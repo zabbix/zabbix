@@ -18,29 +18,48 @@ require_once __DIR__.'/../include/CAPITest.php';
 require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
 /**
- * @onBefore prepareData
- * @onAfter clearData
- *
- * @backup cep_rule,cep_condition,cep_window,cep_window_condition,cep_group,cep_operation,cep_operation_tag
+ * @onBefore	prepareData
+ * @onAfter		clearData
  */
 class testCepRule extends CAPITest {
-	static array $ids = [];
+	static array $ruleids = [];
 
 	public static function prepareData() {
-
+		CTestDataHelper::createObjects([
+			'ceprules' => [
+				[
+					'name' => 'update.success',
+					'operations' => [
+						'step' => 1,
+						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+						'type' => ZBX_CEP_OP_SET_NAME,
+						'event_name' => 'bla'
+					]
+				],
+				[
+					'name' => 'update.fail',
+					'operations' => [
+						'step' => 1,
+						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+						'type' => ZBX_CEP_OP_SET_NAME,
+						'event_name' => 'bla'
+					]
+				]
+			]
+		]);
 	}
 
-	public function clearData() {
-		if (self::$ids) {
-			$this->call('ceprule.delete', self::$ids);
+	public static function clearData() {
+		if (self::$ruleids) {
+			CDataHelper::call('ceprule.delete', self::$ruleids);
 		}
 
 		CTestDataHelper::cleanUp();
 	}
 
-	public function cepRuleCreateDataProvider(): array {
+	public function cepRuleCreateValidationData(): array {
 		return [
-			'Object is required' => [
+			'Non-empty object is required' => [
 				'request' => [],
 				'expected_error' => 'Invalid parameter "/": cannot be empty.'
 			],
@@ -124,10 +143,39 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/execute_when": value must be '.ZBX_CEP_OP_WHEN_EVENT_OCCURRED.'.'
 			],
+			'Operation must contain step' => [
+				'request' => [
+					'name' => 'ceprule',
+					'operations' => [
+						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "step" is missing.'
+			],
+			'Both step and execute_when are required' => [
+				'request' => [
+					'name' => 'ceprule',
+					'operations' => [
+						'step' => 'abc'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "execute_when" is missing.'
+			],
+			'Operation step must be int' => [
+				'request' => [
+					'name' => 'ceprule',
+					'operations' => [
+						'step' => 'abc',
+						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/operations/1/step": an integer is expected.'
+			],
 			'Operation must contain type' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED
 					]
 				],
@@ -137,16 +185,18 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => 'abc'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/type": an integer is expected.'
 			],
-			'Operation type must be non-negative' => [
+			'Operation type must be in range' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => -1
 					]
@@ -172,6 +222,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_COPY_LAST
 					]
@@ -197,6 +248,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME
 					]
@@ -207,6 +259,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 123
@@ -218,6 +271,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.minimal',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -229,6 +283,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -241,6 +296,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -253,6 +309,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -265,6 +322,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -277,6 +335,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.operation.tags',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -289,6 +348,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -301,6 +361,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -315,6 +376,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -329,6 +391,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -343,6 +406,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -358,6 +422,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+						'step' => 1,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
 						'tags' => [
@@ -372,6 +437,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -388,6 +454,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -403,6 +470,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.operation.tags.multiple',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -418,6 +486,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.operation.tags.multiple.unique',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -433,6 +502,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -445,6 +515,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -457,6 +528,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -469,6 +541,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -482,6 +555,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -494,6 +568,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -506,6 +581,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -518,6 +594,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -530,6 +607,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -542,6 +620,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -550,10 +629,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/severity": value must be 0.'
 			],
-			'Ceprule filter must be object' => [
+			'Filter must be object' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -562,22 +642,39 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter": an array is expected.'
 			],
-			'Ceprule filter requires evaltype' => [
+			'Filter can be reset' => [
 				'request' => [
-					'name' => 'ceprule.filter',
+					'name' => 'ceprule.no.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
 					'filter' => []
 				],
-				'expected_error' => 'Invalid parameter "/1/filter": the parameter "evaltype" is missing.'
+				'expected_error' => null
 			],
-			'Ceprule filter evaltype must be integer' => [
+			'Non-empty filter requires evaltype' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
+						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+						'type' => ZBX_CEP_OP_SET_NAME,
+						'event_name' => 'Event name'
+					],
+					'filter' => [
+						'conditions' => []
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/filter": the parameter "evaltype" is missing.'
+			],
+			'Filter evaltype must be integer' => [
+				'request' => [
+					'name' => 'ceprule.filter',
+					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -588,10 +685,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/evaltype": an integer is expected.'
 			],
-			'Ceprule filter evaltype must be in range' => [
+			'Filter evaltype must be in range' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -607,10 +705,11 @@ class testCepRule extends CAPITest {
 					CONDITION_EVAL_TYPE_EXPRESSION
 				]).'.'
 			],
-			'Ceprule filter formula must be string' => [
+			'Filter formula must be string' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -622,10 +721,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/formula": a character string is expected.'
 			],
-			'Ceprule filter formula must be empty unless CONDITION_EVAL_TYPE_AND_OR' => [
+			'Filter formula must be empty unless CONDITION_EVAL_TYPE_AND_OR' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -637,10 +737,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/formula": value must be empty.'
 			],
-			'Ceprule filter conditions must be array' => [
+			'Filter conditions must be array' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -652,10 +753,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions": an array is expected.'
 			],
-			'Ceprule filter conditions can be empty unless CONDITION_EVAL_TYPE_EXPRESSION' => [
+			'Filter conditions can be empty unless CONDITION_EVAL_TYPE_EXPRESSION' => [
 				'request' => [
 					'name' => 'ceprule.filter.conditions.empty',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -667,10 +769,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Ceprule filter formula cannot be empty with CONDITION_EVAL_TYPE_EXPRESSION' => [
+			'Filter formula cannot be empty with CONDITION_EVAL_TYPE_EXPRESSION' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -681,10 +784,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter": the parameter "formula" is missing.'
 			],
-			'Ceprule filter formula must contain identifier' => [
+			'Filter formula must contain identifier' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -696,10 +800,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/formula": incorrect syntax near "abc".'
 			],
-			'Ceprule filter conditions must be present for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			'Filter conditions must be present for CONDITION_EVAL_TYPE_EXPRESSION' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -711,10 +816,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter": the parameter "conditions" is missing.'
 			],
-			'Ceprule filter conditions cannot be empty for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			'Filter conditions cannot be empty for CONDITION_EVAL_TYPE_EXPRESSION' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -727,10 +833,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions": cannot be empty.'
 			],
-			'Ceprule filter conditions must have formulaid for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			'Filter conditions must have formulaid for CONDITION_EVAL_TYPE_EXPRESSION' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -745,10 +852,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "formulaid" is missing.'
 			],
-			'Ceprule filter conditions formulaid must be string for CONDITION_EVAL_TYPE_EXPRESSION' => [
+			'Filter conditions formulaid must be string for CONDITION_EVAL_TYPE_EXPRESSION' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -763,10 +871,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/formulaid": a character string is expected.'
 			],
-			'Ceprule filter conditions formulaid cannot be empty' => [
+			'Filter conditions formulaid cannot be empty' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -781,10 +890,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/formulaid": cannot be empty.'
 			],
-			'Ceprule filter conditions formulaid must be uppercase' => [
+			'Filter conditions formulaid must be uppercase' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -799,10 +909,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/formulaid": uppercase identifier expected.'
 			],
-			'Ceprule filter conditions event_name must be specified' => [
+			'Filter conditions event_name must be specified' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -818,10 +929,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "event_name" is missing.'
 			],
-			'Ceprule filter conditions event_name must be string' => [
+			'Filter conditions event_name must be string' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -838,10 +950,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/event_name": a character string is expected.'
 			],
-			'Ceprule filter conditions event_name must be not empty' => [
+			'Filter conditions event_name must be not empty' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -858,10 +971,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/event_name": cannot be empty.'
 			],
-			'Ceprule filter conditions event_name can be empty if not ZBX_CEP_CONDITION_EVENT_NAME' => [
+			'Filter conditions event_name can be empty if not ZBX_CEP_CONDITION_EVENT_NAME' => [
 				'request' => [
 					'name' => 'ceprule.filter.event_name.empty',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -879,10 +993,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Ceprule filter conditions formulaid must match expression' => [
+			'Filter conditions formulaid must match expression' => [
 				'request' => [
 					'name' => 'ceprule.filter.formulaid',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -899,10 +1014,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/formula": missing filter condition "A".'
 			],
-			'Ceprule filter conditions type must be integer' => [
+			'Filter conditions type must be integer' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -916,10 +1032,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/type": an integer is expected.'
 			],
-			'Ceprule filter conditions type must be in range' => [
+			'Filter conditions type must be in range' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -941,10 +1058,11 @@ class testCepRule extends CAPITest {
 					ZBX_CEP_CONDITION_TIME_PERIOD
 				]).'.'
 			],
-			'Ceprule filter conditions operator must be integer' => [
+			'Filter conditions operator must be integer' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -959,10 +1077,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/operator": an integer is expected.'
 			],
-			'Ceprule filter conditions operator must be in range' => [
+			'Filter conditions operator must be in range' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -982,10 +1101,11 @@ class testCepRule extends CAPITest {
 					CONDITION_OPERATOR_NOT_LIKE
 				]).'.'
 			],
-			'Ceprule filter conditions tag must be string' => [
+			'Filter conditions tag must be string' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1000,10 +1120,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/tag": a character string is expected.'
 			],
-			'Ceprule filter conditions tag must be non-empty' => [
+			'Filter conditions tag must be non-empty' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1018,10 +1139,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/tag": cannot be empty.'
 			],
-			'Ceprule filter conditions tag must be empty when type!=ZBX_CEP_CONDITION_TAG_NAME' => [
+			'Filter conditions tag must be empty when type!=ZBX_CEP_CONDITION_TAG_NAME' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1037,10 +1159,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/tag": value must be empty.'
 			],
-			'Ceprule filter conditions tag_value must be string' => [
+			'Filter conditions tag_value must be string' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1055,10 +1178,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/tag_value": a character string is expected.'
 			],
-			'Ceprule filter conditions tag_value can be empty' => [
+			'Filter conditions tag_value can be empty' => [
 				'request' => [
 					'name' => 'ceprule.filter.tag.value.empty',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1073,10 +1197,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Ceprule filter conditions tag_value must be empty when type!=ZBX_CEP_CONDITION_TAG_VALUE' => [
+			'Filter conditions tag_value must be empty when type!=ZBX_CEP_CONDITION_TAG_VALUE' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1092,10 +1217,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/tag_value": value must be empty.'
 			],
-			'Ceprule filter conditions severity must be integer' => [
+			'Filter conditions severity must be integer' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1110,10 +1236,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/severity": an integer is expected.'
 			],
-			'Ceprule filter conditions severity must be empty when type=ZBX_CEP_CONDITION_EVENT_NAME' => [
+			'Filter conditions severity must be empty when type=ZBX_CEP_CONDITION_EVENT_NAME' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1129,10 +1256,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/severity": value must be 0.'
 			],
-			'Ceprule filter conditions host must be string' => [
+			'Filter conditions host must be string' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1147,10 +1275,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host": a character string is expected.'
 			],
-			'Ceprule filter conditions host must be not empty' => [
+			'Filter conditions host must be not empty' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1165,10 +1294,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host": cannot be empty.'
 			],
-			'Ceprule filter conditions host must be empty when type!=ZBX_CEP_CONDITION_HOST' => [
+			'Filter conditions host must be empty when type!=ZBX_CEP_CONDITION_HOST' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1184,10 +1314,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host": value must be empty.'
 			],
-			'Ceprule filter conditions host_group must be string' => [
+			'Filter conditions host_group must be string' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1202,10 +1333,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_group": a character string is expected.'
 			],
-			'Ceprule filter conditions host_group must be not empty' => [
+			'Filter conditions host_group must be not empty' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1220,10 +1352,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_group": cannot be empty.'
 			],
-			'Ceprule filter conditions host_group must be empty when type=ZBX_CEP_CONDITION_EVENT_NAME' => [
+			'Filter conditions host_group must be empty when type=ZBX_CEP_CONDITION_EVENT_NAME' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1239,10 +1372,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/host_group": value must be empty.'
 			],
-			'Ceprule filter conditions time_period must be string' => [
+			'Filter conditions time_period must be string' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1258,10 +1392,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/time_period": a character string is expected.'
 			],
-			'Ceprule filter conditions time_period must be empty when type!=ZBX_CEP_CONDITION_TIME_PERIOD' => [
+			'Filter conditions time_period must be empty when type!=ZBX_CEP_CONDITION_TIME_PERIOD' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1277,10 +1412,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/time_period": value must be empty.'
 			],
-			'Ceprule filter conditions requires tag when type=ZBX_CEP_CONDITION_TAG_NAME' => [
+			'Filter conditions requires tag when type=ZBX_CEP_CONDITION_TAG_NAME' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1294,10 +1430,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "tag" is missing.'
 			],
-			'Ceprule filter conditions requires tag_value when type=ZBX_CEP_CONDITION_TAG_VALUE' => [
+			'Filter conditions requires tag_value when type=ZBX_CEP_CONDITION_TAG_VALUE' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1311,10 +1448,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "tag_value" is missing.'
 			],
-			'Ceprule filter conditions requires severity when type=ZBX_CEP_CONDITION_SEVERITY' => [
+			'Filter conditions requires severity when type=ZBX_CEP_CONDITION_SEVERITY' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1328,10 +1466,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "severity" is missing.'
 			],
-			'Ceprule filter conditions requires severity must be in range when type=ZBX_CEP_CONDITION_SEVERITY' => [
+			'Filter conditions requires severity must be in range when type=ZBX_CEP_CONDITION_SEVERITY' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1347,10 +1486,11 @@ class testCepRule extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/severity": value must be one of '.
 					implode(', ', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)).'.'
 			],
-			'Ceprule filter conditions requires host when type=ZBX_CEP_CONDITION_HOST' => [
+			'Filter conditions requires host when type=ZBX_CEP_CONDITION_HOST' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1364,10 +1504,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "host" is missing.'
 			],
-			'Ceprule filter conditions requires host_group when type=ZBX_CEP_CONDITION_HOST_GROUP' => [
+			'Filter conditions requires host_group when type=ZBX_CEP_CONDITION_HOST_GROUP' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1381,10 +1522,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "host_group" is missing.'
 			],
-			'Ceprule filter conditions requires time_period when type=ZBX_CEP_CONDITION_TIME_PERIOD' => [
+			'Filter conditions requires time_period when type=ZBX_CEP_CONDITION_TIME_PERIOD' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1398,10 +1540,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "time_period" is missing.'
 			],
-			'Ceprule filter time_period invalid format check' => [
+			'Filter time_period invalid format check' => [
 				'request' => [
 					'name' => 'ceprule.filter',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1416,10 +1559,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/time_period": a time period is expected.'
 			],
-			'Ceprule filter time_period check' => [
+			'Filter time_period check' => [
 				'request' => [
 					'name' => 'ceprule.filter.time_period',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'Event name'
@@ -1434,10 +1578,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Ceprule stop must be integer' => [
+			'Rule stop must be integer' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1446,10 +1591,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/stop": an integer is expected.'
 			],
-			'Ceprule stop must be in range' => [
+			'Rule stop must be in range' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1459,10 +1605,11 @@ class testCepRule extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/stop": value must be one of '.
 					implode(', ', [ZBX_CEP_EXECUTION_CONTINUE, ZBX_CEP_EXECUTION_STOP]).'.'
 			],
-			'Ceprule sortorder must be integer' => [
+			'Rule sortorder must be integer' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1471,10 +1618,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/sortorder": an integer is expected.'
 			],
-			'Ceprule description must be string' => [
+			'Rule description must be string' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1483,10 +1631,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/description": a character string is expected.'
 			],
-			'Ceprule status must be integer' => [
+			'Rule status must be integer' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1495,10 +1644,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/status": an integer is expected.'
 			],
-			'Ceprule status must be in range' => [
+			'Rule status must be in range' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1508,10 +1658,11 @@ class testCepRule extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/status": value must be one of '.
 					implode(', ', [ZBX_CEP_STATUS_ENABLED, ZBX_CEP_STATUS_DISABLED]).'.'
 			],
-			'Ceprule window_type must be integer' => [
+			'Rule window_type must be integer' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1520,10 +1671,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window_type": an integer is expected.'
 			],
-			'Ceprule window_type must be in range' => [
+			'Rule window_type must be in range' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1538,10 +1690,11 @@ class testCepRule extends CAPITest {
 					ZBX_CEP_WINDOW_PATTERN_MATCH
 				]).'.'
 			],
-			'Ceprule window required for window_type=ZBX_CEP_WINDOW_SIMPLE' => [
+			'Rule window required for window_type=ZBX_CEP_WINDOW_SIMPLE' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1550,10 +1703,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "window" is missing.'
 			],
-			'Ceprule window required for window_type=ZBX_CEP_WINDOW_CAUSE_SYMPTOM' => [
+			'Rule window required for window_type=ZBX_CEP_WINDOW_CAUSE_SYMPTOM' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1562,10 +1716,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "window" is missing.'
 			],
-			'Ceprule window required for window_type=ZBX_CEP_WINDOW_TAG_MATCH' => [
+			'Rule window required for window_type=ZBX_CEP_WINDOW_TAG_MATCH' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1574,10 +1729,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "window" is missing.'
 			],
-			'Ceprule window required for window_type=ZBX_CEP_WINDOW_PATTERN_MATCH' => [
+			'Rule window required for window_type=ZBX_CEP_WINDOW_PATTERN_MATCH' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1586,10 +1742,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "window" is missing.'
 			],
-			'Ceprule window must be object' => [
+			'Rule window must be object' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1599,23 +1756,11 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window": an array is expected.'
 			],
-			'Defaults (duration) are applied to window=ZBX_CEP_WINDOW_SIMPLE' => [
-				'request' => [
-					'name' => 'ceprule.window.simple',
-					'operations' => [
-						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
-						'type' => ZBX_CEP_OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
-					'window' => []
-				],
-				'expected_error' => null
-			],
 			'Unexpected fields for window are rejected' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1627,10 +1772,25 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window": unexpected parameter "unexpected".'
 			],
+			'Duration is required for window!=ZBX_CEP_WINDOW_NONE' => [
+				'request' => [
+					'name' => 'ceprule.window.simple',
+					'operations' => [
+						'step' => 1,
+						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+						'type' => ZBX_CEP_OP_SET_NAME,
+						'event_name' => 'bla'
+					],
+					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
+					'window' => []
+				],
+				'expected_error' => 'Invalid parameter "/1/window": the parameter "duration" is missing.'
+			],
 			'Window duration must be time unit' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1646,6 +1806,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1661,6 +1822,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1676,6 +1838,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.window.duration',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1691,6 +1854,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.window.duration.as.year',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
@@ -1706,12 +1870,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
 					'window' => [
+						'duration' => '1h',
 						'capacity' => 'abc'
 					]
 				],
@@ -1721,12 +1887,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
 					'window' => [
+						'duration' => '1h',
 						'capacity' => -1
 					]
 				],
@@ -1736,12 +1904,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
 					'window' => [
+						'duration' => '1h',
 						'script' => 123
 					]
 				],
@@ -1751,12 +1921,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
 					'window' => [
+						'duration' => '1h',
 						'script' => 'abc'
 					]
 				],
@@ -1766,12 +1938,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
 					'window' => [
+						'duration' => '1h',
 						'script' => 'abc'
 					]
 				],
@@ -1781,12 +1955,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'script' => 'abc'
 					]
 				],
@@ -1796,12 +1972,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_PATTERN_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'script' => ''
 					]
 				],
@@ -1811,12 +1989,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
 					'window' => [
+						'duration' => '1h',
 						'group_by_host_group' => 123
 					]
 				],
@@ -1826,12 +2006,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
 					'window' => [
+						'duration' => '1h',
 						'group_by_host' => 123
 					]
 				],
@@ -1841,12 +2023,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
 					'window' => [
+						'duration' => '1h',
 						'group_by_tag' => 123
 					]
 				],
@@ -1856,12 +2040,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
 					'window' => [
+						'duration' => '1h',
 						'group_by_tag' => ZBX_CEP_GROUP_BY_YES
 					]
 				],
@@ -1871,12 +2057,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
 					'window' => [
+						'duration' => '1h',
 						'group_by_tag' => ZBX_CEP_GROUP_BY_YES,
 						'tag' => 123
 					]
@@ -1887,12 +2075,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
 					'window' => [
+						'duration' => '1h',
 						'group_by_tag' => ZBX_CEP_GROUP_BY_YES,
 						'tag' => ''
 					]
@@ -1903,12 +2093,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
 					'window' => [
+						'duration' => '1h',
 						'group_by_tag' => ZBX_CEP_GROUP_BY_NO,
 						'tag' => 'abc'
 					]
@@ -1919,20 +2111,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.window.symptom',
 					'operations' => [
-						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
-						'event_type' => ZBX_CEP_EXECUTE_EVENT_TYPE_ANY,
-						'type' => ZBX_CEP_OP_SET_NAME,
-						'event_name' => 'bla'
-					],
-					'window_type' => ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
-					'window' => []
-				],
-				'expected_error' => 'Invalid parameter "/1/window": at least one of "group_by_host_group", "group_by_host" or "group_by_tag" parameters must be enabled.'
-			],
-			'At least one group_by* required for window=ZBX_CEP_WINDOW_CAUSE_SYMPTOM, test with group_by_host_group' => [
-				'request' => [
-					'name' => 'ceprule.window.symptom.group_by_host_group',
-					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'event_type' => ZBX_CEP_EXECUTE_EVENT_TYPE_ANY,
 						'type' => ZBX_CEP_OP_SET_NAME,
@@ -1940,6 +2119,24 @@ class testCepRule extends CAPITest {
 					],
 					'window_type' => ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
 					'window' => [
+						'duration' => '1h'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/window": at least one of "group_by_host_group", "group_by_host" or "group_by_tag" parameters must be enabled.'
+			],
+			'At least one group_by* required for window=ZBX_CEP_WINDOW_CAUSE_SYMPTOM, test with group_by_host_group' => [
+				'request' => [
+					'name' => 'ceprule.window.symptom.group_by_host_group',
+					'operations' => [
+						'step' => 1,
+						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+						'event_type' => ZBX_CEP_EXECUTE_EVENT_TYPE_ANY,
+						'type' => ZBX_CEP_OP_SET_NAME,
+						'event_name' => 'bla'
+					],
+					'window_type' => ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
+					'window' => [
+						'duration' => '1h',
 						'group_by_host_group' => ZBX_CEP_GROUP_BY_YES
 					]
 				],
@@ -1949,6 +2146,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.window.symptom.group_by_host',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'event_type' => ZBX_CEP_EXECUTE_EVENT_TYPE_ANY,
 						'type' => ZBX_CEP_OP_SET_NAME,
@@ -1956,6 +2154,7 @@ class testCepRule extends CAPITest {
 					],
 					'window_type' => ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
 					'window' => [
+						'duration' => '1h',
 						'group_by_host' => ZBX_CEP_GROUP_BY_YES
 					]
 				],
@@ -1965,6 +2164,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.window.symptom.group_by_tag',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'event_type' => ZBX_CEP_EXECUTE_EVENT_TYPE_ANY,
 						'type' => ZBX_CEP_OP_SET_NAME,
@@ -1972,6 +2172,7 @@ class testCepRule extends CAPITest {
 					],
 					'window_type' => ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
 					'window' => [
+						'duration' => '1h',
 						'group_by_tag' => ZBX_CEP_GROUP_BY_YES,
 						'tag' => 'abc'
 					]
@@ -1983,6 +2184,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.symptom.no.operations',
 					'window_type' => ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
 					'window' => [
+						'duration' => '1h',
 						'group_by_tag' => ZBX_CEP_GROUP_BY_YES,
 						'tag' => 'abc'
 					]
@@ -1993,12 +2195,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
 					'window' => [
+						'duration' => '1h',
 						'event_count_tag' => 123
 					]
 				],
@@ -2008,12 +2212,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.window.event_count_tag',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
 					'window' => [
+						'duration' => '1h',
 						'event_count_tag' => ''
 					]
 				],
@@ -2023,12 +2229,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_NONE,
 					'window' => [
+						'duration' => '1h',
 						'event_count_tag' => 'abc'
 					]
 				],
@@ -2038,12 +2246,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 							'formula' => 'A'
@@ -2056,6 +2266,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.symptom.filter.empty',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'event_type' => ZBX_CEP_EXECUTE_EVENT_TYPE_ANY,
 						'type' => ZBX_CEP_OP_SET_NAME,
@@ -2063,6 +2274,7 @@ class testCepRule extends CAPITest {
 					],
 					'window_type' => ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [],
 						'group_by_host' => ZBX_CEP_GROUP_BY_YES
 					]
@@ -2073,12 +2285,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_PATTERN_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 							'formula' => 'A'
@@ -2091,12 +2305,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.pattern.filter.empty',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_PATTERN_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [],
 						'script' => 'abc'
 					]
@@ -2107,12 +2323,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'unexpected' => true
 						]
@@ -2124,12 +2342,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => 'abc'
 						]
@@ -2141,12 +2361,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => -1
 						]
@@ -2163,12 +2385,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'formula' => 123
@@ -2181,12 +2405,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'formula' => 'abc'
@@ -2199,12 +2425,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 							'formula' => ''
@@ -2217,12 +2445,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 							'formula' => 'abc'
@@ -2235,12 +2465,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => [
@@ -2255,12 +2487,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 							'formula' => 'A'
@@ -2273,12 +2507,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 							'formula' => 'A',
@@ -2292,12 +2528,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 							'formula' => 'A',
@@ -2313,12 +2551,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 							'formula' => 'A',
@@ -2335,12 +2575,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 							'formula' => 'A',
@@ -2357,12 +2599,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 							'formula' => 'A',
@@ -2379,12 +2623,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 							'formula' => 'A',
@@ -2403,12 +2649,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 							'formula' => 'A',
@@ -2425,12 +2673,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => [
@@ -2449,12 +2699,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => [
@@ -2469,12 +2721,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => [
@@ -2490,12 +2744,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => [
@@ -2511,12 +2767,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => [
@@ -2533,12 +2791,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => [
@@ -2556,12 +2816,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => [
@@ -2579,12 +2841,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => [
@@ -2602,12 +2866,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => [
@@ -2623,12 +2889,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => [
@@ -2645,12 +2913,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.window.filter.conditions.tag.empty',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => [
@@ -2667,12 +2937,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => [
@@ -2688,12 +2960,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => [
@@ -2710,12 +2984,14 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.filter.conditions.tag_value.empty',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
 					'window' => [
+						'duration' => '1h',
 						'filter' => [
 							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 							'conditions' => [
@@ -2732,11 +3008,15 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.filter.conditions.like',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
+					'window' => [
+						'duration' => '1h'
+					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
@@ -2752,11 +3032,15 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.filter.conditions.like',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
+					'window' => [
+						'duration' => '1h'
+					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
@@ -2772,11 +3056,15 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.filter.conditions.like',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
+					'window' => [
+						'duration' => '1h'
+					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
@@ -2792,11 +3080,15 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule.filter.conditions.like',
 					'operations' => [
+						'step' => 1,
 						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
 						'type' => ZBX_CEP_OP_SET_NAME,
 						'event_name' => 'bla'
 					],
 					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
+					'window' => [
+						'duration' => '1h'
+					],
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
@@ -2812,13 +3104,289 @@ class testCepRule extends CAPITest {
 	}
 
 	/**
-	 * @dataProvider cepRuleCreateDataProvider
+	 * @dataProvider cepRuleCreateValidationData
 	 */
-	public function testCepRule_Create(array $request, ?string $expected_error = null) {
+	public function testCepRule_CreateValidation(array $request, ?string $expected_error = null) {
 		$result = $this->call('ceprule.create', $request, $expected_error);
 
 		if ($expected_error === null) {
-			self::$ids = array_merge(self::$ids, $result['result']['cep_ruleids']);
+			self::$ruleids = array_merge(self::$ruleids, $result['result']['cep_ruleids']);
 		}
 	}
+
+	public function cepRuleUpdateValidation(): array {
+		return [
+			'Ruleid(s) required' => [
+				'request' => [],
+				'expected_error' => 'Invalid parameter "/1": the parameter "cep_ruleid" is missing.'
+			],
+			'Cannot send unexpected fields' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.fail',
+					'unexpected' => 'unexpected'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "unexpected".'
+			],
+			'Cannot set empty name' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.fail',
+					'name' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
+			],
+			'Cannot send duplicate names' => [
+				'request' => [
+					[
+						'cep_ruleid' => ':ceprule:update.fail',
+						'name' => 'abc'
+					],
+					[
+						'cep_ruleid' => ':ceprule:update.success',
+						'name' => 'abc'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name)=(abc) already exists.'
+			],
+			'Cannot set name existing in DB' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.fail',
+					'name' => 'update.success'
+				],
+				'expected_error' => 'CEP rule "update.success" already exists.'
+			],
+			'Can reset filter' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.fail',
+					'filter' => []
+				],
+				'expected_error' => null
+			],
+			'Cannot send unexpected fields in filter' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.fail',
+					'filter' => [
+						'unexpected' => 'unexpected'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/filter": unexpected parameter "unexpected".'
+			],
+			'Required fields checked for non-empty filter' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.fail',
+					'filter' => [
+						'conditions' => []
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/filter": the parameter "evaltype" is missing.'
+			],
+			'Empty window accepted for ZBX_CEP_WINDOW_NONE' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.success',
+					'window' => []
+				],
+				'expected_error' => null
+			],
+			'Window required on window type switch' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.fail',
+					'window_type' => ZBX_CEP_WINDOW_SIMPLE
+				],
+				'expected_error' => 'Invalid parameter "/1/window": an array is expected.'
+			],
+			'Unexpected fields in window are rejected' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.fail',
+					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
+					'window' => [
+						'unexpected' => true
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/window": unexpected parameter "unexpected".'
+			],
+			'At least one group_by* required for window=ZBX_CEP_WINDOW_CAUSE_SYMPTOM' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.fail',
+					'window_type' => ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
+					'window' => []
+				],
+				'expected_error' => 'Invalid parameter "/1/window": at least one of "group_by_host_group", "group_by_host" or "group_by_tag" parameters must be enabled.'
+			],
+			'At least one group_by* required for window=ZBX_CEP_WINDOW_CAUSE_SYMPTOM, test with group_by_host_group' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.success',
+					'window_type' => ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
+					'window' => [
+						'group_by_host_group' => ZBX_CEP_GROUP_BY_YES
+					]
+				],
+				'expected_error' => null
+			],
+			'At least one group_by* required for window=ZBX_CEP_WINDOW_CAUSE_SYMPTOM, switch to group_by_host' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.success',
+					'window_type' => ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
+					'window' => [
+						'group_by_host_group' => ZBX_CEP_GROUP_BY_NO,
+						'group_by_host' => ZBX_CEP_GROUP_BY_YES
+					]
+				],
+				'expected_error' => null
+			],
+			'At least one group_by* required for window=ZBX_CEP_WINDOW_CAUSE_SYMPTOM, switch to group_by_tag requires tag' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.fail',
+					'window_type' => ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
+					'window' => [
+						'group_by_host_group' => ZBX_CEP_GROUP_BY_NO,
+						'group_by_host' => ZBX_CEP_GROUP_BY_NO,
+						'group_by_tag' => ZBX_CEP_GROUP_BY_YES
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/window": the parameter "tag" is missing.'
+			],
+			'At least one group_by* required for window=ZBX_CEP_WINDOW_CAUSE_SYMPTOM, switch to group_by_tag' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.success',
+					'window_type' => ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
+					'window' => [
+						'group_by_host_group' => ZBX_CEP_GROUP_BY_NO,
+						'group_by_host' => ZBX_CEP_GROUP_BY_NO,
+						'group_by_tag' => ZBX_CEP_GROUP_BY_YES,
+						'tag' => 'abc'
+					]
+				],
+				'expected_error' => null
+			],
+			'Can switch to ZBX_CEP_WINDOW_TAG_MATCH' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.success',
+					'name' => 'pattern',
+					'window_type' => ZBX_CEP_WINDOW_PATTERN_MATCH,
+					'window' => [
+						'duration' => '1h'
+					]
+				],
+				'expected_error' => null
+			],
+			'Cannot pass non-empty window for switch to ZBX_CEP_WINDOW_NONE' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.success',
+					'name' => 'pattern',
+					'window_type' => ZBX_CEP_WINDOW_NONE,
+					'window' => [
+						'duration' => '1h'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/window": should be empty.'
+			],
+
+			'Can provide filter for switch to ZBX_CEP_WINDOW_TAG_MATCH' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.success',
+					'name' => 'pattern',
+					'window_type' => ZBX_CEP_WINDOW_TAG_MATCH,
+					'window' => [
+						'duration' => '1h',
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+							'conditions' => [
+								'type' => ZBX_CEP_WINDOW_CONDITION_OLD_TAG_VALUE,
+								'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+								'past_tag' => 'abc',
+								'tag_value' => ''
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Can reset window' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.success',
+					'window_type' => ZBX_CEP_WINDOW_NONE
+				],
+				'expected_error' => null
+			],
+			'Requires execute_when for operations' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.fail',
+					'operations' => [
+						'unexpected' => 'unexpected'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "execute_when" is missing.'
+			],
+			'Cannot send unexpected field in operations' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.fail',
+					'operations' => [
+						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+						'unexpected' => 'unexpected'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/operations/1": unexpected parameter "unexpected".'
+			],
+			'Can update operations' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.success',
+					'operations' => [
+						'step' => 1,
+						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+						'type' => ZBX_CEP_OP_SET_NAME,
+						'event_name' => 'update.operation'
+					]
+				],
+				'expected_error' => null
+			],
+			'Can reset operations' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.success',
+					'operations' => []
+				],
+				'expected_error' => null
+			],
+			'Can update stop' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.success',
+					'stop' => ZBX_CEP_EXECUTION_STOP
+				],
+				'expected_error' => null
+			],
+			'Can update sortorder' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.success',
+					'sortorder' => 123
+				],
+				'expected_error' => null
+			],
+			'Can update description' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.success',
+					'description' => 'abc'
+				],
+				'expected_error' => null
+			],
+			'Can update status' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.success',
+					'status' => ZBX_CEP_STATUS_DISABLED
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider cepRuleUpdateValidation
+	 */
+	public function testCepRule_UpdateValidation(array $request, ?string $expected_error = null) {
+		if (!is_numeric(key($request))) {
+			$request = [$request];
+		}
+
+		CTestDataHelper::convertCepRuleReferences($request);
+
+		$this->call('ceprule.update', $request, $expected_error);
+	}
 }
+
