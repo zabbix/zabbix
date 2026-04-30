@@ -99,7 +99,7 @@ class CTrend extends CApiService {
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// Filters.
-			'itemids' =>		['type' => API_IDS, 'flags' => API_NORMALIZE, 'uniq' => true],
+			'itemids' =>		['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'time_from' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'time_till' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			// Output.
