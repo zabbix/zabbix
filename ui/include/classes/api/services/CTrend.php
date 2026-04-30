@@ -103,7 +103,7 @@ class CTrend extends CApiService {
 			'time_from' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'time_till' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			// Output.
-			'output' =>			['type' => API_OUTPUT, 'flags' => API_NOT_EMPTY, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
+			'output' =>			['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>	['type' => API_BOOLEAN, 'default' => false],
 			'limit' =>			['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
 		]];
