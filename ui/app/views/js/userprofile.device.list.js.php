@@ -38,36 +38,21 @@ const view = new class {
 		});
 
 		document.querySelector('.js-create-device')?.addEventListener('click', () => {
-			ZABBIX.PopupManager.open('user.device.create', null, {popup_options: {prevent_navigation: false}});
+			ZABBIX.PopupManager.open('user.device.init.view', null, {popup_options: {prevent_navigation: false}});
 		});
 	}
 
 	#delete(target, data) {
-		data[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('user')) ?>;
-		const urlparams = {action: 'user.device.delete'};
+		if (window.confirm(this.#confirm_messages['user.device.delete'])) {
+			target.classList.add('is-loading');
+			data[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('user')) ?>;
 
-		if (target !== null) {
-			this.#confirmAction(urlparams, data, target);
+			this.#post({action: 'user.device.delete'}, data)
+				.finally(() => {
+					target.classList.remove('is-loading');
+					target.blur();
+				});
 		}
-		else {
-			this.#post(urlparams, data);
-		}
-	}
-
-	#confirmAction(urlparams, data, target) {
-		const message = this.#confirm_messages[urlparams.action]
-
-		if (!window.confirm(message)) {
-			return;
-		}
-
-		target.classList.add('is-loading');
-
-		this.#post(urlparams, data)
-			.finally(() => {
-				target.classList.remove('is-loading');
-				target.blur();
-			});
 	}
 
 	#post(urlparams, data) {

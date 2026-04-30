@@ -14,7 +14,7 @@
 **/
 
 
-class CControllerUserDeviceCreate extends CController {
+class CControllerUserDeviceInitView extends CController {
 
 	protected function init(): void {
 		$this->disableCsrfValidation();

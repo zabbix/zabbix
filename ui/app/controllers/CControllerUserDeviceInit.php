@@ -23,7 +23,6 @@ class CControllerUserDeviceInit extends CController {
 
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
-			'admin_mode' => ['boolean'],
 			'userid' => ['db users.userid', 'required']
 		]];
 	}

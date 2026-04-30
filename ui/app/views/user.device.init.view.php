@@ -23,8 +23,7 @@ $form = (new CForm('post'))
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('user')))->removeId())
 	->setId('user-device-form')
 	->setName('user_device_form')
-	->addItem(getMessages())
-	->addVar('admin_mode', $data['admin_mode']);
+	->addItem(getMessages());
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
@@ -87,7 +86,7 @@ $output = [
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('../../../js/vendors/qrcode/qrcode.js').
-		$this->readJsFile('user.device.create.js.php').
+		$this->readJsFile('user.device.init.view.js.php').
 		'user_device_create_popup.init('.json_encode([
 			'rules' => $data['js_validation_rules'],
 			'admin_mode' => $data['admin_mode']

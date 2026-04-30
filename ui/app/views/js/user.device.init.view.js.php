@@ -30,7 +30,7 @@ window.user_device_create_popup = new class {
 	#device_uuid = null;
 
 	init({rules, admin_mode}) {
-		this.#overlay = overlays_stack.getById('user.device.create');
+		this.#overlay = overlays_stack.getById('user.device.init.view');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#footer = this.#overlay.$dialogue.$footer[0];
 		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
@@ -44,7 +44,6 @@ window.user_device_create_popup = new class {
 		this.#initEvents();
 
 		if (!admin_mode) {
-			this.#overlay.setLoading();
 			this.#footer.querySelector('.js-submit').classList.add('is-loading');
 			this.#submit();
 		}

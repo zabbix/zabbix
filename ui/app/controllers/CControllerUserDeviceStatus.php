@@ -45,12 +45,8 @@ class CControllerUserDeviceStatus extends CController {
 			return false;
 		}
 
-		if (!CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
-				|| !CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
-			return false;
-		}
-
-		return true;
+		return CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
+			|| CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER);
 	}
 
 	protected function doAction() {
