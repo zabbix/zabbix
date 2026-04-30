@@ -218,10 +218,10 @@
 								hint += "\n" + maintenance.description;
 							}
 
-							maintenance_icon.setAttribute('data-hintbox-contents', hint);
+							maintenance_icon.setAttribute('data-hintbox-html', hint);
 						}
 						else {
-							maintenance_icon.setAttribute('data-hintbox-contents',
+							maintenance_icon.setAttribute('data-hintbox-html',
 								<?= json_encode(_('Inaccessible maintenance')); ?>);
 						}
 

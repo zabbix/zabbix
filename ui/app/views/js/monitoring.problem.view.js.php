@@ -417,7 +417,7 @@
 							maintenance_icon.setAttribute('type', 'button');
 							maintenance_icon.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_WRENCH_ALT_SMALL,
 								ZBX_STYLE_COLOR_WARNING, ZBX_STYLE_NO_INDENT);
-							maintenance_icon.setAttribute('data-hintbox-contents', hint)
+							maintenance_icon.setAttribute('data-hintbox-html', hint)
 							maintenance_icon.setAttribute('data-hintbox', '1');
 							maintenance_icon.setAttribute('data-hintbox-class', ZBX_STYLE_HINTBOX_WRAP);
 							maintenance_icon.setAttribute('data-hintbox-static', '1');

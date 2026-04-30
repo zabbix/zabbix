@@ -269,10 +269,10 @@
 								hint += "\n" + maintenance.description;
 							}
 
-							maintenance_icon.setAttribute('data-hintbox-contents', hint);
+							maintenance_icon.setAttribute('data-hintbox-html', hint);
 						}
 						else {
-							maintenance_icon.setAttribute('data-hintbox-contents',
+							maintenance_icon.setAttribute('data-hintbox-html',
 								<?= json_encode(_('Inaccessible maintenance')); ?>);
 						}
 
@@ -316,7 +316,7 @@
 						description_icon.setAttribute('type', 'button');
 						description_icon.setAttribute('role', 'button');
 						description_icon.setAttribute('data-content', '?');
-						description_icon.setAttribute('data-hintbox-contents', description_expanded);
+						description_icon.setAttribute('data-hintbox-html', description_expanded);
 						description_icon.setAttribute('data-hintbox', '1');
 						description_icon.setAttribute('data-hintbox-class', ZBX_STYLE_HINTBOX_WRAP);
 						description_icon.setAttribute('data-hintbox-static', '1');
