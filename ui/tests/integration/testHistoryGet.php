@@ -63,7 +63,12 @@ class testHistoryGet extends CIntegrationTest {
 			['key_' => 'trapper_float_range', 'value_type' => ITEM_VALUE_TYPE_FLOAT],
 			['key_' => 'trapper_float_sort', 'value_type' => ITEM_VALUE_TYPE_FLOAT],
 			['key_' => 'trapper_uint_count', 'value_type' => ITEM_VALUE_TYPE_UINT64],
-			['key_' => 'trapper_str_search', 'value_type' => ITEM_VALUE_TYPE_STR]
+			['key_' => 'trapper_str_search', 'value_type' => ITEM_VALUE_TYPE_STR],
+			['key_' => 'trapper_str_startsearch', 'value_type' => ITEM_VALUE_TYPE_STR],
+			['key_' => 'trapper_str_wildcard', 'value_type' => ITEM_VALUE_TYPE_STR],
+			['key_' => 'trapper_uint_filter', 'value_type' => ITEM_VALUE_TYPE_UINT64],
+			['key_' => 'trapper_text_search', 'value_type' => ITEM_VALUE_TYPE_TEXT],
+			['key_' => 'trapper_float_ns_sort', 'value_type' => ITEM_VALUE_TYPE_FLOAT]
 		];
 
 		$item_params = [];
@@ -417,6 +422,504 @@ class testHistoryGet extends CIntegrationTest {
 		]);
 		$this->assertCount(1, $response['result']);
 		$this->assertEquals('other_gamma', $response['result'][0]['value']);
+
+		return true;
+	}
+
+	public function testHistoryValue_caseInsensitiveSearch() {
+		$tm = $this->timeMonotonic();
+		$itemid = self::$items['trapper_str_search']['itemid'];
+
+		$values = [
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'Case_Alpha', 'clock' => $tm, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'CASE_BETA', 'clock' => $tm + 1, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'other', 'clock' => $tm + 2, 'ns' => 0]
+		];
+
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
+
+		$this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2
+		], 5, 5, function($response) {
+			return count($response['result']) === 3;
+		});
+
+		// Uppercase search term matches both mixed-case and uppercase values
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'CASE_']
+		]);
+		$this->assertCount(2, $response['result']);
+
+		// Lowercase search term matches the all-uppercase value
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'case_beta']
+		]);
+		$this->assertCount(1, $response['result']);
+		$this->assertEquals('CASE_BETA', $response['result'][0]['value']);
+
+		// startSearch is also case-insensitive
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'case_'],
+			'startSearch' => true
+		]);
+		$this->assertCount(2, $response['result']);
+
+		return true;
+	}
+
+	public function testHistoryValue_startSearch() {
+		$tm = $this->timeMonotonic();
+		$itemid = self::$items['trapper_str_startsearch']['itemid'];
+
+		$values = [
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_startsearch', 'value' => 'alpha_start', 'clock' => $tm, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_startsearch', 'value' => 'end_alpha', 'clock' => $tm + 1, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_startsearch', 'value' => 'other', 'clock' => $tm + 2, 'ns' => 0]
+		];
+
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
+
+		$this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2
+		], 5, 5, function($response) {
+			return count($response['result']) === 3;
+		});
+
+		// Default substring match: both 'alpha_start' and 'end_alpha' contain 'alpha'
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'alpha']
+		]);
+		$this->assertCount(2, $response['result']);
+
+		// startSearch: only 'alpha_start' has 'alpha' as a prefix
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'alpha'],
+			'startSearch' => true
+		]);
+		$this->assertCount(1, $response['result']);
+		$this->assertEquals('alpha_start', $response['result'][0]['value']);
+
+		// startSearch + excludeSearch: everything except values starting with 'alpha'
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'alpha'],
+			'startSearch' => true,
+			'excludeSearch' => true
+		]);
+		$this->assertCount(2, $response['result']);
+
+		return true;
+	}
+
+	public function testHistoryValue_searchWildcardsEnabled() {
+		$tm = $this->timeMonotonic();
+		$itemid = self::$items['trapper_str_wildcard']['itemid'];
+
+		$values = [
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_wildcard', 'value' => 'abc123', 'clock' => $tm, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_wildcard', 'value' => 'abc456', 'clock' => $tm + 1, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_wildcard', 'value' => 'xyz123', 'clock' => $tm + 2, 'ns' => 0]
+		];
+
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
+
+		$this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2
+		], 5, 5, function($response) {
+			return count($response['result']) === 3;
+		});
+
+		// No wildcard support: literal '*' is not present in any value
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'abc*']
+		]);
+		$this->assertCount(0, $response['result']);
+
+		// 'abc*' matches 'abc123' and 'abc456'
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'abc*'],
+			'searchWildcardsEnabled' => true
+		]);
+		$this->assertCount(2, $response['result']);
+
+		// '*123' matches 'abc123' and 'xyz123'
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => '*123'],
+			'searchWildcardsEnabled' => true
+		]);
+		$this->assertCount(2, $response['result']);
+
+		// 'abc*' + excludeSearch: only 'xyz123'
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'abc*'],
+			'searchWildcardsEnabled' => true,
+			'excludeSearch' => true
+		]);
+		$this->assertCount(1, $response['result']);
+		$this->assertEquals('xyz123', $response['result'][0]['value']);
+
+		return true;
+	}
+
+	public function testHistoryValue_filterValue() {
+		$tm = $this->timeMonotonic();
+		$itemid = self::$items['trapper_uint_filter']['itemid'];
+
+		$values = [
+			['host' => self::HOSTNAME, 'key' => 'trapper_uint_filter', 'value' => 100, 'clock' => $tm, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_uint_filter', 'value' => 200, 'clock' => $tm + 1, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_uint_filter', 'value' => 300, 'clock' => $tm + 2, 'ns' => 0]
+		];
+
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
+
+		$this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_UINT64,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2
+		], 5, 5, function($response) {
+			return count($response['result']) === 3;
+		});
+
+		// Exact match on a single value
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_UINT64,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'filter' => ['value' => '200']
+		]);
+		$this->assertCount(1, $response['result']);
+		$this->assertEquals('200', $response['result'][0]['value']);
+
+		// Exact match on multiple values
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_UINT64,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'filter' => ['value' => ['100', '300']]
+		]);
+		$this->assertCount(2, $response['result']);
+
+		// filter + countOutput
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_UINT64,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'filter' => ['value' => ['100', '300']],
+			'countOutput' => true
+		]);
+		$this->assertEquals('2', $response['result']);
+
+		return true;
+	}
+
+	public function testHistoryValue_textSearch() {
+		$tm = $this->timeMonotonic();
+		$itemid = self::$items['trapper_text_search']['itemid'];
+
+		$values = [
+			['host' => self::HOSTNAME, 'key' => 'trapper_text_search', 'value' => 'contains alpha keyword', 'clock' => $tm, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_text_search', 'value' => 'contains beta keyword', 'clock' => $tm + 1, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_text_search', 'value' => 'no match here', 'clock' => $tm + 2, 'ns' => 0]
+		];
+
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
+
+		$this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_TEXT,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2
+		], 5, 5, function($response) {
+			return count($response['result']) === 3;
+		});
+
+		// Substring match on text value
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_TEXT,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'keyword']
+		]);
+		$this->assertCount(2, $response['result']);
+
+		// excludeSearch: only the non-matching record
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_TEXT,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'keyword'],
+			'excludeSearch' => true
+		]);
+		$this->assertCount(1, $response['result']);
+		$this->assertEquals('no match here', $response['result'][0]['value']);
+
+		// startSearch on text: only 'contains alpha keyword' starts with 'contains alpha'
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_TEXT,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'contains alpha'],
+			'startSearch' => true
+		]);
+		$this->assertCount(1, $response['result']);
+		$this->assertEquals('contains alpha keyword', $response['result'][0]['value']);
+
+		// countOutput + search on text
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_TEXT,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'keyword'],
+			'countOutput' => true
+		]);
+		$this->assertEquals('2', $response['result']);
+
+		return true;
+	}
+
+	public function testHistoryValue_countOutputWithSearch() {
+		$tm = $this->timeMonotonic();
+		$itemid = self::$items['trapper_str_search']['itemid'];
+
+		$values = [
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'cnt_match_one', 'clock' => $tm, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'cnt_match_two', 'clock' => $tm + 1, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'cnt_other', 'clock' => $tm + 2, 'ns' => 0]
+		];
+
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
+
+		$this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2
+		], 5, 5, function($response) {
+			return count($response['result']) === 3;
+		});
+
+		// countOutput combined with search
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'cnt_match'],
+			'countOutput' => true
+		]);
+		$this->assertEquals('2', $response['result']);
+
+		// countOutput + excludeSearch
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'cnt_match'],
+			'excludeSearch' => true,
+			'countOutput' => true
+		]);
+		$this->assertEquals('1', $response['result']);
+
+		// countOutput + startSearch
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'cnt_match'],
+			'startSearch' => true,
+			'countOutput' => true
+		]);
+		$this->assertEquals('2', $response['result']);
+
+		return true;
+	}
+
+	public function testHistoryValue_sortByNs() {
+		$tm = $this->timeMonotonic();
+		$itemid = self::$items['trapper_float_ns_sort']['itemid'];
+
+		$values = [
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_ns_sort', 'value' => 1.0, 'clock' => $tm, 'ns' => 300],
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_ns_sort', 'value' => 2.0, 'clock' => $tm, 'ns' => 100],
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_ns_sort', 'value' => 3.0, 'clock' => $tm, 'ns' => 200]
+		];
+
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_FLOAT,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm,
+			'sortfield' => 'ns',
+			'sortorder' => 'ASC'
+		], 5, 5, function($response) {
+			return count($response['result']) === 3;
+		});
+
+		$result = $response['result'];
+		$this->assertEquals(100, (int)$result[0]['ns']);
+		$this->assertEquals(200, (int)$result[1]['ns']);
+		$this->assertEquals(300, (int)$result[2]['ns']);
+
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_FLOAT,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm,
+			'sortfield' => 'ns',
+			'sortorder' => 'DESC'
+		]);
+		$result = $response['result'];
+		$this->assertEquals(300, (int)$result[0]['ns']);
+		$this->assertEquals(200, (int)$result[1]['ns']);
+		$this->assertEquals(100, (int)$result[2]['ns']);
+
+		// sort by ns ASC with limit
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_FLOAT,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm,
+			'sortfield' => 'ns',
+			'sortorder' => 'ASC',
+			'limit' => 2
+		]);
+		$this->assertCount(2, $response['result']);
+		$this->assertEquals(100, (int)$response['result'][0]['ns']);
+		$this->assertEquals(200, (int)$response['result'][1]['ns']);
+
+		return true;
+	}
+
+	public function testHistoryValue_logOutputFields() {
+		$tm = $this->timeMonotonic();
+		$itemid = self::$items['trapper_log']['itemid'];
+
+		$values = [
+			['host' => self::HOSTNAME, 'key' => 'trapper_log', 'value' => 'log_field_test', 'clock' => $tm + 600, 'ns' => 0]
+		];
+
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
+
+		// Default output includes all log-specific fields
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_LOG,
+			'itemids' => [$itemid],
+			'time_from' => $tm + 600,
+			'time_till' => $tm + 600
+		], 5, 5, function($response) {
+			return count($response['result']) === 1;
+		});
+
+		$record = $response['result'][0];
+		$this->assertArrayHasKey('itemid', $record);
+		$this->assertArrayHasKey('clock', $record);
+		$this->assertArrayHasKey('timestamp', $record);
+		$this->assertArrayHasKey('source', $record);
+		$this->assertArrayHasKey('severity', $record);
+		$this->assertArrayHasKey('value', $record);
+		$this->assertArrayHasKey('logeventid', $record);
+		$this->assertArrayHasKey('ns', $record);
+		$this->assertEquals('log_field_test', $record['value']);
+
+		// Selective output for log-specific fields
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_LOG,
+			'itemids' => [$itemid],
+			'time_from' => $tm + 600,
+			'time_till' => $tm + 600,
+			'output' => ['itemid', 'value', 'source', 'severity']
+		]);
+		$this->assertCount(1, $response['result']);
+		$record = $response['result'][0];
+		$this->assertArrayHasKey('itemid', $record);
+		$this->assertArrayHasKey('value', $record);
+		$this->assertArrayHasKey('source', $record);
+		$this->assertArrayHasKey('severity', $record);
+		$this->assertArrayNotHasKey('clock', $record);
+		$this->assertArrayNotHasKey('ns', $record);
+		$this->assertArrayNotHasKey('timestamp', $record);
+		$this->assertArrayNotHasKey('logeventid', $record);
+
+		// search on log value
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_LOG,
+			'itemids' => [$itemid],
+			'time_from' => $tm + 600,
+			'time_till' => $tm + 600,
+			'search' => ['value' => 'log_field']
+		]);
+		$this->assertCount(1, $response['result']);
+
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_LOG,
+			'itemids' => [$itemid],
+			'time_from' => $tm + 600,
+			'time_till' => $tm + 600,
+			'search' => ['value' => 'log_field'],
+			'excludeSearch' => true
+		]);
+		$this->assertCount(0, $response['result']);
 
 		return true;
 	}
