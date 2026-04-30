@@ -1203,7 +1203,7 @@ class CFormValidator {
 			$unique_values = [];
 
 			foreach ($values as $key => $entry) {
-				if (in_array($entry, $unique_values)) {
+				if (in_array($entry, $unique_values, true)) {
 					$value = implode(', ', array_map(fn ($k, $v) => $k.'='.$v, array_keys($entry), $entry));
 					$error = self::getMessage($rules, 'uniq', _s('Entry "%1$s" is not unique.', $value));
 					$path = $path.'/'.$key.'/'.$field_names[0];
@@ -1510,7 +1510,7 @@ class CFormValidator {
 	 * @return bool
 	 */
 	private static function checkStringNotIn(array $rules, $value, ?string &$error = null): bool {
-		if (array_key_exists('not_in', $rules) && in_array($value, $rules['not_in'])) {
+		if (array_key_exists('not_in', $rules) && in_array($value, $rules['not_in'], true)) {
 			$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $rules['not_in']));
 			$error = _n('This value cannot be %1$s.', 'This value cannot be one of %1$s.',  $values, count($rules['not_in']));
 
