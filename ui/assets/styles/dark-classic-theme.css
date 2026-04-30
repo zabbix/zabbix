@@ -2275,7 +2275,8 @@ button {
     break-after: page; } }
 :root {
   --datatable-row-height: 31px;
-  --datatable-compact-row-height: calc(var(--datatable-row-height) - 9px); }
+  --datatable-compact-row-height: calc(var(--datatable-row-height) - 9px);
+  --datatable-scrollbar-height: 11px; }
 
 .datatable {
   position: relative;
@@ -2481,26 +2482,25 @@ button {
   .datatable .datatable-scrollbar {
     position: sticky;
     bottom: calc(var(--datatable-row-height) + 1px);
-    z-index: 11;
-    box-sizing: border-box;
-    height: 17px;
-    padding: 4px;
-    margin: -1px 0 1px;
-    overflow: hidden;
-    user-select: none;
+    margin-top: -1px;
+    z-index: 10;
+    height: var(--datatable-scrollbar-height);
+    overflow-x: auto;
+    overflow-y: hidden;
     background-color: #2b2b2b;
-    border-top: 1px solid #303030; }
-    .datatable .datatable-scrollbar.datatable-scrollbar-dragging .datatable-scrollbar-thumb {
-      background-color: #515151; }
-    .datatable .datatable-scrollbar .datatable-scrollbar-thumb {
-      height: 8px;
-      cursor: pointer;
-      background-color: #4a4a4a;
-      border-radius: 5px;
-      will-change: transform;
-      touch-action: none; }
-      .datatable .datatable-scrollbar .datatable-scrollbar-thumb:hover {
-        background-color: #515151; }
+    border-top: 1px solid #303030;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: #c2c2c2 #2b2b2b; }
+    .datatable .datatable-scrollbar ::-webkit-scrollbar {
+      height: var(--datatable-scrollbar-height); }
+    .datatable .datatable-scrollbar .datatable-scrollbar-inner {
+      height: 0; }
+      .datatable .datatable-scrollbar .datatable-scrollbar-inner::after {
+        position: absolute;
+        content: '';
+        height: 1px;
+        width: 100%; }
   .datatable .datatable-footer {
     z-index: 10;
     display: grid;

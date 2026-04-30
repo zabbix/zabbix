@@ -1,6 +1,7 @@
 :root {
 	--datatable-row-height: 31px;
 	--datatable-compact-row-height: calc(var(--datatable-row-height) - 9px);
+	--datatable-scrollbar-height: 11px;
 }
 
 .datatable {
@@ -343,30 +344,29 @@
 	.datatable-scrollbar {
 		position: sticky;
 		bottom: calc(var(--datatable-row-height) + 1px);
-		z-index: 11;
-		box-sizing: border-box;
-		height: 17px;
-		padding: 4px;
-		margin: -1px 0 1px;
-		overflow: hidden;
-		user-select: none;
+		margin-top: -1px;
+		z-index: 10;
+		height: var(--datatable-scrollbar-height);
+		overflow-x: auto;
+		overflow-y: hidden;
 		background-color: $ui-bg-color;
 		border-top: 1px solid $ui-border-color;
+		box-sizing: border-box;
+		scrollbar-width: thin;
+		scrollbar-color: $datatable-scrollbar-thumb-bg-color $ui-bg-color;
 
-		&.datatable-scrollbar-dragging .datatable-scrollbar-thumb {
-			background-color: $datatable-scrollbar-thumb-hover-bg-color;
+		::-webkit-scrollbar {
+			height: var(--datatable-scrollbar-height);
 		}
 
-		.datatable-scrollbar-thumb {
-			height: 8px;
-			cursor: pointer;
-			background-color: $datatable-scrollbar-thumb-bg-color;
-			border-radius: 5px;
-			will-change: transform;
-			touch-action: none;
+		.datatable-scrollbar-inner {
+			height: 0;
 
-			&:hover {
-				background-color: $datatable-scrollbar-thumb-hover-bg-color;
+			&::after {
+				position: absolute;
+				content: '';
+				height: 1px;
+				width: 100%;
 			}
 		}
 	}
@@ -855,10 +855,8 @@
 		user-select: none;
 		pointer-events: none;
 
-		.cell.cell-resizing {
-			.cell-header-resizer {
-				z-index: 4;
-			}
+		.cell.cell-resizing .cell-header-resizer {
+			z-index: 4;
 		}
 	}
 }

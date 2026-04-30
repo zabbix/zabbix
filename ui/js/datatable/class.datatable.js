@@ -55,8 +55,7 @@ class CDataTable {
 	static ZBX_STYLE_OPTIONS_BUTTON = 'datatable-options-button';
 
 	static ZBX_STYLE_SCROLLBAR = 'datatable-scrollbar';
-	static ZBX_STYLE_SCROLLBAR_DRAGGING = 'datatable-scrollbar-dragging';
-	static ZBX_STYLE_SCROLLBAR_THUMB = 'datatable-scrollbar-thumb';
+	static ZBX_STYLE_SCROLLBAR_INNER = 'datatable-scrollbar-inner';
 
 	static ZBX_STYLE_CELL = 'cell';
 	static ZBX_STYLE_CELL_BG = 'cell-bg';
@@ -120,16 +119,6 @@ class CDataTable {
 	 * @type {number}
 	 */
 	static TABLE_OPTIONS_BUTTON_WIDTH = 32;
-
-	/**
-	 * @type {number}
-	 */
-	static SCROLLBAR_THUMB_MIN_WIDTH = 20;
-
-	/**
-	 * @type {number}
-	 */
-	static SCROLLBAR_HORIZONTAL_PADDING = 8;
 
 	/**
 	 * Flag to determine when a component is initialized, to disallow any further modifications.
@@ -198,22 +187,6 @@ class CDataTable {
 	#resize_click_count = 0;
 
 	/**
-	 * Flag indicating whether a scroll-drag operation is currently active.
-	 * Used to lock or unlock pointer movement logic for the custom scrollbar.
-	 *
-	 * @type {boolean}
-	 */
-	#scrolling = false;
-
-	/**
-	 * The initial horizontal coordinate (pageX) when the scroll drag started.
-	 * Used as a reference point to calculate the drag distance relative to the thumb.
-	 *
-	 * @type {number}
-	 */
-	#scroll_page_x = 0;
-
-	/**
 	 * The reference to the custom scrollbar track element.
 	 *
 	 * @type {HTMLElement|null}
@@ -221,31 +194,16 @@ class CDataTable {
 	#scrollbar = null;
 
 	/**
-	 * The reference to the draggable scrollbar thumb element.
+	 * The reference to the inner spacer element inside the scrollbar track.
+	 * Its width is kept in sync with the body's scrollWidth to enable native scrolling.
 	 *
 	 * @type {HTMLElement|null}
 	 */
-	#scrollbar_thumb = null;
-
-	/**
-	 * Flag indicating whether a scrollbar thumb width update is currently scheduled.
-	 * Used as a guard to prevent multiple redundant calls when the scroll position changes rapidly.
-	 *
-	 * @type {boolean}
-	 */
-	#scrollbar_thumb_width_updating = false;
-
-	/**
-	 * Flag indicating whether a scrollbar thumb position update is currently scheduled.
-	 * Used as a guard to prevent multiple redundant calls when the scroll position changes rapidly.
-	 *
-	 * @type {boolean}
-	 */
-	#scrollbar_thumb_position_updating = false;
+	#scrollbar_inner = null;
 
 	/**
 	 * Observer instance that monitors changes in the body dimensions.
-	 * Ensures the scrollbar thumb size is recalculated when the content layout changes.
+	 * Ensures the scrollbar inner width is recalculated when the content layout changes.
 	 *
 	 * @type {ResizeObserver|null}
 	 */
@@ -290,7 +248,7 @@ class CDataTable {
 
 	#filter = {};
 
-	#tabfilter_item = { _index: 0 };
+	#tabfilter_item = {_index: 0};
 
 	#pager = null;
 
@@ -793,14 +751,14 @@ class CDataTable {
 			`),
 			table_options_button: new Template(`
 				<div class="${CDataTable.ZBX_STYLE_OPTIONS_BUTTON} ${ZBX_STYLE_HIDDEN}" tabindex="-1">
-					<button class="${CDataTable.ZBX_STYLE_OPTIONS_LINK}" type="button" role="button" title="${t('Customize table')}">
+					<button class="${CDataTable.ZBX_STYLE_OPTIONS_LINK}" type="button" role="button" title="#{title}">
 						<span class="${ZBX_ICON_FILTERS}"></span>
 					</button>
 				</div>
 			`),
 			scrollbar: new Template(`
 				<div class="${CDataTable.ZBX_STYLE_SCROLLBAR}">
-					<div class="${CDataTable.ZBX_STYLE_SCROLLBAR_THUMB} ${ZBX_STYLE_HIDDEN}"></div>
+					<div class="${CDataTable.ZBX_STYLE_SCROLLBAR_INNER}"></div>
 				</div>
 			`)
 		}
@@ -815,7 +773,7 @@ class CDataTable {
 			this.#scrollbar.remove();
 			this.#scrollbar = null;
 
-			this.#scrollbar_thumb = null;
+			this.#scrollbar_inner = null;
 		}
 
 		this.#save_config_request?.abort?.();
@@ -823,7 +781,6 @@ class CDataTable {
 
 		this.#initialized = false;
 		this.#resizing = false;
-		this.#scrolling = false;
 		this.#options_popup = null;
 	}
 
@@ -1421,7 +1378,6 @@ class CDataTable {
 		this.#applyColumnWidths();
 		this.#applyLastColumnPadding();
 		this.#handleScrollbar();
-		this.#updateScrollbarThumbPosition();
 	}
 
 	onColumnResizeStart(e) {
@@ -1478,7 +1434,7 @@ class CDataTable {
 		const {sort_field, sort_order} = e.detail;
 
 		const state = new CState();
-		state.setParams({ sort: sort_field, sortorder: sort_order });
+		state.setParams({sort: sort_field, sortorder: sort_order});
 		state.push();
 
 		this.#sort_field = sort_field;
@@ -1625,8 +1581,8 @@ class CDataTable {
 	onScroll() {
 		this.#header.scrollLeft = this.#body.scrollLeft;
 
-		if (!this.#resizing) {
-			this.#updateScrollbarThumbPosition();
+		if (this.#scrollbar) {
+			this.#scrollbar.scrollLeft = this.#body.scrollLeft;
 		}
 
 		this.#updateTableOptionsButtonPosition();
@@ -1644,40 +1600,9 @@ class CDataTable {
 		this.dispatchEvent(CDataTable.EVENT_SCROLL);
 	}
 
-	onScrollbarPointerDown = e => {
-		this.#scrolling = true;
-		this.#scroll_page_x = e.pageX;
-
-		this.#scrollbar.classList.add(CDataTable.ZBX_STYLE_SCROLLBAR_DRAGGING);
-	}
-
-	onScrollbarPointerMove = e => {
-		if (!this.#scrolling) {
-			return;
-		}
-
-		const delta = e.pageX - this.#scroll_page_x;
-
-		this.#scroll_page_x = e.pageX;
-
-		const left = Math.max(0, Math.min(
-			this.#body.scrollLeft + (delta / (this.#body.clientWidth / this.#body.scrollWidth)),
-			this.#body.scrollWidth - this.#body.clientWidth
-		));
-
-		this.#header.scrollTo({left});
-		this.#body.scrollTo({left});
-	}
-
-	onScrollbarPointerUp = () => {
-		if (!this.#scrolling) {
-			return;
-		}
-
-		this.#scrolling = false;
-		this.#scroll_page_x = 0;
-
-		this.#scrollbar?.classList.remove(CDataTable.ZBX_STYLE_SCROLLBAR_DRAGGING);
+	onScrollbarScroll = () => {
+		this.#header.scrollLeft = this.#scrollbar.scrollLeft;
+		this.#body.scrollLeft = this.#scrollbar.scrollLeft;
 	}
 
 	onPagerSelect = e => {
@@ -1721,7 +1646,7 @@ class CDataTable {
 			}
 
 			const byte_order_mark = new Uint8Array([0xEF, 0xBB, 0xBF]);
-			const blob = new Blob([byte_order_mark, response.export], { type: 'text/csv;charset=utf-8;' });
+			const blob = new Blob([byte_order_mark, response.export], {type: 'text/csv;charset=utf-8'});
 			const url = URL.createObjectURL(blob);
 
 			target.setAttribute('href', url.toString());
@@ -1988,7 +1913,7 @@ class CDataTable {
 
 		const user_config = this.#user_configs[tabfilter_idx];
 		if (!user_config) {
-			return this;
+			return;
 		}
 
 		if (user_config.sort_field) {
@@ -2132,7 +2057,7 @@ class CDataTable {
 	 * @param {string|undefined} message
 	 * @param {string|undefined} description
 	 */
-	#renderEmptyState({ icon = ZBX_ICON_SEARCH_LARGE, message = t('No data found'), description = undefined } = {}) {
+	#renderEmptyState({icon = ZBX_ICON_SEARCH_LARGE, message = t('No data found'), description = undefined} = {}) {
 		const no_data_message = this.#createNoDataMessage({icon, message, description});
 
 		this.#body.appendChild(no_data_message);
@@ -2207,7 +2132,6 @@ class CDataTable {
 		this.#calculateColumnWidths(response);
 		this.#applyLastColumnPadding();
 		this.#handleScrollbar();
-		this.#updateScrollbarThumbPosition();
 
 		this.#pager.update(response);
 
@@ -2422,7 +2346,7 @@ class CDataTable {
 			return;
 		}
 
-		const header_cell = this.#templates.table_options_button.evaluateToElement();
+		const header_cell = this.#templates.table_options_button.evaluateToElement({title: t('Customize table')});
 		const handle = header_cell.querySelector(`.${CDataTable.ZBX_STYLE_OPTIONS_LINK}`);
 
 		handle.addEventListener('click', e => {
@@ -2529,7 +2453,7 @@ class CDataTable {
 	onWindowResize = () => {
 		this.getData().then(response => {
 			for (const column of this.#visible_columns.filter(column => !column.isResized())) {
-				column.resetWidth(column.getDefaults().getWidth());
+				column.resetWidth();
 			}
 
 			this.#calculateColumnWidths(response);
@@ -2618,29 +2542,14 @@ class CDataTable {
 	}
 
 	#bindScrollbarEvents() {
-		this.#body_resize_observer = new ResizeObserver(() => {
-			this.#resizeScrollbarThumb();
-			this.#updateScrollbarThumbPosition();
-		});
+		this.#body_resize_observer = new ResizeObserver(() => this.#updateScrollbarInnerWidth());
 		this.#body_resize_observer.observe(this.#body);
 
-		this.#scrollbar_thumb.addEventListener('pointerdown', this.onScrollbarPointerDown);
-
-		document.addEventListener('pointermove', this.onScrollbarPointerMove);
-
-		for (const type of ['pointerup', 'pointercancel']) {
-			document.addEventListener(type, this.onScrollbarPointerUp);
-		}
+		this.#scrollbar.addEventListener('scroll', this.onScrollbarScroll);
 	}
 
 	#unbindScrollbarEvents() {
-		this.#scrollbar_thumb?.removeEventListener('pointerdown', this.onScrollbarPointerDown);
-
-		document.removeEventListener('pointermove', this.onScrollbarPointerMove);
-
-		for (const type of ['pointerup', 'pointercancel']) {
-			document.removeEventListener(type, this.onScrollbarPointerUp);
-		}
+		this.#scrollbar?.removeEventListener('scroll', this.onScrollbarScroll);
 	}
 
 	#bindColumnResizeEvent(column, resizer) {
@@ -2731,51 +2640,10 @@ class CDataTable {
 		}
 	}
 
-	#resizeScrollbarThumb() {
-		if (this.#scrollbar_thumb_width_updating) {
-			return;
+	#updateScrollbarInnerWidth() {
+		if (this.#scrollbar_inner) {
+			this.#scrollbar_inner.style.width = `${this.#body.scrollWidth}px`;
 		}
-
-		this.#scrollbar_thumb_width_updating = true;
-
-		requestAnimationFrame(() => {
-			if (this.#scrollbar && this.#scrollbar_thumb) {
-				const thumb_width = this.#getScrollbarThumbWidth();
-
-				this.#scrollbar_thumb.style.width = `${thumb_width}px`;
-				this.#scrollbar_thumb.classList.remove(ZBX_STYLE_HIDDEN);
-			}
-
-			this.#scrollbar_thumb_width_updating = false;
-		});
-	}
-
-	#updateScrollbarThumbPosition() {
-		if (this.#scrollbar_thumb_position_updating) {
-			return;
-		}
-
-		this.#scrollbar_thumb_position_updating = true;
-
-		requestAnimationFrame(() => {
-			if (this.#scrollbar && this.#scrollbar_thumb) {
-				const thumb_width = this.#scrollbar_thumb.getBoundingClientRect().width;
-				const max_thumb_travel = this.#scrollbar.clientWidth - thumb_width - CDataTable.SCROLLBAR_HORIZONTAL_PADDING;
-				const max_scroll = this.#body.scrollWidth - this.#body.clientWidth;
-
-				if (max_scroll <= 0) {
-					this.#scrollbar_thumb.style.transform = 'translateX(0)';
-				}
-				else {
-					const scroll_ratio = this.#body.scrollLeft / max_scroll;
-					const thumb_position = scroll_ratio * max_thumb_travel;
-
-					this.#scrollbar_thumb.style.transform = `translateX(${thumb_position}px)`;
-				}
-			}
-
-			this.#scrollbar_thumb_position_updating = false;
-		});
 	}
 
 	#handleScrollbar() {
@@ -2793,31 +2661,25 @@ class CDataTable {
 				this.#scrollbar.remove();
 				this.#scrollbar = null;
 
-				this.#scrollbar_thumb = null;
+				this.#scrollbar_inner = null;
 			}
 
 			return;
 		}
 
 		if (this.#scrollbar) {
-			this.#resizeScrollbarThumb();
+			this.#updateScrollbarInnerWidth();
 
 			return;
 		}
 
 		this.#scrollbar = this.#templates.scrollbar.evaluateToElement();
-		this.#scrollbar_thumb = this.#scrollbar.querySelector(`.${CDataTable.ZBX_STYLE_SCROLLBAR_THUMB}`);
+		this.#scrollbar_inner = this.#scrollbar.querySelector(`.${CDataTable.ZBX_STYLE_SCROLLBAR_INNER}`);
 
 		this.#bindScrollbarEvents();
+		this.#updateScrollbarInnerWidth();
 
 		this.#element.insertBefore(this.#scrollbar, this.#footer);
-	}
-
-	#getScrollbarThumbWidth() {
-		const thumb_width = (this.#body.clientWidth / this.#body.scrollWidth) * this.#scrollbar.clientWidth
-			- CDataTable.SCROLLBAR_HORIZONTAL_PADDING;
-
-		return Math.max(CDataTable.SCROLLBAR_THUMB_MIN_WIDTH, thumb_width);
 	}
 
 	#applyLastColumnPadding() {
