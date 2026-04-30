@@ -430,7 +430,7 @@ class testHistoryGet extends CIntegrationTest {
 		$itemid = self::$items['trapper_str_search']['itemid'];
 
 		$values = [
-			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'Case', 'clock' => $tm, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'CaseAlpha', 'clock' => $tm, 'ns' => 0],
 			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'CASEBETA', 'clock' => $tm + 1, 'ns' => 0],
 			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'other', 'clock' => $tm + 2, 'ns' => 0]
 		];
