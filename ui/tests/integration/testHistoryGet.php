@@ -157,9 +157,9 @@ class testHistoryGet extends CIntegrationTest {
 			]
 		];
 
-		foreach ($cases as $key => $values) {
-			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
+		$this->sendDataValues('sender', array_merge(...array_values($cases)), self::COMPONENT_SERVER, 0);
 
+		foreach ($cases as $key => $values) {
 			$item = self::$items[$key];
 			$this->callUntilDataIsPresent('history.get', [
 				'history' => $item['value_type'],
