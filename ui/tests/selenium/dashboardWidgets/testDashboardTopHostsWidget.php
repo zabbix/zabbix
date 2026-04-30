@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,7 +17,7 @@
 require_once __DIR__.'/../common/testWidgets.php';
 
 /**
- * @dataSource AllItemValueTypes, TopHostsWidget, ItemValueWidget, GlobalMacros
+ * @dataSource AllItemValueTypes, ItemValueWidget, TopHostsWidget, MonitoringOverview, GlobalMacros
  *
  * @backup profiles
  *
@@ -44,6 +44,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 	protected static $aggregation_itemids;
 	protected static $sparkline_itemids;
 	protected static $top_hosts_itemids;
+	protected static $monitoring_overview_itemids;
 	protected static $dashboardids;
 	protected static $other_dashboardids;
 	protected static $dashboardid;
@@ -107,9 +108,10 @@ class testDashboardTopHostsWidget extends testWidgets {
 		self::$other_dashboardids = CDataHelper::get('ItemValueWidget.dashboardids');
 		self::$aggregation_itemids = CDataHelper::get('ItemValueWidget.itemids');
 		self::$top_hosts_itemids = CDataHelper::get('TopHostsWidget.itemids');
+		self::$monitoring_overview_itemids = CDataHelper::get('MonitoringOverview.itemids');
 
 		// Add value to items for CheckTextItems test.
-		CDataHelper::addItemData(99086, 1000); // 1_item.
+		CDataHelper::addItemData(self::$monitoring_overview_itemids['1_item'], 1000);
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_text'], 'Text for text item');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_text2'],  '2.00');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_log'], 'Logs for text item');
@@ -367,7 +369,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'id:sparkline_time_period_data_source' => ['value' => 'Custom', 'labels' => ['Dashboard', 'Widget', 'Custom'],
 				'visible' => false, 'enabled' => false
 			],
-			'id:sparkline_time_period_reference' => ['value' => '', 'visible' => false],
+			'id:sparkline_time_period_reference' => ['value' => '', 'visible' => false, 'enabled' => false],
 			'id:sparkline_time_period_from' => ['value' => 'now-1h', 'placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255,
 				'visible' => false, 'enabled' => false
 			],
@@ -2780,8 +2782,10 @@ class testDashboardTopHostsWidget extends testWidgets {
 		foreach ($data['column_fields'] as $column) {
 			// Open the Column configuration add or column update dialog depending on the action type.
 			$selector = ($action === 'create') ? 'id:add' : 'xpath:(.//button[@name="edit"])['.$column_count.']';
+			$dialog_title = ($action === 'update') ? 'Update column' : 'New column';
 			$form->query($selector)->waitUntilClickable()->one()->click();
-			$column_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
+			$column_overlay = COverlayDialogElement::get($dialog_title);
+			$column_form = $column_overlay->asForm();
 
 			// Fill Thresholds values.
 			if (array_key_exists('Thresholds', $column)) {
@@ -2801,7 +2805,9 @@ class testDashboardTopHostsWidget extends testWidgets {
 				$column_form->fill($column);
 			}
 
-			$column_form->submit();
+			// waitUntilClickable is required because selecting an item in "Item name" briefly disables the submit button.
+			$column_overlay->getFooter()->query('button', ($action === 'update') ? 'Update' : 'Add')
+					->waitUntilClickable()->one()->click();
 
 			// Updating top host several columns, change it count number.
 			if ($action === 'update') {
@@ -2816,8 +2822,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				}
 
 				$this->assertMessage(TEST_BAD, null, $data['column_error']);
-				$selector = ($action === 'update') ? 'Update column' : 'New column';
-				$this->query('xpath://div/h4[text()="'.$selector.'"]/../button[@title="Close"]')->one()->click();
+				$this->query('xpath://div/h4[text()="'.$dialog_title.'"]/../button[@title="Close"]')->one()->click();
 			}
 
 			$column_form->waitUntilNotVisible();

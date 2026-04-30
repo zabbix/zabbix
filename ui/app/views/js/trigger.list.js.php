@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -105,7 +105,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: () => uncheckTableRows('trigger')
+				callback: () => uncheckTableRows(`trigger_${this.checkbox_hash}`)
 			});
 		}
 
@@ -208,7 +208,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('trigger', response.keepids ?? []);
+						uncheckTableRows(`trigger_${this.checkbox_hash}`, response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -217,7 +217,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						uncheckTableRows('trigger');
+						uncheckTableRows(`trigger_${this.checkbox_hash}`, [], true);
 					}
 
 					location.href = location.href;

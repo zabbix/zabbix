@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -114,6 +114,8 @@ static void	pb_discovery_write_row(zbx_pb_discovery_data_t *data, zbx_uint64_t d
 		zbx_pb_discovery_t	*row;
 
 		row = (zbx_pb_discovery_t *)zbx_malloc(NULL, sizeof(zbx_pb_discovery_t));
+		memset(row, 0, sizeof(zbx_pb_discovery_t));
+
 		row->id = 0;
 		row->druleid = druleid;
 		row->dcheckid = dcheckid;
@@ -124,6 +126,9 @@ static void	pb_discovery_write_row(zbx_pb_discovery_data_t *data, zbx_uint64_t d
 		row->value = zbx_strdup(NULL, value);
 		row->clock = clock;
 		row->error = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(error));
+
+		/* no real value for handleid for now */
+		row->handleid = 0;
 
 		zbx_list_append(&data->rows, row, NULL);
 		data->rows_num++;

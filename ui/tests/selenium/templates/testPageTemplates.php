@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -456,11 +456,48 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->assertTableDataColumn($hosts);
 		$this->assertTableStats(count($hosts));
 		// Reset Hosts filter after scenario.
-		$this->resetFilter();
+		$filter->query('button:Reset')->one()->click();
 	}
 
-	private function resetFilter() {
-		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+	public function testPageTemplates_Delete() {
+		$this->page->login()->open('zabbix.php?action=template.list');
+		$table = $this->query('class:list-table')->asTable()->one();
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
+		$filter->getField('Name')->fill('Template for');
+		$filter->submit();
+		$table->waitUntilReloaded();
+
+		$table_rows_count = $table->getRows()->count();
+		$this->assertTableStats($table_rows_count);
+		$delete_button = $this->query('button:Delete')->one();
+
+		// Cancel delete.
+		$all_templates = $this->query('id:all_templates')->asCheckbox()->one();
+		$all_templates->check();
+		$delete_button->click();
+		$this->page->dismissAlert();
+		$this->assertTableStats($table_rows_count);
+		$this->assertSelectedCount($table_rows_count);
+		$all_templates->uncheck();
+
+		$delete_templates = [
+			['Template for tags filtering'],
+			['Template for tags filtering - clone', 'Template for tags filtering - update']
+		];
+
+		// Delete single/multiple templates.
+		foreach ($delete_templates as $selection) {
+			$template_count = count($selection);
+			$this->selectTableRows($selection);
+			$delete_button->click();
+			$this->page->acceptAlert();
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, ($template_count > 1) ? 'Templates deleted' : 'Template deleted');
+			CMessageElement::find()->one()->close();
+			$table_rows_count = $table_rows_count - $template_count;
+			$this->assertTableStats($table_rows_count);
+			$this->assertSelectedCount(0);
+		}
 	}
 }

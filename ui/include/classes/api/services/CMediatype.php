@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -695,6 +695,15 @@ class CMediatype extends CApiService {
 				_('both "access_token" and "access_expires_in" should be either present or absent')
 			));
 		}
+
+		if ($is_update
+				&& !array_key_exists('client_secret', $mediatype)
+				&& array_key_exists('token_url', $mediatype)
+				&& $mediatype['token_url'] !== $db_mediatype['token_url']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('the parameter "%1$s" is missing', 'client_secret')
+			));
+		}
 	}
 
 	private static function getSmsTypeValidationFields(bool $is_update = false): array {
@@ -912,6 +921,12 @@ class CMediatype extends CApiService {
 					$_upd_media_type_oauth = DB::getUpdatedValues('media_type_oauth', $mediatype, $db_mediatype);
 
 					if ($_upd_media_type_oauth) {
+						if (array_key_exists('authorization_url', $_upd_media_type_oauth)
+								|| array_key_exists('token_url', $_upd_media_type_oauth)) {
+							$_upd_media_type_oauth['tokens_status'] = array_key_exists('tokens_status', $mediatype)
+								? $mediatype['tokens_status'] : 0;
+						}
+
 						$upd_media_type_oauth[] = [
 							'values' => $_upd_media_type_oauth,
 							'where' => ['mediatypeid' => $mediatype['mediatypeid']]

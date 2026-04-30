@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -227,6 +227,10 @@ abstract class CControllerPopupItemTest extends CController {
 			'support_lld_macros' => true
 		],
 		'snmp_oid' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'status_codes' => [
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],

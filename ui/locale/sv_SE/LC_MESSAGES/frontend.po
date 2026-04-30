@@ -2243,6 +2243,13 @@ msgstr "Både fälten \"tls_psk_identity\" och \"tls_psk\" måste anges när du 
 msgid "Both passwords must be equal."
 msgstr "Båda lösenorden måste vara lika."
 
+#: app/controllers/CControllerItemCreate.php:264
+#: app/controllers/CControllerItemPrototypeCreate.php:279
+#: app/controllers/CControllerItemPrototypeUpdate.php:267
+#: app/controllers/CControllerItemUpdate.php:264
+msgid "Both username and password should be either present or empty."
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
 #: include/views/js/monitoring.sysmaps.js.php:681
@@ -12245,6 +12252,13 @@ msgstr "Intervall och lagring"
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "Ogiltig API-metod \"%2$s\" för användarrollen \"%1$s\"."
 
+#: app/controllers/CControllerItemCreate.php:183
+#: app/controllers/CControllerItemPrototypeCreate.php:198
+#: app/controllers/CControllerItemPrototypeUpdate.php:186
+#: app/controllers/CControllerItemUpdate.php:183
+msgid "Invalid HTTP status code or range."
+msgstr ""
+
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
@@ -12333,6 +12347,11 @@ msgstr "Ogiltig e-postadress \"%1$s\"."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Ogiltig e-postadress för medietyp med ID \"%1$s\"."
+
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -12715,6 +12734,11 @@ msgstr "Ogiltig sträng."
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Ogiltig tagg \"%1$s\": %2$s."
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -21195,6 +21219,10 @@ msgstr "Storlek på swaputrymme i byte eller i procent av totalt. Returnerar hel
 msgid "Swedish (sv_SE)"
 msgstr "Svenska (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Byte av autentiseringsmetod kommer att återställa alla utom denna session! Fortsätta?"
@@ -21819,6 +21847,10 @@ msgstr "Klientidentifieraren som registrerats i auktoriseringsservern."
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
 msgstr "Klientens hemlighet som registrerats i auktoriseringsservern."
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -23200,6 +23232,10 @@ msgstr "Ångra bekräftelse av problem."
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "Oväntad statuskod för HTTP-svar."
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
+msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -25049,6 +25085,10 @@ msgstr "Widgetkonfigurationen kommer att återställas."
 msgid "Widget is deprecated."
 msgstr "Widget är föråldrad."
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Widgeten är för liten för det angivna antalet kolumner och rader."
@@ -25432,6 +25472,10 @@ msgstr "Du kan inte byta mallar för aktuellt val."
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Du har inte behörighet att utföra den här åtgärden."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -26838,6 +26882,11 @@ msgstr "ogiltig byte-sekvens i UTF-8"
 msgid "invalid data type"
 msgstr "ogiltig datatyp"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "ogiltig fördröjning"
@@ -28237,6 +28286,11 @@ msgstr "värdet måste ligga mellan \"%1$s\" och \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "värdet måste ligga mellan \"%1$s\" och \"%2$s\" och får inte ha fler än \"%3$s\" siffror efter decimaltecknet"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "värdet måste vara tomt"
@@ -28253,6 +28307,16 @@ msgstr[1] "värdet måste vara tomt eller ett av %1$s"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "värdet måste vara större än \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

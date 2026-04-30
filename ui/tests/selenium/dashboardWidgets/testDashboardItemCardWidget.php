@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1124,7 +1124,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				}
 
 				// Check default color code.
-				$this->assertEquals('#42A5F5', $form->getField('id:lbl_sparkline_color')->getAttribute('title'));
+				$this->assertEquals('42A5F5', $form->getField('name:sparkline[color]')->getAttribute('value'));
 
 				// Check radio button options.
 				$radio_buttons = [
@@ -1231,7 +1231,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Selected more than 731 day for graph filter.',
+						'Name' => 'Selected more than 2 years for graph filter.',
 						'Item' => 'Item for item card widget'
 					],
 					'Show' => [
@@ -1241,8 +1241,9 @@ class testDashboardItemCardWidget extends testWidgets {
 						'id:sparkline_time_period_from' => 'now-1000d',
 						'id:sparkline_time_period_to' => 'now'
 					],
+					'days_count' => true,
 					'error_message' => [
-						'Maximum time period to display is 731 days.'
+						'Maximum time period to display is {days} days.'
 					]
 				]
 			],
@@ -1959,8 +1960,10 @@ class testDashboardItemCardWidget extends testWidgets {
 		if (array_key_exists('Triggers', $data)) {
 			// Check list of triggers.
 			$triggers = $widget->query('class:section-triggers')->query('class:triggers')->query('class:trigger')->all();
-			$actualNames = array_map('trim', str_replace(',', '', $triggers->asText()));
-			$this->assertEquals(array_column($data['Triggers'], 'Name'), $actualNames);
+			$actual_names = array_map('trim', str_replace(',', '', $triggers->asText()));
+
+			// Workaround: PostgreSQL returns unsorted trigger list.
+			$this->assertEqualsCanonicalizing(array_column($data['Triggers'], 'Name'), $actual_names);
 
 			// Check trigger counter.
 			$this->assertEquals(count($data['Triggers']), $widget->query('class:section-triggers')
@@ -1973,14 +1976,17 @@ class testDashboardItemCardWidget extends testWidgets {
 			$table = $hint->query('class:list-table')->asTable()->one();
 
 			$this->assertEquals(['Severity', 'Name', 'Expression', 'Status'], $table->getHeadersText());
+			$this->assertEquals(count($data['Triggers']), $table->getRows()->count());
 
-			foreach ($data['Triggers'] as $i => $trigger) {
-				$row = $table->getRow($i);
+			// Workaround: PostgreSQL returns unsorted trigger list.
+			foreach ($data['Triggers'] as $trigger) {
+				$row = $table->findRow('Name', $trigger['Name']);
 
-				foreach (['Severity', 'Name', 'Expression', 'Status'] as $column) {
+				foreach (['Severity', 'Expression', 'Status'] as $column) {
 					$this->assertEquals($trigger[$column], $row->getColumn($column)->getText());
 				}
 			}
+
 			$hint->close();
 		}
 
@@ -2152,22 +2158,31 @@ class testDashboardItemCardWidget extends testWidgets {
 				break;
 
 			case 'severity':
-				$link = ($data['widget_name'] === 'Master item from host')
-					? 'zabbix.php?action=problem.view&hostids%5B0%5D='.self::$host_ids['hostids']
-						[self::HOST_NAME].'&triggerids%5B0%5D='.
-						self::$trigger_ids['Not classified trigger'].'&triggerids%5B1%5D='.
-						self::$trigger_ids['Information trigger'].'&triggerids%5B2%5D='.
-						self::$trigger_ids['Warning trigger'].'&triggerids%5B3%5D='.
-						self::$trigger_ids['Average trigger'].'&triggerids%5B4%5D='.
-						self::$trigger_ids['High trigger'].'&triggerids%5B5%5D='.
-						self::$trigger_ids['Disaster trigger'].'&filter_set=1'
-					: 'zabbix.php?action=problem.view&hostids%5B0%5D='.
-						self::$host_ids['hostids'][self::HOST_NAME].'&triggerids%5B0%5D='.
-						self::$trigger_ids['Trigger 1'].'&filter_set=1';
+				// Workaround: PostgreSQL returns unsorted trigger list.
+				$href = $widget->query('class:sections-header')->query('class:section-item')
+						->query('class:problem-icon-link')->one()->getAttribute('href');
+				if ($data['widget_name'] === 'Master item from host') {
+					parse_str(parse_url($href, PHP_URL_QUERY), $query);
+					$this->assertEquals('problem.view', $query['action']);
+					$this->assertEquals(self::$host_ids['hostids'][self::HOST_NAME], $query['hostids'][0]);
+					$this->assertEquals(1, $query['filter_set']);
 
-				$this->assertEquals($link, $widget->query('class:sections-header')->query('class:section-item')
-						->query('class:problem-icon-link')->one()->getAttribute('href')
-				);
+					$expected_triggers = [self::$trigger_ids['Not classified trigger'],
+						self::$trigger_ids['Information trigger'], self::$trigger_ids['Warning trigger'],
+						self::$trigger_ids['Average trigger'], self::$trigger_ids['High trigger'],
+						self::$trigger_ids['Disaster trigger']
+					];
+					$this->assertEqualsCanonicalizing($expected_triggers, $query['triggerids'],
+							'Trigger IDs order is not important'
+					);
+				}
+				else {
+					$link = 'zabbix.php?action=problem.view&hostids%5B0%5D='.
+							self::$host_ids['hostids'][self::HOST_NAME].'&triggerids%5B0%5D='.
+							self::$trigger_ids['Trigger 1'].'&filter_set=1';
+					$this->assertEquals($link, $href);
+				}
+
 				$widget->query('class:sections-header')->query('class:section-item')->query('class:problem-icon-link')
 						->one()->click();
 				$this->page->assertTitle('Problems');
@@ -2347,7 +2362,17 @@ class testDashboardItemCardWidget extends testWidgets {
 				self::$dashboard_ids['Dashboard for Item Card widget display check']
 		)->waitUntilReady();
 
-		$this->assertScreenshot(CDashboardElement::find()->one()->getWidget($data['Name']), 'itemcard_'.$data['Name']);
+		$widget = CDashboardElement::find()->waitUntilReady()->one()->getWidget($data['Name']);
+
+		// Workaround: PostgreSQL returns unsorted trigger list.
+		if ($data['Name'] === 'Master item from host'){
+			$this->assertScreenshotExcept(CDashboardElement::find()->waitUntilReady()->one()->getWidget($data['Name']),
+					[$widget->query('class:section-triggers')->query('class:triggers')->one()], 'itemcard_'.$data['Name']
+			);
+		}
+		else {
+			$this->assertScreenshot($widget, 'itemcard_'.$data['Name']);
+		}
 	}
 
 	/**
@@ -2422,6 +2447,11 @@ class testDashboardItemCardWidget extends testWidgets {
 	 */
 	protected function checkWidgetForm($data, $action, $dashboard) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			// If required, define max days count in error since it depends on leap year presence in desired period.
+			if (CTestArrayHelper::get($data, 'days_count')) {
+				$data['error_message'] = str_replace('{days}', CDateTimeHelper::countDays('now', 'P2Y'), $data['error_message']);
+			}
+
 			$this->assertMessage(TEST_BAD, null, $data['error_message']);
 			COverlayDialogElement::find()->one()->close();
 			$dashboard->save();

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -68,6 +68,21 @@ class CControllerOauthAuthorize extends CController {
 			error(_('Invalid request.'), true);
 
 			return false;
+		}
+
+		if (!array_key_exists('client_secret', $state)) {
+			$db_mediatype_token_url = (bool) API::MediaType()->get([
+				'output' => ['token_url'],
+				'mediatypeids' => [$state['mediatypeid']],
+				'search' => ['token_url' => $state['token_url']],
+				'startSearch' => true
+			]);
+
+			if (!$db_mediatype_token_url) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'client_secret', _('cannot be empty')), true);
+
+				return false;
+			}
 		}
 
 		$state_sign = $state['sign'];
@@ -156,13 +171,11 @@ class CControllerOauthAuthorize extends CController {
 
 		if (curl_errno($handle)) {
 			error(curl_error($handle), true);
-			curl_close($handle);
 
 			return [];
 		}
 
 		$http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-		curl_close($handle);
 
 		if ($http_code != 200) {
 			error(_('Unexpected HTTP response status code.'), true);

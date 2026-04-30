@@ -1,7 +1,7 @@
 //go:build !windows
 
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -46,7 +46,7 @@ func (*ZBXExec) execute(s string, timeout time.Duration, path string, strict boo
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "sh", "-c", s)
+	cmd := exec.Command("sh", "-c", s)
 	cmd.Dir = path
 
 	var b bytes.Buffer
@@ -60,7 +60,12 @@ func (*ZBXExec) execute(s string, timeout time.Duration, path string, strict boo
 		return "", errs.Errorf("cannot execute command: %s", err)
 	}
 
-	werr := cmd.Wait()
+	done := make(chan error, 1)
+
+	go jobDoneListener(done, cmd)
+	go timeoutListener(ctx, cmd)
+
+	err = <-done
 
 	// we need to check context error so we can inform the user if timeout was reached and Zabbix agent2
 	// terminated the command
@@ -69,10 +74,10 @@ func (*ZBXExec) execute(s string, timeout time.Duration, path string, strict boo
 	}
 
 	// we need to check error after t.Stop so we can inform the user if timeout was reached and Zabbix agent2 terminated the command
-	if strict && werr != nil && !errors.Is(werr, syscall.ECHILD) {
-		log.Debugf("Command [%s] execution failed: %s\n%s", s, werr, b.String())
+	if strict && err != nil && !errors.Is(err, syscall.ECHILD) {
+		log.Debugf("command [%s] execution failed: %s\n%s", s, err, b.String())
 
-		return "", errs.Errorf("command execution failed: %s", werr.Error())
+		return "", errs.Errorf("command execution failed: %s", err.Error())
 	}
 
 	if MaxExecuteOutputLenB <= len(b.String()) {
@@ -93,4 +98,17 @@ func (*ZBXExec) executeBackground(s string) error {
 	go cmd.Wait()
 
 	return nil
+}
+
+func jobDoneListener(done chan<- error, cmd *exec.Cmd) {
+	done <- cmd.Wait()
+}
+
+func timeoutListener(ctx context.Context, cmd *exec.Cmd) {
+	<-ctx.Done()
+
+	err := syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+	if err != nil {
+		log.Debugf("failed to kill cmd processes %s", err)
+	}
 }

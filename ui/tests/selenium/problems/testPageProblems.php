@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,7 +23,7 @@ require_once __DIR__.'/../behaviors/CTagBehavior.php';
  *
  * @onBefore prepareProblemsData
  *
- * @dataSource UserPermissions, WidgetCommunication
+ * @dataSource UserPermissions, WidgetCommunication, MonitoringOverview
  */
 class testPageProblems extends CWebTest {
 
@@ -538,7 +538,7 @@ class testPageProblems extends CWebTest {
 							'Host' => '4_Host_to_check_Monitoring_Overview',
 							'Problem' => '4_trigger_Average',
 							'Update' => 'Update',
-							'Tags' => ''
+							'Tags' => 'DataBase: Oracle DB'
 						]
 					]
 				]
@@ -557,7 +557,7 @@ class testPageProblems extends CWebTest {
 							'Host' => '3_Host_to_check_Monitoring_Overview',
 							'Problem' => '3_trigger_Average',
 							'Update' => 'Update',
-							'Tags' => ''
+							'Tags' => 'DataBase: Oracle'
 						]
 					],
 					'check_trigger_description' => [
@@ -609,7 +609,7 @@ class testPageProblems extends CWebTest {
 							'Host' => '1_Host_to_check_Monitoring_Overview',
 							'Problem' => '2_trigger_Information',
 							'Update' => 'Update',
-							'Tags' => ''
+							'Tags' => 'DataBase: PostgreSQL'
 						]
 					],
 					'check_trigger_description' => [
@@ -2021,8 +2021,11 @@ class testPageProblems extends CWebTest {
 
 		$this->assertEquals($data_in_column, $opdata_column->getText());
 
-
 		if (array_key_exists('screen_name', $data)) {
+			// Remove time from table column - column width varies depending on time text, causing unstable screenshots.
+			CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+					[$table->findRow('Problem', $problem_name)->getColumn('Time')]
+			);
 			$this->assertScreenshot($opdata_column, $data['screen_name']);
 		}
 

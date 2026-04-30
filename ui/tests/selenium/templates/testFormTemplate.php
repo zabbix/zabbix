@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,7 +18,6 @@ require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\Exception\NoSuchElementException;
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup hosts
@@ -192,7 +191,7 @@ class testFormTemplate extends CLegacyWebTest {
 			$name = CTestArrayHelper::get($data, 'visible_name', $data['name']);
 			$this->filterAndOpenTemplate($name);
 
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('template_name'));
+			$this->query('id:template_name')->waitUntilVisible()->one();
 			$this->zbxTestAssertElementValue('template_name', $data['name']);
 
 			$this->zbxTestMultiselectAssertSelected('template_groups_', 'Templates');

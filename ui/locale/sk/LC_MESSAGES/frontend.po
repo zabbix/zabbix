@@ -2269,6 +2269,13 @@ msgstr "Pri zmene PSK pre šifrovanie pripojenia, musia byť špecifikované pol
 msgid "Both passwords must be equal."
 msgstr "Obe heslá musia byť rovnaké."
 
+#: app/controllers/CControllerItemCreate.php:264
+#: app/controllers/CControllerItemPrototypeCreate.php:279
+#: app/controllers/CControllerItemPrototypeUpdate.php:267
+#: app/controllers/CControllerItemUpdate.php:264
+msgid "Both username and password should be either present or empty."
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
 #: include/views/js/monitoring.sysmaps.js.php:681
@@ -12382,6 +12389,13 @@ msgstr ""
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "Neplatná metóda rozhrania API „%2$s“ pre rolu používateľa „%1$s“."
 
+#: app/controllers/CControllerItemCreate.php:183
+#: app/controllers/CControllerItemPrototypeCreate.php:198
+#: app/controllers/CControllerItemPrototypeUpdate.php:186
+#: app/controllers/CControllerItemUpdate.php:183
+msgid "Invalid HTTP status code or range."
+msgstr ""
+
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
@@ -12470,6 +12484,11 @@ msgstr "Neplatná e-mailová adresa „%1$s“."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Neplatná e-mailová adresa pre typ média s ID „%1$s“."
+
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -12852,6 +12871,11 @@ msgstr "Neplatný reťazec."
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Neplatná značka \"%1$s\": %2$s."
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -21368,6 +21392,10 @@ msgstr "Veľkosť voľného swap miesta v bytoch alebo v percentách. Vráti cel
 msgid "Swedish (sv_SE)"
 msgstr "Švédsky (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Prepnutie autentifikačnej metódy spôsobí ukončenie všetkých sedeni okrem Vásho! Pokračovať?"
@@ -21995,6 +22023,10 @@ msgstr "Identifikátor klienta registrovaný na autorizačnom serveri."
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
 msgstr "Tajný klúč klienta registrovaný na autorizačnom serveri."
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -23388,6 +23420,10 @@ msgstr "Zrušte potvrdenie problému."
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "Neočakávaný stavový kód odpovede HTTP."
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
+msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -25247,6 +25283,10 @@ msgstr "Konfigurácia widgetu bude vrátená späť."
 msgid "Widget is deprecated."
 msgstr "Widget je zastaraný."
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Widget je príliš malý pre zadaný počet stĺpcov a riadkov."
@@ -25630,6 +25670,10 @@ msgstr "Pre aktuálny výber nemôžete prepínať templaty."
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Nemáte oprávnenie na vykonanie tejto operácie."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -27036,6 +27080,11 @@ msgstr "neplatná sekvencia bajtov v UTF-8"
 msgid "invalid data type"
 msgstr "neplatný typ údajov"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "neplatné oneskorenie"
@@ -28436,6 +28485,11 @@ msgstr "hodnota musí byť medzi \"%1$s\" a \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "hodnota musí byť medzi \"%1$s\" a \"%2$s\" a nesmie mať viac ako \"%3$s\" číslic za desatinnou čiarkou"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "hodnota musí byť prázdna"
@@ -28453,6 +28507,16 @@ msgstr[2] "hodnoty musia byť prázdne alebo %1$s "
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "hodnota musí byť väčšia ako \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220
