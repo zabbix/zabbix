@@ -116,7 +116,7 @@ static int	async_check_telemetry_query_clickhouse(zbx_dc_telemetry_query_item_t 
 	query = item->telemetry_query;
 	item->telemetry_query = NULL;
 
-	/* FIXME: placeholder */
+	/* FIXME: placeholder start */
 	const telemetry_query_conn_params_clickhouse_t	conn_params =
 	{
 		.url			= "http://127.0.0.1:8123",
@@ -137,6 +137,7 @@ static int	async_check_telemetry_query_clickhouse(zbx_dc_telemetry_query_item_t 
 	const char *config_ssl_ca_location	= poller_config->config_ssl_ca_location;
 	const char *config_ssl_cert_location	= poller_config->config_ssl_cert_location;
 	const char *config_ssl_key_location	= poller_config->config_ssl_key_location;
+	/* FIXME: placeholder end */
 
 	lasttimestamp = item->mtime;
 

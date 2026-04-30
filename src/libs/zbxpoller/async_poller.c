@@ -273,6 +273,8 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 	{
 		if (SUCCEED == status)
 		{
+			zbx_timespec_t	history_entry_ts = timespec;
+
 			for (int i = 0; i < values.values_num; i++)
 			{
 				AGENT_RESULT	result;
@@ -289,16 +291,16 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 				zbx_set_agent_result_meta(&result, 0, item_context->newlasttimestamp);
 
 				zbx_preprocess_item_value(item_context->itemid, item_context->value_type,
-						item_context->flags, item_context->preprocessing, &result, &timespec,
-						ITEM_STATE_NORMAL, NULL);
+						item_context->flags, item_context->preprocessing, &result,
+						&history_entry_ts, ITEM_STATE_NORMAL, NULL);
 
 				zbx_free_agent_result(&result);
 
-				timespec.ns++;
-				while (timespec.ns >= 1000000000)
+				history_entry_ts.ns++;
+				while (history_entry_ts.ns >= 1000000000)
 				{
-					timespec.ns -= 1000000000;
-					timespec.sec++;
+					history_entry_ts.ns -= 1000000000;
+					history_entry_ts.sec++;
 				}
 			}
 
