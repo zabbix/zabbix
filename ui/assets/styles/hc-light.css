@@ -1320,9 +1320,9 @@ footer {
     .banner .banner-content a {
       color: #ffffff;
       text-decoration: underline; }
-    .banner .banner-content > *:first-child {
+    .banner .banner-content p:first-child {
       margin-top: 0; }
-    .banner .banner-content > *:last-child {
+    .banner .banner-content p:last-child {
       margin-bottom: 0; }
   .banner .btn-icon {
     position: absolute;
