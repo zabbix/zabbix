@@ -343,6 +343,25 @@ class testFormMaintenance extends CWebTest {
 
 				$period_overlay->waitUntilReady();
 
+				// Check screenshots.
+				if ($mode === 'Create') {
+					$this->page->removeFocus();
+
+					// Remove Add and Cancel buttons edge curling from screenshots as their rendering is unstable.
+					$dialog_footer = $dialog->getFooter();
+					foreach (['Add', 'Cancel'] as $button) {
+						$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;',
+							[$dialog_footer->query('button', $button)->one()]
+						);
+					}
+
+					if ($period_type === 'One time only') {
+						$this->assertScreenshotExcept($period_overlay, [$period_overlay->query('id:start_date')->one()], $period_type);
+					} else {
+						$this->assertScreenshot($period_overlay, $period_type);
+					}
+				}
+
 				// Initialize expectations.
 				$ui_period_type = ($period_type === 'Monthly with Day of week period') ? 'Monthly' : $period_type;
 
@@ -454,6 +473,25 @@ class testFormMaintenance extends CWebTest {
 						$this->assertEquals($value, $period_overlay->getField($field)->getAttribute($attribute));
 					}
 				}
+
+				// Check screenshots.
+				/*if ($mode === 'Create') {
+					$this->page->removeFocus();
+
+					// Remove Add and Cancel buttons edge curling from screenshots as their rendering is unstable.
+					$dialog_footer = $dialog->getFooter();
+					foreach (['Add', 'Cancel'] as $button) {
+						$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;',
+							[$dialog_footer->query('button', $button)->one()]
+						);
+					}
+
+					if ($period_type === 'One time only') {
+						$this->assertScreenshotExcept($period_overlay, [$period_overlay->query('id:start_date')->one()], $period_type);
+					} else {
+						$this->assertScreenshot($period_overlay, $period_type);
+					}
+				}*/
 			}
 
 			// Check maintenance duration dropdown (hours and minutes) values.
@@ -462,35 +500,16 @@ class testFormMaintenance extends CWebTest {
 				$this->assertEquals(range(0, $max), array_map('intval', $options));
 			}
 
+			// Check footer buttons.
 			if ($mode === 'Create') {
-				// Check footer buttons.
 				$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
 						->filter(CElementFilter::CLICKABLE)->asText()
 				);
-				// Check screenshots.
-				$this->page->removeFocus();
 
-				// Remove Add and Cancel buttons edge curling from screenshots as their rendering is unstable.
-				$dialog_footer = COverlayDialogElement::find()->waitUntilReady()->all()->last()->getFooter();
-				foreach (['Add', 'Cancel'] as $button) {
-					$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;',
-						[$dialog_footer->query('button', $button)->one()]
-					);
-				}
-
-				if ($period_type === 'One time only') {
-					$this->assertScreenshotExcept($period_overlay, [$period_overlay->query('id:start_date')->one()],
-							$period_type
-					);
-				}
-				else {
-					$this->assertScreenshot($period_overlay, $period_type);
-				}
 				$period_overlay->fill(['Period type' => 'One time only']);
 				$period_overlay->submit();
 				$period_overlay->waitUntilNotVisible();
 			} else {
-				// Check footer buttons.
 				$this->assertEquals(['Update', 'Cancel'], $dialog->getFooter()->query('button')->all()
 						->filter(CElementFilter::CLICKABLE)->asText()
 				);
