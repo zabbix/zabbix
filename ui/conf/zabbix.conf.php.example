@@ -46,7 +46,7 @@ $IMAGE_FORMAT_DEFAULT		= IMAGE_FORMAT_PNG;
 // 'db' - Database name. Used for ClickHouse.
 // 'username' and 'password' - Database user and password. Used for ClickHouse.
 //$HISTORY_PROVIDERS[] = [
-//	'types' => ['dbl', 'str', 'log', 'uint', 'text', 'binary'],
+//	'types' => ['dbl', 'str', 'log', 'uint', 'text', 'json'],
 //	'provider' => '<provider>',
 //	'url' => '<url>',
 //	'db' => 'zabbix',
