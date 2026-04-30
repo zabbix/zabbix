@@ -95,7 +95,7 @@ class CBanner {
 	#getCurrentData() {
 		fetch(CBanner.URL, {
 			headers: {
-				'Accept-Language': this.#language
+				'Accept-Language': this.#language.replace('_', '-')
 			}
 		})
 			.then(response => response.json())
