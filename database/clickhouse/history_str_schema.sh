@@ -1,6 +1,7 @@
 #!/bin/bash
 
-. ./clickhouse.sh
+DIR="$(dirname "$0")"
+. "$DIR/clickhouse.sh"
 
 echo "DROP TABLE IF EXISTS $CH_DB.history_str" | curl $CH_URL --data-binary @-
 

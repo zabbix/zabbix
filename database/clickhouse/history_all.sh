@@ -1,7 +1,8 @@
 #!/bin/sh
-./history_schema.sh $@
-./history_str_schema.sh $@
-./history_log_schema.sh $@
-./history_uint_schema.sh $@
-./history_text_schema.sh $@
-./history_json_schema.sh $@
+DIR="$(dirname "$0")"
+"$DIR/history_schema.sh" "$@"
+"$DIR/history_str_schema.sh" "$@"
+"$DIR/history_log_schema.sh" "$@"
+"$DIR/history_uint_schema.sh" "$@"
+"$DIR/history_text_schema.sh" "$@"
+"$DIR/history_json_schema.sh" "$@"
