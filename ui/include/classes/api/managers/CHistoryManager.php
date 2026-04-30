@@ -1703,7 +1703,7 @@ class CHistoryManager {
 
 	/**
 	 * Clear item history and trends by provided item IDs.
-	 * History is deleted from SQL, Elasticsearch and Clickhouse storages.
+	 * History is deleted from SQL, Elasticsearch and ClickHouse storages.
 	 *
 	 * @param array $items  Key - itemid, value - value_type.
 	 *

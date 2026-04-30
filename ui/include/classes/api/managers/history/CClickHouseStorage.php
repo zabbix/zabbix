@@ -636,7 +636,7 @@ class CClickHouseStorage {
 			$this->error_message = $error->getMessage();
 		}
 
-		CProfiler::getInstance()->profileClickhouse(microtime(true) - $time_start, $stream_context['http']['method'],
+		CProfiler::getInstance()->profileClickHouse(microtime(true) - $time_start, $stream_context['http']['method'],
 			$this->url->getUrl(), json_encode(['query' => $query] + $form_values)
 		);
 

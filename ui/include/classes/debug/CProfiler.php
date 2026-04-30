@@ -31,11 +31,11 @@ class CProfiler {
 	protected $slowElasticQueryTime = 0.01;
 
 	/**
-	 * Determines time for single Clickhouse query to be considered slow.
+	 * Determines time for single ClickHouse query to be considered slow.
 	 *
 	 * @var float
 	 */
-	protected $slowClickhouseQueryTime = 0.01;
+	protected $slowClickHouseQueryTime = 0.01;
 
 	/**
 	 * Contains all api requests info.
@@ -59,7 +59,7 @@ class CProfiler {
 	protected $elasticQueryLog = [];
 
 	/**
-	 * Contains Clickhouse queries info.
+	 * Contains ClickHouse queries info.
 	 *
 	 * @var array
 	 */
@@ -80,7 +80,7 @@ class CProfiler {
 	protected $elasticTotalTime = 0.0;
 
 	/**
-	 * Total time of all performed Clickhouse queries.
+	 * Total time of all performed ClickHouse queries.
 	 *
 	 * @var float
 	 */
@@ -270,7 +270,7 @@ class CProfiler {
 				BR()
 			];
 
-			if ($time > $this->slowClickhouseQueryTime) {
+			if ($time > $this->slowClickHouseQueryTime) {
 				$record = bold($record);
 			}
 
@@ -370,9 +370,9 @@ class CProfiler {
 	}
 
 	/**
-	 * Store Clickhouse query data.
+	 * Store ClickHouse query data.
 	 */
-	public function profileClickhouse(float $time, string $method, string $endpoint, string $query) {
+	public function profileClickHouse(float $time, string $method, string $endpoint, string $query) {
 		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
 			&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
 			return;
