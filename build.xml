@@ -414,7 +414,7 @@
 		<echo file="ui/conf/zabbix.conf.php" append="true">${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">$HISTORY_PROVIDERS[] = [${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">     'types' =&gt; ['dbl', 'str', 'log', 'uint', 'text', 'json'],${line.separator}</echo>
-		<echo file="ui/conf/zabbix.conf.php" append="true">     'provider' =&gt; 'elastic',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'provider' =&gt; 'elasticsearch',${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">     'url' =&gt; '${elasticsearch_url}'${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">];${line.separator}</echo>
 	</target>
