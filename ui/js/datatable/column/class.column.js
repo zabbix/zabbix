@@ -30,6 +30,11 @@ class CDataTableColumn {
 	/**
 	 * @type {Object}
 	 */
+	#column_options = {};
+
+	/**
+	 * @type {Object}
+	 */
 	#header_cell = null;
 
 	/**
@@ -41,11 +46,6 @@ class CDataTableColumn {
 	 * @type {string}
 	 */
 	#options_popup_handle_icon = ZBX_ICON_CONTEXT;
-
-	/**
-	 * @type {Object}
-	 */
-	#column_options = {};
 
 	/**
 	 * @type {string|null}
@@ -101,6 +101,11 @@ class CDataTableColumn {
 	 * @type {number}
 	 */
 	#order = 0;
+
+	/**
+	 * @type {Object}
+	 */
+	#overrides = {};
 
 	/**
 	 * @type {boolean}
@@ -421,6 +426,23 @@ class CDataTableColumn {
 	}
 
 	/**
+	 * @returns {Object}
+	 */
+	getOverrides() {
+		return this.#overrides;
+	}
+
+	/**
+	 * @param {Object} overrides
+	 * @returns {CDataTableColumn}
+	 */
+	setOverrides(overrides) {
+		this.#overrides = overrides;
+
+		return this;
+	}
+
+	/**
 	 * @returns {boolean}
 	 */
 	isRenamable() {
@@ -680,6 +702,7 @@ class CDataTableColumn {
 			name: this.#name,
 			only_header: this.#only_header,
 			order: this.#order,
+			overrides: this.#overrides,
 			renderer: this.#renderer,
 			resized: this.#resized,
 			resizable: this.#resizable,

@@ -16,6 +16,7 @@
 class CDataTable {
 
 	static EVENT_INIT = 'init';
+	static EVENT_BEFORE_RENDER = 'render:before';
 	static EVENT_RENDER = 'render';
 	static EVENT_RESET = 'reset';
 	static EVENT_SAVE = 'save';
@@ -834,7 +835,7 @@ class CDataTable {
 		return this;
 	}
 
-	initCheckBoxRange() {
+	#initCheckBoxRange() {
 		const selector = `.${CDataTable.ZBX_STYLE_DATATABLE}`;
 		const row_selector = `.${CDataTable.ZBX_STYLE_ROW}`;
 		const thead_selector = `.${CDataTable.ZBX_STYLE_HEADER} .${CDataTable.ZBX_STYLE_CELL_CHECKBOX}`;
@@ -1102,6 +1103,10 @@ class CDataTable {
 	}
 
 	onColumnToggle(e) {
+		if (e.defaultPrevented) {
+			return;
+		}
+
 		const {column_index, visible} = e.detail;
 
 		const column = this.getColumn(column_index);
@@ -1114,6 +1119,9 @@ class CDataTable {
 		}
 
 		column.setVisible(visible);
+
+		const overrides = column.getOverrides();
+		column.setOverrides({...overrides, visible});
 
 		this.#options_popup_updated = true;
 
@@ -1336,6 +1344,7 @@ class CDataTable {
 			.then(response => {
 				window.addEventListener('resize', this.onWindowResize);
 
+				this.dispatchEvent(CDataTable.EVENT_BEFORE_RENDER, {response});
 				this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
 
 				onSuccess(response);
@@ -2130,7 +2139,6 @@ class CDataTable {
 
 	#afterRender(response) {
 		this.#calculateColumnWidths(response);
-		this.#applyLastColumnPadding();
 		this.#handleScrollbar();
 
 		this.#pager.update(response);
@@ -2140,8 +2148,7 @@ class CDataTable {
 				this.#options_popup?.position();
 			});
 
-			this.initCheckBoxRange();
-
+			this.#initCheckBoxRange();
 			this.#unlockHeight();
 
 			this.#element.classList.remove(ZBX_STYLE_LOADING);
@@ -2489,7 +2496,7 @@ class CDataTable {
 				context: EVENT_CONTEXT_OVERLAY,
 				event: EVENT_UNMOUNT
 			},
-			callback: () => this.initCheckBoxRange()
+			callback: () => this.#initCheckBoxRange()
 		}));
 	}
 

@@ -30,6 +30,7 @@
 		#opened_eventids = [];
 		#datatable = null;
 		#csrf_token = null;
+		#show_problems_hidden_column_ids = ['recovery', 'status'];
 
 		init({
 			csrf_token,
@@ -96,8 +97,6 @@
 				filter.to = this.#global_timerange.to;
 			}
 
-			const show_columns = filter.show != <?= TRIGGERS_OPTION_IN_PROBLEM; ?>;
-
 			this.#datatable = new CDataTable(document.getElementById('problems'), data_provider)
 				.setColumns([
 					new CDataTableColumn('time', <?= json_encode(_('Time')); ?>)
@@ -114,11 +113,9 @@
 						.setRenderer('severity')
 						.setSortable(true),
 					new CDataTableColumn('recovery', <?= json_encode(_('Recovery time')); ?>)
-						.setFields(['recovery'])
-						.setVisible(show_columns),
+						.setFields(['recovery']),
 					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
-						.setFields(['status'])
-						.setVisible(show_columns),
+						.setFields(['status']),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['info']),
 					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
@@ -601,12 +598,38 @@
 
 					new CState().setParams({page});
 				})
+				.on(CDataTable.EVENT_BEFORE_RENDER, () => {
+					const filter = this.#datatable.getFilter();
+
+					this.#handleShowProblemsFilter(filter);
+				})
 				.on(CDataTable.EVENT_RENDER, e => {
 					const response = e.detail.response;
 
 					this.refreshCounters(response);
 
 					requestAnimationFrame(() => this.#initExpandables());
+				})
+				.on(CDataTable.EVENT_COLUMN_TOGGLE, e => {
+					const {column_index} = e.detail;
+
+					const column = this.#datatable.getColumn(column_index);
+					if (!column) {
+						return;
+					}
+
+					const filter = this.#datatable.getFilter();
+					if (filter.show != <?= TRIGGERS_OPTION_IN_PROBLEM; ?>) {
+						return;
+					}
+
+					if (this.#show_problems_hidden_column_ids.includes(column.getId())) {
+						e.preventDefault();
+
+						column.setVisible(false);
+
+						this.#datatable.updateUserConfig();
+					}
 				})
 				.on(CDataTable.EVENT_DATA_SORT, () => this.#scheduleRefresh())
 				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.#unscheduleRefresh())
@@ -794,14 +817,8 @@
 				filter.to = this.#global_timerange.to;
 			}
 
-			if (current_filter.show != url_filter.show) {
-				const show_columns = filter.show != <?= TRIGGERS_OPTION_IN_PROBLEM; ?>;
-
-				for (const id of ['recovery', 'status']) {
-					const column = this.#datatable.getColumnById(id);
-
-					column.setVisible(show_columns);
-				}
+			if (current_filter.show != filter.show) {
+				this.#handleShowProblemsFilter(filter);
 			}
 
 			if (!tabfilter_changed) {
@@ -834,6 +851,24 @@
 		#unscheduleRefresh() {
 			clearInterval(this.#refresh_interval_id);
 			this.#refresh_interval_id = null;
+		}
+
+		#handleShowProblemsFilter(filter) {
+			for (const id of this.#show_problems_hidden_column_ids) {
+				const column = this.#datatable.getColumnById(id);
+				if (!column) {
+					continue;
+				}
+
+				if (filter.show != <?= TRIGGERS_OPTION_IN_PROBLEM; ?>) {
+					const overrides = column.getOverrides();
+
+					column.setVisible(overrides?.visible ?? column.getDefaults().isVisible());
+				}
+				else {
+					column.setVisible(false);
+				}
+			}
 		}
 
 		#onDataDone(response) {
