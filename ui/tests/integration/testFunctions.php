@@ -308,6 +308,9 @@ class testFunctions extends CIntegrationTest{
 	}
 
 	private function assertStep1TriggerExpectations($response) {
+		global $HISTORY_PROVIDERS;
+		$has_history_provider = isset($HISTORY_PROVIDERS);
+
 		$triggers_expected = [
 			'Item 01 min(#5) gt 10' => ['state' => 0, 'value' => 0],
 			'Item 01 min(5m) gt 10' => ['state' => 0, 'value' => 0],
@@ -367,8 +370,8 @@ class testFunctions extends CIntegrationTest{
 			'Item 52 trendsum eq 14' => ['state' => 1, 'value' => 0],
 			'Item 52 trendavg eq 4.6' => ['state' => 1, 'value' => 0],
 			'Item 53 trendstl eq 0' => ['state' => 1, 'value' => 0],
-			'Item 54 baselinedev eq 0' => ['state' => 0, 'value' => 0],
-			'Item 55 baselinewma eq 0' => ['state' => 0, 'value' => 0]
+			'Item 54 baselinedev eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => 0],
+			'Item 55 baselinewma eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => 0]
 		];
 
 		$failures = [];
@@ -404,6 +407,9 @@ class testFunctions extends CIntegrationTest{
 	}
 
 	private function assertStep2TriggerExpectations($response) {
+		global $HISTORY_PROVIDERS;
+		$has_history_provider = isset($HISTORY_PROVIDERS);
+
 		$triggers_expected = [
 			'Item 01 min(#5) gt 10' => ['state' => 0, 'value' => 0],
 			'Item 01 min(5m) gt 10' => ['state' => 0, 'value' => 1],
@@ -457,14 +463,14 @@ class testFunctions extends CIntegrationTest{
 			'Item 30 lastclock() eq {$LASTCLOCK}' => ['state' => 0, 'value' => 1],
 			'Item 31 logtimestamp() eq 0' => ['state' => 1, 'value' => 0],
 			'Item 32 firstclock(5m) eq {$FIRSTCLOCK}' => ['state' => 0, 'value' => 1],
-			'Item 52 trendcount eq 3' => ['state' => 0, 'value' => 1],
-			'Item 52 trendmin eq 2' => ['state' => 0, 'value' => 1],
-			'Item 52 trendmax eq 8' => ['state' => 0, 'value' => 1],
-			'Item 52 trendsum eq 14' => ['state' => 0, 'value' => 1],
-			'Item 52 trendavg eq 4.6' => ['state' => 0, 'value' => 1],
-			'Item 53 trendstl eq 0' => ['state' => 0, 'value' => 1],
-			'Item 54 baselinedev eq 0' => ['state' => 0, 'value' => 0],
-			'Item 55 baselinewma eq 0' => ['state' => 0, 'value' => 0]
+			'Item 52 trendcount eq 3' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
+			'Item 52 trendmin eq 2' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
+			'Item 52 trendmax eq 8' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
+			'Item 52 trendsum eq 14' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
+			'Item 52 trendavg eq 4.6' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
+			'Item 53 trendstl eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
+			'Item 54 baselinedev eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => 0],
+			'Item 55 baselinewma eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => 0]
 		];
 
 		$failures = [];
@@ -500,6 +506,9 @@ class testFunctions extends CIntegrationTest{
 	}
 
 	private function assertStep3TriggerExpectations($response) {
+		global $HISTORY_PROVIDERS;
+		$has_history_provider = isset($HISTORY_PROVIDERS);
+
 		$triggers_expected = [
 			'Item 01 min(#5) gt 10' => ['state' => 0, 'value' => 0],
 			'Item 01 min(5m) gt 10' => ['state' => 0, 'value' => 0],
@@ -553,14 +562,14 @@ class testFunctions extends CIntegrationTest{
 			'Item 30 lastclock() eq {$LASTCLOCK}' => ['state' => 0, 'value' => 0],
 			'Item 31 logtimestamp() eq 0' => ['state' => 1, 'value' => 0],
 			'Item 32 firstclock(5m) eq {$FIRSTCLOCK}' => ['state' => 0, 'value' => 0],
-			'Item 52 trendcount eq 3' => ['state' => 0, 'value' => 1],
-			'Item 52 trendmin eq 2' => ['state' => 0, 'value' => 1],
-			'Item 52 trendmax eq 8' => ['state' => 0, 'value' => 1],
-			'Item 52 trendsum eq 14' => ['state' => 0, 'value' => 1],
-			'Item 52 trendavg eq 4.6' => ['state' => 0, 'value' => 1],
-			'Item 53 trendstl eq 0' => ['state' => 0, 'value' => 1],
-			'Item 54 baselinedev eq 0' => ['state' => 0, 'value' => 0],
-			'Item 55 baselinewma eq 0' => ['state' => 0, 'value' => 0]
+			'Item 52 trendcount eq 3' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
+			'Item 52 trendmin eq 2' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
+			'Item 52 trendmax eq 8' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
+			'Item 52 trendsum eq 14' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
+			'Item 52 trendavg eq 4.6' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
+			'Item 53 trendstl eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
+			'Item 54 baselinedev eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => 0],
+			'Item 55 baselinewma eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => 0]
 		];
 
 		$failures = [];
