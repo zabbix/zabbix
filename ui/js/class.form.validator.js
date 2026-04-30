@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -432,7 +432,13 @@ class CFormValidator {
 
 			if (rule_set.type === 'objects' || rule_set.type === 'array') {
 				if (data[field] !== null) {
-					Object.entries(data[field]).forEach(([key, value]) => scanObject(value, field_path + '/' + key));
+					Object.entries(data[field]).forEach(([key, value]) => {
+						scanObject(value, field_path + '/' + key);
+
+						if (rule_set.field) {
+							checkUse(rule_set.field, field_path + '/' + key);
+						}
+					});
 				}
 			}
 			else if (rule_set.type === 'object') {
@@ -486,7 +492,7 @@ class CFormValidator {
 	/**
 	 * Call API request to validate all api based validations
 	 *
-	 * @param {Array} validatons
+	 * @param {Array} validations
 	 *
 	 * @returns {Promise}
 	 */

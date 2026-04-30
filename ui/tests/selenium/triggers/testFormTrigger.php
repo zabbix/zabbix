@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,7 +17,6 @@
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
@@ -1231,7 +1230,7 @@ class testFormTrigger extends CLegacyWebTest {
 					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[6]", $expression);
 					break;
 				case TEST_BAD:
-					// TODO: All error checks should be moced to inline validation once DEV-4259 is fixed.
+					// TODO: All error checks should be mocked to inline validation once DEV-4259 is fixed.
 					if (array_key_exists('inline_errors', $data)) {
 						$this->assertInlineError($dialog->asForm(), $data['inline_errors']);
 					}

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -108,8 +108,6 @@ abstract class CDashboardGeneral extends CApiService {
 			if ($db_widgets) {
 				self::deleteWidgets(array_keys($db_widgets));
 			}
-
-			DB::delete('dashboard_page', ['dashboard_pageid' => array_keys($db_dashboard_pages)]);
 		}
 
 		DB::delete('dashboard', ['dashboardid' => $dashboardids]);

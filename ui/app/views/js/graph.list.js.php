@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -53,7 +53,7 @@
 
 						const uncheckids = Object.keys(chkbxRange.getSelectedIds());
 
-						uncheckTableRows('graphs_' + this.checkbox_hash, [], false);
+						uncheckTableRows(`graphs_${this.checkbox_hash}`, [], false);
 						chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
 						chkbxRange.update(this.checkbox_object);
 
@@ -118,7 +118,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('graph', response.keepids ?? []);
+						uncheckTableRows(`graphs_${this.checkbox_hash}`, response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -127,7 +127,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						uncheckTableRows('graph');
+						uncheckTableRows(`graphs_${this.checkbox_hash}`);
 					}
 
 					location.href = location.href;

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -103,10 +103,8 @@ window.item_edit_form = new class {
 
 		this.updateFieldsVisibility();
 
-		this.initial_tags_state = {
-			tags: Object.values(this.form.findFieldByName('tags')?.getValue() || [{tag: '', value: ''}]),
-			show_inherited_tags: this.form.findFieldByName('show_inherited_tags')?.getValue() || '0'
-		};
+		this.form.discoverAllFields();
+		this.initial_form_fields = this.#getFormFields();
 		this.form_element.style.display = '';
 		this.overlay.recoverFocus();
 	}
@@ -240,7 +238,7 @@ window.item_edit_form = new class {
 
 	initEvents() {
 		// Item tab events.
-		this.field.key.addEventListener('help_items.paste', this.#keyChangeHandler.bind(this));
+		this.field.key.addEventListener('help_items.paste', this.#keyChangeHandlerPopUp.bind(this));
 		this.field.key.addEventListener('keyup', this.#keyChangeHandler.bind(this));
 		this.field.key_button?.addEventListener('click', this.#keySelectClickHandler.bind(this));
 		this.field.snmp_oid.addEventListener('keyup', this.updateFieldsVisibility.bind(this));
@@ -360,10 +358,7 @@ window.item_edit_form = new class {
 	}
 
 	#isConfirmed() {
-		const tags = Object.values(this.form.findFieldByName('tags')?.getValue() || [{tag: '', value: ''}]);
-		const show_inherited_tags = this.form.findFieldByName('show_inherited_tags')?.getValue() || '';
-
-		return JSON.stringify(this.initial_tags_state) === JSON.stringify({tags, show_inherited_tags})
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(this.#getFormFields())
 			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
@@ -530,22 +525,7 @@ window.item_edit_form = new class {
 			values.delay = '';
 		}
 
-		if (values.preprocessing) {
-			for (let index in values.preprocessing) {
-				const step = values.preprocessing[index];
-
-				if (step.error_handler_params === null) {
-					step.error_handler_params = '';
-				}
-
-				if (step.on_fail === null) {
-					delete step.error_handler;
-					delete step.error_handler_params;
-				}
-			}
-		}
-
-		const delay_flex = [];
+		const delay_flex = {};
 		for (let key in values.delay_flex) {
 			let { schedule, period, type, delay } = values.delay_flex[key];
 			type = parseInt(type);
@@ -558,40 +538,10 @@ window.item_edit_form = new class {
 				continue;
 			}
 
-			delay_flex.push(values.delay_flex[key]);
+			delay_flex[key] = values.delay_flex[key]
 		}
 
-		const query_fields = [];
-		for (let key in values.query_fields) {
-			let {name, value} = values.query_fields[key];
-
-			if (name === '' && value === '') {
-				continue;
-			}
-			query_fields.push({name, value});
-		}
-
-		const parameters = [];
-		for (let key in values.parameters) {
-			let {name, value} = values.parameters[key];
-
-			if (name === '' && value === '') {
-				continue;
-			}
-			parameters.push({name, value});
-		}
-
-		const headers = [];
-		for (let key in values.headers) {
-			let {name, value} = values.headers[key];
-
-			if (name === '' && value === '') {
-				continue;
-			}
-			headers.push({name, value});
-		}
-
-		return {...values, ...{query_fields, headers, delay_flex, parameters}};
+		return {...values, ...{delay_flex}};
 	}
 
 	#post(url, data, keep_open = false) {
@@ -691,7 +641,7 @@ window.item_edit_form = new class {
 		const fields = this.#getFormFields();
 		const data = {
 			tags: fields.tags,
-			show_inherited_tags: fields.show_inherited_tags,
+			show_inherited_tags,
 			itemid: fields.itemid,
 			hostid: fields.hostid
 		}
@@ -708,6 +658,11 @@ window.item_edit_form = new class {
 			.then((response) => response.json())
 			.then((response) => {
 				this.tags_table.innerHTML = response.body;
+
+				const $tags_table = jQuery(this.tags_table);
+
+				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
+				$tags_table.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`).textareaFlexible();
 			})
 			.catch((message) => {
 				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});
@@ -862,6 +817,11 @@ window.item_edit_form = new class {
 		this.updateFieldsVisibility();
 	}
 
+	#keyChangeHandlerPopUp() {
+		this.#keyChangeHandler();
+		this.form.validateChanges(['key']);
+	}
+
 	#keyChangeHandler() {
 		const inferred_type = this.#getInferredValueType(this.field.key.value);
 
@@ -872,7 +832,6 @@ window.item_edit_form = new class {
 		this.last_inferred_type = inferred_type;
 
 		this.updateFieldsVisibility();
-		this.form.validateChanges(['key']);
 	}
 
 	#keySelectClickHandler() {

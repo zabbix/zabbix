@@ -1,0 +1,22 @@
+---
+test case: "localhost"
+in:
+  host: "localhost"
+out:
+  result_v4: "127.0.0.1"
+  result_v6: "::1"
+---
+test case: "empty"
+in:
+  host: ""
+out:
+  result_v4: ""
+  result_v6: ""
+---
+test case: "all printable ASCII"
+in:
+  host: '!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
+out:
+  result_v4: ""
+  result_v6: ""
+...

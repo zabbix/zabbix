@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -64,6 +64,17 @@ class NetworkDiscovery {
 			],
 			[
 				'name' => 'Disabled discovery rule for update',
+				'iprange' => '192.168.1.1-255',
+				'status' => DRULE_STATUS_DISABLED,
+				'dchecks' => [
+					[
+						'type' => SVC_IMAP,
+						'ports' => 10050
+					]
+				]
+			],
+			[
+				'name' => 'Multiple   spaces   in discovery rule name',
 				'iprange' => '192.168.1.1-255',
 				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [

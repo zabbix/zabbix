@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,8 +15,6 @@
 
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
-
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup users
@@ -147,7 +145,7 @@ class testFormUserProfile extends CLegacyWebTest {
 						'"User settings"]')->exists()
 				);
 				self::$old_password = $data['password1'];
-				// TODO: Following test fails on Jenkins with error access denied for Admin to dahsboard page. Logout may help
+				// TODO: Following test fails on Jenkins with error access denied for Admin to dashboard page. Logout may help
 				$this->page->logout();
 				break;
 			case TEST_BAD:
@@ -603,7 +601,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->assertEquals(1, CDBHelper::getCount($sql));
 				break;
 			case TEST_BAD:
-				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[@class='overlay-dialogue-body']//div[@class='msg-details']"));
+				$this->query('xpath://div[@class="overlay-dialogue-body"]//div[@class="msg-details"]')->waitUntilVisible()->one();
 				$this->zbxTestTextPresent($data['error_msg']);
 				break;
 		}

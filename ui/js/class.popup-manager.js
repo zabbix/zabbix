@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -40,6 +40,20 @@ class CPopupManager {
 	 * @type {Overlay|null}
 	 */
 	static #overlay = null;
+
+	/**
+	 * Current popup dialogue ID.
+	 *
+	 * @type {string|null}
+	 */
+	static #dialogueid = null;
+
+	/**
+	 * Current popup action.
+	 *
+	 * @type {string|null}
+	 */
+	static #action = null;
 
 	/**
 	 * Close event handler for currently open dialogue overlay.
@@ -166,8 +180,8 @@ class CPopupManager {
 			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.submit', CPopupManager.#on_submit);
 			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.reload', CPopupManager.#on_reload);
 
-			if (dialogueid !== CPopupManager.#overlay.dialogueid || !reuse_existing) {
-				overlayDialogueDestroy(CPopupManager.#overlay.dialogueid);
+			if (dialogueid !== CPopupManager.#dialogueid || !reuse_existing) {
+				overlayDialogueDestroy(CPopupManager.#dialogueid);
 			}
 
 			const end_scripting_event = new CPopupManagerEvent({
@@ -180,8 +194,8 @@ class CPopupManager {
 				descriptor: {
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
-					dialogueid,
-					action
+					dialogueid: CPopupManager.#dialogueid,
+					action: CPopupManager.#action
 				}
 			});
 
@@ -196,6 +210,8 @@ class CPopupManager {
 
 		overlay.xhr.then(() => {
 			CPopupManager.#overlay = overlay;
+			CPopupManager.#dialogueid = dialogueid;
+			CPopupManager.#action = action;
 
 			CPopupManager.#on_close = e => {
 				if (e.detail.close_by !== Overlay.prototype.CLOSE_BY_USER) {

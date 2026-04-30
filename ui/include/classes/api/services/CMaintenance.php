@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -525,11 +525,7 @@ class CMaintenance extends CApiService {
 			'where' => ['maintenanceid' => $maintenanceids]
 		]);
 
-		DB::delete('maintenances_windows', ['maintenanceid' => $maintenanceids]);
 		DB::delete('timeperiods', ['timeperiodid' => array_column($maintenances_windows, 'timeperiodid')]);
-		DB::delete('maintenances_hosts', ['maintenanceid' => $maintenanceids]);
-		DB::delete('maintenances_groups', ['maintenanceid' => $maintenanceids]);
-		DB::delete('maintenance_tag', ['maintenanceid' => $maintenanceids]);
 		DB::delete('maintenances', ['maintenanceid' => $maintenanceids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MAINTENANCE, $db_maintenances);

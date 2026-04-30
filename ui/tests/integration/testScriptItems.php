@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -87,9 +87,7 @@ class testScriptItems extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['itemids']));
 		$itemid = $response['result']['itemids'][0];
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "[ BADGER X ] Debug auth: \"".self::MACRO_PASSWORD_VALUE_ESCAPED, true, 60, 1);
 	}
 }

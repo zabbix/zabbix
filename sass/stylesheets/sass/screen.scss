@@ -1078,12 +1078,6 @@ select {
 	}
 }
 
-div {
-	.overlay-dialogue.wordbreak {
-		white-space: normal;
-	}
-}
-
 .form-fields-inline {
 	label {
 		margin: 0 8px 0 3px;
@@ -1817,10 +1811,6 @@ div {
 	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 
-	.wordbreak {
-		white-space: normal;
-	}
-
 	.overlay-dialogue-header {
 		margin: -8px -10px 6px -10px;
 		padding: 8px 10px;
@@ -2545,6 +2535,10 @@ div {
 	background-color: $lighter-yellow;
 	border: 1px solid $ui-border-color;
 	@extend %webkit-scrollbar;
+
+	&.debug-output-table-refresh {
+		margin: 10px 0 0 0;
+	}
 }
 
 .overlay-descr {
@@ -2591,6 +2585,13 @@ div {
 	.tag {
 		margin-top: 1px;
 		margin-bottom: 1px;
+	}
+
+	&.form-field {
+		.tag {
+			margin-top: 4px;
+			margin-bottom: 4px;
+		}
 	}
 }
 
@@ -4223,6 +4224,10 @@ z-select {
 		}
 
 		&.link-alt:not(:hover):not(:focus) {
+			@extend .#{$class};
+		}
+
+		&.link:not(:hover):not(:focus) {
 			@extend .#{$class};
 		}
 	}

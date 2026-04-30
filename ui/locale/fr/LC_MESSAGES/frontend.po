@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-18 18:30+0000\n"
+"PO-Revision-Date: 2026-04-20 18:50+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -299,6 +299,24 @@ msgstr "La classe %1$s.php doit étendre %2$s pour le module situé à %3$s."
 #, c-format
 msgid "%1$s: %2$s"
 msgstr "%1$s : %2$s"
+
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr "%1$s : %2$s."
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr "%1$s : le fichier n'est pas lisible."
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr "%1$s : chemin non valide ou fichier introuvable."
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -2224,6 +2242,13 @@ msgstr "Les champs « tls_psk_identity » et « tls_psk » doivent être sp�
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "Les deux mots de passe doivent être égaux."
+
+#: app/controllers/CControllerItemCreate.php:264
+#: app/controllers/CControllerItemPrototypeCreate.php:279
+#: app/controllers/CControllerItemPrototypeUpdate.php:267
+#: app/controllers/CControllerItemUpdate.php:264
+msgid "Both username and password should be either present or empty."
+msgstr "Le nom d'utilisateur et le mot de passe doivent être présents ou vides."
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -4190,6 +4215,10 @@ msgstr "Impossible de configurer \"%1$s\" pour le prototype de graphique \"%2$s\
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Impossible de définir l'« Agrégation d'ensembles de données » lorsqu'un élément de type « Total » est ajouté au graphique."
 
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "Impossible de définir l'encodage des caractères."
+
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
@@ -4695,7 +4724,7 @@ msgstr "Certificat"
 #: include/items.inc.php:1581
 msgctxt "noun"
 msgid "Change"
-msgstr "Changer"
+msgstr "Changement"
 
 #: app/partials/hostmacros.inherited.list.html.php:124
 #: app/partials/hostmacros.inherited.list.html.php:141
@@ -12029,7 +12058,7 @@ msgstr "Tags hérités et d'élément"
 
 #: app/partials/configuration.tags.tab.php:160
 msgid "Inherited and scenario tags"
-msgstr "Tags héritées et de scénario"
+msgstr "Tags hérités et de scénario"
 
 #: app/views/template.edit.php:184
 msgid "Inherited and template macros"
@@ -12223,6 +12252,13 @@ msgstr "Intervalle et stockage"
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "Méthode API \"%2$s\" non valide pour le rôle utilisateur \"%1$s\"."
 
+#: app/controllers/CControllerItemCreate.php:183
+#: app/controllers/CControllerItemPrototypeCreate.php:198
+#: app/controllers/CControllerItemPrototypeUpdate.php:186
+#: app/controllers/CControllerItemUpdate.php:183
+msgid "Invalid HTTP status code or range."
+msgstr "Code retour HTTP ou plage invalide."
+
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
@@ -12311,6 +12347,11 @@ msgstr "Adresse de courrier électronique non valide \"%1$s\"."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Adresse e-mail incorrecte pour le type de media avec l'ID \"%1$s\"."
+
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr "Nom de groupe d'hôte non valide."
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -12694,6 +12735,11 @@ msgstr "Chaîne non valide."
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Tag \"%1$s\" invalide : %2$s."
 
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr "Nom de groupe de modèles non valide."
+
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
 msgstr "Période de temps invalide."
@@ -12785,7 +12831,7 @@ msgstr "Élément ajouté"
 
 #: widgets/itemcard/Widget.php:32
 msgid "Item card"
-msgstr ""
+msgstr "Fiche d'élément"
 
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
@@ -16446,17 +16492,17 @@ msgstr "Un"
 #: app/controllers/CControllerItem.php:166
 #: app/controllers/CControllerItemPrototype.php:168
 msgid "One \"Change\" step allowed per item."
-msgstr ""
+msgstr "Une seule étape \"Changement\" est autorisée par élément."
 
 #: app/controllers/CControllerItem.php:182
 #: app/controllers/CControllerItemPrototype.php:184
 msgid "One \"Prometheus\" step allowed per item."
-msgstr ""
+msgstr "Une seule étape \"Prometheus\" est autorisée par élément."
 
 #: app/controllers/CControllerItem.php:174
 #: app/controllers/CControllerItemPrototype.php:176
 msgid "One \"Throttling\" step allowed per item."
-msgstr ""
+msgstr "Une seule étape \"Limitation\" est autorisée par élément."
 
 #: app/views/maintenance.timeperiod.edit.php:79
 #: include/classes/helpers/CMaintenanceHelper.php:29
@@ -18076,7 +18122,7 @@ msgstr "Pousser"
 
 #: include/views/js/item.preprocessing.js.php:208
 msgid "Qualifier"
-msgstr ""
+msgstr "Qualificatif"
 
 #: include/classes/helpers/CSlaHelper.php:64
 msgid "Quarter"
@@ -18804,7 +18850,7 @@ msgstr "Réinitialiser à la vue initiale"
 
 #: app/views/administration.miscconfig.edit.php:103
 msgid "Resolve secret vault macros by"
-msgstr ""
+msgstr "Résoudre les macros secrètes du coffre-fort par"
 
 #: jsLoader.php:283
 msgid "Resolved"
@@ -21173,6 +21219,10 @@ msgstr "Taille de l'espace de swap en octets ou en pourcentage du total. Retourn
 msgid "Swedish (sv_SE)"
 msgstr "Suédois (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr "Changer d'utilisateur SSO"
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Changer de méthode d'authentification va réinitialiser toutes les sessions sauf celle-ci ! Continuer ?"
@@ -21362,7 +21412,7 @@ msgstr "Nom de tag"
 #: app/controllers/CControllerTriggerPrototypeUpdate.php:61
 #: app/controllers/CControllerTriggerUpdate.php:61
 msgid "Tag name and value combination is not unique."
-msgstr ""
+msgstr "La combinaison du nom et de la valeur du tag n'est pas unique."
 
 #: include/actions.inc.php:68
 msgid "Tag value"
@@ -21798,6 +21848,10 @@ msgstr "L'identifiant client enregistré dans le serveur d'autorisation."
 msgid "The client secret registered within the authorization server."
 msgstr "Le secret client enregistré dans le serveur d'autorisation."
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr "Le secret client a été effacé suite à une modification du point de terminaison du jeton. Veuillez saisir le nouveau secret client."
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "L'hôte cloné contient des macros définies par l'utilisateur avec le type \"Texte secret\". La valeur et le type de ces macros ont été réinitialisés."
@@ -22103,8 +22157,8 @@ msgstr "Cette valeur est trop courte."
 #, c-format
 msgid "This value must be %1$s."
 msgid_plural "This value must be one of %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Cette valeur doit être %1$s."
+msgstr[1] "Cette valeur doit être l'une des %1$s."
 
 #: include/classes/validators/CFormValidator.php:847
 #: include/classes/validators/CFormValidator.php:898 jsLoader.php:433
@@ -22157,7 +22211,7 @@ msgstr "Seuils"
 
 #: include/items.inc.php:1629 include/items.inc.php:1633
 msgid "Throttling"
-msgstr "Étranglement"
+msgstr "Limitation"
 
 #: include/func.inc.php:216
 msgid "Thu"
@@ -22364,7 +22418,7 @@ msgstr ""
 
 #: app/views/oauth.edit.php:188
 msgid "Token endpoint"
-msgstr ""
+msgstr "Token du point de terminaison"
 
 #: app/views/oauth.edit.php:201
 msgid "Token parameters"
@@ -23179,6 +23233,10 @@ msgstr "Annuler l'acquittement du problème."
 msgid "Unexpected HTTP response status code."
 msgstr "Code réponse HTTP inattendu."
 
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
+msgstr "Délai de mise à jour du jeton d'accès inattendu."
+
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
 msgid "Unexpected macro \"%1$s\""
@@ -23663,7 +23721,7 @@ msgstr "Utilisez le filtre pour afficher les résultats"
 
 #: app/views/host.wizard.edit.php:424
 msgid "Use:"
-msgstr ""
+msgstr "Utilisation :"
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
@@ -25027,6 +25085,10 @@ msgstr "La configuration du widget sera rétablie."
 msgid "Widget is deprecated."
 msgstr "Le widget est obsolète."
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr "Le widget n'est pas entièrement configuré"
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Le widget est trop petit pour le nombre de colonnes et de lignes spécifié."
@@ -25410,6 +25472,10 @@ msgstr "Vous ne pouvez pas changer les modèles pour la sélection actuelle."
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Vous n'avez pas la permission d'effectuer cette opération."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr "Vous avez été autorisé via l'authentification unique (SSO), mais la connexion à Zabbix a échoué."
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -26816,6 +26882,11 @@ msgstr "séquence d'octets invalide en UTF-8"
 msgid "invalid data type"
 msgstr "type de données invalide"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr "date invalide"
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "délai invalide"
@@ -28215,6 +28286,11 @@ msgstr "la valeur doit être comprise entre \"%1$s\" et \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "la valeur doit être comprise entre « %1$s » et « %2$s », et ne pas comporter plus de « %3$s » chiffres après la virgule"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr "la valeur doit être comprise entre %1$s et %2$s"
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "la valeur doit être vide"
@@ -28231,6 +28307,16 @@ msgstr[1] "la valeur doit être vide ou une des valeurs %1$s"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "la valeur doit être supérieure à \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr "la valeur doit être supérieure ou égale à %1$s"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr "la valeur ne doit pas être inférieure ou égale à %1$s"
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220
