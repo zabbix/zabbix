@@ -22,7 +22,6 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @suite-components-reuse true
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_history_value
- * @backup history,history_uint,history_str,history_text,history_log,items
  * @onAfterOnce clearData
  */
 class testHistoryGet extends CIntegrationTest {
