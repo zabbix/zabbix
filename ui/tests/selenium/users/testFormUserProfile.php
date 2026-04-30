@@ -629,14 +629,14 @@ class testFormUserProfile extends CLegacyWebTest {
 			]
 		];
 
-		$this->page->login()->open('zabbix.php?action=userprofile.notification.edit')->waitUntilReady();
-		$form = $this->query('id:userprofile-notification-form')->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
+		$form = $this->query('id:user-form')->asForm()->one();
 		$form->selectTab('Frontend notifications');
 		$form->fill($data['frontend_notifications']);
 		$form->fill($data['trigger_severity']);
 		$this->query('button:Update')->one()->click();
 		$this->assertMessage($data['expected'], $data['error_title'], $data['error_msg']);
-		$form = $this->query('id:userprofile-notification-form')->asForm()->one();
+		$form = $this->query('id:user-form')->asForm()->one();
 		// Assert correct checkbox state.
 		foreach ($data['trigger_severity'] as $сheckbox => $state) {
 			$this->assertEquals($state, $form->getField($сheckbox)->asCheckbox()->isChecked());
