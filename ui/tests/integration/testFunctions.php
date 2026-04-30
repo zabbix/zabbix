@@ -17,7 +17,7 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
 
 
 /**
- * Test suite for LLD.
+ * Test suite for trigger functions.
  *
  * @required-components server
  * @suite-components-reuse true

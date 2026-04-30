@@ -431,8 +431,8 @@ class testHistoryGet extends CIntegrationTest {
 		$itemid = self::$items['trapper_str_search']['itemid'];
 
 		$values = [
-			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'Case_Alpha', 'clock' => $tm, 'ns' => 0],
-			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'CASE_BETA', 'clock' => $tm + 1, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'CaseAlpha', 'clock' => $tm, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'CASEBETA', 'clock' => $tm + 1, 'ns' => 0],
 			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'other', 'clock' => $tm + 2, 'ns' => 0]
 		];
 
@@ -447,26 +447,26 @@ class testHistoryGet extends CIntegrationTest {
 			return count($response['result']) === 3;
 		});
 
-		// Uppercase search term matches both mixed-case and uppercase values
+		// Uppercase search term matches both values containing 'case' regardless of stored case
 		$response = $this->call('history.get', [
 			'history' => ITEM_VALUE_TYPE_STR,
 			'itemids' => [$itemid],
 			'time_from' => $tm,
 			'time_till' => $tm + 2,
-			'search' => ['value' => 'CASE_']
+			'search' => ['value' => 'CASE']
 		]);
 		$this->assertCount(2, $response['result']);
 
-		// Lowercase search term matches the all-uppercase value
+		// Lowercase search term matches the all-uppercase stored value
 		$response = $this->call('history.get', [
 			'history' => ITEM_VALUE_TYPE_STR,
 			'itemids' => [$itemid],
 			'time_from' => $tm,
 			'time_till' => $tm + 2,
-			'search' => ['value' => 'case_beta']
+			'search' => ['value' => 'casebeta']
 		]);
 		$this->assertCount(1, $response['result']);
-		$this->assertEquals('CASE_BETA', $response['result'][0]['value']);
+		$this->assertEquals('CASEBETA', $response['result'][0]['value']);
 
 		// startSearch is also case-insensitive
 		$response = $this->call('history.get', [
@@ -474,7 +474,7 @@ class testHistoryGet extends CIntegrationTest {
 			'itemids' => [$itemid],
 			'time_from' => $tm,
 			'time_till' => $tm + 2,
-			'search' => ['value' => 'case_'],
+			'search' => ['value' => 'case'],
 			'startSearch' => true
 		]);
 		$this->assertCount(2, $response['result']);
