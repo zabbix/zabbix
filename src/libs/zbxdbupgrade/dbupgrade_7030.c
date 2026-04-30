@@ -21,7 +21,6 @@
 #include "zbxnum.h"
 #include "dbupgrade_common.h"
 #include "zbxtasks.h"
-#include "zbxdbhigh.h"
 
 /*
  * 7.4 development database patches
