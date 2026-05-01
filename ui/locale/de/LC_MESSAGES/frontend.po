@@ -1817,6 +1817,11 @@ msgstr "Mindestens ein Ausdruck muss gewählt werden."
 msgid "At least one host group or host must be selected."
 msgstr "Mindestens eine Host-Gruppe oder ein Host muss ausgewählt sein."
 
+#: app/controllers/CControllerGraphPrototypeCreate.php:116
+#: app/controllers/CControllerGraphPrototypeUpdate.php:118
+msgid "At least one item must be a prototype"
+msgstr ""
+
 #: app/controllers/CControllerMaintenanceCreate.php:57
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
 #: app/controllers/CControllerMaintenanceUpdate.php:58
@@ -2588,6 +2593,13 @@ msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
 msgstr[0] "Modul kann nicht hinzugefügt werden: %1$s."
 msgstr[1] "Module können nicht hinzugefügt werden: %1$s."
+
+#: app/controllers/CControllerGraphCreate.php:111
+#: app/controllers/CControllerGraphPrototypeCreate.php:121
+#: app/controllers/CControllerGraphPrototypeUpdate.php:123
+#: app/controllers/CControllerGraphUpdate.php:113
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr ""
 
 #: include/classes/api/services/CGraph.php:42
 #, c-format
@@ -13983,6 +13995,10 @@ msgstr ""
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Liste der Blockgeräte und ihres Typs. Rückgabe JSON"
 
+#: include/classes/data/CItemData.php:1724
+msgid "List of block devices with detailed information. Returns JSON"
+msgstr ""
+
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
 msgstr ""
@@ -14002,6 +14018,10 @@ msgstr "Liste der eingehängten Dateisysteme und ihrer Typen. Rückgabe JSON"
 #: include/classes/data/CItemData.php:1703
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr "Liste der eingehängten Dateisysteme, deren Typen, Speicherplatz und Inode-Statistiken. Rückgabe JSON"
+
+#: include/classes/data/CItemData.php:1266
+msgid "List of network interfaces with detailed information. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1109
 msgid "List of network interfaces. Returns JSON"

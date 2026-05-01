@@ -127,11 +127,8 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					'placeholder' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
 			],
 			'id:idp_certificate' => ['value' => '', 'visible' => true, 'placeholder' => 'PEM-encoded IdP certificate'],
-			'id:idp_certificate_file' => ['visible' => true],
 			'id:sp_private_key' => ['value' => '', 'visible' => true, 'placeholder' => 'PEM-encoded SP private key'],
-			'id:sp_private_key_file' => ['visible' => true],
 			'id:sp_certificate' => ['value' => '', 'visible' => true, 'placeholder' => 'PEM-encoded SP certificate'],
-			'id:sp_certificate_file' => ['visible' => true],
 			'id:sign_messages' => ['value' => false, 'visible' => true],
 			'id:sign_assertions' => ['value' => false, 'visible' => true],
 			'id:sign_authn_requests' => ['value' => false, 'visible' => true],
@@ -148,7 +145,6 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			'Media type mapping' => ['visible' => false],
 			'Enable SCIM provisioning' => ['value' => false, 'visible' => false]
 		];
-
 		foreach ($saml_fields as $field => $attributes) {
 			$this->assertEquals($attributes['visible'], $saml_form->getField($field)->isVisible());
 			$this->assertFalse($saml_form->getField($field)->isEnabled());
@@ -166,6 +162,8 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			}
 		}
 
+		$this->assertEquals(0, $saml_form->query('button:Choose file')->all()->filter(CElementFilter::CLICKABLE)->count());
+
 		// Check visible mandatory fields.
 		$this->assertEquals(['IdP entity ID', 'SSO service URL', 'Username attribute', 'SP entity ID', 'IdP certificate'],
 				$saml_form->getRequiredLabels()
@@ -182,6 +180,8 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		foreach (array_keys($saml_fields) as $label) {
 			$this->assertTrue($saml_form->getField($label)->isEnabled());
 		}
+
+		$this->assertEquals(3, $saml_form->query('button:Choose file')->all()->filter(CElementFilter::CLICKABLE)->count());
 
 		// Check mandatory SP fields.
 		$sp_fields = ['SP private key', 'SP certificate'];
