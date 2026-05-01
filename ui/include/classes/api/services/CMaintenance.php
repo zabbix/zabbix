@@ -528,6 +528,7 @@ class CMaintenance extends CApiService {
 		 * records in acknowledges table.
 		 */
 		$ins_acknowledges = [];
+		$time = time();
 
 		$db_suppressions = DBselect(
 			'SELECT es.eventid,es.maintenanceid'.
@@ -538,7 +539,7 @@ class CMaintenance extends CApiService {
 		while ($db_suppression = DBfetch($db_suppressions)) {
 			$ins_acknowledges[] = [
 				'eventid' => $db_suppression['eventid'],
-				'clock' => time(),
+				'clock' => $time,
 				'action' => ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS,
 				'suppress_until' => 0,
 				'maintenanceid' => $db_suppression['maintenanceid']
