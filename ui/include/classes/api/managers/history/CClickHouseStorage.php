@@ -558,7 +558,8 @@ class CClickHouseStorage {
 							$form_value = '['.implode(',', $value).']';
 						}
 						elseif (is_string($value)) {
-							$form_value = '\''.addcslashes($value, '\\\'').'\'';
+							// Single value should not be quoted.
+							$form_value = $value;
 						}
 						break;
 				}
