@@ -431,22 +431,4 @@ else
 ZBX_IPMI_LIB =
 endif
 
-agent_DEPS = \
-	$(ZBX_COMMON_LIBS) \
-	$(ZBX_AGENT_LIBS)
-
-server_DEPS = \
-	$(ZBX_COMMON_LIBS) \
-	$(ZBX_SERVER_RPOXY_LIBS) \
-	$(ZBX_SERVER_LIBS) \
-	$(ZBX_IPMI_LIB)
-
-proxy_DEPS = \
-	$(ZBX_COMMON_LIBS) \
-	$(ZBX_SERVER_RPOXY_LIBS) \
-	$(ZBX_PROXY_LIBS) \
-	$(ZBX_IPMI_LIB)
-
-GROUP_NAME = server
-GROUP_DEPS = $(server_DEPS)
 include ../grouped-libs.mk.inc
