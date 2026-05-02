@@ -19,9 +19,9 @@ proxy_DEPS = \
 GROUPED_LIBS_MK = grouped-libs-generated.mk
 
 $(GROUPED_LIBS_MK): Makefile
-	@echo "agent_GROUPED_LIBS := -Wl,--start-group $(agent_DEPS) -Wl,--end-group" > $@
-	@echo "server_GROUPED_LIBS := -Wl,--start-group $(server_DEPS) -Wl,--end-group" >> $@
-	@echo "proxy_GROUPED_LIBS := -Wl,--start-group $(proxy_DEPS) -Wl,--end-group" >> $@
+	@echo "AGENT_GROUPED_LIBS := -Wl,--start-group $(agent_DEPS) -Wl,--end-group" > $@
+	@echo "SERVER_GROUPED_LIBS := -Wl,--start-group $(server_DEPS) -Wl,--end-group" >> $@
+	@echo "PROXY_GROUPED_LIBS := -Wl,--start-group $(proxy_DEPS) -Wl,--end-group" >> $@
 
 # include generated variables
 -include $(GROUPED_LIBS_MK)

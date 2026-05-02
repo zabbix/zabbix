@@ -19,8 +19,7 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 ALGO_LIBS = \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(SERVER_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
