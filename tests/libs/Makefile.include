@@ -432,3 +432,15 @@ ZBX_IPMI_LIB =
 endif
 
 include ../grouped-libs.mk.inc
+
+if SERVER
+ANY_GROUPED_LIBS = $(SERVER_GROUPED_LIBS)
+else
+if PROXY
+ANY_GROUPED_LIBS = $(PROXY_GROUPED_LIBS)
+else
+if AGENT
+ANY_GROUPED_LIBS = $(AGENT_GROUPED_LIBS)
+endif
+endif
+endif

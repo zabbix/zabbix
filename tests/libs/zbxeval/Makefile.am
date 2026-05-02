@@ -35,11 +35,8 @@ SERVER_tests = \
 	zbx_eval_calc_max \
 	zbx_eval_calc_sum
 
-endif
-
 noinst_PROGRAMS = $(SERVER_tests)
 
-if SERVER
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 

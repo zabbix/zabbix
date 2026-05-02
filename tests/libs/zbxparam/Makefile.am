@@ -9,7 +9,7 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 PARAM_LIBS = \
-	$(SERVER_GROUPED_LIBS) \
+	$(ANY_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
