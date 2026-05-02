@@ -44,13 +44,9 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 EVAL_LIBS = \
-	$(EVAL_DEPS) \
+	$(SERVER_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
-
-if HAVE_IPMI
-	EVAL_LIBS += $(top_srcdir)/src/libs/zbxipmi/libzbxipmi.a
-endif
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
 

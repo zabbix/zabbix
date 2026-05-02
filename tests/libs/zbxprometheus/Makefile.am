@@ -6,15 +6,7 @@ SERVER_tests = prometheus_filter_init zbx_prometheus_pattern zbx_prometheus_to_j
 noinst_PROGRAMS = $(SERVER_tests)
 
 PROMETHEUS_LIBS = \
-	$(top_srcdir)/src/libs/zbxprometheus/libzbxprometheus.a \
-	$(EVAL_DEPS) \
-	$(EXPR_DEPS) \
-	$(JSON_DEPS) \
-	$(REGEXP_DEPS) \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(SERVER_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
