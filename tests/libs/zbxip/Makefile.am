@@ -27,16 +27,11 @@ COMMON_SRC_FILES = \
 #$(info server_GROUPED_LIBS=[${server_GROUPED_LIBS}])
 #$(info GROUPED_LIBS=[${GROUPED_LIBS}])
 
-GROUP_NAME = server
-GROUP_DEPS = $(server_DEPS)
-include ../grouped-libs.mk.inc
-
 
 IP_LIBS = \
 	$(GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
-
 
 IP_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \

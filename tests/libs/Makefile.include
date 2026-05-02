@@ -446,3 +446,7 @@ proxy_DEPS = \
 	$(ZBX_SERVER_RPOXY_LIBS) \
 	$(ZBX_PROXY_LIBS) \
 	$(ZBX_IPMI_LIB)
+
+GROUP_NAME = server
+GROUP_DEPS = $(server_DEPS)
+include ../grouped-libs.mk.inc
