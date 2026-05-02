@@ -18,11 +18,25 @@ noinst_PROGRAMS = $(BINARIES_tests)
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
+#IP_LIBS = \
+#	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
+#	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+#	$(MOCK_DATA_DEPS) \
+#	$(MOCK_TEST_DEPS)
+
+#$(info server_GROUPED_LIBS=[${server_GROUPED_LIBS}])
+#$(info GROUPED_LIBS=[${GROUPED_LIBS}])
+
+GROUP_NAME = server
+GROUP_DEPS = $(server_DEPS)
+include ../grouped-libs.mk.inc
+
+
 IP_LIBS = \
-	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
+
 
 IP_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \
@@ -36,6 +50,8 @@ zbx_is_supported_ip_SOURCES = \
 
 zbx_is_supported_ip_LDADD = \
 	$(IP_LIBS)
+
+#zbx_is_supported_ip_LDADD = $(server_GROUPED_LIBS)
 
 zbx_is_supported_ip_LDADD += @SERVER_LIBS@
 
