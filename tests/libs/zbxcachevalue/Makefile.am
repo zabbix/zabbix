@@ -11,6 +11,7 @@ noinst_PROGRAMS = $(SERVER_tests)
 
 if SERVER
 VALUECACHE_LIBS = \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a \
 	$(SERVER_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
