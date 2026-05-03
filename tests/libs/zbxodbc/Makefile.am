@@ -11,12 +11,10 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 PARAM_LIBS = \
-	$(MOCK_DATA_DEPS) \
-	$(MOCK_TEST_DEPS) \
 	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
-	$(JSON_DEPS)
-
-
+	$(ANY_GROUPED_LIBS) \
+	$(MOCK_DATA_DEPS) \
+	$(MOCK_TEST_DEPS)
 
 PARAM_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \
