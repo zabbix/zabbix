@@ -13,17 +13,17 @@ noinst_PROGRAMS = $(SERVER_tests)
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-JSON_LIBS = \
+PREPROC_LIBS = \
 	$(SERVER_GROUPED_LIBS) \
+	@SERVER_LIBS@ \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 zbx_item_preproc_SOURCES = \
 	zbx_item_preproc.c \
 	configcache_mock.c
 
-zbx_item_preproc_LDADD = $(JSON_LIBS)
+zbx_item_preproc_LDADD = $(PREPROC_LIBS)
 
-zbx_item_preproc_LDADD += @SERVER_LIBS@
 zbx_item_preproc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) \
 	-Wl,--wrap=zbx_dc_expand_user_and_func_macros_from_cache
 
@@ -35,9 +35,8 @@ item_preproc_xpath_SOURCES = \
 	configcache_mock.c \
 	$(COMMON_SRC_FILES)
 
-item_preproc_xpath_LDADD = $(JSON_LIBS)
+item_preproc_xpath_LDADD = $(PREPROC_LIBS)
 
-item_preproc_xpath_LDADD += @SERVER_LIBS@
 item_preproc_xpath_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLD_LDFLAGS) \
 	-Wl,--wrap=zbx_dc_expand_user_and_func_macros_from_cache
 
@@ -49,9 +48,8 @@ item_preproc_csv_to_json_SOURCES = \
 	configcache_mock.c \
 	$(COMMON_SRC_FILES)
 
-item_preproc_csv_to_json_LDADD = $(JSON_LIBS)
+item_preproc_csv_to_json_LDADD = $(PREPROC_LIBS)
 
-item_preproc_csv_to_json_LDADD += @SERVER_LIBS@
 item_preproc_csv_to_json_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) \
 	-Wl,--wrap=zbx_dc_expand_user_and_func_macros_from_cache
 
