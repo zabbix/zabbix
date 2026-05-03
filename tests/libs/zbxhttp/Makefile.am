@@ -3,7 +3,8 @@ include ../Makefile.include
 noinst_PROGRAMS = \
 	zbx_determine_charset
 
-HTTP_LIBS = $(ANY_GROUPED_LIBS) \
+HTTP_LIBS = \
+	$(ANY_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
