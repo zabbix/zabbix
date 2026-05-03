@@ -1,3 +1,24 @@
+# This file exists to safely use linker grouping flags:
+#     -Wl,--start-group ... -Wl,--end-group
+#
+# Problem:
+# Automake does not allow linker flags like --start-group/--end-group
+# inside *_LDADD variables and will fail during automake processing if
+# they are present directly in Makefile.am or included .am/.include files.
+#
+# Why grouping is needed:
+# Zabbix static libraries have many cyclic dependencies. Without
+# --start-group/--end-group, the linker may fail with undefined references
+# depending on library order.
+#
+# Solution:
+# We generate the grouped linker flags at *make runtime* using:
+#     @echo "... --start-group $(LIBS) --end-group" > generated.mk
+#
+# This works because:
+# - Automake never sees the flags (they are generated later)
+# - The linker still receives properly grouped libraries
+
 agent_DEPS = \
 	$(ZBX_COMMON_LIBS) \
 	$(ZBX_AGENT_LIBS)
