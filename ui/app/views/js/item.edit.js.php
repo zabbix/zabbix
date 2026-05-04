@@ -387,6 +387,7 @@ window.item_edit_form = new class {
 		this.form.validateSubmit(fields).then((result) => {
 			if (!result) {
 				this.overlay.unsetLoading();
+				this.#updateActionButtons();
 				return;
 			}
 
@@ -403,6 +404,7 @@ window.item_edit_form = new class {
 		this.form.validateSubmit(fields).then((result) => {
 			if (!result) {
 				this.overlay.unsetLoading();
+				this.#updateActionButtons();
 				return;
 			}
 
