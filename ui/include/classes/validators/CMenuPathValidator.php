@@ -23,7 +23,7 @@ class CMenuPathValidator extends CValidator {
 		$folders = array_map('trim', $folders);
 		$count = count($folders);
 
-		if ($count == 1 && $folders[0] === '') {
+		if ($count == 1) {
 			return true;
 		}
 
