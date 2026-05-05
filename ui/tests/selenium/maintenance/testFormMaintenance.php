@@ -202,7 +202,7 @@ class testFormMaintenance extends CWebTest {
 
 			// Check Periods table.
 			$periods_table = $this->query(self::PERIODS_TABLE)->asTable()->one();
-			$this->assertEquals(['Period type', 'Schedule', 'Period', 'Action'], $periods_table->getHeadersText());
+			$this->assertEquals(['Period type', 'Schedule', 'Period', 'Actions'], $periods_table->getHeadersText());
 			if (!$is_update) {
 				$this->assertEquals(0, $periods_table->getRows()->count());
 			}
@@ -364,7 +364,7 @@ class testFormMaintenance extends CWebTest {
 						break;
 
 					case 'Daily':
-						$expected_required = ['Every day(s)'];
+						$expected_required = ['Every day(s)', 'At (hour:minute)'];
 						$check_fields = [
 							'id:every_day' => ['maxlength' => 3]
 						];
@@ -376,7 +376,7 @@ class testFormMaintenance extends CWebTest {
 						break;
 
 					case 'Weekly':
-						$expected_required = ['Every week(s)', 'Day of week'];
+						$expected_required = ['Every week(s)', 'Day of week', 'At (hour:minute)'];
 						$check_fields = [
 							'id:every_week' => ['maxlength' => 2]
 						];
@@ -393,7 +393,7 @@ class testFormMaintenance extends CWebTest {
 						break;
 
 					case 'Monthly':
-						$expected_required = ['Month', 'Day of month'];
+						$expected_required = ['Month', 'Day of month', 'At (hour:minute)'];
 						$check_fields = [
 							'id:day' => ['maxlength' => 2]
 						];
@@ -411,7 +411,7 @@ class testFormMaintenance extends CWebTest {
 						break;
 
 					case 'Monthly with Day of week period':
-						$expected_required = ['Month', 'Day of week'];
+						$expected_required = ['Month', 'Day of week', 'At (hour:minute)'];
 						$check_fields = [
 						];
 						$expected_default_values += [
