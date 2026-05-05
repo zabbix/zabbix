@@ -1489,7 +1489,7 @@ class CFormValidator {
 	 * @return bool
 	 */
 	private static function checkStringIn(array $rules, $value, ?string &$error = null): bool {
-		if (array_key_exists('in', $rules) && !in_array($value, $rules['in'])) {
+		if (array_key_exists('in', $rules) && !in_array($value, $rules['in'], true)) {
 			$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $rules['in']));
 			$error = _n('This value must be %1$s.', 'This value must be one of %1$s.',  $values, count($rules['in']));
 
