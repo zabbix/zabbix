@@ -447,6 +447,16 @@ class testHistoryGet extends CIntegrationTest {
 			return count($response['result']) === 3;
 		});
 
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'CaseAlpha'],
+			'output' => ['itemid']
+		]);
+		$this->assertCount(1, $response['result']);
+
 		// Uppercase search term matches both values containing 'case' regardless of stored case
 		$response = $this->call('history.get', [
 			'history' => ITEM_VALUE_TYPE_STR,
