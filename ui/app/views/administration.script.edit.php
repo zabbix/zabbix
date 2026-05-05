@@ -360,11 +360,11 @@ $form_grid
 			new CFormField([
 				(new CTextAreaFlexible('manualinput_prompt', $data['form']['manualinput_prompt']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setErrorContainer('manualinput-promt-error-container')
+					->setErrorContainer('manualinput-prompt-error-container')
 					->setMaxlength(DB::getFieldLength('scripts', 'manualinput_prompt')),
 				NBSP(),
 				(new CButton('test_user_input', _('Test user input')))->addClass(ZBX_STYLE_BTN_GREY),
-				(new CDiv())->setId('manualinput-promt-error-container')
+				(new CDiv())->setId('manualinput-prompt-error-container')
 			])
 		])
 		->addItem([
