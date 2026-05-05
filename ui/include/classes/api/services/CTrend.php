@@ -103,17 +103,13 @@ class CTrend extends CApiService {
 			'time_from' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'time_till' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			// Output.
-			'output' =>			['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
+			'output' =>			['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>	['type' => API_BOOLEAN, 'default' => false],
 			'limit' =>			['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = self::OUTPUT_FIELDS;
 		}
 	}
 
@@ -138,15 +134,8 @@ class CTrend extends CApiService {
 
 			$sql_fields = [];
 
-			if (is_array($options['output'])) {
-				foreach ($options['output'] as $field) {
-					if ($this->hasField($field, 'trends') && $this->hasField($field, 'trends_uint')) {
-						$sql_fields[] = 't.'.$field;
-					}
-				}
-			}
-			elseif ($options['output'] == API_OUTPUT_EXTEND) {
-				$sql_fields[] = 't.*';
+			foreach ($options['output'] as $field) {
+				$sql_fields[] = 't.'.$field;
 			}
 
 			// An empty field set or invalid output method (string). Select only "itemid" instead of everything.
