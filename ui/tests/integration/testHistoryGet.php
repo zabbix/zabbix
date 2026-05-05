@@ -441,7 +441,8 @@ class testHistoryGet extends CIntegrationTest {
 			'history' => ITEM_VALUE_TYPE_STR,
 			'itemids' => [$itemid],
 			'time_from' => $tm,
-			'time_till' => $tm + 2
+			'time_till' => $tm + 2,
+			'output' => ['itemid']
 		], 5, 5, function($response) {
 			return count($response['result']) === 3;
 		});
@@ -452,7 +453,8 @@ class testHistoryGet extends CIntegrationTest {
 			'itemids' => [$itemid],
 			'time_from' => $tm,
 			'time_till' => $tm + 2,
-			'search' => ['value' => 'CASE']
+			'search' => ['value' => 'CASE'],
+			'output' => ['itemid']
 		]);
 		$this->assertCount(2, $response['result']);
 
@@ -462,7 +464,8 @@ class testHistoryGet extends CIntegrationTest {
 			'itemids' => [$itemid],
 			'time_from' => $tm,
 			'time_till' => $tm + 2,
-			'search' => ['value' => 'casebeta']
+			'search' => ['value' => 'casebeta'],
+			'output' => ['itemid']
 		]);
 		$this->assertCount(1, $response['result']);
 		$this->assertEquals('CASEBETA', $response['result'][0]['value']);
@@ -474,7 +477,8 @@ class testHistoryGet extends CIntegrationTest {
 			'time_from' => $tm,
 			'time_till' => $tm + 2,
 			'search' => ['value' => 'case'],
-			'startSearch' => true
+			'startSearch' => true,
+			'output' => ['itemid']
 		]);
 		$this->assertCount(2, $response['result']);
 
