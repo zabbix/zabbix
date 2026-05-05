@@ -64,6 +64,7 @@ class testHistoryGet extends CIntegrationTest {
 			['key_' => 'trapper_float_sort', 'value_type' => ITEM_VALUE_TYPE_FLOAT],
 			['key_' => 'trapper_uint_count', 'value_type' => ITEM_VALUE_TYPE_UINT64],
 			['key_' => 'trapper_str_search', 'value_type' => ITEM_VALUE_TYPE_STR],
+			['key_' => 'trapper_str_casesearch', 'value_type' => ITEM_VALUE_TYPE_STR],
 			['key_' => 'trapper_str_startsearch', 'value_type' => ITEM_VALUE_TYPE_STR],
 			['key_' => 'trapper_str_wildcard', 'value_type' => ITEM_VALUE_TYPE_STR],
 			['key_' => 'trapper_uint_filter', 'value_type' => ITEM_VALUE_TYPE_UINT64],
@@ -427,12 +428,12 @@ class testHistoryGet extends CIntegrationTest {
 
 	public function testHistoryValue_caseInsensitiveSearch() {
 		$tm = $this->timeMonotonic();
-		$itemid = self::$items['trapper_str_search']['itemid'];
+		$itemid = self::$items['trapper_str_casesearch']['itemid'];
 
 		$values = [
-			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'CaseAlpha', 'clock' => $tm, 'ns' => 0],
-			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'CASEBETA', 'clock' => $tm + 1, 'ns' => 0],
-			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'other', 'clock' => $tm + 2, 'ns' => 0]
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_casesearch', 'value' => 'CaseAlpha', 'clock' => $tm, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_casesearch', 'value' => 'CASEBETA', 'clock' => $tm + 1, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_casesearch', 'value' => 'other', 'clock' => $tm + 2, 'ns' => 0]
 		];
 
 		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
