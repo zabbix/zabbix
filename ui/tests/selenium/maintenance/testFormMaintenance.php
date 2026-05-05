@@ -1403,21 +1403,23 @@ class testFormMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #2 Daily with invalid hour and minute values.
+			// #2 Daily with invalid At (hour:minute) and maintenance period length days values.
 			[
 				[
 					'fields' => [
 						'Period type' => 'Daily',
 						'id:hour' => '98',
-						'id:minute' => '99'
+						'id:minute' => '99',
+						'id:period_days' => '-9'
 					],
 					'error' => [
 						'Incorrect value for field "hour": value must be no greater than "23".',
-						'Incorrect value for field "minute": value must be no greater than "59".'
+						'Incorrect value for field "minute": value must be no greater than "59".',
+						'Incorrect value for field "period_days": value must be no less than "0".'
 					]
 				]
 			],
-			// #4 Weekly with 'Every week' 0 and no days selected.
+			// #3 Weekly with 'Every week' 0 and no days selected.
 			[
 				[
 					'fields' => [
@@ -1430,7 +1432,7 @@ class testFormMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #5 Monthly (Day of month) with empty months and 'Day of month' 0.
+			// #4 Monthly (Day of month) with empty months and 'Day of month' 0.
 			[
 				[
 					'fields' => [
@@ -1443,7 +1445,7 @@ class testFormMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #6 Monthly (Day of week) with empty months and no days selected.
+			// #5 Monthly (Day of week) with empty months and no days selected.
 			[
 				[
 					'fields' => [
