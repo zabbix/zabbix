@@ -1,5 +1,5 @@
 SELECT itemid,concat(clock,'.',ns),value FROM history_text
-INTO OUTFILE '/tmp/history_text.csv'
+INTO OUTFILE '/var/lib/mysql-files/history_text.csv'
 FIELDS ENCLOSED BY '"'
 TERMINATED BY ','
 ESCAPED BY '"' LINES

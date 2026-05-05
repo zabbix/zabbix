@@ -2,10 +2,10 @@ display_help()
 {
 	echo "Arguments:"
 	echo "  -u|--url		ClickHouse URL ($CH_URL)"
-	echo "  -d|--db			database name ($CH_DB)"
-	echo "  -t|--ttl		housekeeping interval in seconds ($CH_TTL)"
-	echo "  -p|--partition		partitioning schema ($CH_PARTITION)"
-	echo "  -h|--help		help message"
+	echo "  -d|--db			Database name ($CH_DB)"
+	echo "  -t|--ttl		Housekeeping interval in seconds ($CH_TTL)"
+	echo "  -p|--partition		Partitioning schema ($CH_PARTITION)"
+	echo "  -h|--help		Help message"
 
 	exit 0
 }
