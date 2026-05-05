@@ -757,7 +757,7 @@ int	zbx_db_update_software_update_checkid(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set setting value in database                                     *
+ * Purpose: set settings value in database                                    *
  *                                                                            *
  * Parameters: name  - [IN] setting name                                      *
  *             value - [IN] setting value                                     *
