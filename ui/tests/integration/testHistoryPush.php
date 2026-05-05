@@ -292,6 +292,8 @@ class testHistoryPush extends CIntegrationTest {
 			foreach (array_keys($value_retrieved) as $i) {
 				$this->assertEquals(strval($value_sent[$i]), $value_retrieved[$i]);
 			}
+
+			$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'history_cache_clear='.$tc['itemid']);
 		}
 
 		return true;
@@ -330,6 +332,8 @@ class testHistoryPush extends CIntegrationTest {
 		$this->assertEquals($value_sent['value'], $value_retrieved['value']);
 		$this->assertEquals($value_sent['clock'], $value_retrieved['clock']);
 		$this->assertEquals($value_sent['ns'], $value_retrieved['ns']);
+
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'history_cache_clear='. self::$itemids['trapper_uint_host_key_test']);
 
 		return true;
 	}

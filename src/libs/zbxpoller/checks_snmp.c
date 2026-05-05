@@ -3451,6 +3451,8 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 					if (1 == engineid_cache_initialized)
 						snmp_identity_remove(addresses->values[0].ip);
 
+					SNMP_MT_UNLOCK;
+
 					return async_task_process_task_snmp_cb(0, data, fd, addresses, reverse_dns,
 							dnserr, timeout_event);
 				}
@@ -3693,8 +3695,6 @@ stop:
 				snmp_context->item.itemid, snmp_error);
 	}
 
-	SNMP_MT_UNLOCK;
-
 	if (ZBX_ASYNC_TASK_STOP == task_ret && ZBX_ISSET_MSG(&snmp_context->item.result))
 	{
 		if (1 == engineid_cache_initialized)
@@ -3716,6 +3716,8 @@ stop:
 			snmp_sess_close(snmp_context->ssp);
 			zbx_free_agent_result(&snmp_context->item.result);
 
+			SNMP_MT_UNLOCK;
+
 			return async_task_process_task_snmp_cb(0, data, fd, addresses, reverse_dns,
 					dnserr, timeout_event);
 		}
@@ -3733,6 +3735,8 @@ stop:
 				__func__, snmp_context->item.itemid, zbx_get_event_string(event), event, *fd,
 				(zbx_fs_size_t)snmp_context->results_offset, zbx_task_state_to_str(task_ret));
 	}
+
+	SNMP_MT_UNLOCK;
 
 	return task_ret;
 #undef ZBX_SNMP_TIMEOUT_WATERMARK
