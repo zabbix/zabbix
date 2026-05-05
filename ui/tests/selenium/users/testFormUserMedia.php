@@ -458,7 +458,7 @@ class testFormUserMedia extends CWebTest {
 		$this->assertTrue($type_column->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->isValid());
 
 		$this->assertEquals('Media type disabled by Administration.', $type_column->query('tag:button')->one()
-				->getAttribute('data-hintbox-contents'));
+				->getAttribute('data-hintbox-html'));
 
 		// Check that status of disabled media types is not clickable.
 		$this->assertFalse($discord_row->getColumn('Status')->query('xpath:.//a')->one(false)->isValid());
@@ -792,21 +792,21 @@ class testFormUserMedia extends CWebTest {
 			// Check that the passed severities are turned on.
 			foreach ($data['fields']['Use if severity'] as $used_severity) {
 				$actual_severity = $row->query('xpath:./td[4]/div/span['.$reference_severities[$used_severity].']')->one()
-						->getAttribute("data-hintbox-contents");
+						->getAttribute("data-hintbox-html");
 				$this->assertEquals($actual_severity, $used_severity.' (on)');
 				unset($reference_severities[$used_severity]);
 			}
 			// Check that other severities are turned off.
 			foreach ($reference_severities as $name => $unused_severity) {
 				$actual_severity = $row->query('xpath:./td[4]/div/span['.$unused_severity.']')->one()
-						->getAttribute("data-hintbox-contents");
+						->getAttribute("data-hintbox-html");
 				$this->assertEquals($name.' (off)', $actual_severity);
 			}
 		}
 		else {
 			// Check that when no severities are passed - they all are turned on by default.
 			for ($i = 1; $i < 7; $i++) {
-				$severity =  $row->query('xpath:./td[4]/div/span['.$i.']')->one()->getAttribute("data-hintbox-contents");
+				$severity =  $row->query('xpath:./td[4]/div/span['.$i.']')->one()->getAttribute("data-hintbox-html");
 				$this->assertStringContainsString('(on)', $severity);
 			}
 		}

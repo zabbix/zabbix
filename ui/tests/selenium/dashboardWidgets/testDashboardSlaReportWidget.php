@@ -2360,7 +2360,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			 * "days" related information can be discarded.
 			 */
 			if (in_array($data['reporting_period'], ['Monthly', 'Quarterly', 'Annually'])) {
-				$data['fields']['From'] = date('Y-m', strtotime($data['fields']['From']));
+				$data['fields']['From'] = date('Y-m', strtotime($this->normalizeDate($data['fields']['From'])));
 			}
 
 			$to_date = date('Y-m-d', strtotime($data['fields']['From'].' + '.($multiplier * ($show_periods - 1)).

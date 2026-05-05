@@ -146,7 +146,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		for ($batch = 0; $batch < $batches && count($cells) < $limit; $batch++) {
 			$batch_items = array_slice($items, $batch * $limit, $limit);
 			// Extra byte to trim values that exceeds length limit.
-			$length = ZBX_HINTBOX_CONTENT_LIMIT + 1;
+			$length = ZBX_HINTBOX_HTML_LIMIT + 1;
 			$db_history = Manager::History()->getLastValues($batch_items, 1, $history_period, $length);
 
 			foreach ($batch_items as $item) {

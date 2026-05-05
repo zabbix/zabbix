@@ -1499,8 +1499,8 @@ class testFormUser extends CWebTest {
 		if ($update_user === 'LDAP change password button check') {
 			$this->assertFalse($form->query('button:Change password')->one()->isClickable());
 			$hintbox = 'Password can only be changed for users using the internal Zabbix authentication.';
-			$this->assertEquals($hintbox, $this->query('xpath://button[contains(@data-hintbox-contents, '.
-					CXPathHelper::escapeQuotes($hintbox).')]')->one()->getAttribute('data-hintbox-contents')
+			$this->assertEquals($hintbox, $this->query('xpath://button[contains(@data-hintbox-html, '.
+					CXPathHelper::escapeQuotes($hintbox).')]')->one()->getAttribute('data-hintbox-html')
 			);
 		}
 
