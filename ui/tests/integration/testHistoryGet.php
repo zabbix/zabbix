@@ -477,7 +477,6 @@ class testHistoryGet extends CIntegrationTest {
 			'time_from' => $tm,
 			'time_till' => $tm + 2,
 			'search' => ['value' => 'casebeta'],
-			'output' => ['itemid']
 		]);
 		$this->assertCount(1, $response['result']);
 		$this->assertEquals('CASEBETA', $response['result'][0]['value']);
