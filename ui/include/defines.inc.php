@@ -2484,6 +2484,9 @@ define('ZBX_DEVICE_STATUS_NEW',			0);
 define('ZBX_DEVICE_STATUS_ACTIVATED',	1);
 define('ZBX_DEVICE_STATUS_ORPHANED',	2);
 
+define('MOBILE_KEY_SCOPE_IDENTITY',		0);
+define('MOBILE_KEY_SCOPE_ENCRYPTION',	1);
+
 // init $_REQUEST
 ini_set('variables_order', 'GP');
 $_REQUEST = $_POST + $_GET;

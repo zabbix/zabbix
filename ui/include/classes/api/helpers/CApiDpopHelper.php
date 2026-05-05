@@ -48,21 +48,11 @@ class CApiDpopHelper {
 
 		self::checkKid($header, $kid_keys);
 
-		JWT::$timestamp = $check_time;
-		JWT::$leeway = self::TIME_SKEW;
-
-		$jwk = json_decode($kid_keys[$header['kid']], true);
-
-		try {
-			$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);
-
-			JWT::decode($signature, $key);
-		}
-		catch (Exception $e) {
-			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), $e->getMessage().'.');
-		}
-
 		$payload = json_decode(JWT::urlsafeB64Decode($encoded_payload), true);
+
+		if (!is_array($payload) || !$payload) {
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Invalid payload encoding.');
+		}
 
 		self::checkHtu($payload, $requested_api_method);
 
@@ -71,6 +61,8 @@ class CApiDpopHelper {
 		self::checkTokenLifeTime($payload, $check_time);
 
 		self::checkJti($payload, $check_time);
+
+		self::checkSignature($signature, $header, $kid_keys, $check_time);
 	}
 
 	/**
@@ -144,12 +136,11 @@ class CApiDpopHelper {
 			);
 		}
 
-		if ($exp - $iat <= self::MAX_ALLOWED_IAT_AGE) {
-			if ($check_time > $exp + self::TIME_SKEW) {
-				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'JWT token expired.');
-			}
+		if ($check_time > $exp + self::TIME_SKEW) {
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'JWT token expired.');
 		}
-		elseif ($check_time > $iat + self::MAX_ALLOWED_IAT_AGE + self::TIME_SKEW) {
+
+		if ($check_time > $iat + self::MAX_ALLOWED_IAT_AGE + self::TIME_SKEW) {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'),
 				'JWT token exceeded maximum allowed lifetime.'
 			);
@@ -176,6 +167,22 @@ class CApiDpopHelper {
 		];
 
 		DB::insertBatch('dpop_jti_cache', [$dpop_jti_cache_ins], false);
+	}
+
+	private static function checkSignature(string $signature, array $header, array $kid_keys, int $check_time): void {
+		JWT::$timestamp = $check_time;
+		JWT::$leeway = self::TIME_SKEW;
+
+		$jwk = json_decode($kid_keys[$header['kid']], true);
+
+		try {
+			$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);
+
+			JWT::decode($signature, $key);
+		}
+		catch (Exception $e) {
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), $e->getMessage().'.');
+		}
 	}
 
 	public static function checkJwkIntegrity(array $jwk): bool {

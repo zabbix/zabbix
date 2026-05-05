@@ -34,8 +34,7 @@ class CDevice extends CApiService {
 
 	private const ENROLLMENT_TOKEN_EXPIRATION_TTL = 600;
 
-	public const MOBILE_KEY_SCOPE_IDENTITY = 0;
-	public const MOBILE_KEY_SCOPE_ENCRYPTION = 1;
+	public const DEVICE_KEY_ACTIVE = 0;
 
 	/**
 	 * @return array|string
@@ -300,12 +299,12 @@ class CDevice extends CApiService {
 
 		CToken::createForce($tokens, false);
 
-		$ins_device_token = [
+		$ins_token_device = [
 			'tokenid' => $tokens[0]['tokenid'],
 			'deviceid' => $db_device['deviceid']
 		];
 
-		DB::insertBatch('token_device', [$ins_device_token], false);
+		DB::insertBatch('token_device', [$ins_token_device], false);
 
 		CUser::provisionPushMedia($db_device['userid'], $db_device['uuid']);
 
@@ -377,16 +376,18 @@ class CDevice extends CApiService {
 			[
 				'device_keyid' => $device_keyid,
 				'deviceid' => $deviceid,
-				'scope' => self::MOBILE_KEY_SCOPE_IDENTITY,
+				'scope' => MOBILE_KEY_SCOPE_IDENTITY,
 				'kid' => $mobile_identity_key['kid'],
-				'key_' => json_encode($mobile_identity_key)
+				'key_' => json_encode($mobile_identity_key),
+				'active' => self::DEVICE_KEY_ACTIVE
 			],
 			[
 				'device_keyid' => bcadd($device_keyid, 1, 0),
 				'deviceid' => $deviceid,
-				'scope' => self::MOBILE_KEY_SCOPE_ENCRYPTION,
+				'scope' => MOBILE_KEY_SCOPE_ENCRYPTION,
 				'kid' => $mobile_encryption_key['kid'],
-				'key_' => json_encode($mobile_encryption_key)
+				'key_' => json_encode($mobile_encryption_key),
+				'active' => self::DEVICE_KEY_ACTIVE
 			]
 		];
 

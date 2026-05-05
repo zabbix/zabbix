@@ -3083,6 +3083,7 @@ class CUser extends CApiService {
 			'SELECT dk.scope,dk.kid,dk.key_'.
 			' FROM device_key dk'.
 			' WHERE '.dbConditionId('dk.deviceid', [$db_device['deviceid']]).
+				' AND '.dbConditionInt('dk.active', [CDevice::DEVICE_KEY_ACTIVE]).
 			' ORDER BY dk.device_keyid DESC'
 		);
 
@@ -3093,7 +3094,7 @@ class CUser extends CApiService {
 		}
 
 		CApiDpopHelper::verifyDpopSignature($params['signature'],
-			$keys_per_scope[CDevice::MOBILE_KEY_SCOPE_IDENTITY], $params['token'], $params['requested_api_method'],
+			$keys_per_scope[MOBILE_KEY_SCOPE_IDENTITY], $params['token'], $params['requested_api_method'],
 			$time
 		);
 
@@ -3109,8 +3110,8 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Linked devices not allowed.');
 		}
 
-		$mobile_encryption_kid = array_key_first($keys_per_scope[CDevice::MOBILE_KEY_SCOPE_ENCRYPTION]);
-		$mobile_encryption_key = $keys_per_scope[CDevice::MOBILE_KEY_SCOPE_ENCRYPTION][$mobile_encryption_kid];
+		$mobile_encryption_kid = array_key_first($keys_per_scope[MOBILE_KEY_SCOPE_ENCRYPTION]);
+		$mobile_encryption_key = $keys_per_scope[MOBILE_KEY_SCOPE_ENCRYPTION][$mobile_encryption_kid];
 
 		self::$userData += ['uuid' => $db_device['uuid']] +
 			['kid' => $mobile_encryption_kid, 'key' => $mobile_encryption_key];
