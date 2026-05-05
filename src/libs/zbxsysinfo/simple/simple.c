@@ -26,10 +26,6 @@
 #include "zbx_discoverer_constants.h"
 #include "zbxip.h"
 
-#if defined(HAVE_LIBCURL) || defined(HAVE_LDAP)
-#	include "zbxip.h"
-#endif
-
 #ifdef HAVE_LIBCURL
 #	include "zbxcurl.h"
 #endif
