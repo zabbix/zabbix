@@ -3833,7 +3833,7 @@ int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid)
 	return ret;
 }
 
-int	zbx_hc_is_itemid_cached_and_supported(zbx_uint64_t itemid)
+int	zbx_hc_is_itemid_cached_and_normal(zbx_uint64_t itemid)
 {
 	int		ret = FAIL;
 	zbx_hc_item_t	*item;
@@ -3841,7 +3841,7 @@ int	zbx_hc_is_itemid_cached_and_supported(zbx_uint64_t itemid)
 	LOCK_CACHE;
 
 	if (NULL != (item = (zbx_hc_item_t *)zbx_hashset_search(&cache->history_items, &itemid)) &&
-			NULL != item->tail && ITEM_STATE_NOTSUPPORTED != item->tail->state)
+			NULL != item->tail && ITEM_STATE_NORMAL == item->tail->state)
 	{
 			ret = SUCCEED;
 	}
