@@ -320,8 +320,8 @@
 	flex-direction: row;
 	overflow: hidden;
 	align-items: flex-start;
-	border: 1px solid $ui-border-color;
-	border-bottom: 0;
+	border: solid $ui-border-color;
+	border-width: 1px 1px 0;
 	border-top-left-radius: var(--surface-border-radius);
 	border-top-right-radius: var(--surface-border-radius);
 	background-color: $ui-bg-color;
@@ -1093,7 +1093,6 @@
 		--modal-max-width: calc(100vw - 20px);
 		--modal-min-width: 650px;
 
-		border-radius: var(--overlay-border-radius);
 		box-sizing: border-box;
 
 		.overlay-dialogue-body {

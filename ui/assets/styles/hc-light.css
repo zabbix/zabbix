@@ -15,14 +15,6 @@
 [lang="ka"] {
   --font-body-size: 70%; }
 
-[theme="hc-dark"] {
-  --badge-border-radius: 4px;
-  --overlay-border-radius: 4px; }
-
-[theme="hc-light"] {
-  --badge-border-radius: 4px;
-  --overlay-border-radius: 4px; }
-
 .sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, .tag, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
 div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-piechart .dataset-body .form-grid > label, form.dashboard-widget-scatterplot .dataset-head .head-row > label, form.dashboard-widget-scatterplot .dataset-body .form-grid > label, form.dashboard-widget-svggraph .dataset-body .form-grid > label, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
 .totals-list.totals-list-horizontal .name {
@@ -1871,8 +1863,8 @@ button {
   flex-direction: row;
   overflow: hidden;
   align-items: flex-start;
-  border: 1px solid #9f9f9f;
-  border-bottom: 0;
+  border: solid #9f9f9f;
+  border-width: 1px 1px 0;
   border-top-left-radius: var(--surface-border-radius);
   border-top-right-radius: var(--surface-border-radius);
   background-color: #ffffff;
@@ -2271,7 +2263,6 @@ button {
   --modal-width: auto;
   --modal-max-width: calc(100vw - 20px);
   --modal-min-width: 650px;
-  border-radius: var(--overlay-border-radius);
   box-sizing: border-box; }
   .overlay-dialogue.modal.modal-widget-configuration .overlay-dialogue-body {
     overflow-x: auto; }
@@ -3575,13 +3566,19 @@ output {
   padding: 17px 10px 10px;
   background-color: #ffffff;
   border: 1px solid #383838;
-  border-radius: var(--surface-border-radius);
+  border-radius: var(--overlay-border-radius);
   border-bottom-color: #353535;
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
   .overlay-dialogue .overlay-dialogue-header {
+    display: flex;
     margin: -8px -10px 6px -10px;
-    padding: 8px 10px;
-    display: flex; }
+    padding: 8px 10px; }
+    .overlay-dialogue .overlay-dialogue-header h4 {
+      color: #262626;
+      font-weight: bold;
+      margin-right: auto; }
+    .overlay-dialogue .overlay-dialogue-header > ul {
+      margin: -8px -10px -10px 10px; }
     .overlay-dialogue .overlay-dialogue-header .btn-icon,
     .overlay-dialogue .overlay-dialogue-header .btn-overlay-close {
       position: initial;
@@ -3590,12 +3587,15 @@ output {
       .overlay-dialogue .overlay-dialogue-header .btn-icon:last-child,
       .overlay-dialogue .overlay-dialogue-header .btn-overlay-close:last-child {
         margin-right: -6px; }
-    .overlay-dialogue .overlay-dialogue-header h4 {
-      color: #262626;
-      font-weight: bold;
-      margin-right: auto; }
-    .overlay-dialogue .overlay-dialogue-header > ul {
-      margin: -8px -10px -10px 10px; }
+  .overlay-dialogue .overlay-dialogue-body {
+    margin: 0 0 25px;
+    white-space: nowrap; }
+    .overlay-dialogue .overlay-dialogue-body .debug-output {
+      margin: 10px 0 0; }
+  .overlay-dialogue .overlay-dialogue-footer {
+    text-align: right; }
+    .overlay-dialogue .overlay-dialogue-footer button:not(:first-of-type) {
+      margin-left: 10px; }
   .overlay-dialogue .hintbox-raw-data {
     white-space: pre-wrap; }
   .overlay-dialogue .hintbox-wrap,
@@ -3608,7 +3608,6 @@ output {
   .overlay-dialogue .msg-bad,
   .overlay-dialogue .msg-good,
   .overlay-dialogue .msg-warning {
-    position: -webkit-sticky;
     position: sticky;
     top: 0;
     z-index: 4;
@@ -3627,27 +3626,9 @@ output {
     border-top: 1px solid #888888; }
   .overlay-dialogue .table-forms-td-right td label {
     display: block; }
-  .overlay-dialogue #lldoperation_form .table-forms-td-right:has(z-textarea-flexible) {
-    display: flex;
-    align-items: flex-start; }
-  .overlay-dialogue .maps-container {
-    max-height: 128px;
-    overflow-y: auto;
-    margin-left: -10px; }
   .overlay-dialogue .table-forms-second-column {
     float: right;
     line-height: 24px; }
-  .overlay-dialogue .valuemap-list-table td {
-    vertical-align: top; }
-  .overlay-dialogue #host-form #macrosFormList .form-field,
-  .overlay-dialogue #templates-form #macrosFormList .form-field {
-    grid-column-start: 1; }
-  .overlay-dialogue #host-form #macrosFormList .table-forms-td-left,
-  .overlay-dialogue #templates-form #macrosFormList .table-forms-td-left {
-    display: none; }
-  .overlay-dialogue #host-form #macrosFormList .table-forms-td-right,
-  .overlay-dialogue #templates-form #macrosFormList .table-forms-td-right {
-    width: 100%; }
   .overlay-dialogue.modal {
     position: fixed;
     overflow: hidden;
@@ -3656,14 +3637,14 @@ output {
     .overlay-dialogue.modal .overlay-dialogue-header {
       margin-bottom: 12px; }
     .overlay-dialogue.modal .overlay-dialogue-body {
+      position: relative;
+      margin: 0 -10px 8px;
+      padding: 0 10px;
       overflow-y: auto;
       overflow-x: hidden;
       width: 100%;
       max-height: calc(100vh - 220px);
-      max-width: inherit;
-      margin: 0 -10px 8px;
-      padding: 0 10px;
-      position: relative; }
+      max-width: inherit; }
       .overlay-dialogue.modal .overlay-dialogue-body form {
         padding: 2px 0; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
@@ -3739,6 +3720,16 @@ output {
         .overlay-dialogue.notif .overlay-dialogue-header ul li .btn-icon {
           margin-left: 0;
           margin-right: 0; }
+
+.overlay-bg {
+  background-color: #000000;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  opacity: .35; }
 
 .hintbox-wrap {
   display: block; }
@@ -7910,26 +7901,19 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
   .textarea-flexible-container td button {
     line-height: normal; }
 
-.overlay-dialogue-body {
-  margin: 0 0 25px;
-  white-space: nowrap; }
-  .overlay-dialogue-body .debug-output {
-    margin: 10px 0 0; }
+#lldoperation_form .table-forms-td-right:has(z-textarea-flexible) {
+  display: flex;
+  align-items: flex-start; }
 
-.overlay-dialogue-footer {
-  text-align: right; }
-  .overlay-dialogue-footer button:not(:first-of-type) {
-    margin-left: 10px; }
-
-.overlay-bg {
-  background-color: #000000;
-  width: 100%;
-  height: 100%;
-  position: fixed;
-  z-index: 1000;
-  top: 0;
-  left: 0;
-  opacity: .35; }
+#host-form #macrosFormList .form-field,
+#templates-form #macrosFormList .form-field {
+  grid-column-start: 1; }
+#host-form #macrosFormList .table-forms-td-left,
+#templates-form #macrosFormList .table-forms-td-left {
+  display: none; }
+#host-form #macrosFormList .table-forms-td-right,
+#templates-form #macrosFormList .table-forms-td-right {
+  width: 100%; }
 
 .calendar {
   width: 200px; }
@@ -8435,26 +8419,26 @@ span.is-loading {
   text-align: center; }
 
 .dashboard-grid-widget-contents, output .msg-details ul, .multiselect-available, .overlay-dialogue .hintbox-wrap,
-.overlay-dialogue .hintbox-wrap-horizontal, .overlay-dialogue .maps-container, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue.hintbox .hintbox-container, .z-select .focusable,
+.overlay-dialogue .hintbox-wrap-horizontal, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue.hintbox .hintbox-container, .z-select .focusable,
 z-select .focusable, .z-select .list,
 z-select .list, z-textarea-flexible textarea, div.dashboard-widget-item .dashboard-grid-widget-body a, .modal-popup-host-wizard .templates-card-list .template-info, textarea, select, .setup-right-body, .menu-popup, .notif-body, .debug-output, .overlay-descr, .import-compare .toc,
 .import-compare .diff {
   scrollbar-width: thin; }
   .dashboard-grid-widget-contents::-webkit-scrollbar, output .msg-details ul::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar,
-  .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue.hintbox .hintbox-container::-webkit-scrollbar, .z-select .focusable::-webkit-scrollbar,
+  .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue.hintbox .hintbox-container::-webkit-scrollbar, .z-select .focusable::-webkit-scrollbar,
   z-select .focusable::-webkit-scrollbar, .z-select .list::-webkit-scrollbar,
   z-select .list::-webkit-scrollbar, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar, .modal-popup-host-wizard .templates-card-list .template-info::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .menu-popup::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
   .import-compare .diff::-webkit-scrollbar {
     width: 9px;
     height: 9px; }
   .dashboard-grid-widget-contents::-webkit-scrollbar-track, output .msg-details ul::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track,
-  .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue.hintbox .hintbox-container::-webkit-scrollbar-track, .z-select .focusable::-webkit-scrollbar-track,
+  .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue.hintbox .hintbox-container::-webkit-scrollbar-track, .z-select .focusable::-webkit-scrollbar-track,
   z-select .focusable::-webkit-scrollbar-track, .z-select .list::-webkit-scrollbar-track,
   z-select .list::-webkit-scrollbar-track, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar-track, .modal-popup-host-wizard .templates-card-list .template-info::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .menu-popup::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
   .import-compare .diff::-webkit-scrollbar-track {
     background-color: #999999; }
   .dashboard-grid-widget-contents::-webkit-scrollbar-thumb, output .msg-details ul::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb,
-  .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue.hintbox .hintbox-container::-webkit-scrollbar-thumb, .z-select .focusable::-webkit-scrollbar-thumb,
+  .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue.hintbox .hintbox-container::-webkit-scrollbar-thumb, .z-select .focusable::-webkit-scrollbar-thumb,
   z-select .focusable::-webkit-scrollbar-thumb, .z-select .list::-webkit-scrollbar-thumb,
   z-select .list::-webkit-scrollbar-thumb, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar-thumb, .modal-popup-host-wizard .templates-card-list .template-info::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .menu-popup::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
   .import-compare .diff::-webkit-scrollbar-thumb {
@@ -9109,6 +9093,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   border-color: #888888; }
 
 .valuemap-list-table tbody td {
+  vertical-align: top;
   border-bottom: 1px solid #888888; }
 .valuemap-list-table tbody tr:first-child td {
   border-top: 1px solid #888888; }

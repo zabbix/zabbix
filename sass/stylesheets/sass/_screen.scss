@@ -1365,34 +1365,28 @@ select {
 	}
 }
 
-.overlay-dialogue-body {
-	margin: 0 0 25px;
-	white-space: nowrap;
-
-	.debug-output {
-		margin: 10px 0 0;
+#lldoperation_form {
+	.table-forms-td-right:has(z-textarea-flexible) {
+		display: flex;
+		align-items: flex-start;
 	}
 }
 
-.overlay-dialogue-footer {
-	text-align: right;
+#host-form,
+#templates-form {
+	#macrosFormList {
+		.form-field {
+			grid-column-start: 1;
+		}
 
-	button {
-		&:not(:first-of-type) {
-			margin-left: 10px;
+		.table-forms-td-left {
+			display: none;
+		}
+
+		.table-forms-td-right {
+			width: 100%;
 		}
 	}
-}
-
-.overlay-bg {
-	background-color: $overlay-bg-color;
-	width: 100%;
-	height: 100%;
-	position: fixed;
-	z-index: 1000;
-	top: 0;
-	left: 0;
-	opacity: .35;
 }
 
 .calendar {
@@ -3179,6 +3173,7 @@ z-select {
 .valuemap-list-table {
 	tbody {
 		td {
+			vertical-align: top;
 			border-bottom: 1px solid $table-border-color;
 		}
 
