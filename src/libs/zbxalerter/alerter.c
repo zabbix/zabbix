@@ -512,21 +512,15 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		zbx_ipc_message_t *ipc_message,
 		const char *config_adapter_url,
-		int config_adapter_timeout,
 		const char *config_adapter_ca_file,
 		const char *config_adapter_cert_file,
 		const char *config_adapter_key_file,
 		const char *config_adapter_connect_to)
 {
-#define ZBX_ERROR_CODE_LEN	32
-#define ZBX_MESSAGE_LEN		256
-#define ZBX_INFO_LEN		512
-
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(socket);
 	ZBX_UNUSED(ipc_message);
 	ZBX_UNUSED(config_adapter_url);
-	ZBX_UNUSED(config_adapter_timeout);
 	ZBX_UNUSED(config_adapter_ca_file);
 	ZBX_UNUSED(config_adapter_cert_file);
 	ZBX_UNUSED(config_adapter_key_file);
@@ -545,10 +539,8 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	zbx_http_response_t	body = {0}, response_header = {0};
 	struct zbx_json_parse	jp_body, jp_result;
 	char			*payload = NULL, *error = NULL, *error_curl = NULL, errbuf[CURL_ERROR_SIZE],
-				code[ZBX_ERROR_CODE_LEN], message[ZBX_MESSAGE_LEN],
-				error_data[ZBX_MESSAGE_LEN];
-
-	ZBX_UNUSED(config_adapter_timeout);
+				code[ZBX_BRIDGE_ERROR_CODE_LEN], message[ZBX_BRIDGE_MESSAGE_LEN],
+				error_data[ZBX_BRIDGE_MESSAGE_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -557,7 +549,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 
 	if (NULL == (curl = curl_easy_init()))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed initialize cURL library");
+		zabbix_log(LOG_LEVEL_WARNING, "failed to initialize cURL library");
 		error = zbx_strdup(NULL, "Failed to process device.notify request");
 		goto out;
 	}
@@ -590,7 +582,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	{
 		if (SUCCEED != zbx_curl_setopt_https(curl, &error_curl))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed zbx_curl_setopt_https: %s",
+			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL HTTPS options: %s",
 					ZBX_NULL2EMPTY_STR(error_curl));
 			error = zbx_strdup(NULL, "Failed to process device.notify request");
 			goto out;
@@ -598,7 +590,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 
 		if (SUCCEED != zbx_curl_setopt_ssl_version(curl, &error_curl))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed zbx_curl_setopt_ssl_version: %s",
+			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL SSL version: %s",
 					ZBX_NULL2EMPTY_STR(error_curl));
 			error = zbx_strdup(NULL, "Failed to process device.notify request");
 			goto out;
@@ -612,7 +604,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYHOST, 2L)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed set cURL option %d: %s.", (int)opt,
+			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
 			error = zbx_strdup(NULL, "Failed to process device.notify request");
 			goto out;
@@ -632,7 +624,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 
 		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECT_TO, connect_to)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed set cURL option %d: %s.", (int)opt,
+			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 				curl_easy_strerror(err));
 			error = zbx_strdup(NULL, "Failed to process device.notify request");
 			goto out;
@@ -641,14 +633,14 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed connect to bridge-adapter: %s", curl_easy_strerror(err));
+		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to bridge-adapter: %s", curl_easy_strerror(err));
 		error = zbx_strdup(NULL, "Failed connect to bridge-adapter");
 		goto out;
 	}
 
 	if (CURLE_OK != (err = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed obtain bridge-adapter response code: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "failed to obtain bridge-adapter response code: %s",
 				curl_easy_strerror(err));
 		error = zbx_strdup(NULL, "Failed to process device.notify request");
 		goto out;
@@ -678,7 +670,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 				SUCCEED == zbx_json_value_by_name(&jp_result, "data", error_data,
 				sizeof(error_data), NULL))
 		{
-			char	info[ZBX_INFO_LEN];
+			char	info[ZBX_BRIDGE_INFO_LEN];
 
 			zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned %s: message: %s data %s", code,
 					message, error_data);
@@ -709,9 +701,6 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 #endif
-#undef ZBX_ERROR_CODE_LEN
-#undef ZBX_MESSAGE_LEN
-#undef ZBX_INFO_LEN
 }
 
 /******************************************************************************
@@ -812,7 +801,6 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 			case ZBX_IPC_ALERTER_PUSH:
 				alerter_process_push(&alerter_socket, &message,
 						alerter_args_in->config_adapter_url,
-						alerter_args_in->config_adapter_timeout,
 						alerter_args_in->config_adapter_ca_file,
 						alerter_args_in->config_adapter_cert_file,
 						alerter_args_in->config_adapter_key_file,

@@ -37,10 +37,6 @@ ZBX_VECTOR_DECL(push_target, zbx_push_target_t *)
 ZBX_VECTOR_IMPL(push_target, zbx_push_target_t *)
 ZBX_PTR_VECTOR_IMPL(push_alert, zbx_push_alert_t *)
 
-#define ZBX_PUSH_ALERT_ERROR_INVALID_UUID		"Invalid device UUID."
-#define ZBX_PUSH_ALERT_ERROR_NO_PERMISSION		"No permissions to referred device or it does not exist."
-#define ZBX_PUSH_ALERT_ERROR_DEVICE_NOT_LINKED		"Device linkage or registration is not finished."
-
 static int	push_uuid_is_valid(const char *uuid)
 {
 	size_t	i;
@@ -152,7 +148,7 @@ static int	push_get_target_info_by_uuid(const char *uuid, zbx_uint64_t *target_u
 	return ret;
 }
 
-static int	push_get_target_by_uuid(const char *uuid, zbx_push_target_t **target)
+static int	push_get_target_by_uuid(const char *uuid, zbx_push_target_t *target)
 {
 	int			ret = FAIL;
 	zbx_db_result_t		result;
@@ -161,28 +157,25 @@ static int	push_get_target_by_uuid(const char *uuid, zbx_push_target_t **target)
 	result = zbx_db_select(
 			"select d.push_token,dk.key_"
 			" from device d"
-			" left join device_key dk"
-				" on dk.device_keyid=("
-					"select max(dk2.device_keyid)"
-					" from device_key dk2"
-					" where dk2.deviceid=d.deviceid"
-						" and dk2.active=1"
-						" and dk2.scope=%d"
-				")"
+			" left join device_key dk on dk.device_keyid=("
+				"select max(dk2.device_keyid)"
+				" from device_key dk2"
+				" where dk2.deviceid=d.deviceid"
+					" and dk2.active=1"
+					" and dk2.scope=%d"
+			")"
 			" where d.uuid='%s'"
-				" and d.status=1",
+				" and d.status=1"
+				" and d.push_token is not null"
+				" and dk.key_ is not null",
 			ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, uuid);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
-		if (SUCCEED != zbx_db_is_null(row[0]) && SUCCEED != zbx_db_is_null(row[1]))
-		{
-			ret = SUCCEED;
-			*target = zbx_malloc(NULL, sizeof(zbx_push_target_t));
-			(*target)->device_id = zbx_strdup(NULL, uuid);
-			(*target)->token = zbx_strdup(NULL, row[0]);
-			(*target)->enc_key = zbx_strdup(NULL, row[1]);
-		}
+		ret = SUCCEED;
+		target->device_id = zbx_strdup(NULL, uuid);
+		target->token = zbx_strdup(NULL, row[0]);
+		target->enc_key = zbx_strdup(NULL, row[1]);
 	}
 
 	zbx_db_free_result(result);
@@ -196,19 +189,18 @@ static void	push_add_all_user_targets(zbx_uint64_t userid, zbx_vector_push_targe
 	zbx_db_row_t	row;
 
 	result = zbx_db_select(
-		"select d.uuid,d.push_token,dk.key_"
-		" from device d "
-		" left join device_key dk"
-			" on dk.device_keyid=("
+			"select d.uuid,d.push_token,dk.key_"
+			" from device d"
+			" left join device_key dk on dk.device_keyid=("
 				"select max(dk2.device_keyid)"
 				" from device_key dk2"
 				" where dk2.deviceid=d.deviceid"
 					" and dk2.active=1"
 					" and dk2.scope=%d"
 			")"
-		" where d.userid=" ZBX_FS_UI64
-			" and d.status=1",
-		ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, userid);
+			" where d.userid=" ZBX_FS_UI64
+				" and d.status=1",
+			ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, userid);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 		push_target_append(targets, row[0], row[1], row[2]);
@@ -219,6 +211,9 @@ static void	push_add_all_user_targets(zbx_uint64_t userid, zbx_vector_push_targe
 static void	push_collect_targets(zbx_uint64_t userid, const char *sendto, zbx_vector_push_target_t *targets,
 		zbx_vector_push_alert_t *alerts)
 {
+#define ZBX_PUSH_ALERT_ERROR_INVALID_UUID		"Invalid device UUID."
+#define ZBX_PUSH_ALERT_ERROR_NO_PERMISSION		"No permissions to referred device or it does not exist."
+#define ZBX_PUSH_ALERT_ERROR_DEVICE_NOT_LINKED		"Device linkage or registration is not finished."
 	char	*copy, *token, *saveptr;
 
 	if (NULL == sendto || '\0' == *sendto)
@@ -270,20 +265,22 @@ static void	push_collect_targets(zbx_uint64_t userid, const char *sendto, zbx_ve
 
 		if (SUCCEED != push_target_exists(targets, token))
 		{
-			zbx_push_target_t	*target = NULL;
+			zbx_push_target_t	target;
 
 			if (SUCCEED != push_get_target_by_uuid(token, &target))
 				continue;
 
-			push_target_append(targets, target->device_id, target->token, target->enc_key);
-			zbx_free(target->device_id);
-			zbx_free(target->token);
-			zbx_free(target->enc_key);
-			zbx_free(target);
+			push_target_append(targets, target.device_id, target.token, target.enc_key);
+			zbx_free(target.device_id);
+			zbx_free(target.token);
+			zbx_free(target.enc_key);
 		}
 	}
 
 	zbx_free(copy);
+#undef ZBX_PUSH_ALERT_ERROR_INVALID_UUID
+#undef ZBX_PUSH_ALERT_ERROR_NO_PERMISSION
+#undef ZBX_PUSH_ALERT_ERROR_DEVICE_NOT_LINKED
 }
 
 static void	add_hostids_array(struct zbx_json *json, const char *input)
@@ -292,9 +289,6 @@ static void	add_hostids_array(struct zbx_json *json, const char *input)
 	zbx_uint64_t	hostid;
 
 	zbx_json_addarray(json, "hostids");
-
-	if (NULL == input || '\0' == *input)
-		goto out;
 
 	copy = zbx_strdup(NULL, input);
 
@@ -313,7 +307,6 @@ static void	add_hostids_array(struct zbx_json *json, const char *input)
 	}
 
 	zbx_free(copy);
-out:
 	zbx_json_close(json);
 }
 
