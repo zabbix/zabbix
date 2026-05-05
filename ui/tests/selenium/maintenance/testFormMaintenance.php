@@ -991,7 +991,7 @@ class testFormMaintenance extends CWebTest {
 						'Active till' => '2030-01-01 00:00',
 						'Host groups' => 'Zabbix servers',
 						'Hosts' => 'ЗАББИКС Сервер',
-						'Description' => 'This description should be trimmed',
+						'Description' => 'This description should be trimmed'
 					],
 					'expected_tags' => [
 						[
