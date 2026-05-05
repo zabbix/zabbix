@@ -143,7 +143,8 @@ static int	device_get_userid_by_uuid(const char *uuid, zbx_uint64_t *target_user
 }
 
 static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config_comms_args_t *config_comms,
-		const char *config_adapter_url, const char *config_adapter_connect_to, char **error, struct zbx_json *json)
+		const char *config_adapter_url, const char *config_adapter_connect_to, char **error,
+		struct zbx_json *json)
 {
 #define ZBX_ENROLL_URL_LEN		2048
 #define ZBX_BRIDGE_ENCRYPTION_KEY_LEN	256
@@ -265,8 +266,8 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_tls->ca_file)) ||
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT,
 				config_tls->cert_file)) ||
-				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_tls->key_file)) ||
-				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
+				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_tls->key_file))
+				|| CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYHOST, 2L)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
