@@ -721,7 +721,7 @@ a.link-action {
 	&::after {
 		background-image: var(--severity-icon);
 		background-repeat: no-repeat;
-		background-position: center;
+		background-position: center 2px;
 		background-size: 26px;
 	}
 }

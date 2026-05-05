@@ -4929,6 +4929,8 @@ div.dashboard-widget-problemsbysv .by-severity-widget > div {
     display: flex;
     flex-direction: column;
     justify-content: center; }
+  div.dashboard-widget-problemsbysv .by-severity-widget > div::after {
+    background-position: center; }
 
 form.dashboard-widget-svggraph {
   max-width: 1330px;
@@ -8032,7 +8034,7 @@ td.inactive-bg {
   .inactive-bg::after {
     background-image: var(--severity-icon);
     background-repeat: no-repeat;
-    background-position: center;
+    background-position: center 2px;
     background-size: 26px; }
 
 .na-bg,
