@@ -44,8 +44,9 @@ window.user_device_create_popup = new class {
 		this.#initEvents();
 
 		if (!admin_mode) {
-			this.#footer.querySelector('.js-submit').classList.add('is-loading');
-			this.#submit();
+			setTimeout(() => {
+				this.#footer.querySelector('.js-submit').click();
+			});
 		}
 	}
 
