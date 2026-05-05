@@ -1390,7 +1390,7 @@ class testFormMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #2 Daily with invalid At (hour:minute) and maintenance period lenth days values.
+			// #2 Daily with invalid At (hour:minute) and maintenance period length days values.
 			[
 				[
 					'fields' => [
