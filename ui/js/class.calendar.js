@@ -102,6 +102,7 @@ calendar.prototype = {
 		this.syncBSDateBySDT();
 		this.syncHlDate();
 		this.setCDate();
+		this.clearAriaLiveDate();
 
 		this.calendarPositionHandler();
 		this.clndr_calendar.style.display = (this.clndr_calendar.tagName === 'span') ? 'inline' : 'block';
@@ -255,6 +256,8 @@ calendar.prototype = {
 
 			case 9: // Tab
 				event.preventDefault();
+
+				this.clearAriaLiveDate();
 
 				if (event.shiftKey) {
 					this.active_section--;
@@ -500,6 +503,12 @@ calendar.prototype = {
 		this.createDaysTab();
 	},
 
+	clearAriaLiveDate: function() {
+		// The function prevents duplicate announcements of the month and year by screen readers.
+		this.clndr_month_live.textContent = '';
+		this.clndr_year_live.textContent = '';
+	},
+
 	createDaysTab: function() {
 		var tbody = this.clndr_days;
 		tbody.innerHTML = '';
@@ -609,10 +618,9 @@ calendar.prototype = {
 		this.clndr_year_wrap.setAttribute('id', `current-year${this.id}`);
 		this.clndr_year_live_wrap.appendChild(this.clndr_year_live);
 		this.clndr_year_live_wrap.setAttribute('aria-live', 'polite');
-		this.clndr_year_live_wrap.classList.add(ZBX_STYLE_DISPLAY_NONE);
+		this.clndr_year_live_wrap.classList.add(ZBX_STYLE_VISUALLY_HIDDEN);
 		this.clndr_year_div.appendChild(this.clndr_year_wrap);
 		this.clndr_year_div.appendChild(this.clndr_year_live_wrap);
-		this.clndr_year_div.setAttribute('aria-labelledby', this.clndr_year_wrap.id);
 
 		this.clndr_yearup = document.createElement('button');
 		this.clndr_yearup.setAttribute('type', 'button');
@@ -646,10 +654,9 @@ calendar.prototype = {
 		this.clndr_month_wrap.setAttribute('id', `current-month${this.id}`);
 		this.clndr_month_live_wrap.appendChild(this.clndr_month_live);
 		this.clndr_month_live_wrap.setAttribute('aria-live', 'polite');
-		this.clndr_month_live_wrap.classList.add(ZBX_STYLE_DISPLAY_NONE);
+		this.clndr_month_live_wrap.classList.add(ZBX_STYLE_VISUALLY_HIDDEN);
 		this.clndr_month_div.appendChild(this.clndr_month_wrap);
 		this.clndr_month_div.appendChild(this.clndr_month_live_wrap);
-		this.clndr_month_div.setAttribute('aria-labelledby', this.clndr_month_wrap.id);
 
 		this.clndr_monthup = document.createElement('button');
 		this.clndr_monthup.setAttribute('type', 'button');

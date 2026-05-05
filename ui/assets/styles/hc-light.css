@@ -7128,6 +7128,14 @@ svg {
 .visibility-box-caption {
   line-height: 24px; }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap; }
+
 .drag-icon {
   width: 12px;
   height: 1.4em; }

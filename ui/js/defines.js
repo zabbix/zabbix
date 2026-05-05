@@ -16,6 +16,7 @@
 const CSRF_TOKEN_NAME = '_csrf_token';
 
 const ZBX_STYLE_DISPLAY_NONE = 'display-none';
+const ZBX_STYLE_VISUALLY_HIDDEN = 'visually-hidden';
 
 const ZBX_STYLE_NO_DATA = 'no-data';
 
