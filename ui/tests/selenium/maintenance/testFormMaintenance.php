@@ -202,7 +202,7 @@ class testFormMaintenance extends CWebTest {
 
 			// Check Periods table.
 			$periods_table = $this->query(self::PERIODS_TABLE)->asTable()->one();
-			$this->assertEquals(['Period type', 'Schedule', 'Period', 'Action'], $periods_table->getHeadersText());
+			$this->assertEquals(['Period type', 'Schedule', 'Period', 'Actions'], $periods_table->getHeadersText());
 			if (!$is_update) {
 				$this->assertEquals(0, $periods_table->getRows()->count());
 			}
