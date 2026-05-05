@@ -50,8 +50,8 @@ class testFormMaintenance extends CWebTest {
 	];
 
 	const EXPECTED_TAGS = [
-		['tag' => 'Tag1', 'operator' => 'Contains', 'value' => 'A'],
-		['tag' => 'Tag2', 'operator' => 'Equals', 'value' => 'B']
+		['tag' => 'Tag1', 'operator' => 'Contains', 'value' => 'A'], [],
+		['tag' => 'Tag2', 'operator' => 'Equals', 'value' => 'B'], []
 	];
 
 	const EXPECTED_PERIODS = [
@@ -836,16 +836,19 @@ class testFormMaintenance extends CWebTest {
 							'operator' => 'Contains',
 							'value' => 'ValueOne'
 						],
+						[],
 						[
 							'tag' => 'B TagTwo',
 							'operator' => 'Contains',
 							'value' => 'Two'
 						],
+						[],
 						[
 							'tag' => 'B TagTwo',
 							'operator' => 'Equals',
 							'value' => 'ValueTwo'
-						]
+						],
+						[]
 					],
 					'expected_periods' => [
 						[
@@ -938,11 +941,13 @@ class testFormMaintenance extends CWebTest {
 							'operator' => 'Equals',
 							'value' => 'Very long 1st value-., /!?@#$%^&*()_=+[]{}\| ;:<>/ бц 頑張って 😀 &nbsp; \t \r \n 1E+308 %00'
 						],
+						[],
 						[
 							'tag' => 'Very long 2nd tag-., /!?@#$%^&*()_=+[]{}\| ;:<>/ бц 頑張って 😀 &nbsp; \t \r \n 1E+308 %00',
 							'operator' => 'Contains',
 							'value' => 'Very long 2nd value-., /!?@#$%^&*()_=+[]{}\| ;:<>/ бц 頑張って 😀 &nbsp; \t \r \n 1E+308 %00'
-						]
+						],
+						[]
 					]
 				]
 			],
@@ -994,11 +999,13 @@ class testFormMaintenance extends CWebTest {
 							'operator' => 'Contains',
 							'value' => 'ValueTrim1'
 						],
+						[],
 						[
 							'tag' => 'TagTrim2',
 							'operator' => 'Equals',
 							'value' => 'ValueTrim2'
-						]
+						],
+						[]
 					]
 				]
 			],
@@ -1011,42 +1018,20 @@ class testFormMaintenance extends CWebTest {
 						'Maintenance type' => 'With data collection',
 						'Active since' => '',
 						'Active till' => '',
-						'id:tags_evaltype' => 'And/Or'
-					],
-					'error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "active_since": a time is expected.',
-						'Incorrect value for field "active_till": a time is expected.',
-						'Field "timeperiods" is mandatory.'
-					]
-				]
-			],
-			// #6 Hosts and host groups empty.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Hosts and host groups empty',
-						'Maintenance type' => 'With data collection',
-						'Active since' => '2031-02-03 14:30',
-						'Active till' => '2034-09-01 22:55',
 						'Host groups' => '',
 						'Hosts' => '',
 						'id:tags_evaltype' => 'And/Or'
 					],
-					'periods' => [
-						[
-							'fields' => [
-								'Period type' => 'Daily'
-							]
-						]
-					],
-					'error_details' => [
-						'At least one host group or host must be selected.'
+					'inline_errors' => [
+						'id:name' => 'This field cannot be empty.',
+						'id:active_since' => 'This field cannot be empty.',
+						'id:active_till' => 'This field cannot be empty.',
+						'xpath://table[@id="timeperiods"]/..' => 'At least one period must be added.',
+						'xpath://div[@id="groupids_"]/..' => 'At least one host group or host must be selected.'
 					]
 				]
 			],
-			// #7 Duplicate name.
+			// #6 Duplicate name.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1063,15 +1048,18 @@ class testFormMaintenance extends CWebTest {
 					],
 					'error_details' => [
 						'Maintenance "'.self::MAINTENANCE_NAME.'" already exists.'
+					],
+					'inline_errors' => [
+						'id:name' => 'This object already exists.'
 					]
 				]
 			],
-			// #8 Duplicate tags.
+			// #7 Duplicate tags and empty tag name.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Duplicate tags',
+						'Name' => 'Duplicate and empty tags',
 						'Host groups' => 'Zabbix servers'
 					],
 					'periods' => [
@@ -1091,42 +1079,28 @@ class testFormMaintenance extends CWebTest {
 						[
 							'tag' => 'DuplicateTag',
 							'value' => 'DuplicateValue'
-						]
-					],
-					'error_details' => [
-						'Invalid parameter "/1/tags/2": value (tag, operator, value)=(DuplicateTag, 2, DuplicateValue) already exists.'
-					]
-				]
-			],
-			// #9 Empty tag name.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Empty tag name',
-						'Host groups' => 'Zabbix servers'
-					],
-					'periods' => [
+						],
 						[
-							'fields' => [
-								'Period type' => 'Daily'
-							]
-						]
-					],
-					'tags' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'tag' => '',
 							'value' => 'OnlyValue'
 						]
 					],
-					'error_details' => [
-						'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'inline_errors' => [
+						/**
+						 * Target Tag fields by position rather than ID. Since the row counter doesn't reset after row deletion,
+						 * static IDs (e.g., tags_1_tag) shift during Update scenarios, while positional XPaths remain stable.
+						 */
+						// (...)[2] — finds second 'Tag' input field in tags table.
+						'xpath:(//table[@id="tags"]//z-textarea-flexible[contains(@name, "[tag]")])[2]'
+							=> 'Tag name, operator and value combination is not unique.',
+
+						// (...)[3] — finds second 'Tag' input field in tags table.
+						'xpath:(//table[@id="tags"]//z-textarea-flexible[contains(@name, "[tag]")])[3]'
+							=> 'Tag: This field cannot be empty.'
 					]
 				]
 			],
-			// #10 Active since greater than Active till.
+			// #8 Active since greater than Active till.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1190,7 +1164,14 @@ class testFormMaintenance extends CWebTest {
 		$this->page->waitUntilReady();
 
 		if ($expected === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, 'Cannot create maintenance period', $data['error_details']);
+			if (array_key_exists('inline_errors', $data)) {
+				$this->page->removeFocus();
+				$this->assertInlineError($form, $data['inline_errors']);
+			}
+			else if (array_key_exists('error_details', $data)) {
+				$this->assertMessage(TEST_BAD, 'Cannot create maintenance period', $data['error_details']);
+			}
+
 			// Check that DB hash has not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 			$dialog->close();
@@ -1287,14 +1268,13 @@ class testFormMaintenance extends CWebTest {
 
 		// Check tags table is enabled (is disabled in the case when Maintenance type is No data collection).
 		if ($add_button_tags_table->isEnabled()) {
-
-			// Remove all tags table rows except one.
-			$tag_rows = $tags_table->getRows();
-			if ($tag_rows->count() > 1) {
-				// Remove all rows except the first one (index 0).
-				foreach ($tag_rows->slice(1) as $row) {
-					$row->query('button:Remove')->one()->click();
+			// Remove all logical tag rows except the 1st one; skip error rows.
+			while (true) {
+				$remove_buttons = $tags_table->query('button:Remove')->all();
+				if ($remove_buttons->count() <= 1) {
+					break;
 				}
+				$remove_buttons->last()->click();
 			}
 
 			// Fill tags if they exist.
@@ -1303,9 +1283,7 @@ class testFormMaintenance extends CWebTest {
 				$tags_table->fill($data['tags']);
 			} else {
 				// Clear values from the 1st tag row.
-				$row0 = $tags_table->getRow(0);
-				$row0->query('xpath:.//input[contains(@id, "_tag")]')->one()->clear();
-				$row0->query('xpath:.//input[contains(@id, "_value")]')->one()->clear();
+				$tags_table->updateRow(0, ['tag' => '', 'value' => '']);
 			}
 		}
 
@@ -1331,7 +1309,14 @@ class testFormMaintenance extends CWebTest {
 		$form->submit();
 
 		if ($expected === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, 'Cannot update maintenance period', $data['error_details']);
+			if (array_key_exists('inline_errors', $data)) {
+				$this->page->removeFocus();
+				$this->assertInlineError($form, $data['inline_errors']);
+			}
+			else if (array_key_exists('error_details', $data)) {
+				$this->assertMessage(TEST_BAD, 'Cannot update maintenance period', $data['error_details']);
+			}
+
 			// Check that DB hash has not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 			$dialog->close();
@@ -1384,7 +1369,9 @@ class testFormMaintenance extends CWebTest {
 						'Period type' => 'One time only',
 						'Date' => ''
 					],
-					'error' => 'Incorrect value for field "start_date": a time is expected.'
+					'inline_errors' => [
+						'id:start_date' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #1 Daily with 'Every day(s)' 0 and period length 0 hours and 0 minutes.
@@ -1397,62 +1384,64 @@ class testFormMaintenance extends CWebTest {
 						'name:period_hours' => '0',
 						'name:period_minutes' => '0'
 					],
-					'error' => [
-						'Incorrect value for field "every_day": value must be no less than "1".',
-						'Incorrect maintenance period (minimum 5 minutes)'
+					'inline_errors' => [
+						'id:every_day' => 'This value must be no less than "1".',
+						'name:period_minutes' => 'Minutes: Minimum value of "Maintenance period length" is 5 minutes.'
 					]
 				]
 			],
-			// #2 Daily with invalid hour and minute values.
+			// #2 Daily with invalid At (hour:minute) and maintenance period lenth days values.
 			[
 				[
 					'fields' => [
 						'Period type' => 'Daily',
 						'id:hour' => '98',
-						'id:minute' => '99'
+						'id:minute' => '99',
+						'id:period_days' => '-9',
 					],
-					'error' => [
-						'Incorrect value for field "hour": value must be no greater than "23".',
-						'Incorrect value for field "minute": value must be no greater than "59".'
+					'inline_errors' => [
+						'id:hour' => 'Hour: This value must be no greater than "23".',
+						'id:minute' => 'Minute: This value must be no greater than "59".',
+						'id:period_days' => 'Days: This value must be no less than "0".'
 					]
 				]
 			],
-			// #4 Weekly with 'Every week' 0 and no days selected.
+			// #3 Weekly with 'Every week' 0 and no days selected.
 			[
 				[
 					'fields' => [
 						'Period type' => 'Weekly',
 						'id:every_week' => '0'
 					],
-					'error' => [
-						'Incorrect value for field "every_week": value must be no less than "1".',
-						'Field "weekly_days" is mandatory.'
+					'inline_errors' => [
+						'id:every_week' => 'This value must be no less than "1".',
+						'xpath:.//ul[@data-field-name="weekly_days"]' => 'At least one day must be selected.'
 					]
 				]
 			],
-			// #5 Monthly (Day of month) with empty months and 'Day of month' 0.
+			// #4 Monthly (Day of month) with empty months and 'Day of month' 0.
 			[
 				[
 					'fields' => [
 						'Period type' => 'Monthly',
 						'id:day' => '0'
 					],
-					'error' => [
-						'Field "months" is mandatory.',
-						'Incorrect value for field "day": value must be no less than "1".'
+					'inline_errors' => [
+						'id:day' => 'This value must be no less than "1".',
+						'xpath:.//ul[@data-field-name="months"]' => 'At least one month must be selected.'
 					]
 				]
 			],
-			// #6 Monthly (Day of week) with empty months and no days selected.
+			// #5 Monthly (Day of week) with empty months and no days selected.
 			[
 				[
 					'fields' => [
 						'Period type' => 'Monthly',
 						'id:month_date_type' => 'Day of week'
 					],
-					'error' => [
-						'Field "months" is mandatory.',
-						'Field "monthly_days" is mandatory.'
+					'inline_errors' => [
+						'xpath:.//ul[@data-field-name="months"]' => 'At least one month must be selected.',
+						'xpath:.//ul[@data-field-name="monthly_days"]' => 'At least one weekday must be selected.'
 					]
 				]
 			]
@@ -1488,10 +1477,10 @@ class testFormMaintenance extends CWebTest {
 			}
 
 			// Fill invalid data and submit.
-			$overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-			$overlay->asForm()->fill($data['fields'])->submit();
+			$overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
+			$overlay->fill($data['fields'])->submit();
 
-			$this->assertMessage(TEST_BAD, null, $data['error']);
+			$this->assertInlineError($overlay, $data['inline_errors']);
 
 			COverlayDialogElement::closeAll();
 		}
