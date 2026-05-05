@@ -431,7 +431,7 @@ window.itemtestedit_view_popup = new class {
 		if ('value_warning' in response) {
 			const value_warning = this.#form_element.querySelector('#value_warning');
 			value_warning.classList.add('js-retrieved');
-			value_warning.dataset.hintboxContents = response.value_warning;
+			value_warning.dataset.hintboxHtml = response.value_warning;
 			value_warning.style.display = '';
 		}
 

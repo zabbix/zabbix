@@ -51,7 +51,7 @@ class testFormSetup extends CWebTest {
 		$hint_text = 'You are not able to choose some of the languages, because locales for them are not installed '.
 				'on the web server.';
 		$this->assertEquals($hint_text, $this->query('xpath://button[@data-hintbox]')->one()
-				->getAttribute('data-hintbox-contents'));
+				->getAttribute('data-hintbox-html'));
 		$this->checkButtons('first section');
 
 		$this->assertScreenshot($form, 'Welcome_En');
