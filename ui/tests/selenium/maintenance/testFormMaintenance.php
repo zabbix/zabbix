@@ -192,7 +192,7 @@ class testFormMaintenance extends CWebTest {
 				'id:hostids__ms' => ['placeholder' => 'type here to search'],
 				'id:tags_0_tag' => ['maxlength' => 255, 'placeholder' => 'tag'],
 				'id:tags_0_value' => ['maxlength' => 255, 'placeholder' => 'value'],
-				'Description' => ['maxlength' => 65535],
+				'Description' => ['maxlength' => 65535]
 			];
 			foreach ($check_fields as $field => $attributes) {
 				foreach ($attributes as $attribute => $value) {
@@ -507,7 +507,7 @@ class testFormMaintenance extends CWebTest {
 					'title' => 'create'
 				]
 			],
-			// #1 Cancel update without mantenance type change.
+			// #1 Cancel update without maintenance type change.
 			[
 				[
 					'action' => 'update',
@@ -518,7 +518,7 @@ class testFormMaintenance extends CWebTest {
 			[
 				[
 					'action' => 'update',
-					'title' => 'update with maintenance type change',
+					'title' => 'update with maintenance type change'
 				]
 			],
 			// #3 Cancel clone
@@ -1121,7 +1121,7 @@ class testFormMaintenance extends CWebTest {
 						'Invalid parameter "/1/active_till": cannot be less than or equal to the value of parameter "/1/active_since".'
 					]
 				]
-			],
+			]
 		];
 	}
 
@@ -1397,7 +1397,7 @@ class testFormMaintenance extends CWebTest {
 						'Period type' => 'Daily',
 						'id:hour' => '98',
 						'id:minute' => '99',
-						'id:period_days' => '-9',
+						'id:period_days' => '-9'
 					],
 					'inline_errors' => [
 						'id:hour' => 'Hour: This value must be no greater than "23".',
