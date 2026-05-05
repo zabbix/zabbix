@@ -170,7 +170,7 @@ class CControllerUserDeviceList extends CController {
 			]);
 
 			foreach ($devices as &$device) {
-				if (isset($users[$device['userid']])) {
+				if (array_key_exists($device['userid'], $users)) {
 					$device['user_fullname'] = getUserFullname($users[$device['userid']]);
 					$device['user_role'] = $users[$device['userid']]['role']['name'];
 				}
