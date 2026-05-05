@@ -266,9 +266,7 @@ class CControllerScriptCreate extends CController {
 
 			case ZBX_SCRIPT_TYPE_URL:
 				$script['url'] = $this->getInput('url', '');
-				$script['new_window'] = $this->hasInput('new_window')
-					? ZBX_SCRIPT_URL_NEW_WINDOW_YES
-					: ZBX_SCRIPT_URL_NEW_WINDOW_NO;
+				$script['new_window'] = $this->getInput('new_window', ZBX_SCRIPT_URL_NEW_WINDOW_NO);
 				break;
 		}
 
