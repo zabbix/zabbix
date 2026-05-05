@@ -157,7 +157,7 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 	{
 		int	timeout_ms = env->timeout * 1000;
 
-		if (SUCCEED != webdriver_set_timeouts(wd, timeout_ms, timeout_ms, timeout_ms, &error))
+		if (SUCCEED != webdriver_set_timeouts(wd, timeout_ms, timeout_ms, -1, &error))
 		{
 			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot set webdriver timeouts: %s",
 					error);
