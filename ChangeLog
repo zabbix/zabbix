@@ -6,6 +6,7 @@ New features:
 .......PS. [ZBXNEXT-10211] added info about VMware entities to alarm JSON and ifbackingnetwork info to JSON for *vm.discovery and *vm.net.if.discovery items (MVekslers)
 
 Bug fixes:
+.......PS. [ZBX-27496] improved network discovery subsystem to work with snmpv1 and snmpv2c checks (MVekslers)
 .......PS. [ZBX-27635] fixed Zabbix server and proxy build without libcurl (arimdjonoks)
 .........T [ZBX-27592] fixed memory items becoming unsupported in Apache templates (kflorowski)
 .........T [ZBX-17971] fixed macro view in trigger descriptions in some SNMP templates (abrosimovs)
