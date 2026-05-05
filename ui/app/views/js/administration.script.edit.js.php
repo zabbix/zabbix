@@ -318,7 +318,7 @@ window.script_edit_popup = new class {
 		this.form.reload(this.clone_rules);
 
 		for (const input of this.form_element.querySelectorAll('input[name=scope]')) {
-			input.disabled = false;
+			input.readOnly = false;
 		}
 
 		this.overlay.setProperties({
