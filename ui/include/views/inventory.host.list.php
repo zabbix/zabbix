@@ -50,7 +50,7 @@ $html_page->addItem(
 							'parameters' => [
 								'srctbl' => 'host_groups',
 								'srcfld1' => 'groupid',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_groups_',
 								'with_hosts' => true,
 								'enrich_parent_groups' => true

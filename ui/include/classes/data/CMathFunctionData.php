@@ -21,6 +21,7 @@ final class CMathFunctionData {
 
 	/**
 	 * Known math functions along with number or range of required parameters.
+	 * If updated, must be aligned with CTriggerConditionFunctionData.
 	 *
 	 * @var array
 	 */

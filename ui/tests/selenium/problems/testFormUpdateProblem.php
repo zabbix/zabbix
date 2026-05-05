@@ -946,10 +946,6 @@ class testFormUpdateProblem extends CWebTest {
 		$this->page->refresh();
 		$this->assertTrue($row->getColumn('Info')->query('xpath:.//button[not(contains(@class, "js-blink"))]')->exists());
 
-		// TODO: Remove sleep after fix ZBX-26128. Sometimes suppress and unsuppress events have the same acknowledege time and
-		// are displayed in the wrong order in history table in the acknowledege popup. Failure in checkHistoryTable()
-		sleep(1);
-
 		// Unsuppress problem.
 		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog->waitUntilReady();

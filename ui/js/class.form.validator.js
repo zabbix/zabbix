@@ -445,7 +445,13 @@ class CFormValidator {
 
 			if (rule_set.type === 'objects' || rule_set.type === 'array') {
 				if (data[field] !== null) {
-					Object.entries(data[field]).forEach(([key, value]) => scanObject(value, field_path + '/' + key));
+					Object.entries(data[field]).forEach(([key, value]) => {
+						scanObject(value, field_path + '/' + key);
+
+						if (rule_set.field) {
+							checkUse(rule_set.field, field_path + '/' + key);
+						}
+					});
 				}
 			}
 			else if (rule_set.type === 'object') {
@@ -1266,7 +1272,7 @@ class CFormValidator {
 			};
 		}
 
-		if (('allow_macro' in rules) && value !== '' && this.#isUserMacro(value)) {
+		if (('allow_macro' in rules) && value !== '' && this.#isMacro(rules['allow_macro'], value)) {
 			return {result: CFormValidator.SUCCESS};
 		}
 
@@ -1277,7 +1283,7 @@ class CFormValidator {
 			};
 		}
 
-		if ('regex' in rules) {
+		if ('regex' in rules && value !== '') {
 			const {pattern, flags} = this.#extractRegex(rules.regex);
 
 			const re = new RegExp(pattern, flags);
@@ -1761,15 +1767,50 @@ class CFormValidator {
 	}
 
 	/**
-	 * Check if value looks as user macro.
+	 * Check if value looks like macro based on allowed macro types
 	 *
-	 * @param {string} value  Value to check.
+	 * @param {array} macro_types
+	 * @param {string} value
 	 *
 	 * @returns {boolean}
 	 */
-	#isUserMacro(value) {
-		return value.match(/^\{\$[A-Z0-9._]+(:.*)?\}$/) !== null;
+	#isMacro(macro_types, value) {
+		const macro_name = '[A-Z0-9._]+';
+		const quoted_param = '(?:[ ]*"(?:\\\\.|[^"\\\\])*"[ ]*)';
+		const unquoted_context = '(?:[ ]*[^"} ][^}]*)';
+		const macro_context = `(?::(?:[ ]*|${unquoted_context}|${quoted_param}))?`;
+
+		const macro_regexps = [];
+
+		if (macro_types.usermacros) {
+			macro_regexps.push(`(?:{\\$${macro_name}${macro_context}})`);
+		}
+
+		if (macro_types.lldmacros) {
+			macro_regexps.push(`(?:{#${macro_name}})`);
+		}
+
+		if (macro_regexps.length == 0) {
+			return false;
+		}
+
+		const macro = `(?:${macro_regexps.join('|')})`;
+
+		if (value.match(new RegExp(`^${macro}$`))) {
+			return true;
+		}
+
+		const unquoted_param = '(?:[^"][^),]*)';
+		const single_param = `(?:[ ]*|${unquoted_param}|${quoted_param})`;
+		const params_regex = `(?:${single_param},)*${single_param}`;
+
+		if (value.match(new RegExp(`^{${macro}\\.[a-z]+\\((${params_regex})\\)}$`))) {
+			return true;
+		}
+
+		return false;
 	}
+
 
 	/**
 	 * Calculate result of 'when' conditions.
@@ -1811,7 +1852,14 @@ class CFormValidator {
 	 * @returns {string}
 	 */
 	#getFieldAbsolutePath(field_name, field_path) {
-		const target_path = [...field_path.split('/').slice(0, -1), field_name];
+		const target_path = field_path.split('/').slice(0, -1);
+
+		while (field_name.startsWith('../')) {
+			field_name = field_name.substring(3);
+			target_path.pop();
+		}
+
+		target_path.push(field_name);
 
 		return `/${target_path.join('/')}`.replace(/\/\/+/g, '/');
 	}

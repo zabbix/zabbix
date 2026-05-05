@@ -220,7 +220,7 @@ static void	ha_update_parent(zbx_ipc_async_socket_t *rtc_socket, zbx_ha_info_t *
 	if (SUCCEED != ret)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send HA notification to main process");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -237,7 +237,7 @@ static void	ha_send_heartbeat(zbx_ipc_async_socket_t *rtc_socket)
 			SUCCEED != zbx_ipc_async_socket_flush(rtc_socket, ZBX_HA_SERVICE_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send HA heartbeat to main process");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -1876,21 +1876,21 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == rtc_open(&rtc_socket, ZBX_HA_SERVICE_TIMEOUT, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == zbx_ipc_async_socket_send(&rtc_socket, ZBX_IPC_SERVICE_HA_REGISTER, NULL, 0) ||
 			FAIL == zbx_ipc_async_socket_flush(&rtc_socket, ZBX_HA_SERVICE_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot register HA manager to runtime control service");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_cuid_clear(info.ha_nodeid);
@@ -2069,5 +2069,5 @@ pause:
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager has been stopped");
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 }

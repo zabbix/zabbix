@@ -274,8 +274,8 @@ window.item_edit_form = new class {
 
 						dynamic_rows.addRows(url.pairs);
 						dynamic_rows.removeRows(row => [].filter.call(
-								row.querySelectorAll('[type="text"]'),
-								input => input.value === ''
+								row.querySelectorAll('z-textarea-flexible'),
+								textarea => textarea.value === ''
 							).length == 2
 						);
 					}
@@ -521,28 +521,11 @@ window.item_edit_form = new class {
 	#getFormFields() {
 		const values = this.form.getAllValues();
 
-		delete values.show_inherited_tags;
-
 		if (values.delay === undefined) {
 			values.delay = '';
 		}
 
-		if (values.preprocessing) {
-			for (let index in values.preprocessing) {
-				const step = values.preprocessing[index];
-
-				if (step.error_handler_params === null) {
-					step.error_handler_params = '';
-				}
-
-				if (step.on_fail === null) {
-					delete step.error_handler;
-					delete step.error_handler_params;
-				}
-			}
-		}
-
-		const delay_flex = [];
+		const delay_flex = {};
 		for (let key in values.delay_flex) {
 			let { schedule, period, type, delay } = values.delay_flex[key];
 			type = parseInt(type);
@@ -555,50 +538,10 @@ window.item_edit_form = new class {
 				continue;
 			}
 
-			delay_flex.push(values.delay_flex[key]);
+			delay_flex[key] = values.delay_flex[key]
 		}
 
-		const query_fields = [];
-		for (let key in values.query_fields) {
-			let {name, value} = values.query_fields[key];
-
-			if (name === '' && value === '') {
-				continue;
-			}
-			query_fields.push({name, value});
-		}
-
-		const parameters = [];
-		for (let key in values.parameters) {
-			let {name, value} = values.parameters[key];
-
-			if (name === '' && value === '') {
-				continue;
-			}
-			parameters.push({name, value});
-		}
-
-		const headers = [];
-		for (let key in values.headers) {
-			let {name, value} = values.headers[key];
-
-			if (name === '' && value === '') {
-				continue;
-			}
-			headers.push({name, value});
-		}
-
-		const tags = [];
-		for (let key in values.tags) {
-			let {tag, value} = values.tags[key];
-
-			if (tag === '' && value === '') {
-				continue;
-			}
-			tags.push({tag, value});
-		}
-
-		return {...values, ...{tags, query_fields, headers, delay_flex, parameters}};
+		return {...values, ...{delay_flex}};
 	}
 
 	#post(url, data, keep_open = false) {

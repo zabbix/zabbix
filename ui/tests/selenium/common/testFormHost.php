@@ -253,8 +253,9 @@ class testFormHost extends CWebTest {
 		}
 		// Interface fields maxlength attribute.
 		foreach (['IP address' => 64, 'DNS name' => 255, 'Port' => 64] as $field => $maxlength) {
+			$tag = ($field === 'Port') ? 'input' : 'z-textarea-flexible';
 			$this->assertEquals($maxlength, $interfaces_form->getRow(0)->getColumn($field)
-					->query('tag:input')->one()->getAttribute('maxlength')
+					->query('tag', $tag)->one()->getAttribute('maxlength')
 			);
 		}
 
@@ -952,7 +953,7 @@ class testFormHost extends CWebTest {
 		$this->page->login()->open($this->link)->waitUntilReady();
 
 		$this->query('button:Create host')->one()->waitUntilClickable()->click();
-		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
@@ -2208,7 +2209,7 @@ class testFormHost extends CWebTest {
 			$host_link->one()->click();
 		}
 
-		return COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		return COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 	}
 
 	/**
@@ -2261,13 +2262,14 @@ class testFormHost extends CWebTest {
 						['name' => 'id:interface_main_'.$discovered_interface_id , 'value' => $discovered_interface_id,
 								'enabled' => false],
 						['name' => 'Description', 'value' => '', 'maxlength' => 65535, 'enabled' => true],
-						['name' => 'id:monitored_by', 'value' => 'Server', 'enabled' => false],
+						['name' => 'Monitored by', 'value' => 'Server', 'enabled' => false],
 						['name' => 'Enabled', 'value' => true, 'enabled' => true]
 					];
 
 					foreach ($host_fields as $field) {
 						$this->assertTrue($form->getField($field['name'])->isEnabled($field['enabled']));
 						$this->assertEquals($field['value'], $form->getField($field['name'])->getValue());
+
 						if (CTestArrayHelper::get($field, 'maxlength')) {
 							$this->assertEquals($field['maxlength'], $form->getField($field['name'])->getAttribute('maxlength'));
 						}
@@ -2336,7 +2338,6 @@ class testFormHost extends CWebTest {
 							'Value' => 'update'
 						]
 					];
-
 					$tags_table->checkValue($expected_tags);
 
 					$this->assertEquals(['Name', 'Value', ''], $tags_table->getHeadersText());
@@ -2351,7 +2352,7 @@ class testFormHost extends CWebTest {
 				case 'Macros':
 					$radio_switcher = $this->query('id:show_inherited_macros')->asSegmentedRadio()->waitUntilPresent()->one();
 					$macros_table = $this->query('id:tbl_macros')->asMultifieldTable()->one();
-					$macros_table->checkValue([['Macro' => '','Value' => '', 'Description' => '']]);
+					$macros_table->checkValue([['Macro' => '', 'Value' => '', 'description' => '']]);
 					$radio_switcher->select('Inherited and host macros');
 					$macros_table->waitUntilReloaded();
 					$this->assertSame(['Macro', 'Effective value', '', '', 'Template value', '', 'Global value (configure)'],

@@ -245,7 +245,8 @@ class CControllerLatestView extends CControllerLatest {
 				'show_tags_limit' => (int) $filter['show_tags'],
 				'tag_name_format' => (int) $filter['tag_name_format'],
 				'subfilter_tags' => array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : []
-			])
+			]),
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);

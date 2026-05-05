@@ -278,7 +278,7 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 				? (new CTrim($item_value['value'], (64 * ZBX_KIBIBYTE))) : $item_value['value'];
 
 			$hintbox_value = $column['item_value_type'] == ITEM_VALUE_TYPE_JSON
-				? (new CTrim($item_value['value'], ZBX_HINTBOX_CONTENT_LIMIT)) : (new CDiv($item_value['value']));
+				? (new CTrim($item_value['value'], ZBX_HINTBOX_HTML_LIMIT)) : (new CDiv($item_value['value']));
 
 			switch ($column['display']) {
 				case CWidgetFieldColumnsList::DISPLAY_AS_IS:

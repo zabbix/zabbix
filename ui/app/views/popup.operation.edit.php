@@ -207,12 +207,13 @@ $form_grid->addItem([
 $form_grid->addItem([
 	(new CLabel(_('Subject'), 'operation-opmessage-subject'))->setId('operation-message-subject-label'),
 	(new CFormField(
-		(new CTextBox('operation[opmessage][subject]'))
+		(new CTextAreaFlexible('operation[opmessage][subject]'))
 			->setAttribute('value', $operation['opmessage']['default_msg'] == 1
 				? ''
 				: $operation['opmessage']['subject']
 			)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('opmessage', 'subject'))
 			->setId('operation-opmessage-subject')
 	))->setId('operation-message-subject')
 ]);

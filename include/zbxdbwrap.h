@@ -41,7 +41,7 @@ typedef void (*zbx_lld_process_agent_result_func_t)(zbx_uint64_t itemid, zbx_uin
 typedef void (*zbx_preprocess_item_value_func_t)(zbx_uint64_t itemid, unsigned char item_value_type,
 		unsigned char item_flags, unsigned char preprocessing, AGENT_RESULT *result, zbx_timespec_t *ts,
 		unsigned char state, char *error);
-typedef void (*zbx_preprocessor_flush_func_t)(void);
+typedef size_t (*zbx_preprocessor_flush_func_t)(void);
 
 void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func,
 		zbx_preprocess_item_value_func_t preprocess_item_value_func,
@@ -59,17 +59,20 @@ int	zbx_proxy_get_host_active_availability(struct zbx_json *j);
 
 int	zbx_proxy_get_delay(zbx_uint64_t lastid);
 
-int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
-		size_t values_num, zbx_proxy_suppress_t *nodata_win);
+int	zbx_process_history_data(zbx_ipc_async_socket_t *rtc, zbx_history_recv_item_t *items, zbx_agent_value_t *values,
+		int *errcodes, size_t values_num, zbx_proxy_suppress_t *nodata_win);
 int	zbx_get_history_log_value(const char *m, const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
 		int clock, int ns, const char *tz);
 
 void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version_int, time_t lastaccess,
 		int pending_history, zbx_uint64_t flags_add);
 
-int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
-int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
-int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
+int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
+		zbx_timespec_t *ts, char **info);
+int	zbx_process_sender_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
+		zbx_timespec_t *ts, char **info);
+int	zbx_process_proxy_data(zbx_ipc_async_socket_t *rtc, const zbx_dc_proxy_t *proxy,
+		const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
 		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
 		zbx_discovery_update_host_func_t discovery_update_host_cb,
 		zbx_discovery_update_service_func_t discovery_update_service_cb,

@@ -168,6 +168,11 @@
 		margin-top: 10px;
 	}
 
+	.field-inline {
+		display: flex;
+		align-items: baseline;
+	}
+
 	.form-field {
 		$offsets: (
 				1: 2,
@@ -317,5 +322,10 @@
 			top: 1px;
 			vertical-align: text-bottom;
 		}
+	}
+
+	&.form-subgrid {
+		grid-template-columns: subgrid;
+		grid-column: 1 / -1;
 	}
 }

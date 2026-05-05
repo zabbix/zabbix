@@ -453,6 +453,10 @@ class CLineGraphDraw extends CGraphDraw {
 				continue;
 			}
 
+			if (!array_key_exists($item['itemid'], $results)) {
+				continue;
+			}
+
 			$delay = $item['source'] === 'trends' ? max($item['delay'], ZBX_MAX_TREND_DIFF) : $item['delay'];
 			$period = $time_to - $time_from;
 
@@ -1613,7 +1617,9 @@ class CLineGraphDraw extends CGraphDraw {
 						: '-';
 					$side_str = ($side == GRAPH_YAXIS_SIDE_LEFT) ? _('left') : _('right');
 					$legend->addCell($rowNum, [
-						'text' => $percentile['percent'].'th percentile: '.$convertedUnit.' ('.$side_str.')',
+						'text' => _s('Percentile %1$s: %2$s', $percentile['percent'],
+							$convertedUnit.' ('.$side_str.')'
+						),
 						ITEM_CONVERT_NO_UNITS
 					]);
 					$color = ($side == GRAPH_YAXIS_SIDE_LEFT)

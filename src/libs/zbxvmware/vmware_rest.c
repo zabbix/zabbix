@@ -263,9 +263,10 @@ static int	vmware_curl_init(const char *url, unsigned char is_new_api, const cha
 	}
 
 	page->alloc = INIT_PERF_REST_SIZE;
+	page->offset = 0;
 	page->data = (char *)zbx_malloc(NULL, page->alloc);
 	page->url = zbx_strdup(NULL, url);
-	zbx_rtrim(page->url, "/");
+	zbx_rtrim(page->url, "/" ZBX_WHITESPACE);
 	url_sz = strlen(page->url);
 
 	if (url_sz < ZBX_CONST_STRLEN("/sdk") || 0 != strcmp(&page->url[url_sz - ZBX_CONST_STRLEN("/sdk")], "/sdk"))

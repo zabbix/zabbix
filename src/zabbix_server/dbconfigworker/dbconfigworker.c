@@ -152,7 +152,7 @@ ZBX_THREAD_ENTRY(zbx_dbconfig_worker_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start %s service: %s", get_process_type_string(process_type), error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_DBCONFIGWORKER, 0, NULL, 0, SEC_PER_MIN,
@@ -225,7 +225,7 @@ ZBX_THREAD_ENTRY(zbx_dbconfig_worker_thread, args)
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 #undef ZBX_DBCONFIG_WORKER_DELAY
 }
 
@@ -241,14 +241,14 @@ static void	dbconfig_worker_send(zbx_uint32_t code, unsigned char *data, zbx_uin
 		if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_DBCONFIG_WORKER, SEC_PER_MIN, &error))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot connect to connector manager service: %s", error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
 	if (FAIL == zbx_ipc_socket_write(&socket, code, data, size))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to connector manager service");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 

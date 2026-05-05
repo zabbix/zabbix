@@ -39,7 +39,12 @@ class CControllerTemplateCreate extends CController {
 			'visiblename' => ['db hosts.host'],
 			'templates' => ['array', 'field' => ['db hosts.hostid']],
 			'template_add_templates' => ['array', 'field' => ['db hosts.hostid']],
-			'template_groups_new' => ['array', 'field' => ['db hstgrp.name']],
+			'template_groups_new' => ['array', 'field' => [
+					'db hstgrp.name',
+					'use' => [CHostGroupNameParser::class, []],
+					'messages' => ['use' => _('Invalid template group name.')]
+				]
+			],
 			'template_groups' => [
 				['array', 'field' => ['db hstgrp.groupid']],
 				['array', 'required', 'not_empty', 'when' => ['template_groups_new', 'empty']]

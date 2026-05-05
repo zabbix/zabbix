@@ -17,7 +17,6 @@
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
@@ -332,7 +331,7 @@ class testFormTrigger extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('name');
-		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//z-textarea-flexible[@id='name']", 'maxlength', 255);
 
 		if (!isset($data['constructor']) || $data['constructor'] == 'open_close') {
 			$this->zbxTestTextPresent(['Expression', 'Expression constructor']);
@@ -435,7 +434,7 @@ class testFormTrigger extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent('Menu entry URL');
 		$this->zbxTestAssertVisibleId('url');
-		$this->zbxTestAssertAttribute("//input[@id='url']", 'maxlength', 2048);
+		$this->zbxTestAssertAttribute("//z-textarea-flexible[@id='url']", 'maxlength', 2048);
 
 		$this->zbxTestAssertElementPresentId('priority_0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_0'));
@@ -1110,7 +1109,7 @@ class testFormTrigger extends CLegacyWebTest {
 		if (isset($data['description'])) {
 			$this->zbxTestInputTypeWait('name', $data['description']);
 		}
-		$description = $this->zbxTestGetValue("//input[@id='name']");
+		$description = $this->zbxTestGetValue("//z-textarea-flexible[@id='name']");
 
 		if (isset($data['expression'])) {
 			$this->zbxTestInputType('expression', $data['expression']);
@@ -1136,9 +1135,9 @@ class testFormTrigger extends CLegacyWebTest {
 		$url_name = $this->zbxTestGetValue("//input[@id='url_name']");
 
 		if (isset($data['url'])) {
-			$this->zbxTestInputType('url', $data['url']);
+			$this->query('id:url')->one()->fill($data['url']);
 		}
-		$url = $this->zbxTestGetValue("//input[@id='url']");
+		$url = $this->zbxTestGetValue("//z-textarea-flexible[@id='url']");
 
 		if (isset($data['severity'])) {
 			switch ($data['severity']) {
@@ -1206,7 +1205,7 @@ class testFormTrigger extends CLegacyWebTest {
 							$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-negative').']')->all()->count()
 					);
 					$text = $this->query("xpath://tr[1]//button[@data-hintbox]")->one()
-							->getAttribute('data-hintbox-contents');
+							->getAttribute('data-hintbox-html');
 					foreach ($constructor['errors'] as $error) {
 						$this->assertStringContainsString($error, $text);
 					}

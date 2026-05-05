@@ -21,6 +21,7 @@ import (
 
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (
@@ -38,6 +39,13 @@ const (
 	statTypeOperations
 	statTypeSPS
 	statTypeOPS
+)
+
+var (
+	errInvalidFirstParam  = errs.New("invalid first parameter")
+	errInvalidSecondParam = errs.New("invalid second parameter")
+	errInvalidThirdParam  = errs.New("invalid third parameter")
+	errInvalidNumParams   = errs.New("invalid number of parameters")
 )
 
 var impl Plugin
@@ -77,6 +85,7 @@ func init() {
 		"vfs.dev.read", "Disk read statistics.",
 		"vfs.dev.write", "Disk write statistics.",
 		"vfs.dev.discovery", "List of block devices and their type. Used for low-level discovery.",
+		"vfs.dev.get", "List of block devices and their statistics as structured JSON. Used for low-level discovery.",
 	)
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
@@ -134,7 +143,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "vfs.dev.write":
 		mode = ioModeWrite
 	case "vfs.dev.discovery":
-		return p.getDiscovery()
+		return getDiscovery()
+	case "vfs.dev.get":
+		return vfsDevGet(params)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}
@@ -153,7 +164,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		case "avg15":
 			statRange = 60 * 15
 		default:
-			return nil, errors.New("Invalid third parameter.")
+			return nil, errInvalidThirdParam
 		}
 		fallthrough
 	case 2: // type parameter
@@ -167,7 +178,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		case "operations":
 			statType = statTypeOperations
 		default:
-			return nil, errors.New("Invalid second parameter.")
+			return nil, errInvalidSecondParam
 		}
 		fallthrough
 	case 1:
@@ -177,12 +188,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 	case 0:
 	default:
-		return nil, errors.New("Too many parameters.")
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	if statType == statTypeSectors || statType == statTypeOperations {
 		if len(params) > 2 {
-			return nil, errors.New("Invalid number of parameters.")
+			return nil, errInvalidNumParams
 		}
 		var stats *devStats
 		if stats, err = p.getDeviceStats(devParam); err != nil {

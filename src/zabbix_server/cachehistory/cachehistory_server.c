@@ -626,7 +626,7 @@ static void	dc_history_set_value(zbx_dc_history_t *hdata, unsigned char value_ty
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	hdata->value_type = value_type;
@@ -1277,7 +1277,7 @@ static void	DCmodule_prepare_history(zbx_dc_history_t *history, int history_num,
 			case ITEM_VALUE_TYPE_NONE:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 		}
 	}
 }

@@ -84,10 +84,10 @@ window.oauth_edit_popup = new class {
 								this.form_element.querySelector('[name="authorization_mode"][value="manual"]').click();
 								this.form_element.querySelector('[name="code"]').focus();
 
-								return Promise.reject({title: null, messages: [this.messages.authorization_error]});
+								throw {error: {title: null, messages: [this.messages.authorization_error]}};
 							}
 
-							return Promise.reject(error);
+							throw {error};
 						})
 					)
 					.catch(error => {
@@ -130,17 +130,49 @@ window.oauth_edit_popup = new class {
 			e.target.focus();
 		});
 
-		this.form_element.querySelector('button[name="client_secret_button"]')?.addEventListener('click', e => {
-			const input = this.form_element.querySelector('[name="client_secret"]');
+		const client_secret_button = this.form_element.querySelector('[name="client_secret_button"]');
 
-			e.target.remove();
-			input.style.display = '';
-			input.removeAttribute('disabled');
-			input.focus();
-		});
+		if (client_secret_button !== null) {
+			client_secret_button.addEventListener('click', () => {
+				this.#showClientSecretField();
+				this.form_element.querySelector('[name="client_secret"]').focus();
+			});
+
+			if (this.is_advanced_form) {
+				const token_url = this.form_element.querySelector('[name="token_url"]');
+				token_url.addEventListener('input', () => this.#showClientSecretWithWarning());
+
+				const token_parameters_table = this.form_element.querySelector('#oauth-token-parameters-table');
+				token_parameters_table.addEventListener('input', () => this.#showClientSecretWithWarning());
+				token_parameters_table.addEventListener('click', e => {
+					if (e.target.matches('.element-table-remove') || e.target.matches('.element-table-add')) {
+						this.#showClientSecretWithWarning();
+					}
+				});
+			}
+		}
 
 		this.overlay.$dialogue.$footer[0].querySelector('.js-add')
 			.addEventListener('click', () => this.#submit());
+	}
+
+	#showClientSecretWithWarning() {
+		if (this.form_element.querySelector('[name="client_secret_button"]') === null) {
+			return;
+		}
+
+		this.#showClientSecretField();
+		this.form_element.querySelector('.js-client-secret-warning').style.display = '';
+		this.form.findFieldByName('client_secret').setChanged();
+		this.form.validateChanges(['client_secret']);
+	}
+
+	#showClientSecretField() {
+		this.form_element.querySelector('[name="client_secret_button"]').remove();
+
+		const input_element = this.form_element.querySelector('[name="client_secret"]');
+		input_element.style.display = '';
+		input_element.disabled = false;
 	}
 
 	#initDynamicRows(url_selector, parameters_selector, options) {

@@ -33,7 +33,10 @@ ZBX_VECTOR_IMPL(snmp_value_pair, zbx_snmp_value_pair_t)
 #define ZBX_PREPROC_SNMP_UINT_FROM_BITS	3
 
 #ifdef HAVE_NETSNMP
-static char	zbx_snmp_init_done;
+
+#	define SNMP_NO_DEBUGGING		/* disabling debugging messages from Net-SNMP library */
+#	include <net-snmp/net-snmp-config.h>
+#	include <net-snmp/net-snmp-includes.h>
 
 static int	preproc_snmp_translate_oid(const char *oid_in, char **oid_out)
 {
@@ -1090,55 +1093,3 @@ out:
 
 	return ret;
 }
-
-#ifdef HAVE_NETSNMP
-/* This function has to be moved to separate SNMP library when such refactoring will be done in future */
-static void	zbx_init_snmp(void)
-{
-	sigset_t	mask, orig_mask;
-
-	if (1 == zbx_snmp_init_done)
-		return;
-
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
-
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DISABLE_PERSISTENT_LOAD, 1);
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DISABLE_PERSISTENT_SAVE, 1);
-
-	init_snmp(preproc_get_progname_cb()());
-
-	netsnmp_init_mib();
-	zbx_snmp_init_done = 1;
-
-	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
-}
-
-void	preproc_init_snmp(void)
-{
-	zbx_init_snmp();
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS, 1);
-	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT, NETSNMP_OID_OUTPUT_NUMERIC);
-}
-
-void	preproc_shutdown_snmp(void)
-{
-	sigset_t	mask, orig_mask;
-
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
-
-	snmp_shutdown(preproc_get_progname_cb()());
-	zbx_snmp_init_done = 0;
-
-	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
-}
-#endif

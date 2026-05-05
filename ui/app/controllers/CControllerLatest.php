@@ -183,7 +183,7 @@ abstract class CControllerLatest extends CController {
 		$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
 		// Extra byte to trim values that exceeds length limit.
-		$length = ZBX_HINTBOX_CONTENT_LIMIT + 1;
+		$length = ZBX_HINTBOX_HTML_LIMIT + 1;
 		$history = Manager::History()->getLastValues($items, 2,
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)), $length
 		);

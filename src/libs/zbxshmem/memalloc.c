@@ -441,7 +441,7 @@ static void	*__mem_realloc(zbx_shmem_info_t *info, void *old, zbx_uint64_t size)
 		if (NULL == (new_chunk = __mem_malloc(info, size)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		memcpy((char *)new_chunk + SHMEM_SIZE_FIELD, tmp, chunk_size);
@@ -672,14 +672,14 @@ void	*__zbx_shmem_malloc(const char *file, int line, zbx_shmem_info_t *info, con
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): allocating already allocated memory",
 				file, line, __func__);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (0 == size || size > SHMEM_MAX_SIZE)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): asking for a bad number of bytes (" ZBX_FS_SIZE_T
 				")", file, line, __func__, (zbx_fs_size_t)size);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	chunk = __mem_malloc(info, size);
@@ -700,7 +700,7 @@ void	*__zbx_shmem_malloc(const char *file, int line, zbx_shmem_info_t *info, con
 		if (NULL != info->unlock_shmem_on_oom)
 			info->unlock_shmem_on_oom();
 
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return (void *)((char *)chunk + SHMEM_SIZE_FIELD);
@@ -714,7 +714,7 @@ void	*__zbx_shmem_realloc(const char *file, int line, zbx_shmem_info_t *info, vo
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): asking for a bad number of bytes (" ZBX_FS_SIZE_T
 				")", file, line, __func__, (zbx_fs_size_t)size);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (NULL == old)
@@ -738,7 +738,7 @@ void	*__zbx_shmem_realloc(const char *file, int line, zbx_shmem_info_t *info, vo
 		if (NULL != info->unlock_shmem_on_oom)
 			info->unlock_shmem_on_oom();
 
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return (void *)((char *)chunk + SHMEM_SIZE_FIELD);
@@ -749,7 +749,7 @@ void	__zbx_shmem_free(const char *file, int line, zbx_shmem_info_t *info, void *
 	if (NULL == ptr)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): freeing a NULL pointer", file, line, __func__);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	__mem_free(info, ptr);

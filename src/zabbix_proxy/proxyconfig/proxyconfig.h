@@ -15,7 +15,6 @@
 #ifndef ZABBIX_PROXYCONFIG_H
 #define ZABBIX_PROXYCONFIG_H
 
-#include "zbxthreads.h"
 #include "zbxcfg.h"
 #include "zbxvault.h"
 #include "zbxcomms.h"
@@ -24,7 +23,6 @@ typedef struct
 {
 	zbx_config_tls_t	*config_tls;
 	zbx_config_vault_t	*config_vault;
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	int			config_timeout;
 	zbx_vector_addr_ptr_t	*config_server_addrs;
 	const char		*config_hostname;
@@ -33,9 +31,14 @@ typedef struct
 	const char		*config_ssl_cert_location;
 	const char		*config_ssl_key_location;
 	int			config_proxyconfig_frequency;
+	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_find_psk_in_cache_f		zbx_find_psk_in_cache_cb_arg;
+#endif
+
 }
 zbx_thread_proxyconfig_args;
 
-ZBX_THREAD_ENTRY(proxyconfig_thread, args);
+void	*zbx_proxyconfig_thread(void *args);
 
 #endif

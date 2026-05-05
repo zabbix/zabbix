@@ -22,6 +22,16 @@ require_once __DIR__.'/../../include/CLegacyWebTest.php';
  * @backup graphs
  */
 class testInheritanceGraphPrototype extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	private $templateid = 15000;	// 'Inheritance test template'
 	private $template = 'Inheritance test template';
 
@@ -91,8 +101,9 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 					'addItemPrototypes' => [
 						['itemName' => 'testInheritanceItemPrototype1']
 					],
-					'errors'=> 'Graph prototype "testInheritanceGraphPrototype4" already exists on the LLD rule with'.
-						' key "inheritance-discovery-rule" of the template "Inheritance test template".'
+					'inline_errors' => [
+						'Name' => 'This object already exists.'
+					]
 				]
 			]
 		];
@@ -130,11 +141,8 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Graph prototype edit');
-				$message = CMessageElement::find()->waitUntilVisible()->one();
-				$this->assertTrue($message->isBad());
-				$this->assertEquals('Cannot add graph prototype', $message->getTitle());
-				$this->assertTrue($message->hasLine($data['errors']));
 				$this->zbxTestTextNotPresent('Graph prototype added');
+				$this->assertInlineError($dialog->asForm(), $data['inline_errors']);
 				break;
 		}
 	}

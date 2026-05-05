@@ -38,7 +38,7 @@ const view = new class {
 			case STEP_DB_CONNECTION:
 				for (const id of ['type', 'server', 'tls_encryption', 'verify_certificate', 'creds_storage',
 						'vault_certificates_toggle', 'vault_url']) {
-					document.getElementById(id).addEventListener('change', () => this._update());
+					document.getElementById(id).addEventListener('change', () => this.#update());
 				}
 
 				form.addEventListener('submit', () => {
@@ -54,32 +54,33 @@ const view = new class {
 					}
 				});
 
-				this._update();
+				this.#update();
 				break;
 
 			case STEP_SETTINGS:
 				document.getElementById('default-theme').addEventListener('change', () => form.submit());
 				document.getElementById('zbx_server_tls').addEventListener('change', () =>
-					this._updateEncryptionFields()
+					this.#updateEncryptionFields()
 				);
 				document.getElementById('zbx_server_tls_certificate_check').addEventListener('change', () =>
-					this._updateEncryptionFields()
+					this.#updateEncryptionFields()
 				);
 
-				this._updateEncryptionFields();
+				this.#updateEncryptionFields();
 				break;
 		}
 	}
 
-	_update() {
+	#update() {
 		const verify_host = document.getElementById('verify_host');
 		const tls_encryption = document.getElementById('tls_encryption');
 		const tls_encryption_hint = document.getElementById('tls_encryption_hint');
 		const vault_url = document.getElementById('vault_url');
-		const db_warning = document.getElementById('db_warning');
-
 		const db_type = document.querySelector('[name=type]').value;
 		const host = document.querySelector('[name=server]').value;
+		const hintbox = document.querySelector('label[for="server"] button[data-hintbox]');
+
+		hintbox.style.display = db_type === ZBX_DB_POSTGRESQL ? '' : 'none';
 
 		const encryption_enabled = tls_encryption.checked;
 		const encryption_supported = (db_type === ZBX_DB_MYSQL || db_type === ZBX_DB_POSTGRESQL);
@@ -163,7 +164,7 @@ const view = new class {
 		}
 	}
 
-	_updateEncryptionFields() {
+	#updateEncryptionFields() {
 		const encryption_enabled = document.getElementById('zbx_server_tls').checked;
 		const server_verification_enabled = document.getElementById('zbx_server_tls_certificate_check').checked;
 

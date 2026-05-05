@@ -653,7 +653,7 @@ static int	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc
 	{
 		/* sync objects using changelog must be initialized with zbx_dbsync_init_changelog() */
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_vector_dbsync_append(&journal->syncs, sync);

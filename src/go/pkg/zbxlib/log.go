@@ -25,12 +25,13 @@ package zbxlib
 #endif
 
 int	zbx_agent_pid;
+int	log_level = LOG_LEVEL_WARNING;
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
 void handleZabbixLog(int level, const char *message);
 
-void zbx_log_go_impl(int level, const char *fmt, va_list args)
+static void log_go_impl(int level, const char *fmt, va_list args)
 {
 	// no need to allocate memory for message if level is set to log.None (-1)
 	if (zbx_agent_pid == getpid() && -1 != level)
@@ -53,6 +54,11 @@ void zbx_log_go_impl(int level, const char *fmt, va_list args)
 	}
 }
 
+static int get_log_level_impl(void)
+{
+	return log_level;
+}
+
 void	zbx_handle_log(void)
 {
 	// rotation is handled by go logger backend
@@ -66,7 +72,7 @@ int	zbx_redirect_stdio(const char *filename)
 
 void	log_init(void)
 {
-	zbx_init_library_common(zbx_log_go_impl, get_zbx_progname, zbx_backtrace);
+	zbx_init_library_common(log_go_impl, get_log_level_impl, get_zbx_progname, zbx_backtrace);
 }
 
 */
@@ -77,7 +83,7 @@ import (
 )
 
 func SetLogLevel(level int) {
-	C.zbx_set_log_level(C.int(level))
+	C.log_level = C.int(level)
 }
 
 func init() {

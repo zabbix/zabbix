@@ -1033,7 +1033,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				if ($item === 'Dashboard') {
 					// Сheck value and hint message when "Dashboard" is selected.
 					$form->checkValue([$label => 'Dashboard']);
-					$this->assertTrue($field->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
+					$this->assertTrue($field->query('xpath:.//span[@data-hintbox-html="Dashboard is used as data source."]')
 							->one()->isVisible()
 					);
 				}
@@ -1124,7 +1124,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				}
 
 				// Check default color code.
-				$this->assertEquals('#42A5F5', $form->getField('id:lbl_sparkline_color')->getAttribute('title'));
+				$this->assertEquals('42A5F5', $form->getField('name:sparkline[color]')->getAttribute('value'));
 
 				// Check radio button options.
 				$radio_buttons = [
@@ -1231,7 +1231,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Selected more than 731 day for graph filter.',
+						'Name' => 'Selected more than 2 years for graph filter.',
 						'Item' => 'Item for item card widget'
 					],
 					'Show' => [
@@ -1241,8 +1241,9 @@ class testDashboardItemCardWidget extends testWidgets {
 						'id:sparkline_time_period_from' => 'now-1000d',
 						'id:sparkline_time_period_to' => 'now'
 					],
+					'days_count' => true,
 					'error_message' => [
-						'Maximum time period to display is 731 days.'
+						'Maximum time period to display is {days} days.'
 					]
 				]
 			],
@@ -2447,6 +2448,11 @@ class testDashboardItemCardWidget extends testWidgets {
 	 */
 	protected function checkWidgetForm($data, $action, $dashboard) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			// If required, define max days count in error since it depends on leap year presence in desired period.
+			if (CTestArrayHelper::get($data, 'days_count')) {
+				$data['error_message'] = str_replace('{days}', CDateTimeHelper::countDays('now', 'P2Y'), $data['error_message']);
+			}
+
 			$this->assertMessage(TEST_BAD, null, $data['error_message']);
 			COverlayDialogElement::find()->one()->close();
 			$dashboard->save();

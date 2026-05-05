@@ -601,6 +601,7 @@ static int	am_release_mediatype(zbx_am_t *manager, zbx_am_mediatype_t *mediatype
 static zbx_uint64_t	am_calc_alertpoolid(int source, int object, zbx_uint64_t objectid)
 {
 	zbx_uint64_t	alertpoolid;
+	zbx_hash_t	id_hash;
 
 	if (source < 0 || source > 0xffff)
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -612,7 +613,9 @@ static zbx_uint64_t	am_calc_alertpoolid(int source, int object, zbx_uint64_t obj
 	alertpoolid <<= 16;
 	alertpoolid |= object & 0xffff;
 	alertpoolid <<= 32;
-	alertpoolid |= ZBX_DEFAULT_UINT64_HASH_FUNC(&objectid);
+
+	id_hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&objectid);
+	alertpoolid |= ((id_hash ^ (id_hash >> 32)) & 0xffffffff);
 
 	return alertpoolid;
 }
@@ -1007,7 +1010,7 @@ static void	am_register_alerter(zbx_am_t *manager, zbx_ipc_client_t *client, zbx
 		if (manager->next_alerter_index == manager->alerters.values_num)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		alerter = (zbx_am_alerter_t *)manager->alerters.values[manager->next_alerter_index++];
@@ -1064,7 +1067,7 @@ static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_cli
 	if (NULL == alerter)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return *alerter;
@@ -1100,11 +1103,19 @@ static char	*am_create_db_alert_message(const zbx_db_config_t *db_config)
 		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " on \"%s",
 				db_config->dbhost);
 
+#if defined(HAVE_POSTGRESQL)
+		if (NULL != db_config->dbports)
+		{
+			zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " ports:%s\"",
+					db_config->dbports);
+		}
+#else
 		if (0 != db_config->dbport)
 		{
 			zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ":%u\"",
 					db_config->dbport);
 		}
+#endif
 		else
 			zbx_chrcpy_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, '\"');
 	}
@@ -1304,11 +1315,17 @@ static void	am_deinit(zbx_am_t *manager)
 		zbx_am_alerter_t	*alerter = manager->alerters.values[i];
 
 		if (NULL != alerter->client)
+		{
+			zbx_ipc_client_send(alerter->client, ZBX_RTC_SHUTDOWN, NULL, 0);
 			zbx_ipc_client_close(alerter->client);
+		}
 	}
 
 	if (NULL != manager->syncer_client)
+	{
+		zbx_ipc_client_send(manager->syncer_client, ZBX_RTC_SHUTDOWN, NULL, 0);
 		zbx_ipc_client_close(manager->syncer_client);
+	}
 
 	zbx_ipc_service_close(&manager->ipc);
 
@@ -2400,6 +2417,14 @@ static int	am_source_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
+static int	am_compare_source_stats_alerts_num_func(const void *d1, const void *d2)
+{
+	zbx_am_source_stats_t	*m1 = *(zbx_am_source_stats_t * const *)d1;
+	zbx_am_source_stats_t	*m2 = *(zbx_am_source_stats_t * const *)d2;
+
+	return m2->alerts_num - m1->alerts_num;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: processes top alert sources by queued alerts                      *
@@ -2450,7 +2475,7 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 		}
 	}
 
-	zbx_vector_am_source_stats_ptr_sort(&view, am_compare_mediatype_by_alerts_desc);
+	zbx_vector_am_source_stats_ptr_sort(&view, am_compare_source_stats_alerts_num_func);
 	sources_num = MIN(limit, view.values_num);
 
 	data_len = zbx_alerter_serialize_top_sources_result(&data, (zbx_am_source_stats_t **)view.values, sources_num);
@@ -2506,7 +2531,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize alert manager: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	manager.dbstatus = zbx_db_connect(ZBX_DB_CONNECT_ONCE);

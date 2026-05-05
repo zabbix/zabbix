@@ -198,7 +198,7 @@ dnl ISO C Standard Library
 dnl
 AC_CHECK_HEADERS([assert.h ctype.h dirent.h dlfcn.h errno.h float.h          \
                   inttypes.h limits.h math.h signal.h stdarg.h stddef.h      \
-                  stdint.h stdio.h stdlib.h string.h time.h                  \
+                  stdint.h stdio.h stdlib.h string.h time.h setjmp.h         \
 ])
 
 dnl POSIX C Standard Library
@@ -210,6 +210,9 @@ AC_CHECK_HEADERS([sys/ipc.h sys/resource.h sys/sem.h sys/shm.h sys/socket.h  \
                   pthread.h pwd.h strings.h syslog.h termios.h unistd.h      \
                   utmpx.h libgen.h                                           \
 ])
+
+dnl atomics
+AC_CHECK_HEADERS([stdatomic.h])
 
 dnl X/Open and SUS
 AC_CHECK_HEADERS([sys/timeb.h])
@@ -382,6 +385,27 @@ dnl AIX
 AC_SEARCH_LIBS(perfstat_memory_total, perfstat, [AC_DEFINE([HAVE_LIBPERFSTAT], 1, [Define to 1 if you have the 'libperfstat' library (-lperfstat)])])
 AC_SEARCH_LIBS(devstat_getdevs, devstat, [AC_DEFINE([HAVE_LIBDEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
 AC_SEARCH_LIBS(getdevs, devstat, [AC_DEFINE([HAVE_LIBDEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
+
+case "$host_os" in
+  aix*)
+    AC_MSG_CHECKING([for ODM libraries (-lodm -lcfg)])
+    saved_LIBS="$LIBS"
+    LIBS="$LIBS -lodm -lcfg"
+    AC_LINK_IFELSE(
+      [AC_LANG_PROGRAM(
+        [#include <odmi.h>
+         #include <sys/cfgodm.h>],
+        [odm_initialize();
+         odm_open_class(CuAt_CLASS);]
+      )],
+      [AC_MSG_RESULT([yes])
+       AC_DEFINE([HAVE_LIBODM], 1, [Define to 1 if you have the ODM libraries (-lodm -lcfg)])],
+      [AC_MSG_RESULT([no])
+       LIBS="$saved_LIBS"
+       AC_MSG_ERROR([ODM libraries (-lodm -lcfg) not found, ODM support will not be available])]
+    )
+    ;;
+esac
 
 dnl on FreeBSD we have to link with -lexecinfo to get backtraces and also check jail_getname() availability (available after __FreeBSD_version >= 800099)
 AC_SEARCH_LIBS(backtrace_symbols, execinfo, [AC_DEFINE([HAVE_LIBEXECINFO], 1, [Define to 1 if you have the 'libexecinfo' library (-lexecinfo)])])
@@ -2236,9 +2260,12 @@ AC_CONFIG_FILES([
 	src/libs/zbxrtc/Makefile
 	src/libs/zbxself/Makefile
 	src/libs/zbxserialize/Makefile
+	src/libs/zbxsupervisor/Makefile
+    src/libs/zbxsupervisor_client/Makefile
 	src/libs/zbxscripts/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile
+	src/libs/zbxsnmp/Makefile
 	src/libs/zbxsnmptrapper/Makefile
 	src/libs/zbxstr/Makefile
 	src/libs/zbxvmware/Makefile
@@ -2302,7 +2329,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/audit/Makefile
 	src/zabbix_server/autoreg/Makefile
 	src/zabbix_server/actions/Makefile
-	src/zabbix_server/postinit/Makefile
 	src/zabbix_server/cachehistory/Makefile
 	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfigworker/Makefile

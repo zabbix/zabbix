@@ -259,8 +259,7 @@ static int	async_task_process_task_agent_cb(short event, void *data, int *fd, zb
 			}
 
 			agent_context->step = ZABBIX_AGENT_STEP_RECV;
-			zbx_tcp_recv_context_init(&agent_context->s, &agent_context->tcp_recv_context,
-					agent_context->item.flags);
+			zbx_tcp_recv_context_init(&agent_context->s, &agent_context->tcp_recv_context, 0);
 
 			return ZBX_ASYNC_TASK_READ;
 		case ZABBIX_AGENT_STEP_RECV_CLOSE:
@@ -276,7 +275,7 @@ static int	async_task_process_task_agent_cb(short event, void *data, int *fd, zb
 			if (ZABBIX_AGENT_STEP_RECV == agent_context->step)
 			{
 				if (FAIL == zbx_tcp_recv_context(&agent_context->s, &agent_context->tcp_recv_context,
-					agent_context->item.flags, &event_new))
+						0, &event_new))
 				{
 					if (ZBX_ASYNC_TASK_STOP != (state = zbx_async_poller_get_task_state_for_event(event_new)))
 						return state;
@@ -334,7 +333,7 @@ void	zbx_async_check_agent_clean(zbx_agent_context *agent_context)
 	zbx_free_agent_result(&agent_context->item.result);
 }
 
-int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,
+int	zbx_async_check_agent(zbx_dc_agent_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_agent_cb,
 		void *arg, void *arg_action, struct event_base *base, zbx_channel_t *channel,
 		struct evdns_base *dnsbase, const char *config_source_ip,
@@ -357,16 +356,12 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,
 	agent_context->item.interface = item->interface;
 	agent_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
 			agent_context->item.interface.dns_orig : agent_context->item.interface.ip_orig);
-	agent_context->item.key_orig = zbx_strdup(NULL, item->key_orig);
 	agent_context->item.preprocessing = item->preprocessing;
 
-	if (item->key != item->key_orig)
-	{
-		agent_context->item.key = item->key;
-		item->key = NULL;
-	}
-	else
-		agent_context->item.key = zbx_strdup(NULL, item->key);
+	agent_context->item.key_orig = item->key_orig;
+	item->key_orig = NULL;
+	agent_context->item.key = item->key;
+	item->key = NULL;
 
 	agent_context->resolve_reverse_dns = resolve_reverse_dns;
 	agent_context->rdns_step = ZABBIX_ASYNC_STEP_DEFAULT;

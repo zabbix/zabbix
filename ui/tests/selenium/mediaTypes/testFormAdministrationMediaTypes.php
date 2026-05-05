@@ -454,7 +454,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					$form->query('button:Configure')->one()->click();
 					$oauth_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 					$oauth_form = $oauth_overlay->asForm();
-					$this->assertEquals('New oauth', $oauth_overlay->getTitle());
+					$this->assertEquals('New OAuth', $oauth_overlay->getTitle());
 
 					// Check that "Copy" button is enabled and displayed.
 					$this->assertTrue($oauth_form->query('xpath:.//button[contains(@class, "zi-copy")]')->one()->isClickable());
@@ -1941,31 +1941,56 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 	/**
 	 * Check scenarios when warning tooltip does or doesn't appear.
-	 * Possible values:
+	 * Possible values for tokens_status parameter:
 	 * 		0 - (default) Both tokens contain invalid value;
 	 * 		1 - Access token contain valid value;
 	 * 		2 - Refresh token contain valid value;
 	 * 		3 - Both tokens contain valid value.
 	 */
-	public function testFormAdministrationMediaTypes_TokenStatus() {
+	public function testFormAdministrationMediaTypes_WarningTooltip() {
 		$this->page->login()->open(self::URL)->waitUntilReady();
 
 		foreach (['Generic SMTP OAuth', 'Gmail OAuth', 'Gmail relay OAuth', 'Office365 OAuth'] as $name) {
 			foreach ([0, 1, 2, 3] as $tokens_status) {
-				DBexecute('UPDATE media_type_oauth SET tokens_status='.$tokens_status.' WHERE mediatypeid='.
-						self::$mediatypeids[$name]
-				);
-				$this->query('link', $name)->waitUntilClickable()->one()->click();
-				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+				// Change the status of the corresponding mediatype token.
+				CDataHelper::call('mediatype.update', [
+					'mediatypeid' => self::$mediatypeids[$name],
+					'access_token' => 'test',
+					'refresh_token' => 'test',
+					'access_expires_in' => 3599,
+					'tokens_status' => $tokens_status
+				]);
 
-				if ($tokens_status === 0 || $tokens_status === 1) {
-					$this->checkHint($form, 'zi-i-negative', 'Refresh token is invalid or outdated.');
-				}
-				else {
-					$this->assertFalse($form->query('xpath://button[contains(@class, "zi-i-negative")]')->one(false)->isValid());
-				}
+				// Check warning presence based on time access token was updated. '2147483647' - maximal valid unix time.
+				foreach (['2147483647', time()] as $access_token_updated) {
+					CDataHelper::call('mediatype.update', [
+						'mediatypeid' => self::$mediatypeids[$name],
+						'access_token_updated' => $access_token_updated
+					]);
 
-				COverlayDialogElement::find()->one()->close();
+					$this->query('link', $name)->waitUntilClickable()->one()->click();
+					$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+
+					// There will be two warning hints when refresh token is invalid and access token has "unexpected update time".
+					$warning = ($tokens_status === 0 || $tokens_status === 1)
+						? ($access_token_updated === '2147483647'
+							? "Refresh token is invalid or outdated.\nUnexpected access token update time."
+							: 'Refresh token is invalid or outdated.')
+						: ($access_token_updated === '2147483647'
+							? 'Unexpected access token update time.'
+							: null);
+
+					if ($warning !== null) {
+						$this->checkHint($form, 'zi-i-negative', $warning);
+					}
+					else {
+						$this->assertFalse($form->query('xpath://button[contains(@class, "zi-i-negative")]')->one(false)
+								->isValid()
+						);
+					}
+
+					COverlayDialogElement::find()->one()->close();
+				}
 			}
 		}
 	}

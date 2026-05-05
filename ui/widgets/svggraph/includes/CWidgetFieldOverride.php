@@ -43,12 +43,15 @@ class CWidgetFieldOverride extends CWidgetField {
 				'fill'				=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
 				'missingdatafunc'	=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO, SVG_GRAPH_MISSING_DATA_LAST_KNOWN])],
 				'axisy'				=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
+				'invert_values'		=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_INVERT_VALUES_OFF, SVG_GRAPH_INVERT_VALUES_ON])],
 				'timeshift'			=> ['type' => API_TIME_UNIT, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])]
 			]]);
 	}
 
 	public function getOverrideOptions(): array {
-		return ['color', 'color_palette', 'width', 'type', 'transparency', 'fill', 'pointsize', 'missingdatafunc', 'axisy', 'timeshift'];
+		return ['color', 'color_palette', 'width', 'type', 'transparency', 'fill', 'pointsize', 'missingdatafunc',
+			'axisy', 'invert_values', 'timeshift'
+		];
 	}
 
 	public function setValue($value): self {

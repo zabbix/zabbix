@@ -61,7 +61,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 						'parameters' => [
 							'srctbl' => 'hosts',
 							'srcfld1' => 'hostid',
-							'dstfrm' => 'zbx_filter',
+							'dstfrm' => CFilter::FORM_NAME,
 							'dstfld1' => 'filter_hostids_',
 							'real_hosts' => true,
 							'with_graphs' => true
@@ -104,7 +104,7 @@ $html_page->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'filter_form_name' => 'zbx_filter',
+		'filter_form_name' => CFilter::FORM_NAME,
 		'data' => [
 			'charts' => $data['charts'],
 			'timeline' => $data['timeline'],

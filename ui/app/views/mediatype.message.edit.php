@@ -80,7 +80,7 @@ if ($data['params']['type'] != MEDIA_TYPE_SMS) {
 	$form_grid->addItem([
 		new CLabel(_('Subject'), 'subject'),
 		new CFormField(
-			(new CTextBox('subject', $data['params']['subject']))
+			(new CTextAreaFlexible('subject', $data['params']['subject']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('media_type_message', 'subject'))
 		)

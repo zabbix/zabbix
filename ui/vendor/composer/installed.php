@@ -3,7 +3,7 @@
         'name' => 'zabbix/ui',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '2dd4beb0a0666e6a4dd5fc283a4f26924dfa1b33',
+        'reference' => 'ab854d710cfcf8249eb2bb5ad88c8c6dda1a2a21',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'duosecurity/duo_universal_php' => array(
-            'pretty_version' => '1.1.1',
-            'version' => '1.1.1.0',
-            'reference' => '4ee7253863d84653a60a8cad4b03aa3b66fcfd35',
+            'pretty_version' => '1.1.2',
+            'version' => '1.1.2.0',
+            'reference' => '68e699c52d41f681df07dc0f98e2ba551bef2fd3',
             'type' => 'library',
             'install_path' => __DIR__ . '/../duosecurity/duo_universal_php',
             'aliases' => array(),
@@ -29,9 +29,9 @@
             'dev_requirement' => false,
         ),
         'firebase/php-jwt' => array(
-            'pretty_version' => 'v6.10.0',
-            'version' => '6.10.0.0',
-            'reference' => 'a49db6f0a5033aef5143295342f1c95521b075ff',
+            'pretty_version' => 'v7.0.3',
+            'version' => '7.0.3.0',
+            'reference' => '28aa0694bcfdfa5e2959c394d5a1ee7a5083629e',
             'type' => 'library',
             'install_path' => __DIR__ . '/../firebase/php-jwt',
             'aliases' => array(),
@@ -103,7 +103,7 @@
         'zabbix/ui' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '2dd4beb0a0666e6a4dd5fc283a4f26924dfa1b33',
+            'reference' => 'ab854d710cfcf8249eb2bb5ad88c8c6dda1a2a21',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

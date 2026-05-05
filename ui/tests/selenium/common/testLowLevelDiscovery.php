@@ -2365,7 +2365,7 @@ class testLowLevelDiscovery extends CWebTest {
 
 		// Fill Headers.
 		if (array_key_exists('Headers', $data)) {
-			$this->fillComplexFields($data['Headers'], $form, 'Headers', 'input');
+			$this->fillComplexFields($data['Headers'], $form, 'Headers', 'z-textarea-flexible');
 		}
 
 		// Fill Parameters.
@@ -2382,7 +2382,7 @@ class testLowLevelDiscovery extends CWebTest {
 		// Fill Filters tab.
 		if (array_key_exists('Filters', $data)) {
 			$form->selectTab('Filters');
-			$this->fillComplexFields($data['Filters']['filters'], $form, 'Filters', 'input');
+			$this->fillComplexFields($data['Filters']['filters'], $form, 'Filters', 'z-textarea-flexible');
 
 			if (array_key_exists('calculation', $data['Filters'])) {
 				$form->fill(['id:evaltype' => $data['Filters']['calculation']]);
@@ -2473,7 +2473,7 @@ class testLowLevelDiscovery extends CWebTest {
 
 			// Check Headers.
 			if (array_key_exists('Headers', $data)) {
-				$this->checkComplexFields($data['Headers'], $form, 'Headers', 'input');
+				$this->checkComplexFields($data['Headers'], $form, 'Headers', 'z-textarea-flexible');
 			}
 
 			// Check Parameters.
@@ -2490,7 +2490,7 @@ class testLowLevelDiscovery extends CWebTest {
 			// Check LLD Filters.
 			if (array_key_exists('Filters', $data)) {
 				$form->selectTab('Filters');
-				$this->checkComplexFields($data['Filters']['filters'], $form, 'Filters', 'input');
+				$this->checkComplexFields($data['Filters']['filters'], $form, 'Filters', 'z-textarea-flexible');
 
 				if (array_key_exists('calculation', $data['Filters'])) {
 					$form->checkValue(['id:evaltype' => $data['Filters']['calculation']]);
@@ -2698,14 +2698,14 @@ class testLowLevelDiscovery extends CWebTest {
 		// Change Filters.
 		if (array_key_exists('Filters', $data)) {
 			$form->selectTab('Filters');
-			$this->fillComplexFields($data['Filters'], $form, 'Filters', 'input');
+			$this->fillComplexFields($data['Filters'], $form, 'Filters', 'z-textarea-flexible');
 		}
 
 		// Change Overrides.
 		if (array_key_exists('Overrides', $data) && CTestArrayHelper::get($data, 'change_overrides')) {
 			$form->selectTab('Overrides');
 			$form->query('link:Override')->waitUntilClickable()->one()->click();
-			$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$override_dialog_form = COverlayDialogElement::get('Override')->asForm();
 			$override_dialog_form->fill($data['Overrides']);
 			$override_dialog_form->submit();
 			$override_dialog_form->waitUntilNotVisible();
@@ -2734,7 +2734,7 @@ class testLowLevelDiscovery extends CWebTest {
 					? $data['Overrides']['Name']
 					: 'Override';
 				$form->query('link', $override_name)->waitUntilClickable()->one()->click();
-				$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+				$override_dialog_form = COverlayDialogElement::get('Override')->asForm();
 				$override_dialog_form->checkValue($data['Overrides']);
 				$override_dialog_form->submit();
 				$override_dialog_form->waitUntilNotVisible();
@@ -2874,7 +2874,7 @@ class testLowLevelDiscovery extends CWebTest {
 				$form->query('link:Cancel override')->waitUntilClickable()->one()->click();
 			}
 
-			$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$override_dialog_form = COverlayDialogElement::get('Override')->asForm();
 			$override_dialog_form->fill($fields['overrides_fields']['filters']);
 			$override_dialog_form->getFieldContainer('Operations')->query('button:Add')->waitUntilClickable()->one()->click();
 			$operation_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();

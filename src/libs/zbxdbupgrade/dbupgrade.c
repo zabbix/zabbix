@@ -809,7 +809,7 @@ static void	DBget_version(int *mandatory, int *optional)
 	if (-1 == *mandatory)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot get the database version. Exiting ...");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 

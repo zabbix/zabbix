@@ -6,7 +6,9 @@ noinst_PROGRAMS = \
 	zbx_merge_tags \
 	zbx_del_tags \
 	zbx_add_tags \
-	zbx_sync_rowset_merge
+	zbx_sync_rowset_merge \
+	zbx_merge_item_params
+
 else
 if PROXY
 noinst_PROGRAMS = \
@@ -90,6 +92,18 @@ zbx_sync_rowset_merge_CFLAGS = \
 zbx_sync_rowset_merge_LDADD =  $(DBHIGH_LIBS) @SERVER_LIBS@ $(TEST_LIBS) $(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 zbx_sync_rowset_merge_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+zbx_merge_item_params_SOURCES = \
+	zbx_merge_item_params.c \
+	$(COMMON_SRC)
+
+zbx_merge_item_params_LDADD = $(DBHIGH_LIBS)
+
+zbx_merge_item_params_LDADD += @SERVER_LIBS@
+
+zbx_merge_item_params_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_merge_item_params_CFLAGS = $(COMMON_FLAGS)
 
 else
 if PROXY

@@ -103,8 +103,8 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 	public function testInheritanceDiscoveryRule_SimpleCreate($data) {
 		$this->zbxTestLogin('host_discovery.php?form=Create+discovery+rule&context=template&hostid='.$this->templateid);
 
-		$this->zbxTestInputType('name', $data['name']);
-		$this->zbxTestInputType('key', $data['key']);
+		$form = $this->query('name:itemForm')->waitUntilVisible()->asForm()->one();
+		$form->fill(['Name' => $data['name'], 'Key' => $data['key']]);
 
 		if (array_key_exists('macros', $data)) {
 			$this->zbxTestTabSwitch('LLD macros');
@@ -162,8 +162,8 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 				$this->zbxTestLogin('host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='.$this->hostid);
 				$this->zbxTestClickLinkText($data['name']);
 				$this->zbxTestWaitForPageToLoad();
-				$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@value="'.$data['name'].'"][@readonly]');
-				$this->zbxTestAssertElementPresentXpath('//input[@id="key"][@value="'.$data['key'].'"][@readonly]');
+				$this->zbxTestAssertElementPresentXpath('//z-textarea-flexible[@id="name"][@value="'.$data['name'].'"][@readonly]');
+				$this->zbxTestAssertElementPresentXpath('//z-textarea-flexible[@id="key"][@value="'.$data['key'].'"][@readonly]');
 				if (array_key_exists('macros', $data)) {
 					$this->zbxTestTabSwitch('LLD macros');
 					foreach ($data['macros'] as $i => $lld_macro) {

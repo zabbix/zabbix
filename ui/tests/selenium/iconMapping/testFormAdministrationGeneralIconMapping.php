@@ -17,8 +17,6 @@
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup icon_map
  */
@@ -883,6 +881,9 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 	/**
 	 * Test cancel cloning of icon mapping.
+	 *
+	 * TODO: Remove @ignoreBrowserErrors after the console.error for "Failed to fetch" is resolved in ZBX-27065
+	 * @ignoreBrowserErrors
 	 */
 	public function testFormAdministrationGeneralIconMapping_CancelCloning() {
 		$sql_hash = 'SELECT * FROM icon_map ORDER BY iconmapid';
@@ -893,12 +894,9 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		foreach (CDBHelper::getAll('SELECT name FROM icon_map LIMIT 2') as $iconmap) {
 			$new_name = $iconmap['name'].' (cloned)';
 			$this->query('link', $iconmap['name'])->waitUntilClickable()->one()->click();
-			// TODO: remove redundant page->waitUntilReady after ZBX-27065 is fixed.
-			$this->page->waitUntilReady();
 			$form = $this->query('id:iconmap')->waitUntilVisible()->asForm()->one();
 			$form->fill(['Name' => $new_name]);
 			$form->query('button:Clone')->one()->click()->waitUntilNotVisible();
-			$this->page->waitUntilReady();
 			$form->waitUntilReloaded();
 			$form->checkValue(['Name' => $new_name]);
 			$form->query('button:Cancel')->waitUntilVisible()->one()->click()->waitUntilNotVisible();
@@ -972,11 +970,10 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Icon map "'.$name.'" cannot be deleted. Used in map');
 
 		// Check the results in DB.
-		$sql = 'SELECT * FROM icon_map WHERE name='.zbx_dbstr($name);
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
-	private function checkFormFields($data) {
+	protected function checkFormFields($data) {
 		$this->zbxTestClickLinkTextWait($data['name']);
 		$this->zbxTestAssertElementValue('name', $data['name']);
 		$this->zbxTestAssertElementValue('mappings_0_expression', $data['mappings'][0]['expression']);
@@ -985,7 +982,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestDropdownAssertSelected('default-mapping-icon', $data['default_icon']);
 	}
 
-	private function processExpressionRows($rows) {
+	protected function processExpressionRows($rows) {
 		foreach ($rows as $i => $mapping_row) {
 			switch (CTestArrayHelper::get($mapping_row, 'action', 'add')) {
 				case 'add':
@@ -1002,13 +999,14 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 				case 'update':
 					if (!$this->zbxTestElementPresentId('mappings_'.$i.'_expression')) {
 						$this->zbxTestClickXpath('//button[@id="add" and @type="button"]');
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('mappings_'.$i.'_expression'));
+						$this->query('id:iconmap_mappings_'.$i.'_expression')->waitUntilVisible()->one();
 					}
-					$this->zbxTestInputType('mappings_'.$i.'_expression', $mapping_row['expression']);
+					$this->query('id:mappings_'.$i.'_expression')->one()->fill($mapping_row['expression']);
+
 					break;
 
 				case 'remove':
-					$this->zbxTestClickXpathWait('//input[@id="mappings_'.$i.'_expression"]/../../td/button');
+					$this->zbxTestClickXpathWait('//z-textarea-flexible[@id="mappings_'.$i.'_expression"]/../../td/button');
 
 					break;
 			}

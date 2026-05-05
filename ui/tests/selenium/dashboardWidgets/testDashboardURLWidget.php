@@ -802,9 +802,8 @@ class testDashboardURLWidget extends testWidgets {
 		$this->query('button:Save changes')->one()->click();
 
 		// Check that Dashboard can't be saved and returns error regarding invalid parameter.
-		$message = CMessageElement::find('xpath://div[@class="wrapper"]', true)->one()->waitUntilVisible();
 		$this->assertMessage(TEST_BAD, null, 'Cannot save widget "'.self::$default_widget.'". Invalid parameter "URL": cannot be empty.');
-		$message->close();
+		CMessageElement::find()->one()->close();
 
 		// Check updated valid URI schemes.
 		$dashboard->getWidget(self::$default_widget)->edit();
