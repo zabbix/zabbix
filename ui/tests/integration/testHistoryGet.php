@@ -29,6 +29,7 @@ class testHistoryGet extends CIntegrationTest {
 
 	private static $hostid;
 	private static $items = [];
+	private static int $last = 0;
 
 	public function prepareData() {
 		$response = $this->call('hostgroup.get', [
@@ -111,12 +112,11 @@ class testHistoryGet extends CIntegrationTest {
 	}
 
 	private function timeMonotonic(): int {
-		static $last = 0;
 		$now = time();
-		if ($now <= $last) {
-			$now = $last + 1;
+		if ($now <= self::$last) {
+			$now = self::$last + 1;
 		}
-		$last = $now;
+		self::$last = $now;
 		return $now;
 	}
 
