@@ -60,31 +60,8 @@ class CControllerUserDeviceInit extends CController {
 			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES);
 	}
 
-	protected function initFakeDevice (): array {
-		return [
-			'enrollment_token_expires_at' => time() + 300,
-			'uuid' => '018f9c6a7c1b7f3a9b2d5c4f8e6a1d90',
-			'server_id' => '018f9c6a-7c1b-7f3a-9b2d-5c4f8e6a1d90',
-			'enrollment_token' => 'BD0qfl9qmxw_CkWfEaK1DJg0PH3hilZ3mtp8NvHiklFZ9ijGbhx0lD0KNsVVkT3bg8EjbUMoW8bfE2Jio8mU0o',
-			'mobile_enrollment_token' => 'BD0qfl9qmxw_CkWfEaK1DJg0PH3hilZ3mtp8NvHiklFZ9ijGbhx0lD0KNsVVkT3bg8EjbUMoW8bfE2Jio8mU0o',
-			'bridge_adapter_encryption_key' => [
-				'kty' => 'EC',
-				'crv' => 'P-256',
-				'x' => 'V4D0HUpQ7fqiXLyLw4CivPSUAL3tbbyH_bFeRaBT7NY',
-				'y' => 'kZdlarx9bsd7g28If2wNobwRYoBJFvaBDuI2pTyyIKs',
-				'kid' => 'serverKid',
-				'alg' => '1'
-			],
-			'bridge_enrollment_url' => '165.22.83.177:8443'
-		];
-	}
-
 	protected function doAction() {
-		$userid = $this->getInput('userid');
-
-		// TODO: uncomment and use actual init
-		//$device = API::Device()->init(['userid' => $userid]);
-		$device = $this->initFakeDevice();
+		$device = API::Device()->init(['userid' => $this->getInput('userid')]);
 		$output = [];
 
 		if ($device) {
