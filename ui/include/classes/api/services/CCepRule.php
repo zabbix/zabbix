@@ -274,12 +274,12 @@ class CCepRule extends CApiService {
 				'sortfield' => ['cep_conditionid'],
 				'preservekeys' => true
 			];
-			$db_conditions = DBselect(DB::makeSql('cep_condition', $conditions_options));
+			$resource = DBselect(DB::makeSql('cep_condition', $conditions_options));
 			$cep_conditions = [];
 
-			while ($db_condition = DBfetch($db_conditions)) {
-				$cep_conditions[$db_condition['cep_ruleid']][$db_condition['cep_conditionid']] =
-					array_diff_key($db_condition, array_flip(['cep_ruleid', 'cep_conditionid']));
+			while ($row = DBfetch($resource)) {
+				$cep_conditions[$row['cep_ruleid']][$row['cep_conditionid']] =
+					array_diff_key($row, array_flip(['cep_ruleid', 'cep_conditionid']));
 			}
 
 			foreach ($cep_rules as &$cep_rule) {
@@ -294,7 +294,7 @@ class CCepRule extends CApiService {
 				}
 				else {
 					$eval_formula =
-						CConditionHelper::getEvalFormula($conditions, 'type', (int)$cep_rule['evaltype']);
+						CConditionHelper::getEvalFormula($conditions, 'type', (int) $cep_rule['evaltype']);
 				}
 
 				CConditionHelper::addFormulaIds($conditions, $eval_formula);
