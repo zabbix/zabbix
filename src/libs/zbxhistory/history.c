@@ -122,7 +122,7 @@ static void	history_provider_free(zbx_history_provider_t *provider)
 
 /*******************************************************************************
  *                                                                             *
- * Purpose: open history provider                                              *
+ * Purpose: open and initialize history provider by name                       *
  *                                                                             *
  * Parameters: name        - [IN] provider name                                *
  *             options     - [IN] provider options array                       *
