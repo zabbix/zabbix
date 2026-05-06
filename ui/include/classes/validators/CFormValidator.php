@@ -1199,11 +1199,7 @@ class CFormValidator {
 	 */
 	private static function validateDistinctness(array $rules, $array_values, string &$path, ?string &$error = null): bool {
 		foreach ($rules['uniq'] as $field_names) {
-			$values = array_map(function ($entry) use ($field_names) {
-				$filtered = array_intersect_key($entry, array_flip($field_names));
-
-				return array_map('strval', $filtered);
-			}, $array_values);
+			$values = array_map(fn ($entry) => array_intersect_key($entry, array_flip($field_names)), $array_values);
 			$unique_values = [];
 
 			foreach ($values as $key => $entry) {
