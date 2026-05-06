@@ -698,7 +698,7 @@ static int	dc_check_maintenance_period(const zbx_dc_maintenance_t *maintenance,
 
 	rc = dc_calculate_maintenance_period(maintenance, period, period_start, &period_start, &period_end);
 
-	if (SUCCEED == rc && period_start <= now && now < period_end)
+	if (SUCCEED == rc && period_start <= now && now <= period_end)
 	{
 		*running_since = period_start;
 		*running_until = period_end;
@@ -861,7 +861,7 @@ int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer)
 	zbx_dc_maintenance_t		*maintenance;
 	zbx_dc_maintenance_period_t	*period;
 	zbx_hashset_iter_t		iter;
-	int				i, running_num = 0, started_num = 0, stopped_num = 0, ret = FAIL;
+	int				i, running_num = 0, started_num = 0, stopped_num = 0, changed, ret = FAIL;
 	unsigned char			state;
 	time_t				now, period_start, period_end, running_since, running_until;
 	zbx_dc_config_t			*config = get_dc_config();
@@ -888,7 +888,9 @@ int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer)
 
 		if (now >= maintenance->active_since && now < maintenance->active_until)
 		{
-			/* find the longest running maintenance period */
+			changed = 0;
+
+			/* find earliest start and lastest end from currently running mainenance periods */
 			for (i = 0; i < maintenance->periods.values_num; i++)
 			{
 				period = (zbx_dc_maintenance_period_t *)maintenance->periods.values[i];
@@ -897,10 +899,48 @@ int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer)
 						&period_end))
 				{
 					state = ZBX_MAINTENANCE_RUNNING;
-					if (period_end > running_until)
+
+					if (0 == running_since || period_start < running_since)
 					{
 						running_since = period_start;
+						changed = 1;
+					}
+
+					if (period_end > running_until)
+					{
 						running_until = period_end;
+						changed = 1;
+					}
+				}
+			}
+
+			while (1 == changed)
+			{
+				changed = 0;
+
+				for (i = 0; i < maintenance->periods.values_num; i++)
+				{
+					period = (zbx_dc_maintenance_period_t *)maintenance->periods.values[i];
+
+					if (SUCCEED == dc_check_maintenance_period(maintenance, period,
+						running_since, &period_start, &period_end))
+					{
+						/* find earliest start of overlapping periods */
+						if (period_start < running_since)
+						{
+							running_since = period_start;
+							changed = 1;
+						}
+					}
+					else if (SUCCEED == dc_check_maintenance_period(maintenance, period,
+						running_until, &period_start, &period_end))
+					{
+						/* find lastest end of overlapping periods */
+						if (period_end > running_until)
+						{
+							running_until = period_end;
+							changed = 1;
+						}
 					}
 				}
 			}

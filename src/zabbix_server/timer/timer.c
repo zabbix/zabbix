@@ -450,6 +450,7 @@ static void	db_get_query_events(zbx_vector_event_suppress_query_ptr_t *event_que
  * Parameters: suppressed_num - [OUT]                                         *
  *             process_num    - [IN]                                          *
  *             get_forks_cb   - [IN]                                          *
+ *             now            - [IN]                                          *
  *                                                                            *
  ******************************************************************************/
 static int	db_update_event_suppress_data(int *suppressed_num, int process_num, zbx_get_config_forks_f get_forks_cb,
@@ -562,6 +563,11 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 									(int)query->maintenances.values[k].second,
 									query->eventid,
 									query->maintenances.values[k].first);
+
+						zbx_db_insert_add_values(&db_insert_ack, __UINT64_C(0), query->eventid,
+								(int)now, ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS,
+								(int)query->maintenances.values[k].second,
+								query->maintenances.values[k].first);
 
 						if (FAIL == zbx_db_execute_overflowed_sql(&sql, &sql_alloc,
 								&sql_offset))
