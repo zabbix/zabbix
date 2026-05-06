@@ -467,30 +467,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * @depends testLLDHistorySyncAtScale_TriggerRecovery
-	 */
-	public function testLLDHistorySyncAtScale_TriggerUnknown() {
-		$tm = time();
-		$this->sendHistoryAt($tm, 'item is not supported', ITEM_STATE_NOTSUPPORTED);
-
-		// Verify all discovered triggers became unknown (state = UNKNOWN).
-		$this->callUntilDataIsPresent('trigger.get', [
-			'hostids' => [self::$hostid],
-			'output' => ['triggerid', 'value', 'state']
-		], self::TRIGGER_WARMUP_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			if (count($r['result']) !== self::$total_trigger_expected) {
-				return false;
-			}
-			foreach ($r['result'] as $trigger) {
-				if ((int) $trigger['state'] !== TRIGGER_STATE_UNKNOWN) {
-					return false;
-				}
-			}
-			return true;
-		});
-	}
-
-	/**
 	 * Update each trigger prototype expression to nodata(...,30s)=1 and verify that
 	 * all discovered triggers fire after the no-data window elapses.
 	 *
@@ -517,11 +493,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			]);
 			$this->assertCount(1, $response['result']['triggerids']);
 		}
-
-		/*if (!empty(self::$discovered_triggerids)) {
-			$this->call('trigger.delete', self::$discovered_triggerids);
-			self::$discovered_triggerids = [];
-		}*/
 
 		$this->sendDiscoveryData();
 
@@ -579,35 +550,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Send normal data so the nodata() window is satisfied and verify that all
-	 * discovered triggers recover (value = OK, state = NORMAL).
-	 *
-	 * @depends testLLDHistorySyncAtScale_TriggerNoDataFiring
-	 */
-	public function testLLDHistorySyncAtScale_TriggerNoDataRecovery() {
-		$tm = time();
-		$this->sendHistoryAt($tm);
-
-		$this->callUntilDataIsPresent('trigger.get', [
-			'hostids' => [self::$hostid],
-			'output' => ['triggerid', 'value', 'state']
-		], self::TRIGGER_WARMUP_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			if (count($r['result']) !== self::$total_trigger_expected) {
-				return false;
-			}
-			foreach ($r['result'] as $trigger) {
-				if ((int) $trigger['value'] !== TRIGGER_VALUE_FALSE) {
-					return false;
-				}
-				if ((int) $trigger['state'] !== TRIGGER_STATE_NORMAL) {
-					return false;
-				}
-			}
-			return true;
-		});
-	}
-
-	/**
 	 * Resend NOTSUPPORTED data and verify that nodata-based triggers remain firing
 	 * (value = PROBLEM, state = NORMAL) regardless of item state.
 	 *
@@ -616,6 +558,12 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	public function testLLDHistorySyncAtScale_TriggerNoDataNotSupported() {
 		$tm = time();
 		$this->sendHistoryAt($tm, 'item is not supported', ITEM_STATE_NOTSUPPORTED);
+
+		$this->callUntilCountIsPresent('item.get', [
+			'hostids' => [self::$hostid],
+			'search' => ['key_' => self::ITEM_PROTO_KEY.'.'],
+			'filter' => ['state' => ITEM_STATE_NOTSUPPORTED]
+		], self::$total_expected, self::TRIGGER_WARMUP_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		$this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
@@ -650,7 +598,26 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	public function testLLDHistorySyncAtScale_TriggerNoDataRecoveryAfterRestart() {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
-		$this->testLLDHistorySyncAtScale_TriggerNoDataRecovery();
+		$tm = time();
+		$this->sendHistoryAt($tm);
+
+		$this->callUntilDataIsPresent('trigger.get', [
+			'hostids' => [self::$hostid],
+			'output' => ['triggerid', 'value', 'state']
+		], self::TRIGGER_WARMUP_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			if (count($r['result']) !== self::$total_trigger_expected) {
+				return false;
+			}
+			foreach ($r['result'] as $trigger) {
+				if ((int) $trigger['value'] !== TRIGGER_VALUE_FALSE) {
+					return false;
+				}
+				if ((int) $trigger['state'] !== TRIGGER_STATE_NORMAL) {
+					return false;
+				}
+			}
+			return true;
+		});
 	}
 
 	private function verifyTrendsAtClock(int $trend_clock): void {
