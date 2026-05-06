@@ -515,6 +515,34 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		});
 	}
 
+	/**
+	 * Resend NOTSUPPORTED data and verify that nodata-based triggers remain firing
+	 * (value = PROBLEM, state = NORMAL) regardless of item state.
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerNoData
+	 */
+	public function testLLDHistorySyncAtScale_TriggerNoDataNotSupported() {
+		$tm = time();
+		$this->sendHistoryAt($tm, 'item is not supported', ITEM_STATE_NOTSUPPORTED);
+
+		$this->callUntilDataIsPresent('trigger.get', [
+			'hostids' => [self::$hostid],
+			'output' => ['triggerid', 'value', 'state']
+		], self::TRIGGER_WARMUP_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			if (count($r['result']) !== self::$total_trigger_expected) {
+				return false;
+			}
+			foreach ($r['result'] as $trigger) {
+				if ((int) $trigger['value'] !== TRIGGER_VALUE_TRUE) {
+					return false;
+				}
+				if ((int) $trigger['state'] !== TRIGGER_STATE_NORMAL) {
+					return false;
+				}
+			}
+			return true;
+		});
+	}
 
 	private function verifyTrendsAtClock(int $trend_clock): void {
 		foreach ([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] as $vtype) {
