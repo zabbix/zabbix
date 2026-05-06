@@ -62,7 +62,10 @@ public class JavaGateway
 
 			String serverList = (String)ConfigurationManager.getParameter(ConfigurationManager.SERVER).getValue();
 			AllowedPeers allowedPeers = AllowedPeers.parse(serverList);
-			logger.info("accepting connections only from allowed peers: {}", serverList);
+			if (allowedPeers.isEmpty())
+				logger.warn("allowed hosts list is empty (or has no valid entries); all incoming connections will be rejected");
+			else
+				logger.info("accepting connections only from allowed hosts: {}", serverList);
 
 			InetAddress listenIP = (InetAddress)ConfigurationManager.getParameter(ConfigurationManager.LISTEN_IP).getValue();
 			int listenPort = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.LISTEN_PORT);
@@ -86,7 +89,7 @@ public class JavaGateway
 
 				if (!allowedPeers.check(client.getInetAddress()))
 				{
-					logger.warn("connection from {} rejected, allowed peers: {}",
+					logger.warn("connection from {} rejected, allowed hosts: {}",
 							client.getInetAddress().getHostAddress(), serverList);
 
 					try { client.close(); }
