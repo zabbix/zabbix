@@ -524,8 +524,10 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDHistorySyncAtScale_TriggerNoData
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataNotSupported() {
+		$vps_baseline = $this->getVpsWritten();
 		$tm = time();
 		$this->sendHistoryAt($tm, 'item is not supported', ITEM_STATE_NOTSUPPORTED);
+		$this->assertVpsWrittenIncreasedBy($vps_baseline, self::$total_expected);
 
 		$this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
