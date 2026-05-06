@@ -1047,6 +1047,11 @@ static int	DBpatch_7050077(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7050078(void)
+{
+	return DBcreate_index("device", "device_2", "uuid", 1);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -1131,5 +1136,6 @@ DBPATCH_ADD(7050074, 0, 1)
 DBPATCH_ADD(7050075, 0, 1)
 DBPATCH_ADD(7050076, 0, 1)
 DBPATCH_ADD(7050077, 0, 1)
+DBPATCH_ADD(7050078, 0, 1)
 
 DBPATCH_END()
