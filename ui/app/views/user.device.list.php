@@ -40,20 +40,19 @@ $html_page = (new CHtmlPage())
 		->addFilterTab(_('Filter'), [
 
 			(new CFormGrid())
-				->addItem([(
-				new CLabel(_('Users'), 'filter_users__ms')),
+				->addItem([
+					new CLabel(_('User groups'), 'filter_usrgrpids__ms'),
 					new CFormField(
 						(new CMultiSelect([
-							'name' => 'filter_userids[]',
-							'object_name' => 'users',
-							'data' => $data['filter']['ms_users'],
+							'name' => 'filter_usrgrpids[]',
+							'object_name' => 'usersGroups',
+							'data' => $data['filter']['ms_usrgrps'],
 							'popup' => [
 								'parameters' => [
-									'srctbl' => 'users',
-									'srcfld1' => 'userid',
-									'srcfld2' => 'fullname',
+									'srctbl' => 'usrgrp',
+									'srcfld1' => 'usrgrpid',
 									'dstfrm' => CFilter::FORM_NAME,
-									'dstfld1' => 'filter_userids_'
+									'dstfld1' => 'filter_usrgrpids_'
 								]
 							]
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -77,19 +76,20 @@ $html_page = (new CHtmlPage())
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
 				])
-				->addItem([
-					new CLabel(_('User groups'), 'filter_usrgrpids__ms'),
+				->addItem([(
+					new CLabel(_('Users'), 'filter_users__ms')),
 					new CFormField(
 						(new CMultiSelect([
-							'name' => 'filter_usrgrpids[]',
-							'object_name' => 'usersGroups',
-							'data' => $data['filter']['ms_usrgrps'],
+							'name' => 'filter_userids[]',
+							'object_name' => 'users',
+							'data' => $data['filter']['ms_users'],
 							'popup' => [
 								'parameters' => [
-									'srctbl' => 'usrgrp',
-									'srcfld1' => 'usrgrpid',
+									'srctbl' => 'users',
+									'srcfld1' => 'userid',
+									'srcfld2' => 'fullname',
 									'dstfrm' => CFilter::FORM_NAME,
-									'dstfld1' => 'filter_usrgrpids_'
+									'dstfld1' => 'filter_userids_'
 								]
 							]
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -122,7 +122,7 @@ $deviceTable = (new CTableInfo())
 		make_sorting_header(_('Linked on'), 'activated_at', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Last active'), 'lastaccess', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $data['url']),
-		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_USER] ? _('Action') : null
+		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_USER] ? '' : null
 	])
 	->setPageNavigation($data['paging']);
 
@@ -132,9 +132,7 @@ foreach ($data['devices'] as $device) {
 		: $data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_USER];
 
 	$deviceTable->addRow([
-		$device['name'] === ''
-			? new CTag('em', true, _('(unknown name)'))
-			: $device['name'],
+		$device['name'],
 		$device['uuid'],
 		$device['user_fullname'],
 		$device['user_role'],

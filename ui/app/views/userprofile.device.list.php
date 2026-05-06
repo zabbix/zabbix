@@ -43,7 +43,7 @@ $deviceTable = (new CTableInfo())
 		make_sorting_header(_('Device ID'), 'uuid', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Linked on'), 'activated_at', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Last active'), 'lastaccess', $data['sort'], $data['sortorder'], $data['url']),
-		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN] ? _('Action') : null
+		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN] ? '' : null
 	])
 	->setPageNavigation($data['paging']);
 
