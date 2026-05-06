@@ -513,7 +513,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			'Not all '.self::$total_trigger_expected.' discovered triggers were created.');
 
 		foreach ($response['result'] as $trigger) {
-			$this->assertStringContainsString('nodata', $trigger['expression']);
+			$this->assertStringContainsString('nodata', $trigger['expression'], $trigger['expression']);
 			self::$discovered_triggerids[] = (int) $trigger['triggerid'];
 		}
 
