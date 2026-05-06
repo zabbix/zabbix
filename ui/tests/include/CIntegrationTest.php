@@ -952,14 +952,18 @@ class CIntegrationTest extends CAPITest {
 	/**
 	 * Send item values using the agent data protocol (variant 2, itemid-based).
 	 *
-	 * @param array   $values        item values, each with keys: itemid, value, clock, ns
-	 * @param string  $host          Zabbix host name
-	 * @param string  $component     component name or null for active component
-	 * @param integer $delayOverride override default processing delay, or null to use default
+	 * When $proxy is specified, the values are sent as a 'proxy data' request impersonating
+	 * the named proxy instead of the active agent protocol.
 	 *
-	 * @return array    processing result
+	 * @param array       $values        item values, each with keys: itemid, value, clock, ns
+	 * @param string      $host          Zabbix host name
+	 * @param string      $component     component name or null for active component
+	 * @param integer     $delayOverride override default processing delay, or null to use default
+	 * @param string|null $proxy         proxy name to send as, or null for agent data
+	 *
+	 * @return array|bool    processing result
 	 */
-	protected function sendAgentDataValues($values, $host, $component = null, $delayOverride = null) {
+	protected function sendAgentDataValues($values, $host, $component = null, $delayOverride = null, $proxy = null) {
 		$start = microtime(true);
 
 		if ($component === null) {
@@ -968,15 +972,20 @@ class CIntegrationTest extends CAPITest {
 
 		$client = $this->getClient($component);
 		$session = md5(uniqid('', true));
-		$result = $client->sendAgentDataValues($values, $session, $host);
+		$result = $client->sendAgentDataValues($values, $session, $host, '7.4.0', $proxy);
 
 		$this->assertTrue(($result !== false),
 			sprintf('Component "%s" failed to receive data: %s', $component, $client->getError())
 		);
-		$this->assertTrue(array_key_exists('processed', $result), 'Result doesn\'t contain "processed" count.');
-		$this->assertEquals(count($values), $result['processed'],
-			'Processed value count doesn\'t match sent value count.'
-		);
+
+		if ($proxy === null) {
+			$this->assertTrue(array_key_exists('processed', $result),
+				'Result doesn\'t contain "processed" count.'
+			);
+			$this->assertEquals(count($values), $result['processed'],
+				'Processed value count doesn\'t match sent value count.'
+			);
+		}
 
 		$delay = ($delayOverride !== null) ? $delayOverride : self::DATA_PROCESSING_DELAY;
 
