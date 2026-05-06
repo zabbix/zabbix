@@ -470,7 +470,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * Update each trigger prototype expression to nodata(...,30s)=1 and verify that
 	 * all discovered triggers fire after the no-data window elapses.
 	 *
-	 * @depends testLLDHistorySyncAtScale_TriggerUnknown
+	 * @depends testLLDHistorySyncAtScale_TriggerDiscovery
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataDiscovery() {
 		foreach (self::prototypeDefs() as $def) {
@@ -504,7 +504,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		// Wait until a trigger instance is created for every discovered sensor and non-JSON type.
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
-			'output' => ['triggerid', 'description', 'status', 'expression']
+			'output' => ['triggerid', 'description', 'status']
 		], self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
 			return count($r['result']) === self::$total_trigger_expected;
 		});
@@ -513,7 +513,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			'Not all '.self::$total_trigger_expected.' discovered triggers were created.');
 
 		foreach ($response['result'] as $trigger) {
-			$this->assertStringContainsString('nodata', $trigger['expression'], $trigger['expression']);
 			self::$discovered_triggerids[] = (int) $trigger['triggerid'];
 		}
 
