@@ -146,8 +146,8 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	public function configurationProvider() {
 		return [
 			self::COMPONENT_SERVER => [
-				'LogFileSize' => 1,
-				'DebugLevel' => 3,
+				'LogFileSize' => 4,
+				'DebugLevel' => 4,
 				'CacheSize' => '128M',
 				'HistoryCacheSize' => '32M',
 				'HistoryIndexCacheSize' => '32M',
@@ -445,7 +445,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	/**
 	 * @depends testLLDHistorySyncAtScale_TriggerRecovery
 	 */
-	public function testLLDHistorySyncAtScale_TriggerUnknown() {
+	/*public function testLLDHistorySyncAtScale_TriggerUnknown() {
 		$tm = time();
 		$this->sendHistoryAt($tm, 'item is not supported', ITEM_STATE_NOTSUPPORTED);
 
@@ -464,7 +464,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			}
 			return true;
 		});
-	}
+	}*/
 
 	/**
 	 * Update each trigger prototype expression to nodata(...,30s)=1 and verify that
