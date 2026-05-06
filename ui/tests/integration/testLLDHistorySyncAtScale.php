@@ -570,7 +570,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			'output' => ['triggerid', 'value', 'state']
 		]);
 
-		foreach ($response'result'] as $trigger) {
+		foreach ($response['result'] as $trigger) {
 			$this->assertEquals(TRIGGER_STATE_NORMAL, (int) $trigger['state'],
 				'Trigger '.$trigger['triggerid'].' transitioned to UNKNOWN.');
 		}
