@@ -604,21 +604,14 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
 		}
 
-		$response = $this->call('host.get', [
-			'hostids' => [$hostid],
-			'output' => ['maintenance_status', 'maintenance_type', 'proxyid']
-		]);
-		$this->assertCount(1, $response['result']);
-		$host = $response['result'][0];
-
 		$data = [
 			'options' => $options,
 			'item' => $item,
 			'host' => [
 				'hostid' => $hostid,
-				'maintenance_status' => $host['maintenance_status'],
-				'maintenance_type' => $host['maintenance_type'],
-				'proxyid' => (int) $host['proxyid']
+				'maintenance_status' => HOST_MAINTENANCE_STATUS_OFF,
+				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
+				'proxyid' => 0
 			]
 		];
 

@@ -87,7 +87,7 @@ class CZabbixClient extends CZabbixServer {
 	 *
 	 * @return array|bool    array with result data, true for proxy data on success, or false otherwise
 	 */
-	public function sendAgentDataValues(array $data, string $session, string $host, string $version = '7.4.0',
+	public function sendAgentDataValues(array $data, string $session, string $host, string $version = '8.0.0',
 			$proxy = null) {
 		$id = 1;
 		foreach ($data as &$item) {
