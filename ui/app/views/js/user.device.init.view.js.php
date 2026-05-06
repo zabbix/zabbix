@@ -28,6 +28,7 @@ window.user_device_create_popup = new class {
 	#overlay;
 	#qr_expires_at_ms = null;
 	#device_uuid = null;
+	#admin_mode = false;
 
 	init({rules, admin_mode}) {
 		this.#overlay = overlays_stack.getById('user.device.init.view');
@@ -36,21 +37,21 @@ window.user_device_create_popup = new class {
 		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 		this.#form = new CForm(this.#form_element, rules);
 		this.#device_uuid = null;
-
-		const return_url = new URL('zabbix.php', location.href);
-		return_url.searchParams.set('action', admin_mode ? 'user.device.list': 'userprofile.device.list');
-		ZABBIX.PopupManager.setReturnUrl(return_url.href);
+		this.#admin_mode = admin_mode;
 
 		this.#initEvents();
 
-		if (!admin_mode) {
+		if (!this.#admin_mode) {
 			this.#footer.querySelector('.js-submit').click();
 		}
 	}
 
 	#initEvents() {
 		this.#footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
-		this.#dialogue.addEventListener('dialogue.close', () => this.#device_uuid = null);
+		this.#dialogue.addEventListener('dialogue.close', () => {
+			this.#device_uuid = null;
+			location.href = zabbixUrl({action: this.#admin_mode ? 'user.device.list': 'userprofile.device.list'});
+		});
 	}
 
 	#submit() {
@@ -142,8 +143,6 @@ window.user_device_create_popup = new class {
 				if ('success' in response && this.#device_uuid) {
 					this.#device_uuid = null;
 					overlayDialogueDestroy(this.#overlay.dialogueid);
-
-					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				}
 			})
 			.catch((exception) => {
