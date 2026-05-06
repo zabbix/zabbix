@@ -19,27 +19,35 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Allow-list of remote peers for Java Gateway.
  *
- * Accepts a comma separated list of IP addresses, CIDR ranges (e.g. 192.168.1.0/24,
- * 2001:db8::/32) and DNS names (resolved at startup). IPv4-mapped IPv6 peers
- * (::ffff:a.b.c.d) are matched against IPv4 entries and vice versa, mirroring the
- * behaviour of the C trapper (e.g. '::/0' permits any IPv4 or IPv6 peer).
+ * Accepts a comma separated list of IP addresses, CIDR ranges (e.g. 192.168.1.0/24, 2001:db8::/32) and DNS names.
+ * IPv4-mapped IPv6 peers are matched against IPv4 entries and vice versa.
  */
 class AllowedPeers
 {
+	private static final Logger logger = LoggerFactory.getLogger(AllowedPeers.class);
 	private final List<Entry> entries = new ArrayList<Entry>();
 
 	private AllowedPeers()
 	{
 	}
 
-	/** @throws IllegalArgumentException if any list item is malformed or unresolvable. */
+	/**
+	 * Parse allow-list behaviour:
+	 * - invalid / unresolvable tokens are ignored (with a warning)
+	 * - empty / fully invalid list results in an allow-list that matches nothing
+	 *
+	 * @throws IllegalArgumentException if {@code spec} is null.
+	 */
 	static AllowedPeers parse(String spec)
 	{
 		if (null == spec)
-			throw new IllegalArgumentException("allowed peers list is null");
+			throw new IllegalArgumentException("allowed hosts list is null");
 
 		AllowedPeers ap = new AllowedPeers();
 
@@ -56,7 +64,12 @@ class AllowedPeers
 
 				if (-1 != slash)
 				{
-					InetAddress base = InetAddress.getByName(item.substring(0, slash));
+					String baseText = item.substring(0, slash);
+
+					if (!looksLikeIpLiteral(baseText))
+						throw new IllegalArgumentException("CIDR is supported only for IP literals");
+
+					InetAddress base = InetAddress.getByName(baseText);
 					int prefix = Integer.parseInt(item.substring(slash + 1));
 					int max = base.getAddress().length * 8;
 
@@ -76,18 +89,24 @@ class AllowedPeers
 			}
 			catch (UnknownHostException e)
 			{
-				throw new IllegalArgumentException("cannot resolve allowed peer '" + item + "'", e);
+				logger.warn("ignoring SERVER entry '{}': cannot resolve", item);
 			}
 			catch (NumberFormatException e)
 			{
-				throw new IllegalArgumentException("invalid CIDR prefix in '" + item + "'", e);
+				logger.warn("ignoring SERVER entry '{}': invalid CIDR prefix", item);
+			}
+			catch (IllegalArgumentException e)
+			{
+				logger.warn("ignoring SERVER entry '{}': {}", item, e.getMessage());
 			}
 		}
 
-		if (ap.entries.isEmpty())
-			throw new IllegalArgumentException("allowed peers list is empty");
-
 		return ap;
+	}
+
+	boolean isEmpty()
+	{
+		return entries.isEmpty();
 	}
 
 	/** @return true if {@code peer} is permitted by the allow-list. */
@@ -107,6 +126,42 @@ class AllowedPeers
 		return false;
 	}
 
+	private static boolean looksLikeIpLiteral(String s)
+	{
+		if (s.isEmpty())
+			return false;
+
+		boolean hasColon = false;
+		boolean hasDot = false;
+
+		for (int i = 0; i < s.length(); i++)
+		{
+			char c = s.charAt(i);
+
+			if (c >= '0' && c <= '9')
+				continue;
+
+			if (c == '.')
+			{
+				hasDot = true;
+				continue;
+			}
+
+			if (c == ':')
+			{
+				hasColon = true;
+				continue;
+			}
+
+			if (hasColon && ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')))
+				continue;
+
+			return false;
+		}
+
+		return hasDot || hasColon;
+	}
+
 	private static final class Entry
 	{
 		private final byte[] network;
@@ -120,12 +175,18 @@ class AllowedPeers
 
 		boolean matches(byte[] target)
 		{
-			// Cross-family: align IPv4 and IPv4-mapped IPv6 against each other.
 			if (target.length != network.length)
 			{
 				if (4 == target.length && 16 == network.length)
-					target = toIPv4Mapped(target);
-				else if (16 == target.length && 4 == network.length && isIPv4Mapped(target))
+				{
+					if (isIPv4Mapped(network))
+						target = toIPv4Mapped(target);
+					else if (isIPv4Compatible(network))
+						target = toIPv4Compatible(target);
+					else
+						target = toIPv4Mapped(target);
+				}
+				else if (16 == target.length && 4 == network.length && (isIPv4Mapped(target) || isIPv4Compatible(target)))
 					target = new byte[]{target[12], target[13], target[14], target[15]};
 				else
 					return false;
@@ -161,6 +222,17 @@ class AllowedPeers
 			return m;
 		}
 
+		private static byte[] toIPv4Compatible(byte[] v4)
+		{
+			byte[] c = new byte[16];
+			c[12] = v4[0];
+			c[13] = v4[1];
+			c[14] = v4[2];
+			c[15] = v4[3];
+
+			return c;
+		}
+
 		private static boolean isIPv4Mapped(byte[] v6)
 		{
 			for (int i = 0; i < 10; i++)
@@ -170,6 +242,17 @@ class AllowedPeers
 			}
 
 			return (byte)0xff == v6[10] && (byte)0xff == v6[11];
+		}
+
+		private static boolean isIPv4Compatible(byte[] v6)
+		{
+			for (int i = 0; i < 12; i++)
+			{
+				if (0 != v6[i])
+					return false;
+			}
+
+			return true;
 		}
 	}
 }
