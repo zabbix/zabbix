@@ -142,6 +142,49 @@ class CHistoryStorageClickHouseTest extends TestCase {
 			]
 		];
 
+		yield 'Float invalid values ignored' => [
+			$closure,
+			[
+				'Float64' => [
+					'false' => false,
+					'null' => null,
+					'A' => '+4.4',
+					'B' => 'test',
+					'C' => '0test',
+					'D' => '+5',
+					'E' => '--6',
+					'F' => '7-8',
+					'G' => ' 10',
+					'H' => '100_000_000'
+				]
+			],
+			[]
+		];
+
+		yield 'Float value types resolving' => [
+			$closure,
+			[
+				'Float64' => [
+					'empty' => [],
+					'A' => -5,
+					'B' => '-5',
+					'C' => [1],
+					'D' => [1,1.5],
+					'E' => [1,2,'-3.3'],
+					'F' => '1.2e3'
+				]
+			],
+			[
+				'empty' => '[]',
+				'A' => '-5',
+				'B' => '-5',
+				'C' => '[1]',
+				'D' => '[1,1.5]',
+				'E' => '[1,2,-3.3]',
+				'F' => '1.2e3'
+			]
+		];
+
 		yield 'UInt64 invalid values ignored' => [
 			$closure,
 			[

@@ -528,34 +528,50 @@ class CClickHouseStorage {
 				switch ($column_type) {
 					case 'Int32':
 					case 'Int64':
+						$parser = new CNumberParser(['with_float' => false]);
+
 						if (is_array($value)) {
-							$value = array_filter($value,
-								fn($v) => is_int($v) || preg_match('/^\-{0,1}\d+$/', strval($v))
+							$form_value = array_filter($value,
+								fn($v) => is_int($v) || $parser->parse((string) $v) == CParser::PARSE_SUCCESS
 							);
-							$form_value = '['.implode(',', $value).']';
 						}
-						elseif (is_int($value) || preg_match('/^\-{0,1}\d+$/', strval($value))) {
+						elseif (is_int($value) || $parser->parse((string) $value) == CParser::PARSE_SUCCESS) {
+							$form_value = $value;
+						}
+						break;
+
+					case 'Float64':
+						$parser = new CNumberParser();
+
+						if (is_array($value)) {
+							$form_value = array_filter($value,
+								fn($v) => is_float($v) || $parser->parse((string) $v) == CParser::PARSE_SUCCESS
+							);
+						}
+						elseif (is_float($value) || $parser->parse((string) $value) == CParser::PARSE_SUCCESS) {
 							$form_value = $value;
 						}
 						break;
 
 					case 'UInt64':
+						$parser = new CNumberParser(['with_float' => false, 'with_minus' => false]);
+
 						if (is_array($value)) {
-							$value = array_filter($value, fn($v) => is_int($v) || ctype_digit(strval($v)));
-							$form_value = '['.implode(',', $value).']';
+							$form_value = array_filter($value,
+								fn($v) => is_int($v) || $parser->parse((string) $v) == CParser::PARSE_SUCCESS
+							);
 						}
-						elseif (is_int($value) || ctype_digit((string) $value)) {
+						elseif (is_int($value) || $parser->parse((string) $value) == CParser::PARSE_SUCCESS) {
 							$form_value = $value;
 						}
 						break;
 
 					case 'String':
 						if (is_array($value)) {
-							$value = array_map(
-								fn($v) => '\''.addcslashes($v, '\\\'').'\'',
+							$form_value = array_map(
+								fn($v) => '\''.addcslashes((string) $v, '\\\'').'\'',
 								array_filter($value, 'is_string')
 							);
-							$form_value = '['.implode(',', $value).']';
 						}
 						elseif (is_string($value)) {
 							// Single value should not be quoted.
@@ -568,7 +584,9 @@ class CClickHouseStorage {
 					continue;
 				}
 
-				$form_values[$column] = is_array($form_value) ? array_map('strval', $form_value) : (string) $form_value;
+				$form_values[$column] = is_array($form_value)
+					? '['.implode(',', array_map('strval', $form_value)).']'
+					: (string) $form_value;
 			}
 		}
 
