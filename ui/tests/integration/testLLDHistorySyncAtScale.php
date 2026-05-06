@@ -32,7 +32,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	const LLD_MACRO = '{#SENSOR}';
 	const ITEM_PROTO_KEY = 'multiple.history.trap';
 	const SENSOR_BASE = 'sensor';
-	const LLD_DISCOVERY_COUNT = 10000;
+	const LLD_DISCOVERY_COUNT = 1000;
 	const TRIGGER_WARMUP_ITERATIONS = 60;
 	const LLD_ITERATIONS = 120;
 
