@@ -32,7 +32,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	const LLD_MACRO = '{#SENSOR}';
 	const ITEM_PROTO_KEY = 'multiple.history.trap';
 	const SENSOR_BASE = 'sensor';
-	const LLD_DISCOVERY_COUNT = 10;
+	const LLD_DISCOVERY_COUNT = 10000;
 	const TRIGGER_WARMUP_ITERATIONS = 60;
 	const LLD_ITERATIONS = 120;
 
@@ -50,6 +50,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	private static $sent_past = [];
 	private static $sent_now = [];
 	private static $vps_last;
+	private static $agent_ping_itemid;
 
 	private static function prototypeDefs() {
 		return [
@@ -122,7 +123,30 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			$this->assertArrayHasKey(0, $response['result']['itemids']);
 		}
 
+		$response = $this->call('item.create', [
+			'hostid' => self::$hostid,
+			'name' => 'Agent ping',
+			'key_' => 'agent.ping',
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'delay' => '1h'
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['itemids']);
+		self::$agent_ping_itemid = (int) $response['result']['itemids'][0];
+
 		return true;
+	}
+
+	private function sendAgentPing(?int $tm = null): void {
+		$this->sendAgentDataValues([
+			[
+				'itemid' => self::$agent_ping_itemid,
+				'value' => '1',
+				'clock' => isset($tm) ? $tm : time(),
+				'ns' => (int)(microtime(true) * 1e9) % 1000000000
+			]
+		], self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
 	}
 	public static function clearData(): void {
 		if (self::$hostid !== null) {
@@ -146,8 +170,8 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	public function configurationProvider() {
 		return [
 			self::COMPONENT_SERVER => [
-				'LogFileSize' => 4,
-				'DebugLevel' => 4,
+				'LogFileSize' => 1,
+				'DebugLevel' => 3,
 				'CacheSize' => '128M',
 				'HistoryCacheSize' => '32M',
 				'HistoryIndexCacheSize' => '32M',
@@ -445,7 +469,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	/**
 	 * @depends testLLDHistorySyncAtScale_TriggerRecovery
 	 */
-	/*public function testLLDHistorySyncAtScale_TriggerUnknown() {
+	public function testLLDHistorySyncAtScale_TriggerUnknown() {
 		$tm = time();
 		$this->sendHistoryAt($tm, 'item is not supported', ITEM_STATE_NOTSUPPORTED);
 
@@ -464,7 +488,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			}
 			return true;
 		});
-	}*/
+	}
 
 	/**
 	 * Update each trigger prototype expression to nodata(...,30s)=1 and verify that
@@ -494,10 +518,10 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			$this->assertCount(1, $response['result']['triggerids']);
 		}
 
-		if (!empty(self::$discovered_triggerids)) {
+		/*if (!empty(self::$discovered_triggerids)) {
 			$this->call('trigger.delete', self::$discovered_triggerids);
 			self::$discovered_triggerids = [];
-		}
+		}*/
 
 		$this->sendDiscoveryData();
 
@@ -530,6 +554,9 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			'hostids' => [self::$hostid],
 			'output' => ['triggerid', 'value', 'state']
 		], self::TRIGGER_WARMUP_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+
+			$this->sendAgentPing();
+
 			if (count($r['result']) !== self::$total_trigger_expected) {
 				return 'Expected '.self::$total_trigger_expected.' triggers, got '.count($r['result']);
 			}
@@ -596,6 +623,9 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			'hostids' => [self::$hostid],
 			'output' => ['triggerid', 'value', 'state']
 		], self::TRIGGER_WARMUP_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+	
+			$this->sendAgentPing();
+
 			if (count($r['result']) !== self::$total_trigger_expected) {
 				return false;
 			}
