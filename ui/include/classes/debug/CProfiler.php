@@ -227,8 +227,6 @@ class CProfiler {
 			$debug[] = BR();
 		}
 
-		$debug[] = BR();
-
 		foreach ($this->elasticQueryLog as $query) {
 			$time = $query[0];
 
@@ -246,10 +244,6 @@ class CProfiler {
 
 			$debug[] = $this->formatCallStack($query[2]);
 			$debug[] = BR();
-			$debug[] = BR();
-		}
-
-		if ($this->elasticQueryLog) {
 			$debug[] = BR();
 		}
 
