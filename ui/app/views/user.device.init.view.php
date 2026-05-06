@@ -72,7 +72,7 @@ $form->addItem(
 $title = _('Select user to add a device');
 $buttons = [
 	[
-		'title' => _('Add device'),
+		'title' => _('Add a device'),
 		'class' => 'js-submit',
 		'keepOpen' => true,
 		'isSubmit' => true
