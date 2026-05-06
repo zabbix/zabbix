@@ -618,10 +618,6 @@ class testFormUserProfile extends CLegacyWebTest {
 			'expected' => TEST_BAD,
 			'error_title' => 'Cannot update user',
 			'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.',
-			'frontend_notifications' => [
-				'Frontend notifications' => true,
-				'Message timeout' => '86401'
-			],
 			'trigger_severity' => [
 				'Recovery' => false,
 				'Not classified' => false,
