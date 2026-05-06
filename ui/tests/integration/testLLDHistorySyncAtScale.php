@@ -565,6 +565,16 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			'filter' => ['state' => ITEM_STATE_NOTSUPPORTED]
 		], self::$total_expected, self::TRIGGER_WARMUP_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
+		$response = $this->call('trigger.get', [
+			'hostids' => [self::$hostid],
+			'output' => ['triggerid', 'value', 'state']
+		]);
+
+		foreach ($response'result'] as $trigger) {
+			$this->assertEquals(TRIGGER_STATE_NORMAL, (int) $trigger['state'],
+				'Trigger '.$trigger['triggerid'].' transitioned to UNKNOWN.');
+		}
+
 		$this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
 			'output' => ['triggerid', 'value', 'state']
