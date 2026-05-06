@@ -569,7 +569,7 @@ class CClickHouseStorage {
 					case 'String':
 						if (is_array($value)) {
 							$form_value = array_map(
-								fn($v) => '\''.addcslashes((string) $v, '\\\'').'\'',
+								fn($v) => '\''.addcslashes($v, '\\\'').'\'',
 								array_filter($value, 'is_string')
 							);
 						}
