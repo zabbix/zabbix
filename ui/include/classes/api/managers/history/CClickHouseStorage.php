@@ -378,7 +378,7 @@ class CClickHouseStorage {
 					'UInt64' => [
 						'pre_itemids' => array_keys($itemids),
 						'time_gte' => $this->getTtlLimitedTimestamp($value_type, $time_from),
-						'time_lte' => $this->getTtlLimitedTimestamp($value_type, $time_to),
+						'time_lte' => $time_to,
 						'interval' => $interval
 					]
 				]
@@ -412,8 +412,7 @@ class CClickHouseStorage {
 		foreach ($value_type_itemids as $value_type => $itemids) {
 			$table = $this->getTableName($value_type);
 			$_time_from = $this->getTtlLimitedTimestamp($value_type, $time_from);
-			$_time_to = $this->getTtlLimitedTimestamp($value_type, $time_to);
-			$seconds = $_time_to - $_time_from;
+			$seconds = $time_to - $_time_from;
 
 			$values = $this->query(
 				'SELECT itemid,count,avg,min,max,toUnixTimestamp(ts) AS clock'.($width === null ? '' : ',i').
@@ -435,7 +434,7 @@ class CClickHouseStorage {
 					'UInt64' => [
 						'pre_itemids' => array_keys($itemids),
 						'time_gte' => $_time_from,
-						'time_lte' => $_time_to,
+						'time_lte' => $time_to,
 						'width' => $width,
 						'seconds' => $seconds
 					]
@@ -490,9 +489,7 @@ class CClickHouseStorage {
 					'UInt64' => [
 						'itemids' => array_keys($itemids),
 						'time_gte' => $this->getTtlLimitedTimestamp($value_type, $time_from),
-						'time_lte' => $time_to !== null
-							? $this->getTtlLimitedTimestamp($value_type, $time_to)
-							: null
+						'time_lte' => $time_to
 					]
 				]
 			);
@@ -758,9 +755,8 @@ class CClickHouseStorage {
 		}
 
 		if ($options['time_till'] !== null) {
-			$time_till = $this->getTtlLimitedTimestamp($options['history'], (int) $options['time_till']);
-			$sql_parts['param']['UInt64']['pre_time_lte'] = $time_till;
-			$sql_parts['prewhere']['pre_time_lte'] = 'clock_ns<=addNanoseconds(toDateTime64({pre_time_lte:UInt64}, 9),999999999)';
+			$sql_parts['param']['UInt64']['pre_time_lte'] = (int) $options['time_till'];
+			$sql_parts['prewhere']['pre_time_lte'] = 'clock_ns<=addNanoseconds(toDateTime64({pre_time_lte:UInt64},9),999999999)';
 		}
 
 		if (is_array($options['filter']) && $options['filter']) {
