@@ -160,14 +160,15 @@ class CControllerLldRuleList extends CController {
 					ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
 					ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX
 				];
-				$options['filter']['delay'] = $filter['delay'];
+				$options['filter']['delay'] = $filter['filter_delay'];
 			}
-			elseif ($filter['filter_type'] == ITEM_TYPE_TRAPPER || $filter['type'] == ITEM_TYPE_DEPENDENT
-				|| ($filter['filter_type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($filter['key'], 'mqtt.get', 8) == 0)) {
-				$options['filter_filter']['delay'] = -1;
+			elseif ($filter['filter_type'] == ITEM_TYPE_TRAPPER || $filter['filter_type'] == ITEM_TYPE_DEPENDENT
+					|| ($filter['filter_type'] == ITEM_TYPE_ZABBIX_ACTIVE
+						&& strncmp($filter['key'], 'mqtt.get', 8) == 0)) {
+				$options['filter']['delay'] = -1;
 			}
 			else {
-				$options['filter_filter']['delay'] = $filter['delay'];
+				$options['filter']['delay'] = $filter['filter_delay'];
 			}
 		}
 
