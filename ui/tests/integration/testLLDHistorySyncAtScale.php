@@ -495,6 +495,16 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 
 		$this->sendDiscoveryData();
 
+		// Wait until every discovered trigger has been updated with the new nodata() expression.
+		$this->callUntilDataIsPresent('trigger.get', [
+			'hostids' => [self::$hostid],
+			'search' => ['expression' => 'nodata('],
+			'startSearch' => true,
+			'countOutput' => true
+		], self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			return (int) $r['result'] === self::$total_trigger_expected;
+		});
+
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 	}
 
