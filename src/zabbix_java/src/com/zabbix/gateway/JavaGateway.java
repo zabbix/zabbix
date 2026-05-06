@@ -16,6 +16,7 @@ package com.zabbix.gateway;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.*;
 import java.util.Map;
 import java.util.HashMap;
@@ -59,6 +60,10 @@ public class JavaGateway
 		{
 			ConfigurationManager.parseConfiguration();
 
+			String serverList = (String)ConfigurationManager.getParameter(ConfigurationManager.SERVER).getValue();
+			AllowedPeers allowedPeers = AllowedPeers.parse(serverList);
+			logger.info("accepting connections only from allowed peers: {}", serverList);
+
 			InetAddress listenIP = (InetAddress)ConfigurationManager.getParameter(ConfigurationManager.LISTEN_IP).getValue();
 			int listenPort = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.LISTEN_PORT);
 
@@ -76,7 +81,22 @@ public class JavaGateway
 			logger.debug("created a thread pool of {} pollers", startPollers);
 
 			while (true)
-				threadPool.execute(new SocketProcessor(socket.accept()));
+			{
+				Socket client = socket.accept();
+
+				if (!allowedPeers.check(client.getInetAddress()))
+				{
+					logger.warn("connection from {} rejected, allowed peers: {}",
+							client.getInetAddress().getHostAddress(), serverList);
+
+					try { client.close(); }
+					catch (Exception e) { logger.debug("failed to close rejected connection", e); }
+
+					continue;
+				}
+
+				threadPool.execute(new SocketProcessor(client));
+			}
 		}
 		catch (Exception e)
 		{
