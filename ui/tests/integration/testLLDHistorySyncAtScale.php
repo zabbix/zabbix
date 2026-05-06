@@ -434,6 +434,30 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
+	 * @depends testLLDHistorySyncAtScale_TriggerRecovery
+	 */
+	public function testLLDHistorySyncAtScale_TriggerUnknown() {
+		$tm = time();
+		$this->sendHistoryAt($tm, 'item is not supported', ITEM_STATE_NOTSUPPORTED);
+
+		// Verify all discovered triggers became unknown (state = UNKNOWN).
+		$this->callUntilDataIsPresent('trigger.get', [
+			'hostids' => [self::$hostid],
+			'output' => ['triggerid', 'value', 'state']
+		], self::TRIGGER_WARMUP_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			if (count($r['result']) !== self::$total_trigger_expected) {
+				return false;
+			}
+			foreach ($r['result'] as $trigger) {
+				if ((int) $trigger['state'] !== TRIGGER_STATE_UNKNOWN) {
+					return false;
+				}
+			}
+			return true;
+		});
+	}
+
+	/**
 	 * @depends testLLDHistorySyncAtScale_TriggerFiring
 	 */
 	public function testLLDHistorySyncAtScale_TriggerFiringWarmupAfterRestart() {
@@ -495,7 +519,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		}
 	}
 
-	private function prepareHistoryAt(int $tm, ?string $value = null): array {
+	private function prepareHistoryAt(int $tm, ?string $value = null, int $state = ITEM_STATE_NORMAL): array {
 		$sent = [];
 		$values_by_type = [];
 
@@ -510,12 +534,16 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			$idx = 0;
 			$base_ns = (int)(microtime(true) * 1e9) % 1000000000;
 			foreach ($items_by_key as $key => $itemid) {
-				$values[] = [
+				$item_value = [
 					'itemid' => $itemid,
 					'value' => isset($value) ? $value : (string)($idx + 1),
 					'clock' => $tm,
 					'ns' => ($base_ns + $idx) % 1000000000
 				];
+				if ($state !== ITEM_STATE_NORMAL) {
+					$item_value['state'] = $state;
+				}
+				$values[] = $item_value;
 				$idx++;
 			}
 
@@ -543,8 +571,8 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		return ['sent' => $sent, 'values' => $all_values];
 	}
 
-	private function sendHistoryAt(int $tm, ?string $value = null): array {
-		['sent' => $sent, 'values' => $all_values] = $this->prepareHistoryAt($tm, $value);
+	private function sendHistoryAt(int $tm, ?string $value = null, int $state = ITEM_STATE_NORMAL): array {
+		['sent' => $sent, 'values' => $all_values] = $this->prepareHistoryAt($tm, $value, $state);
 		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
 
 		return $sent;
