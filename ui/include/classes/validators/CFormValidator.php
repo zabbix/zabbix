@@ -1199,7 +1199,11 @@ class CFormValidator {
 	 */
 	private static function validateDistinctness(array $rules, $array_values, string &$path, ?string &$error = null): bool {
 		foreach ($rules['uniq'] as $field_names) {
-			$values = array_map(fn ($entry) => array_intersect_key($entry, array_flip($field_names)), $array_values);
+			$values = array_map(function ($entry) use ($field_names) {
+				$filtered = array_intersect_key($entry, array_flip($field_names));
+
+				return array_map('strval', $filtered);
+			}, $array_values);
 			$unique_values = [];
 
 			foreach ($values as $key => $entry) {
@@ -1489,11 +1493,20 @@ class CFormValidator {
 	 * @return bool
 	 */
 	private static function checkStringIn(array $rules, $value, ?string &$error = null): bool {
-		if (array_key_exists('in', $rules) && !in_array($value, $rules['in'], true)) {
-			$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $rules['in']));
-			$error = _n('This value must be %1$s.', 'This value must be one of %1$s.',  $values, count($rules['in']));
+		if (array_key_exists('in', $rules)) {
+			$value = (string)$value;
+			$allowed = array_map('strval', $rules['in']);
 
-			return false;
+			if (!in_array($value, $allowed, true)) {
+				$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $allowed));
+				$error = _n(
+					'This value must be %1$s.',
+					'This value must be one of %1$s.',
+					$values, count($allowed)
+				);
+
+				return false;
+			}
 		}
 
 		return true;
@@ -1510,11 +1523,20 @@ class CFormValidator {
 	 * @return bool
 	 */
 	private static function checkStringNotIn(array $rules, $value, ?string &$error = null): bool {
-		if (array_key_exists('not_in', $rules) && in_array($value, $rules['not_in'], true)) {
-			$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $rules['not_in']));
-			$error = _n('This value cannot be %1$s.', 'This value cannot be one of %1$s.',  $values, count($rules['not_in']));
+		if (array_key_exists('not_in', $rules)) {
+			$value = (string)$value;
+			$disallowed = array_map('strval', $rules['not_in']);
 
-			return false;
+			if (in_array($value, $disallowed, true)) {
+				$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $disallowed));
+				$error = _n(
+					'This value cannot be %1$s.',
+					'This value cannot be one of %1$s.',
+					$values, count($disallowed)
+				);
+
+				return false;
+			}
 		}
 
 		return true;

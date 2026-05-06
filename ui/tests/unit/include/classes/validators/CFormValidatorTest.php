@@ -2114,11 +2114,9 @@ class CFormValidatorTest extends TestCase {
 					'value' => ['string', 'in' => [1, 2, 3]]
 				]],
 				['value' => '1'],
-				[],
-				CFormValidator::ERROR,
-				['/value' => [
-					['message' => 'This value must be one of "1", "2", "3".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
-				]]
+				['value' => '1'],
+				CFormValidator::SUCCESS,
+				[]
 			],
 			[
 				['object', 'fields' => [
@@ -2135,8 +2133,41 @@ class CFormValidatorTest extends TestCase {
 				]],
 				['value' => '1'],
 				['value' => '1'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value cannot be "1".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => [1.0]]
+				]],
+				['value' => '1'],
+				['value' => '1'],
 				CFormValidator::SUCCESS,
 				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => [1]]
+				]],
+				['value' => '1.0'],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value must be "1".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'not_in' => [1.0]]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value cannot be "1".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
 			],
 			[
 				['object', 'fields' => [
