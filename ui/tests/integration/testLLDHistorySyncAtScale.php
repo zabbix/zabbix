@@ -472,7 +472,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 *
 	 * @depends testLLDHistorySyncAtScale_TriggerUnknown
 	 */
-	public function testLLDHistorySyncAtScale_TriggerNoData() {
+	public function testLLDHistorySyncAtScale_TriggerNoDataDiscovery() {
 		foreach (self::prototypeDefs() as $def) {
 			if ($def['value_type'] === ITEM_VALUE_TYPE_JSON) {
 				continue;
@@ -496,8 +496,15 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		$this->sendDiscoveryData();
 
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+	}
 
-		// Verify all discovered triggers fired due to no data (value = PROBLEM, state = NORMAL).
+	/**
+	 * Verify that discovered triggers fire after the no-data window elapses
+	 * (value = PROBLEM, state = NORMAL).
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerNoDataDiscovery
+	 */
+	public function testLLDHistorySyncAtScale_TriggerNoDataFiring() {
 		$this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
 			'output' => ['triggerid', 'value', 'state']
@@ -521,7 +528,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * Resend NOTSUPPORTED data and verify that nodata-based triggers remain firing
 	 * (value = PROBLEM, state = NORMAL) regardless of item state.
 	 *
-	 * @depends testLLDHistorySyncAtScale_TriggerNoData
+	 * @depends testLLDHistorySyncAtScale_TriggerNoDataFiring
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataNotSupported() {
 		$vps_baseline = $this->getVpsWritten();
@@ -537,6 +544,8 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				return false;
 			}
 			foreach ($r['result'] as $trigger) {
+				$this->assertNotEquals(TRIGGER_STATE_UNKNOWN, (int) $trigger['state'],
+					'Trigger '.$trigger['triggerid'].' transitioned to UNKNOWN.');
 				if ((int) $trigger['value'] !== TRIGGER_VALUE_TRUE) {
 					return false;
 				}
