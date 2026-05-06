@@ -550,7 +550,7 @@ function saveItemTestInputs() {
 	input_values.macros = JSON.stringify(macros);
 
 	<?php if ($data['step_obj'] == -2): ?>
-		$test_obj = jQuery('.overlay-dialogue-footer');
+		$test_obj = jQuery(`.${ZBX_STYLE_OVERLAY_DIALOGUE_FOOTER}`);
 	<?php elseif ($data['step_obj'] == -1): ?>
 		$test_obj = jQuery('.preprocessing-list-foot', jQuery('#preprocessing'));
 	<?php else: ?>

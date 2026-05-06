@@ -285,7 +285,7 @@
 	 */
 	function openItemTestDialog(step_nums, show_final_result, get_value, trigger_element, step_obj_nr) {
 		var $row = jQuery(trigger_element)
-					.closest('.preprocessing-list-item, .preprocessing-list-foot, .overlay-dialogue-footer'),
+					.closest(`.preprocessing-list-item, .preprocessing-list-foot, .${ZBX_STYLE_OVERLAY_DIALOGUE_FOOTER}`),
 			item_properties = getItemTestProperties('form[name="itemForm"]'),
 			cached_values = $row.data('test-data') || [];
 

@@ -32,8 +32,6 @@ const ZBX_STYLE_BTN_ICON = 'btn-icon';
 const ZBX_STYLE_BTN_LINK = 'btn-link';
 const ZBX_STYLE_BTN_SMALL = 'btn-small';
 
-const ZBX_STYLE_OVERLAY_DIALOGUE_HEADER = 'overlay-dialogue-header';
-
 const ZBX_STYLE_GRID_COLUMN_FIRST = 'column-first';
 const ZBX_STYLE_GRID_COLUMN_LAST = 'column-last';
 
@@ -92,6 +90,9 @@ const ZBX_STYLE_TAGS_LIST = 'tags-list';
 const ZBX_STYLE_CHECKBOX_RADIO = 'checkbox-radio';
 
 const ZBX_STYLE_OVERLAY_DIALOGUE = 'overlay-dialogue';
+const ZBX_STYLE_OVERLAY_DIALOGUE_HEADER = 'overlay-dialogue-header';
+const ZBX_STYLE_OVERLAY_DIALOGUE_BODY = 'overlay-dialogue-body';
+const ZBX_STYLE_OVERLAY_DIALOGUE_FOOTER = 'overlay-dialogue-footer';
 
 const ZBX_STYLE_HEADER_CONTROLS = 'header-controls';
 
