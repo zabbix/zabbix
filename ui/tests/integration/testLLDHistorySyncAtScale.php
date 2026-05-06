@@ -525,10 +525,39 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
+	 * Send normal data so the nodata() window is satisfied and verify that all
+	 * discovered triggers recover (value = OK, state = NORMAL).
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerNoDataFiring
+	 */
+	public function testLLDHistorySyncAtScale_TriggerNoDataRecovery() {
+		$tm = time();
+		$this->sendHistoryAt($tm);
+
+		$this->callUntilDataIsPresent('trigger.get', [
+			'hostids' => [self::$hostid],
+			'output' => ['triggerid', 'value', 'state']
+		], self::TRIGGER_WARMUP_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			if (count($r['result']) !== self::$total_trigger_expected) {
+				return false;
+			}
+			foreach ($r['result'] as $trigger) {
+				if ((int) $trigger['value'] !== TRIGGER_VALUE_FALSE) {
+					return false;
+				}
+				if ((int) $trigger['state'] !== TRIGGER_STATE_NORMAL) {
+					return false;
+				}
+			}
+			return true;
+		});
+	}
+
+	/**
 	 * Resend NOTSUPPORTED data and verify that nodata-based triggers remain firing
 	 * (value = PROBLEM, state = NORMAL) regardless of item state.
 	 *
-	 * @depends testLLDHistorySyncAtScale_TriggerNoDataFiring
+	 * @depends testLLDHistorySyncAtScale_TriggerNoDataRecovery
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataNotSupported() {
 		$vps_baseline = $this->getVpsWritten();
