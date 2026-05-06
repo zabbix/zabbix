@@ -57,7 +57,7 @@ $form->addItem($form_grid);
 $form->addItem(
 	(new CDiv([
 		(new CDiv())->addClass('qr-code'),
-		new CDiv(_('Scan this QR code to link your device and setup your notifications.')),
+		new CDiv(_('Scan this QR code to add your device and setup your notifications.')),
 		(new CDiv([
 			_('QR code will expire on') . ' ',
 			(new CTag('b'))
