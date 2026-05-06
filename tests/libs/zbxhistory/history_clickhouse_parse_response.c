@@ -19,7 +19,6 @@
 #include "zbxmockdb.h"
 #include "mocks/valuecache/valuecache_mock.h"
 
-#if defined (HAVE_LIBCURL)
 
 #include "../../../src/libs/zbxhistory/history_clickhouse.c"
 
@@ -62,9 +61,3 @@ void	zbx_mock_test_entry(void **state)
 	zbx_history_record_vector_clean(&values_out, value_type);
 	zbx_vector_history_record_destroy(&values_out);
 }
-#else
-void	zbx_mock_test_entry(void **state)
-{
-	ZBX_UNUSED(state);
-}
-#endif

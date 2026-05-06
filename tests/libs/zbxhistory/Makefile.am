@@ -1,4 +1,5 @@
 if SERVER
+if HAVE_LIBCURL
 noinst_PROGRAMS = \
 	zbx_history_get_values \
 	history_clickhouse_parse_response \
@@ -133,4 +134,5 @@ history_provider_parse_options_CFLAGS = \
 	$(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS)		
 	
+endif
 endif

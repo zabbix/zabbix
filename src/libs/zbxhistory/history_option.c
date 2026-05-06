@@ -26,7 +26,7 @@ ZBX_VECTOR_IMPL(history_option, zbx_history_option_t)
  *                                                                            *
  * Purpose: get description of history value type                             *
  *                                                                            *
- * Parameters: value_type - [IN] the history value type                       *
+ * Parameters: value_type - [IN] history value type                           *
  *                                                                            *
  * Return value: description of the history value type                        *
  *                                                                            *
