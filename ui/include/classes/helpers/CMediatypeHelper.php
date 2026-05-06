@@ -130,7 +130,7 @@ class CMediatypeHelper {
 			MEDIA_TYPE_EXEC => _('Script'),
 			MEDIA_TYPE_SMS => _('SMS'),
 			MEDIA_TYPE_WEBHOOK => _('Webhook'),
-			MEDIA_TYPE_PUSH => _('Push notification')
+			MEDIA_TYPE_PUSH => _('Push')
 		];
 
 		if ($type === null) {
