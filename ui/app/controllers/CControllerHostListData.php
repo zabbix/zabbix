@@ -332,7 +332,7 @@ class CControllerHostListData extends CControllerDataTable {
 
 		foreach ($hosts as &$host) {
 			CArrayHelper::sort($host['tags'], ['tag', 'value']);
-			$host['tags'] = CTagHelper::getTagsList($host, ['filter_tags' => $filter['tags']]);
+			$host['tags'] = CTagHelper::getTagsList($host);
 		}
 		unset($host);
 

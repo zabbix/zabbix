@@ -2707,8 +2707,9 @@ class CDataTable {
 
 		const right_edge = header_cell.target.getBoundingClientRect().right - element_rect.left;
 		const right_boundary = element_rect.width - table_options_button.clientWidth;
-		const right_offset = right_edge > right_boundary || this.#element.scrollWidth > element_rect.width
-			? Math.min(table_options_button.clientWidth, right_edge - right_boundary)
+		const right_offset = right_edge > right_boundary || this.#body.scrollWidth > element_rect.width
+			? Math.min(table_options_button.clientWidth,
+				right_edge > right_boundary ? right_edge - right_boundary : this.#body.scrollWidth - element_rect.width)
 			: 0;
 
 		header_cell.target.style.paddingRight = `${right_offset}px`;

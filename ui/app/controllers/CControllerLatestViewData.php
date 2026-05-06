@@ -256,7 +256,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 			$item['change'] = $change;
 
 			CArrayHelper::sort($item['tags'], ['tag', 'value']);
-			$item['tags'] = CTagHelper::getTagsList($item, ['filter_tags' => $filter['tags']]);
+			$item['tags'] = CTagHelper::getTagsList($item);
 
 			$item['item_icons'] = (string) makeInformationList($item_icons);
 

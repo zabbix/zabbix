@@ -729,7 +729,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			foreach ($data['problems'] as &$problem) {
 				CArrayHelper::sort($problem['tags'], ['tag', 'value']);
-				$problem['tags'] = CTagHelper::getTagsList($problem, ['filter_tags' => $filter['tags']]);
+				$problem['tags'] = CTagHelper::getTagsList($problem);
 			}
 			unset($problem);
 		}

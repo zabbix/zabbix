@@ -169,7 +169,7 @@ class CControllerTemplateListData extends CControllerDataTable {
 
 		foreach ($templates as &$template) {
 			CArrayHelper::sort($template['tags'], ['tag', 'value']);
-			$template['tags'] = CTagHelper::getTagsList($template, ['filter_tags' => $filter['tags']]);
+			$template['tags'] = CTagHelper::getTagsList($template);
 		}
 		unset($template);
 
