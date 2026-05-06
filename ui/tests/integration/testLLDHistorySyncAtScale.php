@@ -510,15 +510,21 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			'output' => ['triggerid', 'value', 'state']
 		], self::TRIGGER_WARMUP_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
 			if (count($r['result']) !== self::$total_trigger_expected) {
-				return false;
+				return 'Expected '.self::$total_trigger_expected.' triggers, got '.count($r['result']);
 			}
+			$wrong_value = 0;
+			$wrong_state = 0;
 			foreach ($r['result'] as $trigger) {
 				if ((int) $trigger['value'] !== TRIGGER_VALUE_TRUE) {
-					return false;
+					$wrong_value++;
 				}
 				if ((int) $trigger['state'] !== TRIGGER_STATE_NORMAL) {
-					return false;
+					$wrong_state++;
 				}
+			}
+			if ($wrong_value > 0 || $wrong_state > 0) {
+				return $wrong_value.' triggers did not change to PROBLEM, '
+					.$wrong_state.' triggers not in NORMAL state';
 			}
 			return true;
 		});
@@ -584,6 +590,18 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			}
 			return true;
 		});
+	}
+
+	/**
+	 * Restart the server and verify that nodata-based triggers recover again
+	 * once normal data resumes flowing.
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerNoDataNotSupported
+	 */
+	public function testLLDHistorySyncAtScale_TriggerNoDataRecoveryAfterRestart() {
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
+		$this->testLLDHistorySyncAtScale_TriggerNoDataRecovery();
 	}
 
 	private function verifyTrendsAtClock(int $trend_clock): void {
