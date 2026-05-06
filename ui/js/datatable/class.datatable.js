@@ -1385,7 +1385,6 @@ class CDataTable {
 		column.setWidth(`${width}px`);
 
 		this.#applyColumnWidths();
-		this.#applyLastColumnPadding();
 		this.#handleScrollbar();
 	}
 
@@ -2306,7 +2305,6 @@ class CDataTable {
 		}
 
 		if (this.#customizable) {
-			this.#applyLastColumnPadding();
 			this.#updateTableOptionsButtonPosition();
 		}
 	}
@@ -2465,7 +2463,6 @@ class CDataTable {
 
 			this.#calculateColumnWidths(response);
 			this.#handleScrollbar();
-			this.#applyLastColumnPadding();
 		});
 	}
 
@@ -2671,11 +2668,14 @@ class CDataTable {
 				this.#scrollbar_inner = null;
 			}
 
+			this.#applyLastColumnPadding();
+
 			return;
 		}
 
 		if (this.#scrollbar) {
 			this.#updateScrollbarInnerWidth();
+			this.#applyLastColumnPadding();
 
 			return;
 		}
@@ -2685,6 +2685,7 @@ class CDataTable {
 
 		this.#bindScrollbarEvents();
 		this.#updateScrollbarInnerWidth();
+		this.#applyLastColumnPadding();
 
 		this.#element.insertBefore(this.#scrollbar, this.#footer);
 	}
@@ -2694,7 +2695,7 @@ class CDataTable {
 			return;
 		}
 
-		const column = this.getVisibleColumns().at(-1);
+		const column = this.#visible_columns.at(-1);
 		const header_cell = column.getHeaderCell();
 		const table_options_button = this.#findTableOptionsButton();
 
@@ -2708,8 +2709,7 @@ class CDataTable {
 		const right_edge = header_cell.target.getBoundingClientRect().right - element_rect.left;
 		const right_boundary = element_rect.width - table_options_button.clientWidth;
 		const right_offset = right_edge > right_boundary || this.#body.scrollWidth > element_rect.width
-			? Math.min(table_options_button.clientWidth,
-				right_edge > right_boundary ? right_edge - right_boundary : this.#body.scrollWidth - element_rect.width)
+			? Math.max(0, Math.min(table_options_button.clientWidth, right_edge - right_boundary))
 			: 0;
 
 		header_cell.target.style.paddingRight = `${right_offset}px`;

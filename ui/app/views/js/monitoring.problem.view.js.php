@@ -132,7 +132,7 @@
 						.setSortField('name')
 						.setSortable(true)
 						.setTogglable(false)
-						.setWidth('minmax(auto, 657px)'),
+						.setWidth('auto'),
 					new CDataTableColumn('duration', <?= json_encode(_('Duration')); ?>)
 						.setFields(['duration']),
 					new CDataTableColumn('update', <?= json_encode(_('Update')); ?>)
