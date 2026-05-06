@@ -734,7 +734,7 @@ static void	history_sql_write(void *data, unsigned char value_type, const zbx_hi
 
 /******************************************************************************
  *                                                                            *
- * Purpose: fetch item history data from SQL database                         *
+ * Purpose: fetch single item history data from SQL database                  *
  *                                                                            *
  * Parameters: data       - [IN] history provider data                        *
  *             itemid     - [IN]                                              *
@@ -747,8 +747,6 @@ static void	history_sql_write(void *data, unsigned char value_type, const zbx_hi
  *                                                                            *
  * Return value: >=0      - number of records retrieved                       *
  *               FAIL     - otherwise                                         *
- *                                                                            *
- * Comments: The                                                              *
  *                                                                            *
  ******************************************************************************/
 static int	history_sql_fetch(void *data, zbx_uint64_t itemid, unsigned char value_type, time_t start, time_t end,

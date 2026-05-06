@@ -77,7 +77,7 @@ zbx_history_elastic_data_t;
  *                                                                            *
  * Purpose: get elasticsearch index name                                      *
  *                                                                            *
- * Parameters: value_type - [IN] the history value type                       *
+ * Parameters: value_type - [IN] history value type                           *
  *                                                                            *
  * Return value: description of the history value type                        *
  *                                                                            *
@@ -280,7 +280,7 @@ static int	elastic_is_error_present(zbx_httppage_t *page, char **err)
 
 	*err = zbx_dsprintf(NULL,"index:%s status:%s type:%s reason:%s%s", ZBX_NULL2EMPTY_STR(index),
 			ZBX_NULL2EMPTY_STR(status), ZBX_NULL2EMPTY_STR(type), ZBX_NULL2EMPTY_STR(reason),
-			FAIL == rc_js ? " / ElasticSearch version is not fully compatible with zabbix server" : "");
+			FAIL == rc_js ? " / Elasticsearch version is not fully compatible with zabbix server" : "");
 
 	zbx_free(status);
 	zbx_free(type);

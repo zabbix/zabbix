@@ -603,7 +603,7 @@ out:
  *                                                                                  *
  * Comments: History interfaces are created for all values types based on           *
  *           configuration. Every value type can have different history storage     *
- *           provider. (Binary value type is not supported for ElasticSearch)       *
+ *           provider. (Binary value type is not supported for Elasticsearch)       *
  *                                                                                  *
  ************************************************************************************/
 int	zbx_history_init(const char *config_history_storage_url, const char *config_history_storage_opts,
@@ -1035,14 +1035,15 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
  * Parameters: results    - [IN/OUT] vector of item history structures        *
  *             value_type - [IN] item value type                              *
  *             start      - [IN] start timestamp of the requested period      *
- *             limit      - [IN] maximum number of values to retrieve per item*
+ *             limit      - [IN] maximum number of values to retrieve per     *
+ *                               item                                         *
  *                                                                            *
  ******************************************************************************/
 void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, int start, int limit)
 {
 	zbx_history_session_t	session;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() items:%d value_type:%d start:%d list:%d",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() items:%d value_type:%d start:%d limit:%d",
 			__func__, results->values_num, value_type, start, limit);
 
 	history_manager_init_session(&history_manager, &session);
@@ -1433,7 +1434,7 @@ static void	history_add_version_info(struct zbx_json *json, zbx_history_provider
  *             info_num - [IN] number of history providers                    *
  *                                                                            *
  ******************************************************************************/
-static int	history_dbversion_is_history(zbx_json_parse_t *jp,zbx_history_provider_info_t *info, int info_num)
+static int	history_dbversion_is_history(zbx_json_parse_t *jp, zbx_history_provider_info_t *info, int info_num)
 {
 	char	dbname[MAX_STRING_LEN];
 
@@ -1605,7 +1606,7 @@ void	zbx_history_record_copy(zbx_history_record_t *dst, const zbx_history_record
  *                                                                            *
  * Purpose: get description of history value type                             *
  *                                                                            *
- * Parameters: value_type - [IN] the history value type                       *
+ * Parameters: value_type - [IN] history value type                           *
  *                                                                            *
  * Return value: description of the history value type                        *
  *                                                                            *
@@ -1625,7 +1626,7 @@ const char	*history_value_type_desc(unsigned char value_type)
  *                                                                            *
  * Purpose: convert history value type string to its numeric representation   *
  *                                                                            *
- * Parameters: value_type_str - [IN] the history value type string            *
+ * Parameters: value_type_str - [IN] history value type string                *
  *                                                                            *
  * Return value: value type or FAIL if unknown                                *
  *                                                                            *
@@ -1646,13 +1647,14 @@ int	zbx_item_history_compare_by_itemid(const void *d1, const void *d2)
 	const zbx_item_history_t	*h2 = (const zbx_item_history_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(h1->itemid, h2->itemid);
+
 	return 0;
 }
 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare two item history structures by item identifier            *
+ * Purpose: compare two item history structures by item index                 *
  *                                                                            *
  ******************************************************************************/
 int	zbx_item_history_compare_by_index_desc(const void *d1, const void *d2)
