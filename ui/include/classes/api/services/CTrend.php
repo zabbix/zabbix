@@ -122,16 +122,15 @@ class CTrend extends CApiService {
 		$sql_where = [];
 
 		if ($options['time_from'] !== null) {
-			$sql_where['clock_from'] = 't.clock>='.zbx_dbstr($options['time_from']);
+			$sql_where['clock_from'] = 't.clock>='.$options['time_from'];
 		}
 
 		if ($options['time_till'] !== null) {
-			$sql_where['clock_till'] = 't.clock<='.zbx_dbstr($options['time_till']);
+			$sql_where['clock_till'] = 't.clock<='.$options['time_till'];
 		}
 
 		if (!$options['countOutput']) {
-			$sql_limit = ($options['limit'] && zbx_ctype_digit($options['limit'])) ? $options['limit'] : null;
-
+			$sql_limit = $options['limit'];
 			$sql_fields = [];
 
 			foreach ($options['output'] as $field) {
