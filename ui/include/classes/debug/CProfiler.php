@@ -234,11 +234,7 @@ class CProfiler {
 
 			$record = [
 				'Elasticsearch ('.$time.'): ',
-				$query[1].' ',
-				(new CSpan($query[2]))->addClass(ZBX_STYLE_BLUE),
-				BR(),
-				'Request: ',
-				(new CSpan($query[3]))->addClass(ZBX_STYLE_GREEN),
+				(new CSpan($query[1]))->addClass(ZBX_STYLE_GREEN),
 				BR()
 			];
 
@@ -248,7 +244,7 @@ class CProfiler {
 
 			$debug[] = $record;
 
-			$debug[] = $this->formatCallStack($query[4]);
+			$debug[] = $this->formatCallStack($query[2]);
 			$debug[] = BR();
 			$debug[] = BR();
 		}
@@ -262,11 +258,7 @@ class CProfiler {
 
 			$record = [
 				'ClickHouse ('.$time.'): ',
-				$query[1].' ',
-				(new CSpan($query[2]))->addClass(ZBX_STYLE_BLUE),
-				BR(),
-				'Request: ',
-				(new CSpan($query[3]))->addClass(ZBX_STYLE_GREEN),
+				(new CSpan($query[1]))->addClass(ZBX_STYLE_GREEN),
 				BR()
 			];
 
@@ -276,7 +268,7 @@ class CProfiler {
 
 			$debug[] = $record;
 
-			$debug[] = $this->formatCallStack($query[4]);
+			$debug[] = $this->formatCallStack($query[2]);
 			$debug[] = BR();
 			$debug[] = BR();
 		}
@@ -347,11 +339,9 @@ class CProfiler {
 	 * Store Elasticsearch query data.
 	 *
 	 * @param float  $time
-	 * @param string $method
-	 * @param string $endpoint
 	 * @param string $query
 	 */
-	public function profileElasticsearch($time, $method, $endpoint, $query) {
+	public function profileElasticsearch($time, $query) {
 		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
 				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
 			return;
@@ -362,8 +352,6 @@ class CProfiler {
 		$this->elasticTotalTime += $time;
 		$this->elasticQueryLog[] = [
 			$time,
-			$method,
-			$endpoint,
 			$query,
 			array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1)
 		];
@@ -372,7 +360,7 @@ class CProfiler {
 	/**
 	 * Store ClickHouse query data.
 	 */
-	public function profileClickHouse(float $time, string $method, string $endpoint, string $query) {
+	public function profileClickHouse(float $time, string $query) {
 		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
 			&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
 			return;
@@ -383,8 +371,6 @@ class CProfiler {
 		$this->clickhouseTotalTime += $time;
 		$this->clickhouseQueryLog[] = [
 			$time,
-			$method,
-			$endpoint,
 			$query,
 			array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1)
 		];
