@@ -387,7 +387,7 @@ if (CTemporaryMobileFeatureHelper::isEnabled()) {
 	$form_grid
 		->addItem(
 			new CFormField(
-				(new CTag('h4', true, _('Allow linked devices')))->addClass('input-section-header')
+				(new CTag('h4', true, _('Access from linked devices')))->addClass('input-section-header')
 			)
 		)
 		->addItem([
@@ -415,15 +415,15 @@ if (CTemporaryMobileFeatureHelper::isEnabled()) {
 			->addClass(ZBX_STYLE_NOWRAP);
 	}
 
-	$form_grid->addItem(
-		[(new CFormField($devices_actions))
+	$form_grid->addItem([
+		new CLabel(_('Device actions'), ''),
+		(new CFormField($devices_actions))
 			->setAttribute('data-field-type', 'array')
 			->setAttribute('data-field-name', 'devices_actions')
-		]
-	);
+	]);
 
 	$form_grid->addItem([
-		new CLabel(_('Default access to new linked devices actions'),
+		new CLabel(_('Default access to new device actions'),
 			$data['readonly'] ? '' : 'devices.actions.default_access'
 		),
 		new CFormField(
