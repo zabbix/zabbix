@@ -486,11 +486,12 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			$this->assertNotEmpty($response['result'],
 				'Trigger prototype for '.$def['suffix'].' not found.');
 
-			$this->call('triggerprototype.update', [
+			$response = $this->call('triggerprototype.update', [
 				'triggerid' => $response['result'][0]['triggerid'],
 				'expression' => 'nodata(/'.self::HOSTNAME.'/'.self::ITEM_PROTO_KEY.'.'.$def['suffix']
 					.'['.self::LLD_MACRO.'],30s)=1'
 			]);
+			$this->assertCount(1, $response['result']['triggerids']);
 		}
 
 		if (!empty(self::$discovered_triggerids)) {
