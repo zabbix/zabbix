@@ -434,6 +434,15 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
+	 * @depends testLLDHistorySyncAtScale_TriggerFiring
+	 */
+	public function testLLDHistorySyncAtScale_TriggerFiringWarmupAfterRestart() {
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
+		$this->testLLDHistorySyncAtScale_TriggerFiring();
+	}
+
+	/**
 	 * @depends testLLDHistorySyncAtScale_TriggerRecovery
 	 */
 	public function testLLDHistorySyncAtScale_TriggerUnknown() {
@@ -458,13 +467,54 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * @depends testLLDHistorySyncAtScale_TriggerFiring
+	 * Update each trigger prototype expression to nodata(...,30s)=1 and verify that
+	 * all discovered triggers fire after the no-data window elapses.
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerUnknown
 	 */
-	public function testLLDHistorySyncAtScale_TriggerFiringWarmupAfterRestart() {
-		$this->stopComponent(self::COMPONENT_SERVER);
-		$this->startComponent(self::COMPONENT_SERVER);
-		$this->testLLDHistorySyncAtScale_TriggerFiring();
+	public function testLLDHistorySyncAtScale_TriggerNoData() {
+		foreach (self::prototypeDefs() as $def) {
+			if ($def['value_type'] === ITEM_VALUE_TYPE_JSON) {
+				continue;
+			}
+
+			$response = $this->call('triggerprototype.get', [
+				'hostids' => [self::$hostid],
+				'filter' => ['description' => 'Sensor '.$def['suffix'].' alert ['.self::LLD_MACRO.']'],
+				'output' => ['triggerid']
+			]);
+			$this->assertNotEmpty($response['result'],
+				'Trigger prototype for '.$def['suffix'].' not found.');
+
+			$this->call('triggerprototype.update', [
+				'triggerid' => $response['result'][0]['triggerid'],
+				'expression' => 'nodata(/'.self::HOSTNAME.'/'.self::ITEM_PROTO_KEY.'.'.$def['suffix']
+					.'['.self::LLD_MACRO.'],30s)=1'
+			]);
+		}
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		// Verify all discovered triggers fired due to no data (value = PROBLEM, state = NORMAL).
+		$this->callUntilDataIsPresent('trigger.get', [
+			'hostids' => [self::$hostid],
+			'output' => ['triggerid', 'value', 'state']
+		], self::TRIGGER_WARMUP_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			if (count($r['result']) !== self::$total_trigger_expected) {
+				return false;
+			}
+			foreach ($r['result'] as $trigger) {
+				if ((int) $trigger['value'] !== TRIGGER_VALUE_TRUE) {
+					return false;
+				}
+				if ((int) $trigger['state'] !== TRIGGER_STATE_NORMAL) {
+					return false;
+				}
+			}
+			return true;
+		});
 	}
+
 
 	private function verifyTrendsAtClock(int $trend_clock): void {
 		foreach ([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] as $vtype) {
