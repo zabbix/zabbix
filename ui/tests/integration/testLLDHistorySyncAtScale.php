@@ -32,7 +32,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	const LLD_MACRO = '{#SENSOR}';
 	const ITEM_PROTO_KEY = 'multiple.history.trap';
 	const SENSOR_BASE = 'sensor';
-	const LLD_DISCOVERY_COUNT = 1000;
+	const LLD_DISCOVERY_COUNT = 10000;
 	const TRIGGER_WARMUP_ITERATIONS = 60;
 	const LLD_ITERATIONS = 120;
 
@@ -493,17 +493,28 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			]);
 		}
 
+		if (!empty(self::$discovered_triggerids)) {
+			$this->call('trigger.delete', self::$discovered_triggerids);
+			self::$discovered_triggerids = [];
+		}
+
 		$this->sendDiscoveryData();
 
-		// Wait until every discovered trigger has been updated with the new nodata() expression.
-		$this->callUntilDataIsPresent('trigger.get', [
+		// Wait until a trigger instance is created for every discovered sensor and non-JSON type.
+		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
-			'search' => ['expression' => 'nodata('],
-			'startSearch' => true,
-			'countOutput' => true
+			'output' => ['triggerid', 'description', 'status']
 		], self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			return (int) $r['result'] === self::$total_trigger_expected;
+			return count($r['result']) === self::$total_trigger_expected;
 		});
+
+		$this->assertCount(self::$total_trigger_expected, $response['result'],
+			'Not all '.self::$total_trigger_expected.' discovered triggers were created.');
+
+		foreach ($response['result'] as $trigger) {
+			$this->assertEquals(TRIGGER_STATUS_ENABLED, $trigger['status']);
+			self::$discovered_triggerids[] = (int) $trigger['triggerid'];
+		}
 
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 	}
