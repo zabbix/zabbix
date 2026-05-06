@@ -504,7 +504,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		// Wait until a trigger instance is created for every discovered sensor and non-JSON type.
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
-			'output' => ['triggerid', 'description', 'status']
+			'output' => ['triggerid', 'description', 'status', 'expression']
 		], self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
 			return count($r['result']) === self::$total_trigger_expected;
 		});
@@ -513,7 +513,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			'Not all '.self::$total_trigger_expected.' discovered triggers were created.');
 
 		foreach ($response['result'] as $trigger) {
-			$this->assertEquals(TRIGGER_STATUS_ENABLED, $trigger['status']);
+			$this->assertStringContainsString('nodata', $trigger['expression']);
 			self::$discovered_triggerids[] = (int) $trigger['triggerid'];
 		}
 
