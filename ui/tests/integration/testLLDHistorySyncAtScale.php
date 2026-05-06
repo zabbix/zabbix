@@ -493,6 +493,8 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			]);
 		}
 
+		$this->sendDiscoveryData();
+
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		// Verify all discovered triggers fired due to no data (value = PROBLEM, state = NORMAL).
