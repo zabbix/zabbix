@@ -610,7 +610,9 @@ class testFormUserProfile extends CLegacyWebTest {
 		}
 	}
 
-	// Verify that checkbox state is preserved after failed update.
+	/**
+	 * Verify that checkbox state is preserved after failed update.
+	 */
 	public function testFormUserProfile_triggerSeverity() {
 		$data = [
 			'expected' => TEST_BAD,
@@ -634,14 +636,15 @@ class testFormUserProfile extends CLegacyWebTest {
 		$this->page->login()->open('zabbix.php?action=userprofile.notification.edit')->waitUntilReady();
 		$form = $this->query('id:userprofile-notification-form')->asForm()->one();
 		$form->selectTab('Frontend notifications');
-		$form->fill($data['frontend_notifications']);
+		$form->fill(['Frontend notifications' => true, 'Message timeout' => '86401']);
 		$form->fill($data['trigger_severity']);
 		$this->query('button:Update')->one()->click();
 		$this->assertMessage($data['expected'], $data['error_title'], $data['error_msg']);
-		$form = $this->query('id:userprofile-notification-form')->asForm()->one();
+		$form->invalidate();
+
 		// Assert correct checkbox state.
 		foreach ($data['trigger_severity'] as $сheckbox => $state) {
-			$this->assertEquals($state, $form->getField($сheckbox)->asCheckbox()->isChecked());
+			$form->checkValue([$сheckbox => $state]);
 		};
 	}
 }
