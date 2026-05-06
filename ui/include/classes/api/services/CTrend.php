@@ -51,6 +51,7 @@ class CTrend extends CApiService {
 			$items = API::Item()->get([
 				'output' => ['itemid', 'value_type'],
 				'itemids' => $options['itemids'],
+				'templated' => false,
 				'webitems' => true,
 				'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]]
 			]);

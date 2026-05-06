@@ -135,6 +135,7 @@ class CHistory extends CApiService {
 				'itemids' => $options['itemids'],
 				'hostids' => $options['hostids'],
 				'editable' => $options['editable'],
+				'templated' => false,
 				'webitems' => true,
 				'preservekeys' => true
 			]);
