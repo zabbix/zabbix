@@ -698,7 +698,7 @@ static int	dc_check_maintenance_period(const zbx_dc_maintenance_t *maintenance,
 
 	rc = dc_calculate_maintenance_period(maintenance, period, period_start, &period_start, &period_end);
 
-	if (SUCCEED == rc && period_start <= now && now <= period_end)
+	if (SUCCEED == rc && period_start <= now && now < period_end)
 	{
 		*running_since = period_start;
 		*running_until = period_end;
@@ -890,7 +890,7 @@ int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer)
 		{
 			changed = 0;
 
-			/* find earliest start and lastest end from currently running mainenance periods */
+			/* find the longest running maintenance period */
 			for (i = 0; i < maintenance->periods.values_num; i++)
 			{
 				period = (zbx_dc_maintenance_period_t *)maintenance->periods.values[i];
@@ -899,15 +899,9 @@ int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer)
 						&period_end))
 				{
 					state = ZBX_MAINTENANCE_RUNNING;
-
-					if (0 == running_since || period_start < running_since)
-					{
-						running_since = period_start;
-						changed = 1;
-					}
-
 					if (period_end > running_until)
 					{
+						running_since = period_start;
 						running_until = period_end;
 						changed = 1;
 					}
@@ -922,20 +916,10 @@ int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer)
 				{
 					period = (zbx_dc_maintenance_period_t *)maintenance->periods.values[i];
 
+					/* find lastest end of overlapping periods */
 					if (SUCCEED == dc_check_maintenance_period(maintenance, period,
-						running_since, &period_start, &period_end))
-					{
-						/* find earliest start of overlapping periods */
-						if (period_start < running_since)
-						{
-							running_since = period_start;
-							changed = 1;
-						}
-					}
-					else if (SUCCEED == dc_check_maintenance_period(maintenance, period,
 						running_until, &period_start, &period_end))
 					{
-						/* find lastest end of overlapping periods */
 						if (period_end > running_until)
 						{
 							running_until = period_end;
