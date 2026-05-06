@@ -34,7 +34,7 @@ class CControllerLldRuleList extends CController {
 			'filter_lifetime'				=> 'string',
 			'filter_enabled_lifetime_type'	=> 'in '.implode(',', [-1, ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY]),
 			'filter_enabled_lifetime'		=> 'string',
-			'snmp_oid'						=> 'string',
+			'filter_snmp_oid'				=> 'string',
 			'filter_state'					=> 'in '.implode(',', [-1, ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY]),
 			'filter_status'					=> 'in '.implode(',', [-1, ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY]),
 			'sort'							=> 'in delay,key_,name,status,type',
