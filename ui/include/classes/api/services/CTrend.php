@@ -44,7 +44,7 @@ class CTrend extends CApiService {
 		self::validateGet($options);
 
 		$storage_items = [];
-		$result = ($options['countOutput']) ? 0 : [];
+		$result = $options['countOutput'] ? 0 : [];
 
 		if ($options['itemids'] === null || $options['itemids']) {
 			// Check if items have read permissions.
