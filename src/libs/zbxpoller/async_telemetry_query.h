@@ -28,13 +28,14 @@
 #ifdef HAVE_LIBCURL
 typedef struct
 {
-	zbx_uint64_t	itemid;
-	unsigned char	value_type;
-	unsigned char	flags;
-	char		*posts;
-	unsigned char	preprocessing;
-	zbx_tq_query_t	*query;
-	time_t		newlasttimestamp;
+	zbx_uint64_t		itemid;
+	unsigned char		value_type;
+	unsigned char		flags;
+	char			*posts;
+	unsigned char		preprocessing;
+	zbx_tq_query_t		*query;
+	time_t			newlasttimestamp;
+	zbx_tq_db_type_t	db_type;
 }
 zbx_dc_tq_item_context_t;
 

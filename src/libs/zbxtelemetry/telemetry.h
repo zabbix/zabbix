@@ -28,5 +28,6 @@ void	tq_condition_init(zbx_tq_condition_t *condition);
 void	tq_condition_clean(zbx_tq_condition_t *condition);
 
 int	tq_formula_constant_to_condition_idx(const char *p, int len);
+char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col);
 
 #endif

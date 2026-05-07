@@ -143,7 +143,9 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent
 			res = get_value_browser(item, config_webdriver_url, config_comms->config_source_ip, result);
 			break;
 		case ITEM_TYPE_TELEMETRY_QUERY:
-			res = get_value_telemetry(item, result);
+			res = get_value_telemetry(item, config_comms->config_source_ip,
+					config_comms->config_ssl_ca_location, config_comms->config_ssl_cert_location,
+					config_comms->config_ssl_key_location, result);
 			break;
 		default:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));

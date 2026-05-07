@@ -116,16 +116,29 @@ typedef struct
 }
 zbx_tq_query_t;
 
+typedef enum zbx_tq_db_type
+{
+	ZBX_TQ_DB_TYPE_POSTGRESQL = 0,
+	ZBX_TQ_DB_TYPE_MYSQL,
+	ZBX_TQ_DB_TYPE_CLICKHOUSE,
+	ZBX_TQ_DB_TYPE_ELASTIC
+}
+zbx_tq_db_type_t;
+
 int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query, zbx_tq_macro_expand_func_t macro_expand_cb,
 		void *macro_expand_ctx);
 void	zbx_tq_query_clean(zbx_tq_query_t *query);
 
 void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql);
 void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql);
+void	zbx_tq_generate_elastic(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **dsl);
 
 void	zbx_tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
 		time_t *out_lower, time_t *out_upper);
 
 int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_vector_str_t *values);
+int	zbx_tq_elastic_parse_resp(const zbx_tq_query_t *query, const char *resp, zbx_vector_str_t *values);
+
+const char	*zbx_tq_elastic_get_index_name(zbx_tq_category_t category, zbx_tq_metric_type_t metric_type);
 
 #endif

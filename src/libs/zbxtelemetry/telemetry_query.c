@@ -140,3 +140,11 @@ void	zbx_tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t now,
 				(time_t)query->aggregation_size;
 	}
 }
+
+char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col)
+{
+	if (NULL != col->key)
+		return zbx_dsprintf(NULL, "%s.%s", col->name, col->key);
+	else
+		return zbx_strdup(NULL, col->name);
+}

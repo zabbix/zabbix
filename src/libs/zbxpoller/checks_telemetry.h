@@ -33,10 +33,13 @@ typedef struct telemetry_query_conn_params_clickhouse
 	const char	*username;
 	const char	*password;
 	const char	*token;
+	unsigned char	post_type;
+	unsigned char	output_format;
 }
-telemetry_query_conn_params_clickhouse_t;
+telemetry_query_http_conn_params_t;
 #endif
 
-int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result);
+int	get_value_telemetry(const zbx_dc_item_t *item, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, AGENT_RESULT *result);
 
 #endif

@@ -243,7 +243,7 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 		goto fail;
 	}
 
-	/* FIXME: should be changed to max of current time and min_free_ts */
+	/* FIXME: should probably be changed to max of current time and min_free_ts */
 	zbx_timespec(&timespec);
 
 	item_context = &telemetry_query_context->item_context;
@@ -252,15 +252,22 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 			&response_code, &http_resp, &error) &&
 			SUCCEED == zbx_handle_response_code(status_codes, response_code, http_resp, &error))
 	{
+		int	parse_ret;
+
 		zabbix_log(LOG_LEVEL_TRACE, "%s(): response: '%s'", __func__, http_resp);
 
-		if (SUCCEED == zbx_tq_clickhouse_parse_resp(item_context->query, http_resp, &values))
+		if (ZBX_TQ_DB_TYPE_CLICKHOUSE == item_context->db_type)
+			parse_ret = zbx_tq_clickhouse_parse_resp(item_context->query, http_resp, &values);
+		else
+			parse_ret = zbx_tq_elastic_parse_resp(item_context->query, http_resp, &values);
+
+		if (SUCCEED == parse_ret)
 		{
 			status = SUCCEED;
 		}
 		else
 		{
-			error = zbx_strdup(NULL, "Failed to parse Clickhouse response");
+			error = zbx_strdup(NULL, "Failed to parse data store response");
 			status = FAIL;
 		}
 	}

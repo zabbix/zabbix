@@ -24,30 +24,25 @@
 #endif
 
 #ifdef HAVE_LIBCURL
-static int	send_query_clickhouse_raw(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
-		const telemetry_query_conn_params_clickhouse_t *conn_params, const char *config_source_ip,
-		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+static int	send_query_http_raw(const char *posts, const telemetry_query_http_conn_params_t *conn_params,
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **out, char **error)
 {
 	int			ret;
-	char			*sql = NULL;
 	long			response_code;
 	zbx_http_context_t	context;
 	char			*http_out = NULL;
 	char			*http_error = NULL;
 	char			query_fields[] = "", headers[] = "", status_codes[] = "200,201,202,203,204";
 
-	zbx_tq_sql_generate_clickhouse(query, now, lasttimestamp, &sql);
 	zbx_http_context_create(&context);
 
-	zabbix_log(LOG_LEVEL_TRACE, "%s(): generated SQL: '%s'", __func__, sql);
-
 	if (SUCCEED == zbx_http_request_prepare(&context, HTTP_REQUEST_POST, conn_params->url, query_fields, headers,
-			sql, ZBX_RETRIEVE_MODE_CONTENT, NULL, 0, conn_params->timeout, conn_params->max_attempts,
+			posts, ZBX_RETRIEVE_MODE_CONTENT, NULL, 0, conn_params->timeout, conn_params->max_attempts,
 			conn_params->ssl_cert_file, conn_params->ssl_key_file, conn_params->ssl_key_password,
 			conn_params->verify_peer, conn_params->verify_host, conn_params->authtype,
-			conn_params->username, conn_params->password, conn_params->token, ZBX_POSTTYPE_RAW,
-			HTTP_STORE_RAW, config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
+			conn_params->username, conn_params->password, conn_params->token, conn_params->post_type,
+			conn_params->output_format, config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
 			config_ssl_key_location, &http_error))
 	{
 		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context, 0,
@@ -74,7 +69,6 @@ static int	send_query_clickhouse_raw(const zbx_tq_query_t *query, time_t now, ti
 		http_error = NULL;
 	}
 
-	zbx_free(sql);
 	zbx_free(http_out);
 	zbx_free(http_error);
 	zbx_http_context_destroy(&context);
@@ -82,45 +76,73 @@ static int	send_query_clickhouse_raw(const zbx_tq_query_t *query, time_t now, ti
 	return ret;
 }
 
-static int	send_query_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
-		const telemetry_query_conn_params_clickhouse_t *conn_params, const char *config_source_ip,
+static int	send_query_http(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, zbx_tq_db_type_t db_type,
+		const telemetry_query_http_conn_params_t *conn_params, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, zbx_vector_str_t *values, char **error)
 {
 	int	ret = FAIL;
+	char	*posts = NULL;
 	char	*resp = NULL;
+	int	parse_ret;
 
-	if (SUCCEED != send_query_clickhouse_raw(query, now, lasttimestamp, conn_params, config_source_ip,
+	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type)
+		zbx_tq_sql_generate_clickhouse(query, now, lasttimestamp, &posts);
+	else
+		zbx_tq_generate_elastic(query, now, lasttimestamp, &posts);
+
+	zabbix_log(LOG_LEVEL_TRACE, "%s(): generated posts: '%s'", __func__, posts);
+
+	if (SUCCEED != send_query_http_raw(posts, conn_params, config_source_ip,
 			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &resp, error))
 		goto out;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): Clickhouse response: '%s'", __func__, ZBX_NULL2STR(resp));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): response: '%s'", __func__, ZBX_NULL2STR(resp));
 
-	if (SUCCEED != zbx_tq_clickhouse_parse_resp(query, resp, values))
+
+	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type)
+		parse_ret = zbx_tq_clickhouse_parse_resp(query, resp, values);
+	else
+		parse_ret = zbx_tq_elastic_parse_resp(query, resp, values);
+
+	if (SUCCEED != parse_ret)
 	{
-		*error = zbx_strdup(NULL, "Failed to parse Clickhouse response");
+		*error = zbx_strdup(NULL, "Failed to parse data store response");
 		goto out;
 	}
 
 	ret = SUCCEED;
 out:
+	zbx_free(posts);
 	zbx_free(resp);
 
 	return ret;
 }
 
-static int get_value_telemetry_clickhouse(const zbx_dc_item_t *item, AGENT_RESULT *result)
+static int get_value_telemetry_http(const zbx_dc_item_t *item, zbx_tq_db_type_t db_type, const char *config_source_ip,
+		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, AGENT_RESULT *result)
 {
 	int			ret = NOTSUPPORTED;
 	time_t			now = time(NULL);
 	time_t			lasttimestamp;
 	zbx_vector_str_t	values;
 	char			*error = NULL;
+	char			*url;
 
-	/* FIXME: placeholder, db type and connection parameters should be gotten from the global config */
-	const telemetry_query_conn_params_clickhouse_t	conn_params =
+	/* FIXME: placeholder start */
+	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type)
+		url = zbx_strdup(NULL, "http://127.0.0.1:8123");
+	else
 	{
-		.url			= "http://127.0.0.1:8123",
+		url = zbx_dsprintf(NULL, "https://127.0.0.1:9200/%s/_search",
+				zbx_tq_elastic_get_index_name(item->telemetry_query->category,
+				item->telemetry_query->metric_type));
+	}
+
+	const telemetry_query_http_conn_params_t	conn_params =
+	{
+		.url			= url,
 		.http_proxy		= NULL,
 		.timeout		= item->timeout,
 		.max_attempts		= 1,
@@ -130,21 +152,20 @@ static int get_value_telemetry_clickhouse(const zbx_dc_item_t *item, AGENT_RESUL
 		.verify_peer		= 0,
 		.verify_host		= 0,
 		.authtype		= HTTPTEST_AUTH_BASIC,
-		.username		= "default",
-		.password		= "",
+		.username		= (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type ? "default" : "elastic"),
+		.password		= (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type ? "" : "U8G9kmwI54r3Gcf5YEs7"),
 		.token			= NULL,
+		.post_type		= (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type ? ZBX_POSTTYPE_RAW : ZBX_POSTTYPE_JSON),
+		.output_format		= (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type ? HTTP_STORE_RAW : HTTP_STORE_JSON)
 	};
-	const char *config_source_ip		= NULL;
-	const char *config_ssl_ca_location	= NULL;
-	const char *config_ssl_cert_location	= NULL;
-	const char *config_ssl_key_location	= NULL;
+	/* FIXME: placeholder end */
 
 	/* when testing the item, the time range being queried is restricted only by the loopback limit */
 	lasttimestamp = 0;
 
-	if (SUCCEED != send_query_clickhouse(item->telemetry_query, now, lasttimestamp, &conn_params, config_source_ip,
-			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &values,
-			&error))
+	if (SUCCEED != send_query_http(item->telemetry_query, now, lasttimestamp, db_type, &conn_params,
+			config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+			&values, &error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Query failed: '%s'", error));
 		error = NULL;
@@ -172,13 +193,28 @@ out:
 }
 #endif
 
-int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
+int	get_value_telemetry(const zbx_dc_item_t *item, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, AGENT_RESULT *result)
 {
+	/* FIXME: placeholder, also, when data store config is implemented, make sure to avoid race conditions */
+	/* if it can be changed at runtime */
+	zbx_tq_db_type_t	db_type = ZBX_TQ_DB_TYPE_ELASTIC;
+
+	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type || ZBX_TQ_DB_TYPE_ELASTIC == db_type)
+	{
 #ifdef HAVE_LIBCURL
-	return get_value_telemetry_clickhouse(item, result);
+		return get_value_telemetry_http(item, db_type, config_source_ip, config_ssl_ca_location,
+				config_ssl_cert_location, config_ssl_key_location, result);
 #else
-	ZBX_UNUSED(item);
-	SET_MSG_RESULT(result, zbx_strdup(NULL, "cURL library was not compiled in"));
-	return NOTSUPPORTED;
+		ZBX_UNUSED(item);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "cURL library was not compiled in"));
+		return NOTSUPPORTED;
 #endif
+	}
+	else
+	{
+		/* TODO */
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "UNIMPLEMENTED"));
+		return NOTSUPPORTED;
+	}
 }

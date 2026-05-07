@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "telemetry.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "zbxtelemetry.h"
@@ -53,13 +54,8 @@ static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_jso
 	for (int i = 0; i < query->columns.values_num; i++)
 	{
 		const zbx_tq_column_t	*col = &query->columns.values[i];
-		char		*field_name;
-		zbx_json_type_t	type;
-
-		if (NULL != col->key)
-			field_name = zbx_dsprintf(NULL, "%s.%s", col->name, col->key);
-		else
-			field_name = zbx_strdup(NULL, col->name);
+		char			*field_name = tq_get_result_field_name_dyn(col);
+		zbx_json_type_t		type;
 
 		if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), &type)))
 		{
