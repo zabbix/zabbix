@@ -1374,6 +1374,7 @@ void	zbx_history_value2variant(const zbx_history_value_t *value, unsigned char v
  *                                                                            *
  * Parameters: json - [IN/OUT] JSON object to add version info to             *
  *             info - [IN] history module information                         *
+ *             flag - [IN] database version validation status                 *
  *                                                                            *
  ******************************************************************************/
 static void	history_add_version_info(struct zbx_json *json, zbx_history_provider_info_t *info,
