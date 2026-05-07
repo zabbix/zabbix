@@ -235,12 +235,24 @@ class CClickHouseStorage {
 	/**
 	 * @see CHistoryManager::getItemsHavingValues
 	 */
-	public function getItemsHavingValues(array $value_type_itemids, $lastn_sec = null): array {
+	public function getItemsHavingValues(array $itemids_by_value_type, ?int $period): array {
 		$result = [];
+		$time = time();
 
-		foreach ($value_type_itemids as $value_type => $itemids) {
-			$time_from = $lastn_sec === null ? null : $this->getTtlLimitedTimestamp($value_type, time() - $lastn_sec);
-			$rows = $this->select([
+		foreach ($itemids_by_value_type as $value_type => $itemids) {
+			$time_from = $period;
+
+			if ($this->value_type_ttl[$value_type] !== null) {
+				$time_from = $period !== null
+					? min($period, $this->value_type_ttl[$value_type])
+					: $this->value_type_ttl[$value_type];
+			}
+
+			if ($time_from !== null) {
+				$time_from = $time - $time_from + 1;
+			}
+
+			$resource = $this->select([
 				'output' => ['itemid'],
 				'itemids' => array_keys($itemids),
 				'history' => $value_type,
@@ -248,11 +260,11 @@ class CClickHouseStorage {
 				'limit_by' => [1, 'itemid']
 			]);
 
-			if ($rows === null) {
+			if ($resource === null) {
 				break;
 			}
 
-			$result += array_column($rows, null, 'itemid');
+			$result += array_column($resource, 'itemid', 'itemid');
 		}
 
 		return $result;
@@ -261,17 +273,28 @@ class CClickHouseStorage {
 	/**
 	 * @see CHistoryManager::getLastValues
 	 */
-	public function getLastValues(array $value_type_itemids, int $limit, ?int $lastn_sec, ?int $length): array {
+	public function getLastValues(array $itemids_by_value_type, int $limit, ?int $period, ?int $length): array {
 		$result = [];
+		$time = time();
 
-		foreach ($value_type_itemids as $value_type => $itemids) {
-			$time_from = $lastn_sec === null ? null : $this->getTtlLimitedTimestamp($value_type, time() - $lastn_sec);
+		foreach ($itemids_by_value_type as $value_type => $itemids) {
+			$time_from = $period;
+
+			if ($this->value_type_ttl[$value_type] !== null) {
+				$time_from = $period !== null
+					? min($period, $this->value_type_ttl[$value_type])
+					: $this->value_type_ttl[$value_type];
+			}
+
+			if ($time_from !== null) {
+				$time_from = $time - $time_from + 1;
+			}
+
 			$fields = array_keys(self::VALUE_TYPE_SCHEMA[$value_type]);
 			$fields = array_diff($fields, ['clock_ns']);
-			$fields[] = 'clock';
-			$fields[] = 'ns';
+			array_push($fields, 'clock', 'ns');
 
-			$rows = $this->select([
+			$resource = $this->select([
 				'output' => $fields,
 				'maxValueSize' => $length,
 				'itemids' => array_keys($itemids),
@@ -282,11 +305,11 @@ class CClickHouseStorage {
 				'limit_by' => [$limit, 'itemid']
 			]);
 
-			if ($rows === null) {
+			if ($resource === null) {
 				break;
 			}
 
-			foreach ($rows as $row) {
+			foreach ($resource as $row) {
 				$result[$row['itemid']][] = $row;
 			}
 		}
@@ -298,49 +321,33 @@ class CClickHouseStorage {
 	 * @see CHistoryManager::getValueAt
 	 */
 	public function getValueAt(array $item, int $clock, int $ns): ?array {
-		if (!$this->isTtlValidTimestamp($item['value_type'], $clock)) {
+		$time = time();
+		$value_type = $item['value_type'];
+
+		if ($this->value_type_ttl[$value_type] !== null && $clock <= $time - $this->value_type_ttl[$value_type]) {
 			return null;
 		}
 
-		$fields = array_keys(self::VALUE_TYPE_SCHEMA[$item['value_type']]);
+		$time_from = $clock - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+
+		if ($this->value_type_ttl[$value_type] !== null) {
+			$time_from = max($time_from, $time - $this->value_type_ttl[$value_type] + 1);
+		}
+
+		$fields = array_keys(self::VALUE_TYPE_SCHEMA[$value_type]);
 		$fields = array_diff($fields, ['clock_ns']);
-		$fields[] = 'clock';
-		$fields[] = 'ns';
+		array_push($fields, 'clock', 'ns');
 
-		$rows = $this->select([
+		return $this->select([
 			'output' => $fields,
 			'itemids' => [$item['itemid']],
-			'history' => $item['value_type'],
-			'filter' => [
-				'clock' => $clock
-			]
-		]);
-
-		if ($rows === null) {
-			return null;
-		}
-
-		$rows = array_column($rows, null, 'ns');
-
-		if (array_key_exists($ns, $rows)) {
-			return $rows[$ns];
-		}
-
-		$rows = $this->select([
-			'output' => $fields,
-			'itemids' => [$item['itemid']],
-			'history' => $item['value_type'],
-			'time_till' => $clock,
-			'sortfield' => 'clock',
+			'history' => $value_type,
+			'time_from' => $time_from,
+			'clock_ns_till' => ['clock' => $clock, 'ns' => $ns],
+			'sortfield' => 'clock_ns',
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => 1
-		]);
-
-		if ($rows === null || !$rows) {
-			return null;
-		}
-
-		return $rows[0];
+		])[0] ?? null;
 	}
 
 	/**
@@ -702,6 +709,7 @@ class CClickHouseStorage {
 			'itemids' => null,
 			'time_from' => null,
 			'time_till' => null,
+			'clock_ns_till' => null,
 			'filter' => null,
 			'search' => null,
 			'searchByAny' => false,
@@ -757,6 +765,13 @@ class CClickHouseStorage {
 		if ($options['time_till'] !== null) {
 			$sql_parts['param']['UInt64']['pre_time_lte'] = (int) $options['time_till'];
 			$sql_parts['prewhere']['pre_time_lte'] = 'clock_ns<=addNanoseconds(toDateTime64({pre_time_lte:UInt64},9),999999999)';
+		}
+
+		if ($options['clock_ns_till'] !== null) {
+			$sql_parts['param']['UInt64']['pre_clock_lte'] = $options['clock_ns_till']['clock'];
+			$sql_parts['param']['UInt64']['pre_ns_lte'] = $options['clock_ns_till']['ns'];
+			$sql_parts['prewhere']['pre_clock_ns_lte'] =
+				'clock_ns<=addNanoseconds(toDateTime64({pre_clock_lte:UInt64},9),{pre_ns_lte:UInt64})';
 		}
 
 		if (is_array($options['filter']) && $options['filter']) {
@@ -838,7 +853,7 @@ class CClickHouseStorage {
 		);
 
 		$fields = array_keys(self::VALUE_TYPE_SCHEMA[$options['history']]);
-		$fields = array_diff($fields, ['clock_ns', 'value_str']);
+		$fields = array_diff($fields, ['value_str']);
 		$fields[] = 'clock';
 		foreach ($sortfield as $i => $field) {
 			if (!in_array($field, $fields)) {
@@ -972,18 +987,5 @@ class CClickHouseStorage {
 		$value_ttl = $this->value_type_ttl[$value_type];
 
 		return $value_ttl === null ? $timestamp : max($timestamp, time() - $value_ttl);
-	}
-
-	/**
-	 * Check is timestamp within value type limited, by TTL, time range.
-	 * Return true if no TTL is configured for requested value type.
-	 *
-	 * @param int $value_type
-	 * @param int $timestamp
-	 */
-	private function isTtlValidTimestamp(int $value_type, int $timestamp): bool {
-		$value_ttl = $this->value_type_ttl[$value_type];
-
-		return $value_ttl === null ? true : ($timestamp >= time() - $value_ttl);
 	}
 }

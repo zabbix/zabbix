@@ -134,8 +134,8 @@ class CHistoryManager {
 	 *
 	 * @return array  An array with items IDs as keys and the original item data as values.
 	 */
-	public function getItemsHavingValues(array $items, $period = null) {
-		$items = zbx_toHash($items, 'itemid');
+	public function getItemsHavingValues(array $items, ?int $period = null) {
+		$items = array_column($items, null, 'itemid');
 
 		$results = [];
 		$grouped_items = $this->getItemsGroupedByStorage($items);
@@ -148,10 +148,10 @@ class CHistoryManager {
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
-			foreach ($this->getProviderItemPairs($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]) as $pair) {
-				[$storage_provider, $storage_items] = $pair;
+			foreach ($this->getProviderItemPairs($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]) as
+					[$storage_provider, $itemids_by_value_type]) {
 				/** @var CClickHouseStorage $storage_provider */
-				$results += $storage_provider->getItemsHavingValues($storage_items, $period);
+				$results += $storage_provider->getItemsHavingValues($itemids_by_value_type, $period);
 
 				if ($storage_provider->getErrorCode() !== null) {
 					error($storage_provider->getErrorMessage(), true);
@@ -171,7 +171,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getItemsHavingValues
 	 */
-	private function getItemsHavingValuesFromSql(array $items, $period = null) {
+	private function getItemsHavingValuesFromSql(array $items, ?int $period) {
 		$results = [];
 
 		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
@@ -183,15 +183,15 @@ class CHistoryManager {
 			$period = time() - $period;
 		}
 
-		$items = zbx_toHash($items, 'itemid');
+		$items = array_column($items, null, 'itemid');
 
-		$itemids_by_type = [];
+		$itemids_by_value_type = [];
 
 		foreach ($items as $itemid => $item) {
-			$itemids_by_type[$item['value_type']][] = $itemid;
+			$itemids_by_value_type[$item['value_type']][] = $itemid;
 		}
 
-		foreach ($itemids_by_type as $type => $type_itemids) {
+		foreach ($itemids_by_value_type as $type => $type_itemids) {
 			$type_results = DBfetchColumn(DBselect(
 				'SELECT DISTINCT itemid'.
 				' FROM '.self::getTableName($type).
@@ -215,7 +215,7 @@ class CHistoryManager {
 	 *
 	 * @return array  An array with items IDs as keys and arrays of history objects as values.
 	 */
-	public function getLastValues(array $items, $limit = 1, $period = null, ?int $length = null) {
+	public function getLastValues(array $items, int $limit = 1, ?int $period = null, ?int $length = null) {
 		$results = [];
 		$grouped_items = $this->getItemsGroupedByStorage($items);
 
@@ -226,10 +226,10 @@ class CHistoryManager {
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
-			foreach ($this->getProviderItemPairs($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]) as $pair) {
-				[$storage_provider, $storage_items] = $pair;
+			foreach ($this->getProviderItemPairs($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]) as
+					[$storage_provider, $itemids_by_value_type]) {
 				/** @var CClickHouseStorage $storage_provider */
-				$results += $storage_provider->getLastValues($storage_items, $limit, $period, $length);
+				$results += $storage_provider->getLastValues($itemids_by_value_type, $limit, $period, $length);
 
 				if ($storage_provider->getErrorCode() !== null) {
 					error($storage_provider->getErrorMessage(), true);
@@ -258,7 +258,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getLastValues
 	 */
-	private function getLastValuesFromElasticsearch($items, $limit, $period, ?int $length) {
+	private function getLastValuesFromElasticsearch($items, int $limit, ?int $period, ?int $length) {
 		$terms = [];
 		$results = [];
 		$filter = [];
@@ -397,7 +397,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getLastValues
 	 */
-	private function getLastValuesFromSql($items, $limit, $period, ?int $length) {
+	private function getLastValuesFromSql($items, int $limit, ?int $period, ?int $length) {
 		$results = [];
 		$value_expression = $length === null ? 'h.value' : dbSubstring('value', 1, $length);
 
@@ -529,7 +529,7 @@ class CHistoryManager {
 	 *
 	 * @return array|null  Item data at specified time of first data before specified time. null if data is not found.
 	 */
-	public function getValueAt(array $item, $clock, $ns) {
+	public function getValueAt(array $item, int $clock, int $ns) {
 		switch ($this->getDataSourceType($item['value_type'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
 				return $this->getValueAtFromElasticsearch($item, $clock, $ns);
@@ -556,7 +556,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getValueAt
 	 */
-	private function getValueAtFromElasticsearch(array $item, $clock, $ns) {
+	private function getValueAtFromElasticsearch(array $item, int $clock, int $ns) {
 		$query = [
 			'sort' => [
 				'clock' => ZBX_SORT_DOWN,
@@ -631,7 +631,7 @@ class CHistoryManager {
 	 *
 	 * @return array|null  Item data at specified time of first data before specified time. null if data is not found.
 	 */
-	private function getValueAtFromSqlWithPk(array $item, $clock, $ns): ?array {
+	private function getValueAtFromSqlWithPk(array $item, int $clock, int $ns): ?array {
 		$hk_history_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL);
 		$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
 
@@ -677,7 +677,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getValueAt
 	 */
-	private function getValueAtFromSql(array $item, $clock, $ns) {
+	private function getValueAtFromSql(array $item, int $clock, int $ns) {
 		$hk_history_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL);
 		$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
 
