@@ -612,33 +612,24 @@ class testFormUserProfile extends CLegacyWebTest {
 	 * Verify that checkbox state is preserved after failed update.
 	 */
 	public function testFormUserProfile_triggerSeverity() {
-		$data = [
-			'expected' => TEST_BAD,
-			'error_title' => 'Cannot update user',
-			'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.',
-			'trigger_severity' => [
-				'Recovery' => false,
-				'Not classified' => false,
-				'Information' => false,
-				'Warning' => false,
-				'Average' => false,
-				'High' => false,
-				'Disaster' => false
-			]
+		$trigger_severity = [
+			'Recovery' => false,
+			'Not classified' => false,
+			'Information' => false,
+			'Warning' => false,
+			'Average' => false,
+			'High' => false,
+			'Disaster' => false
 		];
 
 		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
 		$form = $this->query('id:user-form')->asForm()->one();
 		$form->selectTab('Frontend notifications');
 		$form->fill(['Frontend notifications' => true, 'Message timeout' => '86401']);
-		$form->fill($data['trigger_severity']);
-		$this->query('button:Update')->one()->click();
-		$this->assertMessage($data['expected'], $data['error_title'], $data['error_msg']);
+		$form->fill($trigger_severity)->submit();
+		$this->assertMessage(TEST_BAD, 'Cannot update user',
+				'Incorrect value for field "timeout": value must be one of 30-86400.');
 		$form->invalidate();
-
-		// Assert correct checkbox state.
-		foreach ($data['trigger_severity'] as $сheckbox => $state) {
-			$form->checkValue([$сheckbox => $state]);
-		};
+		$form->checkValue($trigger_severity);
 	}
 }
