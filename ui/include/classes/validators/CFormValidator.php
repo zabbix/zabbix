@@ -953,19 +953,19 @@ class CFormValidator {
 			return false;
 		}
 
-		if (array_key_exists('regex', $rules) && !preg_match($rules['regex'], $value)) {
+		if (array_key_exists('regex', $rules) && !preg_match($rules['regex'], $value_check)) {
 			$error = self::getMessage($rules, 'regex', _('This value does not match pattern.'));
 
 			return false;
 		}
 
-		if (!self::checkStringIn($rules, $value, $error)) {
+		if (!self::checkStringIn($rules, $value_check, $error)) {
 			$error = self::getMessage($rules, 'in', $error);
 
 			return false;
 		}
 
-		if (!self::checkStringNotIn($rules, $value, $error)) {
+		if (!self::checkStringNotIn($rules, $value_check, $error)) {
 			$error = self::getMessage($rules, 'not_in', $error);
 
 			return false;
@@ -1483,14 +1483,13 @@ class CFormValidator {
 	 *
 	 * @param array  $rules
 	 * @param int    $rules['in']  (optional)
-	 * @param int    $value
+	 * @param string $value
 	 * @param string $error
 	 *
 	 * @return bool
 	 */
-	private static function checkStringIn(array $rules, $value, ?string &$error = null): bool {
+	private static function checkStringIn(array $rules, string $value, ?string &$error = null): bool {
 		if (array_key_exists('in', $rules)) {
-			$value = (string)$value;
 			$allowed = array_map('strval', $rules['in']);
 
 			if (!in_array($value, $allowed, true)) {
@@ -1513,14 +1512,13 @@ class CFormValidator {
 	 *
 	 * @param array  $rules
 	 * @param int    $rules['not_in']  (optional)
-	 * @param int    $value
+	 * @param string $value
 	 * @param string $error
 	 *
 	 * @return bool
 	 */
-	private static function checkStringNotIn(array $rules, $value, ?string &$error = null): bool {
+	private static function checkStringNotIn(array $rules, string $value, ?string &$error = null): bool {
 		if (array_key_exists('not_in', $rules)) {
-			$value = (string)$value;
 			$disallowed = array_map('strval', $rules['not_in']);
 
 			if (in_array($value, $disallowed, true)) {
