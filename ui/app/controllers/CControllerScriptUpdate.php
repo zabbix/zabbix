@@ -109,7 +109,8 @@ class CControllerScriptUpdate extends CController {
 			'commandipmi' => ['db scripts.command', 'required', 'not_empty',
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_IPMI]]
 			],
-			'parameters' => ['objects', 'required', 'uniq' => ['name'], 'fields' => [
+			'parameters' => ['objects', 'required', 'uniq' => ['name'],
+				'fields' => [
 					'value' => ['db script_param.value'],
 					'name' => [
 						['db script_param.name'],
@@ -143,8 +144,8 @@ class CControllerScriptUpdate extends CController {
 				'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]]
 			],
 			'manualinput' => ['db scripts.manualinput', 'required',
-				'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
-				'in' => [ZBX_SCRIPT_MANUALINPUT_DISABLED, ZBX_SCRIPT_MANUALINPUT_ENABLED]
+				'in' => [ZBX_SCRIPT_MANUALINPUT_DISABLED, ZBX_SCRIPT_MANUALINPUT_ENABLED],
+				'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]]
 			],
 			'manualinput_prompt' => ['db scripts.manualinput_prompt', 'required', 'not_empty',
 				'when' => [
