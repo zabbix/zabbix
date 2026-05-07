@@ -1,1 +1,1 @@
-\COPY (SELECT itemid,concat(clock,'.',LPAD(ns::text,9,'0')),value FROM history_json) TO '/tmp/history_json.csv' DELIMITER ',' CSV;
+\COPY (SELECT itemid,concat(clock,'.',LPAD(ns::text,9,'0')),CASE WHEN jsonb_typeof(value) = 'object' THEN value::text ELSE 'null' END,CASE WHEN jsonb_typeof(value) = 'object' THEN '' ELSE value::text END FROM history_json) TO '/tmp/history_json.csv' DELIMITER ',' CSV;
