@@ -335,7 +335,7 @@ class CProfiler {
 	 * @param float  $time
 	 * @param string $query
 	 */
-	public function profileElasticsearch($time, $query) {
+	public function profileElasticsearch(float $time, string $query) {
 		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
 				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
 			return;
@@ -353,6 +353,9 @@ class CProfiler {
 
 	/**
 	 * Store ClickHouse query data.
+	 *
+	 * @param float  $time
+	 * @param string $query
 	 */
 	public function profileClickHouse(float $time, string $query) {
 		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
