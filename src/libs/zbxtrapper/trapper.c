@@ -1411,14 +1411,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 
 			zbx_timespec(&av.ts);
 			zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-
-			if (ITEM_TYPE_ZABBIX_ACTIVE == item.type)
-				zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_AGENT_DATA,
-						ZBX_JSON_TYPE_STRING);
-			else
-				zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA,
-						ZBX_JSON_TYPE_STRING);
-
 			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 			zbx_json_addobject(&json, NULL);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, host, ZBX_JSON_TYPE_STRING);
@@ -1432,7 +1424,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, av.lastlogsize);
 
 			if ('\0' != *source)
-				zbx_json_addstring(&json, "source", source, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE, source, ZBX_JSON_TYPE_STRING);
 
 			if (0 != av.severity)
 				zbx_json_adduint64(&json, ZBX_PROTO_TAG_SEVERITY, (zbx_uint64_t)av.severity);
@@ -1449,6 +1441,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 
 				zbx_free(info);
 			}
+
 			zbx_json_free(&json);
 		}
 
