@@ -60,7 +60,14 @@ class CBanner {
 		const url = new URL('zabbix.php', location.href);
 		url.searchParams.set('action', 'banner.get');
 
-		fetch(url.toString())
+		const abort_controller = new AbortController();
+
+		this.#abort_controller?.abort();
+		this.#abort_controller = abort_controller;
+
+		fetch(url.toString(), {
+			signal: this.#abort_controller.signal
+		})
 			.then(response => response.json())
 			.then(response => {
 				if ('error' in response) {
@@ -90,14 +97,25 @@ class CBanner {
 					this.#getCurrentData();
 				}
 			})
-			.catch(error => console.log('Could not get saved data.', error));
+			.catch(error => console.log('Could not get saved data.', error))
+			.finally(() => {
+				if (this.#abort_controller === abort_controller) {
+					this.#abort_controller = null;
+				}
+			});
 	}
 
 	#getCurrentData() {
+		const abort_controller = new AbortController();
+
+		this.#abort_controller?.abort();
+		this.#abort_controller = abort_controller;
+
 		fetch(CBanner.URL, {
 			headers: {
 				'Accept-Language': this.#language.replace('_', '-')
-			}
+			},
+			signal: this.#abort_controller.signal
 		})
 			.then(response => response.json())
 			.then(response => {
@@ -119,6 +137,11 @@ class CBanner {
 				this.#number_of_attempts++;
 
 				setTimeout(() => this.#getCurrentData(), CBanner.DELAY_ON_ERROR * 1000);
+			})
+			.finally(() => {
+				if (this.#abort_controller === abort_controller) {
+					this.#abort_controller = null;
+				}
 			});
 	}
 
