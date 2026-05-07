@@ -6,7 +6,6 @@ DIR="$(dirname "$0")"
 while IFS=, read -r itemid clock_ns value; do
 	val="${value%\"}"
 	val="${val#\"}"
-	val="${val//\"\"/\"}"
 
 	# If value looks like a JSON object, insert into JSON
 	if [[ "$val" =~ ^\{.*\}$ ]]; then
