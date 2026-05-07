@@ -1,4 +1,4 @@
-SELECT itemid,concat(clock,'.',ns),value FROM history_str
+SELECT itemid,concat(clock,'.',LPAD(ns,9,'0')),value FROM history_str
 INTO OUTFILE '/var/lib/mysql-files/history_str.csv'
 FIELDS ENCLOSED BY '"'
 TERMINATED BY ','
