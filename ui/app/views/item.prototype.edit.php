@@ -140,7 +140,6 @@ $tabs = (new CTabView(['id' => $tabsid]))
 			'source' => 'itemprototype',
 			'types' => $data['types'],
 			'value_types' => $value_types,
-			'ttl_value_types' => [],
 			'type_with_key_select' => $type_with_key_select
 		])
 	)
