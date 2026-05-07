@@ -1376,7 +1376,8 @@ void	zbx_history_value2variant(const zbx_history_value_t *value, unsigned char v
  *             info - [IN] history module information                         *
  *                                                                            *
  ******************************************************************************/
-static void	history_add_version_info(struct zbx_json *json, zbx_history_provider_info_t *info)
+static void	history_add_version_info(struct zbx_json *json, zbx_history_provider_info_t *info,
+		zbx_db_version_status_t flag)
 {
 	zbx_json_addobject(json, NULL);
 
@@ -1397,6 +1398,8 @@ static void	history_add_version_info(struct zbx_json *json, zbx_history_provider
 		zbx_json_addstring(json, "min_supported_version", info->friendly_min_supported_version,
 				ZBX_JSON_TYPE_STRING);
 	}
+
+	zbx_json_addint64(json, "flag", flag);
 
 	if (0 != info->value_types.values_num)
 	{
@@ -1533,7 +1536,7 @@ int	zbx_history_check_version(int config_allow_unsupported_db_versions, unsigned
 		if (FAIL == zbx_db_verify_version_info(&vi, config_allow_unsupported_db_versions, program_type))
 			ret = FAIL;
 		else
-			history_add_version_info(&json, info + i);
+			history_add_version_info(&json, info + i, vi.flag);
 
 		history_provider_info_clear(info + i);
 	}
