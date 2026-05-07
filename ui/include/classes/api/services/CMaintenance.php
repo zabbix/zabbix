@@ -523,32 +523,7 @@ class CMaintenance extends CApiService {
 			'where' => ['maintenanceid' => $maintenanceids]
 		]);
 
-		/*
-		 * Select all active suppressions for the maintenances that are about to be deleted and add unsuppression
-		 * records in acknowledges table.
-		 */
-		$ins_acknowledges = [];
-		$time = time();
-
-		$db_suppressions = DBselect(
-			'SELECT es.eventid,es.maintenanceid'.
-			' FROM event_suppress es'.
-			' WHERE '.dbConditionId('es.maintenanceid', $maintenanceids)
-		);
-
-		while ($db_suppression = DBfetch($db_suppressions)) {
-			$ins_acknowledges[] = [
-				'eventid' => $db_suppression['eventid'],
-				'clock' => $time,
-				'action' => ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS,
-				'suppress_until' => 0,
-				'maintenanceid' => $db_suppression['maintenanceid']
-			];
-		}
-
-		if ($ins_acknowledges) {
-			DB::insert('acknowledges', $ins_acknowledges);
-		}
+		self::addMaintenanceUnsuppressionRecords($maintenanceids);
 
 		DB::delete('timeperiods', ['timeperiodid' => array_column($maintenances_windows, 'timeperiodid')]);
 		DB::delete('maintenances', ['maintenanceid' => $maintenanceids]);
@@ -556,6 +531,35 @@ class CMaintenance extends CApiService {
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MAINTENANCE, $db_maintenances);
 
 		return ['maintenanceids' => $maintenanceids];
+	}
+
+	/**
+	 * Add unsuppression records for maintenance-related event suppressions.
+	 *
+	 * @param array $maintenanceids  Array of maintenance IDs being deleted.
+	 */
+	private static function addMaintenanceUnsuppressionRecords(array $maintenanceids): void {
+		$ins_acknowledges = [];
+		$time = time();
+
+		$options = [
+			'output' => ['eventid', 'maintenanceid'],
+			'filter' => ['maintenanceid' => $maintenanceids]
+		];
+		$resource = DBselect(DB::makeSql('event_suppress', $options));
+
+		while ($row = DBfetch($resource)) {
+			$ins_acknowledges[] = [
+				'eventid' => $row['eventid'],
+				'clock' => $time,
+				'action' => ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS,
+				'maintenanceid' => $row['maintenanceid']
+			];
+		}
+
+		if ($ins_acknowledges) {
+			DB::insert('acknowledges', $ins_acknowledges);
+		}
 	}
 
 	/**
