@@ -1481,10 +1481,10 @@ class CFormValidator {
 	/**
 	 * Check if given value matches one of values inside $rules['in'].
 	 *
-	 * @param array  $rules
-	 * @param int    $rules['in']  (optional)
-	 * @param string $value
-	 * @param string $error
+	 * @param array  	  $rules
+	 * @param array 	  $rules['in']  (optional)
+	 * @param string	  $value
+	 * @param string|null $error
 	 *
 	 * @return bool
 	 */
@@ -1510,10 +1510,10 @@ class CFormValidator {
 	/**
 	 * Check if given value is not one of values inside $rules['not_in'].
 	 *
-	 * @param array  $rules
-	 * @param int    $rules['not_in']  (optional)
-	 * @param string $value
-	 * @param string $error
+	 * @param array		  $rules
+	 * @param array		  $rules['not_in']  (optional)
+	 * @param string 	  $value
+	 * @param string|null $error
 	 *
 	 * @return bool
 	 */
