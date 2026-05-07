@@ -259,7 +259,7 @@ class CTrend extends CApiService {
 			];
 		}
 
-		$limit = ($options['limit'] && zbx_ctype_digit($options['limit'])) ? $options['limit'] : null;
+		$limit = $options['limit'];
 		$result = [];
 
 		if ($options['countOutput']) {
@@ -326,6 +326,7 @@ class CTrend extends CApiService {
 	 */
 	private function getFromClickHouse(array $options) {
 		$result = $options['countOutput'] ? 0 : [];
+		$limit = $options['limit'];
 
 		foreach ($options['itemids'] as $value_type => $itemids) {
 			/** @var CClickHouseStorage $storage */
@@ -337,7 +338,7 @@ class CTrend extends CApiService {
 				'time_from' => $options['time_from'],
 				'time_till' => $options['time_till'],
 				'countOutput' => $options['countOutput'],
-				'limit' => $options['limit']
+				'limit' => $limit
 			]);
 
 			if ($storage->getErrorCode() !== null) {
@@ -347,6 +348,16 @@ class CTrend extends CApiService {
 			$result = $options['countOutput']
 				? $result + $values[0]['rowscount']
 				: array_merge($result, $values);
+
+			if ($limit === null || $options['countOutput']) {
+				continue;
+			}
+
+			$limit -= count($values);
+
+			if ($limit == 0) {
+				break;
+			}
 		}
 
 		return $result;
