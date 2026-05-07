@@ -13,6 +13,10 @@
 **/
 
 
+const ZBX_STYLE_BANNER = 'banner';
+const ZBX_STYLE_BANNER_CONTENT = 'banner-content';
+const ZBX_STYLE_BANNER_CLOSE = 'banner-close';
+
 class CBanner {
 
 	static URL = 'https://services.zabbix.com/banners/v1';
@@ -28,10 +32,6 @@ class CBanner {
 		banners: []
 	};
 
-	static ZBX_STYLE_BANNER = 'banner';
-	static ZBX_STYLE_BANNER_CONTENT = 'banner-content';
-	static ZBX_STYLE_BANNER_CLOSE = 'banner-close';
-
 	#language = 'en_US';
 	#storage_idx = null;
 	#csrf_token = null;
@@ -41,15 +41,16 @@ class CBanner {
 	#active_banner_id = null;
 	#dismissed_banner_ids = [];
 
+	#abort_controller = null;
 	#number_of_attempts = 0;
 	#banners = [];
 
 	#template = new Template(`
-		<div class="${CBanner.ZBX_STYLE_BANNER}">
-			<div class="${CBanner.ZBX_STYLE_BANNER_CONTENT}"></div>
-			<button type="button" role="button" class="${CBanner.ZBX_STYLE_BANNER_CLOSE} ${ZBX_ICON_TIMES} ${ZBX_STYLE_BTN_ICON}"></button>
+		<div class="${ZBX_STYLE_BANNER}">
+			<div class="${ZBX_STYLE_BANNER_CONTENT}"></div>
+			<button type="button" role="button" class="${ZBX_STYLE_BANNER_CLOSE} ${ZBX_ICON_TIMES} ${ZBX_STYLE_BTN_ICON}"></button>
 		</div>
-	`)
+	`);
 
 	constructor() {
 		this.#startUpdating(CBanner.DELAY_ON_PAGE_LOAD);
@@ -136,9 +137,9 @@ class CBanner {
 		}
 
 		this.#container = this.#template.evaluateToElement();
-		this.#content = this.#container.querySelector(`.${CBanner.ZBX_STYLE_BANNER_CONTENT}`);
+		this.#content = this.#container.querySelector(`.${ZBX_STYLE_BANNER_CONTENT}`);
 
-		const close_button = this.#container.querySelector(`.${CBanner.ZBX_STYLE_BANNER_CLOSE}`);
+		const close_button = this.#container.querySelector(`.${ZBX_STYLE_BANNER_CLOSE}`);
 		close_button.addEventListener('click', () => this.#closeBanner());
 
 		const wrapper = document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`);
@@ -248,6 +249,11 @@ class CBanner {
 			return 'id' in banner && 'content' in banner && Object.keys(banner.content).length > 0 && now <= to;
 		});
 
+		const abort_controller = new AbortController();
+
+		this.#abort_controller?.abort();
+		this.#abort_controller = abort_controller;
+
 		fetch(url.toString(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -255,7 +261,8 @@ class CBanner {
 				number_of_attempts: this.#number_of_attempts,
 				banners,
 				[CSRF_TOKEN_NAME]: this.#csrf_token
-			})
+			}),
+			signal: this.#abort_controller.signal
 		})
 			.then(response => response.json())
 			.then(response => {
@@ -271,6 +278,11 @@ class CBanner {
 
 				this.#displayActiveBanner();
 			})
-			.catch(error => console.log('Could not update banner data.', error));
+			.catch(error => console.log('Could not update banner data.', error))
+			.finally(() => {
+				if (this.#abort_controller === abort_controller) {
+					this.#abort_controller = null;
+				}
+			});
 	}
 }
