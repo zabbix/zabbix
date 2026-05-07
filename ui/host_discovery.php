@@ -674,8 +674,11 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryru
 			? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
 			: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
 
-		show_error_message($message);
+		CMessageHelper::setErrorTitle($message);
 	}
+
+	$response = new CControllerResponseRedirect($backurl);
+	$response->redirect();
 }
 elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdelete' && hasRequest('g_hostdruleid')) {
 	$result = API::DiscoveryRule()->delete(getRequest('g_hostdruleid'));
@@ -748,6 +751,7 @@ if (hasRequest('form')) {
 
 	$data = getItemFormData($item);
 
+	$data['form'] = getRequest('form');
 	$data['evaltype'] = getRequest('evaltype', CONDITION_EVAL_TYPE_AND_OR);
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = getRequest('conditions', []);
