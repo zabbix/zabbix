@@ -782,11 +782,11 @@ class CHistoryManager {
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
-			foreach ($this->getProviderItemPairs($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]) as $pair) {
-				[$storage_provider, $storage_items] = $pair;
+			foreach ($this->getProviderItemPairs($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]) as
+					[$storage_provider, $itemids_by_value_type]) {
 				/** @var CClickHouseStorage $storage_provider */
-				$results += $storage_provider->getAggregationByInterval($storage_items, $time_from, $time_to, $function,
-					$interval
+				$results += $storage_provider->getAggregationByInterval($itemids_by_value_type, $time_from, $time_to,
+					$function, $interval
 				);
 
 				if ($storage_provider->getErrorCode() !== null) {

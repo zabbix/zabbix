@@ -355,55 +355,78 @@ class CClickHouseStorage {
 	/**
 	 * @see CHistoryManager::getAggregationByInterval
 	 */
-	public function getAggregationByInterval(array $value_type_itemids, int $time_from, int $time_to, int $function,
+	public function getAggregationByInterval(array $itemids_by_value_type, int $time_from, int $time_to, int $function,
 			int $interval): array {
 		$result = [];
+		$time = time();
 
-		foreach ($value_type_itemids as $value_type => $itemids) {
+		foreach ($itemids_by_value_type as $value_type => $itemids) {
 			$table = $this->getTableName($value_type);
-			$values = $this->query(
-				'SELECT itemid,value,toUnixTimestamp(tick) AS tick,toUnixTimestamp(ts) AS clock,'.
-					'toUnixTimestamp64Nano(ts)%1000000000 AS ns'.
-					($function == AGGREGATE_AVG ? ',num': '').
-				' FROM ('.
-					'SELECT itemid,toStartOfInterval(clock_ns, toIntervalSecond({interval:UInt64})) AS tick,'.
-						match ($function) {
-							AGGREGATE_MIN	=> 'min(value) AS value,max(clock_ns) AS ts',
-							AGGREGATE_MAX	=> 'max(value) AS value,max(clock_ns) AS ts',
-							AGGREGATE_AVG	=> 'avg(value) AS value,max(clock_ns) AS ts,count(*) AS num',
-							AGGREGATE_COUNT	=> 'count() AS value,max(clock_ns) AS ts',
-							AGGREGATE_SUM	=> 'sum(value) AS value,max(clock_ns) AS ts',
-							AGGREGATE_FIRST	=> 'argMin(value, clock_ns) AS value,min(clock_ns) AS ts',
-							AGGREGATE_LAST	=> 'argMax(value, clock_ns) AS value,max(clock_ns) AS ts'
-						}.
-					' FROM '.$table.
-					' PREWHERE itemid IN {pre_itemids:Array(UInt64)}'.
-					' WHERE clock_ns>=toDateTime64({time_gte:UInt64},9)'.
-						' AND clock_ns<=addNanoseconds(toDateTime64({time_lte:UInt64},9),999999999)'.
-					' GROUP BY itemid,tick'.
-					' ORDER BY itemid,tick'.
-				')',
+			$itemids = array_keys($itemids);
+			$_time_from = $this->value_type_ttl[$value_type] !== null
+				? max($time_from, $time - $this->value_type_ttl[$value_type] + 1)
+				: $time_from;
+
+			$resource = $this->query(
+				'SELECT itemid,'.
+					'toUnixTimestamp(toStartOfInterval(clock_ns,toIntervalSecond({interval:UInt64}))) AS tick,'.
+					match ($function) {
+						AGGREGATE_MIN => 'min(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+						AGGREGATE_MAX => 'max(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+						AGGREGATE_AVG => 'avg(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock,count() AS num',
+						AGGREGATE_COUNT => 'count() AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+						AGGREGATE_SUM => 'sum(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+						AGGREGATE_FIRST => 'argMin(value,clock_ns) AS value,toUnixTimestamp(min(clock_ns)) AS clock,'.
+							'toUnixTimestamp64Nano(min(clock_ns))%1000000000 AS ns',
+						AGGREGATE_LAST => 'argMax(value,clock_ns) AS value,toUnixTimestamp(max(clock_ns)) AS clock,'.
+							'toUnixTimestamp64Nano(max(clock_ns))%1000000000 AS ns'
+					}.
+				' FROM '.$table.
+				' PREWHERE itemid IN {pre_itemids:Array(UInt64)}'.
+				' WHERE clock_ns BETWEEN toDateTime64({clock_ge:UInt64},9)'.
+					' AND addNanoseconds(toDateTime64({clock_le:UInt64},9),999999999)'.
+				' GROUP BY itemid,tick'.
+				' ORDER BY itemid,tick',
 				[
 					'UInt64' => [
-						'pre_itemids' => array_keys($itemids),
-						'time_gte' => $this->getTtlLimitedTimestamp($value_type, $time_from),
-						'time_lte' => $time_to,
+						'pre_itemids' => $itemids,
+						'clock_ge' => $_time_from,
+						'clock_le' => $time_to,
 						'interval' => $interval
 					]
 				]
 			);
 
-			if ($values === null || !$values) {
+			if ($resource === null) {
 				continue;
 			}
 
-			$result += array_fill_keys(array_column($values, 'itemid', 'itemid'),
-				['data' => [], 'source' => 'history']
-			);
-
-			foreach ($values as $value) {
-				$result[$value['itemid']]['data'][] = $value;
+			foreach ($resource as $row) {
+				$result[$row['itemid']]['data'][] = $row;
 			}
+
+			if ($function == AGGREGATE_COUNT) {
+				foreach ($itemids as $itemid) {
+					$db_ticks = array_key_exists($itemid, $result)
+						? array_column($result[$itemid]['data'], 'tick', 'tick')
+						: [];
+
+					for ($tick = $_time_from - $time_from % $interval; $tick <= $time_to; $tick += $interval) {
+						if (!array_key_exists($tick, $db_ticks)) {
+							$result[$itemid]['data'][] = [
+								'itemid' => (string) $itemid,
+								'tick' => (string) $tick,
+								'value' => '0',
+								'clock' => (string) $tick
+							];
+						}
+					}
+				}
+			}
+		}
+
+		foreach ($result as $itemid => $row) {
+			$result[$itemid] = ['source' => 'history'] + $row;
 		}
 
 		return $result;
