@@ -258,7 +258,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getLastValues
 	 */
-	private function getLastValuesFromElasticsearch($items, int $limit, ?int $period, ?int $length) {
+	private function getLastValuesFromElasticsearch(array $items, int $limit, ?int $period, ?int $length) {
 		$terms = [];
 		$results = [];
 		$filter = [];
@@ -397,7 +397,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getLastValues
 	 */
-	private function getLastValuesFromSql($items, int $limit, ?int $period, ?int $length) {
+	private function getLastValuesFromSql(array $items, int $limit, ?int $period, ?int $length) {
 		$results = [];
 		$value_expression = $length === null ? 'h.value' : dbSubstring('value', 1, $length);
 
