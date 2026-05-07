@@ -18,9 +18,6 @@
 #include "zbxjson.h"
 #include "zbxstr.h"
 
-ZBX_PTR_VECTOR_DECL(tq_condition_ptr, zbx_tq_condition_t *)
-ZBX_PTR_VECTOR_IMPL(tq_condition_ptr, zbx_tq_condition_t *)
-
 static int	tq_sql_is_escape_sequence_clickhoouse(char c)
 {
 	if ('\'' == c || '\\' == c || '"' == c)
@@ -162,12 +159,12 @@ static char	*tq_sql_dyn_escape_like_pattern(const char *src, zbx_tq_db_type_t db
 	char	*dst = zbx_malloc(NULL, len);
 	char	*d = dst;
 
-	for (const char	*t = tmp; '\0' != *t; t++)
+	for (const char	*p = tmp; '\0' != *p; p++)
 	{
-		if ('_' == *t || '%' == *t)
+		if ('_' == *p || '%' == *p)
 			*d++ = '\\';
 
-		*d++ = *t;
+		*d++ = *p;
 	}
 	*d = '\0';
 
@@ -503,27 +500,6 @@ static char	*tq_sql_dyn_get_conditions_simple(const zbx_tq_query_t *query, zbx_t
 	return str;
 }
 
-static int	tq_condition_ptr_compare_by_column_and_path(const void *a, const void *b)
-{
-	const zbx_tq_condition_t	*cond_a = *(const zbx_tq_condition_t * const *)a;
-	const zbx_tq_condition_t	*cond_b = *(const zbx_tq_condition_t * const *)b;
-
-	int	column_name_cmp_res = strcmp(cond_a->column_name, cond_b->column_name);
-
-	if (0 != column_name_cmp_res)
-		return column_name_cmp_res;
-
-	if (NULL == cond_a->json_path || NULL == cond_b->json_path)
-	{
-		if (cond_a->json_path != cond_b->json_path)
-			THIS_SHOULD_NEVER_HAPPEN;
-
-		return column_name_cmp_res;
-	}
-
-	return strcmp(cond_a->json_path, cond_b->json_path);
-}
-
 static char	*tq_sql_dyn_get_conditions_and_or(const zbx_tq_query_t *query, zbx_tq_db_type_t db_type)
 {
 	char				*str = NULL;
@@ -537,12 +513,7 @@ static char	*tq_sql_dyn_get_conditions_and_or(const zbx_tq_query_t *query, zbx_t
 		return zbx_strdup(NULL, "");
 	}
 
-	zbx_vector_tq_condition_ptr_create(&conditions_sorted);
-
-	for (int i = 0; i < query->conditions.values_num; i++)
-		zbx_vector_tq_condition_ptr_append(&conditions_sorted, &query->conditions.values[i]);
-
-	zbx_vector_tq_condition_ptr_sort(&conditions_sorted, tq_condition_ptr_compare_by_column_and_path);
+	tq_get_conditions_and_or_sorted(query, &conditions_sorted);
 
 	zbx_snprintf_alloc(&str, &alloc, &offset, "(");
 

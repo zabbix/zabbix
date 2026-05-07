@@ -140,7 +140,7 @@ int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_ve
 
 	if (SUCCEED != ret)
 	{
-		zbx_vector_str_clear(values);
+		zbx_vector_str_clear_ext(values, zbx_str_free);
 		zbx_vector_str_destroy(values);
 	}
 

@@ -23,6 +23,133 @@
 /* TODO: maybe this should be user-defined? or at least documented? */
 #define TQ_ELASTIC_MAX_BUCKETS 10000
 
+/******************************************************************************
+ *                                                                            *
+ * Return value: escaped and UNQUOTED string to use in a LIKE pattern         *
+ *                                                                            *
+ ******************************************************************************/
+static char	*tq_es_escape_wildcard_pattern_dyn(const char *src)
+{
+	size_t	len = strlen(src) + 1;
+
+	for (const char *p = src; '\0' != *p; p++)
+	{
+		if ('*' == *p || '?' == *p || '\\' == *p)
+			len++;
+	}
+
+	char	*dst = zbx_malloc(NULL, len);
+	char	*d = dst;
+
+	for (const char	*p = src; '\0' != *p; p++)
+	{
+		if ('*' == *p || '?' == *p || '\\' == *p)
+			*d++ = '\\';
+
+		*d++ = *p;
+	}
+	*d = '\0';
+
+	return dst;
+}
+
+static void	tq_es_add_condition(const zbx_tq_condition_t *cond, struct zbx_json *j)
+{
+	/* FIXME: with this, json_path must start with column name, this is likely not desired and $. should be used */
+	const char	*operand = NULL == cond->json_path ? cond->column_name : cond->json_path;
+
+	zbx_json_addobject(j, NULL);
+
+	if (ZBX_TQ_OPERATOR_NOT_EQUAL == cond->operator || ZBX_TQ_OPERATOR_NOT_CONTAINS == cond->operator)
+	{
+		zbx_json_addobject(j, "bool");
+		zbx_json_addobject(j, "must_not");
+	}
+
+	if (ZBX_TQ_OPERATOR_EQUAL == cond->operator || ZBX_TQ_OPERATOR_NOT_EQUAL == cond->operator)
+	{
+		zbx_json_addobject(j, "term");
+		zbx_json_addstring(j, operand, cond->value, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(j); /* term */
+	}
+	else /* contains or not contains */
+	{
+		char	*value_esc = tq_es_escape_wildcard_pattern_dyn(cond->value);
+		char	*pattern = zbx_dsprintf(NULL, "*%s*", value_esc);
+
+		/* TODO: remove this if in the final elastic index json keys are not flattened */
+		if (NULL != cond->json_path)
+			THIS_SHOULD_NEVER_HAPPEN; /* wildcard queries are not supported on flattened fields */
+
+		zbx_json_addobject(j, "wildcard");
+		zbx_json_addobject(j, operand);
+
+		zbx_json_addstring(j, "value", pattern, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(j, "case_insensitive", "false", ZBX_JSON_TYPE_FALSE);
+
+		zbx_json_close(j); /* operand */
+		zbx_json_close(j); /* wildcard */
+
+		zbx_free(value_esc);
+		zbx_free(pattern);
+	}
+
+	if (ZBX_TQ_OPERATOR_NOT_EQUAL == cond->operator || ZBX_TQ_OPERATOR_NOT_CONTAINS == cond->operator)
+	{
+		zbx_json_close(j); /* must_not */
+		zbx_json_close(j); /* bool */
+	}
+
+	zbx_json_close(j);
+}
+
+static void	tq_es_add_conditions_simple(const zbx_tq_query_t *query, struct zbx_json *j)
+{
+	zbx_json_addobject(j, NULL);
+	zbx_json_addobject(j, "bool");
+
+	if (ZBX_TQ_EVAL_TYPE_OR == query->evaltype)
+		zbx_json_adduint64(j, "minimum_should_match", 1);
+
+	/* AND and OR respectively */
+	zbx_json_addarray(j, ZBX_TQ_EVAL_TYPE_AND == query->evaltype ? "filter" : "should");
+
+	for (int i = 0; i < query->conditions.values_num; i++)
+	{
+		tq_es_add_condition(&query->conditions.values[i], j);
+	}
+
+	zbx_json_close(j); /* should or filter */
+	zbx_json_close(j); /* bool */
+	zbx_json_close(j);
+}
+
+static void	tq_es_add_conditions(const zbx_tq_query_t *query, struct zbx_json *j)
+{
+	if (0 == query->conditions.values_num)
+		return;
+
+	switch (query->evaltype)
+	{
+		case ZBX_TQ_EVAL_TYPE_AND:
+		case ZBX_TQ_EVAL_TYPE_OR:
+			tq_es_add_conditions_simple(query, j);
+			break;
+
+		case ZBX_TQ_EVAL_TYPE_AND_OR:
+			/* TODO */
+			break;
+
+		case ZBX_TQ_EVAL_TYPE_EXPRESSION:
+			/* TODO */
+			break;
+
+		case ZBX_TQ_EVAL_TYPE_UNKNOWN:
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+}
+
 static void	tq_es_add_query(const zbx_tq_query_t *query, struct zbx_json *j, time_t timestamp_lo,
 		time_t timestamp_hi)
 {
@@ -38,18 +165,15 @@ static void	tq_es_add_query(const zbx_tq_query_t *query, struct zbx_json *j, tim
 	zbx_json_adduint64(j, "lt", timestamp_hi);
 	zbx_json_addstring(j, "format", "epoch_second", ZBX_JSON_TYPE_STRING);
 
-	zbx_json_close(j);
-	zbx_json_close(j);
+	zbx_json_close(j); /* Timestamp */
+	zbx_json_close(j); /* range */
 	zbx_json_close(j);
 
-	if (0 != query->conditions.values_num)
-	{
-		/* TODO: add other filters */
-	}
+	tq_es_add_conditions(query, j);
 
-	zbx_json_close(j);
-	zbx_json_close(j);
-	zbx_json_close(j);
+	zbx_json_close(j); /* filter */
+	zbx_json_close(j); /* bool */
+	zbx_json_close(j); /* query */
 }
 
 static void	tq_es_add_columns(const zbx_vector_tq_column_t *cols, struct zbx_json *j, char *buf, size_t buf_size)
@@ -399,7 +523,7 @@ int	zbx_tq_elastic_parse_resp(const zbx_tq_query_t *query, const char *resp, zbx
 out:
 	if (SUCCEED != ret)
 	{
-		zbx_vector_str_clear(values);
+		zbx_vector_str_clear_ext(values, zbx_str_free);
 		zbx_vector_str_destroy(values);
 	}
 

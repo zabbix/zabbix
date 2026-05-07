@@ -29,5 +29,6 @@ void	tq_condition_clean(zbx_tq_condition_t *condition);
 
 int	tq_formula_constant_to_condition_idx(const char *p, int len);
 char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col);
+void	tq_get_conditions_and_or_sorted(const zbx_tq_query_t *query, zbx_vector_tq_condition_ptr_t *conditions_sorted);
 
 #endif

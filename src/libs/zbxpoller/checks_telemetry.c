@@ -91,8 +91,6 @@ static int	send_query_http(const zbx_tq_query_t *query, time_t now, time_t lastt
 	else
 		zbx_tq_generate_elastic(query, now, lasttimestamp, &posts);
 
-	zabbix_log(LOG_LEVEL_TRACE, "%s(): generated posts: '%s'", __func__, posts);
-
 	if (SUCCEED != send_query_http_raw(posts, conn_params, config_source_ip,
 			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &resp, error))
 		goto out;
@@ -128,7 +126,7 @@ static int get_value_telemetry_http(const zbx_dc_item_t *item, zbx_tq_db_type_t 
 	time_t			lasttimestamp;
 	zbx_vector_str_t	values;
 	char			*error = NULL;
-	char			*url;
+	char			*url = NULL;
 
 	/* FIXME: placeholder start */
 	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type)
@@ -168,7 +166,6 @@ static int get_value_telemetry_http(const zbx_dc_item_t *item, zbx_tq_db_type_t 
 			&values, &error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Query failed: '%s'", error));
-		error = NULL;
 		goto out;
 	}
 
@@ -182,11 +179,12 @@ static int get_value_telemetry_http(const zbx_dc_item_t *item, zbx_tq_db_type_t 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() no buckets, not setting value", __func__);
 	}
 
-	zbx_vector_str_clear(&values);
+	zbx_vector_str_clear_ext(&values, zbx_str_free);
 	zbx_vector_str_destroy(&values);
 
 	ret = SUCCEED;
 out:
+	zbx_free(url);
 	zbx_free(error);
 
 	return ret;

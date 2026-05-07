@@ -19,6 +19,7 @@
 ZBX_VECTOR_IMPL(tq_column, zbx_tq_column_t)
 ZBX_VECTOR_IMPL(tq_aggr_column, zbx_tq_aggr_column_t)
 ZBX_VECTOR_IMPL(tq_condition, zbx_tq_condition_t)
+ZBX_PTR_VECTOR_IMPL(tq_condition_ptr, zbx_tq_condition_t *)
 
 void	tq_query_init(zbx_tq_query_t *query)
 {
@@ -147,4 +148,35 @@ char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col)
 		return zbx_dsprintf(NULL, "%s.%s", col->name, col->key);
 	else
 		return zbx_strdup(NULL, col->name);
+}
+
+static int	tq_condition_ptr_compare_by_column_and_path(const void *a, const void *b)
+{
+	const zbx_tq_condition_t	*cond_a = *(const zbx_tq_condition_t * const *)a;
+	const zbx_tq_condition_t	*cond_b = *(const zbx_tq_condition_t * const *)b;
+
+	int	column_name_cmp_res = strcmp(cond_a->column_name, cond_b->column_name);
+
+	if (0 != column_name_cmp_res)
+		return column_name_cmp_res;
+
+	if (NULL == cond_a->json_path || NULL == cond_b->json_path)
+	{
+		if (cond_a->json_path != cond_b->json_path)
+			THIS_SHOULD_NEVER_HAPPEN;
+
+		return column_name_cmp_res;
+	}
+
+	return strcmp(cond_a->json_path, cond_b->json_path);
+}
+
+void	tq_get_conditions_and_or_sorted(const zbx_tq_query_t *query, zbx_vector_tq_condition_ptr_t *conditions_sorted)
+{
+	zbx_vector_tq_condition_ptr_create(conditions_sorted);
+
+	for (int i = 0; i < query->conditions.values_num; i++)
+		zbx_vector_tq_condition_ptr_append(conditions_sorted, &query->conditions.values[i]);
+
+	zbx_vector_tq_condition_ptr_sort(conditions_sorted, tq_condition_ptr_compare_by_column_and_path);
 }

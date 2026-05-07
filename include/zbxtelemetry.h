@@ -125,6 +125,8 @@ typedef enum zbx_tq_db_type
 }
 zbx_tq_db_type_t;
 
+ZBX_PTR_VECTOR_DECL(tq_condition_ptr, zbx_tq_condition_t *)
+
 int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query, zbx_tq_macro_expand_func_t macro_expand_cb,
 		void *macro_expand_ctx);
 void	zbx_tq_query_clean(zbx_tq_query_t *query);
