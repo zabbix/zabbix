@@ -88,6 +88,7 @@ window.item_edit_form = new class {
 
 		this.footer = this.overlay.$dialogue.$footer[0];
 		this.tags_table = this.form_element.querySelector('.tags-table');
+		this.tags_abort_controller = null;
 
 		ZABBIX.PopupManager.setReturnUrl(return_url);
 
@@ -644,16 +645,25 @@ window.item_edit_form = new class {
 			show_inherited_tags,
 			itemid: fields.itemid,
 			hostid: fields.hostid
-		}
+		};
 
 		const url = new Curl('zabbix.php');
 		url.setArgument('action', 'item.tags.list');
+
+		if (this.tags_abort_controller !== null) {
+			this.tags_abort_controller.abort();
+		}
+
+		const abort_controller = new AbortController();
+		this.tags_abort_controller = abort_controller;
+
 		this.overlay.setLoading();
 
 		fetch(url.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
+			body: JSON.stringify(data),
+			signal: abort_controller.signal
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -664,11 +674,20 @@ window.item_edit_form = new class {
 				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
 			})
 			.catch((message) => {
+				if (abort_controller.signal.aborted) {
+					return;
+				}
+
 				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});
 				this.form.renderErrors();
 				throw message;
 			})
 			.finally(() => {
+				if (this.tags_abort_controller !== abort_controller) {
+					return;
+				}
+
+				this.tags_abort_controller = null;
 				this.overlay.unsetLoading();
 				this.#updateActionButtons();
 			});
