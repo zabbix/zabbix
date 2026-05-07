@@ -837,6 +837,7 @@ static void	vmware_alarm_free(zbx_vmware_alarm_t *alarm)
 	zbx_str_free(alarm->entity_id);
 	zbx_str_free(alarm->entity_uuid);
 	zbx_str_free(alarm->entity_type);
+	zbx_str_free(alarm->entity_name);
 	zbx_free(alarm);
 }
 
@@ -1470,7 +1471,7 @@ clean:
  * Parameters: data - [IN] all collected data                                 *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_service_alarm_uuid_update(zbx_vmware_data_t *data)
+static void	vmware_service_alarm_uuid_name_update(zbx_vmware_data_t *data)
 {
 	int	i, skipped = 0;
 
@@ -1481,6 +1482,7 @@ static void	vmware_service_alarm_uuid_update(zbx_vmware_data_t *data)
 		zbx_vmware_alarm_t	*alarm = data->alarms.values[i];
 
 		alarm->entity_uuid = NULL;	/* we can't guarantee that we will find any uuid */
+		alarm->entity_name = NULL;
 
 		if (NULL == alarm->entity_id)
 			continue;
@@ -1508,6 +1510,8 @@ static void	vmware_service_alarm_uuid_update(zbx_vmware_data_t *data)
 					}
 
 					alarm->entity_uuid = zbx_strdup(NULL, vm->uuid);
+					alarm->entity_name = zbx_strdup(NULL,
+							ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_NAME]));
 					break;
 				}
 
@@ -1532,6 +1536,8 @@ static void	vmware_service_alarm_uuid_update(zbx_vmware_data_t *data)
 				}
 
 				alarm->entity_uuid = zbx_strdup(NULL, hv->uuid);
+				alarm->entity_name = zbx_strdup(NULL,
+						ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NAME]));
 				break;
 			}
 		}
@@ -1551,6 +1557,7 @@ static void	vmware_service_alarm_uuid_update(zbx_vmware_data_t *data)
 			}
 
 			alarm->entity_uuid = zbx_strdup(NULL, data->datastores.values[j]->uuid);
+			alarm->entity_name = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(data->datastores.values[j]->name));
 		}
 		else
 		{
@@ -2808,7 +2815,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	vmware_service_props_load(easyhandle, get_vmware_service_objects()[service->type].property_collector,
 			&prop_query_values);
 	zbx_vector_vmware_alarm_ptr_sort(&data->alarms, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
-	vmware_service_alarm_uuid_update(data);
+	vmware_service_alarm_uuid_name_update(data);
 
 	if (ZBX_VMWARE_TYPE_VCENTER != service->type)
 	{
