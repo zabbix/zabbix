@@ -655,14 +655,14 @@ class CHistoryManager {
 		$time_from = $clock - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 
 		if ($hk_history_global == 1) {
-			$time_from = max($time_from, time() - $hk_history + 1);
+			$time_from = max($time_from, time() - $hk_history);
 		}
 
 		$sql = 'SELECT *'.
 			' FROM '.$history_table.
 			' WHERE itemid='.zbx_dbstr($item['itemid']).
 				' AND clock<'.zbx_dbstr($clock).
-				' AND clock>='.zbx_dbstr($time_from).
+				' AND clock>'.zbx_dbstr($time_from).
 			' ORDER BY clock DESC,ns DESC';
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {

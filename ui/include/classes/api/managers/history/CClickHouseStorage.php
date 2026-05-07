@@ -85,6 +85,8 @@ class CClickHouseStorage {
 	 */
 	private array $value_type_ttl = [];
 
+	private const OP = ['ge' => '>=', 'gt' => '>', 'le' => '<=', 'lt' => '<'];
+
 	public function __construct(array $config, array $value_type_ttl) {
 		$_value_type_ttl = array_fill_keys($config['types'], null);
 		$this->value_type_ttl = array_replace($_value_type_ttl, array_intersect_key($value_type_ttl, $_value_type_ttl));
@@ -249,14 +251,14 @@ class CClickHouseStorage {
 			}
 
 			if ($time_from !== null) {
-				$time_from = $time - $time_from + 1;
+				$time_from = $time - $time_from;
 			}
 
 			$resource = $this->select([
 				'output' => ['itemid'],
 				'itemids' => array_keys($itemids),
 				'history' => $value_type,
-				'time_from' => $time_from,
+				'clock' => ['gt' => $time_from],
 				'limit_by' => [1, 'itemid']
 			]);
 
@@ -287,7 +289,7 @@ class CClickHouseStorage {
 			}
 
 			if ($time_from !== null) {
-				$time_from = $time - $time_from + 1;
+				$time_from = $time - $time_from;
 			}
 
 			$fields = array_keys(self::VALUE_TYPE_SCHEMA[$value_type]);
@@ -299,7 +301,7 @@ class CClickHouseStorage {
 				'maxValueSize' => $length,
 				'itemids' => array_keys($itemids),
 				'history' => $value_type,
-				'time_from' => $time_from,
+				'clock' => ['gt' => $time_from],
 				'sortfield' => 'clock',
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit_by' => [$limit, 'itemid']
@@ -331,7 +333,7 @@ class CClickHouseStorage {
 		$time_from = $clock - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 
 		if ($this->value_type_ttl[$value_type] !== null) {
-			$time_from = max($time_from, $time - $this->value_type_ttl[$value_type] + 1);
+			$time_from = max($time_from, $time - $this->value_type_ttl[$value_type]);
 		}
 
 		$fields = array_keys(self::VALUE_TYPE_SCHEMA[$value_type]);
@@ -342,8 +344,8 @@ class CClickHouseStorage {
 			'output' => $fields,
 			'itemids' => [$item['itemid']],
 			'history' => $value_type,
-			'time_from' => $time_from,
-			'clock_ns_till' => ['clock' => $clock, 'ns' => $ns],
+			'clock' => ['gt' => $time_from],
+			'clock_ns' => ['le' => ['clock' => $clock, 'ns' => $ns]],
 			'sortfield' => 'clock_ns',
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => 1
@@ -707,9 +709,8 @@ class CClickHouseStorage {
 		$options = array_replace([
 			'output' => ['itemid'],
 			'itemids' => null,
-			'time_from' => null,
-			'time_till' => null,
-			'clock_ns_till' => null,
+			'clock' => null,
+			'clock_ns' => null,
 			'filter' => null,
 			'search' => null,
 			'searchByAny' => false,
@@ -756,22 +757,22 @@ class CClickHouseStorage {
 				: 'itemid={pre_itemids:UInt64}';
 		}
 
-		if ($options['time_from'] !== null) {
-			$time_from = $this->getTtlLimitedTimestamp($options['history'], (int) $options['time_from']);
-			$sql_parts['param']['UInt64']['pre_time_gte'] = $time_from;
-			$sql_parts['prewhere']['pre_time_gte'] = 'clock_ns>=toDateTime64({pre_time_gte:UInt64},9)';
+		if ($options['clock'] !== null) {
+			foreach ($options['clock'] as $op => $value) {
+				$param = 'pre_clock_'.$op;
+				$sql_parts['param']['UInt64'][$param] = $value;
+				$sql_parts['prewhere'][$param] = 'clock_ns'.self::OP[$op].'toDateTime64({'.$param.':UInt64},9)';
+			}
 		}
 
-		if ($options['time_till'] !== null) {
-			$sql_parts['param']['UInt64']['pre_time_lte'] = (int) $options['time_till'];
-			$sql_parts['prewhere']['pre_time_lte'] = 'clock_ns<=addNanoseconds(toDateTime64({pre_time_lte:UInt64},9),999999999)';
-		}
-
-		if ($options['clock_ns_till'] !== null) {
-			$sql_parts['param']['UInt64']['pre_clock_lte'] = $options['clock_ns_till']['clock'];
-			$sql_parts['param']['UInt64']['pre_ns_lte'] = $options['clock_ns_till']['ns'];
-			$sql_parts['prewhere']['pre_clock_ns_lte'] =
-				'clock_ns<=addNanoseconds(toDateTime64({pre_clock_lte:UInt64},9),{pre_ns_lte:UInt64})';
+		if ($options['clock_ns'] !== null) {
+			foreach ($options['clock_ns'] as $op => $value) {
+				$param = 'pre_clock_ns_'.$op;
+				$sql_parts['param']['UInt64'][$param.'_clock'] = $value['clock'];
+				$sql_parts['param']['UInt64'][$param.'_ns'] = $value['ns'];
+				$sql_parts['prewhere'][$param] = 'clock_ns'.self::OP[$op].
+					'addNanoseconds(toDateTime64({'.$param.'_clock'.':UInt64},9),{'.$param.'_ns'.':UInt64})';
+			}
 		}
 
 		if (is_array($options['filter']) && $options['filter']) {
@@ -906,7 +907,7 @@ class CClickHouseStorage {
 		 * PREWHERE by max/min clock. If filter do not contain 'clock' PREWHERE is added within current timestamp
 		 */
 		$clock_fields = array_intersect_key($options['filter'], array_flip(['clock', 'ns']));
-		if ($clock_fields && $options['time_from'] === null && $options['time_till'] === null) {
+		if ($clock_fields && $options['clock'] === null) {
 			$clock = array_key_exists('clock', $clock_fields) ? $clock_fields['clock'] : time();
 			$sql_parts['param']['UInt64']['pre_time_gte'] = is_array($clock) ? min($clock) : $clock;
 			$sql_parts['param']['UInt64']['pre_time_lte'] = is_array($clock) ? max($clock) : $clock;
