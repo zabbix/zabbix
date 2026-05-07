@@ -32,9 +32,9 @@ if ($data['form_refresh'] == 0) {
 }
 
 $url = (new CUrl('sysmaps.php'))
-	->setArgument('form', getRequest('form') === 'create' ? 'create' : 'update');
+	->setArgument('form', $data['form'] === 'create' ? 'create' : 'update');
 
-if (getRequest('form') !== 'create') {
+if ($data['form'] !== 'create') {
 	$url->setArgument('sysmapid', $data['sysmap']['sysmapid']);
 }
 
@@ -80,16 +80,28 @@ $multiselect_data = [
 $map_ownerid = $data['sysmap']['userid'];
 
 if ($map_ownerid != 0) {
-	$multiselect_data['data'][] = array_key_exists($map_ownerid, $data['users'])
-		? [
-			'id' => $map_ownerid,
-			'name' => getUserFullname($data['users'][$map_ownerid])
-		]
-		: [
-			'id' => $map_ownerid,
-			'name' => _('Inaccessible user'),
-			'inaccessible' => true
+	$is_owner_accessible = array_key_exists($map_ownerid, $data['users']);
+
+	if ($data['form'] == 'clone' && !$is_owner_accessible) {
+		$user_id = $data['current_user_userid'];
+
+		$multiselect_data['data'][] = [
+			'id' => $user_id,
+			'name' => getUserFullname($data['users'][$user_id])
 		];
+	}
+	else {
+		$multiselect_data['data'][] = $is_owner_accessible
+			? [
+				'id' => $map_ownerid,
+				'name' => getUserFullname($data['users'][$map_ownerid])
+			]
+			: [
+				'id' => $map_ownerid,
+				'name' => _('Inaccessible user'),
+				'inaccessible' => true
+			];
+	}
 }
 
 // Append multiselect to map tab.
@@ -445,7 +457,7 @@ $sharing_tab = (new CFormList('sharing_form'))
 $tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab, TAB_INDICATOR_SHARING);
 
 // Append buttons to form.
-if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !== 'clone') {
+if ($data['sysmap']['sysmapid'] > 0 && $data['form'] !== 'clone') {
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
