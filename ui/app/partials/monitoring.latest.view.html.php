@@ -198,7 +198,7 @@ foreach ($data['items'] as $itemid => $item) {
 		$item_history = (new CSpan($item['history']))->addClass(ZBX_STYLE_RED);
 	}
 
-	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+	if (in_array($item['value_type'], $data['config']['hk_trends_value_types'])) {
 		if ($data['config']['hk_trends_global']) {
 			$keep_trends = timeUnitToSeconds($data['config']['hk_trends']);
 			$item_trends = $data['config']['hk_trends'];

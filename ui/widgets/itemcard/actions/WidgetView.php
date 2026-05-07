@@ -400,7 +400,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$item['history'] = '';
 		}
 
-		if (in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+		if (in_array($item['value_type'], CHousekeepingHelper::getValueTypesWithTrends())) {
 			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
 				$hk_trends = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS);
 

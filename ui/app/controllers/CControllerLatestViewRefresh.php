@@ -96,6 +96,7 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 					'sort_order' => $filter['sortorder'],
 					'paging' => $paging,
 					'config' => [
+						'hk_trends_value_types' => CHousekeepingHelper::getValueTypesWithTrends(),
 						'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
 						'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
 						'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
