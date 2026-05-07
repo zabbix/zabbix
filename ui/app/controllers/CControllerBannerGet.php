@@ -51,7 +51,6 @@ class CControllerBannerGet extends CController {
 			}
 			else {
 				$output += [
-					'language' => CWebUser::$data['lang'],
 					'csrf_token' => CCsrfTokenHelper::get('banner')
 				];
 
@@ -62,8 +61,9 @@ class CControllerBannerGet extends CController {
 		}
 
 		$output += [
-			'storage_idx' => 'web.banner.dismissed_ids',
-			'dismissed_banner_ids' => json_decode(CProfile::get('web.banner.dismissed_ids', '[]'), true)
+			'dismissed_banner_ids' => json_decode(CProfile::get('web.banner.dismissed_ids', '[]'), true),
+			'language' => CWebUser::$data['lang'],
+			'storage_idx' => 'web.banner.dismissed_ids'
 		];
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

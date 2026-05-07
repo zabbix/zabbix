@@ -689,7 +689,7 @@ class CDashboardHelper {
 	public static function getWidgetLastType(): ?string {
 		$known_widgets = APP::ModuleManager()->getWidgets();
 
-		$widget_last_type = CProfile::get('web.dashboard.last_widget_type', '');
+		$widget_last_type = CProfile::get('web.dashboard.last_widget_type');
 
 		if ($widget_last_type === null || !array_key_exists($widget_last_type, $known_widgets)) {
 			$current_types = [];

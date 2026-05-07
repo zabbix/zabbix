@@ -22,7 +22,7 @@ class CBanner {
 	static CONTENT_LANG_ALL = 'all';
 	static RESPONSE_DEFAULTS = {
 		allow_banners: true,
-		language: 'en_US',
+		language: CBanner.CONTENT_LANG_ALL,
 		storage_idx: null,
 		dismissed_banner_ids: [],
 		banners: []
