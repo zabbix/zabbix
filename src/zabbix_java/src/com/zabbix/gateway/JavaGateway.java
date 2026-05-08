@@ -61,7 +61,9 @@ public class JavaGateway
 			ConfigurationManager.parseConfiguration();
 
 			String serverList = (String)ConfigurationManager.getParameter(ConfigurationManager.SERVER).getValue();
-			AllowedPeers allowedPeers = AllowedPeers.parse(serverList);
+			int timeout = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.TIMEOUT);
+			AllowedPeers allowedPeers = AllowedPeers.parse(serverList, timeout);
+
 			if (allowedPeers.isEmpty())
 				logger.warn("allowed hosts list is empty (or has no valid entries); all incoming connections will be rejected");
 			else
