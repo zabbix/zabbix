@@ -132,7 +132,8 @@ $html_page = (new CHtmlPage())
 				(new CTag('nav', true, new CList([
 					(new CButton('dashboard-config'))
 						->addClass(ZBX_STYLE_BTN_ICON)
-						->addClass(ZBX_ICON_COG_FILLED),
+						->addClass(ZBX_ICON_COG_FILLED)
+						->setAttribute('aria-label', _('Dashboard properties')),
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
 						->addItem(
