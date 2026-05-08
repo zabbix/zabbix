@@ -7763,6 +7763,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   margin: 10px;
   background-color: #fcf7c2;
   border: 1px solid #dfe4e7; }
+  .debug-output.debug-output-table-refresh {
+    margin: 10px 0 0 0; }
 
 .overlay-descr {
   max-height: 150px;
