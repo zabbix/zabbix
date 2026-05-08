@@ -56,7 +56,9 @@ class CElasticsearchHelper {
 			error($e->getMessage());
 		}
 
-		CProfiler::getInstance()->profileElasticsearch(microtime(true) - $time_start, $request);
+		CProfiler::getInstance()->profileElasticsearch(microtime(true) - $time_start,
+			parse_url($endpoint, PHP_URL_PATH).' '.$request
+		);
 
 		return $result;
 	}
