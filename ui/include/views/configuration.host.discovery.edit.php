@@ -32,14 +32,14 @@ $url = (new CUrl('host_discovery.php'))
 	->setArgument('form', getRequest('form') === 'create' ? 'create' : 'update')
 	->setArgument('context', $data['context']);
 
-if(getRequest('form') !== 'create') {
+if (getRequest('form') !== 'create') {
 	$url->setArgument('itemid', $data['itemid']);
 }
 else {
 	$url->setArgument('hostid', $data['hostid']);
 }
 
-if(hasRequest('master_itemid') && hasRequest('hostid') && hasRequest('backurl')) {
+if (hasRequest('master_itemid') && hasRequest('hostid') && hasRequest('backurl')) {
 	$url->setArgument('hostid', getRequest('hostid'))
 		->setArgument('master_itemid', getRequest('master_itemid'))
 		->setArgument('backurl', getRequest('backurl'));
@@ -77,7 +77,7 @@ if (array_key_exists('discoveryRule', $data)) {
 	]);
 }
 
-if (!empty($data['templates'])) {
+if (!empty($data['templates']) && $data['form'] !== 'clone') {
 	$item_tab->addItem([
 		new CLabel(_('Parent discovery rules')),
 		new CFormField($data['templates'])
