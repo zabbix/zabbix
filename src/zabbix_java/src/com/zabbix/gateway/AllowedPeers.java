@@ -16,8 +16,22 @@ package com.zabbix.gateway;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.xbill.DNS.Cache;
+import org.xbill.DNS.AAAARecord;
+import org.xbill.DNS.ARecord;
+import org.xbill.DNS.Lookup;
+import org.xbill.DNS.Record;
+import org.xbill.DNS.Resolver;
+import org.xbill.DNS.SimpleResolver;
+import org.xbill.DNS.TextParseException;
+import org.xbill.DNS.Type;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,14 +45,121 @@ import org.slf4j.LoggerFactory;
 class AllowedPeers
 {
 	private static final Logger logger = LoggerFactory.getLogger(AllowedPeers.class);
-	private final List<Entry> entries = new ArrayList<Entry>();
+	private static final long DNS_WARN_LIMIT_MS = 60L * 1000L;
 
-	private AllowedPeers()
+	interface HostResolver
 	{
+		InetAddress[] resolve(String host) throws UnknownHostException;
+	}
+
+	private static HostResolver createDnsJavaResolver(int timeoutSeconds)
+	{
+		final Resolver r;
+		final Cache cacheA;
+		final Cache cacheAAAA;
+
+		try
+		{
+			r = new SimpleResolver();
+			r.setTimeout(Duration.ofSeconds(timeoutSeconds));
+			cacheA = new Cache();
+			cacheAAAA = new Cache();
+		}
+		catch (Exception e)
+		{
+			logger.warn("failed to initialize DNS resolver: {}", e.getMessage());
+			return new DnsJavaResolver(null, null, null);
+		}
+
+		return new DnsJavaResolver(r, cacheA, cacheAAAA);
+	}
+
+	private static final class DnsJavaResolver implements HostResolver
+	{
+		private final Resolver resolver;
+		private final Cache cacheA;
+		private final Cache cacheAAAA;
+
+		DnsJavaResolver(Resolver resolver, Cache cacheA, Cache cacheAAAA)
+		{
+			this.resolver = resolver;
+			this.cacheA = cacheA;
+			this.cacheAAAA = cacheAAAA;
+		}
+
+		@Override
+		public InetAddress[] resolve(String host) throws UnknownHostException
+		{
+			List<InetAddress> out = new ArrayList<InetAddress>(4);
+
+			resolveDnsType(host, Type.A, cacheA, out);
+			resolveDnsType(host, Type.AAAA, cacheAAAA, out);
+
+			if (out.isEmpty())
+				throw new UnknownHostException(host);
+
+			return out.toArray(new InetAddress[out.size()]);
+		}
+
+		private void resolveDnsType(String host, int type, Cache cache, List<InetAddress> out) throws UnknownHostException
+		{
+			Lookup l;
+
+			try
+			{
+				l = new Lookup(host, type);
+			}
+			catch (TextParseException e)
+			{
+				UnknownHostException uhe = new UnknownHostException(host);
+				uhe.initCause(e);
+				throw uhe;
+			}
+
+			if (null != resolver)
+				l.setResolver(resolver);
+
+			if (null != cache)
+				l.setCache(cache);
+
+			Record[] records = l.run();
+
+			if (null == records)
+			{
+				return;
+			}
+
+			for (Record rec : records)
+			{
+				try
+				{
+					if (rec instanceof ARecord)
+						out.add(((ARecord)rec).getAddress());
+					else if (rec instanceof AAAARecord)
+						out.add(((AAAARecord)rec).getAddress());
+				}
+				catch (Exception e)
+				{
+					/* ignore malformed record */
+				}
+			}
+		}
+	}
+
+	private final List<Entry> staticEntries = new ArrayList<Entry>();
+	private final List<String> dnsHosts = new ArrayList<String>();
+	private final Map<String, Long> dnsWarnAtMs = new ConcurrentHashMap<String, Long>();
+	private final HostResolver resolver;
+
+	private AllowedPeers(HostResolver resolver)
+	{
+		this.resolver = resolver;
 	}
 
 	/**
-	 * Parse allow-list behaviour:
+	 * Parse allow-list specification.
+	 *
+	 * Behaviour:
 	 * - invalid / unresolvable tokens are ignored (with a warning)
 	 * - empty / fully invalid list results in an allow-list that matches nothing
 	 *
@@ -46,10 +167,25 @@ class AllowedPeers
 	 */
 	static AllowedPeers parse(String spec)
 	{
+		return parse(spec, 3);
+	}
+
+	/**
+	 * Parse allow-list specification with DNS resolve timeout.
+	 *
+	 * @param dnsResolveTimeoutSeconds maximum time to wait for a DNS resolution attempt.
+	 */
+	static AllowedPeers parse(String spec, int dnsResolveTimeoutSeconds)
+	{
+		return parseForTest(spec, createDnsJavaResolver(dnsResolveTimeoutSeconds));
+	}
+
+	static AllowedPeers parseForTest(String spec, HostResolver resolver)
+	{
 		if (null == spec)
 			throw new IllegalArgumentException("allowed hosts list is null");
 
-		AllowedPeers ap = new AllowedPeers();
+		AllowedPeers ap = new AllowedPeers(resolver);
 
 		for (String raw : spec.split(","))
 		{
@@ -76,15 +212,18 @@ class AllowedPeers
 					if (prefix < 0 || prefix > max)
 						throw new IllegalArgumentException("CIDR prefix out of range: " + prefix);
 
-					ap.entries.add(new Entry(base.getAddress(), prefix));
+					ap.staticEntries.add(new Entry(base.getAddress(), prefix));
 				}
 				else
 				{
-					for (InetAddress a : InetAddress.getAllByName(item))
+					if (looksLikeIpLiteral(item))
 					{
+						InetAddress a = InetAddress.getByName(item);
 						byte[] bytes = a.getAddress();
-						ap.entries.add(new Entry(bytes, bytes.length * 8));
+						ap.staticEntries.add(new Entry(bytes, bytes.length * 8));
 					}
+					else
+						ap.dnsHosts.add(item);
 				}
 			}
 			catch (UnknownHostException e)
@@ -106,7 +245,7 @@ class AllowedPeers
 
 	boolean isEmpty()
 	{
-		return entries.isEmpty();
+		return staticEntries.isEmpty() && dnsHosts.isEmpty();
 	}
 
 	/** @return true if {@code peer} is permitted by the allow-list. */
@@ -117,13 +256,67 @@ class AllowedPeers
 
 		byte[] target = peer.getAddress();
 
-		for (Entry e : entries)
+		for (Entry e : staticEntries)
 		{
 			if (e.matches(target))
 				return true;
 		}
 
+		for (String host : dnsHosts)
+		{
+			for (Entry e : getDnsEntries(host))
+			{
+				if (e.matches(target))
+					return true;
+			}
+		}
+
 		return false;
+	}
+
+	private List<Entry> getDnsEntries(String host)
+	{
+		try
+		{
+			InetAddress[] addrs = resolver.resolve(host);
+			List<Entry> resolved = new ArrayList<Entry>(addrs.length);
+
+			for (InetAddress a : addrs)
+			{
+				byte[] bytes = a.getAddress();
+				resolved.add(new Entry(bytes, bytes.length * 8));
+			}
+
+			return Collections.unmodifiableList(resolved);
+		}
+		catch (UnknownHostException e)
+		{
+			warnDnsOnce(host, "cannot resolve");
+			return Collections.emptyList();
+		}
+		catch (Exception e)
+		{
+			warnDnsOnce(host, e.getMessage());
+			return Collections.emptyList();
+		}
+	}
+
+	private void warnDnsOnce(String host, String reason)
+	{
+		final long now = System.currentTimeMillis();
+		final boolean[] shouldLog = {false};
+
+		dnsWarnAtMs.compute(host, (k, last) -> {
+			if (null == last || now - last.longValue() >= DNS_WARN_LIMIT_MS)
+			{
+				shouldLog[0] = true;
+				return now;
+			}
+			return last;
+		});
+
+		if (shouldLog[0])
+			logger.warn("cannot resolve SERVER host '{}': {}", host, reason);
 	}
 
 	private static boolean looksLikeIpLiteral(String s)
@@ -175,6 +368,7 @@ class AllowedPeers
 
 		boolean matches(byte[] target)
 		{
+			// Cross-family: align IPv4 and IPv4-in-IPv6 (mapped or compatible) against each other.
 			if (target.length != network.length)
 			{
 				if (4 == target.length && 16 == network.length)
@@ -184,7 +378,7 @@ class AllowedPeers
 					else if (isIPv4Compatible(network))
 						target = toIPv4Compatible(target);
 					else
-						target = toIPv4Mapped(target);
+						return false;
 				}
 				else if (16 == target.length && 4 == network.length && (isIPv4Mapped(target) || isIPv4Compatible(target)))
 					target = new byte[]{target[12], target[13], target[14], target[15]};
