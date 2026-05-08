@@ -208,16 +208,16 @@ class CClickHouseStorage {
 	/**
 	 * @see CHistoryManager::deleteHistory
 	 */
-	public function delete(array $itemid_value_type): bool {
+	public function deleteHistory(array $itemid_value_type): bool {
 		foreach (array_keys($this->value_type_ttl) as $value_type) {
+			$table = $this->getTableName($value_type);
 			$itemids = array_keys($itemid_value_type, $value_type);
 
 			if (!$itemids) {
 				continue;
 			}
 
-			$table = $this->getTableName($value_type);
-			$result = $this->query(
+			$resource = $this->query(
 				'ALTER TABLE '.$table.' DELETE WHERE itemid IN {itemids:Array(UInt64)}',
 				[
 					'UInt64' => [
@@ -226,7 +226,7 @@ class CClickHouseStorage {
 				]
 			);
 
-			if ($result === null) {
+			if ($resource === null) {
 				return false;
 			}
 		}
