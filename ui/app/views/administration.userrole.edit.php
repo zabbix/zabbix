@@ -387,7 +387,7 @@ if (CTemporaryMobileFeatureHelper::isEnabled()) {
 	$form_grid
 		->addItem(
 			new CFormField(
-				(new CTag('h4', true, _('Access from linked devices')))->addClass('input-section-header')
+				(new CTag('h4', true, _('Devices')))->addClass('input-section-header')
 			)
 		)
 		->addItem([
@@ -398,6 +398,7 @@ if (CTemporaryMobileFeatureHelper::isEnabled()) {
 					->setChecked($data['rules'][CRoleHelper::DEVICES_ACCESS])
 					->setReadonly($data['readonly'])
 					->setUncheckedValue(0)
+					->addClass('js-checkbox-changes-ui')
 			)
 		]);
 
@@ -411,6 +412,7 @@ if (CTemporaryMobileFeatureHelper::isEnabled()) {
 				)
 				->setReadonly($data['readonly'])
 				->setLabel($label)
+				->addClass('js-checkbox-changes-ui')
 		))
 			->addClass(ZBX_STYLE_NOWRAP);
 	}

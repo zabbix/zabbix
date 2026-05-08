@@ -53,13 +53,11 @@
 				.getElementById('service-write-access')
 				.addEventListener('change', () => this.serviceWriteAccessChange());
 
-			const devices_access_checkbox = document.getElementById('devices.access');
-
-			if (devices_access_checkbox !== null) {
-				devices_access_checkbox.addEventListener('change', () => {
+			this.form_element.querySelectorAll('.js-checkbox-changes-ui').forEach((checkbox) => {
+				checkbox.addEventListener('change', () => {
 					this.updateAccessUiElementsFieldsGroup(this.form.findFieldByName('type').getValue());
 				});
-			}
+			})
 
 			this.updateServicesWriteAccessFields();
 
@@ -190,13 +188,17 @@
 				}
 			}
 
-			if (this.form.findFieldByName('devices_access')?.getValue() == 0) {
-				const checkbox = document.getElementById('devices.actions.manage_own');
+			const device_manage_own_checkbox = document.getElementById('devices.actions.manage_own');
 
-				if (checkbox) {
-					checkbox.checked = false;
-					checkbox.readOnly = true;
-				}
+			if (this.form.findFieldByName('devices_access')?.getValue() == 0 && device_manage_own_checkbox) {
+				device_manage_own_checkbox.checked = false;
+				device_manage_own_checkbox.readOnly = true;
+			}
+
+			if (device_manage_own_checkbox && !device_manage_own_checkbox.checked) {
+				const device_manage_user_checkbox = document.getElementById('devices.actions.manage_user');
+				device_manage_user_checkbox.checked = false;
+				device_manage_user_checkbox.readOnly = true;
 			}
 
 			const access_max = <?= json_encode([
