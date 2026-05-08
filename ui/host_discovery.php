@@ -37,7 +37,7 @@ $evalTypes = [
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && !isset({itemid})'],
-	'itemid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'],
+	'itemid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update" || {form} == "clone"))'],
 	'interfaceid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null, _('Interface')],
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'description' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
@@ -285,6 +285,16 @@ unset($_REQUEST[$paramsFieldName]);
 /*
  * Permissions
  */
+if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
+	access_deny();
+}
+elseif (hasRequest('backurl')) {
+	$backurl = new CUrl(getRequest('backurl'));
+}
+else {
+	$backurl = (new CUrl('host_discovery.php'))->setArgument('context', getRequest('context'));
+}
+
 $itemid = getRequest('itemid');
 
 if ($itemid) {
@@ -296,6 +306,7 @@ if ($itemid) {
 	]);
 
 	if (!$items) {
+		zbx_add_post_js("history.replaceState({}, '');");
 		access_deny();
 	}
 
@@ -316,11 +327,6 @@ else {
 			access_deny();
 		}
 	}
-}
-
-// Validate backurl.
-if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
-	access_deny();
 }
 
 $prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
@@ -597,7 +603,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		if (!hasErrorMessages()) {
 			if (hasRequest('add')) {
-				$item = ['hostid' => $hostid];
+				$item = ['hostid' => getRequest('hostid')];
 
 				$item += getSanitizedItemFields($input + [
 						'templateid' => 0,
@@ -630,31 +636,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$result = false;
 	}
 
-	if (hasRequest('add')) {
-		if ($result) {
-			CMessageHelper::setSuccessTitle(_('Discovery rule created'));
-		}
-		else {
-			CMessageHelper::setErrorTitle(_('Cannot add discovery rule'));
-		}
-	}
-	else {
-		if ($result) {
-			CMessageHelper::setSuccessTitle(_('Discovery rule updated'));
-		}
-		else {
-			CMessageHelper::setErrorTitle(_('Cannot update discovery rule'));
-		}
-	}
-
 	if ($result) {
-		unset($_REQUEST['itemid'], $_REQUEST['form']);
+		$message_success = hasRequest('add') ? _('Discovery rule created') : _('Discovery rule updated');
+		CMessageHelper::setSuccessTitle($message_success);
+
 		uncheckTableRows($checkbox_hash);
 
-		if (hasRequest('backurl')) {
-			$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
-			$response->redirect();
-		}
+		$response = new CControllerResponseRedirect($backurl);
+		$response->redirect();
+	}
+	else {
+		$message_failed = hasRequest('add') ? _('Cannot add discovery rule') : _('Cannot update discovery rule');
+		show_error_message($message_failed);
 	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryrule.massenable', 'discoveryrule.massdisable']) && hasRequest('g_hostdruleid')) {
@@ -684,12 +677,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryru
 			? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
 			: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
 
-		CMessageHelper::setErrorTitle($message);
-	}
-
-	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
-		$response->redirect();
+		show_error_message($message);
 	}
 }
 elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdelete' && hasRequest('g_hostdruleid')) {
@@ -721,7 +709,7 @@ if (hasRequest('action') && hasRequest('g_hostdruleid') && !$result) {
 if (hasRequest('form')) {
 	$master_itemid = getRequest('master_itemid', 0);
 
-	if (hasRequest('itemid') && !hasRequest('clone')) {
+	if (hasRequest('itemid')) {
 		$items = API::DiscoveryRule()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status', 'flags'],
@@ -876,8 +864,8 @@ if (hasRequest('form')) {
 	}
 	// clone form
 	elseif (hasRequest('clone')) {
-		unset($data['itemid']);
 		$data['form'] = 'clone';
+		$data['limited'] = false;
 	}
 
 	if (!$data['conditions']) {
