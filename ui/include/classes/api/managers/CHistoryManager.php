@@ -1729,7 +1729,7 @@ class CHistoryManager {
 
 		foreach ($this->storage_providers as $provider) {
 			/** @var CClickHouseStorage $provider */
-			if ($provider->deleteHistory($items)) {
+			if (!$provider->deleteHistory($items)) {
 				return false;
 			}
 		}
