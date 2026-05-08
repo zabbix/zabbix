@@ -660,16 +660,19 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM report',
-					'link' => 'zabbix.php?action=scheduledreport.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=scheduledreport.list',
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF scheduled report create',
+						'xpath://div[@id="dashboardid"]/..' => 'Global view'
+					]
 				]
 			],
 			// #58 Scheduled report update.
 			[
 				[
 					'db' => 'SELECT * FROM report',
-					'link' => 'zabbix.php?action=scheduledreport.edit&reportid=3',
-					'return_button' => true
+					'link' => 'zabbix.php?action=popup&popup=scheduledreport.edit&reportid=3'
 				]
 			],
 			// #59 Connector create.
@@ -899,22 +902,32 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #2 No token.
 			[
 				[
-					'db' => 'SELECT * FROM report',
-					'link' => 'zabbix.php?form_refresh=1&reportid=4&old_dashboardid=1&userid=95'.
-						'&name=Report+for+delete&dashboardid=1&period=0&cycle=0&hours=00&minutes=00&weekdays%5B1%5D=1'.
-						'&weekdays%5B2%5D=2&weekdays%5B4%5D=4&weekdays%5B8%5D=8&weekdays%5B16%5D=16&weekdays%5B32%5D=32'.
-						'&weekdays%5B64%5D=64&active_since=&active_till=&subject=subject+for+report+delete+test'.
-						'&message=message+for+report+delete+test&subscriptions%5B0%5D%5Brecipientid%5D=96'.
-						'&subscriptions%5B0%5D%5Brecipient_type%5D=0&subscriptions%5B0%5D%5Brecipient_name%5D=user-recipient+of+the+report'.
-						'&subscriptions%5B0%5D%5Brecipient_inaccessible%5D=0&subscriptions%5B0%5D%5Bcreatorid%5D=96'.
-						'&subscriptions%5B0%5D%5Bcreator_type%5D=0&subscriptions%5B0%5D%5Bcreator_name%5D=user-recipient+of+the+report'.
-						'&subscriptions%5B0%5D%5Bcreator_inaccessible%5D=0&subscriptions%5B0%5D%5Bexclude%5D=0'.
-						'&subscriptions%5B1%5D%5Brecipientid%5D=7&subscriptions%5B1%5D%5Brecipient_type%5D=1'.
-						'&subscriptions%5B1%5D%5Brecipient_name%5D=Zabbix+administrators&subscriptions%5B1%5D%5Brecipient_inaccessible%5D=0'.
-						'&subscriptions%5B1%5D%5Bcreatorid%5D=0&subscriptions%5B1%5D%5Bcreator_type%5D=1'.
-						'&subscriptions%5B1%5D%5Bcreator_name%5D=Recipient&subscriptions%5B1%5D%5Bcreator_inaccessible%5D=0'.
-						'&description=&status=0&action=scheduledreport.update',
-					'error' => self::ACCESS_DENIED,
+					'db' => 'SELECT * FROM role',
+					'link' => 'zabbix.php?form_refresh=1&roleid=2&name=Admin+role&type=2&ui_monitoring_dashboard=1'.
+						'&ui_monitoring_problems=1&ui_monitoring_hosts=1&ui_monitoring_latest_data=1&ui_monitoring_maps=1'.
+						'&ui_monitoring_discovery=1&ui_services_services=1&ui_services_sla=1&ui_services_sla_report=1'.
+						'&ui_inventory_overview=1&ui_inventory_hosts=1&ui_reports_system_info=0&ui_reports_scheduled_reports=1'.
+						'&ui_reports_availability_report=1&ui_reports_top_triggers=1&ui_reports_audit=0&ui_reports_action_log=0'.
+						'&ui_reports_notifications=1&ui_configuration_template_groups=1&ui_configuration_host_groups=1'.
+						'&ui_configuration_templates=1&ui_configuration_hosts=1&ui_configuration_maintenance=1'.
+						'&ui_configuration_event_correlation=0&ui_configuration_discovery=1&ui_configuration_trigger_actions=1'.
+						'&ui_configuration_service_actions=1&ui_configuration_discovery_actions=1&ui_configuration_autoregistration_actions=1'.
+						'&ui_configuration_internal_actions=1&ui_administration_media_types=0&ui_administration_scripts=0&ui_administration_user_groups=0'.
+						'&ui_administration_user_roles=0&ui_administration_users=0&ui_administration_api_tokens=0&ui_administration_authentication=0'.
+						'&ui_administration_general=0&ui_administration_audit_log=0&ui_administration_housekeeping=0&ui_administration_proxies=0'.
+						'&ui_administration_macros=0&ui_administration_queue=0&ui_default_access=1&service_write_access=1&service_write_tag_tag='.
+						'&service_write_tag_value=&service_read_access=1&service_read_tag_tag=&service_read_tag_value='.
+						'&modules%5B1%5D=1&modules%5B2%5D=1&modules%5B3%5D=1&modules%5B4%5D=1&modules%5B5%5D=1'.
+						'&modules%5B6%5D=1&modules%5B7%5D=1&modules%5B19%5D=1&modules%5B8%5D=1&modules%5B9%5D=1'.
+						'&modules%5B10%5D=1&modules%5B11%5D=1&modules%5B12%5D=1&modules%5B13%5D=1&modules%5B14%5D='.
+						'1&modules%5B15%5D=1&modules%5B16%5D=1&modules%5B17%5D=1&modules%5B18%5D=1&modules%5B20%5D=1'.
+						'&modules%5B21%5D=1&modules%5B22%5D=1&modules%5B23%5D=1&modules%5B24%5D=1&modules_default_access=1'.
+						'&api_access=1&api_mode=0&actions_edit_dashboards=1&actions_edit_maps=1&actions_edit_maintenance=1'.
+						'&actions_add_problem_comments=1&actions_change_severity=1&actions_acknowledge_problems=1'.
+						'&actions_suppress_problems=1&actions_close_problems=1&actions_execute_scripts=1&actions_manage_api_tokens=1'.
+						'&actions_manage_scheduled_reports=1&actions_manage_sla=1&actions_invoke_execute_now=1&actions_change_problem_ranking=1'.
+						'&actions_default_access=1&action=userrole.update',
+					'error' => self::ACCESS_DENIED_WITHOUT_HTML,
 					'return_button' => true
 				]
 			],
