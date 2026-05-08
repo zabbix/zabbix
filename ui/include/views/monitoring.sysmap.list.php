@@ -28,10 +28,9 @@ $html_page = (new CHtmlPage())
 				->addItem(
 					(new CForm('get'))
 						->addItem(
-							new CRedirectButton(_('Create map'),
-								(new CUrl('sysmaps.php'))
-									->setArgument('form', 'create')
-							)
+							(new CRedirectButton(_('Create map'), (new CUrl('sysmaps.php'))
+								->setArgument('form', 'create')
+							))->setEnabled($data['allowed_edit'])
 						)
 				)
 				->addItem(

@@ -373,6 +373,7 @@ if (hasRequest('form')) {
 
 	$data['current_user_userid'] = $current_userid;
 	$data['form_refresh'] = getRequest('form_refresh', 0);
+	$data['form'] = getRequest('form');
 
 	// advanced labels
 	$data['labelTypes'] = sysmapElementLabel();

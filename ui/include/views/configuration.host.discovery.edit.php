@@ -29,10 +29,10 @@ $html_page = (new CHtmlPage())
 	));
 
 $url = (new CUrl('host_discovery.php'))
-	->setArgument('form', getRequest('form') === 'create' ? 'create' : 'update')
+	->setArgument('form', $data['form'] === 'create' ? 'create' : 'update')
 	->setArgument('context', $data['context']);
 
-if (getRequest('form') !== 'create') {
+if ($data['form'] !== 'create') {
 	$url->setArgument('itemid', $data['itemid']);
 }
 else {
