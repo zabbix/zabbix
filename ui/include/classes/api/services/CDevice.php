@@ -42,13 +42,6 @@ class CDevice extends CApiService {
 	public function get(array $options = []) {
 		self::validateGet($options);
 
-		if ((self::$userData['type'] != USER_TYPE_SUPER_ADMIN
-					&& !self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN))
-				|| (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
-					&& !self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER))) {
-			return $options['countOutput'] ? '0' : [];
-		}
-
 		$resource = DBselect($this->createSelectQuery($this->tableName, $options), $options['limit']);
 
 		$db_devices = [];
@@ -104,12 +97,8 @@ class CDevice extends CApiService {
 	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN
-				|| !self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
-			$sql_parts['where']['userid'] = 'd.userid='.self::$userData['userid'];
-		}
-		elseif (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
-			$sql_parts['where']['userid'] = 'd.userid!='.self::$userData['userid'];
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			$sql_parts['where'][] = 'd.userid='.self::$userData['userid'];
 		}
 
 		if ($options['roleids'] !== null) {
