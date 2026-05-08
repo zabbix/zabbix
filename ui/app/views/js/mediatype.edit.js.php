@@ -196,17 +196,6 @@ window.mediatype_edit_popup = new class {
 
 	#submit() {
 		this.#removePopupMessages();
-
-		if (this.#hasUnsupportedMessageTemplates()) {
-			const message = <?= json_encode(
-				_('At least one of message templates is not supported by select media type. Remove?')
-			)?>;
-
-			if (window.confirm(message)) {
-				this.#removeUnsupportedMessageTemplates();
-			}
-		}
-
 		const fields = this.form.getAllValues();
 
 		switch (fields.maxsessions_type) {
@@ -484,7 +473,7 @@ window.mediatype_edit_popup = new class {
 	 * Toggles the "Add" button state and changes its text depending on already added message templates to the table.
 	 */
 	#toggleAddButton() {
-		const remaining_templates = Object.keys(this.#getAllowedMessageTemplates()).filter(message_type => {
+		const remaining_templates = Object.keys(this.message_templates).filter(message_type => {
 			return !Object.hasOwn(this.message_template_list, message_type);
 		});
 
@@ -495,45 +484,6 @@ window.mediatype_edit_popup = new class {
 		add_button.textContent = limit_reached
 			? <?= json_encode(_('Add (message type limit reached)')) ?>
 			: <?= json_encode(_('Add')) ?>;
-	}
-
-	#getAllowedMessageTemplates() {
-		const media_type = this.form.findFieldByName('type').getValue();
-		const allowed_templates = {};
-
-		Object.keys(this.message_templates).forEach((key) => {
-			if (this.message_templates[key].media_types.findIndex((typeid) => typeid == media_type) != -1) {
-				allowed_templates[key] = this.message_templates[key];
-			}
-		})
-
-		return allowed_templates;
-	}
-
-	#hasUnsupportedMessageTemplates() {
-		const allowed_templates = this.#getAllowedMessageTemplates();
-		let has_matches = false;
-
-		this.form_element.querySelectorAll('#message-templates tbody tr').forEach(row => {
-			if (!Object.hasOwn(allowed_templates, row.dataset.messageType)) {
-				has_matches = true;
-			}
-		});
-
-		return has_matches;
-	}
-
-	#removeUnsupportedMessageTemplates() {
-		const allowed_templates = this.#getAllowedMessageTemplates();
-
-		this.form_element.querySelectorAll('#message-templates tbody tr').forEach((row) => {
-			if (!Object.hasOwn(allowed_templates, row.dataset.messageType)) {
-				row.remove();
-				delete this.message_template_list[row.dataset.messageType];
-			}
-		});
-
-		this.form.discoverAllFields();
 	}
 
 	/**

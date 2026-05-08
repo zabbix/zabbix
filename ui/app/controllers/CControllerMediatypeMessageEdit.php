@@ -90,7 +90,7 @@ class CControllerMediatypeMessageEdit extends CController {
 		$output = [
 			'title' => _('Message template'),
 			'params' => $data,
-			'message_templates' => CMediatypeHelper::getMessageTemplates($data['type']),
+			'message_templates' => CMediatypeHelper::getAllMessageTemplates(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

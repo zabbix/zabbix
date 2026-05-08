@@ -151,9 +151,6 @@ class CMediatypeHelper {
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'recovery' => ACTION_OPERATION,
 				'name' => _('Problem'),
-				'media_types' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK,
-					MEDIA_TYPE_PUSH
-				],
 				'template' => [
 					'default' => [
 						'subject' => 'Problem: {EVENT.NAME}',
@@ -184,9 +181,6 @@ class CMediatypeHelper {
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'recovery' => ACTION_RECOVERY_OPERATION,
 				'name' => _('Problem recovery'),
-				'media_types' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK,
-					MEDIA_TYPE_PUSH
-				],
 				'template' => [
 					'default' => [
 						'subject' => 'Resolved in {EVENT.DURATION}: {EVENT.NAME}',
@@ -216,9 +210,6 @@ class CMediatypeHelper {
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'recovery' => ACTION_UPDATE_OPERATION,
 				'name' => _('Problem update'),
-				'media_types' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK,
-					MEDIA_TYPE_PUSH
-				],
 				'template' => [
 					'default' => [
 						'subject' => 'Updated problem in {EVENT.AGE}: {EVENT.NAME}',
@@ -248,7 +239,6 @@ class CMediatypeHelper {
 				'eventsource' => EVENT_SOURCE_SERVICE,
 				'recovery' => ACTION_OPERATION,
 				'name' => _('Service'),
-				'media_types' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK],
 				'template' => [
 					'default' => [
 						'subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
@@ -282,7 +272,6 @@ class CMediatypeHelper {
 				'eventsource' => EVENT_SOURCE_SERVICE,
 				'recovery' => ACTION_RECOVERY_OPERATION,
 				'name' => _('Service recovery'),
-				'media_types' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK],
 				'template' => [
 					'default' => [
 						'subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
@@ -314,7 +303,6 @@ class CMediatypeHelper {
 				'eventsource' => EVENT_SOURCE_SERVICE,
 				'recovery' => ACTION_UPDATE_OPERATION,
 				'name' => _('Service update'),
-				'media_types' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK],
 				'template' => [
 					'default' => [
 						'subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
@@ -342,7 +330,6 @@ class CMediatypeHelper {
 				'eventsource' => EVENT_SOURCE_DISCOVERY,
 				'recovery' => ACTION_OPERATION,
 				'name' => _('Discovery'),
-				'media_types' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK],
 				'template' => [
 					'default' => [
 						'subject' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
@@ -379,7 +366,6 @@ class CMediatypeHelper {
 				'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 				'recovery' => ACTION_OPERATION,
 				'name' => _('Autoregistration'),
-				'media_types' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK],
 				'template' => [
 					'default' => [
 						'subject' => 'Autoregistration: {HOST.HOST}',
@@ -399,7 +385,6 @@ class CMediatypeHelper {
 				'eventsource' => EVENT_SOURCE_INTERNAL,
 				'recovery' => ACTION_OPERATION,
 				'name' => _('Internal problem'),
-				'media_types' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK],
 				'template' => [
 					'default' => [
 						'subject' => '',
@@ -411,7 +396,6 @@ class CMediatypeHelper {
 				'eventsource' => EVENT_SOURCE_INTERNAL,
 				'recovery' => ACTION_RECOVERY_OPERATION,
 				'name' => _('Internal problem recovery'),
-				'media_types' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK],
 				'template' => [
 					'default' => [
 						'subject' => '',
@@ -427,17 +411,6 @@ class CMediatypeHelper {
 	 */
 	public static function getAllMessageTemplates(): array {
 		return self::messageTemplates();
-	}
-
-	/**
-	 * Returns supported message templates by media type
-	 */
-	public static function getMessageTemplates(int $media_type): array {
-		$message_templates = array_filter(self::messageTemplates(), function ($message_template) use ($media_type) {
-			return in_array($media_type, $message_template['media_types']);
-		});
-
-		return $message_templates;
 	}
 
 	/**
