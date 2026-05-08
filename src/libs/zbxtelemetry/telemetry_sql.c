@@ -190,6 +190,7 @@ static char	*tq_sql_dyn_get_json_extract(const char *field, const char *path, zb
 		case ZBX_TQ_DB_TYPE_CLICKHOUSE:
 			/* FIXME: this is probably slow, maybe use something else, at least for columns */
 			/* FIXME: (as opposed to conditions where a json path expression is required) */
+			/* TODO: probably replace JSON_VALUE with getSubcolumn or similar */
 			str = zbx_dsprintf(NULL, "JSON_VALUE(toJSONString(%s), %s)", field_esc, path_esc);
 			break;
 

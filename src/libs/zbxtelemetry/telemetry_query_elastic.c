@@ -77,7 +77,6 @@ static void	tq_es_add_condition(const zbx_tq_condition_t *cond, struct zbx_json 
 		char	*value_esc = tq_es_escape_wildcard_pattern_dyn(cond->value);
 		char	*pattern = zbx_dsprintf(NULL, "*%s*", value_esc);
 
-		/* TODO: remove this if in the final elastic index json keys are not flattened */
 		if (NULL != cond->json_path)
 			THIS_SHOULD_NEVER_HAPPEN; /* wildcard queries are not supported on flattened fields */
 
@@ -124,6 +123,51 @@ static void	tq_es_add_conditions_simple(const zbx_tq_query_t *query, struct zbx_
 	zbx_json_close(j);
 }
 
+static void	tq_es_add_conditions_and_or(const zbx_tq_query_t *query, struct zbx_json *j)
+{
+	zbx_vector_tq_condition_ptr_t	conditions_sorted;
+
+	tq_get_conditions_and_or_sorted(query, &conditions_sorted);
+
+	zbx_json_addobject(j, NULL);
+	zbx_json_addobject(j, "bool");
+	zbx_json_addarray(j, "filter");
+
+	zbx_json_addobject(j, NULL);
+	zbx_json_addobject(j, "bool");
+	zbx_json_addarray(j, "should");
+
+	for (int i = 0; i < conditions_sorted.values_num; i++)
+	{
+		const zbx_tq_condition_t	*cond = conditions_sorted.values[i];
+
+		tq_es_add_condition(cond, j);
+
+		if (conditions_sorted.values_num - 1 == i)
+		{
+			zbx_json_close(j); /* should */
+			zbx_json_close(j); /* bool */
+			zbx_json_close(j);
+		}
+		else if (0 != strcmp(cond->column_name, conditions_sorted.values[i + 1]->column_name))
+		{
+			zbx_json_close(j); /* should */
+			zbx_json_close(j); /* bool */
+			zbx_json_close(j);
+
+			zbx_json_addobject(j, NULL);
+			zbx_json_addobject(j, "bool");
+			zbx_json_addarray(j, "should");
+		}
+	}
+
+	zbx_json_close(j); /* filter */
+	zbx_json_close(j); /* bool */
+	zbx_json_close(j);
+
+	zbx_vector_tq_condition_ptr_destroy(&conditions_sorted);
+}
+
 static void	tq_es_add_conditions(const zbx_tq_query_t *query, struct zbx_json *j)
 {
 	if (0 == query->conditions.values_num)
@@ -137,7 +181,7 @@ static void	tq_es_add_conditions(const zbx_tq_query_t *query, struct zbx_json *j
 			break;
 
 		case ZBX_TQ_EVAL_TYPE_AND_OR:
-			/* TODO */
+			tq_es_add_conditions_and_or(query, j);
 			break;
 
 		case ZBX_TQ_EVAL_TYPE_EXPRESSION:
