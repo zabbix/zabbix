@@ -31,11 +31,11 @@ if ($data['hostid'] != 0) {
 }
 
 $url = (new CUrl('httpconf.php'))
-	->setArgument('form', getRequest('form') === 'create' ? 'create' : 'update')
+	->setArgument('form', $data['form'] === 'create' ? 'create' : 'update')
 	->setArgument('context', $data['context'])
 	->setArgument('hostid', $data['hostid']);
 
-if (getRequest('form') !== 'create') {
+if ($data['form'] !== 'create') {
 	$url->setArgument('httptestid', $data['httptestid']);
 }
 

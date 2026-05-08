@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'parent_discoveryid' =>	[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
 	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
-	'graphid' =>			[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({form}) && ({form} == "update"  || {form} === "clone")'],
+	'graphid' =>			[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({form}) && ({form} == "update"  || {form} == "clone")'],
 	'name' =>				[T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'width' =>				[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Width')],
 	'height' =>				[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Height')],
@@ -256,7 +256,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if ($result) {
 		CMessageHelper::setSuccessTitle($message_success);
 
-		uncheckTableRows();
+		uncheckTableRows($cookieId);
 
 		$response = new CControllerResponseRedirect($backurl);
 		$response->redirect();

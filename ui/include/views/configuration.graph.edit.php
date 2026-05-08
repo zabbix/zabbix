@@ -35,11 +35,11 @@ else {
 }
 
 $url = (new CUrl('graphs.php'))
-	->setArgument('form', getRequest('form') === 'create' ? 'create' : 'update')
+	->setArgument('form', $data['form'] === 'create' ? 'create' : 'update')
 	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	->setArgument('context', $data['context']);
 
-if (getRequest('form') !== 'create') {
+if ($data['form'] !== 'create') {
 	$url->setArgument('graphid', $data['graphid']);
 }
 
@@ -495,7 +495,7 @@ $graphPreviewTable = (new CTable())
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 
 // Append buttons to form.
-if ($data['graphid'] != 0 && getRequest('form') !== 'clone') {
+if ($data['graphid'] != 0 && $data['form'] !== 'clone') {
 	$updateButton = new CSubmit('update', _('Update'));
 	$deleteButton = new CButtonDelete(
 		($data['parent_discoveryid'] === null) ? _('Delete graph?') : _('Delete graph prototype?'),

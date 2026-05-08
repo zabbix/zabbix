@@ -256,7 +256,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$httpTest[$pair_type][] = $pair;
 			}
 		}
-		if (isset($_REQUEST['httptestid']) && $_REQUEST['form'] !== 'clone') {
+		if (hasRequest('httptestid') && getRequest('form') !== 'clone') {
 			// unset fields that did not change
 			$dbHttpTest = API::HttpTest()->get([
 				'httptestids' => $_REQUEST['httptestid'],
