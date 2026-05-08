@@ -84,7 +84,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	}
 
 	if p.options.LegacyItemTimeout != 0 {
-		log.Debugf("'Plugins.Mysql.CallTimeout' is deprecated")
+		log.Debugf("'Plugins.Oracle.CallTimeout' is deprecated")
 	}
 
 	if p.options.Default.ConnectionTimeout == 0 {
