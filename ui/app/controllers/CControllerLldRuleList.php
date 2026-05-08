@@ -129,7 +129,7 @@ class CControllerLldRuleList extends CController {
 		];
 
 		if ($filter['filter_groupids']) {
-			$options['groupids'] = $filter['filter_groupids'];;
+			$options['groupids'] = getSubGroups($filter['filter_groupids'], $filter['ms_groups'], $context);
 		}
 
 		if ($filter['filter_hostids']) {
