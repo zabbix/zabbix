@@ -27,11 +27,11 @@ $html_page = (new CHtmlPage())
 	->setNavigation(getHostNavigation('lld_prototypes', $data['hostid'], $data['parent_discoveryid']));
 
 $url = (new CUrl('host_discovery_prototypes.php'))
-	->setArgument('form', getRequest('form') === 'create' ? 'create' : 'update')
+	->setArgument('form', $data['form'] === 'create' ? 'create' : 'update')
 	->setArgument('context', $data['context'])
 	->setArgument('parent_discoveryid', $data['parent_discoveryid']);
 
-if (getRequest('form') !== 'create') {
+if ($data['form'] !== 'create') {
 	$url->setArgument('itemid', $data['itemid']);
 }
 else {

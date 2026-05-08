@@ -669,6 +669,7 @@ if (hasRequest('form')) {
 
 	$data = getItemFormData($item);
 
+	$data['form'] = getRequest('form');
 	$data['evaltype'] = getRequest('evaltype', CONDITION_EVAL_TYPE_AND_OR);
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = getRequest('conditions', []);
