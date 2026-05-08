@@ -374,12 +374,15 @@ class CClickHouseStorage {
 						match ($function) {
 							AGGREGATE_MIN => 'min(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
 							AGGREGATE_MAX => 'max(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
-							AGGREGATE_AVG => 'avg(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock,count() AS num',
+							AGGREGATE_AVG => 'avg(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock,'.
+								'count() AS num',
 							AGGREGATE_COUNT => 'count() AS value,toUnixTimestamp(max(clock_ns)) AS clock',
 							AGGREGATE_SUM => 'sum(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
-							AGGREGATE_FIRST => 'argMin(value,clock_ns) AS value,toUnixTimestamp(min(clock_ns)) AS clock,'.
+							AGGREGATE_FIRST => 'argMin(value,clock_ns) AS value,'.
+								'toUnixTimestamp(min(clock_ns)) AS clock,'.
 								'toUnixTimestamp64Nano(min(clock_ns))%1000000000 AS ns',
-							AGGREGATE_LAST => 'argMax(value,clock_ns) AS value,toUnixTimestamp(max(clock_ns)) AS clock,'.
+							AGGREGATE_LAST => 'argMax(value,clock_ns) AS value,'.
+								'toUnixTimestamp(max(clock_ns)) AS clock,'.
 								'toUnixTimestamp64Nano(max(clock_ns))%1000000000 AS ns'
 						}.
 					' FROM '.$table.
@@ -506,44 +509,65 @@ class CClickHouseStorage {
 	 */
 	public function getAggregatedValues(array $value_type_itemids, int $function, int $time_from,
 			?int $time_to): array {
+		$sql_where_extra = '';
+		$sql_params_extra = [];
+
+		if ($time_to !== null) {
+			$sql_where_extra = ' AND clock_ns<=addNanoseconds(toDateTime64({clock_le:UInt64},9),999999999)';
+			$sql_params_extra = ['clock_le' => $time_to];
+		}
+
 		$result = [];
+		$time = time();
 
 		foreach ($value_type_itemids as $value_type => $itemids) {
 			$table = $this->getTableName($value_type);
-			$values = $this->query(
-				'SELECT itemid,value,toUnixTimestamp(ts) AS clock'.
-				' FROM ('.
-					'SELECT itemid,'.
-						match ($function) {
-							AGGREGATE_MIN	=> 'min(value) AS value,max(clock_ns) AS ts',
-							AGGREGATE_MAX	=> 'max(value) AS value,max(clock_ns) AS ts',
-							AGGREGATE_AVG	=> 'avg(value) AS value,max(clock_ns) AS ts',
-							AGGREGATE_COUNT	=> 'count() AS value,max(clock_ns) AS ts',
-							AGGREGATE_SUM	=> 'sum(value) AS value,max(clock_ns) AS ts',
-							AGGREGATE_FIRST	=> 'argMin(value, clock_ns) AS value,min(clock_ns) AS ts',
-							AGGREGATE_LAST	=> 'argMax(value, clock_ns) AS value,max(clock_ns) AS ts'
-						}.
-					' FROM '.$table.
-					' WHERE itemid IN {itemids:Array(UInt64)}'.
-						' AND clock_ns>=toDateTime64({time_gte:UInt64},9)'.
-						($time_to !== null ? ' AND clock_ns<=addNanoseconds(toDateTime64({time_lte:UInt64},9),999999999)' : '').
-					' GROUP BY itemid'.
-				')',
+			$itemids = array_keys($itemids);
+			$_time_from = $this->value_type_ttl[$value_type] !== null
+				? max($time_from, $time - $this->value_type_ttl[$value_type] + 1)
+				: $time_from;
+
+			$resource = $this->query(
+				'SELECT itemid,'.
+					match ($function) {
+						AGGREGATE_MIN => 'min(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+						AGGREGATE_MAX => 'max(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+						AGGREGATE_AVG => 'avg(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+						AGGREGATE_COUNT => 'count() AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+						AGGREGATE_SUM => 'sum(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+						AGGREGATE_FIRST => 'argMin(value,clock_ns) AS value,toUnixTimestamp(min(clock_ns)) AS clock',
+						AGGREGATE_LAST => 'argMax(value,clock_ns) AS value,toUnixTimestamp(max(clock_ns)) AS clock'
+					}.
+				' FROM '.$table.
+				' WHERE itemid IN {itemids:Array(UInt64)}'.
+					' AND clock_ns>=toDateTime64({clock_ge:UInt64},9)'.$sql_where_extra.
+				' GROUP BY itemid',
 				[
 					'UInt64' => [
-						'itemids' => array_keys($itemids),
-						'time_gte' => $this->getTtlLimitedTimestamp($value_type, $time_from),
-						'time_lte' => $time_to
-					]
+						'itemids' => $itemids,
+						'clock_ge' => $_time_from
+					] + $sql_params_extra
 				]
 			);
 
-			if ($values === null || !$values) {
+			if ($resource === null) {
 				continue;
 			}
 
-			foreach ($values as $value) {
-				$result[$value['itemid']] = $value;
+			foreach ($resource as $row) {
+				$result[$row['itemid']] = $row;
+			}
+
+			if ($function == AGGREGATE_COUNT) {
+				foreach ($itemids as $itemid) {
+					if (!array_key_exists($itemid, $result)) {
+						$result[$itemid] = [
+							'itemid' => (string) $itemid,
+							'value' => '0',
+							'clock' => (string) $_time_from
+						];
+					}
+				}
 			}
 		}
 
