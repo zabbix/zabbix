@@ -57,7 +57,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	}
 
 	if p.options.LegacyTimeout != 0 {
-		log.Debugf("'Plugins.Memcached.Timeout' is deprecate")
+		log.Debugf("'Plugins.Memcached.Timeout' is deprecated")
 
 		if p.options.Default.ConnectionTimeout == 0 {
 			p.options.Default.ConnectionTimeout = p.options.LegacyTimeout
