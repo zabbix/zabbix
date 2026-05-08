@@ -31,8 +31,17 @@ if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
+$url = (new CUrl('sysmaps.php'))
+	->setArgument('form', getRequest('form') === 'create' ? 'create' : 'update');
+
+if(getRequest('form') !== 'create') {
+	$url->setArgument('sysmapid', $data['sysmap']['sysmapid']);
+}
+
+$url = $url->getUrl();
+
 // Create sysmap form.
-$form = (new CForm())
+$form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sysmaps.php')))->removeId())
 	->setId('sysmap-form')
@@ -440,7 +449,7 @@ if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new	CButton('clone', _('Clone')),
+			new	CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete selected map?'), url_params(['form', 'sysmapid']).'&'.
 				CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('sysmaps.php')
 			),
@@ -460,3 +469,5 @@ $form->addItem($tabs);
 $html_page
 	->addItem($form)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");
