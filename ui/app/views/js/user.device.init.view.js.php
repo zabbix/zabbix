@@ -50,7 +50,8 @@ window.user_device_create_popup = new class {
 		this.#footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
 		this.#dialogue.addEventListener('dialogue.close', () => {
 			this.#device_uuid = null;
-			location.href = zabbixUrl({action: this.#admin_mode ? 'user.device.list': 'userprofile.device.list'});
+			const redirect_url = zabbixUrl({action: this.#admin_mode ? 'user.device.list': 'userprofile.device.list'});
+			setTimeout(() => location.href = redirect_url);
 		});
 	}
 
