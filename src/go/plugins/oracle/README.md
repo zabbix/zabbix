@@ -151,6 +151,9 @@ Currently has no effect and the maximum wait time is determined by item timeout 
 *Limits:* 1-30
 
 **Plugins.Oracle.ConnectTimeout** — the maximum wait time in seconds for a connection to be established.
+
+The value is now *deprecated*, and used only for requests coming from Zabbix servers old than 7.0 version.
+
 *Default value:* equals the global<sup>[1](#footnote-1)</sup> "Timeout" configuration option.
 *Limits:* 1-30
 
@@ -229,7 +232,7 @@ If the specified ConnString is resolved as a DNS name, the Oracle client attempt
 
 #### Using named sessions
 
-Named sessions allow defining specific parameters for each Oracle instance. Currently, there are four supported parameters: `Uri`, `User`, `Password` and `Service`.
+Named sessions allow defining specific parameters for each Oracle instance. Currently, there are four supported parameters: `Uri`, `User`, `Password`, `Service` and `ConnectionTimeout`.
 This option to store credentials is a slightly more secure way compared to item keys or macros.
 
 For example, if you have two Oracle instances: "Oracle12" and "Oracle19", you should add the following options to the agent configuration file:
@@ -238,11 +241,13 @@ For example, if you have two Oracle instances: "Oracle12" and "Oracle19", you sh
     Plugins.Oracle.Sessions.Oracle12.User=<USERFORORACLE12>
     Plugins.Oracle.Sessions.Oracle12.Password=<PasswordForOracle12>
     Plugins.Oracle.Sessions.Oracle12.Service=orcl
+    Plugins.Oracle.Sessions.Oracle12.ConnectionTimeout=10
 
     Plugins.Oracle.Sessions.Oracle19.Uri=tcp://192.168.1.2:1521
     Plugins.Oracle.Sessions.Oracle19.User=<USERFORORACLE19>
     Plugins.Oracle.Sessions.Oracle19.Password=<PasswordForOracle19>
     Plugins.Oracle.Sessions.Oracle19.Service=orcl
+    Plugins.Oracle.Sessions.Oracle19.ConnectionTimeout=10
 
 Then you will be able to use these names as the first parameter (ConnString) in keys instead of URIs.
 For example:
