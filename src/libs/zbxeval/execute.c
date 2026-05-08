@@ -1897,7 +1897,7 @@ static int	eval_execute_function_repeat(const zbx_eval_context_t *ctx, const zbx
 				total_print_len = UINT64_MAX;
 
 			*error = zbx_dsprintf(*error, "maximum allowed string length (%d) exceeded: " ZBX_FS_UI64,
-					MAX_STRING_LEN, total_print_len);
+					MAX_STRING_LEN - 1, total_print_len);
 
 			return FAIL;
 		}
