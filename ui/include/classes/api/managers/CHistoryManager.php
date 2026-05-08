@@ -1119,7 +1119,7 @@ class CHistoryManager {
 	 *
 	 * @return array  History value aggregation for graphs.
 	 */
-	public function getGraphAggregationByWidth(array $items, $time_from, $time_to, $width = null) {
+	public function getGraphAggregationByWidth(array $items, int $time_from, int $time_to, ?int $width = null) {
 		$grouped_items = $this->getItemsGroupedByStorage($items);
 
 		$results = [];
@@ -1130,10 +1130,12 @@ class CHistoryManager {
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
-			foreach ($this->getProviderItemPairs($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]) as $pair) {
-				[$storage_provider, $storage_items] = $pair;
+			foreach ($this->getProviderItemPairs($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]) as
+					[$storage_provider, $itemids_by_value_type]) {
 				/** @var CClickHouseStorage $storage_provider */
-				$results += $storage_provider->getGraphAggregationByWidth($storage_items, $time_from, $time_to, $width);
+				$results += $storage_provider->getGraphAggregationByWidth($itemids_by_value_type, $time_from,
+					$time_to, $width
+				);
 
 				if ($storage_provider->getErrorCode() !== null) {
 					error($storage_provider->getErrorMessage(), true);
@@ -1155,7 +1157,8 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getGraphAggregationByWidth
 	 */
-	private function getGraphAggregationByWidthFromElasticsearch(array $items, $time_from, $time_to, $width) {
+	private function getGraphAggregationByWidthFromElasticsearch(array $items, int $time_from, int $time_to,
+			?int $width) {
 		$terms = [];
 
 		foreach ($items as $item) {
@@ -1323,7 +1326,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getGraphAggregationByWidth
 	 */
-	private function getGraphAggregationByWidthFromSql(array $items, $time_from, $time_to, $width) {
+	private function getGraphAggregationByWidthFromSql(array $items, int $time_from, int $time_to, ?int $width) {
 		$sql_select_extra = '';
 		$group_by = 'itemid';
 		$order_by = '';

@@ -367,35 +367,37 @@ class CClickHouseStorage {
 				? max($time_from, $time - $this->value_type_ttl[$value_type] + 1)
 				: $time_from;
 
-			$resource = $this->query(
-				'SELECT itemid,'.
-					'toUnixTimestamp(toStartOfInterval(clock_ns,toIntervalSecond({interval:UInt64}))) AS tick,'.
-					match ($function) {
-						AGGREGATE_MIN => 'min(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
-						AGGREGATE_MAX => 'max(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
-						AGGREGATE_AVG => 'avg(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock,count() AS num',
-						AGGREGATE_COUNT => 'count() AS value,toUnixTimestamp(max(clock_ns)) AS clock',
-						AGGREGATE_SUM => 'sum(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
-						AGGREGATE_FIRST => 'argMin(value,clock_ns) AS value,toUnixTimestamp(min(clock_ns)) AS clock,'.
-							'toUnixTimestamp64Nano(min(clock_ns))%1000000000 AS ns',
-						AGGREGATE_LAST => 'argMax(value,clock_ns) AS value,toUnixTimestamp(max(clock_ns)) AS clock,'.
-							'toUnixTimestamp64Nano(max(clock_ns))%1000000000 AS ns'
-					}.
-				' FROM '.$table.
-				' PREWHERE itemid IN {pre_itemids:Array(UInt64)}'.
-				' WHERE clock_ns BETWEEN toDateTime64({clock_ge:UInt64},9)'.
-					' AND addNanoseconds(toDateTime64({clock_le:UInt64},9),999999999)'.
-				' GROUP BY itemid,tick'.
-				' ORDER BY itemid,tick',
-				[
-					'UInt64' => [
-						'pre_itemids' => $itemids,
-						'clock_ge' => $_time_from,
-						'clock_le' => $time_to,
-						'interval' => $interval
+			$resource = $_time_from <= $time_to
+				? $this->query(
+					'SELECT itemid,'.
+						'toUnixTimestamp(toStartOfInterval(clock_ns,toIntervalSecond({interval:UInt64}))) AS tick,'.
+						match ($function) {
+							AGGREGATE_MIN => 'min(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+							AGGREGATE_MAX => 'max(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+							AGGREGATE_AVG => 'avg(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock,count() AS num',
+							AGGREGATE_COUNT => 'count() AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+							AGGREGATE_SUM => 'sum(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+							AGGREGATE_FIRST => 'argMin(value,clock_ns) AS value,toUnixTimestamp(min(clock_ns)) AS clock,'.
+								'toUnixTimestamp64Nano(min(clock_ns))%1000000000 AS ns',
+							AGGREGATE_LAST => 'argMax(value,clock_ns) AS value,toUnixTimestamp(max(clock_ns)) AS clock,'.
+								'toUnixTimestamp64Nano(max(clock_ns))%1000000000 AS ns'
+						}.
+					' FROM '.$table.
+					' PREWHERE itemid IN {pre_itemids:Array(UInt64)}'.
+					' WHERE clock_ns BETWEEN toDateTime64({clock_ge:UInt64},9)'.
+						' AND addNanoseconds(toDateTime64({clock_le:UInt64},9),999999999)'.
+					' GROUP BY itemid,tick'.
+					' ORDER BY itemid,tick',
+					[
+						'UInt64' => [
+							'pre_itemids' => $itemids,
+							'clock_ge' => $_time_from,
+							'clock_le' => $time_to,
+							'interval' => $interval
+						]
 					]
-				]
-			);
+				)
+				: [];
 
 			if ($resource === null) {
 				continue;
@@ -437,52 +439,62 @@ class CClickHouseStorage {
 	 *
 	 * @see CHistoryManager::getGraphAggregationByWidth
 	 */
-	public function getGraphAggregationByWidth(array $value_type_itemids, int $time_from, int $time_to,
+	public function getGraphAggregationByWidth(array $itemids_by_value_type, int $time_from, int $time_to,
 			?int $width): array {
+		$sql_select_extra = '';
+		$sql_params_extra = [];
+		$group_by = 'itemid';
+		$order_by = '';
+
+		if ($width !== null) {
+			$sql_select_extra =
+				',round({width:UInt64}*(toUnixTimestamp(clock_ns)-{time_from:UInt64})/{period:UInt64}) AS i';
+			$sql_params_extra = ['width' => $width, 'period' => $time_to - $time_from, 'time_from' => $time_from];
+
+			$group_by .= ',i';
+			$order_by .= ' ORDER BY itemid,i';
+		}
+
 		$result = [];
+		$time = time();
 
-		foreach ($value_type_itemids as $value_type => $itemids) {
+		foreach ($itemids_by_value_type as $value_type => $itemids) {
 			$table = $this->getTableName($value_type);
-			$_time_from = $this->getTtlLimitedTimestamp($value_type, $time_from);
-			$seconds = $time_to - $_time_from;
+			$itemids = array_keys($itemids);
+			$_time_from = $this->value_type_ttl[$value_type] !== null
+				? max($time_from, $time - $this->value_type_ttl[$value_type] + 1)
+				: $time_from;
 
-			$values = $this->query(
-				'SELECT itemid,count,avg,min,max,toUnixTimestamp(ts) AS clock'.($width === null ? '' : ',i').
-				' FROM ('.
-					'SELECT itemid,count() AS count,avg(value) AS avg,min(value) AS min,max(value) AS max,'.
-						'max(clock_ns) as ts'.
-						($width === null
-							? ''
-							: ',round({width:UInt64}*(toUnixTimestamp(clock_ns)-{time_gte:UInt64})/{seconds:UInt64}) AS i'
-						).
+			foreach ($itemids as $itemid) {
+				$result[$itemid] = ['source' => 'history', 'data' => []];
+			}
+
+			$resource = $_time_from <= $time_to
+				? $this->query(
+					'SELECT itemid,count() AS count,avg(value) AS avg,min(value) AS min,max(value) AS max'.
+						$sql_select_extra.',toUnixTimestamp(max(clock_ns)) as clock'.
 					' FROM '.$table.
 					' PREWHERE itemid IN {pre_itemids:Array(UInt64)}'.
-					' WHERE clock_ns>=toDateTime64({time_gte:UInt64},9)'.
-						' AND clock_ns<=addNanoseconds(toDateTime64({time_lte:UInt64},9),999999999)'.
-					' GROUP BY itemid'.($width === null ? '' : ',i').
-					' ORDER BY itemid'.($width === null ? '' : ',i').
-				')',
-				[
-					'UInt64' => [
-						'pre_itemids' => array_keys($itemids),
-						'time_gte' => $_time_from,
-						'time_lte' => $time_to,
-						'width' => $width,
-						'seconds' => $seconds
+					' WHERE clock_ns>=toDateTime64({clock_ge:UInt64},9)'.
+						' AND clock_ns<=addNanoseconds(toDateTime64({clock_le:UInt64},9),999999999)'.
+					' GROUP BY '.$group_by.
+					$order_by,
+					[
+						'UInt64' => [
+							'pre_itemids' => $itemids,
+							'clock_ge' => $_time_from,
+							'clock_le' => $time_to
+						] + $sql_params_extra
 					]
-				]
-			);
+				)
+				: [];
 
-			if (!$values) {
+			if ($resource === null) {
 				continue;
 			}
 
-			$result += array_fill_keys(array_column($values, 'itemid', 'itemid'),
-				['data' => [], 'source' => 'history']
-			);
-
-			foreach ($values as $value) {
-				$result[$value['itemid']]['data'][] = $value;
+			foreach ($resource as $row) {
+				$result[$row['itemid']]['data'][] = $row;
 			}
 		}
 
