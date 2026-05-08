@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-04-19 05:28+0000\n"
+"PO-Revision-Date: 2026-05-01 20:06+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -15218,7 +15218,7 @@ msgstr "Nou mètode MFA"
 
 #: app/views/oauth.edit.php:242
 msgid "New OAuth"
-msgstr ""
+msgstr "Nova OAuth"
 
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
