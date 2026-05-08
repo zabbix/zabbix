@@ -134,9 +134,9 @@ foreach ($data['discoveries'] as $discovery) {
 		$discovery['name'],
 		(new CUrl('host_discovery_prototypes.php'))
 			->setArgument('form', 'update')
-			->setArgument('itemid', $discovery['itemid'])
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('context', $data['context'])
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('itemid', $discovery['itemid'])
 	);
 
 	$status_disabled = $discovery['status'] == ITEM_STATUS_DISABLED;

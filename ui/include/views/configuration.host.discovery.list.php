@@ -291,8 +291,8 @@ foreach ($data['discoveries'] as $discovery) {
 		$discovery['name'],
 		(new CUrl('host_discovery.php'))
 			->setArgument('form', 'update')
-			->setArgument('itemid', $discovery['itemid'])
 			->setArgument('context', $data['context'])
+			->setArgument('itemid', $discovery['itemid'])
 	);
 
 	// status
