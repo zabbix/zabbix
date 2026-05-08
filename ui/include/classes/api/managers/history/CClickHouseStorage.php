@@ -1036,16 +1036,4 @@ class CClickHouseStorage {
 
 		return $sql_parts;
 	}
-
-	/**
-	 * Get timestamp limited within value type supported TTL range.
-	 *
-	 * @param int $value_type
-	 * @param int $timestamp
-	 */
-	private function getTtlLimitedTimestamp(int $value_type, int $timestamp): int {
-		$value_ttl = $this->value_type_ttl[$value_type];
-
-		return $value_ttl === null ? $timestamp : max($timestamp, time() - $value_ttl);
-	}
 }
