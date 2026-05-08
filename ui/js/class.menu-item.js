@@ -28,18 +28,17 @@ class CMenuItem extends CBaseComponent {
 
 	init(level) {
 		this._toggle = this._target.querySelector('a');
+		this._is_expanded = this.hasClass('is-expanded');
+		this._is_selected = this.hasClass('is-selected');
 
 		if (this.hasClass('has-submenu')) {
 			this._submenu = new CMenu(this._target.querySelector('.submenu'), ++level);
 			this._submenu._target.id = `${this._target.id}-submenu`;
 			this._toggle.setAttribute('aria-controls', this._submenu._target.id);
+			this._toggle.setAttribute('aria-expanded', this._is_expanded ? 'true' : 'false');
 		}
 
-		this._is_expanded = this.hasClass('is-expanded');
-		this._is_selected = this.hasClass('is-selected');
-
 		this._toggle.setAttribute('aria-role','button');
-		this._toggle.setAttribute('aria-expanded', this._is_expanded ? 'true' : 'false');
 	}
 
 	focus() {
