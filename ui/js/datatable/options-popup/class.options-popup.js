@@ -186,7 +186,7 @@ class CDataTableOptionsPopup {
 	/**
 	 * Returns template element.
 	 *
-	 * @returns {Element|null}
+	 * @returns {Element|string|null}
 	 */
 	getTemplate() {
 		return null;
@@ -225,13 +225,17 @@ class CDataTableOptionsPopup {
 		this.#element.setAttribute('role', 'dialog');
 		this.#element.setAttribute('tabindex', '-1');
 
-		this.#template = this.getTemplate();
+		const template = this.getTemplate();
 
-		if (this.#template instanceof HTMLTemplateElement) {
-			this.#element.innerHTML = this.#template.innerHTML;
+		if (template instanceof HTMLElement) {
+			this.#template = template;
+
+			this.#element.append(...this.#template.children);
 		}
-		else if (this.#template instanceof HTMLElement) {
-			Array.from(this.#template.children).forEach(child => this.#element.appendChild(child));
+		else if (typeof template === 'string') {
+			this.#template = new Template(template).evaluateToElement();
+
+			this.#element.innerHTML = this.#template.innerHTML;
 		}
 
 		const column_index = this.#column.getColumnIndex();

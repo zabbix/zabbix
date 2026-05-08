@@ -23,7 +23,7 @@ class CDataTableOptionsPopupMonitoringProblemsProblem extends CDataTableOptionsP
 	}
 
 	getTemplate() {
-		return new Template(`
+		return `
 			<template>
 				<div class="${ZBX_STYLE_FORM_FIELD}">
 					<input type="checkbox" id="show_opdata" name="show_opdata" value="1"
@@ -36,7 +36,7 @@ class CDataTableOptionsPopupMonitoringProblemsProblem extends CDataTableOptionsP
 					<label for="details"><span></span>${t('Show trigger expression')}</label>
 				</div>
 			</template>
-		`).evaluateToElement();
+		`;
 	}
 
 	getFieldData() {

@@ -22,7 +22,7 @@ class CDataTableOptionsPopupMonitoringLatestName extends CDataTableOptionsPopup 
 	}
 
 	getTemplate() {
-		return new Template(`
+		return `
 			<template>
 				<div class="${ZBX_STYLE_FORM_FIELD}">
 					<input type="checkbox" id="show_item_key" name="show_item_key" value="1"
@@ -30,7 +30,7 @@ class CDataTableOptionsPopupMonitoringLatestName extends CDataTableOptionsPopup 
 					<label for="show_item_key"><span></span>${t('Show item key')}</label>
 				</div>
 			</template>
-		`).evaluateToElement();
+		`;
 	}
 
 	getFieldData() {
