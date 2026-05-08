@@ -36,11 +36,11 @@ if ($data['form_refresh'] == 0) {
 }
 
 $url = (new CUrl('host_prototypes.php'))
-	->setArgument('form', getRequest('form') === 'create' ? 'create' : 'update')
+	->setArgument('form', $data['form'] === 'create' ? 'create' : 'update')
 	->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
 	->setArgument('context', $data['context']);
 
-if (getRequest('form') !== 'create') {
+if ($data['form'] !== 'create') {
 	$url->setArgument('hostid', $host_prototype['hostid']);
 }
 
@@ -63,7 +63,7 @@ if ($host_prototype['hostid'] != 0) {
 
 $host_tab = new CFormList('hostlist');
 
-if ($data['templates'] && getRequest('form') !== 'clone') {
+if ($data['templates'] && $data['form'] !== 'clone') {
 	$host_tab->addRow(_('Parent discovery rules'), $data['templates']);
 }
 
@@ -573,7 +573,7 @@ $encryption_tab = (new CFormList('encryption'))
 
 $tabs->addTab('encryptionTab', _('Encryption'), $encryption_tab, TAB_INDICATOR_ENCRYPTION);
 
-if (getRequest('form') === 'update') {
+if ($data['form'] === 'update') {
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[

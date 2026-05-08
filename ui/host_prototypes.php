@@ -352,6 +352,7 @@ if (hasRequest('form')) {
 	$hostid = getRequest('hostid', 0);
 
 	$data = [
+		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0),
 		'discovery_rule' => $discoveryRule,
 		'host_prototype' => [
