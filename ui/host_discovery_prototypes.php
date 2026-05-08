@@ -312,12 +312,16 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 	$result = API::DiscoveryRulePrototype()->delete([$itemid]);
 
 	if ($result) {
+		CMessageHelper::setSuccessTitle(_('Discovery prototype deleted'));
+
 		uncheckTableRows($parent_discovery['itemid']);
 	}
+	else {
+		CMessageHelper::setErrorTitle(_('Cannot delete discovery prototype'));
+	}
 
-	show_messages($result, _('Discovery prototype deleted'), _('Cannot delete discovery prototype'));
-
-	unset($_REQUEST['itemid'], $_REQUEST['form']);
+	$response = new CControllerResponseRedirect($backurl);
+	$response->redirect();
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	try {
