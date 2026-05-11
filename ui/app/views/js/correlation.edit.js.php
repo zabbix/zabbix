@@ -22,11 +22,11 @@
 window.correlation_edit_popup = new class {
 
 	init({rules, clone_rules, conditions}) {
+		this.overlay = overlays_stack.getById('correlation.edit');
 		this.#showWarning(<?= json_encode(
 			_('Global event correlation is deprecated and may be removed in next releases.')
 		) ?>);
 
-		this.overlay = overlays_stack.getById('correlation.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.footer = this.overlay.$dialogue.$footer[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
