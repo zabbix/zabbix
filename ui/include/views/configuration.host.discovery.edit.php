@@ -39,10 +39,10 @@ else {
 	$url->setArgument('hostid', $data['hostid']);
 }
 
-if (hasRequest('master_itemid') && hasRequest('hostid') && hasRequest('backurl')) {
-	$url->setArgument('hostid', getRequest('hostid'))
-		->setArgument('master_itemid', getRequest('master_itemid'))
-		->setArgument('backurl', getRequest('backurl'));
+if ($data['master_itemid'] && $data['hostid'] && $data['backurl']) {
+	$url->setArgument('hostid', $data['hostid'])
+		->setArgument('master_itemid', $data['master_itemid'])
+		->setArgument('backurl', $data['backurl']);
 }
 
 $url = $url->getUrl();
