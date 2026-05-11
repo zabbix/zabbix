@@ -53,8 +53,8 @@ class CCepRuleHelper {
 	public static function getConditionArgumentsString(array $ceprule_condition): string {
 		return match((int) $ceprule_condition['type']) {
 			ZBX_CEP_CONDITION_EVENT_NAME => $ceprule_condition['event_name'],
-			ZBX_CEP_CONDITION_TAG_NAME => $ceprule_condition['tag_name'],
-			ZBX_CEP_CONDITION_TAG_VALUE => $ceprule_condition['tag_name'].':'.$ceprule_condition['tag_value'],
+			ZBX_CEP_CONDITION_TAG_NAME => $ceprule_condition['tag'],
+			ZBX_CEP_CONDITION_TAG_VALUE => $ceprule_condition['tag'].':'.$ceprule_condition['tag_value'],
 			ZBX_CEP_CONDITION_SEVERITY => CSeverityHelper::getName($ceprule_condition['severity']),
 			ZBX_CEP_CONDITION_HOST => $ceprule_condition['host'],
 			ZBX_CEP_CONDITION_HOST_GROUP => $ceprule_condition['host_group'],
