@@ -118,7 +118,8 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		// should check that items, triggers and graphs are not linked to the template anymore
 		$items_link = 'xpath://a[contains(@href,"zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.
 				self::$hostid.'&context=host")]';
-		$this->query($items_link)->one()->scrollIntoView(50)->click();
+		$this->query('class:datatable')->asDatatable()->one()->waitUntilReady()->query($items_link)->one()
+				->scrollIntoView(50)->click();
 
 		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent(self::LINKED_TEMPLATE.':');
