@@ -18,7 +18,6 @@
 #include "zbxjson.h"
 #include "zbxtelemetry.h"
 #include "zbxtypes.h"
-#include <time.h>
 
 /* TODO: maybe this should be user-defined? or at least documented? */
 #define TQ_ELASTIC_MAX_BUCKETS 10000
@@ -135,6 +134,7 @@ static void	tq_es_add_conditions_and_or(const zbx_tq_query_t *query, struct zbx_
 
 	zbx_json_addobject(j, NULL);
 	zbx_json_addobject(j, "bool");
+	zbx_json_adduint64(j, "minimum_should_match", 1);
 	zbx_json_addarray(j, "should");
 
 	for (int i = 0; i < conditions_sorted.values_num; i++)
@@ -157,6 +157,7 @@ static void	tq_es_add_conditions_and_or(const zbx_tq_query_t *query, struct zbx_
 
 			zbx_json_addobject(j, NULL);
 			zbx_json_addobject(j, "bool");
+			zbx_json_adduint64(j, "minimum_should_match", 1);
 			zbx_json_addarray(j, "should");
 		}
 	}
@@ -166,6 +167,60 @@ static void	tq_es_add_conditions_and_or(const zbx_tq_query_t *query, struct zbx_
 	zbx_json_close(j);
 
 	zbx_vector_tq_condition_ptr_destroy(&conditions_sorted);
+}
+
+static void	tq_es_add_condition_node(const zbx_tq_query_t *query, const tq_formula_node_t *node, struct zbx_json *j)
+{
+	if (TQ_FORMULA_NODE_TYPE_OR == node->type || TQ_FORMULA_NODE_TYPE_AND == node->type)
+	{
+		zbx_json_addobject(j, NULL);
+		zbx_json_addobject(j, "bool");
+
+		if (TQ_FORMULA_NODE_TYPE_OR == node->type)
+			zbx_json_adduint64(j, "minimum_should_match", 1);
+
+		zbx_json_addarray(j, TQ_FORMULA_NODE_TYPE_AND == node->type ? "filter" : "should");
+
+		for (int i = 0; i < node->children.values_num; i++)
+			tq_es_add_condition_node(query, node->children.values[i], j);
+
+		zbx_json_close(j); /* filter or should */
+		zbx_json_close(j); /* bool */
+		zbx_json_close(j);
+	}
+	else if (TQ_FORMULA_NODE_TYPE_NOT == node->type)
+	{
+		zbx_json_addobject(j, NULL);
+		zbx_json_addobject(j, "bool");
+		zbx_json_addarray(j, "must_not");
+
+		tq_es_add_condition_node(query, node->children.values[0], j);
+
+		zbx_json_close(j); /* must_not */
+		zbx_json_close(j); /* bool */
+		zbx_json_close(j);
+	}
+	else /* TQ_FORMULA_NODE_TYPE_LEAF */
+	{
+		tq_es_add_condition(&query->conditions.values[node->condition_idx], j);
+	}
+}
+
+static void	tq_es_add_conditions_expression(const zbx_tq_query_t *query, struct zbx_json *j)
+{
+	tq_formula_node_t	*node;
+	const char		*err_pos;
+
+	if (NULL == (node = tq_formula_parse(query->formula, &err_pos)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("failed to parse formula at pos %d: \"%s\"",
+				(int)(err_pos - query->formula), err_pos);
+		return;
+	}
+
+	tq_es_add_condition_node(query, node, j);
+
+	tq_formula_node_free(node);
 }
 
 static void	tq_es_add_conditions(const zbx_tq_query_t *query, struct zbx_json *j)
@@ -185,7 +240,7 @@ static void	tq_es_add_conditions(const zbx_tq_query_t *query, struct zbx_json *j
 			break;
 
 		case ZBX_TQ_EVAL_TYPE_EXPRESSION:
-			/* TODO */
+			tq_es_add_conditions_expression(query, j);
 			break;
 
 		case ZBX_TQ_EVAL_TYPE_UNKNOWN:

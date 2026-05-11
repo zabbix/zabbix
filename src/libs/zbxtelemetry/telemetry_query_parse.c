@@ -607,7 +607,7 @@ out:
 
 static int	tq_validate_formula_char(char c)
 {
-	return (isalpha(c) || '(' == c || ')' == c || ' ' == c) ? SUCCEED : FAIL;
+	return (isalpha((unsigned char)c) || '(' == c || ')' == c || ' ' == c) ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -630,20 +630,28 @@ static int	tq_validate_formula(const char *formula, int condition_count, char *e
 	while ('\0' != *p)
 	{
 		if (FAIL == tq_validate_formula_char(*p))
+		{
+			zbx_snprintf(error, max_error_len,
+				"invalid character in formula at pos %d", (int)(p - formula_copy));
 			goto out;
+		}
 
-		if (!isupper(*p))
+		if (!isupper((unsigned char)*p))
 		{
 			p++;
 			continue;
 		}
 
 		int	len = 1;
-		while (isupper(p[len]))
+		while (isupper((unsigned char)p[len]))
 			len++;
 
 		if (tq_formula_constant_to_condition_idx(p, len) >= condition_count)
+		{
+			zbx_snprintf(error, max_error_len,
+				"invalid condition id in formula at pos %d", (int)(p - formula_copy));
 			goto out;
+		}
 
 		*p = '1';
 		memset(p + 1, ' ', len - 1);

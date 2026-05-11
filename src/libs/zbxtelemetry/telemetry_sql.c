@@ -564,7 +564,7 @@ static char	*tq_sql_dyn_get_conditions_expression(const zbx_tq_query_t *query, z
 			continue;
 		}
 
-		if (islower(*p))
+		if (islower((unsigned char)*p))
 		{
 			if (0 == strncmp(p, "and", ZBX_CONST_STRLEN("and")))
 			{
@@ -592,7 +592,7 @@ static char	*tq_sql_dyn_get_conditions_expression(const zbx_tq_query_t *query, z
 			continue;
 		}
 
-		if (!isupper(*p))
+		if (!isupper((unsigned char)*p))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			zbx_free(str);
@@ -603,7 +603,7 @@ static char	*tq_sql_dyn_get_conditions_expression(const zbx_tq_query_t *query, z
 
 		int	len = 1;
 
-		while (isupper(p[len]))
+		while (isupper((unsigned char)p[len]))
 			len++;
 
 		int	cond_idx = tq_formula_constant_to_condition_idx(p, len);
