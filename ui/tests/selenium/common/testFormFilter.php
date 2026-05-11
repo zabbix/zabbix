@@ -134,6 +134,9 @@ class testFormFilter extends CWebTest {
 		// Check that filter form fields and table result match.
 		$home_form->invalidate()->checkValue($data['filter']);
 		$result_table->waitUntilReady()->invalidate();
+var_dump($filter_result);
+var_dump('-----------------------------');
+var_dump($result_table->getRows()->asText());
 		$this->assertEquals($filter_result, $result_table->getRows()->asText());
 
 		// Reset filter not to interfere next tests.
