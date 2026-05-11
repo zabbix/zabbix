@@ -28,6 +28,7 @@ import (
 
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 )
 
@@ -358,7 +359,7 @@ func pdhEnumObjectGet(refresh bool) ([]uint16, uint32, uintptr) {
 	log.Debugf("pdhEnumObjectGet() refresh:%t", refresh)
 	objectBuf, objectListSizeRet, ret := pdhEnumObjectHelper(objectListSize, refresh)
 	if ret == PDH_MORE_DATA {
-		log.Debugf("PdhEnumObjectGet() insufficient buffer size: %d", objectListSize)
+		log.Debugf("pdhEnumObjectGet() insufficient buffer size: %d", objectListSize)
 		objectListSizeRet = 0
 		ret, _, _ = syscall.Syscall6(pdhEnumObjects, 6, 0, 0, 0, uintptr(unsafe.Pointer(&objectListSizeRet)),
 			uintptr(PERF_DETAIL_WIZARD), bool2uintptr(true))
@@ -371,12 +372,12 @@ func pdhEnumObjectGet(refresh bool) ([]uint16, uint32, uintptr) {
 		}
 
 		objectListSize = objectListSizeRet * 2
-		log.Debugf("PdhEnumObjectGet() new buffer size: %d", objectListSize)
+		log.Debugf("pdhEnumObjectGet() new buffer size: %d", objectListSize)
 		objectBuf, objectListSizeRet, ret = pdhEnumObjectHelper(objectListSize, false)
 	}
 
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
-		log.Debugf("PdhEnumObjectGet() error code: 0x%08X", uint32(ret))
+		log.Debugf("pdhEnumObjectGet() error code: 0x%08X", uint32(ret))
 		return nil, 0, ret
 	}
 
@@ -507,7 +508,7 @@ func getPerflibModtime() (time.Time, error) {
 	}
 	mt := stats.ModTime()
 	if mt.IsZero() {
-		return time.Time{}, errors.New("empty value")
+		return time.Time{}, errs.New("empty value")
 	}
 	log.Debugf("getPerflibModtime() ModTime=%s", stats.ModTime().String())
 
