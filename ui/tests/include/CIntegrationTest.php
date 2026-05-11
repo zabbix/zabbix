@@ -1049,6 +1049,7 @@ class CIntegrationTest extends CAPITest {
 	 * @param integer $delayOverride
 	 */
 	protected function reloadConfigurationCacheAndWaitForLogLine($component = null, $delayOverride = 0) {
+		self::skipLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache($component, $delayOverride);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'finished forced reloading of the configuration cache');
@@ -1103,12 +1104,14 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$exception = null;
+		$last_response = null;
 		$usleep_total = 0;
 		$start = microtime(true);
 
 		for ($i = 0; $i < $iterations; $i++) {
 			try {
 				$response = $this->call($method, $params);
+				$last_response = $response;
 
 				if (is_array($response['result']) && count($response['result']) > 0
 					&& ($callback === null || call_user_func($callback, $response))) {
@@ -1142,7 +1145,8 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$this->fail('Data requested from '.$method.' API is not present within specified interval. Params used:'.
-				"\n".json_encode($params)
+				"\n".json_encode($params).
+				"\nLast response: ".json_encode($last_response)
 		);
 	}
 
