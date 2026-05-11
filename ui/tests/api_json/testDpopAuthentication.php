@@ -212,30 +212,40 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 			hash('sha256', json_encode(self::$data['keys']['encryption'], JSON_UNESCAPED_SLASHES), true)
 		);
 
+		$current_time = time();
+
 		$ins_device_keys = [
 			[
 				'deviceid' => self::$data['deviceids']['superadmin'],
 				'scope' => MOBILE_KEY_SCOPE_IDENTITY,
 				'kid' => self::$data['kids']['identity'],
-				'key_' => json_encode(self::$data['keys']['identity'])
+				'key_' => json_encode(self::$data['keys']['identity']),
+				'active' => 0, // CDevice::DEVICE_KEY_ACTIVE
+				'created_at' => $current_time
 			],
 			[
 				'deviceid' => self::$data['deviceids']['superadmin'],
 				'scope' => MOBILE_KEY_SCOPE_ENCRYPTION,
 				'kid' => self::$data['kids']['encryption'],
-				'key_' => json_encode(self::$data['keys']['encryption'])
+				'key_' => json_encode(self::$data['keys']['encryption']),
+				'active' => 0, // CDevice::DEVICE_KEY_ACTIVE
+				'created_at' => $current_time
 			],
 			[
 				'deviceid' => self::$data['deviceids']['user_linked_devices_not_allowed'],
 				'scope' => MOBILE_KEY_SCOPE_IDENTITY,
 				'kid' => self::$data['kids']['identity'],
-				'key_' => json_encode(self::$data['keys']['identity'])
+				'key_' => json_encode(self::$data['keys']['identity']),
+				'active' => 0, // CDevice::DEVICE_KEY_ACTIVE
+				'created_at' => $current_time
 			],
 			[
 				'deviceid' => self::$data['deviceids']['user_linked_devices_not_allowed'],
 				'scope' => MOBILE_KEY_SCOPE_ENCRYPTION,
 				'kid' => self::$data['kids']['encryption'],
-				'key_' => json_encode(self::$data['keys']['encryption'])
+				'key_' => json_encode(self::$data['keys']['encryption']),
+				'active' => 0, // CDevice::DEVICE_KEY_ACTIVE
+				'created_at' => $current_time
 			]
 		];
 
@@ -307,21 +317,6 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 					'jti' => bin2hex(random_bytes(16))
 				],
 				'expected_error' => 'Not authorized. Unknown identity key for provided kid.'
-			],
-			'Request failed due to failed signature verification' => [
-				'request_data' => [
-					'api_method' => 'user.get',
-					'token' => ['tokens', 'superadmin'],
-					'private_key_pem' => 'encryption',
-					'ath_token' => ['tokens', 'superadmin'],
-					'jwk' => ['keys', 'identity'],
-					'kid' => ['kids', 'identity'],
-					'htu_api_method' => 'user.get',
-					'iat' => 0,
-					'exp' => 0,
-					'jti' => bin2hex(random_bytes(16))
-				],
-				'expected_error' => 'Not authorized. Signature verification failed.'
 			],
 			'Request failed due to a missed htu' => [
 				'request_data' => [
@@ -424,6 +419,36 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 				],
 				'expected_error' => 'Not authorized. iat exceeds exp.'
 			],
+			'Request failed due to JWT token issued in the future' => [
+				'request_data' => [
+					'api_method' => 'user.get',
+					'token' => ['tokens', 'superadmin'],
+					'private_key_pem' => 'identity',
+					'ath_token' => ['tokens', 'superadmin'],
+					'jwk' => ['keys', 'identity'],
+					'kid' => ['kids', 'identity'],
+					'htu_api_method' => 'user.get',
+					'iat' => 3,
+					'exp' => 4,
+					'jti' => bin2hex(random_bytes(16))
+				],
+				'expected_error' => 'Not authorized. Invalid iat: JWT token issued in the future beyond allowed skew.'
+			],
+			'Request failed due to JWT token expired' => [
+				'request_data' => [
+					'api_method' => 'user.get',
+					'token' => ['tokens', 'superadmin'],
+					'private_key_pem' => 'identity',
+					'ath_token' => ['tokens', 'superadmin'],
+					'jwk' => ['keys', 'identity'],
+					'kid' => ['kids', 'identity'],
+					'htu_api_method' => 'user.get',
+					'iat' => -5,
+					'exp' => -3,
+					'jti' => bin2hex(random_bytes(16))
+				],
+				'expected_error' => 'Not authorized. JWT token expired.'
+			],
 			'Request failed due to an invalid iat (too old)' => [
 				'request_data' => [
 					'api_method' => 'user.get',
@@ -481,7 +506,22 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 					'exp' => 0,
 					'jti' => '1234567890'
 				],
-				'expected_error' => 'Not authorized. Replay detected: jti already used.'
+				'expected_error' => 'Not authorized. jti already used.'
+			],
+			'Request failed due to failed signature verification' => [
+				'request_data' => [
+					'api_method' => 'user.get',
+					'token' => ['tokens', 'superadmin'],
+					'private_key_pem' => 'encryption',
+					'ath_token' => ['tokens', 'superadmin'],
+					'jwk' => ['keys', 'identity'],
+					'kid' => ['kids', 'identity'],
+					'htu_api_method' => 'user.get',
+					'iat' => 0,
+					'exp' => 0,
+					'jti' => bin2hex(random_bytes(16))
+				],
+				'expected_error' => 'Not authorized. Signature verification failed.'
 			],
 			'Request failed due to linked devices not allowed' => [
 				'request_data' => [
@@ -496,7 +536,7 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 					'exp' => 0,
 					'jti' => bin2hex(random_bytes(16))
 				],
-				'expected_error' => 'Not authorized. Linked devices not allowed.'
+				'expected_error' => 'No permissions to call "user.get".'
 			],
 			'Request failed due to device inactive' => [
 				'request_data' => [
@@ -519,8 +559,8 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 	/**
 	 * @dataProvider createDpopRequestDataProvider
 	 */
-	public function testDpopAuthentication(array $request_data, ?string $expected_error = null) {
-		$dpop_jwt = self::makeDpopJwt($request_data);
+	public function testDpopAuthentication_validJwtStructure(array $request_data, ?string $expected_error = null) {
+		$dpop_jwt = self::makeDpopJwt(array_diff_key($request_data, array_flip(['api_method', 'token'])));
 
 		$data = [
 			'jsonrpc' => '2.0',
@@ -532,6 +572,75 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 		$token = self::$data[$request_data['token'][0]][$request_data['token'][1]];
 
 		$this->checkResult($this->callRaw($data, $token, $dpop_jwt), $expected_error);
+	}
+
+	public static function createMultipleDpopRequestsDataProvider(): array {
+		return [
+			'Both of requests are successful' => [
+				'request_data' => [
+					'calls' => [
+						'1' => ['api_method' => 'user.get', 'response' => 'result'],
+						'2' => ['api_method' => 'apiinfo.version', 'response' => 'result'],
+					],
+					'token' => ['tokens', 'superadmin'],
+					'private_key_pem' => 'identity',
+					'ath_token' => ['tokens', 'superadmin'],
+					'jwk' => ['keys', 'identity'],
+					'kid' => ['kids', 'identity'],
+					'htu_api_method' => 'user.get,apiinfo.version',
+					'iat' => 0,
+					'exp' => 0,
+					'jti' => bin2hex(random_bytes(16))
+				]
+			],
+			'First request is successful but second gets error' => [
+				'request_data' => [
+					'calls' => [
+						'1' => ['api_method' => 'user.get', 'response' => 'result'],
+						'2' => ['api_method' => 'user.login', 'response' => 'error'],
+					],
+					'token' => ['tokens', 'superadmin'],
+					'private_key_pem' => 'identity',
+					'ath_token' => ['tokens', 'superadmin'],
+					'jwk' => ['keys', 'identity'],
+					'kid' => ['kids', 'identity'],
+					'htu_api_method' => 'user.get,user.login',
+					'iat' => 0,
+					'exp' => 0,
+					'jti' => bin2hex(random_bytes(16))
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createMultipleDpopRequestsDataProvider
+	 */
+	public function testDpopAuthentication_multipleRequests(array $request_data) {
+		$dpop_jwt = self::makeDpopJwt(array_diff_key($request_data, array_flip(['calls', 'token'])));
+
+		$data = [];
+
+		foreach ($request_data['calls'] as $call_id => $call) {
+			$data[] = [
+				'jsonrpc' => '2.0',
+				'method' => $call['api_method'],
+				'params' => [],
+				'id' => $call_id
+			];
+		}
+
+		$token = self::$data[$request_data['token'][0]][$request_data['token'][1]];
+
+		$response = $this->callRaw($data, $token, $dpop_jwt);
+
+		$this->assertIsArray($response, 'Batched response is not an array.');
+
+		foreach ($response as $call_result) {
+			$this->assertIsArray($call_result);
+			$this->assertArrayHasKey('id', $call_result);
+			$this->assertArrayHasKey($request_data['calls'][$call_result['id']]['response'], $call_result);
+		}
 	}
 
 	/**

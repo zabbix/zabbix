@@ -158,7 +158,7 @@ class CApiDpopHelper {
 		DBexecute('DELETE FROM dpop_jti_cache WHERE expires_at<'.$check_time);
 
 		if (DBfetch(DBselect('SELECT jti FROM dpop_jti_cache WHERE jti='.zbx_dbstr($payload['jti'])))) {
-			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Replay detected: jti already used.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'jti already used.');
 		}
 
 		$dpop_jti_cache_ins = [
