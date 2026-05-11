@@ -212,10 +212,11 @@ class CLocalApiClient extends CApiClient {
 	 *
 	 * @param string $api
 	 * @param string $method
+	 * @param int    $auth_type
 	 *
 	 * @return bool
 	 */
-	protected function isAllowedMethod(string $api, string $method): bool {
+	protected function isAllowedMethod(string $api, string $method, int $auth_type): bool {
 		$api_service = $this->serviceFactory->getObject($api);
 		$user_data = $api_service::$userData;
 		$method_rules = $api_service::ACCESS_RULES[$method];
@@ -229,16 +230,22 @@ class CLocalApiClient extends CApiClient {
 			return false;
 		}
 
+		$name_condition_parts = ['name LIKE '.zbx_dbstr('api%')];
+
+		if ($auth_type == CJsonRpc::AUTH_TYPE_DPOP) {
+			$name_condition_parts[] = 'OR name='.zbx_dbstr('devices.access');
+		}
+
 		$exists_action_rule = array_key_exists('action', $method_rules);
 
-		$name_conditions = 'name LIKE '.zbx_dbstr('api%');
 		if ($exists_action_rule) {
-			$name_conditions = '('.
-				$name_conditions.
-				' OR name='.zbx_dbstr($method_rules['action']).
-				' OR name='.zbx_dbstr('actions.default_access').
-			')';
+			$name_condition_parts[] = 'OR name='.zbx_dbstr($method_rules['action']);
+			$name_condition_parts[] = 'OR name='.zbx_dbstr('actions.default_access');
 		}
+
+		$name_conditions = count($name_condition_parts) > 1
+			? '('.implode(' ', $name_condition_parts).')'
+			: $name_condition_parts[0];
 
 		$db_rules = DBselect(
 			'SELECT type,name,value_str,value_int'.
@@ -257,8 +264,14 @@ class CLocalApiClient extends CApiClient {
 			$rule_value = $db_rule[CRole::RULE_TYPE_FIELDS[$db_rule['type']]];
 
 			switch ($db_rule['name']) {
-				case 'api.access':
+				case 'devices.access':
 					if ($rule_value == 0) {
+						return false;
+					}
+					break;
+
+				case 'api.access':
+					if ($rule_value == 0 && $auth_type != CJsonRpc::AUTH_TYPE_DPOP) {
 						return false;
 					}
 					break;
