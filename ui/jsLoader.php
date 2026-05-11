@@ -283,8 +283,7 @@ $translate_strings = [
 	],
 	'class.options-popup.monitoring.problems.problem.js' => [
 		'Show operational data' => _('Show operational data'),
-		'Show trigger expression' => _('Show trigger expression'),
-		'Show suppressed' => _('Show suppressed')
+		'Show trigger expression' => _('Show trigger expression')
 	],
 	'class.options-popup.monitoring.problems.time.js' => [
 		'Show timeline' => _('Show timeline'),
@@ -523,8 +522,8 @@ $translate_strings = [
 		'This value cannot be one of %1$s.' => _('This value cannot be one of %1$s.'),
 		'This value cannot be %1$s.' => _('This value cannot be %1$s.'),
 		'This value must be %1$s.' => _('This value must be %1$s.'),
-		'This value must be no less than "%1$s".' => _('This value must be no less than "%1$s".'),
-		'This value must be no greater than "%1$s".' => _('This value must be no greater than "%1$s".'),
+		'Value must be less than or equal to %1$s.' => _('Value must be less than or equal to %1$s.'),
+		'Value must be greater than or equal to %1$s.' => _('Value must be greater than or equal to %1$s.'),
 		'This value must be one of %1$s.' => _('This value must be one of %1$s.'),
 		'Entry "%1$s" is not unique.' => _('Entry "%1$s" is not unique.'),
 		'within range %1$s' => _('within range %1$s'),

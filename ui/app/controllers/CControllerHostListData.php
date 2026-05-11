@@ -23,6 +23,12 @@ class CControllerHostListData extends CControllerDataTable {
 		'parentTemplates', 'disabled_by_lld', 'disable_source', 'availability', 'active_available', 'tls_accept',
 		'tls_connect', 'info_icons', 'tags', 'custom_text'];
 
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules(['sort_field' => 'string|in name,status']);
+	}
+
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 	}
@@ -32,8 +38,9 @@ class CControllerHostListData extends CControllerDataTable {
 		$options = $this->getInput('options', []);
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', (int) CPagerHelper::loadPage('host.list'));
-		$sort_field = $this->getInput('sort_field', 'name');
-		$sort_order = $this->getInput('sort_order', ZBX_SORT_UP);
+
+		$sort_field = $this->getInput('sort_field', CControllerHost::DEFAULT_SORT);
+		$sort_order = $this->getInput('sort_order', CControllerHost::DEFAULT_SORTORDER);
 
 		CProfile::update('web.hosts.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.hosts.sortorder', $sort_order, PROFILE_TYPE_STR);
@@ -323,7 +330,7 @@ class CControllerHostListData extends CControllerDataTable {
 				: null;
 
 			CArrayHelper::sort($host['tags'], ['tag', 'value']);
-			$host['tags'] = CTagHelper::getTagsList($host, ['filter_tags' => $filter['tags']]);
+			$host['tags'] = CTagHelper::getTagsList($host);
 
 			if (array_key_exists('custom_text', $options)) {
 				$host['custom_text'] = $this->resolveColumnTexts($options['custom_text']);

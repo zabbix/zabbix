@@ -103,18 +103,18 @@ class CControllerHostView extends CControllerHost {
 		$storage_idx = 'web.monitoring.hosts.datatable';
 
 		$data = [
-			'refresh_interval' => CWebUser::getRefresh() * 1000,
+			'can_create_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+			'default_sort_field' => CControllerHost::DEFAULT_SORT,
+			'default_sort_order' => CControllerHost::DEFAULT_SORTORDER,
 			'filter_view' => 'monitoring.host.filter',
 			'filter_defaults' => $profile->filter_defaults,
 			'filter_groupids' => $this->getInput('groupids', []),
 			'filter_tabs' => $filter_tabs,
 			'filter' => $filter,
-			'sort_field' => $filter['sort'],
-			'sort_order' => $filter['sortorder'],
+			'refresh_interval' => CWebUser::getRefresh() * 1000,
+			'sort_field' => $this->getInput('sort', CControllerHost::DEFAULT_SORT),
+			'sort_order' => $this->getInput('sortorder', CControllerHost::DEFAULT_SORTORDER),
 			'storage_idx' => $storage_idx,
-			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
-				CProfile::getArray($storage_idx, [])),
-			'can_create_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
 			'tabfilter_options' => [
 				'idx' => 'web.monitoring.hosts',
 				'selected' => $profile->selected,
@@ -123,7 +123,9 @@ class CControllerHostView extends CControllerHost {
 				'page' => $filter['page'],
 				'csrf_token' => CCsrfTokenHelper::get('tabfilter')
 			],
-			'user' => ['debug_mode' => $this->getDebugMode()]
+			'user' => ['debug_mode' => $this->getDebugMode()],
+			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
+				CProfile::getArray($storage_idx, []))
 		];
 
 		$response = new CControllerResponseData($data);

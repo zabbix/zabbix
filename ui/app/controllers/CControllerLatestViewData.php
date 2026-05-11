@@ -21,6 +21,12 @@ class CControllerLatestViewData extends CControllerDataTable {
 		'history', 'trends', 'type', 'state', 'last_check', 'last_value', 'change', 'is_graph', 'keep_history',
 		'keep_trends', 'item_icons', 'tags', 'custom_text'];
 
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules(['sort_field' => 'string|in host,name']);
+	}
+
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA);
 	}
@@ -30,8 +36,9 @@ class CControllerLatestViewData extends CControllerDataTable {
 		$options = $this->getInput('options', []);
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
-		$sort_field = $this->getInput('sort_field', $filter['sort'] ?? 'name');
-		$sort_order = $this->getInput('sort_order', $filter['sortorder'] ?? ZBX_SORT_UP);
+
+		$sort_field = $this->getInput('sort_field', CControllerLatest::DEFAULT_SORT);
+		$sort_order = $this->getInput('sort_order', CControllerLatest::DEFAULT_SORTORDER);
 
 		if ($filter['tags']) {
 			$filter['tags'] = array_filter($filter['tags'], static fn(array $tag) => $tag && $tag['tag'] != '');
@@ -152,7 +159,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 						->addClass(ZBX_STYLE_CURSOR_POINTER)
 						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 						->setHint(
-							(new CTrim($last_history['value'], ZBX_HINTBOX_CONTENT_LIMIT))
+							(new CTrim($last_history['value'], ZBX_HINTBOX_HTML_LIMIT))
 								->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
 								->addClass(ZBX_STYLE_HINTBOX_WRAP),
 							'', true, '', 0
@@ -251,7 +258,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 			$item['change'] = $change;
 
 			CArrayHelper::sort($item['tags'], ['tag', 'value']);
-			$item['tags'] = CTagHelper::getTagsList($item, ['filter_tags' => $filter['tags']]);
+			$item['tags'] = CTagHelper::getTagsList($item);
 
 			$item['item_icons'] = (string) makeInformationList($item_icons);
 
@@ -300,7 +307,8 @@ class CControllerLatestViewData extends CControllerDataTable {
 				continue;
 			}
 
-			$prepared_data = $this->prepareData($tabfilter, $tabfilter['sort'], $tabfilter['sortorder']);
+			$prepared_data = $this->prepareData($tabfilter, CControllerLatest::DEFAULT_SORT,
+				CControllerLatest::DEFAULT_SORTORDER);
 			$subfilters_fields = CControllerLatest::getSubfilterFields($tabfilter);
 
 			CControllerLatest::getSubfilters($subfilters_fields, $prepared_data);

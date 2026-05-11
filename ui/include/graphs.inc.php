@@ -535,99 +535,47 @@ function dashedLine($image, $x1, $y1, $x2, $y2, $color) {
 }
 
 function find_period_start($periods, $time) {
-	$date = getdate($time);
-	$wday = $date['wday'] == 0 ? 7 : $date['wday'];
-	$curr = $date['hours'] * 100 + $date['minutes'];
+	$date = new DateTime('@'.$time);
+	$date->setTimezone(new DateTimeZone(date_default_timezone_get()));
 
-	if (isset($periods[$wday])) {
-		$next_h = -1;
-		$next_m = -1;
-		foreach ($periods[$wday] as $period) {
-			$per_start = $period['start_h'] * 100 + $period['start_m'];
-			if ($per_start > $curr) {
-				if (($next_h == -1 && $next_m == -1) || ($per_start < ($next_h * 100 + $next_m))) {
-					$next_h = $period['start_h'];
-					$next_m = $period['start_m'];
+	for ($d = 0; $d < 8; $d++) {
+		$wday = $date->format('N');
+
+		if (array_key_exists($wday, $periods)) {
+			foreach ($periods[$wday] as $period) {
+				$date->setTime($period['end_h'], $period['end_m'], 0);
+				$per_end = $date->getTimestamp();
+
+				if ($per_end <= $time) {
+					continue;
 				}
-				continue;
-			}
 
-			$per_end = $period['end_h'] * 100 + $period['end_m'];
-			if ($per_end <= $curr) {
-				continue;
+				$date->setTime($period['start_h'], $period['start_m'], 0);
+				$per_start = $date->getTimestamp();
+
+				return $per_start < $time ? $time : $per_start;
 			}
-			return $time;
 		}
 
-		if ($next_h >= 0 && $next_m >= 0) {
-			return mktime($next_h, $next_m, 0, $date['mon'], $date['mday'], $date['year']);
-		}
+		$date->modify('+1 day');
 	}
 
-	for ($days = 1; $days < 7 ; ++$days) {
-		$new_wday = ($wday + $days - 1) % 7 + 1;
-		if (isset($periods[$new_wday ])) {
-			$next_h = -1;
-			$next_m = -1;
-
-			foreach ($periods[$new_wday] as $period) {
-				$per_start = $period['start_h'] * 100 + $period['start_m'];
-
-				if (($next_h == -1 && $next_m == -1) || ($per_start < ($next_h * 100 + $next_m))) {
-					$next_h = $period['start_h'];
-					$next_m = $period['start_m'];
-				}
-			}
-
-			if ($next_h >= 0 && $next_m >= 0) {
-				return mktime($next_h, $next_m, 0, $date['mon'], $date['mday'] + $days, $date['year']);
-			}
-		}
-	}
 	return -1;
 }
 
 function find_period_end($periods, $time, $max_time) {
-	$date = getdate($time);
-	$wday = $date['wday'] == 0 ? 7 : $date['wday'];
-	$curr = $date['hours'] * 100 + $date['minutes'];
+	$date = new DateTime('@'.$time);
+	$date->setTimezone(new DateTimeZone(date_default_timezone_get()));
 
-	if (isset($periods[$wday])) {
-		$next_h = -1;
-		$next_m = -1;
+	$wday = $date->format('N');
 
+	if (array_key_exists($wday, $periods)) {
 		foreach ($periods[$wday] as $period) {
-			$per_start = $period['start_h'] * 100 + $period['start_m'];
-			$per_end = $period['end_h'] * 100 + $period['end_m'];
-			if ($per_start > $curr) {
-				continue;
-			}
-			if ($per_end < $curr) {
-				continue;
-			}
+			$date->setTime($period['end_h'], $period['end_m'], 0);
+			$per_end = $date->getTimestamp();
 
-			if (($next_h == -1 && $next_m == -1) || ($per_end > ($next_h * 100 + $next_m))) {
-				$next_h = $period['end_h'];
-				$next_m = $period['end_m'];
-			}
-		}
-
-		if ($next_h >= 0 && $next_m >= 0) {
-			$new_time = mktime($next_h, $next_m, 0, $date['mon'], $date['mday'], $date['year']);
-
-			if ($new_time == $time) {
-				return $time;
-			}
-			if ($new_time > $max_time) {
-				return $max_time;
-			}
-
-			$next_time = find_period_end($periods, $new_time, $max_time);
-			if ($next_time < 0) {
-				return $new_time;
-			}
-			else {
-				return $next_time;
+			if ($per_end > $time) {
+				return $per_end > $max_time ? $max_time : $per_end;
 			}
 		}
 	}

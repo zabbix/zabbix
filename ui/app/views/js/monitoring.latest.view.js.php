@@ -35,19 +35,21 @@
 		#popup_message_box = null;
 
 		init({
-			layout_mode,
-			refresh_interval,
+			checkbox_object,
+			csrf_token,
+			default_sort_field,
+			default_sort_order,
+			filter,
 			filter_defaults,
 			filter_options,
-			checkbox_object,
 			filter_set,
-			filter,
+			layout_mode,
 			page,
+			refresh_interval,
 			sort_field,
 			sort_order,
 			storage_idx,
-			user_configs,
-			csrf_token
+			user_configs
 		}) {
 			this.#layout_mode = layout_mode;
 			this.#refresh_interval = refresh_interval;
@@ -60,7 +62,8 @@
 			this.#initExpandableSubfilter();
 			this.#initListActions();
 			this.#initPopupListeners();
-			this.#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs});
+			this.#initDataTable({filter, page, default_sort_field, default_sort_order, sort_field, sort_order,
+				storage_idx, user_configs});
 
 			if (this.#refresh_interval != 0 && this.#filter_set) {
 				this.#scheduleRefresh();
@@ -123,7 +126,7 @@
 			let form = this.#getCurrentForm().get(0);
 
 			form.querySelector('.js-massexecute-item').addEventListener('click', e => {
-				this.#executeNow(e.target, {itemids: Object.keys(chkbxRange.getSelectedIds())});
+				this.executeNow(e.target, {itemids: Object.keys(chkbxRange.getSelectedIds())});
 			});
 		}
 
@@ -164,7 +167,9 @@
 			});
 		}
 
-		#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
+		#initDataTable({filter, page, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
+				user_configs}) {
+
 			const data_provider_url = new URL('zabbix.php', location.href);
 			data_provider_url.searchParams.set('action', 'latest.view.data');
 			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
@@ -222,6 +227,8 @@
 				.setPage(page)
 				.setFilter(filter)
 				.setSelectable('items', 'itemids', ['itemid', 'data_actions'])
+				.setDefaultSortField(default_sort_field)
+				.setDefaultSortOrder(default_sort_order)
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
@@ -263,10 +270,10 @@
 								hint += "\n" + maintenance.description;
 							}
 
-							maintenance_icon.setAttribute('data-hintbox-contents', hint);
+							maintenance_icon.setAttribute('data-hintbox-html', hint);
 						}
 						else {
-							maintenance_icon.setAttribute('data-hintbox-contents',
+							maintenance_icon.setAttribute('data-hintbox-html',
 								<?= json_encode(_('Inaccessible maintenance')); ?>);
 						}
 
@@ -310,7 +317,7 @@
 						description_icon.setAttribute('type', 'button');
 						description_icon.setAttribute('role', 'button');
 						description_icon.setAttribute('data-content', '?');
-						description_icon.setAttribute('data-hintbox-contents', description_expanded);
+						description_icon.setAttribute('data-hintbox-html', description_expanded);
 						description_icon.setAttribute('data-hintbox', '1');
 						description_icon.setAttribute('data-hintbox-class', ZBX_STYLE_HINTBOX_WRAP);
 						description_icon.setAttribute('data-hintbox-static', '1');
@@ -523,7 +530,7 @@
 			this.#refresh_interval_id = null;
 		}
 
-		#executeNow(button, data) {
+		executeNow(button, data) {
 			if (button instanceof Element) {
 				button.classList.add('is-loading');
 			}

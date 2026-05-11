@@ -149,8 +149,8 @@ class CControllerLatestView extends CControllerLatest {
 		$subfilter_set = self::isSubfilterSet($filter);
 
 		// data sort and pager
-		$sort_field = $this->getInput('sort', 'name');
-		$sort_order = $this->getInput('sortorder', ZBX_SORT_UP);
+		$sort_field = $this->getInput('sort', CControllerLatest::DEFAULT_SORT);
+		$sort_order = $this->getInput('sortorder', CControllerLatest::DEFAULT_SORTORDER);
 
 		$prepared_data = [
 			'hosts' => [],
@@ -182,12 +182,20 @@ class CControllerLatestView extends CControllerLatest {
 
 		// display
 		$data = [
-			'refresh_interval' => CWebUser::getRefresh() * 1000,
+			'default_sort_field' => CControllerLatest::DEFAULT_SORT,
+			'default_sort_order' => CControllerLatest::DEFAULT_SORTORDER,
+			'filter' => $filter,
 			'filter_defaults' => $profile->filter_defaults,
-			'mandatory_filter_set' => $mandatory_filter_set,
-			'subfilter_set' => $subfilter_set,
-			'filter_view' => 'monitoring.latest.filter',
 			'filter_tabs' => $filter_tabs,
+			'filter_view' => 'monitoring.latest.filter',
+			'mandatory_filter_set' => $mandatory_filter_set,
+			'paging' => $paging,
+			'refresh_interval' => CWebUser::getRefresh() * 1000,
+			'sort_field' => $sort_field,
+			'sort_order' => $sort_order,
+			'storage_idx' => $storage_idx,
+			'subfilters' => $subfilters,
+			'subfilter_set' => $subfilter_set,
 			'tabfilter_options' => [
 				'idx' => 'web.monitoring.latest',
 				'selected' => $profile->selected,
@@ -196,16 +204,10 @@ class CControllerLatestView extends CControllerLatest {
 				'page' => $filter['page'],
 				'csrf_token' => CCsrfTokenHelper::get('tabfilter')
 			],
-			'filter' => $filter,
-			'subfilters' => $subfilters,
-			'sort_field' => $sort_field,
-			'sort_order' => $sort_order,
-			'view_curl' => $view_url,
-			'paging' => $paging,
 			'uncheck' => $this->hasInput('filter_reset'),
-			'storage_idx' => $storage_idx,
 			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
-				CProfile::getArray($storage_idx, []))
+				CProfile::getArray($storage_idx, [])),
+			'view_curl' => $view_url
 		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);

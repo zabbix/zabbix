@@ -24,7 +24,7 @@ class CDataTableOptionsPopupTags extends CDataTableOptionsPopup {
 	}
 
 	getTemplate() {
-		return new Template(`
+		return `
 			<template>
 				<label for="number_of_tags" class="${ZBX_STYLE_FORM_LABEL}">${t('Number of tags')}</label>
 				<div class="${ZBX_STYLE_FORM_FIELD}">
@@ -69,7 +69,7 @@ class CDataTableOptionsPopupTags extends CDataTableOptionsPopup {
 						data-field-type="text-box" placeholder="${t('comma-separated list')}">
 				</div>
 			</template>
-		`).evaluateToElement();
+		`;
 	}
 
 	getFieldData() {

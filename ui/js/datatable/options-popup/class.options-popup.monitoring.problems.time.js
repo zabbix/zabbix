@@ -22,7 +22,7 @@ class CDataTableOptionsPopupMonitoringProblemsTime extends CDataTableOptionsPopu
 	}
 
 	getTemplate() {
-		return new Template(`
+		return `
 			<template>
 				<div class="${ZBX_STYLE_FORM_FIELD}">
 					<input type="checkbox" id="show_timeline" name="show_timeline" value="1"
@@ -30,7 +30,7 @@ class CDataTableOptionsPopupMonitoringProblemsTime extends CDataTableOptionsPopu
 					<label for="show_timeline"><span></span>${t('Show timeline')}</label>
 				</div>
 			</template>
-		`).evaluateToElement();
+		`;
 	}
 
 	getFieldData() {

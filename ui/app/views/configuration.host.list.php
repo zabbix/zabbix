@@ -248,13 +248,15 @@ $html_page
 (new CScriptTag('
 	view.init('.json_encode([
 		'applied_filter_groupids' => array_keys($data['filter']['groups']),
+		'csrf_token' => $csrf_token,
+		'default_sort_field' => $data['default_sort_field'],
+		'default_sort_order' => $data['default_sort_order'],
 		'filter' => $data['filter'],
 		'page' => $data['page'],
 		'sort_field' => $data['sort_field'],
 		'sort_order' => $data['sort_order'],
 		'storage_idx' => $data['storage_idx'],
-		'user_configs' => $data['user_configs'],
-		'csrf_token' => $csrf_token,
+		'user_configs' => $data['user_configs']
 	]).');
 '))
 	->setOnDocumentReady()

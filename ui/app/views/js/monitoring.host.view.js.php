@@ -34,18 +34,20 @@
 		#popup_message_box = null;
 
 		init({
-			layout_mode,
+			applied_filter_groupids,
+			csrf_token,
+			default_sort_field,
+			default_sort_order,
 			filter_defaults,
 			filter_options,
-			refresh_interval,
-			applied_filter_groupids,
 			filter,
+			layout_mode,
 			page,
+			refresh_interval,
 			sort_field,
 			sort_order,
 			storage_idx,
-			user_configs,
-			csrf_token
+			user_configs
 		}) {
 			this.#layout_mode = layout_mode;
 			this.#refresh_interval = refresh_interval;
@@ -56,7 +58,8 @@
 			this.#initTabFilter(filter_options);
 			this.#initEvents();
 			this.#initPopupListeners();
-			this.#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs});
+			this.#initDataTable({filter, page, default_sort_field, default_sort_order, sort_field, sort_order,
+				storage_idx, user_configs});
 
 			if (this.#refresh_interval != 0) {
 				this.#scheduleRefresh();
@@ -124,7 +127,9 @@
 			});
 		}
 
-		#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
+		#initDataTable({filter, page, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
+				user_configs}) {
+
 			const data_provider_url = new URL('zabbix.php', location.href);
 			data_provider_url.searchParams.set('action', 'host.view.data');
 			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
@@ -172,6 +177,8 @@
 				])
 				.setPage(page)
 				.setFilter(filter)
+				.setDefaultSortField(default_sort_field)
+				.setDefaultSortOrder(default_sort_order)
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
@@ -211,10 +218,10 @@
 								hint += "\n" + maintenance.description;
 							}
 
-							maintenance_icon.setAttribute('data-hintbox-contents', hint);
+							maintenance_icon.setAttribute('data-hintbox-html', hint);
 						}
 						else {
-							maintenance_icon.setAttribute('data-hintbox-contents',
+							maintenance_icon.setAttribute('data-hintbox-html',
 								<?= json_encode(_('Inaccessible maintenance')); ?>);
 						}
 

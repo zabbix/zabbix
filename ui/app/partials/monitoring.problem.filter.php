@@ -223,6 +223,12 @@ $right_column = (new CFormList())
 			->setUncheckedValue(0)
 			->setId('show_symptoms_#{uniqid}')
 	])
+	->addRow(_('Show suppressed problems'), [
+		(new CCheckBox('show_suppressed'))
+			->setChecked($data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
+			->setUncheckedValue(0)
+			->setId('show_suppressed_#{uniqid}')
+	])
 	->addRow(
 		_('Acknowledgement status'),
 		(new CHorList())
@@ -257,9 +263,7 @@ $template = (new CForm('get'))
 		(new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN),
 		(new CVar('filter_name', '#{filter_name}'))->removeId(),
 		(new CVar('filter_show_counter', '#{filter_show_counter}'))->removeId(),
-		(new CVar('filter_custom_time', '#{filter_custom_time}'))->removeId(),
-		(new CVar('sort', '#{sort}'))->removeId(),
-		(new CVar('sortorder', '#{sortorder}'))->removeId()
+		(new CVar('filter_custom_time', '#{filter_custom_time}'))->removeId()
 	]);
 
 if (array_key_exists('render_html', $data)) {
@@ -335,10 +339,10 @@ if (array_key_exists('render_html', $data)) {
 
 	function render(data, container) {
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
-		$('[name="filter_new"],[name="filter_update"]').hide()
-			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
+		document.querySelector('[name="filter_new"]').style.display = data.filter_configurable ? 'none' : '';
+		document.querySelector('[name="filter_update"]').style.display = data.filter_configurable ? '' : 'none';
 
-		let fields = ['show', 'name', 'tag_priority', 'show_opdata', 'show_symptoms', 'show_tags',
+		let fields = ['show', 'name', 'tag_priority', 'show_opdata', 'show_symptoms', 'show_suppressed', 'show_tags',
 				'acknowledgement_status', 'acknowledged_by_me', 'age_state', 'age', 'tag_name_format', 'evaltype'
 			],
 			eventHandler = {
@@ -552,8 +556,8 @@ if (array_key_exists('render_html', $data)) {
 
 	function expand(data, container) {
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
-		$('[name="filter_new"],[name="filter_update"]').hide()
-			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
+		document.querySelector('[name="filter_new"]').style.display = data.filter_configurable ? 'none' : '';
+		document.querySelector('[name="filter_update"]').style.display = data.filter_configurable ? '' : 'none';
 
 		// Trigger change to update timeselector ui disabled state.
 		$('#show_' + data.uniqid, container).trigger('change');

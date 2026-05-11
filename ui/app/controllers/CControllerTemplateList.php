@@ -16,6 +16,9 @@
 
 class CControllerTemplateList extends CController {
 
+	public const DEFAULT_SORT = 'name';
+	public const DEFAULT_SORTORDER = ZBX_SORT_UP;
+
 	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
@@ -80,8 +83,10 @@ class CControllerTemplateList extends CController {
 
 		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
 
-		$sort_field = $this->getInput('sort', CProfile::get('web.templates.sort', 'name'));
-		$sort_order = $this->getInput('sortorder', CProfile::get('web.templates.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort',
+			CProfile::get('web.templates.sort', self::DEFAULT_SORT));
+		$sort_order = $this->getInput('sortorder',
+			CProfile::get('web.templates.sortorder', self::DEFAULT_SORTORDER));
 
 		CProfile::update('web.templates.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.templates.sortorder', $sort_order, PROFILE_TYPE_STR);
@@ -111,13 +116,15 @@ class CControllerTemplateList extends CController {
 		$data = [
 			'action' => $this->getAction(),
 			'active_tab' => CProfile::get('web.templates.filter.active', 1),
+			'default_sort_field' => $sort_field,
+			'default_sort_order' => $sort_order,
 			'filter' => $filter,
-			'profileIdx' => 'web.templates.filter',
 			'sort_field' => $sort_field,
 			'sort_order' => $sort_order,
 			'page' => $this->getInput('page', 1),
-			'uncheck' => $this->getInput('uncheck', 0) == 1,
+			'profileIdx' => 'web.templates.filter',
 			'storage_idx' => $storage_idx,
+			'uncheck' => $this->getInput('uncheck', 0) == 1,
 			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
 				CProfile::getArray($storage_idx, [])
 			)

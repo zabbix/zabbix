@@ -22,7 +22,7 @@ class CDataTableOptionsPopupMonitoringHostProblems extends CDataTableOptionsPopu
 	}
 
 	getTemplate() {
-		return new Template(`
+		return `
 			<template>
 				<div class="${ZBX_STYLE_FORM_FIELD}">
 					<input type="checkbox" id="show_suppressed" name="show_suppressed" value="1"
@@ -30,7 +30,7 @@ class CDataTableOptionsPopupMonitoringHostProblems extends CDataTableOptionsPopu
 					<label for="show_suppressed"><span></span>${t('Show suppressed problems')}</label>
 				</div>
 			</template>
-		`).evaluateToElement();
+		`;
 	}
 
 	getFieldData() {

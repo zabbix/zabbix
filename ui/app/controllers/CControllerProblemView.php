@@ -19,6 +19,9 @@
  */
 class CControllerProblemView extends CControllerProblem {
 
+	public const DEFAULT_SORT = 'clock';
+	public const DEFAULT_SORTORDER = ZBX_SORT_UP;
+
 	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
@@ -37,6 +40,7 @@ class CControllerProblemView extends CControllerProblem {
 			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>					'array',
 			'show_symptoms' =>			'in 0,1',
+			'show_suppressed' =>		'in 0,1',
 			'acknowledgement_status' =>	'in '.ZBX_ACK_STATUS_ALL.','.ZBX_ACK_STATUS_UNACK.','.ZBX_ACK_STATUS_ACK,
 			'acknowledged_by_me' =>		'in 0,1',
 			'from' =>					'range_time',
@@ -106,9 +110,19 @@ class CControllerProblemView extends CControllerProblem {
 
 		$data = [
 			'action' => $this->getAction(),
+			'default_sort_field' => CControllerProblem::DEFAULT_SORT,
+			'default_sort_order' => CControllerProblem::DEFAULT_SORTORDER,
 			'filter' => $filter,
-			'filter_view' => 'monitoring.problem.filter',
 			'filter_defaults' => $profile->filter_defaults,
+			'filter_tabs' => $filter_tabs,
+			'filter_view' => 'monitoring.problem.filter',
+			'inventories' => array_column(getHostInventories(), 'title', 'db_field'),
+			'page' => $this->getInput('page', 1),
+			'refresh_interval' => CWebUser::getRefresh() * 1000,
+			'severities' => CSeverityHelper::getSeverities(),
+			'storage_idx' => $storage_idx,
+			'sort_field' => $this->getInput('sort', CControllerProblem::DEFAULT_SORT),
+			'sort_order' => $this->getInput('sortorder', CControllerProblem::DEFAULT_SORTORDER),
 			'tabfilter_options' => [
 				'idx' => 'web.monitoring.problem',
 				'selected' => $profile->selected,
@@ -118,20 +132,13 @@ class CControllerProblemView extends CControllerProblem {
 				'page' => $filter['page'],
 				'csrf_token' => CCsrfTokenHelper::get('tabfilter'),
 				'timeselector' => [
-					'from' => $timeselector_from,
-					'to' => $timeselector_to,
-					'disabled' => ($filter['show'] != TRIGGERS_OPTION_ALL || $filter['filter_custom_time'])
-				] + getTimeselectorActions($timeselector_from, $timeselector_to)
+						'from' => $timeselector_from,
+						'to' => $timeselector_to,
+						'disabled' => ($filter['show'] != TRIGGERS_OPTION_ALL || $filter['filter_custom_time'])
+					] + getTimeselectorActions($timeselector_from, $timeselector_to)
 			],
-			'filter_tabs' => $filter_tabs,
-			'refresh_interval' => CWebUser::getRefresh() * 1000,
-			'inventories' => array_column(getHostInventories(), 'title', 'db_field'),
-			'sort' => $filter['sort'],
-			'sortorder' => $filter['sortorder'],
 			'uncheck' => $this->hasInput('filter_reset'),
-			'page' => $this->getInput('page', 1),
-			'severities' => CSeverityHelper::getSeverities(),
-			'storage_idx' => $storage_idx,
+			'user' => ['debug_mode' => $this->getDebugMode()],
 			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
 				CProfile::getArray($storage_idx, []))
 		];

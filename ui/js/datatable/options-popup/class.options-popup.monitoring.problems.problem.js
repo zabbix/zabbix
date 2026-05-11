@@ -18,13 +18,12 @@ class CDataTableOptionsPopupMonitoringProblemsProblem extends CDataTableOptionsP
 	getFields() {
 		const show_opdata = this.getElement().querySelector('[name="show_opdata"]');
 		const details = this.getElement().querySelector('[name="details"]');
-		const show_suppressed = this.getElement().querySelector('[name="show_suppressed"]');
 
-		return {show_opdata, details, show_suppressed};
+		return {show_opdata, details};
 	}
 
 	getTemplate() {
-		return new Template(`
+		return `
 			<template>
 				<div class="${ZBX_STYLE_FORM_FIELD}">
 					<input type="checkbox" id="show_opdata" name="show_opdata" value="1"
@@ -36,28 +35,21 @@ class CDataTableOptionsPopupMonitoringProblemsProblem extends CDataTableOptionsP
 						class="${ZBX_STYLE_CHECKBOX_RADIO}" data-field-type="checkbox">
 					<label for="details"><span></span>${t('Show trigger expression')}</label>
 				</div>
-				<div class="${ZBX_STYLE_FORM_FIELD}">
-					<input type="checkbox" id="show_suppressed" name="show_suppressed" value="1"
-						class="${ZBX_STYLE_CHECKBOX_RADIO}" data-field-type="checkbox">
-					<label for="show_suppressed"><span></span>${t('Show suppressed')}</label>
-				</div>
 			</template>
-		`).evaluateToElement();
+		`;
 	}
 
 	getFieldData() {
 		const show_opdata = this.getField('show_opdata').checked ? 1 : 0;
 		const details = this.getField('details').checked ? 1 : 0;
-		const show_suppressed = this.getField('show_suppressed').checked ? 1 : 0;
 
-		return {show_opdata, details, show_suppressed};
+		return {show_opdata, details};
 	}
 
 	getDefaultData() {
 		return {
 			show_opdata: 0,
-			details: 0,
-			show_suppressed: 0
+			details: 0
 		}
 	}
 

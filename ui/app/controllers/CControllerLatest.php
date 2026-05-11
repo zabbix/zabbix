@@ -35,8 +35,6 @@ abstract class CControllerLatest extends CController {
 		'state' => -1,
 		'show_details' => 0,
 		'page' => null,
-		'sort' => 'name',
-		'sortorder' => ZBX_SORT_UP,
 		'subfilter_hostids' => [],
 		'subfilter_tagnames' => [],
 		'subfilter_tags' => [],
@@ -47,25 +45,28 @@ abstract class CControllerLatest extends CController {
 	// Mandatory filter fields.
 	public const MANDATORY_FILTER_FIELDS = ['groupids', 'hostids', 'name', 'tags', 'state'];
 
+	public const DEFAULT_SORT = 'name';
+	public const DEFAULT_SORTORDER = ZBX_SORT_UP;
+
 	/**
 	 * Prepare the latest data based on the given filter and sorting options.
 	 *
 	 * @param array  $filter                       Item filter options.
-	 * @param array  $filter['groupids']           Filter items by host groups.
-	 * @param array  $filter['hostids']            Filter items by hosts.
-	 * @param string $filter['name']               Filter items by name.
-	 * @param int    $filter['evaltype']           Filter evaltype.
-	 * @param array  $filter['tags']               Filter tags.
-	 * @param string $filter['tags'][]['tag']
-	 * @param string $filter['tags'][]['value']
-	 * @param int    $filter['tags'][]['operator']
-	 * @param int    $filter['state']              Filter state.
-	 * @param string $sort_field                   Sorting field.
-	 * @param string $sort_order                   Sorting order.
+	 *        array  $filter['groupids']           Filter items by host groups.
+	 *        array  $filter['hostids']            Filter items by hosts.
+	 *        string $filter['name']               Filter items by name.
+	 *        int    $filter['evaltype']           Filter evaltype.
+	 *        array  $filter['tags']               Filter tags.
+	 *        string $filter['tags'][]['tag']
+	 *        string $filter['tags'][]['value']
+	 *        int    $filter['tags'][]['operator']
+	 *        int    $filter['state']              Filter state.
+	 *        string $sort_field                   Sorting field.
+	 *        string $sort_order                   Sorting order.
 	 *
 	 * @return array
 	 */
-	protected function prepareData(array $filter, $sort_field, $sort_order) {
+	protected function prepareData(array $filter, $sort_field, $sort_order): array {
 		// Select groups for subsequent selection of hosts and items.
 		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
 
@@ -177,7 +178,7 @@ abstract class CControllerLatest extends CController {
 		$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
 		// Extra byte to trim values that exceeds length limit.
-		$length = ZBX_HINTBOX_CONTENT_LIMIT + 1;
+		$length = ZBX_HINTBOX_HTML_LIMIT + 1;
 		$history = Manager::History()->getLastValues($items, 2,
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)), $length
 		);

@@ -28,14 +28,26 @@
 		#datatable = null;
 		#csrf_token = null;
 
-		init({applied_filter_groupids, filter, page, sort_field, sort_order, storage_idx, user_configs, csrf_token}) {
+		init({
+			applied_filter_groupids,
+			csrf_token,
+			default_sort_field,
+			default_sort_order,
+			filter,
+			page,
+			sort_field,
+			sort_order,
+			storage_idx,
+			user_configs
+		}) {
 			this.#applied_filter_groupids = applied_filter_groupids;
 			this.#csrf_token = csrf_token;
 
 			this.#initFilter();
 			this.#initEvents();
 			this.#initPopupListeners();
-			this.#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs});
+			this.#initDataTable({filter, page, default_sort_field, default_sort_order, sort_field, sort_order,
+				storage_idx, user_configs});
 		}
 
 		enable(target, parameters, callback) {
@@ -224,7 +236,9 @@
 			});
 		}
 
-		#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
+		#initDataTable({filter, page, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
+				user_configs}) {
+
 			const data_provider_url = new URL('zabbix.php', location.href);
 			data_provider_url.searchParams.set('action', 'host.list.data');
 			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
@@ -286,6 +300,8 @@
 				.setPage(page)
 				.setFilter(filter)
 				.setSelectable('hosts', 'hostids', ['hostid', 'data_actions'])
+				.setDefaultSortField(default_sort_field)
+				.setDefaultSortOrder(default_sort_order)
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
@@ -394,10 +410,10 @@
 								hint += "\n" + maintenance.description;
 							}
 
-							maintenance_icon.setAttribute('data-hintbox-contents', hint);
+							maintenance_icon.setAttribute('data-hintbox-html', hint);
 						}
 						else {
-							maintenance_icon.setAttribute('data-hintbox-contents',
+							maintenance_icon.setAttribute('data-hintbox-html',
 								<?= json_encode(_('Inaccessible maintenance')); ?>);
 						}
 
@@ -566,7 +582,7 @@
 						description_icon.classList.add('btn-icon', ZBX_ICON_ALERT_WITH_CONTENT, ZBX_STYLE_HINTBOX_WRAP);
 						description_icon.setAttribute('role', 'button');
 						description_icon.setAttribute('data-content', '?');
-						description_icon.setAttribute('data-hintbox-contents',
+						description_icon.setAttribute('data-hintbox-html',
 							<?= json_encode(_('Disabled automatically by an LLD rule.')); ?>);
 						description_icon.setAttribute('data-hintbox', '1');
 						description_icon.setAttribute('data-hintbox-class', ZBX_STYLE_HINTBOX_WRAP);

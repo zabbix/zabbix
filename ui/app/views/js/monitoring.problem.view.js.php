@@ -30,20 +30,23 @@
 		#opened_eventids = [];
 		#datatable = null;
 		#csrf_token = null;
+		#show_problems_hidden_column_ids = ['recovery', 'status'];
 
 		init({
-			layout_mode,
-			filter_options,
-			refresh_interval,
-			filter_defaults,
-			page,
+			csrf_token,
+			default_sort_field,
+			default_sort_order,
 			filter,
+			filter_defaults,
+			filter_options,
+			layout_mode,
+			page,
+			refresh_interval,
+			severities,
 			sort_field,
 			sort_order,
 			storage_idx,
-			user_configs,
-			severities,
-			csrf_token
+			user_configs
 		}) {
 			this.#layout_mode = layout_mode;
 			this.#refresh_interval = refresh_interval;
@@ -51,7 +54,8 @@
 			this.#csrf_token = csrf_token;
 
 			this.#initFilter(filter_options);
-			this.#initDataTable({page, filter, sort_field, sort_order, storage_idx, user_configs, severities});
+			this.#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order,
+				storage_idx, user_configs, severities});
 
 			$.subscribe('event.rank_change', () => this.#refresh());
 
@@ -79,7 +83,9 @@
 			jqBlink.blink();
 		}
 
-		#initDataTable({page, filter, sort_field, sort_order, storage_idx, user_configs, severities}) {
+		#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
+				user_configs, severities}) {
+
 			const data_provider_url = new URL('zabbix.php', location.href);
 			data_provider_url.searchParams.set('action', 'problem.view.data');
 			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
@@ -90,8 +96,6 @@
 				filter.from = this.#global_timerange.from;
 				filter.to = this.#global_timerange.to;
 			}
-
-			const show_columns = filter.show != <?= TRIGGERS_OPTION_IN_PROBLEM; ?>;
 
 			this.#datatable = new CDataTable(document.getElementById('problems'), data_provider)
 				.setColumns([
@@ -109,15 +113,9 @@
 						.setRenderer('severity')
 						.setSortable(true),
 					new CDataTableColumn('recovery', <?= json_encode(_('Recovery time')); ?>)
-						.setFields(['recovery'])
-						.setShowInTableOptions(show_columns)
-						.setTogglable(show_columns)
-						.setVisible(show_columns),
+						.setFields(['recovery']),
 					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
-						.setFields(['status'])
-						.setShowInTableOptions(show_columns)
-						.setTogglable(show_columns)
-						.setVisible(show_columns),
+						.setFields(['status']),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['info']),
 					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
@@ -127,15 +125,14 @@
 					new CDataTableColumn('problem', <?= json_encode(_('Problem')); ?>)
 						.setColumnOptions({
 							show_opdata: '0',
-							details: '0',
-							show_suppressed: '0'
+							details: '0'
 						})
 						.setOptionsPopupHandler('problem')
 						.setFields(['description'])
 						.setSortField('name')
 						.setSortable(true)
 						.setTogglable(false)
-						.setWidth('minmax(auto, 657px)'),
+						.setWidth('auto'),
 					new CDataTableColumn('duration', <?= json_encode(_('Duration')); ?>)
 						.setFields(['duration']),
 					new CDataTableColumn('update', <?= json_encode(_('Update')); ?>)
@@ -180,6 +177,8 @@
 				.setTabFilterItem(this.#active_filter)
 				.setSelectable('problem', 'eventids', ['eventid', 'nested', 'symptom_count', 'cause_eventid',
 					'severity'])
+				.setDefaultSortField(default_sort_field)
+				.setDefaultSortOrder(default_sort_order)
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
@@ -419,7 +418,7 @@
 							maintenance_icon.setAttribute('type', 'button');
 							maintenance_icon.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_WRENCH_ALT_SMALL,
 								ZBX_STYLE_COLOR_WARNING, ZBX_STYLE_NO_INDENT);
-							maintenance_icon.setAttribute('data-hintbox-contents', hint)
+							maintenance_icon.setAttribute('data-hintbox-html', hint)
 							maintenance_icon.setAttribute('data-hintbox', '1');
 							maintenance_icon.setAttribute('data-hintbox-class', ZBX_STYLE_HINTBOX_WRAP);
 							maintenance_icon.setAttribute('data-hintbox-static', '1');
@@ -600,12 +599,38 @@
 
 					new CState().setParams({page});
 				})
+				.on(CDataTable.EVENT_BEFORE_RENDER, () => {
+					const filter = this.#datatable.getFilter();
+
+					this.#handleShowProblemsFilter(filter);
+				})
 				.on(CDataTable.EVENT_RENDER, e => {
 					const response = e.detail.response;
 
 					this.refreshCounters(response);
 
 					requestAnimationFrame(() => this.#initExpandables());
+				})
+				.on(CDataTable.EVENT_COLUMN_TOGGLE, e => {
+					const {column_index} = e.detail;
+
+					const column = this.#datatable.getColumn(column_index);
+					if (!column) {
+						return;
+					}
+
+					const filter = this.#datatable.getFilter();
+					if (filter.show != <?= TRIGGERS_OPTION_IN_PROBLEM; ?>) {
+						return;
+					}
+
+					if (this.#show_problems_hidden_column_ids.includes(column.getId())) {
+						e.preventDefault();
+
+						column.setVisible(false);
+
+						this.#datatable.updateUserConfig();
+					}
 				})
 				.on(CDataTable.EVENT_DATA_SORT, () => this.#scheduleRefresh())
 				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.#unscheduleRefresh())
@@ -636,7 +661,9 @@
 			this.#filter.on(TABFILTER_EVENT_URLSET, () => {
 				chkbxRange.clearSelectedOnFilterChange();
 
-				if (this.#active_filter !== this.#filter._active_item) {
+				const tabfilter_changed = this.#active_filter !== this.#filter._active_item;
+
+				if (tabfilter_changed) {
 					this.#active_filter = this.#filter._active_item;
 					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
 
@@ -644,7 +671,7 @@
 				}
 
 				this.#scheduleRefresh();
-				this.#refresh();
+				this.#refresh(tabfilter_changed);
 			});
 
 			$.subscribe('timeselector.rangeupdate', (e, data) => {
@@ -776,32 +803,30 @@
 			);
 		}
 
-		#refresh() {
+		#refresh(tabfilter_changed = false) {
 			if (isUserInteracting()) {
 				return;
 			}
 
 			const search_params = new URLSearchParams(location.search.substring(1));
-			const current_filter = searchParamsToObject(search_params);
-			const filter = {...this.#filter_defaults, ...current_filter};
+			const url_filter = searchParamsToObject(search_params);
+			const filter = {...this.#filter_defaults, ...url_filter};
+			const current_filter = this.#datatable.getFilter();
 
 			if (filter.filter_custom_time == 0) {
 				filter.from = this.#global_timerange.from;
 				filter.to = this.#global_timerange.to;
 			}
 
-			const show_columns = filter.show != <?= TRIGGERS_OPTION_IN_PROBLEM; ?>;
-
-			for (const column_name of ['recovery', 'status']) {
-				const column = this.#datatable.getColumnById(column_name);
-
-				column.setShowInTableOptions(show_columns)
-					.setTogglable(show_columns)
-					.setVisible(show_columns);
+			if (current_filter.show != filter.show) {
+				this.#handleShowProblemsFilter(filter);
 			}
 
-			this.#datatable.updateUserConfig()
-				.setFilter(filter)
+			if (!tabfilter_changed) {
+				this.#datatable.updateUserConfig();
+			}
+
+			this.#datatable.setFilter(filter)
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,
 					force_load: true,
@@ -827,6 +852,24 @@
 		#unscheduleRefresh() {
 			clearInterval(this.#refresh_interval_id);
 			this.#refresh_interval_id = null;
+		}
+
+		#handleShowProblemsFilter(filter) {
+			for (const id of this.#show_problems_hidden_column_ids) {
+				const column = this.#datatable.getColumnById(id);
+				if (!column) {
+					continue;
+				}
+
+				if (filter.show != <?= TRIGGERS_OPTION_IN_PROBLEM; ?>) {
+					const overrides = column.getOverrides();
+
+					column.setVisible(overrides?.visible ?? column.getDefaults().isVisible());
+				}
+				else {
+					column.setVisible(false);
+				}
+			}
 		}
 
 		#onDataDone(response) {

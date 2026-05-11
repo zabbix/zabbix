@@ -130,10 +130,11 @@ class CScreenProblem extends CScreenBase {
 	 *        string $filter['tags'][]['tag']
 	 *        string $filter['tags'][]['value']
 	 *        int    $filter['show_symptoms']         (optional)
+	 *        int    $filter['show_suppressed']       (optional)
 	 *        array  $filter['cause_eventid']         (optional)
 	 * @param array  $column_options
-	 *        int    $column_options ['show_suppressed']       (optional)
-	 *        int    $column_options ['show_opdata']           (optional)
+	 *        int    $column_options ['show_opdata']  (optional)
+	 *        int    $column_options ['details']      (optional)
 	 * @param int    $limit
 	 * @param bool   $resolve_comments
 	 *
@@ -245,7 +246,7 @@ class CScreenProblem extends CScreenBase {
 			if (array_key_exists('tags', $filter) && $filter['tags']) {
 				$options['tags'] = $filter['tags'];
 			}
-			if (array_key_exists('show_suppressed', $column_options) && $column_options['show_suppressed']) {
+			if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
 				unset($options['suppressed']);
 			}
 

@@ -20,6 +20,12 @@ class CControllerProblemViewData extends CControllerDataTable {
 		'recovery', 'status', 'info', 'host', 'description', 'duration', 'can_be_closed', 'actions', 'opdata', 'nested',
 		'symptom_count', 'cause_eventid', 'tags', 'custom_text'];
 
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules(['sort_field' => 'string|in clock,host,severity,name']);
+	}
+
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
 	}
@@ -210,7 +216,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 				}
 			}
 
-			if ($options['compact_view'] && $options['show_suppressed'] && count($info_icons) > 1) {
+			if ($options['compact_view'] && $filter['show_suppressed'] && count($info_icons) > 1) {
 				$cell_info = (new CButtonIcon(ZBX_ICON_MORE))->setHint(makeInformationList($info_icons));
 			}
 			else {
@@ -507,8 +513,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 		$page = $this->getInput('page', 1);
 		$export = $this->getInput('export_file', '');
 
-		$sort_field = $this->getInput('sort_field', CControllerProblem::FILTER_FIELDS_DEFAULT['sort']);
-		$sort_order = $this->getInput('sort_order', CControllerProblem::FILTER_FIELDS_DEFAULT['sortorder']);
+		$sort_field = $this->getInput('sort_field', CControllerProblem::DEFAULT_SORT);
+		$sort_order = $this->getInput('sort_order', CControllerProblem::DEFAULT_SORTORDER);
 
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
@@ -624,6 +630,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 				// Get all symptoms for given cause event ID.
 				$_symptom_data = CScreenProblem::getData([
 					'show_symptoms' => true,
+					'show_suppressed' => true,
 					'cause_eventid' => $cause_eventid,
 					'show' => $filter['show']
 				], $options, ZBX_PROBLEM_SYMPTOM_LIMIT, true);
@@ -730,7 +737,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			foreach ($data['problems'] as &$problem) {
 				CArrayHelper::sort($problem['tags'], ['tag', 'value']);
-				$problem['tags'] = CTagHelper::getTagsList($problem, ['filter_tags' => $filter['tags']]);
+				$problem['tags'] = CTagHelper::getTagsList($problem);
 			}
 			unset($problem);
 		}

@@ -28,13 +28,24 @@
 	const view = new class {
 		#csrf_token = null;
 
-		init({filter, page, sort_field, sort_order, storage_idx, user_configs, csrf_token}) {
+		init({
+			csrf_token,
+			default_sort_field,
+			default_sort_order,
+			filter,
+			page,
+			sort_field,
+			sort_order,
+			storage_idx,
+			user_configs
+		}) {
 			this.#csrf_token = csrf_token;
 
 			this.#initActions();
 			this.#initFilter();
 			this.#initPopupListeners();
-			this.#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs});
+			this.#initDataTable({filter, page, default_sort_field, default_sort_order, sort_field, sort_order,
+				storage_idx, user_configs});
 		}
 
 		#initActions() {
@@ -91,7 +102,9 @@
 			})
 		}
 
-		#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
+		#initDataTable({filter, page, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
+				user_configs}) {
+
 			const data_provider_url = new URL('zabbix.php', location.href);
 			data_provider_url.searchParams.set('action', 'template.list.data');
 			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
@@ -144,6 +157,8 @@
 				.setPage(page)
 				.setFilter(filter)
 				.setSelectable('templates', 'templates', ['templateid'])
+				.setDefaultSortField(default_sort_field)
+				.setDefaultSortOrder(default_sort_order)
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)

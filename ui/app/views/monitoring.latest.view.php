@@ -113,19 +113,21 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'layout_mode' => $web_layout_mode,
-		'filter_options' => $data['filter_options'],
-		'refresh_interval' => $data['refresh_interval'],
-		'filter_defaults' => $data['filter_defaults'],
 		'checkbox_object' => 'itemids',
-		'filter_set' => $data['mandatory_filter_set'] || $data['subfilter_set'],
+		'csrf_token' => $csrf_token,
+		'default_sort_field' => $data['default_sort_field'],
+		'default_sort_order' => $data['default_sort_order'],
 		'filter' => $data['filter'],
+		'filter_defaults' => $data['filter_defaults'],
+		'filter_options' => $data['filter_options'],
+		'filter_set' => $data['mandatory_filter_set'] || $data['subfilter_set'],
+		'layout_mode' => $web_layout_mode,
 		'page' => $data['tabfilter_options']['page'],
+		'refresh_interval' => $data['refresh_interval'],
 		'sort_field' => $data['sort_field'],
 		'sort_order' => $data['sort_order'],
 		'storage_idx' => $data['storage_idx'],
-		'user_configs' => $data['user_configs'],
-		'csrf_token' => $csrf_token
+		'user_configs' => $data['user_configs']
 	]).');
 '))
 	->setOnDocumentReady()

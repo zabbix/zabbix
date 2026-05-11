@@ -20,6 +20,12 @@ class CControllerHostViewData extends CControllerDataTable {
 		'maintenance_type', 'maintenance_status', 'interface', 'availability', 'active_available', 'status',
 		'items_count', 'problems', 'graphs', 'dashboards', 'httpTests', 'tags'];
 
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules(['sort_field' => 'string|in name,status']);
+	}
+
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS);
 	}
@@ -29,8 +35,9 @@ class CControllerHostViewData extends CControllerDataTable {
 		$options = $this->getInput('options', []);
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
-		$sort_field = $this->getInput('sort_field', $filter['sort'] ?? 'name');
-		$sort_order = $this->getInput('sort_order', $filter['sortorder'] ?? ZBX_SORT_UP);
+
+		$sort_field = $this->getInput('sort_field', CControllerHost::DEFAULT_SORT);
+		$sort_order = $this->getInput('sort_order', CControllerHost::DEFAULT_SORTORDER);
 
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 
@@ -274,7 +281,7 @@ class CControllerHostViewData extends CControllerDataTable {
 			$host['problems'] = $problems->toString();
 
 			CArrayHelper::sort($host['tags'], ['tag', 'value']);
-			$host['tags'] = CTagHelper::getTagsList($host, ['filter_tags' => $filter['tags']]);
+			$host['tags'] = CTagHelper::getTagsList($host);
 		}
 		unset($host);
 
