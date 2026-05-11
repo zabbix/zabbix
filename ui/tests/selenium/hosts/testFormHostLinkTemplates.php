@@ -87,7 +87,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
-		$this->query('class:datatable')->asDatatable()->waitUntilReady();
+		$this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 		$this->query('link', self::HOST_VISIBLE_NAME)->one()->waitUntilPresent();
 	}
 
