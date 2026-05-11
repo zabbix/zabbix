@@ -51,7 +51,7 @@ window.media_edit_popup = new class {
 	 */
 	#media_type;
 
-	init({rules, mediatypes, sendto_emails}) {
+	init({rules, mediatypes, sendto_list}) {
 		this.#overlay = overlays_stack.getById('media-edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
@@ -59,9 +59,9 @@ window.media_edit_popup = new class {
 		this.#mediatypes = mediatypes;
 		this.#media_type = document.getElementById('mediatypeid');
 
-		jQuery('#sendto_emails').dynamicRows({
-			template: '#sendto-emails-row-tmpl',
-			rows: sendto_emails.map(email => ({email})),
+		jQuery('#sendto_list').dynamicRows({
+			template: '#sendto-list-row-tmpl',
+			rows: sendto_list.map(value => ({value})),
 			allow_empty: true
 		});
 
@@ -76,21 +76,27 @@ window.media_edit_popup = new class {
 	#updateForm() {
 		const mediatypeid = this.#media_type.value;
 		const mediatype_type = mediatypeid in this.#mediatypes ? this.#mediatypes[mediatypeid].type : null;
+		const has_sendto_list = mediatype_type == <?= MEDIA_TYPE_EMAIL ?> || mediatype_type == <?= MEDIA_TYPE_PUSH ?>;
 
 		if (mediatypeid in this.#mediatypes) {
 			document.getElementById('mediatype_type').setAttribute('value', this.#mediatypes[mediatypeid].type);
 		}
 
 		for (const field of this.#form_element.querySelectorAll('.js-field-sendto')) {
-			field.style.display = mediatype_type == <?= MEDIA_TYPE_EMAIL ?> ? 'none' : '';
+			field.style.display = has_sendto_list ? 'none' : '';
 		}
 
-		for (const input of this.#form_element.querySelectorAll('.js-field-sendto input')) {
-			input.placeholder = mediatype_type == <?= MEDIA_TYPE_PUSH ?> ? '*' : '';
+		for (const field of this.#form_element.querySelectorAll('.js-field-sendto-list')) {
+			field.style.display = has_sendto_list ? '' : 'none';
 		}
 
-		for (const field of this.#form_element.querySelectorAll('.js-field-sendto-emails')) {
-			field.style.display = mediatype_type == <?= MEDIA_TYPE_EMAIL ?> ? '' : 'none';
+		if (mediatype_type == <?= MEDIA_TYPE_PUSH ?>) {
+			this.#form_element.querySelector('label.js-field-sendto-list').classList
+				.remove(ZBX_STYLE_FIELD_LABEL_ASTERISK);
+		}
+		else {
+			this.#form_element.querySelector('label.js-field-sendto-list').classList
+				.add(ZBX_STYLE_FIELD_LABEL_ASTERISK);
 		}
 
 		if (mediatypeid in this.#mediatypes) {

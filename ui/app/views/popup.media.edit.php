@@ -80,12 +80,12 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Send to')))
 			->setAsteriskMark()
-			->addClass('js-field-sendto-emails'),
+			->addClass('js-field-sendto-list'),
 		(new CFormField([
 			(new CTable())
-				->setId('sendto_emails')
+				->setId('sendto_list')
 				->setAttribute('data-field-type', 'array')
-				->setAttribute('data-field-name', 'sendto_emails')
+				->setAttribute('data-field-name', 'sendto_list')
 				->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
 				->setFooter(
 					(new CCol(
@@ -95,9 +95,9 @@ $form_grid = (new CFormGrid())
 					))->setColspan(2),
 					'dynamic-row-control'
 				),
-			(new CTemplateTag('sendto-emails-row-tmpl'))->addItem(
+			(new CTemplateTag('sendto-list-row-tmpl'))->addItem(
 				(new CRow([
-					(new CTextAreaFlexible('sendto_emails[#{rowNum}]', '#{email}'))
+					(new CTextAreaFlexible('sendto_list[#{rowNum}]', '#{value}'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setReadonly($data['provisioned'] == CUser::PROVISION_STATUS_YES)
 						->setAriaRequired(),
@@ -105,7 +105,7 @@ $form_grid = (new CFormGrid())
 						->setEnabled($data['provisioned'] == CUser::PROVISION_STATUS_NO)
 				]))->addClass('form_row')
 			)
-		]))->addClass('js-field-sendto-emails')
+		]))->addClass('js-field-sendto-list')
 	])
 	->addItem([
 		(new CLabel(_('When active'), 'period'))->setAsteriskMark(),
@@ -141,7 +141,7 @@ $form
 			media_edit_popup.init('.json_encode([
 				'rules' => $data['js_validation_rules'],
 				'mediatypes' => $data['mediatypes'],
-				'sendto_emails' => $data['form']['sendto_emails']
+				'sendto_list' => $data['form']['sendto_list']
 			]).');
 		'))->setOnDocumentReady()
 	);

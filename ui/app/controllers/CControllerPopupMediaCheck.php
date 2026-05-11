@@ -17,7 +17,7 @@
 class CControllerPopupMediaCheck extends CController {
 
 	private ?array $mediatype;
-	private ?array $sendto_emails;
+	private ?array $sendto_list;
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -32,20 +32,24 @@ class CControllerPopupMediaCheck extends CController {
 			'mediaid' => ['db media.mediaid'],
 			'mediatypeid' => ['db media.mediatypeid', 'required'],
 			'mediatype_type' => ['integer', 'required'],
-			'sendto' => [
-				['db media.sendto', 'required',
-					'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_PUSH]]
-				],
-				['db media.sendto', 'required', 'not_empty',
-					'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK]]
-				]
+			'sendto' => ['db media.sendto', 'required', 'not_empty',
+				'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK]]
 			],
-			'sendto_emails' => ['array', 'required', 'not_empty',
-				'field' => ['string'
-					// TODO: uncomment with DEV-4644
-					// 'not_empty', 'use' => [CEmailValidator::class, []]
+			'sendto_list' => [
+				['array', 'required', 'not_empty',
+					'field' => ['db media.sendto'
+						// TODO: uncomment with DEV-4644
+						// 'not_empty', 'use' => [CEmailValidator::class, []]
+					],
+					'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EMAIL]]
 				],
-				'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EMAIL]]
+				['array', 'required',
+					'field' => ['db media.sendto'
+						// TODO: uncomment with DEV-4644
+						// 'use' => [CUuidV7Validator::class]
+					],
+					'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_PUSH]]
+				]
 			],
 			'period' => ['string', 'required', 'not_empty',
 				'use' => [CTimePeriodsParser::class, ['usermacros' => true]],
@@ -98,26 +102,38 @@ class CControllerPopupMediaCheck extends CController {
 	}
 
 	private function validateSendto(): bool {
-		if ($this->mediatype['type'] == MEDIA_TYPE_EMAIL) {
-			$sendto_emails = array_values(array_filter($this->getInput('sendto_emails', [])));
+		if ($this->mediatype['type'] == MEDIA_TYPE_EMAIL || $this->mediatype['type'] == MEDIA_TYPE_PUSH) {
+			$sendto_list = array_values(array_filter($this->getInput('sendto_list', [])));
 
-			if (!$sendto_emails) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto_emails', _('cannot be empty')));
+			if ($this->mediatype['type'] == MEDIA_TYPE_EMAIL) {
+				$email_validator = new CEmailValidator();
 
-				return false;
+				foreach ($sendto_list as $email) {
+					if (!$email_validator->validate($email)) {
+						error($email_validator->getError());
+
+						return false;
+					}
+				}
 			}
+			elseif ($this->mediatype['type'] == MEDIA_TYPE_PUSH) {
+				if (count($sendto_list) === 0) {
+					$sendto_list[] = '*';
+				}
 
-			$email_validator = new CEmailValidator();
+				$uuid_validator = new CUuidV7Validator();
 
-			foreach ($sendto_emails as $email) {
-				if (!$email_validator->validate($email)) {
-					error($email_validator->getError());
+				foreach ($sendto_list as $key => $uuid) {
+					if ($uuid !== '*' && !$uuid_validator->validate($uuid)) {
+						error(_s('Invalid parameter "%1$s": %2$s.', 'sendto_list/'.($key + 1),
+							_("a wildcard pattern '*' or a UUIDv7 is expected")));
 
-					return false;
+						return false;
+					}
 				}
 			}
 
-			$this->sendto_emails = $sendto_emails;
+			$this->sendto_list = $sendto_list;
 		}
 
 		return true;
@@ -149,11 +165,8 @@ class CControllerPopupMediaCheck extends CController {
 			'mediatype_type' => $this->mediatype['type']
 		];
 
-		if ($this->mediatype['type'] == MEDIA_TYPE_EMAIL) {
-			$data['sendto'] = $this->sendto_emails;
-		}
-		elseif ($this->mediatype['type'] == MEDIA_TYPE_PUSH) {
-			$data['sendto'] = $this->getInput('sendto') === '' ? '*' : $this->getInput('sendto');
+		if ($this->mediatype['type'] == MEDIA_TYPE_EMAIL || $this->mediatype['type'] == MEDIA_TYPE_PUSH) {
+			$data['sendto'] = $this->sendto_list;
 		}
 		else {
 			$data['sendto'] = $this->getInput('sendto');

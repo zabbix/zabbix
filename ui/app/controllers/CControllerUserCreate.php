@@ -43,7 +43,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 				'sendto' => [
 					[
 						'db media.sendto', 'required', 'not_empty',
-						'when' => ['mediatype_type', 'not_in' => [MEDIA_TYPE_EMAIL]]
+						'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK]]
 					],
 					[
 						'array', 'required', 'not_empty',
@@ -52,6 +52,14 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 							// 'not_empty', 'use' => [CEmailValidator::class, []]
 						],
 						'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EMAIL]]
+					],
+					[
+						'array', 'required', 'not_empty',
+						'field' => ['db media.sendto', 'required'
+							// TODO: uncomment with DEV-4644
+							// 'use' => [CUuidV7Validator::class]
+						],
+						'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_PUSH]]
 					]
 				],
 				'period' => ['string', 'required', 'not_empty',

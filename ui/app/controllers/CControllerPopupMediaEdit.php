@@ -28,7 +28,7 @@ class CControllerPopupMediaEdit extends CController {
 			'mediaid' =>		'db media.mediaid',
 			'mediatypeid' =>	'db media.mediatypeid',
 			'sendto' =>			'db media.sendto',
-			'sendto_emails'	=>	'array',
+			'sendto_list' =>	'array',
 			'period' =>			'time_periods',
 			'severities' =>		'array',
 			'active' =>			'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
@@ -76,7 +76,7 @@ class CControllerPopupMediaEdit extends CController {
 			'form' => [
 				'mediatypeid' => $this->getInput('mediatypeid', 0),
 				'sendto' => $this->getInput('sendto', DB::getDefault('media', 'sendto')),
-				'sendto_emails' => $this->getInput('sendto_emails', ['']),
+				'sendto_list' => $this->getInput('sendto_list', ['']),
 				'period' => $this->getInput('period', DB::getDefault('media', 'period')),
 				'severities' => $this->getInput('severities', $this->hasInput('edit')
 					? []
