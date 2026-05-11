@@ -663,10 +663,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			}
 			return true;
 		});
-
-		if ($trigger_unknown_error !== null) {
-			self::markTestSkipped('Test case is not supported, see ZBX-27736.');
-		}
 	}
 
 	/**
