@@ -46,7 +46,7 @@ static zbx_cep_guard_t	*cache_guard;
 static zbx_cep_guard_t	*cep_guard_create(char **error)
 {
 	zbx_cep_guard_t	*guard;
-	int			err;
+	int		err;
 
 	guard = (zbx_cep_guard_t *)zbx_malloc(NULL, sizeof(zbx_cep_guard_t));
 
