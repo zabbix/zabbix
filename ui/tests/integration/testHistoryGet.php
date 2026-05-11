@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @suite-components-reuse true
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_history_value
- * @onAfterOnce clearData
+ * @onAfter clearData
  */
 class testHistoryGet extends CIntegrationTest {
 	const HOSTNAME = 'test_history_value';
@@ -171,6 +171,18 @@ class testHistoryGet extends CIntegrationTest {
 				'itemids' => [$item['itemid']],
 				'filter' => [
 					'clock' => array_column($values, 'clock'),
+				]
+			], 5, 5, function($response) use ($values) {
+				return count($response['result']) === count($values);
+			});
+		}
+
+		foreach ($cases as $key => $values) {
+			$item = self::$items[$key];
+			$this->callUntilDataIsPresent('history.get', [
+				'history' => $item['value_type'],
+				'itemids' => [$item['itemid']],
+				'filter' => [
 					'ns' => array_column($values, 'ns')
 				]
 			], 5, 5, function($response) use ($values) {
