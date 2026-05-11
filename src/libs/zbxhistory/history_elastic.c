@@ -127,7 +127,7 @@ static zbx_history_value_t	history_str2value(char *str, unsigned char value_type
 
 static const char	*history_value2str(const zbx_history_entry_t *h)
 {
-	static char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
+	static ZBX_THREAD_LOCAL char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
 	switch (h->value_type)
 	{
@@ -1384,8 +1384,8 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 		char	start_str[32], end_str[32];
 		time_t	end = time(NULL);
 
-		strftime(start_str, sizeof(start_str), "%Y-%m-%d %H:%M:%S", localtime(&start));
-		strftime(end_str, sizeof(end_str), "%Y-%m-%d %H:%M:%S", localtime(&end));
+		strftime(start_str, sizeof(start_str), "%Y-%m-%d %H:%M:%S", zbx_localtime(&start, NULL));
+		strftime(end_str, sizeof(end_str), "%Y-%m-%d %H:%M:%S", zbx_localtime(&end, NULL));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s() window:(%s, %s] age: %s count:%d", __func__, start_str, end_str,
 				zbx_age2str(end - start), 0);

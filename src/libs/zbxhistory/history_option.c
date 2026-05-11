@@ -489,6 +489,7 @@ static int	history_options_validate_precache(const zbx_history_option_t *options
 		return SUCCEED;
 
 	*error = zbx_dsprintf(NULL, "invalid precache option value \"%s\"", precache);
+
 	return FAIL;
 }
 
@@ -509,7 +510,7 @@ int	history_options_validate_common_settings(const zbx_history_option_t *options
 	if (SUCCEED != history_options_validate_value_type(options, options_num, error))
 		return FAIL;
 
-	if (SUCCEED != history_options_validate_precache(options, options_num, error))\
+	if (SUCCEED != history_options_validate_precache(options, options_num, error))
 		return FAIL;
 
 	return SUCCEED;
