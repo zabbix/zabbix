@@ -577,7 +577,7 @@ class CIntegrationTest extends CAPITest {
 	 * @return array
 	 */
 	protected static function getDefaultComponentConfiguration() {
-		global $DB, $HISTORY_PROVIDERS;
+		global $DB, $HISTORY;
 
 		$db = [
 			'DBName' => $DB['DATABASE'],
