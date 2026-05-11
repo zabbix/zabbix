@@ -148,9 +148,14 @@ class CHistory extends CApiService {
 				break;
 
 			case ZBX_HISTORY_SOURCE_CLICKHOUSE:
-				$storage = Manager::History()->getStorageProviderInstance($options['history']);
 				/** @var CClickHouseStorage $storage */
-				$result = $storage->select($options);
+				$storage = Manager::History()->getStorageProviderInstance($options['history']);
+				$result = $storage->select([
+					'clock' => $options['time_from'] !== null ? ['ge' => $options['time_from']] : null,
+					'clock_ns' => $options['time_till'] !== null
+						? ['le' => ['clock' => $options['time_till'], 'ns' => 999999999]]
+						: null
+				] + $options);
 
 				if ($storage->getErrorCode() !== null) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $storage->getErrorMessage());

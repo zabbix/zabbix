@@ -335,8 +335,10 @@ class CTrend extends CApiService {
 				'output' => $options['output'],
 				'history' => $value_type,
 				'itemids' => array_keys($itemids),
-				'time_from' => $options['time_from'],
-				'time_till' => $options['time_till'],
+				'clock' => $options['time_from'] !== null ? ['ge' => $options['time_from']] : null,
+				'clock_ns' => $options['time_till'] !== null
+					? ['le' => ['clock' => $options['time_till'], 'ns' => 999999999]]
+					: null,
 				'countOutput' => $options['countOutput'],
 				'limit' => $limit
 			]);

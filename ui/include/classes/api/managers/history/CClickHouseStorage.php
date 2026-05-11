@@ -154,11 +154,8 @@ class CClickHouseStorage {
 	 */
 	public function selectTrends(array $options): ?array {
 		if ($options['countOutput']) {
-			$options['output'] = ['itemid'];
-			$options['countOutput'] = false;
-			$query_parts = $this->getQueryPartsFromOptions($options);
+			$query_parts = $this->getQueryPartsFromOptions(['output' => ['itemid'], 'countOutput' => false] + $options);
 			$query_parts['group'] = ['itemid', 'toStartOfHour(clock_ns)'];
-
 			$query = 'SELECT count() AS rowscount FROM ('.$this->buildQueryFromParts($query_parts).')';
 
 			return $this->query($query, $query_parts['param']);
