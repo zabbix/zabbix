@@ -490,7 +490,7 @@ class testPageHosts extends CLegacyWebTest {
 							'Name' => 'Host for tags filtering',
 							'Tags' => [
 								'selector' => 'class:tag',
-								'text' => ['tag: HOST', 'test: test_tag', 'action: simple']
+								'text' => ['action: simple', 'tag: HOST', 'tag: TEMPLATE']
 							]
 						]
 					]
@@ -508,21 +508,21 @@ class testPageHosts extends CLegacyWebTest {
 							'Name' => 'Host for tags filtering',
 							'Tags' => [
 								'selector' => 'class:tag',
-								'text' => ['tag: HOST', 'test: test_tag', 'action: simple']
+								'text' => ['action: simple', 'tag: HOST', 'tag: TEMPLATE']
 							]
 						],
 						[
 							'Name' => 'Host for tags filtering - clone',
 							'Tags' => [
 								'selector' => 'class:tag',
-								'text' => ['tag: host', 'action: clone']
+								'text' => ['action: clone', 'tag: host']
 							]
 						],
 						[
 							'Name' => 'Host for tags filtering - update',
 							'Tags' => [
 								'selector' => 'class:tag',
-								'text' => ['tag: host', 'action: update']
+								'text' => ['action: update', 'tag: host']
 							]
 						]
 					]

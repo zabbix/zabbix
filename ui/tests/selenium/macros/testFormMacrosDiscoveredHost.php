@@ -404,6 +404,16 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 				$j++;
 			}
 		}
+
+		// Change the width of datatable columns so that the whole host name would be visible.
+		$layout = '{"columns":[{"id":"name","width":"270px"},{"id":"interface","width":"100px"},'.
+				'{"id":"availability","width":"148px"},{"id":"tags","resized":true,"width":"142px"},{"id":"tagvalue"},'.
+				'{"id":"status","width":"66px"},{"id":"latest_data","width":"98px"},'.
+				'{"id":"problems","resized":true,"width":"116px"},{"id":"graphs","width":"68px"},'.
+				'{"id":"dashboards","width":"95px"},{"id":"web","width":"82px"}],"options":{},'.
+				'"sort_field":"name","sort_order":"ASC"}';
+
+		$this->updateDatatableLayout($layout, 'web.monitoring.hosts.datatable');
 	}
 
 	public static function getDiscoveredHostUpdateMacrosData() {
