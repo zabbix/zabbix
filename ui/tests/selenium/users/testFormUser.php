@@ -633,7 +633,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'Rows per page' => 'This value must be no less than "1".'
+						'Rows per page' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -650,7 +650,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'Rows per page' => 'This value must be no less than "1".'
+						'Rows per page' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1257,7 +1257,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '0'
 					],
 					'inline_errors' => [
-						'Rows per page' => 'This value must be no less than "1".'
+						'Rows per page' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1269,7 +1269,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => 'abc123'
 					],
 					'inline_errors' => [
-						'Rows per page' => 'This value must be no less than "1".'
+						'Rows per page' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
