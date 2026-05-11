@@ -884,7 +884,7 @@ class testPageHosts extends CLegacyWebTest {
 
 		foreach (['Disabled' => HOST_STATUS_NOT_MONITORED, 'Enabled' => HOST_STATUS_MONITORED] as $status => $id) {
 			$host_row->invalidate();
-			$host_row->getColumn('Status')->scrollIntoView(50)->click();
+			$host_row->getColumn('Status')->scrollIntoView(50)->query('tag:a')->one()->click();
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Host '.strtolower($status));
 			$this->assertEquals($status, $host_row->getColumn('Status')->getText());
