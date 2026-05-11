@@ -381,6 +381,12 @@ define('HOST_STATUS_TEMPLATE',		3);
 define('PROXY_OPERATING_MODE_ACTIVE',	0);
 define('PROXY_OPERATING_MODE_PASSIVE',	1);
 
+define('PROXY_MODE_DENY', 0);
+define('PROXY_MODE_ALLOW', 1);
+
+define('PROXY_GROUP_MODE_DENY', 0);
+define('PROXY_GROUP_MODE_ALLOW', 1);
+
 define('HOST_DISCOVER',		0);
 define('HOST_NO_DISCOVER',	1);
 
@@ -1914,6 +1920,7 @@ define('TAB_INDICATOR_OVERRIDES', 'overrides');
 define('TAB_INDICATOR_HOST_PERMISSIONS', 'host-permissions');
 define('TAB_INDICATOR_TEMPLATE_PERMISSIONS', 'template-permissions');
 define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
+define('TAB_INDICATOR_PROXY_ACCESS_LIST', 'proxy-access-list');
 define('TAB_INDICATOR_PROXY_ENCRYPTION', 'proxy-encryption');
 define('TAB_INDICATOR_PROXY_TIMEOUTS', 'proxy-timeouts');
 define('TAB_INDICATOR_SCATTER_PLOT_AXES', 'scatter-plot-axes');

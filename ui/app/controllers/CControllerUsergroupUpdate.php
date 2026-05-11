@@ -70,6 +70,10 @@ class CControllerUsergroupUpdate extends CControllerUsergroupUpdateGeneral {
 				'groupids' => ['array', 'required', 'not_empty', 'field' => ['db rights.groupid']],
 				'permission' => ['integer', 'required', 'in' => [PERM_DENY, PERM_READ, PERM_READ_WRITE]]
 			]],
+			'proxy_access_mode' => ['integer', 'in' => [PROXY_MODE_ALLOW, PROXY_MODE_DENY]],
+			'proxyids' => ['array', 'required', 'field' => ['db proxy.proxyid']],
+			'proxy_group_access_mode' => ['integer', 'in' => [PROXY_GROUP_MODE_ALLOW, PROXY_GROUP_MODE_DENY]],
+			'proxy_groupids' => ['array', 'required', 'field' => ['db proxy_group.proxy_groupid']],
 			'tag_filters' => ['objects', 'required',
 				'fields' => [
 					'groupid' => ['db tag_filter.groupid', 'required'],

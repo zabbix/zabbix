@@ -37,6 +37,10 @@ class CControllerUsergroupEdit extends CController {
 			'hostgroup_right' =>		'array',
 			'ms_templategroup_right' =>	'array',
 			'templategroup_right' =>	'array',
+			'proxy_mode' =>				'db usrgrp.proxy_mode|in '.PROXY_MODE_ALLOW.','.PROXY_MODE_DENY,
+			'proxies' =>				'array_db proxy.proxyid',
+			'proxy_group_mode' =>		'db usrgrp.proxy_group_mode|in '.PROXY_GROUP_MODE_ALLOW.','.PROXY_GROUP_MODE_DENY,
+			'proxy_groups' =>			'array_db proxy_groups.proxyid',
 			'tag_filters' =>			'array'
 		];
 
@@ -57,9 +61,11 @@ class CControllerUsergroupEdit extends CController {
 		if ($this->hasInput('usrgrpid')) {
 			$user_groups = API::UserGroup()->get([
 				'output' => ['name', 'gui_access', 'users_status', 'debug_mode', 'userdirectoryid', 'mfa_status',
-					'mfaid'
+					'mfaid', 'proxy_mode', 'proxy_group_mode'
 				],
 				'selectTagFilters' => ['groupid', 'tag', 'value'],
+				'selectProxies' => ['proxyid', 'name'],
+				'selectProxyGroups' => ['proxy_groupid', 'name'],
 				'usrgrpids' => $this->getInput('usrgrpid'),
 				'editable' => true
 			]);
@@ -85,7 +91,9 @@ class CControllerUsergroupEdit extends CController {
 			'users_status' => $db_defaults['users_status'],
 			'debug_mode' => $db_defaults['debug_mode'],
 			'mfa_status' => $mfa_config_status == MFA_ENABLED ? GROUP_MFA_ENABLED : GROUP_MFA_DISABLED,
-			'mfaid' => 0
+			'mfaid' => 0,
+			'proxy_mode' => PROXY_MODE_DENY,
+			'proxy_group_mode' => PROXY_GROUP_MODE_DENY,
 		];
 
 		if ($this->hasInput('usrgrpid')) {
@@ -100,6 +108,9 @@ class CControllerUsergroupEdit extends CController {
 			if ($this->user_group['mfa_status'] == GROUP_MFA_ENABLED) {
 				$data['mfaid'] = $this->user_group['mfaid'];
 			}
+
+			$data['proxy_mode'] = $this->user_group['proxy_mode'];
+			$data['proxy_group_mode'] = $this->user_group['proxy_group_mode'];
 		}
 
 		$this->getInputs($data, ['name', 'gui_access', 'users_status', 'debug_mode']);
@@ -130,6 +141,20 @@ class CControllerUsergroupEdit extends CController {
 				}
 			}
 		}
+
+		$data['ms_proxy'] = $this->hasInput('usrgrpid')
+			? CArrayHelper::renameObjectsKeys(API::Proxy()->get([
+				'output' => ['proxyid', 'name'],
+				'proxyids' => $this->user_group['proxies']
+			]), ['proxyid' => 'id'])
+			: [];
+
+		$data['ms_proxy_group'] = $this->hasInput('usrgrpid')
+			? CArrayHelper::renameObjectsKeys(API::ProxyGroup()->get([
+				'output' => ['proxy_groupid', 'name'],
+				'proxy_groupids' => $this->user_group['proxy_groups']
+			]), ['proxy_groupid' => 'id'])
+			: [];
 
 		CArrayHelper::sort($data['tag_filters'], ['name']);
 
