@@ -115,7 +115,7 @@ class CClickHouseStorage {
 	 * Get error message for last query. When no errors null is returned.
 	 */
 	public function getErrorMessage(): ?string {
-		return $this->error_message;
+		return _s('ClickHouse error: %1$s.', $this->error_message);
 	}
 
 	/**
@@ -656,69 +656,59 @@ class CClickHouseStorage {
 	 */
 	private function query(string $query, array $param = []): ?array {
 		$result = null;
+		$this->error_code = null;
+		$this->error_message = null;
 		$time_start = microtime(true);
 
 		$form_values = $this->getEncodedParamMap($param);
 		$boundary = bin2hex(random_bytes(16));
-		$content = [
-			'--'.$boundary,
-			'Content-Disposition: form-data; name="query"',
-			'',
-			$query
-		];
+		$content = '--'.$boundary."\r\n".
+			'Content-Disposition: form-data; name="query"'."\r\n\r\n".
+			$query."\r\n";
 
 		foreach ($form_values as $name => $value) {
-			$content[] = '--'.$boundary;
-			$content[] = 'Content-Disposition: form-data; name="param_'.$name.'"';
-			$content[] = '';
-			$content[] = $value;
+			$content .= '--'.$boundary."\r\n".
+				'Content-Disposition: form-data; name="param_'.$name.'"'."\r\n\r\n".
+				$value."\r\n";
 		}
 
-		$content[] = '--'.$boundary.'--';
-		$content[] = '';
-
+		$content .= '--'.$boundary.'--'."\r\n";
 		$stream_context = $this->request_context_data;
-		$stream_context['http']['content'] = implode("\r\n", $content);
-		$stream_context['http']['header'][] = 'Content-Type: multipart/form-data; boundary='.$boundary;
-		$stream_context['http']['header'][] = 'Content-Length: '.strlen($stream_context['http']['content']);
+		$stream_context['http']['content'] = $content;
+		$stream_context['http']['header'] = implode("\r\n", array_merge($stream_context['http']['header'], [
+			'Content-Type: multipart/form-data; boundary='.$boundary,
+			'Content-Length: '.strlen($stream_context['http']['content'])
+		]));
+		$result_raw = file_get_contents($this->url->getUrl(), false, stream_context_create($stream_context));
+		$result = $result_raw === false ? ['exception' => error_get_last()['message']] : json_decode($result_raw, true);
+		$http_code = 500;
 
-		try {
-			$this->error_code = null;
-			$this->error_message = null;
-			$stream_context['http']['header'] = implode("\r\n", $stream_context['http']['header']);
-			$result_raw = file_get_contents($this->url->getUrl(), false, stream_context_create($stream_context));
-			$result = json_decode($result_raw, true);
-			$http_code = 500;
+		// The variable $http_response_header is defined only when file_get_contents succeeds.
+		if (isset($http_response_header)) {
+			sscanf($http_response_header[0], 'HTTP/%*s %d', $http_code);
+		}
 
-			// The variable $http_response_header is defined only when file_get_contents succeeds.
-			if (isset($http_response_header)) {
-				sscanf($http_response_header[0], 'HTTP/%*s %d', $http_code);
-			}
-			elseif ($result_raw === false) {
-				['message' => $result_raw] = error_get_last();
-			}
-
-			if ($http_code != 200) {
-				$error_message = is_array($result) && array_key_exists('exception', $result)
-					? $result['exception']
-					: $result_raw;
-
-				$result = null;
-				$this->error_code = $http_code;
-				$this->error_message = _s('ClickHouse error: %1$s.', $error_message);
-			}
-		} catch (Throwable $error) {
+		if (!is_array($result) || array_key_exists('exception', $result)) {
+			$this->error_code = $http_code;
+			$this->error_message = is_array($result) && array_key_exists('exception', $result)
+				? $result['exception']
+				: $result_raw;
 			$result = null;
-			// Internal server error code
-			$this->error_code = 500;
-			$this->error_message = $error->getMessage();
+		}
+		else {
+			$result = $result['data'];
+
+			foreach ($result as &$row) {
+				$row = array_map('strval', $row);
+			}
+			unset($row);
 		}
 
 		CProfiler::getInstance()->profileClickHouse(microtime(true) - $time_start,
 			json_encode(['query' => $query] + $form_values)
 		);
 
-		return $result === null ? null : $result['data'];
+		return $result;
 	}
 
 	/**
