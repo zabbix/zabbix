@@ -1,5 +1,5 @@
 diff --git a/src/libs/zbxhistory/history_elastic.c b/src/libs/zbxhistory/history_elastic.c
-index da269efa923..2bcedc07f19 100644
+index c90fdd110f2..6b84f66d776 100644
 --- a/src/libs/zbxhistory/history_elastic.c
 +++ b/src/libs/zbxhistory/history_elastic.c
 @@ -84,11 +84,11 @@ zbx_history_elastic_data_t;
@@ -18,15 +18,15 @@ index da269efa923..2bcedc07f19 100644
  	return value_type_str[value_type];
  }
 diff --git a/ui/include/classes/api/managers/CHistoryManager.php b/ui/include/classes/api/managers/CHistoryManager.php
-index b28d1e69095..41e366a7a65 100644
+index e89571b21e4..153cd9d624d 100644
 --- a/ui/include/classes/api/managers/CHistoryManager.php
 +++ b/ui/include/classes/api/managers/CHistoryManager.php
-@@ -1841,7 +1841,7 @@ class CHistoryManager {
+@@ -1839,7 +1839,7 @@ class CHistoryManager {
  
- 		foreach ($this->value_type_storage as $value_type => $storage) {
- 			if ($storage['provider'] === ZBX_HISTORY_SOURCE_ELASTIC && in_array($value_type, $value_types)) {
--				$endpoints[$value_type] = $storage['url'].'/'.$value_type_index[$value_type].'/'.$action;
-+				$endpoints[$value_type] = $storage['url'].'/'."{DBNAME}_".$value_type_index[$value_type].'/'.$action;
+ 		foreach ($this->value_type_config as $value_type => $config) {
+ 			if ($config['provider'] === ZBX_HISTORY_SOURCE_ELASTIC && in_array($value_type, $value_types)) {
+-				$endpoints[$value_type] = $config['url'].'/'.$value_type_index[$value_type].'/'.$action;
++				$endpoints[$value_type] = $config['url'].'/'."{DBNAME}_".$value_type_index[$value_type].'/'.$action;
  			}
  		}
  
