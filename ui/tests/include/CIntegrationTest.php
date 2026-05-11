@@ -964,7 +964,7 @@ class CIntegrationTest extends CAPITest {
 
 		$client = $this->getClient($component);
 		$session = md5(uniqid('', true));
-		$result = $client->sendAgentDataValues($values, $session, $host, '8.0.0', $proxy);
+		$result = $client->sendAgentDataValues($values, $session, $host, ZABBIX_VERSION, $proxy);
 
 		if ($proxy === null) {
 			$this->assertTrue(array_key_exists('processed', $result),
