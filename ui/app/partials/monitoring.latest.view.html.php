@@ -186,8 +186,17 @@ foreach ($data['items'] as $itemid => $item) {
 
 	// Other row data preparation.
 	if ($data['config']['hk_history_global']) {
-		$keep_history = timeUnitToSeconds($data['config']['hk_history']);
-		$item_history = $data['config']['hk_history'];
+		$value_type_ttl = $data['config']['hk_history_value_type_ttl'];
+
+		if (array_key_exists($item['value_type'], $value_type_ttl)) {
+			$hk_history = $value_type_ttl[$item['value_type']]['value_ttl'];
+			$keep_history = $hk_history === null ? 0 : $hk_history;
+			$item_history = $hk_history === null ? '' : convertSecondsToTimeUnits($hk_history);
+		}
+		else {
+			$keep_history = timeUnitToSeconds($data['config']['hk_history']);
+			$item_history = $data['config']['hk_history'];
+		}
 	}
 	elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
 		$keep_history = timeUnitToSeconds($item['history']);

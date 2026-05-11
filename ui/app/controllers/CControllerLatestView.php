@@ -238,6 +238,7 @@ class CControllerLatestView extends CControllerLatest {
 				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
 				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
 				'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
+				'hk_history_value_type_ttl' => Manager::History()->getValueTypesStorageTtls(),
 				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
 			],
 			'tags' => CTagHelper::getTagsHtml($prepared_data['items'], ZBX_TAG_OBJECT_ITEM, [

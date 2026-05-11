@@ -383,10 +383,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$item['trends_has_errors'] = false;
 
 		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
-			$hk_history = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY);
+			$value_type_ttl = Manager::History()->getValueTypesStorageTtls();
 
-			$item['history'] = $hk_history;
-			$item['keep_history'] = timeUnitToSeconds($hk_history);
+			if (array_key_exists($item['value_type'], $value_type_ttl)) {
+				$hk_history = $value_type_ttl[$item['value_type']]['value_ttl'];
+				$item['history'] = $hk_history === null ? '' : convertSecondsToTimeUnits($hk_history);
+				$item['keep_history'] = $hk_history === null ? 0 : $hk_history;
+			}
+			else {
+				$hk_history = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY);
+				$item['history'] = $hk_history;
+				$item['keep_history'] = timeUnitToSeconds($hk_history);
+			}
 		}
 		elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
 			$item['keep_history'] = timeUnitToSeconds($item['history']);
