@@ -271,22 +271,27 @@ elseif (hasRequest('delete') && hasRequest('graphid')) {
 		$result = API::GraphPrototype()->delete([$graphId]);
 
 		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Graph prototype deleted'));
 			uncheckTableRows(getRequest('parent_discoveryid'));
 		}
-		show_messages($result, _('Graph prototype deleted'), _('Cannot delete graph prototype'));
+		else {
+			CMessageHelper::seterrorTitle(_('Cannot delete graph prototype'));
+		}
 	}
 	else {
 		$result = API::Graph()->delete([$graphId]);
 
 		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Graph deleted'));
 			uncheckTableRows($hostid);
 		}
-		show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
+		else {
+			CMessageHelper::seterrorTitle(_('Cannot delete graph'));
+		}
 	}
 
-	if ($result) {
-		unset($_REQUEST['form']);
-	}
+	$response = new CControllerResponseRedirect($backurl);
+	$response->redirect();
 }
 elseif (getRequest('graphid', '') && getRequest('action', '') === 'graph.updatediscover') {
 	$result = API::GraphPrototype()->update([
