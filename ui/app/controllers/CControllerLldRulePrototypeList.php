@@ -26,7 +26,7 @@ class CControllerLldRulePrototypeList extends CController {
 		$fields = [
 			'context'						=> 'in host,template',
 			'parent_discoveryid' 			=> 'required|db items.itemid',
-			'sort'							=> 'in delay,key_,name,status,type',
+			'sort'							=> 'in delay,key_,name,status,type,discover',
 			'sortorder'						=> 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'page'							=> 'ge 1'
 		];
@@ -140,7 +140,7 @@ class CControllerLldRulePrototypeList extends CController {
 		$discoveries = API::DiscoveryRulePrototype()->get($options);
 
 		if ($filter['sort'] === 'delay') {
-			orderItemsByDelay($discoveries, $filter['sortoder'], ['usermacros' => true, 'lldmacros' => true]);
+			orderItemsByDelay($discoveries, $filter['sortorder'], ['usermacros' => true, 'lldmacros' => true]);
 		}
 		else {
 			order_result($discoveries, $filter['sort'], $filter['sortorder']);

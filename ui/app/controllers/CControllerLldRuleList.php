@@ -230,6 +230,16 @@ class CControllerLldRuleList extends CController {
 			unset($discovery);
 		}
 
+		if ($filter['sort'] === 'delay') {
+			orderItemsByDelay($discoveries, $filter['sortorder'], ['usermacros' => true]);
+		}
+		elseif ($filter['sort'] === 'status') {
+			orderItemsByStatus($discoveries, $filter['sortorder']);
+		}
+		else {
+			order_result($discoveries, $filter['sort'], $filter['sortorder']);
+		}
+
 		return $discoveries;
 	}
 
