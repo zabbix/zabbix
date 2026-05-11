@@ -254,10 +254,13 @@ class testExecuteNow extends CWebTest {
 		// Login and select host group for testing.
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getDatatable();
+		$headers = $table->getHeaders();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
 		$this->page->waitUntilReady();
-		$this->query('id:latest')->asDatatable()->one()->waitUntilReady();
+		$headers->waitUntilStalled();
+		$table->waitUntilReady();
 
 		$this->query('link', $data['item'])->waitUntilClickable()->one()->click();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();

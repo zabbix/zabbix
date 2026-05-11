@@ -795,18 +795,18 @@ class testFormTags extends CWebTest {
 
 		// Check created clone.
 		if ($object === 'service') {
-			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+			$table = $this->query('class:list-table')->asTable()->one()->waitUntilVisible();
 			$table->findRow('Name',  $new_name)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
 			if ($object === 'template' || $object === 'discovered host') {
 				$this->query('button:Reset')->one()->click();
-				$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+				$filter = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 				$filter->fill(['Name' => $new_name]);
-				$this->query('button:Apply')->one()->waitUntilClickable()->click();
+				$this->query('button:Apply')->waitUntilClickable()->one()->click();
 			}
 
-			$this->query('link', $new_name)->one()->click();
+			$this->query('link', $new_name)->waitUntilClickable()->one()->click();
 		}
 		$form->invalidate();
 

@@ -148,7 +148,7 @@ class testFormValueMappings extends CWebTest {
 
 		$this->page->open('zabbix.php?action='.$source.'.list&filter_name=Clone Valuemap Test&filter_set=1')->waitUntilReady();
 
-		$this->query('link', 'Clone Valuemap Test')->one()->click();
+		$this->query('link', 'Clone Valuemap Test')->waitUntilClickable()->one()->click();
 		COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Value mapping');
 		$this->assertTableData(self::EXISTING_VALUEMAPS, 'id:valuemap-formlist');
 		COverlayDialogElement::find()->one()->close();
