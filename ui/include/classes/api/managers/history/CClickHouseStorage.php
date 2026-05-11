@@ -87,9 +87,8 @@ class CClickHouseStorage {
 
 	private const OP = ['ge' => '>=', 'gt' => '>', 'le' => '<=', 'lt' => '<'];
 
-	public function __construct(array $config, array $value_type_ttl) {
-		$_value_type_ttl = array_fill_keys($config['types'], null);
-		$this->value_type_ttl = array_replace($_value_type_ttl, array_intersect_key($value_type_ttl, $_value_type_ttl));
+	public function __construct(array $config) {
+		$this->value_type_ttl = $config['value_type_ttl'];
 		$this->url = (new CUrl($config['url']))->setArgument('database', $config['db']);
 		$this->request_context_data = [
 			'http' => [
@@ -117,15 +116,6 @@ class CClickHouseStorage {
 	 */
 	public function getErrorMessage(): ?string {
 		return $this->error_message;
-	}
-
-	/**
-	 * Get storage table name for specified value type.
-	 *
-	 * @param int $value_type
-	 */
-	public function getTableName(int $value_type): string {
-		return static::VALUE_TYPE_TABLE[$value_type];
 	}
 
 	/**
@@ -1035,5 +1025,14 @@ class CClickHouseStorage {
 		}
 
 		return $sql_parts;
+	}
+
+	/**
+	 * Get storage table name for specified value type.
+	 *
+	 * @param int $value_type
+	 */
+	private function getTableName(int $value_type): string {
+		return static::VALUE_TYPE_TABLE[$value_type];
 	}
 }
