@@ -3313,15 +3313,14 @@ static void	recalculate_services(zbx_service_manager_t *service_manager, zbx_dbc
 	for (int i = 0; i < handles.values_num; i += EVENT_BATCH_SIZE)
 	{
 		int	events_num = MIN(EVENT_BATCH_SIZE, handles.values_num - i);
-		int	offset = i * EVENT_BATCH_SIZE;
 
-		zbx_cep_get_events_by_handles(handles.values + offset, events_num, events);
+		zbx_cep_get_events_by_handles(handles.values + i, events_num, events);
 
 		for (int j = 0; j < events_num; j++)
 		{
 			if (NULL == events[j])
 			{
-				process_deleted_problems(service_manager, &handles.values[offset + j], 1);
+				process_deleted_problems(service_manager, &handles.values[i + j], 1);
 				continue;
 			}
 
@@ -3329,7 +3328,7 @@ static void	recalculate_services(zbx_service_manager_t *service_manager, zbx_dbc
 				&service_manager->service_diffs, flags);
 
 			zbx_cep_event_release(events[j]);
-			zbx_cep_event_handle_release(handles.values[i * EVENT_BATCH_SIZE + j]);
+			zbx_cep_event_handle_release(handles.values[i + j]);
 		}
 	}
 
