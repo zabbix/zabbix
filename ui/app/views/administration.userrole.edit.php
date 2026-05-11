@@ -398,7 +398,6 @@ if (CTemporaryMobileFeatureHelper::isEnabled()) {
 					->setChecked($data['rules'][CRoleHelper::DEVICES_ACCESS])
 					->setReadonly($data['readonly'])
 					->setUncheckedValue(0)
-					->addClass('js-checkbox-changes-ui')
 			)
 		]);
 
@@ -412,7 +411,6 @@ if (CTemporaryMobileFeatureHelper::isEnabled()) {
 				)
 				->setReadonly($data['readonly'])
 				->setLabel($label)
-				->addClass('js-checkbox-changes-ui')
 		))
 			->addClass(ZBX_STYLE_NOWRAP);
 	}
@@ -426,12 +424,12 @@ if (CTemporaryMobileFeatureHelper::isEnabled()) {
 
 	$form_grid->addItem([
 		new CLabel(_('Default access to new device actions'),
-			$data['readonly'] ? '' : 'devices.actions.default_access'
+			$data['readonly'] ? '' : CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS
 		),
 		new CFormField(
 			(new CCheckBox('devices_actions_default_access', 1))
-				->setId('devices.actions.default_access')
-				->setChecked($data['rules']['devices.actions.default_access'])
+				->setId(CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS)
+				->setChecked($data['rules'][CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS])
 				->setReadonly($data['readonly'])
 				->setUncheckedValue(0)
 		)

@@ -19,7 +19,7 @@
  */
 ?>
 
-<script>
+//<script>
 
 	const view = new class {
 		/** @type {CForm} */
@@ -53,11 +53,21 @@
 				.getElementById('service-write-access')
 				.addEventListener('change', () => this.serviceWriteAccessChange());
 
-			this.form_element.querySelectorAll('.js-checkbox-changes-ui').forEach((checkbox) => {
-				checkbox.addEventListener('change', () => {
+			const devices_access_checkbox = document.getElementById('devices.access');
+
+			if (devices_access_checkbox !== null) {
+				devices_access_checkbox.addEventListener('change', () => {
 					this.updateAccessUiElementsFieldsGroup(this.form.findFieldByName('type').getValue());
 				});
-			})
+			}
+
+			const device_manage_own_checkbox = document.getElementById('devices.actions.manage_own');
+
+			if (device_manage_own_checkbox !== null) {
+				device_manage_own_checkbox.addEventListener('change', () => {
+					this.updateAccessUiElementsFieldsGroup(this.form.findFieldByName('type').getValue());
+				});
+			}
 
 			this.updateServicesWriteAccessFields();
 
@@ -154,14 +164,14 @@
 				CRoleHelper::DEVICES_ACCESS => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::DEVICES_ACTIONS_MANAGE_USER => USER_TYPE_SUPER_ADMIN,
-				'devices.actions.default_access' => USER_TYPE_ZABBIX_USER
+				CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS => USER_TYPE_ZABBIX_USER
 			], JSON_FORCE_OBJECT) ?>;
 
 			const access_min_default_checked = <?= json_encode([
 				CRoleHelper::DEVICES_ACCESS => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::DEVICES_ACTIONS_MANAGE_USER => USER_TYPE_SUPER_ADMIN,
-				'devices.actions.default_access' => USER_TYPE_SUPER_ADMIN
+				CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS => USER_TYPE_SUPER_ADMIN
 			], JSON_FORCE_OBJECT) ?>;
 
 			for (const [id, value] of Object.entries(access_min)) {

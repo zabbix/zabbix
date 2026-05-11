@@ -85,6 +85,7 @@ class CRoleHelper {
 	public const DEVICES_ACCESS = 'devices.access';
 	public const DEVICES_ACTIONS_MANAGE_OWN = 'devices.actions.manage_own';
 	public const DEVICES_ACTIONS_MANAGE_USER = 'devices.actions.manage_user';
+	public const DEVICES_ACTIONS_DEFAULT_ACCESS = 'devices.actions.default_access';
 
 	public const UI_SECTION_DASHBOARDS = 'ui.dashboards';
 	public const UI_SECTION_MONITORING = 'ui.monitoring';
