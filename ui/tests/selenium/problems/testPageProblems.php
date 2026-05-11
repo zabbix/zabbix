@@ -458,7 +458,7 @@ class testPageProblems extends CWebTest {
 		foreach ($dependant_headers as $field) {
 			$filter_form->fill(['Show' => $field['value']]);
 			$filter_form->submit();
-			$table->waitUntilReady();
+			$table->waitUntilReady()->invalidate();
 			$this->assertEquals($field['headers'], $table->getHeadersText());
 		}
 
