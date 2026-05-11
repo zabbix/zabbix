@@ -1190,11 +1190,10 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		return ret;
 	}
 
-	if (ZBX_TCP_SEC_UNENCRYPTED == sock->connection_type &&
-		NULL != config_comms->config_tls->tls_listen)
+	if (ZBX_TCP_SEC_UNENCRYPTED == sock->connection_type && NULL != config_comms->config_tls->tls_listen)
 	{
-		zabbix_log(LOG_LEVEL_WARNING,
-			"from %s: unencrypted connection not allowed for non-stat requests", sock->peer);
+		zabbix_log(LOG_LEVEL_WARNING, "from %s: unencrypted connection not allowed for non-stat requests",
+				sock->peer);
 
 		return FAIL;
 	}
@@ -1255,8 +1254,10 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 	else if (0 == strcmp(value, ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE))
 	{
 		if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+		{
 			ret = zbx_trapper_expressions_evaluate(sock, &jp, config_comms->config_timeout,
 				config_comms->config_tls, config_frontend_allowed_ip);
+		}
 	}
 	else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST))
 	{
