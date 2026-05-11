@@ -250,7 +250,7 @@ class CTabFilterItem extends CBaseComponent {
 		let item_template = this._template || this._content_container.querySelector('[data-template]');
 
 		this._target.parentNode.classList.add(TABFILTERITEM_STYLE_EXPANDED);
-		this._target.parentNode.setAttribute('aria-expanded', 'true');
+		this._target.setAttribute('aria-expanded', 'true');
 
 		if (item_template instanceof HTMLElement && !this._expanded) {
 			item_template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_EXPAND, {detail: this}));
@@ -268,7 +268,7 @@ class CTabFilterItem extends CBaseComponent {
 
 		this._expanded = false;
 		this._target.parentNode.classList.remove(TABFILTERITEM_STYLE_EXPANDED);
-		this._target.parentNode.setAttribute('aria-expanded', 'false');
+		this._target.setAttribute('aria-expanded', 'false');
 		this._content_container.classList.add('display-none');
 
 		if (item_template instanceof HTMLElement) {
