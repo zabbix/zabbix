@@ -628,7 +628,7 @@ static void	history_clickhouse_add_error(char **err, const char *format, ...)
 	char	*str = NULL;
 	size_t	str_len = 0, str_offset = 0;
 
-	if (0 != *err)
+	if (NULL != *err)
 		zbx_strcpy_alloc(&str, &str_len, &str_offset, ", ");
 
 	va_start(args, format);
@@ -752,7 +752,7 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 
 		if (400 <= status)
 		{
-			history_clickhouse_add_error(error, "cannot send query to ClickHouse,"
+			history_clickhouse_add_error(error, "cannot send query to ClickHouse"
 				" HTTP response code: %ld",
 				status);
 

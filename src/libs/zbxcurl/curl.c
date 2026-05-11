@@ -24,6 +24,8 @@
 #	define CURLOPT_PROTOCOLS_STR	10318L
 #endif
 
+static int	zbx_curl_has_multi_wait(char **error);
+
 static unsigned int	libcurl_version_num(void)
 {
 	return curl_version_info(CURLVERSION_NOW)->version_num;
@@ -421,7 +423,7 @@ int	zbx_curl_has_smtp_auth(char **error)
 	return SUCCEED;
 }
 
-int	zbx_curl_has_multi_wait(char **error)
+static int	zbx_curl_has_multi_wait(char **error)
 {
 	/* History providers need curl_multi_wait() which was added in 7.28.0 (0x071c00) */
 	if (libcurl_version_num() < 0x071c00)

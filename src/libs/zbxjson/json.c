@@ -165,7 +165,7 @@ void	zbx_json_init_with(struct zbx_json *j, const char *src, size_t len)
 	j->status = ('{' == *ptr ? ZBX_JSON_EMPTY : ZBX_JSON_COMMA);
 }
 
-void	zbx_json_setempty(struct zbx_json *j)
+static void	zbx_json_setempty(struct zbx_json *j)
 {
 	j->buffer_offset = 0;
 	j->buffer_size = 0;
