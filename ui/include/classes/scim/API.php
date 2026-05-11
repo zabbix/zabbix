@@ -17,10 +17,13 @@
 namespace SCIM;
 
 use CJsonRpc;
+use Exception;
 use APIException;
+use DBException;
 use CApiClientResponse;
 use CHttpRequest;
 use SCIM\clients\ScimApiClient;
+use CUser;
 
 class API {
 
@@ -41,16 +44,20 @@ class API {
 
 		$auth_header = $request->getParsedAuthHeader();
 
-		$response->setResponse(
-			$client->callMethod($endpoint, $method, $input, [
-				'type' => $auth_header['type'] === CJsonRpc::HEADER_AUTHENTICATE_BEARER
-					? CJsonRpc::AUTH_TYPE_BEARER
-					: CJsonRpc::AUTH_TYPE_COOKIE,
-				'auth' => $auth_header['auth']
-			])
-		);
+		$auth = [
+			'type' => CJsonRpc::AUTH_TYPE_BEARER,
+			'auth' => $auth_header['auth']
+		];
 
-		return $response;
+		$authenticate_response = null;
+
+		if ($client::requiresAuthentication($endpoint, $method)) {
+			$authenticate_response = $this->authenticate($client, $auth);
+		}
+
+		return $authenticate_response === null || $authenticate_response->errorCode === null
+			? $response->setResponse($client->callMethod($endpoint, $method, $input, $auth))
+			: $response->setResponse($authenticate_response);
 	}
 
 	/**
@@ -130,5 +137,47 @@ class API {
 		preg_match('/^displayName eq "(?<value>(?:[^"]|\\\\")*)"$/', $filter, $filter_value);
 
 		return array_key_exists('value', $filter_value) ? $filter_value['value'] : null;
+	}
+
+	public function authenticate(ScimApiClient $client, array $auth): CApiClientResponse {
+		global $NO_AUTH_DEBUG_MODE;
+
+		$response = new CApiClientResponse();
+
+		try {
+			if ($auth['auth'] === null) {
+				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+			}
+
+			$user = (new CUser())->checkAuthentication(['token' => $auth['auth']]);
+
+			if (array_key_exists('debug_mode', $user)) {
+				$client->debug = $user['debug_mode'];
+			}
+		}
+		catch (Exception $e) {
+			if ($e instanceof APIException) {
+				$response->errorCode = $e->getCode();
+			}
+			elseif ($e instanceof DBException) {
+				$response->errorCode = ZBX_API_ERROR_DB;
+			}
+			else {
+				$response->errorCode = ZBX_API_ERROR_INTERNAL;
+			}
+
+			$response->errorMessage = $e->getMessage();
+
+			// add debug data
+			if ($NO_AUTH_DEBUG_MODE) {
+				$response->debug = $e->getTrace();
+
+				if ($e instanceof APIException) {
+					$response->errorMessage = $e->getDebugMessage();
+				}
+			}
+		}
+
+		return $response;
 	}
 }

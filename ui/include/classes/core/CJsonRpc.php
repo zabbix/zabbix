@@ -81,6 +81,10 @@ class CJsonRpc {
 			$auth['auth'] = $session->extractSessionId();
 		}
 
+		$calls_data = [];
+
+		$authentication_required = false;
+
 		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
 			if (!$this->validate($call)) {
 				continue;
@@ -88,9 +92,50 @@ class CJsonRpc {
 
 			[$api, $method] = explode('.', $call['method']) + [1 => ''];
 
-			$result = $this->apiClient->callMethod($api, $method, $call['params'], $auth);
+			if (!$authentication_required &&
+					(CLocalApiClient::requiresAuthentication($api, $method) ||
+						(CLocalApiClient::supportsAuthentication($api, $method) && $auth['auth'] !== null))) {
+				$authentication_required = true;
+			}
 
-			$this->processResult($call, $result);
+			$calls_data[] = [
+				'api' => $api,
+				'method' => $method,
+				'params' => $call['params'],
+				'id' => $call['id']
+			];
+		}
+
+		$authenticate_response = null;
+
+		if ($authentication_required) {
+			$authenticate_response = $this->authenticate($auth, $calls_data);
+		}
+
+		if ($authenticate_response === null || $authenticate_response->errorCode === null) {
+			foreach ($calls_data as $call) {
+				if ($auth['type'] !== CJsonRpc::AUTH_TYPE_COOKIE &&
+						!CLocalApiClient::requiresAuthentication($call['api'], $call['method']) &&
+						!CLocalApiClient::supportsAuthentication($call['api'], $call['method'])) {
+					$result = new CApiClientResponse();
+
+					$error = _('The "%1$s.%2$s" method must be called without authorization header.');
+
+					$result->errorCode = ZBX_API_ERROR_PARAMETERS;
+					$result->errorMessage = _params($error, [$call['api'], $call['method']]);
+				}
+				else {
+					$result =
+						$this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth);
+				}
+
+				$this->processResult($call, $result);
+			}
+		}
+		else {
+			foreach ($calls_data as $call) {
+				$this->processResult($call, $authenticate_response);
+			}
 		}
 
 		$response = new CHttpResponse();
@@ -145,6 +190,74 @@ class CJsonRpc {
 		}
 
 		return true;
+	}
+
+	public function authenticate(array $auth, array $calls_data): CApiClientResponse {
+		global $NO_AUTH_DEBUG_MODE;
+
+		$response = new CApiClientResponse();
+
+		try {
+			if ($auth['auth'] === null ||
+					($auth['type'] == CJsonRpc::AUTH_TYPE_DPOP && !CTemporaryMobileFeatureHelper::isEnabled())) {
+				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+			}
+
+			$user = match ($auth['type']) {
+				CJsonRpc::AUTH_TYPE_BEARER => $this->apiClient->serviceFactory->getObject('user')->checkAuthentication(
+					strlen($auth['auth']) == 64
+						? ['token' => $auth['auth']]
+						: ['sessionid' => $auth['auth']]
+				),
+				CJsonRpc::AUTH_TYPE_COOKIE => $this->apiClient->serviceFactory->getObject('user')->checkAuthentication([
+					'sessionid' => $auth['auth']
+				]),
+				CJsonRpc::AUTH_TYPE_DPOP => $this->apiClient->serviceFactory->getObject('user')
+					->checkAuthenticationDpop([
+						'token' => $auth['auth'],
+						'signature' => $auth['sign'],
+						'requested_api_method' => self::makeRequestedApiMethod($calls_data)
+					])
+			};
+
+			if (array_key_exists('debug_mode', $user)) {
+				$this->apiClient->debug = $user['debug_mode'];
+			}
+		}
+		catch (Exception $e) {
+			if ($e instanceof APIException) {
+				$response->errorCode = $e->getCode();
+			}
+			elseif ($e instanceof DBException) {
+				$response->errorCode = ZBX_API_ERROR_DB;
+			}
+			else {
+				$response->errorCode = ZBX_API_ERROR_INTERNAL;
+			}
+
+			$response->errorMessage = $e->getMessage();
+
+			// add debug data
+			if ($NO_AUTH_DEBUG_MODE) {
+				$response->debug = $e->getTrace();
+
+				if ($e instanceof APIException) {
+					$response->errorMessage = $e->getDebugMessage();
+				}
+			}
+		}
+
+		return $response;
+	}
+
+	public static function makeRequestedApiMethod(array $calls_data): string {
+		$api_methods = [];
+
+		foreach ($calls_data as $call) {
+			$api_methods[] = $call['api'].'.'.$call['method'];
+		}
+
+		return implode(',', $api_methods);
 	}
 
 	public function processResult(array $call, CApiClientResponse $response) {

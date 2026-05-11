@@ -16,10 +16,8 @@
 
 namespace SCIM\clients;
 
-use APIException;
 use CLocalApiClient;
 use Exception;
-use CUser;
 
 class ScimApiClient extends CLocalApiClient {
 	/**
@@ -37,34 +35,7 @@ class ScimApiClient extends CLocalApiClient {
 		return true;
 	}
 
-	/**
-	 * Returns true if calling the given method requires a valid authentication token.
-	 *
-	 * @param $api
-	 * @param $method
-	 *
-	 * @return bool
-	 */
-	protected function requiresAuthentication($api, $method) {
+	public static function requiresAuthentication($api, $method): bool {
 		return !($api === 'serviceproviderconfig' && $method === 'get');
-	}
-
-	/**
-	 * Checks if the authentication token is valid.
-	 *
-	 *
-	 * @param array  $auth
-	 * @param string $requested_api_method
-	 *
-	 * @throws APIException
-	 */
-	protected function authenticate(array $auth, string $requested_api_method = ''): void {
-		if ($auth['auth'] === null) {
-			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-		}
-
-		$user = (new CUser())->checkAuthentication(['token' => $auth['auth']]);
-
-		$this->debug = $user['debug_mode'];
 	}
 }

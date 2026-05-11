@@ -24,14 +24,14 @@ class CLocalApiClient extends CApiClient {
 	 *
 	 * @var CRegistryFactory
 	 */
-	protected $serviceFactory;
+	public $serviceFactory;
 
 	/**
 	 * Whether debug mode is enabled.
 	 *
 	 * @var bool
 	 */
-	protected $debug = false;
+	public $debug = false;
 
 	public function getUserData(): ?array {
 		return CApiService::$userData;
@@ -85,39 +85,24 @@ class CLocalApiClient extends CApiClient {
 		}
 
 		// check the mobile device feature flag
-		if (($auth['type'] == CJsonRpc::AUTH_TYPE_DPOP || $api === 'device')
-				&& !CTemporaryMobileFeatureHelper::isEnabled()) {
+		if ($api === 'device' && !CTemporaryMobileFeatureHelper::isEnabled()) {
 			$response->errorCode = ZBX_API_ERROR_PERMISSIONS;
 			$response->errorMessage = _s('No permissions to call "%1$s.%2$s".', $requestApi, $requestMethod);
 
 			return $response;
 		}
 
-		$requiresAuthentication = $this->requiresAuthentication($api, $method);
-
-		// check that no authentication token (except DPoP token) is passed to methods that don't require it
-		if (!$requiresAuthentication && $auth['type'] !== CJsonRpc::AUTH_TYPE_COOKIE) {
-			$error = _('The "%1$s.%2$s" method must be called without authorization header.');
-
-			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
-			$response->errorMessage = _params($error, [$requestApi, $requestMethod]);
-
-			return $response;
-		}
-
 		$newTransaction = false;
 		try {
-			// authenticate
-			if ($requiresAuthentication) {
-				$this->authenticate($auth, $requestApi.'.'.$requestMethod);
+			// check permissions
+			if (APP::getMode() === APP::EXEC_MODE_API &&
+					(self::requiresAuthentication($api, $method) ||
+						(self::supportsAuthentication($api, $method) && $auth['auth'] !== null)) &&
+					!$this->isAllowedMethod($api, $method, $auth['type'])) {
+				$response->errorCode = ZBX_API_ERROR_PERMISSIONS;
+				$response->errorMessage = _s('No permissions to call "%1$s.%2$s".', $requestApi, $requestMethod);
 
-				// check permissions
-				if (APP::getMode() === APP::EXEC_MODE_API && !$this->isAllowedMethod($api, $method)) {
-					$response->errorCode = ZBX_API_ERROR_PERMISSIONS;
-					$response->errorMessage = _s('No permissions to call "%1$s.%2$s".', $requestApi, $requestMethod);
-
-					return $response;
-				}
+				return $response;
 			}
 
 			// the nopermission parameter must not be available for external API calls.
@@ -177,50 +162,12 @@ class CLocalApiClient extends CApiClient {
 				$response->debug = $e->getTrace();
 
 				if ($e instanceof APIException) {
-					$debug_message = trim($e->getDebugMessage());
-
-					if ($debug_message !== '') {
-						$response->errorMessage .= ' '.$debug_message;
-					}
+					$response->errorMessage = $e->getDebugMessage();
 				}
 			}
 		}
 
 		return $response;
-	}
-
-	/**
-	 * Checks if the authentication token is valid.
-	 *
-	 * @param array  $auth
-	 * @param string $requested_api_method
-	 *
-	 * @throws APIException
-	 */
-	protected function authenticate(array $auth, string $requested_api_method): void {
-		if ($auth['auth'] === null) {
-			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-		}
-
-		$user = match ($auth['type']) {
-			CJsonRpc::AUTH_TYPE_BEARER => $this->serviceFactory->getObject('user')->checkAuthentication(
-				strlen($auth['auth']) == 64
-					? ['token' => $auth['auth']]
-					: ['sessionid' => $auth['auth']]
-			),
-			CJsonRpc::AUTH_TYPE_COOKIE => $this->serviceFactory->getObject('user')->checkAuthentication([
-				'sessionid' => $auth['auth']
-			]),
-			CJsonRpc::AUTH_TYPE_DPOP => $this->serviceFactory->getObject('user')->checkAuthenticationDpop([
-				'token' => $auth['auth'],
-				'signature' => $auth['sign'],
-				'requested_api_method' => $requested_api_method
-			])
-		};
-
-		if (array_key_exists('debug_mode', $user)) {
-			$this->debug = $user['debug_mode'];
-		}
 	}
 
 	/**
@@ -248,20 +195,16 @@ class CLocalApiClient extends CApiClient {
 		return array_key_exists($method, $api_service::ACCESS_RULES);
 	}
 
-	/**
-	 * Returns true if calling the given method requires a valid authentication token.
-	 *
-	 * @param $api
-	 * @param $method
-	 *
-	 * @return bool
-	 */
-	protected function requiresAuthentication($api, $method) {
+	public static function requiresAuthentication($api, $method): bool {
 		return !(($api === 'user' && $method === 'login')
 			|| ($api === 'user' && $method === 'checkauthentication')
 			|| ($api === 'apiinfo' && $method === 'version')
 			|| ($api === 'device' && $method === 'onboard')
 		);
+	}
+
+	public static function supportsAuthentication($api, $method): bool {
+		return $api === 'apiinfo' && $method === 'version';
 	}
 
 	/**
