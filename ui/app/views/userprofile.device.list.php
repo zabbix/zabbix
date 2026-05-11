@@ -27,7 +27,7 @@ $html_page = (new CHtmlPage())
 	->setControls((new CList([
 		(new CTag('nav', true,
 			(new CList())->addItem(
-				(new CSimpleButton(_('Add a device')))
+				(new CSimpleButton(_('Add device')))
 					->addClass('js-create-device')
 					->setEnabled(CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN))
 			)

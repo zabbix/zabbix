@@ -30,7 +30,7 @@ $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $form_grid = (new CFormGrid())
 	->addItem([
-		(new CLabel(_('Username'), 'username'))->setAsteriskMark(),
+		(new CLabel(_('User'), 'userid_ms'))->setAsteriskMark(),
 		new CFormField(
 			(new CMultiSelect([
 				'name' => 'userid',
@@ -69,10 +69,10 @@ $form->addItem(
 		->addStyle('display: none')
 );
 
-$title = _('Select user to add a device');
+$title = _('Select user to add device');
 $buttons = [
 	[
-		'title' => _('Add a device'),
+		'title' => _('Add device'),
 		'class' => 'js-submit',
 		'keepOpen' => true,
 		'isSubmit' => true
