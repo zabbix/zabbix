@@ -1145,8 +1145,10 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 					" (legacy protocols are not supported)", sock->peer);
 
 			if (0 != last_log_time && 0 < dropped_count)
+			{
 				zabbix_log(LOG_LEVEL_WARNING, "trapper dropped %d packets in the last %d seconds",
 						dropped_count, (int)(now - last_log_time));
+			}
 
 			last_log_time = now;
 			dropped_count = 0;
@@ -1156,8 +1158,10 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 	}
 
 	if (0 != last_log_time && 0 < dropped_count)
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "trapper dropped %d packets in the last %d seconds",
 				dropped_count, (int)(zbx_time() - last_log_time));
+	}
 
 	last_log_time = 0;
 	dropped_count = 0;
