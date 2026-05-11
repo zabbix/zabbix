@@ -498,9 +498,11 @@ class testUserRolesPermissions extends CWebTest {
 					$dialog->query('button:Update')->one()->click();
 					$dialog->ensureNotPresent();
 					$this->page->waitUntilReady();
-					$row->invalidate();
-					$row->getColumn('Actions')->query("xpath:.//button[".
-							CXPathHelper::fromClass('zi-alert-with-content')."]")->one()->click();
+					$table->waitUntilReady()->invalidate();
+
+					// Variable row cannot be reused here as it becomes stalled in the problems page.
+					$table->findRow('Problem', 'Test trigger with tag')->getColumn('Actions')->query("xpath:.//button[".
+							CXPathHelper::fromClass('zi-alert-with-content')."]")->one()->scrollIntoView(50)->click();
 					$message_hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
 					$value = $message_hint->query('class:list-table')->asTable()->one()->getRow(0)->getColumn($data['column'])->getText();
 					$this->assertEquals($data['value'], $value);

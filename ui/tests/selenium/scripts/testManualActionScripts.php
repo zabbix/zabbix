@@ -2232,10 +2232,13 @@ class testManualActionScripts extends CWebTest {
 			$scope = (array_key_exists('host', $data)) ? 'host' : 'event';
 
 			if ($content === 'Latest data') {
+				$table = $this->query('id:latest')->asDatatable()->one()->waitUntilReady();
+				$headers = $table->getHeaders();
 				CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['Hosts' => $data[$scope]]);
 				$this->query('button:Apply')->one()->waitUntilClickable()->click();
 				$this->page->waitUntilReady();
-				$table = $this->query('id:latest')->asDatatable()->one()->waitUntilReady();
+				$headers->waitUntilStalled();
+				$table->waitUntilReady()->invalidate();
 			}
 			elseif ($content === 'Global view') {
 				$table = CDashboardElement::find()->one()->getWidget('Current problems');
@@ -2244,7 +2247,7 @@ class testManualActionScripts extends CWebTest {
 				$table = $this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
 			}
 
-			$table->query('link', $data[$scope])->one()->click();
+			$table->query('link', $data[$scope])->waitUntilClickable()->one()->scrollIntoView(50)->click();
 			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 			$popup->fill($data['fields']['Name']);
 			$manual_input_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
@@ -2296,7 +2299,7 @@ class testManualActionScripts extends CWebTest {
 					$this->query('button:Ok')->waitUntilVisible()->one();
 					$output_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 					$this->assertEquals($data['fields']['Name'], $output_dialog->getTitle());
-sleep(15);
+
 					// Check that Zabbix server is down and return error message.
 					$error = "Connection to Zabbix server \"localhost:10051\" refused. Possible reasons:\n".
 						"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".
