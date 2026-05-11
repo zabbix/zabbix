@@ -84,10 +84,11 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent(self::LINKED_TEMPLATE);
 		$dialog->submit();
+		$this->page->waitUntilReady();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 		$this->query('class:datatable')->asDatatable()->waitUntilReady();
-		$this->zbxTestTextPresent(self::HOST_VISIBLE_NAME);
+		$this->query('link', self::HOST_VISIBLE_NAME)->one()->waitUntilPresent();
 	}
 
 	/**
@@ -128,6 +129,9 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestTextNotPresent(self::LINKED_TEMPLATE.':');
 	}
 
+	/**
+	 * @depends testFormHostLinkTemplates_TemplateUnlink
+	 */
 	public function testFormHostLinkTemplates_TemplateLinkUpdate() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
