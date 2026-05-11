@@ -16,8 +16,6 @@
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * Test tag based permissions.
  *
@@ -349,7 +347,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 				}
 
 				$xpath = '//table[@id="tag-filter-table"]//tbody//tr['.$i.']//td/button[text()="Remove"]';
-				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
+				$this->query('xpath:'.$xpath)->waitUntilVisible()->one();
 				$i++;
 			}
 

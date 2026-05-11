@@ -391,6 +391,9 @@ static void	*pg_service_entry(void *data)
 				case ZBX_IPC_PGM_GET_ALL_PGROUP_RTDATA:
 					pg_get_all_pgroup_rtdata(pgs, client);
 					break;
+				case ZBX_IPC_PGM_STOP:
+					atomic_store(&pgs->stop, 1);
+					break;
 			}
 
 			zbx_ipc_message_free(message);
@@ -451,6 +454,13 @@ out:
 void	pg_service_destroy(zbx_pg_service_t *pgs)
 {
 	void	*retval;
+	char	*error = NULL;
+
+	if (FAIL == zbx_pg_stop(&error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot stop pg service: %s", error);
+		zbx_free(error);
+	}
 
 	atomic_store(&pgs->stop, 1);
 	pthread_join(pgs->thread, &retval);

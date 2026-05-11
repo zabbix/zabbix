@@ -367,8 +367,8 @@ class testFormGraphs extends CWebTest {
 					],
 					'inline_errors' => [
 						'Name' => 'This field cannot be empty.',
-						'Width' => 'This value must be no less than "20".',
-						'Height' => 'This value must be no less than "20".',
+						'Width' => 'Value must be greater than or equal to 20.',
+						'Height' => 'Value must be greater than or equal to 20.',
 						'class:graph-items' => 'This field cannot be empty.'
 					]
 				]
@@ -407,10 +407,10 @@ class testFormGraphs extends CWebTest {
 						'id:yaxismax' => ''
 					],
 					'inline_errors' => [
-						'Width' => 'This value must be no less than "20".',
-						'Height' => 'This value must be no less than "20".',
-						'Percentile line (left)' => 'This value must be no less than "0".',
-						'Percentile line (right)' => 'This value must be no less than "0".',
+						'Width' => 'Value must be greater than or equal to 20.',
+						'Height' => 'Value must be greater than or equal to 20.',
+						'Percentile line (left)' => 'Value must be greater than or equal to 0.',
+						'Percentile line (right)' => 'Value must be greater than or equal to 0.',
 						'id:yaxismin' => 'This field cannot be empty.',
 						'id:yaxismax' => 'This field cannot be empty.',
 						'class:graph-items' => 'This field cannot be empty.'
@@ -439,8 +439,8 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Width' => 'This value must be no greater than "8000".',
-						'Height' => 'This value must be no greater than "4500".'
+						'Width' => 'Value must be less than or equal to 8000.',
+						'Height' => 'Value must be less than or equal to 4500.'
 					]
 				]
 			],
@@ -466,8 +466,8 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Width' => 'This value must be no less than "20".',
-						'Height' => 'This value must be no less than "20".'
+						'Width' => 'Value must be greater than or equal to 20.',
+						'Height' => 'Value must be greater than or equal to 20.'
 					]
 				]
 			],
@@ -493,7 +493,7 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Percentile line (left)' => 'This value must be no greater than "100".'
+						'Percentile line (left)' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
@@ -519,7 +519,7 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Percentile line (left)' => 'This value must be no less than "0".'
+						'Percentile line (left)' => 'Value must be greater than or equal to 0.'
 					]
 				]
 			],
@@ -571,7 +571,7 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Percentile line (right)' => 'This value must be no greater than "100".'
+						'Percentile line (right)' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
@@ -597,7 +597,7 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'Percentile line (right)' => 'This value must be no less than "0".'
+						'Percentile line (right)' => 'Value must be greater than or equal to 0.'
 					]
 				]
 			],

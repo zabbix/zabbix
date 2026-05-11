@@ -356,7 +356,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					],
 					'inline_errors' => [
 						'Group for discovered hosts' => 'This field cannot be empty.',
-						'Login attempts' => 'This value must be no less than "1".',
+						'Login attempts' => 'Value must be greater than or equal to 1.',
 						'Login blocking interval' => 'This field cannot be empty.'
 					]
 				]
@@ -374,7 +374,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Resolve secret vault macros by' => 'Zabbix server and proxy'
 					],
 					'inline_errors' => [
-						'Login attempts' => 'This value must be no less than "1".',
+						'Login attempts' => 'Value must be greater than or equal to 1.',
 						'Login blocking interval' => 'A time unit is expected.'
 					]
 				]
@@ -389,7 +389,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '!@#$%^&*()_+'
 					],
 					'inline_errors' => [
-						'Login attempts' => 'This value must be no less than "1".',
+						'Login attempts' => 'Value must be greater than or equal to 1.',
 						'Login blocking interval' => 'A time unit is expected.'
 					]
 				]
@@ -404,7 +404,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => 0
 					],
 					'inline_errors' => [
-						'Login attempts' => 'This value must be no less than "1".',
+						'Login attempts' => 'Value must be greater than or equal to 1.',
 						'Login blocking interval' => 'Value must be between 30s and 3600s (1h).'
 					]
 				]
@@ -458,7 +458,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '3601'
 					],
 					'inline_errors' => [
-						'Login attempts' => 'This value must be no greater than "32".',
+						'Login attempts' => 'Value must be less than or equal to 32.',
 						'Login blocking interval' => 'Value must be between 30s and 3600s (1h).'
 					]
 				]
@@ -551,7 +551,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '99999999999999999999999999999999'
 					],
 					'inline_errors' => [
-						'Login attempts' => 'This value must be no greater than "32".',
+						'Login attempts' => 'Value must be less than or equal to 32.',
 						'Login blocking interval' => 'Value must be between 30s and 3600s (1h).'
 					]
 				]

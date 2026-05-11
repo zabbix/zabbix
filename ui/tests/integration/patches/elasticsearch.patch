@@ -1,0 +1,26 @@
+diff --git a/src/libs/zbxhistory/history_elastic.c b/src/libs/zbxhistory/history_elastic.c
+index 763785e870a..8f8bb83ab4a 100644
+--- a/src/libs/zbxhistory/history_elastic.c
++++ b/src/libs/zbxhistory/history_elastic.c
+@@ -36,7 +36,7 @@
+ #define		ZBX_JSON_ALLOCATE		2048
+ 
+ /* bin is not used for elastic, but is needed for mapping consistency */
+-const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text", "bin", "json"};
++const char	*value_type_str[] = {"{DBNAME}_dbl", "{DBNAME}_str", "{DBNAME}_log", "{DBNAME}_uint", "{DBNAME}_text", "{DBNAME}_bin", "{DBNAME}_json"};
+ 
+ static zbx_uint32_t	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
+ 
+diff --git a/ui/include/classes/api/managers/CHistoryManager.php b/ui/include/classes/api/managers/CHistoryManager.php
+index 55a6640c2cc..c398262f67d 100644
+--- a/ui/include/classes/api/managers/CHistoryManager.php
++++ b/ui/include/classes/api/managers/CHistoryManager.php
+@@ -1723,7 +1723,7 @@ class CHistoryManager {
+ 
+ 		foreach ($indices as $type => $index) {
+ 			if (($url = self::getElasticsearchUrl($index)) !== null) {
+-				$endpoints[$type] = $url.$index.'*/'.$action;
++				$endpoints[$type] = $url."{DBNAME}_".$index.'*/'.$action;
+ 			}
+ 		}
+ 

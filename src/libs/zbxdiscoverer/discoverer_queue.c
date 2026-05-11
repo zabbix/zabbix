@@ -98,15 +98,15 @@ zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 
 	zbx_vector_uint64_create(&ids);
 
-	while (SUCCEED == zbx_list_pop(&queue->jobs, (void*)&job))
+	while (SUCCEED == zbx_list_pop(&queue->jobs, (void**)&job))
 	{
 		int		one_task = SUCCEED;
 		zbx_uint64_t	id;
 
-		if (SUCCEED != zbx_list_peek(&job->tasks, (void*)&task))
+		if (SUCCEED != zbx_list_peek(&job->tasks, (void**)&task))
 			break;
 
-		if (SVC_SNMPv3 != GET_DTYPE(task) && SVC_SNMPv2c != GET_DTYPE(task) && SVC_SNMPv1 != GET_DTYPE(task))
+		if (SVC_SNMPv3 != GET_DTYPE(task))
 			break;
 
 		if (0 != queue->snmp_allowed_workers)
@@ -119,7 +119,7 @@ zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 
 		if (job->tasks.head != job->tasks.tail)				/* if not one snmp task in the list */
 		{
-			(void)zbx_list_pop(&job->tasks, (void*)&task);
+			(void)zbx_list_pop(&job->tasks, (void**)&task);
 			(void)zbx_list_append(&job->tasks, (void*)task, NULL);	/* put task to end of the list */
 			one_task = FAIL;
 		}

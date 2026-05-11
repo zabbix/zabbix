@@ -43,7 +43,7 @@ class CFormValidator {
 	 * Map of field values, types and absolute paths in format {"/absolute/path": {"value": "abc", "type": "string"}}.
 	 *
 	 * Field type is taken from the first valid ruleset (one of multiple alternative rulesets provided in #rules for
-	 * particular field). #when_fields are collected before actual validation and  used during validation to get values
+	 * particular field). #when_fields are collected before actual validation and used during validation to get values
 	 * and types when field is referred in other field rulesets, e.g., in "when" condition.
 	 *
 	 * @type {Object}
@@ -1113,7 +1113,7 @@ class CFormValidator {
 			return {
 				result: CFormValidator.ERROR,
 				error: this.#getMessage(rules, 'min',
-					sprintf(t('This value must be no less than "%1$s".'), rules['min'])
+					sprintf(t('Value must be greater than or equal to %1$s.'), rules['min'])
 				)
 			};
 		}
@@ -1122,7 +1122,7 @@ class CFormValidator {
 			return {
 				result: CFormValidator.ERROR,
 				error: this.#getMessage(rules, 'max',
-					sprintf(t('This value must be no greater than "%1$s".'), rules['max'])
+					sprintf(t('Value must be less than or equal to %1$s.'), rules['max'])
 				)
 			};
 		}
@@ -1232,7 +1232,7 @@ class CFormValidator {
 			return {
 				result: CFormValidator.ERROR,
 				error: this.#getMessage(rules, 'min',
-					sprintf(t('This value must be no less than "%1$s".'),  rules['min'])
+					sprintf(t('Value must be greater than or equal to %1$s.'), rules['min'])
 				)
 			};
 		}
@@ -1241,7 +1241,7 @@ class CFormValidator {
 			return {
 				result: CFormValidator.ERROR,
 				error: this.#getMessage(rules, 'max',
-					sprintf(t('This value must be no greater than "%1$s".'),  rules['max'])
+					sprintf(t('Value must be less than or equal to %1$s.'), rules['max'])
 				)
 			};
 		}

@@ -510,8 +510,14 @@ class testDocumentationLinks extends CWebTest {
 			// #38 Scheduled report configuration form.
 			[
 				[
-					'url' => 'zabbix.php?action=scheduledreport.edit',
-					'doc_link' => '/en/manual/config/reports#configuration'
+					'url' => 'zabbix.php?action=scheduledreport.list',
+					'doc_link' => '/en/manual/config/reports#configuration',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create report'
+						]
+					]
 				]
 			],
 			// #39 Add scheduled report configuration popup from Dashboard view.

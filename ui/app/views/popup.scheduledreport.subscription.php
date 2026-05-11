@@ -24,8 +24,7 @@ $form = (new CForm())
 	->addVar('action', $data['action'])
 	->addVar('recipient_type', $data['recipient_type'])
 	->addVar('recipient_name', $data['recipient_name'])
-	->addVar('recipient_inaccessible', $data['recipient_inaccessible'])
-	->addVar('update', 1);
+	->addVar('recipient_inaccessible', $data['recipient_inaccessible']);
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
@@ -56,8 +55,7 @@ if ($data['recipient_type'] == ZBX_REPORT_RECIPIENT_TYPE_USER) {
 				'dstfrm' => $form->getName(),
 				'dstfld1' => 'recipientid'
 			]
-		],
-		'add_post_js' => false
+		]
 	]);
 }
 else {
@@ -78,8 +76,7 @@ else {
 				'dstfrm' => $form->getName(),
 				'dstfld1' => 'recipientid'
 			]
-		],
-		'add_post_js' => false
+		]
 	]);
 }
 
@@ -120,18 +117,20 @@ $form->addItem($form_grid);
 $output = [
 	'header' => $data['title'],
 	'body' => $form->toString(),
-	'script_inline' => $this->readJsFile('popup.scheduledreport.subscription.js.php'),
+	'script_inline' =>
+		$this->readJsFile('popup.scheduledreport.subscription.js.php').
+		getPagePostJs().'scheduled_report_subscription_edit.init('.json_encode([
+			'rules' => $data['js_validation_rules']
+		]).');',
 	'buttons' => [
 		[
 			'title' => $data['edit'] ? _('Update') : _('Add'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'return submitScheduledReportSubscription(overlay);'
+			'isSubmit' => true
 		]
 	]
 ];
-
-$output['script_inline'] .= $recipient_multiselect->getPostJS();
 
 if (($messages = getMessages()) !== null) {
 	$output['errors'] = $messages->toString();

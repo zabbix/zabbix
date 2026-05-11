@@ -609,7 +609,7 @@ void	zbx_export_events(zbx_dbconn_t *db, const zbx_vector_db_event_t *problems,
 				continue;
 		}
 
-		zbx_json_clean(&json);
+		zbx_json_reset(&json);
 
 		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, event->clock);
 		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, event->ns);
@@ -731,7 +731,19 @@ void	zbx_export_events(zbx_dbconn_t *db, const zbx_vector_db_event_t *problems,
 				continue;
 		}
 
+<<<<<<< HEAD
 		for (int j = 0; j < p_eventids->values_num; j++)
+=======
+		zbx_json_reset(&json);
+
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, recovery->r_event->clock);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, recovery->r_event->ns);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_VALUE, recovery->r_event->value);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_EVENTID, recovery->r_event->eventid);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PROBLEM_EVENTID, recovery->eventid);
+
+		if (0 != connector_object.ids.values_num)
+>>>>>>> master
 		{
 			zbx_json_clean(&json);
 
