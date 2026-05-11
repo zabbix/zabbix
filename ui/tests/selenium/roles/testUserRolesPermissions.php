@@ -479,7 +479,8 @@ class testUserRolesPermissions extends CWebTest {
 
 		foreach ([true, false] as $action_status) {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-			$row = $this->query('id:problems')->asDatatable()->one()->findRow('Problem', 'Test trigger with tag');
+			$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+			$row = $table->findRow('Problem', 'Test trigger with tag');
 			$row->getColumn('Update')->query('link:Update')->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
@@ -514,6 +515,7 @@ class testUserRolesPermissions extends CWebTest {
 					$dialog->query('button:Update')->one()->click();
 					$dialog->ensureNotPresent();
 					$this->page->waitUntilReady();
+					$table->waitUntilReady();
 					$row->invalidate();
 					$status = $row->getColumn($data['column'])->getText();
 					$this->assertEquals($data['value'], $status);
