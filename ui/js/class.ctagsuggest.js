@@ -147,7 +147,8 @@ class CTagSuggest {
 			const highlight_start = tag.substring(0, needle.length);
 			const highlight_end = tag.substring(needle.length);
 
-			li.innerHTML = `<span class="${CTagSuggest.ZBX_STYLE_SUGGEST_FOUND}">${highlight_start}</span>${highlight_end}`;
+			li.innerHTML = `<span class="${
+				CTagSuggest.ZBX_STYLE_SUGGEST_FOUND}">${highlight_start}</span>${highlight_end}`;
 
 			li.addEventListener('mouseover', () => this.#highlight(index));
 			li.addEventListener('mousedown', (e) => {
