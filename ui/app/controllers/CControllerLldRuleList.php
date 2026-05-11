@@ -88,6 +88,7 @@ class CControllerLldRuleList extends CController {
 		$view_url_params = ['action' => $this->getAction(), 'context' => $this->getInput('context')];
 
 		array_map([$view_url, 'setArgument'], array_keys($view_url_params), $view_url_params);
+		$paging = CPagerHelper::paginate($page, $discoveries, $filter['sortorder'], $view_url);
 
 		$data = [
 			'action' => $this->getAction(),
@@ -99,7 +100,7 @@ class CControllerLldRuleList extends CController {
 			'profileIdx' => $this->getProfilePrefix().'filter',
 			'active_tab' => CProfile::get($this->getProfilePrefix().'filter.active', 1),
 			'discoveries' => $discoveries,
-			'paging' => CPagerHelper::paginate($page, $discoveries, $filter['sortorder'], $view_url),
+			'paging' => $paging,
 			'parent_templates' => getItemParentTemplates($discoveries, ZBX_FLAG_DISCOVERY_RULE),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		];

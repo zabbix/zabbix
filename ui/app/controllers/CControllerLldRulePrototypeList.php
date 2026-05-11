@@ -90,6 +90,7 @@ class CControllerLldRulePrototypeList extends CController {
 		];
 
 		array_map([$view_url, 'setArgument'], array_keys($view_url_params), $view_url_params);
+		$paging = CPagerHelper::paginate($page, $discoveries, $filter['sortorder'], $view_url);
 
 		$data = [
 			'action' => $this->getAction(),
@@ -102,7 +103,7 @@ class CControllerLldRulePrototypeList extends CController {
 			'active_tab' => CProfile::get($this->getProfilePrefix().'filter.active', 1),
 			'checkbox_hash' => $this->parent_discovery['itemid'],
 			'discoveries' => $discoveries,
-			'paging' => CPagerHelper::paginate($page, $discoveries, $filter['sortorder'], $view_url),
+			'paging' => $paging,
 			'parent_templates' => getItemParentTemplates($discoveries, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		];
