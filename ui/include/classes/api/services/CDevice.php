@@ -361,6 +361,8 @@ class CDevice extends CApiService {
 			array $mobile_encryption_key): void {
 		$device_keyid = DB::reserveIds('device_key', 2);
 
+		$current_time = time();
+
 		$fields = [
 			[
 				'device_keyid' => $device_keyid,
@@ -368,7 +370,8 @@ class CDevice extends CApiService {
 				'scope' => MOBILE_KEY_SCOPE_IDENTITY,
 				'kid' => $mobile_identity_key['kid'],
 				'key_' => json_encode($mobile_identity_key),
-				'active' => self::DEVICE_KEY_ACTIVE
+				'active' => self::DEVICE_KEY_ACTIVE,
+				'created_at' => $current_time
 			],
 			[
 				'device_keyid' => bcadd($device_keyid, 1, 0),
@@ -376,7 +379,8 @@ class CDevice extends CApiService {
 				'scope' => MOBILE_KEY_SCOPE_ENCRYPTION,
 				'kid' => $mobile_encryption_key['kid'],
 				'key_' => json_encode($mobile_encryption_key),
-				'active' => self::DEVICE_KEY_ACTIVE
+				'active' => self::DEVICE_KEY_ACTIVE,
+				'created_at' => $current_time
 			]
 		];
 
