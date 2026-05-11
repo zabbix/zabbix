@@ -59,6 +59,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'evaltype' => $this->fields_values['evaltype'],
 				'tags' => $this->fields_values['tags'],
 				'show_symptoms' => $this->fields_values['show_symptoms'],
+				'show_suppressed' => $this->fields_values['show_suppressed'],
 				'acknowledgement_status' => $this->fields_values['acknowledgement_status'],
 				'acknowledged_by_me' => $this->fields_values['acknowledgement_status'] == ZBX_ACK_STATUS_ACK
 					? $this->fields_values['acknowledged_by_me']
@@ -67,8 +68,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'show_opdata' => in_array($this->fields_values['show_opdata'],
 					[OPERATIONAL_DATA_SHOW_SEPARATELY, OPERATIONAL_DATA_SHOW_WITH_PROBLEM])
 						? 1
-						: 0,
-				'show_suppressed' => $this->fields_values['show_suppressed']
+						: 0
 			], $search_limit);
 
 			[$sortfield, $sortorder] = self::getSorting($this->fields_values['sort_triggers']);
@@ -154,10 +154,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 						// Get all symptoms for given cause event ID.
 						$_symptom_data = CScreenProblem::getData([
 							'show_symptoms' => true,
+							'show_suppressed' => true,
 							'cause_eventid' => $cause_eventid,
 							'show' => $this->fields_values['show']
 						], [
-							'show_suppressed' => true,
 							'show_opdata' => in_array($this->fields_values['show_opdata'],
 								[OPERATIONAL_DATA_SHOW_SEPARATELY, OPERATIONAL_DATA_SHOW_WITH_PROBLEM])
 									? 1
