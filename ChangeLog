@@ -1,3 +1,8 @@
+Changes for 7.4.10
+
+7.4.10rc1 was released as 7.4.10 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.4.10rc1
 
 New features:
@@ -6,6 +11,7 @@ New features:
 .......PS. [ZBXNEXT-10211] added info about VMware entities to alarm JSON and ifbackingnetwork info to JSON for *vm.discovery and *vm.net.if.discovery items (MVekslers)
 
 Bug fixes:
+.......PS. [ZBX-27496] improved network discovery subsystem to work with snmpv1 and snmpv2c checks (MVekslers)
 .........T [ZBX-27592] fixed memory items becoming unsupported in Apache templates (kflorowski)
 .......PS. [ZBX-27635] fixed Zabbix server and proxy build without libcurl (arimdjonoks)
 ..F....... [ZBX-27463] replaced 'New oauth' with 'New OAuth' in Media Type edit form (dpankins)
@@ -1399,6 +1405,11 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
 
 --------------------------------------------------------------------------------
+Changes for 7.0.26
+
+7.0.26rc1 was released as 7.0.26 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.26rc1
 
 New features:
@@ -1407,6 +1418,7 @@ New features:
 .......PS. [ZBXNEXT-10211] added info about VMware entities to alarm JSON and ifbackingnetwork info to JSON for *vm.discovery and *vm.net.if.discovery items (MVekslers)
 
 Bug fixes:
+.......PS. [ZBX-27496] improved network discovery subsystem to work with snmpv1 and snmpv2c checks (MVekslers)
 .......PS. [ZBX-27635] fixed Zabbix server and proxy build without libcurl (arimdjonoks)
 .........T [ZBX-27592] fixed memory items becoming unsupported in Apache templates (kflorowski)
 .........T [ZBX-17971] fixed macro view in trigger descriptions in some SNMP templates (abrosimovs)
@@ -5450,6 +5462,11 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.46
+
+6.0.46rc1 was released as 6.0.46 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.46rc1
