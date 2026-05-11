@@ -177,7 +177,8 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 
 		$items_locator = 'xpath://a[contains(@href,"zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.
 				self::$hostid.'&context=host")]';
-		$this->query($items_locator)->one()->scrollIntoView(50)->click();
+		$this->query('class:datatable')->asDatatable()->one()->waitUntilReady()->query($items_locator)->one()
+				->scrollIntoView(50)->click();
 		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent(self::LINKED_TEMPLATE.':');
 
