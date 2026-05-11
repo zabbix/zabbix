@@ -1963,6 +1963,17 @@ function parse_period($str) {
 		}
 	}
 
+	foreach ($out as &$periods) {
+		usort($periods, static function(array $p1, array $p2): int {
+			if ($p1['start_h'] == $p2['start_h']) {
+				return $p1['start_m'] <=> $p2['start_m'];
+			}
+
+			return $p1['start_h'] <=> $p2['start_h'];
+		});
+	}
+	unset($periods);
+
 	return $out;
 }
 

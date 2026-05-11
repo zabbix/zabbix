@@ -972,11 +972,7 @@ class CIntegrationTest extends CAPITest {
 
 		$client = $this->getClient($component);
 		$session = md5(uniqid('', true));
-		$result = $client->sendAgentDataValues($values, $session, $host, '8.0.0', $proxy);
-
-		/*$this->assertTrue(($result !== false),
-			sprintf('Component "%s" failed to receive data: %s', $component, $client->getError())
-		);*/
+		$result = $client->sendAgentDataValues($values, $session, $host, ZABBIX_VERSION, $proxy);
 
 		if ($proxy === null) {
 			$this->assertTrue(array_key_exists('processed', $result),
@@ -1208,8 +1204,9 @@ class CIntegrationTest extends CAPITest {
 			try {
 				$response = $this->call($method, $count_params);
 
-				if (isset($response['result']) && $response['result'] == $expected_count
-						&& ($callback === null || call_user_func($callback, $response))) {
+				$callback_ok = ($callback === null || call_user_func($callback, $response) === true);
+
+				if (isset($response['result']) && $response['result'] == $expected_count && $callback_ok) {
 					if (static::$trace_delays) {
 						self::recordDelay('call_count_present', microtime(true) - $start);
 					}
