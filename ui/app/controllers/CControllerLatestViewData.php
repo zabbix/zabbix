@@ -265,12 +265,12 @@ class CControllerLatestViewData extends CControllerDataTable {
 			$item['description_expanded'] = (new CObject())
 				->addItem(zbx_str2links($item['description_expanded']))
 				->toString();
-
-			if (array_key_exists('custom_text', $options)) {
-				$item['custom_text'] = $this->resolveColumnTexts($options['custom_text']);
-			}
 		}
 		unset($item);
+
+		if (array_key_exists('custom_text', $options)) {
+			$this->resolveColumnTexts($data['items'], $options['custom_text']);
+		}
 
 		return [
 			'filter_counters' => $this->getFilterCounters(),
@@ -410,5 +410,24 @@ class CControllerLatestViewData extends CControllerDataTable {
 			'items' => $items,
 			'items_rw' => $items_rw
 		];
+	}
+
+	protected function resolveColumnTexts(array &$objects, array $texts): void {
+		$data = array_fill_keys(array_keys($objects), $texts);
+
+		$db_triggers = API::Trigger()->get([
+			'output' => ['priority', 'manual_close', 'event_name', 'description', 'comments', 'priority',
+				'status', 'state', 'value', 'url', 'url_name', 'expression'],
+			'selectHosts' => ['hostid'],
+			'itemids' => array_keys($objects, 'itemid'),
+			'preservekeys' => true
+		]);
+
+		$resolved_texts = CDataTableMacrosResolver::resolveForSection('latest_data', $data, ['items' => $objects,
+			'triggers' => $db_triggers]);
+
+		foreach ($objects as &$item) {
+			$item['custom_text'] = $resolved_texts[$item['itemid']];
+		}
 	}
 }

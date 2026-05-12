@@ -2443,7 +2443,7 @@ class CDataTable {
 	}
 
 	#getDataProviderParams(params) {
-		const column_options = this.getNonDuplicateColumns().reduce((options, column) => {
+		const column_options = this.getVisibleColumns().reduce((options, column) => {
 			return deepMerge(options, column.getColumnOptions());
 		}, {});
 

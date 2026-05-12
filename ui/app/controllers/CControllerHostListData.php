@@ -331,12 +331,12 @@ class CControllerHostListData extends CControllerDataTable {
 
 			CArrayHelper::sort($host['tags'], ['tag', 'value']);
 			$host['tags'] = CTagHelper::getTagsList($host);
-
-			if (array_key_exists('custom_text', $options)) {
-				$host['custom_text'] = $this->resolveColumnTexts($options['custom_text']);
-			}
 		}
 		unset($host);
+
+		if (array_key_exists('custom_text', $options)) {
+			$this->resolveColumnTexts($hosts, $options['custom_text']);
+		}
 
 		return [
 			'data_fields' => $data_fields,
@@ -345,5 +345,15 @@ class CControllerHostListData extends CControllerDataTable {
 			'can_edit_proxies' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES),
 			'can_edit_proxy_groups' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS)
 		];
+	}
+
+	protected function resolveColumnTexts(array &$objects, array $texts): void {
+		$data = array_fill_keys(array_keys($objects), $texts);
+
+		$resolved_texts = CDataTableMacrosResolver::resolveForSection('hosts', $data);
+
+		foreach ($objects as &$host) {
+			$host['custom_text'] = $resolved_texts[$host['hostid']];
+		}
 	}
 }

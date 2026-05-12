@@ -192,7 +192,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		if (!$options['references_only']) {
 			// Get macro value.
 			$macro_values = self::getHostMacros($macros['host'], $macro_values);
-			$macro_values = self::getIpMacros($macros['interface'], $macro_values);
+			$macro_values = self::getInterfaceMacros($macros['interface'], $macro_values);
 			$macro_values = self::getItemMacros($macros['item'], $macro_values);
 			$macro_values = self::getItemLogMacros($macros['log'], $macro_values);
 			$macro_values = self::getTriggerUserMacros($macros['usermacros'], $macro_values);
@@ -268,8 +268,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Get macro value.
 		$macro_values = self::getHostMacros($macros['host'], $macro_values);
-		$macro_values = self::getIpMacros($macros['interface'], $macro_values);
-		$macro_values = self::getItemMacros($macros['item'], $macro_values, $triggers, $options);
+		$macro_values = self::getInterfaceMacros($macros['interface'], $macro_values);
+		$macro_values = self::getItemMacros($macros['item'], $macro_values, $triggers, [], $options);
 		$macro_values = self::getItemLogMacros($macros['log'], $macro_values);
 		$macro_values = self::getTriggerUserMacros($macros['usermacros'], $macro_values);
 
@@ -385,7 +385,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Get macro value.
 		$macro_values = self::getHostMacros($macros['host'], $macro_values);
-		$macro_values = self::getIpMacros($macros['interface'], $macro_values);
+		$macro_values = self::getInterfaceMacros($macros['interface'], $macro_values);
 		$macro_values = self::getItemMacros($macros['item'], $macro_values);
 		$macro_values = self::getItemLogMacros($macros['log'], $macro_values);
 		$macro_values = self::getTriggerUserMacros($macros['usermacros'], $macro_values);
@@ -1317,14 +1317,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					'expr_macros' => true,
 					'macros' => [
 						'map' => ['{MAP.ID}', '{MAP.NAME}'],
-						'triggers' => self::aggr_triggers_macros
+						'triggers' => self::AGGR_TRIGGERS_MACROS
 					]
 				],
 				SYSMAP_ELEMENT_TYPE_HOST_GROUP => [
 					'expr_macros' => true,
 					'macros' => [
 						'hostgroup' => ['{HOSTGROUP.ID}'],
-						'triggers' => self::aggr_triggers_macros
+						'triggers' => self::AGGR_TRIGGERS_MACROS
 					]
 				],
 				SYSMAP_ELEMENT_TYPE_HOST => [
@@ -1333,14 +1333,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						'host' => ['{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
 						'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 						'inventory' => array_keys($inventory_macros),
-						'triggers' => self::aggr_triggers_macros
+						'triggers' => self::AGGR_TRIGGERS_MACROS
 					]
 				],
 				SYSMAP_ELEMENT_TYPE_TRIGGER => [
 					'expr_macros_host_n' => true,
 					'macros' => [
 						'trigger' => ['{TRIGGER.ID}'],
-						'triggers' => self::aggr_triggers_macros
+						'triggers' => self::AGGR_TRIGGERS_MACROS
 					],
 					'macros_n' => [
 						'host_n' => ['{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],

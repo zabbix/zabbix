@@ -278,7 +278,7 @@ class CScreenProblem extends CScreenBase {
 				}
 			}
 
-			$problems = ($filter['show'] == TRIGGERS_OPTION_ALL)
+			$problems = $filter['show'] == TRIGGERS_OPTION_ALL
 				? self::getDataEvents($options)
 				: self::getDataProblems($options);
 
@@ -298,16 +298,16 @@ class CScreenProblem extends CScreenBase {
 					$seen_triggerids += $triggerids;
 
 					$options = [
-						'output' => ['priority', 'manual_close'],
+						'output' => ['priority', 'manual_close', 'event_name', 'description', 'comments', 'priority',
+							'status', 'state', 'value', 'url', 'url_name', 'expression'],
 						'selectHosts' => ['hostid'],
 						'triggerids' => array_keys($triggerids),
 						'monitored' => true,
-						'skipDependent' => ($filter['show'] == TRIGGERS_OPTION_ALL) ? null : true,
+						'skipDependent' => $filter['show'] == TRIGGERS_OPTION_ALL ? null : true,
 						'preservekeys' => true
 					];
 
-					$details = (array_key_exists('details', $column_options)
-						&& $column_options['details'] == 1);
+					$details = array_key_exists('details', $column_options) && $column_options['details'] == 1;
 
 					if ($show_opdata) {
 						$options['output'][] = 'opdata';

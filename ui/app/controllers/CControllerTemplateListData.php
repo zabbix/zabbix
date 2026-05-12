@@ -168,12 +168,12 @@ class CControllerTemplateListData extends CControllerDataTable {
 
 			CArrayHelper::sort($template['tags'], ['tag', 'value']);
 			$template['tags'] = CTagHelper::getTagsList($template);
-
-			if (array_key_exists('custom_text', $options)) {
-				$template['custom_text'] = $this->resolveColumnTexts($options['custom_text']);
-			}
 		}
 		unset($template);
+
+		if (array_key_exists('custom_text', $options)) {
+			$this->resolveColumnTexts($templates, $options['custom_text']);
+		}
 
 		CPagerHelper::savePage('template.list', $this->paging['page']);
 
@@ -183,5 +183,15 @@ class CControllerTemplateListData extends CControllerDataTable {
 			'max_in_table' => (int) CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
 			'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 		];
+	}
+
+	protected function resolveColumnTexts(array &$objects, array $texts): void {
+		$data = array_fill_keys(array_keys($objects), $texts);
+
+		$resolved_texts = CDataTableMacrosResolver::resolveForSection('templates', $data);
+
+		foreach ($objects as &$template) {
+			$template['custom_text'] = $resolved_texts[$template['templateid']];
+		}
 	}
 }

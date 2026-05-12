@@ -35,16 +35,13 @@ class CControllerProblemViewData extends CControllerDataTable {
 		$data = $this->prepareData();
 		$options = $data['options'];
 
+		if (array_key_exists('custom_text', $options)) {
+			$this->resolveColumnTexts($data['problems'], $options['custom_text']);
+		}
+
 		self::addProblemRows($rows, $data, $data['problems'], $data['filter'], $options);
 
 		order_result($data['problems'], $data['sort_field'], $data['sort_order']);
-
-		foreach ($data['problems'] as &$problem) {
-			if (array_key_exists('custom_text', $options)) {
-				$problem['custom_text'] = $this->resolveColumnTexts($options['custom_text']);
-			}
-		}
-		unset($problem);
 
 		return [
 			'filter_counters' => $this->getFilterCounters(),
@@ -738,6 +735,9 @@ class CControllerProblemViewData extends CControllerDataTable {
 			foreach ($data['problems'] as &$problem) {
 				CArrayHelper::sort($problem['tags'], ['tag', 'value']);
 				$problem['tags'] = CTagHelper::getTagsList($problem);
+
+				$problem['hosts'] = $triggers_hosts[$problem['objectid']] ?? [];
+				$problem['trigger'] = $data['triggers'][$problem['objectid']] ?? null;
 			}
 			unset($problem);
 		}
@@ -775,5 +775,31 @@ class CControllerProblemViewData extends CControllerDataTable {
 		];
 
 		return $data;
+	}
+
+	protected function resolveColumnTexts(array &$objects, array $texts): void {
+		$db_events = API::Event()->get([
+			'eventids' => array_column($objects, 'eventid'),
+			'preservekeys' => true
+		]);
+
+		$triggers = [];
+		$trigger_events = [];
+
+		foreach ($objects as $problem) {
+			$triggerid = $problem['trigger']['triggerid'];
+
+			$triggers[$triggerid] = $problem['trigger'];
+			$trigger_events[$triggerid] = $db_events[$problem['eventid']];
+		}
+
+		$data = array_fill_keys(array_keys($triggers), $texts);
+
+		$resolved_texts = CDataTableMacrosResolver::resolveForSection('problems', $data, ['triggers' => $triggers,
+			'events_data' => $trigger_events]);
+
+		foreach ($objects as &$problem) {
+			$problem['custom_text'] = $resolved_texts[$problem['trigger']['triggerid']];
+		}
 	}
 }
