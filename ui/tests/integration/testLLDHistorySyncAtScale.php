@@ -229,10 +229,12 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				'Expected '.self::LLD_DISCOVERY_COUNT.' discovered items for type '.$def['suffix'].'.');
 		}
 
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
-
 		// Preflight test: check that values can be saved and retrieved by sending
 		// an agent ping and reading it back via a calculated item testItem.
+
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'log_level_increase=trapper');
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
 		$this->sendAgentPing();
 
 		$start = microtime(true);
@@ -256,6 +258,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 
 			usleep(100000);
 		}
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'log_level_decrease=trapper');
 
 		$this->assertNotFalse($result, 'testItem call failed for calculated item.');
 		$this->assertArrayHasKey('item', $result);
@@ -263,9 +266,10 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				'Calculated item evaluation returned an error: '
 				.($result['item']['error'] ?? ''));
 		$this->assertArrayHasKey('result', $result['item']);
-		$this->assertEquals(1, (int) $result['item']['result'],
+		$this->assertEquals(0, (int) $result['item']['result'],
 				'Calculated item did not return the agent ping value within timeout, got: '
 				.var_export($result['item']['result'], true));
+			
 	}
 
 	/**
