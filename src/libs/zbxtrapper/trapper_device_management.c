@@ -375,7 +375,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 	zbx_json_addstring(json, "response", "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(json, "data");
 	zbx_json_addstring(json, "mobile_enrollment_token", met, ZBX_JSON_TYPE_STRING);
-	zbx_json_addraw(json, "bridge_encryption_key", bek_raw);
+	zbx_json_addraw(json, "bridge_adapter_encryption_key", bek_raw);
 	zbx_json_addstring(json, "bridge_enrollment_url", enroll_url, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(json);
 
