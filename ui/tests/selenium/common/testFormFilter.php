@@ -312,6 +312,7 @@ class testFormFilter extends CWebTest {
 	 */
 	public function getTableResults($table_selector) {
 		$table = $this->query($table_selector)->asDatatable()->one()->waitUntilReady();
+var_dump($table->query('class:datatable-body')->one()->getText() === 'No data found');
 		$result = ($table->query('class:datatable-body')->one()->getText() === 'No data found')
 			? 0
 			: $table->getRows()->count();
