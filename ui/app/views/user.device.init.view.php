@@ -58,12 +58,11 @@ $form->addItem(
 	(new CDiv([
 		(new CDiv())->addClass('qr-code'),
 		new CDiv(_('Scan this QR code to add your device and setup your notifications.')),
-		(new CDiv([
-			_('QR code will expire on') . ' ',
-			(new CTag('b'))
-				->addClass('js-qr-expires-at')
-		]))
-			->addClass('qr-code-expiration')
+		(new CDiv())->addClass('qr-code-expiration'),
+		(new CTemplateTag('qr-expires-in-tmpl'))
+			->addItem(_('QR code will expire in'))
+			->addItem((new CTag('b'))->addItem(' #{expires_in}.')),
+		(new CTemplateTag('qr-expired-tmpl'))->addItem(_('QR code has expired.'))
 	]))
 		->addClass('qr-code-container')
 		->addStyle('display: none')

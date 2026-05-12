@@ -67,7 +67,6 @@ class CControllerUserDeviceInit extends CController {
 		if ($device) {
 			$output = [
 				'expires_at' => $device['enrollment_token_expires_at'],
-				'expires_at_text' => zbx_date2str(TIME_FORMAT, $device['enrollment_token_expires_at']),
 				'uuid' => $device['uuid'],
 				'url' => (new CUrl('zabbix://v' . ZABBIX_MOBILE_VERSION . '/link_device'))
 					->setArgument('ver', ZABBIX_API_VERSION)

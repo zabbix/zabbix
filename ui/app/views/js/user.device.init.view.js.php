@@ -29,6 +29,7 @@ window.user_device_create_popup = new class {
 	#qr_expires_at_ms = null;
 	#device_uuid = null;
 	#admin_mode = false;
+	#countdown = null;
 
 	init({rules, admin_mode}) {
 		this.#overlay = overlays_stack.getById('user.device.init.view');
@@ -49,6 +50,7 @@ window.user_device_create_popup = new class {
 	#initEvents() {
 		this.#footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
 		this.#dialogue.addEventListener('dialogue.close', () => {
+			this.#countdown?.destroy();
 			this.#device_uuid = null;
 			const redirect_url = zabbixUrl({action: this.#admin_mode ? 'user.device.list': 'userprofile.device.list'});
 			setTimeout(() => location.href = redirect_url);
@@ -70,12 +72,19 @@ window.user_device_create_popup = new class {
 					this.#footer.querySelector('.js-submit').remove();
 					this.#footer.querySelector('.js-cancel').remove();
 					this.#overlay.setProperties({title: <?= json_encode(_('Add device')) ?>});
-					this.#form_element.querySelector('.js-qr-expires-at').textContent = response.expires_at_text;
+					this.#qr_expires_at_ms = response.expires_at * 1000;
+
+					this.#countdown = new CCountdown(
+						this.#form_element.querySelector('.qr-code-expiration'),
+						this.#qr_expires_at_ms,
+						document.getElementById('qr-expires-in-tmpl').innerHTML,
+						document.getElementById('qr-expired-tmpl').innerHTML
+					);
+
 					this.#form_element.querySelector('.form-grid').style.display = 'none';
 					this.#form_element.querySelector('.qr-code-container').style.display = '';
 					this.#displayQRCode(response.url);
 					this.#device_uuid = response.uuid;
-					this.#qr_expires_at_ms = response.expires_at * 1000;
 
 					setTimeout(() => this.#checkDeviceStatus(), 2000);
 				});
