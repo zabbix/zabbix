@@ -158,6 +158,10 @@ class CFieldSet extends CField {
 		return this.getInnerValue(true);
 	}
 
+	updateState() {
+		this.#discoverAllFields();
+	}
+
 	hasErrors() {
 		for (const field of Object.values(this.#fields)) {
 			if (field.hasErrors()) {

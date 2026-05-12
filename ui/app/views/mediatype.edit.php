@@ -107,13 +107,13 @@ $mediatype_form_grid = (new CFormGrid())
 		))->setId('smtp-security-field')
 	])
 	->addItem([
-		(new CLabel(_('SSL verify peer')))->setId('verify-peer-label'),
+		(new CLabel(_('SSL verify peer'), 'smtp_verify_peer'))->setId('verify-peer-label'),
 		(new CFormField(
 			(new CCheckBox('smtp_verify_peer'))->setChecked($data['smtp_verify_peer'])
 		))->setId('verify-peer-field')
 	])
 	->addItem([
-		(new CLabel(_('SSL verify host')))->setId('verify-host-label'),
+		(new CLabel(_('SSL verify host'), 'smtp_verify_host'))->setId('verify-host-label'),
 		(new CFormField(
 			(new CCheckBox('smtp_verify_host'))->setChecked($data['smtp_verify_host'])
 		))->setId('verify-host-field')
@@ -148,19 +148,28 @@ $mediatype_form_grid = (new CFormGrid())
 $oauth_status = [];
 
 if ($data['mediatypeid'] && $data['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
-	$oauth_status = [];
+	$time = time();
 
 	// Do not show "Configured ago" label for imported media types without defined tokens.
-	if ($data['access_token_updated'] > 0) {
+	if ($data['access_token_updated'] >= 0 && $data['access_token_updated'] <= $time) {
 		$oauth_status[] = italic(_s('Configured %1$s ago', zbx_date2age($data['access_token_updated'])));
 	}
 
+	$access_token_error = _('Unexpected access token update time.');
+
 	if (!($data['tokens_status'] & OAUTH_REFRESH_TOKEN_VALID)) {
+		$refresh_token_error = _('Refresh token is invalid or outdated.');
+
 		if ($oauth_status) {
 			$oauth_status[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		}
 
-		$oauth_status[] = makeErrorIcon(_('Refresh token is invalid or outdated.'));
+		$oauth_status[] = $data['access_token_updated'] > $time
+			? makeErrorIcon((new CList([$refresh_token_error, $access_token_error]))->addClass(ZBX_STYLE_LIST_DASHED))
+			: makeErrorIcon($refresh_token_error);
+	}
+	elseif ($data['access_token_updated'] > $time) {
+		$oauth_status[] = makeErrorIcon($access_token_error);
 	}
 
 	// Add input elements after icon to prevent left margin because icon will be not first child.

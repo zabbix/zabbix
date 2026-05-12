@@ -25,6 +25,7 @@ ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "common_progname")
 
 int	main(void)
 {
+	/* intentionally not specifying the backtrace, to avoid dependencies on zbxnix/zbxwin32 */
 	zbx_init_library_common(zbx_log_impl, get_zbx_progname, NULL);
 
 	return SUCCEED;
