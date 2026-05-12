@@ -57,8 +57,8 @@
 		body.set('idx', idx);
 		body.set(value_fields[profile_type], value);
 
-		for (const idx of idx2) {
-			body.set('idx2[]', idx);
+		for (const idx2_value of idx2) {
+			body.append('idx2[]', idx2_value);
 		}
 
 		body.set(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('profile')) ?>);
