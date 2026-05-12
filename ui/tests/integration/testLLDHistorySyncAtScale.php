@@ -266,10 +266,9 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				'Calculated item evaluation returned an error: '
 				.($result['item']['error'] ?? ''));
 		$this->assertArrayHasKey('result', $result['item']);
-		$this->assertEquals(0, (int) $result['item']['result'],
+		$this->assertEquals(1, (int) $result['item']['result'],
 				'Calculated item did not return the agent ping value within timeout, got: '
 				.var_export($result['item']['result'], true));
-			
 	}
 
 	/**
