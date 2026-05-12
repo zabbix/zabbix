@@ -663,6 +663,8 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			}
 			return true;
 		});
+
+		$this->assertNull($trigger_unknown_error, (string) $trigger_unknown_error);
 	}
 
 	/**
