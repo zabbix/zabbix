@@ -885,7 +885,7 @@ class testPageProblems extends CWebTest {
 							'Host' => 'ЗАББИКС Сервер',
 							'Problem' => 'Test trigger to check tag filter on problem page',
 							'Update' => 'Update',
-							'Tags' => "service: abcdef\nDatabase\nService: abc"
+							'Tags' => "Database\nService: abc\nservice: abcdef"
 						]
 					]
 				]
@@ -1341,7 +1341,7 @@ class testPageProblems extends CWebTest {
 							'Operational data' => '*UNKNOWN*',
 							'Update' => 'Update',
 							'Actions' => '',
-							'Tags' => "Tag\nSer: abc\nDat"
+							'Tags' => "Tag\nDat\nSer: abc"
 						]
 					],
 					'check_tags' => [
