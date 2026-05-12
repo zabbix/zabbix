@@ -152,12 +152,12 @@ class CControllerItemEdit extends CControllerItem {
 			$item['discoveryData']['lldruleid'] = $parent_lld['itemid'];
 		}
 
-		$ttl_value_types = [];
+		$value_type_ttl = [];
 
 		foreach (Manager::History()->getValueTypesStorageTtls() as $value_type => $storage) {
-			if (array_key_exists('value_ttl', $storage)) {
-				$ttl_value_types[] = $value_type;
-			}
+			$value_type_ttl[$value_type] = $storage['value_ttl'] !== null
+				? convertSecondsToTimeUnits($storage['value_ttl'])
+				: '';
 		}
 
 		$data = [
@@ -188,7 +188,7 @@ class CControllerItemEdit extends CControllerItem {
 				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
 				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
 			],
-			'ttl_value_types' => $ttl_value_types,
+			'value_type_ttl' => $value_type_ttl,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 

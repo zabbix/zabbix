@@ -165,7 +165,7 @@ $tabs = (new CTabView(['id' => $tabsid]))
 			'source' => 'item',
 			'types' => $data['types'],
 			'value_types' => $value_types,
-			'ttl_value_types' => $data['ttl_value_types'],
+			'value_type_ttl' => $data['value_type_ttl'],
 			'type_with_key_select' => $type_with_key_select
 		])
 	)
@@ -217,7 +217,14 @@ $form
 			'testable_item_types' => $data['testable_item_types'],
 			'type_with_key_select' => $type_with_key_select,
 			'value_type_keys' => $data['value_type_keys'],
-			'ttl_value_types' => $data['ttl_value_types'],
+			'value_type_ttl' => $data['value_type_ttl'],
+			'history_storage_hint_html' => CWebUser::getType() == USER_TYPE_SUPER_ADMIN
+				? _x('Overridden by', 'item_form').' '.
+					(new CLink(_('Elasticsearch or ClickHouse in global housekeeping settings'), (new CUrl())
+						->setArgument('action', 'housekeeping.edit')
+						->getUrl()
+					))->setTarget('_blank')
+				: _x('Overridden by', 'item_form').' '._('Elasticsearch or ClickHouse in global housekeeping settings'),
 			'return_url' => $return_url
 		]).');'))->setOnDocumentReady()
 	);

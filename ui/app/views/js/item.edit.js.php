@@ -43,7 +43,8 @@ window.item_edit_form = new class {
 
 	init({
 		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly,
-		testable_item_types, type_with_key_select, value_type_keys, source, return_url, ttl_value_types
+		testable_item_types, type_with_key_select, value_type_keys, source, return_url, value_type_ttl,
+		history_storage_hint_html
 	}) {
 		this.actions = actions;
 		this.form_data = form_data;
@@ -58,7 +59,8 @@ window.item_edit_form = new class {
 		this.type_with_key_select = type_with_key_select;
 		this.value_type_keys = value_type_keys;
 		this.last_inferred_type = null;
-		this.ttl_value_types = source === 'item' ? ttl_value_types : [];
+		this.value_type_ttl = source === 'item' ? value_type_ttl : [];
+		this.history_storage_hint_html = history_storage_hint_html;
 
 		for (const type in interface_types) {
 			if (interface_types[type] == INTERFACE_TYPE_OPT) {
@@ -144,6 +146,7 @@ window.item_edit_form = new class {
 			username: this.form_element.querySelector('[for=username]'),
 			ipmi_sensor: this.form_element.querySelector('[for="ipmi_sensor"]'),
 			history_hint: this.form_element.querySelector('[for="history"] .js-hint'),
+			history_storage_hint: this.form_element.querySelector('[for="history"] .js-storage-hint'),
 			trends_hint: this.form_element.querySelector('[for="trends"] .js-hint'),
 			trends_storage_hint: this.form_element.querySelector('[for="trends"] .js-storage-hint'),
 		};
@@ -737,11 +740,23 @@ window.item_edit_form = new class {
 	#updateHistoryModeVisibility() {
 		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop(),
 			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.history.readOnly),
-			custom_ttl = this.ttl_value_types.includes(parseInt(this.field.value_type.value, 10));
+			storage_value_type = parseInt(this.field.value_type.value, 10) in this.value_type_ttl;
 
 		this.field.history.toggleAttribute('disabled', disabled);
 		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-		this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || !custom_ttl);
+		this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || storage_value_type);
+
+		if (this.label.history_storage_hint) {
+			const hintbox_button = this.label.history_storage_hint.querySelector('[data-hintbox="1"]');
+			const storage_ttl = this.value_type_ttl[parseInt(this.field.value_type.value, 10)];
+
+			hintbox_button.dataset.hintboxHtml = this.history_storage_hint_html;
+			this.label.history_storage_hint.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || !storage_value_type);
+
+			if (storage_ttl !== '') {
+				hintbox_button.dataset.hintboxHtml += ' (' + storage_ttl + ')';
+			}
+		}
 	}
 
 	#updateTrendsModeVisibility() {
