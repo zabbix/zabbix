@@ -309,11 +309,11 @@ class CSettings extends CApiService {
 	}
 
 	public static function updatePrivate(array $settings): array {
-		if (array_key_exists('software_update_check_data', $settings) && $settings['software_update_check_data']) {
+		if (array_key_exists('software_update_check_data', $settings)) {
 			$settings['software_update_check_data'] = json_encode($settings['software_update_check_data']);
 		}
 
-		if (array_key_exists('banner_data', $settings) && $settings['banner_data']) {
+		if (array_key_exists('banner_data', $settings)) {
 			$settings['banner_data'] = json_encode($settings['banner_data']);
 		}
 

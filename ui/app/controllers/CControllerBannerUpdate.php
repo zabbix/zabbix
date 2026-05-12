@@ -62,7 +62,7 @@ class CControllerBannerUpdate extends CController {
 		}
 		unset($banner);
 
-		$parameters = [
+		$settings = [
 			'banner_data' => [
 				'lastcheck' => $lastcheck,
 				'lastcheck_success' => $lastcheck_success,
@@ -71,7 +71,7 @@ class CControllerBannerUpdate extends CController {
 			]
 		];
 
-		CSettings::updatePrivate($parameters);
+		CSettings::updatePrivate($settings);
 
 		$output = [
 			'banners' => $banners,

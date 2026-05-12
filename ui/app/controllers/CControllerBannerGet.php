@@ -32,21 +32,24 @@ class CControllerBannerGet extends CController {
 		global $ALLOW_BANNERS;
 
 		$output = [
-			'allow_banners' => $ALLOW_BANNERS
+			'allow_banners' => $ALLOW_BANNERS,
+			'dismissed_banner_ids' => json_decode(CProfile::get('web.banner.dismissed_ids', '[]'), true),
+			'language' => CWebUser::$data['lang'],
+			'storage_idx' => 'web.banner.dismissed_ids'
 		];
 
 		if ($output['allow_banners']) {
 			$now = time();
-			$check_data = CSettingsHelper::getBannerData() + [
+			$banner_data = CSettingsHelper::getBannerData() + [
 				'lastcheck' => 0,
 				'lastcheck_success' => 0,
 				'nextcheck' => 0
 			];
 
-			if ($check_data['nextcheck'] > $now) {
+			if ($banner_data['nextcheck'] > $now) {
 				$output += [
-					'delay' => $check_data['nextcheck'] - $now + mt_rand(1, SEC_PER_MIN),
-					'banners' => $check_data['banners'] ?? []
+					'delay' => $banner_data['nextcheck'] - $now + mt_rand(1, SEC_PER_MIN),
+					'banners' => $banner_data['banners'] ?? []
 				];
 			}
 			else {
@@ -54,17 +57,11 @@ class CControllerBannerGet extends CController {
 					'csrf_token' => CCsrfTokenHelper::get('banner')
 				];
 
-				$check_data['nextcheck'] = $now + SEC_PER_MIN;
+				$banner_data['nextcheck'] = $now + SEC_PER_MIN;
 
-				CSettings::updatePrivate(['banner_data' => $check_data]);
+				CSettings::updatePrivate(['banner_data' => $banner_data]);
 			}
 		}
-
-		$output += [
-			'dismissed_banner_ids' => json_decode(CProfile::get('web.banner.dismissed_ids', '[]'), true),
-			'language' => CWebUser::$data['lang'],
-			'storage_idx' => 'web.banner.dismissed_ids'
-		];
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
