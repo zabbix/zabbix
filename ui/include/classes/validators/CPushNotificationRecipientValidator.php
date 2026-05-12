@@ -15,9 +15,11 @@
 
 
 /**
- * Class to validate UUIDv7 or wildcard value.
+ * Class to validate push notification recipients. Allowed values:
+ * - *
+ * - UUIDv7
  */
-class CUuidV7OrWildcardValidator extends CUuidV7Validator {
+class CPushNotificationRecipientValidator extends CValidator {
 
 	/**
 	 * @param string $value
@@ -29,7 +31,9 @@ class CUuidV7OrWildcardValidator extends CUuidV7Validator {
 			return true;
 		}
 
-		if (!parent::validate($value)) {
+		$uuid_v7_validator = new CUuidV7Validator();
+
+		if (!$uuid_v7_validator->validate($value)) {
 			$this->setError(_s("a wildcard pattern '*' or a UUIDv7 is expected"));
 
 			return false;

@@ -46,7 +46,7 @@ class CControllerPopupMediaCheck extends CController {
 				['array', 'required',
 					'field' => ['db media.sendto'
 						// TODO: uncomment with DEV-4644
-						// 'use' => [CUuidV7OrWildcardValidator::class]
+						// 'use' => [CPushNotificationRecipientValidator::class]
 					],
 					'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_PUSH]]
 				]
@@ -121,12 +121,12 @@ class CControllerPopupMediaCheck extends CController {
 					$sendto_list[] = '*';
 				}
 
-				$uuid_v7_or_wildcard_validator = new CUuidV7OrWildcardValidator();
+				$push_notification_recipient_validator = new CPushNotificationRecipientValidator();
 
 				foreach ($sendto_list as $key => $uuid) {
-					if (!$uuid_v7_or_wildcard_validator->validate($uuid)) {
+					if (!$push_notification_recipient_validator->validate($uuid)) {
 						error(_s('Invalid parameter "%1$s": %2$s.', 'sendto_list/'.($key + 1),
-							$uuid_v7_or_wildcard_validator->getError()
+							$push_notification_recipient_validator->getError()
 						));
 
 						return false;

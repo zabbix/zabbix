@@ -88,7 +88,7 @@ class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGene
 							'array', 'required', 'not_empty',
 							'field' => ['db media.sendto', 'required',
 								// TODO: uncomment with DEV-4644
-								// 'use' => [CUuidV7OrWildcardValidator::class]
+								// 'use' => [CPushNotificationRecipientValidator::class]
 							],
 							'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_PUSH]]
 						]

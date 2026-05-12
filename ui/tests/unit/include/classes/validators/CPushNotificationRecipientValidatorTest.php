@@ -16,10 +16,10 @@
 
 namespace unit\include\classes\validators;
 
-use CUuidV7OrWildcardValidator;
+use CPushNotificationRecipientValidator;
 use PHPUnit\Framework\TestCase;
 
-class CUuidV7OrWildcardValidatorTest extends TestCase {
+class CPushNotificationRecipientValidatorTest extends TestCase {
 
 	/**
 	 * An array of uuids v7 or *, results and error messages.
@@ -76,10 +76,10 @@ class CUuidV7OrWildcardValidatorTest extends TestCase {
 	/**
 	 * @dataProvider dataProvider
 	 */
-	public function testValidateUuidV7OrWildcard($uuid, $expected_result, $expected_error) {
-		$uuid_v7_or_wildcard_validator = new CUuidV7OrWildcardValidator();
-		$result = $uuid_v7_or_wildcard_validator->validate($uuid);
+	public function testPushNotificationRecipientValidator($uuid, $expected_result, $expected_error) {
+		$push_notification_recipient_validator = new CPushNotificationRecipientValidator();
+		$result = $push_notification_recipient_validator->validate($uuid);
 		$this->assertSame($expected_result, $result);
-		$this->assertSame($expected_error, $uuid_v7_or_wildcard_validator->getError());
+		$this->assertSame($expected_error, $push_notification_recipient_validator->getError());
 	}
 }
