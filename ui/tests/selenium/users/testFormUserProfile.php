@@ -607,4 +607,29 @@ class testFormUserProfile extends CLegacyWebTest {
 				break;
 		}
 	}
+
+	/**
+	 * Verify that checkbox state is preserved after failed update.
+	 */
+	public function testFormUserProfile_triggerSeverity() {
+		$trigger_severity = [
+			'Recovery' => false,
+			'Not classified' => false,
+			'Information' => false,
+			'Warning' => false,
+			'Average' => false,
+			'High' => false,
+			'Disaster' => false
+		];
+
+		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
+		$form = $this->query('id:user-form')->asForm()->one();
+		$form->selectTab('Frontend notifications');
+		$form->fill(['Frontend notifications' => true, 'Message timeout' => '86401']);
+		$form->fill($trigger_severity)->submit();
+		$this->assertMessage(TEST_BAD, 'Cannot update user',
+				'Incorrect value for field "timeout": value must be one of 30-86400.');
+		$form->invalidate();
+		$form->checkValue($trigger_severity);
+	}
 }
