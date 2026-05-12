@@ -67,8 +67,8 @@
 		 */
 		#delete(target, correlationids) {
 			const confirmation = correlationids.length > 1
-				? <?= json_encode(_('Delete selected event correlations?')) ?>
-				: <?= json_encode(_('Delete selected event correlation?')) ?>;
+				? <?= json_encode(_('Delete selected event processing rules?')) ?>
+				: <?= json_encode(_('Delete selected event processing rule?')) ?>;
 
 			if (!window.confirm(confirmation)) {
 				return;
@@ -77,6 +77,8 @@
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'correlation.delete');
+			// TODO: or..
+			curl.setArgument('action', 'ceprule.delete');
 			this.#post(target, correlationids, curl);
 		}
 
@@ -189,7 +191,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: () => uncheckTableRows('correlation')
+				callback: () => uncheckTableRows('correlation') // TODO: complex ID checkbox rows
 			});
 		}
 	};

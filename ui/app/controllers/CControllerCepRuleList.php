@@ -27,7 +27,7 @@ class CControllerCepRuleList extends CController {
 			'filter_set' =>		'in 1',
 			'filter_rst' =>		'in 1',
 			'filter_name' =>	'string',
-			'filter_status' =>	'in -1,'.ZBX_CORRELATION_ENABLED.','.ZBX_CORRELATION_DISABLED,
+			'filter_status' =>	'in -1,'.ZBX_CEP_STATUS_ENABLED.','.ZBX_CEP_STATUS_DISABLED,
 			'filter_type' =>	'in '.ZBX_CEP_FILTER_SHOW_ALL.','.ZBX_CEP_FILTER_SHOW_CEP.','.ZBX_CEP_FILTER_SHOW_LEGACY,
 			'page' =>			'ge 1'
 		];
@@ -77,15 +77,15 @@ class CControllerCepRuleList extends CController {
 			'active_tab' => CProfile::get('web.ceprule.filter.active', 1)
 		];
 
-		$data['correlations'] = self::fetchCepRules($filter);
-		$data['group_names'] = self::fetchGroupNames($data['correlations']);
+		$data['ceprules'] = self::fetchCepRules($filter);
+		$data['group_names'] = self::fetchGroupNames($data['ceprules']);
 
-		CArrayHelper::sort($data['correlations'], [['field' => $sort_field, 'order' => $sort_order]]);
+		CArrayHelper::sort($data['ceprules'], [['field' => $sort_field, 'order' => $sort_order]]);
 
 		// pager
 		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('ceprule.list', $page_num);
-		$data['paging'] = CPagerHelper::paginate($page_num, $data['correlations'], $sort_order,
+		$data['paging'] = CPagerHelper::paginate($page_num, $data['ceprules'], $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
@@ -104,7 +104,7 @@ class CControllerCepRuleList extends CController {
 			$result_legacy = API::Correlation()->get([
 				'output' => ['correlationid', 'name', 'description', 'status'],
 				'selectFilter' => ['conditions'],
-				'selectOperations' => ['type'],
+				'selectOperations' => 'extend',
 				'search' => [
 					'name' => ($filter['name'] === '') ? null : $filter['name']
 				],
@@ -146,6 +146,8 @@ class CControllerCepRuleList extends CController {
 					'conditions' => []
 				];
 			}
+
+			$record['cepruleid'] = $record['cep_ruleid'] ?? null;
 
 			return $record;
 		}, array_merge($result_cep, $result_legacy));

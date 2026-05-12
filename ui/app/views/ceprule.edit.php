@@ -20,8 +20,11 @@
  */
 
 $id = 'cep';
+$id_filter = "$id-filter";
+$id_timewindow = $id.'-timewindow';
+$id_operations = "$id-operations";
 
-if ($data['cep_rule']['cep_ruleid'] === null) {
+if ($data['ceprule']['cep_ruleid'] === null) {
 	$buttons = [
 		[
 			'title' => _('Add'),
@@ -55,65 +58,77 @@ else {
 }
 
 $form = (new CForm())
+	->addVar('cepruleid', $data['ceprule']['cep_ruleid'] ?? null)
 	->setId($id)
+	->addStyle('display: none;')
 	->addItem((new CFormGrid())
 		->addItem([
 			(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('name', $data['cep_rule']['name']))
+				(new CTextBox('name', $data['ceprule']['name']))
 					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					->setAriaRequired()
 					->setAttribute('autofocus', 'autofocus')
 			)
 		])
-		/* ->addItem(new CPartial('cep.filter', [ */
-		/* 	'id' => $id_filter, */
-		/* 	'filter' => $ceprule->filter */
-		/* ])) */
-		/* ->addItem(new CPartial('cep.timewindow', [ */
+		->addItem((new CTemplateTag('cep-filter-condition-modal-template'))->addItem(
+			new CPartial('ceprule.modal.condition', ['id' => '$id_modal', 'id_template' => '$id_modal_template'])
+		))
+		->addItem(new CPartial('ceprule.filter', [
+			'id' => $id_filter,
+			'filter' => $data['ceprule']['filter']
+		]))
+		/* ->addItem(new CPartial('ceprule.window', [ */
 		/* 	'id' => $id_timewindow, */
-		/* 	'type' => $ceprule->window->type, */
-		/* 	'window' => $ceprule->window */
+		/* 	'type' => $data['ceprule']['window_type'], */
+		/* 	'window' => $data['ceprule']['window'] */
 		/* ])) */
-		/* ->addItem(new CPartial('cep.operations', [ */
+		/* ->addItem(new CPartial('ceprule.operations', [ */
 		/* 	'id' => $id_operations, */
-		/* 	'operations' => $ceprule->operations */
+		/* 	'operations' => $data['ceprule']['operations'] */
 		/* ])) */
-		->addItem([
-			new CLabel(_('Stop processing'), 'stop'),
-			new CFormField((new CCheckBox('stop'))
-				->setChecked($ceprule->stop == ZBX_CEP_EXECUTION_STOP)
-				->setUncheckedValue(ZBX_CEP_EXECUTION_CONTINUE)
-			)
-		])
-		->addItem([
-			(new CLabel(_('Sort order'), 'sortorder'))->setAsteriskMark(),
-			new CFormField((new CTextBox('sortorder', $ceprule->sortorder)))
-		])
-		->addItem([
-			new CLabel(_('Description'), 'description'),
-			new CFormField(
-				(new CTextArea('description', $ceprule->description))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			)
-		])
-		->addItem([
-			new CLabel(_('Enabled'), 'status'),
-			new CFormField(
-				(new CCheckBox('status', ZBX_CEP_STATUS_ENABLED))
-					->setChecked($ceprule->status == ZBX_CEP_STATUS_ENABLED)
-					->setUncheckedValue(ZBX_CEP_STATUS_DISABLED)
-			)
-		])
+		/* ->addItem([ */
+		/* 	new CLabel(_('Stop processing'), 'stop'), */
+		/* 	new CFormField((new CCheckBox('stop')) */
+		/* 		->setChecked($data['ceprule']['stop'] == ZBX_CEP_EXECUTION_STOP) */
+		/* 		->setUncheckedValue(ZBX_CEP_EXECUTION_CONTINUE) */
+		/* 	) */
+		/* ]) */
+		/* ->addItem([ */
+		/* 	(new CLabel(_('Sort order'), 'sortorder'))->setAsteriskMark(), */
+		/* 	new CFormField((new CTextBox('sortorder', $data['ceprule']['sortorder']))) */
+		/* ]) */
+		/* ->addItem([ */
+		/* 	new CLabel(_('Description'), 'description'), */
+		/* 	new CFormField( */
+		/* 		(new CTextArea('description', $data['ceprule']['description'])) */
+		/* 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH) */
+		/* 	) */
+		/* ]) */
+		/* ->addItem([ */
+		/* 	new CLabel(_('Enabled'), 'status'), */
+		/* 	new CFormField( */
+		/* 		(new CCheckBox('status', ZBX_CEP_STATUS_ENABLED)) */
+		/* 			->setChecked($data['ceprule']['status'] == ZBX_CEP_STATUS_ENABLED) */
+		/* 			->setUncheckedValue(ZBX_CEP_STATUS_DISABLED) */
+		/* 	) */
+		/* ]) */
 	);
 
 
 $output = [
-	'header' => $data['cep_rule']['cep_ruleid'] === null ? _('New complex event processing') : _('Complex event processing'),
+	'header' => $data['ceprule']['cep_ruleid'] === null ? _('New complex event processing') : _('Complex event processing'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CEPRULE_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => $this->readJsFile('ceprule.edit.js.php'),
+	'script_inline' => $this->readJsFile('ceprule.condition.edit.js.php')
+		.$this->readJsFile('ceprule.edit.js.php')
+		.'ceprule_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'condition_rules' => $data['condition_js_validation_rules'],
+			'operation_rules' => $data['operation_js_validation_rules'],
+			'ceprule' => $data['ceprule']
+		]).');',
 	'dialogue_class' => 'modal-popup-large'
 ];
 

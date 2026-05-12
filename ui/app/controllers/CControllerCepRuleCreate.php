@@ -26,4 +26,8 @@ class CControllerCepRuleCreate extends CController {
 	protected function doAction() {
 		throw new \Exception('Not implemented');
 	}
+
+	public static function getValidationRules(): array {
+		return CControllerCepRuleUpdate::getValidationRules();
+	}
 }

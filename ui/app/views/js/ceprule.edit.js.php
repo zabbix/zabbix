@@ -13,6 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 /**
  * @var CView $this
  */
@@ -20,203 +21,399 @@
 
 window.ceprule_edit_popup = new class {
 
-	init({ceprule}) {
-		this.overlay = overlays_stack.getById('cep_rule_edit');
-		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.ceprule = ceprule;
-		this.cep_ruleid = ceprule.cep_ruleid;
+	/** @type {HTMLFormElement} */
+	form_element;
 
+	/** @type {CForm} */
+	form;
+
+	/** @type {Overlay} */
+	#overlay;
+
+	/** @type {Object} */
+	#initial_form_fields;
+
+	/** @type {Object} */
+	#condition_rules;
+
+	/** @type {Template} */
+	#condition_row_template;
+
+	/** @type {Number} */
+	#condition_row_index = 0;
+
+	init({rules, condition_rules, ceprule}) {
+		this.#initTemplates();
+		this.#condition_rules = condition_rules;
+		this.#overlay = overlays_stack.getById('ceprule.edit');
+		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
+
+		for (const condition of Object.values(ceprule.filter.conditions || [])) {
+			this.#addConditionRow({...condition, formulaid: String.fromCharCode(65 + this.#condition_row_index++)});
+		}
+
+		this.#initActions();
+		this.form = new CForm(this.form_element, rules);
+		this.#handleFilterChanged();
+
+		// for (const operation of Object.values(ceprule.operations || [])) {
+		// 	this.#addOperationRow(operation);
+		// }
+
+		this.#initial_form_fields = this.form.getAllValues(); // TODO: use at on-before page unload confirmation
+		console.log([ceprule, '===', this.#initial_form_fields]);
+
+		this.form_element.style.display = '';
+	}
+
+	#initTemplates() {
+		this.#condition_row_template = new Template(`
+			<tr data-formulaid="#{formulaid}">
+				<td>#{formulaid}</td>
+				<td>#{event_name_str} #{operator_name} <em>#{arguments_name}</em></td>
+				<td>
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-condition-edit"><?= _('Edit') ?></button>
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-condition-remove"><?= _('Remove') ?></button>
+					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][type]" type="hidden" value="#{type}"/>
+					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][operator]" type="hidden" value="#{operator}"/>
+					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][severity]" type="hidden" value="#{severity}"/>
+					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][event_name]" type="hidden" value="#{event_name}"/>
+					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][tag]" type="hidden" value="#{tag}"/>
+					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][tag_value]" type="hidden" value="#{tag_value}"/>
+					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][host_name]" type="hidden" value="#{host_name}"/>
+					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][host_group]" type="hidden" value="#{host_group}"/>
+					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][time_period]" type="hidden" value="#{time_period}"/>
+					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][formulaid]" type="hidden" value="#{formulaid}"/>
+				</td>
+			</tr>
+		`);
+	}
+
+	#initActions() {
 		const return_url = new URL('zabbix.php', location.href);
+
 		return_url.searchParams.set('action', 'ceprule.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
-		this.dialogue.addEventListener('click', (e) => {
+		// Primitive event handlers.
+		this.form_element.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-condition-add')) {
 				this.#openConditionPopup();
 			}
+			else if (e.target.classList.contains('js-condition-edit')) {
+				const formulaid = e.target.closest('tr').dataset.formulaid;
+				const conditions = this.form.findFieldByName('filter').getValue().conditions;
+
+				this.#openConditionPopup(conditions[formulaid]);
+			}
 			else if (e.target.classList.contains('js-condition-remove')) {
 				e.target.closest('tr').remove();
+				this.form.discoverAllFields();
+
+				if (this.form.findFieldByName('filter').getValue().conditions === undefined) {
+					this.#condition_row_index = 0;
+				}
+
+				this.form_element.dispatchEvent(new Event('filter.change'));
+			}
+			else if (e.target.classList.contains('js-historical-condition-add')) {
+				this.#openHistoricalConditionPopup();
+			}
+			else if (e.target.classList.contains('js-historical-condition-edit')) {
+				this.#openHistoricalConditionPopup({});
+			}
+			else if (e.target.classList.contains('js-historical-condition-remove')) {
+				e.target.closest('tr').remove();
+				this.form.discoverAllFields();
+				this.form_element.dispatchEvent(new Event('historical.filter.change'));
 			}
 			else if (e.target.classList.contains('js-operation-add')) {
 				this.#openOperationPopup();
 			}
+			else if (e.target.classList.contains('js-operation-edit')) {
+				this.#openOperationPopup({});
+			}
 			else if (e.target.classList.contains('js-operation-remove')) {
 				e.target.closest('tr').remove();
+				this.form.discoverAllFields();
 			}
 		});
 
-		for (const condition of Object.values(ceprule.conditions || [])) {
-			this.#addConditionRow(condition);
+		// Add event proxies.
+		this.form_element.addEventListener('change', (e) => {
+			if (e.target.name === 'filter[evaltype]') {
+				this.form_element.dispatchEvent(new Event('filter.change'));
+			}
+		});
+
+		// Add proxied form event handlers.
+		this.form_element.addEventListener('filter.change', () => this.#handleFilterChanged());
+		// this.form_element.addEventListener('historical.conditions.change', () => this.#handleHistoricalConditionsChanged());
+
+		this.#overlay.$dialogue.$footer.get(0).addEventListener('click', (e) => {
+			const class_list = e.target.classList;
+
+			if (class_list.contains('js-submit')) {
+				this.#submit();
+			}
+			else if (class_list.contains('js-delete')) {
+				console.log('TODO: js-delete');
+			}
+			else if (class_list.contains('js-clone')) {
+				console.log('TODO: js-clone');
+			}
+		});
+	}
+
+	#submit() {
+		// clearMessages();
+		const fields = this.form.getAllValues();
+
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.#unsetLoadingStatus();
+					return;
+				}
+
+				const action = document.getElementById('roleid') !== null
+					? 'ceprule.update'
+					: 'ceprule.create';
+
+				fetch(zabbixUrl({action}), {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(fields)
+				})
+					.then((response) => response.json())
+					.then((response) => {
+						if ('error' in response) {
+							throw {error: response.error};
+						}
+
+						if ('form_errors' in response) {
+							this.form.setErrors(response.form_errors, true, true);
+							this.form.renderErrors();
+							return;
+						}
+
+						if ('success' in response) {
+							postMessageOk(response.success.title);
+
+							if ('messages' in response.success) {
+								postMessageDetails('success', response.success.messages);
+							}
+
+							location.href = new URL(response.success.redirect, location.href).href;
+						}
+					})
+					.catch((exception) => this.#ajaxExceptionHandler(exception))
+					.finally(() => this.#unsetLoadingStatus());
+			});
+	}
+
+	/**
+	 * Method ensures filter view is correct with data:
+	 *	- conditions formula preview string.
+	 *	- type of calculation row.
+	 */
+	#handleFilterChanged() {
+		const evaltype_select = window['cep-filter-evaltype'];
+		const evaltype_field = evaltype_select.closest('.form-field');
+		const conditions = Object.values(this.form.findFieldByName('filter').getValue().conditions ?? {});
+
+		if (conditions.length == 0) {
+			evaltype_field.style.display = 'none';
+			evaltype_field.previousElementSibling.style.display = 'none';
+
+			return;
 		}
+
+		evaltype_field.style.display = '';
+		evaltype_field.previousElementSibling.style.display = '';
+
+		const evaltype = Number(evaltype_select.value);
+		const is_expression_evaltype = evaltype == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
+
+		window['cep-filter-expression'].style.display = is_expression_evaltype ? '' : 'none';
+		window['cep-filter-expression-preview'].style.display = !is_expression_evaltype ? '' : 'none';
+
+		const identifiers = Object.values(conditions).map(condition => ({id: condition.formulaid}));
+
+		window['cep-filter-expression-preview'].innerText = getConditionFormula(identifiers, evaltype);
 	}
 
-	#openConditionPopup() {
-		const overlay = PopUp('popup.ceprule.condition.edit', {}, {
-			dialogueid: 'cep-condition-form',
-			dialogue_class: 'modal-popup-medium'
-		});
-
-		overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
-			this.#addConditionRow(e.detail);
-		});
+	#handleHistoricalConditionsChanged() {
+		console.warn('handleHistoricalConditionsChanged');
 	}
 
-	#openOperationPopup() {
-		const overlay = PopUp('popup.ceprule.operation.edit', {}, {
-			dialogueid: 'cep-operation-form',
-			dialogue_class: 'modal-popup-medium'
+	#openConditionPopup(condition) {
+		const is_new = condition === undefined;
+
+		if (is_new) {
+			condition = {
+				formulaid: String.fromCharCode(65 + this.#condition_row_index++),
+				type: '<?= ZBX_CEP_CONDITION_EVENT_NAME ?>',
+				operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
+				host_group: '',
+				host_name: '',
+				severity: '<?= TRIGGER_SEVERITY_INFORMATION ?>',
+				tag: '',
+				tag_value: '',
+				time_period: ''
+			};
+		}
+
+		const template = document.getElementById('cep-filter-condition-modal-template');
+		const form_element = template.content.querySelector('form').cloneNode(true);
+
+		const overlay = overlayDialogue({
+			title: t('Condition details'),
+			content: form_element,
+			buttons: [
+				{
+					title: is_new ? t('Add') : t('Edit'),
+					action: (overlay) => {
+						const form = ceprule_condition_edit_popup.form;
+						const fields = form.getAllValues();
+
+						form.validateSubmit(fields)
+							.then((result) => {
+								if (!result) {
+									overlay.unsetLoading();
+									return;
+								}
+
+								overlayDialogueDestroy(overlay.dialogueid);
+
+								is_new && this.#addConditionRow(fields) || this.#editConditionRow(fields);
+
+								this.form.discoverAllFields();
+								this.form_element.dispatchEvent(new Event('filter.change'));
+							});
+
+						return false;
+					}
+				},
+				{
+					title: t('Cancel'),
+					class: 'btn-alt',
+					cancel: true,
+					action: () => {}
+				}
+			]
+		}, {
+			dialogueid: 'ceprule.condition.edit',
+			is_modal: true
 		});
 
-		overlay.$dialogue[0].addEventListener('operation.dialogue.submit', (e) => {
-			this.#addOperationRow(e.detail);
-		});
+		ceprule_condition_edit_popup.init({rules: this.#condition_rules, condition, overlay});
+	}
+
+	#openHistoricalConditionPopup(historical_condition) {
+		console.warn('openHistoricalConditionPopup', historical_condition);
+	}
+
+	#openOperationPopup(condition) {
+		console.warn('openOperationPopup', condition);
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
+	}
+
+	#unsetLoadingStatus() {
+		console.warn('todo unsetLoadingStatus');
+	}
+
+	#editConditionRow(condition) {
+		this.form_element.querySelector(`#cep-filter-table [data-formulaid=${condition.formulaid}]`)
+			.replaceWith(this.#buildConditionRow(condition));
 	}
 
 	#addConditionRow(condition) {
-		const row_index = this.form.querySelectorAll('#condition_table tr[id^=conditions_]').length;
-		const label = String.fromCharCode(65 + row_index);
-
-		const template = `
-			<tr id="conditions_${row_index}">
-				<td class="label" data-conditiontype="${condition.conditiontype}" data-formulaid="${label}">${label}</td>
-				<td>${this.#getConditionDescription(condition)}</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_LINK_ACTION ?> js-condition-remove"><?= _('Remove') ?></button>
-					<input type="hidden" name="conditions[${row_index}][type]" value="${condition.conditiontype}">
-					<input type="hidden" name="conditions[${row_index}][operator]" value="${condition.operator || 0}">
-				</td>
-			</tr>
-		`;
-
-		this.form.querySelector('#condition_table tbody').insertAdjacentHTML('beforeend', template);
+		this.form_element.querySelector('#cep-filter-table tbody')
+			.insertAdjacentElement('beforeend', this.#buildConditionRow(condition));
 	}
 
-	#addOperationRow(operation) {
-		const row_index = this.form.querySelectorAll('#operation_table tr[id^=operations_]').length;
+	#buildConditionRow(condition) {
+		const event_name_str = JSON.parse('<?= json_encode([
+			ZBX_CEP_CONDITION_EVENT_NAME => _('Event name'),
+			ZBX_CEP_CONDITION_TAG_NAME => _('Tag name'),
+			ZBX_CEP_CONDITION_TAG_VALUE => _('Tag value'),
+			ZBX_CEP_CONDITION_SEVERITY => _('Severity'),
+			ZBX_CEP_CONDITION_HOST => _('Host'),
+			ZBX_CEP_CONDITION_HOST_GROUP => _('Host group'),
+			ZBX_CEP_CONDITION_TIME_PERIOD => _('Time period')
+		]) ?>')[condition.type];
 
-		const template = `
-			<tr id="operations_${row_index}">
-				<td>${this.#getOperationDescription(operation)}</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_LINK_ACTION ?> js-operation-remove"><?= _('Remove') ?></button>
-					<input type="hidden" name="operations[${row_index}][type]" value="${operation.type}">
-					<input type="hidden" name="operations[${row_index}][execute_when]" value="${operation.execute_when || 0}">
-				</td>
-			</tr>
-		`;
+		const operator_names_json = '<?= json_encode([
+			CONDITION_OPERATOR_IN => _('In'),
+			CONDITION_OPERATOR_NOT_IN => _('Not in'),
+			CONDITION_OPERATOR_EQUAL => _('Equals'),
+			CONDITION_OPERATOR_NOT_EQUAL => _('Does not equal'),
+			CONDITION_OPERATOR_LIKE => _('Contains'),
+			CONDITION_OPERATOR_NOT_LIKE => _('Does not contain'),
+			CONDITION_OPERATOR_MORE_EQUAL => _('Is more than or equal'),
+			CONDITION_OPERATOR_LESS_EQUAL => _('Is less than or equal'),
+			CONDITION_OPERATOR_EXISTS => _('Exists'),
+			CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist')
+		]) ?>';
 
-		this.form.querySelector('#operation_table tbody').insertAdjacentHTML('beforeend', template);
-	}
+		const severity_names_json = '<?= json_encode([
+			TRIGGER_SEVERITY_NOT_CLASSIFIED => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_0)),
+			TRIGGER_SEVERITY_INFORMATION => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_1)),
+			TRIGGER_SEVERITY_WARNING => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_2)),
+			TRIGGER_SEVERITY_AVERAGE => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_3)),
+			TRIGGER_SEVERITY_HIGH => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_4)),
+			TRIGGER_SEVERITY_DISASTER => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_5)),
+		]) ?>';
+		const severity_names = JSON.parse(severity_names_json);
 
-	#getConditionDescription(condition) {
-		const type_labels = {
-			<?= ZBX_CEP_CONDITION_EVENT_NAME ?>: '<?= _('Event name') ?>',
-			<?= ZBX_CEP_CONDITION_TAG_NAME ?>: '<?= _('Tag') ?>',
-			<?= ZBX_CEP_CONDITION_TAG_VALUE ?>: '<?= _('Tag value') ?>',
-			<?= ZBX_CEP_CONDITION_SEVERITY ?>: '<?= _('Severity') ?>',
-			<?= ZBX_CEP_CONDITION_HOST ?>: '<?= _('Host') ?>',
-			<?= ZBX_CEP_CONDITION_HOST_GROUP ?>: '<?= _('Host group') ?>',
-			<?= ZBX_CEP_CONDITION_TIME_PERIOD ?>: '<?= _('Time period') ?>'
-		};
+		const operator_name = JSON.parse(operator_names_json)[condition.operator];
+		const arguments_name = (function condition_arguments(condition) {
+			if (condition.type == <?= ZBX_CEP_CONDITION_EVENT_NAME ?>) {
+				return condition.event_name;
+			}
 
-		return type_labels[condition.conditiontype] || condition.conditiontype;
-	}
+			if (condition.type == <?= ZBX_CEP_CONDITION_TAG_NAME ?>) {
+				return condition.tag;
+			}
 
-	#getOperationDescription(operation) {
-		const type_labels = {
-			<?= ZBX_CEP_OP_SET_NAME ?>: '<?= _('Set name') ?>',
-			<?= ZBX_CEP_OP_CLOSE ?>: '<?= _('Close event') ?>',
-			<?= ZBX_CEP_OP_DISCARD ?>: '<?= _('Discard event') ?>',
-			<?= ZBX_CEP_OP_SET_SEVERITY ?>: '<?= _('Set severity') ?>',
-			<?= ZBX_CEP_OP_INCREASE_SEVERITY ?>: '<?= _('Increase severity') ?>',
-			<?= ZBX_CEP_OP_DECREASE_SEVERITY ?>: '<?= _('Decrease severity') ?>',
-			<?= ZBX_CEP_OP_SUPPRESS ?>: '<?= _('Suppress') ?>'
-		};
+			if (condition.type == <?= ZBX_CEP_CONDITION_TAG_VALUE ?>) {
+				return condition.tag_value;
+			}
 
-		return type_labels[operation.type] || operation.type;
-	}
+			if (condition.type == <?= ZBX_CEP_CONDITION_SEVERITY ?>) {
+				return severity_names[condition.severity];
+			}
 
-	clone({title, buttons}) {
-		this.cep_ruleid = null;
+			if (condition.type == <?= ZBX_CEP_CONDITION_HOST ?>) {
+				return condition.host_name;
+			}
 
-		this.overlay.setProperties({title, buttons});
-		this.overlay.unsetLoading();
-		this.overlay.recoverFocus();
-		this.overlay.containFocus();
-	}
+			if (condition.type == <?= ZBX_CEP_CONDITION_HOST_GROUP ?>) {
+				return condition.host_group;
+			}
 
-	delete() {
-		const curl = new Curl('zabbix.php');
+			if (condition.type == <?= ZBX_CEP_CONDITION_TIME_PERIOD ?>) {
+				return condition.time_period;
+			}
+		})(condition);
 
-		curl.setArgument('action', 'ceprule.delete');
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>);
-
-		this.#post(curl.getUrl(), {cep_ruleids: [this.cep_ruleid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
-	}
-
-	submit(force = false) {
-		const fields = getFormFields(this.form);
-
-		fields.name = (fields.name || '').trim();
-		fields.description = (fields.description || '').trim();
-
-		if (force) {
-			fields.force_update = 1;
-		}
-
-		const curl = new Curl('zabbix.php');
-
-		curl.setArgument('action', this.cep_ruleid === null ? 'ceprule.create' : 'ceprule.update');
-
-		this.#post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
-	}
-
-	#post(url, data, success_callback) {
-		fetch(url, {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-
-				return response;
-			})
-			.then(success_callback)
-			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
-				let title,
-					messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title)[0];
-
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
-			.finally(() => this.overlay.unsetLoading());
+		return this.#condition_row_template
+			.evaluateToElement({arguments_name, operator_name, event_name_str, ...condition});
 	}
 };

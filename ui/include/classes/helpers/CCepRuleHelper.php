@@ -27,6 +27,18 @@ class CCepRuleHelper {
 		];
 	}
 
+	public static function getConditionTypes(): array {
+		return [
+			ZBX_CEP_CONDITION_EVENT_NAME => _('Event name'),
+			ZBX_CEP_CONDITION_TAG_NAME => _('Tag'),
+			ZBX_CEP_CONDITION_TAG_VALUE => _('Tag value'),
+			ZBX_CEP_CONDITION_SEVERITY => _('Severity'),
+			ZBX_CEP_CONDITION_HOST => _('Host'),
+			ZBX_CEP_CONDITION_HOST_GROUP => _('Host group'),
+			ZBX_CEP_CONDITION_TIME_PERIOD => _('Time period')
+		];
+	}
+
 	public static function getConditionLabelString(array $ceprule_condition): string {
 		return self::getConditionLabelStrings()[$ceprule_condition['type']];
 	}
@@ -104,6 +116,26 @@ class CCepRuleHelper {
 			ZBX_CEP_OP_DECREASE_TAG_VALUE => _('Decrease tag value'),
 			ZBX_CEP_OP_RENAME_TAG => _('Rename tag'),
 			ZBX_CEP_OP_REMOVE_TAG => _('Remove tag')
+		];
+	}
+
+	public static function getOperationTypes(): array {
+		return [
+			ZBX_CEP_OP_SET_NAME => _('Set name'),
+			ZBX_CEP_OP_CLOSE => _('Close event'),
+			ZBX_CEP_OP_DISCARD => _('Discard event'),
+			ZBX_CEP_OP_SET_SEVERITY => _('Set severity'),
+			ZBX_CEP_OP_INCREASE_SEVERITY => _('Increase severity'),
+			ZBX_CEP_OP_DECREASE_SEVERITY => _('Decrease severity'),
+			ZBX_CEP_OP_SUPPRESS => _('Suppress')
+		];
+	}
+
+	public static function getExecuteWhenStrings(): array {
+		return [
+			ZBX_CEP_WHEN_EVENT_OCCURED => _('Event occurs'),
+			ZBX_CEP_WHEN_EVENT_RECOVERED => _('Event recovered'),
+			ZBX_CEP_WHEN_TAGS_CORRELATED => _('Tags correlated')
 		];
 	}
 

@@ -16,7 +16,7 @@
 
 class CControllerCepRuleEdit extends CController {
 
-	private array $cep_rule = ['cep_ruleid' => null];
+	private array $ceprule = [];
 
 	public function init(): void {
 		$this->disableCsrfValidation();
@@ -27,25 +27,20 @@ class CControllerCepRuleEdit extends CController {
 			return false;
 		}
 
-		if ($this->hasInput('cep_ruleid')) {
-			$cep_rules = API::CepRule()->get([
-				'cep_ruleids' => $this->getInput('cep_ruleid')
-			]);
+		if ($this->hasInput('cepruleid')) {
+			$this->ceprule = self::fetchCepRule($this->getInput('cepruleid'));
 
-			if (!$cep_rules) {
+			if (!$this->ceprule) {
 				return false;
 			}
-
-			$this->cep_rule = $cep_rules[0];
 		}
-
 
 		return $this->getUserType() >= USER_TYPE_SUPER_ADMIN;
 	}
 
 	protected function checkInput(): bool {
 		$fields = [
-			'cep_ruleid' => 'db cep_rule.cep_ruleid'
+			'cepruleid' => 'db cep_rule.cep_ruleid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -63,26 +58,55 @@ class CControllerCepRuleEdit extends CController {
 		return $ret;
 	}
 
-	protected function doAction() {
-
-		/* sdff(DB::getDefaults('cep_window_condition'));die; */
-		/* sdff(DB::getDefaults('cep_condition'));die; */
-		/* sdff(DB::getDefaults('cep_operation'));die; */
-		/* sdff(DB::getDefaults('cep_window'));die; */
-		/* sdff(DB::getDefaults('cep_rule'));die; */
+	protected function doAction(): void {
+		$js_validation_rules = $this->hasInput('cepruleid')
+			? CControllerCepRuleUpdate::getValidationRules()
+			: CControllerCepRuleCreate::getValidationRules();
 
 		$data = [
-			'js_validation_rules' => [],
-			'cep_rule' => $this->cep_rule + DB::getDefaults('cep_rule'),
+			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules(),
+			'condition_js_validation_rules' => self::getConditionValidationRules(),
+			'operation_js_validation_rules' => [],
+			'ceprule' => $this->ceprule,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle($this->cep_rule['cep_ruleid'] === null
+		$response->setTitle($this->ceprule['cep_ruleid'] === null
 			? _('New complex event processing')
 			: _('Complex event processing')
 		);
 
 		$this->setResponse($response);
+	}
+
+	protected static function fetchCepRule(string $cepruleid): array {
+		$ceprules = API::CepRule()->get([
+			'cep_ruleids' => $cepruleid,
+			'output' => ['cep_ruleid', 'name', 'description', 'window_type', 'status', 'stop', 'sortorder'],
+			'selectOperations' => ['step', 'execute_when', 'event_type', 'eviction_cause', 'type', 'evaltype',
+				'event_name', 'tag', 'new_tag', 'tag_value', 'severity', 'tags'],
+			'selectFilter' => ['formula', 'evaltype', 'conditions'],
+			'selectWindow' => ['duration', 'capacity', 'script', 'group_by_host_group', 'group_by_host', 'group_by_tag',
+				'filter', 'event_count_tag', 'tag']
+		]);
+
+		if (!$ceprules) {
+			return [];
+		}
+
+		$ceprule = $ceprules[0];
+
+		return $ceprule;
+	}
+
+	protected static function getConditionValidationRules(): array {
+		$rules = CControllerCepRuleUpdate::getValidationRules();
+
+		$condition_fields = $rules['fields']['filter']['fields']['conditions']['fields'];
+
+		return (new CFormValidator([
+			'object', 'fields' => $condition_fields
+		]))->getRules();
 	}
 }
