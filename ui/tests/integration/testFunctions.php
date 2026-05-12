@@ -22,7 +22,7 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  * @required-components server
  * @suite-components-reuse true
  * @configurationDataProvider serverConfigurationProvider
- * @onAfterOnce clearData
+ * @onAfter clearData
  *
  */
 class testFunctions extends CIntegrationTest{
@@ -610,13 +610,6 @@ class testFunctions extends CIntegrationTest{
 	 */
 	public function testFunctions_Step3() {
 		$this->processStep3();
-	}
-
-	/**
-	 * @depends testFunctions_Step3
-	 */
-	public function testFunctions_Step4_clearData() {
-		self::clearData();
 	}
 
 	public static function clearData(): void {
