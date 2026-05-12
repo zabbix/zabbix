@@ -15,6 +15,7 @@
 
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup graphs
@@ -28,7 +29,8 @@ class testPageHostGraph extends CLegacyWebTest {
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			'class' => CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
 
@@ -613,10 +615,17 @@ class testPageHostGraph extends CLegacyWebTest {
 	 */
 	public function testPageHostGraph_DeleteSelected($data) {
 		$this->selectGraph($data);
+		$table = $this->query('class:list-table')->asTable()->one();
+		$before_rows_count = $table->getRows()->count();
+		$this->assertTableStats($before_rows_count);
+		$selected_count = ($data['graph'] === 'all') ? $before_rows_count : count($data['graph']);
+		$this->assertSelectedCount($selected_count);
 		$this->zbxTestClickButtonText('Delete');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graphs deleted');
+		$this->assertTableStats($before_rows_count - $selected_count);
+		$this->assertSelectedCount(0);
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');
 
