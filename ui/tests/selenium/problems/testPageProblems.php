@@ -213,8 +213,8 @@ class testPageProblems extends CWebTest {
 	protected function setDatatableStartingLayout() {
 		$layout = '{"columns":[{"id":"time","width":"171px"},{"id":"severity","width":"94px"},{"id":"recovery","width":"99px"},'.
 				'{"id":"status","width":"74px"},{"id":"info","width":"50px"},{"id":"host","resized":true,"width":"160px"},'.
-				'{"id":"problem","width":"127px"},{"id":"duration","width":"77px"},{"id":"update","width":"59px"},'.
-				'{"id":"actions","width":"60px"},{"id":"opdata"},{"id":"tags","resized":true,"width":"186px"},'.
+				'{"id":"problem","width":"160px"},{"id":"duration","width":"77px"},{"id":"update","width":"59px"},'.
+				'{"id":"actions","width":"60px"},{"id":"opdata"},{"id":"tags","resized":true,"width":"180px"},'.
 				'{"id":"tagvalue"}],"options":{"compact_view":0,"highlight_row":0}}';
 		$this->updateDatatableLayout($layout, 'web.monitoring.problem.datatable');
 	}
