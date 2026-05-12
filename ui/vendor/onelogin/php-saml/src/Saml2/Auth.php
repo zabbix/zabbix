@@ -2,15 +2,13 @@
 /**
  * This file is part of php-saml.
  *
- * (c) OneLogin Inc
- *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * @package OneLogin
- * @author  OneLogin Inc <saml-info@onelogin.com>
- * @license MIT https://github.com/onelogin/php-saml/blob/master/LICENSE
- * @link    https://github.com/onelogin/php-saml
+ * @author  Sixto Martin <sixto.martin.garcia@gmail.com>
+ * @license MIT https://github.com/SAML-Toolkits/php-saml/blob/master/LICENSE
+ * @link    https://github.com/SAML-Toolkits/php-saml
  */
 
 namespace OneLogin\Saml2;
@@ -20,7 +18,7 @@ use RobRichards\XMLSecLibs\XMLSecurityKey;
 use Exception;
 
 /**
- * Main class of OneLogin's PHP Toolkit
+ * Main class of SAML PHP Toolkit
  */
 class Auth
 {
@@ -168,13 +166,14 @@ class Auth
      * Initializes the SP SAML instance.
      *
      * @param array|null $settings Setting data
+     * @param bool $spValidationOnly if true, The library will only validate the SAML SP settings,
      *
      * @throws Exception
      * @throws Error
      */
-    public function __construct(?array $settings = null)
+    public function __construct(?array $settings = null, bool $spValidationOnly = false)
     {
-        $this->_settings = new Settings($settings);
+        $this->_settings = new Settings($settings, $spValidationOnly);
     }
 
     /**
@@ -271,6 +270,7 @@ class Auth
      * @param bool        $stay                         True if we want to stay (returns the url string) False to redirect
      *
      * @return string|null
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws Error
      */
@@ -279,7 +279,7 @@ class Auth
         $this->_errors = array();
         $this->_lastError = $this->_lastErrorException = null;
         if (isset($_GET['SAMLResponse'])) {
-            $logoutResponse = new LogoutResponse($this->_settings, $_GET['SAMLResponse']);
+            $logoutResponse = $this->buildLogoutResponse($this->_settings, $_GET['SAMLResponse']);
             $this->_lastResponse = $logoutResponse->getXML();
             if (!$logoutResponse->isValid($requestId, $retrieveParametersFromServer)) {
                 $this->_errors[] = 'invalid_logout_response';
@@ -299,7 +299,7 @@ class Auth
                 }
             }
         } else if (isset($_GET['SAMLRequest'])) {
-            $logoutRequest = new LogoutRequest($this->_settings, $_GET['SAMLRequest']);
+            $logoutRequest = $this->buildLogoutRequest($this->_settings, $_GET['SAMLRequest']);
             $this->_lastRequest = $logoutRequest->getXML();
             if (!$logoutRequest->isValid($retrieveParametersFromServer)) {
                 $this->_errors[] = 'invalid_logout_request';
@@ -315,7 +315,7 @@ class Auth
                 }
                 $inResponseTo = $logoutRequest->id;
                 $this->_lastMessageId = $logoutRequest->id;
-                $responseBuilder = new LogoutResponse($this->_settings);
+                $responseBuilder = $this->buildLogoutResponse($this->_settings);
                 $responseBuilder->build($inResponseTo);
                 $this->_lastResponse = $responseBuilder->getXML();
 
@@ -353,6 +353,7 @@ class Auth
      * @param bool   $stay       True if we want to stay (returns the url string) False to redirect
      *
      * @return string|null
+     * @phpstan-return ($stay is true ? string : never)
      */
     public function redirectTo($url = '', array $parameters = array(), $stay = false)
     {
@@ -534,6 +535,7 @@ class Auth
      * @param string      $nameIdValueReq  Indicates to the IdP the subject that should be authenticated
      *
      * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws Error
      */
@@ -574,6 +576,7 @@ class Auth
      * @param string|null $nameIdNameQualifier The NameID NameQualifier will be set in the LogoutRequest.
      *
      * @return string|null If $stay is True, it return a string with the SLO URL + LogoutRequest + parameters
+     * @phpstan-return ($stay is true ? string : never)
      *
      * @throws Error
      */
@@ -594,7 +597,7 @@ class Auth
             $nameIdFormat = $this->_nameidFormat;
         }
 
-        $logoutRequest = new LogoutRequest($this->_settings, null, $nameId, $sessionIndex, $nameIdFormat, $nameIdNameQualifier, $nameIdSPNameQualifier);
+        $logoutRequest = $this->buildLogoutRequest($this->_settings, null, $nameId, $sessionIndex, $nameIdFormat, $nameIdNameQualifier, $nameIdSPNameQualifier);
 
         $this->_lastRequest = $logoutRequest->getXML();
         $this->_lastRequestID = $logoutRequest->id;
@@ -670,9 +673,40 @@ class Auth
      *
      * @return AuthnRequest The AuthnRequest object
      */
-    public function buildAuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq = null)
+    public function buildAuthnRequest(Settings $settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq = null)
     {
         return new AuthnRequest($settings, $forceAuthn, $isPassive, $setNameIdPolicy, $nameIdValueReq);
+    }
+
+    /**
+     * Creates an LogoutRequest
+     *
+     * @param Settings    $settings            Settings
+     * @param string|null $request             A UUEncoded Logout Request.
+     * @param string|null $nameId              The NameID that will be set in the LogoutRequest.
+     * @param string|null $sessionIndex        The SessionIndex (taken from the SAML Response in the SSO process).
+     * @param string|null $nameIdFormat        The NameID Format will be set in the LogoutRequest.
+     * @param string|null $nameIdNameQualifier The NameID NameQualifier will be set in the LogoutRequest.
+     * @param string|null $nameIdSPNameQualifier The NameID SP NameQualifier will be set in the LogoutRequest.
+     */
+    public function buildLogoutRequest(Settings $settings, $request = null, $nameId = null, $sessionIndex = null, $nameIdFormat = null, $nameIdNameQualifier = null, $nameIdSPNameQualifier = null)
+    {
+        return new LogoutRequest($settings, $request, $nameId, $sessionIndex, $nameIdFormat, $nameIdNameQualifier, $nameIdSPNameQualifier);
+    }
+
+    /**
+     * Constructs a Logout Response object (Initialize params from settings and if provided
+     * load the Logout Response.
+     *
+     * @param Settings    $settings Settings.
+     * @param string|null $response An UUEncoded SAML Logout response from the IdP.
+     *
+     * @throws Error
+     * @throws Exception
+     */
+    public function buildLogoutResponse(Settings $settings, $response = null)
+    {
+        return new LogoutResponse($settings, $response);
     }
 
     /**

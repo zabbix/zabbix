@@ -55,7 +55,7 @@ window.proxy_edit_popup = new class {
 		this._update();
 
 		document.getElementById('proxy-form').style.display = '';
-		document.getElementById('name').focus();
+		this.overlay.recoverFocus();
 	}
 
 	_changePsk() {

@@ -34,7 +34,7 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-	char		sql[512];	/* do not forget to adjust size if SQLs change */
+	char		sql[1024];	/* do not forget to adjust size if SQLs change */
 	size_t		offset;
 	int		ret = SUCCEED;
 
@@ -47,7 +47,13 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password");
 #endif
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by,hp.proxyid");
+			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by");
+
+	if (EVENT_SOURCE_AUTOREGISTRATION == event->source)
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ",p.proxyid");
+	else
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ",hp.proxyid");
+
 	switch (event->source)
 	{
 		case EVENT_SOURCE_TRIGGERS:
@@ -85,13 +91,17 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 			break;
 		case EVENT_SOURCE_AUTOREGISTRATION:
 			zbx_snprintf(sql + offset, sizeof(sql) - offset,
-					" from autoreg_host a,hosts h"
-					" left join host_proxy hp on h.hostid=hp.hostid"
-					" where " ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid")
-						" and a.host=h.host"
+					" from hosts h"
+					" join autoreg_host a on a.host=h.host"
+					" left join proxy p on p.proxyid=a.proxyid"
+					" where ((h.monitored_by=%d"
+						" and p.proxy_groupid=h.proxy_groupid)"
+						" or (h.monitored_by<>%d"
+						" and " ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid") "))"
 						" and h.status=%d"
 						" and h.flags<>%d"
 						" and a.autoreg_hostid=" ZBX_FS_UI64,
+					HOST_MONITORED_BY_PROXY_GROUP, HOST_MONITORED_BY_PROXY_GROUP,
 					HOST_STATUS_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE, event->objectid);
 			break;
 		default:
