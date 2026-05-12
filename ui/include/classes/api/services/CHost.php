@@ -536,6 +536,8 @@ class CHost extends CHostGeneral {
 			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
 			'severities' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true],
 			'withProblemsSuppressed' =>	['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['hostid', 'proxyid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'impi_username', 'impi_password', 'maintenanceid', 'maintenance_status', 'maintenance_type', 'maintenance_from', 'name', 'flags', 'templateid', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'custom_interfaces', 'uuid', 'vendor_name', 'vendor_version', 'proxy_groupid', 'monitored_by', 'wizard_ready', 'readme', 'inventory_mode', 'active_available', 'assigned_proxyid', 'interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'available', 'error', 'errors_from', 'disable_until']],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['host', 'ipmi_username', 'ipmi_password', 'name', 'description', 'tls_issuer', 'tls_subject', 'uuid', 'vendor_name', 'readme', 'ip', 'dns', 'port', 'error']],
 			// Output.
 			'selectParentTemplates' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
 			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value', 'automatic']), 'default' => null],
