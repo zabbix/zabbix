@@ -15057,6 +15057,10 @@ msgstr "新規LDAPサーバー"
 msgid "New MFA method"
 msgstr "新しい多要素認証(MFA)方式"
 
+#: app/views/oauth.edit.php:242
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "新規SLA"
@@ -24887,6 +24891,10 @@ msgstr "ウィジェットの設定が元に戻ります。"
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "ウィジェットは廃止予定です。"
+
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."

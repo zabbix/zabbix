@@ -18,8 +18,6 @@ require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
 require_once __DIR__.'/../behaviors/CTagBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup hosts
  *

@@ -25,7 +25,6 @@
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
-#include "zbxalgo.h"
 #include "zbxcachehistory.h"
 #include "zbxalgo.h"
 

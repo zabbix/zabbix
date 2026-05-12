@@ -15217,6 +15217,10 @@ msgstr "Nuevo servidor LDAP"
 msgid "New MFA method"
 msgstr "Nuevo método MFA"
 
+#: app/views/oauth.edit.php:242
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "Nuevo SLA"
@@ -25084,6 +25088,10 @@ msgstr "Se revertirá la configuración del widget."
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "El widget está en desuso."
+
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
