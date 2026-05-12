@@ -108,6 +108,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'roleid' => '',
 			'role' => [],
 			'modules_rules' => [],
+			'proxies' => $this->getEmptyAccessResult(),
+			'proxy_groups' => $this->getEmptyAccessResult(),
 			'user_type' => '',
 			'form_refresh' => 0,
 			'action' => $this->getAction(),
@@ -166,10 +168,41 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		$data['groups'] = $user_groups
 			? API::UserGroup()->get([
-				'output' => ['usrgrpid', 'name', 'userdirectoryid'],
-				'usrgrpids' => $user_groups
+				'output' => ['usrgrpid', 'name', 'userdirectoryid', 'proxy_mode', 'proxy_group_mode'],
+				'usrgrpids' => $user_groups,
+				'selectProxies' => ['proxyid', 'name'],
+				'selectProxyGroups' => ['proxy_groupid', 'name']
 			])
 			: [];
+
+		if (!empty($data['groups'])) {
+			$limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE);
+			$db_proxies_count = API::Proxy()->get([
+				'countOutput' => true,
+				'proxy_groupids' => [0]
+			]);
+
+			$db_proxy_group_count = API::ProxyGroup()->get([
+				'countOutput' => true
+			]);
+
+			$db_proxies = API::Proxy()->get([
+				'output' => ['proxyid', 'name'],
+				'proxy_groupids' => [0],
+				'limit' => $limit
+			]);
+
+			$db_proxy_groups = API::ProxyGroup()->get([
+				'output' => ['proxy_groupid', 'name'],
+				'limit' => $limit
+			]);
+
+			$data['proxies'] = $this->resolveProxyAccess($db_proxies, $db_proxies_count, $data['groups']);
+			$data['proxy_groups'] = $this->resolveProxyGroupAccess(
+				$db_proxy_groups, $db_proxy_group_count, $data['groups']
+			);
+		}
+
 		CArrayHelper::sort($data['groups'], ['name']);
 		$data['groups'] = CArrayHelper::renameObjectsKeys($data['groups'], ['usrgrpid' => 'id']);
 
@@ -290,5 +323,100 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));
 		$this->setResponse($response);
+	}
+
+	protected function resolveProxyAccess(array $all_proxies, int $total_count, array $user_groups): array {
+		return $this->resolveAccess(
+			$all_proxies,
+			$total_count,
+			$user_groups,
+			'proxy_mode',
+			'proxies',
+			'proxyid'
+		);
+	}
+
+	protected function resolveProxyGroupAccess(array $all_proxy_groups, int $total_count, array $user_groups): array {
+		return $this->resolveAccess(
+			$all_proxy_groups,
+			$total_count,
+			$user_groups,
+			'proxy_group_mode',
+			'proxy_groups',
+			'proxy_groupid'
+		);
+	}
+
+	private function resolveAccess(array $all_objects, int $total_count, array $user_groups, string $mode_key,
+			string $object_key, string $id_key): array {
+		$all_by_id = [];
+
+		foreach ($all_objects as $object) {
+			$all_by_id[$object[$id_key]] = $object['name'];
+		}
+
+		$allowed_ids = [];
+		$denied_ids = [];
+
+		$has_allow_rules = false;
+
+		foreach ($user_groups as $user_group) {
+			$object_ids = array_column($user_group[$object_key], $id_key);
+			$is_allow_mode = (int) $user_group[$mode_key] === PROXY_MODE_ALLOW;
+
+			if ($is_allow_mode && empty($object_ids)) {
+				return [
+					'list' => [],
+					'mode' => PROXY_MODE_DENY,
+					'more' => 0
+				];
+			}
+
+			if (!$is_allow_mode && empty($object_ids)) {
+				$allowed_ids = array_keys($all_by_id);
+				continue;
+			}
+
+			if ($is_allow_mode) {
+				$has_allow_rules = true;
+				$allowed_ids = array_merge($allowed_ids, $object_ids);
+			}
+			else {
+				$denied_ids = array_merge($denied_ids, $object_ids);
+			}
+		}
+
+		$allowed_ids = array_unique($allowed_ids);
+		$denied_ids = array_unique($denied_ids);
+
+		if (!$has_allow_rules && empty($allowed_ids)) {
+			$allowed_ids = array_keys($all_by_id);
+		}
+
+		$final_allowed_ids = array_diff($allowed_ids, $denied_ids);
+		$allowed_lookup = array_flip($final_allowed_ids);
+
+		$list = [];
+
+		foreach ($all_by_id as $object_id => $object_name) {
+			$list[] = [
+				'name' => $object_name,
+				'mode' => array_key_exists($object_id, $allowed_lookup) ? PROXY_MODE_ALLOW : PROXY_MODE_DENY
+			];
+		}
+
+		return [
+			'list' => count($final_allowed_ids) === $total_count ? [] : $list,
+			'mode' => count($final_allowed_ids) === $total_count ? PROXY_MODE_ALLOW : PROXY_MODE_DENY,
+			'more' => max(0, $total_count - count($all_objects))
+		];
+	}
+
+	protected function getEmptyAccessResult(): array {
+		return [
+			'list' => [],
+			'mode' => PROXY_MODE_DENY,
+			'more' => 0
+		];
 	}
 }
