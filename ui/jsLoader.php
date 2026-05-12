@@ -284,7 +284,7 @@ $translate_strings = [
 		'Show trigger expression' => _('Show trigger expression')
 	],
 	'class.options-popup.monitoring.problems.time.js' => [
-		'Show timeline' => _('Show timeline'),
+		'Show timeline' => _('Show timeline')
 	],
 	'class.options-popup.tags.js' => [
 		'Number of tags' => _('Number of tags'),
