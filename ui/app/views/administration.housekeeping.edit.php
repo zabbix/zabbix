@@ -198,7 +198,14 @@ $house_keeper_tab->addRow((new CTag('h4', true, _('Trends')))->addClass('input-s
 			->setUncheckedValue(0)
 	)
 	->addRow(
-		(new CLabel(_('Data storage period'), 'hk_trends'))
+		(new CLabel([
+			_('Data storage period'),
+			$data['value_type_storage']
+				? makeWarningIcon(
+					_('Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse.')
+				)
+				: null
+		], 'hk_trends'))
 			->setAsteriskMark(),
 		(new CTextBox('hk_trends', $data['hk_trends'], false, CSettingsSchema::getFieldLength('hk_trends')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
