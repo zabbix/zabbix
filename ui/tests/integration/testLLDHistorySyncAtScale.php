@@ -230,6 +230,39 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		}
 
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		// Preflight test: check that values can be saved and retrieved by sending
+		// an agent ping and reading it back via a calculated item testItem.
+		$this->sendAgentPing();
+
+		$start = microtime(true);
+		$timeout = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
+		$last_result = null;
+
+		while ((microtime(true) - $start) < $timeout) {
+			$result = $this->testItemOnServer((string) self::$hostid, [
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'type' => ITEM_TYPE_CALCULATED,
+				'key' => 'calc.agent.ping.presence',
+				'params' => 'last(/'.self::HOSTNAME.'/agent.ping)'
+			]);
+
+			$this->assertNotFalse($result);
+			$this->assertArrayHasKey('item', $result);
+			$this->assertArrayNotHasKey('error', $result['item']);
+			$this->assertArrayHasKey('result', $result['item']);
+
+			$last_result = $result['item']['result'];
+			if ((int) $last_result === 1) {
+				break;
+			}
+
+			usleep(100000);
+		}
+
+		$this->assertEquals(1, (int) $last_result,
+				'Calculated item did not return the agent ping value within timeout, got: '
+				.var_export($last_result, true));
 	}
 
 	/**
