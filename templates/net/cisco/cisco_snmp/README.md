@@ -5,9 +5,9 @@
 
 ### Known Issues
 
-Description: no if(in|out)(Errors|Discards) are available for vlan ifType
-Version: IOS for example: 12.1(22)EA11, 15.4(3)M2
-Device: C2911, C7600
+- Description: no if(in|out)(Errors|Discards) are available for vlan ifType
+  - Version: IOS for example: 12.1(22)EA11, 15.4(3)M2
+  - Device: C2911, C7600
 
 ## Requirements
 

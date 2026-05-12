@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -31,11 +31,9 @@ class CMacroFunction {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
-		set_error_handler(function ($errno, $errstr) {});
-		$rc = preg_match('/'.$parameters[0].'/'.($insensitive ? 'i' : ''), $value, $matches);
-		restore_error_handler();
+		$regex = '/'.CRegexHelper::handleSlashEscaping($parameters[0]).'/'.($insensitive ? 'i' : '');
 
-		if ($rc === false) {
+		if (@preg_match($regex, $value, $matches) === false) {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
@@ -155,26 +153,18 @@ class CMacroFunction {
 
 				$replacement = self::handleReplacement($replacement);
 
-				// Escape '/' characters that are not already escaped.
-				$pattern = preg_replace('/\\\?\//', '\\/', $pattern);
-
-				// Add the 'u' modifier to treat it as UTF-8 for multibyte characters and ensure pattern ends with '/'.
-				if ($pattern[0] !== '/' || substr($pattern, -1) !== '/') {
-					$pattern = '/'.$pattern.'/u';
-				}
+				$pattern = '/'.CRegexHelper::handleSlashEscaping($pattern).'/u';
 
 				// Adjust pattern to match ASCII only if the value has multibyte characters and the pattern includes \w.
 				if (!mb_detect_encoding($value, 'ASCII', true)) {
 					$pattern = preg_replace('/\\\w/', '[a-zA-Z0-9_]+', $pattern);
 				}
 
-				if (@preg_match($pattern, '') === false) {
-					return UNRESOLVED_MACRO_STRING;
-				}
-
 				// Get all matches of the pattern in the string
 				$matches = [];
-				preg_match_all($pattern, $value, $matches);
+				if (@preg_match_all($pattern, $value, $matches) === false) {
+					return UNRESOLVED_MACRO_STRING;
+				}
 
 				// Estimate the new length of value after replacements, and return *UNKNOWN* if it exceeds 64KB.
 				foreach ($matches[0] as $match) {

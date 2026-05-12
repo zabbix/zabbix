@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -304,7 +304,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 			]
 		]);
 
-		// Make all old listener widgets on the page to listen the corresponding custom proadcaster widget.
+		// Make all old listener widgets on the page to listen the corresponding custom broadcaster widget.
 		foreach (array_keys($pageids) as $page_name) {
 			// Create the broadcaster reference using the type of broadcasted data and pre-defined reference id.
 			if ($used_pages[$page_name] === 'groupids') {
@@ -408,18 +408,14 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 			// Prepare the expected feedback, containing both formatted and unixtime "From" and "To" time periods.
 			$from_unixtime = strtotime('today - 2 days - 12hours');
 			$from_formatted = date('Y-m-d H:i:s', $from_unixtime);
-			$to_unixtime = strtotime('yesterday 11:59:59');
+			// Calculate to_unixtime arithmetically (48h - 1s) to avoid DST-related strtotime() inaccuracies.
+			$to_unixtime = $from_unixtime + 48 * 3600 - 1;
 			$to_formatted = date('Y-m-d H:i:s', $to_unixtime);
-			/*
-			 * TODO: "Daylight Saving Time" transitions can break test.
-			 * When clocks move forward/back, $to_unixtime and $to_formatted ('yesterday 11:59:59')
-			 * can land one hour later/earlier than expected. As a result the actual time
-			 * will be ('yesterday 12:59:59') or ('yesterday 10:59:59').
-			 * Won't fix ZBX-26299
-			 */
 			$expected = '_timeperiod | {"from":"'.$from_formatted.'","to":"'.$to_formatted.
 					'","from_ts":'.$from_unixtime.',"to_ts":'.$to_unixtime.'}';
 		}
+
+		$dashboard->waitUntilReady();
 
 		// Get the feedback value from the textarea, remove the timestamp and compare with the expected string.
 		$this->assertEquals($expected, substr($feedback_field->getValue(), 11));
@@ -517,7 +513,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 			$this->assertEquals($expected_text, substr($value, 11));
 		}
 
-		// Check that no feedback was send to the custom broadcaster thom the listeners.
+		// Check that no feedback was send to the custom broadcaster from the listeners.
 		if (array_key_exists('broadcaster', $data)) {
 			$value = $dashboard->getWidget($data['broadcaster'])->query('name:feedbacks')->one()->getValue();
 			$this->assertEquals('', $value);
@@ -656,6 +652,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 
 		// Select an element on the broadcaster widget to trigger a broadcast.
 		$this->getWidgetElement($data['select_element'], $broadcaster)->click();
+		$dashboard->waitUntilReady();
 
 		// Check the broadcasted value on the listener.
 		$selected_entity = CTestArrayHelper::get($data, 'selected_entity', $data['select_element']);

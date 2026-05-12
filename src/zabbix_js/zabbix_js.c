@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -36,7 +36,7 @@ char	zabbix_event_source[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 #undef ZBX_SERVICE_NAME_LEN
 
 #define JS_TIMEOUT_MIN		1
-#define JS_TIMEOUT_MAX		60
+#define JS_TIMEOUT_MAX		600
 #define JS_TIMEOUT_DEF		ZBX_ES_TIMEOUT
 #define JS_TIMEOUT_MIN_STR	ZBX_STR(JS_TIMEOUT_MIN)
 #define JS_TIMEOUT_MAX_STR	ZBX_STR(JS_TIMEOUT_MAX)
@@ -46,13 +46,18 @@ static const char	*help_message[] = {
 	"Execute script using Zabbix embedded scripting engine.",
 	"",
 	"General options:",
-	"  -s,--script script-file      Specify the filename of script to execute. Specify - for",
+	"  -s,--script script-file      Specify the filename of script to execute. Specify '-' for",
 	"                               standard input.",
-	"  -i,--input input-file        Specify input parameter file name. Specify - for",
-	"                               standard input.",
-	"  -p,--param input-param       Specify input parameter",
+	"  -i,--input input-file        Specify a file containing the input parameter passed to the",
+	"                               script. The file contents are passed verbatim as a string",
+	"                               and are available in the script via the 'value' variable.",
+	"                               Specify '-' to read from standard input. Mutually",
+	"                               exclusive with -p.",
+	"  -p,--param input-param       Specify the input parameter passed to the script. Parameter",
+	"                               is passed verbatim as a string and is available in the",
+	"                               script via the 'value' variable. Mutually exclusive with -i.",
 	"  -w,--webdriver url           Specify webdriver URL",
-	"  -l,--loglevel log-level      Specify log level",
+	"  -l,--loglevel log-level      Specify log level (Range: 0-5).",
 	"  -t --timeout timeout         Specify the timeout in seconds. Valid range: " JS_TIMEOUT_MIN_STR "-"
 			JS_TIMEOUT_MAX_STR " seconds",
 	"                               (default: " JS_TIMEOUT_DEF_STR " seconds)",
@@ -160,6 +165,15 @@ static int	execute_script(const char *command, const char *param, int timeout, c
 	if (NULL != webdriver && FAIL == zbx_es_init_browser_env(&es, webdriver, &errmsg))
 	{
 		zbx_snprintf(error, max_error_len, "cannot initialize Browser object: %s", errmsg);
+		zbx_free(errmsg);
+		ret = FAIL;
+
+		goto failure;
+	}
+
+	if (SUCCEED != zbx_es_globals_make_readonly(&es, &errmsg))
+	{
+		zbx_snprintf(error, max_error_len, "cannot initialize read-only environment: %s", errmsg);
 		zbx_free(errmsg);
 		ret = FAIL;
 

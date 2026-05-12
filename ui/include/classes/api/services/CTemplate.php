@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -753,27 +753,8 @@ class CTemplate extends CHostGeneral {
 			$del_templates[$row['del_templateid']][$row['hostid']][] = $row['templateid'];
 		}
 
-		$del_links_clear = [];
-		$options = [
-			'output' => ['templateid', 'hostid'],
-			'filter' => [
-				'templateid' => $templateids
-			]
-		];
-		$result = DBselect(DB::makeSql('hosts_templates', $options));
-
-		while ($row = DBfetch($result)) {
-			if (!in_array($row['hostid'], $templateids)) {
-				$del_links_clear[$row['templateid']][$row['hostid']] = true;
-			}
-		}
-
 		if ($del_templates) {
 			$this->checkTriggerExpressionsOfDelTemplates($del_templates);
-		}
-
-		if ($del_links_clear) {
-			$this->checkTriggerDependenciesOfHostTriggers($del_links_clear);
 		}
 
 		self::checkUsedInActions($db_templates);

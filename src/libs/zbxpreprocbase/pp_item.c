@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -177,4 +177,9 @@ int	zbx_pp_preproc_has_serial_history(int type)
 void	zbx_pp_item_clear(zbx_pp_item_t *item)
 {
 	zbx_pp_item_preproc_release(item->preproc);
+}
+
+void	zbx_pp_item_clear_wrapper(void *data)
+{
+	zbx_pp_item_clear((zbx_pp_item_t*)data);
 }

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -32,8 +32,10 @@ zbx_mock_callback_t;
 
 zbx_vector_ptr_t	callbacks;
 
-static void	mock_callback_free(zbx_mock_callback_t *cb)
+static void	mock_callback_free(void *ptr)
 {
+	zbx_mock_callback_t	*cb = (zbx_mock_callback_t *)ptr;
+
 	zbx_variant_clear(&cb->retval);
 	zbx_free(cb);
 }
@@ -142,7 +144,6 @@ static int 	callback_cb(const char *name, size_t len, int args_num, zbx_variant_
 	return FAIL;
 }
 
-
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_eval_context_t	ctx;
@@ -187,7 +188,7 @@ void	zbx_mock_test_entry(void **state)
 
 out:
 	zbx_free(error);
-	zbx_vector_ptr_clear_ext(&callbacks, (zbx_clean_func_t)mock_callback_free);
+	zbx_vector_ptr_clear_ext(&callbacks, mock_callback_free);
 	zbx_vector_ptr_destroy(&callbacks);
 	zbx_eval_clear(&ctx);
 }

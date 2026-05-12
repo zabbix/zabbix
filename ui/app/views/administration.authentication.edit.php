@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -204,7 +204,8 @@ $ldap_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Provisioning period'), 'jit_provision_interval'),
 		new CFormField(
-			(new CTextBox('jit_provision_interval', $data['jit_provision_interval']))
+			(new CTextBox('jit_provision_interval', $data['jit_provision_interval'], false,
+					DB::getFieldLength('config', 'jit_provision_interval')))
 				->setWidth(ZBX_TEXTAREA_4DIGITS_WIDTH)
 				->setEnabled($ldap_auth_enabled && $data['ldap_jit_status'] == JIT_PROVISIONING_ENABLED)
 		)

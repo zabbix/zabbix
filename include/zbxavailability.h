@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -89,6 +89,7 @@ zbx_proxy_hostdata_t;
 
 ZBX_PTR_VECTOR_DECL(proxy_hostdata_ptr, zbx_proxy_hostdata_t *)
 
+void	zbx_proxy_hostdata_free(zbx_proxy_hostdata_t *ph);
 void	zbx_availability_serialize_json_hostdata(zbx_vector_proxy_hostdata_ptr_t *hostdata, struct zbx_json *j);
 int	zbx_get_active_agent_availability(zbx_uint64_t hostid);
 

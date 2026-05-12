@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -150,7 +150,7 @@ static int	db_trigger_expand_macros(const zbx_db_trigger *trigger, zbx_eval_cont
 	um_handle = zbx_dc_open_user_macros();
 
 	(void)zbx_eval_expand_user_macros(ctx, cache->hostids.values, cache->hostids.values_num,
-			(zbx_macro_expand_func_t)zbx_dc_expand_user_and_func_macros, um_handle, NULL);
+			zbx_um_expand_cb_wrapper, um_handle, NULL);
 
 	zbx_dc_close_user_macros(um_handle);
 

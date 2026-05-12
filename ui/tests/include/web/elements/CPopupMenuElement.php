@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -110,7 +110,7 @@ class CPopupMenuElement extends CElement {
 		$element = $this->getItem(array_shift($items));
 
 		if ($items) {
-			$parents = $element->parents('tag:li')->one()->hover();
+			$parents = $element->parents('tag:li')->one()->hoverMouse();
 			$parents->query('class:menu-popup')->asPopupMenu()->waitUntilVisible()->one()->select($items);
 		}
 		else {

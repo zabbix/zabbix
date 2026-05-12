@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -765,7 +765,7 @@ class testFormScheduledReport extends CWebTest {
 	 */
 	public function testFormScheduledReport_CreateInDashboard($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1')->waitUntilReady();
-		$this->query('id:dashboard-actions')->one()->waitUntilClickable()->click();
+		$this->query('id:dashboard-actions')->one()->waitUntilClickable()->hoverMouse()->click();
 		CPopupMenuElement::find()->waitUntilVisible()->one()->select('Create new report');
 
 		$this->executeAction($data, 'dashboard', 'Scheduled report created');
@@ -1422,8 +1422,8 @@ class testFormScheduledReport extends CWebTest {
 				$data['fields'] = CTestArrayHelper::trim($data['fields']);
 			}
 			$name = CTestArrayHelper::get($data, 'fields.Name', self::UPDATE_REPORT_NAME);
-			$this->assertEquals(1, CDBHelper::getCount('SELECT null FROM report WHERE name='.zbx_dbstr($name)));
 			$this->assertMessage(TEST_GOOD, $success_message);
+			$this->assertEquals(1, CDBHelper::getCount('SELECT null FROM report WHERE name='.zbx_dbstr($name)));
 
 			// Trim spaces in the middle of a name after DB check; spaces in links are trimmed.
 			$name = CTestArrayHelper::get($data, 'trim', false) ? preg_replace('/\s+/', ' ', $name) : $name;

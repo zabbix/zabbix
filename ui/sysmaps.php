@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -346,6 +346,8 @@ if (hasRequest('form')) {
 	else {
 		$data['sysmap'] = $sysmap;
 	}
+
+	CArrayHelper::sort($data['sysmap']['urls'], ['name']);
 
 	$data['current_user_userid'] = $current_userid;
 	$data['form_refresh'] = getRequest('form_refresh', 0);

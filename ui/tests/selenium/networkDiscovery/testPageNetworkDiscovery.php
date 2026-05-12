@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -225,6 +225,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Status' => 'Disabled'
 					],
 					'expected' => [
+						'Multiple spaces in discovery rule name',
 						'Local network',
 						'Discovery rule to check delete',
 						'Discovery rule for successful deleting',
@@ -244,6 +245,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Name' => ''
 					],
 					'expected' => [
+						'Multiple spaces in discovery rule name',
 						'Local network',
 						'External network',
 						self::SYMBOLS_ERROR_RULE,
@@ -269,6 +271,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Name' => 'RULE'
 					],
 					'expected' => [
+						'Multiple spaces in discovery rule name',
 						self::SYMBOLS_ERROR_RULE,
 						'Discovery rule to check delete',
 						'Discovery rule for update',
@@ -291,6 +294,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Name' => 'Disco'
 					],
 					'expected' => [
+						'Multiple spaces in discovery rule name',
 						self::SYMBOLS_ERROR_RULE,
 						'Discovery rule to check delete',
 						'Discovery rule for update',
@@ -310,9 +314,17 @@ class testPageNetworkDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => '    '
+						'Name' => '   spaces   '
 					],
-					'expected' => []
+					'expected' => ['Multiple spaces in discovery rule name']
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'expected' => ['Multiple spaces in discovery rule name']
 				]
 			],
 			[
@@ -333,9 +345,11 @@ class testPageNetworkDiscovery extends CWebTest {
 	 */
 	public function testPageNetworkDiscovery_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected'));
 		$this->assertTableStats(count($data['expected']));
@@ -346,7 +360,7 @@ class testPageNetworkDiscovery extends CWebTest {
 	 * Check Network Discovery pages reset buttons functionality.
 	 */
 	public function testPageNetworkDiscovery_ResetButton() {
-		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
+		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC&filter_rst=1');
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 
@@ -358,6 +372,8 @@ class testPageNetworkDiscovery extends CWebTest {
 		// Filling fields with needed discovery rules information.
 		$form->fill(['id:filter_name' => 'External network']);
 		$form->submit();
+		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
 
 		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
@@ -591,7 +607,8 @@ class testPageNetworkDiscovery extends CWebTest {
 	 */
 	public function testPageNetworkDiscovery_Actions($data) {
 		$old_hash = CDBHelper::getHash(self::SQL);
-		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
+		// Added &filter_rst=1 in case testPageNetworkDiscovery_ResetButton test fails midway.
+		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC&filter_rst=1');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$count = CDBHelper::getCount(self::SQL);
 

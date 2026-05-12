@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -31,7 +31,7 @@ class testAutoregistrationHostMetaDataItem extends CIntegrationTest {
 	 * @return array
 	 */
 	public function agentConfigurationProvider_MetadataItem() {
-		self::$metadata_file = "/tmp/zabbix_agent_metadata_file.txt".time();
+		self::$metadata_file = "/tmp/zabbix_agent_metadata_file.txt" . microtime();
 
 		return [
 			self::COMPONENT_AGENT => [
@@ -91,7 +91,7 @@ class testAutoregistrationHostMetaDataItem extends CIntegrationTest {
 			unlink(self::$metadata_file);
 		}
 
-		if (file_put_contents(self::$metadata_file, "\\".time()) === false) {
+		if (file_put_contents(self::$metadata_file, "\\" . microtime()) === false) {
 			throw new Exception('Failed to create metadata_file');
 		}
 
@@ -146,15 +146,13 @@ class testAutoregistrationHostMetaDataItem extends CIntegrationTest {
 		$actionids = $response['result']['actionids'];
 		$this->assertCount(1, $actionids, 'Failed to create an autoregistration action');
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
-				"finished forced reloading of the configuration cache", true, 60, 1);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		if (file_exists(self::$metadata_file)) {
 			unlink(self::$metadata_file);
 		}
 
-		if (file_put_contents(self::$metadata_file, "\\".time()) === false) {
+		if (file_put_contents(self::$metadata_file, "\\" . microtime()) === false) {
 			throw new Exception('Failed to create metadata_file');
 		}
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1339,7 +1339,7 @@ void	zbx_ipc_message_format(const zbx_ipc_message_t *message, char **data)
 		if (0 != i)
 			zbx_strcpy_alloc(data, &data_alloc, &data_offset, (0 == (i & 7) ? " | " : " "));
 
-		zbx_snprintf_alloc(data, &data_alloc, &data_offset, "%02x", (int)message->data[i]);
+		zbx_snprintf_alloc(data, &data_alloc, &data_offset, "%02x", (unsigned int)message->data[i]);
 	}
 
 	(*data)[data_offset] = '\0';

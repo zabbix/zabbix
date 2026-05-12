@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1189,14 +1189,14 @@ out:
 	{
 		result = ZBX_MATH_ERROR;
 	}
+	else if (0.0 > result || DBL_MAX < result)
+	{
+		result = DBL_MAX;
+	}
 	else if (ZBX_IS_NAN(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
 		result = ZBX_MATH_ERROR;
-	}
-	else if (0.0 > result || DBL_MAX < result)
-	{
-		result = DBL_MAX;
 	}
 
 	zbx_matrix_free(coefficients);
