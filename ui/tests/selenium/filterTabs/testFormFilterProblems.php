@@ -203,6 +203,11 @@ class testFormFilterProblems extends testFormFilter {
 					'filter_form' => [
 						'Severity' => 'High'
 					],
+					'header_filter' => [
+						'Time' => [
+							'Show timeline' => false
+						]
+					],
 					'filter' => [
 						'Name' => '*;%№:?(',
 						'Show number of records' => true
@@ -250,6 +255,10 @@ class testFormFilterProblems extends testFormFilter {
 	 */
 	public function testFormFilterProblems_CheckCreatedFilter($data) {
 		$this->createFilter($data, 'filter-create', 'zabbix', $this->table_selector);
+
+		if (array_key_exists('header_filter', $data)) {
+			$this->filterFromHeader($data['header_filter']);
+		}
 		$this->checkFilters($data, $this->table_selector);
 	}
 
