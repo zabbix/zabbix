@@ -341,7 +341,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=iconmap.edit');
 		$this->zbxTestInputTypeWait('name', 'CancelCreation');
 		$this->zbxTestInputTypeWait('mappings_0_expression', 'CancelCreation');
-		$this->zbxTestClick('cancel');
+		$this->query('button:Cancel')->one()->click();
 
 		// Check the results in frontend.
 		$this->zbxTestCheckTitle('Configuration of icon mapping');
@@ -366,7 +366,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		foreach (CDBHelper::getAll('SELECT name FROM icon_map') as $iconmap) {
 			$this->zbxTestClickLinkText($iconmap['name']);
 			$this->zbxTestWaitForPageToLoad();
-			$this->zbxTestClickWait('update');
+			$this->query('button:Update')->waitUntilClickable()->one()->click();
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map updated');
 		}
 
@@ -480,8 +480,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		}
 
 		$form = $this->query('id:iconmap')->asForm()->one();
-		$this->zbxTestClick('update');
-		$form->query('button:Update')->one()->waitUntilClassesNotPresent('is-loading');
+		$form->query('button:Update')->one()->click()->waitUntilClassesNotPresent('is-loading');
 
 		// Check the results in frontend.
 		if (array_key_exists('error_inline', $data)) {
@@ -593,7 +592,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			$this->zbxTestDropdownSelect('default-mapping-icon', $data['default_icon']);
 		}
 
-		$this->zbxTestClick('update');
+		$this->query('button:Update')->one()->click();
 
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map updated');
@@ -641,7 +640,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		foreach (CDBHelper::getAll('SELECT name FROM icon_map LIMIT 1') as $iconmap) {
 			$this->zbxTestClickLinkText($iconmap['name']);
 			$this->zbxTestInputTypeOverwrite('name', $iconmap['name'].' (updated)');
-			$this->zbxTestClick('cancel');
+			$this->query('button:Cancel')->one()->click();
 			$this->zbxTestCheckTitle('Configuration of icon mapping');
 			$this->zbxTestCheckHeader('Icon mapping');
 			$this->zbxTestTextNotPresent($iconmap['name'].' (updated)');
@@ -729,28 +728,26 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 	 */
 	public function testFormAdministrationGeneralIconMapping_CloneValidation($data) {
 		$name = 'Icon mapping to check clone functionality';
-		$sql_hash = 'SELECT icon_map.name, icon_mapping.expression FROM icon_map LEFT JOIN icon_mapping'
-				.' ON icon_map.iconmapid = icon_mapping.iconmapid WHERE icon_map.name = '.zbx_dbstr($name);
+		$sql_hash = 'SELECT icon_map.name, icon_mapping.expression FROM icon_map LEFT JOIN icon_mapping'.
+				' ON icon_map.iconmapid = icon_mapping.iconmapid WHERE icon_map.name = '.zbx_dbstr($name);
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('zabbix.php?action=iconmap.list');
-		$this->zbxTestClickLinkTextWait($name);
-		$this->zbxTestClickWait('clone');
-		$this->zbxTestWaitForPageToLoad();
+		$this->page->login()->open('zabbix.php?action=iconmap.list')->waitUntilReady();
+		$this->query('link', $name)->waitUntilClickable()->one()->click();
+		$this->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
+		$this->page->waitUntilReady();
 
-		$this->zbxTestInputType('name', $data['new_name']);
+		$this->query('id:name')->one()->fill($data['new_name']);
+
 		if (array_key_exists('mappings', $data)) {
 			$this->processExpressionRows($data['mappings']);
 		}
 
-		$this->zbxTestClickXpath('//button[@value="Add"]');
-		$this->zbxTestWaitForPageToLoad();
-		$form = $this->query('id:iconmap')->asForm()->one();
-		$form->query('xpath:.//tr[@id="iconmap-list-footer"]//button')->one()->waitUntilClassesNotPresent('is-loading');
+		// Activate inline validation error.
+		$this->query('id:iconmap')->one()->asForm()->getField('Default icon')->click();
 
 		// Check the results in frontend.
-		$this->assertInlineError($form, $data['error']);
-
+		$this->assertInlineError($this->query('id:iconmap')->asForm()->one(), $data['error']);
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
@@ -837,7 +834,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 	public function testFormAdministrationGeneralIconMapping_Clone($data) {
 		$this->zbxTestLogin('zabbix.php?action=iconmap.list');
 		$this->zbxTestClickLinkTextWait($data['old_name']);
-		$this->zbxTestClickWait('clone');
+		$this->query('button:Clone')->waitUntilClickable()->one()->click();
 		$this->query('button:Update')->waitUntilNotVisible();
 		if (array_key_exists('name', $data)) {
 			$this->zbxTestInputTypeOverwrite('name', $data['name']);
@@ -921,7 +918,8 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=iconmap.list');
 		$this->zbxTestClickLinkTextWait($name);
-		$this->zbxTestClickAndAcceptAlert('delete');
+		$this->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->zbxTestAcceptAlert();
 
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map deleted');
@@ -942,7 +940,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=iconmap.list');
 		$this->zbxTestClickLinkTextWait($name);
-		$this->zbxTestClickWait('delete');
+		$this->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->zbxTestDismissAlert();
 
 		// Check the results in frontend.
@@ -963,7 +961,8 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=iconmap.list');
 		$this->zbxTestClickLinkTextWait($name);
-		$this->zbxTestClickAndAcceptAlert('delete');
+		$this->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->zbxTestAcceptAlert();
 
 		// Check the results in frontend.
 		$this->zbxTestCheckTitle('Configuration of icon mapping');

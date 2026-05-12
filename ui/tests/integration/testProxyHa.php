@@ -651,7 +651,8 @@ HEREDOC;
 				'key_' => 'trap',
 				'type' => ITEM_TYPE_TRAPPER,
 				'hostid' => $hostid_trapper,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);

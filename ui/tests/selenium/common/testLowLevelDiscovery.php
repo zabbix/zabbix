@@ -133,7 +133,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'id:lifetime_type' => ['labels' => ['Never', 'Immediately', 'After'], 'value' => 'After'],
 			'id:enabled_lifetime_type' => ['labels' => ['Never', 'Immediately', 'After'], 'value' => 'Immediately'],
 			'Enable trapping' => ['value' => false],
-			'id:trapper_hosts' => ['maxlength' => 255],
+			'id:trapper_hosts' => ['value' => '{$TRAPPER.ALLOWED_HOSTS}', 'maxlength' => 255],
 			'Description' => ['value' => '', 'maxlength' => 65535],
 			'Enabled' => ['value' => true],
 

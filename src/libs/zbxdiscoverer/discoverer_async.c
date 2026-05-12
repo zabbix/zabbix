@@ -650,11 +650,12 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 			ZBX_FS_UI64 " checks per ip:%u dchecks:%d type:%u concurrency_max:%d checks_per_worker_max:%d",
 			log_worker_id, __func__, druleid, task->range.id, task->range.state.count,
 			task->range.state.checks_per_ip, task->ds_dchecks.values_num,
-			task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.type, concurrency_max,
-			dmanager->queue.checks_per_worker_max);
+			GET_DTYPE(task), concurrency_max, dmanager->queue.checks_per_worker_max);
 
 	if (0 == concurrency_max)
 		concurrency_max = dmanager->queue.checks_per_worker_max;
+
+	*first_ip = *ip = '\0';
 
 	if (SUCCEED != discovery_async_poller_init(dmanager, &poller_config))
 	{
@@ -663,7 +664,6 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 	}
 
 	zbx_vector_discoverer_results_ptr_create(&results);
-	*first_ip = '\0';
 #ifdef HAVE_LIBCURL
 	if ((SVC_HTTP == GET_DTYPE(task) || SVC_HTTPS == GET_DTYPE(task)) &&
 			NULL == (http_config = zbx_async_httpagent_create(poller_config.base, process_http_response,
@@ -682,7 +682,7 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG) && '\0' == *first_ip)
 			zbx_strlcpy(first_ip, ip, sizeof(first_ip));
 
-		result = discoverer_result_create(druleid, task->unique_dcheckid);
+		result = discoverer_result_create(druleid, task);
 		result->ip = zbx_strdup(NULL, ip);
 		zbx_vector_discoverer_results_ptr_append(&results, result);
 		dcheck = &task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck;

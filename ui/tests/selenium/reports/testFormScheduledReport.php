@@ -27,8 +27,9 @@ class testFormScheduledReport extends CWebTest {
 
 	const USER = 'user';
 	const USER_GROUP = 'user group';
-	const UPDATE_REPORT_NAME = 'Report for update';
 	const TEST_REPORT_NAME = 'Report for testFormScheduledReport';
+
+	protected static $update_report_name = 'Report for update';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -185,7 +186,7 @@ class testFormScheduledReport extends CWebTest {
 	 */
 	public static function getCommonValidationData() {
 		return [
-			// Empty fields.
+			// #0 Empty fields.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -193,9 +194,12 @@ class testFormScheduledReport extends CWebTest {
 						'Owner' => '',
 						'Name' => 'empty owner'
 					],
-					'message_details' => 'Field "userid" is mandatory.'
+					'inline_errors' => [
+						'Owner' => 'This field cannot be empty.'
+					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -204,9 +208,13 @@ class testFormScheduledReport extends CWebTest {
 						'Cycle' => 'Weekly',
 						'Repeat on' => []
 					],
-					'message_details' => 'Incorrect value for field "Repeat on": at least one day of the week must be selected.'
+					'inline_errors' => [
+						'xpath:.//ul[@data-field-name="weekdays"]' =>
+								'Incorrect value for field "Repeat on": at least one day of the week must be selected.'
+					]
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -222,9 +230,12 @@ class testFormScheduledReport extends CWebTest {
 							]
 						]
 					],
-					'subscription_error' => 'Incorrect value for field "Recipient": cannot be empty.'
+					'subscription_inline_errors' => [
+						'Recipient' => 'This field cannot be empty.'
+					]
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -240,9 +251,12 @@ class testFormScheduledReport extends CWebTest {
 							]
 						]
 					],
-					'subscription_error' => 'Incorrect value for field "Recipient": cannot be empty.'
+					'subscription_inline_errors' => [
+						'Recipient' => 'This field cannot be empty.'
+					]
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -258,21 +272,25 @@ class testFormScheduledReport extends CWebTest {
 							]
 						]
 					],
-					'subscription_error' => 'Incorrect value for field "Recipient": cannot be empty.'
+					'subscription_inline_errors' => [
+						'Recipient' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// The identical report names, users or user groups recipient.
+			// #5 The identical report names, users or user groups recipient.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Report for delete'
 					],
-					'error_message_part' => 'add',
 					'unique' => false,
-					'message_details' => 'Report "Report for delete" already exists.'
+					'inline_errors' => [
+						'Name' => 'This object already exists.'
+					]
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -288,9 +306,12 @@ class testFormScheduledReport extends CWebTest {
 							]
 						]
 					],
-					'subscription_error' => 'Recipient already exists.'
+					'subscription_inline_errors' => [
+						'Recipient' => 'Recipient already exists.'
+					]
 				]
 			],
+			// #7.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -313,10 +334,12 @@ class testFormScheduledReport extends CWebTest {
 							]
 						]
 					],
-					'subscription_error' => 'Recipient already exists.'
+					'subscription_inline_errors' => [
+						'Recipient' => 'Recipient already exists.'
+					]
 				]
 			],
-			// Start time field validation.
+			// #8 Start time field validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -324,9 +347,12 @@ class testFormScheduledReport extends CWebTest {
 						'Name' => 'start time 24 hours'
 					],
 					'Start time' => '24:10',
-					'message_details' => 'Incorrect value for field "hours": value must be no greater than "23".'
+					'inline_errors' => [
+						'id:hours' => 'Value must be less than or equal to 23.'
+					]
 				]
 			],
+			// #9.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -334,10 +360,12 @@ class testFormScheduledReport extends CWebTest {
 						'Name' => 'start time 60 minutes'
 					],
 					'Start time' => '00:60',
-					'message_details' => 'Incorrect value for field "minutes": value must be no greater than "59".'
+					'inline_errors' => [
+						'id:minutes' => 'Value must be less than or equal to 59.'
+					]
 				]
 			],
-			// Date fields validation.
+			// #10 Date fields validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -346,10 +374,10 @@ class testFormScheduledReport extends CWebTest {
 						'Start date' => '2021-07-02',
 						'End date' => '2021-07-01'
 					],
-					'error_message_part' => 'add',
-					'message_details' => '"active_till" must be an empty string or greater than "active_since".'
+					'error_details' => '"active_till" must be an empty string or greater than "active_since".'
 				]
 			],
+			// #11.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -357,10 +385,12 @@ class testFormScheduledReport extends CWebTest {
 						'Name' => 'start date with symbols',
 						'Start date' => 'YYYY-MM-DD'
 					],
-					'error_message_part' => 'add',
-					'message_details' => 'Invalid parameter "/1/active_since": a date in YYYY-MM-DD format is expected.'
+					'inline_errors' => [
+						'id:active_since' => 'Invalid date.'
+					]
 				]
 			],
+			// #12.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -368,10 +398,12 @@ class testFormScheduledReport extends CWebTest {
 						'Name' => 'end date with symbols',
 						'End date' => 'YYYY-MM-DD'
 					],
-					'error_message_part' => 'add',
-					'message_details' => 'Invalid parameter "/1/active_till": a date in YYYY-MM-DD format is expected.'
+					'inline_errors' => [
+						'id:active_till' => 'Invalid date.'
+					]
 				]
 			],
+			// #13.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -379,10 +411,12 @@ class testFormScheduledReport extends CWebTest {
 						'Name' => 'start date month is 13',
 						'Start date' => '2021-13-02'
 					],
-					'error_message_part' => 'add',
-					'message_details' => 'Invalid parameter "/1/active_since": a date in YYYY-MM-DD format is expected.'
+					'inline_errors' => [
+						'id:active_since' => 'Invalid date.'
+					]
 				]
 			],
+			// #14.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -390,10 +424,12 @@ class testFormScheduledReport extends CWebTest {
 						'Name' => 'end date month is 13',
 						'End date' => '2021-13-02'
 					],
-					'error_message_part' => 'add',
-					'message_details' => 'Invalid parameter "/1/active_till": a date in YYYY-MM-DD format is expected.'
+					'inline_errors' => [
+						'id:active_till' => 'Invalid date.'
+					]
 				]
 			],
+			// #15.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -401,10 +437,12 @@ class testFormScheduledReport extends CWebTest {
 						'Name' => 'start date is february 30',
 						'Start date' => '2021-02-30'
 					],
-					'error_message_part' => 'add',
-					'message_details' => 'Invalid parameter "/1/active_since": a date in YYYY-MM-DD format is expected.'
+					'inline_errors' => [
+						'id:active_since' => 'Invalid date.'
+					]
 				]
 			],
+			// #16.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -413,10 +451,12 @@ class testFormScheduledReport extends CWebTest {
 						'Dashboard' => 'Global view',
 						'End date' => '2021-02-30'
 					],
-					'error_message_part' => 'add',
-					'message_details' => 'Invalid parameter "/1/active_till": a date in YYYY-MM-DD format is expected.'
+					'inline_errors' => [
+						'id:active_till' => 'Invalid date.'
+					]
 				]
 			],
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -424,10 +464,12 @@ class testFormScheduledReport extends CWebTest {
 						'Name' => 'start date invalid',
 						'Start date' => '2021/07/02'
 					],
-					'error_message_part' => 'add',
-					'message_details' => 'Invalid parameter "/1/active_since": a date in YYYY-MM-DD format is expected.'
+					'inline_errors' => [
+						'id:active_since' => 'Invalid date.'
+					]
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -435,8 +477,9 @@ class testFormScheduledReport extends CWebTest {
 						'Name' => 'end date invalid',
 						'End date' => '02-07-2021'
 					],
-					'error_message_part' => 'add',
-					'message_details' => 'Invalid parameter "/1/active_till": a date in YYYY-MM-DD format is expected.'
+					'inline_errors' => [
+						'id:active_till' => 'Invalid date.'
+					]
 				]
 			]
 		];
@@ -449,13 +492,17 @@ class testFormScheduledReport extends CWebTest {
 	 */
 	public static function getCommonCreateData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [],
-					'message_details' => 'Incorrect value for field "name": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.'
+					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -470,11 +517,12 @@ class testFormScheduledReport extends CWebTest {
 							]
 						]
 					],
-					'error_message_part' => 'add',
-					'message_details' => 'At least one user or user group must be specified.'
+					'inline_errors' => [
+						'id:subscriptions' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Exclude user from subscriptions.
+			// #2 Exclude user from subscriptions.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -491,10 +539,10 @@ class testFormScheduledReport extends CWebTest {
 							]
 						]
 					],
-					'error_message_part' => 'add',
-					'message_details' => 'If no user groups are specified, at least one user must be included in the mailing list.'
+					'error_details' => 'If no user groups are specified, at least one user must be included in the mailing list.'
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -503,6 +551,7 @@ class testFormScheduledReport extends CWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -515,6 +564,7 @@ class testFormScheduledReport extends CWebTest {
 					'trim' => true
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -540,6 +590,7 @@ class testFormScheduledReport extends CWebTest {
 					]
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -567,6 +618,7 @@ class testFormScheduledReport extends CWebTest {
 					]
 				]
 			],
+			// #7.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -625,6 +677,7 @@ class testFormScheduledReport extends CWebTest {
 					]
 				]
 			],
+			// #8.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -636,6 +689,7 @@ class testFormScheduledReport extends CWebTest {
 					'Dashboard' => 'Global view'
 				]
 			],
+			// #9.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -647,6 +701,7 @@ class testFormScheduledReport extends CWebTest {
 					'Dashboard' => 'Global view'
 				]
 			],
+			// #10.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -668,14 +723,10 @@ class testFormScheduledReport extends CWebTest {
 		$data = [];
 		$common_data = array_merge($this->getCommonValidationData(), $this->getCommonCreateData());
 
-		// Add 'Dashboard' field value and error message header.
+		// Add 'Dashboard' field value.
 		foreach ($common_data as $report) {
 			if (!array_key_exists('Dashboard', $report[0]['fields'])) {
 				$report[0]['fields']['Dashboard'] = 'Global view';
-			}
-			if ($report[0]['expected'] === TEST_BAD) {
-				$report[0]['message_header'] = 'Cannot '.CTestArrayHelper::get($report[0], 'error_message_part', 'create').
-						' scheduled report';
 			}
 
 			$data[] = $report;
@@ -687,8 +738,10 @@ class testFormScheduledReport extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [],
-					'message_header' => 'Cannot create scheduled report',
-					'message_details' => ['Incorrect value for field "name": cannot be empty.', 'Field "dashboardid" is mandatory.']
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Dashboard' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -697,8 +750,9 @@ class testFormScheduledReport extends CWebTest {
 					'fields' => [
 						'Name' => 'empty dashboard field'
 					],
-					'message_header' => 'Cannot create scheduled report',
-					'message_details' => 'Field "dashboardid" is mandatory.'
+					'inline_errors' => [
+						'Dashboard' => 'This field cannot be empty.'
+					]
 				]
 			]
 		]);
@@ -708,7 +762,8 @@ class testFormScheduledReport extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testFormScheduledReport_Create($data) {
-		$this->page->login()->open('zabbix.php?action=scheduledreport.edit');
+		$this->page->login()->open('zabbix.php?action=scheduledreport.list');
+		$this->query('button:Create report')->waitUntilClickable()->one()->click();
 		$this->executeAction($data, 'add', 'Scheduled report added');
 	}
 
@@ -724,10 +779,7 @@ class testFormScheduledReport extends CWebTest {
 			if (array_key_exists('Name', $report[0]['fields']) && $report[0]['fields']['Name'] !== 'Report for delete') {
 				$report[0]['fields']['Name'] = 'From dashboard - '.$report[0]['fields']['Name'];
 			}
-			// Reports in dashboard do not have an error message header.
-			if ($report[0]['expected'] === TEST_BAD) {
-				$report[0]['message_header'] = null;
-			}
+
 			$data[] = $report;
 		}
 
@@ -740,10 +792,10 @@ class testFormScheduledReport extends CWebTest {
 						'Owner' => '',
 						'Dashboard' => ''
 					],
-					'message_header' => null,
-					'message_details' => ['Field "userid" is mandatory.',
-						'Incorrect value for field "name": cannot be empty.',
-						'Field "dashboardid" is mandatory.'
+					'inline_errors' => [
+						'Owner' => 'This field cannot be empty.',
+						'Name' => 'This field cannot be empty.',
+						'Dashboard' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -753,8 +805,9 @@ class testFormScheduledReport extends CWebTest {
 					'fields' => [
 						'Dashboard' => ''
 					],
-					'message_header' => null,
-					'message_details' => 'Field "dashboardid" is mandatory.'
+					'inline_errors' => [
+						'Dashboard' => 'This field cannot be empty.'
+					]
 				]
 			]
 		]);
@@ -768,7 +821,7 @@ class testFormScheduledReport extends CWebTest {
 		$this->query('id:dashboard-actions')->one()->waitUntilClickable()->hoverMouse()->click();
 		CPopupMenuElement::find()->waitUntilVisible()->one()->select('Create new report');
 
-		$this->executeAction($data, 'dashboard', 'Scheduled report created');
+		$this->executeAction($data, 'dashboard', 'Scheduled report added');
 	}
 
 	public function testFormScheduledReport_SimpleUpdate() {
@@ -776,7 +829,7 @@ class testFormScheduledReport extends CWebTest {
 		$name = CDBHelper::getRandom('SELECT name FROM report', 1);
 		$this->page->login()->open('zabbix.php?action=scheduledreport.list');
 		$this->query('link', $name)->waitUntilClickable()->one()->click();
-		$this->query('button:Update')->waitUntilClickable()->one()->click();
+		COverlayDialogElement::find()->waitUntilReady()->one()->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'Scheduled report updated');
 		$this->assertEquals($old_hash, $this->getHash());
 	}
@@ -785,12 +838,11 @@ class testFormScheduledReport extends CWebTest {
 		$data = [];
 
 		foreach ($this->getCommonValidationData() as $report) {
-			$report[0]['message_header'] = 'Cannot update scheduled report';
 			$data[] = $report;
 		}
 
 		return array_merge($data, [
-			// Empty fields.
+			// #0 Empty fields.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -799,35 +851,38 @@ class testFormScheduledReport extends CWebTest {
 						'Name' => '',
 						'Dashboard' => ''
 					],
-					'message_header' => 'Cannot update scheduled report',
-					'message_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Field "userid" is mandatory.',
-						'Field "dashboardid" is mandatory.'
+					'inline_errors' => [
+						'Owner' => 'This field cannot be empty.',
+						'Name' => 'This field cannot be empty.',
+						'Dashboard' => 'This field cannot be empty.'
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => ''
 					],
-					'message_header' => 'Cannot update scheduled report',
-					'message_details' => 'Incorrect value for field "name": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.'
+					]
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Dashboard' => ''
 					],
-					'message_header' => 'Cannot update scheduled report',
-					'message_details' => 'Field "dashboardid" is mandatory.'
+					'inline_errors' => [
+						'Dashboard' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Remove all subscriptions.
+			// #3 Remove all subscriptions.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -854,11 +909,12 @@ class testFormScheduledReport extends CWebTest {
 							]
 						]
 					],
-					'message_header' => 'Cannot update scheduled report',
-					'message_details' => 'At least one user or user group must be specified.'
+					'inline_errors' => [
+						'id:subscriptions' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Exclude user from subscriptions.
+			// #4 Exclude user from subscriptions.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -879,10 +935,10 @@ class testFormScheduledReport extends CWebTest {
 							]
 						]
 					],
-					'message_header' => 'Cannot update scheduled report',
-					'message_details' => 'If no user groups are specified, at least one user must be included in the mailing list.'
+					'error_details' => 'If no user groups are specified, at least one user must be included in the mailing list.'
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -905,11 +961,10 @@ class testFormScheduledReport extends CWebTest {
 							]
 						]
 					],
-					'message_header' => 'Cannot update scheduled report',
-					'message_details' => 'If no user groups are specified, at least one user must be included in the mailing list.'
+					'error_details' => 'If no user groups are specified, at least one user must be included in the mailing list.'
 				]
 			],
-			// Remove not required fields and remove subscriptions except user group.
+			// #6 Remove not required fields and remove subscriptions except user group.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -941,7 +996,7 @@ class testFormScheduledReport extends CWebTest {
 					]
 				]
 			],
-			// Update all fields (update, delete and create new subscriptions).
+			// #7 Update all fields (update, delete and create new subscriptions).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1008,6 +1063,7 @@ class testFormScheduledReport extends CWebTest {
 					]
 				]
 			],
+			// #8.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1019,6 +1075,7 @@ class testFormScheduledReport extends CWebTest {
 					'Dashboard' => 'Global view'
 				]
 			],
+			// #9.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1030,6 +1087,7 @@ class testFormScheduledReport extends CWebTest {
 					'Dashboard' => 'Global view'
 				]
 			],
+			// #10.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1050,9 +1108,10 @@ class testFormScheduledReport extends CWebTest {
 	 * @backupOnce report
 	 */
 	public function testFormScheduledReport_Update($data) {
-		$update_reportid = CDataHelper::get('ScheduledReports.reportids.'.
-				CTestArrayHelper::get($data, 'report', self::UPDATE_REPORT_NAME));
-		$this->page->login()->open('zabbix.php?action=scheduledreport.edit&reportid='.$update_reportid);
+		$this->page->login()->open('zabbix.php?action=scheduledreport.list')->waitUntilReady();
+		$report_name = (array_key_exists('report', $data)) ? $data['report'] : self::$update_report_name;
+		$this->query('link', $report_name)->waitUntilClickable()->one()->click();
+		COverlayDialogElement::find()->waitUntilReady();
 
 		$this->executeAction($data, 'update', 'Scheduled report updated');
 	}
@@ -1116,8 +1175,9 @@ class testFormScheduledReport extends CWebTest {
 	 * @dataProvider getCloneData
 	 */
 	public function testFormScheduledReport_Clone($data) {
-		$this->page->login()->open('zabbix.php?action=scheduledreport.edit&reportid='.
-				CDataHelper::get('ScheduledReports.reportids.'.self::TEST_REPORT_NAME));
+		$this->page->login()->open('zabbix.php?action=scheduledreport.list')->waitUntilReady();
+		$this->query('link', self::TEST_REPORT_NAME)->waitUntilClickable()->one()->click();
+		COverlayDialogElement::find()->waitUntilReady();
 		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asForm()->one();
 
 		// Get field values from form.
@@ -1221,7 +1281,8 @@ class testFormScheduledReport extends CWebTest {
 		];
 
 		if ($data['action'] === 'Add') {
-			$this->page->login()->open('zabbix.php?action=scheduledreport.edit');
+			$this->page->login()->open('zabbix.php?action=scheduledreport.list')->waitUntilReady();
+			$this->query('button:Create report')->waitUntilClickable()->one()->click();
 		}
 		elseif ($data['action'] === 'Dashboard') {
 			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
@@ -1230,8 +1291,8 @@ class testFormScheduledReport extends CWebTest {
 			CPopupMenuElement::find()->waitUntilVisible()->one()->select('Create new report');
 		}
 		else {
-			$this->page->login()->open('zabbix.php?action=scheduledreport.edit&reportid='.
-					CDataHelper::get('ScheduledReports.reportids.'.self::TEST_REPORT_NAME));
+			$this->page->login()->open('zabbix.php?action=scheduledreport.list')->waitUntilReady();
+			$this->query('link', self::TEST_REPORT_NAME)->waitUntilClickable()->one()->click();
 		}
 
 		// Change report data to make sure that the changes are not saved to the database after cancellation.
@@ -1240,7 +1301,7 @@ class testFormScheduledReport extends CWebTest {
 		$this->fillSubscriptions($subscriptions);
 
 		if ($data['action'] === 'Delete') {
-			$this->query('button', $data['action'])->one()->click();
+			COverlayDialogElement::find()->one()->query('button:Delete')->waitUntilClickable()->one()->click();
 			$this->page->dismissAlert();
 		}
 
@@ -1248,8 +1309,11 @@ class testFormScheduledReport extends CWebTest {
 		if ($data['action'] === 'Clone') {
 			$this->query('button', $data['action'])->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertFalse($this->query('button', ['Update', 'Delete'])->one(false)->isValid());
-			$this->assertTrue($this->query('button', ['Add', 'Cancel'])->one(false)->isValid());
+			$dialog = COverlayDialogElement::find()->one();
+
+			foreach (['Update' => false, 'Delete' => false, 'Add' => true, 'Cancel' => true] as $button => $valid) {
+				$this->assertEquals($valid, $dialog->query('button', $button)->one(false)->isValid());
+			}
 		}
 
 		$this->query('button:Cancel')->waitUntilClickable()->one()->click();
@@ -1272,7 +1336,10 @@ class testFormScheduledReport extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'error' => ['Incorrect value for field "name": cannot be empty.', 'Field "dashboardid" is mandatory.']
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Dashboard' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -1281,7 +1348,9 @@ class testFormScheduledReport extends CWebTest {
 					'fields' => [
 						'Name' => 'Test option - report without dashboard'
 					],
-					'error' => 'Field "dashboardid" is mandatory.'
+					'inline_errors' => [
+						'Dashboard' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -1290,7 +1359,9 @@ class testFormScheduledReport extends CWebTest {
 					'fields' => [
 						'Dashboard' => 'Global view'
 					],
-					'error' => 'Incorrect value for field "name": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -1301,7 +1372,10 @@ class testFormScheduledReport extends CWebTest {
 						'Name' => '',
 						'Dashboard' => ''
 					],
-					'error' => ['Incorrect value for field "name": cannot be empty.', 'Field "dashboardid" is mandatory.']
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Dashboard' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -1326,31 +1400,28 @@ class testFormScheduledReport extends CWebTest {
 	 * @dataProvider getTestData
 	 */
 	public function testFormScheduledReport_TestOption($data) {
-		if (array_key_exists('report', $data)) {
-			$url = 'zabbix.php?action=scheduledreport.edit&reportid='.
-					CDataHelper::get('ScheduledReports.reportids.'.$data['report']);
-		}
-		else {
-			$url = 'zabbix.php?action=scheduledreport.edit';
-		}
-		$this->page->login()->open($url);
+		$button = (array_key_exists('report', $data)) ? 'link:'.$data['report'] : 'button:Create report';
+
+		$this->page->login()->open('zabbix.php?action=scheduledreport.list')->waitUntilReady();
+		$this->query($button)->waitUntilClickable()->one()->click();
 		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asForm()->one();
 		$form->fill(CTestArrayHelper::get($data, 'fields', []));
 		$this->query('button:Test')->waitUntilClickable()->one()->click();
-		COverlayDialogElement::find()->waitUntilReady()->one();
 
 		if ($data['expected'] === TEST_GOOD) {
+			COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertMessage(TEST_BAD, 'Report generating test failed.');
 		}
 		else {
-			$this->assertMessage(TEST_BAD, null, $data['error']);
+			$this->assertInlineError($form, $data['inline_errors']);
 		}
 	}
 
 	public function testFormScheduledReport_Delete() {
 		$reportid = CDataHelper::get('ScheduledReports.reportids.Report for delete');
-		$this->page->login()->open('zabbix.php?action=scheduledreport.edit&reportid='.$reportid);
-		$this->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->page->login()->open('zabbix.php?action=scheduledreport.list')->waitUntilReady();
+		$this->query('link:Report for delete')->waitUntilClickable()->one()->click();
+		COverlayDialogElement::find()->one()->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
 
 		$this->assertMessage(TEST_GOOD, 'Scheduled report deleted');
@@ -1403,27 +1474,39 @@ class testFormScheduledReport extends CWebTest {
 		$form->fill($data['fields']);
 		$this->fillSubscriptions($data);
 
-		if (CTestArrayHelper::get($data, 'subscription_error', false) === false) {
-			$form->submit();
-			$this->page->waitUntilReady();
+		// No more actions required in case of inline validation check in subscription overlay.
+		if (CTestArrayHelper::get($data, 'subscription_inline_errors')) {
+			return;
+		}
 
-			if ($data['expected'] === TEST_BAD) {
-				$this->assertMessage(TEST_BAD, $data['message_header'], $data['message_details']);
-				$this->assertEquals($old_hash, $this->getHash());
+		$form->submit();
+
+		if ($data['expected'] === TEST_BAD) {
+			if (array_key_exists('error_details', $data)) {
+				$title = 'Cannot '.(($action === 'update') ? 'update' : 'add').' scheduled report';
+				$this->assertMessage(TEST_BAD, $title, $data['error_details']);
 			}
+			else {
+				$this->assertInlineError($form, $data['inline_errors']);
+			}
+
+			$this->assertEquals($old_hash, $this->getHash());
 		}
 
 		if ($data['expected'] === TEST_GOOD) {
-			if ($action === 'dashboard') {
-				COverlayDialogElement::ensureNotPresent();
-			}
+			COverlayDialogElement::ensureNotPresent();
+
 			// Trim trailing and leading spaces in expected values before comparison.
 			if (CTestArrayHelper::get($data, 'trim', false)) {
 				$data['fields'] = CTestArrayHelper::trim($data['fields']);
 			}
-			$name = CTestArrayHelper::get($data, 'fields.Name', self::UPDATE_REPORT_NAME);
+			$name = CTestArrayHelper::get($data, 'fields.Name', self::$update_report_name);
 			$this->assertMessage(TEST_GOOD, $success_message);
 			$this->assertEquals(1, CDBHelper::getCount('SELECT null FROM report WHERE name='.zbx_dbstr($name)));
+
+			if ($action === 'update' && CTestArrayHelper::get($data, 'fields.Name') && !array_key_exists('report', $data)) {
+				self::$update_report_name = $data['fields']['Name'];
+			}
 
 			// Trim spaces in the middle of a name after DB check; spaces in links are trimmed.
 			$name = CTestArrayHelper::get($data, 'trim', false) ? preg_replace('/\s+/', ' ', $name) : $name;
@@ -1471,7 +1554,10 @@ class testFormScheduledReport extends CWebTest {
 	 * @param array $data
 	 */
 	private function fillSubscriptions($data) {
-		foreach (CTestArrayHelper::get($data, 'Subscriptions', []) as $i => $subscriber) {
+		$subscriptions = CTestArrayHelper::get($data, 'Subscriptions', []);
+		$subscriptions_count = count($subscriptions);
+
+		foreach ($subscriptions as $i => $subscriber) {
 			$report_form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asForm()->one();
 			$container = $report_form->getField('Subscriptions')->asTable();
 
@@ -1492,24 +1578,24 @@ class testFormScheduledReport extends CWebTest {
 				}
 				$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 				$form = $overlay->query('id:subscription-form')->waitUntilVisible()->asForm()->one();
+
 				if (array_key_exists('fields', $subscriber)) {
 					$form->fill($subscriber['fields']);
 				}
 
 				$form->submit();
-				$this->query('xpath:.//button[contains(@class, "is-loading")]')->waitUntilNotPresent();
 
-				if (CTestArrayHelper::get($data, 'subscription_error', false)) {
+				if (CTestArrayHelper::get($data, 'subscription_inline_errors') && $i === ($subscriptions_count - 1)) {
 					// Check error in subscription overlay for last subscriber.
-					if ($i === count($data['Subscriptions'])) {
-						$this->assertMessage(TEST_BAD, null, $data['subscription_error']);
-					}
+					$this->assertInlineError($form, $data['subscription_inline_errors']);
 				}
 				else {
 					$overlay->waitUntilNotVisible();
+
 					// Wait for the subscriber to be added to the subscription table.
-					$user = CTestArrayHelper::get($subscriber,
-							'fields.Recipient', $this->default_values['Subscriptions']['Recipient']);
+					$user = CTestArrayHelper::get($subscriber, 'fields.Recipient',
+							$this->default_values['Subscriptions']['Recipient']
+					);
 					$container->query('link', $user)->waitUntilVisible();
 				}
 			}
