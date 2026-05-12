@@ -584,8 +584,10 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			COverlayDialogElement::find()->one()->setDataContext(self::TRIGGER_HOST);
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
+			$headers = $table->getHeaders();
 			$this->query('name:filter_apply')->one()->click();
-			$table->waitUntilReady();
+			$headers->waitUntilStalled();
+			$table->waitUntilReady()->invalidate();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
 			// Reset filter.
@@ -687,8 +689,10 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			COverlayDialogElement::find()->one()->setDataContext(self::TRIGGER_HOST);
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
+			$headers = $table->getHeaders();
 			$this->query('name:filter_apply')->one()->click();
-			$table->waitUntilReady();
+			$headers->waitUntilStalled();
+			$table->waitUntilReady()->invalidate();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
 			// Reset filter.
