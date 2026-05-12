@@ -161,7 +161,7 @@ static int	push_get_target_by_uuid(const char *uuid, zbx_push_target_t *target)
 				"select max(dk2.device_keyid)"
 				" from device_key dk2"
 				" where dk2.deviceid=d.deviceid"
-					" and dk2.active=1"
+					" and dk2.active=0"
 					" and dk2.scope=%d"
 			")"
 			" where d.uuid='%s'"
@@ -195,7 +195,7 @@ static void	push_add_all_user_targets(zbx_uint64_t userid, zbx_vector_push_targe
 				"select max(dk2.device_keyid)"
 				" from device_key dk2"
 				" where dk2.deviceid=d.deviceid"
-					" and dk2.active=1"
+					" and dk2.active=0"
 					" and dk2.scope=%d"
 			")"
 			" where d.userid=" ZBX_FS_UI64

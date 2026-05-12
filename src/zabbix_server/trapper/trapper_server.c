@@ -50,7 +50,7 @@ static int	trapper_build_push_test_params(const char *sendto, const char *subjec
 	result = zbx_db_select(
 			"select d.uuid,d.push_token,dk.key_"
 			" from device d"
-			" left join device_key dk on dk.deviceid=d.deviceid and dk.active=1 and dk.scope=%d"
+			" left join device_key dk on dk.deviceid=d.deviceid and dk.active=0 and dk.scope=%d"
 			" where d.uuid='%s'"
 				" and d.status=1"
 			" order by dk.device_keyid desc",
