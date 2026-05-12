@@ -242,23 +242,13 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		$result = null;
 
 		sleep(1);
-		while ((microtime(true) - $start) < $timeout) {
-			$result = $this->testItemOnServer((string) self::$hostid, [
-				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'type' => ITEM_TYPE_CALCULATED,
-				'key' => 'calc.agent.ping.presence',
-				'params' => 'last(/'.self::HOSTNAME.'/agent.ping)'
-			]);
+		$result = $this->testItemOnServer((string) self::$hostid, [
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'type' => ITEM_TYPE_CALCULATED,
+			'key' => 'calc.agent.ping.presence',
+			'params' => 'last(/'.self::HOSTNAME.'/agent.ping)'
+		]);
 
-			// Until the agent ping reaches the database, the calculated item evaluation
-			// returns an error ("not supported") instead of a result; keep polling.
-			if ($result !== false && isset($result['item']['result'])
-					&& (int) $result['item']['result'] === 1) {
-				break;
-			}
-
-			usleep(100000);
-		}
 		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'log_level_decrease=trapper');
 
 		$this->assertNotFalse($result, 'testItem call failed for calculated item.');
