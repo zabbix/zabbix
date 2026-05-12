@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-07-14 08:34+0000\n"
+"PO-Revision-Date: 2026-02-16 07:42+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -314,6 +314,24 @@ msgstr "Класс %1$s.php должен расширять %2$s для моду
 #, c-format
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
+
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr "%1$s: %2$s."
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr "%1$s: файл недоступен для чтения."
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr "%1$s: неверный путь или файл не найден."
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -2070,7 +2088,7 @@ msgstr "Избегать легко угадываемых паролей"
 
 #: app/views/host.wizard.edit.php:473
 msgid "Avoid including sensitive data."
-msgstr ""
+msgstr "Избегайте включения конфиденциальных данных."
 
 #: jsLoader.php:172
 msgid "Awaiting data"
@@ -2249,6 +2267,13 @@ msgstr "При изменении PSK для шифрования соедине
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "Оба пароля должны совпадать."
+
+#: app/controllers/CControllerItemCreate.php:264
+#: app/controllers/CControllerItemPrototypeCreate.php:279
+#: app/controllers/CControllerItemPrototypeUpdate.php:267
+#: app/controllers/CControllerItemUpdate.php:264
+msgid "Both username and password should be either present or empty."
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -3680,6 +3705,10 @@ msgstr "Не удалось найти преобразование значен
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти преобразование значений \"%1$s\", используемое в прототипе элементов данных \"%2$s\" прототипа правил обнаружения \"%3$s\" на \"%4$s\"."
 
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr "Не удалось получить токены аутентификации"
+
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
 msgstr "Не удалось получить код авторизации."
@@ -4214,6 +4243,11 @@ msgstr "Не удалось прочитать XML: %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr "Не удалось прочитать YAML: %1$s."
 
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr "Не удалось прочитать ответ от сервера Zabbix \"%1$s\"."
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -4276,6 +4310,10 @@ msgstr "Не удалось установить \"%1$s\" для прототи�
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Невозможно задать \"Агрегирование набора данных\" при добавленном на диаграмму элементе данных с типом \"Итого\"."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "Не удалось задать кодировку."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -7404,7 +7442,7 @@ msgstr "Обнаруженная лицензия TimescaleDB не поддер�
 
 #: app/views/administration.housekeeping.edit.php:204
 msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "Обнаруженная лицензия не поддерживает сжатие. Сжатие поддерживается в TimescaleDB Community Edition."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -8672,7 +8710,7 @@ msgstr "Введите строку идентификатора PSK (pre-shared
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
-msgstr ""
+msgstr "Введите уникальное имя, которое компоненты Zabbix будут использовать для распознавания pre-shared ключа."
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
@@ -11794,12 +11832,12 @@ msgstr "Некорректное значение \"%1$s\" для \"%2$s\" по�
 #: include/validate.inc.php:362
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s, and have no more than %5$s digits after the decimal point."
-msgstr "Некорректное значение \"%1$s\" для \"%2$s\" поля: должно быть между %3$s и %4$s, и должно содержать не более %5$s цифр после десятичной точки."
+msgstr "Некорректное значение \"%1$s\" для \"%2$s\" поля: должно быть в пределах %3$s и %4$s, и должно содержать не более %5$s цифр после десятичной точки."
 
 #: include/validate.inc.php:367
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
-msgstr "Некорректное значение \"%1$s\" для \"%2$s\" поля: должно быть между %3$s и %4$s."
+msgstr "Некорректное значение \"%1$s\" для \"%2$s\" поля: должно быть в пределах %3$s и %4$s."
 
 #: include/classes/db/DB.php:422
 #, c-format
@@ -12341,10 +12379,21 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "Интервал"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr "Интервал и хранение"
+
 #: include/classes/api/services/CRole.php:731
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "Ошибочный API метод \"%2$s\" для роли пользователей \"%1$s\"."
+
+#: app/controllers/CControllerItemCreate.php:183
+#: app/controllers/CControllerItemPrototypeCreate.php:198
+#: app/controllers/CControllerItemPrototypeUpdate.php:186
+#: app/controllers/CControllerItemUpdate.php:183
+msgid "Invalid HTTP status code or range."
+msgstr ""
 
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
@@ -12434,6 +12483,11 @@ msgstr "Ошибочный email адрес \"%1$s\"."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Ошибочный email адрес у способа оповещения с ID \"%1$s\"."
+
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -12816,6 +12870,11 @@ msgstr "Ошибочная строка."
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Ошибочный тег \"%1$s\": %2$s."
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -14396,7 +14455,7 @@ msgstr "Максимально требуемая версия базы данн
 #: app/partials/administration.system.info.php:221
 #, c-format
 msgid "Maximum required version is %1$s."
-msgstr ""
+msgstr "Максимально допустимая версия - %1$s."
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
@@ -14749,7 +14808,7 @@ msgstr "Минимально требуемый размер PHP post - %1$s (\"
 #: app/views/administration.housekeeping.edit.php:183
 #, c-format
 msgid "Minimum required version is %1$s."
-msgstr ""
+msgstr "Минимально допустимая версия - %1$s."
 
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
@@ -14991,7 +15050,7 @@ msgstr "Множественные события ПРОБЛЕМА"
 #: app/partials/administration.system.info.php:235
 #, c-format
 msgid "Must be at least %1$s."
-msgstr ""
+msgstr "Должно быть не менее %1$s."
 
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
@@ -15000,7 +15059,7 @@ msgstr "Обязательно для выбора."
 #: app/partials/administration.system.info.php:254
 #, c-format
 msgid "Must not be higher than %1$s."
-msgstr ""
+msgstr "Должно быть не более %1$s."
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -15317,6 +15376,10 @@ msgstr "Новый сервер LDAP"
 #: app/views/mfa.edit.php:149
 msgid "New MFA method"
 msgstr "Новый MFA метод"
+
+#: app/views/oauth.edit.php:242
+msgid "New OAuth"
+msgstr ""
 
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
@@ -15774,63 +15837,63 @@ msgstr "Нет прав доступа на вызов \"%1$s.%2$s\"."
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
-msgstr ""
+msgstr "Нет прав на импорт правил обнаружения."
 
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
-msgstr ""
+msgstr "Нет прав на импорт графиков."
 
 #: include/classes/api/services/CConfiguration.php:314
 msgid "No permissions to import host groups."
-msgstr ""
+msgstr "Нет прав на импорт групп узлов сети."
 
 #: include/classes/api/services/CConfiguration.php:316
 msgid "No permissions to import hosts."
-msgstr ""
+msgstr "Нет прав на импорт узлов сети."
 
 #: include/classes/api/services/CConfiguration.php:318
 msgid "No permissions to import images."
-msgstr ""
+msgstr "Нет прав на импорт изображений."
 
 #: include/classes/api/services/CConfiguration.php:319
 msgid "No permissions to import items."
-msgstr ""
+msgstr "Нет прав на импорт элементов данных."
 
 #: include/classes/api/services/CConfiguration.php:320
 msgid "No permissions to import maps."
-msgstr ""
+msgstr "Нет прав на импорт карт."
 
 #: include/classes/api/services/CConfiguration.php:321
 msgid "No permissions to import media types."
-msgstr ""
+msgstr "Нет прав на импорт способов оповещения."
 
 #: include/classes/api/services/CConfiguration.php:324
 msgid "No permissions to import template dashboards."
-msgstr ""
+msgstr "Нет прав на импорт шаблонов панелей."
 
 #: include/classes/api/services/CConfiguration.php:315
 msgid "No permissions to import template groups."
-msgstr ""
+msgstr "Нет прав на импорт групп шаблонов."
 
 #: include/classes/api/services/CConfiguration.php:322
 msgid "No permissions to import template links."
-msgstr ""
+msgstr "Нет прав на импорт шаблонов связей."
 
 #: include/classes/api/services/CConfiguration.php:323
 msgid "No permissions to import templates."
-msgstr ""
+msgstr "Нет прав на импорт шаблонов."
 
 #: include/classes/api/services/CConfiguration.php:325
 msgid "No permissions to import triggers."
-msgstr ""
+msgstr "Нет прав на импорт триггеров."
 
 #: include/classes/api/services/CConfiguration.php:326
 msgid "No permissions to import value maps."
-msgstr ""
+msgstr "Нет прав на импорт преобразований значений."
 
 #: include/classes/api/services/CConfiguration.php:317
 msgid "No permissions to import web scenarios."
-msgstr ""
+msgstr "Нет прав на импорт веб-сценариев."
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -17034,6 +17097,10 @@ msgstr "Отсутствует расширение PHP ctype (параметр 
 #: include/classes/setup/CFrontendSetup.php:687
 msgid "PHP curl"
 msgstr "PHP curl"
+
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr "Расширение PHP curl отсутствует или устарело."
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
@@ -19006,6 +19073,11 @@ msgstr "Код ответа"
 msgid "Response time"
 msgstr "Время ответа"
 
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr "Превышено время ожидания ответа %1$s при подключении к серверу Zabbix \"%2$s\"."
+
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
 msgstr "Тип ответа: JSON"
@@ -20381,13 +20453,13 @@ msgstr "Сокращённое"
 #: app/views/administration.housekeeping.edit.php:187
 #, c-format
 msgid "Should be at least %1$s."
-msgstr ""
+msgstr "Следует указать не менее %1$s."
 
 #: app/partials/administration.system.info.php:262
 #: app/views/administration.housekeeping.edit.php:197
 #, c-format
 msgid "Should not be higher than %1$s."
-msgstr ""
+msgstr "Следует указать не более %1$s."
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
@@ -21323,6 +21395,10 @@ msgstr "Размер файла подкачки в байтах или в пр�
 msgid "Swedish (sv_SE)"
 msgstr "Шведский (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Переключение метода аутентификации сбросит все сессии исключая эту! Продолжить?"
@@ -21951,6 +22027,10 @@ msgstr "Идентификатор клиента (client identifier), заре�
 msgid "The client secret registered within the authorization server."
 msgstr "Секрет клиента (client secret), зарегистрированный на сервере авторизации."
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Склонированный узел сети содержит пользовательские макросы с типом \"Скрытый текст\". Значения и тип этих макросов сброшены."
@@ -22048,7 +22128,7 @@ msgstr "Параметр \"%1$s\" отсутствует в атрибутах �
 
 #: app/views/popup.ldap.edit.php:101
 msgid "The previous password was cleared due to a host change. Please enter the new password."
-msgstr ""
+msgstr "Предыдущий пароль был удалён из-за изменения узла. Введите новый пароль."
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
@@ -23263,11 +23343,11 @@ msgstr "Не удалось получить версию TimescaleDB."
 
 #: app/views/administration.housekeeping.edit.php:173
 msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "Не удалось получить статус поддержки сжатия расширением TimescaleDB для PostgreSQL."
 
 #: app/views/administration.housekeeping.edit.php:178
 msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "Не удалось получить версию расширения TimescaleDB для PostgreSQL."
 
 #: include/views/mfa.login.php:65
 #, c-format
@@ -23343,6 +23423,10 @@ msgstr "Отмена подтверждения проблемы."
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "Неожиданный код статуса HTTP-ответа."
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
+msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -23562,7 +23646,7 @@ msgstr "Версия %1$s сервера базы данных не поддер
 #: app/partials/administration.system.info.php:206
 #: app/views/administration.housekeeping.edit.php:169
 msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
-msgstr ""
+msgstr "Используется неподдерживаемая версия расширения TimescaleDB для PostgreSQL."
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -25023,7 +25107,7 @@ msgstr "Предупреждающее сообщение"
 #: app/partials/administration.system.info.php:243
 #: app/partials/administration.system.info.php:262
 msgid "Warning!"
-msgstr ""
+msgstr "Предупреждение!"
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
@@ -25201,6 +25285,10 @@ msgstr "Конфигурация виджета будет возвращена 
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "Устаревший виджет."
+
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
@@ -25585,6 +25673,10 @@ msgstr "Вы не можете переключить шаблоны для те
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "У вас нет полномочий для выполнения этой операции."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -26616,6 +26708,10 @@ msgstr "описание"
 msgid "directory cannot be empty"
 msgstr "папка не может быть пустой"
 
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr "правило обнаружения"
+
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562
 #, c-format
@@ -26986,6 +27082,11 @@ msgstr "ошибочная последовательность байт в UTF-
 #: include/validate.inc.php:191
 msgid "invalid data type"
 msgstr "ошибочный тип данных"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr "ошибочная дата"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
@@ -28377,7 +28478,7 @@ msgstr[2] "значение должно быть одно из %1$s"
 #: widgets/svggraph/includes/WidgetForm.php:107
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
-msgstr "значение должно быть между \"%1$s\" и \"%2$s\""
+msgstr "значение должно быть в пределах \"%1$s\" и \"%2$s\""
 
 #: app/controllers/CControllerGraphCreate.php:208
 #: app/controllers/CControllerGraphPrototypeCreate.php:226
@@ -28385,7 +28486,12 @@ msgstr "значение должно быть между \"%1$s\" и \"%2$s\""
 #: app/controllers/CControllerGraphUpdate.php:228
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
-msgstr "значение должно быть между \"%1$s\" и \"%2$s\", и иметь не более \"%3$s\" цифр после десятичной точки"
+msgstr "значение должно быть в пределах \"%1$s\" и \"%2$s\", и иметь не более \"%3$s\" цифр после десятичной точки"
+
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr "значение должно быть в пределах %1$s и %2$s"
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
@@ -28404,6 +28510,16 @@ msgstr[2] "значение должно быть пустым или одним
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "значение должно быть больше \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr "значение должно быть больше или равно %1$s"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr "значение должно быть меньше или равно %1$s"
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220
@@ -28549,4 +28665,4 @@ msgstr "г"
 #: include/classes/validators/CApiInputValidator.php:3324
 #, c-format
 msgid "zoom level must be between \"%1$s\" and \"%2$s\""
-msgstr "уровень масштаба должен быть между \"%1$s\" и \"%2$s\""
+msgstr "уровень масштаба должен быть в пределах \"%1$s\" и \"%2$s\""

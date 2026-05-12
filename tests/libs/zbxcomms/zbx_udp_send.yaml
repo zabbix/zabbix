@@ -1,0 +1,38 @@
+---
+test case: "no errors"
+in:
+  data: data
+  data_len: 5
+  poll_mode: "MOCK_POLL_DEFAULT"
+  sendto_return: 1
+out:
+  result: SUCCEED
+---
+test case: "socket blocking error"
+in:
+  data: data
+  data_len: 5
+  poll_mode: "MOCK_POLL_DEFAULT"
+  sendto_return: -1
+  socket_had_blocking_error: true
+out:
+  result: FAIL
+---
+test case: "poll error"
+in:
+  data: data
+  data_len: 5
+  poll_mode: "MOCK_POLL_SOCKET_BLOCKING_ERROR"
+  sendto_return: -1
+out:
+  result: FAIL
+---
+test case: "revents error"
+in:
+  data: data
+  data_len: 5
+  poll_mode: "MOCK_POLL_REVENTS_ERROR"
+  sendto_return: -1
+out:
+  result: FAIL
+...

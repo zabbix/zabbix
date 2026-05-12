@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,7 +27,9 @@
 
 		// the chkbxRange.init() method must be called after the inserted post scripts and initializing cookies
 		cookie.init();
-		chkbxRange.init();
+		// Timeout is added to reliably restore checkbox states, when using Back and Forward navigation
+		// in different browsers.
+		setTimeout(() => chkbxRange.init());
 	});
 
 	/**

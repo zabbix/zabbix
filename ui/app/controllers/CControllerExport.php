@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -36,8 +36,7 @@ class CControllerExport extends CController {
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
-
-		if (!CHtmlUrlValidator::validateSameSite($this->getInput('backurl'))) {
+		elseif (!CHtmlUrlValidator::validateSameSite($this->getInput('backurl'))) {
 			throw new CAccessDeniedException();
 		}
 

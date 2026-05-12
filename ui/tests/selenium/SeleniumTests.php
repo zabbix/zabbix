@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -76,6 +76,7 @@ require_once __DIR__.'/dashboardWidgets/testDashboardHoneycombWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardHostCardWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardHostNavigatorWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardItemCardWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemHistoryWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemNavigatorWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemValueWidget.php';
@@ -208,6 +209,7 @@ require_once __DIR__.'/networkDiscovery/testFormNetworkDiscovery.php';
 require_once __DIR__.'/networkDiscovery/testPageNetworkDiscovery.php';
 
 // Permissions.
+require_once __DIR__.'/permissions/testDashboardUserPermissions.php';
 require_once __DIR__.'/permissions/testPermissionsWithoutCSRF.php';
 require_once __DIR__.'/permissions/testTagBasedPermissions.php';
 require_once __DIR__.'/permissions/testUrlUserPermissions.php';
@@ -424,6 +426,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardHostCardWidget');
 		$suite->addTestSuite('testDashboardHostNavigatorWidget');
+		$suite->addTestSuite('testDashboardItemCardWidget');
 		$suite->addTestSuite('testDashboardItemHistoryWidget');
 		$suite->addTestSuite('testDashboardItemNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
@@ -556,6 +559,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageNetworkDiscovery');
 
 		// Permissions.
+		$suite->addTestSuite('testDashboardUserPermissions');
 		$suite->addTestSuite('testPermissionsWithoutCSRF');
 		$suite->addTestSuite('testTagBasedPermissions');
 		$suite->addTestSuite('testUrlUserPermissions');

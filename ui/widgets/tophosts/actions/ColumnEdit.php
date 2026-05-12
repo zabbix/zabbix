@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -99,7 +99,7 @@ class ColumnEdit extends CController {
 	}
 
 	protected function doAction(): void {
-		$input = $this->getInputAll() + self::getColumnDefaults();
+		$input = $this->getInputAll();
 		unset($input['update']);
 
 		if (!$this->hasInput('update')) {
@@ -111,7 +111,7 @@ class ColumnEdit extends CController {
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]
-			] + $input;
+			] + $input + self::getColumnDefaults();
 
 			$data['time_period_field'] = (new CWidgetFieldTimePeriod('time_period', _('Time period')))
 				->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])

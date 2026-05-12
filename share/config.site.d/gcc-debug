@@ -40,10 +40,13 @@ then
 	CFLAGS+=" -Wformat-security"
 	CFLAGS+=" -Wcast-function-type"
 	CFLAGS+=" -fstrict-aliasing"
+	CFLAGS+=" -Wpedantic"
 
 	# flags for gcc
 	CFLAGS+=" -Wno-maybe-uninitialized"
 	CFLAGS+=" -Wjump-misses-init"
 	CFLAGS+=" -Wformat-signedness"
 
+	# other
+	CFLAGS+=" -DZBX_DEBUG"
 fi

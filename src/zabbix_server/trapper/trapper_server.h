@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,6 +21,7 @@
 #include "zbxcomms.h"
 #include "zbxtime.h"
 #include "zbxjson.h"
+#include "zbxipcservice.h"
 
 int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, const char *info, int status,
 		int upload_status, int config_timeout);
@@ -30,6 +31,7 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,
 		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
 		zbx_get_config_forks_f get_config_forks,
-		const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip);
+		const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip,
+		zbx_ipc_async_socket_t *rtc);
 
 #endif

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,12 +25,12 @@ require_once __DIR__.'/../behaviors/CMacrosBehavior.php';
 class testInheritanceHostPrototype extends CLegacyWebTest {
 
 	/**
-	 * Attach MacrosBehavior to the test.
+	 * Attach MacrosBehavior and CMessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMacrosBehavior::class];
+		return [CMacrosBehavior::class, CMessageBehavior::class];
 	}
 
 	public static function getLayoutData() {
@@ -568,14 +568,15 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$form->selectTab('Macros');
 		$this->fillMacros($macros);
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Host prototype updated');
 
 		// Open host prototype inherited from template on host and check inherited macros.
 		$this->page->open('host_prototypes.php?form=update&context=host&parent_discoveryid='
-			.$host_lld_id.'&hostid='.$host_prototype_id);
+			.$host_lld_id.'&hostid='.$host_prototype_id)->waituntilReady();
 		$form->selectTab('Macros');
 		$this->assertMacros($macros);
 
-		// Check that inherited macros field are not editabble.
+		// Check that inherited macros field are not editable.
 		$fields = $this->getMacros();
 		foreach ($fields as $i => $field) {
 			$this->assertFalse($this->query('id:macros_'.$i.'_macro')->one()->isEnabled());

@@ -1,0 +1,66 @@
+---
+test case: "default protocol (TCP)"
+in:
+  data: '!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
+  len: 94
+  reserved: 0
+  flags: 0
+out:
+  result: "SUCCEED"
+---
+test case: "with protocol"
+in:
+  data: '!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
+  len: 94
+  reserved: 94
+  flags: 1   # ZBX_TCP_PROTOCOL
+out:
+  result: "SUCCEED"
+---
+test case: "force compression"
+in:
+  data: '!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
+  len: 94
+  reserved: 0
+  flags: 3   # ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS
+  compress_result: "SUCCEED"
+out:
+  result: "SUCCEED"
+---
+test case: "force compression - failed compression"
+in:
+  data: "aaaaaaaaaa"
+  len: 10
+  reserved: 0
+  flags: 3   # ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS
+  compress_result: "FAIL"
+out:
+  result: "FAIL"
+---
+test case: "len > MAX"
+in:
+  data: "ABCD"
+  len: 17179869185
+  reserved: 0
+  flags: 1
+out:
+  result: "FAIL"
+---
+test case: "reserved > MAX"
+in:
+  data: "ABCD"
+  len: 1
+  reserved: 17179869185
+  flags: 1
+out:
+  result: "FAIL"
+---
+test case: "large message, with LARGE flag"
+in:
+  data: "ABCDABCDABCDA"
+  len: 5000000000
+  reserved: 5000000000
+  flags: 5   # ZBX_TCP_PROTOCOL | ZBX_TCP_LARGE
+out:
+  result: SUCCEED
+...

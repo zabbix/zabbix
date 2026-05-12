@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -209,7 +209,7 @@ func Test_statusHandler(t *testing.T) {
 			"-unknownHealth",
 			args{
 				map[command][]byte{
-					cmdStatus: []byte(`{"health": {"status":"bannana"}}`),
+					cmdStatus: []byte(`{"health": {"status":"banana"}}`),
 				},
 			},
 			nil,
@@ -220,7 +220,7 @@ func Test_statusHandler(t *testing.T) {
 			args{map[command][]byte{cmdStatus: []byte(
 				`{
                     "health": {"status":"HEALTH_OK"},
-                    "pgmap": {"pgs_by_state":[{"state_name":"bannan", "count": 3}]}
+                    "pgmap": {"pgs_by_state":[{"state_name":"banana", "count": 3}]}
                  }`,
 			)}},
 			nil,
