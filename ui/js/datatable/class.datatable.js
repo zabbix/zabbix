@@ -516,7 +516,7 @@ class CDataTable {
 				return;
 			}
 
-			tags = tags.filter(tag => tag.tag == column_options['tag_name']);
+			tags = tags.filter(tag => tag.tag === column_options['tag_name']);
 			if (tags.length == 0) {
 				return;
 			}
@@ -524,34 +524,36 @@ class CDataTable {
 			const tags_wrapper = document.createElement('div');
 			tags_wrapper.classList.add(ZBX_STYLE_TAGS_WRAPPER);
 
-			const tag_label = document.createElement('span');
-			tag_label.classList.add(ZBX_STYLE_TAG);
-			tag_label.textContent = tags[0].value;
+			for (const tag of tags) {
+				const tag_label = document.createElement('span');
+				tag_label.classList.add(ZBX_STYLE_TAG);
+				tag_label.textContent = tag.value;
 
-			if (tags[0].type == ZBX_PROPERTY_INHERITED) {
-				tag_label.classList.add(ZBX_STYLE_TAG_INHERITED);
+				if (tag.type == ZBX_PROPERTY_INHERITED) {
+					tag_label.classList.add(ZBX_STYLE_TAG_INHERITED);
+				}
+
+				const tag_label_hintbox = document.createElement('div');
+
+				if (tag.type == ZBX_PROPERTY_INHERITED) {
+					const inherited_title = document.createElement('div');
+					inherited_title.classList.add(ZBX_STYLE_TAG_INHERITED_TITLE);
+					inherited_title.textContent = t('Inherited tag');
+
+					tag_label_hintbox.appendChild(inherited_title);
+				}
+
+				const hintbox_contents = document.createTextNode(`${tag.tag}: ${tag.value}`);
+				tag_label_hintbox.appendChild(hintbox_contents);
+
+				tag_label.setAttribute('data-hintbox-html', tag_label_hintbox.outerHTML);
+				tag_label.setAttribute('data-hintbox', '1');
+				tag_label.setAttribute('data-hintbox-class', ZBX_STYLE_HINTBOX_WRAP);
+				tag_label.setAttribute('data-hintbox-static', '1');
+				tag_label.setAttribute('aria-expanded', 'false');
+
+				tags_wrapper.appendChild(tag_label);
 			}
-
-			const tag_label_hintbox = document.createElement('div');
-
-			if (tags[0].type == ZBX_PROPERTY_INHERITED) {
-				const inherited_title = document.createElement('div');
-				inherited_title.classList.add(ZBX_STYLE_TAG_INHERITED_TITLE);
-				inherited_title.textContent = t('Inherited tag');
-
-				tag_label_hintbox.appendChild(inherited_title);
-			}
-
-			const hintbox_contents = document.createTextNode(`${tags[0].tag}: ${tags[0].value}`);
-			tag_label_hintbox.appendChild(hintbox_contents);
-
-			tag_label.setAttribute('data-hintbox-html', tag_label_hintbox.outerHTML);
-			tag_label.setAttribute('data-hintbox', '1');
-			tag_label.setAttribute('data-hintbox-class', ZBX_STYLE_HINTBOX_WRAP);
-			tag_label.setAttribute('data-hintbox-static', '1');
-			tag_label.setAttribute('aria-expanded', 'false');
-
-			tags_wrapper.appendChild(tag_label);
 
 			cell_inner.appendChild(tags_wrapper);
 		});
