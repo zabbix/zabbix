@@ -6636,10 +6636,10 @@ static void	dc_trigger_add_item_links(ZBX_DC_TRIGGER *trigger, zbx_vector_uint64
 	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	dc_trigger_add_itemids(trigger, itemids);
-
 	for (int j = 0; j < itemids->values_num; j++)
 		item_triggers_add(item_triggers, itemids->values[j], trigger);
+
+	dc_trigger_add_itemids(trigger, itemids);
 
 	zbx_vector_uint64_clear(itemids);
 	zbx_vector_uint64_clear(functionids);
