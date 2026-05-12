@@ -836,14 +836,41 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			$itemids = $sent[$vtype]['itemids'];
 			$expected_by_itemid = $sent[$vtype]['expected_by_itemid'];
 
+			$this->callUntilDataIsPresent('history.get', [
+				'history' => $vtype,
+				'itemids' => [$itemids[0]],
+				'time_from' => $tm,
+				'time_till' => $tm,
+				'limit' => 1
+			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+				return count($response['result']) === 1;
+			});
+
+			$attempts = 0;
 			$history_response = $this->callUntilDataIsPresent('history.get', [
 				'history' => $vtype,
 				'itemids' => $itemids,
 				'time_from' => $tm,
 				'time_till' => $tm,
 				'limit' => self::LLD_DISCOVERY_COUNT
-			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-				return count($response['result']) === self::LLD_DISCOVERY_COUNT;
+			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
+					function ($response) use (&$attempts, $vtype, $itemids, $tm) {
+				$attempts++;
+				if (count($response['result']) === self::LLD_DISCOVERY_COUNT) {
+					return true;
+				}
+				if ($attempts >= self::WAIT_ITERATIONS) {
+					$probe = $this->call('history.get', [
+						'history' => $vtype,
+						'itemids' => array_slice($itemids, 0, 5000),
+						'time_from' => $tm,
+						'time_till' => $tm,
+						'limit' => 5000
+					]);
+					return 'got '.count($response['result']).' when asking for '.self::LLD_DISCOVERY_COUNT
+							.', got '.count($probe['result']).' when asking for 5000';
+				}
+				return false;
 			});
 
 			$this->assertCount(self::LLD_DISCOVERY_COUNT, $history_response['result']);
