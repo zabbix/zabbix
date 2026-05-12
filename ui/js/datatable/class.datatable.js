@@ -226,11 +226,11 @@ class CDataTable {
 	#options_popup_updated = false;
 
 	/**
-	 * This holds a request when saving the current table's configuration.
+	 * This holds an instance of AbortController for the table's configuration save request.
 	 *
-	 * @type {Object|null}
+	 * @var {AbortController|null}
 	 */
-	#save_config_request = null;
+	#abort_controller = null;
 
 	/**
 	 * @type {CDataProvider}
@@ -779,8 +779,8 @@ class CDataTable {
 			this.#scrollbar_inner = null;
 		}
 
-		this.#save_config_request?.abort?.();
-		this.#save_config_request = null;
+		this.#abort_controller?.abort();
+		this.#abort_controller = null;
 
 		this.#initialized = false;
 		this.#resizing = false;
@@ -1008,6 +1008,8 @@ class CDataTable {
 	setTabFilterItem(tabfilter_item) {
 		this.#tabfilter_item = tabfilter_item;
 
+		tabfilter_item?._parent?.setReloadOnTabCreate(false);
+
 		return this;
 	}
 
@@ -1076,19 +1078,13 @@ class CDataTable {
 			return;
 		}
 
-		if (this.#save_config_request != null) {
-			this.#save_config_request.abort();
-
-			this.#save_config_request = null;
-		}
-
 		const config = this.getConfig();
 
 		this.updateUserConfig(config);
 
 		const idx2 = this.#tabfilter_item ? [this.#tabfilter_item._index] : [];
 
-		this.#save_config_request = this.#updateUserProfile(JSON.stringify(config), idx2);
+		this.#updateUserProfile(JSON.stringify(config), idx2);
 	}
 
 	onRender(e) {
@@ -2538,7 +2534,8 @@ class CDataTable {
 		this.#tabfilter_item._index = index;
 		this.#user_configs[index] = this.getConfig();
 
-		this.#updateUserProfile(JSON.stringify(this.#user_configs[index]), [index]);
+		this.#updateUserProfile(JSON.stringify(this.#user_configs[index]), [index])
+			.finally(() => window.location.reload(true));
 	}
 
 	onTabfilterDelete = e => {
@@ -2597,13 +2594,26 @@ class CDataTable {
 		}
 	}
 
+	/**
+	 * @returns {Promise<any>}
+	 */
 	#updateUserProfile(value, idx2) {
 		if (!this.#storage_idx) {
-			return;
+			return Promise.resolve();
 		}
 
+		const abort_controller = new AbortController();
+
+		this.#abort_controller?.abort();
+		this.#abort_controller = abort_controller;
+
 		/* global updateUserProfile */
-		return updateUserProfile(this.#storage_idx, value, idx2, PROFILE_TYPE_STR);
+		return updateUserProfile(this.#storage_idx, value, idx2, PROFILE_TYPE_STR, abort_controller)
+			.finally(() => {
+				if (this.#abort_controller === abort_controller) {
+					this.#abort_controller = null;
+				}
+			});
 	}
 
 	#findClosestHeaderCell(element) {
