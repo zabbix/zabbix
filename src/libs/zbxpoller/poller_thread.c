@@ -737,6 +737,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query format"));
 					errcodes[i] = CONFIG_ERROR;
 					zbx_free(items[i].telemetry_query);
+					zbx_free(timeout);
 					continue;
 				}
 
