@@ -238,7 +238,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		$this->sendAgentPing();
 
 		$start = microtime(true);
-		$timeout = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
+		$timeout = 3 * self::WAIT_ITERATION_DELAY;
 		$result = null;
 
 		while ((microtime(true) - $start) < $timeout) {
@@ -255,7 +255,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 					&& (int) $result['item']['result'] === 1) {
 				break;
 			}
-
+			$this->sendAgentPing();
 			usleep(100000);
 		}
 		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'log_level_decrease=trapper');
