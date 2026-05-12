@@ -100,8 +100,8 @@ int	dbconn_init(char **error)
 		}
 		else
 		{
-			zbx_dbconn_execute(db, "%s", zbx_dbschema_get_schema());
-			zbx_dbconn_close(db);
+			dbconn_execute(db, "%s", zbx_dbschema_get_schema());
+			dbconn_close(db);
 		}
 
 		zbx_dbconn_free(db);
@@ -1588,8 +1588,8 @@ int	zbx_dbconn_begin(zbx_dbconn_t *db)
 
 	while (ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if (ZBX_DB_DOWN == (rc = dbconn_begin(db)))
 		{
@@ -1645,8 +1645,8 @@ int	zbx_dbconn_rollback(zbx_dbconn_t *db)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot perform transaction rollback, connection will be reset");
 
-		zbx_dbconn_close(db);
-		rc = zbx_dbconn_open(db);
+		dbconn_close(db);
+		rc = dbconn_open(db);
 	}
 	else
 	{
@@ -1695,8 +1695,8 @@ int	zbx_dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 
 	while (ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if (ZBX_DB_DOWN == (rc = dbconn_vexecute(db, fmt, args)))
 		{
@@ -1747,8 +1747,8 @@ zbx_db_result_t	__zbx_attr_weak zbx_dbconn_vselect(zbx_dbconn_t *db, const char 
 
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if ((zbx_db_result_t)ZBX_DB_DOWN == (rc = dbconn_vselect(db, fmt, args)))
 		{
@@ -1799,8 +1799,8 @@ zbx_db_result_t	zbx_dbconn_select_n(zbx_dbconn_t *db, const char *query, int n)
 
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if ((zbx_db_result_t)ZBX_DB_DOWN == (rc = dbconn_select_n(db, query, n)))
 		{
