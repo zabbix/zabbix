@@ -295,6 +295,9 @@ $translate_strings = [
 		'Tag display priority' => _('Tag display priority'),
 		'comma-separated list' => _('comma-separated list')
 	],
+	'class.options-popup.tagvalue.js' => [
+		'Tag name' => _('Tag name')
+	],
 	'class.options-popup.table-options.js' => [
 		'Table options' => _('Table options'),
 		'Column list' => _('Column list'),
