@@ -841,7 +841,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				'itemids' => [$itemids[0]],
 				'time_from' => $tm,
 				'time_till' => $tm,
-				'limit' => 1
 			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 				return count($response['result']) === 1;
 			});
