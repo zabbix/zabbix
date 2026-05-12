@@ -570,14 +570,28 @@ class testCauseAndSymptomEvents extends CWebTest {
 	 * Test scenario checks "Problems" page filtering results using disabled/enabled triggers and/or "Show symptoms" flag.
 	 *
 	 * @dataProvider getСauseAndSymptomsData
+	 *
 	 * @onBefore prepareTriggersStatus
 	 */
 	public function testCauseAndSymptomEvents_FilterResults($data) {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
 		$displayed_symptom_xpath = 'xpath:.//div[@class="row"]//a[text()="Problem trap>10 [Symptom]"]';
 
+		// Reset datatable layout to default before checking the its default state.
+		$table = $this->getDatatable();
+		$options_button = $table->query('xpath:.//button[@title="Customize table"]')->one()->waitUntilClickable();
+		$options_button->click();
+		$options_dialog = $this->query('class:datatable-options-popup')->one()->waitUntilVisible();
+		$options_dialog->query('button:Reset layout')->waitUntilClickable()->one()->click();
+		$this->page->acceptAlert();
+		$table->waitUntilReady()->invalidate();
+
+		// Click on button again to close the popup.
+		$options_button->invalidate();
+		$options_button->click();
+		$options_dialog->waitUntilNotVisible();
+
 		// Check that cells with timeline are present and that symptoms are not present as separate problems by default.
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 		$this->assertTrue($table->query('class:cell-timeline')->one(false)->isValid(), 'Timeline should be present.');
 		$this->assertFalse($table->query($displayed_symptom_xpath)->one(false)->isValid());
 
@@ -585,8 +599,10 @@ class testCauseAndSymptomEvents extends CWebTest {
 				self::$hostsids['hostids']['Host for Cause and Symptom check']
 		)->waitUntilReady();
 
+		$headers = $table->getHeaders();
 		CFilterElement::find()->one()->getForm()->fill(['Show symptoms' => $data['Show symptoms']])->submit();
 		$this->page->waitUntilReady();
+		$headers->waitUntilStalled();
 		$table->waitUntilReady()->invalidate();
 
 		// Only "Show timeline" field is set through table header, so presence of "header_filter" key indicates change.
