@@ -1903,8 +1903,9 @@ class testPageProblems extends CWebTest {
 			$form->fill($data['fields']);
 		}
 
+		$headers = $table->getHeaders();
 		$form->submit();
-
+		$headers->invalidate();
 		$table->waitUntilReady()->invalidate();
 
 		// If required, update the list of columns in problems datatable.
@@ -2029,8 +2030,10 @@ class testPageProblems extends CWebTest {
 
 		if (array_key_exists('removed_tag_result', $data)) {
 			$form->query('name:tags[0][remove]')->one()->click();
+			$headers = $table->getHeaders();
 			$form->submit();
-			$table->waitUntilReady();
+			$headers->waitUntilStalled();
+			$table->waitUntilReady()->invalidate();
 			$this->assertDatatableData($data['removed_tag_result']);
 			$this->assertDatatableStats(count($data['removed_tag_result']));
 		}
