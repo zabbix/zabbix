@@ -61,7 +61,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 						'array', 'required', 'not_empty',
 						'field' => ['db media.sendto', 'required'
 							// TODO: uncomment with DEV-4644
-							// 'use' => [CUuidV7Validator::class]
+							// 'use' => [CUuidV7OrWildcardValidator::class]
 						],
 						'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_PUSH]]
 					]

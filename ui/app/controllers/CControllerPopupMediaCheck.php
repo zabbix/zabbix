@@ -46,7 +46,7 @@ class CControllerPopupMediaCheck extends CController {
 				['array', 'required',
 					'field' => ['db media.sendto'
 						// TODO: uncomment with DEV-4644
-						// 'use' => [CUuidV7Validator::class]
+						// 'use' => [CUuidV7OrWildcardValidator::class]
 					],
 					'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_PUSH]]
 				]
@@ -121,12 +121,13 @@ class CControllerPopupMediaCheck extends CController {
 					$sendto_list[] = '*';
 				}
 
-				$uuid_validator = new CUuidV7Validator();
+				$uuid_v7_or_wildcard_validator = new CUuidV7OrWildcardValidator();
 
 				foreach ($sendto_list as $key => $uuid) {
-					if ($uuid !== '*' && !$uuid_validator->validate($uuid)) {
+					if (!$uuid_v7_or_wildcard_validator->validate($uuid)) {
 						error(_s('Invalid parameter "%1$s": %2$s.', 'sendto_list/'.($key + 1),
-							_("a wildcard pattern '*' or a UUIDv7 is expected")));
+							$uuid_v7_or_wildcard_validator->getError()
+						));
 
 						return false;
 					}
