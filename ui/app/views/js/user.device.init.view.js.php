@@ -43,12 +43,13 @@ window.user_device_create_popup = new class {
 		this.#initEvents();
 
 		if (!this.#admin_mode) {
-			this.#footer.querySelector('.js-submit').click();
+			this.#footer.querySelector('.js-cancel').remove();
+			this.#submit();
 		}
 	}
 
 	#initEvents() {
-		this.#footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+		this.#footer.querySelector('.js-submit')?.addEventListener('click', () => this.#submit());
 		this.#dialogue.addEventListener('dialogue.close', () => {
 			this.#countdown?.destroy();
 			this.#device_uuid = null;
@@ -69,8 +70,8 @@ window.user_device_create_popup = new class {
 				}
 
 				this.#post(zabbixUrl({action: 'user.device.init'}), fields, (response) => {
-					this.#footer.querySelector('.js-submit').remove();
-					this.#footer.querySelector('.js-cancel').remove();
+					this.#footer.querySelector('.js-submit')?.remove();
+					this.#footer.querySelector('.js-cancel')?.remove();
 					this.#overlay.setProperties({title: <?= json_encode(_('Add device')) ?>});
 					this.#qr_expires_at_ms = response.expires_at * 1000;
 
@@ -82,6 +83,8 @@ window.user_device_create_popup = new class {
 					);
 
 					this.#form_element.querySelector('.form-grid').style.display = 'none';
+					this.#form_element.querySelector('.js-qr-code-loading').style.display = 'none';
+					this.#form_element.querySelector('.js-qr-code-wrapper').style.display = '';
 					this.#form_element.querySelector('.qr-code-container').style.display = '';
 					this.#displayQRCode(response.url);
 					this.#device_uuid = response.uuid;
@@ -129,7 +132,25 @@ window.user_device_create_popup = new class {
 
 				success_callback(response);
 			})
-			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.catch((exception) => {
+				if (this.#admin_mode) {
+					this.#ajaxExceptionHandler(exception)
+				}
+				else {
+					if (typeof exception === 'object' && 'error' in exception) {
+						if ('title' in exception.error) {
+							postMessageError(exception.error.title);
+						}
+
+						postMessageDetails('error', exception.error.messages);
+					}
+					else {
+						postMessageDetails('error', [exception]);
+					}
+
+					overlayDialogueDestroy(this.#overlay.dialogueid);
+				}
+			})
 			.finally(() => this.#overlay.unsetLoading());
 	}
 
