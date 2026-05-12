@@ -237,8 +237,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 
 		$this->sendAgentPing();
 
-		$start = microtime(true);
-		$timeout = 3 * self::WAIT_ITERATION_DELAY;
 		$result = null;
 
 		sleep(1);
