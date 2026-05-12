@@ -64,17 +64,17 @@ window.item_edit_form = new class {
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 
-		this.footer = this.overlay.$dialogue.$footer[0];
-		this.tags_table = this.form_element.querySelector('.tags-table');
-
-		ZABBIX.PopupManager.setReturnUrl(return_url);
-
 		this.#host_interface_selector = new HostInterfaceSelector({
 			container: document.getElementById('items-tab'),
 			interface_types,
 			host_interfaces: host.interfaces,
 			type: this.form_data.type
 		});
+
+		this.footer = this.overlay.$dialogue.$footer[0];
+		this.tags_table = this.form_element.querySelector('.tags-table');
+
+		ZABBIX.PopupManager.setReturnUrl(return_url);
 
 		this.#tabs = {
 			preprocessing: new ItemEditPreprocessingTab({
@@ -497,6 +497,7 @@ window.item_edit_form = new class {
 
 	#getFormFields() {
 		const values = this.form.getAllValues();
+		values.interfaceid = values.interfaceid ? values.interfaceid : null;
 
 		if (values.delay === undefined) {
 			values.delay = '';

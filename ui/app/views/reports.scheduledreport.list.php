@@ -19,9 +19,7 @@
  * @var array $data
  */
 
-if ($data['uncheck']) {
-	uncheckTableRows('scheduledreport');
-}
+$this->includeJsFile('reports.scheduledreport.list.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Scheduled reports'))
@@ -30,9 +28,9 @@ $html_page = (new CHtmlPage())
 		(new CTag('nav', true,
 			(new CList())
 				->addItem(
-					(new CRedirectButton(_('Create report'),
-						(new CUrl('zabbix.php'))->setArgument('action', 'scheduledreport.edit')
-					))->setEnabled($data['allowed_edit'])
+					(new CSimpleButton(_('Create report')))
+						->addClass('js-create-scheduledreport')
+						->setEnabled($data['allowed_edit'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -65,8 +63,8 @@ $html_page = (new CHtmlPage())
 	);
 
 $form = (new CForm())
-	->setId('scheduledreport-form')
-	->setName('scheduledreport-form');
+	->setId('scheduledreport-list-form')
+	->setName('scheduledreport-list-form');
 
 $csrf_token = CCsrfTokenHelper::get('scheduledreport');
 
@@ -80,30 +78,39 @@ $form->addItem([
 			'paging' => $data['paging']
 		]),
 		new CActionButtonList('action', 'reportids', [
-			'scheduledreport.enable' => [
-				'name' => _('Enable'),
-				'confirm_singular' => _('Enable selected scheduled report?'),
-				'confirm_plural' => _('Enable selected scheduled reports?'),
-				'disabled' => !$data['allowed_edit'],
-				'csrf_token' => $csrf_token
+			'scheduledreport.massenable' => [
+				'content' => (new CSimpleButton(_('Enable')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massenable-scheduledreport')
+					->addClass('js-no-chkbxrange')
+					->setAttribute('data-disabled', !$data['allowed_edit'])
+					->setEnabled($data['allowed_edit'])
 			],
-			'scheduledreport.disable' => [
-				'name' => _('Disable'),
-				'confirm_singular' => _('Disable selected scheduled report?'),
-				'confirm_plural' => _('Disable selected scheduled reports?'),
-				'disabled' => !$data['allowed_edit'],
-				'csrf_token' => $csrf_token
+			'scheduledreport.massdisable' => [
+				'content' => (new CSimpleButton(_('Disable')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdisable-scheduledreport')
+					->addClass('js-no-chkbxrange')
+					->setAttribute('data-disabled', !$data['allowed_edit'])
+					->setEnabled($data['allowed_edit'])
 			],
-			'scheduledreport.delete' => [
-				'name' => _('Delete'),
-				'confirm_singular' => _('Delete selected scheduled report?'),
-				'confirm_plural' => _('Delete selected scheduled reports?'),
-				'disabled' => !$data['allowed_edit'],
-				'csrf_token' => $csrf_token
+			'scheduledreport.massdelete' => [
+				'content' => (new CSimpleButton(_('Delete')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdelete-scheduledreport')
+					->addClass('js-no-chkbxrange')
+					->setAttribute('data-disabled', !$data['allowed_edit'])
+					->setEnabled($data['allowed_edit'])
 			]
 		], 'scheduledreport')
 	]);
 
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag('
+	view.init();
+'))
+	->setOnDocumentReady()
 	->show();

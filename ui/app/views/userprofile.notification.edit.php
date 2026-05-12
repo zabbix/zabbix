@@ -147,8 +147,8 @@ $tabs->addTab('notificationsTab', _('Frontend notifications'), $messaging_form_l
 
 // Append buttons to form.
 $tabs->setFooter(makeFormFooter(
-	new CSubmit('update', _('Update')),
-	[(new CRedirectButton(_('Cancel'), CMenuHelper::getFirstUrl()))->setId('cancel')]
+	(new CSubmit('', _('Update')))->addClass('js-submit'),
+	[(new CRedirectButton(_('Cancel'), CMenuHelper::getFirstUrl()))->addClass('js-cancel')]
 ));
 
 // Append tab to form.
