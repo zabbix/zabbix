@@ -752,7 +752,7 @@ window.item_edit_form = new class {
 		this.field.trends.toggleAttribute('disabled', disabled);
 		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
 		this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || storage_value_type);
-		this.label.trends_storage_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !storage_value_type);
+		this.label.trends_storage_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || !storage_value_type);
 	}
 
 	#updateValueTypeOptionVisibility() {
