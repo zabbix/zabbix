@@ -179,7 +179,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	public function configurationProvider() {
 		return [
 			self::COMPONENT_SERVER => [
-				'LogFileSize' => 1,
+				'LogFileSize' => 2,
 				'DebugLevel' => 3,
 				'CacheSize' => '128M',
 				'HistoryCacheSize' => '32M',
@@ -241,6 +241,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		$timeout = 3 * self::WAIT_ITERATION_DELAY;
 		$result = null;
 
+		sleep(1);
 		while ((microtime(true) - $start) < $timeout) {
 			$result = $this->testItemOnServer((string) self::$hostid, [
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
@@ -255,7 +256,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 					&& (int) $result['item']['result'] === 1) {
 				break;
 			}
-			$this->sendAgentPing();
+
 			usleep(100000);
 		}
 		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'log_level_decrease=trapper');
