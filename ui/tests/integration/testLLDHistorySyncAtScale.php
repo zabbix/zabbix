@@ -237,7 +237,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 
 		$start = microtime(true);
 		$timeout = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
-		$last_result = null;
+		$result = null;
 
 		while ((microtime(true) - $start) < $timeout) {
 			$result = $this->testItemOnServer((string) self::$hostid, [
@@ -247,22 +247,25 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				'params' => 'last(/'.self::HOSTNAME.'/agent.ping)'
 			]);
 
-			$this->assertNotFalse($result);
-			$this->assertArrayHasKey('item', $result);
-			$this->assertArrayNotHasKey('error', $result['item']);
-			$this->assertArrayHasKey('result', $result['item']);
-
-			$last_result = $result['item']['result'];
-			if ((int) $last_result === 1) {
+			// Until the agent ping reaches the database, the calculated item evaluation
+			// returns an error ("not supported") instead of a result; keep polling.
+			if ($result !== false && isset($result['item']['result'])
+					&& (int) $result['item']['result'] === 1) {
 				break;
 			}
 
 			usleep(100000);
 		}
 
-		$this->assertEquals(1, (int) $last_result,
+		$this->assertNotFalse($result, 'testItem call failed for calculated item.');
+		$this->assertArrayHasKey('item', $result);
+		$this->assertArrayNotHasKey('error', $result['item'],
+				'Calculated item evaluation returned an error: '
+				.($result['item']['error'] ?? ''));
+		$this->assertArrayHasKey('result', $result['item']);
+		$this->assertEquals(1, (int) $result['item']['result'],
 				'Calculated item did not return the agent ping value within timeout, got: '
-				.var_export($last_result, true));
+				.var_export($result['item']['result'], true));
 	}
 
 	/**
