@@ -461,7 +461,7 @@ class CDevice extends CApiService {
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DEVICE, $db_devices);
 
-		return ['deviceid' => $device['deviceid']];
+		return $data;
 	}
 
 	private function validateOffboard(array $data, ?array &$db_devices): void {
