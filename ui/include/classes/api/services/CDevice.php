@@ -142,16 +142,6 @@ class CDevice extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage own devices.'));
-			}
-		}
-		elseif (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
-				&& !self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage user devices.'));
-		}
-
 		$this->validateInit($data);
 
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
@@ -418,17 +408,7 @@ class CDevice extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage own devices.'));
-			}
-		}
-		elseif (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
-				&& !self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage user devices.'));
-		}
-
-		$this->validateOffboard($data, $db_devices);
+		$this->validateOffboard($data, $db_device);
 
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
@@ -443,13 +423,11 @@ class CDevice extends CApiService {
 			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
 		}
 
-		$device = reset($db_devices);
-
-		CUser::deprovisionPushMedia($device['userid'], $device['uuid']);
+		CUser::deprovisionPushMedia($db_device['userid'], $db_device['uuid']);
 
 		$db_token_devices = DB::select('token_device', [
 			'output' => [],
-			'filter' => ['deviceid' => $device['deviceid']],
+			'filter' => ['deviceid' => $db_device['deviceid']],
 			'preservekeys' => true
 		]);
 
@@ -457,14 +435,14 @@ class CDevice extends CApiService {
 
 		DB::delete('token_device', ['tokenid' => $tokenids]);
 		DB::delete('token', ['tokenid' => $tokenids]);
-		DB::delete('device', ['deviceid' => $device['deviceid']]);
+		DB::delete('device', ['deviceid' => $db_device['deviceid']]);
 
-		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DEVICE, $db_devices);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DEVICE, [$db_device['deviceid'] => $db_device]);
 
 		return $data;
 	}
 
-	private function validateOffboard(array $data, ?array &$db_devices): void {
+	private function validateOffboard(array $data, ?array &$db_device): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'uuid' =>	['type' => API_UUID_V7, 'flags' => API_REQUIRED]
 		]];
@@ -475,12 +453,22 @@ class CDevice extends CApiService {
 
 		$db_devices = $this->get([
 			'output' => ['deviceid', 'userid', 'uuid', 'name'],
-			'filter' => ['uuid' => $data['uuid']],
-			'preservekeys' => true
+			'filter' => ['uuid' => $data['uuid']]
 		]);
 
 		if (!$db_devices) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$db_device = $db_devices[0];
+
+		if (bccomp($db_device['userid'], self::$userData['userid']) == 0) {
+			if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage own devices.'));
+			}
+		}
+		elseif (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage user devices.'));
 		}
 	}
 }
