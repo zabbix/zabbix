@@ -169,6 +169,7 @@ class testFormFilter extends CWebTest {
 			$filter->selectTab('update_tab');
 
 			$table->waitUntilReady()->invalidate();
+			$headers = $table->getHeaders();
 
 			if ($i === 0) {
 				$this->query('button:Reset')->one()->click();
@@ -179,6 +180,7 @@ class testFormFilter extends CWebTest {
 			}
 
 			$this->page->waitUntilReady();
+			$headers->waitUntilStalled();
 			$table->waitUntilReady()->invalidate();
 		}
 
@@ -311,7 +313,6 @@ class testFormFilter extends CWebTest {
 	 * @return int
 	 */
 	public function getTableResults($table_selector) {
-sleep(3);
 		$table = $this->query($table_selector)->asDatatable()->one()->waitUntilReady();
 		$result = ($table->query('class:datatable-body')->one()->getText() === 'No data found')
 			? 0
