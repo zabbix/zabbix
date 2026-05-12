@@ -94,7 +94,7 @@ if ($item['itemid']) {
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'item_edit_form.test('.json_encode(['rules' => $data['js_test_validation_rules']]).');'
+			'action' => 'item_edit_form.test();'
 		],
 		[
 			'title' => _('Delete'),
@@ -120,7 +120,7 @@ else {
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'item_edit_form.test('.json_encode(['rules' => $data['js_test_validation_rules']]).');'
+			'action' => 'item_edit_form.test();'
 		]
 	];
 }
