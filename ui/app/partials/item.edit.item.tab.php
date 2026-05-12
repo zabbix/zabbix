@@ -813,7 +813,7 @@ if ($data['source'] === 'item'
 		])))->addClass('js-hint');
 	}
 
-	if ($data['ttl_value_types']) {
+	if ($data['value_type_ttl']) {
 		$storage_hint = (new CSpan(makeWarningIcon(
 			_('Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse.')
 		)))->addClass('js-storage-hint');

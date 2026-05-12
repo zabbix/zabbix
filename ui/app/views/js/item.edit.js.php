@@ -762,7 +762,7 @@ window.item_edit_form = new class {
 	#updateTrendsModeVisibility() {
 		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop(),
 			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.trends.readOnly),
-			storage_value_type = this.ttl_value_types.includes(parseInt(this.field.value_type.value, 10));
+			storage_value_type = parseInt(this.field.value_type.value, 10) in this.value_type_ttl;
 
 		this.field.trends.toggleAttribute('disabled', disabled);
 		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
