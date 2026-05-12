@@ -1473,6 +1473,20 @@ clean:
  ******************************************************************************/
 static void	vmware_service_alarm_uuid_name_update(zbx_vmware_data_t *data)
 {
+#	define	entity_name_update(entity_type, entity_vector_type, entity_vector)		\
+		entity_vector_type	*values = entity_vector;				\
+												\
+		for (int j = 0; j < values->values_num; j++)					\
+		{										\
+			entity_type	*entity = values->values[j];				\
+												\
+			if (0 != strcmp(entity->id, alarm->entity_id))				\
+				continue;							\
+												\
+			alarm->entity_name = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(entity->name));\
+			break;									\
+		}
+
 	int	i, skipped = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alerts:%d", __func__, data->alarms.values_num);
@@ -1558,6 +1572,19 @@ static void	vmware_service_alarm_uuid_name_update(zbx_vmware_data_t *data)
 
 			alarm->entity_uuid = zbx_strdup(NULL, data->datastores.values[j]->uuid);
 			alarm->entity_name = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(data->datastores.values[j]->name));
+		}
+		else if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_CLUSTER))
+		{
+			entity_name_update(zbx_vmware_cluster_t, zbx_vector_vmware_cluster_ptr_t, &data->clusters);
+		}
+		else if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_DC))
+		{
+			entity_name_update(zbx_vmware_datacenter_t, zbx_vector_vmware_datacenter_ptr_t,
+					&data->datacenters);
+		}
+		else if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_DVS))
+		{
+			entity_name_update(zbx_vmware_dvswitch_t, zbx_vector_vmware_dvswitch_ptr_t, &data->dvswitches);
 		}
 		else
 		{
