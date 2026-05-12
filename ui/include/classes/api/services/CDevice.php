@@ -213,35 +213,35 @@ class CDevice extends CApiService {
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
+
+			return;
 		}
-		else {
-			if (bccomp($data['userid'], self::$userData['userid']) == 0) {
-				if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage own devices.'));
-				}
+
+		if (bccomp($data['userid'], self::$userData['userid']) == 0) {
+			if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage own devices.'));
 			}
-			else {
-				if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage user devices.'));
-				}
 
-				$db_users = API::User()->get([
-					'output' => ['username'],
-					'selectRole' => ['roleid'],
-					'userids' => $data['userid']
-				]);
+			return;
+		}
 
-				if (!$db_users) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
+		if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage user devices.'));
+		}
 
-				if ($db_users[0]['username'] === ZBX_GUEST_USER
-						|| !CRoleHelper::checkAccess(CRoleHelper::DEVICES_ACCESS, $db_users[0]['role']['roleid'])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('User is not allowed to use linked devices.'));
-				}
-			}
+		$db_users = API::User()->get([
+			'output' => ['username'],
+			'selectRole' => ['roleid'],
+			'userids' => $data['userid']
+		]);
+
+		if (!$db_users) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		if ($db_users[0]['username'] === ZBX_GUEST_USER
+				|| !CRoleHelper::checkAccess(CRoleHelper::DEVICES_ACCESS, $db_users[0]['role']['roleid'])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('User is not allowed to use linked devices.'));
 		}
 	}
 
