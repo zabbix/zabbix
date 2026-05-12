@@ -423,18 +423,21 @@ class CDevice extends CApiService {
 			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
 		}
 
-		CUser::deprovisionPushMedia($db_device['userid'], $db_device['uuid']);
+		if ($db_device['userid'] != 0) {
+			CUser::deprovisionPushMedia($db_device['userid'], $db_device['uuid']);
 
-		$db_token_devices = DB::select('token_device', [
-			'output' => [],
-			'filter' => ['deviceid' => $db_device['deviceid']],
-			'preservekeys' => true
-		]);
+			$db_token_devices = DB::select('token_device', [
+				'output' => [],
+				'filter' => ['deviceid' => $db_device['deviceid']],
+				'preservekeys' => true
+			]);
 
-		$tokenids = array_keys($db_token_devices);
+			$tokenids = array_keys($db_token_devices);
 
-		DB::delete('token_device', ['tokenid' => $tokenids]);
-		DB::delete('token', ['tokenid' => $tokenids]);
+			DB::delete('token_device', ['tokenid' => $tokenids]);
+			DB::delete('token', ['tokenid' => $tokenids]);
+		}
+
 		DB::delete('device', ['deviceid' => $db_device['deviceid']]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DEVICE, [$db_device['deviceid'] => $db_device]);
