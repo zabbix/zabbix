@@ -207,7 +207,7 @@ class CConfigFile {
 			if (is_array($HISTORY)
 					&& array_key_exists('types', $HISTORY) && is_array($HISTORY['types'])
 					&& array_key_exists('url', $HISTORY) && (is_array($HISTORY['url']) || is_string($HISTORY['url']))) {
-				$HISTORY_PROVIDERS = $this->getHistoryProvidersDeprecated($HISTORY);
+				$HISTORY_PROVIDERS = $this->validateHistoryProvidersDeprecated($HISTORY);
 			}
 			else {
 				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', '$HISTORY',
@@ -223,7 +223,7 @@ class CConfigFile {
 				);
 			}
 
-			$this->config['HISTORY_PROVIDERS'] = $this->getHistoryProviders($HISTORY_PROVIDERS);
+			$this->config['HISTORY_PROVIDERS'] = $this->validateHistoryProviders($HISTORY_PROVIDERS);
 		}
 
 		if (isset($SSO)) {
@@ -441,11 +441,12 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 	}
 
 	/**
-	 * Get history storage configuration.
+	 * Get valid history storage configuration.
 	 *
 	 * @param array $providers
+	 * @throws ConfigFileException
 	 */
-	protected function getHistoryProviders(array $providers): array {
+	protected function validateHistoryProviders(array $providers): array {
 		$result = [];
 		$value_types = [];
 		$required = [
@@ -497,13 +498,13 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 	}
 
 	/**
-	 * Get Elastic history storage configuration from deprecated format.
+	 * Get valid Elastic history storage configuration from deprecated format.
 	 * Return array of providers configurations in format compatible with $HISTORY_PROVIDERS configuration.
 	 *
 	 * @param array $config
-	 * @see self::getHistoryProviders()
+	 * @throws ConfigFileException
 	 */
-	protected function getHistoryProvidersDeprecated(array $config): array {
+	protected function validateHistoryProvidersDeprecated(array $config): array {
 		if (is_string($config['url'])) {
 			return [[
 				'types' => $config['types'],
