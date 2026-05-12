@@ -144,7 +144,8 @@ window.item_edit_form = new class {
 			username: this.form_element.querySelector('[for=username]'),
 			ipmi_sensor: this.form_element.querySelector('[for="ipmi_sensor"]'),
 			history_hint: this.form_element.querySelector('[for="history"] .js-hint'),
-			trends_hint: this.form_element.querySelector('[for="trends"] .js-hint')
+			trends_hint: this.form_element.querySelector('[for="trends"] .js-hint'),
+			trends_storage_hint: this.form_element.querySelector('[for="trends"] .js-storage-hint'),
 		};
 		jQuery('#parameters-table').dynamicRows({
 			template: '#parameter-row-tmpl',
@@ -745,11 +746,13 @@ window.item_edit_form = new class {
 
 	#updateTrendsModeVisibility() {
 		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop(),
-			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.trends.readOnly);
+			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.trends.readOnly),
+			storage_value_type = this.ttl_value_types.includes(parseInt(this.field.value_type.value, 10));
 
 		this.field.trends.toggleAttribute('disabled', disabled);
 		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-		this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+		this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || storage_value_type);
+		this.label.trends_storage_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !storage_value_type);
 	}
 
 	#updateValueTypeOptionVisibility() {
