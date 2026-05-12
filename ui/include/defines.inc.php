@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0beta1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050053);
+define('ZABBIX_DB_VERSION',		7050055);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -659,6 +659,7 @@ define('ZBX_DEFAULT_KEY_SSH',					'ssh.run[<unique short description>,<ip>,<port
 define('ZBX_DEFAULT_KEY_TELNET',				'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');
 
 define('ZBX_DEFAULT_JMX_ENDPOINT',	'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi');
+define('ZBX_DEFAULT_TRAPPER_HOSTS',	'{$TRAPPER.ALLOWED_HOSTS}');
 
 define('SYSMAP_ELEMENT_USE_ICONMAP_ON',		1);
 define('SYSMAP_ELEMENT_USE_ICONMAP_OFF',	0);

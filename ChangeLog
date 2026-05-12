@@ -1,6 +1,9 @@
 Changes for 8.0.0beta1
 
 New features:
+.........T [ZBXNEXT-10311] fixed gauge widget, and implemented minor fixes for 'PostgreSQL by ODBC' template (smansurovs)
+..F....... [ZBXNEXT-8788] implemented inline form validation for Scheduled reports form (msnihach, talbergs)
+.........T [ZBXNEXT-8733] added Podman template (abakaldin)
 .........T [ZBXNEXT-9722] added authentication macros to Redis by Zabbix agent 2 template (smansurovs)
 A.F....... [ZBXNEXT-8791] implemented inline validation in event correlation form (miks, talbergs)
 ..F....... [ZBXNEXT-9754] added inline validation to proxy groups form (talbergs)
@@ -34,6 +37,7 @@ A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25
 A...I..PS. [ZBXNEXT-10076] changed delayed deletion process via housekeeper table (agriscenko, askolmeisters)
 
 Bug fixes:
+..F....... [ZBX-27441] fixed rendering of working days on graphs when only a single working day is defined (Sasha)
 .......PS. [ZBX-27496] improved network discovery subsystem to work with snmpv1 and snmpv2c checks (MVekslers)
 .......P.. [ZBX-27399] fixed possible deadlocks in configuration cache sync (sboidenko)
 .........T [ZBX-27592] fixed memory items becoming unsupported in Apache templates (kflorowski)
@@ -294,6 +298,18 @@ Bug fixes:
 .......PS. [ZBX-25752] reduced memory allocations in preprocessing manager (wiper)
 A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
 .......PS. [ZBX-27638] prohibited to modify or override global system JavaScript objects via user script for preprocessing subsystem and zabbix_js (MVekslers)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.11rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.4.10
+
+7.4.10rc1 was released as 7.4.10 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.4.10rc1
@@ -1696,6 +1712,18 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.27rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.26
+
+7.0.26rc1 was released as 7.0.26 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.26rc1
@@ -5750,6 +5778,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.47rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.46
+
+6.0.46rc1 was released as 6.0.46 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.46rc1

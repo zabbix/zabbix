@@ -764,8 +764,54 @@ static int	DBpatch_7050052(void)
 
 static int	DBpatch_7050053(void)
 {
-	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str,value_int) values"
-			"('banner_data',1,'',0)"))
+	zbx_db_result_t	result;
+	const char	*macro = "{$TRAPPER.ALLOWED_HOSTS}";
+	int		ret = SUCCEED;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (NULL == (result = zbx_db_select("select macro from globalmacro where macro='%s'", macro)))
+		return FAIL;
+
+	if (NULL == zbx_db_fetch(result))
+	{
+		if (ZBX_DB_OK > zbx_db_execute("insert into globalmacro (globalmacroid,macro,value,description)"
+				" values (" ZBX_FS_UI64 ",'%s','127.0.0.1,::1','')", zbx_db_get_maxid("globalmacro"),
+				macro))
+		{
+			ret = FAIL;
+		}
+	}
+
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_7050054(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 2  - ITEM_TYPE_TRAPPER   */
+	/* 19 - ITEM_TYPE_HTTPAGENT */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update items"
+				" set trapper_hosts='0.0.0.0/0,::/0'"
+				" where (type=2 or (type=19 and allow_traps=1))"
+					" and trapper_hosts=''"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050055(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str) values"
+			"('banner_data',1,'')"))
 	{
 		return FAIL;
 	}
@@ -833,5 +879,7 @@ DBPATCH_ADD(7050050, 0, 1)
 DBPATCH_ADD(7050051, 0, 1)
 DBPATCH_ADD(7050052, 0, 1)
 DBPATCH_ADD(7050053, 0, 1)
+DBPATCH_ADD(7050054, 0, 1)
+DBPATCH_ADD(7050055, 0, 1)
 
 DBPATCH_END()
