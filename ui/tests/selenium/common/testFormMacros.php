@@ -1296,12 +1296,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 		else if ($host_type === 'template') {
 			$this->page->login()
 					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
 			$this->page->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id);
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		}
 

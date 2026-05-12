@@ -201,6 +201,8 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->assertEquals('Cause', $event_table->findRow('Name', 'Rank')->getColumn('Value')->getText());
 
 		$this->page->navigateBack();
+		$this->page->waitUntilReady();
+		$table->waitUntilReady()->invalidate();
 		$symptom = $table->findRow('Problem', 'Problem trap>10 [Symptom]');
 		$this->isCollapsed($cause, $symptom, true);
 		$cause->query(self::EXPAND_XPATH)->one()->click();
