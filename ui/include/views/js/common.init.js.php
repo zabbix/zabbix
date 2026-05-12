@@ -53,12 +53,12 @@
 		url.searchParams.set('action', 'profile.update');
 		url.searchParams.set('output', 'ajax');
 
-		const body = new URLSearchParams();
+		const body = new FormData();
 		body.set('idx', idx);
 		body.set(value_fields[profile_type], value);
 
-		for (const idx2_value of idx2) {
-			body.append('idx2[]', idx2_value);
+		for (const idx2_value of (idx2 ?? [])) {
+			body.append('idx2[]', String(idx2_value));
 		}
 
 		body.set(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('profile')) ?>);
