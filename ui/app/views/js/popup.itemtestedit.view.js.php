@@ -83,7 +83,7 @@ window.itemtestedit_view_popup = new class {
 
 		this.#form_element.querySelectorAll('.js-copy-button').forEach(button => {
 			button.addEventListener('click', this.#onCopyButtonClick);
-		})
+		});
 
 		this.#form_element.querySelector('.js-get-value-submit')?.addEventListener('click', () => this.#getValue());
 		this.#footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
