@@ -538,13 +538,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 				$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 
 				$column = $this->getNameColumn($name);
-				$column->query('link', $name)->asPopupButton()->one()->select('Host');
+				$column->query('link', $name)->asPopupButton()->waitUntilPresent()->one()->select('Host');
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
 			else if ($host_type === 'template') {
 				$this->page->login()
 						->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-				$this->query('link', $name)->one()->click();
+				$this->query('link', $name)->waitUntilClickable()->one()->click();
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
 			else {
@@ -655,7 +655,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		else if ($host_type === 'template') {
 			$this->page->login()
 					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
@@ -664,7 +664,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->page->login()->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id.
 					'&hostid='.$id
 			);
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->waitUntilVisible()->asForm()->one();
 		}
 
@@ -934,12 +934,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 		else if ($host_type === 'template') {
 			$this->page->login()
 					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
 			$this->page->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id);
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 
@@ -1235,7 +1235,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 		else {
 			$this->page->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id);
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			COverlayDialogElement::find()->waitUntilReady();
 		}
 
