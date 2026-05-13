@@ -358,7 +358,7 @@ foreach ($data['labels']['actions'] as $action => $label) {
 	$actions[] = (new CDiv(
 		(new CCheckBox('actions[]', $action))
 			->setId($action)
-			->setChecked(array_key_exists($action, $data['rules']['actions'])&& $data['rules']['actions'][$action])
+			->setChecked(array_key_exists($action, $data['rules']['actions']) && $data['rules']['actions'][$action])
 			->setReadonly($data['readonly'])
 			->setLabel($label)
 	))

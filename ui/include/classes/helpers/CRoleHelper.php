@@ -80,6 +80,7 @@ class CRoleHelper {
 	public const ACTIONS_CHANGE_PROBLEM_RANKING = 'actions.change_problem_ranking';
 	public const ACTIONS_EDIT_OWN_MEDIA = 'actions.edit_own_media';
 	public const ACTIONS_EDIT_USER_MEDIA = 'actions.edit_user_media';
+	public const ACTIONS_SELECT_SERVER_FOR_MONITORING = 'actions.select_server_for_monitoring';
 
 	public const UI_SECTION_DASHBOARDS = 'ui.dashboards';
 	public const UI_SECTION_MONITORING = 'ui.monitoring';
@@ -304,6 +305,7 @@ class CRoleHelper {
 			$rules[] = self::ACTIONS_EDIT_MAINTENANCE;
 			$rules[] = self::ACTIONS_MANAGE_SCHEDULED_REPORTS;
 			$rules[] = self::ACTIONS_MANAGE_SLA;
+			$rules[] = self::ACTIONS_SELECT_SERVER_FOR_MONITORING;
 		}
 
 		$rules = array_merge($rules, [self::ACTIONS_INVOKE_EXECUTE_NOW, self::ACTIONS_CHANGE_PROBLEM_RANKING,
@@ -553,6 +555,10 @@ class CRoleHelper {
 		if ($user_type === USER_TYPE_SUPER_ADMIN) {
 			$labels += [self::ACTIONS_EDIT_USER_MEDIA => _('Create and edit user media')];
 		}
+
+		$labels += [
+			self::ACTIONS_SELECT_SERVER_FOR_MONITORING => _('Select "Server" for monitoring')
+		];
 
 		return $labels;
 	}
