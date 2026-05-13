@@ -246,46 +246,24 @@ if ($data['maintenanceid'] !== null) {
 	$buttons = [
 		[
 			'title' => _('Update'),
-			'class' => 'js-update',
+			'class' => 'js-submit',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'enabled' => $data['allowed_edit'],
-			'action' => 'maintenance_edit.submit();'
+			'enabled' => $data['allowed_edit']
 		],
 		[
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'enabled' => $data['allowed_edit'],
-			'action' => 'maintenance_edit.clone('.json_encode([
-				'rules' => $data['js_clone_validation_rules'],
-				'title' => _('New maintenance period'),
-				'buttons' => [
-					[
-						'title' => _('Add'),
-						'class' => 'js-add',
-						'keepOpen' => true,
-						'isSubmit' => true,
-						'action' => 'maintenance_edit.submit();'
-					],
-					[
-						'title' => _('Cancel'),
-						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
-						'cancel' => true,
-						'action' => ''
-					]
-				]
-			]).');'
+			'enabled' => $data['allowed_edit']
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete maintenance period?'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'enabled' => $data['allowed_edit'],
-			'action' => 'maintenance_edit.delete();'
+			'enabled' => $data['allowed_edit']
 		]
 	];
 }
@@ -294,10 +272,9 @@ else {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => 'js-add',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'maintenance_edit.submit();'
+			'isSubmit' => true
 		]
 	];
 }
@@ -311,10 +288,11 @@ $output = [
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('maintenance.edit.js.php').
 		'maintenance_edit.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'clone_rules' => $data['js_clone_validation_rules'],
 			'timeperiods' => $data['timeperiods'],
 			'tags' => $data['tags'],
-			'allowed_edit' => $data['allowed_edit'],
-			'rules' => $data['js_validation_rules']
+			'allowed_edit' => $data['allowed_edit']
 		]).');'
 ];
 

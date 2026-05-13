@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        php: [7.4, 8.0, 8.1, 8.2, 8.3]
+        php: [8.2, 8.3, 8.4, 8.5]
 
     steps:
       - name: Checkout
@@ -46,3 +46,10 @@ jobs:
       - name: Ensure example runs
         working-directory: example
         run: php index.php
+
+  ci_success:
+    name: CI Success
+    runs-on: ubuntu-latest
+    needs: [ci]
+    steps:
+      - run: echo "All CI jobs passed successfully"

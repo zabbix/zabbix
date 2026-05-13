@@ -63,19 +63,15 @@
 
 			const clone = document.getElementById('clone');
 
-			if (clone) {
-				clone.addEventListener('click', () => this.#clone());
-			}
+			this.form_element.querySelector('.table-forms .tfoot-buttons .js-clone')
+				?.addEventListener('click', () => this.#clone());
 
-			const delete_btn = document.getElementById('delete');
-
-			if (delete_btn) {
-				delete_btn.addEventListener('click', () => this.#delete(delete_btn.getAttribute('data-redirect-url')));
-			}
+			this.form_element.querySelector('.table-forms .tfoot-buttons .js-delete')
+				?.addEventListener('click', () => this.#delete());
 		}
 
 		submit() {
-			this.#setLoadingStatus(['add', 'update']);
+			this.#setLoadingStatus('js-submit');
 			clearMessages();
 
 			const fields = this.form.getAllValues();
@@ -99,15 +95,18 @@
 					})
 						.then(response => response.json())
 						.then(response => {
+							if ('error' in response) {
+								throw {error: response.error};
+							}
+
 							if ('form_errors' in response) {
 								this.form.setErrors(response.form_errors, true, true);
 								this.form.renderErrors();
-								this.#unsetLoadingStatus();
+
+								return;
 							}
-							else if ('error' in response) {
-								throw {error: response.error};
-							}
-							else {
+
+							if ('success' in response) {
 								postMessageOk(response.success.title);
 
 								if ('messages' in response.success) {
@@ -118,7 +117,8 @@
 								location.href = curl.getUrl();
 							}
 						})
-						.catch(exception => this.#ajaxExceptionHandler(exception));
+						.catch(exception => this.#ajaxExceptionHandler(exception))
+						.finally(() => this.#unsetLoadingStatus());
 				});
 		}
 
@@ -141,15 +141,22 @@
 			this.#unsetLoadingStatus();
 		}
 
-		#delete(url) {
+		#delete() {
 			if (window.confirm('<?=_('Delete regular expression?') ?>')) {
-				this.#setLoadingStatus(['delete']);
-				redirect(url, 'post', 'action', undefined, true);
+				this.#setLoadingStatus('js-delete');
+
+				const params = {
+					action: 'regex.delete',
+					regexpids: [this.form.findFieldByName('regexpid').getValue()]
+				};
+				params[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('regex')) ?>;
+
+				redirect(zabbixUrl(params), 'post', 'action', undefined, true);
 			}
 		}
 
 		#clone() {
-			this.#setLoadingStatus(['clone']);
+			this.#setLoadingStatus('js-clone');
 
 			const curl = new Curl(this.form_element.getAttribute('action'));
 			const {name, expressions, test_string} = this.form.getAllValues();
@@ -217,35 +224,27 @@
 				.finally(() => this.#unsetTestLoadingStatus());
 		}
 
-		#setLoadingStatus(loading_ids) {
-			[
-				document.getElementById('add'),
-				document.getElementById('clone'),
-				document.getElementById('delete'),
-				document.getElementById('update')
-			].forEach(button => {
-				if (button) {
-					button.setAttribute('disabled', true);
+		#setLoadingStatus(loading_btn_class) {
+			this.form_element.classList.add('is-loading', 'is-loading-fadein');
 
-					if (loading_ids.includes(button.id)) {
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)')
+				.forEach(button => {
+					button.disabled = true;
+
+					if (button.classList.contains(loading_btn_class)) {
 						button.classList.add('is-loading');
 					}
-				}
-			});
+				});
 		}
 
 		#unsetLoadingStatus() {
-			[
-				document.getElementById('add'),
-				document.getElementById('clone'),
-				document.getElementById('delete'),
-				document.getElementById('update')
-			].forEach(button => {
-				if (button) {
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)')
+				.forEach(button => {
 					button.classList.remove('is-loading');
-					button.removeAttribute('disabled');
-				}
-			});
+					button.disabled = false;
+				});
+
+			this.form_element.classList.remove('is-loading', 'is-loading-fadein');
 		}
 
 		#setTestLoadingStatus() {
@@ -253,8 +252,8 @@
 			const textarea = document.getElementById('test-string');
 
 			button.classList.add('is-loading');
-			button.setAttribute('disabled', true);
-			textarea.setAttribute('disabled', true);
+			button.disabled = true;
+			textarea.disabled = true;
 		}
 
 		#unsetTestLoadingStatus() {
@@ -262,8 +261,8 @@
 			const textarea = document.getElementById('test-string');
 
 			button.classList.remove('is-loading');
-			button.removeAttribute('disabled');
-			textarea.removeAttribute('disabled');
+			button.disabled = false;
+			textarea.disabled = false;
 		}
 
 		#showTestResult(response, expressions) {
@@ -337,11 +336,11 @@
 				const delimiter = target.closest('tr').querySelector('.js-expression-delimiter-select');
 
 				if (target.value == <?= EXPRESSION_TYPE_ANY_INCLUDED ?>) {
-					delimiter.removeAttribute('disabled');
+					delimiter.disabled = false;
 					delimiter.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 				}
 				else {
-					delimiter.setAttribute('disabled', true);
+					delimiter.disabled = true;
 					delimiter.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 				}
 			}

@@ -41,8 +41,8 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$RABBITMQ.API.USER}||`zbx_monitor`|
-|{$RABBITMQ.API.PASSWORD}||`zabbix`|
+|{$RABBITMQ.API.USER}|<p>RabbitMQ API username.</p>|`zbx_monitor`|
+|{$RABBITMQ.API.PASSWORD}|<p>RabbitMQ API password.</p>|`zabbix`|
 |{$RABBITMQ.API.CLUSTER_HOST}|<p>The hostname or IP of the API endpoint for the RabbitMQ cluster.</p>||
 |{$RABBITMQ.API.PORT}|<p>The port of the RabbitMQ API endpoint.</p>|`15672`|
 |{$RABBITMQ.API.SCHEME}|<p>The request scheme, which may be HTTP or HTTPS.</p>|`http`|
@@ -174,8 +174,8 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$RABBITMQ.API.USER}||`zbx_monitor`|
-|{$RABBITMQ.API.PASSWORD}||`zabbix`|
+|{$RABBITMQ.API.USER}|<p>RabbitMQ API username.</p>|`zbx_monitor`|
+|{$RABBITMQ.API.PASSWORD}|<p>RabbitMQ API password.</p>|`zabbix`|
 |{$RABBITMQ.CLUSTER.NAME}|<p>The name of the RabbitMQ cluster.</p>|`rabbit`|
 |{$RABBITMQ.API.PORT}|<p>The port of the RabbitMQ API endpoint.</p>|`15672`|
 |{$RABBITMQ.API.SCHEME}|<p>The request scheme, which may be HTTP or HTTPS.</p>|`http`|
