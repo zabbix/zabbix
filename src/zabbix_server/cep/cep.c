@@ -894,13 +894,14 @@ void	cep_resolve_trigger_events(zbx_cep_t *cep, zbx_cep_event_t *r_event, zbx_ve
  *             correlation_tag  - [IN]     correlation tag name               *
  *             tags             - [IN]     correlation tags                   *
  *             events           - [OUT]    matching events to close           *
+ *             obj_value        - [OUT]    resulting trigger value            *
  *                                                                            *
  * Return value: new event ID or 0 if no events can be closed                 *
  *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	cep_close_trigger_events(zbx_cep_t *cep, zbx_uint64_t triggerid,
 		const zbx_vector_uint64_t *dep_triggerids, unsigned char correlation_mode, const char *correlation_tag,
-		const zbx_vector_tags_ptr_t *tags, zbx_vector_cep_event_handle_t *events)
+		const zbx_vector_tags_ptr_t *tags, zbx_vector_cep_event_handle_t *events, int *obj_value)
 {
 	zbx_cep_origin_t	origin = {
 					.source = EVENT_SOURCE_TRIGGERS,
@@ -938,8 +939,13 @@ zbx_uint64_t	cep_close_trigger_events(zbx_cep_t *cep, zbx_uint64_t triggerid,
 	if (0 == events->values_num)
 		return 0;
 
-	if (0 == obj->events.values_num && 0 == obj->pending_events_num)
-		zbx_hashset_remove_direct(&cep->objects, obj);
+	if (0 == obj->events.values_num)
+	{
+		*obj_value = TRIGGER_VALUE_OK;
+
+		if (0 == obj->pending_events_num)
+			zbx_hashset_remove_direct(&cep->objects, obj);
+	}
 
 	return cep_eventid_next(cep);
 }
@@ -952,12 +958,13 @@ zbx_uint64_t	cep_close_trigger_events(zbx_cep_t *cep, zbx_uint64_t triggerid,
  *             triggerid - [IN]  trigger ID                                   *
  *             eventid   - [IN]  event ID                                     *
  *             handles   - [OUT] handle of event to close                     *
+ *             obj_value      - [OUT]    resulting trigger value              *
  *                                                                            *
  * Return value: new event ID or 0 if the specified event cannot be closed    *
  *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	cep_close_trigger_event_by_eventid(zbx_cep_t *cep, zbx_uint64_t triggerid, zbx_uint64_t eventid,
-		zbx_vector_cep_event_handle_t *handles)
+		zbx_vector_cep_event_handle_t *handles, int *obj_value)
 {
 	zbx_cep_object_t	*obj;
 	zbx_cep_origin_t        origin = {
@@ -989,8 +996,13 @@ zbx_uint64_t	cep_close_trigger_event_by_eventid(zbx_cep_t *cep, zbx_uint64_t tri
 	if (0 == handles->values_num)
 		return 0;
 
-	if (0 == obj->events.values_num && 0 == obj->pending_events_num)
-		zbx_hashset_remove_direct(&cep->objects, obj);
+	if (0 == obj->events.values_num)
+	{
+		*obj_value = TRIGGER_VALUE_OK;
+
+		if (0 == obj->pending_events_num)
+			zbx_hashset_remove_direct(&cep->objects, obj);
+	}
 
 	return cep_eventid_next(cep);
 }

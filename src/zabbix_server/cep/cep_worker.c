@@ -135,7 +135,7 @@ static void	cep_worker_add_close_problem(zbx_cep_worker_t *worker, zbx_cep_task_
 
 	zbx_mw_queue_lock(worker->base.queue);
 	cep_queue_push((zbx_cep_queue_t *)worker->base.queue, t);
-	zbx_mw_queue_lock(worker->base.queue);
+	zbx_mw_queue_unlock(worker->base.queue);
 }
 
 /******************************************************************************
@@ -449,7 +449,6 @@ static void	cep_worker_resolve_trigger_events(zbx_db_event *db_event, zbx_uint64
 	cep_resolve_trigger_events(cep, r_event, handles);
 	cep_cache_release(&cep);
 
-	task->obj_value = TRIGGER_VALUE_OK;
 	task->event_op = CEP_EVENT_CLOSE;
 	zbx_cep_get_eventids_from_handles(handles->values, handles->values_num, &task->eventids);
 
@@ -492,7 +491,7 @@ static void	cep_worker_close_trigger_event(zbx_cep_task_event_t *task)
 	cep_cache_acquire(&cep);
 	r_eventid = cep_close_trigger_events(cep, db_event->objectid, &db_event->trigger.dep_triggerids,
 			db_event->trigger.correlation_mode, db_event->trigger.correlation_tag, &db_event->tags,
-			&handles);
+			&handles, &task->obj_value);
 	cep_cache_release(&cep);
 
 	if (0 != r_eventid)
@@ -661,7 +660,8 @@ static void	cep_worker_process_task_close_event(zbx_cep_task_close_event_t *task
 	zbx_vector_cep_event_handle_create(&handles);
 
 	cep_cache_acquire(&cep);
-	r_eventid = cep_close_trigger_event_by_eventid(cep, db_event->objectid, task->eventid, &handles);
+	r_eventid = cep_close_trigger_event_by_eventid(cep, db_event->objectid, task->eventid, &handles,
+			&task->parent.obj_value);
 	cep_cache_release(&cep);
 
 	if (0 != r_eventid)
