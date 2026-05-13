@@ -1,0 +1,1 @@
+..F....... [ZBX-27533] changed host form agent port validation to accept values from 1024 to 32767 (aluchko)

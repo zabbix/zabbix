@@ -39,7 +39,6 @@ func queryDockerAPI(ctx plugin.ContextProvider, client *http.Client, query strin
 		"http://"+path.Join(dockerVersion, query),
 		http.NoBody,
 	)
-
 	if err != nil {
 		return nil, errs.Wrap(err, "failed to create request")
 	}

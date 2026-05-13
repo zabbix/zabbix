@@ -152,6 +152,7 @@ class testNestedLLD extends CIntegrationTest{
 			'key_' => self::LLDRULE_MAIN,
 			'hostid' => self::$templateid_main,
 			'type' => ITEM_TYPE_TRAPPER,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'delay' => 0,
 			'lifetime' => '7d',
 			'lld_macro_paths' => [
@@ -271,6 +272,7 @@ class testNestedLLD extends CIntegrationTest{
 			'hostid' => self::$templateid_main,
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'delay' => 0,
 			'ruleid' => self::$lld_ruleid_main
 		]);
@@ -312,6 +314,7 @@ class testNestedLLD extends CIntegrationTest{
 			'key_' => self::LLDRULE_ITEMTYPES,
 			'hostid' => self::$templateid_item_types,
 			'type' => ITEM_TYPE_TRAPPER,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'delay' => 0,
 			'lifetime' => '7d'
 		]);
@@ -325,6 +328,7 @@ class testNestedLLD extends CIntegrationTest{
 			'hostid' => self::$templateid_item_types,
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'delay' => 0,
 			'ruleid' => self::$lld_ruleid_item_types
 		]);
@@ -424,6 +428,7 @@ class testNestedLLD extends CIntegrationTest{
 			'key_' => self::LLDRULE_KEY_ROOT,
 			'hostid' => self::$hostid_macros,
 			'type' => ITEM_TYPE_TRAPPER,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'lld_macro_paths' => [
 				[
 					'lld_macro' => '{#L0}',
@@ -441,6 +446,7 @@ class testNestedLLD extends CIntegrationTest{
 			'hostid' => self::$hostid_macros,
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'ruleid' => self::$lld_ruleid_macros_root
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -477,6 +483,7 @@ class testNestedLLD extends CIntegrationTest{
 			'hostid' => self::$hostid_macros,
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'ruleid' => self::$lld_drule_protoid_macros_1st_level
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);

@@ -89,53 +89,63 @@ class testHistoryPush extends CIntegrationTest {
 			[
 				'key_' => 'trapper_uint',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_uint2',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_uint_host_key_test',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_uint_no_perms',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_uint_bad_valuetype',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_uint_disabled',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'status' => ITEM_STATUS_DISABLED
+				'status' => ITEM_STATUS_DISABLED,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_float',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_FLOAT
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_log',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_LOG
+				'value_type' => ITEM_VALUE_TYPE_LOG,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_text',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_TEXT
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_str',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_STR
+				'value_type' => ITEM_VALUE_TYPE_STR,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_text_bad_allow_hosts',
@@ -149,7 +159,8 @@ class testHistoryPush extends CIntegrationTest {
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'url' => 'http://127.0.0.1:7123/httptest',
 				'delay' => '10s',
-				'allow_traps' => 1
+				'allow_traps' => 1,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'http_agent_text_no_trap',
