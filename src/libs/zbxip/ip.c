@@ -43,8 +43,10 @@ int	zbx_is_rfc_hostname(const char *host)
 	/* with clarifications in RFC 1123, RFC 2181. */
 
 	/* Host name should start with [0-9A-Za-z] */
-	if ('\0' == *p || 0x80 == (0x80 & *p) || 0 == isalnum(*p++))
+	if ('\0' == *p || 0x80 == (0x80 & *p) || 0 == isalnum(*p))
 		return FAIL;
+	else if (0 == isdigit(*p++))
+		is_purely_numeric = 0;
 
 	while ('\0' != *p)
 	{

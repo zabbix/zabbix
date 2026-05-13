@@ -130,4 +130,10 @@ in:
   string: "192.168.10.4"
 out:
   return: FAIL
+---
+test case: "23. Almost numeric a92.168.10.4"
+in:
+  string: "a92.168.10.4"
+out:
+  return: SUCCEED
 ...
