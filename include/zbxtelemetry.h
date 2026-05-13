@@ -16,6 +16,7 @@
 #define ZABBIX_ZBXTELEMETRY_H
 
 #include "zbxalgo.h"
+#include "zbxdb.h"
 
 typedef int	(*zbx_tq_macro_expand_func_t)(char **text, void *ctx);
 
@@ -140,6 +141,7 @@ void	zbx_tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t now,
 
 int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_vector_str_t *values);
 int	zbx_tq_elastic_parse_resp(const zbx_tq_query_t *query, const char *resp, zbx_vector_str_t *values);
+int	zbx_tq_parse_sql_result(const zbx_tq_query_t *query, zbx_db_result_t result, zbx_vector_str_t *values);
 
 const char	*zbx_tq_elastic_get_index_name(zbx_tq_category_t category, zbx_tq_metric_type_t metric_type);
 

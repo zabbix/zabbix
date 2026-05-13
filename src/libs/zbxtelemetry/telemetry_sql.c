@@ -226,7 +226,7 @@ static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, zbx_t
 			char	*path = zbx_strdup(NULL, col->key);
 
 			zbx_json_escape(&path);
-			path = zbx_dsprintf(path, "$[\"%s\"]", path);
+			path = zbx_dsprintf(path, "$.\"%s\"", path);
 
 			char	*extract_expr = tq_sql_dyn_get_json_extract(col->name, path, db_type);
 
@@ -676,7 +676,7 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, tim
 			"AS rounded_time,",
 			timestamp_filter_lower_bound, query->aggregation_size, query->aggregation_size,
 			timestamp_filter_lower_bound);
-	zbx_snprintf_alloc(sql, &alloc, &offset, "EXTRACT(EPOCH FROM MIN(\"Timestamp\")) AS starttime,");
+	zbx_snprintf_alloc(sql, &alloc, &offset, "EXTRACT(EPOCH FROM MIN(\"Timestamp\"))::bigint AS starttime,");
 	if (query_has_columns)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "%s,", columns_to_select);
 	zbx_snprintf_alloc(sql, &alloc, &offset, "%s ", aggr_columns_to_select);

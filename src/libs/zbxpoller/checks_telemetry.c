@@ -16,6 +16,7 @@
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
+#include "zbxdb.h"
 #include "zbxtelemetry.h"
 #include "zbxstr.h"
 
@@ -117,16 +118,14 @@ out:
 	return ret;
 }
 
-static int get_value_telemetry_http(const zbx_dc_item_t *item, zbx_tq_db_type_t db_type, const char *config_source_ip,
-		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, AGENT_RESULT *result)
+static int	get_values_telemetry_http(const zbx_dc_item_t *item, zbx_tq_db_type_t db_type, time_t now,
+		time_t lasttimestamp, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, zbx_vector_str_t *values,
+		char **error)
 {
-	int			ret = NOTSUPPORTED;
-	time_t			now = time(NULL);
-	time_t			lasttimestamp;
-	zbx_vector_str_t	values;
-	char			*error = NULL;
-	char			*url = NULL;
+	int	ret = FAIL;
+	char	*send_error = NULL;
+	char	*url = NULL;
 
 	/* FIXME: placeholder start */
 	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type)
@@ -158,15 +157,114 @@ static int get_value_telemetry_http(const zbx_dc_item_t *item, zbx_tq_db_type_t 
 	};
 	/* FIXME: placeholder end */
 
+	if (SUCCEED != send_query_http(item->telemetry_query, now, lasttimestamp, db_type, &conn_params,
+			config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+			values, &send_error))
+	{
+		*error = zbx_dsprintf(NULL, "Query failed: '%s'", send_error);
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_free(url);
+	zbx_free(send_error);
+
+	return ret;
+}
+#endif
+
+static int	have_required_db(zbx_tq_db_type_t db_type)
+{
+#if defined(HAVE_MYSQL)
+	return ZBX_TQ_DB_TYPE_MYSQL == db_type ? SUCCEED : FAIL;
+#elif defined(HAVE_POSTGRESQL)
+	return ZBX_TQ_DB_TYPE_POSTGRESQL == db_type ? SUCCEED : FAIL;
+#else
+	return FAIL;
+#endif
+}
+
+static int get_values_telemetry_sql_lib(const zbx_dc_item_t *item, zbx_tq_db_type_t db_type, time_t now,
+		time_t lasttimestamp, zbx_vector_str_t *values, char **error)
+{
+	int		ret = FAIL;
+	char		*sql = NULL;
+	zbx_db_result_t	sql_result;
+
+	if (FAIL == have_required_db(db_type))
+	{
+		*error = zbx_dsprintf(NULL, "%s support was not compiled in",
+				(ZBX_TQ_DB_TYPE_POSTGRESQL == db_type ? "PostgreSQL" : "MySQL"));
+		return FAIL;
+	}
+
+	if (ZBX_TQ_DB_TYPE_POSTGRESQL == db_type)
+		zbx_tq_sql_generate_postgresql(item->telemetry_query, now, lasttimestamp, &sql);
+	else
+	{
+		*error = zbx_strdup(NULL, "UNIMPLEMENTED");
+		return FAIL;
+	}
+
+	/* FIXME: retrying until db is up is probably unwanted, at least if the db is not the same as config db */
+	sql_result = zbx_db_select("%s", sql);
+
+	if (NULL == sql_result)
+	{
+		*error = zbx_strdup(NULL, "Query failed");
+		goto clean;
+	}
+
+	if (SUCCEED != zbx_tq_parse_sql_result(item->telemetry_query, sql_result, values))
+	{
+		*error = zbx_strdup(NULL, "Failed to parse result");
+		goto clean;
+	}
+
+	ret = SUCCEED;
+clean:
+	zbx_db_free_result(sql_result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+int	get_value_telemetry(const zbx_dc_item_t *item, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, AGENT_RESULT *result)
+{
+	time_t			now = time(NULL);
+	time_t			lasttimestamp;
+	int			values_ret;
+	zbx_vector_str_t	values;
+	char			*error = NULL;
+
+	/* FIXME: placeholder, also, when data store config is implemented, make sure to avoid race conditions */
+	/* if it can be changed at runtime */
+	zbx_tq_db_type_t	db_type = ZBX_TQ_DB_TYPE_ELASTIC;
+
 	/* when testing the item, the time range being queried is restricted only by the loopback limit */
 	lasttimestamp = 0;
 
-	if (SUCCEED != send_query_http(item->telemetry_query, now, lasttimestamp, db_type, &conn_params,
-			config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
-			&values, &error))
+	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type || ZBX_TQ_DB_TYPE_ELASTIC == db_type)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Query failed: '%s'", error));
-		goto out;
+#ifdef HAVE_LIBCURL
+		values_ret = get_values_telemetry_http(item, db_type, now, lasttimestamp, config_source_ip,
+				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &values,
+				&error);
+#else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "cURL library was not compiled in"));
+		return NOTSUPPORTED;
+#endif
+	}
+	else
+		values_ret = get_values_telemetry_sql_lib(item, db_type, now, lasttimestamp, &values, &error);
+
+	if (SUCCEED != values_ret)
+	{
+		SET_MSG_RESULT(result, error);
+		error = NULL;
+		return NOTSUPPORTED;
 	}
 
 	if (0 != values.values_num)
@@ -182,37 +280,5 @@ static int get_value_telemetry_http(const zbx_dc_item_t *item, zbx_tq_db_type_t 
 	zbx_vector_str_clear_ext(&values, zbx_str_free);
 	zbx_vector_str_destroy(&values);
 
-	ret = SUCCEED;
-out:
-	zbx_free(url);
-	zbx_free(error);
-
-	return ret;
-}
-#endif
-
-int	get_value_telemetry(const zbx_dc_item_t *item, const char *config_source_ip, const char *config_ssl_ca_location,
-		const char *config_ssl_cert_location, const char *config_ssl_key_location, AGENT_RESULT *result)
-{
-	/* FIXME: placeholder, also, when data store config is implemented, make sure to avoid race conditions */
-	/* if it can be changed at runtime */
-	zbx_tq_db_type_t	db_type = ZBX_TQ_DB_TYPE_ELASTIC;
-
-	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type || ZBX_TQ_DB_TYPE_ELASTIC == db_type)
-	{
-#ifdef HAVE_LIBCURL
-		return get_value_telemetry_http(item, db_type, config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location, result);
-#else
-		ZBX_UNUSED(item);
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "cURL library was not compiled in"));
-		return NOTSUPPORTED;
-#endif
-	}
-	else
-	{
-		/* TODO */
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "UNIMPLEMENTED"));
-		return NOTSUPPORTED;
-	}
+	return SUCCEED;
 }
