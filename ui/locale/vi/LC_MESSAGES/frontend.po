@@ -19745,6 +19745,10 @@ msgstr "Hoán đổi kích thước không gian theo byte hoặc theo tỷ lệ 
 msgid "Swedish (sv_SE)"
 msgstr "Swedish (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Chuyển đổi phương pháp xác nhận sẽ thiết laoapj lại tất cả ngoại trừ phiến này! Tiếp tục?"
@@ -23672,6 +23676,10 @@ msgstr ""
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Bạn không có quyền để thực hiện các thao tác này."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."

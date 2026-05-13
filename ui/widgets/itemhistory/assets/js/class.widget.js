@@ -88,11 +88,7 @@ class CWidgetItemHistory extends CWidget {
 			const element = e.target.closest('.has-broadcast-data');
 
 			if (element !== null) {
-				this.#selected_clock = element.dataset.clock;
-				this.#selected_itemid = element.dataset.itemid;
-				this.#selected_key_ = element.dataset.key_;
-
-				this.#broadcast();
+				this.#broadcast(element.dataset.clock, element.dataset.itemid, element.dataset.key_);
 				this.#markSelected();
 			}
 		});
@@ -102,30 +98,23 @@ class CWidgetItemHistory extends CWidget {
 				const element = this.#getDefaultSelectable();
 
 				if (element !== null) {
-					this.#selected_clock = element.dataset.clock;
-					this.#selected_itemid = element.dataset.itemid;
-					this.#selected_key_ = element.dataset.key_;
+					this.#broadcast(element.dataset.clock, element.dataset.itemid, element.dataset.key_);
 				}
 			}
-
-			this.#broadcast();
-			this.#markSelected();
 		}
 		else if (this.#selected_itemid !== null) {
 			if (!items_data.has(this.#selected_itemid)) {
 				for (let [itemid, item] of items_data) {
 					if (item.key_ === this.#selected_key_) {
-						this.#selected_itemid = itemid;
-						this.#selected_clock = item.clock;
+						this.#broadcast(itemid, item.clock, item.key_);
 
-						this.#broadcast();
 						break;
 					}
 				}
 			}
-
-			this.#markSelected();
 		}
+
+		this.#markSelected();
 	}
 
 	#getDefaultSelectable() {
@@ -140,10 +129,7 @@ class CWidgetItemHistory extends CWidget {
 		const element = this.#getDefaultSelectable();
 
 		if (element !== null) {
-			this.#selected_clock = element.dataset.clock;
-			this.#selected_itemid = element.dataset.itemid;
-
-			this.#broadcast();
+			this.#broadcast(element.dataset.clock, element.dataset.itemid, element.dataset.key_);
 			this.#markSelected();
 		}
 	}
@@ -159,7 +145,11 @@ class CWidgetItemHistory extends CWidget {
 		}
 	}
 
-	#broadcast() {
+	#broadcast(clock, itemid, key) {
+		this.#selected_clock = clock;
+		this.#selected_itemid = itemid;
+		this.#selected_key_ = key;
+
 		this.broadcast({
 			[CWidgetsData.DATA_TYPE_ITEM_ID]: [this.#selected_itemid],
 			[CWidgetsData.DATA_TYPE_ITEM_IDS]: [this.#selected_itemid]

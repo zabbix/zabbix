@@ -299,7 +299,7 @@ class testFormHost extends CWebTest {
 			if ($field === 'SNMPv3') {
 				// Check fields' lengths.
 				$field_lengths = [
-					'Max repetition count' =>  10,
+					'Max repetition count' => 10,
 					'Context name' => 255,
 					'Security name' => 64,
 					'Authentication passphrase' => 64,
@@ -1791,7 +1791,7 @@ class testFormHost extends CWebTest {
 				[
 					'host' => 'testFormHost with secret Macro',
 					'items' => 0,
-					'fields'  => [
+					'fields' => [
 						'Host name' => microtime().' clone with secret Macros'
 					],
 					'expected' => TEST_ERROR,
@@ -2183,23 +2183,24 @@ class testFormHost extends CWebTest {
 						['name' => 'id:add_templates_', 'value' => '', 'enabled' => true],
 						['name' => 'Host groups', 'value' => ['Group created from host prototype 1',
 								'Group for discovered host test'], 'enabled' => false],
-						['name' => 'id:interfaces_'.$discovered_interface_id.'_ip', 'value' =>  '127.0.0.1',
+						['name' => 'id:interfaces_'.$discovered_interface_id.'_ip', 'value' => '127.0.0.1',
 								'maxlength' => 64, 'enabled' => false],
-						['name' => 'id:interfaces_'.$discovered_interface_id.'_dns', 'value' =>  '',
+						['name' => 'id:interfaces_'.$discovered_interface_id.'_dns', 'value' => '',
 								'maxlength' => 255, 'enabled' => false],
-						['name' => 'id:interfaces_'.$discovered_interface_id.'_useip', 'value' =>  'IP', 'enabled' => false],
+						['name' => 'id:interfaces_'.$discovered_interface_id.'_useip', 'value' => 'IP', 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_port', 'value' => 10050,
 								'maxlength' => 64, 'enabled' => false],
 						['name' => 'id:interface_main_'.$discovered_interface_id , 'value' => $discovered_interface_id,
 								'enabled' => false],
 						['name' => 'Description', 'value' => '', 'maxlength' => 65535, 'enabled' => true],
-						['name' => 'id:monitored_by', 'value' => 'Server', 'enabled' => false],
+						['name' => 'Monitored by', 'value' => 'Server', 'enabled' => false],
 						['name' => 'Enabled', 'value' => true, 'enabled' => true]
 					];
 
 					foreach ($host_fields as $field) {
 						$this->assertTrue($form->getField($field['name'])->isEnabled($field['enabled']));
 						$this->assertEquals($field['value'], $form->getField($field['name'])->getValue());
+
 						if (CTestArrayHelper::get($field, 'maxlength')) {
 							$this->assertEquals($field['maxlength'], $form->getField($field['name'])->getAttribute('maxlength'));
 						}

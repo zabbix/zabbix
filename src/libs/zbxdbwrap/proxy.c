@@ -867,14 +867,6 @@ static void	log_client_timediff(int level, struct zbx_json_parse *jp, const zbx_
 	}
 }
 
-static void	adjust_time(zbx_timespec_t *unique_shift, zbx_agent_value_t *av)
-{
-	av->ts.sec += unique_shift->sec;
-	av->ts.ns = unique_shift->ns++;
-
-	zbx_timespec_normalize(unique_shift);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: parses agent value from history data json row                     *
@@ -905,17 +897,14 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 		if (FAIL == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc, NULL))
 		{
 			/* ensure unique value timestamp (clock, ns) if only clock is available */
-			adjust_time(unique_shift, av);
+			av->ts.sec += unique_shift->sec;
+			av->ts.ns = unique_shift->ns++;
+			zbx_timespec_normalize(unique_shift);
 		}
-		else if (SUCCEED == zbx_is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns), 0LL,
-				999999999LL))
+		else if (FAIL == zbx_is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns), 0LL, 999999999LL))
 		{
-			/* adjust ns for older systems where sometimes ns == 0 */
-			if (av->ts.ns == 0)
-				adjust_time(unique_shift, av);
-		}
-		else
 			goto out;
+		}
 	}
 	else
 		zbx_timespec(&av->ts);

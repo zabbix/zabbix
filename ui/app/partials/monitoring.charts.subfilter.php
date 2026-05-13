@@ -120,7 +120,7 @@ if (count($data['tags']) > 0) {
 						->addClass('js-subfilter-unset')
 						->addStyle($element_style)
 						->setAttribute('data-tag', $tag_name)
-						->setAttribute('data-name', 'subfilter_tags['.$tag_name .'][]')
+						->setAttribute('data-name', 'subfilter_tags['.$tag_name.'][]')
 						->setAttribute('data-value', $element['name']),
 					' ',
 					new CSup($element['count'])
@@ -146,7 +146,7 @@ if (count($data['tags']) > 0) {
 							->addClass('js-subfilter-set')
 							->addStyle($element_style)
 							->setAttribute('data-tag', $tag_name)
-							->setAttribute('data-name', 'subfilter_tags['.$tag_name .'][]')
+							->setAttribute('data-name', 'subfilter_tags['.$tag_name.'][]')
 							->setAttribute('data-value', $element['name']),
 						' ',
 						new CSup(($subfilter_used ? '+' : '').$element['count'])

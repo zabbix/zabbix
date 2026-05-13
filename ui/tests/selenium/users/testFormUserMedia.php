@@ -492,6 +492,7 @@ class testFormUserMedia extends CWebTest {
 			$row = $table->findRow('Send to', 'test@zabbix.com');
 			$this->assertEquals($row->getColumn('Status')->getText(), 'Enabled');
 			$row->getColumn('Status')->click();
+			$this->page->waitUntilReady();
 			$this->assertEquals($row->getColumn('Status')->getText(), 'Disabled');
 
 			// Remove one of the media.
@@ -502,6 +503,7 @@ class testFormUserMedia extends CWebTest {
 			$this->query('link', 'Admin')->waitUntilVisible()->one()->click();
 			$this->query('id:tab_mediaTab')->waitUntilVisible()->one()->click();
 			if ($action === 'Update') {
+				$table = $this->query('xpath://ul[@id="userMediaFormList"]//table')->asTable()->one();
 				$this->assertFalse($table->findRow('Send to', 'test@zabbix.com')->isValid());
 			}
 			else {

@@ -29,6 +29,8 @@ window.connector_edit_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
+		this.dialogue.classList.add('modal-popup-connector-edit');
+
 		jQuery('#tags').dynamicRows({
 			template: '#tag-row-tmpl',
 			rows: tags,

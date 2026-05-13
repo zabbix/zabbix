@@ -143,8 +143,8 @@
 
 			hintBox.positionElement(e, graph[0], graph[0].hintBoxItem);
 
-			Overlay.prototype.recoverFocus.call({'$dialogue': graph[0].hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': graph[0].hintBoxItem});
+			Focuser.recoverFocus(graph.hintBoxItem[0]);
+			Focuser.containFocus(graph.hintBoxItem[0]);
 
 			graph
 				.off('mouseup', hintboxSilentMode)

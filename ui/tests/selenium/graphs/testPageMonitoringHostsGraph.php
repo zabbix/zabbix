@@ -880,8 +880,10 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 		// Check result amount and graph/item ids.
 		if (array_key_exists('graphs_amount', $data)) {
-			$this->assertEquals($data['graphs_amount'],
-					$this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count());
+			// Wait for all charts to be rendered by JS (charts.view uses native fetch, not tracked by waitUntilReady).
+			// img[@src] is set by chart.refresh() which runs after replacePaging(), ensuring table-stats is stable.
+			$this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]//img[@src]')
+					->waitUntilCount($data['graphs_amount']);
 
 			// Find links with graphs and items ids.
 			$graph_sources = [];

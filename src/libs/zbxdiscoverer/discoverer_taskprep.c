@@ -295,6 +295,7 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *ch
 		dcc.druleid = drule->druleid;
 		zbx_strlcpy(dcc.ip, ip, sizeof(dcc.ip));
 		dcc.count = checks_count;
+		dcc.revision = drule->revision;
 		zbx_hashset_insert(check_counts, &dcc, sizeof(zbx_discoverer_check_count_t));
 		uniq_ips_num++;
 	}

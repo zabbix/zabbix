@@ -651,16 +651,9 @@ static int	proxyconfig_delete_rows(const zbx_table_data_t *td, char **error)
 		return SUCCEED;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where", td->table->table);
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, td->table->recid, td->del_ids.values,
-			td->del_ids.values_num);
 
-	if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-	{
+	if (FAIL == (ret = zbx_db_execute_multiple_query(sql, td->table->recid, &td->del_ids)))
 		*error = zbx_dsprintf(NULL, "cannot remove old objects from table \"%s\"", td->table->table);
-		ret = FAIL;
-	}
-	else
-		ret = SUCCEED;
 
 	zbx_free(sql);
 
@@ -758,15 +751,9 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, char **error)
 	}
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " where");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, td->table->recid, updateids.values, updateids.values_num);
 
-	if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-	{
+	if (FAIL == (ret = zbx_db_execute_multiple_query(sql, td->table->recid, &updateids)))
 		*error = zbx_dsprintf(NULL, "cannot prepare rows for update in table \"%s\"", td->table->table);
-		ret = FAIL;
-	}
-	else
-		ret = SUCCEED;
 
 	zbx_free(sql);
 out:
@@ -870,6 +857,8 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, char **error)
 	if (0 == td->updates.values_num)
 		return SUCCEED;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'", __func__, td->table->table);
+
 	buf = (char *)zbx_malloc(NULL, buf_alloc);
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -947,6 +936,8 @@ out:
 
 	if (SUCCEED != ret && NULL == *error)
 		*error = zbx_dsprintf(NULL, "cannot update rows in table \"%s\"", td->table->table);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() '%s'", __func__, td->table->table);
 
 	return ret;
 }

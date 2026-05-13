@@ -1936,8 +1936,6 @@ class CUser extends CApiService {
 		), 'ugsetid');
 
 		if ($del_ugsetids) {
-			DB::delete('permission', ['ugsetid' => $del_ugsetids]);
-			DB::delete('ugset_group', ['ugsetid' => $del_ugsetids]);
 			DB::delete('ugset', ['ugsetid' => $del_ugsetids]);
 		}
 	}
