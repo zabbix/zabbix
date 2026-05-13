@@ -29,7 +29,7 @@ require_once __DIR__.'/../behaviors/CTagBehavior.php';
 class testPageProblems extends CWebTest {
 
 	/**
-	 * Attach TagBehavior and TableBehavior to the test.
+	 * Attach TagBehavior, DatatablBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
@@ -210,6 +210,7 @@ class testPageProblems extends CWebTest {
 		$this->setDatatableStartingLayout();
 	}
 
+	// Update problems datatable layout
 	protected function setDatatableStartingLayout() {
 		$layout = '{"columns":[{"id":"time","width":"171px"},{"id":"severity","width":"94px"},{"id":"recovery","width":"99px"},'.
 				'{"id":"status","width":"74px"},{"id":"info","width":"50px"},{"id":"host","resized":true,"width":"160px"},'.
@@ -433,7 +434,7 @@ class testPageProblems extends CWebTest {
 		$this->assertEquals(['Time', 'Severity', 'Host', 'Problem'], $table->getSortableHeaders()->asText());
 
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
-		$table->waitUntilReady();
+		$table->waitUntilReady()->invalidate();
 
 		// Check how displayed datatable headers change based on the selected value in "Show" field.
 		$dependant_headers = [
