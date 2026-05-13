@@ -2739,7 +2739,7 @@ static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t
 				/* nodata requires 1 value, which is the starting point */
 				break;
 			default:
-				THIS_SHOULD_NEVER_HAPPEN_MSG("invalid history range:%u for itemid:" ZBX_FS_UI64 
+				THIS_SHOULD_NEVER_HAPPEN_MSG("invalid history range:%u for itemid:" ZBX_FS_UI64
 						" ts_end:%d", query->selector->type, query->itemid, query->ts_end);
 		}
 	}
