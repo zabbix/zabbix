@@ -891,7 +891,7 @@ class testFormTags extends CWebTest {
 			case 'template':
 				$this->page->open('zabbix.php?action=template.list&filter_name='.$data['name'].'&filter_set=1')
 					->waitUntilReady();
-				$this->query('link', $data['name'])->one()->click();
+				$this->query('link', $data['name'])->waitUntilClickable()->one()->click();
 				$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 				break;
 

@@ -1071,14 +1071,14 @@ abstract class testFormMacros extends CLegacyWebTest {
 		else if ($host_type === 'template') {
 			$this->page->login()
 					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
 			$this->page->login()->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id.
 					'&hostid='.$id
-			);
-			$this->query('link', $name)->one()->click();
+			)->waitUntilReady();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 
@@ -1230,7 +1230,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		else if ($host_type === 'template') {
 			$this->page->login()
 					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
@@ -1832,12 +1832,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 		if ($source === 'hosts') {
 			$column = $this->getDatatable()->findRow('Name', $name, true)->getColumn('Name');
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
-			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Macros');
+			$form = COverlayDialogElement::find()->asForm()->waitUntilVisible()->one()->selectTab('Macros');
 		}
 		else if ($source === 'templates') {
 			$this->page->login()
 					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-			$this->query('link', $name)->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Macros');
 		}
 		else {
@@ -2612,7 +2612,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 			return $this->getDatatable()->findRow('Name', $name)->getColumn('Name');
 		}
 		else {
-			return $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
+			return $this->query('xpath://table[@class="list-table"]')->asTable()->waitUntilVisible()->one()
+					->findRow('Name', $name)->getColumn('Name');
 		}
 	}
 }

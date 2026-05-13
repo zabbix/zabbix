@@ -1219,7 +1219,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 */
 	public function testPageMonitoringHosts_CheckCounters($data) {
 		$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
-		$row = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one()->findRow('Name', $data['host']);
+		$row = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady()->findRow('Name', $data['host']);
 
 		foreach ($data['counters'] as $counter) {
 			if ($counter['column'] === 'Problems') {
