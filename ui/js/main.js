@@ -800,9 +800,6 @@ const hintBox = {
 	},
 
 	deleteHint: function(target, do_focus_target = true) {
-		delete event_x;
-		delete event_y;
-
 		if (target.isStatic) {
 			target.dispatchEvent(new CustomEvent('onDeleteStaticHint'));
 		}
