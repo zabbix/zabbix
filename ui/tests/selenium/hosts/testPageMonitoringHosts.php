@@ -398,10 +398,13 @@ class testPageMonitoringHosts extends CWebTest {
 	public function testPageMonitoringHosts_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
+		$headers = $table->getHeaders();
 		$form->fill($data['filter']);
 		$this->query('button:Apply')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
-		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
+		$headers->waitUntilStalled();
+		$table->waitUntilReady()->invalidate();
 		$this->assertDatatableDataColumn($data['expected']);
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		$table->waitUntilReady();
@@ -843,6 +846,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->setTags($data['tag_options']['tags']);
 		$headers = $table->getHeaders();
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->page->waitUntilReady();
 		$headers->waitUntilStalled();
 		$table->waitUntilReady();
 		$this->assertDatatableDataColumn(CTestArrayHelper::get($data, 'result', []));

@@ -763,7 +763,7 @@ class testPageMonitoringLatestData extends CWebTest {
 			$this->query('button:Reset')->one()->click();
 			$this->page->waitUntilReady();
 			$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
-					explode("\n", $this->query('class:no-data-message')->one()->getText())
+					explode("\n", $this->query('class:no-data-message')->waitUntilVisible()->one()->getText())
 			);
 		}
 	}
