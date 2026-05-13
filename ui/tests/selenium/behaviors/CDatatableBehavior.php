@@ -16,7 +16,7 @@
 
 require_once __DIR__.'/CTableBehavior.php';
 
-use Facebook\WebDriver\Exception\StaleElementReferenceException;
+use Facebook\WebDriver\Exception\ElementClickInterceptedException;
 
 /**
  * Behavior for filter related tests.
