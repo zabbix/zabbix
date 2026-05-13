@@ -228,7 +228,6 @@ class CDatatableBehavior extends CTableBehavior {
 				$button->click();
 			}
 			catch (ElementClickInterceptedException $exception) {
-var_dump('AAAAAAAAAAAAAAAAAAAAAAAAAAAA');
 				$table->scrollRightHorizontally();
 				$button->click();
 			}
@@ -301,8 +300,8 @@ var_dump('AAAAAAAAAAAAAAAAAAAAAAAAAAAA');
 		$table = $this->getDatatable();
 		$table->query('xpath:.//button[@title="Customize table"]')->one()->waitUntilClickable()->click();
 
-		$popup_dialog = $this->test->query('xpath:.//div[@class="datatable-options-popup datatable-options"]')->one()
-				->waitUntilVisible();
+		$popup_dialog = $this->test->query('xpath://div[@class="datatable-options-popup datatable-options"]')
+				->waitUntilVisible()->one();
 		$this->test->assertEquals('Column list', $popup_dialog->query('class:datatable-options-header')->one()->getText());
 
 		foreach ($column_list as $column => $parameters) {
@@ -322,8 +321,8 @@ var_dump('AAAAAAAAAAAAAAAAAAAAAAAAAAAA');
 		$table = $this->getDatatable();
 		$button = $table->query('xpath:.//button[@title="Customize table"]')->one()->waitUntilClickable();
 		$button->click();
-		$popup_dialog = $this->test->query('xpath:.//div[@class="datatable-options-popup datatable-options"]')->one()
-				->waitUntilVisible();
+		$popup_dialog = $this->test->query('xpath://div[@class="datatable-options-popup datatable-options"]')
+				->waitUntilVisible()->one();
 
 		foreach ($field_changes as $field => $value) {
 			$for = $popup_dialog->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($field).']/..')->one()
