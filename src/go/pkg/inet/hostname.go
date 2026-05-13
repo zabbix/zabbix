@@ -33,7 +33,7 @@ func IsRFCHostName(host string) bool {
 		return false
 	}
 
-	is_purely_numeric := true;  // detect numeric-only names
+	is_purely_numeric := true // detect numeric-only names
 
 	// first character must be alphanumeric
 	c := host[0]
@@ -91,8 +91,8 @@ func IsRFCHostName(host string) bool {
 	}
 
 	// reject purely numeric names
-        if is_purely_numeric {
-                return false
+	if is_purely_numeric {
+		return false
 	}
 
 	return true
