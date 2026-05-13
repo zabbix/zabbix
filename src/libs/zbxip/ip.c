@@ -37,12 +37,13 @@ int	zbx_is_rfc_hostname(const char *host)
 	const char	*p = host;
 	int		label_len = 1;
 	int		prev_hyphen = 0;
+	int		is_purely_numeric = 1;	/* detect numeric-only names */
 
 	/* Requirements and limits for host names are defined in RFC 1035, */
 	/* with clarifications in RFC 1123, RFC 2181. */
 
 	/* Host name should start with [0-9A-Za-z] */
-	if ('\0' == *p || 0x80 == (0x80 & *p) || 0 == isalnum(*p++))\
+	if ('\0' == *p || 0x80 == (0x80 & *p) || 0 == isalnum(*p++))
 		return FAIL;
 
 	while ('\0' != *p)
@@ -54,6 +55,9 @@ int	zbx_is_rfc_hostname(const char *host)
 		{
 			label_len++;
 			prev_hyphen = 0;
+
+			if (0 == isdigit(*p))
+				is_purely_numeric = 0;
 		}
 		else if ('-' == *p)
 		{
@@ -63,6 +67,7 @@ int	zbx_is_rfc_hostname(const char *host)
 
 			label_len++;
 			prev_hyphen = 1;
+			is_purely_numeric = 0;
 		}
 		else if ('.' == *p)
 		{
@@ -90,6 +95,10 @@ int	zbx_is_rfc_hostname(const char *host)
 
 	/* last label must not be empty or end with hyphen */
 	if (0 == label_len || 1 == prev_hyphen)
+		return FAIL;
+
+	/* reject purely numeric names */
+	if (1 == is_purely_numeric)
 		return FAIL;
 
 	return SUCCEED;

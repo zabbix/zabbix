@@ -106,4 +106,28 @@ in:
   string: "localhost"
 out:
   return: SUCCEED
+---
+test case: "19. Purely numeric 192"
+in:
+  string: "192"
+out:
+  return: FAIL
+---
+test case: "20. Purely numeric 192.168"
+in:
+  string: "192.168"
+out:
+  return: FAIL
+---
+test case: "21. Purely numeric 192.168.10"
+in:
+  string: "192.168.10"
+out:
+  return: FAIL
+---
+test case: "22. Purely numeric 192.168.10.4"
+in:
+  string: "192.168.10.4"
+out:
+  return: FAIL
 ...
