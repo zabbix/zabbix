@@ -46,179 +46,38 @@ class CScreenDiscovery extends CScreenBase {
 	public function get() {
 		$this->dataId = 'discovery';
 
-		$sort_field = $this->data['sort'];
-		$sort_order = $this->data['sortorder'];
+		$drules = $this->getDRules();
 
-		$drules = API::DRule()->get([
-			'output' => ['druleid', 'name'],
-			'selectDHosts' => ['dhostid', 'status', 'lastup', 'lastdown'],
-			'druleids' => (array_key_exists('filter_druleids', $this->data) && $this->data['filter_druleids'])
-				? $this->data['filter_druleids']
-				: null,
-			'filter' => ['status' => DRULE_STATUS_ACTIVE],
-			'preservekeys' => true
-		]);
-
-		order_result($drules, 'name');
-
-		$dservices = API::DService()->get([
-			'output' => ['dserviceid', 'port', 'status', 'lastup', 'lastdown', 'dcheckid', 'ip', 'dns'],
-			'selectHosts' => ['hostid', 'name', 'status'],
-			'druleids' => array_keys($drules),
-			'sortfield' => $sort_field,
-			'sortorder' => $sort_order,
-			'limitSelects' => 1,
-			'preservekeys' => true
-		]);
-
-		// user macros
-		$macros = API::UserMacro()->get([
-			'output' => ['macro', 'value', 'type'],
-			'globalmacro' => true
-		]);
-		$macros = zbx_toHash($macros, 'macro');
-
-		$dchecks = API::DCheck()->get([
-			'output' => ['type', 'key_', 'allow_redirect'],
-			'dserviceids' => array_keys($dservices),
-			'preservekeys' => true
-		]);
-
-		// services
-		$services = [];
-		foreach ($dservices as $dservice) {
-			$key_ = $dchecks[$dservice['dcheckid']]['key_'];
-			if ($key_ !== '') {
-				if (array_key_exists($key_, $macros)) {
-					$key_ = CMacrosResolverGeneral::getMacroValue($macros[$key_]);
-				}
-				$key_ = ': '.$key_;
-			}
-
-			$allow_redirect = ($dchecks[$dservice['dcheckid']]['allow_redirect'] == 1)
-				? ' "'._('allow redirect').'"'
-				: '';
-
-			$service_name = discovery_check_type2str($dchecks[$dservice['dcheckid']]['type']).
-				discovery_port2str($dchecks[$dservice['dcheckid']]['type'], $dservice['port']).$key_.$allow_redirect;
-			$services[$service_name] = 1;
-		}
-		ksort($services);
-
-		$dhosts = API::DHost()->get([
-			'output' => ['dhostid'],
-			'selectDServices' => ['dserviceid'],
-			'druleids' => array_keys($drules),
-			'preservekeys' => true
-		]);
-
-		$header = [
-			make_sorting_header(_('Discovered device'), 'ip', $sort_field, $sort_order,
-				'zabbix.php?action=discovery.view'
-			),
-			_('Monitored host'),
-			_('Uptime').'/'._('Downtime')
-		];
-
-		foreach ($services as $name => $foo) {
-			$header[] = (new CVertical($name))->setTitle($name);
+		if (!$drules) {
+			return $this->getOutput((new CTableInfo()), true, $this->data);
 		}
 
-		// create table
-		$table = (new CTableInfo())->setHeader($header);
+		$dhosts = $this->getDHosts(array_keys($drules));
+		$dservices = $this->getDServices(array_keys($drules));
+		$dchecks = $this->getDChecks(array_keys($dservices));
+		$macros = $this->getMacros();
 
-		foreach ($drules as $drule) {
-			$discovery_info = [];
+		$prepared_services = $this->buildPreparedServices($dservices, $dchecks, $macros);
 
-			foreach ($drule['dhosts'] as $dhost) {
-				if ($dhost['status'] == DHOST_STATUS_DISABLED) {
-					$hclass = 'disabled';
-					$htime = $dhost['lastdown'];
-				}
-				else {
-					$hclass = 'enabled';
-					$htime = $dhost['lastup'];
-				}
+		$services = $this->buildServicesHeader($prepared_services);
 
-				// $primary_ip stores the primary host ip of the dhost
-				$primary_ip = '';
+		$table = (new CTableInfo())->setHeader($this->buildHeader($services));
 
-				foreach ($dhosts[$dhost['dhostid']]['dservices'] as $dservice) {
-					$dservice = $dservices[$dservice['dserviceid']];
-					$host_name = '';
-					$hostid = '';
-					$host_status = HOST_STATUS_NOT_MONITORED;
-					$host = reset($dservices[$dservice['dserviceid']]['hosts']);
+		$drule_hosts = [];
 
-					if ($host) {
-						$host_name = $host['name'];
-						$hostid = $host['hostid'];
-						$host_status = $host['status'];
-					}
+		foreach ($dhosts as $dhost) {
+			$drule_hosts[$dhost['druleid']][] = $dhost;
+		}
 
-					if ($primary_ip !== '') {
-						if ($primary_ip === $dservice['ip']) {
-							$htype = 'primary';
-						}
-						else {
-							$htype = 'slave';
-						}
-					}
-					else {
-						$primary_ip = $dservice['ip'];
-						$htype = 'primary';
-					}
-
-					if (!array_key_exists($dservice['ip'], $discovery_info)) {
-						$discovery_info[$dservice['ip']] = [
-							'ip' => $dservice['ip'],
-							'dns' => $dservice['dns'],
-							'type' => $htype,
-							'class' => $hclass,
-							'host' => $host_name,
-							'status' => $host_status,
-							'hostid' => $hostid,
-							'time' => $htime
-						];
-					}
-
-					if ($dservice['status'] == DSVC_STATUS_DISABLED) {
-						$class = ZBX_STYLE_INACTIVE_BG;
-						$time = 'lastdown';
-					}
-					else {
-						$class = null;
-						$time = 'lastup';
-					}
-
-					$key_ = $dchecks[$dservice['dcheckid']]['key_'];
-					if ($key_ !== '') {
-						if (array_key_exists($key_, $macros)) {
-							$key_ = CMacrosResolverGeneral::getMacroValue($macros[$key_]);
-						}
-						$key_ = NAME_DELIMITER.$key_;
-					}
-
-					$allow_redirect = ($dchecks[$dservice['dcheckid']]['allow_redirect'] == 1)
-						? ' "'._('allow redirect').'"'
-						: '';
-
-					$service_name = discovery_check_type2str($dchecks[$dservice['dcheckid']]['type']).
-						discovery_port2str($dchecks[$dservice['dcheckid']]['type'], $dservice['port']).$key_.
-						$allow_redirect;
-
-					$discovery_info[$dservice['ip']]['services'][$service_name] = [
-						'class' => $class,
-						'time' => $dservice[$time]
-					];
-				}
-			}
+		foreach ($drules as $druleid => $drule) {
+			$discovery_info = $this->buildDiscoveryInfo(
+				$drule_hosts[$druleid] ?? [],
+				$prepared_services
+			);
 
 			if ($discovery_info) {
 				$col = new CCol([
-					bold(
-						(new CLinkAction($drule['name']))->setMenuPopup(CMenuPopupHelper::getDRule($drule['druleid']))
-					),
+					bold((new CLinkAction($drule['name']))->setMenuPopup(CMenuPopupHelper::getDRule($druleid))),
 					NBSP(),
 					'('._n('%d device', '%d devices', count($discovery_info)).')'
 				]);
@@ -229,44 +88,277 @@ class CScreenDiscovery extends CScreenBase {
 
 				$table->addRow($col);
 			}
-			order_result($discovery_info, $sort_field, $sort_order);
 
-			foreach ($discovery_info as $ip => $h_data) {
-				$dns = ($h_data['dns'] === '') ? '' : ' ('.$h_data['dns'].')';
-				$host = '';
+			$discovery_info = $this->groupPrimaryAndSecondaryInterfaces($discovery_info);
 
-				if (array_key_exists('host', $h_data)) {
-					$host = $h_data['host'];
-
-					if ($h_data['hostid'] !== '') {
-						$host = (new CLinkAction($host))
-							->addClass($h_data['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
-							->setMenuPopup(CMenuPopupHelper::getHost($h_data['hostid']));
-					}
-				}
-
-				$row = [
-					($h_data['type'] === 'primary')
-						? (new CSpan($ip.$dns))->addClass($h_data['class'])
-						: new CSpan([NBSP(), NBSP(), $ip.$dns]),
-					new CSpan($host),
-					(new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave')
-						? ''
-						: convertUnits(['value' => time() - $h_data['time'], 'units' => 'uptime'])))
-					)
-						->addClass($h_data['class'])
-				];
-
-				foreach ($services as $name => $foo) {
-					$row[] = array_key_exists($name, $h_data['services'])
-						? (new CCol(zbx_date2age($h_data['services'][$name]['time'])))
-							->addClass($h_data['services'][$name]['class'])
-						: '';
-				}
-				$table->addRow($row);
+			foreach ($discovery_info as $row_data) {
+				$table->addRow($this->buildTableRow($row_data, $services));
 			}
 		}
 
 		return $this->getOutput($table, true, $this->data);
+	}
+
+	private function getDRules(): array {
+		$drules = API::DRule()->get([
+			'output' => ['druleid', 'name'],
+			'druleids' => (array_key_exists('filter_druleids', $this->data) && $this->data['filter_druleids'])
+				? $this->data['filter_druleids']
+				: null,
+			'filter' => ['status' => DRULE_STATUS_ACTIVE],
+			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT),
+			'preservekeys' => true
+		]);
+
+		order_result($drules, 'name');
+
+		return $drules;
+	}
+
+	private function getDHosts(array $druleids): array {
+		return API::DHost()->get([
+			'output' => ['dhostid', 'druleid', 'status', 'lastup', 'lastdown'],
+			'selectDServices' => ['dserviceid'],
+			'druleids' => $druleids,
+			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT),
+			'preservekeys' => true
+		]);
+	}
+
+	private function getDServices(array $druleids): array {
+		return API::DService()->get([
+			'output' => ['dserviceid', 'port', 'status', 'lastup', 'lastdown', 'dcheckid', 'ip', 'dns'],
+			'selectHosts' => ['hostid', 'name', 'status'],
+			'druleids' => $druleids,
+			'limitSelects' => 1,
+			'preservekeys' => true
+		]);
+	}
+
+	private function getDChecks(array $dserviceids): array {
+		return API::DCheck()->get([
+			'output' => ['type', 'key_', 'allow_redirect'],
+			'dserviceids' => $dserviceids,
+			'preservekeys' => true
+		]);
+	}
+
+	private function getMacros(): array {
+		$macros = API::UserMacro()->get([
+			'output' => ['macro', 'value', 'type'],
+			'globalmacro' => true
+		]);
+
+		return zbx_toHash($macros, 'macro');
+	}
+
+	private function buildPreparedServices(array $dservices, array $dchecks, array $macros): array {
+		$index = [];
+
+		foreach ($dservices as $dserviceid => $dservice) {
+			$dcheck = $dchecks[$dservice['dcheckid']];
+
+			$host = reset($dservice['hosts']) ?: [];
+
+			$index[$dserviceid] = [
+				'dservice' => $dservice,
+				'dcheck' => $dcheck,
+				'host' => [
+					'hostid' => $host['hostid'] ?? '',
+					'name' => $host['name'] ?? '',
+					'status' => $host['status'] ?? HOST_STATUS_NOT_MONITORED
+				],
+				'service_name' => $this->buildServiceName(
+					$dservice,
+					$dcheck,
+					$macros
+				),
+				'ip_bin' => inet_pton($dservice['ip'])
+			];
+		}
+
+		return $index;
+	}
+
+	private function buildServiceName(array $dservice, array $dcheck, array $macros): string {
+		$key_ = $dcheck['key_'];
+
+		if ($key_ !== '') {
+			if (array_key_exists($key_, $macros)) {
+				$key_ = CMacrosResolverGeneral::getMacroValue($macros[$key_]);
+			}
+
+			$key_ = NAME_DELIMITER.$key_;
+		}
+
+		$allow_redirect = ($dcheck['allow_redirect'] == 1)
+			? ' "'._('allow redirect').'"'
+			: '';
+
+		return discovery_check_type2str($dcheck['type'])
+			.discovery_port2str($dcheck['type'], $dservice['port'])
+			.$key_
+			.$allow_redirect;
+	}
+
+	private function buildServicesHeader(array $prepared_services): array {
+		$services = [];
+
+		foreach ($prepared_services as $service) {
+			$services[] = $service['service_name'];
+		}
+
+		$services = array_unique($services);
+		sort($services);
+
+		return $services;
+	}
+
+	private function buildHeader(array $services): array {
+		$header = [
+			make_sorting_header(_('Discovered device'), 'ip', $this->data['sort'], $this->data['sortorder'],
+				'zabbix.php?action=discovery.view'
+			),
+			_('Monitored host'),
+			_('Uptime').'/'._('Downtime')
+		];
+
+		foreach ($services as $service_name) {
+			$header[] = (new CVertical($service_name))->setTitle($service_name);
+		}
+
+		return $header;
+	}
+
+	private function buildDiscoveryInfo(array $dhosts, array $prepared_services): array {
+		$discovery_info = [];
+
+		foreach ($dhosts as $dhost) {
+			$host_class = $dhost['status'] == DHOST_STATUS_DISABLED ? 'disabled' : 'enabled';
+			$host_time = $dhost['status'] == DHOST_STATUS_DISABLED ? $dhost['lastdown'] : $dhost['lastup'];
+
+			$dhost_services = [];
+
+			foreach ($dhost['dservices'] as $ref) {
+				$dhost_services[] = $prepared_services[$ref['dserviceid']];
+			}
+
+			usort($dhost_services, static function($a, $b) {
+				return $a['ip_bin'] <=> $b['ip_bin'];
+			});
+
+			$primary_ip = $dhost_services[0]['dservice']['ip'] ?? null;
+
+			foreach ($dhost_services as $service) {
+				if ($service['host']['hostid'] !== '') {
+					$primary_ip = $service['dservice']['ip'];
+					break;
+				}
+			}
+
+			foreach ($dhost_services as $service) {
+				$dservice = $service['dservice'];
+
+				$ip = $dservice['ip'];
+
+				if (!isset($discovery_info[$ip])) {
+					$discovery_info[$ip] = [
+						'ip' => $ip,
+						'dns' => $dservice['dns'],
+						'type' => ($ip === $primary_ip) ? 'primary' : 'secondary',
+						'class' => $host_class,
+						'host' => $service['host']['name'],
+						'status' => $service['host']['status'],
+						'hostid' => $service['host']['hostid'],
+						'dhostid' => $dhost['dhostid'],
+						'time' => $host_time,
+						'services' => []
+					];
+				}
+
+				$is_disabled = $dservice['status'] == DSVC_STATUS_DISABLED;
+
+				$discovery_info[$ip]['services'][$service['service_name']] = [
+					'class' => $is_disabled ? ZBX_STYLE_INACTIVE_BG : null,
+					'time' => $is_disabled ? $dservice['lastdown'] : $dservice['lastup']
+				];
+			}
+		}
+
+		return $discovery_info;
+	}
+
+	private function buildTableRow(array $h_data, array $services): array {
+		$dns = $h_data['dns'] === '' ? '' : ' ('.$h_data['dns'].')';
+		$host = '';
+
+		if (array_key_exists('host', $h_data)) {
+			$host = $h_data['host'];
+
+			if ($h_data['hostid'] !== '') {
+				$host = (new CLinkAction($host))
+					->addClass($h_data['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
+					->setMenuPopup(CMenuPopupHelper::getHost($h_data['hostid']));
+			}
+		}
+
+		$row = [
+			$h_data['type'] === 'primary'
+				? (new CSpan($h_data['ip'].$dns))->addClass($h_data['class'])
+				: (new CSpan([NBSP(), NBSP(), NBSP(), NBSP(), $h_data['ip'].$dns]))
+				->addClass($h_data['class']),
+
+			new CSpan($host),
+			(new CSpan($h_data['time'] == 0 || $h_data['type'] === 'secondary'
+				? ''
+				: convertUnits(['value' => time() - $h_data['time'], 'units' => 'uptime'])
+			))
+				->addClass($h_data['class'])
+		];
+
+		foreach ($services as $service_name) {
+			$row[] = array_key_exists($service_name, $h_data['services'])
+				? (new CCol(zbx_date2age($h_data['services'][$service_name]['time'])))
+					->addClass($h_data['services'][$service_name]['class'])
+				: '';
+		}
+
+		return $row;
+	}
+
+	private function groupPrimaryAndSecondaryInterfaces(array $discovery_info): array {
+		$groups = [];
+		$primaries = [];
+
+		foreach ($discovery_info as $ip => $host) {
+			if ($host['type'] === 'primary') {
+				$primaries[$ip] = $host;
+			}
+			else {
+				$groups[$host['dhostid']][$ip] = $host;
+			}
+		}
+
+		uasort($primaries, function($a, $b) {
+			$cmp = inet_pton($a['ip']) <=> inet_pton($b['ip']);
+
+			return $this->data['sortorder'] === ZBX_SORT_DOWN ? -$cmp : $cmp;
+		});
+
+		$sorted = [];
+
+		foreach ($primaries as $primary_ip => $primary) {
+			$sorted[$primary_ip] = $primary;
+
+			if (!empty($groups[$primary['dhostid']])) {
+				foreach ($groups[$primary['dhostid']] as $ip => $secondary) {
+					unset($secondary['dhostid']);
+
+					$sorted[$ip] = $secondary;
+				}
+			}
+		}
+
+		return $sorted;
 	}
 }
