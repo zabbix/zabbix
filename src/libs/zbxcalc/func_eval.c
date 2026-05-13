@@ -1221,6 +1221,12 @@ static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 		goto out;
 	}
 
+	if (ZBX_VALUE_NONE == selector->type)
+	{
+		selector->type = ZBX_VALUE_NVALUES;
+		selector->value = 1;
+	}
+
 	if (2 <= nparams && SUCCEED != get_function_parameter_str(parameters, 2, &operator))
 	{
 		*error = zbx_strdup(*error, "invalid third parameter");
@@ -1256,9 +1262,6 @@ static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 			break;
 		case ZBX_VALUE_NVALUES:
 			nvalues = selector->value;
-			break;
-		case ZBX_VALUE_NONE:
-			nvalues = 1;
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
