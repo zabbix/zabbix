@@ -21,6 +21,9 @@
 static zbx_dbconn_t	*dbconn;
 static int		db_autoincrement;
 
+static zbx_dbconn_pool_t	*dbpool_default = NULL;
+static int			dbconn_ref_num = 0;
+
 void	zbx_db_init_autoincrement_options(void)
 {
 	db_autoincrement = 1;
@@ -819,4 +822,76 @@ zbx_dbconn_t	*zbx_db_dbconn(void)
 	}
 
 	return dbconn;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set the default database connection pool                          *
+ *                                                                            *
+ * Parameters: dbpool - [IN] database connection pool to set as default       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_set_default_pool(zbx_dbconn_pool_t *dbpool)
+{
+	dbpool_default = dbpool;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire a database connection                                     *
+ *                                                                            *
+ * Return value: acquired database connection                                 *
+ *                                                                            *
+ * Comments: In thread-based components the default pool is set and the       *
+ *           connection is acquired from it. Otherwise, a legacy single       *
+ *           shared connection is used, which does not support concurrent     *
+ *           acquisition.                                                     *
+ *                                                                            *
+ ******************************************************************************/
+zbx_dbconn_t	*zbx_db_acquire(void)
+{
+	if (NULL != dbpool_default)
+		return zbx_dbconn_pool_acquire_connection(dbpool_default);
+
+	if (0 != dbconn_ref_num)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("attempted to acquire already acquired db connection");
+		exit(EXIT_FAILURE);
+	}
+
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("attempted to acquire closed db connection");
+		exit(EXIT_FAILURE);
+	}
+	dbconn_ref_num++;
+
+	return dbconn;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: release a database connection                                     *
+ *                                                                            *
+ * Parameters: db - [IN] database connection to release                       *
+ *                                                                            *
+ * Comments: In thread-based components the default pool is set and the       *
+ *           connection is released back to it. Otherwise, the legacy shared  *
+ *           connection reference count is decremented.                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_release(zbx_dbconn_t *db)
+{
+	if (NULL != dbpool_default)
+	{
+		zbx_dbconn_pool_release_connection(dbpool_default, db);
+		return;
+	}
+
+	if (0 == dbconn_ref_num)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("attempted to release unacquired db connection");
+		exit(EXIT_FAILURE);
+	}
+	dbconn_ref_num--;
 }
