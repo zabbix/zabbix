@@ -18,7 +18,6 @@ class CRelativeTimeValidator extends CValidator {
 
 	protected ?array $allowed_suffixes = null;
 	protected ?array $allowed_types = null;
-	protected bool $lldmacros = false;
 	protected bool $max_now = false;
 	protected ?int $max_tokens = null;
 	protected bool $usermacros = false;
@@ -34,10 +33,7 @@ class CRelativeTimeValidator extends CValidator {
 	 * @param string $value
 	 */
 	public function validate($value): bool {
-		$relative_time_parser = new CRelativeTimeParser([
-			'usermacros' => $this->usermacros,
-			'lldmacros' => $this->lldmacros
-		]);
+		$relative_time_parser = new CRelativeTimeParser(['usermacros' => $this->usermacros]);
 
 		if ($relative_time_parser->parse($value) != CParser::PARSE_SUCCESS) {
 			$this->setError(_('a relative time is expected'));

@@ -25,7 +25,6 @@ class CRelativeTimeValidatorTest extends TestCase {
 			['now-1s', 				[], 							null],
 			['now/d+1s',			[],								null],
 			['{$MACRO}', 			['usermacros' => true], 		null],
-			['{#MACRO}', 			['lldmacros' => true],			null],
 			['now', 				['max_now' => true],			null],
 
 			// Invalid relative time
