@@ -861,7 +861,7 @@ int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer)
 	zbx_dc_maintenance_t		*maintenance;
 	zbx_dc_maintenance_period_t	*period;
 	zbx_hashset_iter_t		iter;
-	int				i, running_num = 0, started_num = 0, stopped_num = 0, changed, ret = FAIL;
+	int				i, changed, running_num = 0, started_num = 0, stopped_num = 0, ret = FAIL;
 	unsigned char			state;
 	time_t				now, period_start, period_end, running_since, running_until;
 	zbx_dc_config_t			*config = get_dc_config();
@@ -916,7 +916,7 @@ int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer)
 				{
 					period = (zbx_dc_maintenance_period_t *)maintenance->periods.values[i];
 
-					/* find lastest end of overlapping periods */
+					/* find latest end of overlapping periods */
 					if (SUCCEED == dc_check_maintenance_period(maintenance, period,
 						running_until, &period_start, &period_end))
 					{
