@@ -20,8 +20,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.xbill.DNS.Cache;
 import org.xbill.DNS.AAAARecord;
@@ -40,12 +38,11 @@ import org.slf4j.LoggerFactory;
  * Allow-list of remote peers for Java Gateway.
  *
  * Accepts a comma separated list of IP addresses, CIDR ranges (e.g. 192.168.1.0/24, 2001:db8::/32) and DNS names.
- * IPv4-mapped IPv6 peers are matched against IPv4 entries and vice versa.
+ * IPv4-mapped (::ffff:x.x.x.x) and IPv4-compatible (::x.x.x.x) peers are matched against IPv4 entries and vice versa.
  */
 class AllowedPeers
 {
 	private static final Logger logger = LoggerFactory.getLogger(AllowedPeers.class);
-	private static final long DNS_WARN_LIMIT_MS = 60L * 1000L;
 
 	interface HostResolver
 	{
@@ -125,30 +122,20 @@ class AllowedPeers
 			Record[] records = l.run();
 
 			if (null == records)
-			{
 				return;
-			}
 
 			for (Record rec : records)
 			{
-				try
-				{
-					if (rec instanceof ARecord)
-						out.add(((ARecord)rec).getAddress());
-					else if (rec instanceof AAAARecord)
-						out.add(((AAAARecord)rec).getAddress());
-				}
-				catch (Exception e)
-				{
-					/* ignore malformed record */
-				}
+				if (rec instanceof ARecord)
+					out.add(((ARecord)rec).getAddress());
+				else if (rec instanceof AAAARecord)
+					out.add(((AAAARecord)rec).getAddress());
 			}
 		}
 	}
 
 	private final List<Entry> staticEntries = new ArrayList<Entry>();
 	private final List<String> dnsHosts = new ArrayList<String>();
-	private final Map<String, Long> dnsWarnAtMs = new ConcurrentHashMap<String, Long>();
 	private final HostResolver resolver;
 
 	private AllowedPeers(HostResolver resolver)
@@ -156,25 +143,6 @@ class AllowedPeers
 		this.resolver = resolver;
 	}
 
-	/**
-	 * Parse allow-list specification.
-	 *
-	 * Behaviour:
-	 * - invalid / unresolvable tokens are ignored (with a warning)
-	 * - empty / fully invalid list results in an allow-list that matches nothing
-	 *
-	 * @throws IllegalArgumentException if {@code spec} is null.
-	 */
-	static AllowedPeers parse(String spec)
-	{
-		return parse(spec, 3);
-	}
-
-	/**
-	 * Parse allow-list specification with DNS resolve timeout.
-	 *
-	 * @param dnsResolveTimeoutSeconds maximum time to wait for a DNS resolution attempt.
-	 */
 	static AllowedPeers parse(String spec, int dnsResolveTimeoutSeconds)
 	{
 		return parseForTest(spec, createDnsJavaResolver(dnsResolveTimeoutSeconds));
@@ -289,34 +257,10 @@ class AllowedPeers
 
 			return Collections.unmodifiableList(resolved);
 		}
-		catch (UnknownHostException e)
-		{
-			warnDnsOnce(host, "cannot resolve");
-			return Collections.emptyList();
-		}
 		catch (Exception e)
 		{
-			warnDnsOnce(host, e.getMessage());
 			return Collections.emptyList();
 		}
-	}
-
-	private void warnDnsOnce(String host, String reason)
-	{
-		final long now = System.currentTimeMillis();
-		final boolean[] shouldLog = {false};
-
-		dnsWarnAtMs.compute(host, (k, last) -> {
-			if (null == last || now - last.longValue() >= DNS_WARN_LIMIT_MS)
-			{
-				shouldLog[0] = true;
-				return now;
-			}
-			return last;
-		});
-
-		if (shouldLog[0])
-			logger.warn("cannot resolve SERVER host '{}': {}", host, reason);
 	}
 
 	private static boolean looksLikeIpLiteral(String s)
@@ -324,35 +268,18 @@ class AllowedPeers
 		if (s.isEmpty())
 			return false;
 
-		boolean hasColon = false;
-		boolean hasDot = false;
+		if (-1 != s.indexOf(':'))
+			return true;
 
 		for (int i = 0; i < s.length(); i++)
 		{
 			char c = s.charAt(i);
 
-			if (c >= '0' && c <= '9')
-				continue;
-
-			if (c == '.')
-			{
-				hasDot = true;
-				continue;
-			}
-
-			if (c == ':')
-			{
-				hasColon = true;
-				continue;
-			}
-
-			if (hasColon && ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')))
-				continue;
-
-			return false;
+			if ((c < '0' || c > '9') && c != '.')
+				return false;
 		}
 
-		return hasDot || hasColon;
+		return -1 != s.indexOf('.');
 	}
 
 	private static final class Entry
