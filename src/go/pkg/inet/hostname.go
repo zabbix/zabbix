@@ -18,6 +18,7 @@ package inet
 //
 // Valid host names for this function are names with only ASCII characters 0-9, A-Z, a-z,
 // hyphen ('-') and dot ('.').
+// Additionally underscore ('_') is allowed as Windows host names allow it.
 // Internationalized Domain Names with multibyte UTF-8 characters will be rejected as not
 // valid (Punycode can be used).
 //
@@ -35,9 +36,9 @@ func IsRFCHostName(host string) bool {
 
 	is_purely_numeric := true // detect numeric-only names
 
-	// first character must be alphanumeric
+	// first character must be alphanumeric, additionally underscore ('_') is allowed.
 	c := host[0]
-	if !isAlnumASCII(c) {
+	if !isAlnumASCII(c) && c != '_' {
 		return false
 	}
 
@@ -75,6 +76,9 @@ func IsRFCHostName(host string) bool {
 			}
 
 			labelLen = 0
+			prevHyphen = false
+		case c == '_':
+			labelLen++
 			prevHyphen = false
 		default:
 			return false
