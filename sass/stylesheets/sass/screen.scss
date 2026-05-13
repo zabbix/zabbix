@@ -2028,6 +2028,15 @@ select {
 	}
 }
 
+// Modals.
+.modal-popup.modal-popup-static {
+	&.modal-popup-sla-edit,
+	&.modal-popup-proxy-edit,
+	&.modal-popup-connector-edit {
+		--modal-max-width: 750px;
+	}
+}
+
 // Multiline input control.
 .multilineinput-control {
 	display: flex;
