@@ -102,7 +102,7 @@ class CScreenDiscovery extends CScreenBase {
 	private function getDRules(): array {
 		$drules = API::DRule()->get([
 			'output' => ['druleid', 'name'],
-			'druleids' => (array_key_exists('filter_druleids', $this->data) && $this->data['filter_druleids'])
+			'druleids' => array_key_exists('filter_druleids', $this->data) && $this->data['filter_druleids']
 				? $this->data['filter_druleids']
 				: null,
 			'filter' => ['status' => DRULE_STATUS_ACTIVE],
@@ -191,9 +191,7 @@ class CScreenDiscovery extends CScreenBase {
 			$key_ = NAME_DELIMITER.$key_;
 		}
 
-		$allow_redirect = ($dcheck['allow_redirect'] == 1)
-			? ' "'._('allow redirect').'"'
-			: '';
+		$allow_redirect = $dcheck['allow_redirect'] == 1 ? ' "'._('allow redirect').'"' : '';
 
 		return discovery_check_type2str($dcheck['type'])
 			.discovery_port2str($dcheck['type'], $dservice['port'])
@@ -265,7 +263,7 @@ class CScreenDiscovery extends CScreenBase {
 					$discovery_info[$ip] = [
 						'ip' => $ip,
 						'dns' => $dservice['dns'],
-						'type' => ($ip === $primary_ip) ? 'primary' : 'secondary',
+						'type' => $ip === $primary_ip ? 'primary' : 'secondary',
 						'class' => $host_class,
 						'host' => $service['host']['name'],
 						'status' => $service['host']['status'],
