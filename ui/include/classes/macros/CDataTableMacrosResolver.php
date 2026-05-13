@@ -258,7 +258,7 @@ class CDataTableMacrosResolver extends CMacrosResolver {
 			if (array_key_exists('usermacros', $matched_macros)) {
 				$macros['usermacros'][$triggerid] = [
 					'hostids' => [],
-					'macros' => $matched_macros['usermacros'],
+					'macros' => $matched_macros['usermacros']
 				];
 			}
 		}

@@ -3201,7 +3201,7 @@ class CMacrosResolverGeneral {
 			'TRIGGER.URL' => $url,
 			'TRIGGER.URL.NAME' => $url_name,
 			'TRIGGER.EXPRESSION' => $trigger['expression'] ?? '',
-			'TRIGGER.EXPRESSION.RECOVERY' => $trigger['recovery_expression'] ?? '',
+			'TRIGGER.EXPRESSION.RECOVERY' => $trigger['recovery_expression'] ?? ''
 		];
 
 		if (!array_key_exists($macro, $map)) {
@@ -3258,7 +3258,7 @@ class CMacrosResolverGeneral {
 			'EVENT.CAUSE.STATUS' => ($cause && array_key_exists('value', $cause))
 				? trigger_value2str($cause['value'])
 				: null,
-			'EVENT.CAUSE.VALUE' => $cause ? ($cause['value'] ?? '') : null,
+			'EVENT.CAUSE.VALUE' => $cause ? ($cause['value'] ?? '') : null
 		];
 
 		if (!array_key_exists($macro, $map)) {

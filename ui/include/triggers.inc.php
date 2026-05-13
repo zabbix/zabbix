@@ -65,7 +65,7 @@ function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAck
 function trigger_state2str($state = null) {
 	$triggerStates = [
 		TRIGGER_STATE_NORMAL => _('Normal'),
-		TRIGGER_STATE_UNKNOWN => _('Unknown'),
+		TRIGGER_STATE_UNKNOWN => _('Unknown')
 	];
 
 	if ($state === null) {
