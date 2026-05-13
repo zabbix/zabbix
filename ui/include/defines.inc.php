@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0beta1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050050);
+define('ZABBIX_DB_VERSION',		7050054);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -659,6 +659,7 @@ define('ZBX_DEFAULT_KEY_SSH',					'ssh.run[<unique short description>,<ip>,<port
 define('ZBX_DEFAULT_KEY_TELNET',				'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');
 
 define('ZBX_DEFAULT_JMX_ENDPOINT',	'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi');
+define('ZBX_DEFAULT_TRAPPER_HOSTS',	'{$TRAPPER.ALLOWED_HOSTS}');
 
 define('SYSMAP_ELEMENT_USE_ICONMAP_ON',		1);
 define('SYSMAP_ELEMENT_USE_ICONMAP_OFF',	0);
@@ -878,6 +879,9 @@ define('TRIGGER_SEVERITY_AVERAGE',			3);
 define('TRIGGER_SEVERITY_HIGH',				4);
 define('TRIGGER_SEVERITY_DISASTER',			5);
 define('TRIGGER_SEVERITY_COUNT',			6);
+
+define('TRIGGER_SEVERITY_OFF',			0);
+define('TRIGGER_SEVERITY_ON',			1);
 
 define('EVENT_CUSTOM_COLOR_DISABLED',	0);
 define('EVENT_CUSTOM_COLOR_ENABLED',	1);
@@ -1297,6 +1301,9 @@ define('SVG_GRAPH_TYPE_POINTS',		1);
 define('SVG_GRAPH_TYPE_STAIRCASE',	2);
 define('SVG_GRAPH_TYPE_BAR',		3);
 
+define('SVG_GRAPH_INVERT_VALUES_OFF',	0);
+define('SVG_GRAPH_INVERT_VALUES_ON',	1);
+
 define('SVG_GRAPH_STACKED_OFF',	0);
 define('SVG_GRAPH_STACKED_ON',	1);
 
@@ -1682,6 +1689,9 @@ define('ZBX_JAN_2038', 2145916800);
 define('ZBX_MIN_PORT_NUMBER', 0);
 define('ZBX_MAX_PORT_NUMBER', 65535);
 
+define('ZBX_AGENT_INTERFACE_MIN_PORT_NUMBER', 1024);
+define('ZBX_AGENT_INTERFACE_MAX_PORT_NUMBER', 32767);
+
 define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
 define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
 define('ZBX_MACRO_TYPE_VAULT', 2); // Display macro value as text (path to secret in Vault).
@@ -1749,7 +1759,7 @@ define('ZBX_ACTION_REMOVE',		2);
 define('ZBX_ACTION_REMOVE_ALL', 3);
 define('ZBX_ACTION_RENAME',		4);
 
-define('ZBX_HINTBOX_CONTENT_LIMIT',				8192);
+define('ZBX_HINTBOX_HTML_LIMIT',				8192);
 
 define('ZBX_OPDATA_HINTBOX_COLUMN_MAX_WIDTH', 	500);
 
@@ -1930,6 +1940,7 @@ define('ZBX_COLOR_SCHEME_LIGHT', 'light');
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
 define('ZBX_STYLE_ACTION_CONTAINER', 'action-container');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
+define('ZBX_STYLE_ALIGN_TOP', 'align-top');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
 define('ZBX_STYLE_ARROW_DOWN', 'arrow-down');
 define('ZBX_STYLE_ARROW_LEFT', 'arrow-left');
@@ -2010,6 +2021,7 @@ define('ZBX_STYLE_DASHBOARD_WIDGET_FORM', 'dashboard-widget-form');
 define('ZBX_STYLE_DASHBOARD_EDIT', 'dashboard-edit');
 define('ZBX_STYLE_DASHBOARD_WIDGET_GRAPH_LINK', 'dashboard-widget-graph-link');
 define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
+define('ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH', 'debug-output-table-refresh');
 define('ZBX_STYLE_DIFF', 'diff');
 define('ZBX_STYLE_DIFF_ADDED', 'diff-added');
 define('ZBX_STYLE_DIFF_REMOVED', 'diff-removed');

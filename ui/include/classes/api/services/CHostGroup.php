@@ -435,10 +435,27 @@ class CHostGroup extends CApiService {
 		DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids]);
 
 		API::Host()->unlinkGroups($groupids);
+		self::deleteUnusedHgSets($groupids);
 
 		DB::delete('hstgrp', ['groupid' => $groupids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_GROUP, $db_groups);
+	}
+
+	/**
+	 * Deletes host group sets that have no hosts linked to them.
+	 * This may happen during parallel deletion of hosts which have the same host group set.
+	 */
+	private static function deleteUnusedHgSets(array $groupids): void {
+		DBexecute(
+			'DELETE FROM hgset'.
+			' WHERE EXISTS ('.
+				'SELECT NULL'.
+				' FROM hgset_group hg'.
+				' WHERE hgset.hgsetid=hg.hgsetid'.
+					' AND '.dbConditionId('hg.groupid', $groupids).
+			')'
+		);
 	}
 
 	/**

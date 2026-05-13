@@ -63,7 +63,7 @@ $filter = (new CFilter())
 							'parameters' => [
 								'srctbl' => 'template_groups',
 								'srcfld1' => 'groupid',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_groups_',
 								'with_templates' => true,
 								'editable' => true,
@@ -85,7 +85,7 @@ $filter = (new CFilter())
 							'srctbl' => 'templates',
 							'srcfld1' => 'hostid',
 							'srcfld2' => 'host',
-							'dstfrm' => 'zbx_filter',
+							'dstfrm' => CFilter::FORM_NAME,
 							'dstfld1' => 'filter_templates_'
 						]
 					]
@@ -304,7 +304,7 @@ $form->addItem([
 		'template.export' => [
 			'content' => new CButtonExport('export.templates',
 				(new CUrl('zabbix.php'))
-					->setArgument('action', 'templates.list')
+					->setArgument('action', 'template.list')
 					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
 					->getUrl()
 			)

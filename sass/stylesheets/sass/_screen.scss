@@ -747,13 +747,25 @@ form {
 		white-space: nowrap;
 
 		label {
+			box-sizing: border-box;
 			display: block;
 			height: 24px;
 			line-height: 24px;
 			overflow: hidden;
 			text-overflow: ellipsis;
 
-			.btn-icon,
+			&:has(.btn-icon) {
+				position: relative;
+				margin-right: -2px;
+				padding-right: 23px;
+
+				.btn-icon {
+					position: absolute;
+					top: 4px;
+					right: 2px;
+				}
+			}
+
 			.icon {
 				margin-left: 5px;
 			}
@@ -2036,6 +2048,13 @@ select {
 		}
 	}
 
+	#lldoperation_form {
+		.table-forms-td-right:has(z-textarea-flexible) {
+			display: flex;
+			align-items: flex-start;
+		}
+	}
+
 	.maps-container {
 		max-height: 128px;
 		overflow-y: auto;
@@ -2046,6 +2065,15 @@ select {
 	.table-forms-second-column {
 		float: right;
 		line-height: 24px;
+	}
+}
+
+// Modals.
+.modal-popup.modal-popup-static {
+	&.modal-popup-sla-edit,
+	&.modal-popup-proxy-edit,
+	&.modal-popup-connector-edit {
+		--modal-max-width: 750px;
 	}
 }
 
@@ -2519,7 +2547,6 @@ select {
 			display: flex;
 			flex-wrap: nowrap;
 			align-items: center;
-			padding-left: 3px;
 			white-space: pre;
 
 			.scatter-plot-hintbox-icon-color {
@@ -2587,6 +2614,10 @@ select {
 	background-color: $lighter-yellow;
 	border: 1px solid $ui-border-color;
 	@extend %webkit-scrollbar;
+
+	&.debug-output-table-refresh {
+		margin: 10px 0 0 0;
+	}
 }
 
 .overlay-descr {
@@ -3284,7 +3315,8 @@ svg {
 	}
 
 	input[type=text],
-	select {
+	select,
+	z-textarea-flexible {
 		width: 100%;
 		min-width: 0; // https://stackoverflow.com/a/43361500
 	}
@@ -3338,6 +3370,13 @@ svg {
 		}
 	}
 
+	.preprocessing-list-item {
+		.step-parameters {
+			align-items: baseline;
+			line-height: 22px;
+		}
+	}
+
 	.step-parameters {
 		flex: 1;
 
@@ -3346,7 +3385,8 @@ svg {
 		}
 
 		> input[type=text],
-		z-select {
+		z-select,
+		z-textarea-flexible {
 			&:not(:last-child) {
 				margin-right: 5px;
 			}
@@ -3367,14 +3407,18 @@ svg {
 	}
 
 	.on-fail-options {
+		display: flex;
+		align-items: flex-start;
 		padding-right: $on-fail-width + $action-width + 5px;
-		margin-bottom: 5px;
+		margin-top: 6px;
+		line-height: 24px;
 
 		> label {
+			padding-top: 0;
 			padding-left: 30px;
 		}
 
-		input[type=text] {
+		z-textarea-flexible {
 			flex: 1;
 
 			&:not(:first-child) {
@@ -4284,6 +4328,10 @@ z-select {
 		}
 
 		&.link-alt:not(:hover):not(:focus) {
+			@extend .#{$class};
+		}
+
+		&.link:not(:hover):not(:focus) {
 			@extend .#{$class};
 		}
 	}

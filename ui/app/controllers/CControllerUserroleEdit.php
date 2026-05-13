@@ -241,6 +241,12 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		]);
 
 		$data['form_refresh'] = $this->getInput('form_refresh', 0);
+		$data['js_validation_rules'] = $data['roleid'] == null
+			? (new CFormValidator(CControllerUserroleCreate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerUserroleUpdate::getValidationRules()))->getRules();
+
+		$data['js_validation_rules_create'] = (new CFormValidator(CControllerUserroleCreate::getValidationRules()))
+			->getRules();
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user roles'));

@@ -10,8 +10,10 @@
 [lang="ka"] {
   --font-body-size: 70%; }
 
-.sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
-div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-piechart .dataset-body .form-grid > label, form.dashboard-widget-scatterplot .dataset-head .head-row > label, form.dashboard-widget-scatterplot .dataset-body .form-grid > label, form.dashboard-widget-svggraph .dataset-body .form-grid > label, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
+.sidebar .server-name, .form-grid > label,
+.form-grid .collapsible > label,
+.form-grid .fields-group > label, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
+div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-scatterplot .dataset-head .head-row > label, form.dashboard-widget-scatterplot .dataset-body .form-grid > label, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
 .totals-list.totals-list-horizontal .name {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1190,6 +1192,7 @@ footer {
   .form-grid > label,
   .form-grid .collapsible > label,
   .form-grid .fields-group > label {
+    box-sizing: border-box;
     align-self: start;
     line-height: 24px;
     text-align: right;
@@ -1198,13 +1201,22 @@ footer {
     .form-grid .collapsible > label.fields-group-label,
     .form-grid .fields-group > label.fields-group-label {
       margin-top: 6px; }
-    .form-grid > label .btn-icon,
     .form-grid > label .icon,
-    .form-grid .collapsible > label .btn-icon,
     .form-grid .collapsible > label .icon,
-    .form-grid .fields-group > label .btn-icon,
     .form-grid .fields-group > label .icon {
       margin-left: 5px; }
+    .form-grid > label:has(.btn-icon:not([hidden]):not([style*="display: none"])),
+    .form-grid .collapsible > label:has(.btn-icon:not([hidden]):not([style*="display: none"])),
+    .form-grid .fields-group > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) {
+      position: relative;
+      right: -2px;
+      padding-right: 23px; }
+      .form-grid > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) .btn-icon,
+      .form-grid .collapsible > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) .btn-icon,
+      .form-grid .fields-group > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) .btn-icon {
+        position: absolute;
+        top: 4px;
+        right: 2px; }
     .form-grid > label:not([for]),
     .form-grid .collapsible > label:not([for]),
     .form-grid .fields-group > label:not([for]) {
@@ -1234,6 +1246,9 @@ footer {
     margin-left: 10px; }
   .form-grid.form-grid-actions {
     margin-top: 10px; }
+  .form-grid .field-inline {
+    display: flex;
+    align-items: baseline; }
   .form-grid .form-field.offset-1 {
     grid-column-start: 2 !important; }
   .form-grid .form-field.offset-2 {
@@ -1301,6 +1316,11 @@ footer {
   .form-grid .btn-icon.btn-small {
     top: 1px;
     vertical-align: text-bottom; }
+  .form-grid.form-subgrid {
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1; }
+  .form-grid [hidden] {
+    display: none !important; }
 
 button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-grey-icon, .btn-link, .btn-overlay-close, .btn-debug {
   position: relative;
@@ -2354,9 +2374,14 @@ textarea.has-error {
   border: 1px solid #ff5e5e; }
 
 div[data-field-type="set"].has-error {
-  padding-left: 5px;
-  width: min-content;
   border: 1px solid #ff5e5e; }
+
+div[data-field-type="array"].has-error input[type="checkbox"]:not([readonly]) + label span {
+  border: 1px solid #ff5e5e;
+  color: #000000 !important; }
+div[data-field-type="array"].has-error input[type="checkbox"]:not([readonly]):checked + label span::after {
+  border-left-color: #ff5e5e;
+  border-bottom-color: #ff5e5e; }
 
 .radio-list-control.has-error input[type="radio"] + label {
   border-color: #ff5e5e; }
@@ -2389,6 +2414,9 @@ div[data-field-type="set"].has-error {
   .macro-input-group .has-error ~ .btn-dropdown-container .btn-dropdown-toggle:hover, .macro-input-group .has-error ~ .btn-dropdown-container .btn-dropdown-toggle:focus, .macro-input-group .has-error ~ .btn-dropdown-container .btn-dropdown-toggle[aria-expanded="true"] {
     background-color: #ff5e5e;
     color: #000000 !important; }
+
+z-color-picker.has-error .color-picker-box {
+  border: 1px solid #ff5e5e; }
 
 .list-check-radio .error {
   margin-top: 0; }
@@ -2683,9 +2711,9 @@ div[data-field-type="set"].has-error {
 .list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis,
 .list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
   border-bottom-style: none; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)),
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)):not(.green.link:not(:hover):not(:focus)),
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) td,
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)),
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)):not(.green.link:not(:hover):not(:focus)),
 .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) td,
 .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) sup {
   color: #f8f8f8; }
@@ -4487,19 +4515,21 @@ z-select {
       background-color: #383838;
       border-color: #666666;
       box-shadow: none; }
-    .z-select .focusable.color-negative, .z-select .focusable.color-negative.link-action:not(:hover):not(:focus), .z-select .focusable.color-negative.link-alt:not(:hover):not(:focus),
+    .z-select .focusable.color-negative, .z-select .focusable.color-negative.link-action:not(:hover):not(:focus), .z-select .focusable.color-negative.link-alt:not(:hover):not(:focus), .z-select .focusable.color-negative.link:not(:hover):not(:focus),
     z-select .focusable.color-negative,
     z-select .focusable.color-negative.btn-icon:not([disabled]),
     z-select .focusable.color-negative.btn-link:not([disabled]),
     z-select .focusable.color-negative.link-action:not(:hover):not(:focus),
-    z-select .focusable.color-negative.link-alt:not(:hover):not(:focus) {
+    z-select .focusable.color-negative.link-alt:not(:hover):not(:focus),
+    z-select .focusable.color-negative.link:not(:hover):not(:focus) {
       color: #ff5050; }
-      .z-select .focusable.color-negative::after, .z-select .focusable.color-negative.link-action:not(:focus):not(:hover)::after, .z-select .focusable.color-negative.link-alt:not(:focus):not(:hover)::after,
+      .z-select .focusable.color-negative::after, .z-select .focusable.color-negative.link-action:not(:focus):not(:hover)::after, .z-select .focusable.color-negative.link-alt:not(:focus):not(:hover)::after, .z-select .focusable.color-negative.link:not(:focus):not(:hover)::after,
       z-select .focusable.color-negative::after,
       z-select .focusable.color-negative.btn-icon:not([disabled])::after,
       z-select .focusable.color-negative.btn-link:not([disabled])::after,
       z-select .focusable.color-negative.link-action:not(:focus):not(:hover)::after,
-      z-select .focusable.color-negative.link-alt:not(:focus):not(:hover)::after {
+      z-select .focusable.color-negative.link-alt:not(:focus):not(:hover)::after,
+      z-select .focusable.color-negative.link:not(:focus):not(:hover)::after {
         color: #ffffff; }
   .z-select .list,
   z-select .list {
@@ -4530,12 +4560,13 @@ z-select {
       .z-select .list li.hover,
       z-select .list li.hover {
         background-color: #454545; }
-      .z-select .list li.color-negative, .z-select .list li.color-negative.link-action:not(:hover):not(:focus), .z-select .list li.color-negative.link-alt:not(:hover):not(:focus),
+      .z-select .list li.color-negative, .z-select .list li.color-negative.link-action:not(:hover):not(:focus), .z-select .list li.color-negative.link-alt:not(:hover):not(:focus), .z-select .list li.color-negative.link:not(:hover):not(:focus),
       z-select .list li.color-negative,
       z-select .list li.color-negative.btn-icon:not([disabled]),
       z-select .list li.color-negative.btn-link:not([disabled]),
       z-select .list li.color-negative.link-action:not(:hover):not(:focus),
-      z-select .list li.color-negative.link-alt:not(:hover):not(:focus) {
+      z-select .list li.color-negative.link-alt:not(:hover):not(:focus),
+      z-select .list li.color-negative.link:not(:hover):not(:focus) {
         color: #ff5050; }
       .z-select .list li[disabled],
       z-select .list li[disabled] {
@@ -4576,8 +4607,9 @@ z-sparkline {
     left: 0; }
 
 z-textarea-flexible {
-  display: inline-block; }
+  display: inline-grid; }
   z-textarea-flexible textarea {
+    display: block !important;
     width: 100%;
     height: 24px;
     overflow: hidden;
@@ -5250,6 +5282,21 @@ div.dashboard-widget-itemcard .item-card {
             height: 14px;
             margin-top: 2px; }
 
+.dashboard-widget-itemcard-hintbox-image .dashboard-widget-itemhcard-hintbox {
+  overflow: hidden; }
+.dashboard-widget-itemcard-hintbox-image.is-loading {
+  min-width: 100px;
+  min-height: 56px; }
+  .dashboard-widget-itemcard-hintbox-image.is-loading::before {
+    content: ' '; }
+  .dashboard-widget-itemcard-hintbox-image.is-loading img {
+    opacity: 0; }
+.dashboard-widget-itemcard-hintbox-image img {
+  display: block;
+  max-width: 50vw;
+  max-height: 50vh;
+  opacity: 1; }
+
 form.dashboard-widget-itemhistory #list_columns .overflow-ellipsis {
   max-width: 250px; }
 form.dashboard-widget-itemhistory #list_columns .inaccessible {
@@ -5855,6 +5902,11 @@ form.dashboard-widget-scatterplot {
 
 div.dashboard-widget-scatterplot {
   overflow-x: hidden; }
+
+.svg-scatter-plot-point {
+  fill-opacity: 1;
+  fill: var(--color);
+  stroke: var(--color); }
 
 .svg-scatter-plot-legend {
   position: relative;
@@ -6910,12 +6962,20 @@ form.is-loading {
     width: 15%;
     white-space: nowrap; }
     .table-forms .table-forms-td-left label {
+      box-sizing: border-box;
       display: block;
       height: 24px;
       line-height: 24px;
       overflow: hidden;
       text-overflow: ellipsis; }
-      .table-forms .table-forms-td-left label .btn-icon,
+      .table-forms .table-forms-td-left label:has(.btn-icon) {
+        position: relative;
+        margin-right: -2px;
+        padding-right: 23px; }
+        .table-forms .table-forms-td-left label:has(.btn-icon) .btn-icon {
+          position: absolute;
+          top: 4px;
+          right: 2px; }
       .table-forms .table-forms-td-left label .icon {
         margin-left: 5px; }
     .table-forms .table-forms-td-left .checkbox-radio {
@@ -7651,6 +7711,9 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     border-top: 1px solid #333333; }
   .overlay-dialogue .table-forms-td-right td label {
     display: block; }
+  .overlay-dialogue #lldoperation_form .table-forms-td-right:has(z-textarea-flexible) {
+    display: flex;
+    align-items: flex-start; }
   .overlay-dialogue .maps-container {
     max-height: 128px;
     overflow-y: auto;
@@ -7658,6 +7721,9 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
   .overlay-dialogue .table-forms-second-column {
     float: right;
     line-height: 24px; }
+
+.modal-popup.modal-popup-static.modal-popup-sla-edit, .modal-popup.modal-popup-static.modal-popup-proxy-edit, .modal-popup.modal-popup-static.modal-popup-connector-edit {
+  --modal-max-width: 750px; }
 
 .multilineinput-control {
   display: flex;
@@ -7951,7 +8017,6 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    padding-left: 3px;
     white-space: pre; }
     .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis .scatter-plot-hintbox-icon-color {
       display: inline-block;
@@ -7997,6 +8062,8 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
   margin: 10px;
   background-color: #222222;
   border: 1px solid #444444; }
+  .debug-output.debug-output-table-refresh {
+    margin: 10px 0 0 0; }
 
 .overlay-descr {
   max-height: 150px;
@@ -8521,7 +8588,8 @@ svg {
     line-height: 24px;
     padding-right: 5px; }
   .preprocessing-list input[type=text],
-  .preprocessing-list select {
+  .preprocessing-list select,
+  .preprocessing-list z-textarea-flexible {
     width: 100%;
     min-width: 0; }
   .preprocessing-list .btn-link:not(:first-child) {
@@ -8557,12 +8625,16 @@ svg {
     .preprocessing-list .preprocessing-step .step-on-fail,
     .preprocessing-list .preprocessing-step .step-action {
       height: 34px; }
+  .preprocessing-list .preprocessing-list-item .step-parameters {
+    align-items: baseline;
+    line-height: 22px; }
   .preprocessing-list .step-parameters {
     flex: 1; }
     .preprocessing-list .step-parameters z-select {
       flex: 0 0 auto; }
     .preprocessing-list .step-parameters > input[type=text]:not(:last-child),
-    .preprocessing-list .step-parameters z-select:not(:last-child) {
+    .preprocessing-list .step-parameters z-select:not(:last-child),
+    .preprocessing-list .step-parameters z-textarea-flexible:not(:last-child) {
       margin-right: 5px; }
   .preprocessing-list .step-on-fail {
     flex: 0 0 100px;
@@ -8574,13 +8646,17 @@ svg {
     max-width: 188px;
     padding-right: 0; }
   .preprocessing-list .on-fail-options {
+    display: flex;
+    align-items: flex-start;
     padding-right: 293px;
-    margin-bottom: 5px; }
+    margin-top: 6px;
+    line-height: 24px; }
     .preprocessing-list .on-fail-options > label {
+      padding-top: 0;
       padding-left: 30px; }
-    .preprocessing-list .on-fail-options input[type=text] {
+    .preprocessing-list .on-fail-options z-textarea-flexible {
       flex: 1; }
-      .preprocessing-list .on-fail-options input[type=text]:not(:first-child) {
+      .preprocessing-list .on-fail-options z-textarea-flexible:not(:first-child) {
         margin-left: 5px; }
   .preprocessing-list .preprocessing-list-head {
     color: #cacaca;
@@ -9070,64 +9146,64 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   .audit-details-wrapper .audit-show-details-btn-wrapper {
     margin: 0 5px 0 5px; }
 
-.color-accent, .color-accent.btn-icon:not([disabled]), .color-accent.btn-link:not([disabled]), .color-accent.link-action:not(:hover):not(:focus), .color-accent.link-alt:not(:hover):not(:focus) {
+.color-accent, .color-accent.btn-icon:not([disabled]), .color-accent.btn-link:not([disabled]), .color-accent.link-action:not(:hover):not(:focus), .color-accent.link-alt:not(:hover):not(:focus), .color-accent.link:not(:hover):not(:focus) {
   color: #ff7800; }
-  .color-accent.btn-link:not([disabled]), .btn-link.color-accent.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-accent.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .color-accent.btn-link:not([disabled]), .btn-link.color-accent.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-accent.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.color-accent.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #ff7800; }
 
-.color-icon, .color-icon.btn-icon:not([disabled]), .color-icon.btn-link:not([disabled]), .color-icon.link-action:not(:hover):not(:focus), .color-icon.link-alt:not(:hover):not(:focus) {
+.color-icon, .color-icon.btn-icon:not([disabled]), .color-icon.btn-link:not([disabled]), .color-icon.link-action:not(:hover):not(:focus), .color-icon.link-alt:not(:hover):not(:focus), .color-icon.link:not(:hover):not(:focus) {
   color: #dddddd; }
-  .color-icon.btn-link:not([disabled]), .btn-link.color-icon.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-icon.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .color-icon.btn-link:not([disabled]), .btn-link.color-icon.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-icon.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.color-icon.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #dddddd; }
 
-.color-negative, .color-negative.btn-icon:not([disabled]), .color-negative.btn-link:not([disabled]), .color-negative.link-action:not(:hover):not(:focus), .color-negative.link-alt:not(:hover):not(:focus) {
+.color-negative, .color-negative.btn-icon:not([disabled]), .color-negative.btn-link:not([disabled]), .color-negative.link-action:not(:hover):not(:focus), .color-negative.link-alt:not(:hover):not(:focus), .color-negative.link:not(:hover):not(:focus) {
   color: #ff5050; }
-  .color-negative.btn-link:not([disabled]), .btn-link.color-negative.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-negative.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .color-negative.btn-link:not([disabled]), .btn-link.color-negative.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-negative.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.color-negative.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #ff5050; }
 
-.color-warning, .color-warning.btn-icon:not([disabled]), .color-warning.btn-link:not([disabled]), .color-warning.link-action:not(:hover):not(:focus), .color-warning.link-alt:not(:hover):not(:focus) {
+.color-warning, .color-warning.btn-icon:not([disabled]), .color-warning.btn-link:not([disabled]), .color-warning.link-action:not(:hover):not(:focus), .color-warning.link-alt:not(:hover):not(:focus), .color-warning.link:not(:hover):not(:focus) {
   color: #ffa20d; }
-  .color-warning.btn-link:not([disabled]), .btn-link.color-warning.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-warning.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .color-warning.btn-link:not([disabled]), .btn-link.color-warning.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-warning.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.color-warning.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #ffa20d; }
 
-.color-positive, .color-positive.btn-icon:not([disabled]), .color-positive.btn-link:not([disabled]), .color-positive.link-action:not(:hover):not(:focus), .color-positive.link-alt:not(:hover):not(:focus) {
+.color-positive, .color-positive.btn-icon:not([disabled]), .color-positive.btn-link:not([disabled]), .color-positive.link-action:not(:hover):not(:focus), .color-positive.link-alt:not(:hover):not(:focus), .color-positive.link:not(:hover):not(:focus) {
   color: #23d545; }
-  .color-positive.btn-link:not([disabled]), .btn-link.color-positive.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-positive.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .color-positive.btn-link:not([disabled]), .btn-link.color-positive.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-positive.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.color-positive.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #23d545; }
 
-.blue, .blue.btn-icon:not([disabled]), .blue.btn-link:not([disabled]), .blue.link-action:not(:hover):not(:focus), .blue.link-alt:not(:hover):not(:focus) {
+.blue, .blue.btn-icon:not([disabled]), .blue.btn-link:not([disabled]), .blue.link-action:not(:hover):not(:focus), .blue.link-alt:not(:hover):not(:focus), .blue.link:not(:hover):not(:focus) {
   color: #ffffff; }
-  .blue.btn-link:not([disabled]), .btn-link.blue.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.blue.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .blue.btn-link:not([disabled]), .btn-link.blue.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.blue.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.blue.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #ffffff; }
 
-.green, .green.btn-icon:not([disabled]), .green.btn-link:not([disabled]), .green.link-action:not(:hover):not(:focus), .green.link-alt:not(:hover):not(:focus) {
+.green, .green.btn-icon:not([disabled]), .green.btn-link:not([disabled]), .green.link-action:not(:hover):not(:focus), .green.link-alt:not(:hover):not(:focus), .green.link:not(:hover):not(:focus) {
   color: #23d545; }
-  .green.btn-link:not([disabled]), .btn-link.green.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.green.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .green.btn-link:not([disabled]), .btn-link.green.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.green.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.green.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #23d545; }
 
-.grey, .grey.btn-icon:not([disabled]), .grey.btn-link:not([disabled]), .grey.link-action:not(:hover):not(:focus), .grey.link-alt:not(:hover):not(:focus) {
+.grey, .grey.btn-icon:not([disabled]), .grey.btn-link:not([disabled]), .grey.link-action:not(:hover):not(:focus), .grey.link-alt:not(:hover):not(:focus), .grey.link:not(:hover):not(:focus) {
   color: #cacaca; }
-  .grey.btn-link:not([disabled]), .btn-link.grey.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.grey.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .grey.btn-link:not([disabled]), .btn-link.grey.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.grey.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.grey.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #cacaca; }
 
-.orange, .orange.btn-icon:not([disabled]), .orange.btn-link:not([disabled]), .orange.link-action:not(:hover):not(:focus), .orange.link-alt:not(:hover):not(:focus) {
+.orange, .orange.btn-icon:not([disabled]), .orange.btn-link:not([disabled]), .orange.link-action:not(:hover):not(:focus), .orange.link-alt:not(:hover):not(:focus), .orange.link:not(:hover):not(:focus) {
   color: #ff7800; }
-  .orange.btn-link:not([disabled]), .btn-link.orange.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.orange.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .orange.btn-link:not([disabled]), .btn-link.orange.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.orange.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.orange.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #ff7800; }
 
-.red, .red.btn-icon:not([disabled]), .red.btn-link:not([disabled]), .red.link-action:not(:hover):not(:focus), .red.link-alt:not(:hover):not(:focus) {
+.red, .red.btn-icon:not([disabled]), .red.btn-link:not([disabled]), .red.link-action:not(:hover):not(:focus), .red.link-alt:not(:hover):not(:focus), .red.link:not(:hover):not(:focus) {
   color: #ff5050; }
-  .red.btn-link:not([disabled]), .btn-link.red.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.red.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .red.btn-link:not([disabled]), .btn-link.red.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.red.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.red.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #ff5050; }
 
-.teal, .teal.btn-icon:not([disabled]), .teal.btn-link:not([disabled]), .teal.link-action:not(:hover):not(:focus), .teal.link-alt:not(:hover):not(:focus) {
+.teal, .teal.btn-icon:not([disabled]), .teal.btn-link:not([disabled]), .teal.link-action:not(:hover):not(:focus), .teal.link-alt:not(:hover):not(:focus), .teal.link:not(:hover):not(:focus) {
   color: #0f998b; }
-  .teal.btn-link:not([disabled]), .btn-link.teal.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.teal.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .teal.btn-link:not([disabled]), .btn-link.teal.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.teal.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.teal.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #0f998b; }
 
-.yellow, .yellow.btn-icon:not([disabled]), .yellow.btn-link:not([disabled]), .yellow.link-action:not(:hover):not(:focus), .yellow.link-alt:not(:hover):not(:focus) {
+.yellow, .yellow.btn-icon:not([disabled]), .yellow.btn-link:not([disabled]), .yellow.link-action:not(:hover):not(:focus), .yellow.link-alt:not(:hover):not(:focus), .yellow.link:not(:hover):not(:focus) {
   color: #ffa20d; }
-  .yellow.btn-link:not([disabled]), .btn-link.yellow.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.yellow.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .yellow.btn-link:not([disabled]), .btn-link.yellow.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.yellow.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.yellow.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #ffa20d; }
 
 .sidebar .logo:focus .zabbix-logo-sidebar {

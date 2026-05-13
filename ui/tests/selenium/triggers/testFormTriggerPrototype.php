@@ -20,7 +20,6 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 define('LONG_KEY', substr(STRING_6000, 0, 2038).'[{#MACRO}]');
 
-use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
@@ -343,8 +342,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 
 		$this->zbxTestTextPresent('Name');
-		$this->zbxTestAssertVisibleXpath("//input[@name='name']");
-		$this->zbxTestAssertAttribute("//input[@name='name']", 'maxlength', 255);
+		$this->zbxTestAssertVisibleXpath("//z-textarea-flexible[@name='name']");
+		$this->zbxTestAssertAttribute("//z-textarea-flexible[@name='name']", 'maxlength', 255);
 
 		if (!(isset($data['constructor'])) || $data['constructor'] == 'open_close') {
 			$this->zbxTestTextPresent(['Expression', 'Expression constructor']);
@@ -435,7 +434,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent('Menu entry URL');
 		$this->zbxTestAssertVisibleId('url');
-		$this->zbxTestAssertAttribute("//input[@id='url']", 'maxlength', 2048);
+		$this->zbxTestAssertAttribute("//z-textarea-flexible[@id='url']", 'maxlength', 2048);
 
 		$this->zbxTestAssertElementPresentId('priority_0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_0'));
@@ -514,7 +513,6 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 
 		COverlayDialogElement::find()->one()->close();
-
 	}
 
 	// Returns update data
@@ -981,21 +979,15 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$dialog_footer = $dialog->getFooter();
 
 		if (isset($data['description'])) {
-			$this->zbxTestInputTypeByXpath("//input[@name='name']", $data['description']);
+			$this->query('id:name')->one()->fill($data['description']);
 			$description = $data['description'];
 		}
 
 		if (isset($data['expression'])) {
-			switch ($data['expression']) {
-				case 'default':
-					$expression = 'last(/'.self::HOST.'/'.self::ITEM_KEY.'[{#KEY}],#1)=0';
-					$this->zbxTestInputType('expression', $expression);
-					break;
-				default:
-					$expression = $data['expression'];
-					$this->zbxTestInputType('expression', $expression);
-					break;
-			}
+			$expression = ($data['expression'] === 'default')
+				? 'last(/'.self::HOST.'/'.self::ITEM_KEY.'[{#KEY}],#1)=0'
+				: $data['expression'];
+			$this->query('id:expression')->one()->fill($expression);
 		}
 
 		if (isset($data['type'])) {
@@ -1011,7 +1003,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['url'])) {
-			$this->zbxTestInputType('url', $data['url']);
+			$this->query('id:url')->one()->fill($data['url']);
 		}
 
 		if (isset($data['severity'])) {
@@ -1076,7 +1068,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 							$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-negative').']')->all()->count()
 					);
 					$text = $this->query('xpath://tr[1]//button[@data-hintbox]')->one()
-							->getAttribute('data-hintbox-contents');
+							->getAttribute('data-hintbox-html');
 					foreach ($constructor['errors'] as $error) {
 						$this->assertStringContainsString($error, $text);
 					}
@@ -1090,7 +1082,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 
 		if (!isset($data['constructor'])) {
-			$dialog_footer->query('button:Add')->one()->click();
+			$dialog_footer->query('button:Add')->waitUntilClickable()->one()->click();
 			switch ($data['expected']) {
 				case TEST_GOOD:
 					$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger prototype added');
@@ -1135,7 +1127,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 			$this->zbxTestClickLinkTextWait($description);
 			$this->zbxTestAssertElementValue('expression', $expression);
-			$getName = $this->zbxTestGetValue("//input[@name='name']");
+			$getName = $this->zbxTestGetValue("//z-textarea-flexible[@name='name']");
 			$this->assertEquals($getName, $description);
 		}
 

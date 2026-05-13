@@ -37,6 +37,7 @@
 #include "zbxstr.h"
 #include "zbx_scripts_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxsupervisor_client.h"
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
 #endif
@@ -70,7 +71,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 {
 	zbx_db_row_t	row;
 	zbx_uint64_t	parent_taskid, hostid, alertid;
-	int		ret = FAIL;
+	int		ret = FAIL, host_found;
 	zbx_script_t	script;
 	char		*info = NULL, error[MAX_STRING_LEN];
 	zbx_dc_host_t	host;
@@ -88,23 +89,35 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 
 	t = zbx_time();
 
-	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, (time_t)t,
-			0, 0);
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, (time_t)t, 0, 0);
 
 	ZBX_STR2UINT64(parent_taskid, row[9]);
+	ZBX_STR2UINT64(hostid, row[10]);
+
+	host_found = zbx_dc_get_host_by_hostid(&host, hostid);
 
 	if (0 != ttl && clock + ttl < now)
 	{
-		task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
-				"The remote command has been expired.");
+		if (FAIL == host_found)
+		{
+			task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
+					"The remote command has been expired. Unknown host.");
+		}
+		else
+		{
+			task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
+					"The remote command has been expired.");
+		}
+
 		goto finish;
 	}
 
-	ZBX_STR2UINT64(hostid, row[10]);
-	if (FAIL == zbx_dc_get_host_by_hostid(&host, hostid))
+	if (FAIL == host_found)
 	{
-		task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL, "Unknown host.");
-		goto finish;
+		zbx_tm_task_free(task);
+		zbx_db_free_result(result);
+
+		return ret;
 	}
 
 	zbx_script_init(&script);
@@ -573,6 +586,8 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, rtc_msgs_num,
 			taskmanager_args_in->config_comms->config_timeout, &rtc);
+
+	zbx_supervisor_set_process_running(server_num);
 
 	while (ZBX_IS_RUNNING())
 	{

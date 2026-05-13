@@ -67,25 +67,12 @@ window.trigger_edit_popup = new class {
 	}
 
 	#initActions() {
-		['input', 'keydown', 'paste'].forEach((event_type) => {
-			this.name.addEventListener(event_type,
-				(e) => {
-					this.form_element.querySelector('#event_name').placeholder = e.target.value;
-				}
-			);
-			this.name.dispatchEvent(new Event('input'));
-		});
+		const update_event_name_placeholder = placeholder => {
+			this.form_element.querySelector('#event_name').placeholder = placeholder;
+		};
 
-		// Form submit on Enter for event_name field, because textareaflexible.js triggers JQuery event.
-		this.form_element.querySelector('[name="event_name"]').addEventListener('keyup', e => {
-			if (e.key === 'Enter') {
-				if (e.target.readOnly) {
-					return;
-				}
-
-				$(this.form_element).submit();
-			}
-		});
+		this.name.addEventListener('input', e => update_event_name_placeholder(e.target.value));
+		update_event_name_placeholder(this.name.value);
 
 		// Tags tab events.
 		this.form_element.querySelectorAll('[name="show_inherited_tags"]')
@@ -499,9 +486,24 @@ window.trigger_edit_popup = new class {
 	}
 
 	#openPopupTriggerExpr(trigger_options) {
-		PopUp('popup.triggerexpr', {...this.expression_popup_parameters, ...trigger_options},
+		const dialogue = PopUp('popup.triggerexpr.edit', {...this.expression_popup_parameters, ...trigger_options},
 			{dialogueid: 'trigger-expr', dialogue_class: 'modal-popup-generic'}
-		);
+		).$dialogue[0];
+
+		dialogue.addEventListener('dialogue.submit', (e) => {
+			overlayDialogueDestroy('trigger-expr');
+			const expression_field = document.getElementById(trigger_options.dstfld1);
+
+			if (trigger_options.dstfld1 === 'expr_temp' || trigger_options.dstfld1 === 'recovery_expr_temp') {
+				expression_field.value = e.detail.expression;
+			}
+			else {
+				expression_field.value += e.detail.expression;
+			}
+
+			expression_field.dispatchEvent(new Event('change'));
+			this.form.validateChanges(['expression', 'recovery_expression']);
+		});
 	}
 
 	#expressionConstructor(fields = {}, expression_type = <?= TRIGGER_EXPRESSION ?>) {
