@@ -523,7 +523,7 @@ class CMaintenance extends CApiService {
 			'where' => ['maintenanceid' => $maintenanceids]
 		]);
 
-		self::addMaintenanceUnsuppressionRecords($maintenanceids);
+		self::createUnsuppressionAcknowledgements($maintenanceids);
 
 		DB::delete('timeperiods', ['timeperiodid' => array_column($maintenances_windows, 'timeperiodid')]);
 		DB::delete('maintenances', ['maintenanceid' => $maintenanceids]);
@@ -538,7 +538,7 @@ class CMaintenance extends CApiService {
 	 *
 	 * @param array $maintenanceids  Array of maintenance IDs being deleted.
 	 */
-	private static function addMaintenanceUnsuppressionRecords(array $maintenanceids): void {
+	private static function createUnsuppressionAcknowledgements(array $maintenanceids): void {
 		$ins_acknowledges = [];
 		$time = time();
 
