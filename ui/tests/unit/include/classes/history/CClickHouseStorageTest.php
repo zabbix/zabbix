@@ -26,8 +26,9 @@ class CHistoryStorageClickHouseTest extends TestCase {
 				'types' => [],
 				'db' => '',
 				'username' => '',
-				'password' => ''
-			], []),
+				'password' => '',
+				'value_type_ttl' => []
+			]),
 			CClickHouseStorage::class
 		);
 
@@ -294,8 +295,9 @@ class CHistoryStorageClickHouseTest extends TestCase {
 				'types' => [],
 				'db' => '',
 				'username' => '',
-				'password' => ''
-			], []),
+				'password' => '',
+				'value_type_ttl' => []
+			]),
 			CClickHouseStorage::class
 		);
 
@@ -349,8 +351,9 @@ class CHistoryStorageClickHouseTest extends TestCase {
 				'types' => [],
 				'db' => '',
 				'username' => '',
-				'password' => ''
-			], []),
+				'password' => '',
+				'value_type_ttl' => []
+			]),
 			CClickHouseStorage::class
 		);
 		$defaults = [
@@ -414,8 +417,9 @@ class CHistoryStorageClickHouseTest extends TestCase {
 				'types' => [],
 				'db' => '',
 				'username' => '',
-				'password' => ''
-			], []),
+				'password' => '',
+				'value_type_ttl' => []
+			]),
 			CClickHouseStorage::class
 		);
 		$defaults = [
@@ -550,8 +554,9 @@ class CHistoryStorageClickHouseTest extends TestCase {
 				'types' => [],
 				'db' => '',
 				'username' => '',
-				'password' => ''
-			], []),
+				'password' => '',
+				'value_type_ttl' => []
+			]),
 			CClickHouseStorage::class
 		);
 		$defaults = [
