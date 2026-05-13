@@ -628,7 +628,7 @@ class testPageProblems extends CWebTest {
 			$this->filterFromHeader($options['column']);
 			$table->waitUntilReady()->invalidate();
 
-			// Check that expected elements are shown in the speciffic datatable row and column.
+			// Check that expected elements are shown in the specific datatable row and column.
 			foreach (['elements_present' => true, 'elements_not_present' => false] as $key => $expected_presence) {
 				if (array_key_exists($key, $options)) {
 					foreach ($options[$key] as $element) {
@@ -2260,7 +2260,7 @@ class testPageProblems extends CWebTest {
 
 		$form->fill($data['filter'])->submit();
 
-		// Set oprational data in Problem column.
+		// Set operational data in Problem column.
 		if (array_key_exists('header_filter', $data)) {
 			$this->filterFromHeader($data['header_filter']);
 		}
