@@ -500,6 +500,7 @@ func processConfigItem(taskManager scheduler.Scheduler, timeout time.Duration, n
 
 		var err error
 		var taskResult *string
+
 		taskResult, err = taskManager.PerformTask(item, timeout, false, clientID)
 		if err != nil {
 			return "", err

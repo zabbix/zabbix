@@ -82,6 +82,7 @@ func processConfigItem(timeout time.Duration, name, value, item string, length i
 
 	var err error
 	var taskResult *string
+
 	taskResult, err = performTask(item, timeout, false, clientID)
 	if err != nil {
 		return "", err

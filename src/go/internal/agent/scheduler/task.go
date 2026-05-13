@@ -652,7 +652,8 @@ func (t *commandTask) perform(s Scheduler) {
 
 		exportStartedCtx := plugin.StartTimeout(t, time.Now())
 
-		if ret, err := e.Export("system.run", t.params, exportStartedCtx); err == nil {
+		ret, err := e.Export("system.run", t.params, exportStartedCtx)
+		if err == nil {
 			if ret != nil {
 				cr = &resultcache.CommandResult{
 					ID:     t.id,

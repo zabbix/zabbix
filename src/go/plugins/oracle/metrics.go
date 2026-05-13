@@ -83,18 +83,16 @@ var metricsMeta = map[string]handlerFunc{ //nolint:gochecknoglobals
 var (
 	//nolint:gochecknoglobals
 	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
-			WithValidator(uri.URIValidator{Defaults: dbconn.URIDefaults, AllowedSchemes: []string{"tcp", "tcps"}}). //nolint:gci,gofmt,lll //here and next - suppress linter's dislike of newlines in fluent builder
+			WithValidator(uri.URIValidator{Defaults: dbconn.URIDefaults, AllowedSchemes: []string{"tcp", "tcps"}}).
 			WithDefault(dbconn.URIDefaults.Scheme + "://localhost:" + dbconn.URIDefaults.Port).
 			WithSession()
 	//nolint:gochecknoglobals
-	paramUsername = metric.NewConnParam("User", "Oracle user.").
-			WithDefault("") //nolint:gci,gofmt
+	paramUsername = metric.NewConnParam("User", "Oracle user.").WithDefault("")
 	//nolint:gochecknoglobals
-	paramPassword = metric.NewConnParam("Password", "User's password.").
-			WithDefault("") //nolint:gci,gofmt
+	paramPassword = metric.NewConnParam("Password", "User's password.").WithDefault("")
 	//nolint:gochecknoglobals
-	paramService = metric.NewConnParam("Service", "Service name to be used for connection.").
-			WithDefault("XE") //nolint:gci,gofmt
+	paramService = metric.NewConnParam("Service", "Service name to be used for connection.").WithDefault("XE")
+	//nolint:gochecknoglobals
 	paramConnTimeout = metric.NewSessionOnlyParam("ConnectionTimeout", "Time for connection to timeout.")
 )
 

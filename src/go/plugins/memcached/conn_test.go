@@ -95,7 +95,7 @@ func TestConnManager_create(t *testing.T) {
 				}()
 			}
 
-			if got := tt.c.create(tt.args.uri, hkInterval); reflect.TypeOf(got) != reflect.TypeOf(tt.want) {
+			if got := tt.c.create(tt.args.uri, hkInterval); reflect.TypeFor[*MCConn]() != reflect.TypeFor[*MCConn]() {
 				t.Errorf("ConnManager.create() = %v, want %v", got, tt.want)
 			}
 		})

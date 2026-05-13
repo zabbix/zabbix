@@ -240,6 +240,7 @@ func ParseAndValidateItemTimeout(unparsedTimeout any) (int, error) {
 	var timeout int
 	var err error
 
+	//nolint:wsl_v5 // false positive
 	switch v := unparsedTimeout.(type) {
 	case nil:
 		timeout = agent.Options.Timeout

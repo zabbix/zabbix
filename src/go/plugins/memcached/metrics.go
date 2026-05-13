@@ -34,11 +34,15 @@ var (
 
 // Common params: [URI|Session][,User][,Password]
 var (
+	//nolint:gochecknoglobals // global constant
 	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
 			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
 			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
-	paramUser        = metric.NewConnParam("User", "Memcached user.").WithDefault("")
-	paramPassword    = metric.NewConnParam("Password", "User's password.").WithDefault("")
+	//nolint:gochecknoglobals // global constant
+	paramUser = metric.NewConnParam("User", "Memcached user.").WithDefault("")
+	//nolint:gochecknoglobals // global constant
+	paramPassword = metric.NewConnParam("Password", "User's password.").WithDefault("")
+	//nolint:gochecknoglobals // global constant
 	paramConnTimeout = metric.NewSessionOnlyParam("ConnectionTimeout", "Time for connection to timeout.")
 )
 

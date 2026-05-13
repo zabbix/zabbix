@@ -48,7 +48,7 @@ var (
 	// Common params: [URI|Session][,User][,Password].
 	//nolint:gochecknoglobals //readability
 	paramURI = metric.NewConnParam(uriParam, "URI to connect or session name.").
-			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port). //nolint:gci,gofmt //readablility
+			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).
 			WithSession().
 			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
 	//nolint:gochecknoglobals //readability
