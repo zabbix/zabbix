@@ -692,8 +692,9 @@ class CHistoryStorageClickHouseTest extends TestCase {
 				'types' => [],
 				'db' => '',
 				'username' => '',
-				'password' => ''
-			], []),
+				'password' => '',
+				'value_type_ttl' => []
+			]),
 			CClickHouseStorage::class
 		);
 		$defaults = [
