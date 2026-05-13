@@ -107,7 +107,13 @@ function normalizeNumericBox(input, {allow_empty, allow_negative, min_length}) {
  * @param {String} str
  */
 function t(str) {
-	return (!!locale[str]) ? locale[str] : str;
+	if (!!locale[str]) {
+		return locale[str];
+	}
+
+	console.warn(`Missing translation for string: ${str}`);
+
+	return str;
 }
 
 /**
@@ -847,7 +853,10 @@ function urlEncodeData(parameters, prefix = '') {
  *            d: "3"
  *        },
  *        e: {
- *            f: ["4", "5"]
+ *            f: {
+ *                0: "4",
+ *                1: "5"
+ *            }
  *        }
  *    }
  *
@@ -860,49 +869,40 @@ function getFormFields(form) {
 }
 
 /**
- * Convert URL search parameters into nested object.
+ * Convert URL search parameters into a nested object.
  *
  * @param search_params  An object implementing iterator protocol (URLSearchParams).
  *
  * @returns {Object}
  */
 function searchParamsToObject(search_params) {
-	const fields = {};
+	const fields = Object.create(null);
 
 	for (let [key, value] of search_params) {
 		value = value.replace(/\r?\n/g, '\r\n');
 
-		const key_parts = [...key.matchAll(/[^\[\]]+|\[\]/g)];
+		const key_parts = [...key.matchAll(/[^\[\]]+|\[]/g)];
 
 		let key_fields = fields;
 
 		for (let i = 0; i < key_parts.length; i++) {
-			const key_part = key_parts[i][0];
+			let key_part = key_parts[i][0];
+
+			if (key_part === '[]') {
+				key_part = Object.keys(key_fields).length;
+			}
 
 			if (i === key_parts.length - 1) {
-				if (key_part === '[]') {
-					key_fields.push(value);
-				}
-				else {
-					key_fields[key_part] = value;
-				}
+				key_fields[key_part] = value;
 
 				break;
 			}
 
-			if (key_part === '[]') {
-				const key_field = key_parts[i + 1][0] === '[]' ? [] : {};
-
-				key_fields.push(key_field);
-				key_fields = key_field;
+			if (!Object.hasOwn(key_fields, key_part)) {
+				key_fields[key_part] = Object.create(null);
 			}
-			else {
-				if (!(key_part in key_fields)) {
-					key_fields[key_part] = key_parts[i + 1][0] === '[]' ? [] : {};
-				}
 
-				key_fields = key_fields[key_part];
-			}
+			key_fields = key_fields[key_part];
 		}
 	}
 
@@ -910,7 +910,7 @@ function searchParamsToObject(search_params) {
 }
 
 /**
- * Convert nested data object into URL search parameters object.
+ * Convert a nested data object into URL search parameters object.
  *
  * @param {Object|Array} object
  *
@@ -918,12 +918,7 @@ function searchParamsToObject(search_params) {
  */
 function objectToSearchParams(object) {
 	const combine = (data, search_params = new URLSearchParams(), name_prefix = '') => {
-		if (Array.isArray(data)) {
-			for (const [index, datum] of data.entries()) {
-				combine(datum, search_params, name_prefix !== '' ? `${name_prefix}[${index}]` : index);
-			}
-		}
-		else if (typeof data === 'object') {
+		if (typeof data === 'object') {
 			for (const [name, datum] of Object.entries(data)) {
 				combine(datum, search_params, name_prefix !== '' ? `${name_prefix}[${name}]` : name);
 			}
@@ -936,6 +931,17 @@ function objectToSearchParams(object) {
 	};
 
 	return combine(object);
+}
+
+/**
+ * Create a URL pointing to zabbix.php.
+ *
+ * @param arguments
+ *
+ * @returns {string}
+ */
+function zabbixUrl(arguments) {
+	return `zabbix.php?${objectToSearchParams(arguments)}`;
 }
 
 /**
@@ -978,4 +984,3 @@ function convertHSLToRGB(h, s, l) {
 function isColorHex(value) {
 	return /^#([0-9A-F]{6})$/i.test(value);
 }
-

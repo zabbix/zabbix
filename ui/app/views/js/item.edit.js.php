@@ -41,6 +41,8 @@ const ZBX_STYLE_TEXTAREA_FLEXIBLE = <?= json_encode(ZBX_STYLE_TEXTAREA_FLEXIBLE)
 
 window.item_edit_form = new class {
 
+	#host_interface_selector;
+
 	init({
 		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly, testable_item_types,
 		type_with_key_select, value_type_keys, source, return_url
@@ -49,42 +51,24 @@ window.item_edit_form = new class {
 		this.form_data = form_data;
 		this.form_readonly = readonly;
 		this.host = host;
-		this.interface_types = interface_types;
 		this.inherited_timeouts = inherited_timeouts;
-		this.optional_interfaces = [];
 		this.source = source;
 		this.testable_item_types = testable_item_types;
-		this.type_interfaceids = {};
 		this.type_with_key_select = type_with_key_select;
 		this.value_type_keys = value_type_keys;
 		this.last_inferred_type = null;
-
-		for (const type in interface_types) {
-			if (interface_types[type] == INTERFACE_TYPE_OPT) {
-				this.optional_interfaces.push(parseInt(type, 10));
-			}
-		}
-
-		for (const host_interface of Object.values(host.interfaces)) {
-			if (host_interface.type in this.type_interfaceids) {
-				this.type_interfaceids[host_interface.type].push(host_interface.interfaceid);
-			}
-			else {
-				this.type_interfaceids[host_interface.type] = [host_interface.interfaceid];
-			}
-		}
 
 		this.overlay = overlays_stack.end();
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 
-		const interface_field = this.form.findFieldByName('interfaceid');
-
-		if (interface_field) {
-			interface_field.setChanged();
-			this.form.validateChanges(['interfaceid']);
-		}
+		this.#host_interface_selector = new HostInterfaceSelector({
+			container: document.getElementById('items-tab'),
+			interface_types,
+			host_interfaces: host.interfaces,
+			type: this.form_data.type
+		});
 
 		this.footer = this.overlay.$dialogue.$footer[0];
 		this.tags_table = document.getElementById('tagsFormList').querySelector('[data-field-name="tags"]');
@@ -107,6 +91,10 @@ window.item_edit_form = new class {
 		this.initial_form_fields = this.#getFormFields();
 		this.form_element.style.display = '';
 		this.overlay.recoverFocus();
+
+		this.form.findFieldByName('interfaceid')?.setChanged();
+		this.form.findFieldByName('type').setChanged();
+		this.form.validateChanges(['interfaceid', 'type']);
 	}
 
 	initForm(field_switches) {
@@ -120,7 +108,6 @@ window.item_edit_form = new class {
 			custom_timeout: this.form_element.querySelectorAll('[name="custom_timeout"]'),
 			history: this.form_element.querySelector('[name="history"]'),
 			history_mode: this.form_element.querySelectorAll('[name="history_mode"]'),
-			interfaceid: this.form_element.querySelector('[name="interfaceid"]'),
 			key: this.form_element.querySelector('[name="key"]'),
 			key_button: this.form_element.querySelector('[name="key"] ~ .js-select-key'),
 			inherited_timeout: this.form_element.querySelector('[name="inherited_timeout"]'),
@@ -138,7 +125,6 @@ window.item_edit_form = new class {
 			retrieve_mode: this.form_element.querySelectorAll('[name="retrieve_mode"]')
 		};
 		this.label = {
-			interfaceid: this.form_element.querySelector('[for="interfaceid"]'),
 			value_type_hint: this.form_element.querySelector('[for="label-value-type"] .js-hint'),
 			username: this.form_element.querySelector('[for=username]'),
 			ipmi_sensor: this.form_element.querySelector('[for="ipmi_sensor"]'),
@@ -476,7 +462,6 @@ window.item_edit_form = new class {
 		const key = this.field.key.value;
 		const username_required = type == ITEM_TYPE_SSH || type == ITEM_TYPE_TELNET;
 		const ipmi_sensor_required = type == ITEM_TYPE_IPMI && key !== 'ipmi.get';
-		const interface_optional = this.optional_interfaces.indexOf(type) != -1;
 		const preprocessing_active = this.form_element.querySelector('[name^="preprocessing"][name$="[type]"]') !== null;
 
 		this.#updateActionButtons();
@@ -491,11 +476,9 @@ window.item_edit_form = new class {
 		this.field.key_button?.toggleAttribute('disabled', this.type_with_key_select.indexOf(type) == -1);
 		this.field.username[username_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.username.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, username_required);
-		this.field.interfaceid?.toggleAttribute('aria-required', !interface_optional);
-		this.label.interfaceid?.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !interface_optional);
 		this.field.ipmi_sensor[ipmi_sensor_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.ipmi_sensor.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, ipmi_sensor_required);
-		organizeInterfaces(this.type_interfaceids, this.interface_types, parseInt(this.field.type.value, 10));
+		this.#host_interface_selector.setType(type);
 		this.form_element.querySelectorAll('.js-item-preprocessing-type').forEach(
 			node => node.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !preprocessing_active)
 		);
@@ -520,29 +503,13 @@ window.item_edit_form = new class {
 
 	#getFormFields() {
 		const values = this.form.getAllValues();
-
-		delete values.show_inherited_tags;
+		values.interfaceid = values.interfaceid ? values.interfaceid : null;
 
 		if (values.delay === undefined) {
 			values.delay = '';
 		}
 
-		if (values.preprocessing) {
-			for (let index in values.preprocessing) {
-				const step = values.preprocessing[index];
-
-				if (step.error_handler_params === null) {
-					step.error_handler_params = '';
-				}
-
-				if (step.on_fail === null) {
-					delete step.error_handler;
-					delete step.error_handler_params;
-				}
-			}
-		}
-
-		const delay_flex = [];
+		const delay_flex = {};
 		for (let key in values.delay_flex) {
 			let { schedule, period, type, delay } = values.delay_flex[key];
 			type = parseInt(type);
@@ -555,50 +522,10 @@ window.item_edit_form = new class {
 				continue;
 			}
 
-			delay_flex.push(values.delay_flex[key]);
+			delay_flex[key] = values.delay_flex[key]
 		}
 
-		const query_fields = [];
-		for (let key in values.query_fields) {
-			let {name, value} = values.query_fields[key];
-
-			if (name === '' && value === '') {
-				continue;
-			}
-			query_fields.push({name, value});
-		}
-
-		const parameters = [];
-		for (let key in values.parameters) {
-			let {name, value} = values.parameters[key];
-
-			if (name === '' && value === '') {
-				continue;
-			}
-			parameters.push({name, value});
-		}
-
-		const headers = [];
-		for (let key in values.headers) {
-			let {name, value} = values.headers[key];
-
-			if (name === '' && value === '') {
-				continue;
-			}
-			headers.push({name, value});
-		}
-
-		const tags = [];
-		for (let key in values.tags) {
-			let {tag, value} = values.tags[key];
-
-			if (tag === '' && value === '') {
-				continue;
-			}
-			tags.push({tag, value});
-		}
-
-		return {...values, ...{tags, query_fields, headers, delay_flex, parameters}};
+		return {...values, ...{delay_flex}};
 	}
 
 	#post(url, data, keep_open = false) {

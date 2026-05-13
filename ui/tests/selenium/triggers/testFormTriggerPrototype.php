@@ -20,7 +20,6 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 define('LONG_KEY', substr(STRING_6000, 0, 2038).'[{#MACRO}]');
 
-use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
@@ -1090,7 +1089,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 
 		if (!isset($data['constructor'])) {
-			$dialog_footer->query('button:Add')->one()->click();
+			$dialog_footer->query('button:Add')->waitUntilClickable()->one()->click();
 			switch ($data['expected']) {
 				case TEST_GOOD:
 					$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger prototype added');
