@@ -61,7 +61,7 @@ window.itemtestedit_view_popup = new class {
 	}
 
 	#initEvents() {
-		this.#form.findFieldByName('not_supported').getField().addEventListener('change', (e) => {
+		this.#form.findFieldByName('not_supported')?.getField().addEventListener('change', (e) => {
 			const get_value_checked = this.#form.findFieldByName('get_value').getField().checked;
 
 			$(this.#form.findFieldByName('value').getField())
@@ -206,7 +206,7 @@ window.itemtestedit_view_popup = new class {
 
 		const remember_values = {
 			value: fields.value,
-			not_supported: this.#form.findFieldByName('not_supported').getField().checked ? 1 : 0,
+			not_supported: this.#form.findFieldByName('not_supported')?.getField().checked ? 1 : 0,
 			eol: fields.eol,
 			macros: fields.macros
 		};
