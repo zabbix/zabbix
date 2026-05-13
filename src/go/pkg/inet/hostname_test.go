@@ -34,6 +34,7 @@ func Test_IsRFCHostName(t *testing.T) {
 		args args
 		want bool
 	}{
+		{"+almostNumerica92.168.10.4", args{"a92.168.10.4"}, true},
 		{"+localhost", args{"localhost"}, true},
 		{"+punycode", args{"xn--bcher-kva.com"}, true},
 		{"+minimalLabel", args{"a.com"}, true},
@@ -63,6 +64,10 @@ func Test_IsRFCHostName(t *testing.T) {
 		{"-underscore", args{"example_com.com"}, false},
 		{"-unicodeCharacter", args{"tēst.zabbix.com"}, false},
 		{"-endsWithHyphen", args{"example.com-"}, false},
+		{"-purelyNumeric192", args{"192"}, false},
+		{"-purelyNumeric192.168", args{"192.168"}, false},
+		{"-purelyNumeric192.168.10", args{"192.168.10"}, false},
+		{"-purelyNumeric192.168.10.4", args{"192.168.10.4"}, false},
 	}
 
 	for _, tt := range tests {
