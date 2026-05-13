@@ -286,7 +286,7 @@ $translate_strings = [
 		'Show trigger expression' => _('Show trigger expression')
 	],
 	'class.options-popup.monitoring.problems.time.js' => [
-		'Show timeline' => _('Show timeline'),
+		'Show timeline' => _('Show timeline')
 	],
 	'class.options-popup.tags.js' => [
 		'Number of tags' => _('Number of tags'),
@@ -296,6 +296,9 @@ $translate_strings = [
 		'None' => _('None'),
 		'Tag display priority' => _('Tag display priority'),
 		'comma-separated list' => _('comma-separated list')
+	],
+	'class.options-popup.tagvalue.js' => [
+		'Tag name' => _('Tag name')
 	],
 	'class.options-popup.custom-text.js' => [
 		'Custom text' => _('Custom text'),
