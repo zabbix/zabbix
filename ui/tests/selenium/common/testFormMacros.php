@@ -2584,7 +2584,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		if ($this->query('class:datatable')->one(false)->isValid()) {
 			$table = $this->getDatatable();
-			$this->filterFromHeader(['Name' => ['Show item key' => true]]);
+			$this->changeLayoutFromHeader(['Name' => ['Show item key' => true]]);
 			$table->waitUntilReady()->invalidate();
 		}
 		else {

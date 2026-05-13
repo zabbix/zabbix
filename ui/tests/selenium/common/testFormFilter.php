@@ -115,8 +115,8 @@ class testFormFilter extends CWebTest {
 		$this->page->waitUntilReady();
 		$headers->waitUntilStalled();
 
-		if (array_key_exists('header_filter', $data)) {
-			$this->filterFromHeader($data['header_filter']);
+		if (array_key_exists('header_settings', $data)) {
+			$this->changeLayoutFromHeader($data['header_settings']);
 			$result_table->waitUntilReady()->invalidate();
 		}
 

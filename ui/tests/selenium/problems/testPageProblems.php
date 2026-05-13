@@ -240,8 +240,8 @@ class testPageProblems extends CWebTest {
 				$filter_form->getLabels()->asText()
 		);
 
-		// Check the layout of filters that are hiddent in datatable headers.
-		$header_filters = [
+		// Check the layout configuration options that are present in datatable headers.
+		$header_settings = [
 			'Time' => [
 				'Show timeline' => [
 					'value' => true
@@ -271,7 +271,7 @@ class testPageProblems extends CWebTest {
 				'duplicate' => true
 			]
 		];
-		$this->checkHeaderFilterLayout($header_filters);
+		$this->checkHeaderSettingsLayout($header_settings);
 
 		// Check presence of "By me" label.
 		$this->assertTrue($filter_form->query('xpath:.//label[text()="By me"]')->one()->isVisible());
@@ -465,7 +465,7 @@ class testPageProblems extends CWebTest {
 			$this->assertEquals($field['headers'], $table->getHeadersText());
 		}
 
-		// Check how the data displayed in datatable changes based on the selected values in header filters.
+		// Check how the data displayed in datatable changes based on the settings set in datatable headers.
 		$header_options = [
 			[
 				'column' => [
@@ -623,9 +623,9 @@ class testPageProblems extends CWebTest {
 			]
 		];
 
-		// Change header filter and check in corresponding elements are show or not shown in datatable.
+		// Change datatable layout throug header settings and check if corresponding elements are show shown in datatable.
 		foreach ($header_options as $options) {
-			$this->filterFromHeader($options['column']);
+			$this->changeLayoutFromHeader($options['column']);
 			$table->waitUntilReady()->invalidate();
 
 			// Check that expected elements are shown in the specific datatable row and column.
@@ -819,7 +819,7 @@ class testPageProblems extends CWebTest {
 			// #5 Or tag operator.
 			[
 				[
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'Tags' => [
@@ -906,7 +906,7 @@ class testPageProblems extends CWebTest {
 			// #8 "And/Or" and operator Exists, one tag.
 			[
 				[
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'Tags' => [
@@ -932,7 +932,7 @@ class testPageProblems extends CWebTest {
 							['name' => 'Service', 'operator' => 'Exists']
 						]
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -968,7 +968,7 @@ class testPageProblems extends CWebTest {
 							['name' => 'Database', 'operator' => 'Exists']
 						]
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -985,7 +985,7 @@ class testPageProblems extends CWebTest {
 					'fields' => [
 						'Host groups' => 'Zabbix servers'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'Tags' => [
@@ -1014,7 +1014,7 @@ class testPageProblems extends CWebTest {
 							['name' => 'Alpha', 'operator' => 'Does not exist']
 						]
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -1038,7 +1038,7 @@ class testPageProblems extends CWebTest {
 							['name' => 'Database', 'operator' => 'Does not exist']
 						]
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -1062,7 +1062,7 @@ class testPageProblems extends CWebTest {
 							['name' => 'Database', 'operator' => 'Does not exist']
 						]
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -1085,7 +1085,7 @@ class testPageProblems extends CWebTest {
 							['name' => 'server', 'operator' => 'Does not equal', 'value' => 'selenium']
 						]
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -1152,7 +1152,7 @@ class testPageProblems extends CWebTest {
 							['name' => 'Beta', 'operator' => 'Does not equal', 'value' => 'b']
 						]
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -1176,7 +1176,7 @@ class testPageProblems extends CWebTest {
 							['name' => 'Database', 'operator' => 'Does not equal']
 						]
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -1202,7 +1202,7 @@ class testPageProblems extends CWebTest {
 							['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a']
 						]
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -1227,7 +1227,7 @@ class testPageProblems extends CWebTest {
 							['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a']
 						]
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -1252,7 +1252,7 @@ class testPageProblems extends CWebTest {
 							['name' => 'Delta', 'operator' => 'Does not contain', 'value' => 'd']
 						]
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -1270,7 +1270,7 @@ class testPageProblems extends CWebTest {
 					'fields' => [
 						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers']
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'Tags' => [
@@ -1312,7 +1312,7 @@ class testPageProblems extends CWebTest {
 						'Status' => false,
 						'Info' => false
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Number of tags' => 3,
 							'Tag name display' => 'Shortened',
@@ -1360,7 +1360,7 @@ class testPageProblems extends CWebTest {
 						'Problem' => 'Test trigger',
 						'Average' => true
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Number of tags' => 2,
 							'Tag name display' => 'Full'
@@ -1386,7 +1386,7 @@ class testPageProblems extends CWebTest {
 						'Problem' => 'Test trigger',
 						'Average' => true
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Number of tags' => 1,
 							'Tag name display' => 'None'
@@ -1410,7 +1410,7 @@ class testPageProblems extends CWebTest {
 					'fields' => [
 						'Problem' => 'test trigger with tag priority'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Tag display priority' => 'Kappa'
 						]
@@ -1441,7 +1441,7 @@ class testPageProblems extends CWebTest {
 					'fields' => [
 						'Problem' => 'test trigger with tag priority'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Tag display priority' => 'Kappa, Beta'
 						]
@@ -1472,7 +1472,7 @@ class testPageProblems extends CWebTest {
 					'fields' => [
 						'Problem' => 'test trigger with tag priority'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Tag display priority' => 'Gamma, Kappa, Beta'
 						]
@@ -1571,7 +1571,7 @@ class testPageProblems extends CWebTest {
 						'id:age_state_0' => true,
 						'name:age' => 999
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -1611,7 +1611,7 @@ class testPageProblems extends CWebTest {
 						'id:age_state_0' => true,
 						'name:age' => 10
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => [
 							'Show timeline' => false
 						]
@@ -1644,7 +1644,7 @@ class testPageProblems extends CWebTest {
 					'time_selector' => [
 						'link' => 'Last 1 day'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -1672,7 +1672,7 @@ class testPageProblems extends CWebTest {
 						'Show' => 'Problems',
 						'Not classified' => true
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -1690,7 +1690,7 @@ class testPageProblems extends CWebTest {
 						'Severity' => 'Warning',
 						'Acknowledgement status' => 'Unacknowledged'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -1794,7 +1794,7 @@ class testPageProblems extends CWebTest {
 						'id:from' => 'now-2w',
 						'id:to' => 'now'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -1821,7 +1821,7 @@ class testPageProblems extends CWebTest {
 					'time_selector' => [
 						'link' => 'Last 1 year'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
@@ -1890,8 +1890,8 @@ class testPageProblems extends CWebTest {
 		}
 
 		// Apply the filter from datatable headers.
-		if (array_key_exists('header_filter', $data)) {
-			$this->filterFromHeader($data['header_filter']);
+		if (array_key_exists('header_settings', $data)) {
+			$this->changeLayoutFromHeader($data['header_settings']);
 			$table->waitUntilReady()->invalidate();
 		}
 
@@ -2197,7 +2197,7 @@ class testPageProblems extends CWebTest {
 					'filter' => [
 						'Problem' => 'Filled opdata with macros'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Problem' => ['Show operational data' => true]
 					],
 					'popup rows' => [
@@ -2216,7 +2216,7 @@ class testPageProblems extends CWebTest {
 					'filter' => [
 						'Problem' => 'No operational data popup'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Problem' => ['Show operational data' => true]
 					],
 					'popup rows' => []
@@ -2228,7 +2228,7 @@ class testPageProblems extends CWebTest {
 					'filter' => [
 						'Problem' => 'Two trigger expressions'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Problem' => ['Show operational data' => true]
 					],
 					'popup rows' => []
@@ -2261,8 +2261,8 @@ class testPageProblems extends CWebTest {
 		$form->fill($data['filter'])->submit();
 
 		// Set operational data in Problem column.
-		if (array_key_exists('header_filter', $data)) {
-			$this->filterFromHeader($data['header_filter']);
+		if (array_key_exists('header_settings', $data)) {
+			$this->changeLayoutFromHeader($data['header_settings']);
 		}
 
 		// Add "Operational data" column to the list of columns in problems datatable.
@@ -2271,8 +2271,8 @@ class testPageProblems extends CWebTest {
 		}
 
 		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
-		$column = (array_key_exists('header_filter', $data)) ? 'Problem' : 'Operational data';
-		$problem_name = (array_key_exists('header_filter', $data) && $data['custom data'] !== '')
+		$column = (array_key_exists('header_settings', $data)) ? 'Problem' : 'Operational data';
+		$problem_name = (array_key_exists('header_settings', $data) && $data['custom data'] !== '')
 			? $data['filter']['Problem'].' ('.$data['custom data'].')'
 			: $data['filter']['Problem'];
 		$opdata_column = $table->findRow('Problem', $problem_name)->getColumn($column);
@@ -2285,7 +2285,7 @@ class testPageProblems extends CWebTest {
 
 		// Check operation data in table on page.
 		$data_in_column = CTestArrayHelper::get($data, 'custom data', implode(', ', $metrics));
-		if (array_key_exists('header_filter', $data)) {
+		if (array_key_exists('header_settings', $data)) {
 			$data_in_column = ($data_in_column === '')
 				? $data['filter']['Problem']
 				: $data['filter']['Problem'].' ('.$data_in_column.')';
@@ -2328,7 +2328,7 @@ class testPageProblems extends CWebTest {
 		$this->page->login()->open(self::URL);
 
 		// Check table contents before filtering. Set false "Show timeline" because it makes table complicated.
-		$this->filterFromHeader(['Time' => ['Show timeline' => false]]);
+		$this->changeLayoutFromHeader(['Time' => ['Show timeline' => false]]);
 		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 		$start_rows_count = $table->getRows()->count();
 		$this->assertDatatableStats($start_rows_count);

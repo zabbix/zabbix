@@ -14,14 +14,14 @@
 **/
 
 
-require_once __DIR__.'/CTableBehavior.php';
+require_once __DIR__.'/../../include/CBehavior.php';
 
 use Facebook\WebDriver\Exception\ElementClickInterceptedException;
 
 /**
- * Behavior for filter related tests.
+ * Behavior for datatable element.
  */
-class CDatatableBehavior extends CTableBehavior {
+class CDatatableBehavior extends CBehavior {
 
 	/**
 	 * Table column names.
@@ -60,8 +60,20 @@ class CDatatableBehavior extends CTableBehavior {
 		return $data;
 	}
 
-	const COMMON_SELECTOR = 'class:datatable';
+	/**
+	 * Default selector for locating the databable element.
+	 *
+	 * @var string
+	 */
+	const COMMON_SELECTOR = 'class:datatable-scrollable';
 
+	/**
+	 * Get datatable element by specified selector or by common selector.
+	 *
+	 * @param string   $selector   selector for identifying the datatable element
+	 *
+	 * @return CDatatableElement
+	 */
 	public function getDatatable($selector = null) {
 		if ($selector === null) {
 			$selector = self::COMMON_SELECTOR;
@@ -79,7 +91,7 @@ class CDatatableBehavior extends CTableBehavior {
 	 * Check if values in table rows match data from data provider.
 	 *
 	 * @param array   $data        data array to be match with result in table
-	 * @param string  $selector    table selector
+	 * @param string  $selector    datatable selector
 	 */
 	public function assertDatatableData($data = [], $selector = null) {
 		$rows = $this->getDatatable($selector)->waitUntilReady()->getRows();
@@ -110,57 +122,11 @@ class CDatatableBehavior extends CTableBehavior {
 	}
 
 	/**
-	 * Check if values in table rows have data from data provider.
-	 *
-	 * @param array   $data        data array to be matched with result in table
-	 * @param string  $selector    table selector
-	 *
-	 * @throws Exception
-	 */
-	public function assertTableHasData($data = [], $selector = null) {
-		$table = $this->getTable($selector);
-
-		if (!$data) {
-			// Check that table contains one row with text "No data found."
-			$this->test->assertEquals(['No data found'], $table->getRows()->asText());
-
-			return;
-		}
-
-		foreach ($data as $data_row) {
-			$found = false;
-			$current = null;
-
-			foreach ($table->index() as $table_row) {
-				$match = true;
-
-				foreach ($data_row as $key => $value) {
-					if (!isset($table_row[$key]) || $table_row[$key] != $data_row[$key]) {
-						$current = json_encode($table_row);
-						$match = false;
-						break;
-					}
-				}
-
-				if ($match) {
-					$found = true;
-					break;
-				}
-			}
-
-			if (!$found) {
-				throw new \Exception('Row ('.implode(', ', array_map(function ($value) {
-					return '"'.$value.'"';
-				}, $data_row)).') was not found in table. Table row is: '.$current);
-			}
-		}
-	}
-
-	/**
-	 * Check if values in table column match data from data provider.
+	 * Check if values in datatable column match data from data provider.
 	 *
 	 * @param array   $rows        data array to be match with result in table
 	 * @param string  $field       table column name
+	 * @param string  $selector    selector used for locating the datatable
 	 */
 	public function assertDatatableDataColumn($rows = [], $field = 'Name', $selector = self::COMMON_SELECTOR) {
 		$data = [];
@@ -170,34 +136,19 @@ class CDatatableBehavior extends CTableBehavior {
 
 		$this->assertDatatableData($data, $selector);
 	}
-//
-//	/**
-//	 * Check if values in table column have data from data provider.
-//	 *
-//	 * @param array   $rows        data array to be matched with result in table
-//	 * @param string  $field       table column name
-//	 */
-//	public function assertTableHasDataColumn($rows = [], $field = 'Name', $selector = self::COMMON_SELECTOR) {
-//		$data = [];
-//		foreach ($rows as $row) {
-//			$data[] = [$field => $row];
-//		}
-//
-//		$this->assertTableHasData($data, $selector);
-//	}
 
 	/**
-	 * Select table rows.
+	 * Select datatable rows.
 	 *
 	 * @param mixed  $data			rows to be selected
 	 * @param string $column		column name
-	 * @param string $selector		table selector
+	 * @param string $selector		datatable selector
 	 */
 	public function selectDatatableRows($data = [], $column = 'Name', $selector = null) {
 		$table = $this->getDatatable($selector);
 
 		if (!$data) {
-			// Select all rows in table.
+			// Select all rows in datatable.
 			$table->query('xpath:./div[contains(@class, "datatable-header")]/div/input[@type="checkbox"]')->asCheckbox()
 					->one()->check();
 
@@ -207,10 +158,16 @@ class CDatatableBehavior extends CTableBehavior {
 		$table->findRows($column, $data)->select();
 	}
 
-	public function filterFromHeader($header_filter, $selector = self::COMMON_SELECTOR) {
+	/**
+	 * Update the datatable layout by changing settings in datatable column headers.
+	 *
+	 * @param array    $header_settings    settings to be changed through datatable headers
+	 * @param string   $selector           datatable selector
+	 */
+	public function changeLayoutFromHeader($header_settings, $selector = self::COMMON_SELECTOR) {
 		$table = $this->getDatatable($selector);
 
-		foreach ($header_filter as $column => $select_data) {
+		foreach ($header_settings as $column => $select_data) {
 			$button_selector = (in_array($column, ['Name', 'Time', 'Problem']))
 				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
 				: 'tag:button';
@@ -249,23 +206,37 @@ class CDatatableBehavior extends CTableBehavior {
 		}
 	}
 
-	public function checkHeaderFilterLayout($header_filter, $selector = self::COMMON_SELECTOR) {
+	/**
+	 * Check the layout of datatable header settings in corrisponding table headers.
+	 *
+	 * @param array    $header_settings    settings in corresponding datatable headers and their parameters
+	 * @param string   $selector           datatable selector
+	 */
+	public function checkHeaderSettingsLayout($header_settings, $selector = self::COMMON_SELECTOR) {
 		$table = $this->getDatatable($selector);
 
-		foreach ($header_filter as $column => $column_filter) {
+		foreach ($header_settings as $column => $column_settings) {
 			$button_selector = (in_array($column, ['Name', 'Time', 'Problem']))
 				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
 				: 'tag:button';
 			$button = $table->getHeaderByText($column)->query($button_selector)->one();
 
-			if (!$button->isClickable()) {
+			/**
+			 *  When the button is placed under the datatable-options button it is considered clickable.
+			 *  Additional scrolling is required in such cases.
+			 */
+			try {
+				$button->click();
+			}
+			catch (ElementClickInterceptedException $exception) {
 				$table->scrollRightHorizontally();
+				$button->click();
 			}
 
 			$button->click();
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
 
-			foreach ($column_filter as $field => $parameters) {
+			foreach ($column_settings as $field => $parameters) {
 				if ($field === 'duplicate') {
 					$this->test->assertTrue($popup_dialog->query('link:Duplicate column')->one()->isClickable());
 
@@ -277,7 +248,6 @@ class CDatatableBehavior extends CTableBehavior {
 				$field = $popup_dialog->query('id', $for)->one()->detect();
 
 				if (array_key_exists('value', $parameters)) {
-
 					$this->test->assertEquals($parameters['value'], $field->getValue());
 				}
 
@@ -296,6 +266,11 @@ class CDatatableBehavior extends CTableBehavior {
 		}
 	}
 
+	/**
+	 * Check the available datatable configuration options in datatable options dialog.
+	 *
+	 * @param array $column_list   list of available columns in datatable options dialog, their state and status
+	 */
 	public function checkColumnList($column_list) {
 		$table = $this->getDatatable();
 		$table->query('xpath:.//button[@title="Customize table"]')->one()->waitUntilClickable()->click();
@@ -317,14 +292,19 @@ class CDatatableBehavior extends CTableBehavior {
 		$this->test->assertTrue($popup_dialog->query('button:Reset layout')->one()->isClickable());
 	}
 
-	public function updateColumnList($field_changes) {
+	/**
+	 * Change the whether specified columns should be displayed.
+	 *
+	 * @param array $column_state_changes   list of columns which state should be changed
+	 */
+	public function updateColumnList($column_state_changes) {
 		$table = $this->getDatatable();
 		$button = $table->query('xpath:.//button[@title="Customize table"]')->one()->waitUntilClickable();
 		$button->click();
 		$popup_dialog = $this->test->query('xpath://div[@class="datatable-options-popup datatable-options"]')
 				->waitUntilVisible()->one();
 
-		foreach ($field_changes as $field => $value) {
+		foreach ($column_state_changes as $field => $value) {
 			$for = $popup_dialog->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($field).']/..')->one()
 						->getAttribute('for');
 			$popup_dialog->query('id', $for)->one()->asCheckbox()->set($value);
@@ -340,8 +320,8 @@ class CDatatableBehavior extends CTableBehavior {
 	/**
 	 * Change datatable column configuration in DB.
 	 *
-	 * @param string   $layout   JSON that contains configuration of datatable headers.
-	 * @param string   $idx      id of the profile that represents the datatable that should be updated.
+	 * @param string   $layout   JSON that contains configuration of datatable headers
+	 * @param string   $idx      id of the profile that represents the datatable that should be updated
 	 */
 	public function updateDatatableLayout($layout, $idx) {
 		// Check if the corresponding record already exists. If yes - replace the value, if not - add new profile.
@@ -358,15 +338,15 @@ class CDatatableBehavior extends CTableBehavior {
 	}
 
 	/**
-	 * Assert text of displayed rows amount.
+	 * Assert text of displayed rows count.
 	 *
-	 * @param integer|string $count		rows count per page
-	 * @param integer $total			total rows count
+	 * @param integer|string $count     rows count per page
+	 * @param integer        $total     total rows count
 	 */
 	public function assertDatatableStats($count = null, $total = null) {
 		if ($count === null || $count === 0) {
 			$this->test->assertFalse($this->getDatatable()->query('xpath://div[@class="table-stats"]')
-					->one()->isVisible(), 'Table rows amount is visible on page'
+					->one()->isVisible(), 'Datatable rows count is visible on page'
 			);
 
 			return;
@@ -385,7 +365,7 @@ class CDatatableBehavior extends CTableBehavior {
 	 * Get data from chosen column.
 	 *
 	 * @param string $column    column name, where value should be checked
-	 * @param string $selector  table selector
+	 * @param string $selector  datatable selector
 	 *
 	 * @return array
 	 */
@@ -399,7 +379,7 @@ class CDatatableBehavior extends CTableBehavior {
 	}
 
 	/**
-	 * Assert text of selected rows amount.
+	 * Assert the count of selected datatable rows.
 	 *
 	 * @param integer $count	selected rows count
 	 */

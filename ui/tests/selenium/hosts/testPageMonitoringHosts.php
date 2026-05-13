@@ -892,8 +892,9 @@ class testPageMonitoringHosts extends CWebTest {
 		$form->fill(['Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReady();
+
 		foreach ([true, false] as $show) {
-			$this->filterFromHeader(['Problems' => ['Show suppressed problems' => $show]]);
+			$this->changeLayoutFromHeader(['Problems' => ['Show suppressed problems' => $show]]);
 			$table->waitUntilReady()->invalidate();
 			$this->assertTrue($table->findRow('Name', 'Host for suppression')->isPresent($show));
 		}

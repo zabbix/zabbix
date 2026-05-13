@@ -163,8 +163,8 @@ class testPageMonitoringLatestData extends CWebTest {
 		);
 		$this->assertTrue($this->query('button:Apply')->one()->isClickable());
 
-		// Check the layout of filters that are hiddent in datatable headers.
-		$header_filters = [
+		// Check the layout configuration options that are present in datatable headers.
+		$header_settings = [
 			'Name' => [
 				'Show item key' => [
 					'value' => false
@@ -186,7 +186,7 @@ class testPageMonitoringLatestData extends CWebTest {
 				'duplicate' => true
 			]
 		];
-		$this->checkHeaderFilterLayout($header_filters);
+		$this->checkHeaderSettingsLayout($header_settings);
 
 		// Subfilter is not visible if filter isn't set.
 		$this->assertFalse($this->query('id:latest-data-subfilter')->exists());
@@ -435,7 +435,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Number of tags' => 1
 						]
@@ -451,7 +451,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Number of tags' => 2
 						]
@@ -467,7 +467,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Number of tags' => 3,
 							'Tag name display' => 'Full'
@@ -484,7 +484,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Tag name display' => 'Shortened'
 						]
@@ -500,7 +500,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Tag name display' => 'None'
 						]
@@ -516,7 +516,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Tag display priority' => 'tag_'
 						]
@@ -532,7 +532,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Tag display priority' => 'tag_number,tag,component'
 						]
@@ -548,7 +548,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Tag display priority' => 'tag'
 						]
@@ -590,11 +590,11 @@ class testPageMonitoringLatestData extends CWebTest {
 		$table = $this->getDatatable()->waitUntilReady();
 		$table->waitUntilRowsCount(count($data['result']));
 
-		// Set the Tags header filter.
-		$tag_number = CTestArrayHelper::get($data, 'header_filter.Tags.Number of tags', 3);
-		$tag_display = CTestArrayHelper::get($data, 'header_filter.Tags.Tag name display', 'Full');
-		$tag_priority = CTestArrayHelper::get($data, 'header_filter.Tags.Tag display priority', '');
-		$this->filterFromHeader([
+		// Set the datatable layout from Tags column header.
+		$tag_number = CTestArrayHelper::get($data, 'header_settings.Tags.Number of tags', 3);
+		$tag_display = CTestArrayHelper::get($data, 'header_settings.Tags.Tag name display', 'Full');
+		$tag_priority = CTestArrayHelper::get($data, 'header_settings.Tags.Tag display priority', '');
+		$this->changeLayoutFromHeader([
 			'Tags' => [
 				'Number of tags' => $tag_number,
 				'Tag name display' => $tag_display,

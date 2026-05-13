@@ -171,7 +171,7 @@ class testFormFilterHosts extends testFormFilter {
 						'Information' => true,
 						'Status' => 'Enabled'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Problems' => [
 							'Show suppressed problems' => true
 						]

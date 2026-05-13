@@ -163,7 +163,7 @@ class testFormFilterProblems extends testFormFilter {
 						'Hosts' => ['Host for tag permissions']
 
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => [
 							'Show timeline' => true
 						]
@@ -203,7 +203,7 @@ class testFormFilterProblems extends testFormFilter {
 					'filter_form' => [
 						'Severity' => 'High'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => [
 							'Show timeline' => false
 						]
@@ -256,8 +256,8 @@ class testFormFilterProblems extends testFormFilter {
 	public function testFormFilterProblems_CheckCreatedFilter($data) {
 		$this->createFilter($data, 'filter-create', 'zabbix', $this->table_selector);
 
-		if (array_key_exists('header_filter', $data)) {
-			$this->filterFromHeader($data['header_filter']);
+		if (array_key_exists('header_settings', $data)) {
+			$this->changeLayoutFromHeader($data['header_settings']);
 		}
 		$this->checkFilters($data, $this->table_selector);
 	}
@@ -270,7 +270,7 @@ class testFormFilterProblems extends testFormFilter {
 						'Hosts' => ['Host for triggers filtering'],
 						'Average' => true
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Number of tags' => '1'
 						]
@@ -286,7 +286,7 @@ class testFormFilterProblems extends testFormFilter {
 						'Warning' => true,
 						'Average' => true
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Number of tags' => '3'
 						]

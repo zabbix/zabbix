@@ -461,7 +461,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 			[
 				[
 					'Show symptoms' => false,
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => [
 							'Show timeline' => false
 						]
@@ -473,7 +473,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 			[
 				[
 					'Show symptoms' => true,
-					'header_filter' => [
+					'header_settings' => [
 						'Time' => [
 							'Show timeline' => false
 						]
@@ -605,12 +605,12 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$headers->waitUntilStalled();
 		$table->waitUntilReady()->invalidate();
 
-		// Only "Show timeline" field is set through table header, so presence of "header_filter" key indicates change.
-		if (array_key_exists('header_filter', $data)) {
-			$this->filterFromHeader($data['header_filter']);
+		// Only "Show timeline" field is set through table header, so presence of "header_settings" key indicates change.
+		if (array_key_exists('header_settings', $data)) {
+			$this->changeLayoutFromHeader($data['header_settings']);
 			$table->waitUntilReady()->invalidate();
 
-			$this->assertEquals($data['header_filter']['Time']['Show timeline'], $table->query('class:cell-timeline')
+			$this->assertEquals($data['header_setings']['Time']['Show timeline'], $table->query('class:cell-timeline')
 					->one(false)->isValid(), '"Show timeline" option did not work as expected.'
 			);
 		}

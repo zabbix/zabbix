@@ -231,7 +231,7 @@ class testFormFilterLatestData extends testFormFilter {
 						'Hosts' => ['ЗАББИКС Сервер'],
 						'Name' => 'Free'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Number of tags' => '1'
 						]
@@ -243,7 +243,7 @@ class testFormFilterLatestData extends testFormFilter {
 					'filter' => [
 						'Name' => 'Total'
 					],
-					'header_filter' => [
+					'header_settings' => [
 						'Tags' => [
 							'Tag display priority' => 'Alfa, Beta',
 							'Tag name display' => 'Shortened'
