@@ -747,13 +747,25 @@ form {
 		white-space: nowrap;
 
 		label {
+			box-sizing: border-box;
 			display: block;
 			height: 24px;
 			line-height: 24px;
 			overflow: hidden;
 			text-overflow: ellipsis;
 
-			.btn-icon,
+			&:has(.btn-icon) {
+				position: relative;
+				margin-right: -2px;
+				padding-right: 23px;
+
+				.btn-icon {
+					position: absolute;
+					top: 4px;
+					right: 2px;
+				}
+			}
+
 			.icon {
 				margin-left: 5px;
 			}

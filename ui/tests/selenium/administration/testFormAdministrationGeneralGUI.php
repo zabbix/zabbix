@@ -370,9 +370,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '0'
 					],
 					'inline_errors' => [
-						'Limit for search and filter results' => 'This value must be no less than "1".',
-						'Max number of columns and rows in overview tables' => 'This value must be no less than "5".',
-						'Max count of elements to show inside table cell' => 'This value must be no less than "1".',
+						'Limit for search and filter results' => 'Value must be greater than or equal to 1.',
+						'Max number of columns and rows in overview tables' => 'Value must be greater than or equal to 5.',
+						'Max count of elements to show inside table cell' => 'Value must be greater than or equal to 1.',
 						'Working time' => 'Invalid time period.',
 						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
 						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
@@ -410,9 +410,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => ''
 					],
 					'inline_errors' => [
-						'Limit for search and filter results' => 'This value must be no less than "1".',
-						'Max number of columns and rows in overview tables' => 'This value must be no less than "5".',
-						'Max count of elements to show inside table cell' => 'This value must be no less than "1".',
+						'Limit for search and filter results' => 'Value must be greater than or equal to 1.',
+						'Max number of columns and rows in overview tables' => 'Value must be greater than or equal to 5.',
+						'Max count of elements to show inside table cell' => 'Value must be greater than or equal to 1.',
 						'Working time' => 'This field cannot be empty.',
 						'Max history display period' => 'This field cannot be empty.',
 						'Time filter default period' => 'This field cannot be empty.',
@@ -434,9 +434,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => 'text'
 					],
 					'inline_errors' => [
-						'Limit for search and filter results' => 'This value must be no less than "1".',
-						'Max number of columns and rows in overview tables' => 'This value must be no less than "5".',
-						'Max count of elements to show inside table cell' => 'This value must be no less than "1".',
+						'Limit for search and filter results' => 'Value must be greater than or equal to 1.',
+						'Max number of columns and rows in overview tables' => 'Value must be greater than or equal to 5.',
+						'Max count of elements to show inside table cell' => 'Value must be greater than or equal to 1.',
 						'Working time' => 'Invalid time period.',
 						'Max history display period' => 'A time unit is expected.',
 						'Time filter default period' => 'A time unit is expected.',
@@ -458,9 +458,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '!@#$%^&*()_+'
 					],
 					'inline_errors' => [
-						'Limit for search and filter results' => 'This value must be no less than "1".',
-						'Max number of columns and rows in overview tables' => 'This value must be no less than "5".',
-						'Max count of elements to show inside table cell' => 'This value must be no less than "1".',
+						'Limit for search and filter results' => 'Value must be greater than or equal to 1.',
+						'Max number of columns and rows in overview tables' => 'Value must be greater than or equal to 5.',
+						'Max count of elements to show inside table cell' => 'Value must be greater than or equal to 1.',
 						'Working time' => 'Invalid time period.',
 						'Max history display period' => 'A time unit is expected.',
 						'Time filter default period' => 'A time unit is expected.',
@@ -479,7 +479,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '31535999s'
 					],
 					'inline_errors' => [
-						'Max number of columns and rows in overview tables' => 'This value must be no less than "5".',
+						'Max number of columns and rows in overview tables' => 'Value must be greater than or equal to 5.',
 						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
 						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
 						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
@@ -892,7 +892,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '-1'
 					],
 					'inline_errors' => [
-						'Max number of columns and rows in overview tables' => 'This value must be no less than "5".',
+						'Max number of columns and rows in overview tables' => 'Value must be greater than or equal to 5.',
 						'Working time' => 'Invalid time period.',
 						'Max history display period' => 'A time unit is expected.',
 						'Time filter default period' => 'A time unit is expected.',

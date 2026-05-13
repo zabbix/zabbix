@@ -5,6 +5,7 @@ declare -A BASELINE_TIMES=(
   [testEscalations]=443
   [testProxyHa]=417
   [testNestedLLD]=385
+  [testLLDHistorySyncAtScale]=300
   [testMacros]=279
   [testItemTimeouts]=209
   [testAgentJsonProtocol]=188
