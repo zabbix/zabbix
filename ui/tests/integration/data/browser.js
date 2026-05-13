@@ -176,9 +176,10 @@ try
 
 	findElementStrict(browser,"xpath", "//li[@id='config' and @class='has-submenu is-expanded']");
 
+	clickElement(browser, "link text", "Hosts");
+
 	browser.setElementWaitTimeout(5000);
 
-	clickElement(browser, "link text", "Hosts");
 	clickElement(browser, "xpath", "//input[@id='all_hosts']");
 	clickElement(browser, "xpath", "//button[text()='Disable']");
 
