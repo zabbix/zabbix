@@ -16,6 +16,8 @@
 
 require_once __DIR__.'/CTableBehavior.php';
 
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
+
 /**
  * Behavior for filter related tests.
  */
@@ -218,7 +220,19 @@ class CDatatableBehavior extends CTableBehavior {
 				$table->scrollRightHorizontally();
 			}
 
-			$button->click();
+			/**
+			 *  When the button is placed under the datatable-options button it is considered clickable.
+			 *  Additional scrolling is required in such cases.
+			 */
+			try {
+				$button->click();
+			}
+			catch (ElementClickInterceptedException $exception) {
+var_dump('AAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+				$table->scrollRightHorizontally();
+				$button->click();
+			}
+
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
 
 			foreach ($select_data as $field => $value) {
