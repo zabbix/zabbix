@@ -436,7 +436,8 @@ window.itemtestedit_view_popup = new class {
 		}
 
 		if (response.eol !== undefined) {
-			this.#form.findFieldByName('eol').getField().checked = true;
+			this.#form.findFieldByName('eol').getField()
+				.querySelector(`input[value="${response.eol}"]`).checked = true;
 		}
 	}
 
