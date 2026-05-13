@@ -815,6 +815,7 @@ void	*cep_worker_entry(void *args)
 
 			zbx_mw_queue_lock(worker->base.queue);
 			cep_queue_push_completed((zbx_cep_queue_t *)worker->base.queue, task);
+			zbx_mw_worker_notify(&worker->base);
 
 			continue;
 		}
