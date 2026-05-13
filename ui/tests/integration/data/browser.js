@@ -178,7 +178,7 @@ try
 
 	clickElement(browser, "link text", "Hosts");
 
-	Zabbix.sleep(5000); // Hosts is clicked and datatable is loaded
+	Zabbix.sleep(1000); // Hosts is clicked and datatable is loaded
 
 	clickElement(browser, "xpath", "//input[@id='all_hosts']");
 	clickElement(browser, "xpath", "//button[text()='Disable']");
