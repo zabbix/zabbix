@@ -22,11 +22,12 @@ class CDataTableOptionsPopupCustomText extends CDataTableOptionsPopup {
 	}
 
 	getTemplate() {
+		const label = t('Custom text');
 		const placeholder = t('Text, macros, or combined');
 
 		return `
 			<template>
-				<label for="custom_text" class="${ZBX_STYLE_FORM_LABEL}">Custom text</label>
+				<label for="custom_text" class="${ZBX_STYLE_FORM_LABEL}">${label}</label>
 				<div class="${ZBX_STYLE_FORM_FIELD}">
 					<input type="text" id="custom_text" name="custom_text" maxlength="255" placeholder="${placeholder}"
 						data-field-type="text-box">

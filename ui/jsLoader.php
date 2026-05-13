@@ -298,6 +298,7 @@ $translate_strings = [
 		'comma-separated list' => _('comma-separated list')
 	],
 	'class.options-popup.custom-text.js' => [
+		'Custom text' => _('Custom text'),
 		'Text, macros, or combined' => _('Text, macros, or combined')
 	],
 	'class.options-popup.table-options.js' => [
