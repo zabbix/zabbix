@@ -28,6 +28,8 @@
  *                                                                            *
  * Comments: valid host names for this function are names with only ASCII     *
  *           characters 0-9, A-Z, a-z, hyphen ('-') and dot ('.').            *
+ *           Additionally underscore ('_') is allowed as Windows host names   *
+ *           allow it.                                                        *
  *           Internationalized Domain Names with multibyte UTF-8 characters   *
  *           will be rejected as not valid (Punycode can be used).            *
  *                                                                            *
@@ -42,8 +44,8 @@ int	zbx_is_rfc_hostname(const char *host)
 	/* Requirements and limits for host names are defined in RFC 1035, */
 	/* with clarifications in RFC 1123, RFC 2181. */
 
-	/* Host name should start with [0-9A-Za-z] */
-	if ('\0' == *p || 0x80 == (0x80 & *p) || 0 == isalnum(*p))
+	/* Host name should start with [0-9A-Za-z], additionally underscore ('_') is allowed. */
+	if ('\0' == *p || 0x80 == (0x80 & *p) || (0 == isalnum(*p) && '_' != *p))
 		return FAIL;
 	else if (0 == isdigit(*p++))
 		is_purely_numeric = 0;
@@ -53,7 +55,7 @@ int	zbx_is_rfc_hostname(const char *host)
 		if (0 != (0x80 & *p))
 			return FAIL;
 
-		if (0 != isalnum(*p))
+		if (0 != isalnum(*p) || '_' == *p)
 		{
 			label_len++;
 			prev_hyphen = 0;

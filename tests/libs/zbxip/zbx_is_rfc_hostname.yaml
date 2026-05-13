@@ -69,7 +69,13 @@ test case: "12. Underscore"
 in:
   string: "example_com.com"
 out:
-  return: FAIL
+  return: SUCCEED
+---
+test case: "12-1. Underscore at start"
+in:
+  string: "_example.com"
+out:
+  return: SUCCEED
 ---
 test case: "13. Space"
 in:
