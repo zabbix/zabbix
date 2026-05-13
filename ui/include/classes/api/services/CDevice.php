@@ -207,22 +207,16 @@ class CDevice extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if (bccomp($data['userid'], self::$userData['userid']) != 0) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			return;
-		}
-
 		if (bccomp($data['userid'], self::$userData['userid']) == 0) {
 			if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage own devices.'));
 			}
 
 			return;
+		}
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
