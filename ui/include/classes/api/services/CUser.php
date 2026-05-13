@@ -1222,7 +1222,7 @@ class CUser extends CApiService {
 		}
 
 		$email_validator = new CEmailValidator();
-		$uuid_v7_validator = new CUuidV7Validator();
+		$push_notification_recipient_validator = new CPushNotificationRecipientValidator();
 		$length = DB::getFieldLength('media', 'sendto');
 
 		foreach ($users as $i1 => $user) {
@@ -1268,10 +1268,10 @@ class CUser extends CApiService {
 					}
 
 					// MEDIA_TYPE_PUSH
-					if ($sendto !== '*' && !$uuid_v7_validator->validate($sendto)) {
+					if (!$push_notification_recipient_validator->validate($sendto)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Invalid parameter "%1$s": %2$s.', $path,
-								_("a wildcard pattern '*' or a UUIDv7 is expected")
+								$push_notification_recipient_validator->getError()
 							)
 						);
 					}
