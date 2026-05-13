@@ -15,6 +15,7 @@
 #include "pp_queue.h"
 #include "pp_task.h"
 #include "zbxalgo.h"
+#include "zbxcacheconfig.h"
 
 #define PP_TASK_QUEUE_INIT_NONE		0x00
 #define PP_TASK_QUEUE_INIT_LOCK		0x01
@@ -313,23 +314,24 @@ void	pp_task_queue_push_test(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
  *                                                                            *
  * Purpose: queue normal task to be processed                                 *
  *                                                                            *
- * Parameters: queue - [IN] task queue                                        *
- *             task  - [IN] task                                              *
+ * Parameters: queue         - [IN] task queue                                *
+ *             task          - [IN] task                                      *
+ *             preprocessing - [IN] priority flag,                            *
+ *                                  see ZBX_ITEM_PREPROCESSING_ defines       *
  *                                                                            *
  * Comments: This function is used to push tasks created by new preprocessing *
  *           or testing requests.                                             *
  *                                                                            *
  ******************************************************************************/
-void	pp_task_queue_push(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
+void	pp_task_queue_push(zbx_pp_queue_t *queue, zbx_pp_task_t *task, unsigned char prepressing)
 {
-	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
 	queue->pending_num++;
 
 	/* track input value order to have the same output order for non sequential tasks */
 	if (ZBX_PP_TASK_VALUE == task->type)
 		pp_track_value_task(queue, task);
 
-	if (ITEM_TYPE_INTERNAL != d->preproc->type)
+	if (prepressing != ZBX_ITEM_PREPROCESSING_PRIORITY)
 	{
 		(void)zbx_list_append(&queue->pending, task, NULL);
 		return;

@@ -63,7 +63,7 @@ zabbix_export:
         2. Set the hostname or IP address of the node_exporter host in the `The node_exporter host` parameter. You can also change the Prometheus endpoint port in the `TCP Port node_exporter` parameter if necessary.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: 'Templates/Operating systems'
       items:
@@ -1116,8 +1116,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value "0", marking this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `last(/TEMPLATE_NAME/METRIC,#1)<>last(/TEMPLATE_NAME/METRIC,#2)` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    2. `{ $IFCONTROL:"{#IFNAME}" }=1` - a user can redefine context macro to value - 0, marking this interface as not important. No new trigger will be fired if this interface is down.
+                    3. The trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'

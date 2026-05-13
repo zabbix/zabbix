@@ -1004,7 +1004,7 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 	zbx_uint64_t		global_revision;
 	zbx_dc_config_t		*dc_config = get_dc_config();
 
-	if (get_dc_config()->revision.config == *config_revision)
+	if (zbx_dc_config_get_config_revision() == *config_revision)
 		return;
 
 	global_revision = *config_revision;
@@ -1082,7 +1082,7 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 	if (global_revision > *config_revision)
 		global_macro_updated = SUCCEED;
 
-	*config_revision = dc_config->revision.config;
+	*config_revision = dc_config_get_config_revision();
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 

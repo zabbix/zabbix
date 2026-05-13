@@ -175,7 +175,7 @@ static void	notify_alerter(zbx_alerter_notify_mode_t mode)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot open IPC connection to alert manager: %s", error);
 			zbx_free(error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -3750,7 +3750,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot open IPC connection to alert manager: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #ifdef HAVE_ARES_QUERY_CACHE
 	zbx_ares_library_init();

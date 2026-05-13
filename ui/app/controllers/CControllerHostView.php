@@ -120,7 +120,8 @@ class CControllerHostView extends CControllerHost {
 				'expanded' => $profile->expanded,
 				'page' => $filter['page'],
 				'csrf_token' => CCsrfTokenHelper::get('tabfilter')
-			]
+			],
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
 		$response = new CControllerResponseData($data);

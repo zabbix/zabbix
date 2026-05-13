@@ -180,8 +180,6 @@ window.item_history_column_edit = new class {
 
 		this.#form.removeAttribute('style');
 		this.#overlay.recoverFocus();
-
-		this.#form.addEventListener('submit', () => this.submit());
 	}
 
 	/**

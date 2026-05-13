@@ -117,8 +117,8 @@ class testFormGraph extends testFormGraphs {
 							'item' => 'testFormItem'
 						]
 					],
-					'details' => [
-						'Graph "Duplicated graph" already exists on the host "Simple form test host".'
+					'inline_errors' => [
+						'Name' => 'This object already exists.'
 					]
 				]
 			],
@@ -157,11 +157,12 @@ class testFormGraph extends testFormGraphs {
 							]
 						]
 					],
-					'details' => [
-						'Cannot add more than one item with type "Graph sum" on graph "Exploded graph duplicated Graph sum type".'
+					'inline_errors' => [
+						'xpath:.//z-select[@name="items[2][type]"]' => 'Cannot add more than one item with type "Graph sum"'
 					]
 				]
 			],
+			// TODO: Move this check to inline validation once DEV-4632 is fixed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -182,6 +183,7 @@ class testFormGraph extends testFormGraphs {
 					]
 				]
 			],
+			// TODO: Move this check to inline validation once DEV-4632 is fixed.
 			[
 				[
 					'expected' => TEST_BAD,

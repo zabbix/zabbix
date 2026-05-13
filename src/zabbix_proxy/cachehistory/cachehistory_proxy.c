@@ -212,6 +212,7 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 	int			i;
 	zbx_pb_history_data_t	*handle;
 	time_t			now;
+	int 			written_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -226,6 +227,7 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 		if (ITEM_STATE_NOTSUPPORTED == h->state)
 		{
 			dc_add_proxy_history_notsupported(handle, h, now);
+			written_num++;
 			continue;
 		}
 
@@ -255,9 +257,12 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
 
+		written_num++;
 	}
 
 	zbx_pb_history_close(handle);
+
+	zbx_vps_monitor_add_written((zbx_uint64_t)written_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

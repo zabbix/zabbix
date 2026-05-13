@@ -16,8 +16,6 @@
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup users
  */
@@ -596,7 +594,7 @@ class testFormUserProfile extends CLegacyWebTest {
 			$this->zbxTestDropdownSelect('mediatypeid', $data['type']);
 		}
 
-		$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="sendto"]', $data['send_to']);
+		$this->query('id:sendto')->one()->fill($data['send_to']);
 
 		if (array_key_exists('When active', $data)) {
 			$form->fill(['When active' => $data['When active']]);

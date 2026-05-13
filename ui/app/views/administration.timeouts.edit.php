@@ -25,11 +25,6 @@ $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('timeouts')))->removeId())
 	->setId('timeouts-form')
 	->setName('timeouts_form')
-	->setAction(
-		(new CUrl('zabbix.php'))
-			->setArgument('action', 'timeouts.update')
-			->getUrl()
-	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 $form_grid = (new CFormGrid())
@@ -201,7 +196,10 @@ $form_grid = (new CFormGrid())
 			])
 	)
 	->addItem(
-		new CFormActions(new CSubmit('update', _('Update')), [new CButton('reset-defaults', _('Reset defaults'))])
+		new CFormActions(
+			(new CSubmit('', _('Update')))->addClass('js-submit'),
+			[(new CButton('', _('Reset defaults')))->addClass('js-reset-defaults')]
+		)
 	);
 
 $form->addItem(
@@ -217,24 +215,8 @@ $form->addItem(
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'default_timeouts' => [
-			'timeout_zabbix_agent' => CSettingsSchema::getDefault('timeout_zabbix_agent'),
-			'timeout_simple_check' => CSettingsSchema::getDefault('timeout_simple_check'),
-			'timeout_snmp_agent' => CSettingsSchema::getDefault('timeout_snmp_agent'),
-			'timeout_external_check' => CSettingsSchema::getDefault('timeout_external_check'),
-			'timeout_db_monitor' => CSettingsSchema::getDefault('timeout_db_monitor'),
-			'timeout_http_agent' => CSettingsSchema::getDefault('timeout_http_agent'),
-			'timeout_ssh_agent' => CSettingsSchema::getDefault('timeout_ssh_agent'),
-			'timeout_telnet_agent' => CSettingsSchema::getDefault('timeout_telnet_agent'),
-			'timeout_script' => CSettingsSchema::getDefault('timeout_script'),
-			'timeout_browser' => CSettingsSchema::getDefault('timeout_browser'),
-			'socket_timeout' => CSettingsSchema::getDefault('socket_timeout'),
-			'connect_timeout' => CSettingsSchema::getDefault('connect_timeout'),
-			'media_type_test_timeout' => CSettingsSchema::getDefault('media_type_test_timeout'),
-			'script_timeout' => CSettingsSchema::getDefault('script_timeout'),
-			'item_test_timeout' => CSettingsSchema::getDefault('item_test_timeout'),
-			'report_test_timeout' => CSettingsSchema::getDefault('report_test_timeout')
-		]
+		'rules' => $data['js_validation_rules'],
+		'default_values' => $data['default_values']
 	]).');
 '))
 	->setOnDocumentReady()
