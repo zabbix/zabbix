@@ -795,9 +795,11 @@ class CClickHouseStorage {
 
 		if ($options['clock'] !== null) {
 			foreach ($options['clock'] as $op => $value) {
-				$param = 'pre_clock_'.$op;
-				$sql_parts['param']['UInt64'][$param] = $value;
-				$sql_parts['prewhere'][$param] = 'clock_ns'.self::OP[$op].'toDateTime64({'.$param.':UInt64},9)';
+				if ($value !== null) {
+					$param = 'pre_clock_'.$op;
+					$sql_parts['param']['UInt64'][$param] = $value;
+					$sql_parts['prewhere'][$param] = 'clock_ns'.self::OP[$op].'toDateTime64({'.$param.':UInt64},9)';
+				}
 			}
 		}
 
