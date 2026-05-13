@@ -17,25 +17,39 @@
 namespace SCIM\clients;
 
 use CLocalApiClient;
+use CUser;
+use CApiClientResponse;
 use Exception;
+use APIException;
 
 class ScimApiClient extends CLocalApiClient {
-	/**
-	 * Returns true if the given API is valid.
-	 *
-	 * @param string $api
-	 *
-	 * @return bool
-	 */
-	protected function isValidApi($api) {
-		if (!$this->serviceFactory->hasObject($api)) {
-			throw new Exception(sprintf('The requested endpoint "%1$s" is not supported.', $api), 501);
-		}
 
-		return true;
+	public function isValidApi(string $api): bool {
+		return $this->serviceFactory->hasObject($api);
 	}
 
-	public static function requiresAuthentication($api, $method): bool {
+	public function requiresAuthentication(string $api, string $method): bool {
 		return !($api === 'serviceproviderconfig' && $method === 'get');
+	}
+
+	public function authenticate(array $auth, string $requested_api_method = ''): CApiClientResponse {
+		$response = new CApiClientResponse();
+
+		try {
+			if ($auth['auth'] === null) {
+				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+			}
+
+			$user = (new CUser())->checkAuthentication(['token' => $auth['auth']]);
+
+			if (array_key_exists('debug_mode', $user)) {
+				$this->debug = (bool) $user['debug_mode'];
+			}
+		}
+		catch (Exception $e) {
+			$response->setErrorByException($e, $this->debug);
+		}
+
+		return $response;
 	}
 }

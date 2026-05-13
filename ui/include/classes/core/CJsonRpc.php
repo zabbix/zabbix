@@ -44,7 +44,10 @@ class CJsonRpc {
 	 * @param string $data
 	 */
 	public function __construct(CApiClient $apiClient, $data) {
+		global $NO_AUTH_DEBUG_MODE;
+
 		$this->apiClient = $apiClient;
+		$this->apiClient->debug = $NO_AUTH_DEBUG_MODE;
 
 		$this->initErrors();
 
@@ -90,43 +93,60 @@ class CJsonRpc {
 				continue;
 			}
 
-			[$api, $method] = explode('.', $call['method']) + [1 => ''];
+			[$request_api, $request_method] = explode('.', $call['method']) + [1 => ''];
+
+			$api = strtolower($request_api);
+			$method = strtolower($request_method);
+
+			if (!$this->apiClient->isValidApi($api)) {
+				$this->jsonError($call, '-32601', _s('Incorrect API "%1$s".', $request_api));
+
+				continue;
+			}
+
+			if (!$this->apiClient->isValidMethod($api, $method)) {
+				$this->jsonError($call, '-32601', _s('Incorrect method "%1$s.%2$s".', $request_api, $request_method));
+
+				continue;
+			}
 
 			if (!$authentication_required &&
-					(CLocalApiClient::requiresAuthentication($api, $method) ||
-						(CLocalApiClient::supportsAuthentication($api, $method) && $auth['auth'] !== null))) {
+					($this->apiClient->requiresAuthentication($api, $method) ||
+						($this->apiClient->supportsAuthentication($api, $method) && $auth['auth'] !== null))) {
 				$authentication_required = true;
 			}
 
 			$calls_data[] = [
-				'api' => $api,
-				'method' => $method,
+				'api' => $request_api,
+				'method' => $request_method,
 				'params' => $call['params'],
-				'id' => $call['id']
+				'id' => array_key_exists('id', $call) ? $call['id'] : null
 			];
 		}
 
 		$authenticate_response = null;
 
 		if ($authentication_required) {
-			$authenticate_response = $this->authenticate($auth, $calls_data);
+			$authenticate_response = $this->apiClient->authenticate($auth, self::makeRequestedApiMethod($calls_data));
 		}
 
 		if ($authenticate_response === null || $authenticate_response->errorCode === null) {
 			foreach ($calls_data as $call) {
+				$api = strtolower($call['api']);
+				$method = strtolower($call['method']);
+
 				if ($auth['type'] !== CJsonRpc::AUTH_TYPE_COOKIE &&
-						!CLocalApiClient::requiresAuthentication($call['api'], $call['method']) &&
-						!CLocalApiClient::supportsAuthentication($call['api'], $call['method'])) {
+						!$this->apiClient->requiresAuthentication($api, $method) &&
+						!$this->apiClient->supportsAuthentication($api, $method)) {
 					$result = new CApiClientResponse();
 
-					$error = _('The "%1$s.%2$s" method must be called without authorization header.');
-
 					$result->errorCode = ZBX_API_ERROR_PARAMETERS;
-					$result->errorMessage = _params($error, [$call['api'], $call['method']]);
+					$result->errorMessage = _s('The "%1$s.%2$s" method must be called without authorization header.',
+						$call['api'], $call['method']
+					);
 				}
 				else {
-					$result =
-						$this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth);
+					$result = $this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth);
 				}
 
 				$this->processResult($call, $result);
@@ -192,64 +212,6 @@ class CJsonRpc {
 		return true;
 	}
 
-	public function authenticate(array $auth, array $calls_data): CApiClientResponse {
-		global $NO_AUTH_DEBUG_MODE;
-
-		$response = new CApiClientResponse();
-
-		try {
-			if ($auth['auth'] === null ||
-					($auth['type'] == CJsonRpc::AUTH_TYPE_DPOP && !CTemporaryMobileFeatureHelper::isEnabled())) {
-				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-			}
-
-			$user = match ($auth['type']) {
-				CJsonRpc::AUTH_TYPE_BEARER => $this->apiClient->serviceFactory->getObject('user')->checkAuthentication(
-					strlen($auth['auth']) == 64
-						? ['token' => $auth['auth']]
-						: ['sessionid' => $auth['auth']]
-				),
-				CJsonRpc::AUTH_TYPE_COOKIE => $this->apiClient->serviceFactory->getObject('user')->checkAuthentication([
-					'sessionid' => $auth['auth']
-				]),
-				CJsonRpc::AUTH_TYPE_DPOP => $this->apiClient->serviceFactory->getObject('user')
-					->checkAuthenticationDpop([
-						'token' => $auth['auth'],
-						'signature' => $auth['sign'],
-						'requested_api_method' => self::makeRequestedApiMethod($calls_data)
-					])
-			};
-
-			if (array_key_exists('debug_mode', $user)) {
-				$this->apiClient->debug = $user['debug_mode'];
-			}
-		}
-		catch (Exception $e) {
-			if ($e instanceof APIException) {
-				$response->errorCode = $e->getCode();
-			}
-			elseif ($e instanceof DBException) {
-				$response->errorCode = ZBX_API_ERROR_DB;
-			}
-			else {
-				$response->errorCode = ZBX_API_ERROR_INTERNAL;
-			}
-
-			$response->errorMessage = $e->getMessage();
-
-			// add debug data
-			if ($NO_AUTH_DEBUG_MODE) {
-				$response->debug = $e->getTrace();
-
-				if ($e instanceof APIException) {
-					$response->errorMessage = $e->getDebugMessage();
-				}
-			}
-		}
-
-		return $response;
-	}
-
 	public static function makeRequestedApiMethod(array $calls_data): string {
 		$api_methods = [];
 
@@ -274,7 +236,7 @@ class CJsonRpc {
 		}
 		else {
 			// Notifications (request object without an "id" member) MUST NOT be answered.
-			$this->_response[] = array_key_exists('id', $call)
+			$this->_response[] = $call['id'] !== null
 				? [
 					'jsonrpc' => self::VERSION,
 					'result' => $response->data,
