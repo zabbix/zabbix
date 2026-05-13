@@ -88,11 +88,12 @@ public class JavaGateway
 			while (true)
 			{
 				Socket client = socket.accept();
+				InetAddress peer = client.getInetAddress();
 
-				if (!allowedPeers.check(client.getInetAddress()))
+				if (!allowedPeers.check(peer))
 				{
 					logger.warn("connection from {} rejected, allowed hosts: {}",
-							client.getInetAddress().getHostAddress(), serverList);
+							peer.getHostAddress(), serverList);
 
 					try { client.close(); }
 					catch (Exception e) { logger.debug("failed to close rejected connection", e); }
