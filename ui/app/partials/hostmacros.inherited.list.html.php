@@ -217,24 +217,25 @@ else {
 
 		$table
 			->addRow($row, 'form_row')
-			->addRow((new CRow([
-				(new CCol([
-					(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
-						->setErrorContainer('macros_'.$i.'_error_container')
-						->setMaxlength(DB::getFieldLength('hostmacro', 'description'))
-						->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->setAttribute('placeholder', _('description'))
-						->setReadonly($description_readonly)
-						->setAttribute('data-skip-from-submit', $skip_from_submit),
-					($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL)
-						? (new CSpan(_('(created by host discovery)')))->addClass(ZBX_STYLE_GREY)
-						: null
-				]))
-					->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
-					->addClass(CControllerHostMacrosList::MACRO_TEXTAREA_PARENT)
-					->setColSpan(2),
-				(new CCol())
-					->setColSpan(count($row) - 2)
+			->addRow(
+				(new CRow([
+					(new CCol([
+						(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
+							->setErrorContainer('macros_'.$i.'_error_container')
+							->setMaxlength(DB::getFieldLength('hostmacro', 'description'))
+							->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->setAttribute('placeholder', _('description'))
+							->setReadonly($description_readonly)
+							->setAttribute('data-skip-from-submit', $skip_from_submit),
+						($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL)
+							? (new CSpan(_('(created by host discovery)')))->addClass(ZBX_STYLE_GREY)
+							: null
+					]))
+						->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+						->addClass(CControllerHostMacrosList::MACRO_TEXTAREA_PARENT)
+						->setColSpan(2),
+					(new CCol())
+						->setColSpan(count($row) - 2)
 				]))->addClass('form_row')
 			)
 			->addRow((new CCol())
