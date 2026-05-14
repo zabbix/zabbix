@@ -45,8 +45,10 @@ $form_grid = (new CFormGrid())
 		new CLabel(_('Discovery by'), 'discovery_by'),
 		new CFormField(
 			(new CRadioButtonList('discovery_by', $data['discovery_by']))
-				->addValue(_('Server'), ZBX_DISCOVERY_BY_SERVER)
+				->addValue(_('Server'), ZBX_DISCOVERY_BY_SERVER, null, null,
+					!$data['user']['can_select_server_for_discovery_by'])
 				->addValue(_('Proxy'), ZBX_DISCOVERY_BY_PROXY)
+				->setReadonly(!$data['user']['can_edit_discovery_by'])
 				->setModern()
 		)
 	])
