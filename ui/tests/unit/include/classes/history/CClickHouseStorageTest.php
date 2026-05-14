@@ -339,8 +339,8 @@ class CHistoryStorageClickHouseTest extends TestCase {
 	 * @covers CClickHouseStorage::buildQueryFromParts
 	 * @dataProvider dataProviderBuildQueryFromParts
 	 */
-	public function testBuildQueryFromParts(Closure $method, array $query_parts, $expected) {
-		$this->assertSame($expected, $method($query_parts));
+	public function testBuildQueryFromParts(Closure $method, array $sql_parts, $expected) {
+		$this->assertSame($expected, $method($sql_parts));
 	}
 
 	public static function dataProviderAddQueryOutputOptions() {

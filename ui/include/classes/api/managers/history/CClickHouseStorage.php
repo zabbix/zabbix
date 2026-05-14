@@ -141,10 +141,10 @@ class CClickHouseStorage {
 	 * @param array $options
 	 */
 	public function select(array $options): ?array {
-		$query_parts = $this->getQueryPartsFromOptions($options);
-		$query = $this->buildQueryFromParts($query_parts);
+		$sql_parts = $this->getQueryPartsFromOptions($options);
+		$query = $this->buildQueryFromParts($sql_parts);
 
-		return $this->query($query, $query_parts['param']);
+		return $this->query($query, $sql_parts['param']);
 	}
 
 	/**
@@ -154,22 +154,25 @@ class CClickHouseStorage {
 	 */
 	public function selectTrends(array $options): ?array {
 		if ($options['countOutput']) {
-			$query_parts = $this->getQueryPartsFromOptions(['output' => ['itemid'], 'countOutput' => false] + $options);
-			$query_parts['group'] = ['itemid', 'toStartOfHour(clock_ns)'];
-			$query = 'SELECT count() AS rowscount FROM ('.$this->buildQueryFromParts($query_parts).')';
+			$sql_parts = ['group' => ['itemid', 'toStartOfHour(clock_ns)']] + $this->getQueryPartsFromOptions([
+				'output' => ['itemid'],
+				'countOutput' => false,
+				'limit' => null
+			] + $options);
+			$query = 'SELECT count() AS rowscount FROM ('.$this->buildQueryFromParts($sql_parts).')';
 
-			return $this->query($query, $query_parts['param']);
+			return $this->query($query, $sql_parts['param']);
 		}
 
-		// Create query parts without SELECT
-		$query_parts = $this->getQueryPartsFromOptions(['output' => []] + $options);
+		// Create query parts without SELECT.
+		$sql_parts = $this->getQueryPartsFromOptions(['output' => []] + $options);
 
-		// Add columns required for GROUP and ORDER
-		$output = array_merge($options['output'], ['itemid', 'clock']);
-		$query_parts['order'] = ['clock ASC'];
-		$query_parts['group'] = ['itemid', 'toStartOfHour(clock_ns)'];
+		// Add columns required for GROUP and ORDER.
+		$output = array_unique(array_merge($options['output'], ['itemid', 'clock']));
+		$sql_parts['order'] = ['clock ASC'];
+		$sql_parts['group'] = ['itemid', 'toStartOfHour(clock_ns)'];
 
-		$query_parts['select'] = array_intersect_key([
+		$sql_parts['select'] = array_intersect_key([
 			'itemid' => 'itemid',
 			'clock' => 'toUnixTimestamp(toStartOfHour(clock_ns))',
 			'num' => 'count()',
@@ -178,18 +181,22 @@ class CClickHouseStorage {
 			'value_max' => 'max(value)'
 		], array_flip($output));
 
-		$query = $this->buildQueryFromParts($query_parts);
-		$rows = $this->query($query, $query_parts['param']);
+		$query = $this->buildQueryFromParts($sql_parts);
+		$resource = $this->query($query, $sql_parts['param']);
 
-		if (is_array($rows) && array_diff($output, $options['output'])) {
+		if ($resource === null) {
+			return null;
+		}
+
+		if (array_diff($output, $options['output'])) {
 			$output = array_flip($options['output']);
-			foreach ($rows as &$row) {
+			foreach ($resource as &$row) {
 				$row = array_intersect_key($row, $output);
 			}
 			unset($row);
 		}
 
-		return $rows;
+		return $resource;
 	}
 
 	/**
