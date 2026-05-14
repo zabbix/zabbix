@@ -318,8 +318,6 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 	zbx_dc_um_handle_t		*um_handle_unmasked;
 	zbx_vector_push_target_t	targets;
 	char				*subject_dyn = NULL;
-	zbx_config_t			cfg;
-	const char			*server_id;
 
 	zbx_db_alert	alert = {
 			.sendto = (char *)sendto,
@@ -375,9 +373,6 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 	substitute_message_macros(&trigger_id, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
 			r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
 
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SERVER_ID);
-	server_id = cfg.serverid;
-
 	for (int i = 0; i < targets.values_num; i++)
 	{
 		struct zbx_json		json;
@@ -394,7 +389,6 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 		zbx_json_addobject(&json, "to");
 
 		zbx_json_addstring(&json, "push_token", t->token, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, "server_id", server_id, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, "device_id", t->device_id, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json); /* to */
 

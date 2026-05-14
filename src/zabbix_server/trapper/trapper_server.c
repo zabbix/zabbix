@@ -40,8 +40,7 @@ static int	trapper_build_push_test_params(const char *sendto, const char *subjec
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	struct zbx_json		json;
-	zbx_config_t		cfg;
-	const char		*server_id, *device_id, *push_token, *mobile_encryption_key;
+	const char		*device_id, *push_token, *mobile_encryption_key;
 	char			*sendto_esc = NULL, *message_uuid7 = NULL, *request_uuid7 = NULL;
 	int			ret = FAIL;
 
@@ -66,9 +65,6 @@ static int	trapper_build_push_test_params(const char *sendto, const char *subjec
 	device_id = row[0];
 	push_token = row[1];
 	mobile_encryption_key = row[2];
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SERVER_ID);
-	server_id = cfg.serverid;
-
 	zbx_json_init(&json, 1024);
 	zbx_json_addstring(&json, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, "method", "device.notify", ZBX_JSON_TYPE_STRING);
@@ -77,7 +73,6 @@ static int	trapper_build_push_test_params(const char *sendto, const char *subjec
 
 	zbx_json_addobject(&json, "to");
 	zbx_json_addstring(&json, "push_token", push_token, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&json, "server_id", server_id, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, "device_id", device_id, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&json);
 

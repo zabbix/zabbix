@@ -14340,9 +14340,6 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	if (0 != (flags & ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER))
 		cfg->proxy_secrets_provider = config->config->proxy_secrets_provider;
 
-	if (0 != (flags & ZBX_CONFIG_FLAGS_SERVER_ID))
-		cfg->serverid = config->config->serverid;
-
 	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	cfg->flags = flags;

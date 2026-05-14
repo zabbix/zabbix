@@ -177,9 +177,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 					*uuid7id = NULL;
 	int				ret = FAIL;
 	size_t				bek_len;
-	zbx_config_t			cfg;
 	const zbx_config_tls_t		*config_tls = config_comms->config_tls;
-	const char			*serverid;
 
 	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_body))
 	{
@@ -194,9 +192,6 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
 		goto out2;
 	}
-
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SERVER_ID);
-	serverid = cfg.serverid;
 
 	if (NULL == (curl = curl_easy_init()))
 	{
@@ -223,7 +218,6 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 	zbx_json_addstring(&request, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&request, "method", ZBX_PROTO_VALUE_DEVICE_INIT, ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&request, "params");
-	zbx_json_addstring(&request, "server_id", serverid, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&request, "device_id", device_id, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&request);
 	uuid7id = zbx_gen_uuid7_hyphenated();
@@ -529,9 +523,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 					message[ZBX_BRIDGE_MESSAGE_LEN], error_data[ZBX_BRIDGE_MESSAGE_LEN],
 					*uuid7id = NULL;
 	int				ret = FAIL;
-	zbx_config_t			cfg;
 	const zbx_config_tls_t		*config_tls = config_comms->config_tls;
-	const char			*serverid;
 
 	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_body))
 	{
@@ -546,9 +538,6 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
 		goto out2;
 	}
-
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SERVER_ID);
-	serverid = cfg.serverid;
 
 	if (NULL == (curl = curl_easy_init()))
 	{
@@ -575,7 +564,6 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 	zbx_json_addstring(&request, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&request, "method", ZBX_PROTO_VALUE_DEVICE_OFFBOARD, ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&request, "params");
-	zbx_json_addstring(&request, "server_id", serverid, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&request, "device_id", device_id, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&request);
 	uuid7id = zbx_gen_uuid7_hyphenated();
