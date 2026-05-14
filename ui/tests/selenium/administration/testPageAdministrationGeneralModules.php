@@ -1322,6 +1322,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->checkWidgetStatusOnDashboard($dashboard, $module, $status, 'kiosk');
 		$this->query('xpath://button[@title="Normal view"]')->one()->click();
 		$this->page->waitUntilReady();
+		$dashboard->waitUntilReady();
 
 		// Open dashboard in edit mode or open dashboard on template and check widget display again.
 		if (array_key_exists('template', $module)) {
