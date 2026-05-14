@@ -34,7 +34,7 @@ func Test_IsRFCExtendedHostName(t *testing.T) {
 		args args
 		want bool
 	}{
-		{"+almostNumerica92.168.10.4", args{"a92.168.10.4"}, true},
+		{"+almostNumericalX92.168.10.4", args{"X92.168.10.4"}, true},
 		{"+underscoreAtStart", args{"_example.com"}, true},
 		{"+underscore", args{"example_com.com"}, true},
 		{"+localhost", args{"localhost"}, true},

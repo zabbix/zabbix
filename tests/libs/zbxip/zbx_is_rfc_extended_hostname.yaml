@@ -155,9 +155,9 @@ in:
 out:
   return: FAIL
 ---
-test case: "23. Almost numeric a92.168.10.4"
+test case: "23. Almost numerical X92.168.10.4"
 in:
-  string: "a92.168.10.4"
+  string: "X92.168.10.4"
 out:
   return: SUCCEED
 ...
