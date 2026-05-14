@@ -343,7 +343,11 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 			*error = zbx_strdup(NULL, info);
 		}
 		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "incomplete error in bridge-adapter response body: %s",
+					ZBX_NULL2EMPTY_STR(body.data));
 			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+		}
 
 		goto out;
 	}
@@ -356,13 +360,13 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 		goto out;
 	}
 
-	if (FAIL == zbx_json_value_by_name(&jp_result, "met", met, sizeof(met), NULL) ||
-			FAIL == zbx_json_brackets_by_name(&jp_result, "bek", &jp_bek) ||
+	if (FAIL == zbx_json_value_by_name(&jp_result, "enrollment_token", met, sizeof(met), NULL) ||
+			FAIL == zbx_json_brackets_by_name(&jp_result, "adapter_enc_key", &jp_bek) ||
 			FAIL == zbx_json_value_by_name(&jp_result, "enroll_url", enroll_url,
 			sizeof(enroll_url), NULL))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "missing met/bek/enroll_url in bridge-adapter result: %s",
-				ZBX_NULL2EMPTY_STR(body.data));
+		zabbix_log(LOG_LEVEL_WARNING, "missing enrollment_token/adapter_enc_key/enroll_url in bridge-adapter"
+				" result: %s", ZBX_NULL2EMPTY_STR(body.data));
 		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
 		goto out2;
 	}
@@ -688,7 +692,11 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 			*error = zbx_strdup(NULL, info);
 		}
 		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "incomplete error in bridge-adapter response body: %s",
+					ZBX_NULL2EMPTY_STR(body.data));
 			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
+		}
 
 		goto out;
 	}
