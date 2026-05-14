@@ -931,7 +931,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataFiringAfterRestart() {
 		$unknown_before = $this->getUnknownTriggerEventCount();
-	
+
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
 		$this->testLLDHistorySyncAtScale_TriggerNoDataFiring();
