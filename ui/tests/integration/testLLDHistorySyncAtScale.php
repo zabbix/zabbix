@@ -71,6 +71,18 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 */
 	public function prepareData() {
 		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
+
+		$response = $this->call('host.get', [
+			'filter' => ['host' => 'Zabbix server'],
+			'output' => ['hostid']
+		]);
+		if (!empty($response['result'])) {
+			$this->call('host.update', [
+				'hostid' => $response['result'][0]['hostid'],
+				'status' => HOST_STATUS_NOT_MONITORED
+			]);
+		}
+
 		$response = $this->call('hostgroup.get', [
 			'filter' => ['name' => ['Zabbix servers']],
 			'output' => ['groupid']
@@ -171,6 +183,28 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		}
 
 		CAPIHelper::call('settings.update', ['auditlog_enabled' => 1, 'auditlog_mode' => 1]);
+
+		$response = CAPIHelper::call('action.get', [
+			'output' => ['actionid'],
+			'filter' => ['name' => 'Report unknown triggers']
+		]);
+		if (!empty($response['result'])) {
+			CAPIHelper::call('action.update', [
+				'actionid' => $response['result'][0]['actionid'],
+				'status' => ACTION_STATUS_DISABLED
+			]);
+		}
+
+		$response = CAPIHelper::call('host.get', [
+			'filter' => ['host' => 'Zabbix server'],
+			'output' => ['hostid']
+		]);
+		if (!empty($response['result'])) {
+			CAPIHelper::call('host.update', [
+				'hostid' => $response['result'][0]['hostid'],
+				'status' => HOST_STATUS_MONITORED
+			]);
+		}
 	}
 	/**
 	 * Component configuration provider.
@@ -532,6 +566,16 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDHistorySyncAtScale_TriggerDiscovery
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataDiscovery() {
+		$response = $this->call('action.get', [
+			'output' => ['actionid'],
+			'filter' => ['name' => 'Report unknown triggers']
+		]);
+		$this->assertNotEmpty($response['result'], 'Action "Report unknown triggers" not found.');
+		$this->call('action.update', [
+			'actionid' => $response['result'][0]['actionid'],
+			'status' => ACTION_STATUS_ENABLED
+		]);
+
 		$this->updateTriggerPrototypesAndRediscover('NoData Sensor', function ($def) {
 			return 'nodata(/'.self::HOSTNAME.'/'.self::ITEM_PROTO_KEY.'.'.$def['suffix']
 				.'['.self::LLD_MACRO.'],30s)=1';
@@ -591,6 +635,8 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDHistorySyncAtScale_TriggerNoDataDiscovery
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataFiring() {
+		$unknown_before = $this->getUnknownTriggerEventCount();
+
 		$this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
 			'output' => ['triggerid', 'value', 'state']
@@ -617,6 +663,10 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			}
 			return true;
 		});
+
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		$this->assertEquals($unknown_before, $unknown_after,
+			'Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
 	}
 
 	/**
@@ -642,6 +692,8 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDHistorySyncAtScale_ProxyLastaccess
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataNotSupported() {
+		$unknown_before = $this->getUnknownTriggerEventCount();
+
 		$tm = time();
 
 		$this->sendHistoryAt($tm, 'item is not supported', ITEM_STATE_NOTSUPPORTED);
@@ -657,6 +709,10 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		});
 
 		$this->verifyProxyLastaccessAndNoDataTriggersFiring();
+
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		$this->assertEquals($unknown_before, $unknown_after,
+			'Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
 	}
 
 	/**
@@ -721,6 +777,8 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	private function verifyProxyLastaccessAndNoDataTriggersFiring(): void {
+		$unknown_before = $this->getUnknownTriggerEventCount();
+
 		$response = $this->call('proxy.get', [
 			'proxyids' => [self::$proxyid],
 			'output' => ['lastaccess']
@@ -758,6 +816,10 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		});
 
 		$this->assertNull($trigger_unknown_error, (string) $trigger_unknown_error);
+
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		$this->assertEquals($unknown_before, $unknown_after,
+			'Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
 	}
 
 	/**
@@ -769,9 +831,73 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	public function testLLDHistorySyncAtScale_TriggerNoDataRecoveryAfterRestart() {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
+		$unknown_before = $this->getUnknownTriggerEventCount();
+
 		$tm = time();
 		$this->sendHistoryAt($tm);
 
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		$this->assertEquals($unknown_before, $unknown_after,
+			'Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
+	}
+
+	/**
+	 * Wait long enough for nodata triggers to fire (30s window) and verify they
+	 * stay suppressed — neither value = PROBLEM nor state = UNKNOWN.
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerNoDataRecoveryAfterRestart
+	 */
+	public function testLLDHistorySyncAtScale_TriggerNoDataSuppressedAfterConnectionLoss() {
+		$unknown_before = $this->getUnknownTriggerEventCount();
+		sleep(45);
+
+		$response = $this->call('trigger.get', [
+			'hostids' => [self::$hostid],
+			'output' => ['triggerid', 'value', 'state', 'error']
+		]);
+
+		foreach ($response['result'] as $trigger) {
+			$this->assertNotEquals(TRIGGER_VALUE_TRUE, (int) $trigger['value'],
+				'Trigger '.$trigger['triggerid'].' transitioned to PROBLEM but expected to be suppressed.');
+			$this->assertNotEquals(TRIGGER_STATE_UNKNOWN, (int) $trigger['state'],
+				'Trigger '.$trigger['triggerid'].' transitioned to UNKNOWN. Error:'.$trigger['error']);
+		}
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		$this->assertEquals($unknown_before, $unknown_after,
+			'Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
+	}
+
+	/**
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerNoDataSuppressedAfterConnectionLoss
+	 */
+	public function testLLDHistorySyncAtScale_TriggerNoDataOKAfterConnectionLoss() {
+		$unknown_before = $this->getUnknownTriggerEventCount();
+		$tm = time();
+
+		$vps_baseline = $this->getVpsWritten();
+		$this->sendHistoryAtTimes([$tm - 45, $tm]);
+		$this->assertVpsWrittenIncreasedBy($vps_baseline, 2 * self::$total_expected);
+
+		$this->waitUntilTriggersRecovered();
+
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		$this->assertEquals($unknown_before, $unknown_after,
+			'Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
+	}
+
+	private function getUnknownTriggerEventCount(): int {
+		$response = $this->call('event.get', [
+			'hostids' => [self::$hostid],
+			'source' => EVENT_SOURCE_INTERNAL,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'value' => TRIGGER_STATE_UNKNOWN,
+			'countOutput' => true
+		]);
+		return (int) $response['result'];
+	}
+
+	private function waitUntilTriggersRecovered(): void {
 		$this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
 			'output' => ['triggerid', 'value', 'state']
@@ -804,9 +930,14 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDHistorySyncAtScale_TriggerNoDataRecoveryAfterRestart
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataFiringAfterRestart() {
+		$unknown_before = $this->getUnknownTriggerEventCount();
+	
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
 		$this->testLLDHistorySyncAtScale_TriggerNoDataFiring();
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		$this->assertEquals($unknown_before, $unknown_after,
+			'Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
 	}
 
 	private function verifyTrendsAtClock(int $trend_clock): void {
@@ -930,6 +1061,20 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
 
 		return $sent;
+	}
+
+	private function sendHistoryAtTimes(array $tms, ?string $value = null, int $state = ITEM_STATE_NORMAL,
+			bool $omit_value = false): array {
+		$sent_per_tm = [];
+		$combined = [];
+		foreach ($tms as $tm) {
+			['sent' => $sent, 'values' => $values] = $this->prepareHistoryAt($tm, $value, $state, $omit_value);
+			$sent_per_tm[$tm] = $sent;
+			$combined = array_merge($combined, $values);
+		}
+		$this->sendAgentDataValues($combined, self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+
+		return $sent_per_tm;
 	}
 
 	private function verifyHistoryAt(int $tm, array $sent): void {
