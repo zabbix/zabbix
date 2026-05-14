@@ -102,8 +102,9 @@ $host_tab->addRow(
 $host_tab->addRow(
 	(new CVisibilityBox('visible[monitored_by]', 'monitored-by-field', _('Original')))->setLabel(_('Monitored by')),
 	(new CDiv([
-		(new CRadioButtonList('monitored_by', ZBX_MONITORED_BY_SERVER))
-			->addValue(_('Server'), ZBX_MONITORED_BY_SERVER)
+		(new CRadioButtonList('monitored_by', (int) $data['monitored_by']))
+			->addValue(_('Server'), ZBX_MONITORED_BY_SERVER, null, null,
+				!$data['user']['can_select_server_for_monitoring'])
 			->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
 			->addValue(_('Proxy group'), ZBX_MONITORED_BY_PROXY_GROUP)
 			->setModern(),

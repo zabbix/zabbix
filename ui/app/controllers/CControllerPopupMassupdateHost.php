@@ -546,14 +546,19 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			$data = [
 				'title' => _('Mass update'),
 				'user' => [
-					'debug_mode' => $this->getDebugMode()
+					'debug_mode' => $this->getDebugMode(),
+					'can_select_server_for_monitoring' =>
+						CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
 				],
 				'hostids' => $this->getInput('hostids'),
 				'inventories' => zbx_toHash(getHostInventories(), 'db_field'),
 				'location_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'host.list')
 					->setArgument('page', CPagerHelper::loadPage('host.list'))
-					->getUrl()
+					->getUrl(),
+				'monitored_by' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
+					? ZBX_MONITORED_BY_SERVER
+					: ZBX_MONITORED_BY_PROXY
 			];
 
 			$data['discovered_host'] = !(bool) API::Host()->get([
