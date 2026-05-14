@@ -222,7 +222,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function configurationProvider() {
 		return [
 			self::COMPONENT_SERVER => [
-				'LogFileSize' => 1024,
+				'LogFileSize' => 0,
 				'DebugLevel' => 4,
 			]
 		];
@@ -1149,7 +1149,6 @@ class testTriggerCEP extends CIntegrationTest {
 
 	/**
 	 * @depends testTriggerCEP_DependentTriggerTagCorrelationRestart
-	 * @configurationDataProvider configurationProvider
 	 */
 	public function testTriggerCEP_EventAssessmentServiceCorrelation() {
 		$this->prepareDataServiceCorrelation();
@@ -1198,7 +1197,6 @@ class testTriggerCEP extends CIntegrationTest {
 	 * recovery sent to proto 2.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCrossTrigger)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
-	 * @configurationDataProvider configurationProvider
 	 */
 	public function testTriggerCEP_EventAssessmentGlobalCorrelationCrossTrigger() {
 		/*$this->triggerCEP_Cleanup();
@@ -1509,11 +1507,9 @@ class testTriggerCEP extends CIntegrationTest {
 	 *   1. "down" → proto 1 items → find(regexp,"down") = true, service="down"
 	 *                 → PROBLEM event on proto 1 triggers; proto 1 triggers go TRUE.
 	 *   2. "down" → proto 2 items → find(regexp,"down") = true, service="down"
-	 *                 → PROBLEM event on proto 2 triggers; proto 2 triggers go TRUE.
-	 *   3. "up"   → proto 1 items → expression false, service="up"
-	 *                 → RESOLVED event; global correlation matches old service="down"
-	 *                 against new service="up" → closes proto 2's open problems;
-	 *                 proto 2 triggers return to OK. Proto 1 also returns to OK.
+	 *                 → PROBLEM event on proto 2 triggers;
+	 *                 global correlation matches new type "cep-dep" and old service="down"
+	 *                 closes matched (old and new) problems
 	 */
 	private function runEventAssessmentTestGlobalCorrelationCrossTrigger(bool $restart): void {
 		$keys1 = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
@@ -1542,16 +1538,10 @@ class testTriggerCEP extends CIntegrationTest {
 		);
 		$this->maybeRestartServer($restart);
 
-		fwrite(STDERR, "wait for sending...\n");
-		fread(STDIN, 1);
-
 		$this->sendSenderValues(
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down'], $keys2),
 			null, 0
 		);
-
-		fwrite(STDERR, "check open probelms...\n");
-		fread(STDIN, 1);
 
 		$this->waitForNoOpenProblems(array_merge($triggerids1, $triggerids2));
 	}
@@ -1753,7 +1743,6 @@ class testTriggerCEP extends CIntegrationTest {
 	 * rejected while the flag is off, then enable manual_close on the trigger prototypes,
 	 * resend LLD discovery data so the change propagates to the discovered triggers, reload
 	 * the configuration cache, close all problems, and wait for every trigger to return to OK.
-	 * @configurationDataProvider configurationProvider
 	 */
 	private function closeTagCorrelationProblems(array $triggerids): void {
 		// Collect the event ID of the open problem for every trigger.
