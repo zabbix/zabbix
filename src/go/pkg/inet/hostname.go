@@ -29,10 +29,11 @@ func IsRFCExtendedHostName(host string) bool {
 	// Requirements and limits for host names are defined in RFC 1035,
 	// with clarifications in RFC 1123, RFC 2181.
 	//
-	// Total length should not exceed 253 characters.
-	// This is excluding trailing dot and additional byte usually used when saved.
+	// Total length should not exceed 253 characters without trailing dot
+	// and 254 characters if trailing dot is present.
+
 	n := len(host)
-	if n == 0 || n > 253 {
+	if n == 0 || n > 254 {
 		return false
 	}
 
@@ -89,10 +90,20 @@ func IsRFCExtendedHostName(host string) bool {
 		if labelLen > 63 {
 			return false
 		}
+
+		if i > 252 {
+			if c != '.' {
+				return false
+			}
+
+			if i > 253 {
+				return false
+			}
+		}
 	}
 
-	// last label must not be empty or end with hyphen
-	if labelLen == 0 || prevHyphen {
+	// last label must not end with hyphen
+	if prevHyphen {
 		return false
 	}
 

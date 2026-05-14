@@ -92,14 +92,20 @@ int	zbx_is_rfc_extended_hostname(const char *host)
 
 		p++;
 
-		/* Total length should not exceed 253 characters. */
-		/* This is excluding trailing dot and additional byte usually used when saved. */
+		/* Total length should not exceed 253 characters without trailing dot */
+		/* and 254 characters if trailing dot is present. */
 		if (253 < p - host)
-			return FAIL;
+		{
+			if ('.' != *(p - 1))
+				return FAIL;
+
+			if (255 < p - host)
+				return FAIL;
+		}
 	}
 
-	/* last label must not be empty or end with hyphen */
-	if (0 == label_len || 1 == prev_hyphen)
+	/* last label must not end with hyphen */
+	if (1 == prev_hyphen)
 		return FAIL;
 
 	/* reject purely numeric names */
