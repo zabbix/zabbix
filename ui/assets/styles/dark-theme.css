@@ -15,8 +15,10 @@
 [lang="ka"] {
   --font-body-size: 70%; }
 
-.sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
-div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-piechart .dataset-body .form-grid > label, form.dashboard-widget-scatterplot .dataset-head .head-row > label, form.dashboard-widget-scatterplot .dataset-body .form-grid > label, form.dashboard-widget-svggraph .dataset-body .form-grid > label, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
+.sidebar .server-name, .form-grid > label,
+.form-grid .collapsible > label,
+.form-grid .fields-group > label, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
+div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-scatterplot .dataset-head .head-row > label, form.dashboard-widget-scatterplot .dataset-body .form-grid > label, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
 .totals-list.totals-list-horizontal .name {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1219,6 +1221,7 @@ footer {
   .form-grid > label,
   .form-grid .collapsible > label,
   .form-grid .fields-group > label {
+    box-sizing: border-box;
     align-self: start;
     line-height: 24px;
     text-align: right;
@@ -1227,13 +1230,22 @@ footer {
     .form-grid .collapsible > label.fields-group-label,
     .form-grid .fields-group > label.fields-group-label {
       margin-top: 6px; }
-    .form-grid > label .btn-icon,
     .form-grid > label .icon,
-    .form-grid .collapsible > label .btn-icon,
     .form-grid .collapsible > label .icon,
-    .form-grid .fields-group > label .btn-icon,
     .form-grid .fields-group > label .icon {
       margin-left: 5px; }
+    .form-grid > label:has(.btn-icon:not([hidden]):not([style*="display: none"])),
+    .form-grid .collapsible > label:has(.btn-icon:not([hidden]):not([style*="display: none"])),
+    .form-grid .fields-group > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) {
+      position: relative;
+      right: -2px;
+      padding-right: 23px; }
+      .form-grid > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) .btn-icon,
+      .form-grid .collapsible > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) .btn-icon,
+      .form-grid .fields-group > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) .btn-icon {
+        position: absolute;
+        top: 4px;
+        right: 2px; }
     .form-grid > label:not([for]),
     .form-grid .collapsible > label:not([for]),
     .form-grid .fields-group > label:not([for]) {
@@ -1336,6 +1348,8 @@ footer {
   .form-grid.form-subgrid {
     grid-template-columns: subgrid;
     grid-column: 1 / -1; }
+  .form-grid [hidden] {
+    display: none !important; }
 
 button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-grey-icon, .btn-link, .btn-overlay-close, .btn-debug {
   position: relative;
@@ -5943,6 +5957,11 @@ form.dashboard-widget-scatterplot {
 div.dashboard-widget-scatterplot {
   overflow-x: hidden; }
 
+.svg-scatter-plot-point {
+  fill-opacity: 1;
+  fill: var(--color);
+  stroke: var(--color); }
+
 .svg-scatter-plot-legend {
   position: relative;
   top: 4px;
@@ -6999,12 +7018,20 @@ form.is-loading {
     width: 15%;
     white-space: nowrap; }
     .table-forms .table-forms-td-left label {
+      box-sizing: border-box;
       display: block;
       height: 24px;
       line-height: 24px;
       overflow: hidden;
       text-overflow: ellipsis; }
-      .table-forms .table-forms-td-left label .btn-icon,
+      .table-forms .table-forms-td-left label:has(.btn-icon) {
+        position: relative;
+        margin-right: -2px;
+        padding-right: 23px; }
+        .table-forms .table-forms-td-left label:has(.btn-icon) .btn-icon {
+          position: absolute;
+          top: 4px;
+          right: 2px; }
       .table-forms .table-forms-td-left label .icon {
         margin-left: 5px; }
     .table-forms .table-forms-td-left .checkbox-radio {
@@ -7755,6 +7782,9 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     float: right;
     line-height: 24px; }
 
+.modal-popup.modal-popup-static.modal-popup-sla-edit, .modal-popup.modal-popup-static.modal-popup-proxy-edit, .modal-popup.modal-popup-static.modal-popup-connector-edit {
+  --modal-max-width: 750px; }
+
 .multilineinput-control {
   display: flex;
   width: 100%; }
@@ -8049,7 +8079,6 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    padding-left: 3px;
     white-space: pre; }
     .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis .scatter-plot-hintbox-icon-color {
       display: inline-block;

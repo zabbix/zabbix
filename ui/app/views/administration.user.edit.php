@@ -613,23 +613,22 @@ $tabs->addTab('permissionsTab', _('Permissions'), $permissions_form_list);
 $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 	->setArgument('action', 'user.list')
 	->setArgument('page', CPagerHelper::loadPage('user.list', null))
-))->setId('cancel');
+))->addClass('js-cancel');
 
 if ($data['userid'] != 0) {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
+		(new CSubmit('', _('Update')))->addClass('js-submit'),
 		[
 			(new CSimpleButton(_('Delete')))
-				->setId('delete')
 				->setEnabled(bccomp(CWebUser::$data['userid'], $data['userid']) != 0)
-				->setId('delete'),
+				->addClass('js-delete'),
 			$cancel_button
 		]
 	));
 }
 else {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
+		(new CSubmit('', _('Add')))->addClass('js-submit'),
 		[$cancel_button]
 	));
 }
