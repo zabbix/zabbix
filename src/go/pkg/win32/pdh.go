@@ -517,7 +517,8 @@ func isPdhErrorRetryable(code uintptr) bool {
 		PDH_INVALID_HANDLE     = 0xC0000BBC
 	)
 	switch code {
-	case PDH_CSTATUS_INVALID_DATA,
+	case PDH_MORE_DATA,
+		PDH_CSTATUS_INVALID_DATA,
 		PDH_CSTATUS_NO_MACHINE,
 		PDH_CSTATUS_NO_OBJECT,
 		PDH_LOG_TYPE_NOT_FOUND,
