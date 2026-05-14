@@ -111,7 +111,10 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 	$triggers_table->addRow([
 		(new CCheckBox('messages[triggers.severities]['.$severity.']'))
 			->setLabel(CSeverityHelper::getName($severity))
-			->setChecked(array_key_exists($severity, $data['messages']['triggers.severities']))
+			->setChecked(
+				array_key_exists($severity, $data['messages']['triggers.severities'])
+					&& $data['messages']['triggers.severities'][$severity] == TRIGGER_SEVERITY_ON
+			)
 			->setUncheckedValue(0),
 		[
 			(new CSelect('messages[sounds.'.$severity.']'))

@@ -113,7 +113,8 @@ class testUserMacrosWithContext extends CIntegrationTest {
 				'name' => sprintf("trapper item %d", $i+1),
 				'key_' => sprintf("trap%d", $i+1),
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			];
 		}
 		$response = $this->call('item.create', $trapperItems);

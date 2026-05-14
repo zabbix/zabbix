@@ -131,8 +131,8 @@ $form->addItem([
 		'template.export' => [
 			'content' => new CButtonExport('export.templates',
 				(new CUrl('zabbix.php'))
-					->setArgument('action', $data['action'])
-					->setArgument('page', $data['page'] == 1 ? null : $data['page'])
+					->setArgument('action', 'template.list')
+					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
 					->getUrl()
 			)
 		],

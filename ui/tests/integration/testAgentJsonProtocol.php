@@ -109,7 +109,8 @@ class testAgentJsonProtocol extends CIntegrationTest {
 				'key_' => self::TRAPPER_KEY,
 				'type' => ITEM_TYPE_TRAPPER,
 				'hostid' => self::$hostid,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
