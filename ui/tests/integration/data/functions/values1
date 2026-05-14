@@ -51,3 +51,13 @@ Functions item[55] 1762376400 3
 Functions item[55] 1762426400 4
 Functions item[55] 1762430000 5
 Functions item[55] 1762530000 0
+Functions trap[0] 1762430000 Must have admin rights to Repository
+Functions trap[1] 1762430000 must have admin rights to repository
+Functions trap[2] 1762430000 Error: Must have admin rights to Repository to push
+Functions trap[3] 1762430000 MUST HAVE ADMIN RIGHTS TO REPOSITORY
+Functions trap[4] 1762430000 prefix Must have admin rights to Repository
+Functions trap[5] 1762430000 Permission denied
+Functions trap[6] 1762430000 Some unrelated error
+Functions trap[7] 1762430000 Repository access denied
+Functions trap[8] 1762430000 Admin rights required
+Functions trap[9] 1762430000 You do not have permission

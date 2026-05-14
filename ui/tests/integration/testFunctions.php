@@ -108,6 +108,16 @@ class testFunctions extends CIntegrationTest{
 			['hostid' => $templateid, 'name' => 'Item 30', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'item[30]', 'value_type' => ITEM_VALUE_TYPE_FLOAT],
 			['hostid' => $templateid, 'name' => 'Item 31', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'item[31]', 'value_type' => ITEM_VALUE_TYPE_LOG],
 			['hostid' => $templateid, 'name' => 'Item 32', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'item[32]', 'value_type' => ITEM_VALUE_TYPE_FLOAT],
+			['hostid' => $templateid, 'name' => 'Trap 0', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'trap[0]', 'value_type' => ITEM_VALUE_TYPE_TEXT],
+			['hostid' => $templateid, 'name' => 'Trap 1', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'trap[1]', 'value_type' => ITEM_VALUE_TYPE_TEXT],
+			['hostid' => $templateid, 'name' => 'Trap 2', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'trap[2]', 'value_type' => ITEM_VALUE_TYPE_TEXT],
+			['hostid' => $templateid, 'name' => 'Trap 3', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'trap[3]', 'value_type' => ITEM_VALUE_TYPE_TEXT],
+			['hostid' => $templateid, 'name' => 'Trap 4', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'trap[4]', 'value_type' => ITEM_VALUE_TYPE_TEXT],
+			['hostid' => $templateid, 'name' => 'Trap 5', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'trap[5]', 'value_type' => ITEM_VALUE_TYPE_TEXT],
+			['hostid' => $templateid, 'name' => 'Trap 6', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'trap[6]', 'value_type' => ITEM_VALUE_TYPE_TEXT],
+			['hostid' => $templateid, 'name' => 'Trap 7', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'trap[7]', 'value_type' => ITEM_VALUE_TYPE_TEXT],
+			['hostid' => $templateid, 'name' => 'Trap 8', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'trap[8]', 'value_type' => ITEM_VALUE_TYPE_TEXT],
+			['hostid' => $templateid, 'name' => 'Trap 9', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'trap[9]', 'value_type' => ITEM_VALUE_TYPE_TEXT],
 			['hostid' => $templateid, 'name' => 'Item 51', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'item[51]', 'value_type' => ITEM_VALUE_TYPE_FLOAT],
 			['hostid' => $templateid, 'name' => 'Item 52', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'item[52]', 'value_type' => ITEM_VALUE_TYPE_FLOAT],
 			['hostid' => $templateid, 'name' => 'Item 53', 'type' => ITEM_TYPE_TRAPPER, 'key_' => 'item[53]', 'value_type' => ITEM_VALUE_TYPE_FLOAT],
@@ -175,7 +185,17 @@ class testFunctions extends CIntegrationTest{
 			['expression' => 'trendsum(/Integration function test/item[52], 1d:now/d) = 14 and last(/Integration function test/item[51]) > 0', 'description' => 'Item 52 trendsum eq 14'],
 			['expression' => 'trendstl(/Integration function test/item[53], 1d:now/d, 1h, 2h) = 0 and last(/Integration function test/item[51]) > 0', 'description' => 'Item 53 trendstl eq 0'],
 			['expression' => 'baselinedev(/Integration function test/item[54], 1d:now/d, "d", 1) = 0 and last(/Integration function test/item[51]) > 0', 'description' => 'Item 54 baselinedev eq 0'],
-			['expression' => 'baselinewma(/Integration function test/item[55], 1d:now/d, "d", 1) = 0 and last(/Integration function test/item[51]) > 0', 'description' => 'Item 55 baselinewma eq 0']
+			['expression' => 'baselinewma(/Integration function test/item[55], 1d:now/d, "d", 1) = 0 and last(/Integration function test/item[51]) > 0', 'description' => 'Item 55 baselinewma eq 0'],
+			['expression' => 'find(/Integration function test/trap[0],,"iregexp","Must have admin rights to Repository")=1', 'description' => 'trap[0] find iregexp eq 1'],
+			['expression' => 'find(/Integration function test/trap[1],,"iregexp","Must have admin rights to Repository")=1', 'description' => 'trap[1] find iregexp eq 1'],
+			['expression' => 'find(/Integration function test/trap[2],,"iregexp","Must have admin rights to Repository")=1', 'description' => 'trap[2] find iregexp eq 1'],
+			['expression' => 'find(/Integration function test/trap[3],,"iregexp","Must have admin rights to Repository")=1', 'description' => 'trap[3] find iregexp eq 1'],
+			['expression' => 'find(/Integration function test/trap[4],,"iregexp","Must have admin rights to Repository")=1', 'description' => 'trap[4] find iregexp eq 1'],
+			['expression' => 'find(/Integration function test/trap[5],,"iregexp","Must have admin rights to Repository")=1', 'description' => 'trap[5] find iregexp eq 1'],
+			['expression' => 'find(/Integration function test/trap[6],,"iregexp","Must have admin rights to Repository")=1', 'description' => 'trap[6] find iregexp eq 1'],
+			['expression' => 'find(/Integration function test/trap[7],,"iregexp","Must have admin rights to Repository")=1', 'description' => 'trap[7] find iregexp eq 1'],
+			['expression' => 'find(/Integration function test/trap[8],,"iregexp","Must have admin rights to Repository")=1', 'description' => 'trap[8] find iregexp eq 1'],
+			['expression' => 'find(/Integration function test/trap[9],,"iregexp","Must have admin rights to Repository")=1', 'description' => 'trap[9] find iregexp eq 1']
 		]);
 	}
 
@@ -277,7 +297,7 @@ class testFunctions extends CIntegrationTest{
 				$data[] = [
 					'host' => self::HOSTNAME_MAIN,
 					'key' => $parts[1],
-					'value' => $parts[3],
+					'value' => implode(' ', array_slice($parts, 3)),
 					'clock' => (int)$parts[2]
 				];
 			}
@@ -371,7 +391,17 @@ class testFunctions extends CIntegrationTest{
 			'Item 52 trendavg eq 4.6' => ['state' => 1, 'value' => 0],
 			'Item 53 trendstl eq 0' => ['state' => 1, 'value' => 0],
 			'Item 54 baselinedev eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => 0],
-			'Item 55 baselinewma eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => 0]
+			'Item 55 baselinewma eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => 0],
+			'trap[0] find iregexp eq 1' => ['state' => 0, 'value' => 1],
+			'trap[1] find iregexp eq 1' => ['state' => 0, 'value' => 1],
+			'trap[2] find iregexp eq 1' => ['state' => 0, 'value' => 1],
+			'trap[3] find iregexp eq 1' => ['state' => 0, 'value' => 1],
+			'trap[4] find iregexp eq 1' => ['state' => 0, 'value' => 1],
+			'trap[5] find iregexp eq 1' => ['state' => 0, 'value' => 0],
+			'trap[6] find iregexp eq 1' => ['state' => 0, 'value' => 0],
+			'trap[7] find iregexp eq 1' => ['state' => 0, 'value' => 0],
+			'trap[8] find iregexp eq 1' => ['state' => 0, 'value' => 0],
+			'trap[9] find iregexp eq 1' => ['state' => 0, 'value' => 0]
 		];
 
 		$failures = [];
@@ -470,7 +500,17 @@ class testFunctions extends CIntegrationTest{
 			'Item 52 trendavg eq 4.6' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
 			'Item 53 trendstl eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
 			'Item 54 baselinedev eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => 0],
-			'Item 55 baselinewma eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => 0]
+			'Item 55 baselinewma eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => 0],
+			'trap[0] find iregexp eq 1' => ['state' => 0, 'value' => 1],
+			'trap[1] find iregexp eq 1' => ['state' => 0, 'value' => 1],
+			'trap[2] find iregexp eq 1' => ['state' => 0, 'value' => 1],
+			'trap[3] find iregexp eq 1' => ['state' => 0, 'value' => 1],
+			'trap[4] find iregexp eq 1' => ['state' => 0, 'value' => 1],
+			'trap[5] find iregexp eq 1' => ['state' => 0, 'value' => 0],
+			'trap[6] find iregexp eq 1' => ['state' => 0, 'value' => 0],
+			'trap[7] find iregexp eq 1' => ['state' => 0, 'value' => 0],
+			'trap[8] find iregexp eq 1' => ['state' => 0, 'value' => 0],
+			'trap[9] find iregexp eq 1' => ['state' => 0, 'value' => 0]
 		];
 
 		$failures = [];
@@ -569,7 +609,17 @@ class testFunctions extends CIntegrationTest{
 			'Item 52 trendavg eq 4.6' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
 			'Item 53 trendstl eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => $has_history_provider ? 0 : 1],
 			'Item 54 baselinedev eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => 0],
-			'Item 55 baselinewma eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => 0]
+			'Item 55 baselinewma eq 0' => ['state' => $has_history_provider ? 1 : 0, 'value' => 0],
+			'trap[0] find iregexp eq 1' => ['state' => 0, 'value' => 1],
+			'trap[1] find iregexp eq 1' => ['state' => 0, 'value' => 1],
+			'trap[2] find iregexp eq 1' => ['state' => 0, 'value' => 1],
+			'trap[3] find iregexp eq 1' => ['state' => 0, 'value' => 1],
+			'trap[4] find iregexp eq 1' => ['state' => 0, 'value' => 1],
+			'trap[5] find iregexp eq 1' => ['state' => 0, 'value' => 0],
+			'trap[6] find iregexp eq 1' => ['state' => 0, 'value' => 0],
+			'trap[7] find iregexp eq 1' => ['state' => 0, 'value' => 0],
+			'trap[8] find iregexp eq 1' => ['state' => 0, 'value' => 0],
+			'trap[9] find iregexp eq 1' => ['state' => 0, 'value' => 0]
 		];
 
 		$failures = [];
