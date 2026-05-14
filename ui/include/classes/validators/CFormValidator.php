@@ -1217,19 +1217,19 @@ class CFormValidator {
 			return false;
 		}
 
-		if (array_key_exists('regex', $rules) && $value !== '' && !preg_match($rules['regex'], $value)) {
+		if (array_key_exists('regex', $rules) && $value !== '' && !preg_match($rules['regex'], $value_check)) {
 			$error = self::getMessage($rules, 'regex', _('This value does not match pattern.'));
 
 			return false;
 		}
 
-		if (!self::checkStringIn($rules, $value, $error)) {
+		if (!self::checkStringIn($rules, $value_check, $error)) {
 			$error = self::getMessage($rules, 'in', $error);
 
 			return false;
 		}
 
-		if (!self::checkStringNotIn($rules, $value, $error)) {
+		if (!self::checkStringNotIn($rules, $value_check, $error)) {
 			$error = self::getMessage($rules, 'not_in', $error);
 
 			return false;
@@ -1487,7 +1487,7 @@ class CFormValidator {
 			$unique_values = [];
 
 			foreach ($values as $key => $entry) {
-				if (in_array($entry, $unique_values)) {
+				if (in_array($entry, $unique_values, true)) {
 					$value = implode(', ', array_map(fn ($k, $v) => $k.'='.$v, array_keys($entry), $entry));
 					$error = self::getMessage($rules, 'uniq', _s('Entry "%1$s" is not unique.', $value));
 					$path = $path.'/'.$key.'/'.$field_names[0];
@@ -1842,19 +1842,27 @@ class CFormValidator {
 	/**
 	 * Check if given value matches one of values inside $rules['in'].
 	 *
-	 * @param array  $rules
-	 * @param int    $rules['in']  (optional)
-	 * @param int    $value
-	 * @param string $error
+	 * @param array  	  $rules
+	 * @param array 	  $rules['in']  (optional)
+	 * @param string	  $value
+	 * @param string|null $error
 	 *
 	 * @return bool
 	 */
-	private static function checkStringIn(array $rules, $value, ?string &$error = null): bool {
-		if (array_key_exists('in', $rules) && !in_array($value, $rules['in'])) {
-			$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $rules['in']));
-			$error = _n('This value must be %1$s.', 'This value must be one of %1$s.',  $values, count($rules['in']));
+	private static function checkStringIn(array $rules, string $value, ?string &$error = null): bool {
+		if (array_key_exists('in', $rules)) {
+			$allowed = array_map('strval', $rules['in']);
 
-			return false;
+			if (!in_array($value, $allowed, true)) {
+				$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $allowed));
+				$error = _n(
+					'This value must be %1$s.',
+					'This value must be one of %1$s.',
+					$values, count($allowed)
+				);
+
+				return false;
+			}
 		}
 
 		return true;
@@ -1863,19 +1871,27 @@ class CFormValidator {
 	/**
 	 * Check if given value is not one of values inside $rules['not_in'].
 	 *
-	 * @param array  $rules
-	 * @param int    $rules['not_in']  (optional)
-	 * @param int    $value
-	 * @param string $error
+	 * @param array		  $rules
+	 * @param array		  $rules['not_in']  (optional)
+	 * @param string 	  $value
+	 * @param string|null $error
 	 *
 	 * @return bool
 	 */
-	private static function checkStringNotIn(array $rules, $value, ?string &$error = null): bool {
-		if (array_key_exists('not_in', $rules) && in_array($value, $rules['not_in'])) {
-			$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $rules['not_in']));
-			$error = _n('This value cannot be %1$s.', 'This value cannot be one of %1$s.',  $values, count($rules['not_in']));
+	private static function checkStringNotIn(array $rules, string $value, ?string &$error = null): bool {
+		if (array_key_exists('not_in', $rules)) {
+			$disallowed = array_map('strval', $rules['not_in']);
 
-			return false;
+			if (in_array($value, $disallowed, true)) {
+				$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $disallowed));
+				$error = _n(
+					'This value cannot be %1$s.',
+					'This value cannot be one of %1$s.',
+					$values, count($disallowed)
+				);
+
+				return false;
+			}
 		}
 
 		return true;

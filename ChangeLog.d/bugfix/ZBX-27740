@@ -1,0 +1,1 @@
+..F....... [ZBX-27740] added strict mode to in_array() to prevent incorrect matches during inline validation of existing values (msnihach)
