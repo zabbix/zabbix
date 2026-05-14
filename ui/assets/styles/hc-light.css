@@ -7380,6 +7380,9 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     float: right;
     line-height: 24px; }
 
+.modal-popup.modal-popup-static.modal-popup-sla-edit, .modal-popup.modal-popup-static.modal-popup-proxy-edit, .modal-popup.modal-popup-static.modal-popup-connector-edit {
+  --modal-max-width: 750px; }
+
 .multilineinput-control {
   display: flex;
   width: 100%; }
@@ -7706,6 +7709,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   margin: 10px;
   background-color: #f4f4f4;
   border: 1px solid #9f9f9f; }
+  .debug-output.debug-output-table-refresh {
+    margin: 10px 0 0 0; }
 
 .overlay-descr {
   max-height: 150px;

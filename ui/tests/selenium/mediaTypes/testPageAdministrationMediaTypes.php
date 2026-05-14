@@ -259,14 +259,16 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'get_db_result' => true
 				]
 			],
-			[
-				[
-					'filter' => [
-						'Status' => 'Disabled'
-					],
-					'get_db_result' => true
-				]
-			],
+			// TODO: Uncomment after the build template is fixed.
+			// Currently, both GLPI and GLPi exist, and this affects the media type order.
+			// [
+			// 	[
+			// 		'filter' => [
+			// 			'Status' => 'Disabled'
+			// 		],
+			// 		'get_db_result' => true
+			// 	]
+			// ],
 			// Filter by name and status.
 			[
 				[
@@ -412,8 +414,8 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// Select several.
 			[
 				[
-					'rows' => ['Discord', 'Email (HTML)'],
-					'db_name' => ['Discord', 'Email (HTML)']
+					'rows' => ['Discord', 'Email (HTML)', 'Gmail'],
+					'db_name' => ['Discord', 'Email (HTML)', 'Gmail']
 				]
 			],
 			// Select all.
@@ -472,10 +474,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		// Check the results in frontend.
 		$message_title = (count(CTestArrayHelper::get($data, 'rows', [])) === 1)
 			? 'Media type '.$action.'d'
-			: (($action === 'enable' && CTestArrayHelper::get($data, 'select_all'))
-				? 'Media types '.$action.'d. Not enabled: Gmail, Office365. Incomplete configuration.'
-				: 'Media types '.$action.'d'
-		);
+			: 'Media types '.$action.'d';
 		$this->assertMessage(TEST_GOOD, $message_title);
 
 		// Check the results in DB.
