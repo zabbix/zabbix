@@ -558,111 +558,33 @@ class CClickHouseStorage {
 	}
 
 	/**
-	 * Encodes typed parameters into a column-value map.
-	 *
-	 * Supports integer and string types. Arrays are filtered and serialized
-	 * into bracketed lists (e.g. "[1,2]" or "['a','b']").
-	 * Invalid or empty values are skipped.
-	 *
-	 * @param array $params  Array of typed parameters.
-	 */
-	private function getEncodedParamMap(array $params): array {
-		$form_values = [];
-
-		foreach ($params as $column_type => $columns_values) {
-			foreach ($columns_values as $column => $value) {
-				$form_value = null;
-
-				switch ($column_type) {
-					case 'Int32':
-					case 'Int64':
-						$parser = new CNumberParser(['with_float' => false]);
-
-						if (is_array($value)) {
-							$form_value = array_filter($value,
-								fn($v) => is_int($v) || $parser->parse((string) $v) == CParser::PARSE_SUCCESS
-							);
-						}
-						elseif (is_int($value) || $parser->parse((string) $value) == CParser::PARSE_SUCCESS) {
-							$form_value = $value;
-						}
-						break;
-
-					case 'Float64':
-						$parser = new CNumberParser();
-
-						if (is_array($value)) {
-							$form_value = array_filter($value,
-								fn($v) => is_float($v) || $parser->parse((string) $v) == CParser::PARSE_SUCCESS
-							);
-						}
-						elseif (is_float($value) || $parser->parse((string) $value) == CParser::PARSE_SUCCESS) {
-							$form_value = $value;
-						}
-						break;
-
-					case 'UInt64':
-						$parser = new CNumberParser(['with_float' => false, 'with_minus' => false]);
-
-						if (is_array($value)) {
-							$form_value = array_filter($value,
-								fn($v) => is_int($v) || $parser->parse((string) $v) == CParser::PARSE_SUCCESS
-							);
-						}
-						elseif (is_int($value) || $parser->parse((string) $value) == CParser::PARSE_SUCCESS) {
-							$form_value = $value;
-						}
-						break;
-
-					case 'String':
-						if (is_array($value)) {
-							$form_value = array_map(
-								fn($v) => '\''.addcslashes($v, '\\\'').'\'',
-								array_filter($value, 'is_string')
-							);
-						}
-						elseif (is_string($value)) {
-							// Single value should not be quoted.
-							$form_value = $value;
-						}
-						break;
-				}
-
-				if ($form_value === null) {
-					continue;
-				}
-
-				$form_values[$column] = is_array($form_value)
-					? '['.implode(',', array_map('strval', $form_value)).']'
-					: (string) $form_value;
-			}
-		}
-
-		return $form_values;
-	}
-
-	/**
 	 * Get result of HTTP query to ClickHouse.
 	 *
-	 * @param string $query  Query string.
-	 * @param array  $param  Array of query parameters grouped by column value type.
+	 * @param string $query   Query string.
+	 * @param array  $params  Array of query parameters grouped by column value type.
 	 */
-	private function query(string $query, array $param = []): ?array {
+	private function query(string $query, array $params = []): ?array {
 		$result = null;
 		$this->error_code = null;
 		$this->error_message = null;
 		$time_start = microtime(true);
 
-		$form_values = $this->getEncodedParamMap($param);
 		$boundary = bin2hex(random_bytes(16));
 		$content = '--'.$boundary."\r\n".
 			'Content-Disposition: form-data; name="query"'."\r\n\r\n".
 			$query."\r\n";
 
-		foreach ($form_values as $name => $value) {
-			$content .= '--'.$boundary."\r\n".
-				'Content-Disposition: form-data; name="param_'.$name.'"'."\r\n\r\n".
-				$value."\r\n";
+		foreach ($params as $column_type => $columns_values) {
+			foreach ($columns_values as $column => $value) {
+				if ($column_type === 'String' && is_array($value)) {
+					$value = array_map(static fn ($v) => '\''.addcslashes((string) $v, '\\\'').'\'', $value);
+				}
+
+				$value = is_array($value) ? '['.implode(',', array_map('strval', $value)).']' : (string) $value;
+
+				$content .= '--'.$boundary."\r\n".
+					'Content-Disposition: form-data; name="param_'.$column.'"'."\r\n\r\n".$value."\r\n";
+			}
 		}
 
 		$content .= '--'.$boundary.'--'."\r\n";
@@ -698,7 +620,7 @@ class CClickHouseStorage {
 		}
 
 		CProfiler::getInstance()->profileClickHouse(microtime(true) - $time_start,
-			json_encode(['query' => $query] + $form_values)
+			json_encode(['query' => $query] + $params)
 		);
 
 		return $result;
@@ -711,9 +633,9 @@ class CClickHouseStorage {
 	 */
 	private function buildQueryFromParts(array $sql_parts): string {
 		$select = implode(',', array_map(
-			fn($field, $expression) => $field === $expression ? $field : $expression.' AS '.$field,
+			static fn ($field, $expression) => $field === $expression ? $field : $expression.' AS '.$field,
 			array_keys($sql_parts['select']),
-			array_values($sql_parts['select'])
+			$sql_parts['select']
 		));
 
 		return
@@ -891,7 +813,66 @@ class CClickHouseStorage {
 
 		$fields = self::VALUE_TYPE_SCHEMA[$options['history']] + ['clock' => 'UInt64', 'ns' => 'Int32'];
 		foreach (array_intersect_key($fields, $options['filter']) as $field => $param_type) {
-			$sql_parts['param'][$param_type]['filter_'.$field] = $options['filter'][$field];
+			$values = [];
+
+			switch ($param_type) {
+				case 'Int32':
+					foreach ($options['filter'][$field] as $val) {
+						if (!is_int($val) && (!is_string($val) || !preg_match('/^'.ZBX_PREG_INT.'$/', $val))) {
+							continue;
+						}
+
+						if ($val < ZBX_MIN_INT32 || $val > ZBX_MAX_INT32) {
+							continue;
+						}
+
+						$values[] = $val;
+					}
+					break;
+
+				case 'Int64':
+					foreach ($options['filter'][$field] as $val) {
+						if (!is_int($val) && (!is_string($val) || !preg_match('/^'.ZBX_PREG_INT.'$/', $val))) {
+							continue;
+						}
+
+						if (bccomp((string) $val, ZBX_MIN_INT64) < 0 || bccomp((string) $val, ZBX_MAX_INT64) > 0) {
+							continue;
+						}
+
+						$values[] = $val;
+					}
+					break;
+
+				case 'UInt64':
+					foreach ($options['filter'][$field] as $val) {
+						if (!is_int($val) && (!is_string($val) || !ctype_digit($val))) {
+							continue;
+						}
+
+						if ($val < 0 || bccomp((string) $val, ZBX_MAX_UINT64) > 0) {
+							continue;
+						}
+
+						$values[] = $val;
+					}
+					break;
+
+				case 'Float64':
+					foreach ($options['filter'][$field] as $val) {
+						if (!is_numeric($val)) {
+							continue;
+						}
+
+						$values[] = $val;
+					}
+					break;
+
+				default:
+					$values = $options['filter'][$field];
+			}
+
+			$sql_parts['param'][$param_type]['filter_'.$field] = $values;
 			$filter[$field] = match ($field) {
 				'clock' => 'toUnixTimestamp(clock_ns)',
 				'ns' => 'toUnixTimestamp64Nano(clock_ns)%1000000000',
