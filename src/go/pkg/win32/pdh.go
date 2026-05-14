@@ -46,12 +46,6 @@ const (
 	PDH_FMT_LARGE    = 0x00000400
 	PDH_FMT_NOCAP100 = 0x00008000
 
-	// Retryable errors
-	PDH_CSTATUS_NO_MACHINE = 0x800007D0
-	PDH_CSTATUS_NO_OBJECT  = 0xC0000BB8
-	PDH_LOG_TYPE_NOT_FOUND = 0xC0000BCB
-	PDH_INVALID_HANDLE     = 0xC0000BBC
-
 	PDH_MAX_COUNTER_NAME = 1024
 
 	PERF_DETAIL_WIZARD = 400
@@ -346,48 +340,6 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 	return instances, nil
 }
 
-func pdhEnumObjectHelper(objListSize uint32, refresh bool) ([]uint16, uint32, uintptr) {
-	objSize := objListSize
-	objBuf := make([]uint16, objSize)
-	ret, _, _ := syscall.Syscall6(pdhEnumObjects, 6, 0, 0, uintptr(unsafe.Pointer(&objBuf[0])),
-		uintptr(unsafe.Pointer(&objSize)), uintptr(PERF_DETAIL_WIZARD), bool2uintptr(refresh))
-
-	return objBuf, objSize, ret
-}
-
-func pdhEnumObjectGet(refresh bool) ([]uint16, uint32, uintptr) {
-	log.Debugf("pdhEnumObjectGet() refresh:%t", refresh)
-	objectBuf, objectListSizeRet, ret := pdhEnumObjectHelper(objectListSize, refresh)
-	if ret == PDH_MORE_DATA {
-		log.Debugf("pdhEnumObjectGet() insufficient buffer size: %d", objectListSize)
-		objectListSizeRet = 0
-		ret, _, _ = syscall.Syscall6(pdhEnumObjects, 6, 0, 0, 0, uintptr(unsafe.Pointer(&objectListSizeRet)),
-			uintptr(PERF_DETAIL_WIZARD), bool2uintptr(true))
-		if ret != PDH_MORE_DATA {
-			return nil, 0, ret
-		}
-
-		if objectListSizeRet < 1 {
-			return nil, 0, ret
-		}
-
-		objectListSize = objectListSizeRet * 2
-		log.Debugf("pdhEnumObjectGet() new buffer size: %d", objectListSize)
-		objectBuf, objectListSizeRet, ret = pdhEnumObjectHelper(objectListSize, false)
-	}
-
-	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
-		log.Debugf("pdhEnumObjectGet() error code: 0x%08X", uint32(ret))
-		return nil, 0, ret
-	}
-
-	if objectListSizeRet < 1 {
-		return nil, 0, ret
-	}
-
-	return objectBuf, objectListSizeRet, ret
-}
-
 func PdhEnumObject(force bool) (objects []string, err error) {
 	const maxAttempts = 3
 	var (
@@ -402,10 +354,12 @@ func PdhEnumObject(force bool) (objects []string, err error) {
 	pflModtimeNew, pflErr := getPerflibModtime()
 	if pflErr != nil {
 		log.Debugf("getPerflibModtime() error: %s", pflErr.Error())
+	} else {
+		log.Debugf("getPerflibModtime() ModTime=%s", pflModtimeNew.String())
 	}
 
 	if pflModtime.IsZero() == false && pflModtime.Equal(pflModtimeNew) {
-		log.Debugf("pdhEnumObjectGet(false) Perflib Modtime has not changed")
+		log.Debugf("getPerflibModtime() Perflib Modtime has not changed")
 		refresh = false
 	}
 
@@ -456,6 +410,48 @@ func PdhEnumObject(force bool) (objects []string, err error) {
 	return objects, nil
 }
 
+func pdhEnumObjectHelper(objListSize uint32, refresh bool) ([]uint16, uint32, uintptr) {
+	objSize := objListSize
+	objBuf := make([]uint16, objSize)
+	ret, _, _ := syscall.Syscall6(pdhEnumObjects, 6, 0, 0, uintptr(unsafe.Pointer(&objBuf[0])),
+		uintptr(unsafe.Pointer(&objSize)), uintptr(PERF_DETAIL_WIZARD), bool2uintptr(refresh))
+
+	return objBuf, objSize, ret
+}
+
+func pdhEnumObjectGet(refresh bool) ([]uint16, uint32, uintptr) {
+	log.Debugf("pdhEnumObjectGet() refresh:%t", refresh)
+	objectBuf, objectListSizeRet, ret := pdhEnumObjectHelper(objectListSize, refresh)
+	if ret == PDH_MORE_DATA {
+		log.Debugf("pdhEnumObjectGet() insufficient buffer size: %d", objectListSize)
+		objectListSizeRet = 0
+		ret, _, _ = syscall.Syscall6(pdhEnumObjects, 6, 0, 0, 0, uintptr(unsafe.Pointer(&objectListSizeRet)),
+			uintptr(PERF_DETAIL_WIZARD), bool2uintptr(true))
+		if ret != PDH_MORE_DATA {
+			return nil, 0, ret
+		}
+
+		if objectListSizeRet < 1 {
+			return nil, 0, ret
+		}
+
+		objectListSize = objectListSizeRet * 2
+		log.Debugf("pdhEnumObjectGet() new buffer size: %d", objectListSize)
+		objectBuf, objectListSizeRet, ret = pdhEnumObjectHelper(objectListSize, false)
+	}
+
+	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
+		log.Debugf("pdhEnumObjectGet() error code: 0x%08X", uint32(ret))
+		return nil, 0, ret
+	}
+
+	if objectListSizeRet < 1 {
+		return nil, 0, ret
+	}
+
+	return objectBuf, objectListSizeRet, ret
+}
+
 func getCounterValueDouble(counter PDH_HCOUNTER) (*float64, error) {
 	var pdhValue PDH_FMT_COUNTERVALUE_DOUBLE
 
@@ -498,28 +494,32 @@ func getPerflibModtime() (time.Time, error) {
 	plPath := "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Perflib"
 	rootKey, err := registry.OpenKey(registry.LOCAL_MACHINE, plPath, registry.READ)
 	if err != nil {
-		return time.Time{}, err
+		return time.Time{}, errs.Wrap(err, "registry.OpenKey() failed for Perflib key")
 	}
 	defer rootKey.Close()
 
 	stats, err := rootKey.Stat()
 	if err != nil {
-		return time.Time{}, err
+		return time.Time{}, errs.Wrap(err, "rootKey.Stat() failed")
 	}
 	mt := stats.ModTime()
 	if mt.IsZero() {
-		return time.Time{}, errs.New("empty value")
+		return time.Time{}, errs.New("Perflib modtime is zero")
 	}
-	log.Debugf("getPerflibModtime() ModTime=%s", stats.ModTime().String())
-
 	return mt, nil
 }
 
 func isPdhErrorRetryable(code uintptr) bool {
+	const (
+		PDH_CSTATUS_NO_MACHINE = 0x800007D0
+		PDH_CSTATUS_NO_OBJECT  = 0xC0000BB8
+		PDH_LOG_TYPE_NOT_FOUND = 0xC0000BCB
+		PDH_INVALID_HANDLE     = 0xC0000BBC
+	)
 	switch code {
-	case PDH_CSTATUS_NO_MACHINE,
+	case PDH_CSTATUS_INVALID_DATA,
+		PDH_CSTATUS_NO_MACHINE,
 		PDH_CSTATUS_NO_OBJECT,
-		PDH_CSTATUS_INVALID_DATA,
 		PDH_LOG_TYPE_NOT_FOUND,
 		PDH_INVALID_HANDLE:
 		return true
