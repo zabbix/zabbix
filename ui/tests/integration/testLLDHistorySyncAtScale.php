@@ -628,6 +628,28 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			return true;
 		});
 
+		$this->verifyProxyLastaccessAndNoDataTriggersFiring();
+	}
+
+	/**
+	 * Resend data with the value field omitted and verify that nodata-based triggers remain firing
+	 * (value = PROBLEM, state = NORMAL).
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerNoDataFiring
+	 */
+	public function testLLDHistorySyncAtScale_TriggerNoDataValueOmitted() {
+		$this->waitUntilDelayedItemsCount(self::$total_expected);
+
+		$tm = time();
+
+		$this->sendHistoryAt($tm, null, ITEM_STATE_NORMAL, true);
+
+		$this->waitUntilDelayedItemsCount(0);
+
+		$this->verifyProxyLastaccessAndNoDataTriggersFiring();
+	}
+
+	private function verifyProxyLastaccessAndNoDataTriggersFiring(): void {
 		$response = $this->call('proxy.get', [
 			'proxyids' => [self::$proxyid],
 			'output' => ['lastaccess']
@@ -769,7 +791,8 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		}
 	}
 
-	private function prepareHistoryAt(int $tm, ?string $value = null, int $state = ITEM_STATE_NORMAL): array {
+	private function prepareHistoryAt(int $tm, ?string $value = null, int $state = ITEM_STATE_NORMAL,
+			bool $omit_value = false): array {
 		$sent = [];
 		$values_by_type = [];
 
@@ -786,10 +809,12 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			foreach ($items_by_key as $itemid) {
 				$item_value = [
 					'itemid' => $itemid,
-					'value' => isset($value) ? $value : (string)($idx + 1),
 					'clock' => $tm,
 					'ns' => ($base_ns + $idx) % 1000000000
 				];
+				if (!$omit_value) {
+					$item_value['value'] = isset($value) ? $value : (string)($idx + 1);
+				}
 				if ($state !== ITEM_STATE_NORMAL) {
 					$item_value['state'] = $state;
 				}
@@ -821,8 +846,9 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		return ['sent' => $sent, 'values' => $all_values];
 	}
 
-	private function sendHistoryAt(int $tm, ?string $value = null, int $state = ITEM_STATE_NORMAL): array {
-		['sent' => $sent, 'values' => $all_values] = $this->prepareHistoryAt($tm, $value, $state);
+	private function sendHistoryAt(int $tm, ?string $value = null, int $state = ITEM_STATE_NORMAL,
+			bool $omit_value = false): array {
+		['sent' => $sent, 'values' => $all_values] = $this->prepareHistoryAt($tm, $value, $state, $omit_value);
 		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
 
 		return $sent;
@@ -917,6 +943,35 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		$this->assertIsNumeric($result['item']['result']);
 
 		return (int) $result['item']['result'];
+	}
+
+	private function getDelayedItemsCount(): int {
+		$result = $this->testItemOnServer((string) self::$hostid,
+			['value_type' => ITEM_VALUE_TYPE_UINT64, 'type' => ITEM_TYPE_INTERNAL, 'key' => 'zabbix[queue,3,]']
+		);
+		$this->assertNotFalse($result);
+		$this->assertArrayHasKey('item', $result);
+		$this->assertArrayNotHasKey('error', $result['item']);
+		$this->assertArrayHasKey('result', $result['item']);
+		$this->assertIsNumeric($result['item']['result']);
+
+		return (int) $result['item']['result'];
+	}
+
+	private function waitUntilDelayedItemsCount(int $expected): void {
+		$timeout = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
+		$start = microtime(true);
+		$count = $this->getDelayedItemsCount();
+
+		while ($count !== $expected && (microtime(true) - $start) < $timeout) {
+			$this->sendAgentPing();
+			usleep(100000); // 100 ms
+			$count = $this->getDelayedItemsCount();
+		}
+
+		$waited = round(microtime(true) - $start, 1);
+		$this->assertSame($expected, $count,
+			"Delayed items count did not reach {$expected} after waiting {$waited}s (last value: {$count})");
 	}
 
 	private function assertVpsWrittenIncreasedBy(int $baseline, int $min_increase): void {
