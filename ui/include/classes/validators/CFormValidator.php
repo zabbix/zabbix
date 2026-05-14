@@ -1512,6 +1512,7 @@ class CFormValidator {
 	 * @return bool
 	 */
 	public static function existsAPIObject(string $api, array $options, ?string $exclude_primary_id = null): bool {
+		$options['output'] = [];
 		$options['preservekeys'] = true;
 		$auth = [
 			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
