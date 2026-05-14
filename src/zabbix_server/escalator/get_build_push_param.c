@@ -115,7 +115,7 @@ static void	push_target_append(zbx_vector_push_target_t *targets, const char *de
 	target = zbx_malloc(NULL, sizeof(zbx_push_target_t));
 	target->device_id = zbx_strdup(NULL, device_id);
 	target->token = zbx_strdup(NULL, token);
-	target->enc_key = zbx_strdup(NULL, enc_key);
+	target->enc_key = (NULL != enc_key ? zbx_strdup(NULL, enc_key) : NULL);
 
 	zbx_vector_push_target_append(targets, target);
 }
@@ -166,8 +166,7 @@ static int	push_get_target_by_uuid(const char *uuid, zbx_push_target_t *target)
 			")"
 			" where d.uuid='%s'"
 				" and d.status=1"
-				" and d.push_token is not null"
-				" and dk.key_ is not null",
+				" and d.push_token is not null",
 			ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, uuid);
 
 	if (NULL != (row = zbx_db_fetch(result)))
@@ -175,7 +174,7 @@ static int	push_get_target_by_uuid(const char *uuid, zbx_push_target_t *target)
 		ret = SUCCEED;
 		target->device_id = zbx_strdup(NULL, uuid);
 		target->token = zbx_strdup(NULL, row[0]);
-		target->enc_key = zbx_strdup(NULL, row[1]);
+		target->enc_key = (NULL != row[1] ? zbx_strdup(NULL, row[1]) : NULL);
 	}
 
 	zbx_db_free_result(result);
@@ -442,7 +441,7 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 
 		zbx_json_addint64(&json, "priority", event->severity);
 
-		zbx_json_addraw(&json, "mobile_encryption_key", t->enc_key);
+		zbx_json_addraw(&json, "mobile_encryption_key", NULL != t->enc_key ? t->enc_key : "{}");
 
 		zbx_json_close(&json); /* params */
 
