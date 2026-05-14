@@ -110,9 +110,9 @@ class CJsonRpc {
 				continue;
 			}
 
-			if (!$authentication_required &&
-					($this->apiClient->requiresAuthentication($api, $method) ||
-						($this->apiClient->supportsAuthentication($api, $method) && $auth['auth'] !== null))) {
+			if (!$authentication_required
+					&& ($this->apiClient->requiresAuthentication($api, $method)
+						|| ($this->apiClient->supportsAuthentication($api, $method) && $auth['auth'] !== null))) {
 				$authentication_required = true;
 			}
 
@@ -135,9 +135,9 @@ class CJsonRpc {
 				$api = strtolower($call['api']);
 				$method = strtolower($call['method']);
 
-				if ($auth['type'] !== CJsonRpc::AUTH_TYPE_COOKIE &&
-						!$this->apiClient->requiresAuthentication($api, $method) &&
-						!$this->apiClient->supportsAuthentication($api, $method)) {
+				if ($auth['type'] !== CJsonRpc::AUTH_TYPE_COOKIE
+						&& !$this->apiClient->requiresAuthentication($api, $method)
+						&& !$this->apiClient->supportsAuthentication($api, $method)) {
 					$result = new CApiClientResponse();
 
 					$result->errorCode = ZBX_API_ERROR_PARAMETERS;

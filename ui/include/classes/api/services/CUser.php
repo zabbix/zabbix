@@ -4147,7 +4147,7 @@ class CUser extends CApiService {
 						return;
 					}
 
-					$media['sendto'][] = $uuid;
+					$media['sendto'] = ['*'];
 
 					$existing_media_updated = true;
 				}
@@ -4193,6 +4193,11 @@ class CUser extends CApiService {
 			'preservekeys' => true
 		]);
 
+		$db_devices_count = DB::select('device', [
+			'countOutput' => true,
+			'filter' => ['userid' => $userid, 'status' => ZBX_DEVICE_STATUS_ACTIVATED]
+		]);
+
 		$users = [];
 
 		foreach ($db_users as &$db_user) {
@@ -4203,13 +4208,9 @@ class CUser extends CApiService {
 				$user_media['sendto'] = explode("\n", $user_media['sendto']);
 
 				if (array_key_exists($user_media['mediatypeid'], $db_user_media_types)
-						&& in_array($uuid, $user_media['sendto'])) {
-					if (count($user_media['sendto']) == 1) {
-						unset($user['medias'][$key]);
-					}
-					else {
-						$user_media['sendto'] = array_diff($user_media['sendto'], [$uuid]);
-					}
+						&& (in_array($uuid, $user_media['sendto'])
+							|| in_array('*', $user_media['sendto']) && $db_devices_count == 1)) {
+					unset($user['medias'][$key]);
 				}
 			}
 			unset($user_media);

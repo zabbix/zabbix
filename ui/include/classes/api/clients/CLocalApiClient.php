@@ -77,10 +77,10 @@ class CLocalApiClient extends CApiClient {
 		$newTransaction = false;
 		try {
 			// check permissions
-			if (APP::getMode() === APP::EXEC_MODE_API &&
-					($this->requiresAuthentication($api, $method) ||
-						($this->supportsAuthentication($api, $method) && $auth['auth'] !== null)) &&
-					!$this->isAllowedMethod($api, $method, $auth['type'])) {
+			if (APP::getMode() === APP::EXEC_MODE_API
+					&& ($this->requiresAuthentication($api, $method)
+						|| ($this->supportsAuthentication($api, $method) && $auth['auth'] !== null))
+					&& !$this->isAllowedMethod($api, $method, $auth['type'])) {
 				$response->errorCode = ZBX_API_ERROR_PERMISSIONS;
 				$response->errorMessage = _s('No permissions to call "%1$s.%2$s".', $requestApi, $requestMethod);
 
@@ -303,8 +303,8 @@ class CLocalApiClient extends CApiClient {
 		$response = new CApiClientResponse();
 
 		try {
-			if ($auth['auth'] === null ||
-				($auth['type'] == CJsonRpc::AUTH_TYPE_DPOP && !CTemporaryMobileFeatureHelper::isEnabled())) {
+			if ($auth['auth'] === null
+					|| ($auth['type'] == CJsonRpc::AUTH_TYPE_DPOP && !CTemporaryMobileFeatureHelper::isEnabled())) {
 				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 			}
 

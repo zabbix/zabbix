@@ -66,7 +66,7 @@ class CUuidV7ValidatorTest extends TestCase {
 			['018f8a67-b9c4-7a12-3c7f-8fdbde4c94ab', false, 'a UUIDv7 is expected'],
 			['018f8a67-b9c4-7a12-0c7f-8fdbde4c94ab', false, 'a UUIDv7 is expected'],
 			['018f8a67-b9c4-7a12-fc7f-8fdbde4c94ab', false, 'a UUIDv7 is expected'],
-			['018f8a67-b9c4-7a12-dc7f-8fdbde4c94ab', false, 'a UUIDv7 is expected'],
+			['018f8a67-b9c4-7a12-dc7f-8fdbde4c94ab', false, 'a UUIDv7 is expected']
 		];
 	}
 

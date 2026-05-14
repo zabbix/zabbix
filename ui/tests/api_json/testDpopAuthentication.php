@@ -72,11 +72,11 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 		],
 		'keys' => [
 			'identity' => null,
-			'encryption' => null,
+			'encryption' => null
 		],
 		'kids' => [
 			'identity' => null,
-			'encryption' => null,
+			'encryption' => null
 		]
 	];
 
@@ -580,7 +580,7 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 				'request_data' => [
 					'calls' => [
 						'1' => ['api_method' => 'user.get', 'response' => 'result'],
-						'2' => ['api_method' => 'apiinfo.version', 'response' => 'result'],
+						'2' => ['api_method' => 'apiinfo.version', 'response' => 'result']
 					],
 					'token' => ['tokens', 'superadmin'],
 					'private_key_pem' => 'identity',
@@ -597,7 +597,7 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 				'request_data' => [
 					'calls' => [
 						'1' => ['api_method' => 'user.get', 'response' => 'result'],
-						'2' => ['api_method' => 'user.login', 'response' => 'error'],
+						'2' => ['api_method' => 'user.login', 'response' => 'error']
 					],
 					'token' => ['tokens', 'superadmin'],
 					'private_key_pem' => 'identity',
