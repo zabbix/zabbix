@@ -540,7 +540,7 @@ class CHost extends CHostGeneral {
 			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
 			'severities' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true],
 			'withProblemsSuppressed' =>	['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
-			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getFilterFields('hosts', self::OUTPUT_FIELDS), DB::getFilterFields('interface', self::HOST_INTERFACE_QUERY_FIELDS))],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getFilterFields('hosts', self::OUTPUT_FIELDS), DB::getFilterFields('interface', self::HOST_INTERFACE_QUERY_FIELDS), ['assigned_proxyid', 'inventory_mode', 'active_available'])],
 			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getSearchFields('hosts', self::OUTPUT_FIELDS), DB::getSearchFields('interface', self::HOST_INTERFACE_QUERY_FIELDS))],
 			// Output.
 			'selectParentTemplates' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
