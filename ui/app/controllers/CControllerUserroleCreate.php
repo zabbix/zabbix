@@ -25,8 +25,6 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 	}
 
 	public static function getValidationRules(): array {
-		global $ZBX_FEATURE_FLAGS;
-
 		$api_uniq = [
 			['role.get', ['name' => '{name}']]
 		];
@@ -41,7 +39,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 				'messages' => ['not_empty' => _('At least one UI element must be checked.')]
 			],
 			'ui_default_access' => ['boolean'],
-			'modules' => ['array', 'required', 'field' => ['boolean']],
+			'modules' => ['array', 'field' => ['boolean']],
 			'modules_default_access' => ['boolean'],
 			'actions' => ['array', 'required',
 				'field' => ['string', 'in' => CRoleHelper::getActionsByUserType(USER_TYPE_SUPER_ADMIN)]
@@ -96,10 +94,6 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			],
 			'form_refresh' => ['integer']
 		]];
-
-		if (!$ZBX_FEATURE_FLAGS['modules_config_enabled']) {
-			unset($rules['fields']['modules'], $rules['fields']['modules_default_access']);
-		}
 
 		return $rules;
 	}
