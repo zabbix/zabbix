@@ -194,6 +194,7 @@ class CDateSelector extends CTag {
 			->addItem((new CButton($this->name.'_calendar'))
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_CALENDAR)
+				->addClass('calendar-btn')
 				->setEnabled($this->enabled && !$this->readonly)
 				->onClick('toggleCalendar(this, "'.zbx_formatDomId($this->name).'", "'.$this->date_format.'");'));
 

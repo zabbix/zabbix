@@ -2222,9 +2222,9 @@ button {
 .date-selector {
   display: flex;
   flex-wrap: wrap; }
-  .date-selector .btn-icon:not(:first-child) {
+  .date-selector .btn-icon.calendar-btn:not(:first-child) {
     margin-left: 2px; }
-  .date-selector .btn-icon::before {
+  .date-selector .btn-icon.calendar-btn::before {
     font-size: 22px; }
   .date-selector .error {
     flex-basis: 100%; }

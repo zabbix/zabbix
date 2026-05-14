@@ -2,7 +2,7 @@
 	display: flex;
 	flex-wrap: wrap;
 
-	.btn-icon {
+	.btn-icon.calendar-btn {
 		&:not(:first-child) {
 			margin-left: 2px;
 		}
