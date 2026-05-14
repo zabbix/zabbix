@@ -610,7 +610,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 			$this->changeLayoutFromHeader($data['header_settings']);
 			$table->waitUntilReady()->invalidate();
 
-			$this->assertEquals($data['header_setings']['Time']['Show timeline'], $table->query('class:cell-timeline')
+			$this->assertEquals($data['header_settings']['Time']['Show timeline'], $table->query('class:cell-timeline')
 					->one(false)->isValid(), '"Show timeline" option did not work as expected.'
 			);
 		}

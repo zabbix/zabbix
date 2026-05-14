@@ -233,7 +233,6 @@ class CDatatableBehavior extends CBehavior {
 				$button->click();
 			}
 
-			$button->click();
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
 
 			foreach ($column_settings as $field => $parameters) {

@@ -903,7 +903,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->submit();
 
 		$table_rows_count = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady()->getRows()->count();
-		$this->assertTableStats($table_rows_count);
+		$this->assertDatatableStats($table_rows_count);
 		$delete_button = $this->query('button:Delete')->one();
 
 		// Cancel delete.
