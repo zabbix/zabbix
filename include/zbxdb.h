@@ -581,8 +581,11 @@ zbx_db_query_mask_t	zbx_db_get_log_masked_values(void);
 zbx_dbconn_t	*zbx_db_dbconn(void);
 
 void	zbx_db_set_default_pool(zbx_dbconn_pool_t *dbpool);
-zbx_dbconn_t	*zbx_db_acquire(void);
-void	zbx_db_release(zbx_dbconn_t *db);
+zbx_dbconn_t	*zbx_db_acquire_connection(void);
+void	zbx_db_release_connection(zbx_dbconn_t *db);
+void	zbx_db_stash_connection(zbx_dbconn_t *db);
+void	zbx_db_unstash_connection(zbx_dbconn_t *db);
+
 
 /* connection pool settings */
 #define ZBX_SETTINGS_DBPOOL			"dbpool_"

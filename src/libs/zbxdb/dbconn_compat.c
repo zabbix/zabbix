@@ -18,8 +18,8 @@
 #include "zbxdbschema.h"
 #include "zbxtypes.h"
 
-static zbx_dbconn_t	*dbconn;
-static int		db_autoincrement;
+static ZBX_THREAD_LOCAL	zbx_dbconn_t	*dbconn  = NULL;
+static int				db_autoincrement = 0;
 
 static zbx_dbconn_pool_t	*dbpool_default = NULL;
 static int			dbconn_ref_num = 0;
@@ -848,7 +848,7 @@ void	zbx_db_set_default_pool(zbx_dbconn_pool_t *dbpool)
  *           acquisition.                                                     *
  *                                                                            *
  ******************************************************************************/
-zbx_dbconn_t	*zbx_db_acquire(void)
+zbx_dbconn_t	*zbx_db_acquire_connection(void)
 {
 	if (NULL != dbpool_default)
 		return zbx_dbconn_pool_acquire_connection(dbpool_default);
@@ -880,7 +880,7 @@ zbx_dbconn_t	*zbx_db_acquire(void)
  *           connection reference count is decremented.                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_release(zbx_dbconn_t *db)
+void	zbx_db_release_connection(zbx_dbconn_t *db)
 {
 	if (NULL != dbpool_default)
 	{
@@ -894,4 +894,49 @@ void	zbx_db_release(zbx_dbconn_t *db)
 		exit(EXIT_FAILURE);
 	}
 	dbconn_ref_num--;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: stash database connection for legacy db api usage                 *
+ *                                                                            *
+ * Parameters: db - [IN] database connection to stash                         *
+ *                                                                            *
+ * Comments: Use stash/unstash approach when callinng functions that uses     *
+ *           old (process) database access somewhere deep inside,             *
+ *           for example resolves macros.                                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_stash_connection(zbx_dbconn_t *db)
+{
+	if (NULL != dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("attempted to double stash db connection");
+		exit(EXIT_FAILURE);
+	}
+	dbconn = db;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unstash database connection from legacy db api usage              *
+ *                                                                            *
+ * Parameters: db - [IN] database connection to stash                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_unstash_connection(zbx_dbconn_t *db)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("attempted to unstash empty db connection stash");
+		exit(EXIT_FAILURE);
+	}
+
+	if (db != dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("attempted to unstash wrong db connection");
+		exit(EXIT_FAILURE);
+	}
+
+	dbconn = NULL;
 }
