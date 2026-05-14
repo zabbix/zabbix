@@ -261,8 +261,12 @@ class CProfiler {
 			}
 
 			$debug[] = $record;
+			if ($query[2]) {
+				$debug[] = (new CSpan(json_encode($query[2])))->addClass(ZBX_STYLE_GREY);
+				$debug[] = BR();
+			}
 
-			$debug[] = $this->formatCallStack($query[2]);
+			$debug[] = $this->formatCallStack($query[3]);
 			$debug[] = BR();
 			$debug[] = BR();
 		}
@@ -356,8 +360,9 @@ class CProfiler {
 	 *
 	 * @param float  $time
 	 * @param string $query
+	 * @param array  $params
 	 */
-	public function profileClickHouse(float $time, string $query) {
+	public function profileClickHouse(float $time, string $query, array $params = []) {
 		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
 			&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
 			return;
@@ -366,9 +371,7 @@ class CProfiler {
 		$time = round($time, 6);
 
 		$this->clickhouseTotalTime += $time;
-		$this->clickhouseQueryLog[] = [
-			$time,
-			$query,
+		$this->clickhouseQueryLog[] = [$time, $query, $params,
 			array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1)
 		];
 	}

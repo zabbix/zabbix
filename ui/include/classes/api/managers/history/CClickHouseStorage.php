@@ -570,12 +570,10 @@ class CClickHouseStorage {
 		$time_start = microtime(true);
 
 		$boundary = bin2hex(random_bytes(16));
-		$content = '--'.$boundary."\r\n".
-			'Content-Disposition: form-data; name="query"'."\r\n\r\n".
-			$query."\r\n";
+		$content = '--'.$boundary."\r\n".'Content-Disposition: form-data; name="query"'."\r\n\r\n".$query."\r\n";
 
-		foreach ($params as $column_type => $columns_values) {
-			foreach ($columns_values as $column => $value) {
+		foreach ($params as $column_type => $column_values) {
+			foreach ($column_values as $column => $value) {
 				if ($column_type === 'String' && is_array($value)) {
 					$value = array_map(static fn ($v) => '\''.addcslashes((string) $v, '\\\'').'\'', $value);
 				}
@@ -594,20 +592,20 @@ class CClickHouseStorage {
 			'Content-Type: multipart/form-data; boundary='.$boundary,
 			'Content-Length: '.strlen($stream_context['http']['content'])
 		]));
+
 		$result_raw = file_get_contents($this->url->getUrl(), false, stream_context_create($stream_context));
 		$result = $result_raw === false ? ['exception' => error_get_last()['message']] : json_decode($result_raw, true);
 		$http_code = 500;
+		$http_response_headers = http_get_last_response_headers();
 
 		// The variable $http_response_header is defined only when file_get_contents succeeds.
-		if (isset($http_response_header)) {
-			sscanf($http_response_header[0], 'HTTP/%*s %d', $http_code);
+		if ($http_response_headers !== null) {
+			sscanf($http_response_headers[0], 'HTTP/%*s %d', $http_code);
 		}
 
 		if (!is_array($result) || array_key_exists('exception', $result)) {
 			$this->error_code = $http_code;
-			$this->error_message = is_array($result) && array_key_exists('exception', $result)
-				? $result['exception']
-				: $result_raw;
+			$this->error_message = is_array($result) ? $result['exception'] : $result_raw;
 			$result = null;
 		}
 		else {
@@ -619,9 +617,7 @@ class CClickHouseStorage {
 			unset($row);
 		}
 
-		CProfiler::getInstance()->profileClickHouse(microtime(true) - $time_start,
-			json_encode(['query' => $query] + $params)
-		);
+		CProfiler::getInstance()->profileClickHouse(microtime(true) - $time_start, $query, $params);
 
 		return $result;
 	}
