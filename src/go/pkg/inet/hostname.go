@@ -34,7 +34,7 @@ func IsRFCHostName(host string) bool {
 		return false
 	}
 
-	is_purely_numeric := true // detect numeric-only names
+	isPurelyNumeric := true // detect numeric-only names
 
 	// first character must be alphanumeric, additionally underscore ('_') is allowed.
 	c := host[0]
@@ -43,7 +43,7 @@ func IsRFCHostName(host string) bool {
 	}
 
 	if c > '9' || c < '0' {
-		is_purely_numeric = false
+		isPurelyNumeric = false
 	}
 
 	labelLen := 1
@@ -58,7 +58,7 @@ func IsRFCHostName(host string) bool {
 			prevHyphen = false
 
 			if c > '9' || c < '0' {
-				is_purely_numeric = false
+				isPurelyNumeric = false
 			}
 		case c == '-':
 			// label must not start with hyphen
@@ -68,7 +68,7 @@ func IsRFCHostName(host string) bool {
 
 			labelLen++
 			prevHyphen = true
-			is_purely_numeric = false
+			isPurelyNumeric = false
 		case c == '.':
 			// empty label or label ending with hyphen
 			if labelLen == 0 || prevHyphen {
@@ -95,7 +95,7 @@ func IsRFCHostName(host string) bool {
 	}
 
 	// reject purely numeric names
-	if is_purely_numeric {
+	if isPurelyNumeric {
 		return false
 	}
 
