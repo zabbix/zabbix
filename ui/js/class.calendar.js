@@ -616,7 +616,7 @@ calendar.prototype = {
 
 		this.clndr_yeardown = document.createElement('button');
 		this.clndr_yeardown.setAttribute('type', 'button');
-		this.clndr_yeardown.className = 'btn-grey btn-year-prev';
+		this.clndr_yeardown.className = `${ZBX_STYLE_BTN_GREY} btn-year-prev`;
 		this.clndr_yeardown.setAttribute('aria-label', t('Previous year'));
 		this.clndr_yeardown.appendChild(arrow_left);
 		this.clndr_year_div.appendChild(this.clndr_yeardown);
@@ -630,7 +630,7 @@ calendar.prototype = {
 
 		this.clndr_yearup = document.createElement('button');
 		this.clndr_yearup.setAttribute('type', 'button');
-		this.clndr_yearup.className = 'btn-grey btn-year-next';
+		this.clndr_yearup.className = `${ZBX_STYLE_BTN_GREY} btn-year-next`;
 		this.clndr_yearup.setAttribute('aria-label', t('Next year'));
 		this.clndr_yearup.appendChild(arrow_right);
 		this.clndr_year_div.appendChild(this.clndr_yearup);
@@ -647,7 +647,7 @@ calendar.prototype = {
 
 		this.clndr_monthdown = document.createElement('button');
 		this.clndr_monthdown.setAttribute('type', 'button');
-		this.clndr_monthdown.className = 'btn-grey btn-month-prev';
+		this.clndr_monthdown.className = `${ZBX_STYLE_BTN_GREY} btn-month-prev`;
 		this.clndr_monthdown.setAttribute('aria-label', t('Previous month'));
 		this.clndr_monthdown.appendChild(arrow_left);
 		this.clndr_month_div.appendChild(this.clndr_monthdown);
@@ -661,7 +661,7 @@ calendar.prototype = {
 
 		this.clndr_monthup = document.createElement('button');
 		this.clndr_monthup.setAttribute('type', 'button');
-		this.clndr_monthup.className = 'btn-grey btn-month-next';
+		this.clndr_monthup.className = `${ZBX_STYLE_BTN_GREY} btn-month-next`;
 		this.clndr_monthup.setAttribute('aria-label', t('Next month'));
 		this.clndr_monthup.appendChild(arrow_right);
 		this.clndr_month_div.appendChild(this.clndr_monthup);
