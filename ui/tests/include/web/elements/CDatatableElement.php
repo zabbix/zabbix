@@ -15,15 +15,15 @@
 
 
 require_once 'vendor/autoload.php';
-require_once __DIR__.'/CTableElement.php';
+require_once __DIR__.'/../CElement.php';
 
 /**
- * Table element.
+ * Datatable element.
  */
-class CDatatableElement extends CTableElement {
+class CDatatableElement extends CElement {
 
 	/**
-	 * Table element selectors.
+	 * Datatable element selectors.
 	 *
 	 * @var array
 	 */
@@ -116,7 +116,7 @@ class CDatatableElement extends CTableElement {
 	}
 
 	/**
-	 * Get sortable table headers.
+	 * Get sortable datatable headers.
 	 *
 	 * @return CElementCollection
 	 */
@@ -138,7 +138,7 @@ class CDatatableElement extends CTableElement {
 	}
 
 	/**
-	 * Set array of header element texts for column naming.
+	 * Get collection of datatable rows.
 	 *
 	 * @param array $names  array of names
 	 */
@@ -159,7 +159,7 @@ class CDatatableElement extends CTableElement {
 	}
 
 	/**
-	 * Get table row by index.
+	 * Get datatable row by index.
 	 *
 	 * @param $index    row index
 	 *
@@ -170,30 +170,6 @@ class CDatatableElement extends CTableElement {
 			'parent' => $this,
 			'column_selector' => $this->selectors['column']
 		])->one();
-	}
-
-	/**
-	 * Get indexed collections of table columns.
-	 *
-	 * @return array
-	 */
-	public function getCells() {
-		$headers = $this->getColumnNames();
-
-		$table = [];
-		foreach ($this->getRows() as $row) {
-			$data = [];
-			$columns = $row->query('xpath:./'.CXPathHelper::fromSelector($this->selectors['column']).
-					'|./div[contains(@class, "cell-header")]'
-			)->all();
-			foreach ($columns as $i => $column) {
-				$data[CTestArrayHelper::get($headers, $i, $i)] = $column;
-			}
-
-			$table[] = new CElementCollection($data);
-		}
-
-		return $table;
 	}
 
 	/**
@@ -265,54 +241,6 @@ class CDatatableElement extends CTableElement {
 	}
 
 	/**
-	 * Index table row text by values of table column.
-	 *
-	 * @param string  $column	         column name
-	 * @param boolean $include_column    flag used to include or remove column used in index
-	 *
-	 * @return array
-	 */
-	public function index($column = null, $include_column = false) {
-		$table = [];
-		foreach ($this->getCells() as $i => $row) {
-			$data = [];
-			$id = $i;
-
-			foreach ($row as $header => $element) {
-				$value = $element->getText();
-
-				if ($header === $column) {
-					$id = $value;
-				}
-
-				if ($include_column || $header !== $column) {
-					$data[$header] = $value;
-				}
-			}
-
-			$table[$id] = $data;
-		}
-
-		return $table;
-	}
-
-	/**
-	 * Index table rows by column text.
-	 *
-	 * @param mixed $column    column name or index @see CTableRowElement::getColumn
-	 *
-	 * @return CElementCollection
-	 */
-	public function indexRows($column) {
-		$table = [];
-		foreach ($this->getRows() as $row) {
-			$table[$row->getColumn($column)->getText()] = $row;
-		}
-
-		return new CElementCollection($table, 'CTableRowElement');
-	}
-
-	/**
 	 * @inheritdoc
 	 */
 	public function waitUntilReady($timeout = null) {
@@ -321,6 +249,11 @@ class CDatatableElement extends CTableElement {
 		return $this;
 	}
 
+	/**
+	 * Wait until datatable has the expected count of rows.
+	 *
+	 * @param int $count   expected count of rows
+	 */
 	public function waitUntilRowsCount($count) {
 		$table = $this;
 		CElementQuery::wait(2)->until(function () use ($table, $count) {

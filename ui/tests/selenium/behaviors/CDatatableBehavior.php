@@ -31,15 +31,6 @@ class CDatatableBehavior extends CBehavior {
 	protected $column_names = null;
 
 	/**
-	 * Set names of columns.
-	 *
-	 * @param array $names column names
-	 */
-	public function setColumnNames($names) {
-		$this->column_names = $names;
-	}
-
-	/**
 	 * Perform data array normalization.
 	 *
 	 * @param array $data
