@@ -190,7 +190,12 @@ class CControllerHostEdit extends CController {
 				'debug_mode' => $this->getDebugMode(),
 				'can_edit_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 				'can_edit_proxy_groups' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS),
-				'can_edit_proxies' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
+				'can_edit_proxies' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES),
+				'can_edit_monitoring_by' => !$this->host['hostid']
+					|| CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING),
+				'can_select_server_for_monitoring' =>
+					CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING),
+				'has_preconfigured_inaccessible_proxy' => false
 			]
 		];
 
@@ -315,25 +320,42 @@ class CControllerHostEdit extends CController {
 		$data['host']['assigned_proxy_name'] = '';
 
 		if ($data['host']['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
-			$data['ms_proxy'] = CArrayHelper::renameObjectsKeys(API::Proxy()->get([
-				'output' => ['proxyid', 'name'],
-				'proxyids' => $data['host']['proxyid']
-			]), ['proxyid' => 'id']);
+			$proxyid = $data['host']['proxyid'];
+
+			$proxy = $this->getProxyInfo((int) $proxyid);
+			$data['ms_proxy'] = [$proxy];
+
+			if ($proxy['inaccessible']) {
+				$data['user']['has_preconfigured_inaccessible_proxy'] = true;
+			}
 		}
 		elseif ($data['host']['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
-			$data['ms_proxy_group'] = CArrayHelper::renameObjectsKeys(API::ProxyGroup()->get([
+			$proxy_groupid = $data['host']['proxy_groupid'];
+
+			$proxy_groups = API::ProxyGroup()->get([
 				'output' => ['proxy_groupid', 'name'],
-				'proxy_groupids' => $data['host']['proxy_groupid']
-			]), ['proxy_groupid' => 'id']);
+				'proxy_groupids' => $proxy_groupid
+			]);
 
-			if ($data['host']['assigned_proxyid'] != 0) {
-				$db_proxies = API::Proxy()->get([
-					'output' => ['name'],
-					'proxyids' => $data['host']['assigned_proxyid']
-				]);
-
-				$data['host']['assigned_proxy_name'] = $db_proxies[0]['name'];
+			if (count($proxy_groups) > 0 && array_key_exists('proxy_groupid', $proxy_groups[0])) {
+				$data['ms_proxy_group'] = CArrayHelper::renameObjectsKeys($proxy_groups, ['proxy_groupid' => 'id']);
 			}
+			else {
+				$data['host']['monitored_by'] = ZBX_MONITORED_BY_PROXY;
+				$data['user']['has_preconfigured_inaccessible_proxy'] = true;
+				$data['ms_proxy'] = [
+					[
+						'id' => $proxy_groupid,
+						'name' => _('Inaccessible proxy'),
+						'inaccessible' => true
+					]
+				];
+			}
+
+			$proxy = $this->getProxyInfo((int) $data['host']['assigned_proxyid']);
+
+			$data['host']['assigned_proxy_name'] = $proxy['name'];
+			$data['host']['assigned_proxy_inaccessible'] = $proxy['inaccessible'];
 		}
 
 		$data['is_discovery_rule_editable'] = $this->host['discoveryRule']
@@ -579,7 +601,9 @@ class CControllerHostEdit extends CController {
 			'hostid' => null,
 			'name' => '',
 			'host' => '',
-			'monitored_by' => ZBX_MONITORED_BY_SERVER,
+			'monitored_by' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
+				? ZBX_MONITORED_BY_SERVER
+				: ZBX_MONITORED_BY_PROXY,
 			'proxyid' => '0',
 			'proxy_groupid' => '0',
 			'assigned_proxyid' => '0',
@@ -605,6 +629,33 @@ class CControllerHostEdit extends CController {
 			'inventory' => [],
 			'valuemaps' => [],
 			'inventory_mode' => CSettingsHelper::get(CSettingsHelper::DEFAULT_INVENTORY_MODE)
+		];
+	}
+
+	private function getProxyInfo(int $proxyid): array {
+		if ($proxyid === 0) {
+			return [];
+		}
+
+		$proxies = API::Proxy()->get([
+			'output' => ['proxyid', 'name'],
+			'proxyids' => $proxyid
+		]);
+
+		if ($proxies) {
+			$proxy = $proxies[0];
+
+			return [
+				'id' => $proxy['proxyid'],
+				'name' => $proxy['name'],
+				'inaccessible' => false
+			];
+		}
+
+		return [
+			'id' => $proxyid,
+			'name' => _('Inaccessible proxy'),
+			'inaccessible' => true
 		];
 	}
 }
