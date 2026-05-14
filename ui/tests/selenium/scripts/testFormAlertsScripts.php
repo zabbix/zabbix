@@ -1886,7 +1886,7 @@ class testFormAlertsScripts extends CWebTest {
 			$form->fill($parameters);
 			$this->query('button:'.(($scenario === 'confirmation') ? 'Test confirmation' : 'Test user input'))
 					->waitUntilClickable()->one()->click();
-			$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+			$dialog = COverlayDialogElement::find(1)->waitUntilReady()->one();
 			$this->assertEquals((($scenario === 'confirmation') ? 'Execution confirmation' : 'Manual input'), $dialog->getTitle());
 
 			if ($scenario === 'confirmation') {
