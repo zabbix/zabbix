@@ -50,7 +50,7 @@
 					name: 'copy_targetids[]',
 					data: data.length ? data : [],
 					objectOptions: {
-						editable: true
+						editable: 1
 					},
 					popup: {
 						parameters: {
