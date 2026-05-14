@@ -28,6 +28,7 @@
  *                                                                            *
  * Comments: valid host names for this function are names with only ASCII     *
  *           characters 0-9, A-Z, a-z, hyphen ('-') and dot ('.').            *
+ *           Purely numeric names (e.g. 192.168.10) are not allowed.          *
  *           Additionally underscore ('_') is allowed as Windows host names   *
  *           allow it.                                                        *
  *           Internationalized Domain Names with multibyte UTF-8 characters   *
