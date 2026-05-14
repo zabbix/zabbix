@@ -1095,7 +1095,7 @@ static void	add_sentusers_ack_msg(zbx_user_msg_t **user_msg, zbx_uint64_t action
 
 	result = zbx_db_select(
 			"select distinct u.userid"
-			" from acknowledges a, users u"
+			" from acknowledges a,users u"
 			" where a.eventid=" ZBX_FS_UI64
 				" and a.userid=u.userid",	/* we skip all acknowledges where userid is NULL */
 			event->eventid);
