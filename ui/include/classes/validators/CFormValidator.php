@@ -207,7 +207,8 @@ class CFormValidator {
 							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain non-empty array (Path: '.$rule_path.')');
 						}
 
-						$result[$key] = $value;
+						// Force sparse array conversion to regular array to prevent Javascript side issues with sparse arrays being encoded as objects.
+						$result[$key] = array_values($value);
 						break;
 
 					case 'fields':
@@ -529,7 +530,8 @@ class CFormValidator {
 
 					case 'not_in':
 					case 'in':
-						$result[$key] = $value;
+						// Force sparse array conversion to regular array to prevent Javascript side issues with sparse arrays being encoded as objects.
+						$result[$key] = array_values($value);
 						break;
 
 					default:
