@@ -1755,7 +1755,7 @@ define('ZBX_ACTION_REMOVE',		2);
 define('ZBX_ACTION_REMOVE_ALL', 3);
 define('ZBX_ACTION_RENAME',		4);
 
-define('ZBX_HINTBOX_CONTENT_LIMIT',				8192);
+define('ZBX_HINTBOX_HTML_LIMIT',				8192);
 
 define('ZBX_OPDATA_HINTBOX_COLUMN_MAX_WIDTH', 	500);
 
@@ -2017,6 +2017,7 @@ define('ZBX_STYLE_DASHBOARD_WIDGET_FORM', 'dashboard-widget-form');
 define('ZBX_STYLE_DASHBOARD_EDIT', 'dashboard-edit');
 define('ZBX_STYLE_DASHBOARD_WIDGET_GRAPH_LINK', 'dashboard-widget-graph-link');
 define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
+define('ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH', 'debug-output-table-refresh');
 define('ZBX_STYLE_DIFF', 'diff');
 define('ZBX_STYLE_DIFF_ADDED', 'diff-added');
 define('ZBX_STYLE_DIFF_REMOVED', 'diff-removed');

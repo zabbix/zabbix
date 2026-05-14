@@ -360,9 +360,11 @@ $form_grid
 			new CFormField([
 				(new CTextAreaFlexible('manualinput_prompt', $data['form']['manualinput_prompt']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setErrorContainer('manualinput-prompt-error-container')
 					->setMaxlength(DB::getFieldLength('scripts', 'manualinput_prompt')),
 				NBSP(),
-				(new CButton('test_user_input', _('Test user input')))->addClass(ZBX_STYLE_BTN_GREY)
+				(new CButton('test_user_input', _('Test user input')))->addClass(ZBX_STYLE_BTN_GREY),
+				(new CDiv())->setId('manualinput-prompt-error-container')
 			])
 		])
 		->addItem([
@@ -414,9 +416,11 @@ $form_grid
 				(new CTextAreaFlexible('confirmation', $data['form']['confirmation']))
 					->setAttribute('data-notrim', '')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setErrorContainer('confirmation-error-container')
 					->setMaxlength(DB::getFieldLength('scripts', 'confirmation')),
 				NBSP(),
-				(new CButton('test_confirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)
+				(new CButton('test_confirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY),
+				(new CDiv())->setId('confirmation-error-container')
 			])
 		])
 	);

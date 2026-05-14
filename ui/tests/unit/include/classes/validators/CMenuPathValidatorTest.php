@@ -23,6 +23,7 @@ class CMenuPathValidatorTest extends TestCase {
 	private const VALID_ALWAYS = 2;
 
 	private CMenuPathValidator $validator;
+	private CMenuPathValidator $validator_strict;
 
 	protected function setUp(): void {
 		$this->validator = new CMenuPathValidator();

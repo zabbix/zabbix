@@ -17,8 +17,6 @@
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup regexps
  */
@@ -150,7 +148,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestClickLinkText($this->regexp);
 
 		$this->zbxTestTabSwitchById('tab_test', 'Test');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='test-result-table']//span[@class='green']"));
+		$this->query('xpath://table[@id="test-result-table"]//span[@class="green"]')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent('TRUE');
 	}
 
@@ -163,7 +161,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->query('xpath://textarea[@id="test-string"][@disabled]')->waitUntilNotPresent();
 		$this->zbxTestInputType('test-string', 'abcdef');
 		$this->zbxTestClick('test-expression');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='test-result-table']//span[@class='red']"));
+		$this->query('xpath://table[@id="test-result-table"]//span[@class="red"]')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent('FALSE');
 	}
 

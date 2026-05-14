@@ -63,11 +63,11 @@ class CControllerScriptCreate extends CController {
 					'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_ACTION]]
 				]
 			],
-			'execute_on' => ['db scripts.execute_on',
+			'execute_on' => ['db scripts.execute_on', 'required',
 				'in' => [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY],
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT]]
 			],
-			'menu_path' => ['db scripts.menu_path',
+			'menu_path' => ['db scripts.menu_path', 'required',
 				'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
 				'use' => [CMenuPathValidator::class, ['strict' => true]]
 			],
@@ -78,7 +78,10 @@ class CControllerScriptCreate extends CController {
 			'username' => ['db scripts.username', 'required', 'not_empty',
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]]
 			],
-			'password' => ['db scripts.password'],
+			'password' => [
+				['db scripts.password', 'required', 'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_TELNET]]],
+				['db scripts.password', 'required', 'when' => ['authtype', 'in' => [ITEM_AUTHTYPE_PASSWORD]]]
+			],
 			'publickey' => ['db scripts.publickey', 'required', 'not_empty',
 				'when' => [
 					['type', 'in' => [ZBX_SCRIPT_TYPE_SSH]],
@@ -91,8 +94,10 @@ class CControllerScriptCreate extends CController {
 					['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
 				]
 			],
-			'passphrase' => ['db scripts.password'],
-			'port' => ['db scripts.port',
+			'passphrase' => ['db scripts.password', 'required',
+				'when' => ['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
+			],
+			'port' => ['db scripts.port', 'required',
 				'use' => [CPortParser::class, ['usermacros' => true]],
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET]],
 				'messages' => ['use' => _('Incorrect port.')]
@@ -103,14 +108,16 @@ class CControllerScriptCreate extends CController {
 			'commandipmi' => ['db scripts.command', 'required', 'not_empty',
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_IPMI]]
 			],
-			'parameters' => ['objects', 'uniq' => ['name'], 'fields' => [
+			'parameters' => ['objects', 'required', 'uniq' => ['name'],
+				'fields' => [
 					'value' => ['db script_param.value'],
 					'name' => [
 						['db script_param.name'],
 						['db script_param.name', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
 					]
 				],
-				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]
+				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]],
+				'messages' => ['uniq' => _('Name is not unique.')]
 			],
 			'script' => ['db scripts.command', 'required', 'not_empty',
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]
@@ -122,12 +129,12 @@ class CControllerScriptCreate extends CController {
 			'url' => ['db scripts.url', 'required', 'not_empty',
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_URL]]
 			],
-			'new_window' => ['db scripts.new_window',
+			'new_window' => ['db scripts.new_window', 'required',
 				'in' => [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES],
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_URL]]
 			],
-			'description' => ['db scripts.description'],
-			'host_access' => ['db scripts.host_access',
+			'description' => ['db scripts.description', 'required'],
+			'host_access' => ['db scripts.host_access', 'required',
 				'in' => [PERM_READ, PERM_READ_WRITE],
 				'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]]
 			],
@@ -136,8 +143,8 @@ class CControllerScriptCreate extends CController {
 				'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]]
 			],
 			'manualinput' => ['db scripts.manualinput', 'required',
-				'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
-				'in' => [ZBX_SCRIPT_MANUALINPUT_DISABLED, ZBX_SCRIPT_MANUALINPUT_ENABLED]
+				'in' => [ZBX_SCRIPT_MANUALINPUT_DISABLED, ZBX_SCRIPT_MANUALINPUT_ENABLED],
+				'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]]
 			],
 			'manualinput_prompt' => ['db scripts.manualinput_prompt', 'required', 'not_empty',
 				'when' => [
@@ -168,6 +175,7 @@ class CControllerScriptCreate extends CController {
 				]
 			],
 			'dropdown_options' => ['db scripts.manualinput_validator', 'required', 'not_empty',
+				'use' => [CUniqueValuesValidator::class],
 				'when' => [
 					['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
 					['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]],
@@ -189,87 +197,7 @@ class CControllerScriptCreate extends CController {
 	}
 
 	protected function doAction(): void {
-		$script = [];
-
-		$this->getInputs($script, ['name', 'description']);
-
-		$script['groupid'] = $this->getInput('groupid', 0);
-		$script['scope'] = $this->getInput('scope', ZBX_SCRIPT_SCOPE_ACTION);
-		$script['type'] = $this->getInput('type', ZBX_SCRIPT_TYPE_WEBHOOK);
-
-		if ($script['scope'] != ZBX_SCRIPT_SCOPE_ACTION) {
-			$script['menu_path'] = trimPath($this->getInput('menu_path', ''));
-			$script['host_access'] = $this->getInput('host_access', PERM_READ);
-			$script['confirmation'] = $this->getInput('confirmation', '');
-			$script['usrgrpid'] = $this->getInput('usrgrpid', 0);
-
-			$script['manualinput'] =
-				$this->getInput('manualinput', ZBX_SCRIPT_MANUALINPUT_DISABLED) == ZBX_SCRIPT_MANUALINPUT_ENABLED
-					? ZBX_SCRIPT_MANUALINPUT_ENABLED
-					: ZBX_SCRIPT_MANUALINPUT_DISABLED;
-
-			if ($script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
-				$script['manualinput_prompt'] = $this->getInput('manualinput_prompt');
-				$script['manualinput_validator_type'] = $this->getInput('manualinput_validator_type');
-
-				if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
-					$user_input_values = array_map('trim', explode(',', $this->getInput('dropdown_options', [])));
-					$script['manualinput_validator'] = implode(',', $user_input_values);
-				}
-				else {
-					$script['manualinput_validator'] = $this->getInput('manualinput_validator', '');
-					$script['manualinput_default_value'] = trim($this->getInput('manualinput_default_value'));
-				}
-			}
-		}
-
-		switch ($script['type']) {
-			case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-				$script['command'] = $this->getInput('command', '');
-				$script['execute_on'] = $this->getInput('execute_on', ZBX_SCRIPT_EXECUTE_ON_PROXY);
-				break;
-
-			case ZBX_SCRIPT_TYPE_IPMI:
-				$script['command'] = $this->getInput('commandipmi', '');
-				break;
-
-			case ZBX_SCRIPT_TYPE_SSH:
-				$script['command'] = $this->getInput('command', '');
-				$script['username'] = $this->getInput('username', '');
-				$script['port'] = $this->getInput('port', '');
-				$script['authtype'] = $this->getInput('authtype', ITEM_AUTHTYPE_PASSWORD);
-
-				if ($script['authtype'] == ITEM_AUTHTYPE_PASSWORD) {
-					$script['password'] = $this->getInput('password', '');
-				}
-				else {
-					$script['publickey'] = $this->getInput('publickey', '');
-					$script['privatekey'] = $this->getInput('privatekey', '');
-					$script['password'] = $this->getInput('passphrase', '');
-				}
-				break;
-
-			case ZBX_SCRIPT_TYPE_TELNET:
-				$script['command'] = $this->getInput('command', '');
-				$script['username'] = $this->getInput('username', '');
-				$script['password'] = $this->getInput('password', '');
-				$script['port'] = $this->getInput('port', '');
-				break;
-
-			case ZBX_SCRIPT_TYPE_WEBHOOK:
-				$script['command'] = $this->getInput('script', '');
-				$script['timeout'] = $this->getInput('timeout', DB::getDefault('scripts', 'timeout'));
-				$script['parameters'] = $this->removeEmptyParameters($this->getInput('parameters', []));
-				break;
-
-			case ZBX_SCRIPT_TYPE_URL:
-				$script['url'] = $this->getInput('url', '');
-				$script['new_window'] = $this->hasInput('new_window')
-					? ZBX_SCRIPT_URL_NEW_WINDOW_YES
-					: ZBX_SCRIPT_URL_NEW_WINDOW_NO;
-				break;
-		}
-
+		$script = $this->convertFormInputForApi($this->getInputAll() + ['groupid' => 0, 'confirmation' => '']);
 		$result = (bool) API::Script()->create($script);
 		$output = [];
 
@@ -288,6 +216,35 @@ class CControllerScriptCreate extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+	}
+
+	protected function convertFormInputForApi(array $input): array {
+		unset($input['enable_confirmation']);
+
+		if (array_key_exists('dropdown_options', $input)) {
+			$user_input_values = array_map('trim', explode(',', $input['dropdown_options']));
+			$input['manualinput_validator'] = implode(',', $user_input_values);
+			unset($input['dropdown_options']);
+		}
+
+		$renamed_fields = [
+			'passphrase' => 'password',
+			'commandipmi' => 'command',
+			'script' => 'command'
+		];
+
+		foreach ($renamed_fields as $old_field => $new_field) {
+			if (array_key_exists($old_field, $input)) {
+				$input[$new_field] = $input[$old_field];
+				unset($input[$old_field]);
+			}
+		}
+
+		if (array_key_exists('parameters', $input)) {
+			$input['parameters'] = $this->removeEmptyParameters($input['parameters']);
+		}
+
+		return $input;
 	}
 
 	protected function removeEmptyParameters(array $parameters): array {

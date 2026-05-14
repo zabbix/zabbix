@@ -282,7 +282,7 @@ window.script_edit_popup = new class {
 		const parameters_table_element = this.form_element.querySelector('#parameters-table tbody');
 		let row_index = 0;
 
-		while (parameters_table_element.querySelector(`[name="parameters[${row_index}][name]"`) !== null) {
+		while (parameters_table_element.querySelector(`[name="parameters[${row_index}][name]"]`) !== null) {
 			row_index++;
 		}
 
@@ -318,7 +318,7 @@ window.script_edit_popup = new class {
 		this.form.reload(this.clone_rules);
 
 		for (const input of this.form_element.querySelectorAll('input[name=scope]')) {
-			input.disabled = false;
+			input.readOnly = false;
 		}
 
 		this.overlay.setProperties({

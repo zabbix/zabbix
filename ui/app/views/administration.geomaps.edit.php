@@ -100,17 +100,12 @@ $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('geomaps')))->removeId())
 	->setId('geomaps-form')
 	->setName('geomaps-form')
-	->setAction(
-		(new CUrl('zabbix.php'))
-			->setArgument('action', 'geomaps.update')
-			->getUrl()
-	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem(
 		(new CTabView())
 			->addTab('geomaps_tab', _('Geographical maps'), $form_grid)
 			->setFooter(makeFormFooter(
-				new CSubmit('update', _('Update'))
+				(new CSubmit('', _('Update')))->addClass('js-submit')
 			))
 	);
 
