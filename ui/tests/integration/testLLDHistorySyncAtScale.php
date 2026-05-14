@@ -804,9 +804,9 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDHistorySyncAtScale_TriggerNoDataRecoveryAfterRestart
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataFiringAfterRestart() {
-		//$this->stopComponent(self::COMPONENT_SERVER);
-		//$this->startComponent(self::COMPONENT_SERVER);
-		//$this->testLLDHistorySyncAtScale_TriggerNoDataFiring();
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
+		$this->testLLDHistorySyncAtScale_TriggerNoDataFiring();
 	}
 
 	private function verifyTrendsAtClock(int $trend_clock): void {
