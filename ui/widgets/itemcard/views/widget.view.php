@@ -447,7 +447,7 @@ function makeSectionLatestData(array $item, string $context): CDiv {
 			}
 			else {
 				$hintbox_value = $item['value_type'] == ITEM_VALUE_TYPE_JSON
-					? (new CTrim($item_value['value'], ZBX_HINTBOX_CONTENT_LIMIT))
+					? (new CTrim($item_value['value'], ZBX_HINTBOX_HTML_LIMIT))
 					: (new CDiv ($item_value['value']));
 
 				$last_value_column_value = (new CSpan(formatHistoryValue($item_value['value'], $item, false)))

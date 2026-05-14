@@ -330,9 +330,9 @@ class testUserRolesPermissions extends CWebTest {
 						'Cancel'
 					],
 					'list_link' => 'zabbix.php?action=scheduledreport.list',
-					'action_link' => 'zabbix.php?action=scheduledreport.edit&reportid=',
+					'action_link' => 'zabbix.php?action=popup&popup=scheduledreport.edit&reportid=',
 					'action' => 'Manage scheduled reports',
-					'check_links' => ['zabbix.php?action=scheduledreport.edit']
+					'check_links' => ['zabbix.php?action=popup&popup=scheduledreport.edit']
 				]
 			]
 		];
@@ -364,6 +364,13 @@ class testUserRolesPermissions extends CWebTest {
 
 			foreach ($data['form_button'] as $text) {
 				$this->assertTrue($this->query('button', $text)->one()->isEnabled(($text === 'Cancel') ? true : $action_status));
+			}
+
+			// For modal overlay form pages, click Cancel to properly close the overlay before navigating away.
+			// This prevents Chrome from logging a SEVERE console error about blocking the beforeunload dialog.
+			if (in_array('Cancel', $data['form_button'])) {
+				$this->query('button:Cancel')->one()->click();
+				COverlayDialogElement::ensureNotPresent();
 			}
 
 			if ($action_status) {

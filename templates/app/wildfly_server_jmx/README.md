@@ -35,9 +35,9 @@ Depending on your server setup, you may need to specify a custom JMX scheme in m
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$WILDFLY.USER}||`zabbix`|
-|{$WILDFLY.PASSWORD}||`zabbix`|
-|{$WILDFLY.JMX.PROTOCOL}||`remote+http`|
+|{$WILDFLY.USER}|<p>WildFly JMX username.</p>|`zabbix`|
+|{$WILDFLY.PASSWORD}|<p>WildFly JMX password.</p>|`zabbix`|
+|{$WILDFLY.JMX.PROTOCOL}|<p>WildFly JMX protocol.</p>|`remote+http`|
 |{$WILDFLY.DEPLOYMENT.MATCHES}|<p>Filter of discoverable deployments</p>|`.*`|
 |{$WILDFLY.DEPLOYMENT.NOT_MATCHES}|<p>Filter to exclude discovered deployments</p>|`CHANGE_IF_NEEDED`|
 |{$WILDFLY.CONN.USAGE.WARN.MAX}|<p>The maximum connection usage percent for trigger expression.</p>|`80`|

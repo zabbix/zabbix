@@ -57,7 +57,7 @@ zabbix_export:
         4. Set the user name and password in the host wizard configuration fields `Username` and `Password`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -971,11 +971,13 @@ zabbix_export:
             description: 'The hostname or IP of the API endpoint for the RabbitMQ cluster.'
             required: 'YES'
         - macro: '{$RABBITMQ.API.PASSWORD}'
-          value: zabbix
+          type: SECRET_TEXT
+          description: 'RabbitMQ API password.'
           config:
             type: TEXT
             priority: '2'
             label: Password
+            description: 'RabbitMQ API password.'
             required: 'YES'
         - macro: '{$RABBITMQ.API.PORT}'
           value: '15672'
@@ -1003,10 +1005,12 @@ zabbix_export:
                 text: https
         - macro: '{$RABBITMQ.API.USER}'
           value: zbx_monitor
+          description: 'RabbitMQ API username.'
           config:
             type: TEXT
             priority: '1'
             label: Username
+            description: 'RabbitMQ API username.'
             required: 'YES'
         - macro: '{$RABBITMQ.LLD.FILTER.EXCHANGE.MATCHES}'
           value: '.*'
@@ -1159,7 +1163,7 @@ zabbix_export:
         4. Set the user name and password in the host wizard configuration fields `Username` and `Password`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -2395,11 +2399,13 @@ zabbix_export:
             description: 'The hostname or IP of the API endpoint for the RabbitMQ.'
             required: 'YES'
         - macro: '{$RABBITMQ.API.PASSWORD}'
-          value: zabbix
+          type: SECRET_TEXT
+          description: 'RabbitMQ API password.'
           config:
             type: TEXT
             priority: '2'
             label: Password
+            description: 'RabbitMQ API password.'
             required: 'YES'
         - macro: '{$RABBITMQ.API.PORT}'
           value: '15672'
@@ -2427,10 +2433,12 @@ zabbix_export:
                 text: https
         - macro: '{$RABBITMQ.API.USER}'
           value: zbx_monitor
+          description: 'RabbitMQ API username.'
           config:
             type: TEXT
             priority: '1'
             label: Username
+            description: 'RabbitMQ API username.'
             required: 'YES'
         - macro: '{$RABBITMQ.CLUSTER.NAME}'
           value: rabbit

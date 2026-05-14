@@ -731,7 +731,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => 9,
+					'index' => 10,
 					'macro' => '{$X_SECRET_2_SECRET}',
 					'value' => [
 						'text' => 'This text is updated and should stay secret'
@@ -741,7 +741,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => 10,
+					'index' => 11,
 					'macro' => '{$X_SECRET_2_TEXT}',
 					'value' => [
 						'text' => 'This text is updated and should become visible',
@@ -752,7 +752,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => 11,
+					'index' => 12,
 					'macro' => '{$X_TEXT_2_SECRET}',
 					'value' => [
 						'text' => 'This text is updated and should become secret',

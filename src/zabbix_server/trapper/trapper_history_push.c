@@ -220,10 +220,11 @@ zbx_host_permission_t;
  *               FAIL    - item configuration error                           *
  *                                                                            *
  ******************************************************************************/
-static int	validate_item_config(ZBX_SOCKADDR *peer_addr, ZBX_SOCKADDR *client_addr,
-		zbx_hashset_t *rights, const zbx_user_t *user, zbx_history_recv_item_t *item,
-		const zbx_hp_item_value_t *value, char **error)
+static int	validate_item_config(ZBX_SOCKADDR *client_addr, zbx_hashset_t *rights, const zbx_user_t *user,
+		zbx_history_recv_item_t *item, const zbx_hp_item_value_t *value, char **error)
 {
+	int	ret = FAIL;
+
 	if (NULL != rights)
 	{
 		zbx_host_permission_t	*perm;
@@ -280,29 +281,19 @@ static int	validate_item_config(ZBX_SOCKADDR *peer_addr, ZBX_SOCKADDR *client_ad
 	if ('\0' != *item->trapper_hosts)
 	{
 		char			*allowed_peers;
-		int			ret = FAIL;
 		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
 		allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
 		zbx_substitute_macros(&allowed_peers, NULL, 0, zbx_macro_allowed_hosts_resolv, um_handle, item);
-
 		zbx_dc_close_user_macros(um_handle);
-
-		if (SUCCEED == (ret = zbx_tcp_check_allowed_peers_info(peer_addr, allowed_peers)))
-		{
-			if (FAIL == (ret = zbx_tcp_check_allowed_peers_info(client_addr, allowed_peers)))
-				*error = zbx_strdup(NULL, "Client IP is not in item's allowed hosts list.");
-		}
-		else
-			*error = zbx_strdup(NULL, "Connection source address is not in item's allowed hosts list.");
-
+		ret = zbx_tcp_check_allowed_peers_info(client_addr, allowed_peers);
 		zbx_free(allowed_peers);
-
-		if (FAIL == ret)
-			return FAIL;
 	}
 
-	return SUCCEED;
+	if (FAIL == ret)
+		*error = zbx_strdup(NULL, "Client IP is not in item's allowed hosts list.");
+
+	return ret;
 }
 
 /******************************************************************************
@@ -386,7 +377,6 @@ static int	hk_compare(const void *d1, const void *d2)
  * Purpose: processes received item values                                    *
  *                                                                            *
  * Parameters: userid        - [IN]                                           *
- *             peer_addr     - [IN] connection source address                 *
  *             client_addr   - [IN] clientip address                          *
  *             values        - [IN] parsed values                             *
  *             itemids_num   - [IN]                                           *
@@ -399,7 +389,7 @@ static int	hk_compare(const void *d1, const void *d2)
  *               FAIL    - parsing failure                                    *
  *                                                                            *
  ******************************************************************************/
-static void	process_item_values(const zbx_user_t *user, ZBX_SOCKADDR *peer_addr, ZBX_SOCKADDR *client_addr,
+static void	process_item_values(const zbx_user_t *user, ZBX_SOCKADDR *client_addr,
 		zbx_vector_hp_item_value_ptr_t *values, int itemids_num, int hostkeys_num, int *processed_num,
 		int *failed_num, struct zbx_json *j)
 {
@@ -539,7 +529,7 @@ static void	process_item_values(const zbx_user_t *user, ZBX_SOCKADDR *peer_addr,
 				zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, item_err->error, ZBX_JSON_TYPE_STRING);
 				(*failed_num)++;
 			}
-			else if (SUCCEED != validate_item_config(peer_addr, client_addr, prights, user, item,
+			else if (SUCCEED != validate_item_config(client_addr, prights, user, item,
 					values->values[i], &error))
 			{
 				zbx_item_error_t	item_err_local = {.itemid = item->itemid, .error = error};
@@ -672,9 +662,7 @@ out:
  *                                                                            *
  * Purpose: processes history push request                                    *
  *                                                                            *
- * Parameters:                                                                *
- *             sock  - [IN]                                                   *
- *             jp    - [IN] history push request in json format               *
+ * Parameters: jp    - [IN] history push request in json format               *
  *             j     - [OUT] json response buffer                             *
  *             error - [OUT] error message                                    *
  *                                                                            *
@@ -682,8 +670,7 @@ out:
  *               FAIL    - parsing/authentication failure                     *
  *                                                                            *
  ******************************************************************************/
-static int	process_history_push(zbx_socket_t *sock, const struct zbx_json_parse *jp, struct zbx_json *j,
-		char **error)
+static int	process_history_push(const struct zbx_json_parse *jp, struct zbx_json *j, char **error)
 {
 	zbx_user_t			user;
 	struct zbx_json_parse		jp_data;
@@ -758,7 +745,7 @@ static int	process_history_push(zbx_socket_t *sock, const struct zbx_json_parse 
 			itemids_num++;
 	}
 
-	process_item_values(&user, (ZBX_SOCKADDR *)&sock->peer_info, (ZBX_SOCKADDR *)ai->ai_addr, &values, itemids_num,
+	process_item_values(&user, (ZBX_SOCKADDR *)ai->ai_addr, &values, itemids_num,
 			hostkeys_num, &processed_num, &failed_num, j);
 
 	zbx_auditlog_history_push(user.userid, user.username, clientip, processed_num, failed_num,
@@ -805,7 +792,7 @@ int	trapper_process_history_push(zbx_socket_t *sock, const struct zbx_json_parse
 
 	zbx_json_init(&j, 1024);
 
-	if (SUCCEED != (ret = process_history_push(sock, jp, &j, &error)))
+	if (SUCCEED != (ret = process_history_push(jp, &j, &error)))
 	{
 		zbx_send_response(sock, ret, error, timeout);
 		zbx_free(error);
