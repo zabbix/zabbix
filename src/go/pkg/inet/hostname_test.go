@@ -20,10 +20,10 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func Test_IsRFCHostName(t *testing.T) {
+func Test_IsRFCExtendedHostName(t *testing.T) {
 	t.Parallel()
 
-	// Synchronize with tests/libs/zbxip/zbx_is_rfc_hostname.yaml
+	// Synchronize with tests/libs/zbxip/zbx_is_rfc_extended_hostname.yaml
 
 	type args struct {
 		host string
@@ -75,10 +75,10 @@ func Test_IsRFCHostName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := IsRFCHostName(tt.args.host)
+			got := IsRFCExtendedHostName(tt.args.host)
 
 			if diff := cmp.Diff(tt.want, got); diff != "" {
-				t.Fatalf("IsRFCHostName() = %s", diff)
+				t.Fatalf("IsRFCExtendedHostName() = %s", diff)
 			}
 		})
 	}

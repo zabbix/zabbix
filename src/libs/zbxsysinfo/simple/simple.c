@@ -397,7 +397,7 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 
 	if (0 == strncmp("net.tcp.service", get_rkey(request), 15))
 	{
-		if (FAIL == zbx_is_ip(ip) && FAIL == zbx_is_rfc_hostname(ip))
+		if (FAIL == zbx_is_ip(ip) && FAIL == zbx_is_rfc_extended_hostname(ip))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			return SYSINFO_RET_FAIL;
@@ -495,7 +495,7 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 	{
 		if (0 == strcmp(service, "ntp"))
 		{
-			if (FAIL == zbx_is_ip(ip) && FAIL == zbx_is_rfc_hostname(ip))
+			if (FAIL == zbx_is_ip(ip) && FAIL == zbx_is_rfc_extended_hostname(ip))
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 				return SYSINFO_RET_FAIL;

@@ -34,7 +34,7 @@
  *           will be rejected as not valid (Punycode can be used).            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_is_rfc_hostname(const char *host)
+int	zbx_is_rfc_extended_hostname(const char *host)
 {
 	const char	*p = host;
 	int		label_len = 1;

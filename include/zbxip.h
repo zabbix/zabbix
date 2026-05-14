@@ -17,7 +17,7 @@
 
 #include "zbxtypes.h"
 
-int	zbx_is_rfc_hostname(const char *host);
+int	zbx_is_rfc_extended_hostname(const char *host);
 
 int	zbx_is_ip4(const char *ip);
 int	zbx_is_ip6(const char *ip);

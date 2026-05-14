@@ -79,7 +79,7 @@ func (p *Plugin) exportNetTcpPort(params []string, timeout int) (result int, err
 	}
 
 	if len(params) >= 1 && params[0] != "" {
-		if net.ParseIP(params[0]) == nil && !inet.IsRFCHostName(params[0]) {
+		if net.ParseIP(params[0]) == nil && !inet.IsRFCExtendedHostName(params[0]) {
 			return 0, errs.New(errorInvalidFirstParam)
 		}
 	}
@@ -521,7 +521,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		if len(params) >= 2 && params[1] != "" {
-			if net.ParseIP(params[1]) == nil && !inet.IsRFCHostName(params[1]) {
+			if net.ParseIP(params[1]) == nil && !inet.IsRFCExtendedHostName(params[1]) {
 				return nil, errs.New(errorInvalidSecondParam)
 			}
 		}

@@ -92,7 +92,7 @@ int	net_tcp_port(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		if (FAIL == zbx_is_ip(ip_str) && FAIL == zbx_is_rfc_hostname(ip_str))
+		if (FAIL == zbx_is_ip(ip_str) && FAIL == zbx_is_rfc_extended_hostname(ip_str))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 			return SYSINFO_RET_FAIL;

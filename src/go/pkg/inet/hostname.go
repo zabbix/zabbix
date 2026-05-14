@@ -14,7 +14,8 @@
 
 package inet
 
-// IsRFCHostName checks if host is valid host name (should work the same as zbx_is_rfc_hostname() in C)
+// IsRFCExtendedHostName checks if host is valid host name (should work the same as
+// zbx_is_rfc_extended_hostname() in C)
 //
 // Valid host names for this function are names with only ASCII characters 0-9, A-Z, a-z,
 // hyphen ('-') and dot ('.').
@@ -23,7 +24,7 @@ package inet
 // valid (Punycode can be used).
 //
 //nolint:cyclop,gocyclo // high complexity due to host name validation, splitting not practical
-func IsRFCHostName(host string) bool {
+func IsRFCExtendedHostName(host string) bool {
 	// Requirements and limits for host names are defined in RFC 1035,
 	// with clarifications in RFC 1123, RFC 2181.
 	//
