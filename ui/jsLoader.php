@@ -118,7 +118,6 @@ $available_js = [
 	'class.coverride.js' => '',
 	'class.crangecontrol.js' => '',
 	'class.csuggest.js' => '',
-	'class.csvggraph.js' => '',
 	'class.curl.js' => '',
 	'class.form.fieldset.collapsible.js' => '',
 	'class.overlaycollection.js' => '',
@@ -555,10 +554,6 @@ $translate_strings = [
 		'No interface found' => _('No interface found'),
 		'Item type does not use interface' => _('Item type does not use interface')
 	],
-	'class.csvggraph.js' => [
-		'S_MINUTE_SHORT' => _x('m', 'minute short'),
-		'Unexpected server error.' => _('Unexpected server error.')
-	],
 	'class.svggauge.js' => [
 		'No data' => _('No data')
 	],
@@ -672,7 +667,6 @@ if (empty($_GET['files'])) {
 		'init.js',
 		'class.coverride.js',
 		'class.crangecontrol.js',
-		'class.csvggraph.js',
 		'class.dashboard.js',
 		'class.dashboard.page.js',
 		'class.dashboard.print.js',
