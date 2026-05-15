@@ -5657,7 +5657,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 			// TODO: sometimes test is unstable due to different image size.
 			sleep(2);
-//			$this->assertScreenshot($charts_table, $screenshot_string.$show);
+			$this->assertScreenshot($charts_table, $screenshot_string.$show);
 
 			// Switch back to normal view to avoid impacting following scenarios.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
