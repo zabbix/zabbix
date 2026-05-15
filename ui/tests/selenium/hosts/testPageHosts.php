@@ -426,9 +426,9 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->fill($data['filter']);
 		$filter->submit();
 		$this->page->waitUntilReady();
+		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 
 		$this->assertDatatableStats(count($data['expected']));
-		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 		$this->assertEquals(array_keys($data['expected']), $this->getDatatableColumnData('Name'));
 
 		foreach($data['expected'] as $host => $proxy) {
@@ -930,7 +930,7 @@ class testPageHosts extends CLegacyWebTest {
 			$this->assertMessage(TEST_GOOD, ($host_count > 1) ? 'Hosts deleted' : 'Host deleted');
 			CMessageElement::find()->one()->close();
 			$table_rows_count = $table_rows_count - $host_count;
-			$this->assertTableStats($table_rows_count);
+			$this->assertDatatableStats($table_rows_count);
 			$this->assertSelectedCount(0);
 		}
 	}
