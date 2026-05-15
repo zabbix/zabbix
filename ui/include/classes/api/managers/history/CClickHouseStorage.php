@@ -156,8 +156,7 @@ class CClickHouseStorage {
 		if ($options['countOutput']) {
 			$sql_parts = ['group' => ['itemid', 'toStartOfHour(clock_ns)']] + $this->getQueryPartsFromOptions([
 				'output' => ['itemid'],
-				'countOutput' => false,
-				'limit' => null
+				'countOutput' => false
 			] + $options);
 			$query = 'SELECT count() AS rowscount FROM ('.$this->buildQueryFromParts($sql_parts).')';
 

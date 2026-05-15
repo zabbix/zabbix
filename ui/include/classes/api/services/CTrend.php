@@ -112,6 +112,10 @@ class CTrend extends CApiService {
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+
+		if ($options['countOutput']) {
+			$options['limit'] = null;
+		}
 	}
 
 	/**
@@ -359,7 +363,7 @@ class CTrend extends CApiService {
 				? $result + $values[0]['rowscount']
 				: array_merge($result, $values);
 
-			if ($limit === null || $options['countOutput']) {
+			if ($limit === null) {
 				continue;
 			}
 
