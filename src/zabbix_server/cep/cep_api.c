@@ -256,12 +256,12 @@ void	zbx_cep_get_events_by_updates(zbx_cep_event_update_t *updates, int updates_
  * Parameters: handles - [OUT] vector to store handles of retrieved events    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_cep_get_events(zbx_vector_cep_event_handle_t *handles)
+void	zbx_cep_get_events(unsigned char source, zbx_vector_cep_event_handle_t *handles)
 {
 	zbx_cep_t	*cep;
 
 	cep_cache_acquire(&cep);
-	cep_get_events(cep, handles);
+	cep_get_events(cep, source, handles);
 	cep_cache_release(&cep);
 }
 

@@ -21,6 +21,7 @@
 
 #include "zbxcep.h"
 #include "zbxcep_client.h"
+#include "zbxcommon.h"
 #include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxalgo.h"
@@ -3306,7 +3307,7 @@ static void	recalculate_services(zbx_service_manager_t *service_manager, zbx_dbc
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_cep_event_handle_create(&handles);
-	zbx_cep_get_events(&handles);
+	zbx_cep_get_events(EVENT_SOURCE_TRIGGERS, &handles);
 
 	flags = ZBX_FLAG_SERVICE_RECALCULATE;
 

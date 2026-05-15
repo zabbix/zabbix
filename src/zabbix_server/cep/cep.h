@@ -72,7 +72,7 @@ void	cep_get_events_by_handles(zbx_cep_t *cep, zbx_cep_event_handle_t *handles, 
 		zbx_cep_event_t **events);
 void	cep_get_events_by_updates(zbx_cep_t *cep, zbx_cep_event_update_t *updates, int updates_num,
 		zbx_cep_event_t **events);
-void	cep_get_events(zbx_cep_t *cep, zbx_vector_cep_event_handle_t *handles);
+void	cep_get_events(zbx_cep_t *cep, unsigned char source, zbx_vector_cep_event_handle_t *handles);
 void	cep_delete_events(zbx_cep_t *cep, const zbx_vector_uint64_t *eventids, zbx_vector_cep_event_handle_t *handles);
 
 #endif /* ZABBIX_CEP_CACHE_H */

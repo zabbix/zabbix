@@ -476,16 +476,15 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 			zbx_vector_uint64_create(&event->maintenanceids);
 
 			zbx_cep_object_t	*obj;
-			zbx_cep_origin_t	origin;
 			zbx_cep_event_handle_t	h;
 
-			ZBX_STR2UCHAR(origin.source, row[6]);
-			ZBX_STR2UCHAR(origin.object, row[7]);
-			ZBX_STR2UINT64(origin.objectid, row[8]);
+			ZBX_STR2UCHAR(event->origin.source, row[6]);
+			ZBX_STR2UCHAR(event->origin.object, row[7]);
+			ZBX_STR2UINT64(event->origin.objectid, row[8]);
 
-			event->value = cep_origin_problem(&origin);
+			event->value = cep_origin_problem(&event->origin);
 
-			obj = cep_get_object_or_create(cep, &origin);
+			obj = cep_get_object_or_create(cep, &event->origin);
 			h = cep_create_event_handle(cep, event);
 			zbx_vector_cep_event_handle_append(&obj->events, zbx_cep_event_handle_addref(h));
 		}
@@ -1451,7 +1450,7 @@ void	zbx_cep_get_eventids_from_handles(const zbx_cep_event_handle_t *handles, in
  *             handles - [OUT] active event handles                           *
  *                                                                            *
  ******************************************************************************/
-void	cep_get_events(zbx_cep_t *cep, zbx_vector_cep_event_handle_t *handles)
+void	cep_get_events(zbx_cep_t *cep, unsigned char source, zbx_vector_cep_event_handle_t *handles)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_cep_event_handle_t	h;
@@ -1461,6 +1460,9 @@ void	cep_get_events(zbx_cep_t *cep, zbx_vector_cep_event_handle_t *handles)
 	while (NULL != (h = (zbx_cep_event_handle_t)zbx_hashset_iter_next(&iter)))
 	{
 		if (CEP_EVENT_STATE_DELETED == h->state)
+			continue;
+
+		if (h->event->origin.source != source)
 			continue;
 
 		zbx_vector_cep_event_handle_append(handles, zbx_cep_event_handle_addref(h));

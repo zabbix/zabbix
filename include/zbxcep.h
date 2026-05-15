@@ -95,7 +95,7 @@ zbx_cep_event_handle_t	zbx_cep_event_handle_addref(zbx_cep_event_handle_t h);
 void	zbx_cep_event_handle_release(zbx_cep_event_handle_t h);
 void	zbx_cep_get_events_by_handles(zbx_cep_event_handle_t *handles, int handles_num, zbx_cep_event_t **events);
 void	zbx_cep_get_events_by_updates(zbx_cep_event_update_t *updates, int updates_num, zbx_cep_event_t **events);
-void	zbx_cep_get_events(zbx_vector_cep_event_handle_t *handles);
+void	zbx_cep_get_events(unsigned char source, zbx_vector_cep_event_handle_t *handles);
 
 void	zbx_cep_get_eventids_from_handles(const zbx_cep_event_handle_t *handles, int handles_num,
 		zbx_vector_uint64_t *eventids);
