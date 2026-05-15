@@ -31,7 +31,6 @@ func IsRFCExtendedHostName(host string) bool {
 	//
 	// Total length should not exceed 253 characters without trailing dot
 	// and 254 characters if trailing dot is present.
-
 	n := len(host)
 	if n == 0 || n > 254 {
 		return false
