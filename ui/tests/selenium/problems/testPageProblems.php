@@ -623,7 +623,7 @@ class testPageProblems extends CWebTest {
 			]
 		];
 
-		// Change datatable layout throug header settings and check if corresponding elements are show shown in datatable.
+		// Change datatable layout through header settings and check if corresponding elements are show shown in datatable.
 		foreach ($header_options as $options) {
 			$this->changeLayoutFromHeader($options['column']);
 			$table->waitUntilReady()->invalidate();

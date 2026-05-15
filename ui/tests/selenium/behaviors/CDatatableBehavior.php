@@ -198,7 +198,7 @@ class CDatatableBehavior extends CBehavior {
 	}
 
 	/**
-	 * Check the layout of datatable header settings in corrisponding headers.
+	 * Check the layout of datatable header settings in corresponding headers.
 	 *
 	 * @param array    $header_settings    settings in corresponding datatable headers and their parameters
 	 * @param string   $selector           datatable selector
