@@ -56,10 +56,14 @@ $id_table = "$id-table";
 <?= new CLabel(_('Conditions')) ?>
 <?= (new CFormField(
 	(new CTable())
+		->setColumns([
+			(new CTableColumn(new CColHeader(_('Label'))))->setAttribute('width', '10%'),
+			(new CTableColumn(new CColHeader(_('Name'))))->setAttribute('width', '70%'),
+			(new CTableColumn(new CColHeader(_('Actions'))))->setAttribute('width', '20%'),
+		])
 		->setAttribute('data-field-type', 'set')
-		->setAttribute('data-field-name', 'filter')
+		->setAttribute('data-field-name', 'filter[conditions]')
 		->setId($id_table)
-		->setHeader([_('Label'), _('Name'), _('Action')])
 		->addItem(
 			(new CTag('tfoot', true))
 				->addItem(

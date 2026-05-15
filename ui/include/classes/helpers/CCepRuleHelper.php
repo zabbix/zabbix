@@ -131,14 +131,6 @@ class CCepRuleHelper {
 		];
 	}
 
-	public static function getExecuteWhenStrings(): array {
-		return [
-			ZBX_CEP_WHEN_EVENT_OCCURED => _('Event occurs'),
-			ZBX_CEP_WHEN_EVENT_RECOVERED => _('Event recovered'),
-			ZBX_CEP_WHEN_TAGS_CORRELATED => _('Tags correlated')
-		];
-	}
-
 	public static function getOperationLabelString(array $ceprule_operation): string {
 		return self::getOperationLabelStrings()[$ceprule_operation['type']];
 	}

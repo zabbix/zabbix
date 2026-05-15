@@ -28,6 +28,7 @@ class CControllerCepRuleUpdate extends CController {
 	}
 
 	public static function getValidationRules(): array {
+		// TODO 2: 'conditions' => ['objects', using letters instead of numbers in field names may cause problems.
 		// TODO: state what fields have macro and usermacro support
 		$api_uniq = ['ceprule.get', ['name' => '{name}'], 'cepruleid'];
 
@@ -188,7 +189,7 @@ class CControllerCepRuleUpdate extends CController {
 				'execute_when' => [
 					[
 						'db cep_operation.execute_when', 'required',
-						'in' => [ZBX_CEP_OP_WHEN_EVENT_OCCURRED, ZBX_CEP_OP_WHEN_EVENT_EVICTED, ZBX_CEP_OP_WHEN_WINDOW_CLOSED, ZBX_CEP_WHEN_TAGS_CORRELATED, ZBX_CEP_OP_WHEN_PATTERN_MATCHED],
+						'in' => [ZBX_CEP_OP_WHEN_EVENT_OCCURRED, ZBX_CEP_OP_WHEN_EVENT_EVICTED, ZBX_CEP_OP_WHEN_WINDOW_CLOSED, ZBX_CEP_OP_WHEN_TAGS_CORRELATED, ZBX_CEP_OP_WHEN_PATTERN_MATCHED],
 					],
 				],
 				// Type: List of "CEP rule operation tag" objects.
@@ -223,7 +224,7 @@ class CControllerCepRuleUpdate extends CController {
 					],
 					['db cep_operation.type', 'required',
 						'in' => [ZBX_CEP_OP_SET_NAME, ZBX_CEP_OP_CLOSE, ZBX_CEP_OP_SET_SEVERITY, ZBX_CEP_OP_INCREASE_SEVERITY, ZBX_CEP_OP_DECREASE_SEVERITY, ZBX_CEP_OP_SUPPRESS, ZBX_CEP_OP_ADD_TAG, ZBX_CEP_OP_SET_TAG, ZBX_CEP_OP_SET_TAG_VALUE, ZBX_CEP_OP_INCREASE_TAG_VALUE, ZBX_CEP_OP_DECREASE_TAG_VALUE, ZBX_CEP_OP_RENAME_TAG, ZBX_CEP_OP_REMOVE_TAG],
-						'when' => ['execute_when', 'in' => [ZBX_CEP_WHEN_TAGS_CORRELATED]]
+						'when' => ['execute_when', 'in' => [ZBX_CEP_OP_WHEN_TAGS_CORRELATED]]
 					],
 					['db cep_operation.type', 'required',
 						'in' => [ZBX_CEP_OP_COPY_FIRST, ZBX_CEP_OP_COPY_LAST],

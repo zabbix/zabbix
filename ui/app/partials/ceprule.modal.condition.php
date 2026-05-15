@@ -33,6 +33,9 @@ $id_event_name = "$id-event-name";
 ?>
 
 <form>
+	<!-- Enable form submitting on Enter. -->
+	<button type="submit" class="form-submit-hidden"></button>
+
 	<div class="form-grid">
 		<?= new CLabel('Type', $id_type_focus) ?>
 		<div class="form-field">
@@ -54,6 +57,7 @@ $id_event_name = "$id-event-name";
 			<div class="form-field">
 				<?= (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))
 					->setModern()
+					// TODO: not translated use CCepRuleHelper::getConditionOperatorString
 					->addValue('Equals', CONDITION_OPERATOR_EQUAL)
 					->addValue('Does not equal', CONDITION_OPERATOR_NOT_EQUAL)
 					->addValue('Contains', CONDITION_OPERATOR_LIKE)

@@ -66,7 +66,7 @@ class CControllerCepRuleEdit extends CController {
 		$data = [
 			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules(),
 			'condition_js_validation_rules' => self::getConditionValidationRules(),
-			'operation_js_validation_rules' => [],
+			'operation_js_validation_rules' => self::getOperationValidationRules(),
 			'ceprule' => $this->ceprule,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
@@ -107,6 +107,16 @@ class CControllerCepRuleEdit extends CController {
 
 		return (new CFormValidator([
 			'object', 'fields' => $condition_fields
+		]))->getRules();
+	}
+
+	protected static function getOperationValidationRules(): array {
+		$rules = CControllerCepRuleUpdate::getValidationRules();
+
+		$operation_fields = $rules['fields']['operations']['fields'];
+
+		return (new CFormValidator([
+			'object', 'fields' => $operation_fields
 		]))->getRules();
 	}
 }
