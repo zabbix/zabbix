@@ -691,6 +691,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
 
+		$this->query('id:latest')->asDatatable()->one()->waitUntilRowsCount(count($data['result']));
 		$this->assertDatatableData($data['result']);
 
 		// Check that subfilter remains selected after main field is cleared.
