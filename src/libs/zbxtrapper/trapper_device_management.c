@@ -229,7 +229,8 @@ static int	trapper_device_adapter_request(const zbx_config_comms_args_t *config_
 	}
 	else
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
+		if (NULL != config_tls->ca_file || NULL != config_tls->cert_file || NULL != config_tls->key_file)
+			THIS_SHOULD_NEVER_HAPPEN;
 	}
 
 	if (NULL != config_adapter_connect_to)
