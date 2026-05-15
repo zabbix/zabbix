@@ -528,6 +528,7 @@ void	cep_db_process_actions(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_
 			zbx_vector_uint64_pair_append(&event_recovery, pair);
 		}
 	}
+	zbx_vector_uint64_pair_sort(&event_recovery, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (ret = ZBX_DB_DOWN; ret == ZBX_DB_DOWN;)
 	{
