@@ -317,19 +317,15 @@ class CForm {
 	 *
 	 * @param {Array} fields
 	 * @param {?Object} rules
-	 * @param {Boolean|?Array} lock_fields
+	 * @param {?Object} values
 	 *
 	 * @returns {Promise}
 	 */
-	validateFieldsForAction(fields, rules, lock_fields = false) {
+	validateFieldsForAction(fields, rules, values = null) {
 		const validator = new CFormValidator(rules ? rules : this.#rules);
-		const values = this.getAllValues();
+		const values_to_validate = values === null ? this.getAllValues() : values;
 
-		if (lock_fields !== false) {
-			this.lock(lock_fields);
-		}
-
-		return validator.validateChanges(values, fields)
+		return validator.validateChanges(values_to_validate, fields)
 			.then((result) => {
 				this.setErrors(validator.getErrors(), true);
 				this.renderErrors();

@@ -302,7 +302,10 @@ window.itemtestedit_view_popup = new class {
 			}
 		});
 
-		this.#form.validateFieldsForAction(field_names, this.#rules_get_value, null)
+		const values = this.#form.getAllValues();
+		this.#form.lock();
+
+		this.#form.validateFieldsForAction(field_names, this.#rules_get_value, values)
 			.then((result) => {
 				if (!result) {
 					this.#unsetLoading();
