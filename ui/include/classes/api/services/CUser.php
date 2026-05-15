@@ -4105,17 +4105,23 @@ class CUser extends CApiService {
 
 	public static function provisionPushMedia(string $userid, string $uuid): void {
 		$db_media_types = DB::select('media_type', [
-			'output' => [],
+			'output' => ['name', 'status'],
 			'filter' => [
 				'type' => [MEDIA_TYPE_PUSH]
 			],
-			'sortfield' => ['name', 'status'],
 			'preservekeys' => true
 		]);
 
 		if (!$db_media_types) {
 			return;
 		}
+
+		CArrayHelper::sort($db_media_types, [
+			['field' => 'status', 'order' => ZBX_SORT_UP],
+			['field' => 'name', 'order' => ZBX_SORT_UP]
+		]);
+
+		$preferred_mediatypeid = array_key_first($db_media_types);
 
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'username'],
@@ -4142,12 +4148,12 @@ class CUser extends CApiService {
 			foreach ($user['medias'] as &$media) {
 				$media['sendto'] = explode("\n", $media['sendto']);
 
-				if (!$existing_media_updated && array_key_exists($media['mediatypeid'], $db_media_types)) {
+				if (!$existing_media_updated && bccomp($media['mediatypeid'], $preferred_mediatypeid) == 0) {
 					if (in_array('*', $media['sendto']) || in_array($uuid, $media['sendto'])) {
 						return;
 					}
 
-					$media['sendto'] = ['*'];
+					$media['sendto'][] = $uuid;
 
 					$existing_media_updated = true;
 				}
@@ -4156,8 +4162,8 @@ class CUser extends CApiService {
 
 			if (!$existing_media_updated) {
 				$user['medias'][] = [
-					'mediatypeid' => key($db_media_types),
-					'sendto' => [$uuid],
+					'mediatypeid' => $preferred_mediatypeid,
+					'sendto' => ['*'],
 					'status' => MEDIA_STATUS_ACTIVE
 				];
 			}
@@ -4207,10 +4213,14 @@ class CUser extends CApiService {
 			foreach ($user['medias'] as $key => &$user_media) {
 				$user_media['sendto'] = explode("\n", $user_media['sendto']);
 
-				if (array_key_exists($user_media['mediatypeid'], $db_user_media_types)
-						&& (in_array($uuid, $user_media['sendto'])
-							|| in_array('*', $user_media['sendto']) && $db_devices_count == 1)) {
-					unset($user['medias'][$key]);
+				if (array_key_exists($user_media['mediatypeid'], $db_user_media_types)) {
+					if (in_array($uuid, $user_media['sendto']) && count($user_media['sendto']) == 1
+							|| in_array('*', $user_media['sendto']) && $db_devices_count == 1) {
+						unset($user['medias'][$key]);
+					}
+					elseif (in_array($uuid, $user_media['sendto'])) {
+						$user_media['sendto'] = array_diff($user_media['sendto'], [$uuid]);
+					}
 				}
 			}
 			unset($user_media);
@@ -4219,7 +4229,7 @@ class CUser extends CApiService {
 
 			$db_user['medias'] = $db_user_medias;
 		}
-		unset($db_user, $user);
+		unset($db_user);
 
 		self::updateMedias($users, $db_users);
 
