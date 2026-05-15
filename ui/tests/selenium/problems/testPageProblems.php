@@ -1906,7 +1906,8 @@ class testPageProblems extends CWebTest {
 
 		$headers = $table->getHeaders();
 		$form->submit();
-		$headers->invalidate();
+		$this->page->waitUntilReady();
+		$headers->waitUntilStalled();
 		$table->waitUntilReady()->invalidate();
 
 		// If required, update the list of columns in problems datatable.
