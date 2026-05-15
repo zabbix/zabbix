@@ -633,7 +633,12 @@ jQuery(document).ready(function($) {
 
 				<?php if ($data['proxies_enabled']): ?>
 					for (const element of document.querySelectorAll('#test_with input')) {
-						element.disabled = false;
+						if (element.value == <?= CControllerPopupItemTest::TEST_WITH_SERVER ?>) {
+							element.disabled = <?= json_encode(!$data['user']['can_select_server_for_test']) ?>;
+						}
+						else {
+							element.disabled = false;
+						}
 					}
 
 					$('#proxyid').multiSelect('enable');

@@ -257,7 +257,8 @@ if ($data['is_item_testable']) {
 		(new CLabel(_('Test with'), 'test_with'))->addClass('js-test-with-row'),
 		(new CFormField([
 			(new CRadioButtonList('test_with', (int) $data['test_with']))
-				->addValue(_('Server'), CControllerPopupItemTest::TEST_WITH_SERVER)
+				->addValue(_('Server'), CControllerPopupItemTest::TEST_WITH_SERVER, null, null,
+					!$data['user']['can_select_server_for_test'])
 				->addValue(_('Proxy'), CControllerPopupItemTest::TEST_WITH_PROXY)
 				->setReadonly(!$data['proxies_enabled'])
 				->setModern(),
@@ -267,6 +268,7 @@ if ($data['is_item_testable']) {
 					'object_name' => 'proxies',
 					'multiple' => false,
 					'data' => $data['ms_proxy'],
+					'readonly' => !$data['proxies_enabled'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'proxies',

@@ -289,7 +289,7 @@ $host_tab
 					!$data['user']['can_select_server_for_monitoring'])
 				->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
 				->addValue(_('Proxy group'), ZBX_MONITORED_BY_PROXY_GROUP)
-				->setReadonly($host_is_discovered || $data['user']['has_preconfigured_inaccessible_proxy'])
+				->setReadonly($host_is_discovered || !$data['user']['can_edit_monitoring_by'])
 				->setModern()
 		)
 	])
@@ -300,7 +300,7 @@ $host_tab
 				'object_name' => 'proxies',
 				'multiple' => false,
 				'data' => $data['ms_proxy'],
-				'readonly' => $host_is_discovered || $data['user']['has_preconfigured_inaccessible_proxy'],
+				'readonly' => $host_is_discovered || !$data['user']['can_edit_monitoring_by'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'proxies',
@@ -320,7 +320,7 @@ $host_tab
 				'object_name' => 'proxy_groups',
 				'multiple' => false,
 				'data' => $data['ms_proxy_group'],
-				'readonly' => $host_is_discovered || $data['user']['has_preconfigured_inaccessible_proxy'],
+				'readonly' => $host_is_discovered || !$data['user']['can_edit_monitoring_by'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'proxy_groups',

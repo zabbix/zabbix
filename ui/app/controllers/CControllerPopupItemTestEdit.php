@@ -464,15 +464,26 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				$test_with = $data['test_with'];
 			}
 			else {
-				$test_with = $this->getInput('test_with', $proxyid == 0
+				$default_test_with = $proxyid == 0
+						&& CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
 					? self::TEST_WITH_SERVER
-					: self::TEST_WITH_PROXY
-				);
+					: self::TEST_WITH_PROXY;
+
+				$test_with = $this->getInput('test_with', $default_test_with);
 			}
 		}
 		else {
 			$test_with = self::TEST_WITH_SERVER;
 			$proxyid = 0;
+		}
+
+		$ms_proxy = [];
+		$ms_proxy_inaccessible = false;
+
+		if($proxyid != 0) {
+			$resolved_proxy = CProxyHelper::resolveProxyOption((int) $proxyid);
+			$ms_proxy = [$resolved_proxy];
+			$ms_proxy_inaccessible = $resolved_proxy['inaccessible'];
 		}
 
 		$this->setResponse(new CControllerResponseData([
@@ -498,13 +509,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'is_item_testable' => $this->is_item_testable,
 			'inputs' => $inputs,
 			'test_with' => $test_with,
-			'ms_proxy' => $proxyid != 0
-				? CArrayHelper::renameObjectsKeys(API::Proxy()->get([
-					'output' => ['proxyid', 'name'],
-					'proxyids' => [$proxyid]
-				]), ['proxyid' => 'id'])
-				: [],
-			'proxies_enabled' => in_array($this->item_type, $this->items_support_proxy),
+			'ms_proxy' => $ms_proxy,
+			'proxies_enabled' => in_array($this->item_type, $this->items_support_proxy) && !$ms_proxy_inaccessible,
 			'interface_address_enabled' => (array_key_exists($this->item_type, $this->items_require_interface)
 				&& $this->items_require_interface[$this->item_type]['address']
 			),
@@ -514,7 +520,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'show_snmp_form' => ($this->item_type == ITEM_TYPE_SNMP),
 			'show_warning' => $show_warning,
 			'user' => [
-				'debug_mode' => $this->getDebugMode()
+				'debug_mode' => $this->getDebugMode(),
+				'can_select_server_for_test' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
 			]
 		]));
 	}

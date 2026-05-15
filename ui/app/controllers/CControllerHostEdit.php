@@ -194,8 +194,7 @@ class CControllerHostEdit extends CController {
 				'can_edit_monitoring_by' => !$this->host['hostid']
 					|| CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING),
 				'can_select_server_for_monitoring' =>
-					CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING),
-				'has_preconfigured_inaccessible_proxy' => false
+					CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
 			]
 		];
 
@@ -318,18 +317,18 @@ class CControllerHostEdit extends CController {
 		$data['ms_proxy'] = [];
 		$data['ms_proxy_group'] = [];
 		$data['host']['assigned_proxy_name'] = '';
+		$data['host']['assigned_proxy_inaccessible'] = false;
 
-		if ($data['host']['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+		if ($this->host['hostid'] && $data['host']['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
 			$proxyid = $data['host']['proxyid'];
 
-			$proxy = $this->getProxyInfo((int) $proxyid);
+			$proxy = CProxyHelper::resolveProxyOption((int) $proxyid);
 			$data['ms_proxy'] = [$proxy];
 
-			if ($proxy['inaccessible']) {
-				$data['user']['has_preconfigured_inaccessible_proxy'] = true;
-			}
+			$data['user']['can_edit_monitoring_by'] = !$proxy['inaccessible'];
 		}
 		elseif ($data['host']['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+			$data['user']['can_edit_monitoring_by'] = true;
 			$proxy_groupid = $data['host']['proxy_groupid'];
 
 			$proxy_groups = API::ProxyGroup()->get([
@@ -342,7 +341,7 @@ class CControllerHostEdit extends CController {
 			}
 			else {
 				$data['host']['monitored_by'] = ZBX_MONITORED_BY_PROXY;
-				$data['user']['has_preconfigured_inaccessible_proxy'] = true;
+				$data['user']['can_edit_monitoring_by'] = false;
 				$data['ms_proxy'] = [
 					[
 						'id' => $proxy_groupid,
@@ -352,7 +351,7 @@ class CControllerHostEdit extends CController {
 				];
 			}
 
-			$proxy = $this->getProxyInfo((int) $data['host']['assigned_proxyid']);
+			$proxy = CProxyHelper::resolveProxyOption((int) $data['host']['assigned_proxyid']);
 
 			$data['host']['assigned_proxy_name'] = $proxy['name'];
 			$data['host']['assigned_proxy_inaccessible'] = $proxy['inaccessible'];
@@ -629,33 +628,6 @@ class CControllerHostEdit extends CController {
 			'inventory' => [],
 			'valuemaps' => [],
 			'inventory_mode' => CSettingsHelper::get(CSettingsHelper::DEFAULT_INVENTORY_MODE)
-		];
-	}
-
-	private function getProxyInfo(int $proxyid): array {
-		if ($proxyid === 0) {
-			return [];
-		}
-
-		$proxies = API::Proxy()->get([
-			'output' => ['proxyid', 'name'],
-			'proxyids' => $proxyid
-		]);
-
-		if ($proxies) {
-			$proxy = $proxies[0];
-
-			return [
-				'id' => $proxy['proxyid'],
-				'name' => $proxy['name'],
-				'inaccessible' => false
-			];
-		}
-
-		return [
-			'id' => $proxyid,
-			'name' => _('Inaccessible proxy'),
-			'inaccessible' => true
 		];
 	}
 }
