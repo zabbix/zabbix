@@ -628,7 +628,7 @@ class testDashboardsPages extends CWebTest {
 				$this->assertEquals($widget.' page kiosk', $dashboard->getWidgets()->last()->getHeaderText());
 				$this->query('xpath://button[contains(@class, '.CXPathHelper::escapeQuotes($direction).')]')
 						->one()->hoverMouse()->click();
-				$dashboard->waitntilReady();
+				$dashboard->waitUntilReady();
 			}
 		}
 
