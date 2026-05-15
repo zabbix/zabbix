@@ -604,7 +604,14 @@ class CClickHouseStorage {
 		$result_raw = file_get_contents($this->url->getUrl(), false, stream_context_create($stream_context));
 		$result = $result_raw === false ? ['exception' => error_get_last()['message']] : json_decode($result_raw, true);
 		$http_code = 500;
-		$http_response_headers = http_get_last_response_headers();
+
+		if (PHP_VERSION_ID >= 80400) {
+			$http_response_headers = http_get_last_response_headers();
+		}
+		else {
+			// The variable $http_response_header is defined only when file_get_contents succeeds.
+			$http_response_headers = $http_response_header ?? null;
+		}
 
 		// The variable $http_response_header is defined only when file_get_contents succeeds.
 		if ($http_response_headers !== null) {
