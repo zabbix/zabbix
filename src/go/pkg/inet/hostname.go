@@ -83,6 +83,7 @@ func IsRFCExtendedHostName(host string) bool {
 		case c == '_':
 			labelLen++
 			prevHyphen = false
+			isPurelyNumeric = false
 		default:
 			return false
 		}
