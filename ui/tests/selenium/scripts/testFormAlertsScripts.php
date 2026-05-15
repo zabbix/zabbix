@@ -514,7 +514,6 @@ class testFormAlertsScripts extends CWebTest {
 					'inline_errors' => [
 						'URL' => 'This field cannot be empty.'
 					]
-					// Will fail until subissue 38 fixed on main task
 				]
 			],*/
 			// #21
@@ -701,7 +700,6 @@ class testFormAlertsScripts extends CWebTest {
 				]
 			],
 			// #28
-			// Will fail until fix for subissue 41 merged
 			[
 				[
 					'expected' => TEST_BAD,
@@ -723,7 +721,6 @@ class testFormAlertsScripts extends CWebTest {
 				]
 			],
 			// #29
-			// Will fail until fix for subissue 41 merged
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1322,7 +1319,6 @@ class testFormAlertsScripts extends CWebTest {
 				]
 			],
 			// #57 URL.
-			// Will fail until fix for subissue 42 merged
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1357,7 +1353,6 @@ class testFormAlertsScripts extends CWebTest {
 				]
 			],
 			// #59
-			// Will fail until fix for subissue 42 is merged
 			[
 				[
 					'expected' => TEST_GOOD,
