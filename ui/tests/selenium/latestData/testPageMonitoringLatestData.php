@@ -696,7 +696,11 @@ class testPageMonitoringLatestData extends CWebTest {
 		// Check that subfilter remains selected after main field is cleared.
 		if (CTestArrayHelper::get($data, 'check_after_clear', false)) {
 			$table = $this->query('id:latest')->one()->asDatatable();
+			$headers = $table->getHeaders();
 			CFilterElement::find()->one()->getForm()->fill(['Name' => ''])->submit();
+
+			$this->page->waitUntilReady();
+			$headers->waitUntilStalled();
 			$table->waitUntilReady()->invalidate();
 
 			foreach ($data['subfilter']['Tag values'] as $subfilter) {
