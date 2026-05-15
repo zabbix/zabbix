@@ -125,10 +125,13 @@ static int	device_get_userid_by_uuid(const char *uuid, zbx_uint64_t *target_user
 	int			ret = FAIL;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
+	char			*uuid_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:%s", __func__, uuid);
 
-	result = zbx_db_select("select userid from device where uuid='%s'", uuid);
+	uuid_esc = zbx_db_dyn_escape_string(uuid);
+
+	result = zbx_db_select("select userid from device where uuid='%s'", uuid_esc);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -137,67 +140,34 @@ static int	device_get_userid_by_uuid(const char *uuid, zbx_uint64_t *target_user
 	}
 
 	zbx_db_free_result(result);
+	zbx_free(uuid_esc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
-static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config_comms_args_t *config_comms,
-		const char *config_adapter_url, const char *config_adapter_connect_to, char **error,
-		struct zbx_json *json)
+#if defined(HAVE_LIBCURL)
+static int	trapper_device_adapter_request(const zbx_config_comms_args_t *config_comms,
+		const char *config_adapter_url, const char *config_adapter_connect_to, const char *payload,
+		const char *request, char **body_data, struct zbx_json_parse *jp_body, char **error)
 {
-#define ZBX_ENROLL_URL_LEN		2048
-#define ZBX_BRIDGE_ENCRYPTION_KEY_LEN	256
-#define ZBX_ENROLL_TOKE_LEN		128
+	zbx_http_response_t	body = {0}, response_header = {0};
+	CURL			*curl = NULL;
+	CURLcode		err;
+	CURLoption		opt;
+	struct curl_slist	*headers = NULL, *connect_to = NULL;
+	char			*error_curl = NULL, errbuf[CURL_ERROR_SIZE];
+	long			http_code = 0;
+	int			ret = FAIL;
+	const zbx_config_tls_t	*config_tls = config_comms->config_tls;
 
-#if !defined(HAVE_LIBCURL)
-	ZBX_UNUSED(jp);
-	ZBX_UNUSED(config_comms);
-	ZBX_UNUSED(config_adapter_url);
-	ZBX_UNUSED(config_adapter_connect_to);
-	ZBX_UNUSED(error);
-	ZBX_UNUSED(json);
-
-	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
-
-	return FAIL;
-#else
-	zbx_http_response_t		body = {0}, response_header = {0};
-	CURL				*curl = NULL;
-	CURLcode			err;
-	CURLoption			opt;
-	struct curl_slist		*headers = NULL, *connect_to = NULL;
-	long				http_code = 0;
-	struct zbx_json			request;
-	struct zbx_json_parse		jp_body, jp_result, jp_bek;
-	char				*payload = NULL, *error_curl = NULL, *bek_raw = NULL, errbuf[CURL_ERROR_SIZE],
-					device_id[ZBX_UUID_LEN], met[ZBX_ENROLL_TOKE_LEN],
-					enroll_url[ZBX_ENROLL_URL_LEN], code[ZBX_BRIDGE_ERROR_CODE_LEN],
-					message[ZBX_BRIDGE_MESSAGE_LEN], error_data[ZBX_BRIDGE_MESSAGE_LEN],
-					*uuid7id = NULL;
-	int				ret = FAIL;
-	size_t				bek_len;
-	const zbx_config_tls_t		*config_tls = config_comms->config_tls;
-
-	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_body))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "missing data object in " ZBX_PROTO_VALUE_DEVICE_INIT " request");
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
-		goto out2;
-	}
-
-	if (FAIL == zbx_json_value_by_name(&jp_body, "uuid", device_id, sizeof(device_id), NULL))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "missing uuid in " ZBX_PROTO_VALUE_DEVICE_INIT " request");
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
-		goto out2;
-	}
+	*body_data = NULL;
 
 	if (NULL == (curl = curl_easy_init()))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to initialize cURL library");
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
-		goto out2;
+		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		goto out;
 	}
 
 	if (SUCCEED != zbx_http_prepare_callbacks(curl, &response_header, &body, zbx_curl_ignore_cb,
@@ -205,26 +175,13 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot prepare HTTP callbacks: %s",
 				ZBX_NULL2EMPTY_STR(error_curl));
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
-		goto out2;
+		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		goto out;
 	}
 
 	headers = curl_slist_append(headers, "Content-Type: application/json");
 	/* Will be removed, currently necessary for adapter-mock */
 	headers = curl_slist_append(headers, "X-Trace-Id: test-trace-1");
-
-	zbx_json_init(&request, 512);
-
-	zbx_json_addstring(&request, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&request, "method", ZBX_PROTO_VALUE_DEVICE_INIT, ZBX_JSON_TYPE_STRING);
-	zbx_json_addobject(&request, "params");
-	zbx_json_addstring(&request, "device_id", device_id, ZBX_JSON_TYPE_STRING);
-	zbx_json_close(&request);
-	uuid7id = zbx_gen_uuid7_hyphenated();
-	zbx_json_addstring(&request, "id", uuid7id, ZBX_JSON_TYPE_STRING);
-	zbx_json_close(&request);
-
-	payload = zbx_strdup(NULL, request.buffer);
 
 	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, config_adapter_url)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
@@ -233,19 +190,19 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT,
 					(long)ZBX_BRIDGE_ADAPTER_TIMEOUT)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: %s.", (int)opt,
+				curl_easy_strerror(err));
+		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
 		goto out;
 	}
 
 	if (NULL != config_tls->ca_file && NULL != config_tls->cert_file && NULL != config_tls->key_file)
 	{
-
 		if (SUCCEED != zbx_curl_setopt_https(curl, &error_curl))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL HTTPS options: %s",
 					ZBX_NULL2EMPTY_STR(error_curl));
-			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+			*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
 			goto out;
 		}
 
@@ -253,7 +210,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL SSL version: %s",
 					ZBX_NULL2EMPTY_STR(error_curl));
-			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+			*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
 			goto out;
 		}
 
@@ -266,9 +223,13 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
-			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+			*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
 			goto out;
 		}
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
 	}
 
 	if (NULL != config_adapter_connect_to)
@@ -278,15 +239,15 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 		if (NULL == connect_to)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to prepare CURLOPT_CONNECT_TO value");
-			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+			*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
 			goto out;
 		}
 
 		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECT_TO, connect_to)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
-				curl_easy_strerror(err));
-			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+					curl_easy_strerror(err));
+			*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
 			goto out;
 		}
 	}
@@ -302,15 +263,15 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to obtain bridge-adapter response code: %s",
 				curl_easy_strerror(err));
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
 		goto out;
 	}
 
-	if (FAIL == zbx_json_open(body.data, &jp_body))
+	if (FAIL == zbx_json_open(body.data, jp_body))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
 		goto out;
 	}
 
@@ -318,9 +279,85 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
 				ZBX_NULL2EMPTY_STR(body.data));
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
 		goto out;
 	}
+
+	*body_data = body.data;
+	body.data = NULL;
+	ret = SUCCEED;
+out:
+	curl_slist_free_all(connect_to);
+	curl_slist_free_all(headers);
+	if (NULL != curl)
+		curl_easy_cleanup(curl);
+	zbx_free(error_curl);
+	zbx_free(body.data);
+	zbx_free(response_header.data);
+
+	return ret;
+}
+
+#endif
+
+static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config_comms_args_t *config_comms,
+		const char *config_adapter_url, const char *config_adapter_connect_to, char **error,
+		struct zbx_json *json)
+{
+#define ZBX_ENROLL_URL_LEN		2048
+#define ZBX_BRIDGE_ENCRYPTION_KEY_LEN	256
+#define ZBX_ENROLL_TOKEN_LEN		128
+
+#if !defined(HAVE_LIBCURL)
+	ZBX_UNUSED(jp);
+	ZBX_UNUSED(config_comms);
+	ZBX_UNUSED(config_adapter_url);
+	ZBX_UNUSED(config_adapter_connect_to);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(json);
+
+	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
+
+	return FAIL;
+#else
+	struct zbx_json			request;
+	struct zbx_json_parse		jp_body, jp_result, jp_bek;
+	char				*body_data = NULL, *bek_raw = NULL,
+					device_id[ZBX_UUID_LEN], met[ZBX_ENROLL_TOKEN_LEN],
+					enroll_url[ZBX_ENROLL_URL_LEN], code[ZBX_BRIDGE_ERROR_CODE_LEN],
+					message[ZBX_BRIDGE_MESSAGE_LEN], error_data[ZBX_BRIDGE_MESSAGE_LEN],
+					*uuid7id = NULL;
+	int				ret = FAIL;
+	size_t				bek_len;
+
+	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_body))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "missing data object in " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+		goto out2;
+	}
+
+	if (FAIL == zbx_json_value_by_name(&jp_body, "uuid", device_id, sizeof(device_id), NULL))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "missing uuid in " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+		goto out2;
+	}
+
+	zbx_json_init(&request, 512);
+
+	zbx_json_addstring(&request, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&request, "method", ZBX_PROTO_VALUE_DEVICE_INIT, ZBX_JSON_TYPE_STRING);
+	zbx_json_addobject(&request, "params");
+	zbx_json_addstring(&request, "device_id", device_id, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(&request);
+	uuid7id = zbx_gen_uuid7_hyphenated();
+	zbx_json_addstring(&request, "id", uuid7id, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(&request);
+
+	if (SUCCEED != trapper_device_adapter_request(config_comms, config_adapter_url, config_adapter_connect_to,
+			request.buffer, ZBX_PROTO_VALUE_DEVICE_INIT, &body_data, &jp_body, error))
+		goto out;
 
 	if (SUCCEED == zbx_json_brackets_by_name(&jp_body, "error", &jp_result))
 	{
@@ -339,7 +376,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "incomplete error in bridge-adapter response body: %s",
-					ZBX_NULL2EMPTY_STR(body.data));
+					ZBX_NULL2EMPTY_STR(body_data));
 			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
 		}
 
@@ -349,7 +386,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 	if (FAIL == zbx_json_brackets_by_name(&jp_body, "result", &jp_result))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing result in bridge-adapter response body: %s",
-				ZBX_NULL2EMPTY_STR(body.data));
+				ZBX_NULL2EMPTY_STR(body_data));
 		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
 		goto out;
 	}
@@ -360,9 +397,9 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 			sizeof(enroll_url), NULL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing enrollment_token/adapter_enc_key/enroll_url in bridge-adapter"
-				" result: %s", ZBX_NULL2EMPTY_STR(body.data));
+				" result: %s", ZBX_NULL2EMPTY_STR(body_data));
 		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
-		goto out2;
+		goto out;
 	}
 
 	bek_len = (size_t)(jp_bek.end - jp_bek.start + 1);
@@ -381,12 +418,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 out:
 	zbx_json_free(&request);
 out2:
-	curl_slist_free_all(headers);
-	curl_easy_cleanup(curl);
-	zbx_free(error_curl);
-	zbx_free(payload);
-	zbx_free(body.data);
-	zbx_free(response_header.data);
+	zbx_free(body_data);
 	zbx_free(bek_raw);
 	zbx_free(uuid7id);
 
@@ -395,7 +427,7 @@ out2:
 #endif
 #undef ZBX_ENROLL_URL_LEN
 #undef ZBX_BRIDGE_ENCRYPTION_KEY_LEN
-#undef ZBX_ENROLL_TOKE_LEN
+#undef ZBX_ENROLL_TOKEN_LEN
 }
 
 /******************************************************************************
@@ -510,20 +542,13 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 
 	return FAIL;
 #else
-	zbx_http_response_t		body = {0}, response_header = {0};
-	CURL				*curl = NULL;
-	CURLcode			err;
-	CURLoption			opt;
-	struct curl_slist		*headers = NULL, *connect_to = NULL;
-	long				http_code = 0;
 	struct zbx_json			request;
 	struct zbx_json_parse		jp_body, jp_result;
-	char				*payload = NULL, *error_curl = NULL, errbuf[CURL_ERROR_SIZE],
+	char				*body_data = NULL,
 					device_id[ZBX_UUID_LEN], code[ZBX_BRIDGE_ERROR_CODE_LEN],
 					message[ZBX_BRIDGE_MESSAGE_LEN], error_data[ZBX_BRIDGE_MESSAGE_LEN],
 					*uuid7id = NULL;
 	int				ret = FAIL;
-	const zbx_config_tls_t		*config_tls = config_comms->config_tls;
 
 	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_body))
 	{
@@ -539,30 +564,10 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 		goto out2;
 	}
 
-	if (NULL == (curl = curl_easy_init()))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to initialize cURL library");
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
-		goto out2;
-	}
-
-	if (SUCCEED != zbx_http_prepare_callbacks(curl, &response_header, &body, zbx_curl_ignore_cb,
-			zbx_curl_write_cb, errbuf, &error_curl))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot prepare HTTP callbacks: %s",
-				ZBX_NULL2EMPTY_STR(error_curl));
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
-		goto out2;
-	}
-
-	headers = curl_slist_append(headers, "Content-Type: application/json");
-	/* Will be removed, currently necessary for adapter-mock */
-	headers = curl_slist_append(headers, "X-Trace-Id: test-trace-1");
-
 	zbx_json_init(&request, 512);
 
 	zbx_json_addstring(&request, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&request, "method", ZBX_PROTO_VALUE_DEVICE_OFFBOARD, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&request, "method", "device.deactivate", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&request, "params");
 	zbx_json_addstring(&request, "device_id", device_id, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&request);
@@ -570,100 +575,9 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 	zbx_json_addstring(&request, "id", uuid7id, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&request);
 
-	payload = zbx_strdup(NULL, request.buffer);
-
-	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, config_adapter_url)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, payload)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDSIZE, strlen(payload))) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT,
-					(long)ZBX_BRIDGE_ADAPTER_TIMEOUT)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: %s", (int)opt,
-				curl_easy_strerror(err));
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
+	if (SUCCEED != trapper_device_adapter_request(config_comms, config_adapter_url, config_adapter_connect_to,
+			request.buffer, ZBX_PROTO_VALUE_DEVICE_OFFBOARD, &body_data, &jp_body, error))
 		goto out;
-	}
-
-	if (SUCCEED != zbx_curl_setopt_https(curl, &error_curl))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL HTTPS options: %s",
-				ZBX_NULL2EMPTY_STR(error_curl));
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
-		goto out;
-	}
-
-	if (SUCCEED != zbx_curl_setopt_ssl_version(curl, &error_curl))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL SSL version: %s",
-				ZBX_NULL2EMPTY_STR(error_curl));
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
-		goto out;
-	}
-
-	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_tls->ca_file)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT, config_tls->cert_file)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_tls->key_file)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYHOST, 2L)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s", (int)opt,
-				curl_easy_strerror(err));
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
-		goto out;
-	}
-
-	if (NULL != config_adapter_connect_to)
-	{
-		connect_to = curl_slist_append(connect_to, config_adapter_connect_to);
-
-		if (NULL == connect_to)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to prepare CURLOPT_CONNECT_TO value");
-			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
-			goto out;
-		}
-
-		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECT_TO, connect_to)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
-				curl_easy_strerror(err));
-			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
-			goto out;
-		}
-	}
-
-	if (CURLE_OK != (err = curl_easy_perform(curl)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to bridge-adapter: %s",
-				curl_easy_strerror(err));
-		*error = zbx_strdup(NULL, "Failed connect to bridge-adapter");
-		goto out;
-	}
-
-	if (CURLE_OK != (err = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to obtain bridge-adapter response code: %s",
-				curl_easy_strerror(err));
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
-		goto out;
-	}
-
-	if (FAIL == zbx_json_open(body.data, &jp_body))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
-				ZBX_NULL2EMPTY_STR(body.data));
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
-		goto out;
-	}
-
-	if (http_code < 200 || http_code >= 300)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
-				ZBX_NULL2EMPTY_STR(body.data));
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
-		goto out;
-	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(&jp_body, "error", &jp_result))
 	{
@@ -682,7 +596,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "incomplete error in bridge-adapter response body: %s",
-					ZBX_NULL2EMPTY_STR(body.data));
+					ZBX_NULL2EMPTY_STR(body_data));
 			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
 		}
 
@@ -694,12 +608,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 out:
 	zbx_json_free(&request);
 out2:
-	curl_slist_free_all(headers);
-	curl_easy_cleanup(curl);
-	zbx_free(payload);
-	zbx_free(error_curl);
-	zbx_free(body.data);
-	zbx_free(response_header.data);
+	zbx_free(body_data);
 	zbx_free(uuid7id);
 
 	return ret;

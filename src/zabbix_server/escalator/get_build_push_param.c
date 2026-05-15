@@ -125,12 +125,15 @@ static int	push_get_target_info_by_uuid(const char *uuid, zbx_uint64_t *target_u
 	int			ret = FAIL;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
+	char			*uuid_esc;
+
+	uuid_esc = zbx_db_dyn_escape_string(uuid);
 
 	result = zbx_db_select(
 			"select d.userid,d.status"
 			" from device d"
 			" where d.uuid='%s'",
-			uuid);
+			uuid_esc);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -144,6 +147,7 @@ static int	push_get_target_info_by_uuid(const char *uuid, zbx_uint64_t *target_u
 	}
 
 	zbx_db_free_result(result);
+	zbx_free(uuid_esc);
 
 	return ret;
 }
@@ -153,6 +157,9 @@ static int	push_get_target_by_uuid(const char *uuid, zbx_push_target_t *target)
 	int			ret = FAIL;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
+	char			*uuid_esc;
+
+	uuid_esc = zbx_db_dyn_escape_string(uuid);
 
 	result = zbx_db_select(
 			"select d.push_token,dk.key_"
@@ -167,7 +174,7 @@ static int	push_get_target_by_uuid(const char *uuid, zbx_push_target_t *target)
 			" where d.uuid='%s'"
 				" and d.status=1"
 				" and d.push_token is not null",
-			ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, uuid);
+			ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, uuid_esc);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -178,6 +185,7 @@ static int	push_get_target_by_uuid(const char *uuid, zbx_push_target_t *target)
 	}
 
 	zbx_db_free_result(result);
+	zbx_free(uuid_esc);
 
 	return ret;
 }

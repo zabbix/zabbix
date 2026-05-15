@@ -65,6 +65,7 @@ static int	trapper_build_push_test_params(const char *sendto, const char *subjec
 	device_id = row[0];
 	push_token = row[1];
 	mobile_encryption_key = row[2];
+
 	zbx_json_init(&json, 1024);
 	zbx_json_addstring(&json, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, "method", "device.notify", ZBX_JSON_TYPE_STRING);
