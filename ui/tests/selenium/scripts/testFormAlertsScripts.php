@@ -1886,6 +1886,7 @@ class testFormAlertsScripts extends CWebTest {
 			$form->fill($parameters);
 			$this->query('button:'.(($scenario === 'confirmation') ? 'Test confirmation' : 'Test user input'))
 					->waitUntilClickable()->one()->click();
+			// TODO: remove sleep(1) when ZBX-27797 is fixed
 			sleep(1);
 			$dialog = COverlayDialogElement::find(1)->waitUntilReady()->one();
 			$this->assertEquals((($scenario === 'confirmation') ? 'Execution confirmation' : 'Manual input'), $dialog->getTitle());
