@@ -24,7 +24,7 @@ package inet
 // Internationalized Domain Names with multibyte UTF-8 characters will be rejected as not
 // valid (Punycode can be used).
 //
-//nolint:cyclop,gocyclo // high complexity due to host name validation, splitting not practical
+//nolint:gocognit,cyclop,gocyclo // high complexity due to host name validation, splitting not practical
 func IsRFCExtendedHostName(host string) bool {
 	// Requirements and limits for host names are defined in RFC 1035,
 	// with clarifications in RFC 1123, RFC 2181.
