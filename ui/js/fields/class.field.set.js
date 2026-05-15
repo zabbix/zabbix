@@ -322,4 +322,24 @@ class CFieldSet extends CField {
 			return getObjKey(field.getName()) == getObjKey(field_key);
 		}).some(field => field.hasChanged());
 	}
+
+	lock() {
+		let res = false;
+
+		for (const field of Object.values(this.#fields)) {
+			res = field.lock() || res;
+		}
+
+		return res;
+	}
+
+	unlock() {
+		let res = false;
+
+		for (const field of Object.values(this.#fields)) {
+			res = field.unlock() || res;
+		}
+
+		return res;
+	}
 }

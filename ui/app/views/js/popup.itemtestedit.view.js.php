@@ -260,6 +260,7 @@ window.itemtestedit_view_popup = new class {
 			get_value_button.disabled = false;
 		}
 
+		this.#form.unlock();
 		this.#overlay.unsetLoading();
 	}
 
@@ -301,7 +302,7 @@ window.itemtestedit_view_popup = new class {
 			}
 		});
 
-		this.#form.validateFieldsForAction(field_names, this.#rules_get_value)
+		this.#form.validateFieldsForAction(field_names, this.#rules_get_value, null)
 			.then((result) => {
 				if (!result) {
 					this.#unsetLoading();
@@ -319,6 +320,7 @@ window.itemtestedit_view_popup = new class {
 		this.#cleanPreviousTestResults();
 		const fields = this.#getFormFields(this.#form.findFieldByName('get_value')?.getField().checked ? true : false);
 
+		this.#form.lock();
 		this.#setLoading();
 
 		this.#form.validateSubmit(fields)

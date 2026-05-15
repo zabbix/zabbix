@@ -126,4 +126,24 @@ class CFieldMultiselect extends CField {
 		super.focusErrorField();
 		$('input[type="text"]', this._field).focus();
 	}
+
+	lock() {
+		const res = super.lock();
+
+		if (res) {
+			$(this._field).multiSelect('disable');
+		}
+
+		return res;
+	}
+
+	unlock() {
+		const res = super.lock();
+
+		if (res) {
+			$(this._field).multiSelect('enable');
+		}
+
+		return res;
+	}
 }

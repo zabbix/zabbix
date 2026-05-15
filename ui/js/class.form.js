@@ -317,13 +317,19 @@ class CForm {
 	 *
 	 * @param {Array} fields
 	 * @param {?Object} rules
+	 * @param {Boolean|?Array} lock_fields
 	 *
 	 * @returns {Promise}
 	 */
-	validateFieldsForAction(fields, rules) {
+	validateFieldsForAction(fields, rules, lock_fields = false) {
 		const validator = new CFormValidator(rules ? rules : this.#rules);
+		const values = this.getAllValues();
 
-		return validator.validateChanges(this.getAllValues(), fields)
+		if (lock_fields !== false) {
+			this.lock(lock_fields);
+		}
+
+		return validator.validateChanges(values, fields)
 			.then((result) => {
 				this.setErrors(validator.getErrors(), true);
 				this.renderErrors();
@@ -536,6 +542,38 @@ class CForm {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Function to disable fields in case they are not disabled. Must be paired with unlock.
+	 * Any field, that is disabled in such way will have attribute data-form-disabled.
+	 * Warning: Locked field values will act as disabled and won't return any values until unlocked.
+	 *
+	 * @param {?Array} field_names
+	 */
+	lock(field_names = null) {
+		const fields = field_names !== null
+			? field_names.map((name) => this.findFieldByName(name))
+			: Object.values(this.#fields);
+
+		for (const field of fields) {
+			field.lock();
+		}
+	}
+
+	/**
+	 * Function to enable fields which were disabled by lock function.
+	 *
+	 * @param {?Array} field_names
+	 */
+	unlock(field_names = null) {
+		const fields = field_names !== null
+			? field_names.map((name) => this.findFieldByName(name))
+			: Object.values(this.#fields);
+
+		for (const field of fields) {
+			field.unlock();
+		}
 	}
 
 	/**
