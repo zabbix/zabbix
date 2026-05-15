@@ -26,7 +26,7 @@ zabbix_export:
         3. You can set custom macro values and add macros with context for specific metrics following macro description.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -518,12 +518,13 @@ zabbix_export:
             label: 'Thread pools filter (exclude)'
             description: 'Filter to exclude thread pools.'
         - macro: '{$TOMCAT.PASSWORD}'
-          description: 'Password for JMX'
+          type: SECRET_TEXT
+          description: 'Tomcat JMX password.'
           config:
             type: TEXT
             priority: '2'
             label: Password
-            description: 'Password for JMX'
+            description: 'Tomcat JMX password.'
             required: 'YES'
         - macro: '{$TOMCAT.THREADS.MAX.PCT}'
           value: '75'
@@ -544,12 +545,12 @@ zabbix_export:
             label: 'Busy threads duration above threshold'
             description: 'The time during which the number of busy threads can exceed the threshold. Can be used with {#JMXNAME} as context.'
         - macro: '{$TOMCAT.USER}'
-          description: 'User for JMX'
+          description: 'Tomcat JMX user.'
           config:
             type: TEXT
             priority: '1'
             label: Username
-            description: 'User for JMX'
+            description: 'Tomcat JMX user.'
             required: 'YES'
       dashboards:
         - uuid: 330fa4902aed4d45b8747ddb2c8c7d70

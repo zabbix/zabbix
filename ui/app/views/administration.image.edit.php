@@ -70,25 +70,24 @@ $tab_view = (new CTabView())
 
 if ($data['imageid'] != null) {
 	$tab_view->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
+		(new CSubmit('', _('Update')))->addClass('js-submit'),
 		[
-			(new CSimpleButton(_('Delete')))
-				->setId('delete'),
+			(new CSimpleButton(_('Delete')))->addClass('js-delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'image.list')
 				->setArgument('imagetype', $data['imagetype'])
-			))->setId('cancel')
+			))->addClass('js-cancel')
 		]
 	));
 }
 else {
 	$tab_view->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
+		(new CSubmit('', _('Add')))->addClass('js-submit'),
 		[
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'image.list')
 				->setArgument('imagetype', $data['imagetype'])
-			))->setId('cancel')
+			))->addClass('js-cancel')
 		]
 	));
 }
