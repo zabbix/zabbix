@@ -840,7 +840,13 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
-	 * Scroll the element to the visible position.
+	 * Scroll the element to the visible position. In datatables element can be covered by the datatable-options button
+	 * or the horizontal scrollbar, and still be considered visible by Selenium. Therefore, it is possible to scroll by
+	 * the $additional_scroll amount of pixels to make sure the element is really visible.
+	 *
+	 * @param int $additional_scroll  number of px that is required to scroll after element has been scrolled into view.
+	 *
+	 * @return $this
 	 */
 	public function scrollIntoView($additional_scroll = null) {
 		CElementQuery::getDriver()->executeScript('arguments[0].scrollIntoView({behavior:\'instant\',block:\'end\',inline:\'nearest\'});',

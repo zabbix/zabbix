@@ -24,7 +24,7 @@ use Facebook\WebDriver\Exception\ElementClickInterceptedException;
 class CDatatableBehavior extends CBehavior {
 
 	/**
-	 * Table column names.
+	 * Datatable column names.
 	 *
 	 * @var array
 	 */
@@ -79,16 +79,16 @@ class CDatatableBehavior extends CBehavior {
 	}
 
 	/**
-	 * Check if values in table rows match data from data provider.
+	 * Check if values in datatable rows match data from data provider.
 	 *
-	 * @param array   $data        data array to be match with result in table
+	 * @param array   $data        data array to be match with result in datatable
 	 * @param string  $selector    datatable selector
 	 */
 	public function assertDatatableData($data = [], $selector = null) {
 		$rows = $this->getDatatable($selector)->waitUntilReady()->getRows();
 		if (!$data) {
 			$this->test->assertEquals(0, $rows->count());
-			// Check that table contain one row with text "No data found."
+			// Check that datatable contain one row with text "No data found."
 			$this->test->assertEquals('No data found', $this->test->query('class:datatable-body')->one()->getText());
 
 			return;
@@ -115,8 +115,8 @@ class CDatatableBehavior extends CBehavior {
 	/**
 	 * Check if values in datatable column match data from data provider.
 	 *
-	 * @param array   $rows        data array to be match with result in table
-	 * @param string  $field       table column name
+	 * @param array   $rows        data array to be match with result in datatable
+	 * @param string  $field       datatable column name
 	 * @param string  $selector    selector used for locating the datatable
 	 */
 	public function assertDatatableDataColumn($rows = [], $field = 'Name', $selector = self::COMMON_SELECTOR) {
@@ -198,7 +198,7 @@ class CDatatableBehavior extends CBehavior {
 	}
 
 	/**
-	 * Check the layout of datatable header settings in corrisponding table headers.
+	 * Check the layout of datatable header settings in corrisponding headers.
 	 *
 	 * @param array    $header_settings    settings in corresponding datatable headers and their parameters
 	 * @param string   $selector           datatable selector
@@ -321,7 +321,7 @@ class CDatatableBehavior extends CBehavior {
 			DBexecute('UPDATE profiles SET value_str = '.zbx_dbstr($layout).' WHERE idx = '. zbx_dbstr($idx));
 		}
 		else {
-			DBExecute('INSERT INTO profiles (profileid, userid, idx, value_str, type) VALUES '.
+			DBExecute('INSERT INTO profiles (profileid, userid, idx, value_str, type) VALUES'.
 					' (666, 1, '. zbx_dbstr($idx).', '.zbx_dbstr($layout).', 3);'
 			);
 		}
