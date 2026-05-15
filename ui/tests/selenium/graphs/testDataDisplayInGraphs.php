@@ -5626,7 +5626,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			if ($data['type'] === 'pie' && $show !== 'Host graphs') {
 				continue;
 			}
-var_dump($show_data.' => '.$count);
+var_dump($show.' => '.$count);
 			// Select the desired value in Show field, if it is not selected already.
 			$filter_form->invalidate();
 			if ($filter_form->getField('Show')->getValue() !== $show) {
