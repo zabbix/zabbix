@@ -352,9 +352,3 @@ $geomap-marker-selected-stroke: #ced7db !default;
 
 // Timeline.
 $timeline-color: #aad7f0;
-
-:root {
-	// Item Value.
-	--item-value-label-color: var(--theme-item-value-label-color, #f2f2f2);
-	--item-value-label-contrast-color: var(--theme-item-value-label-contrast-color, #1f2c33);
-}

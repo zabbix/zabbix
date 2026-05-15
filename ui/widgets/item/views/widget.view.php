@@ -102,7 +102,7 @@ else {
 	$body = new CLink($rows, $data['url']);
 
 	if ($data['bg_color'] !== '') {
-		$body->addStyle('background-color: #'.$data['bg_color'].'; color: '.getLabelColor($data['bg_color']).';');
+		$body->addStyle('background-color: #'.$data['bg_color'].'; color: '.getTextColor($data['bg_color']).';');
 	}
 }
 
@@ -223,9 +223,9 @@ function addTextFormatting(CDiv $div, array $text_data): CDiv {
  *
  * @return string
  */
-function getLabelColor(string $color): string {
+function getTextColor(string $color): string {
 	$rgb = hex2rgb($color);
 	$brightness = ($rgb[0] * 299 + $rgb[1] * 587 + $rgb[2] * 114) / 1000;
 
-	return $brightness > 128 ? 'var(--item-value-label-contrast-color)' : 'var(--item-value-label-color)';
+	return $brightness > 128 ? 'var(--text-color-on-light)' : 'var(--text-color-on-dark)';
 }
