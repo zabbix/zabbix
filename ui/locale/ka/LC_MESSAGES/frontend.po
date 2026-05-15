@@ -12200,6 +12200,11 @@ msgstr "არასწორი ელფოსტის მისამარ�
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr ""
 
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
+
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
 msgstr "არასწორი შეყვანა"
@@ -12581,6 +12586,11 @@ msgstr ""
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "არასწორი ჭდე \"%1$s\": %2$s."
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -15034,6 +15044,10 @@ msgstr "ახალი LDAP სერვერი"
 #: app/views/mfa.edit.php:149
 msgid "New MFA method"
 msgstr "ახალი MFA-ის მეთოდი"
+
+#: app/views/oauth.edit.php:242
+msgid "New OAuth"
+msgstr ""
 
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
@@ -21025,6 +21039,10 @@ msgstr ""
 msgid "Swedish (sv_SE)"
 msgstr "შვედური (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr ""
@@ -21645,6 +21663,10 @@ msgstr ""
 
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
 msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
@@ -23014,6 +23036,10 @@ msgstr ""
 
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
+msgstr ""
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
 msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
@@ -24854,6 +24880,10 @@ msgstr ""
 msgid "Widget is deprecated."
 msgstr "ვიჯეტი მოძველებულია."
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr ""
@@ -25236,6 +25266,10 @@ msgstr ""
 #: include/classes/api/services/CToken.php:402
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
+msgstr ""
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
 msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686

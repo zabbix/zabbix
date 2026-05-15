@@ -23,19 +23,26 @@ class CControllerValidateApiExists extends CController {
 	}
 
 	public static function getValidationRules(): array {
-		$api_services = ['dashboard', 'discoveryrule', 'discoveryruleprototype', 'host', 'hostgroup', 'hostprototype',
-			'httptest', 'image', 'iconmap', 'item', 'itemprototype', 'maintenance', 'mediatype', 'proxy', 'proxygroup',
-			'report', 'regexp', 'role', 'service', 'sla', 'template', 'templatedashboard', 'templategroup', 'token',
-			'user', 'usergroup', 'usermacro'
-		];
+		$api_services = ['host', 'template', 'item', 'itemprototype'];
 
 		return ['object', 'fields' => [
 			'validations' => ['objects', 'required', 'not_empty', 'fields' => [
 				'api' => ['string', 'required', 'in' => $api_services],
 				'method' => ['string', 'required', 'in' => ['get']],
 				'field' => ['string', 'required'],
-				'options' => ['array'],
-				'exclude_id' => ['integer'],
+				'options' => ['object', 'required', 'fields' => [
+					'filter' => [
+						['object', 'fields' => [
+							'name' => ['string'],
+							'host' => ['string']
+						], 'when' => ['../api', 'in' => ['host', 'template']]],
+						['object', 'fields' => [
+							'key_' => ['string', 'required', 'not_empty'],
+							'hostid' => ['id', 'required']
+						], 'when' => ['../api', 'in' => ['item', 'itemprototype']]]
+					]
+				]],
+				'exclude_id' => ['id'],
 				'error_msg' => ['string']
 			]]
 		]];
