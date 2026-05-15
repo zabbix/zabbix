@@ -732,7 +732,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		if ($kiosk_mode) {
 			$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertTrue($this->query('xpath://button[@title="Normal view"]')->exists());
+			$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent();
 		}
 
 		$this->query('id:latest')->one()->asDatatable()->waitUntilReady()->query('button', $tag['tag'].$tag['value'])
@@ -756,7 +756,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		if ($kiosk_mode) {
 			$this->query('xpath://button[@title="Normal view"]')->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
+			$this->query('xpath://button[@title="Kiosk mode"]')->waitUntilVisible();
 			$this->assertDatatableData($data);
 		}
 		else {
