@@ -240,6 +240,7 @@ class CTrend extends CApiService {
 		];
 
 		if ($options['time_from'] !== null) {
+			$options['time_from'] -= $options['time_from'] % 3600;
 			$query_must[] = [
 				'range' => [
 					'clock' => [
@@ -250,6 +251,7 @@ class CTrend extends CApiService {
 		}
 
 		if ($options['time_till'] !== null) {
+			$options['time_till'] += 3599 - $options['time_till'] % 3600;
 			$query_must[] = [
 				'range' => [
 					'clock' => [
@@ -328,6 +330,14 @@ class CTrend extends CApiService {
 		$result = $options['countOutput'] ? 0 : [];
 		$limit = $options['limit'];
 
+		if ($options['time_from'] !== null) {
+			$options['time_from'] -= $options['time_from'] % 3600;
+		}
+
+		if ($options['time_till'] !== null) {
+			$options['time_till'] += 3599 - $options['time_till'] % 3600;
+		}
+
 		foreach ($options['itemids'] as $value_type => $itemids) {
 			/** @var CClickHouseStorage $storage */
 			$storage = Manager::History()->getStorageProviderInstance($value_type);
@@ -335,10 +345,8 @@ class CTrend extends CApiService {
 				'output' => $options['output'],
 				'history' => $value_type,
 				'itemids' => array_keys($itemids),
-				'clock' => $options['time_from'] !== null ? ['ge' => $options['time_from']] : null,
-				'clock_ns' => $options['time_till'] !== null
-					? ['le' => ['clock' => $options['time_till'], 'ns' => 999999999]]
-					: null,
+				'time_from' => $options['time_from'],
+				'time_till' => $options['time_till'],
 				'countOutput' => $options['countOutput'],
 				'limit' => $limit
 			]);

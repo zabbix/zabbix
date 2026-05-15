@@ -251,7 +251,7 @@ class CClickHouseStorage {
 				'output' => ['itemid'],
 				'itemids' => array_keys($itemids),
 				'history' => $value_type,
-				'clock' => ['gt' => $time_from],
+				'clock_ns' => ['gt' => ['clock' => $time_from, 'ns' => 999999999]],
 				'limit_by' => [1, 'itemid']
 			]);
 
@@ -294,7 +294,7 @@ class CClickHouseStorage {
 				'maxValueSize' => $length,
 				'itemids' => array_keys($itemids),
 				'history' => $value_type,
-				'clock' => ['gt' => $time_from],
+				'clock_ns' => ['gt' => ['clock' => $time_from, 'ns' => 999999999]],
 				'sortfield' => ['clock'],
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit_by' => [$limit, 'itemid']
@@ -337,8 +337,10 @@ class CClickHouseStorage {
 			'output' => $fields,
 			'itemids' => [$item['itemid']],
 			'history' => $value_type,
-			'clock' => ['gt' => $time_from],
-			'clock_ns' => ['le' => ['clock' => $clock, 'ns' => $ns]],
+			'clock_ns' => [
+				'gt' => ['clock' => $time_from, 'ns' => 999999999],
+				'le' => ['clock' => $clock, 'ns' => $ns]
+			],
 			'sortfield' => ['clock_ns'],
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => 1
@@ -666,7 +668,8 @@ class CClickHouseStorage {
 		$options = array_replace([
 			'output' => ['itemid'],
 			'itemids' => null,
-			'clock' => null,
+			'time_from' => null,
+			'time_till' => null,
 			'clock_ns' => null,
 			'filter' => null,
 			'search' => null,
@@ -701,14 +704,12 @@ class CClickHouseStorage {
 				: 'itemid={pre_itemids:UInt64}';
 		}
 
-		if ($options['clock'] !== null) {
-			foreach ($options['clock'] as $op => $value) {
-				if ($value !== null) {
-					$param = 'pre_clock_'.$op;
-					$sql_parts['param']['UInt64'][$param] = $value;
-					$sql_parts['prewhere'][$param] = 'clock_ns'.self::OP[$op].'toDateTime64({'.$param.':UInt64},9)';
-				}
-			}
+		if ($options['time_from'] !== null) {
+			$options['clock_ns']['ge'] = ['clock' => $options['time_from'], 'ns' => 0];
+		}
+
+		if ($options['time_till'] !== null) {
+			$options['clock_ns']['le'] = ['clock' => $options['time_till'], 'ns' => 999999999];
 		}
 
 		if ($options['clock_ns'] !== null) {
