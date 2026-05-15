@@ -108,8 +108,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'roleid' => '',
 			'role' => [],
 			'modules_rules' => [],
-			'proxies' => $this->getEmptyAccessResult(),
-			'proxy_groups' => $this->getEmptyAccessResult(),
+			'proxies_list' => $this->buildAccessListHtml(['mode' => PROXY_MODE_DENY]),
+			'proxy_groups_list' => $this->buildAccessListHtml(['mode' => PROXY_MODE_DENY]),
 			'user_type' => '',
 			'form_refresh' => 0,
 			'action' => $this->getAction(),
@@ -174,34 +174,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 				'selectProxyGroups' => ['proxy_groupid', 'name']
 			])
 			: [];
-
-		if (!empty($data['groups'])) {
-			$limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE);
-			$db_proxies_count = API::Proxy()->get([
-				'countOutput' => true,
-				'proxy_groupids' => [0]
-			]);
-
-			$db_proxy_group_count = API::ProxyGroup()->get([
-				'countOutput' => true
-			]);
-
-			$db_proxies = API::Proxy()->get([
-				'output' => ['proxyid', 'name'],
-				'proxy_groupids' => [0],
-				'limit' => $limit
-			]);
-
-			$db_proxy_groups = API::ProxyGroup()->get([
-				'output' => ['proxy_groupid', 'name'],
-				'limit' => $limit
-			]);
-
-			$data['proxies'] = $this->resolveProxyAccess($db_proxies, $db_proxies_count, $data['groups']);
-			$data['proxy_groups'] = $this->resolveProxyGroupAccess(
-				$db_proxy_groups, $db_proxy_group_count, $data['groups']
-			);
-		}
 
 		CArrayHelper::sort($data['groups'], ['name']);
 		$data['groups'] = CArrayHelper::renameObjectsKeys($data['groups'], ['usrgrpid' => 'id']);
@@ -283,10 +255,30 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 					'grouped' => '1'
 				]
 			];
+			$data['proxies_list'] = $this->buildAccessListHtml(['mode' => PROXY_MODE_ALLOW]);
+			$data['proxy_groups_list'] = $this->buildAccessListHtml(['mode' => PROXY_MODE_ALLOW]);
 		}
 		else {
 			$data['groups_rights'] = collapseGroupRights(getHostGroupsRights($user_groups));
 			$data['templategroups_rights'] = collapseGroupRights(getTemplateGroupsRights($user_groups));
+
+			if (!empty($data['groups'])) {
+				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+
+				$db_proxies = API::Proxy()->get([
+					'output' => ['proxyid', 'name'],
+					'proxy_groupids' => 0,
+					'limit' => $limit
+				]);
+
+				$db_proxy_groups = API::ProxyGroup()->get([
+					'output' => ['proxy_groupid', 'name'],
+					'limit' => $limit
+				]);
+
+				$data['proxies_list'] = $this->getProxiesHtml($db_proxies, $data['groups']);
+				$data['proxy_groups_list'] = $this->getProxyGroupsHtml($db_proxy_groups, $data['groups']);
+			}
 		}
 
 		$data['modules'] = [];
@@ -325,30 +317,9 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		$this->setResponse($response);
 	}
 
-	protected function resolveProxyAccess(array $all_proxies, int $total_count, array $user_groups): array {
-		return $this->resolveAccess(
-			$all_proxies,
-			$total_count,
-			$user_groups,
-			'proxy_mode',
-			'proxies',
-			'proxyid'
-		);
-	}
-
-	protected function resolveProxyGroupAccess(array $all_proxy_groups, int $total_count, array $user_groups): array {
-		return $this->resolveAccess(
-			$all_proxy_groups,
-			$total_count,
-			$user_groups,
-			'proxy_group_mode',
-			'proxy_groups',
-			'proxy_groupid'
-		);
-	}
-
-	private function resolveAccess(array $all_objects, int $total_count, array $user_groups, string $mode_key,
+	private function resolveAccessList(array $all_objects, array $user_groups, string $mode_key,
 			string $object_key, string $id_key): array {
+		$show_objects_limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE);
 		$all_by_id = [];
 
 		foreach ($all_objects as $object) {
@@ -405,18 +376,61 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			];
 		}
 
+		$total_objects = count($all_objects);
+		$all_allowed = count($final_allowed_ids) === $total_objects;
+
 		return [
-			'list' => count($final_allowed_ids) === $total_count ? [] : $list,
-			'mode' => count($final_allowed_ids) === $total_count ? PROXY_MODE_ALLOW : PROXY_MODE_DENY,
-			'more' => max(0, $total_count - count($all_objects))
+			'list' => $all_allowed ? [] : $list,
+			'mode' => $all_allowed ? PROXY_MODE_ALLOW : PROXY_MODE_DENY,
+			'more' => max(0, $total_objects - $show_objects_limit)
 		];
 	}
 
-	protected function getEmptyAccessResult(): array {
-		return [
-			'list' => [],
-			'mode' => PROXY_MODE_DENY,
-			'more' => 0
-		];
+	protected function getProxiesHtml(array $all_proxies, array $user_groups): array {
+		$data = $this->resolveAccessList($all_proxies, $user_groups, 'proxy_mode', 'proxies', 'proxyid');
+		return $this->buildAccessListHtml($data);
+	}
+
+	protected function getProxyGroupsHtml(array $all_proxy_groups, array $user_groups): array {
+		$data = $this->resolveAccessList($all_proxy_groups, $user_groups, 'proxy_group_mode', 'proxy_groups',
+			'proxy_groupid');
+		return $this->buildAccessListHtml($data);
+	}
+
+	private function buildAccessListHtml($objects): array {
+		if (empty($objects['list'])) {
+			return [
+				(new CSpan(_('All')))->addClass(
+					$objects['mode'] === PROXY_MODE_ALLOW ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
+				)
+			];
+		}
+
+		$show_objects_limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE);
+		$objects_list = [];
+		$all_entities = [];
+
+		foreach ($objects['list'] as $index => $object) {
+			$object_html = $this->buildObjectBadge($object);
+
+			$all_entities[] = $object_html;
+
+			if ($index < $show_objects_limit) {
+				$objects_list[] = $object_html;
+			}
+		}
+
+		if ($objects['more'] > 0) {
+			$objects_list[] = (new CSpan(_s('+ %1$d more', $objects['more'])))
+				->addClass(ZBX_STYLE_STATUS_GREY)
+				->setHint($all_entities, ZBX_STYLE_HINTBOX_WRAP);
+		}
+
+		return $objects_list;
+	}
+	private function buildObjectBadge($object): CSpan {
+		return (new CSpan($object['name']))->addClass(
+			$object['mode'] === PROXY_MODE_ALLOW ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
+		);
 	}
 }

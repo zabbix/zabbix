@@ -402,62 +402,19 @@ if ($data['roleid']) {
 		}
 	}
 
-	$proxies_list = [];
-
-	if (empty($data['proxies']['list'])) {
-		$proxies_list[] = (new CSpan(_('All')))->addClass(
-			$data['proxies']['mode'] === PROXY_MODE_ALLOW ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-		);
-	}
-	else {
-		foreach ($data['proxies']['list'] as $proxy) {
-			$proxies_list[] = (new CSpan($proxy['name']))->addClass(
-				$proxy['mode'] === PROXY_MODE_ALLOW
-					? ZBX_STYLE_STATUS_GREEN
-					: ZBX_STYLE_STATUS_GREY
-			);
-		}
-
-		if($data['proxies']['more'] > 0) {
-			$proxies_list[] = (new CSpan(_s('+ %1$d more', $data['proxies']['more'])))
-				->addClass(ZBX_STYLE_STATUS_GREY);
-		}
-	}
-
-	$proxy_groups_list = [];
-
-	if (empty($data['proxy_groups']['list'])) {
-		$proxy_groups_list[] = (new CSpan(_('All')))->addClass(
-			$data['proxy_groups']['mode'] === PROXY_MODE_ALLOW ? ZBX_STYLE_STATUS_GREEN :ZBX_STYLE_STATUS_GREY
-		);
-	}
-	else {
-		foreach ($data['proxy_groups']['list'] as $proxy_group) {
-			$proxy_groups_list[] = (new CSpan($proxy_group['name']))->addClass(
-				$proxy_group['mode'] === PROXY_MODE_ALLOW
-					? ZBX_STYLE_STATUS_GREEN
-					: ZBX_STYLE_STATUS_GREY
-			);
-		}
-
-		if($data['proxy_groups']['more'] > 0) {
-			$proxy_groups_list[] = (new CSpan(_s('+ %1$d more', $data['proxy_groups']['more'])))
-				->addClass(ZBX_STYLE_STATUS_GREY);
-		}
-	}
-
 	$permissions_form_list
+		->addRow((new CTag('h4', true, _('User group permissions')))->addClass('input-section-header'))
 		->addRow(_('Permissions'),
 			(new CDiv($permissions_table))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		)
 		->addRow(_('Proxies'),
-			(new CDiv($proxies_list))
+			(new CDiv($data['proxies_list']))
 				->addClass('rules-status-container')
 		)
 		->addRow(_('Proxy Groups'),
-			(new CDiv($proxy_groups_list))
+			(new CDiv($data['proxy_groups_list']))
 				->addClass('rules-status-container')
 		)
 		->addInfo(_('Permissions can be assigned for user groups only.'));
