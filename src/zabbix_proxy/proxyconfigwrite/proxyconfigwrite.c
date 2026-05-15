@@ -1997,12 +1997,12 @@ static int	proxyconfig_delete_hosts(const zbx_vector_uint64_t *hostids, zbx_dbco
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid from items where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
-	zbx_db_select_uint64(sql, &itemids);
+	zbx_dbconn_select_uint64(db, sql, &itemids);
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select httptestid from httptest where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
-	zbx_db_select_uint64(sql, &httptestids);
+	zbx_dbconn_select_uint64(db, sql, &httptestids);
 
 	if (0 != httptestids.values_num)
 	{
@@ -2010,7 +2010,7 @@ static int	proxyconfig_delete_hosts(const zbx_vector_uint64_t *hostids, zbx_dbco
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select httpstepid from httpstep where");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", httptestids.values,
 				httptestids.values_num);
-		zbx_db_select_uint64(sql, &httpstepids);
+		zbx_dbconn_select_uint64(db, sql, &httpstepids);
 
 		if (0 != httpstepids.values_num)
 		{
