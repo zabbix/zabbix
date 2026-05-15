@@ -257,12 +257,15 @@ window.ceprule_operation_edit_popup = new class {
 		// Update a dependent selector view.
 		this.#setAvailableOperationOptions();
 
-		// TODO: change tags suggestions
-		// [...this.form_element.querySelectorAll('z-cep-tagsuggest')]
-		// 	.map(node => {
-		// 		node.dataset.past = value == <?= ZBX_CEP_OP_WHEN_TAGS_CORRELATED ?> ? '1' : '0';
-		// 		node.dataset.past === '0' && delete node.dataset.past;
-		// 	});
+		[...this.form_element.querySelectorAll('[is="z-cep-tagsuggest"]')]
+			.map(node => {
+				if (value == <?= ZBX_CEP_OP_WHEN_TAGS_CORRELATED ?>) {
+					node.setAttribute('disable-position-tags', '');
+				}
+				else {
+					node.removeAttribute('disable-position-tags');
+				}
+			});
 	}
 };
 
@@ -318,7 +321,11 @@ if (window.customElements.get('z-cep-tagsuggest') === undefined) {
 		}
 
 		#triggerSuggestions(value) {
-			this.#suggestions = [...this.#position_tags, ...this.#property_tags];
+			this.#suggestions = [
+				...this.hasAttribute('disable-position-tags') ? [] : this.#position_tags,
+				...this.#property_tags
+			];
+
 			this.#suggestions = !value.startsWith('$')
 				? []
 				: this.#suggestions.filter(tag => tag.startsWith(value));
