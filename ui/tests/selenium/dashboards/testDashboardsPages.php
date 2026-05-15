@@ -644,6 +644,7 @@ class testDashboardsPages extends CWebTest {
 		$dashboard->waitUntilReady();
 		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->click();
 		$this->page->waitUntilReady();
+		$dashboard->waitUntilReady();
 		$this->page->assertHeader('Dashboard for kiosk');
 	}
 
