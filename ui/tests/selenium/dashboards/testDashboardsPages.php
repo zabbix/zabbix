@@ -618,7 +618,7 @@ class testDashboardsPages extends CWebTest {
 		$this->page->waitUntilReady();
 
 		// Switch pages next/previous.
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		foreach (['btn-dashboard-kioskmode-next-page', 'btn-dashboard-kioskmode-previous-page'] as $direction) {
 			$widget_name = ($direction === 'btn-dashboard-kioskmode-next-page')
 				? ['First', 'Second', 'Third']
