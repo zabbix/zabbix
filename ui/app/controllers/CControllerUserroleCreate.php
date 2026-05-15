@@ -29,7 +29,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			['role.get', ['name' => '{name}']]
 		];
 
-		$rules = ['object', 'api_uniq' => $api_uniq, 'fields' => [
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'name' => ['db role.name', 'required', 'not_empty'],
 			'type' => ['db role.type', 'required', 'in' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN,
 				USER_TYPE_SUPER_ADMIN
@@ -94,8 +94,6 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			],
 			'form_refresh' => ['integer']
 		]];
-
-		return $rules;
 	}
 
 	protected function checkInput(): bool {

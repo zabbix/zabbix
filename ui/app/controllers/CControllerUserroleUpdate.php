@@ -31,7 +31,7 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			['role.get', ['name' => '{name}'], 'roleid']
 		];
 
-		$rules = ['object', 'api_uniq' => $api_uniq, 'fields' => [
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'roleid' => ['db role.roleid', 'required'],
 			'name' => ['db role.name', 'required', 'not_empty'],
 			'type' => ['db role.type', 'required', 'in' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN,
@@ -97,8 +97,6 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			],
 			'form_refresh' => ['integer']
 		]];
-
-		return $rules;
 	}
 
 	protected function checkInput(): bool {
