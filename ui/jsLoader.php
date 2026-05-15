@@ -118,7 +118,6 @@ $available_js = [
 	'class.coverride.js' => '',
 	'class.crangecontrol.js' => '',
 	'class.csuggest.js' => '',
-	'class.csvggraph.js' => '',
 	'class.curl.js' => '',
 	'class.form.fieldset.collapsible.js' => '',
 	'class.overlaycollection.js' => '',
@@ -176,6 +175,7 @@ $available_js = [
 	'class.field.set.js' => 'fields/',
 	'class.field.textarea.js' => 'fields/',
 	'class.field.textbox.js' => 'fields/',
+	'class.field.zcolorpicker.js' => 'fields/',
 	'class.field.zselect.js' => 'fields/',
 	'class.field.ztextarea-flexible.js' => 'fields/'
 ];
@@ -250,7 +250,8 @@ $translate_strings = [
 	'class.widget.misconfigured.js' => [
 		'Please update configuration' => _('Please update configuration'),
 		'Referred widget is unavailable' => _('Referred widget is unavailable'),
-		'Refresh interval' => _('Refresh interval')
+		'Refresh interval' => _('Refresh interval'),
+		'Widget is not fully configured' => _('Widget is not fully configured')
 	],
 	'class.widget-select.popup.js' => [
 		'Cancel' => _('Cancel'),
@@ -278,13 +279,14 @@ $translate_strings = [
 	'functions.js' => [
 		'Close' => _('Close'),
 		'Details' => _('Details'),
+		'Error message' => _('Error message'),
+		'Info message' => _('Info message'),
 		'S_YEAR_SHORT' => _x('y', 'year short'),
 		'S_MONTH_SHORT' => _x('M', 'month short'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
 		'Success message' => _('Success message'),
-		'Error message' => _('Error message'),
 		'Warning message' => _('Warning message')
 	],
 	'inputsecret.js' => [
@@ -429,8 +431,8 @@ $translate_strings = [
 		'This value cannot be one of %1$s.' => _('This value cannot be one of %1$s.'),
 		'This value cannot be %1$s.' => _('This value cannot be %1$s.'),
 		'This value must be %1$s.' => _('This value must be %1$s.'),
-		'This value must be no less than "%1$s".' => _('This value must be no less than "%1$s".'),
-		'This value must be no greater than "%1$s".' => _('This value must be no greater than "%1$s".'),
+		'Value must be less than or equal to %1$s.' => _('Value must be less than or equal to %1$s.'),
+		'Value must be greater than or equal to %1$s.' => _('Value must be greater than or equal to %1$s.'),
 		'This value must be one of %1$s.' => _('This value must be one of %1$s.'),
 		'Entry "%1$s" is not unique.' => _('Entry "%1$s" is not unique.'),
 		'within range %1$s' => _('within range %1$s'),
@@ -552,10 +554,6 @@ $translate_strings = [
 		'No interface found' => _('No interface found'),
 		'Item type does not use interface' => _('Item type does not use interface')
 	],
-	'class.csvggraph.js' => [
-		'S_MINUTE_SHORT' => _x('m', 'minute short'),
-		'Unexpected server error.' => _('Unexpected server error.')
-	],
 	'class.svggauge.js' => [
 		'No data' => _('No data')
 	],
@@ -632,6 +630,7 @@ if (empty($_GET['files'])) {
 		'class.field.set.js',
 		'class.field.textarea.js',
 		'class.field.textbox.js',
+		'class.field.zcolorpicker.js',
 		'class.field.zselect.js',
 		'class.field.ztextarea-flexible.js',
 		'class.form.js',
@@ -668,7 +667,6 @@ if (empty($_GET['files'])) {
 		'init.js',
 		'class.coverride.js',
 		'class.crangecontrol.js',
-		'class.csvggraph.js',
 		'class.dashboard.js',
 		'class.dashboard.page.js',
 		'class.dashboard.print.js',

@@ -31,7 +31,7 @@
 			});
 
 			document.getElementById('change-password-button')?.addEventListener('click', () => {
-				document.getElementById('change_password').setAttribute('value', 1);
+				document.getElementById('change_password').value = 1;
 				this.#displayPasswordChange(true);
 
 				const current_password = document.getElementById('current_password');
@@ -95,12 +95,7 @@
 			const hidden = autologout.parentElement.
 				querySelector(`input[type=hidden][name=${autologout.getAttribute('name')}]`);
 
-			if (disabled) {
-				autologout.setAttribute('disabled', '')
-			}
-			else {
-				autologout.removeAttribute('disabled')
-			}
+			autologout.disabled = disabled;
 
 			if (!hidden) {
 				const hidden_input = document.createElement('input');
@@ -146,7 +141,7 @@
 				return;
 			}
 
-			this.#setLoadingStatus(['update'])
+			this.#setLoadingStatus('js-submit');
 			clearMessages();
 			const fields = this.form.getAllValues();
 
@@ -207,31 +202,25 @@
 			addMessage(makeMessageBox('bad', messages, title)[0]);
 		}
 
-		#setLoadingStatus(loading_ids) {
+		#setLoadingStatus(loading_btn_class) {
 			this.form_element.classList.add('is-loading', 'is-loading-fadein');
 
-			[
-				document.getElementById('update')
-			].forEach(button => {
-				if (button) {
-					button.setAttribute('disabled', 'disabled');
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)')
+				.forEach(button => {
+					button.disabled = true;
 
-					if (loading_ids.includes(button.id)) {
+					if (button.classList.contains(loading_btn_class)) {
 						button.classList.add('is-loading');
 					}
-				}
-			});
+				});
 		}
 
 		#unsetLoadingStatus() {
-			[
-				document.getElementById('update')
-			].forEach(button => {
-				if (button) {
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)')
+				.forEach(button => {
 					button.classList.remove('is-loading');
-					button.removeAttribute('disabled');
-				}
-			});
+					button.disabled = false;
+				});
 
 			this.form_element.classList.remove('is-loading', 'is-loading-fadein');
 		}

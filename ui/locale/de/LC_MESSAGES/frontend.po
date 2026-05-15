@@ -1817,6 +1817,11 @@ msgstr "Mindestens ein Ausdruck muss gewählt werden."
 msgid "At least one host group or host must be selected."
 msgstr "Mindestens eine Host-Gruppe oder ein Host muss ausgewählt sein."
 
+#: app/controllers/CControllerGraphPrototypeCreate.php:116
+#: app/controllers/CControllerGraphPrototypeUpdate.php:118
+msgid "At least one item must be a prototype"
+msgstr ""
+
 #: app/controllers/CControllerMaintenanceCreate.php:57
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
 #: app/controllers/CControllerMaintenanceUpdate.php:58
@@ -2589,6 +2594,13 @@ msgid_plural "Cannot add modules: %1$s."
 msgstr[0] "Modul kann nicht hinzugefügt werden: %1$s."
 msgstr[1] "Module können nicht hinzugefügt werden: %1$s."
 
+#: app/controllers/CControllerGraphCreate.php:111
+#: app/controllers/CControllerGraphPrototypeCreate.php:121
+#: app/controllers/CControllerGraphPrototypeUpdate.php:123
+#: app/controllers/CControllerGraphUpdate.php:113
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr ""
+
 #: include/classes/api/services/CGraph.php:42
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
@@ -2634,6 +2646,10 @@ msgstr "Kann Skript nicht hinzufügen"
 #: widgets/navtree/views/navtreeitem.edit.php:72
 msgid "Cannot add submaps. Max depth reached."
 msgstr "Kann keine Unter-Karte hinzufügen. Maximale Tiefe erreicht."
+
+#: app/controllers/CControllerPopupScheduledReportSubscriptionCheck.php:85
+msgid "Cannot add subscription"
+msgstr ""
 
 #: app/controllers/CControllerTemplateCreate.php:49
 #: app/controllers/CControllerTemplateCreate.php:171
@@ -7026,6 +7042,10 @@ msgstr "Fehlende löschen"
 msgid "Delete regular expression?"
 msgstr "Regulären Ausdruck löschen?"
 
+#: app/views/js/reports.scheduledreport.edit.js.php:160
+msgid "Delete scheduled report?"
+msgstr ""
+
 #: app/views/administration.script.edit.php:389
 msgid "Delete script?"
 msgstr "Skript löschen?"
@@ -8760,6 +8780,10 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:612
+msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:609
@@ -11272,6 +11296,10 @@ msgstr "Wenn weniger als %2$s Kinderdienste den Status %1$s oder darunter haben"
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
 msgstr "Wenn weniger als %2$s der Kinderdienste den Status %1$s oder darunter haben"
+
+#: include/classes/setup/CSetupWizard.php:614
+msgid "If no port is specified, the \"Database port\" value is used."
+msgstr ""
 
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -13975,6 +14003,10 @@ msgstr ""
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Liste der Blockgeräte und ihres Typs. Rückgabe JSON"
 
+#: include/classes/data/CItemData.php:1724
+msgid "List of block devices with detailed information. Returns JSON"
+msgstr ""
+
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
 msgstr ""
@@ -13994,6 +14026,10 @@ msgstr "Liste der eingehängten Dateisysteme und ihrer Typen. Rückgabe JSON"
 #: include/classes/data/CItemData.php:1703
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr "Liste der eingehängten Dateisysteme, deren Typen, Speicherplatz und Inode-Statistiken. Rückgabe JSON"
+
+#: include/classes/data/CItemData.php:1266
+msgid "List of network interfaces with detailed information. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1109
 msgid "List of network interfaces. Returns JSON"
@@ -15626,6 +15662,10 @@ msgstr "neuer LDAP-Server"
 msgid "New MFA method"
 msgstr ""
 
+#: app/views/oauth.edit.php:254
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "Neues SLA"
@@ -15758,6 +15798,11 @@ msgstr ""
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "Neuer regulärer Ausdruck"
+
+#: app/views/js/reports.scheduledreport.edit.js.php:99
+#: app/views/reports.scheduledreport.edit.php:250
+msgid "New scheduled report"
+msgstr ""
 
 #: app/views/administration.script.edit.php:369
 #: app/views/administration.script.edit.php:409
@@ -20044,6 +20089,10 @@ msgid_plural "Scheduled reports disabled"
 msgstr[0] "Geplanter Bericht gelöscht"
 msgstr[1] "Geplante Berichte gelöscht"
 
+#: app/controllers/CControllerPopup.php:60
+msgid "Scheduled report edit"
+msgstr ""
+
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
 msgid_plural "Scheduled reports enabled"
@@ -22352,6 +22401,10 @@ msgstr ""
 
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
 msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
@@ -25182,6 +25235,18 @@ msgstr "Wertezuordnung"
 msgid "Value must be greater than %1$s."
 msgstr ""
 
+#: include/classes/validators/CFormValidator.php:1089
+#: include/classes/validators/CFormValidator.php:1147 jsLoader.php:435
+#, c-format
+msgid "Value must be greater than or equal to %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1095
+#: include/classes/validators/CFormValidator.php:1153 jsLoader.php:434
+#, c-format
+msgid "Value must be less than or equal to %1$s."
+msgstr ""
+
 #: include/classes/validators/CFormValidator.php:1033
 #: include/classes/validators/CFormValidator.php:1042
 #, c-format
@@ -25601,6 +25666,10 @@ msgstr ""
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "Widget ist veraltet."
+
+#: jsLoader.php:255
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."

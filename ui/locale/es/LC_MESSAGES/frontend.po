@@ -1815,6 +1815,11 @@ msgstr ""
 msgid "At least one host group or host must be selected."
 msgstr "Debe ser seleccionado al menos un equipo o grupo de equipos."
 
+#: app/controllers/CControllerGraphPrototypeCreate.php:116
+#: app/controllers/CControllerGraphPrototypeUpdate.php:118
+msgid "At least one item must be a prototype"
+msgstr ""
+
 #: app/controllers/CControllerMaintenanceCreate.php:57
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
 #: app/controllers/CControllerMaintenanceUpdate.php:58
@@ -2586,6 +2591,13 @@ msgid_plural "Cannot add modules: %1$s."
 msgstr[0] "No se puede añadir el módulo: %1$s."
 msgstr[1] "No se pueden agregar módulos: %1$s."
 
+#: app/controllers/CControllerGraphCreate.php:111
+#: app/controllers/CControllerGraphPrototypeCreate.php:121
+#: app/controllers/CControllerGraphPrototypeUpdate.php:123
+#: app/controllers/CControllerGraphUpdate.php:113
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr ""
+
 #: include/classes/api/services/CGraph.php:42
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
@@ -2631,6 +2643,10 @@ msgstr "No se puede añadir el comando"
 #: widgets/navtree/views/navtreeitem.edit.php:72
 msgid "Cannot add submaps. Max depth reached."
 msgstr "No pude agregar submapas. Se alcanzó la profundidad máxima."
+
+#: app/controllers/CControllerPopupScheduledReportSubscriptionCheck.php:85
+msgid "Cannot add subscription"
+msgstr ""
 
 #: app/controllers/CControllerTemplateCreate.php:49
 #: app/controllers/CControllerTemplateCreate.php:171
@@ -7012,6 +7028,10 @@ msgstr "Eliminar faltante"
 msgid "Delete regular expression?"
 msgstr "¿Desea eliminar la expresión regular?"
 
+#: app/views/js/reports.scheduledreport.edit.js.php:160
+msgid "Delete scheduled report?"
+msgstr ""
+
 #: app/views/administration.script.edit.php:389
 msgid "Delete script?"
 msgstr "¿Desea eliminar el comando?"
@@ -8741,6 +8761,10 @@ msgstr "Introduzca una cadena de identidad de clave precompartida no secreta. Ev
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:612
+msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:609
@@ -11245,6 +11269,10 @@ msgstr "Si menos de %2$s servicios dependientes tienen el estado %1$s o inferior
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
 msgstr "Si menos de %2$s de servicios dependientes tienen el estado %1$s o inferior"
+
+#: include/classes/setup/CSetupWizard.php:614
+msgid "If no port is specified, the \"Database port\" value is used."
+msgstr ""
 
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -13944,6 +13972,10 @@ msgstr "Lista de datos de configuración de grupos de proxy de Zabbix y datos en
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Lista de dispositivos de bloques y su tipo. Devuelve JSON"
 
+#: include/classes/data/CItemData.php:1724
+msgid "List of block devices with detailed information. Returns JSON"
+msgstr ""
+
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
 msgstr "Lista de caracteres"
@@ -13963,6 +13995,10 @@ msgstr "Lista de sistemas de archivos montados y sus tipos. Devuelve JSON"
 #: include/classes/data/CItemData.php:1703
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr "Lista de sistemas de archivos montados, sus tipos y estadísticas de inodos. Devuelve JSON"
+
+#: include/classes/data/CItemData.php:1266
+msgid "List of network interfaces with detailed information. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1109
 msgid "List of network interfaces. Returns JSON"
@@ -15593,6 +15629,10 @@ msgstr "Nuevo servidor LDAP"
 msgid "New MFA method"
 msgstr "Nuevo método MFA"
 
+#: app/views/oauth.edit.php:254
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "Nuevo SLA"
@@ -15725,6 +15765,11 @@ msgstr "Nuevo grupo de proxy"
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "Nueva expresión regular"
+
+#: app/views/js/reports.scheduledreport.edit.js.php:99
+#: app/views/reports.scheduledreport.edit.php:250
+msgid "New scheduled report"
+msgstr ""
 
 #: app/views/administration.script.edit.php:369
 #: app/views/administration.script.edit.php:409
@@ -20001,6 +20046,10 @@ msgid_plural "Scheduled reports disabled"
 msgstr[0] "Informe programado desactivado"
 msgstr[1] "Informes programados desactivados"
 
+#: app/controllers/CControllerPopup.php:60
+msgid "Scheduled report edit"
+msgstr ""
+
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
 msgid_plural "Scheduled reports enabled"
@@ -22301,6 +22350,10 @@ msgstr "El identificador de cliente registrado dentro del servidor de autorizaci
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
 msgstr "El secreto del cliente registrado dentro del servidor de autorización."
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -25130,6 +25183,18 @@ msgstr "Asignaciones de valor"
 msgid "Value must be greater than %1$s."
 msgstr "El valor debe ser mayor que %1$s."
 
+#: include/classes/validators/CFormValidator.php:1089
+#: include/classes/validators/CFormValidator.php:1147 jsLoader.php:435
+#, c-format
+msgid "Value must be greater than or equal to %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1095
+#: include/classes/validators/CFormValidator.php:1153 jsLoader.php:434
+#, c-format
+msgid "Value must be less than or equal to %1$s."
+msgstr ""
+
 #: include/classes/validators/CFormValidator.php:1033
 #: include/classes/validators/CFormValidator.php:1042
 #, c-format
@@ -25547,6 +25612,10 @@ msgstr "Se revertirá la configuración del widget."
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "El widget está en desuso."
+
+#: jsLoader.php:255
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."

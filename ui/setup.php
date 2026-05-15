@@ -36,7 +36,7 @@ $fields = [
 	'default_lang' =>                       [T_ZBX_STR, O_OPT, null,	null,				null],
 	'type' =>                               [T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'"'), null],
 	'server' =>                             [T_ZBX_STR, O_OPT, null,	null,				null],
-	'port' =>                               [T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Database port')],
+	'port' =>                               [T_ZBX_INT, O_OPT, null,	BETWEEN(ZBX_MIN_PORT_NUMBER, ZBX_MAX_PORT_NUMBER), null, _('Database port')],
 	'database' =>                           [T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			null, _('Database name')],
 	'user' =>                               [T_ZBX_STR, O_OPT, null,	null,				null],
 	'password' =>                           [T_ZBX_STR, O_OPT, null,	null, 				null],
@@ -78,6 +78,17 @@ $fields = [
 ];
 
 $check_fields_result = check_fields($fields, false);
+
+if ($check_fields_result && getRequest('type') === ZBX_DB_POSTGRESQL) {
+	$invalid_port = validatePostgresqlDbPorts(getRequest('server'));
+
+	if ($invalid_port !== null) {
+		error(_s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.', $invalid_port,
+			_('Database host'), ZBX_MIN_PORT_NUMBER, ZBX_MAX_PORT_NUMBER
+		));
+		$check_fields_result = false;
+	}
+}
 
 if (hasRequest('cancel') || hasRequest('finish')) {
 	redirect('index.php');

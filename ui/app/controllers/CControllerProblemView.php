@@ -147,7 +147,8 @@ class CControllerProblemView extends CControllerProblem {
 			'sort' => $filter['sort'],
 			'sortorder' => $filter['sortorder'],
 			'uncheck' => $this->hasInput('filter_reset'),
-			'page' => $this->getInput('page', 1)
+			'page' => $this->getInput('page', 1),
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
 		$response = new CControllerResponseData($data);
