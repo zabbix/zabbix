@@ -465,7 +465,7 @@ stop:
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free();
 #endif
-	zbx_dc_config_local_destroy();
+	zbx_dc_config_local_release();
 
 	zbx_supervisor_update_activity("%s [terminated]", unit_args->name);
 

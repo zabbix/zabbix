@@ -229,7 +229,7 @@ stop:
 
 	zbx_ipc_async_socket_close(&rtc);
 
-	zbx_dc_config_local_destroy();
+	zbx_dc_config_local_release();
 
 	zbx_supervisor_update_activity("%s [terminated]", unit_args->name);
 

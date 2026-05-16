@@ -779,6 +779,8 @@ void	*cep_worker_entry(void *args)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		worker->problem_export = zbx_problems_export_init("event-processor", worker->base.id);
 
+	zbx_dc_config_local_addref();
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 	zbx_supervisor_update_activity("%s running", worker->base.name);
 
@@ -838,6 +840,8 @@ void	*cep_worker_entry(void *args)
 
 	if (NULL != worker->problem_export)
 		zbx_export_deinit(worker->problem_export);
+
+	zbx_dc_config_local_release();
 
 	zbx_supervisor_update_activity("%s stopped", worker->base.name);
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped");

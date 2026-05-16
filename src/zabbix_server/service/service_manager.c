@@ -3521,6 +3521,8 @@ void	*zbx_service_manager_thread(void *args)
 	recalculate_services(&service_manager, unit_args->shared->dbpool);
 	zbx_dbconn_pool_release_connection(unit_args->shared->dbpool, db);
 
+	zbx_dc_config_local_addref();
+
 	zbx_supervisor_update_activity("%s #%d started", get_process_type_string(process_type), process_num);
 	zbx_supervisor_set_process_running(server_num);
 
@@ -3666,6 +3668,8 @@ void	*zbx_service_manager_thread(void *args)
 		if (0 == running || !ZBX_IS_RUNNING())
 			break;
 	}
+
+	zbx_dc_config_local_release();
 
 	zbx_ipc_service_close(&service);
 	service_manager_free(&service_manager);
