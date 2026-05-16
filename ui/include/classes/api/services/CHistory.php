@@ -148,6 +148,11 @@ class CHistory extends CApiService {
 				break;
 
 			case ZBX_HISTORY_SOURCE_CLICKHOUSE:
+				$value_type_ttl = Manager::History()->getValueTypesStorageTtls()[$options['history']]['value_ttl'];
+				if ($value_type_ttl !== null) {
+					$options['time_from'] = max($options['time_from'], time() - $value_type_ttl + 1);
+				}
+
 				/** @var CClickHouseStorage $storage */
 				$storage = Manager::History()->getStorageProviderInstance($options['history']);
 				$result = $storage->select($options);
