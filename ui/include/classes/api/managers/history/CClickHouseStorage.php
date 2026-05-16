@@ -243,14 +243,14 @@ class CClickHouseStorage {
 			}
 
 			if ($time_from !== null) {
-				$time_from = $time - $time_from;
+				$time_from = $time - $time_from + 1;
 			}
 
 			$resource = $this->select([
 				'output' => ['itemid'],
 				'itemids' => array_keys($itemids),
 				'history' => $value_type,
-				'clock_ns' => ['gt' => ['clock' => $time_from, 'ns' => 999999999]],
+				'time_from' => $time_from,
 				'limit_by' => [1, 'itemid']
 			]);
 
@@ -281,7 +281,7 @@ class CClickHouseStorage {
 			}
 
 			if ($time_from !== null) {
-				$time_from = $time - $time_from;
+				$time_from = $time - $time_from + 1;
 			}
 
 			$fields = array_keys(self::VALUE_TYPE_SCHEMA[$value_type]);
@@ -293,7 +293,7 @@ class CClickHouseStorage {
 				'maxValueSize' => $length,
 				'itemids' => array_keys($itemids),
 				'history' => $value_type,
-				'clock_ns' => ['gt' => ['clock' => $time_from, 'ns' => 999999999]],
+				'time_from' => $time_from,
 				'sortfield' => ['clock'],
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit_by' => [$limit, 'itemid']
@@ -336,10 +336,8 @@ class CClickHouseStorage {
 			'output' => $fields,
 			'itemids' => [$item['itemid']],
 			'history' => $value_type,
-			'clock_ns' => [
-				'gt' => ['clock' => $time_from, 'ns' => 999999999],
-				'le' => ['clock' => $clock, 'ns' => $ns]
-			],
+			'time_from' => $time_from + 1,
+			'clock_ns' => ['le' => ['clock' => $clock, 'ns' => $ns]],
 			'sortfield' => ['clock_ns'],
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => 1
