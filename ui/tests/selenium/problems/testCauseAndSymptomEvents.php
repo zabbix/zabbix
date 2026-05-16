@@ -581,7 +581,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$table = $this->getDatatable();
 		$options_button = $table->query('xpath:.//button[@title="Customize table"]')->one()->waitUntilClickable();
 		$options_button->click();
-		$options_dialog = $this->query('class:datatable-options-popup')->one()->waitUntilVisible();
+		$options_dialog = $this->query('class:datatable-options-popup')->waitUntilVisible()->one();
 		$options_dialog->query('button:Reset layout')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
 		$table->waitUntilReady()->invalidate();

@@ -101,8 +101,11 @@ class testPageTemplates extends CLegacyWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$table = $this->getDatatable();
 		$form->fill(['Name' => $name]);
+		$headers = $table->getHeaders();
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$table->waitUntilReady();
+		$this->page->waitUntilReady();
+		$headers->waitUntilStalled();
+		$table->waitUntilReady()->invalidate();
 		$table->findRow('Name', $name)->getColumn('Name')->query('link', $name)->one()->click();
 
 		$modal = COverlayDialogElement::find()->waitUntilReady()->one();
@@ -412,9 +415,11 @@ class testPageTemplates extends CLegacyWebTest {
 
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
 		$this->setTags($data['tags']);
+		$headers = $table->getHeaders();
 		$form->submit();
-		$table->waitUntilReady();
 		$this->page->waitUntilReady();
+		$headers->waitUntilStalled();
+		$table->waitUntilReady()->invalidate();
 
 		// Check that correct result displayed.
 		if (array_key_exists('absent_templates', $data)) {
