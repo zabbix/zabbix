@@ -36,6 +36,7 @@
 #include "zbxthreads.h"
 #include "zbxtime.h"
 #include "zbxcachehistory.h"
+#include "zbxexit.h"
 
 #define CEP_WORKERS_MAX		100
 #define CEP_WORKERS_DEFAULT	10

@@ -23,6 +23,7 @@
 #include "zbxlog.h"
 #include "zbx_rtc_constants.h"
 #include "zbxthreads.h"
+#include "zbxexit.h"
 
 #if defined(__linux__)
 #define ZBX_PID_FILE_TIMEOUT 20

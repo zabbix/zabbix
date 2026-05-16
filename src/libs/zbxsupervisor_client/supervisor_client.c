@@ -19,6 +19,7 @@
 #include "zbxtypes.h"
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
+#include "zbxexit.h"
 
 #define SUPERVISOR_TIMEOUT	5
 

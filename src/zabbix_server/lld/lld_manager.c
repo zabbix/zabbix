@@ -26,6 +26,7 @@
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
 #include "zbxrtc.h"
+#include "zbxexit.h"
 
 /*
  * The LLD queue is organized as a queue (rule_queue binary heap) of LLD rules,

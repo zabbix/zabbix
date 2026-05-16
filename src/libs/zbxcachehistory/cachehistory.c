@@ -37,6 +37,7 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "zbxvariant.h"
+#include "zbxexit.h"
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
 static zbx_shmem_info_t	*hc_mem = NULL;

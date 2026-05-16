@@ -22,6 +22,7 @@
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxtypes.h"
+#include "zbxexit.h"
 
 #define ZBX_PROMETHEUS_HINT_HELP	0
 #define ZBX_PROMETHEUS_HINT_TYPE	1

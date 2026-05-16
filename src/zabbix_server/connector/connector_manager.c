@@ -27,6 +27,7 @@
 #include "zbxdbhigh.h"
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
+#include "zbxexit.h"
 
 #define ZBX_CONNECTOR_MANAGER_DELAY	1
 #define ZBX_CONNECTOR_FLUSH_INTERVAL	1

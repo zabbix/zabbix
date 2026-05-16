@@ -40,6 +40,8 @@
 #	include "zbxxml.h"
 #endif
 
+#include "zbxexit.h"
+
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.
  * This data can be accessed with zbx_vmware_get_service() function and is regularly

@@ -21,39 +21,13 @@
 
 #include "zbxcommon.h"
 #include "zbxtypes.h"
+#include "zbxexit.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxstr.h"
 #endif
 
 static ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
-
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
-
-static ZBX_THREAD_LOCAL void	(*zbx_exit_impl)(int) ZBX_NORETURN = exit;
-static ZBX_THREAD_LOCAL void	(*zbx_exit_immediate_impl)(int) ZBX_NORETURN = _exit;
-
-void	zbx_set_exit(zbx_exit_cb_t exit_cb)
-{
-	zbx_exit_impl = exit_cb;
-}
-
-void	zbx_set_exit_immediate(zbx_exit_cb_t exit_cb)
-{
-	zbx_exit_immediate_impl = exit_cb;
-}
-
-void	zbx_exit(int ret)
-{
-	zbx_exit_impl(ret);
-}
-
-void	zbx_exit_immediate(int ret)
-{
-	zbx_exit_immediate_impl(ret);
-}
-
-#endif
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 

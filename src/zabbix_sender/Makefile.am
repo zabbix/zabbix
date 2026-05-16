@@ -33,7 +33,8 @@ zabbix_sender_LDADD = \
 	$(top_builddir)/src/libs/zbxip/libzbxip.a \
 	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(SENDER_LIBS)
+	$(SENDER_LIBS) \
+	$(top_builddir)/src/libs/zbxexit/libzbxexit.a
 
 zabbix_sender_LDFLAGS = $(SENDER_LDFLAGS)
 

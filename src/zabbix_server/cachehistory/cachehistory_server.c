@@ -39,6 +39,7 @@
 #include "zbxhash.h"
 #include "zbxcep_client.h"
 #include "../events/events.h"
+#include "zbxexit.h"
 
 /******************************************************************************
  *                                                                            *

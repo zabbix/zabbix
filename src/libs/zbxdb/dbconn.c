@@ -20,6 +20,7 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxexit.h"
 
 #if defined(HAVE_POSTGRESQL)
 #	define ZBX_PG_READ_ONLY	"25006"

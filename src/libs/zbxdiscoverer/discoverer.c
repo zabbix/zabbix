@@ -42,6 +42,7 @@
 #include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbxcalc.h"
+#include "zbxexit.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxpoller.h"
@@ -1306,7 +1307,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 
 	log_worker_id = worker->worker_id;
 
-	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret, NULL);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);

@@ -27,6 +27,7 @@
 #include "zbxthreads.h"
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
+#include "zbxexit.h"
 
 #define AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	(SEC_PER_MIN * 10)
 

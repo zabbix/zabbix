@@ -19,6 +19,7 @@
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "zbxshmem.h"
+#include "zbxexit.h"
 
 /*
  * The cache (zbx_vc_cache_t) is organized as a hashset of item records (zbx_vc_item_t).

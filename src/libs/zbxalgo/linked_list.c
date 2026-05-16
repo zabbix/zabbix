@@ -13,6 +13,7 @@
 **/
 
 #include "zbxalgo.h"
+#include "zbxexit.h"
 
 struct zbx_list_item_pool
 {

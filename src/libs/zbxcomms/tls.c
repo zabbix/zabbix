@@ -17,6 +17,7 @@
 #include "tls.h"
 
 #include "zbxcrypto.h"
+#include "zbxexit.h"
 
 void	zbx_psk_warn_misconfig(const char *psk_identity)
 {

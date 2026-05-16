@@ -20,6 +20,7 @@
 #include "zbxpgservice.h"
 #include "zbxtime.h"
 #include "zbxversion.h"
+#include "zbxexit.h"
 
 #define PG_GROUP_UNBALANCE_FACTOR	2
 #define PG_GROUP_UNBALANCE_LIMIT	10

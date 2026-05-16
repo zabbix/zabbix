@@ -13,6 +13,7 @@
 **/
 
 #include "zbxstr.h"
+#include "zbxexit.h"
 
 #ifdef HAVE_ICONV
 #	include <iconv.h>

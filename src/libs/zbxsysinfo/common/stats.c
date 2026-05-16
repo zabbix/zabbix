@@ -19,6 +19,7 @@
 #include "zbxtime.h"
 #include "zbxmutexs.h"
 #include "zbxthreads.h"
+#include "zbxexit.h"
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
 #	include "procstat.h"

@@ -17,6 +17,7 @@
 
 #include "zbxstr.h"
 #include "zbxexpr.h"
+#include "zbxexit.h"
 
 static ALIAS	*aliasList = NULL;
 

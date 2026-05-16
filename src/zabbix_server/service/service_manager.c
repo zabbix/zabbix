@@ -41,6 +41,7 @@
 #include "zbxthreads.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_rtc_constants.h"
+#include "zbxexit.h"
 
 ZBX_PTR_VECTOR_IMPL(service_update_ptr, zbx_service_update_t *)
 ZBX_PTR_VECTOR_IMPL(service_action_condition_ptr, zbx_service_action_condition_t *)
@@ -3485,7 +3486,6 @@ void	*zbx_service_manager_thread(void *args)
 	double				time_stat, time_idle = 0, time_now, time_flush = 0, time_cleanup = 0, sec;
 	zbx_service_manager_t		service_manager;
 	zbx_timespec_t			timeout = {1, 0};
-	sigjmp_buf			jmp_ret;
 	zbx_dbconn_t			*db;
 
 	const zbx_thread_service_manager_args	*service_manager_args_in =
@@ -3498,8 +3498,6 @@ void	*zbx_service_manager_thread(void *args)
 	zbx_set_log_component(process_title, unit_args->logger);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
-
-	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 

@@ -26,6 +26,7 @@
 #include "zbxcachehistory.h"
 #include "zbxjson.h"
 #include "zbxdbhigh.h"
+#include "zbxexit.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1

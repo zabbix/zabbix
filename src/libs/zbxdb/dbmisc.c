@@ -27,6 +27,7 @@
 #	include "zbx_dbversion_constants.h"
 #	include "zbxip.h"
 #endif
+#include "zbxexit.h"
 
 ZBX_CONST_PTR_VECTOR_IMPL(const_db_field_ptr, const zbx_db_field_t *)
 ZBX_PTR_VECTOR_IMPL(db_value_ptr, zbx_db_value_t *)

@@ -27,6 +27,7 @@
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 #include "zbxstr.h"
+#include "zbxexit.h"
 
 #if defined(HAVE_LIBCURL)
 #	include "zbxcurl.h"

@@ -20,6 +20,7 @@
 #include "zbxdb.h"
 #include "zbxnum.h"
 #include "zbxalgo.h"
+#include "zbxexit.h"
 
 static int	trigger_flag_to_resource_type(int flag)
 {

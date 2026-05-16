@@ -18,7 +18,7 @@
 
 #include "fatal.h"
 #include "sigcommon.h"
-#include <setjmp.h>
+#include "zbxexit.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #	include "zbxcomms.h"

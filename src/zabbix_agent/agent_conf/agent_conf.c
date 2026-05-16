@@ -21,6 +21,7 @@
 #ifdef _WINDOWS
 #include	"zbxparam.h"
 #endif
+#include "zbxexit.h"
 /******************************************************************************
  *                                                                            *
  * Purpose: loads aliases from configuration                                  *

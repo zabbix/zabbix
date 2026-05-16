@@ -18,6 +18,7 @@
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxtypes.h"
+#include "zbxexit.h"
 
 static ZBX_THREAD_LOCAL	zbx_ipc_socket_t	pgservice_sock;
 

@@ -39,6 +39,7 @@
 #include "zbx_expression_constants.h"
 #include "zbx_rtc_constants.h"
 #include "zbxrtc.h"
+#include "zbxexit.h"
 
 #define ZBX_AM_LOCATION_NOWHERE			0
 #define ZBX_AM_LOCATION_QUEUE			1

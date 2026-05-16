@@ -39,6 +39,7 @@
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
 #endif
+#include "zbxexit.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 
