@@ -407,7 +407,7 @@ class CClickHouseStorage {
 						? array_column($result[$itemid]['data'], 'tick', 'tick')
 						: [];
 
-					for ($tick = $_time_from - $time_from % $interval; $tick <= $time_to; $tick += $interval) {
+					for ($tick = $_time_from - $_time_from % $interval; $tick <= $time_to; $tick += $interval) {
 						if (!array_key_exists($tick, $db_ticks)) {
 							$result[$itemid]['data'][] = [
 								'itemid' => (string) $itemid,
