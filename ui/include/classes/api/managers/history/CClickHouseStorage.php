@@ -762,9 +762,13 @@ class CClickHouseStorage {
 	 * @param ?int  $options['maxValueSize']  Value max length, required.
 	 */
 	private function addQueryOutputOptions(array $sql_parts, array $options): array {
-		$value = $options['maxValueSize'] !== null && $options['history'] == ITEM_VALUE_TYPE_JSON
-			? 'substringUTF8(value_str!=\'\'?value_str:toString(value),1,'.$options['maxValueSize'].')'
-			: 'value';
+		$value = 'value';
+
+		if ($options['history'] == ITEM_VALUE_TYPE_JSON) {
+			$value = $options['maxValueSize'] !== null
+				? 'substringUTF8(value_str!=\'\'?value_str:toString(value),1,'.$options['maxValueSize'].')'
+				: 'value_str!=\'\'?value_str:toString(value)';
+		}
 
 		$fields = array_keys(self::VALUE_TYPE_SCHEMA[$options['history']]);
 		array_push($fields, 'clock', 'ns');
