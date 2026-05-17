@@ -333,23 +333,31 @@ class CTrend extends CApiService {
 	private function getFromClickHouse(array $options) {
 		$result = $options['countOutput'] ? 0 : [];
 		$limit = $options['limit'];
-
-		if ($options['time_from'] !== null) {
-			$options['time_from'] -= $options['time_from'] % 3600;
-		}
+		$time = time();
 
 		if ($options['time_till'] !== null) {
 			$options['time_till'] += 3599 - $options['time_till'] % 3600;
 		}
 
 		foreach ($options['itemids'] as $value_type => $itemids) {
+			$time_from = $options['time_from'];
+
+			$value_type_ttl = Manager::History()->getValueTypesStorageTtls()[$value_type]['value_ttl'];
+			if ($value_type_ttl !== null) {
+				$time_from = max($time_from, $time - $value_type_ttl + 1);
+			}
+
+			if ($time_from !== null && $time_from % 3600 != 0) {
+				$time_from += 3600 - $time_from % 3600;
+			}
+
 			/** @var CClickHouseStorage $storage */
 			$storage = Manager::History()->getStorageProviderInstance($value_type);
 			$values = $storage->selectTrends([
 				'output' => $options['output'],
 				'history' => $value_type,
 				'itemids' => array_keys($itemids),
-				'time_from' => $options['time_from'],
+				'time_from' => $time_from,
 				'time_till' => $options['time_till'],
 				'countOutput' => $options['countOutput'],
 				'limit' => $limit
