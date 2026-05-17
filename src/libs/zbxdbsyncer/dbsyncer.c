@@ -242,14 +242,21 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		}
 
 		if (ZBX_SYNC_MORE == sync_stats.more)
+		{
+			if (0 == running)
+				zabbix_log(LOG_LEVEL_DEBUG, "shutdown data sync in progress ...");
 			continue;
+		}
 
 		/* always check if there are values to sync when stopping */
 		if (0 == running)
 			break;
 
-		if (!ZBX_IS_RUNNING())
+		if (!ZBX_IS_RUNNING() && 0 != running)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "shutdown in progress...");
 			running = 0;
+		}
 	}
 
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
