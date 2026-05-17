@@ -1381,7 +1381,7 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
  *                                                                                     *
  ***************************************************************************************/
 void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs,
-		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats)
+		int config_history_storage_pipelines, int mode, zbx_history_sync_stats_t *stats)
 {
 /* the minimum processed item percentage of item candidates to continue synchronizing */
 #define ZBX_HC_SYNC_MIN_PCNT	10
@@ -1625,7 +1625,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs,
 			zbx_vector_item_diff_ptr_clear_ext(&item_diff, zbx_item_diff_free);
 		}
 
-		if (FAIL != ret)
+		if (FAIL != ret && mode != ZBX_HISTORY_SYNC_SKIP_TRIGGERS)
 		{
 			/* don't process trigger timers when server is shutting down */
 			if (ZBX_IS_RUNNING())
@@ -1701,9 +1701,6 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs,
 						zbx_escalation_new_ptr_free);
 				zbx_vector_escalation_new_ptr_destroy(&escalations);
 
-				// TODO move itservice handling to CEP
-				//if (ZBX_DB_OK == txn_error && NULL != events_cbs->events_update_itservices_cb)
-				//	events_cbs->events_update_itservices_cb();
 				zbx_prof_end();
 			}
 		}

@@ -180,8 +180,11 @@ double	zbx_hc_mem_pused(void);
 double	zbx_hc_mem_pused_lock(void);
 void	zbx_hc_remove_items_by_ids(zbx_vector_uint64_t *itemids);
 
+#define ZBX_HISTORY_SYNC_DEFAULT	0
+#define ZBX_HISTORY_SYNC_SKIP_TRIGGERS	1
+
 typedef void (*zbx_sync_history_cache_f)(const zbx_events_funcs_t *events_cbs,
-		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats);
+		int config_history_storage_pipelines, int mode, zbx_history_sync_stats_t *stats);
 
 int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 		zbx_sync_history_cache_f sync_history_cache_func, zbx_uint64_t history_cache_size,
