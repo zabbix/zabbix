@@ -376,6 +376,7 @@ void	*zbx_cep_manager_thread(void *args)
 	const zbx_thread_cep_manager_args_t	*cep_args = (const zbx_thread_cep_manager_args_t *)unit_args->args.args;
 	zbx_cep_manager_t			*manager;
 	zbx_vector_mw_task_ptr_t		tasks;
+	int					shutdown = 0;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -406,7 +407,7 @@ void	*zbx_cep_manager_thread(void *args)
 
 	while (1)
 	{
-		int		shutdown = 0, pending_num;
+		int		pending_num;
 		double		time_start = zbx_time();
 
 		if (STAT_INTERVAL < time_start - time_stat)
