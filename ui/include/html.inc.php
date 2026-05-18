@@ -1125,10 +1125,15 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 	}
 
 	$maintenances = implode(', ', $maintenance_names);
+	$is_suppressed_by_maintenance = $maintenances !== '' && $username === '';
 
 	return (new CButtonIcon(ZBX_ICON_EYE_OFF))
-		->addClass(($maintenances !== '' && $username === '') ? ZBX_STYLE_COLOR_WARNING : ZBX_STYLE_COLOR_ICON)
+		->addClass($is_suppressed_by_maintenance ? ZBX_STYLE_COLOR_WARNING : ZBX_STYLE_COLOR_ICON)
 		->addClass($blink ? 'js-blink' : null)
+		->setAttribute('aria-label', $is_suppressed_by_maintenance
+			? _('Suppressed by maintenance')
+			: _('Manually suppressed')
+		)
 		->setHint(
 			_s('Suppressed till: %1$s', $suppressed_till).
 			($username !== '' ? "\n"._s('Manually by: %1$s', $username) : '').

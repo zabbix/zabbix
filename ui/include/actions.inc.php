@@ -1625,7 +1625,7 @@ function makeEventActionsIcons(string $eventid, array $actions, array $users, bo
 }
 
 /**
- * Create icon with hintbox for event suppressions.
+ * Create icon with hintbox for event suppressions. These suppressions are done manually by users.
  *
  * @param array $data  Suppression data.
  *
@@ -1657,7 +1657,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButtonIc
 		$suppression['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 
 		if (array_key_exists('suppress_until', $suppression)) {
-			$icon = new CIcon(ZBX_ICON_EYE_OFF, _('Suppressed'));
+			$icon = (new CIcon(ZBX_ICON_EYE_OFF))->setAttribute('aria-label', _('Manually suppressed'));
 
 			if ($suppression['suppress_until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
 				$suppress_until = _s('Indefinitely');
@@ -1670,7 +1670,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButtonIc
 			}
 		}
 		else {
-			$icon = new CIcon(ZBX_ICON_EYE, _('Unsuppressed'));
+			$icon = (new CIcon(ZBX_ICON_EYE))->setAttribute('aria-label', _('Manually unsuppressed'));
 			$suppress_until = '';
 		}
 
@@ -1689,11 +1689,11 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButtonIc
 		);
 	}
 
-	return (new CButtonIcon(array_key_exists('suppress_until', $data['suppress_until'][0])
-		? ZBX_ICON_EYE_OFF
-		: ZBX_ICON_EYE
-	))
+	$is_suppressed = array_key_exists('suppress_until', $data['suppress_until'][0]);
+
+	return (new CButtonIcon($is_suppressed ? ZBX_ICON_EYE_OFF : ZBX_ICON_EYE))
 		->addClass(ZBX_STYLE_COLOR_ICON)
+		->setAttribute('aria-label', $is_suppressed ? _('Manually suppressed'): _('Manually unsuppressed'))
 		->setHint($table, ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL);
 }
 
@@ -2190,11 +2190,14 @@ function makeActionTableIcon(array $action, array $maintenances): ?CTag {
 
 				$action_icons[] = (new CButtonIcon(ZBX_ICON_EYE_OFF))
 					->addClass(ZBX_STYLE_COLOR_ICON)
+					->setAttribute('aria-label', _('Manually suppressed'))
 					->setHint(_s('Suppressed till: %1$s', $suppress_until), ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
-				$action_icons[] = new CIcon(ZBX_ICON_EYE, _('Unsuppressed'));
+				$action_icons[] = (new CIcon(ZBX_ICON_EYE))
+					->setAttribute('aria-label', _('Manually unsuppressed'))
+					->setAttribute('tabindex', 0);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE) {
@@ -2233,6 +2236,7 @@ function makeActionTableIcon(array $action, array $maintenances): ?CTag {
 
 				$action_icons[] = (new CButtonIcon(ZBX_ICON_EYE_OFF))
 					->addClass(ZBX_STYLE_COLOR_WARNING)
+					->setAttribute('aria-label', _('Suppressed by maintenance'))
 					->setHint(
 						_s('Suppressed till: %1$s', $suppress_until).
 						"\n".
@@ -2248,6 +2252,7 @@ function makeActionTableIcon(array $action, array $maintenances): ?CTag {
 					== ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS) {
 				$action_icons[] = (new CButtonIcon(ZBX_ICON_EYE))
 					->addClass(ZBX_STYLE_COLOR_WARNING)
+					->setAttribute('aria-label', _('Unsuppressed by maintenance'))
 					->setHint(
 						_('Unsuppressed').
 						"\n".

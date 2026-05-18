@@ -262,6 +262,15 @@
 
 	.icon {
 		border-radius: 2px;
+
+		@if $ui-transitions {
+			transition: box-shadow $ui-controls-transition-duration ease-out;
+		}
+
+		&:focus {
+			outline: none;
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
+		}
 	}
 
 	.btn-icon:not(.btn-small),
