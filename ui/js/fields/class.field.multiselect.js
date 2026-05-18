@@ -138,7 +138,7 @@ class CFieldMultiselect extends CField {
 	}
 
 	unlock() {
-		const res = super.lock();
+		const res = super.unlock();
 
 		if (res) {
 			$(this._field).multiSelect('enable');
