@@ -646,17 +646,17 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		goto out;
 	}
 
-	if (FAIL == zbx_json_open(body.data, &jp_body))
+	if (http_code < 200 || http_code >= 300)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
 				ZBX_NULL2EMPTY_STR(body.data));
 		error = zbx_strdup(NULL, "Failed to process device.notify request");
 		goto out;
 	}
 
-	if (http_code < 200 || http_code >= 300)
+	if (FAIL == zbx_json_open(body.data, &jp_body))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
+		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
 		error = zbx_strdup(NULL, "Failed to process device.notify request");
 		goto out;

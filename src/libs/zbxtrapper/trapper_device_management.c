@@ -268,17 +268,17 @@ static int	trapper_device_adapter_request(const zbx_config_comms_args_t *config_
 		goto out;
 	}
 
-	if (FAIL == zbx_json_open(body.data, jp_body))
+	if (http_code < 200 || http_code >= 300)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
 				ZBX_NULL2EMPTY_STR(body.data));
 		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
 		goto out;
 	}
 
-	if (http_code < 200 || http_code >= 300)
+	if (FAIL == zbx_json_open(body.data, jp_body))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
+		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
 		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
 		goto out;
