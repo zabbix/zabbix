@@ -244,8 +244,6 @@ window.ceprule_edit_popup = new class {
 
 		fields.operations = operations;
 
-		debugger
-
 		this.form.validateSubmit(fields)
 			.then((result) => {
 				if (!result) {

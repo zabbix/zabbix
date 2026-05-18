@@ -74,7 +74,7 @@ $form = (new CForm())
 		->addItem((new CTemplateTag('ceprule-condition-modal-template'))->addItem(
 			new CPartial('ceprule.modal.condition')
 		))
-		->addItem(new CPartial('ceprule.filter', [ // TODO: rename ceprule.filter => ceprule.conditions
+		->addItem(new CPartial('ceprule.conditions', [
 			'id' => $id_filter,
 			'filter' => $data['ceprule']['filter']
 		]))
