@@ -60,13 +60,14 @@ $SSO['CERT_STORAGE']		= 'database';
 //$SSO['SP_CERT']		= 'conf/certs/sp.crt';
 //$SSO['IDP_CERT']		= 'conf/certs/idp.crt';
 
-// Possible values true/false to enable/disable user HTTP authentication.
+// Uncomment and set to false to disable user HTTP authentication.
 //$ZBX_FEATURE_FLAGS['http_auth_enabled'] = true;
 
-// Possible values true/false to enable/disable access to Modules.
+// Uncomment and set to false to disable access to modules.
 //$ZBX_FEATURE_FLAGS['modules_config_enabled'] = true;
 
-// Possible values 'email', 'script', 'sms', 'webhook'. Can be defined one or several.
+// Uncomment and set to desired values to disable editing of specific media types.
+// Possible values: 'email', 'script', 'sms', 'webhook'. One or more values can be set.
 //$ZBX_FEATURE_FLAGS['media_type_denylist'] = [];
 
 $ZBX_SERVER_TLS['ACTIVE'] = false;
