@@ -121,32 +121,32 @@ $form = (new CForm())
 				)
 			))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		)
-		/* ->addItem([ */
-		/* 	new CLabel(_('Stop processing'), 'stop'), */
-		/* 	new CFormField((new CCheckBox('stop')) */
-		/* 		->setChecked($data['ceprule']['stop'] == ZBX_CEP_EXECUTION_STOP) */
-		/* 		->setUncheckedValue(ZBX_CEP_EXECUTION_CONTINUE) */
-		/* 	) */
-		/* ]) */
-		/* ->addItem([ */
-		/* 	(new CLabel(_('Sort order'), 'sortorder'))->setAsteriskMark(), */
-		/* 	new CFormField((new CTextBox('sortorder', $data['ceprule']['sortorder']))) */
-		/* ]) */
-		/* ->addItem([ */
-		/* 	new CLabel(_('Description'), 'description'), */
-		/* 	new CFormField( */
-		/* 		(new CTextArea('description', $data['ceprule']['description'])) */
-		/* 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH) */
-		/* 	) */
-		/* ]) */
-		/* ->addItem([ */
-		/* 	new CLabel(_('Enabled'), 'status'), */
-		/* 	new CFormField( */
-		/* 		(new CCheckBox('status', ZBX_CEP_STATUS_ENABLED)) */
-		/* 			->setChecked($data['ceprule']['status'] == ZBX_CEP_STATUS_ENABLED) */
-		/* 			->setUncheckedValue(ZBX_CEP_STATUS_DISABLED) */
-		/* 	) */
-		/* ]) */
+		->addItem([
+			new CLabel(_('Stop processing'), 'stop'),
+			new CFormField((new CCheckBox('stop'))
+				->setChecked($data['ceprule']['stop'] == ZBX_CEP_EXECUTION_STOP)
+				->setUncheckedValue(ZBX_CEP_EXECUTION_CONTINUE)
+			)
+		])
+		->addItem([
+			(new CLabel(_('Sort order'), 'sortorder'))->setAsteriskMark(),
+			new CFormField((new CTextBox('sortorder', $data['ceprule']['sortorder'])))
+		])
+		->addItem([
+			new CLabel(_('Description'), 'description'),
+			new CFormField(
+				(new CTextArea('description', $data['ceprule']['description']))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			)
+		])
+		->addItem([
+			new CLabel(_('Enabled'), 'status'),
+			new CFormField(
+				(new CCheckBox('status', ZBX_CEP_STATUS_ENABLED))
+					->setChecked($data['ceprule']['status'] == ZBX_CEP_STATUS_ENABLED)
+					->setUncheckedValue(ZBX_CEP_STATUS_DISABLED)
+			)
+		])
 	);
 
 
