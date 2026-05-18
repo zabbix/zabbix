@@ -381,20 +381,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$item['history_has_errors'] = false;
 		$item['trends_has_errors'] = false;
+		$value_type_ttl = Manager::History()->getValueTypesStorageTtls();
 
-		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
-			$value_type_ttl = Manager::History()->getValueTypesStorageTtls();
-
-			if (array_key_exists($item['value_type'], $value_type_ttl)) {
-				$hk_history = $value_type_ttl[$item['value_type']]['value_ttl'];
-				$item['history'] = $hk_history === null ? '' : convertSecondsToTimeUnits($hk_history);
-				$item['keep_history'] = $hk_history === null ? 0 : $hk_history;
-			}
-			else {
-				$hk_history = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY);
-				$item['history'] = $hk_history;
-				$item['keep_history'] = timeUnitToSeconds($hk_history);
-			}
+		if (array_key_exists($item['value_type'], $value_type_ttl)) {
+			$hk_history = $value_type_ttl[$item['value_type']]['value_ttl'];
+			$item['history'] = $hk_history === null ? '' : convertSecondsToTimeUnits($hk_history);
+			$item['keep_history'] = $hk_history === null ? 0 : $hk_history;
+		}
+		elseif (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
+			$hk_history = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY);
+			$item['history'] = $hk_history;
+			$item['keep_history'] = timeUnitToSeconds($hk_history);
 		}
 		elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
 			$item['keep_history'] = timeUnitToSeconds($item['history']);
