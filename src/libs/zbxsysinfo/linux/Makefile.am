@@ -6,6 +6,10 @@ if AGENT
 noinst_LIBRARIES += libspecsysinfo.a
 endif
 
+if TESTS
+noinst_LIBRARIES += libspecsysinfo.a
+endif
+
 if AGENT2
 noinst_LIBRARIES += libzbxagent2specsysinfo.a
 endif
