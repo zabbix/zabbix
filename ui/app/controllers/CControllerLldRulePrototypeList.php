@@ -79,6 +79,7 @@ class CControllerLldRulePrototypeList extends CController {
 	}
 
 	protected function doAction(): void {
+		$this->updateProfileSort();
 		$page = $this->getInput('page', 1);
 		$filter = $this->getFilter();
 
@@ -152,18 +153,6 @@ class CControllerLldRulePrototypeList extends CController {
 	}
 
 	protected function getFilter(): array {
-		$filter = $this->getProfileFilters();
-
-		if ($this->getInput('sort', $filter['sort']) !== $filter['sort']
-				|| $this->getInput('sortorder', $filter['sortorder']) !== $filter['sortorder']) {
-			$this->getInputs($filter, ['sort', 'sortorder']);
-			$this->updateProfileSort();
-		}
-
-		return $filter;
-	}
-
-	protected function getProfileFilters(): array {
 		$prefix = $this->getProfilePrefix();
 
 		$filter = [

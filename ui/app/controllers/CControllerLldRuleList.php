@@ -78,6 +78,9 @@ class CControllerLldRuleList extends CController {
 		elseif ($this->hasInput('filter_rst')) {
 			$this->deleteProfileFilters();
 		}
+		else {
+			$this->updateProfileSort();
+		}
 
 		$page = $this->getInput('page', 1);
 		$filter = $this->getFilter();
@@ -277,12 +280,6 @@ class CControllerLldRuleList extends CController {
 				'output' => ['groupid', 'name'],
 				'groupids' => $filter['filter_groupids']
 			]), ['groupid' => 'id']);
-		}
-
-		if ($this->getInput('sort', $filter['sort']) !== $filter['sort']
-				|| $this->getInput('sortorder', $filter['sortorder']) !== $filter['sortorder']) {
-			$this->getInputs($filter, ['sort', 'sortorder']);
-			$this->updateProfileSort();
 		}
 
 		return $filter;
