@@ -1,6 +1,14 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libzbxlogfiles.a libzbxagent2logfiles.a
+noinst_LIBRARIES =
+
+if AGENT
+noinst_LIBRARIES += libzbxlogfiles.a
+endif
+
+if AGENT2
+noinst_LIBRARIES += libzbxagent2logfiles.a
+endif
 
 libzbxlogfiles_a_SOURCES = \
 	logfiles.c logfiles.h \

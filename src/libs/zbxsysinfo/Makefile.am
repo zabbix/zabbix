@@ -25,11 +25,23 @@ SUBDIRS = \
 EXTRA_DIST = \
 	win32
 
-noinst_LIBRARIES = \
-	libzbxagentsysinfo.a \
-	libzbxproxysysinfo.a \
-	libzbxserversysinfo.a \
-	libzbxagent2sysinfo.a
+noinst_LIBRARIES =
+
+if PROXY
+noinst_LIBRARIES += libzbxproxysysinfo.a
+endif
+
+if SERVER
+noinst_LIBRARIES += libzbxserversysinfo.a
+endif
+
+if AGENT
+noinst_LIBRARIES += libzbxagentsysinfo.a
+endif
+
+if AGENT2
+noinst_LIBRARIES += libzbxagent2sysinfo.a
+endif
 
 # AGENT version of sysinfo library
 libzbxagentsysinfo_a_CFLAGS = \
