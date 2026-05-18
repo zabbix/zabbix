@@ -13814,14 +13814,14 @@ zabbix_export:
                 
                 var metrics = [
                 	['BackendServers', 'min'],
-                	['UnHealthyBackendServers', 'max'],
+                	'UnHealthyBackendServers',
                 	'BytesSent',
                 	'BytesReceived',
                 	'HttpRequests',
                 	'HttpResponses',
                 	'ActiveConnections',
-                	['ResponseTimeHttpHeader', 'max'],
-                	['ResponseTimeFirstByte', 'max'],
+                	'ResponseTimeHttpHeader',
+                	'ResponseTimeFirstByte',
                 	'BackendTimeouts',
                 	['InvalidHeaderResponses', 'sum'],
                 	'HttpResponses200',
@@ -13832,7 +13832,7 @@ zabbix_export:
                 	'HttpResponses502',
                 	'HttpResponses504',
                 	'KeepaliveConnections',
-                	['ClosedConnections', 'sum']
+                	'ClosedConnections'
                 ];
                 
                 buildMql(params['lb_id'], metrics, 'max', [['backendSetName', params['backend_set_id']]], 'groupBy(backendSetName)');
