@@ -90,7 +90,7 @@ class CProxyHelper {
 		];
 	}
 	private static function prepareAccessListData(array $all_objects, array $user_groups, string $mode_key,
-											  string $object_key, string $id_key): array {
+			string $object_key, string $id_key): array {
 		$show_objects_limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE);
 		$all_by_id = [];
 
@@ -178,8 +178,8 @@ class CProxyHelper {
 		}
 
 		if ($objects['more'] > 0) {
-			$objects_list[] = (new CSpan(_s('+ %1$d more', $objects['more'])))
-				->addClass(ZBX_STYLE_PLUS_N_MORE)
+			$objects_list[] = (new CButton('plus_more', _s('+ %1$d more', $objects['more'])))
+				->addClass(ZBX_STYLE_BTN_PLUS_MORE)
 				->setHint(
 					$all_entities,
 					ZBX_STYLE_HINTBOX_WRAP.' '.ZBX_STYLE_TAGS_WRAPPER

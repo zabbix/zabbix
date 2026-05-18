@@ -287,6 +287,10 @@ $status-red-border-color: darken(desaturate($alt-red, 10%), 9%);
 $status-yellow-bg-color: darken(desaturate($alt-yellow, 9%), 18%);
 $status-yellow-border-color: darken(desaturate($alt-yellow, 9%), 20%);
 
+$btn-plus-more: #1f2c33 !default;
+$btn-plus-more-bg-color: $white !default;
+$btn-plus-more-border-color: #acbbc2 !default;
+
 // Multiselect.
 $multiselect-selected-bg-color: #93a5af !default;
 $multiselect-disabled-bg-color: $disabled-bg-color;
