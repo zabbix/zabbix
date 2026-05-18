@@ -756,10 +756,10 @@ class CTrigger extends CTriggerGeneral {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if ((!$options['countOutput'] && array_filter([
-					$this->outputIsRequested('value', $options['output']),
-					$this->outputIsRequested('state', $options['output']),
-					$this->outputIsRequested('lastchange', $options['output']),
-					$this->outputIsRequested('error', $options['output'])
+				$this->outputIsRequested('value', $options['output']),
+				$this->outputIsRequested('state', $options['output']),
+				$this->outputIsRequested('lastchange', $options['output']),
+				$this->outputIsRequested('error', $options['output'])
 			]))
 				|| (is_array($options['filter'])
 					&& array_intersect_key($options['filter'], array_flip(['value', 'state', 'lastchange', 'error'])))
