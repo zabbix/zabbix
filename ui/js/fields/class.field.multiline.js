@@ -28,10 +28,10 @@ class CFieldMultiline extends CField {
 					return;
 				}
 
-				let overlay = overlays_stack.end()?.element;
-				overlay = overlay instanceof jQuery ? overlay[0] : overlay;
+				let element = overlays_stack.end()?.element;
+				element = element instanceof jQuery ? element[0] : element;
 
-				if (!edit_button.contains(document.activeElement) && !edit_button.contains(overlay)) {
+				if (!edit_button.contains(document.activeElement) && !edit_button.contains(element)) {
 					this.onBlur();
 				}
 			});
