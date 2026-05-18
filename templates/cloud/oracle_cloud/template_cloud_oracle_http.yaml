@@ -12499,12 +12499,12 @@ zabbix_export:
             	'AcceptedSSLHandshake',
             	'FailedSSLHandshake',
             	['FailedSSLClientCertVerify', 'sum'],
-            	'BytesReceived',
-            	'BytesSent',
-            	'PeakBandwidth',
-            	'ResponseTimeFirstByte'
+            	['BytesReceived', 'mean'],
+            	['BytesSent', 'mean'],
+            	['PeakBandwidth', 'mean'],
+            	['ResponseTimeFirstByte', 'mean']
             ];
-            buildMql(params['lb_id'], metrics, 'mean', undefined, 'groupBy(lbName)');
+            buildMql(params['lb_id'], metrics, 'max', undefined, 'groupBy(lbName)');
             
             var result = {};
             for (var i = 0, metricsLength = metrics.length; i < metricsLength; i++) {
@@ -13835,7 +13835,7 @@ zabbix_export:
                 	['ClosedConnections', 'sum']
                 ];
                 
-                buildMql(params['lb_id'], metrics, 'mean', [['backendSetName', params['backend_set_id']]], 'groupBy(backendSetName)');
+                buildMql(params['lb_id'], metrics, 'max', [['backendSetName', params['backend_set_id']]], 'groupBy(backendSetName)');
                 
                 var result = {};
                 for (var i = 0, metricsLength = metrics.length; i < metricsLength; i++) {
