@@ -153,19 +153,24 @@ $house_keeper_tab = (new CFormList())
 			->setAriaRequired()
 	);
 
-foreach ([ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC] as $storage) {
-	$value_type_storage = array_filter($data['value_type_storage'], fn($s) => $s['provider'] === $storage);
+$show_trends_hint = false;
+$trends_value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
+
+foreach ([ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC] as $storage_type) {
+	$value_type_storage = array_filter($data['value_type_storage'], static fn($s) => $s['provider'] === $storage_type);
 
 	if (!$value_type_storage) {
 		continue;
 	}
 
 	$house_keeper_tab->addRow(
-		(new CTag('p', true, match ($storage) {
+		(new CTag('p', true, match ($storage_type) {
 			ZBX_HISTORY_SOURCE_CLICKHOUSE => _s('%1$s data storage period', _('ClickHouse')),
 			ZBX_HISTORY_SOURCE_ELASTIC => _s('%1$s data storage period', _('Elasticsearch'))
 		}))->addClass('input-section-header')
 	);
+
+	$show_trends_hint = $show_trends_hint || array_intersect(array_keys($value_type_storage), $trends_value_types);
 
 	foreach ($value_type_storage as $value_type => $storage) {
 		$house_keeper_tab->addRow(
@@ -200,10 +205,8 @@ $house_keeper_tab->addRow((new CTag('h4', true, _('Trends')))->addClass('input-s
 	->addRow(
 		(new CLabel([
 			_('Data storage period'),
-			$data['value_type_storage']
-				? makeWarningIcon(
-					_('Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse.')
-				)
+			$show_trends_hint
+				? makeWarningIcon(_('Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse.'))
 				: null
 		], 'hk_trends'))
 			->setAsteriskMark(),
