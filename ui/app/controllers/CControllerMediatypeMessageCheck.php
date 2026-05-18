@@ -24,7 +24,7 @@ class CControllerMediatypeMessageCheck extends CController {
 
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
-			'type' => ['integer', 'required', 'in' => array_keys(CMediatypeHelper::getMediaTypes())],
+			'type' => ['integer', 'required', 'in' => CMediatypeHelper::getSupportedMediaTypes()],
 			'message_format' => ['integer', 'required',
 				'in' => [ZBX_MEDIA_MESSAGE_FORMAT_TEXT, ZBX_MEDIA_MESSAGE_FORMAT_HTML]
 			],

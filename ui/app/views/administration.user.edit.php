@@ -530,30 +530,32 @@ if ($data['roleid']) {
 
 	// Modules section.
 
-	$permissions_form_list->addRow(
-		(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
-	);
+	if ($data['modules_config_enabled']) {
+		$permissions_form_list->addRow(
+			(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
+		);
 
-	if (!$data['modules']) {
-		$permissions_form_list->addRow(italic(_('No enabled modules found.')));
-	}
-	else {
-		$elements = [];
-
-		foreach ($data['modules'] as $moduleid => $module_name) {
-			$elements[] = (new CSpan($module_name))->addClass(
-				array_key_exists($moduleid, $data['disabled_moduleids'])
-						|| $data['modules_rules'][$moduleid] == MODULE_STATUS_DISABLED
-					? ZBX_STYLE_STATUS_GREY
-					: ZBX_STYLE_STATUS_GREEN
-			);
+		if (!$data['modules']) {
+			$permissions_form_list->addRow(italic(_('No enabled modules found.')));
 		}
+		else {
+			$elements = [];
 
-		if ($elements) {
-			$permissions_form_list->addRow((new CDiv($elements))
-				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-				->addClass('rules-status-container')
-			);
+			foreach ($data['modules'] as $moduleid => $module_name) {
+				$elements[] = (new CSpan($module_name))->addClass(
+					array_key_exists($moduleid, $data['disabled_moduleids'])
+					|| $data['modules_rules'][$moduleid] == MODULE_STATUS_DISABLED
+						? ZBX_STYLE_STATUS_GREY
+						: ZBX_STYLE_STATUS_GREEN
+				);
+			}
+
+			if ($elements) {
+				$permissions_form_list->addRow((new CDiv($elements))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+				);
+			}
 		}
 	}
 
