@@ -137,13 +137,17 @@ zbx_add_post_js(
 	'var filterTypeSwitcher = new CViewSwitcher("filter_type", "change", '.json_encode($filter_type_visibility).');'
 );
 
-$filter_column2 = (new CFormList())
-	->addRow(new CLabel(_('Type'), $type_select->getFocusableElementId()), $type_select)
-	->addRow(_('Update interval'),
-		(new CTextBox('filter_delay', $data['filter']['filter_delay']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		'filter_delay_row'
-	)
-	->addRow(
+$filter_column2 = (new CFormGrid())
+	->addItem([
+		new CLabel(_('Type'), $type_select->getFocusableElementId()),
+		$type_select
+	])
+	->addItem([
+		new CLabel(_('Update interval'), 'filter_delay'),
+		(new CTextBox('filter_delay', $data['filter']['filter_delay']))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	])
+	->addItem([
 		new CLabel(_('Delete lost resources'), 'filter_lifetime'),
 		new CFormField([
 			(new CRadioButtonList('filter_lifetime_type', (int) $data['filter']['filter_lifetime_type']))
@@ -157,8 +161,8 @@ $filter_column2 = (new CFormList())
 				->setAttribute('disabled', $data['filter']['filter_lifetime_type'] != ZBX_LLD_DELETE_AFTER)
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 		])
-	)
-	->addRow(
+	])
+	->addItem([
 		new CLabel(_('Disable lost resources'), 'filter_enabled_lifetime'),
 		new CFormField([
 			(new CRadioButtonList('filter_enabled_lifetime_type', $data['filter']['filter_enabled_lifetime_type']))
@@ -172,31 +176,33 @@ $filter_column2 = (new CFormList())
 				->setAttribute('disabled', $data['filter']['filter_enabled_lifetime_type'] != ZBX_LLD_DISABLE_AFTER)
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 		])
-	)
-	->addRow(_('SNMP OID'),
+	])
+	->addItem([
+		new CLabel(_('SNMP OID'), 'filter_snmp_oid'),
 		(new CTextBox('filter_snmp_oid', $data['filter']['filter_snmp_oid']))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		'filter_snmp_oid_row'
-	);
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	]);
 
 if ($data['context'] === 'host') {
-	$filter_column2->addRow(_('State'),
+	$filter_column2->addItem([
+		new CLabel(_('State'), 'filter_state'),
 		(new CRadioButtonList('filter_state', (int) $data['filter']['filter_state']))
 			->addValue(_('All'), -1)
 			->addValue(_('Normal'), ITEM_STATE_NORMAL)
 			->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED)
 			->setModern(true)
-	);
+	]);
 }
 
-$filter_column2->addRow(_('Status'),
+$filter_column2->addItem([
+	new CLabel(_('Status'), 'filter_status'),
 	(new CRadioButtonList('filter_status', (int) $data['filter']['filter_status']))
 		->addValue(_('All'), -1)
 		->addValue(_('Enabled'), ITEM_STATUS_ACTIVE)
 		->addValue(_('Disabled'), ITEM_STATUS_DISABLED)
 		->setEnabled($data['context'] !== 'host' || $data['filter']['filter_state'] == -1)
 		->setModern(true)
-);
+]);
 
 $filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
