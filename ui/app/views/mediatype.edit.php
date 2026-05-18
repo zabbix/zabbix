@@ -52,7 +52,8 @@ $mediatype_form_grid = (new CFormGrid())
 					array_intersect_key(
 						CMediatypeHelper::getMediaTypes(),
 						array_flip(CMediatypeHelper::getSupportedMediaTypes())
-					)))
+					)
+				))
 				->setValue($data['type'])
 		))->setId('type-field')
 	])

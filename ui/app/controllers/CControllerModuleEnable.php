@@ -43,8 +43,8 @@ class CControllerModuleEnable extends CController {
 	protected function checkPermissions(): bool {
 		global $ZBX_FEATURE_FLAGS;
 
-		return ($ZBX_FEATURE_FLAGS['modules_config_enabled']
-			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL));
+		return $ZBX_FEATURE_FLAGS['modules_config_enabled']
+			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
 	protected function doAction(): void {
