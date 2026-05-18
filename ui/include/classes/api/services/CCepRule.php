@@ -498,7 +498,7 @@ class CCepRule extends CApiService {
 										ZBX_CEP_WINDOW_SIMPLE,
 										ZBX_CEP_WINDOW_TAG_MATCH,
 										ZBX_CEP_WINDOW_PATTERN_MATCH
-									])], 'type' => API_OBJECTS, 'flags' => $api_required | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => []],
+									])], 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => []],
 									['if' => ['field' => 'window_type', 'in' => implode(',', [
 										ZBX_CEP_WINDOW_CAUSE_SYMPTOM
 									])], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => []]
@@ -535,6 +535,7 @@ class CCepRule extends CApiService {
 									['else' => true, 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => self::getConditionValidationFields()]
 			]]
 		]];
+		$db_filter_defaults = array_intersect_key(DB::getDefaults('cep_rule'), array_flip(['evaltype', 'formula']));
 
 		foreach ($cep_rules as $i => &$cep_rule) {
 			if (!array_key_exists('filter', $cep_rule)) {
@@ -548,6 +549,8 @@ class CCepRule extends CApiService {
 
 				self::checkFilterFormula($cep_rule, '/'.($i + 1));
 			}
+
+			$cep_rule['filter'] += $db_filter_defaults + ['conditions' => []];
 		}
 		unset($cep_rule);
 	}
@@ -636,14 +639,21 @@ class CCepRule extends CApiService {
 		$is_update = $db_cep_rules !== null;
 		$api_required = $is_update ? 0x00 : API_REQUIRED;
 
-		foreach ($cep_rules as $i => &$cep_rule) {
-			if ($cep_rule['window_type'] == ZBX_CEP_WINDOW_NONE) {
-				continue;
-			}
+		self::addRequiredWindowFieldsByWindowType($cep_rules, $db_cep_rules);
 
-			if ($is_update && !array_key_exists('window', $cep_rule)
-					&& $cep_rule['window_type'] == $db_cep_rules[$cep_rule['cep_ruleid']]['window_type']) {
-				continue;
+		$db_filter_defaults = array_intersect_key(DB::getDefaults('cep_window'), array_flip(['evaltype', 'formula']));
+
+		foreach ($cep_rules as $i => &$cep_rule) {
+			if (!array_key_exists('window', $cep_rule)) {
+				if ($is_update && $cep_rule['window_type'] == $db_cep_rules[$cep_rule['cep_ruleid']]['window_type']) {
+					continue;
+				}
+				elseif ($cep_rule['window_type'] == ZBX_CEP_WINDOW_NONE) {
+					$cep_rule += ['window' => []];
+					$cep_rule['window'] += ['filter' => $db_filter_defaults + ['conditions' => []]];
+
+					continue;
+				}
 			}
 
 			$path = '/'.($i + 1).'/window';
@@ -653,39 +663,12 @@ class CCepRule extends CApiService {
 				ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
 				ZBX_CEP_WINDOW_PATTERN_MATCH
 			]);
-
-			if ($grouping_allowed && array_key_exists('window', $cep_rule)) {
-				$cep_rule['window'] += $is_update
-						&& $cep_rule['window_type'] == $db_cep_rules[$cep_rule['cep_ruleid']]['window_type']
-					? array_intersect_key($db_cep_rules[$cep_rule['cep_ruleid']]['window'],
-						array_flip(['group_by_host_group', 'group_by_host', 'group_by_tag', 'tag'])
-					)
-					: ['group_by_tag' => DB::getDefault('cep_window', 'group_by_tag')];
-			}
-
 			$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 				'duration' =>				['type' => API_TIME_UNIT, 'flags' => $api_required, 'in' => '1:'.SEC_PER_YEAR],
 				'capacity' =>				['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT64],
 				'filter' =>					$cep_rule['window_type'] == ZBX_CEP_WINDOW_TAG_MATCH
-												? ['type' => API_OBJECT, 'fields' => [
-													'evaltype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [
-																		CONDITION_EVAL_TYPE_AND_OR,
-																		CONDITION_EVAL_TYPE_AND,
-																		CONDITION_EVAL_TYPE_OR,
-																		CONDITION_EVAL_TYPE_EXPRESSION
-																	])],
-													'formula' =>	['type' => API_MULTIPLE, 'rules' => [
-																		['if' => ['field' => 'evaltype', 'in' =>implode(',', [CONDITION_EVAL_TYPE_EXPRESSION])], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_rule', 'formula')],
-																		['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_rule', 'formula')]
-													]],
-													'conditions' =>	['type' => API_MULTIPLE, 'rules' => [
-																		['if' => ['field' => 'evaltype', 'in' => implode(',', [CONDITION_EVAL_TYPE_EXPRESSION])], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['formulaid']], 'fields' => [
-																			'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
-																		] + self::getWindowConditionValidationFields()],
-																		['else' => true, 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'fields' => self::getWindowConditionValidationFields()]
-													]]
-												]]
-												: ['type' => API_OBJECT, 'fields' => [], 'unset' => true],
+												? ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []]
+												: ['type' => API_OBJECT, 'fields' => []],
 				'event_count_tag' =>		$cep_rule['window_type'] == ZBX_CEP_WINDOW_CAUSE_SYMPTOM
 												? ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('cep_window', 'event_count_tag')]
 												: ['type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window', 'event_count_tag')],
@@ -714,7 +697,35 @@ class CCepRule extends CApiService {
 			}
 
 			if (array_key_exists('filter', $cep_rule['window'])) {
-				self::checkFilterFormula($cep_rule['window'], $path);
+				if ($cep_rule['window']['filter']) {
+					$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+						'evaltype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [
+											CONDITION_EVAL_TYPE_AND_OR,
+											CONDITION_EVAL_TYPE_AND,
+											CONDITION_EVAL_TYPE_OR,
+											CONDITION_EVAL_TYPE_EXPRESSION
+										])],
+						'formula' =>	['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'evaltype', 'in' =>implode(',', [CONDITION_EVAL_TYPE_EXPRESSION])], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_rule', 'formula')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_rule', 'formula')]
+						]],
+						'conditions' =>	['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'evaltype', 'in' => implode(',', [CONDITION_EVAL_TYPE_EXPRESSION])], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['formulaid']], 'fields' => [
+												'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+											] + self::getWindowConditionValidationFields()],
+											['else' => true, 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'fields' => self::getWindowConditionValidationFields()]
+						]]
+					]];
+
+					if (!CApiInputValidator::validate($api_input_rules, $cep_rule['window']['filter'], $path.'/filter', $error)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+					}
+
+					self::checkFilterFormula($cep_rule['window'], $path);
+				}
+				else {
+					$cep_rule['window']['filter'] += $db_filter_defaults + ['conditions' => []];
+				}
 			}
 
 			if ($cep_rule['window_type'] == ZBX_CEP_WINDOW_CAUSE_SYMPTOM) {
@@ -728,6 +739,46 @@ class CCepRule extends CApiService {
 			}
 		}
 		unset($cep_rule);
+	}
+
+	private static function addRequiredWindowFieldsByWindowType(array &$cep_rules, ?array $db_cep_rules = null): void {
+		$rule_indexes = [];
+
+		foreach ($cep_rules as $i => &$cep_rule) {
+			if (!array_key_exists('window', $cep_rule)) {
+				continue;
+			}
+
+			if ($db_cep_rules !== null
+					&& $cep_rule['window_type'] == $db_cep_rules[$cep_rule['cep_ruleid']]['window_type']
+					&& in_array($cep_rule['window_type'], [
+						ZBX_CEP_WINDOW_SIMPLE,
+						ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
+						ZBX_CEP_WINDOW_PATTERN_MATCH
+					])) {
+				$rule_indexes[$cep_rule['cep_ruleid']] = $i;
+			}
+			else {
+				$cep_rule['window'] += ['group_by_tag' => DB::getDefault('cep_window', 'group_by_tag')];
+			}
+		}
+		unset($cep_rule);
+
+		if (!$rule_indexes) {
+			return;
+		}
+
+		$options = [
+			'output' => ['cep_ruleid', 'group_by_host_group', 'group_by_host', 'group_by_tag', 'tag'],
+			'filter' => ['cep_ruleid' => array_keys($rule_indexes)]
+		];
+		$resource = DBselect(DB::makeSql('cep_window', $options));
+
+		while ($row = DBfetch($resource)) {
+			$cep_rules[$rule_indexes[$row['cep_ruleid']]]['window'] += array_intersect_key($row,
+				array_flip(['group_by_host_group', 'group_by_host', 'group_by_tag', 'tag'])
+			);
+		}
 	}
 
 	private static function getWindowConditionValidationFields(): array {
@@ -769,9 +820,9 @@ class CCepRule extends CApiService {
 		}
 
 		$path .= '/filter';
-		$condition_formula_parser = new CConditionFormula();
+		$condition_formula_parser = new CConditionFormulaParser();
 		$condition_formula_parser->parse($object['filter']['formula']);
-		$constants = array_unique(array_column($condition_formula_parser->constants, 'value'));
+		$constants = array_unique(array_column($condition_formula_parser->getConstants(), 'value'));
 		$condition_formulaids = array_column($object['filter']['conditions'], 'formulaid');
 
 		foreach ($constants as $constant) {
@@ -933,44 +984,19 @@ class CCepRule extends CApiService {
 				continue;
 			}
 
-			$db_cep_rule = $db_cep_rules !== null ? $db_cep_rules[$cep_rule['cep_ruleid']] : [];
+			$upd_rule = array_intersect_key($cep_rule['filter'], array_flip(['evaltype', 'formula']));
 
-			if (!$db_cep_rule) {
-				continue;
+			if ($cep_rule['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				CConditionHelper::replaceFormulaIds($upd_rule['formula'],
+					array_column($cep_rule['filter']['conditions'], null, 'cep_conditionid')
+				);
 			}
 
-			$upd_rule = [];
-
-			if ($cep_rule['filter']) {
-				if ($cep_rule['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					CConditionHelper::replaceFormulaIds($cep_rule['filter']['formula'],
-						array_column($cep_rule['filter']['conditions'], null, 'cep_conditionid')
-					);
-
-					$upd_rule['formula'] = $cep_rule['filter']['formula'];
-				}
-				elseif ($db_cep_rule['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					$upd_rule['formula'] = $db_defaults['formula'];
-				}
-
-				if ($db_cep_rule['evaltype'] != $cep_rule['filter']['evaltype']) {
-					$upd_rule['evaltype'] = $cep_rule['filter']['evaltype'];
-				}
-			}
-			else {
-				if ($db_cep_rule['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					$upd_rule['formula'] = $db_defaults['formula'];
-				}
-
-				if ($db_cep_rule['evaltype'] != $db_defaults['evaltype']) {
-					$upd_rule['evaltype'] = $db_defaults['evaltype'];
-				}
-			}
+			$upd_rule = DB::getUpdatedValues('cep_rule', $upd_rule,
+				$db_cep_rules !== null ? $db_cep_rules[$cep_rule['cep_ruleid']]['filter'] : $db_defaults
+			);
 
 			if ($upd_rule) {
-				$cep_rule += ['filter' => []];
-				$cep_rule['filter'] = $upd_rule + $cep_rule['filter'];
-
 				$upd_rules[] = [
 					'values' => $upd_rule,
 					'where' => ['cep_ruleid' => $cep_rule['cep_ruleid']]
@@ -995,7 +1021,7 @@ class CCepRule extends CApiService {
 				continue;
 			}
 
-			$db_conditions = $db_cep_rules !== null && array_key_exists('filter', $db_cep_rules[$cep_rule['cep_ruleid']])
+			$db_conditions = $db_cep_rules !== null
 				? $db_cep_rules[$cep_rule['cep_ruleid']]['filter']['conditions']
 				: [];
 
@@ -1061,6 +1087,10 @@ class CCepRule extends CApiService {
 		}
 
 		foreach ($cep_rules as &$cep_rule) {
+			if (!array_key_exists('window', $cep_rule)) {
+				continue;
+			}
+
 			$cep_ruleid = $cep_rule['cep_ruleid'];
 
 			if ($cep_rule['window_type'] == ZBX_CEP_WINDOW_NONE) {
@@ -1068,21 +1098,19 @@ class CCepRule extends CApiService {
 					$del_windowids[] = $db_cep_rules[$cep_ruleid]['window']['cep_windowid'];
 				}
 			}
-			elseif (array_key_exists('window', $cep_rule)) {
-				if ($db_cep_rules === null || $db_cep_rules[$cep_ruleid]['window_type'] == ZBX_CEP_WINDOW_NONE) {
-					$ins_windows[] = ['cep_ruleid' => $cep_ruleid] + $cep_rule['window'];
-				}
-				else {
-					$db_window = $db_cep_rules[$cep_ruleid]['window'];
-					$cep_rule['window']['cep_windowid'] = $db_window['cep_windowid'];
-					$upd_window = DB::getUpdatedValues('cep_window', $cep_rule['window'], $db_window);
+			elseif ($db_cep_rules === null || $db_cep_rules[$cep_ruleid]['window_type'] == ZBX_CEP_WINDOW_NONE) {
+				$ins_windows[] = ['cep_ruleid' => $cep_ruleid] + $cep_rule['window'];
+			}
+			else {
+				$db_window = $db_cep_rules[$cep_ruleid]['window'];
+				$cep_rule['window']['cep_windowid'] = $db_window['cep_windowid'];
+				$upd_window = DB::getUpdatedValues('cep_window', $cep_rule['window'], $db_window);
 
-					if ($upd_window) {
-						$upd_windows[] = [
-							'values' => $upd_window,
-							'where' => ['cep_windowid' => $db_window['cep_windowid']]
-						];
-					}
+				if ($upd_window) {
+					$upd_windows[] = [
+						'values' => $upd_window,
+						'where' => ['cep_windowid' => $db_window['cep_windowid']]
+					];
 				}
 			}
 		}
@@ -1102,7 +1130,12 @@ class CCepRule extends CApiService {
 		}
 
 		foreach ($cep_rules as &$cep_rule) {
-			if (array_key_exists('window', $cep_rule) && !array_key_exists('cep_windowid', $cep_rule['window'])) {
+			if (!array_key_exists('window', $cep_rule)) {
+				continue;
+			}
+
+			if ($cep_rule['window_type'] != ZBX_CEP_WINDOW_NONE
+					&& !array_key_exists('cep_windowid', $cep_rule['window'])) {
 				$cep_rule['window']['cep_windowid'] = array_shift($windowids);
 			}
 		}
@@ -1115,13 +1148,8 @@ class CCepRule extends CApiService {
 		$db_defaults = DB::getDefaults('cep_window');
 
 		foreach ($cep_rules as &$cep_rule) {
-			if (!array_key_exists('window', $cep_rule)) {
-				continue;
-			}
-
-			$db_cep_rule = $db_cep_rules[$cep_rule['cep_ruleid']];
-
-			if ($cep_rule['window_type'] == $db_cep_rule['window_type']) {
+			if (!array_key_exists('window', $cep_rule)
+					|| $cep_rule['window_type'] == $db_cep_rules[$cep_rule['cep_ruleid']]['window_type']) {
 				continue;
 			}
 
@@ -1156,54 +1184,30 @@ class CCepRule extends CApiService {
 	private static function updateWindowFilter(array &$cep_rules, ?array $db_cep_rules = null): void {
 		self::updateWindowFilterConditions($cep_rules, $db_cep_rules);
 
-		$db_defaults = DB::getDefaults('cep_window');
+		$db_filter_defaults = array_intersect_key(DB::getDefaults('cep_window'), array_flip(['evaltype', 'formula']));
 		$upd_windows = [];
 
 		foreach ($cep_rules as &$cep_rule) {
-			if (!array_key_exists('window', $cep_rule)) {
+			if ($cep_rule['window_type'] == ZBX_CEP_WINDOW_NONE
+					|| !array_key_exists('window', $cep_rule) || !array_key_exists('filter', $cep_rule['window'])) {
 				continue;
 			}
 
-			$db_window = $db_cep_rules !== null && array_key_exists('window', $db_cep_rules[$cep_rule['cep_ruleid']])
-				? $db_cep_rules[$cep_rule['cep_ruleid']]['window']
-				: [];
+			$upd_window = array_intersect_key($cep_rule['window']['filter'], array_flip(['evaltype', 'formula']));
 
-			if (!$db_window) {
-				continue;
+			if ($cep_rule['window']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				CConditionHelper::replaceFormulaIds($upd_window['formula'],
+					array_column($cep_rule['window']['filter']['conditions'], null, 'cep_window_conditionid')
+				);
 			}
 
-			$upd_window = [];
-
-			if (array_key_exists('filter', $cep_rule['window'])) {
-				if ($cep_rule['window']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					CConditionHelper::replaceFormulaIds($cep_rule['window']['filter']['formula'],
-						array_column($cep_rule['window']['filter']['conditions'], null, 'cep_conditionid')
-					);
-
-					$upd_window['formula'] = $cep_rule['window']['filter']['formula'];
-				}
-				elseif ($db_window['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					$upd_window['formula'] = $db_defaults['formula'];
-				}
-
-				if ($db_window['evaltype'] != $cep_rule['window']['filter']['evaltype']) {
-					$upd_window['evaltype'] = $cep_rule['window']['filter']['evaltype'];
-				}
-			}
-			else {
-				if ($db_window['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					$upd_window['formula'] = $db_defaults['formula'];
-				}
-
-				if ($db_window['evaltype'] != $db_defaults['evaltype']) {
-					$upd_window['evaltype'] = $db_defaults['evaltype'];
-				}
-			}
+			$upd_window = DB::getUpdatedValues('cep_window', $upd_window,
+				$db_cep_rules !== null && $db_cep_rules[$cep_rule['cep_ruleid']]['window_type'] != ZBX_CEP_WINDOW_NONE
+					? $db_cep_rules[$cep_rule['cep_ruleid']]['window']
+					: $db_filter_defaults
+			);
 
 			if ($upd_window) {
-				$cep_rule['window'] += ['filter' => []];
-				$cep_rule['window']['filter'] = $upd_window + $cep_rule['window']['filter'];
-
 				$upd_windows[] = [
 					'values' => $upd_window,
 					'where' => ['cep_windowid' => $cep_rule['window']['cep_windowid']]
@@ -1485,11 +1489,11 @@ class CCepRule extends CApiService {
 
 		self::checkDuplicates($cep_rules, $db_cep_rules);
 
-		self::addAffectedObjects($cep_rules, $db_cep_rules);
-
 		self::validateFilter($cep_rules);
 		self::validateWindow($cep_rules, $db_cep_rules);
 		self::validateOperations($cep_rules);
+
+		self::addAffectedObjects($cep_rules, $db_cep_rules);
 	}
 
 	private static function addAffectedObjects(array $cep_rules, array &$db_cep_rules): void {
@@ -1505,12 +1509,11 @@ class CCepRule extends CApiService {
 			if (array_key_exists('filter', $cep_rule)) {
 				$cep_ruleid = $cep_rule['cep_ruleid'];
 
-				if ($db_cep_rules[$cep_ruleid]['window_type'] != ZBX_CEP_WINDOW_NONE) {
-					$db_cep_rules[$cep_ruleid]['filter'] =
-						array_intersect_key($db_cep_rules[$cep_ruleid], array_flip(['evaltype', 'formula']));
+				$db_cep_rules[$cep_ruleid]['filter'] =
+					array_intersect_key($db_cep_rules[$cep_ruleid], array_flip(['evaltype', 'formula']))
+					+ ['conditions' => []];
 
-					$cep_ruleids[] = $cep_ruleid;
-				}
+				$cep_ruleids[] = $cep_ruleid;
 			}
 		}
 
@@ -1532,7 +1535,7 @@ class CCepRule extends CApiService {
 				array_diff_key($row, array_flip(['cep_ruleid']));
 		}
 
-		foreach ($cep_ruleids as $cep_ruleid => $foo) {
+		foreach ($cep_ruleids as $cep_ruleid) {
 			self::addFilterConditionFormulaids($db_cep_rules[$cep_ruleid]['filter']);
 		}
 	}
@@ -1540,6 +1543,7 @@ class CCepRule extends CApiService {
 	private static function addFilterConditionFormulaids(array &$filter): void {
 		if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 			CConditionHelper::addFormulaIds($filter['conditions'], $filter['formula']);
+			CConditionHelper::replaceConditionIds($filter['formula'], $filter['conditions']);
 		}
 		else {
 			foreach ($filter['conditions'] as &$condition) {
@@ -1555,11 +1559,7 @@ class CCepRule extends CApiService {
 		foreach ($cep_rules as $cep_rule) {
 			if (array_key_exists('window', $cep_rule) || (array_key_exists('window_type', $cep_rule)
 					&& $cep_rule['window_type'] != $db_cep_rules[$cep_rule['cep_ruleid']]['window_type'])) {
-				$cep_ruleid = $cep_rule['cep_ruleid'];
-
-				if ($db_cep_rules[$cep_ruleid]['window_type'] != ZBX_CEP_WINDOW_NONE) {
-					$cep_ruleids[] = $cep_ruleid;
-				}
+				$cep_ruleids[] = $cep_rule['cep_ruleid'];
 			}
 		}
 
@@ -1568,24 +1568,32 @@ class CCepRule extends CApiService {
 		}
 
 		$options = [
-			'output' => ['cep_windowid', 'cep_ruleid', 'duration', 'capacity', 'evaltype' ,'formula', 'script',
+			'output' => ['cep_windowid', 'cep_ruleid', 'duration', 'capacity', 'evaltype', 'formula', 'script',
 				'group_by_host_group', 'group_by_host', 'group_by_tag', 'tag', 'event_count_tag'
 			],
 			'filter' => ['cep_ruleid' => $cep_ruleids]
 		];
 		$resource = DBselect(DB::makeSql('cep_window', $options));
+		$db_filter_defaults = array_intersect_key(DB::getDefaults('cep_window'), array_flip(['evaltype', 'formula']));
 		$window_ruleids = [];
 
 		while ($row = DBfetch($resource)) {
 			$cep_ruleid = $row['cep_ruleid'];
-			$db_cep_rules[$cep_ruleid]['window'] = array_diff_key($row, array_flip(['cep_ruleid']));
 
 			if ($db_cep_rules[$cep_ruleid]['window_type'] == ZBX_CEP_WINDOW_TAG_MATCH) {
-				$db_cep_rules[$cep_ruleid]['window']['filter'] =
-					array_intersect_key($row, array_flip(['evaltype', 'formula']));
+				$row['filter'] = array_intersect_key($row, array_flip(['evaltype', 'formula']));
 
 				$window_ruleids[$row['cep_windowid']] = $cep_ruleid;
 			}
+			else {
+				$row['filter'] = $db_filter_defaults;
+			}
+
+			$row['filter'] += ['conditions' => []];
+
+			$db_cep_rules[$cep_ruleid]['window'] = array_diff_key(
+				$row, array_flip(['cep_ruleid', 'evaltype', 'formula'])
+			);
 		}
 
 		if (!$window_ruleids) {

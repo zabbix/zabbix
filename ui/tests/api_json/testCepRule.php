@@ -3156,7 +3156,7 @@ class testCepRule extends CAPITest {
 			],
 			'Can reset filter' => [
 				'request' => [
-					'cep_ruleid' => ':ceprule:update.fail',
+					'cep_ruleid' => ':ceprule:update.success',
 					'filter' => []
 				],
 				'expected_error' => null
@@ -3338,9 +3338,21 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Can reset operations' => [
+			'Cannot reset operations unless ZBX_CEP_WINDOW_CAUSE_SYMPTOM' => [
+				'request' => [
+					'cep_ruleid' => ':ceprule:update.fail',
+					'operations' => []
+				],
+				'expected_error' => 'Invalid parameter "/1/operations": cannot be empty.'
+			],
+			'Can switch to ZBX_CEP_WINDOW_CAUSE_SYMPTOM and reset operations' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.success',
+					'window_type' => ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
+					'window' => [
+						'duration' => '1h',
+						'group_by_host_group' => ZBX_CEP_GROUP_BY_YES
+					],
 					'operations' => []
 				],
 				'expected_error' => null
