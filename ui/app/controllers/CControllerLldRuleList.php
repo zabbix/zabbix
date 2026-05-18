@@ -133,7 +133,7 @@ class CControllerLldRuleList extends CController {
 		];
 
 		if ($filter['filter_groupids']) {
-			$options['groupids'] = getSubGroups($filter['filter_groupids'], $filter['ms_groups'], $context);
+			$options['groupids'] = $filter['filter_groupids'];
 		}
 
 		if ($filter['filter_hostids']) {
@@ -275,11 +275,7 @@ class CControllerLldRuleList extends CController {
 		}
 
 		if ($filter['filter_groupids']) {
-			$service = $context === 'host' ? API::HostGroup() : API::TemplateGroup();
-			$filter['ms_groups'] = CArrayHelper::renameObjectsKeys($service->get([
-				'output' => ['groupid', 'name'],
-				'groupids' => $filter['filter_groupids']
-			]), ['groupid' => 'id']);
+			$filter['filter_groupids'] = getSubGroups($filter['filter_groupids'], $filter['ms_groups'], $context);
 		}
 
 		return $filter;
