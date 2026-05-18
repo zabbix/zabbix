@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-04-20 18:49+0000\n"
+"PO-Revision-Date: 2026-04-27 18:43+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -1818,7 +1818,7 @@ msgstr "Au moins un groupe hôte ou un hôte doit être sélectionné."
 #: app/controllers/CControllerGraphPrototypeCreate.php:116
 #: app/controllers/CControllerGraphPrototypeUpdate.php:118
 msgid "At least one item must be a prototype"
-msgstr ""
+msgstr "Au moins un élément doit être un prototype"
 
 #: app/controllers/CControllerMaintenanceCreate.php:57
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
@@ -2596,7 +2596,7 @@ msgstr[1] "Impossible d'ajouter les modules : %1$s."
 #: app/controllers/CControllerGraphPrototypeUpdate.php:123
 #: app/controllers/CControllerGraphUpdate.php:113
 msgid "Cannot add more than one item with type \"Graph sum\""
-msgstr ""
+msgstr "Impossible d'ajouter plus d'un élément de type \"Somme du graphique\""
 
 #: include/classes/api/services/CGraph.php:42
 #, c-format
@@ -2643,6 +2643,10 @@ msgstr "Impossible d'ajouter le script"
 #: widgets/navtree/views/navtreeitem.edit.php:72
 msgid "Cannot add submaps. Max depth reached."
 msgstr "Impossible d'ajouter des sous-cartes. La profondeur maximum est atteinte."
+
+#: app/controllers/CControllerPopupScheduledReportSubscriptionCheck.php:85
+msgid "Cannot add subscription"
+msgstr ""
 
 #: app/controllers/CControllerTemplateCreate.php:49
 #: app/controllers/CControllerTemplateCreate.php:171
@@ -7023,6 +7027,10 @@ msgstr "Supprimer les manquants"
 #: app/views/administration.regex.edit.php:160
 msgid "Delete regular expression?"
 msgstr "Supprimer l'expression régulière ?"
+
+#: app/views/js/reports.scheduledreport.edit.js.php:160
+msgid "Delete scheduled report?"
+msgstr ""
 
 #: app/views/administration.script.edit.php:389
 msgid "Delete script?"
@@ -13966,7 +13974,7 @@ msgstr "Liste les périphériques de bloc et leur type. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1724
 msgid "List of block devices with detailed information. Returns JSON"
-msgstr ""
+msgstr "Liste des périphériques de stockage avec informations détaillées. Retourne un JSON"
 
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
@@ -13990,7 +13998,7 @@ msgstr "Liste les systèmes de fichiers montés, leurs types, l'espace disque et
 
 #: include/classes/data/CItemData.php:1266
 msgid "List of network interfaces with detailed information. Returns JSON"
-msgstr ""
+msgstr "Liste des interfaces réseau avec informations détaillées. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1109
 msgid "List of network interfaces. Returns JSON"
@@ -15621,6 +15629,10 @@ msgstr "Nouveau serveur LDAP"
 msgid "New MFA method"
 msgstr "Nouvelle méthode d'authentification multi-facteur"
 
+#: app/views/oauth.edit.php:254
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "Nouveau SLA"
@@ -15753,6 +15765,11 @@ msgstr "Nouveau groupe de proxy"
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "Nouvelle expression régulière"
+
+#: app/views/js/reports.scheduledreport.edit.js.php:99
+#: app/views/reports.scheduledreport.edit.php:250
+msgid "New scheduled report"
+msgstr ""
 
 #: app/views/administration.script.edit.php:369
 #: app/views/administration.script.edit.php:409
@@ -20028,6 +20045,10 @@ msgid "Scheduled report disabled"
 msgid_plural "Scheduled reports disabled"
 msgstr[0] "Rapport planifié désactivé"
 msgstr[1] "Rapports planifiés désactivés"
+
+#: app/controllers/CControllerPopup.php:60
+msgid "Scheduled report edit"
+msgstr ""
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
@@ -25161,6 +25182,18 @@ msgstr "Tables de correspondance"
 #, c-format
 msgid "Value must be greater than %1$s."
 msgstr "La valeur doit être supérieure à %1$s."
+
+#: include/classes/validators/CFormValidator.php:1089
+#: include/classes/validators/CFormValidator.php:1147 jsLoader.php:435
+#, c-format
+msgid "Value must be greater than or equal to %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1095
+#: include/classes/validators/CFormValidator.php:1153 jsLoader.php:434
+#, c-format
+msgid "Value must be less than or equal to %1$s."
+msgstr ""
 
 #: include/classes/validators/CFormValidator.php:1033
 #: include/classes/validators/CFormValidator.php:1042

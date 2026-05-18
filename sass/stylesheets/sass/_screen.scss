@@ -747,13 +747,25 @@ form {
 		white-space: nowrap;
 
 		label {
+			box-sizing: border-box;
 			display: block;
 			height: 24px;
 			line-height: 24px;
 			overflow: hidden;
 			text-overflow: ellipsis;
 
-			.btn-icon,
+			&:has(.btn-icon) {
+				position: relative;
+				margin-right: -2px;
+				padding-right: 23px;
+
+				.btn-icon {
+					position: absolute;
+					top: 4px;
+					right: 2px;
+				}
+			}
+
 			.icon {
 				margin-left: 5px;
 			}
@@ -2056,6 +2068,15 @@ select {
 	}
 }
 
+// Modals.
+.modal-popup.modal-popup-static {
+	&.modal-popup-sla-edit,
+	&.modal-popup-proxy-edit,
+	&.modal-popup-connector-edit {
+		--modal-max-width: 750px;
+	}
+}
+
 // Multiline input control.
 .multilineinput-control {
 	display: flex;
@@ -2526,7 +2547,6 @@ select {
 			display: flex;
 			flex-wrap: nowrap;
 			align-items: center;
-			padding-left: 3px;
 			white-space: pre;
 
 			.scatter-plot-hintbox-icon-color {

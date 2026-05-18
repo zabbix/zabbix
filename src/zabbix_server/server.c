@@ -2382,6 +2382,19 @@ static void	server_restart_ha(zbx_rtc_t *rtc)
 	ha_status = ZBX_NODE_STATUS_STANDBY;
 }
 
+static void	zbx_on_exit_rtc(int ret, void *on_exit_args)
+{
+	ZBX_UNUSED(ret);
+
+	if (NULL != on_exit_args)
+	{
+		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
+
+		if (NULL != args->rtc)
+			event_active(args->rtc->service.ev_timer, 0, 0);
+	}
+}
+
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	char	*error = NULL, *smtp_auth_feature_status = NULL;
@@ -2622,7 +2635,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	zbx_unset_exit_on_terminate();
+	zbx_unset_exit_on_terminate(zbx_on_exit_rtc);
 
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
