@@ -183,7 +183,8 @@ class testPermissions extends CIntegrationTest {
 				'key_' => self::ITEM_NAME,
 				'hostid' => self::$templateids[self::TEMPLATE_NAME_01],
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			]
 		];
 
@@ -209,7 +210,8 @@ class testPermissions extends CIntegrationTest {
 			'name' => self::LLD_NAME,
 			'key_' => self::LLD_NAME,
 			'hostid' => self::$templateids[self::TEMPLATE_NAME_02],
-			'type' => ITEM_TYPE_TRAPPER
+			'type' => ITEM_TYPE_TRAPPER,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 
 		$this->assertCount(1, $response['result']['itemids']);

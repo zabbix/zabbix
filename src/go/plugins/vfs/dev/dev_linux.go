@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package vfsdev
+package dev
 
 import (
 	"bufio"
@@ -257,7 +257,6 @@ func getDevRecords(sysfs bool) ([]*devRecord, map[string]uint64, error) {
 		devname := devLocation + entry.Name()
 
 		stat, err := os.Stat(devname)
-
 		if err != nil {
 			continue
 		}
