@@ -22,6 +22,27 @@
 
 typedef enum
 {
+	TQ_COLUMN_TYPE_UNKNOWN,
+	TQ_COLUMN_TYPE_ATTRIBUTES,
+	TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,
+	TQ_COLUMN_TYPE_STR,
+	TQ_COLUMN_TYPE_ARRAY_STR,
+	TQ_COLUMN_TYPE_NUM,
+	TQ_COLUMN_TYPE_ARRAY_NUM,
+}
+tq_column_type_t;
+
+typedef struct
+{
+	const char		*name;
+	tq_column_type_t	type;
+	const char		*es_nested_path; /* NULL - not nested subfield */
+	const char		*es_nested_subfield; /* NULL - not nested subfield */
+}
+tq_column_info_t;
+
+typedef enum
+{
 	TQ_FORMULA_NODE_TYPE_OR,
 	TQ_FORMULA_NODE_TYPE_AND,
 	TQ_FORMULA_NODE_TYPE_NOT,
@@ -48,6 +69,13 @@ void	tq_aggr_column_init(zbx_tq_aggr_column_t *aggr_column);
 void	tq_aggr_column_clean(zbx_tq_aggr_column_t *aggr_column);
 void	tq_condition_init(zbx_tq_condition_t *condition);
 void	tq_condition_clean(zbx_tq_condition_t *condition);
+
+const tq_column_info_t	*tq_get_column_info(zbx_tq_category_t category, zbx_tq_metric_type_t metric_type,
+		const char *column_name);
+tq_column_type_t	tq_get_column_type(zbx_tq_category_t category, zbx_tq_metric_type_t metric_type,
+		const char *column_name);
+
+int	tq_column_type_is_arr(tq_column_type_t type);
 
 int	tq_formula_constant_to_condition_idx(const char *p, int len);
 char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col);

@@ -15,8 +15,12 @@
 #include "telemetry.h"
 #include "zbxcommon.h"
 #include "zbxdb.h"
-#include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbxtelemetry.h"
+
+/* because clickhouse does not support JSON columns to be arrays on top level, the array is located in a subcolumn */
+/* TODO: decide if this is the way to go, maybe just have the field be of Array(...) type (at least for clickhouse) */
+#define TQ_SQL_ATTRIBUTES_ARRAY_JSON_KEY "attributes"
 
 static int	tq_sql_is_escape_sequence_clickhoouse(char c)
 {
@@ -173,36 +177,56 @@ static char	*tq_sql_dyn_escape_like_pattern(const char *src, zbx_tq_db_type_t db
 	return dst;
 }
 
-static char	*tq_sql_dyn_get_json_extract(const char *field, const char *path, zbx_tq_db_type_t db_type)
+/******************************************************************************
+ *                                                                            *
+ * Comments: does not escape operand! If escaping is needed, it must be done  *
+ *           by the caller, before passing it to this function.               *
+ *                                                                            *
+ ******************************************************************************/
+static char	*tq_sql_dyn_get_json_subcolumn_raw(const char *operand, const char *key, zbx_tq_db_type_t db_type)
 {
 	char	*str;
-	char	*field_esc = tq_sql_dyn_escape_name(field, db_type);
-	char	*path_esc = tq_sql_dyn_escape_string(path, db_type);
 
 	switch (db_type)
 	{
 		case ZBX_TQ_DB_TYPE_POSTGRESQL:
-			str = zbx_dsprintf(NULL, "(jsonb_path_query_first(%s, %s) #>> '{}')", field_esc, path_esc);
+			/* TODO */
+			str = zbx_dsprintf(NULL, "UNIMPLEMENTED");
 			break;
 		case ZBX_TQ_DB_TYPE_MYSQL:
 			str = zbx_dsprintf(NULL, "UNIMPLEMENTED");
 			break;
 		case ZBX_TQ_DB_TYPE_CLICKHOUSE:
-			/* FIXME: this is probably slow, maybe use something else, at least for columns */
-			/* FIXME: (as opposed to conditions where a json path expression is required) */
-			/* TODO: probably replace JSON_VALUE with getSubcolumn or similar */
-			str = zbx_dsprintf(NULL, "JSON_VALUE(toJSONString(%s), %s)", field_esc, path_esc);
+		{
+			char	*key_esc_unquoted = tq_sql_dyn_escape_string_unquoted(key, db_type);
+
+			/* casting to string so that it can be used in group by */
+			str = zbx_dsprintf(NULL, "%s.\"%s\".:String", operand, key_esc_unquoted);
+
+			zbx_free(key_esc_unquoted);
 			break;
+		}
 
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			str = zbx_strdup(NULL, "");
 	}
 
-	zbx_free(field_esc);
-	zbx_free(path_esc);
-
 	return str;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Comments: does not escape x! If escaping is needed, it must be done        *
+ *           by the caller, before passing it to this function.               *
+ *                                                                            *
+ ******************************************************************************/
+static char	*tq_sql_dyn_get_operand_raw(const char *x, const char *key, zbx_tq_db_type_t db_type)
+{
+	if (NULL == key)
+		return zbx_strdup(NULL, x);
+
+	return tq_sql_dyn_get_json_subcolumn_raw(x, key, db_type);
 }
 
 static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, zbx_tq_db_type_t db_type)
@@ -214,27 +238,13 @@ static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, zbx_t
 	for (int i = 0; i < query->columns.values_num; i++)
 	{
 		const zbx_tq_column_t	*col = &query->columns.values[i];
+		char			*name_esc = tq_sql_dyn_escape_name(col->name, db_type);
+		char			*col_to_select = tq_sql_dyn_get_operand_raw(name_esc, col->key, db_type);
 
-		if (NULL == col->key)
-		{
-			char	*name_esc = tq_sql_dyn_escape_name(col->name, db_type);
-			zbx_snprintf_alloc(&str, &alloc, &offset, "%s", name_esc);
-			zbx_free(name_esc);
-		}
-		else
-		{
-			char	*path = zbx_strdup(NULL, col->key);
+		zbx_snprintf_alloc(&str, &alloc, &offset, "%s", col_to_select);
 
-			zbx_json_escape(&path);
-			path = zbx_dsprintf(path, "$.\"%s\"", path);
-
-			char	*extract_expr = tq_sql_dyn_get_json_extract(col->name, path, db_type);
-
-			zbx_snprintf_alloc(&str, &alloc, &offset, "%s", extract_expr);
-
-			zbx_free(extract_expr);
-			zbx_free(path);
-		}
+		zbx_free(name_esc);
+		zbx_free(col_to_select);
 
 		if (query->columns.values_num - 1 != i)
 			zbx_snprintf_alloc(&str, &alloc, &offset, ",");
@@ -395,19 +405,10 @@ static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, zb
 	return str_esc;
 }
 
-static char	*tq_sql_dyn_get_condition_operand(const zbx_tq_condition_t *cond, zbx_tq_db_type_t db_type)
-{
-	if (NULL == cond->json_path)
-		return tq_sql_dyn_escape_name(cond->column_name, db_type);
-
-	return tq_sql_dyn_get_json_extract(cond->column_name, cond->json_path, db_type);
-}
-
-static char	*tq_sql_dyn_get_condition_contains(const zbx_tq_condition_t *cond, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_condition_contains(const char *operand, const char *value, zbx_tq_db_type_t db_type)
 {
 	char	*str;
-	char	*operand = tq_sql_dyn_get_condition_operand(cond, db_type);
-	char	*value_esc = tq_sql_dyn_escape_like_pattern(cond->value, db_type);
+	char	*value_esc = tq_sql_dyn_escape_like_pattern(value, db_type);
 
 	switch (db_type)
 	{
@@ -427,45 +428,128 @@ static char	*tq_sql_dyn_get_condition_contains(const zbx_tq_condition_t *cond, z
 			str = zbx_strdup(NULL, "");
 	}
 
-	zbx_free(operand);
 	zbx_free(value_esc);
 
 	return str;
 }
 
-static char	*tq_sql_dyn_get_condition(const zbx_tq_condition_t *cond, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, zbx_tq_db_type_t db_type)
 {
-	if (ZBX_TQ_OPERATOR_UNKNOWN == cond->operator)
+	char	*str;
+
+	switch (db_type)
+	{
+		case ZBX_TQ_DB_TYPE_POSTGRESQL:
+			/* TODO */
+			str = zbx_dsprintf(NULL, "UNIMPLEMENTED");
+			break;
+		case ZBX_TQ_DB_TYPE_MYSQL:
+			str = zbx_dsprintf(NULL, "UNIMPLEMENTED");
+			break;
+		case ZBX_TQ_DB_TYPE_CLICKHOUSE:
+		{
+			char	*key_esc_unquoted = tq_sql_dyn_escape_string_unquoted(key, db_type);
+
+			str = zbx_dsprintf(NULL, "isNotNull(%s.\"%s\")", atom, key_esc_unquoted);
+
+			zbx_free(key_esc_unquoted);
+			break;
+		}
+
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			str = zbx_strdup(NULL, "");
+	}
+
+	return str;
+}
+
+static char	*tq_sql_dyn_get_atom_condition(const char *atom, const char *key, const char *value,
+		zbx_tq_operator_t operator, zbx_tq_db_type_t db_type)
+{
+	if (ZBX_TQ_OPERATOR_UNKNOWN == operator)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		return zbx_strdup(NULL, "");
 	}
 
-	if (ZBX_TQ_OPERATOR_EQUAL == cond->operator || ZBX_TQ_OPERATOR_NOT_EQUAL == cond->operator)
+	if (ZBX_TQ_OPERATOR_EQUAL == operator || ZBX_TQ_OPERATOR_NOT_EQUAL == operator)
 	{
 		char	*str;
-		char	*operand = tq_sql_dyn_get_condition_operand(cond, db_type);
-		char	*value_esc = tq_sql_dyn_escape_string(cond->value, db_type);
+		char	*operand = tq_sql_dyn_get_operand_raw(atom, key, db_type);
+		char	*value_esc = tq_sql_dyn_escape_string(value, db_type);
 
-		if (ZBX_TQ_OPERATOR_EQUAL == cond->operator)
-			str = zbx_dsprintf(NULL, "%s = %s", operand, value_esc);
+		if (ZBX_TQ_OPERATOR_EQUAL == operator)
+			str = zbx_dsprintf(NULL, "(%s IS NOT NULL AND %s = %s)", operand, operand, value_esc);
 		else
-			str = zbx_dsprintf(NULL, "%s <> %s", operand, value_esc);
+			str = zbx_dsprintf(NULL, "(%s IS NULL OR %s <> %s)", operand, operand, value_esc);
 
-		zbx_free(operand);
 		zbx_free(value_esc);
+		zbx_free(operand);
 
 		return	str;
 	}
+	else if (ZBX_TQ_OPERATOR_CONTAINS == operator || ZBX_TQ_OPERATOR_NOT_CONTAINS == operator)
+	{
+		char	*operand = tq_sql_dyn_get_operand_raw(atom, key, db_type);
+		char	*str = tq_sql_dyn_get_condition_contains(operand, value, db_type);
 
-	if (ZBX_TQ_OPERATOR_CONTAINS == cond->operator)
-		return tq_sql_dyn_get_condition_contains(cond, db_type);
+		if (ZBX_TQ_OPERATOR_NOT_CONTAINS == operator)
+			str = zbx_dsprintf(str, "(NOT %s)", str);
+
+		zbx_free(operand);
+
+		return str;
+	}
+	else /* exists */
+	{
+		return tq_sql_dyn_get_condition_exists(atom, key, db_type);
+	}
+}
+
+static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, tq_column_type_t col_type,
+		zbx_tq_db_type_t db_type)
+{
+	char	*str;
+
+	if (ZBX_TQ_DB_TYPE_POSTGRESQL == db_type)
+	{
+		/* TODO */
+		str = zbx_strdup(NULL, "UNIMPLEMENTED");
+	}
+	else if (ZBX_TQ_DB_TYPE_MYSQL == db_type)
+	{
+		str = zbx_strdup(NULL, "UNIMPLEMENTED");
+	}
+	else /* clickhouse */
+	{
+		char	*elem_cond = tq_sql_dyn_get_atom_condition("x", cond->key, cond->value, cond->operator,
+				db_type);
+		char	*col_esc = tq_sql_dyn_escape_name(cond->column_name, db_type);
+
+		str = zbx_dsprintf(NULL, "arrayExists(x -> %s, %s." TQ_SQL_ATTRIBUTES_ARRAY_JSON_KEY ".:\"Array(%s)\")",
+				elem_cond, col_esc, TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == col_type ? "JSON" : "String");
+
+		zbx_free(elem_cond);
+		zbx_free(col_esc);
+	}
+
+	return str;
+}
+
+static char	*tq_sql_dyn_get_condition(const zbx_tq_condition_t *cond, zbx_tq_category_t category,
+		zbx_tq_metric_type_t metric_type, zbx_tq_db_type_t db_type)
+{
+	tq_column_type_t	col_type = tq_get_column_type(category, metric_type, cond->column_name);
+
+	if (SUCCEED == tq_column_type_is_arr(col_type))
+		return tq_sql_dyn_get_array_condition(cond, col_type, db_type);
 	else
 	{
-		char	*contains_str = tq_sql_dyn_get_condition_contains(cond, db_type);
-		char	*str = zbx_dsprintf(NULL, "(NOT %s)", contains_str);
+		char	*name_esc = tq_sql_dyn_escape_name(cond->column_name, db_type);
+		char	*str = tq_sql_dyn_get_atom_condition(name_esc, cond->key, cond->value, cond->operator, db_type);
 
-		zbx_free(contains_str);
+		zbx_free(name_esc);
 
 		return str;
 	}
@@ -481,7 +565,7 @@ static char	*tq_sql_dyn_get_conditions_simple(const zbx_tq_query_t *query, zbx_t
 	{
 		const zbx_tq_condition_t	*cond = &query->conditions.values[i];
 
-		char	*cond_str = tq_sql_dyn_get_condition(cond, db_type);
+		char	*cond_str = tq_sql_dyn_get_condition(cond, query->category, query->metric_type, db_type);
 
 		zbx_snprintf_alloc(&str, &alloc, &offset, "%s", cond_str);
 
@@ -521,7 +605,8 @@ static char	*tq_sql_dyn_get_conditions_and_or(const zbx_tq_query_t *query, zbx_t
 	for (int i = 0; i < conditions_sorted.values_num; i++)
 	{
 		const zbx_tq_condition_t	*cond = conditions_sorted.values[i];
-		char				*cond_str = tq_sql_dyn_get_condition(cond, db_type);
+		char				*cond_str = tq_sql_dyn_get_condition(cond, query->category,
+				query->metric_type, db_type);
 
 		zbx_snprintf_alloc(&str, &alloc, &offset, "%s", cond_str);
 
@@ -607,7 +692,8 @@ static char	*tq_sql_dyn_get_conditions_expression(const zbx_tq_query_t *query, z
 			len++;
 
 		int	cond_idx = tq_formula_constant_to_condition_idx(p, len);
-		char	*cond_str = tq_sql_dyn_get_condition(&query->conditions.values[cond_idx], db_type);
+		char	*cond_str = tq_sql_dyn_get_condition(&query->conditions.values[cond_idx], query->category,
+				query->metric_type, db_type);
 
 		zbx_snprintf_alloc(&str, &alloc, &offset, "%s", cond_str);
 

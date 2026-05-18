@@ -68,6 +68,7 @@ typedef enum
 	ZBX_TQ_OPERATOR_NOT_EQUAL,
 	ZBX_TQ_OPERATOR_CONTAINS,
 	ZBX_TQ_OPERATOR_NOT_CONTAINS,
+	ZBX_TQ_OPERATOR_EXISTS,
 }
 zbx_tq_operator_t;
 
@@ -94,7 +95,7 @@ ZBX_VECTOR_DECL(tq_aggr_column, zbx_tq_aggr_column_t)
 typedef struct
 {
 	char			*column_name;
-	char			*json_path;
+	char			*key;
 	char			*value;
 	zbx_tq_operator_t	operator;
 }

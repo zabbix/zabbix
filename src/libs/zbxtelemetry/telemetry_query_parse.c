@@ -173,6 +173,8 @@ static zbx_tq_operator_t	tq_match_operator(const char *str)
 		return ZBX_TQ_OPERATOR_CONTAINS;
 	else if (0 == strcmp(str, "not_contains"))
 		return ZBX_TQ_OPERATOR_NOT_CONTAINS;
+	else if (0 == strcmp(str, "exists"))
+		return ZBX_TQ_OPERATOR_EXISTS;
 
 	return ZBX_TQ_OPERATOR_UNKNOWN;
 }
@@ -368,9 +370,9 @@ static int	tq_parse_cond(struct zbx_json_parse *jp, zbx_tq_condition_t *cond, ch
 			if (FAIL == tq_read_string(p, &cond->column_name))
 				goto out;
 		}
-		else if (0 == strcmp(buf, "json_path"))
+		else if (0 == strcmp(buf, "key"))
 		{
-			if (FAIL == tq_read_string(p, &cond->json_path))
+			if (FAIL == tq_read_string(p, &cond->key))
 				goto out;
 		}
 		else if (0 == strcmp(buf, "value"))
@@ -557,7 +559,7 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query,
 		}
 
 		for (int i = 0; i < query->conditions.values_num; i++) {
-			if (SUCCEED != tq_expand_macros(&query->conditions.values[i].json_path, macro_expand_cb,
+			if (SUCCEED != tq_expand_macros(&query->conditions.values[i].key, macro_expand_cb,
 					macro_expand_ctx))
 				goto out;
 			if (SUCCEED != tq_expand_macros(&query->conditions.values[i].value, macro_expand_cb,
@@ -685,13 +687,18 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 {
 	if (ZBX_TQ_CATEGORY_UNKNOWN == query->category)
 		return ret_errf(FAIL, error, max_error_len, "catagory is not set");
+
 	if (ZBX_TQ_CATEGORY_APM_METRICS == query->category && ZBX_TQ_METRIC_TYPE_UNKNOWN == query->metric_type)
 		return ret_errf(FAIL, error, max_error_len, "metric type is not (when category is \"APM metrics\")");
 
 	for (int i = 0; i < query->columns.values_num; i++)
 	{
-		if (NULL == query->columns.values[i].name)
-		return ret_errf(FAIL, error, max_error_len, "column name is not set for column #%d", i);
+		const zbx_tq_column_t	*col = &query->columns.values[i];
+		if (NULL == col->name)
+			return ret_errf(FAIL, error, max_error_len, "column name is not set for column #%d", i);
+
+		if (NULL == tq_get_column_info(query->category, query->metric_type, col->name))
+			return ret_errf(FAIL, error, max_error_len, "column name is invalid for column #%d", i);
 	}
 
 	if (0 == query->aggregated_columns.values_num)
@@ -703,8 +710,15 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function && NULL == aggr_col->column_name)
 			return ret_errf(FAIL, error, max_error_len,
 					"column name is not set for aggregated column #%d", i);
+
+		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function &&
+				NULL == tq_get_column_info(query->category, query->metric_type, aggr_col->column_name))
+			return ret_errf(FAIL, error, max_error_len, "column name is invalid for aggregated column #%d",
+					i);
+
 		if (NULL == aggr_col->alias)
 			return ret_errf(FAIL, error, max_error_len, "alias is not set for aggregated column #%d", i);
+
 		if (ZBX_TQ_FUNCTION_UNKNOWN == aggr_col->function)
 			return ret_errf(FAIL, error, max_error_len, "function is not set for aggregated column #%d", i);
 
@@ -728,6 +742,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 			if (NULL == query->formula)
 				return ret_errf(FAIL, error, max_error_len,
 						"formula is not (when evaltype is \"expression\")");
+
 			if (FAIL == tq_validate_formula(query->formula, query->conditions.values_num, error,
 					max_error_len))
 				return FAIL;
@@ -735,22 +750,54 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 
 		for (int i = 0; i < query->conditions.values_num; i++)
 		{
-			const zbx_tq_condition_t *condition = &query->conditions.values[i];
+			const zbx_tq_condition_t	*condition = &query->conditions.values[i];
+			tq_column_type_t		column_type;
 
 			if (NULL == condition->column_name)
 				return ret_errf(FAIL, error, max_error_len,
 						"column name is not set for condition #%d", i);
-			if (NULL == condition->value)
-				return ret_errf(FAIL, error, max_error_len, "value is not set for condition #%d", i);
+
+			column_type = tq_get_column_type(query->category, query->metric_type, condition->column_name);
+
+			if (TQ_COLUMN_TYPE_UNKNOWN == column_type)
+				return ret_errf(FAIL, error, max_error_len,
+						"column name is invalid for condition #%d", i);
+
 			if (ZBX_TQ_OPERATOR_UNKNOWN == condition->operator)
 				return ret_errf(FAIL, error, max_error_len, "operator is not set for condition #%d", i);
+
+			if (NULL != condition->key &&
+					!(TQ_COLUMN_TYPE_ATTRIBUTES == column_type ||
+					TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == column_type))
+				return ret_errf(FAIL, error, max_error_len,
+						"key is set for non-attribute column #%d", i);
+
+			if (NULL == condition->key &&
+					(TQ_COLUMN_TYPE_ATTRIBUTES == column_type ||
+					TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == column_type))
+				return ret_errf(FAIL, error, max_error_len, "key is not set for attribute column #%d",
+						i);
+
+			if (NULL == condition->value && ZBX_TQ_OPERATOR_EXISTS != condition->operator)
+				return ret_errf(FAIL, error, max_error_len, "value is not set for condition #%d", i);
+
+			if (ZBX_TQ_OPERATOR_EXISTS == condition->operator &&
+					!(TQ_COLUMN_TYPE_ATTRIBUTES == column_type ||
+					TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == column_type))
+				return ret_errf(FAIL, error, max_error_len,
+						"operator \"exists\" selected for non-attribute column #%d", i);
+
+			/* TODO: maybe add failing validation if operator is contains/not_contains and column */
+			/* is not simple (because of elasticsearch limitation) */
 		}
 	}
 
 	if (TQ_TIME_INTERVAL_INVALID == query->time_shift)
 		return ret_errf(FAIL, error, max_error_len, "time shift is not set");
+
 	if (TQ_TIME_INTERVAL_INVALID == query->loopback_limit)
 		return ret_errf(FAIL, error, max_error_len, "loopback limit is not set");
+
 	if (TQ_TIME_INTERVAL_INVALID == query->aggregation_size)
 		return ret_errf(FAIL, error, max_error_len, "aggregation size is not set");
 

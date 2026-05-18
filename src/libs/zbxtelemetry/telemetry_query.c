@@ -67,7 +67,7 @@ void	tq_aggr_column_clean(zbx_tq_aggr_column_t *aggr_column)
 void	tq_condition_init(zbx_tq_condition_t *condition)
 {
 	condition->column_name	= NULL;
-	condition->json_path	= NULL;
+	condition->key		= NULL;
 	condition->value	= NULL;
 	condition->operator	= ZBX_TQ_OPERATOR_UNKNOWN;
 }
@@ -75,7 +75,7 @@ void	tq_condition_init(zbx_tq_condition_t *condition)
 void	tq_condition_clean(zbx_tq_condition_t *condition)
 {
 	zbx_free(condition->column_name);
-	zbx_free(condition->json_path);
+	zbx_free(condition->key);
 	zbx_free(condition->value);
 }
 
@@ -150,7 +150,7 @@ char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col)
 		return zbx_strdup(NULL, col->name);
 }
 
-static int	tq_condition_ptr_compare_by_column_and_path(const void *a, const void *b)
+static int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void *b)
 {
 	const zbx_tq_condition_t	*cond_a = *(const zbx_tq_condition_t * const *)a;
 	const zbx_tq_condition_t	*cond_b = *(const zbx_tq_condition_t * const *)b;
@@ -160,15 +160,15 @@ static int	tq_condition_ptr_compare_by_column_and_path(const void *a, const void
 	if (0 != column_name_cmp_res)
 		return column_name_cmp_res;
 
-	if (NULL == cond_a->json_path || NULL == cond_b->json_path)
+	if (NULL == cond_a->key || NULL == cond_b->key)
 	{
-		if (cond_a->json_path != cond_b->json_path)
+		if (cond_a->key != cond_b->key)
 			THIS_SHOULD_NEVER_HAPPEN;
 
 		return column_name_cmp_res;
 	}
 
-	return strcmp(cond_a->json_path, cond_b->json_path);
+	return strcmp(cond_a->key, cond_b->key);
 }
 
 void	tq_get_conditions_and_or_sorted(const zbx_tq_query_t *query, zbx_vector_tq_condition_ptr_t *conditions_sorted)
@@ -178,5 +178,5 @@ void	tq_get_conditions_and_or_sorted(const zbx_tq_query_t *query, zbx_vector_tq_
 	for (int i = 0; i < query->conditions.values_num; i++)
 		zbx_vector_tq_condition_ptr_append(conditions_sorted, &query->conditions.values[i]);
 
-	zbx_vector_tq_condition_ptr_sort(conditions_sorted, tq_condition_ptr_compare_by_column_and_path);
+	zbx_vector_tq_condition_ptr_sort(conditions_sorted, tq_condition_ptr_compare_by_column_and_key);
 }
