@@ -108,34 +108,16 @@ $filter_column1 = (new CFormGrid())
 	]);
 
 // type select
-$filter_type_visibility = [];
 $type_select = (new CSelect('filter_type'))
 	->setId('filter_type')
 	->setFocusableElementId('label-type')
 	->addOption(new CSelectOption(-1, _('All')))
 	->setValue($data['filter']['filter_type']);
 
-zbx_subarray_push($filter_type_visibility, -1, 'filter_delay_row');
-zbx_subarray_push($filter_type_visibility, -1, 'filter_delay');
-
 $lld_types = item_type2str();
 unset($lld_types[ITEM_TYPE_HTTPTEST], $lld_types[ITEM_TYPE_CALCULATED], $lld_types[ITEM_TYPE_SNMPTRAP]);
 
 $type_select->addOptions(CSelect::createOptionsFromArray($lld_types));
-
-foreach ($lld_types as $type => $name) {
-	if ($type != ITEM_TYPE_TRAPPER) {
-		zbx_subarray_push($filter_type_visibility, $type, 'filter_delay_row');
-		zbx_subarray_push($filter_type_visibility, $type, 'filter_delay');
-	}
-	if ($type == ITEM_TYPE_SNMP) {
-		zbx_subarray_push($filter_type_visibility, $type, 'filter_snmp_oid_row');
-	}
-}
-
-zbx_add_post_js(
-	'var filterTypeSwitcher = new CViewSwitcher("filter_type", "change", '.json_encode($filter_type_visibility).');'
-);
 
 $filter_column2 = (new CFormGrid())
 	->addItem([

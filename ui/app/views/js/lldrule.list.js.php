@@ -67,9 +67,10 @@ const view = new class {
 			}
 		});
 
-		document.querySelectorAll('#filter_lifetime_type, #filter_enabled_lifetime_type').forEach(element => {
-			element.addEventListener('change', () => this.#update());
-		});
+		document.querySelectorAll('#filter_lifetime_type, #filter_enabled_lifetime_type, #filter_type')
+			.forEach(element => {
+				element.addEventListener('change', () => this.#update());
+			});
 
 		document.querySelector('.js-create-item')?.addEventListener('click', () => {
 			ZABBIX.PopupManager.open('lldrule.edit', {hostid: this.#hostid, context: this.#context});
@@ -79,6 +80,7 @@ const view = new class {
 	}
 
 	#update() {
+		const type = document.getElementById('filter_type').value;
 		const lifetime_type = document.querySelector('[name="filter_lifetime_type"]:checked').value;
 		const enabled_lifetime_type = document.querySelector('[name="filter_enabled_lifetime_type"]:checked').value;
 
@@ -90,6 +92,28 @@ const view = new class {
 		document.getElementById('filter_enabled_lifetime').disabled =
 			enabled_lifetime_type != <?= ZBX_LLD_DISABLE_AFTER ?>
 			|| lifetime_type == <?= ZBX_LLD_DELETE_IMMEDIATELY ?>;
+
+		const filter_snmp_oid = document.getElementById('filter_snmp_oid');
+
+		if (type == <?= ITEM_TYPE_SNMP ?>) {
+			filter_snmp_oid.style.display = '';
+			filter_snmp_oid.previousSibling.style.display = '';
+		}
+		else {
+			filter_snmp_oid.style.display = 'none';
+			filter_snmp_oid.previousSibling.style.display = 'none';
+		}
+
+		const filter_delay = document.getElementById('filter_delay');
+
+		if (type == <?= ITEM_TYPE_TRAPPER ?>) {
+			filter_delay.style.display = 'none';
+			filter_delay.previousSibling.style.display = 'none';
+		}
+		else {
+			filter_delay.style.display = '';
+			filter_delay.previousSibling.style.display = '';
+		}
 	}
 
 	#enable(target, data) {
