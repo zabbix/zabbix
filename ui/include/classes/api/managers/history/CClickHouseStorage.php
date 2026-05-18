@@ -788,7 +788,7 @@ class CClickHouseStorage {
 	 * @param array $sql_parts
 	 * @param array $options
 	 * @param int   $options['history']    Item value type, required.
-	 * @param mixed $options['sortfield']  Sorting field, required.
+	 * @param array $options['sortfield']  Sorting field, required.
 	 * @param mixed $options['sortorder']  Sorting order, required.
 	 */
 	private function addQuerySortOptions(array $sql_parts, array $options): array {
