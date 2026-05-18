@@ -695,6 +695,10 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asTable($options);
 		}
 
+		if ($tag === 'z-textarea-flexible') {
+			return $this->asTextareaFlexible($options);
+		}
+
 		if ($tag === 'input') {
 			$type = $this->getAttribute('type');
 			if ($type === 'checkbox' || $type === 'radio') {
@@ -708,7 +712,7 @@ class CElement extends CBaseElement implements IWaitable {
 		$attribute = $this->getAttribute('class');
 		if ($attribute) {
 			$class = explode(' ', $attribute);
-			if (in_array('multiselect-control', $class)) {
+			if (in_array('multiselect-control', $class) || in_array('multiselect', $class)) {
 				return $this->asMultiselect($options);
 			}
 
@@ -730,6 +734,10 @@ class CElement extends CBaseElement implements IWaitable {
 
 			if (in_array('macro-input-group', $class)) {
 				return $this->asInputGroup($options);
+			}
+
+			if (in_array('fields-group', $class)) {
+				return $this->asElement($options);
 			}
 		}
 

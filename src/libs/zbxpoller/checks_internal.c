@@ -1102,6 +1102,83 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, j.buffer));
 		zbx_json_free(&j);
 	}
+	else if (0 == strcmp(tmp, "vps"))
+	{
+		zbx_vps_monitor_stats_t	stats;
+		zbx_vps_monitor_get_stats(&stats);
+
+		if (2 > nparams || nparams > 3)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		tmp1 = get_rparam(&request, 1);
+
+		if (2 == nparams)
+		{
+			if (0 == strcmp(tmp1, "status"))
+			{
+				zbx_uint64_t	value = (SUCCEED == zbx_vps_monitor_capped() ? 1 : 0);
+				SET_UI64_RESULT(result, value);
+				ret = SUCCEED;
+
+				goto out;
+			}
+			else if (0 == strcmp(tmp1, "limit"))
+			{
+				SET_UI64_RESULT(result, stats.values_limit);
+				ret = SUCCEED;
+
+				goto out;
+			}
+		}
+
+		tmp = get_rparam(&request, 2);
+
+		if (0 == strcmp(tmp1, "written"))
+		{
+			if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "total"))
+			{
+				SET_UI64_RESULT(result, stats.written_num);
+				ret = SUCCEED;
+			}
+			else
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+
+			goto out;
+		}
+		else if (0 != strcmp(tmp1, "overcommit"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			goto out;
+		}
+
+		if (0 == stats.values_limit)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "VPS throttling is disabled."));
+			goto out;
+		}
+
+		if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "pavailable"))
+		{
+			SET_DBL_RESULT(result, (double)(stats.overcommit_limit - stats.overcommit) * 100 /
+					stats.overcommit_limit);
+		}
+		else if (0 == strcmp(tmp, "available"))
+		{
+			SET_UI64_RESULT(result, stats.overcommit_limit - stats.overcommit);
+		}
+		else if (0 == strcmp(tmp, "limit"))
+		{
+			SET_UI64_RESULT(result, stats.overcommit_limit);
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+			goto out;
+		}
+	}
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));

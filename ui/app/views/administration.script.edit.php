@@ -46,11 +46,13 @@ $parameters_table = (new CTable())
 $row_template = (new CTemplateTag('script-parameter-template'))
 	->addItem(
 		(new CRow([
-			(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('script_param', 'name')))
+			(new CTextAreaFlexible('parameters[name][]', ''))
+				->setMaxlength(DB::getFieldLength('script_param', 'name'))
 				->setAttribute('style', 'width: 100%;')
 				->setAttribute('value', '#{name}')
 				->removeId(),
-			(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('script_param', 'value')))
+			(new CTextAreaFlexible('parameters[value][]', ''))
+				->setMaxlength(DB::getFieldLength('script_param', 'value'))
 				->setAttribute('style', 'width: 100%;')
 				->setAttribute('value', '#{value}')
 				->removeId(),
@@ -63,8 +65,9 @@ $form_grid = (new CFormGrid())
 		(new CLabel(_('Name'), 'name'))
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('name', $data['name'], false, DB::getFieldLength('scripts', 'name')))
+			(new CTextAreaFlexible('name', $data['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('scripts', 'name'))
 				->setAriaRequired()
 		))
 	])
@@ -82,8 +85,9 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Menu path'), 'menu_path'))->setId('menu-path-label'),
 		(new CFormField(
-			(new CTextBox('menu_path', $data['menu_path'], false, DB::getFieldLength('scripts', 'menu_path')))
+			(new CTextAreaFlexible('menu_path', $data['menu_path']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('scripts', 'menu_path'))
 				->setAttribute('placeholder', _('<sub-menu/sub-menu/...>'))
 		))->setId('menu-path')
 	])
@@ -217,8 +221,9 @@ $form_grid = (new CFormGrid())
 			->setId('url-label')
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('url', $data['url'], false, DB::getFieldLength('scripts', 'url')))
+			(new CTextAreaFlexible('url', $data['url']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('scripts', 'url'))
 				->setAriaRequired()
 		))->setId('url')
 	])
@@ -337,9 +342,9 @@ $form_grid
 		->addItem([
 			(new CLabel(_('Input prompt'), 'manualinput_prompt')),
 			new CFormField([
-				(new CTextBox('manualinput_prompt', $data['manualinput_prompt'], false,
-					DB::getFieldLength('scripts', 'manualinput_prompt')
-				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				(new CTextAreaFlexible('manualinput_prompt', $data['manualinput_prompt']))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setMaxlength(DB::getFieldLength('scripts', 'manualinput_prompt')),
 				NBSP(),
 				(new CButton('test_user_input', _('Test user input')))->addClass(ZBX_STYLE_BTN_GREY)
 			])
@@ -356,29 +361,27 @@ $form_grid
 		->addItem([
 			new CLabel(_('Default input string'), 'manualinput_default_value'),
 			new CFormField([
-				(new CTextBox('manualinput_default_value', $data['manualinput_default_value'], false,
-					DB::getFieldLength('scripts', 'manualinput_default_value')
-				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				(new CTextAreaFlexible('manualinput_default_value', $data['manualinput_default_value']))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setMaxlength(DB::getFieldLength('scripts', 'manualinput_default_value'))
 			])
 		])
 		->addItem([
 			new CLabel(_('Dropdown options'), 'dropdown_options'),
 			new CFormField([
-				(new CTextBox('dropdown_options', $dropdown_options, false,
-					DB::getFieldLength('scripts', 'manualinput_validator')
-				))
+				(new CTextAreaFlexible('dropdown_options', $dropdown_options))
 					->setAttribute('placeholder', _('comma-separated list'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setMaxlength(DB::getFieldLength('scripts', 'manualinput_validator'))
 			])
 		])
 		->addItem([
 			new CLabel(_('Input validation rule'), 'manualinput_validator'),
 			new CFormField([
-				(new CTextBox('manualinput_validator', $validation_rule, false,
-					DB::getFieldLength('scripts', 'manualinput_validator')
-				))
+				(new CTextAreaFlexible('manualinput_validator', $validation_rule))
 					->setAttribute('placeholder', _('regular expression'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setMaxlength(DB::getFieldLength('scripts', 'manualinput_validator'))
 			])
 		])
 		->addItem([
@@ -390,9 +393,9 @@ $form_grid
 		->addItem([
 			(new CLabel(_('Confirmation text'), 'confirmation')),
 			new CFormField([
-				(new CTextBox('confirmation', $data['confirmation'], false,
-					DB::getFieldLength('scripts', 'confirmation')
-				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				(new CTextAreaFlexible('confirmation', $data['confirmation']))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setMaxlength(DB::getFieldLength('scripts', 'confirmation')),
 				NBSP(),
 				(new CButton('test_confirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)
 			])

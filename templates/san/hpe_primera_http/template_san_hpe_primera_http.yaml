@@ -43,7 +43,7 @@ zabbix_export:
         4. Change the `Scheme` and `Port` if needed.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/SAN
       items:
@@ -1825,6 +1825,10 @@ zabbix_export:
                 New (3) - physical disk is new, needs to be admitted;
                 Failed (4) - physical disk has failed;
                 Unknown (99) - physical disk state is unknown.
+                
+                Note:
+                WSAPI 1.7 reports Failed as state = 3;
+                WSAPI 1.8+ reports Failed as state = 4 and introduces New as state = 3.
               valuemap:
                 name: 'diskState enum'
               preprocessing:
@@ -1857,7 +1861,7 @@ zabbix_export:
                     - tag: scope
                       value: capacity
                 - uuid: bc8c8281c3ac4742ba8f570a56753dd3
-                  expression: 'last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",state])=3'
+                  expression: 'last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",state])=4'
                   name: 'HPE Primera: Disk [{#POSITION}]: Failed'
                   priority: HIGH
                   description: 'Disk [{#POSITION}] in failed state.'

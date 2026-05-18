@@ -223,7 +223,7 @@ static zbx_export_file_t	*export_init(const char *process_type, const char *proc
 	if (NULL == config_export)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "export library is not initialized");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	export_dir = zbx_strdup(NULL, config_export->dir);
@@ -244,7 +244,7 @@ static zbx_export_file_t	*export_init(const char *process_type, const char *proc
 	if (FAIL == open_export_file(file, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "%s", error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	file->missing = 0;
@@ -295,7 +295,7 @@ static void	export_write(const char *buf, size_t count, zbx_export_file_t *file)
 	if (NULL == config_export)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "export library is not initialized");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (0 == file->missing && 0 != access(file->name, F_OK))

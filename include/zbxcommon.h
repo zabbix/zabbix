@@ -80,6 +80,12 @@
 #	define ZBX_FALLTHROUGH
 #endif
 
+#if defined(__GNUC__) && __GNUC__ >= 3
+#	define ZBX_NORETURN	__attribute__ ((noreturn))
+#else
+#	define ZBX_NORETURN
+#endif
+
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_sysinfo_ret_string(int ret);
 const char	*zbx_result_string(int result);
@@ -101,6 +107,8 @@ const char	*zbx_result_string(int result);
 #define ZBX_SIZE_T_MAX	(~(size_t)0)
 
 #define ZBX_MALLOC_TRIM (128 * ZBX_KIBIBYTE)
+
+#define ZBX_MAX_PROCNAME_LEN	64
 
 /******************************************************************************
  *                                                                            *
@@ -301,7 +309,8 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_PG_MANAGER		45
 #define ZBX_PROCESS_TYPE_BROWSERPOLLER		46
 #define ZBX_PROCESS_TYPE_HA_MANAGER		47
-#define ZBX_PROCESS_TYPE_COUNT			48	/* number of process types */
+#define ZBX_PROCESS_TYPE_SUPERVISOR		48
+#define ZBX_PROCESS_TYPE_COUNT			49	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_MAIN			126
@@ -766,6 +775,14 @@ static	type2	get_##varname(void) \
 	return varname; \
 }
 
+/* logger interface */
+
+typedef void (*zbx_log_cb_t)(int level, const char *fmt, va_list args);
+typedef int (*zbx_log_level_cb_t)(void);
+
+void	zbx_log_handle(int level, const char *fmt, ...);
+int	zbx_get_log_level(void);
+
 #define LOG_LEVEL_EMPTY		0	/* printing nothing (if not LOG_LEVEL_INFORMATION set) */
 #define LOG_LEVEL_CRIT		1
 #define LOG_LEVEL_ERR		2
@@ -793,20 +810,6 @@ static	type2	get_##varname(void) \
 #	define zabbix_log zbx_log_handle
 #endif
 
-typedef void (*zbx_log_func_t)(int level, const char *fmt, va_list args);
-
-void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_progname, zbx_backtrace_f backtrace);
-void	zbx_log_handle(int level, const char *fmt, ...) __zbx_attr_format_printf(2, 3);
-int	zbx_get_log_level(void);
-void	zbx_set_log_level(int level);
-const char	*zbx_get_log_component_name(void);
-
-#ifndef _WINDOWS
-void		zabbix_increase_log_level(void);
-void		zabbix_decrease_log_level(void);
-void		zabbix_report_log_level_change(void);
-const char	*zabbix_get_log_level_string(void);
-
 typedef struct
 {
 	int		level;
@@ -814,9 +817,23 @@ typedef struct
 }
 zbx_log_component_t;
 
-void	zbx_set_log_component(const char *name, zbx_log_component_t *component);
-void	zbx_change_component_log_level(zbx_log_component_t *component, int direction);
+void	zbx_init_library_common(zbx_log_cb_t log_func, zbx_log_level_cb_t log_level_func,
+		zbx_get_progname_f get_progname, zbx_backtrace_f backtrace);
+
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+
 void	zbx_malloc_trim(time_t now, int period, size_t pad);
+
+typedef void (*zbx_exit_cb_t)(int) ZBX_NORETURN;
+
+void	zbx_exit(int ret) ZBX_NORETURN;
+void	zbx_exit_immediate(int ret) ZBX_NORETURN;
+
+void	zbx_set_exit(zbx_exit_cb_t exit_cb);
+void	zbx_set_exit_immediate(zbx_exit_cb_t exit_cb);
+#else
+#	define zbx_exit(status)		exit(status)
+#	define zbx_exit_immediate(status)	_exit(status)
 #endif
 
 #endif

@@ -165,7 +165,7 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 	if (-1 == setpgid(0, 0))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to create a process group: %s", __func__, zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): executing script", __func__);
@@ -176,14 +176,14 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to duplicate stdout: %s",
 				__func__, zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (-1 == (stderr_orig = dup(STDERR_FILENO)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to duplicate stderr: %s",
 				__func__, zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (-1 == fcntl(stdout_orig, F_SETFD, FD_CLOEXEC))
@@ -207,7 +207,7 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 	if (NULL != dir && 0 != chdir(dir))
 	{
 		fprintf(stderr, "cannot change directory to UserParameterDir: %s\n", zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	execl("/bin/sh", "sh", "-c", command, (char *)NULL);
@@ -223,7 +223,7 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 	zabbix_log(LOG_LEVEL_WARNING, "execl() failed for [%s]: %s", command, zbx_strerror(errno));
 
 	/* execl() returns only when an error occurs, let parent process know about it */
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -666,6 +666,6 @@ int	zbx_execute_nowait(const char *command)
 	}
 
 	/* always exit, parent has already returned */
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 #endif
 }

@@ -138,9 +138,12 @@ class CControllerAuditLogList extends CController {
 		}
 
 		$data['auditlogs'] = API::AuditLog()->get($params);
-		$data['paging'] = CPagerHelper::paginate($data['page'], $data['auditlogs'], ZBX_SORT_UP,
-			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
-		);
+
+		if ($this->getAction() !== 'auditlog.csv') {
+			$data['paging'] = CPagerHelper::paginate($data['page'], $data['auditlogs'], ZBX_SORT_UP,
+				(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
+			);
+		}
 
 		$data['auditlogs'] = $this->sanitizeDetails($data['auditlogs']);
 
@@ -172,6 +175,11 @@ class CControllerAuditLogList extends CController {
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Audit log'));
+
+		if ($this->getAction() === 'auditlog.csv') {
+			$response->setFileName('zbx_auditlog_export.csv');
+		}
+
 		$this->setResponse($response);
 	}
 
@@ -287,10 +295,12 @@ class CControllerAuditLogList extends CController {
 	private function sanitizeDetails(array $auditlogs): array {
 		foreach ($auditlogs as &$auditlog) {
 			$auditlog['short_details'] = '';
+			$auditlog['full_details'] = '';
 			$auditlog['details_button'] = 0;
 
 			if ($auditlog['resourcename'] != '') {
 				$auditlog['short_details'] .= _('Description').': '.$auditlog['resourcename'];
+				$auditlog['full_details'] .= _('Description').': '.$auditlog['resourcename'];
 			}
 
 			if (!in_array($auditlog['action'], [CAudit::ACTION_ADD, CAudit::ACTION_UPDATE, CAudit::ACTION_EXECUTE,
@@ -310,6 +320,10 @@ class CControllerAuditLogList extends CController {
 				$auditlog['short_details'] .= "\n\n";
 			}
 
+			if ($auditlog['full_details'] != '') {
+				$auditlog['full_details'] .= "\n\n";
+			}
+
 			$details = $this->formatDetails($details);
 			$short_details = array_slice($details, 0, 2);
 
@@ -326,6 +340,7 @@ class CControllerAuditLogList extends CController {
 			unset($detail);
 
 			$auditlog['details'] = implode("\n", $details);
+			$auditlog['full_details'] .= implode("\n", $details);
 			$auditlog['short_details'] .= implode("\n", $short_details);
 
 			if (!$auditlog['details_button'] && count($details) > 2) {
