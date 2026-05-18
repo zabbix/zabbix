@@ -65,6 +65,10 @@ class CFieldArray extends CField {
 		return this.getInnerValue(true);
 	}
 
+	updateState() {
+		this.#discoverAllFields();
+	}
+
 	_appendErrorHint(error_hint) {
 		this._field.parentNode.parentNode.appendChild(error_hint);
 	}

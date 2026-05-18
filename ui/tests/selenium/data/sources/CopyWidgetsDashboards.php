@@ -20,10 +20,10 @@ class CopyWidgetsDashboards {
 	/**
 	 * Create data for Copy widgets test.
 	 *
-	 * !!! Please, add new widgets to "Dashboard for Copying widgets _2" if necessary.
-	 * If "Dashboard for Copying widgets _2" is run out of space, create new dashboard with this exact name:
-	 * "Dashboard for Copying widgets _3", etc.
-	 * Second page on new dashboard for paste widgets should be named "Test_page".
+	 * !!! Please, add new widgets to "Widget copy dashboard 2" if necessary.
+	 * If "Widget copy dashboard 2" is run out of space, create new dashboard with this exact name:
+	 * "Widget copy dashboard 3", etc.
+	 * Second page on new widget pasting dashboard should be named "Test_page".
 	 *
 	 * @return array
 	 */
@@ -118,7 +118,7 @@ class CopyWidgetsDashboards {
 
 		CDataHelper::call('dashboard.create', [
 			[
-				'name' => 'Dashboard for Copying widgets _1',
+				'name' => 'Widget copy dashboard 1',
 				'display_period' => 30,
 				'auto_start' => 0,
 				'pages' => [
@@ -727,7 +727,7 @@ class CopyWidgetsDashboards {
 				]
 			],
 			[
-				'name' => 'Dashboard for Copying widgets _2',
+				'name' => 'Widget copy dashboard 2',
 				'display_period' => 30,
 				'auto_start' => 0,
 				'pages' => [
@@ -2518,7 +2518,7 @@ class CopyWidgetsDashboards {
 				]
 			],
 			[
-				'name' => 'Dashboard for Paste widgets',
+				'name' => 'Widget pasting dashboard',
 				'display_period' => 30,
 				'auto_start' => 0,
 				'pages' => [

@@ -2028,6 +2028,15 @@ select {
 	}
 }
 
+// Modals.
+.modal-popup.modal-popup-static {
+	&.modal-popup-sla-edit,
+	&.modal-popup-proxy-edit,
+	&.modal-popup-connector-edit {
+		--modal-max-width: 750px;
+	}
+}
+
 // Multiline input control.
 .multilineinput-control {
 	display: flex;
@@ -2535,6 +2544,10 @@ select {
 	background-color: $lighter-yellow;
 	border: 1px solid $ui-border-color;
 	@extend %webkit-scrollbar;
+
+	&.debug-output-table-refresh {
+		margin: 10px 0 0 0;
+	}
 }
 
 .overlay-descr {
@@ -4220,6 +4233,10 @@ z-select {
 		}
 
 		&.link-alt:not(:hover):not(:focus) {
+			@extend .#{$class};
+		}
+
+		&.link:not(:hover):not(:focus) {
 			@extend .#{$class};
 		}
 	}
