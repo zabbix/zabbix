@@ -281,6 +281,90 @@ class testItemPrototype extends CAPITest {
 					'delay' => '0'
 				],
 				'expected_error' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
+			],
+			//Test trapper items
+			[
+				'request_data' => [
+					'hostid' => '50009',
+					'ruleid' => '400660',
+					'name' => 'Trapper item 2',
+					'key_' => 'trapper_item[{#2}]',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_TRAPPER,
+					'trapper_hosts' => ''
+				],
+				'expected_error' => null
+			],
+			[
+				'request_data' => [
+					'hostid' => '50009',
+					'ruleid' => '400660',
+					'name' => 'Trapper item 3',
+					'key_' => 'trapper_item[{#3}]',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_TRAPPER,
+					'trapper_hosts' => 'localhost'
+				],
+				'expected_error' => null
+			],
+			[
+				'request_data' => [
+					'hostid' => '50009',
+					'ruleid' => '400660',
+					'name' => 'Trapper item with empty trapper_hosts',
+					'key_' => 'httpagent_item[{#1}]',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
+					'trapper_hosts' => 'localhost',
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => null
+			],
+			[
+				'request_data' => [
+					'hostid' => '50009',
+					'ruleid' => '400660',
+					'name' => 'HTTP agent without trapper_hosts',
+					'key_' => 'httpagent_item[{#2}]',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => null
+			],
+			[
+				'request_data' => [
+					'hostid' => '50009',
+					'ruleid' => '400660',
+					'name' => 'HTTP agent with empty trapper_hosts',
+					'key_' => 'httpagent_item[{#3}]',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
+					'trapper_hosts' => '',
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => null
+			],
+			[
+				'request_data' => [
+					'hostid' => '50009',
+					'ruleid' => '400660',
+					'name' => 'HTTP agent with localhost trapper_hosts',
+					'key_' => 'httpagent_item[{#4}]',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
+					'trapper_hosts' => 'localhost',
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => null
 			]
 		], $item_type_tests, $interfaces_tests);
 	}
@@ -296,15 +380,27 @@ class testItemPrototype extends CAPITest {
 				$request_data['delay'] = CTestArrayHelper::get($request_data, 'delay', '0');
 			}
 
+			if ($request_data['type'] === ITEM_TYPE_TRAPPER || $request_data['type'] === ITEM_TYPE_HTTPAGENT
+				&& array_key_exists('allow_traps', $request_data)
+				&& $request_data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON) {
+				if (!array_key_exists('trapper_hosts', $request_data)) {
+					$request_data['trapper_hosts'] = '{$TRAPPER.ALLOWED_HOSTS}';
+				}
+			}
+
 			if (!array_key_exists('delay', $request_data)) {
 				$request_data['delay'] = 0;
 			}
 
 			foreach ($result['result']['itemids'] as $id) {
-				$db_item = CDBHelper::getRow('SELECT hostid, name, key_, type, delay FROM items WHERE itemid='.zbx_dbstr($id));
+				$db_item = CDBHelper::getRow('SELECT hostid, name, key_, type, delay, trapper_hosts FROM items WHERE itemid='.zbx_dbstr($id));
 
 				foreach (['hostid', 'name', 'key_', 'type', 'delay'] as $field) {
 					$this->assertSame($db_item[$field], strval($request_data[$field]));
+				}
+
+				if (array_key_exists('trapper_hosts', $request_data)) {
+					$this->assertSame($db_item['trapper_hosts'], strval($request_data['trapper_hosts']));
 				}
 			}
 		}

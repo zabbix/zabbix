@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0beta1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050052);
+define('ZABBIX_DB_VERSION',		7050054);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -659,6 +659,7 @@ define('ZBX_DEFAULT_KEY_SSH',					'ssh.run[<unique short description>,<ip>,<port
 define('ZBX_DEFAULT_KEY_TELNET',				'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');
 
 define('ZBX_DEFAULT_JMX_ENDPOINT',	'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi');
+define('ZBX_DEFAULT_TRAPPER_HOSTS',	'{$TRAPPER.ALLOWED_HOSTS}');
 
 define('SYSMAP_ELEMENT_USE_ICONMAP_ON',		1);
 define('SYSMAP_ELEMENT_USE_ICONMAP_OFF',	0);
@@ -878,6 +879,9 @@ define('TRIGGER_SEVERITY_AVERAGE',			3);
 define('TRIGGER_SEVERITY_HIGH',				4);
 define('TRIGGER_SEVERITY_DISASTER',			5);
 define('TRIGGER_SEVERITY_COUNT',			6);
+
+define('TRIGGER_SEVERITY_OFF',			0);
+define('TRIGGER_SEVERITY_ON',			1);
 
 define('EVENT_CUSTOM_COLOR_DISABLED',	0);
 define('EVENT_CUSTOM_COLOR_ENABLED',	1);
