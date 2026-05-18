@@ -152,6 +152,7 @@ zbx_timezone_t;
 extern double	ZBX_DOUBLE_EPSILON;
 
 int	zbx_double_compare(double a, double b);
+void	zbx_update_epsilon_to_float_precision(void);
 
 /* item types */
 typedef enum

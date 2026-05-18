@@ -62,6 +62,8 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
+	zbx_update_epsilon_to_float_precision();
+
 	rules = mock_eval_read_rules("in.rules");
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 
