@@ -60,7 +60,7 @@ class CApiDpopHelper {
 
 		self::checkTokenLifeTime($payload, $check_time);
 
-		self::checkJti($payload, $check_time);
+		self::checkJti($payload);
 
 		self::checkSignature($signature, $header, $kid_keys, $check_time);
 	}
@@ -150,12 +150,10 @@ class CApiDpopHelper {
 	/**
 	 * @throws APIException
 	 */
-	private static function checkJti(array $payload, int $check_time): void {
+	private static function checkJti(array $payload): void {
 		if (!array_key_exists('jti', $payload)) {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Missing jti claim.');
 		}
-
-		DBexecute('DELETE FROM dpop_jti_cache WHERE expires_at<'.$check_time);
 
 		if (DBfetch(DBselect('SELECT jti FROM dpop_jti_cache WHERE jti='.zbx_dbstr($payload['jti'])))) {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'jti already used.');
