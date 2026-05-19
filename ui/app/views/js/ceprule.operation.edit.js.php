@@ -269,31 +269,58 @@ window.ceprule_operation_edit_popup = new class {
 	}
 };
 
-// TODO: move to file maybe..
 if (window.customElements.get('z-cep-tagsuggest') === undefined) {
 	class ZCepTagsuggest extends HTMLInputElement {
 
+		/** @type {Array} */
 		#position_tags = ['$IS.FIRST', '$IS.LAST'];
+
+		/** @type {Array} */
 		#property_tags = ['$IS.COPIED', '$RANK', '$STATUS.CODE'];
+
+		/** @type {Function} */
 		#handler;
-		#suggestion_template;
+
+		/** @type {HTMLElement} */
 		#suggestion_container;
-		#suggestions = [];
+
+		/** @type {Number} */
+		#highlighted_index = -1;
+
+		/** @type {Number} */
+		#suggestions_debounce;
+
+		/** @type {String} */
+		#last_value;
 
 		constructor() {
 			super();
 			this.setAttribute('autocomplete', 'off');
 			this.#handler = this.#onEvent.bind(this);
-			this.#suggestion_template = new Template('<li><span class="suggest-found">#{match}</span>#{unmatch}</li>');
-			this.#suggestion_container = (new Template(`
+			this.#suggestion_container = this.#buildSuggestionsContainer();
+		}
+
+		#buildSuggestionsContainer() {
+			const node = (new Template(`
 				<div class="multiselect-available">
 					<ul class="multiselect-suggest" aria-hidden="true"></ul>
 				</div>
 			`)).evaluateToElement();
 
-			this.#suggestion_container.addEventListener('click', console.log);
-			this.#suggestion_container.addEventListener('mouseenter', console.log);
-			this.#suggestion_container.addEventListener('mouseleave', console.log);
+			node.addEventListener('mouseover', (e) => {
+				const tag = e.target.dataset?.tag;
+
+				if (tag !== undefined) {
+					[...node.querySelectorAll('li')]
+						.map(li => li.classList.toggle('suggest-hover', tag === li.dataset.tag));
+				}
+			});
+
+			node.addEventListener('mousedown', (e) => {
+				this.#select((e.target instanceof HTMLLIElement) ? e.target : e.target.closest('li'));
+			});
+
+			return node;
 		}
 
 		#onEvent(e) {
@@ -309,56 +336,120 @@ if (window.customElements.get('z-cep-tagsuggest') === undefined) {
 				if (e.type === 'keyup') {
 					this.#triggerSuggestions(e.target.value);
 				}
-				else if (e.type === 'keydown') {
-					if (e.key === 'ArrowUp') {
-					}
-					else if (e.key === 'ArrowDown') {
-						// TODO: add "suggest-hover" class to focused li.
-						// TODO: confirm suggestion on enter and click
+				else if (e.type === 'keydown' && this.#suggestion_container.isConnected) {
+					const items = this.#suggestion_container.querySelectorAll('li');
+
+					switch (e.key) {
+						case 'ArrowDown':
+							e.preventDefault();
+							this.#highlight(Math.min(this.#highlighted_index + 1, items.length - 1));
+							break;
+						case 'ArrowUp':
+							e.preventDefault();
+							this.#highlight(Math.max(this.#highlighted_index - 1, 0));
+							break;
+						case 'Enter':
+							if (this.#highlighted_index >= 0 && items[this.#highlighted_index]) {
+								e.preventDefault();
+								this.#select(items[this.#highlighted_index]);
+							}
+							break;
 					}
 				}
+			}
+			else if (e.type === 'scroll' || e.type === 'resize') {
+				this.#hideSuggestions();
 			}
 		}
 
 		#triggerSuggestions(value) {
-			this.#suggestions = [
-				...this.hasAttribute('disable-position-tags') ? [] : this.#position_tags,
-				...this.#property_tags
-			];
+			if (value === this.#last_value) {
+				return;
+			}
+			else {
+				this.#last_value = value;
+			}
 
-			this.#suggestions = !value.startsWith('$')
-				? []
-				: this.#suggestions.filter(tag => tag.startsWith(value));
+			if (!value.startsWith('$')) {
+				return this.#hideSuggestions();
+			}
 
-			this.#suggestions.length
-				? this.#showSuggestions(this.#suggestions, value.length)
+			clearTimeout(this.#suggestions_debounce);
+
+			const position_tags = this.hasAttribute('disable-position-tags') ? [] : this.#position_tags;
+			const suggestions = [...position_tags, ...this.#property_tags].filter(tag => tag.startsWith(value));
+			const show = () => this.#showSuggestions(suggestions, value.length);
+
+			suggestions.length
+				? this.#suggestions_debounce = setTimeout(show, 50)
 				: this.#hideSuggestions();
 		}
 
 		#showSuggestions(suggestions, match_position) {
-			const suggestions_html = suggestions.sort()
-				.map(suggestion => this.#suggestion_template.evaluate({
+			const ul = this.#suggestion_container.querySelector('ul');
+
+			suggestions.sort()
+				.map((suggestion, index) => (new Template(`
+					<li data-tag="#{tag}"><span class="suggest-found">#{match}</span>#{unmatch}</li>
+				`)).evaluateToElement({
+					tag: suggestion,
 					match: suggestion.substr(0, match_position),
 					unmatch: suggestion.substr(match_position)
-				})).join('');
+				}))
+				.map((node, index) => ul.children[index] !== undefined
+					? ul.children[index].replaceWith(node)
+					: ul.append(node)
+				);
 
-			window.requestAnimationFrame(() => {
-				this.#positionSuggestions();
-				this.#suggestion_container.querySelector('ul').innerHTML = suggestions_html;
-				!this.#suggestion_container.isConnected && document.body.append(this.#suggestion_container);
-			});
+			while (ul.children.length > suggestions.length) {
+				ul.children[ul.children.length - 1].remove();
+			}
+
+			this.#positionSuggestions();
+			this.#highlight(0);
+
+			!this.#suggestion_container.isConnected && document.body.append(this.#suggestion_container);
 		}
 
 		#positionSuggestions() {
-			const {x, y, width} = this.getBoundingClientRect();
+			const box = this.#suggestion_container;
+			const rect = this.getBoundingClientRect();
+			const gap = 2;
+			const box_height = box.offsetHeight;
+			const space_below = window.innerHeight - rect.bottom - gap;
+			const space_above = rect.top - gap;
 
-			this.#suggestion_container.style.width = `${width - 20}px`;
-			this.#suggestion_container.style.top = `${y + 24}px`;
-			this.#suggestion_container.style.left = `${x}px`;
+			if (box_height <= space_below || space_below >= space_above) {
+				box.style.marginTop = '';
+				box.style.top = `${rect.bottom + gap + window.scrollY}px`;
+			}
+			else {
+				box.style.marginTop = `${-(box_height + gap)}px`;
+				box.style.top = `${rect.top + window.scrollY}px`;
+			}
+
+			box.style.width = `${rect.width}px`;
+			box.style.left = `${rect.left + window.scrollX}px`;
 		}
 
 		#hideSuggestions() {
+			this.#last_value = null;
+			clearTimeout(this.#suggestions_debounce);
 			this.#suggestion_container.isConnected && this.#suggestion_container.remove();
+		}
+
+		#highlight(index) {
+			this.#suggestion_container.querySelectorAll('li').forEach((item, i) => {
+				item.classList.toggle('suggest-hover', i === index);
+			});
+
+			this.#highlighted_index = index;
+		}
+
+		#select(li) {
+			this.value = li.dataset.tag;
+			this.focus();
+			this.#hideSuggestions();
 		}
 
 		connectedCallback() {
@@ -366,6 +457,9 @@ if (window.customElements.get('z-cep-tagsuggest') === undefined) {
 			this.addEventListener('keyup', this.#handler);
 			this.addEventListener('focusin', this.#handler);
 			this.addEventListener('focusout', this.#handler);
+
+			window.addEventListener('resize', this.#handler);
+			window.addEventListener('scroll', this.#handler, {capture: true, passive: true});
 		}
 
 		disconnectedCallback() {
@@ -373,6 +467,9 @@ if (window.customElements.get('z-cep-tagsuggest') === undefined) {
 			this.removeEventListener('keyup', this.#handler);
 			this.removeEventListener('focusin', this.#handler);
 			this.removeEventListener('focusout', this.#handler);
+
+			window.removeEventListener('resize', this.#handler);
+			window.removeEventListener('scroll', this.#handler, {capture: true, passive: true});
 		}
 	}
 
