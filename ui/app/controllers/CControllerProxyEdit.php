@@ -133,6 +133,18 @@ class CControllerProxyEdit extends CController {
 					'timeout_script' => $this->proxy['timeout_script'],
 					'timeout_browser' => $this->proxy['timeout_browser']
 				];
+
+			$connected_usrgrps = array_column(API::UserGroup()->get([
+				'output' => ['name'],
+				'proxyids' => $this->proxy['proxyid'],
+				'limit' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
+			]), 'name');
+
+			if(count($connected_usrgrps) > 0) {
+				$data['warnings'][] = _s('By adding the proxy to a proxy group, it will be removed from proxy allow/deny lists of the following user groups: %1$s',
+						implode(', ', $connected_usrgrps)
+					);
+			}
 		}
 		else {
 			$data = [
@@ -165,7 +177,8 @@ class CControllerProxyEdit extends CController {
 					'timeout_telnet_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELNET_AGENT),
 					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
 					'timeout_browser' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER)
-				]
+				],
+				'warnings' => []
 			];
 		}
 

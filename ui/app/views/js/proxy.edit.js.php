@@ -23,7 +23,7 @@ window.proxy_edit_popup = new class {
 		this.form_element = null;
 	}
 
-	init({proxyid, rules}) {
+	init({proxyid, rules, warnings}) {
 		this.proxyid = proxyid;
 
 		this.overlay = overlays_stack.getById('proxy.edit');
@@ -50,7 +50,7 @@ window.proxy_edit_popup = new class {
 			}
 		}
 
-		jQuery('#proxy_groupid').on('change', () => this._update());
+		jQuery('#proxy_groupid').on('change', () => this._update(warnings));
 
 		for (const id of ['operating_mode', 'tls_connect', 'tls_accept_psk', 'tls_accept_certificate',
 				'custom_timeouts']) {
@@ -83,8 +83,19 @@ window.proxy_edit_popup = new class {
 		this.display_change_psk = false;
 	}
 
-	_update() {
+	_update(warnings) {
 		const $proxy_group = jQuery('#proxy_groupid').multiSelect('getData');
+		const hasSelection = $proxy_group.length > 0;
+
+		if (hasSelection && warnings?.length) {
+			this.#removePopupMessages();
+			const message_box = makeMessageBox('warning', warnings, null, true, false)[0];
+
+			this.form_element.parentNode.insertBefore(message_box, this.form_element);
+		}
+		else if (!hasSelection) {
+			this.#removePopupMessages();
+		}
 
 		for (const element of this.form_element.querySelectorAll('.js-local-address')) {
 			element.style.display = $proxy_group.length ? '' : 'none';
@@ -171,6 +182,8 @@ window.proxy_edit_popup = new class {
 	}
 
 	clone({title, buttons, rules}) {
+		this.#removePopupMessages();
+
 		this.clone_proxyid = this.proxyid;
 		this.proxyid = null;
 
@@ -183,6 +196,8 @@ window.proxy_edit_popup = new class {
 	}
 
 	delete() {
+		this.#removePopupMessages();
+
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'proxy.delete');
 		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('proxy')) ?>);
@@ -191,6 +206,8 @@ window.proxy_edit_popup = new class {
 	}
 
 	submit() {
+		this.#removePopupMessages();
+
 		const fields = this.form.getAllValues();
 
 		if (this.proxyid !== null) {
@@ -273,5 +290,16 @@ window.proxy_edit_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	}
+
+	/**
+	 * Removes all popup message boxes above the form.
+	 */
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
 	}
 };
