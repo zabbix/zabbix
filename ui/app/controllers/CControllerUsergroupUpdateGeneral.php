@@ -73,4 +73,34 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 
 		return $tag_filters;
 	}
+
+	protected function validateProxyGroupConflicts(): void {
+		$proxyids = $this->getInput('proxyids');
+
+		if (!$proxyids) {
+			return;
+		}
+
+		$proxy_groups = API::ProxyGroup()->get([
+			'output' => ['proxy_groupid', 'name'],
+			'proxyids' => $proxyids,
+			'selectProxies' => ['proxyid', 'name']
+		]);
+
+		$selected_proxyids = array_flip($proxyids);
+
+		foreach ($proxy_groups as $proxy_group) {
+			foreach ($proxy_group['proxies'] ?? [] as $proxy) {
+				if (!isset($selected_proxyids[$proxy['proxyid']])) {
+					continue;
+				}
+
+				CMessageHelper::addError(_s(
+					'Proxy "%1$s" cannot be added to the proxy list because it is already managed by "%2$s".',
+					$proxy['name'],
+					$proxy_group['name']
+				));
+			}
+		}
+	}
 }

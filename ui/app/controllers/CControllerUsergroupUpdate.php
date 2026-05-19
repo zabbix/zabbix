@@ -123,9 +123,22 @@ class CControllerUsergroupUpdate extends CControllerUsergroupUpdateGeneral {
 	protected function doAction(): void {
 		$user_group = self::processUserGroupInputData($this->getUserGroupInputData());
 
-		$result = (bool) API::UserGroup()->update($user_group);
+		$this->validateProxyGroupConflicts();
 
 		$output = [];
+
+		if ($messages = get_and_clear_messages()) {
+			$output['error'] = [
+				'title' => _('Cannot update user group'),
+				'messages' => array_column($messages, 'message')
+			];
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+
+			return;
+		}
+
+		$result = (bool) API::UserGroup()->update($user_group);
 
 		if ($result) {
 			$output['success']['title'] = _('User group updated');
