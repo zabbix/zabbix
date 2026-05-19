@@ -767,9 +767,15 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDHistorySyncAtScale_TriggerNoDataNotSupported
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataValueOmitted() {
+		$unknown_before = $this->getUnknownTriggerEventCount();
 		$this->verifyValueOmittedDrainsDelay();
 
 		$this->verifyProxyLastaccessAndNoDataTriggersFiring();
+
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		if ($unknown_before !== $unknown_after) {
+			$this->markTestSkipped('Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
+		}
 	}
 
 	private function verifyValueOmittedDrainsDelay(): void {
@@ -789,9 +795,15 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDHistorySyncAtScale_TriggerNoDataNotSupported
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataValueOmittedLastlogsize() {
+		$unknown_before = $this->getUnknownTriggerEventCount();
 		$this->verifyLogLastlogsizeAdvances();
 
 		$this->verifyProxyLastaccessAndNoDataTriggersFiring();
+	
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		if ($unknown_before !== $unknown_after) {
+			$this->markTestSkipped('Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
+		}
 	}
 
 	private function verifyLogLastlogsizeAdvances(): void {
@@ -822,8 +834,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	private function verifyProxyLastaccessAndNoDataTriggersFiring(): void {
-		$unknown_before = $this->getUnknownTriggerEventCount();
-
 		$response = $this->call('proxy.get', [
 			'proxyids' => [self::$proxyid],
 			'output' => ['lastaccess']
@@ -858,11 +868,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			}
 			return true;
 		});
-
-		$unknown_after = $this->getUnknownTriggerEventCount();
-		if ($unknown_before !== $unknown_after) {
-			$this->markTestSkipped('Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
-		}
 	}
 
 	/**
@@ -1184,16 +1189,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			$vtype = $def['value_type'];
 			$itemids = $sent[$vtype]['itemids'];
 			$expected_by_itemid = $sent[$vtype]['expected_by_itemid'];
-
-			$this->callUntilDataIsPresent('history.get', [
-				'history' => $vtype,
-				'itemids' => [$itemids[0]],
-				'time_from' => $tm,
-				'time_till' => $tm,
-				'limit' => 1
-			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-				return count($response['result']) === 1;
-			});
 
 			$history_response = $this->callUntilDataIsPresent('history.get', [
 				'history' => $vtype,
