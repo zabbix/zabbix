@@ -242,7 +242,13 @@ try
 
 		browser2.setElementWaitTimeout(0);
 
-		findElementStrict(browser2, "xpath", "//div[@class='no-data-message']");
+		try {
+			findElementStrict(browser2, "xpath", "//div[@class='no-data-message']");
+		}
+		catch (error) {
+			Zabbix.log(5, "screenshot: " + browser2.getScreenshot());
+			throw error;
+		}
 
 		browser2.setElementWaitTimeout(3000);
 
@@ -279,7 +285,7 @@ try
 		el = browser2.findElement("link text", "Sign out");
 
 		Zabbix.log(3, "collect performance entries");
-		browser2.collectPerfEntries();
+		browser2.collectPerfEntries();	// only collect, dashboard performance entries are too big to fit into history table
 
 		try
 		{
@@ -321,6 +327,9 @@ try
 	}
 	catch (error)
 	{
+		if (null !== browser2.getError())
+			browser.setError(browser2.getError());
+
 		throw error;
 	}
 
@@ -419,7 +428,6 @@ catch (err)
 }
 
 result = browser.getResult();
-result.browserDashboard = browserDashboardResult;
 
 Zabbix.log(3, "finished");
 return JSON.stringify(result);
