@@ -1721,7 +1721,7 @@ FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 TABLE|event_suppress|event_suppressid|0
 FIELD		|event_suppressid|t_id		|	|NOT NULL	|0
 FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
-FIELD		|maintenanceid	|t_id		|	|NULL		|0			|2|maintenances
+FIELD		|maintenanceid	|t_id		|	|NULL		|0			|-|maintenances
 FIELD		|suppress_until	|t_time		|'0'	|NOT NULL	|0
 FIELD		|userid		|t_id		|	|NULL		|0			|3|users
 UNIQUE		|1		|eventid,maintenanceid
@@ -2298,4 +2298,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7050057	|7050057
+ROW		|1		|7050058	|7050058
