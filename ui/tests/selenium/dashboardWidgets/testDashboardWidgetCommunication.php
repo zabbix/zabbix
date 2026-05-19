@@ -2873,7 +2873,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 							],
 							[
 								'operation' => 'fill',
-								'element' => ['Item' => 'Unique trapper item']
+								'element' => [
+									'Item' => 'Unique trapper item',
+									'History data' => 'History'
+								]
 							]
 						]
 					],
