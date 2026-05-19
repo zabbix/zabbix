@@ -1058,7 +1058,7 @@ void	zbx_dc_poller_requeue_items(const zbx_uint64_t *itemids, const int *lastclo
 void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num);
 #endif
 
-int	zbx_dc_config_check_trigger_dependencies(zbx_uint64_t triggerid);
+void	zbx_dc_get_trigger_deps_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uint64_t *depids);
 
 void	zbx_dc_config_triggers_apply_changes(zbx_trigger_diff_t **trigger_diffs, int diffs_num);
 void	zbx_dc_config_items_apply_changes(const zbx_vector_item_diff_ptr_t *item_diff);

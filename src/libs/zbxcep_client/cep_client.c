@@ -21,6 +21,7 @@
 #include "zbxipcservice.h"
 #include "zbxdbhigh.h"
 #include "zbxexit.h"
+#include "zbxcacheconfig.h"
 
 ZBX_VECTOR_IMPL(cep_assessment_query, zbx_cep_assessment_query_t)
 ZBX_VECTOR_IMPL(event_maintenance, zbx_event_maintenance_t)
@@ -884,3 +885,71 @@ void	zbx_cep_deserialize_ids(const unsigned char *data, zbx_vector_uint64_t *ids
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check trigger dependencies via cep service                        *
+ *                                                                            *
+ * Parameters: depids - [IN] trigger dependency IDs to check                  *
+ *                                                                            *
+ * Return value: SUCCEED if no dependent trigger has a problem                *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	cep_check_trigger_deps(zbx_vector_uint64_t *depids)
+{
+	zbx_uint32_t	data_len;
+	unsigned char	*data;
+	int		ret;
+
+	data_len = zbx_cep_serialize_ids(depids, &data);
+
+	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_CHECK_TRIGGER_DEPS, data, data_len))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send delete events message to CEP service");
+		zbx_exit(EXIT_FAILURE);
+	}
+
+	zbx_ipc_message_t	response = {0};
+
+	if (FAIL == zbx_ipc_socket_read(cep_client_socket(), &response))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot receive data from CEP service");
+		zbx_exit(EXIT_FAILURE);
+	}
+
+	ret = (CEP_EVENT_ALLOW == *response.data ? SUCCEED : FAIL);
+
+	zbx_ipc_message_clean(&response);
+	zbx_free(data);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check trigger dependencies via cep service                        *
+ *                                                                            *
+ * Parameters: triggerid - [IN] trigger ID to check                           *
+ *                                                                            *
+ * Return value: SUCCEED if no dependent trigger has a problem                *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cep_check_trigger_deps(zbx_uint64_t triggerid)
+{
+	zbx_vector_uint64_t	depids;
+	int			ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64, __func__, triggerid);
+
+	zbx_vector_uint64_create(&depids);
+
+	zbx_dc_get_trigger_deps_by_triggerid(triggerid, &depids);
+	ret = cep_check_trigger_deps(&depids);
+
+	zbx_vector_uint64_destroy(&depids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}

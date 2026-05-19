@@ -360,6 +360,5 @@ void	zbx_log_fatal_info(void *context, unsigned int flags)
 
 void	zbx_exit_thread(int ret)
 {
-	zabbix_log(LOG_LEVEL_ERR, "[WDN] exit thread");
 	pthread_exit((void *)(zbx_int64_t)ret);
 }

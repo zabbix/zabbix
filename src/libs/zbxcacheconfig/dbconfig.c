@@ -60,6 +60,7 @@
 #include "zbx_expression_constants.h"
 #include "module.h"
 #include "zbxhash.h"
+#include "zbxcep_client.h"
 
 #define	ZBX_VECTOR_ARRAY_RESERVE	3
 
@@ -10732,9 +10733,6 @@ void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_dc_tr
 				if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION != dc_trigger->recovery_mode)
 					continue;
 
-				if (TRIGGER_VALUE_PROBLEM != dc_trigger->value)
-					continue;
-
 				if (SUCCEED != DCconfig_find_active_time_function(dc_trigger->recovery_expression,
 						dc_trigger->recovery_expression_bin,
 						dc_trigger->timer & ZBX_TRIGGER_TIMER_RECOVERY_EXPRESSION))
@@ -12328,100 +12326,6 @@ int	zbx_dc_set_interfaces_availability(zbx_vector_availability_ptr_t *availabili
 		if (SUCCEED == DCinterface_set_availability(dc_interface, now, ia))
 			ret = SUCCEED;
 	}
-
-	UNLOCK_CACHE;
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Comments: helper function for trigger dependency checking                  *
- *                                                                            *
- * Parameters: trigdep        - [IN] the trigger dependency data              *
- *             level          - [IN] the trigger dependency level             *
- *             triggerids     - [IN] the currently processing trigger ids     *
- *                                   for bulk trigger operations              *
- *                                   (optional, can be NULL)                  *
- *             master_triggerids - [OUT] unresolved master trigger ids        *
- *                                   for bulk trigger operations              *
- *                                   (optional together with triggerids       *
- *                                   parameter)                               *
- *                                                                            *
- * Return value: SUCCEED - trigger dependency check succeed / was unresolved  *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- * Comments: With bulk trigger processing a master trigger can be in the same *
- *           batch as dependent trigger. In this case it might be impossible  *
- *           to perform dependency check based on cashed trigger values. The  *
- *           unresolved master trigger ids will be added to master_triggerids *
- *           vector, so the dependency check can be performed after a new     *
- *           master trigger value has been calculated.                        *
- *                                                                            *
- ******************************************************************************/
-static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST *trigdep, int level,
-		const zbx_vector_uint64_t *triggerids, zbx_vector_uint64_t *master_triggerids)
-{
-	int				i;
-	const ZBX_DC_TRIGGER		*next_trigger;
-	const ZBX_DC_TRIGGER_DEPLIST	*next_trigdep;
-
-	if (ZBX_TRIGGER_DEPENDENCY_LEVELS_MAX < level)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "recursive trigger dependency is too deep (triggerid:" ZBX_FS_UI64 ")",
-				trigdep->triggerid);
-		return SUCCEED;
-	}
-
-	if (0 != trigdep->dependencies.values_num)
-	{
-		for (i = 0; i < trigdep->dependencies.values_num; i++)
-		{
-			next_trigdep = (const ZBX_DC_TRIGGER_DEPLIST *)trigdep->dependencies.values[i];
-
-			if (NULL != (next_trigger = next_trigdep->trigger) &&
-					TRIGGER_STATUS_ENABLED == next_trigger->status &&
-					TRIGGER_FUNCTIONAL_TRUE == next_trigger->functional)
-			{
-
-				if (NULL == triggerids || FAIL == zbx_vector_uint64_bsearch(triggerids,
-						next_trigger->triggerid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-				{
-					if (TRIGGER_VALUE_PROBLEM == next_trigger->value)
-						return FAIL;
-				}
-				else
-					zbx_vector_uint64_append(master_triggerids, next_trigger->triggerid);
-			}
-
-			if (FAIL == DCconfig_check_trigger_dependencies_rec(next_trigdep, level + 1, triggerids,
-					master_triggerids))
-			{
-				return FAIL;
-			}
-		}
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check whether any of trigger dependencies have value PROBLEM      *
- *                                                                            *
- * Return value: SUCCEED - trigger can change its value                       *
- *               FAIL - otherwise                                             *
- *                                                                            *
- ******************************************************************************/
-int	zbx_dc_config_check_trigger_dependencies(zbx_uint64_t triggerid)
-{
-	int				ret = SUCCEED;
-	const ZBX_DC_TRIGGER_DEPLIST	*trigdep;
-
-	RDLOCK_CACHE;
-
-	if (NULL != (trigdep = (const ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_search(&config->trigdeps, &triggerid)))
-		ret = DCconfig_check_trigger_dependencies_rec(trigdep, 0, NULL, NULL);
 
 	UNLOCK_CACHE;
 
@@ -17092,9 +16996,9 @@ static void	dc_get_trigger_deps_rec(const ZBX_DC_TRIGGER_DEPLIST *trigdep, int l
 
 void	zbx_dc_get_trigger_deps(zbx_vector_dc_trigger_t *triggers)
 {
-	ZBX_DC_TRIGGER_DEPLIST	*trigdep;
-
 	RDLOCK_CACHE;
+
+	ZBX_DC_TRIGGER_DEPLIST	*trigdep;
 
 	for (int i = 0; i < triggers->values_num; i++)
 	{
@@ -17104,6 +17008,23 @@ void	zbx_dc_get_trigger_deps(zbx_vector_dc_trigger_t *triggers)
 			continue;
 		}
 		dc_get_trigger_deps_rec(trigdep, 0, &triggers->values[i]->dep_triggerids);
+	}
+
+	UNLOCK_CACHE;
+}
+
+void	zbx_dc_get_trigger_deps_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uint64_t *depids)
+{
+	const ZBX_DC_TRIGGER	*dc_trigger;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (dc_trigger = (const ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &triggerid)))
+	{
+		ZBX_DC_TRIGGER_DEPLIST	*trigdep;
+
+		if (NULL != (trigdep = (ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_search(&config->trigdeps, &triggerid)))
+			dc_get_trigger_deps_rec(trigdep, 0, depids);
 	}
 
 	UNLOCK_CACHE;

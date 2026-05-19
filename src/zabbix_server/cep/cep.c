@@ -544,7 +544,7 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
  *                                                                            *
  * Purpose: initialize cache                                                  *
  *                                                                            *
- * Parameters: cache  - [IN/OUT] cache context                                *
+ * Parameters: cep   - [IN/OUT] cep cache                                     *
  *             dbpool - [IN]     database connection pool                     *
  *                                                                            *
  ******************************************************************************/
@@ -590,7 +590,7 @@ zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event)
  *                                                                            *
  * Purpose: check trigger dependencies for event processing                   *
  *                                                                            *
- * Parameters: cache        - [IN] cache context                              *
+ * Parameters: cep          - [IN] cep cache                                  *
  *             triggerids   - [IN] trigger IDs processed in current batch or  *
  *                                 NULL                                       *
  *             dep_triggerids - [IN] dependency trigger IDs                   *
@@ -638,7 +638,7 @@ static zbx_cep_result_t	cep_check_trigger_dependency(zbx_cep_t *cep, const zbx_h
  *                                                                            *
  * Purpose: assess trigger events against cache state                         *
  *                                                                            *
- * Parameters: cache   - [IN/OUT] cache context                               *
+ * Parameters: cep     - [IN/OUT] cep cache                                   *
  *             queries - [IN]     trigger assessment queries                  *
  *             results - [OUT]    assessment results                          *
  *                                                                            *
@@ -731,6 +731,37 @@ void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_q
 	zbx_hashset_destroy(&triggerids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() dropped:%d", __func__, dropped_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check trigger dependencies in CEP cache                           *
+ *                                                                            *
+ * Parameters: cep        - [IN] correlation expression processor             *
+ *             triggerids - [IN] trigger dependencies                         *
+ *                                                                            *
+ * Return value: CEP_EVENT_DEPENDENCY_DENY if any trigger has open events,    *
+ *               CEP_EVENT_ALLOW otherwise                                    *
+ *                                                                            *
+ ******************************************************************************/
+zbx_cep_result_t	cep_check_trigger_deps(zbx_cep_t *cep, const zbx_vector_uint64_t *triggerids)
+{
+	zbx_cep_origin_t	origin = {.source = EVENT_SOURCE_TRIGGERS, .object = EVENT_OBJECT_TRIGGER};
+
+	for (int i = 0; i < triggerids->values_num; i++)
+	{
+		zbx_cep_object_t	*obj;
+
+		origin.objectid = triggerids->values[i];
+
+		if (NULL == (obj = cep_get_object(cep, &origin)))
+			continue;
+
+		if (0 != obj->events.values_num)
+			return CEP_EVENT_DEPENDENCY_DENY;
+	}
+
+	return CEP_EVENT_ALLOW;
 }
 
 /******************************************************************************

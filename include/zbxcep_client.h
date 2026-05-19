@@ -31,6 +31,8 @@
 #define ZBX_CEP_UPDATE_SEVERITIES	(ZBX_IPC_RTC_MAX + 7)
 #define ZBX_CEP_ADD_EVENT_TAGS		(ZBX_IPC_RTC_MAX + 8)
 #define ZBX_CEP_DELETE_EVENTS		(ZBX_IPC_RTC_MAX + 9)
+#define ZBX_CEP_CHECK_TRIGGER_DEPS	(ZBX_IPC_RTC_MAX + 10)
+
 typedef enum
 {
 	CEP_EVENT_ALLOW,
@@ -101,6 +103,8 @@ void	zbx_buffer_serialize_event_tags(unsigned char **data, zbx_uint32_t *data_al
 
 void	zbx_cep_send_deleted_events(const zbx_uint64_t *eventids, int eventids_num);
 void	zbx_cep_deserialize_ids(const unsigned char *data, zbx_vector_uint64_t *ids);
+
+int	zbx_cep_check_trigger_deps(zbx_uint64_t triggerid);
 
 #endif
 

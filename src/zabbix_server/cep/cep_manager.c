@@ -209,6 +209,25 @@ static void	cep_manager_add_assess_trigger_events(zbx_cep_manager_t *manager, zb
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check trigger dependency status                                   *
+ *                                                                            *
+ * Parameters: manager - [IN] CEP manager instance                            *
+ *             client  - [IN] IPC client handle                               *
+ *             message - [IN] IPC message descriptor                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_manager_check_trigger_deps(zbx_cep_manager_t *manager, zbx_ipc_client_t **client,
+	zbx_ipc_message_t **message)
+{
+	unsigned char*	response;
+
+	response = (unsigned char*)zbx_malloc(NULL, 1);
+
+	cep_manager_add_remote_task(manager, client, message, response, 1);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: send remote CEP task response if available                        *
  *                                                                            *
  * Parameters: task - [IN] remote CEP task descriptor                         *
@@ -433,6 +452,9 @@ void	*zbx_cep_manager_thread(void *args)
 			{
 				case ZBX_CEP_ASSESS_TRIGGER_EVENTS:
 					cep_manager_add_assess_trigger_events(manager, &client, &message);
+					break;
+				case ZBX_CEP_CHECK_TRIGGER_DEPS:
+					cep_manager_check_trigger_deps(manager, &client, &message);
 					break;
 				case ZBX_CEP_ADD_EVENTS:
 				case ZBX_CEP_ADD_USER_CLOSE_EVENT:

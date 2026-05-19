@@ -84,6 +84,29 @@ static void	cep_worker_assess_trigger_events(zbx_cep_task_remote_t *task)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check trigger depdendency status                                  *
+ *                                                                            *
+ * Parameters: task - [IN] task containing trigger status                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_worker_check_trigger_deps(zbx_cep_task_remote_t *task)
+{
+	zbx_cep_t		*cep;
+	zbx_vector_uint64_t	triggerids;
+
+	zbx_vector_uint64_create(&triggerids);
+
+	zbx_cep_deserialize_ids(task->message->data, &triggerids);
+
+	cep_cache_acquire(&cep);
+	*task->response = (unsigned char)cep_check_trigger_deps(cep, &triggerids);
+	cep_cache_release(&cep);
+
+	zbx_vector_uint64_destroy(&triggerids);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: deserialize events and enqueue corresponding event creation tasks *
  *                                                                            *
  * Parameters: worker - [IN]                                                  *
@@ -328,6 +351,9 @@ static void	cep_worker_process_task_remote(zbx_cep_worker_t *worker, zbx_cep_tas
 	{
 		case ZBX_CEP_ASSESS_TRIGGER_EVENTS:
 			cep_worker_assess_trigger_events(task);
+			break;
+		case ZBX_CEP_CHECK_TRIGGER_DEPS:
+			cep_worker_check_trigger_deps(task);
 			break;
 		case ZBX_CEP_ADD_EVENTS:
 			cep_worker_add_events(worker, task);
