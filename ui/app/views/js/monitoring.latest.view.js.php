@@ -348,6 +348,10 @@
 			this._removeRefreshMessage();
 			this.doRefresh(response.body, response.subfilter ? response.subfilter : null);
 
+            if ('filter_set' in response) {
+                this.filter_set = response.filter_set;
+            }
+
 			if ('messages' in response) {
 				this._addRefreshMessage(response.messages);
 			}
@@ -378,6 +382,8 @@
 		},
 
 		onDataAlways() {
+            this.running = this.refresh_interval != 0 && this.filter_set;
+
 			if (this.running) {
 				this.scheduleRefresh();
 			}
