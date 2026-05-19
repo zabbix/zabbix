@@ -168,6 +168,7 @@ class testGraphAxis extends CWebTest {
 				->scrollIntoView(50)->click();
 		$this->page->waitUntilReady();
 		$this->waitUntilGraphIsLoaded();
+sleep(2);
 		$this->query('id:from')->one()->fill($data['start_period']);
 		$this->query('id:to')->one()->fill($data['end_period']);
 		$this->query('id:apply')->one()->waitUntilClickable()->click();
