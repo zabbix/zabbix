@@ -174,7 +174,7 @@ class testGraphAxis extends CWebTest {
 
 		$this->page->waitUntilReady();
 		// TODO: This sleep is added here because of DEV-1908.
-		sleep(5);
+		sleep(1);
 		$this->assertScreenshot($this->waitUntilGraphIsLoaded(), $data['name']);
 	}
 

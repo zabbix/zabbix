@@ -5820,6 +5820,7 @@ class testDataDisplayInGraphs extends CWebTest {
 		}
 		else {
 			$object->asDashboard()->waitUntilReady();
+			$this->query('class:dashboard-is-multipage')->one()->waitUntilClassesPresent('is-ready');
 		}
 
 		$this->assertScreenshotExcept($object, $this->query('class:header-kioskmode-controls')->one(), $id.'_kiosk');

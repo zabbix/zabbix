@@ -616,6 +616,7 @@ class testDashboardsPages extends CWebTest {
 				->waitUntilReady();
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 		$this->page->waitUntilReady();
+		$this->query('xpath://button[@title="Normal view"]')->waitUntilVisible()->one();
 
 		// Switch pages next/previous.
 		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
