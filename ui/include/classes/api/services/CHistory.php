@@ -142,40 +142,11 @@ class CHistory extends CApiService {
 			$options['itemids'] = array_keys($items);
 		}
 
-		switch (Manager::History()->getDataSourceType($options['history'])) {
-			case ZBX_HISTORY_SOURCE_ELASTIC:
-				$result = $this->getFromElasticsearch($options);
-				break;
-
-			case ZBX_HISTORY_SOURCE_CLICKHOUSE:
-				$value_type_ttl = Manager::History()->getValueTypesStorageTtls()[$options['history']]['value_ttl'];
-				if ($value_type_ttl !== null) {
-					$options['time_from'] = max($options['time_from'], time() - $value_type_ttl + 1);
-				}
-
-				/** @var CClickHouseStorage $storage */
-				$storage = Manager::History()->getStorageProviderInstance($options['history']);
-				$result = $storage->select($options);
-
-				if ($storage->getErrorCode() !== null) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $storage->getErrorMessage());
-				}
-
-				if ($options['countOutput']) {
-					$result = $result[0]['rowscount'];
-				}
-				break;
-
-			case ZBX_HISTORY_SOURCE_SQL:
-				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
-					$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
-					$options['time_from'] = max($options['time_from'], time() - $hk_history + 1);
-				}
-
-				$this->tableName = Manager::History()->getTableName($options['history']);
-				$result = $this->getFromSql($options);
-				break;
-		}
+		$result = match (Manager::History()->getDataSourceType($options['history'])) {
+			ZBX_HISTORY_SOURCE_ELASTIC => $this->getFromElasticsearch($options),
+			ZBX_HISTORY_SOURCE_CLICKHOUSE => $this->getFromClickHouse($options),
+			ZBX_HISTORY_SOURCE_SQL => $this->getFromSql($options)
+		};
 
 		if ($options['countOutput']) {
 			return (string) $result;
@@ -196,7 +167,13 @@ class CHistory extends CApiService {
 	 *
 	 * @see CHistory::get
 	 */
-	private function getFromSql($options) {
+	private function getFromSql(array $options) {
+		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
+			$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+			$options['time_from'] = max($options['time_from'], time() - $hk_history + 1);
+		}
+
+		$this->tableName = Manager::History()->getTableName($options['history']);
 		$result = [];
 		$sql_parts = [
 			'select'	=> ['history' => 'h.itemid'],
@@ -266,7 +243,7 @@ class CHistory extends CApiService {
 	 *
 	 * @see CHistory::get
 	 */
-	private function getFromElasticsearch($options) {
+	private function getFromElasticsearch(array $options) {
 		$query = [];
 		$table = Manager::History()->getTableName($options['history']);
 		$schema = DB::getSchema($table);
@@ -347,6 +324,29 @@ class CHistory extends CApiService {
 		}
 
 		return null;
+	}
+
+	/**
+	 * ClickHouse specific implementation of get.
+	 *
+	 * @see CHistory::get
+	 */
+	private function getFromClickHouse(array $options) {
+		$value_type_ttl = Manager::History()->getValueTypesStorageTtls()[$options['history']]['value_ttl'];
+
+		if ($value_type_ttl !== null) {
+			$options['time_from'] = max($options['time_from'], time() - $value_type_ttl + 1);
+		}
+
+		/** @var CClickHouseStorage $storage */
+		$storage = Manager::History()->getStorageProviderInstance($options['history']);
+		$result = $storage->select($options);
+
+		if ($storage->getErrorCode() !== null) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $storage->getErrorMessage());
+		}
+
+		return $options['countOutput'] ? $result[0]['rowscount'] : $result;
 	}
 
 	/**

@@ -63,38 +63,20 @@ class CTrend extends CApiService {
 		}
 
 		foreach ([ZBX_HISTORY_SOURCE_ELASTIC, ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_SQL] as $source) {
-			if (array_key_exists($source, $storage_items)) {
-				$options['itemids'] = $storage_items[$source];
-
-				switch ($source) {
-					case ZBX_HISTORY_SOURCE_ELASTIC:
-						$data = $this->getFromElasticsearch($options);
-						break;
-
-					case ZBX_HISTORY_SOURCE_CLICKHOUSE:
-						$data = $this->getFromClickHouse($options);
-						break;
-
-					case ZBX_HISTORY_SOURCE_SQL:
-						if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL) == 1) {
-							$hk_trends = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
-							$options['time_from'] = max($options['time_from'], time() - $hk_trends + 1);
-						}
-
-						$data = $this->getFromSql($options);
-						break;
-				}
-
-				if (is_array($result)) {
-					$result = array_merge($result, $data);
-				}
-				else {
-					$result += $data;
-				}
+			if (!array_key_exists($source, $storage_items)) {
+				continue;
 			}
+
+			$options['itemids'] = $storage_items[$source];
+			$data = match ($source) {
+				ZBX_HISTORY_SOURCE_ELASTIC => $this->getFromElasticsearch($options),
+				ZBX_HISTORY_SOURCE_CLICKHOUSE => $this->getFromClickHouse($options),
+				ZBX_HISTORY_SOURCE_SQL => $this->getFromSql($options)
+			};
+			$result = $options['countOutput'] ? $result + $data : array_merge($result, $data);
 		}
 
-		return is_array($result) ? $result : (string) $result;
+		return $options['countOutput'] ? (string) $result : $result;
 	}
 
 	private static function validateGet(array &$options): void {
@@ -123,7 +105,12 @@ class CTrend extends CApiService {
 	 *
 	 * @see CTrend::get
 	 */
-	private function getFromSql($options) {
+	private function getFromSql(array $options) {
+		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL) == 1) {
+			$hk_trends = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+			$options['time_from'] = max($options['time_from'], time() - $hk_trends + 1);
+		}
+
 		$sql_where = [];
 
 		if ($options['time_from'] !== null) {
@@ -202,7 +189,7 @@ class CTrend extends CApiService {
 	 *
 	 * @see CTrend::get
 	 */
-	private function getFromElasticsearch($options) {
+	private function getFromElasticsearch(array $options) {
 		$query_must = [];
 		$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
 
