@@ -122,11 +122,9 @@
 
 		initCharts() {
 			this._$tmpl_row = $('<tr>').append(
-				$('<td>').append(
-					$('<div>', {class: 'flickerfreescreen'}).append(
-						$('<div>', {class: '<?= ZBX_STYLE_CENTER ?>', style: 'min-height: 300px;'}).append(
-							$('<img>')
-						)
+				$('<div>', {class: 'flickerfreescreen'}).append(
+					$('<div>', {class: '<?= ZBX_STYLE_CENTER ?>', style: 'min-height: 300px;'}).append(
+						$('<img>')
 					)
 				)
 			);
