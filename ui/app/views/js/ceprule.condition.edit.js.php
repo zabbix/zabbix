@@ -49,11 +49,11 @@ window.ceprule_condition_edit_popup = new class {
 
 		this.#setValues(condition);
 		this.#initActions();
-		window['cep-condition-type'].dispatchEvent(new Event('change'));
+		window['ceprule-condition-type'].dispatchEvent(new Event('change'));
 	}
 
 	#initActions() {
-		window['cep-condition-type'].addEventListener('change', (e) => this.#handleTypeChanged(e.target.value));
+		window['ceprule-condition-type'].addEventListener('change', (e) => this.#handleTypeChanged(e.target.value));
 	}
 
 	#setValues(condition) {

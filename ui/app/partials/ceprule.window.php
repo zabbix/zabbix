@@ -19,17 +19,6 @@
  * @var array    $data
  */
 
-$window = $data['window'];
-$id = $data['id'];
-// TODO: replace ids
-$id_duration = "$id-duration";
-$id_capacity = "$id-capacity";
-$id_capacity_toggle = "$id-capacity-toggle";
-$id_groupby_tag_input = "$id-groupby-tag";
-$id_groupby_tag = "$id-groupby-opt-tag";
-$id_groupby_host = "$id-groupby-opt-host";
-$id_groupby_group = "$id-groupby-opt-group";
-
 echo (new CObject())
 	->addItem(new CLabel(_('Time window'), 'ceprule-window'))
 	->addItem(new CFormField((new CRadioButtonList('window_type', (int) $data['window_type']))
@@ -42,32 +31,33 @@ echo (new CObject())
 		->setModern(true)
 	))
 
-	->addItem(new CLabel(_('Duration'), 'ceprule-time-window'))
-	->addItem(new CFormField(new CTextBox('window[duration]', $window['duration'])
-			->setId($id_duration)
+	->addItem(new CLabel(_('Duration'), 'ceprule-window-duration'))
+	->addItem(new CFormField(new CTextBox('window[duration]', $data['window']['duration'])
+			->setId('ceprule-window-duration')
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	))
 
-	->addItem((new CLabel(_('Capacity'), $id_capacity))
+	->addItem((new CLabel(_('Capacity'), 'ceprule-window-capacity'))
 		->addItem(makeHelpIcon(
 			_('Time window may be limited to contain specific event count. When this limit is reached, new events will be evicted due to capacity restriction.')
 		))->setAsteriskMark()
 	)
-	->addItem(new CFormField(
-		(new CRadioButtonList('window[capacity_enabled]', $window['capacity'] !== 0 ? '1' : '0'))
-			->setId($id_capacity_toggle)
+	->addItem((new CFormField())
+		->addItem((new CRadioButtonList('window[capacity_enabled]', $data['window']['capacity'] !== 0 ? '1' : '0'))
+			->setId('ceprule-window-capacity-toggle')
 			->addValue('Unlimited', '0')
 			->addValue('Limited', '1')
 			->setModern()
-	))
+		)
 		->addItem(new CObject('&nbsp;'))
-		->addItem((new CTextBox('window[capacity]', $window['capacity']))
-			->setId($id_capacity)
+		->addItem((new CTextBox('window[capacity]', $data['window']['capacity']))
+			->setId('ceprule-window-capacity')
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
+		)
 	)
 
 	->addItem(new CLabel(_('Group by')))
@@ -75,41 +65,46 @@ echo (new CObject())
 		(new CListItem())
 			->addItem((new CCheckBox('window[group_by_host_group]', ZBX_CEP_GROUP_BY_YES))
 				->setUncheckedValue(ZBX_CEP_GROUP_BY_NO)
-				->setChecked($window['group_by_host_group'] == ZBX_CEP_GROUP_BY_YES)
-				->setId($id_groupby_group)
+				->setChecked($data['window']['group_by_host_group'] == ZBX_CEP_GROUP_BY_YES)
+				->setId('ceprule-window-groupby-opt-group')
 			)
-			->addItem(new CLabel(_('Host group'), $id_groupby_group)),
+			->addItem(new CLabel(_('Host group'), 'ceprule-window-groupby-opt-group')),
 
 		(new CListItem())
 			->addItem((new CCheckBox('window[group_by_host]', ZBX_CEP_GROUP_BY_YES))
 				->setUncheckedValue(ZBX_CEP_GROUP_BY_NO)
-				->setChecked($window['group_by_host'] == ZBX_CEP_GROUP_BY_YES)
-				->setId($id_groupby_host)
+				->setChecked($data['window']['group_by_host'] == ZBX_CEP_GROUP_BY_YES)
+				->setId('ceprule-window-groupby-opt-host')
 			)
-			->addItem(new CLabel(_('Host'), $id_groupby_host)),
+			->addItem(new CLabel(_('Host'), 'ceprule-window-groupby-opt-host')),
 
 		(new CListItem())
 			->addItem((new CCheckBox('window[group_by_tag]', ZBX_CEP_GROUP_BY_YES))
 				->setUncheckedValue(ZBX_CEP_GROUP_BY_NO)
-				->setChecked($window['group_by_tag'] == ZBX_CEP_GROUP_BY_YES)
-				->setId($id_groupby_tag)
+				->setChecked($data['window']['group_by_tag'] == ZBX_CEP_GROUP_BY_YES)
+				->setId('ceprule-window-groupby-opt-tag')
 			)
-			->addItem(new CLabel(_('Tag'), $id_groupby_tag))
+			->addItem(new CLabel(_('Tag'), 'ceprule-window-groupby-opt-tag'))
 			->addItem(new CObject('&nbsp;'))
 			->addItem(new CObject('&nbsp;'))
-			->addItem((new CTextBox('window[group_by_tag]', $window['group_by_tag']))->setId($id_groupby_tag_input)),
+			->addItem((new CTextBox('window[group_by_tag]', $data['window']['group_by_tag']))
+				->setId('ceprule-window-groupby-tag')
+			),
 	]))))
 
 	->addItem((new CLabel(_('Event count tag'), 'ceprule-window-counttag'))->setAsteriskMark())
 	->addItem(new CFormField()
-		->addItem((new CRadioButtonList('window[event_count_tag_enabled]', $window['event_count_tag'] !== '' ? '1' : '0'))
+		->addItem((new CRadioButtonList(
+			name: 'window[event_count_tag_enabled]',
+			value: ($data['window']['event_count_tag'] !== '') ? '1' : '0'
+		))
 			->setId('ceprule-window-counttag-toggle')
 			->addValue('No', '0')
 			->addValue('Yes', '1')
 			->setModern()
 		)
 		->addItem(new CObject('&nbsp;'))
-		->addItem((new CTextBox('window[event_count_tag]', $window['event_count_tag']))
+		->addItem((new CTextBox('window[event_count_tag]', $data['window']['event_count_tag']))
 			->setId('ceprule-window-counttag')
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
@@ -127,5 +122,5 @@ echo (new CObject())
 	))
 
 	->addItem(new CPartial('ceprule.window.conditions', [
-		'filter' => $window['filter']
+		'filter' => $data['window']['filter']
 	]));

@@ -20,56 +20,45 @@
  * @var array    $data
  */
 
-$filter = $data['filter'];
-$id = $data['id'];
-
-$id_modal = "$id-condition-modal";
-$id_modal_template = "$id_modal-template";
-$id_evaltype_select = "$id-evaltype-select";
-$id_row_template = "$id-row-template";
-$id_table = "$id-table";
-?>
-
-<?= new CLabel(_('Type of calculation'), $id_evaltype_select) ?>
-<?= new CFormField([
-	(new CDiv(
-		(new CSelect('filter[evaltype]'))
-		/* (new CSelect('filters[evaltype]')) */
-			->setValue($filter['evaltype'])
-			->setId('cep-filter-evaltype')
-			->setFocusableElementId($id_evaltype_select)
-			->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND_OR, _('And/Or')))
-			->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND, _('And')))
-			->addOption(new CSelectOption(CONDITION_EVAL_TYPE_OR, _('Or')))
-			->addOption(new CSelectOption(CONDITION_EVAL_TYPE_EXPRESSION, _('Custom expression')))
-			->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-	))->addClass(ZBX_STYLE_CELL),
-	(new CDiv([
-		(new CSpan())->setId('cep-filter-expression-preview'),
-		(new CTextBox('filter[formula]', $filter['formula']))
-				->setId('cep-filter-expression')
+echo (new CObject())
+	->addItem(new CLabel(_('Type of calculation'), 'ceprule-filter-evaltype-select'))
+	->addItem(new CFormField([
+		(new CDiv(
+			(new CSelect('filter[evaltype]'))
+				->setValue($data['filter']['evaltype'])
+				->setId('ceprule-filter-evaltype')
+				->setFocusableElementId('ceprule-filter-evaltype-select')
+				->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND_OR, _('And/Or')))
+				->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND, _('And')))
+				->addOption(new CSelectOption(CONDITION_EVAL_TYPE_OR, _('Or')))
+				->addOption(new CSelectOption(CONDITION_EVAL_TYPE_EXPRESSION, _('Custom expression')))
+				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+		))->addClass(ZBX_STYLE_CELL),
+		(new CDiv([
+			(new CSpan())->setId('ceprule-filter-expression-preview'),
+			(new CTextBox('filter[formula]', $data['filter']['formula']))
+				->setId('ceprule-filter-expression')
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setAttribute('placeholder', 'A or (B and C) ...')
-	]))->addClass(ZBX_STYLE_CELL)
-]) ?>
-
-<?= new CLabel(_('Conditions')) ?>
-<?= (new CFormField(
-	(new CTable())
-		->setColumns([
-			(new CTableColumn(new CColHeader(_('Label'))))->setAttribute('width', '10%'),
-			(new CTableColumn(new CColHeader(_('Name'))))->setAttribute('width', '70%'),
-			(new CTableColumn(new CColHeader(_('Actions'))))->setAttribute('width', '20%'),
-		])
-		->setAttribute('data-field-type', 'set')
-		->setAttribute('data-field-name', 'filter[conditions]')
-		->setId($id_table)
-		->addItem(
-			(new CTag('tfoot', true))
-				->addItem(
-					(new CCol(
-						(new CButtonLink(_('Add')))->addClass('js-condition-add')
-					))->setColSpan(4)
-				)
-		)
-))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR) ?>
+		]))->addClass(ZBX_STYLE_CELL)
+	]))
+	->addItem(new CLabel(_('Conditions')))
+	->addItem((new CFormField(
+		(new CTable())
+			->setColumns([
+				(new CTableColumn(new CColHeader(_('Label'))))->setAttribute('width', '10%'),
+				(new CTableColumn(new CColHeader(_('Name'))))->setAttribute('width', '70%'),
+				(new CTableColumn(new CColHeader(_('Actions'))))->setAttribute('width', '20%'),
+			])
+			->setAttribute('data-field-type', 'set')
+			->setAttribute('data-field-name', 'filter[conditions]')
+			->setId('ceprule-filter-conditions')
+			->addItem(
+				(new CTag('tfoot', true))
+					->addItem(
+						(new CCol(
+							(new CButtonLink(_('Add')))->addClass('js-condition-add')
+						))->setColSpan(4)
+					)
+			)
+	))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));

@@ -142,7 +142,7 @@ window.ceprule_edit_popup = new class {
 					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][event_name]" type="hidden" value="#{event_name}"/>
 					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][tag]" type="hidden" value="#{tag}"/>
 					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][tag_value]" type="hidden" value="#{tag_value}"/>
-					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][host_name]" type="hidden" value="#{host_name}"/>
+					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][host]" type="hidden" value="#{host}"/>
 					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][host_group]" type="hidden" value="#{host_group}"/>
 					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][time_period]" type="hidden" value="#{time_period}"/>
 					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][formulaid]" type="hidden" value="#{formulaid}"/>
@@ -361,7 +361,7 @@ window.ceprule_edit_popup = new class {
 	 *	- type of calculation row.
 	 */
 	#handleFilterChanged() {
-		const evaltype_select = window['cep-filter-evaltype']; // TODO fix IDs to static string cep -> ceprule ..
+		const evaltype_select = window['ceprule-filter-evaltype']; // TODO fix IDs to static string cep -> ceprule ..
 		const evaltype_field = evaltype_select.closest('.form-field');
 
 		const conditions = Object.values(this.form.findFieldByName('filter[conditions]').getValue() ?? {});
@@ -379,12 +379,12 @@ window.ceprule_edit_popup = new class {
 		const evaltype = Number(evaltype_select.value);
 		const is_expression_evaltype = evaltype == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
 
-		window['cep-filter-expression'].style.display = is_expression_evaltype ? '' : 'none';
-		window['cep-filter-expression-preview'].style.display = !is_expression_evaltype ? '' : 'none';
+		window['ceprule-filter-expression'].style.display = is_expression_evaltype ? '' : 'none';
+		window['ceprule-filter-expression-preview'].style.display = !is_expression_evaltype ? '' : 'none';
 
 		const identifiers = Object.values(conditions).map(condition => ({id: condition.formulaid}));
 
-		window['cep-filter-expression-preview'].innerText = getConditionFormula(identifiers, evaltype);
+		window['ceprule-filter-expression-preview'].innerText = getConditionFormula(identifiers, evaltype);
 	}
 
 	/**
@@ -428,7 +428,7 @@ window.ceprule_edit_popup = new class {
 				type: '<?= ZBX_CEP_CONDITION_EVENT_NAME ?>',
 				operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
 				host_group: '',
-				host_name: '',
+				host: '',
 				severity: '<?= TRIGGER_SEVERITY_INFORMATION ?>',
 				tag: '',
 				tag_value: '',
@@ -720,12 +720,12 @@ window.ceprule_edit_popup = new class {
 	}
 
 	#editConditionRow(condition) {
-		this.form_element.querySelector(`#cep-filter-table [data-formulaid=${condition.formulaid}]`)
+		window['ceprule-filter-conditions'].querySelector(`[data-formulaid=${condition.formulaid}]`)
 			.replaceWith(this.#buildConditionRow(condition));
 	}
 
 	#addConditionRow(condition) {
-		this.form_element.querySelector('#cep-filter-table tbody')
+		window['ceprule-filter-conditions'].querySelector('tbody')
 			.insertAdjacentElement('beforeend', this.#buildConditionRow(condition));
 	}
 
@@ -759,7 +759,7 @@ window.ceprule_edit_popup = new class {
 			}
 
 			if (condition.type == <?= ZBX_CEP_CONDITION_HOST ?>) {
-				return condition.host_name;
+				return condition.host;
 			}
 
 			if (condition.type == <?= ZBX_CEP_CONDITION_HOST_GROUP ?>) {

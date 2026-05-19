@@ -19,11 +19,6 @@
  * @var array $data
  */
 
-$id = 'cep';
-$id_filter = "$id-filter";
-$id_window = "$id-window";
-$id_operations = "$id-operations";
-
 if ($data['ceprule']['cep_ruleid'] === null) {
 	$buttons = [
 		[
@@ -58,8 +53,10 @@ else {
 }
 
 $form = (new CForm())
+	// Enable form submitting on Enter.
+	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
 	->addVar('cepruleid', $data['ceprule']['cep_ruleid'] ?? null)
-	->setId($id)
+	->setId('cep')
 	->addStyle('display: none;')
 	->addItem((new CFormGrid())
 		->addItem([
@@ -75,7 +72,6 @@ $form = (new CForm())
 			new CPartial('ceprule.modal.condition')
 		))
 		->addItem(new CPartial('ceprule.conditions', [
-			'id' => $id_filter,
 			'filter' => $data['ceprule']['filter']
 		]))
 
@@ -85,7 +81,6 @@ $form = (new CForm())
 			])
 		))
 		->addItem(new CPartial('ceprule.window', [
-			'id' => $id_window,
 			'window_type' => $data['ceprule']['window_type'],
 			'window' => $data['ceprule']['window']
 		]))
@@ -142,10 +137,6 @@ $form = (new CForm())
 			)
 		])
 	);
-
-
-// Enable form submitting on Enter.
-$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $output = [
 	'header' => $data['ceprule']['cep_ruleid'] === null ? _('New complex event processing') : _('Complex event processing'),
