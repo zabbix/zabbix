@@ -799,7 +799,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		$this->verifyLogLastlogsizeAdvances();
 
 		$this->verifyProxyLastaccessAndNoDataTriggersFiring();
-	
+
 		$unknown_after = $this->getUnknownTriggerEventCount();
 		if ($unknown_before !== $unknown_after) {
 			$this->markTestSkipped('Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
