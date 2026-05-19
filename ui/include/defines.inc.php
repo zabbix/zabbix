@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.4.10rc1');
-define('ZABBIX_API_VERSION',	'7.4.10');
+define('ZABBIX_VERSION',		'7.4.11rc1');
+define('ZABBIX_API_VERSION',	'7.4.11');
 define('ZABBIX_EXPORT_VERSION',	'7.4');
 
 define('ZABBIX_DB_VERSION',		7040000);
@@ -894,6 +894,9 @@ define('TRIGGER_SEVERITY_AVERAGE',			3);
 define('TRIGGER_SEVERITY_HIGH',				4);
 define('TRIGGER_SEVERITY_DISASTER',			5);
 define('TRIGGER_SEVERITY_COUNT',			6);
+
+define('TRIGGER_SEVERITY_OFF',			0);
+define('TRIGGER_SEVERITY_ON',			1);
 
 define('EVENT_CUSTOM_COLOR_DISABLED',	0);
 define('EVENT_CUSTOM_COLOR_ENABLED',	1);
