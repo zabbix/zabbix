@@ -237,7 +237,6 @@
 			user-select: none;
 			background-color: transparent;
 			border: 1px solid transparent;
-			border-left-color: $ui-border-color;
 			border-radius: 0;
 
 			&:hover,
@@ -282,6 +281,10 @@
 
 			.datatable-options-link {
 				margin-right: 0;
+
+				&:not(:hover):not(.datatable-options-link-opened) {
+					border-left-color: $ui-border-color;
+				}
 			}
 		}
 	}

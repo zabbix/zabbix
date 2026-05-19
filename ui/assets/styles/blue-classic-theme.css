@@ -2434,7 +2434,6 @@ button {
       user-select: none;
       background-color: transparent;
       border: 1px solid transparent;
-      border-left-color: #dfe4e7;
       border-radius: 0; }
       .datatable .datatable-header .datatable-options-link:hover, .datatable .datatable-header .datatable-options-link:focus, .datatable .datatable-header .datatable-options-link.datatable-options-link-opened {
         color: #768d99;
@@ -2464,6 +2463,8 @@ button {
       background-color: #ffffff; }
       .datatable .datatable-header .datatable-options-button .datatable-options-link {
         margin-right: 0; }
+        .datatable .datatable-header .datatable-options-button .datatable-options-link:not(:hover):not(.datatable-options-link-opened) {
+          border-left-color: #dfe4e7; }
   .datatable .datatable-body {
     display: grid;
     align-items: center;
