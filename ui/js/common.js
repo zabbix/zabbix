@@ -537,15 +537,16 @@ function removeFromOverlaysStack(dialogueid, return_focus = true) {
 /**
  * Reload content of Modal Overlay dialogue without closing it.
  *
- * @param {object} form		Filter form in which element has been changed. Assumed that form is inside Overlay Dialogue.
- * @param {string} action	(optional) action value that is used in CRouter. Default value is 'popup.generic'.
+ * @param {object} form			Filter form in which element has been changed. Assumed that form is inside Overlay Dialogue.
+ * @param {string} action		(optional) action value that is used in CRouter. Default value is 'popup.generic'.
+ * @param {object} parameters	(optional) Form values to use instead of serializing form fields.
  */
-function reloadPopup(form, action) {
+function reloadPopup(form, action, parameters = null) {
 	const dialogueid = form.closest('[data-dialogueid]').dataset.dialogueid;
 	const dialogue_class = jQuery(form).closest('[data-dialogueid]').prop('class');
-	const parameters = getFormFields(form);
 
 	action = action || 'popup.generic';
+	parameters = parameters !== null ? parameters : getFormFields(form);
 
 	PopUp(action, parameters, {dialogueid, dialogue_class});
 }

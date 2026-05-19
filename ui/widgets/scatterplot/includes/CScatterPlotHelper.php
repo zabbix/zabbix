@@ -89,6 +89,7 @@ class CScatterPlotHelper {
 		$svg_height = max(0, $height - ($legend !== null ? $legend->getHeight() : 0));
 
 		$scatter_plot = (new CScatterPlot([
+			'id_prefix' => $options['id_prefix'],
 			'time_period' => $options['time_period'],
 			'axes' => $options['axes']
 		]))
@@ -121,10 +122,7 @@ class CScatterPlotHelper {
 					'w' => $scatter_plot->getCanvasWidth(),
 					'h' => $scatter_plot->getCanvasHeight()
 				],
-				'spp' => $scatter_plot->getCanvasWidth() === 0
-					? 0
-					: ($options['time_period']['time_to'] - $options['time_period']['time_from'])
-					/ $scatter_plot->getCanvasWidth()
+				'hintbox_data' => $scatter_plot->getHintboxData()
 			],
 			'errors' => $errors
 		];
@@ -132,16 +130,7 @@ class CScatterPlotHelper {
 
 	private static function getMetricsPattern(array &$metrics, array $data_sets, string $templateid,
 			string $override_hostid, bool $show_hostnames): void {
-		$max_metrics = [
-			'x_axis_items' => SVG_GRAPH_MAX_NUMBER_OF_METRICS,
-			'y_axis_items' => SVG_GRAPH_MAX_NUMBER_OF_METRICS
-		];
-
 		foreach ($data_sets as $index => $data_set) {
-			if ($max_metrics['x_axis_items'] <= 0 || $max_metrics['y_axis_items'] <= 0) {
-				break;
-			}
-
 			if ($data_set['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM) {
 				continue;
 			}
@@ -151,17 +140,47 @@ class CScatterPlotHelper {
 					continue;
 				}
 			}
-			else {
-				if (!$data_set['x_axis_items'] || !$data_set['y_axis_items']) {
-					continue;
+			elseif (!$data_set['x_axis_items'] || !$data_set['y_axis_items']) {
+				continue;
+			}
+
+			$items_by_hosts = [];
+			$hostids = [];
+
+			if ($templateid === '') {
+				if ($data_set['override_hostid']) {
+					$hostids = $data_set['override_hostid'];
 				}
+				else {
+					$hosts = API::Host()->get([
+						'output' => [],
+						'search' => [
+							'name' => self::processPattern($data_set['hosts'])
+						],
+						'evaltype' => $data_set['host_tags_evaltype'],
+						'tags' => $data_set['host_tags'] ?: null,
+						'groupids' => $data_set['hostgroupids'] ?: null,
+						'searchWildcardsEnabled' => true,
+						'searchByAny' => true,
+						'preservekeys' => true
+					]);
+
+					if ($hosts) {
+						$hostids = array_keys($hosts);
+					}
+				}
+			}
+			else {
+				$hostids = $override_hostid !== '' ? $override_hostid : $templateid;
+			}
+
+			if (!$hostids) {
+				continue;
 			}
 
 			$data_set['timeshift'] = ($data_set['timeshift'] !== '')
 				? (int)timeUnitToSeconds($data_set['timeshift'])
 				: 0;
-
-			$items_by_hosts = [];
 
 			$resolve_macros = $templateid === '' || $override_hostid !== '';
 
@@ -170,14 +189,14 @@ class CScatterPlotHelper {
 					'output' => ['itemid', 'hostid', 'history', 'trends', 'units', 'value_type'],
 					'selectHosts' => $show_hostnames ? ['name'] : null,
 					'webitems' => true,
+					'hostids' => $hostids,
 					'filter' => [
 						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
 					],
 					'searchWildcardsEnabled' => true,
 					'searchByAny' => true,
 					'sortfield' => 'name',
-					'sortorder' => ZBX_SORT_UP,
-					'limit' => $max_metrics[$axis]
+					'sortorder' => ZBX_SORT_UP
 				];
 
 				if ($resolve_macros) {
@@ -195,54 +214,27 @@ class CScatterPlotHelper {
 					$options['search']['name'] = self::processPattern($data_set[$axis]);
 				}
 
-				if ($templateid === '') {
-					if ($data_set['override_hostid']) {
-						$options['hostids'] = $data_set['override_hostid'];
-					}
-					else {
-						$hosts = API::Host()->get([
-							'output' => [],
-							'search' => [
-								'name' => self::processPattern($data_set['hosts'])
-							],
-							'evaltype' => $data_set['host_tags_evaltype'],
-							'tags' => $data_set['host_tags'] ?: null,
-							'groupids' => $data_set['hostgroupids'] ?: null,
-							'searchWildcardsEnabled' => true,
-							'searchByAny' => true,
-							'preservekeys' => true
-						]);
-
-						if ($hosts) {
-							$options['hostids'] = array_keys($hosts);
-						}
-					}
-				}
-				else {
-					$options['hostids'] = $override_hostid !== '' ? $override_hostid : $templateid;
-				}
-
-				$items[$axis] = [];
-
-				if (array_key_exists('hostids', $options) && $options['hostids']) {
-					$items[$axis] = API::Item()->get($options);
-				}
+				$items[$axis] = API::Item()->get($options);
 
 				if (!$items[$axis]) {
-					continue;
+					break;
 				}
 
 				if ($resolve_macros) {
 					$items[$axis] = CArrayHelper::renameObjectsKeys($items[$axis], ['name_resolved' => 'name']);
 				}
 
-				unset($data_set[$axis]);
+				$hostids = [];
 
 				foreach ($items[$axis] as $item) {
 					$items_by_hosts[$item['hostid']][$axis][] = $item;
-
-					$max_metrics[$axis] --;
 				}
+
+				if ($axis === 'x_axis_items') {
+					$hostids = array_keys($items_by_hosts);
+				}
+
+				unset($data_set[$axis]);
 			}
 
 			$items_by_hosts = array_filter($items_by_hosts,
@@ -253,8 +245,9 @@ class CScatterPlotHelper {
 				? CColorPicker::getColorVariations($data_set['color'], count($items_by_hosts))
 				: CColorPicker::getPaletteColors($data_set['color_palette'], count($items_by_hosts));
 
-			$data_set = array_diff_key($data_set, array_flip(['x_axis_itemids, y_axis_itemids', 'x_axis_references',
-				'y_axis_references', 'color_palette'
+			$data_set = array_diff_key($data_set, array_flip(['x_axis_references', 'y_axis_references', 'color_palette',
+				'hostgroupids', 'host_tags_evaltype', 'host_tags', 'override_hostid', 'hosts', 'x_axis_itemids',
+				'y_axis_itemids'
 			]));
 
 			foreach ($items_by_hosts as $items_by_host) {
@@ -271,16 +264,7 @@ class CScatterPlotHelper {
 
 	private static function getMetricsItems(array &$metrics, array $data_sets, string $templateid,
 			string $override_hostid, bool $show_hostnames): void {
-		$max_metrics = [
-			'x_axis_itemids' => SVG_GRAPH_MAX_NUMBER_OF_METRICS,
-			'y_axis_itemids' => SVG_GRAPH_MAX_NUMBER_OF_METRICS
-		];
-
 		foreach ($data_sets as $index => $data_set) {
-			if ($max_metrics['x_axis_itemids'] <= 0 || $max_metrics['y_axis_itemids'] <= 0) {
-				break;
-			}
-
 			if ($data_set['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM) {
 				continue;
 			}
@@ -357,8 +341,7 @@ class CScatterPlotHelper {
 						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
 					],
 					'itemids' => $data_set[$axis],
-					'preservekeys' => true,
-					'limit' => $max_metrics[$axis]
+					'preservekeys' => true
 				]);
 
 				if (!$db_items) {
@@ -380,14 +363,13 @@ class CScatterPlotHelper {
 							: $db_items[$itemid];
 
 						$result[$axis][] = $item;
-
-						$max_metrics[$axis]--;
 					}
 				}
 			}
 
-			$data_set = array_diff_key($data_set, array_flip(['x_axis_items', 'y_axis_items', 'x_axis_references',
-				'y_axis_references', 'hostgroupids', 'hosts', 'host_tags', 'host_tags_evaltype', 'color_palette'
+			$data_set = array_diff_key($data_set, array_flip(['x_axis_itemids', 'y_axis_itemids', 'x_axis_references',
+				'y_axis_references', 'hostgroupids', 'hosts', 'host_tags', 'host_tags_evaltype', 'color_palette',
+				'override_hostid', 'x_axis_items', 'y_axis_items'
 			]));
 
 			if ($result['x_axis_itemids'] && $result['y_axis_itemids']) {
@@ -455,6 +437,8 @@ class CScatterPlotHelper {
 				$metric['time_period']['time_from'] += $metric['options']['timeshift'];
 				$metric['time_period']['time_to'] += $metric['options']['timeshift'];
 			}
+
+			unset($metric['options']['timeshift']);
 		}
 		unset($metric);
 	}
@@ -602,21 +586,36 @@ class CScatterPlotHelper {
 	 */
 	private static function setMetricNames(array &$metrics, array $legend_options, bool $show_hostnames): void {
 		foreach ($metrics as &$metric) {
-			$metric['aggregation_name'] = $legend_options['show_aggregation']
+			$metric['options']['aggregation_name'] = $legend_options['show_aggregation']
 				? CItemHelper::getAggregateFunctionName($metric['options']['aggregate_function'])
 				: '';
 
 			foreach (['x_axis_items', 'y_axis_items'] as $axis) {
 				$names = [];
 
-				foreach ($metric[$axis] as $item) {
-					$names[$item['itemid']] = $show_hostnames
-						? $item['hosts'][0]['name'].NAME_DELIMITER.$item['name']
-						: $item['name'];
+				if ($metric['options']['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM) {
+					foreach ($metric[$axis] as $item) {
+						$metric['hostname'] = '';
+
+						$names[$item['itemid']] = $show_hostnames
+							? $item['hosts'][0]['name'].NAME_DELIMITER.$item['name']
+							: $item['name'];
+					}
+				}
+				else {
+					foreach ($metric[$axis] as $item) {
+						$metric['hostname'] = $show_hostnames
+							? $item['hosts'][0]['name'].NAME_DELIMITER
+							: '';
+
+						$names[$item['itemid']] = $item['name'];
+					}
 				}
 
 				$metric[$axis.'_name'] = $names;
 			}
+
+			unset($metric['options']['dataset_type']);
 		}
 		unset($metric);
 	}
@@ -720,9 +719,7 @@ class CScatterPlotHelper {
 				}
 			}
 
-			$metric_points = array_filter($metric_points,
-				static fn ($point) => array_key_exists('x_axis', $point) && array_key_exists('y_axis', $point)
-			);
+			$metric_points = self::filterPoints($metric_points);
 
 			if (!$metric_points) {
 				continue;
@@ -740,9 +737,33 @@ class CScatterPlotHelper {
 
 			$metric['points'] = $metric_points;
 
-			unset($metric['x_axis_items'], $metric['y_axis_items']);
+			unset($metric['x_axis_items'], $metric['y_axis_items'], $metric['options']['aggregate_function'],
+				$metric['time_period']
+			);
 		}
 		unset($metric);
+	}
+
+	private static function filterPoints(array $points): array {
+		$result = [];
+
+		foreach ($points as $tick => $point) {
+			if (!array_key_exists('x_axis', $point) || !array_key_exists('y_axis', $point)) {
+				continue;
+			}
+
+			$key = $point['x_axis'].':'.$point['y_axis'];
+
+			if (!array_key_exists($key, $result)) {
+				$result[$key] = $point + [
+					'ticks' => []
+				];
+			}
+
+			$result[$key]['ticks'][] = $tick;
+		}
+
+		return array_values($result);
 	}
 
 	private static function calculatePointColorByThresholds(string $color, $value_x, $value_y, string $units_x,
@@ -856,13 +877,13 @@ class CScatterPlotHelper {
 						$names[$axis] .= ', ';
 					}
 
-					$names[$axis] .= $item_name;
+					$names[$axis] .= $metric['hostname'].$item_name;
 
 					$count++;
 				}
 
 				if ($legend_options['show_aggregation']) {
-					$names[$axis] = $metric['aggregation_name'].'('.$names[$axis].')';
+					$names[$axis] = $metric['options']['aggregation_name'].'('.$names[$axis].')';
 				}
 				elseif ($count > 1) {
 					$names[$axis] = '('.$names[$axis].')';
@@ -870,7 +891,6 @@ class CScatterPlotHelper {
 			}
 
 			$item = [
-				'aggregation_name' => $metric['aggregation_name'],
 				'name' => $names['x_axis_items_name'].', '.$names['y_axis_items_name'],
 				'color' => $metric['options']['color'],
 				'marker' => $metric['options']['marker']

@@ -233,7 +233,7 @@
 			}
 
 			document.querySelectorAll('.js-userrole-apimode input').forEach((element) => {
-				element.disabled = !is_apiaccess_checked;
+				element.readOnly = !is_apiaccess_checked;
 			});
 
 			$('#api_methods_').multiSelect(is_apiaccess_checked ? 'enable' : 'disable');
@@ -372,7 +372,7 @@
 			}
 		}
 
-		#ajaxExceptionHandler (exception) {
+		#ajaxExceptionHandler(exception) {
 			let title, messages;
 
 			if (typeof exception === 'object' && 'error' in exception) {

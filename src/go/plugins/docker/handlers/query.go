@@ -39,7 +39,6 @@ func queryDockerAPI(client *http.Client, query string) ([]byte, error) {
 		"http://"+path.Join(dockerVersion, query),
 		http.NoBody,
 	)
-
 	if err != nil {
 		return nil, errs.Wrap(err, "failed to create request")
 	}

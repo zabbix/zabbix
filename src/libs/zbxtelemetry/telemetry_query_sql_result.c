@@ -33,7 +33,7 @@ int	zbx_tq_parse_sql_result(const zbx_tq_query_t *query, zbx_db_result_t result,
 		int	col_idx = 0;
 		zbx_uint64_t	timestamp;
 
-		zbx_json_clean(&j);
+		zbx_json_reset(&j);
 
 		/* row id */
 		zbx_json_adduint64(&j, "id", row_id);

@@ -1265,7 +1265,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 			continue;
 		}
 
-		zbx_json_clean(&json);
+		zbx_json_reset(&json);
 
 		zbx_json_addobject(&json,ZBX_PROTO_TAG_HOST);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.host, ZBX_JSON_TYPE_STRING);
@@ -1403,7 +1403,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 			continue;
 		}
 
-		zbx_json_clean(&json);
+		zbx_json_reset(&json);
 
 		zbx_json_addobject(&json, ZBX_PROTO_TAG_HOST);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.host, ZBX_JSON_TYPE_STRING);
@@ -2842,23 +2842,26 @@ int	zbx_hc_clear_item_middle(zbx_uint64_t itemid)
 
 	if (NULL != (item = hc_get_item(itemid)))
 	{
-		if (NULL != item->tail->next)
+		if (NULL != item->tail)
 		{
-			for (zbx_hc_data_t *tail = item->tail; NULL != tail->next->next;)
+			if (NULL != item->tail->next)
 			{
-				zbx_hc_data_t	*next = tail->next;
+				for (zbx_hc_data_t *tail = item->tail; NULL != tail->next->next;)
+				{
+					zbx_hc_data_t	*next = tail->next;
 
-				tail->next = next->next;
+					tail->next = next->next;
 
-				hc_free_data(next);
-				item->values_num--;
-				i++;
+					hc_free_data(next);
+					item->values_num--;
+					i++;
+				}
 			}
-		}
-		else
-			item->cache = ZBX_HC_ITEM_CACHE_FALSE;
+			else
+				item->cache = ZBX_HC_ITEM_CACHE_FALSE;
 
-		cache->history_num -= i;
+			cache->history_num -= i;
+		}
 	}
 	else
 		i = FAIL;

@@ -1586,7 +1586,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'inline_errors' => [
 						'form' => 'server',
 						'errors' => [
-							'Port' => 'This value must be no greater than "65535".'
+							'Port' => 'Value must be less than or equal to 65535.'
 						]
 					]
 				]

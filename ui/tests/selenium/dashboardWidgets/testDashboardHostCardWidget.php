@@ -776,7 +776,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		// After selecting Dashboard from dropdown menu, check hint and field value.
 		$menu_button->select('Dashboard');
 		$form->checkValue(['Host' => 'Dashboard']);
-		$this->assertTrue($label->query('xpath', './/span[@data-hintbox-contents="Dashboard is used as data source."]')
+		$this->assertTrue($label->query('xpath', './/span[@data-hintbox-html="Dashboard is used as data source."]')
 				->one()->isVisible()
 		);
 

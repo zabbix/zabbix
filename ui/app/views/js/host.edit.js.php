@@ -25,6 +25,7 @@ window.host_edit_popup = {
 	dialogue: null,
 	form: null,
 	form_element: null,
+	tags_abort_controller: null,
 
 	init({rules, host_interfaces, proxy_groupid, host_is_discovered, warnings}) {
 		this.overlay = overlays_stack.getById('host.edit');
@@ -306,14 +307,22 @@ window.host_edit_popup = {
 			templateids: this.getAllTemplates(),
 			show_inherited_tags: fields.host_show_inherited_tags,
 			tags: fields.tags
+		};
+
+		if (this.tags_abort_controller !== null) {
+			this.tags_abort_controller.abort();
 		}
+
+		const abort_controller = new AbortController();
+		this.tags_abort_controller = abort_controller;
 
 		this.overlay.setLoading();
 
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
+			body: JSON.stringify(data),
+			signal: abort_controller.signal
 		})
 			.then(response => response.json())
 			.then(response => {
@@ -324,11 +333,20 @@ window.host_edit_popup = {
 				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
 			})
 			.catch((message) => {
+				if (abort_controller.signal.aborted) {
+					return;
+				}
+
 				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});
 				this.form.renderErrors();
 				throw message;
 			})
 			.finally(() => {
+				if (this.tags_abort_controller !== abort_controller) {
+					return;
+				}
+
+				this.tags_abort_controller = null;
 				this.overlay.unsetLoading();
 			});
 	},

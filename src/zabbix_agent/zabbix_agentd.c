@@ -1479,7 +1479,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 #else
 	zbx_set_child_pids(zbx_threads, zbx_threads_num);
-	zbx_unset_exit_on_terminate();
+	zbx_unset_exit_on_terminate(NULL);
 
 	while (ZBX_IS_RUNNING())
 	{
