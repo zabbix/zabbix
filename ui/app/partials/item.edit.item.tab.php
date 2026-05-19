@@ -756,31 +756,13 @@ $formgrid->addItem([
 ]);
 
 $hint = null;
-$storage_hint = null;
-if ($data['source'] === 'item'
+if ($data['source'] === 'item' && $data['history_hint']
 		&& ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED)) {
-	if ($data['config']['hk_history_global']) {
-		$link = _x('global housekeeping settings', 'item_form');
-
-		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-			$link = (new CLink($link, (new CUrl())
-				->setArgument('action', 'housekeeping.edit')
-				->getUrl()
-			))->setTarget('_blank');
-		}
-
-		$hint = (new CSpan(makeWarningIcon([_x('Overridden by', 'item_form').' ', $link,
-			' ('.$data['config']['hk_history'].')'
-		])))->addClass('js-hint');
-	}
-
-	if ($data['value_type_ttl']) {
-		$storage_hint = (new CSpan(makeWarningIcon('')))->addClass('js-storage-hint');
-	}
+	$hint = (new CSpan(makeWarningIcon('')))->addClass('js-history-hint');
 }
 
 $formgrid->addItem([
-	(new CLabel([_('History'), $hint, $storage_hint], 'history'))->setAsteriskMark(),
+	(new CLabel([_('History'), $hint], 'history'))->setAsteriskMark(),
 	new CFormField([
 		(new CRadioButtonList('history_mode', (int) $item['history_mode']))
 			->addValue(_('Do not store'), ITEM_STORAGE_OFF)
@@ -810,13 +792,13 @@ if ($data['source'] === 'item'
 
 		$hint = (new CSpan(makeWarningIcon([_x('Overridden by', 'item_form').' ', $link,
 			' ('.$data['config']['hk_trends'].')'
-		])))->addClass('js-hint');
+		])))->addClass('js-trends-hint');
 	}
 
-	if ($data['value_type_ttl']) {
+	if ($data['trends_storage_hint']) {
 		$storage_hint = (new CSpan(makeWarningIcon(
 			_('Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse.')
-		)))->addClass('js-storage-hint');
+		)))->addClass('js-trends-storage-hint');
 	}
 }
 
