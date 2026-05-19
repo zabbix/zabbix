@@ -749,6 +749,8 @@ void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vecto
 			tr->new_value = TRIGGER_VALUE_OK;
 			continue;
 		}
+		else
+			tr->new_value = TRIGGER_VALUE_NONE;
 	}
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
