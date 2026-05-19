@@ -380,8 +380,7 @@ static int	update_event_names(void)
 			"select t.triggerid,t.description,t.expression,t.priority,t.comments,t.url,t.url_name,"
 				"t.recovery_expression,t.recovery_mode,rt.value"
 			" from triggers t"
-			" left join trigger_rtdata rt"
-				" on t.triggerid=rt.triggerid"
+			" left join trigger_rtdata rt on t.triggerid=rt.triggerid"
 			" order by triggerid");
 
 	um_handle = zbx_dc_open_user_macros();

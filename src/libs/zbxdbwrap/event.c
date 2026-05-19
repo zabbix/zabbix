@@ -407,9 +407,10 @@ void	zbx_db_get_event_data_triggers(zbx_db_event *event)
 	if (0 != (ZBX_FLAGS_DB_EVENT_RETRIEVED_TRIGGERS & event->flags) || EVENT_OBJECT_TRIGGER != event->object)
 		return;
 
-	result = zbx_db_select("select description,expression,priority,comments,url,url_name,recovery_expression,"
-			"recovery_mode,value,opdata,event_name"
-			" from triggers"
+	result = zbx_db_select("select t.description,t.expression,t.priority,t.comments,t.url,t.url_name,"
+			"t.recovery_expression,t.recovery_mode,rt.value,t.opdata,t.event_name"
+			" from triggers t"
+			" join trigger_rtdata rt on t.triggerid=rt.triggerid"
 			" where triggerid=" ZBX_FS_UI64, event->objectid);
 
 	if (NULL != (row = zbx_db_fetch(result)))
