@@ -186,4 +186,12 @@ class CCepRuleHelper {
 	public static function getWindowLabelString(array $ceprule): string {
 		return self::getWindowLabelStrings()[$ceprule['window_type']];
 	}
+
+	public static function getWindowConditionLabelStrings(): array {
+		return [
+			ZBX_CEP_WINDOW_CONDITION_TAG_PAIR => _('Event tag pair'),
+			ZBX_CEP_WINDOW_CONDITION_OLD_TAG => _('Past event tag name'),
+			ZBX_CEP_WINDOW_CONDITION_OLD_TAG_VALUE => _('Past event tag value')
+		];
+	}
 }

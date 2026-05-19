@@ -21,7 +21,7 @@
 
 $id = 'cep';
 $id_filter = "$id-filter";
-$id_timewindow = $id.'-timewindow';
+$id_window = "$id-window";
 $id_operations = "$id-operations";
 
 if ($data['ceprule']['cep_ruleid'] === null) {
@@ -79,22 +79,16 @@ $form = (new CForm())
 			'filter' => $data['ceprule']['filter']
 		]))
 
-		->addItem(new CLabel(_('Time window'), 'ceprule-time-window'))
-		->addItem(new CFormField((new CRadioButtonList('window_type', (int) $data['ceprule']['window_type']))
-			->setId('ceprule-time-window')
-			->addValue(_('None'), ZBX_CEP_WINDOW_NONE)
-			->addValue(_('Simple'), ZBX_CEP_WINDOW_SIMPLE)
-			->addValue(_('Cause and symptoms grouping'), ZBX_CEP_WINDOW_CAUSE_SYMPTOM)
-			->addValue(_('Tag correlation'), ZBX_CEP_WINDOW_TAG_MATCH)
-			->addValue(_('Event pattern match'), ZBX_CEP_WINDOW_PATTERN_MATCH)
-			->setModern(true)
+		->addItem((new CTemplateTag('ceprule-window-condition-modal-template'))->addItem(
+			new CPartial('ceprule.modal.window.condition', [
+				'filter' => $data['ceprule']['window']['filter']
+			])
 		))
-
-		/* ->addItem(new CPartial('ceprule.window', [ */
-		/* 	'id' => $id_timewindow, */
-		/* 	'type' => $data['ceprule']['window_type'], */
-		/* 	'window' => $data['ceprule']['window'] */
-		/* ])) */
+		->addItem(new CPartial('ceprule.window', [
+			'id' => $id_window,
+			'window_type' => $data['ceprule']['window_type'],
+			'window' => $data['ceprule']['window']
+		]))
 
 		->addItem((new CTemplateTag('ceprule-operation-modal-template'))->addItem(
 			new CPartial('ceprule.modal.operation')
@@ -159,11 +153,13 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => $this->readJsFile('ceprule.condition.edit.js.php')
+		.$this->readJsFile('ceprule.window.condition.edit.js.php')
 		.$this->readJsFile('ceprule.operation.edit.js.php')
 		.$this->readJsFile('ceprule.edit.js.php')
 		.'ceprule_edit_popup.init('.json_encode([
 			'rules' => $data['js_validation_rules'],
 			'condition_rules' => $data['condition_js_validation_rules'],
+			'window_condition_rules' => $data['window_condition_js_validation_rules'],
 			'operation_rules' => $data['operation_js_validation_rules'],
 			'ceprule' => $data['ceprule']
 		]).');',
