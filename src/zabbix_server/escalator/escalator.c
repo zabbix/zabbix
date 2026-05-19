@@ -1258,11 +1258,12 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 				/* selected IPMI fields changes */
 				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
-				",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by"
+				",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by, hp.proxyid"
 				);
 
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-				" from opcommand o,hosts_groups hg,hosts h,scripts s"
+				" from opcommand o,hosts_groups hg, scripts s, hosts h"
+					" left join host_proxy hp on h.hostid=hp.hostid"
 				" where o.operationid=" ZBX_FS_UI64
 					" and o.scriptid=s.scriptid"
 					" and hg.hostid=h.hostid"
@@ -1286,10 +1287,11 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 #ifdef HAVE_OPENIPMI
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
-			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by"
+			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by, hp.proxyid"
 			);
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			" from opcommand o,opcommand_hst oh,hosts h,scripts s"
+			" from opcommand o,opcommand_hst oh, scripts s, hosts h"
+				" left join host_proxy hp on h.hostid=hp.hostid"
 			" where o.operationid=oh.operationid"
 				" and o.scriptid=s.scriptid"
 				" and oh.hostid=h.hostid"
@@ -1306,7 +1308,7 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 				",0,2,null,null");
 #endif
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
-				",null,null,null,null,0");
+				",null,null,null,null,0,null");
 	if (EVENT_SOURCE_SERVICE == event->source)
 	{
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
@@ -1455,6 +1457,9 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 				zbx_strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 				ZBX_STR2UCHAR(host.monitored_by, row[22 + ZBX_IPMI_FIELDS_NUM]);
+
+				if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by)
+					ZBX_DBROW2UINT64(host.proxyid, row[23 + ZBX_IPMI_FIELDS_NUM]);
 			}
 		}
 
