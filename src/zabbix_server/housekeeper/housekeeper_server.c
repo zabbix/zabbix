@@ -1186,6 +1186,22 @@ static int	housekeeping_proxy_dhistory(int now)
 	return deleted;
 }
 
+static int	housekeeping_dpop_jti_cache(int now)
+{
+	int	deleted = 0, rc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
+
+	rc = zbx_db_execute("delete from dpop_jti_cache where expires_at<%d", now);
+
+	if (ZBX_DB_OK <= rc)
+		deleted = rc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
+
+	return deleted;
+}
+
 static int	get_housekeeping_period(double time_slept)
 {
 	if (SEC_PER_HOUR > time_slept)
@@ -1338,6 +1354,10 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [removing old records]", get_process_type_string(process_type));
 		int	records = housekeeping_proxy_dhistory(now);
 
+		zbx_setproctitle("%s [removing old DPoP JTI cache records]",
+				get_process_type_string(process_type));
+		int	d_dpop_jti_cache = housekeeping_dpop_jti_cache(now);
+
 		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
 		housekeeper_process(housekeeper_args_in->config_max_housekeeper_delete, &d_history_and_trends,
 				&d_events, &d_problems);
@@ -1347,9 +1367,10 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zbx_snprintf(msg, sizeof(msg), "%s [deleted " ZBX_FS_I64 " hist/trends, " ZBX_FS_I64 " events, "
 				ZBX_FS_I64 " problems, %d sessions, %d alarms, %d audit, %d autoreg_host,"
-				" %d records in " ZBX_FS_DBL " sec, %s]", get_process_type_string(process_type),
+				" %d records, %d dpop_jti_cache in " ZBX_FS_DBL " sec, %s]",
+				get_process_type_string(process_type),
 				d_history_and_trends, d_events, d_problems, d_sessions, d_services, d_audit,
-				d_autoreg_host, records, sec, sleeptext);
+				d_autoreg_host, records, d_dpop_jti_cache, sec, sleeptext);
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s", msg);
 
