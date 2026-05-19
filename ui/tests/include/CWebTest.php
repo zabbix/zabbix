@@ -452,7 +452,7 @@ class CWebTest extends CTest {
 					$coordinates[] = $region;
 				}
 			}
-
+sleep(2);
 			$screenshot = CImageHelper::getImageWithoutRegions($this->page->takeScreenshot($element), $coordinates);
 
 			if (($reference = @file_get_contents(PHPUNIT_REFERENCE_DIR.$class.'/'.$name)) === false) {
