@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -791,9 +791,6 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 		else {
 			// If name is empty string it is replaced by default widget name "Host navigator".
 			$header = ($data['fields']['Name'] === '') ? 'Host navigator' : $data['fields']['Name'];
-			if ($update) {
-				self::$update_widget = $header;
-			}
 
 			COverlayDialogElement::ensureNotPresent();
 			$widget = $dashboard->getWidget($header);
@@ -801,6 +798,11 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 			// Save Dashboard to ensure that widget is correctly saved.
 			$dashboard->save()->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+			// Update widget name for the next test case in testDashboardHostNavigatorWidget_Update test.
+			if ($update) {
+				self::$update_widget = $header;
+			}
 
 			// Check widgets count.
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());

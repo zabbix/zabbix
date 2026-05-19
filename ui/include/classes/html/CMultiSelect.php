@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -96,8 +96,11 @@ class CMultiSelect extends CTag {
 			$this->params['data'] = zbx_cleanHashes($options['data']);
 		}
 
-		foreach (['defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles', 'placeholder', 'hidden', 'readonly']
-				as $option) {
+		$options_list = [
+			'defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles', 'placeholder', 'hidden',
+			'readonly', 'maxlength'
+		];
+		foreach ($options_list as $option) {
 			if (array_key_exists($option, $options)) {
 				$this->params[$option] = $options[$option];
 			}
@@ -151,7 +154,7 @@ class CMultiSelect extends CTag {
 	protected function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiselect_id', 'multiple', 'disabled', 'default_value', 'data',
 			'add_new', 'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest', 'hidden',
-			'readonly'
+			'readonly', 'maxlength'
 		];
 
 		foreach ($options as $field => $value) {
@@ -173,7 +176,8 @@ class CMultiSelect extends CTag {
 			'add_post_js' => 'add_post_js',
 			'styles' => 'styles',
 			'placeholder' => 'placeholder',
-			'readonly' => 'readonly'
+			'readonly' => 'readonly',
+			'maxlength' => 'maxlength'
 		];
 
 		foreach ($mappings as $new_field => $old_field) {
@@ -313,7 +317,7 @@ class CMultiSelect extends CTag {
 				}
 
 				if (array_key_exists('with_hosts', $parameters) && $parameters['with_hosts']) {
-					$popup_parameters['real_hosts'] = '1';
+					$popup_parameters['with_hosts'] = '1';
 					$autocomplete_parameters['with_hosts'] = true;
 				}
 

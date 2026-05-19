@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -204,7 +204,7 @@ typedef struct
 	char			ssl_key_file_orig[ZBX_ITEM_SSL_KEY_FILE_LEN_MAX], *ssl_key_file;
 	char			ssl_key_password_orig[ZBX_ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
 	zbx_vector_ptr_pair_t 	script_params;
-	char			*error;
+	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	unsigned char		*formula_bin;
 	int			snmp_max_repetitions;
 	unsigned char		preprocessing;
@@ -233,7 +233,7 @@ typedef struct
 	zbx_uint64_t		valuemapid;
 	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	char			*units;
-	char			*error;
+	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	char			*history_period, *trends_period;
 	int			mtime;
 	int			history_sec;
@@ -878,7 +878,8 @@ int	zbx_dc_config_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t *
 size_t	zbx_dc_config_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, zbx_dc_item_t **items);
 
 void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
-		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now);
+		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags,
+		unsigned int connection_type, int now);
 void	zbx_dc_config_delete_autoreg_host(const zbx_vector_str_t *autoreg_hosts);
 
 #define ZBX_HK_OPTION_DISABLED		0
@@ -927,15 +928,24 @@ void	zbx_dc_requeue_proxy(zbx_uint64_t proxyid, unsigned char update_nextcheck, 
 		int proxyconfig_frequency, int proxydata_frequency);
 int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		unsigned char *status, unsigned char *monitored_by, zbx_uint64_t *revision,
-		zbx_comms_redirect_t *redirect, char **error);
+		zbx_comms_redirect_t *redirect, int change_flags, char **error);
+
+#define	ZBX_AUTOREG_NO_CHANGES			0x00
+#define	ZBX_AUTOREG_NOT_FOUND			0x01
+#define	ZBX_AUTOREG_CHANGED_HOST_METADATA	0x02
+#define	ZBX_AUTOREG_CHANGED_FLAGS		0x04
+#define	ZBX_AUTOREG_CHANGED_INTERFACE_IP	0x08
+#define	ZBX_AUTOREG_CHANGED_INTERFACE_DNS	0x10
+#define	ZBX_AUTOREG_CHANGED_HEARTBEAT		0x20
+#define	ZBX_AUTOREG_CHANGED_CONNECTION_TYPE	0x40
 int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
-		zbx_conn_flags_t flag, const char *interface, int now);
+		zbx_conn_flags_t flag, const char *interface, unsigned int connection_type, int now);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, unsigned int *psk_usage);
 #endif
-void	zbx_dc_get_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_len,
-		unsigned char *psk_buf, size_t psk_buf_len);
+void	zbx_dc_get_autoreg_tls_config(size_t psk_identity_buf_len, size_t psk_buf_len, unsigned char *tls_accept,
+		char *psk_identity_buf, char *psk_buf);
 
 #define ZBX_MACRO_ENV_SECURE	0
 #define ZBX_MACRO_ENV_NONSECURE	1
@@ -944,8 +954,6 @@ void	zbx_dc_get_autoregistration_psk(char *psk_identity_buf, size_t psk_identity
 #define ZBX_MACRO_VALUE_TEXT	0
 #define ZBX_MACRO_VALUE_SECRET	1
 #define ZBX_MACRO_VALUE_VAULT	2
-
-#define ZBX_MACRO_SECRET_MASK	"******"
 
 int	zbx_dc_interface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
 		zbx_agent_availability_t *out);
@@ -1228,6 +1236,8 @@ void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *um_handle);
 
 void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macro, const zbx_uint64_t *hostids,
 		int hostids_num, char **value);
+
+unsigned char	zbx_dc_get_user_macro_env(zbx_dc_um_handle_t *um_handle);
 
 int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char **text,
 		const zbx_uint64_t *hostids, int hostids_num, char **error);

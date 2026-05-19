@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -314,4 +314,39 @@ void	jsonobj_clear_ref_vector(zbx_vector_jsonobj_ref_t *refs)
 		}
 	}
 	zbx_vector_jsonobj_ref_clear(refs);
+}
+
+void	zbx_jsonobj_remove_value(zbx_jsonobj_t *obj, const char *name)
+{
+	zbx_jsonobj_el_t	el_local, *el;
+
+	if (ZBX_JSON_TYPE_OBJECT != obj->type)
+		return;
+
+	el_local.name = (char *)name;
+
+	if (NULL == (el = (zbx_jsonobj_el_t *)zbx_hashset_search(&obj->data.object, &el_local)))
+		return;
+
+	jsonobj_el_clear(el);
+	zbx_hashset_remove_direct(&obj->data.object, el);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get json value by name                                            *
+ *                                                                            *
+ ******************************************************************************/
+zbx_jsonobj_t *zbx_jsonobj_get_value(zbx_jsonobj_t *obj, const char *name)
+{
+	zbx_jsonobj_el_t	el_local, *el;
+
+	if (ZBX_JSON_TYPE_OBJECT != obj->type)
+		return NULL;
+
+	el_local.name = (char *)name;
+	if (NULL == (el = (zbx_jsonobj_el_t *)zbx_hashset_search(&obj->data.object, &el_local)))
+		return NULL;
+
+	return &el->value;
 }

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,8 +15,6 @@
 
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
-
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * Test tag based permissions.
@@ -351,7 +349,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 				}
 
 				$xpath = '//table[@id="tag-filter-table"]//tbody//tr['.$i.']//td/button[text()="Remove"]';
-				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
+				$this->query('xpath:'.$xpath)->waitUntilVisible()->one();
 				$i++;
 			}
 
@@ -730,7 +728,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						[
 							'Host' => 'First Host for tag filter permission test',
 							'Problem' => 'Third trigger for tag filter permission check',
-							'Tags' => implode(['item OS: Linux', 'trigger OS: Windows'])
+							'Tags' => implode("\n", ['item OS: Linux', 'trigger OS: Windows'])
 						],
 						[
 
@@ -765,7 +763,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						[
 							'Host' => 'First Host for tag filter permission test',
 							'Problem' => 'Third trigger for tag filter permission check',
-							'Tags' => implode(['item OS: Linux', 'trigger OS: Windows'])
+							'Tags' => implode("\n", ['item OS: Linux', 'trigger OS: Windows'])
 						],
 						[
 							'Host' => 'Second Host for tag filter permission test',
@@ -799,7 +797,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						[
 							'Host' => 'First Host for tag filter permission test',
 							'Problem' => 'Third trigger for tag filter permission check',
-							'Tags' => implode(['item OS: Linux', 'trigger OS: Windows'])
+							'Tags' => implode("\n", ['item OS: Linux', 'trigger OS: Windows'])
 						],
 						[
 							'Host' => 'Second Host for tag filter permission test',

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -282,7 +282,7 @@ foreach ($data['templates'] as $template) {
 		$template['vendor_version'],
 		$linked_templates_output,
 		$linked_to_output,
-		$data['tags'][$template['templateid']]
+		(new CDiv($data['tags'][$template['templateid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 
@@ -292,7 +292,7 @@ $form->addItem([
 		'template.export' => [
 			'content' => new CButtonExport('export.templates',
 				(new CUrl('zabbix.php'))
-					->setArgument('action', 'templates.list')
+					->setArgument('action', 'template.list')
 					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
 					->getUrl()
 			)

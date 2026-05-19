@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -229,11 +229,13 @@ func (c *Connector) refreshActiveChecks() bool {
 		if c.configRevision == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
 				c.address.Get())
+
+			return false
 		} else {
 			parseSuccess = true
 		}
 
-		return false
+		return true
 	}
 
 	c.configRevision = response.ConfigRevision
@@ -348,7 +350,7 @@ func (c *Connector) sendHeartbeatMsg() {
 	}
 
 	log.Debugf("[%d] In sendHeartbeatMsg() from %s", c.clientID, c.address)
-	defer log.Debugf("[%d] End of sendHeartBeatMsg() from %s", c.clientID, c.address)
+	defer log.Debugf("[%d] End of sendHeartbeatMsg() from %s", c.clientID, c.address)
 
 	request, err := json.Marshal(&h)
 	if err != nil {
