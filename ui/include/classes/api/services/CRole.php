@@ -169,6 +169,8 @@ class CRole extends CApiService {
 	 * @throws APIException
 	 */
 	private function validateCreate(array &$roles): void {
+		global $ZBX_FEATURE_FLAGS;
+
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
 			'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
@@ -215,6 +217,11 @@ class CRole extends CApiService {
 				'devices.actions.default_access' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])]
 			]]
 		]];
+
+		if (!$ZBX_FEATURE_FLAGS['modules_config_enabled']) {
+			unset($api_input_rules['fields']['rules']['fields']['modules'],
+				$api_input_rules['fields']['rules']['fields']['modules.default_access']);
+		}
 
 		if (false) {
 			unset($api_input_rules['fields']['rules']['fields']['devices.access'],
@@ -281,6 +288,8 @@ class CRole extends CApiService {
 	 * @throws APIException
 	 */
 	private function validateUpdate(array &$roles, ?array &$db_roles): void {
+		global $ZBX_FEATURE_FLAGS;
+
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'roleid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
@@ -328,6 +337,11 @@ class CRole extends CApiService {
 				'devices.actions.default_access' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])]
 			]]
 		]];
+
+		if (!$ZBX_FEATURE_FLAGS['modules_config_enabled']) {
+			unset($api_input_rules['fields']['rules']['fields']['modules'],
+				$api_input_rules['fields']['rules']['fields']['modules.default_access']);
+		}
 
 		if (false) {
 			unset($api_input_rules['fields']['rules']['fields']['devices.access'],

@@ -39,7 +39,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 				'messages' => ['not_empty' => _('At least one UI element must be checked.')]
 			],
 			'ui_default_access' => ['boolean'],
-			'modules' => ['array', 'required', 'field' => ['boolean']],
+			'modules' => ['array', 'field' => ['boolean']],
 			'modules_default_access' => ['boolean'],
 			'actions' => ['array', 'required',
 				'field' => ['string', 'in' => CRoleHelper::getActionsByUserType(USER_TYPE_SUPER_ADMIN)]

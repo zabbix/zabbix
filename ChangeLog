@@ -1,6 +1,9 @@
 Changes for 8.0.0beta1
 
 New features:
+..F....... [ZBXNEXT-6779] added csv export for audit log records (kastafjevs)
+.........T [ZBXNEXT-10349] added Kubernetes Cluster by HTTP template (egordymov)
+..F.I..... [ZBXNEXT-10468] added default value for Allowed hosts of Trapper items, added new global macro {$TRAPPER.ALLOWED_HOSTS} (msnihach, MVekslers)
 .........T [ZBXNEXT-10311] fixed gauge widget, and implemented minor fixes for 'PostgreSQL by ODBC' template (smansurovs)
 ..F....... [ZBXNEXT-8788] implemented inline form validation for Scheduled reports form (msnihach, talbergs)
 .........T [ZBXNEXT-8733] added Podman template (abakaldin)
@@ -37,6 +40,25 @@ A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25
 A...I..PS. [ZBXNEXT-10076] changed delayed deletion process via housekeeper table (agriscenko, askolmeisters)
 
 Bug fixes:
+..F....... [ZBX-26678] fixed action log widget not displaying results with all statuses unset (agriscenko)
+..F....... [ZBX-27210] fixed the infinite loading on widgets after removing maps from Map Navigation Tree widget (aluchko)
+..F....... [ZBX-27740] added strict mode to in_array() to prevent incorrect matches during inline validation of existing values (msnihach)
+.........T [ZBX-27694] updated dependent item key from 'vm.memory.utilization' to 'vm.memory.util' in 'Linux by Zabbix agent' active and passive templates (smansurovs)
+A.F....... [ZBX-26657] fixed negative threshold sorting (gklavins)
+.......PS. [ZBX-27675] improved configuration syncer not to reserve large amounts of memory (vso)
+..F....... [ZBX-26742] fixed text overlap in popups for portuguese language (gklavins)
+.........T [ZBX-27475] fixed typo in Mattermost webhook 'fallback' field name (smansurovs)
+..F....... [ZBX-27658] fixed clipping of the help button’s shadow by an adjacent element (aluchko, ashubin)
+..F....... [ZBX-27632] fixed trigger severity checkboxes update to checked state after validation error (kastafjevs)
+.......PS. [ZBX-27022] fixed preprocessing step "Discard unchanged" for string types (Andris, askolmeisters)
+..F....... [ZBX-27688] removed checks to prevent bulk enabling of Gmail and Office 365 media types with incomplete configuration (aluchko)
+..F....... [ZBX-27652] fixed incorrect documentation link for Administration/General/Other (aluchko)
+..F....... [ZBX-27517] fixed 'page not found' issue when exporting template that contains inaccessible dashboard element (aluchko)
+.........T [ZBX-27379] changed macro type from plaintext to secret and updated descriptions for referenced templates (smansurovs)
+..F....... [ZBX-27533] changed host form agent port validation to accept values from 1024 to 32767 (aluchko)
+..F....... [ZBX-27328] fixed error when pressing Esc button (ashubin)
+..F....... [ZBX-27121] fixed an issue where repeatedly clicking the Close button on the notifications floating popup could cause an error (msnihach)
+..F....... [ZBX-27587] fixed to display interface missing error in the item and item prototype form (gberzina)
 ..F....... [ZBX-27441] fixed rendering of working days on graphs when only a single working day is defined (Sasha)
 .......PS. [ZBX-27496] improved network discovery subsystem to work with snmpv1 and snmpv2c checks (MVekslers)
 .......P.. [ZBX-27399] fixed possible deadlocks in configuration cache sync (sboidenko)
@@ -305,6 +327,23 @@ Changes for 7.4.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-26678] fixed action log widget not displaying results with all statuses unset (agriscenko)
+..F....... [ZBX-27210] fixed the infinite loading on widgets after removing maps from Map Navigation Tree widget (aluchko)
+..F....... [ZBX-27740] added strict mode to in_array() to prevent incorrect matches during inline validation of existing values (msnihach)
+.........T [ZBX-27694] updated dependent item key from 'vm.memory.utilization' to 'vm.memory.util' in 'Linux by Zabbix agent' active and passive templates (smansurovs)
+.......P.. [ZBX-27399] fixed possible deadlocks in configuration cache sync (sboidenko)
+A.F....... [ZBX-26657] fixed negative threshold sorting (gklavins)
+.......PS. [ZBX-27675] improved configuration syncer not to reserve large amounts of memory (vso)
+.........T [ZBX-27475] fixed typo in Mattermost webhook 'fallback' field name (smansurovs)
+..F....... [ZBX-26742] fixed text overlap in popups for portuguese language (gklavins)
+..F....... [ZBX-27632] fixed trigger severity checkboxes update to checked state after validation error (kastafjevs)
+.......PS. [ZBX-27022] fixed preprocessing step "Discard unchanged" for string types (Andris, askolmeisters)
+..F....... [ZBX-27688] removed checks to prevent bulk enabling of Gmail and Office 365 media types with incomplete configuration (aluchko)
+..F....... [ZBX-27652] fixed incorrect documentation link for Administration/General/Other (aluchko)
+..F....... [ZBX-27517] fixed 'page not found' issue when exporting template that contains inaccessible dashboard element (aluchko)
+..F....... [ZBX-27328] fixed error when pressing Esc button (ashubin)
+..F....... [ZBX-27121] fixed an issue where repeatedly clicking the Close button on the notifications floating popup could cause an error (msnihach)
+..F....... [ZBX-27587] fixed to display interface missing error in the item and item prototype form (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.10
@@ -1719,6 +1758,18 @@ Changes for 7.0.27rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-27210] fixed the infinite loading on widgets after removing maps from Map Navigation Tree widget (aluchko)
+.........T [ZBX-27694] updated dependent item key from 'vm.memory.utilization' to 'vm.memory.util' in 'Linux by Zabbix agent' active and passive templates (smansurovs)
+.......P.. [ZBX-27399] fixed possible deadlocks in configuration cache sync (sboidenko)
+.......PS. [ZBX-27675] improved configuration syncer not to reserve large amounts of memory (vso)
+.........T [ZBX-27475] fixed typo in Mattermost webhook 'fallback' field name (smansurovs)
+..F....... [ZBX-26742] fixed text overlap in popups for portuguese language (gklavins)
+..F....... [ZBX-27632] fixed trigger severity checkboxes update to checked state after validation error (kastafjevs)
+.......PS. [ZBX-27022] fixed preprocessing step "Discard unchanged" for string types (Andris, askolmeisters)
+..F....... [ZBX-27688] removed checks to prevent bulk enabling of Gmail and Office 365 media types with incomplete configuration (aluchko)
+..F....... [ZBX-27652] fixed incorrect documentation link for Administration/General/Other (aluchko)
+..F....... [ZBX-27517] fixed 'page not found' issue when exporting template that contains inaccessible dashboard element (aluchko)
+..F....... [ZBX-27121] fixed an issue where repeatedly clicking the Close button on the notifications floating popup could cause an error (msnihach)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.26

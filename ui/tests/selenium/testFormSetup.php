@@ -20,6 +20,8 @@ require_once __DIR__.'/behaviors/CTableBehavior.php';
 /**
  * @backup sessions
  *
+ * @onBefore deleteConfFile
+ *
  * @backupConfig
  */
 class testFormSetup extends CWebTest {
@@ -36,6 +38,10 @@ class testFormSetup extends CWebTest {
 		];
 	}
 
+	protected function deleteConfFile() {
+		unlink(__DIR__.'/../../conf/zabbix.conf.php');
+	}
+
 	/**
 	 * @backup settings
 	 */
@@ -47,7 +53,7 @@ class testFormSetup extends CWebTest {
 		$this->checkSections('Welcome');
 		$form = $this->query('xpath://form')->asForm()->one();
 		$language_field = $form->getField('Default language');
-		$this->assertEquals('English (en_GB)', $language_field->getValue());
+		$this->assertEquals('English (en_US)', $language_field->getValue());
 		$hint_text = 'You are not able to choose some of the languages, because locales for them are not installed '.
 				'on the web server.';
 		$this->assertEquals($hint_text, $this->query('xpath://button[@data-hintbox]')->one()
@@ -267,6 +273,8 @@ class testFormSetup extends CWebTest {
 
 	/**
 	 * @backup settings
+	 *
+	 * @onAfter deleteConfFile
 	 */
 	public function testFormSetup_settingsSection() {
 		// Open the Pre-installation summary section.
@@ -389,6 +397,9 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $skip_fields, 'PreInstall_'.$db_parameters['Database type']);
 	}
 
+	/**
+	 * @onAfter deleteConfFile
+	 */
 	public function testFormSetup_installSection() {
 		$this->openSpecifiedSection('Install');
 		$this->checkPageTextElements('Install', 'Configuration file "conf/zabbix.conf.php" created.');
@@ -882,10 +893,6 @@ class testFormSetup extends CWebTest {
 		$this->assertEquals("Welcome to\nZabbix ".ZABBIX_EXPORT_VERSION, $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$this->checkButtons('first section');
-
-		// Cancel setup form update.
-		$this->query('button:Cancel')->one()->click()->waitUntilStalled();
-		$this->assertStringContainsString('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
 	}
 
 	/**
@@ -913,7 +920,6 @@ class testFormSetup extends CWebTest {
 		switch ($section) {
 			case 'first section':
 				$buttons = [
-					'Cancel' => true,
 					'Back' => false,
 					'Next step' => true
 				];
@@ -921,7 +927,6 @@ class testFormSetup extends CWebTest {
 
 			case 'last section':
 				$buttons = [
-					'Cancel' => false,
 					'Back' => false,
 					'Finish' => true
 				];
@@ -929,7 +934,6 @@ class testFormSetup extends CWebTest {
 
 			case 'middle section':
 				$buttons = [
-					'Cancel' => true,
 					'Back' => true,
 					'Next step' => true
 				];
@@ -937,7 +941,6 @@ class testFormSetup extends CWebTest {
 
 			case 'russian':
 				$buttons = [
-					'Отмена' => true,
 					'Назад' => false,
 					'Далее' => true
 				];
