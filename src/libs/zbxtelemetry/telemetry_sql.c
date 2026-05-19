@@ -190,9 +190,14 @@ static char	*tq_sql_dyn_get_json_subcolumn_raw(const char *operand, const char *
 	switch (db_type)
 	{
 		case ZBX_TQ_DB_TYPE_POSTGRESQL:
-			/* TODO */
-			str = zbx_dsprintf(NULL, "UNIMPLEMENTED");
+		{
+			char	*key_esc = tq_sql_dyn_escape_string(key, db_type);
+
+			str = zbx_dsprintf(NULL, "%s->>%s", operand, key_esc);
+
+			zbx_free(key_esc);
 			break;
+		}
 		case ZBX_TQ_DB_TYPE_MYSQL:
 			str = zbx_dsprintf(NULL, "UNIMPLEMENTED");
 			break;
@@ -440,9 +445,14 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 	switch (db_type)
 	{
 		case ZBX_TQ_DB_TYPE_POSTGRESQL:
-			/* TODO */
-			str = zbx_dsprintf(NULL, "UNIMPLEMENTED");
+		{
+			char	*key_esc = tq_sql_dyn_escape_string(key, db_type);
+
+			str = zbx_dsprintf(NULL, "%s ? %s", atom, key_esc);
+
+			zbx_free(key_esc);
 			break;
+		}
 		case ZBX_TQ_DB_TYPE_MYSQL:
 			str = zbx_dsprintf(NULL, "UNIMPLEMENTED");
 			break;
@@ -514,8 +524,15 @@ static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, tq_c
 
 	if (ZBX_TQ_DB_TYPE_POSTGRESQL == db_type)
 	{
-		/* TODO */
-		str = zbx_strdup(NULL, "UNIMPLEMENTED");
+		char	*elem_cond = tq_sql_dyn_get_atom_condition("e.elem", cond->key, cond->value, cond->operator,
+				db_type);
+		char	*col_esc = tq_sql_dyn_escape_name(cond->column_name, db_type);
+
+		str = zbx_dsprintf(NULL, "EXISTS(SELECT 1 FROM jsonb_array_elements(%s->'"
+				TQ_SQL_ATTRIBUTES_ARRAY_JSON_KEY "') AS e(elem) WHERE %s)", col_esc, elem_cond);
+
+		zbx_free(elem_cond);
+		zbx_free(col_esc);
 	}
 	else if (ZBX_TQ_DB_TYPE_MYSQL == db_type)
 	{
