@@ -1257,10 +1257,10 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			if ((bool) array_column($problem['suppression_data'], 'userid')) {
-				$actions_performed[] = _('Suppressed');
+				$actions_performed[] = _('Manually suppressed');
 			}
 			elseif ($data['actions']['suppressions'][$problem['eventid']]['count'] > 0) {
-				$actions_performed[] = _('Unsuppressed');
+				$actions_performed[] = _('Manually unsuppressed');
 			}
 
 			if ($data['actions']['actions'][$problem['eventid']]['count'] > 0) {
