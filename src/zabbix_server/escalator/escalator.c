@@ -1258,11 +1258,11 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 				/* selected IPMI fields changes */
 				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
-				",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by, hp.proxyid"
+				",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by,hp.proxyid"
 				);
 
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-				" from opcommand o,hosts_groups hg, scripts s, hosts h"
+				" from opcommand o,hosts_groups hg,scripts s,hosts h"
 					" left join host_proxy hp on h.hostid=hp.hostid"
 				" where o.operationid=" ZBX_FS_UI64
 					" and o.scriptid=s.scriptid"
@@ -1287,10 +1287,10 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 #ifdef HAVE_OPENIPMI
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
-			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by, hp.proxyid"
+			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by,hp.proxyid"
 			);
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			" from opcommand o,opcommand_hst oh, scripts s, hosts h"
+			" from opcommand o,opcommand_hst oh,scripts s,hosts h"
 				" left join host_proxy hp on h.hostid=hp.hostid"
 			" where o.operationid=oh.operationid"
 				" and o.scriptid=s.scriptid"
