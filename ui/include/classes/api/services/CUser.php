@@ -4143,38 +4143,32 @@ class CUser extends CApiService {
 			$db_user['medias'] = $db_user_medias;
 			$user['medias'] = array_values($db_user_medias);
 
-			$existing_media_updated = false;
+			$sendto_all = true;
 
 			foreach ($user['medias'] as &$media) {
 				$media['sendto'] = explode("\n", $media['sendto']);
 
-				if (!$existing_media_updated && bccomp($media['mediatypeid'], $preferred_mediatypeid) == 0) {
-					if (in_array('*', $media['sendto']) || in_array($uuid, $media['sendto'])) {
+				if (bccomp($media['mediatypeid'], $preferred_mediatypeid) == 0) {
+					if (in_array('*', $media['sendto'])) {
 						return;
 					}
 
-					$media['sendto'][] = $uuid;
-
-					$existing_media_updated = true;
+					$sendto_all = false;
 				}
 			}
 			unset($media);
 
-			if (!$existing_media_updated) {
-				$user['medias'][] = [
-					'mediatypeid' => $preferred_mediatypeid,
-					'sendto' => ['*'],
-					'status' => MEDIA_STATUS_ACTIVE
-				];
-			}
+			$user['medias'][] = [
+				'mediatypeid' => $preferred_mediatypeid,
+				'sendto' => $sendto_all ? ['*'] : [$uuid],
+				'status' => MEDIA_STATUS_ACTIVE
+			];
 
 			$users[] = $user;
 		}
 		unset($db_user, $user);
 
-		self::updateMedias($users, $db_users);
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
+		self::updateForce($users, $db_users);
 	}
 
 	public static function deprovisionPushMedia(string $userid, string $uuid): void {
@@ -4231,8 +4225,6 @@ class CUser extends CApiService {
 		}
 		unset($db_user);
 
-		self::updateMedias($users, $db_users);
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
+		self::updateForce($users, $db_users);
 	}
 }
