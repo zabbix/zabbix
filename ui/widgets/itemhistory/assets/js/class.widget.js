@@ -45,6 +45,32 @@ class CWidgetItemHistory extends CWidget {
 			return;
 		}
 
+		for (const iframe of this.#values_table.querySelectorAll('.js-iframe')) {
+			iframe.addEventListener('load', () => {
+				const iframe_content_body = iframe.contentDocument.body;
+				const computed_style = getComputedStyle(iframe);
+
+				iframe_content_body.style.margin = '0';
+				iframe_content_body.style.font = computed_style.font;
+				iframe_content_body.style.color = computed_style.color;
+
+				const resizeIframe = () => {
+					const content_scroll_width = iframe_content_body.scrollWidth;
+
+					if (content_scroll_width > iframe_content_body.clientWidth) {
+						iframe.style.minWidth =	`${content_scroll_width}px`;
+					}
+
+					iframe.style.height = `${iframe_content_body.scrollHeight}px`;
+				};
+
+				const resize_observer = new ResizeObserver(resizeIframe);
+				resize_observer.observe(iframe_content_body);
+
+				resizeIframe();
+			});
+		}
+
 		const items_data = new Map();
 		this.#values_table.querySelectorAll('.has-broadcast-data').forEach(element => {
 			const itemid = element.dataset.itemid;
@@ -62,11 +88,7 @@ class CWidgetItemHistory extends CWidget {
 			const element = e.target.closest('.has-broadcast-data');
 
 			if (element !== null) {
-				this.#selected_clock = element.dataset.clock;
-				this.#selected_itemid = element.dataset.itemid;
-				this.#selected_key_ = element.dataset.key_;
-
-				this.#broadcast();
+				this.#broadcast(element.dataset.clock, element.dataset.itemid, element.dataset.key_);
 				this.#markSelected();
 			}
 		});
@@ -76,30 +98,23 @@ class CWidgetItemHistory extends CWidget {
 				const element = this.#getDefaultSelectable();
 
 				if (element !== null) {
-					this.#selected_clock = element.dataset.clock;
-					this.#selected_itemid = element.dataset.itemid;
-					this.#selected_key_ = element.dataset.key_;
+					this.#broadcast(element.dataset.clock, element.dataset.itemid, element.dataset.key_);
 				}
 			}
-
-			this.#broadcast();
-			this.#markSelected();
 		}
 		else if (this.#selected_itemid !== null) {
 			if (!items_data.has(this.#selected_itemid)) {
 				for (let [itemid, item] of items_data) {
 					if (item.key_ === this.#selected_key_) {
-						this.#selected_itemid = itemid;
-						this.#selected_clock = item.clock;
+						this.#broadcast(itemid, item.clock, item.key_);
 
-						this.#broadcast();
 						break;
 					}
 				}
 			}
-
-			this.#markSelected();
 		}
+
+		this.#markSelected();
 	}
 
 	#getDefaultSelectable() {
@@ -114,10 +129,7 @@ class CWidgetItemHistory extends CWidget {
 		const element = this.#getDefaultSelectable();
 
 		if (element !== null) {
-			this.#selected_clock = element.dataset.clock;
-			this.#selected_itemid = element.dataset.itemid;
-
-			this.#broadcast();
+			this.#broadcast(element.dataset.clock, element.dataset.itemid, element.dataset.key_);
 			this.#markSelected();
 		}
 	}
@@ -133,7 +145,11 @@ class CWidgetItemHistory extends CWidget {
 		}
 	}
 
-	#broadcast() {
+	#broadcast(clock, itemid, key) {
+		this.#selected_clock = clock;
+		this.#selected_itemid = itemid;
+		this.#selected_key_ = key;
+
 		this.broadcast({
 			[CWidgetsData.DATA_TYPE_ITEM_ID]: [this.#selected_itemid],
 			[CWidgetsData.DATA_TYPE_ITEM_IDS]: [this.#selected_itemid]

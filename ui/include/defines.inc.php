@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.0.23rc2');
-define('ZABBIX_API_VERSION',	'7.0.23');
+define('ZABBIX_VERSION',		'7.0.27rc1');
+define('ZABBIX_API_VERSION',	'7.0.27');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
 define('ZABBIX_DB_VERSION',		7000000);
@@ -864,6 +864,9 @@ define('TRIGGER_SEVERITY_AVERAGE',			3);
 define('TRIGGER_SEVERITY_HIGH',				4);
 define('TRIGGER_SEVERITY_DISASTER',			5);
 define('TRIGGER_SEVERITY_COUNT',			6);
+
+define('TRIGGER_SEVERITY_OFF',			0);
+define('TRIGGER_SEVERITY_ON',			1);
 
 define('EVENT_CUSTOM_COLOR_DISABLED',	0);
 define('EVENT_CUSTOM_COLOR_ENABLED',	1);
@@ -1999,6 +2002,7 @@ define('ZBX_STYLE_DASHBOARD_EDIT', 'dashboard-edit');
 define('ZBX_STYLE_DASHBOARD_WIDGET_GRAPH_LINK', 'dashboard-widget-graph-link');
 define('ZBX_STYLE_DASHED_BORDER', 'dashed-border');
 define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
+define('ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH', 'debug-output-table-refresh');
 define('ZBX_STYLE_DIFF', 'diff');
 define('ZBX_STYLE_DIFF_ADDED', 'diff-added');
 define('ZBX_STYLE_DIFF_REMOVED', 'diff-removed');

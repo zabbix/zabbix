@@ -561,7 +561,7 @@ class testDocumentationLinks extends CWebTest {
 						]
 					],
 					'open_button' => 'button:Create host group',
-					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+					'doc_link' => '/en/manual/config/hosts/host_groups#configuration'
 				]
 			],
 			// #47 Edit host group popup.
@@ -574,14 +574,14 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'xpath://a[text()="Zabbix servers"]'
 						]
 					],
-					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+					'doc_link' => '/en/manual/config/hosts/host_groups#configuration'
 				]
 			],
 			// #48 Create host group form view (standalone).
 			[
 				[
 					'url' => 'zabbix.php?action=hostgroup.edit',
-					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+					'doc_link' => '/en/manual/config/hosts/host_groups#configuration'
 				]
 			],
 			// #49 Template list view.
@@ -1889,7 +1889,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=miscconfig.edit',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#other-parameters'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#other'
 				]
 			],
 			// #179 Administration -> Proxy list view.
@@ -2153,7 +2153,7 @@ class testDocumentationLinks extends CWebTest {
 						]
 					],
 					'open_button' => 'button:Create template group',
-					'doc_link' => '/en/manual/config/templates/template#creating-a-template-group'
+					'doc_link' => '/en/manual/config/templates/template_groups#configuration'
 				]
 			],
 			// #208 Edit template group popup.
@@ -2166,14 +2166,14 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'xpath://a[text()="Templates/Applications"]'
 						]
 					],
-					'doc_link' => '/en/manual/config/templates/template#creating-a-template-group'
+					'doc_link' => '/en/manual/config/templates/template_groups#configuration'
 				]
 			],
 			// #209 Create template group form view (standalone).
 			[
 				[
 					'url' => 'zabbix.php?action=templategroup.edit',
-					'doc_link' => '/en/manual/config/templates/template#creating-a-template-group'
+					'doc_link' => '/en/manual/config/templates/template_groups#configuration'
 				]
 			],
 			// #210 Start creating Discovery status widget.

@@ -66,11 +66,11 @@ function getLocales(): array {
 /**
  * Get support URL for specified language.
  *
- * @param string|null $language  ISO639-1 code or null for English support URL.
+ * @param string $language  ISO639-1 code.
  *
- * @return string
+ * @return string  Fallback to English support URL.
  */
-function getSupportUrl(?string $language = null): string {
+function getSupportUrl(string $language): string {
 	$urls = [
 		'cs' => 'https://www.zabbix.com/cz/support',
 		'fr' => 'https://www.zabbix.com/fr/support',
@@ -86,11 +86,11 @@ function getSupportUrl(?string $language = null): string {
 /**
  * Get integrations URL for specified language.
  *
- * @param string|null $language  ISO639-1 code or null for English integrations URL.
+ * @param string $language  ISO639-1 code.
  *
- * @return string
+ * @return string  Fallback to English integrations URL.
  */
-function getIntegrationsUrl(?string $language = null): string {
+function getIntegrationsUrl(string $language): string {
 	$urls = [
 		'cs' => 'https://www.zabbix.com/cz/integrations',
 		'fr' => 'https://www.zabbix.com/fr/integrations',

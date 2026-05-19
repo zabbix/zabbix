@@ -310,6 +310,12 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 		zbx_vps_monitor_stats_t	stats;
 		zbx_vps_monitor_get_stats(&stats);
 
+		if (2 > nparams || nparams > 3)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
 		param2 = get_rparam(request, 1);
 
 		if (2 == nparams)
@@ -329,12 +335,6 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 
 				goto out;
 			}
-		}
-
-		if (3 < nparams)
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-			goto out;
 		}
 
 		param3 = get_rparam(request, 2);

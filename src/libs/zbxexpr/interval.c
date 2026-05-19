@@ -1686,11 +1686,11 @@ int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now
  ******************************************************************************/
 int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time)
 {
-	struct tm	*tm;
+	struct tm	tm;
 	time_t		yesterday = now - SEC_PER_DAY;
 	int		nextcheck, tm_hour, tm_min, tm_sec;
 
-	tm = zbx_localtime(&yesterday, NULL);
+	tm = *zbx_localtime(&yesterday, NULL);	/* zbx_tm_(add/sub) should call zbx_localtime again */
 
 	tm_sec = start_time % 60;
 	start_time /= 60;
@@ -1701,36 +1701,37 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 	do
 	{
 		/* handle midnight startup times */
-		if (0 == tm->tm_sec && 0 == tm->tm_min && 0 == tm->tm_hour)
-			zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
+		if (0 == tm.tm_sec && 0 == tm.tm_min && 0 == tm.tm_hour)
+			zbx_tm_add(&tm, 1, ZBX_TIME_UNIT_DAY);
 
 		switch (cycle)
 		{
 			case ZBX_REPORT_CYCLE_YEARLY:
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_YEAR);
+				zbx_tm_round_up(&tm, ZBX_TIME_UNIT_YEAR);
 				break;
 			case ZBX_REPORT_CYCLE_MONTHLY:
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_MONTH);
+				zbx_tm_round_up(&tm, ZBX_TIME_UNIT_MONTH);
 				break;
 			case ZBX_REPORT_CYCLE_WEEKLY:
 				if (0 == weekdays)
 					return -1;
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY);
+				zbx_tm_round_up(&tm, ZBX_TIME_UNIT_DAY);
 
-				while (0 == (weekdays & (1 << (tm->tm_wday + 6) % 7)))
-					zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
+				while (0 == (weekdays & (1 << (tm.tm_wday + 6) % 7)))
+					zbx_tm_add(&tm, 1, ZBX_TIME_UNIT_DAY);
 
 				break;
 			case ZBX_REPORT_CYCLE_DAILY:
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY);
+				zbx_tm_round_up(&tm, ZBX_TIME_UNIT_DAY);
 				break;
 		}
 
-		tm->tm_sec = tm_sec;
-		tm->tm_min = tm_min;
-		tm->tm_hour = tm_hour;
+		tm.tm_sec = tm_sec;
+		tm.tm_min = tm_min;
+		tm.tm_hour = tm_hour;
+		tm.tm_isdst = -1;	/* we don't know DST state after the time change */
 
-		nextcheck = (int)mktime(tm);
+		nextcheck = (int)mktime(&tm);
 	}
 	while (-1 != nextcheck && nextcheck <= now);
 
