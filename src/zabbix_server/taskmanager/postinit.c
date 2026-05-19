@@ -16,6 +16,7 @@
 
 #include "../db_lengths_constants.h"
 
+#include "zbx_trigger_constants.h"
 #include "zbxcommon.h"
 #include "zbxtypes.h"
 #include "zbxtasks.h"
@@ -376,9 +377,11 @@ static int	update_event_names(void)
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
 
 	result = zbx_db_select(
-			"select triggerid,description,expression,priority,comments,url,url_name,"
-				"recovery_expression,recovery_mode,value"
-			" from triggers"
+			"select t.triggerid,t.description,t.expression,t.priority,t.comments,t.url,t.url_name,"
+				"t.recovery_expression,t.recovery_mode,rt.value"
+			" from triggers t"
+			" left join trigger_rtdata rt"
+				" on t.triggerid=rt.triggerid"
 			" order by triggerid");
 
 	um_handle = zbx_dc_open_user_macros();
@@ -394,7 +397,12 @@ static int	update_event_names(void)
 		trigger.url_name = zbx_strdup(NULL, row[6]);
 		trigger.recovery_expression = zbx_strdup(NULL, row[7]);
 		ZBX_STR2UCHAR(trigger.recovery_mode, row[8]);
-		ZBX_STR2UCHAR(trigger.value, row[9]);
+
+		if (SUCCEED != zbx_db_is_null(row[9]))
+			ZBX_STR2UCHAR(trigger.value, row[9]);
+		else
+			trigger.value = TRIGGER_VALUE_OK;
+
 		zbx_vector_uint64_create(&trigger.dep_triggerids);
 
 		int	historical;
