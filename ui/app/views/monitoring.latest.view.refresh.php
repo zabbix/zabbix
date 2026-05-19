@@ -36,4 +36,6 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
+$output['filter_set'] = $data['results']['filter_set'];
+
 echo json_encode($output);
