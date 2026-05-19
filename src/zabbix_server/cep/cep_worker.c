@@ -817,7 +817,7 @@ void	*cep_worker_entry(void *args)
 	{
 		zbx_mw_task_t	*task;
 
-		while (NULL != (task = zbx_mw_queue_pop(worker->base.queue)))
+		if (NULL != (task = zbx_mw_queue_pop(worker->base.queue)))
 		{
 			zbx_mw_queue_unlock(worker->base.queue);
 
