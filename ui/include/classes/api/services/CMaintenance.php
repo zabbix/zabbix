@@ -523,43 +523,12 @@ class CMaintenance extends CApiService {
 			'where' => ['maintenanceid' => $maintenanceids]
 		]);
 
-		self::createUnsuppressionAcknowledgements($maintenanceids);
-
 		DB::delete('timeperiods', ['timeperiodid' => array_column($maintenances_windows, 'timeperiodid')]);
 		DB::delete('maintenances', ['maintenanceid' => $maintenanceids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MAINTENANCE, $db_maintenances);
 
 		return ['maintenanceids' => $maintenanceids];
-	}
-
-	/**
-	 * Add unsuppression records for maintenance-related event suppressions.
-	 *
-	 * @param array $maintenanceids  Array of maintenance IDs being deleted.
-	 */
-	private static function createUnsuppressionAcknowledgements(array $maintenanceids): void {
-		$ins_acknowledges = [];
-		$time = time();
-
-		$options = [
-			'output' => ['eventid', 'maintenanceid'],
-			'filter' => ['maintenanceid' => $maintenanceids]
-		];
-		$resource = DBselect(DB::makeSql('event_suppress', $options));
-
-		while ($row = DBfetch($resource)) {
-			$ins_acknowledges[] = [
-				'eventid' => $row['eventid'],
-				'clock' => $time,
-				'action' => ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS,
-				'maintenanceid' => $row['maintenanceid']
-			];
-		}
-
-		if ($ins_acknowledges) {
-			DB::insert('acknowledges', $ins_acknowledges);
-		}
 	}
 
 	/**
