@@ -91,7 +91,7 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 					'filter' => $filter,
 					'mandatory_filter_set' => $mandatory_filter_set,
 					'subfilter_set' => $subfilter_set,
-                    'filter_set' => $mandatory_filter_set || $subfilter_set,
+					'filter_set' => $mandatory_filter_set || $subfilter_set,
 					'view_curl' => $view_url,
 					'sort_field' => $filter['sort'],
 					'sort_order' => $filter['sortorder'],
