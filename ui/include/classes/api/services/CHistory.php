@@ -142,6 +142,13 @@ class CHistory extends CApiService {
 			$options['itemids'] = array_keys($items);
 		}
 
+		$extra_fields = [];
+
+		if (!$options['countOutput'] && !$options['output']) {
+			$options['output'] = ['itemid'];
+			$extra_fields = ['itemid' => ''];
+		}
+
 		$result = match (Manager::History()->getDataSourceType($options['history'])) {
 			ZBX_HISTORY_SOURCE_ELASTIC => $this->getFromElasticsearch($options),
 			ZBX_HISTORY_SOURCE_CLICKHOUSE => $this->getFromClickHouse($options),
@@ -157,6 +164,10 @@ class CHistory extends CApiService {
 				$row['value'] = base64_encode($row['value']);
 			}
 			unset($row);
+		}
+
+		if ($extra_fields) {
+			$result = array_map(static fn ($row) => array_diff_key($row, $extra_fields), $result);
 		}
 
 		return $result;
@@ -176,7 +187,7 @@ class CHistory extends CApiService {
 		$this->tableName = Manager::History()->getTableName($options['history']);
 		$result = [];
 		$sql_parts = [
-			'select'	=> ['history' => 'h.itemid'],
+			'select'	=> [],
 			'from'		=> $this->tableName.' h',
 			'where'		=> [],
 			'group'		=> [],
