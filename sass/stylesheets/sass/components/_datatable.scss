@@ -282,7 +282,7 @@
 			.datatable-options-link {
 				margin-right: 0;
 
-				&:not(:hover):not(.datatable-options-link-opened) {
+				&:not(:hover):not(:focus):not(.datatable-options-link-opened) {
 					border-left-color: $ui-border-color;
 				}
 			}

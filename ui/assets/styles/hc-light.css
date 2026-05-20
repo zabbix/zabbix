@@ -2403,7 +2403,7 @@ button {
       background-color: #ffffff; }
       .datatable .datatable-header .datatable-options-button .datatable-options-link {
         margin-right: 0; }
-        .datatable .datatable-header .datatable-options-button .datatable-options-link:not(:hover):not(.datatable-options-link-opened) {
+        .datatable .datatable-header .datatable-options-button .datatable-options-link:not(:hover):not(:focus):not(.datatable-options-link-opened) {
           border-left-color: #9f9f9f; }
   .datatable .datatable-body {
     display: grid;
