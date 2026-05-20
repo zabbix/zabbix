@@ -65,9 +65,7 @@
 			this.#initDataTable({filter, page, default_sort_field, default_sort_order, sort_field, sort_order,
 				storage_idx, user_configs});
 
-			if (this.#refresh_interval != 0 && this.#filter_set) {
-				this.#scheduleRefresh();
-			}
+			this.#scheduleRefresh();
 		}
 
 		#initTabFilter(filter_options) {
@@ -520,6 +518,10 @@
 		}
 
 		#scheduleRefresh() {
+			if (this.#refresh_interval == 0 || !this.#filter_set) {
+				return;
+			}
+
 			this.#unscheduleRefresh();
 			this.#refresh_interval_id = setInterval(() => this.#refresh(), this.#refresh_interval);
 		}

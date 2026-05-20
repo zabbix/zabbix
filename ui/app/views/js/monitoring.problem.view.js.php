@@ -61,10 +61,7 @@
 
 			this.#initEvents();
 			this.#initPopupListeners();
-
-			if (this.#refresh_interval != 0) {
-				this.#scheduleRefresh();
-			}
+			this.#scheduleRefresh();
 
 			$(document).on({
 				mouseenter: function() {
@@ -844,6 +841,10 @@
 		}
 
 		#scheduleRefresh() {
+			if (this.#refresh_interval == 0) {
+				return;
+			}
+
 			this.#unscheduleRefresh();
 			this.#refresh_interval_id = setInterval(() => this.#refresh(), this.#refresh_interval);
 		}
