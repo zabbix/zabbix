@@ -266,7 +266,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 		}
 		unset($item);
 
-		return [
+		$output = [
 			'filter_counters' => $this->getFilterCounters(),
 			'data_fields' => $data_fields,
 			'rows' => array_values(array_map(static fn (array $item) => [[], $item], $data['items'])),
@@ -276,6 +276,15 @@ class CControllerLatestViewData extends CControllerDataTable {
 				'subfilters_expanded' => array_flip($filter['subfilters_expanded'] ?? [])
 			]))->getOutput()
 		];
+
+		$debug_mode = CWebUser::$data['debug_mode'] ?? GROUP_DEBUG_MODE_DISABLED;
+
+		if ($debug_mode == GROUP_DEBUG_MODE_ENABLED) {
+			CProfiler::getInstance()->stop();
+			$output['debug'] = CProfiler::getInstance()->make()->toString();
+		}
+
+		return $output;
 	}
 
 	private function getFilterCounters(): array {

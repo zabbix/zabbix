@@ -405,6 +405,17 @@
 			}
 		}
 
+		#refreshDebug(debug) {
+			const debug_output = document
+				.querySelector('.wrapper > main > .<?= ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH ?>');
+
+			if (debug_output) {
+				debug_output.classList.add('<?= ZBX_STYLE_DEBUG_OUTPUT ?>');
+				debug_output.innerHTML = new DOMParser().parseFromString(debug, 'text/html')
+					.querySelector('.<?= ZBX_STYLE_DEBUG_OUTPUT ?>').innerHTML;
+			}
+		}
+
 		#refresh() {
 			if (isUserInteracting()) {
 				return;
@@ -435,15 +446,19 @@
 		#onDataDone(response) {
 			this.#removeRefreshMessage();
 
+			if ('messages' in response) {
+				this.#addRefreshMessage(response.messages);
+			}
+
+			if ('debug' in response) {
+				this.#refreshDebug(response.debug);
+			}
+
 			if ('groupids' in response) {
 				this.#applied_filter_groupids = response.groupids;
 			}
 
 			this.#refreshCounters(response);
-
-			if ('messages' in response) {
-				this.#addRefreshMessage(response.messages);
-			}
 		}
 
 		#scheduleRefresh() {

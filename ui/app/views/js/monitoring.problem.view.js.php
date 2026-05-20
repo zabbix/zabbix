@@ -31,6 +31,7 @@
 		#datatable = null;
 		#csrf_token = null;
 		#show_problems_hidden_column_ids = ['recovery', 'status'];
+		#refresh_message_box = null;
 
 		init({
 			csrf_token,
@@ -603,7 +604,7 @@
 				.on(CDataTable.EVENT_RENDER, e => {
 					const response = e.detail.response;
 
-					this.refreshCounters(response);
+					this.#refreshCounters(response);
 
 					requestAnimationFrame(() => this.#initExpandables());
 				})
@@ -793,10 +794,29 @@
 			return document.querySelector('.wrapper > .debug-output');
 		}
 
-		refreshDebug(debug) {
-			this.getCurrentDebugBlock().replaceWith(
-				new DOMParser().parseFromString(debug, 'text/html').body.firstElementChild
-			);
+		#addRefreshMessage(messages) {
+			this.#removeRefreshMessage();
+
+			this.#refresh_message_box = $($.parseHTML(messages));
+			addMessage(this.#refresh_message_box);
+		}
+
+		#removeRefreshMessage() {
+			if (this.#refresh_message_box !== null) {
+				this.#refresh_message_box.remove();
+				this.#refresh_message_box = null;
+			}
+		}
+
+		#refreshDebug(debug) {
+			const debug_output = document
+				.querySelector('.wrapper > main > .<?= ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH ?>');
+
+			if (debug_output) {
+				debug_output.classList.add('<?= ZBX_STYLE_DEBUG_OUTPUT ?>');
+				debug_output.innerHTML = new DOMParser().parseFromString(debug, 'text/html')
+					.querySelector('.<?= ZBX_STYLE_DEBUG_OUTPUT ?>').innerHTML;
+			}
 		}
 
 		#refresh(tabfilter_changed = false) {
@@ -830,7 +850,7 @@
 				});
 		}
 
-		refreshCounters(response) {
+		#refreshCounters(response) {
 			if (this.#layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
 				return;
 			}
@@ -873,13 +893,17 @@
 		}
 
 		#onDataDone(response) {
+			this.#removeRefreshMessage();
+
 			if ('messages' in response) {
-				CMessageHelper.success(this.#datatable.getElement(), [], response.messages, {show_close_box: true});
+				this.#addRefreshMessage(response.messages);
 			}
 
-			this.refreshCounters(response);
+			if ('debug' in response) {
+				this.#refreshDebug(response.debug);
+			}
 
-			('debug' in response) && this.refreshDebug(response.debug);
+			this.#refreshCounters(response);
 		}
 
 		getDataTable() {
