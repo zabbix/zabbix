@@ -336,12 +336,21 @@ class CControllerHostListData extends CControllerDataTable {
 		}
 		unset($host);
 
-		return [
+		$debug_mode = CWebUser::$data['debug_mode'] ?? GROUP_DEBUG_MODE_DISABLED;
+
+		$output = [
 			'data_fields' => $data_fields,
 			'rows' => array_values(array_map(static fn (array $host) => [[], $host], $hosts)),
 			'max_in_table' => (int) CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
 			'can_edit_proxies' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES),
 			'can_edit_proxy_groups' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS)
 		];
+
+		if ($debug_mode == GROUP_DEBUG_MODE_ENABLED) {
+			CProfiler::getInstance()->stop();
+			$output['debug'] = CProfiler::getInstance()->make()->toString();
+		}
+
+		return $output;
 	}
 }

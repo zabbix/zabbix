@@ -2468,7 +2468,7 @@ button {
       background-color: #2b2b2b; }
       .datatable .datatable-header .datatable-options-button .datatable-options-link {
         margin-right: 0; }
-        .datatable .datatable-header .datatable-options-button .datatable-options-link:not(:hover):not(.datatable-options-link-opened) {
+        .datatable .datatable-header .datatable-options-button .datatable-options-link:not(:hover):not(:focus):not(.datatable-options-link-opened) {
           border-left-color: #303030; }
   .datatable .datatable-body {
     display: grid;
@@ -2754,6 +2754,10 @@ button {
       .datatable .cell .cell-inner .btn-icon:not(.btn-small) {
         min-width: 18px;
         height: 18px; }
+        .datatable .cell .cell-inner .btn-icon:not(.btn-small):first-of-type {
+          margin-left: 2px; }
+        .datatable .cell .cell-inner .btn-icon:not(.btn-small):last-of-type {
+          margin-right: 2px; }
       .datatable .cell .cell-inner .action-container {
         display: flex;
         width: 100%; }

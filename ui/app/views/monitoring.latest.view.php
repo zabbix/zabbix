@@ -108,8 +108,13 @@ $html_page
 					]
 				], 'latest'))->setAddSelectedCountElement(false)
 			])
-	)
-	->show();
+	);
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	$html_page->addItem((new CPre())->addClass(ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH));
+}
+
+$html_page->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

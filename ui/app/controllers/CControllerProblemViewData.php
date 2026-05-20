@@ -38,7 +38,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 		order_result($data['problems'], $data['sort_field'], $data['sort_order']);
 
-		return [
+		$output = [
 			'filter_counters' => $this->getFilterCounters(),
 			'data_fields' => $data['data_fields'],
 			'page' => $data['page'],
@@ -47,6 +47,15 @@ class CControllerProblemViewData extends CControllerDataTable {
 			'show_two_columns' => $data['show_two_columns'],
 			'rows' => $rows
 		];
+
+		$debug_mode = CWebUser::$data['debug_mode'] ?? GROUP_DEBUG_MODE_DISABLED;
+
+		if ($debug_mode == GROUP_DEBUG_MODE_ENABLED) {
+			CProfiler::getInstance()->stop();
+			$output['debug'] = CProfiler::getInstance()->make()->toString();
+		}
+
+		return $output;
 	}
 
 	private function getFilterCounters(): array {

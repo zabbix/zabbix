@@ -1311,6 +1311,10 @@ class CDataTable {
 
 		if (loading) {
 			this.#element.classList.add(ZBX_STYLE_LOADING);
+
+			if (this.#initialized) {
+				this.#element.classList.add(ZBX_STYLE_LOADING_FADEIN);
+			}
 		}
 
 		const {onSuccess, onError, onFinally} = {
@@ -2148,7 +2152,7 @@ class CDataTable {
 			this.#initCheckBoxRange();
 			this.#unlockHeight();
 
-			this.#element.classList.remove(ZBX_STYLE_LOADING);
+			this.#element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
 		});
 	}
 
@@ -2609,6 +2613,11 @@ class CDataTable {
 
 		/* global updateUserProfile */
 		return updateUserProfile(this.#storage_idx, value, idx2, PROFILE_TYPE_STR, abort_controller)
+			.catch(error => {
+				if (error.name != 'AbortError') {
+					CMessageHelper.error(this.#element, [error.message], error.name);
+				}
+			})
 			.finally(() => {
 				if (this.#abort_controller === abort_controller) {
 					this.#abort_controller = null;
@@ -2718,7 +2727,7 @@ class CDataTable {
 		const header_resizer = header_cell.target.querySelector(`.${CDataTable.ZBX_STYLE_CELL_HEADER_RESIZER}`);
 		const element_rect = this.#element.getBoundingClientRect();
 
-		const right_edge = header_cell.target.getBoundingClientRect().right - element_rect.left;
+		const right_edge = header_cell.target.getBoundingClientRect().right - element_rect.left + 1;
 		const right_boundary = element_rect.width - table_options_button.clientWidth;
 		const right_offset = right_edge > right_boundary || this.#body.scrollWidth > element_rect.width
 			? Math.max(0, Math.min(table_options_button.clientWidth, right_edge - right_boundary))

@@ -431,7 +431,25 @@
 
 					new CState().setParams({page});
 				})
+				.on(CDataTable.EVENT_RENDER, e => {
+					const {response} = e.detail;
+
+					if ('debug' in response) {
+						this.#refreshDebug(response.debug);
+					}
+				})
 				.init(user_configs);
+		}
+
+		#refreshDebug(debug) {
+			const debug_output = document
+				.querySelector('.wrapper > main > .<?= ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH ?>');
+
+			if (debug_output) {
+				debug_output.classList.add('<?= ZBX_STYLE_DEBUG_OUTPUT ?>');
+				debug_output.innerHTML = new DOMParser().parseFromString(debug, 'text/html')
+					.querySelector('.<?= ZBX_STYLE_DEBUG_OUTPUT ?>').innerHTML;
+			}
 		}
 
 		#initPopupListeners() {
