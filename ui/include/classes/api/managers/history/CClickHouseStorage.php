@@ -357,22 +357,23 @@ class CClickHouseStorage {
 			$_time_from = $this->value_type_ttl[$value_type] !== null
 				? max($time_from, $time - $this->value_type_ttl[$value_type] + 1)
 				: $time_from;
+			$value = $value_type == ITEM_VALUE_TYPE_JSON ? 'value_str!=\'\'?value_str:toString(value)' : 'value';
 
 			$resource = $_time_from <= $time_to
 				? $this->query(
 					'SELECT itemid,'.
 						'toUnixTimestamp(toStartOfInterval(clock_ns,toIntervalSecond({interval:UInt64}))) AS tick,'.
 						match ($function) {
-							AGGREGATE_MIN => 'min(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
-							AGGREGATE_MAX => 'max(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
-							AGGREGATE_AVG => 'avg(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock,'.
+							AGGREGATE_MIN => 'min('.$value.') AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+							AGGREGATE_MAX => 'max('.$value.') AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+							AGGREGATE_AVG => 'avg('.$value.') AS value,toUnixTimestamp(max(clock_ns)) AS clock,'.
 								'count() AS num',
 							AGGREGATE_COUNT => 'count() AS value,toUnixTimestamp(max(clock_ns)) AS clock',
-							AGGREGATE_SUM => 'sum(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
-							AGGREGATE_FIRST => 'argMin(value,clock_ns) AS value,'.
+							AGGREGATE_SUM => 'sum('.$value.') AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+							AGGREGATE_FIRST => 'argMin('.$value.',clock_ns) AS value,'.
 								'toUnixTimestamp(min(clock_ns)) AS clock,'.
 								'toUnixTimestamp64Nano(min(clock_ns))%1000000000 AS ns',
-							AGGREGATE_LAST => 'argMax(value,clock_ns) AS value,'.
+							AGGREGATE_LAST => 'argMax('.$value.',clock_ns) AS value,'.
 								'toUnixTimestamp(max(clock_ns)) AS clock,'.
 								'toUnixTimestamp64Nano(max(clock_ns))%1000000000 AS ns'
 						}.
@@ -515,17 +516,18 @@ class CClickHouseStorage {
 			$_time_from = $this->value_type_ttl[$value_type] !== null
 				? max($time_from, $time - $this->value_type_ttl[$value_type] + 1)
 				: $time_from;
+			$value = $value_type == ITEM_VALUE_TYPE_JSON ? 'value_str!=\'\'?value_str:toString(value)' : 'value';
 
 			$resource = $this->query(
 				'SELECT itemid,'.
 					match ($function) {
-						AGGREGATE_MIN => 'min(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
-						AGGREGATE_MAX => 'max(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
-						AGGREGATE_AVG => 'avg(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+						AGGREGATE_MIN => 'min('.$value.') AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+						AGGREGATE_MAX => 'max('.$value.') AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+						AGGREGATE_AVG => 'avg('.$value.') AS value,toUnixTimestamp(max(clock_ns)) AS clock',
 						AGGREGATE_COUNT => 'count() AS value,toUnixTimestamp(max(clock_ns)) AS clock',
-						AGGREGATE_SUM => 'sum(value) AS value,toUnixTimestamp(max(clock_ns)) AS clock',
-						AGGREGATE_FIRST => 'argMin(value,clock_ns) AS value,toUnixTimestamp(min(clock_ns)) AS clock',
-						AGGREGATE_LAST => 'argMax(value,clock_ns) AS value,toUnixTimestamp(max(clock_ns)) AS clock'
+						AGGREGATE_SUM => 'sum('.$value.') AS value,toUnixTimestamp(max(clock_ns)) AS clock',
+						AGGREGATE_FIRST => 'argMin('.$value.',clock_ns) AS value,toUnixTimestamp(min(clock_ns)) AS clock',
+						AGGREGATE_LAST => 'argMax('.$value.',clock_ns) AS value,toUnixTimestamp(max(clock_ns)) AS clock'
 					}.
 				' FROM '.$this->getTableName($value_type).
 				' WHERE itemid IN {itemids:Array(UInt64)}'.
