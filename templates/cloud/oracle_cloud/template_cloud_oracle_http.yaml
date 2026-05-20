@@ -11683,11 +11683,11 @@ zabbix_export:
           triggers:
             - uuid: a13ccb456f5a4efdb072475c8962bfed
               expression: 'last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.sets.count,#1)<>last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.sets.count,#2) and length(last(/Oracle Cloud Load Balancer by HTTP/oci.lb.backend.sets.count))>0'
-              name: 'OCI Load Balancer: Backend sets count has changed'
-              event_name: 'OCI Load Balancer: Backend sets count has changed (new state: {ITEM.VALUE})'
+              name: 'OCI Load Balancer: Backend set count has changed'
+              event_name: 'OCI Load Balancer: Backend set count has changed (new state: {ITEM.VALUE})'
               opdata: 'Current backend sets count: {ITEM.LASTVALUE}'
               priority: INFO
-              description: 'Backend sets count has changed.'
+              description: 'Backend set count has changed.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -12147,7 +12147,7 @@ zabbix_export:
           key: oci.lb.metrics.bandwidth.peak
           value_type: FLOAT
           units: Bps
-          description: 'Displays load balancer''s peak bandwidth for the duration.'
+          description: 'Displays the load balancer''s peak bandwidth for the duration.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -12579,7 +12579,7 @@ zabbix_export:
           key: oci.lb.metrics.time.response
           value_type: FLOAT
           units: s
-          description: 'Displays load balancer''s first byte response time (TCP only).'
+          description: 'Displays the load balancer''s first byte response time (TCP only).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -12745,8 +12745,7 @@ zabbix_export:
               key: 'oci.lb.backend.backup[{#BACKEND.SET.NAME}/{#BACKEND.NAME}]'
               description: |
                 Whether the load balancer should treat this server as a backup unit. 
-                If true, the load balancer forwards no ingress traffic to this backend server unless all other 
-                backend servers not marked as "backup" fail the health check policy.
+                If true, the load balancer forwards no ingress traffic to this backend server unless all other backend servers not marked as "backup" fail the health check policy.
               valuemap:
                 name: Boolean
               preprocessing:
@@ -12773,8 +12772,7 @@ zabbix_export:
               value_type: FLOAT
               description: |
                 The maximum number of simultaneous connections the load balancer can make to the backend.
-                If this is not set or set to 0 then the maximum number of simultaneous connections the 
-                load balancer can make to the backend is unlimited.
+                If this is not set or set to 0 then the maximum number of simultaneous connections the load balancer can make to the backend is unlimited.
               valuemap:
                 name: 'Not set'
               preprocessing:
@@ -13181,7 +13179,7 @@ zabbix_export:
               - macro: '{#BACKEND.SET.POLICY}'
                 value: '{$OCI.LOAD.BALANCER.BACKEND_SET.DISCOVERY.POLICY.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-          description: 'Discover load balancer''s backend sets.'
+          description: 'Discover the load balancer''s backend sets.'
           item_prototypes:
             - uuid: 18acb81f58e8412b82eadfdb509082e1
               name: 'Backend set [{#BACKEND.SET.NAME}]: Backend servers: Unhealthy'
@@ -13284,7 +13282,7 @@ zabbix_export:
               name: 'Backend set [{#BACKEND.SET.NAME}]: Connections: Active'
               type: DEPENDENT
               key: 'oci.lb.backend.set.connections.active[{#BACKEND.SET.NAME}]'
-              description: 'Number of active connections from load balancer to all the backend servers.'
+              description: 'Number of active connections from the load balancer to all backend servers.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -13343,7 +13341,7 @@ zabbix_export:
               key: 'oci.lb.backend.set.get[{#BACKEND.SET.NAME}]'
               history: '0'
               value_type: TEXT
-              description: 'Get the raw data for the discovered load balancer backend set.'
+              description: 'Gets the raw data for the discovered load balancer backend set.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -14186,7 +14184,7 @@ zabbix_export:
               - macro: '{#LISTENER.PORT}'
                 value: '{$OCI.LOAD.BALANCER.LISTENER.DISCOVERY.PORT.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-          description: 'Discover load balancer''s listeners.'
+          description: 'Discover the load balancer''s listeners.'
           item_prototypes:
             - uuid: e8a7be49ba134b6ca3f1c46aecc5c15a
               name: 'Listener [{#LISTENER.NAME}]: Get data'
