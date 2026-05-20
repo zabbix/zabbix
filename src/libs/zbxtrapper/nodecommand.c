@@ -418,6 +418,20 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			zbx_strlcpy(error, "Unknown host identifier.", sizeof(error));
 			goto fail;
 		}
+
+		if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by)
+		{
+			zbx_db_result_t	hp_result;
+			zbx_db_row_t	hp_row;
+
+			hp_result = zbx_db_select("select proxyid from host_proxy where hostid=" ZBX_FS_UI64,
+					host.hostid);
+
+			if (NULL != (hp_row = zbx_db_fetch(hp_result)))
+				ZBX_DBROW2UINT64(host.proxyid, hp_row[0]);
+
+			zbx_db_free_result(hp_result);
+		}
 	}
 	else /* eventid */
 	{
