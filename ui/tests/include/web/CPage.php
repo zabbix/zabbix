@@ -420,7 +420,7 @@ class CPage {
 		if ($this->viewportUpdated === true || !$this->updateViewport()) {
 			return $this->driver->takeScreenshot();
 		}
-sleep(3);
+
 		$screenshot = $this->driver->takeScreenshot();
 		$this->resetViewport();
 
