@@ -1686,7 +1686,7 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-	int		now, priority, have_alerts = 0;
+	int		now, priority, have_alerts = 0, have_push_alerts = 0;
 	zbx_db_insert_t	db_insert;
 	zbx_uint64_t	ackid, eventid, p_eventid;
 	char		*period = NULL;
@@ -1819,6 +1819,9 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 			get_build_push_params(event, r_event, actionid, userid, row[1], subject, message,
 					ack, service_alarm, service, &push_alerts, tz);
 
+			if (0 != push_alerts.values_num)
+				have_push_alerts = 1;
+
 			for (int i = 0; i < push_alerts.values_num; i++)
 			{
 				const zbx_push_alert_t	*push_alert = push_alerts.values[i];
@@ -1880,8 +1883,18 @@ err_alert:
 
 	if (0 != have_alerts)
 	{
+		zbx_db_query_mask_t	old_queries = ZBX_DB_DONT_MASK_QUERIES;
+
 		zbx_db_insert_autoincrement(&db_insert, "alertid");
+
+		if (0 != have_push_alerts)
+			old_queries = zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
+
 		zbx_db_insert_execute(&db_insert);
+
+		if (0 != have_push_alerts)
+			zbx_db_set_log_masked_values(old_queries);
+
 		zbx_db_insert_clean(&db_insert);
 
 		/* because alerts are inserted without transaction there no need to wait for */
