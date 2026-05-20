@@ -2609,6 +2609,11 @@ class CDataTable {
 
 		/* global updateUserProfile */
 		return updateUserProfile(this.#storage_idx, value, idx2, PROFILE_TYPE_STR, abort_controller)
+			.catch(error => {
+				if (error.name != 'AbortError') {
+					CMessageHelper.error(this.#element, [error.message], error.name);
+				}
+			})
 			.finally(() => {
 				if (this.#abort_controller === abort_controller) {
 					this.#abort_controller = null;
@@ -2721,7 +2726,7 @@ class CDataTable {
 		const right_edge = header_cell.target.getBoundingClientRect().right - element_rect.left;
 		const right_boundary = element_rect.width - table_options_button.clientWidth;
 		const right_offset = right_edge > right_boundary || this.#body.scrollWidth > element_rect.width
-			? Math.max(0, Math.min(table_options_button.clientWidth, Math.ceil(right_edge - right_boundary)))
+			? Math.max(0, Math.min(table_options_button.clientWidth, right_edge - right_boundary))
 			: 0;
 
 		header_cell.target.style.paddingRight = `${right_offset}px`;
