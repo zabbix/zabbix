@@ -190,6 +190,7 @@ class testExpandExpressionMacros extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->waitUntilGraphIsLoaded();
 		// TODO: This sleep is added here because of DEV-1908.
+		$this->page->updateViewPort();
 		sleep(1);
 		$covered_region = [
 			'x' => 78,

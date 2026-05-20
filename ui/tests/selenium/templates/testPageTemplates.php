@@ -106,7 +106,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 		$headers->waitUntilStalled();
 		$table->waitUntilReady()->invalidate();
-		$table->findRow('Name', $name)->getColumn('Name')->query('link', $name)->one()->click();
+		$table->findRow('Name', $name)->getColumn('Name')->query('link', $name)->one()->scrollIntoView(50)->click();
 
 		$modal = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->assertEquals('Template', $modal->getTitle());
