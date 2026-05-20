@@ -368,6 +368,10 @@
 					const response = e.detail.response;
 
 					this.#refreshCounters(response);
+
+					if ('debug' in response) {
+						this.#refreshDebug(response.debug);
+					}
 				})
 				.on(CDataTable.EVENT_DATA_SORT, () => this.#scheduleRefresh())
 				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.#unscheduleRefresh())

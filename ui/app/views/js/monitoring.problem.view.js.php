@@ -606,6 +606,10 @@
 
 					this.#refreshCounters(response);
 
+					if ('debug' in response) {
+						this.#refreshDebug(response.debug);
+					}
+
 					requestAnimationFrame(() => this.#initExpandables());
 				})
 				.on(CDataTable.EVENT_COLUMN_TOGGLE, e => {
@@ -897,10 +901,6 @@
 
 			if ('messages' in response) {
 				this.#addRefreshMessage(response.messages);
-			}
-
-			if ('debug' in response) {
-				this.#refreshDebug(response.debug);
 			}
 
 			this.#refreshCounters(response);
