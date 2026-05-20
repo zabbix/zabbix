@@ -170,7 +170,7 @@ class testHistoryGet extends CIntegrationTest {
 				'history' => $item['value_type'],
 				'itemids' => [$item['itemid']],
 				'filter' => [
-					'clock' => array_column($values, 'clock'),
+					'clock' => array_column($values, 'clock')
 				]
 			], 5, 5, function($response) use ($values) {
 				return count($response['result']) === count($values);
