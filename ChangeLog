@@ -145,6 +145,7 @@ A......... [ZBX-27448] fixed inability to delete host, user or template groups w
 ........S. [ZBX-27407] fixed Zabbix HA manager process crashing on failed commits with Galera cluster (mkorotkov)
 ........S. [ZBX-27460] fixed multiple event generation not to generate changelog entries on new events (vso)
 ...G...... [ZBX-27305] fixed compilation of Zabbix agent on HP-UX 11.23 (ia64) (Andris)
+..F....... [ZBX-27819] updated onelogin/php-saml to version 4.3.1 (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 8.0.0alpha2
@@ -494,6 +495,7 @@ A......... [ZBX-27448] fixed inability to delete host, user, or template groups 
 ...G...PS. [ZBX-26383] fixed inability to return "not supported" via user parameters (dgoloscapov, mkorotkov)
 .......PS. [ZBX-27176] fixed discovery uniqueness criteria bug (vsmelovs)
 ..F....... [ZBX-26827] fixed checkboxes "SSL verify peer" and "SSL verify host" not being selected when corresponding label is clicked in media type form (msnihach)
+..F....... [ZBX-27819] updated onelogin/php-saml to version 4.3.1 (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.7
@@ -1899,6 +1901,7 @@ A......... [ZBX-27448] fixed inability to delete host, user, or template groups 
 ..F....... [ZBX-26984] updated documentation links for Create template group and Create host group (msnihach)
 ..F....... [ZBX-26827] fixed checkboxes "SSL verify peer" and "SSL verify host" not being selected when corresponding label is clicked in media type form (msnihach)
 ..F....... [ZBX-27416] fixed message box display bug in Monitoring problems page (gberzina)
+..F....... [ZBX-27819] updated onelogin/php-saml to version 4.3.1 (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.23
@@ -5884,6 +5887,7 @@ A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25
 Bug fixes:
 ...G...... [ZBX-25805] fixed regexp runtime error when processing log* items with unspecified encoding by sanitizing invalid UTF-8 (vsmelovs)
 ...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
+..F....... [ZBX-27819] updated onelogin/php-saml to version 4.3.1 (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.44
