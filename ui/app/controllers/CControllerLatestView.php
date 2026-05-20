@@ -205,6 +205,7 @@ class CControllerLatestView extends CControllerLatest {
 				'csrf_token' => CCsrfTokenHelper::get('tabfilter')
 			],
 			'uncheck' => $this->hasInput('filter_reset'),
+			'user' => ['debug_mode' => $this->getDebugMode()],
 			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
 				CProfile::getArray($storage_idx, [])),
 			'view_curl' => $view_url
