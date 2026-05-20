@@ -1311,6 +1311,10 @@ class CDataTable {
 
 		if (loading) {
 			this.#element.classList.add(ZBX_STYLE_LOADING);
+
+			if (this.#initialized) {
+				this.#element.classList.add(ZBX_STYLE_LOADING_FADEIN);
+			}
 		}
 
 		const {onSuccess, onError, onFinally} = {
@@ -2148,7 +2152,7 @@ class CDataTable {
 			this.#initCheckBoxRange();
 			this.#unlockHeight();
 
-			this.#element.classList.remove(ZBX_STYLE_LOADING);
+			this.#element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
 		});
 	}
 
