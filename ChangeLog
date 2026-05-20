@@ -131,6 +131,7 @@ A......... [ZBX-27448] fixed inability to delete host, user, or template groups 
 ..F....... [ZBX-26984] updated documentation links for Create template group and Create host group (msnihach)
 ..F....... [ZBX-26827] fixed checkboxes "SSL verify peer" and "SSL verify host" not being selected when corresponding label is clicked in media type form (msnihach)
 ..F....... [ZBX-27416] fixed message box display bug in Monitoring problems page (gberzina)
+..F....... [ZBX-27819] updated onelogin/php-saml to version 4.3.1 (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.23
@@ -4116,6 +4117,7 @@ A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25
 Bug fixes:
 ...G...... [ZBX-25805] fixed regexp runtime error when processing log* items with unspecified encoding by sanitizing invalid UTF-8 (vsmelovs)
 ...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
+..F....... [ZBX-27819] updated onelogin/php-saml to version 4.3.1 (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.44
