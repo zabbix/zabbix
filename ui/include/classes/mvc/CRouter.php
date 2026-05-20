@@ -55,6 +55,7 @@ class CRouter {
 		'actionlog.list'							=> [CControllerActionLogList::class,								'layout.htmlpage',		'reports.actionlog.list'],
 		'audit.settings.edit'						=> [CControllerAuditSettingsEdit::class,							'layout.htmlpage',		'administration.audit.settings.edit'],
 		'audit.settings.update'						=> [CControllerAuditSettingsUpdate::class, 							'layout.json',			null],
+		'auditlog.csv'								=> [CControllerAuditLogList::class,									'layout.csv',			'reports.auditlog.list.csv'],
 		'auditlog.list'								=> [CControllerAuditLogList::class,									'layout.htmlpage',		'reports.auditlog.list'],
 		'authentication.edit'						=> [CControllerAuthenticationEdit::class,							'layout.htmlpage',		'administration.authentication.edit'],
 		'authentication.update'						=> [CControllerAuthenticationUpdate::class, 						'layout.json',			null],

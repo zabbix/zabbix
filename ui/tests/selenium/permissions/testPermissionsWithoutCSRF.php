@@ -609,7 +609,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM scripts',
 					'link' => 'zabbix.php?action=script.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF validation script create',
+						'id:script' => 'csrf script'
+					]
 				]
 			],
 			// #52 User profile update.

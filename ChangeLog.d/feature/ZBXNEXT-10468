@@ -1,1 +1,0 @@
-..F.I..... [ZBXNEXT-10468] added default value for Allowed hosts of Trapper items, added new global macro {$TRAPPER.ALLOWED_HOSTS} (msnihach, MVekslers)

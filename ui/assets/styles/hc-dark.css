@@ -5906,6 +5906,11 @@ form.dashboard-widget-scatterplot {
 div.dashboard-widget-scatterplot {
   overflow-x: hidden; }
 
+.svg-scatter-plot-point {
+  fill-opacity: 1;
+  fill: var(--color);
+  stroke: var(--color); }
+
 .svg-scatter-plot-legend {
   position: relative;
   top: 4px;
@@ -7724,6 +7729,9 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     float: right;
     line-height: 24px; }
 
+.modal-popup.modal-popup-static.modal-popup-sla-edit, .modal-popup.modal-popup-static.modal-popup-proxy-edit, .modal-popup.modal-popup-static.modal-popup-connector-edit {
+  --modal-max-width: 750px; }
+
 .multilineinput-control {
   display: flex;
   width: 100%; }
@@ -8016,7 +8024,6 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    padding-left: 3px;
     white-space: pre; }
     .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis .scatter-plot-hintbox-icon-color {
       display: inline-block;
