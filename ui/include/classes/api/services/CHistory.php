@@ -142,11 +142,10 @@ class CHistory extends CApiService {
 			$options['itemids'] = array_keys($items);
 		}
 
-		$extra_fields = [];
+		$_output = $options['output'];
 
 		if (!$options['countOutput'] && !$options['output']) {
 			$options['output'] = ['itemid'];
-			$extra_fields = ['itemid' => ''];
 		}
 
 		$result = match (Manager::History()->getDataSourceType($options['history'])) {
@@ -166,11 +165,7 @@ class CHistory extends CApiService {
 			unset($row);
 		}
 
-		if ($extra_fields) {
-			$result = array_map(static fn ($row) => array_diff_key($row, $extra_fields), $result);
-		}
-
-		return $result;
+		return $this->unsetExtraFields($result, ['itemid'], $_output);
 	}
 
 	/**
