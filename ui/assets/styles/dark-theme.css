@@ -2656,9 +2656,10 @@ z-color-picker.has-error .color-picker-box {
   .list-table .link-action:not(.no-indent):not(:first-child) {
     margin-left: 5px; }
 .list-table .icon {
-  border-radius: 2px;
+  border-radius: 2px; }
+.list-table [aria-label] {
   transition: box-shadow 0.2s ease-out; }
-  .list-table .icon:focus {
+  .list-table [aria-label]:focus {
     outline: none;
     box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
 .list-table .btn-small,
@@ -7080,9 +7081,9 @@ form.is-loading {
   .table-forms .btn-icon:not(:first-child),
   .table-forms .icon:not(:first-child) {
     margin-left: 5px; }
-  .table-forms .icon {
+  .table-forms [aria-label] {
     transition: box-shadow 0.2s ease-out; }
-    .table-forms .icon:focus {
+    .table-forms [aria-label]:focus {
       border-radius: 2px;
       outline: none;
       box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }

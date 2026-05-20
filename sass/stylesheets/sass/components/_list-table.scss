@@ -262,7 +262,9 @@
 
 	.icon {
 		border-radius: 2px;
+	}
 
+	[aria-label] {
 		@if $ui-transitions {
 			transition: box-shadow $ui-controls-transition-duration ease-out;
 		}
