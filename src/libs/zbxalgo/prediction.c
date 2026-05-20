@@ -1188,7 +1188,7 @@ out:
 	{
 		result = ZBX_MATH_ERROR;
 	}
-	else if (0.0 > result || DBL_MAX < result)
+	else if (0 == isfinite(result) || 0.0 > result || DBL_MAX < result)
 	{
 		result = DBL_MAX;
 	}
