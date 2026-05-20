@@ -46,14 +46,24 @@ class CControllerLatestViewData extends CControllerDataTable {
 		$mandatory_filter_set = CControllerLatest::isMandatoryFilterFieldSet($filter);
 		$subfilter_set = CControllerLatest::isSubfilterSet($filter);
 
+		$output = [];
+		$debug_mode = CWebUser::$data['debug_mode'] ?? GROUP_DEBUG_MODE_DISABLED;
+
+		if ($debug_mode == GROUP_DEBUG_MODE_ENABLED) {
+			CProfiler::getInstance()->stop();
+			$output['debug'] = CProfiler::getInstance()->make()->toString();
+		}
+
 		if (!$mandatory_filter_set && !$subfilter_set) {
-			return [
+			$output += [
 				'fields' => [],
 				'rows' => [],
 				'no_data_icon' => ZBX_ICON_FILTER_LARGE,
 				'no_data_message' => _('Filter is not set'),
 				'no_data_description' => _('Use the filter to display results')
 			];
+
+			return $output;
 		}
 
 		$filter = CControllerLatest::sanitizeFilter($filter);
@@ -266,7 +276,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 		}
 		unset($item);
 
-		$output = [
+		$output += [
 			'filter_counters' => $this->getFilterCounters(),
 			'data_fields' => $data_fields,
 			'rows' => array_values(array_map(static fn (array $item) => [[], $item], $data['items'])),
@@ -276,13 +286,6 @@ class CControllerLatestViewData extends CControllerDataTable {
 				'subfilters_expanded' => array_flip($filter['subfilters_expanded'] ?? [])
 			]))->getOutput()
 		];
-
-		$debug_mode = CWebUser::$data['debug_mode'] ?? GROUP_DEBUG_MODE_DISABLED;
-
-		if ($debug_mode == GROUP_DEBUG_MODE_ENABLED) {
-			CProfiler::getInstance()->stop();
-			$output['debug'] = CProfiler::getInstance()->make()->toString();
-		}
 
 		return $output;
 	}

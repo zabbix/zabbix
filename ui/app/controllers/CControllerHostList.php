@@ -161,6 +161,7 @@ class CControllerHostList extends CController {
 			'proxy_groups_ms' => $proxy_groups_ms,
 			'storage_idx' => $storage_idx,
 			'uncheck' => ($this->getInput('uncheck', 0) == 1),
+			'user' => ['debug_mode' => $this->getDebugMode()],
 			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
 				CProfile::getArray($storage_idx, []))
 		];

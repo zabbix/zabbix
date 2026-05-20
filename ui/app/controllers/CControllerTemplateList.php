@@ -125,6 +125,7 @@ class CControllerTemplateList extends CController {
 			'profileIdx' => 'web.templates.filter',
 			'storage_idx' => $storage_idx,
 			'uncheck' => $this->getInput('uncheck', 0) == 1,
+			'user' => ['debug_mode' => $this->getDebugMode()],
 			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
 				CProfile::getArray($storage_idx, [])
 			)

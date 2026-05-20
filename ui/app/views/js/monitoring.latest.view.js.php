@@ -533,7 +533,7 @@
 		}
 
 		#scheduleRefresh() {
-			if (this.#refresh_interval == 0 || !this.#filter_set) {
+			if (this.#refresh_interval == 0) {
 				return;
 			}
 
