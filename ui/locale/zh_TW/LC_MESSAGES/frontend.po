@@ -19749,6 +19749,10 @@ msgstr ""
 msgid "Swedish (sv_SE)"
 msgstr "瑞士(sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "切換認證方法將重設除了此連線期之外的所有連線!繼續嗎?"
@@ -23675,6 +23679,10 @@ msgstr ""
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "您沒有許可權來完成此操作."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."

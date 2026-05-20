@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-11-19 05:10+0000\n"
+"PO-Revision-Date: 2024-09-19 06:48+0000\n"
 "Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -19897,6 +19897,10 @@ msgstr "Tamanho do espaço do swap em bytes ou percentual relativo ao total. Ret
 msgid "Swedish (sv_SE)"
 msgstr "Sueco (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "A mudança do método de autenticação irá invalidar todas as sessões, exceto esta! Continuar?"
@@ -23841,6 +23845,10 @@ msgstr "Não é possível alternar os modelos da seleção atual."
 msgid "You do not have permission to perform this operation."
 msgstr "Você não tem permissão para executar esta operação."
 
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
+
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
 msgstr "Você não possui permissão para acessar esta página."
@@ -24982,7 +24990,7 @@ msgstr "h"
 
 #: include/translateDefines.inc.php:37
 msgid "h:i A"
-msgstr "h:i"
+msgstr "H:i"
 
 #: include/translateDefines.inc.php:36
 msgid "h:i:s A"

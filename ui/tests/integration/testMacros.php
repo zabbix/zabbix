@@ -1745,7 +1745,7 @@ const SUBJECT_INTERNAL = "Internal";
 	* @return array
 	*/
 	public function agentConfigurationProvider() {
-		self::$metadata_file = "/tmp/zabbix_agent_metadata_file_" . time() . ".txt";
+		self::$metadata_file = "/tmp/zabbix_agent_metadata_file_" . microtime() . ".txt";
 
 		return [
 			self::COMPONENT_AGENT => [
@@ -3368,12 +3368,11 @@ const SUBJECT_INTERNAL = "Internal";
 	 */
 
 	public function testMacros_AutoregestrationEvent() {
-
 		if (file_exists(self::$metadata_file)) {
 			unlink(self::$metadata_file);
 		}
 
-		if (file_put_contents(self::$metadata_file, "\\".time()) === false) {
+		if (file_put_contents(self::$metadata_file, "\\" . microtime()) === false) {
 			throw new Exception('Failed to create metadata_file');
 		}
 
@@ -3382,7 +3381,21 @@ const SUBJECT_INTERNAL = "Internal";
 
 		$this->stopComponent(self::COMPONENT_AGENT);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		/* action.delete from previous test may take time */
+		for ($i = 0; $i < 30; $i++) {
+			$existing = $this->call('action.get', [
+				'filter' => ['name' => self::ACTION_NAME],
+				'output' => ['actionid']
+			]);
+
+			if (empty($existing['result'])) {
+				break;
+			}
+
+			usleep(100000);
+		}
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		// Create autoregistration action
 		$response = $this->call('action.create', [

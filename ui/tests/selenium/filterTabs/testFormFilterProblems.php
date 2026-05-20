@@ -333,7 +333,7 @@ class testFormFilterProblems extends testFormFilter {
 		if ($data['filter']['Name'] === 'Timeselect_1') {
 			// Enable Set custom time period option.
 			$filter->editProperties();
-			$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+			$dialog = COverlayDialogElement::get('Filter properties')->asForm();
 			$dialog->fill(['Override time period selector' => true, 'From' => 'now-2y']);
 			$dialog->submit();
 			COverlayDialogElement::ensureNotPresent();

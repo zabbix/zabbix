@@ -38,7 +38,7 @@ class CXmlExportWriter extends CExportWriter {
 		$this->xmlWriter->setIndentString('    ');
 		$this->xmlWriter->startDocument('1.0', 'UTF-8');
 
-		$this->fromArray($array);
+		$this->fromArray($array, '');
 
 		$this->xmlWriter->endDocument();
 
@@ -47,18 +47,11 @@ class CXmlExportWriter extends CExportWriter {
 
 	/**
 	 * Recursive function for processing nested arrays.
-	 *
-	 * @param array $array
-	 * @param null  $parentName name of parent node
 	 */
-	protected function fromArray(array $array, $parentName = null) {
+	protected function fromArray(array $array, string $parent_name): void {
 		foreach ($array as $name => $value) {
-			if ($newName = $this->mapName($parentName)) {
-				$this->xmlWriter->startElement($newName);
-			}
-			else {
-				$this->xmlWriter->startElement($name);
-			}
+			$new_name = static::mapName($parent_name);
+			$this->xmlWriter->startElement($new_name !== false ? $new_name : $name);
 
 			if (is_array($value)) {
 				$this->fromArray($value, $name);
@@ -79,12 +72,8 @@ class CXmlExportWriter extends CExportWriter {
 
 	/**
 	 * Returns sub node name based on parent node name.
-	 *
-	 * @param string $name
-	 *
-	 * @return bool
 	 */
-	private function mapName($name) {
+	private static function mapName(string $name): bool|string {
 		$map = [
 			'conditions' => 'condition',
 			'dashboards' => 'dashboard',
@@ -138,6 +127,6 @@ class CXmlExportWriter extends CExportWriter {
 			'widgets' => 'widget'
 		];
 
-		return isset($map[$name]) ? $map[$name] : false;
+		return array_key_exists($name, $map) ? $map[$name] : false;
 	}
 }
