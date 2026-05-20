@@ -63,6 +63,9 @@ class CControllerHousekeepingEdit extends CController {
 		$data['compression_availability'] = false;
 		$data['db_extension'] = CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION);
 		$data['value_type_storage'] = Manager::History()->getValueTypesStorageTtls();
+		$data['trends_storage_hint'] = (bool) array_intersect_key($data['value_type_storage'], array_flip([
+			ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64
+		]));
 
 		if ($data['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
 			// Temporary state to show checkbox checked and disabled before the real state is detected.
