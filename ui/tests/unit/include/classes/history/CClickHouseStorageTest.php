@@ -18,265 +18,6 @@ use PHPUnit\Framework\TestCase;
 
 class CHistoryStorageClickHouseTest extends TestCase {
 
-	public static function dataProviderGetEncodedParamMap() {
-		$closure = Closure::bind(
-			fn($sql_parts) => $this->getEncodedParamMap($sql_parts),
-			new CClickHouseStorage([
-				'url' => '',
-				'types' => [],
-				'db' => '',
-				'username' => '',
-				'password' => '',
-				'value_type_ttl' => []
-			]),
-			CClickHouseStorage::class
-		);
-
-		yield 'Unknown value types are ignored' => [
-			$closure,
-			[
-				'uint64' => ['A' => 123],
-				'_' => ['B' => 5],
-				['C' => 7]
-			],
-			[]
-		];
-
-		yield 'Different value type having same name will overwrite each other' => [
-			$closure,
-			[
-				'Int32' => ['A' => 1],
-				'Int64' => ['A' => 1],
-				'UInt64' => ['A' => 1],
-				'String' => ['A' => 'overwritten']
-			],
-			[
-				'A' => 'overwritten'
-			]
-		];
-
-		yield 'Int32 invalid values ignored' => [
-			$closure,
-			[
-				'Int32' => [
-					'false' => false,
-					'null' => null,
-					'A' => 1.1,
-					'B' => -2.2,
-					'C' => '3.3',
-					'D' => '+4.4',
-					'E' => 'test',
-					'F' => '0test',
-					'G' => '+5',
-					'H' => '--6',
-					'I' => '7-8',
-					'J' => ' 10',
-					'K' => '100_000_000'
-				]
-			],
-			[]
-		];
-
-		yield 'Int32 value types resolving' => [
-			$closure,
-			[
-				'Int32' => [
-					'empty' => [],
-					'A' => -5,
-					'B' => '-5',
-					'C' => [1],
-					'D' => [1,2],
-					'E' => [1,2,'-3']
-				]
-			],
-			[
-				'empty' => '[]',
-				'A' => '-5',
-				'B' => '-5',
-				'C' => '[1]',
-				'D' => '[1,2]',
-				'E' => '[1,2,-3]'
-			]
-		];
-
-		yield 'Int64 invalid values ignored' => [
-			$closure,
-			[
-				'Int64' => [
-					'false' => false,
-					'null' => null,
-					'A' => 1.1,
-					'B' => -2.2,
-					'C' => '3.3',
-					'D' => '+4.4',
-					'E' => 'test',
-					'F' => '0test',
-					'G' => '+5',
-					'H' => '--6',
-					'I' => '7-8',
-					'J' => ' 10',
-					'K' => '100_000_000'
-				]
-			],
-			[]
-		];
-
-		yield 'Int64 value types resolving' => [
-			$closure,
-			[
-				'Int64' => [
-					'empty' => [],
-					'A' => -5,
-					'B' => '-5',
-					'C' => [1],
-					'D' => [1,2],
-					'E' => [1,2,'-3']
-				]
-			],
-			[
-				'empty' => '[]',
-				'A' => '-5',
-				'B' => '-5',
-				'C' => '[1]',
-				'D' => '[1,2]',
-				'E' => '[1,2,-3]'
-			]
-		];
-
-		yield 'Float invalid values ignored' => [
-			$closure,
-			[
-				'Float64' => [
-					'false' => false,
-					'null' => null,
-					'A' => '+4.4',
-					'B' => 'test',
-					'C' => '0test',
-					'D' => '+5',
-					'E' => '--6',
-					'F' => '7-8',
-					'G' => ' 10',
-					'H' => '100_000_000'
-				]
-			],
-			[]
-		];
-
-		yield 'Float value types resolving' => [
-			$closure,
-			[
-				'Float64' => [
-					'empty' => [],
-					'A' => -5,
-					'B' => '-5',
-					'C' => [1],
-					'D' => [1,1.5],
-					'E' => [1,2,'-3.3'],
-					'F' => '1.2e3'
-				]
-			],
-			[
-				'empty' => '[]',
-				'A' => '-5',
-				'B' => '-5',
-				'C' => '[1]',
-				'D' => '[1,1.5]',
-				'E' => '[1,2,-3.3]',
-				'F' => '1.2e3'
-			]
-		];
-
-		yield 'UInt64 invalid values ignored' => [
-			$closure,
-			[
-				'UInt64' => [
-					'false' => false,
-					'null' => null,
-					'A' => 1.1,
-					'B' => -2.2,
-					'C' => '3.3',
-					'D' => '+4.4',
-					'E' => 'test',
-					'F' => '0test',
-					'G' => '+5',
-					'H' => '--6',
-					'I' => '7-8',
-					'J' => '-9',
-					'K' => ' 10',
-					'L' => '100_000_000'
-				]
-			],
-			[]
-		];
-
-		yield 'UInt64 value types resolving' => [
-			$closure,
-			[
-				'UInt64' => [
-					'empty' => [],
-					'A' => 4,
-					'B' => '5',
-					'C' => [1],
-					'D' => [1,2],
-					'E' => [1,2,'3', '12345678901234567890123456789012345678901234567890123456789012345678901234567890']
-				]
-			],
-			[
-				'empty' => '[]',
-				'A' => '4',
-				'B' => '5',
-				'C' => '[1]',
-				'D' => '[1,2]',
-				'E' => '[1,2,3,12345678901234567890123456789012345678901234567890123456789012345678901234567890]'
-			]
-		];
-
-		yield 'String invalid values ignored' => [
-			$closure,
-			[
-				'String' => [
-					'false' => false,
-					'null' => null,
-					'A' => 1.1,
-					'B' => -2.2,
-					'C' => 3,
-					'D' => -4
-				]
-			],
-			[]
-		];
-
-		yield 'String value types resolving' => [
-			$closure,
-			[
-				'String' => [
-					'empty' => [],
-					'A' => '12345678901234567890123456789012345678901234567890123456789012345678901234567890',
-					'B' => 'abc',
-					'C' => 'd\'ef',
-					'D' => ['abc', 'def'],
-					'E' => ['abc', 'd\'ef']
-				]
-			],
-			[
-				'empty' => '[]',
-				'A' => '12345678901234567890123456789012345678901234567890123456789012345678901234567890',
-				'B' => 'abc',
-				'C' => 'd\'ef',
-				'D' => '[\'abc\',\'def\']',
-				'E' => '[\'abc\',\'d\\\'ef\']'
-			]
-		];
-	}
-
-	/**
-	 * @covers CClickHouseStorage::getEncodedParamMap
-	 * @ dataProvider dataProviderGetEncodedParamMap
-	 */
-	// public function testGetEncodedParamMap(Closure $method, array $params, $expected) {
-	// 	$this->assertSame($expected, $method($params));
-	// }
-
 	public static function dataProviderBuildQueryFromParts() {
 		$defaults = [
 			'select' => [],
@@ -339,7 +80,7 @@ class CHistoryStorageClickHouseTest extends TestCase {
 	 * @covers CClickHouseStorage::buildQueryFromParts
 	 * @dataProvider dataProviderBuildQueryFromParts
 	 */
-	public function testBuildQueryFromParts(Closure $method, array $sql_parts, $expected) {
+	public function testBuildQueryFromParts(Closure $method, array $sql_parts, string $expected) {
 		$this->assertSame($expected, $method($sql_parts));
 	}
 
@@ -405,7 +146,7 @@ class CHistoryStorageClickHouseTest extends TestCase {
 	 * @covers CClickHouseStorage::addQueryOutputOptions
 	 * @dataProvider dataProviderAddQueryOutputOptions
 	 */
-	public function testAddQueryOutputOptions(Closure $method, array $sql_parts, array $options, $expected) {
+	public function testAddQueryOutputOptions(Closure $method, array $sql_parts, array $options, array $expected) {
 		$this->assertSame($expected, $method($sql_parts, $options));
 	}
 
@@ -542,7 +283,7 @@ class CHistoryStorageClickHouseTest extends TestCase {
 	 * @covers CClickHouseStorage::addQuerySortOptions
 	 * @dataProvider dataProviderAddQuerySortOptions
 	 */
-	public function testAddQuerySortOptions(Closure $method, array $sql_parts, array $options, $expected) {
+	public function testAddQuerySortOptions(Closure $method, array $sql_parts, array $options, array $expected) {
 		$this->assertSame($expected, $method($sql_parts, $options));
 	}
 
@@ -564,6 +305,40 @@ class CHistoryStorageClickHouseTest extends TestCase {
 			'time_from' => null,
 			'time_till' => null,
 			'searchByAny' => null
+		];
+
+		yield 'Filter ignore fields for another value type' => [
+			$closure,
+			[],
+			[
+				'history' => ITEM_VALUE_TYPE_UINT64,
+				'filter' => ['severity' => 7]
+			] + $defaults,
+			[]
+		];
+
+		yield 'Filter with searchByAny use OR and enclose filter in brackets' => [
+			$closure,
+			['where' => [], 'param' => []],
+			[
+				'history' => ITEM_VALUE_TYPE_UINT64,
+				'searchByAny' => true,
+				'filter' => [
+					'itemid' => [12345],
+					'value' => [5]
+				]
+			] + $defaults,
+			[
+				'where' => [
+					'filter' => '(itemid IN {filter_itemid:Array(UInt64)} OR value IN {filter_value:Array(UInt64)})'
+				],
+				'param' => [
+					'UInt64' => [
+						'filter_itemid' => [12345],
+						'filter_value' => [5]
+					]
+				]
+			]
 		];
 
 		yield 'Filter for clock produces condition for clock_ns' => [
@@ -601,30 +376,13 @@ class CHistoryStorageClickHouseTest extends TestCase {
 				]
 			]
 		];
-
-		yield 'Filter adds IN for array of values' => [
-			$closure,
-			['where' => [], 'param' => []],
-			[
-				'history' => ITEM_VALUE_TYPE_UINT64,
-				'filter' => ['itemid' => [1, 2, 3, 4]]
-			] + $defaults,
-			[
-				'where' => [
-					'filter' => 'itemid IN {filter_itemid:Array(UInt64)}'
-				],
-				'param' => [
-					'UInt64' => ['filter_itemid' => [1, 2, 3, 4]]
-				]
-			]
-		];
 	}
 
 	/**
 	 * @covers CClickHouseStorage::addQueryFilterOptions
 	 * @dataProvider dataProviderAddQueryFilterOptions
 	 */
-	public function testAddQueryFilterOptions(Closure $method, array $sql_parts, array $options, $expected) {
+	public function testAddQueryFilterOptions(Closure $method, array $sql_parts, array $options, array $expected) {
 		$this->assertSame($expected, $method($sql_parts, $options));
 	}
 
@@ -659,37 +417,6 @@ class CHistoryStorageClickHouseTest extends TestCase {
 			[]
 		];
 
-		yield 'Search ignore fields of not String type' => [
-			$closure,
-			[],
-			[
-				'history' => ITEM_VALUE_TYPE_JSON,
-				'search' => ['itemid' => 7]
-			] + $defaults,
-			[]
-		];
-
-		yield 'Search ignore empty patterns' => [
-			$closure,
-			['where' => [], 'param' => []],
-			[
-				'history' => ITEM_VALUE_TYPE_LOG,
-				'searchWildcardsEnabled' => true,
-				'search' => [
-					'value' => '',
-					'source' => [' ', '']
-				]
-			] + $defaults,
-			[
-				'where' => [
-					'search' => 'source ILIKE {search_source:String}'
-				],
-				'param' => [
-					'String' => ['search_source' => ' ']
-				]
-			]
-		];
-
 		yield 'Search startSearch' => [
 			$closure,
 			['where' => [], 'param' => []],
@@ -697,17 +424,17 @@ class CHistoryStorageClickHouseTest extends TestCase {
 				'history' => ITEM_VALUE_TYPE_LOG,
 				'startSearch' => true,
 				'search' => [
-					'value' => 'str',
+					'value' => ['str'],
 					'source' => ['*str1', '%str2']
 				]
 			] + $defaults,
 			[
 				'where' => [
-					'search' => 'value ILIKE {search_value:String} AND arrayAll(p -> source ILIKE p, {search_source:Array(String)})'
+					'search' => 'arrayAll(p -> value ILIKE p, {search_value:Array(String)}) AND arrayAll(p -> source ILIKE p, {search_source:Array(String)})'
 				],
 				'param' => [
 					'String' => [
-						'search_value' => 'str%',
+						'search_value' => ['str%'],
 						'search_source' => ['*str1%', '\\%str2%']
 					]
 				]
@@ -722,17 +449,17 @@ class CHistoryStorageClickHouseTest extends TestCase {
 				'startSearch' => true,
 				'searchByAny' => true,
 				'search' => [
-					'value' => 'str',
+					'value' => ['str'],
 					'source' => ['*str1', '%str2']
 				]
 			] + $defaults,
 			[
 				'where' => [
-					'search' => '(value ILIKE {search_value:String} OR arrayExists(p -> source ILIKE p, {search_source:Array(String)}))'
+					'search' => '(arrayExists(p -> value ILIKE p, {search_value:Array(String)}) OR arrayExists(p -> source ILIKE p, {search_source:Array(String)}))'
 				],
 				'param' => [
 					'String' => [
-						'search_value' => 'str%',
+						'search_value' => ['str%'],
 						'search_source' => ['*str1%', '\\%str2%']
 					]
 				]
@@ -746,17 +473,17 @@ class CHistoryStorageClickHouseTest extends TestCase {
 				'history' => ITEM_VALUE_TYPE_LOG,
 				'searchWildcardsEnabled' => true,
 				'search' => [
-					'value' => 'str',
+					'value' => ['str'],
 					'source' => ['*str1', '%str2']
 				]
 			] + $defaults,
 			[
 				'where' => [
-					'search' => 'value ILIKE {search_value:String} AND arrayAll(p -> source ILIKE p, {search_source:Array(String)})'
+					'search' => 'arrayAll(p -> value ILIKE p, {search_value:Array(String)}) AND arrayAll(p -> source ILIKE p, {search_source:Array(String)})'
 				],
 				'param' => [
 					'String' => [
-						'search_value' => 'str',
+						'search_value' => ['str'],
 						'search_source' => ['%str1', '\\%str2']
 					]
 				]
@@ -768,7 +495,7 @@ class CHistoryStorageClickHouseTest extends TestCase {
 	 * @covers CClickHouseStorage::addQuerySearchOptions
 	 * @dataProvider dataProviderAddQuerySearchOptions
 	 */
-	public function testAddQuerySearchOptions(Closure $method, array $sql_parts, array $options, $expected) {
+	public function testAddQuerySearchOptions(Closure $method, array $sql_parts, array $options, array $expected) {
 		$this->assertSame($expected, $method($sql_parts, $options));
 	}
 }
