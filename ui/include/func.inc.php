@@ -2475,24 +2475,52 @@ function generateUuidV4($seed = '') {
 }
 
 function generateUuidV7(): string {
-	// 48 bit
-	$unix_timestamp = (int) floor(microtime(true) * 1000);
+	static $last_timestamp = 0;
+	static $random_part = null;
 
-	// 32 bit leftmost bits
-	$left_time_part = ($unix_timestamp >> 16) & 0xffffffff;
+	// Use 48 bits of Unix timestamp.
+	$current_timestamp = (int) floor(microtime(true) * 1000);
 
-	// 16 bit rightmost bits
-	$right_time_part = $unix_timestamp & 0xffff;
+	if ($current_timestamp < $last_timestamp) {
+		$current_timestamp = $last_timestamp;
+	}
 
-	// 6 bytes time part
+	// Millisecond changed since last function call or not called before.
+	if ($current_timestamp > $last_timestamp) {
+		$random_part = random_bytes(10);
+
+		$last_timestamp = $current_timestamp;
+	}
+	else {
+		// Increment random part.
+		for ($i = 9; $i >= 0; $i--) {
+			$value = ord($random_part[$i]);
+
+			if ($value < 255) {
+				$random_part[$i] = chr($value + 1);
+
+				break;
+			}
+
+			$random_part[$i] = chr(0);
+		}
+	}
+
+	// 32 bit leftmost bits.
+	$left_time_part = ($current_timestamp >> 16) & 0xffffffff;
+
+	// 16 bit rightmost bits.
+	$right_time_part = $current_timestamp & 0xffff;
+
+	// 6 bytes time part.
 	$time_part = pack('Nn', $left_time_part, $right_time_part);
 
-	$data = $time_part.random_bytes(10);
+	$data = $time_part.$random_part;
 
-	// Set version: 7th byte to 0111 (0111xxxx)
+	// Set version: 7th byte to 0111 (0111xxxx).
 	$data[6] = chr(ord($data[6]) & 0x0f | 0x70);
 
-	// Set variant: 9th byte to 10 (10xxxxxx)
+	// Set variant: 9th byte to 10 (10xxxxxx).
 	$data[8] = chr(ord($data[8]) & 0x3f | 0x80);
 
 	$hex_data = bin2hex($data);
