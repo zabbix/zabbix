@@ -32,7 +32,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -4193,7 +4193,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
@@ -5214,7 +5214,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
@@ -8418,7 +8418,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -15288,7 +15288,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
@@ -15848,7 +15848,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
