@@ -21,6 +21,8 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * history and trends without triggers, then adding last()- and nodata()-based
  * trigger prototypes and verifying firing, recovery, UNKNOWN state, proxy
  * lastaccess, behavior across server restarts and final LLD cleanup.
+ * 
+ * For minimal test run as (LLDDiscovery|HistoryPrepare|HistoryPastSend|HistoryPastVpsWritten|HistoryPastVerify)
  *
  * @required-components server
  * @suite-components-reuse true
@@ -69,6 +71,15 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+		$config = $this->configurationProvider();
+		if (!empty($config[self::COMPONENT_SERVER]['HistoryProvider'])) {
+			global $HISTORY_PROVIDERS;
+			$this->assertNotEmpty($HISTORY_PROVIDERS,
+				'Server HistoryProvider is set in configurationProvider() but $HISTORY_PROVIDERS is empty — '
+				.'frontend would use SQL while server writes to an external provider; '
+				.'set $HISTORY_PROVIDERS in ui/conf/zabbix.conf.php');
+		}
+
 		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
 		$response = $this->call('hostgroup.get', [
 			'filter' => ['name' => ['Zabbix servers']],
@@ -187,6 +198,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				'ValueCacheSize' => '128M',
 				'LogSlowQueries' => '60000',
 				'StartDBSyncers' => '32' /* LLD_DISCOVERY_COUNT * types / ZBX_HC_SYNC_MAX  */
+				/* 'HistoryProvider'=> 'clickhouse;value_types="str,log,text,dbl,uint,json",url=http://localhost:8123,db=zabbix,username=zabbix,password=zabbix' */
 			]
 		];
 	}
@@ -870,7 +882,12 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				'time_from' => $tm,
 				'time_till' => $tm
 			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-				return count($response['result']) === 1;
+				if (count($response['result']) === 1) {
+					return true;
+				}
+				global $HISTORY_PROVIDERS;
+				return 'history.get returned '.count($response['result']).' records, expected 1; '
+					.'$HISTORY_PROVIDERS='.json_encode($HISTORY_PROVIDERS);
 			});
 
 			$attempts = 0;
@@ -894,8 +911,10 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 						'time_till' => $tm,
 						'limit' => 5000
 					]);
+					global $HISTORY_PROVIDERS;
 					return 'got '.count($response['result']).' when asking for '.self::LLD_DISCOVERY_COUNT
-							.', got '.count($probe['result']).' when asking for 5000';
+							.', got '.count($probe['result']).' when asking for 5000'
+							.'; $HISTORY_PROVIDERS='.json_encode($HISTORY_PROVIDERS);
 				}
 				return false;
 			});
