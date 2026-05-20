@@ -501,7 +501,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	 */
 	public function testBridgeAdapter_realNotification(): void {
 		$this->createRealNotificationObjects();
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		$this->sendSenderValue(self::REAL_NOTIFY_HOST, self::REAL_NOTIFY_ITEM_KEY, 6, self::COMPONENT_SERVER);
 
