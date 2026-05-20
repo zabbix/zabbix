@@ -352,7 +352,12 @@ static zbx_uint64_t	cep_eventid_next(zbx_cep_t *cep)
  ******************************************************************************/
 static zbx_cep_event_handle_t	cep_get_event(zbx_cep_t *cep, zbx_uint64_t eventid)
 {
-	return (zbx_cep_event_handle_t)zbx_hashset_search(&cep->events, &eventid);
+	zbx_cep_event_handle_t	h = (zbx_cep_event_handle_t)zbx_hashset_search(&cep->events, &eventid);
+
+	if (NULL == h || CEP_EVENT_STATE_ACTIVE != h->state)
+		return NULL;
+
+	return h;
 }
 
 /******************************************************************************
