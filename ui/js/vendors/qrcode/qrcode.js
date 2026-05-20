@@ -367,13 +367,69 @@ var QRCode;
 			this._el.appendChild(this._elImage);
 			this._bSupportDataURI = null;
 		};
-			
+
+		/**
+		 * Draw the QRCode with:
+		 * - automatically size down image (square only) so that one module is integer (not float)
+		 * - add 4 module border for QR code
+		 *
+		 * IMPLEMENTED BY ZABBIX
+		 *
+		 * @param oQRCode
+		 */
+		Drawing.prototype.drawPrecise = function (oQRCode) {
+			const nCount = oQRCode.getModuleCount();
+			let module_size = Math.floor(this._htOption.width / nCount);
+
+			while (module_size > Math.floor((this._htOption.width - 8 * module_size) / nCount)) {
+				module_size--;
+			}
+
+			const border = 4 * module_size;
+			const image_size = 2 * border  + nCount * module_size;
+
+			this._elImage.width = image_size;
+			this._elImage.height = image_size;
+			this._elCanvas.width = image_size;
+			this._elCanvas.height = image_size;
+			this._elImage.style.display = "none";
+			this.clear();
+
+			this._oContext.lineWidth = 1;
+			this._oContext.strokeStyle = this._htOption.colorLight;
+			this._oContext.fillStyle = this._htOption.colorLight;
+			this._oContext.fillRect(0, 0, image_size, image_size);
+
+			for (let row = 0; row < nCount; row++) {
+				for (let col = 0; col < nCount; col++) {
+					var bIsDark = oQRCode.isDark(row, col);
+					this._oContext.strokeStyle = bIsDark ? this._htOption.colorDark : this._htOption.colorLight;
+					this._oContext.fillStyle = bIsDark ? this._htOption.colorDark : this._htOption.colorLight;
+					this._oContext.fillRect(
+						col * module_size + border,
+						row * module_size + border,
+						module_size,
+						module_size
+					);
+				}
+			}
+
+			this._bIsPainted = true;
+		}
+
 		/**
 		 * Draw the QRCode
-		 * 
+		 *
+		 * ALTERED BY ZABBIX: switch to use precise drawing.
+		 *
 		 * @param {QRCode} oQRCode 
 		 */
 		Drawing.prototype.draw = function (oQRCode) {
+			if (this._htOption.draw_precise) {
+				this.drawPrecise(oQRCode);
+				return;
+			}
+
             var _elImage = this._elImage;
             var _oContext = this._oContext;
             var _htOption = this._htOption;
