@@ -1012,7 +1012,7 @@ class testFormUpdateProblem extends CWebTest {
 			$action_row = $table->getRow($i);
 			$this->assertEquals('Admin (Zabbix Administrator)', $action_row->getColumn($user)->getText());
 			$query = ($i === 0)
-				? 'xpath:.//span[@title="Unsuppressed"]'
+				? 'xpath:.//span[@title="Manually unsuppressed"]'
 				: 'xpath:.//*['.CXPathHelper::fromClass('zi-eye-off').']';
 			$this->assertTrue($action_row->getColumn($action)->query($query)->exists());
 		}
