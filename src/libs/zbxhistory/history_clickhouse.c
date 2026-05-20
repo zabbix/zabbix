@@ -469,6 +469,7 @@ static int	is_json_object(const char *json_str)
 static void	history_clickhouse_write(void *data, unsigned char value_type,
 		const zbx_history_entry_t * const *entries, int entries_num)
 {
+#define	ZBX_CLICKHOUSE_ASYNC_INSERT "&async_insert=1&wait_for_async_insert=0"
 	zbx_clickhouse_data_t	*d = (zbx_clickhouse_data_t *)data;
 	zbx_clickhouse_conn_t	*conn;
 	char			*error = NULL, url[MAX_STRING_LEN], *post_data = NULL;
@@ -497,14 +498,14 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 	if (ITEM_VALUE_TYPE_JSON == value_type)
 	{
 		zbx_snprintf(url, sizeof(url), "%s?database=%s"
-			"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20RowBinary&input_format_binary_read_json_as_string=1",
-			d->base_url, d->db, clickhouse_history_tables[value_type]);
+			"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20RowBinary&input_format_binary_read_json_as_string=1"
+			ZBX_CLICKHOUSE_ASYNC_INSERT, d->base_url, d->db, clickhouse_history_tables[value_type]);
 	}
 	else
 	{
 		zbx_snprintf(url, sizeof(url), "%s?database=%s"
-			"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20RowBinary", d->base_url, d->db,
-			clickhouse_history_tables[value_type]);
+			"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20RowBinary" ZBX_CLICKHOUSE_ASYNC_INSERT, d->base_url,
+			d->db, clickhouse_history_tables[value_type]);
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_URL, url)))
@@ -610,6 +611,7 @@ out:
 		zbx_vector_clickhouse_conn_ptr_append(&d->active_conns, conn);
 	else
 		history_clickhouse_release_conn(d, conn);
+#undef ZBX_CLICKHOUSE_ASYNC_INSERT
 }
 
 /******************************************************************************
