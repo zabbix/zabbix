@@ -810,24 +810,34 @@ static int	DBpatch_7050054(void)
 
 static int	DBpatch_7050055(void)
 {
+	if (ZBX_DB_OK > zbx_db_execute("update settings set value_str='' where name='session_key'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050056(void)
+{
 	const zbx_db_field_t	field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBdrop_not_null("acknowledges", &field);
 }
 
-static int	DBpatch_7050056(void)
+static int	DBpatch_7050057(void)
 {
 	const zbx_db_field_t	field = {"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("acknowledges", &field);
 }
 
-static int	DBpatch_7050057(void)
+static int	DBpatch_7050058(void)
 {
 	return DBdrop_foreign_key("acknowledges", 1);
 }
 
-static int	DBpatch_7050058(void)
+static int	DBpatch_7050059(void)
 {
 	return DBdrop_foreign_key("event_suppress", 2);
 }
@@ -897,5 +907,6 @@ DBPATCH_ADD(7050055, 0, 1)
 DBPATCH_ADD(7050056, 0, 1)
 DBPATCH_ADD(7050057, 0, 1)
 DBPATCH_ADD(7050058, 0, 1)
+DBPATCH_ADD(7050059, 0, 1)
 
 DBPATCH_END()
