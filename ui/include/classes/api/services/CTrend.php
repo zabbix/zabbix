@@ -73,7 +73,22 @@ class CTrend extends CApiService {
 				ZBX_HISTORY_SOURCE_CLICKHOUSE => $this->getFromClickHouse($options),
 				ZBX_HISTORY_SOURCE_SQL => $this->getFromSql($options)
 			};
-			$result = $options['countOutput'] ? $result + $data : array_merge($result, $data);
+
+			if ($options['countOutput']) {
+				$result += $data;
+			}
+			else {
+				$result = array_merge($result, $data);
+
+				if ($options['limit'] !== null) {
+					$options['limit'] -= count($data);
+
+					if ($options['limit'] == 0) {
+						break;
+					}
+				}
+
+			}
 		}
 
 		return $options['countOutput'] ? (string) $result : $result;
@@ -122,7 +137,6 @@ class CTrend extends CApiService {
 		}
 
 		if (!$options['countOutput']) {
-			$sql_limit = $options['limit'];
 			$sql_fields = [];
 
 			foreach ($options['output'] as $field) {
@@ -137,10 +151,6 @@ class CTrend extends CApiService {
 			$result = [];
 
 			foreach ($options['itemids'] as $value_type => $items) {
-				if ($sql_limit !== null && $sql_limit <= 0) {
-					break;
-				}
-
 				$sql_from = ($value_type == ITEM_VALUE_TYPE_FLOAT) ? 'trends' : 'trends_uint';
 				$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($items));
 
@@ -148,15 +158,15 @@ class CTrend extends CApiService {
 					'SELECT '.implode(',', $sql_fields).
 					' FROM '.$sql_from.' t'.
 					' WHERE '.implode(' AND ', $sql_where),
-					$sql_limit
+					$options['limit'] !== null ? $options['limit'] - count($result) : null
 				);
 
 				while ($row = DBfetch($res)) {
 					$result[] = $row;
 				}
 
-				if ($sql_limit !== null) {
-					$sql_limit -= count($result);
+				if ($options['limit'] !== null && $options['limit'] == count($result)) {
+					break;
 				}
 			}
 
@@ -283,15 +293,6 @@ class CTrend extends CApiService {
 			foreach ($data['group_by_itemid']['buckets'] as $item) {
 				if (!$options['countOutput']) {
 					foreach ($item['group_by_clock']['buckets'] as $histogram) {
-						if ($limit !== null) {
-							// Limit is reached, no need to continue.
-							if ($limit <= 0) {
-								break 3;
-							}
-
-							$limit--;
-						}
-
 						$result[] = [
 							'itemid' => $item['key'],
 							// Field key_as_string is used to get seconds instead of milliseconds.
@@ -301,6 +302,14 @@ class CTrend extends CApiService {
 							'avg_value' => $histogram['avg_value']['value'],
 							'max_value' => $histogram['max_value']['value']
 						];
+
+						if ($limit !== null) {
+							$limit--;
+
+							if ($limit == 0) {
+								break 3;
+							}
+						}
 					}
 				}
 				else {
@@ -358,14 +367,12 @@ class CTrend extends CApiService {
 				? $result + $values[0]['rowscount']
 				: array_merge($result, $values);
 
-			if ($limit === null) {
-				continue;
-			}
+			if ($limit !== null) {
+				$limit -= count($values);
 
-			$limit -= count($values);
-
-			if ($limit == 0) {
-				break;
+				if ($limit == 0) {
+					break;
+				}
 			}
 		}
 
