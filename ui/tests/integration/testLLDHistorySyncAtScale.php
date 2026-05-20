@@ -21,7 +21,6 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * history and trends without triggers, then adding last()- and nodata()-based
  * trigger prototypes and verifying firing, recovery, UNKNOWN state, proxy
  * lastaccess, behavior across server restarts and final LLD cleanup.
- * 
  * For minimal test run as (LLDDiscovery|HistoryPrepare|HistoryPastSend|HistoryPastVpsWritten|HistoryPastVerify)
  *
  * @required-components server
