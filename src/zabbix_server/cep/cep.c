@@ -1182,8 +1182,7 @@ static void	cep_event_remove_maintenaces(zbx_cep_event_handle_t h, zbx_vector_ui
 	zbx_vector_uint64_t	ids;
 
 	zbx_vector_uint64_create(&ids);
-	zbx_vector_uint64_append_array(&ids, h->event->maintenanceids.values,
-			h->event->maintenanceids.values_num);
+	zbx_vector_uint64_append_array(&ids, h->event->maintenanceids.values, h->event->maintenanceids.values_num);
 
 	for (int i = 0; i < ids.values_num;)
 	{

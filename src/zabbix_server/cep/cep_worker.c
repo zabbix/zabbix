@@ -345,7 +345,7 @@ static void	cep_worker_delete_events(zbx_cep_task_remote_t *task)
  ******************************************************************************/
 static void	cep_worker_process_task_remote(zbx_cep_worker_t *worker, zbx_cep_task_remote_t *task)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() process remote task :%u", __func__, task->message->code);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() task :%u", __func__, task->message->code);
 
 	switch (task->message->code)
 	{
