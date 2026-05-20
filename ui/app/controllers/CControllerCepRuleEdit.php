@@ -98,6 +98,11 @@ class CControllerCepRuleEdit extends CController {
 
 		$ceprule = $ceprules[0];
 
+		// Unlimited capacity's default value is "0".
+		if ($ceprule['window']['capacity'] == 0) {
+			$ceprule['window']['capacity'] = '';
+		}
+
 		return $ceprule;
 	}
 

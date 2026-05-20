@@ -88,7 +88,7 @@ $form = (new CForm())
 		->addItem((new CTemplateTag('ceprule-operation-modal-template'))->addItem(
 			new CPartial('ceprule.modal.operation')
 		))
-		->addItem((new CLabel('Operations'))->setAsteriskMark())
+		->addItem((new CLabel('Operations'))->setAsteriskMark()->setId('ceprule-operations-label'))
 		->addItem((new CFormField(
 			(new CTable())
 				->setColumns([

@@ -91,6 +91,10 @@ window.ceprule_edit_popup = new class {
 		this.#handleFilterChanged();
 		this.#handleWindowConditionsChanged();
 		window['ceprule-window-counttag-toggle'].dispatchEvent(new Event('change'));
+		window['ceprule-window-capacity-toggle'].dispatchEvent(new Event('change'));
+		window['ceprule-window-groupby-opt-tag'].dispatchEvent(new Event('change'));
+
+		this.#handleWindowTypeChanged();
 
 		this.#initial_form_fields = this.form.getAllValues(); // TODO: use at on-before page unload confirmation
 		console.log([ceprule, '===', this.#initial_form_fields]);
@@ -259,6 +263,17 @@ window.ceprule_edit_popup = new class {
 			window['ceprule-window-counttag'].style.display = enabled ? '' : 'none';
 		});
 
+		window['ceprule-window-capacity-toggle'].addEventListener('change', (e) => {
+			const enabled = window['ceprule-window-capacity-toggle'].querySelector('[value="1"]').checked;
+			window['ceprule-window-capacity'].style.display = enabled ? '' : 'none';
+		});
+
+		window['ceprule-window-groupby-opt-tag'].addEventListener('change', (e) => {
+			window['ceprule-window-groupby-tag'].style.display = e.target.checked ? '' : 'none';
+		});
+
+		window['ceprule-window-type'].addEventListener('change', () => this.#handleWindowTypeChanged());
+
 		new CSortable(window['ceprule-operations-table'].querySelector('tbody'), {selector_handle: 'div.drag-icon'});
 
 		// Confirm / cancel dialog.
@@ -275,6 +290,82 @@ window.ceprule_edit_popup = new class {
 				this.#clone();
 			}
 		});
+	}
+
+	#handleWindowTypeChanged() {
+		const input = [...window['ceprule-window-type'].querySelectorAll('[name="window_type"]')]
+			.find(node => node.checked);
+		const type = Number(input.value);
+
+		window['ceprule-operations-label']
+			.classList.toggle('form-label-asterisk', type != <?= ZBX_CEP_WINDOW_CAUSE_SYMPTOM ?>);
+
+		{
+			const form_field = window['ceprule-script'].closest('.form-field');
+			const display = type == <?= ZBX_CEP_WINDOW_PATTERN_MATCH ?> ? '' : 'none';
+
+			form_field.style.display = display;
+			form_field.previousSibling.style.display = display;
+		}
+		{
+			const form_field = window['ceprule-window-filter-evaltype'].closest('.form-field');
+			const display = type == <?= ZBX_CEP_WINDOW_TAG_MATCH ?> ? '' : 'none';
+
+			form_field.style.display = display;
+			form_field.previousSibling.style.display = display;
+		}
+		{
+			const form_field = window['ceprule-window-condition-table'].closest('.form-field');
+			const display = type == <?= ZBX_CEP_WINDOW_TAG_MATCH ?> ? '' : 'none';
+
+			form_field.style.display = display;
+			form_field.previousSibling.style.display = display;
+
+			type == <?= ZBX_CEP_WINDOW_TAG_MATCH ?>
+				&& this.form_element.dispatchEvent(new Event('window.filter.change'));
+		}
+		{
+			const form_field = window['ceprule-window-counttag'].closest('.form-field');
+			const display = type == <?= ZBX_CEP_WINDOW_CAUSE_SYMPTOM ?> ? '' : 'none';
+
+			form_field.style.display = display;
+			form_field.previousSibling.style.display = display;
+		}
+		{
+			const form_field = window['ceprule-window-groupby'].closest('.form-field');
+			const display = [
+				<?= ZBX_CEP_WINDOW_SIMPLE ?>,
+				<?= ZBX_CEP_WINDOW_CAUSE_SYMPTOM ?>,
+				<?= ZBX_CEP_WINDOW_PATTERN_MATCH ?>
+			].includes(type) ? '' : 'none';
+
+			form_field.style.display = display;
+			form_field.previousSibling.style.display = display;
+		}
+		{
+			const form_field = window['ceprule-window-capacity'].closest('.form-field');
+			const display = [
+				<?= ZBX_CEP_WINDOW_SIMPLE ?>,
+				<?= ZBX_CEP_WINDOW_CAUSE_SYMPTOM ?>,
+				<?= ZBX_CEP_WINDOW_TAG_MATCH ?>,
+				<?= ZBX_CEP_WINDOW_PATTERN_MATCH ?>
+			].includes(type) ? '' : 'none';
+
+			form_field.style.display = display;
+			form_field.previousSibling.style.display = display;
+		}
+		{
+			const form_field = window['ceprule-window-duration'].closest('.form-field');
+			const display = [
+				<?= ZBX_CEP_WINDOW_SIMPLE ?>,
+				<?= ZBX_CEP_WINDOW_CAUSE_SYMPTOM ?>,
+				<?= ZBX_CEP_WINDOW_TAG_MATCH ?>,
+				<?= ZBX_CEP_WINDOW_PATTERN_MATCH ?>
+			].includes(type) ? '' : 'none';
+
+			form_field.style.display = display;
+			form_field.previousSibling.style.display = display;
+		}
 	}
 
 	#clone() {
