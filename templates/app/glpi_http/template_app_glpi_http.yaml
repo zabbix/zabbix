@@ -2086,7 +2086,7 @@ zabbix_export:
           name: 'Assistance [Changes]: Late this month'
           type: DEPENDENT
           key: glpi.change.late.month
-          description: 'Number of late "Change" items closed during the current month.'
+          description: 'Number of late "Change" items during the current month.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -2177,6 +2177,7 @@ zabbix_export:
               expression: 'min(/GLPI by HTTP/glpi.change.priority.high,5m)>{$GLPI.PRIORITY.HIGH.THRESHOLD:"Change"}'
               name: 'GLPI: Change: Too many open High priority items'
               event_name: 'GLPI: Change: Too many open High priority items (over {$GLPI.PRIORITY.HIGH.THRESHOLD:"Change"} items for 5m)'
+              opdata: 'Current amount: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Number of open High priority "Change" items exceeded the threshold.'
               tags:
@@ -2223,6 +2224,7 @@ zabbix_export:
               expression: 'min(/GLPI by HTTP/glpi.change.priority.major,5m)>{$GLPI.PRIORITY.MAJOR.THRESHOLD:"Change"}'
               name: 'GLPI: Change: Too many open Major priority items'
               event_name: 'GLPI: Change: Too many open Major priority items (over {$GLPI.PRIORITY.MAJOR.THRESHOLD:"Change"} items for 5m)'
+              opdata: 'Current amount: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Number of open Major priority "Change" items exceeded the threshold.'
               tags:
@@ -2269,6 +2271,7 @@ zabbix_export:
               expression: 'min(/GLPI by HTTP/glpi.change.priority.very_high,5m)>{$GLPI.PRIORITY.VERY_HIGH.THRESHOLD:"Change"}'
               name: 'GLPI: Change: Too many open Very high priority items'
               event_name: 'GLPI: Change: Too many open Very high priority items (over {$GLPI.PRIORITY.VERY_HIGH.THRESHOLD:"Change"} items for 5m)'
+              opdata: 'Current amount: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Number of open Very high priority "Change" items exceeded the threshold.'
               tags:
@@ -2698,7 +2701,7 @@ zabbix_export:
           name: 'Assistance [Problems]: Late this month'
           type: DEPENDENT
           key: glpi.problem.late.month
-          description: 'Number of late "Problem" items closed during the current month.'
+          description: 'Number of late "Problem" items during the current month.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -2789,6 +2792,7 @@ zabbix_export:
               expression: 'min(/GLPI by HTTP/glpi.problem.priority.high,5m)>{$GLPI.PRIORITY.HIGH.THRESHOLD:"Problem"}'
               name: 'GLPI: Problem: Too many open High priority items'
               event_name: 'GLPI: Problem: Too many open High priority items (over {$GLPI.PRIORITY.HIGH.THRESHOLD:"Problem"} items for 5m)'
+              opdata: 'Current amount: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Number of open High priority "Problem" items exceeded the threshold.'
               tags:
@@ -2835,6 +2839,7 @@ zabbix_export:
               expression: 'min(/GLPI by HTTP/glpi.problem.priority.major,5m)>{$GLPI.PRIORITY.MAJOR.THRESHOLD:"Problem"}'
               name: 'GLPI: Problem: Too many open Major priority items'
               event_name: 'GLPI: Problem: Too many open Major priority items (over {$GLPI.PRIORITY.MAJOR.THRESHOLD:"Problem"} items for 5m)'
+              opdata: 'Current amount: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Number of open Major priority "Problem" items exceeded the threshold.'
               tags:
@@ -2881,6 +2886,7 @@ zabbix_export:
               expression: 'min(/GLPI by HTTP/glpi.problem.priority.very_high,5m)>{$GLPI.PRIORITY.VERY_HIGH.THRESHOLD:"Problem"}'
               name: 'GLPI: Problem: Too many open Very high priority items'
               event_name: 'GLPI: Problem: Too many open Very high priority items (over {$GLPI.PRIORITY.VERY_HIGH.THRESHOLD:"Problem"} items for 5m)'
+              opdata: 'Current amount: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Number of open Very high priority "Problem" items exceeded the threshold.'
               tags:
@@ -3031,7 +3037,7 @@ zabbix_export:
               expression: 'last(/GLPI by HTTP/glpi.service.cas.status)=3'
               name: 'GLPI: Service [cas]: Is in problem state'
               priority: WARNING
-              description: 'Service cas is in a problem state.'
+              description: 'Service CAS is in a problem state.'
               tags:
                 - tag: scope
                   value: availability
@@ -3039,7 +3045,7 @@ zabbix_export:
               expression: 'last(/GLPI by HTTP/glpi.service.cas.status)=2'
               name: 'GLPI: Service [cas]: Is in warning state'
               priority: WARNING
-              description: 'Service cas is in a warning state.'
+              description: 'Service CAS is in a warning state.'
               tags:
                 - tag: scope
                   value: availability
@@ -3131,7 +3137,7 @@ zabbix_export:
               expression: 'last(/GLPI by HTTP/glpi.service.db.status)=3'
               name: 'GLPI: Service [db]: Is in problem state'
               priority: AVERAGE
-              description: 'Service db is in a problem state.'
+              description: 'Service database is in a problem state.'
               tags:
                 - tag: scope
                   value: availability
@@ -3139,7 +3145,7 @@ zabbix_export:
               expression: 'last(/GLPI by HTTP/glpi.service.db.status)=2'
               name: 'GLPI: Service [db]: Is in warning state'
               priority: WARNING
-              description: 'Service db is in a warning state.'
+              description: 'Service database is in a warning state.'
               tags:
                 - tag: scope
                   value: availability
@@ -3231,7 +3237,7 @@ zabbix_export:
               expression: 'last(/GLPI by HTTP/glpi.service.glpi.status)=3'
               name: 'GLPI: Service [glpi]: Is in problem state'
               priority: AVERAGE
-              description: 'Service glpi is in a problem state.'
+              description: 'Service GLPI is in a problem state.'
               tags:
                 - tag: scope
                   value: availability
@@ -3239,7 +3245,7 @@ zabbix_export:
               expression: 'last(/GLPI by HTTP/glpi.service.glpi.status)=2'
               name: 'GLPI: Service [glpi]: Is in warning state'
               priority: WARNING
-              description: 'Service glpi is in a warning state.'
+              description: 'Service GLPI is in a warning state.'
               tags:
                 - tag: scope
                   value: availability
@@ -3281,7 +3287,7 @@ zabbix_export:
               expression: 'last(/GLPI by HTTP/glpi.service.imap.status)=3'
               name: 'GLPI: Service [imap]: Is in problem state'
               priority: WARNING
-              description: 'Service imap is in a problem state.'
+              description: 'Service IMAP is in a problem state.'
               tags:
                 - tag: scope
                   value: availability
@@ -3289,7 +3295,7 @@ zabbix_export:
               expression: 'last(/GLPI by HTTP/glpi.service.imap.status)=2'
               name: 'GLPI: Service [imap]: Is in warning state'
               priority: WARNING
-              description: 'Service imap is in a warning state.'
+              description: 'Service IMAP is in a warning state.'
               tags:
                 - tag: scope
                   value: availability
@@ -3331,7 +3337,7 @@ zabbix_export:
               expression: 'last(/GLPI by HTTP/glpi.service.ldap.status)=3'
               name: 'GLPI: Service [ldap]: Is in problem state'
               priority: WARNING
-              description: 'Service ldap is in a problem state.'
+              description: 'Service LDAP is in a problem state.'
               tags:
                 - tag: scope
                   value: availability
@@ -3339,7 +3345,7 @@ zabbix_export:
               expression: 'last(/GLPI by HTTP/glpi.service.ldap.status)=2'
               name: 'GLPI: Service [ldap]: Is in warning state'
               priority: WARNING
-              description: 'Service ldap is in a warning state.'
+              description: 'Service LDAP is in a warning state.'
               tags:
                 - tag: scope
                   value: availability
@@ -3719,7 +3725,7 @@ zabbix_export:
           name: 'Assistance [Tickets]: Late this month'
           type: DEPENDENT
           key: glpi.ticket.late.month
-          description: 'Number of late "Ticket" items closed during the current month.'
+          description: 'Number of late "Ticket" items during the current month.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -3810,6 +3816,7 @@ zabbix_export:
               expression: 'min(/GLPI by HTTP/glpi.ticket.priority.high,5m)>{$GLPI.PRIORITY.HIGH.THRESHOLD:"Ticket"}'
               name: 'GLPI: Ticket: Too many open High priority items'
               event_name: 'GLPI: Ticket: Too many open High priority items (over {$GLPI.PRIORITY.HIGH.THRESHOLD:"Ticket"} items for 5m)'
+              opdata: 'Current amount: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Number of open High priority "Ticket" items exceeded the threshold.'
               tags:
@@ -3856,6 +3863,7 @@ zabbix_export:
               expression: 'min(/GLPI by HTTP/glpi.ticket.priority.major,5m)>{$GLPI.PRIORITY.MAJOR.THRESHOLD:"Ticket"}'
               name: 'GLPI: Ticket: Too many open Major priority items'
               event_name: 'GLPI: Ticket: Too many open Major priority items (over {$GLPI.PRIORITY.MAJOR.THRESHOLD:"Ticket"} items for 5m)'
+              opdata: 'Current amount: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Number of open Major priority "Ticket" items exceeded the threshold.'
               tags:
@@ -3902,6 +3910,7 @@ zabbix_export:
               expression: 'min(/GLPI by HTTP/glpi.ticket.priority.very_high,5m)>{$GLPI.PRIORITY.VERY_HIGH.THRESHOLD:"Ticket"}'
               name: 'GLPI: Ticket: Too many open Very high priority items'
               event_name: 'GLPI: Ticket: Too many open Very high priority items (over {$GLPI.PRIORITY.VERY_HIGH.THRESHOLD:"Ticket"} items for 5m)'
+              opdata: 'Current amount: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Number of open Very high priority "Ticket" items exceeded the threshold.'
               tags:
@@ -4149,13 +4158,13 @@ zabbix_export:
             description: 'Regex filter for including asset types in discovery. Use to include only specific asset types.'
         - macro: '{$GLPI.ASSET.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Regex filter for excluding asset types from discovery. Use to skip specific asset types.'
+          description: 'Regex filter for excluding asset types from discovery. Use to exclude specific asset types from discovery.'
           config:
             type: TEXT
             priority: '10'
             section_name: Filters
             label: 'Asset type exclude filter'
-            description: 'Regex filter for excluding asset types from discovery. Use to skip specific asset types.'
+            description: 'Regex filter for excluding asset types from discovery. Use to exclude specific asset types from discovery.'
         - macro: '{$GLPI.CLIENT.ID}'
           description: 'OAuth2 client ID used for GLPI API authentication.'
           config:
@@ -4210,13 +4219,13 @@ zabbix_export:
             description: 'Regex filter for including management types in discovery. Use to include only specific management types.'
         - macro: '{$GLPI.MANAGEMENT.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Regex filter for excluding management types from discovery. Use to skip specific management types.'
+          description: 'Regex filter for excluding management types from discovery. Use to exclude specific management types from discovery.'
           config:
             type: TEXT
             priority: '13'
             section_name: Filters
             label: 'Management type exclude filter'
-            description: 'Regex filter for excluding management types from discovery. Use to skip specific management types.'
+            description: 'Regex filter for excluding management types from discovery. Use to exclude specific management types from discovery.'
         - macro: '{$GLPI.PASSWORD}'
           type: SECRET_TEXT
           description: 'Password of the dedicated monitoring user in GLPI.'
