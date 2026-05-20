@@ -403,12 +403,12 @@
 								maintenance_description = '';
 							}
 
-							let hint = `${maintenance_name} [${maintenance_type
+							let hint = `${escapeHtml(maintenance_name)} [${maintenance_type
 								? <?= json_encode(_('Maintenance without data collection')); ?>
 								: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 
 							if (maintenance_description) {
-								hint += `\n${maintenance_description}`;
+								hint += `\n${escapeHtml(maintenance_description)}`;
 							}
 
 							const maintenance_icon = document.createElement('button');
