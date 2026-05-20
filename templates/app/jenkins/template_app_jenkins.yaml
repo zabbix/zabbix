@@ -32,7 +32,7 @@ zabbix_export:
          Create API token for monitoring user according [official documentations](https://www.jenkins.io/doc/book/system-administration/authenticating-scripted-clients/) and change host wizard configuration field `Username`, `Token` and `URL`.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -2060,14 +2060,15 @@ zabbix_export:
           value: jenkins
       macros:
         - macro: '{$JENKINS.API.KEY}'
-          description: 'API key to access Metrics Servlet'
+          description: 'API key to access Metrics Servlet.'
           config:
             type: TEXT
             priority: '2'
             label: 'API key'
-            description: 'API key to access Metrics Servlet'
+            description: 'API key to access Metrics Servlet.'
             required: 'YES'
         - macro: '{$JENKINS.API.TOKEN}'
+          type: SECRET_TEXT
           description: 'API token for HTTP BASIC authentication.'
           config:
             type: TEXT
@@ -2114,12 +2115,12 @@ zabbix_export:
             required: 'YES'
         - macro: '{$JENKINS.USER}'
           value: zabbix
-          description: 'Username for HTTP BASIC authentication'
+          description: 'Username for HTTP BASIC authentication.'
           config:
             type: TEXT
             priority: '3'
             label: Username
-            description: 'Username for HTTP BASIC authentication'
+            description: 'Username for HTTP BASIC authentication.'
             required: 'YES'
       valuemaps:
         - uuid: d1b719ea85464279bd473fcdb34008da
