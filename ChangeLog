@@ -1,6 +1,8 @@
 Changes for 8.0.0beta1
 
 New features:
+..F....... [ZBXNEXT-9745] introduced inline form validation for Script form (msnihach)
+A.F....... [ZBXNEXT-10243] introduced new ZBX_FEATURE_FLAGS variable to disable access to modules, media types and HTTP authentication at the system level (kkuzmina)
 ..F....... [ZBXNEXT-6779] added csv export for audit log records (kastafjevs)
 .........T [ZBXNEXT-10349] added Kubernetes Cluster by HTTP template (egordymov)
 ..F.I..... [ZBXNEXT-10468] added default value for Allowed hosts of Trapper items, added new global macro {$TRAPPER.ALLOWED_HOSTS} (msnihach, MVekslers)
@@ -40,6 +42,12 @@ A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25
 A...I..PS. [ZBXNEXT-10076] changed delayed deletion process via housekeeper table (agriscenko, askolmeisters)
 
 Bug fixes:
+..F....... [ZBX-27443] fixed widget add/edit pop-up appearing under the main menu after dragging it (aluchko)
+..F....... [ZBX-27708] fixed error displayed instead of graph for graphs with maximum height (kastafjevs)
+..F....... [ZBX-25774] fixed thresholds colors not showing in "Top items" widget for "As is" numeric value (isharha)
+..F....... [ZBX-27655] fixed filtering by type nested in discovery rules list (uolekss)
+..F....... [ZBX-27683] fixed inherited tags being shown under tags after fast switching (kastafjevs)
+..F....... [ZBX-25509] fixed z-select re-rendering after sorting (dpankins)
 ..F....... [ZBX-26678] fixed action log widget not displaying results with all statuses unset (agriscenko)
 ..F....... [ZBX-27210] fixed the infinite loading on widgets after removing maps from Map Navigation Tree widget (aluchko)
 ..F....... [ZBX-27740] added strict mode to in_array() to prevent incorrect matches during inline validation of existing values (msnihach)
@@ -327,6 +335,11 @@ Changes for 7.4.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-27443] fixed widget add/edit pop-up appearing under the main menu after dragging it (aluchko)
+..F....... [ZBX-27708] fixed error displayed instead of graph for graphs with maximum height (kastafjevs)
+..F....... [ZBX-25774] fixed thresholds colors not showing in "Top items" widget for "As is" numeric value (isharha)
+..F....... [ZBX-27655] fixed filtering by type nested in discovery rules list (uolekss)
+..F....... [ZBX-25509] fixed z-select re-rendering after sorting (dpankins)
 ..F....... [ZBX-26678] fixed action log widget not displaying results with all statuses unset (agriscenko)
 ..F....... [ZBX-27210] fixed the infinite loading on widgets after removing maps from Map Navigation Tree widget (aluchko)
 ..F....... [ZBX-27740] added strict mode to in_array() to prevent incorrect matches during inline validation of existing values (msnihach)
@@ -1758,6 +1771,9 @@ Changes for 7.0.27rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-27708] fixed error displayed instead of graph for graphs with maximum height (kastafjevs)
+..F....... [ZBX-27304] fixed missing gap between tag badges when widget overlay dialog is open (isharha)
+..F....... [ZBX-25509] fixed z-select re-rendering after sorting (dpankins)
 ..F....... [ZBX-27210] fixed the infinite loading on widgets after removing maps from Map Navigation Tree widget (aluchko)
 .........T [ZBX-27694] updated dependent item key from 'vm.memory.utilization' to 'vm.memory.util' in 'Linux by Zabbix agent' active and passive templates (smansurovs)
 .......P.. [ZBX-27399] fixed possible deadlocks in configuration cache sync (sboidenko)
