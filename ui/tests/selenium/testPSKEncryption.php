@@ -705,7 +705,7 @@ class testPSKEncryption extends CWebTest {
 					? ($data['object'] === 'host' ? self::UPDATE_SAME_HOST : self::UPDATE_SAME_PROXY)
 					: ($data['object'] === 'host' ? self::HOST_NAME : self::PROXY_NAME);
 
-				$this->query('link', $object)->waitUntilClickable()->one()->click();
+				$this->query('link', $object)->waitUntilClickable()->one()->scrollIntoView(50)->click();
 			}
 			else {
 				$this->query('button', 'Create '.$data['object'])->waitUntilClickable()->one()->click();
@@ -910,7 +910,7 @@ class testPSKEncryption extends CWebTest {
 		}
 
 		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
+		$table = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
 		$table->findRows('Name', $data['hosts'])->select();
 
 		// Open mass update form.
