@@ -456,7 +456,9 @@ class CControllerProblemViewData extends CControllerDataTable {
 			}
 
 			if (array_column($problem['suppression_data'], 'userid')) {
-				$actions_performed[] = _('Manually suppressed');
+				$actions_performed[] = array_column($problem['suppression_data'], 'maintenanceid')
+					? _('Suppressed by maintenance')
+					: _('Manually suppressed');
 			}
 			elseif ($data['actions']['suppressions'][$problem['eventid']]['count'] > 0) {
 				$actions_performed[] = _('Manually unsuppressed');
