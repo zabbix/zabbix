@@ -35,6 +35,7 @@ A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25
 Bug fixes:
 ...G...... [ZBX-25805] fixed regexp runtime error when processing log* items with unspecified encoding by sanitizing invalid UTF-8 (vsmelovs)
 ...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
+..F....... [ZBX-27819] updated onelogin/php-saml to version 4.3.1 (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.44
