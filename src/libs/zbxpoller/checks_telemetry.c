@@ -202,10 +202,7 @@ static int get_values_telemetry_sql_lib(const zbx_dc_item_t *item, zbx_tq_db_typ
 	if (ZBX_TQ_DB_TYPE_POSTGRESQL == db_type)
 		zbx_tq_sql_generate_postgresql(item->telemetry_query, now, lasttimestamp, &sql);
 	else
-	{
-		*error = zbx_strdup(NULL, "UNIMPLEMENTED");
-		return FAIL;
-	}
+		zbx_tq_sql_generate_mysql(item->telemetry_query, now, lasttimestamp, &sql);
 
 	/* FIXME: retrying until db is up is probably unwanted, at least if the db is not the same as config db */
 	sql_result = zbx_db_select("%s", sql);
@@ -266,6 +263,9 @@ int	get_value_telemetry(const zbx_dc_item_t *item, const char *config_source_ip,
 		error = NULL;
 		return NOTSUPPORTED;
 	}
+
+	for (int i = 0; i < values.values_num; i++)
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): row #%d: '%s'", __func__, i + 1, values.values[i]);
 
 	if (0 != values.values_num)
 	{

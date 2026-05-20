@@ -43,7 +43,11 @@ int	zbx_tq_parse_sql_result(const zbx_tq_query_t *query, zbx_db_result_t result,
 
 		/* timestamp */
 		if (SUCCEED != zbx_is_uint64(row[col_idx], &timestamp))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot parse timestamp from row #%d: \"%s\"", row_id,
+					row[col_idx]);
 			goto out;
+		}
 
 		zbx_json_adduint64(&j, "timestamp", timestamp);
 		col_idx++;
