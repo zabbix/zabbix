@@ -44,44 +44,50 @@ $html_page = (new CHtmlPage())
 		->setAttribute('aria-label', _('Content controls'))
 	);
 
-if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-	$filter = (new CTabFilter())
-		->setId('monitoring_hosts_filter')
-		->setOptions($data['tabfilter_options'])
-		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
+$filter = (new CTabFilter())
+	->setId('monitoring_hosts_filter')
+	->setOptions($data['tabfilter_options'])
+	->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
-	foreach ($data['filter_tabs'] as $tab) {
-		$tab['tab_view'] = $data['filter_view'];
-		$filter->addTemplatedTab($tab['filter_name'], $tab);
-	}
+if ($web_layout_mode == ZBX_LAYOUT_KIOSKMODE) {
+	$filter->setAttribute('hidden', '');
+}
 
-	// Set javascript options for tab filter initialization in monitoring.host.view.js.php file.
-	$data['filter_options'] = $filter->options;
-	$html_page->addItem($filter);
+foreach ($data['filter_tabs'] as $tab) {
+	$tab['tab_view'] = $data['filter_view'];
+	$filter->addTemplatedTab($tab['filter_name'], $tab);
 }
-else {
-	$data['filter_options'] = null;
-}
+
+// Set javascript options for tab filter initialization in monitoring.host.view.js.php file.
+$data['filter_options'] = $filter->options;
+
+$csrf_token = CCsrfTokenHelper::get('host');
 
 $html_page
+	->addItem($filter)
 	->addItem(
 		(new CForm())
 			->setName('host_view')
-			->addClass('is-loading')
-	);
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	$html_page->addItem((new CPre())->addClass(ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH));
-}
-
-$html_page->show();
+			->addItem((new CDataTable())->setId('hosts'))
+	)
+	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
+		'applied_filter_groupids' => $data['filter_groupids'],
+		'csrf_token' => $csrf_token,
+		'default_sort_field' => $data['default_sort_field'],
+		'default_sort_order' => $data['default_sort_order'],
+		'filter' => $data['filter'],
+		'filter_defaults' => $data['filter_defaults'],
 		'filter_options' => $data['filter_options'],
-		'refresh_url' => $data['refresh_url'],
+		'layout_mode' => $web_layout_mode,
+		'page' => $data['tabfilter_options']['page'],
 		'refresh_interval' => $data['refresh_interval'],
-		'applied_filter_groupids' => $data['filter_groupids']
+		'sort_field' => $data['sort_field'],
+		'sort_order' => $data['sort_order'],
+		'storage_idx' => $data['storage_idx'],
+		'user_configs' => $data['user_configs']
 	]).');
 '))
 	->setOnDocumentReady()
