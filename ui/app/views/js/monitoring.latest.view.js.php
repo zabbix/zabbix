@@ -259,12 +259,12 @@
 						maintenance_icon.setAttribute('role', 'button');
 
 						if (host.maintenance_status == HOST_MAINTENANCE_STATUS_ON) {
-							let hint = `${maintenance.name} [${maintenance.type
+							let hint = `${escapeHtml(maintenance.name)} [${maintenance.type
 								? <?= json_encode(_('Maintenance without data collection')); ?>
 								: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 
 							if (maintenance.description != '') {
-								hint += "\n" + maintenance.description;
+								hint += "\n" + escapeHtml(maintenance.description);
 							}
 
 							maintenance_icon.setAttribute('data-hintbox-html', hint);
