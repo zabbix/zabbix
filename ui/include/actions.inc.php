@@ -1657,7 +1657,8 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButtonIc
 		$suppression['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 
 		if (array_key_exists('suppress_until', $suppression)) {
-			$icon = (new CIcon(ZBX_ICON_EYE_OFF))->setAttribute('aria-label', _('Manually suppressed'));
+			$icon = (new CIcon(ZBX_ICON_EYE_OFF, _('Manually suppressed')))
+				->setAttribute('aria-label', _('Manually suppressed'));
 
 			if ($suppression['suppress_until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
 				$suppress_until = _s('Indefinitely');
@@ -1670,7 +1671,8 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButtonIc
 			}
 		}
 		else {
-			$icon = (new CIcon(ZBX_ICON_EYE))->setAttribute('aria-label', _('Manually unsuppressed'));
+			$icon = (new CIcon(ZBX_ICON_EYE, _('Manually unsuppressed')))
+				->setAttribute('aria-label', _('Manually unsuppressed'));
 			$suppress_until = '';
 		}
 
@@ -2195,7 +2197,7 @@ function makeActionTableIcon(array $action, array $maintenances): ?CTag {
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
-				$action_icons[] = (new CIcon(ZBX_ICON_EYE))
+				$action_icons[] = (new CIcon(ZBX_ICON_EYE, _('Manually unsuppressed')))
 					->setAttribute('aria-label', _('Manually unsuppressed'))
 					->setAttribute('tabindex', 0);
 			}
