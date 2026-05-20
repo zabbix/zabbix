@@ -235,24 +235,24 @@ Context macros can be defined in the *Macros* section of the host and will overr
 |GLPI: Assistance [Problems]: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/GLPI by HTTP/glpi.assistance.problem.errors))>0`|Average|**Depends on**:<br><ul><li>GLPI: Service: There are errors in requests to API</li></ul>|
 |GLPI: Assistance [Tickets]: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/GLPI by HTTP/glpi.assistance.ticket.errors))>0`|Average|**Depends on**:<br><ul><li>GLPI: Service: There are errors in requests to API</li></ul>|
 |GLPI: Management: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/GLPI by HTTP/glpi.management.errors))>0`|Average|**Depends on**:<br><ul><li>GLPI: Service: There are errors in requests to API</li></ul>|
-|GLPI: Service [glpi]: Is in problem state|<p>Service GLPI is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.glpi.status)=3`|Average||
-|GLPI: Service [glpi]: Is in warning state|<p>Service GLPI is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.glpi.status)=2`|Warning||
-|GLPI: Service [db]: Is in problem state|<p>Service database is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.db.status)=3`|Average||
-|GLPI: Service [db]: Is in warning state|<p>Service database is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.db.status)=2`|Warning||
-|GLPI: Service [cas]: Is in problem state|<p>Service CAS is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.cas.status)=3`|Warning||
-|GLPI: Service [cas]: Is in warning state|<p>Service CAS is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.cas.status)=2`|Warning||
-|GLPI: Service [ldap]: Is in problem state|<p>Service LDAP is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.ldap.status)=3`|Warning||
-|GLPI: Service [ldap]: Is in warning state|<p>Service LDAP is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.ldap.status)=2`|Warning||
-|GLPI: Service [imap]: Is in problem state|<p>Service IMAP is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.imap.status)=3`|Warning||
-|GLPI: Service [imap]: Is in warning state|<p>Service IMAP is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.imap.status)=2`|Warning||
-|GLPI: Service [mail collectors]: Is in problem state|<p>The mail collectors service is in problem state.</p>|`last(/GLPI by HTTP/glpi.service.mail_collectors.status)=3`|Warning||
-|GLPI: Service [mail collectors]: Is in warning state|<p>The mail collectors service is in warning state.</p>|`last(/GLPI by HTTP/glpi.service.mail_collectors.status)=2`|Warning||
-|GLPI: Service [crontasks]: Is in problem state|<p>Service crontasks is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.crontasks.status)=3`|Warning||
-|GLPI: Service [crontasks]: Is in warning state|<p>Service crontasks is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.crontasks.status)=2`|Warning||
-|GLPI: Service [filesystem]: Is in problem state|<p>Service filesystem is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.filesystem.status)=3`|Average||
-|GLPI: Service [filesystem]: Is in warning state|<p>Service filesystem is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.filesystem.status)=2`|Warning||
-|GLPI: Service [plugins]: Is in problem state|<p>Service plugins is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.plugins.status)=3`|Warning||
-|GLPI: Service [plugins]: Is in warning state|<p>Service plugins is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.plugins.status)=2`|Warning||
+|GLPI: Service [glpi]: Is in a problem state|<p>Service GLPI is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.glpi.status)=3`|Average||
+|GLPI: Service [glpi]: Is in a warning state|<p>Service GLPI is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.glpi.status)=2`|Warning||
+|GLPI: Service [db]: Is in a problem state|<p>Service database is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.db.status)=3`|Average||
+|GLPI: Service [db]: Is in a warning state|<p>Service database is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.db.status)=2`|Warning||
+|GLPI: Service [cas]: Is in a problem state|<p>Service CAS is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.cas.status)=3`|Warning||
+|GLPI: Service [cas]: Is in a warning state|<p>Service CAS is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.cas.status)=2`|Warning||
+|GLPI: Service [ldap]: Is in a problem state|<p>Service LDAP is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.ldap.status)=3`|Warning||
+|GLPI: Service [ldap]: Is in a warning state|<p>Service LDAP is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.ldap.status)=2`|Warning||
+|GLPI: Service [imap]: Is in a problem state|<p>Service IMAP is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.imap.status)=3`|Warning||
+|GLPI: Service [imap]: Is in a warning state|<p>Service IMAP is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.imap.status)=2`|Warning||
+|GLPI: Service [mail collectors]: Is in a problem state|<p>The mail collectors service is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.mail_collectors.status)=3`|Warning||
+|GLPI: Service [mail collectors]: Is in a warning state|<p>The mail collectors service is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.mail_collectors.status)=2`|Warning||
+|GLPI: Service [crontasks]: Is in a problem state|<p>Service crontasks is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.crontasks.status)=3`|Warning||
+|GLPI: Service [crontasks]: Is in a warning state|<p>Service crontasks is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.crontasks.status)=2`|Warning||
+|GLPI: Service [filesystem]: Is in a problem state|<p>Service filesystem is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.filesystem.status)=3`|Average||
+|GLPI: Service [filesystem]: Is in a warning state|<p>Service filesystem is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.filesystem.status)=2`|Warning||
+|GLPI: Service [plugins]: Is in a problem state|<p>Service plugins is in a problem state.</p>|`last(/GLPI by HTTP/glpi.service.plugins.status)=3`|Warning||
+|GLPI: Service [plugins]: Is in a warning state|<p>Service plugins is in a warning state.</p>|`last(/GLPI by HTTP/glpi.service.plugins.status)=2`|Warning||
 |GLPI: Change: Average solve time is high|<p>Change average solve time this month exceeded the warning threshold.</p>|`min(/GLPI by HTTP/glpi.change.solve.time.month,1h)>{$GLPI.SOLVE_TIME.WARN:"Change"}*60`|Warning|**Manual close**: Yes|
 |GLPI: Change: Workload is too high|<p>Change workload is too high.</p>|`min(/GLPI by HTTP/glpi.assistance.change.open,5m)>{$GLPI.WORKLOAD.CRIT:"Change"}`|Average||
 |GLPI: Change: Workload is high|<p>Change workload is high.</p>|`min(/GLPI by HTTP/glpi.assistance.change.open,5m)>{$GLPI.WORKLOAD.WARN:"Change"}`|Warning|**Depends on**:<br><ul><li>GLPI: Change: Workload is too high</li></ul>|

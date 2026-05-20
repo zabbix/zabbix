@@ -3035,7 +3035,7 @@ zabbix_export:
           triggers:
             - uuid: 4fba08be50f342ec96c8bfd535704d97
               expression: 'last(/GLPI by HTTP/glpi.service.cas.status)=3'
-              name: 'GLPI: Service [cas]: Is in problem state'
+              name: 'GLPI: Service [cas]: Is in a problem state'
               priority: WARNING
               description: 'Service CAS is in a problem state.'
               tags:
@@ -3043,7 +3043,7 @@ zabbix_export:
                   value: availability
             - uuid: c11dacd9e7b34dcaa92089ee823f9235
               expression: 'last(/GLPI by HTTP/glpi.service.cas.status)=2'
-              name: 'GLPI: Service [cas]: Is in warning state'
+              name: 'GLPI: Service [cas]: Is in a warning state'
               priority: WARNING
               description: 'Service CAS is in a warning state.'
               tags:
@@ -3085,7 +3085,7 @@ zabbix_export:
           triggers:
             - uuid: 983a347b8aad4b88a0675b703786976b
               expression: 'last(/GLPI by HTTP/glpi.service.crontasks.status)=3'
-              name: 'GLPI: Service [crontasks]: Is in problem state'
+              name: 'GLPI: Service [crontasks]: Is in a problem state'
               priority: WARNING
               description: 'Service crontasks is in a problem state.'
               tags:
@@ -3093,7 +3093,7 @@ zabbix_export:
                   value: availability
             - uuid: a7cf730b7bc24ce6912d04d76e54207a
               expression: 'last(/GLPI by HTTP/glpi.service.crontasks.status)=2'
-              name: 'GLPI: Service [crontasks]: Is in warning state'
+              name: 'GLPI: Service [crontasks]: Is in a warning state'
               priority: WARNING
               description: 'Service crontasks is in a warning state.'
               tags:
@@ -3135,7 +3135,7 @@ zabbix_export:
           triggers:
             - uuid: 919ab26e7db244a2b2fcb007763d4c8a
               expression: 'last(/GLPI by HTTP/glpi.service.db.status)=3'
-              name: 'GLPI: Service [db]: Is in problem state'
+              name: 'GLPI: Service [db]: Is in a problem state'
               priority: AVERAGE
               description: 'Service database is in a problem state.'
               tags:
@@ -3143,7 +3143,7 @@ zabbix_export:
                   value: availability
             - uuid: 16c84884729641c499ea4476c2a2193e
               expression: 'last(/GLPI by HTTP/glpi.service.db.status)=2'
-              name: 'GLPI: Service [db]: Is in warning state'
+              name: 'GLPI: Service [db]: Is in a warning state'
               priority: WARNING
               description: 'Service database is in a warning state.'
               tags:
@@ -3185,7 +3185,7 @@ zabbix_export:
           triggers:
             - uuid: e0f5553d55514f2799482fb84ba7704c
               expression: 'last(/GLPI by HTTP/glpi.service.filesystem.status)=3'
-              name: 'GLPI: Service [filesystem]: Is in problem state'
+              name: 'GLPI: Service [filesystem]: Is in a problem state'
               priority: AVERAGE
               description: 'Service filesystem is in a problem state.'
               tags:
@@ -3193,7 +3193,7 @@ zabbix_export:
                   value: availability
             - uuid: 80698f25503b4a0d89f60a9b58399321
               expression: 'last(/GLPI by HTTP/glpi.service.filesystem.status)=2'
-              name: 'GLPI: Service [filesystem]: Is in warning state'
+              name: 'GLPI: Service [filesystem]: Is in a warning state'
               priority: WARNING
               description: 'Service filesystem is in a warning state.'
               tags:
@@ -3235,7 +3235,7 @@ zabbix_export:
           triggers:
             - uuid: c0c94730bfd94671a36a5c123ecb6aa1
               expression: 'last(/GLPI by HTTP/glpi.service.glpi.status)=3'
-              name: 'GLPI: Service [glpi]: Is in problem state'
+              name: 'GLPI: Service [glpi]: Is in a problem state'
               priority: AVERAGE
               description: 'Service GLPI is in a problem state.'
               tags:
@@ -3243,7 +3243,7 @@ zabbix_export:
                   value: availability
             - uuid: 97f74fabfe384d1dbd38c73739023739
               expression: 'last(/GLPI by HTTP/glpi.service.glpi.status)=2'
-              name: 'GLPI: Service [glpi]: Is in warning state'
+              name: 'GLPI: Service [glpi]: Is in a warning state'
               priority: WARNING
               description: 'Service GLPI is in a warning state.'
               tags:
@@ -3285,7 +3285,7 @@ zabbix_export:
           triggers:
             - uuid: 0dabe9cb06a44f8e95556718744e27af
               expression: 'last(/GLPI by HTTP/glpi.service.imap.status)=3'
-              name: 'GLPI: Service [imap]: Is in problem state'
+              name: 'GLPI: Service [imap]: Is in a problem state'
               priority: WARNING
               description: 'Service IMAP is in a problem state.'
               tags:
@@ -3293,7 +3293,7 @@ zabbix_export:
                   value: availability
             - uuid: 96f347dd53bf4588842f3efe351efed0
               expression: 'last(/GLPI by HTTP/glpi.service.imap.status)=2'
-              name: 'GLPI: Service [imap]: Is in warning state'
+              name: 'GLPI: Service [imap]: Is in a warning state'
               priority: WARNING
               description: 'Service IMAP is in a warning state.'
               tags:
@@ -3335,7 +3335,7 @@ zabbix_export:
           triggers:
             - uuid: a6fe599f51fc40a285db570d5bf25012
               expression: 'last(/GLPI by HTTP/glpi.service.ldap.status)=3'
-              name: 'GLPI: Service [ldap]: Is in problem state'
+              name: 'GLPI: Service [ldap]: Is in a problem state'
               priority: WARNING
               description: 'Service LDAP is in a problem state.'
               tags:
@@ -3343,7 +3343,7 @@ zabbix_export:
                   value: availability
             - uuid: f6b04911d5d04e228ca5918c6fb56728
               expression: 'last(/GLPI by HTTP/glpi.service.ldap.status)=2'
-              name: 'GLPI: Service [ldap]: Is in warning state'
+              name: 'GLPI: Service [ldap]: Is in a warning state'
               priority: WARNING
               description: 'Service LDAP is in a warning state.'
               tags:
@@ -3385,17 +3385,17 @@ zabbix_export:
           triggers:
             - uuid: e910b1a448a2458695425890428279a9
               expression: 'last(/GLPI by HTTP/glpi.service.mail_collectors.status)=3'
-              name: 'GLPI: Service [mail collectors]: Is in problem state'
+              name: 'GLPI: Service [mail collectors]: Is in a problem state'
               priority: WARNING
-              description: 'The mail collectors service is in problem state.'
+              description: 'The mail collectors service is in a problem state.'
               tags:
                 - tag: scope
                   value: availability
             - uuid: d19c7ccdde614f1285e02c2d9beb5305
               expression: 'last(/GLPI by HTTP/glpi.service.mail_collectors.status)=2'
-              name: 'GLPI: Service [mail collectors]: Is in warning state'
+              name: 'GLPI: Service [mail collectors]: Is in a warning state'
               priority: WARNING
-              description: 'The mail collectors service is in warning state.'
+              description: 'The mail collectors service is in a warning state.'
               tags:
                 - tag: scope
                   value: availability
@@ -3435,7 +3435,7 @@ zabbix_export:
           triggers:
             - uuid: 5a29270f9ed94e3885c1eb0fcd4f5383
               expression: 'last(/GLPI by HTTP/glpi.service.plugins.status)=3'
-              name: 'GLPI: Service [plugins]: Is in problem state'
+              name: 'GLPI: Service [plugins]: Is in a problem state'
               priority: WARNING
               description: 'Service plugins is in a problem state.'
               tags:
@@ -3443,7 +3443,7 @@ zabbix_export:
                   value: availability
             - uuid: 632bfbe2edd349c7835929415ea537c9
               expression: 'last(/GLPI by HTTP/glpi.service.plugins.status)=2'
-              name: 'GLPI: Service [plugins]: Is in warning state'
+              name: 'GLPI: Service [plugins]: Is in a warning state'
               priority: WARNING
               description: 'Service plugins is in a warning state.'
               tags:
