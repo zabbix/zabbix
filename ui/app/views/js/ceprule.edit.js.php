@@ -281,7 +281,22 @@ window.ceprule_edit_popup = new class {
 			const class_list = e.target.classList;
 
 			if (class_list.contains('js-submit')) {
-				this.#submit();
+				if (class_list.contains('js-submit-force')) {
+					const $target = jQuery(e.target);
+					const item = {
+						label: <?= json_encode(_('Force update')) ?>,
+						clickCallback: () => this.#submit(true)
+					};
+					const options = {
+						position: {at: 'left bottom', my: 'left top', of: $target},
+						closeCallback: () => { $target.focus(); }
+					};
+
+					$target.menuPopup([{items: [item]}], jQuery(e), options);
+				}
+				else {
+					this.#submit(false);
+				}
 			}
 			else if (class_list.contains('js-delete')) {
 				console.log('TODO: js-delete');
@@ -390,7 +405,7 @@ window.ceprule_edit_popup = new class {
 		this.#overlay.setProperties({title, buttons});
 	}
 
-	#submit() {
+	#submit(force_sumbit) {
 		// clearMessages();
 		const fields = this.form.getAllValues();
 
