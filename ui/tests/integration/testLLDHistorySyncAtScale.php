@@ -552,7 +552,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 */
 	public function testLLDHistorySyncAtScale_TriggerUnknown() {
 		$tm = time();
-		$this->sendHistoryAt($tm, 'item is not supported', ITEM_STATE_NOTSUPPORTED);
+		$this->sendHistoryAt($tm, null, ITEM_STATE_NOTSUPPORTED);
 
 		// Verify all discovered triggers became unknown (state = UNKNOWN).
 		$this->callUntilDataIsPresent('trigger.get', [
@@ -716,7 +716,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 
 		$tm = time();
 
-		$this->sendHistoryAt($tm, 'item is not supported', ITEM_STATE_NOTSUPPORTED);
+		$this->sendHistoryAt($tm, null, ITEM_STATE_NOTSUPPORTED);
 		$last_resend = time();
 
 		$this->callUntilCountIsPresent('item.get', [
@@ -727,7 +727,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			$this->sendAgentPing();
 
 			if (time() - $last_resend >= 10) {
-				$this->sendHistoryAt(time(), 'item is not supported', ITEM_STATE_NOTSUPPORTED);
+				$this->sendHistoryAt(time(), null, ITEM_STATE_NOTSUPPORTED);
 				$last_resend = time();
 			}
 
@@ -740,7 +740,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			'output' => ['triggerid', 'value', 'state']
 		], 120, self::WAIT_ITERATION_DELAY, function ($r) use (&$last_resend) {
 			if (time() - $last_resend >= 10) {
-				$this->sendHistoryAt(time(), 'item is not supported', ITEM_STATE_NOTSUPPORTED);
+				$this->sendHistoryAt(time(), null, ITEM_STATE_NOTSUPPORTED);
 				$last_resend = time();
 			}
 
