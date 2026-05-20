@@ -31,7 +31,7 @@ echo (new CObject())
 		->setModern(true)
 	))
 
-	->addItem(new CLabel(_('Duration'), 'ceprule-window-duration'))
+	->addItem((new CLabel(_('Duration'), 'ceprule-window-duration'))->setAsteriskMark())
 	->addItem(new CFormField(new CTextBox('window[duration]', $data['window']['duration'])
 			->setId('ceprule-window-duration')
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)

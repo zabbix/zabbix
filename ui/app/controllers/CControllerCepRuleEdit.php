@@ -27,12 +27,10 @@ class CControllerCepRuleEdit extends CController {
 			return false;
 		}
 
-		if ($this->hasInput('cepruleid')) {
-			$this->ceprule = self::fetchCepRule($this->getInput('cepruleid'));
+		$this->ceprule = self::fetchCepRule($this->getInput('cepruleid', null));
 
-			if (!$this->ceprule) {
-				return false;
-			}
+		if (!$this->ceprule) {
+			return false;
 		}
 
 		return $this->getUserType() >= USER_TYPE_SUPER_ADMIN;
@@ -81,16 +79,31 @@ class CControllerCepRuleEdit extends CController {
 		$this->setResponse($response);
 	}
 
-	protected static function fetchCepRule(string $cepruleid): array {
-		$ceprules = API::CepRule()->get([
-			'cep_ruleids' => $cepruleid,
-			'output' => ['cep_ruleid', 'name', 'description', 'window_type', 'status', 'stop', 'sortorder'],
-			'selectOperations' => ['step', 'execute_when', 'event_type', 'eviction_cause', 'type', 'evaltype',
-				'event_name', 'tag', 'new_tag', 'tag_value', 'severity', 'tags'],
-			'selectFilter' => ['formula', 'evaltype', 'conditions'],
-			'selectWindow' => ['duration', 'capacity', 'script', 'group_by_host_group', 'group_by_host', 'group_by_tag',
-				'filter', 'event_count_tag', 'tag']
-		]);
+	protected static function fetchCepRule(?string $cepruleid): array {
+		if ($cepruleid !== null) {
+			$ceprules = API::CepRule()->get([
+				'cep_ruleids' => $cepruleid,
+				'output' => ['cep_ruleid', 'name', 'description', 'window_type', 'status', 'stop', 'sortorder'],
+				'selectOperations' => ['step', 'execute_when', 'event_type', 'eviction_cause', 'type', 'evaltype',
+					'event_name', 'tag', 'new_tag', 'tag_value', 'severity', 'tags'],
+				'selectFilter' => ['formula', 'evaltype', 'conditions'],
+				'selectWindow' => ['duration', 'capacity', 'script', 'group_by_host_group', 'group_by_host', 'group_by_tag',
+					'filter', 'event_count_tag', 'tag']
+			]);
+		}
+		else {
+			$ceprules = [DB::getDefaults('cep_rule') + [
+				'filter' => [
+					'formula' => DB::getDefault('cep_rule', 'formula'),
+					'evaltype' => DB::getDefault('cep_rule', 'evaltype'),
+					'conditions' => []
+				],
+				'window' => DB::getDefaults('cep_window') + [
+					'filter' => ['conditions' => []]
+				],
+				'operations' => []
+			]];
+		}
 
 		if (!$ceprules) {
 			return [];
@@ -101,6 +114,14 @@ class CControllerCepRuleEdit extends CController {
 		// Unlimited capacity's default value is "0".
 		if ($ceprule['window']['capacity'] == 0) {
 			$ceprule['window']['capacity'] = '';
+		}
+
+		if ($ceprule['sortorder'] == 0) {
+			$ceprule['sortorder'] = '';
+		}
+
+		if ($ceprule['window']['duration'] == 0) {
+			$ceprule['window']['duration'] = '';
 		}
 
 		return $ceprule;
