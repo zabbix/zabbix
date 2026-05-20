@@ -883,6 +883,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 
 		$tm = time();
 		$this->sendHistoryAt($tm);
+		$this->waitUntilTriggersRecovered();
 
 		$unknown_after = $this->getUnknownTriggerEventCount();
 		$this->assertEquals($unknown_before, $unknown_after,
@@ -890,7 +891,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Wait long enough for nodata triggers to fire (30s window) and verify they
+	 * Wait long enough for nodata triggers to fire (45s window) and verify they
 	 * stay suppressed — neither value = PROBLEM nor state = UNKNOWN.
 	 *
 	 * @depends testLLDHistorySyncAtScale_TriggerNoDataRecoveryAfterRestart
