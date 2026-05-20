@@ -1723,7 +1723,7 @@ class CHistoryManager {
 			}
 		}
 
-		return false;
+		return true;
 	}
 
 	/**
