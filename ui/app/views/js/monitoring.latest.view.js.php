@@ -42,7 +42,6 @@
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
 			this.checkbox_object = checkbox_object;
-			this.filter_set = filter_set;
 			this.layout_mode = layout_mode;
 
 			const url = new Curl('zabbix.php');
@@ -53,11 +52,7 @@
 			this.initExpandableSubfilter();
 			this.initListActions();
 			this.initItemFormEvents(this.getCurrentForm().get(0));
-
-			if (this.refresh_interval != 0 && this.filter_set) {
-				this.running = true;
-				this.scheduleRefresh();
-			}
+			this.scheduleRefresh();
 		},
 
 		initTabFilter(filter_options) {
@@ -348,10 +343,6 @@
 			this._removeRefreshMessage();
 			this.doRefresh(response.body, response.subfilter ? response.subfilter : null);
 
-			if ('filter_set' in response) {
-				this.filter_set = response.filter_set;
-			}
-
 			if ('messages' in response) {
 				this._addRefreshMessage(response.messages);
 			}
@@ -382,11 +373,7 @@
 		},
 
 		onDataAlways() {
-			this.running = this.refresh_interval != 0 && this.filter_set;
-
-			if (this.running) {
-				this.scheduleRefresh();
-			}
+			this.scheduleRefresh();
 		},
 
 		scheduleRefresh() {
