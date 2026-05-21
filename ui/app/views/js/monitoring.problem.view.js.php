@@ -794,10 +794,6 @@
 			btn.disabled = false;
 		}
 
-		getCurrentDebugBlock() {
-			return document.querySelector('.wrapper > .debug-output');
-		}
-
 		#addRefreshMessage(messages) {
 			this.#removeRefreshMessage();
 

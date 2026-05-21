@@ -58,11 +58,6 @@ class CDataTableColumn {
 	#defaults = null;
 
 	/**
-	 * @type {number|null}
-	 */
-	#duplicate_column_index = null;
-
-	/**
 	 * @type {string}
 	 */
 	#renderer = CDataTableColumn.RENDERER_HTML;
@@ -279,23 +274,6 @@ class CDataTableColumn {
 	 */
 	setDefaults(defaults) {
 		this.#defaults = defaults;
-
-		return this;
-	}
-
-	/**
-	 * @returns {number|null}
-	 */
-	getDuplicateColumnIndex() {
-		return this.#duplicate_column_index;
-	}
-
-	/**
-	 * @param {number|null} duplicate_column_index
-	 * @returns {CDataTableColumn}
-	 */
-	setDuplicateColumnIndex(duplicate_column_index) {
-		this.#duplicate_column_index = duplicate_column_index;
 
 		return this;
 	}
@@ -694,7 +672,6 @@ class CDataTableColumn {
 			column_options: this.#column_options,
 			options_popup_handler: this.#options_popup_handler,
 			options_popup_handle_icon: this.#options_popup_handle_icon,
-			duplicate_column_index: this.#duplicate_column_index,
 			duplicate: this.#duplicate,
 			duplicatable: this.#duplicatable,
 			fields: this.#fields,
