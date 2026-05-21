@@ -1315,8 +1315,9 @@ class CDataTable {
 	}
 
 	onInit(e) {
-		const {loading, check_changes, force_load, reset} = {
+		const {loading, loading_fadein, check_changes, force_load, reset} = {
 			loading: true,
+			loading_fadein: false,
 			check_changes: true,
 			force_load: false,
 			reset: false,
@@ -1326,7 +1327,7 @@ class CDataTable {
 		if (loading) {
 			this.#element.classList.add(ZBX_STYLE_LOADING);
 
-			if (this.#initialized) {
+			if (loading_fadein) {
 				this.#element.classList.add(ZBX_STYLE_LOADING_FADEIN);
 			}
 		}

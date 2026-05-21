@@ -677,7 +677,7 @@
 				}
 
 				this.#scheduleRefresh();
-				this.#refresh(tabfilter_changed);
+				this.#refresh({tabfilter_changed});
 			});
 
 			$.subscribe('timeselector.rangeupdate', (e, data) => {
@@ -824,7 +824,7 @@
 			}
 		}
 
-		#refresh(tabfilter_changed = false) {
+		#refresh({tabfilter_changed = false, loading_fadein = false} = {}) {
 			if (this.#datatable.isUserInteracting()) {
 				return;
 			}
@@ -853,6 +853,7 @@
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,
 					force_load: true,
+					loading_fadein,
 					onSuccess: response => this.#onDataDone(response),
 					onFinally: () => this.#scheduleRefresh()
 				});
@@ -873,8 +874,10 @@
 				return;
 			}
 
+			const loading_fadein = true;
+
 			this.#unscheduleRefresh();
-			this.#refresh_interval_id = setInterval(() => this.#refresh(), this.#refresh_interval);
+			this.#refresh_interval_id = setInterval(() => this.#refresh({loading_fadein}), this.#refresh_interval);
 		}
 
 		#unscheduleRefresh() {

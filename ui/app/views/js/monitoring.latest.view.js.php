@@ -78,7 +78,9 @@
 			this.#filter.on(TABFILTER_EVENT_URLSET, () => {
 				chkbxRange.clearSelectedOnFilterChange();
 
-				if (this.#active_filter !== this.#filter._active_item) {
+				const tabfilter_changed = this.#active_filter !== this.#filter._active_item;
+
+				if (tabfilter_changed) {
 					this.#active_filter = this.#filter._active_item;
 					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
 
@@ -86,7 +88,7 @@
 				}
 
 				this.#scheduleRefresh();
-				this.#refresh();
+				this.#refresh({tabfilter_changed});
 			});
 
 			// Tags must be activated also using the enter button on keyboard.
@@ -469,7 +471,7 @@
 			}
 		}
 
-		#refresh() {
+		#refresh({tabfilter_changed = false, loading_fadein = false} = {}) {
 			if (this.#datatable.isUserInteracting()) {
 				return;
 			}
@@ -480,10 +482,15 @@
 			const current_filter = searchParamsToObject(search_params);
 			const filter = {...this.#filter_defaults, ...current_filter};
 
+			if (!tabfilter_changed) {
+				this.#datatable.updateUserConfig();
+			}
+
 			this.#datatable.setFilter(filter)
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,
 					force_load: true,
+					loading_fadein,
 					onSuccess: response => this.#onDataDone(response),
 					onFinally: () => this.#scheduleRefresh()
 				});
@@ -540,8 +547,10 @@
 				return;
 			}
 
+			const loading_fadein = true;
+
 			this.#unscheduleRefresh();
-			this.#refresh_interval_id = setInterval(() => this.#refresh(), this.#refresh_interval);
+			this.#refresh_interval_id = setInterval(() => this.#refresh({loading_fadein}), this.#refresh_interval);
 		}
 
 		#unscheduleRefresh() {
