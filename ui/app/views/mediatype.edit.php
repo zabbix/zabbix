@@ -48,7 +48,12 @@ $mediatype_form_grid = (new CFormGrid())
 			(new CSelect('type'))
 				->setId('type')
 				->setFocusableElementId('label-type')
-				->addOptions(CSelect::createOptionsFromArray(CMediatypeHelper::getMediaTypes()))
+				->addOptions(CSelect::createOptionsFromArray(
+					array_intersect_key(
+						CMediatypeHelper::getMediaTypes(),
+						array_flip(CMediatypeHelper::getSupportedMediaTypes())
+					)
+				))
 				->setValue($data['type'])
 		))->setId('type-field')
 	])

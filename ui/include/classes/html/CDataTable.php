@@ -1,4 +1,4 @@
-<?php declare(strict_types = 0);
+<?php
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -13,23 +13,14 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+class CDataTable extends CTag
+{
+	public function __construct($items = null) {
+		parent::__construct('div', true);
 
-/**
- * @var CView $this
- * @var array $data
- */
-
-$output = [
-	'body' => (new CPartial('monitoring.problem.view.html', $data))->getOutput()
-];
-
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
+		$this
+			->addItem((new CDiv())->addClass(ZBX_STYLE_NO_DATA_MESSAGE))
+			->addItem($items)
+			->addClass(ZBX_STYLE_DATATABLE);
+	}
 }
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo json_encode($output);

@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package vfsdev
+package dev
 
 import (
 	"bufio"
@@ -257,7 +257,6 @@ func getDevRecords(sysfs bool) ([]*devRecord, map[string]uint64, error) {
 		devname := devLocation + entry.Name()
 
 		stat, err := os.Stat(devname)
-
 		if err != nil {
 			continue
 		}
@@ -295,7 +294,7 @@ func getDevRecords(sysfs bool) ([]*devRecord, map[string]uint64, error) {
 
 						_, err = fmt.Fscanf(file, "%d\n", &devtype)
 						if err == nil {
-							//nolint:revive // legacy code, suppressed until refactored
+							//nolint:revive,nolintlint // legacy code, suppressed until refactored
 							if devtype == devTypeRom {
 								dev.Type = devTypeRomString
 
@@ -319,7 +318,7 @@ func getDevRecords(sysfs bool) ([]*devRecord, map[string]uint64, error) {
 					if err == nil {
 						scanner := bufio.NewScanner(file)
 						for scanner.Scan() {
-							//nolint:revive // legacy code, suppressed until refactored
+							//nolint:revive,nolintlint // legacy code, suppressed until refactored
 							if strings.HasPrefix(scanner.Text(), devtypePrefix) {
 								dev.Type = scanner.Text()[len(devtypePrefix):]
 							}

@@ -618,7 +618,8 @@ class CSetupWizard extends CForm {
 				], 'server'),
 				(new CTextBox('server', $this->getConfig('DB_SERVER', $config->config['DB']['SERVER'])))
 					->setAttribute('placeholder', $config->config['DB']['SERVER'])
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+				'db_host_row'
 			)
 			->addRow(_('Database port'), [
 				(new CNumericBox('port', $this->getConfig('DB_PORT', $config->config['DB']['PORT']), 5, false, false,
