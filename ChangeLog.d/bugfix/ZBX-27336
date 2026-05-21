@@ -1,0 +1,1 @@
+...G...PS. [ZBX-27336] added host name validation for net.tcp.port[], net.tcp.service[], net.tcp.service.perf[], net.udp.service[], net.udp.service.perf[] items (Andris, askolmeisters)
