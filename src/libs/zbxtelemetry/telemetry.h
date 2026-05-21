@@ -75,7 +75,8 @@ const tq_column_info_t	*tq_get_column_info(zbx_tq_category_t category, zbx_tq_me
 tq_column_type_t	tq_get_column_type(zbx_tq_category_t category, zbx_tq_metric_type_t metric_type,
 		const char *column_name);
 
-int	tq_column_type_is_arr(tq_column_type_t type);
+int	tq_column_type_is_array(tq_column_type_t type);
+int	tq_column_type_is_attributes(tq_column_type_t type);
 
 int	tq_formula_constant_to_condition_idx(const char *p, int len);
 char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col);

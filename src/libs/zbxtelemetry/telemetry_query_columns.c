@@ -119,8 +119,13 @@ tq_column_type_t	tq_get_column_type(zbx_tq_category_t category, zbx_tq_metric_ty
 	return NULL == info ? TQ_COLUMN_TYPE_UNKNOWN : info->type;
 }
 
-int	tq_column_type_is_arr(tq_column_type_t type)
+int	tq_column_type_is_array(tq_column_type_t type)
 {
 	return TQ_COLUMN_TYPE_ARRAY_STR == type || TQ_COLUMN_TYPE_ARRAY_NUM == type
 		|| TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == type ? SUCCEED : FAIL;
+}
+
+int	tq_column_type_is_attributes(tq_column_type_t type)
+{
+	return TQ_COLUMN_TYPE_ATTRIBUTES == type || TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == type ? SUCCEED : FAIL;
 }

@@ -14,6 +14,7 @@
 
 #include "zbxtelemetry.h"
 #include "telemetry.h"
+#include "zbxstr.h"
 #include "zbxcalc.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
@@ -683,6 +684,11 @@ static int	ret_errf(int ret, char *error, size_t max_error_len, const char *fmt,
 	return ret;
 }
 
+static int	tq_validate_str(const char *str)
+{
+	return NULL == str || SUCCEED == zbx_is_utf8(str) ? SUCCEED : FAIL;
+}
+
 static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t max_error_len)
 {
 	if (ZBX_TQ_CATEGORY_UNKNOWN == query->category)
@@ -694,11 +700,24 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 	for (int i = 0; i < query->columns.values_num; i++)
 	{
 		const zbx_tq_column_t	*col = &query->columns.values[i];
+		tq_column_type_t	column_type;
+
 		if (NULL == col->name)
 			return ret_errf(FAIL, error, max_error_len, "column name is not set for column #%d", i);
 
-		if (NULL == tq_get_column_info(query->category, query->metric_type, col->name))
+		column_type = tq_get_column_type(query->category, query->metric_type, col->name);
+
+		if (TQ_COLUMN_TYPE_UNKNOWN == column_type)
 			return ret_errf(FAIL, error, max_error_len, "column name is invalid for column #%d", i);
+
+		if (NULL != col->key && SUCCEED != tq_column_type_is_attributes(column_type))
+			return ret_errf(FAIL, error, max_error_len, "key is set for non-attribute column #%d", i);
+
+		if (NULL == col->key && SUCCEED == tq_column_type_is_attributes(column_type))
+			return ret_errf(FAIL, error, max_error_len, "key is not set for attribute column #%d", i);
+
+		if (FAIL == tq_validate_str(col->key))
+			return ret_errf(FAIL, error, max_error_len, "key is not valid UTF-8 for column #%d", i);
 	}
 
 	if (0 == query->aggregated_columns.values_num)
@@ -707,17 +726,30 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 	{
 		const zbx_tq_aggr_column_t *aggr_col = &query->aggregated_columns.values[i];
 
-		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function && NULL == aggr_col->column_name)
-			return ret_errf(FAIL, error, max_error_len,
+		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function)
+		{
+			tq_column_type_t	column_type;
+
+			if (NULL == aggr_col->column_name)
+				return ret_errf(FAIL, error, max_error_len,
 					"column name is not set for aggregated column #%d", i);
 
-		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function &&
-				NULL == tq_get_column_info(query->category, query->metric_type, aggr_col->column_name))
-			return ret_errf(FAIL, error, max_error_len, "column name is invalid for aggregated column #%d",
-					i);
+			column_type = tq_get_column_type(query->category, query->metric_type, aggr_col->column_name);
+
+			if (TQ_COLUMN_TYPE_UNKNOWN == column_type)
+				return ret_errf(FAIL, error, max_error_len,
+						"column name is invalid for aggregated column #%d", i);
+
+			if (TQ_COLUMN_TYPE_NUM != column_type)
+				return ret_errf(FAIL, error, max_error_len,
+						"invalid column type for aggregated column #%d", i);
+		}
 
 		if (NULL == aggr_col->alias)
 			return ret_errf(FAIL, error, max_error_len, "alias is not set for aggregated column #%d", i);
+
+		if (FAIL == tq_validate_str(aggr_col->alias))
+			return ret_errf(FAIL, error, max_error_len, "alias is not valid UTF-8 for column #%d", i);
 
 		if (ZBX_TQ_FUNCTION_UNKNOWN == aggr_col->function)
 			return ret_errf(FAIL, error, max_error_len, "function is not set for aggregated column #%d", i);
@@ -766,26 +798,29 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 			if (ZBX_TQ_OPERATOR_UNKNOWN == condition->operator)
 				return ret_errf(FAIL, error, max_error_len, "operator is not set for condition #%d", i);
 
-			if (NULL != condition->key &&
-					!(TQ_COLUMN_TYPE_ATTRIBUTES == column_type ||
-					TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == column_type))
+			if (NULL != condition->key && SUCCEED != tq_column_type_is_attributes(column_type))
 				return ret_errf(FAIL, error, max_error_len,
-						"key is set for non-attribute column #%d", i);
+						"key is set for non-attribute condition #%d", i);
 
-			if (NULL == condition->key &&
-					(TQ_COLUMN_TYPE_ATTRIBUTES == column_type ||
-					TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == column_type))
-				return ret_errf(FAIL, error, max_error_len, "key is not set for attribute column #%d",
-						i);
+			if (NULL == condition->key && SUCCEED == tq_column_type_is_attributes(column_type))
+				return ret_errf(FAIL, error, max_error_len,
+						"key is not set for attribute condition #%d", i);
+
+			if (FAIL == tq_validate_str(condition->key))
+				return ret_errf(FAIL, error, max_error_len,
+						"key is not valid UTF-8 for condition #%d", i);
 
 			if (NULL == condition->value && ZBX_TQ_OPERATOR_EXISTS != condition->operator)
 				return ret_errf(FAIL, error, max_error_len, "value is not set for condition #%d", i);
 
-			if (ZBX_TQ_OPERATOR_EXISTS == condition->operator &&
-					!(TQ_COLUMN_TYPE_ATTRIBUTES == column_type ||
-					TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == column_type))
+			if (FAIL == tq_validate_str(condition->value))
 				return ret_errf(FAIL, error, max_error_len,
-						"operator \"exists\" selected for non-attribute column #%d", i);
+						"value is not valid UTF-8 for condition #%d", i);
+
+			if (ZBX_TQ_OPERATOR_EXISTS == condition->operator
+					&& SUCCEED != tq_column_type_is_attributes(column_type))
+				return ret_errf(FAIL, error, max_error_len,
+						"operator \"exists\" selected for non-attribute condition #%d", i);
 
 			/* TODO: maybe add failing validation if operator is contains/not_contains and column */
 			/* is not simple (because of elasticsearch limitation) */
