@@ -6262,6 +6262,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     .overlay-dialogue.modal-popup.modal-popup-static {
       max-width: 700px;
       width: 100%; }
+      .overlay-dialogue.modal-popup.modal-popup-static.modal-popup-sla-edit, .overlay-dialogue.modal-popup.modal-popup-static.modal-popup-proxy-edit, .overlay-dialogue.modal-popup.modal-popup-static.modal-popup-connector-edit {
+        max-width: 750px; }
     .overlay-dialogue.modal-popup.modal-popup-preprocessing {
       max-width: 900px;
       width: 100%; }
