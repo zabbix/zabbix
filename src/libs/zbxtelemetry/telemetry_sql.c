@@ -54,11 +54,26 @@ static char	*tq_sql_dyn_escape_backslash_generic(const char *src, const char *es
 	return dst;
 }
 
+static char	*tq_sql_dyn_quote_generic(const char *src, char quote_char)
+{
+	size_t	src_strlen = strlen(src);
+	char	*dst = zbx_malloc(NULL, src_strlen + 2 + 1);
+
+	*dst = quote_char;
+	zbx_strlcpy(dst + 1, src, src_strlen + 1);
+	*(dst + 1 + src_strlen) = quote_char;
+	*(dst + 1 + src_strlen + 1) = '\0';
+
+	return dst;
+}
+
 static char	*tq_sql_dyn_escape_string_unquoted(const char *src, zbx_tq_db_type_t db_type)
 {
 	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type)
 		return tq_sql_dyn_escape_backslash_generic(src, "'\"`\\");
 
+	/* TODO: when connection to an arbitrary PostgreSQL/MySQL db is added, ensure that escaping works correctly */
+	/*       (e.g. that ZBX_PG_ESCAPE_BACKSLASH is valid handled correctly) */
 	return zbx_db_dyn_escape_string(src);
 }
 
@@ -70,18 +85,11 @@ static char	*tq_sql_dyn_escape_string_unquoted(const char *src, zbx_tq_db_type_t
 static char	*tq_sql_dyn_escape_string(const char *src, zbx_tq_db_type_t db_type)
 {
 	char	*src_esc = tq_sql_dyn_escape_string_unquoted(src, db_type);
-	size_t	src_esc_strlen = strlen(src_esc);
-	char	*dst = zbx_malloc(NULL, src_esc_strlen + 2 + 1);
-	char	quote_char = '\'';
-
-	*dst = quote_char;
-	zbx_strlcpy(dst + 1, src_esc, src_esc_strlen + 1);
-	*(dst + 1 + src_esc_strlen) = quote_char;
-	*(dst + 1 + src_esc_strlen + 1) = '\0';
+	char	*out = tq_sql_dyn_quote_generic(src_esc, '\'');
 
 	zbx_free(src_esc);
 
-	return dst;
+	return out;
 }
 
 /******************************************************************************
@@ -95,35 +103,7 @@ static char	*tq_sql_dyn_escape_string(const char *src, zbx_tq_db_type_t db_type)
  ******************************************************************************/
 static char	*tq_sql_dyn_quote_name(const char *src, zbx_tq_db_type_t db_type)
 {
-	/* TODO: maybe add escaping after all */
-
-
-	size_t	src_strlen = strlen(src);
-	char	*dst = zbx_malloc(NULL, src_strlen + 2 + 1);
-	char	quote_char;
-
-	switch (db_type)
-	{
-		case ZBX_TQ_DB_TYPE_POSTGRESQL:
-		case ZBX_TQ_DB_TYPE_CLICKHOUSE:
-			quote_char = '"';
-			break;
-
-		case ZBX_TQ_DB_TYPE_MYSQL:
-			quote_char = '`';
-			break;
-
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			quote_char = '\0';
-	}
-
-	*dst = quote_char;
-	zbx_strlcpy(dst + 1, src, src_strlen + 1);
-	*(dst + 1 + src_strlen) = quote_char;
-	*(dst + 1 + src_strlen + 1) = '\0';
-
-	return dst;
+	return tq_sql_dyn_quote_generic(src, (ZBX_TQ_DB_TYPE_MYSQL == db_type ? '`' : '"'));
 }
 
 /******************************************************************************
@@ -135,33 +115,36 @@ static char	*tq_sql_dyn_escape_like_pattern(const char *src, zbx_tq_db_type_t db
 {
 	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type)
 	{
+		char	*src_esc_like = tq_sql_dyn_escape_backslash_generic(src, "_%\\");
 		char	*out;
-		char	*esc_like = tq_sql_dyn_escape_backslash_generic(src, "_%\\");
 
-		out = tq_sql_dyn_escape_string_unquoted(esc_like, ZBX_TQ_DB_TYPE_CLICKHOUSE);
+		out = tq_sql_dyn_escape_string_unquoted(src_esc_like, ZBX_TQ_DB_TYPE_CLICKHOUSE);
 
-		zbx_free(esc_like);
+		zbx_free(src_esc_like);
 		return out;
 	}
 
+	/* TODO: when connection to an arbitrary PostgreSQL/MySQL db is added, ensure that escaping works correctly */
+	/*       (e.g. that ZBX_PG_ESCAPE_BACKSLASH is valid handled correctly) */
 	return zbx_db_dyn_escape_like_pattern(src);
 }
 
 /******************************************************************************
  *                                                                            *
- * Return value: escaped and UNQUOTED string to use in JSON_EXTRACT path      *
- *               in MySQL (e.g. "%s->'$.\"%s\"'")                             *
+ * Return value: escaped and QUOTED (with '"') string to use in JSON_EXTRACT  *
+ *               path in MySQL (e.g. "%s->'$.%s'")                            *
  *               (should NOT be escaped the second time as a string literal)  *
  *                                                                            *
  ******************************************************************************/
 static char	*tq_sql_dyn_escape_json_path_key_mysql(const char *src)
 {
-	char	*out;
-	char	*esc_path = tq_sql_dyn_escape_backslash_generic(src, "\"\\");
+	char	*src_esc_path = tq_sql_dyn_escape_backslash_generic(src, "\"\\");
+	char	*src_esc_full = tq_sql_dyn_escape_string_unquoted(src_esc_path, ZBX_TQ_DB_TYPE_MYSQL);
+	char	*out = tq_sql_dyn_quote_generic(src_esc_full, '"');
 
-	out = tq_sql_dyn_escape_string_unquoted(esc_path, ZBX_TQ_DB_TYPE_MYSQL);
+	zbx_free(src_esc_path);
+	zbx_free(src_esc_full);
 
-	zbx_free(esc_path);
 	return out;
 }
 
@@ -191,7 +174,7 @@ static char	*tq_sql_dyn_get_json_subcolumn_raw(const char *operand, const char *
 		{
 			char	*key_esc_unquoted = tq_sql_dyn_escape_json_path_key_mysql(key);
 
-			str = zbx_dsprintf(NULL, "%s->>'$.\"%s\"'", operand, key_esc_unquoted);
+			str = zbx_dsprintf(NULL, "%s->>'$.%s'", operand, key_esc_unquoted);
 
 			zbx_free(key_esc_unquoted);
 			break;
@@ -454,7 +437,7 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 		{
 			char	*key_esc_unquoted = tq_sql_dyn_escape_json_path_key_mysql(key);
 
-			str = zbx_dsprintf(NULL, "JSON_CONTAINS_PATH(%s, 'one', '$.\"%s\"')", atom, key_esc_unquoted);
+			str = zbx_dsprintf(NULL, "JSON_CONTAINS_PATH(%s, 'one', '$.%s')", atom, key_esc_unquoted);
 
 			zbx_free(key_esc_unquoted);
 			break;
