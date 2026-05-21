@@ -1,1 +1,1 @@
-..F....... [ZBX-27732] fixed auto refresh by mandatory filters in latest data history (uolekss)
+..F....... [ZBX-27732] fixed auto refresh to continue running in monitoring latest data view (uolekss)
