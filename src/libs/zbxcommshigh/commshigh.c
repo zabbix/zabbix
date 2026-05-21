@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -604,7 +604,7 @@ static int	zbx_comms_exchange_data(zbx_socket_t *sock, const char *data, zbx_add
  * Return value: SUCCEED - data was exchanged successfully                    *
  *               CONNECT_ERROR - connection error                             *
  *               SEND_ERROR - request sending error                           *
- *               READ_ERROR - response reading error                          *
+ *               RECV_ERROR - response reading error                          *
  *                                                                            *
  * Comments: If response contains valid redirect block the address list will  *
  *           be updated accordingly and connection will be retried with the   *

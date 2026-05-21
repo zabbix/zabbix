@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -515,9 +515,9 @@ class CApiService {
 					$sql_parts['select'][] = $fields;
 				}
 			}
-			elseif (array_key_exists('groupBy', $options) && $options['groupBy']) {
+			elseif (array_key_exists('groupBy', $options) && is_array($options['groupBy'])) {
 				foreach ($options['groupBy'] as $field) {
-					if ($this->hasField($field, $table_name)) {
+					if (is_string($field) && $this->hasField($field, $table_name)) {
 						$field = $this->fieldId($field, $table_alias);
 
 						array_unshift($sql_parts['select'], $field);
@@ -526,11 +526,11 @@ class CApiService {
 				}
 			}
 		}
-		elseif (array_key_exists('groupBy', $options) && $options['groupBy']) {
+		elseif (array_key_exists('groupBy', $options) && is_array($options['groupBy']) && $options['groupBy']) {
 			$sql_parts['select'] = [];
 
 			foreach ($options['groupBy'] as $field) {
-				if ($this->hasField($field, $table_name)) {
+				if (is_string($field) && $this->hasField($field, $table_name)) {
 					$field = $this->fieldId($field, $table_alias);
 
 					array_unshift($sql_parts['select'], $field);
@@ -680,46 +680,40 @@ class CApiService {
 	 */
 	protected function applyQuerySortOptions(string $table_name, string $table_alias, array $options,
 			array $sql_parts): array {
-		$count_output = array_key_exists('countOutput', $options) && $options['countOutput'];
-		$group_by = array_key_exists('groupBy', $options) && $options['groupBy'];
-		$aggregate_sort_columns = [];
-
-		if ($count_output && $group_by) {
-			$aggregate_sort_columns[] = 'rowscount';
+		if (!$this->sortColumns || !array_key_exists('sortfield', $options)
+				|| in_array($options['sortfield'], [null, '', []], true)) {
+			return $sql_parts;
 		}
 
-		$sort_columns = $group_by ? array_merge($options['groupBy'], $aggregate_sort_columns) : $this->sortColumns;
+		$allowed_sort_fields = $this->sortColumns;
 
-		if ($sort_columns && !zbx_empty($options['sortfield'])) {
-			$options['sortfield'] = is_array($options['sortfield'])
-				? array_unique($options['sortfield'])
-				: [$options['sortfield']];
+		if (array_key_exists('groupBy', $options) && is_array($options['groupBy']) && $options['groupBy']) {
+			$allowed_sort_fields = array_intersect($this->sortColumns, $options['groupBy']);
 
-			foreach ($options['sortfield'] as $i => $sortfield) {
-				// Validate sortfield.
-				if (!str_in_array($sortfield, $sort_columns)) {
-					throw new APIException(ZBX_API_ERROR_INTERNAL,
-						_s('Sorting by field "%1$s" not allowed.', $sortfield)
-					);
-				}
+			if (array_key_exists('countOutput', $options) && $options['countOutput']) {
+				$allowed_sort_fields[] = 'rowscount';
+			}
+		}
 
-				// Add sort field to order.
-				$sortorder = '';
-				if (is_array($options['sortorder'])) {
-					if (!empty($options['sortorder'][$i])) {
-						$sortorder = $options['sortorder'][$i] === ZBX_SORT_DOWN ? ' '.ZBX_SORT_DOWN : '';
-					}
-				}
-				else {
-					$sortorder = $options['sortorder'] === ZBX_SORT_DOWN ? ' '.ZBX_SORT_DOWN : '';
-				}
+		foreach (array_unique((array) $options['sortfield']) as $i => $sort_field) {
+			if (!in_array($sort_field, $allowed_sort_fields, true)) {
+				throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%1$s" not allowed.', $sort_field));
+			}
 
-				if (in_array($sortfield, $aggregate_sort_columns)) {
-					$sql_parts['order'][$sortfield] = $sortfield.$sortorder;
-				}
-				else {
-					$sql_parts = $this->applyQuerySortField($sortfield, $sortorder, $table_alias, $sql_parts);
-				}
+			if (is_array($options['sortorder'])) {
+				$sort_order = array_key_exists($i, $options['sortorder']) && $options['sortorder'][$i] === ZBX_SORT_DOWN
+					? ' '.ZBX_SORT_DOWN
+					: '';
+			}
+			else {
+				$sort_order = $options['sortorder'] === ZBX_SORT_DOWN ? ' '.ZBX_SORT_DOWN : '';
+			}
+
+			if ($sort_field === 'rowscount') {
+				$sql_parts['order']['rowscount'] = 'rowscount'.$sort_order;
+			}
+			else {
+				$sql_parts = $this->applyQuerySortField($sort_field, $sort_order, $table_alias, $sql_parts);
 			}
 		}
 

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -299,7 +299,7 @@ class testFormHost extends CWebTest {
 			if ($field === 'SNMPv3') {
 				// Check fields' lengths.
 				$field_lengths = [
-					'Max repetition count' =>  10,
+					'Max repetition count' => 10,
 					'Context name' => 255,
 					'Security name' => 64,
 					'Authentication passphrase' => 64,
@@ -323,7 +323,7 @@ class testFormHost extends CWebTest {
 		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 
-		// Check the value of the "Monitored by" field and the present/absence of the corresponding mulitselect.
+		// Check the value of the "Monitored by" field and the present/absence of the corresponding multiselect.
 		$monitored_by = $form->getField('Monitored by');
 		$this->assertEquals('Proxy', $monitored_by->getValue());
 		$this->assertEquals(['Test Host Proxy'], $monitored_by->query('xpath:./../following-sibling::div')->asMultiselect()->one()->getValue());
@@ -1791,7 +1791,7 @@ class testFormHost extends CWebTest {
 				[
 					'host' => 'testFormHost with secret Macro',
 					'items' => 0,
-					'fields'  => [
+					'fields' => [
 						'Host name' => microtime().' clone with secret Macros'
 					],
 					'expected' => TEST_ERROR,
@@ -2183,23 +2183,24 @@ class testFormHost extends CWebTest {
 						['name' => 'id:add_templates_', 'value' => '', 'enabled' => true],
 						['name' => 'Host groups', 'value' => ['Group created from host prototype 1',
 								'Group for discovered host test'], 'enabled' => false],
-						['name' => 'id:interfaces_'.$discovered_interface_id.'_ip', 'value' =>  '127.0.0.1',
+						['name' => 'id:interfaces_'.$discovered_interface_id.'_ip', 'value' => '127.0.0.1',
 								'maxlength' => 64, 'enabled' => false],
-						['name' => 'id:interfaces_'.$discovered_interface_id.'_dns', 'value' =>  '',
+						['name' => 'id:interfaces_'.$discovered_interface_id.'_dns', 'value' => '',
 								'maxlength' => 255, 'enabled' => false],
-						['name' => 'id:interfaces_'.$discovered_interface_id.'_useip', 'value' =>  'IP', 'enabled' => false],
+						['name' => 'id:interfaces_'.$discovered_interface_id.'_useip', 'value' => 'IP', 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_port', 'value' => 10050,
 								'maxlength' => 64, 'enabled' => false],
 						['name' => 'id:interface_main_'.$discovered_interface_id , 'value' => $discovered_interface_id,
 								'enabled' => false],
 						['name' => 'Description', 'value' => '', 'maxlength' => 65535, 'enabled' => true],
-						['name' => 'id:monitored_by', 'value' => 'Server', 'enabled' => false],
+						['name' => 'Monitored by', 'value' => 'Server', 'enabled' => false],
 						['name' => 'Enabled', 'value' => true, 'enabled' => true]
 					];
 
 					foreach ($host_fields as $field) {
 						$this->assertTrue($form->getField($field['name'])->isEnabled($field['enabled']));
 						$this->assertEquals($field['value'], $form->getField($field['name'])->getValue());
+
 						if (CTestArrayHelper::get($field, 'maxlength')) {
 							$this->assertEquals($field['maxlength'], $form->getField($field['name'])->getAttribute('maxlength'));
 						}

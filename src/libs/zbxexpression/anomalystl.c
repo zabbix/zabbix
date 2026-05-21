@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -13,6 +13,7 @@
 **/
 
 #include "anomalystl.h"
+#include "evalfunc.h"
 
 #include "zbxnum.h"
 #include "zbxeval.h"
@@ -527,7 +528,7 @@ static void	eval_moving_average(const zbx_vector_history_record_t *x, int n, int
 
 static double	find_stl_median(zbx_vector_history_record_t *v)
 {
-	zbx_vector_history_record_sort(v, (zbx_compare_func_t)zbx_history_record_float_compare);
+	zbx_vector_history_record_sort(v, history_record_float_compare);
 
 	if (0 == v->values_num % 2)
 		return (v->values[v->values_num / 2 - 1].value.dbl + v->values[v->values_num / 2].value.dbl) / 2.0;

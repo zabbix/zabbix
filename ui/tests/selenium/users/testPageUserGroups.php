@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -58,8 +58,8 @@ class testPageUserGroups extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider allGroups
-	*/
+	 * @dataProvider allGroups
+	 */
 	public function testPageUserGroups_SimpleUpdate($group) {
 		$usrgrpid = $group['usrgrpid'];
 		$name = $group['name'];
@@ -73,9 +73,9 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestClickLinkText($name);
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'User group updated');
 		$this->zbxTestCheckHeader('User groups');
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->assertMessage(TEST_GOOD, 'User group updated');
 		$this->zbxTestTextPresent($name);
 
 		$this->assertEquals($oldHashGroup, CDBHelper::getHash($sqlHashGroup));
@@ -200,8 +200,10 @@ class testPageUserGroups extends CLegacyWebTest {
 
 	public function testPageUserGroups_FilterByName() {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
+		$table = $this->getTable();
 		$this->zbxTestInputTypeOverwrite('filter_name', 'Zabbix administrators');
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", 'Zabbix administrators');
 		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
@@ -209,8 +211,10 @@ class testPageUserGroups extends CLegacyWebTest {
 
 	public function testPageUserGroups_FilterNone() {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
+		$table = $this->getTable();
 		$this->zbxTestInputTypeOverwrite('filter_name', '1928379128ksdhksdjfh');
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
@@ -221,9 +225,11 @@ class testPageUserGroups extends CLegacyWebTest {
 
 	public function testPageUserGroups_FilterByStatus() {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
+		$table = $this->getTable();
 		$this->zbxTestInputTypeOverwrite('filter_name', 'Zabbix administrators');
 		$this->zbxTestClickXpathWait("//label[@for='filter_user_status_1']");
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableStats(1);
 	}
@@ -231,7 +237,9 @@ class testPageUserGroups extends CLegacyWebTest {
 	public function testPageUserGroups_FilterReset() {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 		$this->zbxTestClickButtonText('Reset');
+		$table = $this->getTable();
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -274,23 +274,26 @@ void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: compares two cache values by their timestamps                     *
- *                                                                            *
- * Parameters: d1   - [IN] the first value                                    *
- *             d2   - [IN] the second value                                   *
- *                                                                            *
- * Return value:   >0 - the first value timestamp is less than second         *
- *                 =0 - the first value timestamp is equal to the second      *
- *                 <0 - the first value timestamp is greater than second      *
- *                                                                            *
- * Comments: This function is commonly used to sort value vector in descending*
- *           order.                                                           *
- *                                                                            *
- ******************************************************************************/
-static int	vc_history_record_compare_desc_func(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: compares two cache values by their timestamps                      *
+ *                                                                             *
+ * Parameters: a1   - [IN] first value                                         *
+ *             a2   - [IN] second value                                        *
+ *                                                                             *
+ * Return value:   >0 - first value timestamp is less than second              *
+ *                 =0 - first value timestamp is equal to the second           *
+ *                 <0 - first value timestamp is greater than second           *
+ *                                                                             *
+ * Comments: This function is commonly used to sort value vector in descending *
+ *           order.                                                            *
+ *                                                                             *
+ *******************************************************************************/
+static int	vc_history_record_compare_desc(const void *a1, const void *a2)
 {
+	const zbx_history_record_t	*d1 = (const zbx_history_record_t*)a1;
+	const zbx_history_record_t	*d2 = (const zbx_history_record_t*)a2;
+
 	if (d1->timestamp.sec == d2->timestamp.sec)
 		return d2->timestamp.ns - d1->timestamp.ns;
 
@@ -328,7 +331,7 @@ void	zbx_mock_test_entry(void **state)
 	err = zbx_history_get_values(itemid, value_type, start, count, end, &values_received);
 	zbx_mock_assert_result_eq("zbx_history_get_values()", SUCCEED, err);
 
-	zbx_vector_history_record_sort(&values_received, (zbx_compare_func_t)vc_history_record_compare_desc_func);
+	zbx_vector_history_record_sort(&values_received, vc_history_record_compare_desc);
 
 	zbx_vcmock_read_values(zbx_mock_get_parameter_handle("out.values"), value_type, &values_expected);
 	zbx_vcmock_check_records("Returned values", value_type,  &values_expected, &values_received);

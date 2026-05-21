@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,6 +21,11 @@ class CWidgetHostNavigator extends CWidget {
 	 * @type {CHostNavigator|null}
 	 */
 	#host_navigator = null;
+
+	/**
+	 * @type {Array}
+	 */
+	#hosts = [];
 
 	/**
 	 * Listeners of host navigator widget.
@@ -81,6 +86,7 @@ class CWidgetHostNavigator extends CWidget {
 		}
 
 		this.#csrf_token = response[CSRF_TOKEN_NAME];
+		this.#hosts = response.hosts;
 
 		if (this.#host_navigator === null) {
 			this.clearContents();
@@ -99,8 +105,10 @@ class CWidgetHostNavigator extends CWidget {
 			selected_hostid: this.#selected_hostid
 		});
 
-		if (!this.hasEverUpdated() && this.isReferred()) {
-			this.#selected_hostid = this.#getDefaultSelectable();
+		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
+			if (this.#selected_hostid === null || !this.#hasSelectable()) {
+				this.#selected_hostid = this.#getDefaultSelectable();
+			}
 
 			if (this.#selected_hostid !== null) {
 				this.#host_navigator.selectItem(this.#selected_hostid);
@@ -119,6 +127,10 @@ class CWidgetHostNavigator extends CWidget {
 		const selected_element = this._body.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE_IS_ITEM}`);
 
 		return selected_element !== null ? selected_element.dataset.id : null;
+	}
+
+	#hasSelectable() {
+		return this.#hosts.some(host => host.id === this.#selected_hostid);
 	}
 
 	onReferredUpdate() {

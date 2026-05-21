@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -29,6 +29,8 @@ window.proxy_edit_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
+		this.dialogue.classList.add('modal-popup-proxy-edit')
+
 		this.display_change_psk =
 			this.form.querySelector('#tls_connect input:checked').value == <?= HOST_ENCRYPTION_PSK ?>
 				|| document.getElementById('tls_accept_psk').checked;
@@ -55,7 +57,7 @@ window.proxy_edit_popup = new class {
 		this._update();
 
 		document.getElementById('proxy-form').style.display = '';
-		document.getElementById('name').focus();
+		this.overlay.recoverFocus();
 	}
 
 	_changePsk() {

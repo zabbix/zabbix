@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -393,7 +393,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				$this->assertEquals('', $param_field->getValue());
 				$this->assertEquals(255, $param_field->getAttribute('maxlength'));
 
-				// Check removal ofscript parameters.
+				// Check removal of script parameters.
 				$script_params->query('button:Remove')->one()->click();
 				$this->assertFalse($param_field->isVisible());
 				break;
@@ -769,7 +769,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'mediatype_tab' => [
-						'Name' => 'Email with 2h in inerval'
+						'Name' => 'Email with 2h in interval'
 					],
 					'options_tab' => [
 						'Attempt interval' => '2h'
@@ -895,7 +895,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					]
 				]
 			],
-			// Offise365 relay email with all possible parameters defined.
+			// Office365 relay email with all possible parameters defined.
 			[
 				[
 					'mediatype_tab' => [

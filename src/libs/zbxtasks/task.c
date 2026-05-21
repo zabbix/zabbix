@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1185,12 +1185,15 @@ static zbx_uint64_t	zbx_create_task_data(const char *data, size_t len, zbx_uint6
  ******************************************************************************/
 static int	zbx_tm_task_result_wait(zbx_uint64_t taskid, char **info)
 {
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	int		ret, time_start;
-
-	for (time_start = time(NULL); ZBX_DATA_TTL > time(NULL) - time_start; sleep(1))
+	for (int time_start = time(NULL), i = 0; ZBX_DATA_TTL > time(NULL) - time_start; i++)
 	{
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
+		int		ret, sleep_ms = 3 > i ? 500 : 1000;
+		struct timespec	poll_delay = {.tv_sec = sleep_ms / 1000, .tv_nsec = sleep_ms % 1000 * 1000000};
+
+		nanosleep(&poll_delay, NULL);
+
 		result = zbx_db_select("select status,info"
 				" from task_result"
 				" where parent_taskid=" ZBX_FS_UI64,

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -152,6 +152,9 @@ class WidgetForm extends CWidgetForm {
 						? CWidgetField::FLAG_DISABLED
 						: 0x00
 					)
+			)
+			->addField(
+				(new CWidgetFieldCheckBox('highlight_row', _('Highlight whole row')))->setDefault(ZBX_HIGHLIGHT_OFF)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,

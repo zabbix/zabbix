@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1431,7 +1431,7 @@ static int	send_data(zbx_thread_sendval_args *sendval_args, int ret, struct zbx_
 	sendval_args->json = NULL;
 
 	*buffer_count = 0;
-	zbx_json_clean(*json);
+	zbx_json_free(*json);
 	zbx_free(*json);
 
 	return ret;

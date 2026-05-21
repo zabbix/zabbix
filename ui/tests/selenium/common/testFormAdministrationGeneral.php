@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -178,8 +178,8 @@ class testFormAdministrationGeneral extends CWebTest {
 		if (CTestArrayHelper::get($data, 'fields.Default time zone')) {
 			$data['fields']['Default time zone'] = CDateTimeHelper::getTimeZoneFormat($data['fields']['Default time zone']);
 		}
-		$form->fill($data['fields']);
 
+		$form->fill($data['fields']);
 		$form->submit();
 		$this->page->waitUntilReady();
 

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -270,6 +270,11 @@ class LoginUsers {
 				'(125,'.zbx_dbstr($actionid).', 1, '.zbx_dbstr($userids['disabled-user']).', 1478201613, 3, \'notificatio.report@zabbix.com\', \'PROBLEM: problem\', \'Event at 2016.11.03 21:33:33\', 1, 0, \'\', 1, 1, \'\'),'.
 				'(126,'.zbx_dbstr($actionid).', 1, '.zbx_dbstr($userids['disabled-user']).', 1478032474, 3, \'notificatio.report@zabbix.com\', \'PROBLEM: problem\', \'Event at 2016.11.01 22:34:34\', 1, 0, \'\', 1, 1, \'\'),'.
 				'(127,'.zbx_dbstr($actionid).', 1, '.zbx_dbstr($userids['disabled-user']).', 1478122535, 3, \'notificatio.report@zabbix.com\', \'PROBLEM: problem\', \'Event at 2016.11.02 23:35:35\', 1, 0, \'\', 1, 1, \'\')'
+		);
+
+		// Profile with default selected dashboard (Global view).
+		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_id, value_str, source, type) VALUES '.
+				' (4, 1, \'web.dashboard.dashboardid\', 1, \'\', \'\', 1);'
 		);
 
 		return [

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-08-11 15:37+0000\n"
+"PO-Revision-Date: 2026-03-21 08:16+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -3757,6 +3757,11 @@ msgstr "No es pot pas llegir l'XML: %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr "No es pot pas llegir el YAML: %1$s."
 
+#: include/classes/server/CZabbixServer.php:502
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr "No es pot llegir la resposta del servidor Zabbix \"%1$s\"."
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -3818,6 +3823,10 @@ msgstr "No es pot pas establir \"%1$s\" per al prototip de gràfic \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "No es pot pas establir \"Afegit del conjunt de dades\" quan s'afegeix un element de tipus \"Total\" al gràfic."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "No es pot definir el joc de caràcters."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -17710,6 +17719,11 @@ msgstr "Codi de resposta"
 msgid "Response time"
 msgstr "Hora de resposta"
 
+#: include/classes/server/CZabbixServer.php:498
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr "S'ha superat el temps d'espera de resposta de %1$s en connectar al servidor Zabbix \"%2$s\"."
+
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
 msgstr "Tipus de resposta: JSON"
@@ -19877,6 +19891,10 @@ msgstr "Canvia la mida de l'espai en octets o en percentatge del total. Retorna 
 #: include/locales.inc.php:63
 msgid "Swedish (sv_SE)"
 msgstr "Suec (sv_SE)"
+
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr "Canviar usuari SSO"
 
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
@@ -23821,6 +23839,10 @@ msgstr "No podeu pas canviar les plantilles per a la selecció actual."
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "No teniu pas permís per realitzar aquesta operació."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr "Heu estat autoritzat mitjançant l'inici de sessió únic (SSO), però no s'ha pogut iniciar la sessió a Zabbix."
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."

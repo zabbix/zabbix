@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -35,6 +35,7 @@ typedef struct
 }
 zbx_pp_cache_t;
 
+int	pp_cache_get_type(int step_type);
 zbx_pp_cache_t	*pp_cache_create(const zbx_pp_item_preproc_t *preproc, const zbx_variant_t *value);
 void		pp_cache_release(zbx_pp_cache_t *cache);
 zbx_pp_cache_t	*pp_cache_copy(zbx_pp_cache_t *cache);
