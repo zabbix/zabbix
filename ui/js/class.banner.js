@@ -193,7 +193,7 @@ class CBanner {
 					&& from <= now
 					&& now <= to;
 			})
-			.sort((a, b) => a.id - b.id)
+			.sort((a, b) => a.id.localeCompare(b.id))
 			.at(0);
 
 		if (!active_banner || !active_banner.content) {
