@@ -1823,7 +1823,7 @@ static void	zbx_on_exit_rtc(int ret, void *on_exit_args)
 		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
 
 		if (NULL != args->rtc)
-			event_active(args->rtc->service.ev_timer, 0, 0);
+			zbx_ipc_service_alert(&args->rtc->service);
 	}
 }
 
