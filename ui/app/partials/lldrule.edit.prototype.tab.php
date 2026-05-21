@@ -418,7 +418,7 @@ $formgrid
 				'data' => $lldrule['master_item']
 					? [[
 						'id' => $lldrule['master_item']['itemid'],
-						'prefix' => $lldrule['host']['name'].NAME_DELIMITER,
+						'prefix' => $data['host']['name'].NAME_DELIMITER,
 						'name' => $lldrule['master_item']['name']
 					]]
 					: [],
