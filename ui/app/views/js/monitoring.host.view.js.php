@@ -421,7 +421,7 @@
 		}
 
 		#refresh() {
-			if (isUserInteracting()) {
+			if (this.#datatable.isUserInteracting()) {
 				return;
 			}
 

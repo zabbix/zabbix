@@ -203,6 +203,18 @@ class CDataTable {
 	#scrollbar_inner = null;
 
 	/**
+	 * Determines whether scroll was triggered from header or not.
+	 *
+	 * @type {boolean}
+	 */
+	#header_scroll = false;
+
+	/**
+	 * @type {ResizeObserver|null}
+	 */
+	#element_resize_observer = null;
+
+	/**
 	 * Observer instance that monitors changes in the body dimensions.
 	 * Ensures the scrollbar inner width is recalculated when the content layout changes.
 	 *
@@ -800,6 +812,7 @@ class CDataTable {
 
 		this.#header = document.createElement('div');
 		this.#header.classList.add(CDataTable.ZBX_STYLE_HEADER);
+		this.#header.addEventListener('scroll', this.onHeaderScroll);
 
 		if (this.#sticky_header) {
 			this.#header.classList.add(CDataTable.ZBX_STYLE_HEADER_STICKY);
@@ -1589,10 +1602,16 @@ class CDataTable {
 	}
 
 	onScroll() {
-		this.#header.scrollLeft = this.#body.scrollLeft;
+		const left = this.#body.scrollLeft;
+
+		if (!this.#header_scroll) {
+			this.#header.scrollTo({left});
+		}
+
+		this.#header_scroll = false;
 
 		if (this.#scrollbar) {
-			this.#scrollbar.scrollLeft = this.#body.scrollLeft;
+			this.#scrollbar.scrollTo({left});
 		}
 
 		this.#updateTableOptionsButtonPosition();
@@ -1606,13 +1625,24 @@ class CDataTable {
 		this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 	}
 
+	onHeaderScroll = e => {
+		if (!this.isUserInteracting()) {
+			return;
+		}
+
+		this.#header_scroll = true;
+		this.#body.scrollLeft = e.target.scrollLeft;
+	}
+
 	onBodyScroll = () => {
 		this.dispatchEvent(CDataTable.EVENT_SCROLL);
 	}
 
 	onScrollbarScroll = () => {
-		this.#header.scrollLeft = this.#scrollbar.scrollLeft;
-		this.#body.scrollLeft = this.#scrollbar.scrollLeft;
+		const left = this.#scrollbar.scrollLeft;
+
+		this.#header.scrollTo({left});
+		this.#body.scrollTo({left});
 	}
 
 	onPagerSelect = e => {
@@ -1822,6 +1852,10 @@ class CDataTable {
 
 			cell_inner.textContent = error.message;
 		}
+	}
+
+	isUserInteracting() {
+		return this.#element.querySelectorAll(':focus, :focus-visible').length > 0 || isUserInteracting();
 	}
 
 	#initColumns() {
@@ -2095,7 +2129,6 @@ class CDataTable {
 		}
 		this.#element_remove_queue = [];
 
-		this.#header.scrollTo({left: 0});
 		this.#body.scrollTo({left: 0});
 
 		for (const column of this.getStickyColumns()) {
@@ -2485,6 +2518,12 @@ class CDataTable {
 
 		document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`)?.addEventListener('scroll', this.onWrapperScroll);
 
+		this.#element_resize_observer = new ResizeObserver(() => {
+			this.#handleScrollbar();
+			this.#applyLastColumnPadding();
+		});
+		this.#element_resize_observer.observe(this.#element);
+
 		if (this.#tabfilter_item._parent) {
 			this.#tabfilter_item._parent.on(TABFILTER_EVENT_NEWITEM, this.onTabfilterNewItem);
 			this.#tabfilter_item.on(TABFILTERITEM_EVENT_DELETE, this.onTabfilterDelete);
@@ -2506,6 +2545,9 @@ class CDataTable {
 
 		this.#body_resize_observer?.disconnect();
 		this.#body_resize_observer = null;
+
+		this.#element_resize_observer?.disconnect();
+		this.#element_resize_observer = null;
 
 		if (this.#pager) {
 			this.#pager
@@ -2672,11 +2714,7 @@ class CDataTable {
 	}
 
 	#handleScrollbar() {
-		const total_column_width = this.#columns
-			.filter(column => column.getHeaderCell())
-			.reduce((width, column) => width + column.getHeaderCell().target.offsetWidth, 0);
-
-		if (total_column_width - 2 <= this.#body.clientWidth) {
+		if (this.#body.scrollWidth === this.#element.clientWidth) {
 			this.#body_resize_observer?.disconnect();
 			this.#body_resize_observer = null;
 
@@ -2725,11 +2763,12 @@ class CDataTable {
 		}
 
 		const header_resizer = header_cell.target.querySelector(`.${CDataTable.ZBX_STYLE_CELL_HEADER_RESIZER}`);
+		const header_cell_rect = header_cell.target.getBoundingClientRect();
 		const element_rect = this.#element.getBoundingClientRect();
 
-		const right_edge = header_cell.target.getBoundingClientRect().right - element_rect.left + 1;
-		const right_boundary = element_rect.width - table_options_button.clientWidth;
-		const right_offset = right_edge > right_boundary || this.#body.scrollWidth > element_rect.width
+		const right_edge = header_cell_rect.right - element_rect.left - 1;
+		const right_boundary = this.#element.clientWidth - table_options_button.clientWidth;
+		const right_offset = right_edge > right_boundary
 			? Math.max(0, Math.min(table_options_button.clientWidth, right_edge - right_boundary))
 			: 0;
 

@@ -824,7 +824,7 @@
 		}
 
 		#refresh(tabfilter_changed = false) {
-			if (isUserInteracting()) {
+			if (this.#datatable.isUserInteracting()) {
 				return;
 			}
 
