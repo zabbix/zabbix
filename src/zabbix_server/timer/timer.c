@@ -516,7 +516,7 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 
 				while (j < data->maintenances.values_num && k < query->maintenances.values_num)
 				{
-					/* delete suppresions that don't have any active maintenance periods */
+					/* delete suppressions that don't have any active maintenance periods */
 					if (data->maintenances.values[j].first < query->maintenances.values[k].first)
 					{
 						pair.first = query->eventid;
@@ -580,7 +580,7 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 					k++;
 				}
 
-				/* delete suppresions that don't have any active maintenance periods */
+				/* delete suppressions that don't have any active maintenance periods */
 				for (;j < data->maintenances.values_num; j++)
 				{
 					pair.first = query->eventid;
