@@ -3,6 +3,7 @@ Changes for 7.4.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-27304] fixed missing gap between tag badges when widget overlay dialog is open (isharha)
 ..F....... [ZBX-27443] fixed widget add/edit pop-up appearing under the main menu after dragging it (aluchko)
 ..F....... [ZBX-27708] fixed error displayed instead of graph for graphs with maximum height (kastafjevs)
 ..F....... [ZBX-25774] fixed thresholds colors not showing in "Top items" widget for "As is" numeric value (isharha)
