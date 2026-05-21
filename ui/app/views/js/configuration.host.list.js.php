@@ -496,13 +496,15 @@
 				.setCellRenderer('discovery', ({cell_data, cell_inner}) => {
 					const [hostid, items] = cell_data;
 
-					const url = new URL('host_discovery.php', location.href);
-					url.searchParams.set('filter_set', '1');
-					url.searchParams.set('filter_hostids[0]', hostid);
-					url.searchParams.set('context', 'host');
+					const url_params = {
+						action: 'lldrule.list',
+						filter_set: 1,
+						filter_hostids: [hostid],
+						context: 'host'
+					};
 
 					const item_link = document.createElement('a');
-					item_link.setAttribute('href', url.toString());
+					item_link.setAttribute('href', zabbixUrl(url_params));
 					item_link.textContent = <?= json_encode(_('Discovery')); ?>;
 
 					cell_inner.appendChild(item_link);
