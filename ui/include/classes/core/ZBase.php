@@ -537,9 +537,7 @@ class ZBase {
 			}
 		}
 
-		if ($HISTORY_PROVIDERS !== null) {
-			$history_manager->setStorageProviders($HISTORY_PROVIDERS, $value_type_ttl);
-		}
+		$history_manager->setStorageProviders($HISTORY_PROVIDERS, $value_type_ttl);
 	}
 
 	/**
