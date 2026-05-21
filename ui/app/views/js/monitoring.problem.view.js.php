@@ -31,6 +31,7 @@
 		#datatable = null;
 		#csrf_token = null;
 		#show_problems_hidden_column_ids = ['recovery', 'status'];
+		#refresh_message_box = null;
 
 		init({
 			csrf_token,
@@ -61,10 +62,7 @@
 
 			this.#initEvents();
 			this.#initPopupListeners();
-
-			if (this.#refresh_interval != 0) {
-				this.#scheduleRefresh();
-			}
+			this.#scheduleRefresh();
 
 			$(document).on({
 				mouseenter: function() {
@@ -405,12 +403,12 @@
 								maintenance_description = '';
 							}
 
-							let hint = `${maintenance_name} [${maintenance_type
+							let hint = `${escapeHtml(maintenance_name)} [${maintenance_type
 								? <?= json_encode(_('Maintenance without data collection')); ?>
 								: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 
 							if (maintenance_description) {
-								hint += `\n${maintenance_description}`;
+								hint += `\n${escapeHtml(maintenance_description)}`;
 							}
 
 							const maintenance_icon = document.createElement('button');
@@ -606,7 +604,11 @@
 				.on(CDataTable.EVENT_RENDER, e => {
 					const response = e.detail.response;
 
-					this.refreshCounters(response);
+					this.#refreshCounters(response);
+
+					if ('debug' in response) {
+						this.#refreshDebug(response.debug);
+					}
 
 					requestAnimationFrame(() => this.#initExpandables());
 				})
@@ -796,10 +798,29 @@
 			return document.querySelector('.wrapper > .debug-output');
 		}
 
-		refreshDebug(debug) {
-			this.getCurrentDebugBlock().replaceWith(
-				new DOMParser().parseFromString(debug, 'text/html').body.firstElementChild
-			);
+		#addRefreshMessage(messages) {
+			this.#removeRefreshMessage();
+
+			this.#refresh_message_box = $($.parseHTML(messages));
+			addMessage(this.#refresh_message_box);
+		}
+
+		#removeRefreshMessage() {
+			if (this.#refresh_message_box !== null) {
+				this.#refresh_message_box.remove();
+				this.#refresh_message_box = null;
+			}
+		}
+
+		#refreshDebug(debug) {
+			const debug_output = document
+				.querySelector('.wrapper > main > .<?= ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH ?>');
+
+			if (debug_output) {
+				debug_output.classList.add('<?= ZBX_STYLE_DEBUG_OUTPUT ?>');
+				debug_output.innerHTML = new DOMParser().parseFromString(debug, 'text/html')
+					.querySelector('.<?= ZBX_STYLE_DEBUG_OUTPUT ?>').innerHTML;
+			}
 		}
 
 		#refresh(tabfilter_changed = false) {
@@ -833,7 +854,7 @@
 				});
 		}
 
-		refreshCounters(response) {
+		#refreshCounters(response) {
 			if (this.#layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
 				return;
 			}
@@ -844,6 +865,10 @@
 		}
 
 		#scheduleRefresh() {
+			if (this.#refresh_interval == 0) {
+				return;
+			}
+
 			this.#unscheduleRefresh();
 			this.#refresh_interval_id = setInterval(() => this.#refresh(), this.#refresh_interval);
 		}
@@ -872,13 +897,13 @@
 		}
 
 		#onDataDone(response) {
+			this.#removeRefreshMessage();
+
 			if ('messages' in response) {
-				CMessageHelper.success(this.#datatable.getElement(), [], response.messages, {show_close_box: true});
+				this.#addRefreshMessage(response.messages);
 			}
 
-			this.refreshCounters(response);
-
-			('debug' in response) && this.refreshDebug(response.debug);
+			this.#refreshCounters(response);
 		}
 
 		getDataTable() {

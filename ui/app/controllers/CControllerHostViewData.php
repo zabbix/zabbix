@@ -285,12 +285,21 @@ class CControllerHostViewData extends CControllerDataTable {
 		}
 		unset($host);
 
-		return [
+		$output = [
 			'filter_counters' => $this->getFilterCounters(),
 			'data_fields' => $data_fields,
 			'rows' => array_values(array_map(static fn (array $host) => [[], $host], $hosts)),
 			'allowed_ui_latest_data' => $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 		];
+
+		$debug_mode = CWebUser::$data['debug_mode'] ?? GROUP_DEBUG_MODE_DISABLED;
+
+		if ($debug_mode == GROUP_DEBUG_MODE_ENABLED) {
+			CProfiler::getInstance()->stop();
+			$output['debug'] = CProfiler::getInstance()->make()->toString();
+		}
+
+		return $output;
 	}
 
 	private function getFilterCounters(): array {

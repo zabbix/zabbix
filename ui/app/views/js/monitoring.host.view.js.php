@@ -61,9 +61,7 @@
 			this.#initDataTable({filter, page, default_sort_field, default_sort_order, sort_field, sort_order,
 				storage_idx, user_configs});
 
-			if (this.#refresh_interval != 0) {
-				this.#scheduleRefresh();
-			}
+			this.#scheduleRefresh();
 		}
 
 		#initTabFilter(filter_options) {
@@ -210,12 +208,12 @@
 						maintenance_icon.setAttribute('role', 'button');
 
 						if (maintenance.status == HOST_MAINTENANCE_STATUS_ON) {
-							let hint = `${maintenance.name} [${maintenance.type
+							let hint = `${escapeHtml(maintenance.name)} [${maintenance.type
 								? <?= json_encode(_('Maintenance without data collection')); ?>
 								: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 
 							if (maintenance.description != '') {
-								hint += "\n" + maintenance.description;
+								hint += "\n" + escapeHtml(maintenance.description);
 							}
 
 							maintenance_icon.setAttribute('data-hintbox-html', hint);
@@ -370,6 +368,10 @@
 					const response = e.detail.response;
 
 					this.#refreshCounters(response);
+
+					if ('debug' in response) {
+						this.#refreshDebug(response.debug);
+					}
 				})
 				.on(CDataTable.EVENT_DATA_SORT, () => this.#scheduleRefresh())
 				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.#unscheduleRefresh())
@@ -407,6 +409,17 @@
 			}
 		}
 
+		#refreshDebug(debug) {
+			const debug_output = document
+				.querySelector('.wrapper > main > .<?= ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH ?>');
+
+			if (debug_output) {
+				debug_output.classList.add('<?= ZBX_STYLE_DEBUG_OUTPUT ?>');
+				debug_output.innerHTML = new DOMParser().parseFromString(debug, 'text/html')
+					.querySelector('.<?= ZBX_STYLE_DEBUG_OUTPUT ?>').innerHTML;
+			}
+		}
+
 		#refresh() {
 			if (isUserInteracting()) {
 				return;
@@ -437,18 +450,26 @@
 		#onDataDone(response) {
 			this.#removeRefreshMessage();
 
+			if ('messages' in response) {
+				this.#addRefreshMessage(response.messages);
+			}
+
+			if ('debug' in response) {
+				this.#refreshDebug(response.debug);
+			}
+
 			if ('groupids' in response) {
 				this.#applied_filter_groupids = response.groupids;
 			}
 
 			this.#refreshCounters(response);
-
-			if ('messages' in response) {
-				this.#addRefreshMessage(response.messages);
-			}
 		}
 
 		#scheduleRefresh() {
+			if (this.#refresh_interval == 0) {
+				return;
+			}
+
 			this.#unscheduleRefresh();
 			this.#refresh_interval_id = setInterval(() => this.#refresh(), this.#refresh_interval);
 		}

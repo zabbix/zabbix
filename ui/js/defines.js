@@ -28,6 +28,7 @@ const ZBX_SORT_UP = 'ASC';
 const ZBX_SORT_DOWN = 'DESC';
 
 const ZBX_STYLE_LOADING = 'is-loading';
+const ZBX_STYLE_LOADING_FADEIN = 'is-loading-fadein';
 
 const ZBX_STYLE_HIDDEN = 'hidden';
 const ZBX_STYLE_DISPLAY_NONE = 'display-none';
