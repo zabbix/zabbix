@@ -149,6 +149,10 @@
 						this.#datatable.getElement().classList.toggle('compact-view', option.checked);
 					},
 					onChange: (e, option) => {
+						for (const id of ['time', 'problem']) {
+							this.#datatable.getColumnById(id)?.setShowOptionsPopup(!e.target.checked);
+						}
+
 						this.#datatable.updateOption(option.id, { checked: e.target.checked });
 
 						this.#datatable.dispatchEvent(CDataTable.EVENT_INIT);

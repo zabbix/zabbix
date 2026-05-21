@@ -423,7 +423,7 @@ class CDataTable {
 					cell.appendChild(cell_inner);
 				}
 
-				if (column.getOptionsPopupHandler()) {
+				if (column.isShowOptionsPopup() && column.getOptionsPopupHandler()) {
 					const icon = document.createElement('span');
 					icon.classList.add(column.getOptionsPopupHandleIcon());
 
