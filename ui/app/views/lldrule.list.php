@@ -244,7 +244,7 @@ foreach ($data['discoveries'] as $discovery) {
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'popup')
 						->setArgument('popup', 'lldrule.edit')
-						->setArgument('context', $data['context'])
+						->setArgument('context', 'host')
 						->setArgument('itemid', $discovery['discoveryRule']['itemid'])
 						->getUrl()
 				))
@@ -269,7 +269,7 @@ foreach ($data['discoveries'] as $discovery) {
 		else {
 			$item_url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'popup')
-				->setArgument('popup', 'lldrule.edit')
+				->setArgument('popup', 'item.edit')
 				->setArgument('context', 'host')
 				->setArgument('itemid', $discovery['master_item']['itemid'])
 				->getUrl();
