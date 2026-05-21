@@ -81,6 +81,18 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		}
 
 		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
+
+		$response = $this->call('host.get', [
+			'filter' => ['host' => 'Zabbix server'],
+			'output' => ['hostid']
+		]);
+		if (!empty($response['result'])) {
+			$this->call('host.update', [
+				'hostid' => $response['result'][0]['hostid'],
+				'status' => HOST_STATUS_NOT_MONITORED
+			]);
+		}
+
 		$response = $this->call('hostgroup.get', [
 			'filter' => ['name' => ['Zabbix servers']],
 			'output' => ['groupid']
