@@ -17,6 +17,7 @@
 
 static const tq_column_info_t	column_info_apm_traces[] = {
 	{"Timestamp",		TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"TraceId",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
 	{"SpanId",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
 	{"ParentSpanId",	TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
 	{"TraceState",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
@@ -40,28 +41,140 @@ static const tq_column_info_t	column_info_apm_traces[] = {
 	{0}
 };
 
+static const tq_column_info_t	column_info_apm_logs[] = {
+	{"Timestamp",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL	},
+	{"TraceId",			TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"SpanId",			TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"TraceFlags",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL	},
+	{"SeverityText",		TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"SeverityNumber",		TQ_COLUMN_TYPE_NUM,		NULL,		NULL	},
+	{"ServiceName",			TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"Body",			TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"ResourceSchemaUrl",		TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"ResourceAttributes",		TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL	},
+	{"ScopeSchemaUrl",		TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"ScopeName",			TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"ScopeVersion",		TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"ScopeAttributes",		TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL	},
+	{"LogAttributes",		TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL	},
+	{0}
+};
+
 static const tq_column_info_t	column_info_apm_metrics_sum[] = {
-	/* TODO */
+	{"ResourceAttributes",		TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL			},
+	{"ResourceSchemaUrl",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ScopeName",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ScopeVersion",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ScopeAttributes",		TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL			},
+	{"ScopeDroppedAttrCount",	TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"ScopeSchemaUrl",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ServiceName",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"MetricName",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"MetricDescription",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"MetricUnit",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"Attributes",			TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL			},
+	{"StartTimeUnix",		TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"TimeUnix",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"Value",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"Flags",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"Exemplars.FilteredAttributes",TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,"Exemplars",    "Exemplars.FilteredAttributes"},
+	{"Exemplars.TimeUnix",		TQ_COLUMN_TYPE_ARRAY_NUM,	"Exemplars",	"Exemplars.TimeUnix"	},
+	{"Exemplars.Value",		TQ_COLUMN_TYPE_ARRAY_NUM,	"Exemplars",	"Exemplars.Value"	},
+	{"Exemplars.SpanId",		TQ_COLUMN_TYPE_ARRAY_STR,	"Exemplars",	"Exemplars.SpanId"	},
+	{"Exemplars.TraceId",		TQ_COLUMN_TYPE_ARRAY_STR,	"Exemplars",	"Exemplars.TraceId"	},
+	{"AggregationTemporality",	TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"IsMonotonic",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
 	{0}
 };
 
 static const tq_column_info_t	column_info_apm_metrics_gauge[] = {
-	/* TODO */
+	{"ResourceAttributes",		TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL			},
+	{"ResourceSchemaUrl",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ScopeName",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ScopeVersion",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ScopeAttributes",		TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL			},
+	{"ScopeDroppedAttrCount",	TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"ScopeSchemaUrl",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ServiceName",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"MetricName",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"MetricDescription",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"MetricUnit",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"Attributes",			TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL			},
+	{"StartTimeUnix",		TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"TimeUnix",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"Value",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"Flags",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"Exemplars.FilteredAttributes",TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,"Exemplars",    "Exemplars.FilteredAttributes"},
+	{"Exemplars.TimeUnix",		TQ_COLUMN_TYPE_ARRAY_NUM,	"Exemplars",	"Exemplars.TimeUnix"	},
+	{"Exemplars.Value",		TQ_COLUMN_TYPE_ARRAY_NUM,	"Exemplars",	"Exemplars.Value"	},
+	{"Exemplars.SpanId",		TQ_COLUMN_TYPE_ARRAY_STR,	"Exemplars",	"Exemplars.SpanId"	},
+	{"Exemplars.TraceId",		TQ_COLUMN_TYPE_ARRAY_STR,	"Exemplars",	"Exemplars.TraceId"	},
 	{0}
 };
 
 static const tq_column_info_t	column_info_apm_metrics_histogram[] = {
-	/* TODO */
+	{"ResourceAttributes",		TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL			},
+	{"ResourceSchemaUrl",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ScopeName",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ScopeVersion",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ScopeAttributes",		TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL			},
+	{"ScopeDroppedAttrCount",	TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"ScopeSchemaUrl",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ServiceName",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"MetricName",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"MetricDescription",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"MetricUnit",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"Attributes",			TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL			},
+	{"StartTimeUnix",		TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"TimeUnix",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"Count",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"Sum",				TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"BucketCounts",		TQ_COLUMN_TYPE_ARRAY_NUM,	"BucketCounts",	"BucketCounts.value"	},
+	{"ExplicitBounds",		TQ_COLUMN_TYPE_ARRAY_NUM,	"ExplicitBounds","ExplicitBounds.value"	},
+	{"Exemplars.FilteredAttributes",TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,"Exemplars",	"Exemplars.FilteredAttributes"},
+	{"Exemplars.TimeUnix",		TQ_COLUMN_TYPE_ARRAY_NUM,	"Exemplars",	"Exemplars.TimeUnix"	},
+	{"Exemplars.Value",		TQ_COLUMN_TYPE_ARRAY_NUM,	"Exemplars",	"Exemplars.Value"	},
+	{"Exemplars.SpanId",		TQ_COLUMN_TYPE_ARRAY_STR,	"Exemplars",	"Exemplars.SpanId"	},
+	{"Exemplars.TraceId",		TQ_COLUMN_TYPE_ARRAY_STR,	"Exemplars",	"Exemplars.TraceId"	},
+	{"Flags",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"Min",				TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"Max",				TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"AggregationTemporality",	TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
 	{0}
 };
 
 static const tq_column_info_t	column_info_apm_metrics_exponentialhistogram[] = {
-	/* TODO */
-	{0}
-};
-
-static const tq_column_info_t	column_info_apm_logs[] = {
-	/* TODO */
+	{"ResourceAttributes",		TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL			},
+	{"ResourceSchemaUrl",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ScopeName",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ScopeVersion",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ScopeAttributes",		TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL			},
+	{"ScopeDroppedAttrCount",	TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"ScopeSchemaUrl",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"ServiceName",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"MetricName",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"MetricDescription",		TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"MetricUnit",			TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
+	{"Attributes",			TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL			},
+	{"StartTimeUnix",		TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"TimeUnix",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"Count",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"Sum",				TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"Scale",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"ZeroCount",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"PositiveOffset",		TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"PositiveBucketCounts",	TQ_COLUMN_TYPE_ARRAY_NUM,	NULL,		NULL			},
+	{"NegativeOffset",		TQ_COLUMN_TYPE_NUM,		"NegativeOffset","NegativeOffset.value"	},
+	{"NegativeBucketCounts",	TQ_COLUMN_TYPE_ARRAY_NUM,  "NegativeBucketCounts","NegativeBucketCounts.value"},
+	{"Exemplars.FilteredAttributes",TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,"Exemplars",	"Exemplars.FilteredAttributes"},
+	{"Exemplars.TimeUnix",		TQ_COLUMN_TYPE_ARRAY_NUM,	"Exemplars",	"Exemplars.TimeUnix"	},
+	{"Exemplars.Value",		TQ_COLUMN_TYPE_ARRAY_NUM,	"Exemplars",	"Exemplars.Value"	},
+	{"Exemplars.SpanId",		TQ_COLUMN_TYPE_ARRAY_STR,	"Exemplars",	"Exemplars.SpanId"	},
+	{"Exemplars.TraceId",		TQ_COLUMN_TYPE_ARRAY_STR,	"Exemplars",	"Exemplars.TraceId"	},
+	{"Flags",			TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"Min",				TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"Max",				TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
+	{"AggregationTemporality",	TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
 	{0}
 };
 
