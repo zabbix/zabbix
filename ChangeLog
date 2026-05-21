@@ -1,6 +1,9 @@
 Changes for 8.0.0beta1
 
 New features:
+.........T [ZBXNEXT-10498] added GLPI by HTTP template (mruszczyk)
+.........T [ZBXNEXT-10392] added Oracle Cloud Load Balancer by HTTP template (knaglis)
+..F....... [ZBXNEXT-5158] implemented customizable table component (gklavins)
 ..F....... [ZBXNEXT-9745] introduced inline form validation for Script form (msnihach)
 A.F....... [ZBXNEXT-10243] introduced new ZBX_FEATURE_FLAGS variable to disable access to modules, media types and HTTP authentication at the system level (kkuzmina)
 ..F....... [ZBXNEXT-6779] added CSV export for audit log records (kastafjevs)
@@ -42,6 +45,9 @@ A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25
 A...I..PS. [ZBXNEXT-10076] changed delayed deletion process via housekeeper table (agriscenko, askolmeisters)
 
 Bug fixes:
+..F....... [ZBX-27821] fixed infinite refresh in monitoring hosts, latest data and problems (gklavins)
+...G...PS. [ZBX-27336] added host name validation for net.tcp.port[], net.tcp.service[], net.tcp.service.perf[], net.udp.service[], net.udp.service.perf[] items (Andris, askolmeisters)
+..F....... [ZBX-27304] fixed missing gap between tag badges when widget overlay dialog is open (isharha)
 ..F....... [ZBX-27443] fixed widget add/edit pop-up appearing under the main menu after dragging it (aluchko)
 ..F....... [ZBX-27708] fixed error displayed instead of graph for graphs with maximum height (kastafjevs)
 ..F....... [ZBX-25774] fixed thresholds colors not showing in "Top items" widget for "As is" numeric value (isharha)
@@ -336,6 +342,7 @@ Changes for 7.4.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-27304] fixed missing gap between tag badges when widget overlay dialog is open (isharha)
 ..F....... [ZBX-27443] fixed widget add/edit pop-up appearing under the main menu after dragging it (aluchko)
 ..F....... [ZBX-27708] fixed error displayed instead of graph for graphs with maximum height (kastafjevs)
 ..F....... [ZBX-25774] fixed thresholds colors not showing in "Top items" widget for "As is" numeric value (isharha)
