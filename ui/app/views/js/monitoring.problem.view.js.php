@@ -160,6 +160,7 @@
 					}
 				})
 				.setOption('highlight_row', <?= json_encode(_('Highlight whole row')); ?>, {
+					enabled: <?= in_array(CWebUser::$data['theme'], ['hc-light', 'hc-dark']) ? 'false' : 'true'; ?>,
 					onRender: option => {
 						this.#datatable.getElement().classList.toggle('has-highlighted-rows', option.checked);
 					},
@@ -281,7 +282,7 @@
 					requestAnimationFrame(() => {
 						const highlight_row = this.#datatable.getOption('highlight_row');
 
-						if (highlight_row.checked) {
+						if (highlight_row.enabled && highlight_row.checked) {
 							const severity_data = severities.find(data => data.value == severity);
 							if (!severity_data) {
 								return;

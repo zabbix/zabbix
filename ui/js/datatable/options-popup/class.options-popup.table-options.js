@@ -36,7 +36,7 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 			const table_options = document.createElement('ul');
 			table_options.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST);
 
-			for (const [id, option] of Object.entries(options)) {
+			for (const [id, option] of Object.entries(options).filter(([, option]) => option.enabled)) {
 				const input = document.createElement('input');
 				input.id = id;
 				input.classList.add(ZBX_STYLE_CHECKBOX_RADIO);

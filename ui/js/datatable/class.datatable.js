@@ -289,6 +289,7 @@ class CDataTable {
 	#visible_columns = [];
 
 	#option_defaults = {
+		enabled: true,
 		checked: false,
 		onRender: () => {},
 		onChange: () => {},
@@ -2164,7 +2165,9 @@ class CDataTable {
 			this.#renderRows(response);
 
 			for (const [, option] of Object.entries(this.#options)) {
-				option.onRender(option);
+				if (option.enabled) {
+					option.onRender(option);
+				}
 			}
 		}
 
