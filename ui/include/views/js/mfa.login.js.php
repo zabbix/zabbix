@@ -31,7 +31,7 @@
 				height: size,
 				correctLevel : QRCode.CorrectLevel.L,
 				useCanvas: true,
-				draw_precise: true
+				draw_integer: true
 			});
 		}
 	}
