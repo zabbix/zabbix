@@ -379,7 +379,7 @@ var QRCode;
 		 */
 		Drawing.prototype.drawInteger = function (oQRCode) {
 			const nCount = oQRCode.getModuleCount();
-			let module_size = Math.floor(this._htOption.width / (8 + nCount));
+			const module_size = Math.floor(this._htOption.width / (8 + nCount));
 
 			const border_size = 4 * module_size;
 			const image_size = 2 * border_size  + nCount * module_size;
