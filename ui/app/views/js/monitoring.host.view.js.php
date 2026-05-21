@@ -425,6 +425,8 @@
 				return;
 			}
 
+			this.#unscheduleRefresh();
+
 			const search_params = new URLSearchParams(location.search.substring(1));
 			const current_filter = searchParamsToObject(search_params);
 			const filter = {...this.#filter_defaults, ...current_filter};
@@ -433,7 +435,8 @@
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,
 					force_load: true,
-					onSuccess: response => this.#onDataDone(response)
+					onSuccess: response => this.#onDataDone(response),
+					onFinally: () => this.#scheduleRefresh()
 				});
 		}
 
