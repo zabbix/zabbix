@@ -377,16 +377,12 @@ var QRCode;
 		 *
 		 * @param oQRCode
 		 */
-		Drawing.prototype.drawPrecise = function (oQRCode) {
+		Drawing.prototype.drawInteger = function (oQRCode) {
 			const nCount = oQRCode.getModuleCount();
-			let module_size = Math.floor(this._htOption.width / nCount);
+			let module_size = Math.floor(this._htOption.width / (8 + nCount));
 
-			while (module_size > Math.floor((this._htOption.width - 8 * module_size) / nCount)) {
-				module_size--;
-			}
-
-			const border = 4 * module_size;
-			const image_size = 2 * border  + nCount * module_size;
+			const border_size = 4 * module_size;
+			const image_size = 2 * border_size  + nCount * module_size;
 
 			this._elImage.width = image_size;
 			this._elImage.height = image_size;
@@ -400,17 +396,19 @@ var QRCode;
 			this._oContext.fillStyle = this._htOption.colorLight;
 			this._oContext.fillRect(0, 0, image_size, image_size);
 
+			this._oContext.strokeStyle = this._htOption.colorDark;
+			this._oContext.fillStyle = this._htOption.colorDark;
+
 			for (let row = 0; row < nCount; row++) {
 				for (let col = 0; col < nCount; col++) {
-					var bIsDark = oQRCode.isDark(row, col);
-					this._oContext.strokeStyle = bIsDark ? this._htOption.colorDark : this._htOption.colorLight;
-					this._oContext.fillStyle = bIsDark ? this._htOption.colorDark : this._htOption.colorLight;
-					this._oContext.fillRect(
-						col * module_size + border,
-						row * module_size + border,
-						module_size,
-						module_size
-					);
+					if (oQRCode.isDark(row, col)) {
+						this._oContext.fillRect(
+							col * module_size + border_size,
+							row * module_size + border_size,
+							module_size,
+							module_size
+						);
+					}
 				}
 			}
 
@@ -425,8 +423,8 @@ var QRCode;
 		 * @param {QRCode} oQRCode 
 		 */
 		Drawing.prototype.draw = function (oQRCode) {
-			if (this._htOption.draw_precise) {
-				this.drawPrecise(oQRCode);
+			if (this._htOption.draw_integer) {
+				this.drawInteger(oQRCode);
 				return;
 			}
 
