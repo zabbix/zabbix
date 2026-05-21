@@ -624,7 +624,7 @@
 							cell_inner.appendChild(proxy_link);
 						}
 						else {
-							cell_inner.innerHTML = proxy.name;
+							cell_inner.innerHTML = escapeHtml(proxy.name);
 						}
 					}
 					else if (monitored_by == ZBX_MONITORED_BY_PROXY_GROUP) {
@@ -643,7 +643,7 @@
 							cell_inner.appendChild(proxy_group_link);
 						}
 						else {
-							cell_inner.innerHTML = proxy_group.name;
+							cell_inner.innerHTML = escapeHtml(proxy_group.name);
 						}
 
 						if (assigned_proxyid != 0) {
@@ -661,7 +661,7 @@
 								cell_inner.appendChild(proxy_link);
 							}
 							else {
-								cell_inner.innerHTML += assigned_proxy.name;
+								cell_inner.innerHTML += escapeHtml(assigned_proxy.name);
 							}
 						}
 					}
