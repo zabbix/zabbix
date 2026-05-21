@@ -29,7 +29,7 @@ require_once __DIR__.'/../behaviors/CTagBehavior.php';
 class testPageProblems extends CWebTest {
 
 	/**
-	 * Attach TagBehavior, DatatablBehavior and TableBehavior to the test.
+	 * Attach TagBehavior, CDatatableBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
