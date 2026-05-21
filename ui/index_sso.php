@@ -190,7 +190,7 @@ try {
 		exit;
 	}
 
-	if (hasRequest('acs') && !CSessionHelper::has('saml_data')) {
+	if (isRequestMethod('post') && hasRequest('acs') && !CSessionHelper::has('saml_data')) {
 		$auth->processResponse();
 
 		if (!$auth->isAuthenticated()) {
@@ -345,18 +345,34 @@ try {
 		redirect(reset($redirect));
 	}
 
-	$auth->login();
+	$auth->login(null, [], hasRequest('force_authn'));
 }
 catch (Exception $e) {
-	CSessionHelper::unset(['saml_data']);
-
 	error($e->getMessage());
+}
+
+$sso_authorized = CSessionHelper::has('saml_data');
+CSessionHelper::unset(['saml_data']);
+
+if ($sso_authorized) {
+	error(_('You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed.'));
+	error(_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.'));
 }
 
 echo (new CView('general.warning', [
 	'header' => _('You are not logged in'),
 	'messages' => array_column(get_and_clear_messages(), 'message'),
 	'buttons' => [
+		$sso_authorized && (!CWebUser::isLoggedIn() || CWebUser::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
+			? (new CButton('force_authn', _('Switch SSO user')))
+					->setAttribute('data-url',
+						(new CUrl('index_sso.php'))
+							->setArgument('force_authn')
+							->setArgument('request', $request)
+							->getUrl()
+					)
+					->onClick('document.location = this.dataset.url;')
+			: null,
 		(new CButton('login', _('Login')))
 			->setAttribute('data-url',
 				$redirect_to

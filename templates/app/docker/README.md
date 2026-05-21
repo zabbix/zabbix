@@ -116,7 +116,9 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Container {#NAME}: Get stats|<p>Get container stats based on resource usage.</p>|Zabbix agent|docker.container_stats["{#NAME}"]|
+|Container {#NAME}: Get stats|<p>Gets container stats based on resource usage.</p>|Zabbix agent|docker.container_stats["{#NAME}"]|
+|Container {#NAME}: Memory usage active|<p>Calculates the active memory usage of the container.</p>|Calculated|docker.container_stats.memory.usage_active["{#NAME}"]|
+|Container {#NAME}: Memory usage inactive|<p>Gets the inactive memory usage of the container.</p>|Dependent item|docker.container_stats.memory.usage_inactive["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.memory_stats.stats.inactive_file`</p></li></ul>|
 |Container {#NAME}: CPU total usage per second||Dependent item|docker.container_stats.cpu_usage.total.rate["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpu_stats.cpu_usage.total_usage`</p></li><li>Change per second</li><li><p>Custom multiplier: `1.0E-9`</p></li></ul>|
 |Container {#NAME}: CPU percent usage||Dependent item|docker.container_stats.cpu_pct_usage["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpu_stats.cpu_usage.percent_usage`</p></li></ul>|
 |Container {#NAME}: CPU kernelmode usage per second||Dependent item|docker.container_stats.cpu_usage.kernel.rate["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpu_stats.cpu_usage.usage_in_kernelmode`</p></li><li>Change per second</li><li><p>Custom multiplier: `1.0E-9`</p></li></ul>|
@@ -125,7 +127,7 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 |Container {#NAME}: Throttling periods|<p>Number of periods with throttling active.</p>|Dependent item|docker.container_stats.cpu_usage.throttling_periods["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpu_stats.throttling_data.periods`</p></li></ul>|
 |Container {#NAME}: Throttled periods|<p>Number of periods when the container hits its throttling limit.</p>|Dependent item|docker.container_stats.cpu_usage.throttled_periods["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpu_stats.throttling_data.throttled_periods`</p></li></ul>|
 |Container {#NAME}: Throttled time|<p>Aggregate time the container was throttled for in nanoseconds.</p>|Dependent item|docker.container_stats.cpu_usage.throttled_time["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpu_stats.throttling_data.throttled_time`</p></li><li><p>Custom multiplier: `1.0E-9`</p></li></ul>|
-|Container {#NAME}: Memory usage||Dependent item|docker.container_stats.memory.usage["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.memory_stats.usage`</p></li></ul>|
+|Container {#NAME}: Memory usage total|<p>Gets the total memory usage (inactive, active) from the container.</p>|Dependent item|docker.container_stats.memory.usage_total["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.memory_stats.usage`</p></li></ul>|
 |Container {#NAME}: Memory maximum usage||Dependent item|docker.container_stats.memory.max_usage["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.memory_stats.max_usage`</p></li></ul>|
 |Container {#NAME}: Memory commit bytes||Dependent item|docker.container_stats.memory.commit_bytes["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.memory_stats.commitbytes`</p></li></ul>|
 |Container {#NAME}: Memory commit peak bytes||Dependent item|docker.container_stats.memory.commit_peak_bytes["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.memory_stats.commitpeakbytes`</p></li></ul>|
@@ -139,7 +141,7 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 |Container {#NAME}: Networks packets sent per second||Dependent item|docker.networks.tx_packets["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.networks[*].tx_packets.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
 |Container {#NAME}: Networks errors sent per second||Dependent item|docker.networks.tx_errors["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.networks[*].tx_errors.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
 |Container {#NAME}: Networks outgoing packets dropped per second||Dependent item|docker.networks.tx_dropped["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.networks[*].tx_dropped.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
-|Container {#NAME}: Get info|<p>Return low-level information about a container.</p>|Zabbix agent|docker.container_info["{#NAME}",full]|
+|Container {#NAME}: Get info|<p>Returns low-level information about a container.</p>|Zabbix agent|docker.container_info["{#NAME}",full]|
 |Container {#NAME}: Created||Dependent item|docker.container_info.created["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Container {#NAME}: Image||Dependent item|docker.container_info.image["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Names[0] == "{#NAME}")].Image.first()`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Container {#NAME}: Restart count||Dependent item|docker.container_info.restart_count["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.RestartCount`</p></li></ul>|

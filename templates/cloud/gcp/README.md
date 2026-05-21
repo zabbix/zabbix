@@ -66,6 +66,8 @@ More on metrics and used API methods:
 
   - [Cloud Run](https://docs.cloud.google.com/monitoring/api/metrics_gcp_p_z#gcp-run)
 
+  - [Cloud Storage](https://docs.cloud.google.com/monitoring/api/metrics_gcp_p_z#gcp-storage)
+
 
 ### Macros used
 
@@ -109,6 +111,8 @@ More on metrics and used API methods:
 |{$GCP.CLOUD.RUN.SERVICE.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Cloud Run services by name.</p>|`CHANGE_IF_NEEDED`|
 |{$GCP.CLOUD.RUN.SERVICE.CONDITION.MATCHES}|<p>The filter to include GCP Cloud Run services by condition.</p>|`.*`|
 |{$GCP.CLOUD.RUN.SERVICE.CONDITION.NOT_MATCHES}|<p>The filter to exclude GCP Cloud Run services by condition.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.BUCKET.NAME.MATCHES}|<p>The filter to include GCP Cloud Storage buckets by name.</p>|`.*`|
+|{$GCP.BUCKET.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Cloud Storage buckets by name.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
@@ -128,6 +132,8 @@ More on metrics and used API methods:
 |Container-optimized GCE instances count|<p>GCP Compute Engine: count of instances with Container-Optimized OS used.</p>|Dependent item|gcp.gce.instances.cos_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.i_type == 'container-optimized')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Project quotas get|<p>GCP Compute Engine resource quotas available for the particular project.</p>|Dependent item|gcp.gce.quotas.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Cloud Run service total|<p>GCP Cloud Run services total count.</p>|Dependent item|gcp.run.service.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[*].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Cloud Storage buckets get|<p>GCP Cloud Storage: Buckets get.</p>|Dependent item|gcp.storage.buckets.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Cloud Storage buckets total|<p>GCP Cloud Storage buckets total count.</p>|Dependent item|gcp.storage.buckets.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[*].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Triggers
 
@@ -187,6 +193,12 @@ More on metrics and used API methods:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |GCP Cloud Run: Service discovery|<p>GCP Cloud Run services discovery.</p>|Dependent item|gcp.run.service.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### LLD rule GCP Cloud Storage: Buckets discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP Cloud Storage: Buckets discovery|<p>GCP Cloud Storage: Buckets discovery.</p>|Dependent item|gcp.storage.buckets.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 # GCP Compute Engine Instance by HTTP
 
@@ -858,6 +870,78 @@ This template will be automatically connected to discovered entities with all th
 |GCP Cloud Run Service: Too many HTTP request failures|<p>Too many requests failed on service with the `5xx` HTTP code.</p>|`min(/GCP Cloud Run Service by HTTP/gcp.run.request.5xx.rate,5m)>{$GCP.HTTP.FAIL.MAX.WARN}`|Warning||
 |GCP Cloud Run Service: Request latency is too high|<p>Fires when latency exceeds the threshold `{$GCP.REQUEST.LATENCY.WARN}`ms.</p>|`min(/GCP Cloud Run Service by HTTP/gcp.run.request.latency,5m)>{$GCP.REQUEST.LATENCY.WARN}`|Warning|**Manual close**: Yes|
 |GCP Cloud Run Service: No active container instances|<p>There are no active container instances for the service. This may indicate that the service is not receiving traffic or there is an issue with scaling.</p>|`max(/GCP Cloud Run Service by HTTP/gcp.run.active.container.count,15m)=0`|Warning|**Manual close**: Yes|
+
+# GCP Cloud Storage Bucket by HTTP
+
+## Overview
+
+This template is designed to monitor Google Cloud Platform Cloud Storage buckets using Zabbix.
+
+
+## Requirements
+
+Zabbix version: 8.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- GCP Cloud Storage
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$GCP.PROJECT.ID}|<p>GCP project ID.</p>||
+|{$GCP.DATA.TIMEOUT}|<p>Response timeout for API.</p>|`15s`|
+|{$GCP.TIME.WINDOW}|<p>Time interval for data requests.</p><p>Supported usage types:</p><p>- Default update interval for most items.</p><p>- Minimal time window for data requested in Monitoring Query Language REST API request.</p>|`1h`|
+|{$GCP.PROXY}|<p>Sets HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$GCS.BUCKET.SIZE.MAX}|<p>GCP Cloud Storage bucket size threshold (in bytes). Default is 1TB.</p>|`1T`|
+|{$GCS.BUCKET.SIZE.GROWTH.MAX}|<p>GCP Cloud Storage bucket size growth threshold (in bytes per hour). Default is 10GB.</p>|`10G`|
+|{$GCS.OBJECT.COUNT.MAX}|<p>GCP Cloud Storage bucket object count threshold. Default is 1M objects.</p>|`1000000`|
+|{$GCS.EGRESS.MAX}|<p>GCP Cloud Storage bucket egress traffic threshold (in bytes per 5m). Default is 100MB.</p>|`104857600`|
+|{$GCS.INGRESS.MAX}|<p>GCP Cloud Storage bucket ingress traffic threshold (in bytes per 5m). Default is 100MB.</p>|`104857600`|
+|{$GCS.API.ERROR.MAX}|<p>GCP Cloud Storage bucket API error rate threshold (per 5m). Default is 50.</p>|`50`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get bucket storage info|<p>GCP Cloud Storage bucket raw metric data.</p>|HTTP agent|gcp.storage.bucket.metrics.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Bucket size|<p>GCP Cloud Storage bucket total size.</p>|Dependent item|gcp.storage.bucket.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..size.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Bucket objects total count|<p>Cloud Storage bucket total object count.</p>|Dependent item|gcp.storage.bucket.objects.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..objects.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get bucket network traffic|<p>GCP Cloud Storage bucket raw traffic data.</p>|HTTP agent|gcp.storage.bucket.network.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Bucket sent bytes|<p>Outgoing network traffic from the bucket.</p>|Dependent item|gcp.storage.bucket.network.sent_bytes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$..sent.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Bucket received bytes|<p>Incoming network traffic to the bucket.</p>|Dependent item|gcp.storage.bucket.network.received_bytes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$..received.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get bucket API metric|<p>GCP Cloud Storage bucket API raw metric data.</p>|HTTP agent|gcp.storage.bucket.requests.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Successful request count|<p>Number of `2xx` requests reaching the service.</p>|Dependent item|gcp.storage.bucket.request.2xx<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.r2xx`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|Client error request count|<p>Number of `4xx` requests reaching the service.</p>|Dependent item|gcp.storage.bucket.request.4xx<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.r4xx`</p></li></ul>|
+|Server error request count|<p>Number of `5xx` requests reaching the service.</p>|Dependent item|gcp.storage.bucket.request.5xx<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.r5xx`</p></li></ul>|
+|Total requests|<p>Number of all requests reaching the service.</p>|Calculated|gcp.storage.bucket.request.total<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Error rate|<p>Rate of failed requests reaching the service.</p>|Calculated|gcp.storage.bucket.request.error.rate<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|Success rate|<p>Rate of successful requests reaching the service.</p>|Calculated|gcp.storage.bucket.request.success.rate<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `100`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|GCP Cloud Storage: GCP API is failing (bucket metrics)|<p>No data received from GCP API for the last 30 minutes. Possible query error or API failure.</p>|`nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.metrics.get,30m)=1`|High|**Manual close**: Yes|
+|GCP Cloud Storage: Bucket size is too large|<p>Bucket size exceeds the configured threshold.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.size,1h)>{$GCS.BUCKET.SIZE.MAX}`|Warning||
+|GCP Cloud Storage: Rapid storage growth detected|<p>Bucket size growth rate exceeds the configured threshold.</p>|`change(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.size)>{$GCS.BUCKET.SIZE.GROWTH.MAX}`|Warning|**Manual close**: Yes|
+|GCP Cloud Storage: Bucket object count is too high|<p>Number of objects in the bucket exceeds the configured limit.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.objects.count,1h)>{$GCS.OBJECT.COUNT.MAX}`|Warning||
+|GCP Cloud Storage: No objects in bucket|<p>No objects have been stored in the bucket for the last 24 hours.</p>|`max(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.objects.count,24h)=0`|Info|**Manual close**: Yes|
+|GCP Cloud Storage: GCP API is failing (bucket network traffic)|<p>No data received from GCP API for the last 30 minutes. Possible query error or API failure.</p>|`nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.network.get,30m)=1`|High|**Manual close**: Yes|
+|GCP Cloud Storage: High egress traffic|<p>Outgoing network traffic from the bucket exceeds the threshold.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.network.sent_bytes,5m)>{$GCS.EGRESS.MAX}`|Warning||
+|GCP Cloud Storage: High ingress traffic|<p>Incoming network traffic to the bucket exceeds the threshold.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.network.received_bytes,5m)>{$GCS.INGRESS.MAX}`|Info||
+|GCP Cloud Storage: GCP API is failing (bucket requests)|<p>No data received from GCP API for the last 30 minutes. Possible query error or API failure.</p>|`nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.requests.get,30m)=1`|High|**Manual close**: Yes|
+|GCP Cloud Storage: High API error rate|<p>GCP Cloud Storage bucket API error rate exceeds the configured threshold.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.request.error.rate,5m)>{$GCS.API.ERROR.MAX}`|Average||
 
 ## Feedback
 

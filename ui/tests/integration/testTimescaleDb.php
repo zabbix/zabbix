@@ -137,7 +137,7 @@ class testTimescaleDb extends CIntegrationTest {
 			}
 		}
 
-		$this->sendDataValues('sender', $sender_data , self::COMPONENT_SERVER);
+		$this->sendDataValues('sender', $sender_data, self::COMPONENT_SERVER);
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_send_response_json():SUCCEED', true, 5);
@@ -223,7 +223,7 @@ class testTimescaleDb extends CIntegrationTest {
 	/**
 	 * Sets compress older value using Zabbix API.
 	 *
-	 * Zabbix server configures TimescaleDB compression on the the next Zabbix server start.
+	 * Zabbix server configures TimescaleDB compression on the next Zabbix server start.
 	 */
 	private function compressOlderSet($compress_older) {
 		$response = $this->call('housekeeping.update', [
@@ -235,7 +235,7 @@ class testTimescaleDb extends CIntegrationTest {
 	/**
 	 * Sets compression on/off using Zabbix API.
 	 *
-	 * Zabbix server configures TimescaleDB compression on the the next Zabbix server start.
+	 * Zabbix server configures TimescaleDB compression on the next Zabbix server start.
 	 */
 	private function compressionSet(int $compression_status) {
 		$response = $this->call('housekeeping.update', [
@@ -296,7 +296,8 @@ class testTimescaleDb extends CIntegrationTest {
 			'name' => self::TRAPNAME,
 			'key_' => self::TRAPNAME,
 			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_UINT64
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
@@ -349,7 +350,7 @@ class testTimescaleDb extends CIntegrationTest {
 		/* Requires disabled compression. This may be changed in future. */
 		$this->generateHistoryData();
 
-		/* Zabbix server configures TimescaleDB compression on the the next Zabbix server start */
+		/* Zabbix server configures TimescaleDB compression on the next Zabbix server start */
 		$this->compressionSet(self::COMPRESSION_STATUS_ON);
 	}
 
@@ -485,7 +486,7 @@ class testTimescaleDb extends CIntegrationTest {
 		/* Requires disabled compression. This may be changed in future. */
 		$this->generateHistoryData();
 
-		/* Zabbix server configures TimescaleDB compression on the the next Zabbix server start */
+		/* Zabbix server configures TimescaleDB compression on the next Zabbix server start */
 		$this->compressionSet(self::COMPRESSION_STATUS_ON);
 	}
 

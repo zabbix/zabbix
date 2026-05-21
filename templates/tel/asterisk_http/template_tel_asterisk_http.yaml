@@ -35,7 +35,7 @@ zabbix_export:
         If there are errors, increase the logging to debug level and see the Zabbix server log.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Telephony
       items:
@@ -1247,7 +1247,7 @@ zabbix_export:
             label: 'API max response time (sec)'
             description: 'The Asterisk Manager API page maximum response time in seconds for trigger expression.'
         - macro: '{$AMI.SECRET}'
-          value: zabbix
+          type: SECRET_TEXT
           description: 'The Asterisk Manager secret.'
           config:
             type: TEXT

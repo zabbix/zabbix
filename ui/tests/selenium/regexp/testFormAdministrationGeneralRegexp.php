@@ -17,8 +17,6 @@
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup regexps
  */
@@ -51,9 +49,9 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestTextPresent('Expressions');
 		$this->zbxTestAssertElementPresentId('name');
-		$this->zbxTestAssertAttribute("//input[@id='name']", "maxlength", 128);
+		$this->zbxTestAssertAttribute("//z-textarea-flexible[@id='name']", "maxlength", 128);
 
-		$this->zbxTestAssertAttribute("//input[@id='expressions_0_expression']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//z-textarea-flexible[@id='expressions_0_expression']", "maxlength", 255);
 
 		$this->zbxTestDropdownHasOptions('expressions_0_expression_type', [
 			'Character string included',
@@ -90,9 +88,13 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickButtonText('New regular expression');
 
-		$this->zbxTestInputType('name', $name);
-		$this->zbxTestInputType('expressions_0_expression', $expression);
-		$this->zbxTestDropdownSelect('expressions_0_expression_type', $expression_type);
+		$form = $this->query('id:regexp-form')->waitUntilVisible()->asForm()->one();
+		$form->fill([
+			'Name' => $name,
+			'id:expressions_0_expression' => $expression,
+			'id:expressions_0_expression_type' => $expression_type
+		]);
+
 		if ($case_sensitive == 1) {
 			$this->zbxTestCheckboxSelect('expressions_0_case_sensitive');
 		}
@@ -103,7 +105,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestTabSwitchById('tab_test', 'Test');
 		$this->query('xpath://textarea[@id="test-string"][@disabled]')->waitUntilNotPresent();
 		$this->zbxTestInputTypeWait('test-string', $test_string);
-		$this->zbxTestClick('add');
+		$this->zbxTestClickXpathWait('//button[contains(@class,"js-submit")]');
 		$this->assertMessage(TEST_GOOD, 'Regular expression added');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($name).' AND r.regexpid=e.regexpid';
@@ -121,8 +123,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 			'id:expressions_0_expression' => 'first test string',
 			'id:expressions_0_case_sensitive' => true
 		];
-		$form->fill($fields);
-		$this->zbxTestClickWait('add');
+		$form->fill($fields)->submit();
 
 		$this->assertInlineError($form, ['id:name' => 'This object already exists.']);
 	}
@@ -134,8 +135,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 
 		$this->zbxTestClickButtonText('New regular expression');
 		$form = $this->query('id:regexp-form')->waitUntilVisible()->asForm()->one();
-		$form->fill(['Name' => '1_regexp3']);
-		$this->zbxTestClickWait('add');
+		$form->fill(['Name' => '1_regexp3'])->submit();
 
 		$this->assertInlineError($form, ['id:expressions_0_expression' => 'Expression: This field cannot be empty.']);
 	}
@@ -146,7 +146,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestClickLinkText($this->regexp);
 
 		$this->zbxTestTabSwitchById('tab_test', 'Test');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='test-result-table']//span[@class='green']"));
+		$this->query('xpath://table[@id="test-result-table"]//span[@class="green"]')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent('TRUE');
 	}
 
@@ -159,7 +159,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->query('xpath://textarea[@id="test-string"][@disabled]')->waitUntilNotPresent();
 		$this->zbxTestInputType('test-string', 'abcdef');
 		$this->zbxTestClick('test-expression');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='test-result-table']//span[@class='red']"));
+		$this->query('xpath://table[@id="test-result-table"]//span[@class="red"]')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent('FALSE');
 	}
 
@@ -167,9 +167,9 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=regex.list');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
-		$this->zbxTestClickWait('clone');
-		$this->zbxTestInputType('name', $this->regexp.'_clone');
-		$this->zbxTestClickWait('add');
+		$this->query('button:Clone')->waitUntilClickable()->one()->click();
+		$this->query('id:name')->one()->fill($this->regexp.'_clone');
+		$this->zbxTestClickXpathWait('//button[contains(@class,"js-submit")]');
 		$this->assertMessage(TEST_GOOD, 'Regular expression added');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($this->cloned_regexp).' AND r.regexpid=e.regexpid';
@@ -180,8 +180,8 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=regex.list');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
-		$this->zbxTestInputTypeOverwrite('name', $this->regexp.'2');
-		$this->zbxTestClickWait('update');
+		$this->query('id:name')->one()->fill($this->regexp.'2');
+		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'Regular expression updated');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($this->regexp.'2').' AND r.regexpid=e.regexpid';
@@ -193,7 +193,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkTextWait($this->regexp2);
 
-		$this->zbxTestClickWait('delete');
+		$this->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Regular expression deleted');
 		$this->zbxTestTextPresent(['Regular expressions', 'Name', 'Expressions']);

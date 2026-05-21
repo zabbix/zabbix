@@ -19,141 +19,223 @@
  */
 ?>
 
-<script type="text/javascript">
-	$(document).ready(function() {
-		const $form = jQuery('#housekeeping-form');
+<script>
+const view = new class {
+	init({rules, default_values}) {
+		this.form_element = document.getElementById('housekeeping-form');
+		this.form = new CForm(this.form_element, rules);
+		this.rules = rules;
+		this.default_values = default_values;
 
-		$form.on('submit', () => {
-			$form.trimValues(['#hk_events_trigger', '#hk_events_service', '#hk_events_internal', '#hk_events_discovery',
-				'#hk_events_autoreg', '#hk_services', '#hk_sessions', '#hk_history', '#hk_trends'
-			]);
+		this.#initEvents();
+	}
+
+	#initEvents() {
+		this.form_element.addEventListener('submit', (e) => this.#submit(e));
+
+		document.getElementById('hk_events_mode').addEventListener('change', (e) => {
+			document.getElementById('hk_events_trigger').disabled = !e.target.checked;
+			document.getElementById('hk_events_service').disabled = !e.target.checked;
+			document.getElementById('hk_events_internal').disabled = !e.target.checked;
+			document.getElementById('hk_events_discovery').disabled = !e.target.checked;
+			document.getElementById('hk_events_autoreg').disabled = !e.target.checked;
 		});
 
-		$('#hk_events_mode').change(function() {
-			$('#hk_events_trigger').prop('disabled', !this.checked);
-			$('#hk_events_service').prop('disabled', !this.checked);
-			$('#hk_events_internal').prop('disabled', !this.checked);
-			$('#hk_events_discovery').prop('disabled', !this.checked);
-			$('#hk_events_autoreg').prop('disabled', !this.checked);
+		document.getElementById('hk_services_mode').addEventListener('change', (e) => {
+			document.getElementById('hk_services').disabled = !e.target.checked;
 		});
 
-		$('#hk_services_mode').change(function() {
-			$('#hk_services').prop('disabled', !this.checked);
+		document.getElementById('hk_sessions_mode').addEventListener('change', (e) => {
+			document.getElementById('hk_sessions').disabled = !e.target.checked;
 		});
 
-		$('#hk_sessions_mode').change(function() {
-			$('#hk_sessions').prop('disabled', !this.checked);
+		document.getElementById('hk_history_global').addEventListener('change', (e) => {
+			document.getElementById('hk_history').disabled = !e.target.checked;
+			this.#checkVisibilityHistoryWarning();
 		});
 
-		$('#hk_history_global').change(function() {
-			$('#hk_history').prop('disabled', !this.checked);
+		document.getElementById('hk_history_mode').addEventListener('change', (e) => {
+			this.#checkVisibilityHistoryWarning();
 		});
 
-		$('#hk_trends_global').change(function() {
-			$('#hk_trends').prop('disabled', !this.checked);
+		document.getElementById('hk_trends_global').addEventListener('change', (e) => {
+			document.getElementById('hk_trends').disabled = !e.target.checked;
+			this.#checkVisibilityTrendsWarning();
 		});
 
-		$('#compression_status').change(function() {
-			$('#compress_older').prop('disabled', !this.checked);
-		});
+		document.getElementById('hk_trends_mode').addEventListener('change', (e) => {
+			this.#checkVisibilityTrendsWarning();
+		})
 
-		$('#hk_history_mode, #hk_history_global')
-			.change(function() {
-				$('.js-hk-history-warning').toggle(document.getElementById('hk_history_mode').checked
-					&& !document.getElementById('hk_history_global').checked
-				)
-			})
-			.trigger('change');
+		const compression_status_input = document.getElementById('compression_status');
 
-		$('#hk_trends_mode, #hk_trends_global')
-			.change(function() {
-				$('.js-hk-trends-warning').toggle(document.getElementById('hk_trends_mode').checked
-					&& !document.getElementById('hk_trends_global').checked
-				)
-			})
-			.trigger('change');
-
-		$("#resetDefaults").click(function() {
-			overlayDialogue({
-				title: <?= json_encode(_('Reset confirmation')) ?>,
-				content: $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
-				buttons: [
-					{
-						title: <?= json_encode(_('Cancel')) ?>,
-						cancel: true,
-						class: '<?= ZBX_STYLE_BTN_ALT ?>',
-						action: function() {}
-					},
-					{
-						title: <?= json_encode(_('Reset defaults')) ?>,
-						focused: true,
-						action: function() {
-							$('main')
-								.prev('.msg-bad')
-								.remove();
-
-							// events and alerts
-							$('#hk_events_mode')
-								.prop('checked',
-									<?= json_encode((bool) CSettingsSchema::getDefault('hk_events_mode')) ?>
-								)
-								.change();
-							$('#hk_events_trigger').val("<?= CSettingsSchema::getDefault('hk_events_trigger') ?>");
-							$('#hk_events_service').val("<?= CSettingsSchema::getDefault('hk_events_service') ?>");
-							$('#hk_events_internal').val("<?= CSettingsSchema::getDefault('hk_events_internal') ?>");
-							$('#hk_events_discovery').val("<?= CSettingsSchema::getDefault('hk_events_discovery') ?>");
-							$('#hk_events_autoreg').val("<?= CSettingsSchema::getDefault('hk_events_autoreg') ?>");
-							$('#hk_services_mode')
-								.prop('checked',
-									<?= json_encode((bool) CSettingsSchema::getDefault('hk_services_mode')) ?>
-								)
-								.change();
-							$('#hk_services').val("<?= CSettingsSchema::getDefault('hk_services') ?>");
-
-							// user sessions
-							$('#hk_sessions_mode')
-								.prop('checked',
-									<?= json_encode((bool) CSettingsSchema::getDefault('hk_sessions_mode')) ?>
-								)
-								.change();
-							$('#hk_sessions').val("<?= CSettingsSchema::getDefault('hk_sessions') ?>");
-
-							// history
-							$('#hk_history_mode').prop('checked',
-								<?= json_encode((bool) CSettingsSchema::getDefault('hk_history_mode')) ?>
-							);
-							$('#hk_history_global')
-								.prop('checked',
-									<?= json_encode((bool) CSettingsSchema::getDefault('hk_history_global')) ?>
-								)
-								.change();
-							$('#hk_history').val("<?= CSettingsSchema::getDefault('hk_history') ?>");
-
-							// trends
-							$('#hk_trends_mode').prop('checked',
-								<?= json_encode((bool) CSettingsSchema::getDefault('hk_trends_mode')) ?>
-							);
-							$('#hk_trends_global')
-								.prop('checked',
-									<?= json_encode((bool) CSettingsSchema::getDefault('hk_trends_global')) ?>
-								)
-								.change();
-							$('#hk_trends').val("<?= CSettingsSchema::getDefault('hk_trends') ?>");
-
-							// history and trends compression
-							$('#compression_status')
-								.prop('checked',
-									<?= json_encode((bool) CSettingsSchema::getDefault('compression_status')) ?>
-								)
-								.change();
-							$('#compress_older').val("<?= CSettingsSchema::getDefault('compress_older') ?>");
-						}
-					}
-				]
-			}, {
-				position: Overlay.prototype.POSITION_CENTER,
-				trigger_element: this
+		if (compression_status_input) {
+			compression_status_input.addEventListener('change', (e) => {
+				document.getElementById('compress_older').disabled = !e.target.checked;
 			});
+		}
+
+		this.form_element.querySelector('.table-forms .tfoot-buttons .js-reset-defaults')
+			.addEventListener('click', (e) => this.#resetDefaults(e.target));
+
+		this.#checkVisibilityHistoryWarning();
+		this.#checkVisibilityTrendsWarning();
+	}
+
+	#checkVisibilityHistoryWarning() {
+		const warning = this.form_element.querySelector('.js-hk-history-warning');
+
+		if (warning != null) {
+			if  (document.getElementById('hk_history_mode').checked
+					&& !document.getElementById('hk_history_global').checked) {
+				warning.style.display = '';
+			}
+			else {
+				warning.style.display = 'none';
+			}
+		}
+	}
+
+	#checkVisibilityTrendsWarning() {
+		const warning = this.form_element.querySelector('.js-hk-trends-warning');
+
+		if (warning != null) {
+			if (document.getElementById('hk_trends_mode').checked
+					&& !document.getElementById('hk_trends_global').checked) {
+				warning.style.display = '';
+			}
+			else {
+				warning.style.display = 'none';
+			}
+		}
+	}
+
+	#resetDefaults(reset_button) {
+		overlayDialogue({
+			title: <?= json_encode(_('Reset confirmation')) ?>,
+			content: document.createElement('span').innerText = <?= json_encode(
+				_('Reset all fields to default values?')
+			) ?>,
+			buttons: [
+				{
+					title: <?= json_encode(_('Cancel')) ?>,
+					cancel: true,
+					class: '<?= ZBX_STYLE_BTN_ALT ?>',
+					action: () => {}
+				},
+				{
+					title: <?= json_encode(_('Reset defaults')) ?>,
+					focused: true,
+					action: () => {
+						clearMessages();
+
+						Object.entries(this.default_values).forEach(([key, value]) => {
+							const input = document.getElementById(key);
+							if (input) {
+								if (input.getAttribute('type') === 'checkbox') {
+									input.checked = value;
+									input.dispatchEvent(new Event('change'));
+								}
+								else {
+									input.value = value;
+								}
+							}
+						});
+
+						this.form.reload(this.rules);
+						this.#checkVisibilityHistoryWarning();
+						this.#checkVisibilityTrendsWarning();
+					}
+				}
+			]
+		}, {
+			position: Overlay.prototype.POSITION_CENTER,
+			trigger_element: reset_button
 		});
-	});
+	}
+
+	#submit(e) {
+		e.preventDefault();
+		this.#setLoadingStatus('js-submit');
+		clearMessages();
+		const fields = this.form.getAllValues();
+
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.#unsetLoadingStatus();
+					return;
+				}
+
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'housekeeping.update');
+
+				fetch(curl.getUrl(), {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(fields)
+				})
+					.then((response) => response.json())
+					.then((response) => {
+						if ('error' in response) {
+							throw {error: response.error};
+						}
+
+						if ('form_errors' in response) {
+							this.form.setErrors(response.form_errors, true, true);
+							this.form.renderErrors();
+
+							return;
+						}
+
+						if ('success' in response) {
+							postMessageOk(response.success.title);
+
+							if ('messages' in response.success) {
+								postMessageDetails('success', response.success.messages);
+							}
+
+							location.href = location.href;
+						}
+					})
+					.catch((exception) => this.#ajaxExceptionHandler(exception))
+					.finally(() => this.#unsetLoadingStatus());
+			});
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		addMessage(makeMessageBox('bad', messages, title)[0]);
+	}
+
+	#setLoadingStatus(loading_btn_class) {
+		this.form_element.classList.add('is-loading', 'is-loading-fadein');
+
+		this.form_element.querySelectorAll('.table-forms .tfoot-buttons button').forEach(button => {
+			button.disabled = true;
+
+			if (button.classList.contains(loading_btn_class)) {
+				button.classList.add('is-loading');
+			}
+		});
+	}
+
+	#unsetLoadingStatus() {
+		this.form_element.querySelectorAll('.table-forms .tfoot-buttons button').forEach(button => {
+			button.classList.remove('is-loading');
+			button.disabled = false;
+		});
+
+		this.form_element.classList.remove('is-loading', 'is-loading-fadein');
+	}
+};
 </script>
