@@ -285,7 +285,7 @@ class CClickHouseStorage {
 			}
 
 			$fields = array_keys(self::VALUE_TYPE_SCHEMA[$value_type]);
-			$fields = array_diff($fields, ['clock_ns']);
+			$fields = array_diff($fields, ['clock_ns', 'value_str']);
 			array_push($fields, 'clock', 'ns');
 
 			$resource = $this->select([
@@ -329,7 +329,7 @@ class CClickHouseStorage {
 		}
 
 		$fields = array_keys(self::VALUE_TYPE_SCHEMA[$value_type]);
-		$fields = array_diff($fields, ['clock_ns']);
+		$fields = array_diff($fields, ['clock_ns', 'value_str']);
 		array_push($fields, 'clock', 'ns');
 
 		return $this->select([
