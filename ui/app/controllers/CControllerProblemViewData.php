@@ -465,7 +465,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 			}
 
 			$is_manually_suppressed = array_filter(array_column($problem['suppression_data'], 'userid'),
-				fn($row) => $row != 0
+				static fn($userid) => $userid != 0
 			);
 
 			if ($is_manually_suppressed) {
