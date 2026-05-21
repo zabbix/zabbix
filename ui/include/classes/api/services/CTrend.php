@@ -241,7 +241,9 @@ class CTrend extends CApiService {
 		];
 
 		if ($options['time_from'] !== null) {
-			$options['time_from'] -= $options['time_from'] % 3600;
+			if ($options['time_from'] % 3600 != 0) {
+				$options['time_from'] += 3600 - $options['time_from'] % 3600;
+			}
 			$query_must[] = [
 				'range' => [
 					'clock' => [
