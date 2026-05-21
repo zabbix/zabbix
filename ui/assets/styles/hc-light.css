@@ -2219,15 +2219,10 @@ button {
   .dashboard-page {
     margin: 10px;
     break-after: page; } }
-.date-selector {
-  display: flex;
-  flex-wrap: wrap; }
-  .date-selector .btn-icon.calendar-btn:not(:first-child) {
-    margin-left: 2px; }
-  .date-selector .btn-icon.calendar-btn::before {
-    font-size: 22px; }
-  .date-selector .error {
-    flex-basis: 100%; }
+.date-selector .btn-icon.calendar-btn:not(:first-child) {
+  margin-left: 2px; }
+.date-selector .btn-icon.calendar-btn::before {
+  font-size: 22px; }
 
 .diff {
   padding: 4px;
@@ -2451,6 +2446,25 @@ z-color-picker.has-error .color-picker-box {
   justify-content: space-between; }
   .inline-filter-footer > li.inline-filter-stats {
     color: #333333; }
+
+.inline-list {
+  display: inline-flex;
+  gap: 6px; }
+  .inline-list .checkbox-radio {
+    position: initial;
+    margin: 4px 4px 4px 0;
+    vertical-align: top; }
+    .inline-list .checkbox-radio + label {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      margin: 4px 4px 4px -20px;
+      vertical-align: top; }
+      .inline-list .checkbox-radio + label span {
+        margin: 0; }
+  .inline-list input[type="text"] {
+    padding: 4px 5px;
+    line-height: 14px; }
 
 .list-table {
   width: 100%;
@@ -7134,11 +7148,11 @@ select {
   margin: 0 3px 0 0; }
 
 .checkbox-radio {
-  position: absolute !important;
-  top: auto !important;
+  position: absolute;
+  top: auto;
   z-index: 1;
-  width: 16px !important;
-  height: 16px !important;
+  width: 16px;
+  height: 16px;
   opacity: 0; }
   .checkbox-radio + label span {
     position: relative;
@@ -7210,11 +7224,7 @@ input[type="radio"] {
   padding: 0;
   border: 0;
   vertical-align: middle;
-  position: relative;
-  top: -1px;
   overflow: hidden;
-  width: 13px;
-  height: 13px;
   background: none; }
 
 input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"] {

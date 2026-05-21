@@ -53,6 +53,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/form-search";
 @import "components/form-errors";
 @import "components/inline-filter";
+@import "components/inline-list";
 @import "components/list-table";
 @import "components/no-data-message";
 @import "components/markdown";
@@ -1091,11 +1092,11 @@ select {
 }
 
 .checkbox-radio {
-	position: absolute !important;
-	top: auto !important;
+	position: absolute;
+	top: auto;
 	z-index: 1;
-	width: 16px !important;
-	height: 16px !important;
+	width: 16px;
+	height: 16px;
 	opacity: 0;
 
 	& + label {
@@ -1229,11 +1230,7 @@ select {
 	padding: 0;
 	border: 0;
 	vertical-align: middle;
-	position: relative;
-	top: -1px;
 	overflow: hidden;
-	width: 13px;
-	height: 13px;
 	background: none;
 }
 

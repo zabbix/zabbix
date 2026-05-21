@@ -77,7 +77,7 @@ $form_list
 				->setEnabled($data['allowed_change_severity'] && $data['problem_severity_can_be_changed']),
 			(new CSeverity('severity', (int) $data['severity'], $data['change_severity']))
 		]))
-			->addClass(ZBX_STYLE_HOR_LIST)
+			->addClass(ZBX_STYLE_INLINE_LIST)
 	)
 	->addRow(
 		new CLabel([_('Suppress'),
@@ -100,7 +100,7 @@ $form_list
 				->setPlaceholder(_($data['suppress_until_problem']))
 				->setAriaRequired()
 				->setEnabled(false)
-		]))->addClass(ZBX_STYLE_HOR_LIST)
+		]))->addClass(ZBX_STYLE_INLINE_LIST)
 	)
 	->addRow(
 		new CLabel([_('Unsuppress'), makeHelpIcon(_('Deactivates manual suppression.'))], 'unsuppress_problem'),
