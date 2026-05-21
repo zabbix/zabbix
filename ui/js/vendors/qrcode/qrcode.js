@@ -391,12 +391,9 @@ var QRCode;
 			this._elImage.style.display = "none";
 			this.clear();
 
-			this._oContext.lineWidth = 1;
-			this._oContext.strokeStyle = this._htOption.colorLight;
 			this._oContext.fillStyle = this._htOption.colorLight;
 			this._oContext.fillRect(0, 0, image_size, image_size);
 
-			this._oContext.strokeStyle = this._htOption.colorDark;
 			this._oContext.fillStyle = this._htOption.colorDark;
 
 			for (let row = 0; row < nCount; row++) {
