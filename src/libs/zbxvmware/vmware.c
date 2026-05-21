@@ -1466,7 +1466,7 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: finds uuid of alarm source entity by its id                       *
+ * Purpose: finds uuid and friendly name of alarm source entity by its id     *
  *                                                                            *
  * Parameters: data - [IN] all collected data                                 *
  *                                                                            *
@@ -1483,7 +1483,9 @@ static void	vmware_service_alarm_uuid_name_update(zbx_vmware_data_t *data)
 			if (0 != strcmp(entity->id, alarm->entity_id))						\
 				continue;									\
 														\
-			alarm->entity_name = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(entity->friendly_name));	\
+			if (NULL != entity->friendly_name)							\
+				alarm->entity_name = zbx_strdup(NULL, entity->friendly_name);			\
+														\
 			break;											\
 		}
 
@@ -1524,8 +1526,13 @@ static void	vmware_service_alarm_uuid_name_update(zbx_vmware_data_t *data)
 					}
 
 					alarm->entity_uuid = zbx_strdup(NULL, vm->uuid);
-					alarm->entity_name = zbx_strdup(NULL,
-							ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_NAME]));
+
+					if (NULL != vm->props[ZBX_VMWARE_VMPROP_NAME])
+					{
+						alarm->entity_name = zbx_strdup(NULL,
+								vm->props[ZBX_VMWARE_VMPROP_NAME]);
+					}
+
 					break;
 				}
 
@@ -1550,8 +1557,10 @@ static void	vmware_service_alarm_uuid_name_update(zbx_vmware_data_t *data)
 				}
 
 				alarm->entity_uuid = zbx_strdup(NULL, hv->uuid);
-				alarm->entity_name = zbx_strdup(NULL,
-						ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NAME]));
+
+				if (NULL != hv->props[ZBX_VMWARE_HVPROP_NAME])
+					alarm->entity_name = zbx_strdup(NULL, hv->props[ZBX_VMWARE_HVPROP_NAME]);
+
 				break;
 			}
 		}
@@ -1571,7 +1580,9 @@ static void	vmware_service_alarm_uuid_name_update(zbx_vmware_data_t *data)
 			}
 
 			alarm->entity_uuid = zbx_strdup(NULL, data->datastores.values[j]->uuid);
-			alarm->entity_name = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(data->datastores.values[j]->name));
+
+			if (NULL != data->datastores.values[j]->name)
+				alarm->entity_name = zbx_strdup(NULL, data->datastores.values[j]->name);
 		}
 		else if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_CLUSTER))
 		{
@@ -1601,6 +1612,8 @@ static void	vmware_service_alarm_uuid_name_update(zbx_vmware_data_t *data)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() skipped uuid:%d", __func__, skipped);
+
+#	undef entity_name_update
 }
 
 /******************************************************************************
