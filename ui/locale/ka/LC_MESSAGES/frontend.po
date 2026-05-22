@@ -15045,6 +15045,10 @@ msgstr "ახალი LDAP სერვერი"
 msgid "New MFA method"
 msgstr "ახალი MFA-ის მეთოდი"
 
+#: app/views/oauth.edit.php:242
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "ახალი SLA"

@@ -15057,6 +15057,10 @@ msgstr "新規LDAPサーバー"
 msgid "New MFA method"
 msgstr "新しい多要素認証(MFA)方式"
 
+#: app/views/oauth.edit.php:242
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "新規SLA"
