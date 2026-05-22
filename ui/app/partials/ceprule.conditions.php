@@ -42,23 +42,26 @@ echo (new CObject())
 				->setAttribute('placeholder', 'A or (B and C) ...')
 		]))->addClass(ZBX_STYLE_CELL)
 	]))
-	->addItem(new CLabel(_('Conditions')))
-	->addItem((new CFormField(
-		(new CTable())
-			->setColumns([
-				(new CTableColumn(new CColHeader(_('Label'))))->setAttribute('width', '10%'),
-				(new CTableColumn(new CColHeader(_('Name'))))->setAttribute('width', '70%'),
-				(new CTableColumn(new CColHeader(_('Actions'))))->setAttribute('width', '20%'),
-			])
+	->addItem(new CLabel(_('Conditions'), 'ceprule-filter-conditions-add'))
+	->addItem((new CFormField())
+		->addItem((new CDiv())
 			->setAttribute('data-field-type', 'set')
 			->setAttribute('data-field-name', 'filter[conditions]')
-			->setId('ceprule-filter-conditions')
-			->addItem(
-				(new CTag('tfoot', true))
-					->addItem(
-						(new CCol(
-							(new CButtonLink(_('Add')))->addClass('js-condition-add')
-						))->setColSpan(4)
-					)
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addItem((new CTable())
+				->setColumns([
+					new CTableColumn(new CColHeader(_('Label'))),
+					(new CTableColumn(new CColHeader(_('Name'))))
+						->setAttribute('width', ZBX_TEXTAREA_BIG_WIDTH.'px'),
+					new CTableColumn(new CColHeader(_('Actions')))
+				])
+				->setId('ceprule-filter-conditions')
+				->addItem((new CTag('tfoot', true))
+					->addItem((new CCol(
+						(new CButtonLink(_('Add')))->addClass('js-condition-add')
+							->setId('ceprule-filter-conditions-add')
+					))->setColSpan(4))
+				)
 			)
-	))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+		)
+	);

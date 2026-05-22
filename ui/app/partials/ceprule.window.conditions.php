@@ -43,22 +43,24 @@ echo (new CObject())
 		]))->addClass(ZBX_STYLE_CELL)
 	]))
 	->addItem(new CLabel(_('Historical conditions')))
-	->addItem((new CFormField(
-		(new CTable())
-			->setColumns([
-				(new CTableColumn(new CColHeader(_('Label'))))->setAttribute('width', '10%'),
-				(new CTableColumn(new CColHeader(_('Name'))))->setAttribute('width', '70%'),
-				(new CTableColumn(new CColHeader(_('Actions'))))->setAttribute('width', '20%')
-			])
+	->addItem((new CFormField())
+		->addItem((new CDiv())
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('data-field-type', 'set')
 			->setAttribute('data-field-name', 'window[filter][conditions]')
-			->setId('ceprule-window-condition-table')
-			->addItem(
-				(new CTag('tfoot', true))
-					->addItem(
-						(new CCol(
-							(new CButtonLink(_('Add')))->addClass('js-window-condition-add')
-						))->setColSpan(4)
-					)
+			->addItem((new CTable())
+				->setColumns([
+					new CTableColumn(new CColHeader(_('Label'))),
+					(new CTableColumn(new CColHeader(_('Name'))))
+						->setAttribute('width', ZBX_TEXTAREA_BIG_WIDTH.'px'),
+					new CTableColumn(new CColHeader(_('Actions')))
+				])
+				->setId('ceprule-window-condition-table')
+				->addItem((new CTag('tfoot', true))
+					->addItem((new CCol(
+						(new CButtonLink(_('Add')))->addClass('js-window-condition-add')
+					))->setColSpan(4))
+				)
 			)
-	))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+		)
+	);

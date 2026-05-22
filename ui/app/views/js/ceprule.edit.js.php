@@ -119,7 +119,9 @@ window.ceprule_edit_popup = new class {
 		this.#window_condition_row_template = new Template(`
 			<tr data-formulaid="#{formulaid}">
 				<td>#{formulaid}</td>
-				<td>#{type_str} <em>#{arg1}</em>#{operator_name} <em>#{arg2}</em></td>
+				<td>
+					<div class="text">#{type_str} <em>#{arg1}</em>#{operator_name} <em>#{arg2}</em></div>
+				</td>
 				<td>
 					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-window-condition-edit"><?= _('Edit') ?></button>
 					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-window-condition-remove"><?= _('Remove') ?></button>
@@ -136,7 +138,9 @@ window.ceprule_edit_popup = new class {
 		this.#condition_row_template = new Template(`
 			<tr data-formulaid="#{formulaid}">
 				<td>#{formulaid}</td>
-				<td>#{event_name_str} #{operator_name} <em>#{arguments_name}</em></td>
+				<td>
+					<div class="text">#{event_name_str} #{operator_name} <em>#{arguments_name}</em></div>
+				</td>
 				<td>
 					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-condition-edit"><?= _('Edit') ?></button>
 					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-condition-remove"><?= _('Remove') ?></button>
@@ -155,12 +159,14 @@ window.ceprule_edit_popup = new class {
 		`);
 
 		this.#operation_row_template = new Template(`
-			<tr class="form_row" data-step="#{step}">
+			<tr data-step="#{step}">
 				<td class="td-drag-icon">
 					<div class="drag-icon"></div>
 					<span class="list-numbered-item">:</span>
 				</td>
-				<td><?= _('Execute when') ?> #{execute_when_str} : #{label_str}<em> #{arguments_str}</em></td>
+				<td>
+					<div class="text"><?= _('Execute when') ?> #{execute_when_str} : #{label_str}<em> #{arguments_str}</em></div>
+				</td>
 				<td>
 					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-operation-edit"><?= _('Edit') ?></button>
 					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-operation-remove"><?= _('Remove') ?></button>

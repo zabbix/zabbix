@@ -90,26 +90,29 @@ $form = (new CForm())
 			new CPartial('ceprule.modal.operation')
 		))
 		->addItem((new CLabel('Operations'))->setAsteriskMark()->setId('ceprule-operations-label'))
-		->addItem((new CFormField(
-			(new CTable())
-				->setColumns([
-					(new CTableColumn(new CColHeader('')))->setAttribute('width', '35px'),
-					(new CTableColumn(new CColHeader(_('Details')))),
-					(new CTableColumn(new CColHeader(''))),
-				])
-				->addClass('list-numbered')
+		->addItem((new CFormField())
+			->addItem((new CDiv())
 				->setAttribute('data-field-type', 'set')
 				->setAttribute('data-field-name', 'operations')
-				->setId('ceprule-operations-table')
-				->addItem(
-					(new CTag('tfoot', true))
-						->addItem(
-							(new CCol(
-								(new CButtonLink(_('Add')))->addClass('js-operation-add')
-							))->setColSpan(3)
-						)
+				->setAttribute('data-error-container', 'ceprule-operations-error-container')
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->addItem((new CTable())
+					->setId('ceprule-operations-table')
+					->addClass('list-numbered')
+					->setColumns([
+						(new CTableColumn(new CColHeader(''))),
+						(new CTableColumn(new CColHeader(_('Details'))))
+							->setAttribute('width', ZBX_TEXTAREA_BIG_WIDTH.'px'),
+						(new CTableColumn(new CColHeader(''))),
+					])
+					->addItem((new CTag('tfoot', true))
+						->addItem((new CCol(
+							(new CButtonLink(_('Add')))->addClass('js-operation-add')
+						))->setColSpan(3))
+					)
 				)
-			))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			)
+			->addItem((new CDiv())->setId('ceprule-operations-error-container'))
 		)
 		->addItem([
 			new CLabel(_('Stop processing'), 'stop'),

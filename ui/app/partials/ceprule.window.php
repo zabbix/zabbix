@@ -119,6 +119,7 @@ echo (new CObject())
 	->addItem(new CFormField((new CDiv()) // CMultilineInput fails on iv-validation before DOM is ready, using CDiv.
 		->setId('ceprule-script')
 		->addClass('multilineinput-control')
+		->addStyle('width: '.ZBX_TEXTAREA_BIG_WIDTH.'px')
 		->setAttribute('data-name', 'window[script]')
 		->setAttribute('data-field-type', 'multiline')
 	))
