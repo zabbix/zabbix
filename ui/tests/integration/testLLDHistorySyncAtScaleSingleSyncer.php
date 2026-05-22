@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -13,24 +13,23 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+/**
+ * Re-runs the testLLDHistorySyncAtScale suite with StartDBSyncers=1 to exercise
+ * the same scenarios under a single history syncer.
+ *
+ * @required-components server
+ * @suite-components-reuse true
+ * @configurationDataProvider configurationProvider
+ * @onAfter clearData
+ */
+class testLLDHistorySyncAtScaleSingleSyncer extends testLLDHistorySyncAtScale {
 
-class testAPIInfo extends CAPITest {
-	public function testAPIInfo_VersionWithAuth() {
-		$error = [
-			'code' => -32602,
-			'message' => 'Invalid params.',
-			'data' => 'The "apiinfo.version" method must be called without authorization header.'
-		];
+	public function configurationProvider() {
+		$config = parent::configurationProvider();
+		$config[self::COMPONENT_SERVER]['StartDBSyncers'] = '1';
 
-		$this->call('apiinfo.version', [], $error);
-	}
-
-	public function testAPIInfo_VersionWithoutAuth() {
-		$this->disableAuthorization();
-		$result = $this->call('apiinfo.version', []);
-
-		$this->assertSame('7.0.27', $result['result']);
+		return $config;
 	}
 }
