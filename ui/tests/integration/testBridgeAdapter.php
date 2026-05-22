@@ -24,24 +24,27 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  */
 class testBridgeAdapter extends CIntegrationTest {
 	private const ADAPTER_HOST = '127.0.0.1';
-	private const ADAPTER_PORT = 10081;
 	private const ADAPTER_SCRIPT = __DIR__.'/data/bridge_adapter_mock.py';
 	private const INIT_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000101';
 	private const NOTIFY_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000102';
 	private const OFFBOARD_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000103';
-	private const REAL_NOTIFY_HOST = 'Zabbix server';
+	private const UNKNOWN_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000104';
+	private const REAL_NOTIFY_HOST = 'bridge_adapter_real_notification_host';
 	private const REAL_NOTIFY_ITEM_KEY = 'bridge.adapter.real.notify';
 	private const REAL_NOTIFY_SUBJECT = 'Bridge adapter real notification';
 	private const REAL_NOTIFY_MESSAGE = 'Bridge adapter real notification message';
+	private const MEDIA_SEVERITY_ALL = 63;
+	private const PUSH_ALERT_ERROR_NO_PERMISSION = 'No permissions to referred device or it does not exist.';
 
 	private static string $adapter_log_file;
 	private static string $adapter_pid_file;
 	private static string $adapter_run_id;
+	private static int $adapter_port;
 	private static array $deviceids = [];
-	private static array $mediaids = [];
 	private static array $actionids = [];
 	private static array $triggerids = [];
 	private static array $itemids = [];
+	private static array $hostids = [];
 	private static ?string $push_mediatypeid = null;
 	private static ?int $push_mediatype_status = null;
 	private static ?string $real_notify_hostid = null;
@@ -51,16 +54,16 @@ class testBridgeAdapter extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
-				'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.self::ADAPTER_PORT.'/rpc'
+				'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc'
 			]
 		];
 	}
 
 	public function prepareData(): bool {
 		$current_time = time();
+
 		$deviceid = DB::reserveIds('device', 2);
 		$device_keyid = DB::reserveIds('device_key', 2);
-		$mediaid = DB::reserveIds('media', 1);
 		$db_push_mediatype = DBfetch(DBselect(
 			'select mediatypeid,status from media_type where type='.MEDIA_TYPE_PUSH.' order by mediatypeid'
 		));
@@ -68,12 +71,13 @@ class testBridgeAdapter extends CIntegrationTest {
 		self::$push_mediatypeid = $db_push_mediatype['mediatypeid'];
 		self::$push_mediatype_status = (int) $db_push_mediatype['status'];
 
-		DB::update('media_type', [
-			[
-				'values' => ['status' => MEDIA_TYPE_STATUS_ACTIVE],
-				'where' => ['mediatypeid' => self::$push_mediatypeid]
-			]
+		$this->clearPreparedData();
+
+		$response = $this->call('mediatype.update', [
+			'mediatypeid' => self::$push_mediatypeid,
+			'status' => MEDIA_TYPE_STATUS_ACTIVE
 		]);
+		$this->assertArrayHasKey('mediatypeids', $response['result']);
 
 		$push_mediatypeid = self::$push_mediatypeid;
 		$mobile_key = json_encode([
@@ -108,7 +112,6 @@ class testBridgeAdapter extends CIntegrationTest {
 		], false);
 
 		self::$deviceids = [$deviceid, bcadd($deviceid, 1, 0)];
-		self::$mediaids = [$mediaid];
 
 		DB::insertBatch('device_key', [
 			[
@@ -131,19 +134,56 @@ class testBridgeAdapter extends CIntegrationTest {
 			]
 		], false);
 
-		DB::insertBatch('media', [
-			[
-				'mediaid' => $mediaid,
-				'userid' => 1,
-				'mediatypeid' => $push_mediatypeid,
-				'sendto' => self::NOTIFY_DEVICE_UUID,
-				'active' => MEDIA_STATUS_ACTIVE,
-				'severity' => 63,
-				'period' => '1-7,00:00-24:00'
+		$response = $this->call('user.update', [
+			'userid' => 1,
+			'medias' => [
+				[
+					'mediatypeid' => $push_mediatypeid,
+					'sendto' => [self::NOTIFY_DEVICE_UUID, self::UNKNOWN_DEVICE_UUID, '*'],
+					'active' => MEDIA_STATUS_ACTIVE,
+					'severity' => self::MEDIA_SEVERITY_ALL,
+					'period' => '1-7,00:00-24:00'
+				]
 			]
-		], false);
+		]);
+		$this->assertArrayHasKey('userids', $response['result']);
 
 		return true;
+	}
+
+	private function clearPreparedData(): void {
+		$response = $this->call('action.get', [
+			'output' => [],
+			'filter' => ['name' => 'Bridge adapter real notification action']
+		]);
+
+		if ($response['result']) {
+			$this->call('action.delete', array_column($response['result'], 'actionid'));
+		}
+
+		$response = $this->call('host.get', [
+			'output' => [],
+			'filter' => ['host' => self::REAL_NOTIFY_HOST]
+		]);
+
+		if ($response['result']) {
+			$this->call('host.delete', array_column($response['result'], 'hostid'));
+		}
+
+		self::deleteRealNotificationMedia();
+
+		$deviceids = array_keys(DB::select('device', [
+			'output' => [],
+			'filter' => ['uuid' => [self::NOTIFY_DEVICE_UUID, self::OFFBOARD_DEVICE_UUID]],
+			'preservekeys' => true
+		]));
+
+		if ($deviceids) {
+			DB::delete('device_key', ['deviceid' => $deviceids]);
+			DB::delete('token_device', ['deviceid' => $deviceids]);
+			DB::delete('device_enrollment_token', ['deviceid' => $deviceids]);
+			DB::delete('device', ['deviceid' => $deviceids]);
+		}
 	}
 
 	public static function clearData(): void {
@@ -157,6 +197,8 @@ class testBridgeAdapter extends CIntegrationTest {
 		if (isset(self::$adapter_log_file)) {
 			@unlink(self::$adapter_log_file);
 		}
+
+		self::deleteRealNotificationMedia();
 
 		if (self::$deviceids) {
 			$tokenids = array_keys(DB::select('token_device', [
@@ -173,25 +215,22 @@ class testBridgeAdapter extends CIntegrationTest {
 				DB::delete('token', ['tokenid' => $tokenids]);
 			}
 
-			if (self::$mediaids) {
-				DB::delete('media', ['mediaid' => self::$mediaids]);
-			}
-
-			DB::delete('media', [
-				'userid' => 1,
-				'sendto' => [self::NOTIFY_DEVICE_UUID, self::OFFBOARD_DEVICE_UUID]
-			]);
 			DB::delete('device', ['deviceid' => self::$deviceids]);
 		}
 
 		if (self::$push_mediatypeid !== null && self::$push_mediatype_status !== null) {
-			DB::update('media_type', [
-				[
-					'values' => ['status' => self::$push_mediatype_status],
-					'where' => ['mediatypeid' => self::$push_mediatypeid]
-				]
+			CDataHelper::call('mediatype.update', [
+				'mediatypeid' => self::$push_mediatypeid,
+				'status' => self::$push_mediatype_status
 			]);
 		}
+	}
+
+	private static function deleteRealNotificationMedia(): void {
+		CDataHelper::call('user.update', [
+			'userid' => 1,
+			'medias' => []
+		]);
 	}
 
 	private function getServerClientAndSid(): array {
@@ -209,19 +248,24 @@ class testBridgeAdapter extends CIntegrationTest {
 	}
 
 	private function createRealNotificationObjects(): void {
-		$hostid = CDBHelper::getValue(
-			'select hostid from hosts where host='.zbx_dbstr(self::REAL_NOTIFY_HOST)
-		);
+		$response = $this->call('host.create', [
+			'host' => self::REAL_NOTIFY_HOST,
+			'groups' => [
+				['groupid' => 4]
+			],
+			'status' => HOST_STATUS_MONITORED
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		self::$hostids = $response['result']['hostids'];
 
-		$this->assertNotFalse($hostid, 'Host "'.self::REAL_NOTIFY_HOST.'" was not found.');
-		self::$real_notify_hostid = $hostid;
+		self::$real_notify_hostid = self::$hostids[0];
 
 		$response = $this->call('item.create', [
 			[
 				'name' => self::REAL_NOTIFY_ITEM_KEY,
 				'key_' => self::REAL_NOTIFY_ITEM_KEY,
 				'type' => ITEM_TYPE_TRAPPER,
-				'hostid' => $hostid,
+				'hostid' => self::$real_notify_hostid,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			]
@@ -300,6 +344,10 @@ class testBridgeAdapter extends CIntegrationTest {
 		if (self::$itemids) {
 			CDataHelper::call('item.delete', self::$itemids);
 		}
+
+		if (self::$hostids) {
+			CDataHelper::call('host.delete', self::$hostids);
+		}
 	}
 
 	public static function startBridgeAdapterMock(): void {
@@ -312,7 +360,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		self::executeCommand('python3', [
 			self::ADAPTER_SCRIPT,
 			'--host', self::ADAPTER_HOST,
-			'--port', (string) self::ADAPTER_PORT,
+			'--port', (string) self::getAdapterPort(),
 			'--log-file', self::$adapter_log_file,
 			'--pid-file', self::$adapter_pid_file
 		], true);
@@ -338,10 +386,25 @@ class testBridgeAdapter extends CIntegrationTest {
 
 	private static function getAdapterRunId(): string {
 		if (!isset(self::$adapter_run_id)) {
-			self::$adapter_run_id = self::ADAPTER_PORT.'_'.date('YmdHis').'_'.getmypid();
+			self::$adapter_run_id = self::getAdapterPort().'_'.date('YmdHis').'_'.getmypid();
 		}
 
 		return self::$adapter_run_id;
+	}
+
+	private static function getAdapterPort(): int {
+		if (!isset(self::$adapter_port)) {
+			$socket = stream_socket_server('tcp://'.self::ADAPTER_HOST.':0', $error_code, $error_message);
+
+			if ($socket === false) {
+				throw new Exception('Cannot reserve bridge-adapter mock port: '.$error_message);
+			}
+
+			self::$adapter_port = (int) substr(strrchr(stream_socket_get_name($socket, false), ':'), 1);
+			fclose($socket);
+		}
+
+		return self::$adapter_port;
 	}
 
 	private function assertAdapterRequest(string $method, callable $predicate): void {
@@ -369,7 +432,67 @@ class testBridgeAdapter extends CIntegrationTest {
 		return $requests;
 	}
 
-	private static function isExpectedRealNotificationRequest(array $request, string $type): bool {
+	private function assertRealNotificationActionLog(bool $recovery): void {
+		$expected_alerts = [
+			[
+				'sendto' => self::UNKNOWN_DEVICE_UUID,
+				'status' => ALERT_STATUS_FAILED,
+				'error' => self::PUSH_ALERT_ERROR_NO_PERMISSION
+			],
+			[
+				'sendto' => self::NOTIFY_DEVICE_UUID,
+				'status' => ALERT_STATUS_SENT,
+				'error' => ''
+			],
+			[
+				'sendto' => self::OFFBOARD_DEVICE_UUID,
+				'status' => ALERT_STATUS_SENT,
+				'error' => ''
+			]
+		];
+
+		$this->callUntilDataIsPresent('alert.get', [
+			'output' => ['sendto', 'status', 'error', 'subject', 'message', 'p_eventid'],
+			'actionids' => self::$actionids,
+			'sortfield' => 'alertid'
+		], 25, 1, static function (array $response) use ($expected_alerts, $recovery): bool {
+			return self::hasExpectedRealNotificationActionLog($response['result'], $expected_alerts,
+				$recovery
+			);
+		});
+	}
+
+	private static function hasExpectedRealNotificationActionLog(array $alerts, array $expected_alerts,
+			bool $recovery): bool {
+		$alerts = array_values(array_filter($alerts, static function (array $alert) use ($recovery): bool {
+			return $recovery ? $alert['p_eventid'] != 0 : $alert['p_eventid'] == 0;
+		}));
+
+		foreach ($expected_alerts as $expected_alert) {
+			if (!self::hasExpectedRealNotificationAlert($alerts, $expected_alert)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private static function hasExpectedRealNotificationAlert(array $alerts, array $expected_alert): bool {
+		foreach ($alerts as $alert) {
+			if ($alert['sendto'] === $expected_alert['sendto']
+					&& (int) $alert['status'] === $expected_alert['status']
+					&& $alert['error'] === $expected_alert['error']
+					&& $alert['subject'] === self::REAL_NOTIFY_SUBJECT
+					&& $alert['message'] === self::REAL_NOTIFY_MESSAGE) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static function isExpectedRealNotificationRequest(array $request, string $type,
+			string $deviceid): bool {
 		if (array_keys($request['body']) !== ['jsonrpc', 'method', 'params', 'id']) {
 			return false;
 		}
@@ -386,9 +509,14 @@ class testBridgeAdapter extends CIntegrationTest {
 			return false;
 		}
 
+		$push_tokens = [
+			self::NOTIFY_DEVICE_UUID => 'bridge-adapter-integration-push-token',
+			self::OFFBOARD_DEVICE_UUID => 'bridge-adapter-integration-offboard-push-token'
+		];
+
 		if ($params['to'] !== [
-			'push_token' => 'bridge-adapter-integration-push-token',
-			'device_id' => self::NOTIFY_DEVICE_UUID
+			'push_token' => $push_tokens[$deviceid],
+			'device_id' => $deviceid
 		]) {
 			return false;
 		}
@@ -506,18 +634,32 @@ class testBridgeAdapter extends CIntegrationTest {
 		$this->sendSenderValue(self::REAL_NOTIFY_HOST, self::REAL_NOTIFY_ITEM_KEY, 6, self::COMPONENT_SERVER);
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
 
 		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
-			return self::isExpectedRealNotificationRequest($request, 'problem.created');
+			return self::isExpectedRealNotificationRequest($request, 'problem.created',
+					self::NOTIFY_DEVICE_UUID);
 		});
+		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
+			return self::isExpectedRealNotificationRequest($request, 'problem.created',
+					self::OFFBOARD_DEVICE_UUID);
+		});
+		$this->assertRealNotificationActionLog(false);
 
 		$this->sendSenderValue(self::REAL_NOTIFY_HOST, self::REAL_NOTIFY_ITEM_KEY, 1, self::COMPONENT_SERVER);
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
 
 		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
-			return self::isExpectedRealNotificationRequest($request, 'problem.recovered');
+			return self::isExpectedRealNotificationRequest($request, 'problem.recovered',
+					self::NOTIFY_DEVICE_UUID);
 		});
+		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
+			return self::isExpectedRealNotificationRequest($request, 'problem.recovered',
+					self::OFFBOARD_DEVICE_UUID);
+		});
+		$this->assertRealNotificationActionLog(true);
 	}
 
 	/**
