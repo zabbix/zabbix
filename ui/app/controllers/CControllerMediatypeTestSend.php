@@ -24,28 +24,50 @@ class CControllerMediatypeTestSend extends CController {
 	private $mediatype;
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'mediatypeid' => ['db media_type.mediatypeid', 'required'],
+			'type' => ['db media_type.type', 'required',
+				'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK]
+			],
+			'sendto' => [
+				['string','required', 'not_empty',
+					'when' => ['type', 'in' => [MEDIA_TYPE_SMS, MEDIA_TYPE_EMAIL]]
+				],
+				['string','required', 'not_empty', 'use' => [CEmailValidator::class, []],
+					'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL]]
+				]
+			],
+			'subject' => ['string', 'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_SMS]]],
+			'message' => ['string', 'required', 'not_empty',
+				'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_SMS]]
+			],
+			'parameters' => ['objects', 'fields' => [
+				'name' => ['db media_type_param.name'],
+				'value' => ['db media_type_param.value']
+			]]
+		]];
+	}
+
 	protected function checkInput(): bool {
-		$fields = [
-			'mediatypeid' =>	'fatal|required|db media_type.mediatypeid',
-			'sendto' =>			'string|not_empty',
-			'subject' =>		'string',
-			'message' =>		'string',
-			'parameters' =>		'array'
-		];
+		$ret = $this->validateInput(self::getValidationRules()) && $this->validateMediaType();
 
-		$ret = $this->validateInput($fields) && $this->validateMediaType();
+		$messages = array_column(get_and_clear_messages(), 'message');
 
-		if (!$ret) {
+		if (!$ret || $messages) {
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'messages' => $messages
+				]];
+
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'title' => _('Media type test failed.'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
+				new CControllerResponseData(['main_block' => json_encode($response)])
 			);
 		}
 

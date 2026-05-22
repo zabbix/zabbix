@@ -21,26 +21,33 @@
 
 window.mediatype_test_edit_popup = new class {
 
-	init() {
-		this.overlay = overlays_stack.getById('mediatype_test_edit');
-		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+	#overlay;
+	#dialogue;
+	#footer;
+	#form;
+	#form_element;
 
-		if (this.form.querySelector('#mediatypetest_log')) {
-			this.form.querySelector('#mediatypetest_log').addEventListener('click', (event) =>
+	init({rules}) {
+		this.#overlay = overlays_stack.getById('mediatype_test_edit');
+		this.#dialogue = this.#overlay.$dialogue[0];
+		this.#footer = this.#overlay.$dialogue.$footer[0];
+		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#form = new CForm(this.#form_element, rules);
+
+		if (this.#form_element.querySelector('#mediatypetest_log')) {
+			this.#form_element.querySelector('#mediatypetest_log').addEventListener('click', (event) =>
 				this.#openLogPopup(event.target)
 			);
 		}
+
+		this.#footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
 	}
 
-	submit() {
-		const fields = getFormFields(this.form);
-		const curl = new Curl('zabbix.php');
+	#submit() {
+		this.#removePopupMessages();
+		const fields = this.#form.getAllValues();
 
-		curl.setArgument('action', 'mediatype.test.send');
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('mediatype')) ?>);
-
-		this.form.querySelector('#mediatypetest_log')?.classList.add('<?= ZBX_STYLE_DISABLED ?>');
+		this.#form_element.querySelector('#mediatypetest_log')?.classList.add('<?= ZBX_STYLE_DISABLED ?>');
 
 		// Trim fields.
 		for (let key in fields) {
@@ -49,13 +56,17 @@ window.mediatype_test_edit_popup = new class {
 			}
 		}
 
-		this.overlay.setLoading();
+		this.#overlay.setLoading();
 
-		this.#post(curl.getUrl(), fields, (response) => {
-			const message_box = makeMessageBox('good', response.success.messages, response.success.title);
+		this.#form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.#overlay.unsetLoading();
+					return;
+				}
 
-			message_box.insertBefore(this.form);
-		});
+				this.#post(zabbixUrl({action: 'mediatype.test.send'}), fields);
+			});
 	}
 
 	/**
@@ -106,13 +117,12 @@ window.mediatype_test_edit_popup = new class {
 	}
 
 	/**
-	 * Sends a POST request to the specified URL with the provided data and executes the success_callback function.
+	 * Sends a POST request to the specified URL with the provided data.
 	 *
-	 * @param {string}   url               The URL to send the POST request to.
-	 * @param {object}   data              The data to send with the POST request.
-	 * @param {callback} success_callback  The function to execute when a successful response is received.
+	 * @param {string}   url			   The URL to send the POST request to.
+	 * @param {object}   data			  The data to send with the POST request.
 	 */
-	#post(url, data, success_callback) {
+	#post(url, data) {
 		fetch(url, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -120,60 +130,68 @@ window.mediatype_test_edit_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				for (const element of this.form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				if ('form_errors' in response) {
+					this.#form.setErrors(response.form_errors, true, true);
+					this.#form.renderErrors();
+
+					return;
 				}
 
 				if ('debug' in response) {
-					this.form.querySelector('#mediatypetest_log').classList.remove('disabled');
+					this.#form_element.querySelector('#mediatypetest_log').classList.remove('disabled');
 					sessionStorage.setItem('mediatypetest', JSON.stringify(response.debug));
 				}
 
 				if ('response' in response) {
 					// Set 'webhook_response_value' input field value
-					const response_value_element = this.form.querySelector('#webhook_response_value');
+					const response_value_element = this.#form_element.querySelector('#webhook_response_value');
 
 					if (response_value_element) {
 						response_value_element.value = response.response.value;
 					}
 
 					// Set 'webhook_response_type' text element value
-					const response_type_element = this.form.querySelector('#webhook_response_type');
+					const response_type_element = this.#form_element.querySelector('#webhook_response_type');
 
 					if (response_type_element) {
 						response_type_element.textContent = response.response.type;
 					}
 				}
 
-				if ('error' in response) {
-					throw { error: response.error };
+				if ('success' in response) {
+					const message_box = makeMessageBox('good', response.success.messages, response.success.title);
+					this.#form_element.parentNode.insertBefore(message_box[0], this.#form_element);
 				}
-
-				return response;
 			})
-			.then(success_callback)
-			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => this.#overlay.unsetLoading());
+	}
 
-				let title, messages;
+	#removePopupMessages() {
+		for (const el of this.#form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
 
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
 
-				const message_box = makeMessageBox('bad', messages, title)[0];
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
-			.finally(() => this.overlay.unsetLoading());
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
 	}
 }
