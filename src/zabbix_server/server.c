@@ -2196,6 +2196,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			if (1 < i && !ZBX_IS_RUNNING())
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot continue server startup because of termination");
+				ret = FAIL;
 				break;
 			}
 

@@ -31,6 +31,7 @@
 #include "zbxlog.h"
 #include "zbxhistory.h"
 #include "zbxexit.h"
+#include "zbxsupervisor_client.h"
 
 static sigset_t			orig_mask;
 
@@ -145,6 +146,8 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		trends_export = zbx_trends_export_init(get_trends_export, "history-syncer", process_num);
 
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), dbsyncer_args->config_timeout, &rtc);
+
+	zbx_supervisor_set_process_running(server_num);
 
 	for (;;)
 	{

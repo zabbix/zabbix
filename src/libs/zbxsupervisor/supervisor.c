@@ -176,6 +176,7 @@ static void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *
 			break;
 
 		case ZBX_PROCESS_TYPE_HISTSYNCER:
+			*runlevel = ZBX_RUNLEVEL_STARTUP;
 			break;
 
 		case ZBX_PROCESS_TYPE_DISCOVERER:
