@@ -576,7 +576,8 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		goto out;
 	}
 
-	if (NULL != config_bridge_adapter_ca_file && NULL != config_bridge_adapter_cert_file && NULL != config_bridge_adapter_key_file)
+	if (NULL != config_bridge_adapter_ca_file && NULL != config_bridge_adapter_cert_file &&
+			NULL != config_bridge_adapter_key_file)
 	{
 		if (SUCCEED != zbx_curl_setopt_https(curl, &error_curl))
 		{

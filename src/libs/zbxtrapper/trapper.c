@@ -1214,7 +1214,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip,
-		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to, zbx_ipc_async_socket_t *rtc)
+		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to,
+		zbx_ipc_async_socket_t *rtc)
 {
 	int	ret = SUCCEED;
 
@@ -1445,7 +1446,8 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip,
-		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to, zbx_ipc_async_socket_t *rtc)
+		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to,
+		zbx_ipc_async_socket_t *rtc)
 {
 	if (FAIL == zbx_tcp_recv_to(sock, config_comms->config_trapper_timeout))
 		return;

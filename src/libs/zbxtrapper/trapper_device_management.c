@@ -148,8 +148,9 @@ static int	device_get_userid_by_uuid(const char *uuid, zbx_uint64_t *target_user
 
 #if defined(HAVE_LIBCURL)
 static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *config_comms,
-		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to, const char *payload,
-		const char *request, char **body_data, struct zbx_json_parse *jp_body, char **error)
+		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to,
+		const char *payload, const char *request, char **body_data, struct zbx_json_parse *jp_body,
+		char **error)
 {
 	zbx_http_response_t	body = {0}, response_header = {0};
 	CURL			*curl = NULL;
@@ -354,8 +355,9 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 	zbx_json_addstring(&request, "id", uuid7id, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&request);
 
-	if (SUCCEED != trapper_device_bridge_adapter_request(config_comms, config_bridge_adapter_url, config_bridge_adapter_connect_to,
-			request.buffer, ZBX_PROTO_VALUE_DEVICE_INIT, &body_data, &jp_body, error))
+	if (SUCCEED != trapper_device_bridge_adapter_request(config_comms, config_bridge_adapter_url,
+			config_bridge_adapter_connect_to, request.buffer, ZBX_PROTO_VALUE_DEVICE_INIT, &body_data,
+			&jp_body, error))
 		goto out;
 
 	if (SUCCEED == zbx_json_brackets_by_name(&jp_body, "error", &jp_result))
@@ -500,8 +502,8 @@ void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	if (SUCCEED == (ret = trapper_device_init(jp, config_comms, config_bridge_adapter_url, config_bridge_adapter_connect_to, &error,
-			&json)))
+	if (SUCCEED == (ret = trapper_device_init(jp, config_comms, config_bridge_adapter_url,
+			config_bridge_adapter_connect_to, &error, &json)))
 	{
 		if (SUCCEED != zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size,
 				config_comms->config_timeout))
@@ -574,8 +576,9 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 	zbx_json_addstring(&request, "id", uuid7id, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&request);
 
-	if (SUCCEED != trapper_device_bridge_adapter_request(config_comms, config_bridge_adapter_url, config_bridge_adapter_connect_to,
-			request.buffer, ZBX_PROTO_VALUE_DEVICE_OFFBOARD, &body_data, &jp_body, error))
+	if (SUCCEED != trapper_device_bridge_adapter_request(config_comms, config_bridge_adapter_url,
+			config_bridge_adapter_connect_to, request.buffer, ZBX_PROTO_VALUE_DEVICE_OFFBOARD, &body_data,
+			&jp_body, error))
 		goto out;
 
 	if (SUCCEED == zbx_json_brackets_by_name(&jp_body, "error", &jp_result))
@@ -691,8 +694,8 @@ void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	if (SUCCEED == (ret = trapper_device_offboard(jp, config_comms, config_bridge_adapter_url, config_bridge_adapter_connect_to, &error,
-			&json)))
+	if (SUCCEED == (ret = trapper_device_offboard(jp, config_comms, config_bridge_adapter_url,
+			config_bridge_adapter_connect_to, &error, &json)))
 	{
 		if (SUCCEED != zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size,
 				config_comms->config_timeout))
