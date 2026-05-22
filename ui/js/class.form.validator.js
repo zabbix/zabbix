@@ -656,7 +656,7 @@ class CFormValidator {
 						});
 					}
 
-					result.result;
+					return result.result;
 				});
 		}
 
