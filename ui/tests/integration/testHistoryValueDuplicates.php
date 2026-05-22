@@ -227,6 +227,7 @@ class testHistoryValueDuplicates extends CIntegrationTest {
 				$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'skipped', true, 5, 5);
 			}
 
+			$expected_count = $has_history_provider ? 16 : 8;
 			$response = $this->callUntilDataIsPresent('history.get', [
 				'history' => $d['value_type'],
 				'itemids' => [
@@ -234,8 +235,10 @@ class testHistoryValueDuplicates extends CIntegrationTest {
 					$d['items'][1]['itemid']
 				],
 				'sortfield' => 'itemid'
-			], 5, 5);
-			$this->assertEquals(8, count($response['result']));
+			], 5, 5, function ($response) use ($expected_count) {
+				return count($response['result']) === $expected_count;
+			});
+			$this->assertEquals($expected_count, count($response['result']));
 		}
 
 		return true;
