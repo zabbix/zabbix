@@ -289,14 +289,14 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						"dc.host_source,dc.name_source,dr.druleid,"
 						"dc.snmp_community,dc.snmpv3_securityname,dc.snmpv3_securitylevel,"
 						"dc.snmpv3_authpassphrase,dc.snmpv3_privpassphrase,"
-						"dc.snmpv3_authprotocol,dc.snmpv3_privprotocol,dc.snmpv3_contextname"
+						"dc.snmpv3_authprotocol,dc.snmpv3_privprotocol,dc.snmpv3_contextname,"
+						"ds.status"
 					" from drules dr,dchecks dc,dservices ds"
 					" where dc.druleid=dr.druleid"
 						" and ds.dcheckid=dc.dcheckid"
 						" and ds.dhostid=" ZBX_FS_UI64
-						" and ds.status=%d"
 					" order by ds.ip,ds.port",
-					event->objectid, DOBJECT_STATUS_UP);
+					event->objectid);
 		}
 		else
 		{
@@ -305,15 +305,15 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						"dc.host_source,dc.name_source,dr.druleid,"
 						"dc.snmp_community,dc.snmpv3_securityname,dc.snmpv3_securitylevel,"
 						"dc.snmpv3_authpassphrase,dc.snmpv3_privpassphrase,"
-						"dc.snmpv3_authprotocol,dc.snmpv3_privprotocol,dc.snmpv3_contextname"
+						"dc.snmpv3_authprotocol,dc.snmpv3_privprotocol,dc.snmpv3_contextname,"
+						"ds.status"
 					" from drules dr,dchecks dc,dservices ds,dservices ds1"
 					" where dc.druleid=dr.druleid"
 						" and ds.dcheckid=dc.dcheckid"
 						" and ds1.dhostid=ds.dhostid"
 						" and ds1.dserviceid=" ZBX_FS_UI64
-						" and ds.status=%d"
 					" order by ds.ip,ds.port",
-					event->objectid, DOBJECT_STATUS_UP);
+					event->objectid);
 		}
 
 		zbx_vector_op_dinterface_ptr_t	d_ifs_agent;
@@ -585,7 +585,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 				add_discovered_host_groups(hostid, &groupids, event);
 			}
-			else
+			else if(DOBJECT_STATUS_UP == atoi(row[17]))
 			{
 				if (INTERFACE_TYPE_AGENT == d_if->type)
 				{
