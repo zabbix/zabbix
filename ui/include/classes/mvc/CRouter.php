@@ -142,7 +142,6 @@ class CRouter {
 		'host.tags.list'							=> [CControllerHostTagsList::class,									'layout.json',			'host.tags.list'],
 		'host.update'								=> [CControllerHostUpdate::class,									'layout.json',			null],
 		'host.view'									=> [CControllerHostView::class,										'layout.htmlpage',		'monitoring.host.view'],
-		'host.view.refresh'							=> [CControllerHostViewRefresh::class,								'layout.json',			'monitoring.host.view.refresh'],
 		'host.view.data'							=> [CControllerHostViewData::class,									'layout.json',			null],
 		'host.prototype.create'						=> [CControllerHostPrototypeCreate::class,							'layout.json',			null],
 		'host.prototype.delete'						=> [CControllerHostPrototypeDelete::class,							'layout.json',			null],
