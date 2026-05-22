@@ -885,7 +885,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		$before = (int) $row['lastlogsize'];
 
 		$tm = time();
-		$this->sendHistoryAt($tm, null, ITEM_STATE_NORMAL, true);
+		$this->sendHistoryAt($tm, null, ITEM_STATE_NORMAL, true, true);
 
 		$timeout = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
 		$start = microtime(true);
@@ -1143,12 +1143,17 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	private function prepareHistoryAt(int $tm, ?string $value = null, int $state = ITEM_STATE_NORMAL,
-			bool $omit_value = false): array {
+			bool $omit_value = false, bool $log_only = false): array {
 		$sent = [];
 		$values_by_type = [];
 
 		foreach (self::prototypeDefs() as $def) {
 			$vtype = $def['value_type'];
+
+			if ($log_only && $vtype !== ITEM_VALUE_TYPE_LOG) {
+				continue;
+			}
+
 			$items_by_key = self::$discovered_itemids[$vtype];
 
 			$this->assertCount(self::LLD_DISCOVERY_COUNT, $items_by_key,
@@ -1205,8 +1210,9 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	private function sendHistoryAt(int $tm, ?string $value = null, int $state = ITEM_STATE_NORMAL,
-			bool $omit_value = false): array {
-		['sent' => $sent, 'values' => $all_values] = $this->prepareHistoryAt($tm, $value, $state, $omit_value);
+			bool $omit_value = false, bool $log_only = false): array {
+		['sent' => $sent, 'values' => $all_values] = $this->prepareHistoryAt($tm, $value, $state, $omit_value,
+			$log_only);
 		$this->dispatchValues($all_values);
 
 		return $sent;
