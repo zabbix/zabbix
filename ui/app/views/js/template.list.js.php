@@ -141,9 +141,11 @@
 						.setFields(['templateid', 'httpTests'])
 						.setRenderer('web'),
 					new CDataTableColumn('vendor', <?= json_encode(_('Vendor')); ?>)
-						.setFields(['vendor_name']),
+						.setFields(['vendor_name'])
+						.setRenderer(CDataTableColumn.RENDERER_TEXT),
 					new CDataTableColumn('version', <?= json_encode(_('Version')); ?>)
-						.setFields(['vendor_version']),
+						.setFields(['vendor_version'])
+						.setRenderer(CDataTableColumn.RENDERER_TEXT),
 					new CDataTableColumn('linked_templates', <?= json_encode(_('Linked templates')); ?>)
 						.setFields(['parentTemplates'])
 						.setRenderer('linked_templates'),

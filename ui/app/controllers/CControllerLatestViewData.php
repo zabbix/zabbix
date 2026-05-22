@@ -271,7 +271,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 			$item['item_icons'] = (string) makeInformationList($item_icons);
 
 			$item['description_expanded'] = (new CObject())
-				->addItem(zbx_str2links($item['description_expanded']))
+				->addItem(zbx_str2links(htmlentities($item['description_expanded'])))
 				->toString();
 		}
 		unset($item);
