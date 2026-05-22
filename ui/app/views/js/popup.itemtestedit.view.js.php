@@ -50,7 +50,7 @@ window.itemtestedit_view_popup = new class {
 		this.#form.discoverAllFields();
 
 		if (this.#show_prev) {
-			this.#form.findFieldByName('upd_last').getField().value = Math.ceil(+new Date() / 1000);
+			this.#form.findFieldByName('upd_last').getField().value = Math.ceil(Date.now() / 1000);
 		}
 
 		this.#initEvents();
@@ -106,7 +106,7 @@ window.itemtestedit_view_popup = new class {
 
 		const not_supported_field = this.#form.findFieldByName('not_supported');
 
-		if (not_supported_field) {
+		if (not_supported_field !== null) {
 			not_supported_field.getField().disabled = get_value_checked;
 			not_supported_field.getField().dispatchEvent(new Event('change'));
 		}
@@ -129,19 +129,19 @@ window.itemtestedit_view_popup = new class {
 
 		const proxy_field = this.#form.findFieldByName('proxyid');
 
-		if (proxy_field) {
+		if (proxy_field !== null) {
 			$(proxy_field.getField()).multiSelect(get_value_checked ? 'enable' : 'disable');
 		}
 
 		const interface_address_field = this.#form.findFieldByName('interface[address]');
 
-		if (interface_address_field) {
+		if (interface_address_field !== null) {
 			interface_address_field.getField().disabled = !get_value_checked || !this.#interface_address_enabled;
 		}
 
 		const interface_port_field = this.#form.findFieldByName('interface[port]');
 
-		if (interface_port_field) {
+		if (interface_port_field !== null) {
 			interface_port_field.getField().disabled = !get_value_checked || !this.#interface_port_enabled;
 		}
 
@@ -270,7 +270,7 @@ window.itemtestedit_view_popup = new class {
 		if (this.#show_prev && with_get_value) {
 			fields.time_change = fields.upd_prev !== ''
 				? parseInt(fields.upd_last) - parseInt(fields.upd_prev)
-				: Math.ceil(+new Date() / 1000) - parseInt(fields.upd_last);
+				: Math.ceil(Date.now() / 1000) - parseInt(fields.upd_last);
 		}
 
 		return fields;
@@ -297,7 +297,7 @@ window.itemtestedit_view_popup = new class {
 		field_names.forEach(field_name => {
 			const field = this.#form.findFieldByName(field_name);
 
-			if (field) {
+			if (field !== null) {
 				field.setChanged();
 			}
 		});
@@ -337,13 +337,13 @@ window.itemtestedit_view_popup = new class {
 					this.#processItemPreprocessingTestResults(response.steps ?? []);
 					this.#processGetValueResult(response, fields.upd_last);
 
-					if ('not_supported' in response && this.#form.findFieldByName('not_supported')) {
+					if ('not_supported' in response && this.#form.findFieldByName('not_supported') !== null) {
 						const not_supported_field = this.#form.findFieldByName('not_supported');
 						not_supported_field.getField().checked = response.not_supported != 0;
 						not_supported_field.getField().dispatchEvent(new Event('change'));
 					}
 
-					if ('runtime_error' in response && this.#form.findFieldByName('runtime_error')) {
+					if ('runtime_error' in response && this.#form.findFieldByName('runtime_error') !== null) {
 						$(this.#form.findFieldByName('runtime_error').getField())
 							.multilineInput('value', response.runtime_error);
 					}
@@ -426,7 +426,7 @@ window.itemtestedit_view_popup = new class {
 				.multilineInput('value', response.prev_value);
 			this.#form.findFieldByName('prev_time').getField().value = response.prev_time;
 			this.#form.findFieldByName('upd_prev').getField().value = last_updated;
-			this.#form.findFieldByName('upd_last').getField().value = Math.ceil(+new Date() / 1000);
+			this.#form.findFieldByName('upd_last').getField().value = Math.ceil(Date.now() / 1000);
 		}
 
 		if ('value' in response) {
