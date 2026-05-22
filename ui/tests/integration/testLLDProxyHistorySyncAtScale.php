@@ -45,7 +45,7 @@ class testLLDProxyHistorySyncAtScale extends testLLDHistorySyncAtScale {
 			'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX,
 			'ConfigFrequency' => 1,
 			'DataSenderFrequency' => 1,
-			'LogFileSize' => 1,
+			'LogFileSize' => 8,
 			'DebugLevel' => 3,
 			'CacheSize' => '128M',
 			'HistoryCacheSize' => '32M',
@@ -73,11 +73,10 @@ class testLLDProxyHistorySyncAtScale extends testLLDHistorySyncAtScale {
 	 * this, tests that rely on freshly-discovered items/triggers would race
 	 * against the proxy's periodic ConfigFrequency pull.
 	 */
-	protected function reloadConfigurationCacheAndWaitForLogLine($component = null, $delayOverride = 0) {
-		parent::reloadConfigurationCacheAndWaitForLogLine($component, $delayOverride);
-
-		$this->reloadConfigurationCache(self::COMPONENT_PROXY, $delayOverride);
-		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'finished forced reloading of the configuration cache');
+	protected function reloadConfigurationCacheAndWaitForLogLine($component = null, $delayOverride = 0,
+			$iterations = null, $delay = null) {
+		parent::reloadConfigurationCacheAndWaitForLogLine($component, $delayOverride, $iterations, $delay);
+		parent::reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY, $delayOverride, $iterations, $delay);
 	}
 
 	public function testLLDHistorySyncAtScale_ValueOmittedDrainsDelay() {
@@ -86,9 +85,9 @@ class testLLDProxyHistorySyncAtScale extends testLLDHistorySyncAtScale {
 
 	/*public function testLLDHistorySyncAtScale_LogLastlogsizeAdvances() {
 		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
-	}*/
+	}
 
-	public function testLLDHistorySyncAtScale_SingleLogBurstPreTriggersSend() {
+	/*public function testLLDHistorySyncAtScale_SingleLogBurstPreTriggersSend() {
 		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
 	}
 
@@ -103,7 +102,7 @@ class testLLDProxyHistorySyncAtScale extends testLLDHistorySyncAtScale {
 	public function testLLDHistorySyncAtScale_PreTriggerZeroVpsWritten() {
 		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
 	}
-
+	
 	public function testLLDHistorySyncAtScale_TriggerDiscovery() {
 		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
 	}
@@ -131,7 +130,7 @@ class testLLDProxyHistorySyncAtScale extends testLLDHistorySyncAtScale {
 	public function testLLDHistorySyncAtScale_TriggerRecoverUnknown() {
 		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
 	}
-
+*/
 	public function testLLDHistorySyncAtScale_TriggerNoDataDiscovery() {
 		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
 	}

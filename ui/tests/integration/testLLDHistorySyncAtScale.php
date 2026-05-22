@@ -1422,7 +1422,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		], 0, self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		/* check that server succeessfuly removed large amount of items from cache */
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER, null, self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 	}
 }

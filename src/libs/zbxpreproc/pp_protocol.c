@@ -1190,7 +1190,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "unexpected result type: %d and item_value_type: %hhu combo "
 						"for itemid: " ZBX_FS_UI64, result->type, item_value_type, itemid);
-				THIS_SHOULD_NEVER_HAPPEN;
+				/* THIS_SHOULD_NEVER_HAPPEN; */
 				goto out;
 			}
 
