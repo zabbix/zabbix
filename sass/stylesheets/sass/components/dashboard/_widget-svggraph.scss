@@ -60,8 +60,6 @@ form.dashboard-widget-svggraph {
 				text-align: right;
 				min-width: 80px;
 				max-width: 120px;
-
-				@extend %overflow-ellipsis;
 			}
 
 			&:first-child {

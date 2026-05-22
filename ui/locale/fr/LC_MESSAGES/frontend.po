@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-04-20 18:49+0000\n"
+"PO-Revision-Date: 2026-04-27 18:43+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -13,8 +13,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pontoon\n"
-"X-POOTLE-MTIME: 1516000918.000000\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1516000918.000000\n"
 
 #: include/classes/validators/CFormValidator.php:1397
 #: include/classes/validators/CFormValidator.php:1442 jsLoader.php:439
@@ -1818,7 +1818,7 @@ msgstr "Au moins un groupe hôte ou un hôte doit être sélectionné."
 #: app/controllers/CControllerGraphPrototypeCreate.php:116
 #: app/controllers/CControllerGraphPrototypeUpdate.php:118
 msgid "At least one item must be a prototype"
-msgstr ""
+msgstr "Au moins un élément doit être un prototype"
 
 #: app/controllers/CControllerMaintenanceCreate.php:57
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
@@ -2596,7 +2596,7 @@ msgstr[1] "Impossible d'ajouter les modules : %1$s."
 #: app/controllers/CControllerGraphPrototypeUpdate.php:123
 #: app/controllers/CControllerGraphUpdate.php:113
 msgid "Cannot add more than one item with type \"Graph sum\""
-msgstr ""
+msgstr "Impossible d'ajouter plus d'un élément de type \"Somme du graphique\""
 
 #: include/classes/api/services/CGraph.php:42
 #, c-format
@@ -2643,6 +2643,10 @@ msgstr "Impossible d'ajouter le script"
 #: widgets/navtree/views/navtreeitem.edit.php:72
 msgid "Cannot add submaps. Max depth reached."
 msgstr "Impossible d'ajouter des sous-cartes. La profondeur maximum est atteinte."
+
+#: app/controllers/CControllerPopupScheduledReportSubscriptionCheck.php:85
+msgid "Cannot add subscription"
+msgstr "Impossible d'ajouter l'abonnement"
 
 #: app/controllers/CControllerTemplateCreate.php:49
 #: app/controllers/CControllerTemplateCreate.php:171
@@ -5727,7 +5731,7 @@ msgstr[1] "Connecteurs désactivés"
 
 #: app/controllers/CControllerPopup.php:43
 msgid "Connector edit"
-msgstr ""
+msgstr "Modification du connecteur"
 
 #: app/controllers/CControllerConnectorEnable.php:69
 msgid "Connector enabled"
@@ -5889,7 +5893,7 @@ msgstr "Copier dans le presse-papier"
 
 #: app/controllers/CControllerPopup.php:44
 msgid "Correlation edit"
-msgstr ""
+msgstr "Modification de la corrélation"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:52
 #: app/controllers/CControllerPopupTriggerExpr.php:693
@@ -7023,6 +7027,10 @@ msgstr "Supprimer les manquants"
 #: app/views/administration.regex.edit.php:160
 msgid "Delete regular expression?"
 msgstr "Supprimer l'expression régulière ?"
+
+#: app/views/js/reports.scheduledreport.edit.js.php:160
+msgid "Delete scheduled report?"
+msgstr "Supprimer le rapport planifié ?"
 
 #: app/views/administration.script.edit.php:389
 msgid "Delete script?"
@@ -9973,7 +9981,7 @@ msgstr[1] "Graphiques supprimés"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Graph edit"
-msgstr ""
+msgstr "Modification du graphique"
 
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
@@ -10029,7 +10037,7 @@ msgstr[1] "Prototypes de graphique supprimés"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Graph prototype edit"
-msgstr ""
+msgstr "Modification du prototype de graphique"
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -10588,7 +10596,7 @@ msgstr[1] "Hôtes désactivés"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Host edit"
-msgstr ""
+msgstr "Modification de l'hôte"
 
 #: app/controllers/CControllerHostGroupEnable.php:76
 #: app/controllers/CControllerPopupMassupdateHost.php:491
@@ -10651,7 +10659,7 @@ msgstr[1] "Groupes d'hôtes supprimé"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Host group edit"
-msgstr ""
+msgstr "Modification du groupe d'hôtes"
 
 #: include/views/js/monitoring.sysmaps.js.php:112
 msgid "Host group elements"
@@ -10822,7 +10830,7 @@ msgstr[1] "Prototypes d'hôte supprimés"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Host prototype edit"
-msgstr ""
+msgstr "Modification du prototype d'hôte"
 
 #: include/views/configuration.host.prototype.edit.php:370
 msgid "Host prototype macros"
@@ -13204,7 +13212,7 @@ msgstr[1] "Éléments désactivés"
 
 #: app/controllers/CControllerPopup.php:48
 msgid "Item edit"
-msgstr ""
+msgstr "Modification de l'élément"
 
 #: items.php:707
 msgid "Item enabled"
@@ -13281,7 +13289,7 @@ msgstr[1] "Prototypes d'élément supprimés"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Item prototype edit"
-msgstr ""
+msgstr "Modification du prototype d'élément"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
@@ -13966,7 +13974,7 @@ msgstr "Liste les périphériques de bloc et leur type. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1724
 msgid "List of block devices with detailed information. Returns JSON"
-msgstr ""
+msgstr "Liste des périphériques de stockage avec informations détaillées. Retourne un JSON"
 
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
@@ -13990,7 +13998,7 @@ msgstr "Liste les systèmes de fichiers montés, leurs types, l'espace disque et
 
 #: include/classes/data/CItemData.php:1266
 msgid "List of network interfaces with detailed information. Returns JSON"
-msgstr ""
+msgstr "Liste des interfaces réseau avec informations détaillées. Retourne un JSON"
 
 #: include/classes/data/CItemData.php:1109
 msgid "List of network interfaces. Returns JSON"
@@ -14286,7 +14294,7 @@ msgstr "La maintenance \"%1$s\" existe déjà."
 
 #: app/controllers/CControllerPopup.php:50
 msgid "Maintenance edit"
-msgstr ""
+msgstr "Modification de la maintenance"
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:238
@@ -14764,7 +14772,7 @@ msgstr "Type de média désactivé par l'administration."
 
 #: app/controllers/CControllerPopup.php:51
 msgid "Media type edit"
-msgstr ""
+msgstr "Modification du type de média"
 
 #: app/controllers/CControllerMediatypeEnable.php:87
 #: app/controllers/CControllerMediatypeEnable.php:94
@@ -15141,7 +15149,7 @@ msgstr[1] "Modules désactivés"
 
 #: app/controllers/CControllerPopup.php:52
 msgid "Module edit"
-msgstr ""
+msgstr "Modification du module"
 
 #: app/controllers/CControllerModuleEnable.php:91
 msgid "Module enabled"
@@ -15621,6 +15629,10 @@ msgstr "Nouveau serveur LDAP"
 msgid "New MFA method"
 msgstr "Nouvelle méthode d'authentification multi-facteur"
 
+#: app/views/oauth.edit.php:254
+msgid "New OAuth"
+msgstr "Nouveau OAuth"
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "Nouveau SLA"
@@ -15753,6 +15765,11 @@ msgstr "Nouveau groupe de proxy"
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "Nouvelle expression régulière"
+
+#: app/views/js/reports.scheduledreport.edit.js.php:99
+#: app/views/reports.scheduledreport.edit.php:250
+msgid "New scheduled report"
+msgstr "Nouveau rapport planifié"
 
 #: app/views/administration.script.edit.php:369
 #: app/views/administration.script.edit.php:409
@@ -18457,7 +18474,7 @@ msgstr[1] "Proxy supprimé"
 
 #: app/controllers/CControllerPopup.php:53
 msgid "Proxy edit"
-msgstr ""
+msgstr "Modification du proxy"
 
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/partials/configuration.host.edit.html.php:266
@@ -18495,7 +18512,7 @@ msgstr[1] "Groupes de proxy supprimés"
 
 #: app/controllers/CControllerPopup.php:54
 msgid "Proxy group edit"
-msgstr ""
+msgstr "Modification du groupe de proxys"
 
 #: app/controllers/CControllerProxyGroupUpdate.php:74
 msgid "Proxy group updated"
@@ -19649,7 +19666,7 @@ msgstr[1] "SLAs désactivés"
 
 #: app/controllers/CControllerPopup.php:58
 msgid "SLA edit"
-msgstr ""
+msgstr "Modification du SLA"
 
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
@@ -20029,6 +20046,10 @@ msgid_plural "Scheduled reports disabled"
 msgstr[0] "Rapport planifié désactivé"
 msgstr[1] "Rapports planifiés désactivés"
 
+#: app/controllers/CControllerPopup.php:60
+msgid "Scheduled report edit"
+msgstr "Modification du rapport planifié"
+
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
 msgid_plural "Scheduled reports enabled"
@@ -20112,7 +20133,7 @@ msgstr "Le script n'a pas de paramètres."
 
 #: app/controllers/CControllerPopup.php:56
 msgid "Script edit"
-msgstr ""
+msgstr "Modification du script"
 
 #: app/views/administration.timeouts.edit.php:168
 msgid "Script execution"
@@ -20491,7 +20512,7 @@ msgstr[1] "Services supprimés"
 
 #: app/controllers/CControllerPopup.php:57
 msgid "Service edit"
-msgstr ""
+msgstr "Modification du service"
 
 #: app/views/administration.userrole.edit.php:166
 #: app/views/administration.userrole.edit.php:207
@@ -22030,7 +22051,7 @@ msgstr[1] "Modèles supprimés"
 
 #: app/controllers/CControllerPopup.php:59
 msgid "Template edit"
-msgstr ""
+msgstr "Modification du modèle"
 
 #: app/controllers/CControllerAuditLogList.php:259
 #: app/partials/configuration.templategroup.edit.html.php:52
@@ -22057,7 +22078,7 @@ msgstr[1] "Groupes de modèles supprimés"
 
 #: app/controllers/CControllerPopup.php:55
 msgid "Template group edit"
-msgstr ""
+msgstr "Modification du groupe de modèles"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:86
 msgid "Template group updated"
@@ -22909,7 +22930,7 @@ msgstr "Aujourd'hui jusqu'à présent"
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
-msgstr ""
+msgstr "Modification du jeton"
 
 #: app/views/oauth.edit.php:188
 msgid "Token endpoint"
@@ -23182,7 +23203,7 @@ msgstr "Options d'affichage des déclencheurs"
 
 #: app/controllers/CControllerPopup.php:61
 msgid "Trigger edit"
-msgstr ""
+msgstr "Modification du déclencheur"
 
 #: app/controllers/CControllerTriggerEnable.php:67
 msgid "Trigger enabled"
@@ -23325,7 +23346,7 @@ msgstr[1] "Prototypes de déclencheur supprimés"
 
 #: app/controllers/CControllerPopup.php:62
 msgid "Trigger prototype edit"
-msgstr ""
+msgstr "Modification du prototype de déclencheur"
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -25161,6 +25182,18 @@ msgstr "Tables de correspondance"
 #, c-format
 msgid "Value must be greater than %1$s."
 msgstr "La valeur doit être supérieure à %1$s."
+
+#: include/classes/validators/CFormValidator.php:1089
+#: include/classes/validators/CFormValidator.php:1147 jsLoader.php:435
+#, c-format
+msgid "Value must be greater than or equal to %1$s."
+msgstr "La valeur doit être supérieure ou égale à %1$s."
+
+#: include/classes/validators/CFormValidator.php:1095
+#: include/classes/validators/CFormValidator.php:1153 jsLoader.php:434
+#, c-format
+msgid "Value must be less than or equal to %1$s."
+msgstr "La valeur doit être inférieure ou égale à %1$s."
 
 #: include/classes/validators/CFormValidator.php:1033
 #: include/classes/validators/CFormValidator.php:1042

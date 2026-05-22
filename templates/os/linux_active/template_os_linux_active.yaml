@@ -34,7 +34,7 @@ zabbix_export:
         - The FS utilization chart, derived from graph prototypes, reflects FS reserved space as the difference between used and available space from the total volume.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: 'Templates/Operating systems'
       items:
@@ -605,7 +605,7 @@ zabbix_export:
         - uuid: 07e60e812d32443ba8e8b0eb27166b98
           name: 'Memory utilization'
           type: DEPENDENT
-          key: vm.memory.utilization
+          key: vm.memory.util
           value_type: FLOAT
           units: '%'
           description: 'The percentage of used memory is calculated as `100-pavailable`.'
@@ -620,7 +620,7 @@ zabbix_export:
               value: memory
           triggers:
             - uuid: fb368aa704064a44b9a4ed8c129cf3e8
-              expression: 'min(/Linux by Zabbix agent active/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/Linux by Zabbix agent active/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
               name: 'Linux: High memory utilization'
               event_name: 'Linux: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
@@ -2145,7 +2145,7 @@ zabbix_export:
       description: 'If there is no swap configured, this trigger is ignored.'
       dependencies:
         - name: 'Linux: High memory utilization'
-          expression: 'min(/Linux by Zabbix agent active/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}'
+          expression: 'min(/Linux by Zabbix agent active/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
         - name: 'Linux: Lack of available memory'
           expression: 'max(/Linux by Zabbix agent active/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Zabbix agent active/vm.memory.size[total])>0'
       tags:
@@ -2275,7 +2275,7 @@ zabbix_export:
           color: 199C0D
           item:
             host: 'Linux by Zabbix agent active'
-            key: vm.memory.utilization
+            key: vm.memory.util
     - uuid: 60078a7b24494a41a3595650b113ee1d
       name: 'Linux: Processes'
       graph_items:

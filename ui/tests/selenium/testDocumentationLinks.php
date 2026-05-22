@@ -1807,7 +1807,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=miscconfig.edit',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#other-parameters'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#other'
 				]
 			],
 			// #185 Administration -> Proxy list view.

@@ -197,6 +197,9 @@ $compact-view-tag-bg-color: $ui-bg-selected-color;
 $toc-title-color: #f2f2f2;
 $toc-title-bg-color: #4f4f4f;
 
+// Datatable.
+$datatable-overlay-color: rgba(#383838, .4);
+$datatable-resizer-border-color: #69808d;
 // Important! @import string should come after variables
 @import 'screen';
 

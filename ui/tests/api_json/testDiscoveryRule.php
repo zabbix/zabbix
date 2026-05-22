@@ -424,6 +424,61 @@ class testDiscoveryRule extends CAPITest {
 					'enabled_lifetime_type' => ZBX_LLD_DISABLE_NEVER
 				],
 				'expected_error' => null
+			],
+			'Test trapper item without trapper_hosts' => [
+				'discoveryrule' => [
+					'name' => 'Trapper allow traps empty',
+					'key_' => 'trapper_item_0',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_TRAPPER,
+					'delay' => '0'
+				],
+				'expected_error' => null
+			],
+			'Test trapper item with empty hosts' => [
+				'discoveryrule' => [
+					'name' => 'Trapper allow traps empty',
+					'key_' => 'trapper_item_1',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_TRAPPER,
+					'delay' => '0',
+					'trapper_hosts' => ''
+				],
+				'expected_error' => null
+			],
+			'Test trapper item with trapper_hosts' => [
+				'discoveryrule' => [
+					'name' => 'Trapper allow traps hosts',
+					'key_' => 'trapper_item_2',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_TRAPPER,
+					'trapper_hosts' => 'localhost',
+					'delay' => '0'
+				],
+				'expected_error' => null
+			],
+			'Test HTTP agent with empty hosts' => [
+				'discoveryrule' => [
+					'name' => 'HTTP agent allow traps 1',
+					'key_' => 'http_allow_1',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'url' => 'localhost',
+					'delay' => '30s',
+					'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON
+				],
+				'expected_error' => null
+			],
+			'Test HTTP agent allow_traps 0' => [
+				'discoveryrule' => [
+					'name' => 'HTTP agent allow traps 0',
+					'key_' => 'http_allow_2',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'url' => 'localhost',
+					'delay' => '30s'
+				],
+				'expected_error' => null
 			]
 		] + $item_type_tests;
 
@@ -449,7 +504,7 @@ class testDiscoveryRule extends CAPITest {
 		if ($expected_error === null) {
 			foreach ($result['result']['itemids'] as $num => $id) {
 				$db_discoveryrule = CDBHelper::getRow(
-					'SELECT i.hostid,i.name,i.key_,i.type,i.delay'.
+					'SELECT i.hostid,i.name,i.key_,i.type,i.delay,i.trapper_hosts'.
 					' FROM items i'.
 					' WHERE i.itemid='.zbx_dbstr($id)
 				);
@@ -457,11 +512,27 @@ class testDiscoveryRule extends CAPITest {
 				if ($discoveryrules[$num]['type'] === ITEM_TYPE_ZABBIX_ACTIVE && substr($discoveryrules[$num]['key_'], 0, 8) === 'mqtt.get') {
 					$discoveryrules[$num]['delay'] = CTestArrayHelper::get($discoveryrules[$num], 'delay', '0');
 				}
+
+				if ($discoveryrules[$num]['type'] === ITEM_TYPE_TRAPPER || (
+						$discoveryrules[$num]['type'] === ITEM_TYPE_HTTPAGENT
+						&& array_key_exists('allow_traps', $discoveryrules[$num])
+						&& $discoveryrules[$num]['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON
+					)
+				) {
+					if (!array_key_exists('trapper_hosts', $discoveryrules[$num])) {
+						$discoveryrules[$num]['trapper_hosts'] = '{$TRAPPER.ALLOWED_HOSTS}';
+					}
+				}
+
 				$this->assertSame($db_discoveryrule['hostid'], $discoveryrules[$num]['hostid']);
 				$this->assertSame($db_discoveryrule['name'], $discoveryrules[$num]['name']);
 				$this->assertSame($db_discoveryrule['key_'], $discoveryrules[$num]['key_']);
 				$this->assertSame($db_discoveryrule['type'], strval($discoveryrules[$num]['type']));
 				$this->assertSame($db_discoveryrule['delay'], $discoveryrules[$num]['delay']);
+
+				if (array_key_exists('trapper_hosts', $discoveryrules[$num])) {
+					$this->assertSame($db_discoveryrule['trapper_hosts'], strval($discoveryrules[$num]['trapper_hosts']));
+				}
 			}
 		}
 

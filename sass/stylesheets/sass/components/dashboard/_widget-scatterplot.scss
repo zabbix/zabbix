@@ -283,6 +283,12 @@ div.dashboard-widget-scatterplot {
 	overflow-x: hidden;
 }
 
+.svg-scatter-plot-point {
+	fill-opacity: 1;
+	fill: var(--color);
+	stroke: var(--color);
+}
+
 .svg-scatter-plot-legend {
 	$svg-legend-line-height: 18px;
 

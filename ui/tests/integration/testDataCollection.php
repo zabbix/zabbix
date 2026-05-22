@@ -561,6 +561,7 @@ class testDataCollection extends CIntegrationTest {
 			'key_' => 'trap',
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'preprocessing' => [[
 				'params' => '100',
 				'type' => 1,

@@ -15,6 +15,7 @@
 
 
 require_once __DIR__.'/../include/CWebTest.php';
+require_once __DIR__.'/behaviors/CDatatableBehavior.php';
 
 /**
  * Test for checking empty pages and tables.
@@ -35,12 +36,15 @@ class testPagesWithoutData extends CWebTest {
 	protected static $template_lldid;
 
 	/**
-	 * Attach TableBehavior to the test.
+	 * Attach TableBehavior and DatatableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CTableBehavior::class];
+		return [
+			CTableBehavior::class,
+			CDatatableBehavior::class
+		];
 	}
 
 	/**
@@ -299,6 +303,7 @@ class testPagesWithoutData extends CWebTest {
 	 * @dataProvider getEmptyPagesData
 	 */
 	public function testPagesWithoutData_CheckEmptyPages($data) {
+		$datatable_present = in_array(CTestArrayHelper::get($data, 'page'), ['Hosts', 'Templates']) ? true : false;
 		$context_host = str_contains($data['url'], 'context=host');
 
 		if (in_array(CTestArrayHelper::get($data, 'page'), ['Hosts', 'Templates', 'SLA', 'SLA report',
@@ -318,6 +323,7 @@ class testPagesWithoutData extends CWebTest {
 			CFilterElement::find()->one()->selectTab('Filter');
 			$form->fill($data['filter']);
 			$form->submit();
+			$this->page->waitUntilReady();
 		}
 
 		if (CTestArrayHelper::get($data, 'page') === 'SLA report') {
@@ -326,10 +332,16 @@ class testPagesWithoutData extends CWebTest {
 			);
 		}
 		else {
-			$this->assertEquals(['No data found'],
-					$this->getTable('xpath://table[@class="list-table no-data"]')->getRows()->asText()
-			);
-			$this->assertTableStats();
+			if ($datatable_present) {
+				$table = $this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
+				$this->assertDatatableStats();
+				$this->assertEquals('No data found', $table->query('class:datatable-body')->one()->getText());
+			}
+			else {
+				$table = $this->getTable('xpath://table[@class="list-table no-data"]');
+				$this->assertTableStats();
+				$this->assertEquals(['No data found'], $table->getRows()->asText());
+			}
 		}
 	}
 }

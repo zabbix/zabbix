@@ -58,12 +58,14 @@ class testDashboardFavoriteGraphsWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=latest.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 		$this->page->assertHeader('Latest data');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table fixed').']')->asTable()->one();
+		$table = $this->query('id:latest')->asDatatable()->one();
 
 		foreach ([$this->graph_cpu, $this->graph_memory] as $graph) {
+			$table_headers = $table->getHeaders();
 			$filter->fill(['Hosts' => $this->host_name, 'Name' => $graph]);
 			$filter->submit();
-			$table->waitUntilReloaded()->invalidate();
+			$table_headers->waitUntilStalled();
+			$table->invalidate();
 			$table->findRow('Host', $this->host_name)->query('link:Graph')->waitUntilClickable()->one()->click();
 
 			// Add graph to favorite.

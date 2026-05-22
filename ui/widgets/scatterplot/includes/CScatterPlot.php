@@ -22,6 +22,7 @@ use CMathHelper,
 	CSvgGraphGrid,
 	CSvgLine,
 	CSvgTag,
+	CTag,
 	Exception;
 
 class CScatterPlot extends CSvg {
@@ -36,6 +37,20 @@ class CScatterPlot extends CSvg {
 	private ?int $canvas_height = null;
 
 	private array $graph_theme;
+
+	/**
+	 * Scatter plot unique prefix for template ids.
+	 *
+	 * @var string
+	 */
+	private string $id_prefix;
+
+	/**
+	 * Scatter plot dataset configurations.
+	 *
+	 * @var array
+	 */
+	private array $datasets = [];
 
 	/**
 	 * Scatter plot metrics.
@@ -121,6 +136,8 @@ class CScatterPlot extends CSvg {
 
 		$this->graph_theme = getUserGraphTheme();
 
+		$this->id_prefix = $options['id_prefix'];
+
 		$this->show_x_axis = $options['axes']['show_x_axis'];
 		$this->x_min = $options['axes']['x_axis_min'];
 		$this->x_max = $options['axes']['x_axis_max'];
@@ -156,21 +173,23 @@ class CScatterPlot extends CSvg {
 
 	public function addMetrics(array $metrics): self {
 		foreach ($metrics as $index => $metric) {
-			$this->metrics[$index] = [
-				'data_set' => $metric['data_set'],
-				'aggregation_name' => $metric['aggregation_name'],
-				'x_axis_items_name' => $metric['x_axis_items_name'],
-				'y_axis_items_name' => $metric['y_axis_items_name'],
-				'x_units' => $metric['x_units'],
-				'y_units' => $metric['y_units'],
-				'options' => $metric['options']
-			];
-
 			if (!array_key_exists('points', $metric) || !$metric['points']) {
 				continue;
 			}
 
-			$this->metrics[$index]['points'] = $metric['points'];
+			$this->metrics[$index] = [
+				'data_set' => $metric['data_set'],
+				'hostname' => $metric['hostname'],
+				'x_axis_items_name' => $metric['x_axis_items_name'],
+				'y_axis_items_name' => $metric['y_axis_items_name'],
+				'x_units' => $metric['x_units'],
+				'y_units' => $metric['y_units']
+			];
+
+			if (!array_key_exists($metric['data_set'], $this->datasets)) {
+				$this->datasets[$metric['data_set']] = $metric['options'];
+			}
+
 			$this->points[$index] = $metric['points'];
 		}
 
@@ -397,7 +416,7 @@ class CScatterPlot extends CSvg {
 
 			$path_points = [];
 
-			foreach ($this->points[$index] as $time => $point) {
+			foreach ($this->points[$index] as $point) {
 				$coordinates = [];
 
 				foreach ($params as $axis => $options) {
@@ -423,19 +442,25 @@ class CScatterPlot extends CSvg {
 					}
 				}
 
+				$time_intervals = [];
+
+				foreach ($point['ticks'] as $tick) {
+					$time_intervals[] = $tick;
+				}
+
 				$path_points[] = [
 					(int) ceil($coordinates['x_axis']),
 					(int) ceil($coordinates['y_axis']),
 					convertUnits([
 						'value' => $point['x_axis'],
 						'units' => $this->x_units
-					]),convertUnits([
+					]),
+					convertUnits([
 						'value' => $point['y_axis'],
 						'units' => $this->y_units
 					]),
 					$point['color'],
-					$time,
-					$time + $metric['options']['aggregate_interval']
+					$time_intervals
 				];
 			}
 
@@ -499,16 +524,84 @@ class CScatterPlot extends CSvg {
 	}
 
 	private function drawMetricsPoint(): void {
+		$templates = new CTag('defs', true);
+		$existing_templates = [];
+
 		foreach ($this->metrics as $index => $metric) {
 			if (array_key_exists($index, $this->paths)) {
-				foreach ($this->paths[$index] as $key => $path) {
-					$this->addItem(new CScatterPlotMetricPoint($path, $metric + [
-						'order' => $index,
-						'key' => $key
-					]));
+				$marker_type = $this->datasets[$metric['data_set']]['marker'];
+				$marker_size =  $this->datasets[$metric['data_set']]['marker_size'];
+
+				if (!array_key_exists($marker_type, $existing_templates)
+						|| !array_key_exists($marker_size, $existing_templates[$marker_type])) {
+					$markers = CScatterPlotMetricPoint::createMarker($marker_type, $marker_size);
+
+					$templates
+						->addItem(
+							$markers[0]->setId('highlight_point_'.$this->id_prefix.'_'.$marker_type.'_'.$marker_size)
+						)
+						->addItem(
+							$markers[1]->setId('point_'.$this->id_prefix.'_'.$marker_type.'_'.$marker_size)
+						);
+
+					$existing_templates[$marker_type][$marker_size] = true;
+				}
+
+				foreach ($this->paths[$index] as $path) {
+					$this->addItem(
+						new CScatterPlotMetricPoint($path, $this->id_prefix, $marker_type, $marker_size)
+					);
 				}
 			}
 		}
+
+		$this->addItem($templates);
+	}
+
+	public function getHintboxData(): array {
+		$datasets = [];
+		$metrics = [];
+		$paths = [];
+
+		foreach ($this->datasets as $index => $dataset) {
+			$datasets[$index] = [
+				'aggregation_name' => $dataset['aggregation_name'],
+				'aggregate_interval' => $dataset['aggregate_interval'],
+				'marker_class' => CScatterPlotMetricPoint::MARKER_ICONS[$dataset['marker']]
+			];
+		}
+
+		foreach ($this->metrics as $index => $metric) {
+			foreach ($this->paths[$index] as $path) {
+				$x = round($path[0]);
+				$y = round($path[1]);
+
+				if (!array_key_exists($x, $paths) || !array_key_exists($y, $paths[$x])) {
+					$paths[$x.'_'.$y] = [];
+				}
+
+				$paths[$x.'_'.$y][] = [
+					'vx' => $path[2],
+					'vy' => $path[3],
+					'color' => $path[4],
+					'time_intervals' => $path[5],
+					'metric' => $index
+				];
+			}
+
+			$metrics[$index] = [
+				'data_set' => $metric['data_set'],
+				'hostname' => $metric['hostname'],
+				'x_items' => $metric['x_axis_items_name'],
+				'y_items' => $metric['y_axis_items_name']
+			];
+		}
+
+		return [
+			'datasets' => $datasets,
+			'metrics' => $metrics,
+			'paths' => $paths
+		];
 	}
 
 	/**

@@ -44,7 +44,7 @@ zabbix_export:
         Test availability: `zabbix_get -s mongos.node -k 'mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]"`
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Databases
       items:
@@ -1059,94 +1059,98 @@ zabbix_export:
       macros:
         - macro: '{$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
           value: '1000'
-          description: 'Minimum number of available connections'
+          description: 'Minimum number of available connections.'
           config:
             type: TEXT
             priority: '4'
             section_name: Thresholds
             label: 'Minimum available connections'
-            description: 'Minimum number of available connections'
+            description: 'Minimum number of available connections.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MONGODB.CONNSTRING}'
           value: 'tcp://localhost:27017'
-          description: 'Connection string in the URI format (password is not used). This param overwrites a value configured in the "Server" option of the configuration file (if it''s set), otherwise, the plugin''s default value is used: "tcp://localhost:27017"'
+          description: |
+            MongoDB connection string in URI format (password not included).
+            If set, it overrides the Server option from the config file.
+            Otherwise, it uses the default: tcp://localhost:27017
           config:
             type: TEXT
             priority: '1'
             label: 'Connection string'
-            description: 'Connection string in the URI format (password is not used). This param overwrites a value configured in the "Server" option of the configuration file (if it''s set), otherwise, the plugin''s default value is used: "tcp://localhost:27017"'
+            description: 'MongoDB connection string in URI format (password not included). If set, it overrides the Server option from the config file. Otherwise, it uses the default: tcp://localhost:27017'
             required: 'YES'
         - macro: '{$MONGODB.CURSOR.OPEN.MAX.WARN}'
           value: '10000'
-          description: 'Maximum number of open cursors'
+          description: 'Maximum number of open cursors.'
           config:
             type: TEXT
             priority: '10'
             section_name: Thresholds
             label: 'Max open cursors'
-            description: 'Maximum number of open cursors'
+            description: 'Maximum number of open cursors.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
           value: '1'
-          description: 'Maximum number of cursors timing out per second'
+          description: 'Maximum number of cursors timing out per second.'
           config:
             type: TEXT
             priority: '9'
             section_name: Thresholds
             label: 'Max cursors timing out per second'
-            description: 'Maximum number of cursors timing out per second'
+            description: 'Maximum number of cursors timing out per second.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MONGODB.LLD.FILTER.COLLECTION.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable collections'
+          description: 'Filter of discoverable collections.'
           config:
             type: TEXT
             priority: '5'
             section_name: Filters
             label: 'Collections filter (include)'
-            description: 'Filter of discoverable collections'
+            description: 'Filter of discoverable collections.'
         - macro: '{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered collections'
+          description: 'Filter to exclude discovered collections.'
           config:
             type: TEXT
             priority: '6'
             section_name: Filters
             label: 'Collections filter (exclude)'
-            description: 'Filter to exclude discovered collections'
+            description: 'Filter to exclude discovered collections.'
         - macro: '{$MONGODB.LLD.FILTER.DB.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable databases'
+          description: 'Filter of discoverable databases.'
           config:
             type: TEXT
             priority: '7'
             section_name: Filters
             label: 'Databases filter (include)'
-            description: 'Filter of discoverable databases'
+            description: 'Filter of discoverable databases.'
         - macro: '{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}'
           value: (admin|config|local)
-          description: 'Filter to exclude discovered databases'
+          description: 'Filter to exclude discovered databases.'
           config:
             type: TEXT
             priority: '8'
             section_name: Filters
             label: 'Databases filter (exclude)'
-            description: 'Filter to exclude discovered databases'
+            description: 'Filter to exclude discovered databases.'
         - macro: '{$MONGODB.PASSWORD}'
-          description: 'MongoDB user password'
+          type: SECRET_TEXT
+          description: 'MongoDB password.'
           config:
             type: TEXT
             priority: '3'
             label: Password
-            description: 'MongoDB user password'
+            description: 'MongoDB password.'
             required: 'YES'
         - macro: '{$MONGODB.USER}'
-          description: 'MongoDB username'
+          description: 'MongoDB username.'
           config:
             type: TEXT
             priority: '2'
             label: Username
-            description: 'MongoDB username'
+            description: 'MongoDB username.'
             required: 'YES'
       dashboards:
         - uuid: b850d8e640bc4ce58a4aa4a2967c6ecf
