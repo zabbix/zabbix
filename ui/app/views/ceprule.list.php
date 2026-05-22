@@ -129,7 +129,7 @@ foreach ($data['ceprules'] as $ceprule) {
 	}
 
 	$make_stop_toggle_button = function (array $ceprule): CLink {
-		if ($ceprule['stop'] == ZBX_CEP_EXECUTION_CONTINUE) {
+		if ($ceprule['stop'] == ZBX_CEP_EXECUTION_STOP) {
 			return (new CLink(_('Enabled')))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)

@@ -412,8 +412,8 @@ window.ceprule_edit_popup = new class {
 	}
 
 	#submit(force_sumbit) {
-		// clearMessages();
 		const fields = this.form.getAllValues();
+		fields[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('ceprule.edit')) ?>;
 
 		// Correct the sortorder.
 		const operations = {};
@@ -424,6 +424,7 @@ window.ceprule_edit_popup = new class {
 
 		fields.operations = operations;
 
+		this.#removePopupMessages();
 		this.form.validateSubmit(fields)
 			.then((result) => {
 				if (!result) {
@@ -431,9 +432,9 @@ window.ceprule_edit_popup = new class {
 					return;
 				}
 
-				const action = document.getElementById('roleid') !== null
-					? 'ceprule.update'
-					: 'ceprule.create';
+				const action = fields.cepruleid === undefined
+					? 'ceprule.create'
+					: 'ceprule.update';
 
 				fetch(zabbixUrl({action}), {
 					method: 'POST',
@@ -459,7 +460,9 @@ window.ceprule_edit_popup = new class {
 								postMessageDetails('success', response.success.messages);
 							}
 
-							location.href = new URL(response.success.redirect, location.href).href;
+							overlayDialogueDestroy(this.#overlay.dialogueid);
+							this.#overlay.$dialogue[0]
+								.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 						}
 					})
 					.catch((exception) => this.#ajaxExceptionHandler(exception))
@@ -665,7 +668,7 @@ window.ceprule_edit_popup = new class {
 		if (is_new) {
 			operation = {
 				step: 1 + Math.max(0, ...Object.keys(this.form.findFieldByName('operations').getValue())),
-				event_type: '<?= ZBX_CEP_OP_SET_NAME ?>',
+				event_type: <?= json_encode(DB::getDefault('cep_operation', 'event_type')) ?>,
 				evaltype: '<?= CONDITION_EVAL_TYPE_AND_OR ?>',
 				event_name: '',
 				eviction_cause: '<?= ZBX_CEP_EXECUTE_EVENT_TYPE_ANY ?>',
@@ -750,7 +753,7 @@ window.ceprule_edit_popup = new class {
 	}
 
 	#unsetLoadingStatus() {
-		console.warn('todo unsetLoadingStatus');
+		this.#overlay.unsetLoading();
 	}
 
 	#editOperationRow(operation) {
@@ -924,5 +927,13 @@ window.ceprule_edit_popup = new class {
 
 		return this.#window_condition_row_template
 			.evaluateToElement({arg1: `${arg1} `, arg2, operator_name, type_str, ...window_condition});
+	}
+
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
 	}
 };

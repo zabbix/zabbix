@@ -57,9 +57,7 @@ class CControllerCepRuleEdit extends CController {
 	}
 
 	protected function doAction(): void {
-		$js_validation_rules = $this->hasInput('cepruleid')
-			? CControllerCepRuleUpdate::getValidationRules()
-			: CControllerCepRuleCreate::getValidationRules();
+		$js_validation_rules = CControllerCepRuleGeneral::getValidationRules(existing: $this->hasInput('cepruleid'));
 
 		$data = [
 			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules(),
@@ -87,8 +85,8 @@ class CControllerCepRuleEdit extends CController {
 				'selectOperations' => ['step', 'execute_when', 'event_type', 'eviction_cause', 'type', 'evaltype',
 					'event_name', 'tag', 'new_tag', 'tag_value', 'severity', 'tags'],
 				'selectFilter' => ['formula', 'evaltype', 'conditions'],
-				'selectWindow' => ['duration', 'capacity', 'script', 'group_by_host_group', 'group_by_host', 'group_by_tag',
-					'filter', 'event_count_tag', 'tag']
+				'selectWindow' => ['duration', 'capacity', 'script', 'group_by_host_group', 'group_by_host',
+					'group_by_tag', 'filter', 'event_count_tag', 'tag']
 			]);
 		}
 		else {
@@ -111,6 +109,11 @@ class CControllerCepRuleEdit extends CController {
 
 		$ceprule = $ceprules[0];
 
+		$ceprule['window'] += DB::getDefaults('cep_window');
+		if (!array_key_exists('filter', $ceprule['window'])) {
+			$ceprule['window']['filter'] = ['conditions' => []];
+		}
+
 		// Unlimited capacity's default value is "0".
 		if ($ceprule['window']['capacity'] == 0) {
 			$ceprule['window']['capacity'] = '';
@@ -129,11 +132,28 @@ class CControllerCepRuleEdit extends CController {
 		unset($ceprule['cep_ruleid']);
 		unset($ceprule['window']['filter']['eval_formula']);
 
+		/* // Key by step value. */
+		/* $ceprule['operations'] = array_reduce($ceprule['operations'], */
+		/* 	static fn (array $carry, array $operation) => [$operation['step'] => $operation, ...$carry], [] */
+		/* ); */
+		/**/
+
+		// Key by formula ID value.
+		$ceprule['filter']['conditions'] = array_reduce($ceprule['filter']['conditions'],
+			static fn (array $carry, array $condition) => [$condition['formulaid'] => $condition, ...$carry], []
+		);
+		ksort($ceprule['filter']['conditions']);
+
+		$ceprule['window']['filter']['conditions'] = array_reduce($ceprule['window']['filter']['conditions'],
+			static fn (array $carry, array $condition) => [$condition['formulaid'] => $condition, ...$carry], []
+		);
+		ksort($ceprule['window']['filter']['conditions']);
+
 		return $ceprule;
 	}
 
 	protected static function getWindowConditionValidationRules(): array {
-		$rules = CControllerCepRuleUpdate::getValidationRules();
+		$rules = CControllerCepRuleGeneral::getValidationRules();
 
 		$condition_fields = $rules
 			['fields']['window']
@@ -147,7 +167,7 @@ class CControllerCepRuleEdit extends CController {
 	}
 
 	protected static function getConditionValidationRules(): array {
-		$rules = CControllerCepRuleUpdate::getValidationRules();
+		$rules = CControllerCepRuleGeneral::getValidationRules();
 
 		$condition_fields = $rules['fields']['filter']['fields']['conditions']['fields'];
 
@@ -157,7 +177,7 @@ class CControllerCepRuleEdit extends CController {
 	}
 
 	protected static function getOperationValidationRules(): array {
-		$rules = CControllerCepRuleUpdate::getValidationRules();
+		$rules = CControllerCepRuleGeneral::getValidationRules();
 
 		$operation_fields = $rules['fields']['operations']['fields'];
 

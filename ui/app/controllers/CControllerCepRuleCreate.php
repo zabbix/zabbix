@@ -14,20 +14,30 @@
 **/
 
 
-class CControllerCepRuleCreate extends CController {
-	protected function checkPermissions() {
-		throw new \Exception('Not implemented');
-	}
-
-	protected function checkInput() {
-		throw new \Exception('Not implemented');
-	}
+class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 
 	protected function doAction() {
-		throw new \Exception('Not implemented');
-	}
+		$result = API::CepRule()->create($this->prepareApiRequest());
+		$output = [];
 
-	public static function getValidationRules(): array {
-		return CControllerCepRuleUpdate::getValidationRules();
+		if ($result) {
+			$output['success']['title'] = _('Complex event processing rule added');
+			$output['success']['redirect'] = (new CUrl('zabbix.php'))
+				->setArgument('action', 'ceprule.list')
+				->setArgument('page', CPagerHelper::loadPage('ceprule.list', null))
+				->getUrl();
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
+		}
+		else {
+			$output['error'] = [
+				'title' => _('Cannot add complex event processing rule'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+		}
+
+		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 	}
 }
