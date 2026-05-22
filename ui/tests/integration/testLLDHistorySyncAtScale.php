@@ -56,6 +56,27 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	private static $agent_ping_itemid;
 	private static $log_lastlogsize = 0;
 
+		/**
+	 * Component configuration provider.
+	 *
+	 * @return array
+	 */
+	public function configurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'LogFileSize' => 1,
+				'DebugLevel' => 3,
+				'CacheSize' => '128M',
+				'HistoryCacheSize' => '32M',
+				'HistoryIndexCacheSize' => '32M',
+				'ValueCacheSize' => '128M',
+				'LogSlowQueries' => '60000',
+				'StartDBSyncers' => '32' /* LLD_DISCOVERY_COUNT * types / ZBX_HC_SYNC_MAX  */
+				/* 'HistoryProvider'=> 'clickhouse;value_types="str,log,text,dbl,uint,json",url=http://localhost:8123,db=zabbix,username=zabbix,password=zabbix' */
+			]
+		];
+	}
+
 	private static function prototypeDefs() {
 		return [
 			['suffix' => 'float', 'value_type' => ITEM_VALUE_TYPE_FLOAT],
@@ -226,26 +247,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				'status' => HOST_STATUS_MONITORED
 			]);
 		}
-	}
-	/**
-	 * Component configuration provider.
-	 *
-	 * @return array
-	 */
-	public function configurationProvider() {
-		return [
-			self::COMPONENT_SERVER => [
-				'LogFileSize' => 1,
-				'DebugLevel' => 3,
-				'CacheSize' => '128M',
-				'HistoryCacheSize' => '32M',
-				'HistoryIndexCacheSize' => '32M',
-				'ValueCacheSize' => '128M',
-				'LogSlowQueries' => '60000',
-				'StartDBSyncers' => '32' /* LLD_DISCOVERY_COUNT * types / ZBX_HC_SYNC_MAX  */
-				/* 'HistoryProvider'=> 'clickhouse;value_types="str,log,text,dbl,uint,json",url=http://localhost:8123,db=zabbix,username=zabbix,password=zabbix' */
-			]
-		];
 	}
 
 	/**

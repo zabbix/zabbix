@@ -836,7 +836,7 @@ class testHistoryGet extends CIntegrationTest {
 			'itemids' => [$itemid],
 			'time_from' => $tm,
 			'time_till' => $tm,
-			'sortfield' => 'ns',
+			'sortfield' => ['clock', 'ns'],
 			'sortorder' => 'ASC'
 		], 5, 5, function($response) {
 			return count($response['result']) === 3;
@@ -852,7 +852,7 @@ class testHistoryGet extends CIntegrationTest {
 			'itemids' => [$itemid],
 			'time_from' => $tm,
 			'time_till' => $tm,
-			'sortfield' => 'ns',
+			'sortfield' => ['clock', 'ns'],
 			'sortorder' => 'DESC'
 		]);
 		$result = $response['result'];
@@ -860,13 +860,13 @@ class testHistoryGet extends CIntegrationTest {
 		$this->assertEquals(200, (int)$result[1]['ns']);
 		$this->assertEquals(100, (int)$result[2]['ns']);
 
-		// sort by ns ASC with limit
+		// sort by clock,ns ASC with limit
 		$response = $this->call('history.get', [
 			'history' => ITEM_VALUE_TYPE_FLOAT,
 			'itemids' => [$itemid],
 			'time_from' => $tm,
 			'time_till' => $tm,
-			'sortfield' => 'ns',
+			'sortfield' => ['clock', 'ns'],
 			'sortorder' => 'ASC',
 			'limit' => 2
 		]);
