@@ -47,6 +47,7 @@ class testLLDProxyHistorySyncAtScale extends testLLDHistorySyncAtScale {
 			'DataSenderFrequency' => 1,
 			'LogFileSize' => 8,
 			'DebugLevel' => 3,
+			'LogSlowQueries' => '60000',
 			'CacheSize' => '128M',
 			'HistoryCacheSize' => '32M',
 			'HistoryIndexCacheSize' => '32M',

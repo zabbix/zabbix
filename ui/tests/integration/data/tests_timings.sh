@@ -9,6 +9,7 @@ declare -A BASELINE_TIMES=(
   [testMacros]=279
   [testItemTimeouts]=209
   [testAgentJsonProtocol]=188
+  [testLLDProxyHistorySyncAtScale]=180
   [testHighAvailability]=165
   [testAlertingForServices]=160
   [testPermissions]=138
