@@ -1578,6 +1578,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							zbx_config_source_ip, &events_cbs, zbx_discovery_open_server,
 							zbx_discovery_close_server, zbx_discovery_find_host_server,
 							zbx_discovery_update_host_server,
+							zbx_discovery_update_hosts_server,
 							zbx_discovery_update_service_server,
 							zbx_discovery_update_service_down_server,
 							zbx_discovery_update_drule_server};

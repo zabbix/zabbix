@@ -163,7 +163,7 @@ void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const 
 	if (SUCCEED == ret)
 	{
 		if (SUCCEED != (ret = zbx_process_proxy_data(&proxy, jp, ts, PROXY_OPERATING_MODE_ACTIVE, events_cbs,
-				proxydata_frequency, zbx_discovery_update_host_server,
+				proxydata_frequency, zbx_discovery_update_hosts_server,
 				zbx_discovery_update_service_server, zbx_discovery_update_service_down_server,
 				zbx_discovery_find_host_server, zbx_discovery_update_drule_server,
 				zbx_autoreg_host_free_server, zbx_autoreg_flush_hosts_server,

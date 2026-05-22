@@ -1507,6 +1507,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								zbx_discovery_open_proxy, zbx_discovery_close_proxy,
 								zbx_discovery_find_host_proxy,
 								zbx_discovery_update_host_proxy,
+								zbx_discovery_update_hosts_proxy,
 								zbx_discovery_update_service_proxy,
 								zbx_discovery_update_service_down_proxy,
 								zbx_discovery_update_drule_proxy};

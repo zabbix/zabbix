@@ -287,7 +287,7 @@ void	dcheck_port_ranges_get(const char *ports, zbx_vector_portrange_t *ranges)
 	}
 }
 
-static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
+static int	process_services(void *handle, zbx_uint64_t druleid, const char *ip,
 		const char *dns, time_t now, zbx_uint64_t unique_dcheckid,
 		const zbx_vector_discoverer_services_ptr_t *services, zbx_add_event_func_t add_event_cb,
 		zbx_discovery_update_service_func_t discovery_update_service_cb,
@@ -297,6 +297,7 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 	int				host_status = -1, unique_index;
 	zbx_vector_uint64_t		dserviceids;
 	zbx_discoverer_dservice_t	unique_service;
+	zbx_db_dhost			dhost = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -309,7 +310,7 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 		zbx_discoverer_dservice_t	*service = services->values[unique_index];
 
 		host_status = service->status;
-		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost, ip, dns,
+		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, &dhost, ip, dns,
 				service->port, service->status, service->value, now, &dserviceids, add_event_cb);
 	}
 
@@ -323,18 +324,18 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 		if (-1 == host_status || (host_status != service->status && DOBJECT_STATUS_UP == service->status))
 			host_status = service->status;
 
-		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost, ip, dns,
+		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, &dhost, ip, dns,
 				service->port, service->status, service->value, now, &dserviceids, add_event_cb);
 	}
 
 	if (0 == services->values_num)
 	{
-		discovery_find_host_cb(druleid, ip, dhost);
+		discovery_find_host_cb(druleid, ip, &dhost);
 		host_status = DOBJECT_STATUS_DOWN;
 	}
 
-	if (0 != dhost->dhostid)
-		discovery_update_service_down_cb(dhost->dhostid, ip, now, &dserviceids, add_event_cb);
+	if (0 != dhost.dhostid)
+		discovery_update_service_down_cb(dhost.dhostid, ip, now, &dserviceids, add_event_cb);
 
 	zbx_vector_uint64_destroy(&dserviceids);
 
@@ -564,6 +565,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, const zbx_vector_u
 		zbx_vector_discoverer_drule_error_t *drule_errors, const zbx_events_funcs_t *events_cbs,
 		zbx_discovery_open_func_t discovery_open_cb, zbx_discovery_close_func_t discovery_close_cb,
 		zbx_discovery_update_host_func_t discovery_update_host_cb,
+		zbx_discovery_update_hosts_func_t discovery_update_hosts_cb,
 		zbx_discovery_update_service_func_t discovery_update_service_cb,
 		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
 		zbx_discovery_find_host_func_t discovery_find_host_cb)
@@ -646,7 +648,6 @@ static int	process_results(zbx_discoverer_manager_t *manager, const zbx_vector_u
 
 		for (int i = 0; i < results.values_num; i++)
 		{
-			zbx_db_dhost	dhost;
 			int		host_status;
 
 			result = results.values[i];
@@ -659,17 +660,18 @@ static int	process_results(zbx_discoverer_manager_t *manager, const zbx_vector_u
 				continue;
 			}
 
-			memset(&dhost, 0, sizeof(zbx_db_dhost));
-
 			zbx_db_begin();
 
-			host_status = process_services(handle, result->druleid, &dhost, result->ip, result->dnsname,
+			host_status = process_services(handle, result->druleid, result->ip, result->dnsname,
 					result->now, result->unique_dcheckid, &result->services,
 					events_cbs->add_event_cb, discovery_update_service_cb,
 					discovery_update_service_down_cb, discovery_find_host_cb);
 
-			discovery_update_host_cb(handle, result->druleid, &dhost, result->ip, result->dnsname,
-					host_status, result->now, events_cbs->add_event_cb);
+			discovery_update_host_cb(handle, result->druleid, result->ip, result->dnsname, host_status,
+					result->now);
+
+			if (ZBX_DISCOVERER_RESULT_CHECK_LAST == (result->status & ZBX_DISCOVERER_RESULT_CHECK_LAST))
+				discovery_update_hosts_cb(result-> druleid, result->now, events_cbs->add_event_cb);
 
 			if (NULL != events_cbs->process_events_cb)
 				events_cbs->process_events_cb(NULL, NULL, NULL);
@@ -1830,6 +1832,7 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 				&unsaved_checks, &drule_errors, discoverer_args_in->events_cbs,
 				discoverer_args_in->discovery_open_cb, discoverer_args_in->discovery_close_cb,
 				discoverer_args_in->discovery_update_host_cb,
+				discoverer_args_in->discovery_update_hosts_cb,
 				discoverer_args_in->discovery_update_service_cb,
 				discoverer_args_in->discovery_update_service_down_cb,
 				discoverer_args_in->discovery_find_host_cb);

@@ -34,6 +34,7 @@ typedef struct
 	zbx_discovery_close_func_t			discovery_close_cb;
 	zbx_discovery_find_host_func_t			discovery_find_host_cb;
 	zbx_discovery_update_host_func_t		discovery_update_host_cb;
+	zbx_discovery_update_hosts_func_t 		discovery_update_hosts_cb;
 	zbx_discovery_update_service_func_t		discovery_update_service_cb;
 	zbx_discovery_update_service_down_func_t	discovery_update_service_down_cb;
 	zbx_discovery_update_drule_func_t		discovery_update_drule_cb;

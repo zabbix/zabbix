@@ -679,31 +679,61 @@ void	zbx_discovery_find_host_server(const zbx_uint64_t druleid, const char *ip, 
  * Purpose: process new host status                                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_update_host_server(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
-		const char *dns, int status, time_t now, zbx_add_event_func_t add_event_cb)
+void	zbx_discovery_update_host_server(void *handle, zbx_uint64_t druleid, const char *ip, const char *dns,
+		int status, time_t now)
 {
-	zbx_vector_discoverer_interface_ptr_t	interfaces;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
 	ZBX_UNUSED(handle);
 	ZBX_UNUSED(druleid);
+	ZBX_UNUSED(ip);
 	ZBX_UNUSED(dns);
+	ZBX_UNUSED(status);
+	ZBX_UNUSED(now);
+}
 
-	if (0 != dhost->dhostid)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update status of discovered hosts                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_discovery_update_hosts_server(zbx_uint64_t druleid, time_t now, zbx_add_event_func_t add_event_cb)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() druleid: " ZBX_FS_UI64, __func__, druleid);
+
+	result = zbx_db_select(
+			"select dh1.dhostid, dh1.status, dhd.new_status, dhd.max_lastdown"
+			" from dhosts dh1"
+			" left join ("
+				"select dh2.dhostid, %d as new_status, ("
+					"select max(ds1.lastdown) from dservices ds1"
+					" where dh2.dhostid=ds1.dhostid"
+				") as max_lastdown"
+				" from dhosts dh2"
+				" where dh2.druleid=" ZBX_FS_UI64
+					" and dh2.status=%d"
+					" and not exists ("
+						"select null from dservices ds2"
+						" where dh2.dhostid=ds2.dhostid and ds2.status=%d"
+					")"
+			") as dhd on dh1.dhostid=dhd.dhostid"
+			" where dh1.druleid=" ZBX_FS_UI64,
+			DOBJECT_STATUS_DOWN, druleid, DOBJECT_STATUS_UP, DOBJECT_STATUS_UP, druleid);
+
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		zbx_vector_discoverer_interface_ptr_create(&interfaces);
-		discovery_get_host_interfaces(dhost->dhostid, &interfaces);
+		zbx_db_dhost	dhost;
 
-		/* There is a chance that interfaces.values_num can be 0 if SQL error stops SQL queries from     */
-		/* executing during current SQL transaction. One known scenario is when discovery results are    */
-		/* being processed before dcheck removal from drules in database gets synced to server DB cache. */
-		if (0 != interfaces.values_num && FAIL != (status = discovery_get_host_status(ip, &interfaces)))
-			discovery_update_host_status(dhost, status, (int)now, add_event_cb);
+		ZBX_STR2UINT64(dhost.dhostid, row[0]);
+		dhost.status = atoi(row[1]);
 
-		zbx_vector_discoverer_interface_ptr_clear_ext(&interfaces, discoverer_interface_free);
-		zbx_vector_discoverer_interface_ptr_destroy(&interfaces);
+		if (SUCCEED == zbx_db_is_null(row[2]) || SUCCEED == zbx_db_is_null(row[3]))
+			discovery_update_host_status(&dhost, dhost.status, (int)now, add_event_cb);
+		else
+			discovery_update_host_status(&dhost, atoi(row[2]), atoi(row[3]), add_event_cb);
 	}
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -796,8 +826,8 @@ void	zbx_discovery_update_service_down_server(const zbx_uint64_t dhostid, const 
 
 		discovery_update_service_status(NULL, &dservice, DOBJECT_STATUS_DOWN, NULL, now, add_event_cb);
 	}
-
 	zbx_db_free_result(result);
+
 	zbx_free(sql);
 	zbx_free(ip_esc);
 
