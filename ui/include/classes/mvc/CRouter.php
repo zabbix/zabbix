@@ -416,7 +416,7 @@ class CRouter {
 		'userrole.edit'								=> [CControllerUserroleEdit::class,									'layout.htmlpage',		'administration.userrole.edit'],
 		'userrole.list'								=> [CControllerUserroleList::class,									'layout.htmlpage',		'administration.userrole.list'],
 		'userrole.update'							=> [CControllerUserroleUpdate::class, 								'layout.json',			null],
-		'validate'									=> [CControllerValidate::class,										'layout.json',			null],
+		'validate.use'								=> [CControllerValidateUse::class,									'layout.json',			null],
 		'validate.api.exists'						=> [CControllerValidateApiExists::class, 							'layout.json',			null],
 		'web.view'									=> [CControllerWebView::class,										'layout.htmlpage',		'monitoring.web.view'],
 		'webscenario.step.check'					=> [CControllerWebScenarioStepCheck::class,							'layout.json',			null],
