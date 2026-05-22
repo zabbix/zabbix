@@ -278,7 +278,7 @@ class testHistoryPush extends CIntegrationTest {
 			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of trapper_process_history_push', true, 95, 3);
 			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 3);
 
-			$response = $this->call('history.get', [
+			$response = $this->callUntilDataIsPresent('history.get', [
 				'output' => ['itemid', 'value', 'clock', 'ns'],
 				'itemids' => [$tc['itemid']],
 				'sortorder' => 'DESC',
@@ -320,7 +320,7 @@ class testHistoryPush extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of trapper_process_history_push', true, 95, 3);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 3);
 
-		$response = $this->call('history.get', [
+		$response = $this->callUntilDataIsPresent('history.get', [
 			'output' => ['value', 'clock', 'ns'],
 			'itemids' => [self::$itemids['trapper_uint_host_key_test']],
 			'sortorder' => 'DESC',
@@ -385,21 +385,27 @@ class testHistoryPush extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 3);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 3);
 
-		$response = $this->call('history.get', [
+		$expected_text_count = count($values_sent_text);
+		$response = $this->callUntilDataIsPresent('history.get', [
 			'output' => ['itemid', 'value', 'clock', 'ns'],
 			'history' => ITEM_VALUE_TYPE_TEXT,
 			'itemids' => self::$itemids['trapper_text'],
 			'sortfield' => 'clock',
 			'sortorder' => 'ASC'
-		]);
+		], null, null, function ($response) use ($expected_text_count) {
+			return count($response['result']) === $expected_text_count;
+		});
 		$this->assertEquals($values_sent_text, $response['result']);
 
-		$response = $this->call('history.get', [
+		$expected_uint_count = count($values_sent_uint);
+		$response = $this->callUntilDataIsPresent('history.get', [
 			'output' => ['itemid', 'value', 'clock', 'ns'],
 			'itemids' => self::$itemids['trapper_uint2'],
 			'sortfield' => 'clock',
 			'sortorder' => 'ASC'
-		]);
+		], null, null, function ($response) use ($expected_uint_count) {
+			return count($response['result']) === $expected_uint_count;
+		});
 		$this->assertEquals($values_sent_uint, $response['result']);
 
 		return true;
@@ -627,7 +633,7 @@ class testHistoryPush extends CIntegrationTest {
 		$this->checkResult($response1);
 		$this->checkResult($response2);
 
-		$response = $this->call('history.get', [
+		$response = $this->callUntilDataIsPresent('history.get', [
 			'output' => ['itemid', 'value', 'clock', 'ns'],
 			'itemids' => self::$itemids['trapper_uint'],
 			'sortfield' => ['clock', 'ns'],
