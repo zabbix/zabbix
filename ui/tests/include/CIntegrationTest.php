@@ -28,6 +28,7 @@ class CIntegrationTest extends CAPITest {
 
 	// Default iteration count for wait operations.
 	const WAIT_ITERATIONS			= 60;
+	const WAIT_ITERATIONS_STARTUP		= 15;
 
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY			= 1;
@@ -415,7 +416,7 @@ class CIntegrationTest extends CAPITest {
 		self::validateComponent($component);
 
 		$saved_time = time();
-		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
+		for ($r = 0; $r < self::WAIT_ITERATIONS_STARTUP; $r++) {
 			$pid = @file_get_contents(self::getPidPath($component));
 			if ($skip_pid == true || ($pid && is_numeric($pid) && posix_kill($pid, 0))) {
 				switch ($component) {
@@ -1077,11 +1078,19 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @param string  $component     component name or null for active component
 	 * @param integer $delayOverride
+	 * @param integer $iterations    iteration count for wait
+	 * @param integer $delay         iteration delay for wait
 	 */
-	protected function reloadConfigurationCacheAndWaitForLogLine($component = null, $delayOverride = 0) {
+	protected function reloadConfigurationCacheAndWaitForLogLine($component = null, $delayOverride = 0,
+			$iterations = null, $delay = null) {
+		if ($component === null) {
+			$component = self::COMPONENT_SERVER;
+		}
+
 		$this->reloadConfigurationCache($component, $delayOverride);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
-			'finished forced reloading of the configuration cache');
+		$this->waitForLogLineToBePresent($component, 'finished forced reloading of the configuration cache', true,
+			$iterations, $delay
+		);
 	}
 
 	/**
