@@ -28,7 +28,7 @@ class CControllerValidateUse extends CController {
 				'fields' => [
 					'field' => ['string', 'required'],
 					'value' => ['string'],
-					'classname' => ['string', 'required', 'not_empty'],
+					'class' => ['string', 'required', 'not_empty'],
 					'options' => ['array'],
 					'error_msg' => ['string']
 				],
@@ -65,7 +65,7 @@ class CControllerValidateUse extends CController {
 			foreach ($this->getInput('validations') as $validation) {
 				$error = null;
 				$use_rule = [
-					$validation['classname'],
+					$validation['class'],
 					array_key_exists('options', $validation) ? $validation['options'] : []
 				];
 

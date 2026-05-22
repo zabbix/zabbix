@@ -636,7 +636,7 @@ class CFormValidator {
 			const use_validation = {
 				field: check.path,
 				value: check.value,
-				classname: check.rules.use[0],
+				class: check.rules.use[0],
 				options: check.rules.use[1]
 			};
 
