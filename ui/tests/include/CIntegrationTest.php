@@ -28,6 +28,7 @@ class CIntegrationTest extends CAPITest {
 
 	// Default iteration count for wait operations.
 	const WAIT_ITERATIONS			= 60;
+	const WAIT_ITERATIONS_STARTUP		= 15;
 
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY			= 1;
@@ -415,7 +416,7 @@ class CIntegrationTest extends CAPITest {
 		self::validateComponent($component);
 
 		$saved_time = time();
-		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
+		for ($r = 0; $r < self::WAIT_ITERATIONS_STARTUP; $r++) {
 			$pid = @file_get_contents(self::getPidPath($component));
 			if ($skip_pid == true || ($pid && is_numeric($pid) && posix_kill($pid, 0))) {
 				switch ($component) {

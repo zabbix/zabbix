@@ -126,8 +126,9 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			'hostid' => self::$hostid,
 			'name' => 'Multiple Items History LLD Rule',
 			'key_' => self::LLD_RULE_KEY,
-			'type' => ITEM_TYPE_TRAPPER,
-			'lifetime_type' => ZBX_LLD_DELETE_IMMEDIATELY
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'lifetime_type' => ZBX_LLD_DELETE_IMMEDIATELY,
+			'delay' => '1h'
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['itemids']);
@@ -163,15 +164,25 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		return true;
 	}
 
+	/**
+	 * Hook for routing item values. The base class sends to the server while
+	 * spoofing the active proxy name so the server processes the values as if
+	 * delivered by the proxy; subclasses targeting a real proxy daemon
+	 * override this to deliver values to the proxy instead.
+	 */
+	protected function dispatchValues(array $values): void {
+		$this->sendAgentDataValues($values, self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+	}
+
 	private function sendAgentPing(): void {
-		$this->sendAgentDataValues([
+		$this->dispatchValues([
 			[
 				'itemid' => self::$agent_ping_itemid,
 				'value' => '1',
 				'clock' => time(),
 				'ns' => (int)(microtime(true) * 1e9) % 1000000000
 			]
-		], self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+		]);
 	}
 	public static function clearData(): void {
 		if (CAPIHelper::getSessionId() === null) {
@@ -285,7 +296,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 
 		$result = null;
 
-		sleep(1);
+		sleep(3);
 		$result = $this->testItemOnServer((string) self::$hostid, [
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
 			'type' => ITEM_TYPE_CALCULATED,
@@ -327,7 +338,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	public function testLLDHistorySyncAtScale_HistoryPastSend() {
 		['sent' => $sent, 'values' => $all_values] = self::$prepared_past;
 		self::$vps_last = $this->getVpsWritten();
-		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+		$this->dispatchValues($all_values);
 
 		self::$sent_past = $sent;
 	}
@@ -358,7 +369,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	public function testLLDHistorySyncAtScale_HistoryNowSend() {
 		['sent' => $sent, 'values' => $all_values] = self::$prepared_now;
 		self::$vps_last = $this->getVpsWritten();
-		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+		$this->dispatchValues($all_values);
 
 		self::$sent_now = $sent;
 	}
@@ -1196,7 +1207,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	private function sendHistoryAt(int $tm, ?string $value = null, int $state = ITEM_STATE_NORMAL,
 			bool $omit_value = false): array {
 		['sent' => $sent, 'values' => $all_values] = $this->prepareHistoryAt($tm, $value, $state, $omit_value);
-		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+		$this->dispatchValues($all_values);
 
 		return $sent;
 	}
@@ -1210,7 +1221,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			$sent_per_tm[$tm] = $sent;
 			$combined = array_merge($combined, $values);
 		}
-		$this->sendAgentDataValues($combined, self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+		$this->dispatchValues($combined);
 
 		return $sent_per_tm;
 	}
@@ -1243,7 +1254,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		$values = array_merge($past_values, $burst_values, $now_values);
 
 		self::$vps_last = $this->getVpsWritten();
-		$this->sendAgentDataValues($values, self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+		$this->dispatchValues($values);
 	}
 
 	private function assertSingleLogBurstAndFullHistoryVpsWritten(): void {
@@ -1299,14 +1310,14 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			$data[] = [self::LLD_MACRO => self::SENSOR_BASE.$i];
 		}
 
-		$this->sendAgentDataValues([
+		$this->dispatchValues([
 			[
 				'itemid' => (int) self::$lld_ruleid,
 				'value' => json_encode(['data' => $data]),
 				'clock' => time(),
 				'ns' => 0
 			]
-		], self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+		]);
 	}
 
 
@@ -1396,14 +1407,14 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDHistorySyncAtScale_LLDDiscovery
 	 */
 	public function testLLDHistorySyncAtScale_LLDCleanup() {
-		$this->sendAgentDataValues([
+		$this->dispatchValues([
 			[
 				'itemid' => (int) self::$lld_ruleid,
 				'value' => json_encode(['data' => []]),
 				'clock' => time(),
 				'ns' => 0
 			]
-		], self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+		]);
 
 		$this->callUntilCountIsPresent('item.get', [
 			'hostids' => [self::$hostid],
