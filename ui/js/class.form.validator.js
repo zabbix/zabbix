@@ -502,8 +502,8 @@ class CFormValidator {
 		return {when_fields_data, api_uniq_rules, use_checks};
 	}
 
-	#post(url, data) {
-		return fetch(url, {
+	#post(action, data) {
+		return fetch(zabbixUrl({action}), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify(data),
@@ -511,14 +511,13 @@ class CFormValidator {
 			.then(response => response.json())
 			.then(response => {
 				if ('error' in response) {
-					throw {error: response.error};
+					console.error(`${action} error`, response.error);
+					throw new Error();
 				}
 
 				return response;
 			})
-			.catch(exception => {
-				console.error(exception);
-
+			.catch(() => {
 				return {result: false};
 			});
 	}
@@ -531,7 +530,7 @@ class CFormValidator {
 	 * @returns {Promise}
 	 */
 	#validateApiExists(validations) {
-		return this.#post(zabbixUrl({action: 'validate.api.exists'}), {validations});
+		return this.#post('validate.api.exists', {validations});
 	}
 
 	/**
@@ -599,7 +598,7 @@ class CFormValidator {
 			const validations = use_validations.slice(offset, offset + chunk_size);
 
 			requests.push(new Promise((resolve) => {
-				return this.#post(zabbixUrl({action: 'validate.use'}), {validations})
+				return this.#post('validate.use', {validations})
 					.then(response => {
 						result.result = result.result && response.result;
 
