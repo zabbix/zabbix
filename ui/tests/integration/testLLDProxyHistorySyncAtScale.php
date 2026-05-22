@@ -102,7 +102,7 @@ class testLLDProxyHistorySyncAtScale extends testLLDHistorySyncAtScale {
 	public function testLLDHistorySyncAtScale_PreTriggerZeroVpsWritten() {
 		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
 	}
-	
+
 	public function testLLDHistorySyncAtScale_TriggerDiscovery() {
 		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
 	}
