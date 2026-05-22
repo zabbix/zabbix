@@ -689,11 +689,14 @@
 	</target>
 
 	<target name="create-db-clickhouse" depends="drop-db-clickhouse" if="clickhouse">
+		<exec executable="date" outputproperty="now">
+			<arg value="+%s"/>
+		</exec>
 		<exec executable="curl" failonerror="on">
 			<arg line="--silent"/>
 			<arg line="${clickhouse_url}"/>
 			<arg line="--user ${clickhouse_user}:${clickhouse_password}"/>
-			<arg line="--data 'CREATE DATABASE ${clickhouse_dbname}'"/>
+			<arg line="--data 'CREATE DATABASE ${clickhouse_dbname}' COMMENT '${now}'"/>
 		</exec>
 		<exec executable="sh" outputproperty="clickhouse_url_full">
 			<arg value="-c"/>
