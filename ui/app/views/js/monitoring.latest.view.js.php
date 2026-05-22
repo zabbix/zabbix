@@ -37,7 +37,7 @@
 
 		checkbox_object: null,
 
-		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object, filter_set, layout_mode}) {
+		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object, layout_mode}) {
 			this.refresh_url = new Curl(refresh_url);
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
