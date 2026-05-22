@@ -31,8 +31,7 @@
 #include "zbxdb.h"
 #include "zbxstr.h"
 #include "zbxjson.h"
-
-#define ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION	1
+#include "zbx_bridge_adapter_constants.h"
 
 static int	trapper_build_push_test_params(const char *sendto, const char *subject, const char *message,
 		char **params, char **error)
@@ -53,7 +52,7 @@ static int	trapper_build_push_test_params(const char *sendto, const char *subjec
 			" where d.uuid='%s'"
 				" and d.status=1"
 			" order by dk.device_keyid desc",
-			ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, sendto_esc);
+			ZBX_BRIDGE_ADAPTER_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, sendto_esc);
 
 	if (NULL == (row = zbx_db_fetch(result)))
 	{

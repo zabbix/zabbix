@@ -22,8 +22,8 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxalgo.h"
+#include "zbx_bridge_adapter_constants.h"
 
-#define ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION	1
 #define ZBX_DEVICE_NEW				0
 
 typedef struct
@@ -174,7 +174,7 @@ static int	push_get_target_by_uuid(const char *uuid, zbx_push_target_t *target)
 			" where d.uuid='%s'"
 				" and d.status=1"
 				" and d.push_token is not null",
-			ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, uuid_esc);
+			ZBX_BRIDGE_ADAPTER_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, uuid_esc);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -207,7 +207,7 @@ static void	push_add_all_user_targets(zbx_uint64_t userid, zbx_vector_push_targe
 			")"
 			" where d.userid=" ZBX_FS_UI64
 				" and d.status=1",
-			ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, userid);
+			ZBX_BRIDGE_ADAPTER_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, userid);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 		push_target_append(targets, row[0], row[1], row[2]);

@@ -402,9 +402,9 @@ static char	*config_sms_devices			= NULL;
 static char	*config_frontend_allowed_ip		= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
-/* adapter config */
-static char	*config_adapter_url = NULL;
-static char	*config_adapter_connect_to = NULL;
+/* bridge adapter config */
+static char	*config_bridge_adapter_url = NULL;
+static char	*config_bridge_adapter_connect_to = NULL;
 
 struct zbx_db_version_info_t	db_version_info;
 
@@ -895,8 +895,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 				" setting \"StartReportWriters\" configuration parameter");
 	}
 
-	if (NULL != config_adapter_connect_to &&
-			(NULL == config_adapter_url || '\0' == *config_adapter_url))
+	if (NULL != config_bridge_adapter_connect_to &&
+			(NULL == config_bridge_adapter_url || '\0' == *config_bridge_adapter_url))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"BridgeAdapterURL\" configuration parameter must be specified"
 				" when \"BridgeAdapterConnectTo\" is set.");
@@ -1207,9 +1207,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"FrontendAllowedIP",		&config_frontend_allowed_ip,		ZBX_CFG_TYPE_STRING_LIST,
 			ZBX_CONF_PARM_OPT,	0,			0},
-		{"BridgeAdapterURL",			&config_adapter_url,		ZBX_CFG_TYPE_STRING,
+		{"BridgeAdapterURL",		&config_bridge_adapter_url,		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"BridgeAdapterConnectTo",		&config_adapter_connect_to,		ZBX_CFG_TYPE_STRING,
+		{"BridgeAdapterConnectTo",	&config_bridge_adapter_connect_to,	ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
@@ -1651,8 +1651,8 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.trapper_process_request_func_cb = zbx_trapper_process_request_server,
 			.autoreg_update_host_cb = zbx_autoreg_update_host_server,
 			.config_frontend_allowed_ip = config_frontend_allowed_ip,
-			.config_adapter_url = config_adapter_url,
-			.config_adapter_connect_to = config_adapter_connect_to
+			.config_bridge_adapter_url = config_bridge_adapter_url,
+			.config_bridge_adapter_connect_to = config_bridge_adapter_connect_to
 		};
 
 	zbx_thread_escalator_args	escalator_args =
@@ -1756,11 +1756,11 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.config_source_ip = zbx_config_source_ip,
 			.config_ssl_ca_location = config_ssl_ca_location,
 			.config_sms_devices = config_sms_devices,
-			.config_adapter_url = config_adapter_url,
-			.config_adapter_ca_file = zbx_config_tls->ca_file,
-			.config_adapter_cert_file = zbx_config_tls->cert_file,
-			.config_adapter_key_file = zbx_config_tls->key_file,
-			.config_adapter_connect_to = config_adapter_connect_to
+			.config_bridge_adapter_url = config_bridge_adapter_url,
+			.config_bridge_adapter_ca_file = zbx_config_tls->ca_file,
+			.config_bridge_adapter_cert_file = zbx_config_tls->cert_file,
+			.config_bridge_adapter_key_file = zbx_config_tls->key_file,
+			.config_bridge_adapter_connect_to = config_bridge_adapter_connect_to
 		};
 
 	zbx_thread_pinger_args		pinger_args =

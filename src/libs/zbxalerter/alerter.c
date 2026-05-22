@@ -511,20 +511,20 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 
 static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		zbx_ipc_message_t *ipc_message,
-		const char *config_adapter_url,
-		const char *config_adapter_ca_file,
-		const char *config_adapter_cert_file,
-		const char *config_adapter_key_file,
-		const char *config_adapter_connect_to)
+		const char *config_bridge_adapter_url,
+		const char *config_bridge_adapter_ca_file,
+		const char *config_bridge_adapter_cert_file,
+		const char *config_bridge_adapter_key_file,
+		const char *config_bridge_adapter_connect_to)
 {
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(socket);
 	ZBX_UNUSED(ipc_message);
-	ZBX_UNUSED(config_adapter_url);
-	ZBX_UNUSED(config_adapter_ca_file);
-	ZBX_UNUSED(config_adapter_cert_file);
-	ZBX_UNUSED(config_adapter_key_file);
-	ZBX_UNUSED(config_adapter_connect_to);
+	ZBX_UNUSED(config_bridge_adapter_url);
+	ZBX_UNUSED(config_bridge_adapter_ca_file);
+	ZBX_UNUSED(config_bridge_adapter_cert_file);
+	ZBX_UNUSED(config_bridge_adapter_key_file);
+	ZBX_UNUSED(config_bridge_adapter_connect_to);
 
 	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
 #else
@@ -563,10 +563,8 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	}
 
 	headers = curl_slist_append(headers, "Content-Type:application/json");
-	/* Will be removed, currently necessary for adapter-mock */
-	headers = curl_slist_append(headers, "X-Trace-Id: test-trace-1");
 
-	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, config_adapter_url)) ||
+	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, config_bridge_adapter_url)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, payload)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDSIZE, strlen(payload))) ||
@@ -578,7 +576,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		goto out;
 	}
 
-	if (NULL != config_adapter_ca_file && NULL != config_adapter_cert_file && NULL != config_adapter_key_file)
+	if (NULL != config_bridge_adapter_ca_file && NULL != config_bridge_adapter_cert_file && NULL != config_bridge_adapter_key_file)
 	{
 		if (SUCCEED != zbx_curl_setopt_https(curl, &error_curl))
 		{
@@ -596,11 +594,11 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 			goto out;
 		}
 
-		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_adapter_ca_file)) ||
+		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_bridge_adapter_ca_file)) ||
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT,
-				config_adapter_cert_file)) ||
+				config_bridge_adapter_cert_file)) ||
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY,
-				config_adapter_key_file)) ||
+				config_bridge_adapter_key_file)) ||
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYHOST, 2L)))
 		{
@@ -611,9 +609,9 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		}
 	}
 
-	if (NULL != config_adapter_connect_to)
+	if (NULL != config_bridge_adapter_connect_to)
 	{
-		connect_to = curl_slist_append(connect_to, config_adapter_connect_to);
+		connect_to = curl_slist_append(connect_to, config_bridge_adapter_connect_to);
 
 		if (NULL == connect_to)
 		{
@@ -634,7 +632,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to bridge-adapter: %s", curl_easy_strerror(err));
-		error = zbx_strdup(NULL, "Failed connect to bridge-adapter");
+		error = zbx_strdup(NULL, "Failed to connect to bridge-adapter");
 		goto out;
 	}
 
@@ -672,7 +670,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		{
 			char	info[ZBX_BRIDGE_INFO_LEN];
 
-			zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned %s: message: %s data %s", code,
+			zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned %s: message: %s data: %s", code,
 					message, error_data);
 			zbx_snprintf(info, sizeof(info), "Bridge-adapter returned code: %s, message: %s data: %s",
 					code, message, error_data);
@@ -800,11 +798,11 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 				break;
 			case ZBX_IPC_ALERTER_PUSH:
 				alerter_process_push(&alerter_socket, &message,
-						alerter_args_in->config_adapter_url,
-						alerter_args_in->config_adapter_ca_file,
-						alerter_args_in->config_adapter_cert_file,
-						alerter_args_in->config_adapter_key_file,
-						alerter_args_in->config_adapter_connect_to);
+						alerter_args_in->config_bridge_adapter_url,
+						alerter_args_in->config_bridge_adapter_ca_file,
+						alerter_args_in->config_bridge_adapter_cert_file,
+						alerter_args_in->config_bridge_adapter_key_file,
+						alerter_args_in->config_bridge_adapter_connect_to);
 				break;
 			case ZBX_RTC_SHUTDOWN:
 				zbx_set_exiting_with_succeed();

@@ -20,9 +20,9 @@
 
 void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, const char *config_frontend_allowed_ip,
-		const char *config_adapter_url, const char *config_adapter_connect_to);
+		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to);
 void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, const char *config_frontend_allowed_ip,
-		const char *config_adapter_url, const char *config_adapter_connect_to);
+		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to);
 
 #endif
