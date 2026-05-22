@@ -75,12 +75,11 @@ class testLLDProxyHistorySyncAtScale extends testLLDHistorySyncAtScale {
 	 */
 	protected function reloadConfigurationCacheAndWaitForLogLine($component = null, $delayOverride = 0) {
 		parent::reloadConfigurationCacheAndWaitForLogLine($component, $delayOverride);
-		
+
 		$this->reloadConfigurationCache(self::COMPONENT_PROXY, $delayOverride);
 		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'finished forced reloading of the configuration cache');
 	}
 
-	
 	public function testLLDHistorySyncAtScale_ValueOmittedDrainsDelay() {
 		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
 	}
