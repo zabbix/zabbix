@@ -31,12 +31,10 @@ class CControllerMediatypeTestSend extends CController {
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
 			'mediatypeid' => ['db media_type.mediatypeid', 'required'],
-			'type' => ['db media_type.type', 'required',
-				'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK]
-			],
+			'type' => ['db media_type.type', 'required', 'in' => CMediatypeHelper::getSupportedMediaTypes()],
 			'sendto' => [
 				['string','required', 'not_empty',
-					'when' => ['type', 'in' => [MEDIA_TYPE_SMS, MEDIA_TYPE_EMAIL]]
+					'when' => ['type', 'in' => [MEDIA_TYPE_SMS]]
 				],
 				['string','required', 'not_empty', 'use' => [CEmailValidator::class, []],
 					'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL]]
