@@ -19,7 +19,7 @@
  * @var array    $data
  */
 
-global $DB, $ZBX_SERVER_NAME, $ALLOW_BANNERS;
+global $DB, $ZBX_SERVER_NAME, $ZBX_FEATURE_FLAGS;
 
 $scripts = $data['javascript']['files'];
 $page_title = $data['page']['title'];
@@ -45,7 +45,7 @@ if (!empty($DB['DB'])) {
 		$scripts[] = 'class.software-version-check.js';
 	}
 
-	if ($ALLOW_BANNERS && $data['web_layout_mode'] != ZBX_LAYOUT_KIOSKMODE) {
+	if ($ZBX_FEATURE_FLAGS['banners_enabled'] && $data['web_layout_mode'] != ZBX_LAYOUT_KIOSKMODE) {
 		$scripts[] = 'class.banner.js';
 	}
 }

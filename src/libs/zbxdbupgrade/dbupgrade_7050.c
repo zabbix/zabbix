@@ -810,6 +810,16 @@ static int	DBpatch_7050054(void)
 
 static int	DBpatch_7050055(void)
 {
+	if (ZBX_DB_OK > zbx_db_execute("update settings set value_str='' where name='session_key'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050056(void)
+{
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
@@ -885,5 +895,6 @@ DBPATCH_ADD(7050052, 0, 1)
 DBPATCH_ADD(7050053, 0, 1)
 DBPATCH_ADD(7050054, 0, 1)
 DBPATCH_ADD(7050055, 0, 1)
+DBPATCH_ADD(7050056, 0, 1)
 
 DBPATCH_END()

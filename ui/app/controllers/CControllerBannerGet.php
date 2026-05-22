@@ -29,10 +29,10 @@ class CControllerBannerGet extends CController {
 	}
 
 	protected function doAction(): void {
-		global $ALLOW_BANNERS;
+		global $ZBX_FEATURE_FLAGS;
 
 		$output = [
-			'allow_banners' => $ALLOW_BANNERS,
+			'allow_banners' => $ZBX_FEATURE_FLAGS['banners_enabled'],
 			'dismissed_banner_ids' => json_decode(CProfile::get('web.banner.dismissed_ids', '[]'), true),
 			'language' => CWebUser::$data['lang'],
 			'storage_idx' => 'web.banner.dismissed_ids'

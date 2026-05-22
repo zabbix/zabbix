@@ -35,25 +35,35 @@
 	/**
 	 * Toggles filter state and updates title and icons accordingly.
 	 *
-	 * @param {string} 	idx					User profile index
-	 * @param {string} 	value				Value
-	 * @param {Array} 	idx2				An array of IDs
-	 * @param {int} 	profile_type		Profile type
+	 * @param {string} 					idx					User profile index
+	 * @param {string} 					value				Value
+	 * @param {Array} 					idx2				An array of IDs
+	 * @param {int} 					profile_type		Profile type
+	 * @param {AbortController|null} 	abort_controller
+	 *
+	 * @return {Promise<any>}
 	 */
-	function updateUserProfile(idx, value, idx2, profile_type = PROFILE_TYPE_INT) {
+	function updateUserProfile(idx, value, idx2, profile_type = PROFILE_TYPE_INT, abort_controller = null) {
 		const value_fields = {
 			[PROFILE_TYPE_INT]: 'value_int',
 			[PROFILE_TYPE_STR]: 'value_str'
 		};
 
-		return sendAjaxData('zabbix.php?action=profile.update', {
-			data: {
-				idx: idx,
-				[value_fields[profile_type]]: value,
-				idx2: idx2,
-				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('profile')) ?>
-			}
-		});
+		const url = new URL('zabbix.php', location.href);
+		url.searchParams.set('action', 'profile.update');
+		url.searchParams.set('output', 'ajax');
+
+		const body = new FormData();
+		body.set('idx', idx);
+		body.set(value_fields[profile_type], value);
+
+		for (const idx2_value of (idx2 ?? [])) {
+			body.append('idx2[]', String(idx2_value));
+		}
+
+		body.set(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('profile')) ?>);
+
+		return fetch(url.toString(), {method: 'POST', body, signal: abort_controller?.signal});
 	}
 
 	/**

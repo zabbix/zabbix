@@ -188,12 +188,40 @@ class CConfigFile {
 			$this->config['SSO'] = $SSO;
 		}
 
+		if (isset($ALLOW_HTTP_AUTH) && isset($ZBX_FEATURE_FLAGS['http_auth_enabled'])) {
+			self::exception(_s('Cannot use both %1$s and %2$s at the same time.', '$ALLOW_HTTP_AUTH',
+				'$ZBX_FEATURE_FLAGS[\'http_auth_enabled\']'));
+		}
+
 		if (isset($ALLOW_HTTP_AUTH)) {
+			$ZBX_FEATURE_FLAGS['http_auth_enabled'] = $ALLOW_HTTP_AUTH;
 			$this->config['ALLOW_HTTP_AUTH'] = $ALLOW_HTTP_AUTH;
 		}
 
-		if (isset($ALLOW_BANNERS)) {
-			$this->config['ALLOW_BANNERS'] = $ALLOW_BANNERS;
+		if (isset($ZBX_FEATURE_FLAGS['banners_enabled'])) {
+			$this->config['ZBX_FEATURE_FLAGS']['banners_enabled'] = $ZBX_FEATURE_FLAGS['banners_enabled'];
+		}
+
+		if (isset($ZBX_FEATURE_FLAGS['http_auth_enabled'])) {
+			$this->config['ZBX_FEATURE_FLAGS']['http_auth_enabled'] = $ZBX_FEATURE_FLAGS['http_auth_enabled'];
+		}
+
+		if (isset($ZBX_FEATURE_FLAGS['modules_config_enabled'])) {
+			$this->config['ZBX_FEATURE_FLAGS']['modules_config_enabled'] = $ZBX_FEATURE_FLAGS['modules_config_enabled'];
+		}
+
+		if (isset($ZBX_FEATURE_FLAGS['media_type_denylist'])) {
+			if (!is_array($ZBX_FEATURE_FLAGS['media_type_denylist'])) {
+				self::exception(_s('Incorrect configuration %1$s: %2$s.',
+					'$ZBX_FEATURE_FLAGS[\'media_type_denylist\']',
+					_('an array is expected')
+				));
+			}
+			else {
+				$this->config['ZBX_FEATURE_FLAGS']['media_type_denylist'] = $this->getMediaTypeDenylist(
+					$ZBX_FEATURE_FLAGS['media_type_denylist']
+				);
+			}
 		}
 
 		if (isset($ZBX_SERVER_TLS) && is_array($ZBX_SERVER_TLS)) {
@@ -229,7 +257,7 @@ class CConfigFile {
 
 	public function makeGlobal() {
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO,
-			$ALLOW_HTTP_AUTH, $ALLOW_BANNERS, $ZBX_SERVER_TLS;
+			$ZBX_SERVER_TLS, $ZBX_FEATURE_FLAGS;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -238,8 +266,7 @@ class CConfigFile {
 		$IMAGE_FORMAT_DEFAULT = $this->config['IMAGE_FORMAT_DEFAULT'];
 		$HISTORY = $this->config['HISTORY'];
 		$SSO = $this->config['SSO'];
-		$ALLOW_HTTP_AUTH = $this->config['ALLOW_HTTP_AUTH'];
-		$ALLOW_BANNERS = $this->config['ALLOW_BANNERS'];
+		$ZBX_FEATURE_FLAGS = $this->config['ZBX_FEATURE_FLAGS'];
 		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
 	}
 
@@ -343,11 +370,18 @@ $SSO[\'CERT_STORAGE\']		= \'database\';
 //$SSO[\'SP_CERT\']		= \'conf/certs/sp.crt\';
 //$SSO[\'IDP_CERT\']		= \'conf/certs/idp.crt\';
 
-// If set to false, support for HTTP authentication will be disabled.
-// $ALLOW_HTTP_AUTH = true;
+// Uncomment and set to false to disable support for banners.
+//$ZBX_FEATURE_FLAGS[\'banners_enabled\'] = true;
 
-// If set to false, support for banners will be disabled.
-// $ALLOW_BANNERS = true;
+// Uncomment and set to false to disable user HTTP authentication.
+//$ZBX_FEATURE_FLAGS[\'http_auth_enabled\'] = true;
+
+// Uncomment and set to false to disable access to modules.
+//$ZBX_FEATURE_FLAGS[\'modules_config_enabled\'] = true;
+
+// Uncomment and set to desired values to disable editing of specific media types.
+// Possible values: \'email\', \'script\', \'sms\', \'webhook\'. One or more values can be set.
+//$ZBX_FEATURE_FLAGS[\'media_type_denylist\'] = [];
 
 $ZBX_SERVER_TLS[\'ACTIVE\'] = '.($this->config['ZBX_SERVER_TLS']['ACTIVE'] ? 'true' : 'false').';
 $ZBX_SERVER_TLS[\'CA_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CA_FILE'], "'\\").'\';
@@ -356,6 +390,31 @@ $ZBX_SERVER_TLS[\'CERT_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']
 $ZBX_SERVER_TLS[\'CERTIFICATE_ISSUER\']  = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_ISSUER'], "'\\").'\';
 $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_SUBJECT'], "'\\").'\';
 ';
+	}
+
+	/**
+	 * Validate and return $ZBX_FEATURE_FLAGS['media_type_denylist'] configuration.
+	 *
+	 * @param array $media_type_denylist  Array from configuration file.
+	 *
+	 * @throws Exception
+	 */
+	protected function getMediaTypeDenylist(array $media_type_denylist): array {
+		$type_flag = [
+			MEDIA_TYPE_EMAIL => 'email',
+			MEDIA_TYPE_EXEC => 'script',
+			MEDIA_TYPE_SMS => 'sms',
+			MEDIA_TYPE_WEBHOOK => 'webhook'
+		];
+
+		if (array_diff($media_type_denylist, $type_flag)) {
+			self::exception(_s('Incorrect configuration %1$s: %2$s.',
+				'$ZBX_FEATURE_FLAGS[\'media_type_denylist\']',
+				_s('value must be one of %1$s', implode(',', $type_flag))
+			));
+		}
+
+		return array_keys(array_intersect($type_flag, $media_type_denylist));
 	}
 
 	protected function setDefaults() {
@@ -388,8 +447,12 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 		$this->config['IMAGE_FORMAT_DEFAULT'] = IMAGE_FORMAT_PNG;
 		$this->config['HISTORY'] = null;
 		$this->config['SSO'] = null;
-		$this->config['ALLOW_HTTP_AUTH'] = true;
-		$this->config['ALLOW_BANNERS'] = true;
+		$this->config['ZBX_FEATURE_FLAGS'] = [
+			'banners_enabled' => true,
+			'http_auth_enabled' => true,
+			'modules_config_enabled' => true,
+			'media_type_denylist' => []
+		];
 		$this->config['ZBX_SERVER_TLS'] = [
 			'ACTIVE' => false,
 			'CA_FILE' => '',
