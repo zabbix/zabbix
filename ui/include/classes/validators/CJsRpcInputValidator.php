@@ -133,9 +133,9 @@ class CJsRpcInputValidator {
 				'sort' => ['type' => API_STRING_UTF8],
 				'sortorder' => ['type' => API_STRING_UTF8],
 				'filter_druleids' => ['type' => API_IDS, 'flags' => API_NORMALIZE],
-				'groupids' => ['type' => API_IDS, 'flags' => API_NORMALIZE],
-				'hostids' => ['type' => API_IDS, 'flags' => API_NORMALIZE],
-				'evaltype' => ['type' => API_INT32],
+				'groupids' => ['type' => API_ANY],
+				'hostids' => ['type' => API_ANY],
+				'evaltype' => ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
 				'tags' => ['type' => API_OBJECTS, 'fields' => [
 					'tag' => ['type' => API_STRING_UTF8],
 					'value' => ['type' => API_STRING_UTF8],
@@ -246,7 +246,7 @@ class CJsRpcInputValidator {
 					'with_monitored_items' => ['type' => API_INT32],
 					'with_monitored_triggers' => ['type' => API_INT32],
 
-					// TOptions are either not relevant to host API or simply are not passed.
+					// Options are either not relevant to host API or simply are not passed.
 					'monitored' => ['type' => API_INT32],
 					'real_hosts' => ['type' => API_INT32],
 					'with_graphs' => ['type' => API_INT32],
@@ -271,7 +271,7 @@ class CJsRpcInputValidator {
 
 			case 'items':
 				$rules = ['type' => API_OBJECT, 'fields' => $head_rules['fields'] + [
-					'hostid' => ['type' => API_IDS, 'flags' => API_NORMALIZE],
+					'hostid' => ['type' => API_ID],
 					'webitems' => ['type' => API_INT32],
 					'real_hosts' => ['type' => API_INT32],
 					'filter' => ['type' => API_OBJECT, 'fields' => [
@@ -281,14 +281,14 @@ class CJsRpcInputValidator {
 						'flags' => ['type' => API_INT32, 'in' => ZBX_FLAG_DISCOVERY_NORMAL]
 					]],
 
-					// Option not relevant to item API and is passed.
+					// Option not relevant to item API and is not passed either.
 					'with_simple_graph_items' => ['type' => API_INT32]
 				]];
 				break;
 
 			case 'item_prototypes':
 				$rules = ['type' => API_OBJECT, 'fields' => $head_rules['fields'] + [
-					'hostid' => ['type' => API_IDS, 'flags' => API_NORMALIZE],
+					'hostid' => ['type' => API_ID],
 					'real_hosts' => ['type' => API_INT32],
 					'filter' => ['type' => API_OBJECT, 'fields' => [
 						'value_type' => ['type' => API_INTS32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT,
@@ -296,7 +296,7 @@ class CJsRpcInputValidator {
 						])]
 					]],
 
-					// Option not relevant to item API and is passed.
+					// Option not relevant to item prototype API and is not passed either.
 					'with_simple_graph_item_prototypes' => ['type' => API_INT32]
 				]];
 				break;
@@ -306,7 +306,7 @@ class CJsRpcInputValidator {
 					'hostid' => ['type' => API_IDS, 'flags' => API_NORMALIZE],
 					'real_hosts' => ['type' => API_INT32],
 
-					// Option not relevant to graph API and is passed.
+					// Option not relevant to graph API and is not passed either.
 					'with_graphs' => ['type' => API_INT32]
 				]];
 				break;
@@ -316,7 +316,7 @@ class CJsRpcInputValidator {
 					'hostid' => ['type' => API_IDS, 'flags' => API_NORMALIZE],
 					'real_hosts' => ['type' => API_INT32],
 
-					// Option not relevant to graph prototype API and is passed.
+					// Option not relevant to graph prototype API and is not passed either.
 					'with_graph_prototypes' => ['type' => API_INT32]
 				]];
 				break;
@@ -335,7 +335,7 @@ class CJsRpcInputValidator {
 
 			case 'usersGroups':
 				$rules = ['type' => API_OBJECT, 'fields' => $head_rules['fields'] + [
-					// Option not is passed to API.
+					// Option is not passed to API.
 					'editable' => ['type' => API_INT32]
 				]];
 				break;
@@ -362,7 +362,7 @@ class CJsRpcInputValidator {
 					])],
 					'with_inherited' => ['type' => API_INT32],
 
-					// Option not is passed to API.
+					// Option is not passed to API.
 					'editable' => ['type' => API_INT32]
 				]];
 				break;
@@ -374,7 +374,7 @@ class CJsRpcInputValidator {
 						'template'
 					])],
 
-					// Option not is passed to API.
+					// Option is not passed to API.
 					'editable' => ['type' => API_INT32]
 				]];
 				break;
@@ -397,7 +397,7 @@ class CJsRpcInputValidator {
 				return false;
 		}
 
-		return CApiInputValidator::validate($rules, $data, '/', $error);;
+		return CApiInputValidator::validate($rules, $data, '/', $error);
 	}
 
 	/**
@@ -451,11 +451,11 @@ class CJsRpcInputValidator {
 				]];
 				break;
 
-				// jsrpc.php also uses "patternselect.get" for graphs, but none of UI components actually call it.
+				// jsrpc.php uses "patternselect.get" for graphs, but none of UI components actually call it.
 			default:
 				return false;
 		}
 
-		return CApiInputValidator::validate($rules, $data, '/', $error);;
+		return CApiInputValidator::validate($rules, $data, '/', $error);
 	}
 }
