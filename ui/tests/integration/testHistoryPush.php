@@ -20,6 +20,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * Test suite for history.push API methods (pushing of history)
  *
  * @required-components server
+ * @suite-components-reuse true
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_history_push1,test_history_push_non_monitored,test_history_push_maintained
  * @backup history,items,hosts,history_uint,history_text,history_str,history_log,ids
@@ -426,6 +427,7 @@ class testHistoryPush extends CIntegrationTest {
 	}
 
 	public function testHistoryPush_httpAgentTrappingDisabled() {
+		$this->startComponent(self::COMPONENT_SERVER);
 		$response = $this->call('history.push', [
 			'itemid' => self::$itemids['http_agent_text_no_trap'],
 			'value' => 'a',

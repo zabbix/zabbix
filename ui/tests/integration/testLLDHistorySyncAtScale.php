@@ -64,7 +64,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	public function configurationProvider() {
 		return [
 			self::COMPONENT_SERVER => [
-				'LogFileSize' => 1,
+				'LogFileSize' => 8,
 				'DebugLevel' => 3,
 				'CacheSize' => '128M',
 				'HistoryCacheSize' => '32M',
