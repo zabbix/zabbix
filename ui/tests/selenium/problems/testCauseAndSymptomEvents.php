@@ -15,6 +15,7 @@
 
 
 require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 
 /**
  * @backup !profiles, !problem, !problem_tag, !service_problem, !event_symptom
@@ -26,13 +27,13 @@ require_once __DIR__.'/../../include/CWebTest.php';
 class testCauseAndSymptomEvents extends CWebTest {
 
 	/**
-	 * Attach TableBehavior and MessageBehavior to the test.
+	 * Attach DatatableBehavior and MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			CTableBehavior::class,
+			CDatatableBehavior::class,
 			CMessageBehavior::class
 		];
 	}
@@ -181,10 +182,10 @@ class testCauseAndSymptomEvents extends CWebTest {
 			['Problem' => 'Problem trap>150 [Cause]'],
 			['Problem' => 'Problem trap>10 [Symptom]']
 		];
-		$this->assertTableData($result);
+		$this->assertDatatableData($result);
 
 		// Check collapsed symptom count.
-		$table = $this->getTable();
+		$table = $this->getDatatable();
 		$cause = $table->findRow('Problem', 'Problem trap>150 [Cause]');
 		$this->assertTrue($cause->query('class:entity-count')->one()->isVisible());
 		$this->assertEquals(1, $cause->query('class:entity-count')->one()->getText());
@@ -200,6 +201,8 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->assertEquals('Cause', $event_table->findRow('Name', 'Rank')->getColumn('Value')->getText());
 
 		$this->page->navigateBack();
+		$this->page->waitUntilReady();
+		$table->waitUntilReady()->invalidate();
 		$symptom = $table->findRow('Problem', 'Problem trap>10 [Symptom]');
 		$this->isCollapsed($cause, $symptom, true);
 		$cause->query(self::EXPAND_XPATH)->one()->click();
@@ -218,6 +221,8 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view&hostids[]='.
 				self::$hostsids['hostids']['Host for Cause and Symptom check']
 		);
+
+		$table->waitUntilReady()->invalidate();
 		$this->isCollapsed($cause, $symptom, true);
 		$cause->query(self::EXPAND_XPATH)->one()->click();
 		$this->isCollapsed($cause, $symptom);
@@ -233,12 +238,12 @@ class testCauseAndSymptomEvents extends CWebTest {
 	 * @param boolean $collapsed	are symptom events in collapsed state or not
 	 */
 	protected function isCollapsed($cause, $symptom, $collapsed = false) {
-		$chevron = $cause->getColumn(2)->query('tag:button')->one();
+		$chevron = $cause->getColumn(0)->query('tag:button')->one();
 		$this->assertEquals($collapsed, $chevron->hasClass('collapsed'));
 		$this->assertEquals($collapsed ? 'Expand' : 'Collapse', $chevron->getAttribute('title'));
 
 		$this->assertFalse($symptom->isVisible($collapsed));
-		$this->assertFalse($symptom->getColumn(2)->query(self::SYMPTOM_XPATH)->one()->isVisible($collapsed));
+		$this->assertFalse($symptom->getColumn(0)->query(self::SYMPTOM_XPATH)->one()->isVisible($collapsed));
 	}
 
 	public function getContextMenuData() {
@@ -335,13 +340,14 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=problem.view&groupids[]='.self::$groupids['Group for Cause and Symptom check']);
 
 		if (array_key_exists('linked_events', $data)) {
-			$this->query('class:list-table')->asTable()->waitUntilPresent()->one()->query(self::EXPAND_XPATH)->one()->click();
+			$this->getDatatable()->query(self::EXPAND_XPATH)->one()->click();
 		}
 
 		if (array_key_exists('selected_events', $data)) {
-			$this->selectTableRows($data['selected_events'], 'Problem');
+			$this->selectDatatableRows($data['selected_events'], 'Problem');
 		}
 
+		$this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 		$this->query('link', $data['locator'])->one()->waitUntilClickable()->click();
 		$context_menu = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$this->assertTrue($context_menu->hasTitles(['VIEW', 'CONFIGURATION', 'PROBLEM']));
@@ -427,7 +433,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=problem.view&hostids[]='.
 				self::$hostsids['hostids']['Host for Cause and Symptom update']
 		);
-		$table = $this->getTable();
+		$table = $this->getDatatable();
 		$count = count($data['problems']);
 
 		if (array_key_exists('expand', $data)) {
@@ -435,7 +441,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 		}
 
 		if ($count > 1) {
-			$this->selectTableRows(CTestArrayHelper::get($data, 'select_all', false) ? [] : $data['problems'], 'Problem');
+			$this->selectDatatableRows(CTestArrayHelper::get($data, 'select_all', false) ? [] : $data['problems'], 'Problem');
 			$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 		}
 		else {
@@ -454,12 +460,11 @@ class testCauseAndSymptomEvents extends CWebTest {
 			// #0 Filtering results when "Show symptoms" => false.
 			[
 				[
-					'fields' => [
-						'Show symptoms' => false,
-						'Show timeline' => false
-					],
-					'headers' => ['', '', '', 'Time', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
-						'Duration', 'Update', 'Actions', 'Tags'
+					'Show symptoms' => false,
+					'header_settings' => [
+						'Time' => [
+							'Show timeline' => false
+						]
 					],
 					'result' => ['Problem trap>150 [Cause]', 'Problem trap>10 [Symptom]']
 				]
@@ -467,12 +472,11 @@ class testCauseAndSymptomEvents extends CWebTest {
 			// #1 Filtering results when "Show symptoms" => true.
 			[
 				[
-					'fields' => [
-						'Show symptoms' => true,
-						'Show timeline' => false
-					],
-					'headers' => ['', '', '', 'Time', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
-						'Duration', 'Update', 'Actions', 'Tags'
+					'Show symptoms' => true,
+					'header_settings' => [
+						'Time' => [
+							'Show timeline' => false
+						]
 					],
 					'result' => ['Problem trap>150 [Cause]', 'Problem trap>10 [Symptom]', 'Problem trap>10 [Symptom]']
 				]
@@ -480,15 +484,10 @@ class testCauseAndSymptomEvents extends CWebTest {
 			// #2 Cause event is shown when symptom trigger is disabled but 'Show symptoms' => false.
 			[
 				[
-					'fields' => [
-						'Show symptoms' => false
-					],
+					'Show symptoms' => false,
 					'triggers' => [
 						'Problem trap>10 [Symptom]' => TRIGGER_STATUS_DISABLED,
 						'Problem trap>150 [Cause]' => TRIGGER_STATUS_ENABLED
-					],
-					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
-						'Duration', 'Update', 'Actions', 'Tags'
 					],
 					'result' => ['Problem trap>150 [Cause]']
 				]
@@ -496,15 +495,10 @@ class testCauseAndSymptomEvents extends CWebTest {
 			// #3 Cause event is shown when symptom trigger is disabled but 'Show symptoms' => true.
 			[
 				[
-					'fields' => [
-						'Show symptoms' => true
-					],
+					'Show symptoms' => true,
 					'triggers' => [
 						'Problem trap>10 [Symptom]' => TRIGGER_STATUS_DISABLED,
 						'Problem trap>150 [Cause]' => TRIGGER_STATUS_ENABLED
-					],
-					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
-						'Duration', 'Update', 'Actions', 'Tags'
 					],
 					'result' => ['Problem trap>150 [Cause]']
 				]
@@ -512,15 +506,10 @@ class testCauseAndSymptomEvents extends CWebTest {
 			// #4 Symptom event is shown when cause trigger is disabled but 'Show symptoms' => true.
 			[
 				[
-					'fields' => [
-						'Show symptoms' => true
-					],
+					'Show symptoms' => true,
 					'triggers' => [
 						'Problem trap>10 [Symptom]' => TRIGGER_STATUS_ENABLED,
 						'Problem trap>150 [Cause]' => TRIGGER_STATUS_DISABLED
-					],
-					'headers' => ['', '', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
-						'Duration', 'Update', 'Actions', 'Tags'
 					],
 					'result' => ['Problem trap>10 [Symptom]']
 				]
@@ -528,45 +517,30 @@ class testCauseAndSymptomEvents extends CWebTest {
 			// #5 No data is shown when cause trigger is disabled but 'Show symptoms' => false.
 			[
 				[
-					'fields' => [
-						'Show symptoms' => false
-					],
+					'Show symptoms' => false,
 					'triggers' => [
 						'Problem trap>10 [Symptom]' => TRIGGER_STATUS_ENABLED,
 						'Problem trap>150 [Cause]' => TRIGGER_STATUS_DISABLED
-					],
-					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
-						'Duration', 'Update', 'Actions', 'Tags'
 					]
 				]
 			],
 			// #6 No data is shown when cause and symptom triggers are disabled but "Show symptoms" => true.
 			[
 				[
-					'fields' => [
-						'Show symptoms' => true
-					],
+					'Show symptoms' => true,
 					'triggers' => [
 						'Problem trap>10 [Symptom]' => TRIGGER_STATUS_DISABLED,
 						'Problem trap>150 [Cause]' => TRIGGER_STATUS_DISABLED
-					],
-					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
-						'Duration', 'Update', 'Actions', 'Tags'
 					]
 				]
 			],
 			// #7 No data is shown when cause and symptom triggers are disabled but "Show symptoms" => false.
 			[
 				[
-					'fields' => [
-						'Show symptoms' => false
-					],
+					'Show symptoms' => false,
 					'triggers' => [
 						'Problem trap>10 [Symptom]' => TRIGGER_STATUS_DISABLED,
 						'Problem trap>150 [Cause]' => TRIGGER_STATUS_DISABLED
-					],
-					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
-						'Duration', 'Update', 'Actions', 'Tags'
 					]
 				]
 			]
@@ -596,24 +570,51 @@ class testCauseAndSymptomEvents extends CWebTest {
 	 * Test scenario checks "Problems" page filtering results using disabled/enabled triggers and/or "Show symptoms" flag.
 	 *
 	 * @dataProvider getСauseAndSymptomsData
+	 *
 	 * @onBefore prepareTriggersStatus
 	 */
 	public function testCauseAndSymptomEvents_FilterResults($data) {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
+		$displayed_symptom_xpath = 'xpath:.//div[@class="row"]//a[text()="Problem trap>10 [Symptom]"]';
 
-		// Check headers when Cause and Symptoms problems present in table and 'Show timeline' = true (default state).
-		$this->assertEquals(['', '', '', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
-				'Duration', 'Update', 'Actions', 'Tags'], $this->getTable()->getHeadersText()
-		);
+		// Reset datatable layout to default before checking the its default state.
+		$table = $this->getDatatable();
+		$options_button = $table->query('xpath:.//button[@title="Customize table"]')->one()->waitUntilClickable();
+		$options_button->click();
+		$options_dialog = $this->query('class:datatable-options-popup')->waitUntilVisible()->one();
+		$options_dialog->query('button:Reset layout')->waitUntilClickable()->one()->click();
+		$this->page->acceptAlert();
+		$table->waitUntilReady()->invalidate();
+
+		// Click on button again to close the popup.
+		$options_button->invalidate();
+		$options_button->click();
+		$options_dialog->waitUntilNotVisible();
+
+		// Check that cells with timeline are present and that symptoms are not present as separate problems by default.
+		$this->assertTrue($table->query('class:cell-timeline')->one(false)->isValid(), 'Timeline should be present.');
+		$this->assertFalse($table->query($displayed_symptom_xpath)->one(false)->isValid());
 
 		$this->page->open('zabbix.php?action=problem.view&hostids[]='.
 				self::$hostsids['hostids']['Host for Cause and Symptom check']
-		);
-		$table = $this->getTable();
-		CFilterElement::find()->one()->getForm()->fill($data['fields'])->submit();
-		$table->waitUntilReloaded();
-		$this->assertEquals($data['headers'], $table->getHeadersText());
-		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []), 'Problem');
+		)->waitUntilReady();
+
+		$headers = $table->getHeaders();
+		CFilterElement::find()->one()->getForm()->fill(['Show symptoms' => $data['Show symptoms']])->submit();
+		$this->page->waitUntilReady();
+		$headers->waitUntilStalled();
+		$table->waitUntilReady()->invalidate();
+
+		// Only "Show timeline" field is set through table header, so presence of "header_settings" key indicates change.
+		if (array_key_exists('header_settings', $data)) {
+			$this->changeLayoutFromHeader($data['header_settings']);
+			$table->waitUntilReady()->invalidate();
+
+			$this->assertEquals($data['header_settings']['Time']['Show timeline'], $table->query('class:cell-timeline')
+					->one(false)->isValid(), '"Show timeline" option did not work as expected.'
+			);
+		}
+		$this->assertDatatableDataColumn(CTestArrayHelper::get($data, 'result', []), 'Problem');
 
 		if (array_key_exists('result', $data)) {
 			// Check 'cause and symptom' icons when trigger(s) state is changed.
@@ -633,8 +634,12 @@ class testCauseAndSymptomEvents extends CWebTest {
 				$this->assertFalse($table->getRow(1)->query(self::SYMPTOM_XPATH)->one()->isVisible());
 
 				// When Symptom is present in the table it is marked with Symptom arrow icon.
-				if ($data['fields']['Show symptoms']) {
+				if ($data['Show symptoms']) {
 					$this->assertTrue($table->getRow(2)->query(self::SYMPTOM_XPATH)->one()->isVisible());
+				$this->assertTrue($table->query($displayed_symptom_xpath)->one(false)->isValid());
+				}
+				else {
+					$this->assertFalse($table->query($displayed_symptom_xpath)->one(false)->isValid());
 				}
 			}
 		}

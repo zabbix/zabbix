@@ -578,7 +578,7 @@ class testFormTags extends CWebTest {
 	 * @param string    $old_hash           db hash before changes
 	 * @param bool      $inline_validation  flag that determines if inline validation is enabled in the form
 	 */
-	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null, $inline_validation = false) {
+	protected function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null, $inline_validation = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if ($inline_validation) {
 				$inline_error = [];
@@ -688,7 +688,7 @@ class testFormTags extends CWebTest {
 			if ($object === 'host' || $object === 'template') {
 				$this->query('button:Reset')->one()->click();
 			}
-			$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
+			$this->query('link', $this->clone_name)->waitUntilClickable()->one()->scrollIntoView(50)->click();
 		}
 
 		switch ($object) {
@@ -795,18 +795,18 @@ class testFormTags extends CWebTest {
 
 		// Check created clone.
 		if ($object === 'service') {
-			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+			$table = $this->query('class:list-table')->asTable()->one()->waitUntilVisible();
 			$table->findRow('Name',  $new_name)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
 			if ($object === 'template' || $object === 'discovered host') {
 				$this->query('button:Reset')->one()->click();
-				$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+				$filter = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 				$filter->fill(['Name' => $new_name]);
-				$this->query('button:Apply')->one()->waitUntilClickable()->click();
+				$this->query('button:Apply')->waitUntilClickable()->one()->click();
 			}
 
-			$this->query('link', $new_name)->one()->click();
+			$this->query('link', $new_name)->waitUntilClickable()->one()->click();
 		}
 		$form->invalidate();
 
@@ -850,7 +850,7 @@ class testFormTags extends CWebTest {
 	 * @param string   $object   host, template, trigger, item or prototype
 	 * @param string   $form     object configuration form
 	 */
-	private function checkTagFields($data, $object, $form) {
+	protected function checkTagFields($data, $object, $form) {
 		switch ($object) {
 			case 'item':
 			case 'item prototype':
@@ -891,7 +891,7 @@ class testFormTags extends CWebTest {
 			case 'template':
 				$this->page->open('zabbix.php?action=template.list&filter_name='.$data['name'].'&filter_set=1')
 					->waitUntilReady();
-				$this->query('link', $data['name'])->one()->click();
+				$this->query('link', $data['name'])->waitUntilClickable()->one()->click();
 				$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 				break;
 
@@ -1001,9 +1001,10 @@ class testFormTags extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->query('button:Reset')->one()->click();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
+		$table = $this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
 		$form->fill(['Name' => $new_name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$table->waitUntilReady()->invalidate();
 
 		switch ($object) {
 			case 'trigger':
@@ -1025,7 +1026,7 @@ class testFormTags extends CWebTest {
 				break;
 		}
 
-		$table->waitUntilReloaded()->findRow('Name', $new_name)->getColumn($column)->query('link', $column)->one()->click();
+		$table->findRow('Name', $new_name)->getColumn($column)->query('link', $column)->one()->click();
 
 		switch ($object) {
 			case 'trigger':
@@ -1100,7 +1101,7 @@ class testFormTags extends CWebTest {
 			$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$filter->fill(['Name' => $parent]);
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
-			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $parent)
+			$this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady()->findRow('Name', $parent)
 					->getColumn(ucfirst($object).'s')->query('link', ucfirst($object).'s')->one()->click();
 
 			$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
@@ -1312,11 +1313,12 @@ class testFormTags extends CWebTest {
 	 *
 	 * @return array
 	 */
-	private function getInheritedTags() {
+	protected function getInheritedTags() {
 		$inherited_tags = [];
 
 		$tags_table = $this->query($this->tags_table)->asMultifieldTable()->one();
 		$headers = $tags_table->getHeadersText();
+
 		// Find disabled rows of host and/or template tags by disabled Name field.
 		$disabled_rows = $tags_table->findRows(function ($row) {
 			return $row->getColumn('Name')->children()->one()->detect()->isEnabled() === false;
@@ -1324,8 +1326,9 @@ class testFormTags extends CWebTest {
 
 		foreach ($disabled_rows as $row) {
 			// Check other disabled fields.
-			$this->assertFalse($row->getColumn('Value')->children()->one()->detect()->isEnabled());
-			$this->assertFalse($row->getColumn('')->children()->one()->detect()->isEnabled());
+			foreach (['Value', ''] as $column) {
+				$this->assertFalse($row->getColumn($column)->children()->one()->isEnabled());
+			}
 
 			$values = [];
 			// Get disabled row values.
@@ -1346,7 +1349,7 @@ class testFormTags extends CWebTest {
 	 *
 	 * @return array
 	 */
-	private function prepareAllTags($tags, $parent_tags) {
+	protected function prepareAllTags($tags, $parent_tags) {
 		// Prepare all tags data (inherited form host and/or template, and element tags).
 		$all_tags = array_merge($parent_tags, $tags);
 		// Sort reference tags array by field "tag".
@@ -1365,7 +1368,7 @@ class testFormTags extends CWebTest {
 	 *
 	 * @return array
 	 */
-	private function prepareInheritedTags($tags, $parent_tags = false) {
+	protected function prepareInheritedTags($tags, $parent_tags = false) {
 		if (!$parent_tags) {
 			$host_template_tags = array_merge(self::HOST_TAGS, self::TEMPLATE_TAGS);
 			$parent_tags = array_unique($host_template_tags, SORT_REGULAR);

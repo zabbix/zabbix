@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pontoon\n"
-"X-POOTLE-MTIME: 1462925322.000000\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1462925322.000000\n"
 
 #: include/classes/validators/CFormValidator.php:1397
 #: include/classes/validators/CFormValidator.php:1442 jsLoader.php:439
@@ -344,7 +344,7 @@ msgstr "(仅超级管理员能创建群组)"
 
 #: include/forms.inc.php:969
 msgid "(created by LLD)"
-msgstr ""
+msgstr "（由 LLD 创建）"
 
 #: app/partials/configuration.tags.tab.php:86
 #: app/partials/hostmacros.inherited.list.html.php:204
@@ -476,7 +476,7 @@ msgstr "此处需要输入浮点数值"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:89
 msgid "A message or at least one operation is required."
-msgstr ""
+msgstr "需要一条消息或至少一个操作。"
 
 #: app/views/host.wizard.edit.php:139
 msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
@@ -1280,7 +1280,7 @@ msgstr "聚合"
 
 #: widgets/topitems/views/column.edit.php:283
 msgid "Aggregate columns"
-msgstr ""
+msgstr "聚合列"
 
 #: app/views/popup.triggerexpr.php:126
 msgid "Aggregate functions"
@@ -1304,7 +1304,7 @@ msgstr "聚合函数"
 #: widgets/tophosts/views/column.edit.php:330
 #: widgets/topitems/views/column.edit.php:256
 msgid "Aggregation function does not affect the sparkline."
-msgstr ""
+msgstr "聚合函数不会影响迷你图。"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:406
 #: widgets/tophosts/views/column.edit.php:165
@@ -1734,7 +1734,7 @@ msgstr "于(时:分)"
 #: include/classes/validators/CFormValidator.php:2323 jsLoader.php:418
 #, c-format
 msgid "At least %1$d items based on field \"%2$s\" rules"
-msgstr ""
+msgstr "基于字段“%2$s”规则的监控项至少 %1$d 个"
 
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
@@ -1778,7 +1778,7 @@ msgstr "至少需要选择一个加密级别。"
 #: app/controllers/CControllerSlaCreate.php:53
 #: app/controllers/CControllerSlaUpdate.php:54
 msgid "At least one entry should be selected."
-msgstr ""
+msgstr "应至少选择一个条目。"
 
 #: app/controllers/CControllerRegExCreate.php:54
 #: app/controllers/CControllerRegExUpdate.php:55
@@ -1792,6 +1792,11 @@ msgstr "至少需要添加一个表达式。"
 #: include/classes/api/services/CMaintenance.php:577
 msgid "At least one host group or host must be selected."
 msgstr "至少选择一个主机组或主机。"
+
+#: app/controllers/CControllerGraphPrototypeCreate.php:116
+#: app/controllers/CControllerGraphPrototypeUpdate.php:118
+msgid "At least one item must be a prototype"
+msgstr "至少一个监控项必须是原型"
 
 #: app/controllers/CControllerMaintenanceCreate.php:57
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
@@ -1836,7 +1841,7 @@ msgstr "至少需要添加一个时间段。"
 #: app/controllers/CControllerConnectorCreate.php:44
 #: app/controllers/CControllerConnectorUpdate.php:45
 msgid "At least one type of information must be selected."
-msgstr ""
+msgstr "必须至少选择一种信息类型。"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
@@ -2295,7 +2300,7 @@ msgstr "两次密码必须相同。"
 #: app/controllers/CControllerItemPrototypeUpdate.php:257
 #: app/controllers/CControllerItemUpdate.php:256
 msgid "Both username and password should be either present or empty."
-msgstr ""
+msgstr "用户名和密码要么同时填写，要么同时留空。"
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -2563,6 +2568,13 @@ msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
 msgstr[0] "无法添加模块：%1$s。"
 
+#: app/controllers/CControllerGraphCreate.php:111
+#: app/controllers/CControllerGraphPrototypeCreate.php:121
+#: app/controllers/CControllerGraphPrototypeUpdate.php:123
+#: app/controllers/CControllerGraphUpdate.php:113
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr "无法添加多个类型为“Graph sum”的监控项"
+
 #: include/classes/api/services/CGraph.php:42
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
@@ -2608,6 +2620,10 @@ msgstr "无法添加脚本"
 #: widgets/navtree/views/navtreeitem.edit.php:72
 msgid "Cannot add submaps. Max depth reached."
 msgstr "无法添加子图，已经是最大的深度了。"
+
+#: app/controllers/CControllerPopupScheduledReportSubscriptionCheck.php:85
+msgid "Cannot add subscription"
+msgstr "无法添加订阅"
 
 #: app/controllers/CControllerTemplateCreate.php:49
 #: app/controllers/CControllerTemplateCreate.php:171
@@ -3431,7 +3447,7 @@ msgstr "在'%4$s'上找不到发现规则原型'%3$s'的主机原型'%2$s'所属
 #: include/classes/import/importers/CDashboardImporterGeneral.php:57
 #, c-format
 msgid "Cannot find host group \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "找不到仪表板“%2$s”中使用的主机组“%1$s”。"
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -4805,11 +4821,11 @@ msgstr "检查已存在."
 
 #: app/controllers/CControllerPopupImportCompare.php:121
 msgid "Check and reconfigure widgets after the import is completed."
-msgstr ""
+msgstr "导入完成后，请检查并重新配置小组件。"
 
 #: app/controllers/CControllerPopupImport.php:136
 msgid "Check and reconfigure widgets."
-msgstr ""
+msgstr "请检查并重新配置小组件。"
 
 #: include/classes/parsers/C10TriggerExpression.php:542
 #, c-format
@@ -5143,7 +5159,7 @@ msgstr "颜色"
 
 #: widgets/topitems/views/column.edit.php:293
 msgid "Column aggregation function"
-msgstr ""
+msgstr "列聚合函数"
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
@@ -5152,7 +5168,7 @@ msgstr "列数"
 
 #: widgets/topitems/views/column.edit.php:313
 msgid "Combined column name"
-msgstr ""
+msgstr "组合列名称"
 
 #: app/views/js/administration.regex.edit.js.php:66
 msgid "Combined result"
@@ -6347,7 +6363,7 @@ msgstr "仪表盘页面属性"
 
 #: app/controllers/CControllerPopupImportCompare.php:216
 msgid "Dashboard pages"
-msgstr ""
+msgstr "仪表板页面"
 
 #: app/views/dashboard.properties.edit.php:87
 msgid "Dashboard properties"
@@ -6901,6 +6917,10 @@ msgstr "删除缺失"
 #: app/views/administration.regex.edit.php:160
 msgid "Delete regular expression?"
 msgstr "删除正则表达式?"
+
+#: app/views/js/reports.scheduledreport.edit.js.php:160
+msgid "Delete scheduled report?"
+msgstr "删除计划报表？"
 
 #: app/views/administration.script.edit.php:389
 msgid "Delete script?"
@@ -8145,7 +8165,7 @@ msgstr "持续时间"
 
 #: app/controllers/CControllerSlaExcludedDowntimeValidate.php:38
 msgid "Duration must be no less than a minute."
-msgstr ""
+msgstr "持续时间不能少于一分钟。"
 
 #: include/locales.inc.php:40
 msgid "Dutch (nl_NL)"
@@ -8627,6 +8647,10 @@ msgstr "输入非机密的预共享密钥标识字符串，避免包含敏感数
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
 msgstr "请输入 Zabbix 组件用于识别预共享密钥的唯一名称。"
 
+#: include/classes/setup/CSetupWizard.php:612
+msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
+msgstr "输入一个或多个值，格式为 host:port 或 [host]:port（IPv6），并用逗号分隔。"
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr "输入安装在监控目标上的Zabbix agent的IP/DNS地址和端口"
@@ -8876,12 +8900,12 @@ msgstr "排除停机时间"
 #: app/controllers/CControllerSlaExcludedDowntimeValidate.php:88
 #, c-format
 msgid "Excluded downtime must not extend beyond %1$s."
-msgstr ""
+msgstr "排除的停机时间不得超过 %1$s。"
 
 #: app/controllers/CControllerSlaCreate.php:74
 #: app/controllers/CControllerSlaUpdate.php:75
 msgid "Excluded downtime periods must be unique."
-msgstr ""
+msgstr "排除的停机时间段必须唯一。"
 
 #: app/views/popup.sla.edit.php:196 app/views/popup.sla.edit.php:207
 #: app/views/slareport.list.php:168
@@ -9245,6 +9269,66 @@ msgstr "字段 \"%1$s\"不是字符串"
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "字段\"%1$s\"不可以填写"
+
+#: include/classes/data/CTriggerConditionFunctionData.php:275
+#: include/classes/data/CTriggerConditionFunctionData.php:298
+#: include/classes/data/CTriggerConditionFunctionData.php:321
+#: include/classes/data/CTriggerConditionFunctionData.php:344
+#: include/classes/data/CTriggerConditionFunctionData.php:367
+#: include/classes/data/CTriggerConditionFunctionData.php:441
+#: include/classes/data/CTriggerConditionFunctionData.php:466
+#: include/classes/data/CTriggerConditionFunctionData.php:490
+#: include/classes/data/CTriggerConditionFunctionData.php:513
+#: include/classes/data/CTriggerConditionFunctionData.php:537
+#: include/classes/data/CTriggerConditionFunctionData.php:560
+#: include/classes/data/CTriggerConditionFunctionData.php:584
+#: include/classes/data/CTriggerConditionFunctionData.php:608
+#: include/classes/data/CTriggerConditionFunctionData.php:632
+#: include/classes/data/CTriggerConditionFunctionData.php:655
+#: include/classes/data/CTriggerConditionFunctionData.php:678
+#: include/classes/data/CTriggerConditionFunctionData.php:732
+#: include/classes/data/CTriggerConditionFunctionData.php:755
+#: include/classes/data/CTriggerConditionFunctionData.php:779
+#: include/classes/data/CTriggerConditionFunctionData.php:802
+#: include/classes/data/CTriggerConditionFunctionData.php:825
+#: include/classes/data/CTriggerConditionFunctionData.php:905
+#: include/classes/data/CTriggerConditionFunctionData.php:929
+#: include/classes/data/CTriggerConditionFunctionData.php:952
+#: include/classes/data/CTriggerConditionFunctionData.php:975
+#: include/classes/data/CTriggerConditionFunctionData.php:1043
+#: include/classes/data/CTriggerConditionFunctionData.php:1115
+#: include/classes/data/CTriggerConditionFunctionData.php:1139
+#: include/classes/data/CTriggerConditionFunctionData.php:1165
+#: include/classes/data/CTriggerConditionFunctionData.php:1213
+#: include/classes/data/CTriggerConditionFunctionData.php:1236
+#: include/classes/data/CTriggerConditionFunctionData.php:1259
+#: include/classes/data/CTriggerConditionFunctionData.php:1283
+#: include/classes/data/CTriggerConditionFunctionData.php:1306
+#: include/classes/data/CTriggerConditionFunctionData.php:1329
+#: include/classes/data/CTriggerConditionFunctionData.php:1352
+#: include/classes/data/CTriggerConditionFunctionData.php:1376
+#: include/classes/data/CTriggerConditionFunctionData.php:1399
+#: include/classes/data/CTriggerConditionFunctionData.php:1423
+#: include/classes/data/CTriggerConditionFunctionData.php:1446
+#: include/classes/data/CTriggerConditionFunctionData.php:1543
+#: include/classes/data/CTriggerConditionFunctionData.php:1618
+#: include/classes/data/CTriggerConditionFunctionData.php:1742
+#: include/classes/data/CTriggerConditionFunctionData.php:1766
+#: include/classes/data/CTriggerConditionFunctionData.php:1808
+#: include/classes/data/CTriggerConditionFunctionData.php:1832
+#: include/classes/data/CTriggerConditionFunctionData.php:1857
+#: include/classes/data/CTriggerConditionFunctionData.php:1881
+#: include/classes/data/CTriggerConditionFunctionData.php:1905
+#: include/classes/data/CTriggerConditionFunctionData.php:1929
+#: include/classes/data/CTriggerConditionFunctionData.php:1952
+#: include/classes/data/CTriggerConditionFunctionData.php:1975
+#: include/classes/data/CTriggerConditionFunctionData.php:2021
+#: include/classes/data/CTriggerConditionFunctionData.php:2163
+#: include/classes/data/CTriggerConditionFunctionData.php:2376
+#: include/classes/data/CTriggerConditionFunctionData.php:2400
+#: include/classes/data/CTriggerConditionFunctionData.php:2470
+msgid "Field \"Last of\" cannot be empty when \"Time shift\" is not empty."
+msgstr "当“时间偏移”不为空时，“最后的”字段不能为空。"
 
 #: include/forms.inc.php:1495 include/forms.inc.php:1530
 #: include/views/js/item.preprocessing.js.php:154
@@ -10114,7 +10198,7 @@ msgstr "隐藏的"
 #: widgets/scatterplot/includes/WidgetForm.php:176
 #: widgets/svggraph/includes/WidgetForm.php:268
 msgid "Hide"
-msgstr ""
+msgstr "隐藏"
 
 #: jsLoader.php:395
 msgid "Hide debug"
@@ -10576,7 +10660,7 @@ msgstr "主机名称"
 #: widgets/scatterplot/includes/WidgetForm.php:173
 #: widgets/svggraph/includes/WidgetForm.php:265
 msgid "Host names in labels"
-msgstr ""
+msgstr "标签中的主机名称"
 
 #: widgets/hostnavigator/Widget.php:29
 msgid "Host navigator"
@@ -11052,6 +11136,10 @@ msgstr "如果少于 %2$s 个子服务的状态为 %1$s 或更低"
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
 msgstr "如果少于 %2$s 的子服务的状态为 %1$s 或更低"
+
+#: include/classes/setup/CSetupWizard.php:614
+msgid "If no port is specified, the \"Database port\" value is used."
+msgstr "如果未指定端口，则使用“数据库端口”的值。"
 
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -12362,7 +12450,7 @@ msgstr "用户角色 \"%1$s\" 的 API 方法 \"%2$s\" 无效。"
 #: app/controllers/CControllerItemPrototypeUpdate.php:176
 #: app/controllers/CControllerItemUpdate.php:175
 msgid "Invalid HTTP status code or range."
-msgstr ""
+msgstr "无效的 HTTP 状态码或范围。"
 
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
@@ -12461,6 +12549,10 @@ msgstr "无效 email 地址 \"%1$s\"。"
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "媒介类型 ID: \"%1$s\" 的 email 地址无效。"
+
+#: app/controllers/CControllerPopupTriggerExprCheck.php:61
+msgid "Invalid function"
+msgstr "无效的函数"
 
 #: app/controllers/CControllerHostGroupCreate.php:31
 #: app/controllers/CControllerHostGroupUpdate.php:34
@@ -12902,7 +12994,7 @@ msgstr "资产模式"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:235
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:236
 msgid "Invert values"
-msgstr ""
+msgstr "反转值"
 
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
@@ -12949,7 +13041,7 @@ msgstr "监控项"
 #: app/controllers/CControllerPopupTriggerExpr.php:1472
 #, c-format
 msgid "Item \"%1$s\" cannot be used in trigger: unsupported data type."
-msgstr ""
+msgstr "监控项“%1$s”不能在触发器中使用：不支持的数据类型。"
 
 #: items.php:667
 msgid "Item added"
@@ -13352,7 +13444,7 @@ msgstr "LDAP 没有配置"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:34
 msgid "LDAP is not configured."
-msgstr ""
+msgstr "LDAP 未配置。"
 
 #: include/classes/api/services/CAuthentication.php:175
 msgid "LDAP must be enabled"
@@ -13734,6 +13826,10 @@ msgstr "Zabbix proxy 组的配置数据和实时数据列表。配置数据包�
 msgid "List of block devices and their type. Returns JSON"
 msgstr "块设备列表及其类型。返回 JSON"
 
+#: include/classes/data/CItemData.php:1724
+msgid "List of block devices with detailed information. Returns JSON"
+msgstr "包含详细信息的块设备列表。返回 JSON"
+
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
 msgstr "字符列表"
@@ -13753,6 +13849,10 @@ msgstr "已安装文件系统及其类型的列表。返回 JSON"
 #: include/classes/data/CItemData.php:1703
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr "挂载的文件系统、类型、磁盘空间列表和 inode 统计信息。返回 JSON"
+
+#: include/classes/data/CItemData.php:1266
+msgid "List of network interfaces with detailed information. Returns JSON"
+msgstr "包含详细信息的网络接口列表。返回 JSON"
 
 #: include/classes/data/CItemData.php:1109
 msgid "List of network interfaces. Returns JSON"
@@ -14504,7 +14604,7 @@ msgstr "报警媒介类型已添加"
 #: app/controllers/CControllerAuthenticationUpdate.php:296
 #: app/controllers/CControllerPopupLdapCheck.php:116
 msgid "Media type and attribute is not unique."
-msgstr ""
+msgstr "媒介类型和属性不唯一。"
 
 #: app/controllers/CControllerMediatypeDelete.php:61
 msgid "Media type deleted"
@@ -15280,17 +15380,17 @@ msgstr "用户ID"
 #: app/controllers/CControllerPopupLdapCheck.php:30
 #: app/controllers/CControllerPopupUserGroupMappingCheck.php:30
 msgid "Name already exists."
-msgstr ""
+msgstr "名称已存在。"
 
 #: app/controllers/CControllerOauthCheck.php:36
 #: app/controllers/CControllerOauthCheck.php:44
 msgid "Name and value combination is not unique."
-msgstr ""
+msgstr "名称和值的组合不唯一。"
 
 #: app/controllers/CControllerMediatypeCreate.php:193
 #: app/controllers/CControllerMediatypeUpdate.php:194
 msgid "Name is not unique."
-msgstr ""
+msgstr "名称不唯一。"
 
 #: app/views/js/webscenario.step.edit.js.php:286
 msgid "Name of the form field should not exceed 255 characters."
@@ -15371,6 +15471,10 @@ msgstr "添加LDAP 服务器"
 #: app/views/mfa.edit.php:149
 msgid "New MFA method"
 msgstr "新的MFA方法"
+
+#: app/views/oauth.edit.php:254
+msgid "New OAuth"
+msgstr "新建 OAuth"
 
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
@@ -15504,6 +15608,11 @@ msgstr "新proxy组"
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "新的正则表达式"
+
+#: app/views/js/reports.scheduledreport.edit.js.php:99
+#: app/views/reports.scheduledreport.edit.php:250
+msgid "New scheduled report"
+msgstr "新建计划报表"
 
 #: app/views/administration.script.edit.php:369
 #: app/views/administration.script.edit.php:409
@@ -15774,7 +15883,7 @@ msgstr "没有找到匹配"
 #: include/classes/validators/CFormValidator.php:2332 jsLoader.php:419
 #, c-format
 msgid "No more than %1$d items based on field \"%2$s\" rules"
-msgstr ""
+msgstr "基于字段“%2$s”规则的监控项不能超过 %1$d 个"
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
@@ -15837,7 +15946,7 @@ msgstr "没有调用“%1$s.%2$s”的权限。"
 
 #: include/classes/api/services/CConfiguration.php:337
 msgid "No permissions to import dashboards."
-msgstr ""
+msgstr "没有导入仪表板的权限。"
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
@@ -16771,7 +16880,7 @@ msgstr "打开日志"
 #: include/classes/validators/CSslCertificateValidator.php:28
 #: include/classes/validators/CSslPrivateKeyValidator.php:28
 msgid "OpenSSL extension is not available"
-msgstr ""
+msgstr "OpenSSL 扩展不可用"
 
 #: include/classes/server/CZabbixServer.php:627
 msgid "OpenSSL extension is not available."
@@ -17555,6 +17664,12 @@ msgstr "在线proxy的百分比。返回浮点数。"
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
 msgstr "虚拟机已就绪但无法安排在物理 CPU 上运行的时间百分比，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符，“instance”- CPU 实例"
+
+#: include/classes/graph/CSvgGraph.php:1764
+#: include/classes/graphdraw/CLineGraphDraw.php:1620
+#, c-format
+msgid "Percentile %1$s: %2$s"
+msgstr "百分位数 %1$s：%2$s"
 
 #: graphs.php:50 include/views/configuration.graph.edit.php:154
 #: widgets/svggraph/includes/WidgetForm.php:87
@@ -18540,11 +18655,11 @@ msgstr "引用属性"
 
 #: app/controllers/CControllerPopupImport.php:135
 msgid "References to missing objects were ignored:"
-msgstr ""
+msgstr "对缺失对象的引用已被忽略："
 
 #: app/controllers/CControllerPopupImportCompare.php:120
 msgid "References to missing objects will be ignored:"
-msgstr ""
+msgstr "对缺失对象的引用将被忽略："
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
@@ -19764,6 +19879,10 @@ msgstr[0] "计划报表已删除"
 msgid "Scheduled report disabled"
 msgid_plural "Scheduled reports disabled"
 msgstr[0] "定时报表已禁用"
+
+#: app/controllers/CControllerPopup.php:60
+msgid "Scheduled report edit"
+msgstr "计划报告编辑"
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
@@ -21422,7 +21541,7 @@ msgstr "瑞士(sv_SE)"
 
 #: index_sso.php:367
 msgid "Switch SSO user"
-msgstr ""
+msgstr "切换 SSO 用户"
 
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
@@ -21589,7 +21708,7 @@ msgstr "标签过滤器"
 #: app/controllers/CControllerConnectorCreate.php:120
 #: app/controllers/CControllerConnectorUpdate.php:121
 msgid "Tag filter name, operator and value combination is not unique."
-msgstr ""
+msgstr "标签过滤器名称、运算符和值的组合不是唯一的。"
 
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"
@@ -22060,6 +22179,10 @@ msgstr "在授权服务器中注册的客户端标识符"
 msgid "The client secret registered within the authorization server."
 msgstr "在授权服务器中注册的客户端密钥"
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr "由于令牌端点已更改，客户端密钥已被清除。请输入新的客户端密钥。"
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "克隆的主机包含用户定义的“秘密文本”类型的宏。这些宏的值和类型已重置。"
@@ -22335,7 +22458,7 @@ msgstr "该值不能是%1$s中的任一值"
 #: include/classes/validators/CFormValidator.php:1143 jsLoader.php:427
 #, c-format
 msgid "This value cannot have more than %1$s decimal places."
-msgstr ""
+msgstr "该值的小数位数不能超过 %1$s 位。"
 
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
@@ -23441,6 +23564,10 @@ msgstr "撤消问题确认。"
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "意外的HTTP响应状态码"
+
+#: app/views/mediatype.edit.php:166
+msgid "Unexpected access token update time."
+msgstr "意外的访问令牌更新时间。"
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -24865,6 +24992,18 @@ msgstr "映射值"
 msgid "Value must be greater than %1$s."
 msgstr "值必须大于%1$s"
 
+#: include/classes/validators/CFormValidator.php:1089
+#: include/classes/validators/CFormValidator.php:1147 jsLoader.php:435
+#, c-format
+msgid "Value must be greater than or equal to %1$s."
+msgstr "值必须大于或等于 %1$s。"
+
+#: include/classes/validators/CFormValidator.php:1095
+#: include/classes/validators/CFormValidator.php:1153 jsLoader.php:434
+#, c-format
+msgid "Value must be less than or equal to %1$s."
+msgstr "值必须小于或等于 %1$s。"
+
 #: include/classes/validators/CFormValidator.php:1033
 #: include/classes/validators/CFormValidator.php:1042
 #, c-format
@@ -25279,6 +25418,10 @@ msgstr "部件配置将被还原"
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "小组件已弃用。"
+
+#: jsLoader.php:255
+msgid "Widget is not fully configured"
+msgstr "小组件未完全配置"
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
@@ -25697,7 +25840,7 @@ msgstr "您没有权限来完成此操作."
 
 #: index_sso.php:358
 msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
-msgstr ""
+msgstr "您已通过单点登录（SSO）获得授权，但登录 Zabbix 失败。"
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -26618,7 +26761,7 @@ msgstr "颜色"
 #: include/classes/validators/CTimeRangesValidator.php:33
 #: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:22
 msgid "comma separated list of time periods is expected"
-msgstr ""
+msgstr "应为以逗号分隔的时间段列表"
 
 #: app/controllers/CControllerSlaCreateUpdate.php:35
 msgid "comma separated list of time periods is expected for scheduled week days"
@@ -27125,7 +27268,7 @@ msgstr "无效的数据类型"
 #: include/classes/validators/CAbsoluteTimeValidator.php:45
 #: include/classes/validators/CAbsoluteTimeValidator.php:53
 msgid "invalid date"
-msgstr ""
+msgstr "无效日期"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
@@ -27221,7 +27364,7 @@ msgstr "无效的趋势存储期"
 
 #: widgets/svggraph/includes/CSvgGraphHelper.php:1119
 msgid "inverted"
-msgstr ""
+msgstr "已反转"
 
 #: app/views/popup.valuemap.edit.php:75 include/actions.inc.php:29
 msgid "is greater than or equals"
@@ -27826,7 +27969,7 @@ msgstr "percentile() - 周期 T 内的百分位数 P"
 #: include/classes/validators/CTimeRangesValidator.php:56
 #: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:24
 msgid "periods must be unique"
-msgstr ""
+msgstr "时间段必须唯一"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:885
 msgid "pi() - Returns the Pi constant"
@@ -28051,7 +28194,7 @@ msgstr "sqrt() - 平方根"
 #: include/classes/validators/CTimeRangesValidator.php:44
 #: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:23
 msgid "start time must be less than end time"
-msgstr ""
+msgstr "开始时间必须早于结束时间"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1027
 msgid "stddevpop() - Population standard deviation"
@@ -28370,7 +28513,7 @@ msgstr "未知函数“%1$s”"
 
 #: include/classes/api/services/CMap.php:1999
 msgid "unsupported data type"
-msgstr ""
+msgstr "不支持的数据类型"
 
 #: app/controllers/CControllerPopupItemTestSend.php:212
 msgid "unsupported time suffix"
@@ -28468,6 +28611,14 @@ msgstr "值 %1$s 已存在"
 msgid "value contains unescaped character at position %1$d"
 msgstr "值在位置 %1$d 处包含未转义字符"
 
+#: include/classes/validators/CNumberValidator.php:74
+msgid "value is not a valid floating point number"
+msgstr "值不是有效的浮点数"
+
+#: include/classes/validators/CNumberValidator.php:77
+msgid "value is not a valid integer"
+msgstr "值不是有效的整数"
+
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:101
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:107
 #: include/classes/api/services/CItemGeneral.php:284
@@ -28546,7 +28697,7 @@ msgstr "值必须在'%1$s'到'%2$s'之间，且小数点后不超过'%3$s'位"
 #: include/classes/validators/CTimeUnitValidator.php:84
 #, c-format
 msgid "value must be between %1$s and %2$s"
-msgstr ""
+msgstr "值必须介于 %1$s 和 %2$s 之间"
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
@@ -28567,12 +28718,12 @@ msgstr "值必须大于“%1$s”"
 #: include/classes/validators/CAbsoluteTimeValidator.php:59
 #, c-format
 msgid "value must be greater than or equal to %1$s"
-msgstr ""
+msgstr "值必须大于或等于 %1$s"
 
 #: include/classes/validators/CAbsoluteTimeValidator.php:64
 #, c-format
 msgid "value must be less than or equal to %1$s"
-msgstr ""
+msgstr "值必须小于或等于 %1$s"
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

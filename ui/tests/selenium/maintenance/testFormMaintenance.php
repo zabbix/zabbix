@@ -17,8 +17,6 @@ require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * Tests for "Configuration -> Maintenance".
  *

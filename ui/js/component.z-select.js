@@ -39,9 +39,11 @@ class ZSelect extends HTMLElement {
 	}
 
 	connectedCallback() {
-		this._is_connected = true;
+		if (!this.contains(this._button)) {
+			this.init();
+			this._is_connected = true;
+		}
 
-		this.init();
 		this.registerEvents();
 	}
 
@@ -63,7 +65,7 @@ class ZSelect extends HTMLElement {
 				break;
 
 			case 'value':
-				if (!this._is_connected || this._input.value !== new_value) {
+				if (this._input.value !== new_value) {
 					const option = this.getOptionByValue(new_value);
 
 					this._highlight(option ? option._index : -1);
@@ -132,13 +134,7 @@ class ZSelect extends HTMLElement {
 
 		if (this.hasAttribute('data-options')) {
 			const options = JSON.parse(this.getAttribute('data-options'));
-
-			for (const option of options) {
-				option.options instanceof Array
-					? this.addOptionGroup(option)
-					: this.addOption(option);
-			}
-
+			this.addOptions(options);
 			this.removeAttribute('data-options');
 		}
 
@@ -146,8 +142,29 @@ class ZSelect extends HTMLElement {
 			this.setAttribute('width', this._listWidth());
 		}
 
+		this.preselectHightlighted();
+	}
+
+	preselectHightlighted() {
 		this._preselect(this._highlighted_index >= 0 ? this._highlighted_index : this._first(this._highlighted_index));
 		this._input.value = this.getValueByIndex(this._preselected_index);
+	}
+
+	clearOptions() {
+		this._options_map.clear();
+		this._highlighted_index = -1;
+		this._preselected_index = -1;
+		this._list.innerHTML = '';
+		this._button.innerHTML = '';
+		this._input.value = '';
+	}
+
+	addOptions(options) {
+		for (const option of options) {
+			option.options instanceof Array
+				? this.addOptionGroup(option)
+				: this.addOption(option);
+		}
 	}
 
 	getOptions() {

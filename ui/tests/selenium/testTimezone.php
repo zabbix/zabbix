@@ -242,7 +242,7 @@ class testTimezone extends CWebTest {
 	 * @param string $problem   problem name from monitoring->problems
 	 */
 	private function getProblemTime($problem) {
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 		$row = $table->findRow('Problem', $problem);
 		return date_create($row->getColumn('Time')->getText());
 	}
