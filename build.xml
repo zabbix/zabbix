@@ -419,7 +419,7 @@
 		<echo file="ui/conf/zabbix.conf.php" append="true">];${line.separator}</echo>
 	</target>
 
-	<target name="apply-elasticsearch-patches">
+	<target name="apply-elasticsearch-patches" if="elasticsearch">
 		<exec executable="git" failonerror="on">
 			<arg line="apply"/>
 			<arg line="ui/tests/integration/patches/elasticsearch.patch"/>
@@ -662,7 +662,60 @@
 		</and>
 	</condition>
 
-	<target name="init-integration-postgresql" depends="create-configs,create-frontend-elasticsearch-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-postgresql,create-db-postgresql,create-db-elasticsearch,init-proxy-postgresql">
+	<target name="create-frontend-clickhouse-configs" if="clickhouse">
+		<property name="clickhouse_url" value="${CLICKHOUSE_URL}"/>
+		<property name="clickhouse_user" value="${CLICKHOUSE_USER}"/>
+		<property name="clickhouse_password" value="${CLICKHOUSE_PASSWORD}"/>
+		<property name="clickhouse_dbname" value="${CLICKHOUSE_DBNAME}"/>
+
+		<echo file="ui/conf/zabbix.conf.php" append="true">${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">$HISTORY_PROVIDERS[] = [${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'types' =&gt; ['dbl', 'str', 'log', 'uint', 'text', 'json'],${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'provider' =&gt; 'clickhouse',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'url' =&gt; '${clickhouse_url}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'username' =&gt; '${clickhouse_user}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'password' =&gt; '${clickhouse_password}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'db' =&gt; '${clickhouse_dbname}'${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">];${line.separator}</echo>
+	</target>
+
+	<target name="drop-db-clickhouse" if="clickhouse">
+		<exec executable="curl" failonerror="on">
+			<arg line="--silent"/>
+			<arg line="${clickhouse_url}"/>
+			<arg line="--user ${clickhouse_user}:${clickhouse_password}"/>
+			<arg line="--data 'DROP DATABASE IF EXISTS ${clickhouse_dbname}'"/>
+		</exec>
+	</target>
+
+	<target name="create-db-clickhouse" depends="drop-db-clickhouse" if="clickhouse">
+		<exec executable="curl" failonerror="on">
+			<arg line="--silent"/>
+			<arg line="${clickhouse_url}"/>
+			<arg line="--user ${clickhouse_user}:${clickhouse_password}"/>
+			<arg line="--data 'CREATE DATABASE ${clickhouse_dbname}'"/>
+		</exec>
+		<exec executable="sh" outputproperty="clickhouse_url_full">
+			<arg value="-c"/>
+			<arg value='echo "${clickhouse_url}" | sed "s#^http://#http://${clickhouse_user}:${clickhouse_password}@#"'/>
+		</exec>
+		<exec executable="./history_all.sh" dir="database/clickhouse" failonerror="on">
+			<arg line="--url ${clickhouse_url_full}"/>
+			<arg line="--db ${clickhouse_dbname}"/>
+		</exec>
+	</target>
+
+	<condition property="clickhouse">
+		<and>
+			<isset property="HISTORY_STORAGE"/>
+			<equals arg1="${HISTORY_STORAGE}" arg2="CH"/>
+		</and>
+	</condition>
+
+	<target name="create-frontend-nosql-configs" depends="create-frontend-elasticsearch-configs,create-frontend-clickhouse-configs"/>
+	<target name="create-db-nosql" depends="create-db-elasticsearch,create-db-clickhouse"/>
+
+	<target name="init-integration-postgresql" depends="create-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-postgresql,create-db-postgresql,create-db-nosql,init-proxy-postgresql">
 		<exec executable="psql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -675,7 +728,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-tsdb" depends="create-configs,create-frontend-elasticsearch-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-postgresql,create-db-tsdb,create-db-elasticsearch,init-proxy-postgresql"/>
+	<target name="init-integration-tsdb" depends="create-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-postgresql,create-db-tsdb,create-db-nosql,init-proxy-postgresql"/>
 
 	<target name="init-dast-postgresql" depends="create-frontend-configs,make-dbschema,create-db-postgresql"/>
 
@@ -821,7 +874,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-mysql" depends="create-configs,create-frontend-elasticsearch-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-mysql,create-db-mysql,create-db-elasticsearch,init-proxy-mysql">
+	<target name="init-integration-mysql" depends="create-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-mysql,create-db-mysql,create-db-nosql,init-proxy-mysql">
 		<exec executable="mysql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>

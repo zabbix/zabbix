@@ -599,9 +599,17 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		if (isset($HISTORY_PROVIDERS)) {
-			$db_history['HistoryProvider'] = 'elasticsearch;'.
-				'value_types="'.implode(',', $HISTORY_PROVIDERS[0]['types']).'",'.
-				'url='.$HISTORY_PROVIDERS[0]['url'];
+			foreach ($HISTORY_PROVIDERS as $provider) {
+				$provider_str = $provider['provider'].';'.
+					'value_types="'.implode(',', $provider['types']).'",'.
+					'url='.$provider['url'];
+				foreach (['username', 'password', 'db'] as $key) {
+					if (array_key_exists($key, $provider)) {
+						$provider_str .= ','.$key.'='.$provider[$key];
+					}
+				}
+				$db_history['HistoryProvider'][] = $provider_str;
+			}
 		}
 
 		$configuration = [
