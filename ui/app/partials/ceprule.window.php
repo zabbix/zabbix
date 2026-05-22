@@ -88,10 +88,10 @@ echo (new CObject())
 			->addItem(new CLabel(_('Tag'), 'ceprule-window-groupby-opt-tag'))
 			->addItem(new CObject('&nbsp;'))
 			->addItem(new CObject('&nbsp;'))
-			->addItem((new CTextBox('window[event_count_tag]', $data['window']['event_count_tag']))
+			->addItem((new CTextBox('window[tag]', $data['window']['tag']))
 				->addStyle('line-height: 16px;')
 				->setId('ceprule-window-groupby-tag')
-			),
+			)
 	]))->setId('ceprule-window-groupby')))
 
 	->addItem((new CLabel(_('Event count tag'), 'ceprule-window-counttag'))->setAsteriskMark())

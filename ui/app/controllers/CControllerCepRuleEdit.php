@@ -71,7 +71,7 @@ class CControllerCepRuleEdit extends CController {
 		];
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle($this->ceprule['cep_ruleid'] === null
+		$response->setTitle($this->ceprule['cepruleid'] === null
 			? _('New complex event processing')
 			: _('Complex event processing')
 		);
@@ -123,6 +123,11 @@ class CControllerCepRuleEdit extends CController {
 		if ($ceprule['window']['duration'] == 0) {
 			$ceprule['window']['duration'] = '';
 		}
+
+		// Consistant naming with URL and fields.
+		$ceprule['cepruleid'] = $ceprule['cep_ruleid'] ?? null;
+		unset($ceprule['cep_ruleid']);
+		unset($ceprule['window']['filter']['eval_formula']);
 
 		return $ceprule;
 	}

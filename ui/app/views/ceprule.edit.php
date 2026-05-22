@@ -19,7 +19,7 @@
  * @var array $data
  */
 
-if ($data['ceprule']['cep_ruleid'] === null) {
+if ($data['ceprule']['cepruleid'] === null) {
 	$buttons = [
 		[
 			'title' => _('Add'),
@@ -56,8 +56,8 @@ else {
 $form = (new CForm())
 	// Enable form submitting on Enter.
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
-	->addVar('cepruleid', $data['ceprule']['cep_ruleid'] ?? null)
-	->setId('cep')
+	->addVar('cepruleid', $data['ceprule']['cepruleid'])
+	->setId('cep') // TODO, is this used?
 	->addStyle('display: none;')
 	->addItem((new CFormGrid())
 		->addItem([
@@ -140,7 +140,7 @@ $form = (new CForm())
 	);
 
 $output = [
-	'header' => $data['ceprule']['cep_ruleid'] === null ? _('New complex event processing') : _('Complex event processing'),
+	'header' => $data['ceprule']['cepruleid'] === null ? _('New complex event processing') : _('Complex event processing'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CEPRULE_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,

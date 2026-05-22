@@ -168,7 +168,7 @@ echo (new CForm())
 				->addItem([
 					new CLabel('Operator'),
 					new CFormField(
-						(new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))
+						(new CRadioButtonList('operator', CONDITION_OPERATOR_IN))
 							->setModern()
 							->addValue('In', CONDITION_OPERATOR_IN)
 							->addValue('Not in', CONDITION_OPERATOR_NOT_IN)

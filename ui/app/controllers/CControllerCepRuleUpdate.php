@@ -29,7 +29,6 @@ class CControllerCepRuleUpdate extends CController {
 
 	public static function getValidationRules(): array {
 		// TODO 2: 'conditions' => ['objects', using letters instead of numbers in field names may cause problems.
-		// TODO: state what fields have macro and usermacro support
 		$api_uniq = ['ceprule.get', ['name' => '{name}'], 'cepruleid'];
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
@@ -98,7 +97,7 @@ class CControllerCepRuleUpdate extends CController {
 					],
 				]],
 				'formula' => ['db cep_rule.formula', 'required', 'not_empty',
-					/* 'use' => [CConditionFormula::class, []], // Only parser for syntax check. TODO: we had a work in progress on validator that is not merged yet? */
+					'use' => [CConditionFormulaParser::class, []],
 					'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 				]
 			], /*'use' => [CConditionValidator::class, []] // TODO: something that asserts integrity beyond syntax, i.e. - if formula has all conditions */],
@@ -109,17 +108,17 @@ class CControllerCepRuleUpdate extends CController {
 			'window' => ['object', 'fields' => [
 				'duration' => ['db cep_window.duration', 'required', 'not_empty',
 					'use' => [CTimeUnitValidator::class, [
-						// TODO: specify correct constraints
 						'max' => null, 'min' => 1, 'usermacros' => false, 'lldmacros' => false, 'accept_zero' => false, 'with_year' => false
 					]],
 					'when' => ['../window_type', 'in' => [ZBX_CEP_WINDOW_SIMPLE, ZBX_CEP_WINDOW_CAUSE_SYMPTOM, ZBX_CEP_WINDOW_TAG_MATCH, ZBX_CEP_WINDOW_PATTERN_MATCH]]
 				],
-				'capacity_unlimited' => ['boolean', 'required',
+				'capacity_enabled' => ['boolean', 'required',
 					'when' => ['../window_type', 'in' => [ZBX_CEP_WINDOW_SIMPLE, ZBX_CEP_WINDOW_CAUSE_SYMPTOM, ZBX_CEP_WINDOW_TAG_MATCH, ZBX_CEP_WINDOW_PATTERN_MATCH]]
-				], // field never sent to API - maybe rather implicitly unlimited if capacity = 0 or '' ?
+				],
 				'capacity' => ['db cep_window.capacity', 'required', 'not_empty',
+					'use' => [CNumberValidator::class, ['min' => 1, 'max' => ZBX_MAX_INT64, 'with_float' => false, 'usermacros' => false, 'lldmacros' => false]],
 					'when' => [
-						['capacity_unlimited', 'in' => [1]],
+						['capacity_enabled', 'in' => [1]],
 						['../window_type', 'in' => [ZBX_CEP_WINDOW_SIMPLE, ZBX_CEP_WINDOW_CAUSE_SYMPTOM, ZBX_CEP_WINDOW_TAG_MATCH, ZBX_CEP_WINDOW_PATTERN_MATCH]
 					]
 				]],
@@ -150,7 +149,6 @@ class CControllerCepRuleUpdate extends CController {
 						'evaltype' => ['db cep_rule.evaltype', 'required',
 							'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]
 						],
-						// Type: List of "CEP rule window condition" objects.
 						'conditions' => ['objects', 'fields' => [
 							'type' => ['integer', 'required', 'in' => [ZBX_CEP_WINDOW_CONDITION_TAG_PAIR, ZBX_CEP_WINDOW_CONDITION_OLD_TAG, ZBX_CEP_WINDOW_CONDITION_OLD_TAG_VALUE]],
 							'operator' => [
@@ -174,7 +172,8 @@ class CControllerCepRuleUpdate extends CController {
 							],
 						]],
 						'formula' => ['db cep_rule.formula', 'required', 'not_empty',
-							'use' => [CConditionFormulaParser::class, []], // Only parser for syntax check. TODO: we had work in progress on validator that is not merged yet?
+							// Only parser for syntax check. TODO: we had work in progress on validator that is not merged yet?
+							'use' => [CConditionFormulaParser::class, []],
 							'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 						]
 					]
@@ -257,7 +256,6 @@ class CControllerCepRuleUpdate extends CController {
 			'stop' => ['db cep_rule.stop', 'required', 'in' => [0, 1]], // TODO: no constants?
 			'sortorder' => ['db cep_rule.sortorder', 'required',
 				'use' => [CNumberValidator::class, ['min' => 1, 'max' => ZBX_MAX_INT64, 'with_float' => false, 'usermacros' => false, 'lldmacros' => false]]
-				// TODO: ZBX_MAX_INT64 or ZBX_MAX_INT32 ? What will server handle?
 			],
 			'description' => ['db cep_rule.description'],
 			'status' => ['db cep_rule.status', 'required', 'in' => [ZBX_CEP_STATUS_ENABLED, ZBX_CEP_STATUS_DISABLED]],

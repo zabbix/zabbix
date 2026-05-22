@@ -62,6 +62,7 @@ window.ceprule_condition_edit_popup = new class {
 			.map((node) => {
 				if (node.type === 'radio') {
 					node.checked = node.value === condition[node.name];
+					// TODO: this overwrites time_period first
 				}
 				else {
 					node.value = condition[node.name] ?? '';
