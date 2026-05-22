@@ -36,6 +36,18 @@ class CControllerOauthCheck extends CController {
 
 		$ret = $this->validateInput($fields);
 
+		if ($ret && $this->hasInput('authorization_url')) {
+			$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
+			if (!$url_validator->validate($this->getInput('authorization_url'))) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Authorization endpoint'),
+					$url_validator->getError()
+				));
+
+				$ret = false;
+			}
+		}
+
 		if (!$ret) {
 			$this->setResponse(
 				(new CControllerResponseData([

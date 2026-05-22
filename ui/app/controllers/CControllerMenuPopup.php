@@ -401,7 +401,9 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function sanitizeMapElementUrls(array $urls): array {
 		foreach ($urls as &$url) {
-			if (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false]) === false) {
+			$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
+			if (!$url_validator->validate($url['url'])) {
 				$url['url'] = 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).');';
 			}
 		}
@@ -964,7 +966,9 @@ class CControllerMenuPopup extends CController {
 				? '_blank'
 				: '';
 
-			if (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
+			$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
+			if ($url_validator->validate($url['url'])) {
 				$menu_data_parameters += [
 					'url' => $url['url'],
 					'target' => $target

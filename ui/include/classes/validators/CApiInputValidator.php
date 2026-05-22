@@ -2616,7 +2616,10 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['length']  (optional)
-	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_ALLOW_EVENT_TAGS_MACRO, API_NOT_EMPTY
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO,
+	 *                                             API_ALLOW_MANUALINPUT_MACRO, API_ALLOW_EVENT_TAGS_MACRO.
+	 * @param array  $rule['scheme']  (optional) Validate the URL against a provided URI scheme for
+	 *                                frontend usage. If not passed, scheme validation won't take place.
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -2630,8 +2633,13 @@ class CApiInputValidator {
 			return false;
 		}
 
+		if ($data === '') {
+			return true;
+		}
+
 		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
 			return false;
 		}
 
@@ -2641,8 +2649,14 @@ class CApiInputValidator {
 			'allow_event_tags_macro' => (bool) ($flags & API_ALLOW_EVENT_TAGS_MACRO)
 		];
 
-		if ($data !== '' && CHtmlUrlValidator::validate($data, $options) === false) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('unacceptable URL'));
+		if (array_key_exists('scheme', $rule) && is_array($rule['scheme'])) {
+			$options['schemes'] = $rule['scheme'];
+		}
+
+		$validator = new CUrlValidator($options);
+
+		if (!$validator->validate($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $validator->getError());
 			return false;
 		}
 

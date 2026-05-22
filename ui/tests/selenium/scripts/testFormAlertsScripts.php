@@ -439,7 +439,7 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/url": unacceptable URL.',
+					'details' => 'Invalid parameter "/1/url": unacceptable URL scheme.',
 					'fields' => [
 						'Name' => 'invalid uri schema',
 						'Scope' => 'Manual event action',
@@ -2009,7 +2009,7 @@ class testFormAlertsScripts extends CWebTest {
 				$this->openScriptForm(self::$ids['URI schemes'], false);
 			}
 			else {
-				$this->assertMessage(TEST_BAD, 'Cannot update script', 'Invalid parameter "/1/url": unacceptable URL.');
+				$this->assertMessage(TEST_BAD, 'Cannot update script', 'Invalid parameter "/1/url": unacceptable URL scheme.');
 				CMessageElement::find()->one()->close();
 			}
 		}
