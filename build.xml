@@ -696,7 +696,7 @@
 			<arg line="--silent"/>
 			<arg line="${clickhouse_url}"/>
 			<arg line="--user ${clickhouse_user}:${clickhouse_password}"/>
-			<arg line="--data 'CREATE DATABASE ${clickhouse_dbname}' COMMENT '${now}'"/>
+			<arg line="--data &quot;CREATE DATABASE ${clickhouse_dbname} COMMENT '${now}'&quot;"/>
 		</exec>
 		<exec executable="sh" outputproperty="clickhouse_url_full">
 			<arg value="-c"/>
