@@ -640,7 +640,7 @@ class CFormValidator {
 				options: check.rules.use[1]
 			};
 
-			if (check.rules.messages && 'use' in check.rules.messages) {
+			if ('messages' in check.rules && 'use' in check.rules.messages) {
 				use_validation.error_msg = check.rules.messages.use;
 			}
 
