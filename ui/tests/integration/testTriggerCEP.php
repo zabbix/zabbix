@@ -792,7 +792,8 @@ class testTriggerCEP extends CIntegrationTest {
 	/**
 	 * Send LLD data via sendSenderValues and verify that the item and trigger
 	 * prototypes are instantiated for the discovered component.
-	 * configurationDataProvider configurationProvider
+	 *
+	 * @configurationDataProvider configurationProvider
 	 */
 	public function testPrepareTriggerCEP_LLDDiscovery() {
 		// Reload configuration cache before sending discovery data.
