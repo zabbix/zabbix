@@ -32,6 +32,7 @@
 #include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxregexp.h"
+#include "zbxserialize.h"
 #include "zbxsupervisor_client.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
@@ -338,6 +339,25 @@ static void	cep_worker_delete_events(zbx_cep_task_remote_t *task)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: serialize CEP statistics into a remote task response buffer       *
+ *                                                                            *
+ * Parameters: task - [IN/OUT] remote task with pre-allocated response buffer *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_worker_get_stats(zbx_cep_task_remote_t *task)
+{
+	zbx_cep_stats_t	stats;
+	unsigned char	*ptr = task->response;
+
+	cep_stats_collect(&stats);
+
+	ptr += zbx_serialize_value(ptr, stats.events_accessed);
+	ptr += zbx_serialize_value(ptr, stats.events_processed);
+	(void)zbx_serialize_value(ptr, stats.events_discarded);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: process a remote task                                             *
  *                                                                            *
  * Parameters: worker - [IN]                                                  *
@@ -376,6 +396,9 @@ static void	cep_worker_process_task_remote(zbx_cep_worker_t *worker, zbx_cep_tas
 			break;
 		case ZBX_CEP_DELETE_EVENTS:
 			cep_worker_delete_events(task);
+			break;
+		case ZBX_CEP_GET_STATS:
+			cep_worker_get_stats(task);
 			break;
 	}
 

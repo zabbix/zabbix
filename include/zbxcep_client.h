@@ -33,6 +33,7 @@
 #define ZBX_CEP_ADD_EVENT_TAGS		(ZBX_IPC_RTC_MAX + 8)
 #define ZBX_CEP_DELETE_EVENTS		(ZBX_IPC_RTC_MAX + 9)
 #define ZBX_CEP_CHECK_TRIGGER_DEPS	(ZBX_IPC_RTC_MAX + 10)
+#define ZBX_CEP_GET_STATS		(ZBX_IPC_RTC_MAX + 11)
 
 typedef enum
 {
@@ -114,6 +115,8 @@ typedef struct
 	zbx_uint64_t	events_discarded;
 }
 zbx_cep_stats_t;
+
+int	zbx_cep_get_stats(zbx_cep_stats_t *stats, char **error);
 
 #endif
 

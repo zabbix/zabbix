@@ -228,6 +228,26 @@ static void	cep_manager_check_trigger_deps(zbx_cep_manager_t *manager, zbx_ipc_c
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get cep statistics                                                *
+ *                                                                            *
+ * Parameters: manager - [IN/OUT] CEP manager                                 *
+ *             client  - [IN/OUT] IPC client requesting the statistics        *
+ *             message - [IN/OUT] IPC message from the client                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_manager_get_stats(zbx_cep_manager_t *manager, zbx_ipc_client_t **client,
+	zbx_ipc_message_t **message)
+{
+	unsigned char*	response;
+	zbx_uint32_t	reponse_len = sizeof(zbx_uint64_t) * 3;
+
+	response = (unsigned char*)zbx_malloc(NULL, reponse_len);
+
+	cep_manager_add_remote_task(manager, client, message, response, reponse_len);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: send remote CEP task response if available                        *
  *                                                                            *
  * Parameters: task - [IN] remote CEP task descriptor                         *
@@ -473,6 +493,9 @@ void	*zbx_cep_manager_thread(void *args)
 					break;
 				case ZBX_CEP_CHECK_TRIGGER_DEPS:
 					cep_manager_check_trigger_deps(manager, &client, &message);
+					break;
+				case ZBX_CEP_GET_STATS:
+					cep_manager_get_stats(manager, &client, &message);
 					break;
 				case ZBX_CEP_ADD_EVENTS:
 				case ZBX_CEP_ADD_USER_CLOSE_EVENT:

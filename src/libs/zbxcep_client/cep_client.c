@@ -953,3 +953,56 @@ int	zbx_cep_check_trigger_deps(zbx_uint64_t triggerid)
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve statistics from the CEP service                          *
+ *                                                                            *
+ * Parameters: stats - [OUT] populated with event counters from CEP service   *
+ *             error - [OUT] error message if the operation fails             *
+ *                                                                            *
+ * Return value: SUCCEED on success, FAIL otherwise                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cep_get_stats(zbx_cep_stats_t *stats, char **error)
+{
+	zbx_ipc_socket_t	socket;
+	char			*errmsg = NULL;
+	int			ret = FAIL;
+	zbx_ipc_message_t	response = {0};
+	unsigned char		*ptr;
+
+	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_CEP, SEC_PER_MIN, &errmsg))
+	{
+		*error = zbx_dsprintf(NULL, "cannot connect to CEP service: %s", errmsg);
+		zbx_free(errmsg);
+		return ret;
+	}
+
+	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_GET_STATS, NULL, 0))
+	{
+		*error = zbx_strdup(NULL, "cannot send delete events message to CEP service");
+		goto out;
+	}
+
+	if (FAIL == zbx_ipc_socket_read(cep_client_socket(), &response))
+	{
+		*error = zbx_strdup(NULL, "cannot send delete events message to CEP service");
+		goto out;
+	}
+
+	ptr = response.data;
+	ptr += zbx_deserialize_value(ptr, &stats->events_accessed);
+	ptr += zbx_deserialize_value(ptr, &stats->events_processed);
+	(void)zbx_deserialize_value(ptr, &stats->events_discarded);
+
+	zbx_ipc_message_clean(&response);
+
+	ret = SUCCEED;
+out:
+	zbx_ipc_socket_close(&socket);
+
+	return ret;
+}
+
+
