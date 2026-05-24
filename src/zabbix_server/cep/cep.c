@@ -103,6 +103,10 @@ struct zbx_cep
 	zbx_uint64_t			eventid_last;
 
 	zbx_dbconn_pool_t		*dbpool;
+
+	zbx_atomic_uint64_t		events_accessed_num;
+	zbx_atomic_uint64_t		events_processed_num;
+	zbx_atomic_uint64_t		events_discarded_num;
 };
 
 static void	cep_event_clear(zbx_cep_event_t *event)
@@ -277,6 +281,7 @@ zbx_cep_t	*cep_create(void)
 	zbx_cep_t	*cep;
 
 	cep = (zbx_cep_t *)zbx_malloc(NULL, sizeof(zbx_cep_t));
+	memset(cep, 0, sizeof(zbx_cep_t));
 
 	zbx_hashset_create_ext(&cep->events, 100, cep_event_ptr_hash, cep_event_ptr_compare,
 			NULL, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
@@ -284,9 +289,6 @@ zbx_cep_t	*cep_create(void)
 
 	zbx_hashset_create_ext(&cep->objects, 100, cep_object_hash, cep_object_compare, cep_object_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
-
-	cep->eventid_next = 0;
-	cep->eventid_last = 0;
 
 	return cep;
 }
@@ -1618,5 +1620,27 @@ void	cep_dump(zbx_cep_t *cep, const char *msg)
 
 	/* WDN remove */
 	zbx_set_log_level(log_level);
+}
+
+void	cep_update_events_accessed(zbx_cep_t *cep, zbx_uint64_t value)
+{
+	atomic_fetch_add(&cep->events_accessed_num, value);
+}
+
+void	cep_update_events_processed(zbx_cep_t *cep, zbx_uint64_t value)
+{
+	atomic_fetch_add(&cep->events_processed_num, value);
+}
+
+void	cep_update_events_discarded(zbx_cep_t *cep, zbx_uint64_t value)
+{
+	atomic_fetch_add(&cep->events_discarded_num, value);
+}
+
+void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats)
+{
+	stats->events_accessed = atomic_load(&cep->events_accessed_num);
+	stats->events_processed = atomic_load(&cep->events_processed_num);
+	stats->events_discarded = atomic_load(&cep->events_discarded_num);
 }
 

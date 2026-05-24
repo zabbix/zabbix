@@ -79,6 +79,7 @@ static void	cep_worker_assess_trigger_events(zbx_cep_task_remote_t *task)
 	for (int i = 0; i < queries.values_num; i++)
 		zbx_cep_assessment_query_clear(&queries.values[i]);
 
+	cep_stats_update_events_accessed((zbx_uint64_t)queries.values_num);
 	zbx_vector_cep_assessment_query_destroy(&queries);
 }
 
@@ -402,7 +403,10 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	cep_cache_release(&cep);
 
 	if (0 == eventid)
+	{
+		cep_stats_update_events_discarded(1);
 		return;
+	}
 
 	db_event->eventid = eventid;
 
@@ -413,6 +417,8 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	cep_cache_acquire(&cep);
 	h = zbx_cep_event_handle_addref(cep_add_event(cep, event));
 	cep_cache_release(&cep);
+
+	cep_stats_update_events_processed(1);
 
 	zbx_vector_mw_task_ptr_t	tasks;
 	int				corr_ret;
@@ -522,7 +528,12 @@ static void	cep_worker_close_trigger_event(zbx_cep_task_event_t *task)
 	cep_cache_release(&cep);
 
 	if (0 != r_eventid)
+	{
 		cep_worker_resolve_trigger_events(db_event, r_eventid, &handles, task);
+		cep_stats_update_events_processed(1);
+	}
+	else
+		cep_stats_update_events_discarded(1);
 
 	zbx_vector_cep_event_handle_destroy(&handles);
 
@@ -563,7 +574,10 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 	cep_cache_release(&cep);
 
 	if (0 == eventid)
+	{
+		cep_stats_update_events_discarded(1);
 		return;
+	}
 
 	db_event->eventid = eventid;
 
@@ -574,6 +588,8 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 	cep_cache_acquire(&cep);
 	(void)cep_add_event(cep, event);
 	cep_cache_release(&cep);
+
+	cep_stats_update_events_processed(1);
 
 	task->event_op = CEP_EVENT_OPEN;
 
@@ -598,7 +614,12 @@ static void	cep_worker_close_internal_event(zbx_cep_task_event_t *task)
 	cep_cache_release(&cep);
 
 	if (0 == eventid)
+	{
+		cep_stats_update_events_discarded(1);
 		return;
+	}
+
+	cep_stats_update_events_processed(1);
 
 	db_event->eventid = eventid;
 	task->event_op = CEP_EVENT_CLOSE;
@@ -692,7 +713,12 @@ static void	cep_worker_process_task_close_event(zbx_cep_task_close_event_t *task
 	cep_cache_release(&cep);
 
 	if (0 != r_eventid)
+	{
 		cep_worker_resolve_trigger_events(db_event, r_eventid, &handles, &task->parent);
+		cep_stats_update_events_processed(1);
+	}
+	else
+		cep_stats_update_events_discarded(1);
 
 	zbx_vector_cep_event_handle_destroy(&handles);
 

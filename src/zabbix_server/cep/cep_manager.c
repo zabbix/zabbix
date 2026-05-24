@@ -396,6 +396,7 @@ void	*zbx_cep_manager_thread(void *args)
 	zbx_cep_manager_t			*manager;
 	zbx_vector_mw_task_ptr_t		tasks;
 	int					shutdown = 0;
+	zbx_cep_stats_t				stats = {0};
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -431,9 +432,24 @@ void	*zbx_cep_manager_thread(void *args)
 
 		if (STAT_INTERVAL < time_start - time_stat)
 		{
-			// TODO: update activity in supervisor
+			zbx_cep_stats_t	stats_tmp;
+			zbx_uint64_t	accessed_num, processed_num, discarded_num;
+
+			cep_stats_collect(&stats_tmp);
+
+			accessed_num = stats_tmp.events_accessed - stats.events_accessed;
+			processed_num = stats_tmp.events_processed - stats.events_processed;
+			discarded_num = stats_tmp.events_discarded - stats.events_discarded;
+
+			zbx_supervisor_update_activity("%s #%d [assessed:" ZBX_FS_UI64 " processed:" ZBX_FS_UI64
+					" discarded:" ZBX_FS_UI64 " events, idle %.1fs, during %.1fs]",
+					get_process_type_string(process_type), process_num,
+					accessed_num, processed_num, discarded_num,
+					time_idle, time_start - time_stat);
+
 			time_stat = time_start;
 			time_idle = 0;
+			stats = stats_tmp;
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
@@ -443,6 +459,8 @@ void	*zbx_cep_manager_thread(void *args)
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		double	time_now = zbx_time();
+
+		time_idle += time_now - time_start;
 
 		zbx_prof_update(get_process_type_string(process_type), time_now);
 

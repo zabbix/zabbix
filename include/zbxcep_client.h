@@ -19,6 +19,7 @@
 #include "zbxtypes.h"
 #include "zbxdbhigh.h"
 #include "zbx_rtc_constants.h"
+#include "zbxtypes_ext.h"
 
 #define ZBX_IPC_SERVICE_CEP	"cep"
 
@@ -106,6 +107,13 @@ void	zbx_cep_deserialize_ids(const unsigned char *data, zbx_vector_uint64_t *ids
 
 int	zbx_cep_check_trigger_deps(zbx_uint64_t triggerid);
 
-#endif
+typedef struct
+{
+	zbx_uint64_t	events_accessed;
+	zbx_uint64_t	events_processed;
+	zbx_uint64_t	events_discarded;
+}
+zbx_cep_stats_t;
 
+#endif
 

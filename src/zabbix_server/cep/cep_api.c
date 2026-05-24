@@ -288,4 +288,23 @@ void	zbx_cep_event_handle_release(zbx_cep_event_handle_t h)
 	zbx_cep_event_release(event);
 }
 
+void	cep_stats_update_events_accessed(zbx_uint64_t value)
+{
+	cep_update_events_accessed(cache_guard->cep, value);
+}
+
+void	cep_stats_update_events_processed(zbx_uint64_t value)
+{
+	cep_update_events_processed(cache_guard->cep, value);
+}
+
+void	cep_stats_update_events_discarded(zbx_uint64_t value)
+{
+	cep_update_events_discarded(cache_guard->cep, value);
+}
+
+void	cep_stats_collect(zbx_cep_stats_t *stats)
+{
+	cep_get_stats(cache_guard->cep, stats);
+}
 
