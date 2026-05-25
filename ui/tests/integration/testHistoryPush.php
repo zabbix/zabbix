@@ -218,7 +218,7 @@ class testHistoryPush extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'LogFileSize' => 0,
-				'DebugLevel' => 5
+				'DebugLevel' => 4
 			]
 		];
 	}
