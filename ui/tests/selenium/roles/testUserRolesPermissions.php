@@ -17,6 +17,7 @@
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 use Facebook\WebDriver\WebDriverKeys;
@@ -31,14 +32,15 @@ use Facebook\WebDriver\WebDriverKeys;
 class testUserRolesPermissions extends CWebTest {
 
 	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
+	 * Attach MessageBehavior, TableBehavior and DatatableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
 			CMessageBehavior::class,
-			CTableBehavior::class
+			CTableBehavior::class,
+			CDatatableBehavior::class
 		];
 	}
 
@@ -479,7 +481,8 @@ class testUserRolesPermissions extends CWebTest {
 
 		foreach ([true, false] as $action_status) {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-			$row = $this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Test trigger with tag');
+			$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+			$row = $table->findRow('Problem', 'Test trigger with tag');
 			$row->getColumn('Update')->query('link:Update')->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
@@ -489,7 +492,7 @@ class testUserRolesPermissions extends CWebTest {
 			// Check that problem actions works after they were turned on.
 			if ($action_status === false) {
 				$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-				$row->getColumn('Update')->query('link:Update')->waitUntilCLickable()->one()->click();
+				$row->getColumn('Update')->query('link:Update')->waitUntilClickable()->one()->click();
 				COverlayDialogElement::find()->waitUntilReady()->one();
 
 				if ($data['activityid'] === 'message') {
@@ -497,8 +500,11 @@ class testUserRolesPermissions extends CWebTest {
 					$dialog->query('button:Update')->one()->click();
 					$dialog->ensureNotPresent();
 					$this->page->waitUntilReady();
-					$row->getColumn('Actions')->query("xpath:.//button[".
-							CXPathHelper::fromClass('zi-alert-with-content')."]")->one()->click();
+					$table->waitUntilReady()->invalidate();
+
+					// Variable row cannot be reused here as it becomes stalled in the problems page.
+					$table->findRow('Problem', 'Test trigger with tag')->getColumn('Actions')->query("xpath:.//button[".
+							CXPathHelper::fromClass('zi-alert-with-content')."]")->one()->scrollIntoView(50)->click();
 					$message_hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
 					$value = $message_hint->query('class:list-table')->asTable()->one()->getRow(0)->getColumn($data['column'])->getText();
 					$this->assertEquals($data['value'], $value);
@@ -513,6 +519,8 @@ class testUserRolesPermissions extends CWebTest {
 					$dialog->query('button:Update')->one()->click();
 					$dialog->ensureNotPresent();
 					$this->page->waitUntilReady();
+					$table->waitUntilReady();
+					$row->invalidate();
 					$status = $row->getColumn($data['column'])->getText();
 					$this->assertEquals($data['value'], $status);
 				}
@@ -548,7 +556,7 @@ class testUserRolesPermissions extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view&name=Problem trap>150 [Cause]');
 
 		// Check context menu 'Mark as cause' & 'Mark selected as symptoms' options accessibility.
-		$table = $this->getTable();
+		$table = $this->getDatatable();
 		$table->query('link', 'Problem trap>150 [Cause]')->waitUntilVisible()->one()->click();
 		$context_menu = CPopupMenuElement::find()->waitUntilVisible()->one();
 
@@ -571,7 +579,7 @@ class testUserRolesPermissions extends CWebTest {
 		COverlayDialogElement::closeAll();
 
 		// Check 'Convert to cause' checkbox state via mass update form.
-		$this->selectTableRows();
+		$this->selectDatatableRows();
 		$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 		$this->assertTrue(COverlayDialogElement::find()->waitUntilReady()->one()->asForm()
 				->getField('Convert to cause')->isEnabled($data['state'])
@@ -597,7 +605,7 @@ class testUserRolesPermissions extends CWebTest {
 		foreach ([true, false] as $action_status) {
 			// Problem page.
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-			$problem_row = $this->query('class:list-table')->asTable()->one()->findRow('Problem', $problem);
+			$problem_row = $this->query('id:problems')->asDatatable()->one()->waitUntilReady()->findRow('Problem', $problem);
 			$this->assertEquals($action_status, $problem_row->getColumn('Update')->query('xpath:.//*[text()="Update"]')
 					->one()->isAttributePresent('href'));
 
@@ -1795,13 +1803,12 @@ class testUserRolesPermissions extends CWebTest {
 		// Login and select host group for testing.
 		$this->page->userLogin($data['user'], 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=latest.view')->waitUntilReady();
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table fixed').']')->asTable()->one();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
-		$table->waitUntilReloaded();
+		$table = $this->query('id:latest')->asDatatable()->one()->waitUntilReady();
 
-		$selected_count = $this->query('id:selected_count')->one();
+		$selected_count = $this->query('class:selected-item-count')->one()->waitUntilVisible();
 		$select_all = $this->query('id:all_items')->asCheckbox()->one();
 
 		foreach ($data['test_cases'] as $test_case) {
@@ -1903,12 +1910,12 @@ class testUserRolesPermissions extends CWebTest {
 		// Login and select host group for testing.
 		$this->page->userLogin($data['user'], 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=latest.view&filter_reset=1')->waitUntilReady();
-		$table = $this->getTable();
+		$table = $this->getDatatable();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
-		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
+		$table->waitUntilReady()->invalidate();
 
 		foreach ($data['test_cases'] as $test_case) {
 			// Disabled "Execute now" option in context menu.
