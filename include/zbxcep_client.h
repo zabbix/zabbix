@@ -19,6 +19,7 @@
 #include "zbxtypes.h"
 #include "zbxdbhigh.h"
 #include "zbx_rtc_constants.h"
+#include "zbxtypes_ext.h"
 
 #define ZBX_IPC_SERVICE_CEP	"cep"
 
@@ -31,6 +32,9 @@
 #define ZBX_CEP_UPDATE_SEVERITIES	(ZBX_IPC_RTC_MAX + 7)
 #define ZBX_CEP_ADD_EVENT_TAGS		(ZBX_IPC_RTC_MAX + 8)
 #define ZBX_CEP_DELETE_EVENTS		(ZBX_IPC_RTC_MAX + 9)
+#define ZBX_CEP_CHECK_TRIGGER_DEPS	(ZBX_IPC_RTC_MAX + 10)
+#define ZBX_CEP_GET_STATS		(ZBX_IPC_RTC_MAX + 11)
+
 typedef enum
 {
 	CEP_EVENT_ALLOW,
@@ -102,6 +106,21 @@ void	zbx_buffer_serialize_event_tags(unsigned char **data, zbx_uint32_t *data_al
 void	zbx_cep_send_deleted_events(const zbx_uint64_t *eventids, int eventids_num);
 void	zbx_cep_deserialize_ids(const unsigned char *data, zbx_vector_uint64_t *ids);
 
-#endif
+int	zbx_cep_check_trigger_deps(zbx_uint64_t triggerid);
 
+typedef struct
+{
+	zbx_uint64_t	events_accessed;
+	zbx_uint64_t	events_processed;
+	zbx_uint64_t	events_discarded;
+
+	int		task_remote_num;
+	int		task_internal_num;
+	int		task_completed_num;
+}
+zbx_cep_stats_t;
+
+int	zbx_cep_get_stats(zbx_cep_stats_t *stats, char **error);
+
+#endif
 

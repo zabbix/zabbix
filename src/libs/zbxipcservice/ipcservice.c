@@ -26,6 +26,7 @@
 #include "zbxalgo.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxexit.h"
 
 #define ZBX_IPC_DATA_DUMP_SIZE		128
 
@@ -1062,6 +1063,24 @@ static void	ipc_service_timer_cb(evutil_socket_t fd, short what, void *arg)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: alert callback                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	ipc_service_alert_cb(evutil_socket_t fd, short what, void *arg)
+{
+	char			buf[16];
+	zbx_ipc_service_t	*service = (zbx_ipc_service_t *)arg;
+
+	ZBX_UNUSED(what);
+
+	while (read(fd, buf, sizeof(buf)) > 0)
+		;
+
+	event_base_loopbreak(service->ev);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: checks if an IPC service is already running                       *
  *                                                                            *
  * Parameters: service_name - [IN]                                            *
@@ -1359,13 +1378,6 @@ void	zbx_ipc_message_copy(zbx_ipc_message_t *dst, const zbx_ipc_message_t *src)
 }
 #endif /* HAVE_OPENIPMI */
 
-static void	ipc_service_user_cb(evutil_socket_t fd, short what, void *arg)
-{
-	ZBX_UNUSED(fd);
-	ZBX_UNUSED(what);
-	ZBX_UNUSED(arg);
-}
-
 /*
  * Public service API
  */
@@ -1526,7 +1538,14 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 	event_add(service->ev_listener, NULL);
 
 	service->ev_timer = event_new(service->ev, -1, 0, ipc_service_timer_cb, service);
-	service->ev_alert = event_new(service->ev, -1, 0, ipc_service_user_cb, NULL);
+
+	pipe(service->alert_pipe);
+	evutil_make_socket_nonblocking(service->alert_pipe[0]);
+	evutil_make_socket_nonblocking(service->alert_pipe[1]);
+
+	service->ev_alert = event_new(service->ev, service->alert_pipe[0], EV_READ | EV_PERSIST, ipc_service_alert_cb,
+			service);
+	event_add(service->ev_alert, NULL);
 
 	service->next_clientid = 1;
 
@@ -1577,6 +1596,9 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 	event_free(service->ev_timer);
 	event_free(service->ev_listener);
 	event_base_free(service->ev);
+
+	close(service->alert_pipe[0]);
+	close(service->alert_pipe[1]);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1668,7 +1690,9 @@ int	zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeo
  ******************************************************************************/
 void	zbx_ipc_service_alert(zbx_ipc_service_t *service)
 {
-	event_active(service->ev_alert, 0, 0);
+	char	byte = 1;
+
+	write(service->alert_pipe[1], &byte, 1);
 }
 
 /******************************************************************************

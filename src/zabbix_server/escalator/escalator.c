@@ -48,6 +48,7 @@
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
 #endif
+#include "zbxexit.h"
 
 #define CONFIG_ESCALATOR_FREQUENCY	3
 
@@ -2355,7 +2356,7 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 	if (NULL != *error)
 		goto out;
 
-	*ignore = (SUCCEED == zbx_dc_config_check_trigger_dependencies(trigger.triggerid) ? 0 : 1);
+	*ignore = (SUCCEED == zbx_cep_check_trigger_deps(trigger.triggerid) ? 0 : 1);
 
 	ret = SUCCEED;
 out:

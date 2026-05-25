@@ -46,7 +46,7 @@ static zbx_cep_guard_t	*cache_guard;
 static zbx_cep_guard_t	*cep_guard_create(char **error)
 {
 	zbx_cep_guard_t	*guard;
-	int			err;
+	int		err;
 
 	guard = (zbx_cep_guard_t *)zbx_malloc(NULL, sizeof(zbx_cep_guard_t));
 
@@ -256,12 +256,12 @@ void	zbx_cep_get_events_by_updates(zbx_cep_event_update_t *updates, int updates_
  * Parameters: handles - [OUT] vector to store handles of retrieved events    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_cep_get_events(zbx_vector_cep_event_handle_t *handles)
+void	zbx_cep_get_events(unsigned char source, zbx_vector_cep_event_handle_t *handles)
 {
 	zbx_cep_t	*cep;
 
 	cep_cache_acquire(&cep);
-	cep_get_events(cep, handles);
+	cep_get_events(cep, source, handles);
 	cep_cache_release(&cep);
 }
 
@@ -288,4 +288,23 @@ void	zbx_cep_event_handle_release(zbx_cep_event_handle_t h)
 	zbx_cep_event_release(event);
 }
 
+void	cep_stats_update_events_accessed(zbx_uint64_t value)
+{
+	cep_update_events_accessed(cache_guard->cep, value);
+}
+
+void	cep_stats_update_events_processed(zbx_uint64_t value)
+{
+	cep_update_events_processed(cache_guard->cep, value);
+}
+
+void	cep_stats_update_events_discarded(zbx_uint64_t value)
+{
+	cep_update_events_discarded(cache_guard->cep, value);
+}
+
+void	cep_stats_collect(zbx_cep_stats_t *stats)
+{
+	cep_get_stats(cache_guard->cep, stats);
+}
 

@@ -17,8 +17,10 @@
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
+#include "zbxtypes_ext.h"
 
 static zbx_dc_config_local_t	*config_local = NULL;
+static zbx_atomic_uint32_t	config_local_refcount = 0;
 
 void	zbx_dc_config_local_init(void)
 {
@@ -29,10 +31,34 @@ void	zbx_dc_config_local_init(void)
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	config_local->correlation_cache = correlation_cache_create();
+
+	atomic_fetch_add(&config_local_refcount, 1);
 }
 
-void	zbx_dc_config_local_destroy(void)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: increment local configuration cache reference count               *
+ *                                                                            *
+ * Comments: Must be called during startup of each thread-based component     *
+ *           that uses the configuration cache.                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_config_local_addref(void)
 {
+	atomic_fetch_add(&config_local_refcount, 1);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decrement local configuration cache reference count and free      *
+ *          resources when the last reference is released                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_config_local_release(void)
+{
+	if (1 != atomic_fetch_sub(&config_local_refcount, 1))
+		return;
+
 	zbx_hashset_destroy(&config_local->item_tag_links);
 	correlation_cache_destroy(config_local->correlation_cache);
 	zbx_free(config_local);

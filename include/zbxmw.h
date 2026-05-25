@@ -133,6 +133,7 @@ void	zbx_mw_queue_push_completed(zbx_mw_queue_t *queue, zbx_mw_task_t *task);
 void	zbx_mw_queue_push_completed_direct(zbx_mw_queue_t *queue, zbx_mw_task_t *task);
 zbx_mw_task_t	*zbx_mw_queue_pop_completed(zbx_mw_queue_t *queue);
 int	zbx_mw_queue_drain_completed(zbx_mw_queue_t *queue, zbx_vector_mw_task_ptr_t *tasks);
+void	zbx_mw_queue_get_stats(zbx_mw_queue_t *queue, int *priority_num, int *normal_num, int *completed_num);
 
 int	zbx_mw_manager_init(zbx_mw_manager_t *manager, const zbx_thread_info_t *info, const char *service,
 		unsigned char worker_process_type, zbx_mw_worker_t **workers, int workers_max, int workers_num,

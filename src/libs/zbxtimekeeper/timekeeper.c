@@ -15,6 +15,7 @@
 #include "zbxtimekeeper.h"
 
 #include "zbxalgo.h"
+#include "zbxexit.h"
 
 #define MAX_HISTORY	60
 

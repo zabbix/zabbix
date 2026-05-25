@@ -164,13 +164,14 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_db_
 		zbx_vector_uint64_uniq(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		sql_offset = 0;
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids.values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", triggerids.values,
 				triggerids.values_num);
 
 		result = zbx_db_select(
-				"select triggerid,description,expression,priority,comments,url,url_name,recovery_expression,"
-					"recovery_mode,value,opdata,event_name"
-				" from triggers"
+				"select t.triggerid,t.description,t.expression,t.priority,t.comments,t.url,t.url_name,"
+				" t.recovery_expression,t.recovery_mode,rt.value,t.opdata,t.event_name"
+				" from triggers t"
+				" join trigger_rtdata rt on t.triggerid=rt.triggerid"
 				" where%s",
 				sql);
 
@@ -406,9 +407,10 @@ void	zbx_db_get_event_data_triggers(zbx_db_event *event)
 	if (0 != (ZBX_FLAGS_DB_EVENT_RETRIEVED_TRIGGERS & event->flags) || EVENT_OBJECT_TRIGGER != event->object)
 		return;
 
-	result = zbx_db_select("select description,expression,priority,comments,url,url_name,recovery_expression,"
-			"recovery_mode,value,opdata,event_name"
-			" from triggers"
+	result = zbx_db_select("select t.description,t.expression,t.priority,t.comments,t.url,t.url_name,"
+			"t.recovery_expression,t.recovery_mode,rt.value,t.opdata,t.event_name"
+			" from triggers t"
+			" join trigger_rtdata rt on t.triggerid=rt.triggerid"
 			" where triggerid=" ZBX_FS_UI64, event->objectid);
 
 	if (NULL != (row = zbx_db_fetch(result)))

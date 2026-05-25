@@ -83,14 +83,7 @@ $form_grid = (new CFormGrid())
 	]);
 
 $form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag('
-			service_status_rule_edit_popup.init('.json_encode([
-				'rules' => $data['js_validation_rules']
-			]).');
-		'))->setOnDocumentReady()
-	);
+	->addItem($form_grid);
 
 $output = [
 	'header' => $data['is_edit'] ? _('Additional rule') : _('New additional rule'),
@@ -98,13 +91,16 @@ $output = [
 	'buttons' => [
 		[
 			'title' => $data['is_edit'] ? _('Update') : _('Add'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'service_status_rule_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	],
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('popup.service.statusrule.edit.js.php')
+		$this->readJsFile('popup.service.statusrule.edit.js.php').
+		'service_status_rule_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules']
+		]).');'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

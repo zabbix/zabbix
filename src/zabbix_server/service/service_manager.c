@@ -21,6 +21,7 @@
 
 #include "zbxcep.h"
 #include "zbxcep_client.h"
+#include "zbxcommon.h"
 #include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxalgo.h"
@@ -40,6 +41,7 @@
 #include "zbxthreads.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_rtc_constants.h"
+#include "zbxexit.h"
 
 ZBX_PTR_VECTOR_IMPL(service_update_ptr, zbx_service_update_t *)
 ZBX_PTR_VECTOR_IMPL(service_action_condition_ptr, zbx_service_action_condition_t *)
@@ -3306,22 +3308,21 @@ static void	recalculate_services(zbx_service_manager_t *service_manager, zbx_dbc
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_cep_event_handle_create(&handles);
-	zbx_cep_get_events(&handles);
+	zbx_cep_get_events(EVENT_SOURCE_TRIGGERS, &handles);
 
 	flags = ZBX_FLAG_SERVICE_RECALCULATE;
 
 	for (int i = 0; i < handles.values_num; i += EVENT_BATCH_SIZE)
 	{
 		int	events_num = MIN(EVENT_BATCH_SIZE, handles.values_num - i);
-		int	offset = i * EVENT_BATCH_SIZE;
 
-		zbx_cep_get_events_by_handles(handles.values + offset, events_num, events);
+		zbx_cep_get_events_by_handles(handles.values + i, events_num, events);
 
 		for (int j = 0; j < events_num; j++)
 		{
 			if (NULL == events[j])
 			{
-				process_deleted_problems(service_manager, &handles.values[offset + j], 1);
+				process_deleted_problems(service_manager, &handles.values[i + j], 1);
 				continue;
 			}
 
@@ -3329,7 +3330,7 @@ static void	recalculate_services(zbx_service_manager_t *service_manager, zbx_dbc
 				&service_manager->service_diffs, flags);
 
 			zbx_cep_event_release(events[j]);
-			zbx_cep_event_handle_release(handles.values[i * EVENT_BATCH_SIZE + j]);
+			zbx_cep_event_handle_release(handles.values[i + j]);
 		}
 	}
 
@@ -3485,7 +3486,6 @@ void	*zbx_service_manager_thread(void *args)
 	double				time_stat, time_idle = 0, time_now, time_flush = 0, time_cleanup = 0, sec;
 	zbx_service_manager_t		service_manager;
 	zbx_timespec_t			timeout = {1, 0};
-	sigjmp_buf			jmp_ret;
 	zbx_dbconn_t			*db;
 
 	const zbx_thread_service_manager_args	*service_manager_args_in =
@@ -3498,8 +3498,6 @@ void	*zbx_service_manager_thread(void *args)
 	zbx_set_log_component(process_title, unit_args->logger);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
-
-	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -3520,6 +3518,8 @@ void	*zbx_service_manager_thread(void *args)
 	sync_service_problems(&service_manager.services, db, &service_manager.service_problems_index);
 	recalculate_services(&service_manager, unit_args->shared->dbpool);
 	zbx_dbconn_pool_release_connection(unit_args->shared->dbpool, db);
+
+	zbx_dc_config_local_addref();
 
 	zbx_supervisor_update_activity("%s #%d started", get_process_type_string(process_type), process_num);
 	zbx_supervisor_set_process_running(server_num);
@@ -3666,6 +3666,8 @@ void	*zbx_service_manager_thread(void *args)
 		if (0 == running || !ZBX_IS_RUNNING())
 			break;
 	}
+
+	zbx_dc_config_local_release();
 
 	zbx_ipc_service_close(&service);
 	service_manager_free(&service_manager);

@@ -14,6 +14,7 @@
 
 #include "zbxalgo.h"
 #include "algodefs.h"
+#include "zbxexit.h"
 
 static void	__hashset_free_entry(zbx_hashset_t *hs, ZBX_HASHSET_ENTRY_T *entry);
 

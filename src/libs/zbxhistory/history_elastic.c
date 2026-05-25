@@ -29,6 +29,7 @@
 #include "zbxvariant.h"
 #include "zbxcurl.h"
 #include "zbxcacheconfig.h"
+#include "zbxexit.h"
 
 #define		ZBX_HISTORY_STORAGE_DOWN	10000 /* Timeout in milliseconds */
 

@@ -16,6 +16,7 @@
 /* or libraries/files it depends on */
 
 #include "zbxcommon.h"
+#include "zbxexit.h"
 
 /******************************************************************************
  *                                                                            *

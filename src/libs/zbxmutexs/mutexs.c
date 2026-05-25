@@ -13,6 +13,7 @@
 **/
 
 #include "zbxmutexs.h"
+#include "zbxexit.h"
 
 #ifdef _WINDOWS
 #	include "zbxsysinfo.h"

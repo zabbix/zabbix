@@ -783,16 +783,21 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['boolean', 'required']
+					'value' => ['boolean', 'in' => [1]]
 				]],
 				['type' => 'object', 'fields' => [
 					'value' => [[
 						'type' => 'integer',
-						'in' => [1],
-						'required' => true,
-						'messages' => ['in' => 'Must be selected.']
+						'in' => [1]
 					]]
 				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['boolean', 'in' => [1, 2]]
+				]],
+				null,
+				'[RULES ERROR] Invalid value for rule "in" for type "boolean" (Path: /value)'
 			],
 			[
 				['object', 'fields' => [
@@ -1107,6 +1112,14 @@ class CFormValidatorTest extends TestCase {
 							'message' => 'Must have 3-100 items with field2 equal to 1 or 2.'
 						]]
 					]]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'color' => ['string', 'rgb']
+				]],
+				['type' => 'object', 'fields' => [
+					'color' => [['type' => 'string', 'regex' => '/^[0-9a-f]{6}$/i']]
 				]]
 			]
 		];
@@ -1764,7 +1777,7 @@ class CFormValidatorTest extends TestCase {
 				[],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'This value must be no less than "5".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+					['message' => 'Value must be greater than or equal to 5.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
 			],
 			[
@@ -1793,7 +1806,7 @@ class CFormValidatorTest extends TestCase {
 				[],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'This value must be no greater than "5".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+					['message' => 'Value must be less than or equal to 5.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
 			],
 			[
@@ -2398,6 +2411,86 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
+					'value' => ['string', 'in' => [1, 2, 3]]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => ['1']]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'not_in' => [1]]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value cannot be "1".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => [1.0]]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => [1]]
+				]],
+				['value' => '1.0'],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value must be "1".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'not_in' => [1.0]]
+				]],
+				['value' => '1'],
+				['value' => '1'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value cannot be "1".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'not_in' => [1]]
+				]],
+				['value' => '01'],
+				['value' => '01'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => [1]]
+				]],
+				['value' => '01'],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value must be "1".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
 					'value' => ['string', 'use' => [CUserMacroParser::class, []]]
 				]],
 				['value' => '{$MACRO}'],
@@ -2625,7 +2718,7 @@ class CFormValidatorTest extends TestCase {
 				[],
 				CFormValidator::ERROR,
 				['/field2' => [
-					['message' => 'This value must be no less than "3".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+					['message' => 'Value must be greater than or equal to 3.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
 			],
 			[
@@ -3237,6 +3330,35 @@ class CFormValidatorTest extends TestCase {
 				CFormValidator::ERROR,
 				['/value' => [
 					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'rgb']
+				]],
+				['value' => '00FFBF'],
+				['value' => '00FFBF'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'rgb']
+				]],
+				['value' => '00ffbf'],
+				['value' => '00ffbf'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'rgb']
+				]],
+				['value' => '00f'],
+				['value' => '00f'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value does not match pattern.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
 			]
 		];

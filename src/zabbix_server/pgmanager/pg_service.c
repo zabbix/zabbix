@@ -26,6 +26,7 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "zbxversion.h"
+#include "zbxexit.h"
 
 /******************************************************************************
  *                                                                            *
@@ -364,7 +365,7 @@ static void	*pg_service_entry(void *data)
 	zbx_ipc_message_t	*message;
 	sigjmp_buf		jmp_ret;
 
-	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret, NULL);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -390,6 +391,9 @@ static void	*pg_service_entry(void *data)
 					break;
 				case ZBX_IPC_PGM_GET_ALL_PGROUP_RTDATA:
 					pg_get_all_pgroup_rtdata(pgs, client);
+					break;
+				case ZBX_IPC_PGM_STOP:
+					atomic_store(&pgs->stop, 1);
 					break;
 			}
 
@@ -451,6 +455,13 @@ out:
 void	pg_service_destroy(zbx_pg_service_t *pgs)
 {
 	void	*retval;
+	char	*error = NULL;
+
+	if (FAIL == zbx_pg_stop(&error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot stop pg service: %s", error);
+		zbx_free(error);
+	}
 
 	atomic_store(&pgs->stop, 1);
 	pthread_join(pgs->thread, &retval);

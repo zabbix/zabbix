@@ -1033,7 +1033,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				if ($item === 'Dashboard') {
 					// Сheck value and hint message when "Dashboard" is selected.
 					$form->checkValue([$label => 'Dashboard']);
-					$this->assertTrue($field->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
+					$this->assertTrue($field->query('xpath:.//span[@data-hintbox-html="Dashboard is used as data source."]')
 							->one()->isVisible()
 					);
 				}
@@ -1124,7 +1124,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				}
 
 				// Check default color code.
-				$this->assertEquals('#42A5F5', $form->getField('id:lbl_sparkline_color')->getAttribute('title'));
+				$this->assertEquals('42A5F5', $form->getField('name:sparkline[color]')->getAttribute('value'));
 
 				// Check radio button options.
 				$radio_buttons = [

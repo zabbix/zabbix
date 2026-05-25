@@ -19,6 +19,7 @@
 #	include "vmware_hv.h"
 #	include "vmware_perfcntr.h"
 #endif
+#include "zbxexit.h"
 
 #define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref, __vm_shmem_malloc_func, \
 		__vm_shmem_realloc_func, __vm_shmem_free_func)
@@ -308,6 +309,9 @@ void	vmware_shmem_alarm_free(zbx_vmware_alarm_t *alarm)
 	vmware_shared_strfree(alarm->description);
 	vmware_shared_strfree(alarm->overall_status);
 	vmware_shared_strfree(alarm->time);
+	vmware_shared_strfree(alarm->entity_id);
+	vmware_shared_strfree(alarm->entity_uuid);
+	vmware_shared_strfree(alarm->entity_type);
 
 	__vm_shmem_free_func(alarm);
 }
@@ -796,6 +800,9 @@ static zbx_vmware_alarm_t	*vmware_alarm_shared_dup(const zbx_vmware_alarm_t *src
 	alarm->time = vmware_shared_strdup(src->time);
 	alarm->enabled = src->enabled;
 	alarm->acknowledged = src->acknowledged;
+	alarm->entity_id = vmware_shared_strdup(src->entity_id);
+	alarm->entity_uuid = vmware_shared_strdup(src->entity_uuid);
+	alarm->entity_type = vmware_shared_strdup(src->entity_type);
 
 	return alarm;
 }

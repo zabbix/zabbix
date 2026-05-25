@@ -65,7 +65,8 @@ class testEscalations extends CIntegrationTest {
 			'name' => self::TRAPPER_ITEM_NAME,
 			'key_' => self::TRAPPER_ITEM_NAME,
 			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_UINT64
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
@@ -178,7 +179,6 @@ class testEscalations extends CIntegrationTest {
 	 * @backup actions,alerts,history_uint,history,problem,events
 	 */
 	public function testEscalations_disabledAction() {
-		$this->clearLog(self::COMPONENT_SERVER);
 		$response = $this->call('action.update', [
 			'actionid' => self::$trigger_actionid,
 			'status' => 1
@@ -204,7 +204,7 @@ class testEscalations extends CIntegrationTest {
 	 * @backup alerts,triggers,history_uint,history,problem,events
 	 */
 	public function testEscalations_disabledTrigger() {
-		$this->clearLog(self::COMPONENT_SERVER);
+		$this->skipLog(self::COMPONENT_SERVER);
 		$response = $this->call('trigger.update', [
 			'triggerid' => self::$triggerid,
 			'status' => 1
@@ -236,7 +236,7 @@ class testEscalations extends CIntegrationTest {
 	 * @backup alerts,history,history_uint,maintenances,events,problem
 	 */
 	public function testEscalations_checkScenario1() {
-		$this->clearLog(self::COMPONENT_SERVER);
+		$this->skipLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache();
 		// Create maintenance period
 		self::$maint_start_tm = time();
@@ -628,6 +628,7 @@ class testEscalations extends CIntegrationTest {
 				'name' => $name,
 				'key_' => $key,
 				'type' => ITEM_TYPE_TRAPPER,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			]);
 			$this->assertArrayHasKey('itemids', $response['result']);
@@ -916,7 +917,7 @@ HEREDOC;
 
 	/**
 	 * Test active remote commands
-	 *testEscalations_checkActiveCommands
+	 * testEscalations_checkActiveCommands
 	 * @required-components server, agent
 	 * @configurationDataProvider serverConfigurationProviderRemote
 	 * @backup actions, alerts, history_uint, media_type, users, media, events, problem

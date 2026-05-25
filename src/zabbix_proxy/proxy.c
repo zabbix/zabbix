@@ -75,6 +75,7 @@
 #include "zbxbincommon.h"
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
+#include "zbxexit.h"
 
 #ifdef HAVE_OPENIPMI
 #include "zbxipmi.h"
@@ -968,7 +969,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1024},
 		{"ExternalScripts",		&config_externalscripts,		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"DBHost",			&(zbx_db_config->dbhost),	ZBX_CFG_TYPE_STRING,
+		{"DBHost",			&(zbx_db_config->dbhost),	ZBX_CFG_TYPE_STRING_LIST,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"DBName",			&(zbx_db_config->dbname),	ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_MAND,	0,			0},
@@ -1813,6 +1814,19 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 	proxy_has_started = 1;
 }
 
+static void	zbx_on_exit_rtc(int ret, void *on_exit_args)
+{
+	ZBX_UNUSED(ret);
+
+	if (NULL != on_exit_args)
+	{
+		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
+
+		if (NULL != args->rtc)
+			zbx_ipc_service_alert(&args->rtc->service);
+	}
+}
+
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t				listen_sock = {0};
@@ -2029,7 +2043,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (0 != config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
 		zbx_discoverer_init();
 
-	zbx_unset_exit_on_terminate();
+	zbx_unset_exit_on_terminate(zbx_on_exit_rtc);
 
 	zbx_threads_num = zbx_supervisor_get_process_count(config_forks);
 	zbx_threads = (pid_t *)zbx_calloc(zbx_threads, (size_t)zbx_threads_num, sizeof(pid_t));

@@ -103,7 +103,7 @@ DB_DEPS = \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a 
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
 # WARNING - cyclyc dependency with DBHIGH
 TAGFILTER_DEPS = \
@@ -250,4 +250,5 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_builddir)/src/libs/zbxresolver/libzbxresolver.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxexit/libzbxexit.a

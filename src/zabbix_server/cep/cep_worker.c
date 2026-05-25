@@ -32,9 +32,11 @@
 #include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxregexp.h"
+#include "zbxserialize.h"
 #include "zbxsupervisor_client.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
+#include "zbxexit.h"
 
 /******************************************************************************
  *                                                                            *
@@ -78,7 +80,31 @@ static void	cep_worker_assess_trigger_events(zbx_cep_task_remote_t *task)
 	for (int i = 0; i < queries.values_num; i++)
 		zbx_cep_assessment_query_clear(&queries.values[i]);
 
+	cep_stats_update_events_accessed((zbx_uint64_t)queries.values_num);
 	zbx_vector_cep_assessment_query_destroy(&queries);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check trigger depdendency status                                  *
+ *                                                                            *
+ * Parameters: task - [IN] task containing trigger status                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_worker_check_trigger_deps(zbx_cep_task_remote_t *task)
+{
+	zbx_cep_t		*cep;
+	zbx_vector_uint64_t	triggerids;
+
+	zbx_vector_uint64_create(&triggerids);
+
+	zbx_cep_deserialize_ids(task->message->data, &triggerids);
+
+	cep_cache_acquire(&cep);
+	*task->response = (unsigned char)cep_check_trigger_deps(cep, &triggerids);
+	cep_cache_release(&cep);
+
+	zbx_vector_uint64_destroy(&triggerids);
 }
 
 /******************************************************************************
@@ -135,7 +161,7 @@ static void	cep_worker_add_close_problem(zbx_cep_worker_t *worker, zbx_cep_task_
 
 	zbx_mw_queue_lock(worker->base.queue);
 	cep_queue_push((zbx_cep_queue_t *)worker->base.queue, t);
-	zbx_mw_queue_lock(worker->base.queue);
+	zbx_mw_queue_unlock(worker->base.queue);
 }
 
 /******************************************************************************
@@ -313,6 +339,34 @@ static void	cep_worker_delete_events(zbx_cep_task_remote_t *task)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: serialize CEP statistics into a remote task response buffer       *
+ *                                                                            *
+ * Parameters: task - [IN/OUT] remote task with pre-allocated response buffer *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_worker_get_stats(zbx_cep_worker_t *worker, zbx_cep_task_remote_t *task)
+{
+	zbx_cep_stats_t	stats;
+	unsigned char	*ptr = task->response;
+
+	cep_stats_collect(&stats);
+
+	zbx_mw_queue_lock(worker->base.queue);
+	zbx_mw_queue_get_stats(worker->base.queue, &stats.task_remote_num, &stats.task_internal_num,
+			&stats.task_completed_num);
+	zbx_mw_queue_unlock(worker->base.queue);
+
+	ptr += zbx_serialize_value(ptr, stats.events_accessed);
+	ptr += zbx_serialize_value(ptr, stats.events_processed);
+	ptr += zbx_serialize_value(ptr, stats.events_discarded);
+	ptr += zbx_serialize_value(ptr, stats.task_remote_num);
+	ptr += zbx_serialize_value(ptr, stats.task_internal_num);
+	(void)zbx_serialize_value(ptr, stats.task_completed_num);
+
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: process a remote task                                             *
  *                                                                            *
  * Parameters: worker - [IN]                                                  *
@@ -321,12 +375,15 @@ static void	cep_worker_delete_events(zbx_cep_task_remote_t *task)
  ******************************************************************************/
 static void	cep_worker_process_task_remote(zbx_cep_worker_t *worker, zbx_cep_task_remote_t *task)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() process remote task :%u", __func__, task->message->code);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() task :%u", __func__, task->message->code);
 
 	switch (task->message->code)
 	{
 		case ZBX_CEP_ASSESS_TRIGGER_EVENTS:
 			cep_worker_assess_trigger_events(task);
+			break;
+		case ZBX_CEP_CHECK_TRIGGER_DEPS:
+			cep_worker_check_trigger_deps(task);
 			break;
 		case ZBX_CEP_ADD_EVENTS:
 			cep_worker_add_events(worker, task);
@@ -348,6 +405,9 @@ static void	cep_worker_process_task_remote(zbx_cep_worker_t *worker, zbx_cep_tas
 			break;
 		case ZBX_CEP_DELETE_EVENTS:
 			cep_worker_delete_events(task);
+			break;
+		case ZBX_CEP_GET_STATS:
+			cep_worker_get_stats(worker, task);
 			break;
 	}
 
@@ -375,7 +435,10 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	cep_cache_release(&cep);
 
 	if (0 == eventid)
+	{
+		cep_stats_update_events_discarded(1);
 		return;
+	}
 
 	db_event->eventid = eventid;
 
@@ -386,6 +449,8 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	cep_cache_acquire(&cep);
 	h = zbx_cep_event_handle_addref(cep_add_event(cep, event));
 	cep_cache_release(&cep);
+
+	cep_stats_update_events_processed(1);
 
 	zbx_vector_mw_task_ptr_t	tasks;
 	int				corr_ret;
@@ -449,7 +514,6 @@ static void	cep_worker_resolve_trigger_events(zbx_db_event *db_event, zbx_uint64
 	cep_resolve_trigger_events(cep, r_event, handles);
 	cep_cache_release(&cep);
 
-	task->obj_value = TRIGGER_VALUE_OK;
 	task->event_op = CEP_EVENT_CLOSE;
 	zbx_cep_get_eventids_from_handles(handles->values, handles->values_num, &task->eventids);
 
@@ -492,11 +556,16 @@ static void	cep_worker_close_trigger_event(zbx_cep_task_event_t *task)
 	cep_cache_acquire(&cep);
 	r_eventid = cep_close_trigger_events(cep, db_event->objectid, &db_event->trigger.dep_triggerids,
 			db_event->trigger.correlation_mode, db_event->trigger.correlation_tag, &db_event->tags,
-			&handles);
+			&handles, &task->obj_value);
 	cep_cache_release(&cep);
 
 	if (0 != r_eventid)
+	{
 		cep_worker_resolve_trigger_events(db_event, r_eventid, &handles, task);
+		cep_stats_update_events_processed(1);
+	}
+	else
+		cep_stats_update_events_discarded(1);
 
 	zbx_vector_cep_event_handle_destroy(&handles);
 
@@ -537,7 +606,10 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 	cep_cache_release(&cep);
 
 	if (0 == eventid)
+	{
+		cep_stats_update_events_discarded(1);
 		return;
+	}
 
 	db_event->eventid = eventid;
 
@@ -548,6 +620,8 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 	cep_cache_acquire(&cep);
 	(void)cep_add_event(cep, event);
 	cep_cache_release(&cep);
+
+	cep_stats_update_events_processed(1);
 
 	task->event_op = CEP_EVENT_OPEN;
 
@@ -572,7 +646,12 @@ static void	cep_worker_close_internal_event(zbx_cep_task_event_t *task)
 	cep_cache_release(&cep);
 
 	if (0 == eventid)
+	{
+		cep_stats_update_events_discarded(1);
 		return;
+	}
+
+	cep_stats_update_events_processed(1);
 
 	db_event->eventid = eventid;
 	task->event_op = CEP_EVENT_CLOSE;
@@ -661,11 +740,17 @@ static void	cep_worker_process_task_close_event(zbx_cep_task_close_event_t *task
 	zbx_vector_cep_event_handle_create(&handles);
 
 	cep_cache_acquire(&cep);
-	r_eventid = cep_close_trigger_event_by_eventid(cep, db_event->objectid, task->eventid, &handles);
+	r_eventid = cep_close_trigger_event_by_eventid(cep, db_event->objectid, task->eventid, &handles,
+			&task->parent.obj_value);
 	cep_cache_release(&cep);
 
 	if (0 != r_eventid)
+	{
 		cep_worker_resolve_trigger_events(db_event, r_eventid, &handles, &task->parent);
+		cep_stats_update_events_processed(1);
+	}
+	else
+		cep_stats_update_events_discarded(1);
 
 	zbx_vector_cep_event_handle_destroy(&handles);
 
@@ -779,6 +864,8 @@ void	*cep_worker_entry(void *args)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		worker->problem_export = zbx_problems_export_init("event-processor", worker->base.id);
 
+	zbx_dc_config_local_addref();
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 	zbx_supervisor_update_activity("%s running", worker->base.name);
 
@@ -788,7 +875,7 @@ void	*cep_worker_entry(void *args)
 	{
 		zbx_mw_task_t	*task;
 
-		while (NULL != (task = zbx_mw_queue_pop(worker->base.queue)))
+		if (NULL != (task = zbx_mw_queue_pop(worker->base.queue)))
 		{
 			zbx_mw_queue_unlock(worker->base.queue);
 
@@ -815,6 +902,7 @@ void	*cep_worker_entry(void *args)
 
 			zbx_mw_queue_lock(worker->base.queue);
 			cep_queue_push_completed((zbx_cep_queue_t *)worker->base.queue, task);
+			zbx_mw_worker_notify(&worker->base);
 
 			continue;
 		}
@@ -837,6 +925,8 @@ void	*cep_worker_entry(void *args)
 
 	if (NULL != worker->problem_export)
 		zbx_export_deinit(worker->problem_export);
+
+	zbx_dc_config_local_release();
 
 	zbx_supervisor_update_activity("%s stopped", worker->base.name);
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped");

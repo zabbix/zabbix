@@ -30,6 +30,8 @@
 #include "zbxipcservice.h"
 #include "zbxlog.h"
 #include "zbxhistory.h"
+#include "zbxexit.h"
+#include "zbxsupervisor_client.h"
 
 static sigset_t			orig_mask;
 
@@ -145,6 +147,8 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), dbsyncer_args->config_timeout, &rtc);
 
+	zbx_supervisor_set_process_running(server_num);
+
 	for (;;)
 	{
 		sec = zbx_time();
@@ -241,14 +245,21 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		}
 
 		if (ZBX_SYNC_MORE == sync_stats.more)
+		{
+			if (0 == running)
+				zabbix_log(LOG_LEVEL_DEBUG, "shutdown data sync in progress ...");
 			continue;
+		}
 
 		/* always check if there are values to sync when stopping */
 		if (0 == running)
 			break;
 
-		if (!ZBX_IS_RUNNING())
+		if (!ZBX_IS_RUNNING() && 0 != running)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "shutdown in progress...");
 			running = 0;
+		}
 	}
 
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */

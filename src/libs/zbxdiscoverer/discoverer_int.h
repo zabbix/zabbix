@@ -32,6 +32,7 @@ typedef struct
 	zbx_uint64_t	druleid;
 	char		ip[ZBX_INTERFACE_IP_LEN_MAX];
 	zbx_uint64_t	count;
+	zbx_uint64_t	revision;
 }
 zbx_discoverer_check_count_t;
 
@@ -85,12 +86,17 @@ typedef struct
 	time_t					now;
 	zbx_uint64_t				unique_dcheckid;
 	unsigned int				processed_checks_per_ip;
+#	define ZBX_DISCOVERER_RESULT_CHECK_INIT	0x00
+#	define ZBX_DISCOVERER_RESULT_CHECK_LAST	0x01
+#	define ZBX_DISCOVERER_RESULT_JOB_FINISH	0x02
+	unsigned char				status;
+
 }
 zbx_discoverer_results_t;
 
 ZBX_PTR_VECTOR_DECL(discoverer_results_ptr, zbx_discoverer_results_t*)
 
-zbx_discoverer_results_t	*discoverer_result_create(zbx_uint64_t druleid, const zbx_uint64_t unique_dcheckid);
+zbx_discoverer_results_t	*discoverer_result_create(zbx_uint64_t druleid, const zbx_discoverer_task_t *task);
 int				discoverer_results_partrange_merge(zbx_hashset_t *hr_dst,
 					zbx_vector_discoverer_results_ptr_t *vr_src, zbx_discoverer_task_t *task,
 					int force);

@@ -20,6 +20,7 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxexit.h"
 
 #if defined(HAVE_POSTGRESQL)
 #	define ZBX_PG_READ_ONLY	"25006"
@@ -53,7 +54,7 @@ static const zbx_db_config_t	*db_config = NULL;
 static zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
 
 #if defined(HAVE_POSTGRESQL)
-static 	ZBX_THREAD_LOCAL char	ZBX_PG_ESCAPE_BACKSLASH = 1;
+static char	ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
 static zbx_mutex_t		db_sqlite_access = ZBX_MUTEX_NULL;
 #endif
@@ -100,14 +101,50 @@ int	dbconn_init(char **error)
 		}
 		else
 		{
-			zbx_dbconn_execute(db, "%s", zbx_dbschema_get_schema());
-			zbx_dbconn_close(db);
+			dbconn_execute(db, "%s", zbx_dbschema_get_schema());
+			dbconn_close(db);
 		}
 
 		zbx_dbconn_free(db);
 
 		return (ZBX_DB_OK == ret ? SUCCEED : FAIL);
 	}
+#elif defined(HAVE_POSTGRESQL)
+	zbx_dbconn_t	*db;
+	int		ret = SUCCEED;;
+
+	db = zbx_dbconn_create();
+
+	if (ZBX_DB_OK != (ret = dbconn_open(db)))
+	{
+		*error = zbx_strdup(*error, "cannot open database");
+		ret = FAIL;
+	}
+	else
+	{
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
+
+		result = dbconn_select(db, "show standard_conforming_strings");
+
+		if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+		{
+			ret = FAIL;
+		}
+		else
+		{
+			if (NULL != (row = zbx_db_fetch(result)))
+				ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
+		}
+
+		zbx_db_free_result(result);
+		dbconn_close(db);
+	}
+
+	zbx_dbconn_free(db);
+
+	if (FAIL == ret)
+		return FAIL;
 #else
 	ZBX_UNUSED(error);
 #endif
@@ -376,7 +413,7 @@ static int	dbconn_open(zbx_dbconn_t *db)
 #if defined(HAVE_MYSQL)
 	int		err_no = 0;
 #elif defined(HAVE_POSTGRESQL)
-#	define ZBX_DB_MAX_PARAMS	9
+#	define ZBX_DB_MAX_PARAMS	11
 
 	int		rc;
 	char		*cport = NULL;
@@ -636,10 +673,19 @@ static int	dbconn_open(zbx_dbconn_t *db)
 		values[i++] = db->config->dbpassword;
 	}
 
-	if (0 != db->config->dbport)
+	if (NULL != db->config->dbports)
 	{
 		keywords[i] = "port";
-		values[i++] = cport = zbx_dsprintf(cport, "%u", db->config->dbport);
+		values[i++] = db->config->dbports;
+
+		if (NULL != strchr(db->config->dbports, ','))
+		{
+			keywords[i] = "target_session_attrs";
+			values[i++] = "read-write";
+
+			keywords[i] = "connect_timeout";
+			values[i++] = "3";
+		}
 	}
 
 	keywords[i] = NULL;
@@ -684,19 +730,6 @@ static int	dbconn_open(zbx_dbconn_t *db)
 
 	if (ZBX_DB_OK != ret)
 		goto out;
-
-	result = dbconn_select(db, "show standard_conforming_strings");
-
-	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
-	{
-		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
-		goto out;
-	}
-
-	if (NULL != (row = zbx_db_fetch(result)))
-		ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
-
-	zbx_db_free_result(result);
 
 	result = dbconn_select(db, "show default_transaction_read_only");
 
@@ -1579,8 +1612,8 @@ int	zbx_dbconn_begin(zbx_dbconn_t *db)
 
 	while (ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if (ZBX_DB_DOWN == (rc = dbconn_begin(db)))
 		{
@@ -1636,8 +1669,8 @@ int	zbx_dbconn_rollback(zbx_dbconn_t *db)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot perform transaction rollback, connection will be reset");
 
-		zbx_dbconn_close(db);
-		rc = zbx_dbconn_open(db);
+		dbconn_close(db);
+		rc = dbconn_open(db);
 	}
 	else
 	{
@@ -1686,8 +1719,8 @@ int	zbx_dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 
 	while (ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if (ZBX_DB_DOWN == (rc = dbconn_vexecute(db, fmt, args)))
 		{
@@ -1738,8 +1771,8 @@ zbx_db_result_t	__zbx_attr_weak zbx_dbconn_vselect(zbx_dbconn_t *db, const char 
 
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if ((zbx_db_result_t)ZBX_DB_DOWN == (rc = dbconn_vselect(db, fmt, args)))
 		{
@@ -1790,8 +1823,8 @@ zbx_db_result_t	zbx_dbconn_select_n(zbx_dbconn_t *db, const char *query, int n)
 
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
-		zbx_dbconn_close(db);
-		zbx_dbconn_open(db);
+		dbconn_close(db);
+		dbconn_open(db);
 
 		if ((zbx_db_result_t)ZBX_DB_DOWN == (rc = dbconn_select_n(db, query, n)))
 		{

@@ -18,6 +18,7 @@
 #include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
+#include "zbxexit.h"
 
 typedef struct
 {
@@ -113,6 +114,8 @@ void	zbx_supervisor_update_activity(const char *fmt, ...)
 	zbx_strbuf_t	*buf = &worklog.activities.values[component_index];
 
 	zbx_vsnprintf_alloc(&buf->str, &buf->alloc, &offset, fmt, args);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s", buf->str);
 
 	pthread_mutex_unlock(&worklog.sync);
 	va_end(args);

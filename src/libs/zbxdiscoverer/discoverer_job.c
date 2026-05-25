@@ -93,9 +93,17 @@ void	discoverer_task_free(zbx_discoverer_task_t *task)
 	zbx_free(task);
 }
 
-zbx_uint64_t	discoverer_task_check_count_get(zbx_discoverer_task_t *task)
+zbx_uint64_t	discoverer_task_check_count_get(const zbx_discoverer_task_t *task)
 {
 	return task->range.state.count;
+}
+
+int	discoverer_task_ip_is_last(const zbx_discoverer_task_t *task)
+{
+	zbx_task_range_t	range = {.state = task->range.state};
+
+	return FAIL == zbx_iprange_uniq_iter(task->range.ipranges->values, task->range.ipranges->values_num,
+			&range.state.index_ip, range.state.ipaddress) ? SUCCEED : FAIL;
 }
 
 static zbx_discoverer_task_t	*discoverer_task_clone(zbx_discoverer_task_t *task)
@@ -164,8 +172,7 @@ static zbx_discoverer_task_t	*discoverer_task_split_get(zbx_discoverer_task_t *t
 	zbx_task_range_t	range;
 	int			ret;
 
-	if (SVC_SNMPv3 == GET_DTYPE(task) || SVC_SNMPv2c == GET_DTYPE(task) || SVC_SNMPv1 == GET_DTYPE(task) ||
-			0 != job->concurrency_max)
+	if (SVC_SNMPv3 == GET_DTYPE(task) || 0 != job->concurrency_max)
 	{
 		return task;	/* only one worker of given type is allowed on the drule (not per process) */
 	}

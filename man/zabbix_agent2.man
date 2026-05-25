@@ -86,12 +86,12 @@ Reload user parameters from the configuration file
 .RE
 .RS 4
 .TP 4
-\fBloglevel increase\fR
+\fBlog_level_increase\fR
 Increase log level
 .RE
 .RS 4
 .TP 4
-\fBloglevel decrease\fR
+\fBlog_level_decrease\fR
 Decrease log level
 .RE
 .RS 4

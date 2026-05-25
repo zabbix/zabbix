@@ -471,6 +471,12 @@ zbx_dbconn_t	*zbx_dbconn_pool_acquire_connection(zbx_dbconn_pool_t *pool)
  ******************************************************************************/
 void	zbx_dbconn_pool_release_connection(zbx_dbconn_pool_t *pool, zbx_dbconn_t *db)
 {
+	if (0 != db->txn_level)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("releasing db connection with active transaction");
+		exit(EXIT_FAILURE);
+	}
+
 	dbconn_pool_lock(pool);
 
 	dbconn_pool_update_stats(pool, zbx_time(), 0.0, 0, db);

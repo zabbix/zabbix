@@ -357,3 +357,8 @@ void	zbx_log_fatal_info(void *context, unsigned int flags)
 
 	zabbix_log(LOG_LEVEL_CRIT, "================================");
 }
+
+void	zbx_exit_thread(int ret)
+{
+	pthread_exit((void *)(zbx_int64_t)ret);
+}

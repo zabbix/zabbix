@@ -26,6 +26,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
+#include "zbxexit.h"
 
 /******************************************************************************
  *                                                                            *

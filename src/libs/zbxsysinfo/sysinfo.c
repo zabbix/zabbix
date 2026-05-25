@@ -38,6 +38,7 @@
 #include "zbxparam.h"
 #include "zbxexpr.h"
 #include "zbxtime.h"
+#include "zbxexit.h"
 
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"

@@ -14,10 +14,12 @@ zabbix_export:
         - name: main_drule
           type: TRAP
           key: main_drule
+          allowed_hosts: '{$TRAPPER.ALLOWED_HOSTS}'
           item_prototypes:
             - name: 'item[{#PARENTNAME}]'
               type: TRAP
               key: 'item[{#PARENTNAME}]'
+              allowed_hosts: '{$TRAPPER.ALLOWED_HOSTS}'
               trigger_prototypes:
                 - expression: 'last(/lld_drule_proto_elem_update/item[{#PARENTNAME}])>1'
                   name: 'trigger[{#PARENTNAME}]'
@@ -43,6 +45,7 @@ zabbix_export:
             - name: 'item.update.nested[{#PARENTNAME},{#NAME}]'
               type: TRAP
               key: 'item.update.nested[{#PARENTNAME},{#NAME}]'
+              allowed_hosts: '{$TRAPPER.ALLOWED_HOSTS}'
               trigger_prototypes:
                 - expression: 'last(/lld_drule_proto_elem_update/item.update.nested[{#PARENTNAME},{#NAME}])>2'
                   name: 'item.update.nested[{#PARENTNAME},{#NAME}]'

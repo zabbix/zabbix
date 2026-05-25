@@ -369,6 +369,7 @@ zbx_db_event	*zbx_create_internal_event(unsigned char object, zbx_uint64_t objec
 
 			if (NULL != dc_trigger)
 			{
+				event->trigger.triggerid = objectid;
 				event->trigger.expression = zbx_strdup(NULL, dc_trigger->expression);
 				event->trigger.recovery_expression = zbx_strdup(NULL, dc_trigger->recovery_expression);
 
@@ -608,7 +609,7 @@ void	zbx_export_events(zbx_dbconn_t *db, const zbx_vector_db_event_t *problems,
 				continue;
 		}
 
-		zbx_json_clean(&json);
+		zbx_json_reset(&json);
 
 		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, event->clock);
 		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, event->ns);
@@ -732,7 +733,7 @@ void	zbx_export_events(zbx_dbconn_t *db, const zbx_vector_db_event_t *problems,
 
 		for (int j = 0; j < p_eventids->values_num; j++)
 		{
-			zbx_json_clean(&json);
+			zbx_json_reset(&json);
 
 			zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, event->clock);
 			zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, event->ns);

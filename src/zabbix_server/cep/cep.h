@@ -42,6 +42,7 @@ void	cep_destroy(zbx_cep_t *cep);
 
 void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_query_t *queries,
 		unsigned char *results);
+zbx_cep_result_t	cep_check_trigger_deps(zbx_cep_t *cep, const zbx_vector_uint64_t *triggerids);
 
 zbx_uint64_t	cep_open_trigger_event(zbx_cep_t *cep, zbx_uint64_t triggerid, unsigned char trigger_type,
 		const zbx_vector_uint64_t *dep_triggerids, int *obj_value);
@@ -49,9 +50,9 @@ zbx_uint64_t	cep_open_trigger_event(zbx_cep_t *cep, zbx_uint64_t triggerid, unsi
 void	cep_resolve_trigger_events(zbx_cep_t *cep, zbx_cep_event_t *r_event, zbx_vector_cep_event_handle_t *events);
 zbx_uint64_t	cep_close_trigger_events(zbx_cep_t *cep, zbx_uint64_t triggerid,
 		const zbx_vector_uint64_t *dep_triggerids, unsigned char correlation_mode, const char *correlation_tag,
-		const zbx_vector_tags_ptr_t *tags, zbx_vector_cep_event_handle_t *events);
+		const zbx_vector_tags_ptr_t *tags, zbx_vector_cep_event_handle_t *events, int *obj_value);
 zbx_uint64_t	cep_close_trigger_event_by_eventid(zbx_cep_t *cep, zbx_uint64_t triggerid, zbx_uint64_t eventid,
-		zbx_vector_cep_event_handle_t *handles);
+		zbx_vector_cep_event_handle_t *handles, int *obj_value);
 
 zbx_uint64_t	cep_open_internal_event(zbx_cep_t *cep, unsigned char object, zbx_uint64_t objectid);
 zbx_uint64_t	cep_close_internal_event(zbx_cep_t *cep, unsigned char object, zbx_uint64_t objectid,
@@ -72,7 +73,13 @@ void	cep_get_events_by_handles(zbx_cep_t *cep, zbx_cep_event_handle_t *handles, 
 		zbx_cep_event_t **events);
 void	cep_get_events_by_updates(zbx_cep_t *cep, zbx_cep_event_update_t *updates, int updates_num,
 		zbx_cep_event_t **events);
-void	cep_get_events(zbx_cep_t *cep, zbx_vector_cep_event_handle_t *handles);
+void	cep_get_events(zbx_cep_t *cep, unsigned char source, zbx_vector_cep_event_handle_t *handles);
 void	cep_delete_events(zbx_cep_t *cep, const zbx_vector_uint64_t *eventids, zbx_vector_cep_event_handle_t *handles);
+
+/* statistics */
+void	cep_update_events_accessed(zbx_cep_t *cep, zbx_uint64_t value);
+void	cep_update_events_processed(zbx_cep_t *cep, zbx_uint64_t value);
+void	cep_update_events_discarded(zbx_cep_t *cep, zbx_uint64_t value);
+void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats);
 
 #endif /* ZABBIX_CEP_CACHE_H */

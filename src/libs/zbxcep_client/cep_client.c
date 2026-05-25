@@ -20,6 +20,8 @@
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 #include "zbxdbhigh.h"
+#include "zbxexit.h"
+#include "zbxcacheconfig.h"
 
 ZBX_VECTOR_IMPL(cep_assessment_query, zbx_cep_assessment_query_t)
 ZBX_VECTOR_IMPL(event_maintenance, zbx_event_maintenance_t)
@@ -137,18 +139,18 @@ void	zbx_cep_assessment_query_clear(zbx_cep_assessment_query_t *query)
  ******************************************************************************/
 static	zbx_ipc_socket_t	*cep_client_socket(void)
 {
-		static ZBX_THREAD_LOCAL zbx_ipc_socket_t	socket;
+	static ZBX_THREAD_LOCAL zbx_ipc_socket_t	socket;
 
-		if (FAIL == zbx_ipc_socket_connected(&socket))
+	if (FAIL == zbx_ipc_socket_connected(&socket))
+	{
+		char	*error = NULL;
+
+		if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_CEP, SEC_PER_MIN, &error))
 		{
-			char	*error = NULL;
-
-			if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_CEP, SEC_PER_MIN, &error))
-			{
-				zabbix_log(LOG_LEVEL_CRIT, "cannot connect to CEP service: %s", error);
-				zbx_exit(EXIT_FAILURE);
-			}
+			zabbix_log(LOG_LEVEL_CRIT, "cannot connect to CEP service: %s", error);
+			zbx_exit(EXIT_FAILURE);
 		}
+	}
 
 	return &socket;
 }
@@ -882,4 +884,128 @@ void	zbx_cep_deserialize_ids(const unsigned char *data, zbx_vector_uint64_t *ids
 		zbx_vector_uint64_append(ids, id);
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check trigger dependencies via cep service                        *
+ *                                                                            *
+ * Parameters: depids - [IN] trigger dependency IDs to check                  *
+ *                                                                            *
+ * Return value: SUCCEED if no dependent trigger has a problem                *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	cep_check_trigger_deps(zbx_vector_uint64_t *depids)
+{
+	zbx_uint32_t	data_len;
+	unsigned char	*data;
+	int		ret;
+
+	data_len = zbx_cep_serialize_ids(depids, &data);
+
+	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_CHECK_TRIGGER_DEPS, data, data_len))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send delete events message to CEP service");
+		zbx_exit(EXIT_FAILURE);
+	}
+
+	zbx_ipc_message_t	response = {0};
+
+	if (FAIL == zbx_ipc_socket_read(cep_client_socket(), &response))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot receive data from CEP service");
+		zbx_exit(EXIT_FAILURE);
+	}
+
+	ret = (CEP_EVENT_ALLOW == *response.data ? SUCCEED : FAIL);
+
+	zbx_ipc_message_clean(&response);
+	zbx_free(data);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check trigger dependencies via cep service                        *
+ *                                                                            *
+ * Parameters: triggerid - [IN] trigger ID to check                           *
+ *                                                                            *
+ * Return value: SUCCEED if no dependent trigger has a problem                *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cep_check_trigger_deps(zbx_uint64_t triggerid)
+{
+	zbx_vector_uint64_t	depids;
+	int			ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64, __func__, triggerid);
+
+	zbx_vector_uint64_create(&depids);
+
+	zbx_dc_get_trigger_deps_by_triggerid(triggerid, &depids);
+	ret = cep_check_trigger_deps(&depids);
+
+	zbx_vector_uint64_destroy(&depids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve statistics from the CEP service                          *
+ *                                                                            *
+ * Parameters: stats - [OUT] populated with event counters from CEP service   *
+ *             error - [OUT] error message if the operation fails             *
+ *                                                                            *
+ * Return value: SUCCEED on success, FAIL otherwise                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cep_get_stats(zbx_cep_stats_t *stats, char **error)
+{
+	zbx_ipc_socket_t	socket;
+	char			*errmsg = NULL;
+	int			ret = FAIL;
+	zbx_ipc_message_t	response = {0};
+	unsigned char		*ptr;
+
+	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_CEP, SEC_PER_MIN, &errmsg))
+	{
+		*error = zbx_dsprintf(NULL, "cannot connect to CEP service: %s", errmsg);
+		zbx_free(errmsg);
+		return ret;
+	}
+
+	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_GET_STATS, NULL, 0))
+	{
+		*error = zbx_strdup(NULL, "cannot send delete events message to CEP service");
+		goto out;
+	}
+
+	if (FAIL == zbx_ipc_socket_read(cep_client_socket(), &response))
+	{
+		*error = zbx_strdup(NULL, "cannot send delete events message to CEP service");
+		goto out;
+	}
+
+	ptr = response.data;
+	ptr += zbx_deserialize_value(ptr, &stats->events_accessed);
+	ptr += zbx_deserialize_value(ptr, &stats->events_processed);
+	ptr += zbx_deserialize_value(ptr, &stats->events_discarded);
+	ptr += zbx_deserialize_value(ptr, &stats->task_remote_num);
+	ptr += zbx_deserialize_value(ptr, &stats->task_internal_num);
+	(void)zbx_deserialize_value(ptr, &stats->task_completed_num);
+
+	zbx_ipc_message_clean(&response);
+
+	ret = SUCCEED;
+out:
+	zbx_ipc_socket_close(&socket);
+
+	return ret;
+}
+
 

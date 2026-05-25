@@ -33,6 +33,7 @@
 #include "zbxversion.h"
 #include "zbxcomms.h"
 #include "zbxipcservice.h"
+#include "zbxexit.h"
 
 typedef struct
 {

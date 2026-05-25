@@ -39,6 +39,7 @@ VALUECACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxexit/libzbxexit.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 COMMON_WRAP_FUNCS = \

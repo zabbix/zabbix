@@ -386,6 +386,27 @@ AC_SEARCH_LIBS(perfstat_memory_total, perfstat, [AC_DEFINE([HAVE_LIBPERFSTAT], 1
 AC_SEARCH_LIBS(devstat_getdevs, devstat, [AC_DEFINE([HAVE_LIBDEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
 AC_SEARCH_LIBS(getdevs, devstat, [AC_DEFINE([HAVE_LIBDEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
 
+case "$host_os" in
+  aix*)
+    AC_MSG_CHECKING([for ODM libraries (-lodm -lcfg)])
+    saved_LIBS="$LIBS"
+    LIBS="$LIBS -lodm -lcfg"
+    AC_LINK_IFELSE(
+      [AC_LANG_PROGRAM(
+        [#include <odmi.h>
+         #include <sys/cfgodm.h>],
+        [odm_initialize();
+         odm_open_class(CuAt_CLASS);]
+      )],
+      [AC_MSG_RESULT([yes])
+       AC_DEFINE([HAVE_LIBODM], 1, [Define to 1 if you have the ODM libraries (-lodm -lcfg)])],
+      [AC_MSG_RESULT([no])
+       LIBS="$saved_LIBS"
+       AC_MSG_ERROR([ODM libraries (-lodm -lcfg) not found, ODM support will not be available])]
+    )
+    ;;
+esac
+
 dnl on FreeBSD we have to link with -lexecinfo to get backtraces and also check jail_getname() availability (available after __FreeBSD_version >= 800099)
 AC_SEARCH_LIBS(backtrace_symbols, execinfo, [AC_DEFINE([HAVE_LIBEXECINFO], 1, [Define to 1 if you have the 'libexecinfo' library (-lexecinfo)])])
 AC_SEARCH_LIBS(jail_getname, jail, [AC_DEFINE([HAVE_LIBJAIL], 1, [Define to 1 if you have 'libjail' library (-ljail)])])
@@ -2088,6 +2109,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxthreads/libzbxthreads.a \
 		\${abs_top_builddir}/src/libs/zbxvariant/libzbxvariant.a \
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
+        \${abs_top_builddir}/src/libs/zbxexit/libzbxexit.a \
 		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
 	AC_SUBST(CGO_CFLAGS)
@@ -2206,6 +2228,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxeval/Makefile
 	src/libs/zbxevent/Makefile
 	src/libs/zbxexec/Makefile
+	src/libs/zbxexit/Makefile
 	src/libs/zbxexport/Makefile
 	src/libs/zbxexpr/Makefile
 	src/libs/zbxfile/Makefile
@@ -2242,7 +2265,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxself/Makefile
 	src/libs/zbxserialize/Makefile
 	src/libs/zbxsupervisor/Makefile
-    src/libs/zbxsupervisor_client/Makefile
+	src/libs/zbxsupervisor_client/Makefile
 	src/libs/zbxscripts/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile

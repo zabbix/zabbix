@@ -398,7 +398,7 @@ class CMediatype extends CApiService {
 	 * @return array
 	 */
 	public function create(array $mediatypes): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (!CMediatypeHelper::getSupportedMediaTypes() || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'mediatype', __FUNCTION__)
 			);
@@ -446,7 +446,7 @@ class CMediatype extends CApiService {
 	 * @return array
 	 */
 	public function update(array $mediatypes): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (!CMediatypeHelper::getSupportedMediaTypes() || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'mediatype', __FUNCTION__)
 			);
@@ -498,6 +498,7 @@ class CMediatype extends CApiService {
 		$db_mediatypes = $this->get([
 			'output' => array_diff(self::OUTPUT_FIELDS, ['parameters']),
 			'mediatypeids' => array_column($mediatypes, 'mediatypeid'),
+			'filter' => ['type' => CMediatypeHelper::getSupportedMediaTypes()],
 			'preservekeys' => true
 		]);
 
@@ -524,7 +525,7 @@ class CMediatype extends CApiService {
 			: [];
 
 		return ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['name']], 'fields' => $specific_fields + [
-			'type' =>					['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK])],
+			'type' =>					['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', CMediatypeHelper::getSupportedMediaTypes())],
 			'name' =>					['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'name')],
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED])],
 			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
@@ -853,6 +854,15 @@ class CMediatype extends CApiService {
 				_('both "access_token" and "access_expires_in" should be either present or absent')
 			));
 		}
+
+		if ($is_update
+				&& !array_key_exists('client_secret', $mediatype)
+				&& array_key_exists('token_url', $mediatype)
+				&& $mediatype['token_url'] !== $db_mediatype['token_url']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('the parameter "%1$s" is missing', 'client_secret')
+			));
+		}
 	}
 
 	private static function getSmsTypeValidationFields(bool $is_update = false): array {
@@ -1070,6 +1080,12 @@ class CMediatype extends CApiService {
 					$_upd_media_type_oauth = DB::getUpdatedValues('media_type_oauth', $mediatype, $db_mediatype);
 
 					if ($_upd_media_type_oauth) {
+						if (array_key_exists('authorization_url', $_upd_media_type_oauth)
+								|| array_key_exists('token_url', $_upd_media_type_oauth)) {
+							$_upd_media_type_oauth['tokens_status'] = array_key_exists('tokens_status', $mediatype)
+								? $mediatype['tokens_status'] : 0;
+						}
+
 						$upd_media_type_oauth[] = [
 							'values' => $_upd_media_type_oauth,
 							'where' => ['mediatypeid' => $mediatype['mediatypeid']]
@@ -1266,6 +1282,7 @@ class CMediatype extends CApiService {
 		$db_mediatypes = DB::select('media_type', [
 			'output' => ['mediatypeid', 'name'],
 			'mediatypeids' => $mediatypeids,
+			'filter' => ['type' => CMediatypeHelper::getSupportedMediaTypes()],
 			'preservekeys' => true
 		]);
 

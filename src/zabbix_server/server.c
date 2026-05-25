@@ -102,6 +102,7 @@
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
 #include "zbxcep.h"
+#include "zbxexit.h"
 
 #ifdef HAVE_LIBCURL
 #	include "zbxcurl.h"
@@ -1007,7 +1008,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"ExternalScripts",		&config_externalscripts,		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"DBHost",			&(zbx_db_config->dbhost),	ZBX_CFG_TYPE_STRING,
+		{"DBHost",			&(zbx_db_config->dbhost),	ZBX_CFG_TYPE_STRING_LIST,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"DBName",			&(zbx_db_config->dbname),	ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_MAND,	0,			0},
@@ -2195,6 +2196,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			if (1 < i && !ZBX_IS_RUNNING())
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot continue server startup because of termination");
+				ret = FAIL;
 				break;
 			}
 
@@ -2392,6 +2394,19 @@ static void	server_restart_ha(zbx_rtc_t *rtc)
 	}
 
 	ha_status = ZBX_NODE_STATUS_STANDBY;
+}
+
+static void	zbx_on_exit_rtc(int ret, void *on_exit_args)
+{
+	ZBX_UNUSED(ret);
+
+	if (NULL != on_exit_args)
+	{
+		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
+
+		if (NULL != args->rtc)
+			zbx_ipc_service_alert(&args->rtc->service);
+	}
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
@@ -2634,7 +2649,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	zbx_unset_exit_on_terminate();
+	zbx_unset_exit_on_terminate(zbx_on_exit_rtc);
 
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;

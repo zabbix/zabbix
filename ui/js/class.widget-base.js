@@ -926,8 +926,7 @@ class CWidgetBase {
 	 * @returns {boolean}
 	 */
 	isUserInteracting() {
-		return this._target
-			.querySelectorAll('[data-expanded="true"], [aria-expanded="true"][aria-haspopup="true"]').length > 0;
+		return isUserInteracting(this._target);
 	}
 
 	/**
@@ -1664,7 +1663,7 @@ class CWidgetBase {
 			li_button.setAttribute('data-hintbox', '1');
 			li_button.setAttribute('data-hintbox-static', '1');
 			li_button.setAttribute('data-hintbox-ignore-position-change', '1');
-			li_button.setAttribute('data-hintbox-contents', info[i].hint);
+			li_button.setAttribute('data-hintbox-html', info[i].hint);
 			li_button.classList.add(ZBX_STYLE_BTN_ICON, info[i].icon);
 			li.appendChild(li_button);
 

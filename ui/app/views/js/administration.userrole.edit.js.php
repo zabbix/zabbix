@@ -113,7 +113,7 @@
 				CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_CONFIGURATION_CEPRULES => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_CONFIGURATION_DISCOVERY => USER_TYPE_ZABBIX_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_GENERAL => USER_TYPE_SUPER_ADMIN,
 				CRoleHelper::UI_ADMINISTRATION_AUDIT_LOG => USER_TYPE_SUPER_ADMIN,
@@ -233,7 +233,7 @@
 			}
 
 			document.querySelectorAll('.js-userrole-apimode input').forEach((element) => {
-				element.disabled = !is_apiaccess_checked;
+				element.readOnly = !is_apiaccess_checked;
 			});
 
 			$('#api_methods_').multiSelect(is_apiaccess_checked ? 'enable' : 'disable');
@@ -372,7 +372,7 @@
 			}
 		}
 
-		#ajaxExceptionHandler (exception) {
+		#ajaxExceptionHandler(exception) {
 			let title, messages;
 
 			if (typeof exception === 'object' && 'error' in exception) {

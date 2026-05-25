@@ -1586,7 +1586,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'inline_errors' => [
 						'form' => 'server',
 						'errors' => [
-							'Port' => 'This value must be no greater than "65535".'
+							'Port' => 'Value must be less than or equal to 65535.'
 						]
 					]
 				]
@@ -2515,7 +2515,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Host' => STRING_255,
 								'Port' => 65535,
 								'Base DN' => STRING_255,
-								'Search attribute' => STRING_255,
+								'Search attribute' => STRING_128,
 								'Bind password' => STRING_128,
 								'Bind DN' => STRING_255,
 								'Description' => STRING_6000,
@@ -3160,7 +3160,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							->one()->click();
 				}
 
-				$ldap_form->query('id:bind_password')->one()->waitUntilVisible()->fill($ldap['Bind password']);
+				$ldap_form->query('name:bind_password')->one()->waitUntilVisible()->fill($ldap['Bind password']);
 			}
 
 			if (CTestArrayHelper::get($ldap['fields'], 'Configure JIT provisioning')) {

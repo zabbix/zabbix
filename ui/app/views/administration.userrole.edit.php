@@ -39,13 +39,14 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('name', $data['name'], $data['readonly'], DB::getFieldLength('role', 'name')))
+			(new CTextAreaFlexible('name', $data['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('role', 'name'))
+				->setReadonly($data['readonly'])
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
-				->setAttribute('maxlength', DB::getFieldLength('role', 'name'))
 		)
-]);
+	]);
 
 if ($data['readonly'] || $data['is_own_role']) {
 	$form_grid->addItem([
@@ -178,12 +179,12 @@ $form_grid
 			->addStyle('display: none;'),
 		(new CFormField([
 			new CHorList([
-				(new CTextBox('service_write_tag_tag', $data['rules']['service_write_tag']['tag']))
+				(new CTextAreaFlexible('service_write_tag_tag', $data['rules']['service_write_tag']['tag']))
 					->setId('service-write-tag-tag')
 					->setAttribute('data-error-container', 'service-write-tag-tag-error-container')
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-				(new CTextBox('service_write_tag_value', $data['rules']['service_write_tag']['value']))
+				(new CTextAreaFlexible('service_write_tag_value', $data['rules']['service_write_tag']['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			]),
@@ -224,12 +225,12 @@ $form_grid
 			->addStyle('display: none;'),
 		(new CFormField([
 			new CHorList([
-				(new CTextBox('service_read_tag_tag', $data['rules']['service_read_tag']['tag']))
+				(new CTextAreaFlexible('service_read_tag_tag', $data['rules']['service_read_tag']['tag']))
 					->setId('service-read-tag-tag')
 					->setAttribute('data-error-container', 'service-read-tag-tag-error-container')
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-				(new CTextBox('service_read_tag_value', $data['rules']['service_read_tag']['value']))
+				(new CTextAreaFlexible('service_read_tag_value', $data['rules']['service_read_tag']['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			]),
@@ -241,60 +242,64 @@ $form_grid
 			->addStyle('display: none;')
 	]);
 
-$form_grid->addItem(
-	(new CFormField(
-		(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
-	))
-		->setAttribute('data-field-type', 'array')
-		->setAttribute('data-field-name', 'modules')
-);
-
-$modules = [];
-
-foreach ($data['labels']['modules'] as $moduleid => $module_name) {
-	$module = new CDiv(
-		(new CCheckBox('modules['.$moduleid.']', 1))
-			->setChecked(
-				array_key_exists($moduleid, $data['rules']['modules'])
-					? $data['rules']['modules'][$moduleid]
-					: !array_key_exists($moduleid, $data['disabled_moduleids'])
-			)
-			->setReadonly($data['readonly'])
-			->setLabel($module_name)
-			->setUncheckedValue(0)
+if ($data['rules']['modules_config_enabled']) {
+	$form_grid->addItem(
+		(new CFormField(
+			(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
+		))
+			->setAttribute('data-field-type', 'array')
+			->setAttribute('data-field-name', 'modules')
 	);
 
-	if (array_key_exists($moduleid, $data['disabled_moduleids'])) {
-		$module->addItem((new CSpan([' (', _('Disabled'), ')']))->addClass(ZBX_STYLE_RED));
+	$modules = [];
+
+	foreach ($data['labels']['modules'] as $moduleid => $module_name) {
+		$module = new CDiv(
+			(new CCheckBox('modules['.$moduleid.']', 1))
+				->setChecked(
+					array_key_exists($moduleid, $data['rules']['modules'])
+						? $data['rules']['modules'][$moduleid]
+						: !array_key_exists($moduleid, $data['disabled_moduleids'])
+				)
+				->setReadonly($data['readonly'])
+				->setLabel($module_name)
+				->setUncheckedValue(0)
+		);
+
+		if (array_key_exists($moduleid, $data['disabled_moduleids'])) {
+			$module->addItem((new CSpan([' (', _('Disabled'), ')']))->addClass(ZBX_STYLE_RED));
+		}
+
+		$modules[] = $module;
 	}
 
-	$modules[] = $module;
-}
+	if ($modules) {
+		$form_grid->addItem(
+			new CFormField($modules)
+		);
+	}
+	else {
+		$form_grid->addItem(
+			new CFormField(
+				new CLabel(_('No enabled modules found.'))
+			)
+		);
+	}
 
-if ($modules) {
-	$form_grid->addItem(
-		new CFormField($modules)
-	);
-}
-else {
-	$form_grid->addItem(
-		new CFormField(
-			new CLabel(_('No enabled modules found.'))
-		)
-	);
+	$form_grid
+		->addItem([
+			new CLabel(_('Default access to new modules'), $data['readonly'] ? '' : 'modules.default_access'),
+			new CFormField(
+				(new CCheckBox('modules_default_access', 1))
+					->setId('modules.default_access')
+					->setChecked($data['rules']['modules.default_access'])
+					->setReadonly($data['readonly'])
+					->setUncheckedValue(0)
+			)
+		]);
 }
 
 $form_grid
-	->addItem([
-		new CLabel(_('Default access to new modules'), $data['readonly'] ? '' : 'modules.default_access'),
-		new CFormField(
-			(new CCheckBox('modules_default_access', 1))
-				->setId('modules.default_access')
-				->setChecked($data['rules']['modules.default_access'])
-				->setReadonly($data['readonly'])
-				->setUncheckedValue(0)
-		)
-	])
 	->addItem(
 		new CFormField(
 			(new CTag('h4', true, _('Access to API')))->addClass('input-section-header')
@@ -350,7 +355,7 @@ $form_grid
 		new CFormField(
 			(new CTag('h4', true, _('Access to actions')))->addClass('input-section-header')
 		)
-);
+	);
 
 $actions = [];
 foreach ($data['labels']['actions'] as $action => $label) {

@@ -19,6 +19,7 @@
 #include "zbxnum.h"
 #include "zbxprof.h"
 #include "zbxvariant.h"
+#include "zbxexit.h"
 
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 

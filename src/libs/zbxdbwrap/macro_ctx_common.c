@@ -1157,7 +1157,7 @@ static int	expr_db_get_trigger_error(const zbx_db_trigger *trigger, char **repla
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL == (result = zbx_db_select("select error from triggers where triggerid=" ZBX_FS_UI64,
+	if (NULL == (result = zbx_db_select("select error from trigger_rtdata where triggerid=" ZBX_FS_UI64,
 			trigger->triggerid)))
 	{
 		ret = FAIL;

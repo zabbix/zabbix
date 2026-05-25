@@ -35,6 +35,7 @@
 #include "zbxjson.h"
 #include "zbxstr.h"
 #include "zbx_expression_constants.h"
+#include "zbxexit.h"
 
 #define ZBX_REPORT_STATUS_ENABLED	0
 #define ZBX_REPORT_STATUS_DISABLED	1
@@ -389,7 +390,7 @@ static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str);
 	zbx_base64_encode_dyn(j.buffer, &cookie, j.buffer_size);
 
-	zbx_json_clean(&j);
+	zbx_json_free(&j);
 	zbx_free(out_str);
 
 	return cookie;

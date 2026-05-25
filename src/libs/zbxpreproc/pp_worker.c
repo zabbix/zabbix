@@ -24,6 +24,7 @@
 #include "zbxthreads.h"
 #include "zbxnix.h"
 #include "zbxlog.h"
+#include "zbxexit.h"
 
 #define PP_WORKER_INIT_NONE	0x00
 #define PP_WORKER_INIT_THREAD	0x01
@@ -111,7 +112,7 @@ static void	*pp_worker_entry(void *args)
 	zbx_snprintf(component, sizeof(component), "preprocessing worker #%d", worker->id);
 	zbx_set_log_component(component, &worker->logger);
 
-	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret, NULL);
 
 	zbx_init_regexp_env();
 

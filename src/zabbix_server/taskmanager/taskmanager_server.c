@@ -43,6 +43,7 @@
 #include "zbxstr.h"
 #include "zbxsupervisor_client.h"
 #include "postinit.h"
+#include "zbxexit.h"
 
 /******************************************************************************
  *                                                                            *

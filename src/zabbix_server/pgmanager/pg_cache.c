@@ -20,6 +20,7 @@
 #include "zbxpgservice.h"
 #include "zbxtime.h"
 #include "zbxversion.h"
+#include "zbxexit.h"
 
 #define PG_GROUP_UNBALANCE_FACTOR	2
 #define PG_GROUP_UNBALANCE_LIMIT	10
@@ -1175,7 +1176,7 @@ void	pg_cache_update_proxy_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_h
 			if (ZBX_PG_PROXY_STATE_UNKNOWN == state || proxy->state == state)
 				continue;
 
-			zabbix_log(LOG_LEVEL_WARNING, "Proxy \"%s\" changed state from %s to %s",
+			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" changed state from %s to %s",
 					proxy->name, proxy_state_str[proxy->state], proxy_state_str[state]);
 
 			proxy->state = state;
@@ -1295,7 +1296,7 @@ void	pg_cache_update_group_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_h
 
 		if (state != group->state)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Proxy group \"%s\" changed state from %s to %s",
+			zabbix_log(LOG_LEVEL_WARNING, "proxy group \"%s\" changed state from %s to %s",
 					group->name, group_state_str[group->state], group_state_str[state]);
 
 			group->state = state;

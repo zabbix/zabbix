@@ -675,8 +675,16 @@ int	zbx_eval_substitute_macros(const zbx_eval_context_t *ctx, char **error,
 		{
 			case ZBX_EVAL_TOKEN_VAR_MACRO:
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
-				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
-				ret = resolver(token->type, &value, error, pargs);
+				if (ZBX_VARIANT_NONE == token->value.type)
+					value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
+				else if (ZBX_VARIANT_STR == token->value.type)
+					value = zbx_strdup(NULL, token->value.data.str);
+				else
+					ret = SUCCEED_PARTIAL;
+
+				if (NULL != value)
+					ret = resolver(token->type, &value, error, pargs);
+
 				break;
 			case ZBX_EVAL_TOKEN_VAR_STR:
 				if (SUCCEED != eval_has_usermacro(ctx->expression + token->loc.l,

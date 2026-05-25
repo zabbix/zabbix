@@ -106,23 +106,17 @@ $form
 	->addItem((new CTabView())
 		->addTab('iconmap-edit', _('Icon map'), $form_grid)
 		->setFooter($data['iconmapid'] != 0
-			? makeFormFooter(new CSubmit('update', _('Update')), [
-				(new CSimpleButton(_('Clone')))->setId('clone'),
-				(new CSimpleButton(_('Delete')))
-					->setAttribute('data-redirect-url', (new CUrl('zabbix.php'))
-						->setArgument('action', 'iconmap.delete')
-						->setArgument('iconmapid', $data['iconmapid'])
-						->setArgument(CSRF_TOKEN_NAME, $csrf_token)
-					)
-					->setId('delete'),
+			? makeFormFooter((new CSubmit('', _('Update')))->addClass('js-submit'), [
+				(new CSimpleButton(_('Clone')))->addClass('js-clone'),
+				(new CSimpleButton(_('Delete')))->addClass('js-delete'),
 				(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'iconmap.list')
-				))->setId('cancel')
+				))->addClass('js-cancel')
 			])
-			: makeFormFooter(new CSubmit('add', _('Add')), [
+			: makeFormFooter((new CSubmit('', _('Add')))->addClass('js-submit'), [
 				(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'iconmap.list')
-				))->setId('cancel')
+				))->addClass('js-cancel')
 			])
 		)
 	)
@@ -156,11 +150,13 @@ function getMappingEntryView(string $sortorder, string $expression, string $icon
 			)
 		)
 		->addItem((new CCol())
-			->addItem((new CTextBox("mappings[$sortorder][expression]", $expression, false, 64))
+			->addClass(ZBX_STYLE_ALIGN_TOP)
+			->addItem((new CTextAreaFlexible("mappings[$sortorder][expression]", $expression))
 				->setErrorContainer('mapping-'.$sortorder.'-error-container')
 				->setErrorLabel(_('Expression'))
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setMaxlength(DB::getFieldLength('icon_mapping', 'expression'))
 			)
 		)
 		->addItem((new CCol())

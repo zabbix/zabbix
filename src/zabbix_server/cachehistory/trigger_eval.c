@@ -727,11 +727,14 @@ void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vecto
 			continue;
 		}
 
-		/* otherwise try to recover trigger by setting OK value */
-		if (TRIGGER_RECOVERY_MODE_EXPRESSION == tr->recovery_mode)
+		switch (tr->recovery_mode)
 		{
-			tr->new_value = TRIGGER_VALUE_OK;
-			continue;
+			case TRIGGER_RECOVERY_MODE_EXPRESSION:
+				tr->new_value = TRIGGER_VALUE_OK;
+				continue;
+			case TRIGGER_RECOVERY_MODE_NONE:
+				tr->new_value = TRIGGER_VALUE_NONE;
+				continue;
 		}
 
 		/* processing recovery expression mode */
@@ -746,6 +749,8 @@ void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vecto
 			tr->new_value = TRIGGER_VALUE_OK;
 			continue;
 		}
+		else
+			tr->new_value = TRIGGER_VALUE_NONE;
 	}
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))

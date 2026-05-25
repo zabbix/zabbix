@@ -31,6 +31,7 @@ window.template_edit_popup = new class {
 		this.all_templateids = null;
 		this.show_inherited_tags = false;
 		this.tags_table = this.form_element.querySelector('.tags-table');
+		this.tags_abort_controller = null;
 		this.show_inherited_macros = false;
 
 		const return_url = new URL('zabbix.php', location.href);
@@ -137,14 +138,22 @@ window.template_edit_popup = new class {
 			templateids: this.#getAllTemplates(),
 			show_inherited_tags: fields.template_show_inherited_tags,
 			tags: fields.tags
+		};
+
+		if (this.tags_abort_controller !== null) {
+			this.tags_abort_controller.abort();
 		}
+
+		const abort_controller = new AbortController();
+		this.tags_abort_controller = abort_controller;
 
 		this.overlay.setLoading();
 
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
+			body: JSON.stringify(data),
+			signal: abort_controller.signal
 		})
 			.then(response => response.json())
 			.then(response => {
@@ -155,18 +164,31 @@ window.template_edit_popup = new class {
 				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
 			})
 			.catch((message) => {
+				if (abort_controller.signal.aborted) {
+					return;
+				}
+
 				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});
 				this.form.renderErrors();
 				throw message;
 			})
 			.finally(() => {
+				if (this.tags_abort_controller !== abort_controller) {
+					return;
+				}
+
+				this.tags_abort_controller = null;
 				this.overlay.unsetLoading();
 			});
 	}
 
 	#initMacrosTab() {
+		const container = $('#template_macros_container .table-forms-td-right');
+		const show_inherited_macros_element = document.getElementById('show_inherited_template_macros');
+
 		this.macros_manager = new HostMacrosManager({
-			container: $('#template_macros_container .table-forms-td-right'),
+			container: container,
+			source: 'template',
 			load_callback: () => {
 				this.form.discoverAllFields();
 
@@ -181,7 +203,14 @@ window.template_edit_popup = new class {
 			}
 		});
 
-		const show_inherited_macros_element = document.getElementById('show_inherited_template_macros');
+		container
+			.bind('loader.start', () => show_inherited_macros_element.querySelectorAll('input')
+				.forEach(radio_input => radio_input.setAttribute('readonly', 'readonly'))
+			)
+			.bind('loader.stop', () => show_inherited_macros_element.querySelectorAll('input')
+				.forEach(radio_input => radio_input.removeAttribute('readonly'))
+			);
+
 		this.show_inherited_macros = show_inherited_macros_element.querySelector('input:checked').value == 1;
 
 		this.macros_manager.initMacroTable(this.show_inherited_macros);

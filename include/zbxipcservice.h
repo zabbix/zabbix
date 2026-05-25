@@ -70,7 +70,10 @@ typedef struct
 	struct event_base		*ev;
 	struct event			*ev_listener;
 	struct event			*ev_timer;
+
+	/* internally used to wake up ipc service from recv wait */
 	struct event			*ev_alert;
+	int				alert_pipe[2];
 
 	/* the unix socket path */
 	char				*path;

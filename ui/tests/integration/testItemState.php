@@ -25,8 +25,8 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  */
 class testItemState extends CIntegrationTest {
 
-	const REFRESH_ACT_CHKS_INTERVAL = 60;
-	const PROCESS_ACT_CHKS_DELAY = 60;
+	const REFRESH_ACT_CHKS_INTERVAL = 1;
+	const PROCESS_ACT_CHKS_DELAY = 10;
 	const LOG_LINE_WAIT_TIME	 = 30;
 	const PSV_FILE_NAME = '/tmp/some_temp_file_psv';
 	const ACT_FILE_NAME = '/tmp/some_temp_file_act';

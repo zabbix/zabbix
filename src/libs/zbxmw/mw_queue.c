@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxalgo.h"
 #include "zbxmw.h"
 #include "mw_queue.h"
 
@@ -298,6 +299,23 @@ int	zbx_mw_queue_drain_completed(zbx_mw_queue_t *queue, zbx_vector_mw_task_ptr_t
 	}
 
 	return tasks->values_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get queue statistics                                              *
+ *                                                                            *
+ * Parameters: queue         - [IN]  queue to get statistics for              *
+ *             priority_num  - [OUT] number of priority tasks                 *
+ *             normal_num    - [OUT] number of normal tasks                   *
+ *             completed_num - [OUT] number of completed tasks                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_mw_queue_get_stats(zbx_mw_queue_t *queue, int *priority_num, int *normal_num, int *completed_num)
+{
+	*priority_num = zbx_queue_ptr_values_num(&queue->priority);
+	*normal_num = zbx_queue_ptr_values_num(&queue->normal);
+	*completed_num = zbx_queue_ptr_values_num(&queue->completed);
 }
 
 /******************************************************************************

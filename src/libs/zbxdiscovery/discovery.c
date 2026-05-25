@@ -21,6 +21,7 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxstats.h"
+#include "zbxexit.h"
 
 #define DISCOVERER_INITIALIZED_YES	1
 

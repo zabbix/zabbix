@@ -42,7 +42,10 @@ class CControllerModuleEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
+		global $ZBX_FEATURE_FLAGS;
+
+		if (!$ZBX_FEATURE_FLAGS['modules_config_enabled']
+				|| !$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
 

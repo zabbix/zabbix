@@ -39,6 +39,7 @@ require_once dirname(__FILE__).'/testHistoryValueDuplicates.php';
 require_once dirname(__FILE__).'/testHighAvailability.php';
 require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
+require_once dirname(__FILE__).'/testTriggerCEP.php';
 /* require_once dirname(__FILE__).'/testTlsRequest.php'; */
 require_once dirname(__FILE__).'/testActiveAvailability.php';
 require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
@@ -64,6 +65,7 @@ require_once dirname(__FILE__).'/testUserMacrosWithContextRegex.php';
 require_once dirname(__FILE__).'/testNestedLLD.php';
 require_once dirname(__FILE__).'/testCalculatedExpression.php';
 require_once dirname(__FILE__).'/testDiagInfo.php';
+require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -101,6 +103,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testHighAvailability');
 		$suite->addTestSuite('testUserParametersReload');
 		$suite->addTestSuite('testTriggerState');
+		$suite->addTestSuite('testTriggerCEP');
 		/* $suite->addTestSuite('testTlsRequest'); */
 		$suite->addTestSuite('testActiveAvailability');
 		$suite->addTestSuite('testProxyConfSync');
@@ -124,6 +127,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testNestedLLD');
 		$suite->addTestSuite('testCalculatedExpression');
 		$suite->addTestSuite('testDiagInfo');
+		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		return $suite;
 	}
 }

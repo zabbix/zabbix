@@ -34,12 +34,13 @@ class CControllerPopup extends CController {
 	 */
 	private string $action;
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 
 		$this->supported_popups = [
 			'acknowledge.edit' => _('Update problem'),
 			'action.edit' => _('Action edit'),
+			'ceprule.edit' => _('CEP rule edit'),
 			'connector.edit' => _('Connector edit'),
 			'correlation.edit' => _('Correlation edit'),
 			'discovery.edit' => _('Discovery rule edit'),
@@ -57,6 +58,7 @@ class CControllerPopup extends CController {
 			'proxy.edit' => _('Proxy edit'),
 			'proxygroup.edit' => _('Proxy group edit'),
 			'templategroup.edit' => _('Template group edit'),
+			'scheduledreport.edit' => _('Scheduled report edit'),
 			'script.edit' => _('Script edit'),
 			'service.edit' => _('Service edit'),
 			'sla.edit' => _('SLA edit'),
@@ -67,7 +69,7 @@ class CControllerPopup extends CController {
 		];
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'popup' => 'required|in '.implode(',', array_keys($this->supported_popups))
 		];
@@ -94,11 +96,11 @@ class CControllerPopup extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->popup_controller->checkPermissions();
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'popup' => [
 				'action' => $this->action,

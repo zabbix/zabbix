@@ -1712,6 +1712,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$new_functions = [];
 		$triggers_functions = [];
 		$new_tags = [];
+		$ins_trigger_rtdata = [];
 		$this->implode_expressions($new_triggers, null, $triggers_functions, $inherited);
 
 		$triggerid = DB::reserveIds('triggers', count($new_triggers));
@@ -1728,6 +1729,9 @@ abstract class CTriggerGeneral extends CApiService {
 			if ($this instanceof CTriggerPrototype) {
 				$new_trigger['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 			}
+			else {
+				$ins_trigger_rtdata[] = ['triggerid' => $new_trigger['triggerid']];
+			}
 
 			if (array_key_exists('tags', $new_trigger)) {
 				foreach ($new_trigger['tags'] as $tag) {
@@ -1742,6 +1746,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 		DB::insert('triggers', $new_triggers, false);
 		DB::insertBatch('functions', $new_functions, false);
+		DB::insertBatch('trigger_rtdata', $ins_trigger_rtdata, false);
 
 		if ($new_tags) {
 			DB::insert('trigger_tag', $new_tags);

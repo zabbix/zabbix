@@ -17,6 +17,8 @@
 
 #include "zbxtypes.h"
 
+int	zbx_is_rfc_extended_hostname(const char *host);
+
 int	zbx_is_ip4(const char *ip);
 int	zbx_is_ip6(const char *ip);
 int	zbx_is_supported_ip(const char *ip);
@@ -55,7 +57,7 @@ typedef struct
 	unsigned char	type;
 
 	/* 1 if the range was defined with network mask, 0 otherwise */
-	unsigned char   mask;
+	unsigned char	mask;
 }
 zbx_iprange_t;
 

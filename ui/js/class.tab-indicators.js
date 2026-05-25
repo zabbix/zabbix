@@ -901,8 +901,8 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		const form_rows = document
-			.querySelectorAll('#conditions tbody .form_row > td > input.macro:not(:placeholder-shown)');
+		const form_rows = [...document.querySelectorAll('#conditions tbody .form_row > td > z-textarea-flexible.macro')]
+			.filter(el => el.value !== '');
 
 		return [...form_rows].filter((row) => !row.readOnly || row.dataset.discovered).length;
 	}

@@ -26,6 +26,7 @@
 #include "zbxcachehistory.h"
 #include "zbxjson.h"
 #include "zbxdbhigh.h"
+#include "zbxexit.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
@@ -1219,7 +1220,7 @@ out:
  * Purpose: send flush command to preprocessing manager                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocessor_flush(void)
+size_t	zbx_preprocessor_flush(void)
 {
 	if (0 < preproc_offset)
 	{
@@ -1230,7 +1231,7 @@ void	zbx_preprocessor_flush(void)
 		zbx_free(preproc_data);
 	}
 
-	zbx_dc_flush_history();
+	return zbx_dc_flush_history();
 }
 
 /******************************************************************************

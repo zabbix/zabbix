@@ -18,6 +18,7 @@
 #include "zbxmutexs.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxexit.h"
 
 #ifdef _WINDOWS
 #	include "messages.h"

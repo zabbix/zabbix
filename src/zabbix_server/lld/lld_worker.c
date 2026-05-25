@@ -31,6 +31,7 @@
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
 #include "zbxhash.h"
+#include "zbxexit.h"
 
 typedef struct
 {

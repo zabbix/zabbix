@@ -374,9 +374,10 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 }
 
 void	zbx_sync_history_cache_proxy(const zbx_events_funcs_t *events_cbs,
-		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats)
+		int config_history_storage_pipelines, int mode, zbx_history_sync_stats_t *stats)
 {
 	ZBX_UNUSED(events_cbs);
+	ZBX_UNUSED(mode);
 
 	int				history_num, txn_rc = ZBX_DB_OK;
 	time_t				sync_start;

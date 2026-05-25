@@ -36,6 +36,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxcep_client.h"
 #include "zbxservice.h"
+#include "zbxexit.h"
 
 typedef struct
 {

@@ -17,6 +17,7 @@
 #ifdef HAVE_LIBCURL
 
 #include "zbxcurl.h"
+#include "zbxexit.h"
 
 /* See https://curl.se/libcurl/c/symbols-by-name.html for information in which version a symbol was added. */
 

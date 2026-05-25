@@ -27,6 +27,7 @@
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 #include "zbxstr.h"
+#include "zbxexit.h"
 
 #if defined(HAVE_LIBCURL)
 #	include "zbxcurl.h"
@@ -235,7 +236,7 @@ out:
 	if (NULL != curl)
 		curl_easy_cleanup(curl);
 
-	zbx_json_clean(&j);
+	zbx_json_free(&j);
 	zbx_free(cookie_value);
 
 	return ret;

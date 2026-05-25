@@ -41,7 +41,7 @@ class CControllerCorrelationDisable extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION);
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES);
 	}
 
 	protected function doAction(): void {

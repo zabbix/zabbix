@@ -25,4 +25,10 @@ void	cep_cache_release(zbx_cep_t **);
 void	cep_post_event_updates(zbx_cep_event_update_t *updates, int updates_num);
 void	cep_post_event_handle_action(zbx_cep_event_handle_t *handles, int handles_num, zbx_cep_event_op_t action);
 
+/* statistics */
+void	cep_stats_update_events_accessed(zbx_uint64_t value);
+void	cep_stats_update_events_processed(zbx_uint64_t value);
+void	cep_stats_update_events_discarded(zbx_uint64_t value);
+void	cep_stats_collect(zbx_cep_stats_t *stats);
+
 #endif

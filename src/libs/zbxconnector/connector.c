@@ -17,6 +17,7 @@
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxalgo.h"
+#include "zbxexit.h"
 
 ZBX_PTR_VECTOR_IMPL(connector_stat_ptr, zbx_connector_stat_t *)
 

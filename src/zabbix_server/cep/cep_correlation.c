@@ -625,14 +625,16 @@ static void	correlation_add_close_new_task(zbx_vector_mw_task_ptr_t *tasks, cons
  *                                                                            *
  * Purpose: add CEP tasks to close matched old problem events                 *
  *                                                                            *
- * Parameters: tasks   - [IN/OUT] vector of CEP tasks                         *
+ * Parameters: db      - [IN] database connection                             *
+ *             tasks   - [IN/OUT] vector of CEP tasks                         *
  *             results - [IN]     hash set of correlation results for old     *
  *                               problem events                               *
  *                                                                            *
  * Return value: none                                                         *
  *                                                                            *
  ******************************************************************************/
-static void	correlation_add_close_old_tasks(zbx_vector_mw_task_ptr_t *tasks, zbx_hashset_t *results)
+static void	correlation_add_close_old_tasks(zbx_dbconn_t *db, zbx_vector_mw_task_ptr_t *tasks,
+		zbx_hashset_t *results)
 {
 	zbx_mw_task_t			*task;
 	zbx_vector_uint64_t		triggerids;
@@ -655,6 +657,8 @@ static void	correlation_add_close_old_tasks(zbx_vector_mw_task_ptr_t *tasks, zbx
 
 	zbx_dc_config_get_triggers_by_triggerids(triggers, triggerids.values, errcodes, (size_t)triggerids.values_num);
 
+	zbx_db_stash_connection(db);
+
 	zbx_hashset_iter_reset(results, &iter);
 	while (NULL != (result = (zbx_correlation_result_t *)zbx_hashset_iter_next(&iter)))
 	{
@@ -675,6 +679,8 @@ static void	correlation_add_close_old_tasks(zbx_vector_mw_task_ptr_t *tasks, zbx
 		task = cep_create_task_close_event(db_event, result->eventid, 0, result->correlationid);
 		zbx_vector_mw_task_ptr_append(tasks, task);
 	}
+
+	zbx_db_unstash_connection(db);
 
 	zbx_dc_config_clean_triggers(triggers, errcodes, triggerids.values_num);
 	zbx_free(triggers);
@@ -813,8 +819,8 @@ int	cep_correlate_db_event(const zbx_db_event *db_event, zbx_dbconn_pool_t *dbpo
 		zbx_free(sql);
 	}
 
-	zbx_dbconn_pool_release_connection(dbpool, db);
 	zbx_correlation_cache_close(handle);
+
 
 	/* process 'close new' operation */
 
@@ -831,8 +837,10 @@ int	cep_correlate_db_event(const zbx_db_event *db_event, zbx_dbconn_pool_t *dbpo
 	if (0 != results.num_data)
 	{
 		op_result |= CORRELATION_RESULT_CLOSE_OLD;
-		correlation_add_close_old_tasks(tasks, &results);
+		correlation_add_close_old_tasks(db, tasks, &results);
 	}
+
+	zbx_dbconn_pool_release_connection(dbpool, db);
 
 	zbx_vector_correlation_ptr_destroy(&corr_new);
 	zbx_vector_correlation_ptr_destroy(&corr_old);

@@ -17,6 +17,7 @@
 #include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbxlog.h"
+#include "zbxexit.h"
 
 /* the size of temporary buffer used to read from output stream */
 #define PIPE_BUFFER_SIZE	4096
