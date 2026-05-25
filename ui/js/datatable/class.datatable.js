@@ -1336,6 +1336,8 @@ class CDataTable {
 			if (loading_fadein) {
 				this.#element.classList.add(ZBX_STYLE_LOADING_FADEIN);
 			}
+
+			this.#options_popup?.getElement()?.classList.add(ZBX_STYLE_LOADING);
 		}
 
 		const {onSuccess, onError, onFinally} = {
@@ -2199,6 +2201,8 @@ class CDataTable {
 			this.#unlockHeight();
 
 			this.#element.classList.remove(ZBX_STYLE_LOADING, ZBX_STYLE_LOADING_FADEIN);
+
+			this.#options_popup?.getElement()?.classList.remove(ZBX_STYLE_LOADING);
 		});
 	}
 
