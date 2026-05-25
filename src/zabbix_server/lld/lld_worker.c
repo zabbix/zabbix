@@ -240,6 +240,9 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 		}
 
 		zbx_ipc_message_clean(&message);
+#ifdef HAVE_MALLOC_TRIM
+		zbx_malloc_trim(time(NULL), 0, ZBX_MEBIBYTE * 8);
+#endif
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
