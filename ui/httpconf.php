@@ -191,12 +191,12 @@ elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('update')) {
-		$messageTrue = _('Web scenario updated');
-		$messageFalse = _('Cannot update web scenario');
+		$message_success = _('Web scenario updated');
+		$message_failed = _('Cannot update web scenario');
 	}
 	else {
-		$messageTrue = _('Web scenario added');
-		$messageFalse = _('Cannot add web scenario');
+		$message_success = _('Web scenario added');
+		$message_failed = _('Cannot add web scenario');
 	}
 
 	$result = false;
@@ -353,13 +353,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			error($msg);
 		}
 
-		show_error_message($messageFalse);
+		show_error_message($message_failed);
 	}
 
 	$result = DBend($result);
 
 	if ($result) {
-		CMessageHelper::setSuccessTitle($messageTrue);
+		CMessageHelper::setSuccessTitle($message_success);
 
 		$response = new CControllerResponseRedirect($backurl);
 		$response->redirect();
@@ -421,10 +421,10 @@ elseif (hasRequest('action') && getRequest('action') === 'httptest.massdelete'
 	}
 
 	$web_scenarios_count = count(getRequest('group_httptestid'));
-	$messageSuccess = _n('Web scenario deleted', 'Web scenarios deleted', $web_scenarios_count);
-	$messageFailed = _n('Cannot delete web scenario', 'Cannot delete web scenarios', $web_scenarios_count);
+	$message_success = _n('Web scenario deleted', 'Web scenarios deleted', $web_scenarios_count);
+	$message_failed = _n('Cannot delete web scenario', 'Cannot delete web scenarios', $web_scenarios_count);
 
-	show_messages($result, $messageSuccess, $messageFailed);
+	show_messages($result, $message_success, $message_failed);
 }
 
 if (hasRequest('action') && hasRequest('group_httptestid') && !$result) {
