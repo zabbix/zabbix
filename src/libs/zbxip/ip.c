@@ -19,6 +19,104 @@
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check if string is valid host name used for checking services     *
+ *                                                                            *
+ * Parameters: host - [IN]                                                    *
+ *                                                                            *
+ * Return value: SUCCEED - input is hostname address                          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: valid host names for this function are names with only ASCII     *
+ *           characters 0-9, A-Z, a-z, hyphen ('-') and dot ('.').            *
+ *           Purely numeric names (e.g. 192.168.10) are not allowed.          *
+ *           Additionally underscore ('_') is allowed as Windows host names   *
+ *           allow it.                                                        *
+ *           Internationalized Domain Names with multibyte UTF-8 characters   *
+ *           will be rejected as not valid (Punycode can be used).            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_is_rfc_extended_hostname(const char *host)
+{
+	const char	*p = host;
+	int		label_len = 1;
+	int		prev_hyphen = 0;
+	int		is_purely_numeric = 1;	/* detect numeric-only names */
+
+	/* Requirements and limits for host names are defined in RFC 1035, */
+	/* with clarifications in RFC 1123, RFC 2181. */
+
+	/* Host name should start with [0-9A-Za-z], additionally underscore ('_') is allowed. */
+	if ('\0' == *p || 0x80 == (0x80 & *p) || (0 == isalnum(*p) && '_' != *p))
+		return FAIL;
+	else if (0 == isdigit(*p++))
+		is_purely_numeric = 0;
+
+	while ('\0' != *p)
+	{
+		if (0 != (0x80 & *p))
+			return FAIL;
+
+		if (0 != isalnum(*p) || '_' == *p)
+		{
+			label_len++;
+			prev_hyphen = 0;
+
+			if (0 == isdigit(*p))
+				is_purely_numeric = 0;
+		}
+		else if ('-' == *p)
+		{
+			/* label must not start with hyphen */
+			if (0 == label_len)
+				return FAIL;
+
+			label_len++;
+			prev_hyphen = 1;
+			is_purely_numeric = 0;
+		}
+		else if ('.' == *p)
+		{
+			/* empty label or label ending with hyphen */
+			if (0 == label_len || 1 == prev_hyphen)
+				return FAIL;
+
+			label_len = 0;
+			prev_hyphen = 0;
+		}
+		else
+			return FAIL;
+
+		/* label should not exceed 63 characters */
+		if (63 < label_len)
+			return FAIL;
+
+		p++;
+
+		/* Total length should not exceed 253 characters without trailing dot */
+		/* and 254 characters if trailing dot is present. */
+		if (253 < p - host)
+		{
+			if ('.' != *(p - 1))
+				return FAIL;
+
+			if (255 < p - host)
+				return FAIL;
+		}
+	}
+
+	/* last label must not end with hyphen */
+	if (1 == prev_hyphen)
+		return FAIL;
+
+	/* reject purely numeric names */
+	if (1 == is_purely_numeric)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: checks if string is IPv4 address                                  *
  *                                                                            *
  * Parameters: ip - [IN]                                                      *
@@ -31,8 +129,6 @@ int	zbx_is_ip4(const char *ip)
 {
 	const char	*p = ip;
 	int		digits = 0, dots = 0, res = FAIL, octet = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __func__, ip);
 
 	while ('\0' != *p)
 	{
@@ -61,7 +157,7 @@ int	zbx_is_ip4(const char *ip)
 	if (3 == dots && 1 <= digits && 3 >= digits && 255 >= octet)
 		res = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): ip:'%s' %s", __func__, ip, zbx_result_string(res));
 
 	return res;
 }
@@ -80,8 +176,6 @@ int	zbx_is_ip6(const char *ip)
 {
 	const char	*p = ip, *last_colon;
 	int		xdigits = 0, only_xdigits = 0, colons = 0, dbl_colons = 0, res;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __func__, ip);
 
 	while ('\0' != *p)
 	{
@@ -123,7 +217,7 @@ int	zbx_is_ip6(const char *ip)
 	else
 		res = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): ip:'%s' %s", __func__, ip, zbx_result_string(res));
 
 	return res;
 }

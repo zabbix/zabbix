@@ -65,8 +65,8 @@ require_once dirname(__FILE__).'/testNestedLLD.php';
 require_once dirname(__FILE__).'/testCalculatedExpression.php';
 require_once dirname(__FILE__).'/testDiagInfo.php';
 require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
+/* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
 require_once dirname(__FILE__).'/testBridgeAdapter.php';
-
 use PHPUnit\Framework\TestSuite;
 
 class IntegrationTests {
@@ -127,6 +127,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testCalculatedExpression');
 		$suite->addTestSuite('testDiagInfo');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
+		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		$suite->addTestSuite('testBridgeAdapter');
 		return $suite;
 	}

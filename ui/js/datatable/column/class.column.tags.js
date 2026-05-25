@@ -1,4 +1,3 @@
-<?php
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -13,18 +12,16 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-$output = [
-	'body' => (new CPartial('monitoring.host.view.html', $data))->getOutput(),
-	'groupids' => $data['filter']['groupids']
-];
 
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
+class CDataTableColumnTags extends CDataTableColumn {
+
+	constructor(id, name) {
+		super(id, name);
+
+		this.setOptionsPopupHandler('tags')
+			.setFields(['tags'])
+			.setRenderer('tags')
+			.setDuplicatable(true)
+			.setWidth('max-content');
+	}
 }
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo json_encode($output);

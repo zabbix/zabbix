@@ -182,7 +182,8 @@ class testPageTriggerUrl extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=problem.view');
 
 		// Open trigger context menu.
-		$this->query('class:list-table')->asTable()->one()->query('link', $data['trigger'])->one()->click();
+		$this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady()
+				->query('link', $data['trigger'])->one()->scrollIntoView(50)->click();
 		$this->checkTriggerUrl($data);
 	}
 

@@ -810,46 +810,56 @@ static int	DBpatch_7050054(void)
 
 static int	DBpatch_7050055(void)
 {
+	if (ZBX_DB_OK > zbx_db_execute("update settings set value_str='' where name='session_key'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050056(void)
+{
 	const zbx_db_field_t	field = {"auth_scheme", "0", NULL, NULL, 32, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("token", &field);
 }
 
-static int	DBpatch_7050056(void)
+static int	DBpatch_7050057(void)
 {
 	return DBdrop_foreign_key("token", 1);
 }
 
-static int	DBpatch_7050057(void)
+static int	DBpatch_7050058(void)
 {
 	return DBdrop_foreign_key("token", 2);
 }
 
-static int	DBpatch_7050058(void)
+static int	DBpatch_7050059(void)
 {
 	return DBdrop_index("token", "token_2");
 }
 
-static int	DBpatch_7050059(void)
+static int	DBpatch_7050060(void)
 {
 	return DBcreate_index("token", "token_2", "userid,auth_scheme,name", 1);
 }
 
-static int	DBpatch_7050060(void)
+static int	DBpatch_7050061(void)
 {
 	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("token", 1, &field);
 }
 
-static int	DBpatch_7050061(void)
+static int	DBpatch_7050062(void)
 {
 	const zbx_db_field_t	field = {"creator_userid", NULL, "users", "userid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("token", 2, &field);
 }
 
-static int	DBpatch_7050062(void)
+static int	DBpatch_7050063(void)
 {
 	const zbx_db_table_t	table =
 			{"dpop_jti_cache", "jti", 0,
@@ -864,7 +874,7 @@ static int	DBpatch_7050062(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050063(void)
+static int	DBpatch_7050064(void)
 {
 	const zbx_db_table_t	table =
 			{"device", "deviceid", 0,
@@ -884,19 +894,19 @@ static int	DBpatch_7050063(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050064(void)
+static int	DBpatch_7050065(void)
 {
 	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("device", 1, &field);
 }
 
-static int	DBpatch_7050065(void)
+static int	DBpatch_7050066(void)
 {
 	return DBcreate_index("device", "device_1", "userid", 0);
 }
 
-static int	DBpatch_7050066(void)
+static int	DBpatch_7050067(void)
 {
 	const zbx_db_table_t	table =
 			{"token_device", "tokenid", 0,
@@ -911,26 +921,26 @@ static int	DBpatch_7050066(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050067(void)
+static int	DBpatch_7050068(void)
 {
 	const zbx_db_field_t	field = {"tokenid", NULL, "token", "tokenid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("token_device", 1, &field);
 }
 
-static int	DBpatch_7050068(void)
+static int	DBpatch_7050069(void)
 {
 	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("token_device", 2, &field);
 }
 
-static int	DBpatch_7050069(void)
+static int	DBpatch_7050070(void)
 {
 	return DBcreate_index("token_device", "token_device_1", "deviceid", 0);
 }
 
-static int	DBpatch_7050070(void)
+static int	DBpatch_7050071(void)
 {
 	const zbx_db_table_t	table =
 			{"device_key", "device_keyid", 0,
@@ -950,7 +960,7 @@ static int	DBpatch_7050070(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050071(void)
+static int	DBpatch_7050072(void)
 {
 	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
@@ -958,17 +968,17 @@ static int	DBpatch_7050071(void)
 	return DBadd_foreign_key("device_key", 1, &field);
 }
 
-static int	DBpatch_7050072(void)
+static int	DBpatch_7050073(void)
 {
 	return DBcreate_index("device_key", "device_key_1", "deviceid", 0);
 }
 
-static int	DBpatch_7050073(void)
+static int	DBpatch_7050074(void)
 {
 	return DBcreate_index("device_key", "device_key_2", "kid", 0);
 }
 
-static int	DBpatch_7050074(void)
+static int	DBpatch_7050075(void)
 {
 	const zbx_db_table_t	table =
 			{"device_enrollment_token", "deviceid", 0,
@@ -984,7 +994,7 @@ static int	DBpatch_7050074(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050075(void)
+static int	DBpatch_7050076(void)
 {
 	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
@@ -992,12 +1002,12 @@ static int	DBpatch_7050075(void)
 	return DBadd_foreign_key("device_enrollment_token", 1, &field);
 }
 
-static int	DBpatch_7050076(void)
+static int	DBpatch_7050077(void)
 {
 	return DBcreate_index("device_enrollment_token", "device_enrollment_token_1", "token", 1);
 }
 
-static int	DBpatch_7050077(void)
+static int	DBpatch_7050078(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1011,7 +1021,7 @@ static int	DBpatch_7050077(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050078(void)
+static int	DBpatch_7050079(void)
 {
 	int		i;
 	const char	*columns = "role_ruleid,roleid,type,name,value_int,value_str,value_moduleid,value_serviceid";
@@ -1042,7 +1052,7 @@ static int	DBpatch_7050078(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050079(void)
+static int	DBpatch_7050080(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1093,7 +1103,7 @@ static int	DBpatch_7050079(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050080(void)
+static int	DBpatch_7050081(void)
 {
 	return DBcreate_index("device", "device_2", "uuid", 1);
 }
@@ -1185,5 +1195,6 @@ DBPATCH_ADD(7050077, 0, 1)
 DBPATCH_ADD(7050078, 0, 1)
 DBPATCH_ADD(7050079, 0, 1)
 DBPATCH_ADD(7050080, 0, 1)
+DBPATCH_ADD(7050081, 0, 1)
 
 DBPATCH_END()

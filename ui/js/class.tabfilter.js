@@ -24,6 +24,11 @@ class CTabFilter extends CBaseComponent {
 	 */
 	#tabs_sortable = null;
 
+	/**
+	 * @type {boolean}
+	 */
+	#reload_on_tab_create = true;
+
 	constructor(target, options) {
 		super(target);
 		this._options = options;
@@ -419,6 +424,13 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	/**
+	 * @param {boolean} reload_on_tab_create
+	 */
+	setReloadOnTabCreate(reload_on_tab_create) {
+		this.#reload_on_tab_create = reload_on_tab_create;
+	}
+
+	/**
 	 * Register tab filter events, called once during initialization.
 	 */
 	registerEvents() {
@@ -617,6 +629,11 @@ class CTabFilter extends CBaseComponent {
 					})
 					.then(() => {
 						item.setBrowserLocation(params);
+
+						if (!this.#reload_on_tab_create) {
+							return;
+						}
+
 						window.location.reload(true);
 					});
 				}

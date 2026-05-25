@@ -1,1 +1,0 @@
-A.F....... [ZBXNEXT-10243] introduced new ZBX_FEATURE_FLAGS variable to disable access to modules, media types and HTTP authentication at the system level (kkuzmina)

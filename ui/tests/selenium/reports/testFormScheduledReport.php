@@ -1479,14 +1479,21 @@ class testFormScheduledReport extends CWebTest {
 			return;
 		}
 
-		$form->submit();
-
 		if ($data['expected'] === TEST_BAD) {
 			if (array_key_exists('error_details', $data)) {
+				$form->submit();
+
 				$title = 'Cannot '.(($action === 'update') ? 'update' : 'add').' scheduled report';
 				$this->assertMessage(TEST_BAD, $title, $data['error_details']);
 			}
 			else {
+				// It is required to submit the form to trigger inline validation for the Dashboard field.
+				if (array_key_exists('Dashboard', $data['inline_errors'])) {
+					$form->submit();
+				}
+				else {
+					$this->page->removeFocus();
+				}
 				$this->assertInlineError($form, $data['inline_errors']);
 			}
 
@@ -1494,6 +1501,7 @@ class testFormScheduledReport extends CWebTest {
 		}
 
 		if ($data['expected'] === TEST_GOOD) {
+			$form->submit();
 			COverlayDialogElement::ensureNotPresent();
 
 			// Trim trailing and leading spaces in expected values before comparison.
