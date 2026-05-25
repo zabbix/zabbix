@@ -76,6 +76,7 @@ const view = new class {
 		const tls_encryption = document.getElementById('tls_encryption');
 		const tls_encryption_hint = document.getElementById('tls_encryption_hint');
 		const vault_url = document.getElementById('vault_url');
+		const db_host_row = document.getElementById('db_host_row');
 		const db_type = document.querySelector('[name=type]').value;
 		const host = document.querySelector('[name=server]').value;
 		const hintbox = document.querySelector('label[for="server"] button[data-hintbox]');
@@ -162,6 +163,8 @@ const view = new class {
 		else if (encryption_customizable) {
 			verify_host.removeAttribute('disabled');
 		}
+
+		db_host_row.querySelector('button').classList.toggle(ZBX_STYLE_BTN_ICON, db_type !== ZBX_DB_MYSQL);
 	}
 
 	#updateEncryptionFields() {

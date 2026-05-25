@@ -466,6 +466,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		}
 
 		$dialog->submit();
+		$this->page->waitUntilReady();
 
 		if (array_key_exists('error', $data)) {
 			$this->assertMessage(TEST_BAD, null, $data['error']);

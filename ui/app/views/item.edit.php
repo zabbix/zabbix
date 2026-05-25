@@ -224,7 +224,9 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_EDIT),
 	'body' => $form->toString().implode('', $scripts),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('item.edit.js.php'),
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('item.edit.js.php').
+		$this->readJsFile('host.interface.selector.js.php', null, '/../partials/js'),
 	'dialogue_class' => 'modal-popup-large'
 ];
 
