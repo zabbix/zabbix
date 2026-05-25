@@ -33,7 +33,8 @@ void	zbx_discovery_update_host_proxy(void *handle, zbx_uint64_t druleid, const c
 	zbx_pb_discovery_write_host((zbx_pb_discovery_data_t *)handle, druleid, ip, dns, status, (int)now, "");
 }
 
-void	zbx_discovery_update_hosts_proxy(zbx_uint64_t druleid, time_t now, zbx_add_event_func_t add_event_cb)
+void	zbx_discovery_update_hosts_proxy(const zbx_uint64_t druleid, const time_t now,
+		zbx_add_event_func_t add_event_cb)
 {
 	ZBX_UNUSED(druleid);
 	ZBX_UNUSED(now);

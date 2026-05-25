@@ -608,6 +608,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						zbx_vector_op_dinterface_ptr_append(&d_ifs_snmp, d_if);
 				}
 			}
+			else
+				zbx_free(d_if);
 		}
 		zbx_db_free_result(result);
 

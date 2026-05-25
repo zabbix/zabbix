@@ -54,7 +54,8 @@ typedef	void(*zbx_discovery_close_func_t)(void *handle);
 typedef	void(*zbx_discovery_find_host_func_t)(const zbx_uint64_t druleid, const char *ip, zbx_db_dhost *dhost);
 typedef void(*zbx_discovery_update_host_func_t)(void *handle, zbx_uint64_t druleid, const char *ip, const char *dns,
 		int status, time_t now);
-typedef	void(*zbx_discovery_update_hosts_func_t)(zbx_uint64_t druleid, time_t now, zbx_add_event_func_t add_event_cb);
+typedef	void(*zbx_discovery_update_hosts_func_t)(const zbx_uint64_t druleid, const time_t now,
+		zbx_add_event_func_t add_event_cb);
 typedef	void(*zbx_discovery_update_service_func_t)(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		zbx_uint64_t unique_dcheckid, zbx_db_dhost *dhost, const char *ip, const char *dns, int port,
 		int status, const char *value, time_t now, zbx_vector_uint64_t *dserviceids,

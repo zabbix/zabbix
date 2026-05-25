@@ -2167,8 +2167,10 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_u
 		if (FAIL == (i = zbx_vector_ptr_search(&drules, &druleid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			if (FAIL == zbx_discovery_process_drule_iprange(valid_drules.values[vdr_idx], &ipranges,
-					NULL, 0))
+					tmp, sizeof(tmp)))
 			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): %s", __func__, tmp);
+
 				zbx_discovery_drule_free(valid_drules.values[vdr_idx]);
 				zbx_vector_dc_drule_ptr_remove(&valid_drules, vdr_idx);
 				continue;

@@ -560,7 +560,8 @@ void	zbx_discovery_update_host_server(void *handle, zbx_uint64_t druleid, const 
  * Purpose: update status of discovered hosts                                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_update_hosts_server(zbx_uint64_t druleid, time_t now, zbx_add_event_func_t add_event_cb)
+void	zbx_discovery_update_hosts_server(const zbx_uint64_t druleid, const time_t now,
+		zbx_add_event_func_t add_event_cb)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
