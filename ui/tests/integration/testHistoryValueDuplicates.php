@@ -35,7 +35,8 @@ class testHistoryValueDuplicates extends CIntegrationTest {
 			'name' => $item,
 			'key_' => $item,
 			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => $type
+			'value_type' => $type,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));

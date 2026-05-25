@@ -94,8 +94,7 @@ if (hasRequest('cancel') || hasRequest('finish')) {
 	redirect('index.php');
 }
 
-if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN
-		&& CSessionHelper::get('step') != CSetupWizard::STAGE_INSTALL) {
+if (file_exists(APP::getRootDir().CConfigFile::CONFIG_FILE_PATH)) {
 	access_deny(ACCESS_DENY_PAGE);
 }
 

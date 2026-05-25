@@ -56,7 +56,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	private static $agent_ping_itemid;
 	private static $log_lastlogsize = 0;
 
-		/**
+	/**
 	 * Component configuration provider.
 	 *
 	 * @return array
@@ -72,7 +72,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				'ValueCacheSize' => '128M',
 				'LogSlowQueries' => '60000',
 				'StartDBSyncers' => '32' /* LLD_DISCOVERY_COUNT * types / ZBX_HC_SYNC_MAX  */
-				/* 'HistoryProvider'=> 'clickhouse;value_types="str,log,text,dbl,uint,json",url=http://localhost:8123,db=zabbix,username=zabbix,password=zabbix' */
 			]
 		];
 	}
@@ -942,17 +941,13 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			}
 			return true;
 		});
-
-		if ($trigger_unknown_error !== null) {
-			self::markTestSkipped('Test case is not supported, see ZBX-27736.');
-		}
 	}
 
 	/**
 	 * Restart the server and verify that nodata-based triggers recover again
 	 * once normal data resumes flowing.
 	 *
-	 * @depends testLLDHistorySyncAtScale_TriggerNoDataFiring
+	 * @depends testLLDHistorySyncAtScale_TriggerNoDataNotSupported
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataRecoveryAfterRestart() {
 		$this->stopComponent(self::COMPONENT_SERVER);

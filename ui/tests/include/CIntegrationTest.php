@@ -212,6 +212,8 @@ class CIntegrationTest extends CAPITest {
 				= array_merge(self::$suite_configuration[$component], $result['configuration'][$component]);
 		}
 
+		$this->updatedAllowedHostsGlobalMacro();
+
 		try {
 			if ($this->prepareData() === false) {
 				throw new Exception('Failed to prepare data for test suite.');
@@ -581,7 +583,7 @@ class CIntegrationTest extends CAPITest {
 	 * @return array
 	 */
 	protected static function getDefaultComponentConfiguration() {
-		global $DB, $HISTORY_PROVIDERS;
+		global $DB, $HISTORY;
 
 		$db = [
 			'DBName' => $DB['DATABASE'],
@@ -1420,5 +1422,29 @@ class CIntegrationTest extends CAPITest {
 		$args = array_merge($params, $cmd);
 
 		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, $args, '> /dev/null 2>&1');
+	}
+
+	/**
+	 * Update the value of the '{$TRAPPER.ALLOWED_HOSTS}' global macro to '0.0.0.0/0,::/0'
+	 *
+	 * @return void
+	 */
+	protected function updatedAllowedHostsGlobalMacro(): void {
+		$allowed_hosts = $this->call('usermacro.get', [
+			'globalmacro' => true,
+			'filter' => ['macro' => '{$TRAPPER.ALLOWED_HOSTS}'],
+			'output' => ['globalmacroid', 'value']
+		]);
+
+		$this->assertArrayHasKey('result', $allowed_hosts);
+		$this->assertArrayHasKey(0, $allowed_hosts['result']);
+
+		if ($allowed_hosts['result'][0]['value'] !== '0.0.0.0/0,::/0') {
+			$this->call('usermacro.updateglobal', [
+				'globalmacroid' => $allowed_hosts['result'][0]['globalmacroid'],
+				'macro' => '{$TRAPPER.ALLOWED_HOSTS}',
+				'value' => '0.0.0.0/0,::/0'
+			]);
+		}
 	}
 }
