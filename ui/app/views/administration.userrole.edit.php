@@ -398,7 +398,7 @@ if (CTemporaryMobileFeatureHelper::isEnabled()) {
 			new CLabel(_('Enabled'), $data['readonly'] ? '' : CRoleHelper::DEVICES_ACCESS),
 			new CFormField(
 				(new CCheckBox('devices_access', 1))
-					->setId(CRoleHelper::DEVICES_ACCESS)
+					->setId('devices.access')
 					->setChecked($data['rules'][CRoleHelper::DEVICES_ACCESS])
 					->setReadonly($data['readonly'])
 					->setUncheckedValue(0)
@@ -432,7 +432,7 @@ if (CTemporaryMobileFeatureHelper::isEnabled()) {
 		),
 		new CFormField(
 			(new CCheckBox('devices_actions_default_access', 1))
-				->setId(CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS)
+				->setId('devices.actions.default_access')
 				->setChecked($data['rules'][CRoleHelper::DEVICES_ACTIONS_DEFAULT_ACCESS])
 				->setReadonly($data['readonly'])
 				->setUncheckedValue(0)
