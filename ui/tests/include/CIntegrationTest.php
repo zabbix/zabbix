@@ -296,6 +296,9 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$case_name = strtr($this->getName(true), [' ' => '-']);
+		if (is_dir(PHPUNIT_COMPONENT_DIR.'all/'.$case_name)) {
+			$case_name = strtr(get_class($this).'_'.$this->getName(true), [' ' => '-']);
+		}
 		mkdir(PHPUNIT_COMPONENT_DIR.'all/'.$case_name, 0775, true);
 		if ($this->hasFailed()) {
 			mkdir(PHPUNIT_COMPONENT_DIR.'failed/'.$case_name, 0775, true);
