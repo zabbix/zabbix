@@ -26,20 +26,10 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 define('PROXY_GOOD', 0);
 define('PROXY_BAD', 1);
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup hosts
  */
 class testFormAdministrationDMProxies extends CLegacyWebTest  {
-	private $proxy_name = 'proxy_name_1';
-	private $new_proxy_name = 'proxy_name_new';
-	private $cloned_proxy_name = 'proxy_name_new_clone';
-	private $long_proxy_name =  '1234567890123456789012345678901234567890123456789012345678901234';
-	private $long_proxy_name2 = '12345678901234567890123456789012345678901234567890123456789012345';
-	private $proxy_host = 'Zabbix server';
-	private $passive_proxy_host = 'H1';
-	private $passive_proxy_name = 'passive_proxy_name1';
 
 	/**
 	 * Attach Behaviors to the test.
@@ -69,7 +59,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest  {
 
 		// Switch to passive mode
 		$this->zbxTestClickXpathWait("//ul[@id='status']//label[@for='status_1']");
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('ip'));
+		$this->query('id:ip')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent(['Proxy name', 'Proxy mode', 'Interface', 'Description']);
 		$this->zbxTestTextPresent(['IP address', 'DNS name', 'Connect to', 'Port']);
 
@@ -197,7 +187,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest  {
 			case HOST_STATUS_PROXY_ACTIVE:
 				$this->zbxTestClickXpathWait("//ul[@id='status']//label[@for='status_0']");
 				$this->zbxTestClickWait('tab_encryptionTab');
-				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('encryption'));
+				$this->query('id:encryption')->waitUntilVisible()->one();
 				$this->zbxTestAssertElementPresentXpath("//input[@id='tls_connect_0'][@disabled]");
 				$this->zbxTestAssertElementPresentXpath("//input[@id='tls_connect_1'][@disabled]");
 				$this->zbxTestAssertElementPresentXpath("//input[@id='tls_connect_2'][@disabled]");
@@ -230,7 +220,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest  {
 				$this->zbxTestInputTypeOverwrite('dns', $dns);
 				$this->zbxTestInputTypeOverwrite('port', $port);
 				$this->zbxTestClickWait('tab_encryptionTab');
-				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('encryption'));
+				$this->query('id:encryption')->waitUntilVisible()->one();
 				$this->zbxTestAssertElementPresentXpath("//input[@id='tls_in_none'][@disabled]");
 				$this->zbxTestAssertElementPresentXpath("//input[@id='tls_psk_identity'][@disabled]");
 				$this->zbxTestAssertElementPresentXpath("//input[@id='tls_psk'][@disabled]");

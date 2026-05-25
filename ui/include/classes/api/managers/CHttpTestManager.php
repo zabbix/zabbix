@@ -249,7 +249,9 @@ class CHttpTestManager {
 				}
 			}
 			else {
-				$this->updateStepItems($httptest, $db_httptests[$httptest['httptestid']]);
+				$this->updateStepItems($httptest, $db_httptests[$httptest['httptestid']],
+					$itemids[$httptest['httptestid']]
+				);
 			}
 		}
 
@@ -257,8 +259,9 @@ class CHttpTestManager {
 		self::updateHttpTestTags($httptests);
 
 		foreach ($httptests as $httptest) {
-			$tags = array_key_exists('tags', $httptest) ? $httptest['tags'] : [];
-			self::updateItemsTags($tags, $itemids[$httptest['httptestid']]);
+			if (array_key_exists('tags', $httptest)) {
+				self::updateItemsTags($httptest['tags'], $itemids[$httptest['httptestid']]);
+			}
 		}
 
 		return $httptests;
@@ -1056,7 +1059,7 @@ class CHttpTestManager {
 	 *
 	 * @param array  $httpTest
 	 * @param array  $websteps
-	 * @param array  $itemids_per_http_tests
+	 * @param array  $_itemids
 	 *
 	 * @throws Exception
 	 */
@@ -1147,8 +1150,9 @@ class CHttpTestManager {
 	 *
 	 * @param array $httptest
 	 * @param array $db_httptest
+	 * @param array $itemids
 	 */
-	protected function updateStepItems(array $httptest, array $db_httptest): void {
+	protected function updateStepItems(array $httptest, array $db_httptest, array &$itemids): void {
 		$has_status = array_key_exists('status', $httptest);
 		$has_name_changed = ($httptest['name'] !== $db_httptest['name']);
 
@@ -1162,6 +1166,7 @@ class CHttpTestManager {
 		), 'itemid');
 
 		$stepitemids = array_keys($stepitems);
+		$itemids = array_merge($itemids, $stepitemids);
 
 		if ($has_status) {
 			$status = ($httptest['status'] == HTTPTEST_STATUS_ACTIVE)

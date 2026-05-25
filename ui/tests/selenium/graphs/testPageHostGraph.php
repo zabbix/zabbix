@@ -21,8 +21,6 @@
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup graphs
  */
@@ -465,7 +463,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
 		}
 		else {
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::className('msg-good'));
+			$this->query('class:msg-good')->waitUntilVisible()->one();
 			$this->zbxTestAssertElementPresentXpath('//output[@class="msg-good"]/span[contains(text(),"copied")]');
 
 			// DB check, if copy target was host or template.

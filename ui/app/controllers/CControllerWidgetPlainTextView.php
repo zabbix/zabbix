@@ -91,7 +91,11 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 					foreach ($histories as &$history) {
 						$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']], false);
 						$history['value'] = $fields['show_as_html']
-							? new CJsScript($history['value'])
+							? (new CIFrame(null, '0', '0', 'no', null))
+								->setAttribute('srcdoc', $history['value'])
+								->setAttribute('sandbox', 'allow-same-origin')
+								->addStyle('vertical-align: top;')
+								->addClass('js-iframe')
 							: new CPre($history['value']);
 					}
 					unset($history);

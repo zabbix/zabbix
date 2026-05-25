@@ -593,7 +593,8 @@ class CElementQuery implements IWaitable {
 			'CDropdownElement'			=> '/z-select[@name]',
 			'CCheckboxElement'			=> '/input[@name][@type="checkbox" or @type="radio"]',
 			'CMultiselectElement'		=> [
-				'/div[contains(@class, "multiselect-control")]'
+				'/div[contains(@class, "multiselect-control")]',
+				'/div/div[contains(@class, "multiselect-control")]'
 			],
 			'CSegmentedRadioElement'	=> [
 				'/ul[contains(@class, "radio-list-control")]',

@@ -18,9 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
-use Facebook\WebDriver\WebDriverBy;
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
  * Tests for "Configuration -> Maintenance".
@@ -50,7 +49,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		// Add "One time only" maintenance period.
 		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
 		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//button[text()="Add"]');
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[contains(@class, "overlay-dialogue modal")]'));
+		COverlayDialogElement::ensureNotPresent();
 		$this->zbxTestAssertElementText('//div[@id="maintenance_periods"]//tbody/tr/td','One time only');
 
 		// Add "Daily" maintenance period.
@@ -171,7 +170,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('days_4');
 		$this->zbxTestCheckboxSelect('days_16');
 		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//button[text()="Apply"]');
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[contains(@class, "overlay-dialogue modal")]'));
+		COverlayDialogElement::ensureNotPresent();
 		$this->zbxTestWaitForPageToLoad();
 		$text = $this->query('xpath://div[@id="maintenance_periods"]//tbody/tr[2]/td[2]')->waitUntilVisible()->one()->getText();
 		$this->assertRegexp('/Monday/', $text);
@@ -185,7 +184,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestClickXpath('//ul[@id="month_date_type"]//label[contains(text(), "Day of week")]');
 		$this->zbxTestCheckboxSelect('monthly_days_4');
 		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//button[text()="Apply"]');
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[contains(@class, "overlay-dialogue modal")]'));
+		COverlayDialogElement::ensureNotPresent();
 		$this->zbxTestWaitForPageToLoad();
 		$text = $this->query('xpath://div[@id="maintenance_periods"]//tbody/tr[3]/td[2]')->waitUntilVisible()->one()->getText();
 		$this->assertRegexp('/Wednesday/', $text);

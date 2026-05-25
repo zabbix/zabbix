@@ -1875,8 +1875,8 @@ class testDashboardGraphWidget extends CWebTest {
 	/**
 	 * Fill graph widget form with provided data.
 	 *
-	 * @param array $data		data provider with fields values
-	 * @param array $form		CFormElement
+	 * @param array 		$data		data provider with fields values
+	 * @param CFormElement 	$form		widget configuration form element
 	 */
 	private function fillForm($data, $form) {
 		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
@@ -2415,18 +2415,21 @@ class testDashboardGraphWidget extends CWebTest {
 
 		$fields = ['Selected items only', 'Severity', 'Problem', 'Tags', 'Problem hosts'];
 		$tag_elements = [
-			'id:evaltype',				// Tag type.
-			'id:tags_0_tag',			// Tag name.
-			'id:tags_0_operator',		// Tag operator.
-			'id:tags_0_value',			// Tag value
-			'id:tags_0_remove',			// Tag remove button.
-			'id:tags_add'				// Tagg add button.
+			'id:tags_0_tag',		// Tag name.
+			'id:tags_0_operator',	// Tag operator.
+			'id:tags_0_value'		// Tag value.
 		];
 		$this->assertEnabledFields(array_merge($fields, $tag_elements), false);
+		$this->assertEquals(0, $form->query('id:tags_table_tags')->query('button', ['Add', 'Remove'])->all()
+				->filter((CElementFilter::CLICKABLE))->count()
+		);
 
-		// Set "Show problems" and check that fields enabled now.
+		// Set "Show problems" and check that fields and buttons are enabled now.
 		$form->fill(['Show problems' => true]);
 		$this->assertEnabledFields(array_merge($fields, $tag_elements), true);
+		$this->assertEquals(2, $form->query('id:tags_table_tags')->query('button', ['Add', 'Remove'])->all()
+				->filter((CElementFilter::CLICKABLE))->count()
+		);
 	}
 
 	public static function getAxesDisabledFieldsData() {

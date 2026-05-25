@@ -21,8 +21,6 @@
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup users
  */
@@ -575,7 +573,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->assertEquals(1, CDBHelper::getCount($sql));
 				break;
 			case TEST_BAD:
-				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[@class='overlay-dialogue-body']//div[@class='msg-details']"));
+				$this->query('xpath://div[@class="overlay-dialogue-body"]//div[@class="msg-details"]')->waitUntilVisible()->one();
 				$this->zbxTestTextPresent($data['error_msg']);
 				break;
 		}

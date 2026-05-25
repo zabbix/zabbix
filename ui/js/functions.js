@@ -952,7 +952,10 @@ function urlEncodeData(parameters, prefix = '') {
  *            d: "3"
  *        },
  *        e: {
- *            f: ["4", "5"]
+ *            f: {
+ *                0: "4",
+ *                1: "5"
+ *            }
  *        }
  *    }
  *
@@ -961,42 +964,33 @@ function urlEncodeData(parameters, prefix = '') {
  * @return {object}
  */
 function getFormFields(form) {
-	const fields = {};
+	const fields = Object.create(null);
 
 	for (let [key, value] of new FormData(form)) {
 		value = value.replace(/\r?\n/g, '\r\n');
 
-		const key_parts = [...key.matchAll(/[^\[\]]+|\[\]/g)];
+		const key_parts = [...key.matchAll(/[^\[\]]+|\[]/g)];
 
 		let key_fields = fields;
 
 		for (let i = 0; i < key_parts.length; i++) {
-			const key_part = key_parts[i][0];
+			let key_part = key_parts[i][0];
 
-			if (i == key_parts.length - 1) {
-				if (key_part === '[]') {
-					key_fields.push(value);
-				}
-				else {
-					key_fields[key_part] = value;
-				}
+			if (key_part === '[]') {
+				key_part = Object.keys(key_fields).length;
+			}
+
+			if (i === key_parts.length - 1) {
+				key_fields[key_part] = value;
 
 				break;
 			}
 
-			if (key_part === '[]') {
-				const key_field = key_parts[i + 1][0] === '[]' ? [] : {};
-
-				key_fields.push(key_field);
-				key_fields = key_field;
+			if (!Object.hasOwn(key_fields, key_part)) {
+				key_fields[key_part] = Object.create(null);
 			}
-			else {
-				if (!(key_part in key_fields)) {
-					key_fields[key_part] = key_parts[i + 1][0] === '[]' ? [] : {};
-				}
 
-				key_fields = key_fields[key_part];
-			}
+			key_fields = key_fields[key_part];
 		}
 	}
 

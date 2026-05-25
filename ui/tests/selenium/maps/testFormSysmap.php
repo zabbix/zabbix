@@ -23,8 +23,6 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup sysmaps
  */
@@ -337,7 +335,7 @@ class testFormSysmap extends CLegacyWebTest {
 
 		if (isset($data['formCheck'])) {
 			$this->zbxTestClickXpathWait("//a[text()='".$data['name']."']/../..//a[text()='Properties']");
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
+			$this->query('id:name')->waitUntilVisible()->one();
 			$this->zbxTestAssertElementValue('name', $data['name']);
 			$this->zbxTestAssertElementValue('width', $width);
 			$this->zbxTestAssertElementValue('height', $height);

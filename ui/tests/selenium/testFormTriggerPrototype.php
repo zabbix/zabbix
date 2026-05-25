@@ -22,8 +22,6 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *

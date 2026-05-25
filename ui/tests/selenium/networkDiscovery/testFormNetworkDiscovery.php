@@ -323,14 +323,16 @@ class testFormNetworkDiscovery extends CWebTest {
 				}
 
 				if ($data['action'] === 'Clone') {
-					$form->query('button', $data['action'])->one()->click();
+					$form->query('button', $data['action'])->one()->click()->waitUntilNotPresent();
 				}
 			}
 
 			$form->query('button', ($data['action'] === 'Simple update') ? 'Update' : 'Cancel')
 					->waitUntilClickable()->one()->click();
+			$form->waitUntilNotPresent();
 		}
 
+		$this->page->waitUntilReady();
 		$this->page->assertHeader('Discovery rules');
 		$this->assertEquals($old_hash, $this->getHash().CDBHelper::getHash('SELECT * FROM actions'));
 	}

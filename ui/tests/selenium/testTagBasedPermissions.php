@@ -21,8 +21,6 @@
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * Test tag based permissions
  */
@@ -83,8 +81,8 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						}
 
 						$this->zbxTestClickXpath("//ul[@id='tagFilterFormList']//button[text()='Add']");
-						$xpath = '//table[@id="tag-filter-table"]//tbody//tr['.$i.']//td/button[text()="Remove"]';
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath)	);
+						$this->query('xpath://table[@id="tag-filter-table"]//tbody//tr['.$i.']//td/button[text()="Remove"]')
+								->waitUntilVisible()->one();
 					}
 				}
 			}
@@ -189,34 +187,36 @@ class testTagBasedPermissions extends CLegacyWebTest {
 	public function testTagBasedPermissions_IncorrectTags($data) {
 		$this->setTagFilter($data['user_groups']);
 
-		// Go to Dashboard and check user name
+		// Go to Dashboard and check user name.
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 		$this->zbxTestAssertAttribute("//a[@class='icon-profile']", 'title', $this->user);
 
-		// Check tag filter in Problem widget
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[contains(@class, "is-loading")]'));
+		// Check tag filter in Problem widget.
+		CDashboardElement::find()->one()->getWidget('Problems', true);
 		$this->zbxTestTextNotPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText('//h4[text()="Problems"]/../../..//tr[@class="nothing-to-show"]', 'No data found.');
 
-		// Check problem displaying on Problem page
+		// Check problem displaying on Problem page.
 		$this->zbxTestOpen('zabbix.php?action=problem.view');
 		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
 		$this->zbxTestTextNotPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
 
-		// Check trigger filter on Problem page
+		// Check trigger filter on Problem page.
 		foreach ($data['trigger_names'] as $name) {
-			// Select trigger
+			// Select trigger.
 			$this->zbxTestClickButtonMultiselect('triggerids_0');
 			$this->zbxTestLaunchOverlayDialog('Triggers');
 			COverlayDialogElement::find()->one()->waitUntilReady()->setDataContext($this->trigger_host);
 			$this->zbxTestClickLinkTextWait($name);
-			// Apply filter
+
+			// Apply filter.
 			$this->query('name:filter_apply')->one()->click();
 			$table->waitUntilReloaded();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
-			//Reset filter
+
+			// Reset filter.
 			$this->zbxTestClickButtonText('Reset');
 			$table->waitUntilReloaded();
 		}
@@ -295,48 +295,51 @@ class testTagBasedPermissions extends CLegacyWebTest {
 	public function testTagBasedPermissions_AddTags($data) {
 		$this->setTagFilter($data['user_groups']);
 
-		// Count triggers
+		// Count triggers.
 		$countTriggers = count($data['trigger_names']);
 
-		// Go to Dashboard and check user name
+		// Go to Dashboard and check user name.
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 		$this->zbxTestAssertAttribute("//a[@class='icon-profile']", 'title', $this->user);
 
-		// Check tag filter in Problem widget
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[contains(@class, "is-loading")]'));
+		// Check tag filter in Problem widget.
+		CDashboardElement::find()->one()->getWidget('Problems', true);
 		$this->zbxTestTextPresent($data['trigger_names']);
 
-		// Check problem displaying on Problem page
+		// Check problem displaying on Problem page.
 		$this->zbxTestOpen('zabbix.php?action=problem.view');
 		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
 		$this->zbxTestTextPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$countTriggers.' of '.$countTriggers.' found');
 
-		// Check trigger filter on Problem page
+		// Check trigger filter on Problem page.
 		foreach ($data['trigger_names'] as $name) {
-			// Select trigger
+			// Select trigger.
 			$this->zbxTestClickButtonMultiselect('triggerids_0');
 			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestLaunchOverlayDialog('Triggers');
 			COverlayDialogElement::find()->one()->setDataContext($this->trigger_host);
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			COverlayDialogElement::ensureNotPresent();
-			// Apply filter
+
+			// Apply filter.
 			$this->query('name:filter_apply')->one()->click();
 			$table->waitUntilReloaded();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
-			//Reset filter
+
+			// Reset filter.
 			$this->zbxTestClickButtonText('Reset');
 			$table->waitUntilReloaded();
 		}
 
-		// Check Event details page
+		// Check Event details page.
 		foreach ($data['trigger_names'] as $name) {
 			$triggerid = DBfetch(DBselect('SELECT triggerid FROM triggers WHERE description='. zbx_dbstr($name)));
 			$this->zbxTestClickXpathWait("//a[contains(@href,'tr_events.php?triggerid=".$triggerid['triggerid']."')]");
 			$this->zbxTestCheckHeader('Event details');
-			// Go back to problem page
+
+			// Go back to problem page.
 			$this->zbxTestOpen('zabbix.php?action=problem.view');
 		}
 	}
@@ -400,46 +403,49 @@ class testTagBasedPermissions extends CLegacyWebTest {
 	public function testTagBasedPermissions_MultipleUserGroups($data) {
 		$this->setTagFilter($data['user_groups']);
 
-		// Count triggers
+		// Count triggers.
 		$countTriggers = count($data['trigger_names']);
 
-		// Go to Dashboard and check user name
+		// Go to Dashboard and check user name.
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 		$this->zbxTestAssertAttribute("//a[@class='icon-profile']", 'title', $this->user);
 
-		// Check tag filter in Problem widget
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[contains(@class, "is-loading")]'));
+		// Check tag filter in Problem widget.
+		CDashboardElement::find()->one()->getWidget('Problems', true);
 		$this->zbxTestTextPresent($data['trigger_names']);
 
-		// Check problem displaying on Problem page
+		// Check problem displaying on Problem page.
 		$this->zbxTestOpen('zabbix.php?action=problem.view');
 		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
 		$this->zbxTestTextPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$countTriggers.' of '.$countTriggers.' found');
 
-		// Check filter on Problem page
+		// Check filter on Problem page.
 		foreach ($data['trigger_names'] as $name) {
-			// Select trigger
+			// Select trigger.
 			$this->zbxTestClickButtonMultiselect('triggerids_0');
 			$this->zbxTestLaunchOverlayDialog('Triggers');
 			COverlayDialogElement::find()->one()->setDataContext($this->trigger_host);
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
-			// Apply filter
+
+			// Apply filter.
 			$this->query('name:filter_apply')->one()->click();
 			$table->waitUntilReloaded();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
-			//Reset filter
+
+			//Reset filter.
 			$this->zbxTestClickButtonText('Reset');
 			$table->waitUntilReloaded();
 		}
 
-		// Check Event details page
+		// Check Event details page.
 		foreach ($data['trigger_names'] as $name) {
-			$triggerid = DBfetch(DBselect('SELECT triggerid FROM triggers WHERE description='. zbx_dbstr($name)));
+			$triggerid = DBfetch(DBselect('SELECT triggerid FROM triggers WHERE description='.zbx_dbstr($name)));
 			$this->zbxTestClickXpathWait("//a[contains(@href,'tr_events.php?triggerid=".$triggerid['triggerid']."')]");
 			$this->zbxTestCheckHeader('Event details');
-			// Go back to problem page
+
+			// Go back to problem page.
 			$this->zbxTestOpen('zabbix.php?action=problem.view');
 		}
 	}

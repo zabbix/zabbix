@@ -694,7 +694,6 @@ class CLegacyWebTest extends CWebTest {
 
 	public function __get($attribute) {
 		if ($attribute === 'webDriver') {
-			self::zbxAddWarning('Web driver should not be accessed directly from test cases.');
 			return CElementQuery::getDriver();
 		}
 

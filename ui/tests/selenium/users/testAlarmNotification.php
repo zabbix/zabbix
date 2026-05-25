@@ -25,8 +25,6 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
  * @backup profiles
  *
  * @onBefore prepareAlarmData
- *
- * @onAfterEach closeAndAcknowledgeEvents
  */
 class testAlarmNotification extends CWebTest {
 
@@ -224,6 +222,7 @@ class testAlarmNotification extends CWebTest {
 	/**
 	 * Check Alarm notification overlay dialog layout.
 	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 * @onAfter openResetedPage
 	 */
 	public function testAlarmNotification_Layout() {
@@ -315,6 +314,8 @@ class testAlarmNotification extends CWebTest {
 
 	/**
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
+	 * @onAfter closeAndAcknowledgeEvents
+	 * @onAfter deleteEvents
 	 */
 	public function testAlarmNotification_CheckColorChange() {
 		// Trigger problem.
@@ -441,6 +442,8 @@ class testAlarmNotification extends CWebTest {
 
 	/**
 	 * Check that correct problems displayed in alarm notification overlay.
+	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 *
 	 * @dataProvider getDisplayedProblemsData
 	 */
@@ -605,6 +608,8 @@ class testAlarmNotification extends CWebTest {
 	 * Check notification display after changing user Frontend notification settings.
 	 *
 	 * @onBefore resetTriggerSeverities
+	 * @onAfter closeAndAcknowledgeEvents
+	 * @onAfter deleteEvents
 	 *
 	 * @dataProvider getNotificationSettingsData
 	 */
@@ -652,8 +657,12 @@ class testAlarmNotification extends CWebTest {
 			// Check close button.
 			$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click()->waitUntilNotVisible();
 		}
+	}
 
-		// Delete the events so they don't appear in the next test case.
+	/**
+	 * Delete the events so they don't appear in the next test case.
+	 */
+	protected function deleteEvents() {
 		DB::delete('events', ['eventid' => self::$eventids]);
 	}
 

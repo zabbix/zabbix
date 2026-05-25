@@ -250,7 +250,7 @@ class testSlaReport extends CWebTest {
 		switch ($period_type) {
 			case 'Daily':
 				// By default the last 20 periods are displayed.
-				for ($i = 0; $i < 20; $i++) {
+				for ($i = 0; $i < ZBX_SLA_DEFAULT_REPORTING_PERIODS; $i++) {
 					$day = strtotime('today '.-$i.' day');
 					$period_values[$i]['value'] = date('Y-m-d', $day);
 					$period_values[$i]['start'] = $day;
@@ -259,7 +259,7 @@ class testSlaReport extends CWebTest {
 				break;
 
 			case 'Weekly':
-				for ($i = 1; $i <= 20; $i++) {
+				for ($i = 1; $i <= ZBX_SLA_DEFAULT_REPORTING_PERIODS; $i++) {
 					// Next Sunday should be taken as period start date in case if today is Sunday (0 represents Sunday).
 					$start_string = (date('w', time()) == 0) ? 'Sunday next week ' : 'next Sunday ';
 
@@ -275,7 +275,7 @@ class testSlaReport extends CWebTest {
 				// Get the number of Months to be displayed as difference between today and SLA creation day in months.
 				$months = CDateTimeHelper::countMonthsBetweenDates(self::SLA_CREATION_TIME, time());
 
-				$months = ($months > 20) ? 20 : $months;
+				$months = ($months > ZBX_SLA_DEFAULT_REPORTING_PERIODS) ? ZBX_SLA_DEFAULT_REPORTING_PERIODS : $months;
 
 				for ($i = 0; $i < $months; $i++) {
 					$month = strtotime('first day of this month '.-$i.' month');
@@ -313,6 +313,11 @@ class testSlaReport extends CWebTest {
 					}
 				}
 				$period_values = array_reverse($period_values);
+
+				if (count($period_values) > ZBX_SLA_DEFAULT_REPORTING_PERIODS) {
+					$period_values = array_slice($period_values, 0, ZBX_SLA_DEFAULT_REPORTING_PERIODS);
+				}
+
 				break;
 
 			case 'Annually':
