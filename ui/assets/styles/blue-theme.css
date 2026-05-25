@@ -653,7 +653,7 @@ svg a {
   border-radius: 50%;
   background: #429e47; }
 
-.navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity-color, .svg-pie-chart-hintbox .svg-pie-chart-hintbox-color, .map-link-hintbox-row .map-link-hintbox-row-color-box {
+.svg-pie-chart-hintbox .svg-pie-chart-hintbox-color, .map-link-hintbox-row .map-link-hintbox-row-color-box {
   width: 10px;
   height: 10px;
   margin-right: 10px; }
@@ -3198,6 +3198,11 @@ z-color-picker.has-error .color-picker-box {
     margin-left: 5px; }
 .list-table .icon {
   border-radius: 2px; }
+.list-table [aria-label] {
+  transition: box-shadow 0.2s ease-out; }
+  .list-table [aria-label]:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
 .list-table .btn-small,
 .list-table .problem-icon-link,
 .list-table .status-container,
@@ -5098,9 +5103,6 @@ z-color-picker {
       .color-picker-is-palette .color-picker-palette-icon .color-picker-palette-icon-part:last-of-type {
         border-top-right-radius: 1px;
         border-bottom-right-radius: 1px; }
-
-z-color-picker[readonly] .color-picker-box:focus {
-  box-shadow: none; }
 
 .z-select,
 z-select {
@@ -7614,6 +7616,12 @@ form.is-loading {
   .table-forms .btn-icon:not(:first-child),
   .table-forms .icon:not(:first-child) {
     margin-left: 5px; }
+  .table-forms [aria-label] {
+    transition: box-shadow 0.2s ease-out; }
+    .table-forms [aria-label]:focus {
+      border-radius: 2px;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
   .table-forms .btn-icon.btn-small {
     top: 1px;
     vertical-align: text-bottom; }

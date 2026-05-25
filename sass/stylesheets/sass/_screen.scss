@@ -860,6 +860,18 @@ form {
 		}
 	}
 
+	[aria-label] {
+		@if $ui-transitions {
+			transition: box-shadow $ui-controls-transition-duration ease-out;
+		}
+
+		&:focus {
+			border-radius: 2px;
+			outline: none;
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
+		}
+	}
+
 	.btn-icon {
 		&.btn-small {
 			top: 1px;
