@@ -266,8 +266,11 @@ window.host_edit_popup = {
 	 * Set up of macros functionality.
 	 */
 	initMacrosTab() {
+		const container = $('#macros_container .table-forms-td-right');
+		const show_inherited_macros_element = document.getElementById('show_inherited_macros');
+
 		this.macros_manager = new HostMacrosManager({
-			container: $('#macros_container .table-forms-td-right'),
+			container: container,
 			load_callback: () => {
 				this.form.discoverAllFields();
 
@@ -282,6 +285,14 @@ window.host_edit_popup = {
 			},
 			source: 'host'
 		});
+
+		container
+			.bind('loader.start', () => show_inherited_macros_element.querySelectorAll('input')
+				.forEach(radio_input => radio_input.setAttribute('readonly', 'readonly'))
+			)
+			.bind('loader.stop', () => show_inherited_macros_element.querySelectorAll('input')
+				.forEach(radio_input => radio_input.removeAttribute('readonly'))
+			);
 
 		$('#host-tabs', this.form_element).on('tabscreate tabsactivate', (e, ui) => {
 			const panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;
@@ -320,7 +331,7 @@ window.host_edit_popup = {
 			}
 		});
 
-		this.form_element.querySelector('#show_inherited_macros').onchange = (e) => {
+		show_inherited_macros_element.onchange = (e) => {
 			this.macros_manager.load(e.target.value == 1, this.getAllTemplates());
 		};
 	},

@@ -283,15 +283,20 @@ func removeScheme(in string) (scheme string, host string, err error) {
 
 func encloseIPv6(in string) string {
 	parsedIP := net.ParseIP(in)
-	if parsedIP != nil {
-		ipv6 := parsedIP.To16()
-		if ipv6 != nil {
-			out := ipv6.String()
-			return fmt.Sprintf("[%s]", out)
-		}
+	if parsedIP == nil {
+		return in
 	}
 
-	return in
+	if parsedIP.To4() != nil {
+		return parsedIP.String()
+	}
+
+	ipv6 := parsedIP.To16()
+	if ipv6 == nil {
+		return in
+	}
+
+	return fmt.Sprintf("[%s]", ipv6.String())
 }
 
 func (p *Plugin) httpsExpect(ip string, port string, timeout int) int {

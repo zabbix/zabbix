@@ -22,7 +22,6 @@
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
 #include "zbxeval.h"
-#include "zbxexpr.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtime.h"

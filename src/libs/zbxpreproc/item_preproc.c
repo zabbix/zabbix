@@ -888,7 +888,7 @@ int	item_preproc_get_error_from_json(const zbx_variant_t *value, const char *par
 		goto out;
 	}
 
-	if (FAIL == zbx_json_open(value->data.str, &jp))
+	if (FAIL == zbx_json_open(value_str.data.str, &jp))
 		goto out;
 
 	if (FAIL == (ret = zbx_jsonpath_query(&jp, params, error)))
@@ -1171,7 +1171,8 @@ out:
  *                                                                            *
  * Purpose: throttles value by suppressing identical values                   *
  *                                                                            *
- * Parameters: value             - [IN/OUT] value to process                  *
+ * Parameters: value_type        - [IN] item value type                       *
+ *             value             - [IN/OUT] value to process                  *
  *             ts                - [IN] value timestamp                       *
  *             history_value_in  - [IN] historical (previous) data            *
  *             history_value_out - [OUT] historical (next) data               *
@@ -1181,12 +1182,20 @@ out:
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-int	item_preproc_throttle_value(zbx_variant_t *value, const zbx_timespec_t *ts,
+int	item_preproc_throttle_value(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
 		const zbx_variant_t *history_value_in, zbx_variant_t *history_value_out, zbx_timespec_t *history_ts)
 {
 	int	ret;
 
-	ret = zbx_variant_compare(value, history_value_in);
+	if (ZBX_VARIANT_NONE == item_preproc_numeric_type_hint(value_type) && ZBX_VARIANT_STR == value->type &&
+			ZBX_VARIANT_STR == history_value_in->type)
+	{
+		ret = strcmp(value->data.str, history_value_in->data.str);
+	}
+	else
+	{
+		ret = zbx_variant_compare(value, history_value_in);
+	}
 
 	zbx_variant_clear(history_value_out);
 	zbx_variant_copy(history_value_out, value);

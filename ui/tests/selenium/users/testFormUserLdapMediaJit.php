@@ -424,13 +424,13 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * @dataProvider getMediaEditData
 	 */
 	public function testFormUserLdapMediaJit_CheckEditableFields($data) {
-		if ($data['expected'] === TEST_BAD) {
-			$old_hash = CDBHelper::getHash(self::HASH_SQL);
-		}
-
 		// Log in as the LDAP provisioned user.
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->open('zabbix.php?action=userprofile.notification.edit');
+
+		if ($data['expected'] === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::HASH_SQL);
+		}
 
 		// Close the warning message, to not affect further message check.
 		$this->query('class:btn-overlay-close')->one()->click();
@@ -477,8 +477,6 @@ class testFormUserLdapMediaJit extends CWebTest {
 	/**
 	 * Check that LDAP provisioned user can add and remove non-provisioned media.
 	 */
-	// TODO: Uncomment this check, after ZBX-26064 is fixed.
-	/*
 	public function testFormUserLdapMediaJit_AddRemoveMedia() {
 		// Media type configuration.
 		$data = [
@@ -540,7 +538,6 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->page->open('zabbix.php?action=userprofile.notification.edit');
 		$this->assertFalse($form->getField('Media')->asTable()->findRow('Type', $data['fields']['Type'])->isPresent());
 	}
-	*/
 
 	public function getUpdateMediaMappings() {
 		return [
@@ -1308,9 +1305,10 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$table->query('link:'.self::LDAP_SERVER_NAME)->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$media_table = $dialog->query('id:ldap-media-type-mapping-table')->asTable()->one();
-		$media_table->findRow('Name', self::MEDIA_MAPPING_REMOVE, true)->query('button:Remove')->one()->click();
+		$media_table->findRow('Name', self::MEDIA_MAPPING_REMOVE, true)->query('button:Remove')->one()->click()->waitUntilNotPresent();
 		$dialog->query('button:Update')->one()->click();
 		$form->submit()->waitUntilStalled();
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 		$this->page->waitUntilReady();
 
 		// Check that media is not present for LDAP provisioned user.
