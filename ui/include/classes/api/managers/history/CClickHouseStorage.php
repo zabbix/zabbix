@@ -484,7 +484,7 @@ class CClickHouseStorage {
 				: [];
 
 			if ($resource === null) {
-				continue;
+				break;
 			}
 
 			foreach ($resource as $row) {
@@ -542,7 +542,7 @@ class CClickHouseStorage {
 			);
 
 			if ($resource === null) {
-				continue;
+				break;
 			}
 
 			foreach ($resource as $row) {
