@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * @suite-components-reuse true
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_history_push1,test_history_push_non_monitored,test_history_push_maintained
- * @backup history,items,hosts,history_uint,history_text,history_str,history_log,ids
  * @onAfter clearData
  */
 class testHistoryPush extends CIntegrationTest {
@@ -211,19 +210,48 @@ class testHistoryPush extends CIntegrationTest {
 	}
 
 	public static function clearData(): void {
-		if (CAPIHelper::getSessionId() === null) {
-			CAPIHelper::authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+		// Force re-auth as admin — testHistoryPush_noPermission may have switched the session
+		// to a restricted user, in which case the cleanup would silently see nothing to delete.
+		CAPIHelper::authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+
+		// Maintenances must be removed first — a host can't be deleted while it is the only
+		// host/group of an existing maintenance (see testHistoryPush_hostUnderMaintenance).
+		$maintenances = CDataHelper::call('maintenance.get', [
+			'output' => ['maintenanceid'],
+			'filter' => ['name' => 'Test maintenance']
+		]);
+
+		if (!empty($maintenances)) {
+			$expected_ids = array_column($maintenances, 'maintenanceid');
+			$response = CDataHelper::call('maintenance.delete', $expected_ids);
+			self::assertEqualsCanonicalizing($expected_ids, $response['maintenanceids'],
+				'maintenance.delete did not return the expected maintenanceids');
 		}
 
-		$response = CAPIHelper::call('host.get', [
+		$hosts = CDataHelper::call('host.get', [
 			'output' => ['hostid'],
 			'search' => ['host' => 'test_history_push'],
 			'startSearch' => true
 		]);
 
-		if (!empty($response['result'])) {
-			$hostids = array_column($response['result'], 'hostid');
-			CAPIHelper::call('host.delete', $hostids);
+		if (!empty($hosts)) {
+			$expected_ids = array_column($hosts, 'hostid');
+			$response = CDataHelper::call('host.delete', $expected_ids);
+			self::assertEqualsCanonicalizing($expected_ids, $response['hostids'],
+				'host.delete did not return the expected hostids');
+		}
+
+		// testHistoryPush_noPermission creates user "John"; remove so re-runs can recreate it.
+		$users = CDataHelper::call('user.get', [
+			'output' => ['userid'],
+			'filter' => ['username' => 'John']
+		]);
+
+		if (!empty($users)) {
+			$expected_ids = array_column($users, 'userid');
+			$response = CDataHelper::call('user.delete', $expected_ids);
+			self::assertEqualsCanonicalizing($expected_ids, $response['userids'],
+				'user.delete did not return the expected userids');
 		}
 
 		self::$hostid_normal = null;
