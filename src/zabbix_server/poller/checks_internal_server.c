@@ -102,6 +102,11 @@ static int	get_cep_stats(AGENT_RESULT *result)
 	zbx_json_adduint64(&json, "assessed", stats.events_accessed);
 	zbx_json_adduint64(&json, "processed", stats.events_processed);
 	zbx_json_adduint64(&json, "discarded", stats.events_discarded);
+	zbx_json_close(&json);
+	zbx_json_addobject(&json, "tasks");
+	zbx_json_addint64(&json, "remote", stats.task_remote_num);
+	zbx_json_addint64(&json, "internal", stats.task_internal_num);
+	zbx_json_addint64(&json, "completed", stats.task_completed_num);
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, json.buffer));
 

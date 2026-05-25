@@ -113,6 +113,10 @@ typedef struct
 	zbx_uint64_t	events_accessed;
 	zbx_uint64_t	events_processed;
 	zbx_uint64_t	events_discarded;
+
+	int		task_remote_num;
+	int		task_internal_num;
+	int		task_completed_num;
 }
 zbx_cep_stats_t;
 

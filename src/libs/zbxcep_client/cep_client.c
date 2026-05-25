@@ -994,7 +994,10 @@ int	zbx_cep_get_stats(zbx_cep_stats_t *stats, char **error)
 	ptr = response.data;
 	ptr += zbx_deserialize_value(ptr, &stats->events_accessed);
 	ptr += zbx_deserialize_value(ptr, &stats->events_processed);
-	(void)zbx_deserialize_value(ptr, &stats->events_discarded);
+	ptr += zbx_deserialize_value(ptr, &stats->events_discarded);
+	ptr += zbx_deserialize_value(ptr, &stats->task_remote_num);
+	ptr += zbx_deserialize_value(ptr, &stats->task_internal_num);
+	(void)zbx_deserialize_value(ptr, &stats->task_completed_num);
 
 	zbx_ipc_message_clean(&response);
 

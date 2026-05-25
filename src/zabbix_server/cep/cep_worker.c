@@ -344,16 +344,25 @@ static void	cep_worker_delete_events(zbx_cep_task_remote_t *task)
  * Parameters: task - [IN/OUT] remote task with pre-allocated response buffer *
  *                                                                            *
  ******************************************************************************/
-static void	cep_worker_get_stats(zbx_cep_task_remote_t *task)
+static void	cep_worker_get_stats(zbx_cep_worker_t *worker, zbx_cep_task_remote_t *task)
 {
 	zbx_cep_stats_t	stats;
 	unsigned char	*ptr = task->response;
 
 	cep_stats_collect(&stats);
 
+	zbx_mw_queue_lock(worker->base.queue);
+	zbx_mw_queue_get_stats(worker->base.queue, &stats.task_remote_num, &stats.task_internal_num,
+			&stats.task_completed_num);
+	zbx_mw_queue_unlock(worker->base.queue);
+
 	ptr += zbx_serialize_value(ptr, stats.events_accessed);
 	ptr += zbx_serialize_value(ptr, stats.events_processed);
-	(void)zbx_serialize_value(ptr, stats.events_discarded);
+	ptr += zbx_serialize_value(ptr, stats.events_discarded);
+	ptr += zbx_serialize_value(ptr, stats.task_remote_num);
+	ptr += zbx_serialize_value(ptr, stats.task_internal_num);
+	(void)zbx_serialize_value(ptr, stats.task_completed_num);
+
 }
 
 /******************************************************************************
@@ -398,7 +407,7 @@ static void	cep_worker_process_task_remote(zbx_cep_worker_t *worker, zbx_cep_tas
 			cep_worker_delete_events(task);
 			break;
 		case ZBX_CEP_GET_STATS:
-			cep_worker_get_stats(task);
+			cep_worker_get_stats(worker, task);
 			break;
 	}
 
