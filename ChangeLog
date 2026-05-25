@@ -3,6 +3,7 @@ Changes for 6.0.47rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-22504] improved memory usage in lld worker proecesses with large low level discovery (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.46
