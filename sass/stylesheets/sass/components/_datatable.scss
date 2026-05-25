@@ -22,7 +22,6 @@
 			.cell.cell-data {
 				height: calc(var(--datatable-compact-row-height) + 1px);
 				min-height: initial;
-				padding: 2px 8px;
 
 				.symptoms {
 					height: calc(var(--datatable-compact-row-height) - 4px);
@@ -40,7 +39,7 @@
 
 				.cell-inner {
 					min-height: auto;
-					padding: 0;
+					padding: 2px 8px;
 
 					.tags-wrapper {
 						flex-wrap: nowrap;
@@ -56,16 +55,6 @@
 	}
 
 	&.has-highlighted-rows .datatable-body .row:not(.row-disabled) {
-		.cell.cell-data {
-			a.link-action {
-				color: $font-color;
-			}
-
-			a:hover {
-				color: $btn-alt-color;
-			}
-		}
-
 		&:not(.row-selected) {
 			&:not(:hover) {
 				.btn-icon,
@@ -75,21 +64,9 @@
 			}
 
 			&:hover .cell.cell-data {
-				a:not(.link-action) {
-					color: $btn-alt-color;
-				}
-
 				&:not(.cell-bg) {
 					background-color: $ui-hover-bg-color;
 					border-bottom-color: $ui-border-color;
-				}
-			}
-
-			&:not(:hover) .cell.cell-data {
-				color: $font-color;
-
-				a {
-					color: $font-color;
 				}
 			}
 		}
@@ -130,7 +107,6 @@
 					margin-top: 0;
 
 					& + label span {
-						margin-top: -1px;
 						vertical-align: middle;
 					}
 				}
@@ -310,7 +286,7 @@
 		.row {
 			display: contents;
 
-			&:not(.row-disabled):hover {
+			&:not(.row-selected):not(.row-disabled):hover {
 				.row-spacer,
 				.cell.cell-data:not(.cell-bg) {
 					background-color: $ui-hover-bg-color;
@@ -341,6 +317,11 @@
 			.table-stats.table-stats-small {
 				font-size: 11px;
 			}
+		}
+
+		&:focus,
+		&:focus-visible {
+			outline: none;
 		}
 	}
 
@@ -553,7 +534,6 @@
 
 		&.cell-data {
 			align-items: flex-start;
-			padding: 0 8px;
 
 			&.cell-sticky:not(.cell-bg-hover) {
 				background-color: $ui-bg-color;
@@ -596,7 +576,11 @@
 				display: block;
 				height: 100%;
 				min-height: var(--datatable-row-height);
-				padding: 7px 0;
+				padding: 7px 8px;
+
+				.checkbox-radio {
+					display: none;
+				}
 
 				& + .timeline-axis {
 					margin-left: 5px;
@@ -704,11 +688,11 @@
 		&.cell-checkbox {
 			position: sticky;
 			justify-content: flex-start;
-			padding: 0 8px;
 
 			.cell-inner {
-				min-width: 23px;
+				box-sizing: border-box;
 				text-overflow: initial;
+				padding: 6px 8px;
 			}
 
 			.checkbox-radio {
@@ -738,14 +722,6 @@
 			.btn-icon:not(.btn-small) {
 				min-width: 18px;
 				height: 18px;
-
-				&:first-of-type {
-					margin-left: 2px;
-				}
-
-				&:last-of-type {
-					margin-right: 2px;
-				}
 			}
 
 			.link-action {
@@ -774,14 +750,21 @@
 			.tags-wrapper {
 				display: flex;
 				align-items: center;
-				min-height: 18px;
+				column-gap: 2px;
+				row-gap: 2px;
 
 				.tag {
+					margin: 0;
+					height: 16px;
 					min-width: 24px;
 
 					&.tag-inherited {
 						min-width: 35px;
 					}
+				}
+
+				.btn-icon {
+					height: 16px;
 				}
 			}
 

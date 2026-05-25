@@ -232,7 +232,7 @@
 							column.setWidth('72px');
 						}
 						else {
-							column.setWidth('37px');
+							column.setWidth('33px');
 						}
 					}
 
