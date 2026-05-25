@@ -4139,7 +4139,7 @@ int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync)
 			" left join proxy_rtdata pr"
 				" on p.proxyid=pr.proxyid");
 
-	dbsync_prepare(sync, 27, NULL);
+	dbsync_prepare(sync, 28, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
