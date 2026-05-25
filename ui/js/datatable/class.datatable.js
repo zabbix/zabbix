@@ -249,6 +249,8 @@ class CDataTable {
 	 */
 	#data_provider;
 
+	#body_scroll_left = 0;
+
 	#form_name = null;
 
 	#checkbox_id = null;
@@ -468,7 +470,11 @@ class CDataTable {
 				label.appendChild(document.createElement('span'));
 
 				cell.classList.add(CDataTable.ZBX_STYLE_CELL_CHECKBOX);
-				cell.append(checkbox, label);
+
+				const cell_inner = this.#templates.cell_inner.evaluateToElement();
+				cell_inner.append(checkbox, label);
+
+				cell.appendChild(cell_inner);
 			}
 		};
 
@@ -1604,19 +1610,19 @@ class CDataTable {
 	}
 
 	onScroll() {
-		const left = this.#body.scrollLeft;
+		const left = this.#body_scroll_left;
 
-		if (!this.#header_scroll) {
+		if (this.#header_scroll) {
+			this.#header_scroll = false;
+		}
+		else {
 			this.#header.scrollTo({left});
 		}
 
-		this.#header_scroll = false;
-
-		if (this.#scrollbar) {
-			this.#scrollbar.scrollTo({left});
-		}
+		this.#scrollbar?.scrollTo({left});
 
 		this.#updateTableOptionsButtonPosition();
+		this.#applyLastColumnPadding();
 
 		if (this.#options_popup_updated) {
 			this.#options_popup_updated = false;
@@ -1633,17 +1639,19 @@ class CDataTable {
 		}
 
 		this.#header_scroll = true;
-		this.#body.scrollLeft = e.target.scrollLeft;
+
+		this.#body.scrollTo({left: e.target.scrollLeft});
 	}
 
 	onBodyScroll = () => {
+		this.#body_scroll_left = this.#body.scrollLeft;
+
 		this.dispatchEvent(CDataTable.EVENT_SCROLL);
 	}
 
 	onScrollbarScroll = () => {
 		const left = this.#scrollbar.scrollLeft;
 
-		this.#header.scrollTo({left});
 		this.#body.scrollTo({left});
 	}
 
@@ -1857,7 +1865,7 @@ class CDataTable {
 	}
 
 	isUserInteracting() {
-		return this.#element.querySelectorAll(':focus, :focus-visible').length > 0 || isUserInteracting();
+		return this.#element.querySelectorAll(':focus-visible').length > 0 || isUserInteracting();
 	}
 
 	#initColumns() {
@@ -2131,8 +2139,6 @@ class CDataTable {
 		}
 		this.#element_remove_queue = [];
 
-		this.#body.scrollTo({left: 0});
-
 		for (const column of this.getStickyColumns()) {
 			const header_cell = column.getHeaderCell();
 			if (!header_cell) {
@@ -2181,11 +2187,14 @@ class CDataTable {
 
 		this.#pager.update(response);
 
+		this.#body.scrollTo({left: this.#body_scroll_left});
+
 		requestAnimationFrame(() => {
 			requestAnimationFrame(() => {
 				this.#options_popup?.position();
 			});
 
+			this.#updateTableOptionsButtonPosition();
 			this.#initCheckBoxRange();
 			this.#unlockHeight();
 
@@ -2296,6 +2305,8 @@ class CDataTable {
 
 		this.#row_spacer_width = 'auto';
 		this.#applyColumnWidths();
+
+		this.updateUserConfig();
 	}
 
 	#calculateColumnWidth(column) {
@@ -2416,7 +2427,7 @@ class CDataTable {
 			return;
 		}
 
-		table_options.style.right = `${-this.#body.scrollLeft}px`;
+		table_options.style.right = `${Math.min(0, -this.#body.scrollLeft)}px`;
 		table_options.classList.remove(ZBX_STYLE_HIDDEN);
 	}
 
@@ -2645,7 +2656,7 @@ class CDataTable {
 	}
 
 	/**
-	 * @returns {Promise<any>}
+	 * @returns {Promise<any>|void}
 	 */
 	#updateUserProfile(value, idx2) {
 		if (!this.#storage_idx) {
