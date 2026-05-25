@@ -1,6 +1,7 @@
 Changes for 8.0.0beta2
 
 New features:
+A.F.....S. [ZBXNEXT-1150] implemented storage and display of maintenance-related event suppressions and unsuppressions (aetatsu, Ivo)
 
 Bug fixes:
 ........S. [ZBX-22504] improved memory usage in lld worker proecesses with large low level discovery (vso)
