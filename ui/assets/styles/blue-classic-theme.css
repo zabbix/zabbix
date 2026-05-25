@@ -3227,6 +3227,11 @@ z-color-picker.has-error .color-picker-box {
     margin-left: 5px; }
 .list-table .icon {
   border-radius: 2px; }
+.list-table [aria-label] {
+  transition: box-shadow 0.2s ease-out; }
+  .list-table [aria-label]:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
 .list-table .btn-small,
 .list-table .problem-icon-link,
 .list-table .status-container,
@@ -7640,6 +7645,12 @@ form.is-loading {
   .table-forms .btn-icon:not(:first-child),
   .table-forms .icon:not(:first-child) {
     margin-left: 5px; }
+  .table-forms [aria-label] {
+    transition: box-shadow 0.2s ease-out; }
+    .table-forms [aria-label]:focus {
+      border-radius: 2px;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
   .table-forms .btn-icon.btn-small {
     top: 1px;
     vertical-align: text-bottom; }
