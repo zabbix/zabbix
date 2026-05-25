@@ -230,7 +230,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$message_failed = _('Cannot add graph prototype');
 		}
 
-		$cookieId = getRequest('parent_discoveryid');
+		$cookieid = getRequest('parent_discoveryid');
 	}
 	// create and update graphs
 	else {
@@ -248,7 +248,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$message_failed = _('Cannot add graph');
 		}
 
-		$cookieId = $hostid;
+		$cookieid = $hostid;
 	}
 
 	$result = DBend($result);
@@ -256,7 +256,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if ($result) {
 		CMessageHelper::setSuccessTitle($message_success);
 
-		uncheckTableRows($cookieId);
+		uncheckTableRows($cookieid);
 
 		$response = new CControllerResponseRedirect($backurl);
 		$response->redirect();
