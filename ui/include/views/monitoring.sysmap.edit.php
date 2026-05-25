@@ -82,12 +82,12 @@ $map_ownerid = $data['sysmap']['userid'];
 if ($map_ownerid != 0) {
 	$is_owner_accessible = array_key_exists($map_ownerid, $data['users']);
 
-	if ($data['form'] == 'clone' && !$is_owner_accessible) {
-		$user_id = $data['current_user_userid'];
+	if ($data['form'] === 'clone' && !$is_owner_accessible) {
+		$userid = $data['current_user_userid'];
 
 		$multiselect_data['data'][] = [
-			'id' => $user_id,
-			'name' => getUserFullname($data['users'][$user_id])
+			'id' => $userid,
+			'name' => getUserFullname($data['users'][$userid])
 		];
 	}
 	else {
