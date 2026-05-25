@@ -3,6 +3,8 @@ Changes for 7.0.27rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-22504] improved memory usage in lld worker proecesses with large low level discovery (vso)
+A......... [ZBX-27780] restored support of LLD macros in LLD rule override operations 'Update interval', 'History' and 'Trends' (dpankins)
 ........S. [ZBX-27736] fixed no_data trigger flickering into unknown state for unsupported items (arimdjonoks)
 ..F....... [ZBX-27708] fixed error displayed instead of graph for graphs with maximum height (kastafjevs)
 ..F....... [ZBX-27304] fixed missing gap between tag badges when widget overlay dialog is open (isharha)
@@ -4086,6 +4088,7 @@ Changes for 6.0.47rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-22504] improved memory usage in lld worker proecesses with large low level discovery (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.46
