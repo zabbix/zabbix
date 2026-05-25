@@ -848,11 +848,8 @@ static int	DBpatch_7050060(void)
 		return SUCCEED;
 
 	/* 1 - ZBX_SETTING_TYPE_STR */
-	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str) values"
-			"('banner_data',1,'')"))
-	{
+	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str) values ('banner_data',1,'')"))
 		return FAIL;
-	}
 
 	return SUCCEED;
 }
