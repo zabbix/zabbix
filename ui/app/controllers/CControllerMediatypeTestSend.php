@@ -101,71 +101,17 @@ class CControllerMediatypeTestSend extends CController {
 			return false;
 		}
 
-		$ret = true;
-
-		if ($this->mediatype['type'] != MEDIA_TYPE_EXEC && $this->mediatype['type'] != MEDIA_TYPE_WEBHOOK) {
-			$validator = new CNewValidator(array_map('trim', $this->getInputAll()), [
-				'message' =>	'string|not_empty'
-			]);
-
-			foreach ($validator->getAllErrors() as $error) {
-				error($error);
-			}
-
-			$ret = !$validator->isError();
-
-			if ($ret && $this->mediatype['type'] == MEDIA_TYPE_EMAIL) {
-				$email_validator = new CEmailValidator();
-				$ret = $email_validator->validate($this->getInput('sendto'));
-
-				if (!$ret) {
-					error($email_validator->getError());
-				}
-			}
-		}
-
-		return $ret;
+		return true;
 	}
 
 	protected function doAction(): void {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		switch ($this->mediatype['type']) {
-			case MEDIA_TYPE_EXEC:
-				$parameters = [];
-
-				foreach ($this->getInput('parameters', []) as $parameter) {
-					$parameters[] = $parameter['value'];
-				}
-
-				$params = ['parameters' => $parameters];
-				break;
-
-			case MEDIA_TYPE_WEBHOOK:
-				$parameters = [];
-
-				foreach ($this->getInput('parameters', []) as $parameter) {
-					$parameters[$parameter['name']] = $parameter['value'];
-				}
-
-				$params = ['parameters' => $parameters];
-				break;
-
-			default:
-				$params = [
-					'sendto' =>	$this->getInput('sendto'),
-					'subject' => $this->getInput('subject'),
-					'message' => $this->getInput('message')
-				];
-
-		}
-
-		$params['mediatypeid'] = $this->getInput('mediatypeid');
 		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::MEDIA_TYPE_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
-		$result = $server->testMediaType($params, CSessionHelper::getId());
+		$result = $server->testMediaType($this->getInputAll(), CSessionHelper::getId());
 		$debug = $server->getDebug();
 
 		if ($result) {

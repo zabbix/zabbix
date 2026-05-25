@@ -34,6 +34,10 @@ window.mediatype_test_edit_popup = new class {
 		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 		this.#form = new CForm(this.#form_element, rules);
 
+		this.#initEvents();
+	}
+
+	#initEvents() {
 		if (this.#form_element.querySelector('#mediatypetest_log')) {
 			this.#form_element.querySelector('#mediatypetest_log').addEventListener('click', (event) =>
 				this.#openLogPopup(event.target)
@@ -49,13 +53,6 @@ window.mediatype_test_edit_popup = new class {
 
 		this.#form_element.querySelector('#mediatypetest_log')?.classList.add('<?= ZBX_STYLE_DISABLED ?>');
 
-		// Trim fields.
-		for (let key in fields) {
-			if (['sendto', 'subject', 'message'].includes(key)) {
-				fields[key] = fields[key].trim();
-			}
-		}
-
 		this.#overlay.setLoading();
 
 		this.#form.validateSubmit(fields)
@@ -65,7 +62,11 @@ window.mediatype_test_edit_popup = new class {
 					return;
 				}
 
-				this.#post(zabbixUrl({action: 'mediatype.test.send'}), fields);
+				this.#post(zabbixUrl({action: 'mediatype.test.send'}), fields, (response) => {
+					const message_box = makeMessageBox('good', response.success.messages, response.success.title);
+
+					this.#form_element.parentNode.insertBefore(message_box[0], this.#form_element);
+				});
 			});
 	}
 
@@ -117,12 +118,13 @@ window.mediatype_test_edit_popup = new class {
 	}
 
 	/**
-	 * Sends a POST request to the specified URL with the provided data.
+	 * Sends a POST request to the specified URL with the provided data and executes the success_callback function.
 	 *
 	 * @param {string}   url			   The URL to send the POST request to.
-	 * @param {object}   data			  The data to send with the POST request.
+	 * @param {object}   data			   The data to send with the POST request.
+	 * @param {callback} success_callback  The function to execute when a successful response is received.
 	 */
-	#post(url, data) {
+	#post(url, data, success_callback) {
 		fetch(url, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -148,25 +150,23 @@ window.mediatype_test_edit_popup = new class {
 
 				if ('response' in response) {
 					// Set 'webhook_response_value' input field value
-					const response_value_element = this.#form_element.querySelector('#webhook_response_value');
+					const response_value_element = this.#form.findFieldByName('webhook_response_value').getField();
 
-					if (response_value_element) {
+					if (response_value_element !== null) {
 						response_value_element.value = response.response.value;
 					}
 
 					// Set 'webhook_response_type' text element value
 					const response_type_element = this.#form_element.querySelector('#webhook_response_type');
 
-					if (response_type_element) {
+					if (response_type_element !== null) {
 						response_type_element.textContent = response.response.type;
 					}
 				}
 
-				if ('success' in response) {
-					const message_box = makeMessageBox('good', response.success.messages, response.success.title);
-					this.#form_element.parentNode.insertBefore(message_box[0], this.#form_element);
-				}
+				return response;
 			})
+			.then(success_callback)
 			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => this.#overlay.unsetLoading());
 	}

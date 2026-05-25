@@ -89,8 +89,7 @@ switch ($data['type']) {
 			->addItem([
 				new CLabel(_('Response')),
 				new CFormField([
-					(new CTextArea(''))
-						->setId('webhook_response_value')
+					(new CTextArea('webhook_response_value'))
 						->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 						->setEnabled(false),
 					(new CDiv(''))->setId('webhook_response_type'),
