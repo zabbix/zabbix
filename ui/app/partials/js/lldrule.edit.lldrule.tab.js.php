@@ -23,10 +23,12 @@ var LldRuleEditLldRuleTab = class {
 	#container;
 	#field_switches;
 	#host_interface_selector;
+	#readonly;
 
-	constructor({container, field_switches, lldrule, interface_types, host_interfaces}) {
+	constructor({container, field_switches, lldrule, interface_types, host_interfaces, readonly}) {
 		this.#container = container;
 		this.#field_switches = field_switches;
+		this.#readonly = readonly;
 
 		if (!(lldrule.templated || lldrule.discovered)) {
 			if (lldrule.parameters.length == 0) {
@@ -100,7 +102,7 @@ var LldRuleEditLldRuleTab = class {
 
 	#initEvents() {
 		const input_selectors = ['[name="authtype"]', '[name="custom_timeout"]', '[name="lifetime_type"]',
-			'[name="enabled_lifetime_type"]', '[name="key"]'
+			'[name="enabled_lifetime_type"]', '[name="key"]', '[name="request_method"]'
 		];
 		const inputs = this.#container.querySelectorAll(input_selectors.join(','));
 
@@ -193,6 +195,19 @@ var LldRuleEditLldRuleTab = class {
 		this.#container.querySelectorAll('.js-item-disable-resources').forEach(el =>
 			el.classList.toggle('<?=ZBX_STYLE_DISPLAY_NONE ?>', delete_immediately)
 		);
+
+		if (type == <?= ITEM_TYPE_HTTPAGENT ?>) {
+			const request_method = this.#container.querySelector('[name="request_method"]').value;
+			const is_retrieve_mode_read_only = request_method == <?= HTTPCHECK_REQUEST_HEAD ?>;
+
+			this.#container.querySelectorAll('[name="retrieve_mode"]').forEach(radio => {
+				if (is_retrieve_mode_read_only && radio.value == <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>) {
+					radio.checked = true;
+				}
+
+				radio.readOnly = is_retrieve_mode_read_only || this.#readonly;
+			})
+		}
 
 		const custom_timeout = this.#container.querySelector(['[name="custom_timeout"]:checked']).value;
 		const inherited_hidden = custom_timeout == <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED; ?>
