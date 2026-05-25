@@ -40,6 +40,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	static $json_with_image;
 	static $invalid_json;
 	static $json_image_normalized;
+	static $race_hostid;
 
 	public static function ksort_recursive(&$array) {
 		if (!is_array($array)) {
@@ -237,9 +238,15 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 				'groups' => $groups,
 				'status' => HOST_STATUS_MONITORED,
 				'items' => $items_simple
+			],
+			[
+				'host' => 'race_agent',
+				'interfaces' => $interfaces,
+				'groups' => $groups,
+				'status' => HOST_STATUS_MONITORED
 			]
 		]);
-
+		self::$race_hostid = $result['hostids']['race_agent'];
 		self::$itemids = $result['itemids'];
 
 		$dep_items_create_result = CDataHelper::createItems('item',
@@ -516,364 +523,110 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals($state, $item['state'], 'User parameter failed to reload, item name: '.$name);
 	}
 
-
 	/**
-	 * Test trapper items
-	 *
-	 * @required-components server
-	 * @configurationDataProvider agentConfigurationProvider
-	 *
-	 * @hosts agent
-	 */
-	public function testTrapperJSON() {
-
-		$this->sendSenderValue('agent', 'JSON_TRAPPER', self::$json_with_image);
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids' => self::$itemids['agent:JSON_TRAPPER'],
-			'history' => ITEM_VALUE_TYPE_JSON
-		]);
-		$this->assertArrayHasKey('result', $response);
-		$this->assertEquals(1, count($response['result']));
-		$this->assertArrayHasKey('value', $response['result'][0]);
-
-		$json_result = self::normalize_json($response['result'][0]['value']);
-
-		$this->assertEquals(self::$json_image_normalized, $json_result);
-
-		// Dependent
-		$this->checkItemState('agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL);
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_TEXT,
-			'sortfield'	=>	'clock',
-			'sortorder'	=>	'ASC'
-		]);
-
-		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
-		$this->assertEquals($response['result'][0]['value'], self::error_message);
-
-		$this->checkItemState('agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL);
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_UINT64,
-			'sortfield'	=>	'clock',
-			'sortorder'	=>	'ASC'
-		]);
-
-		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
-		$this->assertEquals($response['result'][0]['value'], self::tls_handshake);
-
-		// Invalid JSON
-
-		$this->sendSenderValue('agent', 'JSON_TRAPPER', self::$invalid_json);
-		$this->checkItemState('agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED);
-
-		$this->sendSenderValue('agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image);
-		$this->sendSenderValue('agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image);
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['agent:JSON_TRAPPER_PREPROC_THROTTLING'],
-			'history'	=>	ITEM_VALUE_TYPE_JSON
-		]);
-
-		$this->assertEquals(1, count($response['result']), json_encode($response));
-		$json_result = self::normalize_json($response['result'][0]['value']);
-		$this->assertEquals(self::$json_image_normalized, $json_result);
-
-		$this->sendSenderValue('agent', 'JSON_TRAPPER_PREPROC_THROTTLING', "{}");
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['agent:JSON_TRAPPER_PREPROC_THROTTLING'],
-			'history'	=>	ITEM_VALUE_TYPE_JSON,
-			'sortfield'	=>	'clock',
-			'sortorder'	=>	'ASC'
-		]);
-
-		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
-		$this->assertEquals(json_encode($response['result'][1]['value']), json_encode("{}"));
-
-		$expectedDiagInfoLogEntries = [
-			'diaginfo=alerting' => '== alerting diagnostic information ==',
-			'diaginfo=valuecache' => '== value cache diagnostic information ==',
-			'diaginfo=lld' => '== LLD diagnostic information ==',
-			'diaginfo=historycache' => '== history cache diagnostic information ==',
-			'diaginfo=preprocessing' => '== preprocessing diagnostic information ==',
-			'diaginfo=locks' => '== locks diagnostic information ==',
-			'diaginfo=connector' => '== connector diagnostic information =='
-		];
-		foreach ($expectedDiagInfoLogEntries as $cmd => $e) {
-			$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, $cmd);
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $e, true, 20, 3);
-		}
-	}
-
-	/**
-	 * Test trapper items
-	 *
-	 * @required-components server, proxy
-	 * @configurationDataProvider proxyConfigurationProvider
-	 *
-	 * @hosts proxy_agent
-	 */
-	public function testTrapperJSON_proxy() {
-		$this->reloadConfigurationCache(self::COMPONENT_PROXY);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 120, 1, true);
-		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$json_with_image, self::COMPONENT_PROXY);
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids' => self::$itemids['proxy_agent:JSON_TRAPPER'],
-			'history' => ITEM_VALUE_TYPE_JSON
-		]);
-		$this->assertArrayHasKey('result', $response);
-		$this->assertEquals(1, count($response['result']));
-		$this->assertArrayHasKey('value', $response['result'][0]);
-
-		$json_result = self::normalize_json($response['result'][0]['value']);
-		$this->assertEquals(self::$json_image_normalized, $json_result);
-
-		// Dependent
-		$this->checkItemState('proxy_agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL);
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['proxy_agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_TEXT,
-			'sortfield'	=>	'clock',
-			'sortorder'	=>	'ASC'
-		]);
-
-		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
-		$this->assertEquals($response['result'][0]['value'], self::error_message);
-
-		$this->checkItemState('proxy_agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL);
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['proxy_agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_UINT64,
-			'sortfield'	=>	'clock',
-			'sortorder'	=>	'ASC'
-		]);
-
-		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
-		$this->assertEquals($response['result'][0]['value'], self::tls_handshake);
-
-		// Invalid JSON
-		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$invalid_json, self::COMPONENT_PROXY);
-		$this->checkItemState('proxy_agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED);
-
-		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image, self::COMPONENT_PROXY);
-		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image, self::COMPONENT_PROXY);
-
-		// there is intentionally no limit, we need to make sure, the throttling worked
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['proxy_agent:JSON_TRAPPER_PREPROC_THROTTLING'],
-			'history'	=>	ITEM_VALUE_TYPE_JSON
-		]);
-
-		$this->assertEquals(1, count($response['result']), json_encode($response));
-		$json_result = self::normalize_json($response['result'][0]['value']);
-		$this->assertEquals(self::$json_image_normalized, $json_result);
-
-		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', "null", self::COMPONENT_PROXY);
-
-		// there is intentionally no limit, we need to make sure, the throttling worked
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['proxy_agent:JSON_TRAPPER_PREPROC_THROTTLING'],
-			'history'	=>	ITEM_VALUE_TYPE_JSON,
-			'sortfield'	=>	'clock',
-			'sortorder'	=>	'DESC'
-		]);
-
-		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
-		$this->assertEquals($response['result'][0]['value'], "null");
-
-		$expectedDiagInfoLogEntries = [
-			'diaginfo=historycache' => '== history cache diagnostic information ==',
-			'diaginfo=preprocessing' => '== preprocessing diagnostic information ==',
-			'diaginfo=locks' => '== locks diagnostic information =='
-		];
-		foreach ($expectedDiagInfoLogEntries as $cmd => $e) {
-			$this->executeRuntimeControlCommand(self::COMPONENT_PROXY, $cmd);
-			$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, $e, true, 20, 3);
-		}
-	}
-
-	/**
-	 * Test if both active and passive agent checks are processed.
-	 *
-	 * @required-components server, agent
-	 * @configurationDataProvider agentConfigurationProvider
-	 * @hosts agent
-	 */
-	public function testBinaryValueTypeDataCollection_checkAgentData() {
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
-			'enabling Zabbix agent checks on host "agent": interface became available',
-			'resuming Zabbix agent checks on host "agent": connection restored'
-		]);
-
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
-
-		// Retrieve history data from API as soon it is available.
-		// image
-		$active_data = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['agent:BINARY_IMAGE'],
-			'history'	=>	ITEM_VALUE_TYPE_BINARY,
-			'sortfield'	=>	"clock",
-			'sortorder'	=>	"DESC",
-			'limit'		=>	1,
-			'maxValueSize'  =>	null // disable truncation
-		]);
-
-		$this->assertEquals(1, count($active_data['result']), json_encode($active_data['result']));
-		$base64_image = self::base64_image;
-		$this->assertEquals($base64_image, $active_data['result'][0]['value']);
-
-		// empty
-		$active_data = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['agent:BINARY_IMAGE_EMPTY'],
-			'history'	=>	ITEM_VALUE_TYPE_BINARY
-		]);
-
-		$base64_empty = self::base64_empty;
-		$this->assertEquals($base64_empty, $active_data['result'][0]['value']);
-
-		// Retrieve JSON item value type history data from API
-		$active_data = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_JSON,
-			'sortfield'	=>	"clock",
-			'sortorder'	=>	"DESC",
-			'limit'		=>	1
-		]);
-
-		$this->assertEquals(1, count($active_data['result']), json_encode($active_data['result']));
-		$json_data_http_response = self::json_data_http_response;
-		$this->assertEquals($json_data_http_response, $active_data['result'][0]['value']);
-
-		// Retrieve str dependent item value type history data from API
-		$active_data = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['agent:STR_VALUE_TYPE_DEP_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_STR
-		]);
-		$this->assertEquals($json_data_http_response, $active_data['result'][0]['value']);
-
-		// Retrieve JSON item value type history data from API, dep
-		$json_dep_data = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['agent:JSON_VALUE_TYPE_DEP'],
-			'history'	=>	ITEM_VALUE_TYPE_JSON,
-			'sortfield'	=>	"clock",
-			'sortorder'	=>	"DESC",
-			'limit'		=>	1
-		]);
-
-		$this->assertEquals(1, count($json_dep_data['result']), json_encode($json_dep_data['result']));
-		$json_result = self::normalize_json($json_dep_data['result'][0]['value']);
-
-		$this->assertEquals(self::$json_image_normalized, $json_result);
-
-		$this->checkItemState('agent:BINARY_IMAGE', ITEM_STATE_NORMAL);
-		$this->checkItemState('agent:BINARY_IMAGE_EMPTY', ITEM_STATE_NORMAL);
-		$this->checkItemState('agent:BINARY_IMAGE_INVALID', ITEM_STATE_NOTSUPPORTED);
-
-		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP', ITEM_STATE_NORMAL);
-		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC', ITEM_STATE_NORMAL);
-		$this->checkItemState('agent:STR_VALUE_TYPE_DEP_WITH_PREPROC', ITEM_STATE_NORMAL);
-		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP_INVALID', ITEM_STATE_NOTSUPPORTED);
-	}
-
-	/**
-	 * Component configuration provider for proxy related tests.
+	 * Component configuration provider for non-agent and non-trapper related tests.
 	 *
 	 * @return array
 	 */
-	public function proxyConfigurationProvider() {
+	public function slowServerConfigurationProvider() {
 		return [
 			self::COMPONENT_SERVER => [
 				'UnreachablePeriod' => 5,
 				'UnavailableDelay' => 5,
 				'UnreachableDelay' => 1,
+				'StartDBSyncers' => 1,
+				'HistoryCacheSize' => '16M',
 				'DebugLevel' => 5,
 				'LogFileSize' => 0
-			],
-			self::COMPONENT_PROXY => [
-				'UnreachablePeriod' => 5,
-				'UnavailableDelay' => 5,
-				'UnreachableDelay' => 1,
-				'DebugLevel' => 5,
-				'LogFileSize' => 0,
-				'Hostname' => 'proxy',
-				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
-			],
-			self::COMPONENT_AGENT => [
-				'Hostname' => 'proxy_agent',
-				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_PROXY, 'ListenPort')
 			]
 		];
 	}
 
-	/**
-	 * Test if both active and passive agent checks are processed.
-	 *
-	 * @required-components server, proxy, agent
-	 * @configurationDataProvider proxyConfigurationProvider
-	 * @hosts proxy_agent
-	 */
-	public function testBinaryValueTypeDataCollection_checkProxyData() {
-		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'received configuration data from server');
+/**
+ * Regression test:
+ * invalid JSON + runtime value_type switch.
+ *
+ * @required-components server
+ * @configurationDataProvider slowServerConfigurationProvider
+ *
+ * @hosts agent
+ */
+public function testJSONRaceUnderSyncerBacklog() {
 
-		$base64_image = self::base64_image;
+	$large_payload = [
+		'a' => str_repeat('A', 1024 * 1024),
+		'b' => str_repeat('B', 1024 * 1024),
+		'c' => [
+			'd' => str_repeat('C', 1024 * 1024)
+		]
+	];
 
-		// Retrieve binary image history data from API as soon it is available.
-		$active_data = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['proxy_agent:BINARY_IMAGE'],
-			'history'	=>	ITEM_VALUE_TYPE_BINARY,
-			'sortfield'	=>	"clock",
-			'sortorder'	=>	"DESC",
-			'limit'		=>	1,
-			'maxValueSize'	=>	null // disable truncation
+	self::$invalid_json = json_encode($large_payload).',';
+
+	$result = $this->call('item.create', [
+		[
+			'hostid' => self::$race_hostid,
+			'name' => 'JSON_RACE',
+			'key_' => 'JSON_RACE',
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_TEXT,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
+		]
+	]);
+
+	$itemid = $result['result']['itemids'][0];
+	self::$itemids['race_agent:JSON_RACE'] = $itemid;
+
+
+	$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+
+	for ($ii = 0; $ii < 20; $ii++) {
+		$this->call('item.update', [
+			'itemid' => $itemid,
+			'value_type' => ITEM_VALUE_TYPE_TEXT
 		]);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
-		$this->assertEquals(1, count($active_data['result']));
+		for ($i = 0; $i < 20; $i++) {
+			$this->sendSenderValue(
+				'race_agent',
+				'JSON_RACE',
+				self::$invalid_json
+			);
+		}
 
-		$this->assertEquals($base64_image, $active_data['result'][0]['value']);
-
-		// Retrieve JSON item value type history data from API
-		$active_data = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['proxy_agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_JSON,
-			'sortfield'     =>      "clock",
-			'sortorder'     =>      "DESC",
-			'limit'         =>      1
+		$this->call('item.update', [
+			'itemid' => $itemid,
+			'value_type' => ITEM_VALUE_TYPE_JSON
 		]);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
-		$this->assertEquals(1, count($active_data['result']));
-
-		$json_data_http_response = self::json_data_http_response;
-
-		$this->assertEquals($json_data_http_response, $active_data['result'][0]['value']);
-
-		// Retrieve str dependent item value type history data from API
-		$active_data = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['proxy_agent:STR_VALUE_TYPE_DEP_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_STR,
-			'sortfield'     =>      "clock",
-			'sortorder'     =>      "DESC",
-			'limit'         =>      1
-		]);
-
-		$this->assertEquals(1, count($active_data['result']));
-		$this->assertEquals($json_data_http_response, $active_data['result'][0]['value']);
+		for ($i = 0; $i < 20; $i++) {
+			$this->sendSenderValue(
+				'race_agent',
+				'JSON_RACE',
+				self::$invalid_json
+			);
+		}
 	}
 
-	/**
-	 * Test simple items with JSON
-	 *
-	 * @required-components server
-	 * @configurationDataProvider simpleConfigurationProvider
-	 *
-	 * @hosts simple
-	 */
-	public function testSimpleJSON() {
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids' => self::$itemids['simple:net.tcp.service[http,127.0.0.1]'],
-			'history' => ITEM_VALUE_TYPE_JSON
-		]);
-		$this->assertArrayHasKey('result', $response);
+	sleep(20);
 
-		$this->assertEquals(1, $response['result'][0]['value']);
-	}
+	$this->assertFalse(
+		$this->isLogLinePresent(
+			self::COMPONENT_SERVER,
+			'invalid input syntax for type json'
+		)
+	);
+
+	$this->assertFalse(
+		$this->isLogLinePresent(
+			self::COMPONENT_SERVER,
+			'history_json'
+		)
+	);
+}
+
+
 }
