@@ -842,6 +842,18 @@ static int	DBpatch_7050059(void)
 	return DBdrop_foreign_key("event_suppress", 2);
 }
 
+static int	DBpatch_7050060(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 1 - ZBX_SETTING_TYPE_STR */
+	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str) values ('banner_data',1,'')"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -908,5 +920,6 @@ DBPATCH_ADD(7050056, 0, 1)
 DBPATCH_ADD(7050057, 0, 1)
 DBPATCH_ADD(7050058, 0, 1)
 DBPATCH_ADD(7050059, 0, 1)
+DBPATCH_ADD(7050060, 0, 1)
 
 DBPATCH_END()
