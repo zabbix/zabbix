@@ -1576,7 +1576,7 @@ class CDataTable {
 		this.#element.appendChild(this.#options_popup.getElement());
 
 		this.#options_popup.position();
-		this.#options_popup.getElement().focus();
+		this.#options_popup.getElement().focus({preventScroll: true});
 	}
 
 	onOptionsPopupClose() {
