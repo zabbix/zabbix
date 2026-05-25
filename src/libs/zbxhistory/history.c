@@ -371,8 +371,8 @@ void	zbx_history_record_vector_clean(zbx_vector_history_record_t *vector, int va
  *                                                                            *
  * Purpose: compares two cache values by their timestamps                     *
  *                                                                            *
- * Parameters: d1   - [IN] the first value                                    *
- *             d2   - [IN] the second value                                   *
+ * Parameters: a1   - [IN] first value                                        *
+ *             a2   - [IN] second value                                       *
  *                                                                            *
  * Return value:   <0 - the first value timestamp is less than second         *
  *                 =0 - the first value timestamp is equal to the second      *
@@ -382,31 +382,37 @@ void	zbx_history_record_vector_clean(zbx_vector_history_record_t *vector, int va
  *           order.                                                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_history_record_compare_asc_func(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
+int	zbx_history_record_compare_asc(const void *a1, const void *a2)
 {
+	const	zbx_history_record_t	*d1 = (const zbx_history_record_t *)a1;
+	const	zbx_history_record_t	*d2 = (const zbx_history_record_t *)a2;
+
 	if (d1->timestamp.sec == d2->timestamp.sec)
 		return d1->timestamp.ns - d2->timestamp.ns;
 
 	return d1->timestamp.sec - d2->timestamp.sec;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: compares two cache values by their timestamps                     *
- *                                                                            *
- * Parameters: d1   - [IN] the first value                                    *
- *             d2   - [IN] the second value                                   *
- *                                                                            *
- * Return value:   >0 - the first value timestamp is less than second         *
- *                 =0 - the first value timestamp is equal to the second      *
- *                 <0 - the first value timestamp is greater than second      *
- *                                                                            *
- * Comments: This function is commonly used to sort value vector in descending*
- *           order.                                                           *
- *                                                                            *
- ******************************************************************************/
-int	zbx_history_record_compare_desc_func(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: compares two cache values by their timestamps                      *
+ *                                                                             *
+ * Parameters: a1   - [IN] first value                                         *
+ *             a2   - [IN] second value                                        *
+ *                                                                             *
+ * Return value:   >0 - first value timestamp is less than second              *
+ *                 =0 - first value timestamp is equal to the second           *
+ *                 <0 - first value timestamp is greater than second           *
+ *                                                                             *
+ * Comments: This function is commonly used to sort value vector in descending *
+ *           order.                                                            *
+ *                                                                             *
+ *******************************************************************************/
+int	zbx_history_record_compare_desc(const void *a1, const void *a2)
 {
+	const	zbx_history_record_t	*d1 = (const zbx_history_record_t *)a1;
+	const	zbx_history_record_t	*d2 = (const zbx_history_record_t *)a2;
+
 	if (d1->timestamp.sec == d2->timestamp.sec)
 		return d2->timestamp.ns - d1->timestamp.ns;
 

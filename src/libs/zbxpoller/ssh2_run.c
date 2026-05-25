@@ -278,7 +278,7 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 
 	/* Create a session instance and start it up. This will trade welcome */
 	/* banners, exchange keys, and setup crypto, compression, and MAC layers */
-	while (0 != (rc = libssh2_session_startup(session, s.socket)))
+	while (0 != (rc = libssh2_session_handshake(session, s.socket)))
 	{
 		if (SUCCEED != ssh_nonblocking_error(&s, session, rc, &ssherr))
 		{

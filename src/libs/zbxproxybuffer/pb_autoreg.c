@@ -386,7 +386,7 @@ int	pb_autoreg_has_mem_rows(zbx_pb_t *pb)
 void	zbx_pb_autoreg_write_host(const char *host, const char *ip, const char *dns, unsigned short port,
 		unsigned int connection_type, const char *host_metadata, int flags, int clock)
 {
-	zbx_uint64_t	id;
+	zbx_uint64_t	id = 0;
 	zbx_pb_t	*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -424,11 +424,13 @@ void	zbx_pb_autoreg_write_host(const char *host, const char *ip, const char *dns
 	pb_data->db_handles_num++;
 	pb_unlock();
 
-	id = zbx_db_get_maxid("proxy_autoreg_host");
-
 	do
 	{
 		zbx_db_begin();
+
+		if (0 == id)
+			id = zbx_db_get_maxid("proxy_autoreg_host");
+
 		pb_autoreg_write_host_db(id, host, ip, dns, port, connection_type, host_metadata, flags, clock);
 	}
 	while (ZBX_DB_DOWN == zbx_db_commit());

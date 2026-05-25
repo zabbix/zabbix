@@ -207,7 +207,7 @@ void	zbx_mock_test_entry(void **state)
 
 	mock_error = zbx_mock_in_parameter("sets", &handle);
 	if (ZBX_MOCK_SUCCESS != mock_error)
-		fail_msg("Invalid input path, %d", mock_error);
+		fail_msg("Invalid input path, %d", (int)mock_error);
 
 	init_test();
 
