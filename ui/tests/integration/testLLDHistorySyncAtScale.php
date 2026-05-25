@@ -224,6 +224,9 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			self::$proxyid = null;
 		}
 
+		self::$discovered_itemids = [];
+		self::$log_lastlogsize = 0;
+
 		CAPIHelper::call('settings.update', ['auditlog_enabled' => 1, 'auditlog_mode' => 1]);
 
 		$response = CAPIHelper::call('action.get', [

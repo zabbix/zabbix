@@ -19,8 +19,9 @@ require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
  * Variant of testLLDHistorySyncAtScale that runs a real active proxy daemon and
  * routes all item values through it instead of spoofing the proxy name when
  * sending directly to the server. The nodata-based trigger scenarios are
- * skipped — values traverse the proxy queue and arrive with proxy-introduced
- * latency, so nodata(...,30s) windows are not deterministic in this setup.
+ * skipped.
+ *
+ * can be tested with parent as (testLLDHistorySyncAtScale|testLLDProxyHistorySyncAtScale)
  *
  * @required-components server, proxy
  * @suite-components-reuse true
