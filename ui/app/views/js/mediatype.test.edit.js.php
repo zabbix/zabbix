@@ -132,17 +132,6 @@ window.mediatype_test_edit_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-
-				if ('form_errors' in response) {
-					this.#form.setErrors(response.form_errors, true, true);
-					this.#form.renderErrors();
-
-					return;
-				}
-
 				if ('debug' in response) {
 					this.#form_element.querySelector('#mediatypetest_log').classList.remove('disabled');
 					sessionStorage.setItem('mediatypetest', JSON.stringify(response.debug));
@@ -162,6 +151,17 @@ window.mediatype_test_edit_popup = new class {
 					if (response_type_element !== null) {
 						response_type_element.textContent = response.response.type;
 					}
+				}
+
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				if ('form_errors' in response) {
+					this.#form.setErrors(response.form_errors, true, true);
+					this.#form.renderErrors();
+
+					return;
 				}
 
 				return response;
