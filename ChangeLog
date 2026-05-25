@@ -1,10 +1,50 @@
+Changes for 7.0.27rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-27736] fixed no_data trigger flickering into unknown state for unsupported items (arimdjonoks)
+..F....... [ZBX-27708] fixed error displayed instead of graph for graphs with maximum height (kastafjevs)
+..F....... [ZBX-27304] fixed missing gap between tag badges when widget overlay dialog is open (isharha)
+..F....... [ZBX-25509] fixed z-select re-rendering after sorting (dpankins)
+..F....... [ZBX-27210] fixed the infinite loading on widgets after removing maps from Map Navigation Tree widget (aluchko)
+.........T [ZBX-27694] updated dependent item key from 'vm.memory.utilization' to 'vm.memory.util' in 'Linux by Zabbix agent' active and passive templates (smansurovs)
+.......P.. [ZBX-27399] fixed possible deadlocks in configuration cache sync (sboidenko)
+.......PS. [ZBX-27675] improved configuration syncer not to reserve large amounts of memory (vso)
+.........T [ZBX-27475] fixed typo in Mattermost webhook 'fallback' field name (smansurovs)
+..F....... [ZBX-26742] fixed text overlap in popups for portuguese language (gklavins)
+..F....... [ZBX-27632] fixed trigger severity checkboxes update to checked state after validation error (kastafjevs)
+.......PS. [ZBX-27022] fixed preprocessing step "Discard unchanged" for string types (Andris, askolmeisters)
+..F....... [ZBX-27688] removed checks to prevent bulk enabling of Gmail and Office 365 media types with incomplete configuration (aluchko)
+..F....... [ZBX-27652] fixed incorrect documentation link for Administration/General/Other (aluchko)
+..F....... [ZBX-27517] fixed 'page not found' issue when exporting template that contains inaccessible dashboard element (aluchko)
+..F....... [ZBX-27121] fixed an issue where repeatedly clicking the Close button on the notifications floating popup could cause an error (msnihach)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.26
+
+7.0.26rc1 was released as 7.0.26 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.26rc1
 
 New features:
-.......PS. [ZBXNEXT-10211] added info about VMware entities to alarm json and 'ifbackingnetwork' info to json for *vm.discovery and *vm.net.if.discovery items (MVekslers)
+.........T [ZBXNEXT-9722] added authentication macros to Redis by Zabbix agent 2 template (smansurovs)
+.........T [ZBXNEXT-10502] added support for native connection mode in Ceph by Zabbix agent 2 template (abakaldin)
+.......PS. [ZBXNEXT-10211] added info about VMware entities to alarm JSON and ifbackingnetwork info to JSON for *vm.discovery and *vm.net.if.discovery items (MVekslers)
 
 Bug fixes:
-.........T [ZBX-27611] reduced received data size for elasticsearch template (kflorowski)
+.......PS. [ZBX-27496] improved network discovery subsystem to work with snmpv1 and snmpv2c checks (MVekslers)
+.......PS. [ZBX-27635] fixed Zabbix server and proxy build without libcurl (arimdjonoks)
+.........T [ZBX-27592] fixed memory items becoming unsupported in Apache templates (kflorowski)
+.........T [ZBX-17971] fixed macro view in trigger descriptions in some SNMP templates (abrosimovs)
+..F....... [ZBX-27610] fixed http agent item user macros not resolving in required status codes (kastafjevs)
+.........T [ZBX-26388] improved memory usage monitoring for Docker by Zabbix agent 2 template (smansurovs)
+.......PS. [ZBX-27115] fixed some ODBC errors not being processed (mkorotkov)
+.........T [ZBX-27025] fixed incorrect header parsing in JS files (kflorowski)
+..F....... [ZBX-27485] fixed issue with disabled toggling and readonly attributes in "Access to API" section (msnihach)
+.........T [ZBX-27418] fixed "disk failed" status in HPE Primera by HTTP template (smansurovs)
+.........T [ZBX-27611] reduced received data size for Elasticsearch template (kflorowski)
 .........T [ZBX-27552] fixed macro descriptions in Azure template (kflorowski)
 ..F....... [ZBX-27569] fixed broadcasting of item in Item history widget (dfofanovs)
 
@@ -92,6 +132,7 @@ A......... [ZBX-27448] fixed inability to delete host, user, or template groups 
 ..F....... [ZBX-26984] updated documentation links for Create template group and Create host group (msnihach)
 ..F....... [ZBX-26827] fixed checkboxes "SSL verify peer" and "SSL verify host" not being selected when corresponding label is clicked in media type form (msnihach)
 ..F....... [ZBX-27416] fixed message box display bug in Monitoring problems page (gberzina)
+..F....... [ZBX-27819] updated onelogin/php-saml to version 4.3.1 (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.23
@@ -4040,6 +4081,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.47rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.46
+
+6.0.46rc1 was released as 6.0.46 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.46rc1
 
 New features:
@@ -4048,7 +4101,8 @@ A......PS. [ZBXNEXT-10448] updated maximum supported MySQL version to 9.6 (mprih
 .......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
-A......... [ZBX-27306] prevented deletion of httptest item tags when 'tags' parameter wasn't passed to httptest.update API method (aluchko)
+..F....... [ZBX-27603] fixed issue with updating existing LDAP settings after LDAP host change (kkuzmina)
+A......... [ZBX-27306] prevented deletion of httptest item tags when "tags" parameter hasn't been passed to httptest.update API method (aluchko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.45
@@ -4064,6 +4118,7 @@ A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25
 Bug fixes:
 ...G...... [ZBX-25805] fixed regexp runtime error when processing log* items with unspecified encoding by sanitizing invalid UTF-8 (vsmelovs)
 ...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
+..F....... [ZBX-27819] updated onelogin/php-saml to version 4.3.1 (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.44

@@ -1926,6 +1926,12 @@ select {
 		&.modal-popup-static {
 			max-width: 700px;
 			width: 100%;
+
+			&.modal-popup-sla-edit,
+			&.modal-popup-proxy-edit,
+			&.modal-popup-connector-edit {
+				max-width: 750px;
+			}
 		}
 
 		&.modal-popup-preprocessing {
