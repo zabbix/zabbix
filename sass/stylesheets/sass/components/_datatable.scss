@@ -155,6 +155,10 @@
 		border: 1px solid $ui-border-color;
 		box-shadow: 0 4px 20px 0 $action-shadow-color;
 
+		&.is-loading {
+			pointer-events: all;
+		}
+
 		&:focus {
 			outline: none;
 		}

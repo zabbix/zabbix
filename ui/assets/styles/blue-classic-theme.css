@@ -2382,6 +2382,8 @@ button {
     background-color: #ffffff;
     border: 1px solid #dfe4e7;
     box-shadow: 0 4px 20px 0 rgba(118, 141, 153, 0.5); }
+    .datatable .datatable-options-popup.is-loading {
+      pointer-events: all; }
     .datatable .datatable-options-popup:focus {
       outline: none; }
     .datatable .datatable-options-popup .datatable-options-popup-links {
