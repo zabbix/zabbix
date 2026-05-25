@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_history_push1,test_history_push_non_monitored,test_history_push_maintained
  * @backup history,items,hosts,history_uint,history_text,history_str,history_log,ids
+ * @onAfter clearData
  */
 class testHistoryPush extends CIntegrationTest {
 	const HOSTNAME1 = 'test_history_push1';
@@ -209,6 +210,28 @@ class testHistoryPush extends CIntegrationTest {
 		return true;
 	}
 
+	public static function clearData(): void {
+		if (CAPIHelper::getSessionId() === null) {
+			CAPIHelper::authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+		}
+
+		$response = CAPIHelper::call('host.get', [
+			'output' => ['hostid'],
+			'search' => ['host' => 'test_history_push'],
+			'startSearch' => true
+		]);
+
+		if (!empty($response['result'])) {
+			$hostids = array_column($response['result'], 'hostid');
+			CAPIHelper::call('host.delete', $hostids);
+		}
+
+		self::$hostid_normal = null;
+		self::$hostid_non_monitored = null;
+		self::$hostid_maintained = null;
+		self::$itemids = null;
+	}
+
 	/**
 	 * Component configuration provider for agent related tests.
 	 *
@@ -275,9 +298,9 @@ class testHistoryPush extends CIntegrationTest {
 			$this->assertEquals($tc['itemid'], $response['result']['data'][0]['itemid']);
 			$this->assertArrayNotHasKey('error', $response['result']['data'][0]);
 
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In trapper_process_history_push', true, 95, 3);
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of trapper_process_history_push', true, 95, 3);
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 3);
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In trapper_process_history_push', true, 95, 1);
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of trapper_process_history_push', true, 95, 1);
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 1);
 
 			$response = $this->callUntilDataIsPresent('history.get', [
 				'output' => ['itemid', 'value', 'clock', 'ns'],
@@ -317,9 +340,9 @@ class testHistoryPush extends CIntegrationTest {
 		$this->assertEquals(self::$itemids['trapper_uint_host_key_test'], $response['result']['data'][0]['itemid']);
 		$this->assertArrayNotHasKey('error', $response['result']['data'][0]);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In trapper_process_history_push', true, 95, 3);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of trapper_process_history_push', true, 95, 3);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 3);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In trapper_process_history_push', true, 95, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of trapper_process_history_push', true, 95, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 1);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'output' => ['value', 'clock', 'ns'],
@@ -378,13 +401,13 @@ class testHistoryPush extends CIntegrationTest {
 				"key 'error' exists in a response (itemid: ".$rec['itemid'].")");
 		}
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In trapper_process_history_push', true, 95, 3);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of trapper_process_history_push', true, 95, 3);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 3);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 3);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 3);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 3);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 3);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In trapper_process_history_push', true, 95, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of trapper_process_history_push', true, 95, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBmass_add_history', true, 95, 1);
 
 		$expected_text_count = count($values_sent_text);
 		$response = $this->callUntilDataIsPresent('history.get', [
@@ -415,15 +438,22 @@ class testHistoryPush extends CIntegrationTest {
 	public function testHistoryPush_serverIsDown() {
 		$this->stopComponent(self::COMPONENT_SERVER);
 
-		// CAPITest::call() has assertions for 'result' key in a response, these will throw an exception
-		$this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+		if (CAPIHelper::getSessionId() === null) {
+			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+		}
 
-		$response = $this->call('history.push', [
+		// Use CAPIHelper::call() directly so the response is not asserted on the 'result' key.
+		$response = CAPIHelper::call('history.push', [
 			'itemid' => self::$itemids['trapper_uint'],
 			'value' => 1,
 			'clock' => time() - 25,
 			'ns' => 255
 		]);
+
+		$this->assertArrayNotHasKey('result', $response,
+			'Expected history.push to fail with server down, got: '.json_encode($response));
+		$this->assertArrayHasKey('error', $response,
+			'Expected error in response with server down, got: '.json_encode($response));
 	}
 
 	public function testHistoryPush_httpAgentTrappingDisabled() {
