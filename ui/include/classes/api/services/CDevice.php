@@ -310,11 +310,15 @@ class CDevice extends CApiService {
 		}
 
 		if (!CApiDpopHelper::checkJwkIntegrity($data['mobile_identity_key'])) {
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Failed to parse identity key material.');
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/mobile_identity_key',
+				_('failed to parse key material')
+			));
 		}
 
 		if (!CApiDpopHelper::checkJwkIntegrity($data['mobile_encryption_key'])) {
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Failed to parse encryption key material.');
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/mobile_encryption_key',
+				_('failed to parse key material')
+			));
 		}
 
 		$db_device = DBfetch(DBselect(
@@ -327,7 +331,9 @@ class CDevice extends CApiService {
 		));
 
 		if (!$db_device) {
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+			self::exception(ZBX_API_ERROR_NO_ENTITY, _s('Invalid parameter "%1$s": %2$s.', '/enrollment_token',
+				_('referred object does not exist')
+			));
 		}
 	}
 
