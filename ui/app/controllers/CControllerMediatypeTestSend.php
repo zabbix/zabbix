@@ -36,7 +36,7 @@ class CControllerMediatypeTestSend extends CController {
 				['string','required', 'not_empty',
 					'when' => ['type', 'in' => [MEDIA_TYPE_SMS]]
 				],
-				['string','required', 'not_empty', 'use' => [CEmailValidator::class, []],
+				['string','required', 'not_empty', 'use' => [CEmailValidator::class],
 					'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL]]
 				]
 			],
@@ -54,14 +54,12 @@ class CControllerMediatypeTestSend extends CController {
 	protected function checkInput(): bool {
 		$ret = $this->validateInput(self::getValidationRules()) && $this->validateMediaType();
 
-		$messages = array_column(get_and_clear_messages(), 'message');
-
-		if (!$ret || $messages) {
+		if (!$ret) {
 			$form_errors = $this->getValidationError();
 			$response = $form_errors
 				? ['form_errors' => $form_errors]
 				: ['error' => [
-					'messages' => $messages
+					'messages' => array_column(get_and_clear_messages(), 'message')
 				]];
 
 			$this->setResponse(

@@ -38,11 +38,9 @@ window.mediatype_test_edit_popup = new class {
 	}
 
 	#initEvents() {
-		if (this.#form_element.querySelector('#mediatypetest_log')) {
-			this.#form_element.querySelector('#mediatypetest_log').addEventListener('click', (event) =>
-				this.#openLogPopup(event.target)
-			);
-		}
+		this.#form_element.querySelector('#mediatypetest_log')?.addEventListener('click', (event) =>
+			this.#openLogPopup(event.target)
+		);
 
 		this.#footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
 	}
