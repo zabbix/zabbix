@@ -40,11 +40,12 @@ $IMAGE_FORMAT_DEFAULT		= IMAGE_FORMAT_PNG;
 
 // Uncomment this block if you are using Elasticsearch or ClickHouse for storing history data.
 // Supported configuration parameters:
-// 'types' - An array with provider supported value types.
-// 'provider' - History provider type, (elasticsearch, clickhouse).
-// 'url' - History provider URL.
-// 'db' - Database name. Used for ClickHouse.
-// 'username' and 'password' - Database user and password. Used for ClickHouse.
+// 'types'    - Array of data types to be stored in the external storage.
+// 'provider' - History provider type: 'elasticsearch' or 'clickhouse'.
+// 'url'      - History provider URL.
+// 'db'       - Database name (used for ClickHouse).
+// 'username' - Database user (used for ClickHouse).
+// 'password' - Database password (used for ClickHouse).
 //$HISTORY_PROVIDERS[] = [
 //	'types' => ['dbl', 'str', 'log', 'uint', 'text', 'json'],
 //	'provider' => '<provider>',
