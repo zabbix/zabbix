@@ -21,7 +21,6 @@
 #include "zbxcomms.h"
 #include "zbxcommshigh.h"
 #include "zbxcrypto.h"
-#include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
 #include "zbxstr.h"

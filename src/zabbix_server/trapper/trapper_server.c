@@ -25,7 +25,6 @@
 #include "zbxalerter.h"
 #include "zbxipcservice.h"
 #include "zbxcommshigh.h"
-#include "zbxcacheconfig.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbxdb.h"
