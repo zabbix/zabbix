@@ -592,10 +592,9 @@ class CFormValidator {
 	#validateUse(use_validations) {
 		const requests = [];
 		const result = {result: true, errors: []};
-		const chunk_size = VALIDATE_USE_CHUNK_SIZE;
 
-		for (let offset = 0; offset < use_validations.length; offset += chunk_size) {
-			const validations = use_validations.slice(offset, offset + chunk_size);
+		for (let offset = 0; offset < use_validations.length; offset += VALIDATE_USE_CHUNK_SIZE) {
+			const validations = use_validations.slice(offset, offset + VALIDATE_USE_CHUNK_SIZE);
 
 			requests.push(
 				this.#post('validate.use', {validations})
