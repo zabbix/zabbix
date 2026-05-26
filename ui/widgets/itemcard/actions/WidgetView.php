@@ -248,12 +248,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		else {
 			$db_items_values = API::Trend()->get([
 				'output' => ['value_avg', 'clock'],
-				'history' => $item['value_type'],
 				'itemids' => $item['itemid'],
 				'time_from' => $history_period,
 				'time_till' => time(),
-				'sortfield' => ['clock', 'ns'],
-				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => 1
 			]);
 
