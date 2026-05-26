@@ -76,7 +76,8 @@ class IntegrationTests {
 	public static function suite() {
 		$suite = new TestSuite('Integration');
 
-		if  (substr(getenv('DB'), 0, 4) === "tsdb" ) {
+		global $HISTORY_PROVIDERS;
+		if (substr(getenv('DB'), 0, 4) === "tsdb" && !isset($HISTORY_PROVIDERS)) {
 			$suite->addTestSuite('testTimescaleDb');
 		}
 		/*$suite->addTestSuite('testDiscoveryRules'); */

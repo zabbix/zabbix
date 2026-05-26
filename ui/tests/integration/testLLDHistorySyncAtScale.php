@@ -456,6 +456,21 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDHistorySyncAtScale_LLDDiscovery
 	 */
 	public function testLLDHistorySyncAtScale_ValueOmittedDrainsDelay() {
+		$response = $this->call('host.get', [
+			'filter' => ['status' => HOST_STATUS_MONITORED],
+			'output' => ['hostid', 'host']
+		]);
+		$other_hosts = [];
+		foreach ($response['result'] as $h) {
+			if ((string) $h['hostid'] !== (string) self::$hostid) {
+				$other_hosts[] = $h;
+			}
+		}
+		if (!empty($other_hosts)) {
+			$this->markTestSkipped('Unexpected enabled hosts present (would pollute zabbix[queue,3,]): '
+				.json_encode($other_hosts));
+		}
+
 		$this->verifyValueOmittedDrainsDelay();
 	}
 
