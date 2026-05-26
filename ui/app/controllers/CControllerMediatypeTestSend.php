@@ -109,10 +109,10 @@ class CControllerMediatypeTestSend extends CController {
 
 		$params = $this->getInputAll();
 
-		if ($this->mediatype['type'] == MEDIA_TYPE_EXEC) {
+		if ($params['type'] == MEDIA_TYPE_EXEC) {
 			$params['parameters'] = array_column($params['parameters'], 'value');
 		}
-		elseif ($this->mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
+		elseif ($params['type'] == MEDIA_TYPE_WEBHOOK) {
 			$params['parameters'] =  array_column($params['parameters'], 'value', 'name');
 		}
 
