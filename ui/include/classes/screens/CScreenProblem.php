@@ -61,7 +61,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getDataEvents(array $options): array|string {
 		return API::Event()->get([
-			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid'],
+			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid', 'cep_ruleid'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
@@ -90,7 +90,9 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getDataProblems(array $options): array|string {
 		return API::Problem()->get([
-			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid'],
+			'output' => [
+				'eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid', 'cep_ruleid', 'flags'
+			],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'sortfield' => ['eventid'],

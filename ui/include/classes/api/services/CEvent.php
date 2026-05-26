@@ -29,8 +29,8 @@ class CEvent extends CApiService {
 	protected $sortColumns = ['eventid', 'objectid', 'clock'];
 
 	public const OUTPUT_FIELDS = ['eventid', 'source', 'object', 'objectid', 'clock', 'value', 'acknowledged', 'ns',
-		'name', 'severity', 'r_eventid', 'c_eventid', 'correlationid', 'userid', 'cause_eventid', 'opdata',
-		'suppressed', 'urls'
+		'name', 'severity', 'r_eventid', 'c_eventid', 'correlationid', 'userid', 'cep_ruleid', 'cause_eventid',
+		'opdata', 'suppressed', 'urls'
 	];
 
 	/**
@@ -566,7 +566,7 @@ class CEvent extends CApiService {
 
 		// Select fields from event_recovery table using LEFT JOIN.
 		$left_join_recovery = false;
-		foreach (['c_eventid', 'correlationid', 'userid'] as $field) {
+		foreach (['c_eventid', 'correlationid', 'userid', 'cep_ruleid'] as $field) {
 			if ($this->outputIsRequested($field, $options['output'])) {
 				$sql_parts['select'][$field] = 'er2.'.$field;
 				$left_join_recovery = true;
