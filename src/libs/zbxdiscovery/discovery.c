@@ -290,6 +290,11 @@ out:
 	zbx_vector_dbl_destroy(&usage);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parses IP ranges from drule                                       *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_discovery_process_drule_iprange(const zbx_dc_drule_t *drule, zbx_vector_iprange_t *ipranges,
 		char *err, int sz_err)
 {

@@ -460,6 +460,16 @@ int	zbx_iprange_next(const zbx_iprange_t *iprange, int *address)
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets last IP address from specified range                         *
+ *                                                                            *
+ * Parameters: iprange - [IN]                                                 *
+ *             address - [OUT]                                                *
+ *                                                                            *
+ * Comments: IP address is returned as number array                           *
+ *                                                                            *
+ ******************************************************************************/
 static void	zbx_iprange_last(const zbx_iprange_t *iprange, int *address)
 {
 	int	i, groups;
@@ -560,6 +570,16 @@ int	zbx_iprange_uniq_iter(const zbx_iprange_t *ipranges, const int num, int *idx
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets last IP address from array of ranges                         *
+ *                                                                            *
+ * Parameters: ipranges - [IN] array of ipranges                              *
+ *             num      - [IN] size of ipranges array                         *
+ *             ip       - [OUT] string with last address from IP ranges       *
+ *             len      - [IN] size of string buffer for ip address           *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_iprange_uniq_last(const zbx_iprange_t *ipranges, const int num, char *ip, const size_t len)
 {
 	int	randge_address[ZBX_IPRANGE_GROUPS_V6] = {0}, address[ZBX_IPRANGE_GROUPS_V6] = {0};

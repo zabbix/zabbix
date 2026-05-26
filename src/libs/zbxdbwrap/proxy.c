@@ -2559,7 +2559,7 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
  *    proxy_status                - [IN] active or passive proxy mode        *
  *    events_cbs                  - [IN]                                     *
  *    proxydata_frequency         - [IN]                                     *
- *    discovery_update_host_cb    - [IN]                                     *
+ *    discovery_update_hosts_cb   - [IN]                                     *
  *    discovery_update_service_cb - [IN]                                     *
  *    autoreg_host_free_cb        - [IN]                                     *
  *    autoreg_flush_hosts_cb      - [IN]                                     *

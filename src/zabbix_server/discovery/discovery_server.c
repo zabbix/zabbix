@@ -557,7 +557,7 @@ void	zbx_discovery_update_host_server(void *handle, zbx_uint64_t druleid, const 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update status of discovered hosts                                 *
+ * Purpose: update status of discovered hosts for specified drule             *
  *                                                                            *
  ******************************************************************************/
 void	zbx_discovery_update_hosts_server(const zbx_uint64_t druleid, const time_t now,
