@@ -96,10 +96,8 @@ func parse(rec Record) (r *Rule, err error) {
 		if rec.Pattern == "" {
 			return nil, errRegexpPatternMustNotBeEmpty
 		}
-		// Wrap in non-capturing group and anchor to enforce full-string matching (RE2 compatible).
-		anchored := "^(?:" + rec.Pattern + ")$"
 
-		r.Regexp, err = regexp.Compile(anchored)
+		r.Regexp, err = regexp.Compile(rec.Pattern)
 		if err != nil {
 			return nil, fmt.Errorf("failed to compile regular expression: %w", err)
 		}
