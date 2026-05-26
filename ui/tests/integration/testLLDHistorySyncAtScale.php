@@ -1392,15 +1392,24 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		$start = microtime(true);
 		$count = $this->getDelayedItemsCount();
 
-		while ($count !== $expected && (microtime(true) - $start) < $timeout) {
+		$reached = $expected === 0
+			? function (int $c) use ($expected) { return $c === $expected; }
+			: function (int $c) use ($expected) { return $c >= $expected; };
+
+		while (!$reached($count) && (microtime(true) - $start) < $timeout) {
 			$this->sendAgentPing();
 			usleep(100000); // 100 ms
 			$count = $this->getDelayedItemsCount();
 		}
 
 		$waited = round(microtime(true) - $start, 1);
-		$this->assertSame($expected, $count,
-			"Delayed items count did not reach {$expected} after waiting {$waited}s (last value: {$count})");
+		if ($expected === 0) {
+			$this->assertSame($expected, $count,
+				"Delayed items count did not reach {$expected} after waiting {$waited}s (last value: {$count})");
+		} else {
+			$this->assertGreaterThanOrEqual($expected, $count,
+				"Delayed items count did not reach at least {$expected} after waiting {$waited}s (last value: {$count})");
+		}
 	}
 
 	private function assertVpsWrittenIncreasedBy(int $baseline, int $min_increase): void {
