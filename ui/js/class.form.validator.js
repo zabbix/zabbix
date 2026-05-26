@@ -597,8 +597,8 @@ class CFormValidator {
 		for (let offset = 0; offset < use_validations.length; offset += chunk_size) {
 			const validations = use_validations.slice(offset, offset + chunk_size);
 
-			requests.push(new Promise((resolve) => {
-				return this.#post('validate.use', {validations})
+			requests.push(
+				this.#post('validate.use', {validations})
 					.then(response => {
 						result.result = result.result && response.result;
 
@@ -606,9 +606,9 @@ class CFormValidator {
 							result.errors = result.errors.concat(response.errors);
 						}
 
-						resolve();
-					});
-			}));
+						return result;
+					})
+			);
 		}
 
 		return Promise.all(requests).then(() => result);
