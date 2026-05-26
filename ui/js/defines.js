@@ -72,8 +72,8 @@ const ZBX_STYLE_FORMATED_TEXT = 'formated-text';
 
 const ZBX_STYLE_GREY = 'grey';
 
-const ZBX_STYLE_PAGING_BTN_CONTAINER = 'paging-btn-container';
-const ZBX_STYLE_TABLE_PAGING = 'table-paging';
+const ZBX_STYLE_PAGER = 'pager';
+const ZBX_STYLE_PAGER_CONTAINER = 'pager-container';
 const ZBX_STYLE_TABLE_STATS = 'table-stats';
 
 const ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';

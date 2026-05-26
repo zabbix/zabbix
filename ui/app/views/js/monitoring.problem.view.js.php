@@ -469,7 +469,7 @@
 					table_stats.textContent = paging;
 
 					const paging_container = document.createElement('div');
-					paging_container.classList.add(ZBX_STYLE_PAGING_BTN_CONTAINER);
+					paging_container.classList.add(ZBX_STYLE_PAGER_CONTAINER);
 					paging_container.appendChild(table_stats);
 
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);

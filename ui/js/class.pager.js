@@ -78,7 +78,7 @@ class CPager {
 	}
 
 	update({page, rows_per_page, num_rows, limit_exceeded}) {
-		this.#element.querySelector(`.${ZBX_STYLE_PAGING_BTN_CONTAINER}`)?.remove();
+		this.#element.querySelector(`.${ZBX_STYLE_PAGER_CONTAINER}`)?.remove();
 		this.#element.querySelector(`.${ZBX_STYLE_TABLE_STATS}`)?.remove();
 
 		if (this.#page != page) {
@@ -95,7 +95,7 @@ class CPager {
 		const end = Math.min(num_rows, start + rows_per_page);
 
 		const nav = document.createElement('nav');
-		nav.classList.add(ZBX_STYLE_PAGING_BTN_CONTAINER);
+		nav.classList.add(ZBX_STYLE_PAGER_CONTAINER);
 		nav.setAttribute('role', 'navigation');
 		nav.setAttribute('aria-label', 'Pager');
 
@@ -180,9 +180,7 @@ class CPager {
 			}
 		}
 
-		if (!this.#element.classList.contains(ZBX_STYLE_TABLE_PAGING)) {
-			this.#element.classList.add(ZBX_STYLE_TABLE_PAGING);
-		}
+		this.#element.classList.add(ZBX_STYLE_PAGER);
 
 		this.#element.appendChild(nav);
 		this.#element.appendChild(stats);
