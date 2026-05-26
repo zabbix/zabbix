@@ -31,7 +31,8 @@ class CControllerMediatypeTestSend extends CController {
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
 			'mediatypeid' => ['db media_type.mediatypeid', 'required'],
-			'type' => ['db media_type.type', 'required', 'in' => CMediatypeHelper::getSupportedMediaTypes()],
+			'type' => ['db media_type.type', 'required',
+				'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK]],
 			'sendto' => [
 				['string','required', 'not_empty',
 					'when' => ['type', 'in' => [MEDIA_TYPE_SMS]]
@@ -45,9 +46,10 @@ class CControllerMediatypeTestSend extends CController {
 				'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_SMS]]
 			],
 			'parameters' => ['objects', 'fields' => [
-				'name' => ['db media_type_param.name'],
-				'value' => ['db media_type_param.value']
-			]]
+				'name' => ['db media_type_param.name', 'required', 'not_empty',
+					'when' => ['../type', 'in' => [MEDIA_TYPE_WEBHOOK]]],
+				'value' => ['db media_type_param.value', 'required']
+			], 'when' => ['../type', 'in' => [MEDIA_TYPE_EXEC, MEDIA_TYPE_WEBHOOK]]]
 		]];
 	}
 
@@ -105,11 +107,41 @@ class CControllerMediatypeTestSend extends CController {
 	protected function doAction(): void {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
+		switch ($this->mediatype['type']) {
+			case MEDIA_TYPE_EXEC:
+				$parameters = [];
+
+				foreach ($this->getInput('parameters', []) as $parameter) {
+					$parameters[] = $parameter['value'];
+				}
+
+				$params = ['parameters' => $parameters];
+				break;
+
+			case MEDIA_TYPE_WEBHOOK:
+				$parameters = [];
+
+				foreach ($this->getInput('parameters', []) as $parameter) {
+					$parameters[$parameter['name']] = $parameter['value'];
+				}
+
+				$params = ['parameters' => $parameters];
+				break;
+
+			default:
+				$params = [
+					'sendto' =>	$this->getInput('sendto'),
+					'subject' => $this->getInput('subject'),
+					'message' => $this->getInput('message')
+				];
+		}
+
+		$params['mediatypeid'] = $this->getInput('mediatypeid');
 		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::MEDIA_TYPE_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
-		$result = $server->testMediaType($this->getInputAll(), CSessionHelper::getId());
+		$result = $server->testMediaType($params, CSessionHelper::getId());
 		$debug = $server->getDebug();
 
 		if ($result) {
