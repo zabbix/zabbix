@@ -366,12 +366,9 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 				NULL) && SUCCEED == zbx_json_value_by_name(&jp_result, "data", error_data,
 				sizeof(error_data), NULL))
 		{
-			char	info[ZBX_BRIDGE_INFO_LEN];
-
-			zbx_snprintf(info, sizeof(info), "Bridge-adapter returned code: %s, message: %s data: %s",
+			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s data: %s",
 					code, message, error_data);
-			zabbix_log(LOG_LEVEL_WARNING, info);
-			*error = zbx_strdup(NULL, info);
+			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
 		}
 		else
 		{
@@ -587,12 +584,9 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 				sizeof(message), NULL) && SUCCEED == zbx_json_value_by_name(&jp_result, "data",
 				error_data, sizeof(error_data), NULL))
 		{
-			char	info[ZBX_BRIDGE_INFO_LEN];
-
-			zbx_snprintf(info, sizeof(info), "Bridge-adapter returned code: %s, message: %s data: %s",
+			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s data: %s",
 					code, message, error_data);
-			zabbix_log(LOG_LEVEL_WARNING, info);
-			*error = zbx_strdup(NULL, info);
+			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
 		}
 		else
 		{

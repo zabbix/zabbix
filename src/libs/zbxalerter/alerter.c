@@ -669,13 +669,9 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 				SUCCEED == zbx_json_value_by_name(&jp_result, "data", error_data,
 				sizeof(error_data), NULL))
 		{
-			char	info[ZBX_BRIDGE_INFO_LEN];
-
-			zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned %s: message: %s data: %s", code,
-					message, error_data);
-			zbx_snprintf(info, sizeof(info), "Bridge-adapter returned code: %s, message: %s data: %s",
+			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s data: %s",
 					code, message, error_data);
-			error = zbx_strdup(NULL, info);
+			error = zbx_strdup(NULL, "Failed to process device.notify request");
 		}
 		else
 			error = zbx_strdup(NULL, "Failed to process device.notify request");
