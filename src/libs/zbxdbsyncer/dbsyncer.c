@@ -156,6 +156,7 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 
 	for (;;)
 	{
+		sleep(10);
 		sec = zbx_time();
 
 		zbx_prof_update(get_process_type_string(process_type), sec);

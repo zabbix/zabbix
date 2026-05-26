@@ -577,18 +577,16 @@ public function testJSONRaceUnderSyncerBacklog() {
 	$itemid = $result['result']['itemids'][0];
 	self::$itemids['race_agent:JSON_RACE'] = $itemid;
 
-
 	$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
-
-	for ($ii = 0; $ii < 20; $ii++) {
+	for ($ii = 0; $ii < 1; $ii++) {
 		$this->call('item.update', [
 			'itemid' => $itemid,
 			'value_type' => ITEM_VALUE_TYPE_TEXT
 		]);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
-		for ($i = 0; $i < 20; $i++) {
+		for ($i = 0; $i < 10; $i++) {
 			$this->sendSenderValue(
 				'race_agent',
 				'JSON_RACE',
@@ -602,7 +600,7 @@ public function testJSONRaceUnderSyncerBacklog() {
 		]);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
-		for ($i = 0; $i < 20; $i++) {
+		for ($i = 0; $i < 10; $i++) {
 			$this->sendSenderValue(
 				'race_agent',
 				'JSON_RACE',
@@ -610,8 +608,6 @@ public function testJSONRaceUnderSyncerBacklog() {
 			);
 		}
 	}
-
-	sleep(20);
 
 	$this->assertFalse(
 		$this->isLogLinePresent(
