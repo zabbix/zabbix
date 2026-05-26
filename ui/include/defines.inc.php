@@ -2484,6 +2484,9 @@ define('ZBX_NODE_STATUS_ACTIVE',		3);
 // Datatable.
 define('ZBX_STYLE_DATATABLE', 'datatable');
 
+// Limit amount of validations per request in CControllerValidateUse
+define('VALIDATE_USE_CHUNK_SIZE', 500);
+
 // init $_REQUEST
 ini_set('variables_order', 'GP');
 $_REQUEST = $_POST + $_GET;

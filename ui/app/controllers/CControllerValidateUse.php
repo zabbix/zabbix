@@ -32,7 +32,7 @@ class CControllerValidateUse extends CController {
 					'options' => ['array'],
 					'error_msg' => ['string']
 				],
-				'count_values' => ['field_rules' => ['field'], 'max' => 500]
+				'count_values' => ['field_rules' => ['field'], 'max' => VALIDATE_USE_CHUNK_SIZE]
 			]
 		]];
 	}

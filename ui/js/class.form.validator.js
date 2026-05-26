@@ -583,7 +583,7 @@ class CFormValidator {
 
 	/**
 	 * Call request to check provided use validations on fields.
-	 * Provided validations are split by 500 per request.
+	 * Provided validations are split by VALIDATE_USE_CHUNK_SIZE per request.
 	 *
 	 * @param {Array} use_validations
 	 *
@@ -592,7 +592,7 @@ class CFormValidator {
 	#validateUse(use_validations) {
 		const requests = [];
 		const result = {result: true, errors: []};
-		const chunk_size = 500;
+		const chunk_size = VALIDATE_USE_CHUNK_SIZE;
 
 		for (let offset = 0; offset < use_validations.length; offset += chunk_size) {
 			const validations = use_validations.slice(offset, offset + chunk_size);
