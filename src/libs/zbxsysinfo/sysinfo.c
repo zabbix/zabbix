@@ -853,11 +853,14 @@ static int	zbx_check_request_access_rules(const char *metric, AGENT_REQUEST *req
 			if (ZBX_REGEXP_MATCH == re_ret)
 				return rule->type;
 
-			if (ZBX_REGEXP_RUNTIME_FAIL == re_ret)
+			if (FAIL == re_ret)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "regex runtime error for rule \"%s\" against \"%s\": %s",
 						rule->pattern, metric, re_err);
 				zbx_free(re_err);
+
+				if (ZBX_KEY_ACCESS_DENY == rule->type)
+					return rule->type;
 			}
 
 			continue;
