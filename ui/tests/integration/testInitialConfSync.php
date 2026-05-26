@@ -1837,6 +1837,21 @@ class testInitialConfSync extends CIntegrationTest
 		$got = $this->parseSyncResults();
 		$this->assertSyncResults($got, $this->expected_delete);
 
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
+
+		$got = $this->parseSyncResults();
+		foreach ($got as $obj_name => $ops)
+		{
+			if ($obj_name === 'config') {
+				continue;
+			}
+			$this->assertEquals('0', $ops['insert'], 'unexpected inserts for '.$obj_name);
+			$this->assertEquals('0', $ops['update'], 'unexpected updates for '.$obj_name);
+			$this->assertEquals('0', $ops['delete'], 'unexpected deletes for '.$obj_name);
+		}
+
 		self::stopComponent(self::COMPONENT_SERVER);
 		self::clearLog(self::COMPONENT_SERVER);
 		self::startComponent(self::COMPONENT_SERVER);
