@@ -499,8 +499,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 			$response = $this->call('housekeeping.update', $data['precondition']);
 			$this->assertArrayHasKey('result', $response);
 
-			$this->clearLog(self::COMPONENT_SERVER);
-			$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+			$this->reloadServerAndAssertHousekeeping($data['precondition']);
 		}
 
 		$response = $this->call('housekeeping.update', $data['update']);
@@ -511,8 +510,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 
 		$this->clearLog(self::COMPONENT_PROXY);
 		$this->reloadConfigurationCache(self::COMPONENT_PROXY);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
-				'sending configuration data to proxy "'.self::PROXY_NAME.'"', true, 90, 1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, 'received configuration data from server',
 				true, 90, 1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, 'memory statistics for configuration cache',
