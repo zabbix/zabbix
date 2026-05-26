@@ -16,4 +16,5 @@ libzbxeval_a_SOURCES = \
 	misc.c \
 	query.c \
 	calc.c \
-	eval.h
+	eval.h \
+	variant_misc.c

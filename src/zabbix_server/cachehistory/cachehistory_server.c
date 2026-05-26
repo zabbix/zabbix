@@ -577,7 +577,7 @@ static void	dc_history_set_value(zbx_dc_history_t *hdata, unsigned char value_ty
 {
 	char	*errmsg = NULL;
 
-	if (FAIL == zbx_variant_to_value_type(value, value_type, &errmsg))
+	if (FAIL == zbx_eval_variant_to_value_type(value, value_type, &errmsg))
 	{
 		dc_history_set_error(hdata, errmsg);
 		return;
