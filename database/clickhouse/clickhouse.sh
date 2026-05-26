@@ -1,17 +1,21 @@
 display_help()
 {
 	echo "Arguments:"
-	echo "  -u|--url		ClickHouse URL ($CH_URL)"
-	echo "  -d|--db			Database name ($CH_DB)"
-	echo "  -t|--ttl		Housekeeping interval in seconds ($CH_TTL)"
-	echo "  -p|--partition		Partitioning schema ($CH_PARTITION)"
-	echo "  -h|--help		Help message"
+	printf "  %-16s %s\n" "-s|--server" "ClickHouse URL ($CH_URL)"
+	printf "  %-16s %s\n" "-d|--db" "Database name ($CH_DB)"
+	printf "  %-16s %s\n" "-u|--username" "ClickHouse username ($CH_USER)"
+	printf "  %-16s %s\n" "-p|--password" "ClickHouse password"
+	printf "  %-16s %s\n" "-t|--ttl" "Housekeeping interval in seconds ($CH_TTL)"
+	printf "  %-16s %s\n" "-P|--partition" "Partitioning schema ($CH_PARTITION)"
+	printf "  %-16s %s\n" "-h|--help" "Help message"
 
 	exit 0
 }
 
 CH_URL=http://localhost:8123
 CH_DB=zabbix
+CH_USER=""
+CH_PASSWORD=""
 
 # default TTL time - 31 days
 CH_TTL="2678400"
@@ -29,7 +33,7 @@ fi
 
 while [ $# -gt 0 ]; do
 	case $1 in
-	-u|--url)
+	-s|--server)
 		shift
 		CH_URL=$1
 		;;
@@ -37,15 +41,23 @@ while [ $# -gt 0 ]; do
 		shift
 		CH_DB=$1
 		;;
+	-u|--username)
+		shift
+		CH_USER=$1
+		;;
+	-p|--password)
+		shift
+		CH_PASSWORD=$1
+		;;
 	-t|--ttl)
 		shift
 		CH_TTL=$1
 		;;
-	-p|--partition)
+	-P|--partition)
 		shift
 		CH_PARTITION=$1
 		;;
-	-v|--help)
+	-h|--help)
 		display_help
 		;;
 	*)
@@ -55,3 +67,8 @@ while [ $# -gt 0 ]; do
 
 	shift
 done
+
+CH_CURL_AUTH=""
+if [ -n "$CH_USER" ]; then
+	CH_CURL_AUTH="-u $CH_USER:$CH_PASSWORD"
+fi

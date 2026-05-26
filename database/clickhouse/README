@@ -1,6 +1,6 @@
 Zabbix ClickHouse schema and history migration scripts
 
-This collection of scripts facilitates creation of clickhouse tables
+This collection of scripts facilitates creation of ClickHouse tables
 and migration of Zabbix history data from MySQL or PostgreSQL to ClickHouse.
 
 Scripts Overview
@@ -19,24 +19,26 @@ Schema Creation Scripts:
 These scripts create ClickHouse table schemas for corresponding value types.
 
 Usage:
-./<history table>_schema.sh -u <ClickHouse URL> -d <database> [-t <TTL>] [-p <partition schema>]
+./<history table>_schema.sh -s <ClickHouse URL> -d <database> [-u <username>] [-p <password>] [-t <TTL>] [-P <partition schema>]
 
 Parameters:
--u|--url: ClickHouse URL (default: http://localhost:8123)
+-s|--server: ClickHouse URL (default: http://localhost:8123)
 -d|--db: Database name (default: zabbix)
+-u|--username: ClickHouse username (default: empty, unauthenticated)
+-p|--password: ClickHouse password (default: empty)
 -t|--ttl: Housekeeping interval in seconds (default: 2678400 (31 days))
--p|--partition: Partitioning schema (default: toDate (by days))
+-P|--partition: Partitioning schema (default: toDate (by days))
 -h|--help: Display help message
 
 Example:
-./history_schema.sh -u http://user:password@localhost:8123 -d zabbix
+./history_schema.sh -s http://localhost:8123 -d zabbix -u user -p password
 
 The housekeeping interval (TTL) and partition schema are loosely linked.
 When increasing housekeeping interval, it might be worth increasing also
-partition schema, for example with year long housekeeping interval it
+partition schema, for example with year long housekeeping interval, it
 might be better to set monthly partitioning:
 
-./<history table>_schema.sh -u <ClickHouse URL> -d <database> -t 31536000 -p toYYYYMM
+./<history table>_schema.sh -s <ClickHouse URL> -d <database> -t 31536000 -P toYYYYMM
 
 Data Export Scripts:
 
@@ -86,7 +88,7 @@ These scripts import exported history data from /tmp/<history table>.csv into
 corresponding ClickHouse tables.
 
 Usage:
-./<history table>_import.sh -u <ClickHouse URL> -d <database>
+./<history table>_import.sh -s <ClickHouse URL> -d <database> [-u <username>] [-p <password>]
 
 Migration Process:
 
@@ -97,42 +99,42 @@ Migration Process:
 PostgreSQL migration example (all tables):
 
 PGPASSWORD=zabbix psql -U postgres -d zabbix -h 127.0.0.1 -f history_export_pgsql.sql
-./history_import.sh -u http://zabbix:zabbix@localhost:8123 -d zabbix
+./history_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix
 
 PGPASSWORD=zabbix psql -U postgres -d zabbix -h 127.0.0.1 -f history_uint_export_pgsql.sql
-./history_uint_import.sh -u http://zabbix:zabbix@localhost:8123 -d zabbix
+./history_uint_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix
 
 PGPASSWORD=zabbix psql -U postgres -d zabbix -h 127.0.0.1 -f history_str_export_pgsql.sql
-./history_str_import.sh -u http://zabbix:zabbix@localhost:8123 -d zabbix
+./history_str_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix
 
 PGPASSWORD=zabbix psql -U postgres -d zabbix -h 127.0.0.1 -f history_text_export_pgsql.sql
-./history_text_import.sh -u http://zabbix:zabbix@localhost:8123 -d zabbix
+./history_text_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix
 
 PGPASSWORD=zabbix psql -U postgres -d zabbix -h 127.0.0.1 -f history_log_export_pgsql.sql
-./history_log_import.sh -u http://zabbix:zabbix@localhost:8123 -d zabbix
+./history_log_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix
 
 PGPASSWORD=zabbix psql -U postgres -d zabbix -h 127.0.0.1 -f history_json_export_pgsql.sql
-./history_json_import.sh -u http://zabbix:zabbix@localhost:8123 -d zabbix
+./history_json_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix
 
 MySQL migration example (all tables):
 
 mysql -uzabbix -pzabbix zabbix < history_export_mysql.sql
-./history_import.sh -u http://zabbix:zabbix@localhost:8123 -d zabbix
+./history_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix
 
 mysql -uzabbix -pzabbix zabbix < history_uint_export_mysql.sql
-./history_uint_import.sh -u http://zabbix:zabbix@localhost:8123 -d zabbix
+./history_uint_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix
 
 mysql -uzabbix -pzabbix zabbix < history_str_export_mysql.sql
-./history_str_import.sh -u http://zabbix:zabbix@localhost:8123 -d zabbix
+./history_str_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix
 
 mysql -uzabbix -pzabbix zabbix < history_text_export_mysql.sql
-./history_text_import.sh -u http://zabbix:zabbix@localhost:8123 -d zabbix
+./history_text_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix
 
 mysql -uzabbix -pzabbix zabbix < history_log_export_mysql.sql
-./history_log_import.sh -u http://zabbix:zabbix@localhost:8123 -d zabbix
+./history_log_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix
 
 mysql -uzabbix -pzabbix zabbix < history_json_export_mysql.sql
-./history_json_import.sh -u http://zabbix:zabbix@localhost:8123 -d zabbix
+./history_json_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix
 
 Ensure you have the necessary permissions and ClickHouse is properly
 configured before running these scripts.

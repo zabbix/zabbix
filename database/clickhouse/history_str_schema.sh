@@ -3,9 +3,9 @@
 DIR="$(dirname "$0")"
 . "$DIR/clickhouse.sh"
 
-echo "DROP TABLE IF EXISTS $CH_DB.history_str" | curl $CH_URL --data-binary @-
+echo "DROP TABLE IF EXISTS $CH_DB.history_str" | curl $CH_CURL_AUTH $CH_URL --data-binary @-
 
-cat << EOF | curl $CH_URL --data-binary @-
+cat << EOF | curl $CH_CURL_AUTH $CH_URL --data-binary @-
 CREATE TABLE $CH_DB.history_str
 (
 	itemid UInt64,
