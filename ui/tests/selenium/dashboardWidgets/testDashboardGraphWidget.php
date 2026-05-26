@@ -302,6 +302,7 @@ class testDashboardGraphWidget extends testWidgets {
 			}
 
 			$this->page->removeFocus();
+			$this->page->updateViewPort();
 			sleep(1);
 			$this->assertScreenshotExcept($overlay, $add_button, 'tab_'.$tab);
 		}

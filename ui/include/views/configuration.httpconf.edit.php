@@ -58,10 +58,8 @@ if ($data['templates']) {
 	]);
 }
 
-$name_text_box = (new CTextAreaFlexible('name', $data['name']))
+$name_text_box = (new CTextBox('name', $data['name'], $data['templated'], DB::getFieldLength('httptest', 'name')))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setMaxlength(DB::getFieldLength('httptest', 'name'))
-	->setReadonly($data['templated'])
 	->setAriaRequired()
 	->setAttribute('autofocus', 'autofocus');
 

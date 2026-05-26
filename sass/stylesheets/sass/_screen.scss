@@ -41,11 +41,13 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "layout/grid-columns";
 @import "layout/form-grid";
 
+@import "components/banner";
 @import "components/buttons";
 @import "components/icons-extended";
 @import "components/checkbox-list";
 @import "components/columns-wrapper";
 @import "components/dashboard/dashboard";
+@import "components/datatable";
 @import "components/diff";
 @import "components/entity-count";
 @import "components/expandable-subfilter";
@@ -747,13 +749,25 @@ form {
 		white-space: nowrap;
 
 		label {
+			box-sizing: border-box;
 			display: block;
 			height: 24px;
 			line-height: 24px;
 			overflow: hidden;
 			text-overflow: ellipsis;
 
-			.btn-icon,
+			&:has(.btn-icon) {
+				position: relative;
+				margin-right: -2px;
+				padding-right: 23px;
+
+				.btn-icon {
+					position: absolute;
+					top: 4px;
+					right: 2px;
+				}
+			}
+
 			.icon {
 				margin-left: 5px;
 			}
@@ -844,6 +858,18 @@ form {
 	.icon {
 		&:not(:first-child) {
 			margin-left: 5px;
+		}
+	}
+
+	[aria-label] {
+		@if $ui-transitions {
+			transition: box-shadow $ui-controls-transition-duration ease-out;
+		}
+
+		&:focus {
+			border-radius: 2px;
+			outline: none;
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
 		}
 	}
 
@@ -2056,6 +2082,15 @@ select {
 	}
 }
 
+// Modals.
+.modal-popup.modal-popup-static {
+	&.modal-popup-sla-edit,
+	&.modal-popup-proxy-edit,
+	&.modal-popup-connector-edit {
+		--modal-max-width: 750px;
+	}
+}
+
 // Multiline input control.
 .multilineinput-control {
 	display: flex;
@@ -2526,7 +2561,6 @@ select {
 			display: flex;
 			flex-wrap: nowrap;
 			align-items: center;
-			padding-left: 3px;
 			white-space: pre;
 
 			.scatter-plot-hintbox-icon-color {

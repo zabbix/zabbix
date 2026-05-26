@@ -2644,6 +2644,10 @@ msgstr "Det går inte att lägga till skript"
 msgid "Cannot add submaps. Max depth reached."
 msgstr "Det går inte att lägga till submaps. Maxdjup uppnått."
 
+#: app/controllers/CControllerPopupScheduledReportSubscriptionCheck.php:85
+msgid "Cannot add subscription"
+msgstr ""
+
 #: app/controllers/CControllerTemplateCreate.php:49
 #: app/controllers/CControllerTemplateCreate.php:171
 msgid "Cannot add template"
@@ -7023,6 +7027,10 @@ msgstr "Radera saknad"
 #: app/views/administration.regex.edit.php:160
 msgid "Delete regular expression?"
 msgstr "Ta bort reguljärt uttryck?"
+
+#: app/views/js/reports.scheduledreport.edit.js.php:160
+msgid "Delete scheduled report?"
+msgstr ""
 
 #: app/views/administration.script.edit.php:389
 msgid "Delete script?"
@@ -15621,6 +15629,10 @@ msgstr "Ny LDAP-server"
 msgid "New MFA method"
 msgstr "Ny MFA-metod"
 
+#: app/views/oauth.edit.php:254
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "Ny SLA"
@@ -15753,6 +15765,11 @@ msgstr "Ny proxygrupp"
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "Nytt reguljärt uttryck"
+
+#: app/views/js/reports.scheduledreport.edit.js.php:99
+#: app/views/reports.scheduledreport.edit.php:250
+msgid "New scheduled report"
+msgstr ""
 
 #: app/views/administration.script.edit.php:369
 #: app/views/administration.script.edit.php:409
@@ -20028,6 +20045,10 @@ msgid "Scheduled report disabled"
 msgid_plural "Scheduled reports disabled"
 msgstr[0] "Schemalagd rapport inaktiverad"
 msgstr[1] "Schemalagda rapporter inaktiverade"
+
+#: app/controllers/CControllerPopup.php:60
+msgid "Scheduled report edit"
+msgstr ""
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
@@ -25161,6 +25182,18 @@ msgstr "Mappning av värden"
 #, c-format
 msgid "Value must be greater than %1$s."
 msgstr "Värdet måste vara större än %1$s."
+
+#: include/classes/validators/CFormValidator.php:1089
+#: include/classes/validators/CFormValidator.php:1147 jsLoader.php:435
+#, c-format
+msgid "Value must be greater than or equal to %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1095
+#: include/classes/validators/CFormValidator.php:1153 jsLoader.php:434
+#, c-format
+msgid "Value must be less than or equal to %1$s."
+msgstr ""
 
 #: include/classes/validators/CFormValidator.php:1033
 #: include/classes/validators/CFormValidator.php:1042

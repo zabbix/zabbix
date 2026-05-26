@@ -205,7 +205,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => ''
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -221,7 +221,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '0'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -237,7 +237,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '101'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no greater than "100".'
+						'Attempts' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
@@ -291,7 +291,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Custom' => '101'
 					],
 					'inline_errors' => [
-						'id:maxsessions' => 'This value must be no greater than "100".'
+						'id:maxsessions' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
@@ -413,7 +413,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => ''
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -429,7 +429,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '0'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -445,7 +445,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '101'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no greater than "100".'
+						'Attempts' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
@@ -461,7 +461,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => 'five'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],

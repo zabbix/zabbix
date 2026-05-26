@@ -46,6 +46,7 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"auditlog_mode",		ZBX_SETTING_TYPE_INT, 		ZBX_SERVER,		"1"},
 	{"authentication_type",		ZBX_SETTING_TYPE_INT, 		0,			"0"},
 	{"autoreg_tls_accept",		ZBX_SETTING_TYPE_INT, 		ZBX_SERVER | ZBX_PROXY,	"1"},
+	{"banner_data",			ZBX_SETTING_TYPE_STR, 		0,			""},
 	{"blink_period",		ZBX_SETTING_TYPE_STR, 		0,			"2m"},
 	{"compress_older",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER,		"7d"},
 	{"compression_status",		ZBX_SETTING_TYPE_INT, 		ZBX_SERVER,		"0"},

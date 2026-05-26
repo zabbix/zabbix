@@ -39,11 +39,14 @@ $html_page = (new CHtmlPage())
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
-
 $filter = (new CTabFilter())
 	->setId('monitoring_latest_filter')
 	->setOptions($data['tabfilter_options'])
 	->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
+
+if ($web_layout_mode == ZBX_LAYOUT_KIOSKMODE) {
+	$filter->setAttribute('hidden', '');
+}
 
 if ($data['mandatory_filter_set'] && $data['items'] || $data['subfilter_set']) {
 	$filter->addSubfilter(new CPartial('monitoring.latest.subfilter',
@@ -59,14 +62,52 @@ foreach ($data['filter_tabs'] as $tab) {
 // Set javascript options for tab filter initialization in monitoring.latest.view.js.php file.
 $data['filter_options'] = $filter->options;
 
+$button_list = [
+	GRAPH_TYPE_STACKED => [
+		'name' => _('Display stacked graph'),
+		'attributes' => ['data-required' => 'graph', 'data-required-count' => 2]
+	],
+	GRAPH_TYPE_NORMAL => [
+		'name' => _('Display graph'),
+		'attributes' => ['data-required' => 'graph']
+	],
+	'item.execute' => [
+		'content' => (new CSimpleButton(_('Execute now')))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-massexecute-item')
+			->addClass('js-no-chkbxrange')
+			->setAttribute('data-required', 'execute')
+	]
+];
+
+$csrf_token = CCsrfTokenHelper::get('latest');
+
 $html_page
 	->addItem($filter)
 	->addItem(
-		new CPartial('monitoring.latest.view.html', array_intersect_key($data,
-			array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history',
-				'config', 'tags', 'maintenances', 'items_rw', 'mandatory_filter_set', 'subfilter_set'
+		(new CForm('GET', 'history.php'))
+			->setName('items')
+			->addItem(new CVar('action', HISTORY_BATCH_GRAPH))
+			->addItem([
+				(new CDataTable())->setId('latest'),
+				(new CActionButtonList('graphtype', 'itemids', [
+					GRAPH_TYPE_STACKED => [
+						'name' => _('Display stacked graph'),
+						'attributes' => ['data-required' => 'graph', 'data-required-count' => 2]
+					],
+					GRAPH_TYPE_NORMAL => [
+						'name' => _('Display graph'),
+						'attributes' => ['data-required' => 'graph']
+					],
+					'item.execute' => [
+						'content' => (new CSimpleButton(_('Execute now')))
+							->addClass(ZBX_STYLE_BTN_ALT)
+							->addClass('js-massexecute-item')
+							->addClass('js-no-chkbxrange')
+							->setAttribute('data-required', 'execute')
+					]
+				], 'latest'))->setAddSelectedCountElement(false)
 			])
-		))
 	);
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
@@ -77,13 +118,21 @@ $html_page->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'filter_options' => $data['filter_options'],
-		'refresh_url' => $data['refresh_url'],
-		'refresh_data' => $data['refresh_data'],
-		'refresh_interval' => $data['refresh_interval'],
 		'checkbox_object' => 'itemids',
+		'csrf_token' => $csrf_token,
+		'default_sort_field' => $data['default_sort_field'],
+		'default_sort_order' => $data['default_sort_order'],
+		'filter' => $data['filter'],
+		'filter_defaults' => $data['filter_defaults'],
+		'filter_options' => $data['filter_options'],
 		'filter_set' => $data['mandatory_filter_set'] || $data['subfilter_set'],
-		'layout_mode' => $web_layout_mode
+		'layout_mode' => $web_layout_mode,
+		'page' => $data['tabfilter_options']['page'],
+		'refresh_interval' => $data['refresh_interval'],
+		'sort_field' => $data['sort_field'],
+		'sort_order' => $data['sort_order'],
+		'storage_idx' => $data['storage_idx'],
+		'user_configs' => $data['user_configs']
 	]).');
 '))
 	->setOnDocumentReady()

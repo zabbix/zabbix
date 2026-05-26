@@ -907,7 +907,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'SMTP server port' => '99999'
 					],
 					'inline_errors' => [
-						'SMTP server port' => 'This value must be no greater than "65535".'
+						'SMTP server port' => 'Value must be less than or equal to 65535.'
 					]
 				]
 			],
@@ -1036,7 +1036,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Attempts' => 0
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1051,7 +1051,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Attempts' => ''
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1066,7 +1066,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Attempts' => 101
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no greater than "100".'
+						'Attempts' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
@@ -1081,7 +1081,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Attempts' => 'æų'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1096,7 +1096,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Attempts' => '☺'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1232,7 +1232,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'id:maxsessions' => 101
 					],
 					'inline_errors' => [
-						'id:maxsessions' => 'This value must be no greater than "100".'
+						'id:maxsessions' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],

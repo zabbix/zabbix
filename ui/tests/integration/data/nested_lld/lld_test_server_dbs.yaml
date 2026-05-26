@@ -12,6 +12,7 @@ zabbix_export:
         - name: 'Discover databases and tablespaces'
           type: TRAP
           key: main_drule
+          allowed_hosts: '{$TRAPPER.ALLOWED_HOSTS}'
           host_prototypes:
             - host: 'Host for database {#DB}'
               name: 'Host for database {#DB}'

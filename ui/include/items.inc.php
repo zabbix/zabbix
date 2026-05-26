@@ -338,6 +338,39 @@ function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
 }
 
 /**
+ * Filters and sorts threshold values in ascending order.
+ *
+ * @param array $thresholds
+ * @param bool  $is_binary_size
+ *
+ * @return array
+ */
+function filterAndSortThresholds(array $thresholds, bool $is_binary_size = false): array {
+	$number_parser = new CNumberParser([
+		'with_size_suffix' => true,
+		'with_time_suffix' => true,
+		'is_binary_size' => $is_binary_size
+	]);
+
+	$filtered_thresholds = [];
+
+	foreach ($thresholds as $index => $threshold) {
+		if ($number_parser->parse(trim($threshold['threshold'])) == CParser::PARSE_SUCCESS) {
+			$filtered_thresholds[$index] = ['order_threshold' => $number_parser->calcValue()] + $threshold;
+		}
+	}
+
+	uasort($filtered_thresholds, static fn (array $t1, array $t2) => $t1['order_threshold'] <=> $t2['order_threshold']);
+
+	foreach ($filtered_thresholds as &$threshold) {
+		unset($threshold['order_threshold']);
+	}
+	unset($threshold);
+
+	return $filtered_thresholds;
+}
+
+/**
  * Returns the name of the given interface type. Items "status" and "state" properties must be defined.
  *
  * @param int $type

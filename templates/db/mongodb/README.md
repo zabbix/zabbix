@@ -36,18 +36,18 @@ Test availability: `zabbix_get -s mongodb.node -k 'mongodb.ping["{$MONGODB.CONNS
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$MONGODB.CONNSTRING}|<p>Connection string in the URI format (password is not used). This param overwrites a value configured in the "Server" option of the configuration file (if it's set), otherwise, the plugin's default value is used: "tcp://localhost:27017"</p>|`tcp://localhost:27017`|
-|{$MONGODB.USER}|<p>MongoDB username</p>||
-|{$MONGODB.PASSWORD}|<p>MongoDB user password</p>||
-|{$MONGODB.CONNS.PCT.USED.MAX.WARN}|<p>Maximum percentage of used connections</p>|`80`|
-|{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}|<p>Maximum number of cursors timing out per second</p>|`1`|
-|{$MONGODB.CURSOR.OPEN.MAX.WARN}|<p>Maximum number of open cursors</p>|`10000`|
-|{$MONGODB.REPL.LAG.MAX.WARN}|<p>Maximum replication lag in seconds</p>|`10s`|
-|{$MONGODB.LLD.FILTER.COLLECTION.MATCHES}|<p>Filter of discoverable collections</p>|`.*`|
-|{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}|<p>Filter to exclude discovered collections</p>|`CHANGE_IF_NEEDED`|
-|{$MONGODB.LLD.FILTER.DB.MATCHES}|<p>Filter of discoverable databases</p>|`.*`|
-|{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}|<p>Filter to exclude discovered databases</p>|`(admin\|config\|local)`|
-|{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}|<p>Minimum number of available WiredTiger read or write tickets remaining</p>|`5`|
+|{$MONGODB.CONNSTRING}|<p>MongoDB connection string in URI format (password not included).</p><p>If set, it overrides the Server option from the config file.</p><p>Otherwise, it uses the default: tcp://localhost:27017</p>|`tcp://localhost:27017`|
+|{$MONGODB.USER}|<p>MongoDB username.</p>||
+|{$MONGODB.PASSWORD}|<p>MongoDB password.</p>||
+|{$MONGODB.CONNS.PCT.USED.MAX.WARN}|<p>Maximum percentage of used connections.</p>|`80`|
+|{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}|<p>Maximum number of cursors timing out per second.</p>|`1`|
+|{$MONGODB.CURSOR.OPEN.MAX.WARN}|<p>Maximum number of open cursors.</p>|`10000`|
+|{$MONGODB.REPL.LAG.MAX.WARN}|<p>Maximum replication lag in seconds.</p>|`10s`|
+|{$MONGODB.LLD.FILTER.COLLECTION.MATCHES}|<p>Filter of discoverable collections.</p>|`.*`|
+|{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}|<p>Filter to exclude discovered collections.</p>|`CHANGE_IF_NEEDED`|
+|{$MONGODB.LLD.FILTER.DB.MATCHES}|<p>Filter of discoverable databases.</p>|`.*`|
+|{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}|<p>Filter to exclude discovered databases.</p>|`(admin\|config\|local)`|
+|{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}|<p>Minimum number of available WiredTiger read or write tickets remaining.</p>|`5`|
 
 ### Items
 

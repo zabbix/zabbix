@@ -83,60 +83,68 @@ class testUsersPasswordComplexity extends CWebTest {
 
 	public function getFormValidationData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => ['Minimum password length' => '0'],
-					'error' => 'This value must be no less than "1".'
+					'error' => 'Value must be greater than or equal to 1.'
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => ['Minimum password length' => '71'],
-					'error' => 'This value must be no greater than "70".'
+					'error' => 'Value must be less than or equal to 70.'
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => ['Minimum password length' => '-a'],
-					'error' => 'This value must be no less than "1".'
+					'error' => 'Value must be greater than or equal to 1.'
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => ['Minimum password length' => '!@'],
-					'error' => 'This value must be no less than "1".'
+					'error' => 'Value must be greater than or equal to 1.'
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => ['Minimum password length' => ''],
-					'error' => 'This value must be no less than "1".'
+					'error' => 'Value must be greater than or equal to 1.'
 				]
 			],
+			// #5.
 			[
 				[
 					'fields' => ['Minimum password length' => '1'],
 					'db_passwd_min_length' => 1
 				]
 			],
+			// #6.
 			[
 				[
 					'fields' => ['Minimum password length' => '50'],
 					'db_passwd_min_length' => 50
 				]
 			],
+			// #7.
 			[
 				[
 					'fields' => ['Minimum password length' => '70'],
 					'db_passwd_min_length' => 70
 				]
 			],
-			// Negative number will be converted to positive when focus-out.
+			// #8 Negative number will be converted to positive when focus-out.
 			[
 				[
 					'fields' => ['Minimum password length' => '-8'],

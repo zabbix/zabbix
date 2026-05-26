@@ -23,6 +23,8 @@ class CMenuHelper {
 	 * @return CMenu
 	 */
 	public static function getMainMenu(): CMenu {
+		global $ZBX_FEATURE_FLAGS;
+
 		$menu = new CMenu();
 
 		if (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)) {
@@ -351,9 +353,11 @@ class CMenuHelper {
 							->setAction('trigdisplay.edit'),
 						(new CMenuItem(_('Geographical maps')))
 							->setAction('geomaps.edit'),
-						(new CMenuItem(_('Modules')))
-							->setAction('module.list')
-							->setAliases(['module.edit', 'module.scan']),
+						$ZBX_FEATURE_FLAGS['modules_config_enabled']
+							? (new CMenuItem(_('Modules')))
+								->setAction('module.list')
+								->setAliases(['module.edit', 'module.scan'])
+							: null,
 						(new CMenuItem(_('Connectors')))
 							->setAction('connector.list')
 							->setAliases(['connector.edit']),

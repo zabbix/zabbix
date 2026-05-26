@@ -77,7 +77,7 @@ zabbix_export:
         - See the host wizard configuration fields section, as it will set the trigger values.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -1183,12 +1183,12 @@ zabbix_export:
             label: 'gRPC codes trigger filter (include)'
             description: 'The filter of discoverable gRPC codes, which will create triggers.'
         - macro: '{$ETCD.HOST}'
-          description: 'The hostname or IP address of the `etcd` API endpoint.'
+          description: 'Etcd API host.'
           config:
             type: TEXT
             priority: '1'
             label: 'Etcd API host'
-            description: 'The hostname or IP address of the `etcd` API endpoint.'
+            description: 'Etcd API host.'
             required: 'YES'
         - macro: '{$ETCD.HTTP.FAIL.MAX.WARN}'
           value: '2'
@@ -1221,19 +1221,22 @@ zabbix_export:
             description: 'The maximum percentage of used file descriptors. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ETCD.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'Etcd password.'
           config:
             type: TEXT
             priority: '5'
             label: 'Etcd password'
+            description: 'Etcd password.'
             required: 'YES'
         - macro: '{$ETCD.PORT}'
           value: '2379'
-          description: 'The port of the `etcd` API endpoint.'
+          description: 'Etcd API port.'
           config:
             type: TEXT
             priority: '2'
             label: 'Etcd API port'
-            description: 'The port of the `etcd` API endpoint. In the range from 1 to 65535 inclusive.'
+            description: 'Etcd API port. In the range from 1 to 65535 inclusive.'
             required: 'YES'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ETCD.PROPOSAL.FAIL.MAX.WARN}'
@@ -1258,12 +1261,12 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ETCD.SCHEME}'
           value: http
-          description: 'The request scheme which may be `http` or `https`.'
+          description: 'Etcd HTTP scheme.'
           config:
             type: LIST
             priority: '3'
             label: 'Etcd request scheme'
-            description: 'The request scheme which may be `http` or `https`.'
+            description: 'Etcd HTTP scheme.'
             required: 'YES'
             options:
               - value: http
@@ -1271,10 +1274,12 @@ zabbix_export:
               - value: https
                 text: https
         - macro: '{$ETCD.USER}'
+          description: 'Etcd username.'
           config:
             type: TEXT
             priority: '4'
             label: 'Etcd username'
+            description: 'Etcd username.'
             required: 'YES'
       dashboards:
         - uuid: 5b0ffbb731cd4415a2edbc74978e0276

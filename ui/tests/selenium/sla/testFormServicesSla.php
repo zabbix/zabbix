@@ -301,6 +301,7 @@ class testFormServicesSla extends CWebTest {
 
 	public function getSlaData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -314,6 +315,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -327,7 +329,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
-			// Duplicate SLA name
+			// #2 Duplicate SLA name.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -341,6 +343,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -354,6 +357,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -367,6 +371,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -376,10 +381,11 @@ class testFormServicesSla extends CWebTest {
 						'id:service_tags_0_tag' => 'tag'
 					],
 					'inline_errors' => [
-						'SLO' => 'This value must be no less than "0".'
+						'SLO' => 'Value must be greater than or equal to 0.'
 					]
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -389,11 +395,11 @@ class testFormServicesSla extends CWebTest {
 						'id:service_tags_0_tag' => 'tag'
 					],
 					'inline_errors' => [
-						'SLO' => 'This value must be no greater than "100".'
+						'SLO' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
-			// TODO: move "Schedule", days and period fields to the end of the fields array when DEV-4776 is merged.
+			// #7 TODO: move "Schedule", days and period fields to the end of the fields array when DEV-4776 is merged.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -413,7 +419,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
-			// TODO: remove the "'id:schedule_enabled_1' => true" line when ZBX-21084 is fixed.
+			// #8 TODO: remove the "'Monday' => true' => true" line when ZBX-21084 is fixed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -430,7 +436,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
-			// TODO: remove the "'id:schedule_enabled_1' => true" line when ZBX-21084 is fixed.
+			// #9 TODO: remove the "'Monday' => true" line when ZBX-21084 is fixed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -447,7 +453,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
-			// TODO: remove the "'id:schedule_enabled_1' => true" line when ZBX-21084 is fixed.
+			// #10 TODO: remove the "'Monday' => true' => true" line when ZBX-21084 is fixed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -464,7 +470,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
-			// TODO: remove the "'id:schedule_enabled_1' => true" line when ZBX-21084 is fixed.
+			// #11 TODO: remove the "'Monday' => true' => true" line when ZBX-21084 is fixed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -481,6 +487,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #12.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -495,6 +502,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -509,6 +517,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #14.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -523,6 +532,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -537,7 +547,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
-			// TODO: change the error message when ZBX-21085 will be fixed.
+			// #16.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -552,6 +562,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -566,6 +577,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -580,6 +592,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #19.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -598,6 +611,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #20.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -616,6 +630,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -635,6 +650,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #22.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -654,6 +670,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #23.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -672,6 +689,7 @@ class testFormServicesSla extends CWebTest {
 					'downtime_error' => 'Excluded downtime must not extend beyond 2038-01-19 05:14:07.'
 				]
 			],
+			// #24.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -691,6 +709,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #25.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -710,6 +729,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #26.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -729,6 +749,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #27.
 			[
 				[
 					'fields' => [
@@ -738,6 +759,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #28.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -767,6 +789,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #29.
 			[
 				[
 					'fields' => [
@@ -808,6 +831,7 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// #30.
 			[
 				[
 					'fields' => [
