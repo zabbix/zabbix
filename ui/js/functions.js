@@ -764,7 +764,7 @@ function downloadSvgImage(svg, file_name, legend_class = '') {
 function downloadPngImage(img, file_name) {
 	var a = document.createElement('a');
 
-	a.href = img.src;
+	a.href = img.src + "&download=1";
 	a.rel = 'noopener' + (ZBX_NOREFERER ? ' noreferrer' : '');
 	a.download = file_name;
 	a.target = '_blank';
