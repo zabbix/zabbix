@@ -65,7 +65,7 @@ typedef struct
 	zbx_vector_str_t		elements;
 	zbx_key_access_rule_type_t	type;
 	int				empty_arguments;
-	int				is_regexp;
+	zbx_key_access_pattern_type_t	pattern_type;
 	zbx_regexp_t			*regexp;
 }
 zbx_key_access_rule_t;
@@ -488,7 +488,7 @@ static zbx_key_access_rule_t	*zbx_key_access_rule_create(char *pattern, zbx_key_
 	rule = zbx_malloc(NULL, sizeof(zbx_key_access_rule_t));
 	rule->type = type;
 	rule->pattern = zbx_strdup(NULL, pattern);
-	rule->is_regexp = 0;
+	rule->pattern_type = ZBX_KEY_ACCESS_PATTERN_WILDCARD;
 	rule->regexp = NULL;
 	zbx_vector_str_create(&rule->elements);
 
@@ -553,7 +553,7 @@ void	zbx_finalize_key_access_rules_configuration(void)
 			{
 				rule = (zbx_key_access_rule_t*)key_access_rules.values[j];
 
-				if (0 != rule->is_regexp)
+				if (ZBX_KEY_ACCESS_PATTERN_REGEXP == rule->pattern_type)
 				{
 					rule_name = (ZBX_KEY_ACCESS_ALLOW == rule->type ? "AllowKeyRegexp" :
 							"DenyKeyRegexp");
@@ -579,7 +579,7 @@ void	zbx_finalize_key_access_rules_configuration(void)
 				break;
 
 			/* regex rule redundancy cannot be determined statically */
-			if (0 != rule->is_regexp)
+			if (ZBX_KEY_ACCESS_PATTERN_REGEXP == rule->pattern_type)
 				break;
 
 			/* system.run allow rules are not redundant because of default system.run[*] deny rule */
@@ -790,7 +790,7 @@ int	zbx_add_key_access_rule_regexp(const char *parameter, char *pattern, zbx_key
 	{
 		r = (zbx_key_access_rule_t *)key_access_rules.values[i];
 
-		if (0 != r->is_regexp && 0 == strcmp(r->pattern, pattern))
+		if (ZBX_KEY_ACCESS_PATTERN_REGEXP == r->pattern_type && 0 == strcmp(r->pattern, pattern))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s access rule \"%s\" was not added because it %s another rule "
 					"defined above", parameter, pattern,
@@ -802,7 +802,7 @@ int	zbx_add_key_access_rule_regexp(const char *parameter, char *pattern, zbx_key
 	rule = zbx_malloc(NULL, sizeof(zbx_key_access_rule_t));
 	rule->type = type;
 	rule->pattern = zbx_strdup(NULL, pattern);
-	rule->is_regexp = 1;
+	rule->pattern_type = ZBX_KEY_ACCESS_PATTERN_REGEXP;
 	rule->regexp = NULL;
 	rule->empty_arguments = 0;
 	zbx_vector_str_create(&rule->elements);
@@ -851,7 +851,7 @@ static int	zbx_check_request_access_rules(const char *metric, AGENT_REQUEST *req
 	{
 		rule = (zbx_key_access_rule_t*)key_access_rules.values[i];
 
-		if (0 != rule->is_regexp)
+		if (ZBX_KEY_ACCESS_PATTERN_REGEXP == rule->pattern_type)
 		{
 			char	*re_err = NULL;
 			int	re_ret = zbx_regexp_match_precompiled2(metric, rule->regexp, &re_err);

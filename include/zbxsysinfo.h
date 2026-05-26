@@ -85,6 +85,13 @@ typedef enum
 }
 zbx_key_access_rule_type_t;
 
+typedef enum
+{
+	ZBX_KEY_ACCESS_PATTERN_WILDCARD,
+	ZBX_KEY_ACCESS_PATTERN_REGEXP
+}
+zbx_key_access_pattern_type_t;
+
 void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get_config_int_f
 		get_config_enable_remote_commands_f, zbx_get_config_int_f get_config_log_remote_commands_f,
 		zbx_get_config_int_f get_config_unsafe_user_parameters_cb, zbx_get_config_str_f
