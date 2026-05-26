@@ -1724,11 +1724,11 @@ void	zbx_dc_local_set_itservices_num(int num);
 int	zbx_dc_local_get_itservices_num(void);
 
 
-typedef struct zbx_correlation_cache_handle *	zbx_correlation_cache_handle_t;
+typedef struct zbx_correlation_config_handle *	zbx_correlation_config_handle_t;
 
-zbx_correlation_cache_handle_t	zbx_correlation_cache_open(void);
-void	zbx_correlation_cache_close(zbx_correlation_cache_handle_t handle);
+zbx_correlation_config_handle_t	zbx_correlation_config_open(void);
+void	zbx_correlation_config_close(zbx_correlation_config_handle_t handle);
 
-zbx_vector_correlation_ptr_t	*zbx_correlation_cache_get_correlations(zbx_correlation_cache_handle_t handle);
+zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correlation_config_handle_t handle);
 
 #endif

@@ -712,9 +712,9 @@ int	cep_correlate_db_event(const zbx_db_event *db_event, zbx_dbconn_pool_t *dbpo
 	zbx_vector_correlation_ptr_t	*rules, corr_old, corr_new;
 	zbx_dbconn_t			*db;
 	zbx_hashset_t			results;
-	zbx_correlation_cache_handle_t	handle;
+	zbx_correlation_config_handle_t	handle;
 
-	if (NULL == (handle = zbx_correlation_cache_open()))
+	if (NULL == (handle = zbx_correlation_config_open()))
 		return op_result;
 
 	zbx_hashset_create(&results, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -722,7 +722,7 @@ int	cep_correlate_db_event(const zbx_db_event *db_event, zbx_dbconn_pool_t *dbpo
 	zbx_vector_correlation_ptr_create(&corr_old);
 	zbx_vector_correlation_ptr_create(&corr_new);
 
-	rules = zbx_correlation_cache_get_correlations(handle);
+	rules = zbx_correlation_config_get_correlations(handle);
 
 	db = zbx_dbconn_pool_acquire_connection(dbpool);
 
@@ -819,7 +819,7 @@ int	cep_correlate_db_event(const zbx_db_event *db_event, zbx_dbconn_pool_t *dbpo
 		zbx_free(sql);
 	}
 
-	zbx_correlation_cache_close(handle);
+	zbx_correlation_config_close(handle);
 
 
 	/* process 'close new' operation */

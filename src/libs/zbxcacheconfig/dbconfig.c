@@ -7820,7 +7820,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	if (FAIL == zbx_dbsync_compare_corr_operations(&corr_operation_sync))
 		goto out;
 
-	correlation_cache_sync(&correlation_sync, &corr_operation_sync, &corr_condition_sync);
+	correlation_config_sync(&correlation_sync, &corr_operation_sync, &corr_condition_sync);
 
 	START_SYNC;
 
@@ -7992,14 +7992,14 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 				config->action_conditions.num_data, config->action_conditions.num_slots);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr.      : %d (%d slots)", __func__,
-				dc_local()->correlation_cache->correlations.num_data,
-				dc_local()->correlation_cache->correlations.num_slots);
+				dc_local()->correlation_config->correlations.num_data,
+				dc_local()->correlation_config->correlations.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr. conds: %d (%d slots)", __func__,
-				dc_local()->correlation_cache->corr_conditions.num_data,
-				dc_local()->correlation_cache->corr_conditions.num_slots);
+				dc_local()->correlation_config->corr_conditions.num_data,
+				dc_local()->correlation_config->corr_conditions.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr. ops  : %d (%d slots)", __func__,
-				dc_local()->correlation_cache->corr_operations.num_data,
-				dc_local()->correlation_cache->corr_operations.num_slots);
+				dc_local()->correlation_config->corr_operations.num_data,
+				dc_local()->correlation_config->corr_operations.num_slots);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : %d (%d slots)", __func__,
 				config->hostgroups.num_data, config->hostgroups.num_slots);

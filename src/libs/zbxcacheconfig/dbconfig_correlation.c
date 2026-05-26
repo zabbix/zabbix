@@ -26,9 +26,9 @@
 #include "zbxstr.h"
 #include "zbxalgo.h"
 
-static void	correlation_cache_handle_release(zbx_correlation_cache_handle_t handle);
+static void	correlation_config_handle_release(zbx_correlation_config_handle_t handle);
 
-struct zbx_correlation_cache_handle
+struct zbx_correlation_config_handle
 {
 	zbx_vector_correlation_ptr_t	correlations;
 	zbx_atomic_uint32_t		refcount;
@@ -108,46 +108,46 @@ static void	corr_condition_ref_clear(void *a)
 	corr_condition_release(ref->condition);
 }
 
-zbx_correlation_cache_t	*correlation_cache_create(void)
+zbx_correlation_config_t	*correlation_config_create(void)
 {
-	zbx_correlation_cache_t	*cache;
+	zbx_correlation_config_t	*corr_config;
 
-	cache = (zbx_correlation_cache_t *)zbx_malloc(NULL, sizeof(zbx_correlation_cache_t));
+	corr_config = (zbx_correlation_config_t *)zbx_malloc(NULL, sizeof(zbx_correlation_config_t));
 
-	if (0 != pthread_mutex_init(&cache->lock, NULL))
+	if (0 != pthread_mutex_init(&corr_config->lock, NULL))
 	{
-		zbx_free(cache);
+		zbx_free(corr_config);
 		THIS_SHOULD_NEVER_HAPPEN_MSG("failed to initialize channel mutex");
 		exit(EXIT_FAILURE);
 	}
 
-	cache->correlations_num = 0;
-	cache->handle = NULL;
+	corr_config->correlations_num = 0;
+	corr_config->handle = NULL;
 
-	zbx_hashset_create_ext(&cache->correlations, 0, ZBX_DEFAULT_ID_HASH_FUNC,
+	zbx_hashset_create_ext(&corr_config->correlations, 0, ZBX_DEFAULT_ID_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, correlation_ref_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC,
 			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-	zbx_hashset_create(&cache->corr_operations, 0, ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&corr_config->corr_operations, 0, ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_hashset_create_ext(&cache->corr_conditions, 0, ZBX_DEFAULT_ID_HASH_FUNC,
+	zbx_hashset_create_ext(&corr_config->corr_conditions, 0, ZBX_DEFAULT_ID_HASH_FUNC,
 		ZBX_DEFAULT_UINT64_COMPARE_FUNC, corr_condition_ref_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC,
 		ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
-	return cache;
+	return corr_config;
 }
 
-void	correlation_cache_destroy(zbx_correlation_cache_t *cache)
+void	correlation_config_destroy(zbx_correlation_config_t *corr_config)
 {
-	zbx_hashset_destroy(&cache->correlations);
-	zbx_hashset_destroy(&cache->corr_conditions);
-	zbx_hashset_destroy(&cache->corr_operations);
+	zbx_hashset_destroy(&corr_config->correlations);
+	zbx_hashset_destroy(&corr_config->corr_conditions);
+	zbx_hashset_destroy(&corr_config->corr_operations);
 
-	if (NULL != cache->handle)
-		correlation_cache_handle_release(cache->handle);
+	if (NULL != corr_config->handle)
+		correlation_config_handle_release(corr_config->handle);
 
-	pthread_mutex_destroy(&cache->lock);
+	pthread_mutex_destroy(&corr_config->lock);
 
-	zbx_free(cache);
+	zbx_free(corr_config);
 }
 
 static zbx_correlation_t	*correlation_create(zbx_uint64_t correlationid)
@@ -231,7 +231,7 @@ static char	*correlation_basic_formula(const zbx_correlation_t *correlation)
 	zbx_uint64_t			last_id;
 
 	if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == correlation->evaltype || 0 == correlation->conditions.values_num)
-		return NULL;
+		return zbx_strdup(NULL, "");
 
 	switch (correlation->evaltype)
 	{
@@ -357,19 +357,19 @@ static int	correlation_compare_by_id(const void *a1, const void *a2)
 	return 0;
 }
 
-static zbx_correlation_cache_handle_t	correlation_cache_handle_create(void)
+static zbx_correlation_config_handle_t	correlation_config_handle_create(void)
 {
-	zbx_correlation_cache_handle_t	handle;
-	zbx_correlation_cache_t		*cache = dc_local()->correlation_cache;
+	zbx_correlation_config_handle_t	handle;
+	zbx_correlation_config_t		*corr_config = dc_local()->correlation_config;
 	zbx_hashset_iter_t		iter;
 	zbx_correlation_ref_t		*ref;
 
-	handle = (zbx_correlation_cache_handle_t)zbx_malloc(NULL, sizeof(struct zbx_correlation_cache_handle));
+	handle = (zbx_correlation_config_handle_t)zbx_malloc(NULL, sizeof(struct zbx_correlation_config_handle));
 	handle->refcount = 1;
 	zbx_vector_correlation_ptr_create(&handle->correlations);
-	zbx_vector_correlation_ptr_reserve(&handle->correlations, (size_t)cache->correlations.num_data);
+	zbx_vector_correlation_ptr_reserve(&handle->correlations, (size_t)corr_config->correlations.num_data);
 
-	zbx_hashset_iter_reset(&cache->correlations, &iter);
+	zbx_hashset_iter_reset(&corr_config->correlations, &iter);
 	while (NULL != (ref = (zbx_correlation_ref_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_vector_correlation_ptr_append(&handle->correlations, correlation_addref(ref->correlation));
@@ -380,7 +380,7 @@ static zbx_correlation_cache_handle_t	correlation_cache_handle_create(void)
 	return handle;
 }
 
-static void	correlation_cache_handle_release(zbx_correlation_cache_handle_t handle)
+static void	correlation_config_handle_release(zbx_correlation_config_handle_t handle)
 {
 	if (1 != atomic_fetch_sub(&handle->refcount, 1))
 		return;
@@ -423,13 +423,13 @@ static int	compare_corr_conditions_by_type(const void *a1, const void *a2)
  *           3 - formula                                                      *
  *                                                                            *
  ******************************************************************************/
-static void	correlation_cache_sync_correlations(zbx_dbsync_t *sync)
+static void	correlation_config_sync_correlations(zbx_dbsync_t *sync)
 {
-	char			**row;
-	zbx_uint64_t		rowid;
-	unsigned char		tag;
-	int			ret;
-	zbx_correlation_cache_t	*cache = dc_local()->correlation_cache;
+	char				**row;
+	zbx_uint64_t			rowid;
+	unsigned char			tag;
+	int				ret;
+	zbx_correlation_config_t	*corr_config = dc_local()->correlation_config;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -447,7 +447,8 @@ static void	correlation_cache_sync_correlations(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(ref_local.correlationid, row[0]);
 		ref_local.correlation = NULL;
 
-		ref = (zbx_correlation_ref_t *)zbx_hashset_insert(&cache->correlations, &ref_local, sizeof(ref_local));
+		ref = (zbx_correlation_ref_t *)zbx_hashset_insert(&corr_config->correlations, &ref_local,
+				sizeof(ref_local));
 
 		if (NULL != ref->correlation)
 			correlation = correlation_acquire(ref->correlation);
@@ -462,7 +463,7 @@ static void	correlation_cache_sync_correlations(zbx_dbsync_t *sync)
 			if (NULL == correlation->formula || 0 != strcmp(correlation->formula, row[1]))
 				correlation->formula = zbx_strdup(correlation->formula, row[1]);
 		}
-		else if (NULL != ref->correlation)
+		else
 		{
 			/* for new correlations the formula will be updated during condition sync */
 			zbx_free(correlation->formula);
@@ -481,13 +482,13 @@ static void	correlation_cache_sync_correlations(zbx_dbsync_t *sync)
 
 		ref_local.correlationid = rowid;
 
-		if (NULL == (ref = (zbx_correlation_ref_t *)zbx_hashset_search(&cache->correlations, &ref_local)))
+		if (NULL == (ref = (zbx_correlation_ref_t *)zbx_hashset_search(&corr_config->correlations, &ref_local)))
 			continue;
 
-		zbx_hashset_remove_direct(&cache->correlations, ref);
+		zbx_hashset_remove_direct(&corr_config->correlations, ref);
 	}
 
-	atomic_store(&cache->correlations_num, cache->correlations.num_data);
+	atomic_store(&corr_config->correlations_num, corr_config->correlations.num_data);
 	zbx_dcsync_sync_end(sync, dbconfig_used_size());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -506,13 +507,13 @@ static void	correlation_cache_sync_correlations(zbx_dbsync_t *sync)
  *           2 - type                                                         *
  *                                                                            *
  ******************************************************************************/
-static void	correlation_cache_sync_operations(zbx_dbsync_t *sync)
+static void	correlation_config_sync_operations(zbx_dbsync_t *sync)
 {
-	char			**row;
-	zbx_uint64_t		rowid;
-	unsigned char		tag;
-	int			ret;
-	zbx_correlation_cache_t	*cache = dc_local()->correlation_cache;
+	char				**row;
+	zbx_uint64_t			rowid;
+	unsigned char			tag;
+	int				ret;
+	zbx_correlation_config_t	*corr_config = dc_local()->correlation_config;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -534,11 +535,14 @@ static void	correlation_cache_sync_operations(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(correlationid, row[1]);
 
-		if (NULL == (ref = (zbx_correlation_ref_t *)zbx_hashset_search(&cache->correlations, &correlationid)))
+		if (NULL == (ref = (zbx_correlation_ref_t *)zbx_hashset_search(&corr_config->correlations,
+				&correlationid)))
+		{
 			continue;
+		}
 
 		ZBX_STR2UINT64(op_local.corr_operationid, row[0]);
-		op = (zbx_dc_corr_operation_t *)zbx_hashset_insert(&cache->corr_operations, &op_local,
+		op = (zbx_dc_corr_operation_t *)zbx_hashset_insert(&corr_config->corr_operations, &op_local,
 				sizeof(op_local));
 		op->correlationid = ref->correlationid;
 		correlation = correlation_acquire(ref->correlation);
@@ -568,10 +572,10 @@ static void	correlation_cache_sync_operations(zbx_dbsync_t *sync)
 		zbx_dc_corr_operation_t	*op;
 		zbx_correlation_t	*correlation;
 
-		if (NULL == (op = (zbx_dc_corr_operation_t *)zbx_hashset_search(&cache->corr_operations, &rowid)))
+		if (NULL == (op = (zbx_dc_corr_operation_t *)zbx_hashset_search(&corr_config->corr_operations, &rowid)))
 			continue;
 
-		if (NULL == (ref = (zbx_correlation_ref_t *)zbx_hashset_search(&cache->correlations,
+		if (NULL == (ref = (zbx_correlation_ref_t *)zbx_hashset_search(&corr_config->correlations,
 				&op->correlationid)))
 		{
 			continue;
@@ -591,7 +595,7 @@ static void	correlation_cache_sync_operations(zbx_dbsync_t *sync)
 				THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported correlation operation");
 				continue;
 		}
-		zbx_hashset_remove_direct(&cache->corr_operations, op);
+		zbx_hashset_remove_direct(&corr_config->corr_operations, op);
 
 		correlation_ref_update(ref, correlation);
 	}
@@ -621,15 +625,15 @@ static void	correlation_cache_sync_operations(zbx_dbsync_t *sync)
  *          10 - corr_condition_tagpair.newtag                                *
  *                                                                            *
  ******************************************************************************/
-static void	correlation_cache_sync_conditions(zbx_dbsync_t *sync)
+static void	correlation_config_sync_conditions(zbx_dbsync_t *sync)
 {
-	char				**row;
-	zbx_uint64_t			rowid;
-	unsigned char			tag;
-	zbx_uint64_t			correlationid;
-	int				ret;
-	zbx_vector_correlation_ptr_t	correlations;
-	zbx_correlation_cache_t		*cache = dc_local()->correlation_cache;
+	char					**row;
+	zbx_uint64_t				rowid;
+	unsigned char				tag;
+	zbx_uint64_t				correlationid;
+	int					ret;
+	zbx_vector_correlation_ptr_t		correlations;
+	zbx_correlation_config_t		*corr_config = dc_local()->correlation_config;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -650,13 +654,16 @@ static void	correlation_cache_sync_conditions(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(correlationid, row[1]);
 
-		if (NULL == (ref = (zbx_correlation_ref_t *)zbx_hashset_search(&cache->correlations, &correlationid)))
+		if (NULL == (ref = (zbx_correlation_ref_t *)zbx_hashset_search(&corr_config->correlations,
+				&correlationid)))
+		{
 			continue;
+		}
 
 		ZBX_STR2UINT64(cond_ref_local.conditionid, row[0]);
 
-		cond_ref = (zbx_corr_condition_ref_t *)zbx_hashset_insert(&cache->corr_conditions, &cond_ref_local,
-				sizeof(cond_ref_local));
+		cond_ref = (zbx_corr_condition_ref_t *)zbx_hashset_insert(&corr_config->corr_conditions,
+				&cond_ref_local, sizeof(cond_ref_local));
 
 		correlation = correlation_acquire(ref->correlation);
 
@@ -686,13 +693,13 @@ static void	correlation_cache_sync_conditions(zbx_dbsync_t *sync)
 		zbx_corr_condition_ref_t	*cond_ref;
 		zbx_correlation_t		*correlation;
 
-		if (NULL == (cond_ref = (zbx_corr_condition_ref_t *)zbx_hashset_search(&cache->corr_conditions,
+		if (NULL == (cond_ref = (zbx_corr_condition_ref_t *)zbx_hashset_search(&corr_config->corr_conditions,
 				&rowid)))
 		{
 			continue;
 		}
 
-		if (NULL == (ref = (zbx_correlation_ref_t *)zbx_hashset_search(&cache->correlations,
+		if (NULL == (ref = (zbx_correlation_ref_t *)zbx_hashset_search(&corr_config->correlations,
 				&cond_ref->correlationid)))
 		{
 				continue;
@@ -705,7 +712,7 @@ static void	correlation_cache_sync_conditions(zbx_dbsync_t *sync)
 		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
 			zbx_vector_correlation_ptr_append(&correlations, correlation);
 
-		zbx_hashset_remove_direct(&cache->corr_conditions, cond_ref);
+		zbx_hashset_remove_direct(&corr_config->corr_conditions, cond_ref);
 
 		correlation_ref_update(ref, correlation);
 	}
@@ -735,14 +742,14 @@ static void	correlation_cache_sync_conditions(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	correlation_cache_sync(zbx_dbsync_t *correlation_sync, zbx_dbsync_t *corr_operation_sync,
+void	correlation_config_sync(zbx_dbsync_t *correlation_sync, zbx_dbsync_t *corr_operation_sync,
 		zbx_dbsync_t *corr_condition_sync)
 {
 	zbx_uint64_t	changes_num;
 
-	correlation_cache_sync_correlations(correlation_sync);
-	correlation_cache_sync_operations(corr_operation_sync);
-	correlation_cache_sync_conditions(corr_condition_sync);
+	correlation_config_sync_correlations(correlation_sync);
+	correlation_config_sync_operations(corr_operation_sync);
+	correlation_config_sync_conditions(corr_condition_sync);
 
 	changes_num = correlation_sync->add_num + correlation_sync->update_num + correlation_sync->remove_num;
 	changes_num += corr_operation_sync->add_num + corr_operation_sync->update_num + corr_operation_sync->remove_num;
@@ -750,16 +757,16 @@ void	correlation_cache_sync(zbx_dbsync_t *correlation_sync, zbx_dbsync_t *corr_o
 
 	if (0 != changes_num)
 	{
-		zbx_correlation_cache_t		*cache = dc_local()->correlation_cache;
-		zbx_correlation_cache_handle_t	handle = correlation_cache_handle_create();
+		zbx_correlation_config_t		*corr_config = dc_local()->correlation_config;
+		zbx_correlation_config_handle_t		handle = correlation_config_handle_create();
 
-		pthread_mutex_lock(&cache->lock);
+		pthread_mutex_lock(&corr_config->lock);
 
-		if (NULL != cache->handle)
-			correlation_cache_handle_release(cache->handle);
-		cache->handle = handle;
+		if (NULL != corr_config->handle)
+			correlation_config_handle_release(corr_config->handle);
+		corr_config->handle = handle;
 
-		pthread_mutex_unlock(&cache->lock);
+		pthread_mutex_unlock(&corr_config->lock);
 	}
 }
 
@@ -804,50 +811,50 @@ static void	correlation_dump(const zbx_correlation_t *correlation)
 		correlation_conditon_dump(correlation->conditions.values[i], "    ");
 }
 
-void	correlation_cache_dump(void)
+void	correlation_config_dump(void)
 {
-	zbx_hashset_iter_t	iter;
-	zbx_correlation_ref_t	*ref;
-	zbx_correlation_cache_t	*cache = dc_local()->correlation_cache;
+	zbx_hashset_iter_t		iter;
+	zbx_correlation_ref_t		*ref;
+	zbx_correlation_config_t	*corr_config = dc_local()->correlation_config;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	pthread_mutex_lock(&cache->lock);
+	pthread_mutex_lock(&corr_config->lock);
 
-	zbx_hashset_iter_reset(&cache->correlations, &iter);
+	zbx_hashset_iter_reset(&corr_config->correlations, &iter);
 	while (NULL != (ref = (zbx_correlation_ref_t *)zbx_hashset_iter_next(&iter)))
 	{
 		correlation_dump(ref->correlation);
 	}
 
-	pthread_mutex_unlock(&cache->lock);
+	pthread_mutex_unlock(&corr_config->lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-zbx_correlation_cache_handle_t	zbx_correlation_cache_open(void)
+zbx_correlation_config_handle_t	zbx_correlation_config_open(void)
 {
-	zbx_correlation_cache_handle_t	handle;
-	zbx_correlation_cache_t		*cache = dc_local()->correlation_cache;
+	zbx_correlation_config_handle_t		handle;
+	zbx_correlation_config_t		*corr_config = dc_local()->correlation_config;
 
-	if (0 == atomic_load(&cache->correlations_num))
+	if (0 == atomic_load(&corr_config->correlations_num))
 		return NULL;
 
-	pthread_mutex_lock(&cache->lock);
-	handle = cache->handle;
+	pthread_mutex_lock(&corr_config->lock);
+	handle = corr_config->handle;
 	atomic_fetch_add(&handle->refcount, 1);
 
-	pthread_mutex_unlock(&cache->lock);
+	pthread_mutex_unlock(&corr_config->lock);
 
 	return handle;
 }
 
-void	zbx_correlation_cache_close(zbx_correlation_cache_handle_t handle)
+void	zbx_correlation_config_close(zbx_correlation_config_handle_t handle)
 {
-	correlation_cache_handle_release(handle);
+	correlation_config_handle_release(handle);
 }
 
-zbx_vector_correlation_ptr_t	*zbx_correlation_cache_get_correlations(zbx_correlation_cache_handle_t handle)
+zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correlation_config_handle_t handle)
 {
 	return &handle->correlations;
 }

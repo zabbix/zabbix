@@ -43,18 +43,18 @@ typedef struct
 
 	zbx_atomic_int_t		correlations_num;
 
-	zbx_correlation_cache_handle_t	handle;
+	zbx_correlation_config_handle_t	handle;
 
 	pthread_mutex_t			lock;
 }
-zbx_correlation_cache_t;
+zbx_correlation_config_t;
 
-zbx_correlation_cache_t	*correlation_cache_create(void);
-void	correlation_cache_destroy(zbx_correlation_cache_t *cache);
+zbx_correlation_config_t	*correlation_config_create(void);
+void	correlation_config_destroy(zbx_correlation_config_t *cache);
 
-void	correlation_cache_sync(zbx_dbsync_t *correlation_sync, zbx_dbsync_t *corr_operation_sync,
+void	correlation_config_sync(zbx_dbsync_t *correlation_sync, zbx_dbsync_t *corr_operation_sync,
 	zbx_dbsync_t *corr_condition_sync);
 
-void	correlation_cache_dump(void);
+void	correlation_config_dump(void);
 
 #endif
