@@ -231,7 +231,12 @@ func prepareSystemRunRule() (*Rule, int, int, error) {
 
 func trimRulesAfterMatchAll(sysrunIndex *int) {
 	for i, r := range rules {
-		if !r.IsRegexp && len(r.Params) == 0 && r.Key == "*" {
+		// regexp rule cannot be a wildcard match-all
+		if r.IsRegexp {
+			continue
+		}
+
+		if len(r.Params) == 0 && r.Key == "*" {
 			if i < *sysrunIndex {
 				*sysrunIndex = i
 			}
