@@ -778,7 +778,6 @@ int	zbx_add_key_access_rule_regexp(const char *parameter, char *pattern, zbx_key
 	zbx_key_access_rule_t	*rule, *r;
 	char			*err_msg = NULL;
 	size_t			anchored_alloc = 0;
-	int			ret;
 
 	if ('\0' == *pattern)
 	{
@@ -807,9 +806,7 @@ int	zbx_add_key_access_rule_regexp(const char *parameter, char *pattern, zbx_key
 	rule->empty_arguments = 0;
 	zbx_vector_str_create(&rule->elements);
 
-	ret = zbx_regexp_compile_ext(pattern, &rule->regexp, 0, &err_msg);
-
-	if (SUCCEED != ret)
+	if (SUCCEED != zbx_regexp_compile_ext(pattern, &rule->regexp, 0, &err_msg))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "failed to compile %s regular expression \"%s\": %s", parameter, pattern,
 				err_msg);
