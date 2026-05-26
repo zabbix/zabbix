@@ -1731,4 +1731,21 @@ void	zbx_correlation_cache_close(zbx_correlation_cache_handle_t handle);
 
 zbx_vector_correlation_ptr_t	*zbx_correlation_cache_get_correlations(zbx_correlation_cache_handle_t handle);
 
+#define ZBX_CEP_CONDITION_EVENT_NAME	1
+#define ZBX_CEP_CONDITION_TAG_NAME	2
+#define ZBX_CEP_CONDITION_TAG_VALUE	3
+#define ZBX_CEP_CONDITION_SEVERITY	4
+#define ZBX_CEP_CONDITION_HOST		5
+#define ZBX_CEP_CONDITION_HOST_GROUP	6
+#define ZBX_CEP_CONDITION_TIME_PERIOD	7
+
+typedef struct zbx_cep_config_handle *zbx_cep_config_handle_t;
+typedef struct zbx_cep_rule zbx_cep_rule_t;
+
+ZBX_PTR_VECTOR_DECL(cep_rule_ptr, zbx_cep_rule_t *)
+
+zbx_cep_config_handle_t	zbx_cep_config_open(void);
+void	zbx_cep_config_close(zbx_cep_config_handle_t handle);
+const zbx_vector_cep_rule_ptr_t	*zbx_cep_config_get_rules(zbx_cep_config_handle_t handle);
+
 #endif

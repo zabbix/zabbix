@@ -73,10 +73,12 @@
 #define ZBX_DBSYNC_OBJ_PROXY_GROUP	20
 #define ZBX_DBSYNC_OBJ_HOST_PROXY	21
 #define ZBX_DBSYNC_OBJ_TRIGGER_DEP	22
+#define ZBX_DBSYNC_OBJ_CEP_RULE		23
+#define ZBX_DBSYNC_OBJ_CEP_CONDITION	24
 
-#define ZBX_DBSYNC_OBJ_ITEM_DISCOVERY	23	/* virtual object */
+#define ZBX_DBSYNC_OBJ_ITEM_DISCOVERY	25	/* virtual object */
 /* number of dbsync objects - keep in sync with above defines */
-#define ZBX_DBSYNC_OBJ_COUNT		23
+#define ZBX_DBSYNC_OBJ_COUNT		25
 
 /******************************************************************************
  *                                                                            *
@@ -262,6 +264,10 @@ void	dc_sync_settings(zbx_dbsync_t *sync, zbx_uint64_t revision, unsigned char p
 
 int	zbx_dbsync_prepare_proxy_group(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_host_proxy(zbx_dbsync_t *sync);
+
+int	zbx_dbsync_prepare_cep_rule(zbx_dbsync_t *sync);
+int	zbx_dbsync_prepare_cep_condition(zbx_dbsync_t *sync);
+
 void	zbx_dcsync_sql_start(zbx_dbsync_t *sync);
 void	zbx_dcsync_sql_end(zbx_dbsync_t *sync);
 void	zbx_dcsync_sync_start(zbx_dbsync_t *sync, zbx_uint64_t used_size);

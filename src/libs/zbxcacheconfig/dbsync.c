@@ -4207,6 +4207,64 @@ out:
 	return ret;
 }
 
+int	zbx_dbsync_prepare_cep_rule(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_dcsync_sql_start(sync);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select cep_ruleid,formula,window_type,evaltype,status,stop,sortorder from cep_rule");
+
+	dbsync_prepare(sync, 7, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = zbx_dbconn_select(sync->db, "%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "cep_rule", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CEP_RULE)]);
+out:
+	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
+
+	return ret;
+}
+
+int	zbx_dbsync_prepare_cep_condition(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_dcsync_sql_start(sync);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select cep_conditionid,cep_ruleid,type,operator,event_name,tag,tag_value,host,host_group,"
+				"time_period,severity from cep_condition");
+
+	dbsync_prepare(sync, 11, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = zbx_dbconn_select(sync->db, "%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "cep_condition", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CEP_CONDITION)]);
+out:
+	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
+
+	return ret;
+}
 
 void	zbx_dcsync_sql_start(zbx_dbsync_t *sync)
 {
