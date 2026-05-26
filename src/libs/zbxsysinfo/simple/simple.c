@@ -24,10 +24,10 @@
 #include "zbxtime.h"
 #include "zbxcomms.h"
 #include "zbx_discoverer_constants.h"
+#include "zbxip.h"
 
 #ifdef HAVE_LIBCURL
 #	include "zbxcurl.h"
-#	include "zbxip.h"
 #endif
 
 #ifdef HAVE_LDAP
@@ -397,6 +397,12 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 
 	if (0 == strncmp("net.tcp.service", get_rkey(request), 15))
 	{
+		if (FAIL == zbx_is_ip(ip) && FAIL == zbx_is_rfc_extended_hostname(ip))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			return SYSINFO_RET_FAIL;
+		}
+
 		if (0 == strcmp(service, "ssh"))
 		{
 			if (NULL == port_str || '\0' == *port_str)
@@ -489,8 +495,15 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 	{
 		if (0 == strcmp(service, "ntp"))
 		{
+			if (FAIL == zbx_is_ip(ip) && FAIL == zbx_is_rfc_extended_hostname(ip))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+				return SYSINFO_RET_FAIL;
+			}
+
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_NTP_PORT;
+
 			ret = check_ntp(ip, port, request->timeout, &value_int);
 		}
 		else

@@ -1790,6 +1790,11 @@ msgstr ""
 msgid "At least one host group or host must be selected."
 msgstr "적어도 1개의 호스트 그룹 혹은 호스트가 선택되어 있을 필요가 있습니다."
 
+#: app/controllers/CControllerGraphPrototypeCreate.php:116
+#: app/controllers/CControllerGraphPrototypeUpdate.php:118
+msgid "At least one item must be a prototype"
+msgstr ""
+
 #: app/controllers/CControllerMaintenanceCreate.php:57
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
 #: app/controllers/CControllerMaintenanceUpdate.php:58
@@ -2560,6 +2565,13 @@ msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
 msgstr[0] "모듈을 추가할 수 없습니다: %1$s."
 
+#: app/controllers/CControllerGraphCreate.php:111
+#: app/controllers/CControllerGraphPrototypeCreate.php:121
+#: app/controllers/CControllerGraphPrototypeUpdate.php:123
+#: app/controllers/CControllerGraphUpdate.php:113
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr ""
+
 #: include/classes/api/services/CGraph.php:42
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
@@ -2605,6 +2617,10 @@ msgstr "스크립트를 추가할 수 없습니다"
 #: widgets/navtree/views/navtreeitem.edit.php:72
 msgid "Cannot add submaps. Max depth reached."
 msgstr "서브맵을 추가할 수 없습니다. 최대 계층에 도달하였습니다."
+
+#: app/controllers/CControllerPopupScheduledReportSubscriptionCheck.php:85
+msgid "Cannot add subscription"
+msgstr ""
 
 #: app/controllers/CControllerTemplateCreate.php:49
 #: app/controllers/CControllerTemplateCreate.php:171
@@ -6899,6 +6915,10 @@ msgstr "존재하지 않는 경우에 삭제"
 msgid "Delete regular expression?"
 msgstr "정규표현식을 삭제하시겠습니까?"
 
+#: app/views/js/reports.scheduledreport.edit.js.php:160
+msgid "Delete scheduled report?"
+msgstr ""
+
 #: app/views/administration.script.edit.php:389
 msgid "Delete script?"
 msgstr "스크립트를 삭제하시겠습니까?"
@@ -8623,6 +8643,10 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:612
+msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:609
@@ -11110,6 +11134,10 @@ msgstr "%2$s 미만의 하위 서비스가 %1$s 이하인 경우"
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
 msgstr "하위 서비스의 %2$s 미만이 %1$s 이하의 상태인 경우"
+
+#: include/classes/setup/CSetupWizard.php:614
+msgid "If no port is specified, the \"Database port\" value is used."
+msgstr ""
 
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -13796,6 +13824,10 @@ msgstr ""
 msgid "List of block devices and their type. Returns JSON"
 msgstr "블록 장치 및 유형 목록. 반환 JSON"
 
+#: include/classes/data/CItemData.php:1724
+msgid "List of block devices with detailed information. Returns JSON"
+msgstr ""
+
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
 msgstr ""
@@ -13815,6 +13847,10 @@ msgstr "마운트된 파일 시스템 및 유형 목록. 반환 JSON"
 #: include/classes/data/CItemData.php:1703
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr "마운트된 파일 시스템, 해당 유형, 디스크 공간 및 inode 통계 목록입니다. 반환 JSON"
+
+#: include/classes/data/CItemData.php:1266
+msgid "List of network interfaces with detailed information. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1109
 msgid "List of network interfaces. Returns JSON"
@@ -15434,6 +15470,10 @@ msgstr "새 LDAP 서버"
 msgid "New MFA method"
 msgstr "새 MFA 방식"
 
+#: app/views/oauth.edit.php:254
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "새 SLA"
@@ -15566,6 +15606,11 @@ msgstr "새 프록시 그룹"
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "정규표현식 작성"
+
+#: app/views/js/reports.scheduledreport.edit.js.php:99
+#: app/views/reports.scheduledreport.edit.php:250
+msgid "New scheduled report"
+msgstr ""
 
 #: app/views/administration.script.edit.php:369
 #: app/views/administration.script.edit.php:409
@@ -19832,6 +19877,10 @@ msgstr[0] "예약 보고서 삭제됨"
 msgid "Scheduled report disabled"
 msgid_plural "Scheduled reports disabled"
 msgstr[0] "예약 보고서 비활성화"
+
+#: app/controllers/CControllerPopup.php:60
+msgid "Scheduled report edit"
+msgstr ""
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
@@ -24941,6 +24990,18 @@ msgstr "값 매핑"
 msgid "Value must be greater than %1$s."
 msgstr ""
 
+#: include/classes/validators/CFormValidator.php:1089
+#: include/classes/validators/CFormValidator.php:1147 jsLoader.php:435
+#, c-format
+msgid "Value must be greater than or equal to %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1095
+#: include/classes/validators/CFormValidator.php:1153 jsLoader.php:434
+#, c-format
+msgid "Value must be less than or equal to %1$s."
+msgstr ""
+
 #: include/classes/validators/CFormValidator.php:1033
 #: include/classes/validators/CFormValidator.php:1042
 #, c-format
@@ -25355,6 +25416,10 @@ msgstr ""
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "위젯은 더 이상 사용되지 않습니다."
+
+#: jsLoader.php:255
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."

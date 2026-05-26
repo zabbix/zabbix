@@ -41,12 +41,14 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "layout/grid-columns";
 @import "layout/form-grid";
 
+@import "components/banner";
 @import "components/buttons";
 @import "components/icons-extended";
 @import "components/checkbox-list";
 @import "components/checkbox-radio";
 @import "components/columns-wrapper";
 @import "components/dashboard/dashboard";
+@import "components/datatable";
 @import "components/diff";
 @import "components/entity-count";
 @import "components/expandable-subfilter";
@@ -1650,7 +1652,6 @@ select {
 			display: flex;
 			flex-wrap: nowrap;
 			align-items: center;
-			padding-left: 3px;
 			white-space: pre;
 
 			.scatter-plot-hintbox-icon-color {
@@ -1727,6 +1728,10 @@ select {
 	background-color: $lighter-yellow;
 	border: 1px solid $ui-border-color;
 	@extend %webkit-scrollbar;
+
+	&.debug-output-table-refresh {
+		margin: 10px 0 0 0;
+	}
 }
 
 .overlay-descr {

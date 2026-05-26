@@ -37,14 +37,16 @@ $new_tag_filter_table = (new CTable())
 	->addItem(
 		(new CTag('tfoot', true))
 			->addItem(new CCol((new CButtonLink(_('Add')))->addClass('js-add-tag-filter-row')))
-	);
+	)
+	->setAttribute('data-field-type', 'set')
+	->setAttribute('data-field-name', 'new_tag_filters');
 
 $form_grid
 	->addItem([
-		(new CLabel(_('Host groups'), 'ms_new_tag_filter_groupids__ms'))->setAsteriskMark(),
+		(new CLabel(_('Host groups'), 'new_tag_groups__ms'))->setAsteriskMark(),
 		new CFormField(
 			(new CMultiSelect([
-				'name' => 'ms_new_tag_filter[groupids][]',
+				'name' => 'new_tag_groups[]',
 				'object_name' => 'hostGroup',
 				'data' => $data['host_groups_ms'],
 				'popup' => [
@@ -52,7 +54,7 @@ $form_grid
 						'srctbl' => 'host_groups',
 						'srcfld1' => 'groupid',
 						'dstfrm' => $form->getName(),
-						'dstfld1' => 'ms_new_tag_filter_groupids_',
+						'dstfld1' => 'new_tag_groups_',
 						'disableids' => array_column($data['host_groups_ms'], 'id')
 					]
 				],
@@ -70,19 +72,26 @@ $form_grid
 		->setId('tag-list-form-field')
 	]);
 
-$tag_filter_row_template = (new CTemplateTag('tag-filter-row-template'))->addItem(
+$tag_filter_row_template = (new CTemplateTag('tag-filter-row-template'))->addItem([
 	(new CRow([
-		(new CTextAreaFlexible('new_tag_filter[#{rowid}][tag]', '#{tag}'))
+		(new CTextAreaFlexible('new_tag_filters[#{rowid}][tag]', '#{tag}'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setMaxlength(DB::getFieldLength('tag_filter', 'tag'))
-			->setAttribute('placeholder', _('tag')),
-		(new CTextAreaFlexible('new_tag_filter[#{rowid}][value]', '#{value}'))
+			->setAttribute('placeholder', _('tag'))
+			->setErrorContainer('new-tag-filters-#{rowid}-error-container'),
+		(new CTextAreaFlexible('new_tag_filters[#{rowid}][value]', '#{value}'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setMaxlength(DB::getFieldLength('tag_filter', 'value'))
-			->setAttribute('placeholder', _('value')),
+			->setAttribute('placeholder', _('value'))
+			->setErrorContainer('new-tag-filters-#{rowid}-error-container'),
 		(new CButtonLink(_('Remove')))->addClass('js-remove-table-row')
-	]))->addClass('form_row')
-);
+	]))->addClass('form_row'),
+	(new CRow([
+		(new CCol((new CDiv())->setId('new-tag-filters-#{rowid}-error-container')))
+			->addClass(ZBX_STYLE_ERROR_CONTAINER)
+			->setColSpan(3)
+	]))->addClass('error-container-row')
+]);
 
 $form_grid->addItem($tag_filter_row_template);
 
@@ -90,7 +99,8 @@ $form
 	->addItem($form_grid)
 	->addItem(
 		(new CScriptTag('
-			tag_filter_edit.init('.json_encode([
+			window.tag_filter_edit.init('.json_encode([
+				'rules' => $data['js_validation_rules'],
 				'tag_filters' => $data['tag_filters'],
 				'groupid' => $data['groupid'] ?: 0
 			]).');
@@ -105,9 +115,9 @@ $output = [
 	'buttons' => [
 		[
 			'title' => $data['edit'] == 0 ? _('Add') : _('Update'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'tag_filter_edit.submit();'
+			'isSubmit' => true
 		]
 	]
 ];
