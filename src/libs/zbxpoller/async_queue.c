@@ -34,6 +34,9 @@ void	async_task_queue_destroy(zbx_async_queue_t *queue)
 	zbx_vector_int32_destroy(&queue->errcodes);
 	zbx_vector_int32_destroy(&queue->lastclocks);
 
+	if (SUCCEED == zbx_dc_config_poller_type_has_cached_data(queue->poller_type))
+		zbx_vector_dc_cached_data_destroy(&queue->cached_datas);
+
 	zbx_vector_poller_item_clear_ext(&queue->poller_items, zbx_poller_item_free);
 	zbx_vector_poller_item_destroy(&queue->poller_items);
 	zbx_vector_interface_status_clear_ext(&queue->interfaces, zbx_interface_status_free);
@@ -58,6 +61,10 @@ int	async_task_queue_init(zbx_async_queue_t *queue, zbx_thread_poller_args *poll
 	zbx_vector_uint64_create(&queue->itemids);
 	zbx_vector_int32_create(&queue->errcodes);
 	zbx_vector_int32_create(&queue->lastclocks);
+
+	if (SUCCEED == zbx_dc_config_poller_type_has_cached_data(queue->poller_type))
+		zbx_vector_dc_cached_data_create(&queue->cached_datas);
+
 	zbx_vector_poller_item_create(&queue->poller_items);
 	zbx_vector_interface_status_create(&queue->interfaces);
 

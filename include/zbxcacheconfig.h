@@ -307,8 +307,10 @@ typedef struct
 	int			mtime;
 	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
 	int			timeout;
+	/* TODO: change query_fields to query + other fields, implement lld for it */
 	char			*query_fields;
 	zbx_tq_query_t		*telemetry_query;
+	time_t			lasttimestamp;
 	unsigned char		preprocessing;
 }
 zbx_dc_telemetry_query_item_t;
@@ -323,6 +325,15 @@ typedef union
 	void				*any;
 }
 zbx_dc_poller_item_t;
+
+typedef struct
+{
+	time_t	lasttimestamp;
+	/* TODO: probably add min_free_ts */
+}
+zbx_dc_cached_data_t;
+
+ZBX_VECTOR_DECL(dc_cached_data, zbx_dc_cached_data_t);
 
 typedef struct
 {
@@ -1062,6 +1073,9 @@ void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, 
 		unsigned int connection_type, int now);
 void	zbx_dc_config_delete_autoreg_host(const zbx_vector_str_t *autoreg_hosts);
 
+int			zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type);
+zbx_dc_cached_data_t	zbx_dc_config_get_default_cached_data(void);
+
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
 
@@ -1075,8 +1089,8 @@ void	zbx_dc_config_delete_autoreg_host(const zbx_vector_str_t *autoreg_hosts);
 #define ZBX_HK_PERIOD_MAX	(25 * SEC_PER_YEAR)
 
 void	zbx_dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes, size_t num);
-void	zbx_dc_poller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
-		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck);
+void	zbx_dc_poller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes,
+		const zbx_dc_cached_data_t *cached_datas, size_t num, unsigned char poller_type, int *nextcheck);
 #ifdef HAVE_OPENIPMI
 void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num);
 #endif

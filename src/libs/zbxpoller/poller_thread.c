@@ -1481,7 +1481,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 					items[i].preprocessing, NULL, &timespec, items[i].state, results[i].msg);
 		}
 
-		zbx_dc_poller_requeue_items(&items[i].itemid, &timespec.sec, &errcodes[i], 1, poller_type,
+		/* currently only telemetry query item has cached data and it is not polled here */
+		zbx_dc_poller_requeue_items(&items[i].itemid, &timespec.sec, &errcodes[i], NULL, 1, poller_type,
 				nextcheck);
 	}
 

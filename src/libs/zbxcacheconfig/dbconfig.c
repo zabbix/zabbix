@@ -206,6 +206,7 @@ ZBX_VECTOR_IMPL(host_rev, zbx_host_rev_t)
 ZBX_PTR_VECTOR_IMPL(dc_connector_tag, zbx_dc_connector_tag_t *)
 ZBX_PTR_VECTOR_IMPL(dc_dcheck_ptr, zbx_dc_dcheck_t *)
 ZBX_PTR_VECTOR_IMPL(dc_drule_ptr, zbx_dc_drule_t *)
+ZBX_VECTOR_IMPL(dc_cached_data, zbx_dc_cached_data_t);
 ZBX_PTR_VECTOR_IMPL(item_tag, zbx_item_tag_t *)
 ZBX_PTR_VECTOR_IMPL(dc_item, zbx_dc_item_t *)
 ZBX_PTR_VECTOR_IMPL(dc_trigger, zbx_dc_trigger_t *)
@@ -3197,6 +3198,8 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 			{
 				item->itemtype.tqitem = (ZBX_DC_TQITEM *)__config_shmem_malloc_func(NULL,
 						sizeof(ZBX_DC_TQITEM));
+
+				item->itemtype.tqitem->lasttimestamp = 0;
 			}
 
 			dc_strpool_replace(found, &item->itemtype.tqitem->query_fields, row[32]);
@@ -10234,6 +10237,7 @@ static void	DCget_telemetry_query_item(zbx_dc_telemetry_query_item_t *dst_item, 
 
 	dst_item->query_fields = zbx_strdup(NULL, src_item->itemtype.tqitem->query_fields);
 	dst_item->telemetry_query = NULL;
+	dst_item->lasttimestamp = src_item->itemtype.tqitem->lasttimestamp;
 
 	dst_item->timeout = 0;
 }
@@ -12167,6 +12171,20 @@ out:
 	return num;
 }
 
+int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type)
+{
+	return (ZBX_POLLER_TYPE_TELEMETRY_QUERY == poller_type ? SUCCEED : FAIL);
+}
+
+zbx_dc_cached_data_t	zbx_dc_config_get_default_cached_data(void)
+{
+	zbx_dc_cached_data_t	ret;
+
+	ret.lasttimestamp = 0;
+
+	return ret;
+}
+
 #ifdef HAVE_OPENIPMI
 /******************************************************************************
  *                                                                            *
@@ -12376,7 +12394,19 @@ unlock:
 	return items_num;
 }
 
-static void	dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes, size_t num)
+static void	dc_set_cached_data(ZBX_DC_ITEM *dc_item, int errcode, const zbx_dc_cached_data_t *cached_data)
+{
+	if (SUCCEED != errcode)
+		return;
+
+	if (ITEM_TYPE_TELEMETRY_QUERY == dc_item->type)
+	{
+		dc_item->itemtype.tqitem->lasttimestamp = cached_data->lasttimestamp;
+	}
+}
+
+static void	dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes,
+		const zbx_dc_cached_data_t *cached_datas, size_t num)
 {
 	size_t			i;
 	ZBX_DC_ITEM		*dc_item;
@@ -12408,6 +12438,9 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 
 		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
 
+		if (NULL != cached_datas)
+			dc_set_cached_data(dc_item, errcodes[i], &cached_datas[i]);
+
 		switch (errcodes[i])
 		{
 			case SUCCEED:
@@ -12435,17 +12468,17 @@ void	zbx_dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, co
 {
 	WRLOCK_CACHE;
 
-	dc_requeue_items(itemids, lastclocks, errcodes, num);
+	dc_requeue_items(itemids, lastclocks, errcodes, NULL, num);
 
 	UNLOCK_CACHE;
 }
 
-void	zbx_dc_poller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
-		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck)
+void	zbx_dc_poller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes,
+		const zbx_dc_cached_data_t *cached_datas, size_t num, unsigned char poller_type, int *nextcheck)
 {
 	WRLOCK_CACHE;
 
-	dc_requeue_items(itemids, lastclocks, errcodes, num);
+	dc_requeue_items(itemids, lastclocks, errcodes, cached_datas, num);
 	*nextcheck = dc_config_get_queue_nextcheck(&config->queues[poller_type]);
 
 	UNLOCK_CACHE;

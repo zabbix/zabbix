@@ -116,7 +116,7 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 		SET_MSG_RESULT(&item->result, NULL);
 	}
 
-	zbx_async_manager_requeue(poller_config->manager, item->itemid, item->ret, timespec.sec);
+	zbx_async_manager_requeue(poller_config->manager, item->itemid, item->ret, timespec.sec, NULL);
 
 	poller_config->processing--;
 	poller_config->processed++;
@@ -204,7 +204,7 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 	zbx_free(out);
 
 	zbx_async_manager_requeue(poller_config->manager, httpagent_context->item_context.itemid, SUCCEED,
-			timespec.sec);
+			timespec.sec, NULL);
 
 	poller_config->processing--;
 	poller_config->processed++;
@@ -230,6 +230,7 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 	zbx_timespec_t			timespec;
 	zbx_poller_config_t		*poller_config;
 	CURLcode			err_info;
+	zbx_dc_cached_data_t		cached_data;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -293,8 +294,6 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 				SET_TEXT_RESULT(&result, values.values[i]);
 				values.values[i] = NULL;
 
-				/* FIXME: item metadata might not update in time for the next check, */
-				/* this must be changed */
 				zbx_set_agent_result_meta(&result, 0, item_context->newlasttimestamp);
 
 				zbx_preprocess_item_value(item_context->itemid, item_context->value_type,
@@ -311,8 +310,6 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 				}
 			}
 
-			/* FIXME: this is really only needed because zbx_set_agent_result_meta is used */
-			/* if lasttimestamp is updated some other way, this should be removed */
 			if (0 == values.values_num)
 			{
 				AGENT_RESULT	result;
@@ -321,8 +318,6 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 
 				zbx_init_agent_result(&result);
 
-				/* FIXME: item metadata might not update in time for the next check, */
-				/* this must be changed */
 				zbx_set_agent_result_meta(&result, 0, item_context->newlasttimestamp);
 
 				zbx_preprocess_item_value(item_context->itemid, item_context->value_type,
@@ -346,8 +341,10 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 	zbx_free(error);
 	zbx_free(http_resp);
 
+	cached_data.lasttimestamp = item_context->newlasttimestamp;
+
 	zbx_async_manager_requeue(poller_config->manager, telemetry_query_context->item_context.itemid, SUCCEED,
-			timespec.sec);
+			timespec.sec, &cached_data);
 
 	poller_config->processing--;
 	poller_config->processed++;
@@ -522,8 +519,9 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 						ITEM_STATE_NOTSUPPORTED, results[i].msg);
 			}
 
+			/* cached data is only used on SUCCESS */
 			zbx_async_manager_requeue(poller_config->manager, itemid, errcodes[i],
-					timespec.sec);
+					timespec.sec, NULL);
 		}
 
 		zbx_poller_item_free(poller_items.values[j]);

@@ -241,6 +241,7 @@ ZBX_DC_BROWSERITEM;
 typedef struct
 {
 	const char	*query_fields;
+	time_t		lasttimestamp;
 }
 ZBX_DC_TQITEM;
 
