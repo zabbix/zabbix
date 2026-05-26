@@ -605,8 +605,6 @@ class CFormValidator {
 						if (response.result === false && response.errors) {
 							result.errors = result.errors.concat(response.errors);
 						}
-
-						return result;
 					})
 			);
 		}
