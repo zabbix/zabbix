@@ -88,14 +88,14 @@ class CApiDpopHelper {
 
 				$der_signature = self::jwtSignatureToDerEncode(self::base64UrlDecode($encoded_signature));
 
-				$rezult = openssl_verify($encoded_header.'.'.$encoded_payload, $der_signature, $public_key_pem,
+				$result = openssl_verify($encoded_header.'.'.$encoded_payload, $der_signature, $public_key_pem,
 					OPENSSL_ALGO_SHA256
 				);
 
-				if ($rezult == 0) {
+				if ($result == 0) {
 					throw new Exception('Signature verification failed.');
 				}
-				elseif ($rezult == -1) {
+				elseif ($result == -1) {
 					throw new Exception('OpenSSL error: '.openssl_error_string());
 				}
 			}
