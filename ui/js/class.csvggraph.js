@@ -612,12 +612,12 @@
 
 					if (show_hint && data.hintMaxRows > rows_added) {
 						jQuery('<li>')
-							.text(point.g.getAttribute('data-metric') + ': ' + point.v)
 							.append(
 								jQuery('<span>')
 									.css('background-color', point.g.getAttribute('data-color'))
 									.addClass('svg-graph-hintbox-item-color')
 							)
+							.append(`${point.g.getAttribute('data-metric')}: ${point.v}`)
 							.appendTo(html);
 						rows_added++;
 					}
@@ -814,12 +814,12 @@
 				triggers.slice(0, data.hintMaxRows).forEach((val, i) => {
 					hint_body.append(
 						jQuery('<li>')
-							.text(val.trigger + ' [' + val.constant + ']')
 							.append(
 								jQuery('<span>')
 									.css('background-color', val.color)
 									.addClass('svg-graph-hintbox-trigger-color')
 							)
+							.append(`${val.trigger} [${val.constant}]`)
 					)
 
 					val.elem.classList.toggle('svg-graph-simple-trigger-hover', true)

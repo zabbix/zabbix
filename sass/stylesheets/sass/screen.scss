@@ -2501,15 +2501,17 @@ select {
 	}
 
 	li {
-		padding-left: 23px;
+		display: flex;
+		width: fit-content;
+		align-items: center;
 
 		.svg-graph-hintbox-item-color,
 		.svg-graph-hintbox-trigger-color {
-			margin: 3px 10px 3px -20px;
-			width: 10px;
+			display: inline-block;
+			min-width: 10px;
 			height: 10px;
-			float: left;
-			display: block;
+			margin-left: 3px;
+			margin-right: 10px;
 		}
 
 		.svg-graph-hintbox-trigger-color {
