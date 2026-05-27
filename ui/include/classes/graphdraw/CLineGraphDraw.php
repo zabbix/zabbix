@@ -2018,9 +2018,99 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
+	function truncateTextByMaxWidth(int $font_size, string $text, int $max_width, int $ellipsis_width): string {
+		$text_width = imageTextSize($font_size, 0, $text)['width'];
+
+		if ($text_width <= $max_width) {
+			return $text;
+		}
+
+		$target_width = $max_width - $ellipsis_width;
+
+		$text_length = mb_strlen($text);
+
+		// First level of clipping
+		$cut_length = (int) floor($text_length * ($target_width / $text_width));
+
+		$text = mb_substr($text, 0, $cut_length);
+
+		// Minimal correction
+		while (imageTextSize($font_size, 0, $text)['width'] > $target_width) {
+			$text = trim(mb_substr($text, 0, -1));
+		}
+
+		return $text.'...';
+	}
+
 	private function calcDimensions() {
-		$this->shiftXleft = $this->yaxis[GRAPH_YAXIS_SIDE_LEFT] ? 85 : 30;
-		$this->shiftXright = $this->yaxis[GRAPH_YAXIS_SIDE_RIGHT] ? 85 : 30;
+		$LABEL_STEP_WIDTH = 32;
+		$FREE_SPACE = 50;
+		$MINIMAL_GRAPH_GRID_WIDTH = 160;
+		$YAXIS_STANDARD_WIDTH = 85;
+		$yaxis_left_width = $YAXIS_STANDARD_WIDTH;
+		$yaxis_right_width = $YAXIS_STANDARD_WIDTH;
+		$units_by_side = [
+			GRAPH_YAXIS_SIDE_LEFT => [],
+			GRAPH_YAXIS_SIDE_RIGHT => []
+		];
+
+		foreach ($this->items as $item) {
+			if ($item['yaxisside'] == GRAPH_YAXIS_SIDE_LEFT) {
+				$yaxis_left_width = max($yaxis_left_width, imageTextSize(8, 0, $item['units'])['width'] + $FREE_SPACE);
+			}
+			else {
+				$yaxis_right_width = max($yaxis_right_width, imageTextSize(8, 0, $item['units'])['width'] + $FREE_SPACE);
+			}
+
+			$units_by_side[$item['yaxisside']][$item['units']] = true;
+		}
+
+		$yaxis_left_width = count($units_by_side[GRAPH_YAXIS_SIDE_LEFT]) > 1 ? $YAXIS_STANDARD_WIDTH :
+			ceil($yaxis_left_width / $LABEL_STEP_WIDTH) * $LABEL_STEP_WIDTH;
+
+		$yaxis_right_width = count($units_by_side[GRAPH_YAXIS_SIDE_RIGHT]) > 1 ? $YAXIS_STANDARD_WIDTH :
+			ceil($yaxis_right_width / $LABEL_STEP_WIDTH) * $LABEL_STEP_WIDTH;
+
+		$this->shiftXleft = $this->yaxis[GRAPH_YAXIS_SIDE_LEFT] ? $yaxis_left_width : $LABEL_STEP_WIDTH;
+		$this->shiftXright = $this->yaxis[GRAPH_YAXIS_SIDE_RIGHT] ? $yaxis_right_width : $LABEL_STEP_WIDTH;
+
+		if ($this->sizeX - ($this->shiftXleft + $this->shiftXright) < $MINIMAL_GRAPH_GRID_WIDTH) {
+			$remaining_width = $this->sizeX - $MINIMAL_GRAPH_GRID_WIDTH;
+			$scale = $remaining_width / ($this->shiftXleft + $this->shiftXright);
+			$max_left_width = ceil($scale * $this->shiftXleft);
+			$max_right_width = ceil($scale * $this->shiftXright);
+
+			if ($max_left_width < $LABEL_STEP_WIDTH + $FREE_SPACE || $max_right_width < $LABEL_STEP_WIDTH + $FREE_SPACE) {
+				$max_left_width = max($max_left_width, $LABEL_STEP_WIDTH + $FREE_SPACE);
+				$max_right_width = max($max_right_width, $LABEL_STEP_WIDTH + $FREE_SPACE);
+				$this->sizeX = $max_left_width + $max_right_width + $MINIMAL_GRAPH_GRID_WIDTH;
+			}
+
+			$this->shiftXleft = $max_left_width;
+			$this->shiftXright = $max_right_width;
+
+			$ellipsis_width = imageTextSize(8, 0, '...')['width'];
+			foreach ($this->items as &$item) {
+				if ($item['yaxisside'] == GRAPH_YAXIS_SIDE_LEFT) {
+					$item['units'] = $this->truncateTextByMaxWidth(
+						8, $item['units'], $max_left_width - $FREE_SPACE, $ellipsis_width
+					);
+				}
+				else {
+					$item['units'] = $this->truncateTextByMaxWidth(
+						8, $item['units'], $max_right_width - $FREE_SPACE, $ellipsis_width
+					);
+				}
+
+			}
+			unset($item);
+		}
+
+		if (!$this->outer) {
+			$this->sizeX -= $this->yaxis[GRAPH_YAXIS_SIDE_LEFT] ? $yaxis_left_width - 83 : 0;
+			$this->sizeX -= $this->yaxis[GRAPH_YAXIS_SIDE_RIGHT] ? $yaxis_right_width - 83 : 0;
+		}
+		//----------------------------------------------------------------------------------------------
 
 		// Calculate graph summary padding for both axes.
 		$x_offsets = $this->shiftXleft + $this->shiftXright + 1;
