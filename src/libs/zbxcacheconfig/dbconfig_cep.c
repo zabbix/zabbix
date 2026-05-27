@@ -19,8 +19,10 @@
 #include "dbconfig_local.h"
 #include "dbconfig.h"
 #include "zbxcommon.h"
+#include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxlog.h"
+#include "zbxnum.h"
 
 ZBX_PTR_VECTOR_IMPL(cep_rule_ptr, zbx_cep_rule_t *)
 ZBX_VECTOR_IMPL(cep_condition, zbx_cep_condition_t)
@@ -36,6 +38,38 @@ static void	cep_condition_clear(zbx_cep_condition_t *condition)
 {
 	zbx_free(condition->value1_str);
 	zbx_free(condition->value2_str);
+}
+
+static void	cep_window_free(zbx_cep_window_t *window)
+{
+	zbx_free(window->capacity);
+	zbx_free(window->duration);
+	zbx_free(window->event_count_tag);
+	zbx_free(window->formula);
+	zbx_free(window->script);
+	zbx_free(window->group_tag);
+	zbx_free(window);
+}
+
+static zbx_cep_window_t	*cep_window_clone(const zbx_cep_window_t *window)
+{
+	zbx_cep_window_t	*clone;
+
+	if (NULL == window)
+		return NULL;
+
+	clone = (zbx_cep_window_t *)zbx_malloc(NULL, sizeof(zbx_cep_window_t));
+	clone->type = window->type;
+	clone->evaltype = window->evaltype;
+	clone->group_by = window->group_by;
+	clone->capacity = zbx_strdup(NULL, window->capacity);
+	clone->duration = zbx_strdup(NULL, window->duration);
+	clone->event_count_tag = zbx_strdup(NULL, window->event_count_tag);
+	clone->formula = zbx_strdup(NULL, window->formula);
+	clone->script = zbx_strdup(NULL, window->script);
+	clone->group_tag = zbx_strdup(NULL, window->group_tag);
+
+	return clone;
 }
 
 static zbx_cep_rule_t	*cep_rule_create(zbx_uint64_t ruleid)
@@ -66,8 +100,8 @@ static void	cep_rule_release(zbx_cep_rule_t *rule)
 	for (int i = 0; i < rule->conditions.values_num; i++)
 		cep_condition_clear(&rule->conditions.values[i]);
 
+	cep_window_free(rule->window);
 	zbx_vector_cep_condition_destroy(&rule->conditions);
-
 	zbx_free(rule->formula);
 
 	zbx_free(rule);
@@ -95,6 +129,8 @@ static zbx_cep_rule_t	*cep_rule_clone(const zbx_cep_rule_t *rule)
 			cep_cond->value2_str = zbx_strdup(NULL, cep_cond->value2_str);
 	}
 
+	clone->window = cep_window_clone(rule->window);
+
 	return clone;
 }
 
@@ -115,6 +151,18 @@ static zbx_cep_rule_t	*cep_acquire_rule(zbx_cep_rule_ref_t *ref, zbx_uint64_t re
 	ref->rule->revision = revision;
 
 	return ref->rule;
+}
+
+static zbx_cep_rule_t	*cep_acquire_rule_by_id(zbx_cep_config_t *cep_config, zbx_uint64_t ruleid,
+		zbx_uint64_t revision)
+{
+	zbx_cep_rule_ref_t	ref_local, *ref;
+
+	ref_local.ruleid = ruleid;
+	if (NULL == (ref = (zbx_cep_rule_ref_t *)zbx_hashset_search(&cep_config->rules, &ref_local)))
+		return NULL;
+
+	return cep_acquire_rule(ref, revision);
 }
 
 static void	cep_rule_ref_clear(void *a)
@@ -290,16 +338,11 @@ static int	cep_condition_compare_by_type(const void *a1, const void *a2)
 static zbx_cep_condition_t	*cep_acquire_condition(zbx_cep_config_t *cep_config, zbx_uint64_t ruleid,
 		zbx_uint64_t conditionid, zbx_uint64_t revision, zbx_vector_cep_rule_ptr_t *rules)
 {
-	zbx_cep_rule_ref_t	ref_local, *ref;
 	zbx_cep_rule_t		*rule;
 	int			index;
 	zbx_cep_condition_t	condition_local = {.conditionid = conditionid};
 
-	ref_local.ruleid = ruleid;
-	if (NULL == (ref = (zbx_cep_rule_ref_t *)zbx_hashset_search(&cep_config->rules, &ref_local)))
-		return NULL;
-
-	rule = cep_acquire_rule(ref, revision);
+	rule = cep_acquire_rule_by_id(cep_config, ruleid, revision);
 
 	if (FAIL == (index = zbx_vector_cep_condition_search(&rule->conditions, condition_local,
 			cep_condition_compare_by_id)))
@@ -582,7 +625,80 @@ static void	cep_update_formulas(zbx_cep_config_t *cep_config, zbx_vector_cep_rul
 	zbx_free(str);
 }
 
-void	cep_config_sync(zbx_dbsync_t *rule_sync, zbx_dbsync_t *condition_sync, zbx_uint64_t revision)
+static void	cep_sync_windows(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, zbx_uint64_t revision)
+{
+	char		**row;
+	zbx_uint64_t	rowid;
+	unsigned char	tag;
+	int		ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_dcsync_sync_start(sync, dbconfig_used_size());
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		zbx_cep_rule_t		*rule;
+		zbx_uint64_t		ruleid;
+		zbx_cep_window_t	*window;
+		zbx_uint32_t		group_by = ZBX_CEP_GROUP_BY_NONE;
+
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(ruleid, row[0]);
+		if (NULL == (rule = cep_acquire_rule_by_id(cep_config, ruleid, revision)))
+			continue;
+
+		if (NULL == rule->window)
+			rule->window = (zbx_cep_window_t *)zbx_calloc(NULL, 1, sizeof(zbx_cep_window_t));
+
+		window = rule->window;
+
+		window->type = atoi(row[1]);
+		ZBX_DBROW2STR(window->duration, row[2]);
+		ZBX_DBROW2STR(window->capacity, row[3]);
+		window->evaltype = atoi(row[4]);
+		ZBX_DBROW2STR(window->formula, row[5]);
+		ZBX_DBROW2STR(window->script, row[6]);
+
+		if (0 != atoi(row[7]))
+			group_by |= ZBX_CEP_GROUP_BY_HOSTGROUP;
+		if (0 != atoi(row[8]))
+			group_by |= ZBX_CEP_GROUP_BY_HOST;
+		if (0 != atoi(row[9]))
+			group_by |= ZBX_CEP_GROUP_BY_TAG;
+		window->group_by = group_by;
+		ZBX_DBROW2STR(window->group_tag, row[10]);
+		ZBX_DBROW2STR(window->event_count_tag, row[11]);
+	}
+
+	/* remove deleted correlations */
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		zbx_cep_rule_t	*rule;
+
+		if (NULL == (rule = cep_acquire_rule_by_id(cep_config, rowid, revision)))
+			continue;
+
+		if (NULL != rule->window)
+		{
+			cep_window_free(rule->window);
+			rule->window = NULL;
+		}
+	}
+
+	if (0 != sync->add_num + sync->update_num + sync->remove_num)
+		cep_config->revision = revision;
+
+	zbx_dcsync_sync_end(sync, dbconfig_used_size());
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+void	cep_config_sync(zbx_dbsync_t *rule_sync, zbx_dbsync_t *condition_sync, zbx_dbsync_t *window_sync,
+		zbx_uint64_t revision)
 {
 	zbx_vector_cep_rule_ptr_t	rules, *prules = NULL;
 	zbx_cep_config_t		*cep_config = dc_local()->cep_config;
@@ -595,6 +711,7 @@ void	cep_config_sync(zbx_dbsync_t *rule_sync, zbx_dbsync_t *condition_sync, zbx_
 
 	cep_sync_rules(cep_config, rule_sync, revision, prules);
 	cep_sync_conditions(cep_config, condition_sync, revision, prules);
+	cep_sync_windows(cep_config, window_sync, revision);
 
 	cep_update_formulas(cep_config, prules);
 	cep_config_update_handle(cep_config, revision);

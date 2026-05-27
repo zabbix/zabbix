@@ -7463,7 +7463,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync,
 			drules_sync, dchecks_sync, httptest_sync, httptest_field_sync, httpstep_sync,
 			httpstep_field_sync, autoreg_host_sync, connector_sync, connector_tag_sync, proxy_sync,
-			proxy_group_sync, hp_sync, autoreg_config_sync, cep_rule_sync, cep_condition_sync;
+			proxy_group_sync, hp_sync, autoreg_config_sync, cep_rule_sync, cep_condition_sync,
+			cep_window_sync;
 	zbx_uint64_t	update_flags = 0;
 	zbx_int64_t	used_size, update_size = 0, topology_size = 0, timers_size = 0, um_cache_dup_size = 0;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
@@ -7542,6 +7543,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	zbx_dbsync_init(&action_sync, "actions", mode, db);
 	zbx_dbsync_init_changelog(&cep_rule_sync, "cep_rule", changelog_sync_mode, db);
 	zbx_dbsync_init_changelog(&cep_condition_sync, "cep_condition", changelog_sync_mode, db);
+	zbx_dbsync_init_changelog(&cep_window_sync, "cep_window", changelog_sync_mode, db);
 
 	/* Action operation sync produces virtual rows with two columns - actionid, opflags. */
 	/* Because of this it cannot return the original database select and must always be  */
@@ -7830,7 +7832,10 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	if (FAIL == zbx_dbsync_prepare_cep_condition(&cep_condition_sync))
 		goto out;
 
-	cep_config_sync(&cep_rule_sync, &cep_condition_sync, new_revision);
+	if (FAIL == zbx_dbsync_prepare_cep_rule(&cep_window_sync))
+		goto out;
+
+	cep_config_sync(&cep_rule_sync, &cep_condition_sync, &cep_window_sync, new_revision);
 
 	START_SYNC;
 

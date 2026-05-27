@@ -75,10 +75,11 @@
 #define ZBX_DBSYNC_OBJ_TRIGGER_DEP	22
 #define ZBX_DBSYNC_OBJ_CEP_RULE		23
 #define ZBX_DBSYNC_OBJ_CEP_CONDITION	24
+#define ZBX_DBSYNC_OBJ_CEP_WINDOW	25
 
-#define ZBX_DBSYNC_OBJ_ITEM_DISCOVERY	25	/* virtual object */
+#define ZBX_DBSYNC_OBJ_ITEM_DISCOVERY	26	/* virtual object */
 /* number of dbsync objects - keep in sync with above defines */
-#define ZBX_DBSYNC_OBJ_COUNT		25
+#define ZBX_DBSYNC_OBJ_COUNT		26
 
 /******************************************************************************
  *                                                                            *
@@ -267,6 +268,7 @@ int	zbx_dbsync_prepare_host_proxy(zbx_dbsync_t *sync);
 
 int	zbx_dbsync_prepare_cep_rule(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_cep_condition(zbx_dbsync_t *sync);
+int	zbx_dbsync_prepare_cep_window(zbx_dbsync_t *sync);
 
 void	zbx_dcsync_sql_start(zbx_dbsync_t *sync);
 void	zbx_dcsync_sql_end(zbx_dbsync_t *sync);

@@ -1748,4 +1748,10 @@ zbx_cep_config_handle_t	zbx_cep_config_open(void);
 void	zbx_cep_config_close(zbx_cep_config_handle_t handle);
 const zbx_vector_cep_rule_ptr_t	*zbx_cep_config_get_rules(zbx_cep_config_handle_t handle);
 
+#define ZBX_CEP_GROUP_BY_NONE		0x00
+#define ZBX_CEP_GROUP_BY_HOSTGROUP	0x01
+#define ZBX_CEP_GROUP_BY_HOST		0x02
+#define ZBX_CEP_GROUP_BY_TAG		0x04
+
+
 #endif

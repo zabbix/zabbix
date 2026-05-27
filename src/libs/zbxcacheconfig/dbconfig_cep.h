@@ -38,14 +38,15 @@ ZBX_VECTOR_DECL(cep_condition, zbx_cep_condition_t)
 
 typedef struct
 {
-	int	duration;
-	int	capacity;
-	int	evaltype;
-	int	group_by;
-	char	*formula;
-	char	*symptom_tag_num;
-	char	*script;
-	char	*group_tag;
+	int		type;
+	int		evaltype;
+	zbx_uint32_t	group_by;
+	char		*duration;
+	char		*capacity;
+	char		*formula;
+	char		*event_count_tag;
+	char		*script;
+	char		*group_tag;
 }
 zbx_cep_window_t;
 
@@ -57,6 +58,8 @@ struct zbx_cep_rule
 	int			status;
 	int			stop;
 	int			sortorder;
+
+	zbx_cep_window_t	*window;
 
 	zbx_vector_cep_condition_t	conditions;
 
@@ -98,6 +101,7 @@ zbx_cep_config_t;
 zbx_cep_config_t	*cep_config_create(void);
 void	cep_config_destroy(zbx_cep_config_t *cep_config);
 
-void	cep_config_sync(zbx_dbsync_t *rule_sync, zbx_dbsync_t *condition_sync, zbx_uint64_t revision);
+void	cep_config_sync(zbx_dbsync_t *rule_sync, zbx_dbsync_t *condition_sync, zbx_dbsync_t *window_sync,
+		zbx_uint64_t revision);
 
 #endif
