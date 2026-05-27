@@ -82,7 +82,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 
 		$columns = $columns
 			? array_filter($columns, static function ($column) {
-				return array_key_exists('itemid', $column) && $column['itemid'] !== '';
+				return array_key_exists('itemid', $column);
 			})
 			: [];
 

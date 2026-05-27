@@ -1254,19 +1254,19 @@ class CDiscoveryRule extends CItemGeneral {
 			]],
 			'opperiod' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'operationobject', 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE])], 'type' => API_OBJECT, 'fields' => [
-											'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('lld_override_opperiod', 'delay')]
+											'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('lld_override_opperiod', 'delay')]
 										]],
 										['else' => true, 'type' => API_OBJECT, 'fields' => []]
 			]],
 			'ophistory' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'operationobject', 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE])], 'type' => API_OBJECT, 'fields' => [
-											'history' =>		['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_ophistory', 'history')]
+											'history' =>		['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_ophistory', 'history')]
 										]],
 										['else' => true, 'type' => API_OBJECT, 'fields' => []]
 			]],
 			'optrends' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'operationobject', 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE])], 'type' => API_OBJECT, 'fields' => [
-											'trends' =>			['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_optrends', 'trends')]
+											'trends' =>			['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_optrends', 'trends')]
 										]],
 										['else' => true, 'type' => API_OBJECT, 'fields' => []]
 			]],

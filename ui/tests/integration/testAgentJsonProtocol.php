@@ -127,7 +127,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 		self::$agent_script_output_file = '/tmp/agent_script_exec_' . $now->format('Hms_dmy');
 		$response = $this->call('script.create', [
 			'name' => 'Timeout test: script on agent',
-			'command' => 'sleep ' . self::SCRIPT_OUTPUT_TIMEOUT .' && echo 1 > ' . self::$agent_script_output_file ,
+			'command' => 'sleep ' . self::SCRIPT_OUTPUT_TIMEOUT .' && echo 1 > ' . self::$agent_script_output_file,
 			'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT,
 			'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 			'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT

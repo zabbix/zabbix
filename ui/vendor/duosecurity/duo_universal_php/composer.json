@@ -20,7 +20,7 @@
         "php": ">=7.4",
         "ext-curl": "*",
         "ext-json": "*",
-        "firebase/php-jwt": "^6.0"
+        "firebase/php-jwt": "^6.0 || ^7.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.0",

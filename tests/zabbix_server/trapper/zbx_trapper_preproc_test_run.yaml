@@ -1562,5 +1562,42 @@ out:
   return: SUCCEED
   expected_len: 524288
   expected_truncated: true
+---
+test case: 'throttle of convertible string and float values should be compared as floats (I)'
+# Tests for function item_preproc_throttle_value() are located in file
+# tests/libs/zbxpreproc/zbx_item_preproc.yaml.
+# This test cannot be implemented in that file because in 7.0 the item_preproc_throttle_value()
+# outputs the input value (e.g. 000000050000002900000019) instead of history value
+# (e.g. 50000002900000016, after converting 000000050000002900000019 to 'double') if throttling
+# takes place. As a workaround the test is here, in trapper preprocessor tests.
+in:
+  request: |
+    {
+      "data": {
+        "item": {
+          "steps": [
+            {
+              "type": "19",
+              "params": "",
+              "error_handler": "1",
+              "error_handler_params":""
+            }
+          ],
+          "value_type": "0",
+          "value": "000000050000002900000019"
+        }
+      },
+      "request": "preprocessing.test",
+      "sid": "400b58fe5ca56f23553bc68b35c9b571"
+    }
+out:
+  return: SUCCEED
+  response: | # Both 50000002900000019 and 50000002900000012 result in 50000002900000016 after converting to double
+    {
+      "steps":[
+        {"result":"50000002900000016"}
+      ],
+      "result": "50000002900000016"
+    }
 ...
 

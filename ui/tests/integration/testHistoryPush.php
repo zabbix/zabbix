@@ -646,4 +646,29 @@ class testHistoryPush extends CIntegrationTest {
 			]
 		]);
 	}
+
+	public function testHistoryPush_LargePayloadMemoryLeak() {
+		if (CAPIHelper::getSessionId() === null) {
+			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+		}
+
+		$large_history_data = [];
+
+		for ($i = 0; $i < 250; $i++) {
+			$large_history_data[] = [
+				'itemid' => self::$itemids['trapper_uint'],
+				'value' => rand(1, 1000),
+				'clock' => time() - $i,
+				'ns' => 0
+			];
+		}
+
+		$response = CAPIHelper::call('history.push', $large_history_data);
+
+		$this->checkResult($response);
+
+		$this->assertArrayHasKey('data', $response['result']);
+		$this->assertCount(250, $response['result']['data'], 'Server did not process all items in the large payload');
+		$this->assertArrayNotHasKey('error', $response['result']['data'][0]);
+	}
 }

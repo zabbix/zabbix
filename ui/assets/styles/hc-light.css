@@ -6262,6 +6262,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     .overlay-dialogue.modal-popup.modal-popup-static {
       max-width: 700px;
       width: 100%; }
+      .overlay-dialogue.modal-popup.modal-popup-static.modal-popup-sla-edit, .overlay-dialogue.modal-popup.modal-popup-static.modal-popup-proxy-edit, .overlay-dialogue.modal-popup.modal-popup-static.modal-popup-connector-edit {
+        max-width: 750px; }
     .overlay-dialogue.modal-popup.modal-popup-preprocessing {
       max-width: 900px;
       width: 100%; }
@@ -6633,6 +6635,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   margin: 10px;
   background-color: #f4f4f4;
   border: 1px solid #9f9f9f; }
+  .debug-output.debug-output-table-refresh {
+    margin: 10px 0 0 0; }
 
 .overlay-descr {
   max-height: 150px;

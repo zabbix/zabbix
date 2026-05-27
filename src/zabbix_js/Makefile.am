@@ -9,7 +9,6 @@ zabbix_js_LDADD = \
 	$(top_srcdir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
@@ -23,6 +22,7 @@ zabbix_js_LDADD = \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \

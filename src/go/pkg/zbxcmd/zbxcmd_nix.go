@@ -46,6 +46,7 @@ func (*ZBXExec) execute(s string, timeout time.Duration, path string, strict boo
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
+	//nolint:gosec,noctx // intended behavior, might require refactoring for CommandContext.
 	cmd := exec.Command("sh", "-c", s)
 	cmd.Dir = path
 
