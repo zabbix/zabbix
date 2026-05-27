@@ -20,7 +20,6 @@
 #include "zbxvariant.h"
 #include "zbxeval.h"
 
-//#include "zbx_variant_common.h"
 #include "zbxmockvariant.h"
 
 void	zbx_mock_test_entry(void **state)
