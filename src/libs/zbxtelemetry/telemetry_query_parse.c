@@ -822,8 +822,13 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 				return ret_errf(FAIL, error, max_error_len,
 						"operator \"exists\" selected for non-attribute condition #%d", i);
 
-			/* TODO: maybe add failing validation if operator is contains/not_contains and column */
-			/* is not simple (because of elasticsearch limitation) */
+			if (SUCCEED == tq_column_type_is_attributes(column_type) &&
+					(ZBX_TQ_OPERATOR_CONTAINS == condition->operator ||
+					ZBX_TQ_OPERATOR_NOT_CONTAINS == condition->operator))
+				return ret_errf(FAIL, error, max_error_len,
+						"operator \"%s\" selected for attribute condition #%d",
+						(ZBX_TQ_OPERATOR_CONTAINS == condition->operator ? "contains" :
+						"not contains"), i);
 		}
 	}
 

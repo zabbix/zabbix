@@ -509,12 +509,6 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 static char	*tq_sql_dyn_get_atom_condition(const char *atom, const char *key, const char *value,
 		zbx_tq_operator_t operator, zbx_tq_db_type_t db_type)
 {
-	if (ZBX_TQ_OPERATOR_UNKNOWN == operator)
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		return zbx_strdup(NULL, "");
-	}
-
 	if (ZBX_TQ_OPERATOR_EQUAL == operator || ZBX_TQ_OPERATOR_NOT_EQUAL == operator)
 	{
 		char	*str;
