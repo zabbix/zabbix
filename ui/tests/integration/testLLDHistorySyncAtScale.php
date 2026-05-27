@@ -470,10 +470,8 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				$other_hosts[] = $h;
 			}
 		}
-		if (!empty($other_hosts)) {
-			$this->markTestSkipped('Unexpected enabled hosts present (would pollute zabbix[queue,3,]): '
-				.json_encode($other_hosts));
-		}
+		$this->assertEmpty($other_hosts,
+			'Unexpected enabled hosts present (would pollute zabbix[queue,15,]): '.json_encode($other_hosts));
 
 		$this->verifyValueOmittedDrainsDelay();
 	}
