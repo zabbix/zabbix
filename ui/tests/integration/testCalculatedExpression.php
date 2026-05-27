@@ -682,6 +682,19 @@ class testCalculatedExpression extends CIntegrationTest {
 			$values
 		);
 
+		for ($i = 0; $i < 120; $i++) {
+			$item = $this->call('item.get', [
+				'output' => ['state'],
+				'itemids' => [$calcItemId]
+			])['result'][0];
+
+			if ((int)$item['state'] === 0) {
+				break;
+			}
+
+			usleep(500000);
+		}
+
 		// wait for calculated item to process
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "zbx_expression_eval_execute() expression:" .
 			"'histogram_quantile(0.25,0.1,last(0),0.5,last(1),1.0,last(2),2.0,last(3),\"+Inf\",last(4))'",
