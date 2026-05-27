@@ -1791,8 +1791,6 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 --------------------------------------------------------------------------------
 Changes for 7.0.27rc1
 
-New features:
-
 Bug fixes:
 ........S. [ZBX-22504] improved memory usage in LLD worker processes with large low-level discovery (vso)
 A......... [ZBX-27780] restored support of LLD macros in LLD rule override operations Update interval, History, and Trends (dpankins)
