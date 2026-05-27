@@ -21,7 +21,8 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * history and trends without triggers, then adding last()- and nodata()-based
  * trigger prototypes and verifying firing, recovery, UNKNOWN state, proxy
  * lastaccess, behavior across server restarts and final LLD cleanup.
- * For minimal test run as (LLDDiscovery|HistoryPrepare|HistoryPastSend|HistoryPastVpsWritten|HistoryPastVerify)
+ * For minimal test run as '/testLLDHistorySyncAtScale_(LLDDiscovery|HistoryPrepare|HistoryPastSend|HistoryPastVpsWritten|HistoryPastVerify|HistoryNowSend|HistoryNowVpsWritten|HistoryNowVerify)$/'
+
  *
  * @required-components server
  * @suite-components-reuse true
@@ -71,7 +72,10 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				'HistoryIndexCacheSize' => '32M',
 				'ValueCacheSize' => '128M',
 				'LogSlowQueries' => '60000',
-				'StartDBSyncers' => '32' /* LLD_DISCOVERY_COUNT * types / ZBX_HC_SYNC_MAX  */
+				'StartDBSyncers' => '32' /* LLD_DISCOVERY_COUNT * types / ZBX_HC_SYNC_MAX */
+				/*'HistoryProvider'=> [
+					'clickhouse;value_types="uint,dbl,str,log,text,json",url=http://localhost:8123,db=zabbix,username=zabbix,password=zabbix'
+				]*/
 			]
 		];
 	}
@@ -1376,7 +1380,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 
 	private function getDelayedItemsCount(): int {
 		$result = $this->testItemOnServer((string) self::$hostid,
-			['value_type' => ITEM_VALUE_TYPE_UINT64, 'type' => ITEM_TYPE_INTERNAL, 'key' => 'zabbix[queue,3,]']
+			['value_type' => ITEM_VALUE_TYPE_UINT64, 'type' => ITEM_TYPE_INTERNAL, 'key' => 'zabbix[queue,15,]']
 		);
 		$this->assertNotFalse($result);
 		$this->assertArrayHasKey('item', $result);
