@@ -670,7 +670,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, const zbx_vector_u
 			discovery_update_host_cb(handle, result->druleid, result->ip, result->dnsname, host_status,
 					result->now);
 
-			if (ZBX_DISCOVERER_RESULT_CHECK_LAST == (result->status & ZBX_DISCOVERER_RESULT_CHECK_LAST))
+			if (0 != (result->status & ZBX_DISCOVERER_RESULT_CHECK_LAST))
 				discovery_update_hosts_cb(result-> druleid, result->now, events_cbs->add_event_cb);
 
 			if (NULL != events_cbs->process_events_cb)
