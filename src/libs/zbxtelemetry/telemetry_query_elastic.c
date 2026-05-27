@@ -59,10 +59,10 @@ static void	tq_es_add_condition(const zbx_tq_condition_t *cond, zbx_tq_category_
 	const char		*field = NULL == col_info->es_nested_path ? cond->column_name :
 			col_info->es_nested_subfield;
 
-	if (NULL == cond->key)
-		zbx_strlcpy(buf, field, buf_size);
-	else
+	if (SUCCEED == tq_column_type_is_attributes(cond->col_type))
 		zbx_snprintf(buf, buf_size, "%s.%s", field, cond->key);
+	else
+		zbx_strlcpy(buf, field, buf_size);
 
 	zbx_json_addobject(j, NULL);
 
@@ -91,7 +91,7 @@ static void	tq_es_add_condition(const zbx_tq_condition_t *cond, zbx_tq_category_
 		char	*value_esc = tq_es_escape_wildcard_pattern_dyn(cond->value);
 		char	*pattern = zbx_dsprintf(NULL, "*%s*", value_esc);
 
-		if (NULL != cond->key)
+		if (SUCCEED == tq_column_type_is_attributes(cond->col_type))
 			THIS_SHOULD_NEVER_HAPPEN_MSG("wildcard queries are not supported on flattened fields");
 
 		zbx_json_addobject(j, "wildcard");
@@ -317,10 +317,10 @@ static void	tq_es_add_columns(const zbx_vector_tq_column_t *cols, struct zbx_jso
 
 		zbx_json_addobject(j, "terms");
 
-		if (NULL == cols->values[i].key)
-			zbx_strlcpy(buf, cols->values[i].name, buf_size);
-		else
+		if (SUCCEED == tq_column_type_is_attributes(cols->values[i].col_type))
 			zbx_snprintf(buf, buf_size, "%s.%s", cols->values[i].name, cols->values[i].key);
+		else
+			zbx_strlcpy(buf, cols->values[i].name, buf_size);
 
 		zbx_json_addstring(j, "field", buf, ZBX_JSON_TYPE_STRING);
 

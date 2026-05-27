@@ -37,8 +37,9 @@ void	tq_query_init(zbx_tq_query_t *query)
 
 void	tq_column_init(zbx_tq_column_t *column)
 {
-	column->name	= NULL;
-	column->key	= NULL;
+	column->name		= NULL;
+	column->col_type	= ZBX_TQ_COLUMN_TYPE_UNKNOWN;
+	column->key		= NULL;
 }
 
 void	tq_column_clean(zbx_tq_column_t *column)
@@ -50,6 +51,7 @@ void	tq_column_clean(zbx_tq_column_t *column)
 void	tq_aggr_column_init(zbx_tq_aggr_column_t *aggr_column)
 {
 	aggr_column->column_name	= NULL;
+	aggr_column->col_type		= ZBX_TQ_COLUMN_TYPE_UNKNOWN;
 	aggr_column->function		= ZBX_TQ_FUNCTION_UNKNOWN;
 	zbx_vector_str_create(&aggr_column->args);
 	aggr_column->alias		= NULL;
@@ -67,6 +69,7 @@ void	tq_aggr_column_clean(zbx_tq_aggr_column_t *aggr_column)
 void	tq_condition_init(zbx_tq_condition_t *condition)
 {
 	condition->column_name	= NULL;
+	condition->col_type	= ZBX_TQ_COLUMN_TYPE_UNKNOWN;
 	condition->key		= NULL;
 	condition->value	= NULL;
 	condition->operator	= ZBX_TQ_OPERATOR_UNKNOWN;
@@ -144,7 +147,7 @@ void	zbx_tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t now,
 
 char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col)
 {
-	if (NULL != col->key)
+	if (SUCCEED == tq_column_type_is_attributes(col->col_type))
 		return zbx_dsprintf(NULL, "%s.%s", col->name, col->key);
 	else
 		return zbx_strdup(NULL, col->name);
@@ -154,15 +157,19 @@ static int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void 
 {
 	const zbx_tq_condition_t	*cond_a = *(const zbx_tq_condition_t * const *)a;
 	const zbx_tq_condition_t	*cond_b = *(const zbx_tq_condition_t * const *)b;
+	int				is_attr_a, is_attr_b;
 
 	int	column_name_cmp_res = strcmp(cond_a->column_name, cond_b->column_name);
 
 	if (0 != column_name_cmp_res)
 		return column_name_cmp_res;
 
-	if (NULL == cond_a->key || NULL == cond_b->key)
+	is_attr_a = tq_column_type_is_attributes(cond_a->col_type);
+	is_attr_b = tq_column_type_is_attributes(cond_b->col_type);
+
+	if (SUCCEED != is_attr_a || SUCCEED != is_attr_b)
 	{
-		if (cond_a->key != cond_b->key)
+		if (!(SUCCEED != is_attr_a && SUCCEED != is_attr_b))
 			THIS_SHOULD_NEVER_HAPPEN;
 
 		return column_name_cmp_res;

@@ -22,6 +22,18 @@ typedef int	(*zbx_tq_macro_expand_func_t)(char **text, void *ctx);
 
 typedef enum
 {
+	ZBX_TQ_COLUMN_TYPE_UNKNOWN,
+	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,
+	ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,
+	ZBX_TQ_COLUMN_TYPE_STR,
+	ZBX_TQ_COLUMN_TYPE_ARRAY_STR,
+	ZBX_TQ_COLUMN_TYPE_NUM,
+	ZBX_TQ_COLUMN_TYPE_ARRAY_NUM,
+}
+zbx_tq_column_type_t;
+
+typedef enum
+{
 	ZBX_TQ_CATEGORY_UNKNOWN = 0,
 	ZBX_TQ_CATEGORY_APM_TRACES,
 	ZBX_TQ_CATEGORY_APM_METRICS,
@@ -74,8 +86,9 @@ zbx_tq_operator_t;
 
 typedef struct
 {
-	char	*name;
-	char	*key;
+	char			*name;
+	zbx_tq_column_type_t	col_type; /* stored here in order to not look it up every time */
+	char			*key;
 }
 zbx_tq_column_t;
 
@@ -84,6 +97,7 @@ ZBX_VECTOR_DECL(tq_column, zbx_tq_column_t)
 typedef struct
 {
 	char			*column_name;
+	zbx_tq_column_type_t	col_type; /* stored here in order to not look it up every time */
 	zbx_tq_function_type_t	function;
 	zbx_vector_str_t	args;
 	char			*alias;
@@ -95,6 +109,7 @@ ZBX_VECTOR_DECL(tq_aggr_column, zbx_tq_aggr_column_t)
 typedef struct
 {
 	char			*column_name;
+	zbx_tq_column_type_t	col_type; /* stored here in order to not look it up every time */
 	char			*key;
 	char			*value;
 	zbx_tq_operator_t	operator;

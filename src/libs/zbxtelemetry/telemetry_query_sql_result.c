@@ -58,9 +58,8 @@ int	zbx_tq_parse_sql_result(const zbx_tq_query_t *query, zbx_db_result_t result,
 		{
 			const zbx_tq_column_t	*col = &query->columns.values[i];
 			char			*field_name = tq_get_result_field_name_dyn(col);
-			zbx_json_type_t		type = TQ_COLUMN_TYPE_NUM ==
-					tq_get_column_type(query->category, query->metric_type, col->name)
-					? ZBX_JSON_TYPE_NUMBER : ZBX_JSON_TYPE_STRING;
+			zbx_json_type_t		type = ZBX_TQ_COLUMN_TYPE_NUM == col->col_type ? ZBX_JSON_TYPE_NUMBER :
+					ZBX_JSON_TYPE_STRING;
 
 			zbx_json_addstring(&j, field_name, row[col_idx++], type);
 
