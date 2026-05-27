@@ -760,7 +760,7 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 
 			if (NULL != conn->resp.page.data)
 			{
-				history_clickhouse_add_error(error, ", ClickHouse error: %s",
+				history_clickhouse_add_error(error, "ClickHouse error: %s",
 						conn->resp.page.data);
 			}
 
