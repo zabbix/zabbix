@@ -12,8 +12,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxvariant.h"
+#include "zbxeval.h"
 
+#include "zbxvariant.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxjson.h"
