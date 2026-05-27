@@ -614,17 +614,21 @@ out:
 test case: Regexp full-string match enforced - substring pattern does not match key with params
 in:
   rules:
-    - pattern: 'system\.run'
+    - pattern: '^system\.run$'
       type: ZBX_KEY_ACCESS_ALLOW_REGEXP
+    - pattern: '*'
+      type: ZBX_KEY_ACCESS_DENY
 out:
   number_of_rules: 2
   metrics:
+    - metric: 'system.run'
+      result: ZBX_KEY_ACCESS_ALLOW
     - metric: 'system.run[echo 1]'
       result: ZBX_KEY_ACCESS_DENY
     - metric: 'system.run[/bin/hostname]'
       result: ZBX_KEY_ACCESS_DENY
     - metric: 'vfs.file.size[/tmp/x]'
-      result: ZBX_KEY_ACCESS_ALLOW
+      result: ZBX_KEY_ACCESS_DENY
 ---
 test case: Regexp invalid pattern fails on rule add
 in:
