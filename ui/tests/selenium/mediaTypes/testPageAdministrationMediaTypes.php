@@ -484,9 +484,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			);
 		}
 		else {
-			// Gmail and Office365 media types cannot be mass updated as they have an empty mandatory password by default.
-			$expected_count = ($action === 'enable' && CTestArrayHelper::get($data, 'select_all')) ? 2 : 0;
-			$this->assertEquals($expected_count, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status<>'.$status));
+			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status<>'.$status));
 		}
 	}
 

@@ -40,6 +40,7 @@ window.host_prototype_edit_popup = new class {
 		this.all_templateids = null;
 		this.show_inherited_tags = false;
 		this.tags_table = this.form_element.querySelector('.tags-table');
+		this.tags_abort_controller = null;
 		this.show_inherited_macros = false;
 		this.parent_hostid = parent_hostid;
 
@@ -398,12 +399,20 @@ window.host_prototype_edit_popup = new class {
 			templateids: this.#getAllTemplates(),
 			show_inherited_tags: fields.show_inherited_tags,
 			tags: fields.tags
+		};
+
+		if (this.tags_abort_controller !== null) {
+			this.tags_abort_controller.abort();
 		}
+
+		const abort_controller = new AbortController();
+		this.tags_abort_controller = abort_controller;
 
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
+			body: JSON.stringify(data),
+			signal: abort_controller.signal
 		})
 			.then(response => response.json())
 			.then(response => {
@@ -416,11 +425,20 @@ window.host_prototype_edit_popup = new class {
 				}
 			})
 			.catch((message) => {
+				if (abort_controller.signal.aborted) {
+					return;
+				}
+
 				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});
 				this.form.renderErrors();
 				throw message;
 			})
 			.finally(() => {
+				if (this.tags_abort_controller !== abort_controller) {
+					return;
+				}
+
+				this.tags_abort_controller = null;
 				this.overlay.unsetLoading();
 			});
 	}

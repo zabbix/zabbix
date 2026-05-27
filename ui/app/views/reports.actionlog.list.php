@@ -180,8 +180,7 @@ foreach ($data['alerts'] as $alert) {
 		(new CTag('nav', true,
 			(new CList())
 				->addItem(
-					(new CRedirectButton(_('Export to CSV'), (new CUrl())->setArgument('action', 'actionlog.csv')))
-						->setId('export_csv')
+					new CRedirectButton(_('Export to CSV'), (new CUrl())->setArgument('action', 'actionlog.csv'))
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
