@@ -60,7 +60,8 @@ PostgreSQL:
 - history_json_export_pgsql.sql
 
 These SQL scripts export history data from MySQL or PostgreSQL databases to
-/tmp/<history table>.csv files.
+/tmp/<history table>_clockns.csv files (the clock and ns columns are merged
+into a single clock.ns timestamp column).
 
 MySQL export note:
 The MySQL export scripts use INTO OUTFILE, which writes files on the MySQL server
@@ -70,7 +71,7 @@ side. The output path is determined by the server's secure_file_priv setting
 scripts, or point the import scripts at that directory with the -i|--import-dir
 option (e.g. -i /var/lib/mysql-files). When MySQL runs in Docker, files are
 written inside the container and must be copied to the host:
-docker cp <container>:<secure_file_priv_path>/<table>.csv /tmp/<table>.csv
+docker cp <container>:<secure_file_priv_path>/<table>_clockns.csv /tmp/<table>_clockns.csv
 
 MySQL export example:
 mysql -u<user> -p<password> <database> < history_export_mysql.sql
@@ -86,7 +87,7 @@ Data Import Scripts:
 - history_uint_import.sh
 - history_json_import.sh
 
-These scripts import exported history data from <import dir>/<history table>.csv
+These scripts import exported history data from <import dir>/<history table>_clockns.csv
 into corresponding ClickHouse tables. The import directory defaults to /tmp and
 can be overridden with the -i|--import-dir option.
 
