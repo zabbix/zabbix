@@ -2618,8 +2618,9 @@ class CApiInputValidator {
 	 * @param int    $rule['length']  (optional)
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO,
 	 *                                             API_ALLOW_MANUALINPUT_MACRO, API_ALLOW_EVENT_TAGS_MACRO.
-	 * @param array  $rule['scheme']  (optional) Validate the URL against a provided URI scheme for
-	 *                                frontend usage. If not passed, scheme validation won't take place.
+	 * @param array  $rule['schemes'] (optional) Validate the URL against a provided URI scheme for
+	 *                                frontend usage. If not passed, scheme validation will take place against
+	 *                                allowed URI schemes in Settings.
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -2649,8 +2650,11 @@ class CApiInputValidator {
 			'allow_event_tags_macro' => (bool) ($flags & API_ALLOW_EVENT_TAGS_MACRO)
 		];
 
-		if (array_key_exists('scheme', $rule) && is_array($rule['scheme'])) {
-			$options['schemes'] = $rule['scheme'];
+		if (array_key_exists('schemes', $rule) && is_array($rule['schemes'])) {
+			$options['schemes'] = $rule['schemes'];
+		}
+		else {
+			$options['schemes'] = CSettingsHelper::getAllowedUriSchemes();
 		}
 
 		$validator = new CUrlValidator($options);
