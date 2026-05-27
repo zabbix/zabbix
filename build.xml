@@ -698,13 +698,11 @@
 			<arg line="--user ${clickhouse_user}:${clickhouse_password}"/>
 			<arg line="--data &quot;CREATE DATABASE ${clickhouse_dbname} COMMENT '${now}'&quot;"/>
 		</exec>
-		<exec executable="sh" outputproperty="clickhouse_url_full">
-			<arg value="-c"/>
-			<arg value='echo "${clickhouse_url}" | sed "s#^http://#http://${clickhouse_user}:${clickhouse_password}@#"'/>
-		</exec>
 		<exec executable="./history_all.sh" dir="database/clickhouse" failonerror="on">
-			<arg line="--url ${clickhouse_url_full}"/>
+			<arg line="--server ${clickhouse_url}"/>
 			<arg line="--db ${clickhouse_dbname}"/>
+			<arg line="--user ${clickhouse_user}"/>
+			<arg line="--password ${clickhouse_password}"/>
 		</exec>
 	</target>
 

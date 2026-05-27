@@ -24,10 +24,11 @@ Usage:
 Parameters:
 -s|--server: ClickHouse URL (default: http://localhost:8123)
 -d|--db: Database name (default: zabbix)
--u|--username: ClickHouse username (default: empty, unauthenticated)
+-u|--user: ClickHouse username (default: empty, unauthenticated)
 -p|--password: ClickHouse password (default: empty)
 -t|--ttl: Housekeeping interval in seconds (default: 2678400 (31 days))
 -P|--partition: Partitioning schema (default: toDate (by days))
+-i|--import-dir: Directory with the exported CSV files (default: /tmp)
 -h|--help: Display help message
 
 Example:
