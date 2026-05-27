@@ -490,6 +490,9 @@ New features:
 A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27759] added sanitization of service parameter in Oracle TNS connection string creation process (opucka)
+..F....... [ZBX-27760] wrapped html content into iframe when "show as html" is selected in Item history widget (dfofanovs)
+..F....... [ZBX-27758] fixed XSS vulnerability in Host navigator widget maintenance tooltip (aluchko)
 ..F....... [ZBX-27423] fixed graph rendering for items using throttling (Sasha)
 .......PS. [ZBX-27067] fixed script macros expanding via Zabbix proxy during autoregistration (vsmelovs)
 .......PS. [ZBX-27406] fixed dependent item error message clearing in preprocessing (askolmeisters)
@@ -1903,6 +1906,9 @@ New features:
 A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27759] added sanitization of service parameter in Oracle TNS connection string creation process (opucka)
+..F....... [ZBX-27760] wrapped html content into iframe when "show as html" is selected in Item history widget (dfofanovs)
+..F....... [ZBX-27758] fixed XSS vulnerability in Host navigator widget maintenance tooltip (aluchko)
 .......PS. [ZBX-27067] fixed script macros expanding via Zabbix proxy during autoregistration (vsmelovs)
 .......PS. [ZBX-27406] fixed dependent item error message clearing in preprocessing (askolmeisters)
 ..F....... [ZBX-25930] fixed incorrect filter being applied when switching subfilters in multiple tabs in Data collection->Hosts->Items, Monitoring->Hosts->Graphs (gberzina)
@@ -5906,6 +5912,8 @@ New features:
 A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27759] added sanitization of service parameter in Oracle TNS connection string creation process (opucka)
+..F....... [ZBX-27760] wrapped html content into iframe when "show as html" is selected in Item history widget (dfofanovs)
 ...G...... [ZBX-25805] fixed regexp runtime error when processing log* items with unspecified encoding by sanitizing invalid UTF-8 (vsmelovs)
 ...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
 ..F....... [ZBX-27819] updated onelogin/php-saml to version 4.3.1 (gcalenko)
