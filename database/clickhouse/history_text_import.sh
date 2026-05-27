@@ -3,4 +3,4 @@
 DIR="$(dirname "$0")"
 . "$DIR/clickhouse.sh"
 
-curl $CH_CURL_AUTH -X POST "$CH_URL?query=INSERT%20INTO%20$CH_DB.history_text%20FORMAT%20CSV" -T /tmp/history_text.csv
+curl $CH_CURL_AUTH -X POST "$CH_URL?query=INSERT%20INTO%20$CH_DB.history_text%20FORMAT%20CSV" -T "$CH_IMPORT_DIR/history_text.csv"

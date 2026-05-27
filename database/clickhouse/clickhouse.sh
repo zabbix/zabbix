@@ -7,6 +7,7 @@ display_help()
 	printf "  %-16s %s\n" "-p|--password" "ClickHouse password"
 	printf "  %-16s %s\n" "-t|--ttl" "Housekeeping interval in seconds ($CH_TTL)"
 	printf "  %-16s %s\n" "-P|--partition" "Partitioning schema ($CH_PARTITION)"
+	printf "  %-16s %s\n" "-i|--import-dir" "Directory with the exported CSV files ($CH_IMPORT_DIR)"
 	printf "  %-16s %s\n" "-h|--help" "Help message"
 
 	exit 0
@@ -21,6 +22,9 @@ CH_PASSWORD=""
 CH_TTL="2678400"
 
 CH_PARTITION="toDate"
+
+# directory with the exported CSV files
+CH_IMPORT_DIR="/tmp"
 
 if [ $# -eq 0 ]; then
 	display_help
@@ -56,6 +60,10 @@ while [ $# -gt 0 ]; do
 	-P|--partition)
 		shift
 		CH_PARTITION=$1
+		;;
+	-i|--import-dir)
+		shift
+		CH_IMPORT_DIR=$1
 		;;
 	-h|--help)
 		display_help
