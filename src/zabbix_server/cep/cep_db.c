@@ -274,13 +274,14 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 		zbx_vector_cep_db_event_recovery_sort(&recoveries, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		zbx_dbconn_prepare_insert(db, &db_insert_event_recovery,  "event_recovery", "eventid",
-			"r_eventid", (char *)NULL);
+			"r_eventid", "userid", "correlationid", (char *)NULL);
 
 		for (int i = 0; i < recoveries.values_num; i++)
 		{
 			zbx_cep_db_event_recovery_t	*recovery = &recoveries.values[i];
 
-			zbx_db_insert_add_values(&db_insert_event_recovery, recovery->p_eventid, recovery->r_eventid);
+			zbx_db_insert_add_values(&db_insert_event_recovery, recovery->p_eventid, recovery->r_eventid,
+					recovery->userid, recovery->correlationid);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update problem set r_eventid=" ZBX_FS_UI64 ",r_clock=%d,r_ns=%d",
