@@ -76,6 +76,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @param string $event['eventid']                   Event ID.
  * @param string $event['r_eventid']                 OK event ID.
  * @param string $event['cause_eventid']             Cause event ID.
+ * @param string $event['cep_ruleid']                OK Event CEP rule ID.
  * @param string $event['correlationid']             OK Event correlation ID.
  * @param string $event['userid']                    User ID who generated the OK event.
  * @param string $event['name']                      Event name.
