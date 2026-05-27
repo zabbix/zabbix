@@ -17,11 +17,6 @@
 require_once __DIR__.'/../include/CAPITest.php';
 require_once __DIR__.'/../../include/classes/api/helpers/CApiTokenHelper.php';
 require_once __DIR__.'/../../include/classes/api/helpers/CApiDpopHelper.php';
-require_once __DIR__.'/../../vendor/firebase/php-jwt/src/JWT.php';
-require_once __DIR__.'/../../vendor/firebase/php-jwt/src/JWK.php';
-
-use Firebase\JWT\JWT;
-use Firebase\JWT\JWK;
 
 /**
  * @onBefore prepareTestData
@@ -203,12 +198,12 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 
 		// Create device keys.
 		self::$data['keys']['identity']= self::makeJWK(self::$private_identity_key_pem);
-		self::$data['kids']['identity'] = JWT::urlsafeB64Encode(
+		self::$data['kids']['identity'] = CApiDpopHelper::base64UrlEncode(
 			hash('sha256', json_encode(self::$data['keys']['identity'], JSON_UNESCAPED_SLASHES), true)
 		);
 
 		self::$data['keys']['encryption']= self::makeJWK(self::$private_encryption_key_pem);
-		self::$data['kids']['encryption'] = JWT::urlsafeB64Encode(
+		self::$data['kids']['encryption'] = CApiDpopHelper::base64UrlEncode(
 			hash('sha256', json_encode(self::$data['keys']['encryption'], JSON_UNESCAPED_SLASHES), true)
 		);
 
@@ -267,8 +262,8 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 		return [
 			'kty' => 'EC',
 			'crv' => 'P-256',
-			'x' => JWT::urlsafeB64Encode($ec['x']),
-			'y' => JWT::urlsafeB64Encode($ec['y'])
+			'x' => CApiDpopHelper::base64UrlEncode($ec['x']),
+			'y' => CApiDpopHelper::base64UrlEncode($ec['y'])
 		];
 	}
 
@@ -688,14 +683,14 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 		if (array_key_exists('ath_token', $dpop_data)) {
 			$token = self::$data[$dpop_data['ath_token'][0]][$dpop_data['ath_token'][1]];
 
-			$payload['ath'] = JWT::urlsafeB64Encode(hash('sha256', $token, true));
+			$payload['ath'] = CApiDpopHelper::base64UrlEncode(hash('sha256', $token, true));
 		}
 
 		$private_key_pem = $dpop_data['private_key_pem'] === 'identity'
 			? self::$private_identity_key_pem
 			: self::$private_encryption_key_pem;
 
-		return JWT::encode($payload, $private_key_pem, 'ES256', null, $head);
+		return CApiDpopHelper::makeJwt($head, $payload, $private_key_pem);
 	}
 
 	public static function cleanTestData(): void {
