@@ -10275,6 +10275,9 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 				zbx_free(items[i].params);
 				zbx_free(items[i].formula_bin);
 				break;
+			case ITEM_TYPE_TELEMETRY_QUERY:
+				zbx_free(items[i].query_fields);
+				break;
 		}
 
 		zbx_free(items[i].delay);
