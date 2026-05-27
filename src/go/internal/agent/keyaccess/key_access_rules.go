@@ -52,44 +52,45 @@ func (t RuleType) String() string {
 	}
 }
 
-// ruleTypeName returns the config parameter name corresponding to a rule's type and kind.
-func ruleTypeName(permission RuleType, isRegexp bool) string {
-	if isRegexp {
-		if permission == ALLOW {
+// BasePattern holds the common fields shared by Record and Rule.
+type BasePattern struct {
+	Pattern    string
+	Permission RuleType
+	IsRegexp   bool
+}
+
+// permissionName returns the config parameter name corresponding to a pattern's permission type and kind.
+func (b BasePattern) permissionName() string {
+	if b.IsRegexp {
+		if b.Permission == ALLOW {
 			return "AllowKeyRegexp"
 		}
 
 		return "DenyKeyRegexp"
 	}
 
-	return permission.String()
+	return b.Permission.String()
 }
 
 // Record key access record
 type Record struct {
-	Pattern    string
-	Permission RuleType
-	IsRegexp   bool
-	Line       int
+	BasePattern
+	Line int
 }
 
 // Rule key access rule definition
 type Rule struct {
-	Pattern    string
-	Permission RuleType
-	IsRegexp   bool
-	Key        string
-	Params     []string
-	Regexp     *regexp.Regexp
+	BasePattern
+	Key    string
+	Params []string
+	Regexp *regexp.Regexp
 }
 
 var rules []*Rule
 
 func parse(rec Record) (r *Rule, err error) {
 	r = &Rule{
-		Permission: rec.Permission,
-		Pattern:    rec.Pattern,
-		IsRegexp:   rec.IsRegexp,
+		BasePattern: rec.BasePattern,
 	}
 
 	if rec.IsRegexp {
@@ -172,7 +173,7 @@ func addRule(rec Record) (err error) {
 			desc = "conflicts"
 		}
 		log.Warningf(`%s access rule "%s" was not added because it %s with another rule defined above`,
-			ruleTypeName(rec.Permission, rec.IsRegexp), rec.Pattern, desc)
+			rec.permissionName(), rec.Pattern, desc)
 		return
 	}
 	rules = append(rules, rule)
@@ -184,10 +185,12 @@ func appendRecordsFromNode(records *[]Record, node any, permission RuleType, isR
 		for _, v := range cfgNode.Nodes {
 			if value, ok := v.(*conf.Value); ok {
 				*records = append(*records, Record{
-					Pattern:    string(value.Value),
-					Permission: permission,
-					IsRegexp:   isRegexp,
-					Line:       value.Line,
+					BasePattern: BasePattern{
+						Pattern:    string(value.Value),
+						Permission: permission,
+						IsRegexp:   isRegexp,
+					},
+					Line: value.Line,
 				})
 			}
 		}
@@ -200,7 +203,7 @@ func addConfiguredRules(records []Record) error {
 			return fmt.Errorf(
 				"%w: %s %q %s",
 				errInvalidRule,
-				ruleTypeName(r.Permission, r.IsRegexp),
+				r.permissionName(),
 				r.Pattern,
 				err.Error(),
 			)
@@ -216,7 +219,7 @@ func prepareSystemRunRule() (*Rule, int, int, error) {
 
 	// create system.run[*] deny rule to be appended at the end of rule list unless other
 	// system.run[*] rules are present
-	sysrunRule, err := parse(Record{Pattern: "system.run[*]", Permission: DENY, Line: 0})
+	sysrunRule, err := parse(Record{BasePattern: BasePattern{Pattern: "system.run[*]", Permission: DENY}})
 	if err != nil {
 		return nil, sysrunIndex, rulesNum, err
 	}
@@ -242,8 +245,8 @@ func trimRulesAfterMatchAll(sysrunIndex *int) {
 			}
 
 			for j := i + 1; j < len(rules); j++ {
-				log.Warningf(`removed unreachable %s "%s" rule`,
-					ruleTypeName(rules[j].Permission, rules[j].IsRegexp), rules[j].Pattern)
+				log.Warningf(`removed unreachable %s "%s" rule`, rules[j].permissionName(),
+					rules[j].Pattern)
 			}
 
 			rules = rules[:i+1]
