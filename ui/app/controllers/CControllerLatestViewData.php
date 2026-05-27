@@ -18,8 +18,8 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['itemid', 'data_actions', 'host', 'maintenance', 'maintenanceid',
 		'maintenance_type', 'maintenance_status', 'itemid', 'description_expanded', 'name', 'key_expanded', 'interval',
-		'history', 'trends', 'type', 'state', 'last_check', 'last_value', 'change', 'is_graph', 'keep_history',
-		'keep_trends', 'item_icons', 'tags'];
+		'history', 'trends', 'type', 'state', 'last_check', 'last_value', 'change', 'is_graph', 'show_link',
+		'item_icons', 'tags'];
 
 	protected function init(): void {
 		parent::init();
@@ -222,20 +222,24 @@ class CControllerLatestViewData extends CControllerDataTable {
 			}
 
 			$item['interval'] = $item_delay;
-
+			$show_link = false;
 			$value_type_ttl = $config['hk_history_value_type_ttl'];
-			if (array_key_exists($item['value_type'], $value_type_ttl)) {
-				$hk_history = $value_type_ttl[$item['value_type']]['value_ttl'];
-				$keep_history = $hk_history === null ? 0 : $hk_history;
-				$item_history = $hk_history === null ? '' : convertSecondsToTimeUnits($hk_history);
-			}
-			elseif ($config['hk_history_global']) {
+			$with_storage_ttl = array_key_exists($item['value_type'], $value_type_ttl);
+
+			if (!$with_storage_ttl && $config['hk_history_global']) {
 				$keep_history = timeUnitToSeconds($config['hk_history']);
 				$item_history = $config['hk_history'];
 			}
 			elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
 				$keep_history = timeUnitToSeconds($item['history']);
 				$item_history = $item['history'];
+
+				if ($keep_history > 0 && $with_storage_ttl) {
+					$show_link = true;
+					$hk_history = $value_type_ttl[$item['value_type']]['value_ttl'];
+					$keep_history = $hk_history === null ? 0 : $hk_history;
+					$item_history = $hk_history === null ? '' : convertSecondsToTimeUnits($hk_history);
+				}
 			}
 			else {
 				$keep_history = 0;
@@ -244,7 +248,6 @@ class CControllerLatestViewData extends CControllerDataTable {
 					->toString();
 			}
 
-			$item['keep_history'] = $keep_history;
 			$item['history'] = $item_history;
 
 			if (in_array($item['value_type'], $config['hk_trends_value_types'])) {
@@ -266,8 +269,8 @@ class CControllerLatestViewData extends CControllerDataTable {
 				$item_trends = '';
 			}
 
-			$item['keep_trends'] = $keep_trends;
 			$item['trends'] = $item_trends;
+			$item['show_link'] = $keep_history > 0 || $keep_trends > 0 || $show_link;
 			$item['type'] = item_type2str($item['type']);
 			$item['last_check'] = $last_check;
 			$item['last_value'] = $last_value;

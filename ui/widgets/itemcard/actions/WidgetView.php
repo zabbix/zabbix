@@ -378,20 +378,24 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$item['history_has_errors'] = false;
 		$item['trends_has_errors'] = false;
+		$show_link = false;
 		$value_type_ttl = Manager::History()->getValueTypesStorageTtls();
+		$with_storage_ttl = array_key_exists($item['value_type'], $value_type_ttl);
 
-		if (array_key_exists($item['value_type'], $value_type_ttl)) {
-			$hk_history = $value_type_ttl[$item['value_type']]['value_ttl'];
-			$item['history'] = $hk_history === null ? '' : convertSecondsToTimeUnits($hk_history);
-			$item['keep_history'] = $hk_history === null ? 0 : $hk_history;
-		}
-		elseif (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
+		if (!$with_storage_ttl && CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
 			$hk_history = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY);
 			$item['history'] = $hk_history;
 			$item['keep_history'] = timeUnitToSeconds($hk_history);
 		}
 		elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
 			$item['keep_history'] = timeUnitToSeconds($item['history']);
+
+			if ($item['keep_history'] > 0 && $with_storage_ttl) {
+				$show_link = true;
+				$hk_history = $value_type_ttl[$item['value_type']]['value_ttl'];
+				$item['history'] = $hk_history === null ? '' : convertSecondsToTimeUnits($hk_history);
+				$item['keep_history'] = $hk_history === null ? 0 : $hk_history;
+			}
 		}
 		else {
 			$item['keep_history'] = 0;
@@ -425,6 +429,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$item['trends'] = '';
 			$item['keep_trends'] = 0;
 		}
+
+		$item['show_link'] = $item['keep_history'] > 0 || $item['keep_trends'] > 0 || $show_link;
 	}
 
 	protected function getAndPrepareItemTriggers(array $triggerids, string $context): array {
