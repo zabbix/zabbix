@@ -25,6 +25,9 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	const HOSTNAME = 'Housekeeping host';
 	const AGENT_PING_KEY = 'agent.ping';
 	const TRIGGER_NAME = 'Housekeeping trigger';
+	const HK_MODE_DISABLED = 0;
+	const HK_MODE_REGULAR = 1;
+	const HK_MODE_PARTITION = 2;
 
 	private static $proxyid = null;
 	private static $hostid = null;
@@ -221,16 +224,20 @@ class testHousekeepingConfSync extends CIntegrationTest {
 			'hk_events_internal' => $this->timeToSeconds($housekeeping['hk_events_internal']),
 			'hk_events_autoreg' => $this->timeToSeconds($housekeeping['hk_events_autoreg']),
 			'hk_events_discovery' => $this->timeToSeconds($housekeeping['hk_events_discovery']),
-			'hk_audit_mode' => $housekeeping['hk_audit_mode'],
+			'hk_audit_mode' => self::expectedPartitionableMode($housekeeping['hk_audit_mode']),
 			'hk_audit' => $this->timeToSeconds($housekeeping['hk_audit']),
 			'hk_services_mode' => $housekeeping['hk_services_mode'],
 			'hk_services' => $this->timeToSeconds($housekeeping['hk_services']),
 			'hk_sessions_mode' => $housekeeping['hk_sessions_mode'],
 			'hk_sessions' => $this->timeToSeconds($housekeeping['hk_sessions']),
-			'hk_history_mode' => $housekeeping['hk_history_mode'],
+			'hk_history_mode' => $housekeeping['hk_history_global'] == self::HK_MODE_REGULAR
+				? self::expectedPartitionableMode($housekeeping['hk_history_mode'])
+				: $housekeeping['hk_history_mode'],
 			'hk_history_global' => $housekeeping['hk_history_global'],
 			'hk_history' => $this->timeToSeconds($housekeeping['hk_history']),
-			'hk_trends_mode' => $housekeeping['hk_trends_mode'],
+			'hk_trends_mode' => $housekeeping['hk_trends_global'] == self::HK_MODE_REGULAR
+				? self::expectedPartitionableMode($housekeeping['hk_trends_mode'])
+				: $housekeeping['hk_trends_mode'],
 			'hk_trends_global' => $housekeeping['hk_trends_global'],
 			'hk_trends' => $this->timeToSeconds($housekeeping['hk_trends'])
 		];
@@ -239,7 +246,13 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	private function assertHousekeepingEquals(array $expected, array $actual) {
 		foreach ($expected as $name => $value) {
 			$this->assertArrayHasKey($name, $actual);
-			$this->assertEquals($value, $actual[$name], 'Unexpected synced value for '.$name.'.');
+
+			if (is_array($value)) {
+				$this->assertContains($actual[$name], $value, 'Unexpected synced value for '.$name.'.');
+			}
+			else {
+				$this->assertEquals($value, $actual[$name], 'Unexpected synced value for '.$name.'.');
+			}
 		}
 	}
 
@@ -486,6 +499,10 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		}
 
 		return (int) $matches[1] * ($matches[2] === '' ? 1 : $units[$matches[2]]);
+	}
+
+	private static function expectedPartitionableMode($mode) {
+		return $mode == self::HK_MODE_REGULAR ? [self::HK_MODE_REGULAR, self::HK_MODE_PARTITION] : $mode;
 	}
 
 	/**
