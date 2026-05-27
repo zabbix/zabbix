@@ -1192,11 +1192,6 @@ out:
 	{
 		result = DBL_MAX;
 	}
-	else if (0 != isnan(result))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
-		result = ZBX_MATH_ERROR;
-	}
 
 	zbx_matrix_free(coefficients);
 

@@ -36,7 +36,7 @@ class testCalculatedExpression extends CIntegrationTest {
 	const CALCULATED_ITEM_KEY = 'test.calc.calculated';
 
 	const DBL_MAX = '1.7976931348623157e308';
-	const DBL_MIN = '-1.7976931348623157e308';
+	const MINUS_DBL_MAX = '-1.7976931348623157e308';
 
 	/**
 	 * Component configuration provider.
@@ -144,7 +144,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		}
 
 		for ($i = 1; $i <= $sendMin; $i++) {
-			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MIN, null, 1);
+			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::MINUS_DBL_MAX, null, 1);
 		}
 		sleep(1);
 	}
@@ -168,17 +168,13 @@ class testCalculatedExpression extends CIntegrationTest {
 		return $response['result'][$itemid]['lastvalue'];
 	}
 
-	private function historyGet($itemid, $limit = null)
+	private function historyGet($itemid)
 	{
 		$params = [
 				'itemids'   => $itemid,
 				'history'   => ITEM_VALUE_TYPE_FLOAT,
 				'sortorder' => ZBX_SORT_UP
 		];
-
-		if ($limit !== null) {
-			$params['limit'] = $limit;
-		}
 
 		$data = $this->call('history.get', $params);
 
@@ -294,8 +290,8 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->assertSame(
 			[
-				(float)self::DBL_MIN,
-				(float)self::DBL_MIN,
+				(float)self::MINUS_DBL_MAX,
+				(float)self::MINUS_DBL_MAX,
 				(float)self::DBL_MAX,
 				(float)self::DBL_MAX
 			],
@@ -345,8 +341,8 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->assertSame(
 			[
-				(float)self::DBL_MIN,
-				(float)self::DBL_MIN,
+				(float)self::MINUS_DBL_MAX,
+				(float)self::MINUS_DBL_MAX,
 				(float)self::DBL_MAX,
 				(float)self::DBL_MAX,
 				(float)self::DBL_MAX
@@ -354,7 +350,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			array_map('floatval', $values)
 		);
 
-		$this->assertEquals((float)self::DBL_MIN, $this->getItemLastValue($itemid));
+		$this->assertEquals((float)self::MINUS_DBL_MAX, $this->getItemLastValue($itemid));
 	}
 
 	public function testCalculatedExpression_LastValue()
@@ -390,6 +386,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 
 		$this->sendSupportedExtremeValues(3, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
+		$this->checkItemState($itemid, ITEM_STATE_NORMAL);
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
@@ -404,7 +401,6 @@ class testCalculatedExpression extends CIntegrationTest {
 		);
 
 		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
-
 	}
 
 	public function testCalculatedExpression_TimeleftForecastOverflow()
@@ -442,7 +438,6 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		/* timeleft of course cannot reach -1, so test that it is cropped to DBL_MAX */
 		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($timeleft_itemid));
-
 
 		/* test forecast */
 
@@ -813,7 +808,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			$response = $this->call('history.push', [
 				'itemid' => $trapId[0],
 				'value' => (float)self::DBL_MAX,
-				'clock' => time() - (3600) - 70 - $i,
+				'clock' => time() - 3600 - 70 - $i,
 				'ns' => 255
 			]);
 		}
@@ -884,13 +879,13 @@ class testCalculatedExpression extends CIntegrationTest {
 				'itemids' => [$itemid]
 			])['result'][0];
 
-			if ($item['state'] == $state && ($state == ITEM_STATE_NOTSUPPORTED)) {
+			if ($item['state'] == $state) {
 				break;
 			}
 
 			sleep($wait_iteration_delay);
 		}
 
-		$this->assertEquals($state, $item['state'], 'User parameter failed to reload, itemid: '. $itemid);
+		$this->assertEquals($state, $item['state'], 'Unexpected item state: '. $state . ' for itemid: ' . $itemid);
 	}
 }
