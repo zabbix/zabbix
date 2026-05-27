@@ -24,7 +24,6 @@
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-#include "zbxexit.h"
 
 /******************************************************************************
  *                                                                            *

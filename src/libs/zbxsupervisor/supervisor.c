@@ -30,11 +30,9 @@
 #include "zbxtypes.h"
 #include "zbxdb.h"
 #include "zbxprof.h"
-#include "zbxtypes_ext.h"
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
 #endif
-#include "zbxexit.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxsnmp.h"

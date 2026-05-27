@@ -20,7 +20,6 @@
 #include "zbxdbschema.h"
 #include "zbxstr.h"
 #include "zbxtypes.h"
-#include "zbxexit.h"
 
 /******************************************************************************
  *                                                                            *

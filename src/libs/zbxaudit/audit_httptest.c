@@ -20,7 +20,6 @@
 #include "zbxdb.h"
 #include "zbxnum.h"
 #include "zbxhttp.h"
-#include "zbxexit.h"
 
 void	zbx_audit_httptest_create_entry(int audit_context_mode, int audit_action, zbx_uint64_t httptestid,
 		const char *name)

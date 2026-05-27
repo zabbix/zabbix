@@ -21,7 +21,6 @@
 #include "zbxlog.h"
 #include "zbxjson.h"
 #include "zbxbincommon.h"
-#include "zbxexit.h"
 
 #ifndef _WINDOWS
 #	include "zbxnix.h"

@@ -13,7 +13,6 @@
 **/
 
 #include "zbxalgo.h"
-#include "zbxexit.h"
 
 static void	__binary_heap_ensure_free_space(zbx_binary_heap_t *heap);
 

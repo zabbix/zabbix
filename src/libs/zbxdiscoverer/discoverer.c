@@ -42,7 +42,6 @@
 #include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbxcalc.h"
-#include "zbxexit.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxpoller.h"

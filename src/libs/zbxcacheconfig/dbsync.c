@@ -31,7 +31,6 @@
 #include "zbxinterface.h"
 #include "zbxip.h"
 #include "zbxtime.h"
-#include "zbxexit.h"
 
 /* global correlation constants */
 #define ZBX_CORRELATION_ENABLED				0

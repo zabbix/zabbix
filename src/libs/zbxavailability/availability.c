@@ -20,7 +20,6 @@
 #include "zbxstr.h"
 #include "zbxipcservice.h"
 #include "zbxjson.h"
-#include "zbxexit.h"
 
 int	zbx_interface_availability_compare_func(const void *d1, const void *d2)
 {

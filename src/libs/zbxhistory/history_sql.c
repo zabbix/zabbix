@@ -21,7 +21,6 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxvariant.h"
-#include "zbxexit.h"
 
 typedef struct
 {

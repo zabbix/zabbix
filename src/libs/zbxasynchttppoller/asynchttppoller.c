@@ -17,7 +17,6 @@
 #if defined(HAVE_LIBCURL) && defined(HAVE_LIBEVENT)
 
 #include "zbxasynchttppoller.h"
-#include "zbxexit.h"
 
 typedef struct
 {

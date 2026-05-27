@@ -48,7 +48,6 @@
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
 #endif
-#include "zbxexit.h"
 
 #define CONFIG_ESCALATOR_FREQUENCY	3
 

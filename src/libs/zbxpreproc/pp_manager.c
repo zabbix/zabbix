@@ -37,7 +37,6 @@
 #include "zbxpreprocbase.h"
 #include "zbx_rtc_constants.h"
 #include "zbxsupervisor_client.h"
-#include "zbxexit.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>

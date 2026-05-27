@@ -36,7 +36,6 @@
 #include "zbxstr.h"
 #include "zbxinterface.h"
 #include "zbxdbschema.h"
-#include "zbxexit.h"
 
 typedef enum
 {

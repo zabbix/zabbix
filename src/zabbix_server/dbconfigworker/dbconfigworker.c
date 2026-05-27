@@ -27,7 +27,6 @@
 #include "zbxstr.h"
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
-#include "zbxexit.h"
 
 static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, int *updated_num,
 		int *macro_used)

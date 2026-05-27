@@ -19,7 +19,6 @@
 #	include "vmware_hv.h"
 #	include "vmware_perfcntr.h"
 #endif
-#include "zbxexit.h"
 
 #define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref, __vm_shmem_malloc_func, \
 		__vm_shmem_realloc_func, __vm_shmem_free_func)

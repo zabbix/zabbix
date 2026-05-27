@@ -27,7 +27,6 @@
 #include "zbxtime.h"
 #include "zbxipmi.h"
 #include "zbxthreads.h"
-#include "zbxexit.h"
 
 /******************************************************************************
  *                                                                            *

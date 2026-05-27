@@ -24,7 +24,6 @@
 #include "zbxthreads.h"
 #include "zbxnix.h"
 #include "zbxlog.h"
-#include "zbxexit.h"
 
 #define PP_WORKER_INIT_NONE	0x00
 #define PP_WORKER_INIT_THREAD	0x01

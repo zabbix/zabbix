@@ -19,7 +19,6 @@
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxstr.h"
-#include "zbxexit.h"
 
 ZBX_PTR_VECTOR_IMPL(am_mediatype_ptr, zbx_am_mediatype_t *)
 ZBX_PTR_VECTOR_IMPL(am_media_ptr, zbx_am_media_t *)

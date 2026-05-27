@@ -28,7 +28,6 @@
 #include "zbxcomms.h"
 #include "zbxbincommon.h"
 #include "zbxip.h"
-#include "zbxexit.h"
 
 #if !defined(_WINDOWS)
 #	include "zbxnix.h"
