@@ -4665,6 +4665,24 @@ in:
 out:
   return: SUCCEED
   value: 272384191.768584
+test case: Evaluate timeleft(#3,1.7976931348623158e+308,"logarithmic")
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.7976931348623155e+308
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 1.7976931348623156e+308
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: timeleft
+  params: '#3,1.7976931348623158e+308,"logarithmic"'
+out:
+  return: SUCCEED
+  value: 1.7976931348623158E+308
 ---
 test case: Evaluate lastclock() <- 0.1, 0.2
 in:
