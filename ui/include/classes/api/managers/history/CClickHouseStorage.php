@@ -613,7 +613,6 @@ class CClickHouseStorage {
 			$http_response_headers = $http_response_header ?? null;
 		}
 
-		// The variable $http_response_header is defined only when file_get_contents succeeds.
 		if ($http_response_headers !== null) {
 			sscanf($http_response_headers[0], 'HTTP/%*s %d', $http_code);
 		}
