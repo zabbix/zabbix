@@ -4215,9 +4215,9 @@ int	zbx_dbsync_prepare_cep_rule(zbx_dbsync_t *sync)
 	zbx_dcsync_sql_start(sync);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select cep_ruleid,formula,window_type,evaltype,status,stop,sortorder from cep_rule");
+			"select cep_ruleid,formula,evaltype,status,stop,sortorder from cep_rule");
 
-	dbsync_prepare(sync, 7, NULL);
+	dbsync_prepare(sync, 6, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

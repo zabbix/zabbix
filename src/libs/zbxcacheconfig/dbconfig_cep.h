@@ -52,7 +52,6 @@ zbx_cep_window_t;
 struct zbx_cep_rule
 {
 	zbx_uint64_t		ruleid;
-	int			window_type;
 	int			evaltype;
 	char			*formula;
 	int			status;

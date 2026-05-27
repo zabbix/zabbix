@@ -81,7 +81,6 @@ static zbx_cep_rule_t	*cep_rule_clone(const zbx_cep_rule_t *rule)
 	clone->sortorder = rule->sortorder;
 	clone->status = rule->status;
 	clone->stop = rule->stop;
-	clone->window_type = rule->window_type;
 	clone->formula = zbx_strdup(NULL, rule->formula);
 
 	zbx_vector_cep_condition_append_array(&clone->conditions, rule->conditions.values, rule->conditions.values_num);
@@ -240,11 +239,10 @@ static void	cep_sync_rules(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, zbx
 		if (NULL == rule->formula || 0 != strcmp(rule->formula, row[1]))
 			rule->formula = zbx_strdup(rule->formula, row[1]);
 
-		rule->window_type = atoi(row[2]);
-		rule->evaltype = atoi(row[3]);
-		rule->status = atoi(row[4]);
-		rule->stop = atoi(row[5]);
-		rule->sortorder = atoi(row[6]);
+		rule->evaltype = atoi(row[2]);
+		rule->status = atoi(row[3]);
+		rule->stop = atoi(row[4]);
+		rule->sortorder = atoi(row[5]);
 
 		if (ZBX_DBSYNC_ROW_UPDATE == tag && NULL != rules)
 			zbx_vector_cep_rule_ptr_append(rules, rule);
@@ -507,9 +505,9 @@ static void	cep_condition_dump(zbx_cep_condition_t *condition)
 static void	cep_rule_dump(zbx_cep_rule_t *rule)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "ruleid:" ZBX_FS_UI64 " revision:" ZBX_FS_UI64 " refcount:%u status:%d stop:%d"
-			" sortoder:%d window:%d evaltype:%d formula:%s",
+			" sortoder:%d evaltype:%d formula:%s",
 			rule->ruleid, rule->revision, atomic_load(&rule->refcount),rule->status, rule->stop,
-			rule->sortorder, rule->window_type, rule->evaltype, rule->formula);
+			rule->sortorder, rule->evaltype, rule->formula);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  conditions:");
 	for (int i = 0; i < rule->conditions.values_num; i++)
