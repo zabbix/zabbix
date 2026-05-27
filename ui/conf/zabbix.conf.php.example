@@ -68,6 +68,9 @@ $SSO['CERT_STORAGE']		= 'database';
 //$SSO['SP_CERT']		= 'conf/certs/sp.crt';
 //$SSO['IDP_CERT']		= 'conf/certs/idp.crt';
 
+// Uncomment and set to false to disable support for banners.
+//$ZBX_FEATURE_FLAGS['banners_enabled'] = true;
+
 // Uncomment and set to false to disable user HTTP authentication.
 //$ZBX_FEATURE_FLAGS['http_auth_enabled'] = true;
 

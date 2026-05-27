@@ -323,7 +323,7 @@ class testFormUpdateProblem extends CWebTest {
 		if (array_key_exists('history', $data)) {
 			$history = ($data['history'] === []) ? $data['history'] : [date('Y-m-d H:i:s', self::$acktime).$data['history'][0]];
 			$history_table = $form->getField('History')->asTable();
-			$this->assertEquals(['Time', 'User', 'User action', 'Message'], $history_table->getHeadersText());
+			$this->assertEquals(['Time', 'User', 'Action', 'Message'], $history_table->getHeadersText());
 			$this->assertEquals($history, $history_table->getRows()->asText());
 
 			if ($data['problems'] === ['Trigger for unsigned']) {
@@ -971,7 +971,7 @@ class testFormUpdateProblem extends CWebTest {
 		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog->waitUntilReady();
 		$form->invalidate();
-		$this->checkHistoryTable($form->getField('History')->asTable(), 'User', 'User action');
+		$this->checkHistoryTable($form->getField('History')->asTable(), 'User', 'Action');
 		$dialog->close();
 		$this->page->waitUntilReady();
 
@@ -1012,7 +1012,7 @@ class testFormUpdateProblem extends CWebTest {
 			$action_row = $table->getRow($i);
 			$this->assertEquals('Admin (Zabbix Administrator)', $action_row->getColumn($user)->getText());
 			$query = ($i === 0)
-				? 'xpath:.//span[@title="Unsuppressed"]'
+				? 'xpath:.//span[@title="Manually unsuppressed"]'
 				: 'xpath:.//*['.CXPathHelper::fromClass('zi-eye-off').']';
 			$this->assertTrue($action_row->getColumn($action)->query($query)->exists());
 		}
