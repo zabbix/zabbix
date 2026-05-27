@@ -350,8 +350,6 @@ A......... [ZBX-27567] prevented low-privilege users from modifying entities via
 --------------------------------------------------------------------------------
 Changes for 7.4.11rc1
 
-New features:
-
 Bug fixes:
 ........S. [ZBX-22504] improved memory usage in LLD worker processes with large low-level discovery (vso)
 A......... [ZBX-27780] restored support of LLD macros in LLD rule override operations Update interval, History, and Trends (dpankins)
