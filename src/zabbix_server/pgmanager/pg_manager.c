@@ -27,7 +27,6 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxlog.h"
-#include "zbxexit.h"
 
 /******************************************************************************
  *                                                                            *

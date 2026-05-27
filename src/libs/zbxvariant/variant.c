@@ -17,7 +17,6 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxalgo.h"
-#include "zbxexit.h"
 
 ZBX_VECTOR_IMPL(var, zbx_variant_t)
 

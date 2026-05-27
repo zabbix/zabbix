@@ -36,7 +36,6 @@ DIST_SUBDIRS = \
 	zbxeval \
 	zbxevent \
 	zbxexec \
-	zbxexit \
 	zbxexport \
 	zbxexpr \
 	zbxfile \
@@ -262,7 +261,6 @@ SUBDIRS = \
 	zbxcrypto \
 	zbxcurl \
 	zbxexec \
-	zbxexit \
 	zbxexpr \
 	zbxfile \
 	zbxgetopt \

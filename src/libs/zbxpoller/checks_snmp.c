@@ -41,7 +41,6 @@
 #include <net-snmp/library/large_fd_set.h>
 #include <net-snmp/library/snmpusm.h>
 #include "zbxself.h"
-#include "zbxexit.h"
 
 #ifndef EVDNS_BASE_INITIALIZE_NAMESERVERS
 #	define EVDNS_BASE_INITIALIZE_NAMESERVERS	1

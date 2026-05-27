@@ -19,7 +19,7 @@
 
 #include "../server_constants.h"
 
-#include "zbxcep.h"
+#include "../cep/zbxcep.h"
 #include "zbxcep_client.h"
 #include "zbxcommon.h"
 #include "zbxtimekeeper.h"
@@ -41,7 +41,6 @@
 #include "zbxthreads.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_rtc_constants.h"
-#include "zbxexit.h"
 
 ZBX_PTR_VECTOR_IMPL(service_update_ptr, zbx_service_update_t *)
 ZBX_PTR_VECTOR_IMPL(service_action_condition_ptr, zbx_service_action_condition_t *)

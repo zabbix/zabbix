@@ -30,7 +30,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
-#include "zbxexit.h"
 
 static int	connector_object_compare_func(const void *d1, const void *d2)
 {

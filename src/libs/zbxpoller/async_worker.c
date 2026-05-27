@@ -26,7 +26,6 @@
 #include "zbxinterface.h"
 #include "zbxnix.h"
 #include "zbxregexp.h"
-#include "zbxexit.h"
 
 #define ASYNC_WORKER_INIT_NONE		0x00
 #define ASYNC_WORKER_INIT_THREAD	0x01

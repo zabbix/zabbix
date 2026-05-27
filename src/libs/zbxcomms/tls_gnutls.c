@@ -21,7 +21,6 @@
 #include "zbxlog.h"
 #include "zbxstr.h"
 #include "zbxcrypto.h"
-#include "zbxexit.h"
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 

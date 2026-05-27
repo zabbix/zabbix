@@ -26,7 +26,6 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "zbxversion.h"
-#include "zbxexit.h"
 
 /******************************************************************************
  *                                                                            *

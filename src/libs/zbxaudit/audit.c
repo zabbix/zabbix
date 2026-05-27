@@ -23,7 +23,6 @@
 #include "zbxdbschema.h"
 #include "zbxstr.h"
 #include "zbx_scripts_constants.h"
-#include "zbxexit.h"
 
 #define AUDIT_USERID		__UINT64_C(0)
 #define AUDIT_USERID_SQL	"null"

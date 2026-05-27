@@ -17,7 +17,6 @@
 #include "zbxalgo.h"
 #include "zbxipcservice.h"
 #include "zbxdbwrap.h"
-#include "zbxexit.h"
 
 static void	cep_task_request_remote_free(void *mw_task);
 static void	cep_task_event_free(void *mw_task);

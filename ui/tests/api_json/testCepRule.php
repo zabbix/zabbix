@@ -1866,6 +1866,54 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window/duration": a time unit is expected.'
 			],
+			'Window duration accepts macro' => [
+				'request' => [
+					'name' => 'ceprule.window.duration.as.macro',
+					'operations' => [
+						'step' => 1,
+						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+						'type' => ZBX_CEP_OP_SET_NAME,
+						'event_name' => 'bla'
+					],
+					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
+					'window' => [
+						'duration' => '{$DURATION}'
+					]
+				],
+				'expected_error' => null
+			],
+			'Window duration rejects malformed macro' => [
+				'request' => [
+					'name' => 'ceprule.window.duration.as.macro.malformed',
+					'operations' => [
+						'step' => 1,
+						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+						'type' => ZBX_CEP_OP_SET_NAME,
+						'event_name' => 'bla'
+					],
+					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
+					'window' => [
+						'duration' => '{$DURATIon}'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/window/duration": a time unit is expected.'
+			],
+			'Window duration rejects too long macro' => [
+				'request' => [
+					'name' => 'ceprule.window.duration.as.macro.long',
+					'operations' => [
+						'step' => 1,
+						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+						'type' => ZBX_CEP_OP_SET_NAME,
+						'event_name' => 'bla'
+					],
+					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
+					'window' => [
+						'duration' => '{$'.str_repeat('M', DB::getFieldLength('cep_window', 'duration')).'}'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/window/duration": value is too long.'
+			],
 			'Window capacity must be integer' => [
 				'request' => [
 					'name' => 'ceprule',
@@ -1899,6 +1947,57 @@ class testCepRule extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/window/capacity": value must be one of 0-'.ZBX_MAX_INT64.'.'
+			],
+			'Window capacity accepts macro' => [
+				'request' => [
+					'name' => 'ceprule.window.capacity.as.macro',
+					'operations' => [
+						'step' => 1,
+						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+						'type' => ZBX_CEP_OP_SET_NAME,
+						'event_name' => 'bla'
+					],
+					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
+					'window' => [
+						'duration' => '{$DURATION}',
+						'capacity' => '{$CAPACITY}'
+					]
+				],
+				'expected_error' => null
+			],
+			'Window capacity rejects malformed macro' => [
+				'request' => [
+					'name' => 'ceprule.window.capacity.as.macro.malformed',
+					'operations' => [
+						'step' => 1,
+						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+						'type' => ZBX_CEP_OP_SET_NAME,
+						'event_name' => 'bla'
+					],
+					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
+					'window' => [
+						'duration' => '{$DURATION}',
+						'capacity' => '{$CAPAcity}'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/window/capacity": an integer is expected.'
+			],
+			'Window capacity rejects too long macro' => [
+				'request' => [
+					'name' => 'ceprule.window.capacity.as.macro.long',
+					'operations' => [
+						'step' => 1,
+						'execute_when' => ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+						'type' => ZBX_CEP_OP_SET_NAME,
+						'event_name' => 'bla'
+					],
+					'window_type' => ZBX_CEP_WINDOW_SIMPLE,
+					'window' => [
+						'duration' => '{$DURATION}',
+						'capacity' => '{$'.str_repeat('M', DB::getFieldLength('cep_window', 'capacity')).'}'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/window/capacity": value is too long.'
 			],
 			'Window script must be string' => [
 				'request' => [

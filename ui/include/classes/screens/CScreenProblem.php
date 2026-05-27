@@ -61,7 +61,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getDataEvents(array $options): array|string {
 		return API::Event()->get([
-			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid'],
+			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid', 'cep_ruleid'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
@@ -90,7 +90,9 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getDataProblems(array $options): array|string {
 		return API::Problem()->get([
-			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid'],
+			'output' => [
+				'eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid', 'cep_ruleid', 'flags'
+			],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'sortfield' => ['eventid'],
@@ -653,6 +655,7 @@ class CScreenProblem extends CScreenBase {
 			? self::getExDataEvents($eventids)
 			: self::getExDataProblems($eventids);
 
+		$cep_ruleids = [];
 		$correlationids = [];
 		$userids = [];
 
@@ -670,6 +673,9 @@ class CScreenProblem extends CScreenBase {
 				$problem['acknowledged'] = $problem_data['acknowledged'];
 				$problem['suppression_data'] = $problem_data['suppression_data'];
 
+				if ($problem['cep_ruleid'] != 0) {
+					$cep_ruleids[$problem['cep_ruleid']] = true;
+				}
 				if ($problem['correlationid'] != 0) {
 					$correlationids[$problem['correlationid']] = true;
 				}
@@ -688,6 +694,14 @@ class CScreenProblem extends CScreenBase {
 		// Possible performance improvement: one API call may be saved, if r_clock for problem will be used.
 		$actions = getEventsActionsIconsData($data['problems'], $data['triggers']);
 		$data['actions'] = $actions['data'];
+
+		$data['cep_rules'] = $cep_ruleids
+			? API::CepRule()->get([
+				'output' => ['name'],
+				'cep_ruleids' => array_keys($cep_ruleids),
+				'preservekeys' => true
+			])
+			: [];
 
 		$data['correlations'] = $correlationids
 			? API::Correlation()->get([

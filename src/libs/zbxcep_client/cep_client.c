@@ -20,7 +20,6 @@
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 #include "zbxdbhigh.h"
-#include "zbxexit.h"
 #include "zbxcacheconfig.h"
 
 ZBX_VECTOR_IMPL(cep_assessment_query, zbx_cep_assessment_query_t)

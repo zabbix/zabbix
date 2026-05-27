@@ -13,7 +13,6 @@
 **/
 
 #include "zbxthreads.h"
-#include "zbxexit.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "zbxwin32.h"
@@ -443,4 +442,3 @@ int	zbx_waitpid_nohang(ZBX_THREAD_HANDLE *threads, size_t threads_num)
 	return SUCCEED;
 }
 #endif
-

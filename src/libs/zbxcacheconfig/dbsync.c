@@ -31,7 +31,6 @@
 #include "zbxinterface.h"
 #include "zbxip.h"
 #include "zbxtime.h"
-#include "zbxexit.h"
 
 /* global correlation constants */
 #define ZBX_CORRELATION_ENABLED				0
@@ -2673,7 +2672,7 @@ int	zbx_dbsync_compare_correlations(zbx_dbsync_t *sync)
 	zbx_hashset_iter_t	iter;
 	zbx_uint64_t		rowid;
 	zbx_correlation_ref_t	*ref;
-	zbx_correlation_cache_t	*cache = dc_local()->correlation_cache;
+	zbx_correlation_config_t	*cache = dc_local()->correlation_config;
 
 	zbx_dcsync_sql_start(sync);
 
@@ -2802,7 +2801,7 @@ int	zbx_dbsync_compare_corr_conditions(zbx_dbsync_t *sync)
 	zbx_hashset_iter_t		iter;
 	zbx_uint64_t			rowid;
 	zbx_corr_condition_ref_t	*ref;
-	zbx_correlation_cache_t		*cache = dc_local()->correlation_cache;
+	zbx_correlation_config_t		*cache = dc_local()->correlation_config;
 
 	zbx_dcsync_sql_start(sync);
 
@@ -2909,7 +2908,7 @@ int	zbx_dbsync_compare_corr_operations(zbx_dbsync_t *sync)
 	zbx_hashset_iter_t	iter;
 	zbx_uint64_t		rowid;
 	zbx_dc_corr_operation_t	*corr_operation;
-	zbx_correlation_cache_t	*cache = dc_local()->correlation_cache;
+	zbx_correlation_config_t	*cache = dc_local()->correlation_config;
 
 	zbx_dcsync_sql_start(sync);
 

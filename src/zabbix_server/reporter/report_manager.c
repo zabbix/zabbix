@@ -35,7 +35,6 @@
 #include "zbxjson.h"
 #include "zbxstr.h"
 #include "zbx_expression_constants.h"
-#include "zbxexit.h"
 
 #define ZBX_REPORT_STATUS_ENABLED	0
 #define ZBX_REPORT_STATUS_DISABLED	1

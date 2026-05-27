@@ -30,8 +30,7 @@ zabbix_get_LDADD = \
 	$(top_builddir)/src/libs/zbxbincommon/libzbxbincommon.a \
 	$(top_builddir)/src/libs/zbxagentget/libzbxagentget.a \
 	$(top_builddir)/src/libs/zbxversion/libzbxversion.a \
-	$(ZBXGET_LIBS) \
-	$(top_builddir)/src/libs/zbxexit/libzbxexit.a
+	$(ZBXGET_LIBS)
 
 zabbix_get_LDFLAGS = $(ZBXGET_LDFLAGS)
 

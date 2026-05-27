@@ -17,7 +17,6 @@
 #include "zbxcommon.h"
 #include "zbxstr.h"
 #include "zbxtypes.h"
-#include "zbxexit.h"
 
 #define ZBX_OPTION_EXPTYPE_EVENTS	"events"
 #define ZBX_OPTION_EXPTYPE_HISTORY	"history"

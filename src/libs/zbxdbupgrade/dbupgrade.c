@@ -21,7 +21,6 @@
 #include "zbxstr.h"
 #include "zbx_ha_constants.h"
 #include "zbxdbhigh.h"
-#include "zbxexit.h"
 
 #ifdef HAVE_MYSQL
 #	define ZBX_DB_TABLE_OPTIONS	" engine=innodb"

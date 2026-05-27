@@ -20,7 +20,6 @@
 #include "zbxtime.h"
 #include "zbxmutexs.h"
 #include "zbxsysinfo.h"
-#include "zbxexit.h"
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
 

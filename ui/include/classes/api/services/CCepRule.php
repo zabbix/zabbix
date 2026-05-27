@@ -679,8 +679,8 @@ class CCepRule extends CApiService {
 				ZBX_CEP_WINDOW_PATTERN_MATCH
 			]);
 			$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-				'duration' =>				['type' => API_TIME_UNIT, 'flags' => $api_required, 'in' => '1:'.SEC_PER_YEAR],
-				'capacity' =>				['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT64],
+				'duration' =>				['type' => API_TIME_UNIT, 'flags' => $api_required | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_YEAR, 'length' => DB::getFieldLength('cep_window', 'duration')],
+				'capacity' =>				['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'in' => '0:'.ZBX_MAX_INT64, 'length' => DB::getFieldLength('cep_window', 'capacity')],
 				'filter' =>					$cep_rule['window_type'] == ZBX_CEP_WINDOW_TAG_MATCH
 												? ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []]
 												: ['type' => API_OBJECT, 'fields' => []],

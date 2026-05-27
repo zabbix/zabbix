@@ -779,7 +779,7 @@ class CApiInputValidator {
 	 * Integers validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL
+	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL, API_ALLOW_USER_MACRO
 	 * @param string $rule['in']      (optional) a comma-delimited character string, for example: '0,60:900'
 	 * @param mixed  $data
 	 * @param string $path
@@ -794,8 +794,22 @@ class CApiInputValidator {
 			return true;
 		}
 
+		if (($flags & API_ALLOW_USER_MACRO) && is_string($data) && self::checkValueIsUserMacro($data)) {
+			if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+				return false;
+			}
+
+			return true;
+		}
+
 		if ((!is_int($data) && !is_string($data)) || !preg_match('/^'.ZBX_PREG_INT.'$/', strval($data))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an integer is expected'));
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && strlen(strval($data)) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
 			return false;
 		}
 

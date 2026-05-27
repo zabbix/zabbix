@@ -30,7 +30,6 @@
 #include "zbxipcservice.h"
 #include "zbxlog.h"
 #include "zbxhistory.h"
-#include "zbxexit.h"
 #include "zbxsupervisor_client.h"
 
 static sigset_t			orig_mask;

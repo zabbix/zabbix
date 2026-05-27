@@ -18,7 +18,6 @@
 #include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
-#include "zbxexit.h"
 
 typedef struct
 {

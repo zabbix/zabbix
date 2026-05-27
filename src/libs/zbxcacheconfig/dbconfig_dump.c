@@ -1567,7 +1567,7 @@ void	DCdump_configuration(void)
 	DCdump_functions();
 	DCdump_expressions();
 	DCdump_actions();
-	correlation_cache_dump();
+	correlation_config_dump();
 	DCdump_host_groups();
 	DCdump_host_group_index();
 	DCdump_maintenances();

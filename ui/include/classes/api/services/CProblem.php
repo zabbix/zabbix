@@ -29,7 +29,7 @@ class CProblem extends CApiService {
 
 	public const OUTPUT_FIELDS = ['eventid', 'source', 'object', 'objectid', 'clock', 'ns', 'r_eventid', 'r_clock', 'r_ns',
 		'correlationid', 'userid', 'name', 'acknowledged', 'severity', 'cause_eventid', 'opdata', 'suppressed',
-		'urls'
+		'urls', 'cep_ruleid', 'flags'
 	];
 
 	/**

@@ -14,7 +14,6 @@
 
 #include "zbxvmware.h"
 #include "zbxthreads.h"
-#include "zbxexit.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 

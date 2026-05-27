@@ -75,7 +75,6 @@
 #include "zbxbincommon.h"
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
-#include "zbxexit.h"
 
 #ifdef HAVE_OPENIPMI
 #include "zbxipmi.h"

@@ -29,7 +29,6 @@
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #endif
-#include "zbxexit.h"
 
 ZBX_VECTOR_IMPL(uint16, uint16_t)
 ZBX_PTR_VECTOR_IMPL(perf_available_ptr, zbx_vmware_perf_available_t *)

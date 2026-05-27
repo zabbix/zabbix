@@ -22,11 +22,11 @@
 
 typedef struct
 {
-	zbx_hashset_t		item_tag_links;
-	zbx_atomic_int_t	itservices_num;
-	zbx_correlation_cache_t	*correlation_cache;
-	zbx_cep_config_t	*cep_config;
+	zbx_hashset_t			item_tag_links;
+	zbx_atomic_int_t		itservices_num;
 
+	zbx_correlation_config_t	*correlation_config;
+	zbx_cep_config_t		*cep_config;
 }
 zbx_dc_config_local_t;
 

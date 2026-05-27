@@ -19,7 +19,6 @@
 #include "zbxdbhigh.h"
 #include "zbxcep_client.h"
 #include "zbxserialize.h"
-#include "zbxexit.h"
 
 ZBX_PTR_VECTOR_IMPL(db_service, zbx_db_service *)
 

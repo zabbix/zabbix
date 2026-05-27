@@ -34,7 +34,6 @@
 #include "zbxdb.h"
 #include "zbxthreads.h"
 #include "zbxtimekeeper.h"
-#include "zbxexit.h"
 
 /* IPMI request queued by pollers */
 typedef struct
