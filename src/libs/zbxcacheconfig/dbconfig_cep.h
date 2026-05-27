@@ -36,6 +36,19 @@ zbx_cep_condition_t;
 
 ZBX_VECTOR_DECL(cep_condition, zbx_cep_condition_t)
 
+typedef struct
+{
+	int	duration;
+	int	capacity;
+	int	evaltype;
+	int	group_by;
+	char	*formula;
+	char	*symptom_tag_num;
+	char	*script;
+	char	*group_tag;
+}
+zbx_cep_window_t;
+
 struct zbx_cep_rule
 {
 	zbx_uint64_t		ruleid;
