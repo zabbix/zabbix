@@ -294,6 +294,7 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 				SET_TEXT_RESULT(&result, values.values[i]);
 				values.values[i] = NULL;
 
+				/* TODO: decide if storing meta is needed */
 				zbx_set_agent_result_meta(&result, 0, item_context->newlasttimestamp);
 
 				zbx_preprocess_item_value(item_context->itemid, item_context->value_type,
@@ -312,6 +313,7 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 
 			if (0 == values.values_num)
 			{
+				/* TODO: decide if storing meta is needed, if not - this is not needed */
 				AGENT_RESULT	result;
 
 				zabbix_log(LOG_LEVEL_TRACE, "%s(): saving empty result", __func__);

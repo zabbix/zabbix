@@ -161,6 +161,7 @@ static int	async_check_telemetry_query_http(zbx_dc_telemetry_query_item_t *item,
 	/* We probably could detect the switch and update lasttimestamp to mtime (or change what timestamp means */
 	/* and simply always make lasttimestamp max(lasttimestamp, mtime)), but history can be stuck in preprocessing */
 	/* or similar, thus making stored mtime outdated. */
+	/* TODO: do something with this */
 	if (0 == lasttimestamp)
 	{
 		/* mtime is used to store lasttimestamp persistently */
