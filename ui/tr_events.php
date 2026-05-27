@@ -56,7 +56,7 @@ $trigger = reset($triggers);
 
 $events = API::Event()->get([
 	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'name', 'acknowledged', 'severity',
-		'cause_eventid'
+		'cause_eventid', 'cep_ruleid'
 	],
 	'selectAcknowledges' => ['clock', 'message', 'action', 'userid', 'old_severity', 'new_severity',
 		'suppress_until'
@@ -89,7 +89,7 @@ $event['comments'] = ($trigger['comments'] !== '')
 
 if ($event['r_eventid'] != 0) {
 	$r_events = API::Event()->get([
-		'output' => ['correlationid', 'userid'],
+		'output' => ['correlationid', 'userid', 'cep_ruleid'],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'eventids' => [$event['r_eventid']],
@@ -99,6 +99,7 @@ if ($event['r_eventid'] != 0) {
 	if ($r_events) {
 		$r_event = reset($r_events);
 
+		$event['cep_ruleid'] = $r_event['cep_ruleid'];
 		$event['correlationid'] = $r_event['correlationid'];
 		$event['userid'] = $r_event['userid'];
 	}
@@ -141,7 +142,7 @@ $mediatypes = API::Mediatype()->get([
 ]);
 
 $allowed = [
-	'ui_correlation' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES),
+	'event_processing' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES),
 	'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
 	'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
 	'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
