@@ -566,6 +566,9 @@ static int	history_manager_get_info(zbx_history_manager_t *manager, zbx_history_
 
 		provider = manager->providers[i].values[0];
 
+		zabbix_log(LOG_LEVEL_INFORMATION, "retrieving history provider \"%s\" information",
+				manager->registry.values[i]->name);
+
 		if (FAIL == (ret = provider->impl.get_info(provider->data, &mi, &errmsg)))
 		{
 			*error = zbx_dsprintf(NULL, "cannot retrieve history provider \"%s\" information: %s",
@@ -574,6 +577,9 @@ static int	history_manager_get_info(zbx_history_manager_t *manager, zbx_history_
 
 			goto out;
 		}
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "history provider \"%s\" version \"%s\"",
+				manager->registry.values[i]->name, mi.friendly_current_version);
 
 		zbx_vector_history_provider_info_append(&custom, mi);
 	}
