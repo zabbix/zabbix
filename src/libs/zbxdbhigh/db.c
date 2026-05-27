@@ -96,7 +96,7 @@ int	zbx_db_verify_version_info(struct zbx_db_version_info_t *info, int allow_uns
 
 		if (0 == allow_unsupported || 0 != server_db_deprecated)
 		{
-			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "==================================================");
 			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix %s due to unsupported %s database"
 					" version (%s).", program_type_s, info->database,
 					info->friendly_current_version);
@@ -121,7 +121,7 @@ int	zbx_db_verify_version_info(struct zbx_db_version_info_t *info, int allow_uns
 						" in Zabbix %s configuration file at your own risk.", program_type_s);
 			}
 
-			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "==================================================");
 
 			return FAIL;
 		}
