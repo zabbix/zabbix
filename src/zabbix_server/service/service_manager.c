@@ -19,7 +19,7 @@
 
 #include "../server_constants.h"
 
-#include "zbxcep.h"
+#include "../cep/zbxcep.h"
 #include "zbxcep_client.h"
 #include "zbxcommon.h"
 #include "zbxtimekeeper.h"
