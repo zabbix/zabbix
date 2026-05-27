@@ -2506,17 +2506,6 @@ select {
 	white-space: nowrap;
 	min-width: 160px;
 
-	.table-paging {
-		min-height: 18px;
-		padding: 0 0 2px;
-		border: 0;
-		top: 2px;
-
-		.paging-btn-container {
-			min-height: inherit;
-		}
-	}
-
 	.list-table tbody tr:last-child td {
 		border-bottom-style: none;
 		box-shadow: none;
@@ -2573,7 +2562,7 @@ select {
 			min-width: 10px;
 			height: 10px;
 			margin-left: 3px;
-			margin-right: 10px
+			margin-right: 10px;
 		}
 
 		.svg-graph-hintbox-trigger-color {

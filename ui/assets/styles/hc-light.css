@@ -7994,13 +7994,6 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
   line-height: 18px;
   white-space: nowrap;
   min-width: 160px; }
-  .svg-graph-hintbox .table-paging {
-    min-height: 18px;
-    padding: 0 0 2px;
-    border: 0;
-    top: 2px; }
-    .svg-graph-hintbox .table-paging .paging-btn-container {
-      min-height: inherit; }
   .svg-graph-hintbox .list-table tbody tr:last-child td {
     border-bottom-style: none;
     box-shadow: none; }
