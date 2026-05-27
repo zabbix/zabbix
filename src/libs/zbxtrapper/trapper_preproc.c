@@ -19,6 +19,7 @@
 #include "zbxtime.h"
 #include "zbxvariant.h"
 #include "zbxdbhigh.h"
+#include "zbxeval.h"
 #include "zbx_item_constants.h"
 
 /******************************************************************************
