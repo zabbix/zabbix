@@ -2356,9 +2356,9 @@ CHANGELOG	|26
 
 TABLE|cep_group|cep_groupid|ZBX_DATA
 FIELD		|cep_groupid	|t_id		|	|NOT NULL	|0
-FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0			|1|cep_rule	|cep_ruleid	|RESTRICT
-FIELD		|groupid	|t_id		|	|NULL		|0			|2|hstgrp	|groupid	|RESTRICT
-FIELD		|hostid		|t_id		|	|NULL		|0			|3|hosts	|hostid		|RESTRICT
+FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0			|1|cep_rule	|cep_ruleid
+FIELD		|groupid	|t_id		|	|NULL		|0			|2|hstgrp	|groupid
+FIELD		|hostid		|t_id		|	|NULL		|0			|3|hosts	|hostid
 FIELD		|tag_value	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|cep_ruleid
 INDEX		|2		|groupid
