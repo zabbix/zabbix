@@ -613,15 +613,18 @@ func TestRegexpDenyBeforeWildcardAllow(t *testing.T) {
 }
 
 //nolint:paralleltest
-func TestRegexpFullStringMatchEnforced(t *testing.T) {
+func TestRegexpExplicitAnchorsEnforceFullStringMatch(t *testing.T) {
 	var records accessRules
 
-	records.addRegexpRule(`system\.run`, ALLOW)
+	// user-supplied patterns are not auto-anchored; use ^...$ for full-string match
+	records.addRegexpRule(`^system\.run$`, ALLOW)
+	records.addRule("*", DENY)
 
 	var scenarios = []scenario{
+		{metric: "system.run", result: true},
 		{metric: "system.run[echo 1]", result: false},
 		{metric: "system.run[/bin/hostname]", result: false},
-		{metric: "vfs.file.size[/tmp/x]", result: true},
+		{metric: "vfs.file.size[/tmp/x]", result: false},
 	}
 
 	RunScenarios(t, scenarios, records, 2)
