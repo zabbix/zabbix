@@ -86,9 +86,6 @@ zbx_cep_config_t;
 zbx_cep_config_t	*cep_config_create(void);
 void	cep_config_destroy(zbx_cep_config_t *cep_config);
 
-void	cep_sync_rules(zbx_dbsync_t *sync, zbx_uint64_t revision);
-void	cep_sync_condition(zbx_dbsync_t *sync, zbx_uint64_t revision);
-
-void	cep_config_update_handle(zbx_uint64_t revision);
+void	cep_config_sync(zbx_dbsync_t *rule_sync, zbx_dbsync_t *condition_sync, zbx_uint64_t revision);
 
 #endif

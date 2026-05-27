@@ -7830,9 +7830,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	if (FAIL == zbx_dbsync_prepare_cep_condition(&cep_condition_sync))
 		goto out;
 
-	cep_sync_rules(&cep_rule_sync, new_revision);
-	cep_sync_condition(&cep_condition_sync, new_revision);
-	cep_config_update_handle(new_revision);
+	cep_config_sync(&cep_rule_sync, &cep_condition_sync, new_revision);
 
 	START_SYNC;
 

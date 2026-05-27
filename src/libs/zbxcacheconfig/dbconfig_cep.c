@@ -138,6 +138,14 @@ static void	cep_config_handle_release(zbx_cep_config_handle_t handle)
 	zbx_free(handle);
 }
 
+static int	cep_rule_compare_by_sortorder(const void *a1, const void *a2)
+{
+	const zbx_cep_rule_t	*r1 = *(const zbx_cep_rule_t * const *)a1;
+	const zbx_cep_rule_t	*r2 = *(const zbx_cep_rule_t * const *)a2;
+
+	return r1->sortorder - r2->sortorder;
+}
+
 static zbx_cep_config_handle_t	cep_config_handle_create(zbx_cep_config_t *cep_config, zbx_uint64_t revision)
 {
 	zbx_cep_config_handle_t	handle;
@@ -160,7 +168,7 @@ static zbx_cep_config_handle_t	cep_config_handle_create(zbx_cep_config_t *cep_co
 		zbx_vector_cep_rule_ptr_append(&handle->rules, cep_rule_addref(ref->rule));
 	}
 
-	// TODO: sort rules by sororder
+	zbx_vector_cep_rule_ptr_sort(&handle->rules, cep_rule_compare_by_sortorder);
 
 	return handle;
 }
@@ -201,13 +209,13 @@ void	cep_config_destroy(zbx_cep_config_t *cep_config)
 	zbx_free(cep_config);
 }
 
-void	cep_sync_rules(zbx_dbsync_t *sync, zbx_uint64_t revision)
+static void	cep_sync_rules(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, zbx_uint64_t revision,
+		zbx_vector_cep_rule_ptr_t *rules)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
 	int			ret;
-	zbx_cep_config_t	*cep_config = dc_local()->cep_config;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -237,6 +245,9 @@ void	cep_sync_rules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		rule->status = atoi(row[4]);
 		rule->stop = atoi(row[5]);
 		rule->sortorder = atoi(row[6]);
+
+		if (ZBX_DBSYNC_ROW_UPDATE == tag && NULL != rules)
+			zbx_vector_cep_rule_ptr_append(rules, rule);
 	}
 
 	/* remove deleted correlations */
@@ -401,25 +412,17 @@ static void	cep_rule_update_formula(zbx_cep_rule_t *rule, char **str, size_t *st
 	rule->formula = zbx_strdup(rule->formula, *str);
 }
 
-void	cep_sync_condition(zbx_dbsync_t *sync, zbx_uint64_t revision)
+static void	cep_sync_conditions(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, zbx_uint64_t revision,
+	zbx_vector_cep_rule_ptr_t *rules)
 {
-	char				**row, *str = NULL;
-	size_t				str_alloc = 0;
-	zbx_uint64_t			rowid;
-	unsigned char			tag;
-	int				ret;
-	zbx_cep_config_t		*cep_config = dc_local()->cep_config;
-	zbx_vector_cep_rule_ptr_t	rules, *prules = NULL;
+	char		**row;
+	zbx_uint64_t	rowid;
+	unsigned char	tag;
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_dcsync_sync_start(sync, dbconfig_used_size());
-
-	if (1 != revision)
-	{
-		zbx_vector_cep_rule_ptr_create(&rules);
-		prules = &rules;
-	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -434,7 +437,7 @@ void	cep_sync_condition(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		ZBX_STR2UINT64(conditionid, row[0]);
 		ZBX_STR2UINT64(ruleid, row[1]);
 
-		condition = cep_acquire_condition(cep_config, ruleid, conditionid, revision, prules);
+		condition = cep_acquire_condition(cep_config, ruleid, conditionid, revision, rules);
 
 		condition->type = atoi(row[2]);
 		condition->operator = atoi(row[3]);
@@ -483,34 +486,11 @@ void	cep_sync_condition(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	/* remove deleted correlations */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		cep_remove_condition(cep_config, rowid, revision, prules);
-	}
-
-	if (NULL != prules)
-	{
-		zbx_vector_cep_rule_ptr_sort(prules, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-		zbx_vector_cep_rule_ptr_uniq(prules, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-
-		for (int i = 0; i < prules->values_num; i++)
-			cep_rule_update_formula(prules->values[i], &str, &str_alloc);
-
-		zbx_vector_cep_rule_ptr_destroy(prules);
-	}
-	else
-	{
-		zbx_hashset_iter_t	iter;
-		zbx_cep_rule_ref_t	*ref;
-
-		zbx_hashset_iter_reset(&cep_config->rules, &iter);
-		while (NULL != (ref = (zbx_cep_rule_ref_t *)zbx_hashset_iter_next(&iter)))
-			cep_rule_update_formula(ref->rule, &str, &str_alloc);
-
+		cep_remove_condition(cep_config, rowid, revision, rules);
 	}
 
 	if (0 != sync->add_num + sync->update_num + sync->remove_num)
 		cep_config->revision = revision;
-
-	zbx_free(str);
 
 	zbx_dcsync_sync_end(sync, dbconfig_used_size());
 
@@ -558,10 +538,8 @@ static void	cep_config_dump(void)
 	zbx_set_log_level(loglevel);
 }
 
-void	cep_config_update_handle(zbx_uint64_t revision)
+static void	cep_config_update_handle(zbx_cep_config_t *cep_config, zbx_uint64_t revision)
 {
-	zbx_cep_config_t	*cep_config = dc_local()->cep_config;
-
 	pthread_mutex_lock(&cep_config->lock);
 
 	if (cep_config->revision == revision)
@@ -575,8 +553,58 @@ void	cep_config_update_handle(zbx_uint64_t revision)
 	}
 
 	pthread_mutex_unlock(&cep_config->lock);
+}
+
+static void	cep_update_formulas(zbx_cep_config_t *cep_config, zbx_vector_cep_rule_ptr_t *rules)
+{
+	char	*str = NULL;
+	size_t	str_alloc = 0;
+
+	if (NULL != rules)
+	{
+		zbx_vector_cep_rule_ptr_sort(rules, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+		zbx_vector_cep_rule_ptr_uniq(rules, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
+		for (int i = 0; i < rules->values_num; i++)
+			cep_rule_update_formula(rules->values[i], &str, &str_alloc);
+
+		zbx_vector_cep_rule_ptr_destroy(rules);
+	}
+	else
+	{
+		zbx_hashset_iter_t	iter;
+		zbx_cep_rule_ref_t	*ref;
+
+		zbx_hashset_iter_reset(&cep_config->rules, &iter);
+		while (NULL != (ref = (zbx_cep_rule_ref_t *)zbx_hashset_iter_next(&iter)))
+			cep_rule_update_formula(ref->rule, &str, &str_alloc);
+
+	}
+
+	zbx_free(str);
+}
+
+void	cep_config_sync(zbx_dbsync_t *rule_sync, zbx_dbsync_t *condition_sync, zbx_uint64_t revision)
+{
+	zbx_vector_cep_rule_ptr_t	rules, *prules = NULL;
+	zbx_cep_config_t		*cep_config = dc_local()->cep_config;
+
+	if (0 != cep_config->rules.num_data)
+	{
+		zbx_vector_cep_rule_ptr_create(&rules);
+		prules = &rules;
+	}
+
+	cep_sync_rules(cep_config, rule_sync, revision, prules);
+	cep_sync_conditions(cep_config, condition_sync, revision, prules);
+
+	cep_update_formulas(cep_config, prules);
+	cep_config_update_handle(cep_config, revision);
 
 	cep_config_dump();
+
+	if (NULL != prules)
+		zbx_vector_cep_rule_ptr_destroy(prules);
 }
 
 zbx_cep_config_handle_t	zbx_cep_config_open(void)
