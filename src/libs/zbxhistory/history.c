@@ -196,7 +196,7 @@ static int	history_manager_register_provider(zbx_history_manager_t *manager, con
  * Purpose: clear the history manager and free allocated resources             *
  *                                                                             *
  ******************************************************************************/
-static int	history_manager_clear(zbx_history_manager_t *manager)
+static void	history_manager_clear(zbx_history_manager_t *manager)
 {
 	for (int i = 0; i < manager->registry.values_num; i++)
 	{
@@ -218,8 +218,6 @@ static int	history_manager_clear(zbx_history_manager_t *manager)
 	zbx_vector_history_registry_ptr_destroy(&manager->registry);
 
 	zbx_free(manager->providers);
-
-	return SUCCEED;
 }
 
 /*******************************************************************************
@@ -991,7 +989,7 @@ int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, zbx_uint6
 int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values)
 {
-	int			ret, num = 0;
+	int			ret;
 	zbx_history_session_t	session;
 	zbx_history_record_t	*records = NULL;
 
@@ -1029,7 +1027,7 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
 
 	history_session_clear(&session);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s values:%d", __func__, zbx_result_string(ret), num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s values:%d", __func__, zbx_result_string(ret), ret);
 
 	return ret;
 }

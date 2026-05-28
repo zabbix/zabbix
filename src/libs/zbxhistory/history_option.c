@@ -495,7 +495,7 @@ static int	history_options_validate_precache(const zbx_history_option_t *options
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate value types specified in history provider options        *
+ * Purpose: validate value types,precache in history provider options         *
  *                                                                            *
  * Parameters: options     - [IN] array of history options                    *
  *             options_num - [IN] number of options in the array              *

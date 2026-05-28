@@ -40,7 +40,7 @@
 #define HISTORY_PROVIDER_OPTION_SSL_VERIFY_HOST		"ssl_verify_host"
 #define HISTORY_PROVIDER_OPTION_SSL_CA_LOCATION		"ssl_ca_location"
 #define HISTORY_PROVIDER_OPTION_SSL_CERT_LOCATION	"ssl_cert_location"
-#define HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION 	"ssl_key_location"
+#define HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION	"ssl_key_location"
 
 ZBX_VECTOR_DECL(history_option, zbx_history_option_t)
 

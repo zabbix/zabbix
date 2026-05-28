@@ -190,6 +190,7 @@ typedef int (*zbx_history_provider_fetch_batch_t)(void *data, zbx_vector_item_hi
  * Purpose: retrieve information about the history storage provider           *
  *                                                                            *
  * Parameters:                                                                *
+ *     data  - [IN] internal ClickHouse data                                  *
  *     info  - [OUT] pointer to structure for storing provider information    *
  *     error - [OUT] error message in case of failure                         *
  *                                                                            *
