@@ -369,9 +369,27 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'default timezone', true, 90, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_dc_sync_configuration()',
+				true, 90, 1);
 
 		$server_hk = $this->extractSyncedHousekeeping(self::COMPONENT_SERVER);
 		$this->assertHousekeepingEquals($this->expectedServerHousekeeping($housekeeping), $server_hk);
+	}
+
+	private function reloadProxyAndWaitForConfiguration($wait_for_cache_stats = false) {
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->clearLog(self::COMPONENT_PROXY);
+
+		$this->reloadConfigurationCache(self::COMPONENT_PROXY);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'sending configuration data to proxy "'.self::PROXY_NAME.'"', true, 90, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, 'received configuration data from server',
+				true, 90, 1);
+
+		if ($wait_for_cache_stats) {
+			$this->waitForLogLineToBePresent(self::COMPONENT_PROXY,
+					'memory statistics for configuration cache', true, 90, 1);
+		}
 	}
 
 	public static function housekeepingProvider() {
@@ -525,12 +543,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		$expected_housekeeping = $data['expected'] ?? $data['update'];
 		$this->reloadServerAndAssertHousekeeping($expected_housekeeping);
 
-		$this->clearLog(self::COMPONENT_PROXY);
-		$this->reloadConfigurationCache(self::COMPONENT_PROXY);
-		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, 'received configuration data from server',
-				true, 90, 1);
-		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, 'memory statistics for configuration cache',
-				true, 90, 1);
+		$this->reloadProxyAndWaitForConfiguration(true);
 
 		$proxy_hk = $this->extractSyncedHousekeeping(self::COMPONENT_PROXY);
 		$this->assertArrayHasKey('hk_history', $proxy_hk);
@@ -574,9 +587,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 
 		$this->reloadServerAndAssertHousekeeping($housekeeping);
 
-		$this->reloadConfigurationCache(self::COMPONENT_PROXY);
-		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, 'received configuration data from server',
-				true, 90, 1);
+		$this->reloadProxyAndWaitForConfiguration();
 
 		$eventids = $this->createEventPairs(time() - 2 * SEC_PER_DAY, time());
 		$this->assertEventsCount($eventids['old'], count($eventids['old']));
