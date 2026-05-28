@@ -104,7 +104,7 @@ zabbix_export:
             - Since version 7.2.0, you can also connect to the MSSQL instance using its name. To do this, set the connection string in the `MSSQL URI` host wizard configuration field as `<protocol://host/instance_name>`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Databases
       items:
@@ -3829,7 +3829,7 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MSSQL.HOST}'
           value: localhost
-          description: 'The hostname or IP address of the MSSQL instance.'
+          description: 'Hostname or IP address of the MSSQL instance.'
           config:
             type: TEXT
             priority: '4'
@@ -3943,6 +3943,7 @@ zabbix_export:
             description: 'Threshold of the maximum number of page writes per second. No less than 0.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MSSQL.PASSWORD}'
+          type: SECRET_TEXT
           description: 'MSSQL database password.'
           config:
             type: TEXT
@@ -3997,7 +3998,7 @@ zabbix_export:
             type: TEXT
             priority: '5'
             label: 'MSSQL TCP port'
-            description: 'Port of the MSSQL instance. In the range from 1 to 65535 inclusive.'
+            description: 'MSSQL TCP port. In the range from 1 to 65535 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MSSQL.QUORUM.MEMBER.DISCOVERY.NAME.MATCHES}'
           value: '.*'
@@ -4018,7 +4019,7 @@ zabbix_export:
             label: 'Exclude quorum member filter'
             description: 'Regex string to exclude discovered quorum member by name.'
         - macro: '{$MSSQL.URI}'
-          description: 'Connection string.'
+          description: 'Connection string for the MSSQL instance.'
           config:
             type: TEXT
             priority: '1'

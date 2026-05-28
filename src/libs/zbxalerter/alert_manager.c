@@ -1010,7 +1010,7 @@ static void	am_register_alerter(zbx_am_t *manager, zbx_ipc_client_t *client, zbx
 		if (manager->next_alerter_index == manager->alerters.values_num)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		alerter = (zbx_am_alerter_t *)manager->alerters.values[manager->next_alerter_index++];
@@ -1067,7 +1067,7 @@ static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_cli
 	if (NULL == alerter)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return *alerter;
@@ -1103,11 +1103,19 @@ static char	*am_create_db_alert_message(const zbx_db_config_t *db_config)
 		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " on \"%s",
 				db_config->dbhost);
 
+#if defined(HAVE_POSTGRESQL)
+		if (NULL != db_config->dbports)
+		{
+			zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " ports:%s\"",
+					db_config->dbports);
+		}
+#else
 		if (0 != db_config->dbport)
 		{
 			zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ":%u\"",
 					db_config->dbport);
 		}
+#endif
 		else
 			zbx_chrcpy_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, '\"');
 	}
@@ -1307,11 +1315,17 @@ static void	am_deinit(zbx_am_t *manager)
 		zbx_am_alerter_t	*alerter = manager->alerters.values[i];
 
 		if (NULL != alerter->client)
+		{
+			zbx_ipc_client_send(alerter->client, ZBX_RTC_SHUTDOWN, NULL, 0);
 			zbx_ipc_client_close(alerter->client);
+		}
 	}
 
 	if (NULL != manager->syncer_client)
+	{
+		zbx_ipc_client_send(manager->syncer_client, ZBX_RTC_SHUTDOWN, NULL, 0);
 		zbx_ipc_client_close(manager->syncer_client);
+	}
 
 	zbx_ipc_service_close(&manager->ipc);
 
@@ -2517,7 +2531,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize alert manager: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	manager.dbstatus = zbx_db_connect(ZBX_DB_CONNECT_ONCE);

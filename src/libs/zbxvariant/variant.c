@@ -85,7 +85,7 @@ void	zbx_variant_clear(zbx_variant_t *value)
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	value->type = ZBX_VARIANT_NONE;
@@ -593,7 +593,7 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	switch (value2->type)
@@ -609,7 +609,7 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED == zbx_double_compare(value1_dbl, value2_dbl))

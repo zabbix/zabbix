@@ -873,12 +873,12 @@ class testFormUserRoles extends CWebTest {
 				$this->page->scrollToTop();
 			}
 
-			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
+			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://z-textarea-flexible[@id="name"]'], $role);
 		}
 
 		// Screen for the existing super admin role.
 		$this->page->open('zabbix.php?action=userrole.edit&roleid=3');
-		$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]']);
+		$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://z-textarea-flexible[@id="name"]']);
 		foreach (['Clone' => true, 'Cancel' => true, 'Update' => false, 'Delete' => false] as $button => $clickable) {
 			$this->assertEquals($clickable, $this->query('button', $button)->one()->isClickable());
 		}
@@ -1561,7 +1561,9 @@ class testFormUserRoles extends CWebTest {
 			// Check the layout of tag related fields in Service section of user role config form.
 			$tag_field = $form->getField($field.' access to services with tag');
 			foreach (['tag', 'value'] as $input_type) {
-				$input = $tag_field->query('xpath:.//input[contains(@name, '.CXPathHelper::escapeQuotes('tag_'.$input_type).')]')->one();
+				$input = $tag_field->query('xpath:.//z-textarea-flexible[contains(@name, '.
+						CXPathHelper::escapeQuotes('tag_'.$input_type).')]'
+				)->one();
 				$this->assertEquals($input_type, $input->getAttribute('placeholder'));
 				$this->assertEquals(255, $input->getAttribute('maxlength'));
 			}

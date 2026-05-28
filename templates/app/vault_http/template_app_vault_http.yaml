@@ -33,7 +33,7 @@ zabbix_export:
         Create a Vault service token and set it to the host wizard configuration field `Vault auth token`.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -2399,6 +2399,7 @@ zabbix_export:
             description: 'Maximum percentage of used file descriptors for trigger expression. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$VAULT.TOKEN}'
+          type: SECRET_TEXT
           description: 'Vault auth token.'
           config:
             type: TEXT

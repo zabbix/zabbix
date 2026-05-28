@@ -304,8 +304,9 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow(_('URL (after login)'),
-		(new CTextBox('url', $data['url'], false, DB::getFieldLength('users', 'url')))
+		(new CTextAreaFlexible('url', $data['url']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('users', 'url'))
 	);
 
 $tabs->addTab('userTab', _('User'), $user_form_list);
@@ -529,30 +530,32 @@ if ($data['roleid']) {
 
 	// Modules section.
 
-	$permissions_form_list->addRow(
-		(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
-	);
+	if ($data['modules_config_enabled']) {
+		$permissions_form_list->addRow(
+			(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
+		);
 
-	if (!$data['modules']) {
-		$permissions_form_list->addRow(italic(_('No enabled modules found.')));
-	}
-	else {
-		$elements = [];
-
-		foreach ($data['modules'] as $moduleid => $module_name) {
-			$elements[] = (new CSpan($module_name))->addClass(
-				array_key_exists($moduleid, $data['disabled_moduleids'])
-						|| $data['modules_rules'][$moduleid] == MODULE_STATUS_DISABLED
-					? ZBX_STYLE_STATUS_GREY
-					: ZBX_STYLE_STATUS_GREEN
-			);
+		if (!$data['modules']) {
+			$permissions_form_list->addRow(italic(_('No enabled modules found.')));
 		}
+		else {
+			$elements = [];
 
-		if ($elements) {
-			$permissions_form_list->addRow((new CDiv($elements))
-				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-				->addClass('rules-status-container')
-			);
+			foreach ($data['modules'] as $moduleid => $module_name) {
+				$elements[] = (new CSpan($module_name))->addClass(
+					array_key_exists($moduleid, $data['disabled_moduleids'])
+					|| $data['modules_rules'][$moduleid] == MODULE_STATUS_DISABLED
+						? ZBX_STYLE_STATUS_GREY
+						: ZBX_STYLE_STATUS_GREEN
+				);
+			}
+
+			if ($elements) {
+				$permissions_form_list->addRow((new CDiv($elements))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+				);
+			}
 		}
 	}
 
@@ -612,23 +615,22 @@ $tabs->addTab('permissionsTab', _('Permissions'), $permissions_form_list);
 $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 	->setArgument('action', 'user.list')
 	->setArgument('page', CPagerHelper::loadPage('user.list', null))
-))->setId('cancel');
+))->addClass('js-cancel');
 
 if ($data['userid'] != 0) {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
+		(new CSubmit('', _('Update')))->addClass('js-submit'),
 		[
 			(new CSimpleButton(_('Delete')))
-				->setId('delete')
 				->setEnabled(bccomp(CWebUser::$data['userid'], $data['userid']) != 0)
-				->setId('delete'),
+				->addClass('js-delete'),
 			$cancel_button
 		]
 	));
 }
 else {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
+		(new CSubmit('', _('Add')))->addClass('js-submit'),
 		[$cancel_button]
 	));
 }

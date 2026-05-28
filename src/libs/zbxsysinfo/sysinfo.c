@@ -347,7 +347,7 @@ void	zbx_init_metrics(void)
 		if (SUCCEED != zbx_add_metric(&parameters_agent[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 #endif
@@ -360,7 +360,7 @@ void	zbx_init_metrics(void)
 		if (SUCCEED != zbx_add_metric(&parameters_common[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -371,7 +371,7 @@ void	zbx_init_metrics(void)
 		if (SUCCEED != add_metric_local(&parameters_common_local[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 #endif
@@ -384,7 +384,7 @@ void	zbx_init_metrics(void)
 		if (SUCCEED != zbx_add_metric(&parameters_common_http[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 #endif
@@ -397,7 +397,7 @@ void	zbx_init_metrics(void)
 		if (SUCCEED != zbx_add_metric(&parameters_specific[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 #endif
@@ -410,7 +410,7 @@ void	zbx_init_metrics(void)
 		if (SUCCEED != zbx_add_metric(&parameters_simple[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 #endif
@@ -419,7 +419,7 @@ void	zbx_init_metrics(void)
 	if (SUCCEED != zbx_add_metric(&parameter_hostname, error, sizeof(error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 }
@@ -517,7 +517,7 @@ void	zbx_finalize_key_access_rules_configuration(void)
 	if (NULL == (sysrun_deny = zbx_key_access_rule_create(sysrun_pattern, ZBX_KEY_ACCESS_DENY)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (FAIL != (i = zbx_vector_ptr_search(&key_access_rules, sysrun_deny, compare_key_access_rules)))
@@ -601,7 +601,7 @@ void	zbx_finalize_key_access_rules_configuration(void)
 			zabbix_log(LOG_LEVEL_CRIT, "Item key access rules are configured to match all keys,"
 					" indicating possible configuration problem. "
 					" Please remove the rules if that was the purpose.");
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -1455,7 +1455,7 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c)
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	return ret;
@@ -1900,7 +1900,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 		close(fds[1]);
 
-		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
+		zbx_exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
 	close(fds[1]);

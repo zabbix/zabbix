@@ -175,7 +175,7 @@ static void	notify_alerter(zbx_alerter_notify_mode_t mode)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot open IPC connection to alert manager: %s", error);
 			zbx_free(error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -1094,9 +1094,10 @@ static void	add_sentusers_ack_msg(zbx_user_msg_t **user_msg, zbx_uint64_t action
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = zbx_db_select(
-			"select distinct userid"
-			" from acknowledges"
-			" where eventid=" ZBX_FS_UI64,
+			"select distinct u.userid"
+			" from acknowledges a,users u"
+			" where a.eventid=" ZBX_FS_UI64
+				" and a.userid=u.userid",	/* we skip all acknowledges where userid is NULL */
 			event->eventid);
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -3750,7 +3751,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot open IPC connection to alert manager: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #ifdef HAVE_ARES_QUERY_CACHE
 	zbx_ares_library_init();
