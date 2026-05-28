@@ -331,8 +331,6 @@ abstract class CHostGeneral extends CHostBase {
 	private static function updateHostHgSets(array $hgsets): void {
 		$upd_host_hgsets = [];
 
-		$db_hgsetids = array_flip(self::getDbHgSetIds($hgsets));
-
 		$empty_hgset_hash = hash('sha256', '');
 
 		if (array_key_exists($empty_hgset_hash, $hgsets)) {
@@ -352,11 +350,6 @@ abstract class CHostGeneral extends CHostBase {
 					'values' => ['hgsetid' => $row['hgsetid']],
 					'where' => ['hostid' => $hgsets[$row['hash']]['hostids']]
 				];
-
-				if (array_key_exists($row['hgsetid'], $db_hgsetids)) {
-					unset($db_hgsetids[$row['hgsetid']]);
-				}
-
 				unset($hgsets[$row['hash']]);
 			}
 
@@ -373,8 +366,6 @@ abstract class CHostGeneral extends CHostBase {
 
 			DB::update('host_hgset', $upd_host_hgsets);
 		}
-
-		self::deleteUnusedHgSets(array_keys($db_hgsetids));
 	}
 
 	private static function getDbHgSetIds(array $hgsets): array {
@@ -467,20 +458,6 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($ins_permissions) {
 			DB::insert('permission', $ins_permissions, false);
-		}
-	}
-
-	private static function deleteUnusedHgSets(array $db_hgsetids): void {
-		$del_hgsetids = DBfetchColumn(DBselect(
-			'SELECT h.hgsetid'.
-			' FROM hgset h'.
-			' LEFT JOIN host_hgset hh ON h.hgsetid=hh.hgsetid'.
-			' WHERE '.dbConditionId('h.hgsetid', $db_hgsetids).
-				' AND hh.hostid IS NULL'
-		), 'hgsetid');
-
-		if ($del_hgsetids) {
-			DB::delete('hgset', ['hgsetid' => $del_hgsetids]);
 		}
 	}
 

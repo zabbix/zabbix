@@ -1685,7 +1685,6 @@ class CUser extends CApiService {
 		$upd_user_ugsets = [];
 
 		$db_user_ugsetids = self::getDbUserUgSetIds($ugsets);
-		$db_ugsetids = array_flip($db_user_ugsetids);
 
 		$empty_ugset_hash = self::getUgSetHash([]);
 
@@ -1722,10 +1721,6 @@ class CUser extends CApiService {
 						'values' => ['ugsetid' => $row['ugsetid']],
 						'where' => ['userid' => $upd_userids]
 					];
-
-					if (array_key_exists($row['ugsetid'], $db_ugsetids)) {
-						unset($db_ugsetids[$row['ugsetid']]);
-					}
 				}
 
 				unset($ugsets[$row['hash']]);
@@ -1766,10 +1761,6 @@ class CUser extends CApiService {
 			if ($ins_user_ugsets) {
 				DB::insert('user_ugset', $ins_user_ugsets, false);
 			}
-		}
-
-		if ($db_ugsetids) {
-			self::deleteUnusedUgSets(array_keys($db_ugsetids));
 		}
 	}
 
@@ -1924,20 +1915,6 @@ class CUser extends CApiService {
 		}
 
 		return $hgset_groupids;
-	}
-
-	private static function deleteUnusedUgSets(array $db_ugsetids): void {
-		$del_ugsetids = DBfetchColumn(DBselect(
-			'SELECT u.ugsetid'.
-			' FROM ugset u'.
-			' LEFT JOIN user_ugset uu ON u.ugsetid=uu.ugsetid'.
-			' WHERE '.dbConditionId('u.ugsetid', $db_ugsetids).
-				' AND uu.userid IS NULL'
-		), 'ugsetid');
-
-		if ($del_ugsetids) {
-			DB::delete('ugset', ['ugsetid' => $del_ugsetids]);
-		}
 	}
 
 	/**
