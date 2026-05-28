@@ -282,6 +282,11 @@ class CControllerMenuPopup extends CController {
 				$is_executable = $is_writable ? true : CWebUser::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW);
 			}
 
+			[
+				'keep_history' => $keep_history,
+				'keep_trends' => $keep_trends
+			] = CItemHelper::getStoragePeriods((int) $db_item['value_type'], $db_item['history'], $db_item['trends']);
+
 			return [
 				'type' => 'item',
 				'backurl' => $data['backurl'],
@@ -292,11 +297,10 @@ class CControllerMenuPopup extends CController {
 				'hostid' => $db_item['hostid'],
 				'host' => $db_item['hosts'][0]['host'],
 				'triggers' => $db_item['triggers'],
-				'showGraph' => ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT
-					|| $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64
-				),
-				'history' => $db_item['history'] != 0,
-				'trends' => $db_item['trends'] != 0,
+				// A strict comparison with zero is required here because the $keep_* variables may have a null value.
+				'showGraph' => in_array($db_item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
+						&& ($keep_history !== 0 || $keep_trends !== 0),
+				'history' => $keep_history !== 0,
 				'isDiscovery' => $db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
 				'isExecutable' => $is_executable,
 				'isWriteable' => $is_writable,

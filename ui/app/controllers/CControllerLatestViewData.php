@@ -110,17 +110,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 		order_result($data['items'], $sort_field, $sort_order);
 
-		$simple_interval_parser = new CSimpleIntervalParser();
 		$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
-
-		$config = [
-			'hk_trends_value_types' => CHousekeepingHelper::getValueTypesWithTrends(),
-			'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
-			'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
-			'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
-			'hk_history_value_type_ttl' => Manager::History()->getValueTypesStorageTtls(),
-			'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
-		];
 
 		foreach ($data['items'] as &$item) {
 			$host = $hosts_on_page[$item['hostid']];
@@ -222,55 +212,31 @@ class CControllerLatestViewData extends CControllerDataTable {
 			}
 
 			$item['interval'] = $item_delay;
-			$show_link = false;
-			$value_type_ttl = $config['hk_history_value_type_ttl'];
-			$with_storage_ttl = array_key_exists($item['value_type'], $value_type_ttl);
 
-			if (!$with_storage_ttl && $config['hk_history_global']) {
-				$keep_history = timeUnitToSeconds($config['hk_history']);
-				$item_history = $config['hk_history'];
-			}
-			elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
-				$keep_history = timeUnitToSeconds($item['history']);
-				$item_history = $item['history'];
+			[
+				'history' => $item['history'],
+				'keep_history' => $keep_history,
+				'history_has_errors' => $history_has_errors,
+				'trends' => $item['trends'],
+				'keep_trends' => $keep_trends,
+				'trends_has_errors' => $trends_has_errors
+			] = CItemHelper::getStoragePeriods((int) $item['value_type'], $item['history'], $item['trends']);
 
-				if ($keep_history > 0 && $with_storage_ttl) {
-					$show_link = true;
-					$hk_history = $value_type_ttl[$item['value_type']]['value_ttl'];
-					$keep_history = $hk_history === null ? 0 : $hk_history;
-					$item_history = $hk_history === null ? '' : convertSecondsToTimeUnits($hk_history);
-				}
-			}
-			else {
-				$keep_history = 0;
-				$item_history = (new CSpan($item['history']))
+			if ($history_has_errors) {
+				$item['history'] = (new CSpan($item['history']))
 					->addClass(ZBX_STYLE_RED)
 					->toString();
 			}
 
-			$item['history'] = $item_history;
-
-			if (in_array($item['value_type'], $config['hk_trends_value_types'])) {
-				if ($config['hk_trends_global']) {
-					$keep_trends = timeUnitToSeconds($config['hk_trends']);
-					$item_trends = $config['hk_trends'];
-				}
-				elseif ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
-					$keep_trends = timeUnitToSeconds($item['trends']);
-					$item_trends = $item['trends'];
-				}
-				else {
-					$keep_trends = 0;
-					$item_trends = (new CSpan($item['trends']))->addClass(ZBX_STYLE_RED);
-				}
-			}
-			else {
-				$keep_trends = 0;
-				$item_trends = '';
+			if ($trends_has_errors) {
+				$item['trends'] = (new CSpan($item['trends']))
+					->addClass(ZBX_STYLE_RED)
+					->toString();
 			}
 
-			$item['trends'] = $item_trends;
-			$item['show_link'] = $keep_history > 0 || $keep_trends > 0 || $show_link;
+			// A strict comparison with zero is required here because these variables may have a null value.
+			$item['show_link'] = $keep_history !== 0 || $keep_trends !== 0;
+
 			$item['type'] = item_type2str($item['type']);
 			$item['last_check'] = $last_check;
 			$item['last_value'] = $last_value;
