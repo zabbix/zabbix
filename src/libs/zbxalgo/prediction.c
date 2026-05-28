@@ -1157,27 +1157,9 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 		goto out;
 	}
 
-	double a, b, exponent;
-
-	a = ZBX_MATRIX_EL(coefficients, 0, 0);
-	b = ZBX_MATRIX_EL(coefficients, 1, 0);
-
-	if (0 != isnan(a) || 0 != isnan(b) || 0.0 == b)
-	{
-		res = FAIL;
-		goto out;
-	}
-
-	if (0 != isinf(a) || 0 != isinf(b))
-	{
-		result = DBL_MAX;
-		goto out;
-	}
-
 	if (FIT_LINEAR == fit)
 	{
-		result = (threshold - ZBX_MATRIX_EL(coefficients, 0, 0)) /
-				ZBX_MATRIX_EL(coefficients, 1, 0) - now;
+		result = (threshold - ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0) - now;
 	}
 	else if (FIT_POLYNOMIAL == fit)
 	{
@@ -1185,82 +1167,28 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 	}
 	else if (FIT_EXPONENTIAL == fit)
 	{
-		if (0 != isnan(threshold) || 0.0 >= threshold)
-		{
-			res = FAIL;
-			goto out;
-		}
-
-		if (0 != isinf(threshold))
-		{
-			result = DBL_MAX;
-			goto out;
-		}
-
-		result = (log(threshold) - ZBX_MATRIX_EL(coefficients, 0, 0)) /
-				ZBX_MATRIX_EL(coefficients, 1, 0) - now;
+		result = (log(threshold) - ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0) - now;
 	}
 	else if (FIT_LOGARITHMIC == fit)
 	{
-		exponent = (threshold - ZBX_MATRIX_EL(coefficients, 0, 0)) /
-				ZBX_MATRIX_EL(coefficients, 1, 0);
-
-		if (0 != isnan(exponent))
-		{
-			res = FAIL;
-			goto out;
-		}
-
-		if (0 != isinf(exponent) || exponent > log(DBL_MAX))
-		{
-			result = DBL_MAX;
-			goto out;
-		}
-
-		result = exp(exponent) - now;
+		result = exp((threshold - ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)) - now;
 	}
 	else if (FIT_POWER == fit)
 	{
-		if (0 != isnan(threshold) || 0.0 >= threshold)
-		{
-			res = FAIL;
-			goto out;
-		}
-
-		if (0 != isinf(threshold))
-		{
-			result = DBL_MAX;
-			goto out;
-		}
-
-		exponent = (log(threshold) - ZBX_MATRIX_EL(coefficients, 0, 0)) /
-			ZBX_MATRIX_EL(coefficients, 1, 0);
-
-		if (0 != isnan(exponent))
-		{
-			res = FAIL;
-			goto out;
-		}
-
-		if (0 != isinf(exponent) || exponent > log(DBL_MAX))
-		{
-			result = DBL_MAX;
-			goto out;
-		}
-
-		result = exp(exponent) - now;
+		result = exp((log(threshold) - ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0))
+				- now;
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		res = FAIL;
 	}
 out:
 	if (SUCCEED != res)
 	{
 		result = ZBX_MATH_ERROR;
 	}
-	else if (0 != isnan(result))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
-		result = ZBX_MATH_ERROR;
-	}
-	else if (0 != isinf(result) || 0.0 > result || DBL_MAX < result)
+	else if (0 == isfinite(result) || 0.0 > result || DBL_MAX < result)
 	{
 		result = DBL_MAX;
 	}
