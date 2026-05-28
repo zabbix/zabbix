@@ -57,7 +57,6 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 				(new CDiv())
 					->setId('tab_info')
 					->addClass(ZBX_STYLE_FILTER_CONTAINER)
-					->addClass(ZBX_STYLE_SERVICE_INFO_CONTAINER)
 					->addItem(new CPartial('service.info', $data + ['is_editable' => false]))
 			);
 	}

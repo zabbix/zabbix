@@ -3001,8 +3001,6 @@ button {
   .filter-space .filter-btn-container {
     height: 29px;
     z-index: 2; }
-  .filter-space .service-info-container {
-    border-top-right-radius: var(--surface-border-radius); }
   .filter-space .ui-tabs-nav {
     height: 29px;
     border-bottom: 0; }
