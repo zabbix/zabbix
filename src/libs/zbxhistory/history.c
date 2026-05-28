@@ -308,7 +308,7 @@ static void	history_manager_registry_update_types(zbx_history_manager_t *manager
  *                                                                            *
  * Parameters: manager - [IN] history manager                                 *
  *                                                                            *
- * Return value: index of the default provider                                *
+ * Return value: index of the default provider or FAIL if not registered      *
  *                                                                            *
  * Comments: Default history provider is SQL.                                 *
  *                                                                            *
