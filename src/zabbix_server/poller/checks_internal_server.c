@@ -108,10 +108,20 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 	}
 	else if (0 == strcmp(param1, "proxy"))			/* zabbix["proxy",<hostname>,"lastaccess" OR "delay"] */
 	{							/* zabbix["proxy","discovery"]                        */
-		int	res;
+		int	res, errorcode;
 		char	*error = NULL;
+		zbx_dc_host_t	host;
 
-		/* this item is always processed by server */
+		zbx_dc_config_get_hosts_by_hostids(&host, &item->host.hostid, &errorcode, 1);
+		if (SUCCEED != errorcode)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to verify host data."));
+			goto out;
+		}
+
+		/* this item is alowed only on hosts monitored by server */
+		if (HOST_MONITORED_BY_SERVER != host.monitored_by)
+			goto out;
 
 		if (2 > nparams || 3 < nparams)
 		{
@@ -309,11 +319,21 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 	/* zabbix["proxy group",<groupname>,"state" OR "available" OR "pavailable" OR "proxies" ] */
 	else if (0 == strcmp(param1, "proxy group"))
 	{
-		char		*error = NULL;
+		int		errorcode;
+		char		*data, *error = NULL;
 		zbx_pg_stats_t	stats;
-		char		*data;
+		zbx_dc_host_t	host;
 
-		/* this item is always processed by server */
+		zbx_dc_config_get_hosts_by_hostids(&host, &item->host.hostid, &errorcode, 1);
+		if (SUCCEED != errorcode)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to verify host data."));
+			goto out;
+		}
+
+		/* this item is alowed only on hosts monitored by server */
+		if (HOST_MONITORED_BY_SERVER != host.monitored_by)
+			goto out;
 
 		if (2 != nparams && 3 != nparams)
 		{
