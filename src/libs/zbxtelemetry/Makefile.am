@@ -5,7 +5,7 @@ noinst_LIBRARIES = libzbxtelemetry.a
 libzbxtelemetry_a_SOURCES = \
         telemetry_query.c \
         telemetry_query_parse.c \
-        telemetry_sql.c \
+        telemetry_query_sql.c \
         telemetry.h \
         telemetry_query_clickhouse.c \
         telemetry_query_elastic.c \
