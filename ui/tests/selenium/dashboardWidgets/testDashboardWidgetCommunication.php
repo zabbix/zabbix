@@ -2819,7 +2819,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 		$dashboard->waitUntilReady();
 		$this->closeOpenedPopup();
 
-		// Go through all updated listeners and theck that no data is available on the listener widget.
+		// Go through all updated listeners and check that no data is available on the listener widget.
 		foreach ($data['expected'] as $listener_name => $outcome) {
 			$listener = $dashboard->getWidget($listener_name);
 
