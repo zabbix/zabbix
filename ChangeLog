@@ -1,9 +1,12 @@
 Changes for 8.0.0beta2
 
 New features:
+A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
+.......PS. [ZBXNEXT-10611] added real host name for native vmware.*.alarms.get item keys (MVekslers)
 A.F.....S. [ZBXNEXT-1150] implemented storage and display of maintenance-related event suppressions and unsuppressions (aetatsu, Ivo)
 
 Bug fixes:
+.......PS. [ZBX-27832] fixed changelog not being flushed (vso)
 ........S. [ZBX-22504] improved memory usage in lld worker proecesses with large low level discovery (vso)
 A......... [ZBX-27780] restored support of LLD macros in LLD rule override operations 'Update interval', 'History' and 'Trends' (dpankins)
 ........S. [ZBX-27736] fixed no_data trigger flickering into unknown state for unsupported items (arimdjonoks)
@@ -353,6 +356,7 @@ Changes for 7.4.11rc2
 New features:
 
 Bug fixes:
+.......PS. [ZBX-27832] fixed changelog not being flushed (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.11rc1
@@ -5886,6 +5890,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.47rc1
 
 New features:
+A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
 
 Bug fixes:
 ........S. [ZBX-22504] improved memory usage in lld worker proecesses with large low level discovery (vso)
