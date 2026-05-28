@@ -146,7 +146,7 @@ typedef zbx_uint64_t(*zbx_history_provider_flush_t)(void *data);
  *     end        - [IN] end timestamp of the requested period                *
  *                       (less or equal, optional)                            *
  *     count      - [IN] maximum number of values to retrieve                 *
- *     values     - [OUT] pointer to store the retrieved history records      *
+ *     rows       - [OUT] pointer to store the retrieved history records      *
  *     error      - [OUT] error message in case of failure                    *
  *                                                                            *
  * Return value: SUCCEED - data fetched successfully                          *

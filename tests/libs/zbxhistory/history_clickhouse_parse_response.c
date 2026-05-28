@@ -24,7 +24,7 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	char	 			*response;
+	char				*response;
 	unsigned char			value_type;
 	zbx_vector_history_record_t	values_exp, values_out;
 	zbx_history_record_t		*values = NULL;

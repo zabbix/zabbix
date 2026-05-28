@@ -4,7 +4,6 @@ noinst_PROGRAMS = \
 	zbx_history_get_values \
 	history_clickhouse_parse_response \
 	history_provider_parse_options
-	
 
 HISTORY_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \

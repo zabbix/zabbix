@@ -66,7 +66,6 @@ void	zbx_mock_test_entry(void **state)
 	const char			*conf, *name_exp;
 	char				*name_ret, *error = NULL;
 
-
 	ZBX_UNUSED(state);
 
 	zbx_vector_history_option_create(&options_ret);

@@ -161,7 +161,6 @@ zbx_evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=zbx_history_get_trends_flags \
 	$(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-
 zbx_STL_SOURCES = \
 	zbx_STL.c \
 	$(COMMON_SRC_FILES)

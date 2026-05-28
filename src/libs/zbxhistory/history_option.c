@@ -679,7 +679,7 @@ int	history_options_add_common_params(zbx_vector_history_option_t *options, cons
  ******************************************************************************/
 void	history_log_options(zbx_history_option_t *options, int options_num)
 {
-	const char *unmasked =
+	const char	*unmasked =
 			HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES ","
 			HISTORY_PROVIDER_OPTION_VALUE_TYPES ","
 			HISTORY_PROVIDER_OPTION_SOURCE_IP ","

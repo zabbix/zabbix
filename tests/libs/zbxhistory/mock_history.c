@@ -60,7 +60,6 @@ int	__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_
 	ZBX_UNUSED(error);
 
 	return SUCCEED;
-
 }
 
 int	__wrap_zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
