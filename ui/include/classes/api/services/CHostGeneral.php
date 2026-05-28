@@ -368,20 +368,6 @@ abstract class CHostGeneral extends CHostBase {
 		}
 	}
 
-	private static function getDbHgSetIds(array $hgsets): array {
-		$hostids = [];
-
-		foreach ($hgsets as $hgset) {
-			$hostids = array_merge($hostids, $hgset['hostids']);
-		}
-
-		return DBfetchColumn(DBselect(
-			'SELECT DISTINCT hh.hgsetid'.
-			' FROM host_hgset hh'.
-			' WHERE '.dbConditionId('hh.hostid', $hostids)
-		), 'hgsetid');
-	}
-
 	private static function createHgSets(array &$hgsets): void {
 		$hgsetids = DB::insert('hgset', $hgsets);
 
