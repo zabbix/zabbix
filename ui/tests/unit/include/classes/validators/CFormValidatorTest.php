@@ -2639,4 +2639,56 @@ class CFormValidatorTest extends TestCase {
 			$this->assertSame($expected_data, $data);
 		}
 	}
+
+	public function testNormalizeRulesArrayNormalization() {
+		$non_sequential_array = [1 => 'agent', 2 => 'snmp', 3 => 'simple'];
+
+		$rules = [
+			'object',
+			'fields' => [
+				'item_type' => ['string', 'in' => $non_sequential_array]
+			]
+		];
+
+		$validator = new CFormValidator($rules);
+		$reflection = new ReflectionClass($validator);
+		$property = $reflection->getProperty('rules');
+		$normalized_rules = $property->getValue($validator);
+
+		$processed_in_array = $normalized_rules['fields']['item_type'][0]['in'];
+		$this->assertSame(
+			['agent', 'snmp', 'simple'],
+			$processed_in_array,
+			"The normalization failed!"
+		);
+	}
+
+	public function testNormalizeWhenRulesArrayNormalization() {
+		$non_sequential_array = [1 => 'agent', 2 => 'snmp', 3 => 'simple'];
+
+		$rules = [
+			'object',
+			'fields' => [
+				'item_type' => ['string'],
+				'target_field' => ['string',
+					'when' => [
+						'item_type',
+						'in' => $non_sequential_array
+					]
+				]
+			]
+		];
+
+		$validator = new CFormValidator($rules);
+		$reflection = new ReflectionClass($validator);
+		$property = $reflection->getProperty('rules');
+		$normalized_rules = $property->getValue($validator);
+
+		$processed_in_array = $normalized_rules['fields']['target_field'][0]['when'][0]['in'];
+		$this->assertSame(
+			['agent', 'snmp', 'simple'],
+			$processed_in_array,
+			"The normalization failed!"
+		);
+	}
 }
