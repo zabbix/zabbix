@@ -15,11 +15,12 @@
 package keyaccess
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"math"
 	"regexp"
-	"sort"
+	"slices"
 
 	"golang.zabbix.com/agent2/pkg/wildcard"
 	"golang.zabbix.com/sdk/conf"
@@ -30,6 +31,10 @@ import (
 var (
 	errInvalidRule                 = errors.New("invalid key access rule")
 	errRegexpPatternMustNotBeEmpty = errors.New("regular expression pattern must not be empty")
+
+	// rules is a package-level cache of loaded access rules.
+	//nolint:gochecknoglobals // rules are loaded once and used across checks.
+	rules []*Rule
 )
 
 // RuleType Access rule permission type
@@ -41,6 +46,29 @@ const (
 	DENY
 )
 
+// BasePattern holds the common fields shared by Record and Rule.
+type BasePattern struct {
+	Pattern    string
+	Permission RuleType
+	IsRegexp   bool
+}
+
+// Record is a key access record.
+type Record struct {
+	BasePattern
+
+	Line int
+}
+
+// Rule is a key access rule definition.
+type Rule struct {
+	BasePattern
+
+	Key    string
+	Params []string
+	Regexp *regexp.Regexp
+}
+
 func (t RuleType) String() string {
 	switch t {
 	case ALLOW:
@@ -50,13 +78,6 @@ func (t RuleType) String() string {
 	default:
 		return "unknown"
 	}
-}
-
-// BasePattern holds the common fields shared by Record and Rule.
-type BasePattern struct {
-	Pattern    string
-	Permission RuleType
-	IsRegexp   bool
 }
 
 // permissionName returns the config parameter name corresponding to a pattern's permission type and kind.
@@ -72,21 +93,17 @@ func (b BasePattern) permissionName() string {
 	return b.Permission.String()
 }
 
-// Record key access record
-type Record struct {
-	BasePattern
-	Line int
+func (r Record) permissionName() string {
+	return r.BasePattern.permissionName()
 }
 
-// Rule key access rule definition
-type Rule struct {
-	BasePattern
-	Key    string
-	Params []string
-	Regexp *regexp.Regexp
-}
+func (r *Rule) permissionName() string {
+	if r == nil {
+		return "unknown"
+	}
 
-var rules []*Rule
+	return r.BasePattern.permissionName()
+}
 
 func parse(rec Record) (r *Rule, err error) {
 	r = &Rule{
@@ -199,7 +216,8 @@ func appendRecordsFromNode(records *[]Record, node any, permission RuleType, isR
 
 func addConfiguredRules(records []Record) error {
 	for _, r := range records {
-		if err := addRule(r); err != nil {
+		err := addRule(r)
+		if err != nil {
 			return fmt.Errorf(
 				"%w: %s %q %s",
 				errInvalidRule,
@@ -301,15 +319,22 @@ func LoadRules(allowRecords, denyRecords, allowRegexpRecords, denyRegexpRecords 
 	appendRecordsFromNode(&records, allowRegexpRecords, ALLOW, true)
 	appendRecordsFromNode(&records, denyRegexpRecords, DENY, true)
 
-	sort.SliceStable(records, func(i, j int) bool {
-		return records[i].Line < records[j].Line
+	slices.SortStableFunc(records, func(a, b Record) int {
+		return cmp.Compare(a.Line, b.Line)
 	})
 
-	if err := addConfiguredRules(records); err != nil {
+	err := addConfiguredRules(records)
+	if err != nil {
 		return err
 	}
 
-	sysrunRule, sysrunIndex, rulesNum, err := prepareSystemRunRule()
+	var (
+		sysrunRule  *Rule
+		sysrunIndex int
+		rulesNum    int
+	)
+
+	sysrunRule, sysrunIndex, rulesNum, err = prepareSystemRunRule()
 	if err != nil {
 		return err
 	}
