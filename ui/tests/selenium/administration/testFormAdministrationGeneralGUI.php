@@ -1028,7 +1028,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 
 			case 'Limit for search and filter results':
 			case 'Max number of columns and rows in overview tables':
-				$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
+				$table = $this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
 				$this->assertEquals($data['row_count'], $table->getRows()->count());
 				break;
 

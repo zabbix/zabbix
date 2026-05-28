@@ -1244,6 +1244,7 @@ class testFormEventCorrelation extends CWebTest {
 			// When no error expected.
 
 			$dialog->ensureNotPresent();
+			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Event correlation '.($update ? 'updated' : 'created'));
 
 			if ($update) {

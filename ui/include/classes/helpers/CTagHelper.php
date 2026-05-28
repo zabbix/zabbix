@@ -65,6 +65,18 @@ class CTagHelper {
 		}
 	}
 
+	public static function getTagsList(array $object, array $options = []): array {
+		$options += [
+			'filter_tags' => [],
+			'tag_priority' => ''
+		];
+
+		$filter_tags = self::getFilterTagsIndexedByTag($options['filter_tags']);
+		$priority_tags = self::getPriorityTags($options['tag_priority']);
+
+		return self::getReorderedTags($object['tags'], $filter_tags, $priority_tags);
+	}
+
 	public static function getTagsHtml(array $objects, int $object_type, array $options = []): array {
 		$options += [
 			'filter_tags' => [],
@@ -164,7 +176,7 @@ class CTagHelper {
 			self::orderByPriorityTagsFirst($tags, $priority_tags);
 		}
 
-		return $tags;
+		return array_values($tags);
 	}
 
 	private static function orderByFilterTagsFirst(array &$tags, array $filter_tags): void {

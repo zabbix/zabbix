@@ -41,7 +41,7 @@ $form_list = (new CFormList())
 
 if (array_key_exists('history', $data)) {
 	$form_list->addRow(_('History'),
-		(new CDiv(makeEventHistoryTable($data['history'], $data['users'])))
+		(new CDiv(makeEventHistoryTable($data['history'], $data['users'], $data['maintenances'])))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);

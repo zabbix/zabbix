@@ -18,11 +18,28 @@ const CSRF_TOKEN_NAME = '_csrf_token';
 const ZBX_COLOR_SCHEME_DARK = 'dark';
 const ZBX_COLOR_SCHEME_LIGHT = 'light';
 
+const ZBX_FLAG_DISCOVERY_CREATED = 0x04;
+
+const ZBX_PROPERTY_INHERITED = 0x01;
+const ZBX_PROPERTY_OWN = 0x02;
+const ZBX_PROPERTY_BOTH = 0x03;
+
+const ZBX_SORT_UP = 'ASC';
+const ZBX_SORT_DOWN = 'DESC';
+
+const ZBX_STYLE_LOADING = 'is-loading';
+const ZBX_STYLE_LOADING_FADEIN = 'is-loading-fadein';
+
+const ZBX_STYLE_HIDDEN = 'hidden';
 const ZBX_STYLE_DISPLAY_NONE = 'display-none';
 
 const ZBX_STYLE_NO_DATA = 'no-data';
 const ZBX_STYLE_NO_DATA_DESCRIPTION = 'no-data-description';
 const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';
+const ZBX_STYLE_NO_INDENT = 'no-indent';
+const ZBX_STYLE_WORDBREAK = 'wordbreak';
+
+const ZBX_STYLE_LAYOUT_WRAPPER = 'wrapper';
 
 const ZBX_STYLE_BTN = 'btn';
 const ZBX_STYLE_BTN_ALT = 'btn-alt';
@@ -31,21 +48,35 @@ const ZBX_STYLE_BTN_GREY_ICON = 'btn-grey-icon';
 const ZBX_STYLE_BTN_ICON = 'btn-icon';
 const ZBX_STYLE_BTN_LINK = 'btn-link';
 const ZBX_STYLE_BTN_SMALL = 'btn-small';
+const ZBX_STYLE_BTN_TAG = 'btn-tag';
+
+const ZBX_STYLE_ACTION_CONTAINER = 'action-container';
 
 const ZBX_STYLE_OVERLAY_DIALOGUE_HEADER = 'overlay-dialogue-header';
 
 const ZBX_STYLE_GRID_COLUMN_FIRST = 'column-first';
 const ZBX_STYLE_GRID_COLUMN_LAST = 'column-last';
 
+const ZBX_STYLE_DISABLED = 'disabled';
+
 const ZBX_STYLE_FORM_GRID = 'form-grid';
+const ZBX_STYLE_FORM_LABEL = 'form-label';
 const ZBX_STYLE_FORM_FIELD = 'form-field';
 const ZBX_STYLE_FORM_FIELDS_HINT = 'form-fields-hint';
 const ZBX_STYLE_FORM_DESCRIPTION = 'form-description';
+
+const ZBX_STYLE_RADIO_LIST_CONTROL = 'radio-list-control';
 
 const ZBX_STYLE_FIELD_LABEL_ASTERISK = 'form-label-asterisk';
 
 const ZBX_STYLE_MARKDOWN = 'markdown';
 const ZBX_STYLE_FORMATED_TEXT = 'formated-text';
+
+const ZBX_STYLE_GREY = 'grey';
+
+const ZBX_STYLE_PAGING_BTN_CONTAINER = 'paging-btn-container';
+const ZBX_STYLE_TABLE_PAGING = 'table-paging';
+const ZBX_STYLE_TABLE_STATS = 'table-stats';
 
 const ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
 const ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER = 'textarea-flexible-container';
@@ -56,6 +87,7 @@ const ZBX_STYLE_COLOR_PICKER = 'color-picker';
 
 const ZBX_STYLE_COLOR_WARNING = 'color-warning';
 
+const ZBX_STYLE_ARROW_UP = 'arrow-up';
 const ZBX_STYLE_ARROW_DOWN = 'arrow-down';
 const ZBX_STYLE_ARROW_RIGHT = 'arrow-right';
 const ZBX_STYLE_COLLAPSIBLE = 'collapsible';
@@ -65,6 +97,7 @@ const ZBX_STYLE_PROBLEM_ICON_LINK = 'problem-icon-link';
 const ZBX_STYLE_PROBLEM_ICON_LIST_ITEM = 'problem-icon-list-item';
 const ZBX_STYLE_TOGGLE = 'toggle';
 
+const ZBX_STYLE_LINK_ACTION = 'link-action';
 const ZBX_STYLE_LINK_ALT = 'link-alt';
 
 const ZBX_STYLE_LIST_TABLE = 'list-table';
@@ -77,6 +110,11 @@ const ZBX_STYLE_AVERAGE_BG = 'average-bg';
 const ZBX_STYLE_HIGH_BG = 'high-bg';
 const ZBX_STYLE_DISASTER_BG = 'disaster-bg';
 
+const ZBX_STYLE_NOWRAP = 'nowrap';
+const ZBX_STYLE_STATUS_CONTAINER = 'status-container';
+const ZBX_STYLE_STATUS_GREEN = 'status-green';
+const ZBX_STYLE_STATUS_GREY = 'status-grey';
+
 const ZBX_STYLE_STATUS_NA_BG = 'status-na-bg';
 const ZBX_STYLE_STATUS_INFO_BG = 'status-info-bg';
 const ZBX_STYLE_STATUS_WARNING_BG = 'status-warning-bg';
@@ -87,7 +125,11 @@ const ZBX_STYLE_STATUS_DISASTER_BG = 'status-disaster-bg';
 const ZBX_STYLE_DEFAULT_OPTION = 'default-option';
 
 const ZBX_STYLE_TAG = 'tag';
+const ZBX_STYLE_TAG_INHERITED = 'tag-inherited';
+const ZBX_STYLE_TAG_INHERITED_DUPLICATE = 'tag-inherited-duplicate';
+const ZBX_STYLE_TAG_INHERITED_TITLE = 'tag-inherited-title';
 const ZBX_STYLE_TAGS_LIST = 'tags-list';
+const ZBX_STYLE_TAGS_WRAPPER = 'tags-wrapper';
 
 const ZBX_STYLE_CHECKBOX_RADIO = 'checkbox-radio';
 
@@ -95,6 +137,16 @@ const ZBX_STYLE_OVERLAY_DIALOGUE = 'overlay-dialogue';
 
 const ZBX_STYLE_HEADER_CONTROLS = 'header-controls';
 
+const ZBX_STYLE_GREEN = 'green';
+const ZBX_STYLE_RED = 'red';
+const ZBX_STYLE_ORANGE = 'orange';
+const ZBX_STYLE_REL_CONTAINER = 'rel-container';
+
+const ZBX_STYLE_SELECTED_ITEM_COUNT = 'selected-item-count';
+
+const ZBX_STYLE_HINTBOX_WRAP = 'hintbox-wrap';
+
+const ZBX_ICON_ALERT_WITH_CONTENT = 'zi-alert-with-content';
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';
 const ZBX_ICON_CHECK = 'zi-check';
@@ -104,9 +156,12 @@ const ZBX_ICON_CHEVRON_LEFT = 'zi-chevron-left';
 const ZBX_ICON_CHEVRON_RIGHT = 'zi-chevron-right';
 const ZBX_ICON_CHEVRON_UP = 'zi-chevron-up';
 const ZBX_ICON_COG_FILLED = 'zi-cog-filled';
+const ZBX_ICON_CONTEXT = 'zi-context';
 const ZBX_ICON_COPY = 'zi-copy';
+const ZBX_ICON_CROSS = 'zi-cross';
 const ZBX_ICON_EYE_OFF = 'zi-eye-off';
 const ZBX_ICON_FILTER = 'zi-filter';
+const ZBX_ICON_FILTERS = 'zi-filters';
 const ZBX_ICON_HELP_SMALL = 'zi-help-small';
 const ZBX_ICON_HOME = 'zi-home';
 const ZBX_ICON_LOCK = 'zi-lock';
@@ -122,12 +177,33 @@ const ZBX_ICON_SEARCH_LARGE = 'zi-search-large';
 const ZBX_ICON_SPEAKER = 'zi-speaker';
 const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
 const ZBX_ICON_TEXT = 'zi-text';
+const ZBX_ICON_TIMES = 'zi-times';
 const ZBX_ICON_WIDGET_AWAITING_DATA_LARGE = 'zi-widget-awaiting-data-large';
 const ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE = 'zi-widget-empty-references-large';
 const ZBX_ICON_WIDGET_NOT_CONFIGURED_LARGE = ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE;
 const ZBX_ICON_WRENCH_ALT_SMALL = 'zi-wrench-alt-small';
 
 const ZBX_PREG_NUMBER = /(?<number>-?((?<int>\d+)(\.(?<frac>\d*))?|\.(?<frac_only>\d+))([Ee](?<exp>[+-]?\d+))?)/;
+
+const HOST_STATUS_MONITORED = 0;
+
+const HOST_MAINTENANCE_STATUS_ON = 1;
+
+const HOST_ENCRYPTION_NONE = 1;
+const HOST_ENCRYPTION_PSK = 2;
+const HOST_ENCRYPTION_CERTIFICATE = 4;
+
+const ZBX_MONITORED_BY_PROXY = 1;
+const ZBX_MONITORED_BY_PROXY_GROUP = 2;
+
+const ZBX_TAG_OBJECT_TEMPLATE = 0;
+const ZBX_TAG_OBJECT_HOST = 1;
+const ZBX_TAG_OBJECT_HOST_PROTOTYPE = 2;
+const ZBX_TAG_OBJECT_ITEM = 3;
+const ZBX_TAG_OBJECT_ITEM_PROTOTYPE = 4;
+const ZBX_TAG_OBJECT_TRIGGER = 5;
+const ZBX_TAG_OBJECT_TRIGGER_PROTOTYPE = 6;
+const ZBX_TAG_OBJECT_HTTPTEST = 7;
 
 const ITEM_VALUE_TYPE_FLOAT = 0;
 const ITEM_VALUE_TYPE_STR = 1;
@@ -136,6 +212,9 @@ const ITEM_VALUE_TYPE_UINT64 = 3;
 const ITEM_VALUE_TYPE_TEXT = 4;
 const ITEM_VALUE_TYPE_BINARY = 5;
 const ITEM_VALUE_TYPE_JSON = 6;
+
+const ITEM_STATE_NORMAL = 0;
+const ITEM_STATE_NOTSUPPORTED = 1;
 
 const TRIGGER_SEVERITY_NOT_CLASSIFIED = 0;
 const TRIGGER_SEVERITY_INFORMATION = 1;
@@ -254,5 +333,21 @@ const NAME_DELIMITER = ': ';
 
 const WRAPPER_PADDING_RIGHT = 10;
 
+const SHOW_TAGS_NONE = 0;
+const SHOW_TAGS_1 = 1;
+const SHOW_TAGS_2 = 2;
+const SHOW_TAGS_3 = 3;
+
+const TAG_NAME_FULL = 0;
+const TAG_NAME_SHORTENED = 1;
+const TAG_NAME_NONE = 2;
+
+const OPERATIONAL_DATA_SHOW_NONE = 0;
+const OPERATIONAL_DATA_SHOW_SEPARATELY = 1;
+const OPERATIONAL_DATA_SHOW_WITH_PROBLEM = 2;
+
 const EVENT_CONTEXT_PAGE_NAVIGATION = 'page_navigation';
 const EVENT_BACK_FORWARD = 'back_forward';
+
+const EVENT_CONTEXT_OVERLAY = 'overlay';
+const EVENT_UNMOUNT = 'unmount';
