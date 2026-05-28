@@ -175,7 +175,6 @@ class CHistory extends CApiService {
 	 * @see CHistory::get
 	 */
 	private function getFromSql($options) {
-		$result = [];
 		$sql_parts = [
 			'select'	=> ['history' => 'h.itemid'],
 			'from'		=> $this->tableName.' h',
@@ -189,16 +188,6 @@ class CHistory extends CApiService {
 			$sql_parts['where']['itemid'] = dbConditionId('h.itemid', $options['itemids']);
 		}
 
-		// time_from
-		if ($options['time_from'] !== null) {
-			$sql_parts['where']['clock_from'] = 'h.clock>='.$options['time_from'];
-		}
-
-		// time_till
-		if ($options['time_till'] !== null) {
-			$sql_parts['where']['clock_till'] = 'h.clock<='.$options['time_till'];
-		}
-
 		// filter
 		if ($options['filter'] !== null) {
 			$this->dbFilter($sql_parts['from'], $options, $sql_parts);
@@ -209,11 +198,111 @@ class CHistory extends CApiService {
 			zbx_db_search($sql_parts['from'], $options, $sql_parts);
 		}
 
+		$use_offsets = $options['limit'] !== null && reset($options['sortfield']) === 'clock';
+
+		if ($use_offsets) {
+			$sortorder = (array) $options['sortorder'];
+			$sortorder = $sortorder ? reset($sortorder) : ZBX_SORT_UP;
+
+			$use_offsets = $sortorder == ZBX_SORT_DOWN;
+		}
+
+		return $use_offsets
+			? $this->getIterativeResultFromSql($options, $sql_parts)
+			: $this->getResultFromSql($options, $sql_parts);
+	}
+
+	private function getIterativeResultFromSql(array $options, array $sql_parts) {
+		$result = [];
+		$count = 0;
+
+		foreach (self::getOffsetPeriods($options) as $period) {
+			if ($options['countOutput']) {
+				$count += $this->getResultFromSql($period + $options, $sql_parts);
+			}
+			else {
+				$result = array_merge($result, $this->getResultFromSql($period + $options, $sql_parts));
+
+				if (count($result) >= $options['limit']) {
+					return array_slice($result, 0, $options['limit'], true);
+				}
+			}
+		}
+
+		return $options['countOutput'] ? (string) $count : $result;
+	}
+
+	private static function getOffsetPeriods(array $options): array {
+		$now = time();
+		$time_till = $options['time_till'] !== null ? $options['time_till'] : $now;
+		$offsets = [SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH];
+
+		$periods = [];
+		foreach ($offsets as $offset) {
+			$period = ['time_from' => $time_till - $offset + 1];
+
+			if ($periods) {
+				$period['time_till'] = $time_till;
+			}
+
+			$periods[] = $period;
+
+			$time_till -= $offset;
+		}
+
+		if ($periods) {
+			$periods[] = ['time_till' => $time_till];
+		}
+
+		foreach ($periods as $i => &$period) {
+			if ($options['time_from'] !== null) {
+				if (array_key_exists('time_till', $period) && $period['time_till'] < $options['time_from']) {
+					unset($periods[$i]);
+
+					continue;
+				}
+
+				if (array_key_exists('time_from', $period) && $period['time_from'] < $options['time_from']) {
+					$period['time_from'] = $options['time_from'];
+				}
+			}
+
+			if ($options['time_till'] !== null) {
+				if (array_key_exists('time_till', $period) && $period['time_till'] > $options['time_till']) {
+					$period['time_till'] = $options['time_till'];
+				}
+			}
+
+			if (array_key_exists('time_from', $period) && array_key_exists('time_till', $period)) {
+				if ($period['time_from'] >= $period['time_till']) {
+					unset($periods[$i]);
+				}
+			}
+		}
+		unset($period);
+
+		if (!$periods) {
+			$periods[] = [];
+		}
+
+		return $periods;
+	}
+
+	private function getResultFromSql(array $options, array $sql_parts) {
+		if ($options['time_from'] !== null) {
+			$sql_parts['where']['clock_from'] = 'h.clock>='.$options['time_from'];
+		}
+
+		if ($options['time_till'] !== null) {
+			$sql_parts['where']['clock_till'] = 'h.clock<='.$options['time_till'];
+		}
+
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
 
 		$db_res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
+		$result = [];
 		while ($data = DBfetch($db_res)) {
 			if ($options['countOutput']) {
 				$result = $data['rowscount'];
