@@ -377,10 +377,11 @@ func runAgent(isForeground bool, configPath string, systemOpt agent.PluginSystem
 
 	log.Infof("using configuration file: %s", configPath)
 
-	if err = keyaccess.LoadRules(
+	err = keyaccess.LoadRules(
 		agent.Options.AllowKey, agent.Options.DenyKey,
 		agent.Options.AllowKeyRegexp, agent.Options.DenyKeyRegexp,
-	); err != nil {
+	)
+	if err != nil {
 		return errs.Wrap(err, "Failed to load key access rules")
 	}
 
