@@ -1627,6 +1627,7 @@ define('API_NUMBER',				71);
 define('API_SELEMENTID',			72);
 define('API_SSL_CERTIFICATE',		73);
 define('API_SSL_PRIVATE_KEY',		74);
+define('API_FRONTEND_ACTION',		75);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1697,6 +1698,17 @@ define('ZBX_PROXY_SECRETS_PROVIDER_SERVER', 0);
 define('ZBX_PROXY_SECRETS_PROVIDER_PROXY', 1);
 
 define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
+
+// Standard action layouts.
+define('ZBX_LAYOUT_DOWNLOAD',	'layout.download');
+define('ZBX_LAYOUT_EXPORT',		'layout.export');
+define('ZBX_LAYOUT_HTMLPAGE',	'layout.htmlpage');
+define('ZBX_LAYOUT_IMAGE',		'layout.image');
+define('ZBX_LAYOUT_JAVASCRIPT',	'layout.javascript');
+define('ZBX_LAYOUT_JSON',		'layout.json');
+define('ZBX_LAYOUT_PRINT',		'layout.print');
+define('ZBX_LAYOUT_WARNING',	'layout.warning');
+define('ZBX_LAYOUT_WIDGET',		'layout.widget');
 
 // Layout
 define('ZBX_LAYOUT_NORMAL',		0);

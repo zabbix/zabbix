@@ -139,7 +139,7 @@ elseif (hasRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])
 }
 
 // Validate backurl.
-if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
+if (hasRequest('backurl') && !(new CFrontendActionValidator())->validate(getRequest('backurl'))) {
 	access_deny();
 }
 

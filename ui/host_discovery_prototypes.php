@@ -235,10 +235,10 @@ $fields = [
 	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
-	'backurl' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'backurl' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
-	'sort' =>							[T_ZBX_STR, O_OPT, P_SYS, IN('"name","key_","delay","type","status","discover"'),	null],
-	'sortorder' =>						[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name","key_","delay","type","status","discover"'),	null],
+	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 
 check_fields($fields);
@@ -293,7 +293,7 @@ else {
 }
 
 // Validate backurl.
-if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
+if (hasRequest('backurl') && !(new CFrontendActionValidator())->validate(getRequest('backurl'))) {
 	access_deny();
 }
 
@@ -693,10 +693,6 @@ if (hasRequest('form')) {
 	$data['display_interfaces'] = in_array($host['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 	$data['backurl'] = getRequest('backurl');
 	$data['is_discovered_prototype'] = false;
-
-	if ($data['backurl'] && !CHtmlUrlValidator::validateSameSite($data['backurl'])) {
-		throw new CAccessDeniedException();
-	}
 
 	$default_timeout = DB::getDefault('items', 'timeout');
 	$data['custom_timeout'] = (int) getRequest('custom_timeout', $data['timeout'] !== $default_timeout);

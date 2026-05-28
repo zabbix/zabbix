@@ -154,7 +154,9 @@ class CControllerProblemView extends CControllerProblem {
 		$response->setTitle(_('Problems'));
 
 		if ($data['action'] === 'problem.view.csv') {
-			$response->setFileName('zbx_problems_export.csv');
+			$response
+				->setFileName('zbx_problems_export.csv')
+				->setFileMimeType('text/csv');
 		}
 
 		$this->setResponse($response);

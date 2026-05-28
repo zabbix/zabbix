@@ -20,7 +20,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 $redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
 $request = getRequest('request', '');
 
-if ($request !== '' && !CHtmlUrlValidator::validateSameSite($request)) {
+if ($request !== '' && !(new CFrontendActionValidator())->validate($request)) {
 	$request = '';
 }
 

@@ -38,11 +38,11 @@ $page['scripts'] = ['qrcode.js'];
 $redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
 $request = getRequest('request', '');
 
-if ($request != '' && !CHtmlUrlValidator::validateSameSite($request)) {
+if ($request !== '' && !(new CFrontendActionValidator())->validate($request)) {
 	$request = '';
 }
 
-if ($request != '') {
+if ($request !== '') {
 	$redirect_to->setArgument('request', $request);
 }
 

@@ -38,7 +38,7 @@ class CControllerExport extends CController {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
-		if (!CHtmlUrlValidator::validateSameSite($this->getInput('backurl'))) {
+		if (!(new CFrontendActionValidator())->validate($this->getInput('backurl'))) {
 			throw new CAccessDeniedException();
 		}
 
@@ -104,12 +104,10 @@ class CControllerExport extends CController {
 
 		$result = API::Configuration()->export($params);
 
-		if ($result) {
-			$response = new CControllerResponseData([
-				'main_block' => $result,
-				'mime_type' => CExportWriterFactory::getMimeType($params['format']),
-				'page' => ['file' => 'zbx_export_'.substr($action, 7).'.'.$params['format']]
-			]);
+		if ($result !== false) {
+			$response = (new CControllerResponseData(['main_block' => $result]))
+				->setFileName('zbx_export_'.substr($action, 7).'.'.$params['format'])
+				->setFileMimeType(CExportWriterFactory::getMimeType($params['format']));
 		}
 		else {
 			$response = new CControllerResponseRedirect(

@@ -56,7 +56,7 @@ if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
 $autologin = hasRequest('enter') ? getRequest('autologin', 0) : getRequest('autologin', 1);
 $request = getRequest('request', '');
 
-if ($request !== '' && !CHtmlUrlValidator::validateSameSite($request)) {
+if ($request !== '' && !(new CFrontendActionValidator())->validate($request)) {
 	$request = '';
 }
 

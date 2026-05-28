@@ -276,6 +276,9 @@ class CApiInputValidator {
 
 			case API_SSL_PRIVATE_KEY:
 				return self::validateSslPrivateKey($rule, $data, $path, $error);
+
+			case API_FRONTEND_ACTION:
+				return self::validateFrontendAction($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -360,6 +363,7 @@ class CApiInputValidator {
 			case API_SELEMENTID:
 			case API_SSL_CERTIFICATE:
 			case API_SSL_PRIVATE_KEY:
+			case API_FRONTEND_ACTION:
 				return true;
 
 			case API_OBJECT:
@@ -2639,9 +2643,9 @@ class CApiInputValidator {
 		}
 
 		$options = [
-			'allow_user_macro' => (bool) ($flags & API_ALLOW_USER_MACRO),
-			'allow_manualinput_macro' => (bool) ($flags & API_ALLOW_MANUALINPUT_MACRO),
-			'allow_event_tags_macro' => (bool) ($flags & API_ALLOW_EVENT_TAGS_MACRO)
+			'user_macro' => (bool) ($flags & API_ALLOW_USER_MACRO),
+			'manualinput_macro' => (bool) ($flags & API_ALLOW_MANUALINPUT_MACRO),
+			'event_tags_macro' => (bool) ($flags & API_ALLOW_EVENT_TAGS_MACRO)
 		];
 
 		if ($data !== '' && CHtmlUrlValidator::validate($data, $options) === false) {
@@ -4324,6 +4328,46 @@ class CApiInputValidator {
 
 		if (!openssl_pkey_get_private($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a PEM-encoded private key is expected'));
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate the relative URL to a registered frontend action.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY.
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateFrontendAction(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if ($data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
+			return false;
+		}
+
+		$validator = new CFrontendActionValidator();
+
+		if (!$validator->validate($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $validator->getError());
 
 			return false;
 		}

@@ -319,7 +319,7 @@ else {
 }
 
 // Validate backurl.
-if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
+if (hasRequest('backurl') && !(new CFrontendActionValidator())->validate(getRequest('backurl'))) {
 	access_deny();
 }
 
@@ -780,10 +780,6 @@ if (hasRequest('form')) {
 	$data['display_interfaces'] = in_array($host['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 	$data['backurl'] = getRequest('backurl');
 	$data['discovered_lld'] = false;
-
-	if ($data['backurl'] && !CHtmlUrlValidator::validateSameSite($data['backurl'])) {
-		throw new CAccessDeniedException();
-	}
 
 	$default_timeout = DB::getDefault('items', 'timeout');
 	$data['custom_timeout'] = (int) getRequest('custom_timeout', $data['timeout'] !== $default_timeout);
