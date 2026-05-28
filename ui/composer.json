@@ -9,7 +9,7 @@
 		"onelogin/php-saml": "4.3.1",
 		"pragmarx/google2fa": "^8.0",
 		"duosecurity/duo_universal_php": "1.1.2",
-		"erusev/parsedown": "^1.7"
+		"erusev/parsedown": "^1.8"
 	},
 	"autoload": {
 		"psr-4": {
