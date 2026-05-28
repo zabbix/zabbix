@@ -839,8 +839,6 @@ static int	zbx_check_request_access_rules(const char *metric, AGENT_REQUEST *req
 	/* empty arguments flag means key is followed by empty brackets, which is not the same as no brackets */
 	int	empty_arguments = (1 == request->nparam && 0 == strlen(request->params[0]));
 
-	assert(NULL != metric);
-
 	for (int i = 0; key_access_rules.values_num > i; i++)
 	{
 		rule = (zbx_key_access_rule_t*)key_access_rules.values[i];
