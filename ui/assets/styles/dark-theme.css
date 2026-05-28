@@ -4702,11 +4702,6 @@ section {
       padding-right: 10px; }
     section .list-table.no-data tbody tr:last-child td {
       border-bottom: none; }
-  section.section-hat {
-    border-radius: var(--surface-border-radius); }
-    section.section-hat .list-table {
-      border-bottom-left-radius: var(--surface-border-radius);
-      border-bottom-right-radius: var(--surface-border-radius); }
 
 .service-info {
   --service-info-severity-color: #59db8f;

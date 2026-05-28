@@ -96,13 +96,4 @@ section {
 			}
 		}
 	}
-
-	&.section-hat {
-		border-radius: var(--surface-border-radius);
-
-		.list-table {
-			border-bottom-left-radius: var(--surface-border-radius);
-			border-bottom-right-radius: var(--surface-border-radius);
-		}
-	}
 }

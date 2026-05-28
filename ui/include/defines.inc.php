@@ -2220,7 +2220,6 @@ define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
 define('ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK', 'overflow-break');
 define('ZBX_STYLE_TABLE_INITIAL_WIDTH', 'table-initial-width');
 define('ZBX_STYLE_TABLE_STATS', 'table-stats');
-define('ZBX_STYLE_SECTION_HAT',	'section-hat');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TAG', 'tag');
 define('ZBX_STYLE_TAG_INHERITED', 'tag-inherited');
