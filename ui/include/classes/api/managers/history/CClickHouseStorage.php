@@ -115,7 +115,7 @@ class CClickHouseStorage {
 	 * Get error message for last query. When no errors null is returned.
 	 */
 	public function getErrorMessage(): ?string {
-		return $this->error_message !== null ? _s('ClickHouse error: %1$s.', $this->error_message) : null;
+		return $this->error_message !== null ? _s('ClickHouse error: %1$s.', trim($this->error_message)) : null;
 	}
 
 	/**
