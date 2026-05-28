@@ -1731,6 +1731,7 @@ void	zbx_correlation_config_close(zbx_correlation_config_handle_t handle);
 
 zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correlation_config_handle_t handle);
 
+#define ZBX_CEP_CONDITION_NONE		0
 #define ZBX_CEP_CONDITION_EVENT_NAME	1
 #define ZBX_CEP_CONDITION_TAG_NAME	2
 #define ZBX_CEP_CONDITION_TAG_VALUE	3
@@ -1738,6 +1739,27 @@ zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correl
 #define ZBX_CEP_CONDITION_HOST		5
 #define ZBX_CEP_CONDITION_HOST_GROUP	6
 #define ZBX_CEP_CONDITION_TIME_PERIOD	7
+
+#define ZBX_CEP_WINDOW_CONDITION_TAG_PAIR	1
+#define ZBX_CEP_WINDOW_CONDITION_OLD_TAG	2
+#define ZBX_CEP_WINDOW_CONDITION_OLD_TAG_VALUE	3
+
+#define ZBX_CEP_OP_SET_NAME		1
+#define ZBX_CEP_OP_CLOSE		2
+#define ZBX_CEP_OP_DISCARD		3
+#define ZBX_CEP_OP_SET_SEVERITY		4
+#define ZBX_CEP_OP_INCREASE_SEVERITY	5
+#define ZBX_CEP_OP_DECREASE_SEVERITY	6
+#define ZBX_CEP_OP_SUPPRESS		7
+#define ZBX_CEP_OP_COPY_FIRST		8
+#define ZBX_CEP_OP_COPY_LAST		9
+#define ZBX_CEP_OP_ADD_TAG		10
+#define ZBX_CEP_OP_SET_TAG		11
+#define ZBX_CEP_OP_SET_TAG_VALUE	12
+#define ZBX_CEP_OP_INCREASE_TAG_VALUE	13
+#define ZBX_CEP_OP_DECREASE_TAG_VALUE	14
+#define ZBX_CEP_OP_RENAME_TAG		15
+#define ZBX_CEP_OP_REMOVE_TAG		16
 
 typedef struct zbx_cep_config_handle *zbx_cep_config_handle_t;
 typedef struct zbx_cep_rule zbx_cep_rule_t;
