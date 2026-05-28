@@ -60,8 +60,7 @@ static int	async_send_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, 
 	else
 		zbx_tq_generate_elastic(query, now, lasttimestamp, &telemetry_query_context->item_context.posts);
 
-	zbx_tq_get_timestamp_filter_bounds(query, now, lasttimestamp, NULL,
-			&telemetry_query_context->item_context.newlasttimestamp);
+	zbx_tq_get_newlasttimestamp(query, now, lasttimestamp, &telemetry_query_context->item_context.newlasttimestamp);
 	telemetry_query_context->item_context.query = query;
 	telemetry_query_context->item_context.db_type = db_type;
 
@@ -154,22 +153,19 @@ static int	async_check_telemetry_query_http(zbx_dc_telemetry_query_item_t *item,
 	const char *config_ssl_key_location	= poller_config->config_ssl_key_location;
 	/* FIXME: placeholder end */
 
+	/* mtime is used to store lasttimestamp persistently and throughout monitored_by changes */
+	/* TODO: test with proxy groups */
+
 	lasttimestamp = item->lasttimestamp;
 
-	/* FIXME: If host is moved to proxy and then back to the server (or vice versa) lasttimestamp does not */
-	/* currently sync between them, because we only set it to mtime on the first poll since startup. */
-	/* We probably could detect the switch and update lasttimestamp to mtime (or change what timestamp means */
-	/* and simply always make lasttimestamp max(lasttimestamp, mtime)), but history can be stuck in preprocessing */
-	/* or similar, thus making stored mtime outdated. */
-	/* TODO: do something with this */
-	if (0 == lasttimestamp)
+	if (item->mtime > (int)item->lasttimestamp)
 	{
-		/* mtime is used to store lasttimestamp persistently */
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): setting lasttimestamp to mtime", __func__);
 		lasttimestamp = item->mtime;
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() lasttimestamp is not set, setting it to mtime", __func__);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): lasttimestamp: " ZBX_FS_TIME_T, __func__, lasttimestamp);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): lasttimestamp: " ZBX_FS_TIME_T ", mtime: %d, max: " ZBX_FS_TIME_T,
+			__func__, item->lasttimestamp, item->mtime, lasttimestamp);
 
 	if (SUCCEED != async_send_telemetry_query_http(item, query, now, lasttimestamp, db_type, &conn_params,
 			config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,

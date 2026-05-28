@@ -118,31 +118,52 @@ int	tq_formula_constant_to_condition_idx(const char *p, int len)
 	return res;
 }
 
-void	zbx_tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
+static void	tq_get_timestamp_filter_bounds_unshifted(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
 		time_t *out_lower, time_t *out_upper)
 {
-	time_t	now_shifted = now - query->time_shift;
+	if (lasttimestamp > now)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): lasttimestamp (" ZBX_FS_TIME_T ") is larger than now ("
+				ZBX_FS_TIME_T "), setting lasttimestamp to now",
+				__func__, lasttimestamp, now);
+		lasttimestamp = now;
+	}
 
-	if (lasttimestamp > now_shifted)
-		lasttimestamp = now_shifted;
-
-	if (query->aggregation_size > now_shifted - lasttimestamp)
+	if (query->aggregation_size > now - lasttimestamp)
 	{
 		if (NULL != out_lower)
-			*out_lower = now_shifted - query->aggregation_size;
+			*out_lower = now - query->aggregation_size;
 		if (NULL != out_upper)
-			*out_upper = now_shifted;
+			*out_upper = now;
 	}
 	else
 	{
-		time_t	start = MAX(lasttimestamp, now_shifted - (time_t)query->loopback_limit);
+		time_t	start = MAX(lasttimestamp, now - (time_t)query->loopback_limit);
 
 		if (NULL != out_lower)
 			*out_lower = start;
 		if (NULL != out_upper)
-			*out_upper = start + ((now_shifted - start) / (time_t)query->aggregation_size) *
+			*out_upper = start + ((now - start) / (time_t)query->aggregation_size) *
 				(time_t)query->aggregation_size;
 	}
+}
+
+void	zbx_tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
+		time_t *out_lower, time_t *out_upper)
+{
+	tq_get_timestamp_filter_bounds_unshifted(query, now, lasttimestamp, out_lower, out_upper);
+
+	if (NULL != out_lower)
+		*out_lower = MAX(*out_lower - query->time_shift, 0);
+
+	if (NULL != out_upper)
+		*out_upper = MAX(*out_upper - query->time_shift, 0);
+}
+
+void	zbx_tq_get_newlasttimestamp(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
+		time_t *newlasttimestamp)
+{
+	tq_get_timestamp_filter_bounds_unshifted(query, now, lasttimestamp, NULL, newlasttimestamp);
 }
 
 char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col)

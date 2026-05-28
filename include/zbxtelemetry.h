@@ -155,6 +155,8 @@ void	zbx_tq_generate_elastic(const zbx_tq_query_t *query, time_t now, time_t las
 
 void	zbx_tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
 		time_t *out_lower, time_t *out_upper);
+void	zbx_tq_get_newlasttimestamp(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
+		time_t *newlasttimestamp);
 
 int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_vector_str_t *values);
 int	zbx_tq_elastic_parse_resp(const zbx_tq_query_t *query, const char *resp, zbx_vector_str_t *values);
