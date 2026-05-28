@@ -107,6 +107,10 @@ func (c *client) addRequest(
 	var info *pluginInfo
 	var ok bool
 
+	if r.Timeout == nil {
+		r.LegacyTimeout = true
+	}
+
 	timeout, err := ParseAndValidateItemTimeout(r.Timeout)
 	if err != nil {
 		return errs.Wrap(err, "item timeout parse failed")
