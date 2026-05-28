@@ -67,7 +67,7 @@ class CLocalApiClient extends CApiClient {
 		$response = new CApiClientResponse();
 
 		// check the mobile device feature flag
-		if ($api === 'device' && !CTemporaryMobileFeatureHelper::isEnabled()) {
+		if ($api === 'device' && !CSettingsHelper::isMobileDevicesEnabled()) {
 			$response->errorCode = ZBX_API_ERROR_PERMISSIONS;
 			$response->errorMessage = _s('No permissions to call "%1$s.%2$s".', $requestApi, $requestMethod);
 
@@ -310,7 +310,7 @@ class CLocalApiClient extends CApiClient {
 
 		try {
 			if ($auth['auth'] === null
-					|| ($auth['type'] == CJsonRpc::AUTH_TYPE_DPOP && !CTemporaryMobileFeatureHelper::isEnabled())) {
+					|| ($auth['type'] == CJsonRpc::AUTH_TYPE_DPOP && !CSettingsHelper::isMobileDevicesEnabled())) {
 				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 			}
 

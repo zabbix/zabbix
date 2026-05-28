@@ -223,7 +223,7 @@ class CRole extends CApiService {
 				$api_input_rules['fields']['rules']['fields']['modules.default_access']);
 		}
 
-		if (false) {
+		if (!CSettingsHelper::isMobileDevicesEnabled()) {
 			unset($api_input_rules['fields']['rules']['fields']['devices.access'],
 				$api_input_rules['fields']['rules']['fields']['devices.actions'],
 				$api_input_rules['fields']['rules']['fields']['devices.actions.default_access']
@@ -343,7 +343,7 @@ class CRole extends CApiService {
 				$api_input_rules['fields']['rules']['fields']['modules.default_access']);
 		}
 
-		if (false) {
+		if (!CSettingsHelper::isMobileDevicesEnabled()) {
 			unset($api_input_rules['fields']['rules']['fields']['devices.access'],
 				$api_input_rules['fields']['rules']['fields']['devices.actions'],
 				$api_input_rules['fields']['rules']['fields']['devices.actions.default_access']

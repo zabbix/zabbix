@@ -235,4 +235,8 @@ class CSettingsHelper {
 	public static function isSoftwareUpdateCheckEnabled(): bool {
 		return !CWebUser::isGuest() && self::getServerStatus()['configuration']['allow_software_update_check'];
 	}
+
+	public static function isMobileDevicesEnabled(): bool {
+		return self::getServerStatus()['configuration']['enable_mobile_devices'];
+	}
 }
