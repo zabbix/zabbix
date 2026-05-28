@@ -1162,15 +1162,15 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 	a = ZBX_MATRIX_EL(coefficients, 0, 0);
 	b = ZBX_MATRIX_EL(coefficients, 1, 0);
 
-	if (0 != isnan(a) || 0 != isnan(b) || 0.0 == b)
-	{
-		res = FAIL;
-		goto out;
-	}
-
 	if (0 != isinf(a) || 0 != isinf(b))
 	{
 		result = DBL_MAX;
+		goto out;
+	}
+
+	if (0 != isnan(a) || 0 != isnan(b) || 0.0 == b)
+	{
+		res = FAIL;
 		goto out;
 	}
 
