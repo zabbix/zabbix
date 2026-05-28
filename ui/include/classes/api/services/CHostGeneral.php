@@ -1365,17 +1365,4 @@ abstract class CHostGeneral extends CHostBase {
 		}
 		unset($host);
 	}
-
-	protected static function deleteHgSets(array $db_hosts): void {
-		$hgsets = [];
-		$hgset_hash = self::getHgSetHash([]);
-
-		foreach ($db_hosts as $hostid => $foo) {
-			$hgsets[$hgset_hash]['hash'] = $hgset_hash;
-			$hgsets[$hgset_hash]['groupids'] = [];
-			$hgsets[$hgset_hash]['hostids'][] = $hostid;
-		}
-
-		self::updateHostHgSets($hgsets);
-	}
 }

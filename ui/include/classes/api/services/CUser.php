@@ -1996,7 +1996,6 @@ class CUser extends CApiService {
 	public function delete(array $userids) {
 		$this->validateDelete($userids, $db_users);
 
-		self::deleteUgSets($db_users);
 		DB::update('token', [
 			'values' => ['creator_userid' => null],
 			'where' => ['creator_userid' => $userids]
@@ -2018,24 +2017,6 @@ class CUser extends CApiService {
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $db_users);
 
 		return ['userids' => $userids];
-	}
-
-	private static function deleteUgSets(array $db_users): void {
-		$ugsets = [];
-		$ugset_hash = self::getUgSetHash([]);
-
-		foreach ($db_users as $db_user) {
-			if ($db_user['role'] && $db_user['role']['type'] != USER_TYPE_SUPER_ADMIN
-					&& $db_user['usrgrps']) {
-				$ugsets[$ugset_hash]['hash'] = $ugset_hash;
-				$ugsets[$ugset_hash]['usrgrpids'] = [];
-				$ugsets[$ugset_hash]['userids'][] = $db_user['userid'];
-			}
-		}
-
-		if ($ugsets) {
-			self::updateUserUgSets($ugsets);
-		}
 	}
 
 	/**
