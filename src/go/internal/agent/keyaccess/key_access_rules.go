@@ -32,8 +32,6 @@ var (
 	errInvalidRule                 = errors.New("invalid key access rule")
 	errRegexpPatternMustNotBeEmpty = errors.New("regular expression pattern must not be empty")
 
-	// rules is a package-level cache of loaded access rules.
-	//nolint:gochecknoglobals // rules are loaded once and used across checks.
 	rules []*Rule
 )
 
