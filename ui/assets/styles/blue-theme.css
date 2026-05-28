@@ -4704,8 +4704,10 @@ section {
       border-bottom-right-radius: var(--surface-border-radius); }
 
 .service-info {
+  --service-info-severity-color: #429e47;
+  --service-info-severity-text-color: #ffffff;
   margin: -10px 0;
-  border-left: 4px solid #429e47;
+  border-left: 4px solid var(--service-info-severity-color);
   border-radius: var(--surface-border-radius); }
   .service-info .service-info-grid {
     display: grid;
@@ -4738,39 +4740,28 @@ section {
   .service-info .service-status {
     display: inline-block;
     padding: 0 4px;
-    border-radius: var(--surface-border-radius);
-    background-color: #429e47;
-    color: #ffffff; }
-  .service-info.service-status-na-bg {
-    border-color: var(--severity-color-na-bg); }
-    .service-info.service-status-na-bg .service-status {
-      background-color: var(--severity-color-na-bg);
-      color: #2a353a; }
-  .service-info.service-status-info-bg {
-    border-color: var(--severity-color-info-bg); }
-    .service-info.service-status-info-bg .service-status {
-      background-color: var(--severity-color-info-bg);
-      color: #00268e; }
-  .service-info.service-status-average-bg {
-    border-color: var(--severity-color-average-bg); }
-    .service-info.service-status-average-bg .service-status {
-      background-color: var(--severity-color-average-bg);
-      color: #733100; }
-  .service-info.service-status-warning-bg {
-    border-color: var(--severity-color-warning-bg); }
-    .service-info.service-status-warning-bg .service-status {
-      background-color: var(--severity-color-warning-bg);
-      color: #734d00; }
-  .service-info.service-status-high-bg {
-    border-color: var(--severity-color-high-bg); }
-    .service-info.service-status-high-bg .service-status {
-      background-color: var(--severity-color-high-bg);
-      color: #52190b; }
-  .service-info.service-status-disaster-bg {
-    border-color: var(--severity-color-disaster-bg); }
-    .service-info.service-status-disaster-bg .service-status {
-      background-color: var(--severity-color-disaster-bg);
-      color: #4b0c0c; }
+    border-radius: var(--badge-border-radius);
+    background-color: var(--service-info-severity-color);
+    color: var(--service-info-severity-text-color); }
+  .service-info .service-status-na-bg {
+    --service-info-severity-color: var(--severity-color-na-bg); }
+  .service-info .service-status-info-bg {
+    --service-info-severity-color: var(--severity-color-info-bg); }
+  .service-info .service-status-average-bg {
+    --service-info-severity-color: var(--severity-color-average-bg); }
+  .service-info .service-status-warning-bg {
+    --service-info-severity-color: var(--severity-color-warning-bg); }
+  .service-info .service-status-high-bg {
+    --service-info-severity-color: var(--severity-color-high-bg); }
+  .service-info .service-status-disaster-bg {
+    --service-info-severity-color: var(--severity-color-disaster-bg); }
+  .service-info .service-status-na-bg,
+  .service-info .service-status-info-bg,
+  .service-info .service-status-average-bg,
+  .service-info .service-status-warning-bg,
+  .service-info .service-status-high-bg,
+  .service-info .service-status-disaster-bg {
+    --service-info-severity-text-color: color-mix(in oklch, var(--service-info-severity-color), #000 45%); }
 
 .status-na-bg,
 .status-info-bg,
@@ -7607,7 +7598,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     .modal-popup-host-wizard .form-field input,
     .modal-popup-host-wizard .form-field textarea,
     .modal-popup-host-wizard .form-field z-select > button {
-      border-radius: var(--button-border-radius); }
+      border-radius: var(--input-border-radius); }
     .modal-popup-host-wizard .form-field z-select .list li {
       max-width: 100%; }
     .modal-popup-host-wizard .form-field input[type="checkbox"] + label {
