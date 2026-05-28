@@ -25,7 +25,9 @@ if ($data['readonly'] && !$data['macros']) {
 else {
 	$link = null;
 	$is_hostprototype = array_key_exists('parent_hostid', $data);
-	$inherited_width = $is_hostprototype ? ZBX_TEXTAREA_MACRO_INHERITED_WIDTH : ZBX_TEXTAREA_MACRO_VALUE_WIDTH;
+	$contains_templates = (bool) array_filter($data['macros'], fn($macro) => array_key_exists('template', $macro));
+	$inherited_width = $contains_templates || $is_hostprototype
+		? ZBX_TEXTAREA_MACRO_INHERITED_WIDTH : ZBX_TEXTAREA_MACRO_VALUE_WIDTH;
 	$table = (new CTable())
 		->setId('tbl_macros')
 		->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
