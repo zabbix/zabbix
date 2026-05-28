@@ -1,6 +1,7 @@
 Changes for 6.0.47rc1
 
 New features:
+A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
 
 Bug fixes:
 ........S. [ZBX-22504] improved memory usage in lld worker proecesses with large low level discovery (vso)
