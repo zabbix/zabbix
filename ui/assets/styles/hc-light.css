@@ -3,7 +3,7 @@
   --font-stack: Inter, "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, "Microsoft YaHei", "PingFang SC", Roboto, Sylfaen, sans-serif;
   --font-stack-mono: "Courier New", Courier, monospace;
   --font-body-size: 75%;
-  --badge-border-radius: 4px;
+  --badge-border-radius: 2px;
   --button-border-radius: 4px;
   --input-border-radius: 4px;
   --overlay-border-radius: 4px;
@@ -4786,7 +4786,7 @@ section {
 
 .subfilter-enabled {
   background-color: #333333;
-  border-radius: max(0px, calc(var(--badge-border-radius) - 2px));
+  border-radius: var(--badge-border-radius);
   color: #ffffff;
   padding: 0 4px; }
   .subfilter-enabled .link-action {
@@ -5191,7 +5191,7 @@ section {
   padding: 0.1em 0.4em;
   font-size: 0.917em;
   background-color: #333333;
-  border-radius: max(0px, calc(var(--badge-border-radius) - 2px));
+  border-radius: var(--badge-border-radius);
   color: #ffffff;
   content: attr(data-counter); }
 
@@ -5390,7 +5390,7 @@ section {
   padding: 2px 3px;
   line-height: 1em;
   vertical-align: middle;
-  border-radius: max(0px, calc(var(--badge-border-radius) - 2px));
+  border-radius: var(--badge-border-radius);
   box-sizing: border-box; }
   .tag a.link-action {
     color: inherit !important;

@@ -287,7 +287,7 @@
 	padding: 0.1em 0.4em;
 	font-size: $font-h3-size;
 	background-color: $ui-bg-selected-color;
-	border-radius: #{"max(0px, calc(var(--badge-border-radius) - 2px))"};
+	border-radius: var(--badge-border-radius);
 	color: $white;
 	content: attr(data-counter);
 }

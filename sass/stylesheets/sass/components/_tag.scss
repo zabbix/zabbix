@@ -24,7 +24,7 @@
 	line-height: 1em;
 	vertical-align: middle;
 	@extend %overflow-ellipsis;
-	border-radius: #{"max(0px, calc(var(--badge-border-radius) - 2px))"};
+	border-radius: var(--badge-border-radius);
 	box-sizing: border-box;
 
 	a.link-action {

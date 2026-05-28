@@ -25,7 +25,7 @@
 
 .subfilter-enabled {
 	background-color: $ui-bg-selected-color;
-	border-radius: #{"max(0px, calc(var(--badge-border-radius) - 2px))"};
+	border-radius: var(--badge-border-radius);
 	color: $font-selected-color;
 	padding: 0 4px;
 
