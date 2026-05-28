@@ -41,7 +41,7 @@ class CControllerUserDeviceInitView extends CController {
 	}
 
 	protected function checkPermissions() {
-		if (CWebUser::isGuest() || !CTemporaryMobileFeatureHelper::isEnabled()) {
+		if (CWebUser::isGuest() || !CSettingsHelper::isMobileDevicesEnabled()) {
 			return false;
 		}
 

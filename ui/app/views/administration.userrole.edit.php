@@ -387,7 +387,7 @@ $form_grid->addItem([
 	)
 ]);
 
-if (CTemporaryMobileFeatureHelper::isEnabled()) {
+if (CSettingsHelper::isMobileDevicesEnabled()) {
 	$form_grid
 		->addItem(
 			new CFormField(

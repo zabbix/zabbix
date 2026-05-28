@@ -118,7 +118,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			unset($fields['fields']['modules'], $fields['fields']['modules_default_access']);
 		}
 
-		if (!CTemporaryMobileFeatureHelper::isEnabled()) {
+		if (!CSettingsHelper::isMobileDevicesEnabled()) {
 			unset($fields['fields']['ui_administration_linked_devices'], $fields['fields']['devices_actions'],
 				$fields['fields']['devices_actions_default_access']
 			);
@@ -365,7 +365,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			}
 		}
 
-		if (CTemporaryMobileFeatureHelper::isEnabled()) {
+		if (CSettingsHelper::isMobileDevicesEnabled()) {
 			// Devices actions section.
 			foreach (CRoleHelper::getDeviceActionsByUserType((int) $data['type']) as $label) {
 				$input_name = str_replace('.', '_', $label);

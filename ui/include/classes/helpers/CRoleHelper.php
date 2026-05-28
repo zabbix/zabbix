@@ -509,7 +509,7 @@ class CRoleHelper {
 						self::UI_ADMINISTRATION_AUTHENTICATION => _('Authentication')
 					];
 
-					if (CTemporaryMobileFeatureHelper::isEnabled()) {
+					if (CSettingsHelper::isMobileDevicesEnabled()) {
 						$labels[self::UI_ADMINISTRATION_LINKED_DEVICES] = _('Devices');
 					}
 				}

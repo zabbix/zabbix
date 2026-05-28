@@ -43,7 +43,7 @@ class CControllerUserDeviceDelete extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if (CWebUser::isGuest() || !CTemporaryMobileFeatureHelper::isEnabled()) {
+		if (CWebUser::isGuest() || !CSettingsHelper::isMobileDevicesEnabled()) {
 			return false;
 		}
 

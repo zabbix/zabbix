@@ -95,7 +95,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'form_refresh' => ['integer']
 		]];
 
-		if (CTemporaryMobileFeatureHelper::isEnabled()) {
+		if (CSettingsHelper::isMobileDevicesEnabled()) {
 			$rules['fields'] += [
 				'devices_access' => ['boolean'],
 				'devices_actions' => ['array', 'required',

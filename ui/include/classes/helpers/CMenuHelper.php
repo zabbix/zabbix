@@ -318,7 +318,7 @@ class CMenuHelper {
 				? (new CMenuItem(_('Authentication')))
 					->setAction('authentication.edit')
 				: null,
-			!CWebUser::isGuest() && CTemporaryMobileFeatureHelper::isEnabled() &&
+			!CWebUser::isGuest() && CSettingsHelper::isMobileDevicesEnabled() &&
 				CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES)
 				? (new CMenuItem(_('Devices')))
 					->setAction('user.device.list')
@@ -480,7 +480,7 @@ class CMenuHelper {
 				);
 			}
 
-			if (CTemporaryMobileFeatureHelper::isEnabled() && CWebUser::checkAccess(CRoleHelper::DEVICES_ACCESS)) {
+			if (CSettingsHelper::isMobileDevicesEnabled() && CWebUser::checkAccess(CRoleHelper::DEVICES_ACCESS)) {
 				$submenu->add(
 					(new CMenuItem(_('Devices')))
 						->setAction('userprofile.device.list')

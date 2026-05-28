@@ -148,7 +148,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	}
 
 	private function getDevicesActionSectionRules(int $user_type): array {
-		if (!CTemporaryMobileFeatureHelper::isEnabled()) {
+		if (!CSettingsHelper::isMobileDevicesEnabled()) {
 			return [];
 		}
 

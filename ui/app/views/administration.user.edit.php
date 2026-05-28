@@ -608,7 +608,7 @@ if ($data['roleid']) {
 		->addClass('rules-status-container')
 	);
 
-	if (CTemporaryMobileFeatureHelper::isEnabled()) {
+	if (CSettingsHelper::isMobileDevicesEnabled()) {
 		$permissions_form_list->addRow((new CTag('h4', true, _('Devices')))->addClass('input-section-header'));
 		$elements = [
 			[(new CSpan(_('Enabled')))

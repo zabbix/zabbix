@@ -48,7 +48,7 @@ class CControllerTimeoutsEdit extends CController {
 			'report_test_timeout' => CSettingsSchema::getDefault('report_test_timeout')
 		];
 
-		if (CTemporaryMobileFeatureHelper::isEnabled()) {
+		if (CSettingsHelper::isMobileDevicesEnabled()) {
 			$default_values['device_link_timeout'] = CSettingsSchema::getDefault('device_link_timeout');
 		}
 

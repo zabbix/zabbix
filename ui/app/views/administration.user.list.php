@@ -132,7 +132,7 @@ $headers = [
 	_('API access')
 ];
 
-if (CTemporaryMobileFeatureHelper::isEnabled()) {
+if (CSettingsHelper::isMobileDevicesEnabled()) {
 	$headers[] = _('Linked devices');
 }
 
@@ -289,7 +289,7 @@ foreach ($data['users'] as $user) {
 		$api_access
 	];
 
-	if (CTemporaryMobileFeatureHelper::isEnabled()) {
+	if (CSettingsHelper::isMobileDevicesEnabled()) {
 		$row[] = CRoleHelper::checkAccess(CRoleHelper::DEVICES_ACCESS, $user['roleid'])
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_ORANGE);

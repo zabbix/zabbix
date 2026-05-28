@@ -464,10 +464,10 @@ $mediatype_form_grid
 		]))
 			->setId('bridge_adapter_label'),
 		(new CFormField(
-			CTemporaryMobileFeatureHelper::isConfigured() ? _('Configured') : _('Not configured')
+			CSettingsHelper::isMobileDevicesEnabled() ? _('Configured') : _('Not configured')
 		))
 			->setId('bridge_adapter_field')
-			->addClass(CTemporaryMobileFeatureHelper::isConfigured() ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			->addClass(CSettingsHelper::isMobileDevicesEnabled() ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 	]);
 
 $message_template = (new CTemplateTag('message-templates-row-tmpl'))
