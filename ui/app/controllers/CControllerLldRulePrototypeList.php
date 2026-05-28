@@ -16,6 +16,7 @@
 
 class CControllerLldRulePrototypeList extends CController {
 
+	protected string $context;
 	private array $parent_discovery = [];
 
 	protected function init() {
@@ -45,7 +46,9 @@ class CControllerLldRulePrototypeList extends CController {
 			return false;
 		}
 
-		$has_access = $this->getInput('context') === 'host'
+		$this->context = $this->getInput('context');
+
+		$has_access = $this->context === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
@@ -73,7 +76,7 @@ class CControllerLldRulePrototypeList extends CController {
 	}
 
 	private function getProfilePrefix () {
-		return $this->getInput('context') === 'host'
+		return $this->context === 'host'
 			? 'web.hosts.lldrules.prototypes.'
 			: 'web.templates.lldrules.prototypes.';
 	}
@@ -83,10 +86,10 @@ class CControllerLldRulePrototypeList extends CController {
 		$page = $this->getInput('page', 1);
 		$filter = $this->getFilter();
 
-		$discoveries = $this->getDiscoveries($this->getInput('context'), $filter);
+		$discoveries = $this->getDiscoveries($filter);
 
 		$view_url = new CUrl('zabbix.php');
-		$view_url_params = ['action' => $this->getAction(), 'context' => $this->getInput('context'),
+		$view_url_params = ['action' => $this->getAction(), 'context' => $this->context,
 			'parent_discoveryid' => $this->getInput('parent_discoveryid')
 		];
 
@@ -95,7 +98,7 @@ class CControllerLldRulePrototypeList extends CController {
 
 		$data = [
 			'action' => $this->getAction(),
-			'context' => $this->getInput('context'),
+			'context' => $this->context,
 			'hostid' => $this->parent_discovery['hosts'][0]['hostid'],
 			'parent_discoveryid' => $this->parent_discovery['itemid'],
 			'is_parent_discovered' => $this->parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
@@ -121,7 +124,7 @@ class CControllerLldRulePrototypeList extends CController {
 		$this->setResponse($response);
 	}
 
-	protected function getDiscoveries(string $context, array $filter): array {
+	protected function getDiscoveries(array $filter): array {
 		$options = [
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => ['hostid', 'name', 'status', 'flags'],
@@ -132,7 +135,7 @@ class CControllerLldRulePrototypeList extends CController {
 			'selectDiscoveryRulePrototypes' => API_OUTPUT_COUNT,
 			'selectDiscoveryData' => ['parent_itemid'],
 			'discoveryids' => $this->parent_discovery['itemid'],
-			'templated' => ($context === 'template'),
+			'templated' => $this->context === 'template',
 			'sortfield' => $filter['sort'],
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
 			'editable' => true

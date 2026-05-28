@@ -15,6 +15,9 @@
 
 
 class CControllerLldRuleList extends CController {
+
+	protected string $context;
+
 	protected function init() {
 		$this->disableCsrfValidation();
 	}
@@ -62,13 +65,15 @@ class CControllerLldRuleList extends CController {
 			return false;
 		}
 
-		return $this->getInput('context') === 'host'
+		$this->context = $this->getInput('context');
+
+		return $this->context === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
-	private function getProfilePrefix () {
-		return $this->getInput('context') === 'host' ? 'web.hosts.lldrules.' : 'web.templates.lldrules.';
+	private function getProfilePrefix(): string {
+		return $this->context === 'host' ? 'web.hosts.lldrules.' : 'web.templates.lldrules.';
 	}
 
 	protected function doAction(): void {
@@ -85,10 +90,10 @@ class CControllerLldRuleList extends CController {
 		$page = $this->getInput('page', 1);
 		$filter = $this->getFilter();
 
-		$discoveries = $this->getDiscoveries($this->getInput('context'), $filter);
+		$discoveries = $this->getDiscoveries($filter);
 
 		$view_url = new CUrl('zabbix.php');
-		$view_url_params = ['action' => $this->getAction(), 'context' => $this->getInput('context')];
+		$view_url_params = ['action' => $this->getAction(), 'context' => $this->context];
 
 		array_map([$view_url, 'setArgument'], array_keys($view_url_params), $view_url_params);
 		$paging = CPagerHelper::paginate($page, $discoveries, $filter['sortorder'], $view_url);
@@ -96,7 +101,7 @@ class CControllerLldRuleList extends CController {
 		$data = [
 			'action' => $this->getAction(),
 			'filter' => $filter,
-			'context' => $this->getInput('context'),
+			'context' => $this->context,
 			'hostid' => count($filter['filter_hostids']) == 1 ? reset($filter['filter_hostids']) : 0,
 			'sort' => $filter['sort'],
 			'sortorder' => $filter['sortorder'],
@@ -113,7 +118,7 @@ class CControllerLldRuleList extends CController {
 		$this->setResponse($response);
 	}
 
-	protected function getDiscoveries(string $context, array $filter): array {
+	protected function getDiscoveries(array $filter): array {
 		$options = [
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => ['hostid', 'name', 'status'],
@@ -125,7 +130,7 @@ class CControllerLldRuleList extends CController {
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectDiscoveryData' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'editable' => true,
-			'templated' => ($context === 'template'),
+			'templated' => $this->context === 'template',
 			'filter' => [],
 			'search' => [],
 			'sortfield' => $filter['sort'],
@@ -247,14 +252,13 @@ class CControllerLldRuleList extends CController {
 	}
 
 	protected function getFilter(): array {
-		$context = $this->getInput('context');
 		$filter = $this->getProfileFilters() + [
 				'ms_groups' => [],
 				'ms_hosts' => []
 			];
 
 		if ($filter['filter_hostids']) {
-			if ($context === 'host') {
+			if ($this->context === 'host') {
 				$filter['ms_hosts'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
 					'output' => ['hostid', 'name'],
 					'hostids' => $filter['filter_hostids'],
@@ -275,7 +279,7 @@ class CControllerLldRuleList extends CController {
 		}
 
 		if ($filter['filter_groupids']) {
-			$filter['filter_groupids'] = getSubGroups($filter['filter_groupids'], $filter['ms_groups'], $context);
+			$filter['filter_groupids'] = getSubGroups($filter['filter_groupids'], $filter['ms_groups'], $this->context);
 		}
 
 		return $filter;
@@ -284,7 +288,7 @@ class CControllerLldRuleList extends CController {
 	protected function getProfileFilters(): array {
 		$prefix = $this->getProfilePrefix();
 
-		$filter = [
+		return [
 			'filter_groupids'				=> CProfile::getArray($prefix.'filter.groupids', []),
 			'filter_hostids'				=> CProfile::getArray($prefix.'filter.hostids', []),
 			'filter_name'					=> CProfile::get($prefix.'filter.name', ''),
@@ -301,8 +305,6 @@ class CControllerLldRuleList extends CController {
 			'sort'							=> CProfile::get($prefix.'sort', 'name'),
 			'sortorder' 					=> CProfile::get($prefix.'sortorder', ZBX_SORT_UP)
 		];
-
-		return $filter;
 	}
 
 	protected function updateProfileFilters(): void {

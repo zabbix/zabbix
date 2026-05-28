@@ -34,10 +34,10 @@ $html_page = (new CHtmlPage())
 					$data['hostid'] != 0
 						? (new CSimpleButton(_('Create discovery rule')))->addClass('js-create-item')
 						: (new CSimpleButton(
-						$data['context'] === 'host'
-							? _('Create discovery rule (select host first)')
-							: _('Create discovery rule (select template first)')
-					))->setEnabled(false)
+							$data['context'] === 'host'
+								? _('Create discovery rule (select host first)')
+								: _('Create discovery rule (select template first)')
+						))->setEnabled(false)
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
@@ -299,7 +299,7 @@ foreach ($data['discoveries'] as $discovery) {
 
 	// Hide zeros for specific items.
 	if (in_array($discovery['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_NESTED])
-		|| ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($discovery['key_'], 'mqtt.get', 8) == 0)) {
+			|| ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($discovery['key_'], 'mqtt.get', 8) == 0)) {
 		$discovery['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {
@@ -329,8 +329,8 @@ foreach ($data['discoveries'] as $discovery) {
 	$checkbox = new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']);
 
 	if (in_array($discovery['type'], checkNowAllowedTypes())
-		&& $discovery['status'] == ITEM_STATUS_ACTIVE
-		&& $discovery['hosts'][0]['status'] == HOST_STATUS_MONITORED) {
+			&& $discovery['status'] == ITEM_STATUS_ACTIVE
+			&& $discovery['hosts'][0]['status'] == HOST_STATUS_MONITORED) {
 		$checkbox->setAttribute('data-actions', 'execute');
 	}
 
