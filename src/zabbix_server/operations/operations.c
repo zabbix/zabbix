@@ -611,7 +611,6 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 			else
 				zbx_free(d_if);
 		}
-		zbx_db_free_result(result);
 
 		if (0 != hostid)
 		{
@@ -686,6 +685,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 		zbx_vector_op_dinterface_ptr_destroy(&d_ifs_agent);
 		zbx_vector_op_dinterface_ptr_destroy(&d_ifs_snmp);
+
+		zbx_db_free_result(result);
 	}
 	else if (EVENT_OBJECT_ZABBIX_ACTIVE == event->object)
 	{

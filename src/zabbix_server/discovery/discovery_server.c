@@ -569,7 +569,7 @@ void	zbx_discovery_update_hosts_server(const zbx_uint64_t druleid, const time_t 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() druleid: " ZBX_FS_UI64, __func__, druleid);
 
 	result = zbx_db_select(
-			"select dh1.dhostid, dh1.status, dhd.new_status, dhd.max_lastdown"
+			"select dh1.dhostid,dh1.status,dh1.lastup,dh1.lastdown,dhd.new_status,dhd.max_lastdown"
 			" from dhosts dh1"
 			" left join ("
 				"select dh2.dhostid, %d as new_status, ("
@@ -593,11 +593,13 @@ void	zbx_discovery_update_hosts_server(const zbx_uint64_t druleid, const time_t 
 
 		ZBX_STR2UINT64(dhost.dhostid, row[0]);
 		dhost.status = atoi(row[1]);
+		dhost.lastup = atoi(row[2]);
+		dhost.lastdown = atoi(row[3]);
 
-		if (SUCCEED == zbx_db_is_null(row[2]) || SUCCEED == zbx_db_is_null(row[3]))
+		if (SUCCEED == zbx_db_is_null(row[4]) || SUCCEED == zbx_db_is_null(row[5]))
 			discovery_update_host_status(&dhost, dhost.status, (int)now, add_event_cb);
 		else
-			discovery_update_host_status(&dhost, atoi(row[2]), atoi(row[3]), add_event_cb);
+			discovery_update_host_status(&dhost, atoi(row[4]), atoi(row[5]), add_event_cb);
 	}
 	zbx_db_free_result(result);
 
