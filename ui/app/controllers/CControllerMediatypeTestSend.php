@@ -49,7 +49,7 @@ class CControllerMediatypeTestSend extends CController {
 				'name' => ['db media_type_param.name', 'required', 'not_empty',
 					'when' => ['../type', 'in' => [MEDIA_TYPE_WEBHOOK]]],
 				'value' => ['db media_type_param.value', 'required']
-			], 'when' => ['../type', 'in' => [MEDIA_TYPE_EXEC, MEDIA_TYPE_WEBHOOK]]]
+			], 'when' => ['type', 'in' => [MEDIA_TYPE_EXEC, MEDIA_TYPE_WEBHOOK]]]
 		]];
 	}
 
@@ -110,10 +110,10 @@ class CControllerMediatypeTestSend extends CController {
 		$params = $this->getInputAll();
 
 		if ($params['type'] == MEDIA_TYPE_EXEC) {
-			$params['parameters'] = array_column($params['parameters'], 'value');
+			$params['parameters'] = array_column($params['parameters'] ?? [], 'value');
 		}
 		elseif ($params['type'] == MEDIA_TYPE_WEBHOOK) {
-			$params['parameters'] =  array_column($params['parameters'], 'value', 'name');
+			$params['parameters'] =  array_column($params['parameters'] ?? [], 'value', 'name');
 		}
 
 		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
