@@ -26,13 +26,13 @@ import (
 	"strings"
 )
 
-//nolint:revive // these consts are part of higher level script.
+//nolint:revive,nolintlint // these consts are part of higher level script.
 const (
 	ZABBIX_REVDATE          = "5 May 2026"
 	ZABBIX_VERSION_MAJOR    = 6
 	ZABBIX_VERSION_MINOR    = 0
-	ZABBIX_VERSION_PATCH    = 46
-	ZABBIX_VERSION_RC       = ""
+	ZABBIX_VERSION_PATCH    = 47
+	ZABBIX_VERSION_RC       = "rc1"
 	ZABBIX_VERSION_RC_NUM   = "{ZABBIX_RC_NUM}"
 	ZABBIX_VERSION_REVISION = "{ZABBIX_REVISION}"
 	copyrightMessage        = "Copyright (C) 2026 Zabbix SIA\n" +

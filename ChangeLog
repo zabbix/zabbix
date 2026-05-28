@@ -1,3 +1,11 @@
+Changes for 6.0.47rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-22504] improved memory usage in lld worker proecesses with large low level discovery (vso)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.46
 
 6.0.46rc1 was released as 6.0.46 without any changes
@@ -26,8 +34,11 @@ New features:
 A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27759] added sanitization of service parameter in Oracle TNS connection string creation process (opucka)
+..F....... [ZBX-27760] wrapped html content into iframe when "show as html" is selected in Item history widget (dfofanovs)
 ...G...... [ZBX-25805] fixed regexp runtime error when processing log* items with unspecified encoding by sanitizing invalid UTF-8 (vsmelovs)
 ...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
+..F....... [ZBX-27819] updated onelogin/php-saml to version 4.3.1 (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.44
