@@ -144,7 +144,7 @@ static void	tq_get_timestamp_filter_bounds_unshifted(const zbx_tq_query_t *query
 			*out_lower = start;
 		if (NULL != out_upper)
 			*out_upper = start + ((now - start) / (time_t)query->aggregation_size) *
-				(time_t)query->aggregation_size;
+					(time_t)query->aggregation_size;
 	}
 }
 
