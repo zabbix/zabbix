@@ -46,6 +46,7 @@ switch ($data['type']) {
 						: null,
 					new CFormField(
 						(new CTextBox('parameters['.$parameter['sortorder'].'][value]', $parameter['value']))
+							->setAttribute('maxlength', DB::getFieldLength('media_type_param', 'value'))
 							->setAttribute('autofocus', 'autofocus')
 							->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					)
