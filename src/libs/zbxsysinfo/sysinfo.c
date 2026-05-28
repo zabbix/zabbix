@@ -777,7 +777,6 @@ int	zbx_add_key_access_rule_regexp(const char *parameter, char *pattern, zbx_key
 {
 	zbx_key_access_rule_t	*rule, *r;
 	char			*err_msg = NULL;
-	size_t			anchored_alloc = 0;
 
 	if ('\0' == *pattern)
 	{
