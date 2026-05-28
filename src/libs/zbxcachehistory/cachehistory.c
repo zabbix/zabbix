@@ -66,9 +66,6 @@ static zbx_sync_history_cache_f	sync_history_cache_cb = NULL;
 
 #define ZBX_TRENDS_CLEANUP_TIME	(SEC_PER_MIN * 55)
 
-/* the maximum number of characters for history cache values (except binary and JSON) */
-#define ZBX_HISTORY_VALUE_LEN		(1024 * 64)
-
 typedef struct
 {
 	char		table_name[ZBX_TABLENAME_LEN_MAX];
@@ -2495,20 +2492,27 @@ static void	validate_json_and_add_to_history(zbx_uint64_t itemid, unsigned char 
 		const zbx_variant_t *value, zbx_timespec_t ts, unsigned char value_flags, int mtime,
 		zbx_uint64_t lastlogsize)
 {
-	if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(value->data.str))
+	size_t	history_len = strlen(value->data.str);
+
+	if (ZBX_HISTORY_JSON_VALUE_LEN < history_len)
 	{
 		dc_local_add_history_notsupported(itemid, &ts, "JSON is too large. ", lastlogsize, mtime, value_flags);
 		return;
 	}
 
-	char	*err = NULL;
-
-	if (FAIL == zbx_json_validate_ext(value->data.str, &err))
+	/* Large JSON entries are validated now to avoid polluting history cache */
+	/* with large invalid JSON that will be discarded anyway.                */
+	if (ZBX_HISTORY_VALUE_LEN < history_len)
 	{
-		dc_local_add_history_notsupported(itemid, &ts, err, lastlogsize, mtime, value_flags);
-		zbx_free(err);
+		char	*err = NULL;
 
-		return;
+		if (FAIL == zbx_json_validate_ext(value->data.str, &err))
+		{
+			dc_local_add_history_notsupported(itemid, &ts, err, lastlogsize, mtime, value_flags);
+			zbx_free(err);
+
+			return;
+		}
 	}
 
 	dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_JSON, itemid, value_type, &ts, value->data.str,

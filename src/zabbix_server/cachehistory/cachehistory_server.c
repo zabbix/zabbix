@@ -674,6 +674,23 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, zbx_dc_his
 			case ITEM_VALUE_TYPE_JSON:
 				/* JSON values do not need to be truncated since their sizes are already checked */
 				/* before inserting them into history cache. */
+
+				/* JSON needs to be validated only if it equals or smaller than ZBX_HISTORY_VALUE_LEN */
+				/* Large JSON entries do get validated before entering history cache.                 */
+				/* JSON entries that are equal or smaller than ZBX_HISTORY_VALUE_LEN however, could   */
+				/* had initially TEXT item value and bypass the original JSON validation, so they     */
+				/* must JSON validated here. If history entry is larger than ZBX_HISTORY_VALUE_LEN    */
+				/* then we know it passed the JSON validation before entering the history cache       */
+				if (ZBX_HISTORY_VALUE_LEN >= strlen(hdata->value.str))
+				{
+					char	*err = NULL;
+
+					if (FAIL == zbx_json_validate_ext(hdata->value.str, &err))
+					{
+						dc_history_set_error(hdata, err);
+						break;
+					}
+				}
 				break;
 			case ITEM_VALUE_TYPE_BIN:
 				/* in history cache binary values are stored as ITEM_VALUE_TYPE_STR */
