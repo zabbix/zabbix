@@ -474,7 +474,7 @@ class CJsRpcInputValidator {
 					'host_pattern' => ['type' => API_STRINGS_UTF8],
 					'host_pattern_multiple' => ['type' => API_INT32],
 					'host_pattern_wildcard_allowed' => ['type' => API_INT32],
-					'wildcard_allowed' => ['type' => API_INT32],
+					'wildcard_allowed' => ['type' => API_INT32]
 				]];
 				break;
 
