@@ -891,6 +891,12 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
+	if (NULL != config_history_storage_url)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "\"HistoryStorageURL\" configuration parameter is deprecated, please use"
+				" \"HistoryProvider\"");
+	}
+
 	if (NULL != *config_history_providers)
 	{
 		if (NULL != config_history_storage_url)
