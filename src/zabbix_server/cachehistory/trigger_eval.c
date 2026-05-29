@@ -555,7 +555,7 @@ static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint6
 	zbx_hashset_iter_reset(funcs, &iter);
 	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
 	{
-		int				ret;
+		int	ret;
 
 		/* skip functions with errors */
 		if (NULL != func->error || ZBX_VARIANT_NONE != func->value.type)

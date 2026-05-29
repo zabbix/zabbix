@@ -943,7 +943,7 @@ static const char	*history_clickhouse_parse_log_value(const struct zbx_json_pars
  * Return value: pointer to next position in JSON data or NULL on failure     *
  *                                                                            *
  ******************************************************************************/
-static const char 	*history_clickhouse_parse_numeric_value(const struct zbx_json_parse *jp, const char *p,
+static const char	*history_clickhouse_parse_numeric_value(const struct zbx_json_parse *jp, const char *p,
 		unsigned char value_type, zbx_history_record_t *record)
 {
 	char	buf[ZBX_MAX_DOUBLE_LEN + 1];

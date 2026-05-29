@@ -66,4 +66,3 @@ int	history_options_add_common_params(zbx_vector_history_option_t *options, cons
 
 void	history_log_options(zbx_history_option_t *options, int options_num);
 #endif
-

@@ -219,7 +219,7 @@ static ssize_t	history_option_parse_quoted_value(const char *text)
  *           Spaces around commas are ignored.                                 *
  *                                                                             *
  ******************************************************************************/
-static int 	history_get_options(const char *text, zbx_vector_history_option_t *options, char **error)
+static int	history_get_options(const char *text, zbx_vector_history_option_t *options, char **error)
 {
 	int	ret = FAIL;
 

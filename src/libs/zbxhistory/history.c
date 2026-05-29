@@ -686,7 +686,7 @@ static void	history_session_clear(zbx_history_session_t *session)
 static zbx_history_provider_t	*history_session_get_provider(zbx_history_session_t *session, unsigned char value_type)
 {
 	int			index;
-	zbx_history_provider_t 	*provider = NULL;
+	zbx_history_provider_t	*provider = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -723,7 +723,7 @@ out:
  *             entries_num- [IN] number of entries in the array                *
  *                                                                             *
  *******************************************************************************/
-static void 	history_session_write(zbx_history_session_t *session, unsigned char value_type,
+static void	history_session_write(zbx_history_session_t *session, unsigned char value_type,
 		const zbx_history_entry_t * const *entries, int entries_num)
 {
 	zbx_history_provider_t	*provider;

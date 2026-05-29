@@ -970,7 +970,7 @@ static int	remove_history_duplicates(zbx_vector_dc_history_ptr_t *history)
 		}
 
 		zbx_snprintf_alloc(&select_ptr->sql, &select_ptr->sql_alloc, &select_ptr->sql_offset,
-				"%s (itemid=" ZBX_FS_UI64 " and clock=%d and ns=%d)", separator , h->entry.itemid,
+				"%s (itemid=" ZBX_FS_UI64 " and clock=%d and ns=%d)", separator, h->entry.itemid,
 				h->entry.ts.sec, h->entry.ts.ns);
 	}
 
