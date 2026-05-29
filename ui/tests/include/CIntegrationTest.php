@@ -1083,8 +1083,6 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @param string  $component     component name or null for active component
 	 * @param integer $delayOverride
-	 * @param integer $iterations    iteration count for wait
-	 * @param integer $delay         iteration delay for wait
 	 */
 	protected function reloadConfigurationCacheAndWaitForLogLine($component = null, $delayOverride = 0) {
 		if ($component === null) {
