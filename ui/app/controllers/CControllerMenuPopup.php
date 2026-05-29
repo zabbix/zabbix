@@ -250,6 +250,7 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @param array  $data
 	 *        string $data['itemid']
+	 *        string $data['backurl']
 	 *        bool   $data['combined']  (optional) is item aggregated using combined function or not
 	 *
 	 * @return array|null
@@ -269,17 +270,15 @@ class CControllerMenuPopup extends CController {
 			$is_executable = false;
 
 			if ($db_item['type'] != ITEM_TYPE_HTTPTEST) {
-				$is_writable = CWebUser::getType() == USER_TYPE_SUPER_ADMIN
-					? true
-					: (bool) API::Host()->get([
-						'output' => ['hostid'],
-						'hostids' => $db_item['hostid'],
-						'editable' => true
-					]);
+				$is_writable = CWebUser::getType() == USER_TYPE_SUPER_ADMIN || (bool) API::Host()->get([
+					'output' => ['hostid'],
+					'hostids' => $db_item['hostid'],
+					'editable' => true
+				]);
 			}
 
 			if (in_array($db_item['type'], checkNowAllowedTypes())) {
-				$is_executable = $is_writable ? true : CWebUser::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW);
+				$is_executable = $is_writable || CWebUser::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW);
 			}
 
 			[
