@@ -464,11 +464,15 @@ class CControllerProblemViewData extends CControllerDataTable {
 				$actions_performed[] = _('Severity changes');
 			}
 
-			if (array_column($problem['suppression_data'], 'userid')) {
-				$actions_performed[] = _('Suppressed');
+			$is_manually_suppressed = array_filter(array_column($problem['suppression_data'], 'userid'),
+				static fn($userid) => $userid != 0
+			);
+
+			if ($is_manually_suppressed) {
+				$actions_performed[] = _('Manually suppressed');
 			}
 			elseif ($data['actions']['suppressions'][$problem['eventid']]['count'] > 0) {
-				$actions_performed[] = _('Unsuppressed');
+				$actions_performed[] = _('Manually unsuppressed');
 			}
 
 			if ($data['actions']['actions'][$problem['eventid']]['count'] > 0) {
