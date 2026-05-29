@@ -356,10 +356,24 @@ class CItemHelper extends CItemGeneralHelper {
 	 * @return array
 	 */
 	public static function getStoragePeriods(int $value_type, string $history, string $trends): array {
-		// History retention period in external storages such as ClickHouse or Elasticsearch.
-		static $value_type_ttl = Manager::History()->getValueTypesStorageTtls();
-		static $value_types_with_trends = CHousekeepingHelper::getValueTypesWithTrends();
-		static $hk_history_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL);
+		static $value_type_ttl, $value_types_with_trends, $hk_history_global, $hk_history;
+
+		if ($value_type_ttl === null) {
+			// History retention period in external storages such as ClickHouse or Elasticsearch.
+			$value_type_ttl = Manager::History()->getValueTypesStorageTtls();
+		}
+
+		if ($value_types_with_trends === null) {
+			$value_types_with_trends = CHousekeepingHelper::getValueTypesWithTrends();
+		}
+
+		if ($hk_history_global === null) {
+			$hk_history_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL);
+
+			if ($hk_history_global == 1) {
+				$hk_history = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY);
+			}
+		}
 
 		$simple_interval_parser = new CSimpleIntervalParser();
 		$keep_history = $simple_interval_parser->parse($history) == CParser::PARSE_SUCCESS
@@ -373,8 +387,6 @@ class CItemHelper extends CItemGeneralHelper {
 			$history = $keep_history !== null ? convertSecondsToTimeUnits($keep_history) : '';
 		}
 		elseif ($keep_history !== 0 && $hk_history_global == 1) {
-			static $hk_history = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY);
-
 			$history = $hk_history;
 			$keep_history = timeUnitToSeconds($history);
 		}
@@ -383,15 +395,21 @@ class CItemHelper extends CItemGeneralHelper {
 		}
 
 		if (in_array($value_type, $value_types_with_trends)) {
-			static $hk_trends_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL);
+			static $hk_trends_global, $hk_trends;
+
+			if ($hk_trends_global === null) {
+				$hk_trends_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL);
+
+				if ($hk_trends_global == 1) {
+					$hk_trends = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS);
+				}
+			}
 
 			$keep_trends = $simple_interval_parser->parse($trends) == CParser::PARSE_SUCCESS
 				? timeUnitToSeconds($trends)
 				: null;
 
 			if ($keep_trends !== 0 && $hk_trends_global == 1) {
-				static $hk_trends = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS);
-
 				$trends = $hk_trends;
 				$keep_trends = timeUnitToSeconds($trends);
 			}
