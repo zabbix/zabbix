@@ -63,6 +63,36 @@ abstract class CControllerCepRuleGeneral extends CController {
 			unset($request['cepruleid']);
 		}
 
+		if (array_key_exists('window', $request)) {
+			if (array_key_exists('capacity_enabled', $request['window'])) {
+				unset($request['window']['capacity_enabled']);
+			}
+
+			if (array_key_exists('event_count_tag_enabled', $request['window'])) {
+				unset($request['window']['event_count_tag_enabled']);
+			}
+
+			if (array_key_exists('filter', $request['window'])) {
+				if (array_key_exists('conditions', $request['window']['filter'])) {
+					array_walk($request['window']['filter']['conditions'], function (array &$condition) {
+						unset($condition['formulaid']);
+					});
+					$request['window']['filter']['conditions'] = array_values(
+						$request['window']['filter']['conditions']
+					);
+				}
+			}
+		}
+
+		if (array_key_exists('filter', $request)) {
+			if (array_key_exists('conditions', $request['filter'])) {
+				array_walk($request['filter']['conditions'], function (array &$condition) {
+					unset($condition['formulaid']);
+				});
+				$request['filter']['conditions'] = array_values($request['filter']['conditions']);
+			}
+		}
+
 		return $request;
 	}
 
