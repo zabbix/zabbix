@@ -592,10 +592,6 @@ switch ($data['method']) {
 				break;
 
 			case 'valuemap_names':
-				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
-					break;
-				}
-
 				$hostids = $data['hostids'];
 
 				if (array_key_exists('with_inherited', $data)) {
@@ -615,10 +611,6 @@ switch ($data['method']) {
 
 			case 'valuemaps':
 			case 'template_valuemaps':
-				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
-					break;
-				}
-
 				if ($data['context'] === 'host') {
 					$hosts = API::Host()->get([
 						'output' => ['name'],
