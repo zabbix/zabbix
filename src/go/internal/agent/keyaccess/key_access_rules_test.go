@@ -479,6 +479,56 @@ func TestNoRulesAfterDenyAll(t *testing.T) {
 	RunScenarios(t, scenarios, records, 2)
 }
 
+//nolint:paralleltest
+func TestNoRulesAfterAllowAllRegexp(t *testing.T) {
+	var records accessRules
+
+	records.addRule("vfs.file.*[*]", DENY)
+	records.addRegexpRule(".*", ALLOW)     // Will not be added
+	records.addRule("system.run[*]", DENY) // Will not be added
+
+	var scenarios = []scenario{
+		{metric: "vfs.file.contents[/etc/passwd]", result: false},
+		{metric: "vfs.file.size[/etc/systemd.conf]", result: false},
+		{metric: "system.run[echo 1]", result: true},
+	}
+
+	RunScenarios(t, scenarios, records, 1)
+}
+
+//nolint:paralleltest
+func TestNoRulesAfterDenyAllRegexp(t *testing.T) {
+	var records accessRules
+
+	records.addRule("vfs.file.*[*]", ALLOW)
+	records.addRegexpRule(".*", DENY)
+	records.addRule("system.run[*]", ALLOW) // Will not be added
+
+	var scenarios = []scenario{
+		{metric: "vfs.file.contents[/etc/passwd]", result: true},
+		{metric: "vfs.file.size[/etc/systemd.conf]", result: true},
+		{metric: "system.run[echo 1]", result: false},
+		{metric: "system.localtime", result: false},
+	}
+
+	RunScenarios(t, scenarios, records, 2)
+}
+
+//nolint:paralleltest
+func TestNonCanonicalMatchAllRegexpIsNotTrimmed(t *testing.T) {
+	var records accessRules
+
+	records.addRegexpRule("^.*$", ALLOW)
+	records.addRule("vfs.file.*[*]", DENY) // Not trimmed, although unreachable
+
+	var scenarios = []scenario{
+		{metric: "vfs.file.contents[/etc/passwd]", result: true},
+		{metric: "system.run[echo 1]", result: true},
+	}
+
+	RunScenarios(t, scenarios, records, 3)
+}
+
 func TestIncompleteWhitelist(t *testing.T) {
 	var records accessRules
 

@@ -39,8 +39,11 @@ var (
 // RuleType Access rule permission type
 type RuleType int
 
-// Rule access types
+// Rule access and trimming constants.
 const (
+	// matchAllRegexpPattern is the only regexp form treated as unconditional match-all for rule trimming.
+	matchAllRegexpPattern = ".*"
+
 	ALLOW RuleType = iota
 	DENY
 )
@@ -249,27 +252,31 @@ func prepareSystemRunRule() (*Rule, int, int, error) {
 	return sysrunRule, sysrunIndex, rulesNum, nil
 }
 
+func isUnconditionalMatchAll(r *Rule) bool {
+	if r.IsRegexp {
+		return r.Pattern == matchAllRegexpPattern
+	}
+
+	return len(r.Params) == 0 && r.Key == "*"
+}
+
 func trimRulesAfterMatchAll(sysrunIndex *int) {
 	for i, r := range rules {
-		// regexp rule cannot be a wildcard match-all
-		if r.IsRegexp {
+		if !isUnconditionalMatchAll(r) {
 			continue
 		}
 
-		if len(r.Params) == 0 && r.Key == "*" {
-			if i < *sysrunIndex {
-				*sysrunIndex = i
-			}
-
-			for j := i + 1; j < len(rules); j++ {
-				log.Warningf(`removed unreachable %s "%s" rule`, rules[j].permissionName(),
-					rules[j].Pattern)
-			}
-
-			rules = rules[:i+1]
-
-			return
+		if i < *sysrunIndex {
+			*sysrunIndex = i
 		}
+
+		for j := i + 1; j < len(rules); j++ {
+			log.Warningf(`removed unreachable %s "%s" rule`, rules[j].permissionName(), rules[j].Pattern)
+		}
+
+		rules = rules[:i+1]
+
+		return
 	}
 }
 
@@ -277,25 +284,27 @@ func trimTrailingAllowRules(sysrunIndex int) {
 	cutoff := len(rules)
 
 	for i := len(rules) - 1; i >= 0; i-- {
-		if rules[i].Permission != ALLOW {
+		r := rules[i]
+		if r.Permission != ALLOW {
 			break
 		}
 
-		if rules[i].IsRegexp {
-			break
-		}
-		// system.run allow rules are not redundant because of default system.run[*] deny rule
-		if rules[i].Key != "system.run" {
-			if i != sysrunIndex {
-				log.Warningf(`removed redundant trailing AllowKey "%s" rule`, rules[i].Pattern)
+		if !isUnconditionalMatchAll(r) {
+			if r.IsRegexp || r.Key == "system.run" {
+				// system.run allow rules are not redundant because of default system.run[*] deny rule
+				break
 			}
-
-			for j := i; j < len(rules)-1; j++ {
-				rules[j] = rules[j+1]
-			}
-
-			cutoff--
 		}
+
+		if i != sysrunIndex {
+			log.Warningf(`removed redundant trailing %s "%s" rule`, r.permissionName(), r.Pattern)
+		}
+
+		for j := i; j < len(rules)-1; j++ {
+			rules[j] = rules[j+1]
+		}
+
+		cutoff--
 	}
 
 	rules = rules[:cutoff]

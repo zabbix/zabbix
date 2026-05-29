@@ -456,6 +456,61 @@ out:
     - metric: 'system.localtime'
       result: ZBX_KEY_ACCESS_DENY
 ---
+test case: No rules after AllowKeyRegexp=.*
+in:
+  rules:
+    - pattern: 'vfs.file.*[*]'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: '.*'
+      type: ZBX_KEY_ACCESS_ALLOW_REGEXP
+    - pattern: 'system.run[*]'
+      type: ZBX_KEY_ACCESS_DENY
+out:
+  number_of_rules: 1
+  metrics:
+    - metric: 'vfs.file.contents[/etc/passwd]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'vfs.file.size[/etc/systemd.conf]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'system.run[echo 1]'
+      result: ZBX_KEY_ACCESS_ALLOW
+---
+test case: No rules after DenyKeyRegexp=.*
+in:
+  rules:
+    - pattern: 'vfs.file.*[*]'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: '.*'
+      type: ZBX_KEY_ACCESS_DENY_REGEXP
+    - pattern: 'system.run[*]'
+      type: ZBX_KEY_ACCESS_ALLOW
+out:
+  number_of_rules: 2
+  metrics:
+    - metric: 'vfs.file.contents[/etc/passwd]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'vfs.file.size[/etc/systemd.conf]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[echo 1]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'system.localtime'
+      result: ZBX_KEY_ACCESS_DENY
+---
+test case: Non-canonical regexp match-all is not trimmed
+in:
+  rules:
+    - pattern: '^.*$'
+      type: ZBX_KEY_ACCESS_ALLOW_REGEXP
+    - pattern: 'vfs.file.*[*]'
+      type: ZBX_KEY_ACCESS_DENY
+out:
+  number_of_rules: 3
+  metrics:
+    - metric: 'vfs.file.contents[/etc/passwd]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[echo 1]'
+      result: ZBX_KEY_ACCESS_ALLOW
+---
 test case: Incomplete whitelist (no deny all at the end)
 in:
   rules:

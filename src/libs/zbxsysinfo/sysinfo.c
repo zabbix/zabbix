@@ -500,6 +500,24 @@ static zbx_key_access_rule_t	*zbx_key_access_rule_create(char *pattern, zbx_key_
 	return rule;
 }
 
+#define ZBX_KEY_ACCESS_REGEXP_MATCH_ALL	".*"
+
+static int	key_access_rule_is_unconditional_match_all(const zbx_key_access_rule_t *rule)
+{
+	if (ZBX_KEY_ACCESS_PATTERN_REGEXP == rule->pattern_type)
+	{
+		if (0 == strcmp(rule->pattern, ZBX_KEY_ACCESS_REGEXP_MATCH_ALL))
+			return SUCCEED;
+
+		return FAIL;
+	}
+
+	if (1 == rule->elements.values_num && 0 == strcmp(rule->elements.values[0], "*"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: validates key access rules configuration                          *
@@ -510,6 +528,7 @@ void	zbx_finalize_key_access_rules_configuration(void)
 	int			i, j, rules_num, sysrun_index = ZBX_MAX_UINT31_1;
 	zbx_key_access_rule_t	*rule, *sysrun_deny;
 	char			sysrun_pattern[] = "system.run[*]";
+	const char		*rule_name;
 
 	rules_num = key_access_rules.values_num;
 
@@ -531,24 +550,22 @@ void	zbx_finalize_key_access_rules_configuration(void)
 
 	if (0 != rules_num)
 	{
-		/* throw out all rules after '*', because they would never match */
+		/* throw out all rules after unconditional match-all, because they would never match */
 		for (i = 0; i < key_access_rules.values_num; i++)
 		{
 			rule = (zbx_key_access_rule_t*)key_access_rules.values[i];
-			if (1 == rule->elements.values_num && 0 == strcmp(rule->elements.values[0], "*"))
-			{
-				/* 'match all' rule also matches system.run[*] */
-				if (i < sysrun_index)
-					sysrun_index = i;
 
-				break;
-			}
+			if (SUCCEED != key_access_rule_is_unconditional_match_all(rule))
+				continue;
+			/* 'match all' rule also matches system.run[*] */
+			if (i < sysrun_index)
+				sysrun_index = i;
+
+			break;
 		}
 
 		if (i != key_access_rules.values_num)
 		{
-			const char	*rule_name;
-
 			for (j = ++i; j < key_access_rules.values_num; j++)
 			{
 				rule = (zbx_key_access_rule_t*)key_access_rules.values[j];
@@ -569,8 +586,8 @@ void	zbx_finalize_key_access_rules_configuration(void)
 			}
 			key_access_rules.values_num = i;
 		}
-
-		/* trailing AllowKey rules are meaningless, because AllowKey=* is default behavior, */
+		/* trailing AllowKey=* and AllowKeyRegexp=".*" are redundant (default is allow all); */
+		/* keep trailing AllowKeyRegexp patterns other than ".*" and AllowKey=system.run[...]. */
 		for (i = key_access_rules.values_num - 1; 0 <= i; i--)
 		{
 			rule = (zbx_key_access_rule_t*)key_access_rules.values[i];
@@ -578,22 +595,33 @@ void	zbx_finalize_key_access_rules_configuration(void)
 			if (ZBX_KEY_ACCESS_ALLOW != rule->type)
 				break;
 
-			/* regex rule redundancy cannot be determined statically */
-			if (ZBX_KEY_ACCESS_PATTERN_REGEXP == rule->pattern_type)
-				break;
-
-			/* system.run allow rules are not redundant because of default system.run[*] deny rule */
-			if (0 == rule->elements.values_num || 0 != strcmp(rule->elements.values[0], "system.run"))
+			if (SUCCEED != key_access_rule_is_unconditional_match_all(rule))
 			{
-				if (i != sysrun_index)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "removed redundant trailing AllowKey \"%s\" rule",
-							rule->pattern);
-				}
+				if (ZBX_KEY_ACCESS_PATTERN_REGEXP == rule->pattern_type)
+					break;
 
-				zbx_key_access_rule_free(rule);
-				zbx_vector_ptr_remove(&key_access_rules, i);
+				if (0 != rule->elements.values_num &&
+						0 == strcmp(rule->elements.values[0], "system.run"))
+				{
+					/* system.run allow rules are not redundant because of default system.run[*]
+					 * deny rule */
+					break;
+				}
 			}
+
+			if (i != sysrun_index)
+			{
+				if (ZBX_KEY_ACCESS_PATTERN_REGEXP == rule->pattern_type)
+					rule_name = "AllowKeyRegexp";
+				else
+					rule_name = "AllowKey";
+
+				zabbix_log(LOG_LEVEL_WARNING, "removed redundant trailing %s \"%s\" rule",
+						rule_name, rule->pattern);
+			}
+
+			zbx_key_access_rule_free(rule);
+			zbx_vector_ptr_remove(&key_access_rules, i);
 		}
 
 		if (0 == key_access_rules.values_num)
