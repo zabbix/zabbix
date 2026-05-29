@@ -175,8 +175,6 @@ window.ceprule_edit_popup = new class {
 
 					<input data-field-type="hidden" name="operations[#{step}][step]" type="hidden" value="#{step}"/>
 					<input data-field-type="hidden" name="operations[#{step}][execute_when]" type="hidden" value="#{execute_when}"/>
-					<input data-field-type="hidden" name="operations[#{step}][event_type]" type="hidden" value="#{event_type}"/>
-					<input data-field-type="hidden" name="operations[#{step}][eviction_cause]" type="hidden" value="#{eviction_cause}"/>
 					<input data-field-type="hidden" name="operations[#{step}][type]" type="hidden" value="#{type}"/>
 					<input data-field-type="hidden" name="operations[#{step}][evaltype]" type="hidden" value="#{evaltype}"/>
 					<input data-field-type="hidden" name="operations[#{step}][event_name]" type="hidden" value="#{event_name}"/>
@@ -668,10 +666,8 @@ window.ceprule_edit_popup = new class {
 		if (is_new) {
 			operation = {
 				step: 1 + Math.max(0, ...Object.keys(this.form.findFieldByName('operations').getValue())),
-				event_type: <?= json_encode(DB::getDefault('cep_operation', 'event_type')) ?>,
 				evaltype: '<?= CONDITION_EVAL_TYPE_AND_OR ?>',
 				event_name: '',
-				eviction_cause: '<?= ZBX_CEP_EXECUTE_EVENT_TYPE_ANY ?>',
 				execute_when: '<?= ZBX_CEP_OP_WHEN_EVENT_OCCURRED ?>',
 				new_tag: '',
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',

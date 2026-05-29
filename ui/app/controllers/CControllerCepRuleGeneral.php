@@ -306,12 +306,6 @@ abstract class CControllerCepRuleGeneral extends CController {
 					]
 				],
 				'evaltype' => ['db cep_operation.evaltype', 'required', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]],
-				'event_type' => ['db cep_operation.event_type', 'required', 'in' => [0, 1],
-					'when' => [
-						['execute_when', 'in' => [ZBX_CEP_OP_WHEN_EVENT_OCCURRED]],
-						/* ['../window_type', 'in' => [ZBX_CEP_WINDOW_CAUSE_SYMPTOM]] */
-					]
-				],
 				'event_name' => ['db cep_operation.event_name', 'required', 'not_empty',
 					'when' => ['type', 'in' => [ZBX_CEP_OP_SET_NAME]]
 				],

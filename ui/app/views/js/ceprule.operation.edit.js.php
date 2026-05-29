@@ -49,7 +49,6 @@ window.ceprule_operation_edit_popup = new class {
 		this.#setAvailableExecuteWhenOptions();
 		this.#setAvailableOperationOptions();
 		window['ceprule-operation-execute-when'].dispatchEvent(new Event('change'));
-		window['ceprule-operation-eviction-cause'].dispatchEvent(new Event('change'));
 		window['ceprule-operation-action'].dispatchEvent(new Event('change'));
 
 		window.requestAnimationFrame(() => this.form_element.style.display = '');
@@ -57,7 +56,6 @@ window.ceprule_operation_edit_popup = new class {
 
 	#initActions() {
 		this.form_element.addEventListener('change', (e) => {
-			e.target.name === 'eviction_cause' && this.#setAvailableOperationOptions();
 			e.target.id === 'ceprule-operation-execute-when' && this.#handleExecuteWhenChanged(e.target.value);
 			e.target.id === 'ceprule-operation-action' && this.#handleActionChanged(e.target.value);
 		}, {capture: true});
@@ -118,7 +116,6 @@ window.ceprule_operation_edit_popup = new class {
 	#setAvailableOperationOptions() {
 		const type = Number(this.form.findFieldByName('type').getValue());
 		const execute_when = Number(this.form.findFieldByName('execute_when').getValue());
-		const eviction_cause = Number(this.form.findFieldByName('eviction_cause').getValue());
 		const zselect = window['ceprule-operation-action'];
 
 		const events_options = [];
@@ -133,8 +130,7 @@ window.ceprule_operation_edit_popup = new class {
 
 			if (value == <?= ZBX_CEP_OP_DISCARD ?>) {
 				option.is_disabled = (execute_when == <?= ZBX_CEP_OP_WHEN_TAGS_CORRELATED ?>)
-					|| (execute_when == <?= ZBX_CEP_OP_WHEN_EVENT_EVICTED ?>
-						&& eviction_cause == <?= ZBX_CEP_EVICTION_CAUSE_DURATION ?>);
+					|| (execute_when == <?= ZBX_CEP_OP_WHEN_EVENT_EVICTED ?>);
 			}
 		};
 
@@ -247,13 +243,6 @@ window.ceprule_operation_edit_popup = new class {
 	}
 
 	#handleExecuteWhenChanged(value) {
-		// Toggle secondary options.
-		window['ceprule-operation-eviction-cause']
-			.style.display = value === '<?= ZBX_CEP_OP_WHEN_EVENT_EVICTED ?>' ? '' : 'none';
-		window['ceprule-operation-event-type']
-			.style.display = this.#window_type === '<?= ZBX_CEP_WINDOW_CAUSE_SYMPTOM ?>'
-				&& value === '<?= ZBX_CEP_OP_WHEN_EVENT_OCCURRED ?>' ? '' : 'none';
-
 		// Update a dependent selector view.
 		this.#setAvailableOperationOptions();
 
