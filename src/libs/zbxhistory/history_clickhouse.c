@@ -173,7 +173,6 @@ static void	history_clickhouse_release_conn(zbx_clickhouse_data_t *data, zbx_cli
 	zbx_vector_clickhouse_conn_ptr_append(&data->conns, conn);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: validate configuration options for ClickHouse history provider    *
@@ -469,7 +468,7 @@ static int	is_json_object(const char *json_str)
 static void	history_clickhouse_write(void *data, unsigned char value_type,
 		const zbx_history_entry_t * const *entries, int entries_num)
 {
-#define	ZBX_CLICKHOUSE_ASYNC_INSERT "&async_insert=1&wait_for_async_insert=0"
+#define ZBX_CLICKHOUSE_ASYNC_INSERT	"&async_insert=1&wait_for_async_insert=0"
 	zbx_clickhouse_data_t	*d = (zbx_clickhouse_data_t *)data;
 	zbx_clickhouse_conn_t	*conn;
 	char			*error = NULL, url[MAX_STRING_LEN], *post_data = NULL;

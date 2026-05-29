@@ -1411,8 +1411,7 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
  * Parameters:                                                                         *
  *   events_cbs                       - [IN]                                           *
  *   rtc                              - [IN] RTC socket                                *
- *   config_history_storage_pipelines - [IN]                                           *
- *   stats                             - [OUT] flag indicating the cache emptiness:    *
+ *   stats                            - [OUT] flag indicating the cache emptiness:     *
  *                                            ZBX_SYNC_DONE - nothing to sync, go idle *
  *                                            ZBX_SYNC_MORE - more data to sync        *
  *                                                                                     *

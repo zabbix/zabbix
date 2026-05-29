@@ -835,7 +835,6 @@ int	zbx_db_settings_set_value(const char *name, const void *value, int type)
 			default:
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FS_UI64,
 						*(const zbx_uint64_t *)value);
-
 		}
 
 		if (old_type != type)

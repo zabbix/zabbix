@@ -39,4 +39,3 @@ size_t	history_curl_recv(void *ptr, size_t size, size_t nmemb, void *userdata);
 #endif
 
 #endif
-

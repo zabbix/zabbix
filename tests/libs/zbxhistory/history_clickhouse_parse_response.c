@@ -19,7 +19,6 @@
 #include "zbxmockdb.h"
 #include "mocks/valuecache/valuecache_mock.h"
 
-
 #include "../../../src/libs/zbxhistory/history_clickhouse.c"
 
 void	zbx_mock_test_entry(void **state)

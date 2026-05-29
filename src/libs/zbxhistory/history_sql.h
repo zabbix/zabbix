@@ -20,4 +20,3 @@
 zbx_history_provider_t	*history_sql_open(const zbx_history_option_t *options, int options_num, char **error);
 
 #endif
-
