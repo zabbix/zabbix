@@ -55,7 +55,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Template groups')->select('Templates/SAN');
 		$filter->submit();
-		$table->waitUntilReady();
+		$table->waitUntilReloaded();
 		$this->zbxTestTextPresent($this->templateName);
 
 		$headers = ['', 'Name', 'Hosts', 'Items', 'Triggers', 'Graphs', 'Dashboards', 'Discovery', 'Web', 'Vendor',
@@ -127,7 +127,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$filter->getField('Template groups')->select('Templates/SAN');
 		$filter->getField('Name')->fill($this->templateName);
 		$filter->submit();
-		$table->waitUntilReady();
+		$table->waitUntilReloaded();
 		$this->assertDatatableDataColumn([$this->templateName]);
 		$this->assertDatatableStats(1);
 	}
@@ -136,12 +136,13 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->query('button:Reset')->one()->click();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getDatatable();
 		$filter->getField('Linked templates')->fill([
 				'values' => 'Template ZBX6663 Second',
 				'context' => 'Templates'
 		]);
 		$filter->submit();
-		$this->zbxTestWaitForPageToLoad();
+		$table->waitUntilReloaded();
 		$this->assertDatatableDataColumn(['Template ZBX6663 First']);
 		$this->assertDatatableDataColumn(['Template ZBX6663 Second'], 'Linked templates');
 		$this->assertDatatableStats(1);
@@ -160,7 +161,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->assertDatatableStats(0);
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
 		$this->zbxTestClickButtonText('Apply');
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 		$this->assertDatatableStats(0);
 	}
 
