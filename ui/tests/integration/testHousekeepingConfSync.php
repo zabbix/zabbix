@@ -32,6 +32,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	private static $agent_ping_itemid = null;
 	private static $triggerid = null;
 	private static $eventids = [];
+	private static $db_extension = null;
 
 	/**
 	 * @inheritdoc
@@ -192,6 +193,33 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		return $housekeeping;
 	}
 
+	/**
+	 * Extract database settings dumped by DCdump_config().
+	 */
+	private function extractSyncedDbSettings($component) {
+		$log = file_get_contents(self::getLogPath($component));
+		$data = explode("\n", $log);
+		$db_settings = [];
+
+		foreach ($data as $line) {
+			$line = preg_replace('/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+\s+/', '', $line);
+
+			if (preg_match('/extension: (.*)/', $line, $matches)) {
+				$db_settings['db_extension'] = $matches[1];
+			}
+			else if (preg_match('/history_compression_status: (\d+)/', $line, $matches)) {
+				$db_settings['compression_status'] = (int) $matches[1];
+			}
+			else if (preg_match('/history_compress_older: (\d+)/', $line, $matches)) {
+				$db_settings['compress_older'] = (int) $matches[1];
+			}
+		}
+
+		$this->assertNotEmpty($db_settings);
+
+		return $db_settings;
+	}
+
 	private static function defaultHousekeeping() {
 		return [
 			'hk_events_mode' => 1,
@@ -211,8 +239,18 @@ class testHousekeepingConfSync extends CIntegrationTest {
 			'hk_history' => '31d',
 			'hk_trends_mode' => 1,
 			'hk_trends_global' => 0,
-			'hk_trends' => '365d'
+			'hk_trends' => '365d',
+			'compression_status' => 0,
+			'compress_older' => '7d'
 		];
+	}
+
+	private static function getDBExtension() {
+		if (self::$db_extension === null) {
+			self::$db_extension = CDBHelper::getValue("SELECT value_str FROM settings WHERE name='db_extension'");
+		}
+
+		return self::$db_extension;
 	}
 
 	private function expectedServerHousekeeping(array $housekeeping) {
@@ -369,6 +407,13 @@ class testHousekeepingConfSync extends CIntegrationTest {
 
 		$server_hk = $this->extractSyncedHousekeeping(self::COMPONENT_SERVER);
 		$this->assertHousekeepingEquals($this->expectedServerHousekeeping($housekeeping), $server_hk);
+	}
+
+	private function reloadServerAndAssertDbSettings(array $expected) {
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->assertHousekeepingEquals($expected, $this->extractSyncedDbSettings(self::COMPONENT_SERVER));
 	}
 
 	private function reloadProxyAndWaitForConfiguration($wait_for_cache_stats = false) {
@@ -543,6 +588,36 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		$this->assertArrayHasKey('hk_history_global', $proxy_hk);
 		$this->assertEquals($this->timeToSeconds($data['update']['hk_history']), $proxy_hk['hk_history']);
 		$this->assertEquals($data['update']['hk_history_global'], $proxy_hk['hk_history_global']);
+
+		return true;
+	}
+
+	/**
+	 * Check that TimescaleDB compression settings are propagated to server
+	 * runtime configuration cache.
+	 *
+	 * @required-components server
+	 * @configurationDataProvider configurationProvider
+	 */
+	public function testHousekeepingConfSync_TimescaleDbCompressionSettings() {
+		if (self::getDBExtension() !== ZBX_DB_EXTENSION_TIMESCALEDB) {
+			$this->markTestSkipped('TimescaleDB extension is not available.');
+		}
+
+		$housekeeping = [
+			'compression_status' => 1,
+			'compress_older' => '14d'
+		];
+		$expected = [
+			'db_extension' => ZBX_DB_EXTENSION_TIMESCALEDB,
+			'compression_status' => $housekeeping['compression_status'],
+			'compress_older' => $this->timeToSeconds($housekeeping['compress_older'])
+		];
+
+		$response = $this->call('housekeeping.update', $housekeeping);
+		$this->assertArrayHasKey('result', $response);
+
+		$this->reloadServerAndAssertDbSettings($expected);
 
 		return true;
 	}
