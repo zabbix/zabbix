@@ -163,7 +163,7 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	zbx_es_env_t		*env;
 	int			err_index = -1;
 	void			*objptr;
-	long			ssl_verify_host = 0L, ssl_verify_peer = 0L;
+	long			ssl_verify_host = 1L, ssl_verify_peer = 1L;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
