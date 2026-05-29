@@ -26,6 +26,8 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	const HK_MODE_DISABLED = 0;
 	const HK_MODE_REGULAR = 1;
 	const HK_MODE_PARTITION = 2;
+	const TSDB_COMPRESSION_TABLE = 'history_uint';
+	const MAX_TSDB_POLICY_ATTEMPTS = 10;
 
 	private static $proxyid = null;
 	private static $hostid = null;
@@ -129,7 +131,8 @@ class testHousekeepingConfSync extends CIntegrationTest {
 				'LogFileSize' => 20,
 				'Hostname' => self::PROXY_NAME,
 				'ProxyMode' => PROXY_OPERATING_MODE_ACTIVE,
-				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
+				'Server' => '127.0.0.1:'.
+					self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
 			]
 		];
 	}
@@ -247,10 +250,44 @@ class testHousekeepingConfSync extends CIntegrationTest {
 
 	private static function getDBExtension() {
 		if (self::$db_extension === null) {
-			self::$db_extension = CDBHelper::getValue("SELECT value_str FROM settings WHERE name='db_extension'");
+			self::$db_extension = CDBHelper::getValue(
+					"SELECT value_str FROM settings WHERE name='db_extension'"
+			);
 		}
 
 		return self::$db_extension;
+	}
+
+	private function getTimescaleDbCompressionPolicyAge() {
+		$sql = "SELECT extract(epoch from (config::json->>'compress_after')::interval) AS compress_after".
+			" FROM timescaledb_information.jobs".
+			" WHERE (application_name LIKE 'Columnstore Policy%' OR application_name LIKE 'Compression%')".
+				" AND hypertable_schema='public'".
+				" AND hypertable_name=".zbx_dbstr(self::TSDB_COMPRESSION_TABLE);
+
+		$res = DBfetch(DBselect($sql));
+		$this->assertNotFalse($res, 'TimescaleDB compression policy is not configured.');
+		$this->assertArrayHasKey('compress_after', $res);
+
+		return (int) $res['compress_after'];
+	}
+
+	private function assertTimescaleDbCompressionPolicyAge($expected) {
+		for ($attempt = 1; $attempt <= self::MAX_TSDB_POLICY_ATTEMPTS; $attempt++) {
+			try {
+				$this->assertEquals($expected, $this->getTimescaleDbCompressionPolicyAge(),
+						'Unexpected TimescaleDB compression policy age.');
+
+				return;
+			}
+			catch (Throwable $e) {
+				if ($attempt === self::MAX_TSDB_POLICY_ATTEMPTS) {
+					throw $e;
+				}
+			}
+
+			sleep(1);
+		}
 	}
 
 	private function expectedServerHousekeeping(array $housekeeping) {
@@ -594,7 +631,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 
 	/**
 	 * Check that TimescaleDB compression settings are propagated to server
-	 * runtime configuration cache.
+	 * runtime configuration cache and applied to TimescaleDB compression policy.
 	 *
 	 * @required-components server
 	 * @configurationDataProvider configurationProvider
@@ -618,6 +655,8 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		$this->assertArrayHasKey('result', $response);
 
 		$this->reloadServerAndAssertDbSettings($expected);
+		$this->executeHousekeeper(self::COMPONENT_SERVER);
+		$this->assertTimescaleDbCompressionPolicyAge($expected['compress_older'] + 2 * SEC_PER_HOUR);
 
 		return true;
 	}
