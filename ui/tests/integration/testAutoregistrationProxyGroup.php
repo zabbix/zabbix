@@ -108,6 +108,11 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => self::$proxy_groupid
+						],
+						[
+							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => self::$proxyid
 						]
 					],
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR
