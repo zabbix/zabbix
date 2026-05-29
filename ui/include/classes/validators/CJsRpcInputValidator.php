@@ -159,6 +159,7 @@ class CJsRpcInputValidator {
 			'from' => ['type' => API_STRING_UTF8],
 			'to' => ['type' => API_STRING_UTF8],
 			'itemids' => ['type' => API_IDS, 'flags' => API_NORMALIZE],
+			'filter' => ['type' => API_STRING_UTF8],
 			'filter_task' => ['type' => API_INT32],
 			'mark_color' => ['type' => API_INT32],
 			'action' => ['type' => API_STRING_UTF8, 'in' => implode(',', [HISTORY_VALUES, HISTORY_LATEST])]
