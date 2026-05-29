@@ -2350,7 +2350,8 @@ button {
 
 .datatable {
   position: relative;
-  border: 1px solid #9f9f9f; }
+  border: 1px solid #9f9f9f;
+  border-radius: var(--surface-border-radius); }
   .datatable::before {
     content: ''; }
   .datatable.is-loading::before {
@@ -2449,6 +2450,7 @@ button {
     user-select: none;
     background-color: #ffffff;
     border: 1px solid #9f9f9f;
+    border-radius: var(--surface-border-radius);
     box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
     .datatable .datatable-options-popup:focus {
       outline: none; }
@@ -2469,7 +2471,9 @@ button {
       margin-top: 5px; }
   .datatable .datatable-header {
     display: grid;
-    overflow: hidden; }
+    overflow: hidden;
+    border-top-left-radius: var(--surface-border-radius);
+    border-top-right-radius: var(--surface-border-radius); }
     .datatable .datatable-header.datatable-header-sticky {
       position: sticky;
       top: 0;
@@ -2518,7 +2522,8 @@ button {
       user-select: none;
       background-color: #ffffff; }
       .datatable .datatable-header .datatable-options-button .datatable-options-link {
-        margin-right: 0; }
+        margin-right: 0;
+        border-radius: 0 var(--surface-border-radius) 0 0; }
         .datatable .datatable-header .datatable-options-button .datatable-options-link:not(:hover):not(:focus):not(.datatable-options-link-opened) {
           border-left-color: #9f9f9f; }
   .datatable .datatable-body {
@@ -9067,6 +9072,8 @@ main .server-name {
   border-radius: var(--surface-border-radius); }
   .flickerfreescreen.is-loading {
     min-height: 64px; }
+  .flickerfreescreen img {
+    border-radius: var(--surface-border-radius); }
 
 .clock {
   display: flex;

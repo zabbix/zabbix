@@ -2155,6 +2155,10 @@ main {
 	&.is-loading {
 		min-height: 64px;
 	}
+
+	img {
+		border-radius: var(--surface-border-radius);
+	}
 }
 
 // Analog Clock.
