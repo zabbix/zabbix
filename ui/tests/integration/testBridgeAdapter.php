@@ -35,6 +35,10 @@ class testBridgeAdapter extends CIntegrationTest {
 	private const REAL_NOTIFY_MESSAGE = 'Bridge adapter real notification message';
 	private const MEDIA_SEVERITY_ALL = 63;
 	private const PUSH_ALERT_ERROR_NO_PERMISSION = 'No permissions to referred device or it does not exist.';
+	private const LOG_MOBILE_DEVICES_DISABLED_INIT = 'cannot initialize device: mobile devices are disabled';
+	private const LOG_MOBILE_DEVICES_DISABLED_NOTIFY =
+		'cannot send device notification: mobile devices are disabled';
+	private const LOG_MOBILE_DEVICES_DISABLED_OFFBOARD = 'cannot offboard device: mobile devices are disabled';
 
 	private static string $adapter_log_file;
 	private static string $adapter_pid_file;
@@ -54,7 +58,16 @@ class testBridgeAdapter extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
+				'EnableMobileDevices' => 1,
 				'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc'
+			]
+		];
+	}
+
+	public function disabledMobileDevicesConfigurationProvider(): array {
+		return [
+			self::COMPONENT_SERVER => [
+				'EnableMobileDevices' => 0
 			]
 		];
 	}
@@ -598,6 +611,24 @@ class testBridgeAdapter extends CIntegrationTest {
 	}
 
 	/**
+	 * @configurationDataProvider disabledMobileDevicesConfigurationProvider
+	 */
+	public function testBridgeAdapter_initDisabledMobileDevices(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$init_response = $client->initDevice([
+			'userid' => 1,
+			'uuid' => self::INIT_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_MOBILE_DEVICES_DISABLED_INIT, true,
+			120, 1
+		);
+
+		$this->assertFalse($init_response);
+	}
+
+	/**
 	 * @onBeforeOnce startBridgeAdapterMock
 	 * @onAfterOnce stopBridgeAdapterMock
 	 */
@@ -621,6 +652,30 @@ class testBridgeAdapter extends CIntegrationTest {
 		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
 			return $request['body']['params']['to']['device_id'] === self::NOTIFY_DEVICE_UUID;
 		});
+	}
+
+	/**
+	 * @configurationDataProvider disabledMobileDevicesConfigurationProvider
+	 */
+	public function testBridgeAdapter_notifyDisabledMobileDevices(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$mediatypeid = CDBHelper::getValue(
+			'select mediatypeid from media_type where type='.MEDIA_TYPE_PUSH.' order by mediatypeid'
+		);
+
+		$result = $client->testMediaType([
+			'mediatypeid' => $mediatypeid,
+			'sendto' => self::NOTIFY_DEVICE_UUID,
+			'subject' => 'Bridge adapter integration test',
+			'message' => 'Bridge adapter integration test message'
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_MOBILE_DEVICES_DISABLED_NOTIFY, true,
+			120, 1
+		);
+
+		$this->assertFalse($result);
 	}
 
 	/**
@@ -681,6 +736,22 @@ class testBridgeAdapter extends CIntegrationTest {
 		$this->assertAdapterRequest('device.deactivate', static function (array $request): bool {
 			return $request['body']['params']['device_id'] === self::OFFBOARD_DEVICE_UUID;
 		});
+	}
+
+	/**
+	 * @configurationDataProvider disabledMobileDevicesConfigurationProvider
+	 */
+	public function testBridgeAdapter_offboardDisabledMobileDevices(): void {
+		[$client, $sid] = $this->getServerClientAndSid();
+
+		$offboard_response = $client->offboardDevice([
+			'uuid' => self::OFFBOARD_DEVICE_UUID
+		], $sid);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, self::LOG_MOBILE_DEVICES_DISABLED_OFFBOARD,
+			true, 120, 1);
+
+		$this->assertFalse($offboard_response);
 	}
 
 }
