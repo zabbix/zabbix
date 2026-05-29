@@ -30,7 +30,7 @@ require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
  */
 class testLLDProxyHistorySyncAtScale extends testLLDHistorySyncAtScale {
 
-	const POST_TRENDS_SKIP_REASON = 'proxy variant: scenarios after TrendsVerify are not yet exercised';
+	const NODATA_SKIP_REASON = 'proxy variant: nodata-based trigger scenarios are not exercised';
 
 	/**
 	 * Component configuration provider — adds the proxy daemon configuration on
@@ -82,94 +82,64 @@ class testLLDProxyHistorySyncAtScale extends testLLDHistorySyncAtScale {
 	}
 
 	public function testLLDHistorySyncAtScale_ValueOmittedDrainsDelay() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
+		$this->markTestSkipped(self::NODATA_SKIP_REASON);
 	}
 
-	/*public function testLLDHistorySyncAtScale_LogLastlogsizeAdvances() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
-	}
-
-	/*public function testLLDHistorySyncAtScale_SingleLogBurstPreTriggersSend() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
-	}
-
-	public function testLLDHistorySyncAtScale_SingleLogBurstPreTriggersVpsWritten() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
-	}
-
-	public function testLLDHistorySyncAtScale_PreTriggerZeroSend() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
-	}
-
-	public function testLLDHistorySyncAtScale_PreTriggerZeroVpsWritten() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
-	}
-
-	public function testLLDHistorySyncAtScale_TriggerDiscovery() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
-	}
-
-	public function testLLDHistorySyncAtScale_TriggerFiring() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
-	}
-
-	public function testLLDHistorySyncAtScale_TriggerRecovery() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
-	}
-
-	public function testLLDHistorySyncAtScale_TriggerFiringWarmupAfterRestart() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
-	}
-
-	public function testLLDHistorySyncAtScale_TriggerRecoveryWarmupAfterRestart() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
-	}
-
-	public function testLLDHistorySyncAtScale_TriggerUnknown() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
-	}
-
-	public function testLLDHistorySyncAtScale_TriggerRecoverUnknown() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
-	}
-*/
+	/*
+	 * The following tests are inherited from testLLDHistorySyncAtScale and
+	 * intentionally not overridden — they are expected to run in the proxy
+	 * variant:
+	 *
+	 *   - testLLDHistorySyncAtScale_LogLastlogsizeAdvances
+	 *   - testLLDHistorySyncAtScale_SingleLogBurstPreTriggersSend
+	 *   - testLLDHistorySyncAtScale_SingleLogBurstPreTriggersVpsWritten
+	 *   - testLLDHistorySyncAtScale_PreTriggerZeroSend
+	 *   - testLLDHistorySyncAtScale_PreTriggerZeroVpsWritten
+	 *   - testLLDHistorySyncAtScale_TriggerDiscovery
+	 *   - testLLDHistorySyncAtScale_TriggerFiring
+	 *   - testLLDHistorySyncAtScale_TriggerRecovery
+	 *   - testLLDHistorySyncAtScale_TriggerFiringWarmupAfterRestart
+	 *   - testLLDHistorySyncAtScale_TriggerRecoveryWarmupAfterRestart
+	 *   - testLLDHistorySyncAtScale_TriggerUnknown
+	 *   - testLLDHistorySyncAtScale_TriggerRecoverUnknown
+	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataDiscovery() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
+		$this->markTestSkipped(self::NODATA_SKIP_REASON);
 	}
 
 	public function testLLDHistorySyncAtScale_TriggerNoDataFiring() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
+		$this->markTestSkipped(self::NODATA_SKIP_REASON);
 	}
 
 	public function testLLDHistorySyncAtScale_ProxyLastaccess() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
+		$this->markTestSkipped(self::NODATA_SKIP_REASON);
 	}
 
 	public function testLLDHistorySyncAtScale_TriggerNoDataNotSupported() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
+		$this->markTestSkipped(self::NODATA_SKIP_REASON);
 	}
 
 	public function testLLDHistorySyncAtScale_TriggerNoDataValueOmitted() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
+		$this->markTestSkipped(self::NODATA_SKIP_REASON);
 	}
 
 	public function testLLDHistorySyncAtScale_TriggerNoDataValueOmittedLastlogsize() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
+		$this->markTestSkipped(self::NODATA_SKIP_REASON);
 	}
 
 	public function testLLDHistorySyncAtScale_TriggerNoDataRecoveryAfterRestart() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
+		$this->markTestSkipped(self::NODATA_SKIP_REASON);
 	}
 
 	public function testLLDHistorySyncAtScale_TriggerNoDataSuppressedAfterConnectionLoss() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
+		$this->markTestSkipped(self::NODATA_SKIP_REASON);
 	}
 
 	public function testLLDHistorySyncAtScale_TriggerNoDataOKAfterConnectionLossSingleLogBurst() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
+		$this->markTestSkipped(self::NODATA_SKIP_REASON);
 	}
 
 	public function testLLDHistorySyncAtScale_TriggerNoDataFiringAfterRestart() {
-		$this->markTestSkipped(self::POST_TRENDS_SKIP_REASON);
+		$this->markTestSkipped(self::NODATA_SKIP_REASON);
 	}
 }
