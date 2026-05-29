@@ -382,11 +382,14 @@ class CItemHelper extends CItemGeneralHelper {
 		$history_has_errors = false;
 		$trends_has_errors = false;
 
-		if ($keep_history !== 0 && array_key_exists($value_type, $value_type_ttl)) {
-			$keep_history = $value_type_ttl[$value_type]['value_ttl'];
-			$history = $keep_history !== null ? convertSecondsToTimeUnits($keep_history) : '';
+		if ($keep_history === 0) {
+			$history = _('Not stored');
 		}
-		elseif ($keep_history !== 0 && $hk_history_global == 1) {
+		elseif (array_key_exists($value_type, $value_type_ttl)) {
+			$keep_history = $value_type_ttl[$value_type]['value_ttl'];
+			$history = $keep_history !== null ? convertSecondsToTimeUnits($keep_history) : _('Unknown');
+		}
+		elseif ($hk_history_global == 1) {
 			$history = $hk_history;
 			$keep_history = timeUnitToSeconds($history);
 		}
@@ -409,7 +412,10 @@ class CItemHelper extends CItemGeneralHelper {
 				? timeUnitToSeconds($trends)
 				: null;
 
-			if ($keep_trends !== 0 && $hk_trends_global == 1) {
+			if ($keep_trends === 0) {
+				$trends = _('Not stored');
+			}
+			elseif ($hk_trends_global == 1) {
 				$trends = $hk_trends;
 				$keep_trends = timeUnitToSeconds($trends);
 			}
