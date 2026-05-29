@@ -2616,8 +2616,8 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['length']  (optional)
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO,
-	 *                                             API_ALLOW_MANUALINPUT_MACRO, API_ALLOW_EVENT_TAGS_MACRO.
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_MANUALINPUT_MACRO,
+	 *                                API_ALLOW_EVENT_TAGS_MACRO.
 	 * @param array  $rule['schemes'] (optional) Validate the URL against a provided URI scheme for
 	 *                                frontend usage. If not passed, scheme validation will take place against
 	 *                                allowed URI schemes in Settings.
@@ -2645,9 +2645,9 @@ class CApiInputValidator {
 		}
 
 		$options = [
-			'allow_user_macro' => (bool) ($flags & API_ALLOW_USER_MACRO),
-			'allow_manualinput_macro' => (bool) ($flags & API_ALLOW_MANUALINPUT_MACRO),
-			'allow_event_tags_macro' => (bool) ($flags & API_ALLOW_EVENT_TAGS_MACRO)
+			'user_macro' => (bool) ($flags & API_ALLOW_USER_MACRO),
+			'manualinput_macro' => (bool) ($flags & API_ALLOW_MANUALINPUT_MACRO),
+			'event_tags_macro' => (bool) ($flags & API_ALLOW_EVENT_TAGS_MACRO)
 		];
 
 		if (array_key_exists('schemes', $rule) && is_array($rule['schemes'])) {

@@ -64,7 +64,7 @@ class CUrlValidator extends CValidator {
 
 		if (($this->options['user_macro'] === true || $this->options['event_tags_macro'] === true
 				|| $this->options['manualinput_macro'] === true)
-			&& $this->containsMacro($value)) {
+					&& $this->containsMacro($value)) {
 			return true;
 		}
 
