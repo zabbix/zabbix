@@ -23,7 +23,7 @@ The Zabbix Agent's configuration file is used to configure plugins.
 
 **Plugins.Redis.Timeout** — The maximum time for waiting when a request has to be done.
 
-The value is now *deprecated*, and used only for requests coming from Zabbix servers old than 7.0 version.
+> The value is now *deprecated*, and used only for requests coming from Zabbix servers older than 7.0 version.
 
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30

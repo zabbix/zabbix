@@ -37,7 +37,7 @@ Open the Zabbix agent configuration file (`zabbix_agent2.conf`) and set the requ
 
 `Plugins.Mysql.CallTimeout`—The maximum time, in seconds, for waiting when a request has to be completed.
 
-The value is now *deprecated*, and used only for requests coming from Zabbix servers old than 7.0 version.
+> The value is now *deprecated*, and used only for requests coming from Zabbix servers older than 7.0 version.
 
 <br>Default value: equals the global timeout configuration parameter.
 <br>Range: 1–30
@@ -51,7 +51,7 @@ The value is now *deprecated*, and used only for requests coming from Zabbix ser
 
 `Plugins.Mysql.Timeout`—The maximum time, in seconds, for waiting when a connection has to be established.
 
-The value is now *deprecated*, and used only for requests coming from Zabbix servers old than 7.0 version.
+> The value is now *deprecated*, and used only for requests coming from Zabbix servers older than 7.0 version.
 
 <br>Default value: equals the global timeout configuration parameter.
 <br>Range: 1–30

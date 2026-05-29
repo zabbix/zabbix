@@ -15,7 +15,7 @@ Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the requir
 Named sessions allow you to define specific parameters for each instance of modbus device. Currently, only three parameters are supported: 
 Endpoint, SlaveID and Timeout (if certain parameter is not specified for a named session, a value from key will be used). 
 
-Timeout is now *deprecated*, and used only for requests coming from Zabbix servers old than 7.0 version.
+Timeout is now *deprecated*, and used only for requests coming from Zabbix servers older than 7.0 version.
 
 *Example:*  
 If you have two instances: "MB1" and "MB2", the following options have to be added to the agent configuration:

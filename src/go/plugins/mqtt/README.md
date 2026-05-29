@@ -15,7 +15,7 @@ Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the requir
 
 **Plugins.MQTT.Timeout** — connection timeout (how long to wait for a connection to respond before shutting it down).
 
-The value is now *deprecated*, and used only for requests coming from Zabbix servers old than 7.0 version.
+> The value is now *deprecated*, and used only for requests coming from Zabbix servers older than 7.0 version.
 
 *Default value:* equals the global 'Timeout' (configuration parameter set in zabbix_agent2.conf).  
 *Limits:* 1-30

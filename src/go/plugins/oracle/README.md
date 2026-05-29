@@ -152,7 +152,7 @@ Currently has no effect and the maximum wait time is determined by item timeout 
 
 **Plugins.Oracle.ConnectTimeout** — the maximum wait time in seconds for a connection to be established.
 
-The value is now *deprecated*, and used only for requests coming from Zabbix servers old than 7.0 version.
+> The value is now *deprecated*, and used only for requests coming from Zabbix servers older than 7.0 version.
 
 *Default value:* equals the global<sup>[1](#footnote-1)</sup> "Timeout" configuration option.
 *Limits:* 1-30
@@ -164,7 +164,7 @@ The value is now *deprecated*, and used only for requests coming from Zabbix ser
 - `*:\Program Files\Zabbix Agent 2\Custom Queries\Oracle` for Microsoft Windows systems,
 where * is drive name taken from `ProgramFiles` environment variable.
 
-**Plugins.Oracle.CustomQueriesEnabled** — if set, enables the execution of `mysql.custom.query`item key.
+**Plugins.Oracle.CustomQueriesEnabled** — if set, enables the execution of `mysql.custom.query` item key.
 If disabled, will not load any queries from the custom query dir path.
 *Default value:* false
 
