@@ -10308,12 +10308,6 @@ return [
 				'length' => 65535,
 				'default' => ''
 			],
-			'window_type' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
 			'evaltype' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -10431,6 +10425,12 @@ return [
 				'length' => 20,
 				'ref_table' => 'cep_rule',
 				'ref_field' => 'cep_ruleid'
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			],
 			'duration' => [
 				'null' => false,

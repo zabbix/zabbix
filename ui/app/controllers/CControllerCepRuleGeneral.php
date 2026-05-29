@@ -173,7 +173,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 					'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 				]
 			], /*'use' => [CConditionValidator::class, []] // TODO: something that asserts integrity beyond syntax, i.e. - if formula has all conditions */],
-			'window_type' => ['db cep_rule.window_type', 'required',
+			'window_type' => ['db cep_window.type', 'required',
 				'in' => [ZBX_CEP_WINDOW_NONE, ZBX_CEP_WINDOW_SIMPLE, ZBX_CEP_WINDOW_CAUSE_SYMPTOM, ZBX_CEP_WINDOW_TAG_MATCH, ZBX_CEP_WINDOW_PATTERN_MATCH]
 			],
 			// Type: "CEP rule window" object.
