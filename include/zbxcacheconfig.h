@@ -1731,6 +1731,8 @@ void	zbx_correlation_config_close(zbx_correlation_config_handle_t handle);
 
 zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correlation_config_handle_t handle);
 
+/* CEP */
+
 #define ZBX_CEP_CONDITION_NONE		0
 #define ZBX_CEP_CONDITION_EVENT_NAME	1
 #define ZBX_CEP_CONDITION_TAG_NAME	2
@@ -1761,8 +1763,162 @@ zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correl
 #define ZBX_CEP_OP_RENAME_TAG		15
 #define ZBX_CEP_OP_REMOVE_TAG		16
 
+typedef struct
+{
+	char	*name;
+}
+zbx_cep_args_name_t;
+
+typedef struct
+{
+	char	*tag;
+}
+zbx_cep_args_tag_name_t;
+
+typedef struct
+{
+	char	*tag;
+	char	*value;
+}
+zbx_cep_args_tag_value_t;
+
+typedef struct
+{
+	char	*old_tag;
+	char	*new_tag;
+}
+zbx_cep_args_tag_pair_t;
+
+typedef struct
+{
+	int	level;
+}
+zbx_cep_args_severity_t;
+
+typedef struct
+{
+	char	*period;
+}
+zbx_cep_args_time_period_t;
+
+typedef struct
+{
+	zbx_uint64_t	cep_operation_tagid;
+	int		operator;
+	char		*tag;
+	char		*value;
+}
+zbx_cep_operation_tag_t;
+
+ZBX_VECTOR_DECL(cep_operation_tag, zbx_cep_operation_tag_t)
+
+typedef union
+{
+	zbx_cep_args_name_t		set_name;
+	zbx_cep_args_severity_t		set_severity;
+	zbx_cep_args_tag_value_t	add_tag;
+	zbx_cep_args_tag_value_t	set_tag;
+	zbx_cep_args_tag_value_t	set_tag_value;
+	zbx_cep_args_tag_name_t		increase_tag_value;
+	zbx_cep_args_tag_name_t		decrease_tag_value;
+	zbx_cep_args_tag_name_t		remove_tag;
+	zbx_cep_args_tag_pair_t		rename_tag;
+}
+zbx_cep_operation_args_t;
+
+typedef struct
+{
+	zbx_uint64_t			operationid;
+	int				type;
+	int				execute_when;
+	int				evaltype;
+	int				sortorder;
+	zbx_cep_operation_args_t	args;
+	zbx_vector_cep_operation_tag_t	tags;
+}
+zbx_cep_operation_t;
+
+ZBX_VECTOR_DECL(cep_operation, zbx_cep_operation_t)
+
+/* keep union names in sync with CEP condition defines */
+typedef union
+{
+	zbx_cep_args_name_t		event_name;
+	zbx_cep_args_tag_name_t		tag_name;
+	zbx_cep_args_tag_value_t	tag_value;
+	zbx_cep_args_severity_t		severity;
+	zbx_cep_args_name_t		host;
+	zbx_cep_args_name_t		host_group;
+	zbx_cep_args_time_period_t	time_period;
+}
+zbx_cep_condition_args_t;
+
+typedef struct
+{
+	zbx_uint64_t			conditionid;
+	int				type;
+	int				operator;
+	zbx_cep_condition_args_t	args;
+}
+zbx_cep_condition_t;
+
+ZBX_VECTOR_DECL(cep_condition, zbx_cep_condition_t)
+
+typedef union
+{
+	zbx_cep_args_tag_pair_t		tag_pair;
+	zbx_cep_args_tag_name_t		old_tag;
+	zbx_cep_args_tag_value_t	old_tag_value;
+}
+zbx_cep_window_condition_args_t;
+
+typedef struct
+{
+	zbx_uint64_t			conditionid;
+	int				type;
+	int				operator;
+	zbx_cep_window_condition_args_t	args;
+}
+zbx_cep_window_condition_t;
+
+ZBX_VECTOR_DECL(cep_window_condition, zbx_cep_window_condition_t)
+
+typedef struct
+{
+	int		type;
+	int		evaltype;
+	zbx_uint32_t	group_by;
+	char		*duration;
+	char		*capacity;
+	char		*formula;
+	char		*event_count_tag;
+	char		*script;
+	char		*group_tag;
+
+	zbx_vector_cep_window_condition_t	conditions;
+}
+zbx_cep_window_t;
+
+typedef struct
+{
+	zbx_uint64_t		ruleid;
+	int			evaltype;
+	char			*formula;
+	int			status;
+	int			stop;
+	int			sortorder;
+
+	zbx_cep_window_t	*window;
+
+	zbx_vector_cep_condition_t	conditions;
+	zbx_vector_cep_operation_t	operations;
+
+	zbx_uint64_t		revision;
+	zbx_atomic_uint32_t	refcount;
+}
+zbx_cep_rule_t;
+
 typedef struct zbx_cep_config_handle *zbx_cep_config_handle_t;
-typedef struct zbx_cep_rule zbx_cep_rule_t;
 
 ZBX_PTR_VECTOR_DECL(cep_rule_ptr, zbx_cep_rule_t *)
 

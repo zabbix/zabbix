@@ -54,6 +54,11 @@ static int	cep_operation_tag_compare_by_id(const void *a1, const void *a2)
 	return 0;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear arguments of a CEP operation                                *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_operation_clear_args(zbx_cep_operation_t *operation)
 {
 	switch (operation->type)
@@ -89,6 +94,11 @@ static void	cep_operation_clear_args(zbx_cep_operation_t *operation)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear a CEP operation                                             *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_operation_clear(zbx_cep_operation_t *operation)
 {
 	cep_operation_clear_args(operation);
@@ -116,6 +126,11 @@ static int	cep_operation_compare_by_sortorder(const void *a1, const void *a2)
 	return o1->sortorder - o2->sortorder;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear arguments of a CEP condition                                *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_condition_clear_args(zbx_cep_condition_t *condition)
 {
 	switch (condition->type)
@@ -146,11 +161,21 @@ static void	cep_condition_clear_args(zbx_cep_condition_t *condition)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear a CEP condition                                             *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_condition_clear(zbx_cep_condition_t *condition)
 {
 	cep_condition_clear_args(condition);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear arguments of a CEP window condition                         *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_window_condition_clear_args(zbx_cep_window_condition_t *condition)
 {
 	switch (condition->type)
@@ -169,11 +194,21 @@ static void	cep_window_condition_clear_args(zbx_cep_window_condition_t *conditio
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear a CEP window condition                                      *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_window_condition_clear(zbx_cep_window_condition_t *condition)
 {
 	cep_window_condition_clear_args(condition);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free CEP window                                                   *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_window_free(zbx_cep_window_t *window)
 {
 	for (int i = 0; i < window->conditions.values_num; i++)
@@ -189,6 +224,13 @@ static void	cep_window_free(zbx_cep_window_t *window)
 	zbx_free(window);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create a CEP window                                               *
+ *                                                                            *
+ * Return value: pointer to the created CEP window                            *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_cep_window_t	*cep_window_create(void)
 {
 	zbx_cep_window_t	*window;
@@ -199,6 +241,15 @@ static zbx_cep_window_t	*cep_window_create(void)
 	return window;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clone a CEP window                                                *
+ *                                                                            *
+ * Parameters: window - [IN] window to clone                                  *
+ *                                                                            *
+ * Return value: pointer to the cloned CEP window                             *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_cep_window_t	*cep_window_clone(const zbx_cep_window_t *window)
 {
 	zbx_cep_window_t	*clone;
@@ -254,6 +305,15 @@ static int	cep_window_condition_compare_by_id(const void *a1, const void *a2)
 	return 0;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create a CEP rule                                                 *
+ *                                                                            *
+ * Parameters: ruleid - [IN] rule identifier                                  *
+ *                                                                            *
+ * Return value: pointer to the created CEP rule                              *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_cep_rule_t	*cep_rule_create(zbx_uint64_t ruleid)
 {
 	zbx_cep_rule_t	*rule;
@@ -268,6 +328,15 @@ static zbx_cep_rule_t	*cep_rule_create(zbx_uint64_t ruleid)
 	return rule;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: increment reference count of a CEP rule                           *
+ *                                                                            *
+ * Parameters: rule - [IN/OUT] rule to add reference to                       *
+ *                                                                            *
+ * Return value: pointer to the rule                                          *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_cep_rule_t	*cep_rule_addref(zbx_cep_rule_t *rule)
 {
 	atomic_fetch_add(&rule->refcount, 1);
@@ -275,6 +344,14 @@ static zbx_cep_rule_t	*cep_rule_addref(zbx_cep_rule_t *rule)
 	return rule;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decrement reference count of a CEP rule and free it if it         *
+ *          reaches zero                                                      *
+ *                                                                            *
+ * Parameters: rule - [IN/OUT] rule to release                                *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_rule_release(zbx_cep_rule_t *rule)
 {
 	if (1 != atomic_fetch_sub(&rule->refcount, 1))
@@ -296,6 +373,14 @@ static void	cep_rule_release(zbx_cep_rule_t *rule)
 	zbx_free(rule);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copy CEP conditions from one vector to another                    *
+ *                                                                            *
+ * Parameters: dst - [OUT] destination vector                                 *
+ *             src - [IN] source vector                                       *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_rule_copy_conditions(zbx_vector_cep_condition_t *dst, const zbx_vector_cep_condition_t *src)
 {
 	zbx_vector_cep_condition_append_array(dst, src->values, src->values_num);
@@ -331,6 +416,14 @@ static void	cep_rule_copy_conditions(zbx_vector_cep_condition_t *dst, const zbx_
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copy CEP operation tags from one vector to another                *
+ *                                                                            *
+ * Parameters: dst - [OUT] destination vector                                 *
+ *             src - [IN] source vector                                       *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_operation_copy_tags(zbx_vector_cep_operation_tag_t *dst,
 		const zbx_vector_cep_operation_tag_t *src)
 {
@@ -346,6 +439,14 @@ static void	cep_operation_copy_tags(zbx_vector_cep_operation_tag_t *dst,
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copy CEP operations from one vector to another                    *
+ *                                                                            *
+ * Parameters: dst - [OUT] destination vector                                 *
+ *             src - [IN] source vector                                       *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_rule_copy_operations(zbx_vector_cep_operation_t *dst, const zbx_vector_cep_operation_t *src)
 {
 	zbx_vector_cep_operation_append_array(dst, src->values, src->values_num);
@@ -390,6 +491,15 @@ static void	cep_rule_copy_operations(zbx_vector_cep_operation_t *dst, const zbx_
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clone a CEP rule                                                  *
+ *                                                                            *
+ * Parameters: rule - [IN] rule to clone                                      *
+ *                                                                            *
+ * Return value: pointer to the cloned CEP rule                               *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_cep_rule_t	*cep_rule_clone(const zbx_cep_rule_t *rule)
 {
 	zbx_cep_rule_t	*clone = cep_rule_create(rule->ruleid);
@@ -407,6 +517,19 @@ static zbx_cep_rule_t	*cep_rule_clone(const zbx_cep_rule_t *rule)
 	return clone;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire a mutable CEP rule instance from a rule reference         *
+ *                                                                            *
+ * Parameters: ref      - [IN/OUT] rule reference                             *
+ *             revision - [IN] revision to assign to the rule                 *
+ *                                                                            *
+ * Return value: pointer to the acquired CEP rule                             *
+ *                                                                            *
+ * Comments: If the rule is referenced by other entities it is fully cloned   *
+ *           and the reference is updated with the cloned one.                *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_cep_rule_t	*cep_acquire_rule(zbx_cep_rule_ref_t *ref, zbx_uint64_t revision)
 {
 	if (NULL == ref->rule)
@@ -426,6 +549,17 @@ static zbx_cep_rule_t	*cep_acquire_rule(zbx_cep_rule_ref_t *ref, zbx_uint64_t re
 	return ref->rule;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire a mutable CEP rule instance by rule identifier            *
+ *                                                                            *
+ * Parameters: cep_config - [IN/OUT] CEP configuration                        *
+ *             ruleid     - [IN] rule identifier                              *
+ *             revision   - [IN] revision to assign to the rule               *
+ *                                                                            *
+ * Return value: pointer to the acquired CEP rule                             *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_cep_rule_t	*cep_acquire_rule_by_id(zbx_cep_config_t *cep_config, zbx_uint64_t ruleid,
 		zbx_uint64_t revision)
 {
@@ -438,6 +572,11 @@ static zbx_cep_rule_t	*cep_acquire_rule_by_id(zbx_cep_config_t *cep_config, zbx_
 	return cep_acquire_rule(ref, revision);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear a CEP rule reference                                        *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_rule_ref_clear(void *a)
 {
 	zbx_cep_rule_ref_t	*ref = (zbx_cep_rule_ref_t *)a;
@@ -445,6 +584,22 @@ static void	cep_rule_ref_clear(void *a)
 	cep_rule_release(ref->rule);
 }
 
+static int	cep_rule_compare_by_sortorder(const void *a1, const void *a2)
+{
+	const zbx_cep_rule_t	*r1 = *(const zbx_cep_rule_t * const *)a1;
+	const zbx_cep_rule_t	*r2 = *(const zbx_cep_rule_t * const *)a2;
+
+	return r1->sortorder - r2->sortorder;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decrement reference count of a CEP config handle and free it if   *
+ *          it reaches zero                                                   *
+ *                                                                            *
+ * Parameters: handle - [IN/OUT] config handle to release                     *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_config_handle_release(zbx_cep_config_handle_t handle)
 {
 	if (1 != atomic_fetch_sub(&handle->refcount, 1))
@@ -458,14 +613,19 @@ static void	cep_config_handle_release(zbx_cep_config_handle_t handle)
 	zbx_free(handle);
 }
 
-static int	cep_rule_compare_by_sortorder(const void *a1, const void *a2)
-{
-	const zbx_cep_rule_t	*r1 = *(const zbx_cep_rule_t * const *)a1;
-	const zbx_cep_rule_t	*r2 = *(const zbx_cep_rule_t * const *)a2;
-
-	return r1->sortorder - r2->sortorder;
-}
-
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create a CEP config handle for the current configuration          *
+ *                                                                            *
+ * Parameters: cep_config - [IN] CEP configuration                            *
+ *             revision   - [IN] revision to assign to the handle             *
+ *                                                                            *
+ * Return value: pointer to the created CEP config handle                     *
+ *                                                                            *
+ * Comments: Only enabled rules are included in the handle, sorted by         *
+ *           their sortorder field.                                           *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_cep_config_handle_t	cep_config_handle_create(zbx_cep_config_t *cep_config, zbx_uint64_t revision)
 {
 	zbx_cep_config_handle_t	handle;
@@ -493,6 +653,11 @@ static zbx_cep_config_handle_t	cep_config_handle_create(zbx_cep_config_t *cep_co
 	return handle;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create a CEP configuration                                        *
+ *                                                                            *
+ ******************************************************************************/
 zbx_cep_config_t	*cep_config_create(void)
 {
 	zbx_cep_config_t	*cep_config;
@@ -525,6 +690,11 @@ zbx_cep_config_t	*cep_config_create(void)
 	return cep_config;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: destroy a CEP configuration                                       *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_config_destroy(zbx_cep_config_t *cep_config)
 {
 	zbx_hashset_destroy(&cep_config->rules);
@@ -541,6 +711,244 @@ void	cep_config_destroy(zbx_cep_config_t *cep_config)
 	zbx_free(cep_config);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: dump a CEP condition to log                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_condition_dump(zbx_cep_condition_t *condition)
+{
+	char	*args = NULL;
+	size_t	args_alloc = 0, args_offset = 0;
+
+	switch (condition->type)
+	{
+		case ZBX_CEP_CONDITION_EVENT_NAME:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "event_name:%s",
+					condition->args.event_name.name);
+			break;
+		case ZBX_CEP_CONDITION_TAG_NAME:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s",
+					condition->args.tag_name.tag);
+			break;
+		case ZBX_CEP_CONDITION_TAG_VALUE:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s value:%s",
+					condition->args.tag_value.tag, condition->args.tag_value.value);
+			break;
+		case ZBX_CEP_CONDITION_SEVERITY:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "severity:%d",
+					condition->args.severity.level);
+			break;
+		case ZBX_CEP_CONDITION_HOST:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "host:%s",
+					condition->args.host.name);
+			break;
+		case ZBX_CEP_CONDITION_HOST_GROUP:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "host_group:%s",
+					condition->args.host_group.name);
+			break;
+		case ZBX_CEP_CONDITION_TIME_PERIOD:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "period:%s",
+					condition->args.time_period.period);
+			break;
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "    conditionid:" ZBX_FS_UI64 " type:%d operator:%d %s",
+			condition->conditionid, condition->type, condition->operator, args);
+
+	zbx_free(args);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: dump a CEP window condition to log                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_window_condition_dump(zbx_cep_window_condition_t *condition)
+{
+	char	*args = NULL;
+	size_t	args_alloc = 0, args_offset = 0;
+
+	switch (condition->type)
+	{
+		case ZBX_CEP_WINDOW_CONDITION_TAG_PAIR:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "old_tag:%s new_tag:%s",
+					condition->args.tag_pair.old_tag, condition->args.tag_pair.new_tag);
+			break;
+		case ZBX_CEP_WINDOW_CONDITION_OLD_TAG:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s",
+					condition->args.old_tag.tag);
+			break;
+		case ZBX_CEP_WINDOW_CONDITION_OLD_TAG_VALUE:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s value:%s",
+					condition->args.old_tag_value.tag, condition->args.old_tag_value.value);
+			break;
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "      conditionid:" ZBX_FS_UI64 " type:%d operator:%d %s",
+			condition->conditionid, condition->type, condition->operator, args);
+
+	zbx_free(args);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: dump a CEP window to log                                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_window_dump(zbx_cep_window_t *window)
+{
+	zabbix_log(LOG_LEVEL_TRACE, "  window type:%d duration:%s capacity:%s evaltype:%d formula:%s group_by:%x"
+			" group_tag:%s event_count_tag:%s",
+		window->type,  window->duration, window->capacity, window->evaltype, window->formula, window->group_by,
+		window->group_tag, window->event_count_tag);
+
+	if ('\0' != *window->script)
+		zabbix_log(LOG_LEVEL_TRACE, "    script:\n%s", window->script);
+
+	zabbix_log(LOG_LEVEL_TRACE, "    conditions:");
+	for (int i = 0; i < window->conditions.values_num; i++)
+		cep_window_condition_dump(&window->conditions.values[i]);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: dump a CEP operation to log                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_operation_dump(zbx_cep_operation_t *operation)
+{
+	char	*args = NULL;
+	size_t	args_alloc = 0, args_offset = 0;
+
+	switch (operation->type)
+	{
+		case ZBX_CEP_OP_SET_NAME:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "event_name:%s",
+					operation->args.set_name.name);
+			break;
+		case ZBX_CEP_OP_SET_SEVERITY:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "severity:%d",
+					operation->args.set_severity.level);
+			break;
+		case ZBX_CEP_OP_ADD_TAG:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s value:%s",
+					operation->args.add_tag.tag, operation->args.add_tag.value);
+			break;
+		case ZBX_CEP_OP_SET_TAG:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s value:%s",
+					operation->args.set_tag.tag, operation->args.set_tag.value);
+			break;
+		case ZBX_CEP_OP_SET_TAG_VALUE:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s value:%s",
+					operation->args.set_tag_value.tag, operation->args.set_tag_value.value);
+			break;
+		case ZBX_CEP_OP_INCREASE_TAG_VALUE:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s",
+					operation->args.increase_tag_value.tag);
+			break;
+		case ZBX_CEP_OP_DECREASE_TAG_VALUE:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s",
+					operation->args.decrease_tag_value.tag);
+			break;
+		case ZBX_CEP_OP_RENAME_TAG:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "old_tag:%s new_tag:%s",
+					operation->args.rename_tag.old_tag, operation->args.rename_tag.new_tag);
+			break;
+		case ZBX_CEP_OP_REMOVE_TAG:
+			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s",
+					operation->args.remove_tag.tag);
+			break;
+		case ZBX_CEP_OP_CLOSE:
+		case ZBX_CEP_OP_DISCARD:
+		case ZBX_CEP_OP_INCREASE_SEVERITY:
+		case ZBX_CEP_OP_DECREASE_SEVERITY:
+		case ZBX_CEP_OP_SUPPRESS:
+		case ZBX_CEP_OP_COPY_FIRST:
+		case ZBX_CEP_OP_COPY_LAST:
+			break;
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "    operationid:" ZBX_FS_UI64 " type:%d execute_when:%d evaltype:%d"
+			" sortorder:%d %s", operation->operationid, operation->type, operation->execute_when,
+			operation->evaltype, operation->sortorder, ZBX_NULL2EMPTY_STR(args));
+
+	if (0 != operation->tags.values_num)
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "      tags:");
+		for (int i = 0; i < operation->tags.values_num; i++)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "        tagid:" ZBX_FS_UI64 " operator:%d tag:%s value:%s",
+					operation->tags.values[i].cep_operation_tagid,
+					operation->tags.values[i].operator, operation->tags.values[i].tag,
+					operation->tags.values[i].value);
+		}
+	}
+
+	zbx_free(args);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: dump a CEP rule to log                                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_rule_dump(zbx_cep_rule_t *rule)
+{
+	zabbix_log(LOG_LEVEL_TRACE, "ruleid:" ZBX_FS_UI64 " revision:" ZBX_FS_UI64 " refcount:%u status:%d stop:%d"
+			" sortoder:%d evaltype:%d formula:%s",
+			rule->ruleid, rule->revision, atomic_load(&rule->refcount),rule->status, rule->stop,
+			rule->sortorder, rule->evaltype, rule->formula);
+
+	if (NULL != rule->window)
+		cep_window_dump(rule->window);
+
+	zabbix_log(LOG_LEVEL_TRACE, "  conditions:");
+	for (int i = 0; i < rule->conditions.values_num; i++)
+		cep_condition_dump(&rule->conditions.values[i]);
+
+	zabbix_log(LOG_LEVEL_TRACE, "  operations:");
+	for (int i = 0; i < rule->operations.values_num; i++)
+		cep_operation_dump(&rule->operations.values[i]);
+
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: dump a CEP configuration to log                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_config_dump(void)
+{
+	zbx_cep_config_t	*cep_config = dc_local()->cep_config;
+	zbx_hashset_iter_t	iter;
+	zbx_cep_rule_ref_t	*ref;
+
+	// WDN remove
+	int	loglevel = zbx_set_log_level(LOG_LEVEL_TRACE);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() revision:" ZBX_FS_UI64 , __func__, cep_config->revision);
+
+	zbx_hashset_iter_reset(&cep_config->rules, &iter);
+	while (NULL != (ref = (zbx_cep_rule_ref_t *)zbx_hashset_iter_next(&iter)))
+		cep_rule_dump(ref->rule);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	// WDN remove
+	zbx_set_log_level(loglevel);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: cache CEP rules from database                                     *
+ *                                                                            *
+ * Parameters: cep_config - [IN/OUT] CEP configuration                        *
+ *             sync       - [IN/OUT] database synchronization data            *
+ *             revision   - [IN] current configuration revision               *
+ *             rules      - [OUT] updated rules, can be NULL                  *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_sync_rules(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, zbx_uint64_t revision,
 		zbx_vector_cep_rule_ptr_t *rules)
 {
@@ -620,6 +1028,19 @@ static int	cep_condition_compare_by_type(const void *a1, const void *a2)
 	return c1->type - c2->type;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire a mutable CEP condition instance by condition identifier  *
+ *                                                                            *
+ * Parameters: cep_config   - [IN/OUT] CEP configuration                      *
+ *             ruleid       - [IN] rule identifier                            *
+ *             conditionid  - [IN] condition identifier                       *
+ *             revision     - [IN] revision to assign to the condition        *
+ *             rules        - [OUT] updated rules, can be NULL                *
+ *                                                                            *
+ * Return value: pointer to the acquired CEP condition                        *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_cep_condition_t	*cep_acquire_condition(zbx_cep_config_t *cep_config, zbx_uint64_t ruleid,
 		zbx_uint64_t conditionid, zbx_uint64_t revision, zbx_vector_cep_rule_ptr_t *rules)
 {
@@ -647,6 +1068,16 @@ static zbx_cep_condition_t	*cep_acquire_condition(zbx_cep_config_t *cep_config, 
 	return &rule->conditions.values[index];
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove a CEP condition from configuration                         *
+ *                                                                            *
+ * Parameters: cep_config   - [IN/OUT] CEP configuration                      *
+ *             conditionid  - [IN] condition identifier                       *
+ *             revision     - [IN] revision to assign to the affected rule    *
+ *             rules        - [OUT] updated rules, can be NULL                *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_remove_condition(zbx_cep_config_t *cep_config, zbx_uint64_t conditionid, zbx_uint64_t revision,
 		zbx_vector_cep_rule_ptr_t *rules)
 {
@@ -678,6 +1109,18 @@ static void	cep_remove_condition(zbx_cep_config_t *cep_config, zbx_uint64_t cond
 	zbx_hashset_remove_direct(&cep_config->condition_rel, rel);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update formula of a CEP rule based on its evaluation type         *
+ *                                                                            *
+ * Parameters: rule      - [IN/OUT] rule to update formula for                *
+ *             str       - [IN/OUT] temporary buffer for formula building     *
+ *             str_alloc - [IN/OUT] size of the temporary buffer              *
+ *                                                                            *
+ * Comments: Converts condition evaluation to expression evaluation           *
+ *           type by building the corresponding formula.                      *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_rule_update_formula(zbx_cep_rule_t *rule, char **str, size_t *str_alloc)
 {
 	const char	*op = NULL;
@@ -737,8 +1180,19 @@ static void	cep_rule_update_formula(zbx_cep_rule_t *rule, char **str, size_t *st
 	}
 
 	rule->formula = zbx_strdup(rule->formula, *str);
+	rule->evaltype = ZBX_CONDITION_EVAL_TYPE_EXPRESSION;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: cache CEP conditions from database                                *
+ *                                                                            *
+ * Parameters: cep_config - [IN/OUT] CEP configuration                        *
+ *             sync       - [IN/OUT] database synchronization data            *
+ *             revision   - [IN] current configuration revision               *
+ *             rules      - [OUT] updated rules, can be NULL                  *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_sync_conditions(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, zbx_uint64_t revision,
 	zbx_vector_cep_rule_ptr_t *rules)
 {
@@ -817,261 +1271,15 @@ static void	cep_sync_conditions(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	cep_condition_dump(zbx_cep_condition_t *condition)
-{
-	char	*args = NULL;
-	size_t	args_alloc = 0, args_offset = 0;
-
-	switch (condition->type)
-	{
-		case ZBX_CEP_CONDITION_EVENT_NAME:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "event_name:%s",
-					condition->args.event_name.name);
-			break;
-		case ZBX_CEP_CONDITION_TAG_NAME:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s",
-					condition->args.tag_name.tag);
-			break;
-		case ZBX_CEP_CONDITION_TAG_VALUE:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s value:%s",
-					condition->args.tag_value.tag, condition->args.tag_value.value);
-			break;
-		case ZBX_CEP_CONDITION_SEVERITY:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "severity:%d",
-					condition->args.severity.level);
-			break;
-		case ZBX_CEP_CONDITION_HOST:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "host:%s",
-					condition->args.host.name);
-			break;
-		case ZBX_CEP_CONDITION_HOST_GROUP:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "host_group:%s",
-					condition->args.host_group.name);
-			break;
-		case ZBX_CEP_CONDITION_TIME_PERIOD:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "period:%s",
-					condition->args.time_period.period);
-			break;
-	}
-
-	zabbix_log(LOG_LEVEL_TRACE, "    conditionid:" ZBX_FS_UI64 " type:%d operator:%d %s",
-			condition->conditionid, condition->type, condition->operator, args);
-
-	zbx_free(args);
-}
-
-static void	cep_window_condition_dump(zbx_cep_window_condition_t *condition)
-{
-	char	*args = NULL;
-	size_t	args_alloc = 0, args_offset = 0;
-
-	switch (condition->type)
-	{
-		case ZBX_CEP_WINDOW_CONDITION_TAG_PAIR:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "old_tag:%s new_tag:%s",
-					condition->args.tag_pair.old_tag, condition->args.tag_pair.new_tag);
-			break;
-		case ZBX_CEP_WINDOW_CONDITION_OLD_TAG:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s",
-					condition->args.old_tag.tag);
-			break;
-		case ZBX_CEP_WINDOW_CONDITION_OLD_TAG_VALUE:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s value:%s",
-					condition->args.old_tag_value.tag, condition->args.old_tag_value.value);
-			break;
-	}
-
-	zabbix_log(LOG_LEVEL_TRACE, "      conditionid:" ZBX_FS_UI64 " type:%d operator:%d %s",
-			condition->conditionid, condition->type, condition->operator, args);
-
-	zbx_free(args);
-}
-
-static void	cep_window_dump(zbx_cep_window_t *window)
-{
-	zabbix_log(LOG_LEVEL_TRACE, "  window type:%d duration:%s capacity:%s evaltype:%d formula:%s group_by:%x"
-			" group_tag:%s event_count_tag:%s",
-		window->type,  window->duration, window->capacity, window->evaltype, window->formula, window->group_by,
-		window->group_tag, window->event_count_tag);
-
-	if ('\0' != *window->script)
-		zabbix_log(LOG_LEVEL_TRACE, "    script:\n%s", window->script);
-
-	zabbix_log(LOG_LEVEL_TRACE, "    conditions:");
-	for (int i = 0; i < window->conditions.values_num; i++)
-		cep_window_condition_dump(&window->conditions.values[i]);
-}
-
-static void	cep_operation_dump(zbx_cep_operation_t *operation)
-{
-	char	*args = NULL;
-	size_t	args_alloc = 0, args_offset = 0;
-
-	switch (operation->type)
-	{
-		case ZBX_CEP_OP_SET_NAME:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "event_name:%s",
-					operation->args.set_name.name);
-			break;
-		case ZBX_CEP_OP_SET_SEVERITY:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "severity:%d",
-					operation->args.set_severity.level);
-			break;
-		case ZBX_CEP_OP_ADD_TAG:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s value:%s",
-					operation->args.add_tag.tag, operation->args.add_tag.value);
-			break;
-		case ZBX_CEP_OP_SET_TAG:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s value:%s",
-					operation->args.set_tag.tag, operation->args.set_tag.value);
-			break;
-		case ZBX_CEP_OP_SET_TAG_VALUE:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s value:%s",
-					operation->args.set_tag_value.tag, operation->args.set_tag_value.value);
-			break;
-		case ZBX_CEP_OP_INCREASE_TAG_VALUE:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s",
-					operation->args.increase_tag_value.tag);
-			break;
-		case ZBX_CEP_OP_DECREASE_TAG_VALUE:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s",
-					operation->args.decrease_tag_value.tag);
-			break;
-		case ZBX_CEP_OP_RENAME_TAG:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "old_tag:%s new_tag:%s",
-					operation->args.rename_tag.old_tag, operation->args.rename_tag.new_tag);
-			break;
-		case ZBX_CEP_OP_REMOVE_TAG:
-			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s",
-					operation->args.remove_tag.tag);
-			break;
-		case ZBX_CEP_OP_CLOSE:
-		case ZBX_CEP_OP_DISCARD:
-		case ZBX_CEP_OP_INCREASE_SEVERITY:
-		case ZBX_CEP_OP_DECREASE_SEVERITY:
-		case ZBX_CEP_OP_SUPPRESS:
-		case ZBX_CEP_OP_COPY_FIRST:
-		case ZBX_CEP_OP_COPY_LAST:
-			break;
-	}
-
-	zabbix_log(LOG_LEVEL_TRACE, "    operationid:" ZBX_FS_UI64 " type:%d execute_when:%d evaltype:%d"
-			" sortorder:%d %s", operation->operationid, operation->type, operation->execute_when,
-			operation->evaltype, operation->sortorder, ZBX_NULL2EMPTY_STR(args));
-
-	if (0 != operation->tags.values_num)
-	{
-		zabbix_log(LOG_LEVEL_TRACE, "      tags:");
-		for (int i = 0; i < operation->tags.values_num; i++)
-		{
-			zabbix_log(LOG_LEVEL_TRACE, "        tagid:" ZBX_FS_UI64 " operator:%d tag:%s value:%s",
-					operation->tags.values[i].cep_operation_tagid,
-					operation->tags.values[i].operator, operation->tags.values[i].tag,
-					operation->tags.values[i].value);
-		}
-	}
-
-	zbx_free(args);
-}
-
-static void	cep_rule_dump(zbx_cep_rule_t *rule)
-{
-	zabbix_log(LOG_LEVEL_TRACE, "ruleid:" ZBX_FS_UI64 " revision:" ZBX_FS_UI64 " refcount:%u status:%d stop:%d"
-			" sortoder:%d evaltype:%d formula:%s",
-			rule->ruleid, rule->revision, atomic_load(&rule->refcount),rule->status, rule->stop,
-			rule->sortorder, rule->evaltype, rule->formula);
-
-	if (NULL != rule->window)
-		cep_window_dump(rule->window);
-
-	zabbix_log(LOG_LEVEL_TRACE, "  conditions:");
-	for (int i = 0; i < rule->conditions.values_num; i++)
-		cep_condition_dump(&rule->conditions.values[i]);
-
-	zabbix_log(LOG_LEVEL_TRACE, "  operations:");
-	for (int i = 0; i < rule->operations.values_num; i++)
-		cep_operation_dump(&rule->operations.values[i]);
-
-}
-
-static void	cep_config_dump(void)
-{
-	zbx_cep_config_t	*cep_config = dc_local()->cep_config;
-	zbx_hashset_iter_t	iter;
-	zbx_cep_rule_ref_t	*ref;
-
-	// WDN remove
-	int	loglevel = zbx_set_log_level(LOG_LEVEL_TRACE);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() revision:" ZBX_FS_UI64 , __func__, cep_config->revision);
-
-	zbx_hashset_iter_reset(&cep_config->rules, &iter);
-	while (NULL != (ref = (zbx_cep_rule_ref_t *)zbx_hashset_iter_next(&iter)))
-		cep_rule_dump(ref->rule);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	// WDN remove
-	zbx_set_log_level(loglevel);
-}
-
-static void	cep_config_update_handle(zbx_cep_config_t *cep_config, zbx_uint64_t revision)
-{
-	pthread_mutex_lock(&cep_config->lock);
-
-	if (cep_config->revision == revision)
-	{
-		if (NULL != cep_config->handle)
-			cep_config_handle_release(cep_config->handle);
-
-		cep_config->handle = cep_config_handle_create(cep_config, revision);
-
-		atomic_store(&cep_config->rules_num, cep_config->handle->rules.values_num);
-	}
-
-	pthread_mutex_unlock(&cep_config->lock);
-}
-
-static void	cep_update_rules(zbx_cep_config_t *cep_config, zbx_vector_cep_rule_ptr_t *rules_cond,
-		zbx_vector_cep_rule_ptr_t *rules_op)
-{
-	char	*str = NULL;
-	size_t	str_alloc = 0;
-
-	if (NULL != rules_cond && NULL != rules_op)
-	{
-		zbx_vector_cep_rule_ptr_sort(rules_cond, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-		zbx_vector_cep_rule_ptr_uniq(rules_cond, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-
-		for (int i = 0; i < rules_cond->values_num; i++)
-			cep_rule_update_formula(rules_cond->values[i], &str, &str_alloc);
-
-		zbx_vector_cep_rule_ptr_sort(rules_op, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-		zbx_vector_cep_rule_ptr_uniq(rules_op, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-
-		for (int i = 0; i < rules_op->values_num; i++)
-		{
-			zbx_vector_cep_operation_sort(&rules_op->values[i]->operations,
-					cep_operation_compare_by_sortorder);
-		}
-	}
-	else
-	{
-		zbx_hashset_iter_t	iter;
-		zbx_cep_rule_ref_t	*ref;
-
-		zbx_hashset_iter_reset(&cep_config->rules, &iter);
-		while (NULL != (ref = (zbx_cep_rule_ref_t *)zbx_hashset_iter_next(&iter)))
-		{
-			cep_rule_update_formula(ref->rule, &str, &str_alloc);
-			zbx_vector_cep_operation_sort(&ref->rule->operations, cep_operation_compare_by_sortorder);
-		}
-
-	}
-
-	zbx_free(str);
-}
-
+/******************************************************************************
+ *                                                                            *
+ * Purpose: cache CEP windows from database                                   *
+ *                                                                            *
+ * Parameters: cep_config - [IN/OUT] CEP configuration                        *
+ *             sync       - [IN/OUT] database synchronization data            *
+ *             revision   - [IN] current configuration revision               *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_sync_windows(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, zbx_uint64_t revision)
 {
 	char		**row;
@@ -1144,6 +1352,19 @@ static void	cep_sync_windows(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, z
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire a mutable CEP window condition instance by condition      *
+ *          identifier                                                        *
+ *                                                                            *
+ * Parameters: cep_config   - [IN/OUT] CEP configuration                      *
+ *             ruleid       - [IN] rule identifier                            *
+ *             conditionid  - [IN] condition identifier                       *
+ *             revision     - [IN] revision to assign to the condition        *
+ *                                                                            *
+ * Return value: pointer to the acquired CEP window condition                 *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_cep_window_condition_t	*cep_acquire_window_condition(zbx_cep_config_t *cep_config, zbx_uint64_t ruleid,
 		zbx_uint64_t conditionid, zbx_uint64_t revision)
 {
@@ -1168,6 +1389,15 @@ static zbx_cep_window_condition_t	*cep_acquire_window_condition(zbx_cep_config_t
 	return &rule->window->conditions.values[index];
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove a CEP window condition from configuration                  *
+ *                                                                            *
+ * Parameters: cep_config   - [IN/OUT] CEP configuration                      *
+ *             conditionid  - [IN] condition identifier                       *
+ *             revision     - [IN] revision to assign to the affected rule    *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_remove_window_condition(zbx_cep_config_t *cep_config, zbx_uint64_t conditionid,
 		zbx_uint64_t revision)
 {
@@ -1200,6 +1430,15 @@ static void	cep_remove_window_condition(zbx_cep_config_t *cep_config, zbx_uint64
 	zbx_hashset_remove_direct(&cep_config->window_condition_rel, rel);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: cache CEP window conditions from database                         *
+ *                                                                            *
+ * Parameters: cep_config - [IN/OUT] CEP configuration                        *
+ *             sync       - [IN/OUT] database synchronization data            *
+ *             revision   - [IN] current configuration revision               *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_sync_window_conditions(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, zbx_uint64_t revision)
 {
 	char		**row;
@@ -1264,6 +1503,19 @@ static void	cep_sync_window_conditions(zbx_cep_config_t *cep_config, zbx_dbsync_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire a mutable CEP operation instance by operation identifier  *
+ *                                                                            *
+ * Parameters: cep_config   - [IN/OUT] CEP configuration                      *
+ *             ruleid       - [IN] rule identifier                            *
+ *             operationid  - [IN] operation identifier                       *
+ *             revision     - [IN] revision to assign to the operation        *
+ *             rules        - [OUT] updated rules, can be NULL                *
+ *                                                                            *
+ * Return value: pointer to the acquired CEP operation                        *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_cep_operation_t	*cep_acquire_operation(zbx_cep_config_t *cep_config, zbx_uint64_t ruleid,
 		zbx_uint64_t operationid, zbx_uint64_t revision, zbx_vector_cep_rule_ptr_t *rules)
 {
@@ -1293,6 +1545,16 @@ static zbx_cep_operation_t	*cep_acquire_operation(zbx_cep_config_t *cep_config, 
 	return &rule->operations.values[index];
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove a CEP operation from configuration                         *
+ *                                                                            *
+ * Parameters: cep_config   - [IN/OUT] CEP configuration                      *
+ *             operationid  - [IN] operation identifier                       *
+ *             revision     - [IN] revision to assign to the affected rule    *
+ *             rules        - [OUT] updated rules, can be NULL                *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_remove_operation(zbx_cep_config_t *cep_config, zbx_uint64_t operationid, zbx_uint64_t revision,
 		zbx_vector_cep_rule_ptr_t *rules)
 {
@@ -1324,6 +1586,16 @@ static void	cep_remove_operation(zbx_cep_config_t *cep_config, zbx_uint64_t oper
 	zbx_hashset_remove_direct(&cep_config->operation_rel, rel);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: cache CEP operations from database                                *
+ *                                                                            *
+ * Parameters: cep_config - [IN/OUT] CEP configuration                        *
+ *             sync       - [IN/OUT] database synchronization data            *
+ *             revision   - [IN] current configuration revision               *
+ *             rules      - [OUT] updated rules, can be NULL                  *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_sync_operations(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, zbx_uint64_t revision,
 		zbx_vector_cep_rule_ptr_t *rules)
 {
@@ -1412,6 +1684,18 @@ static void	cep_sync_operations(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire a mutable CEP operation tag instance by tag identifier    *
+ *                                                                            *
+ * Parameters: cep_config   - [IN/OUT] CEP configuration                      *
+ *             operationid  - [IN] operation identifier                       *
+ *             tagid        - [IN] tag identifier                             *
+ *             revision     - [IN] revision to assign to the tag              *
+ *                                                                            *
+ * Return value: pointer to the acquired CEP operation tag                    *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_cep_operation_tag_t	*cep_acquire_operation_tag(zbx_cep_config_t *cep_config, zbx_uint64_t operationid,
 		zbx_uint64_t tagid, zbx_uint64_t revision)
 {
@@ -1439,6 +1723,16 @@ static zbx_cep_operation_tag_t	*cep_acquire_operation_tag(zbx_cep_config_t *cep_
 	return &operation->tags.values[index];
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove a CEP operation tag from configuration                     *
+ *                                                                            *
+ * Parameters: cep_config - [IN/OUT] CEP configuration                        *
+ *             tagid      - [IN] tag identifier                               *
+ *             revision   - [IN] revision to assign to the affected           *
+ *                              operation                                     *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_remove_operation_tag(zbx_cep_config_t *cep_config, zbx_uint64_t tagid, zbx_uint64_t revision)
 {
 	zbx_cep_operation_t		*operation;
@@ -1467,6 +1761,15 @@ out:
 	zbx_hashset_remove_direct(&cep_config->operation_tag_rel, rel);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: cache CEP operation tags from database                            *
+ *                                                                            *
+ * Parameters: cep_config - [IN/OUT] CEP configuration                        *
+ *             sync       - [IN/OUT] database synchronization data            *
+ *             revision   - [IN] current configuration revision               *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_sync_operation_tags(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, zbx_uint64_t revision)
 {
 	char		**row;
@@ -1510,6 +1813,98 @@ static void	cep_sync_operation_tags(zbx_cep_config_t *cep_config, zbx_dbsync_t *
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update the active CEP config handle to reflect latest changes     *
+ *                                                                            *
+ * Parameters: cep_config - [IN/OUT] CEP configuration                        *
+ *             revision   - [IN] current configuration revision               *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_config_update_handle(zbx_cep_config_t *cep_config, zbx_uint64_t revision)
+{
+	pthread_mutex_lock(&cep_config->lock);
+
+	if (cep_config->revision == revision)
+	{
+		if (NULL != cep_config->handle)
+			cep_config_handle_release(cep_config->handle);
+
+		cep_config->handle = cep_config_handle_create(cep_config, revision);
+
+		atomic_store(&cep_config->rules_num, cep_config->handle->rules.values_num);
+	}
+
+	pthread_mutex_unlock(&cep_config->lock);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update formulas and operation sort order of CEP rules             *
+ *                                                                            *
+ * Parameters: cep_config  - [IN/OUT] CEP configuration                       *
+ *             rules_cond  - [IN/OUT] rules with updated conditions, can be   *
+ *                           NULL to update all rules                         *
+ *             rules_op    - [IN/OUT] rules with updated operations, can be   *
+ *                           NULL to update all rules                         *
+ *                                                                            *
+ * Comments: If either vector is NULL all rules in the configuration are      *
+ *           updated.                                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_update_rules(zbx_cep_config_t *cep_config, zbx_vector_cep_rule_ptr_t *rules_cond,
+		zbx_vector_cep_rule_ptr_t *rules_op)
+{
+	char	*str = NULL;
+	size_t	str_alloc = 0;
+
+	if (NULL != rules_cond && NULL != rules_op)
+	{
+		zbx_vector_cep_rule_ptr_sort(rules_cond, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+		zbx_vector_cep_rule_ptr_uniq(rules_cond, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
+		for (int i = 0; i < rules_cond->values_num; i++)
+			cep_rule_update_formula(rules_cond->values[i], &str, &str_alloc);
+
+		zbx_vector_cep_rule_ptr_sort(rules_op, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+		zbx_vector_cep_rule_ptr_uniq(rules_op, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
+		for (int i = 0; i < rules_op->values_num; i++)
+		{
+			zbx_vector_cep_operation_sort(&rules_op->values[i]->operations,
+					cep_operation_compare_by_sortorder);
+		}
+	}
+	else
+	{
+		zbx_hashset_iter_t	iter;
+		zbx_cep_rule_ref_t	*ref;
+
+		zbx_hashset_iter_reset(&cep_config->rules, &iter);
+		while (NULL != (ref = (zbx_cep_rule_ref_t *)zbx_hashset_iter_next(&iter)))
+		{
+			cep_rule_update_formula(ref->rule, &str, &str_alloc);
+			zbx_vector_cep_operation_sort(&ref->rule->operations, cep_operation_compare_by_sortorder);
+		}
+
+	}
+
+	zbx_free(str);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: synchronize CEP configuration with database changes               *
+ *                                                                            *
+ * Parameters: rule_sync            - [IN/OUT] rule sync data                 *
+ *             condition_sync       - [IN/OUT] condition sync data            *
+ *             window_sync          - [IN/OUT] window sync data               *
+ *             window_condition_sync - [IN/OUT] window condition sync data    *
+ *             operation_sync       - [IN/OUT] operation sync data            *
+ *             operation_tag_sync   - [IN/OUT] operation tag sync data        *
+ *             revision             - [IN] current configuration revision     *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_config_sync(zbx_dbsync_t *rule_sync, zbx_dbsync_t *condition_sync, zbx_dbsync_t *window_sync,
 		zbx_dbsync_t *window_condition_sync, zbx_dbsync_t *operation_sync, zbx_dbsync_t *operation_tag_sync,
 		zbx_uint64_t revision)
@@ -1545,6 +1940,11 @@ void	cep_config_sync(zbx_dbsync_t *rule_sync, zbx_dbsync_t *condition_sync, zbx_
 		zbx_vector_cep_rule_ptr_destroy(prules_op);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire CEP config handle                                         *
+ *                                                                            *
+ ******************************************************************************/
 zbx_cep_config_handle_t	zbx_cep_config_open(void)
 {
 	zbx_cep_config_handle_t	handle;
@@ -1561,11 +1961,25 @@ zbx_cep_config_handle_t	zbx_cep_config_open(void)
 	return handle;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: release CEP config handle                                         *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_cep_config_close(zbx_cep_config_handle_t handle)
 {
 	cep_config_handle_release(handle);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get rules from a CEP config handle                                *
+ *                                                                            *
+ * Parameters: handle - [IN] config handle                                    *
+ *                                                                            *
+ * Return value: pointer to the vector of CEP rules                           *
+ *                                                                            *
+ ******************************************************************************/
 const zbx_vector_cep_rule_ptr_t	*zbx_cep_config_get_rules(zbx_cep_config_handle_t handle)
 {
 	return &handle->rules;
