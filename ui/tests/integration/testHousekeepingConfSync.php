@@ -16,8 +16,6 @@
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 /**
- * @required-components server, proxy
- * @configurationDataProvider configurationProvider
  * @onAfter clearData
  */
 class testHousekeepingConfSync extends CIntegrationTest {
@@ -130,7 +128,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 				'LogFileSize' => 20,
 				'Hostname' => self::PROXY_NAME,
 				'ProxyMode' => PROXY_OPERATING_MODE_ACTIVE,
-				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX
+				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
 			]
 		];
 	}
@@ -521,6 +519,8 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	 * runtime configuration caches.
 	 *
 	 * @dataProvider housekeepingProvider
+	 * @required-components server, proxy
+	 * @configurationDataProvider configurationProvider
 	 */
 	public function testHousekeepingConfSync_ApiUpdate(array $data) {
 		if (array_key_exists('precondition', $data)) {
@@ -552,6 +552,8 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	 * history records received from proxy.
 	 *
 	 * @depends testHousekeepingConfSync_ApiUpdate
+	 * @required-components server, proxy
+	 * @configurationDataProvider configurationProvider
 	 */
 	public function testHousekeepingConfSync_OldHistoryCleanup() {
 		$housekeeping = [
