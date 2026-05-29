@@ -46,6 +46,7 @@ typedef struct
 	size_t			headers_in_offset;
 	unsigned char		custom_header;
 	size_t			headers_sz;
+	char			errbuf[CURL_ERROR_SIZE];
 }
 zbx_es_httprequest_t;
 
@@ -162,6 +163,7 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	zbx_es_env_t		*env;
 	int			err_index = -1;
 	void			*objptr;
+	long			ssl_verify_host = 0L, ssl_verify_peer = 0L;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
@@ -171,6 +173,23 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 
 	if (MAX_HTTPREQUEST_OBJECT_COUNT == env->http_req_objects)
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "maximum count of HttpRequest objects was reached");
+
+	if (0 == duk_is_null_or_undefined(ctx, 0) && 0 != duk_is_object(ctx, 0))
+	{
+		if (0 != duk_has_prop_string(ctx, 0, "SSLVerifyPeer"))
+		{
+			duk_get_prop_string(ctx, 0, "SSLVerifyPeer");
+			ssl_verify_peer = 0 != duk_to_boolean(ctx, -1) ? 1L : 0L;
+			duk_pop(ctx);
+		}
+
+		if (0 != duk_has_prop_string(ctx, 0, "SSLVerifyHost"))
+		{
+			duk_get_prop_string(ctx, 0, "SSLVerifyHost");
+			ssl_verify_host = 0 != duk_to_boolean(ctx, -1) ? 2L : 0L;
+			duk_pop(ctx);
+		}
+	}
 
 	duk_push_this(ctx);
 	objptr = duk_require_heapptr(ctx, -1);
@@ -190,10 +209,11 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_WRITEFUNCTION, curl_write_cb, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_WRITEDATA, request, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PRIVATE, request, err);
-	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYPEER, 0L, err);
-	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYHOST, 0L, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYPEER, ssl_verify_peer, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYHOST, ssl_verify_host, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERFUNCTION, curl_header_cb, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERDATA, request, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_ERRORBUFFER, request->errbuf, err);
 
 	if (NULL != env->config_source_ip)
 		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_INTERFACE, env->config_source_ip, err);
@@ -413,11 +433,13 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 
 	request->data_offset = 0;
 	request->headers_in_offset = 0;
+	*request->errbuf = '\0';
 
 	if (CURLE_OK != (err = curl_easy_perform(request->handle)))
 	{
-		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot get URL: %s.",
-				curl_easy_strerror(err));
+		const char *detail = ('\0' != request->errbuf[0]) ? request->errbuf : curl_easy_strerror(err);
+
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot get URL: %s.", detail);
 		goto out;
 	}
 
@@ -888,7 +910,7 @@ static const duk_function_list_entry	httprequest_methods[] = {
 static int	es_httprequest_create_prototype(duk_context *ctx, const char *obj_name,
 		const duk_function_list_entry *methods)
 {
-	duk_push_c_function(ctx, es_httprequest_ctor, 0);
+	duk_push_c_function(ctx, es_httprequest_ctor, 1 /* TLS validation options */);
 	duk_push_object(ctx);
 
 	es_put_function_list(ctx, -1, methods);
