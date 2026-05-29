@@ -1003,8 +1003,7 @@ static void	cep_config_dump(void)
 	// WDN remove
 	int	loglevel = zbx_set_log_level(LOG_LEVEL_TRACE);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() revision:" ZBX_FS_UI64 , __func__, cep_config->revision);
 
 	zbx_hashset_iter_reset(&cep_config->rules, &iter);
 	while (NULL != (ref = (zbx_cep_rule_ref_t *)zbx_hashset_iter_next(&iter)))
@@ -1373,15 +1372,15 @@ static void	cep_sync_operations(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 				break;
 			case ZBX_CEP_OP_ADD_TAG:
 				ZBX_DBROW2STR(operation->args.add_tag.tag, row[6]);
-				ZBX_DBROW2STR(operation->args.add_tag.value, row[7]);
+				ZBX_DBROW2STR(operation->args.add_tag.value, row[8]);
 				break;
 			case ZBX_CEP_OP_SET_TAG:
 				ZBX_DBROW2STR(operation->args.set_tag.tag, row[6]);
-				ZBX_DBROW2STR(operation->args.set_tag.value, row[7]);
+				ZBX_DBROW2STR(operation->args.set_tag.value, row[8]);
 				break;
 			case ZBX_CEP_OP_SET_TAG_VALUE:
 				ZBX_DBROW2STR(operation->args.set_tag_value.tag, row[6]);
-				ZBX_DBROW2STR(operation->args.set_tag_value.value, row[7]);
+				ZBX_DBROW2STR(operation->args.set_tag_value.value, row[8]);
 				break;
 			case ZBX_CEP_OP_INCREASE_TAG_VALUE:
 				ZBX_DBROW2STR(operation->args.increase_tag_value.tag, row[6]);
@@ -1391,18 +1390,10 @@ static void	cep_sync_operations(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 				break;
 			case ZBX_CEP_OP_RENAME_TAG:
 				ZBX_DBROW2STR(operation->args.rename_tag.old_tag, row[6]);
-				ZBX_DBROW2STR(operation->args.rename_tag.new_tag, row[8]);
+				ZBX_DBROW2STR(operation->args.rename_tag.new_tag, row[7]);
 				break;
 			case ZBX_CEP_OP_REMOVE_TAG:
 				ZBX_DBROW2STR(operation->args.remove_tag.tag, row[6]);
-				break;
-			case ZBX_CEP_OP_CLOSE:
-			case ZBX_CEP_OP_DISCARD:
-			case ZBX_CEP_OP_INCREASE_SEVERITY:
-			case ZBX_CEP_OP_DECREASE_SEVERITY:
-			case ZBX_CEP_OP_SUPPRESS:
-			case ZBX_CEP_OP_COPY_FIRST:
-			case ZBX_CEP_OP_COPY_LAST:
 				break;
 		}
 	}

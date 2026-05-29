@@ -51,35 +51,38 @@
 /* This list includes virtual objects that are not written into  */
 /* changelog table, but the insert/updates/deletes are copied    */
 /* from the associated object changelog                          */
-#define ZBX_DBSYNC_OBJ_HOST		1
-#define ZBX_DBSYNC_OBJ_HOST_TAG		2
-#define ZBX_DBSYNC_OBJ_ITEM		3
-#define ZBX_DBSYNC_OBJ_ITEM_TAG		4
-#define ZBX_DBSYNC_OBJ_TRIGGER		5
-#define ZBX_DBSYNC_OBJ_TRIGGER_TAG	6
-#define ZBX_DBSYNC_OBJ_FUNCTION		7
-#define ZBX_DBSYNC_OBJ_ITEM_PREPROC	8
-#define ZBX_DBSYNC_OBJ_DRULE		9
-#define ZBX_DBSYNC_OBJ_DCHECK		10
-#define ZBX_DBSYNC_OBJ_HTTPTEST		11
-#define ZBX_DBSYNC_OBJ_HTTPTEST_FIELD	12
-#define ZBX_DBSYNC_OBJ_HTTPTEST_ITEM	13
-#define ZBX_DBSYNC_OBJ_HTTPSTEP		14
-#define ZBX_DBSYNC_OBJ_HTTPSTEP_FIELD	15
-#define ZBX_DBSYNC_OBJ_HTTPSTEP_ITEM	16
-#define ZBX_DBSYNC_OBJ_CONNECTOR	17
-#define ZBX_DBSYNC_OBJ_CONNECTOR_TAG	18
-#define ZBX_DBSYNC_OBJ_PROXY		19
-#define ZBX_DBSYNC_OBJ_PROXY_GROUP	20
-#define ZBX_DBSYNC_OBJ_HOST_PROXY	21
-#define ZBX_DBSYNC_OBJ_TRIGGER_DEP	22
-#define ZBX_DBSYNC_OBJ_CEP_RULE		23
-#define ZBX_DBSYNC_OBJ_CEP_CONDITION	24
-#define ZBX_DBSYNC_OBJ_CEP_WINDOW	25
+#define ZBX_DBSYNC_OBJ_HOST			1
+#define ZBX_DBSYNC_OBJ_HOST_TAG			2
+#define ZBX_DBSYNC_OBJ_ITEM			3
+#define ZBX_DBSYNC_OBJ_ITEM_TAG			4
+#define ZBX_DBSYNC_OBJ_TRIGGER			5
+#define ZBX_DBSYNC_OBJ_TRIGGER_TAG		6
+#define ZBX_DBSYNC_OBJ_FUNCTION			7
+#define ZBX_DBSYNC_OBJ_ITEM_PREPROC		8
+#define ZBX_DBSYNC_OBJ_DRULE			9
+#define ZBX_DBSYNC_OBJ_DCHECK			10
+#define ZBX_DBSYNC_OBJ_HTTPTEST			11
+#define ZBX_DBSYNC_OBJ_HTTPTEST_FIELD		12
+#define ZBX_DBSYNC_OBJ_HTTPTEST_ITEM		13
+#define ZBX_DBSYNC_OBJ_HTTPSTEP			14
+#define ZBX_DBSYNC_OBJ_HTTPSTEP_FIELD		15
+#define ZBX_DBSYNC_OBJ_HTTPSTEP_ITEM		16
+#define ZBX_DBSYNC_OBJ_CONNECTOR		17
+#define ZBX_DBSYNC_OBJ_CONNECTOR_TAG		18
+#define ZBX_DBSYNC_OBJ_PROXY			19
+#define ZBX_DBSYNC_OBJ_PROXY_GROUP		20
+#define ZBX_DBSYNC_OBJ_HOST_PROXY		21
+#define ZBX_DBSYNC_OBJ_TRIGGER_DEP		22
+#define ZBX_DBSYNC_OBJ_CEP_RULE			23
+#define ZBX_DBSYNC_OBJ_CEP_CONDITION		24
+#define ZBX_DBSYNC_OBJ_CEP_WINDOW		25
+#define ZBX_DBSYNC_OBJ_CEP_WINDOW_CONDITION	26
+#define ZBX_DBSYNC_OBJ_CEP_OPERATION		27
+#define ZBX_DBSYNC_OBJ_CEP_OPERATION_TAG	28
 
-#define ZBX_DBSYNC_OBJ_ITEM_DISCOVERY	26	/* virtual object */
+#define ZBX_DBSYNC_OBJ_ITEM_DISCOVERY	29	/* virtual object */
 /* number of dbsync objects - keep in sync with above defines */
-#define ZBX_DBSYNC_OBJ_COUNT		26
+#define ZBX_DBSYNC_OBJ_COUNT		29
 
 /******************************************************************************
  *                                                                            *

@@ -4318,7 +4318,7 @@ int	zbx_dbsync_prepare_cep_window_condition(zbx_dbsync_t *sync)
 	}
 
 	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "cep_window_conditionid", "where", NULL,
-			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CEP_WINDOW)]);
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CEP_WINDOW_CONDITION)]);
 out:
 	zbx_free(sql);
 	zbx_dcsync_sql_end(sync);
@@ -4335,7 +4335,7 @@ int	zbx_dbsync_prepare_cep_operation(zbx_dbsync_t *sync)
 	zbx_dcsync_sql_start(sync);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select cep_operationid,cep_ruleid,execute_when,type,eval_type,event_name,tag,new_tag,"
+			"select cep_operationid,cep_ruleid,type,execute_when,evaltype,event_name,tag,new_tag,"
 				"tag_value,severity,sortorder"
 			" from cep_operation");
 
@@ -4349,7 +4349,7 @@ int	zbx_dbsync_prepare_cep_operation(zbx_dbsync_t *sync)
 	}
 
 	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "cep_operationid", "where", NULL,
-			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CEP_WINDOW)]);
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CEP_OPERATION)]);
 out:
 	zbx_free(sql);
 	zbx_dcsync_sql_end(sync);
@@ -4379,7 +4379,7 @@ int	zbx_dbsync_prepare_cep_operation_tag(zbx_dbsync_t *sync)
 	}
 
 	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "cep_operation_tagid", "where", NULL,
-			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CEP_WINDOW)]);
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CEP_OPERATION_TAG)]);
 out:
 	zbx_free(sql);
 	zbx_dcsync_sql_end(sync);
