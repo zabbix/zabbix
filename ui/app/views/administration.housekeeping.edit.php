@@ -171,7 +171,7 @@ foreach ([ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC] as $storage
 		$house_keeper_tab->addRow(
 			new CLabel(itemValueTypeString($value_type)),
 			$storage['value_ttl'] === null
-				? _('Not available')
+				? _('Unknown')
 				: convertSecondsToTimeUnits($storage['value_ttl'])
 		);
 	}
