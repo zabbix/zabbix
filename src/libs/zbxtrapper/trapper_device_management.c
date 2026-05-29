@@ -173,6 +173,14 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 
 	*body_data = NULL;
 
+	if (NULL == config_bridge_adapter_url || '\0' == *config_bridge_adapter_url)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to bridge-adapter: \"BridgeAdapterURL\""
+				" configuration parameter is not set");
+		*error = zbx_strdup(NULL, "Failed to connect to bridge-adapter");
+		goto out;
+	}
+
 	if (NULL == (curl = curl_easy_init()))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to initialize cURL library");
