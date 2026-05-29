@@ -403,6 +403,7 @@ static char	*config_frontend_allowed_ip		= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 /* bridge adapter config */
+static int	config_enable_mobile_devices		= 0;
 static char	*config_bridge_adapter_url = NULL;
 static char	*config_bridge_adapter_connect_to = NULL;
 
@@ -1207,6 +1208,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"FrontendAllowedIP",		&config_frontend_allowed_ip,		ZBX_CFG_TYPE_STRING_LIST,
 			ZBX_CONF_PARM_OPT,	0,			0},
+		{"EnableMobileDevices",		&config_enable_mobile_devices,		ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			1},
 		{"BridgeAdapterURL",		&config_bridge_adapter_url,		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"BridgeAdapterConnectTo",	&config_bridge_adapter_connect_to,	ZBX_CFG_TYPE_STRING,
@@ -1575,6 +1578,8 @@ static void	zbx_db_save_server_status(void)
 			ZBX_JSON_TYPE_INT);
 	zbx_json_addstring(&json, "allow_software_update_check",
 			(1 == config_allow_software_update_check ? "true" : "false"), ZBX_JSON_TYPE_INT);
+	zbx_json_addstring(&json, "enable_mobile_devices",
+			(1 == config_enable_mobile_devices ? "true" : "false"), ZBX_JSON_TYPE_INT);
 
 	zbx_json_close(&json);
 

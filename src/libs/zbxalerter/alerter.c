@@ -517,6 +517,17 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		const char *config_bridge_adapter_key_file,
 		const char *config_bridge_adapter_connect_to)
 {
+	zbx_config_t	cfg;
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_ENABLE_MOBILE_DEVICES);
+
+	if (0 == cfg.enable_mobile_devices)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send device notification: mobile devices are disabled");
+		alerter_send_result(socket, NULL, FAIL, "Mobile devices are disabled.", NULL);
+		return;
+	}
+
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(socket);
 	ZBX_UNUSED(ipc_message);

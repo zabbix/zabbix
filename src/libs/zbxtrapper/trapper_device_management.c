@@ -25,6 +25,7 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxdbhigh.h"
+#include "zbxcacheconfig.h"
 #include "zbx_bridge_adapter_constants.h"
 
 #if defined(HAVE_LIBCURL)
@@ -106,6 +107,15 @@ static void	trapper_device_send_response(zbx_socket_t *sock, int ret, const char
 {
 	if (SUCCEED != zbx_send_response(sock, ret, info, timeout))
 		zabbix_log(LOG_LEVEL_TRACE, "%s() failed to send %s error response", func, request);
+}
+
+static int	device_mobile_devices_enabled(void)
+{
+	zbx_config_t	cfg;
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_ENABLE_MOBILE_DEVICES);
+
+	return (0 != cfg.enable_mobile_devices ? SUCCEED : FAIL);
 }
 
 /******************************************************************************
@@ -461,6 +471,12 @@ void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp
 	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_comms->config_tls, config_frontend_allowed_ip))
 		goto out;
 
+	if (FAIL == device_mobile_devices_enabled())
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize device: mobile devices are disabled");
+		goto out;
+	}
+
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize device: failed to get user from request");
@@ -642,6 +658,12 @@ void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse
 
 	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_comms->config_tls, config_frontend_allowed_ip))
 		goto out;
+
+	if (FAIL == device_mobile_devices_enabled())
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot offboard device: mobile devices are disabled");
+		goto out;
+	}
 
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL))
 	{
