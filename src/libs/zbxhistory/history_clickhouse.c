@@ -763,7 +763,7 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 				zbx_rtrim(conn->resp.page.data, "\n");
 
 				char	*str = zbx_str_printable_dyn(conn->resp.page.data);
-				
+
 				history_clickhouse_add_error(error, "ClickHouse error: %s",
 						str);
 
