@@ -366,7 +366,8 @@ if (window.customElements.get('z-cep-tagsuggest') === undefined) {
 			clearTimeout(this.#suggestions_debounce);
 
 			const position_tags = this.hasAttribute('disable-position-tags') ? [] : this.#position_tags;
-			const suggestions = [...position_tags, ...this.#property_tags].filter(tag => tag.startsWith(value));
+			const matcher = tag => tag.startsWith(value) && tag !== value;
+			const suggestions = [...position_tags, ...this.#property_tags].filter(matcher);
 			const show = () => this.#showSuggestions(suggestions, value.length);
 
 			suggestions.length
@@ -437,7 +438,7 @@ if (window.customElements.get('z-cep-tagsuggest') === undefined) {
 
 		#select(li) {
 			this.value = li.dataset.tag;
-			this.focus();
+			setTimeout(() => this.focus());
 			this.#hideSuggestions();
 		}
 
