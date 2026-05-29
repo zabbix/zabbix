@@ -13,109 +13,50 @@
 **/
 
 
-class CFieldArray extends CField {
-
-	/**
-	 * Array of input field references that particular FieldArray instance holds.
-	 *
-	 * @type {Array<CField>}
-	 */
-	#fields = [];
-
-	init() {
-		super.init();
-
-		this.#discoverAllFields();
-
-		this._prev_value = this.getValue();
-
-		const observer = new MutationObserver(this.#detectFieldChanges);
-
-		observer.observe(this._field, {
-			childList: true,
-			subtree: true
-		});
-
-		this._field.addEventListener('click', e => e.target.matches('[type="checkbox"]') && this.#detectFieldChanges());
-	}
-
-	getName() {
-		return this._field.getAttribute('data-field-name');
-	}
+class CFieldArray extends CFieldCollection {
 
 	getInnerValue(trim_value) {
 		const result = [];
 
-		for (const field of this.#fields) {
+		for (const [key, field] of Object.entries(this.getFields())) {
 			const value = trim_value ? field.getValueTrimmed() : field.getValue();
 
 			if (value !== null) {
-				result.push(value);
+				result[key] = value;
 			}
 		}
 
 		return result;
 	}
 
-	getValue() {
-		return this.getInnerValue(false);
-	}
+	_fieldsSetErrors(errors, force_display_errors) {
+		for (const [key, field_errors] of Object.entries(errors)) {
+			const key_full = key.replaceAll('[', '').replaceAll(']', '');
 
-	getValueTrimmed() {
-		return this.getInnerValue(true);
-	}
+			if (key_full in this.getFields()) {
+				// These errors need to be added even if field is not changed, but smaller index one was.
+				const error_levels = [CFormValidator.ERROR_LEVEL_UNIQ,
+					CFormValidator.ERROR_LEVEL_OBJECTS_COUNT
+				];
 
-	updateState() {
-		this.#discoverAllFields();
-	}
+				if (this.getFields()[key_full].hasChanged() || force_display_errors
+						|| field_errors.some((error) => error.message === '' || error_levels.includes(error.level))) {
+					field_errors.forEach((error) => this.getFields()[key_full].setErrors(error));
 
-	#detectFieldChanges = () => {
-		this.#discoverAllFields();
-
-		if (this.#hasValueChanged()) {
-			this.fieldChanged();
-		}
-	}
-
-	#discoverAllFields() {
-		const fields = [];
-
-		for (const field of CForm.findAllFields(this._field)) {
-			const field_type = field.getAttribute('data-field-type');
-
-			if (field_type in CForm.field_types) {
-				let field_instance = this.#fields.find(discovered_field => discovered_field.isSameField(field));
-
-				if (field_instance === undefined) {
-					field_instance = new CForm.field_types[field_type](field);
-					field_instance.init();
-					field_instance.setTabId(this._tab_id);
+					this._global_errors = {...this._global_errors, ...this.getFields()[key_full].getGlobalErrors()};
 				}
-				else {
-					field_instance.updateState();
-				}
+			}
+			else if (errors[key_full] !== '') {
+				// Field is not present in fields, display generic error.
+				let extended_name = this.getName() + key;
+				extended_name = '/' + extended_name.replaceAll('[', '/').replaceAll(']', '');
 
-				fields.push(field_instance);
+				field_errors.forEach(error => {
+					if (error.message !== '') {
+						console.log('Validation error for missing field "' + extended_name + '": ' + error.message);
+					}
+				});
 			}
 		}
-
-		this.#fields = fields;
-	}
-
-	#hasValueChanged() {
-		const a = this._prev_value.sort();
-		const b = this.getValue().sort();
-
-		if (a.length != b.length) {
-			return true;
-		}
-
-		for (let i = 0; a.length > i; i++) {
-			if (a[i] != b[i]) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 }

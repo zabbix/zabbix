@@ -1579,15 +1579,11 @@ class CFormValidator {
 	 */
 	#validateArray(rules, array_values, path) {
 		/*
-		 * Some arrays received from form are interpreted as objects so, if it's object but all keys are numeric, it's
-		 * actually array.
+		 * All keys must be numeric. Not all values are always validated therefore some keys might be missing.
 		 */
 		if (this.#isTypeObject(array_values)
-			&& Object.keys(array_values).every((k) => this.#isTypeInt32(k) && parseInt(k) >= 0)) {
-			array_values = Object.values(array_values);
-		}
+				&& !Object.keys(array_values).every((k) => this.#isTypeInt32(k) && parseInt(k) >= 0)) {
 
-		if (!Array.isArray(array_values)) {
 			this.#addError(path, this.#getMessage(rules, 'type', t('An array is expected.')),
 				CFormValidator.ERROR_LEVEL_PRIMARY
 			);
@@ -1595,7 +1591,7 @@ class CFormValidator {
 			return {result: CFormValidator.ERROR};
 		}
 
-		if ('not_empty' in rules && !array_values.filter(v => v !== null).length) {
+		if ('not_empty' in rules && !Object.values(array_values).filter(v => v !== null).length) {
 			this.#addError(path, this.#getMessage(rules, 'not_empty', t('This field cannot be empty.')),
 				CFormValidator.ERROR_LEVEL_PRIMARY
 			);
@@ -1604,20 +1600,21 @@ class CFormValidator {
 		}
 
 		if ('field' in rules) {
-			const normalized_values = [];
+			const normalized_values = Object.create(null);
 
-			for (let i = 0; array_values.length > i; i++) {
+			for (const i of Object.keys(array_values)) {
 				const {result, error, value = array_values} = this.#validateField(rules.field, array_values, i,
 					path + '/' + i
 				);
 
 				if (result === CFormValidator.ERROR) {
-					error && this.#addError(path, error, CFormValidator.ERROR_LEVEL_PRIMARY);
+					error && this.#addError(path + '/' + i, error, CFormValidator.ERROR_LEVEL_PRIMARY);
 
 					return {result: CFormValidator.ERROR};
 				}
 				else {
-					normalized_values.push(value[i]);
+					this.#addPath(path + '/' + i, CFormValidator.ERROR_LEVEL_PRIMARY);
+					normalized_values[i] = value[i];
 				}
 			}
 			array_values = normalized_values;
