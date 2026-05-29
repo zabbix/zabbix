@@ -272,6 +272,15 @@ class testHistoryGet extends CIntegrationTest {
 	}
 
 	public function testHistoryValue_timeRangeCountOutput() {
+		global $HISTORY_PROVIDERS;
+		if (isset($HISTORY_PROVIDERS)) {
+			foreach ($HISTORY_PROVIDERS as $provider) {
+				if ($provider['provider'] === ZBX_HISTORY_SOURCE_ELASTIC) {
+					$this->markTestSkipped('Test is not supported with Elasticsearch history provider.');
+				}
+			}
+		}
+
 		$tm = $this->timeMonotonic();
 
 		$values = [
