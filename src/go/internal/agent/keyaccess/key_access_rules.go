@@ -28,6 +28,23 @@ import (
 	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
+const (
+	// matchAllRegexpPattern is the only regexp form treated as unconditional match-all for rule trimming.
+	matchAllRegexpPattern = ".*"
+)
+
+// PatternWildcard and PatternRegexp are pattern kinds (C: zbx_key_access_pattern_type_t).
+const (
+	PatternWildcard = iota
+	PatternRegexp
+)
+
+// ALLOW and DENY are AllowKey and DenyKey rule permissions.
+const (
+	ALLOW = iota
+	DENY
+)
+
 var (
 	errInvalidRule                 = errors.New("invalid key access rule")
 	errRegexpPatternMustNotBeEmpty = errors.New("regular expression pattern must not be empty")
@@ -36,23 +53,17 @@ var (
 	rules []*Rule
 )
 
-// RuleType Access rule permission type
+// PatternType key access rule pattern.
+type PatternType int
+
+// RuleType Access rule permission type.
 type RuleType int
-
-// Rule access and trimming constants.
-const (
-	// matchAllRegexpPattern is the only regexp form treated as unconditional match-all for rule trimming.
-	matchAllRegexpPattern = ".*"
-
-	ALLOW RuleType = iota
-	DENY
-)
 
 // BasePattern holds the common fields shared by Record and Rule.
 type BasePattern struct {
-	Pattern    string
-	Permission RuleType
-	IsRegexp   bool
+	Pattern     string
+	Permission  RuleType
+	PatternType PatternType
 }
 
 // Record is a key access record.
@@ -84,7 +95,7 @@ func (t RuleType) String() string {
 
 // permissionName returns the config parameter name corresponding to a pattern's permission type and kind.
 func (b BasePattern) permissionName() string {
-	if b.IsRegexp {
+	if b.PatternType == PatternRegexp {
 		if b.Permission == ALLOW {
 			return "AllowKeyRegexp"
 		}
@@ -112,7 +123,7 @@ func parse(rec Record) (r *Rule, err error) {
 		BasePattern: rec.BasePattern,
 	}
 
-	if rec.IsRegexp {
+	if rec.PatternType == PatternRegexp {
 		if rec.Pattern == "" {
 			return nil, errRegexpPatternMustNotBeEmpty
 		}
@@ -153,11 +164,11 @@ func parse(rec Record) (r *Rule, err error) {
 // Regexp and wildcard rules are compared separately.
 func findRule(proto *Rule) (rule *Rule, index int) {
 	for j, r := range rules {
-		if proto.IsRegexp != r.IsRegexp {
+		if proto.PatternType != r.PatternType {
 			continue
 		}
 
-		if proto.IsRegexp {
+		if proto.PatternType == PatternRegexp {
 			if proto.Pattern == r.Pattern {
 				return r, j
 			}
@@ -199,15 +210,15 @@ func addRule(rec Record) (err error) {
 	return
 }
 
-func appendRecordsFromNode(records *[]Record, node any, permission RuleType, isRegexp bool) {
+func appendRecordsFromNode(records *[]Record, node any, permission RuleType, patternType PatternType) {
 	if cfgNode, ok := node.(*conf.Node); ok {
 		for _, v := range cfgNode.Nodes {
 			if value, ok := v.(*conf.Value); ok {
 				*records = append(*records, Record{
 					BasePattern: BasePattern{
-						Pattern:    string(value.Value),
-						Permission: permission,
-						IsRegexp:   isRegexp,
+						Pattern:     string(value.Value),
+						Permission:  permission,
+						PatternType: patternType,
 					},
 					Line: value.Line,
 				})
@@ -239,7 +250,13 @@ func prepareSystemRunRule() (*Rule, int, int, error) {
 
 	// create system.run[*] deny rule to be appended at the end of rule list unless other
 	// system.run[*] rules are present
-	sysrunRule, err := parse(Record{BasePattern: BasePattern{Pattern: "system.run[*]", Permission: DENY}})
+	sysrunRule, err := parse(Record{
+		BasePattern: BasePattern{
+			Pattern:     "system.run[*]",
+			Permission:  DENY,
+			PatternType: PatternWildcard,
+		},
+	})
 	if err != nil {
 		return nil, sysrunIndex, rulesNum, err
 	}
@@ -253,7 +270,7 @@ func prepareSystemRunRule() (*Rule, int, int, error) {
 }
 
 func isUnconditionalMatchAll(r *Rule) bool {
-	if r.IsRegexp {
+	if r.PatternType == PatternRegexp {
 		return r.Pattern == matchAllRegexpPattern
 	}
 
@@ -290,7 +307,7 @@ func trimTrailingAllowRules(sysrunIndex int) {
 		}
 
 		if !isUnconditionalMatchAll(r) {
-			if r.IsRegexp || r.Key == "system.run" {
+			if r.PatternType == PatternRegexp || r.Key == "system.run" {
 				// system.run allow rules are not redundant because of default system.run[*] deny rule
 				break
 			}
@@ -322,10 +339,10 @@ func LoadRules(allowRecords, denyRecords, allowRegexpRecords, denyRegexpRecords 
 	rules = rules[:0]
 	records := make([]Record, 0)
 
-	appendRecordsFromNode(&records, allowRecords, ALLOW, false)
-	appendRecordsFromNode(&records, denyRecords, DENY, false)
-	appendRecordsFromNode(&records, allowRegexpRecords, ALLOW, true)
-	appendRecordsFromNode(&records, denyRegexpRecords, DENY, true)
+	appendRecordsFromNode(&records, allowRecords, ALLOW, PatternWildcard)
+	appendRecordsFromNode(&records, denyRecords, DENY, PatternWildcard)
+	appendRecordsFromNode(&records, allowRegexpRecords, ALLOW, PatternRegexp)
+	appendRecordsFromNode(&records, denyRegexpRecords, DENY, PatternRegexp)
 
 	slices.SortStableFunc(records, func(a, b Record) int {
 		return cmp.Compare(a.Line, b.Line)
@@ -448,7 +465,7 @@ func CheckRules(rawMetric, key string, params []string) bool {
 	emptyParams := len(params) == 1 && params[0] == ""
 
 	for _, r := range rules {
-		if r.IsRegexp {
+		if r.PatternType == PatternRegexp {
 			if r.Regexp.MatchString(rawMetric) {
 				return r.Permission == ALLOW
 			}
