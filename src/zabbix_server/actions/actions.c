@@ -2076,7 +2076,7 @@ static int	check_areg_proxy_group_condition(const zbx_vector_db_event_t *esc_eve
 			" where a.proxyid=p.proxyid"
 				" and");
 
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "autoreg_hostid",
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "a.autoreg_hostid",
 			objectids.values, objectids.values_num);
 
 	result = zbx_db_select("%s", sql);
