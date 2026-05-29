@@ -754,14 +754,20 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 
 		if (400 <= status)
 		{
-			history_clickhouse_add_error(error, "cannot send query to ClickHouse"
+			history_clickhouse_add_error(error, "cannot send query to ClickHouse,"
 				" HTTP response code: %ld",
 				status);
 
 			if (NULL != conn->resp.page.data)
 			{
+				zbx_rtrim(conn->resp.page.data, "\n");
+
+				char	*str = zbx_str_printable_dyn(conn->resp.page.data);
+				
 				history_clickhouse_add_error(error, "ClickHouse error: %s",
-						conn->resp.page.data);
+						str);
+
+				zbx_free(str);
 			}
 
 			continue;
