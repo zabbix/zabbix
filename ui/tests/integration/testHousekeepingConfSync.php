@@ -135,19 +135,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		];
 	}
 
-	protected function reloadConfigurationCacheAndWaitForLogLine($component = null, $delayOverride = 0) {
-		if ($component !== self::COMPONENT_PROXY) {
-			parent::reloadConfigurationCacheAndWaitForLogLine($component, $delayOverride);
-			return;
-		}
-
-		$this->reloadConfigurationCache($component, $delayOverride);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
-				'sending configuration data to proxy "'.self::PROXY_NAME.'"', true, 90, 1);
-		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, 'received configuration data from server',
-				true, 90, 1);
-	}
-
 	/**
 	 * Extract housekeeping settings dumped by DCdump_config().
 	 */
@@ -380,10 +367,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 
 	private function reloadServerAndAssertHousekeeping(array $housekeeping) {
 		$this->clearLog(self::COMPONENT_SERVER);
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'default timezone', true, 90, 1);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_dc_sync_configuration()',
-				true, 90, 1);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		$server_hk = $this->extractSyncedHousekeeping(self::COMPONENT_SERVER);
 		$this->assertHousekeepingEquals($this->expectedServerHousekeeping($housekeeping), $server_hk);
