@@ -299,7 +299,6 @@ static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, zbx_t
  ******************************************************************************/
 static char	*tq_sql_dyn_get_percentile(const char *name, const char *fraction, zbx_tq_db_type_t db_type)
 {
-	/* TODO: decide which functions to use for postgresql and clickhouse */
 	char	*str;
 	char	*name_esc_unquoted = tq_sql_dyn_escape_string_unquoted(name, db_type);
 
@@ -314,7 +313,7 @@ static char	*tq_sql_dyn_get_percentile(const char *name, const char *fraction, z
 					fraction, name_esc_unquoted);
 			break;
 		case ZBX_TQ_DB_TYPE_CLICKHOUSE:
-			str = zbx_dsprintf(NULL, "quantile(%s)(\"%s\")", fraction, name_esc_unquoted);
+			str = zbx_dsprintf(NULL, "quantileTDigest(%s)(\"%s\")", fraction, name_esc_unquoted);
 			break;
 
 		default:
@@ -521,10 +520,9 @@ static char	*tq_sql_dyn_get_atom_condition(const char *atom, const char *key, co
 		char	*operand = tq_sql_dyn_get_operand_raw(atom, key, db_type);
 		char	*value_esc = tq_sql_dyn_escape_string(value, db_type);
 
-		if (ZBX_TQ_OPERATOR_EQUAL == operator)
-			str = zbx_dsprintf(NULL, "(%s IS NOT NULL AND %s = %s)", operand, operand, value_esc);
-		else
-			str = zbx_dsprintf(NULL, "(%s IS NULL OR %s <> %s)", operand, operand, value_esc);
+		/* ensure that "not equal" results in false if attribute key is missing */
+		str = zbx_dsprintf(NULL, "(%s IS NOT NULL AND %s %s %s)", operand, operand,
+				(ZBX_TQ_OPERATOR_EQUAL == operator ? "=" : "<>"), value_esc);
 
 		zbx_free(value_esc);
 		zbx_free(operand);
@@ -536,8 +534,9 @@ static char	*tq_sql_dyn_get_atom_condition(const char *atom, const char *key, co
 		char	*operand = tq_sql_dyn_get_operand_raw(atom, key, db_type);
 		char	*str = tq_sql_dyn_get_condition_contains(operand, value, db_type);
 
-		if (ZBX_TQ_OPERATOR_NOT_CONTAINS == operator)
-			str = zbx_dsprintf(str, "(NOT %s)", str);
+		/* check for NULL for consistency with "equal"/"not equal" behavior */
+		str = zbx_dsprintf(str, "(%s IS NOT NULL AND %s%s)", operand,
+				(ZBX_TQ_OPERATOR_CONTAINS == operator ? "" : "NOT "), str);
 
 		zbx_free(operand);
 
@@ -558,7 +557,7 @@ static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, zbx_
 	if (ZBX_TQ_DB_TYPE_POSTGRESQL == db_type)
 	{
 		const char	*array_elems_func = (ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == cond->col_type
-				? "json_array_elements" : "json_array_elements_text");
+				? "jsonb_array_elements" : "jsonb_array_elements_text");
 		char	*elem_cond = tq_sql_dyn_get_atom_condition("e.elem",
 				tq_sql_key_or_null(cond->key, cond->col_type), cond->value, cond->operator, db_type);
 

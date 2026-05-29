@@ -76,12 +76,19 @@ static void	tq_es_add_condition(const zbx_tq_condition_t *cond, zbx_tq_category_
 	if (ZBX_TQ_OPERATOR_NOT_EQUAL == cond->operator || ZBX_TQ_OPERATOR_NOT_CONTAINS == cond->operator)
 	{
 		zbx_json_addobject(j, "bool");
+
+		/* ensure that "not equal" results in false if attribute key is missing */
+		zbx_json_addobject(j, "filter");
+		zbx_json_addobject(j, "exists");
+		zbx_json_addstring(j, "field", buf, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(j); /* exists */
+		zbx_json_close(j); /* filter */
+
 		zbx_json_addobject(j, "must_not");
 	}
 
 	if (ZBX_TQ_OPERATOR_EQUAL == cond->operator || ZBX_TQ_OPERATOR_NOT_EQUAL == cond->operator)
 	{
-		/* if the field is missing - result is false */
 		zbx_json_addobject(j, "term");
 		zbx_json_addstring(j, buf, cond->value, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(j); /* term */
@@ -461,6 +468,8 @@ void	zbx_tq_generate_elastic(const zbx_tq_query_t *query, time_t now, time_t las
 
 const char	*zbx_tq_elastic_get_index_name(zbx_tq_category_t category, zbx_tq_metric_type_t metric_type)
 {
+	/* TODO: replace with actual index names (or probably macros) */
+
 	switch (category)
 	{
 		case ZBX_TQ_CATEGORY_APM_TRACES:
