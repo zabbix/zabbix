@@ -95,7 +95,7 @@ window.drule_edit_popup = new class {
 
 	#updateCheck(row, input) {
 		delete input.dchecks;
-		input.warning = row.querySelector('.btn-icon')?.getAttribute('data-hintbox-contents');
+		input.warning = row.querySelector('.btn-icon')?.getAttribute('data-hintbox-html');
 
 		this.#addCheck(input, row, true);
 		row.remove();

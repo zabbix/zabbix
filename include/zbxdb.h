@@ -57,6 +57,9 @@ typedef struct
 	char		*db_tls_ca_file;
 	char		*db_tls_cipher;
 	char		*db_tls_cipher_13;
+#if defined(HAVE_POSTGRESQL)
+	char		*dbports;
+#endif
 	unsigned int	dbport;
 	int		log_slow_queries;
 	int		read_only_recoverable;
@@ -576,6 +579,12 @@ void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql)
 
 zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag);
 zbx_db_query_mask_t	zbx_db_get_log_masked_values(void);
+
+/* connection pool settings */
+#define ZBX_SETTINGS_DBPOOL			"dbpool_"
+#define ZBX_SETTINGS_DBPOOL_MAX_IDLE		ZBX_SETTINGS_DBPOOL "max_idle"
+#define ZBX_SETTINGS_DBPOOL_MAX_OPEN		ZBX_SETTINGS_DBPOOL "max_open"
+#define ZBX_SETTINGS_DBPOOL_IDLE_TIMEOUT	ZBX_SETTINGS_DBPOOL "idle_timeout"
 
 #endif
 

@@ -312,21 +312,29 @@ function getEventStatusString(bool $in_closing, array $event): string {
 }
 
 /**
+ * Get table with list of events (Event list [previous 20) for "Event details" page.
  *
- * @param array  $startEvent                    An array of event data.
- * @param string $startEvent['eventid']         Event ID.
- * @param string $startEvent['objectid']        Object ID.
- * @param array  $allowed                       An array of user role rules.
- * @param bool   $allowed['add_comments']       Whether user is allowed to add problems comments.
- * @param bool   $allowed['change_severity']    Whether user is allowed to change problems severity.
- * @param bool   $allowed['acknowledge']        Whether user is allowed to acknowledge problems.
- * @param bool   $allowed['close']              Whether user is allowed to close problems.
- * @param bool   $allowed['suppress_problems']  Whether user is allowed to suppress/unsuppress problems.
- * @param bool   $allowed['rank_change']        Whether user is allowed to change problem ranking.
+ * @param array $start_event  Starting event data.
+ *
+ * $start_event = [
+ *     'eventid' =>  (string)  Event ID.
+ *     'objectid' => (string)  Object ID (trigger ID).
+ * ]
+ *
+ * @param array $allowed  User role rules.
+ *
+ * $allowed = [
+ *     'add_comments' =>      (bool)  Whether user is allowed to add problems comments.
+ *     'change_severity' =>   (bool)  Whether user is allowed to change problems severity.
+ *     'acknowledge' =>       (bool)  Whether user is allowed to acknowledge problems.
+ *     'close' =>             (bool)  Whether user is allowed to close problems.
+ *     'suppress_problems' => (bool)  Whether user is allowed to suppress/unsuppress problems.
+ *     'rank_change' =>       (bool)  Whether user is allowed to change problem ranking.
+ * ]
  *
  * @return CTableInfo
  */
-function make_small_eventlist(array $startEvent, array $allowed) {
+function make_small_eventlist(array $start_event, array $allowed): CTableInfo {
 	$table = (new CTableInfo())
 		->setHeader([
 			_('Time'),
@@ -348,8 +356,8 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'value' => TRIGGER_VALUE_TRUE,
-		'objectids' => $startEvent['objectid'],
-		'eventid_till' => $startEvent['eventid'],
+		'objectids' => $start_event['objectid'],
+		'eventid_till' => $start_event['eventid'],
 		'sortfield' => ['clock', 'eventid'],
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => 20,
@@ -393,6 +401,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		: [];
 
 	$actions = getEventsActionsIconsData($events, $triggers);
+
 	$users = API::User()->get([
 		'output' => ['username', 'name', 'surname'],
 		'userids' => array_keys($actions['userids']),
@@ -517,8 +526,6 @@ function hasEventCloseAction(array $acknowledges): bool {
  * @return bool
  */
 function isEventRecentlySuppressed(array $acknowledges, &$suppression_action = null): bool {
-	CArrayHelper::sort($acknowledges, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
-
 	foreach ($acknowledges as $ack) {
 		if (!array_key_exists('suppress_until', $ack)) {
 			continue;
@@ -541,17 +548,19 @@ function isEventRecentlySuppressed(array $acknowledges, &$suppression_action = n
 }
 
 /**
- * Returns true if event is unsuppressed and not suppressed after that.
+ * Check if event is unsuppressed and not suppressed after that.
  *
- * @param array  $acknowledges
- * @param int    $acknowledges['action']
- * @param ?array $unsuppression_action   [OUT] Variable to store unsuppression action data.
+ * @param array $acknowledges  Array of acknowledges.
+ *
+ * $acknowledges = [[
+ *     'action' => (string)  Action that was performed by problem update.
+ * ]]
+ *
+ * @param array $unsuppression_action  [OUT] Variable to store unsuppression action data.
  *
  * @return bool
  */
 function isEventRecentlyUnsuppressed(array $acknowledges, &$unsuppression_action = null): bool {
-	CArrayHelper::sort($acknowledges, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
-
 	foreach ($acknowledges as $ack) {
 		if (($ack['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
 			return false;

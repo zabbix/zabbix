@@ -25,6 +25,7 @@
 #include "zbxtypes.h"
 #if defined(HAVE_POSTGRESQL)
 #	include "zbx_dbversion_constants.h"
+#	include "zbxip.h"
 #endif
 
 ZBX_CONST_PTR_VECTOR_IMPL(const_db_field_ptr, const zbx_db_field_t *)
@@ -178,7 +179,7 @@ static zbx_uint64_t	dbconn_get_cached_nextid(zbx_dbconn_t *db, size_t index, zbx
 		{
 			zbx_mutex_unlock(idcache_mutex);
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown table: %s", table_name);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		result = zbx_dbconn_select(db, "select max(%s) from %s where %s between " ZBX_FS_UI64 " and "
@@ -231,7 +232,7 @@ static zbx_uint64_t	dbconn_get_nextid(zbx_dbconn_t *db, const char *tablename, z
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Error getting table: %s", tablename);
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	while (FAIL == found)
@@ -265,7 +266,7 @@ static zbx_uint64_t	dbconn_get_nextid(zbx_dbconn_t *db, const char *tablename, z
 					zabbix_log(LOG_LEVEL_CRIT, "maximum number of id's exceeded"
 							" [table:%s, field:%s, id:" ZBX_FS_UI64 "]",
 							table->table, table->recid, ret1);
-					exit(EXIT_FAILURE);
+					zbx_exit(EXIT_FAILURE);
 				}
 			}
 
@@ -675,7 +676,7 @@ static size_t	get_string_field_size(const zbx_db_field_t *field)
 			return CUID_LEN - 1;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 }
 #endif
@@ -745,7 +746,7 @@ char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, co
 	if (NULL == (table = zbx_db_get_table(table_name)) || NULL == (field = zbx_db_get_field(table, field_name)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid table: \"%s\" field: \"%s\"", table_name, field_name);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return db_dyn_escape_field_len(field, src, ESCAPE_SEQUENCE_ON);
@@ -772,6 +773,9 @@ zbx_db_config_t	*zbx_db_config_create(void)
 void	zbx_db_config_free(zbx_db_config_t *config)
 {
 	zbx_free(config->dbhost);
+#if defined(HAVE_POSTGRESQL)
+	zbx_free(config->dbports);
+#endif
 	zbx_free(config->dbname);
 	zbx_free(config->dbschema);
 	zbx_free(config->dbuser);
@@ -835,13 +839,92 @@ int	zbx_db_config_validate_features(zbx_db_config_t *config, unsigned char progr
 	return 0 != err ? FAIL : SUCCEED;
 }
 
+#if defined(HAVE_POSTGRESQL)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse and validate database host configuration for PostgreSQL     *
+ *                                                                            *
+ * Parameters: config - [IN/OUT] database configuration                       *
+ *             error  - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - host string is valid or empty                      *
+ *               FAIL - host string contains invalid address or port          *
+ *                                                                            *
+ * Comments: This function handles multiple comma-separated addresses for     *
+ *           PostgreSQL. It extracts ports from the addresses and updates     *
+ *           the config->dbports and config->dbhost fields.                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
+{
+
+	char		*start, *result = NULL;
+	size_t		result_alloc = 0, result_offset = 0;
+	unsigned short	def_port = (0 != config->dbport ? (unsigned short)config->dbport : 5432);
+
+	if ('\0' == *config->dbhost)
+		return SUCCEED;
+
+	if (NULL == strchr(config->dbhost, ',') && NULL == strchr(config->dbhost, ':'))
+	{
+		if (0 != config->dbport)
+			config->dbports = zbx_strdcatf(NULL, "%u", config->dbport);
+
+		return SUCCEED;
+	}
+
+	for (start = config->dbhost; '\0' != *start;)
+	{
+		char		*parsed_ip = NULL, *end;
+		unsigned short	parsed_port;
+
+		if (NULL != (end = strchr(start, ',')))
+			*end = '\0';
+
+		if (SUCCEED != zbx_parse_serveractive_element(start, &parsed_ip, &parsed_port, def_port))
+		{
+			*error = zbx_dsprintf(NULL, "error parsing the \"DBHost\" parameter: address \"%s\" is "
+					"invalid", start);
+
+			zbx_free(result);
+			zbx_free(config->dbports);
+
+			return FAIL;
+		}
+
+		if (NULL != config->dbports)
+			config->dbports = zbx_strdcatf(config->dbports, ",%u", parsed_port);
+		else
+			config->dbports = zbx_strdcatf(NULL, "%u", parsed_port);
+
+		if (NULL != result)
+			zbx_strcpy_alloc(&result, &result_alloc, &result_offset, ",");
+
+		zbx_strcpy_alloc(&result, &result_alloc, &result_offset, parsed_ip);
+
+		zbx_free(parsed_ip);
+
+		if (NULL != end)
+			start = end + 1;
+		else
+			break;
+	}
+
+	zbx_free(config->dbhost);
+	config->dbhost = result;
+
+	return SUCCEED;
+}
+
+#endif
+
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 static void	check_cfg_empty_str(const char *parameter, const char *value)
 {
 	if (NULL != value && 0 == strlen(value))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"%s\" is defined but empty", parameter);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -852,6 +935,16 @@ static void	check_cfg_empty_str(const char *parameter, const char *value)
  ******************************************************************************/
 void	zbx_db_config_validate(zbx_db_config_t *config)
 {
+#ifdef HAVE_POSTGRESQL
+	char *error = NULL;
+
+	if (SUCCEED != zbx_dbconn_parse_and_validate_dbhost(config, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+#endif
 	check_cfg_empty_str("DBTLSConnect", config->db_tls_connect);
 	check_cfg_empty_str("DBTLSCertFile", config->db_tls_cert_file);
 	check_cfg_empty_str("DBTLSKeyFile", config->db_tls_key_file);
@@ -866,7 +959,7 @@ void	zbx_db_config_validate(zbx_db_config_t *config)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"DBTLSConnect\" configuration parameter: '%s'",
 				config->db_tls_connect);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (NULL != config->db_tls_connect &&
@@ -876,7 +969,7 @@ void	zbx_db_config_validate(zbx_db_config_t *config)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "parameter \"DBTLSConnect\" value \"%s\" requires \"DBTLSCAFile\", but it"
 				" is not defined", config->db_tls_connect);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if ((NULL != config->db_tls_cert_file || NULL != config->db_tls_key_file) &&
@@ -885,14 +978,14 @@ void	zbx_db_config_validate(zbx_db_config_t *config)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "parameter \"DBTLSKeyFile\" or \"DBTLSCertFile\" is defined, but"
 				" \"DBTLSKeyFile\", \"DBTLSCertFile\" or \"DBTLSCAFile\" is not defined");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (NULL != config->dbsocket && 0 != config->dbport)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Both parameters \"DBPort\" and \"DBSocket\" are defined. Either one of "
 				"them can be defined, or neither.");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 #endif
@@ -1455,9 +1548,9 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
  ******************************************************************************/
 const char	*zbx_db_sql_id_ins(zbx_uint64_t id)
 {
-	static unsigned char	n = 0;
-	static char		buf[4][21];	/* 20 - value size, 1 - '\0' */
-	static const char	null[5] = "null";
+	static ZBX_THREAD_LOCAL unsigned char	n = 0;
+	static ZBX_THREAD_LOCAL char		buf[4][21];	/* 20 - value size, 1 - '\0' */
+	static const char			null[5] = "null";
 
 	if (0 == id)
 		return null;
@@ -1481,8 +1574,8 @@ const char	*zbx_db_sql_id_ins(zbx_uint64_t id)
  ******************************************************************************/
 const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
 {
-	static char		buf[22];	/* 1 - '=', 20 - value size, 1 - '\0' */
-	static const char	is_null[9] = " is null";
+	static ZBX_THREAD_LOCAL char		buf[22];	/* 1 - '=', 20 - value size, 1 - '\0' */
+	static const char			is_null[9] = " is null";
 
 	if (0 == id)
 		return is_null;

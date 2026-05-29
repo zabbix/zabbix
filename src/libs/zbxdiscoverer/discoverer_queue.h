@@ -24,7 +24,7 @@ typedef struct
 {
 	int					workers_num;
 	zbx_list_t				jobs;
-	zbx_uint64_t				pending_checks_count;
+	zbx_uint64_t				pending_checks_count;	/* ZBX_IPC_DISCOVERER_QUEUE */
 	int					snmp_allowed_workers;
 	int					checks_per_worker_max;
 	pthread_mutex_t				lock;

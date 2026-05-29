@@ -169,6 +169,7 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
 		zbx_variant_t *value, zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt);
 size_t	zbx_dc_flush_history(void);
+void	zbx_history_cache_destroy_local_cache(void);
 void	zbx_hc_pop_items(zbx_vector_hc_item_ptr_t *history_items);
 void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_hc_item_ptr_t *history_items);
 void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items);
@@ -194,6 +195,7 @@ void	zbx_dc_update_interfaces_availability(void);
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
 void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index);
 int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid);
+int	zbx_hc_is_itemid_cached_and_normal(zbx_uint64_t itemid);
 void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
 void	zbx_hc_get_items_unlocked(zbx_vector_uint64_pair_t *items);
 int	zbx_hc_check_high_usage_timer(void);

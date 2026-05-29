@@ -304,7 +304,7 @@ static const char *field_type_to_name(int type)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "unexpected http field type: ->%d<-", type);
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
