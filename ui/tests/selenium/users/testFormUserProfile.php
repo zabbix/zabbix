@@ -15,8 +15,7 @@
 
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
-
-use Facebook\WebDriver\WebDriverBy;
+require_once __DIR__ . '/../../include/CWebTest.php';
 
 /**
  * @backup users
@@ -43,7 +42,7 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		$this->zbxTestCheckTitle('Profile');
 
-		$this->zbxTestClickWait('update');
+		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'User updated');
 		$this->zbxTestCheckHeader('Global view');
 
@@ -59,7 +58,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Profile');
 		$this->zbxTestInputTypeOverwrite('refresh', '60');
 
-		$this->zbxTestClickWait('cancel');
+		$this->query('button:Cancel')->waitUntilClickable()->one()->click();
 		$this->zbxTestCheckHeader('Global view');
 
 		$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
@@ -266,7 +265,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$form = $this->query('name:userprofile_form')->asForm()->waitUntilVisible()->one();
 
 		$this->zbxTestInputTypeOverwrite('refresh', $data['refresh']);
-		$this->zbxTestClickWait('update');
+		$this->query('button:Update')->waitUntilClickable()->one()->click();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -375,7 +374,7 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		$this->zbxTestCheckboxSelect('autologout_visible', true);
 		$this->zbxTestInputTypeOverwrite('autologout', $data['autologout']);
-		$this->zbxTestClickWait('update');
+		$this->query('button:Update')->waitUntilClickable()->one()->click();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -524,7 +523,7 @@ class testFormUserProfile extends CLegacyWebTest {
 			$this->zbxTestCheckboxSelect('messages_show_suppressed', $data['suppressed']);
 		}
 
-		$this->zbxTestClickWait('update');
+		$this->query('button:Update')->waitUntilClickable()->one()->click();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -608,7 +607,7 @@ class testFormUserProfile extends CLegacyWebTest {
 			case TEST_GOOD:
 				$this->zbxTestWaitForPageToLoad();
 				COverlayDialogElement::ensureNotPresent();
-				$this->zbxTestClickWait('update');
+				$this->zbxTestClickXpathWait('//button[contains(@class,"js-submit")]');
 				$this->assertMessage(TEST_GOOD, 'User updated');
 				$this->zbxTestCheckHeader('Global view');
 				$sql = "SELECT * FROM media WHERE sendto = '".$data['send_to']."'";
@@ -618,5 +617,30 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->assertInlineError($form, $data['error_msg']);
 				break;
 		}
+	}
+
+	/**
+	 * Verify that checkbox state is preserved after failed update.
+	 */
+	public function testFormUserProfile_triggerSeverity() {
+		$trigger_severity = [
+			'Recovery' => false,
+			'Not classified' => false,
+			'Information' => false,
+			'Warning' => false,
+			'Average' => false,
+			'High' => false,
+			'Disaster' => false
+		];
+
+		$this->page->login()->open('zabbix.php?action=userprofile.notification.edit')->waitUntilReady();
+		$form = $this->query('id:userprofile-notification-form')->asForm()->one();
+		$form->selectTab('Frontend notifications');
+		$form->fill(['Frontend notifications' => true, 'Message timeout' => '86401']);
+		$form->fill($trigger_severity);
+		$this->page->removeFocus();
+		$this->assertInlineError($form, ['Message timeout' => 'Value must be between 30s and 86400s (1d).']);
+		$form->submit();
+		$form->checkValue($trigger_severity);
 	}
 }

@@ -68,7 +68,7 @@ static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_jso
 
 	zbx_report_test(&jp_data, user.userid, &j);
 	zbx_tcp_send_bytes_to(sock, j.buffer, j.buffer_size, config_timeout);
-	zbx_json_clean(&j);
+	zbx_json_free(&j);
 out:
 	zbx_user_free(&user);
 }
@@ -287,7 +287,7 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 #ifndef ZBX_DEBUG
 		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", jp->start);
 #endif
-		recv_proxy_data(sock, jp, ts, events_cbs, config_comms->config_timeout, proxydata_frequency);
+		recv_proxy_data(rtc, sock, jp, ts, events_cbs, config_comms->config_timeout, proxydata_frequency);
 
 		return SUCCEED;
 	}

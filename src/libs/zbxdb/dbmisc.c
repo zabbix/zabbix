@@ -25,6 +25,7 @@
 #include "zbxtypes.h"
 #if defined(HAVE_POSTGRESQL)
 #	include "zbx_dbversion_constants.h"
+#	include "zbxip.h"
 #endif
 
 ZBX_CONST_PTR_VECTOR_IMPL(const_db_field_ptr, const zbx_db_field_t *)
@@ -772,6 +773,9 @@ zbx_db_config_t	*zbx_db_config_create(void)
 void	zbx_db_config_free(zbx_db_config_t *config)
 {
 	zbx_free(config->dbhost);
+#if defined(HAVE_POSTGRESQL)
+	zbx_free(config->dbports);
+#endif
 	zbx_free(config->dbname);
 	zbx_free(config->dbschema);
 	zbx_free(config->dbuser);
@@ -835,6 +839,85 @@ int	zbx_db_config_validate_features(zbx_db_config_t *config, unsigned char progr
 	return 0 != err ? FAIL : SUCCEED;
 }
 
+#if defined(HAVE_POSTGRESQL)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse and validate database host configuration for PostgreSQL     *
+ *                                                                            *
+ * Parameters: config - [IN/OUT] database configuration                       *
+ *             error  - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - host string is valid or empty                      *
+ *               FAIL - host string contains invalid address or port          *
+ *                                                                            *
+ * Comments: This function handles multiple comma-separated addresses for     *
+ *           PostgreSQL. It extracts ports from the addresses and updates     *
+ *           the config->dbports and config->dbhost fields.                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
+{
+
+	char		*start, *result = NULL;
+	size_t		result_alloc = 0, result_offset = 0;
+	unsigned short	def_port = (0 != config->dbport ? (unsigned short)config->dbport : 5432);
+
+	if ('\0' == *config->dbhost)
+		return SUCCEED;
+
+	if (NULL == strchr(config->dbhost, ',') && NULL == strchr(config->dbhost, ':'))
+	{
+		if (0 != config->dbport)
+			config->dbports = zbx_strdcatf(NULL, "%u", config->dbport);
+
+		return SUCCEED;
+	}
+
+	for (start = config->dbhost; '\0' != *start;)
+	{
+		char		*parsed_ip = NULL, *end;
+		unsigned short	parsed_port;
+
+		if (NULL != (end = strchr(start, ',')))
+			*end = '\0';
+
+		if (SUCCEED != zbx_parse_serveractive_element(start, &parsed_ip, &parsed_port, def_port))
+		{
+			*error = zbx_dsprintf(NULL, "error parsing the \"DBHost\" parameter: address \"%s\" is "
+					"invalid", start);
+
+			zbx_free(result);
+			zbx_free(config->dbports);
+
+			return FAIL;
+		}
+
+		if (NULL != config->dbports)
+			config->dbports = zbx_strdcatf(config->dbports, ",%u", parsed_port);
+		else
+			config->dbports = zbx_strdcatf(NULL, "%u", parsed_port);
+
+		if (NULL != result)
+			zbx_strcpy_alloc(&result, &result_alloc, &result_offset, ",");
+
+		zbx_strcpy_alloc(&result, &result_alloc, &result_offset, parsed_ip);
+
+		zbx_free(parsed_ip);
+
+		if (NULL != end)
+			start = end + 1;
+		else
+			break;
+	}
+
+	zbx_free(config->dbhost);
+	config->dbhost = result;
+
+	return SUCCEED;
+}
+
+#endif
+
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 static void	check_cfg_empty_str(const char *parameter, const char *value)
 {
@@ -852,6 +935,16 @@ static void	check_cfg_empty_str(const char *parameter, const char *value)
  ******************************************************************************/
 void	zbx_db_config_validate(zbx_db_config_t *config)
 {
+#ifdef HAVE_POSTGRESQL
+	char *error = NULL;
+
+	if (SUCCEED != zbx_dbconn_parse_and_validate_dbhost(config, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+#endif
 	check_cfg_empty_str("DBTLSConnect", config->db_tls_connect);
 	check_cfg_empty_str("DBTLSCertFile", config->db_tls_cert_file);
 	check_cfg_empty_str("DBTLSKeyFile", config->db_tls_key_file);

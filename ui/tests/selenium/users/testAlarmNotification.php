@@ -20,19 +20,17 @@ require_once __DIR__ . '/../../include/CWebTest.php';
  * @backup profiles
  *
  * @onBefore prepareAlarmData
- *
- * @onAfterEach closeAndAcknowledgeEvents
  */
 class testAlarmNotification extends CWebTest {
 
 	/**
-	 * Attach MessageBehavior, CTableBehavior to the test.
+	 * Attach MessageBehavior, CDatatableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			CTableBehavior::class,
+			CDatatableBehavior::class,
 			CMessageBehavior::class
 		];
 	}
@@ -219,6 +217,7 @@ class testAlarmNotification extends CWebTest {
 	/**
 	 * Check Alarm notification overlay dialog layout.
 	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 * @onAfter openResetedPage
 	 */
 	public function testAlarmNotification_Layout() {
@@ -312,6 +311,7 @@ class testAlarmNotification extends CWebTest {
 	/**
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
 	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 * @onAfter deleteEvents
 	 */
 	public function testAlarmNotification_CheckColorChange() {
@@ -441,6 +441,7 @@ class testAlarmNotification extends CWebTest {
 	/**
 	 * Check that correct problems displayed in alarm notification overlay.
 	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 * @dataProvider getDisplayedProblemsData
 	 */
 	public function testAlarmNotification_DisplayedProblems($data) {
@@ -452,7 +453,7 @@ class testAlarmNotification extends CWebTest {
 				self::$hostid[self::HOST_NAME])->waitUntilReady();
 
 		// Check that problems displayed in table.
-		$this->assertTableDataColumn($data['trigger_name'], 'Problem');
+		$this->assertDatatableDataColumn($data['trigger_name'], 'Problem');
 
 		// Find appeared Alarm notification overlay dialog and check triggered problems by trigger name.
 		$alarm_dialog = $this->getAlarmOverlay();
@@ -638,7 +639,7 @@ class testAlarmNotification extends CWebTest {
 
 		// Check that problems displayed in table.
 		$triggered_problems = (array_key_exists('suppressed_problem', $data)) ? $data['suppressed_problem'] : self::ALL_TRIGGERS;
-		$this->assertTableDataColumn($triggered_problems, 'Problem');
+		$this->assertDatatableDataColumn($triggered_problems, 'Problem');
 
 		if ($data['trigger_name'] === '') {
 			$this->assertFalse($this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->one()->isDisplayed());
@@ -658,9 +659,6 @@ class testAlarmNotification extends CWebTest {
 
 	/**
 	 * Delete the events so they don't appear in the next test case.
-	 *
-	 * TODO: test fails on Jenkins with error "Failed to write session data".
-	 * Adding DB::delete in onAfter instead of at the end of the test might help.
 	 */
 	protected function deleteEvents() {
 		DB::delete('events', ['eventid' => self::$eventids]);

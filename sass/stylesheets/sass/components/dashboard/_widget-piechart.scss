@@ -61,8 +61,6 @@ form.dashboard-widget-piechart {
 				text-align: right;
 				min-width: 60px;
 				max-width: 150px;
-
-				@extend %overflow-ellipsis;
 			}
 
 			&:first-child {

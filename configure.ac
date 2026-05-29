@@ -14,7 +14,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix], [8.0.0beta1])
+AC_INIT([Zabbix], [8.0.0beta2])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -385,6 +385,27 @@ dnl AIX
 AC_SEARCH_LIBS(perfstat_memory_total, perfstat, [AC_DEFINE([HAVE_LIBPERFSTAT], 1, [Define to 1 if you have the 'libperfstat' library (-lperfstat)])])
 AC_SEARCH_LIBS(devstat_getdevs, devstat, [AC_DEFINE([HAVE_LIBDEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
 AC_SEARCH_LIBS(getdevs, devstat, [AC_DEFINE([HAVE_LIBDEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
+
+case "$host_os" in
+  aix*)
+    AC_MSG_CHECKING([for ODM libraries (-lodm -lcfg)])
+    saved_LIBS="$LIBS"
+    LIBS="$LIBS -lodm -lcfg"
+    AC_LINK_IFELSE(
+      [AC_LANG_PROGRAM(
+        [#include <odmi.h>
+         #include <sys/cfgodm.h>],
+        [odm_initialize();
+         odm_open_class(CuAt_CLASS);]
+      )],
+      [AC_MSG_RESULT([yes])
+       AC_DEFINE([HAVE_LIBODM], 1, [Define to 1 if you have the ODM libraries (-lodm -lcfg)])],
+      [AC_MSG_RESULT([no])
+       LIBS="$saved_LIBS"
+       AC_MSG_ERROR([ODM libraries (-lodm -lcfg) not found, ODM support will not be available])]
+    )
+    ;;
+esac
 
 dnl on FreeBSD we have to link with -lexecinfo to get backtraces and also check jail_getname() availability (available after __FreeBSD_version >= 800099)
 AC_SEARCH_LIBS(backtrace_symbols, execinfo, [AC_DEFINE([HAVE_LIBEXECINFO], 1, [Define to 1 if you have the 'libexecinfo' library (-lexecinfo)])])

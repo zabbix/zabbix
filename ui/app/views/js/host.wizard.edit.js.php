@@ -1206,7 +1206,7 @@ window.host_wizard_edit = new class {
 	}
 
 	#updateForm(path, new_value, old_value) {
-		if (this.#form_update_locked) {
+		if (this.#form_update_locked || this.#show_cancel_screen) {
 			this.#pending_form_update = true;
 
 			return;
@@ -2240,10 +2240,15 @@ window.host_wizard_edit = new class {
 				message: `${type === 'error' && messages.length > 1 ? '- ' : ''}${message}`
 			});
 
-			if (field.parentElement.classList.contains(ZBX_STYLE_FORM_FIELD)) {
+			const parent = field.parentElement;
+
+			if (parent.classList.contains(ZBX_STYLE_FORM_FIELD)) {
 				field.parentNode.insertBefore(message_element, field.nextSibling);
+			}
+			else if (parent.parentElement.classList.contains('<?= CMacroValue::ZBX_STYLE_MACRO_INPUT_GROUP ?>')) {
+				parent.parentElement.parentNode.insertBefore(message_element, field.nextSibling);
 			} else {
-				field.parentElement.parentNode.insertBefore(message_element, field.parentElement.nextSibling);
+				parent.parentNode.insertBefore(message_element, parent.nextSibling);
 			}
 		});
 	}

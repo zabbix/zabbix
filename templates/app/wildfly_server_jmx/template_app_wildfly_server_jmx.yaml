@@ -8,7 +8,7 @@ zabbix_export:
       template: 'WildFly Server by JMX'
       name: 'WildFly Server by JMX'
       description: |
-        Official JMX Template for WildFly.
+        The template to monitor WildFly Domain by Zabbix that work without any external scripts.
         The metrics are collected by JMX. This template works with standalone and domain instances.
         You can set {$WILDFLY.USER} and {$WILDFLY.PASSWORD} macros in the template for using on the host level.
         
@@ -34,7 +34,7 @@ zabbix_export:
         Depending on your server setup, you may need to specify a custom JMX scheme in host wizard configuration field `Protocol` (default: remote+http)
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -1430,24 +1430,30 @@ zabbix_export:
             description: 'Filter to exclude discovered deployments'
         - macro: '{$WILDFLY.JMX.PROTOCOL}'
           value: remote+http
+          description: 'WildFly JMX protocol.'
           config:
             type: TEXT
             priority: '3'
             label: Protocol
+            description: 'WildFly JMX protocol.'
             required: 'YES'
         - macro: '{$WILDFLY.PASSWORD}'
-          value: zabbix
+          type: SECRET_TEXT
+          description: 'WildFly JMX password.'
           config:
             type: TEXT
             priority: '2'
             label: Password
+            description: 'WildFly JMX password.'
             required: 'YES'
         - macro: '{$WILDFLY.USER}'
           value: zabbix
+          description: 'WildFly JMX username.'
           config:
             type: TEXT
             priority: '1'
             label: Username
+            description: 'WildFly JMX username.'
             required: 'YES'
       valuemaps:
         - uuid: 4004b5f2501f44a69dc86afce3daa4d1

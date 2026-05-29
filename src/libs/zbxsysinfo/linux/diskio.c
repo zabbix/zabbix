@@ -17,6 +17,9 @@
 
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbxregexp.h"
+#include "zbxalgo.h"
+#include "zbxnum.h"
 
 #include "../common/stats.h"
 #include "../common/diskdevices.h"
@@ -25,6 +28,13 @@
 #define ZBX_DEV_READ		0
 #define ZBX_DEV_WRITE		1
 #define ZBX_SYS_BLKDEV_PFX	"/sys/dev/block/"
+#define ZBX_SYS_DISK_BYID_PFX	"/dev/disk/by-id/"
+#define ZBX_MODE_DISKS		0
+#define ZBX_MODE_DISK_STATS	1
+#define ZBX_MODE_DEVICES	2
+#define ZBX_MODE_DEVICE_STATS	3
+
+#define ZBX_SECTOR_SIZE		512
 
 #if defined(KERNEL_2_4)
 #	define INFO_FILE_NAME	"/proc/partitions"
@@ -67,6 +77,18 @@
 				) != 7								\
 				) continue
 #endif
+
+typedef struct
+{
+	unsigned int	major;
+	unsigned int	minor;
+	char		*devid;
+	char		*name;
+}
+zbx_device_t;
+
+ZBX_PTR_VECTOR_DECL(device_ptr, zbx_device_t*)
+ZBX_PTR_VECTOR_IMPL(device_ptr, zbx_device_t*)
 
 int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
@@ -292,13 +314,29 @@ int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 #define DEVTYPE_STR	"DEVTYPE="
 #define DEVTYPE_STR_LEN	ZBX_CONST_STRLEN(DEVTYPE_STR)
-static void	process_entry(struct dirent *entries, zbx_stat_t *stat_buf, int sysfs_found, struct zbx_json *j)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets device type                                                  *
+ *                                                                            *
+ * Parameters: dev_name    - [IN]  like in /dev/<dev_name>                    *
+ *             sysfs_found - [IN]  1 if sysfs a filesystem for exporting      *
+ *                                 kernel objects is available at             *
+ *                                 /sys/dev/block/, otherwise 0               *
+ *             stat_buf    - [OUT] can be used to get major-id and minor-id   *
+ *                                 of the device                              *
+ *                                                                            *
+ * Return value: device type, examples: disk, rom, partition                  *
+ *                                                                            *
+ * Comments: allocates memory for the return value                            *
+ *                                                                            *
+ ******************************************************************************/
+static char	*dev_type_get(const char *dev_name, const int sysfs_found, zbx_stat_t *stat_buf)
 {
 /* SCSI device type CD/DVD-ROM. http://en.wikipedia.org/wiki/SCSI_Peripheral_Device_Type */
 #define SCSI_TYPE_ROM			0x05
 	char		tmp[MAX_STRING_LEN];
 
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_DEV_PFX "%s", entries->d_name);
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_DEV_PFX "%s", dev_name);
 
 	if (0 == zbx_stat(tmp, stat_buf) && 0 != S_ISBLK(stat_buf->st_mode))
 	{
@@ -333,7 +371,7 @@ static void	process_entry(struct dirent *entries, zbx_stat_t *stat_buf, int sysf
 				zbx_fclose(f);
 			}
 			else
-				return;
+				return NULL;
 
 			if (0 == devtype_found)
 			{
@@ -368,14 +406,16 @@ static void	process_entry(struct dirent *entries, zbx_stat_t *stat_buf, int sysf
 
 		if (0 == dev_bypass)
 		{
-			zbx_json_addobject(j, NULL);
-			zbx_json_addstring(j, "{#DEVNAME}", entries->d_name, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(j, "{#DEVTYPE}", 1 == devtype_found ? tmp + offset :
-					(1 == uevent_found ? sys_blkdev_pfx_uevent + offset : ""),
-					ZBX_JSON_TYPE_STRING);
-			zbx_json_close(j);
+			if (1 == devtype_found)
+				return zbx_strdup(NULL, tmp + offset);
+			else if (1 == uevent_found)
+				return zbx_strdup(NULL, sys_blkdev_pfx_uevent + offset);
+			else
+				return zbx_strdup(NULL, "");
 		}
 	}
+
+	return NULL;
 #undef SCSI_TYPE_ROM
 }
 
@@ -401,7 +441,16 @@ int	vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		while (NULL != (entries = readdir(dir)))
 		{
-			process_entry(entries, &stat_buf, sysfs_found, &j);
+			char	*devtype;
+
+			if (NULL != (devtype = dev_type_get(entries->d_name, sysfs_found, &stat_buf)))
+			{
+				zbx_json_addobject(&j, NULL);
+				zbx_json_addstring(&j, "{#DEVNAME}", entries->d_name, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&j, "{#DEVTYPE}", devtype, ZBX_JSON_TYPE_STRING);
+				zbx_json_close(&j);
+				zbx_free(devtype);
+			}
 		}
 		closedir(dir);
 	}
@@ -418,4 +467,645 @@ int	vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 #undef DEVTYPE_STR
 #undef DEVTYPE_STR_LEN
+}
+
+static void	dev_path_add(const char *d_name, struct zbx_json *j)
+{
+	char	path[MAX_STRING_LEN];
+
+	zbx_snprintf(path, sizeof(path), ZBX_DEV_PFX "%s", d_name);
+	zbx_json_addstring(j, "path", path, ZBX_JSON_TYPE_STRING);
+}
+
+static void	dev_serial_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
+{
+	FILE	*f;
+	int	found = FAIL;
+	char	buf[MAX_STRING_LEN];
+
+	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_BLKDEV_PFX "%u:%u/device/serial", major(stat_buf->st_rdev),
+			minor(stat_buf->st_rdev));
+
+	if (NULL != (f = fopen(buf, "r")))
+	{
+		if (NULL != fgets(buf, sizeof(buf), f))
+		{
+			found = SUCCEED;
+			zbx_lrtrim(buf, ZBX_WHITESPACE);
+		}
+		zbx_fclose(f);
+	}
+
+	if (SUCCEED == found)
+		zbx_json_addstring(j, "serial", buf, ZBX_JSON_TYPE_STRING);
+}
+
+static void	dev_wwn_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
+{
+	FILE	*f;
+	int	found = FAIL;
+	char	buf[MAX_STRING_LEN];
+
+	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_BLKDEV_PFX "%u:%u/device/wwid", major(stat_buf->st_rdev),
+			minor(stat_buf->st_rdev));
+
+	if (NULL != (f = fopen(buf, "r")))
+	{
+		if (NULL != fgets(buf, sizeof(buf), f))
+		{
+			found = SUCCEED;
+			zbx_lrtrim(buf, ZBX_WHITESPACE);
+		}
+		zbx_fclose(f);
+	}
+
+	if (SUCCEED == found)
+		zbx_json_addstring(j, "wwn", buf, ZBX_JSON_TYPE_STRING);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Comments: allocates memory                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static char	*dev_model_get(zbx_stat_t *stat_buf)
+{
+	FILE	*f;
+	char	buf[MAX_STRING_LEN], *model = NULL;
+
+	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_BLKDEV_PFX "%u:%u/device/model", major(stat_buf->st_rdev),
+			minor(stat_buf->st_rdev));
+
+	if (NULL != (f = fopen(buf, "r")))
+	{
+		if (NULL != fgets(buf, sizeof(buf), f))
+			model = zbx_strdup(NULL, buf);
+		zbx_fclose(f);
+	}
+
+	if (NULL == model)
+		model = zbx_strdup(NULL, "");
+	else
+		zbx_lrtrim(model, ZBX_WHITESPACE);
+
+	return model;
+}
+
+static void	dev_size_bytes_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
+{
+	FILE		*f;
+	char		buf[MAX_STRING_LEN];
+	zbx_uint64_t	size = 0;
+	int		found = FAIL;
+
+	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_BLKDEV_PFX "%u:%u/size", major(stat_buf->st_rdev),
+			minor(stat_buf->st_rdev));
+
+	if (NULL != (f = fopen(buf, "r")))
+	{
+		if (NULL != fgets(buf, sizeof(buf), f))
+		{
+			/* The size is in standard UNIX 512 byte blocks           */
+			/* and it must be multiplied by 512 to get size in bytes. */
+			zbx_lrtrim(buf, ZBX_WHITESPACE);
+			ZBX_STR2UINT64(size, buf);
+			size *= ZBX_SECTOR_SIZE;
+			found = SUCCEED;
+		}
+		zbx_fclose(f);
+	}
+
+	if (SUCCEED == found)
+		zbx_json_adduint64(j, "size_bytes", size);
+}
+
+static void	dev_logical_blksize_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
+{
+	FILE		*f;
+	char		buf[MAX_STRING_LEN];
+	zbx_uint64_t	size = 0;
+	int		found = FAIL;
+
+	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_BLKDEV_PFX "%u:%u/queue/logical_block_size", major(stat_buf->st_rdev),
+			minor(stat_buf->st_rdev));
+
+	if (NULL != (f = fopen(buf, "r")))
+	{
+		if (NULL != fgets(buf, sizeof(buf), f))
+		{
+			zbx_lrtrim(buf, ZBX_WHITESPACE);
+			ZBX_STR2UINT64(size, buf);
+			found = SUCCEED;
+		}
+		zbx_fclose(f);
+	}
+
+	if (SUCCEED == found)
+		zbx_json_adduint64(j, "logical_block_size", size);
+}
+
+static void	dev_physical_blksize_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
+{
+	FILE		*f;
+	char		buf[MAX_STRING_LEN];
+	zbx_uint64_t	size = 0;
+	int		found = FAIL;
+
+	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_BLKDEV_PFX "%u:%u/queue/physical_block_size", major(stat_buf->st_rdev),
+			minor(stat_buf->st_rdev));
+
+	if (NULL != (f = fopen(buf, "r")))
+	{
+		if (NULL != fgets(buf, sizeof(buf), f))
+		{
+			zbx_lrtrim(buf, ZBX_WHITESPACE);
+			ZBX_STR2UINT64(size, buf);
+			found = SUCCEED;
+		}
+		zbx_fclose(f);
+	}
+
+	if (SUCCEED == found)
+		zbx_json_adduint64(j, "physical_block_size", size);
+}
+
+static void	dev_stats_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
+{
+	FILE		*f;
+	char		buf[MAX_STRING_LEN];
+
+	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_BLKDEV_PFX "%u:%u/stat", major(stat_buf->st_rdev),
+			minor(stat_buf->st_rdev));
+
+	if (NULL != (f = fopen(buf, "r")))
+	{
+		if (NULL != fgets(buf, sizeof(buf), f))
+		{
+			char		*tok, *saveptr;
+			int		tok_idx = 0, opened = 0;
+			zbx_uint64_t	val;
+
+			tok = strtok_r(buf, " ", &saveptr);
+
+			if (NULL != tok)
+			{
+				zbx_json_addobject(j, "stats");
+				opened = 1;
+			}
+
+			while (NULL != tok && 10 >= tok_idx)
+			{
+				switch (tok_idx)
+				{
+					case 0:
+						ZBX_STR2UINT64(val, tok);
+						zbx_json_adduint64(j, "reads_completed", val);
+						break;
+					case 2:
+						ZBX_STR2UINT64(val, tok);
+						zbx_json_adduint64(j, "bytes_read", val * ZBX_SECTOR_SIZE);
+						break;
+					case 4:
+						ZBX_STR2UINT64(val, tok);
+						zbx_json_adduint64(j, "writes_completed", val);
+						break;
+					case 6:
+						ZBX_STR2UINT64(val, tok);
+						zbx_json_adduint64(j, "bytes_written", val * ZBX_SECTOR_SIZE);
+						break;
+					case 10:
+						ZBX_STR2UINT64(val, tok);
+						zbx_json_adduint64(j, "io_time_ms", val);
+						break;
+				}
+
+				tok = strtok_r(NULL, " ", &saveptr);
+				tok_idx++;
+			}
+
+			if (1 == opened)
+				zbx_json_close(j);
+		}
+		zbx_fclose(f);
+	}
+}
+
+static void	dev_disk_partition_sizes_add(zbx_stat_t *stat_buf, struct zbx_json *j)
+{
+	DIR		*dir;
+	struct dirent	*entry;
+	char		buf[MAX_STRING_LEN];
+
+	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_BLKDEV_PFX "%u:%u", major(stat_buf->st_rdev),
+			minor(stat_buf->st_rdev));
+
+	zbx_json_addobject(j, "partitions");
+
+	if (NULL == (dir = opendir(buf)))
+	{
+		zbx_json_close(j);
+
+		return;
+	}
+
+	while (NULL != (entry = readdir(dir)))
+	{
+		FILE		*f = NULL;
+		zbx_stat_t	st;
+
+		zbx_snprintf(buf, sizeof(buf), ZBX_SYS_BLKDEV_PFX "%u:%u/%s/partition", major(stat_buf->st_rdev),
+				minor(stat_buf->st_rdev), entry->d_name);
+
+		/* partition directories should contain a text file named "partition" */
+		if (0 != zbx_stat(buf, &st) || 0 == S_ISREG(st.st_mode))
+			continue;
+
+		zbx_snprintf(buf, sizeof(buf), ZBX_SYS_BLKDEV_PFX "%u:%u/%s/size", major(stat_buf->st_rdev),
+				minor(stat_buf->st_rdev), entry->d_name);
+
+		if (NULL != (f = fopen(buf, "r")) && NULL != fgets(buf, sizeof(buf), f))
+		{
+			zbx_uint64_t	size = 0;
+
+			/* The size is in standard UNIX 512 byte blocks           */
+			/* and it must be multiplied by 512 to get size in bytes. */
+			zbx_lrtrim(buf, ZBX_WHITESPACE);
+			ZBX_STR2UINT64(size, buf);
+			size *= ZBX_SECTOR_SIZE;
+
+			zbx_json_adduint64(j, entry->d_name, size);
+		}
+
+		zbx_fclose(f);
+	}
+
+	closedir(dir);
+	zbx_json_close(j);
+}
+
+static void	device_free(zbx_device_t *device)
+{
+	zbx_free(device->devid);
+	zbx_free(device->name);
+	zbx_free(device);
+}
+
+static int	device_compare(const void *d1, const void *d2)
+{
+	const zbx_device_t	*p1 = *(zbx_device_t * const *)d1;
+	const zbx_device_t	*p2 = *(zbx_device_t * const *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(p1->major, p2->major);
+	ZBX_RETURN_IF_NOT_EQUAL(p1->minor, p2->minor);
+
+	return strcmp(p1->devid, p2->devid);
+}
+
+static void	devids_init(zbx_vector_device_ptr_t *devices)
+{
+	DIR		*dir;
+	struct dirent	*entry;
+	char		buf[MAX_STRING_LEN];
+
+	zbx_vector_device_ptr_create(devices);
+
+	if (NULL == (dir = opendir(ZBX_SYS_DISK_BYID_PFX)))
+		return;
+
+	while (NULL != (entry = readdir(dir)))
+	{
+		zbx_device_t	*device;
+		zbx_stat_t	stat_buf;
+		char		*real;
+
+		if (0 == strcmp(entry->d_name, ".") || 0 == strcmp(entry->d_name, ".."))
+			continue;
+
+		zbx_snprintf(buf, sizeof(buf), ZBX_SYS_DISK_BYID_PFX "%s", entry->d_name);
+
+		if (NULL == (real = realpath(buf, NULL)))
+			continue;
+
+		if (0 != zbx_stat(real, &stat_buf) || 0 == S_ISBLK(stat_buf.st_mode))
+		{
+			zbx_free(real);
+			continue;
+		}
+
+		device = zbx_malloc(NULL, sizeof(zbx_device_t));
+
+		device->major = major(stat_buf.st_rdev);
+		device->minor = minor(stat_buf.st_rdev);
+		device->devid = zbx_strdup(NULL, entry->d_name);
+		device->name = zbx_strdup(NULL, basename(real));
+
+		zbx_vector_device_ptr_append(devices, device);
+
+		zbx_free(real);
+	}
+
+	closedir(dir);
+
+	if (0 < devices->values_num)
+		zbx_vector_device_ptr_sort(devices, device_compare);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: adds device ID in format like in /dev/disk/by-id/                 *
+ *                                                                            *
+ * Parameters: devices  - [IN] cache of pre-sorted devices with IDs           *
+ *             stat_buf - [IN] needed to identify current device by           *
+ *                             major-id and minor-id                          *
+ *             model    - [IN]                                                *
+ *             json     - [OUT]                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ * When more than one device ID is present for the particular device,         *
+ * the device ID containing the model of the device is preferred since it is  *
+ * human readable.                                                            *
+ *                                                                            *
+ * The algorithm of getting device IDs is the following:                      *
+ * 1. Read all names of the symlinks in /dev/disk/by-id/. Treat them as       *
+ * device IDs and get <major-ID> and <minor-ID> for each of them.             *
+ * 2. Sort devices by <major-ID> and <minor-ID>.                              *
+ * Sort IDs of the same device in lexicographical order.                      *
+ * 3. If there is only one device ID for the symlink, then use it.            *
+ * 4. Else try to find the device ID which contains device model.             *
+ *    The device ID containing the model of the device is preferred since it  *
+ *    is human readable.                                                      *
+ *   4.1. Get the model from                                                  *
+ *        /sys/dev/block/<major-ID>:<minor-ID>/device/model                   *
+ *   4.2. Take the continuous part of the model from the left which contains  *
+ *        only the following symbols: alphanumeric, digits, dots and spaces.  *
+ *        Replace spaces by underscores in model.                             *
+ *   4.3. Choose the device ID which contains the model if found.             *
+ * 5. Else take the first symlink for this device.                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	vfs_dev_get_devid_add(const zbx_vector_device_ptr_t *devices, const zbx_stat_t *stat_buf,
+		const char *model, struct zbx_json *json)
+{
+	int	i, j, l = -1, r = -1, match_idx = -1;
+	char	*devid = "", norm_model[MAX_STRING_LEN];
+
+	if (0 == devices->values_num)
+		goto out;
+
+	for (i = 0; i < devices->values_num; i++)
+	{
+		zbx_device_t	*d = devices->values[i];
+
+		if (major(stat_buf->st_rdev) == d->major && minor(stat_buf->st_rdev) == d->minor)
+		{
+			if (-1 == l)
+				l = i;
+
+			r = i;
+		}
+		else if (-1 != l)
+			break;
+	}
+
+	if (-1 == l)
+		goto out;
+
+	if (l == r || 0 == strlen(model))
+	{
+		devid = devices->values[l]->devid;
+		goto out;
+	}
+
+	i = j = 0;
+
+	while ('\0' != model[i] && j < (int)sizeof(norm_model) - 1)
+	{
+		char	c = model[i];
+
+		if (0 != isalnum(c) || '.' == c || ' ' == c)
+		{
+			norm_model[j] = (' ' == c ? '_' : c);
+			i++;
+			j++;
+		}
+		else
+			break;
+	}
+
+	norm_model[j] = '\0';
+
+	for (i = l; i <= r; i++)
+	{
+		if (NULL != strstr(devices->values[i]->devid, norm_model))
+		{
+			match_idx = i;
+			break;
+		}
+	}
+
+	if (-1 != match_idx)
+		devid = devices->values[match_idx]->devid;
+	else
+		devid = devices->values[l]->devid;
+out:
+	if ('\0' != *devid)
+		zbx_json_addstring(json, "devid", devid, ZBX_JSON_TYPE_STRING);
+}
+
+static int	dev_is_disk(const char *dev_type)
+{
+	if (0 == strcmp("disk", dev_type) || 0 == strcmp("rom", dev_type))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	dev_is_partition(const char *dev_type)
+{
+	if (0 == strcmp("partition", dev_type))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static void	vfs_dev_get_process_entry(const char *dev_name, const zbx_regexp_t *devnames_rxp, int mode,
+		zbx_vector_device_ptr_t *devices, struct zbx_json *cfg, struct zbx_json *val)
+{
+	zbx_stat_t	stat_buf;
+	char		*type, *model;
+
+	if (NULL != devnames_rxp && 0 != zbx_regexp_match_precompiled(dev_name, devnames_rxp))
+		return;
+
+	if (NULL == (type = dev_type_get(dev_name, 1, &stat_buf)))
+		return;
+
+	if (ZBX_MODE_DEVICE_STATS == mode)
+	{
+		if (SUCCEED != dev_is_disk(type) && SUCCEED != dev_is_partition(type))
+			goto out;
+	}
+	else
+	{
+		if (SUCCEED != dev_is_disk(type))
+			goto out;
+	}
+
+	model = dev_model_get(&stat_buf);
+
+	zbx_json_addobject(cfg, NULL);
+	zbx_json_addstring(cfg, "name", dev_name, ZBX_JSON_TYPE_STRING);
+	vfs_dev_get_devid_add(devices, &stat_buf, model, cfg);
+	zbx_json_addstring(cfg, "type", type, ZBX_JSON_TYPE_STRING);
+
+	if (ZBX_MODE_DISKS == mode)
+	{
+		dev_path_add(dev_name, cfg);
+
+		if ('\0' != *model)
+			zbx_json_addstring(cfg, "model", model, ZBX_JSON_TYPE_STRING);
+
+		dev_serial_add(&stat_buf, cfg);
+		dev_wwn_add(&stat_buf, cfg);
+		dev_size_bytes_add(&stat_buf, cfg);
+		dev_logical_blksize_add(&stat_buf, cfg);
+		dev_physical_blksize_add(&stat_buf, cfg);
+	}
+	else if (ZBX_MODE_DISK_STATS == mode || ZBX_MODE_DEVICE_STATS == mode)
+	{
+		dev_size_bytes_add(&stat_buf, cfg);
+	}
+	else if (ZBX_MODE_DEVICES == mode)
+	{
+		dev_disk_partition_sizes_add(&stat_buf, cfg);
+	}
+
+	zbx_json_close(cfg);
+
+	if (ZBX_MODE_DISK_STATS == mode || ZBX_MODE_DEVICE_STATS == mode)
+	{
+		zbx_json_addobject(val, NULL);
+		zbx_json_addstring(val, "name", dev_name, ZBX_JSON_TYPE_STRING);
+		dev_stats_add(&stat_buf, val);
+		zbx_json_close(val);
+	}
+
+	zbx_free(model);
+out:
+	zbx_free(type);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: discovers disks and partitions                                    *
+ *                                                                            *
+ * Parameters: request - [IN]                                                 *
+ *             result  - [OUT]                                                *
+ *                                                                            *
+ * Return value: SYSINFO_RET_OK or SYSINFO_RET_FAIL.                          *
+ *                                                                            *
+ ******************************************************************************/
+int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char			*devnames, *mode, *rxp_error = NULL;
+	int			has_vals, imode, ret = SYSINFO_RET_OK;
+	DIR			*dir;
+	zbx_stat_t		stat_buf;
+	struct dirent		*entry;
+	struct zbx_json		j, cfg, val;
+	zbx_vector_device_ptr_t	devices;
+	zbx_regexp_t		*devnames_rxp = NULL;
+
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	mode = get_rparam(request, 0);
+	devnames = get_rparam(request, 1);
+
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "disks"))	/* default parameter */
+	{
+		imode = ZBX_MODE_DISKS;
+		has_vals = 0;
+	}
+	else if (0 == strcmp(mode, "disk_stats"))
+	{
+		imode = ZBX_MODE_DISK_STATS;
+		has_vals = 1;
+	}
+	else if (0 == strcmp(mode, "devices"))
+	{
+		imode = ZBX_MODE_DEVICES;
+		has_vals = 0;
+	}
+	else if (0 == strcmp(mode, "device_stats"))
+	{
+		imode = ZBX_MODE_DEVICE_STATS;
+		has_vals = 1;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
+	}
+
+	if (NULL != devnames && '\0' != *devnames && SUCCEED != zbx_regexp_compile(devnames, &devnames_rxp, &rxp_error))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in second parameter: %s",
+				rxp_error));
+
+		zbx_free(rxp_error);
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
+	}
+
+	/* check if sysfs with block devices is available */
+	if (0 != zbx_stat(ZBX_SYS_BLKDEV_PFX, &stat_buf) || 0 == S_ISDIR(stat_buf.st_mode))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain device information: directory \""
+				ZBX_SYS_BLKDEV_PFX "\" is not found."));
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
+	}
+
+	if (NULL == (dir = opendir(ZBX_DEV_PFX)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL,
+				"Cannot obtain device list: failed to open \"" ZBX_DEV_PFX "\" directory."));
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
+	}
+
+	devids_init(&devices);
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&cfg, ZBX_JSON_STAT_BUF_LEN);
+	if (1 == has_vals)
+		zbx_json_initarray(&val, ZBX_JSON_STAT_BUF_LEN);
+
+	while (NULL != (entry = readdir(dir)))
+		vfs_dev_get_process_entry(entry->d_name, devnames_rxp, imode, &devices, &cfg, &val);
+	closedir(dir);
+
+	zbx_json_addraw(&j, "config", cfg.buffer);
+	if (1 == has_vals)
+		zbx_json_addraw(&j, "values", val.buffer);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+	zbx_json_free(&cfg);
+	if (1 == has_vals)
+		zbx_json_free(&val);
+	zbx_json_free(&j);
+	zbx_vector_device_ptr_clear_ext(&devices, device_free);
+	zbx_vector_device_ptr_destroy(&devices);
+clean:
+	if (NULL != devnames_rxp)
+		zbx_regexp_free(devnames_rxp);
+
+	return ret;
 }

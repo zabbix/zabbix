@@ -26,7 +26,11 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_LIST))
 	->setControls((new CTag('nav', true,
 		(new CList())
-			->addItem((new CSimpleButton(_('Create media type')))->setId('js-create'))
+			->addItem(
+				(new CSimpleButton(_('Create media type')))
+					->setId('js-create')
+					->setEnabled((bool) CMediatypeHelper::getSupportedMediaTypes())
+			)
 			->addItem(
 				(new CSimpleButton(_('Import')))
 					->onClick(
@@ -38,6 +42,7 @@ $html_page = (new CHtmlPage())
 							dialogue_class: "modal-popup-generic"
 						});'
 					)
+					->setEnabled((bool) CMediatypeHelper::getSupportedMediaTypes())
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -178,17 +183,28 @@ foreach ($data['mediatypes'] as $media_type) {
 		}
 	}
 
-	$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
-		? (new CLink(_('Enabled')))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(ZBX_STYLE_GREEN)
-			->addClass('js-disable')
-			->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid'])
-		: (new CLink(_('Disabled')))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(ZBX_STYLE_RED)
-			->addClass('js-enable')
-			->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid']);
+	if (in_array($media_type['typeid'], CMediatypeHelper::getSupportedMediaTypes())) {
+		$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
+			? (new CLink(_('Enabled')))
+				->addClass(ZBX_STYLE_GREEN)
+				->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid'])
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass('js-disable')
+			: (new CLink(_('Disabled')))
+				->addClass(ZBX_STYLE_RED)
+				->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid'])
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass('js-enable');
+	}
+	else {
+		$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
+			? (new CSpan(_('Enabled')))
+				->addClass(ZBX_STYLE_GREEN)
+				->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid'])
+			: (new CSpan(_('Disabled')))
+				->addClass(ZBX_STYLE_RED)
+				->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid']);
+	}
 
 	$test_link = (new CButton('mediatypetest_edit', _('Test')))
 		->addClass(ZBX_STYLE_BTN_LINK)
@@ -203,11 +219,19 @@ foreach ($data['mediatypes'] as $media_type) {
 		->setArgument('mediatypeid', $media_type['mediatypeid'])
 		->getUrl();
 
-	$name = new CLink($media_type['name'], $media_type_url);
+	$checkbox = new CCheckBox('mediatypeids['.$media_type['mediatypeid'].']', $media_type['mediatypeid']);
+
+	if (in_array($media_type['typeid'], CMediatypeHelper::getSupportedMediaTypes())) {
+		$name = new CLink($media_type['name'], $media_type_url);
+	}
+	else {
+		$name = (new CSpan($media_type['name']))->addClass(ZBX_STYLE_GREY);
+		$checkbox->setEnabled(false);
+	}
 
 	// append row
 	$media_type_table->addRow([
-		new CCheckBox('mediatypeids['.$media_type['mediatypeid'].']', $media_type['mediatypeid']),
+		$checkbox,
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		CMediatypeHelper::getMediaTypes($media_type['typeid']),
 		$status,

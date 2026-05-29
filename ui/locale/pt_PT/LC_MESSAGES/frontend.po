@@ -1679,6 +1679,11 @@ msgstr ""
 msgid "Arc size"
 msgstr ""
 
+#: jsLoader.php:267
+#, c-format
+msgid "Are you sure you want to delete %1$s? This action cannot be undone."
+msgstr ""
+
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
 msgstr "Tem a certeza de que deseja excluir este filtro?"
@@ -1814,6 +1819,11 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:577
 msgid "At least one host group or host must be selected."
 msgstr "Deve ser selecionado pelo menos um servidor ou grupo de servidores."
+
+#: app/controllers/CControllerGraphPrototypeCreate.php:116
+#: app/controllers/CControllerGraphPrototypeUpdate.php:118
+msgid "At least one item must be a prototype"
+msgstr ""
 
 #: app/controllers/CControllerMaintenanceCreate.php:57
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
@@ -2586,6 +2596,13 @@ msgid_plural "Cannot add modules: %1$s."
 msgstr[0] "Não é possível adicionar o módulo: %1$s."
 msgstr[1] "Não é possível adicionar os módulos: %1$s."
 
+#: app/controllers/CControllerGraphCreate.php:111
+#: app/controllers/CControllerGraphPrototypeCreate.php:121
+#: app/controllers/CControllerGraphPrototypeUpdate.php:123
+#: app/controllers/CControllerGraphUpdate.php:113
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr ""
+
 #: include/classes/api/services/CGraph.php:42
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
@@ -2631,6 +2648,10 @@ msgstr "Não foi possível adicionar script"
 #: widgets/navtree/views/navtreeitem.edit.php:72
 msgid "Cannot add submaps. Max depth reached."
 msgstr "Não foi possível adicionar submapas. A profundidade máxima foi alcançada."
+
+#: app/controllers/CControllerPopupScheduledReportSubscriptionCheck.php:85
+msgid "Cannot add subscription"
+msgstr ""
 
 #: app/controllers/CControllerTemplateCreate.php:49
 #: app/controllers/CControllerTemplateCreate.php:171
@@ -4764,6 +4785,11 @@ msgstr "Não foi possível actualizar o cenário web"
 msgid "Cannot update web scenario step"
 msgstr ""
 
+#: include/classes/core/CConfigFile.php:192
+#, c-format
+msgid "Cannot use both %1$s and %2$s at the same time."
+msgstr ""
+
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
 msgstr "Distinguir maiúscula/minúscula"
@@ -4807,6 +4833,10 @@ msgstr "Centro"
 #: include/views/configuration.host.prototype.edit.php:505
 msgid "Certificate"
 msgstr "Certificado"
+
+#: app/views/js/monitoring.latest.view.js.php:211
+msgid "Change"
+msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:78
 #: app/partials/monitoring.latest.view.html.php:91 include/items.inc.php:1577
@@ -5261,6 +5291,14 @@ msgstr ""
 
 #: widgets/topitems/views/column.edit.php:293
 msgid "Column aggregation function"
+msgstr ""
+
+#: jsLoader.php:304
+msgid "Column list"
+msgstr ""
+
+#: jsLoader.php:273
+msgid "Column name"
 msgstr ""
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
@@ -6348,6 +6386,10 @@ msgstr "Tamanho personalizado"
 msgid "Custom templates are not supported."
 msgstr ""
 
+#: jsLoader.php:270
+msgid "Customize table"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -6941,6 +6983,10 @@ msgstr "Eliminar e limpar os templates seleccionados? (Atenção: todos os hosts
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Eliminar e limpar template? (Atenção: todos os hosts associados serão limpos!)"
 
+#: jsLoader.php:275
+msgid "Delete column"
+msgstr ""
+
 #: app/views/popup.action.edit.php:292
 msgid "Delete current action?"
 msgstr "Eliminar acção actual?"
@@ -7015,6 +7061,10 @@ msgstr "Eliminar os ausentes"
 #: app/views/administration.regex.edit.php:160
 msgid "Delete regular expression?"
 msgstr "Eliminar expressão regular?"
+
+#: app/views/js/reports.scheduledreport.edit.js.php:160
+msgid "Delete scheduled report?"
+msgstr ""
 
 #: app/views/administration.script.edit.php:389
 msgid "Delete script?"
@@ -8232,6 +8282,10 @@ msgstr "O valor fornecido para o \"nome\" do mapa \"%1$s\" está duplicado."
 msgid "Duplicate \"usrgrpid\" \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Duplicar \"usrgrpid\" \"%1$s\" em grupos de utilizadores para o mapa \"%2$s\"."
 
+#: jsLoader.php:274
+msgid "Duplicate column"
+msgstr ""
+
 #: include/classes/api/services/CHost.php:2096
 #: include/classes/api/services/CHost.php:2396
 #, c-format
@@ -8746,6 +8800,10 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:612
+msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:609
@@ -11256,6 +11314,10 @@ msgstr ""
 msgid "If less than %2$s of child services have %1$s status or below"
 msgstr ""
 
+#: include/classes/setup/CSetupWizard.php:614
+msgid "If no port is specified, the \"Database port\" value is used."
+msgstr ""
+
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
 msgstr ""
@@ -11753,6 +11815,12 @@ msgstr ""
 #: app/controllers/CControllerTemplateCreate.php:35
 #: app/controllers/CControllerTemplateUpdate.php:36
 msgid "Incorrect characters used for template name."
+msgstr ""
+
+#: include/classes/core/CConfigFile.php:215
+#: include/classes/core/CConfigFile.php:411
+#, c-format
+msgid "Incorrect configuration %1$s: %2$s."
 msgstr ""
 
 #: include/classes/api/services/CUser.php:482
@@ -12328,12 +12396,20 @@ msgstr "Macros herdadas e do host"
 msgid "Inherited and host prototype macros"
 msgstr "Macros de protótipo de servidor herdadas"
 
+#: jsLoader.php:260
+msgid "Inherited and host prototype tag"
+msgstr ""
+
 #: include/classes/helpers/CTagHelper.php:230
 msgid "Inherited and host tag"
 msgstr ""
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Inherited and host tags"
+msgstr ""
+
+#: jsLoader.php:262
+msgid "Inherited and item prototype tag"
 msgstr ""
 
 #: include/classes/helpers/CTagHelper.php:231
@@ -12358,6 +12434,10 @@ msgstr ""
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Inherited and template tags"
+msgstr ""
+
+#: jsLoader.php:264
+msgid "Inherited and trigger prototype tag"
 msgstr ""
 
 #: include/classes/helpers/CTagHelper.php:232
@@ -12995,6 +13075,11 @@ msgstr ""
 #: app/controllers/CControllerTemplateCreate.php:102
 #: app/controllers/CControllerTemplateUpdate.php:104
 msgid "Invalid range."
+msgstr ""
+
+#: app/controllers/CControllerDataTable.php:59
+#: app/controllers/CControllerDataTable.php:138
+msgid "Invalid request"
 msgstr ""
 
 #: include/classes/core/CJsonRpc.php:205
@@ -13958,6 +14043,10 @@ msgstr ""
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Lista de dispositivos de bloco e seus tipos. Retorna JSON"
 
+#: include/classes/data/CItemData.php:1724
+msgid "List of block devices with detailed information. Returns JSON"
+msgstr ""
+
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
 msgstr ""
@@ -13977,6 +14066,10 @@ msgstr "Lista de sistemas de arquivos montados e seus tipos. Retorna JSON"
 #: include/classes/data/CItemData.php:1703
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr "Lista de sistemas de arquivos montados, seus tipos, espaço em disco e estatísticas de inode. Retorna JSON"
+
+#: include/classes/data/CItemData.php:1266
+msgid "List of network interfaces with detailed information. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1109
 msgid "List of network interfaces. Returns JSON"
@@ -14370,6 +14463,21 @@ msgstr "Manualmente por: %1$s"
 #: include/actions.inc.php:1987
 msgid "Manually closed"
 msgstr "Fechado manualmente"
+
+#: app/controllers/CControllerProblemViewData.php:472
+#: include/actions.inc.php:1660 include/actions.inc.php:1661
+#: include/actions.inc.php:1698 include/actions.inc.php:2195
+#: include/html.inc.php:1135
+msgid "Manually suppressed"
+msgstr ""
+
+#: app/controllers/CControllerProblemViewData.php:475
+#: include/actions.inc.php:1674 include/actions.inc.php:1675
+#: include/actions.inc.php:1698 include/actions.inc.php:2200
+#: include/actions.inc.php:2201 include/blocks.inc.php:692
+#: widgets/problems/includes/WidgetProblems.php:280
+msgid "Manually unsuppressed"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: include/classes/data/CWidgetsData.php:110
@@ -15608,6 +15716,10 @@ msgstr "Novo servidor LDAP"
 msgid "New MFA method"
 msgstr ""
 
+#: app/views/oauth.edit.php:254
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "Novo SLA"
@@ -15740,6 +15852,11 @@ msgstr ""
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "Nova expressão regular"
+
+#: app/views/js/reports.scheduledreport.edit.js.php:99
+#: app/views/reports.scheduledreport.edit.php:250
+msgid "New scheduled report"
+msgstr ""
 
 #: app/views/administration.script.edit.php:369
 #: app/views/administration.script.edit.php:409
@@ -16676,6 +16793,10 @@ msgstr "Número de temporadas"
 #: include/views/configuration.httpconf.list.php:143
 msgid "Number of steps"
 msgstr "Número de passos"
+
+#: jsLoader.php:291
+msgid "Number of tags"
+msgstr ""
 
 #: app/partials/administration.system.info.php:60
 msgid "Number of templates"
@@ -19279,6 +19400,10 @@ msgstr "Confirmação de reinicialização"
 msgid "Reset defaults"
 msgstr "Reinicializar para valores por omissão"
 
+#: jsLoader.php:305
+msgid "Reset layout"
+msgstr ""
+
 #: widgets/geomap/Widget.php:37
 msgid "Reset to initial view"
 msgstr ""
@@ -20015,6 +20140,10 @@ msgid "Scheduled report disabled"
 msgid_plural "Scheduled reports disabled"
 msgstr[0] "Agendamento de relatório desativado"
 msgstr[1] "Agendamento de relatórios desativados"
+
+#: app/controllers/CControllerPopup.php:60
+msgid "Scheduled report edit"
+msgstr ""
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
@@ -20789,6 +20918,10 @@ msgstr ""
 msgid "Show hosts in maintenance"
 msgstr "Mostrar hosts em manutenção"
 
+#: jsLoader.php:281
+msgid "Show item key"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:158
 #: include/views/js/monitoring.sysmaps.js.php:698
 #: include/views/js/monitoring.sysmaps.js.php:813
@@ -20915,6 +21048,10 @@ msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
+msgstr ""
+
+#: jsLoader.php:285
+msgid "Show trigger expression"
 msgstr ""
 
 #: include/views/configuration.graph.edit.php:131
@@ -21653,6 +21790,10 @@ msgstr ""
 msgid "Suppressed"
 msgstr ""
 
+#: include/actions.inc.php:2241 include/html.inc.php:1134
+msgid "Suppressed by maintenance"
+msgstr ""
+
 #: include/actions.inc.php:2019 include/html.inc.php:1000
 #, c-format
 msgid "Suppressed till: %1$s"
@@ -21815,6 +21956,10 @@ msgstr "A tabela \"%1$s\" não existe."
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr "A tabela \"%1$s\" não tem nenhum campo com nome \"%2$s\"."
 
+#: jsLoader.php:303
+msgid "Table options"
+msgstr ""
+
 #: app/controllers/CControllerActionOperationCheck.php:210
 #: app/controllers/CControllerActionOperationCheck.php:216
 #: app/controllers/CControllerActionOperationCheck.php:228
@@ -21872,6 +22017,10 @@ msgstr ""
 #: app/controllers/CControllerTriggerPrototypeUpdate.php:61
 #: app/controllers/CControllerTriggerUpdate.php:61
 msgid "Tag name and value combination is not unique."
+msgstr ""
+
+#: jsLoader.php:292
+msgid "Tag name display"
 msgstr ""
 
 #: app/controllers/CControllerMaintenanceCreate.php:93
@@ -22317,6 +22466,10 @@ msgstr ""
 
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
 msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
@@ -23980,6 +24133,10 @@ msgstr ""
 msgid "Unsuppressed"
 msgstr ""
 
+#: include/actions.inc.php:2257
+msgid "Unsuppressed by maintenance"
+msgstr ""
+
 #: include/blocks.inc.php:670 include/classes/screens/CScreenProblem.php:1425
 #: widgets/problems/includes/WidgetProblems.php:278
 #, c-format
@@ -24160,6 +24317,11 @@ msgstr "Tempo em execução em segudos do processo do Zabbix."
 #: include/actions.inc.php:61
 msgid "Uptime/Downtime"
 msgstr "Uptime/Downtime"
+
+#: app/partials/administration.system.info.php:328
+#, c-format
+msgid "Use %1$s instead"
+msgstr ""
 
 #: app/views/popup.ldap.edit.php:173
 msgid "Use %{ref} in group filter to reference value of this user attribute."
@@ -25150,6 +25312,18 @@ msgstr "Mapeamentos de valor"
 msgid "Value must be greater than %1$s."
 msgstr ""
 
+#: include/classes/validators/CFormValidator.php:1089
+#: include/classes/validators/CFormValidator.php:1147 jsLoader.php:435
+#, c-format
+msgid "Value must be greater than or equal to %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1095
+#: include/classes/validators/CFormValidator.php:1153 jsLoader.php:434
+#, c-format
+msgid "Value must be less than or equal to %1$s."
+msgstr ""
+
 #: include/classes/validators/CFormValidator.php:1033
 #: include/classes/validators/CFormValidator.php:1042
 #, c-format
@@ -25567,6 +25741,10 @@ msgstr ""
 
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
+msgstr ""
+
+#: jsLoader.php:255
+msgid "Widget is not fully configured"
 msgstr ""
 
 #: jsLoader.php:187
@@ -26006,6 +26184,10 @@ msgstr "A sua base de dados não está a ser executada correctamente. por favor 
 
 #: app/views/host.wizard.edit.php:1044
 msgid "Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?"
+msgstr ""
+
+#: jsLoader.php:307
+msgid "Your table settings will be reset to default and duplicated columns will be removed."
 msgstr ""
 
 #: include/page_header.php:122
@@ -27081,6 +27263,10 @@ msgstr ""
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:77
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:166
 msgid "does not match"
+msgstr ""
+
+#: jsLoader.php:268
+msgid "duplicate"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:598

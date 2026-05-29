@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-09-19 05:55+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2026-05-18 12:39+0000\n"
+"Last-Translator: arturs.dancis@zabbix.com <arturs.dancis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
 "MIME-Version: 1.0\n"
@@ -1065,7 +1065,7 @@ msgstr "Pievienot no veidnes"
 
 #: include/actions.inc.php:629 include/actions.inc.php:860
 msgid "Add host"
-msgstr "Pievienot mezglu"
+msgstr "Pievienot hostu"
 
 #: app/views/host.wizard.edit.php:571 app/views/js/host.wizard.edit.js.php:1133
 msgid "Add host interface"
@@ -1153,7 +1153,7 @@ msgstr "Pievienot resursdatoru grupai"
 #
 #: include/actions.inc.php:684
 msgid "Add to host groups"
-msgstr "Pievienot mezglu grupām"
+msgstr "Pievienot hostu grupām"
 
 #: app/partials/scheduledreport.subscription.php:42
 msgid "Add user"
@@ -1704,6 +1704,11 @@ msgstr ""
 msgid "Arc size"
 msgstr ""
 
+#: jsLoader.php:267
+#, c-format
+msgid "Are you sure you want to delete %1$s? This action cannot be undone."
+msgstr ""
+
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
 msgstr "Vai tiešām vēlaties dzēst šo filtru?"
@@ -1841,6 +1846,11 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:577
 msgid "At least one host group or host must be selected."
 msgstr "Jāizvēlas vismaz viena iekārtu grupa vai iekārta."
+
+#: app/controllers/CControllerGraphPrototypeCreate.php:116
+#: app/controllers/CControllerGraphPrototypeUpdate.php:118
+msgid "At least one item must be a prototype"
+msgstr ""
 
 #: app/controllers/CControllerMaintenanceCreate.php:57
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
@@ -2614,6 +2624,13 @@ msgstr[0] "Nevar pievienot moduli: %1$s."
 msgstr[1] "Nevar pievienot moduļus: %1$s."
 msgstr[2] "Nevar pievienot moduļus: %1$s."
 
+#: app/controllers/CControllerGraphCreate.php:111
+#: app/controllers/CControllerGraphPrototypeCreate.php:121
+#: app/controllers/CControllerGraphPrototypeUpdate.php:123
+#: app/controllers/CControllerGraphUpdate.php:113
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr ""
+
 #: include/classes/api/services/CGraph.php:42
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
@@ -2659,6 +2676,10 @@ msgstr "Skriptu nav iespējams pievienot"
 #: widgets/navtree/views/navtreeitem.edit.php:72
 msgid "Cannot add submaps. Max depth reached."
 msgstr "Nevar pievienot apakškartes. Sasniegts maksimālais dziļums."
+
+#: app/controllers/CControllerPopupScheduledReportSubscriptionCheck.php:85
+msgid "Cannot add subscription"
+msgstr ""
 
 #: app/controllers/CControllerTemplateCreate.php:49
 #: app/controllers/CControllerTemplateCreate.php:171
@@ -4872,6 +4893,11 @@ msgstr "Nevar atjaunināt tīmekļa scenāriju"
 msgid "Cannot update web scenario step"
 msgstr ""
 
+#: include/classes/core/CConfigFile.php:192
+#, c-format
+msgid "Cannot use both %1$s and %2$s at the same time."
+msgstr ""
+
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
 msgstr "Reģistrjutīgs"
@@ -4915,6 +4941,10 @@ msgstr "Centrēt"
 #: include/views/configuration.host.prototype.edit.php:505
 msgid "Certificate"
 msgstr "Sertifikāts"
+
+#: app/views/js/monitoring.latest.view.js.php:211
+msgid "Change"
+msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:78
 #: app/partials/monitoring.latest.view.html.php:91 include/items.inc.php:1577
@@ -5369,6 +5399,14 @@ msgstr ""
 
 #: widgets/topitems/views/column.edit.php:293
 msgid "Column aggregation function"
+msgstr ""
+
+#: jsLoader.php:304
+msgid "Column list"
+msgstr ""
+
+#: jsLoader.php:273
+msgid "Column name"
 msgstr ""
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
@@ -6465,6 +6503,10 @@ msgstr "Pielāgots izmērs"
 msgid "Custom templates are not supported."
 msgstr ""
 
+#: jsLoader.php:270
+msgid "Customize table"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -7059,6 +7101,10 @@ msgstr "Vai dzēst un notīrīt atlasītās veidnes? (Brīdinājums: visas saist
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Vai dzēst un notīrīt veidni? (Brīdinājums: visas saistītās iekārtas tiks notīrītas!)"
 
+#: jsLoader.php:275
+msgid "Delete column"
+msgstr ""
+
 #: app/views/popup.action.edit.php:292
 msgid "Delete current action?"
 msgstr "Vai dzēst pašreizējo darbību?"
@@ -7133,6 +7179,10 @@ msgstr "Dzēst trūkstošo"
 #: app/views/administration.regex.edit.php:160
 msgid "Delete regular expression?"
 msgstr "Nodzēst regulāro izteiksmi?"
+
+#: app/views/js/reports.scheduledreport.edit.js.php:160
+msgid "Delete scheduled report?"
+msgstr ""
 
 #: app/views/administration.script.edit.php:389
 msgid "Delete script?"
@@ -7664,7 +7714,7 @@ msgstr "Atspējot atkļūdošanas režīmu iezīmētajās grupās?"
 
 #: include/actions.inc.php:668 include/actions.inc.php:863
 msgid "Disable host"
-msgstr "Atspējot mezglu"
+msgstr "Atspējot hostu"
 
 #: app/views/configuration.host.list.php:303
 msgid "Disable host?"
@@ -8355,6 +8405,10 @@ msgstr ""
 msgid "Duplicate \"usrgrpid\" \"%1$s\" in user groups for map \"%2$s\"."
 msgstr ""
 
+#: jsLoader.php:274
+msgid "Duplicate column"
+msgstr ""
+
 #: include/classes/api/services/CHost.php:2096
 #: include/classes/api/services/CHost.php:2396
 #, c-format
@@ -8869,6 +8923,10 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:612
+msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:609
@@ -10648,7 +10706,7 @@ msgstr ""
 
 #: include/actions.inc.php:57
 msgid "Host IP"
-msgstr "Mezgla IP"
+msgstr "Hosta IP"
 
 #: app/controllers/CControllerPopup.php:49
 #: app/views/configuration.host.list.php:35
@@ -11115,7 +11173,7 @@ msgstr ""
 #: widgets/trigover/partials/table.left.php:33
 #: widgets/web/includes/WidgetForm.php:52
 msgid "Hosts"
-msgstr "Mezgli"
+msgstr "Hosti"
 
 #: app/views/host.wizard.edit.php:278
 msgid "Hosts are organized into host groups for easier management and access control."
@@ -11390,6 +11448,10 @@ msgstr ""
 #: include/classes/helpers/CServiceHelper.php:101
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:614
+msgid "If no port is specified, the \"Database port\" value is used."
 msgstr ""
 
 #: include/classes/api/services/CReport.php:368
@@ -11889,6 +11951,12 @@ msgstr ""
 #: app/controllers/CControllerTemplateCreate.php:35
 #: app/controllers/CControllerTemplateUpdate.php:36
 msgid "Incorrect characters used for template name."
+msgstr ""
+
+#: include/classes/core/CConfigFile.php:215
+#: include/classes/core/CConfigFile.php:411
+#, c-format
+msgid "Incorrect configuration %1$s: %2$s."
 msgstr ""
 
 #: include/classes/api/services/CUser.php:482
@@ -12464,12 +12532,20 @@ msgstr ""
 msgid "Inherited and host prototype macros"
 msgstr ""
 
+#: jsLoader.php:260
+msgid "Inherited and host prototype tag"
+msgstr ""
+
 #: include/classes/helpers/CTagHelper.php:230
 msgid "Inherited and host tag"
 msgstr ""
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Inherited and host tags"
+msgstr ""
+
+#: jsLoader.php:262
+msgid "Inherited and item prototype tag"
 msgstr ""
 
 #: include/classes/helpers/CTagHelper.php:231
@@ -12494,6 +12570,10 @@ msgstr ""
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Inherited and template tags"
+msgstr ""
+
+#: jsLoader.php:264
+msgid "Inherited and trigger prototype tag"
 msgstr ""
 
 #: include/classes/helpers/CTagHelper.php:232
@@ -13132,6 +13212,11 @@ msgstr ""
 msgid "Invalid range."
 msgstr ""
 
+#: app/controllers/CControllerDataTable.php:59
+#: app/controllers/CControllerDataTable.php:138
+msgid "Invalid request"
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:205
 msgid "Invalid request."
 msgstr ""
@@ -13287,7 +13372,7 @@ msgstr "Itāļu (it_IT)"
 #: widgets/item/includes/WidgetForm.php:122
 #: widgets/tophosts/views/column.edit.php:120
 msgid "Item"
-msgstr "Rādītājs"
+msgstr "Vienums"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1472
 #, c-format
@@ -13296,7 +13381,7 @@ msgstr ""
 
 #: items.php:667
 msgid "Item added"
-msgstr "Rādītājs pievienots"
+msgstr "Vienums pievienots"
 
 #: widgets/itemcard/Widget.php:32
 msgid "Item card"
@@ -13315,15 +13400,14 @@ msgstr[2] ""
 
 #: app/views/administration.proxy.list.php:92
 msgid "Item count"
-msgstr "Rādītāju skaits"
+msgstr "Vienumu skaits"
 
 #: items.php:524 items.php:735
-#, fuzzy
 msgid "Item deleted"
 msgid_plural "Items deleted"
-msgstr[0] "Rādītājs izdzēsts"
-msgstr[1] "Rādītājs izdzēsts"
-msgstr[2] "Rādītājs izdzēsts"
+msgstr[0] "Vienumi izdzēsti"
+msgstr[1] "Vienums izdzēsts"
+msgstr[2] "Vienumi izdzēsti"
 
 #: items.php:708
 msgid "Item disabled"
@@ -13398,7 +13482,7 @@ msgstr ""
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:157
 #: jsLoader.php:362 widgets/graphprototype/includes/WidgetForm.php:61
 msgid "Item prototype"
-msgstr "Rādītāja prototips"
+msgstr "Vienuma prototips"
 
 #: disc_prototypes.php:454
 msgid "Item prototype added"
@@ -13437,7 +13521,7 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:28
 #: include/views/configuration.item.prototype.list.php:29
 msgid "Item prototypes"
-msgstr "Rādītāju prototipi"
+msgstr "Vienuma prototipi"
 
 #: widgets/itemnavigator/Widget.php:44
 msgid "Item tag"
@@ -13461,12 +13545,11 @@ msgid "Item type does not use interface"
 msgstr ""
 
 #: app/controllers/CControllerPopupMassupdateItem.php:287 items.php:670
-#, fuzzy
 msgid "Item updated"
 msgid_plural "Items updated"
-msgstr[0] "Rādītājs atjaunots"
-msgstr[1] "Rādītājs atjaunots"
-msgstr[2] "Rādītājs atjaunots"
+msgstr[0] "Vienumi atjaunoti"
+msgstr[1] "Vienums atjaunots"
+msgstr[2] "Vienumi atjaunoti"
 
 #: widgets/item/Widget.php:53 widgets/tophosts/views/column.edit.php:64
 msgid "Item value"
@@ -13514,11 +13597,11 @@ msgstr ""
 #: widgets/dataover/partials/table.top.php:31
 #: widgets/plaintext/includes/WidgetForm.php:45
 msgid "Items"
-msgstr "Rādītāji"
+msgstr "Vienumi"
 
 #: include/views/monitoring.history.php:140
 msgid "Items list"
-msgstr "Rādītāju saraksts"
+msgstr "Vienumu saraksts"
 
 #: widgets/plaintext/includes/WidgetForm.php:49
 msgid "Items location"
@@ -14105,6 +14188,10 @@ msgstr ""
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1724
+msgid "List of block devices with detailed information. Returns JSON"
+msgstr ""
+
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
 msgstr ""
@@ -14123,6 +14210,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1703
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1266
+msgid "List of network interfaces with detailed information. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1109
@@ -14517,6 +14608,21 @@ msgstr ""
 
 #: include/actions.inc.php:1987
 msgid "Manually closed"
+msgstr ""
+
+#: app/controllers/CControllerProblemViewData.php:472
+#: include/actions.inc.php:1660 include/actions.inc.php:1661
+#: include/actions.inc.php:1698 include/actions.inc.php:2195
+#: include/html.inc.php:1135
+msgid "Manually suppressed"
+msgstr ""
+
+#: app/controllers/CControllerProblemViewData.php:475
+#: include/actions.inc.php:1674 include/actions.inc.php:1675
+#: include/actions.inc.php:1698 include/actions.inc.php:2200
+#: include/actions.inc.php:2201 include/blocks.inc.php:692
+#: widgets/problems/includes/WidgetProblems.php:280
+msgid "Manually unsuppressed"
 msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:245
@@ -15766,6 +15872,10 @@ msgstr ""
 msgid "New MFA method"
 msgstr ""
 
+#: app/views/oauth.edit.php:254
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr ""
@@ -15897,6 +16007,11 @@ msgstr ""
 
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
+msgstr ""
+
+#: app/views/js/reports.scheduledreport.edit.js.php:99
+#: app/views/reports.scheduledreport.edit.php:250
+msgid "New scheduled report"
 msgstr ""
 
 #: app/views/administration.script.edit.php:369
@@ -16834,6 +16949,10 @@ msgstr "Sezonu skaits"
 #: include/views/configuration.httpconf.list.php:143
 msgid "Number of steps"
 msgstr "Soļu skaits"
+
+#: jsLoader.php:291
+msgid "Number of tags"
+msgstr ""
 
 #: app/partials/administration.system.info.php:60
 msgid "Number of templates"
@@ -19224,11 +19343,11 @@ msgstr ""
 
 #: include/actions.inc.php:687
 msgid "Remove from host groups"
-msgstr "Dzēst no mezglu grupām"
+msgstr "Dzēst no hostu grupām"
 
 #: include/actions.inc.php:633 include/actions.inc.php:861
 msgid "Remove host"
-msgstr "Dzēst mezglu"
+msgstr "Dzēst hostu"
 
 #: include/actions.inc.php:656 include/actions.inc.php:872
 msgid "Remove host tags"
@@ -19439,6 +19558,10 @@ msgstr ""
 #: app/views/js/administration.timeouts.edit.js.php:58
 #: app/views/js/administration.trigdisplay.edit.js.php:58
 msgid "Reset defaults"
+msgstr ""
+
+#: jsLoader.php:305
+msgid "Reset layout"
 msgstr ""
 
 #: widgets/geomap/Widget.php:37
@@ -20182,6 +20305,10 @@ msgid_plural "Scheduled reports disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#: app/controllers/CControllerPopup.php:60
+msgid "Scheduled report edit"
+msgstr ""
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
@@ -20959,6 +21086,10 @@ msgstr ""
 msgid "Show hosts in maintenance"
 msgstr ""
 
+#: jsLoader.php:281
+msgid "Show item key"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:158
 #: include/views/js/monitoring.sysmaps.js.php:698
 #: include/views/js/monitoring.sysmaps.js.php:813
@@ -21085,6 +21216,10 @@ msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
+msgstr ""
+
+#: jsLoader.php:285
+msgid "Show trigger expression"
 msgstr ""
 
 #: include/views/configuration.graph.edit.php:131
@@ -21823,6 +21958,10 @@ msgstr ""
 msgid "Suppressed"
 msgstr ""
 
+#: include/actions.inc.php:2241 include/html.inc.php:1134
+msgid "Suppressed by maintenance"
+msgstr ""
+
 #: include/actions.inc.php:2019 include/html.inc.php:1000
 #, c-format
 msgid "Suppressed till: %1$s"
@@ -21985,6 +22124,10 @@ msgstr ""
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr ""
 
+#: jsLoader.php:303
+msgid "Table options"
+msgstr ""
+
 #: app/controllers/CControllerActionOperationCheck.php:210
 #: app/controllers/CControllerActionOperationCheck.php:216
 #: app/controllers/CControllerActionOperationCheck.php:228
@@ -22042,6 +22185,10 @@ msgstr ""
 #: app/controllers/CControllerTriggerPrototypeUpdate.php:61
 #: app/controllers/CControllerTriggerUpdate.php:61
 msgid "Tag name and value combination is not unique."
+msgstr ""
+
+#: jsLoader.php:292
+msgid "Tag name display"
 msgstr ""
 
 #: app/controllers/CControllerMaintenanceCreate.php:93
@@ -22145,7 +22292,7 @@ msgstr "Telnet"
 #: include/views/configuration.httpconf.list.php:138
 #: include/views/configuration.item.list.php:89 report2.php:394
 msgid "Template"
-msgstr "Šablons"
+msgstr "Veidne"
 
 #: include/classes/api/services/CHost.php:1058
 #: include/classes/import/importers/CTemplateImporter.php:84
@@ -22165,7 +22312,7 @@ msgstr ""
 
 #: app/controllers/CControllerTemplateCreate.php:163
 msgid "Template added"
-msgstr "Šablons pievienots"
+msgstr "Veidne pievienota"
 
 #: include/classes/api/services/CHostBase.php:1867
 msgid "Template cannot be linked to another template more than once even through other templates."
@@ -22180,12 +22327,11 @@ msgid "Template dashboards"
 msgstr "Veidņu informācijas paneļi"
 
 #: app/controllers/CControllerTemplateDelete.php:133
-#, fuzzy
 msgid "Template deleted"
 msgid_plural "Templates deleted"
-msgstr[0] "Šablons izdzēsts"
-msgstr[1] "Šablons izdzēsts"
-msgstr[2] "Šablons izdzēsts"
+msgstr[0] "Veidnes izdzēstas"
+msgstr[1] "Veidne izdzēsta"
+msgstr[2] "Veidnes izdzēstas"
 
 #: app/controllers/CControllerPopup.php:59
 msgid "Template edit"
@@ -22197,7 +22343,7 @@ msgstr ""
 #: app/views/popup.generic.php:62 app/views/popup.templategroup.edit.php:31
 #: app/views/search.php:372 report2.php:390
 msgid "Template group"
-msgstr "Šablona grupa"
+msgstr "Veidņu grupa"
 
 #: include/classes/api/services/CTemplateGroup.php:538
 #, c-format
@@ -22245,7 +22391,7 @@ msgstr "Veidņu grupas"
 
 #: app/views/popup.import.php:38
 msgid "Template linkage"
-msgstr "Šablonu saistīšana"
+msgstr "Veidņu saistīšana"
 
 #: app/views/template.edit.php:183
 msgid "Template macros"
@@ -22253,7 +22399,7 @@ msgstr "Veidņu makro"
 
 #: app/views/template.edit.php:38
 msgid "Template name"
-msgstr "Šablonu nosaukums"
+msgstr "Veidnes nosaukums"
 
 #: app/views/usergroup.edit.php:267
 msgid "Template permissions"
@@ -22265,16 +22411,15 @@ msgstr ""
 
 #: report2.php:398
 msgid "Template trigger"
-msgstr "Šablona trigeris"
+msgstr "Veidnes trigeris"
 
 #: app/controllers/CControllerTemplateMassupdate.php:361
 #: app/controllers/CControllerTemplateUpdate.php:188
-#, fuzzy
 msgid "Template updated"
 msgid_plural "Templates updated"
-msgstr[0] "Šablons atjaunots"
-msgstr[1] "Šablons atjaunots"
-msgstr[2] "Šablons atjaunots"
+msgstr[0] "Veidnes atjaunotas"
+msgstr[1] "Veidne atjaunota"
+msgstr[2] "Veidnes atjaunotas"
 
 #: app/partials/hostmacros.inherited.list.html.php:55
 msgid "Template value"
@@ -22325,7 +22470,7 @@ msgstr "Veidne ar redzamu nosaukumu \"%1$s\" jau pastāv."
 #: include/views/configuration.host.prototype.list.php:68
 #: include/views/configuration.httpconf.list.php:49
 msgid "Templates"
-msgstr "Šabloni"
+msgstr "Veidnes"
 
 #: include/classes/api/services/CHostBase.php:1709
 #, c-format
@@ -22490,6 +22635,10 @@ msgstr ""
 
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
 msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
@@ -24166,6 +24315,10 @@ msgstr ""
 msgid "Unsuppressed"
 msgstr ""
 
+#: include/actions.inc.php:2257
+msgid "Unsuppressed by maintenance"
+msgstr ""
+
 #: include/blocks.inc.php:670 include/classes/screens/CScreenProblem.php:1425
 #: widgets/problems/includes/WidgetProblems.php:278
 #, c-format
@@ -24346,6 +24499,11 @@ msgstr ""
 #: include/actions.inc.php:61
 msgid "Uptime/Downtime"
 msgstr "Darbspējas laiks/Zaudlaiks"
+
+#: app/partials/administration.system.info.php:328
+#, c-format
+msgid "Use %1$s instead"
+msgstr ""
 
 #: app/views/popup.ldap.edit.php:173
 msgid "Use %{ref} in group filter to reference value of this user attribute."
@@ -25341,6 +25499,18 @@ msgstr ""
 msgid "Value must be greater than %1$s."
 msgstr ""
 
+#: include/classes/validators/CFormValidator.php:1089
+#: include/classes/validators/CFormValidator.php:1147 jsLoader.php:435
+#, c-format
+msgid "Value must be greater than or equal to %1$s."
+msgstr ""
+
+#: include/classes/validators/CFormValidator.php:1095
+#: include/classes/validators/CFormValidator.php:1153 jsLoader.php:434
+#, c-format
+msgid "Value must be less than or equal to %1$s."
+msgstr ""
+
 #: include/classes/validators/CFormValidator.php:1033
 #: include/classes/validators/CFormValidator.php:1042
 #, c-format
@@ -25761,6 +25931,10 @@ msgstr ""
 
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
+msgstr ""
+
+#: jsLoader.php:255
+msgid "Widget is not fully configured"
 msgstr ""
 
 #: jsLoader.php:187
@@ -26200,6 +26374,10 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:1044
 msgid "Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?"
+msgstr ""
+
+#: jsLoader.php:307
+msgid "Your table settings will be reset to default and duplicated columns will be removed."
 msgstr ""
 
 #: include/page_header.php:122
@@ -27278,6 +27456,10 @@ msgstr ""
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:77
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:166
 msgid "does not match"
+msgstr ""
+
+#: jsLoader.php:268
+msgid "duplicate"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:598

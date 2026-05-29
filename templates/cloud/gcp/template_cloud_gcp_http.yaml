@@ -74,7 +74,7 @@ zabbix_export:
           - [Cloud Run](https://docs.cloud.google.com/monitoring/api/metrics_gcp_p_z#gcp-run)
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Cloud
       items:
@@ -847,6 +847,144 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
+        - uuid: 8d6c8f8f7b364c4f8a663b2f1a0b9c8d
+          name: 'Cloud Storage buckets get'
+          type: DEPENDENT
+          key: gcp.storage.buckets.get
+          history: '0'
+          value_type: TEXT
+          description: 'GCP Cloud Storage: Buckets get.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var token = value;
+                  
+                  function getField(data, path) {
+                  	var steps = path.split('.');
+                  
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			throw 'Required field "' + path + '" is not present in data received.';
+                  		}
+                  		data = data[step];
+                  	}
+                  	return data;
+                  }
+                  
+                  function getFieldBool(data, path) {
+                  	var steps = path.split('.');
+                  
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			return false;
+                  		}
+                  		data = data[step];
+                  	}
+                  	return true;
+                  }
+                  
+                  function getHttpData(url, token) {
+                  	var request = new HttpRequest(),
+                  		proxy = '{$GCP.PROXY}';
+                  
+                  	if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
+                  		request.setProxy(proxy);
+                  	}
+                  
+                  	request.addHeader('Authorization: Bearer ' + token);
+                  	request.addHeader('Content-Type: application/json');
+                  
+                  	var response = request.get(url);
+                  
+                  	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+                  
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+                  		}
+                  	}
+                  
+                  	if (typeof response !== 'object' || response === null) {
+                  		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+                  	}
+                  
+                  	if (request.getStatus() !== 200) {
+                  
+                  		if (typeof (response.error && response.error.message) !== 'undefined') {
+                  			throw response.error.message;
+                  		}
+                  		else {
+                  			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+                  		}
+                  	}
+                  	return response;
+                  }
+                  
+                  var project = '{$GCP.PROJECT.ID}';
+                  
+                  if (!project || project === '{' + '$GCP.PROJECT.ID}') {
+                  	throw 'Error. Set the \{$GCP.PROJECT.ID\} macro value.';
+                  }
+                  
+                  var buckets = [],
+                  	result = null;
+                  
+                  try {
+                  	result = getHttpData(
+                  		'https://storage.googleapis.com/storage/v1/b?project=' +
+                  			encodeURIComponent(project),
+                  		token
+                  	);
+                  
+                  	if (typeof result !== 'object' || typeof result.items === 'undefined') {
+                  		throw 'Invalid response when requesting buckets';
+                  	}
+                  
+                  	result.items.forEach(function (bucket) {
+                  		buckets.push({
+                  			name: getField(bucket, 'name'),
+                  			location: getField(bucket, 'location'),
+                  			location_type: getField(bucket, 'locationType'),
+                  			storage_class: getField(bucket, 'storageClass'),
+                  			project_id: project,
+                  			token: value
+                  		});
+                  	});
+                  
+                  	return JSON.stringify(buckets);
+                  } catch (error) {
+                  	error += (String(error).endsWith('.')) ? '' : '.';
+                  	Zabbix.log(3, '[ GCP API ] ERROR: ' + error);
+                  	return JSON.stringify({error: 'Failed to get GCS buckets: ' + error});
+                  }
+          master_item:
+            key: gcp.authorization
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 0cb00461c01045be989f086857baa958
+          name: 'Cloud Storage buckets total'
+          type: DEPENDENT
+          key: gcp.storage.buckets.total
+          description: 'GCP Cloud Storage buckets total count.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[*].length()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.storage.buckets.get
+          tags:
+            - tag: component
+              value: storage
       discovery_rules:
         - uuid: f210e8e38c194c65b30e74610ec2b86f
           name: 'GCP Cloud SQL: MSSQL instances discovery'
@@ -1518,6 +1656,78 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
+        - uuid: a439501636fd49f0aaf3902300d943c8
+          name: 'GCP Cloud Storage: Buckets discovery'
+          type: DEPENDENT
+          key: gcp.storage.buckets.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#GCS.BUCKET.NAME}'
+                value: '{$GCP.BUCKET.NAME.MATCHES}'
+              - macro: '{#GCS.BUCKET.NAME}'
+                value: '{$GCP.BUCKET.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'GCP Cloud Storage: Buckets discovery.'
+          host_prototypes:
+            - uuid: ea0d03e4f9a34edfae080832b68be985
+              host: '{#GCP.PROJECT.ID}-{#GCS.BUCKET.NAME}'
+              name: '{#GCS.BUCKET.NAME}'
+              group_links:
+                - group:
+                    name: Databases
+              templates:
+                - name: 'GCP Cloud Storage Bucket by HTTP'
+              macros:
+                - macro: '{$GCP.AUTH.TOKEN}'
+                  value: '{#GCP.AUTH.TOKEN}'
+                  description: 'Google Cloud Platform authorization token.'
+                - macro: '{$GCP.PROJECT.ID}'
+                  value: '{#GCP.PROJECT.ID}'
+                  description: 'GCP project id.'
+                - macro: '{$GCS.BUCKET.LOCATION}'
+                  value: '{#GCS.BUCKET.LOCATION}'
+                  description: 'Cloud Storage bucket location.'
+                - macro: '{$GCS.BUCKET.LOCATION_TYPE}'
+                  value: '{#GCS.BUCKET.LOCATION_TYPE}'
+                  description: 'Cloud Storage bucket location type.'
+                - macro: '{$GCS.BUCKET.STORAGE_CLASS}'
+                  value: '{#GCS.BUCKET.STORAGE_CLASS}'
+                  description: 'Cloud Storage bucket storage class.'
+              tags:
+                - tag: location
+                  value: '{#GCS.BUCKET.LOCATION}'
+                - tag: location-type
+                  value: '{#GCS.BUCKET.LOCATION_TYPE}'
+                - tag: project
+                  value: '{#GCP.PROJECT.ID}'
+                - tag: service
+                  value: cloud-storage
+                - tag: service
+                  value: gcp
+                - tag: storage-class
+                  value: '{#GCS.BUCKET.STORAGE_CLASS}'
+          master_item:
+            key: gcp.storage.buckets.get
+          lld_macro_paths:
+            - lld_macro: '{#GCP.AUTH.TOKEN}'
+              path: $.token
+            - lld_macro: '{#GCP.PROJECT.ID}'
+              path: $.project_id
+            - lld_macro: '{#GCS.BUCKET.ID}'
+              path: $.id
+            - lld_macro: '{#GCS.BUCKET.LOCATION_TYPE}'
+              path: $.location_type
+            - lld_macro: '{#GCS.BUCKET.LOCATION}'
+              path: $.location
+            - lld_macro: '{#GCS.BUCKET.NAME}'
+              path: $.name
+            - lld_macro: '{#GCS.BUCKET.STORAGE_CLASS}'
+              path: $.storage_class
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
       tags:
         - tag: class
           value: cloud
@@ -1548,6 +1758,24 @@ zabbix_export:
             priority: '5'
             label: 'Token update frequency'
             description: 'Update interval for the GCP Authorization item, which also equals to the access token regeneration request frequency.'
+        - macro: '{$GCP.BUCKET.NAME.MATCHES}'
+          value: '.*'
+          description: 'The filter to include GCP Cloud Storage buckets by name.'
+          config:
+            type: TEXT
+            priority: '39'
+            section_name: Filters
+            label: 'Include GCP Cloud Storage bucket name filter'
+            description: 'Filter to include GCP Cloud Storage buckets by name.'
+        - macro: '{$GCP.BUCKET.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'The filter to exclude GCP Cloud Storage buckets by name.'
+          config:
+            type: TEXT
+            priority: '40'
+            section_name: Filters
+            label: 'Exclude GCP Cloud Storage bucket name filter'
+            description: 'Filter to exclude GCP Cloud Storage buckets by name.'
         - macro: '{$GCP.CLIENT.EMAIL}'
           description: 'Service account client e-mail.'
           config:
@@ -9098,6 +9326,907 @@ zabbix_export:
               newvalue: Error
             - value: '10'
               newvalue: Unknown
+    - uuid: 4e1e9372a5fe4297936210bc4fc4b1c2
+      template: 'GCP Cloud Storage Bucket by HTTP'
+      name: 'GCP Cloud Storage Bucket by HTTP'
+      description: |
+        Discover GCP Cloud Storage buckets by HTTP with script item usage.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
+        
+        Generated by official Zabbix template tool "Templator"
+      wizard_ready: 'YES'
+      readme: |
+        ## Setup
+        
+        This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
+      vendor:
+        name: Zabbix
+        version: 8.0-0
+      groups:
+        - name: Templates/Cloud
+      items:
+        - uuid: 1b0ea2b38fe740b197ecbcfdd7464b01
+          name: 'Get bucket storage info'
+          type: HTTP_AGENT
+          key: gcp.storage.bucket.metrics.get
+          history: 1h
+          value_type: TEXT
+          description: 'GCP Cloud Storage bucket raw metric data.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  const json_data = JSON.parse(value);
+                  
+                  function getField(data, path, default_value) {
+                  	var steps = path.split('.');
+                  
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			if (typeof default_value !== 'undefined') {
+                  				return default_value;
+                  			}
+                  			throw 'Required field "' + path + '" is not present in data received.';
+                  		}
+                  		data = data[step];
+                  	}
+                  	return data;
+                  }
+                  
+                  
+                  var storage = getField(json_data, 'timeSeriesData', []),
+                  	output_data = [];
+                  
+                  for (var bucket in storage) {
+                  	var size = getField(storage[bucket], 'pointData.0.values.0.doubleValue'),
+                  		objects = getField(storage[bucket], 'pointData.0.values.1.int64Value');
+                  
+                  	output_data.push({
+                  		size: size,
+                  		objects: objects
+                  	});
+                  }
+                  
+                  return JSON.stringify(output_data);
+          timeout: '{$GCP.DATA.TIMEOUT}'
+          url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
+          posts: |
+            {
+               "query": "fetch gcs_bucket
+               | { metric 'storage.googleapis.com/storage/v2/total_bytes'; metric 'storage.googleapis.com/storage/v2/total_count' }
+               | filter resource.bucket_name == '{HOST.NAME}'
+               | group_by {$GCP.TIME.WINDOW}, max(val())
+               | every {$GCP.TIME.WINDOW}
+               | group_by [resource.bucket_name], max(val())
+               | join"
+            }
+          headers:
+            - name: Content-Type
+              value: application/json
+            - name: Authorization
+              value: 'Bearer {$GCP.AUTH.TOKEN}'
+          request_method: POST
+          tags:
+            - tag: component
+              value: raw
+          triggers:
+            - uuid: 1b0ea2b38fe740b197ecbcfdd7364b01
+              expression: 'nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.metrics.get,30m)=1'
+              name: 'GCP Cloud Storage: GCP API is failing (bucket metrics)'
+              priority: HIGH
+              description: 'No data received from GCP API for the last 30 minutes. Possible query error or API failure.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: b93d03d2ee2845a3b11b3be025664742
+          name: 'Get bucket network traffic'
+          type: HTTP_AGENT
+          key: gcp.storage.bucket.network.get
+          history: 1h
+          value_type: TEXT
+          description: 'GCP Cloud Storage bucket raw traffic data.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  const json_data = JSON.parse(value);
+                  
+                  function getField(data, path, default_value) {
+                  	var steps = path.split('.');
+                  
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			if (typeof default_value !== 'undefined') {
+                  				return default_value;
+                  			}
+                  			throw 'Required field "' + path + '" is not present in data received.';
+                  		}
+                  		data = data[step];
+                  	}
+                  	return data;
+                  }
+                  
+                  
+                  var data = getField(json_data, 'timeSeriesData', []),
+                  	output = [];
+                  
+                  for (var i = 0; i < data.length; i++) {
+                  	var sent = getField(data[i], 'pointData.0.values.0.doubleValue'),
+                  		received = getField(data[i], 'pointData.0.values.1.doubleValue');
+                  
+                  	output.push({
+                  		sent: sent,
+                  		received: received
+                  	});
+                  }
+                  
+                  return JSON.stringify(output);
+          timeout: '{$GCP.DATA.TIMEOUT}'
+          url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
+          posts: |
+            {
+              "query": "fetch gcs_bucket
+              | { metric 'storage.googleapis.com/network/sent_bytes_count';
+                  metric 'storage.googleapis.com/network/received_bytes_count' }
+              | filter resource.bucket_name == '{HOST.NAME}'
+              | align rate({$GCP.TIME.WINDOW})
+              | every {$GCP.TIME.WINDOW}
+              | group_by [resource.bucket_name], aggregate(val())
+              | join"
+            }
+          headers:
+            - name: Content-Type
+              value: application/json
+            - name: Authorization
+              value: 'Bearer {$GCP.AUTH.TOKEN}'
+          request_method: POST
+          tags:
+            - tag: component
+              value: raw
+          triggers:
+            - uuid: 1b0ea2b38fe740b197ecbcfdd7364b12
+              expression: 'nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.network.get,30m)=1'
+              name: 'GCP Cloud Storage: GCP API is failing (bucket network traffic)'
+              priority: HIGH
+              description: 'No data received from GCP API for the last 30 minutes. Possible query error or API failure.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: 6cf82f75095c4c4995be5930e46c81e3
+          name: 'Bucket received bytes'
+          type: DEPENDENT
+          key: gcp.storage.bucket.network.received_bytes
+          value_type: FLOAT
+          units: Bps
+          description: 'Incoming network traffic to the bucket.'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '-1'
+            - type: JSONPATH
+              parameters:
+                - $..received.first()
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.storage.bucket.network.get
+          triggers:
+            - uuid: 6cf82f75095c4c4995be5930e46c81e4
+              expression: 'min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.network.received_bytes,5m)>{$GCS.INGRESS.MAX}'
+              name: 'GCP Cloud Storage: High ingress traffic'
+              priority: INFO
+              description: 'Incoming network traffic to the bucket exceeds the threshold.'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: 8feabc73dc474124bd23f14158a1d1bc
+          name: 'Bucket sent bytes'
+          type: DEPENDENT
+          key: gcp.storage.bucket.network.sent_bytes
+          value_type: FLOAT
+          units: Bps
+          description: 'Outgoing network traffic from the bucket.'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '-1'
+            - type: JSONPATH
+              parameters:
+                - $..sent.first()
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.storage.bucket.network.get
+          triggers:
+            - uuid: 8feabc73dc474124bd23f14158a1d1bd
+              expression: 'min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.network.sent_bytes,5m)>{$GCS.EGRESS.MAX}'
+              name: 'GCP Cloud Storage: High egress traffic'
+              priority: WARNING
+              description: 'Outgoing network traffic from the bucket exceeds the threshold.'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: c2bcc97362a746f2916f7a60bdbb2b16
+          name: 'Bucket objects total count'
+          type: DEPENDENT
+          key: gcp.storage.bucket.objects.count
+          description: 'Cloud Storage bucket total object count.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $..objects.first()
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.storage.bucket.metrics.get
+          tags:
+            - tag: component
+              value: storage
+          triggers:
+            - uuid: c2bcc97362a746f2916f7a60bdbb1b16
+              expression: 'min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.objects.count,1h)>{$GCS.OBJECT.COUNT.MAX}'
+              name: 'GCP Cloud Storage: Bucket object count is too high'
+              priority: WARNING
+              description: 'Number of objects in the bucket exceeds the configured limit.'
+              tags:
+                - tag: scope
+                  value: capacity
+            - uuid: c2bcc97362a746f2916f7a60bdbb1b17
+              expression: 'max(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.objects.count,24h)=0'
+              name: 'GCP Cloud Storage: No objects in bucket'
+              priority: INFO
+              description: 'No objects have been stored in the bucket for the last 24 hours.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: b7254ac806484e6ebc5f7b7b5c668d83
+          name: 'Successful request count'
+          type: DEPENDENT
+          key: gcp.storage.bucket.request.2xx
+          value_type: FLOAT
+          units: requests
+          description: 'Number of `2xx` requests reaching the service.'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '-1'
+            - type: JSONPATH
+              parameters:
+                - $.r2xx
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: gcp.storage.bucket.requests.get
+          tags:
+            - tag: component
+              value: requests
+            - tag: http-code
+              value: 2xx
+        - uuid: a559e116586a4fe09c1fe3d69f22f7de
+          name: 'Client error request count'
+          type: DEPENDENT
+          key: gcp.storage.bucket.request.4xx
+          value_type: FLOAT
+          units: requests
+          description: 'Number of `4xx` requests reaching the service.'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '-1'
+            - type: JSONPATH
+              parameters:
+                - $.r4xx
+          master_item:
+            key: gcp.storage.bucket.requests.get
+          tags:
+            - tag: component
+              value: requests
+            - tag: http-code
+              value: 4xx
+        - uuid: 9ee11531d80d42c2ae1b610a2b5238d1
+          name: 'Server error request count'
+          type: DEPENDENT
+          key: gcp.storage.bucket.request.5xx
+          value_type: FLOAT
+          units: requests
+          description: 'Number of `5xx` requests reaching the service.'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '-1'
+            - type: JSONPATH
+              parameters:
+                - $.r5xx
+          master_item:
+            key: gcp.storage.bucket.requests.get
+          tags:
+            - tag: component
+              value: requests
+            - tag: http-code
+              value: 5xx
+        - uuid: 2c9d5a1b8e4a4f0c8b1e5a6d6c3e4f5a
+          name: 'Error rate'
+          type: CALCULATED
+          key: gcp.storage.bucket.request.error.rate
+          value_type: FLOAT
+          units: '%'
+          params: |
+            (
+              last(//gcp.storage.bucket.request.4xx)
+              + last(//gcp.storage.bucket.request.5xx)
+            )
+            /
+            last(//gcp.storage.bucket.request.total)
+            * 100
+          description: 'Rate of failed requests reaching the service.'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '-1'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          tags:
+            - tag: component
+              value: requests
+          triggers:
+            - uuid: 2c9d5a1b8e4a4f0c8b1e5a7d6c3e4f5a
+              expression: 'min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.request.error.rate,5m)>{$GCS.API.ERROR.MAX}'
+              name: 'GCP Cloud Storage: High API error rate'
+              priority: AVERAGE
+              description: 'GCP Cloud Storage bucket API error rate exceeds the configured threshold.'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: cf4df1a934094045963acc86e4232349
+          name: 'Success rate'
+          type: CALCULATED
+          key: gcp.storage.bucket.request.success.rate
+          value_type: FLOAT
+          units: '%'
+          params: |
+            last(//gcp.storage.bucket.request.2xx)
+            /
+            last(//gcp.storage.bucket.request.total)
+            * 100
+          description: 'Rate of successful requests reaching the service.'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '-1'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '100'
+          tags:
+            - tag: component
+              value: requests
+        - uuid: f1b230dd770a4d6cb8563a668b966161
+          name: 'Total requests'
+          type: CALCULATED
+          key: gcp.storage.bucket.request.total
+          units: requests
+          params: 'last(//gcp.storage.bucket.request.2xx) + last(//gcp.storage.bucket.request.4xx) + last(//gcp.storage.bucket.request.5xx)'
+          description: 'Number of all requests reaching the service.'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '-1'
+          tags:
+            - tag: component
+              value: requests
+        - uuid: b93d03d2ee2845a3b11b3be025664743
+          name: 'Get bucket API metric'
+          type: HTTP_AGENT
+          key: gcp.storage.bucket.requests.get
+          history: 1h
+          value_type: TEXT
+          description: 'GCP Cloud Storage bucket API raw metric data.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  const json_data = JSON.parse(value);
+                  
+                  function getField(data, path, default_value) {
+                  	var steps = path.split('.');
+                  
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			if (typeof default_value !== 'undefined') {
+                  				return default_value;
+                  			}
+                  			throw 'Required field "' + path + '" is not present in data received.';
+                  		}
+                  		data = data[step];
+                  	}
+                  	return data;
+                  }
+                  
+                  
+                  var data = getField(json_data, 'timeSeriesData', []),
+                  	output = {
+                  		r2xx: 0,
+                  		r4xx: 0,
+                  		r5xx: 0
+                  	};
+                  
+                  var success_statuses = ['OK'],
+                  	client_errors = [
+                  		'INVALID_ARGUMENT',
+                  		'FAILED_PRECONDITION',
+                  		'OUT_OF_RANGE',
+                  		'UNAUTHENTICATED',
+                  		'PERMISSION_DENIED',
+                  		'NOT_FOUND',
+                  		'ALREADY_EXISTS'
+                  	],
+                  	server_errors = [
+                  		'INTERNAL',
+                  		'UNAVAILABLE',
+                  		'DEADLINE_EXCEEDED',
+                  		'RESOURCE_EXHAUSTED',
+                  		'ABORTED'
+                  	];
+                  
+                  for (var i = 0; i < data.length; i++) {
+                  	var code = getField(data[i], 'labelValues.0.stringValue'),
+                  		value_obj = getField(data[i], 'pointData.0.values.0'),
+                  		value = 0;
+                  
+                  	if (typeof value_obj === 'object') {
+                  		if (typeof value_obj.int64Value !== 'undefined') {
+                  			value = parseInt(value_obj.int64Value);
+                  		} else if (typeof value_obj.doubleValue !== 'undefined') {
+                  			value = value_obj.doubleValue;
+                  		}
+                  	}
+                  
+                  	if (success_statuses.indexOf(code) !== -1) {
+                  		output.r2xx += value;
+                  	} else if (client_errors.indexOf(code) !== -1) {
+                  		output.r4xx += value;
+                  	} else if (server_errors.indexOf(code) !== -1) {
+                  		output.r5xx += value;
+                  	}
+                  }
+                  
+                  return JSON.stringify(output);
+          timeout: '{$GCP.DATA.TIMEOUT}'
+          url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
+          posts: |
+            {
+              "query": "fetch gcs_bucket
+              | metric 'storage.googleapis.com/api/request_count'
+              | filter resource.bucket_name == '{HOST.NAME}'
+              | align delta({$GCP.TIME.WINDOW})
+              | every {$GCP.TIME.WINDOW}
+              | group_by [metric.response_code], aggregate(val())"
+            }
+          headers:
+            - name: Content-Type
+              value: application/json
+            - name: Authorization
+              value: 'Bearer {$GCP.AUTH.TOKEN}'
+          request_method: POST
+          tags:
+            - tag: component
+              value: raw
+            - tag: component
+              value: requests
+          triggers:
+            - uuid: 1b0ea2b38fe740b197ecbcfdd7364b13
+              expression: 'nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.requests.get,30m)=1'
+              name: 'GCP Cloud Storage: GCP API is failing (bucket requests)'
+              priority: HIGH
+              description: 'No data received from GCP API for the last 30 minutes. Possible query error or API failure.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: 5ee0088b70324aaa83630c312d64e39a
+          name: 'Bucket size'
+          type: DEPENDENT
+          key: gcp.storage.bucket.size
+          units: B
+          description: 'GCP Cloud Storage bucket total size.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $..size.first()
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.storage.bucket.metrics.get
+          tags:
+            - tag: component
+              value: storage
+          triggers:
+            - uuid: 1b0ea2b38fe740b197ecbcfdd7364b02
+              expression: 'min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.size,1h)>{$GCS.BUCKET.SIZE.MAX}'
+              name: 'GCP Cloud Storage: Bucket size is too large'
+              priority: WARNING
+              description: 'Bucket size exceeds the configured threshold.'
+              tags:
+                - tag: scope
+                  value: capacity
+            - uuid: 1b0ea2b38fe740b197ecbcfdd7364b03
+              expression: 'change(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.size)>{$GCS.BUCKET.SIZE.GROWTH.MAX}'
+              name: 'GCP Cloud Storage: Rapid storage growth detected'
+              priority: WARNING
+              description: 'Bucket size growth rate exceeds the configured threshold.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: capacity
+      tags:
+        - tag: class
+          value: cloud
+        - tag: subclass
+          value: storage
+        - tag: target
+          value: cloud-storage
+        - tag: target
+          value: gcp
+        - tag: target
+          value: google-cloud-platform
+      macros:
+        - macro: '{$GCP.DATA.TIMEOUT}'
+          value: 15s
+          description: 'Response timeout for API.'
+          config:
+            type: TEXT
+            priority: '2'
+            section_name: Other
+            label: 'Response timeout'
+            description: 'Response timeout for API.'
+        - macro: '{$GCP.PROJECT.ID}'
+          description: 'GCP project ID.'
+          config:
+            type: TEXT
+            priority: '1'
+            label: 'GCP project ID'
+            description: 'Google Cloud Platform project ID.'
+            required: 'YES'
+        - macro: '{$GCP.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty, then no proxy is used.'
+          config:
+            type: TEXT
+            priority: '4'
+            section_name: Other
+            label: 'HTTP proxy'
+            description: 'HTTP proxy to use for requests.'
+        - macro: '{$GCP.TIME.WINDOW}'
+          value: 1h
+          description: |
+            Time interval for data requests.
+            Supported usage types:
+            - Default update interval for most items.
+            - Minimal time window for data requested in Monitoring Query Language REST API request.
+        - macro: '{$GCS.API.ERROR.MAX}'
+          value: '50'
+          description: 'GCP Cloud Storage bucket API error rate threshold (per 5m). Default is 50.'
+          config:
+            type: TEXT
+            priority: '10'
+            section_name: Thresholds
+            label: 'Average API error rate limit (per 5m)'
+            description: 'Average threshold for API error rate (per 5 minutes).'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$GCS.BUCKET.SIZE.GROWTH.MAX}'
+          value: 10G
+          description: 'GCP Cloud Storage bucket size growth threshold (in bytes per hour). Default is 10GB.'
+          config:
+            type: TEXT
+            priority: '6'
+            section_name: Thresholds
+            label: 'Warning bucket size growth limit (bytes/hour)'
+            description: 'Warning threshold for bucket size growth rate (in bytes per hour).'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$GCS.BUCKET.SIZE.MAX}'
+          value: 1T
+          description: 'GCP Cloud Storage bucket size threshold (in bytes). Default is 1TB.'
+          config:
+            type: TEXT
+            priority: '5'
+            section_name: Thresholds
+            label: 'Warning bucket size limit (bytes)'
+            description: 'Warning threshold for bucket size (in bytes).'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$GCS.EGRESS.MAX}'
+          value: '104857600'
+          description: 'GCP Cloud Storage bucket egress traffic threshold (in bytes per 5m). Default is 100MB.'
+          config:
+            type: TEXT
+            priority: '8'
+            section_name: Thresholds
+            label: 'Warning egress traffic limit (bytes/5m)'
+            description: 'Warning threshold for egress traffic (in bytes per 5 minutes).'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$GCS.INGRESS.MAX}'
+          value: '104857600'
+          description: 'GCP Cloud Storage bucket ingress traffic threshold (in bytes per 5m). Default is 100MB.'
+          config:
+            type: TEXT
+            priority: '9'
+            section_name: Thresholds
+            label: 'Information ingress traffic limit (bytes/5m)'
+            description: 'Information threshold for ingress traffic (in bytes per 5 minutes).'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$GCS.OBJECT.COUNT.MAX}'
+          value: '1000000'
+          description: 'GCP Cloud Storage bucket object count threshold. Default is 1M objects.'
+          config:
+            type: TEXT
+            priority: '7'
+            section_name: Thresholds
+            label: 'Warning object count limit'
+            description: 'Warning threshold for object count in the bucket.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+      dashboards:
+        - uuid: 46afdd814acb409aaacbf91d7ffa12a5
+          name: 'GCP Cloud Storage: Bucket overview'
+          pages:
+            - name: Overview
+              widgets:
+                - type: problemsbysv
+                  width: '60'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: reference
+                      value: DTUCV
+                    - type: INTEGER
+                      name: severities.0
+                      value: '1'
+                    - type: INTEGER
+                      name: severities.1
+                      value: '2'
+                    - type: INTEGER
+                      name: severities.2
+                      value: '3'
+                    - type: INTEGER
+                      name: severities.3
+                      value: '4'
+                    - type: INTEGER
+                      name: severities.4
+                      value: '5'
+                - type: item
+                  'y': '2'
+                  width: '12'
+                  height: '4'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GCP Cloud Storage Bucket by HTTP'
+                        key: gcp.storage.bucket.objects.count
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FFCA28
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 81C784
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '1'
+                - type: svggraph
+                  name: 'Request count per HTTP code'
+                  'y': '6'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 81C784
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 0080FF
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: f1e061
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'GCP Cloud Storage Bucket by HTTP'
+                        key: gcp.storage.bucket.request.2xx
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'GCP Cloud Storage Bucket by HTTP'
+                        key: gcp.storage.bucket.request.4xx
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'GCP Cloud Storage Bucket by HTTP'
+                        key: gcp.storage.bucket.request.5xx
+                    - type: STRING
+                      name: reference
+                      value: BKYQE
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: item
+                  x: '12'
+                  'y': '2'
+                  width: '12'
+                  height: '4'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GCP Cloud Storage Bucket by HTTP'
+                        key: gcp.storage.bucket.size
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FFCA28
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 81C784
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '1'
+                - type: gauge
+                  x: '24'
+                  'y': '2'
+                  width: '24'
+                  height: '4'
+                  hide_header: 'YES'
+                  fields:
+                    - type: INTEGER
+                      name: angle
+                      value: '270'
+                    - type: STRING
+                      name: description
+                      value: 'Bucket success request rate'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '10'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GCP Cloud Storage Bucket by HTTP'
+                        key: gcp.storage.bucket.request.success.rate
+                    - type: INTEGER
+                      name: scale_size
+                      value: '10'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFBF59
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '70'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: svggraph
+                  name: 'Bucket sent bytes rate'
+                  x: '24'
+                  'y': '6'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 0080FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'GCP Cloud Storage Bucket by HTTP'
+                        key: gcp.storage.bucket.network.sent_bytes
+                    - type: STRING
+                      name: reference
+                      value: GIYQE
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: hostcard
+                  x: '48'
+                  'y': '2'
+                  width: '24'
+                  height: '4'
+                  fields:
+                    - type: INTEGER
+                      name: sections.0
+                      value: '2'
+                    - type: INTEGER
+                      name: sections.1
+                      value: '1'
+                - type: svggraph
+                  name: 'Bucket received bytes rate'
+                  x: '48'
+                  'y': '6'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: f1e061
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'GCP Cloud Storage Bucket by HTTP'
+                        key: gcp.storage.bucket.network.received_bytes
+                    - type: STRING
+                      name: reference
+                      value: GJYQE
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: clock
+                  x: '60'
+                  width: '12'
+                  fields:
+                    - type: INTEGER
+                      name: clock_type
+                      value: '1'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: time_bold
+                      value: '1'
     - uuid: 6d2443db49e54d59a82b9b525f2424ef
       template: 'GCP Compute Engine Instance by HTTP'
       name: 'GCP Compute Engine Instance by HTTP'
