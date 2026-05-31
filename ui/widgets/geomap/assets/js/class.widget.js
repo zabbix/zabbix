@@ -479,7 +479,7 @@ class CWidgetGeoMap extends CWidget {
 	 */
 	updateFilter(filter) {
 		updateUserProfile('web.dashboard.widget.geomap.severity_filter', filter, [this._widgetid], PROFILE_TYPE_STR)
-			.always(() => {
+			.finally(() => {
 				if (this._state === WIDGET_STATE_ACTIVE) {
 					this._startUpdating();
 				}
@@ -510,7 +510,7 @@ class CWidgetGeoMap extends CWidget {
 	 */
 	unsetDefaultView() {
 		updateUserProfile('web.dashboard.widget.geomap.default_view', '', [this._widgetid], PROFILE_TYPE_STR)
-			.always(() => {
+			.finally(() => {
 				delete this._home_coords.default;
 			});
 

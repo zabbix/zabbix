@@ -177,6 +177,9 @@ try
 	findElementStrict(browser,"xpath", "//li[@id='config' and @class='has-submenu is-expanded']");
 
 	clickElement(browser, "link text", "Hosts");
+
+	Zabbix.sleep(1000); // Hosts is clicked and datatable is loaded
+
 	clickElement(browser, "xpath", "//input[@id='all_hosts']");
 	clickElement(browser, "xpath", "//button[text()='Disable']");
 
@@ -282,7 +285,7 @@ try
 		el = browser2.findElement("link text", "Sign out");
 
 		Zabbix.log(3, "collect performance entries");
-		browser2.collectPerfEntries();
+		browser2.collectPerfEntries();	// only collect, dashboard performance entries are too big to fit into history table
 
 		try
 		{
@@ -324,6 +327,9 @@ try
 	}
 	catch (error)
 	{
+		if (null !== browser2.getError())
+			browser.setError(browser2.getError());
+
 		throw error;
 	}
 
@@ -422,7 +428,6 @@ catch (err)
 }
 
 result = browser.getResult();
-result.browserDashboard = browserDashboardResult;
 
 Zabbix.log(3, "finished");
 return JSON.stringify(result);
