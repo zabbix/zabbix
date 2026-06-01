@@ -39,7 +39,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	const SENSOR_BASE = 'sensor';
 	const LLD_DISCOVERY_COUNT = 10000;
 	const TRIGGER_WARMUP_ITERATIONS = 60;
-	const LLD_ITERATIONS = 120;
+	const LLD_ITERATIONS = 180;
 
 	private static $hostid;
 	private static $proxyid;
