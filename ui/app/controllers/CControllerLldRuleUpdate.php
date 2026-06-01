@@ -27,7 +27,7 @@ class CControllerLldRuleUpdate extends CControllerLldRuleUpdateGeneral {
 		return ['itemid' => ['db items.itemid', 'required']];
 	}
 
-	public static function getIsPrototype(): bool {
+	public static function isPrototype(): bool {
 		return false;
 	}
 

@@ -30,7 +30,7 @@ class CControllerLldRulePrototypeUpdate extends CControllerLldRuleUpdateGeneral 
 		];
 	}
 
-	public static function getIsPrototype(): bool {
+	public static function isPrototype(): bool {
 		return true;
 	}
 

@@ -27,7 +27,7 @@ class CControllerLldRuleCreate extends CControllerLldRuleUpdateGeneral {
 		return [];
 	}
 
-	public static function getIsPrototype(): bool {
+	public static function isPrototype(): bool {
 		return false;
 	}
 

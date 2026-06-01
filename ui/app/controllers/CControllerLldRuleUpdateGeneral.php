@@ -35,7 +35,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 
 	abstract static function getFieldsValidationRulesAdditional(): array;
 
-	abstract static function getIsPrototype(): bool;
+	abstract static function isPrototype(): bool;
 
 	public static function getItemTypes() {
 		return [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
@@ -58,7 +58,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			],
 			'key' => [
 				['db items.key_', 'required', 'not_empty',
-					'use' => [CItemKeyValidator::class, ['lldmacros' => static::getIsPrototype()]]
+					'use' => [CItemKeyValidator::class, ['lldmacros' => static::isPrototype()]]
 				],
 				['string', 'regex' => '/^(?!'.preg_quote(ZBX_DEFAULT_KEY_DB_MONITOR, '/').')/',
 					'messages' => ['regex' => _('Check the key, please. Default example was passed.')],
@@ -128,7 +128,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'status_codes' => ['db items.status_codes',
-				'use' => [CRangesParser::class, ['usermacros' => true, 'lldmacros' => static::getIsPrototype(),
+				'use' => [CRangesParser::class, ['usermacros' => true, 'lldmacros' => static::isPrototype(),
 					'with_minus' => true
 				]],
 				'messages' => ['use' => _('Invalid HTTP status code or range.')],
@@ -234,14 +234,14 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				'type' => ['integer', 'in' => [ITEM_DELAY_FLEXIBLE, ITEM_DELAY_SCHEDULING]],
 				'schedule' => ['string', 'required',
 					'use' => [CSchedulingIntervalParser::class, ['usermacros' => true,
-						'lldmacros' => static::getIsPrototype()
+						'lldmacros' => static::isPrototype()
 					]],
 					'messages' => ['use' => _('Invalid interval.')],
 					'when' => ['type', 'in' => [ITEM_DELAY_SCHEDULING]]
 				],
 				'delay' => ['string', 'required',
 					'use' => [CSimpleIntervalParser::class, ['usermacros' => true,
-						'lldmacros' => static::getIsPrototype()
+						'lldmacros' => static::isPrototype()
 					]],
 					'messages' => ['use' => _('Invalid interval.')],
 					'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
@@ -250,7 +250,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 					[
 						'string', 'required',
 						'use' => [CTimePeriodParser::class,
-							['usermacros' => true, 'lldmacros' => static::getIsPrototype()]
+							['usermacros' => true, 'lldmacros' => static::isPrototype()]
 						],
 						'messages' => ['use' => _('Invalid period.')],
 						'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
@@ -266,7 +266,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				],
 				['db items.delay', 'required', 'not_empty',
 					'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true,
-						'lldmacros' => static::getIsPrototype()
+						'lldmacros' => static::isPrototype()
 					]],
 					'when' => ['type', 'in' => [
 						ITEM_TYPE_DB_MONITOR, ITEM_TYPE_EXTERNAL, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_INTERNAL,
@@ -276,7 +276,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				],
 				['db items.delay', 'required', 'not_empty',
 					'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true,
-						'lldmacros' => static::getIsPrototype()
+						'lldmacros' => static::isPrototype()
 					]],
 					'when' => [
 						['type', 'in' => [ITEM_TYPE_ZABBIX_ACTIVE]],
@@ -290,7 +290,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			'timeout' => [
 				['db items.timeout', 'required', 'not_empty',
 					'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN,
-						'usermacros' => true, 'lldmacros' => static::getIsPrototype()
+						'usermacros' => true, 'lldmacros' => static::isPrototype()
 					]],
 					'when' => [
 						['type', 'in' => [ITEM_TYPE_SIMPLE]],
@@ -300,7 +300,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				],
 				['db items.timeout', 'required', 'not_empty',
 					'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN,
-						'usermacros' => true, 'lldmacros' => static::getIsPrototype()
+						'usermacros' => true, 'lldmacros' => static::isPrototype()
 					]],
 					'when' => [
 						['type', 'in' => [ITEM_TYPE_SNMP]],
@@ -310,7 +310,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				],
 				['db items.timeout', 'required', 'not_empty',
 					'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN,
-						'usermacros' => true, 'lldmacros' => static::getIsPrototype()
+						'usermacros' => true, 'lldmacros' => static::isPrototype()
 					]],
 					'when' => [
 						['type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
@@ -326,7 +326,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			],
 			'lifetime' => ['db items.enabled_lifetime',
 				'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_HOUR, 'max' => 25 * SEC_PER_YEAR,
-					'usermacros' => true, 'lldmacros' => static::getIsPrototype()
+					'usermacros' => true, 'lldmacros' => static::isPrototype()
 				]],
 				'when' => ['lifetime_type', 'in' => [ZBX_LLD_DELETE_AFTER]]
 			],
@@ -335,7 +335,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			],
 			'enabled_lifetime' => ['db items.enabled_lifetime',
 				'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_HOUR, 'max' => 25 * SEC_PER_YEAR,
-					'usermacros' => true, 'lldmacros' => static::getIsPrototype()
+					'usermacros' => true, 'lldmacros' => static::isPrototype()
 				]],
 				'when' => ['enabled_lifetime_type', 'in' => [ZBX_LLD_DELETE_AFTER]]
 			],
@@ -456,7 +456,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 					'opinventory' => ['string']
 				]]
 			]],
-			'preprocessing' => CItemGeneralHelper::getPreprocessingValidationRules(static::getIsPrototype())
+			'preprocessing' => CItemGeneralHelper::getPreprocessingValidationRules(static::isPrototype())
 		] + static::getFieldsValidationRulesAdditional()];
 	}
 }
