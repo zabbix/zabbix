@@ -369,7 +369,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]
 			],
 			'formula' => ['db items.formula', 'required',
-				'use' => [CConditionFormulaParser::class, []],
+				'use' => [CConditionFormulaParser::class],
 				'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 			],
 			'conditions' => [
@@ -408,6 +408,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 							CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]
 						],
 						'formula' => ['db lld_override.formula', 'required',
+							'use' => [CConditionFormulaParser::class],
 							'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 						],
 						'conditions' => ['objects', 'fields' => [
