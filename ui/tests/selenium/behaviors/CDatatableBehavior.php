@@ -52,7 +52,7 @@ class CDatatableBehavior extends CBehavior {
 	}
 
 	/**
-	 * Default selector for locating the databable element.
+	 * Default selector for locating the datatable element.
 	 *
 	 * @var string
 	 */

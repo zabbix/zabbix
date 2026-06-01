@@ -41,6 +41,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "layout/grid-columns";
 @import "layout/form-grid";
 
+@import "components/banner";
 @import "components/buttons";
 @import "components/icons-extended";
 @import "components/checkbox-list";
@@ -857,6 +858,18 @@ form {
 	.icon {
 		&:not(:first-child) {
 			margin-left: 5px;
+		}
+	}
+
+	[aria-label] {
+		@if $ui-transitions {
+			transition: box-shadow $ui-controls-transition-duration ease-out;
+		}
+
+		&:focus {
+			border-radius: 2px;
+			outline: none;
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
 		}
 	}
 
