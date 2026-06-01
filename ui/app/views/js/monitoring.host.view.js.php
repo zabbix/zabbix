@@ -421,13 +421,9 @@
 		}
 
 		#refresh() {
-			if (isUserInteracting()) {
-				return;
-			}
-
 			const search_params = new URLSearchParams(location.search.substring(1));
-			const current_filter = searchParamsToObject(search_params);
-			const filter = {...this.#filter_defaults, ...current_filter};
+			const url_filter = searchParamsToObject(search_params);
+			const filter = {...this.#filter_defaults, ...url_filter};
 
 			this.#datatable.setFilter(filter)
 				.dispatchEvent(CDataTable.EVENT_INIT, {
@@ -471,7 +467,13 @@
 			}
 
 			this.#unscheduleRefresh();
-			this.#refresh_interval_id = setInterval(() => this.#refresh(), this.#refresh_interval);
+			this.#refresh_interval_id = setInterval(() => {
+				if (isUserInteracting()) {
+					return;
+				}
+
+				this.#refresh();
+			}, this.#refresh_interval);
 		}
 
 		#unscheduleRefresh() {
