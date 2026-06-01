@@ -31,7 +31,7 @@ zabbix_export:
         Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]`
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -1313,17 +1313,21 @@ zabbix_export:
       macros:
         - macro: '{$CEPH.API.KEY}'
           type: SECRET_TEXT
+          description: 'Ceph API key.'
           config:
             type: TEXT
             priority: '2'
             label: 'API key'
+            description: 'Ceph API key.'
             required: 'YES'
         - macro: '{$CEPH.CONNSTRING}'
           value: 'https://localhost:8003'
+          description: 'Ceph connection string.'
           config:
             type: TEXT
             priority: '3'
             label: 'Connection string'
+            description: 'Ceph connection string.'
             required: 'YES'
         - macro: '{$CEPH.MODE}'
           value: restful
@@ -1340,10 +1344,12 @@ zabbix_export:
                 text: Native
         - macro: '{$CEPH.USER}'
           value: zabbix
+          description: 'Ceph API user.'
           config:
             type: TEXT
             priority: '1'
             label: Username
+            description: 'Ceph API user.'
             required: 'YES'
       valuemaps:
         - uuid: 2a4b2a8c55ba48b2a815e4123c9ea7fa

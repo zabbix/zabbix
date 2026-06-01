@@ -38,16 +38,16 @@ Test availability: `zabbix_get -s mongos.node -k 'mongodb.ping["{$MONGODB.CONNST
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$MONGODB.CONNSTRING}|<p>Connection string in the URI format (password is not used). This param overwrites a value configured in the "Server" option of the configuration file (if it's set), otherwise, the plugin's default value is used: "tcp://localhost:27017"</p>|`tcp://localhost:27017`|
-|{$MONGODB.USER}|<p>MongoDB username</p>||
-|{$MONGODB.PASSWORD}|<p>MongoDB user password</p>||
-|{$MONGODB.CONNS.AVAILABLE.MIN.WARN}|<p>Minimum number of available connections</p>|`1000`|
-|{$MONGODB.LLD.FILTER.COLLECTION.MATCHES}|<p>Filter of discoverable collections</p>|`.*`|
-|{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}|<p>Filter to exclude discovered collections</p>|`CHANGE_IF_NEEDED`|
-|{$MONGODB.LLD.FILTER.DB.MATCHES}|<p>Filter of discoverable databases</p>|`.*`|
-|{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}|<p>Filter to exclude discovered databases</p>|`(admin\|config\|local)`|
-|{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}|<p>Maximum number of cursors timing out per second</p>|`1`|
-|{$MONGODB.CURSOR.OPEN.MAX.WARN}|<p>Maximum number of open cursors</p>|`10000`|
+|{$MONGODB.CONNSTRING}|<p>MongoDB connection string in URI format (password not included).</p><p>If set, it overrides the Server option from the config file.</p><p>Otherwise, it uses the default: tcp://localhost:27017</p>|`tcp://localhost:27017`|
+|{$MONGODB.USER}|<p>MongoDB username.</p>||
+|{$MONGODB.PASSWORD}|<p>MongoDB password.</p>||
+|{$MONGODB.CONNS.AVAILABLE.MIN.WARN}|<p>Minimum number of available connections.</p>|`1000`|
+|{$MONGODB.LLD.FILTER.COLLECTION.MATCHES}|<p>Filter of discoverable collections.</p>|`.*`|
+|{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}|<p>Filter to exclude discovered collections.</p>|`CHANGE_IF_NEEDED`|
+|{$MONGODB.LLD.FILTER.DB.MATCHES}|<p>Filter of discoverable databases.</p>|`.*`|
+|{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}|<p>Filter to exclude discovered databases.</p>|`(admin\|config\|local)`|
+|{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}|<p>Maximum number of cursors timing out per second.</p>|`1`|
+|{$MONGODB.CURSOR.OPEN.MAX.WARN}|<p>Maximum number of open cursors.</p>|`10000`|
 
 ### Items
 

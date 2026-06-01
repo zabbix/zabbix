@@ -561,9 +561,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 
 		// Main objects are hosts and templates, but sub-objects are items, triggers, graphs, etc.
 		if (array_key_exists('sub_object', $data)) {
-			$this->query('class:list-table')->asTable()->waitUntilPresent()->one()
+			$this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady()
 					->findRow('Name', ($data['object'] === 'Hosts') ? self::EMPTY_HOST : self::EMPTY_TEMPLATE)
-					->getColumn($data['sub_object'])->query('tag:a')->waitUntilClickable()->one()->click();
+					->getColumn($data['sub_object'])->query('tag:a')->waitUntilClickable()->one()->scrollIntoView(50)->click();
 			$this->page->waitUntilReady();
 		}
 
