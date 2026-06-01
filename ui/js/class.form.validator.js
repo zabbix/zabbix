@@ -256,7 +256,7 @@ class CFormValidator {
 			while (path_for_data_lookup.length) {
 				const part = path_for_data_lookup.shift();
 
-				if (!(part in field_data)) {
+				if (typeof(field_data) !== 'object' || !(part in field_data)) {
 					return null;
 				}
 
