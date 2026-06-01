@@ -1076,28 +1076,44 @@ class testItemTest extends CWebTest {
 					$test_form->getOverlayMessage()->close();
 				}
 				else {
-					$details = ($data['fields']['Type'] === 'SNMP agent')
-						? 'interface_details_community' // $elements['community']
-						: 'interface_address'; // ja strada, nomainit pret $elements['address'] , kas ir vnk 'id:interface_address'
+					$fields = ($data['fields']['Type'] === 'SNMP agent')
+						? ['interface_address' => '127.0.0.1', 'interface_details_community' => 'public']
+						: ['interface_address' => '127.0.0.1'];
 
-					// Click Get value button.
+					$expected_errors = [];
+					foreach ($fields as $name => $value) {
+						$expected_errors['id:'.$name] = 'This field cannot be empty.';
+					}
+
+					// Click Get value button and assert inline errors.
 					$test_form->query('button:Get value')->one()->click();
-					$this->assertInlineError($test_form, ['id:'.$details => 'This field cannot be empty.']);
+					$this->assertInlineError($test_form, $expected_errors);
 
-					// Get the field object and enter a value to make inline error disappear.
-					$value = ($details === 'interface_details_community') ? 'public' : '127.0.0.1';
-					$field = $test_form->getField('id:'.$details);
-					$field->fill($value);
+					// Get field objects for further actions.
+					$field_objects = [];
+					foreach ($fields as $name => $value) {
+						$field_objects[$name] = $test_form->getField('id:'.$name);
+					}
 
+					// Fill fields with values to remove inline errors.
+					foreach ($field_objects as $name => $field) {
+						$field->fill($fields[$name]);
+					}
+
+					// Remove focus to trigger validation and wait for all errors do disappear.
 					$this->page->removeFocus();
-					$field->waitUntilClassesNotPresent('has-error');
+					foreach ($field_objects as $field) {
+						$field->waitUntilClassesNotPresent('has-error');
+					}
 
-					// Delete the field value to invoke an inline error again.
-					$field->fill('');
+					// Clear field values to invoke inline errors again.
+					foreach ($field_objects as $field) {
+						$field->fill('');
+					}
 
-					// Click Test button in test form.
+					// Click Test button in test form and assert inline errors.
 					$overlay->query('button:Get value and test')->one()->waitUntilVisible()->click();
-					$this->assertInlineError($test_form, ['id:'.$details => 'This field cannot be empty.']);
+					$this->assertInlineError($test_form, $expected_errors);
 				}
 
 				// Check empty interface fields for item types that use network interface and has IP address and port fields.
