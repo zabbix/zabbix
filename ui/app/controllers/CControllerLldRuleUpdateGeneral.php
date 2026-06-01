@@ -52,10 +52,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			'templateid' => ['db items.templateid'],
 			'discovered' => ['boolean'],
 			'name' => ['db items.name', 'required', 'not_empty'],
-			'type' => [
-				['db items.type', 'required', 'in' => self::getItemTypes()],
-				['db items.type', 'required', 'not_in' => [ITEM_TYPE_NESTED], 'when' => ['discovered', 'in' => [1]]]
-			],
+			'type' => ['db items.type', 'required', 'in' => self::getItemTypes()],
 			'key' => [
 				['db items.key_', 'required', 'not_empty',
 					'use' => [CItemKeyValidator::class, ['lldmacros' => static::isPrototype()]]
