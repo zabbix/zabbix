@@ -419,6 +419,16 @@ static int	zbx_regression(double *t, double *x, int n, zbx_fit_t fit, int k, zbx
 	if (SUCCEED != (res = zbx_least_squares(independent, dependent, coefficients)))
 		goto out;
 
+	/* Reject regressions that produced Inf/NaN coefficients. */
+	for (int i = 0; i < coefficients->rows * coefficients->columns; i++)
+	{
+		if (0 == isfinite(coefficients->elements[i]))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "regression produced non-finite coefficient");
+			res = FAIL;
+			goto out;
+		}
+	}
 out:
 	zbx_matrix_free(independent);
 	zbx_matrix_free(dependent);
@@ -1188,7 +1198,12 @@ out:
 	{
 		result = ZBX_MATH_ERROR;
 	}
-	else if (0 == isfinite(result) || 0.0 > result || DBL_MAX < result)
+	else if (0 != isnan(result))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
+		result = ZBX_MATH_ERROR;
+	}
+	else if (0.0 > result || DBL_MAX < result)
 	{
 		result = DBL_MAX;
 	}
