@@ -253,12 +253,13 @@ static int	tq_parse_function_args(struct zbx_json_parse *jp, zbx_vector_str_t *a
 	/* in case of an error the args vector is cleaned by the calling function */
 	int		ret = FAIL;
 	const char	*p = NULL;
+	zbx_json_type_t	type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (NULL != (p = zbx_json_next(jp, p)))
 	{
-		if (NULL == (p = zbx_json_decodevalue(p, buf, buf_size, NULL)))
+		if (NULL == (p = zbx_json_decodevalue(p, buf, buf_size, &type)) || ZBX_JSON_TYPE_STRING != type)
 			goto out;
 
 		zbx_vector_str_append(args, zbx_strdup(NULL, buf));
