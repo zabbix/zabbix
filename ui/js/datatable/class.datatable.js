@@ -1337,7 +1337,7 @@ class CDataTable {
 
 		this.getData({check_changes, force_load})
 			.then(response => {
-				if ('error' in response) {
+				if (response && 'error' in response) {
 					const title = response.error.title || t('Unexpected server error.');
 					const messages = response.error.messages || [];
 
@@ -1355,6 +1355,10 @@ class CDataTable {
 				onSuccess(response);
 			})
 			.catch(error => {
+				if (window.unloading) {
+					return;
+				}
+
 				if (error.name != 'AbortError') {
 					CMessageHelper.error(this.#element, [error.message], error.name);
 				}
@@ -2514,6 +2518,10 @@ class CDataTable {
 		this.#handleScrollbar();
 	}
 
+	onWindowBeforeUnload = () => {
+		window.unloading = true;
+	}
+
 	onWrapperScroll = () => {
 		this.#options_popup?.position();
 	}
@@ -2528,6 +2536,8 @@ class CDataTable {
 				.on(CPager.EVENT_SELECT, this.onPagerSelect)
 				.on(CPager.EVENT_STATE_CHANGE, this.onPagerStateChange);
 		}
+
+		window.addEventListener('beforeunload', this.onWindowBeforeUnload);
 
 		document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`)?.addEventListener('scroll', this.onWrapperScroll);
 
@@ -2569,6 +2579,7 @@ class CDataTable {
 		}
 
 		window.removeEventListener('resize', this.onWindowResize);
+		window.removeEventListener('beforeunload', this.onWindowBeforeUnload);
 
 		document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`)?.removeEventListener('scroll', this.onWrapperScroll);
 
