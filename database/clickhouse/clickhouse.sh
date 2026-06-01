@@ -3,7 +3,7 @@ display_help()
 	echo "Arguments:"
 	printf "  %-16s %s\n" "-s|--server" "ClickHouse URL ($CH_URL)"
 	printf "  %-16s %s\n" "-d|--db" "Database name ($CH_DB)"
-	printf "  %-16s %s\n" "-u|--user" "ClickHouse username ($CH_USER)"
+	printf "  %-16s %s\n" "-u|--user" "ClickHouse username"
 	printf "  %-16s %s\n" "-p|--password" "ClickHouse password"
 	printf "  %-16s %s\n" "-t|--ttl" "Housekeeping interval in seconds ($CH_TTL)"
 	printf "  %-16s %s\n" "-P|--partition" "Partitioning schema ($CH_PARTITION)"
