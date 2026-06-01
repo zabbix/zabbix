@@ -21,5 +21,7 @@ libzbxcep_a_SOURCES = \
 	cep_api.c \
 	cep_api.h \
 	cep_correlation.c \
-	cep_correlation.h
+	cep_correlation.h \
+	cep_rule.c \
+	cep_rule.h
 

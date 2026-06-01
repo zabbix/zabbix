@@ -1111,76 +1111,15 @@ static void	cep_remove_condition(zbx_cep_config_t *cep_config, zbx_uint64_t cond
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update formula of a CEP rule based on its evaluation type         *
+ * Purpose: prepare CEP rule conditions for evaluation                        *
  *                                                                            *
- * Parameters: rule      - [IN/OUT] rule to update formula for                *
- *             str       - [IN/OUT] temporary buffer for formula building     *
- *             str_alloc - [IN/OUT] size of the temporary buffer              *
- *                                                                            *
- * Comments: Converts condition evaluation to expression evaluation           *
- *           type by building the corresponding formula.                      *
+ * Parameters: rule      - [IN/OUT] rule to prepare                           *
  *                                                                            *
  ******************************************************************************/
-static void	cep_rule_update_formula(zbx_cep_rule_t *rule, char **str, size_t *str_alloc)
+static void	cep_rule_prepare_conditions(zbx_cep_rule_t *rule)
 {
-	const char	*op = NULL;
-	size_t		str_offset = 0;
-
-	if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == rule->evaltype || 0 == rule->conditions.values_num)
-		return;
-
-	switch (rule->evaltype)
-	{
-		case ZBX_CONDITION_EVAL_TYPE_OR:
-			op = " or ";
-			break;
-		case ZBX_CONDITION_EVAL_TYPE_AND:
-			op = " and ";
-			break;
-	}
-
-	if (NULL != op)
-	{
-		for (int i = 0; i < rule->conditions.values_num; i++)
-		{
-			if (0 != str_offset)
-				zbx_strcpy_alloc(str, str_alloc, &str_offset, op);
-
-			zbx_snprintf_alloc(str, str_alloc, &str_offset, "{" ZBX_FS_UI64 "}",
-					rule->conditions.values[i].conditionid);
-		}
-		rule->formula = zbx_strdup(rule->formula, *str);
-
-		return;
-	}
-
-	/* convert and/or evaluation type */
-
-	zbx_vector_cep_condition_sort(&rule->conditions, cep_condition_compare_by_type);
-
-	for (int i = 0, j = 0; i < rule->conditions.values_num; i = j)
-	{
-		op = "";
-
-		if (0 != str_offset)
-			zbx_strcpy_alloc(str, str_alloc, &str_offset, " and ");
-
-		zbx_chrcpy_alloc(str, str_alloc, &str_offset, '(');
-
-		for (j = i; j < rule->conditions.values_num &&
-				rule->conditions.values[j].type == rule->conditions.values[i].type; j++)
-		{
-			zbx_snprintf_alloc(str, str_alloc, &str_offset, "%s{" ZBX_FS_UI64 "}",
-					op, rule->conditions.values[j].conditionid);
-
-			op = " or ";
-		}
-
-		zbx_chrcpy_alloc(str, str_alloc, &str_offset, ')');
-	}
-
-	rule->formula = zbx_strdup(rule->formula, *str);
-	rule->evaltype = ZBX_CONDITION_EVAL_TYPE_EXPRESSION;
+	if (ZBX_CONDITION_EVAL_TYPE_AND_OR == rule->evaltype)
+		zbx_vector_cep_condition_sort(&rule->conditions, cep_condition_compare_by_type);
 }
 
 /******************************************************************************
@@ -1855,16 +1794,13 @@ static void	cep_config_update_handle(zbx_cep_config_t *cep_config, zbx_uint64_t 
 static void	cep_update_rules(zbx_cep_config_t *cep_config, zbx_vector_cep_rule_ptr_t *rules_cond,
 		zbx_vector_cep_rule_ptr_t *rules_op)
 {
-	char	*str = NULL;
-	size_t	str_alloc = 0;
-
 	if (NULL != rules_cond && NULL != rules_op)
 	{
 		zbx_vector_cep_rule_ptr_sort(rules_cond, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 		zbx_vector_cep_rule_ptr_uniq(rules_cond, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
 		for (int i = 0; i < rules_cond->values_num; i++)
-			cep_rule_update_formula(rules_cond->values[i], &str, &str_alloc);
+			cep_rule_prepare_conditions(rules_cond->values[i]);
 
 		zbx_vector_cep_rule_ptr_sort(rules_op, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 		zbx_vector_cep_rule_ptr_uniq(rules_op, ZBX_DEFAULT_PTR_COMPARE_FUNC);
@@ -1883,13 +1819,11 @@ static void	cep_update_rules(zbx_cep_config_t *cep_config, zbx_vector_cep_rule_p
 		zbx_hashset_iter_reset(&cep_config->rules, &iter);
 		while (NULL != (ref = (zbx_cep_rule_ref_t *)zbx_hashset_iter_next(&iter)))
 		{
-			cep_rule_update_formula(ref->rule, &str, &str_alloc);
+			cep_rule_prepare_conditions(ref->rule);
 			zbx_vector_cep_operation_sort(&ref->rule->operations, cep_operation_compare_by_sortorder);
 		}
 
 	}
-
-	zbx_free(str);
 }
 
 /******************************************************************************
