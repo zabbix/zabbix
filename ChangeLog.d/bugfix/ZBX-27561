@@ -1,0 +1,1 @@
+A.......S. [ZBX-27561] fixed intermittent API error -32500 (SQL failed) due to FK constraint on permission table during parallel provisioning (kkuzmina, mprihodko)
