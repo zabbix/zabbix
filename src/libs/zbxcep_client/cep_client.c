@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxcep_client.h"
+#include "zbx_cep_client.h"
 
 #include "zbx_trigger_constants.h"
 #include "zbxcommon.h"

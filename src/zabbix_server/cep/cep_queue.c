@@ -15,7 +15,7 @@
 #include "cep_queue.h"
 #include "cep_task.h"
 #include "cep.h"
-#include "zbxcep.h"
+#include "zbx_cep.h"
 
 #include "zbxalgo.h"
 #include "zbxcommon.h"

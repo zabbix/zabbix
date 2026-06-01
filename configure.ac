@@ -22,7 +22,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/zabbix_server/server.c])
 AC_CONFIG_HEADERS([include/common/config.h])
 
-AC_SUBST(DEFAULT_INCLUDES, ['-I$(top_srcdir)/include/common -I$(top_srcdir)/include'])
+AC_SUBST(DEFAULT_INCLUDES, ['-I$(top_srcdir)/include/common -I$(top_srcdir)/include -I$(top_srcdir)/src'])
 
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST

@@ -30,7 +30,7 @@
 #include "zbxconnector.h"
 #include "zbxtagfilter.h"
 #include "zbx_expression_constants.h"
-#include "zbxcep_client.h"
+#include "zbx_cep_client.h"
 #include "zbxtime.h"
 
 /* event recovery data */

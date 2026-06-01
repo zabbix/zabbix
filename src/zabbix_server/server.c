@@ -101,7 +101,7 @@
 #include "zbxbincommon.h"
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
-#include "cep/zbxcep.h"
+#include "zabbix_server/cep/zbx_cep.h"
 
 #ifdef HAVE_LIBCURL
 #	include "zbxcurl.h"

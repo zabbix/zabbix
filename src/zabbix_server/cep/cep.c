@@ -13,8 +13,8 @@
 **/
 
 #include "cep.h"
-#include "zbxcep.h"
-#include "zbxcep_client.h"
+#include "zbx_cep.h"
+#include "zbx_cep_client.h"
 
 #include "zbxcommon.h"
 #include "zbxalgo.h"

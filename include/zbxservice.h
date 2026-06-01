@@ -18,7 +18,6 @@
 #include "zbxtypes.h"
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
-#include "zbxcep_client.h"
 
 ZBX_PTR_VECTOR_DECL(db_service, zbx_db_service *)
 

@@ -37,7 +37,7 @@
 #include "zbxprof.h"
 #include "zbxcalc.h"
 #include "zbxhash.h"
-#include "zbxcep_client.h"
+#include "zbx_cep_client.h"
 #include "../events/events.h"
 
 /******************************************************************************

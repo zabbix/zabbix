@@ -19,7 +19,7 @@
 #include "../actions/actions.h"
 #include "../audit/audit_server.h"
 
-#include "zbxcep_client.h"
+#include "zbx_cep_client.h"
 #include "zbxtimekeeper.h"
 #include "zbxnix.h"
 #include "zbxself.h"

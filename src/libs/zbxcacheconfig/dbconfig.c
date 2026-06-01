@@ -60,7 +60,6 @@
 #include "zbx_expression_constants.h"
 #include "module.h"
 #include "zbxhash.h"
-#include "zbxcep_client.h"
 
 #define	ZBX_VECTOR_ARRAY_RESERVE	3
 

@@ -19,8 +19,8 @@
 
 #include "../server_constants.h"
 
-#include "../cep/zbxcep.h"
-#include "zbxcep_client.h"
+#include "zabbix_server/cep/zbx_cep.h"
+#include "zbx_cep_client.h"
 #include "zbxcommon.h"
 #include "zbxtimekeeper.h"
 #include "zbxlog.h"

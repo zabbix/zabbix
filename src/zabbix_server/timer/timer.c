@@ -14,7 +14,7 @@
 
 #include "timer.h"
 
-#include "zbxcep_client.h"
+#include "zbx_cep_client.h"
 #include "zbxtimekeeper.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"

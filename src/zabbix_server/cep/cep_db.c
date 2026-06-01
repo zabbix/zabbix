@@ -14,7 +14,7 @@
 
 #include "cep_db.h"
 #include "cep_task.h"
-#include "zbxcep.h"
+#include "zbx_cep.h"
 
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"

@@ -15,7 +15,7 @@
 #ifndef ZABBIX_CEP_TASK_H
 #define ZABBIX_CEP_TASK_H
 
-#include "zbxcep.h"
+#include "zbx_cep.h"
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"

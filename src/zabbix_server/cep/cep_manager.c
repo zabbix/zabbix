@@ -20,8 +20,8 @@
 #include "cep_api.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
-#include "zbxcep_client.h"
-#include "zbxcep.h"
+#include "zbx_cep_client.h"
+#include "zbx_cep.h"
 
 #include "zbxcommon.h"
 #include "zbxipcservice.h"

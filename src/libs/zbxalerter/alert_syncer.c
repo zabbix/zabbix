@@ -34,7 +34,7 @@
 #include "zbxtime.h"
 #include "zbxmedia.h"
 #include "zbxcacheconfig.h"
-#include "zbxcep_client.h"
+#include "zbx_cep_client.h"
 #include "zbxservice.h"
 
 typedef struct
