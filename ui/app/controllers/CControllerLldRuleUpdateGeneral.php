@@ -211,6 +211,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 					['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
 				]
 			],
+			'passphrase' => ['db items.password', 'when' => ['type', 'in' => [ITEM_TYPE_SSH]]],
 			'password' => [
 				['db items.password', 'when' => ['type',
 					'in' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX]

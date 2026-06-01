@@ -565,7 +565,7 @@ $formgrid
 	->addItem([
 		(new CLabel(_('Key passphrase'), 'passphrase'))->setId('js-item-passphrase-label'),
 		(new CFormField(
-			(new CTextBox('password', $lldrule['password'], $lldrule['discovered_lld'],
+			(new CTextBox('passphrase', $lldrule['password'], $lldrule['discovered_lld'],
 				DB::getFieldLength('items', 'password')
 			))
 				->setAttribute('data-notrim', '')
