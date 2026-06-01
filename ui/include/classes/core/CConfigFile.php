@@ -198,6 +198,10 @@ class CConfigFile {
 			$this->config['ALLOW_HTTP_AUTH'] = $ALLOW_HTTP_AUTH;
 		}
 
+		if (isset($ZBX_FEATURE_FLAGS['banners_enabled'])) {
+			$this->config['ZBX_FEATURE_FLAGS']['banners_enabled'] = $ZBX_FEATURE_FLAGS['banners_enabled'];
+		}
+
 		if (isset($ZBX_FEATURE_FLAGS['http_auth_enabled'])) {
 			$this->config['ZBX_FEATURE_FLAGS']['http_auth_enabled'] = $ZBX_FEATURE_FLAGS['http_auth_enabled'];
 		}
@@ -371,6 +375,9 @@ $SSO[\'CERT_STORAGE\']		= \'database\';
 //$SSO[\'SP_CERT\']		= \'conf/certs/sp.crt\';
 //$SSO[\'IDP_CERT\']		= \'conf/certs/idp.crt\';
 
+// Uncomment and set to false to disable support for banners.
+//$ZBX_FEATURE_FLAGS[\'banners_enabled\'] = true;
+
 // Uncomment and set to false to disable user HTTP authentication.
 //$ZBX_FEATURE_FLAGS[\'http_auth_enabled\'] = true;
 
@@ -448,6 +455,7 @@ $NO_AUTH_DEBUG_MODE	= \''.addcslashes($this->config['NO_AUTH_DEBUG_MODE'], "'\\"
 		$this->config['HISTORY'] = null;
 		$this->config['SSO'] = null;
 		$this->config['ZBX_FEATURE_FLAGS'] = [
+			'banners_enabled' => true,
 			'http_auth_enabled' => true,
 			'modules_config_enabled' => true,
 			'media_type_denylist' => []
