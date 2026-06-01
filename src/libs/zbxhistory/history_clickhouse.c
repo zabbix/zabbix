@@ -751,7 +751,7 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 			continue;
 		}
 
-		if (400 <= status)
+		if (300 <= status)
 		{
 			history_clickhouse_add_error(error, "cannot send query to ClickHouse,"
 				" HTTP response code: %ld",
