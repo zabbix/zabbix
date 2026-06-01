@@ -186,9 +186,7 @@
 				.setStorageIdx(storage_idx)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
-				.setCellRenderer(CDataTableColumn.CHECKBOX, ({column, cell_data, row, row_index, cell, cell_inner,
-						response}) => {
-
+				.setCellRenderer(CDataTableColumn.CHECKBOX, ({column, cell_data, row, row_index, cell, response}) => {
 					const [eventid, nested, symptom_count, cause_eventid, severity] = cell_data;
 
 					if (!eventid) {
@@ -215,7 +213,7 @@
 						label.classList.add('symptoms-left');
 					}
 					else {
-						cell_inner.append(checkbox, label);
+						cell.append(checkbox, label);
 					}
 
 					const filter = this.#datatable.getFilter();
@@ -299,7 +297,7 @@
 						}
 					});
 				})
-				.setCellRenderer('time', ({column, cell_data, cell, cell_inner}) => {
+				.setCellRenderer('time', ({column, cell_data, cell}) => {
 					const [clock, eventid, triggerid] = cell_data;
 
 					if (clock && eventid && triggerid) {
@@ -316,15 +314,14 @@
 
 						timeline.appendChild(clock_link);
 
-						cell_inner.append(timeline);
+						cell.append(timeline);
 					}
 
 					const compact_view = this.#datatable.getOption('compact_view');
 					const column_options = column.getColumnOptions();
+					const sort_field = this.#datatable.getSortField();
 
-					if (column_options.show_timeline == 1 && !compact_view.checked
-							&& this.#datatable.getSortField() == 'clock') {
-
+					if (column_options.show_timeline == 1 && !compact_view.checked && sort_field == 'clock') {
 						const axis = document.createElement('div');
 						axis.classList.add('timeline-axis', 'timeline-dot');
 
@@ -335,7 +332,7 @@
 						cell.append(axis, td);
 					}
 				})
-				.setCellRenderer('breakpoint', ({column, cell_data, cell, cell_inner}) => {
+				.setCellRenderer('breakpoint', ({column, cell_data, cell}) => {
 					const [breakpoint] = cell_data;
 
 					const breakpoint_header = document.createElement('h4');
@@ -346,7 +343,7 @@
 
 					timeline.appendChild(breakpoint_header);
 
-					cell_inner.appendChild(timeline);
+					cell.appendChild(timeline);
 
 					const compact_view = this.#datatable.getOption('compact_view');
 					const column_options = column.getColumnOptions();
@@ -362,15 +359,18 @@
 						cell.append(axis, td);
 					}
 				})
-				.setCellRenderer('severity', ({cell_data, cell, cell_inner}) => {
+				.setCellRenderer('severity', ({cell_data, cell}) => {
 					const [severity] = cell_data;
 					const severity_data = severities.find(data => data.value == severity);
 
-					cell.classList.add(CDataTable.ZBX_STYLE_CELL_BG, severity_data.style);
+					cell.classList.add(CDataTable.ZBX_STYLE_CELL_BG);
 
-					cell_inner.textContent = severity_data.label;
+					if (severity_data) {
+						cell.classList.add(severity_data.style);
+						cell.textContent = severity_data.label;
+					}
 				})
-				.setCellRenderer('host', ({cell_data, cell_inner}) => {
+				.setCellRenderer('host', ({cell_data, cell}) => {
 					const [hosts] = cell_data;
 
 					if (!hosts) {
@@ -380,8 +380,11 @@
 					for (const host of hosts) {
 						const {hostid, name, maintenance_type, maintenance_status} = host;
 
+						const flex_wrapper = document.createElement('div');
+						flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
 						const host_link = document.createElement('a');
-						host_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_WORDBREAK);
+						host_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_OVERFLOW_ELLIPSIS);
 						host_link.setAttribute('data-menu-popup', JSON.stringify({
 							type: 'host',
 							data: {
@@ -394,7 +397,7 @@
 						host_link.setAttribute('href', 'javascript:void(0)');
 						host_link.textContent = name;
 
-						cell_inner.appendChild(host_link);
+						flex_wrapper.appendChild(host_link);
 
 						if (maintenance_status == HOST_MAINTENANCE_STATUS_ON) {
 							let maintenance_name, maintenance_description;
@@ -426,11 +429,13 @@
 							maintenance_icon.setAttribute('data-hintbox-static', '1');
 							maintenance_icon.setAttribute('aria-expanded', 'false');
 
-							cell_inner.appendChild(maintenance_icon);
+							flex_wrapper.appendChild(maintenance_icon);
 						}
+
+						cell.appendChild(flex_wrapper);
 					}
 				})
-				.setCellRenderer('update', ({cell_data, cell_inner, response}) => {
+				.setCellRenderer('update', ({cell_data, cell, response}) => {
 					const [can_be_closed, eventid] = cell_data;
 
 					if (!eventid) {
@@ -464,9 +469,9 @@
 
 					update_link.textContent = <?= json_encode(_('Update')); ?>;
 
-					cell_inner.appendChild(update_link);
+					cell.appendChild(update_link);
 				})
-				.setCellRenderer('symptom_limit', ({cell, cell_inner, cell_data}) => {
+				.setCellRenderer('symptom_limit', ({cell, cell_data}) => {
 					const [paging] = cell_data;
 
 					const table_stats = document.createElement('div');
@@ -478,7 +483,7 @@
 					paging_container.appendChild(table_stats);
 
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);
-					cell_inner.appendChild(paging_container);
+					cell.appendChild(paging_container);
 				})
 				.setRowRenderer('nested_symptom', ({columns, row, row_index, data_fields, row_data, response}) => {
 					const column = this.#datatable.getCheckboxColumn();

@@ -234,11 +234,14 @@
 				.setTabFilterItem(this.#active_filter)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
-				.setCellRenderer('host', ({cell_data, cell_inner}) => {
+				.setCellRenderer('host', ({cell_data, cell}) => {
 					const [host, maintenance] = cell_data;
 
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
 					const host_link = document.createElement('a');
-					host_link.classList.add(ZBX_STYLE_LINK_ACTION);
+					host_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					host_link.setAttribute('data-menu-popup', JSON.stringify({
 						type: 'host',
 						data: {
@@ -251,7 +254,7 @@
 					host_link.setAttribute('href', 'javascript:void(0);');
 					host_link.textContent = host.name;
 
-					cell_inner.appendChild(host_link);
+					flex_wrapper.appendChild(host_link);
 
 					if (maintenance && host.status == HOST_STATUS_MONITORED) {
 						const maintenance_icon = document.createElement('button');
@@ -281,19 +284,21 @@
 						maintenance_icon.setAttribute('data-hintbox-static', '1');
 						maintenance_icon.setAttribute('aria-expanded', 'false');
 
-						cell_inner.appendChild(maintenance_icon);
+						flex_wrapper.appendChild(maintenance_icon);
 					}
+
+					cell.appendChild(flex_wrapper);
 				})
-				.setCellRenderer('name', ({column, cell_data, cell_inner}) => {
+				.setCellRenderer('name', ({column, cell_data, cell}) => {
 					const [itemid, description_expanded, name, key_expanded] = cell_data;
 
 					const url_params = objectToSearchParams({action: 'latest.view', context: 'host'});
 
-					const action_container = document.createElement('div');
-					action_container.classList.add(ZBX_STYLE_ACTION_CONTAINER);
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
 
 					const name_link = document.createElement('a');
-					name_link.classList.add(ZBX_STYLE_LINK_ACTION);
+					name_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_OVERFLOW_ELLIPSIS);
 					name_link.setAttribute('data-menu-popup', JSON.stringify({
 						type: 'item',
 						data: {
@@ -308,7 +313,7 @@
 					name_link.setAttribute('href', 'javascript:void(0);');
 					name_link.textContent = name;
 
-					action_container.appendChild(name_link);
+					flex_wrapper.appendChild(name_link);
 
 					if (description_expanded) {
 						const description_icon = document.createElement('button');
@@ -322,23 +327,27 @@
 						description_icon.setAttribute('data-hintbox-static', '1');
 						description_icon.setAttribute('aria-expanded', 'false');
 
-						action_container.innerHTML += ' ';
-						action_container.appendChild(description_icon);
+						flex_wrapper.appendChild(description_icon);
 					}
 
-					cell_inner.appendChild(action_container);
+					cell.appendChild(flex_wrapper);
 
 					const {show_item_key} = column.getColumnOptions();
 
 					if (show_item_key) {
+						const overflow_ellipsis = document.createElement('div');
+						overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+
 						const item_key = document.createElement('span');
 						item_key.classList.add(ZBX_STYLE_GREEN);
 						item_key.textContent = key_expanded;
 
-						cell_inner.appendChild(item_key);
+						overflow_ellipsis.appendChild(item_key);
+
+						cell.appendChild(overflow_ellipsis);
 					}
 				})
-				.setCellRenderer('type', ({cell_data, cell_inner}) => {
+				.setCellRenderer('type', ({cell_data, cell}) => {
 					const [type, state] = cell_data;
 
 					if (state == ITEM_STATE_NOTSUPPORTED) {
@@ -346,13 +355,13 @@
 						type_container.textContent = type;
 						type_container.classList.add(ZBX_STYLE_GREY);
 
-						cell_inner.appendChild(type_container);
+						cell.appendChild(type_container);
 					}
 					else {
-						cell_inner.textContent = type;
+						cell.textContent = type;
 					}
 				})
-				.setCellRenderer('actions', ({cell_data, cell_inner}) => {
+				.setCellRenderer('actions', ({cell_data, cell}) => {
 					const [itemid, is_graph, keep_history, keep_trends] = cell_data;
 
 					if (!keep_history && !keep_trends) {
@@ -373,12 +382,7 @@
 						data_link.textContent = <?= json_encode(_('History')); ?>;
 					}
 
-					cell_inner.appendChild(data_link);
-				})
-				.setCellRenderer('info', ({cell_data, cell_inner}) => {
-					const [item_icons] = cell_data;
-
-					cell_inner.appendChild(item_icons);
+					cell.appendChild(data_link);
 				})
 				.setOptionsHandler('name', CDataTableOptionsPopupMonitoringLatestName)
 				.on(CMessageHelper.EVENT_MESSAGE, e => {

@@ -1067,10 +1067,6 @@ td.inactive-bg {
 			&.disaster-bg {
 				border-bottom-color: $ui-border-color;
 				padding-left: 34px;
-
-				.cell-inner {
-					color: $font-color;
-				}
 			}
 		}
 

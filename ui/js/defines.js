@@ -33,6 +33,9 @@ const ZBX_STYLE_LOADING_FADEIN = 'is-loading-fadein';
 const ZBX_STYLE_HIDDEN = 'hidden';
 const ZBX_STYLE_DISPLAY_NONE = 'display-none';
 
+const ZBX_STYLE_FLEX_WRAPPER = 'flex-wrapper';
+const ZBX_STYLE_OVERFLOW_ELLIPSIS = 'overflow-ellipsis';
+
 const ZBX_STYLE_NO_DATA = 'no-data';
 const ZBX_STYLE_NO_DATA_DESCRIPTION = 'no-data-description';
 const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';

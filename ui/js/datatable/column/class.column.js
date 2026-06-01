@@ -219,23 +219,6 @@ class CDataTableColumn {
 	}
 
 	/**
-	 * @returns {string}
-	 */
-	getOptionsPopupHandleIcon() {
-		return this.#options_popup_handle_icon;
-	}
-
-	/**
-	 * @param {string} context_popup_handle_icon
-	 * @returns {CDataTableColumn}
-	 */
-	setOptionsPopupHandleIcon(context_popup_handle_icon) {
-		this.#options_popup_handle_icon = context_popup_handle_icon;
-
-		return this;
-	}
-
-	/**
 	 * @returns {Object}
 	 */
 	getColumnOptions() {
@@ -269,6 +252,26 @@ class CDataTableColumn {
 		return this;
 	}
 
+	/**
+	 * @returns {string}
+	 */
+	getOptionsPopupHandleIcon() {
+		return this.#options_popup_handle_icon;
+	}
+
+	/**
+	 * @param {string} context_popup_handle_icon
+	 * @returns {CDataTableColumn}
+	 */
+	setOptionsPopupHandleIcon(context_popup_handle_icon) {
+		this.#options_popup_handle_icon = context_popup_handle_icon;
+
+		return this;
+	}
+
+	/**
+	 * @returns {CDataTableColumn|null}
+	 */
 	getDefaults() {
 		return this.#defaults;
 	}

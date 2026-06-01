@@ -22,6 +22,7 @@
 			.cell.cell-data {
 				height: calc(var(--datatable-compact-row-height) + 1px);
 				min-height: initial;
+				padding: 2px 8px;
 
 				.symptoms {
 					height: calc(var(--datatable-compact-row-height) - 4px);
@@ -35,15 +36,6 @@
 					position: absolute;
 					right: 0;
 					padding: 0;
-				}
-
-				.cell-inner {
-					min-height: auto;
-					padding: 2px 8px;
-
-					.tags-wrapper {
-						flex-wrap: nowrap;
-					}
 				}
 			}
 
@@ -393,13 +385,12 @@
 	.cell {
 		position: relative;
 		box-sizing: border-box;
-		display: flex;
-		align-items: center;
 		height: 100%;
 		min-width: 0;
 		min-height: calc(var(--datatable-row-height) + 1px);
 		text-align: left;
 		border-bottom: 1px solid $ui-border-color;
+		padding: 7px 8px;
 
 		&:not(.cell-bg) {
 			color: $font-color;
@@ -421,6 +412,10 @@
 			background-color: $ui-bg-color;
 			border-right: 1px solid $ui-border-color;
 
+			.header-name {
+				@extend %overflow-ellipsis;
+			}
+
 			&:last-of-type {
 				border-right: 0;
 			}
@@ -439,10 +434,6 @@
 
 			&.cell-header-link {
 				padding: 0;
-
-				.cell-inner {
-					padding: 0 8px;
-				}
 
 				.header-link {
 					box-sizing: border-box;
@@ -498,17 +489,10 @@
 				}
 			}
 
-			.cell-inner {
-				flex-grow: 1;
-				padding: 0 8px;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-			}
-
-			.cell-header-resizer {
+			.header-resizer {
 				position: absolute;
 				right: -6px;
+				top: 0;
 				z-index: 2;
 				width: 11px;
 				height: calc(var(--datatable-row-height) + 1px);
@@ -529,6 +513,15 @@
 					border-color: $datatable-resizer-border-color;
 				}
 			}
+
+			&.cell-context {
+				padding: 0;
+
+				.header-name {
+					flex-grow: 1;
+					padding: 7px 8px;
+				}
+			}
 		}
 
 		&.cell-sticky {
@@ -538,6 +531,7 @@
 
 		&.cell-data {
 			align-items: flex-start;
+			overflow: hidden;
 
 			&.cell-sticky:not(.cell-bg-hover) {
 				background-color: $ui-bg-color;
@@ -575,36 +569,30 @@
 				border-right: 1px solid transparent;
 			}
 
-			.cell-inner {
-				box-sizing: border-box;
-				display: block;
-				height: 100%;
-				min-height: var(--datatable-row-height);
-				padding: 7px 8px;
+			.flex-wrapper {
+				display: flex;
+				column-gap: 5px;
+				height: 16px;
+			}
 
-				.checkbox-radio {
-					display: none;
-				}
+			.tags-wrapper {
+				display: flex;
+				align-items: center;
+				column-gap: 2px;
+				row-gap: 2px;
 
-				& + .timeline-axis {
-					margin-left: 5px;
-				}
+				.tag {
+					margin: 0;
+					height: 16px;
+					min-width: 24px;
 
-				.btn-icon,
-				.icon,
-				.link-action {
-					&:not(.no-indent):not(:first-child) {
-						margin-left: 5px;
+					&.tag-inherited {
+						min-width: 35px;
 					}
 				}
 
-				.link-alt {
-					white-space: wrap;
-					text-overflow: initial;
-				}
-
-				.problem-icon-link {
-					vertical-align: middle;
+				.btn-icon {
+					height: 16px;
 				}
 			}
 
@@ -692,12 +680,7 @@
 		&.cell-checkbox {
 			position: sticky;
 			justify-content: flex-start;
-
-			.cell-inner {
-				box-sizing: border-box;
-				text-overflow: initial;
-				padding: 6px 8px;
-			}
+			padding: 6px 8px;
 
 			.checkbox-radio {
 				margin: 0;
@@ -715,84 +698,12 @@
 		}
 
 		&.cell-timeline {
-			padding-right: 0;
-		}
+			display: flex;
+			padding: 0;
 
-		.cell-inner {
-			width: 100%;
-			overflow: hidden;
-			text-overflow: ellipsis;
-
-			.btn-icon:not(.btn-small) {
-				min-width: 18px;
-				height: 18px;
-			}
-
-			.link-action {
-				@extend %overflow-ellipsis;
-			}
-
-			.action-container {
-				display: flex;
-				width: 100%;
-
-				.link-action {
-					height: 16px;
-					min-width: 1ch;
-				}
-
-				.rel-container {
-					display: flex;
-				}
-
-				.separator {
-					flex-shrink: 0;
-					margin-right: 4px;
-				}
-			}
-
-			.tags-wrapper {
-				display: flex;
-				align-items: center;
-				column-gap: 2px;
-				row-gap: 2px;
-
-				.tag {
-					margin: 0;
-					height: 16px;
-					min-width: 24px;
-
-					&.tag-inherited {
-						min-width: 35px;
-					}
-				}
-
-				.btn-icon {
-					height: 16px;
-				}
-			}
-
-			.status-container {
-				@extend %overflow-ellipsis;
-				display: flex;
-				gap: 0;
-
-				.in,
-				.out {
-					display: flex;
-					gap: 0;
-				}
-
-				.out {
-					margin-left: 3px;
-				}
-
-				span {
-					min-width: 24px;
-					overflow: inherit;
-					text-overflow: inherit;
-					white-space: inherit;
-				}
+			.timeline-date {
+				flex-grow: 1;
+				padding: 7px 8px;
 			}
 		}
 	}
@@ -853,7 +764,7 @@
 		user-select: none;
 		pointer-events: none;
 
-		.cell.cell-resizing .cell-header-resizer {
+		.cell.cell-resizing .header-resizer {
 			z-index: 4;
 		}
 	}

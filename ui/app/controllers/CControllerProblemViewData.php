@@ -253,33 +253,36 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			$problem['opdata'] = $opdata?->toString(false);
 
-			$description = array_key_exists($trigger['triggerid'], $data['dependencies'])
-				? makeTriggerDependencies($data['dependencies'][$trigger['triggerid']])
-				: [];
-			$description[] = (new CLinkAction($problem['name']))
-				->addClass(ZBX_STYLE_WORDBREAK)
-				->setMenuPopup(CMenuPopupHelper::getTrigger([
-					'triggerid' => $trigger['triggerid'],
-					'backurl' => (new CUrl('zabbix.php'))
-						->setArgument('action', 'problem.view')
-						->getUrl(),
-					'eventid' => $problem['eventid'],
-					'show_rank_change_cause' => true,
-					'show_rank_change_symptom' => true
-				]));
+			$flex_wrapper = (new CDiv(
+				array_key_exists($trigger['triggerid'], $data['dependencies'])
+					? makeTriggerDependencies($data['dependencies'][$trigger['triggerid']])
+					: []
+			))
+				->addStyle(ZBX_STYLE_FLEX_WRAPPER)
+				->addItem(
+					(new CLinkAction($problem['name']))
+						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+						->setMenuPopup(CMenuPopupHelper::getTrigger([
+							'triggerid' => $trigger['triggerid'],
+							'backurl' => (new CUrl('zabbix.php'))
+								->setArgument('action', 'problem.view')
+								->getUrl(),
+							'eventid' => $problem['eventid'],
+							'show_rank_change_cause' => true,
+							'show_rank_change_symptom' => true
+						]))
+				);
 
 			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] != '' && !$options['compact_view']
 					&& $options['show_opdata'] == 1) {
-				$description[] = ' (';
-				$description[] = $opdata;
-				$description[] = ')';
+				$flex_wrapper->addItem(' ('.$opdata.') ');
 			}
 
-			$description[] = ($problem['comments'] !== '') ? makeDescriptionIcon($problem['comments']) : null;
+			$flex_wrapper->addItem($problem['comments'] !== '' ? makeDescriptionIcon($problem['comments']) : null);
+
+			$description = [$flex_wrapper];
 
 			if (!$options['compact_view'] && $options['details'] == 1) {
-				$description[] = BR();
-
 				if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 					$description[] = [_('Problem'), ': ', (new CDiv($trigger['expression_html']))
 						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS), BR()];
@@ -303,9 +306,11 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			$problem['can_be_closed'] = $can_be_closed;
 
-			$problem['actions'] = (string) makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'],
-				$is_acknowledged
-			);
+			$problem['actions'] = (new CDiv(
+				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged))
+			)
+				->addClass(ZBX_STYLE_WORDBREAK)
+				->toString();
 
 			$problem['nested'] = $nested;
 
