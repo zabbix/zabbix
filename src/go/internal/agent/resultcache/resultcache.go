@@ -92,7 +92,7 @@ type AgentDataRequest struct {
 }
 
 type Uploader interface {
-	Write(data []byte, timeout time.Duration) (upload bool, err []error)
+	Write(data []byte, timeout time.Duration) (upload bool, commsFailed bool, err []error)
 	Addr() (s string)
 	Hostname() (s string)
 	CanRetry() (enabled bool)
@@ -113,16 +113,17 @@ type Writer interface {
 // common cache data
 type cacheData struct {
 	log.Logger
-	input         chan interface{}
-	uploader      Uploader
-	clientID      uint64
-	lastDataID    uint64
-	lastCommandID uint64
-	lastErrors    []error
-	retry         *time.Timer
-	timeout       int
-	historyUpload bool
-	mu            sync.Mutex
+	input              chan interface{}
+	uploader           Uploader
+	clientID           uint64
+	lastDataID         uint64
+	lastCommandID      uint64
+	lastErrors         []error
+	retry              *time.Timer
+	timeout            int
+	historyUpload      bool
+	uploadRetryAfter   int64
+	mu                 sync.Mutex
 }
 
 func (c *cacheData) Stop() {
@@ -143,7 +144,7 @@ func (c *cacheData) UpdateOptions(options *agent.AgentOptions) {
 }
 
 func (c *cacheData) Upload(u Uploader) {
-	if !c.isUploadEnabled() {
+	if !c.isUploadEnabled() && !c.checkUploadRetry() {
 		return
 	}
 
@@ -164,6 +165,51 @@ func (c *cacheData) EnableUpload(enabled bool) {
 	defer c.mu.Unlock()
 
 	c.historyUpload = enabled
+	c.uploadRetryAfter = 0
+}
+
+// sendAgentData performs agent data upload and updates upload state (matching C agent send_buffer()).
+func (c *cacheData) sendAgentData(u Uploader, data []byte, timeout time.Duration) (upload bool, errs []error) {
+	c.mu.Lock()
+	c.uploadRetryAfter = 0
+	c.mu.Unlock()
+
+	upload, commsFailed, errs := u.Write(data, timeout)
+	if errs != nil {
+		if commsFailed {
+			c.enableUploadRetry(time.Now().Unix() + 60)
+		}
+
+		return false, errs
+	}
+
+	c.EnableUpload(upload)
+
+	return upload, nil
+}
+
+// enableUploadRetry disables upload and schedules an automatic retry at retryAfter (unix seconds).
+// Used for communication errors so that upload resumes after 60 seconds without waiting for
+// the next active checks refresh.
+func (c *cacheData) enableUploadRetry(retryAfter int64) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	c.historyUpload = false
+	c.uploadRetryAfter = retryAfter
+}
+
+// checkUploadRetry re-enables upload if the retry timer has expired. Returns true if re-enabled.
+func (c *cacheData) checkUploadRetry() bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.uploadRetryAfter == 0 || time.Now().Unix() < c.uploadRetryAfter {
+		return false
+	}
+	c.historyUpload = true
+	c.uploadRetryAfter = 0
+	return true
 }
 
 func (c *cacheData) isUploadEnabled() bool {
