@@ -65,6 +65,7 @@ typedef struct
 						/* TFC_RECENT_CUTOFF seconds. */
 						/* Or UINT32_MAX if such node does not exist. */
 	zbx_uint64_t	recent_entry_num;
+	time_t		last_ts;
 }
 zbx_tfc_t;
 
@@ -185,9 +186,21 @@ static void	tfc_free_func(void *ptr)
 	__tfc_shmem_free_func(ptr);
 }
 
+static time_t	tfc_get_time_now(void)
+{
+	struct timespec	tp;
+
+	if (0 == clock_gettime(CLOCK_MONOTONIC, &tp))
+		cache->last_ts = tp.tv_sec;
+	else
+		zabbix_log(LOG_LEVEL_WARNING, "clock_gettime(CLOCK_MONOTONIC) failed");
+
+	return cache->last_ts;
+}
+
 static void	tfc_lru_update_recent_cutoff(void)
 {
-	time_t	time_now = time(NULL);
+	time_t	time_now = tfc_get_time_now();
 
 	while (UINT32_MAX != cache->lru_recent_cutoff &&
 			time_now - cache->slots[cache->lru_recent_cutoff].data.last_accessed > TFC_RECENT_CUTOFF)
@@ -218,7 +231,7 @@ static void	tfc_lru_append(zbx_tfc_data_t *data)
 
 	cache->lru_tail = index;
 
-	data->last_accessed = time(NULL);
+	data->last_accessed = tfc_get_time_now();
 
 	cache->recent_entry_num++;
 	if (UINT32_MAX == cache->lru_recent_cutoff)
@@ -478,6 +491,8 @@ int	zbx_tfc_init(zbx_uint64_t cache_size, char **error)
 
 	cache->recent_entry_num = 0;
 	cache->lru_recent_cutoff = UINT32_MAX;
+
+	cache->last_ts = 0;
 
 	ret = SUCCEED;
 out:
