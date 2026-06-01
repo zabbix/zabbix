@@ -1996,7 +1996,7 @@ function prepareLldMacroPaths(array $macro_paths): array {
  */
 function prepareLldFilter(array $filter): array {
 	$filter['conditions'] = array_values(array_filter($filter['conditions'], static function (array $condition): bool {
-		return $condition['macro'] !== '' || $condition['value'] !== '';
+		return $condition['macro'] !== '' || (array_key_exists('value', $condition) && $condition['value'] !== '');
 	}));
 
 	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION && count($filter['conditions']) <= 1) {
