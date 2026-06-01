@@ -246,12 +246,16 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 					'messages' => ['use' => _('Invalid interval.')],
 					'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
 				],
-				'period' => ['string', 'required',
-					'use' => [CTimePeriodParser::class, ['usermacros' => true,
-						'lldmacros' => static::getIsPrototype()
-					]],
-					'messages' => ['use' => _('Invalid period.')],
-					'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
+				'period' => [
+					[
+						'string', 'required',
+						'use' => [CTimePeriodParser::class,
+							['usermacros' => true, 'lldmacros' => static::getIsPrototype()]
+						],
+						'messages' => ['use' => _('Invalid period.')],
+						'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
+					],
+					['string', 'required', 'not_empty', 'when' => ['delay', 'not_empty']]
 				]
 			]],
 			'delay' => [
