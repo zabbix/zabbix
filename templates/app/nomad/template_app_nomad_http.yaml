@@ -47,7 +47,7 @@ zabbix_export:
         * [HashiCorp Nomad nodes API reference](https://developer.hashicorp.com/nomad/api-docs/nodes)
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -546,6 +546,7 @@ zabbix_export:
             priority: '3'
             section_name: Other
             label: 'API response timeout'
+            description: 'Response timeout for an API.'
         - macro: '{$NOMAD.ENDPOINT.API.URL}'
           value: 'http://localhost:4646'
           description: 'API endpoint URL for one of the Nomad cluster members.'
@@ -600,11 +601,13 @@ zabbix_export:
             label: 'Servers by name (exclude)'
             description: 'The filter to exclude HashiCorp Nomad servers by name.'
         - macro: '{$NOMAD.TOKEN}'
+          type: SECRET_TEXT
           description: 'Nomad authentication token.'
           config:
             type: TEXT
             priority: '2'
             label: 'Authentication token'
+            description: 'Nomad authentication token.'
             required: 'YES'
       dashboards:
         - uuid: 0b1cb124081f4cf1af2e35245aeb415f
@@ -716,7 +719,7 @@ zabbix_export:
         * [Zabbix user macros with context](https://www.zabbix.com/documentation/8.0/manual/config/macros/user_macros_context)
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -2569,11 +2572,13 @@ zabbix_export:
             description: 'In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$NOMAD.TOKEN}'
+          type: SECRET_TEXT
           description: 'Nomad authentication token.'
           config:
             type: TEXT
             priority: '3'
             label: 'Nomad authentication token'
+            description: 'Nomad authentication token.'
             required: 'YES'
       dashboards:
         - uuid: 6cb91bf47abb4c29b5fdf6de15ee5f9e
@@ -2985,7 +2990,7 @@ zabbix_export:
         * [Zabbix user macros with context](https://www.zabbix.com/documentation/8.0/manual/config/macros/user_macros_context)
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -5819,6 +5824,7 @@ zabbix_export:
             description: 'In the range from 1 to 65535 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$NOMAD.TOKEN}'
+          type: SECRET_TEXT
           description: 'Nomad authentication token.'
           config:
             type: TEXT

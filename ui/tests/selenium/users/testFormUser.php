@@ -139,10 +139,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '50',
 						'URL (after login)' => ''
 					],
-					// TODO: xpath should be replaced after ZBX-23936 fix.
-					'disabled' => ['Username', 'button:Change password', 'xpath:.//button[@id="label-lang"]/..',
-						'xpath:.//button[@id="label-timezone"]/..', 'xpath:.//button[@id="label-theme"]/..'
-					],
+					'disabled' => ['Username', 'xpath:.//button[@id="label-lang"]/..', 'Time zone', 'xpath:.//button[@id="label-theme"]/..'],
 					'disabled_values' => [
 						'id:label-lang' => 'System default',
 						'id:label-timezone' => CDateTimeHelper::getTimeZoneFormat('System default'),
@@ -177,7 +174,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '150',
 						'URL (after login)' => ''
 					],
-					'disabled' => ['id:autologout', 'button:Delete'],
+					'disabled' => ['id:autologout'],
 					'enabled_buttons' => ['Update', 'Cancel', 'Select'],
 					'hintbox_warning' => [
 						'Language' => 'You are not able to choose some of the languages,'.
@@ -220,6 +217,12 @@ class testFormUser extends CWebTest {
 		}
 
 		$form->checkValue($data['default']);
+
+		if ($user === 'Admin' || $user === 'guest') {
+			$disabled_button = ($user === 'Admin') ? 'button:Delete' : 'button:Change password';
+			$this->assertTrue($form->query($disabled_button)->one()->isDisplayed());
+			$this->assertFalse($form->query($disabled_button)->one()->isEnabled());
+		}
 
 		foreach ($data['disabled'] as $locator) {
 			$field = $form->getField($locator);
@@ -372,7 +375,7 @@ class testFormUser extends CWebTest {
 			$this->assertFalse($form->isRequired('Role'));
 		}
 		else {
-			$this->assertTrue($form->getField('id:roleid')->isEnabled());
+			$this->assertTrue($form->getField('Role')->isEnabled());
 			$this->assertTrue($form->isRequired('Role'));
 		}
 
@@ -630,7 +633,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'Rows per page' => 'This value must be no less than "1".'
+						'Rows per page' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -647,7 +650,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'Rows per page' => 'This value must be no less than "1".'
+						'Rows per page' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1254,7 +1257,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '0'
 					],
 					'inline_errors' => [
-						'Rows per page' => 'This value must be no less than "1".'
+						'Rows per page' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1266,7 +1269,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => 'abc123'
 					],
 					'inline_errors' => [
-						'Rows per page' => 'This value must be no less than "1".'
+						'Rows per page' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -1496,8 +1499,8 @@ class testFormUser extends CWebTest {
 		if ($update_user === 'LDAP change password button check') {
 			$this->assertFalse($form->query('button:Change password')->one()->isClickable());
 			$hintbox = 'Password can only be changed for users using the internal Zabbix authentication.';
-			$this->assertEquals($hintbox, $this->query('xpath://button[contains(@data-hintbox-contents, '.
-					CXPathHelper::escapeQuotes($hintbox).')]')->one()->getAttribute('data-hintbox-contents')
+			$this->assertEquals($hintbox, $this->query('xpath://button[contains(@data-hintbox-html, '.
+					CXPathHelper::escapeQuotes($hintbox).')]')->one()->getAttribute('data-hintbox-html')
 			);
 		}
 

@@ -53,7 +53,7 @@ zabbix_export:
           The value of the `{$YUGABYTEDB.ACCESS.TOKEN}` macro is stored as plain (not secret) text by default.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Databases
       items:
@@ -233,6 +233,7 @@ zabbix_export:
           value: yugabytedb
       macros:
         - macro: '{$YUGABYTEDB.ACCESS.TOKEN}'
+          type: SECRET_TEXT
           description: 'Access token for the YugabyteDB API.'
           config:
             type: TEXT

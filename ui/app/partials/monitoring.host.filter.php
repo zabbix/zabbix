@@ -138,16 +138,7 @@ $right_column = (new CFormList())
 		(new CCheckBox('maintenance_status'))
 			->setChecked($data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
 			->setId('maintenance_status_#{uniqid}')
-			->setUncheckedValue(HOST_MAINTENANCE_STATUS_OFF),
-		(new CDiv([
-			(new CLabel(_('Show suppressed problems'), 'show_suppressed_#{uniqid}'))
-				->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
-			(new CCheckBox('show_suppressed'))
-				->setId('show_suppressed_#{uniqid}')
-				->setChecked($data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
-				->setUncheckedValue(ZBX_PROBLEM_SUPPRESSED_FALSE)
-				->setEnabled($data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
-		]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+			->setUncheckedValue(HOST_MAINTENANCE_STATUS_OFF)
 	]);
 
 $template = (new CDiv())
@@ -164,9 +155,7 @@ $template = (new CForm('get'))
 		(new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN),
 		(new CVar('filter_name', '#{filter_name}'))->removeId(),
 		(new CVar('filter_show_counter', '#{filter_show_counter}'))->removeId(),
-		(new CVar('filter_custom_time', '#{filter_custom_time}'))->removeId(),
-		(new CVar('sort', '#{sort}'))->removeId(),
-		(new CVar('sortorder', '#{sortorder}'))->removeId()
+		(new CVar('filter_custom_time', '#{filter_custom_time}'))->removeId()
 	]);
 
 if (array_key_exists('render_html', $data)) {
@@ -224,8 +213,8 @@ if (array_key_exists('render_html', $data)) {
 
 	function render(data, container) {
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
-		$('[name="filter_new"],[name="filter_update"]').hide()
-			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
+		document.querySelector('[name="filter_new"]').style.display = data.filter_configurable ? 'none' : '';
+		document.querySelector('[name="filter_update"]').style.display = data.filter_configurable ? '' : 'none';
 
 		// Host groups multiselect.
 		$('#groupids_' + data.uniqid, container).multiSelectHelper({
@@ -301,8 +290,8 @@ if (array_key_exists('render_html', $data)) {
 
 	function expand(data, container) {
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
-		$('[name="filter_new"],[name="filter_update"]').hide()
-			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
+		document.querySelector('[name="filter_new"]').style.display = data.filter_configurable ? 'none' : '';
+		document.querySelector('[name="filter_update"]').style.display = data.filter_configurable ? '' : 'none';
 	}
 
 	/**
