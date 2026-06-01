@@ -72,6 +72,10 @@ class CControllerValidateApiExists extends CController {
 				]],
 				'exclude_id' => ['id'],
 				'error_msg' => ['string']
+			],
+			'count_values' => [
+				'field_rules' => ['api'],
+				'max' => 20
 			]]
 		]];
 	}
