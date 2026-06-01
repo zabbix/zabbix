@@ -388,7 +388,7 @@ $ZBX_SERVER_NAME		= \''.addcslashes($this->config['ZBX_SERVER_NAME'], "'\\").'\'
 
 $IMAGE_FORMAT_DEFAULT		= IMAGE_FORMAT_PNG;
 
-// Uncomment this block if you are using Elasticsearch or ClickHouse for storing history data.
+// Configuration of history storage providers for Elasticsearch or ClickHouse.
 // Supported configuration parameters:
 // \'types\'    - Array of data types to be stored in the external storage.
 // \'provider\' - History provider type: \'elasticsearch\' or \'clickhouse\'.
@@ -396,13 +396,34 @@ $IMAGE_FORMAT_DEFAULT		= IMAGE_FORMAT_PNG;
 // \'db\'       - Database name (used for ClickHouse).
 // \'username\' - Database user (used for ClickHouse).
 // \'password\' - Database password (used for ClickHouse).
+// ClickHouse:
 //$HISTORY_PROVIDERS[] = [
-//	\'types\' => [\'dbl\', \'str\', \'log\', \'uint\', \'text\', \'json\'],
-//	\'provider\' => \'<provider>\',
-//	\'url\' => \'<url>\',
+//	\'types\' => [\'uint\', \'dbl\', \'str\', \'log\', \'text\', \'json\'],
+//	\'provider\' => \'clickhouse\',
+//	\'url\' => \'http://localhost:8123\',
 //	\'db\' => \'zabbix\',
 //	\'username\' => \'zabbix\',
 //	\'password\' => \'zabbix\'
+//];
+// Elasticsearch:
+//$HISTORY_PROVIDERS[] = [
+//	\'types\' => [\'uint\', \'dbl\', \'str\', \'log\', \'text\', \'json\'],
+//	\'provider\' => \'elasticsearch\',
+//	\'url\' => \'http://localhost:9200\'
+//];
+// ClickHouse and Elasticsearch:
+//$HISTORY_PROVIDERS[] = [
+//	\'types\' => [\'uint\', \'dbl\', \'str\'],
+//	\'provider\' => \'clickhouse\',
+//	\'url\' => \'http://localhost:8123\',
+//	\'db\' => \'zabbix\',
+//	\'username\' => \'zabbix\',
+//	\'password\' => \'zabbix\'
+//];
+//$HISTORY_PROVIDERS[] = [
+//	\'types\' => [\'log\', \'text\', \'json\'],
+//	\'provider\' => \'elasticsearch\',
+//	\'url\' => \'http://localhost:9200\'
 //];
 
 // Used for SAML authentication.
