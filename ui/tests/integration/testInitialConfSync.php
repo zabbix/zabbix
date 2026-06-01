@@ -1724,7 +1724,7 @@ class testInitialConfSync extends CIntegrationTest
 		$got = $this->parseSyncResults();
 		foreach ($got as $obj_name => $ops)
 		{
-			if ($obj_name === 'config') {
+			if ($obj_name === 'settings') {
 				continue;
 			}
 			if ($obj_name === 'hosts' && $ops['insert'] === '0' && $ops['update'] === '1'
@@ -1806,7 +1806,7 @@ class testInitialConfSync extends CIntegrationTest
 		$got = $this->parseSyncResults();
 		foreach ($got as $obj_name => $ops)
 		{
-			if ($obj_name === 'config') {
+			if ($obj_name === 'settings') {
 				continue;
 			}
 			$this->assertEquals('0', $ops['insert'], 'unexpected inserts for '.$obj_name);
@@ -1844,7 +1844,7 @@ class testInitialConfSync extends CIntegrationTest
 		$got = $this->parseSyncResults();
 		foreach ($got as $obj_name => $ops)
 		{
-			if ($obj_name === 'config') {
+			if ($obj_name === 'settings') {
 				continue;
 			}
 			$this->assertEquals('0', $ops['insert'], 'unexpected inserts for '.$obj_name);
