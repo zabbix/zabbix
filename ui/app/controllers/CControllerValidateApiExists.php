@@ -51,7 +51,7 @@ class CControllerValidateApiExists extends CController {
 	protected function checkInput(): bool {
 		$ret = $this->validateInput($this->getValidationRules());
 
-		if (!$ret) {
+		if ($ret) {
 			$ret = $this->validateApiAmount();
 		}
 
@@ -67,8 +67,6 @@ class CControllerValidateApiExists extends CController {
 					]
 				])]))->disableView()
 			);
-
-			return false;
 		}
 
 		return $ret;
@@ -119,8 +117,8 @@ class CControllerValidateApiExists extends CController {
 	}
 
 	protected function validateApiAmount(): bool {
-		if (count($this->getInput('validations', [])) > 1) {
-			error(_('No more than 20 items based on field "api" rules'));
+		if (count($this->getInput('validations', [])) > 20) {
+			error(_s('No more than %1$s items based on field "%2$s" rules', '20', 'api'));
 			return false;
 		}
 		return true;
