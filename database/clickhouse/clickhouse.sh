@@ -10,7 +10,7 @@ display_help()
 	printf "  %-16s %s\n" "-i|--import-dir" "Directory with the exported CSV files ($CH_IMPORT_DIR)"
 	printf "  %-16s %s\n" "-h|--help" "Help message"
 
-	exit 0
+	exit 1
 }
 
 CH_URL=http://localhost:8123
@@ -32,7 +32,7 @@ fi
 
 if ! curl --version > /dev/null 2>&1; then
 	echo "This script requires curl command utility"
-	exit 0
+	exit 1
 fi
 
 while [ $# -gt 0 ]; do
