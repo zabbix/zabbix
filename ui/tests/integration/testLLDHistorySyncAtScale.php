@@ -300,7 +300,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		// an agent ping and reading it back via a calculated item testItem.
 
 		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'log_level_increase=trapper');
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER, null, self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		$this->sendAgentPing();
 
