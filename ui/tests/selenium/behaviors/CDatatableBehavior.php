@@ -17,6 +17,7 @@
 require_once __DIR__.'/../../include/CBehavior.php';
 
 use Facebook\WebDriver\Exception\ElementClickInterceptedException;
+use Facebook\WebDriver\WebDriverKeys;
 
 /**
  * Behavior for datatable element.
