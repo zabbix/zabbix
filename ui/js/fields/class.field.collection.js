@@ -125,7 +125,7 @@ class CFieldCollection extends CField {
 
 					discovered_field.addEventListener('field.change', (e) => {
 						if (!e.target.hasAttribute('data-prevent-validation-on-change')) {
-							this.fieldChanged(e.detail.source_fields);
+							this.fieldChanged([this.getName(), ...e.detail.source_fields]);
 						}
 					});
 				}
