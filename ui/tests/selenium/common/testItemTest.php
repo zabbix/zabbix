@@ -1064,63 +1064,72 @@ class testItemTest extends CWebTest {
 						['Zabbix internal', 'External check', 'Database monitor', 'HTTP agent', 'JMX agent',
 						'Calculated', 'Script', 'Browser'])) {
 					$details = 'Connection to Zabbix server "localhost:10051" refused. Possible reasons:';
-				}
-				else {
-					$details = ($data['fields']['Type'] === 'SNMP agent')
-						? 'Incorrect value for field "SNMP community": cannot be empty.'
-						: 'Incorrect value for field "Host address": cannot be empty.';
-				}
 
-				// Click Get value button.
-				$button = $test_form->query('button:Get value')->one();
-				$button->click();
-				$this->assertMessage(TEST_BAD, null, $details);
-				$test_form->getOverlayMessage()->close();
-
-				// Click Test button in test form.
-				$overlay->query('button:Get value and test')->one()->waitUntilVisible()->click();
-				$this->assertMessage(TEST_BAD, null, $details);
-				$test_form->getOverlayMessage()->close();
-
-				// Check empty interface fields.
-				if (in_array($data['fields']['Type'], ['Zabbix agent', 'SNMP agent', 'IPMI agent', 'Simple check'])) {
-					if ($data['fields']['Type'] !== 'Simple check') {
-						$elements['port']->clear();
-						$button->click();
-
-						if (!$is_host && !array_key_exists('interface', $data)) {
-							$details = ($data['fields']['Type'] === 'SNMP agent')
-								? 'Incorrect value for field "SNMP community": cannot be empty.'
-								: 'Incorrect value for field "Host address": cannot be empty.';
-						}
-						else {
-							$details = 'Incorrect value for field "Port": cannot be empty.';
-						}
-
-						$this->assertMessage(TEST_BAD, null, $details);
-						$test_form->getOverlayMessage()->close();
-					}
-
-					$elements['address']->clear();
-					$button->click();
-					$details = (!$is_host && $data['fields']['Type'] === 'SNMP agent')
-						? 'Incorrect value for field "SNMP community": cannot be empty.'
-						: 'Incorrect value for field "Host address": cannot be empty.';
+					// Click Get value button.
+					$test_form->query('button:Get value')->one()->click();
 					$this->assertMessage(TEST_BAD, null, $details);
 					$test_form->getOverlayMessage()->close();
 
-					// Check SNMP empty fields for Template.
-					if (!$is_host && (CTestArrayHelper::get($data, 'snmp_fields.community'))) {
-						$test_form->fill(['id:interface_details_community' => $data['snmp_fields']['community']]);
-						$button->click();
-						$this->assertMessage(TEST_BAD, null, 'Incorrect value for field "Host address": cannot be empty.');
-						$test_form->getOverlayMessage()->close();
+					// Click Test button in test form.
+					$overlay->query('button:Get value and test')->one()->waitUntilVisible()->click();
+					$this->assertMessage(TEST_BAD, null, $details);
+					$test_form->getOverlayMessage()->close();
+				}
+				else {
+					$details = ($data['fields']['Type'] === 'SNMP agent')
+						? 'interface_details_community' // $elements['community']
+						: 'interface_address'; // ja strada, nomainit pret $elements['address'] , kas ir vnk 'id:interface_address'
 
-						$elements['address']->fill('127.0.0.1');
-						$button->click();
-						$this->assertMessage(TEST_BAD, null, 'Incorrect value for field "Port": cannot be empty.');
-						$test_form->getOverlayMessage()->close();
+					// Click Get value button.
+					$test_form->query('button:Get value')->one()->click();
+					$this->assertInlineError($test_form, ['id:'.$details => 'This field cannot be empty.']);
+
+					// Get the field object and enter a value to make inline error disappear.
+					$value = ($details === 'interface_details_community') ? 'public' : '127.0.0.1';
+					$field = $test_form->getField('id:'.$details);
+					$field->fill($value);
+
+					$this->page->removeFocus();
+					$field->waitUntilClassesNotPresent('has-error');
+
+					// Delete the field value to invoke an inline error again.
+					$field->fill('');
+
+					// Click Test button in test form.
+					$overlay->query('button:Get value and test')->one()->waitUntilVisible()->click();
+					$this->assertInlineError($test_form, ['id:'.$details => 'This field cannot be empty.']);
+				}
+
+				// Check empty interface fields for item types that use network interface and has IP address and port fields.
+				if (in_array($data['fields']['Type'], ['Zabbix agent', 'SNMP agent', 'IPMI agent', 'Simple check'])) {
+
+					// Array for IDs of fields that will have inline validation error.
+					$error_ids = [];
+
+					$elements['address']->clear();
+					$error_ids[] = 'id:interface_address'; // ja strada, samainit pret $elements['address']
+
+					if ($data['fields']['Type'] !== 'Simple check') {
+						$elements['port']->clear();
+
+						if ($is_host || array_key_exists('interface', $data)) { //|| $data['fields']['Type'] === 'SNMP agent') {
+							$error_ids[] = 'id:interface_port'; // ja strada, samainit pret $elements['port']
+						}
 					}
+
+					// SNMP Community handling (?)
+					if (!$is_host && $data['fields']['Type'] === 'SNMP agent') {
+						$error_ids[] = 'id:interface_details_community';
+					}
+
+					$test_form->query('button:Get value')->one()->click();
+
+					// Convert the flat array of IDs into the associative array format required by assertInlineError
+					// Example output: ['id:interface_address' => 'This field cannot be empty.', ...]
+					$expected_errors = array_fill_keys($error_ids, 'This field cannot be empty.');
+
+					// Assert all inline errors at once
+					$this->assertInlineError($test_form, $expected_errors);
 				}
 
 				// Uncheck "Get value from host" checkbox.
@@ -1131,7 +1140,7 @@ class testItemTest extends CWebTest {
 					foreach (['address', 'port', 'proxy'] as $field) {
 						$elements[$field]->waitUntilNotVisible();
 					}
-					$button->waitUntilNotVisible();
+					$test_form->query('button:Get value')->one()->waitUntilNotVisible();
 					// Check that Test button changed its name.
 					$this->assertFalse($overlay->query('button:Get value and test')->one(false)->isValid());
 					$overlay->query('button:Test')->waitUntilVisible()->one();
