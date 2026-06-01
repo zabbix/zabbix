@@ -69,8 +69,7 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 		timeout = 60
 	}
 
-	upload, errs := u.Write(data, time.Duration(timeout)*time.Second)
-	c.EnableUpload(upload)
+	_, errs := c.sendAgentData(u, data, time.Duration(timeout)*time.Second)
 
 	if errs != nil {
 		if !reflect.DeepEqual(errs, c.lastErrors) {
