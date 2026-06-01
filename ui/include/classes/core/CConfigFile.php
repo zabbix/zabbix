@@ -426,7 +426,7 @@ $IMAGE_FORMAT_DEFAULT		= IMAGE_FORMAT_PNG;
 //	\'url\' => \'http://localhost:9200\'
 //];
 
-// Used for SAML authentication.
+// SAML authentication.
 
 // Uncomment to set extra settings.
 //$SSO[\'SETTINGS\']		= [];
