@@ -1128,13 +1128,12 @@ class testItemTest extends CWebTest {
 					if ($data['fields']['Type'] !== 'Simple check') {
 						$elements['port']->clear();
 
-						if ($is_host || array_key_exists('interface', $data)) { //|| $data['fields']['Type'] === 'SNMP agent') {
-							$error_ids[] = 'id:interface_port'; // ja strada, samainit pret $elements['port']
+						if (/*$is_host || */array_key_exists('interface', $data)) { //|| $data['fields']['Type'] === 'SNMP agent') {
+							$error_ids[] = $elements['port']; // ja strada, samainit pret $elements['port']
 						}
 					}
 
-					// SNMP Community handling (?)
-					if (!$is_host && $data['fields']['Type'] === 'SNMP agent') {
+					if (/*!$is_host && */$data['fields']['Type'] === 'SNMP agent') {
 						$error_ids[] = 'id:interface_details_community';
 					}
 
