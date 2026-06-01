@@ -361,7 +361,9 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			'lld_macro_paths' => ['objects', 'uniq' => ['lld_macro'], 'fields' => [
 				'path' => ['db lld_macro_path.path'],
 				'lld_macro' => [
-					['db lld_macro_path.lld_macro', 'use' => [CLLDMacroParser::class]],
+					['db lld_macro_path.lld_macro', 'use' => [CLLDMacroParser::class],
+						'messages' => ['use' => _('Expected LLD macro format is "{#MACRO}".')]
+					],
 					['db lld_macro_path.lld_macro', 'required', 'not_empty', 'when' => ['path', 'not_empty']]
 				]
 			]],
@@ -386,7 +388,9 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 						'when' => ['operator', 'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]]
 					],
 					'macro' => [
-						['db item_condition.macro', 'use' => [CLLDMacroParser::class]],
+						['db item_condition.macro', 'use' => [CLLDMacroParser::class],
+							'messages' => ['use' => _('Expected LLD macro format is "{#MACRO}".')]
+						],
 						['db item_condition.macro', 'required', 'not_empty',
 							'when' => [
 								['operator', 'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]],
@@ -424,7 +428,9 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 								'when' => ['operator', 'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]]
 							],
 							'macro' => [
-								['db lld_override_condition.macro', 'use' => [CLLDMacroParser::class]],
+								['db lld_override_condition.macro', 'use' => [CLLDMacroParser::class],
+									'messages' => ['use' => _('Expected LLD macro format is "{#MACRO}".')]
+								],
 								['db lld_override_condition.macro', 'required', 'not_empty',
 									'when' => [
 										['operator', 'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]],
