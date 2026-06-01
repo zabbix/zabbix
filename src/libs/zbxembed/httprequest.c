@@ -910,7 +910,7 @@ static const duk_function_list_entry	httprequest_methods[] = {
 static int	es_httprequest_create_prototype(duk_context *ctx, const char *obj_name,
 		const duk_function_list_entry *methods)
 {
-	duk_push_c_function(ctx, es_httprequest_ctor, 1 /* TLS validation options */);
+	duk_push_c_function(ctx, es_httprequest_ctor, 1 /* json object with TLS validation options */);
 	duk_push_object(ctx);
 
 	es_put_function_list(ctx, -1, methods);
