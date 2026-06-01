@@ -1128,7 +1128,7 @@ class testItemTest extends CWebTest {
 					if ($data['fields']['Type'] !== 'Simple check') {
 						$elements['port']->clear();
 
-						if (/*$is_host || */array_key_exists('interface', $data)) { //|| $data['fields']['Type'] === 'SNMP agent') {
+						if (array_key_exists('interface', $data)) {
 							$error_ids[] = 'id:interface_port';
 						}
 					}
@@ -1139,7 +1139,7 @@ class testItemTest extends CWebTest {
 
 					$test_form->query('button:Get value')->one()->click();
 
-					// Convert the flat array of IDs into the associative array format required by assertInlineError
+					// Convert the flat array of IDs into the associative array format required by assertInlineError.
 					// Example output: ['id:interface_address' => 'This field cannot be empty.', ...]
 					$expected_errors = array_fill_keys($error_ids, 'This field cannot be empty.');
 
