@@ -92,9 +92,15 @@ class CTextAreaFlexible extends CTag {
 		return $this;
 	}
 
-	public function setAdaptiveWidth(int $width): self {
-		$this->addStyle('max-width: '.$width.'px;');
+	public function setFullWidth(): self {
 		$this->addStyle('width: 100%;');
+
+		return $this;
+	}
+
+	public function setAdaptiveWidth(int $width): self {
+		$this->addStyle('max-width: '.$width.'px;')
+			->setFullWidth();
 
 		return $this;
 	}

@@ -223,9 +223,9 @@ else {
 						(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 							->setErrorContainer('macros_'.$i.'_error_container')
 							->setMaxlength(DB::getFieldLength('hostmacro', 'description'))
-							->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-							->setAttribute('placeholder', _('description'))
+							->setFullWidth()
 							->setReadonly($description_readonly)
+							->setAttribute('placeholder', _('description'))
 							->setAttribute('data-skip-from-submit', $skip_from_submit),
 						($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL)
 							? (new CSpan(_('(created by host discovery)')))->addClass(ZBX_STYLE_GREY)
