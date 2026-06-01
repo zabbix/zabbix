@@ -1042,8 +1042,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
-				->getColumn('Discovery')->query('link:Discovery')->one()->click();
+		$this->query('class:datatable')->waitUntilReady()->asDatatable()->one()->findRow('Name', $host)->getColumn('Discovery')
+				->query('link:Discovery')->one()->click();
 
 		$this->zbxTestClickLinkTextWait($discovery_rule);
 		$this->zbxTestClickLinkTextWait('Host prototypes');

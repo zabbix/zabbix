@@ -1072,9 +1072,27 @@ class CIntegrationTest extends CAPITest {
 	 * @param integer $delayOverride
 	 */
 	protected function reloadConfigurationCacheAndWaitForLogLine($component = null, $delayOverride = 0) {
+		if ($component === null) {
+			$component = $this->getActiveComponent();
+		}
+
 		$this->reloadConfigurationCache($component, $delayOverride);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
-			'finished forced reloading of the configuration cache');
+
+		switch ($component) {
+			case self::COMPONENT_SERVER:
+				$line = 'finished forced reloading of the configuration cache';
+				break;
+
+			case self::COMPONENT_PROXY:
+				$line = 'forced reloading of the configuration cache';
+				break;
+
+			default:
+				$this->fail('Configuration cache reload wait is not supported for component "'.
+					$component.'".');
+		}
+
+		$this->waitForLogLineToBePresent($component, $line);
 	}
 
 	/**

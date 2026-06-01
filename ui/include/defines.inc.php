@@ -13,11 +13,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'8.0.0beta1');
+define('ZABBIX_VERSION',		'8.0.0beta2');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050054);
+define('ZABBIX_DB_VERSION',	7050060);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -969,7 +969,6 @@ define('SCREEN_RESOURCE_HISTORY',			17);
 define('SCREEN_RESOURCE_HTTPTEST_DETAILS',	21);
 define('SCREEN_RESOURCE_DISCOVERY',			22);
 define('SCREEN_RESOURCE_HTTPTEST',			23);
-define('SCREEN_RESOURCE_PROBLEM',			24);
 
 define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',		1);
 define('SCREEN_SORT_TRIGGERS_HOST_NAME_ASC',		2);
@@ -1178,23 +1177,26 @@ define('ZBX_ACK_STATUS_ALL',	0);
 define('ZBX_ACK_STATUS_UNACK',	1);
 define('ZBX_ACK_STATUS_ACK',	2);
 
-define('ZBX_PROBLEM_UPDATE_NONE',				0x00);
-define('ZBX_PROBLEM_UPDATE_CLOSE',				0x01);
-define('ZBX_PROBLEM_UPDATE_ACKNOWLEDGE',		0x02);
-define('ZBX_PROBLEM_UPDATE_MESSAGE',			0x04);
-define('ZBX_PROBLEM_UPDATE_SEVERITY',			0x08);
-define('ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE',		0x10);
-define('ZBX_PROBLEM_UPDATE_SUPPRESS',			0x20);
-define('ZBX_PROBLEM_UPDATE_UNSUPPRESS',			0x40);
-define('ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE',		0x80);
-define('ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM',	0x100);
+define('ZBX_PROBLEM_UPDATE_NONE',					0x000);
+define('ZBX_PROBLEM_UPDATE_CLOSE',					0x001);
+define('ZBX_PROBLEM_UPDATE_ACKNOWLEDGE',			0x002);
+define('ZBX_PROBLEM_UPDATE_MESSAGE',				0x004);
+define('ZBX_PROBLEM_UPDATE_SEVERITY',				0x008);
+define('ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE',			0x010);
+define('ZBX_PROBLEM_UPDATE_SUPPRESS',				0x020);
+define('ZBX_PROBLEM_UPDATE_UNSUPPRESS',				0x040);
+define('ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE',			0x080);
+define('ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM',		0x100);
+define('ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS',	0x200);
+define('ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS',	0x400);
 
 define('ZBX_PROBLEM_SYMPTOM_LIMIT', 50);
 
-define('ZBX_EVENT_HISTORY_PROBLEM_EVENT',		0);
-define('ZBX_EVENT_HISTORY_RECOVERY_EVENT',		1);
-define('ZBX_EVENT_HISTORY_MANUAL_UPDATE',		2);
-define('ZBX_EVENT_HISTORY_ALERT',				3);
+define('ZBX_EVENT_HISTORY_PROBLEM_EVENT',	0);
+define('ZBX_EVENT_HISTORY_RECOVERY_EVENT',	1);
+define('ZBX_EVENT_HISTORY_MANUAL_UPDATE',	2);
+define('ZBX_EVENT_HISTORY_ALERT',			3);
+define('ZBX_EVENT_HISTORY_MAINTENANCE',		4);
 
 define('ZBX_TM_TASK_CLOSE_PROBLEM', 1);
 define('ZBX_TM_TASK_ACKNOWLEDGE',	4);
@@ -1208,7 +1210,7 @@ define('ZBX_PROTO_VALUE_SUPPRESSION_SUPPRESS', 'suppress');
 define('ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS', 'unsuppress');
 
 define('ZBX_TM_DATA_TYPE_DIAGINFO',			1);
-define('ZBX_TM_DATA_TYPE_PROXYIDS',	        2);
+define('ZBX_TM_DATA_TYPE_PROXYIDS',			2);
 define('ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION', 5);
 define('ZBX_TM_DATA_TYPE_RANK_EVENT',		6);
 
@@ -2027,6 +2029,7 @@ define('ZBX_STYLE_DIFF_ADDED', 'diff-added');
 define('ZBX_STYLE_DIFF_REMOVED', 'diff-removed');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
+define('ZBX_STYLE_HIDDEN', 'hidden');
 define('ZBX_STYLE_DISPLAY_NONE', 'display-none');
 define('ZBX_STYLE_ERROR_CONTAINER', 'error-container');
 define('ZBX_STYLE_VISIBILITY_HIDDEN', 'visibility-hidden');
@@ -2262,9 +2265,9 @@ define('ZBX_STYLE_WIDGET_URL', 'widget-url');
 define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
 define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
-define('ZBX_STYLE_PROBLEM_ICON_LIST' , 'problem-icon-list');
-define('ZBX_STYLE_PROBLEM_ICON_LINK' , 'problem-icon-link');
-define('ZBX_STYLE_PROBLEM_ICON_LIST_ITEM' , 'problem-icon-list-item');
+define('ZBX_STYLE_PROBLEM_ICON_LIST', 'problem-icon-list');
+define('ZBX_STYLE_PROBLEM_ICON_LINK', 'problem-icon-link');
+define('ZBX_STYLE_PROBLEM_ICON_LIST_ITEM', 'problem-icon-list-item');
 define('ZBX_STYLE_ZABBIX_LOGO', 'zabbix-logo');
 define('ZBX_STYLE_ZABBIX_LOGO_SIDEBAR', 'zabbix-logo-sidebar');
 define('ZBX_STYLE_ZABBIX_LOGO_SIDEBAR_COMPACT', 'zabbix-logo-sidebar-compact');
@@ -2361,6 +2364,7 @@ define('ZBX_ICON_CIRCLE_QUESTION', 'zi-circle-question');
 define('ZBX_ICON_CIRCLE_QUESTION_FILLED', 'zi-circle-question-filled');
 define('ZBX_ICON_CLOCK', 'zi-clock');
 define('ZBX_ICON_COG_FILLED', 'zi-cog-filled');
+define('ZBX_ICON_CONTEXT', 'zi-context');
 define('ZBX_ICON_COLLAPSE', 'zi-collapse');
 define('ZBX_ICON_COMMAND', 'zi-command');
 define('ZBX_ICON_COPY', 'zi-copy');
@@ -2376,6 +2380,7 @@ define('ZBX_ICON_EYE', 'zi-eye');
 define('ZBX_ICON_EYE_OFF', 'zi-eye-off');
 define('ZBX_ICON_FILTER', 'zi-filter');
 define('ZBX_ICON_FILTER_LARGE', 'zi-filter-large');
+define('ZBX_ICON_FILTERS', 'zi-filters');
 define('ZBX_ICON_FULLSCREEN', 'zi-fullscreen');
 define('ZBX_ICON_HELP', 'zi-help');
 define('ZBX_ICON_HELP_CIRCLED', 'zi-help-circled');
@@ -2478,6 +2483,9 @@ define('ZBX_NODE_STATUS_STANDBY',		0);
 define('ZBX_NODE_STATUS_STOPPED',		1);
 define('ZBX_NODE_STATUS_UNAVAILABLE',	2);
 define('ZBX_NODE_STATUS_ACTIVE',		3);
+
+// Datatable.
+define('ZBX_STYLE_DATATABLE', 'datatable');
 
 // init $_REQUEST
 ini_set('variables_order', 'GP');

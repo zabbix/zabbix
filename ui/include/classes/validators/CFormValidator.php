@@ -207,7 +207,7 @@ class CFormValidator {
 							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain non-empty array (Path: '.$rule_path.')');
 						}
 
-						$result[$key] = $value;
+						$result[$key] = array_values($value);
 						break;
 
 					case 'fields':
@@ -529,7 +529,7 @@ class CFormValidator {
 
 					case 'not_in':
 					case 'in':
-						$result[$key] = $value;
+						$result[$key] = array_values($value);
 						break;
 
 					default:
@@ -1512,6 +1512,7 @@ class CFormValidator {
 	 * @return bool
 	 */
 	public static function existsAPIObject(string $api, array $options, ?string $exclude_primary_id = null): bool {
+		$options['output'] = [];
 		$options['preservekeys'] = true;
 		$auth = [
 			'type' => CJsonRpc::AUTH_TYPE_COOKIE,

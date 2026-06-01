@@ -98,9 +98,27 @@ $available_js = [
 	'component.z-vertical.js' => '',
 	'class.event-hub.js' => '',
 	'class.event-hub.event.js' => '',
+	'class.banner.js' => '',
 	'class.base-component.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
+	'class.dataprovider.js' => 'datatable/',
+	'class.dataprovider.default.js' => 'datatable/',
+	'class.options-popup.js' => 'datatable/options-popup/',
+	'class.options-popup.table-options.js' => 'datatable/options-popup/',
+	'class.options-popup.tags.js' => 'datatable/options-popup/',
+	'class.options-popup.tagvalue.js' => 'datatable/options-popup/',
+	'class.options-popup.monitoring.problems.time.js' => 'datatable/options-popup/',
+	'class.options-popup.monitoring.problems.problem.js' => 'datatable/options-popup/',
+	'class.options-popup.monitoring.host.problems.js' => 'datatable/options-popup/',
+	'class.options-popup.monitoring.latest.name.js' => 'datatable/options-popup/',
+	'class.column.js' => 'datatable/column/',
+	'class.column.tags.js' => 'datatable/column/',
+	'class.column.tagvalue.js' => 'datatable/column/',
+	'class.datatable.js' => 'datatable/',
+	'class.message.js' => '',
+	'class.pager.js' => '',
+	'class.state.js' => '',
 	'class.expandable.subfilter.js' => '',
 	'class.form.js' => '',
 	'class.form.validator.js' => '',
@@ -169,6 +187,7 @@ $available_js = [
 	'class.field.checkbox.js' => 'fields/',
 	'class.field.file.js' => 'fields/',
 	'class.field.hidden.js' => 'fields/',
+	'class.field.menupath.js' => 'fields/',
 	'class.field.multiline.js' => 'fields/',
 	'class.field.multiselect.js' => 'fields/',
 	'class.field.radiolist.js' => 'fields/',
@@ -197,7 +216,8 @@ $translate_strings = [
 		'Cannot paste inaccessible widget.' => _('Cannot paste inaccessible widget.'),
 		'Copy' => _('Copy'),
 		'Delete' => _('Delete'),
-		'Editing other objects is not allowed in dashboard editing mode.' => _('Editing other objects is not allowed in dashboard editing mode.'),
+		'Editing other objects is not allowed in dashboard editing mode.' =>
+			_('Editing other objects is not allowed in dashboard editing mode.'),
 		'Failed to paste dashboard page.' => _('Failed to paste dashboard page.'),
 		'Failed to paste widget.' => _('Failed to paste widget.'),
 		'Failed to update dashboard page properties.' => _('Failed to update dashboard page properties.'),
@@ -216,6 +236,75 @@ $translate_strings = [
 		'Add a new widget' => _('Add a new widget'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
 		'Release to create a widget.' => _('Release to create a widget.')
+	],
+	'class.pager.js' => [
+		'First' => _x('First', 'page navigation'),
+		'Last' => _x('Last', 'page navigation'),
+		'Go to first page' => _('Go to first page'),
+		'Go to previous page, %1$s' => _('Go to previous page, %1$s'),
+		'Go to page %1$s, current page' => _('Go to page %1$s, current page'),
+		'Go to page %1$s' => _('Go to page %1$s'),
+		'Go to next page, %1$s' => _('Go to next page, %1$s'),
+		'Go to last page, %1$s' => _('Go to last page, %1$s'),
+		'Displaying %1$s of %2$s found' => _('Displaying %1$s of %2$s found'),
+		'Displaying %1$s to %2$s of %3$s found' => _('Displaying %1$s to %2$s of %3$s found')
+	],
+	'class.datatable.js' => [
+		'No data found' => _('No data found'),
+		'Unexpected server error.' => _('Unexpected server error.'),
+		'Enabled' => _('Enabled'),
+		'Disabled' => _('Disabled'),
+		'Inherited tag' => _('Inherited tag'),
+		'Inherited and template tag' => _('Inherited and template tag'),
+		'Inherited and host tag' => _('Inherited and host tag'),
+		'Inherited and host prototype tag' => _('Inherited and host prototype tag'),
+		'Inherited and item tag' => _('Inherited and item tag'),
+		'Inherited and item prototype tag' => _('Inherited and item prototype tag'),
+		'Inherited and trigger tag' => _('Inherited and trigger tag'),
+		'Inherited and trigger prototype tag' => _('Inherited and trigger prototype tag'),
+		'Inherited and web scenario tag' => _('Inherited and web scenario tag'),
+		'Are you sure you want to delete %1$s? This action cannot be undone.' =>
+			_('Are you sure you want to delete %1$s? This action cannot be undone.'),
+		'duplicate' => _('duplicate'),
+		'selected' => _('selected'),
+		'Customize table' => _('Customize table')
+	],
+	'class.options-popup.js' => [
+		'Column name' => _('Column name'),
+		'Duplicate column' => _('Duplicate column'),
+		'Delete column' => _('Delete column')
+	],
+	'class.options-popup.monitoring.host.problems.js' => [
+		'Show suppressed problems' => _('Show suppressed problems')
+	],
+	'class.options-popup.monitoring.latest.name.js' => [
+		'Show item key' => _('Show item key')
+	],
+	'class.options-popup.monitoring.problems.problem.js' => [
+		'Show operational data' => _('Show operational data'),
+		'Show trigger expression' => _('Show trigger expression')
+	],
+	'class.options-popup.monitoring.problems.time.js' => [
+		'Show timeline' => _('Show timeline')
+	],
+	'class.options-popup.tags.js' => [
+		'Number of tags' => _('Number of tags'),
+		'Tag name display' => _('Tag name display'),
+		'Full' => _('Full'),
+		'Shortened' => _('Shortened'),
+		'None' => _('None'),
+		'Tag display priority' => _('Tag display priority'),
+		'comma-separated list' => _('comma-separated list')
+	],
+	'class.options-popup.tagvalue.js' => [
+		'Tag name' => _('Tag name')
+	],
+	'class.options-popup.table-options.js' => [
+		'Table options' => _('Table options'),
+		'Column list' => _('Column list'),
+		'Reset layout' => _('Reset layout'),
+		'Your table settings will be reset to default and duplicated columns will be removed.' =>
+			_('Your table settings will be reset to default and duplicated columns will be removed.')
 	],
 	'class.geomaps.js' => [
 		'Severity filter' => _('Severity filter')
@@ -260,7 +349,8 @@ $translate_strings = [
 		'Widget' => _('Widget')
 	],
 	'class.widget-edit.sandbox.js' => [
-		'Cannot add widget: not enough free space on the dashboard.' => _('Cannot add widget: not enough free space on the dashboard.')
+		'Cannot add widget: not enough free space on the dashboard.' =>
+			_('Cannot add widget: not enough free space on the dashboard.')
 	],
 	'class.widget-edit.validator.js' => [
 		'Failed to update widget properties.' => _('Failed to update widget properties.')
@@ -328,7 +418,7 @@ $translate_strings = [
 		'S_HOST' => _('Host'),
 		'S_HOST_GROUP' => _('Host group'),
 		'S_IMAGE' => _('Image'),
-		'S_INCORRECT_ITEM_VALUE_TYPE' =>  _('incorrect item value type'),
+		'S_INCORRECT_ITEM_VALUE_TYPE' => _('incorrect item value type'),
 		'S_INCORRECT_VALUE' => _('Incorrect value for field "%1$s": %2$s.'),
 		'S_INDICATORS' => _('Indicators'),
 		'S_INVALID_PARAMETER' => _('Invalid parameter "%1$s": %2$s.'),
@@ -504,7 +594,8 @@ $translate_strings = [
 		'Delete dashboard?' => _('Delete dashboard?'),
 		'Discovery' => _('Discovery'),
 		'Discovery rule' => _('Discovery rule'),
-		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
+		'Do you wish to replace the conditional expression?' =>
+			_('Do you wish to replace the conditional expression?'),
 		'Execute now' => _('Execute now'),
 		'Export' => _('Export'),
 		'Item' => _('Item'),
@@ -619,6 +710,23 @@ if (empty($_GET['files'])) {
 		'class.cdate.js',
 		'class.cookie.js',
 		'class.curl.js',
+		'class.dataprovider.js',
+		'class.dataprovider.default.js',
+		'class.options-popup.js',
+		'class.options-popup.table-options.js',
+		'class.options-popup.tags.js',
+		'class.options-popup.tagvalue.js',
+		'class.options-popup.monitoring.problems.time.js',
+		'class.options-popup.monitoring.problems.problem.js',
+		'class.options-popup.monitoring.host.problems.js',
+		'class.options-popup.monitoring.latest.name.js',
+		'class.column.js',
+		'class.column.tags.js',
+		'class.column.tagvalue.js',
+		'class.datatable.js',
+		'class.pager.js',
+		'class.state.js',
+		'class.message.js',
 		'class.field.js',
 		'class.field.array.js',
 		'class.field.checkbox.js',
@@ -630,6 +738,7 @@ if (empty($_GET['files'])) {
 		'class.field.set.js',
 		'class.field.textarea.js',
 		'class.field.textbox.js',
+		'class.field.menupath.js',
 		'class.field.zcolorpicker.js',
 		'class.field.zselect.js',
 		'class.field.ztextarea-flexible.js',

@@ -111,13 +111,14 @@ function is_array(obj) {
  *
  * @returns {Array}
  */
-Array.prototype.xor = function(arr) {
-	var merged_arr = this.concat(arr);
+Object.defineProperty(Array.prototype, 'xor', {
+	value: function(arr) {
+		const merged = this.concat(arr);
 
-	return merged_arr.filter(function(e) {
-		return (merged_arr.indexOf(e) === merged_arr.lastIndexOf(e));
-	});
-};
+		return merged.filter(e => merged.indexOf(e) === merged.lastIndexOf(e));
+	},
+	enumerable: false
+});
 
 function addListener(element, eventname, expression, bubbling) {
 	bubbling = bubbling || false;
@@ -537,15 +538,16 @@ function removeFromOverlaysStack(dialogueid, return_focus = true) {
 /**
  * Reload content of Modal Overlay dialogue without closing it.
  *
- * @param {object} form		Filter form in which element has been changed. Assumed that form is inside Overlay Dialogue.
- * @param {string} action	(optional) action value that is used in CRouter. Default value is 'popup.generic'.
+ * @param {object} form			Filter form in which element has been changed. Assumed that form is inside Overlay Dialogue.
+ * @param {string} action		(optional) action value that is used in CRouter. Default value is 'popup.generic'.
+ * @param {object} parameters	(optional) Form values to use instead of serializing form fields.
  */
-function reloadPopup(form, action) {
+function reloadPopup(form, action, parameters = null) {
 	const dialogueid = form.closest('[data-dialogueid]').dataset.dialogueid;
 	const dialogue_class = jQuery(form).closest('[data-dialogueid]').prop('class');
-	const parameters = getFormFields(form);
 
 	action = action || 'popup.generic';
+	parameters = parameters !== null ? parameters : getFormFields(form);
 
 	PopUp(action, parameters, {dialogueid, dialogue_class});
 }
@@ -1081,6 +1083,44 @@ function uncheckTableRows(page, keepids = [], mvc = true) {
 	else {
 		sessionStorage.removeItem(key);
 	}
+}
+
+/**
+ * Deep comparison of two values.
+ * Returns true if values are the same and false if not.
+ *
+ * @param {any} first
+ * @param {any} second
+ * @returns {boolean}
+ */
+function deepCompare(first, second) {
+	if (first == second) {
+		return true;
+	}
+
+	if (Array.isArray(first) && Array.isArray(second)) {
+		if (first.length != second.length) {
+			return false;
+		}
+
+		for (let i = 0; i < first.length; i++) {
+			if (!deepCompare(first[i], second[i])) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	if (typeof first == 'object' && typeof second == 'object') {
+		if (deepCompare(Object.keys(first), Object.keys(second))) {
+			return deepCompare(Object.values(first), Object.values(second));
+		}
+
+		return Object.is(first, second);
+	}
+
+	return false;
 }
 
 /**
