@@ -1077,12 +1077,12 @@ class testItemTest extends CWebTest {
 				}
 				else {
 					$fields = ($data['fields']['Type'] === 'SNMP agent')
-						? ['interface_address' => '127.0.0.1', 'interface_details_community' => 'public']
-						: ['interface_address' => '127.0.0.1'];
+						? [$elements['address'] => '127.0.0.1', $elements['community'] => 'public']
+						: [$elements['address'] => '127.0.0.1'];
 
 					$expected_errors = [];
 					foreach ($fields as $name => $value) {
-						$expected_errors['id:'.$name] = 'This field cannot be empty.';
+						$expected_errors[$name] = 'This field cannot be empty.';
 					}
 
 					// Click Get value button and assert inline errors.
@@ -1123,18 +1123,18 @@ class testItemTest extends CWebTest {
 					$error_ids = [];
 
 					$elements['address']->clear();
-					$error_ids[] = 'id:interface_address'; // ja strada, samainit pret $elements['address']
+					$error_ids[] = $elements['address'];
 
 					if ($data['fields']['Type'] !== 'Simple check') {
 						$elements['port']->clear();
 
 						if (/*$is_host || */array_key_exists('interface', $data)) { //|| $data['fields']['Type'] === 'SNMP agent') {
-							$error_ids[] = $elements['port']; // ja strada, samainit pret $elements['port']
+							$error_ids[] = $elements['port'];
 						}
 					}
 
-					if (/*!$is_host && */$data['fields']['Type'] === 'SNMP agent') {
-						$error_ids[] = 'id:interface_details_community';
+					if (!$is_host && $data['fields']['Type'] === 'SNMP agent') {
+						$error_ids[] = $elements['community'];
 					}
 
 					$test_form->query('button:Get value')->one()->click();
