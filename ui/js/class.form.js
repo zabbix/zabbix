@@ -395,28 +395,36 @@ class CForm {
 
 		const convertSubfieldErrors = (field, subfield_name, errors, field_errors) => {
 			if (field instanceof CFieldSet) {
-				const set_field_name = subfield_name.split(']').slice(0, 2).join(']') + ']';
+				let subset_errors_set = false;
 
-				if (set_field_name in field.getFields()
-						&& field.getFields()[set_field_name] instanceof CFieldCollection) {
+				for (const [set_field_name, set_field] of Object.entries(field.getFields())) {
+					if (subfield_name.startsWith(set_field_name)) {
+						if (set_field instanceof CFieldCollection) {
+							if (!(set_field_name in field_errors)) {
+								field_errors[set_field_name] = Object.create(null);
+							}
 
-					if (!(set_field_name in field_errors)) {
-						field_errors[set_field_name] = Object.create(null);
-					}
+							if (set_field_name === subfield_name) {
+								field_errors[set_field_name][''] = errors;
+							}
+							else {
+								field_errors[set_field_name] = convertSubfieldErrors(
+									set_field,
+									subfield_name.substring(set_field_name.length),
+									errors,
+									field_errors[set_field_name]
+								);
+							}
 
-					if (set_field_name === subfield_name) {
-						field_errors[set_field_name][''] = errors;
-					}
-					else {
-						field_errors[set_field_name] = convertSubfieldErrors(
-							field.getFields()[set_field_name],
-							subfield_name.split(']').slice(2).join(']'),
-							errors,
-							field_errors[set_field_name]
-						)
+
+							subset_errors_set = true;
+						}
+
+						break;
 					}
 				}
-				else {
+
+				if (!subset_errors_set) {
 					field_errors[subfield_name] = errors;
 				}
 			}
