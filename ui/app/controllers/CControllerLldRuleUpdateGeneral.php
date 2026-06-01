@@ -439,25 +439,102 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 					]
 				],
 				'operations' => ['objects', 'fields' => [
-					'operationobject' => ['string'],
-					'operator' => ['string'],
-					'value' => ['string'],
-					'opstatus' => ['object', 'fields' => [
-						'status' => ['integer', 'in' => [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]]
-					]],
+					'operationobject' => ['integer', 'required',
+						'in' => [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+							OPERATION_OBJECT_GRAPH_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE,
+							OPERATION_OBJECT_LLD_RULE_PROTOTYPE
+						]
+					],
+					'operator' => ['integer',
+						'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+							CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP
+						]
+					],
+					'value' => ['db lld_override_operation.value'],
 					'opdiscover' => ['object', 'fields' => [
-						'discover' => ['integer', 'in' => [ITEM_DISCOVER, ITEM_NO_DISCOVER]]
+						'discover' => ['integer', 'required',
+							'in' => [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]
+						]
 					]],
-					'opperiod' => ['object', 'fields' => ['delay' => ['string']]],
-					'ophistory' => ['object', 'fields' => ['history' => ['string']]],
-					'optrends' => ['object', 'fields' => ['trends' => ['string']]],
-					'opseverity' => ['object', 'fields' => ['severity' => ['string']]],
-					'optag' => ['objects', 'fields' => [
-						'tag' => ['string'],
-						'value' => ['string']
-					]],
-					'optemplate' => ['objects', 'fields' => ['templateid' => ['string']]],
-					'opinventory' => ['string']
+					'opstatus' => ['object',
+						'fields' => [
+							'status' => ['integer', 'required',
+								'in' => [ZBX_PROTOTYPE_STATUS_ENABLED, ZBX_PROTOTYPE_STATUS_DISABLED]
+							]
+						],
+						'when' => ['operationobject',
+							'in' => [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+								OPERATION_OBJECT_HOST_PROTOTYPE, OPERATION_OBJECT_LLD_RULE_PROTOTYPE
+							]
+						]
+					],
+					'opperiod' => ['object',
+						'fields' => [
+							'delay' => ['db lld_override_opperiod.delay', 'required']
+						],
+						'when' => ['operationobject',
+							'in' => [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_LLD_RULE_PROTOTYPE]
+						]
+					],
+					'ophistory' => ['object',
+						'fields' => [
+							'history' => ['db lld_override_ophistory.history', 'required', 'not_empty',
+								'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_HOUR, 'max'=> 25 * SEC_PER_YEAR,
+									'accept_zero' => true, 'lldmacros' => true, 'usermacros' => true
+								]]
+							]
+						],
+						'when' => ['operationobject', 'in' => [OPERATION_OBJECT_ITEM_PROTOTYPE]]
+					],
+					'optrends' => ['object',
+						'fields' => [
+							'trends' => ['db lld_override_optrends.trends', 'required', 'not_empty',
+								'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_DAY, 'max'=> 25 * SEC_PER_YEAR,
+									'accept_zero' => true, 'lldmacros' => true, 'usermacros' => true
+								]]
+							]
+						],
+						'when' => ['operationobject', 'in' => [OPERATION_OBJECT_ITEM_PROTOTYPE]]
+					],
+					'opseverity' => ['object',
+						'fields' => [
+							'severity' => ['integer', 'required',
+								'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION,
+									TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH,
+									TRIGGER_SEVERITY_DISASTER
+								]
+							]
+						],
+						'when' => ['operationobject', 'in' => [OPERATION_OBJECT_TRIGGER_PROTOTYPE]]
+					],
+					'optag' => ['objects',
+						'fields' => [
+							'value' => ['db optag.value'],
+							'tag' => [
+								['db optag.tag'],
+								['db optag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+							]
+						],
+						'when' => ['operationobject',
+							'in' => [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+								OPERATION_OBJECT_HOST_PROTOTYPE
+							]
+						]
+					],
+					'optemplate' => ['objects', 'uniq' => ['templateid'],
+						'fields' => [
+							'templateid' => ['db optemplate.optemplateid', 'required']
+						],
+						'when' => ['operationobject', 'in' => [OPERATION_OBJECT_HOST_PROTOTYPE]]
+					],
+					'opinventory' => ['object',
+						'fields' => [
+							'inventory_mode' => ['integer', 'required',
+								'in' => [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
+							]
+						],
+						'when' => ['operationobject', 'in' => [OPERATION_OBJECT_HOST_PROTOTYPE]]
+					]
 				]]
 			]],
 			'preprocessing' => CItemGeneralHelper::getPreprocessingValidationRules(static::isPrototype())
