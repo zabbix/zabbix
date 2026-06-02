@@ -83,7 +83,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							'community' => ['string', 'required', 'not_empty',
 								'when' => ['version', 'in' => [SNMP_V1, SNMP_V2C]]
 							],
-							'max_repetitions' => ['db interface_snmp.max_repetitions', 'required',
+							'max_repetitions' => ['db interface_snmp.max_repetitions', 'required', 'not_empty',
 								'min' => 1, 'max' => ZBX_MAX_INT32,
 								'when' => ['version', 'in' => [SNMP_V2C, SNMP_V3]]
 							],

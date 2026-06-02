@@ -185,6 +185,7 @@ if ($data['is_item_testable']) {
 				->addClass('js-popup-row-snmp-community'),
 
 			(new CLabel(_('Max repetition count'), 'interface[details][max_repetitions]'))
+				->setAsteriskMark()
 				->addClass('js-popup-row-snmp-max-repetition'),
 			(new CFormField(
 					(new CTextBox('interface[details][max_repetitions]',
