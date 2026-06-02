@@ -588,7 +588,11 @@ $form->addItem([
 	(new CTemplateTag('final-result-row'))->addItem(
 		(new CDiv([
 			(new CSpan('#{action}'))->addClass('final-result-action'),
-			(new CSpan())->addClass('final-result-result'),
+			(new CSpan())
+				->addClass('final-result-result')
+				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+				->addClass('item-test-result')
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
 			(new CButton('copy_button_final_#{mode}'))
 				->setTitle(_('Copy to clipboard'))
 				->addClass(ZBX_ICON_COPY)
