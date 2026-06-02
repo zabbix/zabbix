@@ -25,6 +25,7 @@
 #include "zbxtagfilter.h"
 #include "zbxpgservice.h"
 #include "zbxalgo.h"
+#include "zbxtypes_ext.h"
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -94,8 +95,9 @@ typedef struct
 }
 zbx_dc_interface2_t;
 
-#define ZBX_ITEM_REQUIRES_PREPROCESSING_NO	0
-#define ZBX_ITEM_REQUIRES_PREPROCESSING_YES	1
+#define ZBX_ITEM_PREPROCESSING_NONE	0
+#define ZBX_ITEM_PREPROCESSING_REGULAR	1
+#define ZBX_ITEM_PREPROCESSING_PRIORITY	2
 
 typedef struct
 {
@@ -974,6 +976,7 @@ typedef struct zbx_hc_data
 	zbx_history_value_t	value;
 	zbx_uint64_t		lastlogsize;
 	zbx_timespec_t		ts;
+	unsigned int		sz_value;
 	int			mtime;
 	unsigned char		value_type;
 	unsigned char		flags;
@@ -1249,7 +1252,12 @@ zbx_session_t;
 
 typedef struct
 {
-	zbx_uint64_t	config;			/* configuration cache revision, increased every sync */
+	/* without lockless uint64 atomics use zbx_uint64_t and always lock cache before accessing it */
+#if ATOMIC_LLONG_LOCK_FREE == 2
+	zbx_atomic_uint64_t	config;		/* configuration cache revision, increased every sync */
+#else
+	zbx_uint64_t	config;
+#endif
 	zbx_uint64_t	expression;		/* global expression revision */
 	zbx_uint64_t	autoreg_tls;		/* autoregistration tls revision */
 	zbx_uint64_t	drules;			/* drules revision */
@@ -1711,4 +1719,5 @@ int	zbx_substitute_item_key_params_default(char **data, char *error, size_t maxe
 
 zbx_uint64_t	zbx_dc_get_cache_size(void);
 
+zbx_uint64_t	zbx_dc_config_get_config_revision(void);
 #endif

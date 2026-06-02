@@ -64,8 +64,6 @@ textarea.has-error {
 
 div[data-field-type="set"] {
 	&.has-error {
-		padding-left: 5px;
-		width: min-content;
 		border: 1px solid $error;
 	}
 }
@@ -158,6 +156,14 @@ div[data-field-type="array"] {
 					color: $white;
 				}
 			}
+		}
+	}
+}
+
+z-color-picker {
+	&.has-error {
+		.color-picker-box {
+			border: 1px solid $error;
 		}
 	}
 }

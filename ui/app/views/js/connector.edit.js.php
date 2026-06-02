@@ -29,6 +29,8 @@ window.connector_edit_popup = new class {
 		this.form = new CForm(this.form_element, rules);
 		this.clone_rules = clone_rules;
 
+		this.dialogue.classList.add('modal-popup-connector-edit');
+
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'connector.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
@@ -196,9 +198,8 @@ window.connector_edit_popup = new class {
 					return;
 				}
 
-				return response;
+				success_callback(response);
 			})
-			.then(success_callback)
 			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => this.overlay.unsetLoading());
 	}
