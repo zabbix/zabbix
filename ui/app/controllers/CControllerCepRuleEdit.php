@@ -57,10 +57,24 @@ class CControllerCepRuleEdit extends CController {
 	}
 
 	protected function doAction(): void {
-		$js_validation_rules = CControllerCepRuleGeneral::getValidationRules(existing: $this->hasInput('cepruleid'));
+		if ($this->hasInput('cepruleid')) {
+			$rules = (new CFormValidator(
+				CControllerCepRuleGeneral::getValidationRules(existing: true)
+			))->getRules();
+			$rules_for_clone = (new CFormValidator(
+				CControllerCepRuleGeneral::getValidationRules(existing: false)
+			))->getRules();
+		}
+		else {
+			$rules = (new CFormValidator(
+				CControllerCepRuleGeneral::getValidationRules(existing: false)
+			))->getRules();
+			$rules_for_clone = $rules;
+		}
 
 		$data = [
-			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules(),
+			'js_validation_rules' => $rules,
+			'js_validation_rules_for_clone' => $rules_for_clone,
 			'condition_js_validation_rules' => self::getConditionValidationRules(),
 			'window_condition_js_validation_rules' => self::getWindowConditionValidationRules(),
 			'operation_js_validation_rules' => self::getOperationValidationRules(),

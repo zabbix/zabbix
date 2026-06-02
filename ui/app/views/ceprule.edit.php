@@ -153,6 +153,7 @@ $output = [
 		.$this->readJsFile('ceprule.edit.js.php')
 		.'ceprule_edit_popup.init('.json_encode([
 			'rules' => $data['js_validation_rules'],
+			'rules_for_clone' => $data['js_validation_rules_for_clone'],
 			'condition_rules' => $data['condition_js_validation_rules'],
 			'window_condition_rules' => $data['window_condition_js_validation_rules'],
 			'operation_rules' => $data['operation_js_validation_rules'],

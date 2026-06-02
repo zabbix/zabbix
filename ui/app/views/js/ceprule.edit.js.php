@@ -57,7 +57,11 @@ window.ceprule_edit_popup = new class {
 	/** @type {Object} */
 	#operation_rules;
 
-	init({rules, operation_rules, condition_rules, window_condition_rules, ceprule}) {
+	/** @type {Object} */
+	#rules_for_clone;
+
+	init({rules, rules_for_clone, operation_rules, condition_rules, window_condition_rules, ceprule}) {
+		this.#rules_for_clone = rules_for_clone;
 		this.#initTemplates();
 		this.#condition_rules = condition_rules;
 		this.#window_condition_rules = window_condition_rules;
@@ -389,6 +393,7 @@ window.ceprule_edit_popup = new class {
 
 	#clone() {
 		this.form.findFieldByName('cepruleid')._field.remove();
+		this.#removePopupMessages();
 
 		const title = <?= json_encode(_('New complex event processing')) ?>;
 		const buttons = [
@@ -407,6 +412,7 @@ window.ceprule_edit_popup = new class {
 		];
 
 		this.#overlay.setProperties({title, buttons});
+		this.form.reload(this.#rules_for_clone);
 	}
 
 	#submit(force_sumbit) {

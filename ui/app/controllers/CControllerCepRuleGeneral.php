@@ -51,7 +51,6 @@ abstract class CControllerCepRuleGeneral extends CController {
 
 	protected function prepareApiRequest(): array {
 		$request = $this->getInputAll();
-		sdff(json_encode($request, JSON_PRETTY_PRINT));
 
 		if (!in_array($request['window_type'], [ZBX_CEP_WINDOW_SIMPLE, ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
 				ZBX_CEP_WINDOW_TAG_MATCH, ZBX_CEP_WINDOW_PATTERN_MATCH])) {
@@ -102,8 +101,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 			? ['ceprule.get', ['name' => '{name}']]
 			: ['ceprule.get', ['name' => '{name}'], 'cepruleid'];
 
-		return ['object', 'fields' => [
-		/* return ['object', 'api_uniq' => $api_uniq, 'fields' => [ */
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'cepruleid' => ['db cep_rule.cep_ruleid'],
 			'name' => ['db cep_rule.name', 'required', 'not_empty'],
 			'filter' => ['object', 'fields' => [
