@@ -807,7 +807,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->page->waitUntilReady();
 		CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['State' => 'Normal']);
 		$table = $this->query('id:latest')->one()->asDatatable();
-		$this->query('button:Apply')->one()->click();
+		$this->query('button:Ap-9922ply')->one()->click();
 		$this->page->waitUntilReady();
 		$table->waitUntilReady()->invalidate();
 
@@ -820,11 +820,11 @@ class testPageMonitoringLatestData extends CWebTest {
 				for ($i = 1; $i < 2; $i++) {
 					$this->assertFalse($this->query('link', $host['host'])->one(false)->isValid());
 					$this->query('class:arrow-right')->waitUntilClickable()->one()->scrollIntoView(50)->click();
-					$this->page->waitUntilReady();
+					$table->waitUntilReady();
 				}
 
 				$this->query('class:pager')->query('link:1')->waitUntilClickable()->one()->click();
-				$this->page->waitUntilReady();
+				$table->waitUntilReady();
 			}
 		}
 
