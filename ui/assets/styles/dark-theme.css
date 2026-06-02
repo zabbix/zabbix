@@ -5243,6 +5243,22 @@ div.dashboard-widget-itemcard .item-card {
             height: 14px;
             margin-top: 2px; }
 
+.dashboard-widget-itemcard-hintbox-image .dashboard-widget-itemhcard-hintbox {
+  overflow: hidden; }
+.dashboard-widget-itemcard-hintbox-image.is-loading {
+  min-width: 100px;
+  min-height: 56px; }
+  .dashboard-widget-itemcard-hintbox-image.is-loading::before {
+    content: ' '; }
+  .dashboard-widget-itemcard-hintbox-image.is-loading img {
+    opacity: 0; }
+.dashboard-widget-itemcard-hintbox-image img {
+  display: block;
+  max-width: 50vw;
+  max-height: 50vh;
+  opacity: 1;
+  transition: opacity 0.3s ease-out; }
+
 form.dashboard-widget-itemhistory #list_columns .overflow-ellipsis {
   max-width: 250px; }
 form.dashboard-widget-itemhistory #list_columns .inaccessible {
@@ -7427,6 +7443,9 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     float: right;
     line-height: 24px; }
 
+.modal-popup.modal-popup-static.modal-popup-sla-edit, .modal-popup.modal-popup-static.modal-popup-proxy-edit, .modal-popup.modal-popup-static.modal-popup-connector-edit {
+  --modal-max-width: 750px; }
+
 .multilineinput-control {
   display: flex;
   width: 100%; }
@@ -7755,6 +7774,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   margin: 10px;
   background-color: #2f280a;
   border: 1px solid #303030; }
+  .debug-output.debug-output-table-refresh {
+    margin: 10px 0 0 0; }
 
 .overlay-descr {
   max-height: 150px;
