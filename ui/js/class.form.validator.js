@@ -446,7 +446,8 @@ class CFormValidator {
 					scanObject(field in data ? data[field] : null, field_path);
 				}
 			}
-			else if (['id', 'integer', 'float', 'string'].includes(rule_set.type)) {
+			else if (['id', 'integer', 'float', 'string'].includes(rule_set.type) && this.#isTypeObject(data)
+					&& field in data) {
 				if (!when_paths.length) {
 					checkUse(rule_set, field_path);
 				}
