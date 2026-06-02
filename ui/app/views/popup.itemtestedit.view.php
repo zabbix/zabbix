@@ -105,7 +105,7 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 		(new CCol([
 			(new CTextAreaFlexible('macros['.$i.'][value]', $macro_value))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-				->setMaxlength(CControllerPopupItemTest::INPUT_MAX_LENGTH)
+				->setMaxlength(DB::getFieldLength('globalmacro', 'value'))
 				->setAttribute('placeholder', _('value'))
 				->disableSpellcheck()
 				->removeId()
@@ -133,9 +133,11 @@ if ($data['is_item_testable']) {
 		(new CFormField(
 			$data['interface_address_enabled']
 				? (new CTextBox('interface[address]', $data['inputs']['host']['interface']['address'], false,
-						CControllerPopupItemTest::INPUT_MAX_LENGTH
+						DB::getFieldLength('interface', 'dns')
 					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				: (new CTextBox('interface[address]', '', false, CControllerPopupItemTest::INPUT_MAX_LENGTH))
+				: (new CTextBox('interface[address]', '', false,
+						DB::getFieldLength('interface', 'dns')
+					))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setEnabled(false)
 		))->addClass('js-host-address-row'),
@@ -143,7 +145,9 @@ if ($data['is_item_testable']) {
 		(new CLabel(_('Port'), 'interface_port'))->addClass('js-host-address-row'),
 		(new CFormField(
 			$data['interface_port_enabled']
-				? (new CTextBox('interface[port]', $data['inputs']['host']['interface']['port'], '', 64))
+				? (new CTextBox('interface[port]', $data['inputs']['host']['interface']['port'], '',
+						DB::getFieldLength('interface', 'port')
+					))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				: (new CTextBox('interface[port]'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -176,7 +180,7 @@ if ($data['is_item_testable']) {
 			(new CFormField(
 				(new CTextBox('interface[details][community]',
 					$data['inputs']['host']['interface']['details']['community'], false,
-					CControllerPopupItemTest::INPUT_MAX_LENGTH
+					DB::getFieldLength('interface_snmp', 'community')
 				))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAriaRequired()
@@ -190,7 +194,7 @@ if ($data['is_item_testable']) {
 			(new CFormField(
 					(new CTextBox('interface[details][max_repetitions]',
 						$data['inputs']['host']['interface']['details']['max_repetitions'], false,
-						CControllerPopupItemTest::INPUT_MAX_LENGTH
+						DB::getFieldLength('interface_snmp', 'max_repetitions')
 					))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAriaRequired()
@@ -203,7 +207,7 @@ if ($data['is_item_testable']) {
 			(new CFormField(
 				(new CTextBox('interface[details][contextname]',
 					$data['inputs']['host']['interface']['details']['contextname'], false,
-					CControllerPopupItemTest::INPUT_MAX_LENGTH
+					DB::getFieldLength('interface_snmp', 'contextname')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -214,7 +218,7 @@ if ($data['is_item_testable']) {
 			(new CFormField(
 				(new CTextBox('interface[details][securityname]',
 					$data['inputs']['host']['interface']['details']['securityname'], false,
-					CControllerPopupItemTest::INPUT_MAX_LENGTH
+					DB::getFieldLength('interface_snmp', 'securityname')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -252,7 +256,7 @@ if ($data['is_item_testable']) {
 			(new CFormField(
 				(new CTextBox('interface[details][authpassphrase]',
 					$data['inputs']['host']['interface']['details']['authpassphrase'], false,
-					CControllerPopupItemTest::INPUT_MAX_LENGTH
+					DB::getFieldLength('interface_snmp', 'authpassphrase')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -273,7 +277,7 @@ if ($data['is_item_testable']) {
 			(new CFormField(
 				(new CTextBox('interface[details][privpassphrase]',
 					$data['inputs']['host']['interface']['details']['privpassphrase'], false,
-					CControllerPopupItemTest::INPUT_MAX_LENGTH
+					DB::getFieldLength('interface_snmp', 'privpassphrase')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
