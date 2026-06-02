@@ -163,7 +163,7 @@ window.ceprule_edit_popup = new class {
 		`);
 
 		this.#operation_row_template = new Template(`
-			<tr data-step="#{step}">
+			<tr data-sortorder="#{sortorder}">
 				<td class="td-drag-icon">
 					<div class="drag-icon"></div>
 					<span class="list-numbered-item">:</span>
@@ -177,15 +177,15 @@ window.ceprule_edit_popup = new class {
 
 					#{*tags_input_html}
 
-					<input data-field-type="hidden" name="operations[#{step}][step]" type="hidden" value="#{step}"/>
-					<input data-field-type="hidden" name="operations[#{step}][execute_when]" type="hidden" value="#{execute_when}"/>
-					<input data-field-type="hidden" name="operations[#{step}][type]" type="hidden" value="#{type}"/>
-					<input data-field-type="hidden" name="operations[#{step}][evaltype]" type="hidden" value="#{evaltype}"/>
-					<input data-field-type="hidden" name="operations[#{step}][event_name]" type="hidden" value="#{event_name}"/>
-					<input data-field-type="hidden" name="operations[#{step}][tag]" type="hidden" value="#{tag}"/>
-					<input data-field-type="hidden" name="operations[#{step}][new_tag]" type="hidden" value="#{new_tag_name}"/>
-					<input data-field-type="hidden" name="operations[#{step}][tag_value]" type="hidden" value="#{tag_value}"/>
-					<input data-field-type="hidden" name="operations[#{step}][severity]" type="hidden" value="#{severity}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][sortorder]" type="hidden" value="#{sortorder}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][execute_when]" type="hidden" value="#{execute_when}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][type]" type="hidden" value="#{type}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][evaltype]" type="hidden" value="#{evaltype}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][event_name]" type="hidden" value="#{event_name}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][tag]" type="hidden" value="#{tag}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][new_tag]" type="hidden" value="#{new_tag_name}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][tag_value]" type="hidden" value="#{tag_value}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][severity]" type="hidden" value="#{severity}"/>
 				</td>
 			</tr>
 		`);
@@ -242,7 +242,7 @@ window.ceprule_edit_popup = new class {
 			}
 			else if (e.target.classList.contains('js-operation-edit')) {
 				const {
-					[e.target.closest('[data-step]').getAttribute('data-step')]: operation
+					[e.target.closest('[data-sortorder]').getAttribute('data-sortorder')]: operation
 				} = this.form.findFieldByName('operations').getValue();
 				this.#openOperationPopup(operation, e.target);
 			}
@@ -447,9 +447,9 @@ window.ceprule_edit_popup = new class {
 
 		// Correct the sortorder.
 		const operations = {};
-		[...window['ceprule-operations-table'].querySelectorAll('[data-step]')]
+		[...window['ceprule-operations-table'].querySelectorAll('[data-sortorder]')]
 			.map((row, index) => {
-				operations[index + 1] = {...fields.operations[row.dataset.step], step: index + 1};
+				operations[index + 1] = {...fields.operations[row.dataset.sortorder], sortorder: index + 1};
 			});
 
 		fields.operations = operations;
@@ -697,7 +697,7 @@ window.ceprule_edit_popup = new class {
 
 		if (is_new) {
 			operation = {
-				step: 1 + Math.max(0, ...Object.keys(this.form.findFieldByName('operations').getValue())),
+				sortorder: 1 + Math.max(0, ...Object.keys(this.form.findFieldByName('operations').getValue())),
 				evaltype: '<?= CONDITION_EVAL_TYPE_AND_OR ?>',
 				event_name: '',
 				execute_when: '<?= CCepRuleHelper::OP_WHEN_EVENT_OCCURRED ?>',
@@ -785,7 +785,7 @@ window.ceprule_edit_popup = new class {
 	}
 
 	#editOperationRow(operation) {
-		this.form_element.querySelector(`#ceprule-operations-table [data-step="${operation.step}"]`)
+		this.form_element.querySelector(`#ceprule-operations-table [data-sortorder="${operation.sortorder}"]`)
 			.replaceWith(this.#buildOperationRow(operation));
 	}
 
@@ -850,11 +850,11 @@ window.ceprule_edit_popup = new class {
 		}
 
 		const tags_input_html = Object.values(operation.tags).map((tag, tag_index) => (new Template(`
-			<input data-field-type="hidden" name="operations[${operation.step}][tags][${tag_index}][tag]"
+			<input data-field-type="hidden" name="operations[${operation.sortorder}][tags][${tag_index}][tag]"
 				type="hidden" value="#{tag}"/>
-			<input data-field-type="hidden" name="operations[${operation.step}][tags][${tag_index}][operator]"
+			<input data-field-type="hidden" name="operations[${operation.sortorder}][tags][${tag_index}][operator]"
 				type="hidden" value="#{operator}"/>
-			<input data-field-type="hidden" name="operations[${operation.step}][tags][${tag_index}][value]"
+			<input data-field-type="hidden" name="operations[${operation.sortorder}][tags][${tag_index}][value]"
 				type="hidden" value="#{value}"/>
 		`)).evaluate(tag)).join('');
 

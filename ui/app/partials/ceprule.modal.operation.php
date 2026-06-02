@@ -47,7 +47,7 @@ foreach ($labels as $option => $label) {
 }
 
 echo (new CForm())
-	->addVar('step', '0')
+	->addVar('sortorder', '0')
 	->addStyle('display: none;')
 	->addItem((new CFormGrid())
 		->addItem((new CTemplateTag('ceprule-operation-tag-template'))

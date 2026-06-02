@@ -319,7 +319,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 				'severity' => ['db cep_operation.severity', 'required',
 					'when' => ['type', 'in' => [CCepRuleHelper::OP_SET_SEVERITY]]
 				],
-				'step' => ['db cep_operation.step', 'required']
+				'sortorder' => ['db cep_operation.sortorder', 'required']
 			]],
 			'stop' => ['db cep_rule.stop', 'required', 'in' => [CCepRuleHelper::EXECUTION_CONTINUE, CCepRuleHelper::EXECUTION_STOP]],
 			'sortorder' => ['db cep_rule.sortorder', 'required',
