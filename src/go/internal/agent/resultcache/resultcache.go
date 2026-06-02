@@ -113,17 +113,17 @@ type Writer interface {
 // common cache data
 type cacheData struct {
 	log.Logger
-	input              chan interface{}
-	uploader           Uploader
-	clientID           uint64
-	lastDataID         uint64
-	lastCommandID      uint64
-	lastErrors         []error
-	retry              *time.Timer
-	timeout            int
-	historyUpload      bool
-	uploadRetryAfter   int64
-	mu                 sync.Mutex
+	input            chan any
+	uploader         Uploader
+	clientID         uint64
+	lastDataID       uint64
+	lastCommandID    uint64
+	lastErrors       []error
+	retry            *time.Timer
+	timeout          int
+	historyUpload    bool
+	uploadRetryAfter int64
+	mu               sync.Mutex
 }
 
 func (c *cacheData) Stop() {
@@ -169,7 +169,7 @@ func (c *cacheData) EnableUpload(enabled bool) {
 }
 
 // sendAgentData performs agent data upload and updates upload state (matching C agent send_buffer()).
-func (c *cacheData) sendAgentData(u Uploader, data []byte, timeout time.Duration) (upload bool, errs []error) {
+func (c *cacheData) sendAgentData(u Uploader, data []byte, timeout time.Duration) []error {
 	c.mu.Lock()
 	c.uploadRetryAfter = 0
 	c.mu.Unlock()
@@ -180,12 +180,12 @@ func (c *cacheData) sendAgentData(u Uploader, data []byte, timeout time.Duration
 			c.enableUploadRetry(time.Now().Unix() + 60)
 		}
 
-		return false, errs
+		return errs
 	}
 
 	c.EnableUpload(upload)
 
-	return upload, nil
+	return nil
 }
 
 // enableUploadRetry disables upload and schedules an automatic retry at retryAfter (unix seconds).
@@ -207,8 +207,10 @@ func (c *cacheData) checkUploadRetry() bool {
 	if c.uploadRetryAfter == 0 || time.Now().Unix() < c.uploadRetryAfter {
 		return false
 	}
+
 	c.historyUpload = true
 	c.uploadRetryAfter = 0
+
 	return true
 }
 
@@ -225,9 +227,9 @@ func tableName(prefix string, index int) string {
 
 // fetchRowAndClose fetches and scans the next row. False is returned if there are no
 // rows to fetch or an error occurred.
-func fetchRowAndClose(rows *sql.Rows, args ...interface{}) (ok bool, err error) {
+func fetchRowAndClose(rows *sql.Rows, args ...any) (bool, error) {
 	if rows.Next() {
-		err = rows.Scan(args...)
+		err := rows.Scan(args...)
 		rows.Close()
 
 		return err == nil, err
@@ -240,7 +242,7 @@ func New(options *agent.AgentOptions, clientid uint64, output Uploader) ResultCa
 	data := &cacheData{
 		Logger:   log.New(fmt.Sprintf("%d", clientid)),
 		clientID: clientid,
-		input:    make(chan interface{}, 100),
+		input:    make(chan any, 100),
 		uploader: output,
 	}
 
