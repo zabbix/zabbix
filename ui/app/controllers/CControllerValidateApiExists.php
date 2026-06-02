@@ -56,14 +56,11 @@ class CControllerValidateApiExists extends CController {
 		}
 
 		if (!$ret) {
-			$messages = array_merge($this->getValidationError(),
-				array_column(CMessageHelper::getMessages(), 'message')
-			);
-
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'messages' => $messages
+						'messages' => array_merge($this->getValidationError(),
+							array_column(get_and_clear_messages(), 'message'))
 					]
 				])]))->disableView()
 			);
@@ -119,8 +116,10 @@ class CControllerValidateApiExists extends CController {
 	protected function validateApiAmount(): bool {
 		if (count($this->getInput('validations', [])) > 20) {
 			error(_s('No more than %1$s items based on field "%2$s" rules', '20', 'api'));
+
 			return false;
 		}
+
 		return true;
 	}
 }
