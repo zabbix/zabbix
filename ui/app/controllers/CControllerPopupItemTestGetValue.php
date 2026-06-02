@@ -136,6 +136,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			],
 			'follow_redirects' => ['boolean'],
 			'key' => [
+				['db items.key_'],
 				[
 					'db items.key_', 'required', 'not_empty', 'use' => [CItemKey::class, []],
 					'when' => ['item_type', 'in' => self::$item_types_has_key_mandatory]

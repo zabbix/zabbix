@@ -179,6 +179,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			],
 			'follow_redirects' => ['boolean'],
 			'key' => [
+				['db items.key_'],
 				[
 					'db items.key_', 'required', 'not_empty', 'use' => [CItemKey::class, []],
 					'when' => [
