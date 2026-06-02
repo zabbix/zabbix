@@ -109,7 +109,7 @@ struct zbx_cep
 	zbx_atomic_uint64_t		events_discarded_num;
 };
 
-static void	cep_event_clear(zbx_cep_event_t *event)
+void	cep_event_clear(zbx_cep_event_t *event)
 {
 	if (NULL != event->r_event)
 		zbx_cep_event_release(event->r_event);

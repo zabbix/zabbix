@@ -32,6 +32,7 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 	const zbx_vector_tags_ptr_t *tags, const zbx_vector_db_event_suppress_t *suppress);
 zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event);
 
+void	cep_event_clear(zbx_cep_event_t *event);
 zbx_cep_event_t	*cep_event_addref(zbx_cep_event_t *event);
 zbx_uint32_t	cep_event_handle_release(zbx_cep_event_handle_t h);
 zbx_cep_event_t	*cep_event_handle_remove(zbx_cep_t *cep, zbx_cep_event_handle_t h);

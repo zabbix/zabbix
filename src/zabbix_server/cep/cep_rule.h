@@ -17,6 +17,8 @@
 
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
+
+/* TODO: proper execute_when defines */
 #define CEP_ON_EVENT_OCCURRED	1
 
 #include "zbxcep.h"
@@ -25,10 +27,10 @@
 
 typedef struct
 {
-	zbx_db_event	*db_event;
+	zbx_db_event		*db_event;
 
-	char		**hosts;
-	int		hosts_num;
+	zbx_vector_str_t	hosts;
+	zbx_vector_str_t	groups;
 }
 zbx_cep_event_context_t;
 
@@ -36,10 +38,10 @@ void	cep_event_context_clear(zbx_cep_event_context_t *ctx);
 
 int	cep_event_match_rules(const zbx_cep_event_t *event, zbx_cep_config_handle_t handle,
 		const zbx_cep_rule_t ***matched_rules, int *matched_rules_num, zbx_cep_event_context_t *ctx);
-void	cep_event_execute_ops(zbx_cep_event_t *event, const zbx_vector_cep_rule_ptr_t *matched_rules,
+void	cep_event_execute_ops(zbx_cep_event_t *event, const zbx_cep_rule_t **matched_rules, int matched_rules_num,
 		int op_condition, zbx_cep_event_context_t *ctx);
-
-void	cep_event_add_to_rules(zbx_cep_event_t *event, const zbx_vector_cep_rule_ptr_t *matched_rules);
+void	cep_event_add_to_rules(zbx_cep_event_handle_t hevent, const zbx_cep_rule_t **matched_rules,
+		int matched_rules_num);
 
 #endif
 
