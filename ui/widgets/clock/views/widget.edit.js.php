@@ -84,8 +84,16 @@ window.widget_clock_form = new class {
 			}
 		}
 
-		if (this._time_type.value == <?= TIME_TYPE_SERVER ?> && this._time_type.value != this._init_time_type_value) {
-			document.querySelector('z-select[name="tzone_timezone"]').value = '<?= ZBX_DEFAULT_TIMEZONE ?>';
+		if (this._time_type.value != this._init_time_type_value) {
+			if (this._time_type.value == <?= TIME_TYPE_SERVER ?>) {
+				document.querySelector('z-select[name="tzone_timezone"]').value = '<?= ZBX_DEFAULT_TIMEZONE ?>';
+			}
+			else if (this._time_type.value == <?= TIME_TYPE_LOCAL ?>) {
+				document.querySelector('z-select[name="tzone_timezone"]').value = '<?= TIMEZONE_DEFAULT_LOCAL ?>';
+			}
+
+			this._init_time_type_value = this._time_type.value;
 		}
+
 	}
 };
