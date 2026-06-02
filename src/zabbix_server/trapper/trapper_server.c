@@ -47,11 +47,12 @@ static int	trapper_build_push_test_params(const char *sendto, const char *subjec
 	result = zbx_db_select(
 			"select d.uuid,d.push_token,dk.key_"
 			" from device d"
-			" left join device_key dk on dk.deviceid=d.deviceid and dk.active=0 and dk.scope=%d"
+			" left join device_key dk on dk.deviceid=d.deviceid and dk.active=%d and dk.scope=%d"
 			" where d.uuid='%s'"
-				" and d.status=1"
+				" and d.status=%d"
 			" order by dk.device_keyid desc",
-			ZBX_BRIDGE_ADAPTER_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, sendto_esc);
+			ZBX_DEVICE_KEY_ACTIVE, ZBX_BRIDGE_ADAPTER_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, sendto_esc,
+			ZBX_DEVICE_STATUS_ACTIVATED);
 
 	if (NULL == (row = zbx_db_fetch(result)))
 	{
@@ -66,7 +67,7 @@ static int	trapper_build_push_test_params(const char *sendto, const char *subjec
 
 	zbx_json_init(&json, 1024);
 	zbx_json_addstring(&json, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&json, "method", "device.notify", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "method", ZBX_PROTO_VALUE_DEVICE_NOTIFY, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_addobject(&json, "params");
 

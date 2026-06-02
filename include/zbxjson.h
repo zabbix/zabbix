@@ -268,6 +268,7 @@
 #define ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE	"expressions.evaluate"
 #define ZBX_PROTO_VALUE_DEVICE_INIT		"device.init"
 #define ZBX_PROTO_VALUE_DEVICE_OFFBOARD		"device.offboard"
+#define ZBX_PROTO_VALUE_DEVICE_NOTIFY		"device.notify"
 
 #define ZBX_PROTO_VALUE_HISTORY_UPLOAD_ENABLED	"enabled"
 #define ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED	"disabled"

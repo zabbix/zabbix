@@ -482,6 +482,8 @@ void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp
 	if (FAIL == device_mobile_devices_enabled())
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize device: mobile devices are disabled");
+		trapper_device_send_response(sock, FAIL, "Mobile devices are disabled.", config_comms->config_timeout,
+				__func__, ZBX_PROTO_VALUE_DEVICE_INIT);
 		goto out;
 	}
 
@@ -670,6 +672,8 @@ void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse
 	if (FAIL == device_mobile_devices_enabled())
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot offboard device: mobile devices are disabled");
+		trapper_device_send_response(sock, FAIL, "Mobile devices are disabled.", config_comms->config_timeout,
+				__func__, ZBX_PROTO_VALUE_DEVICE_OFFBOARD);
 		goto out;
 	}
 

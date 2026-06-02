@@ -19,6 +19,7 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
+#include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxalgo.h"
@@ -168,13 +169,14 @@ static int	push_get_target_by_uuid(const char *uuid, zbx_push_target_t *target)
 				"select max(dk2.device_keyid)"
 				" from device_key dk2"
 				" where dk2.deviceid=d.deviceid"
-					" and dk2.active=0"
+					" and dk2.active=%d"
 					" and dk2.scope=%d"
 			")"
 			" where d.uuid='%s'"
-				" and d.status=1"
+				" and d.status=%d"
 				" and d.push_token is not null",
-			ZBX_BRIDGE_ADAPTER_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, uuid_esc);
+			ZBX_DEVICE_KEY_ACTIVE, ZBX_BRIDGE_ADAPTER_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, uuid_esc,
+			ZBX_DEVICE_STATUS_ACTIVATED);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -202,12 +204,13 @@ static void	push_add_all_user_targets(zbx_uint64_t userid, zbx_vector_push_targe
 				"select max(dk2.device_keyid)"
 				" from device_key dk2"
 				" where dk2.deviceid=d.deviceid"
-					" and dk2.active=0"
+					" and dk2.active=%d"
 					" and dk2.scope=%d"
 			")"
 			" where d.userid=" ZBX_FS_UI64
-				" and d.status=1",
-			ZBX_BRIDGE_ADAPTER_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, userid);
+				" and d.status=%d",
+			ZBX_DEVICE_KEY_ACTIVE, ZBX_BRIDGE_ADAPTER_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, userid,
+			ZBX_DEVICE_STATUS_ACTIVATED);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 		push_target_append(targets, row[0], row[1], row[2]);
@@ -390,7 +393,7 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 
 		zbx_json_init(&json, 1024);
 		zbx_json_addstring(&json, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, "method", "device.notify", ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, "method", ZBX_PROTO_VALUE_DEVICE_NOTIFY, ZBX_JSON_TYPE_STRING);
 
 		zbx_json_addobject(&json, "params");
 
