@@ -13704,6 +13704,119 @@ void	zbx_dc_get_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __func__, hosts->num_data);
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host names for the specified list of functions                *
+ *                                                                            *
+ * Parameters: functionids - [IN]                                             *
+ *             hosts       - [OUT] - preallocated array of char*, at least    *
+ *                                   an element for functionid                *
+ *                                                                            *
+ * Return value: number of copied host names                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_host_names_by_functionids(const zbx_vector_uint64_t *functionids, char **hosts)
+{
+	const ZBX_DC_FUNCTION	*dc_function;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_HOST	*dc_host;
+	int			hosts_num = 0;
+	zbx_vector_uint64_t	hostids;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&hostids);
+	zbx_vector_uint64_reserve(&hostids, (size_t)functionids->values_num);
+
+	RDLOCK_CACHE;
+
+	for (int i = 0; i < functionids->values_num; i++)
+	{
+		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
+				&functionids->values[i])))
+		{
+			continue;
+		}
+
+		if (NULL == (dc_item = (const ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_function->itemid)))
+			continue;
+
+		zbx_vector_uint64_append(&hostids, dc_item->hostid);
+	}
+
+	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (int i = 0; i < hostids.values_num; i++)
+	{
+		if (NULL == (dc_host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostids.values[i])))
+			continue;
+
+		hosts[hosts_num++] = zbx_strdup(NULL, dc_host->host);
+	}
+
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_destroy(&hostids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __func__, hosts_num);
+
+	return hosts_num;
+}
+
+int	zbx_dc_get_group_names_by_functionids(const zbx_vector_uint64_t *functionids, char **groups)
+{
+	const ZBX_DC_FUNCTION	*dc_function;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_HOST	*dc_host;
+	int			groups_num = 0;
+	zbx_vector_uint64_t	groupids;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&groupids);
+	zbx_vector_uint64_reserve(&groupids, (size_t)functionids->values_num);
+
+	RDLOCK_CACHE;
+
+	for (int i = 0; i < functionids->values_num; i++)
+	{
+		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
+				&functionids->values[i])))
+		{
+			continue;
+		}
+
+		if (NULL == (dc_item = (const ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_function->itemid)))
+			continue;
+
+		if (NULL == (dc_host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &groupids.values[i])))
+			continue;
+
+		zbx_vector_uint64_append(&groupids, dc_item->hostid);
+	}
+
+	zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (int i = 0; i < groupids.values_num; i++)
+	{
+		if (NULL == (dc_host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &groupids.values[i])))
+			continue;
+
+		groups[groups_num++] = zbx_strdup(NULL, dc_host->host);
+	}
+
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_destroy(&groupids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __func__, groups_num);
+
+	return groups_num;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get number of enabled internal actions                            *

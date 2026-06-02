@@ -1155,6 +1155,7 @@ int	zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
 void	zbx_dc_get_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
 void	zbx_dc_get_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts);
+int	zbx_dc_get_host_names_by_functionids(const zbx_vector_uint64_t *functionids, char **hosts);
 
 int	zbx_dc_get_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodata_win, int *lastaccess);
 int	zbx_dc_get_proxy_delay_by_name(const char *name, int *delay, char **error);

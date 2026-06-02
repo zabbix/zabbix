@@ -15,16 +15,31 @@
 #ifndef ZABBIX_CEP_RULE_H
 #define ZABBIX_CEP_RULE_H
 
+#include "zbxcommon.h"
+#include "zbxdbhigh.h"
 #define CEP_ON_EVENT_OCCURRED	1
 
 #include "zbxcep.h"
 #include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
 
-int	zbx_cep_event_match_rules(const zbx_cep_event_t *event, zbx_cep_config_handle_t handle,
-		const zbx_cep_rule_t ***matched_rules, int *matched_rules_num);
-void	zbx_cep_event_execute_ops(zbx_cep_event_t *event, const zbx_vector_cep_rule_ptr_t *matched_rules,
-		int op_condition);
-void	zbx_cep_event_add_to_rules(zbx_cep_event_t *event, const zbx_vector_cep_rule_ptr_t *matched_rules);
+typedef struct
+{
+	zbx_db_event	*db_event;
+
+	char		**hosts;
+	int		hosts_num;
+}
+zbx_cep_event_context_t;
+
+void	cep_event_context_clear(zbx_cep_event_context_t *ctx);
+
+int	cep_event_match_rules(const zbx_cep_event_t *event, zbx_cep_config_handle_t handle,
+		const zbx_cep_rule_t ***matched_rules, int *matched_rules_num, zbx_cep_event_context_t *ctx);
+void	cep_event_execute_ops(zbx_cep_event_t *event, const zbx_vector_cep_rule_ptr_t *matched_rules,
+		int op_condition, zbx_cep_event_context_t *ctx);
+
+void	cep_event_add_to_rules(zbx_cep_event_t *event, const zbx_vector_cep_rule_ptr_t *matched_rules);
 
 #endif
 

@@ -206,8 +206,8 @@ typedef struct
 #define ZBX_FLAGS_DB_EVENT_RETRIEVED_TRIGGERS	0x0020
 	zbx_uint64_t		flags;
 }
-
 zbx_db_event;
+
 ZBX_PTR_VECTOR_DECL(db_event, zbx_db_event *)
 
 typedef struct
