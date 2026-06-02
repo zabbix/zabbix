@@ -66,7 +66,10 @@ class CControllerValidateApiExists extends CController {
 						]]],
 						['object', 'fields' => [
 							'username' => ['string', 'required', 'not_empty']
-						], 'when' => ['../api', 'in' => ['user']]]
+						], 'when' => ['../api', 'in' => ['user']]],
+						['object', 'fields' => [
+							'name' => ['string', 'required', 'not_empty']
+						], 'when' => ['../api', 'in' => ['ceprule']]]
 					],
 					'discoveryids' => ['id', 'required', 'when' => ['../api', 'in' => ['hostprototype']]]
 				]],

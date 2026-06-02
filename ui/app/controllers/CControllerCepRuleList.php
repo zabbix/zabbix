@@ -51,7 +51,6 @@ class CControllerCepRuleList extends CController {
 		CProfile::update('web.ceprule.list.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.ceprule.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
-		// filter
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.ceprule.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.ceprule.filter_status', $this->getInput('filter_status', CCepRuleHelper::FILTER_SHOW_ALL), PROFILE_TYPE_INT);
@@ -82,7 +81,6 @@ class CControllerCepRuleList extends CController {
 
 		CArrayHelper::sort($data['ceprules'], [['field' => $sort_field, 'order' => $sort_order]]);
 
-		// pager
 		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('ceprule.list', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['ceprules'], $sort_order,

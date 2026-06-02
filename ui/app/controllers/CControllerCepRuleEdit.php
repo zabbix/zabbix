@@ -96,7 +96,7 @@ class CControllerCepRuleEdit extends CController {
 			$ceprules = API::CepRule()->get([
 				'cep_ruleids' => $cepruleid,
 				'output' => ['cep_ruleid', 'name', 'description', 'window_type', 'status', 'stop', 'sortorder'],
-				'selectOperations' => ['step', 'execute_when', 'type', 'evaltype', 'event_name', 'tag', 'new_tag',
+				'selectOperations' => ['sortorder', 'execute_when', 'type', 'evaltype', 'event_name', 'tag', 'new_tag',
 					'tag_value', 'severity', 'tags'],
 				'selectFilter' => ['formula', 'evaltype', 'conditions'],
 				'selectWindow' => ['duration', 'capacity', 'script', 'group_by_host_group', 'group_by_host',
