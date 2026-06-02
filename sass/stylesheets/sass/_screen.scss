@@ -1,8 +1,8 @@
 $theme-name: '' !default;
 
 $ui-transitions: true !default;
-$ui-transition-duration: .3s !default;  // Sync with JavaScript variable: UI_TRANSITION_DURATION.
-$ui-controls-transition-duration: .2s !default;
+$ui-transition-duration: 300ms !default;  // Sync with JavaScript variable: UI_TRANSITION_DURATION.
+$ui-controls-transition-duration: 200ms !default;
 
 $icon-large-size: 40px !default;
 $icon-default-size: 18px !default;

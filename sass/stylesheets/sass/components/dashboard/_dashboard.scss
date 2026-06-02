@@ -492,9 +492,8 @@
 
 	&.dashboard-grid-widget-hidden-header {
 		.dashboard-grid-widget-header {
-			height: 2px;
+			height: 0;
 			z-index: 11;
-			border-bottom: 0;
 
 			@if $ui-transitions {
 				transition: height $ui-transition-duration ease-out,
@@ -505,10 +504,14 @@
 		}
 
 		.dashboard-grid-widget-contents {
-			margin-top: 3px;
+			margin-top: 0;
 			height: 100%;
 			padding-top: 8px;
-			border-top: 0;
+			border-top-left-radius: var(--surface-border-radius);
+			border-top-right-radius: var(--surface-border-radius);
+			transition-property: border-radius;
+			transition-duration: calc(#{$ui-transition-duration} * .25);
+			transition-delay: calc(#{$ui-transition-duration} * .75);
 
 			&.no-padding {
 				.dashboard-grid-widget-messages {
@@ -534,8 +537,15 @@
 		&.dashboard-grid-widget-focus {
 			.dashboard-grid-widget-header {
 				height: 2rem;
-				margin-top: calc(-2rem + 2px);
+				margin-top: -2rem;
 				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
+			}
+
+			.dashboard-grid-widget-contents {
+				border-top-left-radius: 0;
+				border-top-right-radius: 0;
+
+				transition-delay: 0ms;
 			}
 		}
 	}
@@ -603,7 +613,7 @@
 		height: 2rem;
 		display: none;
 		flex-direction: row;
-		flex-shrink: 0; // IE11 fix.
+		flex-shrink: 0;
 		align-items: center;
 
 		.dashboard-grid-iterator-pager-info {
@@ -658,6 +668,7 @@
 		flex-grow: 1;
 		flex-direction: column;
 		border: 1px solid $ui-border-color;
+		border-radius: var(--surface-border-radius);
 		background-color: rgba($ui-bg-color, .3);
 	}
 }
@@ -709,6 +720,7 @@
 			margin-top: -2rem;
 			height: 2rem;
 			box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
+			border-radius: var(--surface-border-radius);
 			opacity: 1;
 
 			// Not inheriting opacity transition here.

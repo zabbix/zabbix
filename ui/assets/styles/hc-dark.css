@@ -2002,14 +2002,17 @@ button {
 .dashboard-grid-widget {
   position: absolute; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
-    height: 2px;
-    z-index: 11;
-    border-bottom: 0; }
+    height: 0;
+    z-index: 11; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents {
-    margin-top: 3px;
+    margin-top: 0;
     height: 100%;
     padding-top: 8px;
-    border-top: 0; }
+    border-top-left-radius: var(--surface-border-radius);
+    border-top-right-radius: var(--surface-border-radius);
+    transition-property: border-radius;
+    transition-duration: calc(300ms * .25);
+    transition-delay: calc(300ms * .75); }
     .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-bad,
     .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-good,
     .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-warning {
@@ -2020,8 +2023,12 @@ button {
         bottom: 0; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-header {
     height: 2rem;
-    margin-top: calc(-2rem + 2px);
+    margin-top: -2rem;
     box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15); }
+  .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-contents {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    transition-delay: 0ms; }
   .dashboard-grid-widget.dashboard-grid-widget-focus .dashboard-grid-widget-actions {
     opacity: 1; }
 
@@ -2096,6 +2103,7 @@ button {
     flex-grow: 1;
     flex-direction: column;
     border: 1px solid #444444;
+    border-radius: var(--surface-border-radius);
     background-color: rgba(0, 0, 0, 0.3); }
 
 .dashboard-grid-iterator-too-small {
@@ -2133,6 +2141,7 @@ button {
     margin-top: -2rem;
     height: 2rem;
     box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
+    border-radius: var(--surface-border-radius);
     opacity: 1; }
   .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-actions {
     opacity: 1; }
