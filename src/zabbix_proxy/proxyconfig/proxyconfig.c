@@ -430,6 +430,9 @@ void	*zbx_proxyconfig_thread(void *args)
 
 		interval = zbx_time() - sec;
 
+		if (1 == config_cache_reload)
+			zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the configuration cache");
+
 		zbx_supervisor_update_activity("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL
 				" sec, idle %d sec]", unit_args->name, (zbx_fs_size_t)data_size, interval,
 				proxyconfig_args_in->config_proxyconfig_frequency);
