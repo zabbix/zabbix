@@ -128,12 +128,12 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						],
 						'when' => ['../item_type', 'in' => [ITEM_TYPE_SNMP]]
 					],
-					'address' => ['string', 'not_empty', 'required',
+					'address' => ['db interface.dns', 'not_empty', 'required',
 						'when' => ['../item_type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SIMPLE,
 							ITEM_TYPE_SNMP, ITEM_TYPE_SSH, ITEM_TYPE_TELNET
 						]]
 					],
-					'port' => ['string', 'not_empty', 'required',
+					'port' => ['db interface.port', 'not_empty', 'required',
 						'when' => ['../item_type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SNMP]]
 					]
 				],
@@ -150,8 +150,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			],
 			'eol' => ['integer', 'in' => [ZBX_EOL_LF, ZBX_EOL_CRLF]],
 			'macros' => ['objects', 'fields' => [
-				'name' => ['string', 'required'],
-				'value' => ['string', 'required']
+				'name' => ['db globalmacro.macro', 'required'],
+				'value' => ['db globalmacro.value', 'required']
 			]],
 			'time_change' => ['integer'],
 
