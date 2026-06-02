@@ -294,18 +294,29 @@ func allCipherSuiteIDs() []uint16 {
 }
 
 func getCertificatesPEM(address, domain string, timeout int) ([]*x509.Certificate, error) {
-	var dialer net.Dialer
-	dialer.Timeout = time.Duration(timeout) * time.Second
+	netDialer := &net.Dialer{
+		Timeout: time.Duration(timeout) * time.Second,
+	}
 
-	conn, err := tls.DialWithDialer(&dialer, "tcp", address, &tls.Config{
-		InsecureSkipVerify: true,
-		ServerName:         domain,
-		CipherSuites:       allCipherSuiteIDs(),
-	})
+	tlsDialer := &tls.Dialer{
+		NetDialer: netDialer,
+		Config: &tls.Config{
+			InsecureSkipVerify: true, //nolint:gosec // unsafe by design and only checks certs
+			ServerName:         domain,
+			CipherSuites:       allCipherSuiteIDs(),
+		},
+	}
+
+	rawConn, err := tlsDialer.Dial("tcp", address)
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer rawConn.Close() //nolint:errcheck // defer close
+
+	conn, ok := rawConn.(*tls.Conn)
+	if !ok {
+		return nil, errs.New(fmt.Sprintf("expected TLS connection, got %T", rawConn))
+	}
 
 	return conn.ConnectionState().PeerCertificates, nil
 }
