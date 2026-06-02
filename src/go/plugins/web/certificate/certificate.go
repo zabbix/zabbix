@@ -276,18 +276,21 @@ func getHostAndPort(uri *uri.URI, port string) (string, string, error) {
 	return uri.Host(), uri.Port(), nil
 }
 
-func getAllCipherSuitesEvenInsecureOnes() []uint16 {
-	allCipherSuites := make([]uint16, 0)
+func allCipherSuiteIDs() []uint16 {
+	secure := tls.CipherSuites()
+	insecure := tls.InsecureCipherSuites()
 
-	for _, cipher := range tls.CipherSuites() {
-		allCipherSuites = append(allCipherSuites, cipher.ID)
+	ids := make([]uint16, 0, len(secure)+len(insecure))
+
+	for _, cipher := range secure {
+		ids = append(ids, cipher.ID)
 	}
 
-	for _, cipher := range tls.InsecureCipherSuites() {
-		allCipherSuites = append(allCipherSuites, cipher.ID)
+	for _, cipher := range insecure {
+		ids = append(ids, cipher.ID)
 	}
 
-	return allCipherSuites
+	return ids
 }
 
 func getCertificatesPEM(address, domain string, timeout int) ([]*x509.Certificate, error) {
@@ -297,7 +300,7 @@ func getCertificatesPEM(address, domain string, timeout int) ([]*x509.Certificat
 	conn, err := tls.DialWithDialer(&dialer, "tcp", address, &tls.Config{
 		InsecureSkipVerify: true,
 		ServerName:         domain,
-		CipherSuites:       getAllCipherSuitesEvenInsecureOnes(),
+		CipherSuites:       allCipherSuiteIDs(),
 	})
 	if err != nil {
 		return nil, err
