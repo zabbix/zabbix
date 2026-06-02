@@ -923,7 +923,15 @@ class CApiInputValidator {
 		}
 		unset($field_rule);
 
-		return self::validateData(['type' => API_OBJECT] + $rule, $data, $path, $error);
+		if (!self::validateData(['type' => API_OBJECT] + $rule, $data, $path, $error)) {
+			return false;
+		}
+
+		if ($data !== null) {
+			$data = array_filter($data, static fn (?array $value) => $value !== null);
+		}
+
+		return true;
 	}
 
 	/**

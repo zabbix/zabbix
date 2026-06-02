@@ -301,76 +301,140 @@ class CItemHelper extends CItemGeneralHelper {
 	 * @return array  Items with updated 'history' and 'trends' properties, as well as 'source' property set.
 	 */
 	public static function addDataSource(array $items, int $time): array {
-		static $hk_history_global, $hk_history_time, $hk_trends_global, $hk_trends_time;
-
-		if ($hk_history_global === null) {
-			$hk_history_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL);
-
-			if ($hk_history_global == 1) {
-				$hk_history_time = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
-			}
-		}
-
-		if ($hk_trends_global === null) {
-			$hk_trends_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL);
-
-			if ($hk_trends_global == 1) {
-				$hk_trends_time = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
-			}
-		}
-
-		if ($hk_history_global) {
-			foreach ($items as &$item) {
-				$item['history'] = $hk_history_time;
-			}
-			unset($item);
-		}
-
-		if ($hk_trends_global) {
-			foreach ($items as &$item) {
-				$item['trends'] = $hk_trends_time;
-			}
-			unset($item);
-		}
-
-		if (!$hk_history_global || !$hk_trends_global) {
-			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items,
-				array_merge($hk_history_global ? [] : ['history'], $hk_trends_global ? [] : ['trends'])
-			);
-
-			foreach ($items as &$item) {
-				if (!$hk_history_global) {
-					$item['history'] = timeUnitToSeconds($item['history']);
-
-					if ($item['history'] === null) {
-						$item['history'] = 0;
-
-						error(_s('Incorrect value for field "%1$s": %2$s.', 'history',
-							_('invalid history storage period')
-						));
-					}
-				}
-
-				if (!$hk_trends_global) {
-					$item['trends'] = timeUnitToSeconds($item['trends']);
-
-					if ($item['trends'] === null) {
-						$item['trends'] = 0;
-
-						error(_s('Incorrect value for field "%1$s": %2$s.', 'trends',
-							_('invalid trend storage period')
-						));
-					}
-				}
-			}
-			unset($item);
-		}
+		$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['history', 'trends']);
 
 		foreach ($items as &$item) {
+			[
+				'keep_history' => $item['history'],
+				'history_has_errors' => $history_has_errors,
+				'keep_trends' => $item['trends'],
+				'trends_has_errors' => $trends_has_errors
+			] = CItemHelper::getStoragePeriods((int) $item['value_type'], $item['history'], $item['trends']);
+
+			if ($history_has_errors) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'history',
+					_('invalid history storage period')
+				));
+			}
+
+			if ($trends_has_errors) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'trends',
+					_('invalid trend storage period')
+				));
+			}
+
+			if ($item['history'] === null) {
+				$item['history'] = 25 * SEC_PER_YEAR;
+			}
+
+			if ($item['trends'] === null) {
+				$item['trends'] = 25 * SEC_PER_YEAR;
+			}
+
 			$item['source'] = $item['trends'] == 0 || time() - $item['history'] <= $time ? 'history' : 'trends';
 		}
 		unset($item);
 
 		return $items;
+	}
+
+	/**
+	 * Returns the actual history and trend retention period, taking into account global settings,
+	 * external storage settings, as well as item settings.
+	 *
+	 * The returned array contains the following keys:
+	 *   string   history, trends                       - Human-readable history/trends retention period.
+	 *   int|null keep_history, keep_trends             - History/trends retention period in seconds. In case of a
+	 *                                                    parsing error or if the retention period cannot be retrieved
+	 *                                                    from the external storage, null is returned.
+	 *   bool     history_has_errors, trends_has_errors - true in case of a parsing error.
+	 *
+	 * @param int    $value_type
+	 * @param string $history
+	 * @param string $trends
+	 *
+	 * @return array
+	 */
+	public static function getStoragePeriods(int $value_type, string $history, string $trends): array {
+		static $value_type_ttl, $value_types_with_trends, $hk_history_global, $hk_history;
+
+		if ($value_type_ttl === null) {
+			// History retention period in external storages such as ClickHouse or Elasticsearch.
+			$value_type_ttl = Manager::History()->getValueTypesStorageTtls();
+		}
+
+		if ($value_types_with_trends === null) {
+			$value_types_with_trends = CHousekeepingHelper::getValueTypesWithTrends();
+		}
+
+		if ($hk_history_global === null) {
+			$hk_history_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL);
+
+			if ($hk_history_global == 1) {
+				$hk_history = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY);
+			}
+		}
+
+		$simple_interval_parser = new CSimpleIntervalParser();
+		$keep_history = $simple_interval_parser->parse($history) == CParser::PARSE_SUCCESS
+			? timeUnitToSeconds($history)
+			: null;
+		$history_has_errors = false;
+		$trends_has_errors = false;
+
+		if ($keep_history === 0) {
+			$history = _('Not stored');
+		}
+		elseif (array_key_exists($value_type, $value_type_ttl)) {
+			$keep_history = $value_type_ttl[$value_type]['value_ttl'];
+			$history = $keep_history !== null ? convertSecondsToTimeUnits($keep_history) : _('Unknown');
+		}
+		elseif ($hk_history_global == 1) {
+			$history = $hk_history;
+			$keep_history = timeUnitToSeconds($history);
+		}
+		elseif ($keep_history === null) {
+			$history_has_errors = true;
+		}
+
+		if (in_array($value_type, $value_types_with_trends)) {
+			static $hk_trends_global, $hk_trends;
+
+			if ($hk_trends_global === null) {
+				$hk_trends_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL);
+
+				if ($hk_trends_global == 1) {
+					$hk_trends = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS);
+				}
+			}
+
+			$keep_trends = $simple_interval_parser->parse($trends) == CParser::PARSE_SUCCESS
+				? timeUnitToSeconds($trends)
+				: null;
+
+			if ($keep_trends === 0) {
+				$trends = _('Not stored');
+			}
+			elseif ($hk_trends_global == 1) {
+				$trends = $hk_trends;
+				$keep_trends = timeUnitToSeconds($trends);
+			}
+			elseif ($keep_trends === null) {
+				$trends_has_errors = true;
+			}
+		}
+		else {
+			$trends = '';
+			$keep_trends = 0;
+		}
+
+		return [
+			'history' => $history,
+			'keep_history' => $keep_history,
+			'history_has_errors' => $history_has_errors,
+			'trends' => $trends,
+			'keep_trends' => $keep_trends,
+			'trends_has_errors' => $trends_has_errors
+		];
 	}
 }
