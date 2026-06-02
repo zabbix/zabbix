@@ -585,7 +585,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 	{
 		zbx_free(post_data);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot write data to ClickHouse: cannot set curl option %d: %s",
-				(int)CURLOPT_URL, curl_easy_strerror(err));
+				(int)CURLOPT_POSTFIELDSIZE, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -593,7 +593,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 	{
 		zbx_free(post_data);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot write data to ClickHouse: cannot set curl option %d: %s",
-				(int)CURLOPT_URL, curl_easy_strerror(err));
+				(int)CURLOPT_POSTFIELDS, curl_easy_strerror(err));
 		goto out;
 	}
 
