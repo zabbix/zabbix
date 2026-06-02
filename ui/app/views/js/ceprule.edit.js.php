@@ -946,10 +946,10 @@ window.ceprule_edit_popup = new class {
 			arg2 = window_condition.tag;
 		}
 		else if (window_condition.type == <?= CCepRuleHelper::WINDOW_CONDITION_OLD_TAG ?>) {
-			arg2 = window_condition.tag;
+			arg2 = window_condition.past_tag;
 		}
 		else if (window_condition.type == <?= CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE ?>) {
-			arg1 = window_condition.tag;
+			arg1 = window_condition.past_tag;
 			arg2 = window_condition.tag_value;
 		}
 

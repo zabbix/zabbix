@@ -236,10 +236,10 @@ abstract class CControllerCepRuleGeneral extends CController {
 									'when' => ['type', 'in' => [CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE]]
 								],
 							],
-							'past_tag' => ['db cep_window_condition.past_tag', 'required', 'not_empty',
+							'past_tag' => ['db cep_window_condition.past_tag', 'required', 'not_empty'],
+							'tag' => ['db cep_window_condition.tag', 'required', 'not_empty',
 								'when' => ['type', 'in' => [CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR]]
 							],
-							'tag' => ['db cep_window_condition.tag', 'required', 'not_empty'],
 							'tag_value' => ['db cep_window_condition.tag_value', 'required', 'not_empty',
 								'when' => ['type', 'in' => [CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE]]
 							],

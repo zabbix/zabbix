@@ -71,7 +71,7 @@ echo (new CForm())
 					),
 					new CLabel('Tag', 'ceprule-window-past-event-tag-name'),
 					new CFormField(
-						(new CTextBox('tag'))
+						(new CTextBox('past_tag'))
 							->setId('ceprule-window-past-event-tag-name')
 							->setAttribute('placeholder', _('tag name'))
 					)
@@ -83,7 +83,7 @@ echo (new CForm())
 				->addItem([
 					new CLabel('Tag', 'ceprule-window-past-event-tag-name'),
 					new CFormField(
-						(new CTextBox('tag'))
+						(new CTextBox('past_tag'))
 							->setId('ceprule-window-past-event-tag-name')
 							->setAttribute('placeholder', _('tag name'))
 					),
