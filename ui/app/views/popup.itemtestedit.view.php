@@ -444,6 +444,7 @@ if (count($data['steps']) > 0) {
 			foreach ($step_params as $j => $param_value) {
 				$form->addItem(
 						(new CInput('hidden', 'steps['.$i.'][params_'.$j.'_not_supported]', $param_value))
+							->setAttribute('data-notrim', '')
 							->setAttribute('data-field-type', 'hidden')
 					);
 			}
@@ -474,6 +475,7 @@ if (count($data['steps']) > 0) {
 			foreach ($step_params as $j => $param_value) {
 				$form->addItem(
 					(new CInput('hidden', 'steps['.$i.'][params_'.$j.']', $param_value))
+						->setAttribute('data-notrim', '')
 						->setAttribute('data-field-type', 'hidden')
 				);
 			}

@@ -403,15 +403,15 @@ window.itemtestedit_view_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-
 				if ('form_errors' in response) {
 					this.#form.setErrors(response.form_errors, true, true);
 					this.#form.renderErrors();
 
 					return;
+				}
+
+				if ('error' in response) {
+					this.#ajaxExceptionHandler(response)
 				}
 
 				success_callback(response);
