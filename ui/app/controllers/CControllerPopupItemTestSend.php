@@ -73,7 +73,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'show_final_result' => ['boolean'],
 			'get_value' => ['boolean'],
 			'test_with' => ['integer', 'in' => [self::TEST_WITH_SERVER, self::TEST_WITH_PROXY]],
-			'proxyid' => ['db proxy.proxyid', 'required', 'when' => ['test_with', 'in'  => [self::TEST_WITH_PROXY]]],
+			'proxyid' => ['db proxy.proxyid', 'required', 'when' => [
+				['get_value', 'in' => [1]],
+				['test_with', 'in'  => [self::TEST_WITH_PROXY]]
+			]],
 			'interface' => ['object',
 				'fields' => [
 					'useip' => ['boolean'],
