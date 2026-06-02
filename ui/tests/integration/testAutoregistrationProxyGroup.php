@@ -47,7 +47,7 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 3,
-				'LogFileSize' => 0,
+				'LogFileSize' => 0
 			],
 			self::COMPONENT_PROXY => [
 				'ProxyMode' => PROXY_OPERATING_MODE_ACTIVE,
