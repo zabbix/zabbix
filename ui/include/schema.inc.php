@@ -10308,12 +10308,6 @@ return [
 				'length' => 65535,
 				'default' => ''
 			],
-			'window_type' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
 			'evaltype' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -10418,19 +10412,20 @@ return [
 		]
 	],
 	'cep_window' => [
-		'key' => 'cep_windowid',
+		'key' => 'cep_ruleid',
 		'fields' => [
-			'cep_windowid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
 			'cep_ruleid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'cep_rule',
 				'ref_field' => 'cep_ruleid'
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			],
 			'duration' => [
 				'null' => false,
@@ -10502,12 +10497,12 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'cep_windowid' => [
+			'cep_ruleid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'cep_window',
-				'ref_field' => 'cep_windowid'
+				'ref_table' => 'cep_rule',
+				'ref_field' => 'cep_ruleid'
 			],
 			'type' => [
 				'null' => false,
@@ -10612,25 +10607,7 @@ return [
 				'ref_table' => 'cep_rule',
 				'ref_field' => 'cep_ruleid'
 			],
-			'step' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
 			'execute_when' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'event_type' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'eviction_cause' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -10673,6 +10650,12 @@ return [
 				'default' => ''
 			],
 			'severity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'sortorder' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

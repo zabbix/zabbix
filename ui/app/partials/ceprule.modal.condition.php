@@ -37,7 +37,7 @@ echo (new CForm())
 		])
 		->addItem(
 			(new CTag('template', true))
-				->setAttribute('for-type', ZBX_CEP_CONDITION_EVENT_NAME)
+				->setAttribute('for-type', CCepRuleHelper::CONDITION_EVENT_NAME)
 				->addItem([
 					new CLabel('Operator'),
 					new CFormField(
@@ -58,7 +58,7 @@ echo (new CForm())
 		)
 		->addItem(
 			(new CTag('template', true))
-				->setAttribute('for-type', ZBX_CEP_CONDITION_HOST)
+				->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST)
 				->addItem([
 					new CLabel('Operator'),
 					new CFormField(
@@ -79,7 +79,7 @@ echo (new CForm())
 		)
 		->addItem(
 			(new CTag('template', true))
-				->setAttribute('for-type', ZBX_CEP_CONDITION_HOST_GROUP)
+				->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST_GROUP)
 				->addItem([
 					new CLabel('Operator'),
 					new CFormField(
@@ -100,7 +100,7 @@ echo (new CForm())
 		)
 		->addItem(
 			(new CTag('template', true))
-				->setAttribute('for-type', ZBX_CEP_CONDITION_TAG_NAME)
+				->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG_NAME)
 				->addItem([
 					new CLabel('Operator'),
 					new CFormField(
@@ -122,7 +122,7 @@ echo (new CForm())
 		)
 		->addItem(
 			(new CTag('template', true))
-				->setAttribute('for-type', ZBX_CEP_CONDITION_TAG_VALUE)
+				->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG_VALUE)
 				->addItem([
 					new CLabel('Operator'),
 					new CFormField(
@@ -145,7 +145,7 @@ echo (new CForm())
 		)
 		->addItem(
 			(new CTag('template', true))
-				->setAttribute('for-type', ZBX_CEP_CONDITION_SEVERITY)
+				->setAttribute('for-type', CCepRuleHelper::CONDITION_SEVERITY)
 				->addItem([
 					new CLabel('Operator'),
 					new CFormField(
@@ -164,7 +164,7 @@ echo (new CForm())
 		)
 		->addItem(
 			(new CTag('template', true))
-				->setAttribute('for-type', ZBX_CEP_CONDITION_TIME_PERIOD)
+				->setAttribute('for-type', CCepRuleHelper::CONDITION_TIME_PERIOD)
 				->addItem([
 					new CLabel('Operator'),
 					new CFormField(

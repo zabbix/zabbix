@@ -57,7 +57,11 @@ window.ceprule_edit_popup = new class {
 	/** @type {Object} */
 	#operation_rules;
 
-	init({rules, operation_rules, condition_rules, window_condition_rules, ceprule}) {
+	/** @type {Object} */
+	#rules_for_clone;
+
+	init({rules, rules_for_clone, operation_rules, condition_rules, window_condition_rules, ceprule}) {
+		this.#rules_for_clone = rules_for_clone;
 		this.#initTemplates();
 		this.#condition_rules = condition_rules;
 		this.#window_condition_rules = window_condition_rules;
@@ -159,7 +163,7 @@ window.ceprule_edit_popup = new class {
 		`);
 
 		this.#operation_row_template = new Template(`
-			<tr data-step="#{step}">
+			<tr data-sortorder="#{sortorder}">
 				<td class="td-drag-icon">
 					<div class="drag-icon"></div>
 					<span class="list-numbered-item">:</span>
@@ -173,17 +177,15 @@ window.ceprule_edit_popup = new class {
 
 					#{*tags_input_html}
 
-					<input data-field-type="hidden" name="operations[#{step}][step]" type="hidden" value="#{step}"/>
-					<input data-field-type="hidden" name="operations[#{step}][execute_when]" type="hidden" value="#{execute_when}"/>
-					<input data-field-type="hidden" name="operations[#{step}][event_type]" type="hidden" value="#{event_type}"/>
-					<input data-field-type="hidden" name="operations[#{step}][eviction_cause]" type="hidden" value="#{eviction_cause}"/>
-					<input data-field-type="hidden" name="operations[#{step}][type]" type="hidden" value="#{type}"/>
-					<input data-field-type="hidden" name="operations[#{step}][evaltype]" type="hidden" value="#{evaltype}"/>
-					<input data-field-type="hidden" name="operations[#{step}][event_name]" type="hidden" value="#{event_name}"/>
-					<input data-field-type="hidden" name="operations[#{step}][tag]" type="hidden" value="#{tag}"/>
-					<input data-field-type="hidden" name="operations[#{step}][new_tag]" type="hidden" value="#{new_tag_name}"/>
-					<input data-field-type="hidden" name="operations[#{step}][tag_value]" type="hidden" value="#{tag_value}"/>
-					<input data-field-type="hidden" name="operations[#{step}][severity]" type="hidden" value="#{severity}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][sortorder]" type="hidden" value="#{sortorder}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][execute_when]" type="hidden" value="#{execute_when}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][type]" type="hidden" value="#{type}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][evaltype]" type="hidden" value="#{evaltype}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][event_name]" type="hidden" value="#{event_name}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][tag]" type="hidden" value="#{tag}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][new_tag]" type="hidden" value="#{new_tag_name}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][tag_value]" type="hidden" value="#{tag_value}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][severity]" type="hidden" value="#{severity}"/>
 				</td>
 			</tr>
 		`);
@@ -240,7 +242,7 @@ window.ceprule_edit_popup = new class {
 			}
 			else if (e.target.classList.contains('js-operation-edit')) {
 				const {
-					[e.target.closest('[data-step]').getAttribute('data-step')]: operation
+					[e.target.closest('[data-sortorder]').getAttribute('data-sortorder')]: operation
 				} = this.form.findFieldByName('operations').getValue();
 				this.#openOperationPopup(operation, e.target);
 			}
@@ -305,7 +307,7 @@ window.ceprule_edit_popup = new class {
 				}
 			}
 			else if (class_list.contains('js-delete')) {
-				console.log('TODO: js-delete');
+				window.confirm(<?= json_encode('Delete	complex event processing rule?') ?>) && this.#delete();
 			}
 			else if (class_list.contains('js-clone')) {
 				this.#clone();
@@ -319,35 +321,35 @@ window.ceprule_edit_popup = new class {
 		const type = Number(input.value);
 
 		window['ceprule-operations-label']
-			.classList.toggle('form-label-asterisk', type != <?= ZBX_CEP_WINDOW_CAUSE_SYMPTOM ?>);
+			.classList.toggle('form-label-asterisk', type != <?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>);
 
 		{
 			const form_field = window['ceprule-script'].closest('.form-field');
-			const display = type == <?= ZBX_CEP_WINDOW_PATTERN_MATCH ?> ? '' : 'none';
+			const display = type == <?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?> ? '' : 'none';
 
 			form_field.style.display = display;
 			form_field.previousSibling.style.display = display;
 		}
 		{
 			const form_field = window['ceprule-window-filter-evaltype'].closest('.form-field');
-			const display = type == <?= ZBX_CEP_WINDOW_TAG_MATCH ?> ? '' : 'none';
+			const display = type == <?= CCepRuleHelper::WINDOW_TAG_MATCH ?> ? '' : 'none';
 
 			form_field.style.display = display;
 			form_field.previousSibling.style.display = display;
 		}
 		{
 			const form_field = window['ceprule-window-condition-table'].closest('.form-field');
-			const display = type == <?= ZBX_CEP_WINDOW_TAG_MATCH ?> ? '' : 'none';
+			const display = type == <?= CCepRuleHelper::WINDOW_TAG_MATCH ?> ? '' : 'none';
 
 			form_field.style.display = display;
 			form_field.previousSibling.style.display = display;
 
-			type == <?= ZBX_CEP_WINDOW_TAG_MATCH ?>
+			type == <?= CCepRuleHelper::WINDOW_TAG_MATCH ?>
 				&& this.form_element.dispatchEvent(new Event('window.filter.change'));
 		}
 		{
 			const form_field = window['ceprule-window-counttag'].closest('.form-field');
-			const display = type == <?= ZBX_CEP_WINDOW_CAUSE_SYMPTOM ?> ? '' : 'none';
+			const display = type == <?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?> ? '' : 'none';
 
 			form_field.style.display = display;
 			form_field.previousSibling.style.display = display;
@@ -355,9 +357,9 @@ window.ceprule_edit_popup = new class {
 		{
 			const form_field = window['ceprule-window-groupby'].closest('.form-field');
 			const display = [
-				<?= ZBX_CEP_WINDOW_SIMPLE ?>,
-				<?= ZBX_CEP_WINDOW_CAUSE_SYMPTOM ?>,
-				<?= ZBX_CEP_WINDOW_PATTERN_MATCH ?>
+				<?= CCepRuleHelper::WINDOW_SIMPLE ?>,
+				<?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>,
+				<?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?>
 			].includes(type) ? '' : 'none';
 
 			form_field.style.display = display;
@@ -366,10 +368,10 @@ window.ceprule_edit_popup = new class {
 		{
 			const form_field = window['ceprule-window-capacity'].closest('.form-field');
 			const display = [
-				<?= ZBX_CEP_WINDOW_SIMPLE ?>,
-				<?= ZBX_CEP_WINDOW_CAUSE_SYMPTOM ?>,
-				<?= ZBX_CEP_WINDOW_TAG_MATCH ?>,
-				<?= ZBX_CEP_WINDOW_PATTERN_MATCH ?>
+				<?= CCepRuleHelper::WINDOW_SIMPLE ?>,
+				<?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>,
+				<?= CCepRuleHelper::WINDOW_TAG_MATCH ?>,
+				<?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?>
 			].includes(type) ? '' : 'none';
 
 			form_field.style.display = display;
@@ -378,10 +380,10 @@ window.ceprule_edit_popup = new class {
 		{
 			const form_field = window['ceprule-window-duration'].closest('.form-field');
 			const display = [
-				<?= ZBX_CEP_WINDOW_SIMPLE ?>,
-				<?= ZBX_CEP_WINDOW_CAUSE_SYMPTOM ?>,
-				<?= ZBX_CEP_WINDOW_TAG_MATCH ?>,
-				<?= ZBX_CEP_WINDOW_PATTERN_MATCH ?>
+				<?= CCepRuleHelper::WINDOW_SIMPLE ?>,
+				<?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>,
+				<?= CCepRuleHelper::WINDOW_TAG_MATCH ?>,
+				<?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?>
 			].includes(type) ? '' : 'none';
 
 			form_field.style.display = display;
@@ -389,8 +391,35 @@ window.ceprule_edit_popup = new class {
 		}
 	}
 
+	#delete() {
+		this.#removePopupMessages();
+		fetch(zabbixUrl({action: 'ceprule.delete'}), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json; charset=UTF-8'},
+			body: JSON.stringify({
+				cepruleids: [this.form.findFieldByName('cepruleid').getValue()],
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule.edit')) ?>
+			})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				overlayDialogueDestroy(this.#overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			})
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => {
+				this.#overlay.unsetLoading();
+			});
+	}
+
 	#clone() {
 		this.form.findFieldByName('cepruleid')._field.remove();
+		this.#removePopupMessages();
 
 		const title = <?= json_encode(_('New complex event processing')) ?>;
 		const buttons = [
@@ -409,6 +438,7 @@ window.ceprule_edit_popup = new class {
 		];
 
 		this.#overlay.setProperties({title, buttons});
+		this.form.reload(this.#rules_for_clone);
 	}
 
 	#submit(force_sumbit) {
@@ -417,9 +447,9 @@ window.ceprule_edit_popup = new class {
 
 		// Correct the sortorder.
 		const operations = {};
-		[...window['ceprule-operations-table'].querySelectorAll('[data-step]')]
+		[...window['ceprule-operations-table'].querySelectorAll('[data-sortorder]')]
 			.map((row, index) => {
-				operations[index + 1] = {...fields.operations[row.dataset.step], step: index + 1};
+				operations[index + 1] = {...fields.operations[row.dataset.sortorder], sortorder: index + 1};
 			});
 
 		fields.operations = operations;
@@ -540,7 +570,7 @@ window.ceprule_edit_popup = new class {
 		if (is_new) {
 			condition = {
 				formulaid: this.#indexToFormulaId(this.#condition_row_index++),
-				type: '<?= ZBX_CEP_CONDITION_EVENT_NAME ?>',
+				type: '<?= CCepRuleHelper::CONDITION_EVENT_NAME ?>',
 				operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
 				host_group: '',
 				host: '',
@@ -604,8 +634,8 @@ window.ceprule_edit_popup = new class {
 		if (is_new) {
 			window_condition = {
 				formulaid: this.#indexToFormulaId(this.#window_condition_row_index++),
-				type: '<?= ZBX_CEP_CONDITION_EVENT_NAME ?>',
-				type: '<?= ZBX_CEP_WINDOW_CONDITION_TAG_PAIR ?>',
+				type: '<?= CCepRuleHelper::CONDITION_EVENT_NAME ?>',
+				type: '<?= CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR ?>',
 				past_tag: '',
 				operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
 				tag: '',
@@ -667,12 +697,10 @@ window.ceprule_edit_popup = new class {
 
 		if (is_new) {
 			operation = {
-				step: 1 + Math.max(0, ...Object.keys(this.form.findFieldByName('operations').getValue())),
-				event_type: <?= json_encode(DB::getDefault('cep_operation', 'event_type')) ?>,
+				sortorder: 1 + Math.max(0, ...Object.keys(this.form.findFieldByName('operations').getValue())),
 				evaltype: '<?= CONDITION_EVAL_TYPE_AND_OR ?>',
 				event_name: '',
-				eviction_cause: '<?= ZBX_CEP_EXECUTE_EVENT_TYPE_ANY ?>',
-				execute_when: '<?= ZBX_CEP_OP_WHEN_EVENT_OCCURRED ?>',
+				execute_when: '<?= CCepRuleHelper::OP_WHEN_EVENT_OCCURRED ?>',
 				new_tag: '',
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
 				tag: '',
@@ -757,7 +785,7 @@ window.ceprule_edit_popup = new class {
 	}
 
 	#editOperationRow(operation) {
-		this.form_element.querySelector(`#ceprule-operations-table [data-step="${operation.step}"]`)
+		this.form_element.querySelector(`#ceprule-operations-table [data-sortorder="${operation.sortorder}"]`)
 			.replaceWith(this.#buildOperationRow(operation));
 	}
 
@@ -787,46 +815,46 @@ window.ceprule_edit_popup = new class {
 
 		let arguments_str;
 		if ([
-			<?= ZBX_CEP_OP_INCREASE_SEVERITY ?>,
-			<?= ZBX_CEP_OP_DECREASE_SEVERITY ?>,
-			<?= ZBX_CEP_OP_SUPPRESS ?>,
-			<?= ZBX_CEP_OP_COPY_FIRST ?>,
-			<?= ZBX_CEP_OP_COPY_LAST ?>,
-			<?= ZBX_CEP_OP_DISCARD ?>,
-			<?= ZBX_CEP_OP_CLOSE ?>
+			<?= CCepRuleHelper::OP_INCREASE_SEVERITY ?>,
+			<?= CCepRuleHelper::OP_DECREASE_SEVERITY ?>,
+			<?= CCepRuleHelper::OP_SUPPRESS ?>,
+			<?= CCepRuleHelper::OP_COPY_FIRST ?>,
+			<?= CCepRuleHelper::OP_COPY_LAST ?>,
+			<?= CCepRuleHelper::OP_DISCARD ?>,
+			<?= CCepRuleHelper::OP_CLOSE ?>
 		].includes(operation.type)) {
 			arguments_str = '';
 		}
 		else if ([
-			<?= ZBX_CEP_OP_INCREASE_TAG_VALUE ?>,
-			<?= ZBX_CEP_OP_DECREASE_TAG_VALUE ?>,
-			<?= ZBX_CEP_OP_REMOVE_TAG ?>
+			<?= CCepRuleHelper::OP_INCREASE_TAG_VALUE ?>,
+			<?= CCepRuleHelper::OP_DECREASE_TAG_VALUE ?>,
+			<?= CCepRuleHelper::OP_REMOVE_TAG ?>
 		].includes(operation.type)) {
 			arguments_str = operation.tag;
 		}
-		else if (operation.type == <?= ZBX_CEP_OP_SET_NAME ?>) {
+		else if (operation.type == <?= CCepRuleHelper::OP_SET_NAME ?>) {
 			arguments_str = operation.event_name;
 		}
-		else if (operation.type == <?= ZBX_CEP_OP_SET_SEVERITY ?>) {
+		else if (operation.type == <?= CCepRuleHelper::OP_SET_SEVERITY ?>) {
 			arguments_str = severity_names[operation.severity];
 		}
-		else if (operation.type == <?= ZBX_CEP_OP_RENAME_TAG ?>) {
+		else if (operation.type == <?= CCepRuleHelper::OP_RENAME_TAG ?>) {
 			arguments_str = `${operation.tag}:${operation.new_tag}`;
 		}
 		else if ([
-			<?= ZBX_CEP_OP_SET_TAG_VALUE ?>,
-			<?= ZBX_CEP_OP_SET_TAG ?>,
-			<?= ZBX_CEP_OP_ADD_TAG ?>
+			<?= CCepRuleHelper::OP_SET_TAG_VALUE ?>,
+			<?= CCepRuleHelper::OP_SET_TAG ?>,
+			<?= CCepRuleHelper::OP_ADD_TAG ?>
 		].includes(operation.type)) {
 			arguments_str = `${operation.tag}:${operation.tag_value}`;
 		}
 
 		const tags_input_html = Object.values(operation.tags).map((tag, tag_index) => (new Template(`
-			<input data-field-type="hidden" name="operations[${operation.step}][tags][${tag_index}][tag]"
+			<input data-field-type="hidden" name="operations[${operation.sortorder}][tags][${tag_index}][tag]"
 				type="hidden" value="#{tag}"/>
-			<input data-field-type="hidden" name="operations[${operation.step}][tags][${tag_index}][operator]"
+			<input data-field-type="hidden" name="operations[${operation.sortorder}][tags][${tag_index}][operator]"
 				type="hidden" value="#{operator}"/>
-			<input data-field-type="hidden" name="operations[${operation.step}][tags][${tag_index}][value]"
+			<input data-field-type="hidden" name="operations[${operation.sortorder}][tags][${tag_index}][value]"
 				type="hidden" value="#{value}"/>
 		`)).evaluate(tag)).join('');
 
@@ -857,31 +885,31 @@ window.ceprule_edit_popup = new class {
 
 		const operator_name = operator_names[condition.operator];
 		const arguments_name = (function condition_arguments(condition) {
-			if (condition.type == <?= ZBX_CEP_CONDITION_EVENT_NAME ?>) {
+			if (condition.type == <?= CCepRuleHelper::CONDITION_EVENT_NAME ?>) {
 				return condition.event_name;
 			}
 
-			if (condition.type == <?= ZBX_CEP_CONDITION_TAG_NAME ?>) {
+			if (condition.type == <?= CCepRuleHelper::CONDITION_TAG_NAME ?>) {
 				return condition.tag;
 			}
 
-			if (condition.type == <?= ZBX_CEP_CONDITION_TAG_VALUE ?>) {
+			if (condition.type == <?= CCepRuleHelper::CONDITION_TAG_VALUE ?>) {
 				return condition.tag_value;
 			}
 
-			if (condition.type == <?= ZBX_CEP_CONDITION_SEVERITY ?>) {
+			if (condition.type == <?= CCepRuleHelper::CONDITION_SEVERITY ?>) {
 				return severity_names[condition.severity];
 			}
 
-			if (condition.type == <?= ZBX_CEP_CONDITION_HOST ?>) {
+			if (condition.type == <?= CCepRuleHelper::CONDITION_HOST ?>) {
 				return condition.host;
 			}
 
-			if (condition.type == <?= ZBX_CEP_CONDITION_HOST_GROUP ?>) {
+			if (condition.type == <?= CCepRuleHelper::CONDITION_HOST_GROUP ?>) {
 				return condition.host_group;
 			}
 
-			if (condition.type == <?= ZBX_CEP_CONDITION_TIME_PERIOD ?>) {
+			if (condition.type == <?= CCepRuleHelper::CONDITION_TIME_PERIOD ?>) {
 				return condition.time_period;
 			}
 		})(condition);
@@ -913,15 +941,15 @@ window.ceprule_edit_popup = new class {
 		let arg1 = '';
 		let arg2 = '';
 
-		if (window_condition.type == <?= ZBX_CEP_WINDOW_CONDITION_TAG_PAIR ?>) {
+		if (window_condition.type == <?= CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR ?>) {
 			arg1 = window_condition.past_tag;
 			arg2 = window_condition.tag;
 		}
-		else if (window_condition.type == <?= ZBX_CEP_WINDOW_CONDITION_OLD_TAG ?>) {
-			arg2 = window_condition.tag;
+		else if (window_condition.type == <?= CCepRuleHelper::WINDOW_CONDITION_OLD_TAG ?>) {
+			arg2 = window_condition.past_tag;
 		}
-		else if (window_condition.type == <?= ZBX_CEP_WINDOW_CONDITION_OLD_TAG_VALUE ?>) {
-			arg1 = window_condition.tag;
+		else if (window_condition.type == <?= CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE ?>) {
+			arg1 = window_condition.past_tag;
 			arg2 = window_condition.tag_value;
 		}
 

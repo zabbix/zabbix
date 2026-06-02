@@ -61,9 +61,9 @@ $html_page = (new CHtmlPage())
 					new CLabel(_('Type')),
 					new CFormField(
 						(new CRadioButtonList('filter_type', (int) $data['filter']['type']))
-							->addValue(_('All'), ZBX_CEP_FILTER_SHOW_ALL)
-							->addValue(_('Complex event processing'), ZBX_CEP_FILTER_SHOW_CEP)
-							->addValue(_('Event correlation'), ZBX_CEP_FILTER_SHOW_LEGACY)
+							->addValue(_('All'), CCepRuleHelper::FILTER_SHOW_ALL)
+							->addValue(_('Complex event processing'), CCepRuleHelper::FILTER_SHOW_CEP)
+							->addValue(_('Event correlation'), CCepRuleHelper::FILTER_SHOW_LEGACY)
 							->setModern()
 					)
 				])
@@ -128,20 +128,12 @@ foreach ($data['ceprules'] as $ceprule) {
 		}
 	}
 
-	$make_stop_toggle_button = function (array $ceprule): CLink {
-		if ($ceprule['stop'] == ZBX_CEP_EXECUTION_STOP) {
-			return (new CLink(_('Enabled')))
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_GREEN)
-				->addClass('js-disable-stop')
-				->setAttribute('data-cepruleid', (int) $ceprule['cepruleid']);
+	$make_stop_indicator = function (array $ceprule): CSpan {
+		if ($ceprule['stop'] == CCepRuleHelper::EXECUTION_STOP) {
+			return (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN);
 		}
 
-		return (new CLink(_('Disabled')))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(ZBX_STYLE_RED)
-			->addClass('js-enable-stop')
-			->setAttribute('data-cepruleid', (int) $ceprule['cepruleid']);
+		return (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_ORANGE);
 	};
 
 	$make_status_toggle_button = function (array $ceprule, bool $is_legacy): CLink {
@@ -159,7 +151,7 @@ foreach ($data['ceprules'] as $ceprule) {
 					->setAttribute('data-correlationid', (int) $ceprule['correlationid']);
 		}
 
-		if ($ceprule['status'] == ZBX_CEP_STATUS_ENABLED) {
+		if ($ceprule['status'] == CCepRuleHelper::STATUS_ENABLED) {
 			return (new CLink(_('Enabled')))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
@@ -194,7 +186,7 @@ foreach ($data['ceprules'] as $ceprule) {
 		$conditions,
 		$is_legacy ? '' : CCepRuleHelper::getWindowLabelString($ceprule),
 		$operations,
-		$is_legacy ? '' : $make_stop_toggle_button($ceprule),
+		$is_legacy ? '' : $make_stop_indicator($ceprule),
 		$is_legacy ? '' : $ceprule['sortorder'],
 		$make_status_toggle_button($ceprule, $is_legacy)
 	]);

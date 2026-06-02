@@ -27,8 +27,8 @@ class CControllerCepRuleList extends CController {
 			'filter_set' =>		'in 1',
 			'filter_rst' =>		'in 1',
 			'filter_name' =>	'string',
-			'filter_status' =>	'in -1,'.ZBX_CEP_STATUS_ENABLED.','.ZBX_CEP_STATUS_DISABLED,
-			'filter_type' =>	'in '.ZBX_CEP_FILTER_SHOW_ALL.','.ZBX_CEP_FILTER_SHOW_CEP.','.ZBX_CEP_FILTER_SHOW_LEGACY,
+			'filter_status' =>	'in -1,'.CCepRuleHelper::STATUS_ENABLED.','.CCepRuleHelper::STATUS_DISABLED,
+			'filter_type' =>	'in '.CCepRuleHelper::FILTER_SHOW_ALL.','.CCepRuleHelper::FILTER_SHOW_CEP.','.CCepRuleHelper::FILTER_SHOW_LEGACY,
 			'page' =>			'ge 1'
 		];
 
@@ -51,10 +51,9 @@ class CControllerCepRuleList extends CController {
 		CProfile::update('web.ceprule.list.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.ceprule.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
-		// filter
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.ceprule.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.ceprule.filter_status', $this->getInput('filter_status', ZBX_CEP_FILTER_SHOW_ALL), PROFILE_TYPE_INT);
+			CProfile::update('web.ceprule.filter_status', $this->getInput('filter_status', CCepRuleHelper::FILTER_SHOW_ALL), PROFILE_TYPE_INT);
 			CProfile::update('web.ceprule.filter_type', $this->getInput('filter_type', -1), PROFILE_TYPE_INT);
 		}
 		elseif ($this->hasInput('filter_rst')) {
@@ -66,7 +65,7 @@ class CControllerCepRuleList extends CController {
 		$filter = [
 			'name' => CProfile::get('web.ceprule.filter_name', ''),
 			'status' => CProfile::get('web.ceprule.filter_status', -1),
-			'type' => CProfile::get('web.ceprule.filter_type', ZBX_CEP_FILTER_SHOW_ALL)
+			'type' => CProfile::get('web.ceprule.filter_type', CCepRuleHelper::FILTER_SHOW_ALL)
 		];
 
 		$data = [
@@ -82,7 +81,6 @@ class CControllerCepRuleList extends CController {
 
 		CArrayHelper::sort($data['ceprules'], [['field' => $sort_field, 'order' => $sort_order]]);
 
-		// pager
 		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('ceprule.list', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['ceprules'], $sort_order,
@@ -100,17 +98,13 @@ class CControllerCepRuleList extends CController {
 		$result_cep = [];
 		$result_legacy = [];
 
-		if ($filter['type'] == ZBX_CEP_FILTER_SHOW_ALL || $filter['type'] == ZBX_CEP_FILTER_SHOW_LEGACY) {
+		if ($filter['type'] == CCepRuleHelper::FILTER_SHOW_ALL || $filter['type'] == CCepRuleHelper::FILTER_SHOW_LEGACY) {
 			$result_legacy = API::Correlation()->get([
 				'output' => ['correlationid', 'name', 'description', 'status'],
 				'selectFilter' => ['conditions'],
-				'selectOperations' => 'extend',
-				'search' => [
-					'name' => ($filter['name'] === '') ? null : $filter['name']
-				],
-				'filter' => [
-					'status' => ($filter['status'] == -1) ? null : $filter['status']
-				],
+				'selectOperations' => ['type'],
+				'search' => ['name' => $filter['name'] === '' ? null : $filter['name']],
+				'filter' => ['status' => $filter['status'] == -1 ? null : $filter['status']],
 				'editable' => true,
 				'limit' => $limit
 			]);
@@ -120,20 +114,16 @@ class CControllerCepRuleList extends CController {
 			}
 		}
 
-		if ($filter['type'] == ZBX_CEP_FILTER_SHOW_ALL || $filter['type'] == ZBX_CEP_FILTER_SHOW_CEP) {
+		if ($filter['type'] == CCepRuleHelper::FILTER_SHOW_ALL || $filter['type'] == CCepRuleHelper::FILTER_SHOW_CEP) {
 			$result_cep = API::CepRule()->get([
-				'output' => 'extend',
-				'selectFilter' => 'extend',
-				'selectOperations' => 'extend',
-				'selectWindow' => 'extend',
-				'search' => [
-					'name' => ($filter['name'] === '') ? null : $filter['name']
-				],
-				'filter' => [
-					'status' => ($filter['status'] == -1) ? null : $filter['status']
-				],
+				'output' => ['cep_ruleid', 'name', 'window_type', 'stop', 'sortorder', 'status'],
+				'selectFilter' => ['conditions'],
+				'selectOperations' => ['execute_when', 'type', 'event_name', 'tag', 'new_tag', 'tag_value', 'severity'],
+				'search' => ['name' => $filter['name'] === '' ? null : $filter['name']],
+				'filter' => ['status' => $filter['status'] == -1 ? null : $filter['status']],
 				'limit' => $limit
 			]);
+
 
 			if ($result_cep === false) {
 				return []; // The get_prepared_messages function for layout.htmlpage will do the error handling.

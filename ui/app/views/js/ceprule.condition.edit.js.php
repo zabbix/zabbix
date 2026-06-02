@@ -57,17 +57,14 @@ window.ceprule_condition_edit_popup = new class {
 	}
 
 	#setValues(condition) {
-		[...this.#live_nodes, ...Object.values(this.#templates)]
-			.reduce((carry, fragment) => [...fragment.querySelectorAll('[name]'), ...carry], [])
-			.map((node) => {
-				if (node.type === 'radio') {
-					node.checked = node.value === condition[node.name];
-					// TODO: this overwrites time_period first
-				}
-				else {
-					node.value = condition[node.name] ?? '';
-				}
-			});
+		[...this.#templates[condition.type].querySelectorAll('[name]')].map((node) => {
+			if (node.type === 'radio') {
+				node.checked = node.value === condition[node.name];
+			}
+			else {
+				node.value = condition[node.name] ?? '';
+			}
+		});
 
 		this.form_element.querySelector('[name="type"]').value = condition.type;
 		this.form_element.querySelector('[name="formulaid"]').value = condition.formulaid;

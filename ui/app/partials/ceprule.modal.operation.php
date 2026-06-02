@@ -28,9 +28,9 @@ $events_operations = new CSelectOptionGroup(_('Events'));
 $tags_operations = new CSelectOptionGroup(_('Tags'));
 $labels = CCepRuleHelper::getOperationLabelStrings();
 
-$events_group_opts = [ZBX_CEP_OP_SET_NAME, ZBX_CEP_OP_CLOSE, ZBX_CEP_OP_DISCARD, ZBX_CEP_OP_SET_SEVERITY,
-	ZBX_CEP_OP_INCREASE_SEVERITY, ZBX_CEP_OP_DECREASE_SEVERITY, ZBX_CEP_OP_SUPPRESS, ZBX_CEP_OP_COPY_LAST,
-	ZBX_CEP_OP_COPY_FIRST
+$events_group_opts = [CCepRuleHelper::OP_SET_NAME, CCepRuleHelper::OP_CLOSE, CCepRuleHelper::OP_DISCARD, CCepRuleHelper::OP_SET_SEVERITY,
+	CCepRuleHelper::OP_INCREASE_SEVERITY, CCepRuleHelper::OP_DECREASE_SEVERITY, CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_COPY_LAST,
+	CCepRuleHelper::OP_COPY_FIRST
 ];
 
 foreach ($labels as $option => $label) {
@@ -47,7 +47,7 @@ foreach ($labels as $option => $label) {
 }
 
 echo (new CForm())
-	->addVar('step', '0')
+	->addVar('sortorder', '0')
 	->addStyle('display: none;')
 	->addItem((new CFormGrid())
 		->addItem((new CTemplateTag('ceprule-operation-tag-template'))
@@ -80,25 +80,12 @@ echo (new CForm())
 			)
 		)
 		->addItem(new CLabel(_('Execute when'), 'ceprule-operation-execute-when-label'))
-		->addItem(new CFormField([
+		->addItem(new CFormField(
 			$execute_when
 				->setAttribute('autofocus', '')
 				->setFocusableElementId('ceprule-operation-execute-when-label')
-				->setId('ceprule-operation-execute-when'),
-			new CObject('&nbsp;'),
-			(new CRadioButtonList('event_type', ZBX_CEP_EXECUTE_EVENT_TYPE_ANY))
-				->setId('ceprule-operation-event-type')
-				->addValue(_('All events'), ZBX_CEP_EXECUTE_EVENT_TYPE_ANY)
-				->addValue(_('Cause events'), ZBX_CEP_EXECUTE_EVENT_TYPE_CAUSE)
-				->addValue(_('Symptom events'), ZBX_CEP_EXECUTE_EVENT_TYPE_SYMPTOM)
-				->setModern(true),
-			(new CRadioButtonList('eviction_cause', ZBX_CEP_EVICTION_CAUSE_ANY))
-				->setId('ceprule-operation-eviction-cause')
-				->addValue(_('Duration or capacity restriction'), ZBX_CEP_EVICTION_CAUSE_ANY)
-				->addValue(_('Duration restriction'), ZBX_CEP_EVICTION_CAUSE_DURATION)
-				->addValue(_('Capacity restriction'), ZBX_CEP_EVICTION_CAUSE_CAPACITY)
-				->setModern(true)
-		]))
+				->setId('ceprule-operation-execute-when')
+		))
 		->addItem(new CLabel('Event tags'))
 		->addItem(new CFormField((new CRadioButtonList('evaltype', TAG_EVAL_TYPE_AND_OR))
 			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
