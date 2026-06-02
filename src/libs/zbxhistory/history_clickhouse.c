@@ -332,15 +332,16 @@ static int	history_clickhouse_conn_init(zbx_clickhouse_conn_t *conn, zbx_clickho
 {
 	CURLoption	opt;
 	CURLcode	err;
+	int		ret = FAIL;
 
 	if (NULL == (conn->handle = curl_easy_init()))
 	{
 		*error = zbx_strdup(NULL, "cannot initialize curl session");
-		return FAIL;
+		goto fail;
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, opt = CURLOPT_POST, 1L)) ||
-		CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_HTTPHEADER, d->curl_headers)) ||
+		CURLE_OK != (err = curl_easy_setopt(conn->handle, opt = CURLOPT_HTTPHEADER, d->curl_headers)) ||
 		CURLE_OK != (err = curl_easy_setopt(conn->handle, opt = CURLOPT_WRITEFUNCTION, history_curl_recv)) ||
 		CURLE_OK != (err = curl_easy_setopt(conn->handle, opt = CURLOPT_WRITEDATA, &conn->resp.page)) ||
 		CURLE_OK != (err = curl_easy_setopt(conn->handle, opt = CURLOPT_ERRORBUFFER, conn->resp.errbuf)) ||
@@ -348,19 +349,19 @@ static int	history_clickhouse_conn_init(zbx_clickhouse_conn_t *conn, zbx_clickho
 		CURLE_OK != (err = curl_easy_setopt(conn->handle, opt = CURLOPT_PRIVATE, conn)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot set curl option %d: %s", (int)opt, curl_easy_strerror(err));
-		return FAIL;
+		goto fail;
 	}
 
 	if (SUCCEED != zbx_curl_setopt_https(conn->handle, error))
-		return FAIL;
+		goto fail;
 
-	/* either username and password both has been set or both are NULL */
+	/* either username and password both have been set or both are NULL */
 	if (NULL != d->username)
 	{
 		if (SUCCEED != zbx_http_prepare_auth(conn->handle, CURLAUTH_BASIC, d->username, d->password, NULL,
 				error))
 		{
-			return FAIL;
+			goto fail;
 		}
 	}
 
@@ -368,10 +369,17 @@ static int	history_clickhouse_conn_init(zbx_clickhouse_conn_t *conn, zbx_clickho
 			d->ssl_verify_peer, d->ssl_verify_host, d->source_ip, d->ssl_ca_location, d->ssl_cert_location,
 			d->ssl_key_location, error))
 	{
-		return FAIL;
+		goto fail;
+	}
+	ret = SUCCEED;
+fail:
+	if (FAIL == ret)
+	{
+		curl_easy_cleanup(conn->handle);
+		conn->handle = NULL;
 	}
 
-	return SUCCEED;
+	return ret;
 }
 
 static int	encode_leb128(zbx_uint64_t value, unsigned char *out)
