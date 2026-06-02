@@ -102,13 +102,9 @@ class CControllerCepRuleList extends CController {
 			$result_legacy = API::Correlation()->get([
 				'output' => ['correlationid', 'name', 'description', 'status'],
 				'selectFilter' => ['conditions'],
-				'selectOperations' => 'extend',
-				'search' => [
-					'name' => ($filter['name'] === '') ? null : $filter['name']
-				],
-				'filter' => [
-					'status' => ($filter['status'] == -1) ? null : $filter['status']
-				],
+				'selectOperations' => ['type'],
+				'search' => ['name' => $filter['name'] === '' ? null : $filter['name']],
+				'filter' => ['status' => $filter['status'] == -1 ? null : $filter['status']],
 				'editable' => true,
 				'limit' => $limit
 			]);
@@ -120,18 +116,14 @@ class CControllerCepRuleList extends CController {
 
 		if ($filter['type'] == CCepRuleHelper::FILTER_SHOW_ALL || $filter['type'] == CCepRuleHelper::FILTER_SHOW_CEP) {
 			$result_cep = API::CepRule()->get([
-				'output' => 'extend',
-				'selectFilter' => 'extend',
-				'selectOperations' => 'extend',
-				'selectWindow' => 'extend',
-				'search' => [
-					'name' => ($filter['name'] === '') ? null : $filter['name']
-				],
-				'filter' => [
-					'status' => ($filter['status'] == -1) ? null : $filter['status']
-				],
+				'output' => ['cep_ruleid', 'name', 'window_type', 'stop', 'sortorder', 'status'],
+				'selectFilter' => ['conditions'],
+				'selectOperations' => ['execute_when', 'type', 'event_name', 'tag', 'new_tag', 'tag_value', 'severity'],
+				'search' => ['name' => $filter['name'] === '' ? null : $filter['name']],
+				'filter' => ['status' => $filter['status'] == -1 ? null : $filter['status']],
 				'limit' => $limit
 			]);
+
 
 			if ($result_cep === false) {
 				return []; // The get_prepared_messages function for layout.htmlpage will do the error handling.
