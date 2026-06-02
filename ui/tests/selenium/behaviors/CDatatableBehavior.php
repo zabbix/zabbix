@@ -17,6 +17,7 @@
 require_once __DIR__.'/../../include/CBehavior.php';
 
 use Facebook\WebDriver\Exception\ElementClickInterceptedException;
+use Facebook\WebDriver\WebDriverKeys;
 
 /**
  * Behavior for datatable element.
@@ -190,10 +191,10 @@ class CDatatableBehavior extends CBehavior {
 				$table->waitUntilReady()->invalidate();
 			}
 
-			// Click on button again to close the popup.
-			$button->invalidate();
-			$button->click();
-			$popup_dialog->waitUntilNotVisible();
+			// Press Escape key to close the popup.
+			// TODO: replace ENTER key with ESCAPE key whe ZBX-27830 will be fixed.
+			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+			$this->test->query('class:datatable-options-popup')->waitUntilNotVisible();
 		}
 	}
 

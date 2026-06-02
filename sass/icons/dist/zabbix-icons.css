@@ -1,9 +1,9 @@
 @font-face {
   font-family: "zabbix-icons";
-  src: url("zabbix-icons.woff2?t=1762943603998") format("woff2"),
-  url("zabbix-icons.woff?t=1762943603998") format("woff"),
-  url('zabbix-icons.ttf?t=1762943603998') format('truetype'),
-  url('zabbix-icons.svg?t=1762943603998#zabbix-icons') format('svg');
+  src: url("zabbix-icons.woff2?t=1779433480634") format("woff2"),
+  url("zabbix-icons.woff?t=1779433480634") format("woff"),
+  url('zabbix-icons.ttf?t=1779433480634') format('truetype'),
+  url('zabbix-icons.svg?t=1779433480634#zabbix-icons') format('svg');
 }
 
 [class^="zi-"]::before, [class*=" zi-"]::before {
@@ -124,23 +124,24 @@
 .zi-support:before { content: "\ea6d"; }
 .zi-text:before { content: "\ea6e"; }
 .zi-time-period:before { content: "\ea6f"; }
-.zi-trash:before { content: "\ea70"; }
-.zi-tree-top-bottom:before { content: "\ea71"; }
-.zi-tree-top-right-bottom:before { content: "\ea72"; }
-.zi-tree-top-right:before { content: "\ea73"; }
-.zi-triangle-flipped-warning:before { content: "\ea74"; }
-.zi-triangle-warning:before { content: "\ea75"; }
-.zi-triangle:before { content: "\ea76"; }
-.zi-uncheck:before { content: "\ea77"; }
-.zi-user-filled:before { content: "\ea78"; }
-.zi-user-settings:before { content: "\ea79"; }
-.zi-user:before { content: "\ea7a"; }
-.zi-users-filled:before { content: "\ea7b"; }
-.zi-users:before { content: "\ea7c"; }
-.zi-widget-add:before { content: "\ea7d"; }
-.zi-widget-awaiting-data-large:before { content: "\ea7e"; }
-.zi-widget-empty-references-large:before { content: "\ea7f"; }
-.zi-widget-resize:before { content: "\ea80"; }
-.zi-wrench-alt:before { content: "\ea81"; }
-.zi-wrench:before { content: "\ea82"; }
+.zi-times:before { content: "\ea70"; }
+.zi-trash:before { content: "\ea71"; }
+.zi-tree-top-bottom:before { content: "\ea72"; }
+.zi-tree-top-right-bottom:before { content: "\ea73"; }
+.zi-tree-top-right:before { content: "\ea74"; }
+.zi-triangle-flipped-warning:before { content: "\ea75"; }
+.zi-triangle-warning:before { content: "\ea76"; }
+.zi-triangle:before { content: "\ea77"; }
+.zi-uncheck:before { content: "\ea78"; }
+.zi-user-filled:before { content: "\ea79"; }
+.zi-user-settings:before { content: "\ea7a"; }
+.zi-user:before { content: "\ea7b"; }
+.zi-users-filled:before { content: "\ea7c"; }
+.zi-users:before { content: "\ea7d"; }
+.zi-widget-add:before { content: "\ea7e"; }
+.zi-widget-awaiting-data-large:before { content: "\ea7f"; }
+.zi-widget-empty-references-large:before { content: "\ea80"; }
+.zi-widget-resize:before { content: "\ea81"; }
+.zi-wrench-alt:before { content: "\ea82"; }
+.zi-wrench:before { content: "\ea83"; }
 
