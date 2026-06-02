@@ -396,8 +396,7 @@ out:
  *             time_from  - [IN] start timestamp                              *
  *             limit      - [IN] maximum number of values to read             *
  *                                                                            *
- * Return value: SUCCEED - the history data were read successfully            *
- *               FAIL    - otherwise                                          *
+ * Return value: SUCCEED - for compatibility with other callbacks             *
  *                                                                            *
  ******************************************************************************/
 static int	db_read_batch(zbx_vector_item_history_t *results, unsigned char value_type, int time_from, int limit)
@@ -745,8 +744,7 @@ static void	history_sql_write(void *data, unsigned char value_type, const zbx_hi
  *             values     - [OUT] item history records                        *
  *             error      - [OUT] error message                               *
  *                                                                            *
- * Return value: >=0      - number of records retrieved                       *
- *               FAIL     - otherwise                                         *
+ * Return value: number of records retrieved                                  *
  *                                                                            *
  ******************************************************************************/
 static int	history_sql_fetch(void *data, zbx_uint64_t itemid, unsigned char value_type, time_t start, time_t end,

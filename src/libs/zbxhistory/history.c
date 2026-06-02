@@ -607,8 +607,8 @@ out:
  *                                                                                  *
  * Comments: History interfaces are created for all values types based on           *
  *           configuration. Every value type can have different history storage     *
- *           provider. (Binary value type is not supported for Elasticsearch)       *
- *                                                                                  *
+ *           provider. (Binary value type is not supported for Elasticsearch and    *
+ *           ClickHouse)                                                            *
  ************************************************************************************/
 int	zbx_history_init(const char *config_history_storage_url, const char *config_history_storage_opts,
 		int config_history_storage_pipelines, char **providers, int config_log_slow_queries,
