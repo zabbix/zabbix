@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -776,7 +776,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		// After selecting Dashboard from dropdown menu, check hint and field value.
 		$menu_button->select('Dashboard');
 		$form->checkValue(['Host' => 'Dashboard']);
-		$this->assertTrue($label->query('xpath', './/span[@data-hintbox-contents="Dashboard is used as data source."]')
+		$this->assertTrue($label->query('xpath', './/span[@data-hintbox-html="Dashboard is used as data source."]')
 				->one()->isVisible()
 		);
 
@@ -1109,15 +1109,16 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 8,
-						'Latest data' => 288,
+						'Latest data' => 291,
 						'Graphs' => 29,
 						'Web' => 1
 					],
 					'Templates' => ['Apache by Zabbix agent', 'Ceph by Zabbix agent 2', 'Docker by Zabbix agent 2',
 							'Linux by Zabbix agent', 'PostgreSQL by Zabbix agent', 'Zabbix server health'
 					],
-					'Tags' => ['class: database', 'class: os', 'class: software', 'subclass: logging',
-							'subclass: monitoring', 'subclass: sql', 'subclass: webserver', 'target: apache',
+					'Tags' => ['class: database', 'class: os', 'class: software', 'subclass: containers',
+							'subclass: deploy', 'subclass: development', 'subclass: logging', 'subclass: monitoring',
+							'subclass: sql', 'subclass: virtualization', 'subclass: webserver', 'target: apache',
 							'target: ceph', 'target: docker', 'target: linux', 'target: postgresql', 'target: server',
 							'target: zabbix'
 					],
@@ -1247,7 +1248,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 4,
-						'Latest data' => 122,
+						'Latest data' => 125,
 						'Graphs' => 8,
 						'Web' => 0
 					]
@@ -1307,9 +1308,9 @@ class testDashboardHostCardWidget extends testWidgets {
 			$icon = $host_selector->query('class:zi-wrench-alt-small')->one();
 			$this->assertTrue($icon->isVisible());
 			$icon->waitUntilClickable()->click();
-			$dialog_text =  $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->getText();
+			$dialog_text =  $this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->getText();
 			$this->assertEquals($data['Maintenance']['Name']."\n".$data['Maintenance']['Description'], $dialog_text);
-			$this->query('xpath://div[@class="overlay-dialogue wordbreak"]/button[@title="Close"]')->one()->click();
+			$this->query('xpath://div[contains(@class, "hintbox-static")]//button[@title="Close"]')->one()->click();
 		}
 
 		if (array_key_exists('Severity', $data)) {
@@ -1329,7 +1330,7 @@ class testDashboardHostCardWidget extends testWidgets {
 
 			foreach ($availabilities as $availability) {
 				$availability->click();
-				$dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+				$dialog = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()
 						->waitUntilPresent()->one();
 				$this->assertTrue($dialog->isVisible());
 				$dialog->close();
@@ -1479,13 +1480,11 @@ class testDashboardHostCardWidget extends testWidgets {
 					'inactive' => true,
 					'header' => 'Problems',
 					'title' => 'Problems',
-					'url' => 'zabbix.php?show=1&name=&acknowledgement_status=0&inventory%5B0%5D%5Bfield%5D=type'.
-							'&inventory%5B0%5D%5Bvalue%5D=&evaltype=0&tags%5B0%5D%5Btag%5D=&tags%5B0%5D%5Boperator%5D=0'.
-							'&tags%5B0%5D%5Bvalue%5D=&show_tags=3&tag_name_format=0&tag_priority=&show_opdata=0'.
-							'&show_timeline=1&filter_name=&filter_show_counter=0&filter_custom_time=0&sort=clock'.
-							'&sortorder=DESC&age_state=0&show_symptoms=0&show_suppressed=0&acknowledged_by_me=0'.
-							'&compact_view=0&details=0&highlight_row=0'.
-							'&action=problem.view&hostids%5B%5D={hostid}'
+					'url' => 'zabbix.php?show=1&name=&inventory%5B0%5D%5Bfield%5D=type&inventory%5B0%5D%5Bvalue%5D=&'.
+							'evaltype=0&tags%5B0%5D%5Btag%5D=&tags%5B0%5D%5Boperator%5D=0&tags%5B0%5D%5Bvalue%5D=&'.
+							'acknowledgement_status=0&filter_name=&filter_show_counter=0&filter_custom_time=0&'.
+							'age_state=0&show_symptoms=0&show_suppressed=0&acknowledged_by_me=0&action=problem.view&'.
+							'hostids%5B%5D={hostid}'
 				]
 			],
 			// #1.
@@ -1514,24 +1513,12 @@ class testDashboardHostCardWidget extends testWidgets {
 					'link'   => 'Latest data',
 					'header' => 'Latest data',
 					'title'  => 'Latest data',
-					'url' => 'zabbix.php?name=&evaltype=0&tags%5B0%5D%5Btag%5D='.
-							'&tags%5B0%5D%5Boperator%5D=0&tags%5B0%5D%5Bvalue%5D=&show_tags=3'.
-							'&tag_name_format=0&tag_priority=&state=-1&filter_name=&filter_show_counter=0'.
-							'&filter_custom_time=0&sort=name&sortorder=ASC&show_details=0&action=latest.view'.
-							'&hostids%5B%5D={hostid}'
+					'url' => 'zabbix.php?name=&evaltype=0&tags%5B0%5D%5Btag%5D=&tags%5B0%5D%5Boperator%5D=0&'.
+							'tags%5B0%5D%5Bvalue%5D=&state=-1&filter_name=&filter_show_counter=0&filter_custom_time=0&'.
+							'action=latest.view&hostids%5B%5D={hostid}'
 				]
 			],
 			// #4.
-			[
-				[
-					'class'  => 'monitoring-item',
-					'link'   => 'Graphs',
-					'header' => 'Graphs',
-					'title'  => 'Custom graphs',
-					'url' => 'zabbix.php?action=charts.view&filter_hostids%5B0%5D={hostid}&filter_show=1&filter_set=1'
-				]
-			],
-			// #5.
 			[
 				[
 					'class'  => 'monitoring-item',
@@ -1539,6 +1526,17 @@ class testDashboardHostCardWidget extends testWidgets {
 					'header' => 'Web monitoring',
 					'title'  => 'Web monitoring',
 					'url' => 'zabbix.php?action=web.view&filter_hostids%5B0%5D={hostid}&filter_set=1'
+				]
+			],
+			// TODO: Unstable test on Jenkins, if Graphs test case is before Web monitoring.
+			// #5.
+			[
+				[
+					'class'  => 'monitoring-item',
+					'link'   => 'Graphs',
+					'header' => 'Graphs',
+					'title'  => 'Custom graphs',
+					'url' => 'zabbix.php?action=charts.view&filter_hostids%5B0%5D={hostid}&filter_show=1&filter_set=1'
 				]
 			]
 		];
@@ -1552,7 +1550,7 @@ class testDashboardHostCardWidget extends testWidgets {
 	public function testDashboardHostCardWidget_CheckLinks($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 
 		// Check for missing reference if there are no objects.
 		if (array_key_exists('inactive', $data)) {

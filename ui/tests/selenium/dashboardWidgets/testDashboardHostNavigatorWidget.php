@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -599,8 +599,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				]
 			],
 			// #24.
-			// TODO: uncomment after fix ZBX-27031
-/*			[
+			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
@@ -608,7 +607,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 						'Show problems' => 'None'
 					]
 				]
-			],*/
+			],
 			// #25.
 			[
 				[

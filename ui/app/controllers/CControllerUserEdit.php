@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,11 +19,9 @@
  */
 class CControllerUserEdit extends CControllerUserEditGeneral {
 
-	protected function checkInput() {
-		$locales = array_keys(getLocales());
-		$locales[] = LANG_DEFAULT;
-		$themes = array_keys(APP::getThemes());
-		$themes[] = THEME_DEFAULT;
+	protected function checkInput(): bool {
+		$locales = CControllerUserUpdateGeneral::getAllowedLocales();
+		$themes = CControllerUserUpdateGeneral::getAllowedThemes();
 
 		$fields = [
 			'userid' =>				'db users.userid',
@@ -31,7 +29,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'name' =>				'db users.name',
 			'surname' =>			'db users.surname',
 			'user_groups' =>		'array_id',
-			'change_password' =>	'in 1',
+			'change_password' =>	'in 0,1',
 			'current_password' =>	'string',
 			'password1' =>			'string',
 			'password2' =>			'string',
@@ -87,10 +85,12 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 	}
 
 	protected function doAction(): void {
+		global $ZBX_FEATURE_FLAGS;
+
 		$db_defaults = DB::getDefaults('users');
 
 		$data = [
-			'userid' => 0,
+			'userid' => null,
 			'username' => '',
 			'name' => '',
 			'surname' => '',
@@ -258,33 +258,41 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['templategroups_rights'] = collapseGroupRights(getTemplateGroupsRights($user_groups));
 		}
 
-		$data['modules'] = [];
+		$data['modules_config_enabled'] = $ZBX_FEATURE_FLAGS['modules_config_enabled'];
 
-		$db_modules = API::Module()->get([
-			'output' => ['moduleid', 'relative_path', 'status']
-		]);
+		if ($data['modules_config_enabled']) {
+			$data['modules'] = [];
 
-		if ($db_modules) {
-			$module_manager = new CModuleManager(APP::getRootDir());
+			$db_modules = API::Module()->get([
+				'output' => ['moduleid', 'relative_path', 'status']
+			]);
 
-			foreach ($db_modules as $db_module) {
-				$manifest = $module_manager->addModule($db_module['relative_path']);
+			if ($db_modules) {
+				$module_manager = new CModuleManager(APP::getRootDir());
 
-				if ($manifest !== null) {
-					$data['modules'][$db_module['moduleid']] = $manifest['name'];
+				foreach ($db_modules as $db_module) {
+					$manifest = $module_manager->addModule($db_module['relative_path']);
+
+					if ($manifest !== null) {
+						$data['modules'][$db_module['moduleid']] = $manifest['name'];
+					}
 				}
 			}
+
+			natcasesort($data['modules']);
+
+			$disabled_modules = array_filter($db_modules,
+				static function (array $db_module): bool {
+					return $db_module['status'] == MODULE_STATUS_DISABLED;
+				}
+			);
+
+			$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
 		}
 
-		natcasesort($data['modules']);
-
-		$disabled_modules = array_filter($db_modules,
-			static function(array $db_module): bool {
-				return $db_module['status'] == MODULE_STATUS_DISABLED;
-			}
-		);
-
-		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
+		$data['js_validation_rules'] = $data['userid'] === null
+			? (new CFormValidator(CControllerUserCreate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerUserUpdate::getValidationRules()))->getRules();
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));

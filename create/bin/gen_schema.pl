@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 #
-# Copyright (C) 2001-2025 Zabbix SIA
+# Copyright (C) 2001-2026 Zabbix SIA
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of
 # the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -24,6 +24,7 @@ my ($szcol1, $szcol2, $szcol3, $szcol4, $sequences, $sql_suffix, $triggers);
 my ($fkeys, $fkeys_prefix, $fkeys_suffix, $uniq, $delete_cascade);
 
 my %table_types;	# for making sure that table types aren't duplicated
+my %housekeeper_types;
 
 my %c = (
 	"type"		=>	"code",
@@ -42,10 +43,11 @@ my %c = (
 	"t_time"	=>	"ZBX_TYPE_INT",
 	"t_varchar"	=>	"ZBX_TYPE_CHAR",
 	"t_cuid"	=>	"ZBX_TYPE_CUID",
+	"t_json"	=>	"ZBX_TYPE_JSON",
 );
 
 $c{"before"} = "/*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -86,6 +88,7 @@ my %mysql = (
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
+	"t_json"	=>	"json",
 );
 
 my %postgresql = (
@@ -107,6 +110,7 @@ my %postgresql = (
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
+	"t_json"	=>	"jsonb",
 );
 
 my %sqlite3 = (
@@ -128,6 +132,7 @@ my %sqlite3 = (
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
+	"t_json"	=>	"jsonb",
 );
 
 sub rtrim($)
@@ -656,7 +661,7 @@ EOF
 
 	my $flags = "migrate_data => true, if_not_exists => true";
 
-	for ("history", "history_uint", "history_log", "history_text", "history_str", "history_bin")
+	for ("history", "history_uint", "history_log", "history_text", "history_str", "history_bin", "history_json")
 	{
 		print<<EOF
 	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 86400, $flags);
@@ -865,6 +870,58 @@ sub process_changelog($)
 	}
 }
 
+sub process_housekeeper($)
+{
+	my $object = shift;
+
+	if ($delete_cascade)
+	{
+		# MySQL does not execute triggers on cascade delete
+		die("table '$table_name' foreign keys without RESTRICT flag are not compatible with table HOUSEKEEPER token");
+	}
+
+	if (exists($housekeeper_types{$object}) && $housekeeper_types{$object} ne $table_name)
+	{
+		die("cannot use table type '$object' for table '$table_name', it was already used for table '$housekeeper_types{$object}'");
+	}
+	$housekeeper_types{$object} = $table_name;
+
+	if ($output{"database"} eq "c")
+	{
+		return;
+	}
+	elsif ($output{"database"} eq "sqlite3")
+	{
+		$triggers .= "create trigger ${table_name}_housekeeping before delete on ${table_name}${eol}\n";
+		$triggers .= "for each row${eol}\n";
+		$triggers .= "begin${eol}\n";
+		$triggers .= "insert into housekeeper (object,objectid)${eol}\n";
+		$triggers .= "values (${object},old.${pkey_name});${eol}\n";
+		$triggers .= "end;${eol}\n";
+	}
+	elsif ($output{"database"} eq "mysql")
+	{
+		$triggers .= "create trigger ${table_name}_housekeeping before delete on ${table_name}${eol}\n";
+		$triggers .= "for each row${eol}\n";
+		$triggers .= "insert into housekeeper (object,objectid)${eol}\n";
+		$triggers .= "values (${object},old.${pkey_name});${eol}\n";
+		$triggers .= "\$\$${eol}\n";
+	}
+	elsif ($output{"database"} eq "postgresql")
+	{
+		$triggers .= "create or replace function ${table_name}_housekeeping_proc() returns trigger as \$\$${eol}\n";
+		$triggers .= "begin${eol}\n";
+		$triggers .= "insert into housekeeper (object,objectid) values (${object},old.${pkey_name});${eol}\n";
+		$triggers .= "return old;${eol}\n";
+		$triggers .= "end;${eol}\n";
+		$triggers .= "\$\$ language plpgsql;${eol}\n";
+		$triggers .= "create trigger ${table_name}_housekeeping${eol}\n";
+		$triggers .= "before delete${eol}\n";
+		$triggers .= "on ${table_name} for each row${eol}\n";
+		$triggers .= "execute procedure ${table_name}_housekeeping_proc();${eol}\n";
+	}
+}
+
 sub process_update_trigger_function($)
 {
 	my $line = shift;
@@ -942,6 +999,7 @@ sub process()
 			elsif ($type eq 'TABLE')				{ process_table($opts); }
 			elsif ($type eq 'UNIQUE')				{ process_index($opts, 1); }
 			elsif ($type eq 'CHANGELOG')				{ process_changelog($opts); }
+			elsif ($type eq 'HOUSEKEEPER')				{ process_housekeeper($opts); }
 			elsif ($type eq 'UPD_TRIG_FUNC')
 			{
 				process_update_trigger_function($opts);
@@ -981,6 +1039,19 @@ static const zbx_db_table_changelog_t\tchangelog_tables[] =
 	print	"\t{0}\n};\n";
 }
 
+sub c_append_housekeeper_tables()
+{
+	print "
+static const zbx_db_table_housekeeper_t\thousekeeper_tables[] =
+{\n";
+
+	while (my ($object, $table) = each(%housekeeper_types)) {
+		print "\t{\"$table\", $object},\n"
+	}
+
+	print	"\t{0}\n};\n";
+}
+
 sub main()
 {
 	if ($#ARGV != 0)
@@ -1014,6 +1085,7 @@ sub main()
 	if ($format eq "c")
 	{
 		c_append_changelog_tables();
+		c_append_housekeeper_tables();
 
 		$eol = "\\n\\";
 		$fk_bol = "\t\"";
@@ -1034,6 +1106,8 @@ sub main()
 		print "\nzbx_db_table_t\t*zbx_dbschema_get_tables(void)\n{\n\treturn tables;\n}\n";
 		print "\nconst zbx_db_table_changelog_t\t*zbx_dbschema_get_changelog_tables(void)\n" .
 				"{\n\treturn changelog_tables;\n}\n";
+		print "\nconst zbx_db_table_housekeeper_t\t*zbx_dbschema_get_housekeeper_tables(void)\n" .
+				"{\n\treturn housekeeper_tables;\n}\n";
 		print "\nconst char\t*zbx_dbschema_get_schema(void)\n{\n\treturn db_schema;\n}\n";
 	}
 }

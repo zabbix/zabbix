@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -97,7 +97,7 @@ static zbx_tfc_slot_t	*tfc_alloc_slot(void)
 	if (UINT32_MAX == cache->free_head)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	index = cache->free_head;
@@ -280,7 +280,7 @@ static void	tfc_reserve_slot(void)
 		if (UINT32_MAX == cache->lru_head)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(1);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		tfc_free_data(&cache->slots[cache->lru_head].data);
@@ -316,7 +316,7 @@ static zbx_tfc_data_t	*tfc_index_add(zbx_tfc_data_t *data_local)
 				sizeof(zbx_tfc_data_t))))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 

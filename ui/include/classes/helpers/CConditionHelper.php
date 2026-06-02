@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -205,7 +205,7 @@ class CConditionHelper {
 	 * @param array  $conditions
 	 */
 	public static function replaceFormulaIds(string &$formula, array $conditions): void {
-		$parser = new CConditionFormula();
+		$parser = new CConditionFormulaParser();
 		$parser->parse($formula);
 
 		$conditionids = [];
@@ -214,7 +214,7 @@ class CConditionHelper {
 			$conditionids[$condition['formulaid']] = $conditionid;
 		}
 
-		foreach (array_reverse($parser->constants) as $constant) {
+		foreach (array_reverse($parser->getConstants()) as $constant) {
 			$formula = substr_replace($formula, '{'.$conditionids[$constant['value']].'}', $constant['pos'],
 				strlen($constant['value'])
 			);

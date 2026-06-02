@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -80,7 +80,8 @@ class testAlertingForServices extends CIntegrationTest {
 				'key_' => self::TRAPPER_KEY,
 				'type' => ITEM_TYPE_TRAPPER,
 				'hostid' => self::$hostid,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);

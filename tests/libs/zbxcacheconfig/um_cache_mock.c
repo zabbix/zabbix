@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -146,6 +146,11 @@ static void	um_mock_kvset_init(zbx_um_mock_kvset_t *kvset, zbx_mock_handle_t han
 	}
 }
 
+static void	zbx_um_mock_kv_free_wrap(zbx_um_mock_kv_t *kv)
+{
+	zbx_ptr_free(kv);
+}
+
 /*********************************************************************************
  *                                                                               *
  * Purpose: free mock mock kv path                                               *
@@ -153,7 +158,7 @@ static void	um_mock_kvset_init(zbx_um_mock_kvset_t *kvset, zbx_mock_handle_t han
  *********************************************************************************/
 static void	um_mock_kvset_free(zbx_um_mock_kvset_t *kvset)
 {
-	zbx_vector_um_mock_kv_clear_ext(&kvset->kvs, (zbx_um_mock_kv_free_func_t)zbx_ptr_free);
+	zbx_vector_um_mock_kv_clear_ext(&kvset->kvs, zbx_um_mock_kv_free_wrap);
 	zbx_vector_um_mock_kv_destroy(&kvset->kvs);
 	zbx_free(kvset);
 }
@@ -657,10 +662,11 @@ void	um_mock_config_init(void)
 	set_dc_config(config);
 }
 
-static void	um_mock_kv_path_free(zbx_dc_kvs_path_t *kvspath)
+static void	um_mock_kv_path_free(void *ptr)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_dc_kv_t		*kv;
+	zbx_dc_kvs_path_t	*kvspath = (zbx_dc_kvs_path_t *)ptr;
 
 	zbx_hashset_iter_reset(&kvspath->kvs, &iter);
 	while (NULL != (kv = (zbx_dc_kv_t *)zbx_hashset_iter_next(&iter)))
@@ -690,7 +696,7 @@ void	um_mock_config_destroy(void)
 	while (NULL != (pmacro = (zbx_um_macro_t **)zbx_hashset_iter_next(&iter)))
 		um_macro_release(*pmacro);
 
-	zbx_vector_ptr_clear_ext(&config->kvs_paths, (zbx_ptr_free_func_t)um_mock_kv_path_free);
+	zbx_vector_ptr_clear_ext(&config->kvs_paths, um_mock_kv_path_free);
 	zbx_vector_ptr_destroy(&config->kvs_paths);
 
 	zbx_hashset_destroy(&config->gmacro_kv);
@@ -698,6 +704,7 @@ void	um_mock_config_destroy(void)
 	zbx_hashset_destroy(&config->gmacros);
 	zbx_hashset_destroy(&config->hmacros);
 	zbx_hashset_destroy(&config->strpool);
+	zbx_hashset_destroy(&config->um_hosts);
 
 	zbx_free(config);
 }

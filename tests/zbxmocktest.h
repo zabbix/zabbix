@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -46,5 +46,7 @@ void	set_zbx_config_value_cache_size(zbx_uint64_t cache_size);
 void	zbx_mock_test_entry(void **state);
 
 void	zbx_mock_log_impl(int level, const char *fmt, va_list args);
+int	zbx_mock_get_log_level_impl(void);
+void	zbx_mock_set_log_level(int level);
 
 #endif	/* ZABBIX_MOCK_TEST_H */

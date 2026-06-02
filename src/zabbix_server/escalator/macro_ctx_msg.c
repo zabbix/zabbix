@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -101,11 +101,11 @@ static int	macro_message_update_resolv(zbx_macro_resolv_data_t *p, va_list args,
 	{
 		if (NULL != ack)
 		{
-			if (0 == strcmp(p->macro, MVAR_ACK_MESSAGE) || 0 == strcmp(p->macro, MVAR_EVENT_UPDATE_MESSAGE))
+			if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_MESSAGE))
 			{
 				*replace_to = zbx_strdup(*replace_to, ack->message);
 			}
-			else if (0 == strcmp(p->macro, MVAR_ACK_TIME) || 0 == strcmp(p->macro, MVAR_EVENT_UPDATE_TIME))
+			else if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_TIME))
 			{
 				*replace_to = zbx_strdup(*replace_to, zbx_time2str(ack->clock, tz));
 			}
@@ -113,20 +113,19 @@ static int	macro_message_update_resolv(zbx_macro_resolv_data_t *p, va_list args,
 			{
 				*replace_to = zbx_dsprintf(*replace_to, "%d", ack->clock);
 			}
-			else if (0 == strcmp(p->macro, MVAR_ACK_DATE) || 0 == strcmp(p->macro, MVAR_EVENT_UPDATE_DATE))
+			else if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_DATE))
 			{
 				*replace_to = zbx_strdup(*replace_to, zbx_date2str(ack->clock, tz));
 			}
 			else if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_ACTION))
 			{
 				zbx_problem_get_actions(ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
-						ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
-						ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_MESSAGE |
-						ZBX_PROBLEM_UPDATE_SEVERITY |
-						ZBX_PROBLEM_UPDATE_SUPPRESS |
-						ZBX_PROBLEM_UPDATE_UNSUPPRESS |
-						ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE |
-						ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM, tz, replace_to);
+						ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_CLOSE |
+						ZBX_PROBLEM_UPDATE_MESSAGE | ZBX_PROBLEM_UPDATE_SEVERITY |
+						ZBX_PROBLEM_UPDATE_SUPPRESS | ZBX_PROBLEM_UPDATE_UNSUPPRESS |
+						ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM |
+						ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS |
+						ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS, tz, replace_to);
 			}
 			else if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_ACTIONJSON))
 			{

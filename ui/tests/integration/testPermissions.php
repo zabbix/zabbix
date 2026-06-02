@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -183,7 +183,8 @@ class testPermissions extends CIntegrationTest {
 				'key_' => self::ITEM_NAME,
 				'hostid' => self::$templateids[self::TEMPLATE_NAME_01],
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			]
 		];
 
@@ -209,7 +210,8 @@ class testPermissions extends CIntegrationTest {
 			'name' => self::LLD_NAME,
 			'key_' => self::LLD_NAME,
 			'hostid' => self::$templateids[self::TEMPLATE_NAME_02],
-			'type' => ITEM_TYPE_TRAPPER
+			'type' => ITEM_TYPE_TRAPPER,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 
 		$this->assertCount(1, $response['result']['itemids']);

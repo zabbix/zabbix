@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,7 +21,6 @@
 #include "zbxstr.h"
 
 void	*__wrap_realloc(void *old , size_t size);
-void	__wrap_zbx_log_handle(int level, const char *fmt, ...);
 
 void		*ret_ptr = (void *)1;
 size_t		got_size;
@@ -44,9 +43,10 @@ void	*__wrap_realloc(void *old , size_t size)
 	return ret_ptr;
 }
 
-void	__wrap_zbx_log_handle(int level, const char *fmt, ...)
+static void	zabbix_log_stub(int level, const char *fmt, va_list args)
 {
 	ZBX_UNUSED(level);
+	ZBX_UNUSED(args);
 
 	if (NULL == warning[0])
 	{
@@ -55,6 +55,7 @@ void	__wrap_zbx_log_handle(int level, const char *fmt, ...)
 	else if (NULL == warning[1])
 	{
 		warning[1] = fmt;
+
 	}
 }
 
@@ -67,6 +68,8 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED == zbx_mock_parameter_exists("in.out_of_mem"))
 		out_of_mem = 1;
+
+	zbx_init_library_common(zabbix_log_stub, zbx_mock_get_log_level_impl, NULL, NULL);
 
 	result = zbx_realloc(old, in_size);
 

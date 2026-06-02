@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,12 +16,12 @@
 
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
-require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 
 /**
  * @backup history_uint, profiles
  *
- * @dataSource GlobalMacros
+ * @dataSource GlobalMacros, MonitoringOverview
  *
  * @onBefore prepareTestData
  */
@@ -38,15 +38,7 @@ class testPageMonitoringLatestData extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CTableBehavior::class];
-	}
-
-	private function getTableSelector() {
-		return 'xpath://table['.CXPathHelper::fromClass('list-table fixed').']';
-	}
-
-	private function getTable() {
-		return $this->query($this->getTableSelector())->asTable()->one();
+		return [CDatatableBehavior::class];
 	}
 
 	public function prepareTestData() {
@@ -112,6 +104,12 @@ class testPageMonitoringLatestData extends CWebTest {
 						'key_' => 'trap',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Multiple   spaces   in item name',
+						'key_' => 'msiin',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
 			],
@@ -160,10 +158,35 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$this->assertEquals(['Host groups', 'Hosts', 'Name', 'Tags', 'Show tags', 'Tag display priority', 'State', 'Show details'],
+		$this->assertEquals(['Host groups', 'Hosts', 'Name', 'Tags', 'State'],
 				$form->getLabels()->asText()
 		);
 		$this->assertTrue($this->query('button:Apply')->one()->isClickable());
+
+		// Check the layout configuration options that are present in datatable headers.
+		$header_settings = [
+			'Name' => [
+				'Show item key' => [
+					'value' => false
+				]
+			],
+			'Tags' => [
+				'Number of tags' => [
+					'value' => 3,
+					'labels' => [1, 2, 3]
+				],
+				'Tag name display' => [
+					'value' => 'Full',
+					'labels' => ['Full', 'Shortened', 'None']
+				],
+				'Tag display priority' => [
+					'value' => '',
+					'maxlenght' => 250
+				],
+				'duplicate' => true
+			]
+		];
+		$this->checkHeaderSettingsLayout($header_settings);
 
 		// Subfilter is not visible if filter isn't set.
 		$this->assertFalse($this->query('id:latest-data-subfilter')->exists());
@@ -184,23 +207,26 @@ class testPageMonitoringLatestData extends CWebTest {
 			$this->assertTrue($subfilter->query($query)->one()->isValid());
 		}
 
-		// Check table headers.
-		$details_headers = [
-			true => ['', 'Host', 'Name', 'Interval', 'History', 'Trends', 'Type', 'Last check', 'Last value',
-				'Change', 'Tags', '', 'Info'],
-			false => ['', 'Host', 'Name', 'Last check', 'Last value', 'Change', 'Tags', '', 'Info']
+		// Check column list default configuration.
+		$column_list = [
+			'Host' => ['value' => true],
+			'Name' => ['value' => true, 'enabled' => false],
+			'Interval' => ['value' => false],
+			'History' => ['value' => false],
+			'Trends' => ['value' => false],
+			'Type' => ['value' => false],
+			'Last check' => ['value' => true],
+			'Last value' => ['value' => true],
+			'Change' => ['value' => true],
+			'Tags' => ['value' => true],
+			'Tag value' => ['value' => false],
+			'Actions' => ['value' => true],
+			'Info' => ['value' => true]
 		];
-
-		$table = $this->getTable();
-		foreach ($details_headers as $status => $headers) {
-			$this->query('name:show_details')->one()->asCheckbox()->set($status);
-			$form->submit();
-			$table->waitUntilReloaded();
-			$this->assertEquals($headers, $table->getHeadersText());
-		}
+		$this->checkColumnList($column_list);
 
 		// Check that sortable headers are clickable.
-		$this->assertEquals(['Host', 'Name'], $table->getSortableHeaders()->asText());
+		$this->assertEquals(['Host', 'Name'], $this->getDatatable()->getSortableHeaders()->asText());
 
 		// Subfilter is not visible again after Reset.
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
@@ -221,18 +247,14 @@ class testPageMonitoringLatestData extends CWebTest {
 
 	public static function getFilterData() {
 		return [
-			// Host groups and Show details.
+			// Host groups.
 			[
 				[
 					'filter' => [
-						'Host groups' => 'Another group to check Overview',
-						'Show details' => true
+						'Host groups' => 'Another group to check Overview'
 					],
 					'result' => [
-						[
-							'Name' => "4_item".
-							"\ntrap[4]"
-						]
+						['Name' => '4_item']
 					]
 				]
 			],
@@ -278,6 +300,27 @@ class testPageMonitoringLatestData extends CWebTest {
 						['Name' => '2_item'],
 						['Name' => '3_item'],
 						['Name' => '4_item']
+					]
+				]
+			],
+			// Multiple spaces in field name.
+			[
+				[
+					'filter' => [
+						'Name' => '   spaces   '
+					],
+					'result' => [
+						['Name' => 'Multiple spaces in item name']
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'result' => [
+						['Name' => 'Multiple spaces in item name']
 					]
 				]
 			],
@@ -386,25 +429,17 @@ class testPageMonitoringLatestData extends CWebTest {
 					]
 				]
 			],
-			// Tags None.
-			[
-				[
-					'filter' => [
-						'Name' => 'tag_item_1'
-					],
-					'Show tags' => 'None',
-					'result' => [
-						['Name' => 'tag_item_1']
-					]
-				]
-			],
 			// Tags: 1.
 			[
 				[
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'Show tags' => '1',
+					'header_settings' => [
+						'Tags' => [
+							'Number of tags' => 1
+						]
+					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => 'component: name:tag_item_1']
 					]
@@ -416,7 +451,11 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'Show tags' => '2',
+					'header_settings' => [
+						'Tags' => [
+							'Number of tags' => 2
+						]
+					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => "component: name:tag_item_1\ntag: filtering_value"]
 					]
@@ -428,8 +467,12 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'Show tags' => '3',
-					'Tags name' => 'Full',
+					'header_settings' => [
+						'Tags' => [
+							'Number of tags' => 3,
+							'Tag name display' => 'Full'
+						]
+					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => "component: name:tag_item_1\ntag: filtering_value\ntag_number: 0"]
 					]
@@ -441,7 +484,11 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'Tags name' => 'Shortened',
+					'header_settings' => [
+						'Tags' => [
+							'Tag name display' => 'Shortened'
+						]
+					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => "com: name:tag_item_1\ntag: filtering_value\ntag: 0"]
 					]
@@ -453,7 +500,11 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'Tags name' => 'None',
+					'header_settings' => [
+						'Tags' => [
+							'Tag name display' => 'None'
+						]
+					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => "name:tag_item_1\nfiltering_value\n0"]
 					]
@@ -463,8 +514,12 @@ class testPageMonitoringLatestData extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'tag_item_1',
-						'Tag display priority' => 'tag_'
+						'Name' => 'tag_item_1'
+					],
+					'header_settings' => [
+						'Tags' => [
+							'Tag display priority' => 'tag_'
+						]
 					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => "component: name:tag_item_1\ntag: filtering_value\ntag_number: 0"]
@@ -475,8 +530,12 @@ class testPageMonitoringLatestData extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'tag_item_1',
-						'Tag display priority' => 'tag_number,tag,component'
+						'Name' => 'tag_item_1'
+					],
+					'header_settings' => [
+						'Tags' => [
+							'Tag display priority' => 'tag_number,tag,component'
+						]
 					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => "tag_number: 0\ntag: filtering_value\ncomponent: name:tag_item_1"]
@@ -487,8 +546,12 @@ class testPageMonitoringLatestData extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'tag_item_1',
-						'Tag display priority' => 'tag'
+						'Name' => 'tag_item_1'
+					],
+					'header_settings' => [
+						'Tags' => [
+							'Tag display priority' => 'tag'
+						]
 					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => "tag: filtering_value\ncomponent: name:tag_item_1\ntag_number: 0"]
@@ -506,14 +569,12 @@ class testPageMonitoringLatestData extends CWebTest {
 	public function testPageMonitoringLatestData_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$table = $this->getTable()->waitUntilPresent();
 
 		// Expand filter if it is collapsed.
 		CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT)->expand();
 
 		// Reset filter in case if some filtering remained before ongoing test case.
 		$this->query('button:Reset')->one()->click();
-		$table->waitUntilReloaded();
 
 		// Fill filter form with data.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
@@ -524,25 +585,29 @@ class testPageMonitoringLatestData extends CWebTest {
 			$form->getField('id:tags_0')->asMultifieldTable()->fill(CTestArrayHelper::get($data, 'Tags.tags', []));
 		}
 
-		$form->getField('id:show_tags_0')->asSegmentedRadio()->fill(CTestArrayHelper::get($data, 'Show tags', '3'));
-		$form->getField('id:tag_name_format_0')->asSegmentedRadio()->fill(CTestArrayHelper::get($data, 'Tags name', 'Full'));
-
 		$form->submit();
-		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
+		$table = $this->getDatatable()->waitUntilReady();
+		$table->waitUntilRowsCount(count($data['result']));
+
+		// Set the datatable layout from Tags column header.
+		$tag_number = CTestArrayHelper::get($data, 'header_settings.Tags.Number of tags', 3);
+		$tag_display = CTestArrayHelper::get($data, 'header_settings.Tags.Tag name display', 'Full');
+		$tag_priority = CTestArrayHelper::get($data, 'header_settings.Tags.Tag display priority', '');
+		$this->changeLayoutFromHeader([
+			'Tags' => [
+				'Number of tags' => $tag_number,
+				'Tag name display' => $tag_display,
+				'Tag display priority' => $tag_priority
+			]
+		]);
 
 		// Check filtered result.
-		$this->assertTableData($data['result'], $this->getTableSelector());
-
-		// Check Show tags filter setting.
-		if (CTestArrayHelper::get($data, 'Show tags') === 'None') {
-			$this->assertEquals(['', 'Host', 'Name', 'Last check', 'Last value', 'Change', '', 'Info'],
-					$this->getTable()->getHeadersText()
-			);
-		}
+		$this->assertDatatableData($data['result']);
 
 		// Reset filter not to impact the results of next tests.
 		$this->query('button:Reset')->one()->click();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady();
 	}
 
 	public static function getSubfilterData() {
@@ -617,7 +682,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		foreach ($data['subfilter'] as $header => $values) {
 			foreach ($values as $value) {
 				$this->query('xpath://h3[text()='.CXPathHelper::escapeQuotes($header).']/..//a[text()='.
-						CXPathHelper::escapeQuotes($value).']')->waitUntilClickable()->one()->click();
+						CXPathHelper::escapeQuotes($value).']')->waitUntilVisible()->one()->click();
 				$this->page->waitUntilReady();
 			}
 		}
@@ -626,13 +691,18 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
 
-		$this->assertTableData($data['result'], $this->getTableSelector());
+		$this->query('id:latest')->asDatatable()->one()->waitUntilRowsCount(count($data['result']));
+		$this->assertDatatableData($data['result']);
 
 		// Check that subfilter remains selected after main field is cleared.
 		if (CTestArrayHelper::get($data, 'check_after_clear', false)) {
-			$table = $this->getTable();
+			$table = $this->query('id:latest')->one()->asDatatable();
+			$headers = $table->getHeaders();
 			CFilterElement::find()->one()->getForm()->fill(['Name' => ''])->submit();
-			$table->waitUntilReloaded();
+
+			$this->page->waitUntilReady();
+			$headers->waitUntilStalled();
+			$table->waitUntilReady()->invalidate();
 
 			foreach ($data['subfilter']['Tag values'] as $subfilter) {
 				$this->assertTrue($this->query('xpath://a[text()='.CXPathHelper::escapeQuotes($subfilter).']/..')
@@ -640,7 +710,7 @@ class testPageMonitoringLatestData extends CWebTest {
 				);
 			}
 
-			$this->assertTableData($data['result'], $this->getTableSelector());
+			$this->assertDatatableData($data['result']);
 		}
 
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
@@ -667,10 +737,11 @@ class testPageMonitoringLatestData extends CWebTest {
 		if ($kiosk_mode) {
 			$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertTrue($this->query('xpath://button[@title="Normal view"]')->exists());
+			$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent();
 		}
 
-		$this->getTable()->query('button', $tag['tag'].$tag['value'])->waitUntilClickable()->one()->click();
+		$this->query('id:latest')->one()->asDatatable()->waitUntilReady()->query('button', $tag['tag'].$tag['value'])
+				->waitUntilClickable()->one()->scrollIntoView(50)->click();
 		$this->page->waitUntilReady();
 
 		// Check that tag value is selected in subfilter under correct header.
@@ -685,19 +756,21 @@ class testPageMonitoringLatestData extends CWebTest {
 			['Name' => 'Free swap space in %'],
 			['Name' => 'Total swap space']
 		];
-		$this->assertTableData($data, $this->getTableSelector());
+		$this->assertDatatableData($data);
 
 		if ($kiosk_mode) {
 			$this->query('xpath://button[@title="Normal view"]')->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
-			$this->assertTableData($data, $this->getTableSelector());
+			$this->query('xpath://button[@title="Kiosk mode"]')->waitUntilVisible();
+			$this->assertDatatableData($data);
 		}
 		else {
 			$this->query('button:Reset')->one()->click();
 			$this->page->waitUntilReady();
+			$this->getDatatable()->waitUntilReady();
+
 			$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
-					explode("\n", $this->query('class:no-data-message')->one()->getText())
+					explode("\n", $this->query('class:no-data-message')->waitUntilVisible()->one()->getText())
 			);
 		}
 	}
@@ -733,10 +806,10 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['State' => 'Normal']);
-		$table = $this->getTable();
+		$table = $this->query('id:latest')->one()->asDatatable();
 		$this->query('button:Apply')->one()->click();
 		$this->page->waitUntilReady();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady()->invalidate();
 
 		foreach ($result as $hosts) {
 			foreach ($hosts as $host) {
@@ -746,12 +819,12 @@ class testPageMonitoringLatestData extends CWebTest {
 				 */
 				for ($i = 1; $i < 2; $i++) {
 					$this->assertFalse($this->query('link', $host['host'])->one(false)->isValid());
-					$this->query('class:arrow-right')->waitUntilClickable()->one()->click();
-					$this->page->waitUntilReady();
+					$this->query('class:arrow-right')->waitUntilClickable()->one()->scrollIntoView(50)->click();
+					$table->waitUntilReady();
 				}
 
-				$this->query('class:table-paging')->query('link:1')->waitUntilClickable()->one()->click();
-				$this->page->waitUntilReady();
+				$this->query('class:paging-btn-container')->query('link:1')->waitUntilClickable()->one()->click();
+				$table->waitUntilReady();
 			}
 		}
 
@@ -849,11 +922,11 @@ class testPageMonitoringLatestData extends CWebTest {
 				self::$hostids['Host with item descriptions'])->waitUntilReady();
 
 		// Find rows from the data provider and click on the description icon if such should persist.
-		$row = $this->getTable()->findRow('Name', $data['Item name'], true);
+		$row = $this->query('id:latest')->one()->asDatatable()->waitUntilReady()->findRow('Name', $data['Item name'], true);
 
-		if (CTestArrayHelper::get($data,'description', false)) {
+		if (CTestArrayHelper::get($data, 'description', false)) {
 			$row->query('class:zi-alert-with-content')->one()->click()->waitUntilReady();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one();
+			$overlay = $this->query('xpath://div[contains(@class, "hintbox-static")]')->one();
 
 			// Verify the real description with the expected one.
 			$this->assertEquals($data['description'], $overlay->getText());
@@ -867,7 +940,7 @@ class testPageMonitoringLatestData extends CWebTest {
 			}
 
 			// Verify that the tool-tip can be closed.
-			$overlay->query('xpath:./button[@title="Close"]')->one()->click();
+			$overlay->query('xpath:.//button[@title="Close"]')->one()->click();
 			$this->assertFalse($overlay->isDisplayed());
 		}
 		// If the item has no description the description icon should not be there.
@@ -880,6 +953,14 @@ class testPageMonitoringLatestData extends CWebTest {
 	 * Maintenance icon hintbox.
 	 */
 	public function testPageMonitoringLatestData_checkMaintenanceIcon() {
+		// Change datatable layout to make sure that the maintenance icon is visible.
+		$layout = '{"columns":[{"id":"host","resized":true,"width":"249px"},{"id":"name","resized":true,"width":"239px"}'.
+				',{"id":"interval"},{"id":"history"},{"id":"trends"},{"id":"type"},{"id":"last_check","width":"79px"},'.
+				'{"id":"last_value","resized":true,"width":"142px"},{"id":"change","width":"62px"},'.
+				'{"id":"tags","resized":true,"width":"194px"},{"id":"tagvalue"},{"id":"actions","width":"60px"},'.
+				'{"id":"info","width":"83px"}],"options":{}}';
+		$this->updateDatatableLayout($layout, 'web.monitoring.latest.datatable');
+
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill(['Hosts' => self::MAINTENANCE_HOSTNAME]);
@@ -907,18 +988,19 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$table = $this->getTable()->waitUntilPresent();
+		$table = $this->query('id:latest')->one()->asDatatable()->waitUntilReady();
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
 		$form->fill(['Name' => '4_item'])->submit();
-		$table->waitUntilReloaded();
+		$table->waitUntilRowsCount(1);
+		$row = $table->getRow(0);
 
 		foreach (['Last check', 'Last value'] as $column) {
 			if ($column === 'Last value') {
-				$this->assertEquals('15 UNIT', $this->getTable()->getRow(0)->getColumn($column)->getText());
+				$this->assertEquals('15 UNIT', $row->getColumn($column)->getText());
 			}
 
-			$this->getTable()->getRow(0)->getColumn($column)->query('class:cursor-pointer')->one()->click();
+			$row->getColumn($column)->query('class:cursor-pointer')->one()->click();
 			$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
 			$compare_hint = ($column === 'Last check') ? $true_time : $value;
 			$this->assertEquals($compare_hint, $hint);

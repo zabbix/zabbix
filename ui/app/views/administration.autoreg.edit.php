@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -69,8 +69,9 @@ $form_grid = (new CFormGrid())
 			->setAsteriskMark()
 			->addClass(ZBX_STYLE_DISPLAY_NONE),
 		(new CFormField(
-			(new CTextBox('tls_psk_identity', '', false, DB::getFieldLength('config_autoreg_tls', 'tls_psk_identity')))
+			(new CTextAreaFlexible('tls_psk_identity', ''))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setMaxlength(DB::getFieldLength('config_autoreg_tls', 'tls_psk_identity'))
 				->setAriaRequired()
 				->setEnabled(false)
 		))->addClass(ZBX_STYLE_DISPLAY_NONE)
@@ -80,10 +81,10 @@ $form_grid = (new CFormGrid())
 			->setAsteriskMark()
 			->addClass(ZBX_STYLE_DISPLAY_NONE),
 		(new CFormField(
-			(new CTextBox('tls_psk', '', false, DB::getFieldLength('config_autoreg_tls', 'tls_psk')))
+			(new CTextAreaFlexible('tls_psk', ''))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setMaxlength(DB::getFieldLength('config_autoreg_tls', 'tls_psk'))
 				->setAriaRequired()
-				->disableAutocomplete()
 				->setEnabled(false)
 		))->addClass(ZBX_STYLE_DISPLAY_NONE)
 	]);

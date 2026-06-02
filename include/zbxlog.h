@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -60,7 +60,7 @@ typedef struct
 
 int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, const char *syslog_app_name,
 		const char *event_source, char **error);
-void	zbx_log_impl(int level, const char *fmt, va_list args);
+void	zabbix_log_impl(int level, const char *fmt, va_list args);
 void	zbx_close_log(void);
 
 char	*zbx_strerror_from_system(zbx_syserror_t error);
@@ -78,5 +78,25 @@ int		zbx_validate_log_parameters(ZBX_TASK_EX *task, const zbx_config_log_t *log_
 
 void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offset, const char *format,
 		...) __zbx_attr_format_printf(5, 6);
+
+int	zbx_get_log_level_impl(void);
+
+void	zbx_set_log_level(int level);
+
+const char	*zbx_get_log_component_name(void);
+
+#ifndef _WINDOWS
+void	zabbix_increase_log_level(void);
+void	zabbix_decrease_log_level(void);
+void	zabbix_report_log_level_change(void);
+const char	*zabbix_get_log_level_string(void);
+
+#define  ZBX_LOG_COMPONENT_NAME_LEN	64
+
+void	zbx_set_log_component(const char *name, zbx_log_component_t *component);
+void	zbx_change_component_log_level(zbx_log_component_t *component, int direction);
+#endif
+
+
 
 #endif

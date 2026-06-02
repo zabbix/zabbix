@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -823,7 +823,7 @@ static void	zbx_tls_library_init(zbx_tls_status_t status)
 	if (GNUTLS_E_SUCCESS != gnutls_global_init())
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize GnuTLS library");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	tls_status = status;
@@ -868,7 +868,7 @@ static void	zbx_gnutls_priority_init_or_exit(gnutls_priority_t *ciphersuites, co
 		zabbix_log(LOG_LEVEL_CRIT, "gnutls_priority_init() for %s failed: %d: %s: error occurred at position:"
 				" \"%s\"", err_msg, res, gnutls_strerror(res), ZBX_NULL2STR(err_pos));
 		zbx_tls_free();
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -911,7 +911,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 			zabbix_log(LOG_LEVEL_CRIT, "gnutls_certificate_allocate_credentials() failed: %d: %s", res,
 					gnutls_strerror(res));
 			zbx_tls_free();
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -933,7 +933,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 			zabbix_log(LOG_LEVEL_CRIT, "cannot parse CA certificate(s) in file \"%s\": %d: %s",
 					config_tls->ca_file, res, gnutls_strerror(res));
 			zbx_tls_free();
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -956,7 +956,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 			zabbix_log(LOG_LEVEL_CRIT, "cannot parse CRL file \"%s\": %d: %s", config_tls->crl_file,
 					res, gnutls_strerror(res));
 			zbx_tls_free();
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -971,7 +971,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 					" %d: %s", config_tls->cert_file, config_tls->key_file, res,
 					gnutls_strerror(res));
 			zbx_tls_free();
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 		else
 		{
@@ -1009,7 +1009,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 				zabbix_log(LOG_LEVEL_CRIT, "gnutls_psk_allocate_client_credentials() failed: %d: %s",
 						res, gnutls_strerror(res));
 				zbx_tls_free();
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 			}
 
 			/* Simplified. 'my_psk_identity' should have been prepared as required by RFC 4518. */
@@ -1019,7 +1019,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 				zabbix_log(LOG_LEVEL_CRIT, "gnutls_psk_set_client_credentials() failed: %d: %s", res,
 						gnutls_strerror(res));
 				zbx_tls_free();
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 			}
 		}
 
@@ -1030,7 +1030,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 				zabbix_log(LOG_LEVEL_CRIT, "gnutls_psk_allocate_server_credentials() failed: %d: %s",
 						res, gnutls_strerror(res));
 				zbx_tls_free();
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 			}
 
 			/* Apparently GnuTLS does not provide API for setting up static server credentials (with a */

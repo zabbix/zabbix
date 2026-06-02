@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -70,9 +70,19 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 					],
 					['db interface.dns', 'required', 'not_empty', 'when' => ['useip', 'in' => [INTERFACE_USE_DNS]]]
 				],
-				'port' => ['db interface.port', 'required', 'not_empty',
-					'use' => [CPortParser::class, ['usermacros' => true]],
-					'messages' => ['use' => _('Incorrect port.')]
+				'port' => [
+					['db interface.port'],
+					['db interface.port', 'required', 'not_empty',
+						'use' => [CNumberValidator::class, ['usermacros' => true, 'with_float' => false,
+							'min' => ZBX_MIN_PORT_NUMBER, 'max' => ZBX_MAX_PORT_NUMBER
+						]]
+					],
+					['db interface.port', 'required', 'not_empty',
+						'use' => [CNumberValidator::class, ['usermacros' => true, 'with_float' => false,
+							'min' => ZBX_AGENT_INTERFACE_MIN_PORT_NUMBER, 'max' => ZBX_AGENT_INTERFACE_MAX_PORT_NUMBER
+						]],
+						'when' => ['type', 'in' => [INTERFACE_TYPE_AGENT]]
+					]
 				],
 				'details' => ['object', 'fields' => [
 					'version' => ['db interface_snmp.version', 'required', 'in' => [SNMP_V1, SNMP_V2C, SNMP_V3]],
@@ -124,7 +134,12 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 			'main_interface_'.INTERFACE_TYPE_SNMP => ['db interface.interfaceid'],
 			'main_interface_'.INTERFACE_TYPE_IPMI => ['db interface.interfaceid'],
 			'main_interface_'.INTERFACE_TYPE_JMX => ['db interface.interfaceid'],
-			'groups_new' => ['array', 'field' => ['db hstgrp.name']],
+			'groups_new' => ['array', 'field' => [
+					'db hstgrp.name',
+					'use' => [CHostGroupNameParser::class, []],
+					'messages' => ['use' => _('Invalid host group name.')]
+				]
+			],
 			'groups' => [
 				['array', 'field' => ['db hstgrp.groupid']],
 				['array', 'required', 'not_empty', 'when' => ['groups_new', 'empty']]
@@ -133,7 +148,10 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
 				'fields' => [
 					'value' => ['db host_tag.value'],
-					'tag' => ['db host_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db host_tag.tag'],
+						['db host_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				]
 			],
 			'templates' => ['array', 'field' => ['db hosts.hostid']],
@@ -166,7 +184,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 			],
 			'tls_psk' => [
 				['db hosts.tls_psk',
-					'regex' => '/^(.{2}){1,}$/',
+					'regex' => ZBX_TLS_PSK_PATTERN,
 					'messages' => ['regex' => _('PSK must be an even number of characters.')]
 				],
 				['db hosts.tls_psk',
@@ -209,40 +227,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 					'inherited_type' => ['integer']
 				]
 			],
-			'valuemaps' => ['objects', 'fields' => [
-				'valuemapid' => ['db valuemap.valuemapid'],
-				'name' => ['db valuemap.name', 'not_empty', 'required'],
-				'mappings' => ['objects', 'not_empty', 'uniq' => [['type', 'value']],
-					'messages' => ['uniq' => _('Mapping type and value combination is not unique.')],
-					'fields' => [
-						'type' => ['db valuemap_mapping.type', 'required', 'in' => [VALUEMAP_MAPPING_TYPE_EQUAL,
-							VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL,
-							VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP, VALUEMAP_MAPPING_TYPE_DEFAULT
-						]],
-						'value' => [
-							['db valuemap_mapping.value', 'required', 'when' => ['type', 'in' => [
-								VALUEMAP_MAPPING_TYPE_EQUAL
-							]]],
-							['db valuemap_mapping.value', 'required', 'not_empty', 'when' => ['type', 'in' => [
-								VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL,
-								VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP
-							]]],
-							['float', 'when' => ['type', 'in' => [VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
-								VALUEMAP_MAPPING_TYPE_LESS_EQUAL
-							]]],
-							['string',
-								'use' => [CRangesParser::class, ['with_minus' => true, 'with_float' => true, 'with_suffix' => true]],
-								'when' => ['type', 'in' => [VALUEMAP_MAPPING_TYPE_IN_RANGE]],
-								'messages' => ['use' => _('Invalid range.')]
-							],
-							['string', 'use' => [CRegexValidator::class, []],
-								'when' => ['type', 'in' => [VALUEMAP_MAPPING_TYPE_REGEXP]]
-							]
-						],
-						'newvalue' => ['db valuemap_mapping.newvalue', 'required', 'not_empty']
-					]
-				]
-			]],
+			'valuemaps' => ['objects', 'fields' => CControllerValueMapCheck::getFieldsValidationRules()],
 			'clone' => ['integer', 'in' => [1]]
 		]];
 	}

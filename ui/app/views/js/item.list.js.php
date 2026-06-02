@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,18 +27,20 @@
 <script>
 	const view = new class {
 
-		init({context, confirm_messages, field_switches, form_name, hostid, token}) {
+		init({context, confirm_messages, field_switches, form_name, hostid, token, filter_values}) {
 			this.confirm_messages = confirm_messages;
 			this.token = token;
 			this.context = context;
 			this.hostid = hostid;
 
 			this.form = document.forms[form_name];
-			this.filter_form = document.querySelector('form[name="zbx_filter"]');
+			this.filter_form = document.querySelector('form[name="<?= CFilter::FORM_NAME; ?>"]');
 
 			this.initForm(field_switches);
 			this.initEvents();
 			this.#initPopupListeners();
+
+			this._init_filter_values = this.getInitFilterValues(filter_values);
 		}
 
 		initForm(field_switches) {
@@ -62,19 +64,53 @@
 				const target = e.target;
 
 				if (target.matches('.link-action') && target.closest('.subfilter') !== null) {
+					const filters = {...this._init_filter_values, subfilter_set: 1};
 					const subfilter = target.closest('.subfilter');
 
-					if (subfilter.matches('.subfilter-enabled')) {
-						subfilter.querySelector('input[type="hidden"]').remove();
-						this.filter_form.submit();
-					}
-					else {
-						const name = target.getAttribute('data-name');
-						const value = target.getAttribute('data-value');
+					const key_parts = [...target.getAttribute('data-name').matchAll(/[^\[\]]+|\[\]/g)];
 
-						subfilter.classList.add('subfilter-enabled');
-						submitFormWithParam('zbx_filter', name, value);
-					}
+					const update_filter = (current_filter, key_parts, i, value, remove) => {
+						const key_name = key_parts[i][0];
+
+						if (i == key_parts.length - 1) {
+							if (remove) {
+								current_filter.forEach((value, idx) => {
+									if (value == target.getAttribute('data-value')) {
+										delete current_filter[idx];
+									}
+								});
+							}
+							else {
+								current_filter.push(value);
+							}
+
+							return current_filter;
+						}
+						else {
+							if (!(key_name in current_filter)) {
+								current_filter[key_name] = [];
+							}
+
+							update_filter(current_filter[key_name], key_parts, i + 1, value, remove);
+
+							if (i == key_parts.length - 2) {
+								current_filter[key_name] = Object.values(current_filter[key_name]);
+							}
+							else {
+								current_filter[key_name] = Object.assign({}, current_filter[key_name]);
+							}
+
+							if (Object.values(current_filter[key_name]).length == 0) {
+								delete current_filter[key_name];
+							}
+						}
+					};
+
+					update_filter(filters, key_parts, 0, target.getAttribute('data-value'),
+						subfilter.matches('.subfilter-enabled')
+					);
+
+					location.href = zabbixUrl(filters);
 				}
 				else if (target.matches('[name="filter_state"]')) {
 					const disabled = e.target.getAttribute('value') != -1;
@@ -85,7 +121,42 @@
 				}
 			});
 
-			this.form.addEventListener('click', e => {
+			this.filter_form.addEventListener('submit', e => {
+				e.preventDefault();
+
+				const filters = {
+					...getFormFields(e.target),
+					filter_set: 1,
+					sort: this._init_filter_values.sort,
+					sortorder: this._init_filter_values.sortorder
+				};
+
+				Object.keys(filters).forEach(key => {
+					if (key.startsWith('subfilter_')) {
+						delete filters[key];
+					}
+				});
+
+				location.href = zabbixUrl(filters);
+			});
+
+			this.form.querySelectorAll('.list-table thead th a').forEach(link => {
+				link.addEventListener('click', e => {
+					e.preventDefault();
+
+					const search_params = new URLSearchParams(e.currentTarget.href);
+
+					const filters = {...this._init_filter_values,
+						subfilter_set: 1,
+						sort: search_params.get('sort'),
+						sortorder: search_params.get('sortorder')
+					};
+
+					location.href = zabbixUrl(filters);
+				});
+			});
+
+			this.form.addEventListener('click', (e) => {
 				const target = e.target;
 				const itemids = Object.keys(chkbxRange.getSelectedIds());
 
@@ -121,6 +192,17 @@
 			document.querySelector('.js-create-item')?.addEventListener('click', () => {
 				ZABBIX.PopupManager.open('item.edit', {hostid: this.hostid, context: this.context});
 			});
+		}
+
+		getInitFilterValues(filter_values) {
+			filter_values.action = 'item.list';
+			filter_values.context = this.context;
+
+			const clear_keys = ['filter_set', 'filter_rst', 'page', 'subfilter_set'];
+
+			clear_keys.forEach(key => delete filter_values[key]);
+
+			return filter_values;
 		}
 
 		executeNow(target, data) {
@@ -256,7 +338,6 @@
 
 						url.searchParams.set('action', 'item.list');
 						url.searchParams.set('context', this.context);
-						url.searchParams.set('filter_set', 1);
 
 						event.setRedirectUrl(url.href);
 					}
@@ -289,7 +370,6 @@
 
 					list_url.setArgument('action', 'item.list');
 					list_url.setArgument('context', this.context);
-					list_url.setArgument('filter_set', 1);
 					new_href = list_url.getUrl();
 				}
 			}

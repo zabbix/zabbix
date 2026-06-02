@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -199,7 +199,12 @@ void	zbx_deinit_library_export(void)
 
 static int	open_export_file(zbx_export_file_t *file, char **error)
 {
-	if (NULL == (file->file = fopen(file->name, "a")))
+	mode_t	old_umask = umask(0026);
+
+	file->file = fopen(file->name, "a");
+	umask(old_umask);
+
+	if (NULL == (file->file))
 	{
 		*error = zbx_dsprintf(*error, "cannot open export file '%s': %s", file->name, zbx_strerror(errno));
 		return FAIL;
@@ -218,7 +223,7 @@ static zbx_export_file_t	*export_init(const char *process_type, const char *proc
 	if (NULL == config_export)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "export library is not initialized");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	export_dir = zbx_strdup(NULL, config_export->dir);
@@ -239,7 +244,7 @@ static zbx_export_file_t	*export_init(const char *process_type, const char *proc
 	if (FAIL == open_export_file(file, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "%s", error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	file->missing = 0;
@@ -290,7 +295,7 @@ static void	export_write(const char *buf, size_t count, zbx_export_file_t *file)
 	if (NULL == config_export)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "export library is not initialized");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (0 == file->missing && 0 != access(file->name, F_OK))

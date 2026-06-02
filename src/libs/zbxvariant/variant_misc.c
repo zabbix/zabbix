@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -58,6 +58,7 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 			ret = zbx_variant_convert(value, ZBX_VARIANT_STR);
 			break;
 		case ITEM_VALUE_TYPE_NONE:

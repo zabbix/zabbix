@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -86,16 +86,6 @@ function get_trigger_by_triggerid($triggerid) {
 	error(_s('No trigger with trigger ID "%1$s".', $triggerid));
 
 	return false;
-}
-
-function get_triggers_by_hostid($hostid) {
-	return DBselect(
-		'SELECT DISTINCT t.*'.
-		' FROM triggers t,functions f,items i'.
-		' WHERE i.hostid='.zbx_dbstr($hostid).
-			' AND f.itemid=i.itemid'.
-			' AND f.triggerid=t.triggerid'
-	);
 }
 
 /**
@@ -642,7 +632,8 @@ function analyzeExpression(string $expression, int $type, ?string &$error = null
 		return false;
 	}
 
-	$expression_tree[] = getExpressionTree($expression_parser, 0, $expression_parser->getLength() - 1);
+	$tokens = array_column($expression_parser->getResult()->getTokens(), null, 'pos');
+	$expression_tree[] = getExpressionTree($expression, $tokens, 0, $expression_parser->getLength() - 1);
 
 	$next = [];
 	$letter_num = 0;
@@ -856,15 +847,31 @@ function expressionLevelDraw(array $next, $level) {
  *     ]
  *   ]
  *
- * @param CExpressionParser $expression_parser
- * @param int $start
- * @param int $end
+ * @param string $expression
+ * @param array  $tokens      An array of tokens indexed by position (pos).
+ * @param int    $start
+ * @param int    $end
  *
  * @return array
  */
-function getExpressionTree(CExpressionParser $expression_parser, int $start, int $end) {
-	$tokens = array_column($expression_parser->getResult()->getTokens(), null, 'pos');
-	$expression = $expression_parser->getMatch();
+function getExpressionTree(string $expression, array $tokens, int $start, int $end, int $calls = 0) {
+	if ($calls > 25) {
+		$openSymbolNum = $start;
+		while (strpos(CExpressionParser::WHITESPACES, $expression[$openSymbolNum]) !== false) {
+			$openSymbolNum++;
+		}
+
+		$closeSymbolNum = $end;
+		while (strpos(CExpressionParser::WHITESPACES, $expression[$closeSymbolNum]) !== false) {
+			$closeSymbolNum--;
+		}
+
+		return [
+			'id' => $start.'_'.$end,
+			'expression' => substr($expression, $openSymbolNum, $closeSymbolNum - $openSymbolNum + 1),
+			'type' => 'expression'
+		];
+	}
 
 	$expressionTree = [];
 	foreach (['or', 'and'] as $operator) {
@@ -878,7 +885,7 @@ function getExpressionTree(CExpressionParser $expression_parser, int $start, int
 			$openSymbolNum++;
 		}
 
-		for ($i = $openSymbolNum, $level = 0; $i <= $end; $i++) {
+		for ($i = $openSymbolNum, $level = 0; $i <= $end && $calls <= 25; $i++) {
 			if (array_key_exists($i, $tokens)) {
 				switch ($tokens[$i]['type']) {
 					case CExpressionParserResult::TOKEN_TYPE_OPEN_BRACE:
@@ -909,7 +916,9 @@ function getExpressionTree(CExpressionParser $expression_parser, int $start, int
 								$closeSymbolNum--;
 							}
 
-							$expressions[] = getExpressionTree($expression_parser, $openSymbolNum, $closeSymbolNum);
+							$expressions[] = getExpressionTree($expression, $tokens, $openSymbolNum, $closeSymbolNum,
+								++$calls
+							);
 							$openSymbolNum = $i + $tokens[$i]['length'];
 							$operatorFound = true;
 						}
@@ -930,7 +939,7 @@ function getExpressionTree(CExpressionParser $expression_parser, int $start, int
 		 * expression on the right.
 		 */
 		if ($operatorFound) {
-			$expressions[] = getExpressionTree($expression_parser, $openSymbolNum, $closeSymbolNum);
+			$expressions[] = getExpressionTree($expression, $tokens, $openSymbolNum, $closeSymbolNum, ++$calls);
 
 			// Trim blank symbols in the beginning of the trigger expression.
 			$openSymbolNum = $start;
@@ -960,7 +969,7 @@ function getExpressionTree(CExpressionParser $expression_parser, int $start, int
 				$openSymbolNum++;
 				$closeSymbolNum--;
 
-				$expressionTree = getExpressionTree($expression_parser, $openSymbolNum, $closeSymbolNum);
+				$expressionTree = getExpressionTree($expression, $tokens, $openSymbolNum, $closeSymbolNum, ++$calls);
 			}
 			// No extra parentheses remain, return the result.
 			else {
@@ -1009,7 +1018,8 @@ function remakeExpression($expression, $expression_id, $action, $new_expression,
 		return false;
 	}
 
-	$expression_tree[] = getExpressionTree($expression_parser, 0, $expression_parser->getLength() - 1);
+	$tokens = array_column($expression_parser->getResult()->getTokens(), null, 'pos');
+	$expression_tree[] = getExpressionTree($expression, $tokens, 0, $expression_parser->getLength() - 1);
 
 	if (rebuildExpressionTree($expression_tree, $expression_id, $action, $new_expression)) {
 		$expression = makeExpression($expression_tree);

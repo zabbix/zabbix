@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -49,7 +49,6 @@ $autoloader->addNamespace('', [
 	__DIR__.'/../../include/classes/parsers',
 	__DIR__.'/../../include/classes/parsers/results',
 	__DIR__.'/../../include/classes/validators',
-	__DIR__.'/../../include/classes/validators/action',
 	__DIR__.'/../../include/classes/validators/object',
 	__DIR__.'/../../include/classes/triggers',
 	__DIR__.'/../../include/classes/import',

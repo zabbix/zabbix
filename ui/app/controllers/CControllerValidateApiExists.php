@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,10 +23,10 @@ class CControllerValidateApiExists extends CController {
 	}
 
 	public static function getValidationRules(): array {
-		$api_services = ['dashboard', 'discoveryrule', 'discoveryruleprototype', 'host', 'hostgroup', 'hostprototype',
-			'httptest', 'image', 'iconmap', 'item', 'itemprototype', 'maintenance', 'mediatype', 'proxy', 'proxygroup',
-			'report', 'regexp', 'role', 'service', 'sla', 'template', 'templatedashboard', 'templategroup', 'token',
-			'user', 'usergroup', 'usermacro'
+		$api_services = ['host', 'template', 'item', 'itemprototype', 'discoveryrule', 'discoveryruleprototype',
+			'hostgroup', 'templategroup', 'iconmap', 'image', 'mediatype', 'proxy', 'proxygroup', 'regexp', 'sla',
+			'token', 'user', 'role', 'usergroup', 'hostprototype', 'maintenance', 'connector', 'correlation',
+			'graph', 'graphprototype', 'report', 'script'
 		];
 
 		return ['object', 'fields' => [
@@ -34,8 +34,43 @@ class CControllerValidateApiExists extends CController {
 				'api' => ['string', 'required', 'in' => $api_services],
 				'method' => ['string', 'required', 'in' => ['get']],
 				'field' => ['string', 'required'],
-				'options' => ['array'],
-				'exclude_id' => ['integer'],
+				'options' => ['object', 'required', 'fields' => [
+					'filter' => [
+						['object', 'fields' => [
+							'name' => ['string'],
+							'host' => ['string']
+						], 'when' => ['../api', 'in' => ['host', 'template', 'hostprototype']]],
+						['object', 'fields' => [
+							'key_' => ['string', 'required', 'not_empty'],
+							'hostid' => ['id', 'required']
+						], 'when' => ['../api', 'in' => ['item', 'itemprototype', 'discoveryrule',
+							'discoveryruleprototype'
+						]]],
+						['object', 'fields' => [
+							'name' => ['string', 'required', 'not_empty'],
+							'hostid' => ['id', 'required']
+						], 'when' => ['../api', 'in' => ['graph', 'graphprototype']]],
+						['object', 'fields' => [
+							'name' => ['string', 'required', 'not_empty'],
+							'userid' => ['id', 'required']
+						], 'when' => ['../api', 'in' => ['token']]],
+						['object', 'fields' => [
+							'name' => ['string', 'required', 'not_empty'],
+							'menu_path' => ['string']
+						], 'when' => ['../api', 'in' => ['script']]],
+						['object', 'fields' => [
+							'name' => ['string', 'required', 'not_empty']
+						], 'when' => ['../api', 'in' => ['hostgroup', 'templategroup', 'iconmap', 'image', 'mediatype',
+							'proxy', 'proxygroup', 'regexp', 'sla', 'role', 'maintenance', 'connector', 'correlation',
+							'usergroup', 'report'
+						]]],
+						['object', 'fields' => [
+							'username' => ['string', 'required', 'not_empty']
+						], 'when' => ['../api', 'in' => ['user']]]
+					],
+					'discoveryids' => ['id', 'required', 'when' => ['../api', 'in' => ['hostprototype']]]
+				]],
+				'exclude_id' => ['id'],
 				'error_msg' => ['string']
 			]]
 		]];
@@ -68,13 +103,15 @@ class CControllerValidateApiExists extends CController {
 		try {
 			foreach ($this->getInput('validations') as $validation) {
 				$object_exists = CFormValidator::existsAPIObject($validation['api'], $validation['options'],
-					array_key_exists('exclude_id', $validation) ? $validation['exclude_id'] : null);
+					array_key_exists('exclude_id', $validation) ? $validation['exclude_id'] : null
+				);
 
 				if ($object_exists) {
 					$errors[] = [
 						'field' => $validation['field'],
-						'message' => array_key_exists('error_msg', $validation) ? $validation['error_msg']:
-							_('This object already exists.')
+						'message' => array_key_exists('error_msg', $validation)
+							? $validation['error_msg']
+							: _('This object already exists.')
 					];
 				}
 			}

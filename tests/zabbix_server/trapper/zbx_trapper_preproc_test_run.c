@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -56,7 +56,7 @@ int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, co
 	else
 		zbx_variant_set_error(&value_in, zbx_strdup(NULL, value));
 
-	preproc = zbx_pp_item_preproc_create(0, ITEM_TYPE_TRAPPER, value_type, 0);
+	preproc = zbx_pp_item_preproc_create(0, value_type, 0);
 
 	preproc->steps = zbx_malloc(NULL, (size_t)steps->values_num * sizeof(zbx_pp_step_t));
 	for (i = 0; i < steps->values_num; i++)

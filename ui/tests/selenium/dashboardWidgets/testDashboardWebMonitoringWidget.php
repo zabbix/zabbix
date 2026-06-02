@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -201,7 +201,7 @@ class testDashboardWebMonitoringWidget extends testWidgets {
 
 				if ($title === 'Dashboard') {
 					$form->checkValue([$label => 'Dashboard']);
-					$this->assertTrue($selector->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
+					$this->assertTrue($selector->query('xpath:.//span[@data-hintbox-html="Dashboard is used as data source."]')
 							->one()->isVisible()
 					);
 				}

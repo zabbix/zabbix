@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -96,8 +96,9 @@ $tags = (new CTable())
 $tag_template = (new CTemplateTag('tag-row-tmpl'))
 	->addItem(
 		(new CRow([
-			(new CTextBox('tags[#{rowNum}][tag]', '#{tag}', false, DB::getFieldLength('maintenance_tag', 'tag')))
+			(new CTextAreaFlexible('tags[#{rowNum}][tag]', '#{tag}'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setMaxlength(DB::getFieldLength('maintenance_tag', 'tag'))
 				->setAttribute('placeholder', _('tag'))
 				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
 				->setErrorContainer('tags_#{rowNum}_error_container')
@@ -109,8 +110,9 @@ $tag_template = (new CTemplateTag('tag-row-tmpl'))
 				->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
 				->setModern()
 				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL),
-			(new CTextBox('tags[#{rowNum}][value]', '#{value}', false, DB::getFieldLength('maintenance_tag', 'value')))
+			(new CTextAreaFlexible('tags[#{rowNum}][value]', '#{value}'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setMaxlength(DB::getFieldLength('maintenance_tag', 'value'))
 				->setAttribute('placeholder',  _('value'))
 				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
 				->setErrorContainer('tags_#{rowNum}_error_container')
@@ -134,9 +136,10 @@ $form->addItem(
 		->addItem([
 			(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('name', $data['name'], false, DB::getFieldLength('maintenances', 'name')))
+				(new CTextAreaFlexible('name', $data['name']))
 					->setAttribute('autofocus', 'autofocus')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setMaxlength(DB::getFieldLength('maintenances', 'name'))
 					->setAriaRequired()
 					->setReadonly(!$data['allowed_edit'])
 			)
@@ -243,46 +246,24 @@ if ($data['maintenanceid'] !== null) {
 	$buttons = [
 		[
 			'title' => _('Update'),
-			'class' => 'js-update',
+			'class' => 'js-submit',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'enabled' => $data['allowed_edit'],
-			'action' => 'maintenance_edit.submit();'
+			'enabled' => $data['allowed_edit']
 		],
 		[
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'enabled' => $data['allowed_edit'],
-			'action' => 'maintenance_edit.clone('.json_encode([
-				'rules' => $data['js_clone_validation_rules'],
-				'title' => _('New maintenance period'),
-				'buttons' => [
-					[
-						'title' => _('Add'),
-						'class' => 'js-add',
-						'keepOpen' => true,
-						'isSubmit' => true,
-						'action' => 'maintenance_edit.submit();'
-					],
-					[
-						'title' => _('Cancel'),
-						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
-						'cancel' => true,
-						'action' => ''
-					]
-				]
-			]).');'
+			'enabled' => $data['allowed_edit']
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete maintenance period?'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'enabled' => $data['allowed_edit'],
-			'action' => 'maintenance_edit.delete();'
+			'enabled' => $data['allowed_edit']
 		]
 	];
 }
@@ -291,10 +272,9 @@ else {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => 'js-add',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'maintenance_edit.submit();'
+			'isSubmit' => true
 		]
 	];
 }
@@ -308,10 +288,11 @@ $output = [
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('maintenance.edit.js.php').
 		'maintenance_edit.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'clone_rules' => $data['js_clone_validation_rules'],
 			'timeperiods' => $data['timeperiods'],
 			'tags' => $data['tags'],
-			'allowed_edit' => $data['allowed_edit'],
-			'rules' => $data['js_validation_rules']
+			'allowed_edit' => $data['allowed_edit']
 		]).');'
 ];
 

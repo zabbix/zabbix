@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,6 +23,7 @@ use CController,
 	CWidgetsData;
 
 use Widgets\TopItems\Includes\CWidgetFieldColumnsList;
+use Widgets\TopItems\Widget;
 use Zabbix\Widgets\CWidgetField;
 
 use Zabbix\Widgets\Fields\{
@@ -40,24 +41,27 @@ class ColumnEdit extends CController {
 	protected function checkInput(): bool {
 		// Validation is done by CWidgetFieldColumnsList
 		$fields = [
-			'items' =>					'array',
-			'item_tags_evaltype' =>		'int32',
-			'item_tags' =>				'array',
-			'base_color' =>				'string',
-			'display_value_as' =>		'int32',
-			'display' =>				'int32',
-			'sparkline' =>				'array',
-			'min' =>					'string',
-			'max' =>					'string',
-			'thresholds' =>				'array',
-			'highlights' =>				'array',
-			'decimal_places' =>			'string',
-			'aggregate_function' =>		'int32',
-			'time_period' =>			'array',
-			'history' =>				'int32',
-			'edit' =>					'in 1',
-			'update' =>					'in 1',
-			'templateid' =>				'string'
+			'items' =>						'array',
+			'item_tags_evaltype' =>			'int32',
+			'item_tags' =>					'array',
+			'base_color' =>					'string',
+			'display_value_as' =>			'int32',
+			'display' =>					'int32',
+			'sparkline' =>					'array',
+			'min' =>						'string',
+			'max' =>						'string',
+			'thresholds' =>					'array',
+			'highlights' =>					'array',
+			'decimal_places' =>				'string',
+			'aggregate_function' =>			'int32',
+			'time_period' =>				'array',
+			'history' =>					'int32',
+			'aggregate_columns' =>			'int32',
+			'column_aggregate_function' =>	'int32',
+			'combined_column_name' =>		'string',
+			'edit' =>						'in 1',
+			'update' =>						'in 1',
+			'templateid' =>					'string'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateFields();
@@ -84,7 +88,7 @@ class ColumnEdit extends CController {
 
 		$field = new CWidgetFieldColumnsList('columns', '');
 
-		if (!$this->hasInput('edit') && !$this->hasInput('update')) {
+		if (!$this->hasInput('edit')) {
 			$input += self::getColumnDefaults();
 			$input['sparkline'] = array_replace(CWidgetFieldColumnsList::SPARKLINE_DEFAULT, $input['sparkline']);
 		}
@@ -145,36 +149,8 @@ class ColumnEdit extends CController {
 			$this->setResponse(new CControllerResponseData($data));
 		}
 		else {
-			$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
-
-			$thresholds = [];
-
 			if (array_key_exists('thresholds', $input)) {
-				foreach ($input['thresholds'] as $threshold) {
-					$order_threshold = trim($threshold['threshold']);
-
-					if ($order_threshold !== '' && $number_parser->parse($order_threshold) == CParser::PARSE_SUCCESS) {
-						$thresholds[] = $threshold + ['order_threshold' => $number_parser->calcValue()];
-					}
-				}
-
-				unset($input['thresholds']);
-			}
-
-			if ($thresholds) {
-				uasort($thresholds,
-					static function (array $threshold_1, array $threshold_2): int {
-						return $threshold_1['order_threshold'] <=> $threshold_2['order_threshold'];
-					}
-				);
-
-				$input['thresholds'] = [];
-
-				foreach ($thresholds as $threshold) {
-					unset($threshold['order_threshold']);
-
-					$input['thresholds'][] = $threshold;
-				}
+				$input['thresholds'] = array_values(filterAndSortThresholds($input['thresholds']));
 			}
 
 			$this->setResponse(
@@ -206,7 +182,10 @@ class ColumnEdit extends CController {
 						CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
 					)
 				],
-				'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO
+				'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
+				'aggregate_columns' => 0,
+				'column_aggregate_function' => AGGREGATE_SUM,
+				'combined_column_name' => ''
 			];
 		}
 

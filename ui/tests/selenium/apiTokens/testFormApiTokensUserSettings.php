@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -71,7 +71,7 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 						'Name' => '',
 						'Set expiration date and time' => false
 					],
-					'error_details' => 'Incorrect value for field "name": cannot be empty.'
+					'error' => ['Name' => 'This field cannot be empty.']
 				]
 			],
 			// Empty spaces used as name.
@@ -82,7 +82,7 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 						'Name' => '   ',
 						'Set expiration date and time' => false
 					],
-					'error_details' => 'Incorrect value for field "name": cannot be empty.'
+					'error' => ['Name' => 'This field cannot be empty.']
 				]
 			],
 			// Empty "Expires at" field if "Set expiration date and time" is true.
@@ -94,7 +94,7 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 						'Set expiration date and time' => true,
 						'Expires at' => ''
 					],
-					'error_details' => 'Incorrect value for field "expires_at": a time is expected.'
+					'error' => ['id:expires_at' => 'This field cannot be empty.']
 				]
 			],
 			// Incorrect "Expires at" field format.
@@ -106,7 +106,7 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 						'Set expiration date and time' => true,
 						'Expires at' => '01-01-2021 00:00:00'
 					],
-					'error_details' => 'Incorrect value for field "expires_at": a time is expected.'
+					'error' => ['id:expires_at' => 'Invalid date.']
 				]
 			],
 			// "Expires at" field value too far in the future.
@@ -118,7 +118,7 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 						'Set expiration date and time' => true,
 						'Expires at' => '2050-01-01 00:00:00'
 					],
-					'error_details' => 'Invalid parameter "/1/expires_at": a number is too large.'
+					'error' => ['id:expires_at' => 'Value must be less than or equal to 2038-01-19 05:14:07.']
 				]
 			],
 			// "Expires at" field value too far in the past.
@@ -130,7 +130,7 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 						'Set expiration date and time' => true,
 						'Expires at' => '1021-01-01 00:00:00'
 					],
-					'error_details' => 'Invalid parameter "/1/expires_at": a number is too large.'
+					'error' => ['id:expires_at' => 'Invalid date.']
 				]
 			],
 			// Correct format but wrong numbers in the "Expires at" field.
@@ -142,7 +142,7 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 						'Set expiration date and time' => true,
 						'Expires at' => '2021-01-01 24:00:00'
 					],
-					'error_details' => 'Incorrect value for field "expires_at": a time is expected.'
+					'error' => ['id:expires_at' => 'Invalid date.']
 				]
 			],
 			// Correct format but wrong numbers in the "Expires at" field.
@@ -154,7 +154,7 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 						'Set expiration date and time' => true,
 						'Expires at' => '2021-01-01 24:00:00'
 					],
-					'error_details' => 'Incorrect value for field "expires_at": a time is expected.'
+					'error' => ['id:expires_at' => 'Invalid date.']
 				]
 			],
 			// API token with special symbols in name and without an expiry date.
@@ -175,7 +175,7 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 						'Name' => 'Expired API token',
 						'Description' => 'Token that is already expired when created',
 						'Set expiration date and time' => true,
-						'Expires at' => '1970-01-01 00:00:00',
+						'Expires at' => '1970-01-02 00:00:00',
 						'Enabled' => true
 					],
 					'already_expired' => true

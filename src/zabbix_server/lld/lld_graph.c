@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -928,17 +928,22 @@ static void	lld_graphs_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_
 }
 
 static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char **field_orig, zbx_uint64_t flag,
-		size_t field_len, char **error)
+		size_t field_len, int dflags, char **error)
 {
+	const char	*kind = "";
+
 	/* only new graphs or graphs with changed data will be validated */
 	if (0 != graph->graphid && 0 == (graph->flags & flag))
 		return;
 
+	if (0 != (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		kind = " prototype";
+
 	if (SUCCEED != zbx_is_utf8(*field))
 	{
 		zbx_replace_invalid_utf8(*field);
-		*error = zbx_strdcatf(*error, "Cannot %s graph \"%s\": value \"%s\" has invalid UTF-8 sequence.\n",
-				(0 != graph->graphid ? "update" : "create"), graph->name, *field);
+		*error = zbx_strdcatf(*error, "Cannot %s graph%s \"%s\": value \"%s\" has invalid UTF-8 sequence.\n",
+				(0 != graph->graphid ? "update" : "create"), kind, graph->name, *field);
 	}
 	else if (zbx_strlen_utf8(*field) > field_len)
 	{
@@ -948,19 +953,25 @@ static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char 
 
 		if (0 != (flag & ZBX_FLAG_LLD_GRAPH_UPDATE_NAME))
 		{
-			*error = zbx_strdcatf(*error, "Cannot %s graph \"%s\": name is too long.\n",
-					(0 != graph->graphid ? "update" : "create"), value_short);
+			*error = zbx_strdcatf(*error, "Cannot %s graph%s \"%s\": name is too long.\n",
+					(0 != graph->graphid ? "update" : "create"), kind, value_short);
 		}
 		else
 		{
-			*error = zbx_strdcatf(*error, "Cannot %s graph \"%s\": value \"%s\" is too long.\n",
-					(0 != graph->graphid ? "update" : "create"), graph->name, value_short);
+			*error = zbx_strdcatf(*error, "Cannot %s graph%s \"%s\": value \"%s\" is too long.\n",
+					(0 != graph->graphid ? "update" : "create"), kind, graph->name, value_short);
 		}
 	}
 	else if (ZBX_FLAG_LLD_GRAPH_UPDATE_NAME == flag && '\0' == **field)
 	{
-		*error = zbx_strdcatf(*error, "Cannot %s graph: name is empty.\n",
-				(0 != graph->graphid ? "update" : "create"));
+		*error = zbx_strdcatf(*error, "Cannot %s graph%s: name is empty.\n",
+				(0 != graph->graphid ? "update" : "create"), kind);
+	}
+	else if (ZBX_FLAG_LLD_GRAPH_UPDATE_NAME == flag && 0 != (dflags & ZBX_FLAG_DISCOVERY_PROTOTYPE) &&
+			SUCCEED != lld_text_has_lld_macro(graph->name))
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s graph%s \"%s\": name does not contain LLD macro(s).\n",
+				(0 != graph->graphid ? "update" : "create"), kind, graph->name);
 	}
 	else
 		return;
@@ -1059,10 +1070,11 @@ out:
  *                                                                            *
  * Parameters: hostid - [IN]                                                  *
  *             graphs - [IN] sorted list of graphs                            *
+ *             dflags - [IN] discovery flags                                  *
  *             error  - [OUT]                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t *graphs, char **error)
+static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t *graphs, int dflags, char **error)
 {
 	zbx_lld_graph_t		*graph;
 	zbx_hashset_t		name_index;
@@ -1082,7 +1094,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 			continue;
 
 		lld_validate_graph_field(graph, &graph->name, &graph->name_orig,
-				ZBX_FLAG_LLD_GRAPH_UPDATE_NAME, ZBX_GRAPH_NAME_LEN, error);
+				ZBX_FLAG_LLD_GRAPH_UPDATE_NAME, ZBX_GRAPH_NAME_LEN, dflags, error);
 
 		/* index existing graphs without pending name updates */
 		if (0 != graph->graphid && 0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_NAME))
@@ -1640,7 +1652,7 @@ static void	lld_process_lost_graphs(zbx_vector_lld_graph_ptr_t *graphs, const zb
  ******************************************************************************/
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
 		char **error, const zbx_lld_lifetime_t *lifetime, int lastcheck, int dflags,
-		const zbx_vector_uint64_t *ruleids)
+		const zbx_vector_uint64_t *ruleids, int auditlog_enabled, int auditlog_mode)
 {
 	int				ret = SUCCEED;
 	zbx_db_result_t			result;
@@ -1655,6 +1667,8 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 							/* updated by the graph prototype */
 	zbx_vector_lld_gitem_ptr_create(&gitems_proto);	/* list of graphs_items which are used by the graph prototype */
 	zbx_vector_lld_item_ptr_create(&items);		/* list of items which are related to the graph prototype */
+
+	zbx_audit_init(auditlog_enabled, auditlog_mode, ZBX_AUDIT_LLD_CONTEXT);
 
 	result = zbx_db_select(
 			"select distinct g.graphid,g.name,g.width,g.height,g.yaxismin,g.yaxismax,g.show_work_period,"
@@ -1707,7 +1721,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		lld_graphs_make(&gitems_proto, &graphs, &items, name_proto, ymin_itemid_proto, ymax_itemid_proto,
 				discover_proto, lastcheck, lld_rows, dflags);
 
-		lld_graphs_validate(hostid, &graphs, error);
+		lld_graphs_validate(hostid, &graphs, dflags, error);
 
 		ret = lld_graphs_save(hostid, parent_graphid, &graphs, width, height, yaxismin, yaxismax,
 				show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left,
@@ -1721,6 +1735,8 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		lld_graphs_free(&graphs);
 	}
 	zbx_db_free_result(result);
+
+	zbx_audit_flush(ZBX_AUDIT_LLD_CONTEXT);
 
 	zbx_vector_lld_item_ptr_destroy(&items);
 	zbx_vector_lld_gitem_ptr_destroy(&gitems_proto);

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,6 +18,7 @@
 #include "zbxcomms.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxip.h"
 
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)
@@ -29,7 +30,7 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 	*value_int = 0;
 
 	if (SUCCEED != (net = zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), host, port, timeout,
-			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
+			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL, ZBX_DNS_FAILOVER_DISABLED)))
 	{
 		goto out;
 	}
@@ -86,9 +87,19 @@ int	net_tcp_port(AGENT_REQUEST *request, AGENT_RESULT *result)
 	port_str = get_rparam(request, 1);
 
 	if (NULL == ip_str || '\0' == *ip_str)
+	{
 		zbx_strscpy(ip, "127.0.0.1");
+	}
 	else
+	{
+		if (FAIL == zbx_is_ip(ip_str) && FAIL == zbx_is_rfc_extended_hostname(ip_str))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return SYSINFO_RET_FAIL;
+		}
+
 		zbx_strscpy(ip, ip_str);
+	}
 
 	if (NULL == port_str || SUCCEED != zbx_is_ushort(port_str, &port))
 	{

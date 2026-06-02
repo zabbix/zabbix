@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -104,7 +104,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'groupids' => $filter_groupids,
 				'hostids' => $this->fields_values['hostids'] ?: null,
 				'evaltype' => $this->fields_values['evaltype'],
-				'tags' => $this->fields_values['tags'],
+				'tags' => $this->fields_values['tags'] ?: null,
+				'inheritedTags' => true,
 				'filter' => [
 					'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
 				],

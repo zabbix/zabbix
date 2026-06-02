@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -50,8 +50,9 @@ class CIconMap extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['icon_map' => 'im.iconmapid'],
-			'from'		=> ['icon_map' => 'icon_map im'],
+			'from'		=> 'icon_map im',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];
@@ -95,9 +96,8 @@ class CIconMap extends CApiService {
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
 
-			$sqlParts['from']['sysmaps'] = 'sysmaps s';
+			$sqlParts['join']['s'] = ['table' => 'sysmaps', 'using' => 'iconmapid'];
 			$sqlParts['where'][] = dbConditionInt('s.sysmapid', $options['sysmapids']);
-			$sqlParts['where']['ims'] = 'im.iconmapid=s.iconmapid';
 		}
 
 		// filter
@@ -491,7 +491,6 @@ class CIconMap extends CApiService {
 
 		self::validateDelete($iconmapids, $db_iconmaps);
 
-		DB::delete('icon_mapping', ['iconmapid' => $iconmapids]);
 		DB::delete('icon_map', ['iconmapid' => $iconmapids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_ICON_MAP, $db_iconmaps);

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -41,6 +41,13 @@ typedef enum
 }
 zbx_dbconn_type_t;
 
+typedef enum
+{
+	DBCONN_MODE_DEFAULT,
+	DBCONN_MODE_DEFERRED_BEGIN
+}
+zbx_dbconn_mode_t;
+
 struct zbx_dbconn
 {
 	int			txn_level;	/* transaction level, nested transactions are not supported */
@@ -56,7 +63,7 @@ struct zbx_dbconn
 	int			connect_options;
 
 	zbx_dbconn_type_t	managed;	/* managed by connection pool */
-
+	zbx_dbconn_mode_t	mode;
 	const zbx_db_config_t	*config;
 
 	double			last_used;	/* last time the connection was used */
@@ -88,12 +95,6 @@ int	db_is_escape_sequence(char c);
 zbx_uint32_t	db_get_server_version(void);
 
 void	dbconn_pool_sync_info(zbx_dbconn_pool_stats_t *stats, zbx_dbconn_pool_config_t *cfg);
-
-/* connection pool settings */
-#define ZBX_SETTINGS_DBPOOL			"dbpool_"
-#define ZBX_SETTINGS_DBPOOL_MAX_IDLE		ZBX_SETTINGS_DBPOOL "max_idle"
-#define ZBX_SETTINGS_DBPOOL_MAX_OPEN		ZBX_SETTINGS_DBPOOL "max_open"
-#define ZBX_SETTINGS_DBPOOL_IDLE_TIMEOUT	ZBX_SETTINGS_DBPOOL "idle_timeout"
 
 #endif
 

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -908,7 +908,7 @@ class testProxyConfSync extends CIntegrationTest
 
 		$sync_lines1 = preg_replace(
 			[
-				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ zbx_dc_sync_configuration\(\) /",
+				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ \[configuration syncer #1\] zbx_dc_sync_configuration\(\) /",
 				"/\s+/",
 				"/-?[0-9]+bytes/",
 				"/:sql:[0-9]+\.[0-9]+sync:[0-9]+\.[0-9]+sec/",

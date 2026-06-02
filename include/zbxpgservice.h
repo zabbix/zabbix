@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -30,7 +30,7 @@
 #define ZBX_IPC_PGM_PROXY_RTDATA		6
 #define ZBX_IPC_PGM_GET_ALL_PGROUP_RTDATA	7
 #define ZBX_IPC_PGM_ALL_PGROUP_RTDATA		8
-#define ZBX_IPC_PGM_STOP			100
+#define ZBX_IPC_PGM_STOP			9
 
 #define ZBX_PROXY_SYNC_NONE	0
 #define ZBX_PROXY_SYNC_FULL	1
@@ -70,5 +70,6 @@ void	zbx_pg_update_object_relocations(zbx_uint32_t code, zbx_vector_objmove_t *u
 int	zbx_pg_get_stats(const char *pg_name, zbx_pg_stats_t *pg_stats, char **error);
 int	zbx_pg_get_all_rtdata(zbx_hashset_t *pgroups_rtdata, char **error);
 void	zbx_pg_update_proxy_rtdata(zbx_uint64_t proxyid, int lastaccess, int version);
+int	zbx_pg_stop(char **error);
 
 #endif

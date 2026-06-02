@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -80,9 +80,12 @@ if (array_key_exists('problems', $data)) {
 	$today = strtotime('today');
 
 	if ($data['problems'] && $data['show_tags'] != SHOW_TAGS_NONE) {
-		$tags = makeTags($data['problems'], true, 'eventid', $data['show_tags'], $data['filter_tags'], null,
-			$data['tag_name_format'], $data['tag_priority']
-		);
+		$tags = CTagHelper::getTagsHtml($data['problems'], ZBX_TAG_OBJECT_EVENT, [
+			'filter_tags' => $data['filter_tags'],
+			'tag_priority' => $data['tag_priority'],
+			'show_tags_limit' => $data['show_tags'],
+			'tag_name_format' => $data['tag_name_format']
+		]);
 	}
 
 	$url_details = $data['allowed_ui_problems']
@@ -193,7 +196,7 @@ if (array_key_exists('problems', $data)) {
 			))
 				->addClass(ZBX_STYLE_NOWRAP),
 			$problem_update_link,
-			($data['show_tags'] != SHOW_TAGS_NONE) ? $tags[$problem['eventid']] : null
+			($data['show_tags'] != SHOW_TAGS_NONE) ? (new CDiv($tags[$problem['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER) : null
 		]));
 	}
 

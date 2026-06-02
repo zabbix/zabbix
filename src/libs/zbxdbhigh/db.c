@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,19 +16,12 @@
 
 #include "zbxcrypto.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
 #include "zbx_host_constants.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 
 #define ZBX_DB_WAIT_DOWN	10
-
-#define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
-#ifndef ZBX_MAX_OVERFLOW_SQL_SIZE
-#	define ZBX_MAX_OVERFLOW_SQL_SIZE	ZBX_MAX_SQL_SIZE
-#elif 0 != ZBX_MAX_OVERFLOW_SQL_SIZE && \
-	(1024 > ZBX_MAX_OVERFLOW_SQL_SIZE || ZBX_MAX_OVERFLOW_SQL_SIZE > ZBX_MAX_SQL_SIZE)
-#error ZBX_MAX_OVERFLOW_SQL_SIZE is out of range
-#endif
 
 #ifdef HAVE_MULTIROW_INSERT
 #	define ZBX_ROW_DL	","
@@ -573,9 +566,11 @@ int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __func__, sessionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __func__, ZBX_STRMASK(sessionid));
 
 	sessionid_esc = zbx_db_dyn_escape_string(sessionid);
+
+	zbx_db_query_mask_t	old_queries = zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
 
 	if (NULL == (result = zbx_db_select(
 			"select u.userid,u.roleid,u.username,r.type"
@@ -601,6 +596,7 @@ int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user)
 out:
 	zbx_db_free_result(result);
 	zbx_free(sessionid_esc);
+	zbx_db_set_log_masked_values(old_queries);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

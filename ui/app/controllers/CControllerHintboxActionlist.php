@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -36,7 +36,7 @@ class CControllerHintboxActionlist extends CController {
 			$events = API::Event()->get([
 				'output' => ['eventid', 'r_eventid', 'clock'],
 				'selectAcknowledges' => ['userid', 'action', 'message', 'clock', 'new_severity', 'old_severity',
-					'suppress_until'
+					'suppress_until', 'maintenanceid'
 				],
 				'eventids' => (array) $this->getInput('eventid')
 			]);
@@ -86,10 +86,19 @@ class CControllerHintboxActionlist extends CController {
 			])
 			: [];
 
+		$maintenances = $actions['maintenanceids']
+			? API::Maintenance()->get([
+				'output' => ['name'],
+				'maintenanceids' => array_keys($actions['maintenanceids']),
+				'preservekeys' => true
+			])
+			: [];
+
 		$this->setResponse(new CControllerResponseData([
 			'actions' => $actions['actions'],
 			'users' => $users,
 			'mediatypes' => $mediatypes,
+			'maintenances' => $maintenances,
 			'foot_note' => ($actions['count'] > ZBX_WIDGET_ROWS)
 				? _s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $actions['count'])
 				: null

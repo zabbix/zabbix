@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,6 +17,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
+#include "zbxmockhelper.h"
 
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
@@ -103,17 +104,37 @@ void	tags_read(const char *path, zbx_vector_db_tag_ptr_t *tags)
 		zbx_mock_handle_t	hid, hauto;
 		zbx_db_tag_t		*db_tag;
 		const char		*tag_str, *value_str, *auto_str;
+		char			*tag_buf = NULL, *value_buf= NULL;
+		size_t			tag_buf_len, value_buf_len;
 
 		if (ZBX_MOCK_SUCCESS != mock_err)
 			fail_msg("Cannot read '%s' %s", path, zbx_mock_error_string(mock_err));
 
-		/* tag */
-		tag_str = zbx_mock_get_object_member_string(htag, "tag");
 
-		/* value */
-		value_str = zbx_mock_get_object_member_string(htag, "value");
+		if (SUCCEED == zbx_mock_parameter_exists("in.buffer_used"))
+		{
+			tag_buf_len = zbx_mock_get_object_member_uint64(htag ,"tag_buf_len");
+			value_buf_len = zbx_mock_get_object_member_uint64(htag ,"value_buf_len");
+
+			tag_buf = zbx_yaml_assemble_binary_sequence_member(htag, "tag_buf", &tag_buf_len);
+			value_buf = zbx_yaml_assemble_binary_sequence_member(htag, "value_buf", &value_buf_len);
+
+			tag_str = tag_buf;
+			value_str = value_buf;
+		}
+		else
+		{
+			/* tag */
+			tag_str = zbx_mock_get_object_member_string(htag, "tag");
+
+			/* value */
+			value_str = zbx_mock_get_object_member_string(htag, "value");
+		}
 
 		db_tag = zbx_db_tag_create(tag_str, value_str);
+
+		zbx_free(tag_buf);
+		zbx_free(value_buf);
 
 		/* tagid */
 		mock_err = zbx_mock_object_member(htag, "tagid", &hid);

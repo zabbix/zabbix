@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -160,8 +160,9 @@ class CMap extends CMapElement {
 	private function getMaps(array $options) {
 		$sql_parts = [
 			'select'	=> ['sysmaps' => 's.sysmapid'],
-			'from'		=> ['sysmaps' => 'sysmaps s'],
+			'from'		=> 'sysmaps s',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];
@@ -1992,9 +1993,10 @@ class CMap extends CMapElement {
 				);
 			}
 
-			if ($db_items[$itemid]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+			if ($db_items[$itemid]['value_type'] == ITEM_VALUE_TYPE_BINARY
+					|| $db_items[$itemid]['value_type'] == ITEM_VALUE_TYPE_JSON) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', $path, _('binary item is not supported'))
+					_s('Invalid parameter "%1$s": %2$s.', $path, _('unsupported data type'))
 				);
 			}
 		}
@@ -3832,20 +3834,7 @@ class CMap extends CMapElement {
 				), 'linkthresholdid');
 
 				if ($link_thresholds) {
-					$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
-
-					foreach ($link_thresholds as &$link_threshold) {
-						$number_parser->parse($link_threshold['threshold']);
-						$link_threshold['order_threshold'] = $number_parser->calcValue();
-					}
-					unset($link_threshold);
-
-					CArrayHelper::sort($link_thresholds, ['order_threshold']);
-
-					foreach ($link_thresholds as &$link_threshold) {
-						unset($link_threshold['order_threshold']);
-					}
-					unset($link_threshold);
+					$link_thresholds = filterAndSortThresholds($link_thresholds);
 				}
 
 				$link_threshold_relation_map = $this->createRelationMap($link_thresholds, 'linkid', 'linkthresholdid');

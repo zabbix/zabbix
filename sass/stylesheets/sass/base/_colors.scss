@@ -304,10 +304,6 @@ $compact-view-color: #1f2c33 !default;
 $compact-view-tag-color: #ffffff !default;
 $compact-view-tag-bg-color: rgba($compact-view-color, .5) !default;
 
-// Dashboard list table.
-$dashboard-shared-bg-color: darken(desaturate($alt-yellow, 9%), 20%) !default;
-$dashboard-my-bg-color: darken(desaturate($alt-green, 10%), 20%) !default;
-
 // Import compare.
 $toc-title-color: #ffffff !default;
 $toc-title-bg-color: #768d99 !default;
@@ -356,3 +352,14 @@ $geomap-marker-selected-stroke: #ced7db !default;
 
 // Timeline.
 $timeline-color: #aad7f0;
+
+// Datatable.
+$datatable-overlay-color: rgba(#fff, .4) !default;
+$datatable-resizer-border-color: #0275b8 !default;
+$datatable-scrollbar-thumb-bg-color: #c2c2c2 !default;
+
+// Banners.
+$banner-bg-color: #3e47ce !default;
+$banner-color: $white !default;
+$banner-link-color: $white !default;
+$banner-icon-color: $white !default;

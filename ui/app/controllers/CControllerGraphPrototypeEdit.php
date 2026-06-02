@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -333,6 +333,10 @@ class CControllerGraphPrototypeEdit extends CController {
 			'is_template' => $data['hostid'] == 0 ? false : isTemplate($data['hostid']),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
+
+		$data['js_validation_rules'] = $data['graphid'] != 0
+			? (new CFormValidator(CControllerGraphPrototypeUpdate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerGraphPrototypeCreate::getValidationRules()))->getRules();
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

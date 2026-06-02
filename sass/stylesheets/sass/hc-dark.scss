@@ -259,6 +259,9 @@ $arrow-fill-up: #FFFFFF;
 $arrow-fill-down: #FFFFFF;
 $arrow-fill-up-down: #FFFFFF;
 
+// Banners.
+$banner-color: #FFFFFF;
+
 // Important! @import string should come after variables.
 @import 'screen';
 
@@ -643,10 +646,11 @@ a.link-action {
 .tag {
 	color: $ui-bg-color;
 
-	&.green-bg,
-	&.yellow-bg {
-		background-color: $ui-bg-selected-color;
-		color: $white;
+	&.tag-inherited,
+	&.tag-inherited-duplicate {
+		&::before {
+			opacity: 1;
+		}
 	}
 }
 
@@ -820,11 +824,6 @@ textarea.has-error {
 			}
 		}
 	}
-}
-
-// Filter checkboxes.
-.filter-highlight-row-cb {
-	display: none;
 }
 
 // Severity statuses.
@@ -1146,6 +1145,74 @@ td.inactive-bg {
 	.tabfilter-item-label {
 		&.focused {
 			box-shadow: 0 0 0 2px $btn-focus-outline-color;
+		}
+	}
+}
+
+// Datatable.
+
+.datatable {
+	.datatable-body {
+		.row {
+			&:not(.row-disabled):hover {
+				.cell {
+					&.cell-data {
+						background-color: $ui-hover-bg-color !important;
+					}
+				}
+			}
+		}
+	}
+
+	.cell {
+		&.cell-data {
+			&.warning-bg,
+			&.average-bg,
+			&.high-bg,
+			&.disaster-bg {
+				border-bottom-color: $ui-border-color;
+				padding-left: 42px;
+
+				.cell-inner {
+					color: $font-color;
+				}
+			}
+		}
+	}
+
+	&.compact-view {
+		.cell {
+			&.cell-data {
+				&.warning-bg,
+				&.average-bg,
+				&.high-bg,
+				&.disaster-bg {
+					&:before {
+						font-size: 22px;
+						padding-top: 0;
+						padding-bottom: 0;
+					}
+				}
+			}
+		}
+	}
+
+	&.has-highlighted-rows {
+		.cell {
+			&.cell-data {
+				&:not(.cell-bg) {
+					&.warning-bg,
+					&.average-bg,
+					&.high-bg,
+					&.disaster-bg {
+						padding-left: 8px;
+
+						&:before {
+							display: none;
+						}
+					}
+				}
+			}
 		}
 	}
 }

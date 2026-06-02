@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -154,12 +154,10 @@ class testFormAdministrationGeneral extends CWebTest {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 
 		if ($expected === TEST_GOOD) {
-			$message = 'Configuration updated';
 			$values = $data['fields'];
 			$db = CTestArrayHelper::get($data, 'db', []);
 		}
 		else {
-			$message = 'Cannot update configuration';
 			$values = $this->default_values;
 			$db = $this->db_default_values;
 		}
@@ -183,7 +181,26 @@ class testFormAdministrationGeneral extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		$this->assertMessage($expected, $message, CTestArrayHelper::get($data, 'details'));
+		// TODO: Uncomment if-else and remove switch after DEV-4632 is fixed.
+		// if ($expected) === TEST_BAD) {
+		// 	$this->assertInlineError($form, $data['inline_errors']);
+		// }
+		// else {
+		// 	$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		// }
+		switch ($expected) {
+			case TEST_GOOD:
+				$this->assertMessage(TEST_GOOD, 'Configuration updated');
+				break;
+			case TEST_BAD:
+				if (array_key_exists('inline_errors', $data)) {
+					$this->assertInlineError($form, $data['inline_errors']);
+				}
+				else {
+					$this->assertMessage(TEST_BAD, 'Cannot update configuration', CTestArrayHelper::get($data, 'details'));
+				}
+				break;
+		}
 
 		// Check saved configuration in frontend.
 		$this->page->refresh();

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -122,9 +122,6 @@ void	zbx_vps_monitor_add_collected(zbx_uint64_t values_num)
  *                                                                            *
  * Purpose: add number of written values to the monitor                       *
  *                                                                            *
- * Comments: This function is called before processes are spawned -           *
- *           no locking is needed.                                            *
- *                                                                            *
  ******************************************************************************/
 void	zbx_vps_monitor_add_written(zbx_uint64_t values_num)
 {
@@ -179,6 +176,32 @@ void	zbx_vps_monitor_get_stats(zbx_vps_monitor_stats_t *stats)
 	/* preconfigured values, cannot change without restarting server */
 	stats->values_limit = monitor->values_limit / ZBX_VPS_FLUSH_PERIOD;
 	stats->overcommit_limit = monitor->overcommit_limit;
+}
+
+void	zbx_vps_monitor_stats_ext_get_data(struct zbx_json *json, const void *arg)
+{
+	zbx_vps_monitor_stats_t	stats;
+
+	ZBX_UNUSED(arg);
+
+	zbx_vps_monitor_get_stats(&stats);
+
+	zbx_json_addobject(json, "vps");
+	zbx_json_adduint64(json, "status", (SUCCEED == zbx_vps_monitor_capped() ? 1 : 0));
+	zbx_json_adduint64(json, "written_total", stats.written_num);
+	zbx_json_adduint64(json, "limit", stats.values_limit);
+
+	if (0 != stats.values_limit)
+	{
+		zbx_json_addobject(json, "overcommit");
+		zbx_json_adduint64(json, "limit", stats.overcommit_limit);
+		zbx_json_adduint64(json, "available", stats.overcommit_limit - stats.overcommit);
+		zbx_json_addfloat(json, "pavailable", (double)(stats.overcommit_limit - stats.overcommit) *
+				100 / stats.overcommit_limit);
+		zbx_json_close(json);
+	}
+
+	zbx_json_close(json);
 }
 
 /******************************************************************************

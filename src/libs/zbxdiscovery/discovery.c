@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -92,19 +92,19 @@ static void	discovery_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t 
 			&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to discoverer service: %s", error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == zbx_ipc_socket_write(&socket, code, data, size))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to discoverer service");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (NULL != response && FAIL == zbx_ipc_socket_read(&socket, response))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot receive data from discoverer service");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 

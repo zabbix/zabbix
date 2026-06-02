@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,6 +14,8 @@
 
 #include "zbxpreprocbase.h"
 
+#include "zbxcommon.h"
+#include "zbxtypes.h"
 #include "zbxalgo.h"
 
 ZBX_PTR_VECTOR_IMPL(pp_step_ptr, zbx_pp_step_t *)
@@ -23,15 +25,13 @@ ZBX_PTR_VECTOR_IMPL(pp_step_ptr, zbx_pp_step_t *)
  * Purpose: create item preprocessing data                                    *
  *                                                                            *
  * Parameters: hostid     - [IN] item host id                                 *
- *             type       - [IN] item type                                    *
  *             value_type - [IN] item value type                              *
  *             flags      - [IN] item flags                                   *
  *                                                                            *
  * Return value: The created item preprocessing data.                         *
  *                                                                            *
  ******************************************************************************/
-zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned char type, unsigned char value_type,
-		unsigned char flags)
+zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned char value_type, unsigned char flags)
 {
 	zbx_pp_item_preproc_t	*preproc = zbx_malloc(NULL, sizeof(zbx_pp_item_preproc_t));
 
@@ -44,7 +44,6 @@ zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned 
 	preproc->dep_itemids = NULL;
 
 	preproc->hostid = hostid;
-	preproc->type = type;
 	preproc->value_type = value_type;
 	preproc->flags = flags;
 	preproc->history_cache = NULL;

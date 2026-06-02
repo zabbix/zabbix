@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -722,19 +722,19 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 			]],
 			'opperiod' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'operationobject', 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_LLD_RULE_PROTOTYPE])], 'type' => API_OBJECT, 'fields' => [
-											'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('lld_override_opperiod', 'delay')]
+											'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('lld_override_opperiod', 'delay')]
 										]],
 										['else' => true, 'type' => API_OBJECT, 'fields' => []]
 			]],
 			'ophistory' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'operationobject', 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE])], 'type' => API_OBJECT, 'fields' => [
-											'history' =>		['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_ophistory', 'history')]
+											'history' =>		['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_ophistory', 'history')]
 										]],
 										['else' => true, 'type' => API_OBJECT, 'fields' => []]
 			]],
 			'optrends' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'operationobject', 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE])], 'type' => API_OBJECT, 'fields' => [
-											'trends' =>			['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_optrends', 'trends')]
+											'trends' =>			['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_optrends', 'trends')]
 										]],
 										['else' => true, 'type' => API_OBJECT, 'fields' => []]
 			]],
@@ -1117,7 +1117,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 	 * @throws APIException
 	 */
 	protected static function checkFilterFormula(array $objects, string $path = '/'): void {
-		$condition_formula_parser = new CConditionFormula();
+		$condition_formula_parser = new CConditionFormulaParser();
 
 		foreach ($objects as $i => $object) {
 			if (!array_key_exists('filter', $object)
@@ -1127,7 +1127,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 
 			$condition_formula_parser->parse($object['filter']['formula']);
 
-			$constants = array_unique(array_column($condition_formula_parser->constants, 'value'));
+			$constants = array_unique(array_column($condition_formula_parser->getConstants(), 'value'));
 			$subpath = ($path === '/' ? $path : $path.'/').($i + 1).'/filter';
 
 			$condition_formulaids = array_column($object['filter']['conditions'], 'formulaid');

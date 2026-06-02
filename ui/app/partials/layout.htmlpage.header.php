@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,7 +19,7 @@
  * @var array    $data
  */
 
-global $DB, $ZBX_SERVER_NAME;
+global $DB, $ZBX_SERVER_NAME, $ZBX_FEATURE_FLAGS;
 
 $scripts = $data['javascript']['files'];
 $page_title = $data['page']['title'];
@@ -43,6 +43,10 @@ if (!empty($DB['DB'])) {
 
 	if (CSettingsHelper::isSoftwareUpdateCheckEnabled()) {
 		$scripts[] = 'class.software-version-check.js';
+	}
+
+	if ($ZBX_FEATURE_FLAGS['banners_enabled'] && $data['web_layout_mode'] != ZBX_LAYOUT_KIOSKMODE) {
+		$scripts[] = 'class.banner.js';
 	}
 }
 

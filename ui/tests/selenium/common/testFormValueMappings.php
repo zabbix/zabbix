@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,26 +17,29 @@
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * Base class for Value mappings function tests.
+ *
+ * @onBefore prepareData
  */
 class testFormValueMappings extends CWebTest {
 
 	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
+	 * Attach MessageBehavior, TableBehavior and DatatableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
 			CMessageBehavior::class,
-			CTableBehavior::class
+			CTableBehavior::class,
+			CDatatableBehavior::class
 		];
 	}
 
-	const HOSTID = 99134;	// ID of the host for valuemap update.
 	const TEMPLATEID = 40000;	// ID of the template for valuemap update.
 	const UPDATE_VALUEMAP1 = 'Valuemap for update 1';
 	const UPDATE_VALUEMAP2 = 'Valuemap for update 2';
@@ -61,9 +64,13 @@ class testFormValueMappings extends CWebTest {
 		]
 	];
 
-	private static $previous_valuemap_name = self::UPDATE_VALUEMAP1;
+	protected static $previous_valuemap_name = self::UPDATE_VALUEMAP1;
+	protected static $previous_class = null;
+	protected static $hostids;
 
-	private static $previous_class = null;
+	public static function prepareData() {
+		self::$hostids = CDataHelper::get('HostAvailabilityWidget.hostids');
+	}
 
 	/**
 	 * Function that checks the layout of the Value mappings tab in Host or Template configuration forms.
@@ -94,14 +101,14 @@ class testFormValueMappings extends CWebTest {
 		$this->assertEquals(['', 'Type', 'Value', '', 'Mapped to', ''], $mappings_table->getHeadersText());
 		$row = $mappings_table->getRow(0);
 		foreach (['Value', 'Mapped to'] as $mapping_column) {
-			$mapping_field = $row->getColumn($mapping_column)->query('xpath:.//input')->one();
+			$mapping_field = $row->getColumn($mapping_column)->query('xpath:.//z-textarea-flexible')->one();
 			$this->assertEquals('64', $mapping_field->getAttribute('maxlength'));
 		}
 		$this->assertEquals(1, $row->query('xpath:.//td[text()="⇒"]')->all()->count());
 		$this->assertTrue($row->query('button:Remove')->one()->isClickable());
 
 		// Check types.
-		$value_column = $row->getColumn('Value')->query('xpath:.//input')->one();
+		$value_column = $row->getColumn('Value')->query('xpath:.//z-textarea-flexible')->one();
 		$dropdown = $row->query('name:mappings[0][type]')->asDropdown()->one();
 		$types = ['equals', 'is greater than or equals', 'is less than or equals', 'in range', 'regexp', 'default'];
 		$this->assertEquals($types, $dropdown->getOptions()->asText());
@@ -143,7 +150,7 @@ class testFormValueMappings extends CWebTest {
 
 		$this->page->open('zabbix.php?action='.$source.'.list&filter_name=Clone Valuemap Test&filter_set=1')->waitUntilReady();
 
-		$this->query('link', 'Clone Valuemap Test')->one()->click();
+		$this->query('link', 'Clone Valuemap Test')->waitUntilClickable()->one()->click();
 		COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Value mapping');
 		$this->assertTableData(self::EXISTING_VALUEMAPS, 'id:valuemap-formlist');
 		COverlayDialogElement::find()->one()->close();
@@ -1002,7 +1009,7 @@ class testFormValueMappings extends CWebTest {
 	 * @return CFormElement|CFluidFormElemt    $form
 	 */
 	private function openValueMappingTab($source, $login = true, $open_tab = true) {
-		$sourceid = ($source === 'host') ? self::HOSTID : self::TEMPLATEID;
+		$sourceid = ($source === 'host') ? self::$hostids['Available host'] : self::TEMPLATEID;
 		if ($login) {
 			$this->page->login();
 		}
@@ -1011,7 +1018,8 @@ class testFormValueMappings extends CWebTest {
 		$name = CDBHelper::getValue('SELECT host FROM hosts WHERE hostid='.zbx_dbstr($sourceid));
 
 		$this->page->open('zabbix.php?action='.$source.'.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-		$this->query('link', $name)->one()->click();
+		$this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
+		$this->query('link', $name)->one()->scrollIntoView(50)->click();
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 
 		if ($open_tab) {
@@ -1186,7 +1194,7 @@ class testFormValueMappings extends CWebTest {
 	 */
 	public function checkMassValuemappingScreenshot($source) {
 		$this->page->login()->open(($source === 'hosts') ? 'zabbix.php?action=host.list' : 'zabbix.php?action=template.list')->waitUntilReady();
-		$this->selectTableRows();
+		$this->selectDatatableRows();
 		$this->query('button:Mass update')->one()->click();
 		$update_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		$update_form->selectTab('Value mapping');

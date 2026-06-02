@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -561,9 +561,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 
 		// Main objects are hosts and templates, but sub-objects are items, triggers, graphs, etc.
 		if (array_key_exists('sub_object', $data)) {
-			$this->query('class:list-table')->asTable()->waitUntilPresent()->one()
+			$this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady()
 					->findRow('Name', ($data['object'] === 'Hosts') ? self::EMPTY_HOST : self::EMPTY_TEMPLATE)
-					->getColumn($data['sub_object'])->query('tag:a')->waitUntilClickable()->one()->click();
+					->getColumn($data['sub_object'])->query('tag:a')->waitUntilClickable()->one()->scrollIntoView(50)->click();
 			$this->page->waitUntilReady();
 		}
 
@@ -581,7 +581,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 		// Fill filter to enable dependent multiselects.
 		if (array_key_exists('filter', $data)) {
 			$form->fill($data['filter']);
-			$form->submit();
+			$form->submit()->waitUntilStalled();
 			$form->invalidate();
 		}
 
@@ -670,8 +670,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'host prototype',
-					'url' => 'host_prototypes.php?context=host&parent_discoveryid=',
-					'form' => 'id:host-prototype-form'
+					'url' => 'zabbix.php?action=host.prototype.list&context=host&parent_discoveryid=',
+					'form' => 'id:host-prototype-form',
+					'overlay_form' => true
 				]
 			],
 			// Template objects.
@@ -752,8 +753,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'host prototype',
-					'url' => 'host_prototypes.php?context=template&parent_discoveryid=',
-					'form' => 'id:host-prototype-form'
+					'url' => 'zabbix.php?action=host.prototype.list&context=template&parent_discoveryid=',
+					'form' => 'id:host-prototype-form',
+					'overlay_form' => true
 				]
 			]
 		];
@@ -818,7 +820,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 				break;
 
 			case 'host prototype':
-				$form = $this->query($data['form'])->asForm(['normalized' => true])->one();
+				$form = $this->query($data['form'])->asForm()->one();
 				$this->checkMultiselectDialogs($form, [self::TEMPLATES_MULTISELECT]);
 				break;
 		}

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -174,7 +174,8 @@ func invokeExport(a plugin.Accessor, key string, params []string, ctx plugin.Con
 
 	var ret any
 	var err error
-	tc := make(chan bool)
+
+	tc := make(chan bool, 1)
 
 	go func() {
 		ret, err = exporter.Export(key, params, ctx)

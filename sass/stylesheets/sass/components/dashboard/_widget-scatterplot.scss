@@ -7,9 +7,7 @@ form.dashboard-widget-scatterplot {
 
 	.scatter-plot-widget-config-tabs {
 		grid-column: 1 / -1;
-	}
 
-	.scatter-plot-config-tabs {
 		> .tabs-nav {
 			border-top: 1px solid $ui-border-color;
 		}
@@ -283,6 +281,12 @@ form.dashboard-widget-scatterplot {
 
 div.dashboard-widget-scatterplot {
 	overflow-x: hidden;
+}
+
+.svg-scatter-plot-point {
+	fill-opacity: 1;
+	fill: var(--color);
+	stroke: var(--color);
 }
 
 .svg-scatter-plot-legend {

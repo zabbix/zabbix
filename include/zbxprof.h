@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,6 +23,7 @@
 
 typedef int zbx_prof_scope_t;
 
+void	zbx_prof_destroy(void);
 void	zbx_prof_enable(zbx_prof_scope_t scope);
 void	zbx_prof_disable(void);
 void	zbx_prof_start(const char *func_name, zbx_prof_scope_t scope);

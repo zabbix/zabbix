@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -65,19 +65,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return [];
 		}
 
-		$groupids = null;
-		$evaltype = null;
-		$tags = null;
-
-		if (!$this->isTemplateDashboard()) {
-			if ($this->fields_values['groupids']) {
-				$groupids = getSubGroups($this->fields_values['groupids']);
-			}
-
-			if ($this->fields_values['host_tags']) {
-				$evaltype = $this->fields_values['evaltype_host'];
-				$tags = $this->fields_values['host_tags'];
-			}
+		if ($this->isTemplateDashboard()) {
+			$groupids = null;
+			$evaltype = TAG_EVAL_TYPE_AND_OR;
+			$tags = null;
+		}
+		else {
+			$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
+			$evaltype = $this->fields_values['evaltype_host'];
+			$tags = $this->fields_values['host_tags'] ?: null;
 		}
 
 		$hostids = $this->fields_values['hostids'] ?: null;
@@ -93,6 +89,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'filter' => $filter,
 				'evaltype' => $evaltype,
 				'tags' => $tags,
+				'inheritedTags' => true,
 				'monitored_hosts' => true,
 				'preservekeys' => true
 			]);
@@ -113,6 +110,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'hostids' => $hostids,
 			'evaltype' => $this->fields_values['evaltype_item'],
 			'tags' => $this->fields_values['item_tags'] ?: null,
+			'inheritedTags' => true,
 			'selectValueMap' => ['mappings'],
 			'searchWildcardsEnabled' => true,
 			'searchByAny' => true,
@@ -147,7 +145,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		for ($batch = 0; $batch < $batches && count($cells) < $limit; $batch++) {
 			$batch_items = array_slice($items, $batch * $limit, $limit);
-			$db_history = Manager::History()->getLastValues($batch_items, 1, $history_period);
+			// Extra byte to trim values that exceeds length limit.
+			$length = ZBX_HINTBOX_HTML_LIMIT + 1;
+			$db_history = Manager::History()->getLastValues($batch_items, 1, $history_period, $length);
 
 			foreach ($batch_items as $item) {
 				if (!array_key_exists($item['itemid'], $db_history)) {

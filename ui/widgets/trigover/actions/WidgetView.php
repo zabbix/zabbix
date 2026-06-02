@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -60,12 +60,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$problem_options = [
 				'show_suppressed' => $this->fields_values['show_suppressed'],
 				'show_recent' => $this->fields_values['show'] == TRIGGERS_OPTION_RECENT_PROBLEM ? true : null,
-				'tags' => array_key_exists('tags', $this->fields_values) && $this->fields_values['tags']
-					? $this->fields_values['tags']
-					: null,
-				'evaltype' => array_key_exists('evaltype', $this->fields_values)
-					? $this->fields_values['evaltype']
-					: TAG_EVAL_TYPE_AND_OR
+				'evaltype' => $this->fields_values['evaltype'],
+				'tags' => $this->fields_values['tags']
 			];
 
 			if ($this->isTemplateDashboard()) {

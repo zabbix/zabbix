@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -227,7 +227,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			'Data set label' => ''
 		];
 		$form->checkValue($expected_values);
-		$expected_labels = ['Data set #1', 'Aggregation function', 'Data set aggregation', 'Data set label'];
+		$expected_labels = ['Data set #1', 'Aggregation function', 'Data set aggregation', 'Data set label', 'Item tags'];
 		$data_set_tab = $form->query('id:data_set')->one();
 		$this->assertAllVisibleLabels($data_set_tab, $expected_labels);
 		$this->validateDataSetHintboxes($form);
@@ -336,9 +336,10 @@ class testDashboardPieChartWidget extends testWidgets {
 			'Size' => false,
 			'Decimal places' => false,
 			'Units' => false,
-			'Bold' => false
+			'Bold' => false,
+			'Colour' => false
 		];
-		$expected_labels = array_merge($expected_labels, array_keys($inputs_enabled), ['Colour']);
+		$expected_labels = array_merge($expected_labels, array_keys($inputs_enabled));
 		$this->assertAllVisibleLabels($displaying_options_tab, $expected_labels);
 		$this->assertRangeSliderParameters($form, 'Width', ['min' => '20', 'max' => '50', 'step' => '10']);
 		$this->assertRangeSliderParameters($form, 'Stroke width', ['min' => '0', 'max' => '10', 'step' => '1']);
@@ -1287,7 +1288,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			$legend_name = CTestArrayHelper::get($data, 'expected_dataset_name', $legend_name);
 
 			// Locate sector for checking.
-			$sector = $widget->query('xpath:.//*[contains(@data-hintbox-contents, '.
+			$sector = $widget->query('xpath:.//*[contains(@data-hintbox-html, '.
 					CXPathHelper::escapeQuotes($legend_name).')]/*[@class="svg-pie-chart-arc"]')->one();
 
 			// Assert sector fill color.
@@ -1346,11 +1347,8 @@ class testDashboardPieChartWidget extends testWidgets {
 
 		// Verify that it is not possible to submit color-picker dialog with invalid color or proceed with form submission.
 		if (CTestArrayHelper::get($data, 'invalid_color')) {
-			$color_picker_dialog = $this->query('class:color-picker-dialog')->one()->asColorPicker();
-			$this->assertTrue($color_picker_dialog->isSubmittionDisabled());
-
-			$color_picker_dialog->close();
-			COverlayDialogElement::find()->one()->close();
+			$this->assertTrue(CColorPickerElement::isSubmitable(false));
+			CColorPickerElement::close();
 		}
 		else {
 			$form->submit();
@@ -1381,9 +1379,9 @@ class testDashboardPieChartWidget extends testWidgets {
 		// For each hintbox - open, assert text, close.
 		foreach ($hints as $field => $text) {
 			$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
+			$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilPresent()->one();
 			$this->assertEquals($text, $hint->getText());
-			$hint->query('xpath:./button')->one()->click();
+			$hint->query('xpath:.//button')->one()->click();
 		}
 	}
 

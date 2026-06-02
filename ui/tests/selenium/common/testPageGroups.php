@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -136,7 +136,7 @@ class testPageGroups extends CWebTest {
 			$icon = $row->getColumn('Info')->query('tag:button')->one();
 			$this->assertTrue($icon->hasClass('zi-i-warning'));
 			$icon->click();
-			$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible();
+			$hintbox = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilVisible();
 			$this->assertEquals('The host group is not discovered anymore and will be deleted the next time discovery'.
 					' rule is processed.',
 					$hintbox->one()->getText()
@@ -185,23 +185,21 @@ class testPageGroups extends CWebTest {
 			? $links['lld'].': '.$links['host_template']
 			: $links['host_template'];
 
-		$host_row = $this->query('class:list-table')->asTable()->one()->findRow('Name',  $name);
-		$this->assertEquals($name, $host_row->getColumn('Name')->getText());
+		$host_row = $this->query('class:datatable')->asDatatable()->one()->findRow('Name',  $name);
+		$this->assertEquals($name, $host_row->getColumn('Name')->getAllText());
 		$this->page->open($this->link)->waitUntilReady();
 
 		// Check link to host prototype from host group name.
 		if (array_key_exists('lld', $links)) {
 			$row->getColumn('Name')->query('link', $links['lld'])->one()->click();
-			$this->assertStringContainsString('host_prototypes.php?form=update&parent_discoveryid=',
+			$this->assertStringContainsString('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid=',
 					$this->page->getCurrentUrl()
 			);
-			$this->page->assertHeader('Host prototypes');
-			$this->query('id:host-prototype-form')->asForm(['normalized' => true])->waitUntilVisible()->one()
+			$this->page->assertHeader('Host groups');
+			$this->query('id:host-prototype-form')->asForm()->waitUntilVisible()->one()
 					->checkValue(['Host name' => self::HOST_PROTOTYPE]);
 			$this->query('button:Cancel')->one()->click();
-			$this->assertStringContainsString('host_prototypes.php?cancel=1&parent_discoveryid=',
-					$this->page->getCurrentUrl()
-			);
+			$this->assertStringContainsString('zabbix.php?action=hostgroup.list', $this->page->getCurrentUrl());
 			$this->page->open($this->link)->waitUntilReady();
 		}
 	}
@@ -252,18 +250,12 @@ class testPageGroups extends CWebTest {
 			$names = $this->getGroupNames($sorting);
 			$table->query('link:Name')->waitUntilClickable()->one()->click();
 			$table->waitUntilReloaded();
-			$this->assertTableDataColumn($names);
+			$this->assertTableDataColumn(preg_replace('/\s+/', ' ', $names));
 		}
 	}
 
 	public static function getFilterData() {
 		return [
-			// Too many spaces in field.
-			[
-				[
-					'Name' => '  '
-				]
-			],
 			// Special symbols, utf8 and long name.
 			[
 				[

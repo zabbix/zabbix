@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -32,7 +32,7 @@ class CControllerMediatypeMessageEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'type' =>				'in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
+			'type' =>				'in '.implode(',', CMediatypeHelper::getSupportedMediaTypes()),
 			'message_format' =>		'in '.ZBX_MEDIA_MESSAGE_FORMAT_TEXT.','.ZBX_MEDIA_MESSAGE_FORMAT_HTML,
 			'message_type' =>		'in -1,'.implode(',', $this->message_types),
 			'old_message_type' =>	'in -1,'.implode(',', $this->message_types),
@@ -94,6 +94,9 @@ class CControllerMediatypeMessageEdit extends CController {
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
+
+		$output['js_validation_rules'] = (new CFormValidator(CControllerMediatypeMessageCheck::getValidationRules()))
+			->getRules();
 
 		$this->setResponse(new CControllerResponseData($output));
 	}

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -89,53 +89,63 @@ class testHistoryPush extends CIntegrationTest {
 			[
 				'key_' => 'trapper_uint',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_uint2',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_uint_host_key_test',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_uint_no_perms',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_uint_bad_valuetype',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_uint_disabled',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'status' => ITEM_STATUS_DISABLED
+				'status' => ITEM_STATUS_DISABLED,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_float',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_FLOAT
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_log',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_LOG
+				'value_type' => ITEM_VALUE_TYPE_LOG,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_text',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_TEXT
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_str',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_STR
+				'value_type' => ITEM_VALUE_TYPE_STR,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'trapper_text_bad_allow_hosts',
@@ -149,7 +159,8 @@ class testHistoryPush extends CIntegrationTest {
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'url' => 'http://127.0.0.1:7123/httptest',
 				'delay' => '10s',
-				'allow_traps' => 1
+				'allow_traps' => 1,
+				'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 			],
 			[
 				'key_' => 'http_agent_text_no_trap',
@@ -292,6 +303,8 @@ class testHistoryPush extends CIntegrationTest {
 			foreach (array_keys($value_retrieved) as $i) {
 				$this->assertEquals(strval($value_sent[$i]), $value_retrieved[$i]);
 			}
+
+			$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'history_cache_clear='.$tc['itemid']);
 		}
 
 		return true;
@@ -330,6 +343,8 @@ class testHistoryPush extends CIntegrationTest {
 		$this->assertEquals($value_sent['value'], $value_retrieved['value']);
 		$this->assertEquals($value_sent['clock'], $value_retrieved['clock']);
 		$this->assertEquals($value_sent['ns'], $value_retrieved['ns']);
+
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'history_cache_clear='. self::$itemids['trapper_uint_host_key_test']);
 
 		return true;
 	}
@@ -645,5 +660,30 @@ class testHistoryPush extends CIntegrationTest {
 			'ns' => 500
 			]
 		]);
+	}
+
+	public function testHistoryPush_LargePayloadMemoryLeak() {
+		if (CAPIHelper::getSessionId() === null) {
+			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+		}
+
+		$large_history_data = [];
+
+		for ($i = 0; $i < 250; $i++) {
+			$large_history_data[] = [
+				'itemid' => self::$itemids['trapper_uint'],
+				'value' => rand(1, 1000),
+				'clock' => time() - $i,
+				'ns' => 0
+			];
+		}
+
+		$response = CAPIHelper::call('history.push', $large_history_data);
+
+		$this->checkResult($response);
+
+		$this->assertArrayHasKey('data', $response['result']);
+		$this->assertCount(250, $response['result']['data'], 'Server did not process all items in the large payload');
+		$this->assertArrayNotHasKey('error', $response['result']['data'][0]);
 	}
 }

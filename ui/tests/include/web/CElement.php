@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -262,18 +262,27 @@ class CElement extends CBaseElement implements IWaitable {
 	public function getText() {
 		try {
 			if (!$this->isVisible()) {
-				return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
+				return $this->getAllText();
 			}
 		}
 		catch (StaleElementReferenceException $exception) {
 			$this->reload();
 
 			if (!$this->isVisible()) {
-				return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
+				return $this->getAllText();
 			}
 		}
 
 		return parent::getText();
+	}
+
+	/**
+	 * Get text of element including text of non-visible parts of the element.
+	 *
+	 * @return string
+	 */
+	public function getAllText() {
+		return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
 	}
 
 	/**
@@ -687,8 +696,16 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asDropdown($options);
 		}
 
+		if ($tag === 'z-color-picker') {
+			return $this->asColorPicker($options);
+		}
+
 		if ($tag === 'table') {
 			return $this->asTable($options);
+		}
+
+		if ($tag === 'z-textarea-flexible') {
+			return $this->asTextareaFlexible($options);
 		}
 
 		if ($tag === 'input') {
@@ -701,33 +718,40 @@ class CElement extends CBaseElement implements IWaitable {
 			}
 		}
 
-		$class = explode(' ', $this->getAttribute('class'));
-		if (in_array('multiselect-control', $class)) {
-			return $this->asMultiselect($options);
-		}
+		$attribute = $this->getAttribute('class');
+		if ($attribute) {
+			$class = explode(' ', $attribute);
+			if (in_array('multiselect-control', $class) || in_array('multiselect', $class)) {
+				return $this->asMultiselect($options);
+			}
 
-		if (in_array('radio-list-control', $class)) {
-			return $this->asSegmentedRadio($options);
-		}
+			if (in_array('radio-list-control', $class)) {
+				return $this->asSegmentedRadio($options);
+			}
 
-		if (in_array('checkbox-list', $class)) {
-			return $this->asCheckboxList($options);
-		}
+			if (in_array('checkbox-list', $class)) {
+				return $this->asCheckboxList($options);
+			}
 
-		if (in_array('range-control', $class) || in_array('calendar-control', $class)) {
-			return $this->asCompositeInput($options);
-		}
+			if (in_array('range-control', $class) || in_array('calendar-control', $class)) {
+				return $this->asCompositeInput($options);
+			}
 
-		if (in_array('color-picker', $class)) {
-			return $this->asColorPicker($options);
-		}
+			if (in_array('multilineinput-control', $class)) {
+				return $this->asMultiline($options);
+			}
 
-		if (in_array('multilineinput-control', $class)) {
-			return $this->asMultiline($options);
-		}
+			if (in_array('macro-input-group', $class)) {
+				return $this->asInputGroup($options);
+			}
 
-		if (in_array('macro-input-group', $class)) {
-			return $this->asInputGroup($options);
+			if (in_array('fields-group', $class)) {
+				return $this->asElement($options);
+			}
+
+			if (in_array('datatable', $class)) {
+				return $this->asDatatableGroup($options);
+			}
 		}
 
 		CTest::zbxAddWarning('No specific element was detected');
@@ -816,10 +840,24 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
-	 * Scroll the element to the visible position.
+	 * Scroll the element to the visible position. In datatables element can be covered by the datatable-options button
+	 * or the horizontal scrollbar, and still be considered visible by Selenium. Therefore, it is possible to scroll by
+	 * the $additional_scroll amount of pixels to make sure the element is really visible.
+	 *
+	 * @param int $additional_scroll  number of px that is required to scroll after element has been scrolled into view.
+	 *
+	 * @return $this
 	 */
-	public function scrollIntoView() {
-		CElementQuery::getDriver()->executeScript('arguments[0].scrollIntoView({behavior:\'instant\',block:\'end\',inline:\'nearest\'});', [$this]);
+	public function scrollIntoView($additional_scroll = null) {
+		CElementQuery::getDriver()->executeScript('arguments[0].scrollIntoView({behavior:\'instant\',block:\'end\',inline:\'nearest\'});',
+				[$this]
+		);
+
+		if ($additional_scroll) {
+			CElementQuery::getDriver()->executeScript('document.querySelector(".wrapper").scrollBy(0, '.$additional_scroll.');',
+					[$this]
+			);
+		}
 
 		return $this;
 	}

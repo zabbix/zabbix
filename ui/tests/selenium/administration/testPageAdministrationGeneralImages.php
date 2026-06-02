@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -77,10 +77,9 @@ class testPageAdministrationGeneralImages extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 		$this->zbxTestCheckHeader('Images');
 		$this->zbxTestTextPresent(['Name', 'Upload', 'Image']);
-		$this->zbxTestAssertElementPresentId('update');
-		$this->zbxTestAssertElementPresentId('delete');
-		$this->zbxTestAssertElementPresentId('cancel');
-		$this->zbxTestClickWait('update');
+		$this->zbxTestAssertElementPresentXpath('//button[text()="Delete"]');
+		$this->zbxTestAssertElementPresentXpath('//button[text()="Cancel"]');
+		$this->zbxTestClickButtonText('Update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');
 
 		$this->assertEquals($old_image_hash, CDBHelper::getHash($sql_image));

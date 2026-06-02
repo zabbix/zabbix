@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,19 +23,15 @@ class CControllerLatestView extends CControllerLatest {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			// filter fields
 			'groupids' =>				'array_db hosts_groups.groupid',
 			'hostids' =>				'array_db hosts.hostid',
 			'name' =>					'string',
-			'show_details' =>			'in 1,0',
 			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>					'array',
 			'state' =>					'in -1,'.ITEM_STATE_NORMAL.','.ITEM_STATE_NOTSUPPORTED,
-			'show_tags' =>				'in '.SHOW_TAGS_NONE.','.SHOW_TAGS_1.','.SHOW_TAGS_2.','.SHOW_TAGS_3,
-			'tag_name_format' =>		'in '.TAG_NAME_FULL.','.TAG_NAME_SHORTENED.','.TAG_NAME_NONE,
-			'tag_priority' =>			'string',
 
 			// table sorting inputs
 			'sort' =>					'in host,name',
@@ -49,7 +45,6 @@ class CControllerLatestView extends CControllerLatest {
 			'filter_counters' =>		'in 1',
 			'filter_set' =>				'in 1',
 			'filter_reset' =>			'in 1',
-			'counter_index' =>			'ge 0',
 			'subfilter_hostids' =>		'array',
 			'subfilter_tagnames' =>		'array',
 			'subfilter_tags' =>			'array',
@@ -125,7 +120,7 @@ class CControllerLatestView extends CControllerLatest {
 
 	protected function doAction(): void {
 		$filter_tabs = [];
-		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
+		$profile = (new CTabFilterProfile('web.monitoring.latest', static::FILTER_FIELDS_DEFAULT))->read();
 
 		if ($this->hasInput('filter_reset')) {
 			$profile->reset();
@@ -153,13 +148,9 @@ class CControllerLatestView extends CControllerLatest {
 		$mandatory_filter_set = self::isMandatoryFilterFieldSet($filter);
 		$subfilter_set = self::isSubfilterSet($filter);
 
-		$refresh_curl = new CUrl('zabbix.php');
-		$refresh_curl_params = ['action' => 'latest.view.refresh'] + $filter;
-		array_map([$refresh_curl, 'setArgument'], array_keys($refresh_curl_params), $refresh_curl_params);
-
 		// data sort and pager
-		$sort_field = $this->getInput('sort', 'name');
-		$sort_order = $this->getInput('sortorder', ZBX_SORT_UP);
+		$sort_field = $this->getInput('sort', CControllerLatest::DEFAULT_SORT);
+		$sort_order = $this->getInput('sortorder', CControllerLatest::DEFAULT_SORTORDER);
 
 		$prepared_data = [
 			'hosts' => [],
@@ -187,62 +178,37 @@ class CControllerLatestView extends CControllerLatest {
 
 		$this->extendData($prepared_data);
 
-		$refresh_data = array_filter([
-			'groupids' => $filter['groupids'],
-			'hostids' => $filter['hostids'],
-			'name' => $filter['name'],
-			'show_details' => $filter['show_details'] ? 1 : 0,
-			'evaltype' => $filter['evaltype'],
-			'tags' => $filter['tags'],
-			'state' => $filter['state'],
-			'show_tags' => $filter['show_tags'],
-			'tag_name_format' => $filter['tag_name_format'],
-			'tag_priority' => $filter['tag_priority'],
-			'subfilter_hostids' => $filter['subfilter_hostids'],
-			'subfilter_tagnames' => $filter['subfilter_tagnames'],
-			'subfilter_tags' => $filter['tags'],
-			'subfilter_state' => $filter['subfilter_state'],
-			'subfilter_data' => $filter['subfilter_data'],
-			'sort' => $sort_field,
-			'sortorder' => $sort_order,
-			'page' => $this->hasInput('page') ? $this->getInput('page') : null
-		]);
+		$storage_idx = 'web.monitoring.latest.datatable';
 
 		// display
 		$data = [
-			'refresh_url' => $refresh_curl->getUrl(),
-			'refresh_interval' => CWebUser::getRefresh() * 1000,
-			'refresh_data' => $refresh_data,
+			'default_sort_field' => CControllerLatest::DEFAULT_SORT,
+			'default_sort_order' => CControllerLatest::DEFAULT_SORTORDER,
+			'filter' => $filter,
 			'filter_defaults' => $profile->filter_defaults,
-			'mandatory_filter_set' => $mandatory_filter_set,
-			'subfilter_set' => $subfilter_set,
-			'filter_view' => 'monitoring.latest.filter',
 			'filter_tabs' => $filter_tabs,
+			'filter_view' => 'monitoring.latest.filter',
+			'mandatory_filter_set' => $mandatory_filter_set,
+			'paging' => $paging,
+			'refresh_interval' => CWebUser::getRefresh() * 1000,
+			'sort_field' => $sort_field,
+			'sort_order' => $sort_order,
+			'storage_idx' => $storage_idx,
+			'subfilters' => $subfilters,
+			'subfilter_set' => $subfilter_set,
 			'tabfilter_options' => [
-				'idx' => static::FILTER_IDX,
+				'idx' => 'web.monitoring.latest',
 				'selected' => $profile->selected,
 				'support_custom_time' => 0,
 				'expanded' => $profile->expanded,
 				'page' => $filter['page'],
 				'csrf_token' => CCsrfTokenHelper::get('tabfilter')
 			],
-			'filter' => $filter,
-			'subfilters' => $subfilters,
-			'sort_field' => $sort_field,
-			'sort_order' => $sort_order,
-			'view_curl' => $view_url,
-			'paging' => $paging,
 			'uncheck' => $this->hasInput('filter_reset'),
-			'config' => [
-				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
-				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
-				'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
-				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
-			],
-			'tags' => makeTags($prepared_data['items'], true, 'itemid', (int) $filter['show_tags'], $filter['tags'],
-				array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : [],
-				(int) $filter['tag_name_format'], $filter['tag_priority']
-			)
+			'user' => ['debug_mode' => $this->getDebugMode()],
+			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
+				CProfile::getArray($storage_idx, [])),
+			'view_curl' => $view_url
 		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);

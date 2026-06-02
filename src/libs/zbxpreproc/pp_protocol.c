@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,6 +25,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
 #include "zbxjson.h"
+#include "zbxdbhigh.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
@@ -133,12 +134,13 @@ static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_fie
 }
 
 static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
-		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, const char *error)
+		unsigned char preprocessing, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state,
+		const char *error)
 {
-	zbx_uint32_t	data_len = 0, value_len, source_len;
+	zbx_uint32_t	data_len = 0, value_len = 0, source_len = 0;
 	unsigned char	var_type = ZBX_VARIANT_NONE, opt_flags = 0;
 	zbx_timespec_t	ts_local;
-	const char	*errmsg;
+	const char	*errmsg = NULL;
 
 	if (NULL == ts)
 	{
@@ -151,6 +153,7 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 	zbx_serialize_prepare_value(data_len, itemid);
 	zbx_serialize_prepare_value(data_len, value_type);
 	zbx_serialize_prepare_value(data_len, item_flags);
+	zbx_serialize_prepare_value(data_len, preprocessing);
 	zbx_serialize_prepare_value(data_len, var_type);
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
@@ -198,7 +201,12 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 		else if (ZBX_ISSET_BIN(result))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
+		}
+		else if (ZBX_ISSET_JSON(result))
+		{
+			var_type = ZBX_VARIANT_STR;
+			zbx_serialize_prepare_str_len(data_len, result->json, value_len);
 		}
 	}
 
@@ -264,6 +272,7 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 	ptr += zbx_serialize_value(ptr, itemid);
 	ptr += zbx_serialize_value(ptr, value_type);
 	ptr += zbx_serialize_value(ptr, item_flags);
+	ptr += zbx_serialize_value(ptr, preprocessing);
 	ptr += zbx_serialize_value(ptr, var_type);
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
@@ -282,6 +291,8 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 			ptr += zbx_serialize_str(ptr, result->str, value_len);
 		else if (ZBX_ISSET_TEXT(result))
 			ptr += zbx_serialize_str(ptr, result->text, value_len);
+		else if (ZBX_ISSET_JSON(result))
+			ptr += zbx_serialize_str(ptr, result->json, value_len);
 	}
 
 	ptr += zbx_serialize_value(ptr, ts->sec);
@@ -331,15 +342,15 @@ static zbx_uint32_t	preprocessor_deserialize_variant(const unsigned char *data, 
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("Unsupported variant type: %s", zbx_variant_type_desc(value));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	return ptr - data;
 }
 
 zbx_uint32_t    zbx_preprocessor_deserialize_value(const unsigned char *data, zbx_uint64_t *itemid,
-		unsigned char *value_type, unsigned char *item_flags, zbx_variant_t *value, zbx_timespec_t *ts,
-		zbx_pp_value_opt_t *opt)
+		unsigned char *value_type, unsigned char *item_flags, unsigned char *preprocessing,
+		zbx_variant_t *value, zbx_timespec_t *ts, zbx_pp_value_opt_t *opt)
 {
 	const unsigned char	*ptr = data;
 	unsigned char		opt_flags;
@@ -347,6 +358,7 @@ zbx_uint32_t    zbx_preprocessor_deserialize_value(const unsigned char *data, zb
 	ptr += zbx_deserialize_value(ptr, itemid);
 	ptr += zbx_deserialize_value(ptr, value_type);
 	ptr += zbx_deserialize_value(ptr, item_flags);
+	ptr += zbx_deserialize_value(ptr, preprocessing);
 
 	ptr += preprocessor_deserialize_variant(ptr, value);
 	ptr += zbx_deserialize_value(ptr, &ts->sec);
@@ -414,6 +426,13 @@ static int	preprocessor_pack_variant(zbx_packed_field_t *fields, const zbx_varia
 			fields[offset++] = PACKED_FIELD(value->data.bin, sizeof(zbx_uint32_t) +
 					zbx_variant_data_bin_get(value->data.bin, NULL));
 			break;
+
+		case ZBX_VARIANT_NONE:
+			break;
+
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	return offset;
@@ -515,7 +534,7 @@ static int	preprocessor_unpack_variant(const unsigned char *data, zbx_variant_t 
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	return (int)(offset - data);
@@ -1044,19 +1063,19 @@ static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
 			&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to preprocessing service: %s", error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == zbx_ipc_socket_write(&socket, code, data, size))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to preprocessing service");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (NULL != response && FAIL == zbx_ipc_socket_read(&socket, response))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot receive data from preprocessing service");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -1103,7 +1122,13 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 		if (0 != ZBX_ISSET_BIN(result))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
+		}
+
+		if (0 != ZBX_ISSET_JSON(result))
+		{
+			if (value_len < (len = strlen(result->json)))
+				value_len = len;
 		}
 
 		if (ZBX_MAX_RECV_DATA_SIZE < value_len)
@@ -1114,18 +1139,78 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 		}
 	}
 
-	if (ZBX_ITEM_REQUIRES_PREPROCESSING_YES == preprocessing)
+	if (ZBX_ITEM_PREPROCESSING_NONE != preprocessing)
 	{
-		preprocessor_serialize_value(itemid, item_value_type, item_flags, result, ts, state, error);
+		preprocessor_serialize_value(itemid, item_value_type, item_flags, preprocessing, result, ts, state,
+				error);
 
 		if (ZBX_PREPROCESSING_BATCH_SIZE < ++preproc_values)
 			zbx_preprocessor_flush();
 	}
 	else
 	{
-		zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, error);
-	}
+		/* When received value from passive agent, all item value types have TEXT type at this stage. */
+		/* When received from trapper - the value type is correlated with item_value_type.            */
+		/* If item_value_type is JSON, then must use result type, depending on result->type.          */
 
+		if (ITEM_VALUE_TYPE_JSON == item_value_type && ITEM_STATE_NOTSUPPORTED != state)
+		{
+			char	*json_val, *dyn_error = NULL;
+
+			if (ZBX_ISSET_JSON(result))
+			{
+				json_val = result->json;
+			}
+			else if (ZBX_ISSET_TEXT(result))
+			{
+				json_val = result->text;
+			}
+			else if (ZBX_ISSET_STR(result))
+			{
+				json_val = result->str;
+			}
+			else if (ZBX_ISSET_LOG(result))
+			{
+				json_val = result->log->value;
+			}
+			else if (ZBX_ISSET_DBL(result) || ZBX_ISSET_UI64(result))
+			{
+				/* double and uint are valid JSON and do not require limit checks */
+				zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, error);
+				goto out;
+			}
+			else if (ZBX_ISSET_BIN(result))
+			{
+				json_val = result->bin;
+				zabbix_log(LOG_LEVEL_CRIT, "unexpected result type: %d and item_value_type: %hhu combo "
+						"for itemid: " ZBX_FS_UI64, result->type, item_value_type, itemid);
+				goto out;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "unexpected result type: %d and item_value_type: %hhu combo "
+						"for itemid: " ZBX_FS_UI64, result->type, item_value_type, itemid);
+				THIS_SHOULD_NEVER_HAPPEN;
+				goto out;
+			}
+
+			if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(json_val))
+			{
+				state = ITEM_STATE_NOTSUPPORTED;
+				dyn_error = zbx_strdup(NULL, "JSON is too large.");
+			}
+			else if (FAIL == zbx_json_validate_ext(json_val, &dyn_error))
+			{
+				state = ITEM_STATE_NOTSUPPORTED;
+			}
+
+			zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, dyn_error);
+			zbx_free(dyn_error);
+		}
+		else
+			zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, error);
+	}
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -1134,7 +1219,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
  * Purpose: send flush command to preprocessing manager                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocessor_flush(void)
+size_t	zbx_preprocessor_flush(void)
 {
 	if (0 < preproc_offset)
 	{
@@ -1145,7 +1230,7 @@ void	zbx_preprocessor_flush(void)
 		zbx_free(preproc_data);
 	}
 
-	zbx_dc_flush_history();
+	return zbx_dc_flush_history();
 }
 
 /******************************************************************************

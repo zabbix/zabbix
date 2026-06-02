@@ -1,6 +1,6 @@
-<?php
+<?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -51,6 +51,14 @@ $filter_actions = (new CCheckBoxList('filter_actions'))
 $html_page = (new CHtmlPage())
 	->setTitle(_('Audit log'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_AUDITLOG_LIST))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					new CRedirectButton(_('Export to CSV'), (new CUrl())->setArgument('action', 'auditlog.csv'))
+				)
+		))->setAttribute('aria-label', _('Content controls'))
+	)
 	->addItem($filter
 		->addVar('action', $data['action'])
 		->setProfile($data['timeline']['profileIdx'])
@@ -69,7 +77,7 @@ $html_page = (new CHtmlPage())
 								'srctbl' => 'users',
 								'srcfld1' => 'userid',
 								'srcfld2' => 'fullname',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'context' => 'audit',
 								'dstfld1' => 'filter_userids_'
 							]

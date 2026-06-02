@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,6 +23,11 @@ class CTabFilter extends CBaseComponent {
 	 * @type {CSortable|null}
 	 */
 	#tabs_sortable = null;
+
+	/**
+	 * @type {boolean}
+	 */
+	#reload_on_tab_create = true;
 
 	constructor(target, options) {
 		super(target);
@@ -419,6 +424,13 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	/**
+	 * @param {boolean} reload_on_tab_create
+	 */
+	setReloadOnTabCreate(reload_on_tab_create) {
+		this.#reload_on_tab_create = reload_on_tab_create;
+	}
+
+	/**
 	 * Register tab filter events, called once during initialization.
 	 */
 	registerEvents() {
@@ -617,6 +629,11 @@ class CTabFilter extends CBaseComponent {
 					})
 					.then(() => {
 						item.setBrowserLocation(params);
+
+						if (!this.#reload_on_tab_create) {
+							return;
+						}
+
 						window.location.reload(true);
 					});
 				}

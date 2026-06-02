@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -40,8 +40,7 @@ class CControllerHostView extends CControllerHost {
 			'filter_custom_time' =>		'in 1,0',
 			'filter_show_counter' =>	'in 1,0',
 			'filter_counters' =>		'in 1',
-			'filter_reset' =>			'in 1',
-			'counter_index' =>			'ge 0'
+			'filter_reset' =>			'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -80,7 +79,7 @@ class CControllerHostView extends CControllerHost {
 
 	protected function doAction(): void {
 		$filter_tabs = [];
-		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
+		$profile = (new CTabFilterProfile('web.monitoring.hosts', static::FILTER_FIELDS_DEFAULT))->read();
 
 		if ($this->hasInput('filter_reset')) {
 			$profile->reset();
@@ -91,7 +90,7 @@ class CControllerHostView extends CControllerHost {
 
 		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {
 			if ($index == $profile->selected) {
-				// Initialize multiselect data for filter_scr to allow tabfilter correctly handle unsaved state.
+				// Initialize multiselect data for filter_src to allow tabfilter to correctly handle unsaved state.
 				$filter_tab['filter_src']['filter_view_data'] = $this->getAdditionalData($filter_tab['filter_src']);
 			}
 
@@ -101,26 +100,32 @@ class CControllerHostView extends CControllerHost {
 		$filter = $filter_tabs[$profile->selected];
 		$filter = self::sanitizeFilter($filter);
 
-		$refresh_curl = new CUrl('zabbix.php');
-		$filter['action'] = 'host.view.refresh';
-		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);
+		$storage_idx = 'web.monitoring.hosts.datatable';
 
 		$data = [
-			'refresh_url' => $refresh_curl->getUrl(),
-			'refresh_interval' => CWebUser::getRefresh() * 1000,
+			'can_create_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+			'default_sort_field' => CControllerHost::DEFAULT_SORT,
+			'default_sort_order' => CControllerHost::DEFAULT_SORTORDER,
 			'filter_view' => 'monitoring.host.filter',
 			'filter_defaults' => $profile->filter_defaults,
 			'filter_groupids' => $this->getInput('groupids', []),
 			'filter_tabs' => $filter_tabs,
-			'can_create_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+			'filter' => $filter,
+			'refresh_interval' => CWebUser::getRefresh() * 1000,
+			'sort_field' => $this->getInput('sort', CControllerHost::DEFAULT_SORT),
+			'sort_order' => $this->getInput('sortorder', CControllerHost::DEFAULT_SORTORDER),
+			'storage_idx' => $storage_idx,
 			'tabfilter_options' => [
-				'idx' => static::FILTER_IDX,
+				'idx' => 'web.monitoring.hosts',
 				'selected' => $profile->selected,
 				'support_custom_time' => 0,
 				'expanded' => $profile->expanded,
 				'page' => $filter['page'],
 				'csrf_token' => CCsrfTokenHelper::get('tabfilter')
-			]
+			],
+			'user' => ['debug_mode' => $this->getDebugMode()],
+			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
+				CProfile::getArray($storage_idx, []))
 		];
 
 		$response = new CControllerResponseData($data);

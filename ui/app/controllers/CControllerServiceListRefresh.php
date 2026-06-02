@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -52,7 +52,7 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 			return false;
 		}
 
-		return parent::checkPermissions();
+		return true;
 	}
 
 	protected function doAction(): void {
@@ -125,7 +125,8 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 
 		self::extendProblemEvents($data['services']);
 
-		$data['tags'] = makeTags($data['services'], true, 'serviceid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
+		$data['tags'] =
+			CTagHelper::getTagsHtml($data['services'], ZBX_TAG_OBJECT_SERVICE, ['filter_tags' => $filter['tags']]);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Services'));

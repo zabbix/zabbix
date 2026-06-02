@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -35,6 +35,7 @@ final class CItemData {
 			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.if.collisions[if]',
 			'net.if.discovery',
+			'net.if.get[<regexp>]',
 			'net.if.in[if,<mode>]',
 			'net.if.list',
 			'net.if.out[if,<mode>]',
@@ -89,6 +90,7 @@ final class CItemData {
 			'system.uptime',
 			'system.users.num',
 			'vfs.dev.discovery',
+			'vfs.dev.get[<mode>,<regex>]',
 			'vfs.dev.read[<device>,<type>,<mode>]',
 			'vfs.dev.write[<device>,<type>,<mode>]',
 			'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]',
@@ -141,6 +143,7 @@ final class CItemData {
 			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.if.collisions[if]',
 			'net.if.discovery',
+			'net.if.get[<regexp>]',
 			'net.if.in[if,<mode>]',
 			'net.if.list',
 			'net.if.out[if,<mode>]',
@@ -195,6 +198,7 @@ final class CItemData {
 			'system.uptime',
 			'system.users.num',
 			'vfs.dev.discovery',
+			'vfs.dev.get[<mode>,<regex>]',
 			'vfs.dev.read[<device>,<type>,<mode>]',
 			'vfs.dev.write[<device>,<type>,<mode>]',
 			'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]',
@@ -1258,6 +1262,14 @@ final class CItemData {
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#net.if.discovery'
 				]
 			],
+			'net.if.get[<regexp>]' => [
+				'description' => _('List of network interfaces with detailed information. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'documentation_link' => [
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#net.if.get',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#net.if.get'
+				]
+			],
 			'net.if.in[if,<mode>]' => [
 				'description' => _('Incoming traffic statistics on network interface. Returns integer'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
@@ -1706,6 +1718,14 @@ final class CItemData {
 				'documentation_link' => [
 					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#vfs.dev.discovery',
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#vfs.dev.discovery'
+				]
+			],
+			'vfs.dev.get[<mode>,<regex>]' => [
+				'description' => _('List of block devices with detailed information. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'documentation_link' => [
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#vfs.dev.get',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#vfs.dev.get'
 				]
 			],
 			'vfs.dev.read[<device>,<type>,<mode>]' => [

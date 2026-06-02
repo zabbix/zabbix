@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -52,7 +52,8 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			'name' => 'Item {$TEST}',
 			'key_' => 'item1',
 			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_UINT64
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
@@ -61,7 +62,8 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			'hostid' => self::$hostid1,
 			'name' => 'Trapper discovery',
 			'key_' => 'item_discovery',
-			'type' => ITEM_TYPE_TRAPPER
+			'type' => ITEM_TYPE_TRAPPER,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -74,7 +76,8 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			'name' => 'LLD {$TEST} {#KEY}',
 			'key_' => 'trap[{#KEY}]',
 			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_TEXT
+			'value_type' => ITEM_VALUE_TYPE_TEXT,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 
 		$this->assertArrayHasKey('itemids', $response['result']);

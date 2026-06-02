@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -43,6 +43,8 @@
 #include "zbxipcservice.h"
 #include "zbxstr.h"
 #include "zbxserialize.h"
+#include "zbxsupervisor_client.h"
+#include "postinit.h"
 
 zbx_export_file_t		*problems_export = NULL;
 static zbx_export_file_t	*get_problems_export(void)
@@ -1630,6 +1632,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD};
+	char			*error = NULL;
 
 	zbx_thread_taskmanager_args	*taskmanager_args_in = (zbx_thread_taskmanager_args *)
 			((((zbx_thread_args_t *)args))->args);
@@ -1642,6 +1645,14 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
+	if (SUCCEED != zbx_check_postinit_tasks(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot complete post initialization tasks: %s",
+				error);
+		zbx_free(error);
+		zbx_exit(EXIT_FAILURE);
+	}
+
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		problems_export = zbx_problems_export_init(get_problems_export, "task-manager", process_num);
 
@@ -1653,6 +1664,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), taskmanager_args_in->config_timeout,
 			&rtc);
+
+
+	zbx_supervisor_set_process_running(server_num);
 
 	while (ZBX_IS_RUNNING())
 	{

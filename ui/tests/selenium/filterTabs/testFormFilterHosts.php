@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,12 +16,14 @@
 require_once __DIR__.'/../common/testFormFilter.php';
 
 /**
+ * @dataSource MonitoringOverview
+ *
  * @backup profiles
  */
 class testFormFilterHosts extends testFormFilter {
 
 	public $url = 'zabbix.php?action=host.view';
-	public $table_selector = 'class:list-table';
+	public $table_selector = 'id:hosts';
 
 	public static function getCheckCreatedFilterData() {
 		return [
@@ -142,7 +144,7 @@ class testFormFilterHosts extends testFormFilter {
 	 * @dataProvider getCheckCreatedFilterData
 	 */
 	public function testFormFilterHosts_CheckCreatedFilter($data) {
-		$this->createFilter($data, 'filter-create', 'zabbix');
+		$this->createFilter($data, 'filter-create', 'zabbix', $this->table_selector);
 		$this->checkFilters($data, $this->table_selector);
 	}
 
@@ -150,22 +152,30 @@ class testFormFilterHosts extends testFormFilter {
 		return [
 			[
 				[
-					'Name' => 'Test name',
-					'Host groups' => ['Zabbix servers'],
-					'IP' => '192.168.10.1',
-					'DNS' => 'test.name',
-					'Port' => '10055',
-					'Average' => true,
-					'Warning' => true
+					'filter' => [
+						'Name' => 'Test name',
+						'Host groups' => ['Zabbix servers'],
+						'IP' => '192.168.10.1',
+						'DNS' => 'test.name',
+						'Port' => '10055',
+						'Average' => true,
+						'Warning' => true
+					]
 				]
 			],
 			[
 				[
-					'Port' => '10050',
-					'Not classified' => true,
-					'Information' => true,
-					'Status' => 'Enabled',
-					'Show suppressed problems' => true
+					'filter' => [
+						'Port' => '10050',
+						'Not classified' => true,
+						'Information' => true,
+						'Status' => 'Enabled'
+					],
+					'header_settings' => [
+						'Problems' => [
+							'Show suppressed problems' => true
+						]
+					]
 				]
 			]
 		];
@@ -177,7 +187,7 @@ class testFormFilterHosts extends testFormFilter {
 	 * @dataProvider getCheckRememberedFilterData
 	 */
 	public function testFormFilterHosts_CheckRememberedFilter($data) {
-		$this->checkRememberedFilters($data);
+		$this->checkRememberedFilters($data, $this->table_selector);
 	}
 
 	/**

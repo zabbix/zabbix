@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -332,6 +332,7 @@ class CTriggerGeneralHelper {
 			if (array_key_exists($tag['tag'], $inherited_tags)
 					&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
 				if (!array_key_exists('type', $tag) || $tag['type'] != ZBX_PROPERTY_INHERITED) {
+					$inherited_tags[$tag['tag']][$tag['value']] += $tag;
 					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
 				}
 			}

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,11 +16,11 @@
 
 class CControllerUsergroupTagFilterEdit extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'edit' =>			'in 1,0',
 			'groupid' =>		'db hosts_groups.groupid',
@@ -43,11 +43,11 @@ class CControllerUsergroupTagFilterEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_GROUPS);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'edit' => 0,
 			'groupid' => null,
@@ -55,6 +55,9 @@ class CControllerUsergroupTagFilterEdit extends CController {
 			'tag_filters' => []
 		];
 		$this->getInputs($data, array_keys($data));
+
+		$data['js_validation_rules'] = (new CFormValidator(CControllerUsergroupTagFilterCheck::getValidationRules()))
+			->getRules();
 
 		$data += [
 			'title' => $data['edit'] == 0 ? _('New tag filter') : _('Tag filter'),

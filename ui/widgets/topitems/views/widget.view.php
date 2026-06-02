@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -133,16 +133,37 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 	$column = $data['configuration'][$cell[Widget::CELL_METADATA]['column_index']];
 	$color = $column['base_color'];
 
-	$value_cell = (new CCol(new CDiv($formatted_value)))
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
-		->addClass(ZBX_STYLE_NOWRAP);
+	$value_cell = new CCol(new CDiv($formatted_value));
+	$value_cell->addClass(ZBX_STYLE_NOWRAP);
+
+	$combined = $item['combined'] ?? false;
+	if (!$combined) {
+		$value_cell->addClass(ZBX_STYLE_CURSOR_POINTER);
+	}
 
 	if ($value !== '') {
-		$value_cell->setHint((new CDiv($value))->addClass(ZBX_STYLE_HINTBOX_WRAP), '', false);
+		$hintbox_value = $item['value_type'] == ITEM_VALUE_TYPE_JSON
+			? (new CTrim($value, ZBX_HINTBOX_HTML_LIMIT)) : (new CDiv($value));
+
+		$value_cell->setHint(
+			$hintbox_value
+				->addClass(ZBX_STYLE_HINTBOX_WRAP),
+			'', true, '', 0
+		);
 	}
 
 	switch ($column['display']) {
 		case CWidgetFieldColumnsList::DISPLAY_AS_IS:
+			if (array_key_exists('thresholds', $column)) {
+				foreach ($column['thresholds'] as $threshold) {
+					if ($value < $threshold['threshold']) {
+						break;
+					}
+
+					$color = $threshold['color'];
+				}
+			}
+
 			$style = $color !== '' ? 'background-color: #'.$color : null;
 			$value_cell->addStyle($style);
 
@@ -193,6 +214,8 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 
 			return [new CCol($bar_gauge), $value_cell];
 	}
+
+	return [];
 }
 
 function makeTableCellViewFormattedValue(array $cell, array $data): CSpan {
@@ -217,8 +240,11 @@ function makeTableCellViewFormattedValue(array $cell, array $data): CSpan {
 		);
 	}
 
-	return (new CSpan($formatted_value))
-		->setMenuPopup(
+	$span = (new CSpan($formatted_value));
+
+	$combined = $item['combined'] ?? false;
+	if (!$combined) {
+		$span->setMenuPopup(
 			CMenuPopupHelper::getItem([
 				'itemid' => $itemid,
 				'context' => 'host',
@@ -227,16 +253,20 @@ function makeTableCellViewFormattedValue(array $cell, array $data): CSpan {
 					->getUrl()
 			])
 		);
+	}
+
+	return $span;
 }
 
 function makeTableCellViewsText(array $cell, array $data, $formatted_value, bool $is_view_value): array {
+	$item = $data['db_items'][$cell[Widget::CELL_ITEMID]];
 	$value = $cell[Widget::CELL_VALUE];
 	$column = $data['configuration'][$cell[Widget::CELL_METADATA]['column_index']];
 
 	$color = '';
 	if (array_key_exists('highlights', $column)) {
 		foreach ($column['highlights'] as $highlight) {
-			if (@preg_match('('.$highlight['pattern'].')', $value)) {
+			if (@preg_match('/'.CRegexHelper::handleSlashEscaping($highlight['pattern']).'/', $value)) {
 				$color = $highlight['color'];
 				break;
 			}
@@ -249,8 +279,15 @@ function makeTableCellViewsText(array $cell, array $data, $formatted_value, bool
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->addClass(ZBX_STYLE_NOWRAP);
 
+	$hintbox_value = $item['value_type'] == ITEM_VALUE_TYPE_JSON
+		? (new CTrim($value, ZBX_HINTBOX_HTML_LIMIT)) : (new CDiv($value));
+
 	if ($value !== '') {
-		$value_cell->setHint((new CDiv($value))->addClass(ZBX_STYLE_HINTBOX_WRAP), '', false);
+		$value_cell->setHint(
+			$hintbox_value
+			->addClass(ZBX_STYLE_HINTBOX_WRAP),
+			'', true, '', 0
+		);
 	}
 
 	if ($is_view_value) {

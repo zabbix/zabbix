@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -80,7 +80,6 @@ $available_js = [
 	'multiselect.js' => '',
 	'chkbxrange.js' => '',
 	'layout.mode.js' => '',
-	'textareaflexible.js' => '',
 	'inputsecret.js' => '',
 	'macrovalue.js' => '',
 	// vendors
@@ -95,13 +94,31 @@ $available_js = [
 	'component.z-color-picker.js' => '',
 	'component.z-select.js' => '',
 	'component.z-sparkline.js' => '',
+	'component.z-textarea-flexible.js' => '',
 	'component.z-vertical.js' => '',
 	'class.event-hub.js' => '',
 	'class.event-hub.event.js' => '',
+	'class.banner.js' => '',
 	'class.base-component.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
-	'class.cdebug.js' => '',
+	'class.dataprovider.js' => 'datatable/',
+	'class.dataprovider.default.js' => 'datatable/',
+	'class.options-popup.js' => 'datatable/options-popup/',
+	'class.options-popup.table-options.js' => 'datatable/options-popup/',
+	'class.options-popup.tags.js' => 'datatable/options-popup/',
+	'class.options-popup.tagvalue.js' => 'datatable/options-popup/',
+	'class.options-popup.monitoring.problems.time.js' => 'datatable/options-popup/',
+	'class.options-popup.monitoring.problems.problem.js' => 'datatable/options-popup/',
+	'class.options-popup.monitoring.host.problems.js' => 'datatable/options-popup/',
+	'class.options-popup.monitoring.latest.name.js' => 'datatable/options-popup/',
+	'class.column.js' => 'datatable/column/',
+	'class.column.tags.js' => 'datatable/column/',
+	'class.column.tagvalue.js' => 'datatable/column/',
+	'class.datatable.js' => 'datatable/',
+	'class.message.js' => '',
+	'class.pager.js' => '',
+	'class.state.js' => '',
 	'class.expandable.subfilter.js' => '',
 	'class.form.js' => '',
 	'class.form.validator.js' => '',
@@ -119,7 +136,6 @@ $available_js = [
 	'class.coverride.js' => '',
 	'class.crangecontrol.js' => '',
 	'class.csuggest.js' => '',
-	'class.csvggraph.js' => '',
 	'class.curl.js' => '',
 	'class.form.fieldset.collapsible.js' => '',
 	'class.overlaycollection.js' => '',
@@ -169,14 +185,18 @@ $available_js = [
 	'class.field.js' => 'fields/',
 	'class.field.array.js' => 'fields/',
 	'class.field.checkbox.js' => 'fields/',
+	'class.field.file.js' => 'fields/',
 	'class.field.hidden.js' => 'fields/',
+	'class.field.menupath.js' => 'fields/',
 	'class.field.multiline.js' => 'fields/',
 	'class.field.multiselect.js' => 'fields/',
 	'class.field.radiolist.js' => 'fields/',
 	'class.field.set.js' => 'fields/',
 	'class.field.textarea.js' => 'fields/',
 	'class.field.textbox.js' => 'fields/',
-	'class.field.zselect.js' => 'fields/'
+	'class.field.zcolorpicker.js' => 'fields/',
+	'class.field.zselect.js' => 'fields/',
+	'class.field.ztextarea-flexible.js' => 'fields/'
 ];
 
 $translate_strings = [
@@ -196,7 +216,8 @@ $translate_strings = [
 		'Cannot paste inaccessible widget.' => _('Cannot paste inaccessible widget.'),
 		'Copy' => _('Copy'),
 		'Delete' => _('Delete'),
-		'Editing other objects is not allowed in dashboard editing mode.' => _('Editing other objects is not allowed in dashboard editing mode.'),
+		'Editing other objects is not allowed in dashboard editing mode.' =>
+			_('Editing other objects is not allowed in dashboard editing mode.'),
 		'Failed to paste dashboard page.' => _('Failed to paste dashboard page.'),
 		'Failed to paste widget.' => _('Failed to paste widget.'),
 		'Failed to update dashboard page properties.' => _('Failed to update dashboard page properties.'),
@@ -215,6 +236,75 @@ $translate_strings = [
 		'Add a new widget' => _('Add a new widget'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
 		'Release to create a widget.' => _('Release to create a widget.')
+	],
+	'class.pager.js' => [
+		'First' => _x('First', 'page navigation'),
+		'Last' => _x('Last', 'page navigation'),
+		'Go to first page' => _('Go to first page'),
+		'Go to previous page, %1$s' => _('Go to previous page, %1$s'),
+		'Go to page %1$s, current page' => _('Go to page %1$s, current page'),
+		'Go to page %1$s' => _('Go to page %1$s'),
+		'Go to next page, %1$s' => _('Go to next page, %1$s'),
+		'Go to last page, %1$s' => _('Go to last page, %1$s'),
+		'Displaying %1$s of %2$s found' => _('Displaying %1$s of %2$s found'),
+		'Displaying %1$s to %2$s of %3$s found' => _('Displaying %1$s to %2$s of %3$s found')
+	],
+	'class.datatable.js' => [
+		'No data found' => _('No data found'),
+		'Unexpected server error.' => _('Unexpected server error.'),
+		'Enabled' => _('Enabled'),
+		'Disabled' => _('Disabled'),
+		'Inherited tag' => _('Inherited tag'),
+		'Inherited and template tag' => _('Inherited and template tag'),
+		'Inherited and host tag' => _('Inherited and host tag'),
+		'Inherited and host prototype tag' => _('Inherited and host prototype tag'),
+		'Inherited and item tag' => _('Inherited and item tag'),
+		'Inherited and item prototype tag' => _('Inherited and item prototype tag'),
+		'Inherited and trigger tag' => _('Inherited and trigger tag'),
+		'Inherited and trigger prototype tag' => _('Inherited and trigger prototype tag'),
+		'Inherited and web scenario tag' => _('Inherited and web scenario tag'),
+		'Are you sure you want to delete %1$s? This action cannot be undone.' =>
+			_('Are you sure you want to delete %1$s? This action cannot be undone.'),
+		'duplicate' => _('duplicate'),
+		'selected' => _('selected'),
+		'Customize table' => _('Customize table')
+	],
+	'class.options-popup.js' => [
+		'Column name' => _('Column name'),
+		'Duplicate column' => _('Duplicate column'),
+		'Delete column' => _('Delete column')
+	],
+	'class.options-popup.monitoring.host.problems.js' => [
+		'Show suppressed problems' => _('Show suppressed problems')
+	],
+	'class.options-popup.monitoring.latest.name.js' => [
+		'Show item key' => _('Show item key')
+	],
+	'class.options-popup.monitoring.problems.problem.js' => [
+		'Show operational data' => _('Show operational data'),
+		'Show trigger expression' => _('Show trigger expression')
+	],
+	'class.options-popup.monitoring.problems.time.js' => [
+		'Show timeline' => _('Show timeline')
+	],
+	'class.options-popup.tags.js' => [
+		'Number of tags' => _('Number of tags'),
+		'Tag name display' => _('Tag name display'),
+		'Full' => _('Full'),
+		'Shortened' => _('Shortened'),
+		'None' => _('None'),
+		'Tag display priority' => _('Tag display priority'),
+		'comma-separated list' => _('comma-separated list')
+	],
+	'class.options-popup.tagvalue.js' => [
+		'Tag name' => _('Tag name')
+	],
+	'class.options-popup.table-options.js' => [
+		'Table options' => _('Table options'),
+		'Column list' => _('Column list'),
+		'Reset layout' => _('Reset layout'),
+		'Your table settings will be reset to default and duplicated columns will be removed.' =>
+			_('Your table settings will be reset to default and duplicated columns will be removed.')
 	],
 	'class.geomaps.js' => [
 		'Severity filter' => _('Severity filter')
@@ -249,7 +339,8 @@ $translate_strings = [
 	'class.widget.misconfigured.js' => [
 		'Please update configuration' => _('Please update configuration'),
 		'Referred widget is unavailable' => _('Referred widget is unavailable'),
-		'Refresh interval' => _('Refresh interval')
+		'Refresh interval' => _('Refresh interval'),
+		'Widget is not fully configured' => _('Widget is not fully configured')
 	],
 	'class.widget-select.popup.js' => [
 		'Cancel' => _('Cancel'),
@@ -257,11 +348,9 @@ $translate_strings = [
 		'No compatible widgets.' => _('No compatible widgets.'),
 		'Widget' => _('Widget')
 	],
-	'class.widget-edit.dialogue.js' => [
-		'Widget configuration will be reverted.' => _('Widget configuration will be reverted.')
-	],
 	'class.widget-edit.sandbox.js' => [
-		'Cannot add widget: not enough free space on the dashboard.' => _('Cannot add widget: not enough free space on the dashboard.')
+		'Cannot add widget: not enough free space on the dashboard.' =>
+			_('Cannot add widget: not enough free space on the dashboard.')
 	],
 	'class.widget-edit.validator.js' => [
 		'Failed to update widget properties.' => _('Failed to update widget properties.')
@@ -280,13 +369,14 @@ $translate_strings = [
 	'functions.js' => [
 		'Close' => _('Close'),
 		'Details' => _('Details'),
+		'Error message' => _('Error message'),
+		'Info message' => _('Info message'),
 		'S_YEAR_SHORT' => _x('y', 'year short'),
 		'S_MONTH_SHORT' => _x('M', 'month short'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
 		'Success message' => _('Success message'),
-		'Error message' => _('Error message'),
 		'Warning message' => _('Warning message')
 	],
 	'inputsecret.js' => [
@@ -328,7 +418,7 @@ $translate_strings = [
 		'S_HOST' => _('Host'),
 		'S_HOST_GROUP' => _('Host group'),
 		'S_IMAGE' => _('Image'),
-		'S_INCORRECT_ITEM_VALUE_TYPE' =>  _('incorrect item value type'),
+		'S_INCORRECT_ITEM_VALUE_TYPE' => _('incorrect item value type'),
 		'S_INCORRECT_VALUE' => _('Incorrect value for field "%1$s": %2$s.'),
 		'S_INDICATORS' => _('Indicators'),
 		'S_INVALID_PARAMETER' => _('Invalid parameter "%1$s": %2$s.'),
@@ -417,27 +507,33 @@ $translate_strings = [
 	],
 	'class.form.validator.js' => [
 		'An array is expected.' => _('An array is expected.'),
-		'Required field is missing.' => _('Required field is missing.'),
+		'At least %1$d items based on field "%2$s" rules' => _('At least %1$d items based on field "%2$s" rules'),
+		'No more than %1$d items based on field "%2$s" rules' => _('No more than %1$d items based on field "%2$s" rules'),
 		'This value does not match pattern.' => _('This value does not match pattern.'),
 		'This value is not a valid identifier.' => _('This value is not a valid identifier.'),
 		'This value is not a valid integer.' => _('This value is not a valid integer.'),
 		'This value is not a valid floating-point value.' => _('This value is not a valid floating-point value.'),
-		'This object already exists.' => _('This object already exists.'),
 		'This value is not a valid string.' => _('This value is not a valid string.'),
 		'This field cannot be empty.' => _('This field cannot be empty.'),
+		'This value cannot have more than %1$s decimal places.' =>
+			_('This value cannot have more than %1$s decimal places.'),
 		'This value is too long.' => _('This value is too long.'),
 		'This value cannot be one of %1$s.' => _('This value cannot be one of %1$s.'),
 		'This value cannot be %1$s.' => _('This value cannot be %1$s.'),
 		'This value must be %1$s.' => _('This value must be %1$s.'),
-		'This value must be no less than "%1$s".' => _('This value must be no less than "%1$s".'),
-		'This value must be no greater than "%1$s".' => _('This value must be no greater than "%1$s".'),
+		'Value must be less than or equal to %1$s.' => _('Value must be less than or equal to %1$s.'),
+		'Value must be greater than or equal to %1$s.' => _('Value must be greater than or equal to %1$s.'),
 		'This value must be one of %1$s.' => _('This value must be one of %1$s.'),
 		'Entry "%1$s" is not unique.' => _('Entry "%1$s" is not unique.'),
 		'within range %1$s' => _('within range %1$s'),
 		'within ranges %1$s' => _('within ranges %1$s'),
 		'one of %1$s' => _('one of %1$s'),
 		' or ' => _(' or '),
-		'%1$s: %2$s' => _('%1$s: %2$s')
+		'%1$s: %2$s' => _('%1$s: %2$s'),
+		'This value is not a valid file.' => _('This value is not a valid file.'),
+		'Image size must be less than %1$s.' => _('Image size must be less than %1$s.'),
+		'File size must be less than %1$s.' => _('File size must be less than %1$s.'),
+		'File format is unsupported.' => _('File format is unsupported.')
 	],
 	'main.js' => [
 		'S_EXPAND' => _('Expand'),
@@ -498,8 +594,10 @@ $translate_strings = [
 		'Delete dashboard?' => _('Delete dashboard?'),
 		'Discovery' => _('Discovery'),
 		'Discovery rule' => _('Discovery rule'),
-		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
+		'Do you wish to replace the conditional expression?' =>
+			_('Do you wish to replace the conditional expression?'),
 		'Execute now' => _('Execute now'),
+		'Export' => _('Export'),
 		'Item' => _('Item'),
 		'Items' => _('Items'),
 		'Item prototype' => _('Item prototype'),
@@ -511,11 +609,8 @@ $translate_strings = [
 		'Host' => _('Host'),
 		'Host Wizard' => _('Host Wizard'),
 		'Inventory' => _('Inventory'),
+		'JSON' => _('JSON'),
 		'Latest data' => _('Latest data'),
-		'Latest values' => _('Latest values'),
-		'Last hour graph' => _('Last hour graph'),
-		'Last month graph' => _('Last month graph'),
-		'Last week graph' => _('Last week graph'),
 		'Links' => _('Links'),
 		'Mark as cause' => _('Mark as cause'),
 		'Mark selected as symptoms' => _('Mark selected as symptoms'),
@@ -536,7 +631,9 @@ $translate_strings = [
 		'Values' => _('Values'),
 		'View' => _('View'),
 		'View related reports' => _('View related reports'),
-		'Web' => _('Web')
+		'Web' => _('Web'),
+		'XML' => _('XML'),
+		'YAML' => _('YAML')
 	],
 	'init.js' => [
 		'Debug' => _('Debug'),
@@ -547,11 +644,6 @@ $translate_strings = [
 			_('To set a host interface select a single item type for all items'),
 		'No interface found' => _('No interface found'),
 		'Item type does not use interface' => _('Item type does not use interface')
-	],
-	'class.csvggraph.js' => [
-		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
-		'S_MINUTE_SHORT' => _x('m', 'minute short'),
-		'Unexpected server error.' => _('Unexpected server error.')
 	],
 	'class.svggauge.js' => [
 		'No data' => _('No data')
@@ -606,21 +698,39 @@ if (empty($_GET['files'])) {
 		'component.z-color-picker.js',
 		'component.z-select.js',
 		'component.z-sparkline.js',
+		'component.z-textarea-flexible.js',
 		'component.z-vertical.js',
 		'class.event-hub.js',
 		'class.event-hub.event.js',
 		'class.base-component.js',
 		'class.calendar.js',
-		'class.cdebug.js',
 		'class.form.fieldset.collapsible.js',
 		'class.overlaycollection.js',
 		'class.overlay.js',
 		'class.cdate.js',
 		'class.cookie.js',
 		'class.curl.js',
+		'class.dataprovider.js',
+		'class.dataprovider.default.js',
+		'class.options-popup.js',
+		'class.options-popup.table-options.js',
+		'class.options-popup.tags.js',
+		'class.options-popup.tagvalue.js',
+		'class.options-popup.monitoring.problems.time.js',
+		'class.options-popup.monitoring.problems.problem.js',
+		'class.options-popup.monitoring.host.problems.js',
+		'class.options-popup.monitoring.latest.name.js',
+		'class.column.js',
+		'class.column.tags.js',
+		'class.column.tagvalue.js',
+		'class.datatable.js',
+		'class.pager.js',
+		'class.state.js',
+		'class.message.js',
 		'class.field.js',
 		'class.field.array.js',
 		'class.field.checkbox.js',
+		'class.field.file.js',
 		'class.field.hidden.js',
 		'class.field.multiline.js',
 		'class.field.multiselect.js',
@@ -628,7 +738,10 @@ if (empty($_GET['files'])) {
 		'class.field.set.js',
 		'class.field.textarea.js',
 		'class.field.textbox.js',
+		'class.field.menupath.js',
+		'class.field.zcolorpicker.js',
 		'class.field.zselect.js',
+		'class.field.ztextarea-flexible.js',
 		'class.form.js',
 		'class.form.validator.js',
 		'class.menu.js',
@@ -657,14 +770,12 @@ if (empty($_GET['files'])) {
 		'class.expandable.subfilter.js',
 		'hostinterfacemanager.js',
 		'hostmacrosmanager.js',
-		'textareaflexible.js',
 		'class.popup-manager.js',
 		'class.popup-manager.event.js',
 		'items.js',
 		'init.js',
 		'class.coverride.js',
 		'class.crangecontrol.js',
-		'class.csvggraph.js',
 		'class.dashboard.js',
 		'class.dashboard.page.js',
 		'class.dashboard.print.js',

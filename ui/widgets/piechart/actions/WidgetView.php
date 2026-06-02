@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -228,6 +228,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			],
 			'selectHosts' => ['name'],
 			'webitems' => true,
+			'evaltype' => $data_set['item_tags_evaltype'],
+			'tags' => $data_set['item_tags'] ?: null,
+			'inheritedTags' => true,
 			'filter' => [
 				'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
 			],
@@ -287,6 +290,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'output' => ['itemid', 'hostid', 'history', 'trends', 'units', 'value_type'],
 			'selectHosts' => ['name'],
 			'webitems' => true,
+			'evaltype' => $data_set['item_tags_evaltype'],
+			'tags' => $data_set['item_tags'] ?: null,
+			'inheritedTags' => true,
 			'hostids' => $hostids,
 			'filter' => [
 				'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]

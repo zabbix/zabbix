@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,6 +15,8 @@
 #ifndef ZABBIX_PP_MANAGER_H
 #define ZABBIX_PP_MANAGER_H
 
+#include "zbxcommon.h"
+#include "zbxtypes.h"
 #include "pp_worker.h"
 #include "pp_queue.h"
 #include "zbxalgo.h"

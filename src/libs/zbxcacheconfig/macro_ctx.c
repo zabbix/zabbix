@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -26,7 +26,7 @@ static int	common_resolv(zbx_macro_resolv_data_t *p, zbx_uint64_t hostid, const 
 {
 	int	ret = SUCCEED;
 
-	if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+	if (0 == strcmp(p->macro, MVAR_HOST_HOST))
 	{
 		*replace_to = zbx_strdup(*replace_to, host);
 	}
@@ -34,7 +34,7 @@ static int	common_resolv(zbx_macro_resolv_data_t *p, zbx_uint64_t hostid, const 
 	{
 		*replace_to = zbx_strdup(*replace_to, name);
 	}
-	else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+	else if (0 == strcmp(p->macro, MVAR_HOST_IP))
 	{
 		if (INTERFACE_TYPE_UNKNOWN != interface->type)
 		{
@@ -164,8 +164,7 @@ int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 		char *error, size_t maxerrlen)
 {
 	/* Passed arguments */
-	const zbx_dc_um_handle_t	*um_handle = va_arg(args, const zbx_dc_um_handle_t *);
-	const zbx_dc_item_t		*item = va_arg(args, const zbx_dc_item_t *);
+	zbx_macro_resolv_item_t item = va_arg(args, zbx_macro_resolv_item_t);
 
 	int	ret = SUCCEED;
 
@@ -177,26 +176,26 @@ int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 	{
 		if ((ZBX_TOKEN_USER_MACRO == p->token.type || (ZBX_TOKEN_USER_FUNC_MACRO == p->token.type)))
 		{
-			zbx_dc_get_user_macro(um_handle, p->macro, &item->host.hostid, 1, replace_to);
+			zbx_dc_get_user_macro(item.um_handle, p->macro, &item.hostid, 1, replace_to);
 
 			p->pos = (int)p->token.loc.r;
 		}
 		else if (0 == strcmp(p->macro, MVAR_HOST_PORT))
 		{
-			if (INTERFACE_TYPE_UNKNOWN != item->interface.type)
+			if (INTERFACE_TYPE_UNKNOWN != item.interface->type)
 			{
-				*replace_to = zbx_dsprintf(*replace_to, "%hu", item->interface.port);
+				*replace_to = zbx_dsprintf(*replace_to, "%hu", item.interface->port);
 			}
 			else
 			{
-				ret = zbx_dc_get_interface_value(item->host.hostid, item->itemid, replace_to,
+				ret = zbx_dc_get_interface_value(item.hostid, item.itemid, replace_to,
 						ZBX_DC_REQUEST_HOST_PORT);
 			}
 		}
 		else
 		{
-			ret = common_resolv(p, item->host.hostid, item->host.host, item->host.name, &item->interface,
-					item->itemid, replace_to);
+			ret = common_resolv(p, item.hostid, item.host_host, item.host_name,
+					item.interface, item.itemid, replace_to);
 		}
 	}
 
@@ -262,13 +261,12 @@ int	zbx_macro_script_params_field_resolv(zbx_macro_resolv_data_t *p, va_list arg
 	return ret;
 }
 
-int	zbx_item_key_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args)
+static int	item_key_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args)
 {
 	int	ret = SUCCEED;
 
 	/* Passed parameters */
-	const zbx_dc_um_handle_t	*um_handle = va_arg(args, const zbx_dc_um_handle_t *);
-	const zbx_dc_item_t		*item = va_arg(args, const zbx_dc_item_t *);
+	zbx_macro_resolv_item_t	item = va_arg(args, zbx_macro_resolv_item_t);
 
 	ZBX_UNUSED(num);
 
@@ -280,7 +278,7 @@ int	zbx_item_key_subst_cb(const char *data, int level, int num, int quoted, char
 	if (0 != level)
 		zbx_unquote_key_param(*param);
 
-	zbx_substitute_macros(param, NULL, 0, zbx_macro_field_params_resolv, um_handle, item);
+	zbx_substitute_macros(param, NULL, 0, zbx_macro_field_params_resolv, item);
 
 	if (0 != level)
 	{
@@ -318,4 +316,20 @@ int	zbx_snmp_oid_subst_cb(const char *data, int level, int num, int quoted, char
 	}
 
 	return ret;
+}
+
+int	zbx_substitute_item_key_params_default(char **data, char *error, size_t maxerrlen,
+		const zbx_dc_um_handle_t *um_handle, zbx_uint64_t hostid, char *host_host, char *host_name,
+		const zbx_uint64_t itemid, const zbx_dc_interface_t *interface)
+{
+	zbx_macro_resolv_item_t item = {
+		.um_handle = um_handle,
+		.hostid = hostid,
+		.host_host = host_host,
+		.host_name = host_name,
+		.itemid = itemid,
+		.interface = interface,
+	};
+
+	return zbx_substitute_item_key_params(data, error, maxerrlen, item_key_subst_cb, item);
 }

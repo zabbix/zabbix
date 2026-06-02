@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,7 +27,9 @@ import (
 	"time"
 
 	"github.com/go-ldap/ldap"
+	"golang.zabbix.com/agent2/pkg/inet"
 	"golang.zabbix.com/agent2/pkg/web"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
@@ -75,6 +77,13 @@ func (p *Plugin) exportNetTcpPort(params []string, timeout int) (result int, err
 		err = errors.New(errorTooManyParams)
 		return
 	}
+
+	if len(params) >= 1 && params[0] != "" {
+		if net.ParseIP(params[0]) == nil && !inet.IsRFCExtendedHostName(params[0]) {
+			return 0, errs.New(errorInvalidFirstParam)
+		}
+	}
+
 	if len(params) < 2 || len(params[1]) == 0 {
 		err = errors.New(errorInvalidSecondParam)
 		return
@@ -283,15 +292,20 @@ func removeScheme(in string) (scheme string, host string, err error) {
 
 func encloseIPv6(in string) string {
 	parsedIP := net.ParseIP(in)
-	if parsedIP != nil {
-		ipv6 := parsedIP.To16()
-		if ipv6 != nil {
-			out := ipv6.String()
-			return fmt.Sprintf("[%s]", out)
-		}
+	if parsedIP == nil {
+		return in
 	}
 
-	return in
+	if parsedIP.To4() != nil {
+		return parsedIP.String()
+	}
+
+	ipv6 := parsedIP.To16()
+	if ipv6 == nil {
+		return in
+	}
+
+	return fmt.Sprintf("[%s]", ipv6.String())
 }
 
 func (p *Plugin) httpsExpect(ip string, port string, timeout int) int {
@@ -504,6 +518,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		default:
 			err = errors.New(errorInvalidFirstParam)
 			return
+		}
+
+		if len(params) >= 2 && params[1] != "" {
+			if net.ParseIP(params[1]) == nil && !inet.IsRFCExtendedHostName(params[1]) {
+				return nil, errs.New(errorInvalidSecondParam)
+			}
 		}
 
 		if len(params) == 3 && len(params[2]) != 0 {

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -12,10 +12,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_DBCONFIG_H
-#define ZABBIX_DBCONFIG_H
+#ifndef ZABBIX_DBCONFIG_SERVER_H
+#define ZABBIX_DBCONFIG_SERVER_H
 
-#include "zbxthreads.h"
 #include "zbxvault.h"
 
 typedef struct
@@ -32,6 +31,6 @@ typedef struct
 }
 zbx_thread_dbconfig_args;
 
-ZBX_THREAD_ENTRY(dbconfig_thread, args);
+void	*zbx_dbconfig_thread(void *args);
 
 #endif
