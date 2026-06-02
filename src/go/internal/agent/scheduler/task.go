@@ -97,9 +97,9 @@ func (t *taskBase) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// Calls a plugin's Collector interface's Collect() method.
-// When this scheduled task is performed, it will call the Collect() method of
-// the task's plugin.
+// collectorTask represents a recurring collection cycle for a plugin.
+// It is scheduled at the plugin collector interval and consumes the whole
+// plugin capacity while Collect() is running.
 type collectorTask struct {
 	taskBase
 	seed uint64
@@ -154,10 +154,9 @@ func (t *collectorTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// Calls a plugin's Exporter interface's Export() method.
-// When this scheduled task is performed, it will call the Export() method of
-// the task's plugin.
-// It is used for active item checks.
+// exporterTask represents a recurring active check for one monitored item.
+// It is used to collect item values at the configured update interval and
+// write the results to the client's output.
 type exporterTask struct {
 	taskBase
 	item    clientItem
@@ -295,12 +294,10 @@ func (t *exporterTask) Delay() string {
 	return t.item.delay
 }
 
-// Calls a plugin's Exporter interface's Export() method.
-// When this scheduled task is performed, it will call the Export() method of
-// the task's plugin.
-// It is used for non-recurring exporter requests, i.e. single passive checks,
-// as well as internal requests to obtain values of HostnameItem,
-// HostMetadataItem, HostInterfaceItem, etc.
+// directExporterTask represents an on-demand exporter request.
+// It is used for single passive checks and internal requests to resolve values
+// such as HostnameItem, HostMetadataItem, and HostInterfaceItem. The task stays
+// recurring only while it waits for a chance to run before its expiration time.
 type directExporterTask struct {
 	taskBase
 	item   clientItem
@@ -416,9 +413,9 @@ func (t *directExporterTask) Delay() string {
 	return t.item.delay
 }
 
-// Calls a plugin's Runner interface's Start() method.
-// Assists in scheduling the startup of a plugin. When this scheduled task is
-// performed, it will call the Start() method of the task's plugin.
+// starterTask represents plugin startup work for an inactive Runner plugin.
+// It is used to run Start() before scheduling item collection, exports, or
+// watcher updates for the plugin.
 type starterTask struct {
 	taskBase
 }
@@ -445,9 +442,9 @@ func (t *starterTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// Calls a plugin's Runner interface's Stop() method.
-// Assists in scheduling the shutdown of a plugin. When this scheduled task is
-// performed, it will call the Stop() method of the task's plugin.
+// stopperTask represents plugin shutdown work for a Runner plugin that is no
+// longer used by any client. It is used to run Stop() as a scheduled plugin
+// task.
 type stopperTask struct {
 	taskBase
 }
@@ -474,9 +471,9 @@ func (t *stopperTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// Calls a plugin's Watcher interface's Watch() method.
-// When this scheduled task is performed, it will call the Watch() method of
-// the task's plugin.
+// watcherTask represents the active-check items watched by a plugin for one
+// client. It is used to pass the current item list to Watch(); an empty list
+// tells the plugin to stop watching items for that client.
 type watcherTask struct {
 	taskBase
 	items  []*plugin.Item
@@ -535,9 +532,9 @@ func (t *watcherTask) Delay() string {
 	return ""
 }
 
-// Calls a plugin's Configurator interface's Configure() method.
-// Assists in scheduling the configuration of a plugin. When this scheduled
-// task is performed, it will call the Configure() method of the task's plugin.
+// configuratorTask represents plugin configuration work.
+// It is queued before regular plugin work when a Configurator plugin becomes
+// active. It is used to pass global and plugin-specific options to Configure().
 type configuratorTask struct {
 	taskBase
 	options *agent.AgentOptions
@@ -565,9 +562,9 @@ func (t *configuratorTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// Executes a remote command.
-// This task essentially will just Export() the item 'system.run', which is
-// handled separately from other items, due to security concerns.
+// commandTask represents one remote command request.
+// It invokes the system.run exporter path with command-specific output and
+// timeout handling instead of registering a regular item check.
 type commandTask struct {
 	taskBase
 	id      uint64
