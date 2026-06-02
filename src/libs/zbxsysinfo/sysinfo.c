@@ -557,6 +557,7 @@ void	zbx_finalize_key_access_rules_configuration(void)
 
 			if (SUCCEED != key_access_rule_is_unconditional_match_all(rule))
 				continue;
+
 			/* 'match all' rule also matches system.run[*] */
 			if (i < sysrun_index)
 				sysrun_index = i;
