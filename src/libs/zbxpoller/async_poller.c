@@ -228,6 +228,7 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 	zbx_telemetry_query_context	*telemetry_query_context;
 	zbx_dc_tq_item_context_t	*item_context;
 	zbx_timespec_t			timespec;
+	zbx_timespec_t			min_free_ts;
 	zbx_poller_config_t		*poller_config;
 	CURLcode			err_info;
 	zbx_dc_cached_data_t		cached_data;
@@ -244,10 +245,21 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 		goto fail;
 	}
 
-	/* FIXME: should probably be changed to max of current time and min_free_ts */
 	zbx_timespec(&timespec);
 
 	item_context = &telemetry_query_context->item_context;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): timespec: (%ds, %dns), min_free_ts: (%ds, %dns)", __func__, timespec.sec,
+			timespec.ns, item_context->min_free_ts.sec, item_context->min_free_ts.ns);
+
+	if (timespec.sec < item_context->min_free_ts.sec || (timespec.sec == item_context->min_free_ts.sec &&
+			timespec.ns < item_context->min_free_ts.ns))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): min_free_ts > timespec, using min_free_ts", __func__);
+		min_free_ts = item_context->min_free_ts;
+	}
+	else
+		min_free_ts = timespec;
 
 	if (SUCCEED == zbx_http_handle_response(easy_handle, &telemetry_query_context->http_context, err,
 			&response_code, &http_resp, &error) &&
@@ -281,8 +293,6 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 	{
 		if (SUCCEED == status)
 		{
-			zbx_timespec_t	history_entry_ts = timespec;
-
 			for (int i = 0; i < values.values_num; i++)
 			{
 				AGENT_RESULT	result;
@@ -294,26 +304,20 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 				SET_TEXT_RESULT(&result, values.values[i]);
 				values.values[i] = NULL;
 
-				/* TODO: decide if storing meta is needed */
 				zbx_set_agent_result_meta(&result, 0, item_context->newlasttimestamp);
 
 				zbx_preprocess_item_value(item_context->itemid, item_context->value_type,
 						item_context->flags, item_context->preprocessing, &result,
-						&history_entry_ts, ITEM_STATE_NORMAL, NULL);
+						&min_free_ts, ITEM_STATE_NORMAL, NULL);
 
 				zbx_free_agent_result(&result);
 
-				history_entry_ts.ns++;
-				while (history_entry_ts.ns >= 1000000000)
-				{
-					history_entry_ts.ns -= 1000000000;
-					history_entry_ts.sec++;
-				}
+				min_free_ts.ns++;
+				zbx_timespec_normalize(&min_free_ts);
 			}
 
 			if (0 == values.values_num)
 			{
-				/* TODO: decide if storing meta is needed, if not - this is not needed */
 				AGENT_RESULT	result;
 
 				zabbix_log(LOG_LEVEL_TRACE, "%s(): saving empty result", __func__);
@@ -344,6 +348,7 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 	zbx_free(http_resp);
 
 	cached_data.lasttimestamp = item_context->newlasttimestamp;
+	cached_data.min_free_ts = min_free_ts;
 
 	zbx_async_manager_requeue(poller_config->manager, telemetry_query_context->item_context.itemid, SUCCEED,
 			timespec.sec, &cached_data);

@@ -20,6 +20,7 @@
 #include "zbxeval.h"
 #include "zbxavailability.h"
 #include "zbxtelemetry.h"
+#include "zbxtime.h"
 #include "zbxversion.h"
 #include "zbxvault.h"
 #include "zbxregexp.h"
@@ -311,6 +312,7 @@ typedef struct
 	char			*query_fields;
 	zbx_tq_query_t		*telemetry_query;
 	time_t			lasttimestamp;
+	zbx_timespec_t		min_free_ts;
 	unsigned char		preprocessing;
 }
 zbx_dc_telemetry_query_item_t;
@@ -328,8 +330,8 @@ zbx_dc_poller_item_t;
 
 typedef struct
 {
-	time_t	lasttimestamp;
-	/* TODO: probably add min_free_ts */
+	time_t		lasttimestamp;
+	zbx_timespec_t	min_free_ts;
 }
 zbx_dc_cached_data_t;
 

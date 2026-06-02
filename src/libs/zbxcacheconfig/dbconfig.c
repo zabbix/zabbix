@@ -3200,6 +3200,8 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 						sizeof(ZBX_DC_TQITEM));
 
 				item->itemtype.tqitem->lasttimestamp = 0;
+				item->itemtype.tqitem->min_free_ts.sec = 0;
+				item->itemtype.tqitem->min_free_ts.ns = 0;
 			}
 
 			dc_strpool_replace(found, &item->itemtype.tqitem->query_fields, row[32]);
@@ -10230,6 +10232,7 @@ static void	DCget_telemetry_query_item(zbx_dc_telemetry_query_item_t *dst_item, 
 	dst_item->query_fields = zbx_strdup(NULL, src_item->itemtype.tqitem->query_fields);
 	dst_item->telemetry_query = NULL;
 	dst_item->lasttimestamp = src_item->itemtype.tqitem->lasttimestamp;
+	dst_item->min_free_ts = src_item->itemtype.tqitem->min_free_ts;
 
 	dst_item->timeout = 0;
 }
@@ -12176,6 +12179,8 @@ zbx_dc_cached_data_t	zbx_dc_config_get_default_cached_data(void)
 	zbx_dc_cached_data_t	ret;
 
 	ret.lasttimestamp = 0;
+	ret.min_free_ts.sec = 0;
+	ret.min_free_ts.ns = 0;
 
 	return ret;
 }
@@ -12397,6 +12402,7 @@ static void	dc_set_cached_data(ZBX_DC_ITEM *dc_item, int errcode, const zbx_dc_c
 	if (ITEM_TYPE_TELEMETRY_QUERY == dc_item->type)
 	{
 		dc_item->itemtype.tqitem->lasttimestamp = cached_data->lasttimestamp;
+		dc_item->itemtype.tqitem->min_free_ts = cached_data->min_free_ts;
 	}
 }
 

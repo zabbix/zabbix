@@ -17,6 +17,7 @@
 #include "zbxcommon.h"
 #include "zbxtelemetry.h"
 #include "checks_telemetry.h"
+#include "zbxtime.h"
 #include "zbxtypes.h"
 
 #ifdef HAVE_LIBCURL
@@ -35,7 +36,7 @@ void	zbx_async_check_telemetry_query_clean(zbx_telemetry_query_context *telemetr
  *                                                                            *
  ******************************************************************************/
 static int	async_send_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, zbx_tq_query_t *query,
-		time_t now, time_t lasttimestamp, zbx_tq_db_type_t db_type,
+		time_t now, time_t lasttimestamp, const zbx_timespec_t *min_free_ts, zbx_tq_db_type_t db_type,
 		const telemetry_query_http_conn_params_t *conn_params, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, CURLM *curl_handle, char **error)
@@ -60,8 +61,9 @@ static int	async_send_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, 
 	else
 		zbx_tq_generate_elastic(query, now, lasttimestamp, &telemetry_query_context->item_context.posts);
 
-	zbx_tq_get_newlasttimestamp(query, now, lasttimestamp, &telemetry_query_context->item_context.newlasttimestamp);
 	telemetry_query_context->item_context.query = query;
+	zbx_tq_get_newlasttimestamp(query, now, lasttimestamp, &telemetry_query_context->item_context.newlasttimestamp);
+	telemetry_query_context->item_context.min_free_ts = *min_free_ts;
 	telemetry_query_context->item_context.db_type = db_type;
 
 	if (SUCCEED != zbx_http_request_prepare(&telemetry_query_context->http_context, HTTP_REQUEST_POST,
@@ -167,9 +169,9 @@ static int	async_check_telemetry_query_http(zbx_dc_telemetry_query_item_t *item,
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): lasttimestamp: " ZBX_FS_TIME_T ", mtime: %d, max: " ZBX_FS_TIME_T,
 			__func__, item->lasttimestamp, item->mtime, lasttimestamp);
 
-	if (SUCCEED != async_send_telemetry_query_http(item, query, now, lasttimestamp, db_type, &conn_params,
-			config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
-			poller_config->curl_handle, &send_error))
+	if (SUCCEED != async_send_telemetry_query_http(item, query, now, lasttimestamp, &item->min_free_ts, db_type,
+			&conn_params, config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
+			config_ssl_key_location, poller_config->curl_handle, &send_error))
 	{
 		SET_MSG_RESULT(result, send_error);
 		zbx_tq_query_clean(query);

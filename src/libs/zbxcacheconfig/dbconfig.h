@@ -20,6 +20,7 @@
 #include "zbxcommon.h"
 #include "vps_monitor.h"
 #include "zbxalgo.h"
+#include "zbxtime.h"
 #include "zbxversion.h"
 #include "zbxvault.h"
 #include "zbx_trigger_constants.h"
@@ -242,6 +243,7 @@ typedef struct
 {
 	const char	*query_fields;
 	time_t		lasttimestamp;
+	zbx_timespec_t	min_free_ts;
 }
 ZBX_DC_TQITEM;
 
