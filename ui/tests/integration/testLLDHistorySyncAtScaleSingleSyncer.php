@@ -1,3 +1,4 @@
+<?php declare(strict_types = 1);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -12,17 +13,23 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package com.zabbix.gateway;
+require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 
-class GeneralInformation
-{
-	static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	static final String REVISION_DATE = "2 June 2026";
-	static final String REVISION = "{ZABBIX_REVISION}";
-	static final String VERSION = "7.0.27";
+/**
+ * Re-runs the testLLDHistorySyncAtScale suite with StartDBSyncers=1 to exercise
+ * the same scenarios under a single history syncer.
+ *
+ * @required-components server
+ * @suite-components-reuse true
+ * @configurationDataProvider configurationProvider
+ * @onAfter clearData
+ */
+class testLLDHistorySyncAtScaleSingleSyncer extends testLLDHistorySyncAtScale {
 
-	static void printVersion()
-	{
-		System.out.println(String.format("%s v%s (revision %s) (%s)", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE));
+	public function configurationProvider() {
+		$config = parent::configurationProvider();
+		$config[self::COMPONENT_SERVER]['StartDBSyncers'] = '1';
+
+		return $config;
 	}
 }
