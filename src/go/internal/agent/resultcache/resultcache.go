@@ -122,7 +122,7 @@ type cacheData struct {
 	retry            *time.Timer
 	timeout          int
 	historyUpload    bool
-	uploadRetryAfter int64
+	uploadRetryAfter time.Time
 	mu               sync.Mutex
 }
 
@@ -165,19 +165,19 @@ func (c *cacheData) EnableUpload(enabled bool) {
 	defer c.mu.Unlock()
 
 	c.historyUpload = enabled
-	c.uploadRetryAfter = 0
+	c.uploadRetryAfter = time.Time{}
 }
 
 // sendAgentData performs agent data upload and updates upload state (matching C agent send_buffer()).
 func (c *cacheData) sendAgentData(u Uploader, data []byte, timeout time.Duration) []error {
 	c.mu.Lock()
-	c.uploadRetryAfter = 0
+	c.uploadRetryAfter = time.Time{}
 	c.mu.Unlock()
 
 	upload, commsFailed, errs := u.Write(data, timeout)
 	if errs != nil {
 		if commsFailed {
-			c.enableUploadRetry(time.Now().Unix() + 60)
+			c.enableUploadRetry(time.Now().Add(60 * time.Second))
 		}
 
 		return errs
@@ -191,7 +191,7 @@ func (c *cacheData) sendAgentData(u Uploader, data []byte, timeout time.Duration
 // enableUploadRetry disables upload and schedules an automatic retry at retryAfter (unix seconds).
 // Used for communication errors so that upload resumes after 60 seconds without waiting for
 // the next active checks refresh.
-func (c *cacheData) enableUploadRetry(retryAfter int64) {
+func (c *cacheData) enableUploadRetry(retryAfter time.Time) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -204,12 +204,12 @@ func (c *cacheData) checkUploadRetry() bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if c.uploadRetryAfter == 0 || time.Now().Unix() < c.uploadRetryAfter {
+	if c.uploadRetryAfter.IsZero() || time.Now().Before(c.uploadRetryAfter) {
 		return false
 	}
 
 	c.historyUpload = true
-	c.uploadRetryAfter = 0
+	c.uploadRetryAfter = time.Time{}
 
 	return true
 }
