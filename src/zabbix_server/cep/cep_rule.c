@@ -177,7 +177,7 @@ static int	cep_rule_match_event(const zbx_cep_rule_t *rule, const zbx_cep_event_
 	return ret;
 }
 
-static int	cep_rule_discard_event(const zbx_cep_rule_t *rule)
+static int	cep_rule_discard_event(const zbx_cep_rule_t *rule, const zbx_cep_event_t *event)
 {
 	for (int i = 0; i < rule->operations.values_num; i++)
 	{
@@ -187,7 +187,11 @@ static int	cep_rule_discard_event(const zbx_cep_rule_t *rule)
 			continue;
 
 		if (ZBX_CEP_OP_DISCARD == op->type)
+		{
+			ZBX_UNUSED(event);
+			/* TODO: need also to check op flags if they match this event */
 			return SUCCEED;
+		}
 	}
 
 	return FAIL;
@@ -211,7 +215,7 @@ int	zbx_cep_event_match_rules(const zbx_cep_event_t *event, zbx_cep_config_handl
 		if (SUCCEED != cep_rule_match_event(rules->values[i], event, &ctx))
 			continue;
 
-		if (SUCCEED == cep_rule_discard_event(rules->values[i]))
+		if (SUCCEED == cep_rule_discard_event(rules->values[i], event))
 		{
 			zbx_free(*matched_rules);
 			*matched_rules_num = 0;
