@@ -245,6 +245,8 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 		goto fail;
 	}
 
+	/* TODO: for elasticsearch: maybe either implement pagination or detect if not all buckets were gotten */
+
 	zbx_timespec(&timespec);
 
 	item_context = &telemetry_query_context->item_context;
@@ -939,7 +941,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 	}
 	else if (ZBX_POLLER_TYPE_TELEMETRY_QUERY == poller_type)
 	{
-	/* TODO: not initialize this if db type is postgresql/mysql */
+		/* TODO: not initialize this if db type is postgresql/mysql */
 #ifdef HAVE_LIBCURL
 		char	*error = NULL;
 
