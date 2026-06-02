@@ -1473,11 +1473,11 @@ static int	housekeeping_hostgroup_sets(int config_max_hk_delete)
 
 	zbx_vector_uint64_create(&ids_uint64);
 
-	const char *sql2 = "select u.hgsetid"
+	const char *sql2 = "select h.hgsetid"
 		" from hgset h"
 			" where not exists ("
 				"select null"
-				" from user_hgset hh"
+				" from host_hgset hh"
 				" where h.hgsetid = hh.hgsetid"
 			")";
 
