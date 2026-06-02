@@ -1434,7 +1434,7 @@ static int	housekeeping_usergroup_sets(int config_max_hk_delete)
 			break;
 
 		const char *tables[] = {"permission", "ugset_group", "ugset"};
-
+#define TABLE_UGSET_IDX	2
 		for (int i = 0; i < (int)ARRSIZE(tables); i++)
 		{
 			int	rc;
@@ -1447,13 +1447,14 @@ static int	housekeeping_usergroup_sets(int config_max_hk_delete)
 			if (ZBX_DB_OK > (rc = zbx_db_execute("%s", sql)))
 				break;
 
-			deleted += rc;
+			if (TABLE_UGSET_IDX == i)
+				deleted += rc;
 		}
 
 		zbx_free(sql);
 		zbx_vector_uint64_clear(&ids_uint64);
 	}
-
+#undef TABLE_UGSET_IDX
 	zbx_vector_uint64_destroy(&ids_uint64);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
@@ -1504,7 +1505,7 @@ static int	housekeeping_hostgroup_sets(int config_max_hk_delete)
 			break;
 
 		const char *tables[] = {"permission", "hgset_group", "hgset"};
-
+#define TABLE_HGSET_IDX	2
 		for (int i = 0; i < (int)ARRSIZE(tables); i++)
 		{
 			int	rc;
@@ -1517,9 +1518,10 @@ static int	housekeeping_hostgroup_sets(int config_max_hk_delete)
 			if (ZBX_DB_OK > (rc = zbx_db_execute("%s", sql)))
 				break;
 
-			deleted += rc;
+			if (TABLE_HGSET_IDX == i)
+				deleted += rc;
 		}
-
+#undef TABLE_HGSET_IDX
 		zbx_free(sql);
 		zbx_vector_uint64_clear(&ids_uint64);
 	}
