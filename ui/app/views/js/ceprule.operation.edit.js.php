@@ -89,20 +89,20 @@ window.ceprule_operation_edit_popup = new class {
 
 			option.disabled = false;
 
-			if (value == <?= ZBX_CEP_OP_WHEN_EVENT_OCCURRED ?>) {
+			if (value == <?= CCepRuleHelper::OP_WHEN_EVENT_OCCURRED ?>) {
 				option.disabled = false;
 			}
-			else if (value == <?= ZBX_CEP_OP_WHEN_EVENT_EVICTED ?>) {
-				option.disabled = this.#window_type === '<?= ZBX_CEP_WINDOW_NONE ?>';
+			else if (value == <?= CCepRuleHelper::OP_WHEN_EVENT_EVICTED ?>) {
+				option.disabled = this.#window_type === '<?= CCepRuleHelper::WINDOW_NONE ?>';
 			}
-			else if (value == <?= ZBX_CEP_OP_WHEN_WINDOW_CLOSED ?>) {
-				option.disabled = this.#window_type !== '<?= ZBX_CEP_WINDOW_CAUSE_SYMPTOM ?>';
+			else if (value == <?= CCepRuleHelper::OP_WHEN_WINDOW_CLOSED ?>) {
+				option.disabled = this.#window_type !== '<?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>';
 			}
-			else if (value == <?= ZBX_CEP_OP_WHEN_TAGS_CORRELATED ?>) {
-				option.disabled = this.#window_type !== '<?= ZBX_CEP_WINDOW_TAG_MATCH ?>';
+			else if (value == <?= CCepRuleHelper::OP_WHEN_TAGS_CORRELATED ?>) {
+				option.disabled = this.#window_type !== '<?= CCepRuleHelper::WINDOW_TAG_MATCH ?>';
 			}
-			else if (value == <?= ZBX_CEP_OP_WHEN_PATTERN_MATCHED ?>) {
-				option.disabled = this.#window_type !== '<?= ZBX_CEP_WINDOW_PATTERN_MATCH ?>';
+			else if (value == <?= CCepRuleHelper::OP_WHEN_PATTERN_MATCHED ?>) {
+				option.disabled = this.#window_type !== '<?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?>';
 			}
 
 			return option;
@@ -124,13 +124,13 @@ window.ceprule_operation_edit_popup = new class {
 			const value = Number(option.value);
 
 			option.is_disabled = false;
-			if (this.#window_type === '<?= ZBX_CEP_WINDOW_PATTERN_MATCH ?>') {
-				option.is_disabled = !(value == <?= ZBX_CEP_OP_COPY_LAST ?> || value == <?= ZBX_CEP_OP_COPY_FIRST ?>);
+			if (this.#window_type === '<?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?>') {
+				option.is_disabled = !(value == <?= CCepRuleHelper::OP_COPY_LAST ?> || value == <?= CCepRuleHelper::OP_COPY_FIRST ?>);
 			}
 
-			if (value == <?= ZBX_CEP_OP_DISCARD ?>) {
-				option.is_disabled = (execute_when == <?= ZBX_CEP_OP_WHEN_TAGS_CORRELATED ?>)
-					|| (execute_when == <?= ZBX_CEP_OP_WHEN_EVENT_EVICTED ?>);
+			if (value == <?= CCepRuleHelper::OP_DISCARD ?>) {
+				option.is_disabled = (execute_when == <?= CCepRuleHelper::OP_WHEN_TAGS_CORRELATED ?>)
+					|| (execute_when == <?= CCepRuleHelper::OP_WHEN_EVENT_EVICTED ?>);
 			}
 		};
 
@@ -190,52 +190,52 @@ window.ceprule_operation_edit_popup = new class {
 		tag_rename.style.display = 'none';
 
 		if ([
-			<?= ZBX_CEP_OP_COPY_FIRST ?>,
-			<?= ZBX_CEP_OP_COPY_LAST ?>,
-			<?= ZBX_CEP_OP_SUPPRESS ?>,
-			<?= ZBX_CEP_OP_DECREASE_SEVERITY ?>,
-			<?= ZBX_CEP_OP_INCREASE_SEVERITY ?>,
-			<?= ZBX_CEP_OP_DISCARD ?>,
-			<?= ZBX_CEP_OP_CLOSE ?>
+			<?= CCepRuleHelper::OP_COPY_FIRST ?>,
+			<?= CCepRuleHelper::OP_COPY_LAST ?>,
+			<?= CCepRuleHelper::OP_SUPPRESS ?>,
+			<?= CCepRuleHelper::OP_DECREASE_SEVERITY ?>,
+			<?= CCepRuleHelper::OP_INCREASE_SEVERITY ?>,
+			<?= CCepRuleHelper::OP_DISCARD ?>,
+			<?= CCepRuleHelper::OP_CLOSE ?>
 		].includes(value)) {
 			return;
 		}
 
 		if ([
-			<?= ZBX_CEP_OP_SET_SEVERITY ?>
+			<?= CCepRuleHelper::OP_SET_SEVERITY ?>
 		].includes(value)) {
 			severity.style.display = '';
 			return;
 		}
 
 		if ([
-			<?= ZBX_CEP_OP_SET_NAME ?>
+			<?= CCepRuleHelper::OP_SET_NAME ?>
 		].includes(value)) {
 			name.style.display = '';
 			return;
 		}
 
 		if ([
-			<?= ZBX_CEP_OP_REMOVE_TAG ?>,
-			<?= ZBX_CEP_OP_DECREASE_TAG_VALUE ?>,
-			<?= ZBX_CEP_OP_INCREASE_TAG_VALUE ?>,
-			<?= ZBX_CEP_OP_REMOVE_TAG ?>
+			<?= CCepRuleHelper::OP_REMOVE_TAG ?>,
+			<?= CCepRuleHelper::OP_DECREASE_TAG_VALUE ?>,
+			<?= CCepRuleHelper::OP_INCREASE_TAG_VALUE ?>,
+			<?= CCepRuleHelper::OP_REMOVE_TAG ?>
 		].includes(value)) {
 			tag.style.display = '';
 			return;
 		}
 
 		if ([
-			<?= ZBX_CEP_OP_RENAME_TAG ?>,
+			<?= CCepRuleHelper::OP_RENAME_TAG ?>,
 		].includes(value)) {
 			tag_rename.style.display = '';
 			return;
 		}
 
 		if ([
-			<?= ZBX_CEP_OP_ADD_TAG ?>,
-			<?= ZBX_CEP_OP_SET_TAG ?>,
-			<?= ZBX_CEP_OP_SET_TAG_VALUE ?>
+			<?= CCepRuleHelper::OP_ADD_TAG ?>,
+			<?= CCepRuleHelper::OP_SET_TAG ?>,
+			<?= CCepRuleHelper::OP_SET_TAG_VALUE ?>
 		].includes(value)) {
 			tag_pair.style.display = '';
 			return;
@@ -248,7 +248,7 @@ window.ceprule_operation_edit_popup = new class {
 
 		[...this.form_element.querySelectorAll('[is="z-cep-tagsuggest"]')]
 			.map(node => {
-				if (value == <?= ZBX_CEP_OP_WHEN_TAGS_CORRELATED ?>) {
+				if (value == <?= CCepRuleHelper::OP_WHEN_TAGS_CORRELATED ?>) {
 					node.setAttribute('disable-position-tags', '');
 				}
 				else {

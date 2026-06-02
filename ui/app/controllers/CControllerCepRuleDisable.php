@@ -46,7 +46,7 @@ class CControllerCepRuleDisable extends CControllerCepRuleGeneral {
 		foreach ($this->getInput('cepruleids') as $cepruleid) {
 			$ceprules[] = [
 				'cep_ruleid' => $cepruleid,
-				'status' => ZBX_CEP_STATUS_DISABLED
+				'status' => CCepRuleHelper::STATUS_DISABLED
 			];
 		}
 

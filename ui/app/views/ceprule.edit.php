@@ -117,8 +117,8 @@ $form = (new CForm())
 		->addItem([
 			new CLabel(_('Stop processing'), 'stop'),
 			new CFormField((new CCheckBox('stop'))
-				->setChecked($data['ceprule']['stop'] == ZBX_CEP_EXECUTION_STOP)
-				->setUncheckedValue(ZBX_CEP_EXECUTION_CONTINUE)
+				->setChecked($data['ceprule']['stop'] == CCepRuleHelper::EXECUTION_STOP)
+				->setUncheckedValue(CCepRuleHelper::EXECUTION_CONTINUE)
 			)
 		])
 		->addItem([
@@ -135,9 +135,9 @@ $form = (new CForm())
 		->addItem([
 			new CLabel(_('Enabled'), 'status'),
 			new CFormField(
-				(new CCheckBox('status', ZBX_CEP_STATUS_ENABLED))
-					->setChecked($data['ceprule']['status'] == ZBX_CEP_STATUS_ENABLED)
-					->setUncheckedValue(ZBX_CEP_STATUS_DISABLED)
+				(new CCheckBox('status', CCepRuleHelper::STATUS_ENABLED))
+					->setChecked($data['ceprule']['status'] == CCepRuleHelper::STATUS_ENABLED)
+					->setUncheckedValue(CCepRuleHelper::STATUS_DISABLED)
 			)
 		])
 	);

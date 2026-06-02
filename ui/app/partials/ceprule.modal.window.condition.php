@@ -37,7 +37,7 @@ echo (new CForm())
 		])
 		->addItem(
 			(new CTemplateTag(null))
-				->setAttribute('for-type', ZBX_CEP_WINDOW_CONDITION_TAG_PAIR)
+				->setAttribute('for-type', CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR)
 				->addItem([
 					new CLabel('Past event tag name', 'ceprule-window-past-event-tag-name'),
 					new CFormField(
@@ -61,7 +61,7 @@ echo (new CForm())
 		)
 		->addItem(
 			(new CTemplateTag(null))
-				->setAttribute('for-type', ZBX_CEP_WINDOW_CONDITION_OLD_TAG)
+				->setAttribute('for-type', CCepRuleHelper::WINDOW_CONDITION_OLD_TAG)
 				->addItem([
 					new CLabel('Operator'),
 					new CFormField(
@@ -79,7 +79,7 @@ echo (new CForm())
 		)
 		->addItem(
 			(new CTemplateTag(null))
-				->setAttribute('for-type', ZBX_CEP_WINDOW_CONDITION_OLD_TAG_VALUE)
+				->setAttribute('for-type', CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE)
 				->addItem([
 					new CLabel('Tag', 'ceprule-window-past-event-tag-name'),
 					new CFormField(

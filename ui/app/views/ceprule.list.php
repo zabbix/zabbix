@@ -61,9 +61,9 @@ $html_page = (new CHtmlPage())
 					new CLabel(_('Type')),
 					new CFormField(
 						(new CRadioButtonList('filter_type', (int) $data['filter']['type']))
-							->addValue(_('All'), ZBX_CEP_FILTER_SHOW_ALL)
-							->addValue(_('Complex event processing'), ZBX_CEP_FILTER_SHOW_CEP)
-							->addValue(_('Event correlation'), ZBX_CEP_FILTER_SHOW_LEGACY)
+							->addValue(_('All'), CCepRuleHelper::FILTER_SHOW_ALL)
+							->addValue(_('Complex event processing'), CCepRuleHelper::FILTER_SHOW_CEP)
+							->addValue(_('Event correlation'), CCepRuleHelper::FILTER_SHOW_LEGACY)
 							->setModern()
 					)
 				])
@@ -129,7 +129,7 @@ foreach ($data['ceprules'] as $ceprule) {
 	}
 
 	$make_stop_indicator = function (array $ceprule): CSpan {
-		if ($ceprule['stop'] == ZBX_CEP_EXECUTION_STOP) {
+		if ($ceprule['stop'] == CCepRuleHelper::EXECUTION_STOP) {
 			return (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN);
 		}
 
@@ -151,7 +151,7 @@ foreach ($data['ceprules'] as $ceprule) {
 					->setAttribute('data-correlationid', (int) $ceprule['correlationid']);
 		}
 
-		if ($ceprule['status'] == ZBX_CEP_STATUS_ENABLED) {
+		if ($ceprule['status'] == CCepRuleHelper::STATUS_ENABLED) {
 			return (new CLink(_('Enabled')))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
