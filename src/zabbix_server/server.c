@@ -1580,6 +1580,9 @@ static void	zbx_db_save_server_status(void)
 			(1 == config_allow_software_update_check ? "true" : "false"), ZBX_JSON_TYPE_INT);
 	zbx_json_addstring(&json, "enable_mobile_devices",
 			(1 == config_enable_mobile_devices ? "true" : "false"), ZBX_JSON_TYPE_INT);
+	zbx_json_addstring(&json, "bridge_adapter_configured",
+			(NULL != config_bridge_adapter_url && '\0' != *config_bridge_adapter_url ? "true" : "false"),
+			ZBX_JSON_TYPE_INT);
 
 	zbx_json_close(&json);
 
