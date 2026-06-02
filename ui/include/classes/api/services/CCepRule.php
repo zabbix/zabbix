@@ -110,9 +110,7 @@ class CCepRule extends CApiService {
 	}
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		if ($options['cep_ruleids'] !== null) {
-			$sqlParts['where']['cep_ruleid'] = dbConditionId('cr.cep_ruleid', $options['cep_ruleids']);
-		}
+		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['filter'] !== null) {
 			if (array_key_exists('window_type', $options['filter']) && $options['filter']['window_type'] !== null) {
