@@ -48,7 +48,7 @@ class CCepRule extends CApiService {
 
 		if ($cep_rules) {
 			$cep_rules = $this->addRelatedObjects($options, $cep_rules);
-			$cep_rules = $this->unsetExtraFields($cep_rules, ['cep_ruleid', 'formula', 'evaltype']);
+			$cep_rules = $this->unsetExtraFields($cep_rules, ['cep_ruleid', 'formula', 'evaltype'], $options['output']);
 		}
 
 		return $options['preservekeys'] ? $cep_rules : array_values($cep_rules);
@@ -65,7 +65,7 @@ class CCepRule extends CApiService {
 			'excludeSearch' =>			['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// Output.
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['cep_ruleid', 'name', 'window_type', 'stop', 'sortorder', 'description', 'status', 'filter']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['cep_ruleid', 'name', 'window_type', 'stop', 'sortorder', 'description', 'status']), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_BOOLEAN, 'default' => false],
 			'selectFilter' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['conditions', 'evaltype', 'eval_formula', 'formula']), 'default' => null],
 			'selectWindow' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['duration', 'capacity', 'filter', 'script', 'group_by_host_group', 'group_by_host', 'group_by_tag', 'tag', 'event_count_tag']), 'default' => null],
