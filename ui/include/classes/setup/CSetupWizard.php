@@ -248,9 +248,8 @@ class CSetupWizard extends CForm {
 					$this->setConfig('DB_USER', getRequest('user', $this->getConfig('DB_USER', 'root')));
 					$this->setConfig('DB_PASSWORD', getRequest('password', $this->getConfig('DB_PASSWORD', '')));
 
-					$this->unsetConfig(['DB_VAULT_URL', 'DB_VAULT_DB_PATH', 'DB_AUTH_TYPE', 'DB_VAULT_TOKEN',
-						'DB_VAULT_APP_ROLE_ID', 'DB_VAULT_APP_SECRET_ID', 'DB_VAULT_CERTIFICATES', 'DB_VAULT_CERT_FILE',
-						'DB_VAULT_KEY_FILE'
+					$this->unsetConfig(['DB_VAULT_URL', 'DB_VAULT_DB_PATH', 'DB_VAULT_TOKEN', 'DB_VAULT_APP_ROLE_ID',
+						'DB_VAULT_APP_SECRET_ID', 'DB_VAULT_CERTIFICATES', 'DB_VAULT_CERT_FILE', 'DB_VAULT_KEY_FILE'
 					]);
 					break;
 			}
