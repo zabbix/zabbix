@@ -31,10 +31,11 @@ type mockWriter struct {
 	t       *testing.T
 }
 
-func (w *mockWriter) Write(data []byte, timeout time.Duration) (upload bool, err []error) {
+func (w *mockWriter) Write(data []byte, timeout time.Duration) (upload bool, commsFailed bool, err []error) {
 	log.Debugf("%s", string(data))
 	if w.counter&1 != 0 {
 		err = []error{errors.New("mock error")}
+		commsFailed = true
 	} else {
 		var request AgentDataRequest
 		_ = json.Unmarshal(data, &request)
