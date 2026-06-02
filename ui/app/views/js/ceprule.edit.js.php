@@ -307,7 +307,7 @@ window.ceprule_edit_popup = new class {
 				}
 			}
 			else if (class_list.contains('js-delete')) {
-				this.#delete();
+				window.confirm(<?= json_encode('Delete	complex event processing rule?') ?>) && this.#delete();
 			}
 			else if (class_list.contains('js-clone')) {
 				this.#clone();
