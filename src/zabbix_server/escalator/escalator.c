@@ -45,6 +45,7 @@
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
 #include "zbxserialize.h"
+#include "zbxcurl.h"
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
 #endif
@@ -3881,6 +3882,7 @@ out:
 	zbx_vector_uint64_destroy(&escalationids);
 	notify_alerter(ALERTER_CLOSE);
 	zbx_db_close();
+	zbx_curl_cleanup();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

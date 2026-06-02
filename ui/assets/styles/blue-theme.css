@@ -656,7 +656,7 @@ svg a {
   border-radius: 50%;
   background: #429e47; }
 
-.svg-pie-chart-hintbox .svg-pie-chart-hintbox-color, .map-link-hintbox-row .map-link-hintbox-row-color-box {
+.navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity-color, .svg-pie-chart-hintbox .svg-pie-chart-hintbox-color, .map-link-hintbox-row .map-link-hintbox-row-color-box {
   width: 10px;
   height: 10px;
   margin-right: 10px; }
@@ -5132,6 +5132,9 @@ z-color-picker {
       .color-picker-is-palette .color-picker-palette-icon .color-picker-palette-icon-part:last-of-type {
         border-top-right-radius: 1px;
         border-bottom-right-radius: 1px; }
+
+z-color-picker[readonly] .color-picker-box:focus {
+  box-shadow: none; }
 
 .z-select,
 z-select {

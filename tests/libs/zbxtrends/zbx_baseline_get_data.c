@@ -40,6 +40,12 @@ void	__wrap_zbx_recalc_time_period(time_t *tm_start, int table_group)
 	ZBX_UNUSED(table_group);
 }
 
+zbx_uint64_t	__wrap_zbx_history_get_trends_flags(void);
+zbx_uint64_t	__wrap_zbx_history_get_trends_flags(void)
+{
+	return 0xFFFF;
+}
+
 static	zbx_mock_handle_t	hout;
 static int			iteration;
 

@@ -599,6 +599,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$this->fillMacros($data['macros']);
 
 		if ($data['expected'] === TEST_BAD && array_key_exists('inline_error', $data)) {
+			// Click the field to ensure it has focus before blur, so inline validation reliably fires.
+			$form->query(array_key_first($data['inline_error']))->one()->click();
 			$this->page->removeFocus();
 		}
 		else {

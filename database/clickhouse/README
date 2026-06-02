@@ -1,0 +1,148 @@
+Zabbix ClickHouse schema and history migration scripts
+
+This collection of scripts facilitates creation of ClickHouse tables
+and migration of Zabbix history data from MySQL or PostgreSQL to ClickHouse.
+
+Scripts Overview
+clickhouse.sh - helper script, not to be used directly
+
+Schema Creation Scripts:
+- history_all.sh - invokes all history schema creation scripts
+
+- history_schema.sh
+- history_log_schema.sh
+- history_str_schema.sh
+- history_text_schema.sh
+- history_uint_schema.sh
+- history_json_schema.sh
+
+These scripts create ClickHouse table schemas for corresponding value types.
+
+Usage:
+./<history table>_schema.sh -s <ClickHouse URL> -d <database> [-u <username>] [-p <password>] [-t <TTL>] [-P <partition schema>]
+
+Parameters:
+-s|--server: ClickHouse URL (default: http://localhost:8123)
+-d|--db: Database name (default: zabbix)
+-u|--user: ClickHouse username (default: empty, unauthenticated)
+-p|--password: ClickHouse password (default: empty)
+-t|--ttl: Housekeeping interval in seconds (default: 2678400 (31 days))
+-P|--partition: Partitioning schema (default: toDate (by days))
+-i|--import-dir: Directory with the exported CSV files (default: /tmp)
+-h|--help: Display help message
+
+Example:
+./history_schema.sh -s http://localhost:8123 -d zabbix -u user -p password
+
+The housekeeping interval (TTL) and partition schema are loosely linked.
+When increasing housekeeping interval, it might be worth increasing also
+partition schema, for example with year long housekeeping interval, it
+might be better to set monthly partitioning:
+
+./<history table>_schema.sh -s <ClickHouse URL> -d <database> -t 31536000 -P toYYYYMM
+
+Data Export Scripts:
+
+MySQL:
+- history_export_mysql.sql
+- history_log_export_mysql.sql
+- history_str_export_mysql.sql
+- history_text_export_mysql.sql
+- history_uint_export_mysql.sql
+- history_json_export_mysql.sql
+
+PostgreSQL:
+- history_export_pgsql.sql
+- history_log_export_pgsql.sql
+- history_str_export_pgsql.sql
+- history_text_export_pgsql.sql
+- history_uint_export_pgsql.sql
+- history_json_export_pgsql.sql
+
+These SQL scripts export history data from MySQL or PostgreSQL databases to
+/tmp/<history table>_clockns.csv files (the clock and ns columns are merged
+into a single clock.ns timestamp column).
+
+MySQL export note:
+The MySQL export scripts use INTO OUTFILE, which writes files on the MySQL server
+side. The output path is determined by the server's secure_file_priv setting
+(check with: mysql -e "SELECT @@secure_file_priv"). If the path differs from
+/tmp/, either copy the exported files to /tmp/ before running the import
+scripts, or point the import scripts at that directory with the -i|--import-dir
+option (e.g. -i /var/lib/mysql-files). When MySQL runs in Docker, files are
+written inside the container and must be copied to the host:
+docker cp <container>:<secure_file_priv_path>/<table>_clockns.csv /tmp/<table>_clockns.csv
+
+MySQL export example:
+mysql -u<user> -p<password> <database> < history_export_mysql.sql
+
+PostgreSQL export example:
+PGPASSWORD=<password> psql -U <user> -d <database> -h <host> -f history_export_pgsql.sql
+
+Data Import Scripts:
+- history_import.sh
+- history_log_import.sh
+- history_str_import.sh
+- history_text_import.sh
+- history_uint_import.sh
+- history_json_import.sh
+
+These scripts import exported history data from <import dir>/<history table>_clockns.csv
+into corresponding ClickHouse tables. The import directory defaults to /tmp and
+can be overridden with the -i|--import-dir option.
+
+Usage:
+./<history table>_import.sh -s <ClickHouse URL> -d <database> [-u <username>] [-p <password>] [-i <import dir>]
+
+Migration Process:
+
+1. Create ClickHouse schemas using the schema creation scripts.
+2. Export data from MySQL or PostgreSQL using the export SQL scripts.
+3. Import the exported data into ClickHouse using the import scripts.
+
+PostgreSQL migration example (all tables):
+
+PGPASSWORD=zabbix psql -U postgres -d zabbix -h 127.0.0.1 -f history_export_pgsql.sql
+./history_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix -i /tmp
+
+PGPASSWORD=zabbix psql -U postgres -d zabbix -h 127.0.0.1 -f history_uint_export_pgsql.sql
+./history_uint_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix -i /tmp
+
+PGPASSWORD=zabbix psql -U postgres -d zabbix -h 127.0.0.1 -f history_str_export_pgsql.sql
+./history_str_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix -i /tmp
+
+PGPASSWORD=zabbix psql -U postgres -d zabbix -h 127.0.0.1 -f history_text_export_pgsql.sql
+./history_text_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix -i /tmp
+
+PGPASSWORD=zabbix psql -U postgres -d zabbix -h 127.0.0.1 -f history_log_export_pgsql.sql
+./history_log_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix -i /tmp
+
+PGPASSWORD=zabbix psql -U postgres -d zabbix -h 127.0.0.1 -f history_json_export_pgsql.sql
+./history_json_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix -i /tmp
+
+MySQL migration example (all tables):
+
+MySQL writes the exported files to the secure_file_priv directory (commonly
+/var/lib/mysql-files), so the import scripts are pointed at it with -i. Adjust
+the path to match your server's secure_file_priv setting.
+
+mysql -uzabbix -pzabbix zabbix < history_export_mysql.sql
+./history_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix -i /var/lib/mysql-files
+
+mysql -uzabbix -pzabbix zabbix < history_uint_export_mysql.sql
+./history_uint_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix -i /var/lib/mysql-files
+
+mysql -uzabbix -pzabbix zabbix < history_str_export_mysql.sql
+./history_str_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix -i /var/lib/mysql-files
+
+mysql -uzabbix -pzabbix zabbix < history_text_export_mysql.sql
+./history_text_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix -i /var/lib/mysql-files
+
+mysql -uzabbix -pzabbix zabbix < history_log_export_mysql.sql
+./history_log_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix -i /var/lib/mysql-files
+
+mysql -uzabbix -pzabbix zabbix < history_json_export_mysql.sql
+./history_json_import.sh -s http://localhost:8123 -d zabbix -u zabbix -p zabbix -i /var/lib/mysql-files
+
+Ensure you have the necessary permissions and ClickHouse is properly
+configured before running these scripts.

@@ -67,6 +67,11 @@ static void	DCdump_config(void)
 	zabbix_log(LOG_LEVEL_TRACE, "  history, mode:%d global:%d period:%d", config->config->hk.history_mode,
 			config->config->hk.history_global, config->config->hk.history);
 
+	zabbix_log(LOG_LEVEL_TRACE, "  history, overrides: %d, %d, %d, %d, %d, %d",
+			config->config->hk.history_override[0], config->config->hk.history_override[1],
+			config->config->hk.history_override[2], config->config->hk.history_override[3],
+			config->config->hk.history_override[4], config->config->hk.history_override[5]);
+
 	zabbix_log(LOG_LEVEL_TRACE, "  trends, mode:%d global:%d period:%d", config->config->hk.trends_mode,
 			config->config->hk.trends_global, config->config->hk.trends);
 

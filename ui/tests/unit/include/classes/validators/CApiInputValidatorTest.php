@@ -6149,7 +6149,7 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
 				['type' => '3', 'name' => null, 'value' => ['1', '2', '3', '4', '1']],
 				'/',
-				['type' => ['3'], 'name' => null, 'value' => ['1', '2', '3', '4', '1']]
+				['type' => ['3'], 'value' => ['1', '2', '3', '4', '1']]
 			],
 			[
 				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
@@ -6162,6 +6162,12 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				['type' => 3, 'name' => 2, 'value' => ['1', 2.5, '3', '4', '1']],
 				'/',
 				['type' => [3], 'name' => [2], 'value' => ['1', 2.5, '3', '4', '1']]
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				null,
+				'/',
+				null
 			],
 			[
 				['type' => API_VALUE],
