@@ -303,7 +303,7 @@ out:
 	return ret;
 }
 
-static int	sleep_remains;
+static ZBX_THREAD_LOCAL int	sleep_remains;
 
 /******************************************************************************
  *                                                                            *

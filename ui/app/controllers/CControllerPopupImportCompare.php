@@ -443,14 +443,14 @@ class CControllerPopupImportCompare extends CController {
 		}
 
 		if ($rows) {
-			$rows[0] += ['id' => $id];
+			$rows[0] += ['id' => $id, 'sequence_start' => true];
 		}
 
 		return $rows;
 	}
 
 	private function blocksToDiff(array $blocks, int $depth, array $outer_names = [],
-			string $outer_change_type = 'updated'): array {
+			string $outer_change_type = 'updated', ?int $sequence_id = null): array {
 		$change_types = [
 			'added' => self::CHANGE_ADDED,
 			'removed' => self::CHANGE_REMOVED,
@@ -461,11 +461,24 @@ class CControllerPopupImportCompare extends CController {
 		foreach ($blocks as $entity_type => $changes) {
 			$changes = self::sortChanges($entity_type, $changes);
 
-			$rows[] = [
-				'value' => $entity_type . ':',
-				'depth' => $depth,
-				'change_type' => $change_types[$outer_change_type]
-			];
+			if ($sequence_id) {
+				$rows[] = [
+					'value' => $entity_type.':',
+					'depth' => $depth,
+					'change_type' => $change_types[$outer_change_type],
+					'id' => $sequence_id,
+					'sequence_start' => true
+				];
+
+				$sequence_id = null;
+			}
+			else {
+				$rows[] = [
+					'value' => $entity_type.':',
+					'depth' => $depth,
+					'change_type' => $change_types[$outer_change_type]
+				];
+			}
 
 			foreach ($changes as $change_type => $entities) {
 				foreach ($entities as $entity) {
@@ -481,19 +494,32 @@ class CControllerPopupImportCompare extends CController {
 						'id' => $this->id_counter
 					];
 
+					$entity_counter_id = null;
 					$new_rows = $this->objectToRows($before, $after, $depth + 1, $this->id_counter);
 
 					if ($new_rows) {
 						$rows = array_merge($rows, $new_rows);
-
-						$this->id_counter++;
 					}
+					else {
+						$entity_counter_id = $this->id_counter;
+					}
+
+					$this->id_counter++;
 
 					// Process any sub-entities.
 					if ($entity) {
 						$rows = array_merge($rows, $this->blocksToDiff($entity, $depth + 2,
-							[...$outer_names, [$entity_type, $name]], $change_type
+							[...$outer_names, [$entity_type, $name]], $change_type, $entity_counter_id
 						));
+					}
+					elseif ($entity_counter_id) {
+						$rows[] = [
+							'value' => $this->convertToYaml([]),
+							'depth' => $depth + 2,
+							'change_type' => $change_types[$change_type],
+							'id' => $entity_counter_id,
+							'sequence_start' => true
+						];
 					}
 				}
 			}

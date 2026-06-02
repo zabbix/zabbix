@@ -1761,7 +1761,7 @@ class CSvgGraph extends CSvg {
 				]);
 
 				$this->addItem(
-					(new CSvgGraphPercentile(_s('%1$sth percentile: %2$s', $percent, $label), $value, $scale,
+					(new CSvgGraphPercentile(_s('Percentile %1$s: %2$s', $percent, $label), $value, $scale,
 						$scale_boundaries
 					))
 						->setPosition($this->canvas_x, $this->canvas_y)

@@ -1237,7 +1237,7 @@ int	zbx_alerter_begin_dispatch(zbx_alerter_dispatch_t *dispatch, const char *sub
 	if (FAIL == zbx_ipc_async_socket_open(&dispatch->alerter, ZBX_IPC_SERVICE_ALERTER, SEC_PER_MIN, error))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	size = zbx_alerter_serialize_begin_dispatch(&data, subject, message, content_name, content_type, content,

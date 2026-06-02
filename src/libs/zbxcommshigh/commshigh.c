@@ -119,7 +119,11 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 					lastlogtime = now;
 				}
 
-				sleep((unsigned int)retry_interval);
+				while (ZBX_IS_RUNNING() && 0 < retry_interval)
+				{
+					sleep(1);
+					retry_interval--;
+				}
 			}
 
 			if (FAIL != res)
