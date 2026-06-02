@@ -307,9 +307,13 @@ func trimTrailingAllowRules(sysrunIndex int) {
 		}
 
 		if !isUnconditionalMatchAll(r) {
-			if r.PatternType == PatternRegexp || r.Key == "system.run" {
-				// system.run allow rules are not redundant because of default system.run[*] deny rule
+			if r.PatternType == PatternRegexp {
 				break
+			}
+
+			if r.Key == "system.run" {
+				// system.run allow rules are not redundant because of default system.run[*] deny rule
+				continue
 			}
 		}
 

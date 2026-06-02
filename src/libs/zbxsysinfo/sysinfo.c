@@ -605,7 +605,7 @@ void	zbx_finalize_key_access_rules_configuration(void)
 				{
 					/* system.run allow rules are not redundant because of default system.run[*]
 					 * deny rule */
-					break;
+					continue;
 				}
 			}
 
