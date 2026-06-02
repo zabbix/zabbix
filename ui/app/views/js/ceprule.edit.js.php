@@ -307,7 +307,7 @@ window.ceprule_edit_popup = new class {
 				}
 			}
 			else if (class_list.contains('js-delete')) {
-				console.log('TODO: js-delete');
+				this.#delete();
 			}
 			else if (class_list.contains('js-clone')) {
 				this.#clone();
@@ -389,6 +389,32 @@ window.ceprule_edit_popup = new class {
 			form_field.style.display = display;
 			form_field.previousSibling.style.display = display;
 		}
+	}
+
+	#delete() {
+		this.#removePopupMessages();
+		fetch(zabbixUrl({action: 'ceprule.delete'}), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json; charset=UTF-8'},
+			body: JSON.stringify({
+				cepruleids: [this.form.findFieldByName('cepruleid').getValue()],
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule.edit')) ?>
+			})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				overlayDialogueDestroy(this.#overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			})
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => {
+				this.#overlay.unsetLoading();
+			});
 	}
 
 	#clone() {
