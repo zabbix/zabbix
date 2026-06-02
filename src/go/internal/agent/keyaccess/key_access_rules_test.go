@@ -563,6 +563,22 @@ func TestNoTrailingAllowRules(t *testing.T) {
 	RunScenarios(t, scenarios, records, 2)
 }
 
+//nolint:paralleltest
+func TestTrailingAllowRuleTrimmedAfterSystemRunAllow(t *testing.T) {
+	var records accessRules
+
+	records.addRule("system.*", ALLOW)
+	records.addRule("system.run[*]", ALLOW)
+
+	var scenarios = []scenario{
+		{metric: "system.run[/usr/bin/hostname -f]", result: true},
+		{metric: "system.localtime", result: true},
+		{metric: "vfs.file.contents[/etc/passwd]", result: true},
+	}
+
+	RunScenarios(t, scenarios, records, 1)
+}
+
 func TestEmptyParametersMatch(t *testing.T) {
 	var records accessRules
 

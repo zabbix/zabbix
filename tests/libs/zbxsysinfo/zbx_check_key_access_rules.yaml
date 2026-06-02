@@ -541,6 +541,23 @@ out:
     - metric: 'system.localtime'
       result: ZBX_KEY_ACCESS_ALLOW
 ---
+test case: Trailing AllowKey system.* trimmed after system.run allow
+in:
+  rules:
+    - pattern: 'system.*'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: 'system.run[*]'
+      type: ZBX_KEY_ACCESS_ALLOW
+out:
+  number_of_rules: 1
+  metrics:
+    - metric: 'system.run[/usr/bin/hostname -f]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.localtime'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'vfs.file.contents[/etc/passwd]'
+      result: ZBX_KEY_ACCESS_ALLOW
+---
 test case: Empty parameters match
 in:
   rules:
