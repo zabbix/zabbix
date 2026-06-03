@@ -125,7 +125,8 @@ class CControllerCepRuleEdit extends CController {
 
 		$ceprule['window'] += DB::getDefaults('cep_window');
 		if (!array_key_exists('filter', $ceprule['window'])) {
-			$ceprule['window']['filter'] = ['conditions' => []];
+			$ceprule['window']['filter'] = ['conditions' => [], 'evaltype' => DB::getDefault('cep_window', 'evaltype'),
+				'formula' => DB::getDefault('cep_window', 'formula')];
 		}
 
 		// Unlimited capacity's default value is "0".
@@ -145,12 +146,6 @@ class CControllerCepRuleEdit extends CController {
 		$ceprule['cepruleid'] = $ceprule['cep_ruleid'] ?? null;
 		unset($ceprule['cep_ruleid']);
 		unset($ceprule['window']['filter']['eval_formula']);
-
-		/* // Key by step value. */
-		/* $ceprule['operations'] = array_reduce($ceprule['operations'], */
-		/* 	static fn (array $carry, array $operation) => [$operation['step'] => $operation, ...$carry], [] */
-		/* ); */
-		/**/
 
 		// Key by formula ID value.
 		$ceprule['filter']['conditions'] = array_reduce($ceprule['filter']['conditions'],
