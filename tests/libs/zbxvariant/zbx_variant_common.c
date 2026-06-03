@@ -100,26 +100,5 @@ void	mock_read_variant(const char *path, zbx_variant_t *variant)
 		return;
 	}
 
-	if (0 == strcmp(type, "ZBX_VARIANT_ERR"))
-	{
-		zbx_variant_set_error(variant, zbx_strdup(NULL, value));
-
-		return;
-	}
-
 	fail_msg("Invalid variant type: %s", type);
-}
-
-int	mock_str_to_variant_type(const char *str)
-{
-	if (0 == strcmp(str, "ZBX_VARIANT_NONE"))	return ZBX_VARIANT_NONE;
-	if (0 == strcmp(str, "ZBX_VARIANT_STR"))	return ZBX_VARIANT_STR;
-	if (0 == strcmp(str, "ZBX_VARIANT_DBL"))	return ZBX_VARIANT_DBL;
-	if (0 == strcmp(str, "ZBX_VARIANT_UI64"))	return ZBX_VARIANT_UI64;
-	if (0 == strcmp(str, "ZBX_VARIANT_BIN"))	return ZBX_VARIANT_BIN;
-	if (0 == strcmp(str, "ZBX_VARIANT_ERR"))	return ZBX_VARIANT_ERR;
-	if (0 == strcmp(str, "ZBX_VARIANT_VECTOR"))	return ZBX_VARIANT_VECTOR;
-
-	fail_msg("Unknown variant type: %s", str);
-	return -1;
 }

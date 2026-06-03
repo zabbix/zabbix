@@ -17,6 +17,5 @@
 #include "zbxmockdata.h"
 
 void	mock_read_variant(const char *path, zbx_variant_t *variant);
-int	mock_str_to_variant_type(const char *str);
 
 #endif
