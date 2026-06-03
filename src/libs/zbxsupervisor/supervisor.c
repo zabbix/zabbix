@@ -1000,8 +1000,6 @@ static int	supervisor_init_shared(zbx_supervisor_unit_shared_t *shared, char **e
 		return FAIL;
 	}
 
-	zbx_db_set_default_pool(shared->dbpool);
-
 	return SUCCEED;
 }
 
