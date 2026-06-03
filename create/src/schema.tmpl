@@ -2315,7 +2315,7 @@ CHANGELOG	|23
 TABLE|cep_condition|cep_conditionid|ZBX_DATA
 FIELD		|cep_conditionid|t_id		|	|NOT NULL	|0
 FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0			|1|cep_rule	|cep_ruleid	|RESTRICT
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|type		|t_integer	|'25'	|NOT NULL	|0
 FIELD		|operator	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|event_name	|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
@@ -2329,7 +2329,7 @@ CHANGELOG	|24
 
 TABLE|cep_window|cep_ruleid|ZBX_DATA
 FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0			|1|cep_rule	|cep_ruleid	|RESTRICT
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|type		|t_integer	|'1'	|NOT NULL	|0
 FIELD		|duration	|t_varchar(255)	|'0'	|NOT NULL	|0
 FIELD		|capacity	|t_varchar(255)	|'0'	|NOT NULL	|0
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
@@ -2346,7 +2346,7 @@ CHANGELOG	|25
 TABLE|cep_window_condition|cep_window_conditionid|ZBX_DATA
 FIELD		|cep_window_conditionid|t_id	|	|NOT NULL	|0
 FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0			|1|cep_rule	|cep_ruleid	|RESTRICT
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|type		|t_integer	|'1'	|NOT NULL	|0
 FIELD		|operator	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|past_tag	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|tag_value	|t_varchar(255)	|''	|NOT NULL	|0
@@ -2373,7 +2373,7 @@ TABLE|cep_operation|cep_operationid|ZBX_DATA
 FIELD		|cep_operationid|t_id		|	|NOT NULL	|0
 FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0			|1|cep_rule	|cep_ruleid	|RESTRICT
 FIELD		|execute_when	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|type		|t_integer	|'1'	|NOT NULL	|0
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|event_name	|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
