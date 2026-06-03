@@ -51,6 +51,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 
 	protected function prepareApiRequest(): array {
 		$request = $this->getInputAll();
+		unset($request['_cep_rule_reset']);
 
 		if (!in_array($request['window_type'], [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 				CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH])) {
@@ -102,6 +103,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 			: ['ceprule.get', ['name' => '{name}'], 'cepruleid'];
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'_cep_rule_reset' => ['boolean'],
 			'cepruleid' => ['db cep_rule.cep_ruleid'],
 			'name' => ['db cep_rule.name', 'required', 'not_empty'],
 			'filter' => ['object', 'fields' => [

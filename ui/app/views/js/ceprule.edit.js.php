@@ -444,6 +444,7 @@ window.ceprule_edit_popup = new class {
 	#submit(force_sumbit) {
 		const fields = this.form.getAllValues();
 		fields[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('ceprule.edit')) ?>;
+		fields._cep_rule_reset = force_sumbit ? 1 : 0;
 
 		// Correct the sortorder.
 		const operations = {};
