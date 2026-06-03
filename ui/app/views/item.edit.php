@@ -165,6 +165,8 @@ $tabs = (new CTabView(['id' => $tabsid]))
 			'source' => 'item',
 			'types' => $data['types'],
 			'value_types' => $value_types,
+			'history_hint' => $data['config']['hk_history_global'] || $data['history_override'],
+			'trends_storage_hint' => (bool) $data['storage_value_types'],
 			'type_with_key_select' => $type_with_key_select
 		])
 	)
@@ -216,6 +218,16 @@ $form
 			'testable_item_types' => $data['testable_item_types'],
 			'type_with_key_select' => $type_with_key_select,
 			'value_type_keys' => $data['value_type_keys'],
+			'history_override' => $data['history_override'],
+			'history_override_hint_html' => _x('Overridden by', 'item_form').' '.
+				(CWebUser::getType() == USER_TYPE_SUPER_ADMIN
+					? (new CLink(_('global housekeeping settings'), (new CUrl())
+							->setArgument('action', 'housekeeping.edit')
+							->getUrl()
+						))->setTarget('_blank')
+					: _('global housekeeping settings')
+				),
+			'storage_value_types' => $data['storage_value_types'],
 			'return_url' => $return_url
 		]).');'))->setOnDocumentReady()
 	);

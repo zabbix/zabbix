@@ -49,6 +49,7 @@
 #include "zbxasyncpoller.h"
 #include "zbxtelemetry.h"
 #include "zbxsysinfo.h"
+#include "zbxcurl.h"
 
 #include <event2/dns.h>
 
@@ -1080,6 +1081,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		zbx_destroy_snmp_engineid_cache();
 #endif
 	zbx_ipc_async_socket_close(&rtc);
+	zbx_curl_cleanup();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
