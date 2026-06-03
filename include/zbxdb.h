@@ -163,7 +163,7 @@ typedef enum
 zbx_escape_sequence_t;
 
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
-char		*zbx_db_dyn_escape_like_pattern(const char *src);
+char		*zbx_dbconn_dyn_escape_like_pattern(const zbx_dbconn_t *db, const char *src);
 
 size_t		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 
@@ -395,14 +395,15 @@ int	zbx_dbconn_execute_multiple_query(zbx_dbconn_t *db, const char *query, const
 int	zbx_dbconn_execute_multiple_query_str(zbx_dbconn_t *db, const char *query, const char *field_name,
 		const zbx_vector_uint64_t *ids);
 
-char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src);
-char	*zbx_db_dyn_escape_string(const char *src);
-char	*zbx_db_dyn_escape_string_len(const char *src, size_t length);
+char	*zbx_dbconn_dyn_escape_field(const zbx_dbconn_t *db, const char *table_name, const char *field_name,
+		const char *src);
+char	*zbx_dbconn_dyn_escape_string(const zbx_dbconn_t *db, const char *src);
+char	*zbx_dbconn_dyn_escape_string_len(const zbx_dbconn_t *db, const char *src, size_t length);
 
 void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);
-void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
-		const char * const *values, const int num);
+void	zbx_dbconn_add_str_condition_alloc(const zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *fieldname, const char * const *values, const int num);
 
 const zbx_db_table_t	*zbx_db_get_table(const char *tablename);
 const zbx_db_field_t	*zbx_db_get_field(const zbx_db_table_t *table, const char *fieldname);
@@ -417,7 +418,7 @@ int	zbx_db_get_row_num(zbx_db_result_t result);
 int	zbx_db_is_null(const char *field);
 
 #if defined(HAVE_POSTGRESQL)
-char	*zbx_db_get_schema_esc(void);
+char	*zbx_dbconn_get_schema_esc(const zbx_dbconn_t *db);
 #endif
 
 int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
@@ -559,6 +560,16 @@ void	zbx_db_large_query_prepare_str(zbx_db_large_query_t *query, char **sql,
 		size_t *sql_alloc, size_t *sql_offset, const char *field, const zbx_vector_str_t *ids);
 void	zbx_db_large_query_prepare(zbx_db_large_query_t *query, char **sql, size_t *sql_alloc, size_t *sql_offset);
 void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
+
+char	*zbx_db_dyn_escape_like_pattern(const char *src);
+char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src);
+char	*zbx_db_dyn_escape_string(const char *src);
+char	*zbx_db_dyn_escape_string_len(const char *src, size_t length);
+void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const char * const *values, const int num);
+#if defined(HAVE_POSTGRESQL)
+char	*zbx_db_get_schema_esc(void);
+#endif
 
 /* type of value in settings table */
 #define ZBX_SETTING_TYPE_STR			1

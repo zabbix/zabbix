@@ -395,11 +395,12 @@ int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_
  *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
- * Comments: sync changes with 'db_get_escape_string_len'                     *
- *           and 'zbx_db_dyn_escape_string'                                   *
+ * Comments: sync changes with 'dbconn_get_escape_string_len'                 *
+ *           and 'zbx_dbconn_dyn_escape_string'                               *
  *                                                                            *
  ******************************************************************************/
-static void	db_escape_string(const char *src, char *dst, size_t len, zbx_escape_sequence_t flag)
+static void	dbconn_escape_string(const zbx_dbconn_t *db, const char *src, char *dst, size_t len,
+		zbx_escape_sequence_t flag)
 {
 	const char	*s;
 	char		*d;
@@ -410,7 +411,7 @@ static void	db_escape_string(const char *src, char *dst, size_t len, zbx_escape_
 
 	for (s = src, d = dst; NULL != s && '\0' != *s && 0 < len; s++)
 	{
-		if (ESCAPE_SEQUENCE_ON == flag && SUCCEED == db_is_escape_sequence(*s))
+		if (ESCAPE_SEQUENCE_ON == flag && SUCCEED == dbconn_is_escape_sequence(db, *s))
 		{
 			if (2 > len)
 				break;
@@ -435,7 +436,8 @@ static void	db_escape_string(const char *src, char *dst, size_t len, zbx_escape_
  * Purpose: to calculate escaped string length limited by bytes or characters *
  *          whichever is reached first.                                       *
  *                                                                            *
- * Parameters: s         - [IN] string to escape                              *
+ * Parameters: db        - [IN] database connection                           *
+ *             s         - [IN] string to escape                              *
  *             max_bytes - [IN] limit in bytes                                *
  *             max_chars - [IN] limit in characters                           *
  *             flag      - [IN] sequences need to be escaped on/off           *
@@ -444,7 +446,7 @@ static void	db_escape_string(const char *src, char *dst, size_t len, zbx_escape_
  *               with terminating '\0'                                        *
  *                                                                            *
  ******************************************************************************/
-static size_t	db_get_escape_string_len(const char *s, size_t max_bytes, size_t max_chars,
+static size_t	dbconn_get_escape_string_len(const zbx_dbconn_t *db, const char *s, size_t max_bytes, size_t max_chars,
 		zbx_escape_sequence_t flag)
 {
 	size_t	csize, len = 1;	/* '\0' */
@@ -463,7 +465,7 @@ static size_t	db_get_escape_string_len(const char *s, size_t max_bytes, size_t m
 		if (max_bytes < csize)
 			break;
 
-		if (ESCAPE_SEQUENCE_ON == flag && SUCCEED == db_is_escape_sequence(*s))
+		if (ESCAPE_SEQUENCE_ON == flag && SUCCEED == dbconn_is_escape_sequence(db, *s))
 			len++;
 
 		s += csize;
@@ -480,7 +482,8 @@ static size_t	db_get_escape_string_len(const char *s, size_t max_bytes, size_t m
  * Purpose: to escape string limited by bytes or characters, whichever limit  *
  *          is reached first.                                                 *
  *                                                                            *
- * Parameters: src       - [IN] string to escape                              *
+ * Parameters: db        - [IN] database connection                           *
+ *             src       - [IN] string to escape                              *
  *             max_bytes - [IN] limit in bytes                                *
  *             max_chars - [IN] limit in characters                           *
  *             flag      - [IN] sequences need to be escaped on/off           *
@@ -488,43 +491,45 @@ static size_t	db_get_escape_string_len(const char *s, size_t max_bytes, size_t m
  * Return value: escaped string                                               *
  *                                                                            *
  ******************************************************************************/
-char	*db_dyn_escape_string(const char *src, size_t max_bytes, size_t max_chars, zbx_escape_sequence_t flag)
+char	*dbconn_dyn_escape_string(const zbx_dbconn_t *db, const char *src, size_t max_bytes, size_t max_chars,
+		zbx_escape_sequence_t flag)
 {
 	char	*dst = NULL;
 	size_t	len;
 
-	len = db_get_escape_string_len(src, max_bytes, max_chars, flag);
+	len = dbconn_get_escape_string_len(db, src, max_bytes, max_chars, flag);
 
 	dst = (char *)zbx_malloc(dst, len);
 
-	db_escape_string(src, dst, len, flag);
+	dbconn_escape_string(db, src, dst, len, flag);
 
 	return dst;
 }
 
-char	*zbx_db_dyn_escape_string_len(const char *src, size_t length)
+char	*zbx_dbconn_dyn_escape_string_len(const zbx_dbconn_t *db, const char *src, size_t length)
 {
-	return db_dyn_escape_string(src, ZBX_SIZE_T_MAX, length, ESCAPE_SEQUENCE_ON);
+	return dbconn_dyn_escape_string(db, src, ZBX_SIZE_T_MAX, length, ESCAPE_SEQUENCE_ON);
 }
 
-char	*zbx_db_dyn_escape_string(const char *src)
+char	*zbx_dbconn_dyn_escape_string(const zbx_dbconn_t *db, const char *src)
 {
-	return db_dyn_escape_string(src, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
+	return dbconn_dyn_escape_string(db, src, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
 }
 
 /******************************************************************************
  *                                                                            *
  * Return value: return length of escaped LIKE pattern with terminating '\0'  *
  *                                                                            *
- * Comments: sync changes with 'db_escape_like_pattern'                       *
+ * Comments: sync changes with 'dbconn_escape_like_pattern'                       *
  *                                                                            *
  ******************************************************************************/
-static size_t	db_get_escape_like_pattern_len(const char *src)
+static size_t	dbconn_get_escape_like_pattern_len(const zbx_dbconn_t *db, const char *src)
 {
 	size_t		len;
 	const char	*s;
 
-	len = db_get_escape_string_len(src, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON) - 1; /* minus '\0' */
+	/* minus '\0' */
+	len = dbconn_get_escape_string_len(db, src, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON) - 1;
 
 	for (s = src; s && *s; s++)
 	{
@@ -560,7 +565,7 @@ static size_t	db_get_escape_like_pattern_len(const char *src)
  *           Hence '!' instead of backslash.                                  *
  *                                                                            *
  ******************************************************************************/
-static void	db_escape_like_pattern(const char *src, char *dst, size_t len)
+static void	dbconn_escape_like_pattern(const zbx_dbconn_t *db, const char *src, char *dst, size_t len)
 {
 	char		*d;
 	char		*tmp = NULL;
@@ -570,7 +575,7 @@ static void	db_escape_like_pattern(const char *src, char *dst, size_t len)
 
 	tmp = (char *)zbx_malloc(tmp, len);
 
-	db_escape_string(src, tmp, len, ESCAPE_SEQUENCE_ON);
+	dbconn_escape_string(db, src, tmp, len, ESCAPE_SEQUENCE_ON);
 
 	len--; /* '\0' */
 
@@ -597,16 +602,16 @@ static void	db_escape_like_pattern(const char *src, char *dst, size_t len)
  * Return value: escaped string to be used as pattern in LIKE                 *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_db_dyn_escape_like_pattern(const char *src)
+char	*zbx_dbconn_dyn_escape_like_pattern(const zbx_dbconn_t *db, const char *src)
 {
 	size_t	len;
 	char	*dst = NULL;
 
-	len = db_get_escape_like_pattern_len(src);
+	len = dbconn_get_escape_like_pattern_len(db, src);
 
 	dst = (char *)zbx_malloc(dst, len);
 
-	db_escape_like_pattern(src, dst, len);
+	dbconn_escape_like_pattern(db, src, dst, len);
 
 	return dst;
 }
@@ -729,16 +734,18 @@ int	zbx_db_validate_field_size(const char *tablename, const char *fieldname, con
 	return SUCCEED;
 }
 
-char	*db_dyn_escape_field_len(const zbx_db_field_t *field, const char *src, zbx_escape_sequence_t flag)
+char	*dbconn_dyn_escape_field_len(const zbx_dbconn_t *db, const zbx_db_field_t *field, const char *src,
+		zbx_escape_sequence_t flag)
 {
 #if defined(HAVE_MYSQL)
-	return db_dyn_escape_string(src, get_string_field_size(field), get_string_field_chars(field), flag);
+	return dbconn_dyn_escape_string(db, src, get_string_field_size(field), get_string_field_chars(field), flag);
 #else
-	return db_dyn_escape_string(src, ZBX_SIZE_T_MAX, get_string_field_chars(field), flag);
+	return dbconn_dyn_escape_string(db, src, ZBX_SIZE_T_MAX, get_string_field_chars(field), flag);
 #endif
 }
 
-char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src)
+char	*zbx_dbconn_dyn_escape_field(const zbx_dbconn_t *db, const char *table_name, const char *field_name,
+		const char *src)
 {
 	const zbx_db_table_t	*table;
 	const zbx_db_field_t	*field;
@@ -749,7 +756,7 @@ char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, co
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	return db_dyn_escape_field_len(field, src, ESCAPE_SEQUENCE_ON);
+	return dbconn_dyn_escape_field_len(db, field, src, ESCAPE_SEQUENCE_ON);
 }
 
 int	zbx_db_is_null(const char *field)
@@ -1433,7 +1440,8 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
  *          it is designed for generating WHERE conditions for strings. Hence,   *
  *          this function is simpler, because only IN condition is possible.     *
  *                                                                               *
- * Parameters: sql        - [IN/OUT] buffer for SQL query construction           *
+ * Parameters: db         - [IN] database connection                             *
+ *             sql        - [IN/OUT] buffer for SQL query construction           *
  *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                    *
  *             sql_offset - [IN/OUT] current position in the 'sql' buffer        *
  *             fieldname  - [IN] field name to be used in SQL WHERE condition    *
@@ -1442,8 +1450,8 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
  *                                                                               *
  *                                                                               *
  *********************************************************************************/
-void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
-		const char * const *values, const int num)
+void	zbx_dbconn_add_str_condition_alloc(const zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *fieldname, const char * const *values, const int num)
 {
 #if defined(HAVE_SQLITE3)
 #define MAX_EXPRESSIONS	950
@@ -1491,7 +1499,7 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 			if ('\0' == *values[i])
 				continue;
 
-			value_esc = zbx_db_dyn_escape_string(values[i]);
+			value_esc = zbx_dbconn_dyn_escape_string(db, values[i]);
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s='%s'", fieldname, value_esc);
 			zbx_free(value_esc);
 		}
@@ -1519,7 +1527,7 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 		}
 		cnt++;
 #endif
-		value_esc = zbx_db_dyn_escape_string(values[i]);
+		value_esc = zbx_dbconn_dyn_escape_string(db, values[i]);
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '\'');
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, value_esc);
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "',");

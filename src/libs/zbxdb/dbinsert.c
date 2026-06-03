@@ -222,7 +222,8 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **v
 			case ZBX_TYPE_CUID:
 			case ZBX_TYPE_BLOB:
 			case ZBX_TYPE_JSON:
-				row[i].str = db_dyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_ON);
+				row[i].str = dbconn_dyn_escape_field_len(db_insert->db, field, value->str,
+						ESCAPE_SEQUENCE_ON);
 				break;
 			case ZBX_TYPE_INT:
 			case ZBX_TYPE_FLOAT:

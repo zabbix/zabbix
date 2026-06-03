@@ -290,7 +290,7 @@ static int	dbconn_pool_sync_settings(zbx_dbconn_pool_config_t *cfg, char **error
 		return FAIL;
 	}
 
-	pattern = zbx_db_dyn_escape_string(ZBX_SETTINGS_DBPOOL);
+	pattern = zbx_dbconn_dyn_escape_string(db, ZBX_SETTINGS_DBPOOL);
 	result = zbx_dbconn_select(db, "select name,value_int from settings where name like '%s%%'", pattern);
 	zbx_free(pattern);
 
