@@ -25,7 +25,7 @@ class CControllerLldRulePrototypeList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context'						=> 'in host,template',
+			'context'						=> 'required|in host,template',
 			'parent_discoveryid' 			=> 'required|db items.itemid',
 			'sort'							=> 'in delay,key_,name,status,type,discover',
 			'sortorder'						=> 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,

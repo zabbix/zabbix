@@ -26,7 +26,7 @@ class CControllerLldRuleList extends CController {
 		$fields = [
 			'filter_set'					=> 'in 1',
 			'filter_rst'					=> 'in 1',
-			'context'						=> 'in host,template',
+			'context'						=> 'required|in host,template',
 			'filter_groupids'				=> 'array_db hstgrp.groupid',
 			'filter_hostids'				=> 'array_db hosts.hostid',
 			'filter_name'					=> 'string',
