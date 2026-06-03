@@ -43,7 +43,7 @@ typedef enum
 	CEP_EVENT_DENY,
 	CEP_EVENT_DEPENDENCY_DENY
 }
-zbx_cep_result_t;
+zbx_cep_assessment_t;
 
 #define CEP_QUERY_MASK_VALUE	0x0f
 #define CEP_QUERY_FLAG_MULTI	0x10

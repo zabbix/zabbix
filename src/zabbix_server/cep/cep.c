@@ -177,6 +177,47 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 	return event;
 }
 
+static zbx_cep_event_t	*cep_event_clone(const zbx_cep_event_t *event)
+{
+	zbx_cep_event_t	*clone;
+
+	clone = (zbx_cep_event_t *)zbx_malloc(NULL, sizeof(zbx_cep_event_t));
+	clone->eventid = event->eventid;
+	clone->r_event = (NULL != event->r_event ? cep_event_addref(event->r_event) : NULL);
+	clone->refcount = 1;
+	clone->origin = event->origin;
+	clone->clock = event->clock;
+	clone->ns = event->ns;
+	clone->value = event->value;
+	clone->severity = event->severity;
+	clone->suppress_mtime = event->suppress_mtime;
+
+	zbx_vector_tag_create(&clone->tags);
+	zbx_vector_tag_reserve(&clone->tags, (size_t)event->tags.values_num);
+	for (int i = 0; i < event->tags.values_num; i++)
+	{
+		zbx_tag_t	tag;
+
+		tag.tag = zbx_strdup(NULL, event->tags.values[i].tag);
+		tag.value = zbx_strdup(NULL, event->tags.values[i].value);
+		zbx_vector_tag_append(&clone->tags, tag);
+	}
+
+	zbx_vector_uint64_create(&clone->maintenanceids);
+	zbx_vector_uint64_append_array(&clone->maintenanceids, event->maintenanceids.values,
+			event->maintenanceids.values_num);
+
+	return clone;
+}
+
+zbx_cep_event_t	*cep_event_get_mutable(zbx_cep_event_t *event)
+{
+	if (1 == atomic_load(&event->refcount))
+		return cep_event_addref(event);
+
+	return cep_event_clone(event);
+}
+
 zbx_cep_event_t	*cep_event_addref(zbx_cep_event_t *event)
 {
 	atomic_fetch_add(&event->refcount, 1);
@@ -610,10 +651,10 @@ zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event)
  *           scheduled in the current batch.                                  *
  *                                                                            *
  ******************************************************************************/
-static zbx_cep_result_t	cep_check_trigger_dependency(zbx_cep_t *cep, const zbx_hashset_t *triggerids,
+static zbx_cep_assessment_t	cep_check_trigger_dependency(zbx_cep_t *cep, const zbx_hashset_t *triggerids,
 		const zbx_vector_uint64_t *dep_triggerids)
 {
-	zbx_cep_result_t	ret = CEP_EVENT_ALLOW;
+	zbx_cep_assessment_t	ret = CEP_EVENT_ALLOW;
 	zbx_cep_origin_t	origin = {.source = EVENT_SOURCE_TRIGGERS, .object = EVENT_OBJECT_TRIGGER};
 
 	for (int i = 0; i < dep_triggerids->values_num; i++)
@@ -751,7 +792,7 @@ void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_q
  *               CEP_EVENT_ALLOW otherwise                                    *
  *                                                                            *
  ******************************************************************************/
-zbx_cep_result_t	cep_check_trigger_deps(zbx_cep_t *cep, const zbx_vector_uint64_t *triggerids)
+zbx_cep_assessment_t	cep_check_trigger_deps(zbx_cep_t *cep, const zbx_vector_uint64_t *triggerids)
 {
 	zbx_cep_origin_t	origin = {.source = EVENT_SOURCE_TRIGGERS, .object = EVENT_OBJECT_TRIGGER};
 

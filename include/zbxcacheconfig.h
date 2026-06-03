@@ -1757,6 +1757,10 @@ zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correl
 #define ZBX_CEP_OP_RENAME_TAG		15
 #define ZBX_CEP_OP_REMOVE_TAG		16
 
+#define ZBX_CEP_ON_EVENT_OCCURRED	1
+#define ZBX_CEP_ON_EVENT_EVICTED	2
+#define ZBX_CEP_ON_WINDOW_CLOSED	3
+#define ZBX_CEP_ON_PATTERN_MATCH	4
 typedef struct
 {
 	char	*name;

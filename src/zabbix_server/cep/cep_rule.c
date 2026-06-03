@@ -14,9 +14,11 @@
 
 #include "cep_rule.h"
 #include "cep.h"
+#include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcalc.h"
+#include "zbxcep.h"
 #include "zbxcommon.h"
 #include "zbxdbwrap.h"
 #include "zbxeval.h"
@@ -46,6 +48,9 @@ void	cep_event_context_clear(zbx_cep_event_context_t *ctx)
 		zbx_vector_str_clear_ext(&ctx->groups, zbx_str_free);
 		zbx_vector_str_destroy(&ctx->groups);
 	}
+
+	if (NULL != ctx->event)
+		zbx_cep_event_release(ctx->event);
 }
 
 /*
@@ -104,6 +109,47 @@ static void	cep_event_context_load_groups(zbx_cep_event_context_t *ctx)
 	zbx_vector_uint64_destroy(&functionids);
 }
 
+static zbx_cep_event_t *cep_event_context_acquire_event(zbx_cep_event_context_t *ctx)
+{
+	if (NULL == ctx->event)
+	{
+		if (NULL != ctx->hevent)
+			zbx_cep_get_events_by_handles(&ctx->hevent, 1, &ctx->event);
+	}
+
+	return ctx->event;
+}
+
+static zbx_cep_event_t *cep_result_acquire_event(zbx_cep_result_t *result, zbx_cep_event_context_t *ctx)
+{
+	if (NULL == result->event)
+	{
+		if (NULL == ctx->event)
+		{
+			if (NULL != ctx->hevent)
+				zbx_cep_get_events_by_handles(&ctx->hevent, 1, &ctx->event);
+
+			if (NULL != ctx->event)
+				result->event = cep_event_get_mutable(ctx->event);
+		}
+	}
+
+	return result->event;
+}
+
+static zbx_db_event	*cep_result_acquire_db_event(zbx_cep_result_t *result, zbx_cep_event_context_t *ctx)
+{
+	if (NULL == result->db_event)
+	{
+		if (NULL == (result->db_event = ctx->db_event))
+		{
+			/* TODO: make db_event from ctx->event */
+		}
+	}
+
+	return result->db_event;
+}
+
 /*
  * operations
  */
@@ -113,7 +159,6 @@ static void	cep_event_context_load_groups(zbx_cep_event_context_t *ctx)
  * Purpose: get built-in tag value for event                                  *
  *                                                                            *
  * Parameters: event - [IN] event to retrieve tag value for                   *
- *             ctx   - [IN/OUT] event context for caching resolved values     *
  *             tag   - [IN] built-in tag name                                 *
  *                                                                            *
  * Return value: tag value string                                             *
@@ -122,11 +167,9 @@ static void	cep_event_context_load_groups(zbx_cep_event_context_t *ctx)
  *           subsequent requests for the same tag.                            *
  *                                                                            *
  ******************************************************************************/
-static const char	*cep_event_get_builtin_tag(const zbx_cep_event_t *event, zbx_cep_event_context_t *ctx,
-		const char *tag)
+static const char	*cep_event_get_builtin_tag(zbx_cep_event_context_t *ctx, const char *tag)
 {
 	/* TODO: resolve builin tags, cache in context and return */
-	ZBX_UNUSED(event);
 	ZBX_UNUSED(ctx);
 	ZBX_UNUSED(tag);
 
@@ -144,20 +187,21 @@ static const char	*cep_event_get_builtin_tag(const zbx_cep_event_t *event, zbx_c
  * Return value: 1 if condition is met, 0 otherwise                           *
  *                                                                            *
  ******************************************************************************/
-static int	cep_operation_tag_eval(const zbx_cep_operation_tag_t *tag, const zbx_cep_event_t *event,
-		zbx_cep_event_context_t *ctx)
+static int	cep_operation_tag_eval(const zbx_cep_operation_tag_t *tag, zbx_cep_event_context_t *ctx)
 {
 	int	ret = 0;
 
 	if ('$' == *tag->tag)
 	{
-		const char	*value = cep_event_get_builtin_tag(event, ctx, tag->tag);
+		const char	*value = cep_event_get_builtin_tag(ctx, tag->tag);
 
 		if (0 == strcmp(value, tag->value))
 			ret = 1;
 	}
 	else
 	{
+		zbx_cep_event_t	*event = cep_event_context_acquire_event(ctx);
+
 		for (int i = 0; i < event->tags.values_num; i++)
 		{
 			if (0 == strcmp(tag->tag, event->tags.values[i].tag))
@@ -183,7 +227,6 @@ static int	cep_operation_tag_eval(const zbx_cep_operation_tag_t *tag, const zbx_
  * Purpose: evaluate AND/OR operation tag filter conditions for event         *
  *                                                                            *
  * Parameters: op    - [IN] operation whose tag conditions to evaluate        *
- *             event - [IN] event to evaluate against                         *
  *             ctx   - [IN/OUT] event context for caching resolved values     *
  *                                                                            *
  * Return value: SUCCEED if all conditions are met, FAIL otherwise            *
@@ -191,8 +234,7 @@ static int	cep_operation_tag_eval(const zbx_cep_operation_tag_t *tag, const zbx_
  * Comments: Conditions on the same tag are OR-ed; distinct tags are AND-ed.  *
  *                                                                            *
  ******************************************************************************/
-static int	cep_operation_eval_and_or(const zbx_cep_operation_t *op, const zbx_cep_event_t *event,
-		zbx_cep_event_context_t *ctx)
+static int	cep_operation_eval_and_or(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx)
 {
 	for (int i = 0, j = 0; i < op->tags.values_num; i = j)
 	{
@@ -201,7 +243,7 @@ static int	cep_operation_eval_and_or(const zbx_cep_operation_t *op, const zbx_ce
 		for (j = i; j < op->tags.values_num && 0 == strcmp(op->tags.values[j].tag, op->tags.values[i].tag); j++)
 		{
 			if (0 == ret)
-				ret = cep_operation_tag_eval(&op->tags.values[j], event, ctx);
+				ret = cep_operation_tag_eval(&op->tags.values[j], ctx);
 		}
 
 		if (0 == ret)
@@ -216,18 +258,16 @@ static int	cep_operation_eval_and_or(const zbx_cep_operation_t *op, const zbx_ce
  * Purpose: evaluate OR operation tag filter conditions for event             *
  *                                                                            *
  * Parameters: op    - [IN] operation whose tag conditions to evaluate        *
- *             event - [IN] event to evaluate against                         *
  *             ctx   - [IN/OUT] event context for caching resolved values     *
  *                                                                            *
  * Return value: SUCCEED if any condition is met, FAIL otherwise              *
  *                                                                            *
  ******************************************************************************/
-static int	cep_operation_eval_or(const zbx_cep_operation_t *op, const zbx_cep_event_t *event,
-		zbx_cep_event_context_t *ctx)
+static int	cep_operation_eval_or(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx)
 {
 	for (int i = 0; i < op->tags.values_num; i++)
 	{
-		if (0 != cep_operation_tag_eval(&op->tags.values[i], event, ctx))
+		if (0 != cep_operation_tag_eval(&op->tags.values[i], ctx))
 			return SUCCEED;
 	}
 
@@ -239,7 +279,6 @@ static int	cep_operation_eval_or(const zbx_cep_operation_t *op, const zbx_cep_ev
  * Purpose: check if event matches operation tag filter                       *
  *                                                                            *
  * Parameters: op    - [IN] operation whose tag filter to match               *
- *             event - [IN] event to match against                            *
  *             ctx   - [IN/OUT] event context for caching resolved values     *
  *                                                                            *
  * Return value: SUCCEED if event matches the filter, FAIL otherwise          *
@@ -247,8 +286,7 @@ static int	cep_operation_eval_or(const zbx_cep_operation_t *op, const zbx_cep_ev
  * Comments: Operations with no tags match all events.                        *
  *                                                                            *
  ******************************************************************************/
-static int	cep_operation_match_event(const zbx_cep_operation_t *op, const zbx_cep_event_t *event,
-		zbx_cep_event_context_t *ctx)
+static int	cep_operation_match_event(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx)
 {
 	int	ret = FAIL;
 
@@ -258,10 +296,10 @@ static int	cep_operation_match_event(const zbx_cep_operation_t *op, const zbx_ce
 	switch (op->evaltype)
 	{
 		case ZBX_CONDITION_EVAL_TYPE_AND_OR:
-			ret = cep_operation_eval_and_or(op, event, ctx);
+			ret = cep_operation_eval_and_or(op, ctx);
 			break;
 		case ZBX_CONDITION_EVAL_TYPE_OR:
-			ret = cep_operation_eval_or(op, event, ctx);
+			ret = cep_operation_eval_or(op, ctx);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("invalid CEP operation evaltype %d", op->evaltype);
@@ -850,14 +888,12 @@ static int	cep_rule_match_event(const zbx_cep_rule_t *rule, zbx_cep_event_contex
  * Purpose: check if event should be discarded by rule                        *
  *                                                                            *
  * Parameters: rule  - [IN] rule to check discard operations for              *
- *             event - [IN] event to check                                    *
  *             ctx   - [IN/OUT] event context for caching resolved values     *
  *                                                                            *
  * Return value: SUCCEED if event should be discarded, FAIL otherwise         *
  *                                                                            *
  ******************************************************************************/
-static int	cep_rule_discard_event(const zbx_cep_rule_t *rule, const zbx_cep_event_t *event,
-		zbx_cep_event_context_t *ctx)
+static int	cep_rule_discard_event(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx)
 {
 	for (int i = 0; i < rule->operations.values_num; i++)
 	{
@@ -866,7 +902,7 @@ static int	cep_rule_discard_event(const zbx_cep_rule_t *rule, const zbx_cep_even
 		if (ZBX_CEP_EXECUTE_ON_EVENT_OCCURRED != op->execute_when)
 			continue;
 
-		if (ZBX_CEP_OP_DISCARD == op->type && SUCCEED == cep_operation_match_event(op, event, ctx))
+		if (ZBX_CEP_OP_DISCARD == op->type && SUCCEED == cep_operation_match_event(op, ctx))
 			return SUCCEED;
 	}
 
@@ -877,8 +913,7 @@ static int	cep_rule_discard_event(const zbx_cep_rule_t *rule, const zbx_cep_even
  *                                                                            *
  * Purpose: match event against CEP rules                                     *
  *                                                                            *
- * Parameters: event             - [IN] event to match                        *
- *             handle            - [IN] CEP configuration handle              *
+ * Parameters: handle            - [IN] CEP configuration handle              *
  *             matched_rules     - [OUT] matched rules, must be freed by      *
  *                                       the caller                           *
  *             matched_rules_num - [OUT] number of matched rules              *
@@ -890,8 +925,8 @@ static int	cep_rule_discard_event(const zbx_cep_rule_t *rule, const zbx_cep_even
  * Comments: Rule processing stops at the first rule with stop flag set.      *
  *                                                                            *
  ******************************************************************************/
-int	cep_event_match_rules(const zbx_cep_event_t *event, zbx_cep_config_handle_t handle,
-		const zbx_cep_rule_t ***matched_rules, int *matched_rules_num, zbx_cep_event_context_t *ctx)
+int	cep_event_match_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t ***matched_rules,
+		int *matched_rules_num, zbx_cep_event_context_t *ctx)
 {
 	int				ret = FAIL;
 	const zbx_vector_cep_rule_ptr_t	*rules;
@@ -913,7 +948,7 @@ int	cep_event_match_rules(const zbx_cep_event_t *event, zbx_cep_config_handle_t 
 		if (SUCCEED != cep_rule_match_event(rules->values[i], ctx))
 			continue;
 
-		if (SUCCEED == cep_rule_discard_event(rules->values[i], event, ctx))
+		if (SUCCEED == cep_rule_discard_event(rules->values[i], ctx))
 		{
 			zbx_free(*matched_rules);
 			*matched_rules_num = 0;
@@ -932,16 +967,204 @@ out:
 	return ret;
 }
 
-void	cep_event_execute_ops(zbx_cep_event_t *event, const zbx_cep_rule_t **matched_rules, int matched_rules_num,
-	int op_condition, zbx_cep_event_context_t *ctx)
+static void	cep_operation_execute_set_name(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
+		zbx_cep_result_t *result)
 {
-	ZBX_UNUSED(event);
-	ZBX_UNUSED(matched_rules);
-	ZBX_UNUSED(matched_rules_num);
-	ZBX_UNUSED(op_condition);
-	ZBX_UNUSED(ctx);
+	zbx_db_event	*db_event;
 
-	/* TODO: implementation */
+	if (NULL != (db_event = cep_result_acquire_db_event(result, ctx)))
+	{
+		db_event->name = zbx_strdup(db_event->name, op->args.set_name.name);
+		/* TODO: set update flags */
+	}
+}
+
+static void	cep_operation_execute_set_severity(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
+		zbx_cep_result_t *result)
+{
+	zbx_db_event	*db_event;
+	zbx_cep_event_t	*event;
+
+	if (NULL != (event = cep_result_acquire_event(result, ctx)))
+		event->severity = op->args.set_severity.level;
+
+	if (NULL != (db_event = cep_result_acquire_db_event(result, ctx)))
+	{
+		db_event->severity = op->args.set_severity.level;
+		/* TODO: set update flags */
+	}
+}
+
+static void	cep_operation_execute_increase_severity(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
+		zbx_cep_result_t *result)
+{
+	zbx_db_event	*db_event;
+	zbx_cep_event_t	*event;
+
+	if (NULL != (event = cep_result_acquire_event(result, ctx)))
+	{
+		/* check if already at max severity */
+		if (TRIGGER_SEVERITY_DISASTER == event->severity)
+			return;
+
+		event->severity++;
+	}
+
+	if (NULL != (db_event = cep_result_acquire_db_event(result, ctx)))
+	{
+		if (TRIGGER_SEVERITY_DISASTER == db_event->severity)
+			return;
+
+		db_event->severity++;
+
+		/* TODO: set update flags */
+	}
+}
+
+static void	cep_operation_execute_decrease_severity(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
+		zbx_cep_result_t *result)
+{
+	zbx_db_event	*db_event;
+	zbx_cep_event_t	*event;
+
+	if (NULL != (event = cep_result_acquire_event(result, ctx)))
+	{
+		/* check if already at max severity */
+		if (TRIGGER_SEVERITY_NOT_CLASSIFIED == event->severity)
+			return;
+
+		event->severity--;
+	}
+
+	if (NULL != (db_event = cep_result_acquire_db_event(result, ctx)))
+	{
+		if (TRIGGER_SEVERITY_NOT_CLASSIFIED == db_event->severity)
+			return;
+
+		db_event->severity--;
+
+		/* TODO: set update flags */
+	}
+}
+
+
+static void	cep_operation_execute(const zbx_cep_operation_t *op, int execute_when,
+		zbx_cep_event_context_t *ctx, zbx_cep_result_t *result)
+{
+#define CEP_FLAG(x)  (__UINT32_C(1) << (x))
+
+#define CEP_OP_SET_NAME_MASK		(CEP_FLAG(ZBX_CEP_ON_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED) | \
+					CEP_FLAG(ZBX_CEP_ON_WINDOW_CLOSED))
+#define CEP_OP_CLOSE_MASK		(CEP_FLAG(ZBX_CEP_ON_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED) | \
+					CEP_FLAG(ZBX_CEP_ON_WINDOW_CLOSED))
+#define CEP_OP_SET_SEVERITY_MASK	(CEP_FLAG(ZBX_CEP_ON_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED) | \
+					CEP_FLAG(ZBX_CEP_ON_WINDOW_CLOSED))
+#define CEP_OP_INCREASE_SEVERITY_MASK	(CEP_FLAG(ZBX_CEP_ON_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED) | \
+					CEP_FLAG(ZBX_CEP_ON_WINDOW_CLOSED))
+#define CEP_OP_DECREASE_SEVERITY_MASK	(CEP_FLAG(ZBX_CEP_ON_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED) | \
+					CEP_FLAG(ZBX_CEP_ON_WINDOW_CLOSED))
+#define CEP_OP_SUPPRESS_MASK		(CEP_FLAG(ZBX_CEP_ON_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED) | \
+					CEP_FLAG(ZBX_CEP_ON_WINDOW_CLOSED))
+#define CEP_OP_COPY_MASK		(CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED)  | CEP_FLAG(ZBX_CEP_ON_WINDOW_CLOSED) | \
+					CEP_FLAG(ZBX_CEP_ON_PATTERN_MATCH))
+#define CEP_OP_ADD_TAG_MASK		(CEP_FLAG(ZBX_CEP_ON_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED) | \
+					CEP_FLAG(ZBX_CEP_ON_WINDOW_CLOSED))
+#define CEP_OP_SET_TAG_MASK		(CEP_FLAG(ZBX_CEP_ON_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED) | \
+					CEP_FLAG(ZBX_CEP_ON_WINDOW_CLOSED))
+#define CEP_OP_SET_TAG_VALUE_MASK	(CEP_FLAG(ZBX_CEP_ON_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED) | \
+					CEP_FLAG(ZBX_CEP_ON_WINDOW_CLOSED))
+#define CEP_OP_INCREASE_TAG_VALUE_MASK	(CEP_FLAG(ZBX_CEP_ON_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED) | \
+					CEP_FLAG(ZBX_CEP_ON_WINDOW_CLOSED))
+#define CEP_OP_DECREASE_TAG_VALUE_MASK	(CEP_FLAG(ZBX_CEP_ON_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED) | \
+					CEP_FLAG(ZBX_CEP_ON_WINDOW_CLOSED))
+#define CEP_OP_RENAME_TAG_MASK		(CEP_FLAG(ZBX_CEP_ON_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED) | \
+					CEP_FLAG(ZBX_CEP_ON_WINDOW_CLOSED))
+#define CEP_OP_REMOVE_TAG_MASK		(CEP_FLAG(ZBX_CEP_ON_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED) | \
+					CEP_FLAG(ZBX_CEP_ON_WINDOW_CLOSED))
+
+	if (op->execute_when != execute_when)
+		return;
+
+	if (SUCCEED != cep_operation_match_event(op, ctx))
+		return;
+
+	switch (op->type)
+	{
+		case ZBX_CEP_OP_SET_NAME:
+			if (0 != (CEP_OP_SET_NAME_MASK & CEP_FLAG(execute_when)))
+				cep_operation_execute_set_name(op, ctx, result);
+			break;
+		case ZBX_CEP_OP_CLOSE:
+			break;
+		case ZBX_CEP_OP_DISCARD:
+			THIS_SHOULD_NEVER_HAPPEN;
+			break;
+		case ZBX_CEP_OP_SET_SEVERITY:
+			if (0 != (CEP_OP_SET_SEVERITY_MASK & CEP_FLAG(execute_when)))
+				cep_operation_execute_set_severity(op, ctx, result);
+			break;
+		case ZBX_CEP_OP_INCREASE_SEVERITY:
+			if (0 != (CEP_OP_INCREASE_SEVERITY_MASK & CEP_FLAG(execute_when)))
+				cep_operation_execute_increase_severity(op, ctx, result);
+			break;
+		case ZBX_CEP_OP_DECREASE_SEVERITY:
+			if (0 != (CEP_OP_DECREASE_SEVERITY_MASK & CEP_FLAG(execute_when)))
+				cep_operation_execute_decrease_severity(op, ctx, result);
+			break;
+		case ZBX_CEP_OP_SUPPRESS:
+			break;
+		case ZBX_CEP_OP_COPY_FIRST:
+			break;
+		case ZBX_CEP_OP_COPY_LAST:
+			break;
+		case ZBX_CEP_OP_ADD_TAG:
+			break;
+		case ZBX_CEP_OP_SET_TAG:
+			break;
+		case ZBX_CEP_OP_SET_TAG_VALUE:
+			break;
+		case ZBX_CEP_OP_INCREASE_TAG_VALUE:
+			break;
+		case ZBX_CEP_OP_DECREASE_TAG_VALUE:
+			break;
+		case ZBX_CEP_OP_RENAME_TAG:
+			break;
+		case ZBX_CEP_OP_REMOVE_TAG:
+			break;
+	}
+
+#undef CEP_FLAG
+#undef CEP_OP_SET_NAME_MASK
+#undef CEP_OP_CLOSE_MASK
+#undef CEP_OP_SET_SEVERITY_MASK
+#undef CEP_OP_INCREASE_SEVERITY_MASK
+#undef CEP_OP_DECREASE_SEVERITY_MASK
+#undef CEP_OP_SUPPRESS_MASK
+#undef CEP_OP_COPY_MASK
+#undef CEP_OP_ADD_TAG_MASK
+#undef CEP_OP_SET_TAG_MASK
+#undef CEP_OP_SET_TAG_VALUE_MASK
+#undef CEP_OP_INCREASE_TAG_VALUE_MASK
+#undef CEP_OP_DECREASE_TAG_VALUE_MASK
+#undef CEP_OP_RENAME_TAG_MASK
+#undef CEP_OP_REMOVE_TAG_MASK
+}
+
+void	cep_rule_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_cep_event_context_t *ctx,
+		zbx_cep_result_t *result)
+{
+	for (int i = 0; i < rule->operations.values_num; i++)
+	{
+		if (rule->operations.values[i].execute_when == execute_when)
+			cep_operation_execute(&rule->operations.values[i], execute_when, ctx, result);
+	}
+}
+
+void	cep_event_execute_ops(const zbx_cep_rule_t **matched_rules, int matched_rules_num, int execute_when,
+		zbx_cep_event_context_t *ctx, zbx_cep_result_t *result)
+{
+	for (int i = 0; i < matched_rules_num; i++)
+		cep_rule_execute_ops(matched_rules[i], execute_when, ctx, result);
 }
 
 

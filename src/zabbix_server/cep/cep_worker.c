@@ -451,12 +451,13 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	const zbx_cep_rule_t	**rules = NULL;
 	int			rules_num = 0;
 	zbx_cep_config_handle_t	hconfig;
-	zbx_cep_event_context_t	event_ctx = {.db_event = db_event};
+	zbx_cep_event_context_t	event_ctx = {.db_event = db_event, .event = cep_event_addref(event)};
+	zbx_cep_result_t	result = {0};
 
 	/* cep config returns NULL handle if there are no cep rules to process */
 	if (NULL != (hconfig = zbx_cep_config_open()))
 	{
-		if (SUCCEED != cep_event_match_rules(event, hconfig, &rules, &rules_num, &event_ctx))
+		if (SUCCEED != cep_event_match_rules(hconfig, &rules, &rules_num, &event_ctx))
 		{
 			cep_event_clear(event);
 			zbx_free(event);
@@ -465,7 +466,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 		}
 
 		if (0 != rules_num)
-			cep_event_execute_ops(event, rules, rules_num, CEP_ON_EVENT_OCCURRED, &event_ctx);
+			cep_event_execute_ops(rules, rules_num, CEP_ON_EVENT_OCCURRED, &event_ctx, &result);
 	}
 
 	cep_cache_acquire(&cep);
@@ -509,11 +510,11 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	else
 		zbx_cep_event_handle_release(h);
 out:
+	cep_event_context_clear(&event_ctx);
+
 	if (hconfig != NULL)
 	{
-		cep_event_context_clear(&event_ctx);
 		zbx_free(rules);
-
 		zbx_cep_config_close(hconfig);
 	}
 
