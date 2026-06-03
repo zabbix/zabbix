@@ -20,13 +20,11 @@ const ZBX_STYLE_BANNER_CLOSE = 'banner-close';
 class CBanner {
 
 	static URL = 'https://services.zabbix.com/banners/v1';
-	static DELAY_ON_PAGE_LOAD = 1; // 1 second
 	static DELAY_ON_ERROR = 60; // 1 minute
 	static NUMBER_OF_ATTEMPTS = 1;
-	static CONTENT_LANG_ALL = 'all';
 	static RESPONSE_DEFAULTS = {
 		allow_banners: true,
-		language: CBanner.CONTENT_LANG_ALL,
+		language: 'all',
 		storage_idx: null,
 		dismissed_banner_ids: [],
 		banners: []
@@ -53,7 +51,7 @@ class CBanner {
 	`);
 
 	constructor() {
-		this.#startUpdating(CBanner.DELAY_ON_PAGE_LOAD);
+		this.#getSavedData();
 	}
 
 	#getSavedData() {
@@ -155,21 +153,23 @@ class CBanner {
 	}
 
 	#createBanner() {
-		if (this.#content) {
-			return;
+		this.#container = document.querySelector(`.${ZBX_STYLE_BANNER}`);
+
+		if (!this.#container) {
+			this.#container = this.#template.evaluateToElement();
+
+			const wrapper = document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`);
+			wrapper.prepend(this.#container);
 		}
 
-		this.#container = this.#template.evaluateToElement();
 		this.#content = this.#container.querySelector(`.${ZBX_STYLE_BANNER_CONTENT}`);
 
 		const close_button = this.#container.querySelector(`.${ZBX_STYLE_BANNER_CLOSE}`);
-		close_button.addEventListener('click', () => this.#closeBanner());
-
-		const wrapper = document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`);
-		wrapper.prepend(this.#container);
+		close_button?.removeEventListener('click', this.#closeBanner);
+		close_button?.addEventListener('click', this.#closeBanner);
 	}
 
-	#closeBanner() {
+	#closeBanner = () => {
 		this.#dismissed_banner_ids.add(this.#active_banner_id);
 
 		this.#displayActiveBanner();
@@ -189,11 +189,26 @@ class CBanner {
 				const to = new Date(banner.to);
 
 				return !this.#dismissed_banner_ids.has(banner.id)
-					&& [this.#language, CBanner.CONTENT_LANG_ALL].some(key => key in banner.content)
+					&& [this.#language, 'all'].some(key => key in banner.content)
 					&& from <= now
 					&& now <= to;
 			})
-			.sort((a, b) => a.id.localeCompare(b.id))
+			.sort((a, b) => {
+				const a_numeric = !isNaN(a.id) && !isNaN(parseInt(a.id));
+				const b_numeric = !isNaN(b.id) && !isNaN(parseInt(b.id));
+
+				if (a_numeric && b_numeric) {
+					return Number(a.id) - Number(b.id);
+				}
+				else if (a_numeric && !b_numeric) {
+					return -1;
+				}
+				else if (!a_numeric && b_numeric) {
+					return 1;
+				}
+
+				return a.id.localeCompare(b.id);
+			})
 			.at(0);
 
 		if (!active_banner || !active_banner.content) {
@@ -214,7 +229,7 @@ class CBanner {
 			this.#updateUserProfile(dismissed_banner_ids);
 		}
 
-		const content = active_banner.content[this.#language] || active_banner.content[CBanner.CONTENT_LANG_ALL];
+		const content = active_banner.content[this.#language] || active_banner.content['all'];
 		if (!content) {
 			return;
 		}
