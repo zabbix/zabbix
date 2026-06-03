@@ -317,7 +317,7 @@ class CDataTableOptionsPopup {
 
 		this.#column.setColumnOptions(this.#data);
 
-		this.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE, {column_index});
+		this.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE, {reset: true, column_index});
 		this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 	}
 
@@ -333,14 +333,15 @@ class CDataTableOptionsPopup {
 
 	onUpdate() {}
 
-	onSave() {
+	onSave(e) {
+		const {reset} = e.detail;
 		const column_index = this.#column.getColumnIndex();
 		const name = this.#column.getName();
 		const column_options = this.#column.getColumnOptions();
 
-		const save = this.#column_name !== name || !deepCompare(this.#data, column_options);
+		const save = reset || this.#column_name !== name || !deepCompare(this.#data, column_options);
 
-		this.dispatchEvent(CDataTableOptionsPopup.EVENT_UPDATE, {column_index, column_options, save});
+		this.dispatchEvent(CDataTableOptionsPopup.EVENT_UPDATE, {column_index, column_options, reset, save});
 	}
 
 	/**
@@ -417,7 +418,7 @@ class CDataTableOptionsPopup {
 	}
 
 	/**
-	 * Callback for handling an "Escape" button.
+	 * Callback for handling an "Enter" and "Escape" buttons.
 	 *
 	 * @param {KeyboardEvent} e
 	 */

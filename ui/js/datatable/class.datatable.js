@@ -1591,6 +1591,7 @@ class CDataTable {
 		const {save = false} = e.detail;
 
 		if (save) {
+			this.dispatchEvent(CDataTable.EVENT_INIT);
 			this.dispatchEvent(CDataTable.EVENT_SAVE);
 		}
 	}
