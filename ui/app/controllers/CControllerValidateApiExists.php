@@ -52,7 +52,7 @@ class CControllerValidateApiExists extends CController {
 		$ret = $this->validateInput($this->getValidationRules());
 
 		if ($ret) {
-			$ret = $this->validateApiAmount();
+			$ret = $this->validateApiCount();
 		}
 
 		if (!$ret) {
@@ -113,9 +113,9 @@ class CControllerValidateApiExists extends CController {
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 	}
 
-	protected function validateApiAmount(): bool {
+	protected function validateApiCount(): bool {
 		if (count($this->getInput('validations', [])) > 20) {
-			error(_s('No more than %1$s items based on field "%2$s" rules', '20', 'api'));
+			error(_s('No more than %1$d items based on field "%2$s" rules', '20', 'api'));
 
 			return false;
 		}
