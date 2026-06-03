@@ -421,16 +421,10 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 		if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by)
 		{
-			zbx_db_result_t	db_result;
-			zbx_db_row_t	row;
+			zbx_uint64_t	proxyid;
 
-			db_result = zbx_db_select("select proxyid from host_proxy where hostid=" ZBX_FS_UI64,
-					host.hostid);
-
-			if (NULL != (row = zbx_db_fetch(db_result)))
-				ZBX_DBROW2UINT64(host.proxyid, row[0]);
-
-			zbx_db_free_result(db_result);
+			if (SUCCEED == zbx_dc_get_host_proxyid_by_name(host.host, &proxyid))
+				host.proxyid = proxyid;
 		}
 	}
 	else /* eventid */
