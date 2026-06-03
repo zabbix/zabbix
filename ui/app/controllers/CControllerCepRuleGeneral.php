@@ -27,7 +27,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules($this->hasInput('cepruleid')));
+		$ret = $this->validateInput(self::getValidationRules(existing: $this->getAction() === 'ceprule.update'));
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
