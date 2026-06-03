@@ -14,8 +14,7 @@ COMMON_LIBS1 = \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
-	$(top_srcdir)/src/libs/zbxexit/libzbxexit.a
+	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a
 
 COMMON_LIBS2 = \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \

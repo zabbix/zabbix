@@ -2109,7 +2109,6 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxthreads/libzbxthreads.a \
 		\${abs_top_builddir}/src/libs/zbxvariant/libzbxvariant.a \
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
-        \${abs_top_builddir}/src/libs/zbxexit/libzbxexit.a \
 		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
 	AC_SUBST(CGO_CFLAGS)
