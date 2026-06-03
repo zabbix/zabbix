@@ -24,13 +24,35 @@ $status = $data['system_info']['status'];
 $info_table = (new CTableInfo())
 	->setHeader([_('Parameter'), _('Value'), _('Details')])
 	->setHeadingColumn(0)
-	->addClass(ZBX_STYLE_LIST_TABLE_STICKY_HEADER)
-	->addRow([
-		_('Zabbix server is running'),
-		(new CSpan($status['is_running'] ? _('Yes') : _('No')))
-			->addClass($status['is_running'] ? ZBX_STYLE_COLOR_POSITIVE : ZBX_STYLE_COLOR_NEGATIVE),
-		$data['system_info']['server_details']
+	->addClass(ZBX_STYLE_LIST_TABLE_STICKY_HEADER);
+
+if (array_key_exists('serverid', $data['system_info']) && $data['system_info']['serverid'] !== '') {
+	$info_table->addRow([
+		_('Zabbix server ID'),
+		[
+			(new CSpan($data['system_info']['serverid']))
+				->setHint($data['system_info']['serverid'])
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+				->addClass('js-serverid')
+				->addStyle('display: inline-block; max-width: 110px'),
+			' ',
+			(new CButton())
+				->removeId()
+				->setTitle(_('Copy to clipboard'))
+				->addClass(ZBX_ICON_COPY)
+				->addClass(ZBX_STYLE_BTN_GREY_ICON)
+				->addClass('js-copy-button')
+		],
+		''
 	]);
+}
+
+$info_table->addRow([
+	_('Zabbix server is running'),
+	(new CSpan($status['is_running'] ? _('Yes') : _('No')))
+		->addClass($status['is_running'] ? ZBX_STYLE_COLOR_POSITIVE : ZBX_STYLE_COLOR_NEGATIVE),
+	$data['system_info']['server_details']
+]);
 
 $server_version = $status['has_status'] ? $status['server_version'] : '';
 $server_version_details = '';
@@ -52,7 +74,7 @@ if ($data['system_info']['is_software_update_check_enabled']) {
 
 		$frontend_version_details = $version_details;
 	}
-	elseif (array_key_exists('latest_release', $check_data)) {
+	elseif ($check_data['latest_release'] !== null) {
 		if ($status['has_status']) {
 			$server_version_details = version_compare($server_version, $check_data['latest_release'], '<')
 				? (new CSpan(_('New update available')))->addClass(ZBX_STYLE_COLOR_WARNING)
@@ -78,7 +100,7 @@ if ($data['system_info']['is_software_update_check_enabled']) {
 	}
 }
 
-if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+if ($data['user_type'] >= USER_TYPE_ZABBIX_ADMIN) {
 	$info_table->addRow([
 		_('Zabbix server version'),
 		$server_version,
@@ -92,7 +114,7 @@ $info_table->addRow([
 	$frontend_version_details
 ]);
 
-if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+if ($data['user_type'] >= USER_TYPE_ZABBIX_ADMIN) {
 	if ($data['system_info']['is_software_update_check_enabled'] && $data['show_software_update_check_details']) {
 		$info_table
 			->addRow([
@@ -278,7 +300,7 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 		);
 	}
 
-	if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY, $data['system_info'])) {
+	if ($data['system_info'][CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY]) {
 		$info_table->addRow((new CRow([
 			_('Housekeeping'),
 			_('Override item history period'),
@@ -292,7 +314,7 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 		])));
 	}
 
-	if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS, $data['system_info'])) {
+	if ($data['system_info'][CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS]) {
 		$info_table->addRow((new CRow([
 			_('Housekeeping'),
 			_('Override item trend period'),

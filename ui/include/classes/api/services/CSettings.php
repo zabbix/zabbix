@@ -55,7 +55,7 @@ class CSettings extends CApiService {
 		'auditlog_enabled', 'auditlog_mode',
 
 		// Read-only parameters.
-		'ha_failover_delay'
+		'ha_failover_delay', 'serverid'
 	];
 
 	/**
@@ -108,7 +108,7 @@ class CSettings extends CApiService {
 	public static function getPrivate(): array {
 		$parameters = CApiSettingsHelper::getParameters([
 			'session_key', 'dbversion_status', 'server_status', 'software_update_checkid', 'software_update_check_data',
-			'banner_data'
+			'banner_data', 'serverid'
 		]);
 
 		$parameters['dbversion_status'] = json_decode($parameters['dbversion_status'], true) ?: [];

@@ -106,6 +106,7 @@ class CSettingsHelper {
 	public const SESSION_KEY = 'session_key';
 	public const DBVERSION_STATUS = 'dbversion_status';
 	public const SERVER_STATUS = 'server_status';
+	public const SERVER_ID = 'serverid';
 	public const SOFTWARE_UPDATE_CHECKID = 'software_update_checkid';
 	public const SOFTWARE_UPDATE_CHECK_DATA = 'software_update_check_data';
 	public const BANNER_DATA = 'banner_data';
@@ -198,7 +199,7 @@ class CSettingsHelper {
 		}
 
 		$supported_params = array_intersect_key(self::$params_private,
-			array_flip([self::SESSION_KEY, self::SOFTWARE_UPDATE_CHECKID])
+			array_flip([self::SERVER_ID, self::SESSION_KEY, self::SOFTWARE_UPDATE_CHECKID])
 		);
 
 		return $supported_params[$field];

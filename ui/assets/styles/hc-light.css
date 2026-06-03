@@ -3065,6 +3065,8 @@ z-color-picker.has-error .color-picker-box {
     border-bottom-style: none; }
   .list-table tbody tr:not(.hover-nobg):not(.row-selected):hover {
     background-color: #f4f4f4; }
+    .list-table tbody tr:not(.hover-nobg):not(.row-selected):hover .btn-grey-icon {
+      background-color: #f4f4f4; }
   .list-table tbody tr.row-selected {
     background-color: #f4f4f4; }
   .list-table tbody th.table-info,

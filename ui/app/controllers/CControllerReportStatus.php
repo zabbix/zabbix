@@ -29,8 +29,14 @@ class CControllerReportStatus extends CController {
 	}
 
 	protected function doAction() {
+		$system_info = CSystemInfoHelper::getData();
+
 		$response = new CControllerResponseData([
 			'system_info' => CSystemInfoHelper::getData(),
+			'export_file_name' => 'Zabbix-system-information-'.$system_info['collected_at'].'.json',
+			'export_payload' => json_encode(CSystemInfoHelper::getExportData($system_info),
+				JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
+			),
 			'user_type' => CWebUser::getType()
 		]);
 

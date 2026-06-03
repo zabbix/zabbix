@@ -29,7 +29,7 @@ class testRole extends CAPITest {
 			[
 				'role' => [
 					'name' => 'role-with-all-ui-elements',
-					'type' => '3',
+					'type' => '3', // USER_TYPE_SUPER_ADMIN
 					'rules' => [
 						'ui' => [
 							[
@@ -89,6 +89,10 @@ class testRole extends CAPITest {
 								'status' => '1'
 							],
 							[
+								'name' => 'reports.system_info',
+								'status' => '1'
+							],
+							[
 								'name' => 'reports.notifications',
 								'status' => '1'
 							],
@@ -134,10 +138,6 @@ class testRole extends CAPITest {
 							],
 							[
 								'name' => 'configuration.internal_actions',
-								'status' => '1'
-							],
-							[
-								'name' => 'reports.system_info',
 								'status' => '1'
 							],
 							[
@@ -281,14 +281,14 @@ class testRole extends CAPITest {
 			[
 				'role' => [
 					'name' => 'New role',
-					'type' => '1'
+					'type' => '1' // USER_TYPE_ZABBIX_USER
 				],
 				'expected_error' => null
 			],
 			[
 				'role' => [
 					'name' => '☺',
-					'type' => '2'
+					'type' => '2' // USER_TYPE_ZABBIX_ADMIN
 				],
 				'expected_error' => null
 			],
@@ -302,14 +302,14 @@ class testRole extends CAPITest {
 			[
 				'role' => [
 					'name' => 'Роль пользователя',
-					'type' => '1'
+					'type' => '1' // USER_TYPE_ZABBIX_USER
 				],
 				'expected_error' => null
 			],
 			[
 				'role' => [
 					'name' => 'New/Nested',
-					'type' => '1'
+					'type' => '1' // USER_TYPE_ZABBIX_USER
 				],
 				'expected_error' => null
 			],
@@ -325,14 +325,14 @@ class testRole extends CAPITest {
 			[
 				'role' => [
 					'name' => '',
-					'type' => '1'
+					'type' => '1' // USER_TYPE_ZABBIX_USER
 				],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
 				'role' => [
 					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
-					'type' => '1'
+					'type' => '1' // USER_TYPE_ZABBIX_USER
 				],
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
@@ -340,7 +340,7 @@ class testRole extends CAPITest {
 			[
 				'role' => [
 					'name' => 'Super admin role',
-					'type' => '1'
+					'type' => '1' // USER_TYPE_ZABBIX_USER
 				],
 				'expected_error' => 'User role "Super admin role" already exists.'
 			],
@@ -476,7 +476,7 @@ class testRole extends CAPITest {
 				'role' => [
 					'roleid' => 'roleid_4',
 					'name' => 'Successfully updated role',
-					'type' => '2'
+					'type' => '2' // USER_TYPE_ZABBIX_ADMIN
 				],
 				'expected_error' => null
 			],
@@ -726,6 +726,10 @@ class testRole extends CAPITest {
 									'status' => '1'
 								],
 								[
+									'name' => 'reports.system_info',
+									'status' => '1'
+								],
+								[
 									'name' => 'reports.notifications',
 									'status' => '1'
 								],
@@ -767,10 +771,6 @@ class testRole extends CAPITest {
 								],
 								[
 									'name' => 'configuration.internal_actions',
-									'status' => '1'
-								],
-								[
-									'name' => 'reports.system_info',
 									'status' => '1'
 								],
 								[

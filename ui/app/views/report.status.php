@@ -20,10 +20,21 @@
  */
 
 require_once __DIR__.'/../../include/blocks.inc.php';
+require_once __DIR__.'/js/report.status.js.php';
 
 (new CHtmlPage())
 	->setTitle(_('System information'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORT_STATUS))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					(new CLink(_('Export')))
+						->addClass('js-export-system-information')
+						->addClass(ZBX_STYLE_BTN)
+				)
+		))->setAttribute('aria-label', _('Content controls'))
+	)
 	->addItem(
 		(new CDiv(
 			new CPartial('administration.system.info', [
@@ -44,4 +55,13 @@ require_once __DIR__.'/../../include/blocks.inc.php';
 			))->addClass(ZBX_STYLE_CONTAINER)
 			: null
 	)
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'export_file_name' => $data['export_file_name'],
+		'export_payload' => $data['export_payload']
+	]).');
+'))
+	->setOnDocumentReady()
 	->show();
