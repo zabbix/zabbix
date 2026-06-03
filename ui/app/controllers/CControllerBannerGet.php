@@ -40,7 +40,7 @@ class CControllerBannerGet extends CController {
 
 		if ($output['allow_banners']) {
 			$now = time();
-			$banner_data = CSettingsHelper::getBannerData() + [
+			$banner_data = CBannerHelper::getData() + [
 				'lastcheck' => 0,
 				'lastcheck_success' => 0,
 				'nextcheck' => 0
@@ -59,7 +59,7 @@ class CControllerBannerGet extends CController {
 
 				$banner_data['nextcheck'] = $now + SEC_PER_MIN;
 
-				CSettings::updatePrivate(['banner_data' => $banner_data]);
+				CProfile::update('web.banner.data', json_encode($banner_data), PROFILE_TYPE_STR);
 			}
 		}
 

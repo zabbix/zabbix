@@ -17,12 +17,30 @@
 class CBannerHelper {
 
 	/**
+	 * Retrieves banner data from the profile.
+	 *
+	 * @return array
+	 */
+	public static function getData(): array {
+		return json_decode(CProfile::get('web.banner.data', '[]'), true) ?? [];
+	}
+
+	/**
+	 * Retrieves a list of dismissed banner IDs from the profile.
+	 *
+	 * @return array
+	 */
+	public static function getDismissedIds(): array {
+		return json_decode(CProfile::get('web.banner.dismissed_ids', '[]'), true);
+	}
+
+	/**
 	 * Retrieves all stored banners.
 	 *
 	 * @return array
 	 */
 	public static function getBanners(): array {
-		$banner_data = CSettingsHelper::getBannerData();
+		$banner_data = self::getData();
 
 		return $banner_data['banners'] ?? [];
 	}
@@ -99,14 +117,5 @@ class CBannerHelper {
 
 			return strcasecmp($a['id'], $b['id']);
 		});
-	}
-
-	/**
-	 * Retrieves a list of dismissed banner IDs from the profile.
-	 *
-	 * @return array
-	 */
-	public static function getDismissedIds(): array {
-		return json_decode(CProfile::get('web.banner.dismissed_ids', '[]'), true);
 	}
 }
