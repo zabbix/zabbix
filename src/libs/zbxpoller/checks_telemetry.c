@@ -181,6 +181,8 @@ static int	have_required_db(zbx_tq_db_type_t db_type)
 #elif defined(HAVE_POSTGRESQL)
 	return ZBX_TQ_DB_TYPE_POSTGRESQL == db_type ? SUCCEED : FAIL;
 #else
+	ZBX_UNUSED(db_type);
+
 	return FAIL;
 #endif
 }
