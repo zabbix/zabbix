@@ -16,6 +16,8 @@
 #include "telemetry.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
+#include "zbxdb.h"
+#include "zbxnum.h"
 
 int	zbx_tq_parse_sql_result(const zbx_tq_query_t *query, zbx_db_result_t result, zbx_vector_str_t *values)
 {

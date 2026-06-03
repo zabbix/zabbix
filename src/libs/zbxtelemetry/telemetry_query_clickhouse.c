@@ -18,6 +18,7 @@
 #include "zbxtelemetry.h"
 #include "zbxcommon.h"
 #include "zbxtypes.h"
+#include "zbxnum.h"
 
 static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_json_parse *jp, int row_id)
 {

@@ -18,6 +18,7 @@
 #include "zbxjson.h"
 #include "zbxtelemetry.h"
 #include "zbxtypes.h"
+#include "zbxnum.h"
 
 /* TODO: maybe this should be user-defined? or at least documented? */
 #define TQ_ELASTIC_MAX_BUCKETS 10000

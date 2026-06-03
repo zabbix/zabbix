@@ -17,6 +17,7 @@
 
 #include "async_manager.h"
 #include "zbxpoller.h"
+#include "zbxcacheconfig.h"
 
 #include "zbxalgo.h"
 
