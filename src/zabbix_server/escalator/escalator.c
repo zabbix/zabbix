@@ -45,6 +45,7 @@
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
 #include "zbxserialize.h"
+#include "zbxcurl.h"
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
 #endif
@@ -1094,9 +1095,10 @@ static void	add_sentusers_ack_msg(zbx_user_msg_t **user_msg, zbx_uint64_t action
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = zbx_db_select(
-			"select distinct userid"
-			" from acknowledges"
-			" where eventid=" ZBX_FS_UI64,
+			"select distinct u.userid"
+			" from acknowledges a,users u"
+			" where a.eventid=" ZBX_FS_UI64
+				" and a.userid=u.userid",	/* we skip all acknowledges where userid is NULL */
 			event->eventid);
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -3885,6 +3887,7 @@ out:
 	zbx_vector_uint64_destroy(&escalationids);
 	notify_alerter(ALERTER_CLOSE);
 	zbx_db_close();
+	zbx_curl_cleanup();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
