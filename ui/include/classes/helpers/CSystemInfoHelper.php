@@ -450,12 +450,12 @@ class CSystemInfoHelper {
 				'value' => $data['status']['hosts_count'],
 				'details' => [
 					'enabled' => $data['status']['hosts_count_monitored'],
-					'disabled' => $data['status']['hosts_count_not_monitored'],
+					'disabled' => $data['status']['hosts_count_not_monitored']
 				]
 			],
 			'templates' => [
 				'id' => _('Number of templates'),
-				'value' => $data['status']['hosts_count_template'],
+				'value' => $data['status']['hosts_count_template']
 			],
 			'items' => [
 				'id' => _('Number of items (enabled/disabled/not supported)'),
