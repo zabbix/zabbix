@@ -205,7 +205,6 @@ class CCepRuleHelper {
 			CONDITION_OPERATOR_NOT_LIKE => _('Does not contain'),
 			CONDITION_OPERATOR_MORE_EQUAL => _('Is more than or equal'),
 			CONDITION_OPERATOR_LESS_EQUAL => _('Is less than or equal'),
-			CONDITION_OPERATOR_EXISTS => _('Exists'),
 			CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist')
 		];
 	}
