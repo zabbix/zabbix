@@ -88,6 +88,8 @@ class CJsonRpc {
 
 		$authentication_required = false;
 
+		$api_method_names = [];
+
 		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
 			if (!$this->validate($call)) {
 				continue;
@@ -116,6 +118,8 @@ class CJsonRpc {
 				$authentication_required = true;
 			}
 
+			$api_method_names[] = $call['method'];
+
 			$calls_data[] = [
 				'api' => $request_api,
 				'method' => $request_method,
@@ -127,7 +131,7 @@ class CJsonRpc {
 		$authenticate_response = null;
 
 		if ($authentication_required) {
-			$authenticate_response = $this->apiClient->authenticate($auth, self::makeRequestedApiMethod($calls_data));
+			$authenticate_response = $this->apiClient->authenticate($auth, implode(',', $api_method_names));
 		}
 
 		if ($authenticate_response === null || $authenticate_response->errorCode === null) {
@@ -210,16 +214,6 @@ class CJsonRpc {
 		}
 
 		return true;
-	}
-
-	public static function makeRequestedApiMethod(array $calls_data): string {
-		$api_methods = [];
-
-		foreach ($calls_data as $call) {
-			$api_methods[] = $call['api'].'.'.$call['method'];
-		}
-
-		return implode(',', $api_methods);
 	}
 
 	public function processResult(array $call, CApiClientResponse $response) {
