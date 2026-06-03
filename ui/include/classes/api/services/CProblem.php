@@ -74,7 +74,7 @@ class CProblem extends CApiService {
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
-			'selectAcknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity', 'new_severity', 'suppress_until', 'taskid']), 'default' => null],
+			'selectAcknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity', 'new_severity', 'suppress_until', 'taskid', 'maintenanceid']), 'default' => null],
 			'selectSuppressionData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid']), 'default' => null],
 			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -413,7 +413,7 @@ class CProblem extends CApiService {
 
 			$output = $options['selectAcknowledges'] === API_OUTPUT_EXTEND
 				? ['acknowledgeid', 'userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
-					'suppress_until', 'taskid'
+					'suppress_until', 'taskid', 'maintenanceid'
 				]
 				: array_unique(array_merge(['acknowledgeid', 'eventid'], $options['selectAcknowledges']));
 

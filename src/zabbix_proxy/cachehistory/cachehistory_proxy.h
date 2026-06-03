@@ -18,7 +18,6 @@
 #include "zbxdbhigh.h"
 #include "zbxcachehistory.h"
 
-void	zbx_sync_history_cache_proxy(const zbx_events_funcs_t *events_cbs,
-		int config_history_storage_pipelines, int mode, zbx_history_sync_stats_t *stats);
+void	zbx_sync_history_cache_proxy(const zbx_events_funcs_t *events_cbs, int mode, zbx_history_sync_stats_t *stats);
 
 #endif

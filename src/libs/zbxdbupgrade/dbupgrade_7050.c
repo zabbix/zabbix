@@ -820,6 +820,42 @@ static int	DBpatch_7050055(void)
 
 static int	DBpatch_7050056(void)
 {
+	const zbx_db_field_t	field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("acknowledges", &field);
+}
+
+static int	DBpatch_7050057(void)
+{
+	const zbx_db_field_t	field = {"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
+static int	DBpatch_7050058(void)
+{
+	return DBdrop_foreign_key("acknowledges", 1);
+}
+
+static int	DBpatch_7050059(void)
+{
+	return DBdrop_foreign_key("event_suppress", 2);
+}
+
+static int	DBpatch_7050060(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 1 - ZBX_SETTING_TYPE_STR */
+	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str) values ('banner_data',1,'')"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050061(void)
+{
 	const zbx_db_table_t	table =
 			{"trigger_rtdata", "triggerid", 0,
 				{
@@ -836,12 +872,12 @@ static int	DBpatch_7050056(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050057(void)
+static int	DBpatch_7050062(void)
 {
 	return DBcreate_index("trigger_rtdata", "trigger_rtdata_1", "value,lastchange", 0);
 }
 
-static int	DBpatch_7050058(void)
+static int	DBpatch_7050063(void)
 {
 	const zbx_db_field_t	field = {"triggerid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -849,7 +885,7 @@ static int	DBpatch_7050058(void)
 	return DBadd_foreign_key("trigger_rtdata", 1, &field);
 }
 
-static int	DBpatch_7050059(void)
+static int	DBpatch_7050064(void)
 {
 	/* hosts.status 3 - HOST_STATUS_TEMPLATE */
 	/* triggers.flags 0, 4 - ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED */
@@ -874,66 +910,66 @@ static int	DBpatch_7050059(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050060(void)
+static int	DBpatch_7050065(void)
 {
 	return DBdrop_field("triggers", "value");
 }
 
-static int	DBpatch_7050061(void)
+static int	DBpatch_7050066(void)
 {
 	return DBdrop_field("triggers", "state");
 }
 
-static int	DBpatch_7050062(void)
+static int	DBpatch_7050067(void)
 {
 	return DBdrop_field("triggers", "lastchange");
 }
 
-static int	DBpatch_7050063(void)
+static int	DBpatch_7050068(void)
 {
 	return DBdrop_field("triggers", "error");
 }
 
-static int	DBpatch_7050064(void)
+static int	DBpatch_7050069(void)
 {
 	return DBcreate_changelog_insert_trigger("trigger_depends", "triggerdepid");
 }
 
-static int	DBpatch_7050065(void)
+static int	DBpatch_7050070(void)
 {
 	return DBcreate_changelog_update_trigger("trigger_depends", "triggerdepid");
 }
 
-static int	DBpatch_7050066(void)
+static int	DBpatch_7050071(void)
 {
 	return DBcreate_changelog_delete_trigger("trigger_depends", "triggerdepid");
 }
 
-static int	DBpatch_7050067(void)
+static int	DBpatch_7050072(void)
 {
 	return DBdrop_foreign_key("trigger_depends", 2);
 }
 
-static int	DBpatch_7050068(void)
+static int	DBpatch_7050073(void)
 {
 	return DBdrop_foreign_key("trigger_depends", 1);
 }
 
-static int	DBpatch_7050069(void)
+static int	DBpatch_7050074(void)
 {
 	const zbx_db_field_t	field = {"triggerid_down", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("trigger_depends", 1, &field);
 }
 
-static int	DBpatch_7050070(void)
+static int	DBpatch_7050075(void)
 {
 	const zbx_db_field_t	field = {"triggerid_up", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("trigger_depends", 2, &field);
 }
 
-static int	DBpatch_7050071(void)
+static int	DBpatch_7050076(void)
 {
 	int	i;
 	const char	*values[] = {
@@ -957,7 +993,7 @@ static int	DBpatch_7050071(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050072(void)
+static int	DBpatch_7050077(void)
 {
 	zbx_db_result_t result;
 	zbx_db_row_t	row;
@@ -1065,5 +1101,10 @@ DBPATCH_ADD(7050069, 0, 1)
 DBPATCH_ADD(7050070, 0, 1)
 DBPATCH_ADD(7050071, 0, 1)
 DBPATCH_ADD(7050072, 0, 1)
+DBPATCH_ADD(7050073, 0, 1)
+DBPATCH_ADD(7050074, 0, 1)
+DBPATCH_ADD(7050075, 0, 1)
+DBPATCH_ADD(7050076, 0, 1)
+DBPATCH_ADD(7050077, 0, 1)
 
 DBPATCH_END()

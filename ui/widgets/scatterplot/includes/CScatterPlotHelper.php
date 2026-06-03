@@ -452,98 +452,43 @@ class CScatterPlotHelper {
 		 * $metric.
 		 */
 		if ($data_source == SVG_GRAPH_DATA_SOURCE_AUTO) {
-			/**
-			 * First, if global configuration setting "Override item history period" is enabled, override globally
-			 * specified "Data storage period" value to each metric custom history storage duration, converting it
-			 * to seconds. If "Override item history period" is disabled, item level field 'history' will be used
-			 * later, but now we are just storing the field name 'history' in array $to_resolve.
-			 *
-			 * Do the same with trends.
-			 */
-			$to_resolve = [];
-
-			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
-				foreach ($metrics as &$metric) {
-					foreach (['x_axis_items', 'y_axis_items'] as $axis) {
-						foreach ($metric[$axis] as &$item) {
-							if ($item['history'] != 0) {
-								$item['history'] = timeUnitToSeconds(
-									CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY)
-								);
-							}
-						}
-						unset($item);
-					}
-				}
-				unset($metric);
-			}
-			else {
-				$to_resolve[] = 'history';
-			}
-
-			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
-				foreach ($metrics as &$metric) {
-					foreach (['x_axis_items', 'y_axis_items'] as $axis) {
-						foreach ($metric[$axis] as &$item) {
-							if ($item['trends'] != 0) {
-								$item['trends'] = timeUnitToSeconds(
-									CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
-								);
-							}
-						}
-						unset($item);
-					}
-				}
-				unset($metric);
-			}
-			else {
-				$to_resolve[] = 'trends';
-			}
-
-			// If no global history and trend override enabled, resolve 'history' and/or 'trends' values for given
-			// $metric.
-			if ($to_resolve) {
-				$simple_interval_parser = new CSimpleIntervalParser();
-
-				foreach ($metrics as &$metric) {
-					foreach (['x_axis_items', 'y_axis_items'] as $axis) {
-						foreach ($metric[$axis] as $num => &$item) {
-							[$item] = CMacrosResolverHelper::resolveTimeUnitMacros([$item], $to_resolve);
-
-							// Convert its values to seconds.
-							if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
-								if ($simple_interval_parser->parse($item['history']) != CParser::PARSE_SUCCESS) {
-									$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'history',
-										_('invalid history storage period')
-									);
-									unset($item[$num]);
-								}
-								else {
-									$item['history'] = timeUnitToSeconds($item['history']);
-								}
-							}
-
-							if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
-								if ($simple_interval_parser->parse($item['trends']) != CParser::PARSE_SUCCESS) {
-									$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'trends',
-										_('invalid trend storage period')
-									);
-									unset($item[$num]);
-								}
-								else {
-									$item['trends'] = timeUnitToSeconds($item['trends']);
-								}
-							}
-						}
-						unset($item);
-					}
-				}
-				unset($metric);
-			}
-
 			foreach ($metrics as &$metric) {
 				foreach (['x_axis_items', 'y_axis_items'] as $axis) {
-					foreach ($metric[$axis] as &$item) {
+					$metric[$axis] =
+						CMacrosResolverHelper::resolveTimeUnitMacros($metric[$axis], ['history', 'trends']);
+
+					foreach ($metric[$axis] as $num => &$item) {
+						[
+							'keep_history' => $item['history'],
+							'history_has_errors' => $history_has_errors,
+							'keep_trends' => $item['trends'],
+							'trends_has_errors' => $trends_has_errors
+						] = CItemHelper::getStoragePeriods((int) $item['value_type'], $item['history'],
+							$item['trends']
+						);
+
+						if ($history_has_errors) {
+							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'history',
+								_('invalid history storage period')
+							);
+							unset($metric[$axis][$num]);
+						}
+
+						if ($trends_has_errors) {
+							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'trends',
+								_('invalid trend storage period')
+							);
+							unset($metric[$axis][$num]);
+						}
+
+						if ($item['history'] === null) {
+							$item['history'] = 25 * SEC_PER_YEAR;
+						}
+
+						if ($item['trends'] === null) {
+							$item['trends'] = 25 * SEC_PER_YEAR;
+						}
+
 						/**
 						 * History as a data source is used in 2 cases:
 						 * 1) if trends are disabled (set to 0) either for particular $metric item or globally;
@@ -552,13 +497,11 @@ class CScatterPlotHelper {
 						 *
 						 * Use trends otherwise.
 						 */
-						$history = $item['history'];
-						$trends = $item['trends'];
 						$time_from = $metric['time_period']['time_from'];
 						$period = $metric['time_period']['time_to'] - $time_from;
 
-						$item['source'] = ($trends == 0 || (time() - $history < $time_from
-								&& $period / $width <= ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL))
+						$item['source'] = $item['trends'] == 0 || (time() - $item['history'] < $time_from
+								&& $period / $width <= ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)
 							? 'history'
 							: 'trends';
 					}
@@ -576,9 +519,8 @@ class CScatterPlotHelper {
 					unset($item);
 				}
 			}
+			unset($metric);
 		}
-
-		unset($metric);
 	}
 
 	/**

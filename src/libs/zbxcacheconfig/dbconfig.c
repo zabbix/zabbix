@@ -7397,6 +7397,7 @@ static void	dc_add_new_items_to_trends(const zbx_vector_dc_item_ptr_t *items)
 	{
 		zbx_vector_uint64_t	itemids;
 		int			i;
+		zbx_uint64_t		trends_flags = zbx_history_get_trends_flags();
 
 		zbx_vector_uint64_create(&itemids);
 		zbx_vector_uint64_reserve(&itemids, (size_t)items->values_num);
@@ -7406,6 +7407,9 @@ static void	dc_add_new_items_to_trends(const zbx_vector_dc_item_ptr_t *items)
 			ZBX_DC_ITEM	*item = items->values[i];
 
 			if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
+				continue;
+
+			if (0 == (trends_flags & (__UINT64_C(1) << item->value_type)))
 				continue;
 
 			ZBX_DC_NUMITEM	*numitem;
@@ -7767,14 +7771,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	DCsync_functions(&func_sync, new_revision, ptriggerids, pfunction_timers);
 
 	FINISH_SYNC;
-
-	/* make memory available to sync triggers, trigger tags and item tags */
-	zbx_dbsync_clear(&if_sync);
-	zbx_dbsync_clear(&items_sync);
-	zbx_dbsync_clear(&item_discovery_sync);
-	zbx_dbsync_clear(&itempp_sync);
-	zbx_dbsync_clear(&itemscrp_sync);
-	zbx_dbsync_clear(&func_sync);
 
 	if (NULL != pnew_items)
 	{
@@ -16761,7 +16757,7 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() templateids_num:%d", __func__, templateids->values_num);
 }
 
-void	zbx_recalc_time_period(time_t *ts_from, int table_group)
+void	zbx_recalc_time_period(time_t *ts_from, int table_group, unsigned char value_type)
 {
 #define HK_CFG_UPDATE_INTERVAL	5
 	time_t			least_ts = 0, now;
@@ -16781,10 +16777,17 @@ void	zbx_recalc_time_period(time_t *ts_from, int table_group)
 
 	if (ZBX_RECALC_TIME_PERIOD_HISTORY == table_group)
 	{
-		if (1 != hk.history_global)
-			return;
+		int	hk_period;
 
-		least_ts = now - hk.history;
+		if (0 == (hk_period = hk.history_override[value_type]))
+		{
+			if (1 != hk.history_global)
+				return;
+
+			hk_period = hk.history;
+		}
+
+		least_ts = now - hk_period;
 	}
 	else if (ZBX_RECALC_TIME_PERIOD_TRENDS == table_group)
 	{

@@ -41,6 +41,7 @@
 #include "zbxipcservice.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
+#include "zbxcurl.h"
 #include "zbxcalc.h"
 
 #ifdef HAVE_NETSNMP
@@ -1489,9 +1490,7 @@ static void	discoverer_libs_init(void)
 #ifdef HAVE_NETSNMP
 	zbx_init_library_mt_snmp(zbx_get_progname_cb());
 #endif
-#ifdef HAVE_LIBCURL
-	curl_global_init(CURL_GLOBAL_DEFAULT);
-#endif
+	zbx_curl_init();
 #ifdef HAVE_LDAP
 	ldap_get_option(NULL, 0, NULL);
 #endif
@@ -1507,9 +1506,7 @@ static void	discoverer_libs_destroy(void)
 #ifdef HAVE_NETSNMP
 	zbx_shutdown_library_mt_snmp(zbx_get_progname_cb());
 #endif
-#ifdef HAVE_LIBCURL
-	curl_global_cleanup();
-#endif
+	zbx_curl_cleanup();
 }
 
 static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread_discoverer_args *args_in,

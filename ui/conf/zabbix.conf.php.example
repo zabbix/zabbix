@@ -38,14 +38,43 @@ $ZBX_SERVER_NAME		= '';
 
 $IMAGE_FORMAT_DEFAULT		= IMAGE_FORMAT_PNG;
 
-// Uncomment this block only if you are using Elasticsearch.
-// Elasticsearch url (can be string if same url is used for all types).
-//$HISTORY['url'] = [
-//	'uint' => 'http://localhost:9200',
-//	'text' => 'http://localhost:9200'
+// Configuration of history storage providers for Elasticsearch or ClickHouse.
+// Supported configuration parameters:
+// 'types'    - Array of data types to be stored in the external storage.
+// 'provider' - History provider type: 'elasticsearch' or 'clickhouse'.
+// 'url'      - History provider URL.
+// 'db'       - Database name (used for ClickHouse).
+// 'username' - Database user (used for ClickHouse).
+// 'password' - Database password (used for ClickHouse).
+// ClickHouse:
+//$HISTORY_PROVIDERS[] = [
+//	'types' => ['uint', 'dbl', 'str', 'log', 'text', 'json'],
+//	'provider' => 'clickhouse',
+//	'url' => 'http://localhost:8123',
+//	'db' => 'zabbix',
+//	'username' => 'zabbix',
+//	'password' => 'zabbix'
 //];
-// Value types stored in Elasticsearch.
-//$HISTORY['types'] = ['uint', 'text'];
+// Elasticsearch:
+//$HISTORY_PROVIDERS[] = [
+//	'types' => ['uint', 'dbl', 'str', 'log', 'text', 'json'],
+//	'provider' => 'elasticsearch',
+//	'url' => 'http://localhost:9200'
+//];
+// ClickHouse and Elasticsearch:
+//$HISTORY_PROVIDERS[] = [
+//	'types' => ['uint', 'dbl', 'str'],
+//	'provider' => 'clickhouse',
+//	'url' => 'http://localhost:8123',
+//	'db' => 'zabbix',
+//	'username' => 'zabbix',
+//	'password' => 'zabbix'
+//];
+//$HISTORY_PROVIDERS[] = [
+//	'types' => ['log', 'text', 'json'],
+//	'provider' => 'elasticsearch',
+//	'url' => 'http://localhost:9200'
+//];
 
 // SAML authentication.
 
@@ -59,6 +88,9 @@ $SSO['CERT_STORAGE']		= 'database';
 //$SSO['SP_KEY']		= 'conf/certs/sp.key';
 //$SSO['SP_CERT']		= 'conf/certs/sp.crt';
 //$SSO['IDP_CERT']		= 'conf/certs/idp.crt';
+
+// Uncomment and set to false to disable support for banners.
+//$ZBX_FEATURE_FLAGS['banners_enabled'] = true;
 
 // Uncomment and set to false to disable user HTTP authentication.
 //$ZBX_FEATURE_FLAGS['http_auth_enabled'] = true;

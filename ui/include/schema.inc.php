@@ -4967,7 +4967,7 @@ return [
 				'length' => 20
 			],
 			'userid' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'users',
@@ -5022,6 +5022,13 @@ return [
 				'length' => 20,
 				'ref_table' => 'task',
 				'ref_field' => 'taskid'
+			],
+			'maintenanceid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'maintenances',
+				'ref_field' => 'maintenanceid'
 			]
 		]
 	],

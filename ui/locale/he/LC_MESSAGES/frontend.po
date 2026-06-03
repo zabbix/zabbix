@@ -1679,6 +1679,11 @@ msgstr "רקע קשת"
 msgid "Arc size"
 msgstr "גודל קשת"
 
+#: jsLoader.php:267
+#, c-format
+msgid "Are you sure you want to delete %1$s? This action cannot be undone."
+msgstr ""
+
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
 msgstr "למחוק את המסנן הזה?"
@@ -4768,6 +4773,11 @@ msgstr "לא ניתן לעדכן תרחישי רשת"
 msgid "Cannot update web scenario step"
 msgstr "לא ניתן לעדכן שלב בתרחיש רשת"
 
+#: include/classes/core/CConfigFile.php:192
+#, c-format
+msgid "Cannot use both %1$s and %2$s at the same time."
+msgstr ""
+
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
 msgstr "תלוי רישיות"
@@ -4811,6 +4821,10 @@ msgstr "מרכז"
 #: include/views/configuration.host.prototype.edit.php:505
 msgid "Certificate"
 msgstr "אישור"
+
+#: app/views/js/monitoring.latest.view.js.php:211
+msgid "Change"
+msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:78
 #: app/partials/monitoring.latest.view.html.php:91 include/items.inc.php:1577
@@ -5265,6 +5279,14 @@ msgstr "צבעים"
 
 #: widgets/topitems/views/column.edit.php:293
 msgid "Column aggregation function"
+msgstr ""
+
+#: jsLoader.php:304
+msgid "Column list"
+msgstr ""
+
+#: jsLoader.php:273
+msgid "Column name"
 msgstr ""
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
@@ -6363,6 +6385,10 @@ msgstr "גודל מותאם אישית"
 msgid "Custom templates are not supported."
 msgstr ""
 
+#: jsLoader.php:270
+msgid "Customize table"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -6955,6 +6981,10 @@ msgstr "למחוק ולפנות את התבניות הנבחרות? (אזהרה:
 #: app/views/template.edit.php:309
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "למחוק ולפנות את התבנית? (אזהרה: כל המארחים המקושרים יפונו גם הם!)"
+
+#: jsLoader.php:275
+msgid "Delete column"
+msgstr ""
 
 #: app/views/popup.action.edit.php:292
 msgid "Delete current action?"
@@ -8249,6 +8279,10 @@ msgstr "ערך „name” (שם) כפול „%1$s” עבור מפה."
 #, c-format
 msgid "Duplicate \"usrgrpid\" \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "„usrgrpid” (מזהה קבוצת משתמשים) כפול „%1$s” בקבוצות משתמשים למפה „%2$s”."
+
+#: jsLoader.php:274
+msgid "Duplicate column"
+msgstr ""
 
 #: include/classes/api/services/CHost.php:2096
 #: include/classes/api/services/CHost.php:2396
@@ -11778,6 +11812,12 @@ msgstr ""
 msgid "Incorrect characters used for template name."
 msgstr ""
 
+#: include/classes/core/CConfigFile.php:215
+#: include/classes/core/CConfigFile.php:411
+#, c-format
+msgid "Incorrect configuration %1$s: %2$s."
+msgstr ""
+
 #: include/classes/api/services/CUser.php:482
 msgid "Incorrect current password."
 msgstr "הסיסמה הנוכחית שגויה."
@@ -12351,12 +12391,20 @@ msgstr "מאקרואים שהתקבלו בירושה ושל המארח"
 msgid "Inherited and host prototype macros"
 msgstr "מאקרואים שהתקבלו בירושה ואבות טיפוס של המארח"
 
+#: jsLoader.php:260
+msgid "Inherited and host prototype tag"
+msgstr ""
+
 #: include/classes/helpers/CTagHelper.php:230
 msgid "Inherited and host tag"
 msgstr ""
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Inherited and host tags"
+msgstr ""
+
+#: jsLoader.php:262
+msgid "Inherited and item prototype tag"
 msgstr ""
 
 #: include/classes/helpers/CTagHelper.php:231
@@ -12381,6 +12429,10 @@ msgstr ""
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Inherited and template tags"
+msgstr ""
+
+#: jsLoader.php:264
+msgid "Inherited and trigger prototype tag"
 msgstr ""
 
 #: include/classes/helpers/CTagHelper.php:232
@@ -13017,6 +13069,11 @@ msgstr ""
 #: app/controllers/CControllerTemplateCreate.php:102
 #: app/controllers/CControllerTemplateUpdate.php:104
 msgid "Invalid range."
+msgstr ""
+
+#: app/controllers/CControllerDataTable.php:59
+#: app/controllers/CControllerDataTable.php:138
+msgid "Invalid request"
 msgstr ""
 
 #: include/classes/core/CJsonRpc.php:205
@@ -14400,6 +14457,21 @@ msgstr "ידנית על ידי: %1$s"
 #: include/actions.inc.php:1987
 msgid "Manually closed"
 msgstr "נסגר ידנית"
+
+#: app/controllers/CControllerProblemViewData.php:472
+#: include/actions.inc.php:1660 include/actions.inc.php:1661
+#: include/actions.inc.php:1698 include/actions.inc.php:2195
+#: include/html.inc.php:1135
+msgid "Manually suppressed"
+msgstr ""
+
+#: app/controllers/CControllerProblemViewData.php:475
+#: include/actions.inc.php:1674 include/actions.inc.php:1675
+#: include/actions.inc.php:1698 include/actions.inc.php:2200
+#: include/actions.inc.php:2201 include/blocks.inc.php:692
+#: widgets/problems/includes/WidgetProblems.php:280
+msgid "Manually unsuppressed"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: include/classes/data/CWidgetsData.php:110
@@ -16714,6 +16786,10 @@ msgstr "מספר העונות"
 #: include/views/configuration.httpconf.list.php:143
 msgid "Number of steps"
 msgstr "מספר השלבים"
+
+#: jsLoader.php:291
+msgid "Number of tags"
+msgstr ""
 
 #: app/partials/administration.system.info.php:60
 msgid "Number of templates"
@@ -19317,6 +19393,10 @@ msgstr "אישור איפוס"
 msgid "Reset defaults"
 msgstr "איפוס לבררות המחדל"
 
+#: jsLoader.php:305
+msgid "Reset layout"
+msgstr ""
+
 #: widgets/geomap/Widget.php:37
 msgid "Reset to initial view"
 msgstr "איפוס לתצוגה הראשונית"
@@ -20831,6 +20911,10 @@ msgstr "הצגת כותרת"
 msgid "Show hosts in maintenance"
 msgstr "הצגת מארחים במצב תחזוקה"
 
+#: jsLoader.php:281
+msgid "Show item key"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:158
 #: include/views/js/monitoring.sysmaps.js.php:698
 #: include/views/js/monitoring.sysmaps.js.php:813
@@ -20958,6 +21042,10 @@ msgstr "הצגת חותם זמן"
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
 msgstr "הצגת ערך כולל"
+
+#: jsLoader.php:285
+msgid "Show trigger expression"
+msgstr ""
 
 #: include/views/configuration.graph.edit.php:131
 msgid "Show triggers"
@@ -21695,6 +21783,10 @@ msgstr "הדחקה עד"
 msgid "Suppressed"
 msgstr "הודחק"
 
+#: include/actions.inc.php:2241 include/html.inc.php:1134
+msgid "Suppressed by maintenance"
+msgstr ""
+
 #: include/actions.inc.php:2019 include/html.inc.php:1000
 #, c-format
 msgid "Suppressed till: %1$s"
@@ -21857,6 +21949,10 @@ msgstr "הטבלה „%1$s“ אינה קיימת."
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr "לטבלה „%1$s“ אין שדה בשם „%2$s“."
 
+#: jsLoader.php:303
+msgid "Table options"
+msgstr ""
+
 #: app/controllers/CControllerActionOperationCheck.php:210
 #: app/controllers/CControllerActionOperationCheck.php:216
 #: app/controllers/CControllerActionOperationCheck.php:228
@@ -21914,6 +22010,10 @@ msgstr "שם תגית"
 #: app/controllers/CControllerTriggerPrototypeUpdate.php:61
 #: app/controllers/CControllerTriggerUpdate.php:61
 msgid "Tag name and value combination is not unique."
+msgstr ""
+
+#: jsLoader.php:292
+msgid "Tag name display"
 msgstr ""
 
 #: app/controllers/CControllerMaintenanceCreate.php:93
@@ -24026,6 +24126,10 @@ msgstr "ביטול הדחקה"
 msgid "Unsuppressed"
 msgstr "לא מודחק"
 
+#: include/actions.inc.php:2257
+msgid "Unsuppressed by maintenance"
+msgstr ""
+
 #: include/blocks.inc.php:670 include/classes/screens/CScreenProblem.php:1425
 #: widgets/problems/includes/WidgetProblems.php:278
 #, c-format
@@ -24206,6 +24310,11 @@ msgstr "זמן פעילות של שרת ה־Zabbix בשניות."
 #: include/actions.inc.php:61
 msgid "Uptime/Downtime"
 msgstr "זמן פעילות/חוסר פעילות"
+
+#: app/partials/administration.system.info.php:328
+#, c-format
+msgid "Use %1$s instead"
+msgstr ""
 
 #: app/views/popup.ldap.edit.php:173
 msgid "Use %{ref} in group filter to reference value of this user attribute."
@@ -26070,6 +26179,10 @@ msgstr "מסד הנתונים שלך אינו פועל כראוי. נא להמת
 msgid "Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?"
 msgstr ""
 
+#: jsLoader.php:307
+msgid "Your table settings will be reset to default and duplicated columns will be removed."
+msgstr ""
+
 #: include/page_header.php:122
 msgid "Zabbix"
 msgstr "Zabbix"
@@ -27147,6 +27260,10 @@ msgstr "לא קיים"
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:166
 msgid "does not match"
 msgstr "לא תואם"
+
+#: jsLoader.php:268
+msgid "duplicate"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"

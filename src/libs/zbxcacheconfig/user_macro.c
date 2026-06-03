@@ -16,6 +16,7 @@
 #include "dbsync.h"
 #include "dbconfig.h"
 
+#include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxjson.h"
 #include "zbxvault.h"

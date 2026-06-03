@@ -29,6 +29,7 @@
 #include "zbxstr.h"
 #include "../actions/actions.h"
 #include "../events/events.h"
+#include "zbxevent.h"
 
 typedef struct
 {
@@ -331,10 +332,12 @@ static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_mw_ta
 {
 	zbx_vector_mw_task_ptr_t	problem_tasks;
 	zbx_vector_uint64_t		maintenanceids;
-	zbx_db_insert_t			db_insert = {0};
-	int				suppress_num = 0;
+	zbx_db_insert_t			db_insert_es = {0}, db_insert_ack;
+	int				suppress_num = 0, now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
+
+	now = (int)time(NULL);
 
 	zbx_vector_mw_task_ptr_create(&problem_tasks);
 	zbx_vector_uint64_create(&maintenanceids);
@@ -353,25 +356,38 @@ static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_mw_ta
 		if (NULL == event->suppress)
 			continue;
 
-		if (SUCCEED != zbx_db_insert_is_prepared(&db_insert))
+		if (SUCCEED != zbx_db_insert_is_prepared(&db_insert_es))
 		{
-			zbx_dbconn_prepare_insert(db, &db_insert, "event_suppress", "event_suppressid",
+			zbx_dbconn_prepare_insert(db, &db_insert_es, "event_suppress", "event_suppressid",
 					"eventid", "maintenanceid", "suppress_until", (char *)NULL);
+
+			zbx_db_insert_prepare(&db_insert_ack, "acknowledges", "acknowledgeid",
+					"eventid", "clock", "action", "suppress_until", "maintenanceid", (char *)NULL);
 		}
 
 		for (int j = 0; j < event->suppress->values_num; j++)
 		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), event->eventid,
-					event->suppress->values[j].maintenanceid, event->suppress->values[j].until);
+			zbx_db_event_suppress_t	*suppress = &event->suppress->values[j];
+
+			zbx_db_insert_add_values(&db_insert_es, __UINT64_C(0), event->eventid, suppress->maintenanceid,
+					suppress->until);
+
+			zbx_db_insert_add_values(&db_insert_ack, __UINT64_C(0), event->eventid, now,
+					ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS, suppress->until,
+					suppress->maintenanceid);
 		}
 	}
 
-	if (SUCCEED == zbx_db_insert_is_prepared(&db_insert))
+	if (SUCCEED == zbx_db_insert_is_prepared(&db_insert_es))
 	{
-		suppress_num = zbx_db_insert_get_row_count(&db_insert);
-		zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
+		suppress_num = zbx_db_insert_get_row_count(&db_insert_es);
+		zbx_db_insert_autoincrement(&db_insert_es, "event_suppressid");
+		zbx_db_insert_execute(&db_insert_es);
+		zbx_db_insert_clean(&db_insert_es);
+
+		zbx_db_insert_autoincrement(&db_insert_ack, "acknowledgeid");
+		zbx_db_insert_execute(&db_insert_ack);
+		zbx_db_insert_clean(&db_insert_ack);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() suppressed problems:%d", __func__, suppress_num);

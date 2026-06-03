@@ -20,8 +20,7 @@
 #include "zbxcachehistory.h"
 #include "zbxalgo.h"
 
-void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs,
-		int config_history_storage_pipelines, int mode, zbx_history_sync_stats_t *stats);
+void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, int mode, zbx_history_sync_stats_t *stats);
 
 int	zbx_hc_check_proxy(zbx_uint64_t proxyid, int pending_history);
 

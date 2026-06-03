@@ -19,6 +19,7 @@
 
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
+#include "zbxevent.h"
 #include "zbxexport.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
