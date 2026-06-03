@@ -717,7 +717,7 @@ static void	tq_set_column_types(zbx_tq_query_t *query)
 static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t max_error_len)
 {
 	if (ZBX_TQ_CATEGORY_UNKNOWN == query->category)
-		return ret_errf(FAIL, error, max_error_len, "catagory is not set");
+		return ret_errf(FAIL, error, max_error_len, "category is not set");
 
 	if (ZBX_TQ_CATEGORY_APM_METRICS == query->category && ZBX_TQ_METRIC_TYPE_UNKNOWN == query->metric_type)
 		return ret_errf(FAIL, error, max_error_len, "metric type is not (when category is \"APM metrics\")");
