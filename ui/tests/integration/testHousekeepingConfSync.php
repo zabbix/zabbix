@@ -419,6 +419,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 			}
 		}
 
+		DB::refreshIds('events', 0);
 		$eventids = DB::insert('events', $events);
 		self::$eventids = array_merge(self::$eventids, $eventids);
 
@@ -594,6 +595,33 @@ class testHousekeepingConfSync extends CIntegrationTest {
 
 	private static function expectedPartitionableMode($mode) {
 		return $mode == self::HK_MODE_REGULAR ? [self::HK_MODE_REGULAR, self::HK_MODE_PARTITION] : $mode;
+	}
+
+	/**
+	 * Check that default housekeeping settings are propagated to server and proxy
+	 * runtime configuration caches without housekeeping.update API call.
+	 *
+	 * @required-components server, proxy
+	 * @configurationDataProvider configurationProvider
+	 */
+	public function testHousekeepingConfSync_DefaultConfig() {
+		$housekeeping = self::defaultHousekeeping();
+
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$server_expected = $this->expectedServerHousekeeping($housekeeping);
+		$server_expected['hk_history'] = 0;
+		$server_expected['hk_trends'] = 0;
+		$this->assertHousekeepingEquals($server_expected, $this->extractSyncedHousekeeping(self::COMPONENT_SERVER));
+
+		$this->reloadProxyAndWaitForConfiguration(true);
+
+		$proxy_hk = $this->extractSyncedHousekeeping(self::COMPONENT_PROXY);
+		$this->assertArrayHasKey('hk_history', $proxy_hk);
+		$this->assertArrayHasKey('hk_history_global', $proxy_hk);
+		$this->assertEquals($this->timeToSeconds('90d'), $proxy_hk['hk_history']);
+		$this->assertEquals($housekeeping['hk_history_global'], $proxy_hk['hk_history_global']);
 	}
 
 	/**
