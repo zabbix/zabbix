@@ -66,6 +66,7 @@ typedef struct
 						/* Or UINT32_MAX if such node does not exist. */
 	zbx_uint64_t	recent_entry_num;
 	time_t		last_ts;
+	int		use_clock_gettime;
 }
 zbx_tfc_t;
 
@@ -188,12 +189,19 @@ static void	tfc_free_func(void *ptr)
 
 static time_t	tfc_get_time_now(void)
 {
-	struct timespec	tp;
+	if (SUCCEED == cache->use_clock_gettime)
+	{
+		struct timespec	tp;
 
-	if (0 == clock_gettime(CLOCK_MONOTONIC, &tp))
-		cache->last_ts = tp.tv_sec;
+		if (0 == clock_gettime(CLOCK_MONOTONIC, &tp))
+			cache->last_ts = tp.tv_sec;
+	}
 	else
-		zabbix_log(LOG_LEVEL_WARNING, "clock_gettime(CLOCK_MONOTONIC) failed");
+	{
+		time_t	now = time(NULL);
+
+		cache->last_ts = MAX(cache->last_ts, now);
+	}
 
 	return cache->last_ts;
 }
@@ -437,6 +445,7 @@ int	zbx_tfc_init(zbx_uint64_t cache_size, char **error)
 {
 	zbx_uint64_t	size_actual, size_entry;
 	int		ret = FAIL;
+	struct timespec	tp;
 
 	if (0 == cache_size)
 	{
@@ -492,7 +501,18 @@ int	zbx_tfc_init(zbx_uint64_t cache_size, char **error)
 	cache->recent_entry_num = 0;
 	cache->lru_recent_cutoff = UINT32_MAX;
 
-	cache->last_ts = 0;
+	if (0 == clock_gettime(CLOCK_MONOTONIC, &tp))
+	{
+		cache->last_ts = tp.tv_sec;
+		cache->use_clock_gettime = SUCCEED;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "clock_gettime(CLOCK_MONOTONIC) failed (%s), falling back to time(NULL)",
+				zbx_strerror(errno));
+		cache->last_ts = 0;
+		cache->use_clock_gettime = FAIL;
+	}
 
 	ret = SUCCEED;
 out:
