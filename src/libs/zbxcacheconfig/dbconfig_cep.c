@@ -146,25 +146,25 @@ static void	cep_condition_clear_args(zbx_cep_condition_t *condition)
 {
 	switch (condition->type)
 	{
-		case ZBX_CEP_CONDITION_EVENT_NAME:
+		case ZBX_CONDITION_TYPE_EVENT_NAME:
 			zbx_free(condition->args.event_name.name);
 			break;
-		case ZBX_CEP_CONDITION_TAG_NAME:
+		case ZBX_CONDITION_TYPE_EVENT_TAG:
 			zbx_free(condition->args.tag_name.tag);
 			break;
-		case ZBX_CEP_CONDITION_TAG_VALUE:
+		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
 			zbx_free(condition->args.tag_value.tag);
 			zbx_free(condition->args.tag_value.value);
 			break;
-		case ZBX_CEP_CONDITION_SEVERITY:
+		case ZBX_CONDITION_TYPE_TRIGGER_SEVERITY:
 			break;
-		case ZBX_CEP_CONDITION_HOST:
+		case ZBX_CONDITION_TYPE_HOST:
 			zbx_free(condition->args.host.name);
 			break;
-		case ZBX_CEP_CONDITION_HOST_GROUP:
+		case ZBX_CONDITION_TYPE_HOST_GROUP:
 			zbx_free(condition->args.host_group.name);
 			break;
-		case ZBX_CEP_CONDITION_TIME_PERIOD:
+		case ZBX_CONDITION_TYPE_TIME_PERIOD:
 			zbx_free(condition->args.time_period.period);
 			break;
 		default:
@@ -402,25 +402,25 @@ static void	cep_rule_copy_conditions(zbx_vector_cep_condition_t *dst, const zbx_
 
 		switch (cond->type)
 		{
-			case ZBX_CEP_CONDITION_EVENT_NAME:
+			case ZBX_CONDITION_TYPE_EVENT_NAME:
 				cond->args.event_name.name = zbx_strdup(NULL, cond->args.event_name.name);
 				break;
-			case ZBX_CEP_CONDITION_TAG_NAME:
+			case ZBX_CONDITION_TYPE_EVENT_TAG:
 				cond->args.tag_name.tag = zbx_strdup(NULL, cond->args.tag_name.tag);
 				break;
-			case ZBX_CEP_CONDITION_TAG_VALUE:
+			case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
 				cond->args.tag_value.tag = zbx_strdup(NULL, cond->args.tag_value.tag);
 				cond->args.tag_value.value = zbx_strdup(NULL, cond->args.tag_value.value);
 				break;
-			case ZBX_CEP_CONDITION_SEVERITY:
+			case ZBX_CONDITION_TYPE_TRIGGER_SEVERITY:
 				break;
-			case ZBX_CEP_CONDITION_HOST:
+			case ZBX_CONDITION_TYPE_HOST:
 				cond->args.host.name = zbx_strdup(NULL, cond->args.host.name);
 				break;
-			case ZBX_CEP_CONDITION_HOST_GROUP:
+			case ZBX_CONDITION_TYPE_HOST_GROUP:
 				cond->args.host_group.name = zbx_strdup(NULL, cond->args.host_group.name);
 				break;
-			case ZBX_CEP_CONDITION_TIME_PERIOD:
+			case ZBX_CONDITION_TYPE_TIME_PERIOD:
 				cond->args.time_period.period = zbx_strdup(NULL, cond->args.time_period.period);
 				break;
 		}
@@ -734,31 +734,31 @@ static void	cep_condition_dump(zbx_cep_condition_t *condition)
 
 	switch (condition->type)
 	{
-		case ZBX_CEP_CONDITION_EVENT_NAME:
+		case ZBX_CONDITION_TYPE_EVENT_NAME:
 			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "event_name:%s",
 					condition->args.event_name.name);
 			break;
-		case ZBX_CEP_CONDITION_TAG_NAME:
+		case ZBX_CONDITION_TYPE_EVENT_TAG:
 			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s",
 					condition->args.tag_name.tag);
 			break;
-		case ZBX_CEP_CONDITION_TAG_VALUE:
+		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
 			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s value:%s",
 					condition->args.tag_value.tag, condition->args.tag_value.value);
 			break;
-		case ZBX_CEP_CONDITION_SEVERITY:
+		case ZBX_CONDITION_TYPE_TRIGGER_SEVERITY:
 			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "severity:%d",
 					condition->args.severity.level);
 			break;
-		case ZBX_CEP_CONDITION_HOST:
+		case ZBX_CONDITION_TYPE_HOST:
 			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "host:%s",
 					condition->args.host.name);
 			break;
-		case ZBX_CEP_CONDITION_HOST_GROUP:
+		case ZBX_CONDITION_TYPE_HOST_GROUP:
 			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "host_group:%s",
 					condition->args.host_group.name);
 			break;
-		case ZBX_CEP_CONDITION_TIME_PERIOD:
+		case ZBX_CONDITION_TYPE_TIME_PERIOD:
 			zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "period:%s",
 					condition->args.time_period.period);
 			break;
@@ -1169,26 +1169,26 @@ static void	cep_sync_conditions(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 
 		switch (condition->type)
 		{
-			case ZBX_CEP_CONDITION_EVENT_NAME:
+			case ZBX_CONDITION_TYPE_EVENT_NAME:
 				ZBX_DBROW2STR(condition->args.event_name.name, row[4]);
 				break;
-			case ZBX_CEP_CONDITION_TAG_NAME:
+			case ZBX_CONDITION_TYPE_EVENT_TAG:
 				ZBX_DBROW2STR(condition->args.tag_name.tag, row[5]);
 				break;
-			case ZBX_CEP_CONDITION_TAG_VALUE:
+			case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
 				ZBX_DBROW2STR(condition->args.tag_value.tag, row[5]);
 				ZBX_DBROW2STR(condition->args.tag_value.value, row[6]);
 				break;
-			case ZBX_CEP_CONDITION_SEVERITY:
+			case ZBX_CONDITION_TYPE_TRIGGER_SEVERITY:
 				condition->args.severity.level = atoi(row[10]);
 				break;
-			case ZBX_CEP_CONDITION_HOST:
+			case ZBX_CONDITION_TYPE_HOST:
 				ZBX_DBROW2STR(condition->args.host.name, row[7]);
 				break;
-			case ZBX_CEP_CONDITION_HOST_GROUP:
+			case ZBX_CONDITION_TYPE_HOST_GROUP:
 				ZBX_DBROW2STR(condition->args.host_group.name, row[8]);
 				break;
-			case ZBX_CEP_CONDITION_TIME_PERIOD:
+			case ZBX_CONDITION_TYPE_TIME_PERIOD:
 				ZBX_DBROW2STR(condition->args.time_period.period, row[9]);
 				break;
 		}

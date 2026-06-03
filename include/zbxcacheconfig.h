@@ -1735,14 +1735,6 @@ zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correl
 
 /* CEP */
 
-#define ZBX_CEP_CONDITION_NONE		0
-#define ZBX_CEP_CONDITION_EVENT_NAME	1
-#define ZBX_CEP_CONDITION_TAG_NAME	2
-#define ZBX_CEP_CONDITION_TAG_VALUE	3
-#define ZBX_CEP_CONDITION_SEVERITY	4
-#define ZBX_CEP_CONDITION_HOST		5
-#define ZBX_CEP_CONDITION_HOST_GROUP	6
-#define ZBX_CEP_CONDITION_TIME_PERIOD	7
 
 #define ZBX_CEP_WINDOW_CONDITION_TAG_PAIR	1
 #define ZBX_CEP_WINDOW_CONDITION_OLD_TAG	2

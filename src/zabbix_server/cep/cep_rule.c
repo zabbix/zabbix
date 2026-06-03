@@ -22,6 +22,7 @@
 #include "zbxeval.h"
 #include "zbxexpr.h"
 #include "zbxvariant.h"
+#include "zbxdbhigh.h"
 
 /* WDN placeholder for proper defines */
 #define ZBX_CEP_EXECUTE_ON_EVENT_OCCURRED	1
@@ -591,25 +592,25 @@ static int	cep_condition_eval(const zbx_cep_condition_t *cond, zbx_cep_event_con
 
 	switch (cond->type)
 	{
-		case ZBX_CEP_CONDITION_EVENT_NAME:
+		case ZBX_CONDITION_TYPE_EVENT_NAME:
 			ret = cep_condition_eval_event_name(cond->operator, &cond->args.event_name, ctx);
 			break;
-		case ZBX_CEP_CONDITION_TAG_NAME:
+		case ZBX_CONDITION_TYPE_EVENT_TAG:
 			ret = cep_condition_eval_tag_name(cond->operator, &cond->args.tag_name, ctx);
 			break;
-		case ZBX_CEP_CONDITION_TAG_VALUE:
+		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
 			ret = cep_condition_eval_tag_value(cond->operator, &cond->args.tag_value, ctx);
 			break;
-		case ZBX_CEP_CONDITION_SEVERITY:
+		case ZBX_CONDITION_TYPE_TRIGGER_SEVERITY:
 			ret = cep_condition_eval_severity(cond->operator, &cond->args.severity, ctx);
 			break;
-		case ZBX_CEP_CONDITION_HOST:
+		case ZBX_CONDITION_TYPE_HOST:
 			ret = cep_condition_eval_host(cond->operator, &cond->args.host, ctx);
 			break;
-		case ZBX_CEP_CONDITION_HOST_GROUP:
+		case ZBX_CONDITION_TYPE_HOST_GROUP:
 			ret = cep_condition_eval_host_group(cond->operator, &cond->args.host_group, ctx);
 			break;
-		case ZBX_CEP_CONDITION_TIME_PERIOD:
+		case ZBX_CONDITION_TYPE_TIME_PERIOD:
 			ret = cep_condition_eval_time_period(cond->operator, &cond->args.time_period, ctx);
 			break;
 		default:
