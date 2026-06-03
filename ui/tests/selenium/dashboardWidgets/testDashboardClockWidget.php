@@ -277,8 +277,7 @@ class testDashboardClockWidget extends testWidgets {
 					// This is Time zone field found by xpath, because we have one more field with Time zone label.
 					'xpath:.//div[@class="fields-group fields-group-tzone"]' => [
 							'id:tzone_bold' => false, 'id:tzone_color' => null,
-							'id:tzone_timezone' => 'Local default: '.CDateTimeHelper::getTimeZoneFormat('Europe/Riga'),
-							'id:tzone_format' => 'Short'
+							'id:tzone_timezone' => null, 'id:tzone_format' => 'Short'
 					]
 				];
 
@@ -286,6 +285,16 @@ class testDashboardClockWidget extends testWidgets {
 				foreach (['Local time', 'Server time', 'Host time'] as $type) {
 					$form->fill(['Time type' => $type]);
 					$form->fill(['Advanced configuration' => true]);
+
+					// Check that default 'Time zone' depends on selected Time type.
+					if ($type === 'Local time') {
+						$advanced_configuration['xpath:.//div[@class="fields-group fields-group-tzone"]'] =
+								['id:tzone_timezone' => 'Local default: '.CDateTimeHelper::getTimeZoneFormat('Europe/Riga')];
+					}
+					elseif ($type === 'Server time') {
+						$advanced_configuration['xpath:.//div[@class="fields-group fields-group-tzone"]'] =
+								['id:tzone_timezone' => 'System default: '.CDateTimeHelper::getTimeZoneFormat('Europe/Riga')];
+					}
 
 					// Check that with Host time 'Time zone' and 'Format' fields disappear.
 					if ($type === 'Host time') {
