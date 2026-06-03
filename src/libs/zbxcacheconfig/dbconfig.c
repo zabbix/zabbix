@@ -206,7 +206,7 @@ ZBX_VECTOR_IMPL(host_rev, zbx_host_rev_t)
 ZBX_PTR_VECTOR_IMPL(dc_connector_tag, zbx_dc_connector_tag_t *)
 ZBX_PTR_VECTOR_IMPL(dc_dcheck_ptr, zbx_dc_dcheck_t *)
 ZBX_PTR_VECTOR_IMPL(dc_drule_ptr, zbx_dc_drule_t *)
-ZBX_VECTOR_IMPL(dc_cached_data, zbx_dc_cached_data_t);
+ZBX_VECTOR_IMPL(dc_cached_data, zbx_dc_cached_data_t)
 ZBX_PTR_VECTOR_IMPL(item_tag, zbx_item_tag_t *)
 ZBX_PTR_VECTOR_IMPL(dc_item, zbx_dc_item_t *)
 ZBX_PTR_VECTOR_IMPL(dc_trigger, zbx_dc_trigger_t *)

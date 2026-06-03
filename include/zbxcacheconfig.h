@@ -335,7 +335,7 @@ typedef struct
 }
 zbx_dc_cached_data_t;
 
-ZBX_VECTOR_DECL(dc_cached_data, zbx_dc_cached_data_t);
+ZBX_VECTOR_DECL(dc_cached_data, zbx_dc_cached_data_t)
 
 typedef struct
 {

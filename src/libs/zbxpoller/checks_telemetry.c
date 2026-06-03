@@ -253,7 +253,13 @@ int	get_value_telemetry(const zbx_dc_item_t *item, const char *config_source_ip,
 				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &values,
 				&error);
 #else
+		ZBX_UNUSED(config_source_ip);
+		ZBX_UNUSED(config_ssl_ca_location);
+		ZBX_UNUSED(config_ssl_cert_location);
+		ZBX_UNUSED(config_ssl_key_location);
+
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "cURL library was not compiled in"));
+
 		return NOTSUPPORTED;
 #endif
 	}

@@ -40,7 +40,7 @@ tq_formula_node_type_t;
 
 typedef struct tq_formula_node tq_formula_node_t;
 
-ZBX_VECTOR_DECL(tq_formula_node_ptr, tq_formula_node_t *);
+ZBX_VECTOR_DECL(tq_formula_node_ptr, tq_formula_node_t *)
 
 typedef struct tq_formula_node
 {

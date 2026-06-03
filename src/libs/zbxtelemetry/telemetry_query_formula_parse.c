@@ -16,7 +16,7 @@
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 
-ZBX_VECTOR_IMPL(tq_formula_node_ptr, tq_formula_node_t *);
+ZBX_VECTOR_IMPL(tq_formula_node_ptr, tq_formula_node_t *)
 
 typedef struct
 {
