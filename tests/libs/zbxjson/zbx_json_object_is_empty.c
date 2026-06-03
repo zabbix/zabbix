@@ -11,12 +11,29 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
-#ifndef ZBX_VARIANT_COMMON
-#define ZBX_VARIANT_COMMON
 
+#include "zbxcommon.h"
+#include "zbxjson.h"
+
+#include "zbxmocktest.h"
 #include "zbxmockdata.h"
+#include "zbxmockassert.h"
+#include "zbxmockutil.h"
 
-void	mock_read_variant(const char *path, zbx_variant_t *variant);
-int	mock_str_to_variant_type(const char *str);
+void	zbx_mock_test_entry(void **state)
+{
+	const char		*json_str;
+	struct zbx_json_parse	jp;
+	int			ret, expected_ret;
 
-#endif
+	ZBX_UNUSED(state);
+
+	json_str = zbx_mock_get_parameter_string("in.json");
+
+	assert_int_equal(SUCCEED, zbx_json_open(json_str, &jp));
+
+	ret          = zbx_json_object_is_empty(&jp);
+	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.ret"));
+
+	zbx_mock_assert_int_eq("Return value", expected_ret, ret);
+}

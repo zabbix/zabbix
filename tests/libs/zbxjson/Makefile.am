@@ -5,7 +5,10 @@ noinst_PROGRAMS = \
 	zbx_json_decodevalue \
 	zbx_json_decodevalue_dyn \
 	zbx_jsonpath_compile \
-	zbx_jsonobj_query
+	zbx_jsonobj_query \
+	zbx_json_value_by_name \
+	zbx_json_object_is_empty \
+	zbx_json_count
 
 JSON_LIBS = \
 	$(JSON_DEPS) \
@@ -114,3 +117,67 @@ endif
 endif
 
 zbx_jsonobj_query_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+
+# zbx_json_value_by_name
+
+zbx_json_value_by_name_SOURCES = \
+	zbx_json_value_by_name.c \
+	mock_json.c mock_json.h \
+	../../zbxmocktest.h
+
+zbx_json_value_by_name_LDADD = $(JSON_LIBS)
+zbx_json_value_by_name_LDFLAGS = $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+if SERVER
+zbx_json_value_by_name_LDADD += @SERVER_LIBS@
+zbx_json_value_by_name_LDFLAGS += @SERVER_LDFLAGS@
+else
+if PROXY
+zbx_json_value_by_name_LDADD += @PROXY_LIBS@
+zbx_json_value_by_name_LDFLAGS += @PROXY_LDFLAGS@
+endif
+endif
+
+zbx_json_value_by_name_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+
+# zbx_json_object_is_empty
+
+zbx_json_object_is_empty_SOURCES = \
+	zbx_json_object_is_empty.c \
+	../../zbxmocktest.h
+
+zbx_json_object_is_empty_LDADD = $(JSON_LIBS)
+zbx_json_object_is_empty_LDFLAGS = $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+if SERVER
+zbx_json_object_is_empty_LDADD += @SERVER_LIBS@
+zbx_json_object_is_empty_LDFLAGS += @SERVER_LDFLAGS@
+else
+if PROXY
+zbx_json_object_is_empty_LDADD += @PROXY_LIBS@
+zbx_json_object_is_empty_LDFLAGS += @PROXY_LDFLAGS@
+endif
+endif
+
+zbx_json_object_is_empty_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+
+# zbx_json_count
+
+zbx_json_count_SOURCES = \
+	zbx_json_count.c \
+	../../zbxmocktest.h
+
+zbx_json_count_LDADD = $(JSON_LIBS)
+zbx_json_count_LDFLAGS = $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+if SERVER
+zbx_json_count_LDADD += @SERVER_LIBS@
+zbx_json_count_LDFLAGS += @SERVER_LDFLAGS@
+else
+if PROXY
+zbx_json_count_LDADD += @PROXY_LIBS@
+zbx_json_count_LDFLAGS += @PROXY_LDFLAGS@
+endif
+endif
+
+zbx_json_count_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)

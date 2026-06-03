@@ -1,0 +1,72 @@
+---
+test case: string value found
+in:
+  json: '{"host":"localhost","port":"10050"}'
+  name: host
+out:
+  ret: SUCCEED
+  value: localhost
+  type: ZBX_JSON_TYPE_STRING
+---
+test case: integer value found
+in:
+  json: '{"count":42,"status":0}'
+  name: count
+out:
+  ret: SUCCEED
+  value: "42"
+  type: ZBX_JSON_TYPE_INT
+---
+test case: second key found
+in:
+  json: '{"a":"first","b":"second","c":"third"}'
+  name: b
+out:
+  ret: SUCCEED
+  value: second
+  type: ZBX_JSON_TYPE_STRING
+---
+test case: missing key fails
+in:
+  json: '{"host":"localhost"}'
+  name: missing
+out:
+  ret: FAIL
+  value:
+  type:
+---
+test case: boolean true value
+in:
+  json: '{"active":true}'
+  name: active
+out:
+  ret: SUCCEED
+  value: "true"
+  type: ZBX_JSON_TYPE_TRUE
+---
+test case: boolean false value
+in:
+  json: '{"enabled":false}'
+  name: enabled
+out:
+  ret: SUCCEED
+  value: "false"
+  type: ZBX_JSON_TYPE_FALSE
+---
+test case: null value
+in:
+  json: '{"error":null}'
+  name: error
+out:
+  ret: SUCCEED
+  value: "null"
+  type: ZBX_JSON_TYPE_NULL
+---
+test case: empty object has no keys
+in:
+  json: '{}'
+  name: key
+out:
+  ret: FAIL
+  value:
+  type:

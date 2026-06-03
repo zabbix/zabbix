@@ -11,12 +11,33 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
-#ifndef ZBX_VARIANT_COMMON
-#define ZBX_VARIANT_COMMON
 
+#include "zbxmocktest.h"
 #include "zbxmockdata.h"
+#include "zbxmockassert.h"
+#include "zbxmockutil.h"
 
-void	mock_read_variant(const char *path, zbx_variant_t *variant);
-int	mock_str_to_variant_type(const char *str);
+#include "zbxvariant.h"
 
-#endif
+#include "zbx_variant_common.h"
+
+void	zbx_mock_test_entry(void **state)
+{
+	zbx_variant_t	value1, value2;
+	int		ret, expected_ret;
+
+	ZBX_UNUSED(state);
+
+	zbx_update_epsilon_to_float_precision();
+
+	mock_read_variant("in.value1", &value1);
+	mock_read_variant("in.value2", &value2);
+
+	ret = zbx_variant_same(&value1, &value2);
+
+	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.ret"));
+	zbx_mock_assert_int_eq("Return value", expected_ret, ret);
+
+	zbx_variant_clear(&value1);
+	zbx_variant_clear(&value2);
+}

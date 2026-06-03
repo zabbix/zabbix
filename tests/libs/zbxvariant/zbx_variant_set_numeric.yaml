@@ -1,0 +1,80 @@
+---
+test case: integer string becomes UI64
+in:
+  text: "42"
+out:
+  ret: SUCCEED
+  type: ZBX_VARIANT_UI64
+  value: "42"
+---
+test case: float string becomes DBL
+in:
+  text: "1.5"
+out:
+  ret: SUCCEED
+  type: ZBX_VARIANT_DBL
+  value: "1.5"
+---
+test case: negative float becomes DBL
+in:
+  text: "-1.5"
+out:
+  ret: SUCCEED
+  type: ZBX_VARIANT_DBL
+  value: "-1.5"
+---
+test case: zero becomes UI64
+in:
+  text: "0"
+out:
+  ret: SUCCEED
+  type: ZBX_VARIANT_UI64
+  value: "0"
+---
+test case: leading plus sign stripped then parsed as UI64
+in:
+  text: "+42"
+out:
+  ret: SUCCEED
+  type: ZBX_VARIANT_UI64
+  value: "42"
+---
+test case: double plus sign fails
+in:
+  text: "++1"
+out:
+  ret: FAIL
+  type:
+  value:
+---
+test case: non-numeric string fails
+in:
+  text: abc
+out:
+  ret: FAIL
+  type:
+  value:
+---
+test case: empty string fails
+in:
+  text: ""
+out:
+  ret: FAIL
+  type:
+  value:
+---
+test case: scientific notation becomes DBL
+in:
+  text: "1e3"
+out:
+  ret: SUCCEED
+  type: ZBX_VARIANT_DBL
+  value: "1000"
+---
+test case: large integer stays UI64
+in:
+  text: "18446744073709551615"
+out:
+  ret: SUCCEED
+  type: ZBX_VARIANT_UI64
+  value: "18446744073709551615"
