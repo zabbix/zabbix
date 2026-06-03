@@ -15,6 +15,8 @@
 package redis
 
 import (
+	"strconv"
+
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
@@ -48,13 +50,13 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	if p.options.LegacyTimeout != 0 {
 		log.Debugf("'Plugins.Redis.Timeout' is deprecated")
 
-		if p.options.Default.ConnectionTimeout == 0 {
-			p.options.Default.ConnectionTimeout = p.options.LegacyTimeout
+		if p.options.Default.ConnectionTimeout == "" {
+			p.options.Default.ConnectionTimeout = strconv.Itoa(p.options.LegacyTimeout)
 		}
 	}
 
-	if p.options.Default.ConnectionTimeout == 0 {
-		p.options.Default.ConnectionTimeout = global.Timeout
+	if p.options.Default.ConnectionTimeout == "" {
+		p.options.Default.ConnectionTimeout = strconv.Itoa(global.Timeout)
 	}
 
 	if p.options.LegacyTimeout == 0 {
@@ -72,6 +74,44 @@ func (*Plugin) Validate(options any) error {
 	err := conf.UnmarshalStrict(options, &opts)
 	if err != nil {
 		return errs.Wrap(err, "plugin config validation failed")
+	}
+
+	for k, s := range opts.Sessions {
+		if s.ConnectionTimeout != "" {
+			ct, err := strconv.Atoi(s.ConnectionTimeout)
+			if err != nil {
+				return errs.Errorf(
+					"connection timeout '%v' must be an integer for session %s",
+					s.ConnectionTimeout,
+					k,
+				)
+			}
+
+			if ct < 1 || ct > 30 {
+				return errs.Errorf(
+					"connection timeout '%v' for session %s must be between 1 and 30",
+					s.ConnectionTimeout,
+					k,
+				)
+			}
+		}
+	}
+
+	if opts.Default.ConnectionTimeout != "" {
+		t, err := strconv.Atoi(opts.Default.ConnectionTimeout)
+		if err != nil {
+			return errs.Errorf(
+				"default connection timeout '%v' must be an integer",
+				opts.Default.ConnectionTimeout,
+			)
+		}
+
+		if t < 1 || t > 30 {
+			return errs.Errorf(
+				"default connection timeout '%v' must be between 1 and 30",
+				opts.Default.ConnectionTimeout,
+			)
+		}
 	}
 
 	err = opts.Default.runSourceConsistencyValidation()

@@ -141,9 +141,9 @@ func (p *Plugin) EventSourceByKey(rawKey string) (watch.EventSource, error) {
 		return nil, errs.WrapConst(errs.New("second parameter \"Topic\" is required"), zbxerr.ErrorTooFewParameters)
 	}
 
-	connectionTimeout, err := strconv.Atoi(params["ConnectionTimeout"])
+	connectionTimeout, err := p.getConnectionTimeout(params)
 	if err != nil {
-		connectionTimeout = p.options.Default.ConnectionTimeout // shouldn't happen anyway
+		return nil, err
 	}
 
 	var (
@@ -391,6 +391,23 @@ func (ms *mqttSub) startAsyncEstablishingConnectionBackoff() {
 			}
 		}
 	}()
+}
+
+func (p *Plugin) getConnectionTimeout(params map[string]string) (int, error) {
+	connectionTimeout, err := strconv.Atoi(params["ConnectionTimeout"])
+	if err != nil {
+		p.Tracef("failed to convert parameter connection timeout %s", err.Error())
+		if p.options.Default != nil {
+			connectionTimeout, err = strconv.Atoi(p.options.Default.ConnectionTimeout)
+			if err != nil {
+				p.Tracef("failed to convert default connection timeout %s", err.Error())
+				return 0, errs.New("failed to get connection timeout")
+			}
+
+		}
+	}
+
+	return connectionTimeout, nil
 }
 
 func (p *Plugin) createOptions(

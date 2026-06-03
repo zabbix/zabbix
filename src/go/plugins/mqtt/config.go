@@ -15,6 +15,8 @@
 package mqtt
 
 import (
+	"strconv"
+
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
@@ -39,7 +41,7 @@ type session struct {
 	TLSCAFile         string `conf:"name=TLSCAFile,optional"`
 	TLSCertFile       string `conf:"name=TLSCertFile,optional"`
 	TLSKeyFile        string `conf:"name=TLSKeyFile,optional"`
-	ConnectionTimeout int    `conf:"optional,range=1:30"`
+	ConnectionTimeout string `conf:"name=ConnectionTimeout,optional"`
 }
 
 // Configure implements plugin.Configurator methods.
@@ -52,13 +54,13 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	if p.options.LegacyTimeout != 0 {
 		log.Debugf("config value 'Plugins.MQTT.Timeout' is deprecated")
 
-		if p.options.Default.ConnectionTimeout == 0 {
-			p.options.Default.ConnectionTimeout = p.options.LegacyTimeout
+		if p.options.Default.ConnectionTimeout == "" {
+			p.options.Default.ConnectionTimeout = strconv.Itoa(p.options.LegacyTimeout)
 		}
 	}
 
-	if p.options.Default.ConnectionTimeout == 0 {
-		p.options.Default.ConnectionTimeout = global.Timeout
+	if p.options.Default.ConnectionTimeout == "" {
+		p.options.Default.ConnectionTimeout = strconv.Itoa(global.Timeout)
 	}
 
 	if p.options.LegacyTimeout == 0 {
@@ -73,6 +75,44 @@ func (*Plugin) Validate(opts any) error {
 	err := conf.UnmarshalStrict(opts, &o)
 	if err != nil {
 		return errs.Wrap(err, "plugin config validation failed")
+	}
+
+	for k, s := range o.Sessions {
+		if s.ConnectionTimeout != "" {
+			ct, err := strconv.Atoi(s.ConnectionTimeout)
+			if err != nil {
+				return errs.Errorf(
+					"connection timeout '%v' must be an integer for session %s",
+					s.ConnectionTimeout,
+					k,
+				)
+			}
+
+			if ct < 1 || ct > 30 {
+				return errs.Errorf(
+					"connection timeout '%v' for session %s must be between 1 and 30",
+					s.ConnectionTimeout,
+					k,
+				)
+			}
+		}
+	}
+
+	if o.Default != nil && o.Default.ConnectionTimeout != "" {
+		t, err := strconv.Atoi(o.Default.ConnectionTimeout)
+		if err != nil {
+			return errs.Errorf(
+				"default connection timeout '%v' must be an integer",
+				o.Default.ConnectionTimeout,
+			)
+		}
+
+		if t < 1 || t > 30 {
+			return errs.Errorf(
+				"default connection timeout '%v' must be between 1 and 30",
+				o.Default.ConnectionTimeout,
+			)
+		}
 	}
 
 	return nil

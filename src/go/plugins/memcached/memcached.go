@@ -19,6 +19,7 @@ import (
 	"strconv"
 	"time"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/uri"
@@ -61,10 +62,9 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, err
 	}
 
-	// temporary workaround until metric.SetDefaults() supports integers
-	connectionTimeout, err := strconv.Atoi(params["ConnectionTimeout"])
+	connectionTimeout, err := p.getConnectionTimeout(params)
 	if err != nil {
-		connectionTimeout = p.options.Default.ConnectionTimeout // shouldn't happen anyway
+		return nil, err
 	}
 
 	handleMetric := getHandlerFunc(key)
@@ -78,6 +78,21 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	}
 
 	return result, err
+}
+
+func (p *Plugin) getConnectionTimeout(params map[string]string) (int, error) {
+	connectionTimeout, err := strconv.Atoi(params["ConnectionTimeout"])
+	if err != nil {
+		p.Tracef("failed to convert parameter connection timeout %s", err.Error())
+		connectionTimeout, err = strconv.Atoi(p.options.Default.ConnectionTimeout)
+		if err != nil {
+			p.Tracef("failed to convert default connection timeout %s", err.Error())
+			return 0, errs.New("failed to get connection timeout")
+		}
+
+	}
+
+	return connectionTimeout, nil
 }
 
 // Start implements the Runner interface and performs initialization when plugin is activated.

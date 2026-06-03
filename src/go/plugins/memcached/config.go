@@ -16,8 +16,10 @@ package memcached
 
 import (
 	"fmt"
+	"strconv"
 
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
@@ -27,12 +29,7 @@ type session struct {
 	Password string `conf:"optional"`
 	User     string `conf:"optional"`
 
-	// Session processing involves marshaling the Session struct into JSON and
-	// then marshaling that JSON into a map[string]string (why anyone would
-	// commit such a horrific act is beyond me).
-	// Since JSON can contain ints and ints can't be unmarshaled into strings,
-	// here we tell the marshaler to do the conversion during initial marshaling.
-	ConnectionTimeout int `conf:"optional,range=1:30" json:"ConnectionTimeout,string"` //nolint:tagalign,tagliatelle
+	ConnectionTimeout string `conf:"name=ConnectionTimeout,optional"`
 }
 
 type PluginOptions struct {
@@ -59,13 +56,13 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if p.options.LegacyTimeout != 0 {
 		log.Debugf("'Plugins.Memcached.Timeout' is deprecated")
 
-		if p.options.Default.ConnectionTimeout == 0 {
-			p.options.Default.ConnectionTimeout = p.options.LegacyTimeout
+		if p.options.Default.ConnectionTimeout == "" {
+			p.options.Default.ConnectionTimeout = strconv.Itoa(p.options.LegacyTimeout)
 		}
 	}
 
-	if p.options.Default.ConnectionTimeout == 0 {
-		p.options.Default.ConnectionTimeout = global.Timeout
+	if p.options.Default.ConnectionTimeout == "" {
+		p.options.Default.ConnectionTimeout = strconv.Itoa(global.Timeout)
 	}
 
 	if p.options.LegacyTimeout == 0 {
@@ -90,6 +87,42 @@ func (p *Plugin) Validate(options interface{}) error {
 		if len(session.Password+session.User) > maxEntryLen {
 			return fmt.Errorf("invalid parameters for session '%s': credentials cannot be longer "+
 				"than %d characters", name, maxEntryLen)
+		}
+
+		if session.ConnectionTimeout != "" {
+			ct, err := strconv.Atoi(session.ConnectionTimeout)
+			if err != nil {
+				return errs.Errorf(
+					"connection timeout '%v' must be an integer for session %s",
+					session.ConnectionTimeout,
+					name,
+				)
+			}
+
+			if ct < 1 || ct > 30 {
+				return errs.Errorf(
+					"connection timeout '%v' for session %s must be between 1 and 30",
+					session.ConnectionTimeout,
+					name,
+				)
+			}
+		}
+	}
+
+	if opts.Default.ConnectionTimeout != "" {
+		t, err := strconv.Atoi(opts.Default.ConnectionTimeout)
+		if err != nil {
+			return errs.Errorf(
+				"default connection timeout '%v' must be an integer",
+				opts.Default.ConnectionTimeout,
+			)
+		}
+
+		if t < 1 || t > 30 {
+			return errs.Errorf(
+				"default connection timeout '%v' must be between 1 and 30",
+				opts.Default.ConnectionTimeout,
+			)
 		}
 	}
 

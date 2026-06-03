@@ -16,6 +16,7 @@ package mysql
 
 import (
 	"path/filepath"
+	"strconv"
 
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
@@ -25,16 +26,14 @@ import (
 
 // Session is a general structure for storing sessions' configuration.
 type Session struct {
-	URI         string `conf:"name=Uri,optional"`
-	Password    string `conf:"optional"`
-	User        string `conf:"optional"`
-	TLSConnect  string `conf:"name=TLSConnect,optional"`
-	TLSCAFile   string `conf:"name=TLSCAFile,optional"`
-	TLSCertFile string `conf:"name=TLSCertFile,optional"`
-	TLSKeyFile  string `conf:"name=TLSKeyFile,optional"`
-
-	// json tag is a temporary workaround until metric.SetDefaults() supports integers
-	ConnectionTimeout int `conf:"optional,range=1:30" json:"ConnectionTimeout,string"` //nolint:tagalign,tagliatelle
+	URI               string `conf:"name=Uri,optional"`
+	Password          string `conf:"optional"`
+	User              string `conf:"optional"`
+	TLSConnect        string `conf:"name=TLSConnect,optional"`
+	TLSCAFile         string `conf:"name=TLSCAFile,optional"`
+	TLSCertFile       string `conf:"name=TLSCertFile,optional"`
+	TLSKeyFile        string `conf:"name=TLSKeyFile,optional"`
+	ConnectionTimeout string `conf:"name=ConnectionTimeout,optional"`
 }
 
 // PluginOptions option from config file.
@@ -73,8 +72,8 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	if p.options.LegacyConnectionTimeout != 0 {
 		log.Debugf("'Plugins.Mysql.Timeout' is deprecated")
 
-		if p.options.Default.ConnectionTimeout == 0 {
-			p.options.Default.ConnectionTimeout = p.options.LegacyConnectionTimeout
+		if p.options.Default.ConnectionTimeout == "" {
+			p.options.Default.ConnectionTimeout = strconv.Itoa(p.options.LegacyConnectionTimeout)
 		}
 	}
 
@@ -82,8 +81,8 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 		log.Debugf("'Plugins.Mysql.CallTimeout' is deprecated")
 	}
 
-	if p.options.Default.ConnectionTimeout == 0 {
-		p.options.Default.ConnectionTimeout = global.Timeout
+	if p.options.Default.ConnectionTimeout == "" {
+		p.options.Default.ConnectionTimeout = strconv.Itoa(global.Timeout)
 	}
 
 	if p.options.LegacyConnectionTimeout == 0 {
@@ -103,6 +102,44 @@ func (*Plugin) Validate(options any) error {
 	err := conf.UnmarshalStrict(options, &opts)
 	if err != nil {
 		return errs.Wrap(err, "failed to unmarshal configuration options")
+	}
+
+	for k, s := range opts.Sessions {
+		if s.ConnectionTimeout != "" {
+			ct, err := strconv.Atoi(s.ConnectionTimeout)
+			if err != nil {
+				return errs.Errorf(
+					"connection timeout '%v' must be an integer for session %s",
+					s.ConnectionTimeout,
+					k,
+				)
+			}
+
+			if ct < 1 || ct > 30 {
+				return errs.Errorf(
+					"connection timeout '%v' for session %s must be between 1 and 30",
+					s.ConnectionTimeout,
+					k,
+				)
+			}
+		}
+	}
+
+	if opts.Default.ConnectionTimeout != "" {
+		t, err := strconv.Atoi(opts.Default.ConnectionTimeout)
+		if err != nil {
+			return errs.Errorf(
+				"default connection timeout '%v' must be an integer",
+				opts.Default.ConnectionTimeout,
+			)
+		}
+
+		if t < 1 || t > 30 {
+			return errs.Errorf(
+				"default connection timeout '%v' must be between 1 and 30",
+				opts.Default.ConnectionTimeout,
+			)
+		}
 	}
 
 	if opts.CustomQueriesEnabled && opts.CustomQueriesPath != "" && !filepath.IsAbs(opts.CustomQueriesPath) {

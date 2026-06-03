@@ -32,8 +32,7 @@ type session struct {
 	TLSCertFile string `conf:"name=TLSCertFile,optional"`
 	TLSKeyFile  string `conf:"name=TLSKeyFile,optional"`
 
-	// json tag is a temporary workaround until metric.SetDefaults() supports integers
-	ConnectionTimeout int `conf:"optional,range=1:30" json:"ConnectionTimeout,string"` //nolint:tagalign,tagliatelle
+	ConnectionTimeout string `conf:"name=ConnectionTimeout,optional"`
 }
 
 func (s *session) getFieldValues() map[comms.ConfigSetting]string {
