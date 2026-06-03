@@ -18,7 +18,6 @@ class CControllerLldRulePrototypeDisable extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
-		$this->disableCsrfValidation();
 	}
 
 	protected function checkPermissions(): bool {
