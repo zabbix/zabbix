@@ -552,12 +552,20 @@ static int	cep_condition_eval_host_group(int operator, const zbx_cep_args_name_t
 static int	cep_condition_eval_time_period(int operator, const zbx_cep_args_time_period_t *args,
 		zbx_cep_event_context_t *ctx)
 {
-	int	ret = 0;
+	int	ret = 0, in;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operator:%d host:%s", __func__, operator, args->period);
 
-	ZBX_UNUSED(ctx);
-	/* TODO: evaluate time period */
+	if (SUCCEED == zbx_check_time_period(args->period, ctx->db_event->clock, NULL, &in))
+	{
+		if (SUCCEED == in)
+			ret = 1;
+
+		if (ZBX_CONDITION_OPERATOR_NOT_IN == operator)
+			ret = !ret;
+	}
+	else
+		zabbix_log(LOG_LEVEL_WARNING, "invalid CEP condition time period \"%s\"", args->period);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:%d", __func__, ret);
 
