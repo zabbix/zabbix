@@ -52,11 +52,11 @@ class CCepRuleHelper {
 	public const OP_RENAME_TAG =			15;
 	public const OP_REMOVE_TAG =			16;
 
-	public const OP_WHEN_EVENT_OCCURRED =	0;
-	public const OP_WHEN_EVENT_EVICTED =	1;
-	public const OP_WHEN_WINDOW_CLOSED =	2;
-	public const OP_WHEN_TAGS_CORRELATED =	3;
-	public const OP_WHEN_PATTERN_MATCHED =	4;
+	public const WHEN_EVENT_OCCURRED =	0;
+	public const WHEN_EVENT_EVICTED =	1;
+	public const WHEN_WINDOW_CLOSED =	2;
+	public const WHEN_TAGS_CORRELATED =	3;
+	public const WHEN_PATTERN_MATCHED =	4;
 
 	public const WINDOW_CONDITION_TAG_PAIR =		0;
 	public const WINDOW_CONDITION_OLD_TAG =			1;
@@ -71,31 +71,31 @@ class CCepRuleHelper {
 
 	public const EXECUTE_WHEN_BY_WINDOW_TYPE = [
 		self::WINDOW_NONE => [
-			self::OP_WHEN_EVENT_OCCURRED
+			self::WHEN_EVENT_OCCURRED
 		],
 		self::WINDOW_SIMPLE => [
-			self::OP_WHEN_EVENT_OCCURRED,
-			self::OP_WHEN_EVENT_EVICTED
+			self::WHEN_EVENT_OCCURRED,
+			self::WHEN_EVENT_EVICTED
 		],
 		self::WINDOW_CAUSE_SYMPTOM => [
-			self::OP_WHEN_EVENT_OCCURRED,
-			self::OP_WHEN_EVENT_EVICTED,
-			self::OP_WHEN_WINDOW_CLOSED
+			self::WHEN_EVENT_OCCURRED,
+			self::WHEN_EVENT_EVICTED,
+			self::WHEN_WINDOW_CLOSED
 		],
 		self::WINDOW_TAG_MATCH => [
-			self::OP_WHEN_EVENT_OCCURRED,
-			self::OP_WHEN_EVENT_EVICTED,
-			self::OP_WHEN_TAGS_CORRELATED
+			self::WHEN_EVENT_OCCURRED,
+			self::WHEN_EVENT_EVICTED,
+			self::WHEN_TAGS_CORRELATED
 		],
 		self::WINDOW_PATTERN_MATCH => [
-			self::OP_WHEN_EVENT_OCCURRED,
-			self::OP_WHEN_EVENT_EVICTED,
-			self::OP_WHEN_PATTERN_MATCHED
+			self::WHEN_EVENT_OCCURRED,
+			self::WHEN_EVENT_EVICTED,
+			self::WHEN_PATTERN_MATCHED
 		]
 	];
 
 	public const OPERATION_TYPES_BY_EXECUTE_WHEN = [
-		self::OP_WHEN_EVENT_OCCURRED => [
+		self::WHEN_EVENT_OCCURRED => [
 			self::OP_SET_NAME,
 			self::OP_CLOSE,
 			self::OP_DISCARD,
@@ -111,7 +111,7 @@ class CCepRuleHelper {
 			self::OP_RENAME_TAG,
 			self::OP_REMOVE_TAG
 		],
-		self::OP_WHEN_EVENT_EVICTED => [
+		self::WHEN_EVENT_EVICTED => [
 			self::OP_SET_NAME,
 			self::OP_CLOSE,
 			self::OP_DISCARD,
@@ -129,7 +129,7 @@ class CCepRuleHelper {
 			self::OP_RENAME_TAG,
 			self::OP_REMOVE_TAG
 		],
-		self::OP_WHEN_WINDOW_CLOSED => [
+		self::WHEN_WINDOW_CLOSED => [
 			self::OP_SET_NAME,
 			self::OP_CLOSE,
 			self::OP_DISCARD,
@@ -145,7 +145,7 @@ class CCepRuleHelper {
 			self::OP_RENAME_TAG,
 			self::OP_REMOVE_TAG
 		],
-		self::OP_WHEN_TAGS_CORRELATED => [
+		self::WHEN_TAGS_CORRELATED => [
 			self::OP_SET_NAME,
 			self::OP_CLOSE,
 			self::OP_SET_SEVERITY,
@@ -160,7 +160,7 @@ class CCepRuleHelper {
 			self::OP_RENAME_TAG,
 			self::OP_REMOVE_TAG
 		],
-		self::OP_WHEN_PATTERN_MATCHED => [
+		self::WHEN_PATTERN_MATCHED => [
 			self::OP_DISCARD,
 			self::OP_COPY_FIRST,
 			self::OP_COPY_LAST
@@ -238,11 +238,11 @@ class CCepRuleHelper {
 
 	public static function getOperationExecuteWhenStrings(): array {
 		return [
-			self::OP_WHEN_EVENT_OCCURRED => _('Event occured'),
-			self::OP_WHEN_EVENT_EVICTED => _('Event evicted'),
-			self::OP_WHEN_WINDOW_CLOSED => _('Window closed'),
-			self::OP_WHEN_TAGS_CORRELATED => _('Tags correlated'),
-			self::OP_WHEN_PATTERN_MATCHED => _('Event pattern matched')
+			self::WHEN_EVENT_OCCURRED => _('Event occured'),
+			self::WHEN_EVENT_EVICTED => _('Event evicted'),
+			self::WHEN_WINDOW_CLOSED => _('Window closed'),
+			self::WHEN_TAGS_CORRELATED => _('Tags correlated'),
+			self::WHEN_PATTERN_MATCHED => _('Event pattern matched')
 		];
 	}
 

@@ -32,7 +32,7 @@ class testCepRule extends CAPITest {
 					'name' => 'update.success',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					]
@@ -41,7 +41,7 @@ class testCepRule extends CAPITest {
 					'name' => 'update.fail',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					]
@@ -126,29 +126,29 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/execute_when": an integer is expected.'
 			],
-			'Operation execute_when without window must be OP_WHEN_EVENT_OCCURRED(0)' => [
+			'Operation execute_when without window must be WHEN_EVENT_OCCURRED(0)' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
 						'execute_when' => -1
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/execute_when": value must be '.CCepRuleHelper::OP_WHEN_EVENT_OCCURRED.'.'
+				'expected_error' => 'Invalid parameter "/1/operations/1/execute_when": value must be '.CCepRuleHelper::WHEN_EVENT_OCCURRED.'.'
 			],
-			'Cannot have execute_when=OP_WHEN_EVENT_EVICTED(1) without window' => [
+			'Cannot have execute_when=WHEN_EVENT_EVICTED(1) without window' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_EVICTED
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/operations/1/execute_when": value must be '.CCepRuleHelper::OP_WHEN_EVENT_OCCURRED.'.'
+				'expected_error' => 'Invalid parameter "/1/operations/1/execute_when": value must be '.CCepRuleHelper::WHEN_EVENT_OCCURRED.'.'
 			],
 			'Operation must contain sortorder' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "sortorder" is missing.'
@@ -167,7 +167,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 'abc',
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1/sortorder": an integer is expected.'
@@ -177,7 +177,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/operations/1": the parameter "type" is missing.'
@@ -187,7 +187,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => 'abc'
 					]
 				],
@@ -198,7 +198,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => -1
 					]
 				],
@@ -219,12 +219,12 @@ class testCepRule extends CAPITest {
 					CCepRuleHelper::OP_REMOVE_TAG
 				]).'.'
 			],
-			'Operation type must be suited for OP_WHEN_EVENT_OCCURRED' => [
+			'Operation type must be suited for WHEN_EVENT_OCCURRED' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_COPY_LAST
 					]
 				],
@@ -245,12 +245,12 @@ class testCepRule extends CAPITest {
 					CCepRuleHelper::OP_REMOVE_TAG
 				]).'.'
 			],
-			'Need event_name for OP_WHEN_EVENT_OCCURRED' => [
+			'Need event_name for WHEN_EVENT_OCCURRED' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME
 					]
 				],
@@ -261,7 +261,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 123
 					]
@@ -273,7 +273,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.minimal',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					]
@@ -285,7 +285,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.operation.tags',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'tags' => []
@@ -298,7 +298,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'tags' => 'abc'
@@ -311,7 +311,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'tags' => [
@@ -326,7 +326,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'tags' => [
@@ -341,7 +341,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'tags' => [
@@ -356,7 +356,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'tags' => [
@@ -370,7 +370,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'sortorder' => 1,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
@@ -387,7 +387,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'tags' => [
@@ -404,7 +404,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'tags' => [
@@ -420,7 +420,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.operation.tags.multiple',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'tags' => [
@@ -436,7 +436,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.operation.tags.multiple.unique',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'tags' => [
@@ -452,7 +452,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'tag' => 123
@@ -465,7 +465,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'tag' => 'abc'
@@ -478,7 +478,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'evaltype' => 'abc'
@@ -491,7 +491,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'evaltype' => -1
@@ -505,7 +505,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'new_tag' => 123
@@ -518,7 +518,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'new_tag' => 'abc'
@@ -531,7 +531,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'tag_value' => 123
@@ -544,7 +544,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'tag_value' => 'abc'
@@ -557,7 +557,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'severity' => 'abc'
@@ -570,7 +570,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name',
 						'severity' => 123
@@ -583,7 +583,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -596,7 +596,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.no.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -609,7 +609,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -624,7 +624,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -639,7 +639,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -659,7 +659,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -675,7 +675,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -691,7 +691,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -707,7 +707,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter.conditions.empty',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -723,7 +723,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -738,7 +738,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -754,7 +754,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -770,7 +770,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -787,7 +787,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -806,7 +806,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -825,7 +825,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -844,7 +844,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -863,7 +863,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -883,7 +883,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -904,7 +904,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -925,7 +925,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter.event_name.empty',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -947,7 +947,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter.formulaid',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -968,7 +968,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -986,7 +986,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1012,7 +1012,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1031,7 +1031,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1055,7 +1055,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1074,7 +1074,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1093,7 +1093,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1113,7 +1113,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1132,7 +1132,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter.tag.value.empty',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1151,7 +1151,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1171,7 +1171,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1190,7 +1190,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1210,7 +1210,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1229,7 +1229,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1248,7 +1248,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1268,7 +1268,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1287,7 +1287,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1306,7 +1306,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1326,7 +1326,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1346,7 +1346,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1366,7 +1366,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1384,7 +1384,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1402,7 +1402,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1420,7 +1420,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1440,7 +1440,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1458,7 +1458,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1476,7 +1476,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1494,7 +1494,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1513,7 +1513,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter.time_period',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'Event name'
 					],
@@ -1532,7 +1532,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1545,7 +1545,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1559,7 +1559,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1572,7 +1572,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1585,7 +1585,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1598,7 +1598,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1612,7 +1612,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1625,7 +1625,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1644,7 +1644,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1657,7 +1657,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1670,7 +1670,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1683,7 +1683,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1696,7 +1696,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1710,7 +1710,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1726,7 +1726,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.simple',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1740,7 +1740,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1756,7 +1756,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1772,7 +1772,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1788,7 +1788,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.duration',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1804,7 +1804,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.duration.as.year',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1820,7 +1820,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.duration.as.macro',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1836,7 +1836,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.duration.as.macro.malformed',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1852,7 +1852,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.duration.as.macro.long',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1868,7 +1868,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1885,7 +1885,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1902,7 +1902,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.capacity.as.macro',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1919,7 +1919,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.capacity.as.macro.malformed',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1936,7 +1936,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.capacity.as.macro.long',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1953,7 +1953,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1970,7 +1970,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -1987,7 +1987,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2004,7 +2004,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2021,7 +2021,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2038,7 +2038,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2055,7 +2055,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2072,7 +2072,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2089,7 +2089,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2106,7 +2106,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2124,7 +2124,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2142,7 +2142,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2160,7 +2160,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.symptom',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2176,7 +2176,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.symptom.group_by_host_group',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2193,7 +2193,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.symptom.group_by_host',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2210,7 +2210,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.symptom.group_by_tag',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2240,7 +2240,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2257,7 +2257,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.event_count_tag',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2274,7 +2274,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2291,7 +2291,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2311,7 +2311,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.symptom.filter.empty',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2329,7 +2329,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2349,7 +2349,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.pattern.filter.empty',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2367,7 +2367,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2386,7 +2386,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2405,7 +2405,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2429,7 +2429,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2449,7 +2449,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2469,7 +2469,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2489,7 +2489,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2509,7 +2509,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2531,7 +2531,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2551,7 +2551,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2572,7 +2572,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2595,7 +2595,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2619,7 +2619,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2643,7 +2643,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2667,7 +2667,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2678,7 +2678,7 @@ class testCepRule extends CAPITest {
 							'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 							'formula' => 'A',
 							'conditions' => [
-								'type' => CCepRuleHelper::CONDITION_TAG_NAME,
+								'type' => CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE,
 								'formulaid' => 'B',
 								'past_tag' => 'abc',
 								'tag_value' => 'abc'
@@ -2693,7 +2693,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2717,7 +2717,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2743,7 +2743,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2765,7 +2765,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2788,7 +2788,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2811,7 +2811,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2835,7 +2835,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2860,7 +2860,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2885,7 +2885,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2910,7 +2910,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2933,7 +2933,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2957,7 +2957,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.window.filter.conditions.tag.empty',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -2981,7 +2981,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -3004,7 +3004,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -3028,7 +3028,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter.conditions.tag_value.empty',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -3052,7 +3052,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter.conditions.like',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -3076,7 +3076,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter.conditions.like',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -3100,7 +3100,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter.conditions.like',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -3124,7 +3124,7 @@ class testCepRule extends CAPITest {
 					'name' => 'ceprule.filter.conditions.like',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'bla'
 					],
@@ -3363,7 +3363,7 @@ class testCepRule extends CAPITest {
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.fail',
 					'operations' => [
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'unexpected' => 'unexpected'
 					]
 				],
@@ -3374,7 +3374,7 @@ class testCepRule extends CAPITest {
 					'cep_ruleid' => ':ceprule:update.success',
 					'operations' => [
 						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::OP_WHEN_EVENT_OCCURRED,
+						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
 						'type' => CCepRuleHelper::OP_SET_NAME,
 						'event_name' => 'update.operation'
 					]

@@ -701,7 +701,7 @@ window.ceprule_edit_popup = new class {
 				sortorder: 1 + Math.max(0, ...Object.keys(this.form.findFieldByName('operations').getValue())),
 				evaltype: '<?= CONDITION_EVAL_TYPE_AND_OR ?>',
 				event_name: '',
-				execute_when: '<?= CCepRuleHelper::OP_WHEN_EVENT_OCCURRED ?>',
+				execute_when: '<?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>',
 				new_tag: '',
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
 				tag: '',

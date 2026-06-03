@@ -89,19 +89,19 @@ window.ceprule_operation_edit_popup = new class {
 
 			option.disabled = false;
 
-			if (value == <?= CCepRuleHelper::OP_WHEN_EVENT_OCCURRED ?>) {
+			if (value == <?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>) {
 				option.disabled = false;
 			}
-			else if (value == <?= CCepRuleHelper::OP_WHEN_EVENT_EVICTED ?>) {
+			else if (value == <?= CCepRuleHelper::WHEN_EVENT_EVICTED ?>) {
 				option.disabled = this.#window_type === '<?= CCepRuleHelper::WINDOW_NONE ?>';
 			}
-			else if (value == <?= CCepRuleHelper::OP_WHEN_WINDOW_CLOSED ?>) {
+			else if (value == <?= CCepRuleHelper::WHEN_WINDOW_CLOSED ?>) {
 				option.disabled = this.#window_type !== '<?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>';
 			}
-			else if (value == <?= CCepRuleHelper::OP_WHEN_TAGS_CORRELATED ?>) {
+			else if (value == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>) {
 				option.disabled = this.#window_type !== '<?= CCepRuleHelper::WINDOW_TAG_MATCH ?>';
 			}
-			else if (value == <?= CCepRuleHelper::OP_WHEN_PATTERN_MATCHED ?>) {
+			else if (value == <?= CCepRuleHelper::WHEN_PATTERN_MATCHED ?>) {
 				option.disabled = this.#window_type !== '<?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?>';
 			}
 
@@ -129,8 +129,8 @@ window.ceprule_operation_edit_popup = new class {
 			}
 
 			if (value == <?= CCepRuleHelper::OP_DISCARD ?>) {
-				option.is_disabled = (execute_when == <?= CCepRuleHelper::OP_WHEN_TAGS_CORRELATED ?>)
-					|| (execute_when == <?= CCepRuleHelper::OP_WHEN_EVENT_EVICTED ?>);
+				option.is_disabled = (execute_when == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>)
+					|| (execute_when == <?= CCepRuleHelper::WHEN_EVENT_EVICTED ?>);
 			}
 		};
 
@@ -248,7 +248,7 @@ window.ceprule_operation_edit_popup = new class {
 
 		[...this.form_element.querySelectorAll('[is="z-cep-tagsuggest"]')]
 			.map(node => {
-				if (value == <?= CCepRuleHelper::OP_WHEN_TAGS_CORRELATED ?>) {
+				if (value == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>) {
 					node.setAttribute('disable-position-tags', '');
 				}
 				else {
