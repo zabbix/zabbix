@@ -551,7 +551,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	struct zbx_json_parse	jp_body, jp_result;
 	char			*payload = NULL, *error = NULL, *error_curl = NULL, errbuf[CURL_ERROR_SIZE],
 				code[ZBX_BRIDGE_ERROR_CODE_LEN], message[ZBX_BRIDGE_MESSAGE_LEN],
-				error_data[ZBX_BRIDGE_MESSAGE_LEN];
+				error_data[ZBX_BRIDGE_MESSAGE_LEN], jsonrpc[ZBX_MAX_UINT64_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -676,6 +676,22 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
+		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		goto out;
+	}
+
+	if (FAIL == zbx_json_value_by_name(&jp_body, "jsonrpc", jsonrpc, sizeof(jsonrpc), NULL))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "missing JSON-RPC version in bridge-adapter response body: %s",
+				ZBX_NULL2EMPTY_STR(body.data));
+		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		goto out;
+	}
+
+	if (0 != strcmp(jsonrpc, "2.0"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid JSON-RPC version in bridge-adapter response body: %s,"
+				" expected 2.0", jsonrpc);
 		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
 		goto out;
 	}

@@ -166,7 +166,7 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	CURLcode		err;
 	CURLoption		opt;
 	struct curl_slist	*headers = NULL, *connect_to = NULL;
-	char			*error_curl = NULL, errbuf[CURL_ERROR_SIZE];
+	char			*error_curl = NULL, errbuf[CURL_ERROR_SIZE], jsonrpc[ZBX_MAX_UINT64_LEN];
 	long			http_code = 0;
 	int			ret = FAIL;
 	const zbx_config_tls_t	*config_tls = config_comms->config_tls;
@@ -296,6 +296,22 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
+		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		goto out;
+	}
+
+	if (FAIL == zbx_json_value_by_name(jp_body, "jsonrpc", jsonrpc, sizeof(jsonrpc), NULL))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "missing JSON-RPC version in bridge-adapter response body: %s",
+				ZBX_NULL2EMPTY_STR(body.data));
+		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		goto out;
+	}
+
+	if (0 != strcmp(jsonrpc, "2.0"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid JSON-RPC version in bridge-adapter response body: %s,"
+				" expected 2.0", jsonrpc);
 		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
 		goto out;
 	}
