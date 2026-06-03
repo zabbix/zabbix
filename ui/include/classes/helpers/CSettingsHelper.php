@@ -248,4 +248,8 @@ class CSettingsHelper {
 	public static function isMobileDevicesEnabled(): bool {
 		return self::getServerStatus()['configuration']['enable_mobile_devices'];
 	}
+
+	public static function isBridgeAdapterConfigured(): bool {
+		return self::getServerStatus()['configuration']['bridge_adapter_configured'];
+	}
 }
