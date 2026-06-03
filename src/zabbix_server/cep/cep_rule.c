@@ -21,6 +21,7 @@
 #include "zbxdbwrap.h"
 #include "zbxeval.h"
 #include "zbxexpr.h"
+#include "zbxnum.h"
 #include "zbxvariant.h"
 #include "zbxdbhigh.h"
 
@@ -377,6 +378,19 @@ static int	cep_condition_eval_tag_name(int operator, const zbx_cep_args_tag_name
 	return ret;
 }
 
+static int	cep_condition_compare_value_str(const char *cond_value, const char *event_value)
+{
+	double	cond_dbl, event_dbl;
+
+	if (SUCCEED == zbx_is_double(cond_value, &cond_dbl) && SUCCEED == zbx_is_double(event_value, &event_dbl))
+	{
+		ZBX_RETURN_IF_DBL_NOT_EQUAL(cond_dbl, event_dbl);
+		return 0;
+	}
+
+	return strcmp(cond_value, event_value);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: evaluate event tag value condition                                *
@@ -405,7 +419,27 @@ static int	cep_condition_eval_tag_value(int operator, const zbx_cep_args_tag_val
 		if (0 != strcmp(args->tag, ctx->db_event->tags.values[i]->tag))
 			continue;
 
-		ret = cep_condition_eval_value_str_raw(operator, args->value, ctx->db_event->tags.values[i]->value);
+		switch (operator)
+		{
+			case ZBX_CONDITION_OPERATOR_MORE_EQUAL:
+				if (0 >= cep_condition_compare_value_str(args->value,
+						ctx->db_event->tags.values[i]->value))
+				{
+					ret = 1;
+				}
+				break;
+			case ZBX_CONDITION_OPERATOR_LESS_EQUAL:
+				if (0 <= cep_condition_compare_value_str(args->value,
+						ctx->db_event->tags.values[i]->value))
+				{
+					ret = 1;
+				}
+				break;
+			default:
+				ret = cep_condition_eval_value_str_raw(operator, args->value,
+						ctx->db_event->tags.values[i]->value);
+				break;
+		}
 	}
 
 	switch (operator)
@@ -441,6 +475,12 @@ static int	cep_condition_eval_severity(int operator, const zbx_cep_args_severity
 
 	switch (operator)
 	{
+		case ZBX_CONDITION_OPERATOR_EQUAL:
+			ret = ctx->db_event->severity == args->level;
+			break;
+		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
+			ret = ctx->db_event->severity != args->level;
+			break;
 		case ZBX_CONDITION_OPERATOR_MORE_EQUAL:
 			ret = ctx->db_event->severity >= args->level;
 			break;
