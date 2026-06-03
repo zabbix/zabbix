@@ -387,6 +387,9 @@ function PopUp(action, parameters, {
 					data: resp.data || null
 				});
 
+				// Display the close button after the screen reader announces the dialog title.
+				overlay.$dialogue.$close_btn.show();
+
 				const resizeHandler = (grid) => {
 					for (const label of grid.querySelectorAll(':scope > label')) {
 						const rect = label.getBoundingClientRect()
