@@ -331,41 +331,32 @@ abstract class CHostGeneral extends CHostBase {
 	private static function updateHostHgSets(array $hgsets): void {
 		$upd_host_hgsets = [];
 
-		$empty_hgset_hash = hash('sha256', '');
+		$options = [
+			'output' => ['hgsetid', 'hash'],
+			'filter' => ['hash' => array_keys($hgsets)]
+		];
+		$result = DBselect(DB::makeSql('hgset', $options));
 
-		if (array_key_exists($empty_hgset_hash, $hgsets)) {
-			DB::delete('host_hgset', ['hostid' => $hgsets[$empty_hgset_hash]['hostids']]);
-			unset($hgsets[$empty_hgset_hash]);
+		while ($row = DBfetch($result)) {
+			$upd_host_hgsets[] = [
+				'values' => ['hgsetid' => $row['hgsetid']],
+				'where' => ['hostid' => $hgsets[$row['hash']]['hostids']]
+			];
+			unset($hgsets[$row['hash']]);
 		}
 
 		if ($hgsets) {
-			$options = [
-				'output' => ['hgsetid', 'hash'],
-				'filter' => ['hash' => array_keys($hgsets)]
-			];
-			$result = DBselect(DB::makeSql('hgset', $options));
-
-			while ($row = DBfetch($result)) {
-				$upd_host_hgsets[] = [
-					'values' => ['hgsetid' => $row['hgsetid']],
-					'where' => ['hostid' => $hgsets[$row['hash']]['hostids']]
-				];
-				unset($hgsets[$row['hash']]);
-			}
-
-			if ($hgsets) {
-				self::createHgSets($hgsets);
+			self::createHgSets($hgsets);
 
 				foreach ($hgsets as $hgset) {
-					$upd_host_hgsets[] = [
-						'values' => ['hgsetid' => $hgset['hgsetid']],
-						'where' => ['hostid' => $hgset['hostids']]
-					];
-				}
+				$upd_host_hgsets[] = [
+					'values' => ['hgsetid' => $hgset['hgsetid']],
+					'where' => ['hostid' => $hgset['hostids']]
+				];
 			}
-
-			DB::update('host_hgset', $upd_host_hgsets);
 		}
+
+		DB::update('host_hgset', $upd_host_hgsets);
 	}
 
 	private static function createHgSets(array &$hgsets): void {
