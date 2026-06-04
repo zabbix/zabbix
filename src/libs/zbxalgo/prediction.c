@@ -1002,7 +1002,31 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 	zbx_matrix_struct_alloc(&coefficients);
 
 	if (SUCCEED != (res = zbx_regression(t, x, n, fit, k, coefficients)))
+	{
+		/* When regression fails due to overflow with extreme values, fall back to a  */
+		/* linear 2-point estimate for linear and logarithmic fits in value mode.     */
+		if ((FIT_LINEAR == fit || FIT_LOGARITHMIC == fit) && MODE_VALUE == mode)
+		{
+			int	i_min_t = 0, i_max_t = 0;
+			double	t_span;
+
+			for (int i = 1; i < n; i++)
+			{
+				if (t[i] < t[i_min_t])	i_min_t = i;
+				if (t[i] > t[i_max_t])	i_max_t = i;
+			}
+
+			if (0.0 < (t_span = t[i_max_t] - t[i_min_t]))
+			{
+				double	slope = (x[i_max_t] - x[i_min_t]) / t_span;
+
+				result = x[i_max_t] + slope * (now + time - t[i_max_t]);
+				res = SUCCEED;
+			}
+		}
+
 		goto out;
+	}
 
 	zbx_log_expression(now, fit, (int)k, coefficients);
 

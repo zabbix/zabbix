@@ -4549,7 +4549,7 @@ out:
       params: '#2,1s,'
     out:
       return: SUCCEED
-      value: -1
+      value: 1.7976931348623158e+308
 ---
     test case: Evaluate forecast inf (#2,3000w)
     in:
