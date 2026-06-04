@@ -307,7 +307,7 @@ window.ceprule_edit_popup = new class {
 				}
 			}
 			else if (class_list.contains('js-delete')) {
-				window.confirm(<?= json_encode('Delete	complex event processing rule?') ?>) && this.#delete();
+				window.confirm(<?= json_encode('Delete complex event processing rule?') ?>) && this.#delete();
 			}
 			else if (class_list.contains('js-clone')) {
 				this.#clone();
@@ -407,9 +407,20 @@ window.ceprule_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				overlayDialogueDestroy(this.#overlay.dialogueid);
+				if ('success' in response) {
+					postMessageOk(response.success.title);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+					if ('messages' in response.success) {
+						postMessageDetails('success', response.success.messages);
+					}
+
+					overlayDialogueDestroy(this.#overlay.dialogueid);
+					this.#overlay.$dialogue[0]
+						.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				}
+				else {
+					throw new Error();
+				}
 			})
 			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => {
