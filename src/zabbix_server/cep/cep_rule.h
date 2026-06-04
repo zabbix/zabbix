@@ -36,12 +36,18 @@ typedef struct
 }
 zbx_cep_event_context_t;
 
+#define CEP_RESULT_UPDATE_EVENT		0x01
+#define CEP_RESULT_UPDATE_DB_EVENT	0x02
+#define CEP_RESULT_UPDATE_CLOSE_EVENT	0x04
+#define CEP_RESULT_UPDATE_COPY_EVENT	0x08
+#define CEP_RESULT_UPDATE_CAUSE_SYMPTOM	0x10
+
 typedef struct
 {
 	zbx_db_event			*db_event;
 	zbx_cep_event_t			*event;
 
-	int				closing;
+	zbx_uint32_t			update_flags;
 	zbx_vector_cep_event_handle_t	to_copy;
 }
 zbx_cep_result_t;
