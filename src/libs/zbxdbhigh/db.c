@@ -771,6 +771,8 @@ int	zbx_db_check_serverid(void)
 
 	if (NULL == (result = zbx_db_select("select value_str from settings where name='serverid'")))
 	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot select serverid record from \"settings\" table "
+				"on the first try");
 		ret = FAIL;
 		goto out;
 	}
@@ -789,7 +791,8 @@ int	zbx_db_check_serverid(void)
 
 			if (NULL == (result = zbx_db_select("select value_str from settings where name='serverid'")))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "cannot select serverid record from \"settings\" table");
+				zabbix_log(LOG_LEVEL_ERR, "cannot select serverid record from \"settings\" table "
+						"after trying to insert");
 				zbx_free(uuid7);
 				ret = FAIL;
 				goto out;
