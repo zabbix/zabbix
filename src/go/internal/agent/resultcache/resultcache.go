@@ -165,7 +165,9 @@ func (c *cacheData) EnableUpload(enabled bool) {
 	defer c.mu.Unlock()
 
 	c.historyUpload = enabled
-	c.uploadRetryAfter = time.Time{}
+	if enabled {
+		c.uploadRetryAfter = time.Time{}
+	}
 }
 
 // sendAgentData performs agent data upload and updates upload state (matching C agent send_buffer()).
