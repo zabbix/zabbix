@@ -28,6 +28,7 @@ class CIntegrationTest extends CAPITest {
 
 	// Default iteration count for wait operations.
 	const WAIT_ITERATIONS			= 60;
+	const WAIT_ITERATIONS_STARTUP		= 15;
 
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY			= 1;
@@ -297,6 +298,9 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$case_name = strtr($this->getName(true), [' ' => '-']);
+		if (is_dir(PHPUNIT_COMPONENT_DIR.'all/'.$case_name)) {
+			$case_name = strtr(get_class($this).'_'.$this->getName(true), [' ' => '-']);
+		}
 		mkdir(PHPUNIT_COMPONENT_DIR.'all/'.$case_name, 0775, true);
 		if ($this->hasFailed()) {
 			mkdir(PHPUNIT_COMPONENT_DIR.'failed/'.$case_name, 0775, true);
@@ -417,7 +421,7 @@ class CIntegrationTest extends CAPITest {
 		self::validateComponent($component);
 
 		$saved_time = time();
-		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
+		for ($r = 0; $r < self::WAIT_ITERATIONS_STARTUP; $r++) {
 			$pid = @file_get_contents(self::getPidPath($component));
 			if ($skip_pid == true || ($pid && is_numeric($pid) && posix_kill($pid, 0))) {
 				switch ($component) {
@@ -579,7 +583,7 @@ class CIntegrationTest extends CAPITest {
 	 * @return array
 	 */
 	protected static function getDefaultComponentConfiguration() {
-		global $DB, $HISTORY;
+		global $DB, $HISTORY_PROVIDERS;
 
 		$db = [
 			'DBName' => $DB['DATABASE'],
@@ -600,9 +604,18 @@ class CIntegrationTest extends CAPITest {
 			$db['DBSchema'] = $DB['SCHEMA'];
 		}
 
-		if (isset($HISTORY)) {
-			$db_history['HistoryStorageURL'] = reset($HISTORY['url']);
-			$db_history['HistoryStorageTypes'] = implode(',', $HISTORY['types']);
+		if (isset($HISTORY_PROVIDERS)) {
+			foreach ($HISTORY_PROVIDERS as $provider) {
+				$provider_str = $provider['provider'].';'.
+					'value_types="'.implode(',', $provider['types']).'",'.
+					'url='.$provider['url'];
+				foreach (['username', 'password', 'db'] as $key) {
+					if (array_key_exists($key, $provider)) {
+						$provider_str .= ','.$key.'='.$provider[$key];
+					}
+				}
+				$db_history['HistoryProvider'][] = $provider_str;
+			}
 		}
 
 		$configuration = [
@@ -973,7 +986,7 @@ class CIntegrationTest extends CAPITest {
 
 		$client = $this->getClient($component);
 		$session = md5(uniqid('', true));
-		$result = $client->sendAgentDataValues($values, $session, $host, '8.0.0', $proxy);
+		$result = $client->sendAgentDataValues($values, $session, $host, ZABBIX_VERSION, $proxy);
 
 		if ($proxy === null) {
 			$this->assertTrue(array_key_exists('processed', $result),
@@ -1080,13 +1093,9 @@ class CIntegrationTest extends CAPITest {
 
 		switch ($component) {
 			case self::COMPONENT_SERVER:
+			case self::COMPONENT_PROXY:
 				$line = 'finished forced reloading of the configuration cache';
 				break;
-
-			case self::COMPONENT_PROXY:
-				$line = 'forced reloading of the configuration cache';
-				break;
-
 			default:
 				$this->fail('Configuration cache reload wait is not supported for component "'.
 					$component.'".');
