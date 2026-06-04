@@ -1391,143 +1391,75 @@ static int	housekeeping_proxy_dhistory(int now)
 	return deleted;
 }
 
-static int	housekeeping_usergroup_sets(int config_max_hk_delete)
+static int	housekeeping_group_sets(int now)
 {
-	int			deleted = 0;
-	zbx_vector_uint64_t	ids_uint64;
-	size_t			sql_alloc = 0, sql_offset;
-	char			*sql = NULL;
+	static int	last_exec_time = 0;
+	int		deleted = 0, rc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_uint64_create(&ids_uint64);
+	if (0 != last_exec_time && SEC_PER_WEEK < now - last_exec_time)
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "Skipping %s(), last time executed at %d", __func__, last_exec_time);
+		goto skip;
+	}
 
-	const char *sql2 = "select u.ugsetid"
-		" from ugset u"
-			" where not exists ("
+	last_exec_time = now;
+
+	if (ZBX_DB_OK <= (rc = zbx_db_execute(
+			"delete from permission where not exists("
 				"select null"
 				" from user_ugset uu"
-				" where u.ugsetid = uu.ugsetid"
-			")";
-
-	while (1)
-	{
-		zbx_db_result_t	result;
-		zbx_db_row_t	row;
-
-		if (0 == config_max_hk_delete)
-			result = zbx_db_select("%s", sql2);
-		else
-			result = zbx_db_select_n(sql2, config_max_hk_delete);
-
-		while (NULL != (row = zbx_db_fetch(result)))
-		{
-			zbx_uint64_t	id;
-
-			ZBX_STR2UINT64(id, row[0]);
-			zbx_vector_uint64_append(&ids_uint64, id);
-		}
-
-		zbx_db_free_result(result);
-
-		if (0 == ids_uint64.values_num)
-			break;
-
-		const char *tables[] = {"permission", "ugset_group", "ugset"};
-#define TABLE_UGSET_IDX	2
-		for (int i = 0; i < (int)ARRSIZE(tables); i++)
-		{
-			int	rc;
-
-			sql_offset = 0;
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where", tables[i]);
-			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "ugsetid", ids_uint64.values,
-					ids_uint64.values_num);
-
-			if (ZBX_DB_OK > (rc = zbx_db_execute("%s", sql)))
-				break;
-
-			if (TABLE_UGSET_IDX == i)
-				deleted += rc;
-		}
-
-		zbx_free(sql);
-		zbx_vector_uint64_clear(&ids_uint64);
-	}
-#undef TABLE_UGSET_IDX
-	zbx_vector_uint64_destroy(&ids_uint64);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
-
-	return deleted;
-}
-
-static int	housekeeping_hostgroup_sets(int config_max_hk_delete)
-{
-	int			deleted = 0;
-	zbx_vector_uint64_t	ids_uint64;
-	size_t			sql_alloc = 0, sql_offset;
-	char			*sql = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_uint64_create(&ids_uint64);
-
-	const char *sql2 = "select h.hgsetid"
-		" from hgset h"
-			" where not exists ("
+				" where permission.ugsetid = uu.ugsetid"
+			") or not exists("
 				"select null"
 				" from host_hgset hh"
-				" where h.hgsetid = hh.hgsetid"
-			")";
-
-	while (1)
+				" where permission.hgsetid = hh.hgsetid"
+			")")))
 	{
-		zbx_db_result_t	result;
-		zbx_db_row_t	row;
-
-		if (0 == config_max_hk_delete)
-			result = zbx_db_select("%s", sql2);
-		else
-			result = zbx_db_select_n(sql2, config_max_hk_delete);
-
-		while (NULL != (row = zbx_db_fetch(result)))
-		{
-			zbx_uint64_t	id;
-
-			ZBX_STR2UINT64(id, row[0]);
-			zbx_vector_uint64_append(&ids_uint64, id);
-		}
-
-		zbx_db_free_result(result);
-
-		if (0 == ids_uint64.values_num)
-			break;
-
-		const char *tables[] = {"permission", "hgset_group", "hgset"};
-#define TABLE_HGSET_IDX	2
-		for (int i = 0; i < (int)ARRSIZE(tables); i++)
-		{
-			int	rc;
-
-			sql_offset = 0;
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where", tables[i]);
-			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", ids_uint64.values,
-					ids_uint64.values_num);
-
-			if (ZBX_DB_OK > (rc = zbx_db_execute("%s", sql)))
-				break;
-
-			if (TABLE_HGSET_IDX == i)
-				deleted += rc;
-		}
-#undef TABLE_HGSET_IDX
-		zbx_free(sql);
-		zbx_vector_uint64_clear(&ids_uint64);
+		deleted += rc;
 	}
 
-	zbx_vector_uint64_destroy(&ids_uint64);
+	if (ZBX_DB_OK <= (rc = zbx_db_execute(
+			"delete from ugset_group where not exists("
+				"select null"
+				" from user_ugset uu"
+				" where ugset_group.ugsetid = uu.ugsetid"
+			")")))
+	{
+		deleted += rc;
+	}
 
+	if (ZBX_DB_OK <= (rc = zbx_db_execute(
+			"delete from ugset where not exists("
+				"select null"
+				" from user_ugset uu"
+				" where ugset.ugsetid = uu.ugsetid"
+			")")))
+	{
+		deleted += rc;
+	}
+
+	if (ZBX_DB_OK <= (rc = zbx_db_execute(
+			"delete from hgset_group where not exists("
+				"select null"
+				" from host_hgset hh"
+				" where hgset_group.hgsetid = hh.hgsetid"
+			")")))
+	{
+		deleted += rc;
+	}
+
+	if (ZBX_DB_OK <= (rc = zbx_db_execute(
+			"delete from hgset where not exists("
+				"select null"
+				" from host_hgset hh"
+				" where hgset.hgsetid = hh.hgsetid"
+			")")))
+	{
+		deleted += rc;
+	}
+skip:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
 
 	return deleted;
@@ -1682,22 +1614,19 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [removing old records]", get_process_type_string(process_type));
 		int	records = housekeeping_proxy_dhistory(now);
 
-		zbx_setproctitle("%s [removing unlinked user group sets]", get_process_type_string(process_type));
-		int	d_ugset = housekeeping_usergroup_sets(housekeeper_args_in->config_max_housekeeper_delete);
-
-		zbx_setproctitle("%s [removing unlinked host group sets]", get_process_type_string(process_type));
-		int	d_hgset = housekeeping_hostgroup_sets(housekeeper_args_in->config_max_housekeeper_delete);
+		zbx_setproctitle("%s [removing unlinked group sets]", get_process_type_string(process_type));
+		int	d_sets = housekeeping_group_sets(now);
 
 		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
 		int	d_cleanup = housekeeping_cleanup(housekeeper_args_in->config_max_housekeeper_delete);
 		sec = zbx_time() - sec;
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items/triggers, %d events, %d problems,"
-				" %d sessions, %d alarms, %d audit, %d autoreg_host, %d records, %d ugset, %d hgset in "
-				ZBX_FS_DBL " sec, %s]",
+				" %d sessions, %d alarms, %d audit, %d autoreg_host, %d records, %d sets in " ZBX_FS_DBL
+				" sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
-				d_problems, d_sessions, d_services, d_audit, d_autoreg_host, records, d_ugset, d_hgset,
-				sec, sleeptext);
+				d_problems, d_sessions, d_services, d_audit, d_autoreg_host, records, d_sets, sec,
+				sleeptext);
 
 		zbx_config_clean(&cfg);
 
@@ -1706,11 +1635,9 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_dc_cleanup_sessions();
 
 		zbx_setproctitle("%s [deleted %d hist/trends, %d items/triggers, %d events, %d sessions, %d alarms,"
-				" %d audit items, %d autoreg_host, %d records, %d ugset, %d hgset in " ZBX_FS_DBL
-				" sec, %s]",
+				" %d audit items, %d autoreg_host, %d records, %d sets in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
-				d_sessions, d_services, d_audit, d_autoreg_host, records, d_ugset, d_hgset, sec,
-				sleeptext);
+				d_sessions, d_services, d_audit, d_autoreg_host, records, d_sets, sec, sleeptext);
 	}
 out:
 	zbx_ipc_async_socket_close(&rtc);
