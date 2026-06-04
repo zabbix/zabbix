@@ -361,7 +361,7 @@ static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_mw_ta
 			zbx_dbconn_prepare_insert(db, &db_insert_es, "event_suppress", "event_suppressid",
 					"eventid", "maintenanceid", "suppress_until", (char *)NULL);
 
-			zbx_db_insert_prepare(&db_insert_ack, "acknowledges", "acknowledgeid",
+			zbx_dbconn_prepare_insert(db, &db_insert_ack, "acknowledges", "acknowledgeid",
 					"eventid", "clock", "action", "suppress_until", "maintenanceid", (char *)NULL);
 		}
 
