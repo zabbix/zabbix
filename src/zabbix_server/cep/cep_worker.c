@@ -157,7 +157,7 @@ static void	cep_worker_add_close_problem(zbx_cep_worker_t *worker, zbx_cep_task_
 	zbx_uint64_t	eventid, userid;
 
 	zbx_cep_deserialize_close_problem(task->message->data, &event, &eventid, &userid);
-	t = cep_create_task_close_event(event, eventid, userid, 0);
+	t = cep_create_task_close_event(event, eventid, userid, 0, 0);
 
 	zbx_mw_queue_lock(worker->base.queue);
 	cep_queue_push((zbx_cep_queue_t *)worker->base.queue, t);
@@ -416,6 +416,32 @@ static void	cep_worker_process_task_remote(zbx_cep_worker_t *worker, zbx_cep_tas
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: process result of CEP operations executed when event occurred     *
+ *                                                                            *
+ * Parameters: ctx    - [IN] event context                                    *
+ *             result - [IN]  CEP evaluation result                           *
+ *             tasks  - [OUT] generated tasks                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_worker_create_tasks_from_occurred_result(zbx_cep_event_t *event, zbx_cep_result_t *result,
+		zbx_vector_mw_task_ptr_t *tasks)
+{
+	if (0 != (result->update_flags & CEP_RESULT_CLOSE_EVENT))
+	{
+		zbx_mw_task_t	*t;
+
+		t = cep_create_task_close_event(result->close_db_event, event->eventid, 0, 0, result->close_ruleid);
+		zbx_vector_mw_task_ptr_append(tasks, t);
+
+		result->close_db_event = NULL;
+	}
+
+	/* reset borrowed db_event */
+	result->db_event = NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: create a problem event for the specified trigger                  *
  *                                                                            *
  * Parameters: worker - [IN]                                                  *
@@ -448,11 +474,14 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 			db_event->trigger.triggerid, db_event->clock, db_event->ns, TRIGGER_VALUE_PROBLEM,
 			db_event->severity, &db_event->tags, db_event->suppress);
 
-	const zbx_cep_rule_t	**rules = NULL;
-	int			rules_num = 0;
-	zbx_cep_config_handle_t	hconfig;
-	zbx_cep_event_context_t	event_ctx = {.db_event = db_event, .event = cep_event_addref(event)};
-	zbx_cep_result_t	result = {0};
+	const zbx_cep_rule_t		**rules = NULL;
+	int				rules_num = 0;
+	zbx_cep_config_handle_t		hconfig;
+	zbx_cep_event_context_t		event_ctx = {.db_event = db_event, .event = cep_event_addref(event)};
+	zbx_cep_result_t		result = {0};
+	zbx_vector_mw_task_ptr_t	tasks;
+
+	zbx_vector_mw_task_ptr_create(&tasks);
 
 	/* cep config returns NULL handle if there are no cep rules to process */
 	if (NULL != (hconfig = zbx_cep_config_open()))
@@ -466,7 +495,9 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 		}
 
 		if (0 != rules_num)
-			cep_event_execute_ops(rules, rules_num, CEP_ON_EVENT_OCCURRED, &event_ctx, &result);
+			cep_event_execute_ops(rules, rules_num, ZBX_CEP_ON_EVENT_OCCURRED, &event_ctx, &result);
+
+		cep_worker_create_tasks_from_occurred_result(event, &result, &tasks);
 	}
 
 	cep_cache_acquire(&cep);
@@ -476,16 +507,15 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	if (0 != rules_num)
 		cep_event_add_to_rules(h, rules, rules_num);
 
-	zbx_vector_mw_task_ptr_t	tasks;
-	int				corr_ret;
+	int	corr_ret;
 
-	zbx_vector_mw_task_ptr_create(&tasks);
 	corr_ret = cep_correlate_db_event(db_event, worker->dbpool, &tasks);
 
 	/* 'close new' operations must skip actions for the problem and generated ok event */
 	if (0 != (corr_ret & CORRELATION_RESULT_CLOSE_NEW))
 		task->action_state = CEP_ACTION_DISABLED;
 
+	/* queue tasks created by cep and correlation */
 	if (0 != tasks.values_num)
 	{
 		zbx_mw_queue_lock(worker->base.queue);
@@ -511,6 +541,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 		zbx_cep_event_handle_release(h);
 out:
 	cep_event_context_clear(&event_ctx);
+	cep_result_clear(&result);
 
 	if (hconfig != NULL)
 	{

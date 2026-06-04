@@ -18,9 +18,6 @@
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
 
-/* TODO: proper execute_when defines */
-#define CEP_ON_EVENT_OCCURRED	1
-
 #include "zbxcep.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
@@ -38,21 +35,29 @@ zbx_cep_event_context_t;
 
 #define CEP_RESULT_UPDATE_EVENT		0x01
 #define CEP_RESULT_UPDATE_DB_EVENT	0x02
-#define CEP_RESULT_UPDATE_CLOSE_EVENT	0x04
-#define CEP_RESULT_UPDATE_COPY_EVENT	0x08
-#define CEP_RESULT_UPDATE_CAUSE_SYMPTOM	0x10
+#define CEP_RESULT_CLOSE_EVENT		0x04
+#define CEP_RESULT_SUPPRESS_EVENT	0x08
+#define CEP_RESULT_COPY_EVENT		0x10
+#define CEP_RESULT_SET_CAUSE_SYMPTOM	0x20
 
+#define CEP_RESULT_TASK_MASK	(CEP_RESULT_CLOSE_EVENT | CEP_RESULT_SUPPRESS_EVENT | CEP_RESULT_COPY_EVENT | \
+				CEP_RESULT_SET_CAUSE_SYMPTOM)
 typedef struct
 {
 	zbx_db_event			*db_event;
 	zbx_cep_event_t			*event;
 
+	zbx_db_event			*close_db_event;
+	zbx_uint64_t			close_ruleid;
 	zbx_uint32_t			update_flags;
+
 	zbx_vector_cep_event_handle_t	to_copy;
 }
 zbx_cep_result_t;
 
 void	cep_event_context_clear(zbx_cep_event_context_t *ctx);
+void	cep_result_clear_borrowed(zbx_cep_result_t *result);
+void	cep_result_clear(zbx_cep_result_t *result);
 
 int	cep_event_match_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t ***matched_rules,
 		int *matched_rules_num, zbx_cep_event_context_t *ctx);
