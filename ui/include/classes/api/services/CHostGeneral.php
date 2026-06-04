@@ -348,7 +348,7 @@ abstract class CHostGeneral extends CHostBase {
 		if ($hgsets) {
 			self::createHgSets($hgsets);
 
-				foreach ($hgsets as $hgset) {
+			foreach ($hgsets as $hgset) {
 				$upd_host_hgsets[] = [
 					'values' => ['hgsetid' => $hgset['hgsetid']],
 					'where' => ['hostid' => $hgset['hostids']]
