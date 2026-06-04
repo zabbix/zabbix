@@ -4055,7 +4055,7 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(triggerdepid, row[0]);
 
-		td = (zbx_dc_trigger_depends_t *)DCfind_id(&config->trigger_depends, triggerdepid,
+		td = (zbx_dc_trigger_depends_t *)DCfind_id(&dc_local()->trigger_depends_links, triggerdepid,
 				sizeof(zbx_dc_trigger_depends_t), &found);
 
 		ZBX_STR2UINT64(td->triggerid_down, row[1]);
@@ -4094,13 +4094,16 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 	/* remove deleted trigger dependencies from buffer */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		if (NULL == (td = (zbx_dc_trigger_depends_t *)zbx_hashset_search(&config->trigger_depends, &rowid)))
-			continue;
-
-		if (NULL == (trigdep_down = (ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_search(&config->trigdeps,
-				&td->triggerid_down)))
+		if (NULL == (td = (zbx_dc_trigger_depends_t *)zbx_hashset_search(&dc_local()->trigger_depends_links,
+				&rowid)))
 		{
-			zbx_hashset_remove_direct(&config->trigger_depends, td);
+			continue;
+		}
+
+		if (NULL == (trigdep_down = (ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_search(
+				&dc_local()->trigger_depends_links, &td->triggerid_down)))
+		{
+			zbx_hashset_remove_direct(&dc_local()->trigger_depends_links, td);
 			continue;
 		}
 
@@ -4115,7 +4118,7 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 			if (FAIL == (index = zbx_vector_ptr_search(&trigdep_down->dependencies, &td->triggerid_up,
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
-				zbx_hashset_remove_direct(&config->trigger_depends, td);
+				zbx_hashset_remove_direct(&dc_local()->trigger_depends_links, td);
 				continue;
 			}
 
@@ -7974,6 +7977,9 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 				config->functions.num_data, config->functions.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __func__,
 				config->triggers.num_data, config->triggers.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() trigger_depends   : %d (%d slots)", __func__,
+				dc_local()->trigger_depends_links.num_data,
+				dc_local()->trigger_depends_links.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : %d (%d slots)", __func__,
 				config->trigdeps.num_data, config->trigdeps.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() trig. tags : %d (%d slots)", __func__,
@@ -8604,7 +8610,6 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	CREATE_HASHSET(config->functions, 0);
 	CREATE_HASHSET(config->triggers, 0);
 	CREATE_HASHSET(config->trigdeps, 0);
-	CREATE_HASHSET(config->trigger_depends, 0);
 	CREATE_HASHSET(config->hosts, 10);
 	CREATE_HASHSET(config->proxies, 0);
 	CREATE_HASHSET(config->host_inventories, 0);

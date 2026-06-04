@@ -29,6 +29,8 @@ void	zbx_dc_config_local_init(void)
 
 	zbx_hashset_create(&config_local->item_tag_links, 0, ZBX_DEFAULT_ID_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&config_local->trigger_depends_links, 0, ZBX_DEFAULT_ID_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	config_local->correlation_config = correlation_config_create();
 
@@ -59,6 +61,7 @@ void	zbx_dc_config_local_release(void)
 	if (1 != atomic_fetch_sub(&config_local_refcount, 1))
 		return;
 
+	zbx_hashset_destroy(&config_local->trigger_depends_links);
 	zbx_hashset_destroy(&config_local->item_tag_links);
 	correlation_config_destroy(config_local->correlation_config);
 	zbx_free(config_local);

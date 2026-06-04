@@ -223,7 +223,7 @@ class testTriggerCEP extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'LogFileSize' => 0,
-				'DebugLevel' => 4,
+				'DebugLevel' => 3,
 			]
 		];
 	}
