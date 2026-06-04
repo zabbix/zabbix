@@ -426,7 +426,7 @@ static zbx_trend_state_t	trends_eval(const char *table, zbx_uint64_t itemid, tim
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_trend_state_t	state;
 
-	zbx_recalc_time_period(&start, ZBX_RECALC_TIME_PERIOD_TRENDS);
+	zbx_recalc_time_period(&start, ZBX_RECALC_TIME_PERIOD_TRENDS, ITEM_VALUE_TYPE_NONE);
 
 	if (start > end)
 		return ZBX_TREND_STATE_NODATA;
@@ -488,7 +488,7 @@ static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid,
 	zbx_trend_state_t	state;
 	double			avg, num, num2, avg2;
 
-	zbx_recalc_time_period(&start, ZBX_RECALC_TIME_PERIOD_TRENDS);
+	zbx_recalc_time_period(&start, ZBX_RECALC_TIME_PERIOD_TRENDS, ITEM_VALUE_TYPE_NONE);
 
 	if (start > end)
 		return ZBX_TREND_STATE_NODATA;
@@ -556,7 +556,7 @@ static zbx_trend_state_t	trends_eval_sum(const char *table, zbx_uint64_t itemid,
 	size_t		sql_alloc = 0, sql_offset = 0;
 	double		sum = 0;
 
-	zbx_recalc_time_period(&start, ZBX_RECALC_TIME_PERIOD_TRENDS);
+	zbx_recalc_time_period(&start, ZBX_RECALC_TIME_PERIOD_TRENDS, ITEM_VALUE_TYPE_NONE);
 
 	if (start > end)
 		return ZBX_TREND_STATE_NODATA;
