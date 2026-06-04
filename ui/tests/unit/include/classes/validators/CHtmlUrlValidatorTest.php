@@ -17,23 +17,6 @@
 use PHPUnit\Framework\TestCase;
 
 class CHtmlUrlValidatorTest extends TestCase {
-	protected function setUp(): void {
-		$settings = $this->createMock(CSettings::class);
-		$settings->method('get')
-			->will($this->returnValue([
-				CSettingsHelper::VALIDATE_URI_SCHEMES => '1',
-				CSettingsHelper::URI_VALID_SCHEMES => 'http,https,ftp,file,mailto,tel,ssh'
-			]));
-
-		$instances_map = [
-			['settings', $settings]
-		];
-		$api_service_factory = $this->createMock(CApiServiceFactory::class);
-		$api_service_factory->method('getObject')
-			->will($this->returnValueMap($instances_map));
-
-		API::setApiServiceFactory($api_service_factory);
-	}
 
 	public function dataProviderValidateSameSiteURL() {
 		return [
