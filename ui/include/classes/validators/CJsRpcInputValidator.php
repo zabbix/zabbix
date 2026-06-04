@@ -58,10 +58,9 @@ class CJsRpcInputValidator {
 
 			case 'patternselect.get':
 				return self::validatePatternselectGet($data);
-
-			default:
-				return false;
 		}
+
+		return false;
 	}
 
 	/**
@@ -97,9 +96,10 @@ class CJsRpcInputValidator {
 	private static function validateZabbixStatus(array $data): bool {
 		$error = '';
 
-		// None of these parameters are actually used in jsrpc.php.
 		$rules = ['type' => API_OBJECT, 'fields' => [
 			'method' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => 'zabbix.status'],
+
+			// None of these parameters are actually used in jsrpc.php.
 			'jsonrpc' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'id' => ['type' => API_JSONRPC_ID, 'flags' => API_REQUIRED],
 			'params' => ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
@@ -197,11 +197,7 @@ class CJsRpcInputValidator {
 				'triggers', 'users', 'usersGroups', 'drules', 'api_methods', 'valuemap_names', 'valuemaps', 'sla',
 				'proxies',  'roles', 'dashboard', 'services', 'sysmaps'
 			])],
-
-			// Multiselect without search would be pointless, therefor it is always required and mandatory.
 			'search' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-
-			// Commonly passed parameters for multiselects. But not actually used in jsrpc.php.
 			'curtime' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'_' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'limit' => ['type' => API_INT32, 'flags' => API_REQUIRED]
@@ -392,9 +388,6 @@ class CJsRpcInputValidator {
 			case 'services':
 			case 'sysmaps':
 				return true;
-
-			default:
-				return false;
 		}
 
 		return CApiInputValidator::validate($rules, $data, '/', $error);
@@ -417,11 +410,7 @@ class CJsRpcInputValidator {
 			'object_name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['hosts',
 				'items'
 			])],
-
-			// Patternselect without search would be pointless, therefore it is always required and mandatory.
 			'search' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-
-			// Commonly passed parameters for multiselects. But not actually used in jsrpc.php.
 			'curtime' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'_' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'limit' => ['type' => API_INT32, 'flags' => API_REQUIRED]
@@ -450,10 +439,6 @@ class CJsRpcInputValidator {
 					'wildcard_allowed' => ['type' => API_INT32]
 				]];
 				break;
-
-				// jsrpc.php uses "patternselect.get" for graphs, but none of UI components actually call it.
-			default:
-				return false;
 		}
 
 		return CApiInputValidator::validate($rules, $data, '/', $error);
