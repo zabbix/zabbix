@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -40,17 +40,85 @@ class CZabbixClient extends CZabbixServer {
 	/**
 	 * Send value for items to server/proxy.
 	 *
-	 * @param string $type      data type
-	 * @param array  $values    trapper values
+	 * @param string  $type      data type
+	 * @param array   $values    trapper values
+	 * @param integer $time      clock
 	 *
 	 * @return array|false    array with result data or false otherwise
 	 */
-	public function sendDataValues($type, $values) {
+	public function sendDataValues($type, $values, $time = null) {
 		$response = parent::request([
 			'request' => $type.' data',
 			'data' => $values,
-			'clock' => time(),
+			'clock' => $time ?? time(),
 			'ns' => 0
+		]);
+
+		if ($response !== false && $this->error === null) {
+			$result = [];
+
+			foreach (explode('; ', $response) as $line) {
+				$parts = explode(': ', $line);
+				if (count($parts) !== 2) {
+					continue;
+				}
+
+				$result[$parts[0]] = floatval($parts[1]);
+			}
+
+			return $result;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Send item values to server/proxy using the agent data protocol (variant 2).
+	 *
+	 * When $proxy is specified, the values are sent as a 'proxy data' request impersonating
+	 * the named proxy instead of the active agent protocol.
+	 *
+	 * @param array       $data       item values, each with keys: itemid, value, clock, ns
+	 * @param string      $session    agent/proxy session identifier
+	 * @param string      $host       host name
+	 * @param string      $version    agent/proxy version
+	 * @param string|null $proxy      proxy name to send as, or null for agent data
+	 *
+	 * @return array|bool    array with result data, true for proxy data on success, or false otherwise
+	 */
+	public function sendAgentDataValues(array $data, string $session, string $host, string $version = ZABBIX_VERSION,
+			$proxy = null) {
+		$id = 1;
+		foreach ($data as &$item) {
+			$item['id'] = $id++;
+		}
+		unset($item);
+
+		if ($proxy !== null) {
+			$response = parent::request([
+				'request' => 'proxy data',
+				'session' => $session,
+				'version' => $version,
+				'host' => $proxy,
+				'history data' => $data,
+				'clock' => time(),
+				'ns' => 0
+			]);
+
+			if ($response !== false && $this->error === null) {
+				return true;
+			}
+
+			return false;
+		}
+
+		$response = parent::request([
+			'request' => 'agent data',
+			'data' => $data,
+			'session' => $session,
+			'host' => $host,
+			'version' => $version,
+			'variant' => 2
 		]);
 
 		if ($response !== false && $this->error === null) {

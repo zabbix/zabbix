@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -964,7 +964,7 @@ window.widget_svggraph_form = new class {
 				};
 
 				if (dataset.itemids !== undefined) {
-					for (const [item_index, itemid] of dataset.itemids.entries()) {
+					for (const [item_index, itemid] of Object.entries(dataset.itemids)) {
 						if (itemid === '0') {
 							const resolved_itemid = this.#resolveWidget(dataset.references[item_index]);
 

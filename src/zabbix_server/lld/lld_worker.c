@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -249,6 +249,9 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 		}
 
 		zbx_ipc_message_clean(&message);
+#ifdef HAVE_MALLOC_TRIM
+		zbx_malloc_trim(time(NULL), 0, ZBX_MEBIBYTE * 8);
+#endif
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

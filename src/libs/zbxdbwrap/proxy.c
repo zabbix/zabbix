@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -867,14 +867,6 @@ static void	log_client_timediff(int level, struct zbx_json_parse *jp, const zbx_
 	}
 }
 
-static void	adjust_time(zbx_timespec_t *unique_shift, zbx_agent_value_t *av)
-{
-	av->ts.sec += unique_shift->sec;
-	av->ts.ns = unique_shift->ns++;
-
-	zbx_timespec_normalize(unique_shift);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: parses agent value from history data json row                     *
@@ -905,17 +897,14 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 		if (FAIL == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc, NULL))
 		{
 			/* ensure unique value timestamp (clock, ns) if only clock is available */
-			adjust_time(unique_shift, av);
+			av->ts.sec += unique_shift->sec;
+			av->ts.ns = unique_shift->ns++;
+			zbx_timespec_normalize(unique_shift);
 		}
-		else if (SUCCEED == zbx_is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns), 0LL,
-				999999999LL))
+		else if (FAIL == zbx_is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns), 0LL, 999999999LL))
 		{
-			/* adjust ns for older systems where sometimes ns == 0 */
-			if (av->ts.ns == 0)
-				adjust_time(unique_shift, av);
-		}
-		else
 			goto out;
+		}
 	}
 	else
 		zbx_timespec(&av->ts);
@@ -1808,16 +1797,20 @@ static void	zbx_dservice_ptr_free(zbx_dservice_t *service)
 	zbx_free(service);
 }
 
-static void	zbx_drule_ip_free(zbx_drule_ip_t *ip)
+static void	zbx_drule_ip_free(void *ptr)
 {
+	zbx_drule_ip_t	*ip = (zbx_drule_ip_t*)ptr;
+
 	zbx_vector_dservice_ptr_clear_ext(&ip->services, zbx_dservice_ptr_free);
 	zbx_vector_dservice_ptr_destroy(&ip->services);
 	zbx_free(ip);
 }
 
-static void	zbx_drule_free(zbx_drule_t *drule)
+static void	zbx_drule_free(void *ptr)
 {
-	zbx_vector_ptr_clear_ext(&drule->ips, (zbx_clean_func_t)zbx_drule_ip_free);
+	zbx_drule_t	*drule = (zbx_drule_t*)ptr;
+
+	zbx_vector_ptr_clear_ext(&drule->ips, zbx_drule_ip_free);
 	zbx_vector_ptr_destroy(&drule->ips);
 	zbx_vector_uint64_destroy(&drule->dcheckids);
 	zbx_free(drule);
@@ -2233,7 +2226,7 @@ json_parse_error:
 json_parse_return:
 	zbx_free(value);
 
-	zbx_vector_ptr_clear_ext(&drules, (zbx_clean_func_t)zbx_drule_free);
+	zbx_vector_ptr_clear_ext(&drules, zbx_drule_free);
 	zbx_vector_ptr_destroy(&drules);
 	zbx_vector_discoverer_drule_error_clear_ext(&drule_errors, zbx_discoverer_drule_error_free);
 	zbx_vector_discoverer_drule_error_destroy(&drule_errors);

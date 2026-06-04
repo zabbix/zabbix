@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -131,8 +131,8 @@ window.mediatype_edit_popup = new class {
 
 		// Trim all string values within the 'parameters_webhook' object.
 		if (typeof fields.parameters_webhook !== 'undefined') {
-			fields.parameters_webhook.name = fields.parameters_webhook.name.map((name) => name.trim());
-			fields.parameters_webhook.value = fields.parameters_webhook.value.map((value) => value.trim());
+			fields.parameters_webhook.name = Object.values(fields.parameters_webhook.name).map(name => name.trim());
+			fields.parameters_webhook.value = Object.values(fields.parameters_webhook.value).map(value => value.trim());
 		}
 
 		// Trim all string values within the 'parameters_exec' object.

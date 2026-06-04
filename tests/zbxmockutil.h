@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,6 +20,7 @@
 
 const char	*zbx_mock_get_parameter_string(const char *path);
 const char	*zbx_mock_get_optional_parameter_string(const char *path);
+const char	*zbx_mock_get_optional_object_member_string(zbx_mock_handle_t object, const char *name);
 const char	*zbx_mock_get_object_member_string(zbx_mock_handle_t object, const char *name);
 
 zbx_mock_handle_t	zbx_mock_get_parameter_handle(const char *path);

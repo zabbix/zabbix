@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -59,6 +59,9 @@ require_once dirname(__FILE__).'/testUserMacrosWithContext.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContextRegex.php';
 require_once dirname(__FILE__).'/testLLDLinking.php';
 require_once dirname(__FILE__).'/testCalculatedExpression.php';
+require_once dirname(__FILE__).'/testDiagInfo.php';
+require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
+/* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
 
 use PHPUnit\Framework\TestSuite;
 
@@ -88,6 +91,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testServiceRoles');
 		$suite->addTestSuite('testMacros');
 		$suite->addTestSuite('testExpressionTriggerMacros');
+		$suite->addTestSuite('testAgentItems');
 		$suite->addTestSuite('testScriptItems');
 		$suite->addTestSuite('testItemRate');
 		$suite->addTestSuite('testHistoryValueDuplicates');
@@ -113,6 +117,9 @@ class IntegrationTests {
 		$suite->addTestSuite('testUserMacrosWithContextRegex');
 		$suite->addTestSuite('testLLDLinking');
 		$suite->addTestSuite('testCalculatedExpression');
+		$suite->addTestSuite('testDiagInfo');
+		$suite->addTestSuite('testLLDHistorySyncAtScale');
+		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		return $suite;
 	}
 }

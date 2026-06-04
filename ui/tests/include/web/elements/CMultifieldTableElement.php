@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -330,7 +330,7 @@ class CMultifieldTableElement extends CTableElement {
 	 */
 	public function addRow($values) {
 		$rows = $this->getRows()->count();
-		$this->query('button:Add')->one()->click();
+		$this->query('button:Add')->one()->hoverMouse()->click();
 
 		// Wait until new table row appears.
 		$this->query('xpath:.//'.CXPathHelper::fromSelector($this->selectors['row']).'['.($rows + 1).']')->waitUntilPresent();

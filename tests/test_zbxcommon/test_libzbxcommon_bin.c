@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,6 +25,7 @@ ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "common_progname")
 
 int	main(void)
 {
+	/* intentionally not specifying the backtrace, to avoid dependencies on zbxnix/zbxwin32 */
 	zbx_init_library_common(zbx_log_impl, get_zbx_progname, NULL);
 
 	return SUCCEED;

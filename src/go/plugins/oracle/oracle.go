@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -84,10 +84,7 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 		return nil, errs.Wrap(err, "get connection failed")
 	}
 
-	timeout := conn.GetCallTimeout()
-	if timeout < time.Second*time.Duration(pluginCtx.Timeout()) {
-		timeout = time.Second * time.Duration(pluginCtx.Timeout())
-	}
+	timeout := max(conn.GetCallTimeout(), time.Second*time.Duration(pluginCtx.Timeout()))
 
 	ctx, cancel := conn.GetContextWithTimeout(timeout)
 	defer cancel()

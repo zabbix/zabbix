@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -662,7 +662,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 		{
 			/* try to get 'stack' property of the object on stack, assuming it's an Error object */
 			if (0 != (rc = duk_get_prop_string(es->env->ctx, -1, "stack")))
-				*error = zbx_strdup(*error, duk_get_string(es->env->ctx, -1));
+				*error = zbx_strdup(*error, duk_safe_to_string(es->env->ctx, -1));
 
 			duk_pop(es->env->ctx);
 		}

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -3582,6 +3582,24 @@ int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid)
 
 	if (NULL != zbx_hashset_search(&cache->history_items, &itemid))
 		ret = SUCCEED;
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+int	zbx_hc_is_itemid_cached_and_normal(zbx_uint64_t itemid)
+{
+	int		ret = FAIL;
+	zbx_hc_item_t	*item;
+
+	LOCK_CACHE;
+
+	if (NULL != (item = (zbx_hc_item_t *)zbx_hashset_search(&cache->history_items, &itemid)) &&
+			NULL != item->tail && ITEM_STATE_NORMAL == item->tail->state)
+	{
+			ret = SUCCEED;
+	}
 
 	UNLOCK_CACHE;
 
