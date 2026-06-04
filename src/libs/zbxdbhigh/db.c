@@ -782,8 +782,24 @@ int	zbx_db_check_serverid(void)
 		if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str,value_int) values"
 				"('serverid',1,'%s',0)", uuid7))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot insert serverid into settings table");
-			ret = FAIL;
+			/* INSERT may fail if a concurrent HA node has already inserted the   */
+			/* serverid row. Re-verify the row exists before treating this as     */
+			/* fatal.                                                             */
+			zbx_db_free_result(result);
+
+			if (NULL == (result = zbx_db_select("select value_str from settings where name='serverid'")))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot insert serverid into settings table");
+				zbx_free(uuid7);
+				ret = FAIL;
+				goto out;
+			}
+
+			if (NULL == zbx_db_fetch(result))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot insert serverid into settings table");
+				ret = FAIL;
+			}
 		}
 
 		zbx_free(uuid7);
