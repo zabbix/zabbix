@@ -1684,7 +1684,7 @@ class CUser extends CApiService {
 		$ins_user_ugsets = [];
 		$upd_user_ugsets = [];
 
-		$db_user_ugsetids = self::getDbUserUgSetIds($ugsets);
+		$db_userids = self::getDbUserIdsWithUgsets($ugsets);
 
 		$empty_ugset_hash = self::getUgSetHash([]);
 
@@ -1704,9 +1704,9 @@ class CUser extends CApiService {
 				$upd_userids = [];
 
 				foreach ($ugsets[$row['hash']]['userids'] as $userid) {
-					if (array_key_exists($userid, $db_user_ugsetids)) {
+					if (array_key_exists($userid, $db_userids)) {
 						$upd_userids[] = $userid;
-						unset($db_user_ugsetids[$userid]);
+						unset($db_userids[$userid]);
 					}
 					else {
 						$ins_user_ugsets[] = [
@@ -1733,9 +1733,9 @@ class CUser extends CApiService {
 					$upd_userids = [];
 
 					foreach ($ugset['userids'] as $userid) {
-						if (array_key_exists($userid, $db_user_ugsetids)) {
+						if (array_key_exists($userid, $db_userids)) {
 							$upd_userids[] = $userid;
-							unset($db_user_ugsetids[$userid]);
+							unset($db_userids[$userid]);
 						}
 						else {
 							$ins_user_ugsets[] = [
@@ -1764,7 +1764,7 @@ class CUser extends CApiService {
 		}
 	}
 
-	private static function getDbUserUgSetIds(array $ugsets): array {
+	private static function getDbUserIdsWithUgsets(array $ugsets): array {
 		$userids = [];
 
 		foreach ($ugsets as $ugset) {
@@ -1772,18 +1772,18 @@ class CUser extends CApiService {
 		}
 
 		$options = [
-			'output' => ['userid', 'ugsetid'],
+			'output' => ['userid'],
 			'userids' => $userids
 		];
 		$result = DBselect(DB::makeSql('user_ugset', $options));
 
-		$db_user_ugsetids = [];
+		$db_userids = [];
 
 		while ($row = DBfetch($result)) {
-			$db_user_ugsetids[$row['userid']] = $row['ugsetid'];
+			$db_userids[$row['userid']] = true;
 		}
 
-		return $db_user_ugsetids;
+		return $db_userids;
 	}
 
 	private static function createUgSets(array &$ugsets): void {
@@ -2034,7 +2034,6 @@ class CUser extends CApiService {
 		$db_users = $this->get([
 			'output' => ['userid', 'username', 'roleid'],
 			'selectRole' => ['type'],
-			'selectUsrgrps' => ['usrgrpid'],
 			'userids' => $userids,
 			'editable' => true,
 			'preservekeys' => true
