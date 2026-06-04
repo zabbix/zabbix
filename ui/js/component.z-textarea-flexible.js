@@ -213,19 +213,29 @@ class ZTextareaFlexible extends HTMLElement {
 	#addEventListeners() {
 		this.#textarea.addEventListener('input', this.#inputHandler);
 		this.#textarea.addEventListener('keydown', this.#keydownHandler);
+		this.#textarea.addEventListener('focusout', this.#focusoutHandler);
 		this.#textarea.addEventListener('blur', this.#blurHandler);
+		this.#textarea.addEventListener('focusin', this.#focusinHandler);
 		this.#textarea.addEventListener('focus', this.#focusHandler);
 	}
 
 	#removeEventListeners() {
 		this.#textarea.removeEventListener('input', this.#inputHandler);
 		this.#textarea.removeEventListener('keydown', this.#keydownHandler);
+		this.#textarea.removeEventListener('focusout', this.#focusoutHandler);
 		this.#textarea.removeEventListener('blur', this.#blurHandler);
+		this.#textarea.removeEventListener('focusin', this.#focusinHandler);
 		this.#textarea.removeEventListener('focus', this.#focusHandler);
 	}
 
 	#inputHandler = (e) => {
 		this.value = e.target.value;
+
+		e.stopPropagation();
+
+		this.dispatchEvent(new CustomEvent('input', {
+			bubbles: true
+		}));
 	}
 
 	#keydownHandler = (e) => {
@@ -235,10 +245,36 @@ class ZTextareaFlexible extends HTMLElement {
 		}
 	}
 
+	#focusoutHandler = (e) => {
+		e.stopPropagation();
+
+		this.#textarea.spellcheck = false;
+
+		this.dispatchEvent(new FocusEvent(e.type, {
+			bubbles: true,
+			relatedTarget: e.relatedTarget
+		}));
+	}
+
 	#blurHandler = (e) => {
 		this.#textarea.spellcheck = false;
 
-		this.dispatchEvent(new FocusEvent(e.type));
+		this.dispatchEvent(new FocusEvent(e.type, {
+			relatedTarget: e.relatedTarget
+		}));
+	}
+
+	#focusinHandler = (e) => {
+		e.stopPropagation();
+
+		if (this.#is_spellcheck_allowed) {
+			this.#textarea.spellcheck = true;
+		}
+
+		this.dispatchEvent(new FocusEvent(e.type, {
+			bubbles: true,
+			relatedTarget: e.relatedTarget
+		}));
 	}
 
 	#focusHandler = (e) => {
@@ -246,7 +282,9 @@ class ZTextareaFlexible extends HTMLElement {
 			this.#textarea.spellcheck = true;
 		}
 
-		this.dispatchEvent(new FocusEvent(e.type));
+		this.dispatchEvent(new FocusEvent(e.type, {
+			relatedTarget: e.relatedTarget
+		}));
 	}
 
 	get autofocus() {

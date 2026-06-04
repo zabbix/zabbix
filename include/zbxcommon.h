@@ -225,6 +225,9 @@ typedef enum
 	ITEM_VALUE_TYPE_NONE	/* Artificial value, not written into DB, used internally in server. */
 }
 zbx_item_value_type_t;
+
+#define ITEM_VALUE_TYPE_COUNT	(ITEM_VALUE_TYPE_JSON + 1)
+
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
 
 typedef struct
@@ -236,6 +239,16 @@ typedef struct
 	char	*value;
 }
 zbx_log_value_t;
+
+typedef union
+{
+	double		dbl;
+	zbx_uint64_t	ui64;
+	char		*str;
+	char		*err;
+	zbx_log_value_t	*log;
+}
+zbx_history_value_t;
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -415,8 +428,8 @@ void	zbx_this_should_never_happen_backtrace(void);
 do														\
 {														\
 	zbx_this_should_never_happen_backtrace();								\
-	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something unexpected has just "	\
-			"happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
+	zbx_error("ERROR [file and function: %s:%d,%s, revision:%s] Something unexpected has just"		\
+			" happened.", __FILE__, __LINE__, __func__, ZABBIX_REVISION);				\
 }														\
 while (0)
 

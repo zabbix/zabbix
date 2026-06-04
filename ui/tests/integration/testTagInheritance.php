@@ -124,6 +124,7 @@ class testTagInheritance extends CIntegrationTest {
 			'key_' => self::TEMPLATE_ITEM_KEY_PREFIX . $n,
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'tags' => [
 				[
 					'tag' => self::TEMPLATE_ITEM_TAG_NAME_PREFIX . $n,
@@ -322,6 +323,7 @@ class testTagInheritance extends CIntegrationTest {
 			'key_' => self::HOST_ITEM_KEY,
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'tags' => [
 				[
 					'tag' => self::HOST_ITEM_TAG_NAME,

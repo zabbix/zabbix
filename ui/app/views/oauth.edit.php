@@ -251,7 +251,7 @@ $form_grid->addItem(
 );
 
 $output = [
-	'header' => $data['update'] ? _('OAuth') : _('New oauth'),
+	'header' => $data['update'] ? _('OAuth') : _('New OAuth'),
 	'body' => $form->addItem($form_grid)->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().$this->readJsFile('oauth.edit.js.php')

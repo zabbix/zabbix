@@ -117,7 +117,8 @@ class testHostConnMacroValidation extends CIntegrationTest {
 			'name' => self::ITEM_TRAP,
 			'key_' => self::ITEM_TRAP,
 			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_UINT64
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));

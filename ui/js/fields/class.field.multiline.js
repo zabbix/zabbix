@@ -18,6 +18,24 @@ class CFieldMultiline extends CField {
 	init() {
 		super.init();
 		jQuery(this._field).on('change', () => this.fieldChanged());
+
+		const edit_button = this._field.querySelector('button.zi-pencil');
+
+		edit_button.addEventListener('focusout', () => {
+			setTimeout(() => {
+				if (!this._field.isConnected || $(this._field).data('multilineInput').options.disabled
+						|| $(this._field).data('multilineInput').options.readonly) {
+					return;
+				}
+
+				let element = overlays_stack.end()?.element;
+				element = element instanceof jQuery ? element[0] : element;
+
+				if (!edit_button.contains(document.activeElement) && !edit_button.contains(element)) {
+					this.onBlur();
+				}
+			});
+		});
 	}
 
 	getValueTrimmed() {

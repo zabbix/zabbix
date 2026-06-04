@@ -134,7 +134,7 @@ void	zbx_block_thread_signals(sigset_t *orig_mask);
 void	zbx_unblock_signals(const sigset_t *orig_mask);
 
 void	zbx_set_exit_on_terminate(void);
-void	zbx_unset_exit_on_terminate(void);
+void	zbx_unset_exit_on_terminate(zbx_on_exit_t on_exit_cb);
 
 void	zbx_log_exit_signal(void);
 void	zbx_set_on_exit_args(void *args);

@@ -1068,7 +1068,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 							$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-negative').']')->all()->count()
 					);
 					$text = $this->query('xpath://tr[1]//button[@data-hintbox]')->one()
-							->getAttribute('data-hintbox-contents');
+							->getAttribute('data-hintbox-html');
 					foreach ($constructor['errors'] as $error) {
 						$this->assertStringContainsString($error, $text);
 					}
@@ -1237,12 +1237,11 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 	 * @param string $name name of a host or template where triggers are opened
 	 */
 	private function filterEntriesAndOpenDiscovery($name, $form) {
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('button:Reset')->one()->click();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$form->waitUntilStalled();
-		$table->waitUntilReloaded();
+		$table = $this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
 		$table->findRow('Name', $name)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

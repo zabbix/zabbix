@@ -129,7 +129,7 @@ $house_keeper_tab = (new CFormList())
 				? makeWarningIcon(
 					_('This setting should be enabled, because history tables contain compressed chunks.')
 				)
-					->addStyle('display:none;')
+					->addStyle('display: none;')
 					->addClass('js-hk-history-warning')
 				: null
 		], 'hk_history_global'),
@@ -138,14 +138,46 @@ $house_keeper_tab = (new CFormList())
 			->setUncheckedValue(0),
 	)
 	->addRow(
-		(new CLabel(_('Data storage period'), 'hk_history'))
+		(new CLabel([
+			_('Data storage period'),
+			$data['value_type_storage']
+				? makeWarningIcon(
+					_('This setting does not affect Elasticsearch and ClickHouse storage periods.')
+				)
+				: null
+		], 'hk_history'))
 			->setAsteriskMark(),
 		(new CTextBox('hk_history', $data['hk_history'], false, CSettingsSchema::getFieldLength('hk_history')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_history_global'] == 1)
 			->setAriaRequired()
-	)
-	->addRow((new CTag('h4', true, _('Trends')))->addClass('input-section-header'))
+	);
+
+foreach ([ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC] as $storage_type) {
+	$value_type_storage = array_filter($data['value_type_storage'], static fn($s) => $s['provider'] === $storage_type);
+
+	if (!$value_type_storage) {
+		continue;
+	}
+
+	$house_keeper_tab->addRow(
+		(new CTag('p', true, match ($storage_type) {
+			ZBX_HISTORY_SOURCE_CLICKHOUSE => _s('%1$s data storage period', _('ClickHouse')),
+			ZBX_HISTORY_SOURCE_ELASTIC => _s('%1$s data storage period', _('Elasticsearch'))
+		}))->addClass('input-section-header')
+	);
+
+	foreach ($value_type_storage as $value_type => $storage) {
+		$house_keeper_tab->addRow(
+			new CLabel(itemValueTypeString($value_type)),
+			$storage['value_ttl'] === null
+				? _('Unknown')
+				: convertSecondsToTimeUnits($storage['value_ttl'])
+		);
+	}
+}
+
+$house_keeper_tab->addRow((new CTag('h4', true, _('Trends')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_trends_mode'),
 		(new CCheckBox('hk_trends_mode'))
@@ -157,7 +189,7 @@ $house_keeper_tab = (new CFormList())
 			_('Override item trend period'),
 			array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS, $data)
 				? makeWarningIcon(_('This setting should be enabled, because trend tables contain compressed chunks.'))
-					->addStyle('display:none;')
+					->addStyle('display: none;')
 					->addClass('js-hk-trends-warning')
 				: null
 		], 'hk_trends_global'),
@@ -166,7 +198,12 @@ $house_keeper_tab = (new CFormList())
 			->setUncheckedValue(0)
 	)
 	->addRow(
-		(new CLabel(_('Data storage period'), 'hk_trends'))
+		(new CLabel([
+			_('Data storage period'),
+			$data['trends_storage_hint']
+				? makeWarningIcon(_('Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse.'))
+				: null
+		], 'hk_trends'))
 			->setAsteriskMark(),
 		(new CTextBox('hk_trends', $data['hk_trends'], false, CSettingsSchema::getFieldLength('hk_trends')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)

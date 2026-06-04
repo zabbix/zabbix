@@ -18,6 +18,7 @@
 #include "zbxcomms.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxip.h"
 
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)
@@ -86,9 +87,19 @@ int	net_tcp_port(AGENT_REQUEST *request, AGENT_RESULT *result)
 	port_str = get_rparam(request, 1);
 
 	if (NULL == ip_str || '\0' == *ip_str)
+	{
 		zbx_strscpy(ip, "127.0.0.1");
+	}
 	else
+	{
+		if (FAIL == zbx_is_ip(ip_str) && FAIL == zbx_is_rfc_extended_hostname(ip_str))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return SYSINFO_RET_FAIL;
+		}
+
 		zbx_strscpy(ip, ip_str);
+	}
 
 	if (NULL == port_str || SUCCEED != zbx_is_ushort(port_str, &port))
 	{

@@ -895,14 +895,6 @@ static void	log_client_timediff(int level, struct zbx_json_parse *jp, const zbx_
 	}
 }
 
-static void	adjust_time(zbx_timespec_t *unique_shift, zbx_agent_value_t *av)
-{
-	av->ts.sec += unique_shift->sec;
-	av->ts.ns = unique_shift->ns++;
-
-	zbx_timespec_normalize(unique_shift);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: parses agent value from history data json row                     *
@@ -951,10 +943,6 @@ static void	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zb
 			if (SUCCEED == zbx_is_uint_n_range(*tmp, *tmp_alloc, &av->ts.ns, sizeof(av->ts.ns), 0LL,
 					999999999LL))
 			{
-				/* adjust ns for older systems where sometimes ns == 0 */
-				if (av->ts.ns == 0)
-					adjust_time(unique_shift, av);
-
 				found_ns = SUCCEED;
 			}
 			else
@@ -1000,7 +988,9 @@ static void	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zb
 		if (FAIL == found_ns)
 		{
 			/* ensure unique value timestamp (clock, ns) if only clock is available */
-			adjust_time(unique_shift, av);
+			av->ts.sec += unique_shift->sec;
+			av->ts.ns = unique_shift->ns++;
+			zbx_timespec_normalize(unique_shift);
 		}
 	}
 	else
@@ -1423,7 +1413,9 @@ static int	agent_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *soc
 static int	sender_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *sock, void *args, char **error)
 {
 	zbx_host_rights_t	*rights;
-	char			key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char			key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *allowed_peers;
+	int			ret = FAIL;
+	zbx_dc_um_handle_t	*um_handle;
 
 	if (HOST_MONITORED_BY_SERVER != item->host.monitored_by)
 	{
@@ -1454,26 +1446,19 @@ static int	sender_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *so
 			return FAIL;
 	}
 
-	if ('\0' != *item->trapper_hosts)	/* list of allowed hosts not empty */
+	allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
+	um_handle = zbx_dc_open_user_macros();
+	zbx_substitute_macros(&allowed_peers, NULL, 0, zbx_macro_allowed_hosts_resolv, um_handle, item);
+	ret = zbx_tcp_check_allowed_peers(sock, allowed_peers);
+	zbx_free(allowed_peers);
+	zbx_dc_close_user_macros(um_handle);
+
+	if (FAIL == ret)
 	{
-		char			*allowed_peers;
-		int			ret;
-		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
-
-		allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
-		zbx_substitute_macros(&allowed_peers, NULL, 0, zbx_macro_allowed_hosts_resolv, um_handle, item);
-		ret = zbx_tcp_check_allowed_peers(sock, allowed_peers);
-		zbx_free(allowed_peers);
-
-		zbx_dc_close_user_macros(um_handle);
-
-		if (FAIL == ret)
-		{
-			*error = zbx_dsprintf(*error, "cannot process item \"%s\" trap: %s",
-					zbx_truncate_itemkey(item->key_orig, VALUE_ERRMSG_MAX, key_short,
-					sizeof(key_short)), zbx_socket_strerror());
-			return FAIL;
-		}
+		*error = zbx_dsprintf(*error, "cannot process item \"%s\" trap: %s",
+				zbx_truncate_itemkey(item->key_orig, VALUE_ERRMSG_MAX, key_short,
+				sizeof(key_short)), zbx_socket_strerror());
+		return FAIL;
 	}
 
 	rights = (zbx_host_rights_t *)args;

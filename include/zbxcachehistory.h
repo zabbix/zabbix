@@ -28,7 +28,7 @@
 #define ZBX_HC_SYNC_TIME_MAX	10
 
 /* the maximum number of items in one synchronization batch */
-#define ZBX_HC_SYNC_MAX		1000
+#define ZBX_HC_SYNC_MAX		2000
 #define ZBX_HC_TIMER_MAX	(ZBX_HC_SYNC_MAX / 2)
 #define ZBX_HC_TIMER_SOFT_MAX	(ZBX_HC_TIMER_MAX - 10)
 
@@ -163,7 +163,7 @@ void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff,
 		const zbx_vector_inventory_value_ptr_t *inventory_values);
 void	zbx_log_sync_history_cache_progress(void);
 void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
-		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats);
+		zbx_history_sync_stats_t *stats);
 void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
 		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
@@ -181,13 +181,13 @@ double	zbx_hc_mem_pused_lock(void);
 void	zbx_hc_remove_items_by_ids(zbx_vector_uint64_t *itemids);
 
 typedef void (*zbx_sync_history_cache_f)(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
-		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats);
+		zbx_history_sync_stats_t *stats);
 
 int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 		zbx_sync_history_cache_f sync_history_cache_func, zbx_uint64_t history_cache_size,
 		zbx_uint64_t history_index_cache_size, zbx_uint64_t *trends_cache_size, char **error);
 
-void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines);
+void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs);
 
 zbx_uint64_t	zbx_dc_get_nextid(const char *table_name, int num);
 
@@ -195,6 +195,7 @@ void	zbx_dc_update_interfaces_availability(void);
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
 void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index);
 int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid);
+int	zbx_hc_is_itemid_cached_and_normal(zbx_uint64_t itemid);
 void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
 void	zbx_hc_get_items_unlocked(zbx_vector_uint64_pair_t *items);
 int	zbx_hc_check_high_usage_timer(void);

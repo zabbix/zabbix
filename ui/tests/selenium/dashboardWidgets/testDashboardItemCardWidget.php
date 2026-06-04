@@ -1033,7 +1033,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				if ($item === 'Dashboard') {
 					// Сheck value and hint message when "Dashboard" is selected.
 					$form->checkValue([$label => 'Dashboard']);
-					$this->assertTrue($field->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
+					$this->assertTrue($field->query('xpath:.//span[@data-hintbox-html="Dashboard is used as data source."]')
 							->one()->isVisible()
 					);
 				}
@@ -1805,7 +1805,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Host' => 'Visible host name for Item Card widget',
 					'Interval and storage' => [
 						'column' => '15m',
-						'center-column' => '',
+						'center-column' => 'Not stored',
 						'right-column' => ''
 					],
 					'Type of information' => 'Log',

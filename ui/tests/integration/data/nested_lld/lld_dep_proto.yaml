@@ -19,8 +19,10 @@ zabbix_export:
         - name: main_drule
           type: TRAP
           key: main_drule
+          allowed_hosts: '{$TRAPPER.ALLOWED_HOSTS}'
           item_prototypes:
             - name: 'master_item[{#NAME}]'
               type: TRAP
               key: 'master_item[{#NAME}]'
+              allowed_hosts: '{$TRAPPER.ALLOWED_HOSTS}'
               value_type: TEXT

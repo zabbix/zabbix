@@ -651,11 +651,7 @@ function getMenuPopupDashboard(options, trigger_element) {
 				label: t('Create new report'),
 				clickCallback: function() {
 					jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-					PopUp('popup.scheduledreport.edit', {dashboardid: options.dashboardid}, {
-						dialogue_class: 'modal-popup-generic',
-						trigger_element
-					});
+					ZABBIX.PopupManager.open('scheduledreport.edit', {dashboardid: options.dashboardid});
 				}
 			});
 		}
@@ -1015,7 +1011,7 @@ function getMenuPopupItem(options) {
 		items.push({
 			label: t('Values'),
 			url: url.getUrl(),
-			disabled: !options.history && !options.trends
+			disabled: !options.history
 		});
 
 		url = new Curl('history.php');
@@ -1025,7 +1021,7 @@ function getMenuPopupItem(options) {
 		items.push({
 			label: t('500 latest values'),
 			url: url.getUrl(),
-			disabled: !options.history && !options.trends
+			disabled: !options.history
 		});
 
 		sections.push({

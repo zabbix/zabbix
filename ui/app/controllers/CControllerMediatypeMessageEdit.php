@@ -32,7 +32,7 @@ class CControllerMediatypeMessageEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'type' =>				'in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
+			'type' =>				'in '.implode(',', CMediatypeHelper::getSupportedMediaTypes()),
 			'message_format' =>		'in '.ZBX_MEDIA_MESSAGE_FORMAT_TEXT.','.ZBX_MEDIA_MESSAGE_FORMAT_HTML,
 			'message_type' =>		'in -1,'.implode(',', $this->message_types),
 			'old_message_type' =>	'in -1,'.implode(',', $this->message_types),

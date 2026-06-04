@@ -19,25 +19,13 @@ namespace Widgets\ScatterPlot\Includes;
 use CSvgCircle,
 	CSvgCross,
 	CSvgDiamond,
-	CSvgGraph,
-	CSvgGroup,
 	CSvgRect,
 	CSvgStar,
-	CSvgTag,
 	CSvgTriangle,
+	CTag,
 	InvalidArgumentException;
 
-class CScatterPlotMetricPoint extends CSvgGroup {
-
-	/**
-	 * Horizontal position of points, which must be hidden, yet still rendered.
-	 */
-	public const X_OUT_OF_RANGE = -10;
-
-	/**
-	 * Vertical position of points, which must be hidden, yet still rendered.
-	 */
-	public const Y_OUT_OF_RANGE = -10;
+class CScatterPlotMetricPoint extends CTag {
 
 	public const MARKER_TYPE_ELLIPSIS = 0;
 	public const MARKER_TYPE_SQUARE = 1;
@@ -55,77 +43,20 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 		self::MARKER_TYPE_CROSS => ZBX_ICON_CROSS
 	];
 
-	private const ZBX_STYLE_CLASS = 'svg-graph-points';
-
 	private ?array $point;
-	private string $aggregation_name;
-	private array $item_x_names;
-	private array $item_y_names;
 
-	protected array $options;
+	protected string $prefix;
+	protected int $marker_type;
+	protected int $marker_size;
 
-	public function __construct(array $point, array $metric) {
-		parent::__construct();
+	public function __construct(array $point, string $prefix, int $marker_type, int $marker_size) {
+		parent::__construct('use', true);
 
 		$this->point = $point;
-		$this->aggregation_name = $metric['aggregation_name'];
-		$this->item_x_names = $metric['x_axis_items_name'];
-		$this->item_y_names = $metric['y_axis_items_name'];
 
-		$this->options = $metric['options'] + [
-			'color' => CSvgGraph::SVG_GRAPH_DEFAULT_COLOR,
-			'order' => $metric['order'],
-			'key' => $metric['key'],
-			'data_set' => $metric['data_set']
-		];
-	}
-
-	public function makeStyles(): array {
-		$index_class = self::ZBX_STYLE_CLASS.'-'.$this->options['order'].'-'.$this->options['key'];
-
-		$this
-			->addClass(self::ZBX_STYLE_CLASS)
-			->addClass($index_class);
-
-		$color = $this->point ? $this->point[4] : $this->options['color'];
-
-		return [
-			'.'.$index_class => [
-				'fill-opacity' => 1,
-				'fill' => $color,
-				'stroke' => $color
-			]
-		];
-	}
-
-	protected function draw(): void {
-		$highlight_point_group = (new CSvgGroup())
-			->setAttribute('transform', 'translate('.self::X_OUT_OF_RANGE.', '.self::Y_OUT_OF_RANGE.')')
-			->addClass('js-svg-highlight-group');
-
-		$point_group = (new CSvgGroup())->setAttribute('transform',
-			'translate('.$this->point[0].', '.$this->point[1].')'
-		);
-
-		[$highlight, $point] = self::createMarker($this->options['marker'],  $this->options['marker_size']);
-
-		$this
-			->addItem(
-				$highlight_point_group->addItem(
-					$highlight->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
-				)
-			)
-			->addItem(
-				$point_group
-					->addClass('metric-point')
-					->setAttribute('value_x', $this->point[2])
-					->setAttribute('value_y', $this->point[3])
-					->setAttribute('color', $this->point[4])
-					->setAttribute('time_from', $this->point[5])
-					->setAttribute('time_to', $this->point[6])
-					->setAttribute('marker_class', self::MARKER_ICONS[$this->options['marker']])
-					->addItem($point)
-			);
+		$this->prefix = $prefix;
+		$this->marker_type = $marker_type;
+		$this->marker_size = $marker_size;
 	}
 
 	public static function createMarker(int $marker_type, int $size, int $cx = 0, int $cy = 0): array {
@@ -175,12 +106,13 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 
 	public function toString($destroy = true): string {
 		$this
-			->setAttribute('data-set', 'points')
-			->setAttribute('data-aggregation-name', $this->aggregation_name)
-			->setAttribute('data-x-items', $this->item_x_names)
-			->setAttribute('data-y-items', $this->item_y_names)
-			->setAttribute('data-ds', $this->options['data_set'])
-			->draw();
+			->addClass('svg-scatter-plot-point')
+			->addClass('point-'.round($this->point[0]).'-'.round($this->point[1]))
+			->setAttribute('href', '#point_'.$this->prefix.'_'.$this->marker_type.'_'.$this->marker_size)
+			->setAttribute('x', $this->point[0])
+			->setAttribute('y', $this->point[1])
+			->setAttribute('data-id', $this->prefix.'_'.$this->marker_type.'_'.$this->marker_size)
+			->addStyle('--color: '.$this->point[4].';');
 
 		return parent::toString($destroy);
 	}
