@@ -419,7 +419,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 			}
 		}
 
-		DB::refreshIds('events', 0);
 		$eventids = DB::insert('events', $events);
 		self::$eventids = array_merge(self::$eventids, $eventids);
 
