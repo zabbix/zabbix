@@ -171,6 +171,7 @@ zbx_db_trigger;
 typedef struct
 {
 	zbx_uint64_t	maintenanceid;
+	zbx_uint64_t	cep_ruleid;
 	int		until;
 }
 zbx_db_event_suppress_t;
@@ -550,15 +551,13 @@ int	zbx_db_get_database_type(void);
 
 typedef struct
 {
-	zbx_uint64_t		eventid;
-	int			clock;
-	int			ns;
-	int			value;
-	int			severity;
-	int			mtime;
-	zbx_vector_tags_ptr_t	tags;
-
-	zbx_vector_uint64_t	*maintenanceids;
+	zbx_uint64_t			eventid;
+	int				clock;
+	int				ns;
+	int				value;
+	int				severity;
+	int				mtime;
+	zbx_vector_tags_ptr_t		tags;
 }
 zbx_event_t;
 

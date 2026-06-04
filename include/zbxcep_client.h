@@ -78,6 +78,7 @@ typedef struct
 {
 	zbx_uint64_t	eventid;
 	zbx_uint64_t	maintenanceid;
+	zbx_uint64_t	cep_ruleid;
 }
 zbx_event_maintenance_t;
 

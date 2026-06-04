@@ -1795,6 +1795,12 @@ zbx_cep_args_severity_t;
 
 typedef struct
 {
+	int	until;
+}
+zbx_cep_args_suppress_t;
+
+typedef struct
+{
 	char	*period;
 }
 zbx_cep_args_time_period_t;
@@ -1821,6 +1827,7 @@ typedef union
 	zbx_cep_args_tag_name_t		decrease_tag_value;
 	zbx_cep_args_tag_name_t		remove_tag;
 	zbx_cep_args_tag_pair_t		rename_tag;
+	zbx_cep_args_suppress_t		suppress;
 }
 zbx_cep_operation_args_t;
 

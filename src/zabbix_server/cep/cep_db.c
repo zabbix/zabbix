@@ -356,13 +356,14 @@ static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_mw_ta
 		if (SUCCEED != zbx_db_insert_is_prepared(&db_insert))
 		{
 			zbx_dbconn_prepare_insert(db, &db_insert, "event_suppress", "event_suppressid",
-					"eventid", "maintenanceid", "suppress_until", (char *)NULL);
+					"eventid", "maintenanceid", "cep_ruleid", "suppress_until", (char *)NULL);
 		}
 
 		for (int j = 0; j < event->suppress->values_num; j++)
 		{
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), event->eventid,
-					event->suppress->values[j].maintenanceid, event->suppress->values[j].until);
+					event->suppress->values[j].maintenanceid, event->suppress->values[j].cep_ruleid,
+					event->suppress->values[j].until);
 		}
 	}
 

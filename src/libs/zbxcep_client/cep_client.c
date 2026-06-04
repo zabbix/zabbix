@@ -490,6 +490,7 @@ static zbx_uint32_t	cep_deserialize_event(const unsigned char *data, zbx_db_even
 
 				ptr += zbx_deserialize_value(ptr, &suppress_local.maintenanceid);
 				ptr += zbx_deserialize_value(ptr, &suppress_local.until);
+				suppress_local.cep_ruleid = 0;
 				zbx_vector_db_event_suppress_append(e->suppress, suppress_local);
 			}
 		}
@@ -590,6 +591,7 @@ void	zbx_cep_deserialize_event_maintenance(const unsigned char *data, zbx_vector
 		zbx_event_maintenance_t	event_local;
 		data += zbx_deserialize_value(data, &event_local.eventid);
 		data += zbx_deserialize_value(data, &event_local.maintenanceid);
+		data += zbx_deserialize_value(data, &event_local.cep_ruleid);
 
 		zbx_vector_event_maintenance_append(events, event_local);
 	}
@@ -607,7 +609,7 @@ void	zbx_cep_deserialize_event_maintenance(const unsigned char *data, zbx_vector
 static void	cep_send_event_maintenance(const zbx_event_maintenance_t *events, int events_num, zbx_uint32_t code)
 {
 	unsigned char	*data = NULL, *ptr;
-	zbx_uint32_t	data_len = 2 * sizeof(zbx_uint64_t) * events_num + sizeof(int);
+	zbx_uint32_t	data_len = 3 * sizeof(zbx_uint64_t) * events_num + sizeof(int);
 
 	ptr = data = (unsigned char *)zbx_malloc(NULL, (size_t)data_len);
 	ptr += zbx_serialize_value(ptr, events_num);
@@ -615,6 +617,7 @@ static void	cep_send_event_maintenance(const zbx_event_maintenance_t *events, in
 	{
 		ptr += zbx_serialize_value(ptr, events[i].eventid);
 		ptr += zbx_serialize_value(ptr, events[i].maintenanceid);
+		ptr += zbx_serialize_value(ptr, events[i].cep_ruleid);
 	}
 
 	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), code, data, data_len))

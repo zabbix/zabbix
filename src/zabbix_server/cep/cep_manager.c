@@ -469,6 +469,12 @@ void	*zbx_cep_manager_thread(void *args)
 			time_stat = time_start;
 			time_idle = 0;
 			stats = stats_tmp;
+
+			zbx_cep_t	*cep;
+
+			cep_cache_acquire(&cep);
+			cep_dump(cep, "...");
+			cep_cache_release(&cep);
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);

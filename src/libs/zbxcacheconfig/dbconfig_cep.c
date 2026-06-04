@@ -1569,7 +1569,7 @@ static void	cep_sync_operations(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 
 		operation->execute_when = atoi(row[3]);
 		operation->evaltype = atoi(row[4]);
-		operation->sortorder = atoi(row[10]);
+		operation->sortorder = atoi(row[11]);
 
 		switch (operation->type)
 		{
@@ -1603,6 +1603,9 @@ static void	cep_sync_operations(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 				break;
 			case ZBX_CEP_OP_REMOVE_TAG:
 				ZBX_DBROW2STR(operation->args.remove_tag.tag, row[6]);
+				break;
+			case ZBX_CEP_OP_SUPPRESS:
+				operation->args.suppress.until = atoi(row[10]);
 				break;
 		}
 	}

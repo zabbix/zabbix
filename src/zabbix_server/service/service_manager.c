@@ -138,11 +138,6 @@ zbx_service_manager_t;
 
 static void	event_free(zbx_event_t *event)
 {
-	if (NULL != event->maintenanceids)
-	{
-		zbx_vector_uint64_destroy(event->maintenanceids);
-		zbx_free(event->maintenanceids);
-	}
 	zbx_vector_tags_ptr_clear_ext(&event->tags, zbx_free_tag);
 	zbx_vector_tags_ptr_destroy(&event->tags);
 
@@ -249,7 +244,7 @@ static void	match_event_to_service_problem_tags(const zbx_cep_event_t *event,
 			service_problem->severity = event->severity;
 			service_problem->ts.sec = event->clock;
 			service_problem->ts.ns = event->ns;
-			service_problem->suppress = (0 == event->maintenanceids.values_num ? 0 : 1);
+			service_problem->suppress = (0 == event->suppress.values_num ? 0 : 1);
 			service_problem->suppress_mtime = 0;
 
 			zbx_vector_service_problem_ptr_append(&services_diff->service_problems, service_problem);
@@ -2784,7 +2779,7 @@ static void	process_problem_suppression(zbx_service_manager_t *service_manager, 
 	if (NULL == (pi = zbx_hashset_search(&service_manager->service_problems_index, &pi_local)))
 		return;
 
-	suppress = (0 == event->maintenanceids.values_num ? 0 : 1);
+	suppress = (0 == event->suppress.values_num ? 0 : 1);
 
 	for (int i = 0; i < pi->services.values_num; i++)
 	{
@@ -2977,7 +2972,7 @@ static void	process_event_updates(zbx_service_manager_t *service_manager, zbx_ce
 				}
 
 				recover_services_problem(service_manager, event->eventid, r_clock, r_ns,
-						event->severity, (0 == event->maintenanceids.values_num ? 0 : 1));
+						event->severity, (0 == event->suppress.values_num ? 0 : 1));
 
 				break;
 			case CEP_EVENT_OPEN:
@@ -3212,15 +3207,6 @@ static void	dump_events(zbx_hashset_t *events)
 			const zbx_tag_t	*tag = (const zbx_tag_t *)event->tags.values[i];
 
 			zabbix_log(LOG_LEVEL_TRACE, "  tag:'%s' value:'%s'", tag->tag, tag->value);
-		}
-
-		if (NULL != event->maintenanceids)
-		{
-			for (int i = 0; i < event->maintenanceids->values_num; i++)
-			{
-				zabbix_log(LOG_LEVEL_TRACE, "  maintenanceid:" ZBX_FS_UI64,
-						event->maintenanceids->values[i]);
-			}
 		}
 	}
 }

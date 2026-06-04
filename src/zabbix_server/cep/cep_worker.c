@@ -436,6 +436,12 @@ static void	cep_worker_create_tasks_from_occurred_result(zbx_cep_event_t *event,
 		result->close_db_event = NULL;
 	}
 
+	if (0 != (result->update_flags * CEP_RESULT_SUPPRESS_EVENT))
+	{
+		zbx_vector_db_event_suppress_append_array(&event->suppress, result->db_event->suppress->values,
+				result->db_event->suppress->values_num);
+	}
+
 	/* reset borrowed db_event */
 	result->db_event = NULL;
 }

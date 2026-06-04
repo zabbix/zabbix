@@ -1134,15 +1134,29 @@ static void	cep_operation_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-
-static void	cep_operation_execute_suppress_event(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
-	zbx_cep_result_t *result)
+static void	cep_operation_execute_suppress_event(zbx_uint64_t ruleid, const zbx_cep_operation_t *op,
+		zbx_cep_event_context_t *ctx, zbx_cep_result_t *result)
 {
+	zbx_db_event	*db_event;
+	int		now;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
+
+	now = (int)time(NULL);
+	if (now < op->args.suppress.until && NULL != (db_event = cep_result_acquire_db_event(result, ctx)))
+	{
+		zbx_db_event_suppress_t	suppress_local = {.cep_ruleid = ruleid, .until = op->args.suppress.until};
+
+		if (NULL == db_event->suppress)
+			db_event->suppress = zbx_create_event_suppress(1);
+
+		zbx_vector_db_event_suppress_append(db_event->suppress, suppress_local);
+
+		result->update_flags |= CEP_RESULT_SUPPRESS_EVENT;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-
 
 static void	cep_operation_execute(const zbx_cep_operation_t *op, int execute_when, zbx_uint64_t ruleid,
 		zbx_cep_event_context_t *ctx, zbx_cep_result_t *result)
@@ -1211,7 +1225,7 @@ static void	cep_operation_execute(const zbx_cep_operation_t *op, int execute_whe
 			break;
 		case ZBX_CEP_OP_SUPPRESS:
 			if (0 != (CEP_OP_SUPPRESS_MASK & CEP_FLAG(execute_when)))
-				cep_operation_execute_suppress_event(op, ctx, result);
+				cep_operation_execute_suppress_event(ruleid, op, ctx, result);
 			break;
 		case ZBX_CEP_OP_COPY_FIRST:
 			break;
