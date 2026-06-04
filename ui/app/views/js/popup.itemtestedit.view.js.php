@@ -463,7 +463,7 @@ window.itemtestedit_view_popup = new class {
 				step.action = tmpl_gray_label.evaluateToElement({label: <?= json_encode(_('Discard value')) ?>});
 			}
 			else if (step.action === <?= ZBX_PREPROC_FAIL_SET_VALUE ?>) {
-				step.result = step.result === '' ? escapeHtml(<?= json_encode(_('<empty string>')) ?>) : step.result;
+				step.result = step.result === '' ? <?= json_encode(_('<empty string>')) ?> : step.result;
 				step.action = tmpl_act_done.evaluateToElement({
 					action_name: <?= json_encode(_('Set value to')) ?>,
 					failed: step.result,
