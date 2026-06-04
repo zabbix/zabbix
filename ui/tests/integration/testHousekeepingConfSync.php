@@ -604,8 +604,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	 * @configurationDataProvider configurationProvider
 	 */
 	public function testHousekeepingConfSync_DefaultConfig() {
-		global $HISTORY_PROVIDERS;
-
 		$housekeeping = self::defaultHousekeeping();
 
 		$this->clearLog(self::COMPONENT_SERVER);
@@ -621,8 +619,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		$proxy_hk = $this->extractSyncedHousekeeping(self::COMPONENT_PROXY);
 		$this->assertArrayHasKey('hk_history', $proxy_hk);
 		$this->assertArrayHasKey('hk_history_global', $proxy_hk);
-		$expected_history = isset($HISTORY_PROVIDERS) ? 0 : $this->timeToSeconds('90d');
-		$this->assertEquals($expected_history, $proxy_hk['hk_history']);
+		$this->assertEquals(0, $proxy_hk['hk_history']);
 		$this->assertEquals($housekeeping['hk_history_global'], $proxy_hk['hk_history_global']);
 	}
 
