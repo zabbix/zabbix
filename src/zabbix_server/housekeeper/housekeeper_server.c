@@ -1406,7 +1406,9 @@ static int	housekeeping_group_sets(int now)
 
 	last_exec_time = now;
 
-	if (ZBX_DB_OK <= (rc = zbx_db_execute(
+	zbx_db_begin();
+
+	if (ZBX_DB_OK > (rc = zbx_db_execute(
 			"delete from permission where not exists("
 				"select null"
 				" from user_ugset uu"
@@ -1417,47 +1419,68 @@ static int	housekeeping_group_sets(int now)
 				" where permission.hgsetid = hh.hgsetid"
 			")")))
 	{
-		deleted += rc;
+		goto out;
 	}
 
-	if (ZBX_DB_OK <= (rc = zbx_db_execute(
+	deleted += rc;
+
+	if (ZBX_DB_OK > (rc = zbx_db_execute(
 			"delete from ugset_group where not exists("
 				"select null"
 				" from user_ugset uu"
 				" where ugset_group.ugsetid = uu.ugsetid"
 			")")))
 	{
-		deleted += rc;
+		goto out;
 	}
 
-	if (ZBX_DB_OK <= (rc = zbx_db_execute(
+	deleted += rc;
+
+	if (ZBX_DB_OK > (rc = zbx_db_execute(
 			"delete from ugset where not exists("
 				"select null"
 				" from user_ugset uu"
 				" where ugset.ugsetid = uu.ugsetid"
 			")")))
 	{
-		deleted += rc;
+		goto out;
 	}
 
-	if (ZBX_DB_OK <= (rc = zbx_db_execute(
+	deleted += rc;
+
+	if (ZBX_DB_OK > (rc = zbx_db_execute(
 			"delete from hgset_group where not exists("
 				"select null"
 				" from host_hgset hh"
 				" where hgset_group.hgsetid = hh.hgsetid"
 			")")))
 	{
-		deleted += rc;
+		goto out;
 	}
 
-	if (ZBX_DB_OK <= (rc = zbx_db_execute(
+	deleted += rc;
+
+	if (ZBX_DB_OK > (rc = zbx_db_execute(
 			"delete from hgset where not exists("
 				"select null"
 				" from host_hgset hh"
 				" where hgset.hgsetid = hh.hgsetid"
 			")")))
 	{
-		deleted += rc;
+		goto out;
+	}
+
+	deleted += rc;
+out:
+	if (ZBX_DB_OK <= rc)
+	{
+		if (ZBX_DB_OK != zbx_db_commit())
+			deleted = 0;
+	}
+	else
+	{
+		zbx_db_rollback();
+		deleted = 0;
 	}
 skip:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
