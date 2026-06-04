@@ -55,7 +55,7 @@ class testHistoryIterativeResult extends CAPITest {
 		$itemids = CTestDataHelper::getConvertedValueReferences(array_keys(self::$items));
 		$now = time();
 
-		// Cover the sum of offsets in CHistory::getIterationPeriods().
+		// Cover the sum of offsets in CHistory::getOffsetPeriods().
 		$max_offset = $now - SEC_PER_MONTH - SEC_PER_WEEK - 2 * SEC_PER_DAY;
 
 		foreach ($itemids as $itemid) {
@@ -100,20 +100,20 @@ class testHistoryIterativeResult extends CAPITest {
 	public static function comparative_requests(): array {
 		$now = time();
 		// For time_from earlier than sum of offsets.
-		$max_offset = $now - SEC_PER_MONTH * 2;
+		$max_offset = SEC_PER_MONTH * 2;
 		// ~ rows created by prepareTestData()
 		$max_rows = 768;
 
 		$cases = [
 			'Small limit, big time_from' => [
 				'request_base' => [
-					'time_from' => $max_offset
+					'time_from' => $now - $max_offset
 				],
 				'limit' => intval($max_rows / 10)
 			],
 			'Medium limit, medium time_from' => [
 				'request_base' => [
-					'time_from' => $now - intval($max_offset/2)
+					'time_from' => $now - intval($max_offset / 2)
 				],
 				'limit' => intval($max_rows / 2)
 			],
@@ -131,20 +131,20 @@ class testHistoryIterativeResult extends CAPITest {
 			],
 			'Small limit, big time_from, small time_till' => [
 				'request_base' => [
-					'time_from' => $max_offset,
+					'time_from' => $now - $max_offset,
 					'time_till' => $now - SEC_PER_WEEK
 				],
 				'limit' => intval($max_rows / 10)
 			],
 			'Medium limit, medium time_till' => [
 				'request_base' => [
-					'time_till' => $now - intval($max_offset/2)
+					'time_till' => $now - intval($max_offset / 2)
 				],
 				'limit' => intval($max_rows / 2)
 			],
 			'Medium limit, medium time_from, small time_till' => [
 				'request_base' => [
-					'time_from' => $now - intval($max_offset/2),
+					'time_from' => $now - intval($max_offset / 2),
 					'time_till' => $now - SEC_PER_WEEK
 				],
 				'limit' => intval($max_rows / 2)

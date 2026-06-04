@@ -226,7 +226,10 @@ class CHistory extends CApiService {
 				$count += $this->getResultFromSql($period + $options, $sql_parts);
 			}
 			else {
-				$result = array_merge($result, $this->getResultFromSql($period + $options, $sql_parts));
+				$result = array_merge($result, $this->getResultFromSql(
+					$period + ['limit' => $options['limit'] - count($result)] + $options,
+					$sql_parts
+				));
 
 				if (count($result) >= $options['limit']) {
 					return array_slice($result, 0, $options['limit'], true);
