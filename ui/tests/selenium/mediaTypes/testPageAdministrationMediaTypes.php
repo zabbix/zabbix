@@ -496,7 +496,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'name' => 'Email',
 					'check_title' => true,
 					'check_params' => true,
-					'error' => 'Incorrect value for field "sendto": cannot be empty.'
+					'inline_error' => [
+						'Send to' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -505,7 +507,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'form' => [
 						'Send to' => ' '
 					],
-					'error' => 'Incorrect value for field "sendto": cannot be empty.'
+					'inline_error' => [
+						'Send to' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -514,7 +518,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'form' => [
 						'Send to' => 'zabbixzabbix.com'
 					],
-					'error' => 'Invalid email address "zabbixzabbix.com".'
+					'inline_error' => [
+						'Send to' => 'Invalid email address "zabbixzabbix.com".'
+					]
 				]
 			],
 			[
@@ -523,7 +529,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'form' => [
 						'Send to' => 'zabbix@zabbixcom'
 					],
-					'error' => 'Invalid email address "zabbix@zabbixcom".'
+					'inline_error' => [
+						'Send to' => 'Invalid email address "zabbix@zabbixcom".'
+					]
 				]
 			],
 			[
@@ -532,7 +540,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'form' => [
 						'Send to' => 'zabbix@zabbixcom'
 					],
-					'error' => 'Invalid email address "zabbix@zabbixcom".'
+					'inline_error' => [
+						'Send to' => 'Invalid email address "zabbix@zabbixcom".'
+					]
 				]
 			],
 			[
@@ -541,7 +551,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'form' => [
 						'Send to' => '@zabbix.com'
 					],
-					'error' => 'Invalid email address "@zabbix.com".'
+					'inline_error' => [
+						'Send to' => 'Invalid email address "@zabbix.com".'
+					]
 				]
 			],
 			[
@@ -550,7 +562,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'form' => [
 						'Send to' => 'zabbix1@zabbix.com,zabbix2@zabbix.com'
 					],
-					'error' => 'Invalid email address "zabbix1@zabbix.com,zabbix2@zabbix.com".'
+					'inline_error' => [
+						'Send to' => 'Invalid email address "zabbix1@zabbix.com,zabbix2@zabbix.com".'
+					]
 				]
 			],
 			[
@@ -576,7 +590,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 						'Send to' => 'zabbix@zabbix.com',
 						'Message' => ''
 					],
-					'error' => 'Incorrect value for field "message": cannot be empty.'
+					'inline_error' => [
+						'Message' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -586,7 +602,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 						'Send to' => 'zabbix@zabbix.com',
 						'Message' => ' '
 					],
-					'error' => 'Incorrect value for field "message": cannot be empty.'
+					'inline_error' => [
+						'Message' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// SMS media type.
@@ -675,7 +693,12 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$form->submit();
 
 		// Check error message.
-		$this->assertMessage(TEST_BAD, 'Media type test failed.', $data['error']);
+		if (array_key_exists('inline_error', $data)) {
+				$this->assertInlineError($form, $data['inline_error']);
+			}
+			else {
+				$this->assertMessage(TEST_BAD, 'Media type test failed.', $data['error']);
+			}
 
 		if (CTestArrayHelper::get($data, 'webhook')) {
 			$form->checkValue(['Response' => 'false']);
