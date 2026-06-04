@@ -28,6 +28,7 @@ const ZBX_SORT_UP = 'ASC';
 const ZBX_SORT_DOWN = 'DESC';
 
 const ZBX_STYLE_LOADING = 'is-loading';
+const ZBX_STYLE_LOADING_FADEIN = 'is-loading-fadein';
 
 const ZBX_STYLE_HIDDEN = 'hidden';
 const ZBX_STYLE_DISPLAY_NONE = 'display-none';
@@ -157,6 +158,7 @@ const ZBX_ICON_CHEVRON_UP = 'zi-chevron-up';
 const ZBX_ICON_COG_FILLED = 'zi-cog-filled';
 const ZBX_ICON_CONTEXT = 'zi-context';
 const ZBX_ICON_COPY = 'zi-copy';
+const ZBX_ICON_CROSS = 'zi-cross';
 const ZBX_ICON_EYE_OFF = 'zi-eye-off';
 const ZBX_ICON_FILTER = 'zi-filter';
 const ZBX_ICON_FILTERS = 'zi-filters';
@@ -175,6 +177,7 @@ const ZBX_ICON_SEARCH_LARGE = 'zi-search-large';
 const ZBX_ICON_SPEAKER = 'zi-speaker';
 const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
 const ZBX_ICON_TEXT = 'zi-text';
+const ZBX_ICON_TIMES = 'zi-times';
 const ZBX_ICON_WIDGET_AWAITING_DATA_LARGE = 'zi-widget-awaiting-data-large';
 const ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE = 'zi-widget-empty-references-large';
 const ZBX_ICON_WIDGET_NOT_CONFIGURED_LARGE = ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE;

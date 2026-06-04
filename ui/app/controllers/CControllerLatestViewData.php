@@ -18,8 +18,8 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['itemid', 'data_actions', 'host', 'maintenance', 'maintenanceid',
 		'maintenance_type', 'maintenance_status', 'itemid', 'description_expanded', 'name', 'key_expanded', 'interval',
-		'history', 'trends', 'type', 'state', 'last_check', 'last_value', 'change', 'is_graph', 'keep_history',
-		'keep_trends', 'item_icons', 'tags', 'custom_text'];
+		'history', 'trends', 'type', 'state', 'last_check', 'last_value', 'change', 'is_graph', 'show_link',
+		'item_icons', 'tags', 'custom_text'];
 
 	protected function init(): void {
 		parent::init();
@@ -47,14 +47,24 @@ class CControllerLatestViewData extends CControllerDataTable {
 		$mandatory_filter_set = CControllerLatest::isMandatoryFilterFieldSet($filter);
 		$subfilter_set = CControllerLatest::isSubfilterSet($filter);
 
+		$output = [];
+		$debug_mode = CWebUser::$data['debug_mode'] ?? GROUP_DEBUG_MODE_DISABLED;
+
+		if ($debug_mode == GROUP_DEBUG_MODE_ENABLED) {
+			CProfiler::getInstance()->stop();
+			$output['debug'] = CProfiler::getInstance()->make()->toString();
+		}
+
 		if (!$mandatory_filter_set && !$subfilter_set) {
-			return [
+			$output += [
 				'fields' => [],
 				'rows' => [],
 				'no_data_icon' => ZBX_ICON_FILTER_LARGE,
 				'no_data_message' => _('Filter is not set'),
 				'no_data_description' => _('Use the filter to display results')
 			];
+
+			return $output;
 		}
 
 		$filter = CControllerLatest::sanitizeFilter($filter);
@@ -101,15 +111,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 		order_result($data['items'], $sort_field, $sort_order);
 
-		$simple_interval_parser = new CSimpleIntervalParser();
 		$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
-
-		$config = [
-			'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
-			'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
-			'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
-			'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
-		];
 
 		foreach ($data['items'] as &$item) {
 			$host = $hosts_on_page[$item['hostid']];
@@ -213,45 +215,30 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 			$item['interval'] = $item_delay;
 
-			if ($config['hk_history_global']) {
-				$keep_history = timeUnitToSeconds($config['hk_history']);
-				$item_history = $config['hk_history'];
-			}
-			elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
-				$keep_history = timeUnitToSeconds($item['history']);
-				$item_history = $item['history'];
-			}
-			else {
-				$keep_history = 0;
-				$item_history = (new CSpan($item['history']))
+			[
+				'history' => $item['history'],
+				'keep_history' => $keep_history,
+				'history_has_errors' => $history_has_errors,
+				'trends' => $item['trends'],
+				'keep_trends' => $keep_trends,
+				'trends_has_errors' => $trends_has_errors
+			] = CItemHelper::getStoragePeriods((int) $item['value_type'], $item['history'], $item['trends']);
+
+			if ($history_has_errors) {
+				$item['history'] = (new CSpan($item['history']))
 					->addClass(ZBX_STYLE_RED)
 					->toString();
 			}
 
-			$item['keep_history'] = $keep_history;
-			$item['history'] = $item_history;
-
-			if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-				if ($config['hk_trends_global']) {
-					$keep_trends = timeUnitToSeconds($config['hk_trends']);
-					$item_trends = $config['hk_trends'];
-				}
-				elseif ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
-					$keep_trends = timeUnitToSeconds($item['trends']);
-					$item_trends = $item['trends'];
-				}
-				else {
-					$keep_trends = 0;
-					$item_trends = (new CSpan($item['trends']))->addClass(ZBX_STYLE_RED);
-				}
-			}
-			else {
-				$keep_trends = 0;
-				$item_trends = '';
+			if ($trends_has_errors) {
+				$item['trends'] = (new CSpan($item['trends']))
+					->addClass(ZBX_STYLE_RED)
+					->toString();
 			}
 
-			$item['keep_trends'] = $keep_trends;
-			$item['trends'] = $item_trends;
+			// A strict comparison with zero is required here because these variables may have a null value.
+			$item['show_link'] = $keep_history !== 0 || $keep_trends !== 0;
+
 			$item['type'] = item_type2str($item['type']);
 			$item['last_check'] = $last_check;
 			$item['last_value'] = $last_value;
@@ -272,7 +259,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 			$this->resolveColumnTexts($data['items'], $options['custom_text']);
 		}
 
-		return [
+		$output += [
 			'filter_counters' => $this->getFilterCounters(),
 			'data_fields' => $data_fields,
 			'rows' => array_values(array_map(static fn (array $item) => [[], $item], $data['items'])),
@@ -282,6 +269,8 @@ class CControllerLatestViewData extends CControllerDataTable {
 				'subfilters_expanded' => array_flip($filter['subfilters_expanded'] ?? [])
 			]))->getOutput()
 		];
+
+		return $output;
 	}
 
 	private function getFilterCounters(): array {

@@ -43,7 +43,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 		order_result($data['problems'], $data['sort_field'], $data['sort_order']);
 
-		return [
+		$output = [
 			'filter_counters' => $this->getFilterCounters(),
 			'data_fields' => $data['data_fields'],
 			'page' => $data['page'],
@@ -52,6 +52,15 @@ class CControllerProblemViewData extends CControllerDataTable {
 			'show_two_columns' => $data['show_two_columns'],
 			'rows' => $rows
 		];
+
+		$debug_mode = CWebUser::$data['debug_mode'] ?? GROUP_DEBUG_MODE_DISABLED;
+
+		if ($debug_mode == GROUP_DEBUG_MODE_ENABLED) {
+			CProfiler::getInstance()->stop();
+			$output['debug'] = CProfiler::getInstance()->make()->toString();
+		}
+
+		return $output;
 	}
 
 	private function getFilterCounters(): array {
@@ -460,11 +469,15 @@ class CControllerProblemViewData extends CControllerDataTable {
 				$actions_performed[] = _('Severity changes');
 			}
 
-			if (array_column($problem['suppression_data'], 'userid')) {
-				$actions_performed[] = _('Suppressed');
+			$is_manually_suppressed = array_filter(array_column($problem['suppression_data'], 'userid'),
+				static fn($userid) => $userid != 0
+			);
+
+			if ($is_manually_suppressed) {
+				$actions_performed[] = _('Manually suppressed');
 			}
 			elseif ($data['actions']['suppressions'][$problem['eventid']]['count'] > 0) {
-				$actions_performed[] = _('Unsuppressed');
+				$actions_performed[] = _('Manually unsuppressed');
 			}
 
 			if ($data['actions']['actions'][$problem['eventid']]['count'] > 0) {

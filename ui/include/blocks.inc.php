@@ -689,6 +689,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 				$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE))
 					->addClass(ZBX_STYLE_COLOR_ICON)
 					->addClass('js-blink')
+					->setAttribute('aria-label', _('Manually unsuppressed'))
 					->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
 			}
 			elseif ($problem['suppression_data']) {
@@ -777,7 +778,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 			zbx_date2age($problem['clock']),
 			$problem_update_link,
 			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['users'], $is_acknowledged),
-			$tags[$problem['eventid']]
+			(new CDiv($tags[$problem['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 		]));
 	}
 

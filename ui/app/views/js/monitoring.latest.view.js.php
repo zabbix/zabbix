@@ -65,9 +65,7 @@
 			this.#initDataTable({filter, page, default_sort_field, default_sort_order, sort_field, sort_order,
 				storage_idx, user_configs});
 
-			if (this.#refresh_interval != 0 && this.#filter_set) {
-				this.#scheduleRefresh();
-			}
+			this.#scheduleRefresh();
 		}
 
 		#initTabFilter(filter_options) {
@@ -218,7 +216,7 @@
 						}),
 					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
 					new CDataTableColumn('actions', <?= json_encode(_('Actions')); ?>)
-						.setFields(['itemid', 'is_graph', 'keep_history', 'keep_trends'])
+						.setFields(['itemid', 'is_graph', 'show_link'])
 						.setRenderer('actions'),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['item_icons']),
@@ -262,12 +260,12 @@
 						maintenance_icon.setAttribute('role', 'button');
 
 						if (host.maintenance_status == HOST_MAINTENANCE_STATUS_ON) {
-							let hint = `${maintenance.name} [${maintenance.type
+							let hint = `${escapeHtml(maintenance.name)} [${maintenance.type
 								? <?= json_encode(_('Maintenance without data collection')); ?>
 								: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 
 							if (maintenance.description != '') {
-								hint += "\n" + maintenance.description;
+								hint += "\n" + escapeHtml(maintenance.description);
 							}
 
 							maintenance_icon.setAttribute('data-hintbox-html', hint);
@@ -354,9 +352,9 @@
 					}
 				})
 				.setCellRenderer('actions', ({cell_data, cell_inner}) => {
-					const [itemid, is_graph, keep_history, keep_trends] = cell_data;
+					const [itemid, is_graph, show_link] = cell_data;
 
-					if (!keep_history && !keep_trends) {
+					if (!show_link) {
 						return;
 					}
 
@@ -400,6 +398,10 @@
 					const response = e.detail.response;
 
 					this.#refreshCounters(response);
+
+					if ('debug' in response) {
+						this.#refreshDebug(response.debug);
+					}
 				})
 				.on(CDataTable.EVENT_DATA_SORT, () => this.#scheduleRefresh())
 				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.#unscheduleRefresh())
@@ -454,6 +456,17 @@
 			if (this.#popup_message_box !== null) {
 				this.#popup_message_box.remove();
 				this.#popup_message_box = null;
+			}
+		}
+
+		#refreshDebug(debug) {
+			const debug_output = document
+				.querySelector('.wrapper > main > .<?= ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH ?>');
+
+			if (debug_output) {
+				debug_output.classList.add('<?= ZBX_STYLE_DEBUG_OUTPUT ?>');
+				debug_output.innerHTML = new DOMParser().parseFromString(debug, 'text/html')
+					.querySelector('.<?= ZBX_STYLE_DEBUG_OUTPUT ?>').innerHTML;
 			}
 		}
 
@@ -521,6 +534,10 @@
 		}
 
 		#scheduleRefresh() {
+			if (this.#refresh_interval == 0) {
+				return;
+			}
+
 			this.#unscheduleRefresh();
 			this.#refresh_interval_id = setInterval(() => this.#refresh(), this.#refresh_interval);
 		}
