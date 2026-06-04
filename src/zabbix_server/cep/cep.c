@@ -1181,31 +1181,29 @@ static int	db_event_suppress_compare(const void *a1, const void *a2)
  *             suppress  - [IN/OUT] event suppress data to add                *
  *                                                                            *
  ******************************************************************************/
-static void	cep_event_add_maintenaces(zbx_cep_event_handle_t h, zbx_vector_db_event_suppress_t *suppress)
+void	cep_event_add_suppress(zbx_cep_event_t *event, const zbx_db_event_suppress_t *suppress,
+		int suppress_num)
 {
-	int	suppress_num = h->event->suppress.values_num;
+	int	event_suppress_num = event->suppress.values_num;
 
-	for (int i = 0; i < suppress->values_num; i++)
+	for (int i = 0; i < suppress_num; i++)
 	{
 		int	index;
 
-		if (FAIL == (index = zbx_vector_db_event_suppress_search(&h->event->suppress, suppress->values[i],
+		if (FAIL == (index = zbx_vector_db_event_suppress_search(&event->suppress, suppress[i],
 				db_event_suppress_compare)))
 		{
-			zbx_cep_event_t	*event = cep_event_handle_mutable(h);
-
-			zbx_vector_db_event_suppress_append(&event->suppress, suppress->values[i]);
+			zbx_vector_db_event_suppress_append(&event->suppress, suppress[i]);
 		}
 	}
 
-	if (h->event->suppress.values_num == suppress_num)
+	if (event->suppress.values_num == suppress_num)
 		return;
 
-	zbx_cep_event_t	*event = cep_event_handle_mutable(h);
-
-	if (0 == suppress_num)
+	if (0 == event_suppress_num)
 		event->suppress_mtime = time(NULL);
 }
+
 
 /******************************************************************************
  *                                                                            *
@@ -1215,30 +1213,26 @@ static void	cep_event_add_maintenaces(zbx_cep_event_handle_t h, zbx_vector_db_ev
  *             suppress - [IN] event supprss data to remove                   *
  *                                                                            *
  ******************************************************************************/
-static void	cep_event_remove_maintenaces(zbx_cep_event_handle_t h, zbx_vector_db_event_suppress_t *suppress)
+static void	cep_event_remove_suppress(zbx_cep_event_t *event, const zbx_db_event_suppress_t *suppress,
+		int suppress_num)
 {
-	for (int i = 0; i < suppress->values_num; i++)
+	for (int i = 0; i < suppress_num; i++)
 	{
 		int	index;
 
-		if (FAIL != (index = zbx_vector_db_event_suppress_search(&h->event->suppress, suppress->values[i],
+		if (FAIL != (index = zbx_vector_db_event_suppress_search(&event->suppress, suppress[i],
 				db_event_suppress_compare)))
 		{
-			zbx_cep_event_t	*event = cep_event_handle_mutable(h);
-
 			zbx_vector_db_event_suppress_remove_noorder(&event->suppress, index);
 		}
 	}
 
-	if (0 == h->event->suppress.values_num)
+	if (0 == event->suppress.values_num)
 	{
-		zbx_cep_event_t	*event = cep_event_handle_mutable(h);
-
 		zbx_vector_db_event_suppress_destroy(&event->suppress);
 		zbx_vector_db_event_suppress_create(&event->suppress);
 
-		if (0 == event->suppress.values_num)
-			event->suppress_mtime = time(NULL);
+		event->suppress_mtime = time(NULL);
 	}
 }
 
@@ -1258,9 +1252,9 @@ static  void	cep_event_update_maintenances(zbx_cep_event_handle_t h, zbx_vector_
 	zbx_cep_event_op_t action)
 {
 	if (CEP_EVENT_SUPPRESS == action)
-		cep_event_add_maintenaces(h, suppress);
+		cep_event_add_suppress(cep_event_handle_mutable(h), suppress->values, suppress->values_num);
 	else
-		cep_event_remove_maintenaces(h, suppress);
+		cep_event_remove_suppress(cep_event_handle_mutable(h), suppress->values, suppress->values_num);
 }
 
 /******************************************************************************

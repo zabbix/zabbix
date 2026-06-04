@@ -14,6 +14,7 @@
 
 #include "cep_rule.h"
 #include "cep.h"
+#include "cep_task.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
@@ -23,6 +24,7 @@
 #include "zbxdbwrap.h"
 #include "zbxeval.h"
 #include "zbxexpr.h"
+#include "zbxmw.h"
 #include "zbxnum.h"
 #include "zbxvariant.h"
 #include "zbxdbhigh.h"
@@ -120,6 +122,14 @@ static zbx_cep_event_t *cep_event_context_acquire_event(zbx_cep_event_context_t 
 	}
 
 	return ctx->event;
+}
+
+static zbx_cep_event_t *cep_event_context_acquire_mutable_event(zbx_cep_event_context_t *ctx)
+{
+	if (NULL != cep_event_context_acquire_event(ctx))
+		return cep_event_get_mutable(ctx->event);
+
+	return NULL;
 }
 
 void	cep_result_clear(zbx_cep_result_t *result)
@@ -983,7 +993,7 @@ out:
 	return ret;
 }
 
-static void	cep_operation_execute_set_name(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
+static void	cep_operation_db_execute_set_name(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_result_t *result)
 {
 	zbx_db_event	*db_event;
@@ -999,7 +1009,7 @@ static void	cep_operation_execute_set_name(const zbx_cep_operation_t *op, zbx_ce
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	cep_operation_execute_set_severity(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
+static void	cep_operation_db_execute_set_severity(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_result_t *result)
 {
 	zbx_db_event	*db_event;
@@ -1019,7 +1029,7 @@ static void	cep_operation_execute_set_severity(const zbx_cep_operation_t *op, zb
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	cep_operation_execute_increase_severity(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
+static void	cep_operation_db_execute_increase_severity(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_result_t *result)
 {
 	zbx_db_event	*db_event;
@@ -1049,7 +1059,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	cep_operation_execute_decrease_severity(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
+static void	cep_operation_db_execute_decrease_severity(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_result_t *result)
 {
 	zbx_db_event	*db_event;
@@ -1113,7 +1123,7 @@ static zbx_db_event	*cep_db_event_create(const zbx_cep_origin_t *origin, int clo
 	return db_event;
 }
 
-static void	cep_operation_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_context_t *ctx,
+static void	cep_operation_db_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_context_t *ctx,
 		zbx_cep_result_t *result)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__ );
@@ -1134,7 +1144,7 @@ static void	cep_operation_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	cep_operation_execute_suppress_event(zbx_uint64_t ruleid, const zbx_cep_operation_t *op,
+static void	cep_operation_db_execute_suppress_event(zbx_uint64_t ruleid, const zbx_cep_operation_t *op,
 		zbx_cep_event_context_t *ctx, zbx_cep_result_t *result)
 {
 	zbx_db_event	*db_event;
@@ -1158,9 +1168,6 @@ static void	cep_operation_execute_suppress_event(zbx_uint64_t ruleid, const zbx_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	cep_operation_execute(const zbx_cep_operation_t *op, int execute_when, zbx_uint64_t ruleid,
-		zbx_cep_event_context_t *ctx, zbx_cep_result_t *result)
-{
 #define CEP_FLAG(x)  (__UINT32_C(1) << (x))
 
 #define CEP_OP_SET_NAME_MASK		(CEP_FLAG(ZBX_CEP_ON_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED) | \
@@ -1192,6 +1199,188 @@ static void	cep_operation_execute(const zbx_cep_operation_t *op, int execute_whe
 #define CEP_OP_REMOVE_TAG_MASK		(CEP_FLAG(ZBX_CEP_ON_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_ON_EVENT_EVICTED) | \
 					CEP_FLAG(ZBX_CEP_ON_WINDOW_CLOSED))
 
+static void	cep_operation_event_execute_set_severity(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
+		zbx_cep_event_t **event)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
+
+	if (NULL == *event)
+		*event = cep_event_context_acquire_mutable_event(ctx);
+
+	if (NULL != *event)
+		(*event)->severity = op->args.set_severity.level;
+
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	cep_operation_event_execute_increase_severity(const zbx_cep_operation_t *op,
+		zbx_cep_event_context_t *ctx, zbx_cep_event_t **event)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
+
+	if (NULL == *event)
+		*event = cep_event_context_acquire_mutable_event(ctx);
+
+	if (NULL != *event)
+	{
+		/* check if already at max severity */
+		if (TRIGGER_SEVERITY_DISASTER == (*event)->severity)
+			goto out;
+
+		(*event)->severity++;
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	cep_operation_event_execute_decrease_severity(const zbx_cep_operation_t *op,
+		zbx_cep_event_context_t *ctx, zbx_cep_event_t **event)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
+
+	if (NULL == *event)
+		*event = cep_event_context_acquire_mutable_event(ctx);
+
+	if (NULL != *event)
+	{
+		/* check if already at max severity */
+		if (TRIGGER_SEVERITY_NOT_CLASSIFIED == (*event)->severity)
+			goto out;
+
+		(*event)->severity++;
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+
+static void	cep_operation_event_execute_suppress_event(zbx_uint64_t ruleid, const zbx_cep_operation_t *op,
+		zbx_cep_event_context_t *ctx, zbx_cep_event_t **event)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
+
+	if (time(NULL) >= (time_t)op->args.suppress.until)
+		goto out;
+
+	if (NULL == *event)
+		*event = cep_event_context_acquire_mutable_event(ctx);
+
+	if (NULL != *event)
+	{
+		zbx_db_event_suppress_t	suppress_local = {.cep_ruleid = ruleid};
+
+		cep_event_add_suppress(*event, &suppress_local, 1);
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	cep_operation_event_execute(const zbx_cep_operation_t *op, int execute_when, zbx_uint64_t ruleid,
+		zbx_cep_event_context_t *ctx, zbx_cep_event_t **event)
+{
+	if (SUCCEED != cep_operation_match_event(op, ctx))
+		return;
+
+	switch (op->type)
+	{
+		case ZBX_CEP_OP_SET_SEVERITY:
+			if (0 != (CEP_OP_SET_SEVERITY_MASK & CEP_FLAG(execute_when)))
+				cep_operation_event_execute_set_severity(op, ctx, event);
+			break;
+		case ZBX_CEP_OP_INCREASE_SEVERITY:
+			if (0 != (CEP_OP_INCREASE_SEVERITY_MASK & CEP_FLAG(execute_when)))
+				cep_operation_event_execute_increase_severity(op, ctx, event);
+			break;
+		case ZBX_CEP_OP_DECREASE_SEVERITY:
+			if (0 != (CEP_OP_DECREASE_SEVERITY_MASK & CEP_FLAG(execute_when)))
+				cep_operation_event_execute_decrease_severity(op, ctx, event);
+			break;
+		case ZBX_CEP_OP_SUPPRESS:
+			if (0 != (CEP_OP_SUPPRESS_MASK & CEP_FLAG(execute_when)))
+				cep_operation_event_execute_suppress_event(ruleid, op, ctx, event);
+			break;
+		case ZBX_CEP_OP_ADD_TAG:
+			break;
+		case ZBX_CEP_OP_SET_TAG:
+			break;
+		case ZBX_CEP_OP_SET_TAG_VALUE:
+			break;
+		case ZBX_CEP_OP_INCREASE_TAG_VALUE:
+			break;
+		case ZBX_CEP_OP_DECREASE_TAG_VALUE:
+			break;
+		case ZBX_CEP_OP_RENAME_TAG:
+			break;
+		case ZBX_CEP_OP_REMOVE_TAG:
+			break;
+	}
+}
+
+static void	cep_operation_db_event_execute_set_name(const zbx_cep_operation_t *op, zbx_db_event *db_event)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
+
+	db_event->name = zbx_strdup(db_event->name, op->args.set_name.name);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	cep_operation_task_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_context_t *ctx,
+		zbx_vector_mw_task_ptr_t *tasks)
+{
+	zbx_cep_event_t	*event;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (NULL != (event = cep_event_context_acquire_event(ctx)))
+	{
+		zbx_mw_task_t	*t;
+		zbx_db_event	*db_event;
+
+		db_event = cep_db_event_create(&event->origin, event->clock, event->ns, event->severity,
+				TRIGGER_VALUE_OK);
+		t = cep_create_task_close_event(db_event, event->eventid, 0, 0, ruleid);
+		zbx_vector_mw_task_ptr_append(tasks, t);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	cep_operation_db_event_update_severity(zbx_cep_event_context_t *ctx, zbx_db_event *db_event)
+{
+	zbx_cep_event_t	*event;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (NULL != (event = cep_event_context_acquire_event(ctx)))
+		db_event->severity = event->severity;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	cep_operation_db_event_execute_suppress_event(zbx_uint64_t ruleid, const zbx_cep_operation_t *op,
+		zbx_db_event *db_event)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
+
+	if (time(NULL) < (time_t)op->args.suppress.until)
+	{
+		zbx_db_event_suppress_t	suppress_local = {.cep_ruleid = ruleid, .until = op->args.suppress.until};
+
+		if (NULL == db_event->suppress)
+			db_event->suppress = zbx_create_event_suppress(1);
+
+		zbx_vector_db_event_suppress_append(db_event->suppress, suppress_local);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	cep_operation_db_event_execute(const zbx_cep_operation_t *op, int execute_when,
+		zbx_uint64_t ruleid, zbx_cep_event_context_t *ctx, zbx_db_event *db_event,
+		zbx_vector_mw_task_ptr_t *tasks)
+{
 	if (op->execute_when != execute_when)
 		return;
 
@@ -1202,30 +1391,27 @@ static void	cep_operation_execute(const zbx_cep_operation_t *op, int execute_whe
 	{
 		case ZBX_CEP_OP_SET_NAME:
 			if (0 != (CEP_OP_SET_NAME_MASK & CEP_FLAG(execute_when)))
-				cep_operation_execute_set_name(op, ctx, result);
+				cep_operation_db_event_execute_set_name(op, db_event);
 			break;
 		case ZBX_CEP_OP_CLOSE:
 			if (0 != (CEP_OP_CLOSE_MASK & CEP_FLAG(execute_when)))
-				cep_operation_execute_close_event(ruleid, ctx, result);
-			break;
-		case ZBX_CEP_OP_DISCARD:
-			THIS_SHOULD_NEVER_HAPPEN;
+				cep_operation_task_execute_close_event(ruleid, ctx, tasks);
 			break;
 		case ZBX_CEP_OP_SET_SEVERITY:
 			if (0 != (CEP_OP_SET_SEVERITY_MASK & CEP_FLAG(execute_when)))
-				cep_operation_execute_set_severity(op, ctx, result);
+				cep_operation_db_event_update_severity(ctx, db_event);
 			break;
 		case ZBX_CEP_OP_INCREASE_SEVERITY:
 			if (0 != (CEP_OP_INCREASE_SEVERITY_MASK & CEP_FLAG(execute_when)))
-				cep_operation_execute_increase_severity(op, ctx, result);
+				cep_operation_db_event_update_severity(ctx, db_event);
 			break;
 		case ZBX_CEP_OP_DECREASE_SEVERITY:
 			if (0 != (CEP_OP_DECREASE_SEVERITY_MASK & CEP_FLAG(execute_when)))
-				cep_operation_execute_decrease_severity(op, ctx, result);
+				cep_operation_db_event_update_severity(ctx, db_event);
 			break;
 		case ZBX_CEP_OP_SUPPRESS:
 			if (0 != (CEP_OP_SUPPRESS_MASK & CEP_FLAG(execute_when)))
-				cep_operation_execute_suppress_event(ruleid, op, ctx, result);
+				cep_operation_db_event_execute_suppress_event(ruleid, op, db_event);
 			break;
 		case ZBX_CEP_OP_COPY_FIRST:
 			break;
@@ -1246,43 +1432,96 @@ static void	cep_operation_execute(const zbx_cep_operation_t *op, int execute_whe
 		case ZBX_CEP_OP_REMOVE_TAG:
 			break;
 	}
-
-#undef CEP_FLAG
-#undef CEP_OP_SET_NAME_MASK
-#undef CEP_OP_CLOSE_MASK
-#undef CEP_OP_SET_SEVERITY_MASK
-#undef CEP_OP_INCREASE_SEVERITY_MASK
-#undef CEP_OP_DECREASE_SEVERITY_MASK
-#undef CEP_OP_SUPPRESS_MASK
-#undef CEP_OP_COPY_MASK
-#undef CEP_OP_ADD_TAG_MASK
-#undef CEP_OP_SET_TAG_MASK
-#undef CEP_OP_SET_TAG_VALUE_MASK
-#undef CEP_OP_INCREASE_TAG_VALUE_MASK
-#undef CEP_OP_DECREASE_TAG_VALUE_MASK
-#undef CEP_OP_RENAME_TAG_MASK
-#undef CEP_OP_REMOVE_TAG_MASK
 }
 
-void	cep_rule_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_cep_event_context_t *ctx,
-		zbx_cep_result_t *result)
+static void	cep_operation_db_execute(const zbx_cep_operation_t *op, int execute_when, zbx_uint64_t ruleid,
+		zbx_cep_event_context_t *ctx, zbx_cep_result_t *result)
+{
+	if (op->execute_when != execute_when)
+		return;
+
+	if (SUCCEED != cep_operation_match_event(op, ctx))
+		return;
+
+	switch (op->type)
+	{
+		case ZBX_CEP_OP_SET_NAME:
+			if (0 != (CEP_OP_SET_NAME_MASK & CEP_FLAG(execute_when)))
+				cep_operation_db_execute_set_name(op, ctx, result);
+			break;
+		case ZBX_CEP_OP_CLOSE:
+			if (0 != (CEP_OP_CLOSE_MASK & CEP_FLAG(execute_when)))
+				cep_operation_db_execute_close_event(ruleid, ctx, result);
+			break;
+		case ZBX_CEP_OP_DISCARD:
+			THIS_SHOULD_NEVER_HAPPEN;
+			break;
+		case ZBX_CEP_OP_SET_SEVERITY:
+			if (0 != (CEP_OP_SET_SEVERITY_MASK & CEP_FLAG(execute_when)))
+				cep_operation_db_execute_set_severity(op, ctx, result);
+			break;
+		case ZBX_CEP_OP_INCREASE_SEVERITY:
+			if (0 != (CEP_OP_INCREASE_SEVERITY_MASK & CEP_FLAG(execute_when)))
+				cep_operation_db_execute_increase_severity(op, ctx, result);
+			break;
+		case ZBX_CEP_OP_DECREASE_SEVERITY:
+			if (0 != (CEP_OP_DECREASE_SEVERITY_MASK & CEP_FLAG(execute_when)))
+				cep_operation_db_execute_decrease_severity(op, ctx, result);
+			break;
+		case ZBX_CEP_OP_SUPPRESS:
+			if (0 != (CEP_OP_SUPPRESS_MASK & CEP_FLAG(execute_when)))
+				cep_operation_db_execute_suppress_event(ruleid, op, ctx, result);
+			break;
+		case ZBX_CEP_OP_COPY_FIRST:
+			break;
+		case ZBX_CEP_OP_COPY_LAST:
+			break;
+		case ZBX_CEP_OP_ADD_TAG:
+			break;
+		case ZBX_CEP_OP_SET_TAG:
+			break;
+		case ZBX_CEP_OP_SET_TAG_VALUE:
+			break;
+		case ZBX_CEP_OP_INCREASE_TAG_VALUE:
+			break;
+		case ZBX_CEP_OP_DECREASE_TAG_VALUE:
+			break;
+		case ZBX_CEP_OP_RENAME_TAG:
+			break;
+		case ZBX_CEP_OP_REMOVE_TAG:
+			break;
+	}
+}
+
+void	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_cep_event_context_t *ctx,
+		zbx_cep_event_t **event)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
 
 	for (int i = 0; i < rule->operations.values_num; i++)
 	{
 		if (rule->operations.values[i].execute_when == execute_when)
-			cep_operation_execute(&rule->operations.values[i], execute_when,  rule->ruleid, ctx, result);
+		{
+			cep_operation_event_execute(&rule->operations.values[i], execute_when,  rule->ruleid, ctx,
+					event);
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 void	cep_event_execute_ops(const zbx_cep_rule_t **matched_rules, int matched_rules_num, int execute_when,
-		zbx_cep_event_context_t *ctx, zbx_cep_result_t *result)
+		zbx_cep_event_context_t *ctx, zbx_cep_event_t **event)
 {
 	for (int i = 0; i < matched_rules_num; i++)
-		cep_rule_execute_ops(matched_rules[i], execute_when, ctx, result);
+		cep_rule_event_execute_ops(matched_rules[i], execute_when, ctx, event);
+}
+
+void	cep_db_event_execute_ops(const zbx_cep_rule_t **matched_rules, int matched_rules_num, int execute_when,
+		zbx_cep_event_context_t *ctx, zbx_db_event *db_event)
+{
+	for (int i = 0; i < matched_rules_num; i++)
+		;//cep_rule_event_execute_ops(matched_rules[i], execute_when, ctx, event);
 }
 
 

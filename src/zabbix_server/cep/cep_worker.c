@@ -416,38 +416,6 @@ static void	cep_worker_process_task_remote(zbx_cep_worker_t *worker, zbx_cep_tas
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process result of CEP operations executed when event occurred     *
- *                                                                            *
- * Parameters: ctx    - [IN] event context                                    *
- *             result - [IN]  CEP evaluation result                           *
- *             tasks  - [OUT] generated tasks                                 *
- *                                                                            *
- ******************************************************************************/
-static void	cep_worker_create_tasks_from_occurred_result(zbx_cep_event_t *event, zbx_cep_result_t *result,
-		zbx_vector_mw_task_ptr_t *tasks)
-{
-	if (0 != (result->update_flags & CEP_RESULT_CLOSE_EVENT))
-	{
-		zbx_mw_task_t	*t;
-
-		t = cep_create_task_close_event(result->close_db_event, event->eventid, 0, 0, result->close_ruleid);
-		zbx_vector_mw_task_ptr_append(tasks, t);
-
-		result->close_db_event = NULL;
-	}
-
-	if (0 != (result->update_flags * CEP_RESULT_SUPPRESS_EVENT))
-	{
-		zbx_vector_db_event_suppress_append_array(&event->suppress, result->db_event->suppress->values,
-				result->db_event->suppress->values_num);
-	}
-
-	/* reset borrowed db_event */
-	result->db_event = NULL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: create a problem event for the specified trigger                  *
  *                                                                            *
  * Parameters: worker - [IN]                                                  *
@@ -501,9 +469,10 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 		}
 
 		if (0 != rules_num)
-			cep_event_execute_ops(rules, rules_num, ZBX_CEP_ON_EVENT_OCCURRED, &event_ctx, &result);
-
-		cep_worker_create_tasks_from_occurred_result(event, &result, &tasks);
+		{
+			cep_event_execute_ops(rules, rules_num, ZBX_CEP_ON_EVENT_OCCURRED, &event_ctx, &event);
+			cep_db_event_execute_ops(rules, rules_num, ZBX_CEP_ON_EVENT_OCCURRED, &event_ctx, db_event);
+		}
 	}
 
 	cep_cache_acquire(&cep);

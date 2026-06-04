@@ -65,6 +65,8 @@ int	cep_origin_problem(const zbx_cep_origin_t *origin);
 void	cep_dump(zbx_cep_t *cep, const char *msg);
 void	cep_dump_handle(zbx_cep_event_handle_t h);
 
+void	cep_event_add_suppress(zbx_cep_event_t *event, const zbx_db_event_suppress_t *suppress,
+		int suppress_num);
 void	cep_update_event_maintenances(zbx_cep_t *cep, const zbx_vector_event_maintenance_t *events,
 		zbx_cep_event_op_t action, zbx_vector_cep_event_handle_t *handles);
 void	cep_update_event_severities(zbx_cep_t *cep, const zbx_vector_event_severity_t *events,
