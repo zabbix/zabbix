@@ -103,7 +103,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'with_float' => false,
 								'min' => ZBX_MIN_PORT_NUMBER, 'max' => ZBX_MAX_PORT_NUMBER
 							]],
-							'when' => ['../item_type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SNMP]]
+							'when' => ['../item_type', 'in' => [ITEM_TYPE_IPMI, ITEM_TYPE_SNMP]]
 						],
 						[
 							'db interface.port', 'not_empty', 'required',
