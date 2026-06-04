@@ -1542,9 +1542,9 @@ in:
   params: '#3,-1'
 out:
   return: SUCCEED
-  value: -1
+  value: 1.7976931348623158e+308
 ---
-test case: Evaluate timeleft(#2,wait 0, calculation error due to Inf collapsing into NaN)
+test case: Evaluate timeleft(#2,wait 0)
 in:
   history:
   - itemid: 1
@@ -1559,7 +1559,7 @@ in:
   params: '#2,-1'
 out:
   return: SUCCEED
-  value: -1
+  value: 0
 ---
 test case: Evaluate timeleft(5m,65)
 in:
@@ -4699,7 +4699,7 @@ in:
   params: '#3,1.7976931348623158e+308,"logarithmic"'
 out:
   return: SUCCEED
-  value: -1
+  value: 1.7976931348623158e+308
 ---
 test case: Evaluate lastclock() <- 0.1, 0.2
 in:

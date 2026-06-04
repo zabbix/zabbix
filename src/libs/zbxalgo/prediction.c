@@ -1153,7 +1153,51 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 	zbx_matrix_struct_alloc(&coefficients);
 
 	if (SUCCEED != (res = zbx_regression(t, x, n, fit, k, coefficients)))
+	{
+		/* When regression fails due to overflow with extreme values, fall back to a linear        */
+		/* 2-point slope estimate using the oldest and newest data points. The value cache may    */
+		/* return data in either ascending or descending time order, so scan for the actual       */
+		/* min-t and max-t indices rather than assuming array ordering.                           */
+		if (FIT_LINEAR == fit || FIT_LOGARITHMIC == fit)
+		{
+			int	i_min_t = 0, i_max_t = 0;
+			double	t_span, slope, val_now;
+
+			for (int i = 1; i < n; i++)
+			{
+				if (t[i] < t[i_min_t])	i_min_t = i;
+				if (t[i] > t[i_max_t])	i_max_t = i;
+			}
+
+			if (0.0 < (t_span = t[i_max_t] - t[i_min_t]))
+			{
+				slope = (x[i_max_t] - x[i_min_t]) / t_span;
+
+				if (0 == isfinite(slope))
+				{
+					/* Slope overflowed — use trend direction and newest value to decide. */
+					result = (x[i_max_t] > x[i_min_t]) ?
+							((x[i_max_t] >= threshold) ? DBL_MAX : 0.0) :
+							((x[i_max_t] <= threshold) ? 0.0 : DBL_MAX);
+				}
+				else
+				{
+					val_now = x[i_max_t] + slope * (now - t[i_max_t]);
+
+					if (0 != isfinite(val_now) && val_now > threshold && 0.0 > slope)
+						result = (threshold - val_now) / slope;
+					else if (val_now > threshold)
+						result = DBL_MAX;
+					else
+						result = 0.0;
+				}
+
+				res = SUCCEED;
+			}
+		}
+
 		goto out;
+	}
 
 	zbx_log_expression(now, fit, (int)k, coefficients);
 
