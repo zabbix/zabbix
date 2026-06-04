@@ -146,8 +146,8 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		$sync = preg_grep('/housekeeping:/', $data);
 		$this->assertNotEmpty($sync);
 
-		$pid = preg_quote(strtok(array_values($sync)[0], ':'), '/');
-		$sync_idx = array_keys($sync)[0];
+		$pid = preg_quote(strtok(array_values($sync)[count($sync) - 1], ':'), '/');
+		$sync_idx = array_keys($sync)[count($sync) - 1];
 		$housekeeping = [];
 
 		for ($x = $sync_idx + 1; $x < count($data); $x++) {
