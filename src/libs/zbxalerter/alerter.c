@@ -529,7 +529,6 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	}
 
 #ifndef HAVE_LIBCURL
-	ZBX_UNUSED(socket);
 	ZBX_UNUSED(ipc_message);
 	ZBX_UNUSED(config_bridge_adapter_url);
 	ZBX_UNUSED(config_bridge_adapter_ca_file);
@@ -538,6 +537,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	ZBX_UNUSED(config_bridge_adapter_connect_to);
 
 	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
+	alerter_send_result(socket, NULL, FAIL, "Application compiled without cURL library.", NULL);
 #else
 	int			ret = FAIL;
 	zbx_uint64_t		alertid;

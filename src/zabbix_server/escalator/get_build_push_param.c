@@ -390,6 +390,7 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 		zbx_push_target_t	*t = targets.values[i];
 		zbx_push_alert_t	*push_alert;
 		char			*message_uuid7, *uuid7id;
+		zbx_uint64_t		eventid, triggerid;
 
 		zbx_json_init(&json, 1024);
 		zbx_json_addstring(&json, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
@@ -433,12 +434,25 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 		zbx_json_addstring(&json, "title", subject, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, "body", message, ZBX_JSON_TYPE_STRING);
 
-		zbx_json_addint64(&json, "eventid", atoi(event_id));
+		if (SUCCEED != zbx_is_uint64(event_id, &eventid))
+		{
+			THIS_SHOULD_NEVER_HAPPEN_MSG("invalid event ID: \"%s\"",
+					NULL == event_id ? "(NULL)" : event_id);
+			eventid = 0;
+		}
 
+		zbx_json_adduint64(&json, "eventid", eventid);
 		add_hostids_array(&json, host_ids);
 
-		zbx_json_addint64(&json, "triggerid", atoi(trigger_id));
-		zbx_json_addint64(&json, "userid", userid);
+		if (SUCCEED != zbx_is_uint64(trigger_id, &triggerid))
+		{
+			THIS_SHOULD_NEVER_HAPPEN_MSG("invalid trigger ID: \"%s\"",
+					NULL == trigger_id ? "(NULL)" : trigger_id);
+			triggerid = 0;
+		}
+
+		zbx_json_adduint64(&json, "triggerid", triggerid);
+		zbx_json_adduint64(&json, "userid", userid);
 		zbx_json_addint64(&json, "severity", event->severity);
 
 		zbx_json_close(&json); /* payload.data */
