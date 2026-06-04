@@ -223,6 +223,42 @@ out:
   return: SUCCEED
   value: 3.5
 ---
+test case: Evaluate avg with max double values
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: avg
+  params: 7m
+out:
+  return: SUCCEED
+  value: 1.7976931348623157e+308
+---
+test case: Evaluate avg with DBL_MAX and -DBL_MAX (cancellation)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: -1.7976931348623157e+308
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: avg
+  params: 7m
+out:
+  return: SUCCEED
+  value: 0
+---
 test case: Evaluate bitand(#1,1)
 in:
   history:
@@ -1210,6 +1246,25 @@ out:
   return: SUCCEED
   value: 3
 ---
+test case: Evaluate max with max double value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.0e+100
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.0e+200
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: max
+  params: 7m
+out:
+  return: SUCCEED
+  value: 1.7976931348623157e+308
+---
 test case: Evaluate min(4m)
 in:
   history:
@@ -1255,6 +1310,25 @@ in:
 out:
   return: SUCCEED
   value: 1
+---
+test case: Evaluate min with negative max double value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -1.7976931348623157e+308
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: -1.0e+200
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: -1.0e+100
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: min
+  params: 7m
+out:
+  return: SUCCEED
+  value: -1.7976931348623157e+308
 ---
 test case: Evaluate nodata(1m)
 in:
@@ -1331,6 +1405,25 @@ in:
 out:
   return: SUCCEED
   value: 3
+---
+test case: Evaluate percentile with max double value (100th percentile)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.0e+100
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.0e+200
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: percentile
+  params: '7m,100'
+out:
+  return: SUCCEED
+  value: 1.7976931348623157e+308
 ---
 test case: Evaluate sum(#4)
 in:
@@ -3939,6 +4032,23 @@ out:
   return: SUCCEED
   value: 1
 ---
+test case: Evaluate rate() with max double value (large but finite result)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+  time: 2021-03-27 10:02:00.000000000 +00:00
+  function: rate
+  params: '60'
+out:
+  return: SUCCEED
+  value: 2.9961552247705265e+306
+---
 test case: Evaluate default all changecount() with UINT64 data (all values different)
 in:
   history:
@@ -4348,6 +4458,40 @@ in:
   params: '#20,"strict"'
 out:
   return: FAIL
+  value: 0
+---
+test case: Evaluate change with DBL_MAX minus smaller value (finite result)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.79e+307
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
+  value: 1.6186931348623158e+308
+---
+test case: Evaluate change with identical DBL_MAX values (zero change)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
   value: 0
 ---
     test case: Evaluate forecast (1h,30m,"logarithmic","max")
@@ -4928,6 +5072,23 @@ in:
   params: 6m
 out:
   return: FAIL
+---
+test case: Evaluate sum with max double value (large but finite)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 8.0e+307
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 8.0e+307
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: sum
+  params: 7m
+out:
+  return: SUCCEED
+  value: 1.6e+308
 ---
 test case: Evaluate sumofsquares with huge float values (mean = inf)
 in:
