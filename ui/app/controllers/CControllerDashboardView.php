@@ -29,7 +29,7 @@ class CControllerDashboardView extends CController {
 			'clone' =>				'in 1',
 			'from' =>				'range_time',
 			'to' =>					'range_time',
-			'slideshow' =>			'in 1'
+			'slideshow' =>			'in '.DASHBOARD_SLIDESHOW_OFF.','.DASHBOARD_SLIDESHOW_ON
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
@@ -105,7 +105,7 @@ class CControllerDashboardView extends CController {
 		}
 
 		if ($this->hasInput('slideshow')) {
-			$dashboard['auto_start'] = '1';
+			$dashboard['auto_start'] = $this->getInput('slideshow') === DASHBOARD_SLIDESHOW_ON ? '1' : '0';
 		}
 
 		$dashboard['can_edit_dashboards'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);

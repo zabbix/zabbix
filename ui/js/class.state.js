@@ -35,7 +35,12 @@ class CState {
 	 */
 	setParams(params) {
 		for (const [key, value] of Object.entries(params)) {
-			this.#url.searchParams.set(key, value.toString());
+			if (value === null) {
+				this.#url.searchParams.delete(key);
+			}
+			else {
+				this.#url.searchParams.set(key, value.toString());
+			}
 		}
 
 		this.push();

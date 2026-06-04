@@ -854,6 +854,13 @@ static int	DBpatch_7050060(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7050061(void)
+{
+	const zbx_db_field_t	field = {"auto_start", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("dashboard", &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -921,5 +928,6 @@ DBPATCH_ADD(7050057, 0, 1)
 DBPATCH_ADD(7050058, 0, 1)
 DBPATCH_ADD(7050059, 0, 1)
 DBPATCH_ADD(7050060, 0, 1)
+DBPATCH_ADD(7050061, 0, 1)
 
 DBPATCH_END()

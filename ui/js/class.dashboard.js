@@ -40,6 +40,9 @@ class CDashboard {
 
 	static EVENT_REFERRED_UPDATE = 'dashboard-referred-update';
 	static EVENT_FEEDBACK = 'dashboard-feedback';
+	static EVENT_PAGE_SELECTED = 'dashboard-page-selected';
+	static EVENT_SLIDESHOW_STARTED = 'dashboard-slideshow-started';
+	static EVENT_SLIDESHOW_STOPPED = 'dashboard-slideshow-stopped';
 
 	#broadcast_options;
 
@@ -272,7 +275,7 @@ class CDashboard {
 		});
 	}
 
-	_startSlideshow() {
+	_startSlideshow(manually_toggled = false) {
 		if (this._slideshow_timeout_id !== null) {
 			clearTimeout(this._slideshow_timeout_id);
 		}
@@ -299,9 +302,11 @@ class CDashboard {
 
 		this._slideshow_switch_time = Date.now() + timeout_ms;
 		this._slideshow_timeout_id = setTimeout(() => this._switchSlideshow(), timeout_ms);
+
+		this.fire(CDashboard.EVENT_SLIDESHOW_STARTED, {manually_toggled});
 	}
 
-	_stopSlideshow() {
+	_stopSlideshow(manually_toggled = false) {
 		if (this._slideshow_timeout_id === null) {
 			return;
 		}
@@ -324,6 +329,8 @@ class CDashboard {
 
 		this._slideshow_switch_time = null;
 		this._slideshow_timeout_id = null;
+
+		this.fire(CDashboard.EVENT_SLIDESHOW_STOPPED, {manually_toggled});
 	}
 
 	_switchSlideshow() {
@@ -1266,17 +1273,9 @@ class CDashboard {
 
 	_setInitialDashboardPage(dashboard_page) {
 		const dashboard_page_index = this.getDashboardPageIndex(dashboard_page);
+		const page = dashboard_page_index > 0 ? dashboard_page_index + 1 : null;
 
-		const url = new URL(location.href);
-
-		if (dashboard_page_index > 0) {
-			url.searchParams.set('page', `${dashboard_page_index + 1}`);
-		}
-		else {
-			url.searchParams.delete('page');
-		}
-
-		history.replaceState(null, null, url);
+		this.fire(CDashboard.EVENT_PAGE_SELECTED, {page});
 	}
 
 	_getInitialDashboardPage() {
@@ -2366,10 +2365,10 @@ class CDashboard {
 				}
 
 				if (this._isSlideshowRunning()) {
-					this._stopSlideshow();
+					this._stopSlideshow(true);
 				}
 				else {
-					this._startSlideshow();
+					this._startSlideshow(true);
 				}
 			},
 

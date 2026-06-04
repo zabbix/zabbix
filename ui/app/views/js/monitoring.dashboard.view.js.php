@@ -197,6 +197,28 @@
 				location.href = location.href;
 			});
 
+			ZABBIX.Dashboard.on(CDashboard.EVENT_PAGE_SELECTED, e => {
+				const {page} = e.detail;
+
+				new CState(location.href).setParams({page});
+			})
+
+			ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_STARTED, e => {
+				const {manually_toggled} = e.detail;
+
+				if (manually_toggled) {
+					new CState(location.href).setParams({slideshow: DASHBOARD_SLIDESHOW_ON});
+				}
+			});
+
+			ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_STOPPED, e => {
+				const {manually_toggled} = e.detail;
+
+				if (manually_toggled) {
+					new CState(location.href).setParams({slideshow: DASHBOARD_SLIDESHOW_OFF});
+				}
+			});
+
 			jqBlink.blink();
 		}
 
@@ -387,10 +409,17 @@
 				curl.setArgument('to', this.#dashboard_time_period.to);
 			}
 
-			const page = new Curl().getArgument('page');
+			const url = new Curl();
+			const page = url.getArgument('page');
 
 			if (page !== null) {
 				curl.setArgument('page', page);
+			}
+
+			const slideshow = url.getArgument('slideshow');
+
+			if (slideshow !== null) {
+				curl.setArgument('slideshow', slideshow);
 			}
 
 			if (add_new) {
