@@ -18,7 +18,7 @@ class CFieldMultiselect extends CField {
 	init() {
 		super.init();
 
-		$('button, input[type="text"]', this._field.parentNode).on('blur', () => {
+		$(this._field.parentNode).on('blur', 'button, input[type="text"]', () => {
 			this.validate_if_no_focus = setTimeout(() => {
 				if (!this._field.isConnected || $(this._field).multiSelect('getOption', 'disabled') === true) {
 					return;
@@ -34,7 +34,7 @@ class CFieldMultiselect extends CField {
 			}, 250);
 		});
 
-		$('input[type="text"]', this._field.parentNode).on('focusin', () => {
+		$(this._field.parentNode).on('focusin', 'input[type="text"]', () => {
 			clearTimeout(this.validate_if_no_focus);
 			this.validate_if_no_focus = null;
 		});
