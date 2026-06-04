@@ -1390,6 +1390,25 @@ static int	DBpatch_7050121(void)
 	return DBadd_field("events", &field);
 }
 
+static int	DBpatch_7050122(void)
+{
+	const zbx_db_field_t	field = {"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("event_suppress", &field);
+}
+
+static int	DBpatch_7050123(void)
+{
+	return DBcreate_index("event_suppress", "event_suppress_5", "cep_ruleid", 0);
+}
+
+static int	DBpatch_7050124(void)
+{
+	const zbx_db_field_t	field = {"cep_ruleid", NULL, "cep_rule", "cep_ruleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("event_suppress", 4, &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -1518,6 +1537,8 @@ DBPATCH_ADD(7050118, 0, 1)
 DBPATCH_ADD(7050119, 0, 1)
 DBPATCH_ADD(7050120, 0, 1)
 DBPATCH_ADD(7050121, 0, 1)
-
+DBPATCH_ADD(7050122, 0, 1)
+DBPATCH_ADD(7050123, 0, 1)
+DBPATCH_ADD(7050124, 0, 1)
 
 DBPATCH_END()
