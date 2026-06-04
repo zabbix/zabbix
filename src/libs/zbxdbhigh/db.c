@@ -789,7 +789,7 @@ int	zbx_db_check_serverid(void)
 
 			if (NULL == (result = zbx_db_select("select value_str from settings where name='serverid'")))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "cannot insert serverid into settings table");
+				zabbix_log(LOG_LEVEL_ERR, "cannot select serverid record from \"settings\" table");
 				zbx_free(uuid7);
 				ret = FAIL;
 				goto out;
