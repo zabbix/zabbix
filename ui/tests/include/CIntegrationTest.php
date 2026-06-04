@@ -1116,11 +1116,11 @@ class CIntegrationTest extends CAPITest {
 	 * @param integer $delayOverride
 	 */
 	protected function reloadConfigurationCacheAndWaitForLogLine($component = null, $delayOverride = 0) {
-		self::skipLog(self::COMPONENT_SERVER);
-
 		if ($component === null) {
 			$component = $this->getActiveComponent();
 		}
+
+		self::skipLog($component);
 
 		$this->reloadConfigurationCache($component, $delayOverride);
 
