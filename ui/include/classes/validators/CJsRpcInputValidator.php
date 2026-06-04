@@ -411,7 +411,8 @@ class CJsRpcInputValidator {
 			case 'dashboard':
 			case 'services':
 			case 'sysmaps':
-				return true;
+				$rules = ['type' => API_OBJECT, 'fields' => $head_rules['fields']];
+				break;
 		}
 
 		return CApiInputValidator::validate($rules, $data, '/', $error);
