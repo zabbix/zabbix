@@ -65,7 +65,7 @@ class CSystemInfoHelper {
 			'is_global_scripts_enabled' => CSettingsHelper::isGlobalScriptsEnabled(),
 			'is_software_update_check_enabled' => CSettingsHelper::isSoftwareUpdateCheckEnabled(),
 			'software_update_check_data' => [
-				'last_check' => null,
+				'lastcheck' => null,
 				'latest_release' => null
 			],
 			'encoding_warning' => null,
@@ -409,7 +409,7 @@ class CSystemInfoHelper {
 				'id' => _('Zabbix server ID'),
 				'value' => $data['serverid']
 			],
-			'sever_running' => [
+			'server_running' => [
 				'id' => _('Zabbix server is running'),
 				'value' => $data['status']['is_running'],
 				'details' => [
@@ -431,7 +431,7 @@ class CSystemInfoHelper {
 							'<'
 						)
 						: null,
-					'last_checked' => $data['software_update_check_data']['last_check']
+					'last_checked' => $data['software_update_check_data']['lastcheck']
 				]
 			],
 			'frontend_version' => [
