@@ -691,11 +691,11 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, zbx_dc_his
 				/* had initially TEXT item value and bypass the original JSON validation, so they     */
 				/* must JSON validated here. If history entry is larger than ZBX_HISTORY_VALUE_LEN    */
 				/* then we know it passed the JSON validation before entering the history cache       */
-				if (ZBX_HISTORY_VALUE_LEN >= strlen(hdata->value.str))
+				if (ZBX_HISTORY_VALUE_LEN >= strlen(hdata->entry.value.str))
 				{
 					char	*err = NULL;
 
-					if (FAIL == zbx_json_validate_ext(hdata->value.str, &err))
+					if (FAIL == zbx_json_validate_ext(hdata->entry.value.str, &err))
 					{
 						dc_history_set_error(hdata, err);
 						break;
