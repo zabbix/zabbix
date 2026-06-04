@@ -85,14 +85,4 @@ zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, const void ** const data)
 void		zbx_variant_set_vector(zbx_variant_t *value, zbx_vector_var_t *vector);
 int		zbx_vector_var_get_type(zbx_vector_var_t *v);
 
-typedef union
-{
-	double		dbl;
-	zbx_uint64_t	ui64;
-	char		*str;
-	char		*err;
-	zbx_log_value_t	*log;
-}
-zbx_history_value_t;
-
 #endif

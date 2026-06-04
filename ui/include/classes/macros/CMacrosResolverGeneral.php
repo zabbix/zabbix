@@ -2537,7 +2537,6 @@ class CMacrosResolverGeneral {
 		}
 
 		$user_macro_parser_with_regex = new CUserMacroParser(['allow_regex' => true]);
-		$user_macro_parser = new CUserMacroParser();
 
 		/*
 		 * @var array $host_templates
