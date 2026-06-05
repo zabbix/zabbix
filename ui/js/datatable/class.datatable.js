@@ -1109,10 +1109,6 @@ class CDataTable {
 			return;
 		}
 
-		// if (!column.isResized()) {
-		// 	column.setWidth(`${CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH}px`);
-		// }
-
 		column.setVisible(visible);
 
 		const overrides = column.getOverrides();
