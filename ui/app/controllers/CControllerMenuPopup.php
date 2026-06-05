@@ -951,11 +951,12 @@ class CControllerMenuPopup extends CController {
 	}
 
 	private static function addUrls(array $menu_data, array $urls): array {
+		$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
 		$fields = ['scriptid', 'manualinput', 'manualinput_prompt', 'manualinput_validator_type',
 			'manualinput_validator', 'manualinput_default_value'
 		];
 
-		$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
 		foreach ($urls as $url) {
 			$menu_data_parameters = [
 				'label' => $url['name'],
