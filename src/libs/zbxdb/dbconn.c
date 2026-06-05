@@ -1538,7 +1538,7 @@ void	zbx_dbconn_free(zbx_dbconn_t *db)
  *               ZBX_DB_FAIL - failed to connect                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dbconn_open(zbx_dbconn_t *db)
+int	__zbx_attr_weak zbx_dbconn_open(zbx_dbconn_t *db)
 {
 	int	err;
 
