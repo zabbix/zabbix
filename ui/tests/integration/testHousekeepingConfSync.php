@@ -615,7 +615,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		$this->assertHousekeepingEquals($server_expected, $this->extractSyncedHousekeeping(self::COMPONENT_SERVER));
 
 		$this->reloadProxyAndWaitForConfiguration(true);
-
+sleep(20);
 		$proxy_hk = $this->extractSyncedHousekeeping(self::COMPONENT_PROXY);
 		$this->assertArrayHasKey('hk_history', $proxy_hk);
 		$this->assertArrayHasKey('hk_history_global', $proxy_hk);
