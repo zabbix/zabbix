@@ -400,9 +400,9 @@ class CControllerMenuPopup extends CController {
 	 * @return array
 	 */
 	private static function sanitizeMapElementUrls(array $urls): array {
-		foreach ($urls as &$url) {
-			$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+		$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
 
+		foreach ($urls as &$url) {
 			if (!$url_validator->validate($url['url'])) {
 				$url['url'] = 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).');';
 			}
@@ -955,6 +955,7 @@ class CControllerMenuPopup extends CController {
 			'manualinput_validator', 'manualinput_default_value'
 		];
 
+		$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
 		foreach ($urls as $url) {
 			$menu_data_parameters = [
 				'label' => $url['name'],
@@ -965,8 +966,6 @@ class CControllerMenuPopup extends CController {
 			$target = array_key_exists('new_window', $url) && $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES
 				? '_blank'
 				: '';
-
-			$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
 
 			if ($url_validator->validate($url['url'])) {
 				$menu_data_parameters += [

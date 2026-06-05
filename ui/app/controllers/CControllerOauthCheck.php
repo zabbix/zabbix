@@ -41,7 +41,7 @@ class CControllerOauthCheck extends CController {
 
 			if ($this->hasInput('redirection_url')
 					&& !$url_validator->validate($this->getInput('redirection_url'))) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Authorization endpoint'),
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Redirection endpoint'),
 					$url_validator->getError()
 				));
 
@@ -59,7 +59,7 @@ class CControllerOauthCheck extends CController {
 
 			if ($this->hasInput('token_url')
 					&& !$url_validator->validate($this->getInput('token_url'))) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Authorization endpoint'),
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Token endpoint'),
 					$url_validator->getError()
 				));
 

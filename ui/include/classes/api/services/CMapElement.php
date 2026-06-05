@@ -68,8 +68,9 @@ abstract class CMapElement extends CApiService {
 					$url_validate_options['inventory_macro'] = INVENTORY_URL_MACRO_NONE;
 				}
 
+				$url_validator = new CUrlValidator($url_validate_options);
 				foreach ($selement['urls'] as &$url_data) {
-					if (!(new CUrlValidator($url_validate_options))->validate($url_data['url'])) {
+					if (!$url_validator->validate($url_data['url'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for "url" field.'));
 					}
 
