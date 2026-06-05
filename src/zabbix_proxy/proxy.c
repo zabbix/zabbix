@@ -2198,9 +2198,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 
 		if (NULL != client)
-		{
 			zbx_ipc_client_release(client);
-		}
 
 		if (0 < (pid = waitpid((pid_t)-1, &i, WNOHANG)))
 		{

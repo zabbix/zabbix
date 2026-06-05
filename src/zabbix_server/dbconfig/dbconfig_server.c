@@ -191,9 +191,11 @@ void	*zbx_dbconfig_thread(void *args)
 					dbconfig_args_in->config_ssl_key_location, &vault_ret);
 
 			if (SUCCEED != vault_ret && NULL != dbconfig_args_in->config_vault->token)
+			{
 				zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
 						(unsigned char*)dbconfig_args_in->config_vault->token,
 						strlen(dbconfig_args_in->config_vault->token) + 1);
+			}
 
 			zbx_dc_config_get_hostids_by_revision(revision, &hostids);
 			zbx_dbconfig_worker_send_ids(&hostids);
@@ -220,9 +222,11 @@ void	*zbx_dbconfig_thread(void *args)
 					dbconfig_args_in->config_ssl_key_location, &vault_ret);
 
 			if (SUCCEED != vault_ret && NULL != dbconfig_args_in->config_vault->token)
+			{
 				zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
 					(unsigned char*)dbconfig_args_in->config_vault->token,
 					strlen(dbconfig_args_in->config_vault->token) + 1);
+			}
 
 			secrets_reload = 0;
 			zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the secrets");

@@ -2817,9 +2817,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 
 		if (NULL != client)
-		{
 			zbx_ipc_client_release(client);
-		}
 
 		if (ZBX_NODE_STATUS_ERROR == ha_status)
 			break;
@@ -2849,7 +2847,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 						zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip,
 								config_ssl_ca_location, config_ssl_cert_location,
 								config_ssl_key_location, &zbx_config_vault.token);
-
 					}
 
 					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay,

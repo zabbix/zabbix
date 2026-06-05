@@ -160,7 +160,7 @@ int	zbx_vault_db_credentials_get(zbx_config_vault_t *config_vault, char **dbuser
 
 	if (NULL == config_vault->token)
 	{
-		zbx_vault_renew_token(config_vault, config_source_ip,config_ssl_ca_location,
+		zbx_vault_renew_token(config_vault, config_source_ip, config_ssl_ca_location,
 				config_ssl_cert_location, config_ssl_key_location, &config_vault->token);
 
 		if (NULL == config_vault->token)
