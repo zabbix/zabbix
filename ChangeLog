@@ -1,9 +1,12 @@
 Changes for 8.0.0beta2
 
 New features:
+A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
+.......PS. [ZBXNEXT-10611] added real host name for native vmware.*.alarms.get item keys (MVekslers)
 A.F.....S. [ZBXNEXT-1150] implemented storage and display of maintenance-related event suppressions and unsuppressions (aetatsu, Ivo)
 
 Bug fixes:
+.......PS. [ZBX-27832] fixed changelog not being flushed (vso)
 ........S. [ZBX-22504] improved memory usage in lld worker proecesses with large low level discovery (vso)
 A......... [ZBX-27780] restored support of LLD macros in LLD rule override operations 'Update interval', 'History' and 'Trends' (dpankins)
 ........S. [ZBX-27736] fixed no_data trigger flickering into unknown state for unsupported items (arimdjonoks)
@@ -348,9 +351,18 @@ A......... [ZBX-27567] prevented low-privilege users from modifying entities via
 .......PS. [ZBX-27638] prohibited to modify or override global system JavaScript objects via user script for preprocessing subsystem and zabbix_js (MVekslers)
 
 --------------------------------------------------------------------------------
-Changes for 7.4.11rc1
+Changes for 7.4.11
 
-New features:
+7.4.11rc2 was released as 7.4.11 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.4.11rc2
+
+Bug fixes:
+.......PS. [ZBX-27832] fixed changelog not being flushed (vso)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.11rc1
 
 Bug fixes:
 ........S. [ZBX-22504] improved memory usage in LLD worker processes with large low-level discovery (vso)
@@ -492,6 +504,9 @@ New features:
 A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27759] added sanitization of service parameter in Oracle TNS connection string creation process (opucka)
+..F....... [ZBX-27760] wrapped html content into iframe when "show as html" is selected in Item history widget (dfofanovs)
+..F....... [ZBX-27758] fixed XSS vulnerability in Host navigator widget maintenance tooltip (aluchko)
 ..F....... [ZBX-27423] fixed graph rendering for items using throttling (Sasha)
 .......PS. [ZBX-27067] fixed script macros expanding via Zabbix proxy during autoregistration (vsmelovs)
 .......PS. [ZBX-27406] fixed dependent item error message clearing in preprocessing (askolmeisters)
@@ -1789,9 +1804,12 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
 
 --------------------------------------------------------------------------------
-Changes for 7.0.27rc1
+Changes for 7.0.27
 
-New features:
+7.0.27rc1 was released as 7.0.27 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.0.27rc1
 
 Bug fixes:
 ........S. [ZBX-22504] improved memory usage in LLD worker processes with large low-level discovery (vso)
@@ -1907,6 +1925,9 @@ New features:
 A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27759] added sanitization of service parameter in Oracle TNS connection string creation process (opucka)
+..F....... [ZBX-27760] wrapped html content into iframe when "show as html" is selected in Item history widget (dfofanovs)
+..F....... [ZBX-27758] fixed XSS vulnerability in Host navigator widget maintenance tooltip (aluchko)
 .......PS. [ZBX-27067] fixed script macros expanding via Zabbix proxy during autoregistration (vsmelovs)
 .......PS. [ZBX-27406] fixed dependent item error message clearing in preprocessing (askolmeisters)
 ..F....... [ZBX-25930] fixed incorrect filter being applied when switching subfilters in multiple tabs in Data collection->Hosts->Items, Monitoring->Hosts->Graphs (gberzina)
@@ -5877,6 +5898,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.47rc1
 
 New features:
+A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
 
 Bug fixes:
 ........S. [ZBX-22504] improved memory usage in lld worker proecesses with large low level discovery (vso)
@@ -5910,6 +5932,8 @@ New features:
 A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27759] added sanitization of service parameter in Oracle TNS connection string creation process (opucka)
+..F....... [ZBX-27760] wrapped html content into iframe when "show as html" is selected in Item history widget (dfofanovs)
 ...G...... [ZBX-25805] fixed regexp runtime error when processing log* items with unspecified encoding by sanitizing invalid UTF-8 (vsmelovs)
 ...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
 ..F....... [ZBX-27819] updated onelogin/php-saml to version 4.3.1 (gcalenko)

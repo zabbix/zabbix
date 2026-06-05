@@ -464,7 +464,7 @@ function makeSectionLatestData(array $item, string $context): CDiv {
 		if ($item['value_type'] != ITEM_VALUE_TYPE_BINARY) {
 			$is_numeric = $item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64;
 
-			if ($item['keep_history'] != 0 || $item['keep_trends'] != 0) {
+			if ($item['show_link']) {
 				$action_column->addItem(
 					(new CDiv(
 						(new CLink($is_numeric ? _('Graph') : _('History'), (new CUrl('history.php'))

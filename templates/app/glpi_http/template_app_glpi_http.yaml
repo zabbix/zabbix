@@ -51,7 +51,7 @@ zabbix_export:
             - Click the *Add* button.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -4322,7 +4322,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: description
-                      value: Tickets
+                      value: 'Tickets: Total'
                     - type: INTEGER
                       name: desc_size
                       value: '20'
@@ -4769,7 +4769,7 @@ zabbix_export:
                       name: value_size
                       value: '20'
                 - type: item
-                  name: Changes
+                  name: 'Changes: Total'
                   x: '24'
                   width: '12'
                   hide_header: 'YES'
@@ -4782,7 +4782,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: description
-                      value: Changes
+                      value: 'Changes: Total'
                     - type: INTEGER
                       name: desc_size
                       value: '20'
