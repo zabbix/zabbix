@@ -92,6 +92,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.monitoring.hosts.datatable':
 				case 'web.hosts.datatable':
 				case 'web.templates.datatable':
+				case 'web.banner.dismissed_ids':
 					$ret = true;
 					break;
 
@@ -117,6 +118,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.monitoring.hosts.datatable':
 				case 'web.hosts.datatable':
 				case 'web.templates.datatable':
+				case 'web.banner.dismissed_ids':
 					$ret = $this->hasInput('value_str');
 					break;
 
@@ -144,6 +146,7 @@ class CControllerProfileUpdate extends CController {
 		switch ($idx) {
 			// PROFILE_TYPE_STR
 			case 'web.dashboard.last_widget_type':
+			case 'web.banner.dismissed_ids':
 				$value_str = $this->getInput('value_str');
 				if ($value_str === '') {
 					CProfile::delete($idx);

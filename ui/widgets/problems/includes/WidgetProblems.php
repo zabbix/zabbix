@@ -277,6 +277,7 @@ class WidgetProblems extends CTableInfo {
 					$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE))
 						->addClass(ZBX_STYLE_COLOR_ICON)
 						->addClass('js-blink')
+						->setAttribute('aria-label', _('Manually unsuppressed'))
 						->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
 				}
 				elseif ($problem['suppression_data']) {

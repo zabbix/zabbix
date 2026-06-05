@@ -18,6 +18,7 @@
 #include "zbx_dbversion_constants.h"
 #include "zbxjson.h"
 #include "zbxtypes.h"
+
 #if defined(HAVE_POSTGRESQL)
 #	include "zbxstr.h"
 #endif
@@ -50,7 +51,7 @@ static int	ZBX_MARIADB_SFORK = OFF;
 /*********************************************************************************
  *                                                                               *
  * Purpose: determine if a vendor database(MySQL, MariaDB, PostgreSQL,           *
- *          ElasticDB) version satisfies Zabbix requirements                     *
+ *          ElasticDB, clickhouse) version satisfies Zabbix requirements         *
  *                                                                               *
  * Parameters: database                - [IN] database name                      *
  *             current_version         - [IN] detected numeric version           *

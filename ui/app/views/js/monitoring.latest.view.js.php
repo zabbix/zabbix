@@ -218,7 +218,7 @@
 						}),
 					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
 					new CDataTableColumn('actions', <?= json_encode(_('Actions')); ?>)
-						.setFields(['itemid', 'is_graph', 'keep_history', 'keep_trends'])
+						.setFields(['itemid', 'is_graph', 'show_link'])
 						.setRenderer('actions'),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['item_icons'])
@@ -364,7 +364,7 @@
 				.setCellRenderer('actions', ({cell_data, cell}) => {
 					const [itemid, is_graph, keep_history, keep_trends] = cell_data;
 
-					if (!keep_history && !keep_trends) {
+					if (!show_link) {
 						return;
 					}
 
