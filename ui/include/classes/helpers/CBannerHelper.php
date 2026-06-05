@@ -31,7 +31,7 @@ class CBannerHelper {
 	 * @return array
 	 */
 	public static function getDismissedIds(): array {
-		return json_decode(CProfile::get('web.banner.dismissed_ids', '[]'), true);
+		return json_decode(CProfile::get('web.banner.dismissed_ids', '[]'), true) ?? [];
 	}
 
 	/**
