@@ -258,7 +258,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 		$custom_text = $this->extractCustomText($options);
 
 		if ($custom_text) {
-			$this->resolveCustomText($data['items'], $custom_text);
+			$this->resolveCustomText($data, $custom_text);
 		}
 
 		$output += [
@@ -403,22 +403,18 @@ class CControllerLatestViewData extends CControllerDataTable {
 		];
 	}
 
-	protected function resolveCustomText(array &$objects, array $custom_text): void {
-		$data = array_fill_keys(array_keys($objects), $custom_text);
+	protected function resolveCustomText(array &$data, array $custom_text): void {
+		$items = [];
 
-		$db_triggers = API::Trigger()->get([
-			'output' => ['priority', 'manual_close', 'event_name', 'description', 'comments', 'priority',
-				'status', 'state', 'value', 'url', 'url_name', 'expression'],
-			'selectHosts' => ['hostid'],
-			'itemids' => array_keys($objects, 'itemid'),
-			'preservekeys' => true
-		]);
+		foreach ($data['items'] as $itemid => $item) {
+			$items[$itemid] = ['hostid' => $item['hostid']] + $custom_text;
+		}
 
-		$resolved_texts = CDataTableMacrosResolver::resolveForSection('latest_data', $data, ['items' => $objects,
-			'triggers' => $db_triggers]);
+		$keys = array_keys($custom_text);
+		$items = CMacrosResolverHelper::resolveItemBasedWidgetMacros($items, array_combine($keys, $keys));
 
-		foreach ($objects as &$item) {
-			$item['custom_text'] = $resolved_texts[$item['itemid']];
+		foreach ($items as $itemid => $item) {
+			$data['items'][$itemid]['custom_text'] = array_intersect_key($item, $custom_text);
 		}
 	}
 }

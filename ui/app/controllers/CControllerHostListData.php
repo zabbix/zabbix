@@ -358,13 +358,13 @@ class CControllerHostListData extends CControllerDataTable {
 		return $output;
 	}
 
-	protected function resolveCustomText(array &$objects, array $custom_text): void {
-		$data = array_fill_keys(array_keys($objects), $custom_text);
+	protected function resolveCustomText(array &$hosts, array $custom_text): void {
+		$custom_text = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($custom_text, array_keys($hosts));
 
-		$resolved_texts = CDataTableMacrosResolver::resolveForSection('hosts', $data);
-
-		foreach ($objects as &$host) {
-			$host['custom_text'] = $resolved_texts[$host['hostid']];
+		foreach ($custom_text as $key => $values) {
+			foreach ($values as $hostid => $value) {
+				$hosts[$hostid]['custom_text'][$key] = $value;
+			}
 		}
 		unset($host);
 	}

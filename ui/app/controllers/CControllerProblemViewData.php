@@ -755,9 +755,6 @@ class CControllerProblemViewData extends CControllerDataTable {
 			foreach ($data['problems'] as &$problem) {
 				CArrayHelper::sort($problem['tags'], ['tag', 'value']);
 				$problem['tags'] = CTagHelper::getTagsList($problem);
-
-				$problem['hosts'] = $triggers_hosts[$problem['objectid']] ?? [];
-				$problem['trigger'] = $data['triggers'][$problem['objectid']] ?? null;
 			}
 			unset($problem);
 		}
@@ -795,35 +792,29 @@ class CControllerProblemViewData extends CControllerDataTable {
 		];
 
 		if ($custom_text) {
-			$this->resolveCustomText($data['problems'], $custom_text);
+			$this->resolveCustomText($data, $custom_text);
 		}
 
 		return $data;
 	}
 
-	protected function resolveCustomText(array &$objects, array $custom_text): void {
-		$db_events = API::Event()->get([
-			'eventids' => array_column($objects, 'eventid'),
-			'preservekeys' => true
-		]);
+	protected function resolveCustomText(array &$data, array $custom_text): void {
+		foreach ($data['problems'] as &$problem) {
+			$trigger = $data['triggers'][$problem['objectid']];
 
-		$triggers = [];
-		$trigger_events = [];
-
-		foreach ($objects as $problem) {
-			$triggerid = $problem['trigger']['triggerid'];
-
-			$triggers[$triggerid] = $problem['trigger'];
-			$trigger_events[$triggerid] = $db_events[$problem['eventid']];
+			$problem['custom_text'] = CMacrosResolverHelper::resolveTriggerCustomTexts(
+				[
+					'triggerid' => $problem['objectid'],
+					'expression' => $trigger['expression'],
+					'clock' => $problem['clock'],
+					'ns' => $problem['ns']
+				] + $custom_text,
+				[
+					'events' => true,
+					'sources' => array_keys($custom_text)
+				]
+			);
 		}
-
-		$data = array_fill_keys(array_keys($triggers), $custom_text);
-
-		$resolved_texts = CDataTableMacrosResolver::resolveForSection('problems', $data, ['triggers' => $triggers,
-			'events_data' => $trigger_events]);
-
-		foreach ($objects as &$problem) {
-			$problem['custom_text'] = $resolved_texts[$problem['trigger']['triggerid']];
-		}
+		unset($problem);
 	}
 }

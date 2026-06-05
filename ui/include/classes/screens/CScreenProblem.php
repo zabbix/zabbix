@@ -297,8 +297,7 @@ class CScreenProblem extends CScreenBase {
 					$seen_triggerids += $triggerids;
 
 					$options = [
-						'output' => ['priority', 'manual_close', 'event_name', 'description', 'comments', 'priority',
-							'status', 'state', 'value', 'url', 'url_name', 'expression'],
+						'output' => ['priority', 'manual_close'],
 						'selectHosts' => ['hostid'],
 						'triggerids' => array_keys($triggerids),
 						'monitored' => true,
@@ -307,13 +306,14 @@ class CScreenProblem extends CScreenBase {
 					];
 
 					$details = array_key_exists('details', $column_options) && $column_options['details'] == 1;
+					$custom_text = array_key_exists('custom_text', $column_options);
 
 					if ($show_opdata) {
 						$options['output'][] = 'opdata';
 						$options['selectFunctions'] = ['itemid'];
 					}
 
-					if ($resolve_comments || $show_opdata || $details) {
+					if ($resolve_comments || $show_opdata || $details || $custom_text) {
 						$options['output'][] = 'expression';
 					}
 
