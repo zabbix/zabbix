@@ -1,1 +1,1 @@
-A.......S. [ZBX-27561] mitigated race conditions when editing sets of groups for users or hosts in parallel API requests (kkuzmina, mprihodko)
+A.......S. [ZBX-27561] mitigated recurring system errors when editing groups for users or hosts in parallel API requests (kkuzmina, mprihodko)
