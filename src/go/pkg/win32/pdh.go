@@ -71,8 +71,8 @@ var (
 	pdhEnumObjectItems          = hPdh.mustGetProcAddress("PdhEnumObjectItemsW")
 	pdhEnumObjects              = hPdh.mustGetProcAddress("PdhEnumObjectsW")
 
-	objectListSize uint32 = objectListSizeInit
-	pflModtime     time.Time
+	objectListSize uint32    = objectListSizeInit
+	pflModtime     time.Time //nolint:gochecknoglobals
 
 	// mutex to prevent concurrent calls of Windows API PDH functions when one of the following is already being executed
 	// pdhEnumObjectItems(), pdhEnumObjects() and pdhCollectQueryData()
@@ -340,16 +340,59 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 	return instances, nil
 }
 
-func PdhEnumObject(force bool) (objects []string, err error) {
+func pdhEnumObjectFetch(force, refresh bool) ([]uint16, bool, error) {
 	const maxAttempts = 3
+
 	var (
 		objectBuf         []uint16
 		objectListSizeRet uint32
 		retErr            uintptr
-		refresh           bool = true
 	)
+
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		objectBuf, objectListSizeRet, retErr = pdhEnumObjectGet(refresh)
+		if !force || !refresh || !isPdhErrorRetryable(retErr) {
+			break
+		}
+
+		log.Debugf("pdhEnumObjectGet(true) attempt:%d err: 0x%08X", attempt, uint32(retErr)) //nolint:gosec
+		time.Sleep(750 * time.Millisecond)
+	}
+
+	if force || !refresh {
+		if syscall.Errno(retErr) != windows.ERROR_SUCCESS {
+			return nil, false, newPdhError(retErr)
+		}
+
+		if objectListSizeRet < 1 {
+			return nil, false, errors.New("No objects found")
+		}
+	}
+
+	fromCache := false
+
+	if objectListSizeRet < 1 {
+		objectBuf, objectListSizeRet, retErr = pdhEnumObjectGet(false)
+		if syscall.Errno(retErr) != windows.ERROR_SUCCESS {
+			return nil, false, newPdhError(retErr)
+		}
+
+		if objectListSizeRet < 1 {
+			return nil, false, errors.New("No cached objects found")
+		}
+
+		fromCache = true
+	}
+
+	return objectBuf, fromCache, nil
+}
+
+// PdhEnumObject returns list of instances for given object. It is used for discovery of performance counter instances.
+func PdhEnumObject(force bool) ([]string, error) {
 	pdhMu.Lock()
 	defer pdhMu.Unlock()
+
+	refresh := true
 
 	pflModtimeNew, pflErr := getPerflibModtime()
 	if pflErr != nil {
@@ -358,50 +401,32 @@ func PdhEnumObject(force bool) (objects []string, err error) {
 		log.Debugf("getPerflibModtime() ModTime=%s", pflModtimeNew.String())
 	}
 
-	if pflModtime.IsZero() == false && pflModtime.Equal(pflModtimeNew) {
+	if !pflModtime.IsZero() && pflModtime.Equal(pflModtimeNew) {
 		log.Debugf("getPerflibModtime() Perflib Modtime has not changed")
+
 		refresh = false
 	}
 
-	for attempt := 1; attempt <= maxAttempts; attempt++ {
-		objectBuf, objectListSizeRet, retErr = pdhEnumObjectGet(refresh)
-		if force == false || refresh == false || isPdhErrorRetryable(retErr) == false {
-			break
-		}
-		log.Debugf("pdhEnumObjectGet(true) attempt:%d err: 0x%08X", attempt, uint32(retErr))
-		time.Sleep(750 * time.Millisecond)
+	objectBuf, fromCache, err := pdhEnumObjectFetch(force, refresh)
+	if err != nil {
+		return nil, err
 	}
 
-	if force == true || refresh == false {
-		if syscall.Errno(retErr) != windows.ERROR_SUCCESS {
-			return nil, newPdhError(retErr)
-		}
-		if objectListSizeRet < 1 {
-			return nil, fmt.Errorf("No objects found.")
-		}
-	}
-
-	if objectListSizeRet < 1 {
-		objectBuf, objectListSizeRet, retErr = pdhEnumObjectGet(false)
-		if syscall.Errno(retErr) != windows.ERROR_SUCCESS {
-			return nil, newPdhError(retErr)
-		}
-		if objectListSizeRet < 1 {
-			return nil, fmt.Errorf("No cached objects found.")
-		}
-	}
-
-	if pflErr == nil {
+	if pflErr == nil && !fromCache {
 		pflModtime = pflModtimeNew
 	}
 
-	var singleName []uint16
+	var (
+		singleName []uint16
+		objects    []string
+	)
 
 	for len(objectBuf) != 0 {
 		singleName, objectBuf = NextField(objectBuf)
 		if len(singleName) == 0 {
 			break
 		}
+
 		objects = append(objects, windows.UTF16ToString(singleName))
 	}
 
@@ -421,6 +446,7 @@ func pdhEnumObjectHelper(objListSize uint32, refresh bool) ([]uint16, uint32, ui
 
 func pdhEnumObjectGet(refresh bool) ([]uint16, uint32, uintptr) {
 	log.Debugf("pdhEnumObjectGet() refresh:%t", refresh)
+
 	objectBuf, objectListSizeRet, ret := pdhEnumObjectHelper(objectListSize, refresh)
 	if ret == PDH_MORE_DATA {
 		log.Debugf("pdhEnumObjectGet() insufficient buffer size: %d", objectListSize)
@@ -441,7 +467,8 @@ func pdhEnumObjectGet(refresh bool) ([]uint16, uint32, uintptr) {
 	}
 
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
-		log.Debugf("pdhEnumObjectGet() error code: 0x%08X", uint32(ret))
+		log.Debugf("pdhEnumObjectGet() error code: 0x%08X", uint32(ret)) //nolint:gosec
+
 		return nil, 0, ret
 	}
 
@@ -487,43 +514,54 @@ func newPdhError(ret uintptr) (err error) {
 		return
 	}
 
-	return fmt.Errorf("%s (error code: 0x%08X)", windows.UTF16ToString(buf), uint32(ret))
+	return fmt.Errorf("%s (error code: 0x%08X)", windows.UTF16ToString(buf), uint32(ret)) //nolint:gosec
 }
 
 func getPerflibModtime() (time.Time, error) {
 	plPath := "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Perflib"
+
 	rootKey, err := registry.OpenKey(registry.LOCAL_MACHINE, plPath, registry.READ)
 	if err != nil {
 		return time.Time{}, errs.Wrap(err, "registry.OpenKey() failed for Perflib key")
 	}
-	defer rootKey.Close()
+
+	defer func() {
+		closeErr := rootKey.Close()
+		if closeErr != nil {
+			log.Debugf("rootKey.Close() failed: %s", closeErr)
+		}
+	}()
 
 	stats, err := rootKey.Stat()
 	if err != nil {
 		return time.Time{}, errs.Wrap(err, "rootKey.Stat() failed")
 	}
+
 	mt := stats.ModTime()
 	if mt.IsZero() {
 		return time.Time{}, errs.New("Perflib modtime is zero")
 	}
+
 	return mt, nil
 }
 
 func isPdhErrorRetryable(code uintptr) bool {
 	const (
-		PDH_CSTATUS_NO_MACHINE = 0x800007D0
-		PDH_CSTATUS_NO_OBJECT  = 0xC0000BB8
-		PDH_LOG_TYPE_NOT_FOUND = 0xC0000BCB
-		PDH_INVALID_HANDLE     = 0xC0000BBC
+		pdhCstatusNoMachine = 0x800007D0
+		pdhCstatusNoObject  = 0xC0000BB8
+		pdhLogTypeNotFound  = 0xC0000BCB
+		pdhInvalidHandle    = 0xC0000BBC
 	)
+
 	switch code {
 	case PDH_MORE_DATA,
 		PDH_CSTATUS_INVALID_DATA,
-		PDH_CSTATUS_NO_MACHINE,
-		PDH_CSTATUS_NO_OBJECT,
-		PDH_LOG_TYPE_NOT_FOUND,
-		PDH_INVALID_HANDLE:
+		pdhCstatusNoMachine,
+		pdhCstatusNoObject,
+		pdhLogTypeNotFound,
+		pdhInvalidHandle:
 		return true
 	}
+
 	return false
 }
