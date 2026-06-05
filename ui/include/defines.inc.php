@@ -1701,7 +1701,6 @@ define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 
 // Standard action layouts.
 define('ZBX_LAYOUT_DOWNLOAD',	'layout.download');
-define('ZBX_LAYOUT_EXPORT',		'layout.export');
 define('ZBX_LAYOUT_HTMLPAGE',	'layout.htmlpage');
 define('ZBX_LAYOUT_IMAGE',		'layout.image');
 define('ZBX_LAYOUT_JAVASCRIPT',	'layout.javascript');

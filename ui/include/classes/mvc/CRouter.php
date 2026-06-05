@@ -121,7 +121,7 @@ final class CRouter {
 		'export.mediatypes'							=> [CControllerExport::class,									ZBX_LAYOUT_DOWNLOAD,	null],
 		'export.sysmaps'							=> [CControllerExport::class,									ZBX_LAYOUT_DOWNLOAD,	null],
 		'export.templates'							=> [CControllerExport::class,									ZBX_LAYOUT_DOWNLOAD,	null],
-		'export.dashboards'							=> [CControllerExport::class,									ZBX_LAYOUT_EXPORT,		null],
+		'export.dashboards'							=> [CControllerExport::class,									ZBX_LAYOUT_DOWNLOAD,	null],
 		'favorite.create'							=> [CControllerFavoriteCreate::class,							ZBX_LAYOUT_JAVASCRIPT,	null],
 		'favorite.delete'							=> [CControllerFavoriteDelete::class,							ZBX_LAYOUT_JAVASCRIPT,	null],
 		'geomaps.edit'								=> [CControllerGeomapsEdit::class,								ZBX_LAYOUT_HTMLPAGE,	'administration.geomaps.edit'],

@@ -16,9 +16,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-header('Content-Type: text/csv; charset=UTF-8');
-header('Content-Disposition: attachment; filename="'.$data['page']['file'].'"');
+header('Content-Type: '.$data['file']['mime_type'].'; charset=utf-8');
+header('Content-Disposition: attachment; filename="'.$data['file']['name'].'"');
 
 echo $data['main_block'];

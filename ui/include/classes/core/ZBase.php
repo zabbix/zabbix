@@ -195,7 +195,7 @@ class ZBase {
 				$this->initModuleManager();
 
 				/** @var CRouter $router */
-				$router = $this->component_registry->get('router');
+				$router = CRouter::getInstance();
 				$router->addActions($this->module_manager->getActions());
 
 				$validator = new CNewValidator(['action' => $action_name], ['action' => 'fatal|required|string']);
@@ -870,8 +870,6 @@ class ZBase {
 	 * Initialize menu for main navigation. Register instance as component with 'menu.main' key.
 	 */
 	private function initComponents(): void {
-		$this->component_registry->register('router', new CRouter());
-
 		if (CWebUser::isLoggedIn()) {
 			$this->component_registry->register('menu.main', CMenuHelper::getMainMenu());
 			$this->component_registry->register('menu.user', CMenuHelper::getUserMenu());
