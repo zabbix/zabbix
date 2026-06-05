@@ -17,7 +17,7 @@ class CWidgetFieldMultiselect extends CWidgetField {
 
 	static #reference_icon_template = `
 		<li class="reference">
-			<span class="${ZBX_ICON_REFERENCE}" data-hintbox="1" data-hintbox-contents="#{hint_text}"></span>
+			<span class="${ZBX_ICON_REFERENCE}" data-hintbox="1" data-hintbox-html="#{hint_text}"></span>
 		</li>
 	`;
 

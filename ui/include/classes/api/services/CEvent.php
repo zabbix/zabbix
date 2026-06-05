@@ -42,7 +42,7 @@ class CEvent extends CApiService {
 	 */
 	public function get(array $options = []) {
 		$acknowledge_output_fields = ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity',
-			'new_severity', 'suppress_until', 'taskid', 'username', 'name', 'surname'
+			'new_severity', 'suppress_until', 'taskid', 'username', 'name', 'surname', 'maintenanceid'
 		];
 		$alert_output_fields = array_diff(CAlert::OUTPUT_FIELDS, ['eventid']);
 
@@ -672,15 +672,15 @@ class CEvent extends CApiService {
 		if ($options['selectAcknowledges'] != API_OUTPUT_COUNT) {
 			$output = $options['selectAcknowledges'] === API_OUTPUT_EXTEND
 				? ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
-					'suppress_until', 'taskid'
+					'suppress_until', 'taskid', 'maintenanceid'
 				]
 				: array_diff($options['selectAcknowledges'], ['username', 'name', 'surname']);
 
 			$db_acknowledges = DB::select('acknowledges', [
 				'output' => $this->outputExtend($output, ['acknowledgeid', 'eventid', 'userid']),
 				'filter' => ['eventid' => array_keys($result)],
-				'sortfield' => ['clock'],
-				'sortorder' => [ZBX_SORT_DOWN],
+				'sortfield' => ['clock', 'acknowledgeid'],
+				'sortorder' => [ZBX_SORT_DOWN, ZBX_SORT_DOWN],
 				'preservekeys' => true
 			]);
 

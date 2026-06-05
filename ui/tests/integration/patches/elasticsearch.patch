@@ -1,0 +1,32 @@
+diff --git a/src/libs/zbxhistory/history_elastic.c b/src/libs/zbxhistory/history_elastic.c
+index c90fdd110f2..6b84f66d776 100644
+--- a/src/libs/zbxhistory/history_elastic.c
++++ b/src/libs/zbxhistory/history_elastic.c
+@@ -84,11 +84,11 @@ zbx_history_elastic_data_t;
+  ******************************************************************************/
+ static const char	*elastic_get_index_name(unsigned char value_type)
+ {
+-	static const char	*value_type_str[ITEM_VALUE_TYPE_COUNT] = {"dbl", "str", "log", "uint", "text", "bin",
+-				"json"};
++	static const char	*value_type_str[ITEM_VALUE_TYPE_COUNT] = {"{DBNAME}_dbl", "{DBNAME}_str", "{DBNAME}_log", "{DBNAME}_uint", "{DBNAME}_text", "{DBNAME}_bin",
++				"{DBNAME}_json"};
+ 
+ 	if (value_type >= ARRSIZE(value_type_str))
+-		return "unknown";
++		return "{DBNAME}_unknown";
+ 
+ 	return value_type_str[value_type];
+ }
+diff --git a/ui/include/classes/api/managers/CHistoryManager.php b/ui/include/classes/api/managers/CHistoryManager.php
+index e89571b21e4..153cd9d624d 100644
+--- a/ui/include/classes/api/managers/CHistoryManager.php
++++ b/ui/include/classes/api/managers/CHistoryManager.php
+@@ -1839,7 +1839,7 @@ class CHistoryManager {
+ 
+ 		foreach ($this->value_type_config as $value_type => $config) {
+ 			if ($config['provider'] === ZBX_HISTORY_SOURCE_ELASTIC && in_array($value_type, $value_types)) {
+-				$endpoints[$value_type] = $config['url'].'/'.$value_type_index[$value_type].'/'.$action;
++				$endpoints[$value_type] = $config['url'].'/'."{DBNAME}_".$value_type_index[$value_type].'/'.$action;
+ 			}
+ 		}
+ 

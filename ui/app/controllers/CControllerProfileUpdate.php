@@ -16,7 +16,7 @@
 
 class CControllerProfileUpdate extends CController {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'idx' =>		'required|string',
 			'value_int' =>	'int32',
@@ -87,12 +87,18 @@ class CControllerProfileUpdate extends CController {
 				case 'web.user.token.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.web.filter.active':
+				case 'web.monitoring.problem.datatable':
+				case 'web.monitoring.latest.datatable':
+				case 'web.monitoring.hosts.datatable':
+				case 'web.hosts.datatable':
+				case 'web.templates.datatable':
+				case 'web.banner.dismissed_ids':
 					$ret = true;
 					break;
 
 				case 'web.dashboard.widget.geomap.default_view':
 				case 'web.dashboard.widget.geomap.severity_filter':
-				case (bool) preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
+				case (bool) preg_match('/^web.dashboard.widget.navtree.item-\d+.toggle$/', $this->getInput('idx')):
 				case 'web.dashboard.widget.navtree.item.selected':
 					$ret = $this->hasInput('idx2');
 					break;
@@ -107,6 +113,12 @@ class CControllerProfileUpdate extends CController {
 				case 'web.dashboard.last_widget_type':
 				case 'web.dashboard.widget.geomap.default_view':
 				case 'web.dashboard.widget.geomap.severity_filter':
+				case 'web.monitoring.problem.datatable':
+				case 'web.monitoring.latest.datatable':
+				case 'web.monitoring.hosts.datatable':
+				case 'web.hosts.datatable':
+				case 'web.templates.datatable':
+				case 'web.banner.dismissed_ids':
 					$ret = $this->hasInput('value_str');
 					break;
 
@@ -123,17 +135,18 @@ class CControllerProfileUpdate extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$idx = $this->getInput('idx');
 
 		DBstart();
 		switch ($idx) {
 			// PROFILE_TYPE_STR
 			case 'web.dashboard.last_widget_type':
+			case 'web.banner.dismissed_ids':
 				$value_str = $this->getInput('value_str');
 				if ($value_str === '') {
 					CProfile::delete($idx);
@@ -144,6 +157,11 @@ class CControllerProfileUpdate extends CController {
 				break;
 			case 'web.dashboard.widget.geomap.default_view':
 			case 'web.dashboard.widget.geomap.severity_filter':
+			case 'web.monitoring.problem.datatable':
+			case 'web.monitoring.latest.datatable':
+			case 'web.monitoring.hosts.datatable':
+			case 'web.hosts.datatable':
+			case 'web.templates.datatable':
 				$value_str = $this->getInput('value_str');
 				if ($value_str === '') { // default value
 					CProfile::delete($idx, $this->getInput('idx2'));
@@ -156,7 +174,7 @@ class CControllerProfileUpdate extends CController {
 				break;
 
 			// PROFILE_TYPE_INT
-			case (bool) preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
+			case (bool) preg_match('/^web.dashboard.widget.navtree.item-\d+.toggle$/', $this->getInput('idx')):
 				$value_int = $this->getInput('value_int');
 				if ($value_int == 1) { // default value
 					CProfile::delete($idx, $this->getInput('idx2'));

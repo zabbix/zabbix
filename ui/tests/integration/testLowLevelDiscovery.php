@@ -99,7 +99,8 @@ class testLowLevelDiscovery extends CIntegrationTest {
 			'hostid' => self::$hostid,
 			'name' => 'Trapper discovery',
 			'key_' => 'item_discovery',
-			'type' => ITEM_TYPE_TRAPPER
+			'type' => ITEM_TYPE_TRAPPER,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -113,7 +114,8 @@ class testLowLevelDiscovery extends CIntegrationTest {
 			'name' => 'Item: {#KEY}',
 			'key_' => 'trap[{#KEY}]',
 			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_TEXT
+			'value_type' => ITEM_VALUE_TYPE_TEXT,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -161,6 +163,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 		$lt['key_'] = $rule_name;
 		$lt['hostid'] = self::$lifetime_hostid;
 		$lt['type'] = ITEM_TYPE_TRAPPER;
+		$lt['trapper_hosts'] = '{$TRAPPER.ALLOWED_HOSTS}';
 
 		$response = $this->call('discoveryrule.create', $lt);
 		$this->assertCount(1, $response['result']['itemids']);
@@ -190,7 +193,8 @@ class testLowLevelDiscovery extends CIntegrationTest {
 			'name' => $rule_name.'_i_'.self::LLD_DATA_MACRO,
 			'key_' => $rule_name.'_trap['.self::LLD_DATA_MACRO.']',
 			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_UINT64
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 
 		$this->assertCount(1, $response['result']['itemids']);

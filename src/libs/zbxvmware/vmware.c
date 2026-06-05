@@ -840,6 +840,10 @@ static void	vmware_alarm_free(zbx_vmware_alarm_t *alarm)
 	zbx_str_free(alarm->description);
 	zbx_str_free(alarm->overall_status);
 	zbx_str_free(alarm->time);
+	zbx_str_free(alarm->entity_id);
+	zbx_str_free(alarm->entity_uuid);
+	zbx_str_free(alarm->entity_type);
+	zbx_str_free(alarm->entity_name);
 	zbx_free(alarm);
 }
 
@@ -1393,6 +1397,7 @@ int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmware_ser
 		int				j;
 		zbx_vmware_alarm_t		*alarm;
 		zbx_vmware_alarm_details_t	detail_cmp;
+		xmlNode				*entity;
 
 		if (NULL == (value = zbx_xml_node_read_value(xdoc, nodeset->nodeTab[i], ZBX_XNN("alarm"))))
 		{
@@ -1442,6 +1447,17 @@ int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmware_ser
 		alarm->acknowledged = (NULL != value && 0 == strcmp(value, "true") ? 1 : 0);
 		zbx_free(value);
 
+		if (NULL != (entity = zbx_xml_node_get(xdoc, nodeset->nodeTab[i], ZBX_XNN("entity"))))
+		{
+			alarm->entity_id = zbx_xml_node_read_value(xdoc, entity, ".");
+			alarm->entity_type = zbx_xml_node_read_prop(entity, "type");
+		}
+		else
+		{
+			alarm->entity_id = NULL;
+			alarm->entity_type = NULL;
+		}
+
 		zbx_vector_vmware_alarm_ptr_append(alarms_data->alarms, alarm);
 		zbx_vector_str_append(ids, zbx_strdup(NULL, alarm->key));
 	}
@@ -1452,6 +1468,158 @@ clean:
 			ids->values_num, alarms_data->alarms->values_num);
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: finds uuid and friendly name of alarm source entity by its id     *
+ *                                                                            *
+ * Parameters: data - [IN] all collected data                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_service_alarm_uuid_name_update(zbx_vmware_data_t *data)
+{
+#	define	entity_name_update(entity_type, friendly_name, entity_vector_type, entity_vector)		\
+		entity_vector_type	*values = entity_vector;						\
+														\
+		for (int j = 0; j < values->values_num; j++)							\
+		{												\
+			entity_type	*entity = values->values[j];						\
+														\
+			if (0 != strcmp(entity->id, alarm->entity_id))						\
+				continue;									\
+														\
+			if (NULL != entity->friendly_name)							\
+				alarm->entity_name = zbx_strdup(NULL, entity->friendly_name);			\
+														\
+			break;											\
+		}
+
+	int	i, skipped = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alerts:%d", __func__, data->alarms.values_num);
+
+	for (i = 0; i < data->alarms.values_num; i++)
+	{
+		zbx_vmware_alarm_t	*alarm = data->alarms.values[i];
+
+		alarm->entity_uuid = NULL;	/* we can't guarantee that we will find any uuid */
+		alarm->entity_name = NULL;
+
+		if (NULL == alarm->entity_id)
+			continue;
+
+		if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_VM))
+		{
+			zbx_hashset_iter_t	iter;
+			zbx_vmware_hv_t		*hv;
+
+			zbx_hashset_iter_reset(&data->hvs, &iter);
+
+			while (NULL != (hv = (zbx_vmware_hv_t *)zbx_hashset_iter_next(&iter)))
+			{
+				int	j;
+
+				for (j = 0; j < hv->vms.values_num; j++)
+				{
+					zbx_vmware_vm_t	*vm = hv->vms.values[j];
+
+					if (0 != strcmp(vm->id, alarm->entity_id) ||
+							FAIL == zbx_vector_str_bsearch(&vm->alarm_ids, alarm->key,
+							ZBX_DEFAULT_STR_COMPARE_FUNC))
+					{
+						continue;
+					}
+
+					alarm->entity_uuid = zbx_strdup(NULL, vm->uuid);
+
+					if (NULL != vm->props[ZBX_VMWARE_VMPROP_NAME])
+					{
+						alarm->entity_name = zbx_strdup(NULL,
+								vm->props[ZBX_VMWARE_VMPROP_NAME]);
+					}
+
+					break;
+				}
+
+				if (j < hv->vms.values_num)
+					break;
+			}
+		}
+		else if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_HV))
+		{
+			zbx_hashset_iter_t	iter;
+			zbx_vmware_hv_t		*hv;
+
+			zbx_hashset_iter_reset(&data->hvs, &iter);
+
+			while (NULL != (hv = (zbx_vmware_hv_t *)zbx_hashset_iter_next(&iter)))
+			{
+				if (0 != strcmp(hv->id, alarm->entity_id) ||
+						FAIL == zbx_vector_str_bsearch(&hv->alarm_ids, alarm->key,
+						ZBX_DEFAULT_STR_COMPARE_FUNC))
+				{
+					continue;
+				}
+
+				alarm->entity_uuid = zbx_strdup(NULL, hv->uuid);
+
+				if (NULL != hv->props[ZBX_VMWARE_HVPROP_NAME])
+					alarm->entity_name = zbx_strdup(NULL, hv->props[ZBX_VMWARE_HVPROP_NAME]);
+
+				break;
+			}
+		}
+		else if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_DS))
+		{
+			int			j;
+			zbx_vmware_datastore_t	ds_cmp;
+
+			ds_cmp.id = alarm->entity_id;
+
+			if (FAIL == (j = zbx_vector_vmware_datastore_ptr_search(&data->datastores, &ds_cmp,
+					vmware_ds_id_compare)) ||
+					FAIL == zbx_vector_str_bsearch(&data->datastores.values[j]->alarm_ids,
+					alarm->key, ZBX_DEFAULT_STR_COMPARE_FUNC))
+			{
+				continue;
+			}
+
+			alarm->entity_uuid = zbx_strdup(NULL, data->datastores.values[j]->uuid);
+
+			if (NULL != data->datastores.values[j]->name)
+				alarm->entity_name = zbx_strdup(NULL, data->datastores.values[j]->name);
+		}
+		else if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_CLUSTER))
+		{
+			entity_name_update(zbx_vmware_cluster_t, name, zbx_vector_vmware_cluster_ptr_t,
+					&data->clusters);
+		}
+		else if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_DC))
+		{
+			entity_name_update(zbx_vmware_datacenter_t, name, zbx_vector_vmware_datacenter_ptr_t,
+					&data->datacenters);
+		}
+		else if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_DVS))
+		{
+			entity_name_update(zbx_vmware_dvswitch_t, name, zbx_vector_vmware_dvswitch_ptr_t,
+					&data->dvswitches);
+		}
+		else if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_RESOURCEPOOL))
+		{
+			entity_name_update(zbx_vmware_resourcepool_t, path, zbx_vector_vmware_resourcepool_ptr_t,
+					&data->resourcepools);
+		}
+		else
+		{
+			skipped++;
+			zabbix_log(LOG_LEVEL_TRACE, "%s() skipped entity_type:%s", __func__, alarm->entity_type);
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() skipped uuid:%d", __func__, skipped);
+
+#	undef entity_name_update
 }
 
 /******************************************************************************
@@ -2608,6 +2776,8 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 
 	page.alloc = ZBX_INIT_UPD_XML_SIZE;
 	page.data = (char *)zbx_malloc(NULL, page.alloc);
+	page.data[0] = '\0';
+	page.offset = 0;
 
 	if (SUCCEED != vmware_curl_set_header(easyhandle, service->major_version, &headers, &data->error))
 		goto clean;
@@ -2657,7 +2827,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	if (SUCCEED != zbx_hashset_reserve(&data->hvs, hvs.values_num))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	for (int i = 0; i < hvs.values_num; i++)
@@ -2698,6 +2868,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	vmware_service_props_load(easyhandle, get_vmware_service_objects()[service->type].property_collector,
 			&prop_query_values);
 	zbx_vector_vmware_alarm_ptr_sort(&data->alarms, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
+	vmware_service_alarm_uuid_name_update(data);
 
 	if (ZBX_VMWARE_TYPE_VCENTER != service->type)
 	{

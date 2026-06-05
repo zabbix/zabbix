@@ -50,9 +50,11 @@ void	__wrap_zbx_shmem_dump_stats(int level, zbx_shmem_info_t *info);
 int	__wrap_zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values);
 int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history);
-void	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type);
-int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type,
-		int config_log_slow_queries, char **error);
+zbx_history_provider_t	*__wrap_history_sql_open(const zbx_history_option_t *options, int options_num, char **error);
+zbx_history_provider_t	*__wrap_history_elastic_open(const zbx_history_option_t *options, int options_num,
+		char **error);
+zbx_history_provider_t	*__wrap_history_clickhouse_open(const zbx_history_option_t *options, int options_num,
+		char **error);
 void	__wrap_zbx_elastic_version_extract(void);
 int	__wrap_zbx_elastic_version_get(void);
 time_t	__wrap_time(time_t *ptr);
@@ -436,12 +438,13 @@ void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_dc_history_p
 		memset(data, 0, sizeof(zbx_dc_history_t));
 
 		itemid = zbx_mock_get_object_member_string(hitem, "itemid");
-		if (SUCCEED != zbx_is_uint64(itemid, &data->itemid))
+		if (SUCCEED != zbx_is_uint64(itemid, &data->entry.itemid))
 			fail_msg("Invalid itemid \"%s\"", itemid);
 
-		data->value_type = zbx_mock_str_to_value_type(zbx_mock_get_object_member_string(hitem, "value type"));
+		data->entry.value_type = zbx_mock_str_to_value_type(zbx_mock_get_object_member_string(hitem,
+				"value type"));
 		hdata = zbx_mock_get_object_member_handle(hitem, "data");
-		zbx_vcmock_read_history_value(hdata, data->value_type, &data->value, &data->ts);
+		zbx_vcmock_read_history_value(hdata, data->entry.value_type, &data->entry.value, &data->entry.ts);
 
 		zbx_vector_dc_history_ptr_append(history, data);
 	}
@@ -454,16 +457,16 @@ void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_dc_history_p
  ******************************************************************************/
 void	zbx_vcmock_free_dc_history(zbx_dc_history_t *h)
 {
-	switch (h->value_type)
+	switch (h->entry.value_type)
 	{
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			zbx_free(h->value.str);
+			zbx_free(h->entry.value.str);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			zbx_free(h->value.log->source);
-			zbx_free(h->value.log->value);
-			zbx_free(h->value.log);
+			zbx_free(h->entry.value.log->source);
+			zbx_free(h->entry.value.log->value);
+			zbx_free(h->entry.value.log);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 		case ITEM_VALUE_TYPE_FLOAT:
@@ -472,7 +475,7 @@ void	zbx_vcmock_free_dc_history(zbx_dc_history_t *h)
 		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
-			fail_msg("Unexpected value type: %c", h->value_type);
+			fail_msg("Unexpected value type: %c", h->entry.value_type);
 	}
 
 	zbx_free(h);
@@ -632,18 +635,18 @@ int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history)
 	{
 		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
 
-		if (NULL == (item = zbx_hashset_search(&vc_ds.items, &h->itemid)))
+		if (NULL == (item = zbx_hashset_search(&vc_ds.items, &h->entry.itemid)))
 		{
-			item_local.itemid = h->itemid;
-			item_local.value_type = h->value_type;
+			item_local.itemid = h->entry.itemid;
+			item_local.value_type = h->entry.value_type;
 			zbx_history_record_vector_create(&item_local.data);
 
 			item = zbx_hashset_insert(&vc_ds.items, &item_local, sizeof(item_local));
 		}
 
-		src.value = h->value;
-		src.timestamp = h->ts;
-		zbx_vcmock_ds_clone_record(&src, h->value_type, &dst);
+		src.value = h->entry.value;
+		src.timestamp = h->entry.ts;
+		zbx_vcmock_ds_clone_record(&src, h->entry.value_type, &dst);
 		zbx_vector_history_record_append_ptr(&item->data, &dst);
 		zbx_vector_history_record_sort(&item->data, history_compare);
 	}
@@ -651,21 +654,33 @@ int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history)
 	return SUCCEED;
 }
 
-void	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type)
+zbx_history_provider_t	*__wrap_history_sql_open(const zbx_history_option_t *options, int options_num, char **error)
 {
-	ZBX_UNUSED(hist);
-	ZBX_UNUSED(value_type);
-}
-
-int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type,
-		int config_log_slow_queries, char **error)
-{
-	ZBX_UNUSED(hist);
-	ZBX_UNUSED(value_type);
-	ZBX_UNUSED(config_log_slow_queries);
+	ZBX_UNUSED(options);
+	ZBX_UNUSED(options_num);
 	ZBX_UNUSED(error);
 
-	return SUCCEED;
+	return NULL;
+}
+
+zbx_history_provider_t	*__wrap_history_elastic_open(const zbx_history_option_t *options, int options_num,
+		char **error)
+{
+	ZBX_UNUSED(options);
+	ZBX_UNUSED(options_num);
+	ZBX_UNUSED(error);
+
+	return NULL;
+}
+
+zbx_history_provider_t	*__wrap_history_clickhouse_open(const zbx_history_option_t *options, int options_num,
+		char **error)
+{
+	ZBX_UNUSED(options);
+	ZBX_UNUSED(options_num);
+	ZBX_UNUSED(error);
+
+	return NULL;
 }
 
 void	__wrap_zbx_elastic_version_extract(void)

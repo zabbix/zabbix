@@ -96,11 +96,5 @@ zbx_uint32_t	db_get_server_version(void);
 
 void	dbconn_pool_sync_info(zbx_dbconn_pool_stats_t *stats, zbx_dbconn_pool_config_t *cfg);
 
-/* connection pool settings */
-#define ZBX_SETTINGS_DBPOOL			"dbpool_"
-#define ZBX_SETTINGS_DBPOOL_MAX_IDLE		ZBX_SETTINGS_DBPOOL "max_idle"
-#define ZBX_SETTINGS_DBPOOL_MAX_OPEN		ZBX_SETTINGS_DBPOOL "max_open"
-#define ZBX_SETTINGS_DBPOOL_IDLE_TIMEOUT	ZBX_SETTINGS_DBPOOL "idle_timeout"
-
 #endif
 

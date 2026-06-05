@@ -176,7 +176,7 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 		}
 	}
 
-	if ('\0' != *ssl_key_password)
+	if (NULL != ssl_key_password && '\0' != *ssl_key_password)
 	{
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_KEYPASSWD, ssl_key_password)))
 		{

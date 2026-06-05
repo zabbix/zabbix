@@ -109,18 +109,32 @@
 	.collapsible,
 	.fields-group {
 		> label {
+			box-sizing: border-box;
 			align-self: start;
 			line-height: 24px;
 			text-align: right;
 			word-wrap: break-word;
 
+			@extend %overflow-ellipsis;
+
 			&.fields-group-label {
 				margin-top: 6px;
 			}
 
-			.btn-icon,
 			.icon {
 				margin-left: 5px;
+			}
+
+			&:has(.btn-icon:not([hidden]):not([style*="display: none"])) {
+				position: relative;
+				right: -2px;
+				padding-right: 23px;
+
+				.btn-icon {
+					position: absolute;
+					top: 4px;
+					right: 2px;
+				}
 			}
 
 			&:not([for]) {
@@ -166,6 +180,11 @@
 
 	&.form-grid-actions {
 		margin-top: 10px;
+	}
+
+	.field-inline {
+		display: flex;
+		align-items: baseline;
 	}
 
 	.form-field {
@@ -317,5 +336,14 @@
 			top: 1px;
 			vertical-align: text-bottom;
 		}
+	}
+
+	&.form-subgrid {
+		grid-template-columns: subgrid;
+		grid-column: 1 / -1;
+	}
+
+	[hidden] {
+		display: none !important;
 	}
 }

@@ -324,11 +324,12 @@ static void	rm_register_writer(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_
 		if (manager->next_writer_index == manager->writers.values_num)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		writer = (zbx_rm_writer_t *)manager->writers.values[manager->next_writer_index++];
 		writer->client = client;
+		zbx_ipc_client_addref(client);
 
 		zbx_queue_ptr_push(&manager->free_writers, writer);
 	}
@@ -388,7 +389,7 @@ static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str);
 	zbx_base64_encode_dyn(j.buffer, &cookie, j.buffer_size);
 
-	zbx_json_clean(&j);
+	zbx_json_free(&j);
 	zbx_free(out_str);
 
 	return cookie;
@@ -2230,7 +2231,7 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize alert manager: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);

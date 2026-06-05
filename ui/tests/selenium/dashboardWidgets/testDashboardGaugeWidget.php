@@ -480,7 +480,7 @@ class testDashboardGaugeWidget extends testWidgets {
 		$this->assertEquals(['Widget', 'Dashboard'], $menu->getItems()->asText());
 		$menu->select('Dashboard');
 		$form->checkValue(['Override host' => 'Dashboard']);
-		$this->assertTrue($override->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
+		$this->assertTrue($override->query('xpath:.//span[@data-hintbox-html="Dashboard is used as data source."]')
 				->one()->isVisible()
 		);
 

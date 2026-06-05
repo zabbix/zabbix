@@ -27,10 +27,6 @@ $html_page = (new CHtmlPage())
 $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('housekeeping')))->removeId())
 	->setId('housekeeping-form')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'housekeeping.update')
-		->getUrl()
-	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 $house_keeper_tab = (new CFormList())
@@ -39,6 +35,7 @@ $house_keeper_tab = (new CFormList())
 		new CLabel(_('Enable internal housekeeping'), 'hk_events_mode'),
 		(new CCheckBox('hk_events_mode'))
 			->setChecked($data['hk_events_mode'] == 1)
+			->setUncheckedValue(0)
 			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(
@@ -91,7 +88,9 @@ $house_keeper_tab = (new CFormList())
 	->addRow((new CTag('h4', true, _('Services')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_services_mode'),
-		(new CCheckBox('hk_services_mode'))->setChecked($data['hk_services_mode'] == 1)
+		(new CCheckBox('hk_services_mode'))
+			->setChecked($data['hk_services_mode'] == 1)
+			->setUncheckedValue(0)
 	)
 	->addRow(
 		(new CLabel(_('Data storage period'), 'hk_services'))
@@ -104,7 +103,9 @@ $house_keeper_tab = (new CFormList())
 	->addRow((new CTag('h4', true, _('User sessions')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_sessions_mode'),
-		(new CCheckBox('hk_sessions_mode'))->setChecked($data['hk_sessions_mode'] == 1)
+		(new CCheckBox('hk_sessions_mode'))
+			->setChecked($data['hk_sessions_mode'] == 1)
+			->setUncheckedValue(0)
 	)
 	->addRow(
 		(new CLabel(_('Data storage period'), 'hk_sessions'))
@@ -117,7 +118,9 @@ $house_keeper_tab = (new CFormList())
 	->addRow((new CTag('h4', true, _('History')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_history_mode'),
-		(new CCheckBox('hk_history_mode'))->setChecked($data['hk_history_mode'] == 1)
+		(new CCheckBox('hk_history_mode'))
+			->setChecked($data['hk_history_mode'] == 1)
+			->setUncheckedValue(0)
 	)
 	->addRow(
 		new CLabel([
@@ -126,38 +129,81 @@ $house_keeper_tab = (new CFormList())
 				? makeWarningIcon(
 					_('This setting should be enabled, because history tables contain compressed chunks.')
 				)
-					->addStyle('display:none;')
+					->addStyle('display: none;')
 					->addClass('js-hk-history-warning')
 				: null
 		], 'hk_history_global'),
-		(new CCheckBox('hk_history_global'))->setChecked($data['hk_history_global'] == 1),
+		(new CCheckBox('hk_history_global'))
+			->setChecked($data['hk_history_global'] == 1)
+			->setUncheckedValue(0),
 	)
 	->addRow(
-		(new CLabel(_('Data storage period'), 'hk_history'))
+		(new CLabel([
+			_('Data storage period'),
+			$data['value_type_storage']
+				? makeWarningIcon(
+					_('This setting does not affect Elasticsearch and ClickHouse storage periods.')
+				)
+				: null
+		], 'hk_history'))
 			->setAsteriskMark(),
 		(new CTextBox('hk_history', $data['hk_history'], false, CSettingsSchema::getFieldLength('hk_history')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_history_global'] == 1)
 			->setAriaRequired()
-	)
-	->addRow((new CTag('h4', true, _('Trends')))->addClass('input-section-header'))
+	);
+
+foreach ([ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC] as $storage_type) {
+	$value_type_storage = array_filter($data['value_type_storage'], static fn($s) => $s['provider'] === $storage_type);
+
+	if (!$value_type_storage) {
+		continue;
+	}
+
+	$house_keeper_tab->addRow(
+		(new CTag('p', true, match ($storage_type) {
+			ZBX_HISTORY_SOURCE_CLICKHOUSE => _s('%1$s data storage period', _('ClickHouse')),
+			ZBX_HISTORY_SOURCE_ELASTIC => _s('%1$s data storage period', _('Elasticsearch'))
+		}))->addClass('input-section-header')
+	);
+
+	foreach ($value_type_storage as $value_type => $storage) {
+		$house_keeper_tab->addRow(
+			new CLabel(itemValueTypeString($value_type)),
+			$storage['value_ttl'] === null
+				? _('Unknown')
+				: convertSecondsToTimeUnits($storage['value_ttl'])
+		);
+	}
+}
+
+$house_keeper_tab->addRow((new CTag('h4', true, _('Trends')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_trends_mode'),
-		(new CCheckBox('hk_trends_mode'))->setChecked($data['hk_trends_mode'] == 1)
+		(new CCheckBox('hk_trends_mode'))
+			->setChecked($data['hk_trends_mode'] == 1)
+			->setUncheckedValue(0)
 	)
 	->addRow(
 		new CLabel([
 			_('Override item trend period'),
 			array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS, $data)
 				? makeWarningIcon(_('This setting should be enabled, because trend tables contain compressed chunks.'))
-					->addStyle('display:none;')
+					->addStyle('display: none;')
 					->addClass('js-hk-trends-warning')
 				: null
 		], 'hk_trends_global'),
-		(new CCheckBox('hk_trends_global'))->setChecked($data['hk_trends_global'] == 1)
+		(new CCheckBox('hk_trends_global'))
+			->setChecked($data['hk_trends_global'] == 1)
+			->setUncheckedValue(0)
 	)
 	->addRow(
-		(new CLabel(_('Data storage period'), 'hk_trends'))
+		(new CLabel([
+			_('Data storage period'),
+			$data['trends_storage_hint']
+				? makeWarningIcon(_('Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse.'))
+				: null
+		], 'hk_trends'))
 			->setAsteriskMark(),
 		(new CTextBox('hk_trends', $data['hk_trends'], false, CSettingsSchema::getFieldLength('hk_trends')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
@@ -215,6 +261,7 @@ $house_keeper_tab = (new CFormList())
 			->setChecked($data['compression_availability'] && $data['compression_status'] == 1
 				|| $data['compression_not_detected']
 			)
+			->setUncheckedValue(0)
 			->setEnabled($data['compression_availability']);
 
 		$house_keeper_tab
@@ -248,11 +295,19 @@ $form->addItem(
 	(new CTabView())
 		->addTab('houseKeeper', _('Housekeeping'), $house_keeper_tab)
 		->setFooter(makeFormFooter(
-			new CSubmit('update', _('Update')),
-			[new CButton('resetDefaults', _('Reset defaults'))]
+			(new CSubmit('', _('Update')))->addClass('js-submit'),
+			[(new CButton('', _('Reset defaults')))->addClass('js-reset-defaults')]
 		))
 );
 
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag(
+	'view.init('.json_encode([
+		'rules' => $data['js_validation_rules'],
+		'default_values' => $data['default_values']
+]).')'))
+	->setOnDocumentReady()
 	->show();

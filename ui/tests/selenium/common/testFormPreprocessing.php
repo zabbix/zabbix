@@ -3136,6 +3136,10 @@ abstract class testFormPreprocessing extends CWebTest {
 			// TODO: Added updateViewport due to not centered screenshot for an item's preprocessing
 			// which makes unclear if result is correct.
 			$this->page->updateViewport();
+			// TODO: unstable screenshots on Jenkins. Added border radius 0 for checkboxes.
+			$this->page->getDriver()->executeScript('document.querySelectorAll(\'.checkbox-radio[type="checkbox"]'.
+					'+ label span\').forEach(function (e){ e.style.borderRadius = 0; });'
+			);
 			$this->assertScreenshot($this->query('id:preprocessing')->one(), 'Preprocessing'.$this->link);
 		}
 
@@ -4303,7 +4307,8 @@ abstract class testFormPreprocessing extends CWebTest {
 			if (array_key_exists('parameters', $step)) {
 				foreach ($step['parameters'] as $i => $parameter) {
 					$parameter['selector'] = CTestArrayHelper::get($parameter, 'selector',
-							'xpath:.//input[@id="preprocessing_0_params_'.$i.'"]'
+							'xpath:.//z-textarea-flexible[@id="preprocessing_0_params_'.$i.
+							'"]|.//input[@id="preprocessing_0_params_'.$i.'"]'
 					);
 					$field = $preprocessing_container->query($parameter['selector'])->waitUntilPresent()->one();
 
@@ -4322,7 +4327,9 @@ abstract class testFormPreprocessing extends CWebTest {
 				}
 			}
 			else {
-				$this->assertFalse($preprocessing_container->query('xpath:.//input[contains(@id, "preprocessing_0_params")]')->exists());
+				$this->assertFalse($preprocessing_container->query('xpath:.//z-textarea-flexible'.
+						'[contains(@id, "preprocessing_0_params")]|.//input[contains(@id, "preprocessing_0_params")]')->exists()
+				);
 			}
 		}
 

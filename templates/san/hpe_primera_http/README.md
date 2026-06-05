@@ -30,6 +30,10 @@ This template has been tested on:
 4. Set the hostname or IP address of the host in the {$HPE.PRIMERA.API.HOST} macro and configure the username and password in the {$HPE.PRIMERA.API.USERNAME} and {$HPE.PRIMERA.API.PASSWORD} macros.
 5. Change the {$HPE.PRIMERA.API.SCHEME} and {$HPE.PRIMERA.API.PORT} macros if needed.
 
+Note:
+In WSAPI 1.7, the `Failed` disk state is reported as `state = 3`.
+WSAPI 1.8+ introduces a separate `New` disk state `state = 3` and reports `Failed` as `state = 4`.
+
 ### Macros used
 
 |Name|Description|Default|
@@ -149,7 +153,7 @@ This template has been tested on:
 |Disk [{#POSITION}]: Path B1 degraded|<p>Indicates if this is a degraded path for the disk.</p>|Dependent item|hpe.primera.disk["{#ID}",loop_b1_degraded]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.loopB1.degraded`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li><li>Boolean to decimal</li></ul>|
 |Disk [{#POSITION}]: RPM|<p>RPM of the physical disk.</p>|Dependent item|hpe.primera.disk["{#ID}",rpm]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.RPM`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Disk [{#POSITION}]: Serial number|<p>Disk drive serial number.</p>|Dependent item|hpe.primera.disk["{#ID}",serial_number]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serialNumber`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Disk [{#POSITION}]: State|<p>State of the physical disk:</p><p></p><p>Normal (1) - physical disk is in Normal state;</p><p>Degraded (2) - physical disk is not operating normally;</p><p>New (3) - physical disk is new, needs to be admitted;</p><p>Failed (4) - physical disk has failed;</p><p>Unknown (99) - physical disk state is unknown.</p>|Dependent item|hpe.primera.disk["{#ID}",state]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p><p>⛔️Custom on fail: Set value to: `99`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Disk [{#POSITION}]: State|<p>State of the physical disk:</p><p></p><p>Normal (1) - physical disk is in Normal state;</p><p>Degraded (2) - physical disk is not operating normally;</p><p>New (3) - physical disk is new, needs to be admitted;</p><p>Failed (4) - physical disk has failed;</p><p>Unknown (99) - physical disk state is unknown.</p><p></p><p>Note:</p><p>WSAPI 1.7 reports Failed as state = 3;</p><p>WSAPI 1.8+ reports Failed as state = 4 and introduces New as state = 3.</p>|Dependent item|hpe.primera.disk["{#ID}",state]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p><p>⛔️Custom on fail: Set value to: `99`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Disk [{#POSITION}]: Total size|<p>Physical disk total size.</p>|Dependent item|hpe.primera.disk["{#ID}",total_size]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalSizeMiB`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
 
 ### Trigger prototypes for Disks discovery
@@ -161,7 +165,7 @@ This template has been tested on:
 |HPE Primera: Disk [{#POSITION}]: Path B0 degraded|<p>Disk [{#POSITION}] path B0 in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",loop_b0_degraded])=1`|Average||
 |HPE Primera: Disk [{#POSITION}]: Path B1 degraded|<p>Disk [{#POSITION}] path B1 in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",loop_b1_degraded])=1`|Average||
 |HPE Primera: Disk [{#POSITION}]: Degraded|<p>Disk [{#POSITION}] in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",state])=2`|Average||
-|HPE Primera: Disk [{#POSITION}]: Failed|<p>Disk [{#POSITION}] in failed state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",state])=3`|High||
+|HPE Primera: Disk [{#POSITION}]: Failed|<p>Disk [{#POSITION}] in failed state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",state])=4`|High||
 |HPE Primera: Disk [{#POSITION}]: Unknown issue|<p>Disk [{#POSITION}] in unknown state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",state])=99`|Info||
 
 ### LLD rule Hosts discovery

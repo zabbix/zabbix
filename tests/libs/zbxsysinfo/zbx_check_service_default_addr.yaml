@@ -1,14 +1,14 @@
 ---
 test case: Both interface and key parameter are present
 in:
-  interface: "127.0.0.1:10051"
+  interface: "127.0.0.1"
   ip: "127.0.0.1"
 out:
   return: "SUCCEED"
 ---
 test case: Only interface is present
 in:
-  interface: "127.0.0.1:10051"
+  interface: "127.0.0.1"
   ip: ""
 out:
   return: "SUCCEED"

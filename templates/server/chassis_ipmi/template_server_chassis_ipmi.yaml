@@ -33,7 +33,7 @@ zabbix_export:
         - Description: If the BMC has a sensor with an empty threshold value, we get the LLD error "Cannot create trigger...".
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: 'Templates/Server hardware'
       items:
@@ -296,36 +296,37 @@ zabbix_export:
           value: server
       macros:
         - macro: '{$IPMI.PASSWORD}'
-          description: 'This macro is used for access to BMC. It can be overridden on the host or linked template level.'
+          type: SECRET_TEXT
+          description: 'IPMI password.'
           config:
             type: TEXT
             priority: '2'
             label: Password
-            description: 'This macro is used for access to BMC. It can be overridden on the host or linked template level.'
+            description: 'IPMI password.'
             required: 'YES'
         - macro: '{$IPMI.SENSOR_TYPE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in sensors discovery. It can be overridden on the host or linked template level.'
+          description: 'Regular expression to filter IPMI sensors based on their types. Only sensors with types matching this regex will be monitored.'
           config:
             type: TEXT
             priority: '3'
             section_name: Filters
             label: 'Sensor type filter (include)'
-            description: 'This macro is used in sensors discovery. It can be overridden on the host or linked template level.'
+            description: 'Regular expression to filter IPMI sensors based on their types. Only sensors with types matching this regex will be monitored.'
         - macro: '{$IPMI.SENSOR_TYPE.NOT_MATCHES}'
           value: invalid
-          description: 'This macro is used in sensors discovery. It can be overridden on the host or linked template level.'
+          description: 'Regular expression to filter IPMI sensors based on their types. Sensors with types matching this regex will be excluded from monitoring.'
           config:
             type: TEXT
             priority: '4'
             section_name: Filters
             label: 'Sensor type filter (exclude)'
-            description: 'This macro is used in sensors discovery. It can be overridden on the host or linked template level.'
+            description: 'Regular expression to filter IPMI sensors based on their types. Sensors with types matching this regex will be excluded from monitoring.'
         - macro: '{$IPMI.USER}'
-          description: 'This macro is used for access to BMC. It can be overridden on the host or linked template level.'
+          description: 'IPMI user.'
           config:
             type: TEXT
             priority: '1'
             label: Username
-            description: 'This macro is used for access to BMC. It can be overridden on the host or linked template level.'
+            description: 'IPMI user.'
             required: 'YES'

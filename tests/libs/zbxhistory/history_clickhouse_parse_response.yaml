@@ -1,0 +1,248 @@
+---
+test case: Test empty input
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: ""
+out:
+  result: 0
+---
+test case: Test space input
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: " "
+out:
+  result: 0
+---
+test case: Test multi line empty input
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: |
+      
+      
+      
+      
+out:
+  result: 0
+---
+test case: Test opening brackets
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: |
+      [
+out:
+  result: 0
+---
+test case: Test empty array
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: |
+      []
+out:
+  result: 0
+---
+test case: Test invalid timestamp xyz
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: |
+      ["xyz"]
+out:
+  result: 0
+---
+test case: Test invalid timestamp 100000000
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: |
+      ["100000000"]
+out:
+  result: 0
+---
+test case: Test missing value
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: |
+      ["1737566463.822456823"]
+out:
+  result: 0
+---
+test case: Test missing log source
+in:
+    value type: ITEM_VALUE_TYPE_LOG
+    data: |
+      ["1737566463.822456823", "xyz"]
+out:
+  result: 0
+---
+test case: Test missing log severity
+in:
+    value type: ITEM_VALUE_TYPE_LOG
+    data: |
+      ["1737566463.822456823", "xyz", "source"]
+out:
+  result: 0
+---
+test case: Test missing log eventid
+in:
+    value type: ITEM_VALUE_TYPE_LOG
+    data: |
+      ["1737566463.822456823", "xyz", "source", 0]
+out:
+  result: 0
+---
+test case: Test missing log timestamp
+in:
+    value type: ITEM_VALUE_TYPE_LOG
+    data: |
+      ["1737566463.822456823", "xyz", "source", 0, 0]
+out:
+  result: 0
+---
+test case: Test one dbl value
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: |
+      ["1737566463.822456823", 1.23]
+out:
+  result: 1
+  values:
+  - value: 1.23
+    ts: 2025-01-22 19:21:03.822456823 +02:00
+---
+test case: Test invalid dbl value
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: |
+      ["1737566463.822456823", "xyz"]
+out:
+  result: 0
+---
+test case: Test extra field 
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: |
+      ["1737566463.822456823", 1.23, "xyz"]
+out:
+  result: 1
+  values:
+  - value: 1.23
+    ts: 2025-01-22 19:21:03.822456823 +02:00
+---
+test case: Test garbage before 
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: |
+      [
+      xyz
+      ["1737566463.822456823", 1.23]
+out:
+  result: 1
+  values:
+  - value: 1.23
+    ts: 2025-01-22 19:21:03.822456823 +02:00
+---
+test case: Test garbage after
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: |
+      ["1737566463.822456823", 1.23]
+      xyz
+      [
+out:
+  result: 1
+  values:
+  - value: 1.23
+    ts: 2025-01-22 19:21:03.822456823 +02:00
+---
+test case: Test invalid json
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: |
+      ["1737566463.822456823", 1.23],
+out:
+  result: 0
+---
+test case: Test two dbl values
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: |
+      ["1737566463.822456823", 1.23]
+      ["1737566462.823107007", -2.47]
+out:
+  result: 2
+  values:
+  - value: 1.23
+    ts: 2025-01-22 19:21:03.822456823 +02:00
+  - value: -2.47
+    ts: 2025-01-22 19:21:02.823107007 +02:00
+---
+test case: Test two dbl values with garbage between
+in:
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: |
+      ["1737566463.822456823", 1.23]
+      ["1737566462.823107007", -2.47]
+out:
+  result: 2
+  values:
+  - value: 1.23
+    ts: 2025-01-22 19:21:03.822456823 +02:00
+  - value: -2.47
+    ts: 2025-01-22 19:21:02.823107007 +02:00
+---
+test case: Test one str value
+in:
+    value type: ITEM_VALUE_TYPE_STR
+    data: |
+      ["1737566463.822456823", "xyz"]
+out:
+  result: 1
+  values:
+  - value: "xyz"
+    ts: 2025-01-22 19:21:03.822456823 +02:00
+---
+test case: Test one log value
+in:
+    value type: ITEM_VALUE_TYPE_LOG
+    data: |
+      ["1737566463.822456823", "xyz", "src", 1, 2, 3]
+out:
+  result: 1
+  values:
+  - value: "xyz"
+    ts: 2025-01-22 19:21:03.822456823 +02:00
+    source: src
+    severity: 1
+    logeventid: 2
+    timestamp: 3
+---
+test case: Test one uint value
+in:
+    value type: ITEM_VALUE_TYPE_UINT64
+    data: |
+      ["1737566463.822456823", 12345678901234567890]
+out:
+  result: 1
+  values:
+  - value: 12345678901234567890
+    ts: 2025-01-22 19:21:03.822456823 +02:00
+---
+test case: Test one invalid uint value
+in:
+    value type: ITEM_VALUE_TYPE_UINT64
+    data: |
+      ["1737566463.822456823", "xyz"]
+out:
+  result: 0
+---
+test case: Test one text value
+in:
+    value type: ITEM_VALUE_TYPE_TEXT
+    data: |
+      ["1737566463.822456823", "xyz"]
+out:
+  result: 1
+  values:
+  - value: "xyz"
+    ts: 2025-01-22 19:21:03.822456823 +02:00
+...
+
+

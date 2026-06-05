@@ -230,8 +230,8 @@ foreach ($data['items'] as $item) {
 			: '',
 		(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
-		$item['history'],
-		$item['trends'],
+		$item['history'] == 0 ? _('Not stored') : $item['history'],
+		$item['trends'] == 0 ? _('Not stored') : $item['trends'],
 		item_type2str($item['type']),
 		(new CDiv([
 			$status,

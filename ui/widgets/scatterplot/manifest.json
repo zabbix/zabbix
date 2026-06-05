@@ -33,6 +33,6 @@
 		}
 	},
 	"assets": {
-		"js": ["class.widget.js", "class.widget-field.axis-thresholds.js"]
+		"js": ["class.cscatterplot.js", "class.widget.js", "class.widget-field.axis-thresholds.js"]
 	}
 }

@@ -522,9 +522,11 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	#broadcast() {
-		this.broadcast({
-			[CWidgetsData.DATA_TYPE_MAP_ID]: [this.#navtree[this.#navtree_item_selected].sysmapid]
-		});
+		if (this.#navtree[this.#navtree_item_selected] !== undefined) {
+			this.broadcast({
+				[CWidgetsData.DATA_TYPE_MAP_ID]: [this.#navtree[this.#navtree_item_selected].sysmapid]
+			});
+		}
 	}
 
 	#updateUserProfileItemSelected() {

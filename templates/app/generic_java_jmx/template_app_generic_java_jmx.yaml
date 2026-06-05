@@ -15,7 +15,7 @@ zabbix_export:
         Official JMX Template from Zabbix distribution. Could be useful for many Java Applications (JMX).
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -642,6 +642,7 @@ zabbix_export:
             label: 'Non-heap memory threshold duration'
             description: 'The time during which the Non-heap memory utilization may exceed the threshold.'
         - macro: '{$JMX.PASSWORD}'
+          type: SECRET_TEXT
           description: 'JMX password.'
           config:
             type: TEXT

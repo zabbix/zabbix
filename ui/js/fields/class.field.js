@@ -82,12 +82,12 @@ class CField {
 		return this._changed;
 	}
 
-	setGlobalError(message) {
-		this._global_errors[this.getName()] = message;
-	}
-
 	getGlobalErrors() {
 		return this._global_errors;
+	}
+
+	getField() {
+		return this._field;
 	}
 
 	getName() {

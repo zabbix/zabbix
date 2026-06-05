@@ -41,7 +41,7 @@ typedef int	(*zbx_get_value_internal_ext_f)(const zbx_dc_item_t *item, const cha
 
 typedef struct
 {
-	zbx_config_comms_args_t		*config_comms;
+	const zbx_config_comms_args_t	*config_comms;
 	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
 	const char			*progname;
 	unsigned char			poller_type;

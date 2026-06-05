@@ -36,8 +36,10 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('name', $data['form']['name'], $data['templated'], DB::getFieldLength('httpstep', 'name')))
+			(new CTextAreaFlexible('name', $data['form']['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('httpstep', 'name'))
+				->setReadonly($data['templated'])
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 		)
@@ -45,8 +47,9 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
 		new CFormField([
-			(new CTextBox('url', $data['form']['url'], false, DB::getFieldLength('httpstep', 'url')))
+			(new CTextAreaFlexible('url', $data['form']['url']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('httpstep', 'url'))
 				->setAriaRequired(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CSimpleButton(_('Parse')))
@@ -253,8 +256,9 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Required string'), 'required'),
 		new CFormField(
-			(new CTextBox('required', $data['form']['required'], false, DB::getFieldLength('httpstep', 'required')))
+			(new CTextAreaFlexible('required', $data['form']['required']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('httpstep', 'required'))
 				->setAttribute('placeholder', _('pattern'))
 		)
 	])

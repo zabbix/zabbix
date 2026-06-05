@@ -19,6 +19,8 @@ require_once __DIR__.'/../common/testFormValueMappings.php';
 /**
  * @backup valuemap, hosts
  *
+ * @dataSource HostAvailabilityWidget
+ *
  * @onBefore prepareHostValueMappings
  */
 class testFormValueMappingsHost extends testFormValueMappings {

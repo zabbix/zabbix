@@ -340,6 +340,7 @@ class testFormServicesServices extends CWebTest {
 
 	public function getServicesData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -351,6 +352,7 @@ class testFormServicesServices extends CWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -360,10 +362,11 @@ class testFormServicesServices extends CWebTest {
 						'Weight' => '9999999'
 					],
 					'inline_errors' => [
-						'Weight' => 'This value must be no greater than "1000000".'
+						'Weight' => 'Value must be less than or equal to 1000000.'
 					]
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -380,10 +383,11 @@ class testFormServicesServices extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'name:limit_value' => 'This value must be no greater than "100".'
+						'name:limit_value' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -400,10 +404,11 @@ class testFormServicesServices extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'name:limit_value' => 'This value must be no less than "1".'
+						'name:limit_value' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'fields' => [
@@ -412,6 +417,7 @@ class testFormServicesServices extends CWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'fields' => [
@@ -424,6 +430,7 @@ class testFormServicesServices extends CWebTest {
 					]
 				]
 			],
+			// #6.
 			[
 				[
 					'fields' => [
@@ -436,6 +443,7 @@ class testFormServicesServices extends CWebTest {
 					]
 				]
 			],
+			// #7.
 			[
 				[
 					'fields' => [
@@ -447,6 +455,7 @@ class testFormServicesServices extends CWebTest {
 					]
 				]
 			],
+			// #8.
 			[
 				[
 					'fields' => [
@@ -515,6 +524,7 @@ class testFormServicesServices extends CWebTest {
 					]
 				]
 			],
+			// #9.
 			[
 				[
 					'fields' => [
@@ -529,7 +539,7 @@ class testFormServicesServices extends CWebTest {
 					]
 				]
 			],
-			// Check that you can create service with already existing name.
+			// #10 Check that you can create service with already existing name.
 			[
 				[
 					'fields' => [
@@ -538,7 +548,7 @@ class testFormServicesServices extends CWebTest {
 					'duplicate' => true
 				]
 			],
-			// This case should always be last, otherwise update scenario won't work.
+			// #11 This case should always be last, otherwise update scenario won't work.
 			[
 				[
 					'fields' => [
@@ -562,6 +572,7 @@ class testFormServicesServices extends CWebTest {
 
 	public function getUpdateAdditionalRulesData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -579,10 +590,11 @@ class testFormServicesServices extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'name:limit_value' => 'This value must be no greater than "100".'
+						'name:limit_value' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -600,10 +612,11 @@ class testFormServicesServices extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'name:limit_value' => 'This value must be no less than "1".'
+						'name:limit_value' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
+			// #2.
 			[
 				[
 					'fields' => [
@@ -624,7 +637,7 @@ class testFormServicesServices extends CWebTest {
 					]
 				]
 			],
-			// Additional rule is removed if the data provider contains the rule to be changed and doesn't have the substitute.
+			// #3 Additional rule is removed if the data provider contains the rule to be changed and doesn't have the substitute.
 			[
 				[
 					'fields' => [

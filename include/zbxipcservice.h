@@ -80,6 +80,9 @@ typedef struct
 
 	/* the clients with messages */
 	zbx_queue_ptr_t			clients_recv;
+
+	/* incremental id for next connected client */
+	zbx_uint64_t			next_clientid;
 }
 zbx_ipc_service_t;
 

@@ -37,8 +37,7 @@ class CControllerExport extends CController {
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
-
-		if (!(new CFrontendActionValidator())->validate($this->getInput('backurl'))) {
+		elseif (!(new CFrontendActionValidator())->validate($this->getInput('backurl'))) {
 			throw new CAccessDeniedException();
 		}
 

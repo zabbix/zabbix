@@ -476,7 +476,7 @@ class CConfigurationImportcompare {
 			elseif ($unique_value instanceof Closure) {
 				$result[] = call_user_func($unique_value, $entity, $entity_key);
 			}
-			else {
+			elseif (array_key_exists($unique_key, $entity)) {
 				$result[] = $entity[$unique_value];
 			}
 		}

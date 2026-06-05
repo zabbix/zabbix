@@ -142,6 +142,20 @@ class CMediatypeHelper {
 	}
 
 	/**
+	 * Returns supported media types values.
+	 *
+	 * @return array
+	 */
+	public static function getSupportedMediaTypes(): array {
+		global $ZBX_FEATURE_FLAGS;
+
+		$types = [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK];
+		$media_type_denylist = $ZBX_FEATURE_FLAGS['media_type_denylist'];
+
+		return array_diff($types, $media_type_denylist);
+	}
+
+	/**
 	 * Returns an array of message templates.
 	 *
 	 * @return array

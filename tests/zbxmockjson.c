@@ -21,6 +21,12 @@
 #include "zbxmockassert.h"
 #include "zbxmockjson.h"
 
+/* in newer versions of cmocka cm_print_error is declared in header */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+void cm_print_error(const char* const format, ...) CMOCKA_PRINTF_ATTRIBUTE(1, 2);
+#pragma GCC diagnostic pop
+
 #define _FAIL(file, line, prefix, message, ...)						\
 											\
 do 											\

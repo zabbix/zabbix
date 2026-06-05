@@ -1,5 +1,5 @@
 if SERVER
-SERVER_tests = zbx_item_preproc pp_execute
+SERVER_tests = zbx_item_preproc
 SERVER_tests += item_preproc_csv_to_json
 
 if HAVE_LIBXML2
@@ -14,12 +14,14 @@ COMMON_SRC_FILES = \
 JSON_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
+	$(top_srcdir)/src/libs/zbxsupervisor_client/libzbxsupervisor_client.a \
 	$(top_srcdir)/src/libs/zbxpreprocbase/libzbxpreprocbase.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxescalations/libzbxescalations.a \
 	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc_service.a \
 	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc.a \
 	$(top_srcdir)/src/libs/zbxdiag/libzbxdiag.a \
+	$(top_srcdir)/src/libs/zbxsnmp/libzbxsnmp.a \
 	$(top_srcdir)/src/libs/zbxexport/libzbxexport.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
@@ -88,8 +90,6 @@ JSON_LIBS = \
 
 zbx_item_preproc_SOURCES = \
 	zbx_item_preproc.c \
-	pp_mock.c \
-	pp_mock.h \
 	configcache_mock.c
 
 zbx_item_preproc_LDADD = $(JSON_LIBS)
@@ -100,23 +100,6 @@ zbx_item_preproc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(
 
 zbx_item_preproc_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) \
 	$(TLS_CFLAGS)
-
-
-pp_execute_SOURCES = \
-	pp_execute.c \
-	pp_mock.c \
-	pp_mock.h \
-	configcache_mock.c
-
-pp_execute_LDADD = $(JSON_LIBS)
-
-pp_execute_LDADD += @SERVER_LIBS@
-pp_execute_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) \
-	-Wl,--wrap=zbx_dc_expand_user_and_func_macros_from_cache
-
-pp_execute_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) \
-	$(TLS_CFLAGS)
-
 
 item_preproc_xpath_SOURCES = \
 	item_preproc_xpath.c \

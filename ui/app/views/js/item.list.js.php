@@ -34,7 +34,7 @@
 			this.hostid = hostid;
 
 			this.form = document.forms[form_name];
-			this.filter_form = document.querySelector('form[name="zbx_filter"]');
+			this.filter_form = document.querySelector('form[name="<?= CFilter::FORM_NAME; ?>"]');
 
 			this.initForm(field_switches);
 			this.initEvents();

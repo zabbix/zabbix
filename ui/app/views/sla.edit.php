@@ -64,8 +64,9 @@ $sla_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('name', $data['form']['name'], false, DB::getFieldLength('sla', 'name')))
+			(new CTextAreaFlexible('name', $data['form']['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('sla', 'name'))
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 		)
@@ -154,13 +155,14 @@ $sla_tab = (new CFormGrid())
 				(new CTemplateTag('service-tag-row-tmpl'))
 					->addItem([
 						(new CRow([
-							(new CTextBox('service_tags[#{rowNum}][tag]', '#{tag}', false,
-								DB::getFieldLength('sla_service_tag', 'tag')
-							))
-								->setAttribute('placeholder', _('tag'))
-								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-								->setErrorLabel(_('Name'))
-								->setErrorContainer('service_tags_#{rowNum}_error_container'),
+							(new CCol(
+								(new CTextAreaFlexible('service_tags[#{rowNum}][tag]', '#{tag}'))
+									->setAttribute('placeholder', _('tag'))
+									->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+									->setMaxlength(DB::getFieldLength('sla_service_tag', 'tag'))
+									->setErrorLabel(_('Name'))
+									->setErrorContainer('service_tags_#{rowNum}_error_container')
+							))->addClass(ZBX_STYLE_ALIGN_TOP),
 							(new CSelect('service_tags[#{rowNum}][operator]'))
 								->addOptions(CSelect::createOptionsFromArray([
 									ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL => _('Equals'),
@@ -169,13 +171,14 @@ $sla_tab = (new CFormGrid())
 								->setValue(ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL)
 								->setErrorLabel(_('Operation'))
 								->setErrorContainer('service_tags_#{rowNum}_error_container'),
-							(new CTextBox('service_tags[#{rowNum}][value]', '#{value}', false,
-								DB::getFieldLength('sla_service_tag', 'value')
-							))
-								->setAttribute('placeholder', _('value'))
-								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-								->setErrorLabel(_('Value'))
-								->setErrorContainer('service_tags_#{rowNum}_error_container'),
+							(new CCol(
+								(new CTextAreaFlexible('service_tags[#{rowNum}][value]', '#{value}'))
+									->setAttribute('placeholder', _('value'))
+									->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+									->setMaxlength(DB::getFieldLength('sla_service_tag', 'value'))
+									->setErrorLabel(_('Value'))
+									->setErrorContainer('service_tags_#{rowNum}_error_container'),
+							))->addClass(ZBX_STYLE_ALIGN_TOP),
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						]))->addClass('form_row'),
 						(new CRow([

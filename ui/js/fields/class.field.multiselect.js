@@ -67,6 +67,16 @@ class CFieldMultiselect extends CField {
 		return $(this._field).multiSelect('getOption', 'name').replace(/\[\]$/, '');
 	}
 
+	getNameNew() {
+		const name = this.getName();
+
+		if (name.endsWith(']')) {
+			return name.slice(0, -1) + '_new]';
+		}
+
+		return name + '_new';
+	}
+
 	getValue() {
 		return this.getExtraFields();
 	}
@@ -76,7 +86,7 @@ class CFieldMultiselect extends CField {
 		const values = $(this._field).multiSelect('getOption', 'addNew')
 			? {
 				[this.getName()]: return_id ? null : [],
-				[this.getName() + '_new']: return_id ? null : []
+				[this.getNameNew()]: return_id ? null : []
 			}
 			: {
 				[this.getName()]: return_id ? null : []
@@ -87,7 +97,7 @@ class CFieldMultiselect extends CField {
 		}
 
 		$(this._field).multiSelect('getData').forEach((value) => {
-			const field_name = value.isNew ? this.getName() + '_new' : this.getName();
+			const field_name = value.isNew ? this.getNameNew() : this.getName();
 
 			if (!return_id) {
 				values[field_name].push(value.id);

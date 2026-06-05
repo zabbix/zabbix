@@ -1248,6 +1248,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		hk_tsdb_check_config();
 	}
 #endif
+	housekeeping_disable_unsupported_types();
 
 	while (ZBX_IS_RUNNING())
 	{

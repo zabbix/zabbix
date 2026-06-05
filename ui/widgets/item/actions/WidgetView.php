@@ -226,7 +226,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$history_limit = $with_data_prev ? 2 : 1;
 		// Extra byte to trim values that exceeds length limit.
-		$length = ZBX_HINTBOX_CONTENT_LIMIT + 1;
+		$length = ZBX_HINTBOX_HTML_LIMIT + 1;
 		$history = $history->getLastValues([$item], $history_limit, $history_period, $length);
 
 		if ($history) {

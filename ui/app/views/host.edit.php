@@ -88,8 +88,10 @@ $host_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Host name'), 'host'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('host', $data['host']['host'], $host_is_discovered, DB::getFieldLength('hosts', 'host')))
+			(new CTextAreaFlexible('host', $data['host']['host']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('hosts', 'host'))
+				->setReadonly($host_is_discovered)
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 		)
@@ -97,8 +99,10 @@ $host_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Visible name'), 'visiblename'),
 		new CFormField(
-			(new CTextBox('visiblename', $data['host']['visiblename'], $host_is_discovered, DB::getFieldLength('hosts', 'name')))
+			(new CTextAreaFlexible('visiblename', $data['host']['visiblename']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('hosts', 'name'))
+				->setReadonly($host_is_discovered)
 		)
 	]);
 
@@ -677,36 +681,37 @@ $encryption_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('tls_psk_identity', $data['host']['tls_psk_identity'], false,
-				DB::getFieldLength('hosts', 'tls_psk_identity')
-			))
+			(new CTextAreaFlexible('tls_psk_identity', $data['host']['tls_psk_identity']))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setMaxlength(DB::getFieldLength('hosts', 'tls_psk_identity'))
 				->setAriaRequired()
 		)
 	])
 	->addItem([
 		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('tls_psk', $data['host']['tls_psk'], false, DB::getFieldLength('hosts', 'tls_psk')))
+			(new CTextAreaFlexible('tls_psk', $data['host']['tls_psk']))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setMaxlength(DB::getFieldLength('hosts', 'tls_psk'))
 				->setAriaRequired()
-				->disableAutocomplete()
 		)
 	])
 	->addItem([
 		new CLabel(_('Issuer'), 'tls_issuer'),
 		new CFormField(
-			(new CTextBox('tls_issuer', $data['host']['tls_issuer'], $host_is_discovered,
-				DB::getFieldLength('hosts', 'tls_issuer')
-			))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			(new CTextAreaFlexible('tls_issuer', $data['host']['tls_issuer']))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setMaxlength(DB::getFieldLength('hosts', 'tls_issuer'))
+				->setReadonly($host_is_discovered)
 		)
 	])
 	->addItem([
 		new CLabel(_x('Subject', 'encryption certificate'), 'tls_subject'),
 		new CFormField(
-			(new CTextBox('tls_subject', $data['host']['tls_subject'], $host_is_discovered,
-				DB::getFieldLength('hosts', 'tls_subject')
-			))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			(new CTextAreaFlexible('tls_subject', $data['host']['tls_subject']))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setMaxlength(DB::getFieldLength('hosts', 'tls_subject'))
+				->setReadonly($host_is_discovered)
 		)
 	]);
 
