@@ -455,9 +455,17 @@ class testHousekeepingConfSync extends CIntegrationTest {
 
 	private function reloadProxyAndWaitForConfiguration($wait_for_cache_stats = false) {
 		$this->clearLog(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
+
+		$this->clearLog(self::COMPONENT_SERVER);
 		$this->clearLog(self::COMPONENT_PROXY);
 
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
+		$this->reloadConfigurationCache(self::COMPONENT_PROXY);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'sending configuration data to proxy "'.self::PROXY_NAME.'"', true, 90, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, "received configuration data from server", true,
+				90, 1);
 
 		if ($wait_for_cache_stats) {
 			$this->waitForLogLineToBePresent(self::COMPONENT_PROXY,
@@ -615,11 +623,10 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		$this->assertHousekeepingEquals($server_expected, $this->extractSyncedHousekeeping(self::COMPONENT_SERVER));
 
 		$this->reloadProxyAndWaitForConfiguration(true);
-sleep(20);
 		$proxy_hk = $this->extractSyncedHousekeeping(self::COMPONENT_PROXY);
 		$this->assertArrayHasKey('hk_history', $proxy_hk);
 		$this->assertArrayHasKey('hk_history_global', $proxy_hk);
-		$this->assertEquals(0, $proxy_hk['hk_history']);
+		$this->assertEquals($this->timeToSeconds('90d'), $proxy_hk['hk_history']);
 		$this->assertEquals($housekeeping['hk_history_global'], $proxy_hk['hk_history_global']);
 	}
 
