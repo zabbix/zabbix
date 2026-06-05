@@ -166,6 +166,28 @@
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, () => {
 					location.href = location.href;
 				});
+
+				ZABBIX.Dashboard.on(CDashboard.EVENT_PAGE_SELECTED, e => {
+					const {page} = e.detail;
+
+					new CState(location.href).setParams({page});
+				})
+
+				ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_STARTED, e => {
+					const {manually_toggled} = e.detail;
+
+					if (manually_toggled) {
+						new CState(location.href).setParams({slideshow: DASHBOARD_SLIDESHOW_ON});
+					}
+				});
+
+				ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_STOPPED, e => {
+					const {manually_toggled} = e.detail;
+
+					if (manually_toggled) {
+						new CState(location.href).setParams({slideshow: DASHBOARD_SLIDESHOW_OFF});
+					}
+				});
 			}
 
 			if (CWidgetsData.DATA_TYPE_TIME_PERIOD in broadcast_requirements) {
