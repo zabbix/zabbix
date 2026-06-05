@@ -295,14 +295,14 @@ abstract class CHostGeneral extends CHostBase {
 	private static function createHostHgSets(array $hgsets): void {
 		$ins_host_hgsets = [];
 
-		$result = DBselect(
+		$resource = DBselect(
 			'SELECT hs.hash,MIN(hs.hgsetid) AS hgsetid'.
 			' FROM hgset hs'.
 			' WHERE '.dbConditionString('hs.hash', array_keys($hgsets)).
 			' GROUP BY hs.hash'
 		);
 
-		while ($row = DBfetch($result)) {
+		while ($row = DBfetch($resource)) {
 			foreach ($hgsets[$row['hash']]['hostids'] as $hostid) {
 				$ins_host_hgsets[] = [
 					'hostid' => $hostid,
