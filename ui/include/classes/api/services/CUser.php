@@ -1771,13 +1771,11 @@ class CUser extends CApiService {
 			$userids = array_merge($userids, $ugset['userids']);
 		}
 
-		$db_userids = DB::select('user_ugset', [
+		return DB::select('user_ugset', [
 			'output' => [],
 			'userids' => $userids,
 			'preservekeys' => true
 		]);
-
-		return $db_userids;
 	}
 
 	private static function createUgSets(array &$ugsets): void {
