@@ -15,8 +15,6 @@
 #ifndef ZABBIX_CEP_RULE_H
 #define ZABBIX_CEP_RULE_H
 
-#include "zbxcommon.h"
-#include "zbxdbhigh.h"
 
 #include "zbxcep.h"
 #include "zbxcacheconfig.h"
@@ -59,6 +57,8 @@ zbx_cep_result_t;
 void	cep_event_context_clear(zbx_cep_event_context_t *ctx);
 zbx_cep_event_t *cep_event_context_acquire_event(zbx_cep_event_context_t *ctx);
 zbx_cep_event_t *cep_event_context_acquire_mutable_event(zbx_cep_event_context_t *ctx);
+
+char	*cep_tag_value_shift(const char *value, int shift);
 
 void	cep_result_clear_borrowed(zbx_cep_result_t *result);
 void	cep_result_clear(zbx_cep_result_t *result);

@@ -16,9 +16,6 @@
 #define ZABBIX_CEP_RULE_OP_DB_H
 
 #include "cep_rule.h"
-#include "zbxcep.h"
-#include "zbxcacheconfig.h"
-#include "zbxdbhigh.h"
 #include "zbxmw.h"
 
 void	cep_operation_db_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_context_t *ctx,

@@ -15,19 +15,11 @@
 #include "cep_rule_op_event.h"
 #include "cep_rule.h"
 #include "cep.h"
-#include "cep_task.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
-#include "zbxcalc.h"
 #include "zbxcep.h"
 #include "zbxcommon.h"
-#include "zbxdbwrap.h"
-#include "zbxeval.h"
-#include "zbxexpr.h"
-#include "zbxmw.h"
-#include "zbxnum.h"
-#include "zbxvariant.h"
 #include "zbxdbhigh.h"
 
 static void	cep_operation_event_execute_set_severity(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
@@ -105,10 +97,10 @@ out:
 }
 
 static int	cep_event_validate_tag(zbx_cep_event_t *event, const char *tag, const char *value,
-		zbx_tag_t **tag_match)
+		int *match_index)
 {
-	if (NULL != tag_match)
-		*tag_match = NULL;
+	if (NULL != match_index)
+		*match_index = FAIL;
 
 	for (int i = 0; i < event->tags.values_num; i++)
 	{
@@ -117,24 +109,23 @@ static int	cep_event_validate_tag(zbx_cep_event_t *event, const char *tag, const
 			if (0 == strcmp(event->tags.values[i].value, value))
 				return FAIL;
 
-			if (NULL != tag_match && NULL == *tag_match)
-				*tag_match = &event->tags.values[i];
+			if (NULL != match_index && FAIL == *match_index)
+				*match_index = i;
 		}
 	}
 
 	return SUCCEED;
 }
 
-static zbx_tag_t	*cep_event_find_tag(zbx_cep_event_t *event, const char *tag)
+static int	cep_event_find_tag(zbx_cep_event_t *event, const char *tag)
 {
-
 	for (int i = 0; i < event->tags.values_num; i++)
 	{
 		if (0 == strcmp(event->tags.values[i].tag, tag))
-			return &event->tags.values[i];
+			return i;
 	}
 
-	return NULL;
+	return FAIL;
 }
 
 static void	cep_operation_event_add_tag(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
@@ -162,14 +153,14 @@ static void	cep_operation_event_set_tag(const zbx_cep_operation_t *op, zbx_cep_e
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
 
-	zbx_tag_t	*tag_match;
+	int	index;
 
 	if (NULL == *event && NULL == (*event = cep_event_context_acquire_mutable_event(ctx)))
 		goto out;
 
-	if (SUCCEED == cep_event_validate_tag(*event, op->args.set_tag.tag, op->args.set_tag.value, &tag_match))
+	if (SUCCEED == cep_event_validate_tag(*event, op->args.set_tag.tag, op->args.set_tag.value, &index))
 	{
-		if (NULL == tag_match)
+		if (FAIL == index)
 		{
 			zbx_tag_t	tag_local;
 
@@ -178,7 +169,11 @@ static void	cep_operation_event_set_tag(const zbx_cep_operation_t *op, zbx_cep_e
 			zbx_vector_tag_append(&(*event)->tags, tag_local);
 		}
 		else
-			tag_match->value = zbx_strdup(tag_match->value, op->args.set_tag.value);
+		{
+			zbx_tag_t	*tag = &(*event)->tags.values[index];
+
+			tag->value = zbx_strdup(tag->value, op->args.set_tag.value);
+		}
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -189,45 +184,23 @@ static void	cep_operation_event_set_tag_value(const zbx_cep_operation_t *op, zbx
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
 
-	zbx_tag_t	*tag_match;
+	int	index;
 
 	if (NULL == *event && NULL == (*event = cep_event_context_acquire_mutable_event(ctx)))
 		goto out;
 
-	if (SUCCEED == cep_event_validate_tag(*event, op->args.set_tag_value.tag, op->args.set_tag_value.value,
-			&tag_match))
+	if (SUCCEED == cep_event_validate_tag(*event, op->args.set_tag_value.tag, op->args.set_tag_value.value, &index))
 	{
-		if (NULL != tag_match)
-			tag_match->value = zbx_strdup(tag_match->value, op->args.set_tag_value.value);
+		if (FAIL != index)
+		{
+			zbx_tag_t	*tag = &(*event)->tags.values[index];
+
+			tag->value = zbx_strdup(tag->value, op->args.set_tag_value.value);
+
+		}
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-static char	*cep_tag_value_shift(const char *value, int shift)
-{
-	zbx_uint64_t	value_ui64;
-	double		value_dbl;
-
-	if ('\0' == *value)
-	{
-		if (1 == shift)
-			return zbx_strdup(NULL, "1");
-		return zbx_strdup(NULL, "0");
-	}
-
-	if (SUCCEED == zbx_is_uint64(value, &value_ui64))
-		return zbx_dsprintf(NULL, ZBX_FS_UI64, value_ui64 + shift);
-
-	if (SUCCEED == zbx_is_double(value, &value_dbl))
-	{
-		char	buffer[32];
-
-		zbx_print_double(buffer, sizeof(buffer), value_dbl + shift);
-		return zbx_strdup(NULL, buffer);
-	}
-
-	return NULL;
 }
 
 static void	cep_operation_event_increase_tag_value(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
@@ -235,14 +208,15 @@ static void	cep_operation_event_increase_tag_value(const zbx_cep_operation_t *op
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
 
-	zbx_tag_t	*tag;
+	int	index;
 
 	if (NULL == *event && NULL == (*event = cep_event_context_acquire_mutable_event(ctx)))
 		goto out;
 
-	if (NULL != (tag = cep_event_find_tag(*event, op->args.increase_tag_value.tag)))
+	if (FAIL != (index = cep_event_find_tag(*event, op->args.increase_tag_value.tag)))
 	{
-		char	*value;
+		zbx_tag_t	*tag = &(*event)->tags.values[index];
+		char		*value;
 
 		if (NULL != (value = cep_tag_value_shift(tag->value, 1)))
 		{
@@ -259,13 +233,14 @@ static void	cep_operation_event_decrease_tag_value(const zbx_cep_operation_t *op
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
 
-	zbx_tag_t	*tag;
+	int	index;
 
 	if (NULL == *event && NULL == (*event = cep_event_context_acquire_mutable_event(ctx)))
 		goto out;
 
-	if (NULL != (tag = cep_event_find_tag(*event, op->args.decrease_tag_value.tag)))
+	if (FAIL != (index = cep_event_find_tag(*event, op->args.decrease_tag_value.tag)))
 	{
+		zbx_tag_t	*tag = &(*event)->tags.values[index];
 		char	*value;
 
 		if (NULL != (value = cep_tag_value_shift(tag->value, -1)))
@@ -283,13 +258,15 @@ static void	cep_operation_event_rename_tag(const zbx_cep_operation_t *op, zbx_ce
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
 
-	zbx_tag_t	*tag;
+	int	index;
 
 	if (NULL == *event && NULL == (*event = cep_event_context_acquire_mutable_event(ctx)))
 		goto out;
 
-	if (NULL != (tag = cep_event_find_tag(*event, op->args.rename_tag.old_tag)))
+	if (FAIL != (index = cep_event_find_tag(*event, op->args.rename_tag.old_tag)))
 	{
+		zbx_tag_t	*tag = &(*event)->tags.values[index];
+
 		if (SUCCEED == cep_event_validate_tag(*event, op->args.rename_tag.new_tag, tag->value, NULL))
 			tag->tag = zbx_strdup(tag->tag, op->args.rename_tag.new_tag);
 	}
@@ -302,16 +279,18 @@ static void	cep_operation_event_remove_tag(const zbx_cep_operation_t *op, zbx_ce
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
 
-	zbx_tag_t	*tag;
+	int	index;
 
 	if (NULL == *event && NULL == (*event = cep_event_context_acquire_mutable_event(ctx)))
 		goto out;
 
-	if (NULL != (tag = cep_event_find_tag(*event, op->args.remove_tag.tag)))
+	if (FAIL != (index = cep_event_find_tag(*event, op->args.remove_tag.tag)))
 	{
+		zbx_tag_t	*tag = &(*event)->tags.values[index];
+
 		zbx_free(tag->tag);
 		zbx_free(tag->value);
-		zbx_vector_tag_remove_noorder(&(*event)->tags, tag - (*event)->tags.values);
+		zbx_vector_tag_remove_noorder(&(*event)->tags, index);
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -374,10 +353,10 @@ static void	cep_operation_event_execute(const zbx_cep_operation_t *op, int execu
 		case ZBX_CEP_OP_DISCARD:
 		case ZBX_CEP_OP_COPY_FIRST:
 		case ZBX_CEP_OP_COPY_LAST:
-			/* non event ops are handled otherwhere */
+			/* non event ops are handled elsewhere */
 			break;
 		default:
-			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown operation type %d", op->type);
+			THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported operation type %d", op->type);
 	}
 }
 

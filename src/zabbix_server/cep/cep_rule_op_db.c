@@ -14,20 +14,12 @@
 
 #include "cep_rule_op_db.h"
 #include "cep_rule.h"
-#include "cep.h"
 #include "cep_task.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
-#include "zbxcacheconfig.h"
-#include "zbxcalc.h"
 #include "zbxcep.h"
 #include "zbxcommon.h"
-#include "zbxdbwrap.h"
-#include "zbxeval.h"
-#include "zbxexpr.h"
 #include "zbxmw.h"
-#include "zbxnum.h"
-#include "zbxvariant.h"
 #include "zbxdbhigh.h"
 
 /******************************************************************************

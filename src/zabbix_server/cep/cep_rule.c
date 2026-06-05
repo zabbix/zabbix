@@ -14,17 +14,13 @@
 
 #include "cep_rule.h"
 #include "cep.h"
-#include "cep_task.h"
-#include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
-#include "zbxcalc.h"
 #include "zbxcep.h"
 #include "zbxcommon.h"
 #include "zbxdbwrap.h"
 #include "zbxeval.h"
 #include "zbxexpr.h"
-#include "zbxmw.h"
 #include "zbxnum.h"
 #include "zbxvariant.h"
 #include "zbxdbhigh.h"
@@ -139,41 +135,6 @@ void	cep_result_clear(zbx_cep_result_t *result)
 
 	if (NULL != result->db_event)
 		zbx_db_free_event(result->db_event);
-}
-
-static zbx_cep_event_t *cep_result_acquire_event(zbx_cep_result_t *result, zbx_cep_event_context_t *ctx)
-{
-	if (NULL == result->event)
-	{
-		if (NULL == ctx->event)
-		{
-			if (NULL != ctx->hevent)
-				zbx_cep_get_events_by_handles(&ctx->hevent, 1, &ctx->event);
-		}
-
-		if (NULL != ctx->event)
-		{
-			result->event = cep_event_get_mutable(ctx->event);
-			result->update_flags |= CEP_RESULT_UPDATE_EVENT;
-		}
-	}
-
-	return result->event;
-}
-
-static zbx_db_event	*cep_result_acquire_db_event(zbx_cep_result_t *result, zbx_cep_event_context_t *ctx)
-{
-	if (NULL == result->db_event)
-	{
-		if (NULL == (result->db_event = ctx->db_event))
-		{
-			/* TODO: make db_event from ctx->event */
-		}
-
-		result->update_flags |= CEP_RESULT_UPDATE_DB_EVENT;
-	}
-
-	return result->db_event;
 }
 
 /*
@@ -993,3 +954,28 @@ out:
 	return ret;
 }
 
+char	*cep_tag_value_shift(const char *value, int shift)
+{
+	zbx_uint64_t	value_ui64;
+	double		value_dbl;
+
+	if ('\0' == *value)
+	{
+		if (1 == shift)
+			return zbx_strdup(NULL, "1");
+		return zbx_strdup(NULL, "0");
+	}
+
+	if (SUCCEED == zbx_is_uint64(value, &value_ui64))
+		return zbx_dsprintf(NULL, ZBX_FS_UI64, value_ui64 + shift);
+
+	if (SUCCEED == zbx_is_double(value, &value_dbl))
+	{
+		char	buffer[32];
+
+		zbx_print_double(buffer, sizeof(buffer), value_dbl + shift);
+		return zbx_strdup(NULL, buffer);
+	}
+
+	return NULL;
+}
