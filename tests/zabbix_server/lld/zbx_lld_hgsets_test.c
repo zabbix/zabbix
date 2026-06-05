@@ -20,6 +20,7 @@
 #include "zbxcommon.h"
 
 #include "zbxalgo.h"
+#include "zbxdb.h"
 
 #include "../../../src/zabbix_server/lld/lld_host.c"
 
@@ -86,6 +87,8 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	zbx_mockdb_init();
+
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_vector_uint64_create(&del_hgsetids_act);
 	zbx_vector_uint64_create(&del_hgsetids_exp);
@@ -253,6 +256,8 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_vector_uint64_destroy(&del_hgsetids_exp);
 	zbx_vector_uint64_destroy(&del_hgsetids_act);
+
+	zbx_db_close();
 
 	zbx_mockdb_destroy();
 }
