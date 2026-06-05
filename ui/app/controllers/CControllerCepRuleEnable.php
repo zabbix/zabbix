@@ -22,7 +22,8 @@ class CControllerCepRuleEnable extends CControllerCepRuleGeneral {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'cepruleids' => 'required|array_db cep_rule.cep_ruleid'
+			'cepruleids' => 'array_db cep_rule.cep_ruleid',
+			'correlationids' => 'array_db correlation.correlationid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -41,19 +42,32 @@ class CControllerCepRuleEnable extends CControllerCepRuleGeneral {
 	}
 
 	protected function doAction(): void {
+		$cepruleids = $this->getInput('cepruleids', []);
+		$correlationids = $this->getInput('correlationids', []);
 		$ceprules = [];
+		$correlations = [];
 
-		foreach ($this->getInput('cepruleids') as $cepruleid) {
+		foreach ($cepruleids as $cepruleid) {
 			$ceprules[] = [
 				'cep_ruleid' => $cepruleid,
 				'status' => CCepRuleHelper::STATUS_ENABLED
 			];
 		}
 
-		$result = API::CepRule()->update($ceprules);
+		foreach ($correlationids as $correlationid) {
+			$correlations[] = [
+				'correlationid' => $correlationid,
+				'status' => ZBX_CORRELATION_ENABLED
+			];
+		}
+
+		$result_cep = !$ceprules || API::CepRule()->update($ceprules);
+		$result_correlation = !$correlations || API::Correlation()->update($correlations);
+
+		$result = $result_cep && $result_correlation;
 
 		$output = [];
-		$updated = count($ceprules);
+		$updated = count($ceprules) + count($correlations);
 
 		if ($result) {
 			$output['success']['title'] = _n('Complex event processing rule enabled',
@@ -70,6 +84,24 @@ class CControllerCepRuleEnable extends CControllerCepRuleGeneral {
 					'Cannot enable complex event processing rules', $updated
 				),
 				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+
+			$keep_cepruleids = array_keys(API::CepRule()->get([
+				'output' => [],
+				'correlationids' => $cepruleids,
+				'editable' => true,
+				'preservekeys' => true
+			]));
+
+			$keep_correlationids = array_keys(API::Correlation()->get([
+				'output' => [],
+				'correlationids' => $correlationids,
+				'editable' => true,
+				'preservekeys' => true
+			]));
+
+			$output['keepids'] = [...$keep_cepruleids,
+				...array_map(fn(string $correlationid) => "legacy-$correlationid", $keep_correlationids)
 			];
 		}
 
