@@ -38,10 +38,10 @@ type activeConnection struct {
 
 func (c *activeConnection) Write(data []byte, timeout time.Duration) (bool, bool, []error) {
 	upload := false
-	b, errs, _ := zbxcomms.ExchangeWithRedirect(c.address, &c.localAddr, timeout,
+	b, commsFailed, errs, _ := zbxcomms.ExchangeWithRedirect(c.address, &c.localAddr, timeout,
 		time.Second*time.Duration(c.timeout), data, c.tlsConfig)
 	if errs != nil {
-		return upload, true, errs
+		return upload, commsFailed, errs
 	}
 
 	var response agentDataResponse
