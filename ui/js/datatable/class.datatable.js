@@ -1264,17 +1264,18 @@ class CDataTable {
 			return;
 		}
 
-		if (column.getDefaults().getWidth() == 'auto') {
-			column.resetWidth(`${CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH}px`);
-		}
-		else {
-			column.resetWidth();
-
-			this.#applyColumnWidths();
-			this.#calculateColumnWidth(column);
-		}
+		const overrides = column.getOverrides();
+		column.resetWidth(overrides.width ?? null);
 
 		this.#applyColumnWidths();
+
+		if (!overrides.width) {
+			this.#calculateColumnWidth(column);
+			this.#applyColumnWidths();
+		}
+
+		this.#handleScrollbar();
+
 		this.dispatchEvent(CDataTable.EVENT_SAVE);
 
 		this.#resize_click_count = 0;
@@ -2309,6 +2310,7 @@ class CDataTable {
 			return;
 		}
 
+		const default_width = column.getDefaults().getWidth();
 		const header_width = column.getHeaderCell()?.target.clientWidth ?? 0;
 		const data_width = column.getDataCells().at(0)?.target.clientWidth ?? 0;
 
@@ -2318,14 +2320,19 @@ class CDataTable {
 			width += 2;
 		}
 
-		if (column.getDefaults().getWidth() === 'auto') {
-			width = Math.max(width, CDataTable.COLUMN_MIN_ALLOWED_CALC_WIDTH);
-		}
-		else {
+		if (default_width === 'max-content') {
 			width = Math.min(width, CDataTable.COLUMN_MAX_ALLOWED_CALC_WIDTH);
 		}
+		else if (default_width === 'auto') {
+			width = Math.max(width, CDataTable.COLUMN_MIN_ALLOWED_CALC_WIDTH);
+		}
 
-		column.setWidth(`${width}px`);
+		const calculated_width = `${width}px`;
+
+		column.setWidth(calculated_width);
+
+		const overrides = column.getOverrides();
+		column.setOverrides({...overrides, width: calculated_width});
 	}
 
 	#renderHeaderCells() {
