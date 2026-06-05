@@ -71,7 +71,7 @@ $html_page = (new CHtmlPage())
 				)
 				->addItem(
 					(new CSimpleButton())
-						->addClass(ZBX_ICON_PAUSE)
+						->addClass(ZBX_ICON_PLAY)
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW)
 						->setTitle(($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
 							? _s('Stop slideshow')
