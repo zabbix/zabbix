@@ -1,6 +1,8 @@
 Changes for 8.0.0beta2
 
 New features:
+A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
+A.F.....S. [ZBXNEXT-10347] added ClickHouse history backend; improved server startup by enabling history bulk fetch with per-item limits for ClickHouse, Elasticsearch, MySQL, and PostgreSQL; optimized Elasticsearch by removing scroll context and reusing connections; fixed potential hang when using multi-handle in Elasticsearch (gcalenko, Sasha, vso, wczerneha, wiper)
 A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
 .......PS. [ZBXNEXT-10611] added real host name for native vmware.*.alarms.get item keys (MVekslers)
 A.F.....S. [ZBXNEXT-1150] implemented storage and display of maintenance-related event suppressions and unsuppressions (aetatsu, Ivo)
@@ -5898,6 +5900,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.47rc1
 
 New features:
+A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
 
 Bug fixes:
