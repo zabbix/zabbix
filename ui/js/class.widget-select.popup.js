@@ -86,6 +86,9 @@ class CWidgetSelectPopup {
 			}],
 			element: document.activeElement ?? undefined
 		});
+
+		// Display the close button after the screen reader announces the dialog title.
+		this.#overlay.$dialogue.$close_btn.show();
 	}
 
 	/**
