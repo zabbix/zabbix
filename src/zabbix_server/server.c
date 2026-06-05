@@ -2781,11 +2781,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 		else
 		{
-			if (ZBX_RTC_VAULT_RELOGIN == message->code && NULL != zbx_config_vault.token &&
-					0 == strcmp(zbx_config_vault.token, (char *)message->data))
+			if (ZBX_RTC_VAULT_RELOGIN == message->code)
 			{
-zabbix_log(LOG_LEVEL_WARNING, "MAIN PROCESS GOT ZBX_RTC_VAULT_RELOGIN ");
-				zbx_free(zbx_config_vault.token);
+				if (NULL != zbx_config_vault.token &&
+					0 == strcmp(zbx_config_vault.token, (char *)message->data))
+				{
+					zbx_free(zbx_config_vault.token);
+				}
 			}
 			else if (ZBX_NODE_STATUS_ACTIVE == ha_status || ZBX_RTC_LOG_LEVEL_DECREASE == message->code ||
 					ZBX_RTC_LOG_LEVEL_INCREASE == message->code)

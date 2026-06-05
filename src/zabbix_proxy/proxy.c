@@ -2171,13 +2171,19 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (NULL != message)
 		{
-			if (ZBX_RTC_VAULT_RELOGIN == message->code && NULL != zbx_config_vault.token &&
-					0 == strcmp(zbx_config_vault.token, (char *)message->data))
+			if (ZBX_RTC_VAULT_RELOGIN == message->code)
 			{
-				zbx_free(zbx_config_vault.token);
+				if (NULL != zbx_config_vault.token &&
+						0 == strcmp(zbx_config_vault.token, (char *)message->data))
+				{
+					zbx_free(zbx_config_vault.token);
+				}
+			}
+			else
+			{
+				zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_func);
 			}
 
-			zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_func);
 			zbx_ipc_message_free(message);
 		}
 
