@@ -461,7 +461,10 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->clearLog(self::COMPONENT_PROXY);
 
-		$this->reloadConfigurationCache(self::COMPONENT_PROXY);
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER,
+				'proxy_config_cache_reload='.self::PROXY_NAME);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'reloading configuration on proxy "'.self::PROXY_NAME.'"', true, 30, 1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
 				'sending configuration data to proxy "'.self::PROXY_NAME.'"', true, 90, 1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, "received configuration data from server", true,
