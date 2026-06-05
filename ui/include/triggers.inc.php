@@ -62,22 +62,6 @@ function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAck
 	}
 }
 
-function trigger_state2str($state = null) {
-	$triggerStates = [
-		TRIGGER_STATE_NORMAL => _('Normal'),
-		TRIGGER_STATE_UNKNOWN => _('Unknown')
-	];
-
-	if ($state === null) {
-		return $triggerStates;
-	}
-	elseif (array_key_exists($state, $triggerStates)) {
-		return $triggerStates[$state];
-	}
-
-	return _('Unknown');
-}
-
 function trigger_value2str($value = null) {
 	$triggerValues = [
 		TRIGGER_VALUE_FALSE => _('OK'),

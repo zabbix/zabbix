@@ -300,27 +300,6 @@ class CTagHelper {
 		}
 	}
 
-	/**
-	 * Returns tags in selected format.
-	 *
-	 * @param array  $tags
-	 * @param int    $tag_name_format  TAG_NAME_*
-	 *
-	 * @return string
-	 */
-	public static function getTagsString(array $tags, int $tag_name_format = TAG_NAME_FULL): string {
-		if (!$tags) {
-			return '';
-		}
-
-		$parts = [];
-		foreach ($tags as $tag) {
-			$parts[] = self::getTagString($tag, $tag_name_format);
-		}
-
-		return implode(', ', $parts);
-	}
-
 	public static function getTagsRaw(array $objects): array {
 		$tags = [];
 
