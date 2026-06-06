@@ -1,0 +1,27 @@
+---
+test case: close with 0 rows - nothing flushed to memory buffer
+in:
+  ip: "192.168.1.1"
+  dns: "host.example.com"
+  value: "42"
+  rows: 0
+out:
+  rows: 0
+---
+test case: close with 1 row - row flushed to memory buffer with correct fields
+in:
+  ip: "192.168.1.1"
+  dns: "host.example.com"
+  value: "42"
+  rows: 1
+out:
+  rows: 1
+---
+test case: close with 3 rows - all rows flushed to memory buffer
+in:
+  ip: "10.0.0.1"
+  dns: "proxy.internal"
+  value: "open"
+  rows: 3
+out:
+  rows: 3
