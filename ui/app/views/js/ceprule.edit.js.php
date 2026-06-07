@@ -603,6 +603,7 @@ window.ceprule_edit_popup = new class {
 			buttons: [
 				{
 					title: is_new ? t('Add') : t('Edit'),
+					isSubmit: true,
 					action: (overlay) => {
 						const form = ceprule_condition_edit_popup.form;
 						const fields = form.getAllValues();
@@ -665,6 +666,7 @@ window.ceprule_edit_popup = new class {
 			buttons: [
 				{
 					title: is_new ? t('Add') : t('Edit'),
+					isSubmit: true,
 					action: (overlay) => {
 						const form = ceprule_window_condition_edit_popup.form;
 						const fields = form.getAllValues();
@@ -731,6 +733,7 @@ window.ceprule_edit_popup = new class {
 			buttons: [
 				{
 					title: is_new ? t('Add') : t('Edit'),
+					isSubmit: true,
 					action: (overlay) => {
 						const form = ceprule_operation_edit_popup.form;
 						const fields = form.getAllValues();
