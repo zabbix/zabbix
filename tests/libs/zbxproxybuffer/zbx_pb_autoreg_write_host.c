@@ -183,9 +183,12 @@ void	zbx_mock_test_entry(void **state)
 
 	for (i = 0; i < rows_written; i++)
 	{
-		/* connection_type=1 == ZBX_TCP_SEC_UNENCRYPTED (zbxcomms.h not included) */
+		/* connection_type=1 == ZBX_TCP_SEC_UNENCRYPTED (zbxcomms.h not included).
+		 * Use the current time: pb_autoreg_check_age() purges rows where
+		 * now - clock > offline_buffer (0); a stale hardcoded clock would cause
+		 * every row written after the first to immediately evict its predecessor. */
 		zbx_pb_autoreg_write_host(host, ip, dns, (unsigned short)port,
-				1, host_metadata, flags, 1234567890);
+				1, host_metadata, flags, (int)time(NULL));
 	}
 
 	pb = get_pb_data();
