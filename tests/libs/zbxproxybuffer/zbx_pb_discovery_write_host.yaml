@@ -52,3 +52,13 @@ in:
   rows: 5
 out:
   rows: 5
+---
+test case: partial set_lastid clears only first row leaving remainder
+in:
+  ip: "10.20.30.40"
+  dns: "partial.example.com"
+  error: ""
+  rows: 3
+out:
+  rows: 3
+  rows_after_partial_clear: 2

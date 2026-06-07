@@ -5,7 +5,8 @@ noinst_PROGRAMS = \
 	zbx_pb_discovery_close \
 	zbx_pb_parse_mode \
 	zbx_pb_discovery_write_host \
-	zbx_pb_autoreg_write_host
+	zbx_pb_autoreg_write_host \
+	zbx_pb_create_error
 
 # ── shared libs / flags ───────────────────────────────────────────────────────
 # All proxybuffer tests use the same library set and LDFLAGS:
@@ -71,4 +72,11 @@ zbx_pb_discovery_write_host_LDADD   = $(PB_LIBS) @PROXY_LIBS@
 zbx_pb_autoreg_write_host_SOURCES = zbx_pb_autoreg_write_host.c
 zbx_pb_autoreg_write_host_CFLAGS  = $(PB_CFLAGS)
 zbx_pb_autoreg_write_host_LDADD   = $(PB_LIBS) @PROXY_LIBS@
+
+# ── zbx_pb_create_error ───────────────────────────────────────────────────────
+# Tests zbx_pb_create failure (size too small), DISK-mode get_mem_info error
+# path, and MEMORY-mode get_mem_info / get_state_info success paths.
+zbx_pb_create_error_SOURCES = zbx_pb_create_error.c
+zbx_pb_create_error_CFLAGS  = $(PB_CFLAGS)
+zbx_pb_create_error_LDADD   = $(PB_LIBS) @PROXY_LIBS@
 endif

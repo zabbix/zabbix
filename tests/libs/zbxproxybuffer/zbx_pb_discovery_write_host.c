@@ -164,6 +164,9 @@ void	zbx_mock_test_entry(void **state)
 	struct zbx_json			j;
 	zbx_uint64_t			lastid = 0;
 	int				more, rows_got;
+	zbx_pb_mem_info_t		mem_info;
+	zbx_pb_state_info_t		state_info;
+	zbx_mock_handle_t		hparam;
 
 	ZBX_UNUSED(state);
 
@@ -179,6 +182,13 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_assert_result_eq("pb_create", SUCCEED,
 			zbx_pb_create(ZBX_PB_MODE_MEMORY, 1024 * 1024, 0, 0, &error));
 	zbx_pb_init();
+
+	/* verify mem/state info after buffer creation */
+	zbx_mock_assert_result_eq("get_mem_info", SUCCEED, zbx_pb_get_mem_info(&mem_info, &error));
+	zbx_mock_assert_int_eq("mem_total > 0", 1, mem_info.mem_total > 0 ? 1 : 0);
+	zbx_mock_assert_int_eq("mem_used > 0",  1, mem_info.mem_used  > 0 ? 1 : 0);
+	zbx_pb_get_state_info(&state_info);
+	zbx_mock_assert_int_eq("state_info.state", 1, state_info.state);
 
 	handle = zbx_pb_discovery_open();
 
@@ -213,7 +223,21 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_assert_int_eq("get_rows count", expected_rows, rows_got);
 	zbx_json_free(&j);
 
-	/* test set_lastid: must clear the buffer so a subsequent get_rows returns 0 */
+	/* optional: partial set_lastid — clear only row id=1, verify remainder */
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.rows_after_partial_clear", &hparam))
+	{
+		int	expected_partial;
+
+		zbx_mock_int(hparam, &expected_partial);
+		zbx_pb_discovery_set_lastid(1);
+
+		zbx_json_init(&j, ZBX_KIBIBYTE * 16);
+		rows_got = zbx_pb_discovery_get_rows(&j, &lastid, &more);
+		zbx_mock_assert_int_eq("get_rows after partial clear", expected_partial, rows_got);
+		zbx_json_free(&j);
+	}
+
+	/* test full set_lastid: must clear the buffer so a subsequent get_rows returns 0 */
 	zbx_pb_discovery_set_lastid(lastid);
 
 	zbx_json_init(&j, ZBX_KIBIBYTE * 16);

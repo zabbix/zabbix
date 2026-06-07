@@ -70,3 +70,16 @@ in:
   rows: 1
 out:
   rows: 1
+---
+test case: partial set_lastid clears only first row leaving remainder
+in:
+  host: "parthost"
+  ip: "192.168.5.5"
+  dns: "parthost.lan"
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 3
+out:
+  rows: 3
+  rows_after_partial_clear: 2

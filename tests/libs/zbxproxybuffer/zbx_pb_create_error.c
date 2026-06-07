@@ -19,14 +19,13 @@
 
 #include "zbxcommon.h"
 #include "zbxalgo.h"
-#include "zbxjson.h"
 #include "zbxmutexs.h"
 #include "zbxdb.h"
 #include "zbxnix.h"
 #include "zbxproxybuffer.h"
 #include "proxybuffer.h"
 
-/* Same wrap/stub block as zbx_pb_discovery_close.c */
+/* Same wrap/stub block as the other proxybuffer tests */
 
 FILE	*__real_fopen(const char *path, const char *mode);
 FILE	*__wrap_fopen(const char *path, const char *mode);
@@ -104,16 +103,7 @@ void		zbx_dc_config_get_items_by_itemids(void *items, const zbx_uint64_t *itemid
 			int *errcodes, size_t num);
 void		zbx_dc_config_clean_items(void *items, int *errcodes, size_t num);
 
-static zbx_uint64_t	g_nextid;
-
-zbx_uint64_t	zbx_dc_get_nextid(const char *t, int n)
-{
-	zbx_uint64_t	id = g_nextid;
-
-	ZBX_UNUSED(t);
-	g_nextid += (zbx_uint64_t)n;
-	return id;
-}
+zbx_uint64_t	zbx_dc_get_nextid(const char *t, int n)		{ ZBX_UNUSED(t); ZBX_UNUSED(n); return 0; }
 
 void	zbx_dc_config_get_items_by_itemids(void *items, const zbx_uint64_t *itemids,
 		int *errcodes, size_t num)
@@ -154,100 +144,71 @@ int		zbx_db_is_null(const char *f)				{ ZBX_UNUSED(f); return SUCCEED; }
 void	zbx_mock_test_entry(void **state)
 {
 	char			*error = NULL;
-	zbx_pb_t		*pb;
-	zbx_pb_autoreg_t	*row;
-	const char		*host, *ip, *dns, *host_metadata;
-	int			i, rows_written, expected_rows, count, port, flags;
-	zbx_list_iterator_t	li;
-	struct zbx_json		j;
-	zbx_uint64_t		lastid = 0;
-	int			more, rows_got;
-	zbx_pb_mem_info_t	mem_info;
-	zbx_pb_state_info_t	state_info;
+	int			mode, create_result, expected_create_result;
+	zbx_uint64_t		size;
 	zbx_mock_handle_t	hparam;
 
 	ZBX_UNUSED(state);
 
-	host          = zbx_mock_get_parameter_string("in.host");
-	ip            = zbx_mock_get_parameter_string("in.ip");
-	dns           = zbx_mock_get_parameter_string("in.dns");
-	host_metadata = zbx_mock_get_parameter_string("in.host_metadata");
-	port          = zbx_mock_get_parameter_int("in.port");
-	flags         = zbx_mock_get_parameter_int("in.flags");
-	rows_written  = zbx_mock_get_parameter_int("in.rows");
-	expected_rows = zbx_mock_get_parameter_int("out.rows");
-
-	g_nextid = 1;
+	mode = zbx_mock_get_parameter_int("in.mode");
+	size = (zbx_uint64_t)zbx_mock_get_parameter_int("in.size");
+	expected_create_result = zbx_mock_get_parameter_int("out.create_result");
 
 	zbx_mock_assert_result_eq("locks_create", SUCCEED, zbx_locks_create(&error));
-	zbx_mock_assert_result_eq("pb_create", SUCCEED,
-			zbx_pb_create(ZBX_PB_MODE_MEMORY, 1024 * 1024, 0, 0, &error));
-	zbx_pb_init();
 
-	/* verify mem/state info after buffer creation */
-	zbx_mock_assert_result_eq("get_mem_info", SUCCEED, zbx_pb_get_mem_info(&mem_info, &error));
-	zbx_mock_assert_int_eq("mem_total > 0", 1, mem_info.mem_total > 0 ? 1 : 0);
-	zbx_mock_assert_int_eq("mem_used > 0",  1, mem_info.mem_used  > 0 ? 1 : 0);
-	zbx_pb_get_state_info(&state_info);
-	zbx_mock_assert_int_eq("state_info.state", 1, state_info.state);
+	create_result = zbx_pb_create(mode, size, 0, 0, &error);
+	zbx_mock_assert_result_eq("create result", expected_create_result, create_result);
 
-	for (i = 0; i < rows_written; i++)
+	if (SUCCEED == create_result)
 	{
-		/* connection_type=1 == ZBX_TCP_SEC_UNENCRYPTED (zbxcomms.h not included).
-		 * Use the current time: pb_autoreg_check_age() purges rows where
-		 * now - clock > offline_buffer (0); a stale hardcoded clock would cause
-		 * every row written after the first to immediately evict its predecessor. */
-		zbx_pb_autoreg_write_host(host, ip, dns, (unsigned short)port,
-				1, host_metadata, flags, (int)time(NULL));
+		zbx_pb_mem_info_t	mem_info;
+		zbx_pb_state_info_t	state_info;
+		char			*mem_error = NULL;
+
+		zbx_pb_init();
+
+		/* test get_mem_info */
+		if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.mem_info_result", &hparam))
+		{
+			int	expected_mem_result, mem_result;
+
+			zbx_mock_int(hparam, &expected_mem_result);
+
+			mem_result = zbx_pb_get_mem_info(&mem_info, &mem_error);
+			zbx_mock_assert_result_eq("mem_info result", expected_mem_result, mem_result);
+
+			if (SUCCEED == mem_result)
+			{
+				/* memory mode: buffer must report non-zero usage */
+				zbx_mock_assert_int_eq("mem_total > 0", 1,
+						mem_info.mem_total > 0 ? 1 : 0);
+				zbx_mock_assert_int_eq("mem_used > 0",  1,
+						mem_info.mem_used  > 0 ? 1 : 0);
+			}
+			else
+			{
+				/* disk mode: error message must be set */
+				zbx_mock_assert_ptr_ne("mem_error not NULL", NULL, mem_error);
+				zbx_free(mem_error);
+			}
+		}
+
+		/* test get_state_info */
+		if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.state", &hparam))
+		{
+			int	expected_state;
+
+			zbx_mock_int(hparam, &expected_state);
+			zbx_pb_get_state_info(&state_info);
+			zbx_mock_assert_int_eq("state", expected_state, state_info.state);
+		}
+
+		zbx_pb_destroy();
 	}
-
-	pb = get_pb_data();
-
-	/* verify row fields in the memory buffer */
-	count = 0;
-	zbx_list_iterator_init(&pb->autoreg, &li);
-
-	while (SUCCEED == zbx_list_iterator_next(&li))
+	else
 	{
-		zbx_list_iterator_peek(&li, (void **)&row);
-		zbx_mock_assert_str_eq("host",          host,          row->host);
-		zbx_mock_assert_str_eq("listen_ip",     ip,            row->listen_ip);
-		zbx_mock_assert_str_eq("listen_dns",    dns,           row->listen_dns);
-		zbx_mock_assert_str_eq("host_metadata", host_metadata, row->host_metadata);
-		zbx_mock_assert_int_eq("listen_port",   port,          row->listen_port);
-		zbx_mock_assert_int_eq("flags",         flags,         row->flags);
-		count++;
+		/* create failure: error message must be set */
+		zbx_mock_assert_ptr_ne("error not NULL on failure", NULL, error);
+		zbx_free(error);
 	}
-
-	zbx_mock_assert_int_eq("row count", expected_rows, count);
-
-	/* test get_rows: must return the same count */
-	zbx_json_init(&j, ZBX_KIBIBYTE * 16);
-	rows_got = zbx_pb_autoreg_get_rows(&j, &lastid, &more);
-	zbx_mock_assert_int_eq("get_rows count", expected_rows, rows_got);
-	zbx_json_free(&j);
-
-	/* optional: partial set_lastid — clear only row id=1, verify remainder */
-	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.rows_after_partial_clear", &hparam))
-	{
-		int	expected_partial;
-
-		zbx_mock_int(hparam, &expected_partial);
-		zbx_pb_autoreg_set_lastid(1);
-
-		zbx_json_init(&j, ZBX_KIBIBYTE * 16);
-		rows_got = zbx_pb_autoreg_get_rows(&j, &lastid, &more);
-		zbx_mock_assert_int_eq("get_rows after partial clear", expected_partial, rows_got);
-		zbx_json_free(&j);
-	}
-
-	/* test full set_lastid: must clear the buffer so a subsequent get_rows returns 0 */
-	zbx_pb_autoreg_set_lastid(lastid);
-
-	zbx_json_init(&j, ZBX_KIBIBYTE * 16);
-	rows_got = zbx_pb_autoreg_get_rows(&j, &lastid, &more);
-	zbx_mock_assert_int_eq("get_rows after set_lastid", 0, rows_got);
-	zbx_json_free(&j);
-
-	zbx_pb_destroy();
 }

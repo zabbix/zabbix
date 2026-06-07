@@ -51,3 +51,27 @@ in:
   mode_str: "Memory"
 out:
   result: -1
+---
+test case: leading whitespace is not stripped
+in:
+  mode_str: " disk"
+out:
+  result: -1
+---
+test case: trailing whitespace is not stripped
+in:
+  mode_str: "disk "
+out:
+  result: -1
+---
+test case: prefix match is not accepted
+in:
+  mode_str: "memo"
+out:
+  result: -1
+---
+test case: hybrid with extra suffix is not accepted
+in:
+  mode_str: "hybrid1"
+out:
+  result: -1
