@@ -270,6 +270,16 @@ static zbx_cep_event_handle_t	cep_create_event_handle(zbx_cep_t *cep, zbx_cep_ev
 	return (zbx_cep_event_handle_t)zbx_hashset_insert(&cep->events, &handle_local, sizeof(handle_local));
 }
 
+int	cep_event_handle_compare(const void *a1, const void *a2)
+{
+	const zbx_cep_event_handle_t *h1 = (const zbx_cep_event_handle_t *)a1;
+	const zbx_cep_event_handle_t *h2 = (const zbx_cep_event_handle_t *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(*h1, *h2);
+
+	return 0;
+}
+
 zbx_hash_t	cep_origin_hash(const zbx_cep_origin_t *origin)
 {
 	zbx_hash_t	hash;
@@ -1499,6 +1509,11 @@ void	zbx_cep_get_eventids_from_handles(const zbx_cep_event_handle_t *handles, in
 	zbx_vector_uint64_reserve(eventids, (size_t)handles_num);
 	for (int i = 0; i < handles_num; i++)
 		zbx_vector_uint64_append(eventids, handles[i]->eventid);
+}
+
+zbx_uint64_t	zbx_cep_event_handle_eventid(zbx_cep_event_handle_t h)
+{
+	return h->eventid;
 }
 
 /******************************************************************************

@@ -796,6 +796,27 @@ static void	cep_worker_process_task_close_event(zbx_cep_task_close_event_t *task
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() r_eventid:" ZBX_FS_UI64, __func__, r_eventid);
 }
 
+static int	cep_task_set_event_name_compare(const void *a1, const void *a2)
+{
+	const zbx_cep_task_set_event_name_t	*t1 = (const zbx_cep_task_set_event_name_t *)a1;
+	const zbx_cep_task_set_event_name_t	*t2 = (const zbx_cep_task_set_event_name_t *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(t1->eventid, t2->eventid);
+
+	return 0;
+}
+
+static int	cep_task_update_event_compare(const void *a1, const void *a2)
+{
+	const zbx_cep_task_update_event_t	*t1 = (const zbx_cep_task_update_event_t *)a1;
+	const zbx_cep_task_update_event_t	*t2 = (const zbx_cep_task_update_event_t *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(zbx_cep_event_handle_eventid(t1->hevent), zbx_cep_event_handle_eventid(t2->hevent));
+
+	return 0;
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Purpose: commit queued finished tasks                                      *
@@ -805,10 +826,12 @@ static void	cep_worker_process_task_close_event(zbx_cep_task_close_event_t *task
  ******************************************************************************/
 static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_task_commit_t *task)
 {
-	zbx_vector_mw_task_ptr_t	event_tasks, add_tags_tasks;
+	zbx_vector_mw_task_ptr_t	event_tasks, add_tags_tasks, set_name_tasks, update_event_tasks;
 
 	zbx_vector_mw_task_ptr_create(&event_tasks);
 	zbx_vector_mw_task_ptr_create(&add_tags_tasks);
+	zbx_vector_mw_task_ptr_create(&set_name_tasks);
+	zbx_vector_mw_task_ptr_create(&update_event_tasks);
 
 	for (int i = 0; i < task->tasks.values_num; i++)
 	{
@@ -820,6 +843,12 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 				break;
 			case CEP_TASK_ADD_TAGS:
 				zbx_vector_mw_task_ptr_append(&add_tags_tasks, task->tasks.values[i]);
+				break;
+			case CEP_TASK_SET_EVENT_NAME:
+				zbx_vector_mw_task_ptr_append(&set_name_tasks, task->tasks.values[i]);
+				break;
+			case CEP_TASK_UPDATE_EVENT:
+				zbx_vector_mw_task_ptr_append(&update_event_tasks, task->tasks.values[i]);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported task %d in commit",
@@ -869,6 +898,23 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 		}
 	}
 
+	if (0 != set_name_tasks.values_num)
+	{
+		zbx_vector_mw_task_ptr_sort(&set_name_tasks, cep_task_set_event_name_compare);
+		cep_db_set_event_names(worker->dbpool, &set_name_tasks);
+	}
+
+	if (0 != update_event_tasks.values_num)
+	{
+		zbx_vector_mw_task_ptr_sort(&set_name_tasks, cep_task_update_event_compare);
+		cep_db_update_events(worker->dbpool, &update_event_tasks);
+
+		/* TODO: make update notifications */
+	}
+
+
+	zbx_vector_mw_task_ptr_destroy(&update_event_tasks);
+	zbx_vector_mw_task_ptr_destroy(&set_name_tasks);
 	zbx_vector_mw_task_ptr_destroy(&add_tags_tasks);
 	zbx_vector_mw_task_ptr_destroy(&event_tasks);
 }
@@ -933,6 +979,10 @@ void	*cep_worker_entry(void *args)
 					break;
 				case CEP_TASK_COMMIT:
 					cep_worker_process_task_commit(worker, (zbx_cep_task_commit_t *)task);
+					break;
+				case CEP_TASK_SET_EVENT_NAME:
+				case CEP_TASK_UPDATE_EVENT:
+					/* nop tasks, contains data for commit */
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN_MSG("unknown task type %d", task->type);

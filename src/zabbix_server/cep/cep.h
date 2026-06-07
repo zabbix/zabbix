@@ -37,6 +37,7 @@ zbx_cep_event_t	*cep_event_addref(zbx_cep_event_t *event);
 zbx_cep_event_t	*cep_event_get_mutable(zbx_cep_event_t *event);
 zbx_uint32_t	cep_event_handle_release(zbx_cep_event_handle_t h);
 zbx_cep_event_t	*cep_event_handle_remove(zbx_cep_t *cep, zbx_cep_event_handle_t h);
+int	cep_event_handle_compare(const void *a1, const void *a2);
 
 zbx_cep_t	*cep_create(void);
 void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool);

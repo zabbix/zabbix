@@ -26,5 +26,7 @@ void	cep_db_process_actions(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_
 void	cep_db_export_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks,
 		zbx_export_file_t *problem_export);
 void	cep_db_add_tags(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks);
+void	cep_db_set_event_names(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks);
+void	cep_db_update_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks);
 
 #endif

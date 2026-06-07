@@ -100,6 +100,6 @@ void	zbx_cep_get_events(unsigned char source, zbx_vector_cep_event_handle_t *han
 
 void	zbx_cep_get_eventids_from_handles(const zbx_cep_event_handle_t *handles, int handles_num,
 		zbx_vector_uint64_t *eventids);
-
+zbx_uint64_t	zbx_cep_event_handle_eventid(zbx_cep_event_handle_t h);
 
 #endif

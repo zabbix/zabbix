@@ -13,6 +13,7 @@
 **/
 
 #include "cep_db.h"
+#include "cep.h"
 #include "cep_task.h"
 #include "zbxcep.h"
 
@@ -25,10 +26,12 @@
 #include "zbxescalations.h"
 #include "zbxconnector.h"
 #include "zbxexport.h"
+#include "zbxnum.h"
 #include "zbxtypes.h"
 #include "zbxstr.h"
 #include "../actions/actions.h"
 #include "../events/events.h"
+#include <stdint.h>
 
 typedef struct
 {
@@ -716,3 +719,332 @@ void	cep_db_add_tags(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+
+
+void	cep_db_set_event_names(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
+
+	zbx_dbconn_t	*db = zbx_dbconn_pool_acquire_connection(dbpool);
+
+	do
+	{
+		size_t	sql_offset = 0;
+
+		zbx_dbconn_begin(db);
+
+		for (int i = 0; i < tasks->values_num; i++)
+		{
+			const zbx_cep_task_set_event_name_t	*task;
+			char					*name_esc;
+
+			task = (const zbx_cep_task_set_event_name_t *)tasks->values[i];
+			name_esc = zbx_db_dyn_escape_string(task->name);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update events set name='%s' where eventid=" ZBX_FS_UI64 ";\n"
+					"update problem set name='%s' where eventid=" ZBX_FS_UI64 ";\n",
+					name_esc, task->eventid, name_esc, task->eventid);
+
+			zbx_dbconn_execute_overflowed_sql(db, &sql, &sql_alloc, &sql_offset, NULL);
+
+			zbx_free(name_esc);
+		}
+
+		(void)zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset);
+	}
+	while (ZBX_DB_DOWN == zbx_dbconn_commit(db));
+
+	zbx_dbconn_pool_release_connection(dbpool, db);
+
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static int	cep_db_sync_event_tags(const char *table, const char *field, const zbx_cep_event_t **events,
+		int events_num, int event_index, zbx_uint64_t eventid, zbx_sync_rowset_t *db_tags, zbx_dbconn_t *db,
+		zbx_db_insert_t *db_insert, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		zbx_vector_uint64_t *deleteids)
+{
+	char			eventid_str[MAX_ID_LEN];
+	zbx_sync_rowset_t	cache_tags;
+
+	while (event_index < events_num)
+	{
+		if (events[event_index]->eventid == eventid)
+			break;
+
+		zbx_snprintf(eventid_str, sizeof(eventid_str), ZBX_FS_UI64, events[event_index]->eventid);
+
+		/* there are no tags for this event in database, insert them */
+		for (int i = 0; i < events[event_index]->tags.values_num; i++)
+		{
+			zbx_tag_t	*tag = &events[event_index]->tags.values[i];
+
+			zbx_db_insert_add_values(db_insert, __UINT64_C(0), eventid_str, tag->tag, tag->value);
+		}
+		event_index++;
+	}
+
+	if (event_index == events_num || NULL == db_tags)
+		return event_index;
+
+	zbx_sync_rowset_init(&cache_tags, 3);
+
+	zbx_snprintf(eventid_str, sizeof(eventid_str), ZBX_FS_UI64, events[event_index]->eventid);
+
+	for (int i = 0; i < events[event_index]->tags.values_num; i++)
+	{
+		zbx_tag_t	*tag = &events[event_index]->tags.values[i];
+
+		zbx_sync_rowset_add_row(&cache_tags, NULL, eventid_str, tag->tag, tag->value);
+	}
+
+	zbx_sync_rowset_merge(db_tags, &cache_tags);
+
+	for (int i = 0; i < db_tags->rows.values_num; i++)
+	{
+		zbx_sync_row_t	*row = db_tags->rows.values[i];
+
+		if (0 != (row->flags & ZBX_SYNC_ROW_DELETE))
+		{
+			zbx_vector_uint64_append(deleteids, row->rowid);
+		}
+		else if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
+		{
+			zbx_db_insert_add_values(db_insert, __UINT64_C(0), eventid, row->cols[1], row->cols[2]);
+		}
+		else if (0 != (row->flags & ZBX_SYNC_ROW_UPDATE))
+		{
+			const char	*fields[] = {NULL, "tag", "value"};
+			char		delim = ' ';
+
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update %s set", table);
+
+			for (int j = 1; j < row->cols_num; j++)
+			{
+				if (0 == (row->flags & (UINT32_C(1) << j)))
+					continue;
+
+				char	*value_esc;
+
+				value_esc = zbx_db_dyn_escape_string(row->cols[j]);
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%c%s='%s'", delim, fields[j],
+						value_esc);
+				zbx_free(value_esc);
+
+				delim = ',';
+			}
+
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where %s=" ZBX_FS_UI64 ";\n",  field,
+					row->rowid);
+			zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset, NULL);
+		}
+	}
+	zbx_sync_rowset_clear(&cache_tags);
+
+	return ++event_index;
+}
+
+static void	cep_db_sync_event_tags_table(zbx_dbconn_t *db, const char *table, const char *field,
+		const zbx_cep_event_t **events, int events_num, const zbx_vector_uint64_t *eventids)
+{
+	zbx_db_result_t				result;
+	zbx_db_row_t				row;
+	char					*sql = NULL;
+	size_t					sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t				eventid, last_eventid = 0;
+	int					event_index = 0;
+	zbx_sync_rowset_t			db_tags;
+	zbx_vector_uint64_t			deleteids;
+	zbx_db_insert_t				db_insert;
+
+	zbx_vector_uint64_create(&deleteids);
+	zbx_sync_rowset_init(&db_tags, 3);
+	zbx_dbconn_prepare_insert(db, &db_insert, table, field, "eventid", "tag", "value", NULL);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s,eventid,tag,value from %s where",
+			field, table);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids->values, eventids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by eventid");
+
+	result = zbx_dbconn_select(db, "%s", sql);
+	sql_offset = 0;
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		ZBX_STR2UINT64(eventid, row[1]);
+
+		if (eventid != last_eventid)
+		{
+			if (0 != last_eventid)
+			{
+				event_index = cep_db_sync_event_tags(table, field, events, events_num, event_index,
+						last_eventid, &db_tags, db, &db_insert, &sql, &sql_alloc, &sql_offset,
+						&deleteids);
+				zbx_sync_rowset_clear(&db_tags);
+				zbx_sync_rowset_init(&db_tags, 3);
+			}
+			last_eventid = eventid;
+		}
+
+		zbx_sync_rowset_add_row(&db_tags, row[0], row[1], row[2], row[3]);
+	}
+	zbx_db_free_result(result);
+
+	event_index = cep_db_sync_event_tags(table, field, events, events_num, event_index, last_eventid, &db_tags,
+			db, &db_insert, &sql, &sql_alloc, &sql_offset, &deleteids);
+
+	(void)cep_db_sync_event_tags(table, field, events, events_num, event_index, 0, NULL, db, &db_insert, &sql,
+			&sql_alloc, &sql_offset, &deleteids);
+
+	zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset);
+
+	if (0 != deleteids.values_num)
+	{
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where", table);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, field, deleteids.values,
+				deleteids.values_num);
+		zbx_dbconn_execute(db, "%s", sql);
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, field);
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	zbx_free(sql);
+
+	zbx_sync_rowset_clear(&db_tags);
+	zbx_vector_uint64_destroy(&deleteids);
+}
+
+static void	cep_db_update_event_tags(zbx_dbconn_t *db, const zbx_vector_cep_event_handle_t *htags)
+{
+	zbx_vector_uint64_t	eventids;
+	zbx_cep_event_t		**events;
+	int			events_num = 0;
+
+	zbx_vector_uint64_create(&eventids);
+	zbx_vector_uint64_reserve(&eventids, (size_t)htags->values_num);
+
+	events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * htags->values_num);
+	zbx_cep_get_events_by_handles(htags->values, htags->values_num, events);
+
+	for (int i = 0; i < htags->values_num; i++)
+	{
+		if (NULL == events[i])
+			continue;
+
+		events[events_num++] = events[i];
+		zbx_vector_uint64_append(&eventids, events[i]->eventid);
+	}
+
+	cep_db_sync_event_tags_table(db, "event_tag", "eventtagid",  (const zbx_cep_event_t **)events, events_num,
+			&eventids);
+	cep_db_sync_event_tags_table(db, "problem_tag", "problemtagid",  (const zbx_cep_event_t **)events, events_num,
+			&eventids);
+
+	zbx_vector_uint64_destroy(&eventids);
+
+	for (int i = 0; i < events_num; i++)
+	{
+		if (NULL != events[i])
+			zbx_cep_event_release(events[i]);
+	}
+
+	zbx_free(events);
+}
+
+
+static void	cep_db_update_event_severity(zbx_dbconn_t *db, const zbx_vector_cep_event_handle_t *hseverities)
+{
+	zbx_cep_event_t		**events;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * hseverities->values_num);
+	zbx_cep_get_events_by_handles(hseverities->values, hseverities->values_num, events);
+
+	for (int i = 0; i < hseverities->values_num; i++)
+	{
+		if (NULL == events[i])
+			continue;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update events set severity=%d where eventid=" ZBX_FS_UI64 ";\n"
+					"update problem set severity=%d where eventid=" ZBX_FS_UI64 ";\n",
+					events[i]->severity, events[i]->eventid,
+					events[i]->severity, events[i]->eventid);
+
+		zbx_dbconn_execute_overflowed_sql(db, &sql, &sql_alloc, &sql_offset, NULL);
+
+		zbx_cep_event_release(events[i]);
+	}
+
+	(void)zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset);
+
+	zbx_free(sql);
+	zbx_free(events);
+}
+
+void	cep_db_update_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks)
+{
+	zbx_vector_cep_event_handle_t		hseverities, htags;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
+
+	zbx_vector_cep_event_handle_create(&hseverities);
+	zbx_vector_cep_event_handle_reserve(&hseverities, (size_t)tasks->values_num);
+
+	zbx_vector_cep_event_handle_create(&htags);
+	zbx_vector_cep_event_handle_reserve(&htags, (size_t)tasks->values_num);
+
+	for (int i = 0; i < tasks->values_num; i++)
+	{
+		const zbx_cep_task_update_event_t	*task = (const zbx_cep_task_update_event_t *)tasks->values[i];
+
+		if (0 != (task->flags & CEP_SYNC_EVENT_SEVERITY))
+			zbx_vector_cep_event_handle_append(&hseverities, task->hevent);
+
+		if (0 != (task->flags & CEP_SYNC_EVENT_TAGS))
+			zbx_vector_cep_event_handle_append(&htags, task->hevent);
+
+	}
+
+	zbx_vector_cep_event_handle_sort(&hseverities, cep_event_handle_compare);
+	zbx_vector_cep_event_handle_uniq(&hseverities, cep_event_handle_compare);
+
+	zbx_vector_cep_event_handle_sort(&htags, cep_event_handle_compare);
+	zbx_vector_cep_event_handle_uniq(&htags, cep_event_handle_compare);
+
+	zbx_dbconn_t	*db = zbx_dbconn_pool_acquire_connection(dbpool);
+
+	do
+	{
+		zbx_dbconn_begin(db);
+
+		/* update event severity */
+
+		if (0 != hseverities.values_num)
+			cep_db_update_event_severity(db, &hseverities);
+
+		if (0 != htags.values_num)
+			cep_db_update_event_tags(db, &htags);
+	}
+	while (ZBX_DB_DOWN == zbx_dbconn_commit(db));
+
+	/* TODO: send tag update notifications to service manager */
+
+	zbx_dbconn_pool_release_connection(dbpool, db);
+
+	zbx_vector_cep_event_handle_destroy(&hseverities);
+	zbx_vector_cep_event_handle_destroy(&htags);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+

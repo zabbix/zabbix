@@ -13,6 +13,7 @@
 **/
 
 #include "cep_task.h"
+#include "cep.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxipcservice.h"
@@ -23,6 +24,8 @@ static void	cep_task_event_free(void *mw_task);
 static void	cep_task_close_event_free(void *mw_task);
 static void	cep_task_event_commit_free(void *mw_task);
 static void	cep_task_add_tags_free(void *mw_task);
+static void	cep_task_set_event_name_free(void *mw_task);
+static void	cep_task_update_event_free(void *mw_task);
 
 /******************************************************************************
  *                                                                            *
@@ -171,7 +174,7 @@ zbx_mw_task_t	*cep_create_task_close_event(zbx_db_event *event, zbx_uint64_t eve
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free event closing task                                           *
+ * Purpose: free 'close event' task                                           *
  *                                                                            *
  * Parameters: task - [IN] event closing task to free                         *
  *                                                                            *
@@ -211,7 +214,7 @@ zbx_mw_task_t	*cep_create_task_commit(zbx_vector_mw_task_ptr_t *tasks)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free task that commits events created by other tasks              *
+ * Purpose: free 'event commit' task                                          *
  *                                                                            *
  ******************************************************************************/
 static void	cep_task_event_commit_free(void *mw_task)
@@ -264,7 +267,7 @@ zbx_mw_task_t	*cep_create_task_add_tags(zbx_vector_event_tags_t *event_tags, zbx
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free task that adds tags to events                                *
+ * Purpose: free 'add tags' task                                              *
  *                                                                            *
  ******************************************************************************/
 static void	cep_task_add_tags_free(void *mw_task)
@@ -285,6 +288,76 @@ static void	cep_task_add_tags_free(void *mw_task)
 
 	zbx_free(task);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create task to set event name                                     *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_set_event_name(zbx_uint64_t eventid, const char *name)
+{
+	zbx_cep_task_set_event_name_t	*task;
+
+	task = (zbx_cep_task_set_event_name_t *)zbx_mw_task_create(CEP_TASK_SET_EVENT_NAME,
+			cep_task_set_event_name_free, sizeof(zbx_cep_task_set_event_name_t));
+
+	task->eventid = eventid;
+	task->name = zbx_strdup(NULL, name);
+
+	return (zbx_mw_task_t *)task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free 'set event name' task                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_task_set_event_name_free(void *mw_task)
+{
+	zbx_cep_task_set_event_name_t	*task = (zbx_cep_task_set_event_name_t *)mw_task;
+
+	zbx_free(task->name);
+	zbx_free(task);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create task to sync event changes from cache to db                *
+ *                                                                            *
+ * Parameters: event - [IN] event to sync                                     *
+ *             flags - [IN] update flags specifying what should be updated    *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_update_event(zbx_cep_event_handle_t event, zbx_uint32_t flags)
+{
+	zbx_cep_task_update_event_t	*task;
+
+	task = (zbx_cep_task_update_event_t *)zbx_mw_task_create(CEP_TASK_UPDATE_EVENT, cep_task_update_event_free,
+			sizeof(zbx_cep_task_update_event_t));
+
+	task->hevent = zbx_cep_event_handle_addref(event);
+	task->flags = flags;
+
+	return (zbx_mw_task_t *)task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free 'set event name' task                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_task_update_event_free(void *mw_task)
+{
+	zbx_cep_task_update_event_t	*task = (zbx_cep_task_update_event_t *)mw_task;
+
+	zbx_cep_event_handle_release(task->hevent);
+	zbx_free(task);
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -311,6 +384,12 @@ void	cep_task_free(zbx_mw_task_t *mw_task)
 			break;
 		case CEP_TASK_ADD_TAGS:
 			cep_task_add_tags_free((zbx_cep_task_add_tags_t *)task);
+			break;
+		case CEP_TASK_SET_EVENT_NAME:
+			cep_task_set_event_name_free((zbx_cep_task_set_event_name_t *)task);
+			break;
+		case CEP_TASK_UPDATE_EVENT:
+			cep_task_update_event_free((zbx_cep_task_update_event_t *)task);
 			break;
 	}
 }
