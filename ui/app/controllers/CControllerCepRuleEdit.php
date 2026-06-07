@@ -75,9 +75,9 @@ class CControllerCepRuleEdit extends CController {
 		$data = [
 			'js_validation_rules' => $rules,
 			'js_validation_rules_for_clone' => $rules_for_clone,
-			'condition_js_validation_rules' => self::getConditionValidationRules(),
-			'window_condition_js_validation_rules' => self::getWindowConditionValidationRules(),
-			'operation_js_validation_rules' => self::getOperationValidationRules(),
+			'condition_js_validation_rules' => self::getConditionValidationRules($rules),
+			'window_condition_js_validation_rules' => self::getWindowConditionValidationRules($rules),
+			'operation_js_validation_rules' => self::getOperationValidationRules($rules),
 			'ceprule' => $this->ceprule,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
@@ -161,37 +161,24 @@ class CControllerCepRuleEdit extends CController {
 		return $ceprule;
 	}
 
-	protected static function getWindowConditionValidationRules(): array {
-		$rules = CControllerCepRuleGeneral::getValidationRules();
-
-		$condition_fields = $rules
-			['fields']['window']
-			['fields']['filter']
-			['fields']['conditions']
-			['fields'];
-
-		return (new CFormValidator([
-			'object', 'fields' => $condition_fields
-		]))->getRules();
+	protected static function getWindowConditionValidationRules(array $rules_normalized): array {
+		return [
+			'type' => 'object',
+			...$rules_normalized['fields']['window'][0]['fields']['filter'][0]['fields']['conditions'][0]
+		];
 	}
 
-	protected static function getConditionValidationRules(): array {
-		$rules = CControllerCepRuleGeneral::getValidationRules();
-
-		$condition_fields = $rules['fields']['filter']['fields']['conditions']['fields'];
-
-		return (new CFormValidator([
-			'object', 'fields' => $condition_fields
-		]))->getRules();
+	protected static function getOperationValidationRules(array $rules_normalized): array {
+		return [
+			'type' => 'object',
+			...$rules_normalized['fields']['operations'][0]
+		];
 	}
 
-	protected static function getOperationValidationRules(): array {
-		$rules = CControllerCepRuleGeneral::getValidationRules();
-
-		$operation_fields = $rules['fields']['operations']['fields'];
-
-		return (new CFormValidator([
-			'object', 'fields' => $operation_fields
-		]))->getRules();
+	protected static function getConditionValidationRules(array $rules_normalized): array {
+		return [
+			'type' => 'object',
+			...$rules_normalized['fields']['filter'][0]['fields']['conditions'][0]
+		];
 	}
 }

@@ -3,7 +3,8 @@
 - for iv-rules
 - for form dynamics
 [x] table massupdate union action or argumented request
-[:] iv-rules - operations optional case
+[x] iv-rules - operations optional case
+[ ] iv-rules - operations optional case works client-side, php validator misbehaves?
 [ ] profile keys migration?
 [ ] A new icon created to be shown in actions history panel in problems list and event details page.
 [x] sub-modal submit not working on <enter> key
