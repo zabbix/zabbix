@@ -35,13 +35,20 @@
 
 /* fopen / fclose — also wrapped explicitly in LDFLAGS */
 FILE	*__real_fopen(const char *path, const char *mode);
-FILE	*__wrap_fopen(const char *path, const char *mode) { return __real_fopen(path, mode); }
+FILE	*__wrap_fopen(const char *path, const char *mode);
 int	 __real_fclose(FILE *fp);
+int	 __wrap_fclose(FILE *fp);
+
+FILE	*__wrap_fopen(const char *path, const char *mode) { return __real_fopen(path, mode); }
 int	 __wrap_fclose(FILE *fp) { return __real_fclose(fp); }
 
 /* open / close / stat — libzbxlog.a references these; --wrap=* is only active
  * via COMMON_WRAP_FUNCS so __real_* do not exist in a direct build.
  * Return failure values — the test never reaches log-file I/O paths anyway. */
+int	__wrap_open(const char *path, int oflag, int mode);
+int	__wrap_close(int fd);
+int	__wrap_stat(const char *path, struct stat *buf);
+
 int	__wrap_open(const char *path, int oflag, int mode)
 		{ ZBX_UNUSED(path); ZBX_UNUSED(oflag); ZBX_UNUSED(mode); return -1; }
 int	__wrap_close(int fd)				{ ZBX_UNUSED(fd); return 0; }
