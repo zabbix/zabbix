@@ -98,6 +98,7 @@ $available_js = [
 	'component.z-vertical.js' => '',
 	'class.event-hub.js' => '',
 	'class.event-hub.event.js' => '',
+	'class.banner.js' => '',
 	'class.base-component.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
