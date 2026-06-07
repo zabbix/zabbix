@@ -1,0 +1,53 @@
+---
+test case: NULL string defaults to disk mode
+in:
+  mode_str: "(null)"
+out:
+  result: 0
+  mode: 0
+---
+test case: empty string defaults to disk mode
+in:
+  mode_str: ""
+out:
+  result: 0
+  mode: 0
+---
+test case: explicit disk string
+in:
+  mode_str: "disk"
+out:
+  result: 0
+  mode: 0
+---
+test case: memory string
+in:
+  mode_str: "memory"
+out:
+  result: 0
+  mode: 1
+---
+test case: hybrid string
+in:
+  mode_str: "hybrid"
+out:
+  result: 0
+  mode: 2
+---
+test case: unrecognized string returns FAIL
+in:
+  mode_str: "invalid"
+out:
+  result: -1
+---
+test case: uppercase DISK is not recognized
+in:
+  mode_str: "DISK"
+out:
+  result: -1
+---
+test case: mixed-case Memory is not recognized
+in:
+  mode_str: "Memory"
+out:
+  result: -1

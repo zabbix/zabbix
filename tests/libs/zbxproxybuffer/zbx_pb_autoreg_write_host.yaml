@@ -1,0 +1,72 @@
+---
+test case: write 0 autoreg hosts - empty buffer, get_rows returns 0
+in:
+  host: "host1"
+  ip: "192.168.1.1"
+  dns: ""
+  host_metadata: ""
+  port: 10050
+  flags: 0
+  rows: 0
+out:
+  rows: 0
+---
+test case: write 1 autoreg host with full metadata
+in:
+  host: "myhost"
+  ip: "10.0.0.1"
+  dns: "myhost.example.com"
+  host_metadata: "role=web,env=prod"
+  port: 10050
+  flags: 0
+  rows: 1
+out:
+  rows: 1
+---
+test case: write 1 autoreg host with empty dns and metadata
+in:
+  host: "barehost"
+  ip: "10.0.0.2"
+  dns: ""
+  host_metadata: ""
+  port: 10051
+  flags: 0
+  rows: 1
+out:
+  rows: 1
+---
+test case: write 1 autoreg host with tls flags set
+in:
+  host: "tlshost"
+  ip: "10.0.0.3"
+  dns: "tlshost.internal"
+  host_metadata: ""
+  port: 10050
+  flags: 2
+  rows: 1
+out:
+  rows: 1
+---
+test case: write 3 autoreg hosts same fields - all rows flushed
+in:
+  host: "agent01"
+  ip: "192.168.10.1"
+  dns: "agent01.local"
+  host_metadata: "version=7.0"
+  port: 10050
+  flags: 0
+  rows: 3
+out:
+  rows: 3
+---
+test case: write 1 host with long metadata - large string stored correctly
+in:
+  host: "bigmeta"
+  ip: "198.51.100.1"
+  dns: "bigmeta.example.net"
+  host_metadata: "role=worker,datacenter=us-east-1,rack=r42,env=staging,team=platform"
+  port: 10050
+  flags: 0
+  rows: 1
+out:
+  rows: 1

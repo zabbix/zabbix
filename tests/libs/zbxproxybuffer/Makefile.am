@@ -2,18 +2,19 @@ include ../Makefile.include
 
 if PROXY
 noinst_PROGRAMS = \
-	zbx_pb_discovery_close
+	zbx_pb_discovery_close \
+	zbx_pb_parse_mode \
+	zbx_pb_discovery_write_host \
+	zbx_pb_autoreg_write_host
 
-# ── zbx_pb_discovery_close ───────────────────────────────────────────────────
-# Integration test: real shared memory via zbx_pb_create(); exercises the full
-# open → write → close cycle against the actual proxy buffer library.
-# DB / DC / JSON functions are stubbed in the test file (never called in the
-# memory-mode close path).  The test file also defines all __wrap_* symbols
-# needed when COMMON_WRAP_FUNCS is injected by "make tests_build" so that no
-# objects from libzbxmockdata.a (zbxmockdb.o, zbxmockexit.o, zbxmockfile.o)
-# are extracted — preventing duplicate-definition conflicts with our stubs.
+# ── shared libs / flags ───────────────────────────────────────────────────────
+# All proxybuffer tests use the same library set and LDFLAGS:
+#   - DB / DC / nix functions are stubbed inline (prevents libzbxmockdata.a
+#     objects from being extracted and causing duplicate-symbol conflicts).
+#   - -Wl,--wrap=open is required so __real_open exists at link time and the
+#     __wrap_open passthrough for .gcda files (coverage) works correctly.
 
-CLOSE_LIBS = \
+PB_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a \
@@ -31,17 +32,43 @@ CLOSE_LIBS = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS)
 
-zbx_pb_discovery_close_SOURCES = zbx_pb_discovery_close.c
-
-zbx_pb_discovery_close_CFLAGS = \
-	-I@top_srcdir@/src/libs/zbxproxybuffer \
-	-I@top_srcdir@/tests \
-	$(CMOCKA_CFLAGS) $(YAML_CFLAGS)
-
-zbx_pb_discovery_close_LDADD = $(CLOSE_LIBS) @PROXY_LIBS@
-zbx_pb_discovery_close_LDFLAGS = @PROXY_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
+# AM_LDFLAGS applies to all targets in this file; per-target *_LDFLAGS would
+# also work but using AM_LDFLAGS avoids automake's "PB has no canonical name"
+# warning that fires when a FOO_LDFLAGS variable has no matching target FOO.
+AM_LDFLAGS = @PROXY_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
 	-Wl,--wrap=exit \
 	-Wl,--wrap=fopen \
 	-Wl,--wrap=fclose \
 	-Wl,--wrap=open
+
+PB_CFLAGS = \
+	-I@top_srcdir@/src/libs/zbxproxybuffer \
+	-I@top_srcdir@/tests \
+	$(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+
+# keep CLOSE_LIBS for backwards compatibility (referenced by name in some scripts)
+CLOSE_LIBS = $(PB_LIBS)
+
+# ── zbx_pb_discovery_close ────────────────────────────────────────────────────
+zbx_pb_discovery_close_SOURCES = zbx_pb_discovery_close.c
+zbx_pb_discovery_close_CFLAGS  = $(PB_CFLAGS)
+zbx_pb_discovery_close_LDADD   = $(PB_LIBS) @PROXY_LIBS@
+
+# ── zbx_pb_parse_mode ─────────────────────────────────────────────────────────
+# Pure string→mode parsing; no shared memory needed.
+zbx_pb_parse_mode_SOURCES = zbx_pb_parse_mode.c
+zbx_pb_parse_mode_CFLAGS  = $(PB_CFLAGS)
+zbx_pb_parse_mode_LDADD   = $(PB_LIBS) @PROXY_LIBS@
+
+# ── zbx_pb_discovery_write_host ───────────────────────────────────────────────
+# Tests write_host (dcheckid=0, port=0, value=""), get_rows, set_lastid.
+zbx_pb_discovery_write_host_SOURCES = zbx_pb_discovery_write_host.c
+zbx_pb_discovery_write_host_CFLAGS  = $(PB_CFLAGS)
+zbx_pb_discovery_write_host_LDADD   = $(PB_LIBS) @PROXY_LIBS@
+
+# ── zbx_pb_autoreg_write_host ─────────────────────────────────────────────────
+# Tests autoreg write_host, get_rows, set_lastid in memory mode.
+zbx_pb_autoreg_write_host_SOURCES = zbx_pb_autoreg_write_host.c
+zbx_pb_autoreg_write_host_CFLAGS  = $(PB_CFLAGS)
+zbx_pb_autoreg_write_host_LDADD   = $(PB_LIBS) @PROXY_LIBS@
 endif

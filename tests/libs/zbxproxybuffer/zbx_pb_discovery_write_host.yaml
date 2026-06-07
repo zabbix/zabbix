@@ -1,0 +1,54 @@
+---
+test case: write 0 host records - empty buffer, get_rows returns 0
+in:
+  ip: "192.168.1.1"
+  dns: "host.example.com"
+  error: ""
+  rows: 0
+out:
+  rows: 0
+---
+test case: write 1 host with no error - dcheckid=0 port=0 value empty
+in:
+  ip: "192.168.1.1"
+  dns: "host.example.com"
+  error: ""
+  rows: 1
+out:
+  rows: 1
+---
+test case: write 1 host with error message - error field preserved
+in:
+  ip: "10.0.0.5"
+  dns: ""
+  error: "connection refused"
+  rows: 1
+out:
+  rows: 1
+---
+test case: write 1 host with empty dns - empty dns stored correctly
+in:
+  ip: "172.16.0.1"
+  dns: ""
+  error: ""
+  rows: 1
+out:
+  rows: 1
+---
+test case: write 3 hosts with error - all rows flushed to buffer
+in:
+  ip: "10.1.1.1"
+  dns: "node.cluster.local"
+  error: "host unreachable"
+  rows: 3
+out:
+  rows: 3
+---
+test case: write 5 hosts with long error - large error string stored
+in:
+  ip: "203.0.113.42"
+  dns: "long-hostname.very-long-domain-name.example.org"
+  error: "ICMP ping failed after 3 retries: no route to host (errno=113)"
+  rows: 5
+out:
+  rows: 5
