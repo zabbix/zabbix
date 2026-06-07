@@ -55,8 +55,11 @@ int	__wrap_close(int fd)				{ ZBX_UNUSED(fd); return 0; }
 int	__wrap_stat(const char *path, struct stat *buf)
 		{ ZBX_UNUSED(path); ZBX_UNUSED(buf); return -1; }
 
-/* exit — fatal paths in libzbxproxybuffer.a; redirect to _exit (not wrapped) */
-void	__wrap_exit(int status)				{ _exit(status); }
+/* exit — fatal paths in libzbxproxybuffer.a; use __real_exit so gcov atexit
+ * handlers flush .gcda files before the process terminates. */
+void	__real_exit(int status);
+void	__wrap_exit(int status);
+void	__wrap_exit(int status)				{ __real_exit(EXIT_SUCCESS); }
 
 /* DB — libzbxproxybuffer.a calls these; never reached in ZBX_PB_MODE_MEMORY */
 zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...)

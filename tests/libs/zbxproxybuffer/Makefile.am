@@ -40,6 +40,7 @@ zbx_pb_discovery_close_CFLAGS = \
 
 zbx_pb_discovery_close_LDADD = $(CLOSE_LIBS) @PROXY_LIBS@
 zbx_pb_discovery_close_LDFLAGS = @PROXY_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
+	-Wl,--wrap=exit \
 	-Wl,--wrap=fopen \
 	-Wl,--wrap=fclose
 endif
