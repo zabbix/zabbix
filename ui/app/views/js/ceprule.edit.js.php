@@ -398,7 +398,7 @@ window.ceprule_edit_popup = new class {
 			headers: {'Content-Type': 'application/json; charset=UTF-8'},
 			body: JSON.stringify({
 				cepruleids: [this.form.findFieldByName('cepruleid').getValue()],
-				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule.edit')) ?>
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>
 			})
 		})
 			.then((response) => response.json())
@@ -454,7 +454,7 @@ window.ceprule_edit_popup = new class {
 
 	#submit(force_sumbit) {
 		const fields = this.form.getAllValues();
-		fields[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('ceprule.edit')) ?>;
+		fields[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>;
 		fields._cep_rule_reset = force_sumbit ? 1 : 0;
 
 		// Correct the sortorder.

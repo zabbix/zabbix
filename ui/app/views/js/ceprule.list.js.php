@@ -109,7 +109,7 @@
 			}
 
 			const payload = {cepruleids, correlationids,
-				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule.list')) ?>
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>
 			};
 
 			return fetch(zabbixUrl({action: 'ceprule.delete'}), {
@@ -130,7 +130,7 @@
 			}
 
 			const payload = {cepruleids, correlationids,
-				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule.list')) ?>
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>
 			};
 
 			return fetch(zabbixUrl({action: 'ceprule.enable'}), {
@@ -151,7 +151,7 @@
 			}
 
 			const payload = {cepruleids, correlationids,
-				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule.list')) ?>
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>
 			};
 
 			return fetch(zabbixUrl({action: 'ceprule.disable'}), {
@@ -163,7 +163,7 @@
 
 		#toggleEnabled(target) {
 			const {action, id} = target.dataset;
-			const payload = {[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule.list')) ?>};
+			const payload = {[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>};
 
 			if (id.startsWith('legacy-')) {
 				payload.correlationids = [id.replace('legacy-', '')];

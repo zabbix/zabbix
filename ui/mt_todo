@@ -2,12 +2,12 @@
 - EXECUTE_WHEN_BY_WINDOW_TYPE and OPERATION_TYPES_BY_EXECUTE_WHEN
 - for iv-rules
 - for form dynamics
-[:] table massupdate union action or argumented request
-[ ] iv-rules - operations optional case
+[x] table massupdate union action or argumented request
+[:] iv-rules - operations optional case
 [ ] profile keys migration?
 [ ] A new icon created to be shown in actions history panel in problems list and event details page.
 [ ] sub-modal submit not working on <enter> key
-[ ] csrf not working
+[x] csrf not working?
 [x] Event details -> Event details. If CEP rule closed this problem "Resolved by": "complex event processing rule" "link to correlation rule" or "complex event processing rule"
 [x] Problems view. The info column shows the same green [i] icon and upon hover either one of messages is shown: Resolved by event correlation rule "<name>". Resolved by complex event processing rule "<name>". (this is new translation string)
 [ ] PR review

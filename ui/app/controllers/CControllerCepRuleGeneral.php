@@ -17,7 +17,6 @@
 abstract class CControllerCepRuleGeneral extends CController {
 
 	protected function init(): void {
-		$this->disableCsrfValidation(); // TODO: TEMP
 		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}

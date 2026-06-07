@@ -16,7 +16,6 @@
 
 class CControllerCepRuleDelete extends CControllerCepRuleGeneral {
 	protected function init(): void {
-		$this->disableCsrfValidation(); // TODO: TEMP
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
