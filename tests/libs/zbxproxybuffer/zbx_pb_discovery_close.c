@@ -44,13 +44,34 @@ int	 __wrap_fclose(FILE *fp) { return __real_fclose(fp); }
 
 /* open / close / stat — libzbxlog.a references these; --wrap=* is only active
  * via COMMON_WRAP_FUNCS so __real_* do not exist in a direct build.
- * Return failure values — the test never reaches log-file I/O paths anyway. */
-int	__wrap_open(const char *path, int oflag, int mode);
+ * Return failure values — the test never reaches log-file I/O paths anyway.
+ * EXCEPTION: pass .gcda paths through to __real_open so the gcov atexit handler
+ * can write coverage data; without this, --wrap=open silently blocks all gcov
+ * output and no .gcda files are produced. */
+int	__real_open(const char *path, int oflag, ...);
+int	__wrap_open(const char *path, int oflag, ...);
 int	__wrap_close(int fd);
 int	__wrap_stat(const char *path, struct stat *buf);
 
-int	__wrap_open(const char *path, int oflag, int mode)
-		{ ZBX_UNUSED(path); ZBX_UNUSED(oflag); ZBX_UNUSED(mode); return -1; }
+int	__wrap_open(const char *path, int oflag, ...)
+{
+	size_t	len = strlen(path);
+
+	if (len > 5 && 0 == strcmp(path + len - 5, ".gcda"))
+	{
+		va_list	args;
+		int	mode;
+
+		va_start(args, oflag);
+		mode = va_arg(args, int);
+		va_end(args);
+		return __real_open(path, oflag, mode);
+	}
+
+	ZBX_UNUSED(oflag);
+	return -1;
+}
+
 int	__wrap_close(int fd)				{ ZBX_UNUSED(fd); return 0; }
 int	__wrap_stat(const char *path, struct stat *buf)
 		{ ZBX_UNUSED(path); ZBX_UNUSED(buf); return -1; }
@@ -59,9 +80,18 @@ int	__wrap_stat(const char *path, struct stat *buf)
  * handlers flush .gcda files before the process terminates. */
 void	__real_exit(int status);
 void	__wrap_exit(int status);
-void	__wrap_exit(int status)				{ __real_exit(EXIT_SUCCESS); }
+void	__wrap_exit(int status)				{ ZBX_UNUSED(status); __real_exit(EXIT_SUCCESS); }
 
 /* DB — libzbxproxybuffer.a calls these; never reached in ZBX_PB_MODE_MEMORY */
+zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...);
+zbx_db_result_t	__wrap_zbx_db_vselect(const char *fmt, va_list args);
+zbx_db_result_t	__wrap_zbx_db_select_n(const char *q, int n);
+int		__wrap_zbx_db_execute(const char *fmt, ...);
+void		__wrap_zbx_db_begin(void);
+int		__wrap_zbx_db_commit(void);
+int		__wrap_zbx_db_execute_multiple_query(const char *q, const char *f,
+		const zbx_vector_uint64_t *v);
+
 zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...)
 		{ ZBX_UNUSED(fmt); return NULL; }
 zbx_db_result_t	__wrap_zbx_db_vselect(const char *fmt, va_list args)
@@ -86,6 +116,11 @@ void	zbx_init_library_nix(zbx_get_progname_f get_progname_cb,
 void	zbx_backtrace(void) {}
 
 /* DC stubs — real cacheconfig not linked; ID counter resets per process */
+zbx_uint64_t	zbx_dc_get_nextid(const char *t, int n);
+void		zbx_dc_config_get_items_by_itemids(void *items, const zbx_uint64_t *itemids,
+			int *errcodes, size_t num);
+void		zbx_dc_config_clean_items(void *items, int *errcodes, size_t num);
+
 static zbx_uint64_t	g_nextid;
 
 zbx_uint64_t	zbx_dc_get_nextid(const char *t, int n)
