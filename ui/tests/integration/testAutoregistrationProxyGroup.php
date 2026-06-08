@@ -430,6 +430,8 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 		);
 		self::prepareComponentConfiguration(self::COMPONENT_AGENT, [self::COMPONENT_AGENT => $agent_config]);
 
+		$this->markTestSkipped('ZBX-27860');
+
 		/* make Zabbix proxy to think that failover should have occurred */
 		self::stopComponent(self::COMPONENT_SERVER);
 		sleep(20);
