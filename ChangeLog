@@ -1,3 +1,15 @@
+Changes for 7.0.28rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.27
+
+7.0.27rc1 was released as 7.0.27 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.27rc1
 
 Bug fixes:
@@ -4087,6 +4099,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.47rc1
 
 New features:
+A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
 
 Bug fixes:
