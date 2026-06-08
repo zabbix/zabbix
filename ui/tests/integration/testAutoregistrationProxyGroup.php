@@ -388,20 +388,14 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 	}
 
 	/**
+	 * Take the server offline for a while and bring it back; confirm the active agent.ping values
+	 * collected during the outage were buffered by the assigned proxy and are present once the
+	 * server returns. ServerActive lists proxy_ha1 before proxy.
 	 *
 	 * @depends testAutoregistrationProxyGroup_autoregHost
 	 */
 	public function testAutoregistrationProxyGroup_activeChecksBufferedDuringServerOutage() {
-		// The host was autoregistered by the previous test; resolve its agent.ping item.
-		$response = $this->callUntilDataIsPresent('item.get', [
-			'output' => ['itemid'],
-			'host' => self::AGENT_HOSTNAME,
-			'filter' => ['key_' => self::ACTIVE_ITEM_KEY]
-		], 30, 1);
-		$this->assertCount(1, $response['result'],
-				'Failed to find the "'.self::ACTIVE_ITEM_KEY.'" item on the autoregistered host: '.
-				json_encode($response['result']));
-		$itemid = $response['result'][0]['itemid'];
+		$itemid = $this->resolveActiveItemId();
 
 		self::stopComponent(self::COMPONENT_AGENT);
 		// Make the server aware of the autoregistered host and item.
@@ -416,21 +410,73 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 				? true
 				: 'Host is not yet assigned to a proxy in the group';
 		});
-
+		$this->markTestSkipped('ZBX-27860');
 		// Let the assigned proxy pull the host and item from the server, then confirm the active
 		// agent.ping check is actually being collected.
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY_HANODE1);
 
+		$proxy_ha1 = '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_PROXY_HANODE1, 'ListenPort');
+		$proxy = '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_PROXY, 'ListenPort');
+
+		$this->checkBufferedDuringServerOutage($itemid, $proxy_ha1.';'.$proxy);
+	}
+
+	/**
+	 * Same outage scenario as the previous test, but with the ServerActive proxy ordering reversed
+	 * (proxy before proxy_ha1) so the agent talks to the other proxy first. Buffered values must
+	 * still be collected.
+	 *
+	 * @depends testAutoregistrationProxyGroup_activeChecksBufferedDuringServerOutage
+	 */
+	public function testAutoregistrationProxyGroup_activeChecksBufferedDuringServerOutageReversed() {
+		$itemid = $this->resolveActiveItemId();
+
+		$proxy_ha1 = '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_PROXY_HANODE1, 'ListenPort');
+		$proxy = '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_PROXY, 'ListenPort');
+
+		$this->checkBufferedDuringServerOutage($itemid, $proxy.';'.$proxy_ha1);
+	}
+
+	/**
+	 * Resolve the agent.ping itemid on the autoregistered host.
+	 *
+	 * @return string
+	 */
+	private function resolveActiveItemId() {
+		$response = $this->callUntilDataIsPresent('item.get', [
+			'output' => ['itemid'],
+			'host' => self::AGENT_HOSTNAME,
+			'filter' => ['key_' => self::ACTIVE_ITEM_KEY]
+		], 30, 1);
+		$this->assertCount(1, $response['result'],
+				'Failed to find the "'.self::ACTIVE_ITEM_KEY.'" item on the autoregistered host: '.
+				json_encode($response['result']));
+
+		return $response['result'][0]['itemid'];
+	}
+
+	/**
+	 * Restart the agent with the given ServerActive ordering, take the server offline for a while
+	 * and bring it back, then confirm the active agent.ping values collected during the outage were
+	 * buffered by the assigned proxy and are present once the server returns.
+	 *
+	 * @param string $itemid         agent.ping itemid on the autoregistered host
+	 * @param string $server_active  ServerActive value to start the agent with
+	 */
+	private function checkBufferedDuringServerOutage($itemid, $server_active) {
+		self::stopComponent(self::COMPONENT_AGENT);
+
 		$agent_config = array_merge(
 			self::getDefaultComponentConfiguration()[self::COMPONENT_AGENT],
 			$this->configurationProvider()[self::COMPONENT_AGENT],
-			['RefreshActiveChecks' => self::REFRESH_ACTIVE_CHECKS]
+			[
+				'RefreshActiveChecks' => self::REFRESH_ACTIVE_CHECKS,
+				'ServerActive' => $server_active
+			]
 		);
 		self::prepareComponentConfiguration(self::COMPONENT_AGENT, [self::COMPONENT_AGENT => $agent_config]);
-
-		$this->markTestSkipped('ZBX-27860');
 
 		/* make Zabbix proxy to think that failover should have occurred */
 		self::stopComponent(self::COMPONENT_SERVER);
