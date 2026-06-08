@@ -11,7 +11,6 @@
 [x] csrf not working?
 [x] Event details -> Event details. If CEP rule closed this problem "Resolved by": "complex event processing rule" "link to correlation rule" or "complex event processing rule"
 [x] Problems view. The info column shows the same green [i] icon and upon hover either one of messages is shown: Resolved by event correlation rule "<name>". Resolved by complex event processing rule "<name>". (this is new translation string)
-[ ] $CAUSE -> $EVICION  (as CAUSE is slightly misleading) with possible values: {duration | capacity}
 [ ] remove from "Tag name" "does not exist"
 [ ] PR review
 

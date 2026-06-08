@@ -265,7 +265,7 @@ if (window.customElements.get('z-cep-tagsuggest') === undefined) {
 		#position_tags = ['$IS.FIRST', '$IS.LAST'];
 
 		/** @type {Array} */
-		#property_tags = ['$IS.COPIED', '$RANK', '$STATUS.CODE', '$CAUSE'];
+		#property_tags = ['$IS.COPIED', '$RANK', '$STATUS.CODE', '$EVICTION'];
 
 		/** @type {Function} */
 		#handler;
