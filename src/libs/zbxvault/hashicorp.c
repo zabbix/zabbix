@@ -316,6 +316,7 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot renew vault token: token is not renewable");
 			status = SUCCEED;
+			renewable = 0;
 			goto out;
 		}
 

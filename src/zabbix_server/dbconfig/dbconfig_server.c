@@ -59,7 +59,7 @@ static void	dbconfig_prof_enable(const unsigned char *data)
 void	*zbx_dbconfig_thread(void *args)
 {
 	double				sec = 0.0;
-	int				sleeptime = 1, nextcheck = 0,
+	int				nextcheck = 0,
 					secrets_reload = 0, cache_reload = 0;
 	zbx_ipc_async_socket_t		rtc;
 	zbx_supervisor_unit_args_t	*unit_args = (zbx_supervisor_unit_args_t *)args;
@@ -113,7 +113,7 @@ void	*zbx_dbconfig_thread(void *args)
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
 		int		vault_ret = SUCCEED;
-		sleeptime = nextcheck - (int)time(NULL);
+		int		sleeptime = nextcheck - (int)time(NULL);
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
