@@ -453,17 +453,20 @@ class CService extends CApiService {
 
 			foreach ($db_services as $db_service) {
 				foreach ($db_service['children'] as $child_service) {
-					if ($permissions['rw_services'][$child_service['serviceid']] !== null) {
-						$permissions['rw_services'][$child_service['serviceid']]--;
+					if ($permissions['rw_services'][$child_service['serviceid']] === null
+							|| array_key_exists($child_service['serviceid'], $permissions['rw_tag_services'])) {
+						continue;
+					}
 
-						if ($permissions['rw_services'][$child_service['serviceid']] == 0) {
-							$error_detail = _s('read-write access to the child service "%1$s" must be retained',
-								$child_service['name']
-							);
-							$error = _s('Cannot delete service "%1$s": %2$s.', $db_service['name'], $error_detail);
+					$permissions['rw_services'][$child_service['serviceid']]--;
 
-							self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
-						}
+					if ($permissions['rw_services'][$child_service['serviceid']] == 0) {
+						$error_detail = _s('read-write access to the child service "%1$s" must be retained',
+							$child_service['name']
+						);
+						$error = _s('Cannot delete service "%1$s": %2$s.', $db_service['name'], $error_detail);
+
+						self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 					}
 				}
 			}
@@ -2169,7 +2172,8 @@ class CService extends CApiService {
 				'r_services' => [],
 				'rw_services' => [],
 				'root_services' => [],
-				'rw_tag' => ['tag' => '', 'value' => '']
+				'rw_tag' => ['tag' => '', 'value' => ''],
+				'rw_tag_services' => []
 			];
 		}
 
@@ -2180,7 +2184,8 @@ class CService extends CApiService {
 				'r_services' => null,
 				'rw_services' => null,
 				'root_services' => null,
-				'rw_tag' => ['tag' => '', 'value' => '']
+				'rw_tag' => ['tag' => '', 'value' => ''],
+				'rw_tag_services' => null
 			];
 		}
 
@@ -2212,7 +2217,11 @@ class CService extends CApiService {
 					: ['tag' => $rules['services.write.tag']['tag']]
 			]);
 
-			$rw_services += array_fill_keys(array_column($tags, 'serviceid'), 0);
+			$rw_tag_services = array_column($tags, 'serviceid', 'serviceid');
+			$rw_services += array_fill_keys($rw_tag_services, 0);
+		}
+		else {
+			$rw_tag_services = [];
 		}
 
 		$sql_options = [
@@ -2282,7 +2291,8 @@ class CService extends CApiService {
 			'r_services' => $r_services,
 			'rw_services' => $rw_services,
 			'root_services' => $root_services,
-			'rw_tag' => $rules['services.write.tag']
+			'rw_tag' => $rules['services.write.tag'],
+			'rw_tag_services' => $rw_tag_services
 		];
 	}
 
@@ -2297,7 +2307,8 @@ class CService extends CApiService {
 		[
 			'r_services' => $r_services,
 			'rw_services' => $rw_services,
-			'rw_tag' => $rw_tag
+			'rw_tag' => $rw_tag,
+			'rw_tag_services' => $rw_tag_services
 		] = $permissions;
 
 		if ($r_services === null || $rw_services === null) {
@@ -2359,8 +2370,6 @@ class CService extends CApiService {
 				&& $rw_services[$service['serviceid']] === null;
 
 			if (!$is_rw_service) {
-				$has_rw_tag = false;
-
 				if ($rw_tag['tag'] !== '') {
 					if (array_key_exists('tags', $service)) {
 						$tags = $service['tags'];
@@ -2375,35 +2384,23 @@ class CService extends CApiService {
 					foreach ($tags as $tag) {
 						if ($tag['tag'] === $rw_tag['tag']
 								&& ($tag['value'] === $rw_tag['value'] || $rw_tag['value'] === '')) {
-							$has_rw_tag = true;
+							$is_rw_service = true;
 
 							break;
 						}
 					}
 				}
-
-				if ($has_rw_tag && $db_services !== null) {
-					$rw_services[$service['serviceid']] = null;
-				}
-
-				$is_rw_service = $has_rw_tag;
 			}
 
 			if (!$is_rw_service) {
 				if (array_key_exists('parents', $service)) {
 					$parent_services = array_column($service['parents'], 'serviceid', 'serviceid');
 
-					$has_rw_parents = (bool) array_intersect_key($parent_services, $rw_services);
-
-					if ($has_rw_parents && $db_services !== null) {
-						$rw_services[$service['serviceid']] = null;
-					}
+					$is_rw_service = (bool) array_intersect_key($parent_services, $rw_services);
 				}
 				else {
-					$has_rw_parents = $db_services !== null;
+					$is_rw_service = $db_services !== null;
 				}
-
-				$is_rw_service = $has_rw_parents;
 			}
 
 			if (!$is_rw_service) {
@@ -2417,6 +2414,8 @@ class CService extends CApiService {
 
 				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 			}
+
+			$rw_services[$service['serviceid']] = null;
 
 			if (array_key_exists('children', $service)) {
 				$new_child_services = array_column($service['children'], 'serviceid', 'serviceid');
@@ -2460,7 +2459,7 @@ class CService extends CApiService {
 
 		if ($db_services !== null) {
 			foreach ($rw_services as $serviceid => $num_rw_parents) {
-				if ($num_rw_parents === null || $num_rw_parents > 0) {
+				if ($num_rw_parents === null || $num_rw_parents > 0 || array_key_exists($serviceid, $rw_tag_services)) {
 					continue;
 				}
 
