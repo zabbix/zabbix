@@ -31,9 +31,6 @@ window.ceprule_edit_popup = new class {
 	#overlay;
 
 	/** @type {Object} */
-	#initial_form_fields;
-
-	/** @type {Object} */
 	#condition_rules;
 
 	/** @type {Object} */
@@ -99,10 +96,6 @@ window.ceprule_edit_popup = new class {
 		window['ceprule-window-groupby-opt-tag'].dispatchEvent(new Event('change'));
 
 		this.#handleWindowTypeChanged();
-
-		this.#initial_form_fields = this.form.getAllValues(); // TODO: use at on-before page unload confirmation
-		console.log([ceprule, '===', this.#initial_form_fields]);
-
 		this.form_element.style.display = '';
 	}
 
