@@ -472,7 +472,7 @@ class CJsRpcInputValidator {
 						'value_type' => ['type' => API_INTS32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT,
 							ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT,
 							ITEM_VALUE_TYPE_BINARY
-						])],
+						])]
 					]],
 					'host_pattern' => ['type' => API_STRINGS_UTF8],
 					'host_pattern_multiple' => ['type' => API_INT32],
