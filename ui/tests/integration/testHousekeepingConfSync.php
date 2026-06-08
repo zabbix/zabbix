@@ -331,8 +331,10 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	}
 
 	private function expectedProxyHousekeeping(array $housekeeping) {
-		$expected = $this->expectedServerHousekeeping(self::defaultHousekeeping());
+		$default_housekeeping = self::defaultHousekeeping();
+		$expected = $this->expectedServerHousekeeping($default_housekeeping);
 
+		/* Proxy uses default housekeeping settings except for synced history configuration. */
 		$expected['hk_history_global'] = $housekeeping['hk_history_global'];
 		$expected['hk_trends'] = 0;
 
