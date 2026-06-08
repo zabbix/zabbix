@@ -5,20 +5,12 @@
 [x] table massupdate union action or argumented request
 [x] iv-rules - operations optional case
 [x] iv-rules - operations optional case works client-side, php validator misbehaves?
-[ ] profile keys migration?
 [ ] A new icon created to be shown in actions history panel in problems list and event details page.
 [x] sub-modal submit not working on <enter> key
 [x] csrf not working?
 [x] Event details -> Event details. If CEP rule closed this problem "Resolved by": "complex event processing rule" "link to correlation rule" or "complex event processing rule"
 [x] Problems view. The info column shows the same green [i] icon and upon hover either one of messages is shown: Resolved by event correlation rule "<name>". Resolved by complex event processing rule "<name>". (this is new translation string)
-[ ] remove from "Tag name" "does not exist"
-[ ] PR review
-
-TBD: API FE Server (specification doc)
-[ ] FR: "Tag value" {"equals", "does not equal", "contains", "does not contain", "is greater than or equals" (numeric only), "is less than or equals" (numeric only)}
-> CEP rule filter will used to associate created events with CEP rules. It defines event matching criteria and is made from the evaluation type (or, and, or/and, custom), optional formula for custom evaluation and conditions
-- need both SPEC AND FR update (drop numeric only from FR) in spec "Tag value" supports ">=" and "<="
-[ ] outdated spec table: 
-> CEP rule defines operations that can be applied to matched events based on a set of conditions
-[ ] no mention on $CAUSE tag in spec
-> Internal event properties can be accessed with built-in tags starting with
+[ ] In conditions merge tag-name and tag-value similar as in problems filter
+[ ] In tags list, hide input for exists operator
+[x] PR review
+[ ] PR review 2

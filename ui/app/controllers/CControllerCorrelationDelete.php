@@ -17,7 +17,6 @@
 class CControllerCorrelationDelete extends CController {
 
 	protected function init(): void {
-		$this->disableCsrfValidation(); // TODO: TEMP
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 

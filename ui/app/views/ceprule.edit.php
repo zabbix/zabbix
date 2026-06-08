@@ -57,7 +57,6 @@ $form = (new CForm())
 	// Enable form submitting on Enter.
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
 	->addVar('cepruleid', $data['ceprule']['cepruleid'])
-	->setId('cep') // TODO, is this used?
 	->addStyle('display: none;')
 	->addItem((new CFormGrid())
 		->addItem([
@@ -103,7 +102,7 @@ $form = (new CForm())
 						(new CTableColumn(new CColHeader(''))),
 						(new CTableColumn(new CColHeader(_('Details'))))
 							->setAttribute('width', ZBX_TEXTAREA_BIG_WIDTH.'px'),
-						(new CTableColumn(new CColHeader(''))),
+						(new CTableColumn(new CColHeader('')))
 					])
 					->addItem((new CTag('tfoot', true))
 						->addItem((new CCol(

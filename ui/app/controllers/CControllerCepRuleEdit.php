@@ -142,7 +142,7 @@ class CControllerCepRuleEdit extends CController {
 			$ceprule['window']['duration'] = '';
 		}
 
-		// Consistant naming with URL and fields.
+		// Consistent naming with URL and fields.
 		$ceprule['cepruleid'] = $ceprule['cep_ruleid'] ?? null;
 		unset($ceprule['cep_ruleid']);
 		unset($ceprule['window']['filter']['eval_formula']);

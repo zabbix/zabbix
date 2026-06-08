@@ -143,7 +143,7 @@ window.ceprule_operation_edit_popup = new class {
 		zselect.addOptionGroup({label: <?= json_encode(_('Events')) ?>, options: events_options});
 		zselect.addOptionGroup({label: <?= json_encode(_('Tags')) ?>, options: tags_options});
 
-		// Select first enabled optioin, if previous selection got disabled.
+		// Select first enabled option, if previous selection got disabled.
 		zselect.value = type;
 		if (!zselect.value.length) {
 			zselect.value = [...events_options, ...tags_options]

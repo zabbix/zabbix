@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -55,12 +55,12 @@ echo (new CForm())
 		->addItem((new CTemplateTag('ceprule-operation-tag-template'))
 			->addItem((new CRow())
 				->setAttribute('data-row_index', '#{row_index}')
-				->addItem((new CCol()
+				->addItem((new CCol())
 					->addItem((new CTextBox('tags[#{row_index}][tag]', '#{tag}'))
 						->setAttribute('is', 'z-cep-tagsuggest')
 						->setAttribute('placeholder', _('tag or $'))
 					)
-				))
+				)
 				->addItem((new CCol()
 					->addItem((new CSelect('tags[#{row_index}][operator]'))
 						->setValue('#{operator}')
