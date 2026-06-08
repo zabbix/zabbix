@@ -74,7 +74,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 // Returns an error if validation of a plugin's configuration is failed.
 //
 //nolint:gocyclo,cyclop // will be removed once set defaults can handle ints
-func (p *Plugin) Validate(options any) error {
+func (*Plugin) Validate(options any) error {
 	var (
 		opts PluginOptions
 		ct   int
