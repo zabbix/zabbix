@@ -181,7 +181,7 @@ static char	*tq_sql_dyn_escape_like_pattern(const char *src, const tq_sql_ctx_t 
 /******************************************************************************
  *                                                                            *
  * Return value: escaped and QUOTED (with '"') string to use in JSON_EXTRACT  *
- *               path in MySQL (e.g. "%s->'$.%s'")                            *
+ *               path in MySQL (e.g. "JSON_EXTRACT(%s,'$.%s')")               *
  *               (should NOT be escaped the second time as a string literal)  *
  *                                                                            *
  ******************************************************************************/
@@ -226,11 +226,11 @@ static char	*tq_sql_dyn_get_json_subcolumn_raw(const char *operand, const char *
 		}
 		case ZBX_TQ_DB_TYPE_MYSQL:
 		{
-			char	*key_esc_unquoted = tq_sql_dyn_escape_json_path_key_mysql(key, ctx);
+			char	*key_esc = tq_sql_dyn_escape_json_path_key_mysql(key, ctx);
 
-			str = zbx_dsprintf(NULL, "%s->>'$.%s'", operand, key_esc_unquoted);
+			str = zbx_dsprintf(NULL, "JSON_UNQUOTE(JSON_EXTRACT(%s,'$.%s'))", operand, key_esc);
 
-			zbx_free(key_esc_unquoted);
+			zbx_free(key_esc);
 			break;
 		}
 		case ZBX_TQ_DB_TYPE_CLICKHOUSE:
@@ -489,11 +489,11 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 		}
 		case ZBX_TQ_DB_TYPE_MYSQL:
 		{
-			char	*key_esc_unquoted = tq_sql_dyn_escape_json_path_key_mysql(key, ctx);
+			char	*key_esc = tq_sql_dyn_escape_json_path_key_mysql(key, ctx);
 
-			str = zbx_dsprintf(NULL, "JSON_CONTAINS_PATH(%s, 'one', '$.%s')", atom, key_esc_unquoted);
+			str = zbx_dsprintf(NULL, "JSON_CONTAINS_PATH(%s, 'one', '$.%s')", atom, key_esc);
 
-			zbx_free(key_esc_unquoted);
+			zbx_free(key_esc);
 			break;
 		}
 		case ZBX_TQ_DB_TYPE_CLICKHOUSE:
@@ -574,8 +574,8 @@ static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, cons
 		char	*elem_cond = tq_sql_dyn_get_atom_condition("e.elem",
 				tq_sql_key_or_null(cond->key, cond->col_type), cond->value, cond->operator, ctx);
 
-		str = zbx_dsprintf(NULL, "EXISTS(SELECT 1 FROM JSON_TABLE(%s->'$."
-				TQ_SQL_ATTRIBUTES_ARRAY_JSON_KEY "', '$[*]' COLUMNS(elem %s PATH '$')) AS e WHERE %s)",
+		str = zbx_dsprintf(NULL, "EXISTS(SELECT 1 FROM JSON_TABLE(JSON_EXTRACT(%s,'$."
+				TQ_SQL_ATTRIBUTES_ARRAY_JSON_KEY "'), '$[*]' COLUMNS(elem %s PATH '$')) AS e WHERE %s)",
 				col_esc, (ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == cond->col_type ? "JSON" : "TEXT"),
 				elem_cond);
 
