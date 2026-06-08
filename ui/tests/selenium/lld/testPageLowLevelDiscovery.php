@@ -309,14 +309,16 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 	public static function getFilterData() {
 		return [
-			// #0.
+			// #0. Row count is retrieved via API because it changes when templates in this group are added or removed.
 			[
 				[
 					'filter' => [
 						'Template groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 113
+					'api_filter' => [
+						'templateGroupids' => ['Templates/Databases']
+					]
 				]
 			],
 			// #1.
@@ -508,7 +510,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #12.
+			// #12. Row count is retrieved via API because it changes when templates in this group are added or removed.
 			[
 				[
 					'filter' => [
@@ -516,7 +518,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Type' => 'Dependent item'
 					],
 					'context' => 'template',
-					'rows' => 33
+					'api_filter' => [
+						'templateGroupids' => ['Templates/Operating systems'],
+						'filter' => ['type' => ITEM_TYPE_DEPENDENT]
+					]
 				]
 			],
 			// #13.
@@ -616,6 +621,20 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 		if (array_key_exists('rows', $data)) {
 			$this->assertEquals($data['rows'], $table->getRows()->count());
+		}
+
+		// Use API to get the expected row count dynamically, as the number of LLD rules in template can change.
+		if (array_key_exists('api_filter', $data)) {
+			$groups = CDataHelper::call('templategroup.get', [
+				'output' => ['groupid'],
+				'filter' => ['name' => $data['api_filter']['templateGroupids']]
+			]);
+			unset($data['api_filter']['templateGroupids']);
+			$this->assertEquals(CDataHelper::call('discoveryrule.get', [
+				'groupids' => array_column($groups, 'groupid'),
+				'templated' => true,
+				'countOutput' => true
+			] + $data['api_filter']), $table->getRows()->count());
 		}
 	}
 
