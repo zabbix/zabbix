@@ -42,8 +42,11 @@ void	zbx_mock_test_entry(void **state)
 	zbx_pb_mem_info_t		mem_info;
 	zbx_pb_state_info_t		state_info;
 	zbx_mock_handle_t		hparam;
+	zbx_uint64_t			buffer_size;
 
 	ZBX_UNUSED(state);
+
+	buffer_size = (zbx_uint64_t)(1024 * 1024);
 
 	ip = zbx_mock_get_parameter_string("in.ip");
 	dns = zbx_mock_get_parameter_string("in.dns");
@@ -51,11 +54,14 @@ void	zbx_mock_test_entry(void **state)
 	rows_written = zbx_mock_get_parameter_int("in.rows");
 	expected_rows = zbx_mock_get_parameter_int("out.rows");
 
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("in.buffer_size", &hparam))
+		zbx_mock_uint64(hparam, &buffer_size);
+
 	g_nextid = 1;
 
 	zbx_mock_assert_result_eq("locks_create", SUCCEED, zbx_locks_create(&error));
 	zbx_mock_assert_result_eq("pb_create", SUCCEED,
-			zbx_pb_create(ZBX_PB_MODE_MEMORY, 1024 * 1024, 0, 0, &error));
+			zbx_pb_create(ZBX_PB_MODE_MEMORY, buffer_size, 0, 0, &error));
 	zbx_pb_init();
 
 	/* verify mem/state info after buffer creation */

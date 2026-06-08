@@ -62,3 +62,29 @@ in:
 out:
   rows: 3
   rows_after_partial_clear: 2
+---
+# Regression test for the bug fixed in commit 4bfdaaa0297.
+#
+# With buffer_size=1708 on 64-bit Linux, the shmem free space after
+# zbx_pb_create (zbx_pb_t + handleids preallocation) is ~184 bytes.
+# In pb_discovery_add_row_mem:
+#   - pb_malloc(sizeof(zbx_pb_discovery_t)=80)  uses 96B → 88B remain
+#   - pb_strdup(ip="")                           uses 40B → 48B remain
+#   - pb_strdup(dns=200-char string, needs 208B) FAILS    → goto out
+#
+# WITHOUT the fix: memcpy already copied src->error into row->error, and
+# the early-exit path does not null it out.  pb_list_free_discovery then
+# calls shmem_free(row->error) on a heap pointer → __mem_free reads
+# row->error-8 (ASAN left-redzone) → heap-buffer-overflow detected.
+#
+# WITH the fix: row->error=NULL before goto out → pb_list_free_discovery
+# skips it → no corruption → row is discarded safely → out.rows=0.
+test case: OOM mid-alloc triggers invalid-free of error field without fix
+in:
+  ip: ""
+  dns: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.example.com"
+  error: "connection refused"
+  rows: 1
+  buffer_size: 1708
+out:
+  rows: 0
