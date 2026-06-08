@@ -20,7 +20,7 @@ class CFieldCollection extends CField {
 	 *
 	 * @type {Object}
 	 */
-	#fields = {};
+	#fields = Object.create(null);
 
 	init() {
 		super.init();
@@ -202,9 +202,8 @@ class CFieldCollection extends CField {
 	}
 
 	unsetErrors() {
-		const errors = {
-			'': [{message: '', level: -1}]
-		};
+		const errors = Object.create(null);
+		errors[''] = [{message: '', level: -1}];
 
 		for (const field_key of Object.keys(this.#fields)) {
 			errors[field_key] = [{message: '', level: -1}];

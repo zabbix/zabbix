@@ -30,7 +30,7 @@ class CFieldSet extends CFieldCollection {
 		let result = Object.create(null);
 		let simple_fields = Object.create(null);
 
-		for (const field of Object.values(this.#fields)) {
+		for (const field of Object.values(this.getFields())) {
 			if (field._field.hasAttribute('data-skip-from-submit') || field.isDisabled()) {
 				continue;
 			}
