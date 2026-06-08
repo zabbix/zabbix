@@ -61,13 +61,18 @@ public class JavaGateway
 			ConfigurationManager.parseConfiguration();
 
 			String serverList = (String)ConfigurationManager.getParameter(ConfigurationManager.SERVER).getValue();
-			int timeout = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.TIMEOUT);
-			AllowedPeers allowedPeers = AllowedPeers.parse(serverList, timeout);
+			AllowedPeers allowedPeers = null;
 
-			if (allowedPeers.isEmpty())
-				logger.warn("allowed hosts list is empty (or has no valid entries); all incoming connections will be rejected");
-			else
-				logger.info("accepting connections only from allowed hosts: {}", serverList);
+			if (null != serverList && !serverList.isEmpty())
+			{
+				int timeout = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.TIMEOUT);
+				allowedPeers = AllowedPeers.parse(serverList, timeout);
+
+				if (allowedPeers.isEmpty())
+					logger.warn("allowed hosts list is empty (or has no valid entries); all incoming connections will be rejected");
+				else
+					logger.info("accepting connections only from allowed hosts: {}", serverList);
+			}
 
 			InetAddress listenIP = (InetAddress)ConfigurationManager.getParameter(ConfigurationManager.LISTEN_IP).getValue();
 			int listenPort = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.LISTEN_PORT);
@@ -90,7 +95,7 @@ public class JavaGateway
 				Socket client = socket.accept();
 				InetAddress peer = client.getInetAddress();
 
-				if (!allowedPeers.check(peer))
+				if (null != allowedPeers && !allowedPeers.check(peer))
 				{
 					logger.warn("connection from {} rejected, allowed hosts: {}",
 							peer.getHostAddress(), serverList);

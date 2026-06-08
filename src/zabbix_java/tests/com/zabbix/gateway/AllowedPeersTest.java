@@ -42,6 +42,14 @@ public class AllowedPeersTest
 	}
 
 	@Test
+	public void testEmptySpecDeniesAll() throws Exception
+	{
+		AllowedPeers ap = AllowedPeers.parseForTest("", h -> new InetAddress[0]);
+		Assert.assertTrue(ap.isEmpty());
+		Assert.assertFalse(ap.check(ip("127.0.0.1")));
+	}
+
+	@Test
 	public void testExactIpv4() throws Exception
 	{
 		AllowedPeers ap = AllowedPeers.parseForTest("127.0.0.1", h -> new InetAddress[0]);
