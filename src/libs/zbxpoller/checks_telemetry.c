@@ -187,11 +187,68 @@ static int	have_required_db(zbx_tq_db_type_t db_type)
 #endif
 }
 
-static int get_values_telemetry_sql_lib(const zbx_dc_item_t *item, zbx_tq_db_type_t db_type, time_t now,
+static zbx_db_result_t	sql_lib_execute_telemetry_query(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
+		zbx_tq_db_type_t db_type, char **error)
+{
+	zbx_db_config_t	*db_config = zbx_db_config_create();
+	zbx_dbconn_t	*db;
+	char		*sql = NULL;
+	zbx_db_result_t	res;
+	int		open_ret;
+
+	/* FIXME: placeholder start */
+	ZBX_STRDUP(db_config->dbhost, "127.0.0.1");
+	db_config->dbport = 5433;
+	ZBX_STRDUP(db_config->dbuser, "testuser");
+	ZBX_STRDUP(db_config->dbpassword, "testpass");
+	ZBX_STRDUP(db_config->dbname, "testdb");
+
+#if defined(HAVE_POSTGRESQL)
+	if (0 != db_config->dbport)
+		db_config->dbports = zbx_dsprintf(NULL, "%u", db_config->dbport);
+#endif
+	/* FIXME: placeholder end */
+
+	db = zbx_dbconn_create_custom(db_config);
+	zbx_dbconn_set_connect_options(db, ZBX_DB_CONNECT_ONCE);
+
+	if (ZBX_DB_OK > (open_ret = zbx_dbconn_open(db)))
+	{
+		if (ZBX_DB_DOWN == open_ret)
+			*error = zbx_strdup(NULL, "Failed to connect to database, database is down");
+		else
+			*error = zbx_strdup(NULL, "Failed to connect to database");
+
+		res = NULL;
+		goto out;
+	}
+
+	if (ZBX_TQ_DB_TYPE_POSTGRESQL == db_type)
+		zbx_tq_sql_generate_postgresql(query, now, lasttimestamp, &sql, db);
+	else
+		zbx_tq_sql_generate_mysql(query, now, lasttimestamp, &sql, db);
+
+	res = zbx_dbconn_select(db, "%s", sql);
+
+	if (NULL == res)
+		*error = zbx_strdup(NULL, "Query failed");
+	else if (ZBX_DB_DOWN == (intptr_t)res)
+	{
+		*error = zbx_strdup(NULL, "Query failed, database is down");
+		res = NULL;
+	}
+out:
+	zbx_free(sql);
+	zbx_dbconn_free(db);
+	zbx_db_config_free(db_config);
+
+	return res;
+}
+
+static int	get_values_telemetry_sql_lib(const zbx_dc_item_t *item, zbx_tq_db_type_t db_type, time_t now,
 		time_t lasttimestamp, zbx_vector_str_t *values, char **error)
 {
 	int		ret = FAIL;
-	char		*sql = NULL;
 	zbx_db_result_t	sql_result;
 
 	if (FAIL == have_required_db(db_type))
@@ -201,20 +258,10 @@ static int get_values_telemetry_sql_lib(const zbx_dc_item_t *item, zbx_tq_db_typ
 		return FAIL;
 	}
 
-	if (ZBX_TQ_DB_TYPE_POSTGRESQL == db_type)
-		zbx_tq_sql_generate_postgresql(item->telemetry_query, now, lasttimestamp, &sql);
-	else
-		zbx_tq_sql_generate_mysql(item->telemetry_query, now, lasttimestamp, &sql);
-
-	/* TODO: support arbitrary db */
-	/* FIXME: retrying until db is up is probably unwanted, at least if the db is not the same as config db */
-	sql_result = zbx_db_select("%s", sql);
+	sql_result = sql_lib_execute_telemetry_query(item->telemetry_query, now, lasttimestamp, db_type, error);
 
 	if (NULL == sql_result)
-	{
-		*error = zbx_strdup(NULL, "Query failed");
 		goto clean;
-	}
 
 	if (SUCCEED != zbx_tq_parse_sql_result(item->telemetry_query, sql_result, values))
 	{
@@ -225,7 +272,6 @@ static int get_values_telemetry_sql_lib(const zbx_dc_item_t *item, zbx_tq_db_typ
 	ret = SUCCEED;
 clean:
 	zbx_db_free_result(sql_result);
-	zbx_free(sql);
 
 	return ret;
 }
@@ -241,7 +287,7 @@ int	get_value_telemetry(const zbx_dc_item_t *item, const char *config_source_ip,
 
 	/* FIXME: placeholder, also, when data store config is implemented, make sure to avoid race conditions */
 	/* if it can be changed at runtime */
-	zbx_tq_db_type_t	db_type = ZBX_TQ_DB_TYPE_ELASTIC;
+	zbx_tq_db_type_t	db_type = ZBX_TQ_DB_TYPE_MYSQL;
 
 	/* when testing the item, the time range being queried is restricted only by the loopback limit */
 	lasttimestamp = 0;

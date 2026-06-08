@@ -28,6 +28,13 @@ ZBX_PTR_VECTOR_IMPL(tq_aggr_column_ptr, zbx_tq_aggr_column_t *)
 /* TODO: rename to something more generic, it isn't always attributes */
 #define TQ_SQL_ATTRIBUTES_ARRAY_JSON_KEY "attributes"
 
+typedef struct
+{
+	zbx_tq_db_type_t	db_type;
+	const zbx_dbconn_t	*db;
+}
+tq_sql_ctx_t;
+
 static char	*tq_sql_dyn_escape_with_backslash_generic(const char *src, const char *esc_chars)
 {
 	size_t	len = 1; /* '\0' */
@@ -105,14 +112,12 @@ static char	*tq_sql_dyn_quote_generic(const char *src, char quote_char)
 	return dst;
 }
 
-static char	*tq_sql_dyn_escape_string_unquoted(const char *src, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_escape_string_unquoted(const char *src, const tq_sql_ctx_t *ctx)
 {
-	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type)
+	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == ctx->db_type)
 		return tq_sql_dyn_escape_with_backslash_generic(src, "'\"`\\");
 
-	/* TODO: when connection to an arbitrary PostgreSQL/MySQL db is added, ensure that escaping works correctly */
-	/*       (e.g. that ZBX_PG_ESCAPE_BACKSLASH is valid handled correctly) */
-	return zbx_db_dyn_escape_string(src);
+	return zbx_dbconn_dyn_escape_string(ctx->db, src);
 }
 
 /******************************************************************************
@@ -120,9 +125,9 @@ static char	*tq_sql_dyn_escape_string_unquoted(const char *src, zbx_tq_db_type_t
  * Return value: escaped and quoted string to be used as a string literal     *
  *                                                                            *
  ******************************************************************************/
-static char	*tq_sql_dyn_escape_string(const char *src, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_escape_string(const char *src, const tq_sql_ctx_t *ctx)
 {
-	char	*src_esc = tq_sql_dyn_escape_string_unquoted(src, db_type);
+	char	*src_esc = tq_sql_dyn_escape_string_unquoted(src, ctx);
 	char	*out = tq_sql_dyn_quote_generic(src_esc, '\'');
 
 	zbx_free(src_esc);
@@ -135,18 +140,18 @@ static char	*tq_sql_dyn_escape_string(const char *src, zbx_tq_db_type_t db_type)
  * Return value: escaped and quoted string to be used as column or table name *
  *                                                                            *
  ******************************************************************************/
-static char	*tq_sql_dyn_escape_name(const char *src, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_escape_name(const char *src, const tq_sql_ctx_t *ctx)
 {
 	char	*src_esc, *out;
 
-	if (ZBX_TQ_DB_TYPE_POSTGRESQL == db_type)
+	if (ZBX_TQ_DB_TYPE_POSTGRESQL == ctx->db_type)
 		src_esc = tq_sql_dyn_escape_with_doubling_generic(src, "\"");
-	else if (ZBX_TQ_DB_TYPE_MYSQL == db_type)
+	else if (ZBX_TQ_DB_TYPE_MYSQL == ctx->db_type)
 		src_esc = tq_sql_dyn_escape_with_doubling_generic(src, "`");
 	else /* clickhouse */
-		src_esc = tq_sql_dyn_escape_string_unquoted(src, ZBX_TQ_DB_TYPE_CLICKHOUSE);
+		src_esc = tq_sql_dyn_escape_string_unquoted(src, ctx);
 
-	out = tq_sql_dyn_quote_generic(src_esc, (ZBX_TQ_DB_TYPE_MYSQL == db_type ? '`' : '"'));
+	out = tq_sql_dyn_quote_generic(src_esc, (ZBX_TQ_DB_TYPE_MYSQL == ctx->db_type ? '`' : '"'));
 
 	zbx_free(src_esc);
 	return out;
@@ -157,22 +162,20 @@ static char	*tq_sql_dyn_escape_name(const char *src, zbx_tq_db_type_t db_type)
  * Return value: escaped and UNQUOTED string to use in a LIKE pattern         *
  *                                                                            *
  ******************************************************************************/
-static char	*tq_sql_dyn_escape_like_pattern(const char *src, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_escape_like_pattern(const char *src, const tq_sql_ctx_t *ctx)
 {
-	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type)
+	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == ctx->db_type)
 	{
 		char	*src_esc_like = tq_sql_dyn_escape_with_backslash_generic(src, "_%\\");
 		char	*out;
 
-		out = tq_sql_dyn_escape_string_unquoted(src_esc_like, ZBX_TQ_DB_TYPE_CLICKHOUSE);
+		out = tq_sql_dyn_escape_string_unquoted(src_esc_like, ctx);
 
 		zbx_free(src_esc_like);
 		return out;
 	}
 
-	/* TODO: when connection to an arbitrary PostgreSQL/MySQL db is added, ensure that escaping works correctly */
-	/*       (e.g. that ZBX_PG_ESCAPE_BACKSLASH is valid handled correctly) */
-	return zbx_db_dyn_escape_like_pattern(src);
+	return zbx_dbconn_dyn_escape_like_pattern(ctx->db, src);
 }
 
 /******************************************************************************
@@ -182,10 +185,10 @@ static char	*tq_sql_dyn_escape_like_pattern(const char *src, zbx_tq_db_type_t db
  *               (should NOT be escaped the second time as a string literal)  *
  *                                                                            *
  ******************************************************************************/
-static char	*tq_sql_dyn_escape_json_path_key_mysql(const char *src)
+static char	*tq_sql_dyn_escape_json_path_key_mysql(const char *src, const tq_sql_ctx_t *ctx)
 {
 	char	*src_esc_path = tq_sql_dyn_escape_with_backslash_generic(src, "\"\\");
-	char	*src_esc_full = tq_sql_dyn_escape_string_unquoted(src_esc_path, ZBX_TQ_DB_TYPE_MYSQL);
+	char	*src_esc_full = tq_sql_dyn_escape_string_unquoted(src_esc_path, ctx);
 	char	*out = tq_sql_dyn_quote_generic(src_esc_full, '"');
 
 	zbx_free(src_esc_path);
@@ -205,16 +208,16 @@ static const char	*tq_sql_key_or_null(const char *key, zbx_tq_column_type_t col_
  *           by the caller, before passing it to this function.               *
  *                                                                            *
  ******************************************************************************/
-static char	*tq_sql_dyn_get_json_subcolumn_raw(const char *operand, const char *key, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_json_subcolumn_raw(const char *operand, const char *key, const tq_sql_ctx_t *ctx)
 {
 	char	*str;
 
-	switch (db_type)
+	switch (ctx->db_type)
 	{
 		case ZBX_TQ_DB_TYPE_POSTGRESQL:
 		{
 			/* TODO: check that this is the correct escaping */
-			char	*key_esc = tq_sql_dyn_escape_string(key, db_type);
+			char	*key_esc = tq_sql_dyn_escape_string(key, ctx);
 
 			str = zbx_dsprintf(NULL, "%s->>%s", operand, key_esc);
 
@@ -223,7 +226,7 @@ static char	*tq_sql_dyn_get_json_subcolumn_raw(const char *operand, const char *
 		}
 		case ZBX_TQ_DB_TYPE_MYSQL:
 		{
-			char	*key_esc_unquoted = tq_sql_dyn_escape_json_path_key_mysql(key);
+			char	*key_esc_unquoted = tq_sql_dyn_escape_json_path_key_mysql(key, ctx);
 
 			str = zbx_dsprintf(NULL, "%s->>'$.%s'", operand, key_esc_unquoted);
 
@@ -233,7 +236,7 @@ static char	*tq_sql_dyn_get_json_subcolumn_raw(const char *operand, const char *
 		case ZBX_TQ_DB_TYPE_CLICKHOUSE:
 		{
 			/* TODO: check that this is the correct escaping */
-			char	*key_esc_unquoted = tq_sql_dyn_escape_string_unquoted(key, db_type);
+			char	*key_esc_unquoted = tq_sql_dyn_escape_string_unquoted(key, ctx);
 
 			/* casting to string so that it can be used in group by */
 			str = zbx_dsprintf(NULL, "%s.\"%s\".:String", operand, key_esc_unquoted);
@@ -256,15 +259,15 @@ static char	*tq_sql_dyn_get_json_subcolumn_raw(const char *operand, const char *
  *           by the caller, before passing it to this function.               *
  *                                                                            *
  ******************************************************************************/
-static char	*tq_sql_dyn_get_operand_raw(const char *x, const char *key, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_operand_raw(const char *x, const char *key, const tq_sql_ctx_t *ctx)
 {
 	if (NULL == key)
 		return zbx_strdup(NULL, x);
 
-	return tq_sql_dyn_get_json_subcolumn_raw(x, key, db_type);
+	return tq_sql_dyn_get_json_subcolumn_raw(x, key, ctx);
 }
 
-static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
 	char	*str = NULL;
 	size_t	alloc = 0;
@@ -273,9 +276,9 @@ static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, zbx_t
 	for (int i = 0; i < query->columns.values_num; i++)
 	{
 		const zbx_tq_column_t	*col = &query->columns.values[i];
-		char			*name_esc = tq_sql_dyn_escape_name(col->name, db_type);
+		char			*name_esc = tq_sql_dyn_escape_name(col->name, ctx);
 		char			*col_to_select = tq_sql_dyn_get_operand_raw(name_esc,
-				tq_sql_key_or_null(col->key, col->col_type), db_type);
+				tq_sql_key_or_null(col->key, col->col_type), ctx);
 
 		zbx_snprintf_alloc(&str, &alloc, &offset, "%s", col_to_select);
 
@@ -297,12 +300,12 @@ static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, zbx_t
  * Comments: fraction must be a valid string representation of a double       *
  *                                                                            *
  ******************************************************************************/
-static char	*tq_sql_dyn_get_percentile(const char *name, const char *fraction, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_percentile(const char *name, const char *fraction, const tq_sql_ctx_t *ctx)
 {
 	char	*str;
-	char	*name_esc_unquoted = tq_sql_dyn_escape_string_unquoted(name, db_type);
+	char	*name_esc_unquoted = tq_sql_dyn_escape_string_unquoted(name, ctx);
 
-	switch (db_type)
+	switch (ctx->db_type)
 	{
 		case ZBX_TQ_DB_TYPE_POSTGRESQL:
 			str = zbx_dsprintf(NULL, "percentile_cont(%s) WITHIN GROUP (ORDER BY \"%s\")", fraction,
@@ -326,7 +329,7 @@ static char	*tq_sql_dyn_get_percentile(const char *name, const char *fraction, z
 	return str;
 }
 
-static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
 	char	*str = NULL;
 	size_t	alloc = 0;
@@ -338,7 +341,7 @@ static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, 
 		char				*col_name_esc = NULL;
 
 		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function && ZBX_TQ_FUNCTION_PERCENTILE != aggr_col->function)
-			col_name_esc = tq_sql_dyn_escape_name(aggr_col->column_name, db_type);
+			col_name_esc = tq_sql_dyn_escape_name(aggr_col->column_name, ctx);
 
 		switch (aggr_col->function)
 		{
@@ -360,7 +363,7 @@ static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, 
 			case ZBX_TQ_FUNCTION_PERCENTILE:
 			{
 				char	*percentile_expr = tq_sql_dyn_get_percentile(aggr_col->column_name,
-						aggr_col->args.values[0], db_type);
+						aggr_col->args.values[0], ctx);
 
 				zbx_snprintf_alloc(&str, &alloc, &offset, "%s", percentile_expr);
 
@@ -392,7 +395,7 @@ static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, 
  *  Return value: escaped and quoted table name                               *
  *                                                                            *
  ******************************************************************************/
-static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
 	/* TODO: replace with actual table names (or probably macros) */
 
@@ -436,19 +439,19 @@ static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, zb
 			str = zbx_strdup(NULL, "");
 	}
 
-	str_esc = tq_sql_dyn_escape_name(str, db_type);
+	str_esc = tq_sql_dyn_escape_name(str, ctx);
 
 	zbx_free(str);
 
 	return str_esc;
 }
 
-static char	*tq_sql_dyn_get_condition_contains(const char *operand, const char *value, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_condition_contains(const char *operand, const char *value, const tq_sql_ctx_t *ctx)
 {
 	char	*str;
-	char	*value_esc = tq_sql_dyn_escape_like_pattern(value, db_type);
+	char	*value_esc = tq_sql_dyn_escape_like_pattern(value, ctx);
 
-	switch (db_type)
+	switch (ctx->db_type)
 	{
 		case ZBX_TQ_DB_TYPE_POSTGRESQL:
 		case ZBX_TQ_DB_TYPE_MYSQL:
@@ -469,15 +472,15 @@ static char	*tq_sql_dyn_get_condition_contains(const char *operand, const char *
 	return str;
 }
 
-static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, const tq_sql_ctx_t *ctx)
 {
 	char	*str;
 
-	switch (db_type)
+	switch (ctx->db_type)
 	{
 		case ZBX_TQ_DB_TYPE_POSTGRESQL:
 		{
-			char	*key_esc = tq_sql_dyn_escape_string(key, db_type);
+			char	*key_esc = tq_sql_dyn_escape_string(key, ctx);
 
 			str = zbx_dsprintf(NULL, "%s ? %s", atom, key_esc);
 
@@ -486,7 +489,7 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 		}
 		case ZBX_TQ_DB_TYPE_MYSQL:
 		{
-			char	*key_esc_unquoted = tq_sql_dyn_escape_json_path_key_mysql(key);
+			char	*key_esc_unquoted = tq_sql_dyn_escape_json_path_key_mysql(key, ctx);
 
 			str = zbx_dsprintf(NULL, "JSON_CONTAINS_PATH(%s, 'one', '$.%s')", atom, key_esc_unquoted);
 
@@ -495,7 +498,7 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 		}
 		case ZBX_TQ_DB_TYPE_CLICKHOUSE:
 		{
-			char	*key_esc_unquoted = tq_sql_dyn_escape_string_unquoted(key, db_type);
+			char	*key_esc_unquoted = tq_sql_dyn_escape_string_unquoted(key, ctx);
 
 			str = zbx_dsprintf(NULL, "isNotNull(%s.\"%s\")", atom, key_esc_unquoted);
 
@@ -512,13 +515,13 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 }
 
 static char	*tq_sql_dyn_get_atom_condition(const char *atom, const char *key, const char *value,
-		zbx_tq_operator_t operator, zbx_tq_db_type_t db_type)
+		zbx_tq_operator_t operator, const tq_sql_ctx_t *ctx)
 {
 	if (ZBX_TQ_OPERATOR_EQUAL == operator || ZBX_TQ_OPERATOR_NOT_EQUAL == operator)
 	{
 		char	*str;
-		char	*operand = tq_sql_dyn_get_operand_raw(atom, key, db_type);
-		char	*value_esc = tq_sql_dyn_escape_string(value, db_type);
+		char	*operand = tq_sql_dyn_get_operand_raw(atom, key, ctx);
+		char	*value_esc = tq_sql_dyn_escape_string(value, ctx);
 
 		/* ensure that "not equal" results in false if attribute key is missing */
 		str = zbx_dsprintf(NULL, "(%s IS NOT NULL AND %s %s %s)", operand, operand,
@@ -531,8 +534,8 @@ static char	*tq_sql_dyn_get_atom_condition(const char *atom, const char *key, co
 	}
 	else if (ZBX_TQ_OPERATOR_CONTAINS == operator || ZBX_TQ_OPERATOR_NOT_CONTAINS == operator)
 	{
-		char	*operand = tq_sql_dyn_get_operand_raw(atom, key, db_type);
-		char	*str = tq_sql_dyn_get_condition_contains(operand, value, db_type);
+		char	*operand = tq_sql_dyn_get_operand_raw(atom, key, ctx);
+		char	*str = tq_sql_dyn_get_condition_contains(operand, value, ctx);
 
 		/* check for NULL for consistency with "equal"/"not equal" behavior */
 		str = zbx_dsprintf(str, "(%s IS NOT NULL AND %s%s)", operand,
@@ -544,32 +547,32 @@ static char	*tq_sql_dyn_get_atom_condition(const char *atom, const char *key, co
 	}
 	else /* exists */
 	{
-		return tq_sql_dyn_get_condition_exists(atom, key, db_type);
+		return tq_sql_dyn_get_condition_exists(atom, key, ctx);
 	}
 }
 
-static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, const tq_sql_ctx_t *ctx)
 {
 	/* TODO: test on non-attribute arrays on all dbs */
 	char	*str;
-	char	*col_esc = tq_sql_dyn_escape_name(cond->column_name, db_type);
+	char	*col_esc = tq_sql_dyn_escape_name(cond->column_name, ctx);
 
-	if (ZBX_TQ_DB_TYPE_POSTGRESQL == db_type)
+	if (ZBX_TQ_DB_TYPE_POSTGRESQL == ctx->db_type)
 	{
 		const char	*array_elems_func = (ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == cond->col_type
 				? "jsonb_array_elements" : "jsonb_array_elements_text");
 		char	*elem_cond = tq_sql_dyn_get_atom_condition("e.elem",
-				tq_sql_key_or_null(cond->key, cond->col_type), cond->value, cond->operator, db_type);
+				tq_sql_key_or_null(cond->key, cond->col_type), cond->value, cond->operator, ctx);
 
 		str = zbx_dsprintf(NULL, "EXISTS(SELECT 1 FROM %s(%s->'" TQ_SQL_ATTRIBUTES_ARRAY_JSON_KEY "')"
 				" AS e(elem) WHERE %s)", array_elems_func, col_esc, elem_cond);
 
 		zbx_free(elem_cond);
 	}
-	else if (ZBX_TQ_DB_TYPE_MYSQL == db_type)
+	else if (ZBX_TQ_DB_TYPE_MYSQL == ctx->db_type)
 	{
 		char	*elem_cond = tq_sql_dyn_get_atom_condition("e.elem",
-				tq_sql_key_or_null(cond->key, cond->col_type), cond->value, cond->operator, db_type);
+				tq_sql_key_or_null(cond->key, cond->col_type), cond->value, cond->operator, ctx);
 
 		str = zbx_dsprintf(NULL, "EXISTS(SELECT 1 FROM JSON_TABLE(%s->'$."
 				TQ_SQL_ATTRIBUTES_ARRAY_JSON_KEY "', '$[*]' COLUMNS(elem %s PATH '$')) AS e WHERE %s)",
@@ -581,7 +584,7 @@ static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, zbx_
 	else /* clickhouse */
 	{
 		char	*elem_cond = tq_sql_dyn_get_atom_condition("x", tq_sql_key_or_null(cond->key, cond->col_type),
-				cond->value, cond->operator, db_type);
+				cond->value, cond->operator, ctx);
 
 		str = zbx_dsprintf(NULL, "arrayExists(x -> %s, %s." TQ_SQL_ATTRIBUTES_ARRAY_JSON_KEY ".:\"Array(%s)\")",
 				elem_cond, col_esc,
@@ -595,15 +598,15 @@ static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, zbx_
 	return str;
 }
 
-static char	*tq_sql_dyn_get_condition(const zbx_tq_condition_t *cond, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_condition(const zbx_tq_condition_t *cond, const tq_sql_ctx_t *ctx)
 {
 	if (SUCCEED == tq_column_type_is_array(cond->col_type))
-		return tq_sql_dyn_get_array_condition(cond, db_type);
+		return tq_sql_dyn_get_array_condition(cond, ctx);
 	else
 	{
-		char	*name_esc = tq_sql_dyn_escape_name(cond->column_name, db_type);
+		char	*name_esc = tq_sql_dyn_escape_name(cond->column_name, ctx);
 		char	*str = tq_sql_dyn_get_atom_condition(name_esc, tq_sql_key_or_null(cond->key, cond->col_type),
-				cond->value, cond->operator, db_type);
+				cond->value, cond->operator, ctx);
 
 		zbx_free(name_esc);
 
@@ -611,7 +614,7 @@ static char	*tq_sql_dyn_get_condition(const zbx_tq_condition_t *cond, zbx_tq_db_
 	}
 }
 
-static char	*tq_sql_dyn_get_conditions_simple(const zbx_tq_query_t *query, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_conditions_simple(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
 	char	*str = NULL;
 	size_t	alloc = 0;
@@ -621,7 +624,7 @@ static char	*tq_sql_dyn_get_conditions_simple(const zbx_tq_query_t *query, zbx_t
 	{
 		const zbx_tq_condition_t	*cond = &query->conditions.values[i];
 
-		char	*cond_str = tq_sql_dyn_get_condition(cond, db_type);
+		char	*cond_str = tq_sql_dyn_get_condition(cond, ctx);
 
 		zbx_snprintf_alloc(&str, &alloc, &offset, "%s", cond_str);
 
@@ -641,7 +644,7 @@ static char	*tq_sql_dyn_get_conditions_simple(const zbx_tq_query_t *query, zbx_t
 	return str;
 }
 
-static char	*tq_sql_dyn_get_conditions_and_or(const zbx_tq_query_t *query, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_conditions_and_or(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
 	char				*str = NULL;
 	size_t				alloc = 0;
@@ -661,7 +664,7 @@ static char	*tq_sql_dyn_get_conditions_and_or(const zbx_tq_query_t *query, zbx_t
 	for (int i = 0; i < conditions_sorted.values_num; i++)
 	{
 		const zbx_tq_condition_t	*cond = conditions_sorted.values[i];
-		char				*cond_str = tq_sql_dyn_get_condition(cond, db_type);
+		char				*cond_str = tq_sql_dyn_get_condition(cond, ctx);
 
 		zbx_snprintf_alloc(&str, &alloc, &offset, "%s", cond_str);
 
@@ -680,7 +683,7 @@ static char	*tq_sql_dyn_get_conditions_and_or(const zbx_tq_query_t *query, zbx_t
 	return str;
 }
 
-static char	*tq_sql_dyn_get_conditions_expression(const zbx_tq_query_t *query, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_conditions_expression(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
 	char		*str = NULL;
 	size_t		alloc = 0;
@@ -747,7 +750,7 @@ static char	*tq_sql_dyn_get_conditions_expression(const zbx_tq_query_t *query, z
 			len++;
 
 		int	cond_idx = tq_formula_constant_to_condition_idx(p, len);
-		char	*cond_str = tq_sql_dyn_get_condition(&query->conditions.values[cond_idx], db_type);
+		char	*cond_str = tq_sql_dyn_get_condition(&query->conditions.values[cond_idx], ctx);
 
 		zbx_snprintf_alloc(&str, &alloc, &offset, "%s", cond_str);
 
@@ -765,7 +768,7 @@ static char	*tq_sql_dyn_get_conditions_expression(const zbx_tq_query_t *query, z
 	return str;
 }
 
-static char	*tq_sql_dyn_get_conditions(const zbx_tq_query_t *query, zbx_tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_conditions(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
 	if (0 == query->conditions.values_num)
 		return zbx_strdup(NULL, "");
@@ -774,13 +777,13 @@ static char	*tq_sql_dyn_get_conditions(const zbx_tq_query_t *query, zbx_tq_db_ty
 	{
 		case ZBX_TQ_EVAL_TYPE_AND:
 		case ZBX_TQ_EVAL_TYPE_OR:
-			return tq_sql_dyn_get_conditions_simple(query, db_type);
+			return tq_sql_dyn_get_conditions_simple(query, ctx);
 
 		case ZBX_TQ_EVAL_TYPE_AND_OR:
-			return tq_sql_dyn_get_conditions_and_or(query, db_type);
+			return tq_sql_dyn_get_conditions_and_or(query, ctx);
 
 		case ZBX_TQ_EVAL_TYPE_EXPRESSION:
-			return tq_sql_dyn_get_conditions_expression(query, db_type);
+			return tq_sql_dyn_get_conditions_expression(query, ctx);
 
 		case ZBX_TQ_EVAL_TYPE_UNKNOWN:
 		default:
@@ -808,7 +811,7 @@ static int	tq_sql_aggr_column_ptr_compare_by_column(const void *a, const void *b
 }
 
 static char	*tq_sql_dyn_get_cume_dists_mysql(const zbx_tq_query_t *query, const char *rounded_time_expr,
-		const char *columns_to_select)
+		const char *columns_to_select, const tq_sql_ctx_t *ctx)
 {
 	zbx_vector_tq_aggr_column_ptr_t	percentile_cols_sorted;
 	char				*str = NULL;
@@ -838,7 +841,7 @@ static char	*tq_sql_dyn_get_cume_dists_mysql(const zbx_tq_query_t *query, const 
 		if (0 != i && 0 == strcmp(percentile_cols_sorted.values[i-1]->column_name, name))
 			continue;
 
-		name_esc_unquoted = tq_sql_dyn_escape_string_unquoted(name, ZBX_TQ_DB_TYPE_MYSQL);
+		name_esc_unquoted = tq_sql_dyn_escape_string_unquoted(name, ctx);
 
 		zbx_snprintf_alloc(&str, &alloc, &offset,
 				"CUME_DIST() OVER (PARTITION BY %s%s%s ORDER BY `%s`) AS `__cd_%s`,",
@@ -863,7 +866,7 @@ static char	*tq_sql_dyn_get_rounded_time_expr_mysql(int aggregation_size, time_t
 			timestamp_filter_lower_bound, aggregation_size, aggregation_size, timestamp_filter_lower_bound);
 }
 
-static char	*tq_sql_dyn_get_used_columns_mysql(const zbx_tq_query_t *query)
+static char	*tq_sql_dyn_get_used_columns_mysql(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
 	zbx_vector_str_t	col_names_sorted;
 	char			*str = NULL;
@@ -890,11 +893,16 @@ static char	*tq_sql_dyn_get_used_columns_mysql(const zbx_tq_query_t *query)
 	for (int i = 0; i < col_names_sorted.values_num; i++)
 	{
 		const char	*name = col_names_sorted.values[i];
+		char		*name_esc;
 
 		if (0 != i && 0 == strcmp(col_names_sorted.values[i-1], name))
 			continue;
 
-		zbx_snprintf_alloc(&str, &alloc, &offset, "`%s`,", name);
+		name_esc = tq_sql_dyn_escape_name(name, ctx);
+
+		zbx_snprintf_alloc(&str, &alloc, &offset, "%s,", name_esc);
+
+		zbx_free(name_esc);
 	}
 
 	offset--;
@@ -905,8 +913,14 @@ static char	*tq_sql_dyn_get_used_columns_mysql(const zbx_tq_query_t *query)
 	return str;
 }
 
-void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
+void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql,
+		const zbx_dbconn_t *db)
 {
+	tq_sql_ctx_t	ctx = {
+		.db_type = ZBX_TQ_DB_TYPE_POSTGRESQL,
+		.db = db,
+	};
+
 	const int	query_has_columns = (0 != query->columns.values_num) ? SUCCEED : FAIL;
 	const int	query_has_conditions = (0 != query->conditions.values_num) ? SUCCEED : FAIL;
 
@@ -915,10 +929,10 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, tim
 
 	*sql = NULL;
 
-	char	*columns_to_select	= tq_sql_dyn_get_columns_to_select(query, ZBX_TQ_DB_TYPE_POSTGRESQL);
-	char	*aggr_columns_to_select	= tq_sql_dyn_get_aggr_columns_to_select(query, ZBX_TQ_DB_TYPE_POSTGRESQL);
-	char	*table_to_select_from	= tq_sql_dyn_get_table_to_select_from(query, ZBX_TQ_DB_TYPE_POSTGRESQL);
-	char	*conditions		= tq_sql_dyn_get_conditions(query, ZBX_TQ_DB_TYPE_POSTGRESQL);
+	char	*columns_to_select	= tq_sql_dyn_get_columns_to_select(query, &ctx);
+	char	*aggr_columns_to_select	= tq_sql_dyn_get_aggr_columns_to_select(query, &ctx);
+	char	*table_to_select_from	= tq_sql_dyn_get_table_to_select_from(query, &ctx);
+	char	*conditions		= tq_sql_dyn_get_conditions(query, &ctx);
 
 	time_t timestamp_filter_lower_bound, timestamp_filter_upper_bound;
 	zbx_tq_get_timestamp_filter_bounds(query, now, lasttimestamp, &timestamp_filter_lower_bound,
@@ -963,8 +977,14 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, tim
 	zbx_free(conditions);
 }
 
-void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
+void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql,
+		const zbx_dbconn_t *db)
 {
+	tq_sql_ctx_t	ctx = {
+		.db_type = ZBX_TQ_DB_TYPE_MYSQL,
+		.db = db,
+	};
+
 	const int	query_has_columns = (0 != query->columns.values_num) ? SUCCEED : FAIL;
 	const int	query_has_conditions = (0 != query->conditions.values_num) ? SUCCEED : FAIL;
 	size_t		alloc = 0, offset = 0;
@@ -984,12 +1004,12 @@ void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, time_t now, time_t l
 
 	rounded_time_expr	= tq_sql_dyn_get_rounded_time_expr_mysql(query->aggregation_size,
 			timestamp_filter_lower_bound);
-	columns_to_select	= tq_sql_dyn_get_columns_to_select(query, ZBX_TQ_DB_TYPE_MYSQL);
-	used_columns		= tq_sql_dyn_get_used_columns_mysql(query);
-	aggr_columns_to_select	= tq_sql_dyn_get_aggr_columns_to_select(query, ZBX_TQ_DB_TYPE_MYSQL);
-	percentile_ranks	= tq_sql_dyn_get_cume_dists_mysql(query, rounded_time_expr, columns_to_select);
-	table_to_select_from	= tq_sql_dyn_get_table_to_select_from(query, ZBX_TQ_DB_TYPE_MYSQL);
-	conditions		= tq_sql_dyn_get_conditions(query, ZBX_TQ_DB_TYPE_MYSQL);
+	columns_to_select	= tq_sql_dyn_get_columns_to_select(query, &ctx);
+	used_columns		= tq_sql_dyn_get_used_columns_mysql(query, &ctx);
+	aggr_columns_to_select	= tq_sql_dyn_get_aggr_columns_to_select(query, &ctx);
+	percentile_ranks	= tq_sql_dyn_get_cume_dists_mysql(query, rounded_time_expr, columns_to_select, &ctx);
+	table_to_select_from	= tq_sql_dyn_get_table_to_select_from(query, &ctx);
+	conditions		= tq_sql_dyn_get_conditions(query, &ctx);
 
 
 	/* outer select */
@@ -1039,6 +1059,11 @@ void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, time_t now, time_t l
 
 void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
 {
+	tq_sql_ctx_t	ctx = {
+		.db_type = ZBX_TQ_DB_TYPE_POSTGRESQL,
+		.db = NULL,
+	};
+
 	const int	query_has_columns = (0 != query->columns.values_num) ? SUCCEED : FAIL;
 	const int	query_has_conditions = (0 != query->conditions.values_num) ? SUCCEED : FAIL;
 
@@ -1047,10 +1072,10 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, tim
 
 	*sql = NULL;
 
-	char	*columns_to_select	= tq_sql_dyn_get_columns_to_select(query, ZBX_TQ_DB_TYPE_CLICKHOUSE);
-	char	*aggr_columns_to_select	= tq_sql_dyn_get_aggr_columns_to_select(query, ZBX_TQ_DB_TYPE_CLICKHOUSE);
-	char	*table_to_select_from	= tq_sql_dyn_get_table_to_select_from(query, ZBX_TQ_DB_TYPE_CLICKHOUSE);
-	char	*conditions		= tq_sql_dyn_get_conditions(query, ZBX_TQ_DB_TYPE_CLICKHOUSE);
+	char	*columns_to_select	= tq_sql_dyn_get_columns_to_select(query, &ctx);
+	char	*aggr_columns_to_select	= tq_sql_dyn_get_aggr_columns_to_select(query, &ctx);
+	char	*table_to_select_from	= tq_sql_dyn_get_table_to_select_from(query, &ctx);
+	char	*conditions		= tq_sql_dyn_get_conditions(query, &ctx);
 
 	time_t timestamp_filter_lower_bound, timestamp_filter_upper_bound;
 	zbx_tq_get_timestamp_filter_bounds(query, now, lasttimestamp, &timestamp_filter_lower_bound,

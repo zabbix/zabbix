@@ -328,6 +328,7 @@ void	zbx_init_library_db(zbx_db_config_t *config);
 void	zbx_deinit_library_db(zbx_db_config_t *config);
 
 zbx_dbconn_t	*zbx_dbconn_create(void);
+zbx_dbconn_t	*zbx_dbconn_create_custom(const zbx_db_config_t	*config);
 void	zbx_dbconn_free(zbx_dbconn_t *db);
 
 int	zbx_dbconn_set_connect_options(zbx_dbconn_t *db, int options);

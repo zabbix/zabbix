@@ -1499,13 +1499,18 @@ void	zbx_dbconn_set_autoincrement(zbx_dbconn_t *db, int options)
  ******************************************************************************/
 zbx_dbconn_t	*zbx_dbconn_create(void)
 {
+	return zbx_dbconn_create_custom(db_config);
+}
+
+zbx_dbconn_t	*zbx_dbconn_create_custom(const zbx_db_config_t	*config)
+{
 	zbx_dbconn_t	*db;
 
 	db = (zbx_dbconn_t *)zbx_malloc(NULL, sizeof(zbx_dbconn_t));
 	memset(db, 0, sizeof(zbx_dbconn_t));
 
 	db->managed = DBCONN_TYPE_UNMANAGED;
-	db->config = db_config;
+	db->config = config;
 	db->txn_error = ZBX_DB_OK;
 	db->txn_end_error = ZBX_DB_OK;
 	db->connect_options = ZBX_DB_CONNECT_NORMAL;
