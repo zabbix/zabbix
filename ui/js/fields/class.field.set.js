@@ -20,7 +20,7 @@ class CFieldSet extends CField {
 	 *
 	 * @type {Object}
 	 */
-	#fields = {};
+	#fields = Object.create(null);
 
 	init() {
 		super.init();
@@ -75,7 +75,7 @@ class CFieldSet extends CField {
 	}
 
 	#discoverAllFields() {
-		const fields = {};
+		const fields = Object.create(null);
 		const fields_rediscovered = [];
 
 		for (const discovered_field of CForm.findAllFields(this._field)) {
@@ -125,7 +125,7 @@ class CFieldSet extends CField {
 	}
 
 	getInnerValue(trim_value) {
-		let result = {};
+		let result = Object.create(null);
 
 		for (const field of Object.values(this.#fields)) {
 			if (field._field.hasAttribute('data-skip-from-submit') || field.isDisabled()) {
@@ -182,9 +182,8 @@ class CFieldSet extends CField {
 	}
 
 	unsetErrors() {
-		const errors = {
-			'': [{message: '', level: -1}]
-		};
+		const errors = Object.create(null);
+		errors[''] = [{message: '', level: -1}];
 
 		for (const field of Object.values(this.#fields)) {
 			errors[field.getName().replace(new RegExp(`^${this.getName()}`), '')] = [{message: '', level: -1}];
@@ -210,8 +209,6 @@ class CFieldSet extends CField {
 	}
 
 	#fieldsSetErrors(errors, force_display_errors) {
-		let missing_field_errors = {};
-
 		for (const [key, field_errors] of Object.entries(errors)) {
 			const key_full = key.charAt(0) === '[' ? key : `[${key}]`;
 
