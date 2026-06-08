@@ -2766,7 +2766,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_ipc_client_t	*client;
 		zbx_ipc_message_t	*message;
 		int			rtc_state;
-		char			*token;
+		static char		*old_token;
 
 		rtc_state = zbx_ipc_service_recv(&rtc.service, &rtc_timeout, &client, &message);
 
@@ -2805,15 +2805,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		zbx_ipc_message_free(message);
 
-		token = zbx_config_vault.token;
-
 		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
 				config_ssl_cert_location, config_ssl_key_location, &zbx_config_vault.token);
 
-		if (token != zbx_config_vault.token && NULL != zbx_config_vault.token)
+		if (0 != zbx_strcmp_null(old_token, zbx_config_vault.token) && NULL != zbx_config_vault.token)
 		{
 			zbx_rtc_notify(&rtc, ZBX_PROCESS_TYPE_UNKNOWN, 0, ZBX_RTC_VAULT_NEW_TOKEN,
 					(const char *)zbx_config_vault.token, strlen(zbx_config_vault.token) + 1);
+
+			old_token = zbx_strdup(old_token, zbx_config_vault.token);
 		}
 
 		if (NULL != client)
