@@ -11,7 +11,9 @@
 #
 # Mandatory: no
 # Default:
-# SERVER="127.0.0.1,::1"
+# SERVER=
+
+SERVER="127.0.0.1,::1"
 
 ### Option: zabbix.listenIP
 #	IP address to listen on.
