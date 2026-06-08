@@ -114,15 +114,14 @@ abstract class CControllerCepRuleGeneral extends CController {
 					'use' => [CConditionFormulaParser::class, []],
 					'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 				]
-			], /*'use' => [CConditionValidator::class, []] // TODO: something that asserts integrity beyond syntax, i.e. - if formula has all conditions */],
+			]],
 			'window_type' => ['db cep_window.type', 'required',
 				'in' => [CCepRuleHelper::WINDOW_NONE, CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH]
 			],
-			// Type: "CEP rule window" object.
 			'window' => ['object', 'fields' => [
 				'duration' => ['db cep_window.duration', 'required', 'not_empty',
 					'use' => [CTimeUnitValidator::class, [
-						'max' => null, 'min' => 1, 'usermacros' => false, 'lldmacros' => false, 'accept_zero' => false, 'with_year' => false
+						'max' => null, 'min' => 1, 'usermacros' => true, 'lldmacros' => false, 'accept_zero' => false, 'with_year' => false
 					]],
 					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH]]
 				],
@@ -130,7 +129,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH]]
 				],
 				'capacity' => ['db cep_window.capacity', 'required', 'not_empty',
-					'use' => [CNumberValidator::class, ['min' => 1, 'max' => ZBX_MAX_INT64, 'with_float' => false, 'usermacros' => false, 'lldmacros' => false]],
+					'use' => [CNumberValidator::class, ['min' => 1, 'max' => ZBX_MAX_INT64, 'with_float' => false, 'usermacros' => true, 'lldmacros' => false]],
 					'when' => [
 						['capacity_enabled', 'in' => [1]],
 						['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH]
@@ -178,7 +177,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 				],
 				'script' => ['db cep_window.script', 'required', 'not_empty',
 					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_PATTERN_MATCH]]
-				],
+				]
 			]],
 			'operations' => [
 				['objects', 'required', 'fields' => self::getOperationValidationFields()],
@@ -193,7 +192,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 				'use' => [CNumberValidator::class, ['min' => 1, 'max' => ZBX_MAX_INT64, 'with_float' => false, 'usermacros' => false, 'lldmacros' => false]]
 			],
 			'description' => ['db cep_rule.description'],
-			'status' => ['db cep_rule.status', 'required', 'in' => [CCepRuleHelper::STATUS_ENABLED, CCepRuleHelper::STATUS_DISABLED]],
+			'status' => ['db cep_rule.status', 'required', 'in' => [CCepRuleHelper::STATUS_ENABLED, CCepRuleHelper::STATUS_DISABLED]]
 		]];
 	}
 
@@ -307,7 +306,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 					'integer', 'required',
 					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
 					'when' => ['type', 'in' => [CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE]]
-				],
+				]
 			],
 			'past_tag' => ['db cep_window_condition.past_tag', 'required', 'not_empty'],
 			'tag' => ['db cep_window_condition.tag', 'required', 'not_empty',
@@ -315,7 +314,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 			],
 			'tag_value' => ['db cep_window_condition.tag_value', 'required', 'not_empty',
 				'when' => ['type', 'in' => [CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE]]
-			],
+			]
 		];
 	}
 
@@ -347,7 +346,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 					'integer', 'required',
 					'in' => [CONDITION_OPERATOR_IN, CONDITION_OPERATOR_NOT_IN],
 					'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
-				],
+				]
 			],
 			'event_name' => ['db cep_condition.event_name', 'required', 'not_empty',
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME]]
@@ -368,7 +367,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 				'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER, TRIGGER_SEVERITY_COUNT],
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_SEVERITY]]
 			],
-			'time_period' => ['db cep_condition.time_period', 'required',
+			'time_period' => ['db cep_condition.time_period', 'required', 'not_empty',
 				'use' => [CTimePeriodParser::class, ['usermacros' => false, 'lldmacros' => false]],
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
 			],
