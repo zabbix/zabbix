@@ -6198,6 +6198,7 @@ static int	check_vcenter_alarm_get_common(zbx_vector_vmware_alarm_ptr_t *alarms,
 		zbx_json_addstring(&json_data, "id", ZBX_NULL2EMPTY_STR(alarm->entity_id), ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "uuid", ZBX_NULL2EMPTY_STR(alarm->entity_uuid), ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "type", ZBX_NULL2EMPTY_STR(alarm->entity_type), ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "name", ZBX_NULL2EMPTY_STR(alarm->entity_name), ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
