@@ -907,10 +907,6 @@ class CDataTable {
 		return this.#columns.filter(column => column.isSticky());
 	}
 
-	getNonDuplicateColumns() {
-		return this.#columns.filter(column => !column.isDuplicate());
-	}
-
 	getColumnsInRange(lowest_order = null, highest_order = null) {
 		return this.#columns.filter(column => {
 			if (column.getId() === this.#checkbox_id) {
@@ -1178,39 +1174,37 @@ class CDataTable {
 	}
 
 	onColumnDuplicate(e) {
-		let {column_index, user_column} = {user_column: {}, ...e.detail};
+		const {column_index} = e.detail;
 
 		const column = this.getColumn(column_index);
 		if (!column) {
 			return null;
 		}
 
-		const duplicate_column = this.#duplicateColumnConfig(column, user_column);
-		duplicate_column.setColumnIndex(this.#columns.length);
+		const duplicate_column = this.#duplicateColumn(column, column.diff(), true);
 
-		const start = this.#columns.indexOf(column) + 1;
-
-		this.#columns.splice(start, 0, duplicate_column);
-
-		for (let i = start; i < this.#columns.length; i++) {
+		for (let i = this.#columns.indexOf(duplicate_column); i < this.#columns.length; i++) {
 			this.#columns[i].setOrder(i + 1);
 		}
 
+		this.updateUserConfig();
+
 		this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
-		this.getData().then(response => {
-			this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
-			this.dispatchEvent(CDataTable.EVENT_SAVE);
+		this.dispatchEvent(CDataTable.EVENT_INIT, {
+			onSuccess: () => {
+				requestAnimationFrame(() => {
+					const header_cell = duplicate_column.getHeaderCell();
+					if (header_cell) {
+						this.#scrollBodyToTarget(header_cell.target);
 
-			requestAnimationFrame(() => {
-				const header_cell = duplicate_column.getHeaderCell();
-				if (header_cell) {
-					this.#scrollBodyToTarget(header_cell.target);
-
-					header_cell.target.focus();
-				}
-			});
+						header_cell.target.focus();
+					}
+				});
+			}
 		});
+
+		this.dispatchEvent(CDataTable.EVENT_SAVE);
 	}
 
 	onColumnDelete(e) {
@@ -1411,6 +1405,8 @@ class CDataTable {
 		if (!column) {
 			return;
 		}
+
+		this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
 		column.setResized(false);
 
@@ -1972,10 +1968,7 @@ class CDataTable {
 					continue;
 				}
 
-				const duplicate_column = this.#duplicateColumnConfig(column, user_column);
-				duplicate_column.setColumnIndex(this.#columns.length);
-
-				this.#columns.splice(this.#columns.indexOf(column) + 1, 0, duplicate_column);
+				this.#duplicateColumn(column, user_column);
 			}
 
 			this.#columns.sort((a, b) => {
@@ -2212,24 +2205,33 @@ class CDataTable {
 		this.#columns = this.#columns.sort((left, right) => left.getOrder() - right.getOrder());
 	}
 
-	#duplicateColumnConfig(column, user_column = {}) {
-		const id = column.getId();
-		const name = this.#columns.find(column => column.getId() === id).getName();
-
-		const duplicate_count = this.#columns
-			.filter(column => column.getName().replace(/\s*\(\d+\)$/g, '') === name)
-			.length;
-
-		const defaults = column.clone()
+	#duplicateColumn(column, user_column = {}, duplicate_name = false) {
+		const defaults = column.getDefaults()
+			.clone()
 			.setDuplicate(false)
-			.setName(`${name} (${duplicate_count})`)
 			.setSpan(1)
 			.setVisible(user_column.visible || true);
 
-		return defaults.clone()
-			.setDuplicate(true)
+		const duplicate_column = defaults.clone()
+			.setColumnIndex(this.#columns.length)
 			.setDefaults(defaults)
+			.setDuplicate(true)
 			.merge(user_column);
+
+		if (duplicate_name) {
+			const name = column.getName().replace(/\s*\(\d+\)$/g, '');
+
+			const duplicate_count = this.#columns
+				.filter(column => column.getName().replace(/\s*\(\d+\)$/g, '') === name)
+				.length;
+
+			duplicate_column.setName(`${name} (${duplicate_count})`);
+		}
+
+		const start = this.#columns.indexOf(column) + 1;
+		this.#columns.splice(start, 0, duplicate_column);
+
+		return duplicate_column;
 	}
 
 	#getColumnMinWidth(column) {
@@ -2445,9 +2447,12 @@ class CDataTable {
 	}
 
 	#getDataProviderParams(params) {
-		const column_options = this.getVisibleColumns().reduce((options, column) => {
-			return deepMerge(options, column.getColumnOptions());
-		}, {});
+		const column_options = {};
+		for (const column of this.getVisibleColumns().filter(column => Object.keys(column.getColumnOptions()).length)) {
+			const column_index = column.getColumnIndex()
+
+			column_options[column_index] = column.getColumnOptions();
+		}
 
 		const options = Object.fromEntries(
 			Object.entries(this.#options).map(([id, option]) => [id, option.checked ? 1 : 0])

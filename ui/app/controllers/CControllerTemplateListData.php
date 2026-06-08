@@ -171,8 +171,10 @@ class CControllerTemplateListData extends CControllerDataTable {
 		}
 		unset($template);
 
-		if (array_key_exists('custom_text', $options)) {
-			$this->resolveColumnTexts($templates, $options['custom_text']);
+		$custom_text = array_combine(array_keys($options), array_column($options, 'custom_text'));
+
+		if ($custom_text) {
+			$this->resolveColumnTexts($templates, $custom_text);
 		}
 
 		CPagerHelper::savePage('template.list', $this->paging['page']);

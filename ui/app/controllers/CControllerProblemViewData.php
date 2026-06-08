@@ -34,9 +34,10 @@ class CControllerProblemViewData extends CControllerDataTable {
 		$rows = [];
 		$data = $this->prepareData();
 		$options = $data['options'];
+		$custom_text = array_combine(array_keys($options), array_column($options, 'custom_text'));
 
-		if (array_key_exists('custom_text', $options)) {
-			$this->resolveColumnTexts($data['problems'], $options['custom_text']);
+		if ($custom_text) {
+			$this->resolveColumnTexts($data['problems'], $custom_text);
 		}
 
 		self::addProblemRows($rows, $data, $data['problems'], $data['filter'], $options);

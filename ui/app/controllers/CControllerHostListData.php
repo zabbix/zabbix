@@ -334,8 +334,10 @@ class CControllerHostListData extends CControllerDataTable {
 		}
 		unset($host);
 
-		if (array_key_exists('custom_text', $options)) {
-			$this->resolveColumnTexts($hosts, $options['custom_text']);
+		$custom_text = array_combine(array_keys($options), array_column($options, 'custom_text'));
+
+		if ($custom_text) {
+			$this->resolveColumnTexts($hosts, $custom_text);
 		}
 
 		$debug_mode = CWebUser::$data['debug_mode'] ?? GROUP_DEBUG_MODE_DISABLED;

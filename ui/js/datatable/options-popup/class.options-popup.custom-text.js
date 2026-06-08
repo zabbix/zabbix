@@ -37,37 +37,29 @@ class CDataTableOptionsPopupCustomText extends CDataTableOptionsPopup {
 	}
 
 	getFieldData() {
-		const column_index = this.getColumnConfig().getColumnIndex();
 		const column_options = this.getColumnConfig().getColumnOptions();
 
 		return {
 			...column_options,
-			custom_text: {
-				[column_index]: this.getField('custom_text').value
-			}
+			custom_text: this.getField('custom_text').value
 		};
 	}
 
 	getDefaultData() {
-		const column_index = this.getColumnConfig().getColumnIndex();
-
 		return {
-			custom_text: {
-				[column_index]: ''
-			}
+			custom_text: ''
 		};
 	}
 
 	onInit() {
 		super.onInit();
 
-		const column_index = this.getColumnConfig().getColumnIndex();
 		const column_options = this.getColumnConfig().getColumnOptions();
 
 		const custom_text_field = this.getField('custom_text');
 
 		if ('custom_text' in column_options) {
-			custom_text_field.value = column_options.custom_text[column_index] ?? '';
+			custom_text_field.value = column_options.custom_text ?? '';
 		}
 
 		const old_value = custom_text_field.value;

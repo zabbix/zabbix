@@ -255,8 +255,10 @@ class CControllerLatestViewData extends CControllerDataTable {
 		}
 		unset($item);
 
-		if (array_key_exists('custom_text', $options)) {
-			$this->resolveColumnTexts($data['items'], $options['custom_text']);
+		$custom_text = array_combine(array_keys($options), array_column($options, 'custom_text'));
+
+		if ($custom_text) {
+			$this->resolveColumnTexts($data['items'], $custom_text);
 		}
 
 		$output += [
