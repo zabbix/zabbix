@@ -43,13 +43,13 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	host          = zbx_mock_get_parameter_string("in.host");
-	ip            = zbx_mock_get_parameter_string("in.ip");
-	dns           = zbx_mock_get_parameter_string("in.dns");
+	host = zbx_mock_get_parameter_string("in.host");
+	ip = zbx_mock_get_parameter_string("in.ip");
+	dns = zbx_mock_get_parameter_string("in.dns");
 	host_metadata = zbx_mock_get_parameter_string("in.host_metadata");
-	port          = zbx_mock_get_parameter_int("in.port");
-	flags         = zbx_mock_get_parameter_int("in.flags");
-	rows_written  = zbx_mock_get_parameter_int("in.rows");
+	port = zbx_mock_get_parameter_int("in.port");
+	flags = zbx_mock_get_parameter_int("in.flags");
+	rows_written = zbx_mock_get_parameter_int("in.rows");
 	expected_rows = zbx_mock_get_parameter_int("out.rows");
 
 	g_nextid = 1;
@@ -85,12 +85,12 @@ void	zbx_mock_test_entry(void **state)
 	while (SUCCEED == zbx_list_iterator_next(&li))
 	{
 		zbx_list_iterator_peek(&li, (void **)&row);
-		zbx_mock_assert_str_eq("host",          host,          row->host);
-		zbx_mock_assert_str_eq("listen_ip",     ip,            row->listen_ip);
-		zbx_mock_assert_str_eq("listen_dns",    dns,           row->listen_dns);
+		zbx_mock_assert_str_eq("host", host, row->host);
+		zbx_mock_assert_str_eq("listen_ip", ip, row->listen_ip);
+		zbx_mock_assert_str_eq("listen_dns", dns, row->listen_dns);
 		zbx_mock_assert_str_eq("host_metadata", host_metadata, row->host_metadata);
-		zbx_mock_assert_int_eq("listen_port",   port,          row->listen_port);
-		zbx_mock_assert_int_eq("flags",         flags,         row->flags);
+		zbx_mock_assert_int_eq("listen_port", port, row->listen_port);
+		zbx_mock_assert_int_eq("flags", flags, row->flags);
 		count++;
 	}
 

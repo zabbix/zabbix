@@ -8,14 +8,13 @@ noinst_PROGRAMS = \
 	zbx_pb_autoreg_write_host \
 	zbx_pb_create_error
 
-# ── shared libs / flags ───────────────────────────────────────────────────────
 # All proxybuffer tests use the same library set and LDFLAGS:
 #   - DB / DC / nix functions are stubbed inline (prevents libzbxmockdata.a
 #     objects from being extracted and causing duplicate-symbol conflicts).
 #   - -Wl,--wrap=open is required so __real_open exists at link time and the
 #     __wrap_open passthrough for .gcda files (coverage) works correctly.
 
-PB_LIBS = \
+PROXYBUFFER_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a \
@@ -42,45 +41,35 @@ AM_LDFLAGS = @PROXY_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
 	-Wl,--wrap=fclose \
 	-Wl,--wrap=open
 
-PB_CFLAGS = \
+PROXYBUFFER_FLAGS = \
 	-I@top_srcdir@/src/libs/zbxproxybuffer \
 	-I@top_srcdir@/tests \
 	$(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
 # keep CLOSE_LIBS for backwards compatibility (referenced by name in some scripts)
-CLOSE_LIBS = $(PB_LIBS)
+CLOSE_LIBS = $(PROXYBUFFER_LIBS)
 
 # zbx_pb_mock_stubs.c is compiled once per binary (automake renames objects
 # with the per-target prefix due to per-target _CFLAGS).
 STUBS = zbx_pb_mock_stubs.c
 
-# ── zbx_pb_discovery_close ────────────────────────────────────────────────────
 zbx_pb_discovery_close_SOURCES = zbx_pb_discovery_close.c $(STUBS)
-zbx_pb_discovery_close_CFLAGS  = $(PB_CFLAGS)
-zbx_pb_discovery_close_LDADD   = $(PB_LIBS) @PROXY_LIBS@
+zbx_pb_discovery_close_CFLAGS = $(PROXYBUFFER_FLAGS)
+zbx_pb_discovery_close_LDADD = $(PROXYBUFFER_LIBS) @PROXY_LIBS@
 
-# ── zbx_pb_parse_mode ─────────────────────────────────────────────────────────
-# Pure string→mode parsing; no shared memory needed.
 zbx_pb_parse_mode_SOURCES = zbx_pb_parse_mode.c $(STUBS)
-zbx_pb_parse_mode_CFLAGS  = $(PB_CFLAGS)
-zbx_pb_parse_mode_LDADD   = $(PB_LIBS) @PROXY_LIBS@
+zbx_pb_parse_mode_CFLAGS = $(PROXYBUFFER_FLAGS)
+zbx_pb_parse_mode_LDADD = $(PROXYBUFFER_LIBS) @PROXY_LIBS@
 
-# ── zbx_pb_discovery_write_host ───────────────────────────────────────────────
-# Tests write_host (dcheckid=0, port=0, value=""), get_rows, set_lastid.
 zbx_pb_discovery_write_host_SOURCES = zbx_pb_discovery_write_host.c $(STUBS)
-zbx_pb_discovery_write_host_CFLAGS  = $(PB_CFLAGS)
-zbx_pb_discovery_write_host_LDADD   = $(PB_LIBS) @PROXY_LIBS@
+zbx_pb_discovery_write_host_CFLAGS = $(PROXYBUFFER_FLAGS)
+zbx_pb_discovery_write_host_LDADD = $(PROXYBUFFER_LIBS) @PROXY_LIBS@
 
-# ── zbx_pb_autoreg_write_host ─────────────────────────────────────────────────
-# Tests autoreg write_host, get_rows, set_lastid in memory mode.
 zbx_pb_autoreg_write_host_SOURCES = zbx_pb_autoreg_write_host.c $(STUBS)
-zbx_pb_autoreg_write_host_CFLAGS  = $(PB_CFLAGS)
-zbx_pb_autoreg_write_host_LDADD   = $(PB_LIBS) @PROXY_LIBS@
+zbx_pb_autoreg_write_host_CFLAGS = $(PROXYBUFFER_FLAGS)
+zbx_pb_autoreg_write_host_LDADD = $(PROXYBUFFER_LIBS) @PROXY_LIBS@
 
-# ── zbx_pb_create_error ───────────────────────────────────────────────────────
-# Tests zbx_pb_create failure (size too small), DISK-mode get_mem_info error
-# path, and MEMORY-mode get_mem_info / get_state_info success paths.
 zbx_pb_create_error_SOURCES = zbx_pb_create_error.c $(STUBS)
-zbx_pb_create_error_CFLAGS  = $(PB_CFLAGS)
-zbx_pb_create_error_LDADD   = $(PB_LIBS) @PROXY_LIBS@
+zbx_pb_create_error_CFLAGS = $(PROXYBUFFER_FLAGS)
+zbx_pb_create_error_LDADD = $(PROXYBUFFER_LIBS) @PROXY_LIBS@
 endif

@@ -62,10 +62,8 @@ void	zbx_mock_test_entry(void **state)
 			if (SUCCEED == mem_result)
 			{
 				/* memory mode: buffer must report non-zero usage */
-				zbx_mock_assert_int_eq("mem_total > 0", 1,
-						mem_info.mem_total > 0 ? 1 : 0);
-				zbx_mock_assert_int_eq("mem_used > 0",  1,
-						mem_info.mem_used  > 0 ? 1 : 0);
+				zbx_mock_assert_int_eq("mem_total > 0", 1, mem_info.mem_total > 0 ? 1 : 0);
+				zbx_mock_assert_int_eq("mem_used > 0",  1, mem_info.mem_used  > 0 ? 1 : 0);
 			}
 			else
 			{

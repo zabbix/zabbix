@@ -87,12 +87,12 @@ void	zbx_mock_test_entry(void **state)
 	while (SUCCEED == zbx_list_iterator_next(&li))
 	{
 		zbx_list_iterator_peek(&li, (void **)&row);
-		zbx_mock_assert_str_eq("ip",       ip,  row->ip);
-		zbx_mock_assert_str_eq("dns",      dns, row->dns);
-		zbx_mock_assert_str_eq("value",    "",  row->value);
-		zbx_mock_assert_str_eq("error",    err, row->error);
+		zbx_mock_assert_str_eq("ip", ip,  row->ip);
+		zbx_mock_assert_str_eq("dns", dns, row->dns);
+		zbx_mock_assert_str_eq("value", "",  row->value);
+		zbx_mock_assert_str_eq("error", err, row->error);
 		zbx_mock_assert_uint64_eq("dcheckid", 0, row->dcheckid);
-		zbx_mock_assert_int_eq("port",     0,   row->port);
+		zbx_mock_assert_int_eq("port", 0, row->port);
 		count++;
 	}
 
