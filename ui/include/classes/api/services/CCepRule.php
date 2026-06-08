@@ -749,7 +749,7 @@ class CCepRule extends CApiService {
 				$operation_path = $path.'/'.($j + 1);
 
 				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-					'execute_when' =>	['type' => API_INT32, 'in' => implode(',', CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE[$cep_rule['window_type']]), 'flags' => API_REQUIRED],
+					'execute_when' =>	['type' => API_INT32, 'in' => implode(',', CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE[$cep_rule['window_type']]), 'flags' => API_REQUIRED]
 				]];
 
 				if (!CApiInputValidator::validate($api_input_rules, $operation, $operation_path, $error)) {

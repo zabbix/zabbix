@@ -223,7 +223,7 @@ class testTriggerCEP extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'LogFileSize' => 0,
-				'DebugLevel' => 3,
+				'DebugLevel' => 3
 			]
 		];
 	}
@@ -1751,7 +1751,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$response = $this->call('problem.get', [
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
-			'source' => EVENT_SOURCE_TRIGGERS,
+			'source' => EVENT_SOURCE_TRIGGERS
 		]);
 		$this->assertCount(count($triggerids), $response['result'], 'Expected exactly one open problem per trigger: '.json_encode($response));
 		$problem_eventids = array_column($response['result'], 'eventid');
@@ -1953,7 +1953,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'sortfield' => 'eventid',
 			'sortorder' => 'DESC',
-			'output' => ['eventid', 'value', 'clock', 'objectid', /* name */]
+			'output' => ['eventid', 'value', 'clock', 'objectid']
 		];
 
 		if ($expected_count === 0) {
@@ -2131,7 +2131,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$response = $this->call('problem.get', [
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
-			'source' => EVENT_SOURCE_TRIGGERS,
+			'source' => EVENT_SOURCE_TRIGGERS
 		]);
 		$this->assertEmpty($response['result'],
 			$prefix.'Expected no open problems: '.json_encode($response));
