@@ -18,25 +18,31 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 /**
  * Test suite for autoregistration with proxy group condition.
  * @suite-components-reuse true
- * @required-components server, proxy, agent
+ * @required-components server, proxy, proxy_ha1, agent
  * @onAfter clearData
  */
 class testAutoregistrationProxyGroup extends CIntegrationTest {
 
 	const PROXY_GROUP_NAME = 'Autoreg proxy group';
 	const PROXY_NAME = 'Autoreg proxy';
+	const PROXY2_NAME = 'Autoreg proxy 2';
 	const AGENT_HOSTNAME = 'autoreg_pg_agent';
 	const AUTOREG_ACTION_NAME = 'Autoreg by proxy group';
 	const DRULE_NAME = 'Autoreg proxy group drule';
 	const DISCOVERY_ACTION_NAME = 'Discovery by proxy group';
 	const DISCOVERED_HOST = '127.0.0.1';
-	const LINUX_TEMPLATEID = 10001;
+	const TEMPLATE_NAME = 'Autoreg proxy group template';
+	const ACTIVE_ITEM_KEY = 'agent.ping';
+	const REFRESH_ACTIVE_CHECKS = 30;
+	const SERVER_DOWNTIME = 40;
 
 	private static $proxy_groupid;
 	private static $proxyid;
+	private static $proxyid2;
 	private static $actionid;
 	private static $druleid;
 	private static $discovery_actionid;
+	private static $templateid;
 
 	/**
 	 * Component configuration provider.
@@ -56,11 +62,19 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 				'Hostname' => self::PROXY_NAME,
 				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
 			],
+			self::COMPONENT_PROXY_HANODE1 => [
+				'ProxyMode' => PROXY_OPERATING_MODE_ACTIVE,
+				'DebugLevel' => 3,
+				'LogFileSize' => 0,
+				'Hostname' => self::PROXY2_NAME,
+				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
+			],
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::AGENT_HOSTNAME,
-				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_PROXY, 'ListenPort'),
+				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_PROXY_HANODE1, 'ListenPort').';'.'127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_PROXY, 'ListenPort'),
 				'RefreshActiveChecks' => 2,
-				'HostInterface' => 'localhost'
+				'HostInterface' => 'localhost',
+				'HeartbeatFrequency' => 0
 			]
 		];
 	}
@@ -97,6 +111,48 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 		$this->assertArrayHasKey('proxyids', $response['result']);
 		self::$proxyid = $response['result']['proxyids'][0];
 
+		$socket_dir = $this->getConfigurationValue(self::COMPONENT_PROXY_HANODE1, 'SocketDir');
+		if (is_dir($socket_dir) === false) {
+			mkdir($socket_dir);
+		}
+
+		$response = $this->call('proxy.create', [
+			'name' => self::PROXY2_NAME,
+			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+			'local_address' => '127.0.0.1',
+			'local_port' => $this->getConfigurationValue(self::COMPONENT_PROXY_HANODE1, 'ListenPort'),
+			'proxy_groupid' => self::$proxy_groupid
+		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+		self::$proxyid2 = $response['result']['proxyids'][0];
+
+		$response = $this->call('templategroup.get', [
+			'filter' => ['name' => 'Templates']
+		]);
+		$this->assertCount(1, $response['result']);
+		$templategroupid = $response['result'][0]['groupid'];
+
+		$response = $this->call('template.create', [
+			'host' => self::TEMPLATE_NAME,
+			'groups' => [
+				'groupid' => $templategroupid
+			]
+		]);
+		$this->assertArrayHasKey('templateids', $response['result']);
+		$this->assertCount(1, $response['result']['templateids']);
+		self::$templateid = $response['result']['templateids'][0];
+
+		$response = $this->call('item.create', [
+			'name' => 'Agent ping',
+			'key_' => self::ACTIVE_ITEM_KEY,
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'delay' => '1s',
+			'hostid' => self::$templateid
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertCount(1, $response['result']['itemids']);
+
 		$response = $this->call('action.create', [
 			[
 				'name' => self::AUTOREG_ACTION_NAME,
@@ -113,6 +169,11 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => self::$proxyid
+						],
+						[
+							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => self::$proxyid2
 						]
 					],
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR
@@ -125,7 +186,7 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 						'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
 						'optemplate' => [
 							[
-								'templateid' => self::LINUX_TEMPLATEID
+								'templateid' => self::$templateid
 							]
 						]
 					]
@@ -171,9 +232,22 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 			CAPIHelper::call('host.delete', $hostids);
 		}
 
+		if (self::$templateid !== null) {
+			CAPIHelper::call('template.delete', [self::$templateid]);
+			self::$templateid = null;
+		}
+
+		$proxy_ids = [];
 		if (self::$proxyid !== null) {
-			CAPIHelper::call('proxy.delete', [self::$proxyid]);
+			$proxy_ids[] = self::$proxyid;
 			self::$proxyid = null;
+		}
+		if (self::$proxyid2 !== null) {
+			$proxy_ids[] = self::$proxyid2;
+			self::$proxyid2 = null;
+		}
+		if (count($proxy_ids) > 0) {
+			CAPIHelper::call('proxy.delete', $proxy_ids);
 		}
 
 		if (self::$proxy_groupid !== null) {
@@ -186,7 +260,7 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 	 * Create a network discovery rule that runs on the proxy and probes the
 	 * agent via SVC_AGENT (agent.version), plus a discovery action gated on
 	 * the proxy group. Verify the host is discovered and linked to the
-	 * "Linux by Zabbix agent" template.
+	 * created template.
 	 *
 	 * @configurationDataProvider configurationProvider
 	 */
@@ -239,7 +313,7 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 						'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
 						'optemplate' => [
 							[
-								'templateid' => self::LINUX_TEMPLATEID
+								'templateid' => self::$templateid
 							]
 						]
 					]
@@ -267,14 +341,14 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 
 		$this->assertArrayHasKey('parentTemplates', $host);
 		$templateids = array_column($host['parentTemplates'], 'templateid');
-		$this->assertContains((string) self::LINUX_TEMPLATEID, $templateids,
-				'Discovered host is expected to be linked to "Linux by Zabbix agent" template, got: '.
+		$this->assertContains((string) self::$templateid, $templateids,
+				'Discovered host is expected to be linked to the "'.self::TEMPLATE_NAME.'" template, got: '.
 				json_encode($host['parentTemplates']));
 	}
 
 	/**
 	 * Start agent, then wait for host to be autoregistered through the proxy
-	 * group and linked to the "Linux by Zabbix agent" template.
+	 * group and linked to the created template.
 	 *
 	 * @configurationDataProvider configurationProvider
 	 */
@@ -283,7 +357,7 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 			'output' => ['hostid', 'host', 'monitored_by', 'proxy_groupid'],
 			'filter' => ['host' => self::AGENT_HOSTNAME],
 			'selectParentTemplates' => ['templateid', 'host']
-		], 30, 1);
+		], 70, 1);
 
 		$this->assertCount(1, $response['result'],
 				'Failed to autoregister host before timeout: '.json_encode($response['result']));
@@ -297,8 +371,93 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 
 		$this->assertArrayHasKey('parentTemplates', $host);
 		$templateids = array_column($host['parentTemplates'], 'templateid');
-		$this->assertContains((string) self::LINUX_TEMPLATEID, $templateids,
-				'Host is expected to be linked to "Linux by Zabbix agent" template, got: '.
+		$this->assertContains((string) self::$templateid, $templateids,
+				'Host is expected to be linked to the "'.self::TEMPLATE_NAME.'" template, got: '.
 				json_encode($host['parentTemplates']));
+
+		// Resolve the agent.ping item created on the autoregistered host through the linked template.
+		$response = $this->callUntilDataIsPresent('item.get', [
+			'output' => ['itemid'],
+			'host' => self::AGENT_HOSTNAME,
+			'filter' => ['key_' => self::ACTIVE_ITEM_KEY]
+		], 30, 1);
+		$this->assertCount(1, $response['result'],
+				'Failed to find the "'.self::ACTIVE_ITEM_KEY.'" item on the autoregistered host: '.
+				json_encode($response['result']));
+		$itemid = $response['result'][0]['itemid'];
+	}
+
+	/**
+	 *
+	 * @depends testAutoregistrationProxyGroup_autoregHost
+	 */
+	public function testAutoregistrationProxyGroup_activeChecksBufferedDuringServerOutage() {
+		// The host was autoregistered by the previous test; resolve its agent.ping item.
+		$response = $this->callUntilDataIsPresent('item.get', [
+			'output' => ['itemid'],
+			'host' => self::AGENT_HOSTNAME,
+			'filter' => ['key_' => self::ACTIVE_ITEM_KEY]
+		], 30, 1);
+		$this->assertCount(1, $response['result'],
+				'Failed to find the "'.self::ACTIVE_ITEM_KEY.'" item on the autoregistered host: '.
+				json_encode($response['result']));
+		$itemid = $response['result'][0]['itemid'];
+
+		self::stopComponent(self::COMPONENT_AGENT);
+		// Make the server aware of the autoregistered host and item.
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->callUntilDataIsPresent('host.get', [
+			'output' => ['hostid', 'assigned_proxyid'],
+			'filter' => ['host' => self::AGENT_HOSTNAME]
+		], 90, 1, function ($response) {
+			return (isset($response['result'][0]['assigned_proxyid'])
+					&& $response['result'][0]['assigned_proxyid'] != 0)
+				? true
+				: 'Host is not yet assigned to a proxy in the group';
+		});
+
+		// Let the assigned proxy pull the host and item from the server, then confirm the active
+		// agent.ping check is actually being collected.
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY_HANODE1);
+
+		$agent_config = array_merge(
+			self::getDefaultComponentConfiguration()[self::COMPONENT_AGENT],
+			$this->configurationProvider()[self::COMPONENT_AGENT],
+			['RefreshActiveChecks' => self::REFRESH_ACTIVE_CHECKS]
+		);
+		self::prepareComponentConfiguration(self::COMPONENT_AGENT, [self::COMPONENT_AGENT => $agent_config]);
+
+		/* make Zabbix proxy to think that failover should have occurred */
+		self::stopComponent(self::COMPONENT_SERVER);
+		sleep(20);
+
+		$agent_started = time();
+		$this->startComponent(self::COMPONENT_AGENT);
+
+		sleep(3);
+
+		// If the active check configuration update already started to fail while the server was
+		// down, wait (up to 70s) for the agent to recover once the server is back.
+		$config_update_failed = self::isLogLinePresent(self::COMPONENT_AGENT,
+				'Active check configuration update started to fail');
+
+		if ($config_update_failed) {
+			$this->waitForLogLineToBePresent(self::COMPONENT_AGENT, 'is working again', true, 70, 1);
+		}
+
+		// allow few seconds to collect
+		sleep(3);
+		$server_started = time();
+		$this->startComponent(self::COMPONENT_SERVER);
+
+		$this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_UINT64,
+			'itemids' => [$itemid],
+			'time_from' => $agent_started,
+			'time_till' => $server_started
+		], 10, 1);
 	}
 }

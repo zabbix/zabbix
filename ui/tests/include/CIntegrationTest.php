@@ -1095,6 +1095,7 @@ class CIntegrationTest extends CAPITest {
 		switch ($component) {
 			case self::COMPONENT_SERVER:
 			case self::COMPONENT_PROXY:
+			case self::COMPONENT_PROXY_HANODE1:
 				$line = 'finished forced reloading of the configuration cache';
 				break;
 			default:
