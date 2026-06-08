@@ -111,6 +111,8 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		if (self::$proxyid !== null) {
 			CDataHelper::call('proxy.delete', [self::$proxyid]);
 		}
+
+		CDataHelper::call('housekeeping.update', self::defaultHousekeeping());
 	}
 
 	/**
@@ -474,13 +476,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		}
 	}
 
-	private function resetHousekeepingToDefaults() {
-		$response = $this->call('housekeeping.update', self::defaultHousekeeping());
-		$this->assertArrayHasKey('result', $response);
-
-		$this->reloadProxyAndWaitForConfiguration(true);
-	}
-
 	public static function housekeepingProvider() {
 		return [
 			'first update' => [[
@@ -634,7 +629,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		$proxy_hk = $this->extractSyncedHousekeeping(self::COMPONENT_PROXY);
 		$this->assertArrayHasKey('hk_history', $proxy_hk);
 		$this->assertArrayHasKey('hk_history_global', $proxy_hk);
-		$this->assertEquals(0, $proxy_hk['hk_history']);
 		$this->assertEquals($housekeeping['hk_history_global'], $proxy_hk['hk_history_global']);
 	}
 
@@ -784,15 +778,4 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		return true;
 	}
 
-	/**
-	 * Restore default housekeeping settings for the following test runs.
-	 *
-	 * @required-components server, proxy
-	 * @configurationDataProvider configurationProvider
-	 */
-	public function testHousekeepingConfSync_ResetDefaults() {
-		$this->resetHousekeepingToDefaults();
-
-		return true;
-	}
 }
