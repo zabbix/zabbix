@@ -124,7 +124,6 @@ void	zbx_backtrace(void) {}
  * Real cacheconfig is not linked; ID counter resets per process invocation.  */
 static zbx_uint64_t	g_nextid;
 
-void		zbx_pb_mock_set_nextid(zbx_uint64_t id);
 zbx_uint64_t	zbx_dc_get_nextid(const char *t, int n);
 void		zbx_dc_config_get_items_by_itemids(void *items, const zbx_uint64_t *itemids,
 			int *errcodes, size_t num);
