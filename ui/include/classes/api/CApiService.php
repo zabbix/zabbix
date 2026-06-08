@@ -273,24 +273,17 @@ class CApiService {
 	 */
 	protected function unsetExtraFields(array $objects, array $fields, $output = []) {
 		// find the fields that have not been requested
-		$extraFields = [];
+		$extra_fields = [];
 		foreach ($fields as $field) {
 			if (!$this->outputIsRequested($field, $output)) {
-				$extraFields[] = $field;
+				$extra_fields[$field] = true;
 			}
 		}
 
 		// unset these fields
-		if ($extraFields) {
-			foreach ($objects as &$object) {
-				foreach ($extraFields as $field) {
-					unset($object[$field]);
-				}
-			}
-			unset($object);
-		}
-
-		return $objects;
+		return $extra_fields
+			? array_map(static fn (array $row) => array_diff_key($row, $extra_fields), $objects)
+			: $objects;
 	}
 
 	/**

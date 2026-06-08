@@ -1702,28 +1702,8 @@ select {
 	width: 100%;
 }
 
-.qr-code {
-	height: 190px;
-	width: 190px;
-	margin: 20px auto;
-}
-
-.qr-code-container {
-	width: 230px;
-	margin: 0 auto;
-	text-align: center;
-	white-space: wrap;
-}
-
-.qr-code-container .qr-code {
-	margin: 0 auto;
-}
-
-.qr-code-container .qr-code-expiration {
-	margin-top: 10px;
-}
-
 .qr-code img {
+	margin: 20px auto;
 	image-rendering: pixelated;
 }
 
