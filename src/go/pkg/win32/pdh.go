@@ -19,7 +19,6 @@ package win32
 
 import (
 	"errors"
-	"fmt"
 	"runtime"
 	"sync"
 	"syscall"
@@ -71,8 +70,8 @@ var (
 	pdhEnumObjectItems          = hPdh.mustGetProcAddress("PdhEnumObjectItemsW")
 	pdhEnumObjects              = hPdh.mustGetProcAddress("PdhEnumObjectsW")
 
-	objectListSize uint32    = objectListSizeInit
-	pflModtime     time.Time //nolint:gochecknoglobals
+	objectListSize uint32    = objectListSizeInit //nolint:gochecknoglobals // used to keep buffer size for PDH call
+	pflModtime     time.Time                      //nolint:gochecknoglobals // mod. time to refresh the objects list
 
 	// mutex to prevent concurrent calls of Windows API PDH functions when one of the following is already being executed
 	// pdhEnumObjectItems(), pdhEnumObjects() and pdhCollectQueryData()
@@ -290,14 +289,14 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 	var instbuf []uint16
 
 	if counterListSize < 1 {
-		return nil, fmt.Errorf("No counters found for given object.")
+		return nil, errs.New("no counters found for given object")
 	}
 
 	counterbuf := make([]uint16, counterListSize)
 
 	for {
 		if instanceListSize == 0 {
-			return nil, fmt.Errorf("Object does not support variable instances.")
+			return nil, errs.New("object does not support variable instances")
 		}
 
 		instbuf = make([]uint16, instanceListSize)
@@ -340,6 +339,7 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 	return instances, nil
 }
 
+//nolint:gocyclo,cyclop // function is not complex and readable, cyclo is high due to retry logic
 func pdhEnumObjectFetch(force, refresh bool) ([]uint16, bool, error) {
 	const maxAttempts = 3
 
@@ -365,7 +365,7 @@ func pdhEnumObjectFetch(force, refresh bool) ([]uint16, bool, error) {
 		}
 
 		if objectListSizeRet < 1 {
-			return nil, false, errors.New("No objects found")
+			return nil, false, errs.New("no objects found")
 		}
 	}
 
@@ -378,7 +378,7 @@ func pdhEnumObjectFetch(force, refresh bool) ([]uint16, bool, error) {
 		}
 
 		if objectListSizeRet < 1 {
-			return nil, false, errors.New("No cached objects found")
+			return nil, false, errs.New("no cached objects found")
 		}
 
 		fromCache = true
@@ -514,7 +514,7 @@ func newPdhError(ret uintptr) (err error) {
 		return
 	}
 
-	return fmt.Errorf("%s (error code: 0x%08X)", windows.UTF16ToString(buf), uint32(ret)) //nolint:gosec
+	return errs.Errorf("%s (error code: 0x%08X)", windows.UTF16ToString(buf), uint32(ret)) //nolint:gosec
 }
 
 func getPerflibModtime() (time.Time, error) {
