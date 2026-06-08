@@ -623,25 +623,30 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($resolve_comments) {
-			foreach ($data['problems'] as &$problem) {
+			$events = [];
+
+			foreach ($data['problems'] as $problem) {
 				$trigger = $data['triggers'][$problem['objectid']];
-				$problem['comments'] = CMacrosResolverHelper::resolveTriggerDescription(
-					[
-						'triggerid' => $problem['objectid'],
-						'expression' => $trigger['expression'],
-						'comments' => $trigger['comments'],
-						'clock' => $problem['clock'],
-						'ns' => $problem['ns']
-					],
-					['events' => true]
-				);
+
+				$events[$problem['eventid']] = [
+					'triggerid' => $problem['objectid'],
+					'expression' => $trigger['expression'],
+					'comments' => $trigger['comments'],
+					'clock' => $problem['clock'],
+					'ns' => $problem['ns']
+				];
 			}
-			unset($problem);
+			$events = CMacrosResolverHelper::resolveEventDescriptions($events);
 
 			foreach ($data['triggers'] as &$trigger) {
 				unset($trigger['comments']);
 			}
 			unset($trigger);
+
+			foreach ($data['problems'] as &$problem) {
+				$problem['comments'] = $events[$problem['eventid']]['comments'];
+			}
+			unset($problem);
 		}
 
 		// get additional data

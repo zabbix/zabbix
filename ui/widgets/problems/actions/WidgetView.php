@@ -153,7 +153,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 							'show' => $this->fields_values['show']
 						], [
 							'show_opdata' => $this->fields_values['show_opdata']
-						], ZBX_PROBLEM_SYMPTOM_LIMIT, true);
+						], ZBX_PROBLEM_SYMPTOM_LIMIT);
 
 						if ($_symptom_data['problems']) {
 							$_symptom_data = CScreenProblem::sortData($_symptom_data, ZBX_PROBLEM_SYMPTOM_LIMIT,
@@ -175,7 +175,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 							], [
 								'details' => 0,
 								'show_opdata' => $this->fields_values['show_opdata']
-							], true);
+							]);
 
 							$data['users'] += $_symptom_data['users'];
 							$data['correlations'] += $_symptom_data['correlations'];

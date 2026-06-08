@@ -112,6 +112,23 @@ class CControllerProblemViewData extends CControllerDataTable {
 	private static function addProblemRows(array &$rows, array &$data, array $problems, array $filter,
 			array $options, bool $nested = false): void {
 
+		$events = [];
+
+		foreach ($problems as $problem) {
+			$trigger = $data['triggers'][$problem['objectid']];
+
+			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] !== '') {
+				$events[$problem['eventid']] = [
+					'triggerid' => $trigger['triggerid'],
+					'expression' => $trigger['expression'],
+					'opdata' => $trigger['opdata'],
+					'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
+					'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
+				];
+			}
+		}
+		$events = CMacrosResolverHelper::resolveEventOpdatas($events, ['html' => true]);
+
 		foreach ($problems as $problem) {
 			if ($data['sort_field'] == 'clock' && $options['show_timeline'] && $options['compact_view'] == 0
 					&& $data['last_clock'] != 0) {
@@ -234,20 +251,9 @@ class CControllerProblemViewData extends CControllerDataTable {
 					$opdata = (new CDiv(
 						CScreenProblem::getLatestValues($trigger['items'])
 					))->addClass('latest-values');
-				} else {
-					$opdata = (new CSpan(CMacrosResolverHelper::resolveTriggerOpdata(
-						[
-							'triggerid' => $trigger['triggerid'],
-							'expression' => $trigger['expression'],
-							'opdata' => $trigger['opdata'],
-							'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
-							'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
-						],
-						[
-							'events' => true,
-							'html' => true
-						]
-					)))->addClass('opdata');
+				}
+				else {
+					$opdata = (new CSpan($events[$problem['eventid']]['opdata']))->addClass('opdata');
 				}
 			}
 
@@ -421,6 +427,23 @@ class CControllerProblemViewData extends CControllerDataTable {
 				: API::Problem()->get($event_options);
 		}
 
+		$events = [];
+
+		foreach ($data['problems'] as $problem) {
+			$trigger = $data['triggers'][$problem['objectid']];
+
+			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] !== '') {
+				$events[$problem['eventid']] = [
+					'triggerid' => $trigger['triggerid'],
+					'expression' => $trigger['expression'],
+					'opdata' => $trigger['opdata'],
+					'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
+					'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
+				];
+			}
+		}
+		$events = CMacrosResolverHelper::resolveEventOpdatas($events);
+
 		foreach ($data['problems'] as $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
@@ -445,16 +468,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 					}
 				}
 				else {
-					$opdata = CMacrosResolverHelper::resolveTriggerOpdata(
-						[
-							'triggerid' => $trigger['triggerid'],
-							'expression' => $trigger['expression'],
-							'opdata' => $trigger['opdata'],
-							'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
-							'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
-						],
-						['events' => true]
-					);
+					$opdata = $events[$problem['eventid']]['opdata'];
 				}
 			}
 
@@ -799,22 +813,22 @@ class CControllerProblemViewData extends CControllerDataTable {
 	}
 
 	protected function resolveCustomText(array &$data, array $custom_text): void {
-		foreach ($data['problems'] as &$problem) {
-			$trigger = $data['triggers'][$problem['objectid']];
+		$problems = [];
 
-			$problem['custom_text'] = CMacrosResolverHelper::resolveTriggerCustomTexts(
-				[
-					'triggerid' => $problem['objectid'],
-					'expression' => $trigger['expression'],
-					'clock' => $problem['clock'],
-					'ns' => $problem['ns']
-				] + $custom_text,
-				[
-					'events' => true,
-					'sources' => array_keys($custom_text)
-				]
-			);
+		foreach ($data['problems'] as $eventid => $problem) {
+			$trigger = $data['triggers'][$problem['objectid']];
+			$problems[$eventid] = [
+				'triggerid' => $problem['objectid'],
+				'expression' => $trigger['expression'],
+				'clock' => $problem['clock'],
+				'ns' => $problem['ns']
+			] + $custom_text;
 		}
-		unset($problem);
+
+		$problems = CMacrosResolverHelper::resolveEventCustomTexts($problems, ['sources' => array_keys($custom_text)]);
+
+		foreach ($problems as $eventid => $problem) {
+			$data['problems'][$eventid]['custom_text'] = array_intersect_key($problem, $custom_text);
+		}
 	}
 }
