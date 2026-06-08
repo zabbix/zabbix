@@ -8074,6 +8074,14 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
   padding: 9px 5px;
   width: 100%; }
 
+.qr-code-container {
+  width: 300px;
+  margin: 0 auto;
+  text-align: center;
+  white-space: wrap; }
+  .qr-code-container .qr-code-expiration {
+    margin-top: 10px; }
+
 .qr-code img {
   margin: 20px auto;
   image-rendering: pixelated; }

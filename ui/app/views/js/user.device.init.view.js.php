@@ -98,17 +98,14 @@ window.user_device_create_popup = new class {
 		const qr_code_div = this.#form_element.querySelector('.qr-code');
 
 		const size = qr_code_div.clientWidth;
-		const qr = new QRCode(qr_code_div, {
+		new QRCode(qr_code_div, {
 			text: url,
 			width: size,
 			height: size,
-			correctLevel : QRCode.CorrectLevel.L
+			correctLevel : QRCode.CorrectLevel.L,
+			useCanvas: true,
+			draw_integer: true
 		});
-		const module_width = Math.ceil(size / qr._oQRCode.moduleCount);
-		const qr_margin_width = module_width * 4;
-		const margin_color = qr._htOption.colorLight;
-
-		qr_code_div.style.border = `${qr_margin_width}px solid ${margin_color}`;
 	}
 
 	#post(url, data, success_callback) {
