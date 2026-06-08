@@ -27,8 +27,8 @@ class CFieldSet extends CFieldCollection {
 	}
 
 	getInnerValue(trim_value) {
-		let result = {};
-		let simple_fields = {};
+		let result = Object.create(null);
+		let simple_fields = Object.create(null);
 
 		for (const field of Object.values(this.getFields())) {
 			if (field._field.hasAttribute('data-skip-from-submit') || field.isDisabled()) {
@@ -36,7 +36,9 @@ class CFieldSet extends CFieldCollection {
 			}
 
 			if (typeof field.getExtraFields === 'function') {
-				simple_fields = {...simple_fields, ...field.getExtraFields()};
+				for (const [field_name, field_value] of Object.entries(field.getExtraFields())) {
+					simple_fields[field_name] = field_value;
+				}
 			}
 			else {
 				simple_fields[field.getName()] = trim_value ? field.getValueTrimmed() : field.getValue();

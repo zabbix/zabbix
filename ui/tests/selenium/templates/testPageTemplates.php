@@ -55,7 +55,8 @@ class testPageTemplates extends CLegacyWebTest {
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Template groups')->select('Templates/SAN');
 		$filter->submit();
-		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
+		$table->waitUntilReloaded()->waitUntilReady();
 		$this->zbxTestTextPresent($this->templateName);
 
 		$headers = ['', 'Name', 'Hosts', 'Items', 'Triggers', 'Graphs', 'Dashboards', 'Discovery', 'Web', 'Vendor',
