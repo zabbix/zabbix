@@ -1667,13 +1667,8 @@ select {
 	width: 100%;
 }
 
-.qr-code {
-	height: 190px;
-	width: 190px;
-	margin: 20px auto;
-}
-
 .qr-code img {
+	margin: 20px auto;
 	image-rendering: pixelated;
 }
 
@@ -1925,6 +1920,12 @@ select {
 		&.modal-popup-static {
 			max-width: 700px;
 			width: 100%;
+
+			&.modal-popup-sla-edit,
+			&.modal-popup-proxy-edit,
+			&.modal-popup-connector-edit {
+				max-width: 750px;
+			}
 		}
 
 		&.modal-popup-preprocessing {
@@ -2513,6 +2514,10 @@ select {
 	background-color: $lighter-yellow;
 	border: 1px solid $ui-border-color;
 	@extend %webkit-scrollbar;
+
+	&.debug-output-table-refresh {
+		margin: 10px 0 0 0;
+	}
 }
 
 .overlay-descr {
