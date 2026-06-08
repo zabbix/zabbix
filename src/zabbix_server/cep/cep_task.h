@@ -35,8 +35,7 @@ typedef enum
 	CEP_TASK_CLOSE_EVENT,
 	CEP_TASK_COMMIT,
 	CEP_TASK_ADD_TAGS,
-	CEP_TASK_SET_EVENT_NAME,
-	CEP_TASK_UPDATE_EVENT
+	CEP_TASK_SYNC_EVENT
 }
 zbx_cep_task_type_t;
 
@@ -99,8 +98,10 @@ typedef struct
 }
 zbx_cep_task_set_event_name_t;
 
-#define CEP_SYNC_EVENT_SEVERITY		0x01
-#define CEP_SYNC_EVENT_TAGS		0x02
+#define CEP_SYNC_EVENT_NAME		0x01
+#define CEP_SYNC_EVENT_SEVERITY		0x02
+#define CEP_SYNC_EVENT_TAGS		0x04
+
 typedef struct
 {
 	zbx_mw_task_t		base;
@@ -122,8 +123,7 @@ zbx_mw_task_t	*cep_create_task_commit(zbx_vector_mw_task_ptr_t *tasks);
 zbx_mw_task_t	*cep_create_task_close_event(zbx_db_event *event, zbx_uint64_t eventid, zbx_uint64_t userid,
 		zbx_uint64_t correlationid, zbx_uint64_t cep_ruleid);
 zbx_mw_task_t	*cep_create_task_add_tags(zbx_vector_event_tags_t *event_tags, zbx_vector_uint64_t *eventids);
-zbx_mw_task_t	*cep_create_task_set_event_name(zbx_uint64_t eventid, const char *name);
-zbx_mw_task_t	*cep_create_task_update_event(zbx_cep_event_handle_t event, zbx_uint32_t flags);
+zbx_mw_task_t	*cep_create_task_sync_event(zbx_cep_event_handle_t event, zbx_uint32_t flags);
 
 void	cep_task_free(zbx_mw_task_t *mw_task);
 

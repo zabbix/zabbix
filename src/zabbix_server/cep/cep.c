@@ -122,6 +122,8 @@ void	cep_event_clear(zbx_cep_event_t *event)
 	zbx_vector_tag_destroy(&event->tags);
 
 	zbx_vector_db_event_suppress_destroy(&event->suppress);
+
+	zbx_free(event->name);
 }
 
 void	zbx_cep_event_release(zbx_cep_event_t *event)
@@ -134,7 +136,7 @@ void	zbx_cep_event_release(zbx_cep_event_t *event)
 }
 
 zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, unsigned char object,
-		zbx_uint64_t objectid, int clock, int ns, int value, int serverity,
+		zbx_uint64_t objectid, const char *name, int clock, int ns, int value, int serverity,
 		const zbx_vector_tags_ptr_t *tags, const zbx_vector_db_event_suppress_t *suppress)
 {
 	zbx_cep_event_t	*event;
@@ -151,6 +153,7 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 	event->value = value;
 	event->severity = serverity;
 	event->suppress_mtime = 0;
+	event->name = zbx_strdup(NULL, name);
 
 	zbx_vector_tag_create(&event->tags);
 	if (NULL != tags)
@@ -187,6 +190,7 @@ static zbx_cep_event_t	*cep_event_clone(const zbx_cep_event_t *event)
 	clone->value = event->value;
 	clone->severity = event->severity;
 	clone->suppress_mtime = event->suppress_mtime;
+	clone->name = zbx_strdup(NULL, event->name);
 
 	zbx_vector_tag_create(&clone->tags);
 	zbx_vector_tag_reserve(&clone->tags, (size_t)event->tags.values_num);

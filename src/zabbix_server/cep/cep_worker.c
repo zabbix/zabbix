@@ -20,6 +20,8 @@
 #include "cep_rule.h"
 #include "cep_task.h"
 #include "cep_correlation.h"
+#include "cep_rule_op_event.h"
+#include "cep_rule_op_db_event.h"
 #include "zbxcep.h"
 #include "zbxcep_client.h"
 #include "zbxmw.h"
@@ -445,8 +447,8 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	db_event->eventid = eventid;
 
 	zbx_cep_event_t	*event = cep_event_create(db_event->eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
-			db_event->trigger.triggerid, db_event->clock, db_event->ns, TRIGGER_VALUE_PROBLEM,
-			db_event->severity, &db_event->tags, db_event->suppress);
+			db_event->trigger.triggerid, db_event->name, db_event->clock, db_event->ns,
+			TRIGGER_VALUE_PROBLEM, db_event->severity, &db_event->tags, db_event->suppress);
 
 	const zbx_cep_rule_t		**rules = NULL;
 	int				rules_num = 0;
@@ -546,7 +548,7 @@ static void	cep_worker_resolve_trigger_events(zbx_db_event *db_event, zbx_uint64
 	db_event->eventid = r_eventid;
 
 	zbx_cep_event_t	*r_event = cep_event_create(db_event->eventid, EVENT_SOURCE_TRIGGERS,
-		EVENT_OBJECT_TRIGGER, db_event->trigger.triggerid, db_event->clock, db_event->ns,
+		EVENT_OBJECT_TRIGGER, db_event->trigger.triggerid, db_event->name, db_event->clock, db_event->ns,
 		TRIGGER_VALUE_OK, db_event->severity, &db_event->tags, db_event->suppress);
 
 	cep_cache_acquire(&cep);
@@ -654,7 +656,8 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 
 	/* don't cache tags for internal events since they are not used */
 	zbx_cep_event_t	*event = cep_event_create(db_event->eventid, EVENT_SOURCE_INTERNAL, db_event->object,
-			db_event->objectid, db_event->clock, db_event->ns, db_event->value, 0, NULL, NULL);
+			db_event->objectid, db_event->name, db_event->clock, db_event->ns, db_event->value, 0, NULL,
+			NULL);
 
 	cep_cache_acquire(&cep);
 	(void)cep_add_event(cep, event);
@@ -796,16 +799,6 @@ static void	cep_worker_process_task_close_event(zbx_cep_task_close_event_t *task
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() r_eventid:" ZBX_FS_UI64, __func__, r_eventid);
 }
 
-static int	cep_task_set_event_name_compare(const void *a1, const void *a2)
-{
-	const zbx_cep_task_set_event_name_t	*t1 = (const zbx_cep_task_set_event_name_t *)a1;
-	const zbx_cep_task_set_event_name_t	*t2 = (const zbx_cep_task_set_event_name_t *)a2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(t1->eventid, t2->eventid);
-
-	return 0;
-}
-
 static int	cep_task_update_event_compare(const void *a1, const void *a2)
 {
 	const zbx_cep_task_update_event_t	*t1 = (const zbx_cep_task_update_event_t *)a1;
@@ -816,7 +809,6 @@ static int	cep_task_update_event_compare(const void *a1, const void *a2)
 	return 0;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: commit queued finished tasks                                      *
@@ -826,12 +818,11 @@ static int	cep_task_update_event_compare(const void *a1, const void *a2)
  ******************************************************************************/
 static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_task_commit_t *task)
 {
-	zbx_vector_mw_task_ptr_t	event_tasks, add_tags_tasks, set_name_tasks, update_event_tasks;
+	zbx_vector_mw_task_ptr_t	event_tasks, add_tags_tasks, sync_tasks;
 
 	zbx_vector_mw_task_ptr_create(&event_tasks);
 	zbx_vector_mw_task_ptr_create(&add_tags_tasks);
-	zbx_vector_mw_task_ptr_create(&set_name_tasks);
-	zbx_vector_mw_task_ptr_create(&update_event_tasks);
+	zbx_vector_mw_task_ptr_create(&sync_tasks);
 
 	for (int i = 0; i < task->tasks.values_num; i++)
 	{
@@ -844,11 +835,8 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 			case CEP_TASK_ADD_TAGS:
 				zbx_vector_mw_task_ptr_append(&add_tags_tasks, task->tasks.values[i]);
 				break;
-			case CEP_TASK_SET_EVENT_NAME:
-				zbx_vector_mw_task_ptr_append(&set_name_tasks, task->tasks.values[i]);
-				break;
-			case CEP_TASK_UPDATE_EVENT:
-				zbx_vector_mw_task_ptr_append(&update_event_tasks, task->tasks.values[i]);
+			case CEP_TASK_SYNC_EVENT:
+				zbx_vector_mw_task_ptr_append(&sync_tasks, task->tasks.values[i]);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported task %d in commit",
@@ -898,23 +886,15 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 		}
 	}
 
-	if (0 != set_name_tasks.values_num)
+	if (0 != sync_tasks.values_num)
 	{
-		zbx_vector_mw_task_ptr_sort(&set_name_tasks, cep_task_set_event_name_compare);
-		cep_db_set_event_names(worker->dbpool, &set_name_tasks);
-	}
-
-	if (0 != update_event_tasks.values_num)
-	{
-		zbx_vector_mw_task_ptr_sort(&set_name_tasks, cep_task_update_event_compare);
-		cep_db_update_events(worker->dbpool, &update_event_tasks);
+		zbx_vector_mw_task_ptr_sort(&sync_tasks, cep_task_update_event_compare);
+		cep_db_sync_events(worker->dbpool, &sync_tasks);
 
 		/* TODO: make update notifications */
 	}
 
-
-	zbx_vector_mw_task_ptr_destroy(&update_event_tasks);
-	zbx_vector_mw_task_ptr_destroy(&set_name_tasks);
+	zbx_vector_mw_task_ptr_destroy(&sync_tasks);
 	zbx_vector_mw_task_ptr_destroy(&add_tags_tasks);
 	zbx_vector_mw_task_ptr_destroy(&event_tasks);
 }
@@ -980,8 +960,7 @@ void	*cep_worker_entry(void *args)
 				case CEP_TASK_COMMIT:
 					cep_worker_process_task_commit(worker, (zbx_cep_task_commit_t *)task);
 					break;
-				case CEP_TASK_SET_EVENT_NAME:
-				case CEP_TASK_UPDATE_EVENT:
+				case CEP_TASK_SYNC_EVENT:
 					/* nop tasks, contains data for commit */
 					break;
 				default:

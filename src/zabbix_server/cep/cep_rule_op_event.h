@@ -22,9 +22,6 @@
 void	cep_event_execute_ops(const zbx_cep_rule_t **matched_rules, int matched_rules_num, int execute_when,
 		zbx_cep_event_context_t *ctx, zbx_cep_event_t **event);
 
-void	cep_event_add_to_rules(zbx_cep_event_handle_t hevent, const zbx_cep_rule_t **matched_rules,
-		int matched_rules_num);
-
 void	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_cep_event_context_t *ctx,
 	zbx_cep_event_t **event);
 

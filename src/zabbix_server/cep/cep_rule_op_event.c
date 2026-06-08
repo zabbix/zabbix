@@ -22,6 +22,21 @@
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
 
+static void	cep_operation_event_execute_set_name(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
+		zbx_cep_event_t **event)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
+
+	if (NULL == *event)
+		*event = cep_event_context_acquire_mutable_event(ctx);
+
+	if (NULL != *event)
+		(*event)->name = zbx_strdup((*event)->name, op->args.set_name.name);
+
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 static void	cep_operation_event_execute_set_severity(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_event_t **event)
 {
@@ -304,6 +319,10 @@ static void	cep_operation_event_execute(const zbx_cep_operation_t *op, int execu
 
 	switch (op->type)
 	{
+		case ZBX_CEP_OP_SET_NAME:
+			if (0 != (CEP_OP_SET_NAME_MASK & CEP_FLAG(execute_when)))
+				cep_operation_event_execute_set_name(op, ctx, event);
+			break;
 		case ZBX_CEP_OP_SET_SEVERITY:
 			if (0 != (CEP_OP_SET_SEVERITY_MASK & CEP_FLAG(execute_when)))
 				cep_operation_event_execute_set_severity(op, ctx, event);
@@ -348,7 +367,6 @@ static void	cep_operation_event_execute(const zbx_cep_operation_t *op, int execu
 			if (0 != (CEP_OP_REMOVE_TAG_MASK & CEP_FLAG(execute_when)))
 				cep_operation_event_remove_tag(op, ctx, event);
 			break;
-		case ZBX_CEP_OP_SET_NAME:
 		case ZBX_CEP_OP_CLOSE:
 		case ZBX_CEP_OP_DISCARD:
 		case ZBX_CEP_OP_COPY_FIRST:

@@ -324,9 +324,7 @@ static int	cep_manager_is_task_pending(zbx_cep_manager_t *manager, const zbx_mw_
 		case CEP_TASK_CLOSE_EVENT:
 			return cep_manager_is_task_event_pending(manager,
 					&((zbx_cep_task_close_event_t *)task)->parent);
-		case CEP_TASK_SET_EVENT_NAME:
-			return cep_manager_is_event_pending(manager, ((zbx_cep_task_set_event_name_t *)task)->eventid);
-		case CEP_TASK_UPDATE_EVENT:
+		case CEP_TASK_SYNC_EVENT:
 			eventid = zbx_cep_event_handle_eventid(((zbx_cep_task_update_event_t *)task)->hevent);
 			return cep_manager_is_event_pending(manager, eventid);
 	}
@@ -432,11 +430,7 @@ static void	cep_manager_process_finished(zbx_cep_manager_t *manager, zbx_vector_
 			case CEP_TASK_ADD_TAGS:
 				zbx_vector_mw_task_ptr_append(&manager->commits, tasks->values[i]);
 				continue;
-			case CEP_TASK_SET_EVENT_NAME:
-				eventid = ((zbx_cep_task_set_event_name_t *)tasks->values[i])->eventid;
-				cep_manager_commit_task(manager, eventid, tasks->values[i]);
-				continue;
-			case CEP_TASK_UPDATE_EVENT:
+			case CEP_TASK_SYNC_EVENT:
 				task_update = (zbx_cep_task_update_event_t *)tasks->values[i];
 				eventid = zbx_cep_event_handle_eventid(task_update->hevent);
 				cep_manager_commit_task(manager, eventid, tasks->values[i]);
