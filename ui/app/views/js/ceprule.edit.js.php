@@ -518,7 +518,7 @@ window.ceprule_edit_popup = new class {
 	 *	- type of calculation row.
 	 */
 	#handleFilterChanged() {
-		const evaltype_select = window['ceprule-filter-evaltype']; // TODO fix IDs to static string cep -> ceprule ..
+		const evaltype_select = window['ceprule-filter-evaltype'];
 		const evaltype_field = evaltype_select.closest('.form-field');
 
 		const conditions = Object.values(this.form.findFieldByName('filter[conditions]').getValue() ?? {});
