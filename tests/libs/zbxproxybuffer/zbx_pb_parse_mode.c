@@ -24,18 +24,19 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*raw;
-	const char	*mode_str;
+	const char	*raw, *mode_str;
 	int		mode, expected_result, result;
 
 	ZBX_UNUSED(state);
 
 	raw = zbx_mock_get_parameter_string("in.mode_str");
+
 	/* sentinel "(null)" maps to a NULL pointer — tests the NULL branch */
 	mode_str = (0 == strcmp(raw, "(null)")) ? NULL : raw;
-	expected_result = zbx_mock_get_parameter_int("out.result");
 
-	mode = -99;
+	expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
+
+	mode = ZBX_PB_MODE_UNSET;
 	result = zbx_pb_parse_mode(mode_str, &mode);
 
 	zbx_mock_assert_result_eq("result", expected_result, result);
