@@ -516,7 +516,7 @@ window.itemtestedit_view_popup = new class {
 
 			return template.evaluateToElement({
 				result: step.result === ''
-					? escapeHtml(<?= json_encode(_('<empty string>')) ?>)
+					? <?= json_encode(_('<empty string>')) ?>
 					: <?= json_encode(_('No value')) ?>
 			});
 		}
