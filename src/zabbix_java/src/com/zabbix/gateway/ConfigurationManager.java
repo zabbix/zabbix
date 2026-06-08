@@ -61,7 +61,7 @@ class ConfigurationManager
 						}
 					}
 				}),
-		new ConfigurationParameter(SERVER, ConfigurationParameter.TYPE_STRING, null,
+		new ConfigurationParameter(SERVER, ConfigurationParameter.TYPE_STRING, "127.0.0.1,::1",
 				null,
 				null),
 		new ConfigurationParameter(LISTEN_IP, ConfigurationParameter.TYPE_INETADDRESS, null,

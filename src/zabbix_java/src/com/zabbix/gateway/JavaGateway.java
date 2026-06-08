@@ -61,10 +61,6 @@ public class JavaGateway
 			ConfigurationManager.parseConfiguration();
 
 			String serverList = (String)ConfigurationManager.getParameter(ConfigurationManager.SERVER).getValue();
-
-			if (null == serverList)
-				serverList = "";
-	
 			int timeout = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.TIMEOUT);
 			AllowedPeers allowedPeers = AllowedPeers.parse(serverList, timeout);
 
