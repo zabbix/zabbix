@@ -4100,8 +4100,8 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 			continue;
 		}
 
-		if (NULL == (trigdep_down = (ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_search(
-				&dc_local()->trigger_depends_links, &td->triggerid_down)))
+		if (NULL == (trigdep_down = (ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_search(&config->trigdeps,
+				&td->triggerid_down)))
 		{
 			zbx_hashset_remove_direct(&dc_local()->trigger_depends_links, td);
 			continue;
@@ -4127,6 +4127,8 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 			else
 				zbx_vector_ptr_remove_noorder(&trigdep_down->dependencies, index);
 		}
+
+		zbx_hashset_remove_direct(&dc_local()->trigger_depends_links, td);
 	}
 
 	zbx_dcsync_sync_end(sync, dbconfig_used_size());

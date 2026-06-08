@@ -573,31 +573,32 @@ static void	correlation_config_sync_operations(zbx_dbsync_t *sync)
 		zbx_correlation_t	*correlation;
 
 		if (NULL == (op = (zbx_dc_corr_operation_t *)zbx_hashset_search(&corr_config->corr_operations, &rowid)))
+		{
 			continue;
+		}
 
-		if (NULL == (ref = (zbx_correlation_ref_t *)zbx_hashset_search(&corr_config->correlations,
+		if (NULL != (ref = (zbx_correlation_ref_t *)zbx_hashset_search(&corr_config->correlations,
 				&op->correlationid)))
 		{
-			continue;
+			correlation = correlation_acquire(ref->correlation);
+
+			switch (op->type)
+			{
+				case ZBX_CORR_OPERATION_CLOSE_OLD:
+					correlation->operations &= ~CORRELATION_OP_CLOSE_OLD;
+					break;
+				case ZBX_CORR_OPERATION_CLOSE_NEW:
+					correlation->operations &= ~CORRELATION_OP_CLOSE_NEW;
+					break;
+				default:
+					THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported correlation operation");
+					continue;
+			}
+
+			correlation_ref_update(ref, correlation);
 		}
 
-		correlation = correlation_acquire(ref->correlation);
-
-		switch (op->type)
-		{
-			case ZBX_CORR_OPERATION_CLOSE_OLD:
-				correlation->operations &= ~CORRELATION_OP_CLOSE_OLD;
-				break;
-			case ZBX_CORR_OPERATION_CLOSE_NEW:
-				correlation->operations &= ~CORRELATION_OP_CLOSE_NEW;
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported correlation operation");
-				continue;
-		}
 		zbx_hashset_remove_direct(&corr_config->corr_operations, op);
-
-		correlation_ref_update(ref, correlation);
 	}
 
 	zbx_dcsync_sync_end(sync, dbconfig_used_size());
@@ -699,22 +700,20 @@ static void	correlation_config_sync_conditions(zbx_dbsync_t *sync)
 			continue;
 		}
 
-		if (NULL == (ref = (zbx_correlation_ref_t *)zbx_hashset_search(&corr_config->correlations,
+		if (NULL != (ref = (zbx_correlation_ref_t *)zbx_hashset_search(&corr_config->correlations,
 				&cond_ref->correlationid)))
 		{
-				continue;
+			correlation = correlation_acquire(ref->correlation);
+			correlation_remove_condition(correlation, cond_ref->condition);
+
+			/* sort the conditions later */
+			if (ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
+				zbx_vector_correlation_ptr_append(&correlations, correlation);
+
+			correlation_ref_update(ref, correlation);
 		}
 
-		correlation = correlation_acquire(ref->correlation);
-		correlation_remove_condition(correlation, cond_ref->condition);
-
-		/* sort the conditions later */
-		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
-			zbx_vector_correlation_ptr_append(&correlations, correlation);
-
 		zbx_hashset_remove_direct(&corr_config->corr_conditions, cond_ref);
-
-		correlation_ref_update(ref, correlation);
 	}
 
 	/* sort conditions by type */

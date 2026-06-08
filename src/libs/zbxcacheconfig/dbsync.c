@@ -2014,7 +2014,7 @@ int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync)
 
 	zbx_dcsync_sql_start(sync);
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select triggerdepid, triggerid_down,triggerid_up from trigger_depends");
+			"select triggerdepid,triggerid_down,triggerid_up from trigger_depends");
 	dbsync_prepare(sync, 3, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
