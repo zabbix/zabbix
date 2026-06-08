@@ -150,12 +150,7 @@ class CMediatypeHelper {
 	public static function getSupportedMediaTypes(): array {
 		global $ZBX_FEATURE_FLAGS;
 
-		$types = [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK];
-
-		if (true) {
-			$types[] = MEDIA_TYPE_PUSH;
-		}
-
+		$types = [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK, MEDIA_TYPE_PUSH];
 		$media_type_denylist = $ZBX_FEATURE_FLAGS['media_type_denylist'];
 
 		return array_diff($types, $media_type_denylist);
