@@ -138,24 +138,44 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	}
 
 	/**
-	 * Extract housekeeping settings dumped by DCdump_config().
+	 * Extract a single DCdump_config() section from a component log.
 	 */
-	private function extractSyncedHousekeeping($component) {
+	private function extractDCDumpSection(string $component, string $start_marker, ?string $stop_marker = null): array {
 		$log = file_get_contents(self::getLogPath($component));
-		$data = explode("\n", $log);
-		$sync = preg_grep('/housekeeping:/', $data);
-		$this->assertNotEmpty($sync);
+		$lines = explode("\n", $log);
 
-		$pid = preg_quote(strtok(array_values($sync)[count($sync) - 1], ':'), '/');
-		$sync_idx = array_keys($sync)[count($sync) - 1];
-		$housekeeping = [];
+		$matching = preg_grep('/'.preg_quote($start_marker, '/').'/', $lines);
+		$this->assertNotEmpty($matching, "Section marker '$start_marker' not found in log.");
 
-		for ($x = $sync_idx + 1; $x < count($data); $x++) {
-			if (!preg_match('/^'.$pid.'/', $data[$x])) {
+		$start_idx = array_key_last($matching);
+		$pid = preg_quote(strtok($lines[$start_idx], ':'), '/');
+
+		$section = [];
+		for ($i = $start_idx + 1; $i < count($lines); $i++) {
+			if (!preg_match('/^'.$pid.':/', $lines[$i])) {
 				continue;
 			}
 
-			$line = preg_replace('/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+\s+/', '', $data[$x]);
+			$line = preg_replace('/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+\s+/', '', $lines[$i]);
+
+			if ($stop_marker !== null && str_contains($line, $stop_marker)) {
+				break;
+			}
+
+			$section[] = $line;
+		}
+
+		return $section;
+	}
+
+	/**
+	 * Extract housekeeping settings dumped by DCdump_config().
+	 */
+	private function extractSyncedHousekeeping($component) {
+		$section = $this->extractDCDumpSection($component, 'housekeeping:', 'default timezone');
+		$housekeeping = [];
+
+		foreach ($section as $line) {
 			$events_pattern = '/events, mode:(\d+) period:\[trigger:(\d+) internal:(\d+) '.
 				'autoreg:(\d+) discovery:(\d+)\]/';
 
@@ -188,9 +208,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 				$housekeeping['hk_trends_global'] = (int) $matches[2];
 				$housekeeping['hk_trends'] = (int) $matches[3];
 			}
-			else if (str_contains($line, 'default timezone')) {
-				break;
-			}
 		}
 
 		return $housekeeping;
@@ -200,13 +217,10 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	 * Extract database settings dumped by DCdump_config().
 	 */
 	private function extractSyncedDbSettings($component) {
-		$log = file_get_contents(self::getLogPath($component));
-		$data = explode("\n", $log);
+		$section = $this->extractDCDumpSection($component, 'db:', 'autoreg_tls_accept:');
 		$db_settings = [];
 
-		foreach ($data as $line) {
-			$line = preg_replace('/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+\s+/', '', $line);
-
+		foreach ($section as $line) {
 			if (preg_match('/extension: (.*)/', $line, $matches)) {
 				$db_settings['db_extension'] = $matches[1];
 			}
@@ -314,6 +328,22 @@ class testHousekeepingConfSync extends CIntegrationTest {
 			'hk_trends_global' => $housekeeping['hk_trends_global'],
 			'hk_trends' => $this->timeToSeconds($housekeeping['hk_trends'])
 		];
+	}
+
+	private function expectedProxyHousekeeping(array $housekeeping) {
+		$expected = $this->expectedServerHousekeeping(self::defaultHousekeeping());
+
+		$expected['hk_history_global'] = $housekeeping['hk_history_global'];
+		$expected['hk_trends'] = 0;
+
+		if ($housekeeping['hk_history_global'] == self::HK_MODE_REGULAR) {
+			$expected['hk_history'] = $this->timeToSeconds($housekeeping['hk_history']);
+		}
+		else {
+			unset($expected['hk_history']);
+		}
+
+		return $expected;
 	}
 
 	private function assertHousekeepingEquals(array $expected, array $actual) {
@@ -626,10 +656,8 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		$this->assertHousekeepingEquals($server_expected, $this->extractSyncedHousekeeping(self::COMPONENT_SERVER));
 
 		$this->reloadProxyAndWaitForConfiguration(true);
-		$proxy_hk = $this->extractSyncedHousekeeping(self::COMPONENT_PROXY);
-		$this->assertArrayHasKey('hk_history', $proxy_hk);
-		$this->assertArrayHasKey('hk_history_global', $proxy_hk);
-		$this->assertEquals($housekeeping['hk_history_global'], $proxy_hk['hk_history_global']);
+		$this->assertHousekeepingEquals($this->expectedProxyHousekeeping($housekeeping),
+				$this->extractSyncedHousekeeping(self::COMPONENT_PROXY));
 	}
 
 	/**
@@ -656,11 +684,8 @@ class testHousekeepingConfSync extends CIntegrationTest {
 
 		$this->reloadProxyAndWaitForConfiguration(true);
 
-		$proxy_hk = $this->extractSyncedHousekeeping(self::COMPONENT_PROXY);
-		$this->assertArrayHasKey('hk_history', $proxy_hk);
-		$this->assertArrayHasKey('hk_history_global', $proxy_hk);
-		$this->assertEquals($this->timeToSeconds($data['update']['hk_history']), $proxy_hk['hk_history']);
-		$this->assertEquals($data['update']['hk_history_global'], $proxy_hk['hk_history_global']);
+		$this->assertHousekeepingEquals($this->expectedProxyHousekeeping($data['update']),
+				$this->extractSyncedHousekeeping(self::COMPONENT_PROXY));
 
 		return true;
 	}
