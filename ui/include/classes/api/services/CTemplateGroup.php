@@ -370,7 +370,7 @@ class CTemplateGroup extends CApiService {
 		$this->validateDelete($groupids, $db_groups);
 
 		$this->unlinkTemplates($db_groups);
-		self::deleteUnusedHgSets($groupids);
+		self::deleteUnusedHgSetGroups($groupids);
 
 		DB::delete('hstgrp', ['groupid' => $groupids]);
 
@@ -477,19 +477,11 @@ class CTemplateGroup extends CApiService {
 	}
 
 	/**
-	 * Deletes template group sets that have no templates linked to them.
+	 * Deletes hgset groups with template group sets that have no templates linked to them.
 	 * This may happen during parallel deletion of templates which have the same template group set.
 	 */
-	private static function deleteUnusedHgSets(array $groupids): void {
-		DBexecute(
-			'DELETE FROM hgset'.
-			' WHERE EXISTS ('.
-				'SELECT NULL'.
-				' FROM hgset_group hg'.
-				' WHERE hgset.hgsetid=hg.hgsetid'.
-					' AND '.dbConditionId('hg.groupid', $groupids).
-			')'
-		);
+	private static function deleteUnusedHgSetGroups(array $groupids): void {
+		DB::delete('hgset_group', ['groupid' => $groupids]);
 	}
 
 	/**
