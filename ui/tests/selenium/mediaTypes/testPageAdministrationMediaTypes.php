@@ -695,10 +695,10 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		// Check error message.
 		if (array_key_exists('inline_error', $data)) {
 				$this->assertInlineError($form, $data['inline_error']);
-			}
-			else {
-				$this->assertMessage(TEST_BAD, 'Media type test failed.', $data['error']);
-			}
+		}
+		else {
+			$this->assertMessage(TEST_BAD, 'Media type test failed.', $data['error']);
+		}
 
 		if (CTestArrayHelper::get($data, 'webhook')) {
 			$form->checkValue(['Response' => 'false']);
