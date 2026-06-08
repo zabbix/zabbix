@@ -20,6 +20,8 @@
 #include "zbxstr.h"
 #include "zbxjson.h"
 
+#define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
+
 typedef	int (*zbx_vault_get_kvs_cb_t)(const char *vault_url, const char *prefix, const char *token, const char *approle,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
@@ -48,7 +50,7 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 			ZBX_HASHICORP_NAME))
 	{
 		if (NULL == config_vault->token && NULL == config_vault->app_role_id &&
-			0 == zbx_strcmp_null(config_vault->name, ZBX_HASHICORP_NAME))
+				0 == zbx_strcmp_null(config_vault->name, ZBX_HASHICORP_NAME))
 		{
 			*error = zbx_dsprintf(*error, "at least one configuration parameter "
 				"(\"VaultToken\" or \"VaultAppRoleID\")"
@@ -58,15 +60,16 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 
 		if (NULL != config_vault->token && NULL != config_vault->app_role_id)
 		{
-			*error = zbx_dsprintf(*error, "Only one authentication method allowed"
-				" \"VaultToken\" or \"VaultAppRoleID\"");
+			*error = zbx_dsprintf(*error, "either \"VaultToken\" or \"VaultAppRoleID\""
+				" configuration parameter or corresponding environment"
+				" variable can be defined but not both");
 			return FAIL;
 		}
 
 		if (NULL != config_vault->app_role_id && NULL == config_vault->app_secret_id)
 		{
 			*error = zbx_dsprintf(*error,
-					" \"VaultAppRoleID\" requires \"VaultAppSecretID\" configuration");
+					"\"VaultAppRoleID\" is defined but \"VaultAppSecretID\" is not defined");
 			return FAIL;
 		}
 

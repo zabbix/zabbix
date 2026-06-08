@@ -362,7 +362,7 @@ void	*zbx_proxyconfig_thread(void *args)
 				case ZBX_RTC_VAULT_NEW_TOKEN:
 					proxyconfig_args_in->config_vault->token =
 						zbx_strdup(proxyconfig_args_in->config_vault->token,
-							(const char*)rtc_data);
+							(const char *)rtc_data);
 					break;
 				case ZBX_RTC_CONFIG_CACHE_RELOAD:
 					config_cache_reload = 1;
@@ -410,7 +410,7 @@ void	*zbx_proxyconfig_thread(void *args)
 				if (SUCCEED != vault_ret && NULL != proxyconfig_args_in->config_vault->token)
 				{
 					zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
-						(unsigned char*)proxyconfig_args_in->config_vault->token,
+						(unsigned char *)proxyconfig_args_in->config_vault->token,
 						strlen(proxyconfig_args_in->config_vault->token) + 1);
 				}
 
@@ -459,7 +459,7 @@ void	*zbx_proxyconfig_thread(void *args)
 		if (SUCCEED != vault_ret && NULL != proxyconfig_args_in->config_vault->token)
 		{
 			zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
-				(unsigned char*)proxyconfig_args_in->config_vault->token,
+				(unsigned char *)proxyconfig_args_in->config_vault->token,
 				strlen(proxyconfig_args_in->config_vault->token) + 1);
 		}
 

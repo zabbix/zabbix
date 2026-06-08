@@ -79,13 +79,13 @@ static int	zbx_vault_app_role_login_hashicorp(const char *url, const char *app_r
 	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "client_token", token, &value_alloc, NULL))
 	{
 		zbx_free(*token);
-		*error = zbx_dsprintf(*error, "cannot find the client_token object in the received JSON object.");
+		*error = zbx_strdup(*error, "cannot find the client_token object in the received JSON object.");
 		goto fail;
 	}
 
 	if (NULL == *token || '\0' == **token)
 	{
-		*error = zbx_dsprintf(*error, "unable to receive token");
+		*error = zbx_strdup(*error, "unable to receive token");
 		goto fail;
 	}
 
@@ -266,7 +266,7 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 					ssl_key_file, config_source_ip, config_ssl_ca_location,
 					config_ssl_cert_location, config_ssl_key_location, timeout, &errmsg, token))
 		{
-			error = zbx_dsprintf(NULL, "unable approle login: %s", errmsg);
+			error = zbx_dsprintf(NULL, "cannot login with approle method: %s", errmsg);
 			zbx_free(errmsg);
 
 			goto out;

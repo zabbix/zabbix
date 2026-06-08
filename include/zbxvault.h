@@ -17,8 +17,6 @@
 
 #include "zbxkvs.h"
 
-#define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
-
 typedef struct
 {
 	char	*name;

@@ -122,7 +122,7 @@ void	*zbx_dbconfig_thread(void *args)
 				case ZBX_RTC_VAULT_NEW_TOKEN:
 					dbconfig_args_in->config_vault->token =
 						zbx_strdup(dbconfig_args_in->config_vault->token,
-								(const char*)rtc_data);
+								(const char *)rtc_data);
 					break;
 				case ZBX_RTC_CONFIG_CACHE_RELOAD:
 					if (0 == cache_reload)
@@ -193,7 +193,7 @@ void	*zbx_dbconfig_thread(void *args)
 			if (SUCCEED != vault_ret && NULL != dbconfig_args_in->config_vault->token)
 			{
 				zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
-						(unsigned char*)dbconfig_args_in->config_vault->token,
+						(unsigned char *)dbconfig_args_in->config_vault->token,
 						strlen(dbconfig_args_in->config_vault->token) + 1);
 			}
 
@@ -224,7 +224,7 @@ void	*zbx_dbconfig_thread(void *args)
 			if (SUCCEED != vault_ret && NULL != dbconfig_args_in->config_vault->token)
 			{
 				zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
-					(unsigned char*)dbconfig_args_in->config_vault->token,
+					(unsigned char *)dbconfig_args_in->config_vault->token,
 					strlen(dbconfig_args_in->config_vault->token) + 1);
 			}
 
