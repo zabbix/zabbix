@@ -6820,6 +6820,13 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 			hgsetids.values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
+	/* hgset_group has to be deleted to prevent error: */
+	/* update or delete on table "hstgrp" violates foreign key constraint on table "hgset_group" */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset_group where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids.values,
+			hgsetids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
 skip_permissions:
 	/* delete sysmaps_elements */
 	DBget_sysmapelements_by_element_type_ids(&ids, SYSMAP_ELEMENT_TYPE_HOST_GROUP, groupids);
