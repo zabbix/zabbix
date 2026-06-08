@@ -82,21 +82,6 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	return result, err
 }
 
-func (p *Plugin) getConnectionTimeout(params map[string]string) (int, error) {
-	connectionTimeout, err := strconv.Atoi(params["ConnectionTimeout"])
-	if err != nil {
-		p.Tracef("failed to convert parameter connection timeout %s", err.Error())
-		connectionTimeout, err = strconv.Atoi(p.options.Default.ConnectionTimeout)
-		if err != nil {
-			p.Tracef("failed to convert default connection timeout %s", err.Error())
-			return 0, errs.New("failed to get connection timeout")
-		}
-
-	}
-
-	return connectionTimeout, nil
-}
-
 // Start implements the Runner interface and performs initialization when plugin is activated.
 func (p *Plugin) Start() {
 	p.connMgr = NewConnManager(
@@ -109,4 +94,20 @@ func (p *Plugin) Start() {
 func (p *Plugin) Stop() {
 	p.connMgr.Destroy()
 	p.connMgr = nil
+}
+
+func (p *Plugin) getConnectionTimeout(params map[string]string) (int, error) {
+	connectionTimeout, err := strconv.Atoi(params["ConnectionTimeout"])
+	if err != nil {
+		p.Tracef("failed to convert parameter connection timeout %s", err.Error())
+
+		connectionTimeout, err = strconv.Atoi(p.options.Default.ConnectionTimeout)
+		if err != nil {
+			p.Tracef("failed to convert default connection timeout %s", err.Error())
+
+			return 0, errs.New("failed to get connection timeout")
+		}
+	}
+
+	return connectionTimeout, nil
 }

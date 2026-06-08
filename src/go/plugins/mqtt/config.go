@@ -77,13 +77,13 @@ func (*Plugin) Validate(opts any) error {
 		return errs.Wrap(err, "plugin config validation failed")
 	}
 
-	for k, s := range o.Sessions {
-		if s.ConnectionTimeout != "" {
-			ct, err := strconv.Atoi(s.ConnectionTimeout)
+	for k := range o.Sessions {
+		if o.Sessions[k].ConnectionTimeout != "" {
+			ct, err := strconv.Atoi(o.Sessions[k].ConnectionTimeout)
 			if err != nil {
 				return errs.Errorf(
 					"connection timeout '%v' must be an integer for session %s",
-					s.ConnectionTimeout,
+					o.Sessions[k].ConnectionTimeout,
 					k,
 				)
 			}
@@ -91,7 +91,7 @@ func (*Plugin) Validate(opts any) error {
 			if ct < 1 || ct > 30 {
 				return errs.Errorf(
 					"connection timeout '%v' for session %s must be between 1 and 30",
-					s.ConnectionTimeout,
+					o.Sessions[k].ConnectionTimeout,
 					k,
 				)
 			}

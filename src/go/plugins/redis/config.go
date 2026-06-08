@@ -69,6 +69,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 func (*Plugin) Validate(options any) error {
 	var (
 		opts pluginOptions
+		ct   int
 	)
 
 	err := conf.UnmarshalStrict(options, &opts)
@@ -76,13 +77,13 @@ func (*Plugin) Validate(options any) error {
 		return errs.Wrap(err, "plugin config validation failed")
 	}
 
-	for k, s := range opts.Sessions {
-		if s.ConnectionTimeout != "" {
-			ct, err := strconv.Atoi(s.ConnectionTimeout)
+	for k := range opts.Sessions {
+		if opts.Sessions[k].ConnectionTimeout != "" {
+			ct, err = strconv.Atoi(opts.Sessions[k].ConnectionTimeout)
 			if err != nil {
 				return errs.Errorf(
 					"connection timeout '%v' must be an integer for session %s",
-					s.ConnectionTimeout,
+					opts.Sessions[k].ConnectionTimeout,
 					k,
 				)
 			}
@@ -90,7 +91,7 @@ func (*Plugin) Validate(options any) error {
 			if ct < 1 || ct > 30 {
 				return errs.Errorf(
 					"connection timeout '%v' for session %s must be between 1 and 30",
-					s.ConnectionTimeout,
+					opts.Sessions[k].ConnectionTimeout,
 					k,
 				)
 			}
@@ -98,7 +99,7 @@ func (*Plugin) Validate(options any) error {
 	}
 
 	if opts.Default.ConnectionTimeout != "" {
-		t, err := strconv.Atoi(opts.Default.ConnectionTimeout)
+		ct, err = strconv.Atoi(opts.Default.ConnectionTimeout)
 		if err != nil {
 			return errs.Errorf(
 				"default connection timeout '%v' must be an integer",
@@ -106,7 +107,7 @@ func (*Plugin) Validate(options any) error {
 			)
 		}
 
-		if t < 1 || t > 30 {
+		if ct < 1 || ct > 30 {
 			return errs.Errorf(
 				"default connection timeout '%v' must be between 1 and 30",
 				opts.Default.ConnectionTimeout,

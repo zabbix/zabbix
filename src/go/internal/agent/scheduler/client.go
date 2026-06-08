@@ -107,6 +107,7 @@ func (c *client) addRequest(
 	var info *pluginInfo
 	var ok bool
 
+	//nolint:wsl_v5 // will be removed when wsl_v5 removed from lint
 	if r.Timeout == nil {
 		r.LegacyTimeout = true
 	}

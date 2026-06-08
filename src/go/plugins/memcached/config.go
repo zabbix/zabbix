@@ -72,13 +72,15 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 
 // Validate implements the Configurator interface.
 // Returns an error if validation of a plugin's configuration is failed.
-func (p *Plugin) Validate(options interface{}) error {
+//
+//nolint:gocyclo,cyclop // will be removed once set defaults can handle ints
+func (p *Plugin) Validate(options any) error {
 	var (
 		opts PluginOptions
-		err  error
+		ct   int
 	)
 
-	err = conf.UnmarshalStrict(options, &opts)
+	err := conf.UnmarshalStrict(options, &opts)
 	if err != nil {
 		return err
 	}
@@ -90,7 +92,7 @@ func (p *Plugin) Validate(options interface{}) error {
 		}
 
 		if session.ConnectionTimeout != "" {
-			ct, err := strconv.Atoi(session.ConnectionTimeout)
+			ct, err = strconv.Atoi(session.ConnectionTimeout)
 			if err != nil {
 				return errs.Errorf(
 					"connection timeout '%v' must be an integer for session %s",
@@ -110,7 +112,7 @@ func (p *Plugin) Validate(options interface{}) error {
 	}
 
 	if opts.Default.ConnectionTimeout != "" {
-		t, err := strconv.Atoi(opts.Default.ConnectionTimeout)
+		ct, err = strconv.Atoi(opts.Default.ConnectionTimeout)
 		if err != nil {
 			return errs.Errorf(
 				"default connection timeout '%v' must be an integer",
@@ -118,7 +120,7 @@ func (p *Plugin) Validate(options interface{}) error {
 			)
 		}
 
-		if t < 1 || t > 30 {
+		if ct < 1 || ct > 30 {
 			return errs.Errorf(
 				"default connection timeout '%v' must be between 1 and 30",
 				opts.Default.ConnectionTimeout,
