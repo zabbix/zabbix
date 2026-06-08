@@ -49,7 +49,7 @@ window.ceprule_operation_edit_popup = new class {
 		this.#setAvailableExecuteWhenOptions();
 		this.#setAvailableOperationOptions();
 		window['ceprule-operation-execute-when'].dispatchEvent(new Event('change'));
-		window['ceprule-operation-action'].dispatchEvent(new Event('change'));
+		window['ceprule-operation-type'].dispatchEvent(new Event('change'));
 
 		window.requestAnimationFrame(() => this.form_element.style.display = '');
 	}
@@ -57,7 +57,7 @@ window.ceprule_operation_edit_popup = new class {
 	#initActions() {
 		this.form_element.addEventListener('change', (e) => {
 			e.target.id === 'ceprule-operation-execute-when' && this.#handleExecuteWhenChanged(e.target.value);
-			e.target.id === 'ceprule-operation-action' && this.#handleActionChanged(e.target.value);
+			e.target.id === 'ceprule-operation-type' && this.#handleActionChanged(e.target.value);
 		}, {capture: true});
 
 		this.form_element.addEventListener('click', (e) => {
@@ -116,7 +116,7 @@ window.ceprule_operation_edit_popup = new class {
 	#setAvailableOperationOptions() {
 		const type = Number(this.form.findFieldByName('type').getValue());
 		const execute_when = Number(this.form.findFieldByName('execute_when').getValue());
-		const zselect = window['ceprule-operation-action'];
+		const zselect = window['ceprule-operation-type'];
 
 		const events_options = [];
 		const tags_options = [];
