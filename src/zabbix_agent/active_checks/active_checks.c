@@ -1243,10 +1243,10 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
 		const char *config_hostname, int config_buffer_send, int config_buffer_size)
 {
-	int			ret = SUCCEED, ret_metrics, ret_commands, now, level;
-	char			*data = NULL;
-	struct zbx_json		json;
-	static int		retry_after;
+	int				ret = SUCCEED, ret_metrics, ret_commands, now, level;
+	char				*data = NULL;
+	struct zbx_json			json;
+	static ZBX_THREAD_LOCAL int	retry_after;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d entries:%d/%d",
 			__func__, ((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
