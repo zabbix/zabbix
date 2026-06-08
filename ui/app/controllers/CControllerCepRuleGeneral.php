@@ -166,7 +166,9 @@ abstract class CControllerCepRuleGeneral extends CController {
 						'evaltype' => ['db cep_rule.evaltype', 'required',
 							'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]
 						],
-						'conditions' => ['objects', 'fields' => self::getWindowConditionValidationFields()],
+						'conditions' => ['objects', 'required', 'not_empty',
+							'fields' => self::getWindowConditionValidationFields()
+						],
 						'formula' => ['db cep_rule.formula', 'required', 'not_empty',
 							// Only parser for syntax check. TODO: we had work in progress on validator that is not merged yet?
 							'use' => [CConditionFormulaParser::class, []],
