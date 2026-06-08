@@ -695,8 +695,6 @@ window.ceprule_edit_popup = new class {
 		});
 
 		ceprule_window_condition_edit_popup.init({rules: this.#window_condition_rules, window_condition, overlay});
-
-		console.warn('openWindowConditionPopup', window_condition);
 	}
 
 	#openOperationPopup(operation, trigger_element) {
