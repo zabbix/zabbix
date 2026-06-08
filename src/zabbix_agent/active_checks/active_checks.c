@@ -1257,8 +1257,13 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 	zbx_json_addint64(&json, ZBX_PROTO_TAG_VARIANT, ZBX_PROGRAM_VARIANT_AGENT);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, config_hostname, ZBX_JSON_TYPE_STRING);
 
-	if (ZBX_HISTORY_UPLOAD_DISABLED_WITH_RETRY == history_upload && 0 != retry_after && retry_after < now)
-		history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
+	if (0 != retry_after)
+	{
+		if (ZBX_HISTORY_UPLOAD_DISABLED == history_upload)
+			retry_after = 0;
+		else if (ZBX_HISTORY_UPLOAD_DISABLED_WITH_RETRY == history_upload && retry_after < now)
+			history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
+	}
 
 	ret_metrics = format_metric_results(&json, now, config_buffer_send, config_buffer_size);
 	ret_commands = format_command_results(&json);
