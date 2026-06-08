@@ -57,7 +57,7 @@ void	zbx_mock_test_entry(void **state)
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("in.buffer_size", &hparam))
 		zbx_mock_uint64(hparam, &buffer_size);
 
-	g_nextid = 1;
+	zbx_pb_mock_set_nextid(1);
 
 	zbx_mock_assert_result_eq("locks_create", SUCCEED, zbx_locks_create(&error));
 	zbx_mock_assert_result_eq("pb_create", SUCCEED,

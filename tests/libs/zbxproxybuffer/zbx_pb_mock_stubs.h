@@ -18,8 +18,8 @@
 #include "zbxcommon.h"
 
 /* Monotonic ID counter used by zbx_dc_get_nextid stub.
- * Tests that write rows must set g_nextid = 1 at the start of
- * zbx_mock_test_entry; tests that never write rows can leave it at 0. */
-extern zbx_uint64_t	g_nextid;
+ * Tests that write rows must call zbx_pb_mock_set_nextid(1) at the start of
+ * zbx_mock_test_entry; tests that never write rows can skip this. */
+void	zbx_pb_mock_set_nextid(zbx_uint64_t id);
 
 #endif
