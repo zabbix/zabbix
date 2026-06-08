@@ -81,6 +81,8 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 		return nil, err
 	}
 
+	p.Tracef("connection timeout set to: %d", connectionTimeout)
+
 	conn, err := p.connMgr.GetConnection(*connDetails, connectionTimeout)
 	if err != nil {
 		p.Errf("%s failed: %v\n", key, err.Error())
@@ -99,7 +101,6 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 	}
 
 	p.Tracef("query timeout set to: %d", ctx.Timeout())
-	p.Tracef("connectionTimeout timeout set to: %d", connectionTimeout)
 
 	result, err := handleMetric(ctx, conn, params, extraParams...)
 	if err != nil {

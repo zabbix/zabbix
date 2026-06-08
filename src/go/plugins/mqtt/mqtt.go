@@ -146,6 +146,8 @@ func (p *Plugin) EventSourceByKey(rawKey string) (watch.EventSource, error) {
 		return nil, err
 	}
 
+	p.Tracef("connection timeout set to: %d", connectionTimeout)
+
 	var (
 		client *mqttClient
 		ok     bool

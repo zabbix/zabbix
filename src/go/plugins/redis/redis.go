@@ -70,6 +70,8 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, err
 	}
 
+	p.Tracef("connection timeout set to: %d", connectionTimeout)
+
 	connection, err := p.connMgr.GetConnection(redisURI, params, connectionTimeout)
 	if err != nil {
 		// Special logic of processing connection errors is used if redis.ping is requested

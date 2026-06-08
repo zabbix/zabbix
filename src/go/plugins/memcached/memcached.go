@@ -67,6 +67,8 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, err
 	}
 
+	p.Tracef("connection timeout set to: %d", connectionTimeout)
+
 	handleMetric := getHandlerFunc(key)
 	if handleMetric == nil {
 		return nil, zbxerr.ErrorUnsupportedMetric
