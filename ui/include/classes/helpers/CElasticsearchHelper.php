@@ -27,6 +27,7 @@ class CElasticsearchHelper {
 
 	/**
 	 * Perform request to Elasticsearch.
+	 * Return empty string for failed request.
 	 *
 	 * @param string $method      HTTP method to be used to perform request
 	 * @param string $endpoint    requested url
@@ -49,16 +50,11 @@ class CElasticsearchHelper {
 			$options['http']['content'] = $request;
 		}
 
-		try {
-			$result = file_get_contents($endpoint, false, stream_context_create($options));
-		}
-		catch (Exception $e) {
-			error($e->getMessage(), true);
-		}
+		$result = file_get_contents($endpoint, false, stream_context_create($options));
 
 		CProfiler::getInstance()->profileElasticsearch(microtime(true) - $time_start, $method, $endpoint, $request);
 
-		return $result;
+		return $result === false ? '' : $result;
 	}
 
 	/**
