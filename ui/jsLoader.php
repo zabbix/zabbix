@@ -652,8 +652,12 @@ $translate_strings = [
 		'No data' => _('No data')
 	],
 	'common.js' => [
+		'Add' => _('Add'),
 		'Cancel' => _('Cancel'),
+		'Condition details' => _('Condition details'),
+		'Historical condition details' => _('Historical condition details'),
 		'Ok' => _('Ok'),
+		'Operation details' => _('Operation details'),
 		'Unexpected server error.' => _('Unexpected server error.')
 	],
 	'macrovalue.js' => [
