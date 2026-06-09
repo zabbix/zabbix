@@ -29,6 +29,12 @@ class CFieldArray extends CFieldCollection {
 		return result;
 	}
 
+	normalizeSubfieldName(subfield_name, index) {
+		const subname = super.normalizeSubfieldName(subfield_name, index);
+
+		return subname === '[]' ? index : subname.substring(1, subname.length - 1);
+	}
+
 	_fieldsSetErrors(errors, force_display_errors) {
 		for (const [key, field_errors] of Object.entries(errors)) {
 			const key_full = key.replaceAll('[', '').replaceAll(']', '');
