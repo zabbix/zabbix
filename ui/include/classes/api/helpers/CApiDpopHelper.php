@@ -232,7 +232,7 @@ class CApiDpopHelper {
 	// todo - REMOVE THIS AFTER REPLACING WITH ORIGINAL METHODS
 
 	public static function getServerId(): string {
-		return 'server_id';
+		return '018f9c6a-7c1b-7f3a-9b2d-5c4f8e6a1d90';
 	}
 
 	/**
