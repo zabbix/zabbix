@@ -57,11 +57,11 @@ require_once __DIR__.'/js/report.status.js.php';
 	)
 	->show();
 
-(new CScriptTag('
-	view.init('.json_encode([
+(new CScriptTag(
+	'view.init('.json_encode([
 		'export_file_name' => $data['export_file_name'],
 		'export_payload' => $data['export_payload']
-	]).');
-'))
+	]).');'
+))
 	->setOnDocumentReady()
 	->show();
