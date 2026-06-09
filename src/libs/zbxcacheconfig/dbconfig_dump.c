@@ -925,8 +925,8 @@ static void	DCdump_triggers(void)
 				trigger->event_name, trigger->type, trigger->status, trigger->priority);
 		zabbix_log(LOG_LEVEL_TRACE, "  expression:'%s' recovery_expression:'%s'", trigger->expression,
 				trigger->recovery_expression);
-		zabbix_log(LOG_LEVEL_TRACE, "  value:%u state:%u error:'%s' lastchange:%d", trigger->value,
-				trigger->state, ZBX_NULL2EMPTY_STR(trigger->error), trigger->lastchange);
+		zabbix_log(LOG_LEVEL_TRACE, "  value:%u state:%u error:'%s'", trigger->value,
+				trigger->state, ZBX_NULL2EMPTY_STR(trigger->error));
 		zabbix_log(LOG_LEVEL_TRACE, "  correlation_tag:'%s' recovery_mode:'%u' correlation_mode:'%u'",
 				trigger->correlation_tag, trigger->recovery_mode, trigger->correlation_mode);
 		zabbix_log(LOG_LEVEL_TRACE, "  topoindex:%u functional:%u locked:%u", trigger->topoindex,

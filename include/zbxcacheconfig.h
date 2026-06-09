@@ -425,7 +425,6 @@ typedef struct _DC_TRIGGER
 	unsigned char		*expression_bin;
 	unsigned char		*recovery_expression_bin;
 	zbx_timespec_t		timespec;
-	int			lastchange;
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;

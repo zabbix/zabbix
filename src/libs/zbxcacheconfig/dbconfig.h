@@ -53,7 +53,6 @@ typedef struct
 	const char		*event_name;
 	const unsigned char	*expression_bin;
 	const unsigned char	*recovery_expression_bin;
-	int			lastchange;
 	zbx_uint64_t		revision;
 	zbx_uint64_t		timer_revision;
 	unsigned char		topoindex;

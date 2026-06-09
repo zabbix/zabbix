@@ -3891,7 +3891,6 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_vector_trigger_ptr_t *trigge
 			dc_strpool_replace(found, &trigger->error, row[3]);
 			trigger->value = 0;
 			ZBX_STR2UCHAR(trigger->state, row[6]);
-			trigger->lastchange = atoi(row[7]);
 			trigger->locked = 0;
 			trigger->timer_revision = 0;
 
@@ -9770,7 +9769,6 @@ void	DCget_trigger(zbx_dc_trigger_t *dst_trigger, const ZBX_DC_TRIGGER *src_trig
 	dst_trigger->value = src_trigger->value;
 	dst_trigger->state = src_trigger->state;
 	dst_trigger->new_value = TRIGGER_VALUE_UNKNOWN;
-	dst_trigger->lastchange = src_trigger->lastchange;
 	dst_trigger->topoindex = src_trigger->topoindex;
 	dst_trigger->status = src_trigger->status;
 	dst_trigger->recovery_mode = src_trigger->recovery_mode;
@@ -12441,9 +12439,6 @@ void	zbx_dc_config_triggers_apply_changes(zbx_trigger_diff_t **trigger_diffs, in
 
 		if (NULL == (dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &diff->triggerid)))
 			continue;
-
-		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE))
-			dc_trigger->lastchange = diff->lastchange;
 
 		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE))
 			dc_trigger->value = diff->value;
