@@ -13691,11 +13691,11 @@ unsigned int	zbx_dc_get_auto_registration_action_count(void)
 {
 	unsigned int count;
 
-	RDLOCK_CACHE;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	count = config->auto_registration_actions;
 
-	UNLOCK_CACHE;
+	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	return count;
 }
@@ -17010,7 +17010,7 @@ static void	dc_get_trigger_deps_rec(const ZBX_DC_TRIGGER_DEPLIST *trigdep, int l
 
 void	zbx_dc_get_trigger_deps(zbx_vector_dc_trigger_t *triggers)
 {
-	RDLOCK_CACHE;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	ZBX_DC_TRIGGER_DEPLIST	*trigdep;
 
@@ -17024,7 +17024,7 @@ void	zbx_dc_get_trigger_deps(zbx_vector_dc_trigger_t *triggers)
 		dc_get_trigger_deps_rec(trigdep, 0, &triggers->values[i]->dep_triggerids);
 	}
 
-	UNLOCK_CACHE;
+	UNLOCK_CACHE_CONFIG_HISTORY;
 }
 
 void	zbx_dc_get_trigger_deps_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uint64_t *depids)
