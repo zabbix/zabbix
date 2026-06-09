@@ -292,7 +292,7 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 		goto out;
 	}
 
-	if (FAIL == zbx_json_open(body.data, jp_body))
+	if (NULL == body.data || FAIL == zbx_json_open(body.data, jp_body))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));

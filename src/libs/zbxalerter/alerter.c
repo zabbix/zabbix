@@ -672,7 +672,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		goto out;
 	}
 
-	if (FAIL == zbx_json_open(body.data, &jp_body))
+	if (NULL == body.data || FAIL == zbx_json_open(body.data, &jp_body))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));

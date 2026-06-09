@@ -1123,9 +1123,6 @@ static int	DBpatch_7050085(void)
 			NULL
 	};
 
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	for (int i = 0; NULL != values[i]; i++)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("insert into media_type_message (%s) values (" ZBX_FS_UI64 ","
