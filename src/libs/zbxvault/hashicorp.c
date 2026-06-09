@@ -140,7 +140,8 @@ int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const
 		}
 		else
 		{
-			*error = zbx_dsprintf(*error, "token not available");
+			*error = zbx_dsprintf(*error, "Vault token is not available."
+					" AppRole authentication failed or token expired");
 		}
 
 		return FAIL;

@@ -168,7 +168,7 @@ int	zbx_vault_db_credentials_get(zbx_config_vault_t *config_vault, char **dbuser
 
 		if (NULL == config_vault->token)
 		{
-			*error = zbx_dsprintf(*error, "cannot approle login");
+			*error = zbx_dsprintf(*error, "cannot login with AppRole method");
 			goto fail;
 		}
 	}
