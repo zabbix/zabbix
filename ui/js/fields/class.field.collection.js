@@ -102,6 +102,14 @@ class CFieldCollection extends CField {
 		return subfield_name.substring(this.getName().length);
 	}
 
+	bindDiscoveredFieldChangeEvent(discovered_field, field_type) {
+		discovered_field.addEventListener('field.change', (e) => {
+			if (!e.target.hasAttribute('data-prevent-validation-on-change')) {
+				this.fieldChanged(e.detail.source_fields);
+			}
+		});
+	}
+
 	#discoverAllFields() {
 		const fields = Object.create(null);
 		const fields_rediscovered = [];
@@ -127,11 +135,7 @@ class CFieldCollection extends CField {
 					field_instance.init();
 					field_instance.setTabId(this._tab_id);
 
-					discovered_field.addEventListener('field.change', (e) => {
-						if (!e.target.hasAttribute('data-prevent-validation-on-change')) {
-							this.fieldChanged([this.getName(), ...e.detail.source_fields]);
-						}
-					});
+					this.bindDiscoveredFieldChangeEvent(discovered_field, field_type);
 				}
 
 				if (!field_instance.getName().startsWith(this.getName())) {

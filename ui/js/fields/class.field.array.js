@@ -35,6 +35,19 @@ class CFieldArray extends CFieldCollection {
 		return subname === '[]' ? index : subname.substring(1, subname.length - 1);
 	}
 
+	bindDiscoveredFieldChangeEvent(discovered_field, field_type) {
+		if (field_type === 'checkbox') {
+			discovered_field.addEventListener('field.change', (e) => {
+				if (!e.target.hasAttribute('data-prevent-validation-on-change')) {
+					this.fieldChanged([this.getName(), ...e.detail.source_fields]);
+				}
+			});
+		}
+		else {
+			super.bindDiscoveredFieldChangeEvent(discovered_field, field_type);
+		}
+	}
+
 	_fieldsSetErrors(errors, force_display_errors) {
 		for (const [key, field_errors] of Object.entries(errors)) {
 			const key_full = key.replaceAll('[', '').replaceAll(']', '');
