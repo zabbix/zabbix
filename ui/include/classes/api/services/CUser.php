@@ -4124,7 +4124,7 @@ class CUser extends CApiService {
 		$preferred_mediatypeid = array_key_first($db_media_types);
 
 		$db_users = DB::select('users', [
-			'output' => ['userid', 'username'],
+			'output' => ['userid', 'roleid', 'username'],
 			'filter' => ['userid' => $userid],
 			'preservekeys' => true
 		]);
@@ -4168,6 +4168,9 @@ class CUser extends CApiService {
 		}
 		unset($db_user, $user);
 
+		$db_roles = self::getDbRoles($users, $db_users);
+		self::addRoleType($users, $db_roles, $db_users);
+
 		self::updateForce($users, $db_users);
 	}
 
@@ -4188,7 +4191,7 @@ class CUser extends CApiService {
 		]);
 
 		$db_users = DB::select('users', [
-			'output' => ['userid', 'username'],
+			'output' => ['userid', 'roleid', 'username'],
 			'filter' => ['userid' => $userid],
 			'preservekeys' => true
 		]);
@@ -4224,6 +4227,9 @@ class CUser extends CApiService {
 			$db_user['medias'] = $db_user_medias;
 		}
 		unset($db_user);
+
+		$db_roles = self::getDbRoles($users, $db_users);
+		self::addRoleType($users, $db_roles, $db_users);
 
 		self::updateForce($users, $db_users);
 	}
