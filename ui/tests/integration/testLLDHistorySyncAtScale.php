@@ -671,6 +671,26 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
+	 * Send value 0 (OK) for all items again after recovering from the UNKNOWN state; triggers
+	 * are already OK so their value must stay unchanged.
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerRecoverUnknown
+	 */
+	public function testLLDHistorySyncAtScale_TriggerUnchangedZeroSend() {
+		self::$vps_last = $this->getVpsWritten();
+		$this->sendHistoryAt(time(), '0');
+	}
+
+	/**
+	 * Verify that the VPS written counter increased by the number of zero values sent.
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerUnchangedZeroSend
+	 */
+	public function testLLDHistorySyncAtScale_TriggerUnchangedZeroVpsWritten() {
+		$this->assertVpsWrittenIncreasedBy(self::$vps_last, self::$total_expected);
+	}
+
+	/**
 	 * Update each trigger prototype expression to nodata(...,30s)=1 and verify that
 	 * all discovered triggers fire after the no-data window elapses.
 	 *
