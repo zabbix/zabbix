@@ -1721,7 +1721,6 @@ define('ZBX_LAYOUT_JSON',		'layout.json');
 define('ZBX_LAYOUT_PRINT',		'layout.print');
 define('ZBX_LAYOUT_WARNING',	'layout.warning');
 define('ZBX_LAYOUT_WIDGET',		'layout.widget');
-define('ZBX_LAYOUT_CSV',		'layout.csv');
 
 // Layout
 define('ZBX_LAYOUT_NORMAL',		0);
