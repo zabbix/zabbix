@@ -94,7 +94,7 @@ class CDataTable {
 	/**
 	 * @type {number}
 	 */
-	static COLUMN_INITIAL_MIN_WIDTH = 50;
+	static COLUMN_INITIAL_MIN_WIDTH = 32;
 
 	/**
 	 * @type {number}
@@ -109,7 +109,7 @@ class CDataTable {
 	/**
 	 * @type {number}
 	 */
-	static COLUMN_OPTIONS_BUTTON_WIDTH = 31;
+	static COLUMN_OPTIONS_BUTTON_WIDTH = 32;
 
 	/**
 	 * @type {number}
@@ -2238,15 +2238,14 @@ class CDataTable {
 		let min_width = CDataTable.COLUMN_INITIAL_MIN_WIDTH;
 
 		if (column.getOptionsPopupHandler()) {
-			min_width += CDataTable.COLUMN_OPTIONS_BUTTON_WIDTH + CDataTable.COLUMN_HEADER_PADDING;
+			min_width += CDataTable.COLUMN_OPTIONS_BUTTON_WIDTH;
+		}
+		else {
+			min_width += CDataTable.COLUMN_HEADER_PADDING;
 		}
 
 		if (column.isSortable()) {
 			min_width += CDataTable.COLUMN_SORTABLE_ARROW_WIDTH;
-		}
-
-		if (this.#customizable && this.#visible_columns.at(-1) === column) {
-			min_width += CDataTable.TABLE_OPTIONS_BUTTON_WIDTH;
 		}
 
 		return min_width;
