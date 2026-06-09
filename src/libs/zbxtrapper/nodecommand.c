@@ -425,6 +425,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 			if (SUCCEED == zbx_dc_get_host_proxyid_by_name(host.host, &proxyid))
 				host.proxyid = proxyid;
+			else
+				host.proxyid = 0;
 		}
 	}
 	else /* eventid */
