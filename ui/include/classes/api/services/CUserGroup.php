@@ -1398,7 +1398,7 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Deletes ugset groups with user group sets that have no users linked to them.
+	 * Deletes ugset groups of user group sets that have no users linked to them.
 	 * This may happen during parallel deletion of users which have the same user group set.
 	 */
 	private static function deleteUnusedUgSetGroups(array $usrgrpids): void {

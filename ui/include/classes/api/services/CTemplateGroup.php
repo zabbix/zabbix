@@ -477,7 +477,7 @@ class CTemplateGroup extends CApiService {
 	}
 
 	/**
-	 * Deletes hgset groups with template group sets that have no templates linked to them.
+	 * Deletes hgset groups of template group sets that have no templates linked to them.
 	 * This may happen during parallel deletion of templates which have the same template group set.
 	 */
 	private static function deleteUnusedHgSetGroups(array $groupids): void {

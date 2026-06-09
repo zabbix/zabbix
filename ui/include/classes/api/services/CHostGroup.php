@@ -473,7 +473,7 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Deletes hgset groups with host group sets that have no hosts linked to them.
+	 * Deletes hgset groups of host group sets that have no hosts linked to them.
 	 * This may happen during parallel deletion of hosts which have the same host group set.
 	 */
 	private static function deleteUnusedHgSetGroups(array $groupids): void {
