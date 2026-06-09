@@ -149,7 +149,8 @@ $tabs->addTab('overridesTab', _('Overrides'),
 				(new CDiv($overrides_table))
 					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			)
-		])
+		]),
+	TAB_INDICATOR_OVERRIDES
 );
 
 $form->addItem($tabs);

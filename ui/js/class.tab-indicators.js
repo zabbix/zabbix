@@ -49,7 +49,8 @@ class TabIndicators {
 		const GRAPH = document.querySelector('form.dashboard-widget-svggraph');
 		const HOST = document.querySelector('#host-form');
 		const HOST_DISCOVERY = document.querySelector('#lldrule-form');
-		const HOST_PROTOTYPE = document.querySelector('#lldrule-prototype-form');
+		const HOST_DISCOVERY_PROTOTYPE = document.querySelector('#lldrule-prototype-form');
+		const HOST_PROTOTYPE = document.querySelector('#host-prototype-form');
 		const ITEM = document.querySelector('#item-form');
 		const ITEM_PROTOTYPE = document.querySelector('#item-prototype-form');
 		const MAP = document.querySelector('#sysmap-form');
@@ -80,6 +81,8 @@ class TabIndicators {
 				return HOST;
 			case !!HOST_DISCOVERY:
 				return HOST_DISCOVERY;
+			case !!HOST_DISCOVERY_PROTOTYPE:
+				return HOST_DISCOVERY_PROTOTYPE;
 			case !!HOST_PROTOTYPE:
 				return HOST_PROTOTYPE;
 			case !!PROXY:
