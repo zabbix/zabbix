@@ -71,20 +71,21 @@ class CFieldSet extends CFieldCollection {
 			const key_full = key.charAt(0) === '[' ? key : `[${key}]`;
 
 			if (key_full in this.getFields()) {
+				const field = this.getFields()[key_full];
 				// These errors need to be added even if field is not changed, but smaller index one was.
 				const error_levels = [CFormValidator.ERROR_LEVEL_UNIQ,
 					CFormValidator.ERROR_LEVEL_OBJECTS_COUNT
 				];
 
-				if (this.getFields()[key_full] instanceof CFieldCollection) {
-					this.getFields()[key_full].setErrors(field_errors, force_display_errors);
-					this._global_errors = {...this._global_errors, ...this.getFields()[key_full].getGlobalErrors()};
+				if (field instanceof CFieldCollection) {
+					field.setErrors(field_errors, force_display_errors);
+					this._global_errors = {...this._global_errors, ...field.getGlobalErrors()};
 				}
-				else if (this.getFields()[key_full].hasChanged() || this.#hasObjectChanged(key_full) || force_display_errors
+				else if (field.hasChanged() || this.#hasObjectChanged(key_full) || force_display_errors
 						|| field_errors.some((error) => error.message === '' || error_levels.includes(error.level))) {
-					field_errors.forEach((error) => this.getFields()[key_full].setErrors(error));
+					field_errors.forEach((error) => field.setErrors(error));
 
-					this._global_errors = {...this._global_errors, ...this.getFields()[key_full].getGlobalErrors()};
+					this._global_errors = {...this._global_errors, ...field.getGlobalErrors()};
 				}
 			}
 			else if (errors[key] !== '') {

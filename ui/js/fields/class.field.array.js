@@ -40,19 +40,20 @@ class CFieldArray extends CFieldCollection {
 			const key_full = key.replaceAll('[', '').replaceAll(']', '');
 
 			if (key_full in this.getFields()) {
+				const field = this.getFields()[key_full];
 				// These errors need to be added even if field is not changed, but smaller index one was.
 				const error_levels = [CFormValidator.ERROR_LEVEL_UNIQ,
 					CFormValidator.ERROR_LEVEL_OBJECTS_COUNT
 				];
 
-				if (this.getFields()[key_full].hasChanged() || force_display_errors
+				if (field.hasChanged() || force_display_errors
 						|| field_errors.some((error) => error.message === '' || error_levels.includes(error.level))) {
-					field_errors.forEach((error) => this.getFields()[key_full].setErrors(error));
+					field_errors.forEach((error) => field.setErrors(error));
 
-					this._global_errors = {...this._global_errors, ...this.getFields()[key_full].getGlobalErrors()};
+					this._global_errors = {...this._global_errors, ...field.getGlobalErrors()};
 				}
 			}
-			else if (errors[key_full] !== '') {
+			else if (errors[key] !== '') {
 				// Field is not present in fields, display generic error.
 				let extended_name = this.getName() + key;
 				extended_name = '/' + extended_name.replaceAll('[', '/').replaceAll(']', '');

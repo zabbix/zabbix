@@ -418,7 +418,6 @@ class CForm {
 								);
 							}
 
-
 							subset_errors_set = true;
 						}
 

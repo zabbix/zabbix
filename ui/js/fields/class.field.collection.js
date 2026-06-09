@@ -72,9 +72,9 @@ class CFieldCollection extends CField {
 		this.setChanged();
 		const child_fields = Object.values(this.#fields).map((field) => field.getName());
 
-		this._field.dispatchEvent(new CustomEvent('field.change', {detail: {
-				source_fields: [this.getName(), ...child_fields]
-			}}));
+		this._field.dispatchEvent(new CustomEvent('field.change',
+			{detail: {source_fields: [this.getName(), ...child_fields]}}
+		));
 	}
 
 	/**
