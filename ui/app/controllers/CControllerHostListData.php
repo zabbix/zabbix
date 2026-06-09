@@ -359,7 +359,7 @@ class CControllerHostListData extends CControllerDataTable {
 	}
 
 	protected function resolveCustomText(array &$hosts, array $custom_text): void {
-		$custom_text = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($custom_text, array_keys($hosts));
+		$custom_text = CMacrosResolverHelper::resolveHostMacros($custom_text, array_keys($hosts));
 
 		foreach ($custom_text as $key => $values) {
 			foreach ($values as $hostid => $value) {

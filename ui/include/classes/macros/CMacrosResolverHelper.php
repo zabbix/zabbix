@@ -500,15 +500,27 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve text-type column macros for top-hosts widget.
+	 * Resolve host macros.
 	 *
 	 * @param array $columns
 	 * @param array $hostids
 	 *
 	 * @return array
 	 */
-	public static function resolveWidgetTopHostsTextColumns(array $columns, array $hostids): array {
-		return CMacrosResolver::resolveWidgetTopHostsTextColumns($columns, $hostids);
+	public static function resolveHostMacros(array $columns, array $hostids): array {
+		return CMacrosResolver::resolveHostMacros($columns, $hostids, ['context' => 'host']);
+	}
+
+	/**
+	 * Resolve template macros.
+	 *
+	 * @param array $columns
+	 * @param array $hostids
+	 *
+	 * @return array
+	 */
+	public static function resolveTemplateMacros(array $columns, array $hostids): array {
+		return CMacrosResolver::resolveHostMacros($columns, $hostids, ['context' => 'template']);
 	}
 
 	/**

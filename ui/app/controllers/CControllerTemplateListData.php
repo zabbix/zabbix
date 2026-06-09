@@ -197,7 +197,7 @@ class CControllerTemplateListData extends CControllerDataTable {
 	}
 
 	protected function resolveCustomText(array &$templates, array $custom_text): void {
-		$custom_text = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($custom_text, array_keys($templates));
+		$custom_text = CMacrosResolverHelper::resolveTemplateMacros($custom_text, array_keys($templates));
 
 		foreach ($custom_text as $key => $values) {
 			foreach ($values as $hostid => $value) {

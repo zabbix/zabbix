@@ -102,7 +102,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
-		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
+		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values, 'host');
 		// Interface macros, macro should be resolved to main agent interface.
 		$macro_values = self::getMainAgentInterfaceMacrosByHostId($macros['interface'], $macro_values);
 		// Interface macros, macro should be resolved to interface with highest priority.
@@ -1160,20 +1160,29 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve text-type column macros for top-hosts widget.
 	 *
-	 * @param array $columns
-	 * @param array $hostids
+	 * @param array  $columns
+	 * @param array  $hostids
+	 * @param string $options['context']  'host', 'template'
 	 *
 	 * @return array
 	 */
-	public static function resolveWidgetTopHostsTextColumns(array $columns, array $hostids): array {
-		$types = [
-			'macros' => [
-				'host' => ['{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
-				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
+	public static function resolveHostMacros(array $columns, array $hostids, array $options): array {
+		$types = match ($options['context']) {
+			'host' => [
+				'macros' => [
+					'host' => ['{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
+					'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+					'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
+				],
+				'usermacros' => true
 			],
-			'usermacros' => true
-		];
+			'template' => [
+				'macros' => [
+					'host' => ['{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}']
+				],
+				'usermacros' => true
+			]
+		};
 
 		$macro_values = [];
 		$macros = ['host' => [], 'interface' => [], 'inventory' => [], 'usermacros' => []];
@@ -1196,7 +1205,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
-		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
+		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values, $options['context']);
 		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
@@ -1631,7 +1640,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$macro_values = self::getMapMacros($macros['map'], $macro_values);
 		$macro_values = self::getAggrTriggerMacros($macros['triggers'], $macro_values, $selements);
-		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
+		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values, 'host');
 		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 
@@ -2019,7 +2028,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
-		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
+		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values, 'host');
 		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 		$macro_values = self::getUserDataMacros($macros['user_data'], $macro_values);

@@ -1757,23 +1757,36 @@ class CMacrosResolverGeneral {
 	 * @param array  $macro_values
 	 * @param array  $macro_values[<hostid>]
 	 * @param string $macro_values[<hostid>][<token>]
+	 * @param string $options['context']               'host', 'template'
 	 *
 	 * @return array
 	 */
-	protected static function getHostMacrosByHostId(array $macros, array $macro_values): array {
+	protected static function getHostMacrosByHostId(array $macros, array $macro_values, string $context): array {
 		if (!$macros) {
 			return $macro_values;
 		}
 
-		$db_hosts = API::Host()->get([
-			'output' => ['host', 'name', 'description'],
-			'hostids' => array_keys($macros),
-			'preservekeys' => true
-		]);
+		$db_hosts = match($context) {
+			'host' => API::Host()->get([
+				'output' => ['hostid', 'host', 'name', 'description'],
+				'hostids' => array_keys($macros),
+				'preservekeys' => true
+			]),
+			'template' => API::Template()->get([
+				'output' => ['templateid', 'host', 'name', 'description'],
+				'templateids' => array_keys($macros),
+				'preservekeys' => true
+			])
+		};
 
-		$host_macros = ['HOST.ID' => 'hostid', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
-			'HOST.DESCRIPTION' => 'description'
-		];
+		$host_macros =  match($context) {
+			'host' => ['HOST.ID' => 'hostid', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
+				'HOST.DESCRIPTION' => 'description'
+			],
+			'template' => ['HOST.ID' => 'templateid', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
+				'HOST.DESCRIPTION' => 'description'
+			]
+		};
 
 		foreach ($db_hosts as $hostid => $db_host) {
 			foreach ($macros[$hostid] as $macro => $tokens) {
