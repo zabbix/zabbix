@@ -1012,7 +1012,7 @@ function getMenuPopupItem(options) {
 		items.push({
 			label: t('Values'),
 			url: url.getUrl(),
-			disabled: !options.history && !options.trends
+			disabled: !options.history
 		});
 
 		url = new Curl('history.php');
@@ -1022,7 +1022,7 @@ function getMenuPopupItem(options) {
 		items.push({
 			label: t('500 latest values'),
 			url: url.getUrl(),
-			disabled: !options.history && !options.trends
+			disabled: !options.history
 		});
 
 		sections.push({
