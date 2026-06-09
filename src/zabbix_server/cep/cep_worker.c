@@ -41,7 +41,7 @@
  *                                                                            *
  * Purpose: initialize event processor worker                                 *
  *                                                                            *
- * Parameters: dboool           - [IN] database connection pool               *
+ * Parameters: dbpool           - [IN] database connection pool               *
  *                                                                            *
  * Return value: created worker                                               *
  *                                                                            *
@@ -85,7 +85,7 @@ static void	cep_worker_assess_trigger_events(zbx_cep_task_remote_t *task)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check trigger depdendency status                                  *
+ * Purpose: check trigger dependency status                                   *
  *                                                                            *
  * Parameters: task - [IN] task containing trigger status                     *
  *                                                                            *

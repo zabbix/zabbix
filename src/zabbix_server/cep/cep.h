@@ -28,7 +28,7 @@ int	cep_origin_compare(const zbx_cep_origin_t *o1, const zbx_cep_origin_t *o2);
 typedef struct zbx_cep zbx_cep_t;
 
 zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, unsigned char object,
-	zbx_uint64_t objectid, int clock, int ns, int value, int serverity,
+	zbx_uint64_t objectid, int clock, int ns, int value, int severity,
 	const zbx_vector_tags_ptr_t *tags, const zbx_vector_db_event_suppress_t *suppress);
 zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event);
 
@@ -82,4 +82,4 @@ void	cep_update_events_processed(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_update_events_discarded(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats);
 
-#endif /* ZABBIX_CEP_CACHE_H */
+#endif /* ZABBIX_CEP_H */

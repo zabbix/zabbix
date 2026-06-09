@@ -696,20 +696,6 @@ zbx_correlation_t;
 
 ZBX_PTR_VECTOR_DECL(correlation_ptr, zbx_correlation_t *)
 
-int	zbx_correlation_compare_func(const void *d1, const void *d2);
-
-typedef struct
-{
-	zbx_vector_correlation_ptr_t	correlations;
-	zbx_hashset_t			conditions;
-
-	/* Configuration synchronization timestamp of the rules. */
-	/* Update the cache if this timestamp is less than the   */
-	/* current configuration synchronization timestamp.      */
-	int			sync_ts;
-}
-zbx_correlation_rules_t;
-
 /* item queue data */
 typedef struct
 {

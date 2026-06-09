@@ -50,7 +50,7 @@
 ZBX_VECTOR_IMPL(cep_event, zbx_cep_event_t)
 ZBX_PTR_VECTOR_IMPL(cep_event_ptr, zbx_cep_event_t *)
 
-/* Ehen CEP is notified about deleted events it might not be able to remove them from cache */
+/* When CEP is notified about deleted events it might not be able to remove them from cache */
 /* if their handles are held by other entities. In this case mark them as deleted in cache  */
 /* and pretend those events are not cached when requested.                                  */
 typedef enum
@@ -134,7 +134,7 @@ void	zbx_cep_event_release(zbx_cep_event_t *event)
 }
 
 zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, unsigned char object,
-		zbx_uint64_t objectid, int clock, int ns, int value, int serverity,
+		zbx_uint64_t objectid, int clock, int ns, int value, int severity,
 		const zbx_vector_tags_ptr_t *tags, const zbx_vector_db_event_suppress_t *suppress)
 {
 	zbx_cep_event_t	*event;
@@ -149,7 +149,7 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 	event->clock = clock;
 	event->ns = ns;
 	event->value = value;
-	event->severity = serverity;
+	event->severity = severity;
 	event->suppress_mtime = 0;
 
 	zbx_vector_tag_create(&event->tags);
@@ -683,7 +683,7 @@ void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_q
 		{
 			if (CEP_EVENT_DEPENDENCY_DENY == result)
 			{
-				/* trigger depdency check fail, drop any event */
+				/* trigger dependency check fail, drop event */
 				results[i] = CEP_EVENT_DEPENDENCY_DENY;
 				dropped_num++;
 

@@ -34,19 +34,6 @@
 #include "zbx_cep_client.h"
 #include "zbxtime.h"
 
-/* event recovery data */
-typedef struct
-{
-	zbx_uint64_t	eventid;
-	zbx_uint64_t	objectid;
-	zbx_db_event	*r_event;
-	zbx_uint64_t	correlationid;
-	zbx_uint64_t	c_eventid;
-	zbx_uint64_t	userid;
-	zbx_timespec_t	ts;
-}
-zbx_event_recovery_t;
-
 typedef enum
 {
 	CORRELATION_MATCH = 0,

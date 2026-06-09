@@ -904,7 +904,7 @@ void	zbx_db_release_connection(zbx_dbconn_t *db)
  *                                                                            *
  * Parameters: db - [IN] database connection to stash                         *
  *                                                                            *
- * Comments: Use stash/unstash approach when callinng functions that uses     *
+ * Comments: Use stash/unstash approach when calling functions that uses      *
  *           old (process) database access somewhere deep inside,             *
  *           for example resolves macros.                                     *
  *                                                                            *

@@ -68,7 +68,7 @@ typedef struct
 	zbx_cep_task_event_t	parent;
 	zbx_uint64_t		eventid;	/* in - eventid to close */
 	zbx_uint64_t		userid;		/* in - userid when closed manually by a user */
-	zbx_uint64_t		correlationid;	/* in - correllationid when closed by correlation rules*/
+	zbx_uint64_t		correlationid;	/* in - correlationid when closed by correlation rules*/
 }
 zbx_cep_task_close_event_t;
 

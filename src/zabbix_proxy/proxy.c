@@ -132,7 +132,7 @@ static const char	*help_message[] = {
 	"        process-type             All processes of specified type",
 	"                                 (availability manager, browser poller, configuration syncer,",
 	"                                 data sender, discovery manager, discovery worker, event manager,",
-	"                                 evet processor, history syncer, housekeeper, http poller, icmp pinger,",
+	"                                 event processor, history syncer, housekeeper, http poller, icmp pinger,",
 	"                                 internal poller, ipmi manager, ipmi poller, java poller, odbc poller,",
 	"                                 poller, agent poller, http agent poller, snmp poller, preprocessing manager,",
 	"                                 preprocessing worker, self-monitoring, snmp trapper, task manager, trapper,",

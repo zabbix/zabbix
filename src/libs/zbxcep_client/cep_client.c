@@ -680,7 +680,7 @@ void	zbx_cep_send_event_severities(const zbx_event_severity_t *events, int event
 
 	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_UPDATE_SEVERITIES, data, data_len))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot send serverity update message to CEP service");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send severity update message to CEP service");
 		zbx_exit(EXIT_FAILURE);
 	}
 

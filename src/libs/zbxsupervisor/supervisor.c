@@ -716,7 +716,7 @@ static void	*supervisor_thread_entry(void *args)
  *             thread_entry - [IN] thread entry function                      *
  *             args         - [IN] thread arguments structure                 *
  *             shared       - [IN] data shared between units                  *
- *              unit_exit_num - [IN] counter of exited (stoped/crashed) units *
+ *              unit_exit_num - [IN] counter of exited (stopped/crashed) units*
  *                                                                            *
  ******************************************************************************/
 static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_entry)(void *),

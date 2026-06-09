@@ -556,7 +556,7 @@ out:
  * Purpose: adds event tags to sql query                                      *
  *                                                                            *
  * Parameters: eventid     - [IN] problem_tag update db event                 *
- *             soruce      - [IN] event soruce                                *
+ *             source      - [IN] event source                                *
  *             params      - [IN] values to process                           *
  *             events_tags - [OUT] vector of events with tags                 *
  *                                                                            *
