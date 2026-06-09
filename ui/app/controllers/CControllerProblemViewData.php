@@ -34,10 +34,11 @@ class CControllerProblemViewData extends CControllerDataTable {
 		$rows = [];
 		$data = $this->prepareData();
 		$options = $data['options'];
-		$custom_text = array_combine(array_keys($options), array_column($options, 'custom_text'));
+
+		$custom_text = $this->extractCustomText($data['options']);
 
 		if ($custom_text) {
-			$this->resolveColumnTexts($data['problems'], $custom_text);
+			$this->resolveCustomText($data['problems'], $custom_text);
 		}
 
 		self::addProblemRows($rows, $data, $data['problems'], $data['filter'], $options);
@@ -791,7 +792,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 		return $data;
 	}
 
-	protected function resolveColumnTexts(array &$objects, array $texts): void {
+	protected function resolveCustomText(array &$objects, array $custom_text): void {
 		$db_events = API::Event()->get([
 			'eventids' => array_column($objects, 'eventid'),
 			'preservekeys' => true
@@ -807,7 +808,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$trigger_events[$triggerid] = $db_events[$problem['eventid']];
 		}
 
-		$data = array_fill_keys(array_keys($triggers), $texts);
+		$data = array_fill_keys(array_keys($triggers), $custom_text);
 
 		$resolved_texts = CDataTableMacrosResolver::resolveForSection('problems', $data, ['triggers' => $triggers,
 			'events_data' => $trigger_events]);

@@ -255,10 +255,10 @@ class CControllerLatestViewData extends CControllerDataTable {
 		}
 		unset($item);
 
-		$custom_text = array_combine(array_keys($options), array_column($options, 'custom_text'));
+		$custom_text = $this->extractCustomText($options);
 
 		if ($custom_text) {
-			$this->resolveColumnTexts($data['items'], $custom_text);
+			$this->resolveCustomText($data['items'], $custom_text);
 		}
 
 		$output += [
@@ -403,8 +403,8 @@ class CControllerLatestViewData extends CControllerDataTable {
 		];
 	}
 
-	protected function resolveColumnTexts(array &$objects, array $texts): void {
-		$data = array_fill_keys(array_keys($objects), $texts);
+	protected function resolveCustomText(array &$objects, array $custom_text): void {
+		$data = array_fill_keys(array_keys($objects), $custom_text);
 
 		$db_triggers = API::Trigger()->get([
 			'output' => ['priority', 'manual_close', 'event_name', 'description', 'comments', 'priority',

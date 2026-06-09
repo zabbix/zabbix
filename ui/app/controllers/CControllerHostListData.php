@@ -334,10 +334,10 @@ class CControllerHostListData extends CControllerDataTable {
 		}
 		unset($host);
 
-		$custom_text = array_combine(array_keys($options), array_column($options, 'custom_text'));
+		$custom_text = $this->extractCustomText($options);
 
 		if ($custom_text) {
-			$this->resolveColumnTexts($hosts, $custom_text);
+			$this->resolveCustomText($hosts, $custom_text);
 		}
 
 		$debug_mode = CWebUser::$data['debug_mode'] ?? GROUP_DEBUG_MODE_DISABLED;
@@ -358,13 +358,14 @@ class CControllerHostListData extends CControllerDataTable {
 		return $output;
 	}
 
-	protected function resolveColumnTexts(array &$objects, array $texts): void {
-		$data = array_fill_keys(array_keys($objects), $texts);
+	protected function resolveCustomText(array &$objects, array $custom_text): void {
+		$data = array_fill_keys(array_keys($objects), $custom_text);
 
 		$resolved_texts = CDataTableMacrosResolver::resolveForSection('hosts', $data);
 
 		foreach ($objects as &$host) {
 			$host['custom_text'] = $resolved_texts[$host['hostid']];
 		}
+		unset($host);
 	}
 }

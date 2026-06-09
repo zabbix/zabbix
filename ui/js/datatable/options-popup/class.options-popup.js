@@ -130,7 +130,7 @@ class CDataTableOptionsPopup {
 	/**
 	 * @returns {CDataTableColumn}
 	 */
-	getColumnConfig() {
+	getColumn() {
 		return this.#column;
 	}
 

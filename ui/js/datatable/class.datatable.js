@@ -428,7 +428,7 @@ class CDataTable {
 						cell.classList.add(CDataTable.ZBX_STYLE_CELL_FOCUSED);
 					});
 
-					if (this.#options_popup?.getColumnConfig().getColumnIndex() == column.getColumnIndex()) {
+					if (this.#options_popup?.getColumn().getColumnIndex() == column.getColumnIndex()) {
 						context_handle.classList.add(CDataTable.ZBX_STYLE_OPTIONS_LINK_OPENED);
 
 						this.#options_popup.setHandle(context_handle);
@@ -1193,6 +1193,7 @@ class CDataTable {
 
 		this.dispatchEvent(CDataTable.EVENT_INIT, {
 			onSuccess: () => {
+				// TODO: not working
 				requestAnimationFrame(() => {
 					const header_cell = duplicate_column.getHeaderCell();
 					if (header_cell) {

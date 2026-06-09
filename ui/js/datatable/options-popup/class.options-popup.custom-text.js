@@ -37,7 +37,7 @@ class CDataTableOptionsPopupCustomText extends CDataTableOptionsPopup {
 	}
 
 	getFieldData() {
-		const column_options = this.getColumnConfig().getColumnOptions();
+		const column_options = this.getColumn().getColumnOptions();
 
 		return {
 			...column_options,
@@ -54,7 +54,7 @@ class CDataTableOptionsPopupCustomText extends CDataTableOptionsPopup {
 	onInit() {
 		super.onInit();
 
-		const column_options = this.getColumnConfig().getColumnOptions();
+		const column_options = this.getColumn().getColumnOptions();
 
 		const custom_text_field = this.getField('custom_text');
 

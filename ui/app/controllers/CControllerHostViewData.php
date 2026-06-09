@@ -285,6 +285,12 @@ class CControllerHostViewData extends CControllerDataTable {
 		}
 		unset($host);
 
+		$custom_text = $this->extractCustomText($options);
+
+		if ($custom_text) {
+			$this->resolveCustomText($hosts, $custom_text);
+		}
+
 		$output = [
 			'filter_counters' => $this->getFilterCounters(),
 			'data_fields' => $data_fields,

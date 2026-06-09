@@ -171,10 +171,10 @@ class CControllerTemplateListData extends CControllerDataTable {
 		}
 		unset($template);
 
-		$custom_text = array_combine(array_keys($options), array_column($options, 'custom_text'));
+		$custom_text = $this->extractCustomText($options);
 
 		if ($custom_text) {
-			$this->resolveColumnTexts($templates, $custom_text);
+			$this->resolveCustomText($templates, $custom_text);
 		}
 
 		CPagerHelper::savePage('template.list', $this->paging['page']);
@@ -196,8 +196,8 @@ class CControllerTemplateListData extends CControllerDataTable {
 		return $output;
 	}
 
-	protected function resolveColumnTexts(array &$objects, array $texts): void {
-		$data = array_fill_keys(array_keys($objects), $texts);
+	protected function resolveCustomText(array &$objects, array $custom_text): void {
+		$data = array_fill_keys(array_keys($objects), $custom_text);
 
 		$resolved_texts = CDataTableMacrosResolver::resolveForSection('templates', $data);
 
