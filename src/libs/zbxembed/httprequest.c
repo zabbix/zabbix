@@ -163,7 +163,7 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	zbx_es_env_t		*env;
 	int			err_index = -1;
 	void			*objptr;
-	long			ssl_verify_host = 1L, ssl_verify_peer = 1L;
+	long			ssl_verify_host = 2L, ssl_verify_peer = 1L;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
@@ -177,7 +177,6 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	if (0 == duk_is_null_or_undefined(ctx, 0) && 0 != duk_is_object(ctx, 0))
 	{
 		if (0 != duk_get_prop_string(ctx, 0, "SSLVerifyPeer"))
-		{
 			ssl_verify_peer = 0 != duk_to_boolean(ctx, -1) ? 1L : 0L;
 
 		duk_pop(ctx);
