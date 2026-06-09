@@ -13678,11 +13678,11 @@ unsigned int	zbx_dc_get_internal_action_count(void)
 {
 	unsigned int count;
 
-	RDLOCK_CACHE;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	count = config->internal_actions;
 
-	UNLOCK_CACHE;
+	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	return count;
 }
