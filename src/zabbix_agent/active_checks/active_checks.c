@@ -106,9 +106,8 @@ static ZBX_THREAD_LOCAL zbx_vector_pre_persistent_t	pre_persistent_vec;	/* used 
 /* used for deleting inactive persistent files */
 static ZBX_THREAD_LOCAL zbx_vector_persistent_inactive_t	persistent_inactive_vec;
 
-#define ZBX_HISTORY_UPLOAD_ENABLED		0
-#define ZBX_HISTORY_UPLOAD_DISABLED		(-1)
-#define ZBX_HISTORY_UPLOAD_DISABLED_WITH_RETRY	(-2)
+#define ZBX_HISTORY_UPLOAD_ENABLED	0
+#define ZBX_HISTORY_UPLOAD_DISABLED	(-1)
 
 static ZBX_THREAD_LOCAL int	history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
 
@@ -1243,10 +1242,9 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
 		const char *config_hostname, int config_buffer_send, int config_buffer_size)
 {
-	int				ret = SUCCEED, ret_metrics, ret_commands, now, level;
-	char				*data = NULL;
-	struct zbx_json			json;
-	static ZBX_THREAD_LOCAL int	retry_after;
+	int			ret = SUCCEED, ret_metrics, ret_commands, now, level;
+	char			*data = NULL;
+	struct zbx_json		json;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d entries:%d/%d",
 			__func__, ((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
@@ -1261,22 +1259,11 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 	zbx_json_addint64(&json, ZBX_PROTO_TAG_VARIANT, ZBX_PROGRAM_VARIANT_AGENT);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, config_hostname, ZBX_JSON_TYPE_STRING);
 
-	if (0 != retry_after)
-	{
-		if (ZBX_HISTORY_UPLOAD_DISABLED == history_upload)
-			retry_after = 0;
-		else if (ZBX_HISTORY_UPLOAD_DISABLED_WITH_RETRY == history_upload && retry_after < now)
-			history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
-	}
-
 	ret_metrics = format_metric_results(&json, now, config_buffer_send, config_buffer_size);
 	ret_commands = format_command_results(&json);
 
 	if (FAIL == ret_metrics && FAIL == ret_commands)
 		goto ret;
-
-	if (0 != retry_after)
-		retry_after = 0;
 
 	level = 0 == buffer.first_error ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG;
 
@@ -1299,8 +1286,7 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 	}
 	else
 	{
-		history_upload = ZBX_HISTORY_UPLOAD_DISABLED_WITH_RETRY;
-		retry_after = now + 60;
+		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
 	}
 
 	if (SUCCEED == ret_metrics)

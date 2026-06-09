@@ -25,8 +25,6 @@ import (
 	"golang.zabbix.com/agent2/pkg/zbxcomms"
 )
 
-var errUnsuccessfulResponse = errors.New("unsuccessful response")
-
 type activeConnection struct {
 	address   zbxcomms.AddressSet
 	hostname  string
@@ -36,12 +34,14 @@ type activeConnection struct {
 	session   string
 }
 
-func (c *activeConnection) Write(data []byte, timeout time.Duration) (bool, bool, []error) {
+func (c *activeConnection) Write(data []byte, timeout time.Duration) (bool, []error) {
+
 	upload := false
-	b, commsFailed, errs, _ := zbxcomms.ExchangeWithRedirect(c.address, &c.localAddr, timeout,
+	b, errs, _ := zbxcomms.ExchangeWithRedirect(c.address, &c.localAddr, timeout,
 		time.Second*time.Duration(c.timeout), data, c.tlsConfig)
 	if errs != nil {
-		return upload, commsFailed, errs
+
+		return upload, errs
 	}
 
 	var response agentDataResponse
@@ -50,24 +50,24 @@ func (c *activeConnection) Write(data []byte, timeout time.Duration) (bool, bool
 	if err != nil {
 		c.address.Next()
 
-		return upload, false, []error{err}
+		return upload, []error{err}
 	}
 
 	if response.Response != "success" {
 		c.address.Next()
 
 		if len(response.Info) != 0 {
-			return upload, false, []error{fmt.Errorf("%w: %s", errUnsuccessfulResponse, response.Info)}
+			return upload, []error{fmt.Errorf("%s", response.Info)}
 		}
 
-		return upload, false, []error{errUnsuccessfulResponse}
+		return upload, []error{errors.New("unsuccessful response")}
 	}
 
 	if response.HistoryUpload != "disabled" {
 		upload = true
 	}
 
-	return upload, false, nil
+	return upload, nil
 }
 
 func (c *activeConnection) Addr() (s string) {

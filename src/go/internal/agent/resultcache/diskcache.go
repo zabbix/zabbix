@@ -307,7 +307,8 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		timeout = 60
 	}
 
-	errs = c.sendAgentData(u, data, time.Duration(timeout)*time.Second)
+	upload, errs := u.Write(data, time.Duration(timeout)*time.Second)
+	c.EnableUpload(upload)
 
 	if errs != nil {
 		if !reflect.DeepEqual(errs, c.lastErrors) {
