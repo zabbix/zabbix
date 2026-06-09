@@ -33,7 +33,6 @@ class CControllerProblemViewData extends CControllerDataTable {
 	protected function getData(): array {
 		$rows = [];
 		$data = $this->prepareData();
-		$options = $data['options'];
 
 		$custom_text = $this->extractCustomText($data['options']);
 
@@ -41,7 +40,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$this->resolveCustomText($data['problems'], $custom_text);
 		}
 
-		self::addProblemRows($rows, $data, $data['problems'], $data['filter'], $options);
+		self::addProblemRows($rows, $data, $data['problems'], $data['filter'], $data['options']);
 
 		order_result($data['problems'], $data['sort_field'], $data['sort_order']);
 
@@ -235,8 +234,9 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$problem['host'] = $data['triggers_hosts'][$trigger['triggerid']];
 
 			$opdata = null;
+			$show_opdata = $options['show_opdata'] || in_array('opdata', $data['data_fields']);
 
-			if (array_key_exists('opdata', $trigger)) {
+			if ($show_opdata && array_key_exists('opdata', $trigger)) {
 				if ($trigger['opdata'] === '') {
 					$opdata = (new CDiv(
 						CScreenProblem::getLatestValues($trigger['items'])
