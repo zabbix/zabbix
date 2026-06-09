@@ -175,7 +175,7 @@ class CControllerLldRuleList extends CController {
 			}
 			elseif ($filter['filter_type'] == ITEM_TYPE_TRAPPER || $filter['filter_type'] == ITEM_TYPE_DEPENDENT
 					|| ($filter['filter_type'] == ITEM_TYPE_ZABBIX_ACTIVE
-						&& strncmp($filter['key'], 'mqtt.get', 8) == 0)) {
+						&& strncmp($filter['filter_key'], 'mqtt.get', 8) == 0)) {
 				$options['filter']['delay'] = -1;
 			}
 			else {
