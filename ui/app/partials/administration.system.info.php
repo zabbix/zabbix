@@ -100,7 +100,7 @@ if ($data['system_info']['is_software_update_check_enabled']) {
 	}
 }
 
-if ($data['user_type'] >= USER_TYPE_ZABBIX_ADMIN) {
+if ($data['user_type'] == USER_TYPE_ZABBIX_ADMIN || $data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 	$info_table->addRow([
 		_('Zabbix server version'),
 		$server_version,
@@ -114,7 +114,7 @@ $info_table->addRow([
 	$frontend_version_details
 ]);
 
-if ($data['user_type'] >= USER_TYPE_ZABBIX_ADMIN) {
+if ($data['user_type'] == USER_TYPE_ZABBIX_ADMIN || $data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 	if ($data['system_info']['is_software_update_check_enabled'] && $data['show_software_update_check_details']) {
 		$info_table
 			->addRow([

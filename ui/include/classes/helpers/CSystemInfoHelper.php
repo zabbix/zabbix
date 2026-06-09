@@ -154,7 +154,7 @@ class CSystemInfoHelper {
 			$data['failover_delay_seconds'] = $failover_delay_seconds;
 		}
 
-		if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN) {
+		if (CWebUser::getType() != USER_TYPE_ZABBIX_ADMIN && CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 			unset($data['dbversion_status'], $data['software_update_check_data'], $data['requirements']);
 
 			return $data;
@@ -249,7 +249,7 @@ class CSystemInfoHelper {
 		$status['is_running'] = $server->isRunning() || $server->canConnect(CSessionHelper::getId());
 		$status['error_code'] = $server->getErrorCode();
 
-		if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN) {
+		if (CWebUser::getType() != USER_TYPE_ZABBIX_ADMIN && CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 			return $status;
 		}
 
