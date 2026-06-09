@@ -843,6 +843,75 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Get item macros by function ID.
+	 *
+	 * @param array $macros
+	 * @param array $macro_values
+	 *
+	 * $macros = [
+	 *     <functionid> => [
+	 *         <macro> => [[
+	 *             'token' => (string) Macro token.
+	 *             'macrofunc' => (array) Macro function.
+	 *         ]]
+	 *     ]
+	 * ]
+	 *
+	 * $macro_values = [
+	 *     <triggerid> => (array) List of macro values.
+	 * ]
+	 *
+	 * @return array
+	 */
+	protected static function getItemMacros(array $macros, array $macro_values): array {
+		if (!$macros) {
+			return $macro_values;
+		}
+
+		$functions = DBfetchArray(DBselect(
+			'SELECT f.triggerid,f.functionid,f.itemid'.
+			' FROM functions f'.
+			' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
+		));
+
+		$db_items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'name_resolved', 'key_', 'value_type', 'state', 'description'],
+			'itemids' => array_values(array_column($functions, 'itemid', 'itemid')),
+			'webitems' => true,
+			'preservekeys' => true
+		]);
+
+		$db_items = CMacrosResolverHelper::resolveItemKeys($db_items);
+		$db_items = CMacrosResolverHelper::resolveItemDescriptions($db_items);
+
+		foreach ($db_items as &$db_item) {
+			$db_item['state'] = itemState($db_item['state']);
+		}
+		unset($db_item);
+
+		$item_macros = ['ITEM.DESCRIPTION' => 'description_expanded', 'ITEM.DESCRIPTION.ORIG' => 'description',
+			'ITEM.ID' => 'itemid', 'ITEM.KEY' => 'key_expanded', 'ITEM.KEY.ORIG' => 'key_',
+			'ITEM.NAME' => 'name_resolved', 'ITEM.NAME.ORIG' => 'name', 'ITEM.STATE' => 'state',
+			'ITEM.VALUETYPE' => 'value_type'
+		];
+
+		foreach ($functions as $function) {
+			foreach ($macros[$function['functionid']] as $macro => $tokens) {
+				if (array_key_exists($function['itemid'], $db_items)) {
+					$value = $db_items[$function['itemid']][$item_macros[$macro]];
+
+					foreach ($tokens as $token) {
+						$macro_values[$function['triggerid']][$token['token']] = array_key_exists('macrofunc', $token)
+							? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
+							: $value;
+					}
+				}
+			}
+		}
+		return $macro_values;
+	}
+
+	/**
 	 * Resolves items value maps, valuemap property will be added to every item.
 	 *
 	 * @param array $items

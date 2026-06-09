@@ -312,6 +312,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'macros_n' => [
 					'host' => ['{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}', '{HOST.DESCRIPTION}'],
 					'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+					'item' => ['{ITEM.DESCRIPTION}', '{ITEM.DESCRIPTION.ORIG}', '{ITEM.ID}', '{ITEM.KEY}',
+						'{ITEM.KEY.ORIG}', '{ITEM.NAME}', '{ITEM.NAME.ORIG}', '{ITEM.STATE}', '{ITEM.VALUETYPE}'
+					],
 					'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
 						'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}',
 						'{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}', '{ITEM.LOG.DATE}',
@@ -325,7 +328,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		};
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'inventory' => [], 'item_value' => [], 'usermacros' => []];
+		$macros = ['host' => [], 'interface' => [], 'item' => [], 'item_value' => [], 'inventory' => [],
+			'usermacros' => []
+		];
 
 		// Find macros.
 		foreach ($events as $eventid => $event) {
@@ -374,6 +379,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values_by_triggerid = self::getHostMacros($macros['host'], $macro_values_by_triggerid);
 		$macro_values_by_triggerid = self::getHostInventoryMacros($macros['inventory'], $macro_values_by_triggerid);
 		$macro_values_by_triggerid = self::getIpMacros($macros['interface'], $macro_values_by_triggerid);
+		$macro_values_by_triggerid = self::getItemMacros($macros['item'], $macro_values_by_triggerid);
 		$macro_values_by_triggerid = self::getTriggerUserMacros($macros['usermacros'], $macro_values_by_triggerid);
 
 		foreach ($events as $eventid => $event) {
