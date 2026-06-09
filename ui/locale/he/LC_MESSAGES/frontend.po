@@ -147,6 +147,12 @@ msgstr "%1$s תווים"
 msgid "%1$s characters remaining"
 msgstr "נותרו %1$s תווים"
 
+#: app/views/administration.housekeeping.edit.php:165
+#: app/views/administration.housekeeping.edit.php:166
+#, c-format
+msgid "%1$s data storage period"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
 #, c-format
@@ -5120,6 +5126,15 @@ msgstr "יש לגרור לגודל הרצוי."
 msgid "Click to view or edit"
 msgstr "יש ללחוץ כדי לצפות או לערוך"
 
+#: app/views/administration.housekeeping.edit.php:165
+msgid "ClickHouse"
+msgstr ""
+
+#: include/classes/api/managers/history/CClickHouseStorage.php:118
+#, c-format
+msgid "ClickHouse error: %1$s."
+msgstr ""
+
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
 msgstr "מזהה לקוח"
@@ -8387,6 +8402,10 @@ msgstr "תאריך תוקף"
 #: app/partials/hostmacros.inherited.list.html.php:50
 msgid "Effective value"
 msgstr "ערך יעיל"
+
+#: app/views/administration.housekeeping.edit.php:166
+msgid "Elasticsearch"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1449
 #: include/classes/api/managers/CHistoryManager.php:1458
@@ -11852,6 +11871,16 @@ msgstr "העלאת קובץ שגוי."
 #: include/triggers.inc.php:768
 msgid "Incorrect function is used"
 msgstr "נעשה שימוש בפונקציה הלא נכונה"
+
+#: include/classes/core/CConfigFile.php:211
+#: include/classes/core/CConfigFile.php:219
+#: include/classes/core/CConfigFile.php:557
+#: include/classes/core/CConfigFile.php:563
+#: include/classes/core/CConfigFile.php:569
+#: include/classes/core/CConfigFile.php:579
+#, c-format
+msgid "Incorrect history storage configuration %1$s: %2$s."
+msgstr ""
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -16630,6 +16659,12 @@ msgstr "פריטים שלא התקבלו בירושה"
 
 #: app/views/host.wizard.edit.php:175
 msgid "Not linked"
+msgstr ""
+
+#: app/views/item.list.php:233 app/views/item.list.php:234
+#: include/classes/helpers/CItemHelper.php:386
+#: include/classes/helpers/CItemHelper.php:416
+msgid "Not stored"
 msgstr ""
 
 #: app/controllers/CControllerLatest.php:546
@@ -22701,6 +22736,10 @@ msgstr "ההגדרה הזאת חלה רק על נתונים מספריים."
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "הגדרה זו חלה רק על נתונים מספריים. נתונים בלתי מספריים תמיד יימשכו מההיסטוריה."
 
+#: app/views/administration.housekeeping.edit.php:145
+msgid "This setting does not affect Elasticsearch and ClickHouse storage periods."
+msgstr ""
+
 #: app/partials/administration.system.info.php:212
 #: app/views/administration.housekeeping.edit.php:132
 msgid "This setting should be enabled, because history tables contain compressed chunks."
@@ -23099,6 +23138,11 @@ msgctxt "compact table header"
 msgid "Total"
 msgstr "סך הכול"
 
+#: include/classes/debug/CProfiler.php:172
+#, c-format
+msgid "Total ClickHouse time: %1$s"
+msgstr ""
+
 #: include/classes/debug/CProfiler.php:153
 #, c-format
 msgid "Total Elasticsearch time: %1$s"
@@ -23188,6 +23232,11 @@ msgstr "סטטיסטיקת זיכרון מטמון פונקציית מגמה. ה
 #: widgets/tophosts/views/column.edit.php:206
 msgid "Trends"
 msgstr "מגמות"
+
+#: app/partials/item.edit.item.tab.php:774
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse."
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:257
 #: app/views/reports.toptriggers.list.php:120 app/views/trigger.edit.php:54
@@ -27370,6 +27419,10 @@ msgstr "fuzzytime()‎ - ההפרש בין ערך פריט (בתור חותמת 
 msgid "geographical coordinates (values of comma separated latitude and longitude) are expected"
 msgstr "אמורות נקודות ציון גאוגרפיות (ערכים של קווי רוחב ואורך מופרדים בפסיקים)"
 
+#: app/views/item.edit.php:224 app/views/item.edit.php:228
+msgid "global housekeeping settings"
+msgstr ""
+
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.edit.php:891
 #: include/views/configuration.item.edit.php:918
@@ -27528,6 +27581,11 @@ msgstr "מניין רכיבים שגוי"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "ביטוי שגוי החל מ־„%1$s”"
+
+#: include/classes/core/CConfigFile.php:212
+#: include/classes/core/CConfigFile.php:220
+msgid "incorrect format"
+msgstr ""
 
 #: jsLoader.php:298
 msgid "incorrect item value type"
