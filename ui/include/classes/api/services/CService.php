@@ -453,7 +453,8 @@ class CService extends CApiService {
 
 			foreach ($db_services as $db_service) {
 				foreach ($db_service['children'] as $child_service) {
-					if ($permissions['rw_services'][$child_service['serviceid']] === null
+					if (array_key_exists($child_service['serviceid'], $db_services)
+							|| $permissions['rw_services'][$child_service['serviceid']] === null
 							|| array_key_exists($child_service['serviceid'], $permissions['rw_tag_services'])) {
 						continue;
 					}
