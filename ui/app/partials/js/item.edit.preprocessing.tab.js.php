@@ -478,13 +478,14 @@ var ItemEditPreprocessingTab = class {
 		}
 
 		if (this.#form) {
+			validate_fields.push('preprocessing');
 			let validate_key = (step_obj_nr === -2);
 			const types_test_key = <?= json_encode(CControllerPopupItemTest::$item_types_has_key_mandatory) ?>;
 
 			for (const field of Object.values(this.#form.findFieldByName('preprocessing').getFields())) {
 				if (step_obj_nr < 0 || field.getPath().startsWith(`/preprocessing/${step_obj_nr}`)) {
 					field.setChanged();
-					validate_fields.push(field.getPath());
+					validate_fields.push(field.getName());
 
 					if (!validate_key && field.getPath().endsWith('/type')) {
 						const type = parseInt(field.getValue());
@@ -501,7 +502,7 @@ var ItemEditPreprocessingTab = class {
 				this.#form.findFieldByName('key').setChanged();
 			}
 
-			this.#form.validateFieldsForAction(['key', 'preprocessing'], this.#test_rules).then((result) => {
+			this.#form.validateFieldsForAction(validate_fields, this.#test_rules).then((result) => {
 				this.#container.dispatchEvent(new CustomEvent('test.validated'));
 
 				if (!result) {
