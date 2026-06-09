@@ -98,6 +98,10 @@ class CFieldCollection extends CField {
 		});
 	}
 
+	normalizeSubfieldName(subfield_name, index) {
+		return subfield_name.substring(this.getName().length);
+	}
+
 	#discoverAllFields() {
 		const fields = Object.create(null);
 		const fields_rediscovered = [];
@@ -135,13 +139,8 @@ class CFieldCollection extends CField {
 					console.log(`Field collection ${this.getName()} has invalid field ${field_instance.getName()}`);
 				}
 				else {
-					let subname = field_instance.getName().substring(this.getName().length);
-
-					if (this instanceof CFieldArray) {
-						subname = subname === '[]' ? index++ : subname.substring(1, subname.length - 1);
-					}
-
-					fields[subname] = field_instance
+					const subname = this.normalizeSubfieldName(field_instance.getName(), index++);
+					fields[subname] = field_instance;
 				}
 			}
 		}
