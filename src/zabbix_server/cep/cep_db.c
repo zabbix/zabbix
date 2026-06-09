@@ -241,9 +241,12 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
 	int					recoveries_num = 0;
+	zbx_vector_uint64_t			eventids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
 
+	zbx_vector_uint64_create(&eventids);
+	zbx_vector_uint64_reserve(&eventids, (size_t)tasks->values_num);
 	zbx_vector_cep_db_event_recovery_create(&recoveries);
 
 	for (int i = 0; i < tasks->values_num; i++)
@@ -265,11 +268,17 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 			};
 
 			zbx_vector_cep_db_event_recovery_append(&recoveries, recovery_local);
+			zbx_vector_uint64_append(&eventids, task->eventids.values[j]);
 		}
 	}
 
 	if (0 != recoveries.values_num)
 	{
+		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_db_lock_ids("problem", "eventid", &eventids);
+
 		recoveries_num = recoveries.values_num;
 
 		zbx_vector_cep_db_event_recovery_sort(&recoveries, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -280,6 +289,12 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 		for (int i = 0; i < recoveries.values_num; i++)
 		{
 			zbx_cep_db_event_recovery_t	*recovery = &recoveries.values[i];
+
+			if (FAIL == zbx_vector_uint64_bsearch(&eventids, recovery->p_eventid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				continue;
+			}
 
 			zbx_db_insert_add_values(&db_insert_event_recovery, recovery->p_eventid, recovery->r_eventid,
 					recovery->userid, recovery->correlationid);
@@ -316,6 +331,7 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 	}
 
 	zbx_vector_cep_db_event_recovery_destroy(&recoveries);
+	zbx_vector_uint64_destroy(&eventids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() recovered problems:%d", __func__, recoveries_num);
 }
