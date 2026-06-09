@@ -149,7 +149,7 @@ static void	lld_flush_value(zbx_lld_value_t *lld_value, unsigned char state, con
 			zbx_add_event(event);
 
 			zbx_db_begin();
-			zbx_process_events(NULL, NULL, NULL);
+			zbx_process_events();
 			zbx_db_commit();
 
 			zbx_clean_events();

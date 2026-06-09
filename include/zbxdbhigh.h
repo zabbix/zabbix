@@ -499,8 +499,7 @@ ZBX_PTR_VECTOR_DECL(connector_filter, zbx_connector_filter_t)
 /* events callbacks */
 typedef void	(*zbx_add_event_func_t)(zbx_db_event *event);
 
-typedef int	(*zbx_process_events_func_t)(zbx_vector_trigger_diff_ptr_t *trigger_diff,
-		zbx_vector_uint64_t *triggerids_lock, zbx_vector_escalation_new_ptr_t *escalations);
+typedef int	(*zbx_process_events_func_t)(void);
 typedef void	(*zbx_clean_events_func_t)(void);
 
 typedef struct

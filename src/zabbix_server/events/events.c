@@ -877,16 +877,11 @@ static void	save_discovery_events(zbx_db_event **db_events, int events_num)
 	process_actions(zbx_db_dbconn(), &events, NULL, NULL);
 }
 
-int	zbx_process_events(zbx_vector_trigger_diff_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock,
-		zbx_vector_escalation_new_ptr_t *escalations)
+int	zbx_process_events(void	)
 {
 	int	processed_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)events.values_num);
-
-	ZBX_UNUSED(trigger_diff);
-	ZBX_UNUSED(triggerids_lock);
-	ZBX_UNUSED(escalations);
 
 	if (0 != events.values_num)
 	{
