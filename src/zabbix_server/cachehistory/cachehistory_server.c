@@ -159,8 +159,6 @@ static void	process_triggers(zbx_vector_dc_trigger_t *triggers, zbx_add_event_fu
 		{
 			zbx_vector_uint64_append_array(&query.dep_triggerids, trigger->dep_triggerids.values,
 					trigger->dep_triggerids.values_num);
-
-			query.flags |= CEP_QUERY_FLAG_DEPS;
 		}
 
 		zbx_vector_cep_assessment_query_append_ptr(&event_queries, &query);

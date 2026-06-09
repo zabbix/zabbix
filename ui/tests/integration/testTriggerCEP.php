@@ -35,7 +35,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const ITEM_PROTO_KEY = 'cep.trap';
 	const ITEM_PROTO_KEY2 = 'cep.trap2';
 	const COMPONENT_VALUE = 'sensor1';
-	const LLD_DISCOVERY_COUNT = 1000;
+	const LLD_DISCOVERY_COUNT = 4000;
 	const WAIT_ITERATIONS = 60;
 	const WAIT_ITERATION_DELAY = 1;
 
@@ -53,6 +53,14 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $discovered_dep_triggerids = [];
 	private static $correlationid;
 	private static $sessionid = null;
+
+	/**
+	 * Lower bound (max eventid captured at the start of the current scenario) used to limit
+	 * every event.get to only the events generated during the scenario. Without this bound the
+	 * queries would re-fetch the entire, ever-growing event history of all discovered triggers
+	 * on every poll iteration, which does not scale with LLD_DISCOVERY_COUNT.
+	 */
+	private $event_baseline_id = 0;
 
 	/**
 	 * @inheritdoc
@@ -1300,7 +1308,8 @@ class testTriggerCEP extends CIntegrationTest {
 		$tag_correlation = ((int) $trigger['correlation_mode'] === ZBX_TRIGGER_CORRELATION_TAG);
 		$mult_event = ((int) $trigger['type'] === TRIGGER_MULT_EVENT_ENABLED);
 
-		$expected_events = $this->getTriggerEventCount(self::$discovered_triggerid);
+		$this->captureEventBaseline($triggerids);
+		$expected_events = 0;
 
 		// 1. OK→OK: no new event, no lastchange update.
 		$this->assertNoStateChangeForAll($triggerids, $keys, '0', TRIGGER_VALUE_FALSE, $expected_events);
@@ -1364,7 +1373,8 @@ class testTriggerCEP extends CIntegrationTest {
 				'All triggers must start in OK state for service correlation assessment.');
 		}
 
-		$expected_events = $this->getTriggerEventCount(self::$discovered_triggerid);
+		$this->captureEventBaseline($triggerids);
+		$expected_events = 0;
 
 		// 1. "down_0": expression true, service tag = "0" → PROBLEM event; trigger goes TRUE.
 		$expected_events++;
@@ -1419,7 +1429,8 @@ class testTriggerCEP extends CIntegrationTest {
 				'All triggers must start in OK state for service correlation manual-close assessment.');
 		}
 
-		$expected_events = $this->getTriggerEventCount(self::$discovered_triggerid);
+		$this->captureEventBaseline($triggerids);
+		$expected_events = 0;
 
 		// 1. "down_0": expression true, service tag = "0" → PROBLEM event; trigger goes TRUE.
 		$expected_events++;
@@ -1472,7 +1483,8 @@ class testTriggerCEP extends CIntegrationTest {
 				'All triggers must start in OK state for service correlation assessment.');
 		}
 
-		$expected_events = $this->getTriggerEventCount(self::$discovered_triggerid);
+		$this->captureEventBaseline($triggerids);
+		$expected_events = 0;
 
 		// 1. "down_0": expression true, service tag = "0" → PROBLEM event; trigger goes TRUE.
 		$expected_events++;
@@ -1531,7 +1543,8 @@ class testTriggerCEP extends CIntegrationTest {
 				'Proto 2 triggers must start in OK state for cross-trigger global correlation test.');
 		}
 
-		$expected_events1 = $this->getTriggerEventCount(self::$discovered_triggerid);
+		$this->captureEventBaseline(array_merge($triggerids1, $triggerids2));
+		$expected_events1 = 0;
 
 		// 1. "down" → proto 1: PROBLEM, service="down"; proto 1 triggers go TRUE.
 		$expected_events1++;
@@ -1561,8 +1574,9 @@ class testTriggerCEP extends CIntegrationTest {
 				'All triggers must start in OK state.');
 		}
 
-		$parent_event_count = $this->getTriggerEventCount($parent_ids[0]);
-		$dep_event_count = $this->getTriggerEventCount($dep_ids[0]);
+		$this->captureEventBaseline(array_merge($parent_ids, $dep_ids));
+		$parent_event_count = 0;
+		$dep_event_count = 0;
 
 		// 1. Parent OK→PROBLEM.
 		$this->assertStateChangeForAll($parent_ids, $parent_keys, '1', TRIGGER_VALUE_TRUE, $parent_event_count + 1);
@@ -1730,7 +1744,8 @@ class testTriggerCEP extends CIntegrationTest {
 			$this->assertEquals(TRIGGER_VALUE_TRUE, $triggers[$triggerid]['value'],
 				'trigger #'.$idx.' must still be PROBLEM before recovery-after-restore check.');
 		}
-		$event_count = $this->getTriggerEventCount($triggerids[0]);
+		$this->captureEventBaseline($triggerids);
+		$event_count = 0;
 
 		$this->maybeRestartServer($restart);
 
@@ -1922,14 +1937,27 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 	}
 
-	private function getTriggerEventCount(int $triggerid): int {
+	/**
+	 * Capture the highest eventid currently recorded for the given triggers. The returned value
+	 * is stored as the scenario baseline so that subsequent event.get queries only retrieve events
+	 * generated after this point (see $event_baseline_id and waitForAllTriggerEventCounts), keeping
+	 * the queries bounded regardless of how much event history has accumulated. Per-trigger event
+	 * counts are then expressed as deltas relative to this baseline (so they start at 0).
+	 */
+	private function captureEventBaseline(array $triggerids): int {
 		$response = $this->call('event.get', [
-			'objectids' => [$triggerid],
+			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
-			'countOutput' => true
+			'sortfield' => 'eventid',
+			'sortorder' => 'DESC',
+			'limit' => 1,
+			'output' => ['eventid']
 		]);
-		return (int) $response['result'];
+
+		$this->event_baseline_id = empty($response['result']) ? 0 : (int) $response['result'][0]['eventid'];
+
+		return $this->event_baseline_id;
 	}
 
 	private function waitForTriggerEventCount(int $triggerid, int $expected_count): array {
@@ -1937,6 +1965,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'objectids' => [$triggerid],
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1,
 			'sortfield' => 'eventid',
 			'sortorder' => 'DESC',
 			'output' => ['eventid', 'name', 'value', 'clock']
@@ -1951,6 +1980,10 @@ class testTriggerCEP extends CIntegrationTest {
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
+			// Only fetch events generated during the current scenario (eventid_from is inclusive,
+			// so +1 excludes the baseline event itself). This keeps the query bounded to the few
+			// events produced per step instead of the entire trigger event history.
+			'eventid_from' => $this->event_baseline_id + 1,
 			'sortfield' => 'eventid',
 			'sortorder' => 'DESC',
 			'output' => ['eventid', 'value', 'clock', 'objectid']
