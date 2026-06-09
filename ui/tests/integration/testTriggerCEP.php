@@ -2230,11 +2230,15 @@ class testTriggerCEP extends CIntegrationTest {
 
 	private function assertVpsWrittenIncreasedBy(int $baseline, int $min_increase): void {
 		$expected = $baseline + $min_increase;
-		for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
+
+		// Poll every 100 ms; keep the same overall timeout as the 1 s-based waits by scaling the
+		// iteration count up by 10x (WAIT_ITERATIONS * WAIT_ITERATION_DELAY seconds total).
+		$iterations = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY * 10;
+		for ($i = 0; $i < $iterations; $i++) {
 			if ($this->getVpsWritten() >= $expected) {
 				break;
 			}
-			sleep(self::WAIT_ITERATION_DELAY);
+			usleep(100000);
 		}
 		$this->assertGreaterThanOrEqual($expected, $this->getVpsWritten());
 	}
