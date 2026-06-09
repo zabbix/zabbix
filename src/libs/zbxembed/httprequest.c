@@ -176,16 +176,14 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 
 	if (0 == duk_is_null_or_undefined(ctx, 0) && 0 != duk_is_object(ctx, 0))
 	{
-		if (0 != duk_has_prop_string(ctx, 0, "SSLVerifyPeer"))
+		if (0 != duk_get_prop_string(ctx, 0, "SSLVerifyPeer"))
 		{
-			duk_get_prop_string(ctx, 0, "SSLVerifyPeer");
 			ssl_verify_peer = 0 != duk_to_boolean(ctx, -1) ? 1L : 0L;
 			duk_pop(ctx);
 		}
 
-		if (0 != duk_has_prop_string(ctx, 0, "SSLVerifyHost"))
+		if (0 != duk_get_prop_string(ctx, 0, "SSLVerifyHost"))
 		{
-			duk_get_prop_string(ctx, 0, "SSLVerifyHost");
 			ssl_verify_host = 0 != duk_to_boolean(ctx, -1) ? 2L : 0L;
 			duk_pop(ctx);
 		}
