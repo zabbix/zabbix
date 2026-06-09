@@ -34,12 +34,6 @@ class CControllerProblemViewData extends CControllerDataTable {
 		$rows = [];
 		$data = $this->prepareData();
 
-		$custom_text = $this->extractCustomText($data['options']);
-
-		if ($custom_text) {
-			$this->resolveCustomText($data['problems'], $custom_text);
-		}
-
 		self::addProblemRows($rows, $data, $data['problems'], $data['filter'], $data['options']);
 
 		order_result($data['problems'], $data['sort_field'], $data['sort_order']);
@@ -234,9 +228,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$problem['host'] = $data['triggers_hosts'][$trigger['triggerid']];
 
 			$opdata = null;
-			$show_opdata = $options['show_opdata'] || in_array('opdata', $data['data_fields']);
 
-			if ($show_opdata && array_key_exists('opdata', $trigger)) {
+			if (array_key_exists('opdata', $trigger)) {
 				if ($trigger['opdata'] === '') {
 					$opdata = (new CDiv(
 						CScreenProblem::getLatestValues($trigger['items'])
@@ -275,8 +268,11 @@ class CControllerProblemViewData extends CControllerDataTable {
 					'show_rank_change_symptom' => true
 				]));
 
+			$show_opdata = array_key_exists('show_opdata', $options)
+				&& in_array($options['show_opdata'], [OPERATIONAL_DATA_SHOW_WITH_PROBLEM, OPERATIONAL_DATA_SHOW_BOTH]);
+
 			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] != '' && !$options['compact_view']
-					&& $options['show_opdata'] == 1) {
+					&& $show_opdata) {
 				$description[] = ' (';
 				$description[] = $opdata;
 				$description[] = ')';
@@ -554,9 +550,18 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$filter['to'] = $timeline['to_ts'];
 		}
 
-		$data = CScreenProblem::getData($filter, ['show_opdata' => OPERATIONAL_DATA_SHOW_SEPARATELY] + $options, $limit,
-			true
-		);
+		$custom_text = $this->extractCustomText($options);
+
+		$show_opdata = array_key_exists('show_opdata', $options) && $options['show_opdata'] == 1;
+
+		if (in_array('opdata', $data_fields)) {
+			$options['show_opdata'] = $show_opdata ? OPERATIONAL_DATA_SHOW_BOTH : OPERATIONAL_DATA_SHOW_SEPARATELY;
+		}
+		else if ($show_opdata) {
+			$options['show_opdata'] = OPERATIONAL_DATA_SHOW_WITH_PROBLEM;
+		}
+
+		$data = CScreenProblem::getData($filter, $options, $limit, true);
 		$data = CScreenProblem::sortData($data, $limit, $sort_field, $sort_order);
 
 		if ($export == null) {
@@ -788,6 +793,10 @@ class CControllerProblemViewData extends CControllerDataTable {
 			'sort_field' => $sort_field,
 			'sort_order' => $sort_order
 		];
+
+		if ($custom_text) {
+			$this->resolveCustomText($data['problems'], $custom_text);
+		}
 
 		return $data;
 	}
