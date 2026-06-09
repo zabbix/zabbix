@@ -20,33 +20,30 @@
 ?>
 
 <script>
-	const view = new class {
-		init({export_file_name, export_payload}) {
-			this.export_file_name = export_file_name;
-			this.export_payload = export_payload;
+const view = new class {
+	init({export_file_name, export_payload}) {
+		this.export_file_name = export_file_name;
+		this.export_payload = export_payload;
 
-			this.#initListeners();
-		}
+		this.#initEvents();
+	}
 
-		#initListeners() {
-			document.querySelector('.js-copy-button')?.addEventListener('click', (e) => {
-				writeTextClipboard(document.querySelector('.js-serverid').textContent);
+	#initEvents() {
+		document.querySelector('.js-copy-button')?.addEventListener('click', (e) => {
+			writeTextClipboard(document.querySelector('.js-serverid').textContent);
 
-				e.target.focus();
-			});
+			e.target.focus();
+		});
 
-			document.querySelector('.js-export-system-information').addEventListener('click', (e) => {
-				e.preventDefault();
+		document.querySelector('.js-export-system-information').addEventListener('click', (e) => {
+			e.preventDefault();
 
-				const a = document.createElement('a');
+			const data_url = URL.createObjectURL(new Blob([this.export_payload], {type: 'application/json'}));
+			const a = Object.assign(document.createElement('a'), {download: this.export_file_name, href: data_url});
 
-				a.rel = 'noopener noreferrer';
-				a.download = this.export_file_name;
-				a.target = '_blank';
-				a.href = URL.createObjectURL(new Blob([this.export_payload], {type: 'text/json'}));
-
-				a.click();
-			})
-		}
-	};
+			a.click();
+			requestAnimationFrame(() => URL.revokeObjectURL(data_url));
+		});
+	}
+};
 </script>
