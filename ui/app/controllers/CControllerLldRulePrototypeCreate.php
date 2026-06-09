@@ -101,7 +101,7 @@ class CControllerLldRulePrototypeCreate extends CControllerLldRuleUpdateGeneral 
 
 	private function getInputForApi(): array {
 		$input = CLldRulePrototypeHelper::normalizeFormData($this->getInputAll() + CLldRulePrototypeHelper::getDefaults());
-		$input['flags'] = ZBX_FLAG_DISCOVERY_RULE;
+		$input['flags'] = ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE;
 		$input = CLldRulePrototypeHelper::convertFormInputForApi($input);
 		$input['templateid'] = 0;
 		$input['itemid'] = 0;
