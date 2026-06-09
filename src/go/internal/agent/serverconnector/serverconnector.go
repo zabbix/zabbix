@@ -144,9 +144,7 @@ func (c *Connector) refreshActiveChecks() bool {
 		return false
 	}
 
-	// we don't check commsFailed here because we change refreshActiveChecks schedule to 60 seconds in case of any error
-	// and no additional network connection check is required
-	data, _, errs, errRead := zbxcomms.ExchangeWithRedirect(c.address, &c.localAddr,
+	data, errs, errRead := zbxcomms.ExchangeWithRedirect(c.address, &c.localAddr,
 		time.Second*time.Duration(c.options.Timeout), time.Second*time.Duration(c.options.Timeout), request,
 		c.tlsConfig)
 
@@ -360,7 +358,7 @@ func (c *Connector) sendHeartbeatMsg() {
 		return
 	}
 
-	_, _, errs, _ := zbxcomms.ExchangeWithRedirect(c.address, &c.localAddr,
+	_, errs, _ := zbxcomms.ExchangeWithRedirect(c.address, &c.localAddr,
 		time.Second*time.Duration(c.options.Timeout), time.Second*time.Duration(c.options.Timeout), request,
 		c.tlsConfig, true)
 
