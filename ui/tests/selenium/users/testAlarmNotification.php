@@ -294,11 +294,10 @@ class testAlarmNotification extends CWebTest {
 			}
 		}
 
-		// Check that no error message is displayed when close button is clicked repeatedly.
-		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
-		usleep(500000);
-		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click()->waitUntilNotVisible();
-		$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid(), 'Field "ids" is mandatory.');
+		// Check that clicking close button twice (simulating double-click) closes the dialog without producing an error.
+		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click()->click();
+		$alarm_dialog->waitUntilNotVisible();
+		$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid());
 
 		// Close problem and open Problem page.
 		CDBHelper::setTriggerProblem('Not_classified_trigger_4', TRIGGER_VALUE_FALSE);
