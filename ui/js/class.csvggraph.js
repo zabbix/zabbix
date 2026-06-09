@@ -93,6 +93,7 @@
 			removeFromOverlaysStack(graph.hintboxid);
 			graph.off('mouseup', makeHintboxStatic);
 			graph.removeData('hintbox');
+			graph.removeData('hintbox_footer');
 			hbox.remove();
 
 			if (graph.observer !== undefined) {
@@ -116,12 +117,16 @@
 			hbox = graph.data('hintbox'),
 			content = hbox ? hbox.find('.svg-graph-hintbox') : null;
 
+		let hbox_footer = graph.data('hintbox_footer') || null;
+
 		// Destroy old hintbox to make new one with close button.
 		destroyHintbox(graph);
 
 		if (content) {
 			// Should be put inside hintBoxItem to use functionality of hintBox.
-			graph[0].hintBoxItem = hintBox.createBox(e, graph[0], content[0], '', true, false);
+			graph[0].hintBoxItem = hintBox.createBox(e, graph[0], content[0], '', true, false, '.wrapper', false,
+				hbox_footer
+			);
 
 			if (graph.data('simpleTriggersHintbox')) {
 				data.isTriggerHintBoxFrozen = true;
@@ -143,8 +148,8 @@
 
 			hintBox.positionElement(e, graph[0], graph[0].hintBoxItem);
 
-			Focuser.recoverFocus(graph.hintBoxItem[0]);
-			Focuser.containFocus(graph.hintBoxItem[0]);
+			Focuser.recoverFocus(graph.hintBoxItem);
+			Focuser.containFocus(graph.hintBoxItem);
 
 			graph
 				.off('mouseup', hintboxSilentMode)
@@ -511,6 +516,8 @@
 			in_values_area = false,
 			in_problem_area = false;
 
+		let hbox_footer = graph.data('hintbox_footer') || null;
+
 		if (graph.data('simpleTriggersHintbox') || data.isTriggerHintBoxFrozen === true) {
 			return;
 		}
@@ -550,16 +557,16 @@
 				});
 
 				html = jQuery('<div>')
-						.addClass('svg-graph-hintbox')
-						.append(
-							jQuery('<table>')
-								.addClass('list-table compact-view')
-								.append(tbody)
-						)
-						.append(problems_total > data.hintMaxRows
-							? makeHintBoxFooter(data.hintMaxRows, problems_total)
-							: null
-						);
+					.addClass('svg-graph-hintbox')
+					.append(
+						jQuery('<table>')
+							.addClass('list-table compact-view')
+							.append(tbody)
+					);
+
+				if (problems_total > data.hintMaxRows) {
+					hbox_footer = makeHintBoxFooter(data.hintMaxRows, problems_total);
+				}
 			}
 		}
 		// Show graph values if mouse is over the graph canvas.
@@ -639,11 +646,11 @@
 							.addClass('header')
 							.html(time.format(PHP_ZBX_FULL_DATE_TIME))
 					)
-					.append(html)
-					.append(points_total > data.hintMaxRows
-						? makeHintBoxFooter(data.hintMaxRows, points_total)
-						: null
-					);
+					.append(html);
+
+				if (points_total > data.hintMaxRows) {
+					hbox_footer = makeHintBoxFooter(data.hintMaxRows, points_total);
+				}
 			}
 		}
 		else {
@@ -652,15 +659,17 @@
 
 		if (html !== null) {
 			if (hbox === null) {
-				hbox = hintBox.createBox(e, graph[0], html[0], '', false, false, '.wrapper', false);
+				hbox = hintBox.createBox(e, graph[0], html[0], '', false, false, '.wrapper', false, hbox_footer);
 
 				graph
 					.off('mouseup', makeHintboxStatic)
 					.on('mouseup', {graph: graph}, makeHintboxStatic);
 				graph.data('hintbox', hbox);
+				graph.data('hintbox_footer', hbox_footer);
 			}
 			else {
 				hbox.find('.svg-graph-hintbox').replaceWith(html);
+				hbox.find('.hintbox-footer').replaceWith(hbox_footer);
 			}
 
 			graph[0].hintBoxItem = hbox;
@@ -675,16 +684,8 @@
 	// Function creates hintbox footer.
 	function makeHintBoxFooter(num_displayed, num_total) {
 		return jQuery('<div>')
-			.addClass('table-paging')
-			.append(
-				jQuery('<div>')
-					.addClass('paging-btn-container')
-					.append(
-						jQuery('<div>')
-							.text(sprintf(t('S_DISPLAYING_FOUND'), num_displayed, num_total))
-							.addClass('table-stats')
-					)
-		);
+			.text(sprintf(t('S_DISPLAYING_FOUND'), num_displayed, num_total))
+			.addClass('svg-hintbox-footer table-stats');
 	}
 
 	var methods = {
@@ -773,6 +774,7 @@
 		graph = graph || e.data.graph;
 		const data = graph.data('options');
 		let hbox = graph.data('hintbox') || null;
+		let hbox_footer = graph.data('hintbox_footer') || null;
 
 		graph.data('simpleTriggersHintbox', false);
 		let html = null;
@@ -828,10 +830,10 @@
 				html = jQuery('<div>')
 					.addClass('svg-graph-hintbox')
 					.append(hint_body)
-					.append(triggers_length > data.hintMaxRows
-						? makeHintBoxFooter(data.hintMaxRows, triggers_length)
-						: null
-					);
+
+				if (triggers_length > data.hintMaxRows)	{
+					hbox_footer = makeHintBoxFooter(data.hintMaxRows, triggers_length);
+				}
 
 				graph.data('simpleTriggersHintbox', true);
 			}
@@ -845,9 +847,11 @@
 					.off('mouseup', makeHintboxStatic)
 					.on('mouseup', {graph: graph}, makeHintboxStatic);
 				graph.data('hintbox', html);
+				graph.data('hintbox_footer', hbox_footer);
 			}
 			else {
 				hbox.find('.svg-graph-hintbox').replaceWith(html);
+				hbox.find('.hintbox-footer').replaceWith(hbox_footer);
 			}
 
 			graph[0].hintBoxItem = hbox;

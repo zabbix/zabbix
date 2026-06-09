@@ -432,7 +432,7 @@ const hintBox = {
 	},
 
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo = '.wrapper',
-						reposition_on_resize = true) {
+						reposition_on_resize = true, footer = null) {
 		const hintboxid = hintBox.getUniqueId();
 		const box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue hintbox wordbreak');
 
@@ -500,6 +500,10 @@ const hintBox = {
 
 		if (target.dataset?.hintboxPreload !== '' && target.dataset?.hintboxContents === '') {
 			hintBox.preloadHint(e, target, box);
+		}
+
+		if (footer !== null) {
+			box.append(footer);
 		}
 
 		jQuery(appendTo).append(box);

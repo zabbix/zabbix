@@ -2482,18 +2482,7 @@ select {
 	font-size: 12px;
 	line-height: 18px;
 	white-space: nowrap;
-	min-width: 145px;
-
-	.table-paging {
-		min-height: 18px;
-		padding: 0 0 2px;
-		border: 0;
-		top: 2px;
-
-		.paging-btn-container {
-			min-height: inherit;
-		}
-	}
+	min-width: 160px;
 
 	.list-table tbody tr:last-child td {
 		border-bottom-style: none;
@@ -2521,6 +2510,14 @@ select {
 
 	.header {
 		margin: 0 0 10px 3px;
+	}
+}
+
+.svg-hintbox-footer {
+	&.table-stats {
+		position: relative;
+		padding: 5px 0 0 0;
+		text-align: right;
 	}
 }
 
