@@ -15,9 +15,9 @@
 #include "zbxsysinfo.h"
 #include "sysinfo.h"
 
-#include "alias/alias.h"
 
 #if !defined(WITH_AGENT2_METRICS)
+#	include "alias/alias.h"
 #	include "zbxthreads.h"
 #endif
 
@@ -222,7 +222,7 @@ static int	add_metric_local(zbx_metric_t *metric, char *error, size_t max_error_
 }
 #endif /* WITH_COMMON_METRICS */
 
-#if !defined(__MINGW32__)
+#if !defined(__MINGW32__) && defined(WITH_COMMON_METRICS)
 int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len)
 {
 	int		ret;
@@ -916,6 +916,7 @@ void	zbx_free_agent_request(AGENT_REQUEST *request)
 	free_request_params(request);
 }
 
+#if !defined(WITH_AGENT2_METRICS)
 /******************************************************************************
  *                                                                            *
  * Purpose: adds new parameter                                                *
@@ -934,6 +935,7 @@ static void	add_request_param(AGENT_REQUEST *request, char *pvalue, zbx_request_
 			request->nparam * sizeof(zbx_request_parameter_type_t));
 	request->types[request->nparam - 1] = type;
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -984,6 +986,7 @@ out:
 #undef ZBX_COMMAND_WITHOUT_PARAMS
 #undef ZBX_COMMAND_WITH_PARAMS
 
+#if !defined(WITH_AGENT2_METRICS)
 void	zbx_test_parameter(const char *key)
 {
 #define ZBX_KEY_COLUMN_WIDTH	45
@@ -1280,6 +1283,7 @@ notsupported:
 
 	return ret;
 }
+#endif /* not WITH_AGENT2_METRICS */
 
 static void	add_log_result(AGENT_RESULT *result, const char *value)
 {
