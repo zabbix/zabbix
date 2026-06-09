@@ -100,6 +100,7 @@ static void	prepare_triggers(zbx_dc_trigger_t **triggers, int triggers_num)
  *                                                                            *
  * Parameters: triggers     - [IN] triggers to process                        *
  *             add_event_cb - [IN]                                            *
+ *             add_internal_event_cb - [IN]                                   *
  *             trigger_diff - [OUT] trigger changeset                         *
  *                                                                            *
  * Comments: The trigger_diff changeset must be cleaned by the caller:        *
@@ -126,7 +127,7 @@ static void	prepare_triggers(zbx_dc_trigger_t **triggers, int triggers_num)
  *                                                                            *
  ******************************************************************************/
 static void	process_triggers(zbx_vector_dc_trigger_t *triggers, zbx_add_event_func_t add_event_cb,
-		zbx_vector_trigger_diff_ptr_t *trigger_diff)
+	zbx_add_event_func_t add_internal_event_cb, zbx_vector_trigger_diff_ptr_t *trigger_diff)
 {
 	zbx_vector_cep_assessment_query_t	event_queries;
 	unsigned char				*results = NULL;
@@ -184,9 +185,6 @@ static void	process_triggers(zbx_vector_dc_trigger_t *triggers, zbx_add_event_fu
 
 	zbx_dc_um_handle_t	*um_handle;
 	zbx_vector_db_event_t	new_events;
-	int			internal_action_num;
-
-	internal_action_num = zbx_dc_get_internal_action_count();
 
 	zbx_vector_db_event_create(&new_events);
 
@@ -221,12 +219,12 @@ static void	process_triggers(zbx_vector_dc_trigger_t *triggers, zbx_add_event_fu
 			zbx_append_trigger_diff(trigger_diff, trigger->triggerid, trigger->priority, flags,
 					trigger->new_value, new_state, trigger->timespec.sec, new_error);
 
-			if (0 != internal_action_num)
+			if (NULL != add_internal_event_cb)
 			{
 				event = zbx_create_internal_event(EVENT_OBJECT_TRIGGER, trigger->triggerid,
 						trigger->timespec.sec, trigger->timespec.ns, new_state, new_error,
 						trigger);
-				add_event_cb(event);
+				add_internal_event_cb(event);
 			}
 		}
 
@@ -389,6 +387,7 @@ out:
  *             history_errcodes  - [IN] item error codes                      *
  *             timers            - [IN] trigger timers                        *
  *             add_event_cb      - [IN]                                       *
+ *             add_internal_event_cb - [IN]                                   *
  *             trigger_diff      - [OUT] trigger updates                      *
  *             itemids           - [OUT] the item identifiers                 *
  *                                      (used for item lookup)                *
@@ -400,7 +399,8 @@ out:
 static void	recalculate_triggers(const zbx_dc_history_t *history, int history_num,
 		const zbx_vector_uint64_t *history_itemids, const zbx_history_sync_item_t *history_items,
 		const int *history_errcodes, const zbx_vector_trigger_timer_ptr_t *timers,
-		zbx_add_event_func_t add_event_cb, zbx_vector_trigger_diff_ptr_t *trigger_diff, zbx_uint64_t *itemids,
+		zbx_add_event_func_t add_event_cb, zbx_add_event_func_t add_internal_event_cb,
+		zbx_vector_trigger_diff_ptr_t *trigger_diff, zbx_uint64_t *itemids,
 		zbx_timespec_t *timespecs, zbx_hashset_t *trigger_info, zbx_vector_dc_trigger_t *trigger_order)
 {
 	int	i, item_num = 0, timers_num = 0;
@@ -462,7 +462,7 @@ static void	recalculate_triggers(const zbx_dc_history_t *history, int history_nu
 
 	zbx_vector_dc_trigger_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	zbx_evaluate_expressions(trigger_order, history_itemids, history_items, history_errcodes);
-	process_triggers(trigger_order, add_event_cb, trigger_diff);
+	process_triggers(trigger_order, add_event_cb, add_internal_event_cb, trigger_diff);
 
 	zbx_dc_free_triggers(trigger_order);
 
@@ -1090,10 +1090,6 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, history_num);
 
-	/* don't generate internal events without corresponding actions */
-	if (0 == zbx_dc_get_internal_action_count())
-		add_event_cb = NULL;
-
 	now = time(NULL);
 
 	default_type_flags = zbx_history_get_default_type_flags();
@@ -1449,6 +1445,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, int mod
 	size_t					data_alloc = 0, data_offset;
 	zbx_vector_connector_filter_t		connector_filters_history;
 	double					start_time, end_time;
+	zbx_add_event_func_t			add_internal_event_cb;
 
 	if (NULL == history_float && NULL != history_float_cbs)
 	{
@@ -1515,6 +1512,8 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, int mod
 		int			trends_num = 0, timers_num = 0, ret = SUCCEED;
 		ZBX_DC_TREND		*trends = NULL;
 
+		add_internal_event_cb = (0 == zbx_dc_get_internal_action_count() ? NULL : events_cbs->add_event_cb);
+
 		stats->more = ZBX_SYNC_DONE;
 
 		zbx_dbcache_lock();
@@ -1578,8 +1577,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, int mod
 
 			um_handle = zbx_dc_open_user_macros();
 
-			DCmass_prepare_history(history, items, errcodes, history_num,
-					events_cbs->add_event_cb, &item_diff,
+			DCmass_prepare_history(history, items, errcodes, history_num, add_internal_event_cb, &item_diff,
 					&inventory_values, compression_age, &proxy_subscriptions);
 
 			start_time = zbx_time();
@@ -1690,8 +1688,8 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, int mod
 				start_time = zbx_time();
 
 				recalculate_triggers(history, history_num, &itemids, items, errcodes,
-						&trigger_timers, events_cbs->add_event_cb, &trigger_diff,
-						trigger_itemids, trigger_timespecs, &trigger_info,
+						&trigger_timers, events_cbs->add_event_cb, add_internal_event_cb,
+						&trigger_diff, trigger_itemids, trigger_timespecs, &trigger_info,
 						&trigger_order);
 
 				end_time = zbx_time();
