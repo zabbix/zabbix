@@ -808,6 +808,52 @@ static int	DBpatch_7050054(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7050055(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update settings set value_str='' where name='session_key'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050056(void)
+{
+	const zbx_db_field_t	field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("acknowledges", &field);
+}
+
+static int	DBpatch_7050057(void)
+{
+	const zbx_db_field_t	field = {"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
+static int	DBpatch_7050058(void)
+{
+	return DBdrop_foreign_key("acknowledges", 1);
+}
+
+static int	DBpatch_7050059(void)
+{
+	return DBdrop_foreign_key("event_suppress", 2);
+}
+
+static int	DBpatch_7050060(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 1 - ZBX_SETTING_TYPE_STR */
+	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str) values ('banner_data',1,'')"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -869,5 +915,11 @@ DBPATCH_ADD(7050051, 0, 1)
 DBPATCH_ADD(7050052, 0, 1)
 DBPATCH_ADD(7050053, 0, 1)
 DBPATCH_ADD(7050054, 0, 1)
+DBPATCH_ADD(7050055, 0, 1)
+DBPATCH_ADD(7050056, 0, 1)
+DBPATCH_ADD(7050057, 0, 1)
+DBPATCH_ADD(7050058, 0, 1)
+DBPATCH_ADD(7050059, 0, 1)
+DBPATCH_ADD(7050060, 0, 1)
 
 DBPATCH_END()

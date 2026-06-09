@@ -1372,6 +1372,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	ZABBIX.EventHub = new CEventHub();
 
+	// Banner initialization.
+
+	if (typeof CBanner !== 'undefined') {
+		ZABBIX.Banner = new CBanner();
+	}
+
 	// Software version check initialization.
 
 	if (typeof CSoftwareVersionCheck !== 'undefined') {

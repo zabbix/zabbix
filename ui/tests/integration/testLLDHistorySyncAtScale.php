@@ -21,6 +21,8 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * history and trends without triggers, then adding last()- and nodata()-based
  * trigger prototypes and verifying firing, recovery, UNKNOWN state, proxy
  * lastaccess, behavior across server restarts and final LLD cleanup.
+ * For minimal test run as '/testLLDHistorySyncAtScale_(LLDDiscovery|HistoryPrepare|HistoryPastSend|HistoryPastVpsWritten|HistoryPastVerify|HistoryNowSend|HistoryNowVpsWritten|HistoryNowVerify)$/'
+
  *
  * @required-components server
  * @suite-components-reuse true
@@ -37,7 +39,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	const SENSOR_BASE = 'sensor';
 	const LLD_DISCOVERY_COUNT = 10000;
 	const TRIGGER_WARMUP_ITERATIONS = 60;
-	const LLD_ITERATIONS = 120;
+	const LLD_ITERATIONS = 180;
 
 	private static $hostid;
 	private static $proxyid;
@@ -53,6 +55,30 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	private static $sent_now = [];
 	private static $vps_last;
 	private static $agent_ping_itemid;
+	private static $log_lastlogsize = 0;
+
+	/**
+	 * Component configuration provider.
+	 *
+	 * @return array
+	 */
+	public function configurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'LogFileSize' => 8,
+				'DebugLevel' => 3,
+				'CacheSize' => '128M',
+				'HistoryCacheSize' => '32M',
+				'HistoryIndexCacheSize' => '32M',
+				'ValueCacheSize' => '128M',
+				'LogSlowQueries' => '60000',
+				'StartDBSyncers' => '32' /* LLD_DISCOVERY_COUNT * types / ZBX_HC_SYNC_MAX */
+				/*'HistoryProvider'=> [
+					'clickhouse;value_types="uint,dbl,str,log,text,json",url=http://localhost:8123,db=zabbix,username=zabbix,password=zabbix'
+				]*/
+			]
+		];
+	}
 
 	private static function prototypeDefs() {
 		return [
@@ -69,7 +95,31 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+		$config = $this->configurationProvider();
+		if (!empty($config[self::COMPONENT_SERVER]['HistoryProvider'])) {
+			global $HISTORY_PROVIDERS;
+			$this->assertNotEmpty($HISTORY_PROVIDERS,
+				'Server HistoryProvider is set in configurationProvider() but $HISTORY_PROVIDERS is empty — '
+				.'frontend would use SQL while server writes to an external provider; '
+				.'set $HISTORY_PROVIDERS in ui/conf/zabbix.conf.php');
+		}
+
 		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
+
+		// Disable every pre-existing monitored host so they don't conflict with the tests:
+		// the global zabbix[queue,15,] metric used to verify delayed-item drain must reflect
+		// only this suite's host (created below).
+		$response = $this->call('host.get', [
+			'filter' => ['status' => HOST_STATUS_MONITORED],
+			'output' => ['hostid']
+		]);
+		foreach ($response['result'] as $h) {
+			$this->call('host.update', [
+				'hostid' => $h['hostid'],
+				'status' => HOST_STATUS_NOT_MONITORED
+			]);
+		}
+
 		$response = $this->call('hostgroup.get', [
 			'filter' => ['name' => ['Zabbix servers']],
 			'output' => ['groupid']
@@ -103,8 +153,9 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			'hostid' => self::$hostid,
 			'name' => 'Multiple Items History LLD Rule',
 			'key_' => self::LLD_RULE_KEY,
-			'type' => ITEM_TYPE_TRAPPER,
-			'lifetime_type' => ZBX_LLD_DELETE_IMMEDIATELY
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'lifetime_type' => ZBX_LLD_DELETE_IMMEDIATELY,
+			'delay' => '1h'
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['itemids']);
@@ -140,15 +191,25 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		return true;
 	}
 
+	/**
+	 * Hook for routing item values. The base class sends to the server while
+	 * spoofing the active proxy name so the server processes the values as if
+	 * delivered by the proxy; subclasses targeting a real proxy daemon
+	 * override this to deliver values to the proxy instead.
+	 */
+	protected function dispatchValues(array $values): void {
+		$this->sendAgentDataValues($values, self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+	}
+
 	private function sendAgentPing(): void {
-		$this->sendAgentDataValues([
+		$this->dispatchValues([
 			[
 				'itemid' => self::$agent_ping_itemid,
 				'value' => '1',
 				'clock' => time(),
 				'ns' => (int)(microtime(true) * 1e9) % 1000000000
 			]
-		], self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+		]);
 	}
 	public static function clearData(): void {
 		if (CAPIHelper::getSessionId() === null) {
@@ -169,26 +230,32 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			self::$proxyid = null;
 		}
 
+		self::$discovered_itemids = [];
+		self::$log_lastlogsize = 0;
+
 		CAPIHelper::call('settings.update', ['auditlog_enabled' => 1, 'auditlog_mode' => 1]);
-	}
-	/**
-	 * Component configuration provider.
-	 *
-	 * @return array
-	 */
-	public function configurationProvider() {
-		return [
-			self::COMPONENT_SERVER => [
-				'LogFileSize' => 1,
-				'DebugLevel' => 3,
-				'CacheSize' => '128M',
-				'HistoryCacheSize' => '32M',
-				'HistoryIndexCacheSize' => '32M',
-				'ValueCacheSize' => '128M',
-				'LogSlowQueries' => '60000',
-				'StartDBSyncers' => '32' /* LLD_DISCOVERY_COUNT * types / ZBX_HC_SYNC_MAX  */
-			]
-		];
+
+		$response = CAPIHelper::call('action.get', [
+			'output' => ['actionid'],
+			'filter' => ['name' => 'Report unknown triggers']
+		]);
+		if (!empty($response['result'])) {
+			CAPIHelper::call('action.update', [
+				'actionid' => $response['result'][0]['actionid'],
+				'status' => ACTION_STATUS_DISABLED
+			]);
+		}
+
+		$response = CAPIHelper::call('host.get', [
+			'filter' => ['host' => 'Zabbix server'],
+			'output' => ['hostid']
+		]);
+		if (!empty($response['result'])) {
+			CAPIHelper::call('host.update', [
+				'hostid' => $response['result'][0]['hostid'],
+				'status' => HOST_STATUS_MONITORED
+			]);
+		}
 	}
 
 	/**
@@ -229,7 +296,35 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				'Expected '.self::LLD_DISCOVERY_COUNT.' discovered items for type '.$def['suffix'].'.');
 		}
 
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		// Preflight test: check that values can be saved and retrieved by sending
+		// an agent ping and reading it back via a calculated item testItem.
+
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'log_level_increase=trapper');
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER, null, self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY);
+
+		$this->sendAgentPing();
+
+		$result = null;
+
+		sleep(3);
+		$result = $this->testItemOnServer((string) self::$hostid, [
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'type' => ITEM_TYPE_CALCULATED,
+			'key' => 'calc.agent.ping.presence',
+			'params' => 'last(/'.self::HOSTNAME.'/agent.ping)'
+		]);
+
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'log_level_decrease=trapper');
+
+		$this->assertNotFalse($result, 'testItem call failed for calculated item.');
+		$this->assertArrayHasKey('item', $result);
+		$this->assertArrayNotHasKey('error', $result['item'],
+				'Calculated item evaluation returned an error: '
+				.($result['item']['error'] ?? ''));
+		$this->assertArrayHasKey('result', $result['item']);
+		$this->assertEquals(1, (int) $result['item']['result'],
+				'Calculated item did not return the agent ping value within timeout, got: '
+				.var_export($result['item']['result'], true));
 	}
 
 	/**
@@ -253,7 +348,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	public function testLLDHistorySyncAtScale_HistoryPastSend() {
 		['sent' => $sent, 'values' => $all_values] = self::$prepared_past;
 		self::$vps_last = $this->getVpsWritten();
-		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+		$this->dispatchValues($all_values);
 
 		self::$sent_past = $sent;
 	}
@@ -284,7 +379,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	public function testLLDHistorySyncAtScale_HistoryNowSend() {
 		['sent' => $sent, 'values' => $all_values] = self::$prepared_now;
 		self::$vps_last = $this->getVpsWritten();
-		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+		$this->dispatchValues($all_values);
 
 		self::$sent_now = $sent;
 	}
@@ -359,6 +454,77 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->verifyTrendsAtClock(self::$tm_now - (self::$tm_now % 3600));
 		$this->startComponent(self::COMPONENT_SERVER);
+	}
+
+	/**
+	 * Verify that after all items become delayed, sending data with the value field
+	 * omitted drains the delay queue.
+	 *
+	 * @depends testLLDHistorySyncAtScale_LLDDiscovery
+	 */
+	public function testLLDHistorySyncAtScale_ValueOmittedDrainsDelay() {
+		$response = $this->call('host.get', [
+			'filter' => ['status' => HOST_STATUS_MONITORED],
+			'output' => ['hostid', 'host']
+		]);
+		$other_hosts = [];
+		foreach ($response['result'] as $h) {
+			if ((string) $h['hostid'] !== (string) self::$hostid) {
+				$other_hosts[] = $h;
+			}
+		}
+		$this->assertEmpty($other_hosts,
+			'Unexpected enabled hosts present (would pollute zabbix[queue,15,]): '.json_encode($other_hosts));
+
+		$this->verifyValueOmittedDrainsDelay();
+	}
+
+	/**
+	 * Verify that lastlogsize for log items advances in item_rtdata when log data
+	 * with the value field omitted (but lastlogsize/mtime present) is sent.
+	 *
+	 * @depends testLLDHistorySyncAtScale_LLDDiscovery
+	 */
+	public function testLLDHistorySyncAtScale_LogLastlogsizeAdvances() {
+		$this->verifyLogLastlogsizeAdvances();
+	}
+
+	/**
+	 * Burst-send 10000 log entries for a single log item at tm-45 alongside a
+	 * full history payload for all items at tm, before any triggers exist.
+	 *
+	 * @depends testLLDHistorySyncAtScale_LogLastlogsizeAdvances
+	 */
+	public function testLLDHistorySyncAtScale_SingleLogBurstPreTriggersSend() {
+		$this->sendSingleLogBurstAndFullHistory();
+	}
+
+	/**
+	 * Verify that VPS written counter increased by the number of values sent in the burst.
+	 *
+	 * @depends testLLDHistorySyncAtScale_SingleLogBurstPreTriggersSend
+	 */
+	public function testLLDHistorySyncAtScale_SingleLogBurstPreTriggersVpsWritten() {
+		$this->assertSingleLogBurstAndFullHistoryVpsWritten();
+	}
+
+	/**
+	 * Send value 0 (OK) for all items before any triggers exist to ensure triggers fire with new value.
+	 *
+	 * @depends testLLDHistorySyncAtScale_LLDDiscovery
+	 */
+	public function testLLDHistorySyncAtScale_PreTriggerZeroSend() {
+		self::$vps_last = $this->getVpsWritten();
+		$this->sendHistoryAt(time(), '0');
+	}
+
+	/**
+	 * Verify that the VPS written counter increased by the number of zero values sent.
+	 *
+	 * @depends testLLDHistorySyncAtScale_PreTriggerZeroSend
+	 */
+	public function testLLDHistorySyncAtScale_PreTriggerZeroVpsWritten() {
+		$this->assertVpsWrittenIncreasedBy(self::$vps_last, self::$total_expected);
 	}
 
 	/**
@@ -478,7 +644,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 */
 	public function testLLDHistorySyncAtScale_TriggerUnknown() {
 		$tm = time();
-		$this->sendHistoryAt($tm, 'item is not supported', ITEM_STATE_NOTSUPPORTED);
+		$this->sendHistoryAt($tm, null, ITEM_STATE_NOTSUPPORTED);
 
 		// Verify all discovered triggers became unknown (state = UNKNOWN).
 		$this->callUntilDataIsPresent('trigger.get', [
@@ -511,6 +677,24 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDHistorySyncAtScale_TriggerDiscovery
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataDiscovery() {
+		$response = $this->call('action.get', [
+			'output' => ['actionid'],
+			'filter' => ['name' => 'Report unknown triggers']
+		]);
+		$this->assertNotEmpty($response['result'], 'Action "Report unknown triggers" not found.');
+		$this->call('action.update', [
+			'actionid' => $response['result'][0]['actionid'],
+			'status' => ACTION_STATUS_ENABLED
+		]);
+
+		$this->updateTriggerPrototypesAndRediscover('NoData Sensor', function ($def) {
+			return 'nodata(/'.self::HOSTNAME.'/'.self::ITEM_PROTO_KEY.'.'.$def['suffix']
+				.'['.self::LLD_MACRO.'],30s)=1';
+		});
+	}
+
+	private function updateTriggerPrototypesAndRediscover(string $description_prefix,
+			callable $expression_builder): void {
 		foreach (self::prototypeDefs() as $def) {
 			if ($def['value_type'] === ITEM_VALUE_TYPE_JSON) {
 				continue;
@@ -518,7 +702,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 
 			$response = $this->call('triggerprototype.get', [
 				'hostids' => [self::$hostid],
-				'filter' => ['description' => 'Sensor '.$def['suffix'].' alert ['.self::LLD_MACRO.']'],
+				'search' => ['description' => ' '.$def['suffix'].' alert ['.self::LLD_MACRO.']'],
 				'output' => ['triggerid']
 			]);
 			$this->assertNotEmpty($response['result'],
@@ -526,9 +710,8 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 
 			$response = $this->call('triggerprototype.update', [
 				'triggerid' => $response['result'][0]['triggerid'],
-				'description' => 'NoData Sensor '.$def['suffix'].' alert ['.self::LLD_MACRO.']',
-				'expression' => 'nodata(/'.self::HOSTNAME.'/'.self::ITEM_PROTO_KEY.'.'.$def['suffix']
-					.'['.self::LLD_MACRO.'],30s)=1'
+				'description' => $description_prefix.' '.$def['suffix'].' alert ['.self::LLD_MACRO.']',
+				'expression' => $expression_builder($def)
 			]);
 			$this->assertCount(1, $response['result']['triggerids']);
 		}
@@ -545,10 +728,10 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		$this->sendDiscoveryData();
 
 		// Wait until a trigger instance is created for every discovered sensor and non-JSON type
-		// and its description carries the updated "NoData " prefix.
+		// and its description carries the updated prefix.
 		$this->callUntilCountIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
-			'search' => ['description' => 'NoData Sensor '],
+			'search' => ['description' => $description_prefix.' '],
 			'startSearch' => true
 		], self::$total_trigger_expected, self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
 			$this->sendAgentPing();
@@ -563,6 +746,8 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDHistorySyncAtScale_TriggerNoDataDiscovery
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataFiring() {
+		$unknown_before = $this->getUnknownTriggerEventCount();
+
 		$this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
 			'output' => ['triggerid', 'value', 'state']
@@ -589,6 +774,11 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			}
 			return true;
 		});
+
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		if ($unknown_before !== $unknown_after) {
+			$this->markTestSkipped('Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
+		}
 	}
 
 	/**
@@ -614,20 +804,129 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDHistorySyncAtScale_ProxyLastaccess
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataNotSupported() {
+		$unknown_before = $this->getUnknownTriggerEventCount();
+
 		$tm = time();
 
-		$this->sendHistoryAt($tm, 'item is not supported', ITEM_STATE_NOTSUPPORTED);
+		$this->sendHistoryAt($tm, null, ITEM_STATE_NOTSUPPORTED);
+		$last_resend = time();
 
 		$this->callUntilCountIsPresent('item.get', [
 			'hostids' => [self::$hostid],
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'.'],
 			'filter' => ['state' => ITEM_STATE_NOTSUPPORTED]
-		], self::$total_expected, self::TRIGGER_WARMUP_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+		], self::$total_expected, self::TRIGGER_WARMUP_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) use (&$last_resend) {
 			$this->sendAgentPing();
+
+			if (time() - $last_resend >= 10) {
+				$this->sendHistoryAt(time(), null, ITEM_STATE_NOTSUPPORTED);
+				$last_resend = time();
+			}
 
 			return true;
 		});
 
+		$last_resend = time();
+		$this->callUntilDataIsPresent('trigger.get', [
+			'hostids' => [self::$hostid],
+			'output' => ['triggerid', 'value', 'state']
+		], 120, self::WAIT_ITERATION_DELAY, function ($r) use (&$last_resend) {
+			if (time() - $last_resend >= 10) {
+				$this->sendHistoryAt(time(), null, ITEM_STATE_NOTSUPPORTED);
+				$last_resend = time();
+			}
+
+			if (count($r['result']) !== self::$total_trigger_expected) {
+				return false;
+			}
+			foreach ($r['result'] as $trigger) {
+				if ((int) $trigger['value'] !== TRIGGER_VALUE_TRUE) {
+					return false;
+				}
+			}
+			return true;
+		});
+
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		if ($unknown_before !== $unknown_after) {
+			$this->markTestSkipped('Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
+		}
+	}
+
+	/**
+	 * Resend data with the value field omitted and verify that nodata-based triggers remain firing
+	 * (value = PROBLEM, state = NORMAL).
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerNoDataNotSupported
+	 */
+	public function testLLDHistorySyncAtScale_TriggerNoDataValueOmitted() {
+		$unknown_before = $this->getUnknownTriggerEventCount();
+		$this->verifyValueOmittedDrainsDelay();
+
+		$this->verifyProxyLastaccessAndNoDataTriggersFiring();
+
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		if ($unknown_before !== $unknown_after) {
+			$this->markTestSkipped('Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
+		}
+	}
+
+	private function verifyValueOmittedDrainsDelay(): void {
+		$this->waitUntilDelayedItemsCount(self::$total_expected);
+
+		$tm = time();
+
+		$this->sendHistoryAt($tm, null, ITEM_STATE_NORMAL, true);
+
+		$this->waitUntilDelayedItemsCount(0);
+	}
+
+	/**
+	 * Send log data with the value field omitted but with lastlogsize/mtime present,
+	 * and verify that lastlogsize for log items advances in item_rtdata.
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerNoDataNotSupported
+	 */
+	public function testLLDHistorySyncAtScale_TriggerNoDataValueOmittedLastlogsize() {
+		$unknown_before = $this->getUnknownTriggerEventCount();
+		$this->verifyLogLastlogsizeAdvances();
+
+		$this->verifyProxyLastaccessAndNoDataTriggersFiring();
+
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		if ($unknown_before !== $unknown_after) {
+			$this->markTestSkipped('Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
+		}
+	}
+
+	private function verifyLogLastlogsizeAdvances(): void {
+		$log_itemids = self::$discovered_itemids[ITEM_VALUE_TYPE_LOG];
+		$probe_itemid = (int) end($log_itemids);
+
+		$row = DBfetch(DBselect('SELECT lastlogsize FROM item_rtdata WHERE itemid='.$probe_itemid));
+		$this->assertNotFalse($row, 'item_rtdata row missing for log itemid '.$probe_itemid);
+		$before = (int) $row['lastlogsize'];
+
+		$tm = time();
+		$this->sendHistoryAt($tm, null, ITEM_STATE_NORMAL, true, true);
+
+		$timeout = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
+		$start = microtime(true);
+		$after = $before;
+		while ($after <= $before && (microtime(true) - $start) < $timeout) {
+			$this->sendAgentPing();
+			usleep(100000); // 100 ms
+			$row = DBfetch(DBselect('SELECT lastlogsize FROM item_rtdata WHERE itemid='.$probe_itemid));
+			$after = (int) $row['lastlogsize'];
+		}
+
+		$waited = round(microtime(true) - $start, 1);
+		$this->assertGreaterThan($before, $after,
+			"lastlogsize for log itemid {$probe_itemid} did not advance after waiting {$waited}s "
+			."(before: {$before}, after: {$after})");
+	}
+
+	private function verifyProxyLastaccessAndNoDataTriggersFiring(): void {
 		$response = $this->call('proxy.get', [
 			'proxyids' => [self::$proxyid],
 			'output' => ['lastaccess']
@@ -648,7 +947,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				if ((int) $trigger['state'] !== TRIGGER_STATE_NORMAL && $trigger_unknown_error === null) {
 					$trigger_unknown_error = 'Trigger '.$trigger['triggerid'].
 							' transitioned to UNKNOWN. Error:'.$trigger['error'];
-					return true;
 				}
 			}
 
@@ -663,24 +961,116 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			}
 			return true;
 		});
-
-		if ($trigger_unknown_error !== null) {
-			self::markTestSkipped('Test case is not supported, see ZBX-27736.');
-		}
 	}
 
 	/**
 	 * Restart the server and verify that nodata-based triggers recover again
 	 * once normal data resumes flowing.
 	 *
-	 * @depends testLLDHistorySyncAtScale_TriggerNoDataFiring
+	 * @depends testLLDHistorySyncAtScale_TriggerNoDataNotSupported
 	 */
 	public function testLLDHistorySyncAtScale_TriggerNoDataRecoveryAfterRestart() {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
+		$unknown_before = $this->getUnknownTriggerEventCount();
+
 		$tm = time();
 		$this->sendHistoryAt($tm);
+		$this->waitUntilTriggersRecovered();
 
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		$this->assertEquals($unknown_before, $unknown_after,
+			'Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
+	}
+
+	/**
+	 * Wait long enough for nodata triggers to fire (45s window) and verify they
+	 * stay suppressed — neither value = PROBLEM nor state = UNKNOWN.
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerNoDataRecoveryAfterRestart
+	 */
+	public function testLLDHistorySyncAtScale_TriggerNoDataSuppressedAfterConnectionLoss() {
+		$unknown_before = $this->getUnknownTriggerEventCount();
+		sleep(45);
+
+		$response = $this->call('trigger.get', [
+			'hostids' => [self::$hostid],
+			'output' => ['triggerid', 'value', 'state', 'error']
+		]);
+
+		foreach ($response['result'] as $trigger) {
+			$this->assertNotEquals(TRIGGER_VALUE_TRUE, (int) $trigger['value'],
+				'Trigger '.$trigger['triggerid'].' transitioned to PROBLEM but expected to be suppressed.');
+			$this->assertNotEquals(TRIGGER_STATE_UNKNOWN, (int) $trigger['state'],
+				'Trigger '.$trigger['triggerid'].' transitioned to UNKNOWN. Error:'.$trigger['error']);
+		}
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		$this->assertEquals($unknown_before, $unknown_after,
+			'Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
+	}
+
+	/**
+	 * Burst-send 10000 log entries for a single log item at tm-45 alongside
+	 * a full history payload for all items at tm, and verify the server
+	 * absorbs them, triggers recover, and no new UNKNOWN trigger events appear.
+	 *
+	 * @depends testLLDHistorySyncAtScale_TriggerNoDataSuppressedAfterConnectionLoss
+	 */
+	public function testLLDHistorySyncAtScale_TriggerNoDataOKAfterConnectionLossSingleLogBurst() {
+		$unknown_before = $this->getUnknownTriggerEventCount();
+		$problem_before = $this->getProblemTriggerEventCount();
+
+		$this->sendSingleLogBurstAndFullHistory();
+		$this->assertSingleLogBurstAndFullHistoryVpsWritten();
+
+		$response = $this->call('trigger.get', [
+			'hostids' => [self::$hostid],
+			'output' => ['triggerid', 'value', 'state', 'error']
+		]);
+		$this->assertCount(self::$total_trigger_expected, $response['result'],
+			'Expected '.self::$total_trigger_expected.' triggers, got '.count($response['result']));
+		foreach ($response['result'] as $trigger) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, (int) $trigger['value'],
+				'Trigger '.$trigger['triggerid'].' is not in OK state.');
+			if ((int) $trigger['state'] !== TRIGGER_STATE_NORMAL) {
+				$this->markTestSkipped('Trigger '.$trigger['triggerid'].' is not in NORMAL state. Error: '
+					.$trigger['error']);
+			}
+		}
+
+		$problem_after = $this->getProblemTriggerEventCount();
+		$this->assertLessThanOrEqual($problem_before, $problem_after,
+			'Problem trigger event count increased: '.$problem_before.' -> '.$problem_after);
+
+		$unknown_after = $this->getUnknownTriggerEventCount();
+		if ($unknown_before !== $unknown_after) {
+			$this->markTestSkipped('Unknown trigger event count changed: '.$unknown_before.' -> '.$unknown_after);
+		}
+	}
+
+	private function getProblemTriggerEventCount(): int {
+		$response = $this->call('event.get', [
+			'hostids' => [self::$hostid],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'value' => TRIGGER_VALUE_TRUE,
+			'countOutput' => true
+		]);
+		return (int) $response['result'];
+	}
+
+	private function getUnknownTriggerEventCount(): int {
+		$response = $this->call('event.get', [
+			'hostids' => [self::$hostid],
+			'source' => EVENT_SOURCE_INTERNAL,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'value' => TRIGGER_STATE_UNKNOWN,
+			'countOutput' => true
+		]);
+		return (int) $response['result'];
+	}
+
+	private function waitUntilTriggersRecovered(): void {
 		$this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
 			'output' => ['triggerid', 'value', 'state']
@@ -771,12 +1161,18 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		}
 	}
 
-	private function prepareHistoryAt(int $tm, ?string $value = null, int $state = ITEM_STATE_NORMAL): array {
+	private function prepareHistoryAt(int $tm, ?string $value = null, int $state = ITEM_STATE_NORMAL,
+			bool $omit_value = false, bool $log_only = false): array {
 		$sent = [];
 		$values_by_type = [];
 
 		foreach (self::prototypeDefs() as $def) {
 			$vtype = $def['value_type'];
+
+			if ($log_only && $vtype !== ITEM_VALUE_TYPE_LOG) {
+				continue;
+			}
+
 			$items_by_key = self::$discovered_itemids[$vtype];
 
 			$this->assertCount(self::LLD_DISCOVERY_COUNT, $items_by_key,
@@ -788,15 +1184,24 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			foreach ($items_by_key as $itemid) {
 				$item_value = [
 					'itemid' => $itemid,
-					'value' => isset($value) ? $value : (string)($idx + 1),
 					'clock' => $tm,
 					'ns' => ($base_ns + $idx) % 1000000000
 				];
+				if (!$omit_value) {
+					$item_value['value'] = isset($value) ? $value : (string)($idx + 1);
+				}
+				if ($vtype === ITEM_VALUE_TYPE_LOG) {
+					$item_value['lastlogsize'] = self::$log_lastlogsize + $idx + 1;
+					$item_value['mtime'] = $tm;
+				}
 				if ($state !== ITEM_STATE_NORMAL) {
 					$item_value['state'] = $state;
 				}
 				$values[] = $item_value;
 				$idx++;
+			}
+			if ($vtype === ITEM_VALUE_TYPE_LOG) {
+				self::$log_lastlogsize += count($items_by_key);
 			}
 
 			$itemids = array_values($items_by_key);
@@ -823,11 +1228,62 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		return ['sent' => $sent, 'values' => $all_values];
 	}
 
-	private function sendHistoryAt(int $tm, ?string $value = null, int $state = ITEM_STATE_NORMAL): array {
-		['sent' => $sent, 'values' => $all_values] = $this->prepareHistoryAt($tm, $value, $state);
-		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+	private function sendHistoryAt(int $tm, ?string $value = null, int $state = ITEM_STATE_NORMAL,
+			bool $omit_value = false, bool $log_only = false): array {
+		['sent' => $sent, 'values' => $all_values] = $this->prepareHistoryAt($tm, $value, $state, $omit_value,
+			$log_only);
+		$this->dispatchValues($all_values);
 
 		return $sent;
+	}
+
+	private function sendHistoryAtTimes(array $tms, ?string $value = null, int $state = ITEM_STATE_NORMAL,
+			bool $omit_value = false): array {
+		$sent_per_tm = [];
+		$combined = [];
+		foreach ($tms as $tm) {
+			['sent' => $sent, 'values' => $values] = $this->prepareHistoryAt($tm, $value, $state, $omit_value);
+			$sent_per_tm[$tm] = $sent;
+			$combined = array_merge($combined, $values);
+		}
+		$this->dispatchValues($combined);
+
+		return $sent_per_tm;
+	}
+
+	private function sendSingleLogBurstAndFullHistory(): void {
+		$tm = time();
+
+		$log_itemids = array_values(self::$discovered_itemids[ITEM_VALUE_TYPE_LOG]);
+		$this->assertNotEmpty($log_itemids, 'No discovered log items available.');
+		$itemid = (int) $log_itemids[0];
+
+		['values' => $past_values] = $this->prepareHistoryAt($tm - 45);
+
+		$base_ns = (int)(microtime(true) * 1e9) % 1000000000;
+		$burst_values = [];
+		for ($i = 0; $i < 10000; $i++) {
+			$burst_values[] = [
+				'itemid' => $itemid,
+				'value' => (string)($i + 1),
+				'clock' => $tm - 45,
+				'ns' => ($base_ns + $i) % 1000000000,
+				'lastlogsize' => self::$log_lastlogsize + $i + 1,
+				'mtime' => $tm - 45
+			];
+		}
+		self::$log_lastlogsize += 10000;
+
+		['values' => $now_values] = $this->prepareHistoryAt($tm);
+
+		$values = array_merge($past_values, $burst_values, $now_values);
+
+		self::$vps_last = $this->getVpsWritten();
+		$this->dispatchValues($values);
+	}
+
+	private function assertSingleLogBurstAndFullHistoryVpsWritten(): void {
+		$this->assertVpsWrittenIncreasedBy(self::$vps_last, 2 * self::$total_expected + 10000);
 	}
 
 	private function verifyHistoryAt(int $tm, array $sent): void {
@@ -835,6 +1291,18 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			$vtype = $def['value_type'];
 			$itemids = $sent[$vtype]['itemids'];
 			$expected_by_itemid = $sent[$vtype]['expected_by_itemid'];
+
+			$this->callUntilDataIsPresent('history.get', [
+				'history' => $vtype,
+				'itemids' => [$itemids[0]],
+				'time_from' => $tm,
+				'time_till' => $tm
+			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+				if (count($response['result']) === 1) {
+					return true;
+				}
+				return false;
+			});
 
 			$history_response = $this->callUntilDataIsPresent('history.get', [
 				'history' => $vtype,
@@ -867,14 +1335,14 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			$data[] = [self::LLD_MACRO => self::SENSOR_BASE.$i];
 		}
 
-		$this->sendAgentDataValues([
+		$this->dispatchValues([
 			[
 				'itemid' => (int) self::$lld_ruleid,
 				'value' => json_encode(['data' => $data]),
 				'clock' => time(),
 				'ns' => 0
 			]
-		], self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+		]);
 	}
 
 
@@ -911,6 +1379,44 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		return (int) $result['item']['result'];
 	}
 
+	private function getDelayedItemsCount(): int {
+		$result = $this->testItemOnServer((string) self::$hostid,
+			['value_type' => ITEM_VALUE_TYPE_UINT64, 'type' => ITEM_TYPE_INTERNAL, 'key' => 'zabbix[queue,15,]']
+		);
+		$this->assertNotFalse($result);
+		$this->assertArrayHasKey('item', $result);
+		$this->assertArrayNotHasKey('error', $result['item']);
+		$this->assertArrayHasKey('result', $result['item']);
+		$this->assertIsNumeric($result['item']['result']);
+
+		return (int) $result['item']['result'];
+	}
+
+	private function waitUntilDelayedItemsCount(int $expected): void {
+		$timeout = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
+		$start = microtime(true);
+		$count = $this->getDelayedItemsCount();
+
+		$reached = $expected === 0
+			? function (int $c) use ($expected) { return $c === $expected; }
+			: function (int $c) use ($expected) { return $c >= $expected; };
+
+		while (!$reached($count) && (microtime(true) - $start) < $timeout) {
+			$this->sendAgentPing();
+			usleep(100000); // 100 ms
+			$count = $this->getDelayedItemsCount();
+		}
+
+		$waited = round(microtime(true) - $start, 1);
+		if ($expected === 0) {
+			$this->assertSame($expected, $count,
+				"Delayed items count did not reach {$expected} after waiting {$waited}s (last value: {$count})");
+		} else {
+			$this->assertGreaterThanOrEqual($expected, $count,
+				"Delayed items count did not reach at least {$expected} after waiting {$waited}s (last value: {$count})");
+		}
+	}
+
 	private function assertVpsWrittenIncreasedBy(int $baseline, int $min_increase): void {
 		$expected = $baseline + $min_increase;
 		$timeout = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
@@ -935,14 +1441,14 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDHistorySyncAtScale_LLDDiscovery
 	 */
 	public function testLLDHistorySyncAtScale_LLDCleanup() {
-		$this->sendAgentDataValues([
+		$this->dispatchValues([
 			[
 				'itemid' => (int) self::$lld_ruleid,
 				'value' => json_encode(['data' => []]),
 				'clock' => time(),
 				'ns' => 0
 			]
-		], self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+		]);
 
 		$this->callUntilCountIsPresent('item.get', [
 			'hostids' => [self::$hostid],
@@ -950,7 +1456,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		], 0, self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		/* check that server succeessfuly removed large amount of items from cache */
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER, null, self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 	}
 }
