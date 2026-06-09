@@ -2367,57 +2367,6 @@ class CService extends CApiService {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 			}
 
-			$is_rw_service = $db_services !== null && array_key_exists($service['serviceid'], $rw_services)
-				&& $rw_services[$service['serviceid']] === null;
-
-			if (!$is_rw_service) {
-				if ($rw_tag['tag'] !== '') {
-					if (array_key_exists('tags', $service)) {
-						$tags = $service['tags'];
-					}
-					elseif ($db_services !== null) {
-						$tags = $db_services[$service['serviceid']]['tags'];
-					}
-					else {
-						$tags = [];
-					}
-
-					foreach ($tags as $tag) {
-						if ($tag['tag'] === $rw_tag['tag']
-								&& ($tag['value'] === $rw_tag['value'] || $rw_tag['value'] === '')) {
-							$is_rw_service = true;
-
-							break;
-						}
-					}
-				}
-			}
-
-			if (!$is_rw_service) {
-				if (array_key_exists('parents', $service)) {
-					$parent_services = array_column($service['parents'], 'serviceid', 'serviceid');
-
-					$is_rw_service = (bool) array_intersect_key($parent_services, $rw_services);
-				}
-				else {
-					$is_rw_service = $db_services !== null;
-				}
-			}
-
-			if (!$is_rw_service) {
-				$error_detail = $db_services !== null
-					? _('read-write access to the service must be retained')
-					: _('read-write access to the service is required');
-
-				$error = $db_services !== null
-					? _s('Cannot update service "%1$s": %2$s.', $name, $error_detail)
-					: _s('Cannot create service "%1$s": %2$s.', $name, $error_detail);
-
-				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
-			}
-
-			$rw_services[$service['serviceid']] = null;
-
 			if (array_key_exists('children', $service)) {
 				$new_child_services = array_column($service['children'], 'serviceid', 'serviceid');
 				$old_child_services = $db_services !== null
@@ -2456,6 +2405,58 @@ class CService extends CApiService {
 					}
 				}
 			}
+		}
+
+		foreach ($services as $service) {
+			$is_rw_service = $db_services !== null && $rw_services[$service['serviceid']] === null;
+
+			if (!$is_rw_service) {
+				if ($rw_tag['tag'] !== '') {
+					if (array_key_exists('tags', $service)) {
+						$tags = $service['tags'];
+					}
+					elseif ($db_services !== null) {
+						$tags = $db_services[$service['serviceid']]['tags'];
+					}
+					else {
+						$tags = [];
+					}
+
+					foreach ($tags as $tag) {
+						if ($tag['tag'] === $rw_tag['tag']
+								&& ($tag['value'] === $rw_tag['value'] || $rw_tag['value'] === '')) {
+							$is_rw_service = true;
+
+							break;
+						}
+					}
+				}
+			}
+
+			if (!$is_rw_service) {
+				if (array_key_exists('parents', $service)) {
+					$parent_services = array_column($service['parents'], 'serviceid', 'serviceid');
+
+					$is_rw_service = (bool) array_intersect_key($parent_services, $rw_services);
+				}
+				else {
+					$is_rw_service = $db_services !== null && $rw_services[$service['serviceid']] > 0;
+				}
+			}
+
+			if (!$is_rw_service) {
+				$error_detail = $db_services !== null
+					? _('read-write access to the service must be retained')
+					: _('read-write access to the service is required');
+
+				$error = $db_services !== null
+					? _s('Cannot update service "%1$s": %2$s.', $name, $error_detail)
+					: _s('Cannot create service "%1$s": %2$s.', $name, $error_detail);
+
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
+
+			$rw_services[$service['serviceid']] = null;
 		}
 
 		if ($db_services !== null) {
