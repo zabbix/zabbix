@@ -518,7 +518,9 @@ class CIntegrationTest extends CAPITest {
 			}
 		}
 
-		sleep(3);
+		if ($failed_pids) {
+			sleep(3);
+		}
 
 		foreach ($failed_pids as $child_pid) {
 			if (!posix_kill($child_pid, SIGKILL)) {
