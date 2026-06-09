@@ -1193,9 +1193,8 @@ class CDataTable {
 
 		this.dispatchEvent(CDataTable.EVENT_INIT, {
 			onSuccess: () => {
-				// TODO: not working
 				requestAnimationFrame(() => {
-					const header_cell = duplicate_column.getHeaderCell();
+					const header_cell = this.getColumn(duplicate_column.getColumnIndex())?.getHeaderCell();
 					if (header_cell) {
 						this.#scrollBodyToTarget(header_cell.target);
 
