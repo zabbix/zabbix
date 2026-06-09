@@ -66,7 +66,7 @@ final class CRouter {
 		'actionlog.list'							=> [CControllerActionLogList::class,							ZBX_LAYOUT_HTMLPAGE,	'reports.actionlog.list'],
 		'audit.settings.edit'						=> [CControllerAuditSettingsEdit::class,						ZBX_LAYOUT_HTMLPAGE,	'administration.audit.settings.edit'],
 		'audit.settings.update'						=> [CControllerAuditSettingsUpdate::class,						ZBX_LAYOUT_JSON,		null],
-		'auditlog.csv'								=> [CControllerAuditLogList::class,								ZBX_LAYOUT_CSV,			'reports.auditlog.list'],
+		'auditlog.csv'								=> [CControllerAuditLogList::class,								ZBX_LAYOUT_CSV,			'reports.auditlog.list.csv'],
 		'auditlog.list'								=> [CControllerAuditLogList::class,								ZBX_LAYOUT_HTMLPAGE,	'reports.auditlog.list'],
 		'authentication.edit'						=> [CControllerAuthenticationEdit::class,						ZBX_LAYOUT_HTMLPAGE,	'administration.authentication.edit'],
 		'authentication.update'						=> [CControllerAuthenticationUpdate::class,						ZBX_LAYOUT_JSON,		null],
