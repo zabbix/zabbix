@@ -112,7 +112,7 @@ function getGraphDims($graphid = null) {
 		$graphDims['shiftXright'] = 85;
 	}
 
-	$graphDims['graphHeight']++;
+	$graphDims['graphHeight'] = min($graphDims['graphHeight'] + 1, 65535);
 
 	return $graphDims;
 }
