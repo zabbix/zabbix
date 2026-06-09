@@ -200,7 +200,7 @@
 			ZABBIX.Dashboard.on(CDashboard.EVENT_PAGE_SELECTED, e => {
 				const {page} = e.detail;
 
-				new CState(location.href).setParams({page});
+				new CState(location.href).setParams({page: page === 1 ? null : page});
 			})
 
 			ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_STARTED, e => {
