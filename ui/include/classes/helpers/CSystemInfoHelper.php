@@ -30,46 +30,18 @@ class CSystemInfoHelper {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$data = [
-			'collected_at' => time(),
-			'serverid' => CSettingsHelper::getPrivate(CSettingsHelper::SERVER_ID),
-			'server_details' => null,
-			'address' => null,
-			'port' => null,
-			'status' => static::getServerStatus($ZBX_SERVER, $ZBX_SERVER_PORT) + [
-				'server_version' => null,
-				'triggers_count_disabled' => null,
-				'triggers_count_off' => null,
-				'triggers_count_on' => null,
-				'items_count_monitored' => null,
-				'items_count_disabled' => null,
-				'items_count_not_supported' => null,
-				'hosts_count_monitored' => null,
-				'hosts_count_not_monitored' => null,
-				'hosts_count_template' => null,
-				'users_count' => null,
-				'users_online' => null,
-				'vps_total' => null,
-				'hosts_count' => null,
-				'items_count' => null,
-				'triggers_count' => null,
-				'triggers_count_enabled' => null
-			],
-			'dbversion_status' => [],
-			'ha_cluster_enabled' => false,
-			'failover_delay' => null,
-			'failover_delay_seconds' => null,
-			'ha_nodes' => [],
-			'history_pk' => false,
-			CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY => false,
-			CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS => false,
 			'is_global_scripts_enabled' => CSettingsHelper::isGlobalScriptsEnabled(),
 			'is_software_update_check_enabled' => CSettingsHelper::isSoftwareUpdateCheckEnabled(),
-			'software_update_check_data' => [
-				'lastcheck' => null,
-				'latest_release' => null
-			],
-			'encoding_warning' => null,
-			'requirements' => [],
+			'software_update_check_data' => [],
+			'status' => static::getServerStatus($ZBX_SERVER, $ZBX_SERVER_PORT),
+			CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY => false,
+			CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS => false,
+			'server_details' => '',
+			'server_host' => null,
+			'server_port' => null,
+			'history_pk' => false,
+			'failover_delay' => 0,
+			'failover_delay_seconds' => 0,
 			'http_auth_warning' => array_key_exists('ALLOW_HTTP_AUTH', APP::getConfig())
 		];
 
@@ -89,7 +61,7 @@ class CSystemInfoHelper {
 		}
 
 		$db_backend = DB::getDbBackend();
-		$data['encoding_warning'] = $db_backend->checkEncoding() ? null : $db_backend->getWarning();
+		$data['encoding_warning'] = $db_backend->checkEncoding() ? '' : $db_backend->getWarning();
 
 		foreach (CSettingsHelper::getDbVersionStatus() as $dbversion) {
 			if (array_key_exists('history_pk', $dbversion)) {
@@ -113,20 +85,22 @@ class CSystemInfoHelper {
 			$data[CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS] = true;
 		}
 
+		$ha_cluster_enabled = false;
+
 		$ha_nodes = API::getApiService('hanode')->get([
 			'output' => ['name', 'address', 'port', 'lastaccess', 'status'],
 			'sortfield' => 'status',
 			'sortorder' => 'DESC'
 		], false);
 
-		foreach ($ha_nodes as $index => &$node) {
+		foreach ($ha_nodes as $index => $node) {
 			if ($node['name'] === '' && $node['status'] == ZBX_NODE_STATUS_ACTIVE) {
-				$data['ha_cluster_enabled'] = false;
+				$ha_cluster_enabled = false;
 				$ha_nodes = [];
 				break;
 			}
 			elseif ($node['status'] == ZBX_NODE_STATUS_STANDBY || $node['status'] == ZBX_NODE_STATUS_ACTIVE) {
-				$data['ha_cluster_enabled'] = true;
+				$ha_cluster_enabled = true;
 			}
 
 			if ($node['status'] == ZBX_NODE_STATUS_ACTIVE) {
@@ -138,16 +112,12 @@ class CSystemInfoHelper {
 					$ha_nodes[$index]['status'] = ZBX_NODE_STATUS_UNAVAILABLE;
 				}
 			}
-
-			$node['port'] = (int) $node['port'];
-			$node['lastaccess'] = (int) $node['lastaccess'];
-			$node['status'] = (int) $node['status'];
 		}
-		unset($node);
 
+		$data['ha_cluster_enabled'] = $ha_cluster_enabled;
 		$data['ha_nodes'] = $ha_nodes;
 
-		if ($data['ha_cluster_enabled']) {
+		if ($ha_cluster_enabled) {
 			$failover_delay = CSettingsHelper::get(CSettingsHelper::HA_FAILOVER_DELAY);
 			$failover_delay_seconds = timeUnitToSeconds($failover_delay);
 			$data['failover_delay'] = secondsToPeriod($failover_delay_seconds);
@@ -155,20 +125,18 @@ class CSystemInfoHelper {
 		}
 
 		if (CWebUser::getType() != USER_TYPE_ZABBIX_ADMIN && CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			unset($data['dbversion_status'], $data['software_update_check_data'], $data['requirements']);
-
 			return $data;
 		}
 
 		if ($ZBX_SERVER !== null && $ZBX_SERVER_PORT !== null) {
 			$data['server_details'] = $ZBX_SERVER.':'.$ZBX_SERVER_PORT;
-			$data['address'] = $ZBX_SERVER;
-			$data['port'] = $ZBX_SERVER_PORT;
+			$data['server_host'] = $ZBX_SERVER;
+			$data['server_port'] = $ZBX_SERVER_PORT;
 		}
 		elseif (count($ha_nodes) == 1) {
 			$data['server_details'] = $ha_nodes[0]['address'].':'.$ha_nodes[0]['port'];
-			$data['address'] = $ha_nodes[0]['address'];
-			$data['port'] = $ha_nodes[0]['port'];
+			$data['server_host'] = $ha_nodes[0]['address'];
+			$data['server_port'] = $ha_nodes[0]['port'];
 		}
 
 		$setup = new CFrontendSetup();
@@ -220,6 +188,182 @@ class CSystemInfoHelper {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Get system information export data.
+	 */
+	public static function getExportData(): array {
+		$system_info = CSystemInfoHelper::getData();
+		$system_info['software_update_check_data'] += [
+			'lastcheck' => null,
+			'latest_release' => null
+		];
+		$system_info['status'] = array_replace([
+			'server_version' => null,
+			'triggers_count_disabled' => null,
+			'triggers_count_off' => null,
+			'triggers_count_on' => null,
+			'items_count_monitored' => null,
+			'items_count_disabled' => null,
+			'items_count_not_supported' => null,
+			'hosts_count_monitored' => null,
+			'hosts_count_not_monitored' => null,
+			'hosts_count_template' => null,
+			'users_count' => null,
+			'users_online' => null,
+			'vps_total' => null,
+			'hosts_count' => null,
+			'items_count' => null,
+			'triggers_count' => null,
+			'triggers_count_enabled' => null
+		], $system_info['status']);
+
+		$result = [
+			'report' => [
+				'id' => _('System information'),
+				'value' => time()
+			],
+			'serverid' => [
+				'id' => _('Zabbix server ID'),
+				'value' => CSettingsHelper::getPrivate(CSettingsHelper::SERVER_ID)
+			],
+			'server_running' => [
+				'id' => _('Zabbix server is running'),
+				'value' => $system_info['status']['is_running'],
+				'details' => [
+					'has_status' => $system_info['status']['has_status'],
+					'error_code' => $system_info['status']['error_code'],
+					'address' => $system_info['server_host'],
+					'port' => $system_info['server_port']
+				]
+			],
+			'server_version' => [
+				'id' => _('Zabbix server version'),
+				'value' => $system_info['status']['server_version'],
+				'details' => [
+					'outdated' => null,
+					'last_checked' => null
+				]
+			],
+			'frontend_version' => [
+				'id' => _('Zabbix frontend version'),
+				'value' => ZABBIX_VERSION,
+				'details' => [
+					'update_check_enabled' => $system_info['is_software_update_check_enabled'],
+					'outdated' => null,
+					'encoding_warning' => $system_info['encoding_warning'] !== ''
+						? $system_info['encoding_warning']
+						: null
+				]
+			],
+			'hosts' => [
+				'id' => _('Number of hosts (enabled/disabled)'),
+				'value' => $system_info['status']['hosts_count'],
+				'details' => [
+					'enabled' => $system_info['status']['hosts_count_monitored'],
+					'disabled' => $system_info['status']['hosts_count_not_monitored']
+				]
+			],
+			'templates' => [
+				'id' => _('Number of templates'),
+				'value' => $system_info['status']['hosts_count_template']
+			],
+			'items' => [
+				'id' => _('Number of items (enabled/disabled/not supported)'),
+				'value' => $system_info['status']['items_count'],
+				'details' => [
+					'enabled' => $system_info['status']['items_count_monitored'],
+					'disabled' => $system_info['status']['items_count_disabled'],
+					'not_supported' => $system_info['status']['items_count_not_supported']
+				]
+			],
+			'triggers' => [
+				'id' => _('Number of triggers (enabled/disabled [problem/ok])'),
+				'value' => $system_info['status']['triggers_count'],
+				'details' => [
+					'enabled' => $system_info['status']['triggers_count_enabled'],
+					'disabled' => $system_info['status']['triggers_count_disabled'],
+					'problem' => $system_info['status']['triggers_count_on'],
+					'ok' => $system_info['status']['triggers_count_off']
+				]
+			],
+			'users' => [
+				'id' => _('Number of users (online)'),
+				'value' => $system_info['status']['users_count'],
+				'details' => [
+					'online' => $system_info['status']['users_online']
+				]
+			],
+			'values_per_second' => [
+				'id' => _('Required server performance, new values per second'),
+				'value' => $system_info['status']['vps_total']
+			],
+			'global_scripts' => [
+				'id' => _('Global scripts on Zabbix server'),
+				'value' => $system_info['is_global_scripts_enabled']
+			],
+			'history_primary_key' => [
+				'id' => _('Database history tables use primary key'),
+				'value' => false
+			],
+			'data_stores' => [
+				'id' => _('Data stores'),
+				'value' => null,
+				'details' => []
+			],
+			'housekeeping' => [
+				'id' => _('Housekeeping'),
+				'value' => null,
+				'details' => [
+					'needs_override_history' => $system_info[CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY],
+					'needs_override_trends' => $system_info[CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS]
+				]
+			],
+			'high_availability' => [
+				'id' => _('High availability cluster'),
+				'value' => $system_info['ha_cluster_enabled'],
+				'details' => [
+					'failover_delay' => $system_info['failover_delay_seconds'],
+					'nodes' => []
+				]
+			]
+		];
+
+		if ($system_info['is_software_update_check_enabled']
+				&& array_key_exists('latest_release', $system_info['software_update_check_data'])) {
+			$latest_release = $system_info['software_update_check_data']['latest_release'];
+			$result['frontend_version']['details']['outdated'] = version_compare(ZABBIX_VERSION, $latest_release, '<');
+			$result['server_version']['details']['last_checked'] = $system_info['software_update_check_data']['lastcheck'];
+
+			if ($system_info['status']['server_version'] !== null) {
+				$result['server_version']['details']['outdated'] = version_compare(
+					$system_info['status']['server_version'],
+					$latest_release, '<'
+				);
+			}
+		}
+
+		foreach ($system_info['dbversion_status'] as $dbversion) {
+			$result['data_stores']['details'][] = [
+				'store' => $dbversion['database'],
+				'current_version' => $dbversion['current_version'],
+				'version_supported' => $dbversion['flag'] == DB_VERSION_SUPPORTED
+				// TODO: check is it necessary data below
+			] + array_intersect_key($dbversion, array_flip(['history_pk', 'value_types']));
+		}
+
+		foreach ($system_info['ha_nodes'] as $ha_node) {
+			$result['high_availability']['details']['nodes'] = [
+				'name' => $ha_node['name'],
+				'address' => $ha_node['address'],
+				'port' => (int) $ha_node['port'],
+				'last_access' => (int) $ha_node['last_access'],
+				'status' => (int) $ha_node['status']
+			];
+		}
+
+		return $result;
 	}
 
 	/**
@@ -391,144 +535,5 @@ class CSystemInfoHelper {
 		$status['server_version'] = $server_status['server stats']['version'];
 
 		return $status;
-	}
-
-	public static function getExportData(array $data): array {
-		foreach ($data['ha_nodes'] as &$node) {
-			$node['last_access'] = $node['lastaccess'];
-			unset($node['lastaccess']);
-		}
-		unset($node);
-
-		$result = [
-			'report' => [
-				'id' => _('System information'),
-				'value' => $data['collected_at']
-			],
-			'serverid' => [
-				'id' => _('Zabbix server ID'),
-				'value' => $data['serverid']
-			],
-			'server_running' => [
-				'id' => _('Zabbix server is running'),
-				'value' => $data['status']['is_running'],
-				'details' => [
-					'has_status' => $data['status']['has_status'],
-					'error_code' => $data['status']['error_code'],
-					'address' => $data['address'],
-					'port' => $data['port']
-				]
-			],
-			'server_version' => [
-				'id' => _('Zabbix server version'),
-				'value' => $data['status']['server_version'],
-				'details' => [
-					'outdated' => $data['status']['server_version'] !== null
-							&& $data['software_update_check_data']['latest_release'] !== null
-						? version_compare(
-							$data['status']['server_version'],
-							$data['software_update_check_data']['latest_release'],
-							'<'
-						)
-						: null,
-					'last_checked' => $data['software_update_check_data']['lastcheck']
-				]
-			],
-			'frontend_version' => [
-				'id' => _('Zabbix frontend version'),
-				'value' => ZABBIX_VERSION,
-				'details' => [
-					'update_check_enabled' => $data['is_software_update_check_enabled'],
-					'outdated' => $data['software_update_check_data']['latest_release'] !== null
-						? version_compare(ZABBIX_VERSION, $data['software_update_check_data']['latest_release'], '<')
-						: null,
-					'encoding_warning' => $data['encoding_warning']
-				]
-			],
-			'hosts' => [
-				'id' => _('Number of hosts (enabled/disabled)'),
-				'value' => $data['status']['hosts_count'],
-				'details' => [
-					'enabled' => $data['status']['hosts_count_monitored'],
-					'disabled' => $data['status']['hosts_count_not_monitored']
-				]
-			],
-			'templates' => [
-				'id' => _('Number of templates'),
-				'value' => $data['status']['hosts_count_template']
-			],
-			'items' => [
-				'id' => _('Number of items (enabled/disabled/not supported)'),
-				'value' => $data['status']['items_count'],
-				'details' => [
-					'enabled' => $data['status']['items_count_monitored'],
-					'disabled' => $data['status']['items_count_disabled'],
-					'not_supported' => $data['status']['items_count_not_supported']
-				]
-			],
-			'triggers' => [
-				'id' => _('Number of triggers (enabled/disabled [problem/ok])'),
-				'value' => $data['status']['triggers_count'],
-				'details' => [
-					'enabled' => $data['status']['triggers_count_enabled'],
-					'disabled' => $data['status']['triggers_count_disabled'],
-					'problem' => $data['status']['triggers_count_on'],
-					'ok' => $data['status']['triggers_count_off']
-				]
-			],
-			'users' => [
-				'id' => _('Number of users (online)'),
-				'value' => $data['status']['users_count'],
-				'details' => [
-					'online' => $data['status']['users_online']
-				]
-			],
-			'values_per_second' => [
-				'id' => _('Required server performance, new values per second'),
-				'value' => $data['status']['vps_total']
-			],
-			'global_scripts' => [
-				'id' => _('Global scripts on Zabbix server'),
-				'value' => $data['is_global_scripts_enabled']
-			],
-			'history_primary_key' => [
-				'id' => _('Database history tables use primary key'),
-				'value' => $data['history_pk']
-			],
-			'data_stores' => [
-				'id' => _('Data stores'),
-				'value' => null,
-				'details' => []
-			],
-			'housekeeping' => [
-				'id' => _('Housekeeping'),
-				'value' => null,
-				'details' => [
-					'needs_override_history' => $data[CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY],
-					'needs_override_trends' => $data[CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS]
-				]
-			],
-			'high_availability' => [
-				'id' => _('High availability cluster'),
-				'value' => $data['ha_cluster_enabled'],
-				'details' => [
-					'failover_delay' => $data['failover_delay_seconds'],
-					'nodes' => $data['ha_cluster_enabled'] ? $data['ha_nodes'] : []
-				]
-			]
-		];
-
-		foreach ($data['dbversion_status'] as $dbversion) {
-			$db_detail = ['store' => $dbversion['database']] +
-				array_intersect_key($dbversion, array_flip(['current_version', 'history_pk', 'value_types']));
-
-			if (array_key_exists('flag', $dbversion)) {
-				$db_detail['version_supported'] = $dbversion['flag'] == DB_VERSION_SUPPORTED;
-			}
-
-			$result['data_stores']['details'][] = $db_detail;
-		}
-
-		return $result;
 	}
 }

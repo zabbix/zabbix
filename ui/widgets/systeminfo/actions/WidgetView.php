@@ -24,12 +24,9 @@ use CControllerDashboardWidgetView,
 class WidgetView extends CControllerDashboardWidgetView {
 
 	protected function doAction(): void {
-		$system_info = CSystemInfoHelper::getData();
-		unset($system_info['serverid']);
-
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'system_info' => $system_info,
+			'system_info' => CSystemInfoHelper::getData(),
 			'info_type' => $this->fields_values['info_type'],
 			'user_type' => CWebUser::getType(),
 			'user' => [
