@@ -122,10 +122,10 @@ var LldRuleEditLldRuleTab = class {
 
 		this.#container.querySelector('.js-parseurl').addEventListener('click', (e) => this.#parseUrl(e.target));
 
-		new CViewSwitcher('authtype', 'change', this.#field_switches.for_authtype);
-		new CViewSwitcher('type', 'change', this.#field_switches.for_type);
-		new CViewSwitcher('http_authtype', 'change', this.#field_switches.for_http_auth_type);
 		new CViewSwitcher('allow_traps', 'change', this.#field_switches.for_traps);
+		new CViewSwitcher('authtype', 'change', this.#field_switches.for_authtype);
+		new CViewSwitcher('http_authtype', 'change', this.#field_switches.for_http_auth_type);
+		new CViewSwitcher('type', 'change', this.#field_switches.for_type);
 
 		this.#container.querySelector('#delay-flex-table').addEventListener('click', e => {
 			if (e.target.type === 'radio') {
