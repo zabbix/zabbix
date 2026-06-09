@@ -173,7 +173,7 @@ $return_url = (new CUrl('zabbix.php'))
 
 $output = [
 	'header' => $data['lldrule']['itemid'] ? _('Discovery rule') : _('New discovery rule'),
-	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_EDIT),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_DISCOVERY_EDIT),
 	'body' => $form->toString().implode('', $scripts),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
