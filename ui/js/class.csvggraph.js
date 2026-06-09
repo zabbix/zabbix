@@ -117,7 +117,7 @@
 			hbox = graph.data('hintbox'),
 			content = hbox ? hbox.find('.svg-graph-hintbox') : null;
 
-		let hbox_footer = graph.data('hintbox_footer') || null;
+		const hbox_footer = graph.data('hintbox_footer') || null;
 
 		// Destroy old hintbox to make new one with close button.
 		destroyHintbox(graph);
