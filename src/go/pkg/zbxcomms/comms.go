@@ -447,11 +447,8 @@ func Exchange(addrpool AddressSet, localAddr *net.Addr, timeout time.Duration, c
 	return b, nil, nil
 }
 
-// ExchangeWithRedirect performs the same operations as Exchange, but also handles redirect responses from the server.
-// where function returns a boolean indicating whether the error is network-related and should trigger a retry,
-// and the error itself.
 func ExchangeWithRedirect(addrpool AddressSet, localAddr *net.Addr, timeout time.Duration,
-	connectTimeout time.Duration, data []byte, args ...any) ([]byte, bool, []error, error) {
+	connectTimeout time.Duration, data []byte, args ...interface{}) ([]byte, []error, error) {
 	retries := 0
 retry:
 	retries++
@@ -469,23 +466,23 @@ retry:
 	b, errs, err := Exchange(exchangeAddrPool, localAddr, timeout, connectTimeout, data, args...)
 
 	if errs != nil {
-		return b, true, errs, err
+		return b, errs, err
 	}
 
 	var response redirectResponse
 
 	if json.Unmarshal(b, &response) != nil {
-		return b, false, errs, err
+		return b, errs, err
 	}
 
 	if response.Response != responseFailed || nil == response.Redirect {
-		return b, false, errs, err
+		return b, errs, err
 	}
 
 	if retries > 1 {
 		errs = append(errs, errors.New("sequential redirect responses detected"))
 
-		return nil, false, errs, err
+		return nil, errs, err
 	}
 
 	if response.Redirect.Reset {
