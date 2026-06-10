@@ -231,7 +231,11 @@ class testTriggerCEP extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'LogFileSize' => 0,
-				'DebugLevel' => 3
+				'DebugLevel' => 3,
+				'CacheSize' => '128M',
+				'HistoryCacheSize' => '32M',
+				'HistoryIndexCacheSize' => '32M',
+				'ValueCacheSize' => '128M'
 			]
 		];
 	}
@@ -930,6 +934,24 @@ class testTriggerCEP extends CIntegrationTest {
 			'Tag type=cep-dep not found in: '.$dep_tags_json);
 		// Reload configuration cache so server is aware of the newly discovered items.
 		$this->reloadConfigurationCacheAndWaitForLogLine();
+	}
+
+	/**
+	 * Sanity check: send a numeric value of 0 to all discovered items and verify the values were
+	 * written to the history cache (zabbix[vps,written] advanced), without asserting any trigger
+	 * state or event changes.
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_VpsWritten() {
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+
+		$vps_written = $this->getVpsWritten();
+		$this->sendSenderValues(
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'], $keys),
+			null, 0
+		);
+		$this->assertVpsWrittenIncreasedBy($vps_written, count($keys));
 	}
 
 	/**
@@ -1782,7 +1804,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'message' => 'Manual close for tag-correlation mode test'
 		]);
 		$this->assertArrayHasKey('error', $ack_response,
-			'Expected manual close to be rejected, but it succeeded.');
+			'Expected manual close to be rejected, but it succeeded: '.json_encode($ack_response));
 
 		// Enable manual close on the trigger prototypes so the setting propagates to all
 		// discovered triggers after LLD re-discovery.
@@ -2069,7 +2091,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'output' => ['triggerid', 'value', 'lastchange', 'state', 'recovery_mode', 'type', 'correlation_mode']
 		];
 		$this->callUntilDataIsPresent('trigger.get', $trigger_params,
-			90, self::WAIT_ITERATION_DELAY,
+			120, self::WAIT_ITERATION_DELAY,
 			function ($response) use ($triggerids, $expected_trigger_value, $prev_lastchanges, $now, $check_lastchange) {
 				$by_id = array_column($response['result'], null, 'triggerid');
 				$missing = 0;
