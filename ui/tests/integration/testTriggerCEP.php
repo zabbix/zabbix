@@ -973,7 +973,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 *   4. Trigger A: PROBLEM→PROBLEM    – item supported again; no new event, lastchange not updated
 	 *   5. Trigger A: PROBLEM→OK         – RESOLVED event generated
 	 *
-	 * @depends testTriggerCEP_TriggerStateTransitions
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_EventAssessment() {
 		$this->runEventAssessmentTest(false);
