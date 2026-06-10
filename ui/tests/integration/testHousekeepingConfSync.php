@@ -177,7 +177,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 
 		foreach ($section as $line) {
 			$events_pattern = '/events, mode:(\d+) period:\[trigger:(\d+) internal:(\d+) '.
-				'autoreg:(\d+) discovery:(\d+)\]/';
+				'autoreg:(\d+) discovery:(\d+) service:(\d+)\]/';
 
 			if (preg_match($events_pattern, $line, $matches)) {
 				$housekeeping['hk_events_mode'] = (int) $matches[1];
@@ -185,6 +185,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 				$housekeeping['hk_events_internal'] = (int) $matches[3];
 				$housekeeping['hk_events_autoreg'] = (int) $matches[4];
 				$housekeeping['hk_events_discovery'] = (int) $matches[5];
+				$housekeeping['hk_events_service'] = (int) $matches[6];
 			}
 			else if (preg_match('/audit, mode:(\d+) period:(\d+)/', $line, $matches)) {
 				$housekeeping['hk_audit_mode'] = (int) $matches[1];
