@@ -386,7 +386,12 @@ class CControllerProblemViewData extends CControllerDataTable {
 		}
 
 		$data = $this->prepareData();
-		$show_opdata_separately = in_array('opdata', $data['data_fields']);
+
+		$show_opdata = $data['options']['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
+		$show_opdata_separately = in_array($data['options']['show_opdata'], [OPERATIONAL_DATA_SHOW_SEPARATELY,
+			OPERATIONAL_DATA_SHOW_BOTH]);
+		$show_opdata_with_problem = in_array($data['options']['show_opdata'], [OPERATIONAL_DATA_SHOW_WITH_PROBLEM,
+			OPERATIONAL_DATA_SHOW_BOTH]);
 
 		$csv = [];
 
@@ -438,7 +443,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			// operational data
 			$opdata = null;
-			if ($data['options']['show_opdata'] || $show_opdata_separately) {
+			if ($show_opdata) {
 				if ($trigger['opdata'] === '') {
 					if ($show_opdata_separately) {
 						$opdata = CScreenProblem::getLatestValues($trigger['items'], false);
@@ -489,7 +494,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$row[] = $problem['r_eventid'] != 0 ? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']) : '';
 			$row[] = $value_str;
 			$row[] = implode(', ', $hosts);
-			$row[] = ($data['options']['show_opdata'] && $trigger['opdata'] !== '')
+			$row[] = ($show_opdata_with_problem && $trigger['opdata'] !== '')
 				? $problem['name'].' ('.$opdata.')'
 				: $problem['name'];
 
