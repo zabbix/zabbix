@@ -430,7 +430,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 
 	if (CURLE_OK != (err = curl_easy_perform(request->handle)))
 	{
-		const char *detail = ('\0' != request->errbuf[0]) ? request->errbuf : curl_easy_strerror(err);
+		const char	*detail = ('\0' != request->errbuf[0]) ? request->errbuf : curl_easy_strerror(err);
 
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot get URL: %s.", detail);
 		goto out;
