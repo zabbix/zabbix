@@ -393,6 +393,5 @@ class CControllerHostViewData extends CControllerDataTable {
 				$hosts[$hostid]['custom_text'][$key] = $value;
 			}
 		}
-		unset($host);
 	}
 }
