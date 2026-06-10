@@ -412,6 +412,10 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 		zbx_json_addstring(&json, "id", message_uuid7, ZBX_JSON_TYPE_STRING);
 		zbx_json_addint64(&json, "time", event->clock);
 
+		char	clock_str[32];
+		zbx_snprintf(clock_str, sizeof(clock_str), "%u", event->clock);
+		zbx_json_addstring(&json, "time", clock_str, ZBX_JSON_TYPE_STRING);
+
 		if (0 == strcmp(event_value, "0"))
 		{
 			zbx_json_addstring(&json, "type", "problem.recovered", ZBX_JSON_TYPE_STRING);
@@ -428,7 +432,7 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 		zbx_json_addstring(&json, "source", "zabbix/server", ZBX_JSON_TYPE_STRING);
 		subject_dyn = zbx_dsprintf(subject_dyn, "event/%s", event_id);
 		zbx_json_addstring(&json, "subject", subject_dyn, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, "schema", "urn:zabbix:server:event:1", ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, "dataschema", "urn:zabbix:server:event:1", ZBX_JSON_TYPE_STRING);
 
 		zbx_json_addobject(&json, "data");
 		zbx_json_addstring(&json, "title", subject, ZBX_JSON_TYPE_STRING);
