@@ -1491,6 +1491,73 @@ button {
 .zi-widget-empty-references-large::before {
   color: #ff5050; }
 
+.calendar {
+  width: 200px; }
+  .calendar .calendar-header {
+    text-align: center; }
+    .calendar .calendar-header .btn-grey {
+      border: 0;
+      background-color: transparent; }
+  .calendar .calendar-year, .calendar .calendar-month {
+    height: 24px;
+    line-height: 26px;
+    display: table;
+    width: 100%; }
+    .calendar .calendar-year button:first-child, .calendar .calendar-month button:first-child {
+      float: left; }
+    .calendar .calendar-year button:last-child, .calendar .calendar-month button:last-child {
+      float: right; }
+    .calendar .calendar-year button:hover, .calendar .calendar-month button:hover {
+      background-color: #454545;
+      cursor: pointer; }
+  .calendar .calendar-time {
+    text-align: center; }
+    .calendar .calendar-time input[type="text"] {
+      width: 32px; }
+  .calendar .calendar-footer {
+    margin: 26px 0 0;
+    text-align: right; }
+    .calendar .calendar-footer .btn-grey {
+      float: left;
+      margin-top: 0; }
+  .calendar .btn-month-prev.highlighted,
+  .calendar .btn-month-next.highlighted,
+  .calendar .btn-year-prev.highlighted,
+  .calendar .btn-year-next.highlighted {
+    background-color: #454545; }
+  .calendar .btn-month-prev:focus,
+  .calendar .btn-month-next:focus,
+  .calendar .btn-year-prev:focus,
+  .calendar .btn-year-next:focus {
+    outline: none; }
+  .calendar table {
+    width: 100%;
+    margin: 5px 0; }
+    .calendar table thead {
+      text-transform: uppercase;
+      color: #cacaca; }
+    .calendar table tbody {
+      text-align: center; }
+      .calendar table tbody td.selected {
+        background-color: #dddddd;
+        color: #000000 !important; }
+        .calendar table tbody td.selected:hover {
+          background-color: lightgray; }
+      .calendar table tbody td:hover {
+        background-color: #454545;
+        cursor: pointer; }
+      .calendar table tbody td.highlighted {
+        color: #333333;
+        background-color: lightgray;
+        border-color: lightgray;
+        cursor: pointer; }
+      .calendar table tbody td:focus {
+        outline: none; }
+      .calendar table tbody td span {
+        z-index: -1;
+        padding: 4px;
+        display: block; }
+
 .checkbox-list {
   display: grid;
   grid-column-gap: 10px;
@@ -7507,73 +7574,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   top: 0;
   left: 0;
   opacity: .35; }
-
-.calendar {
-  width: 200px; }
-  .calendar .calendar-year.highlighted, .calendar .highlighted.calendar-month,
-  .calendar .calendar-month.highlighted {
-    background-color: #454545; }
-  .calendar .calendar-year:focus, .calendar .calendar-month:focus,
-  .calendar .calendar-month:focus {
-    outline: none; }
-  .calendar table {
-    width: 100%;
-    margin: 5px 0; }
-    .calendar table thead {
-      text-transform: uppercase;
-      color: #cacaca; }
-    .calendar table tbody {
-      text-align: center; }
-      .calendar table tbody td.selected {
-        background-color: #dddddd;
-        color: #000000 !important; }
-        .calendar table tbody td.selected:hover {
-          background-color: lightgray; }
-      .calendar table tbody td:hover {
-        background-color: #454545;
-        cursor: pointer; }
-      .calendar table tbody td.highlighted {
-        color: #333333;
-        background-color: lightgray;
-        border-color: lightgray;
-        cursor: pointer; }
-      .calendar table tbody td:focus {
-        outline: none; }
-      .calendar table tbody td span {
-        z-index: -1;
-        padding: 4px;
-        display: block; }
-
-.calendar-header {
-  text-align: center; }
-  .calendar-header .btn-grey {
-    border: 0;
-    background-color: transparent; }
-
-.calendar-year, .calendar-month {
-  height: 24px;
-  line-height: 26px;
-  display: table;
-  width: 100%; }
-  .calendar-year button:first-child, .calendar-month button:first-child {
-    float: left; }
-  .calendar-year button:last-child, .calendar-month button:last-child {
-    float: right; }
-  .calendar-year button:hover, .calendar-month button:hover {
-    background-color: #454545;
-    cursor: pointer; }
-
-.calendar-time {
-  text-align: center; }
-  .calendar-time input[type="text"] {
-    width: 32px; }
-
-.calendar-footer {
-  margin: 26px 0 0;
-  text-align: right; }
-  .calendar-footer .btn-grey {
-    float: left;
-    margin-top: 0; }
 
 .notif.overlay-dialogue {
   width: 250px; }
