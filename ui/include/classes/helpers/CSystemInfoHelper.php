@@ -195,11 +195,7 @@ class CSystemInfoHelper {
 	 */
 	public static function getExportData(): array {
 		$system_info = CSystemInfoHelper::getData();
-		$system_info['software_update_check_data'] += [
-			'lastcheck' => null,
-			'latest_release' => null
-		];
-		$system_info['status'] = array_replace([
+		$status = array_replace([
 			'server_version' => null,
 			'triggers_count_disabled' => null,
 			'triggers_count_off' => null,
@@ -230,17 +226,17 @@ class CSystemInfoHelper {
 			],
 			'server_running' => [
 				'id' => _('Zabbix server is running'),
-				'value' => $system_info['status']['is_running'],
+				'value' => $status['is_running'],
 				'details' => [
-					'has_status' => $system_info['status']['has_status'],
-					'error_code' => $system_info['status']['error_code'],
+					'has_status' => $status['has_status'],
+					'error_code' => $status['error_code'],
 					'address' => $system_info['server_host'],
 					'port' => $system_info['server_port']
 				]
 			],
 			'server_version' => [
 				'id' => _('Zabbix server version'),
-				'value' => $system_info['status']['server_version'],
+				'value' => $status['server_version'],
 				'details' => [
 					'outdated' => null,
 					'last_checked' => null
@@ -259,45 +255,45 @@ class CSystemInfoHelper {
 			],
 			'hosts' => [
 				'id' => _('Number of hosts (enabled/disabled)'),
-				'value' => $system_info['status']['hosts_count'],
+				'value' => $status['hosts_count'],
 				'details' => [
-					'enabled' => $system_info['status']['hosts_count_monitored'],
-					'disabled' => $system_info['status']['hosts_count_not_monitored']
+					'enabled' => $status['hosts_count_monitored'],
+					'disabled' => $status['hosts_count_not_monitored']
 				]
 			],
 			'templates' => [
 				'id' => _('Number of templates'),
-				'value' => $system_info['status']['hosts_count_template']
+				'value' => $status['hosts_count_template']
 			],
 			'items' => [
 				'id' => _('Number of items (enabled/disabled/not supported)'),
-				'value' => $system_info['status']['items_count'],
+				'value' => $status['items_count'],
 				'details' => [
-					'enabled' => $system_info['status']['items_count_monitored'],
-					'disabled' => $system_info['status']['items_count_disabled'],
-					'not_supported' => $system_info['status']['items_count_not_supported']
+					'enabled' => $status['items_count_monitored'],
+					'disabled' => $status['items_count_disabled'],
+					'not_supported' => $status['items_count_not_supported']
 				]
 			],
 			'triggers' => [
 				'id' => _('Number of triggers (enabled/disabled [problem/ok])'),
-				'value' => $system_info['status']['triggers_count'],
+				'value' => $status['triggers_count'],
 				'details' => [
-					'enabled' => $system_info['status']['triggers_count_enabled'],
-					'disabled' => $system_info['status']['triggers_count_disabled'],
-					'problem' => $system_info['status']['triggers_count_on'],
-					'ok' => $system_info['status']['triggers_count_off']
+					'enabled' => $status['triggers_count_enabled'],
+					'disabled' => $status['triggers_count_disabled'],
+					'problem' => $status['triggers_count_on'],
+					'ok' => $status['triggers_count_off']
 				]
 			],
 			'users' => [
 				'id' => _('Number of users (online)'),
-				'value' => $system_info['status']['users_count'],
+				'value' => $status['users_count'],
 				'details' => [
-					'online' => $system_info['status']['users_online']
+					'online' => $status['users_online']
 				]
 			],
 			'values_per_second' => [
 				'id' => _('Required server performance, new values per second'),
-				'value' => $system_info['status']['vps_total']
+				'value' => $status['vps_total']
 			],
 			'global_scripts' => [
 				'id' => _('Global scripts on Zabbix server'),
@@ -336,9 +332,9 @@ class CSystemInfoHelper {
 			$result['frontend_version']['details']['outdated'] = version_compare(ZABBIX_VERSION, $latest_release, '<');
 			$result['server_version']['details']['last_checked'] = $system_info['software_update_check_data']['lastcheck'];
 
-			if ($system_info['status']['server_version'] !== null) {
+			if ($status['server_version'] !== null) {
 				$result['server_version']['details']['outdated'] = version_compare(
-					$system_info['status']['server_version'],
+					$status['server_version'],
 					$latest_release, '<'
 				);
 			}
@@ -349,7 +345,6 @@ class CSystemInfoHelper {
 				'store' => $dbversion['database'],
 				'current_version' => $dbversion['current_version'],
 				'version_supported' => $dbversion['flag'] == DB_VERSION_SUPPORTED
-				// TODO: check is it necessary data below
 			] + array_intersect_key($dbversion, array_flip(['history_pk', 'value_types']));
 		}
 
