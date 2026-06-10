@@ -150,8 +150,7 @@ class CScreenProblem extends CScreenBase {
 		$filter_triggerids = array_key_exists('triggerids', $filter) && $filter['triggerids']
 			? $filter['triggerids']
 			: null;
-		$show_opdata = array_key_exists('show_opdata', $column_options)
-			&& $column_options['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
+		$show_opdata = $column_options['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
 
 		if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
 			$exclude_groupids = getSubGroups($filter['exclude_groupids']);

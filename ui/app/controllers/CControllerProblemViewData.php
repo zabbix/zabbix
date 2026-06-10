@@ -113,7 +113,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 			array $options, bool $nested = false): void {
 
 		foreach ($problems as $problem) {
-			if ($data['sort_field'] == 'clock' && $options['show_timeline'] && !$options['compact_view']
+			if ($data['sort_field'] == 'clock' && $options['show_timeline'] && $options['compact_view'] == 0
 					&& $data['last_clock'] != 0) {
 
 				$breakpoint = self::createTimelineBreakpoint($data, $problem);
@@ -217,7 +217,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 				}
 			}
 
-			if ($options['compact_view'] && $filter['show_suppressed'] && count($info_icons) > 1) {
+			if ($options['compact_view'] == 1 && $filter['show_suppressed'] && count($info_icons) > 1) {
 				$cell_info = (new CButtonIcon(ZBX_ICON_MORE))->setHint(makeInformationList($info_icons));
 			}
 			else {
@@ -268,11 +268,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 					'show_rank_change_symptom' => true
 				]));
 
-			$show_opdata = array_key_exists('show_opdata', $options)
-				&& in_array($options['show_opdata'], [OPERATIONAL_DATA_SHOW_WITH_PROBLEM, OPERATIONAL_DATA_SHOW_BOTH]);
-
-			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] != '' && !$options['compact_view']
-					&& $show_opdata) {
+			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] !== '' && $options['compact_view'] == 0
+					&& $options['show_opdata'] & OPERATIONAL_DATA_SHOW_WITH_PROBLEM) {
 				$description[] = ' (';
 				$description[] = $opdata;
 				$description[] = ')';
@@ -280,7 +277,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			$description[] = ($problem['comments'] !== '') ? makeDescriptionIcon($problem['comments']) : null;
 
-			if (!$options['compact_view'] && $options['details'] == 1) {
+			if ($options['compact_view'] == 0 && $options['details'] == 1) {
 				$description[] = BR();
 
 				if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
@@ -294,7 +291,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 				}
 			}
 
-			$problem['description'] = $options['compact_view']
+			$problem['description'] = $options['compact_view'] == 1
 				? (new CDiv($description))
 					->addClass(ZBX_STYLE_ACTION_CONTAINER)
 					->toString()
@@ -388,10 +385,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 		$data = $this->prepareData();
 
 		$show_opdata = $data['options']['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
-		$show_opdata_separately = in_array($data['options']['show_opdata'], [OPERATIONAL_DATA_SHOW_SEPARATELY,
-			OPERATIONAL_DATA_SHOW_BOTH]);
-		$show_opdata_with_problem = in_array($data['options']['show_opdata'], [OPERATIONAL_DATA_SHOW_WITH_PROBLEM,
-			OPERATIONAL_DATA_SHOW_BOTH]);
+		$show_opdata_separately = (bool) ($data['options']['show_opdata'] & OPERATIONAL_DATA_SHOW_SEPARATELY);
+		$show_opdata_with_problem = (bool) ($data['options']['show_opdata'] & OPERATIONAL_DATA_SHOW_WITH_PROBLEM);
 
 		$csv = [];
 
@@ -557,14 +552,14 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 		$custom_text = $this->extractCustomText($options);
 
-		$show_opdata = array_key_exists('show_opdata', $options) && $options['show_opdata'] == 1;
+		$show_opdata = in_array('opdata', $data_fields) ? OPERATIONAL_DATA_SHOW_SEPARATELY : OPERATIONAL_DATA_SHOW_NONE;
 
-		if (in_array('opdata', $data_fields)) {
-			$options['show_opdata'] = $show_opdata ? OPERATIONAL_DATA_SHOW_BOTH : OPERATIONAL_DATA_SHOW_SEPARATELY;
+		if ($options['compact_view'] == 0 && array_key_exists('show_opdata', $options)
+				&& $options['show_opdata'] == 1) {
+			$show_opdata |= OPERATIONAL_DATA_SHOW_WITH_PROBLEM;
 		}
-		else if ($show_opdata) {
-			$options['show_opdata'] = OPERATIONAL_DATA_SHOW_WITH_PROBLEM;
-		}
+
+		$options['show_opdata'] = $show_opdata;
 
 		$data = CScreenProblem::getData($filter, $options, $limit, true);
 		$data = CScreenProblem::sortData($data, $limit, $sort_field, $sort_order);
