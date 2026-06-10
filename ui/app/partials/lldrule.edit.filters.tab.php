@@ -40,6 +40,7 @@ $formgrid
 			(new CDiv(
 				(new CSelect('evaltype'))
 					->setFocusableElementId('label-evaltype')
+					->setId('evaltype')
 					->setValue($filter['evaltype'])
 					->addOptions(CSelect::createOptionsFromArray([
 						CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
