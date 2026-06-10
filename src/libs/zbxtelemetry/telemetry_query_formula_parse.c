@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxtelemetry.h"
 #include "telemetry.h"
 #include "zbxnum.h"
 #include "zbxtypes.h"
