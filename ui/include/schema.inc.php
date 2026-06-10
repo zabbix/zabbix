@@ -4247,6 +4247,12 @@ return [
 				'type' => DB::FIELD_TYPE_TEXT,
 				'length' => 65535,
 				'default' => ''
+			],
+			'description' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
 			]
 		]
 	],
