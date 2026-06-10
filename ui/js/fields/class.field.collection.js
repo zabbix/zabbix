@@ -98,11 +98,11 @@ class CFieldCollection extends CField {
 		});
 	}
 
-	normalizeSubfieldName(subfield_name, index) {
+	_normalizeSubfieldName(subfield_name, index) {
 		return subfield_name.substring(this.getName().length);
 	}
 
-	bindDiscoveredFieldChangeEvent(discovered_field, field_type) {
+	_bindDiscoveredFieldChangeEvent(discovered_field, field_type) {
 		discovered_field.addEventListener('field.change', (e) => {
 			if (!e.target.hasAttribute('data-prevent-validation-on-change')) {
 				this.fieldChanged(e.detail.source_fields);
@@ -135,7 +135,7 @@ class CFieldCollection extends CField {
 					field_instance.init();
 					field_instance.setTabId(this._tab_id);
 
-					this.bindDiscoveredFieldChangeEvent(discovered_field, field_type);
+					this._bindDiscoveredFieldChangeEvent(discovered_field, field_type);
 				}
 
 				if (!field_instance.getName().startsWith(this.getName())) {
@@ -143,7 +143,7 @@ class CFieldCollection extends CField {
 					console.log(`Field collection ${this.getName()} has invalid field ${field_instance.getName()}`);
 				}
 				else {
-					const subname = this.normalizeSubfieldName(field_instance.getName(), index++);
+					const subname = this._normalizeSubfieldName(field_instance.getName(), index++);
 					fields[subname] = field_instance;
 				}
 			}
