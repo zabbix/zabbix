@@ -84,6 +84,10 @@ window.lldrule_edit = new class {
 		this.#form_element.style.display = '';
 		this.#overlay.recoverFocus();
 		this.#form.reload(rules);
+
+		this.#form.findFieldByName('interfaceid')?.setChanged();
+		this.#form.findFieldByName('type').setChanged();
+		this.#form.validateChanges(['interfaceid', 'type']);
 	}
 
 	#formIsReady() {
