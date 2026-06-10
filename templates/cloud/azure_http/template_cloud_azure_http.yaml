@@ -18267,7 +18267,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure SQL managed instance ID`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -18959,6 +18959,9 @@ zabbix_export:
                   name: 'Availability state'
                   width: '18'
                   fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
                     - type: ITEM
                       name: itemid.0
                       value:
@@ -19214,6 +19217,9 @@ zabbix_export:
                   x: '36'
                   width: '18'
                   fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
                     - type: ITEM
                       name: itemid.0
                       value:
