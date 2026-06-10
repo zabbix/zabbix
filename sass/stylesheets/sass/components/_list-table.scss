@@ -79,10 +79,6 @@
 
 			&:not(.hover-nobg):not(.row-selected):hover {
 				background-color: $ui-hover-bg-color;
-
-				.btn-grey-icon {
-					background-color: $ui-hover-bg-color;
-				}
 			}
 
 			&.row-selected {
