@@ -352,7 +352,7 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 *resolveEventMacros Resolve macros in trigger url name.
+	 * Resolve macros in trigger url name.
 	 *
 	 * @param array  $trigger
 	 * @param string $trigger['triggerid']
