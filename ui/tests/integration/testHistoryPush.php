@@ -288,7 +288,7 @@ class testHistoryPush extends CIntegrationTest {
 	/**
 	 * Push value of every type.
 	 *
-	 * @backup history_uint,history_text,history,history_str,history_log
+	 * @backup !history_uint,!history_text,!history,!history_str,!history_log
 	 */
 	public function testHistoryPush_pushSingleTrapperValue() {
 		$tcs = [
@@ -404,7 +404,7 @@ class testHistoryPush extends CIntegrationTest {
 	/**
 	 * Push multiple values of different types in single request.
 	 *
-	 * @backup history_uint, history_text
+	 * @backup !history_uint, !history_text
 	 */
 	public function testHistoryPush_pushMultipleValues() {
 		$values_sent_uint = [];
