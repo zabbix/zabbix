@@ -49,16 +49,18 @@ class testLowLevelDiscovery extends CWebTest {
 			? static::$templateid.'&context=template'
 			: static::$empty_hostid.'&context=host';
 
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
+		$this->page->login()->open('zabbix.php?action=lldrule.list&filter_set=1&filter_hostids%5B0%5D='.$url);
 		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
-		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
-		$this->page->assertHeader('Discovery rules');
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
+		$this->assertEquals('New discovery rule', $dialog->getTitle());
 		$this->page->assertTitle('Configuration of discovery rules');
 		$this->assertEquals(['Discovery rule', 'Preprocessing', 'LLD macros', 'Filters', 'Overrides'], $form->getTabs());
 
 		// Check form footer buttons clickability.
-		foreach (['id:add', 'button:Test', 'button:Cancel'] as $button) {
-			$this->assertTrue($form->query($button)->one()->isClickable());
+		$footer = $dialog->getFooter();
+		foreach (['Add', 'Test', 'Cancel'] as $button) {
+			$this->assertTrue($footer->query('button', $button)->one()->isClickable());
 		}
 
 		// Check the whole form required labels.
@@ -252,7 +254,7 @@ class testLowLevelDiscovery extends CWebTest {
 						);
 					}
 
-					foreach (['A', 'B'] as $i => $letter) {
+					foreach ([0 => 'A', 2 => 'B'] as $i => $letter) {
 						$this->assertEquals($letter, $filter_table->getRow($i)->query('tag:span')->one()->getText());
 					}
 					break;
@@ -266,6 +268,8 @@ class testLowLevelDiscovery extends CWebTest {
 					break;
 			}
 		}
+
+		$dialog->close();
 	}
 
 	public static function getTypeDependingData() {
@@ -403,9 +407,10 @@ class testLowLevelDiscovery extends CWebTest {
 			? static::$templateid.'&context=template'
 			: static::$empty_hostid.'&context=host';
 
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
+		$this->page->login()->open('zabbix.php?action=lldrule.list&filter_set=1&filter_hostids%5B0%5D='.$url);
 		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
-		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 
 		// Check visible fields depending on LLD type.
 		$permanent_fields = ['Name', 'Type', 'Key', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'];
@@ -460,7 +465,7 @@ class testLowLevelDiscovery extends CWebTest {
 			case 'IPMI agent':
 				if (static::$context === 'host') {
 					// Check red interface info message.
-					$this->assertTrue($form->query('xpath:.//span[@class="red" and text()="No interface found"]')
+					$this->assertTrue($form->query('xpath:.//span[@class="error" and text()="No interface found"]')
 							->one()->isVisible()
 					);
 				}
@@ -525,7 +530,7 @@ class testLowLevelDiscovery extends CWebTest {
 				$timeout_array = [
 					'Global' => [
 						'id:inherited_timeout' => ['enabled' => false, 'visible' => true],
-						'id:timeout' => ['enabled' => false, 'visible' => false]
+						'id:timeout' => ['enabled' => true, 'visible' => false]
 					],
 					'Override' => [
 						'id:inherited_timeout' => ['enabled' => false, 'visible' => false],
@@ -585,9 +590,10 @@ class testLowLevelDiscovery extends CWebTest {
 				// User/password and public/private keys fields dependency on "Authentication method".
 				$key_fields = [
 					'id:username' => ['enabled' => true, 'visible' => true],
-					'id:password' => ['enabled' => true, 'visible' => true],
+					'id:password' => ['enabled' => false, 'visible' => false],
 					'id:publickey' => ['enabled' => true, 'visible' => true],
-					'id:privatekey' => ['enabled' => true, 'visible' => true]
+					'id:privatekey' => ['enabled' => true, 'visible' => true],
+					'id:passphrase' => ['enabled' => true, 'visible' => true]
 				];
 				$this->checkFieldsDependency($form, ['Authentication method' => 'Public key'], $key_fields);
 
@@ -595,7 +601,8 @@ class testLowLevelDiscovery extends CWebTest {
 					'id:username' => ['enabled' => true, 'visible' => true],
 					'id:password' => ['enabled' => true, 'visible' => true],
 					'id:publickey' => ['enabled' => false, 'visible' => false],
-					'id:privatekey' => ['enabled' => false, 'visible' => false]
+					'id:privatekey' => ['enabled' => false, 'visible' => false],
+					'id:passphrase' => ['enabled' => false, 'visible' => false]
 				];
 				$this->checkFieldsDependency($form, ['Authentication method' => 'Password'], $password_fields);
 				break;
@@ -2931,7 +2938,7 @@ class testLowLevelDiscovery extends CWebTest {
 	 * @param array $fields_array    given fields
 	 */
 	protected function checkFieldsParameters($fields_array) {
-		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
+		$form = $this->query('id:lldrule-form')->asForm()->waitUntilVisible()->one();
 
 		foreach ($fields_array as $id => $parameters) {
 			$error_output = 'Failed field: '.$id;
@@ -2968,8 +2975,8 @@ class testLowLevelDiscovery extends CWebTest {
 
 		foreach ($dependant_array as $label => $status) {
 			$dependant_field = $form->getField($label);
-			$this->assertTrue($dependant_field->isVisible($status['visible']));
-			$this->assertTrue($dependant_field->isEnabled($status['enabled']));
+			$this->assertTrue($dependant_field->isVisible($status['visible']), 'Wrong "'.$label.'" visibility.');
+			$this->assertTrue($dependant_field->isEnabled($status['enabled']), 'Wrong "'.$label.'" state.');
 		}
 	}
 
