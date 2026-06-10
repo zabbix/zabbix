@@ -68,7 +68,7 @@ $formgrid
 			(new CDiv([
 				(new CTable())
 					->setId('conditions')
-					->setHeader([_('Label'), _('Macro'), _('Regular expression'), ''])
+					->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), ''])
 					->addClass('js-lld-filters')
 					->setAttribute('data-field-type', 'set')
 					->setAttribute('data-field-name', 'conditions')
