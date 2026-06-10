@@ -503,6 +503,15 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		}
 	}
 
+	if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by && 0 == host.proxyid &&
+			ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on &&
+			ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
+	{
+		zbx_snprintf(error, sizeof(error), "Host is monitored by proxy group, "
+				"but its proxy assignment is still pending.");
+		goto fail;
+	}
+
 	if (SUCCEED != zbx_check_script_permissions(groupid, host.hostid))
 	{
 		zbx_strlcpy(error, "Script does not have permission to be executed on the host.", sizeof(error));
