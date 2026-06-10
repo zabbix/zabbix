@@ -350,11 +350,11 @@ class CSystemInfoHelper {
 		}
 
 		foreach ($system_info['ha_nodes'] as $ha_node) {
-			$result['high_availability']['details']['nodes'] = [
+			$result['high_availability']['details']['nodes'][] = [
 				'name' => $ha_node['name'],
 				'address' => $ha_node['address'],
 				'port' => (int) $ha_node['port'],
-				'last_access' => (int) $ha_node['last_access'],
+				'last_access' => (int) $ha_node['lastaccess'],
 				'status' => (int) $ha_node['status']
 			];
 		}
