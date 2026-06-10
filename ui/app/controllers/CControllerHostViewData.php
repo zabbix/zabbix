@@ -384,4 +384,15 @@ class CControllerHostViewData extends CControllerDataTable {
 			'limit' => (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		]);
 	}
+
+	protected function resolveCustomText(array &$hosts, array $custom_text): void {
+		$custom_text = CMacrosResolverHelper::resolveHostMacros($custom_text, array_keys($hosts));
+
+		foreach ($custom_text as $key => $values) {
+			foreach ($values as $hostid => $value) {
+				$hosts[$hostid]['custom_text'][$key] = $value;
+			}
+		}
+		unset($host);
+	}
 }
