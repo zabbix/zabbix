@@ -144,6 +144,12 @@ msgstr "%1$s სიმბოლო"
 msgid "%1$s characters remaining"
 msgstr "დარჩენილია %1$s სიმბოლო"
 
+#: app/views/administration.housekeeping.edit.php:165
+#: app/views/administration.housekeeping.edit.php:166
+#, c-format
+msgid "%1$s data storage period"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
 #, c-format
@@ -5010,6 +5016,15 @@ msgstr "დააწკაპუნეთ და გადაათრიეთ 
 msgid "Click to view or edit"
 msgstr "დააწკაპუნეთ სანახავად ან ჩასასწორებლად"
 
+#: app/views/administration.housekeeping.edit.php:165
+msgid "ClickHouse"
+msgstr ""
+
+#: include/classes/api/managers/history/CClickHouseStorage.php:118
+#, c-format
+msgid "ClickHouse error: %1$s."
+msgstr ""
+
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
 msgstr "კლიენტის ID"
@@ -8253,6 +8268,10 @@ msgstr "ეფექტურობის თარიღი"
 #: app/partials/hostmacros.inherited.list.html.php:50
 msgid "Effective value"
 msgstr "ეფექტური მნიშვნელობა"
+
+#: app/views/administration.housekeeping.edit.php:166
+msgid "Elasticsearch"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1449
 #: include/classes/api/managers/CHistoryManager.php:1458
@@ -11699,6 +11718,16 @@ msgstr "არასწორი ფაილის ატვირთვა."
 #: include/triggers.inc.php:768
 msgid "Incorrect function is used"
 msgstr "გამოყენებულია არასწორი ფუნქცია"
+
+#: include/classes/core/CConfigFile.php:211
+#: include/classes/core/CConfigFile.php:219
+#: include/classes/core/CConfigFile.php:557
+#: include/classes/core/CConfigFile.php:563
+#: include/classes/core/CConfigFile.php:569
+#: include/classes/core/CConfigFile.php:579
+#, c-format
+msgid "Incorrect history storage configuration %1$s: %2$s."
+msgstr ""
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -16450,6 +16479,12 @@ msgstr "მემკვიდრეობითი ელემენტებ�
 
 #: app/views/host.wizard.edit.php:175
 msgid "Not linked"
+msgstr ""
+
+#: app/views/item.list.php:233 app/views/item.list.php:234
+#: include/classes/helpers/CItemHelper.php:386
+#: include/classes/helpers/CItemHelper.php:416
+msgid "Not stored"
 msgstr ""
 
 #: app/controllers/CControllerLatest.php:546
@@ -22501,6 +22536,10 @@ msgstr ""
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr ""
 
+#: app/views/administration.housekeeping.edit.php:145
+msgid "This setting does not affect Elasticsearch and ClickHouse storage periods."
+msgstr ""
+
 #: app/partials/administration.system.info.php:212
 #: app/views/administration.housekeeping.edit.php:132
 msgid "This setting should be enabled, because history tables contain compressed chunks."
@@ -22897,6 +22936,11 @@ msgctxt "compact table header"
 msgid "Total"
 msgstr "სულ"
 
+#: include/classes/debug/CProfiler.php:172
+#, c-format
+msgid "Total ClickHouse time: %1$s"
+msgstr ""
+
 #: include/classes/debug/CProfiler.php:153
 #, c-format
 msgid "Total Elasticsearch time: %1$s"
@@ -22986,6 +23030,11 @@ msgstr ""
 #: widgets/tophosts/views/column.edit.php:206
 msgid "Trends"
 msgstr "ტრენდები"
+
+#: app/partials/item.edit.item.tab.php:774
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse."
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:257
 #: app/views/reports.toptriggers.list.php:120 app/views/trigger.edit.php:54
@@ -27144,6 +27193,10 @@ msgstr ""
 msgid "geographical coordinates (values of comma separated latitude and longitude) are expected"
 msgstr ""
 
+#: app/views/item.edit.php:224 app/views/item.edit.php:228
+msgid "global housekeeping settings"
+msgstr ""
+
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.edit.php:891
 #: include/views/configuration.item.edit.php:918
@@ -27301,6 +27354,11 @@ msgstr "არასწორი ელემენტების რაოდ�
 #: include/classes/parsers/CExpressionParser.php:140
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
+msgstr ""
+
+#: include/classes/core/CConfigFile.php:212
+#: include/classes/core/CConfigFile.php:220
+msgid "incorrect format"
 msgstr ""
 
 #: jsLoader.php:298
