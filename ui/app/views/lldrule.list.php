@@ -56,7 +56,7 @@ $filter = (new CFilter())
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addVar('action', $data['action'])
-	->addVar('context', $data['context']);
+	->addVar('context', $data['context'], uniqid('lldrule_'));
 
 $hg_ms_params = $data['context'] === 'host' ? ['with_hosts' => true] : ['with_templates' => true];
 
@@ -110,7 +110,7 @@ $filter_column1 = (new CFormGrid())
 // type select
 $type_select = (new CSelect('filter_type'))
 	->setId('filter_type')
-	->setFocusableElementId('label-type')
+	->setFocusableElementId('label-filter-type')
 	->addOption(new CSelectOption(-1, _('All')))
 	->setValue($data['filter']['filter_type']);
 
@@ -201,10 +201,6 @@ $discoveryForm = (new CForm())
 	->addVar('context', $data['context'], uniqid('lldrule_'))
 	->addVar('hostid', $data['hostid'] != 0 ? $data['hostid'] : null)
 	->setName('discovery');
-
-if ($data['hostid'] != 0) {
-	$discoveryForm->addVar('hostid', $data['hostid']);
-}
 
 // create table
 $discoveryTable = (new CTableInfo())
