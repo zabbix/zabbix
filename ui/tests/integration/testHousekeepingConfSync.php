@@ -16,6 +16,7 @@
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 /**
+ * @onBefore clearData
  * @onAfter clearData
  */
 class testHousekeepingConfSync extends CIntegrationTest {
@@ -140,11 +141,18 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	/**
 	 * Extract a single DCdump_config() section from a component log.
 	 */
-	private function extractDCDumpSection(string $component, string $start_marker, ?string $stop_marker = null): array {
+	private function extractDCDumpSection(string $component, string $start_marker,
+			?string $stop_marker = null): array {
 		$log = file_get_contents(self::getLogPath($component));
 		$lines = explode("\n", $log);
 
-		$matching = preg_grep('/'.preg_quote($start_marker, '/').'/', $lines);
+		$matching = [];
+		foreach ($lines as $i => $line) {
+			if ($start_marker === trim($this->stripDCDumpLogPrefix($line))) {
+				$matching[$i] = $line;
+			}
+		}
+
 		$this->assertNotEmpty($matching, "Section marker '$start_marker' not found in log.");
 
 		$start_idx = array_key_last($matching);
@@ -156,7 +164,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 				continue;
 			}
 
-			$line = preg_replace('/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+\s+/', '', $lines[$i]);
+			$line = $this->stripDCDumpLogPrefix($lines[$i]);
 
 			if ($stop_marker !== null && str_contains($line, $stop_marker)) {
 				break;
@@ -166,6 +174,12 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		}
 
 		return $section;
+	}
+
+	private function stripDCDumpLogPrefix(string $line): string {
+		$line = preg_replace('/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+\s+/', '', $line);
+
+		return preg_replace('/^\[[^]]+\]\s+/', '', $line);
 	}
 
 	/**
@@ -452,6 +466,8 @@ class testHousekeepingConfSync extends CIntegrationTest {
 			}
 		}
 
+		DB::refreshIds('events', count($events));
+
 		$eventids = DB::insert('events', $events);
 		self::$eventids = array_merge(self::$eventids, $eventids);
 
@@ -656,7 +672,8 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		$server_expected = $this->expectedServerHousekeeping($housekeeping);
 		$server_expected['hk_history'] = 0;
 		$server_expected['hk_trends'] = 0;
-		$this->assertHousekeepingEquals($server_expected, $this->extractSyncedHousekeeping(self::COMPONENT_SERVER));
+		$this->assertHousekeepingEquals($server_expected,
+				$this->extractSyncedHousekeeping(self::COMPONENT_SERVER));
 
 		$this->reloadProxyAndWaitForConfiguration(true);
 		$this->assertHousekeepingEquals($this->expectedProxyHousekeeping($housekeeping),
