@@ -29,13 +29,13 @@ class CFieldArray extends CFieldCollection {
 		return result;
 	}
 
-	normalizeSubfieldName(subfield_name, index) {
-		const subname = super.normalizeSubfieldName(subfield_name, index);
+	_normalizeSubfieldName(subfield_name, index) {
+		const subname = super._normalizeSubfieldName(subfield_name, index);
 
-		return subname === '[]' ? index : subname.substring(1, subname.length - 1);
+		return subname === '[]' ? `${index}` : subname.substring(1, subname.length - 1);
 	}
 
-	bindDiscoveredFieldChangeEvent(discovered_field, field_type) {
+	_bindDiscoveredFieldChangeEvent(discovered_field, field_type) {
 		if (field_type === 'checkbox') {
 			discovered_field.addEventListener('field.change', (e) => {
 				if (!e.target.hasAttribute('data-prevent-validation-on-change')) {
@@ -44,7 +44,7 @@ class CFieldArray extends CFieldCollection {
 			});
 		}
 		else {
-			super.bindDiscoveredFieldChangeEvent(discovered_field, field_type);
+			super._bindDiscoveredFieldChangeEvent(discovered_field, field_type);
 		}
 	}
 
