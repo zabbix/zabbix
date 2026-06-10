@@ -133,7 +133,7 @@ $headers = [
 ];
 
 if (CSettingsHelper::isMobileDevicesEnabled()) {
-	$headers[] = _('Linked devices');
+	$headers[] = _('Devices');
 }
 
 $headers = array_merge($headers, [
