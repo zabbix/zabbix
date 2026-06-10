@@ -2066,7 +2066,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'output' => ['triggerid', 'value', 'lastchange', 'state', 'recovery_mode', 'type', 'correlation_mode']
 		];
 		$this->callUntilDataIsPresent('trigger.get', $trigger_params,
-			self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
+			90, self::WAIT_ITERATION_DELAY,
 			function ($response) use ($triggerids, $expected_trigger_value, $prev_lastchanges, $now, $check_lastchange) {
 				$by_id = array_column($response['result'], null, 'triggerid');
 				$missing = 0;
