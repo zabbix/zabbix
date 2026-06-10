@@ -597,14 +597,15 @@ class testTriggerCEP extends CIntegrationTest {
 		// Verify the discovered triggers reflect the updated expression and correlation config.
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
-			'output' => ['triggerid', 'correlation_mode', 'correlation_tag', 'expression']
+			'output' => ['triggerid', 'correlation_mode', 'correlation_tag', 'manual_close', 'expression']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			if (count($response['result']) !== 2) {
 				return false;
 			}
 			foreach ($response['result'] as $trigger) {
 				if ((int) $trigger['correlation_mode'] !== ZBX_TRIGGER_CORRELATION_TAG
-						|| $trigger['correlation_tag'] !== 'service') {
+						|| $trigger['correlation_tag'] !== 'service'
+						|| (int) $trigger['manual_close'] !== ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED) {
 					return false;
 				}
 			}
@@ -616,6 +617,8 @@ class testTriggerCEP extends CIntegrationTest {
 				'Discovered trigger '.$trigger['triggerid'].' was not updated to tag-correlation mode.');
 			$this->assertEquals('service', $trigger['correlation_tag'],
 				'Discovered trigger '.$trigger['triggerid'].' has unexpected correlation tag.');
+			$this->assertEquals(ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, $trigger['manual_close'],
+				'Discovered trigger '.$trigger['triggerid'].' has unexpected manual_close setting.');
 		}
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
