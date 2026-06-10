@@ -32,7 +32,6 @@ const view = new class {
 	#initEvents() {
 		document.querySelector('.js-copy-button')?.addEventListener('click', (e) => {
 			writeTextClipboard(this.serverid);
-
 			e.target.focus();
 		});
 
