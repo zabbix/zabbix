@@ -1635,6 +1635,8 @@ int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock,
 		zbx_comms_redirect_t *redirect);
 int	zbx_dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock, zbx_history_recv_host_t *recv_host,
 		zbx_comms_redirect_t *redirect);
+int	zbx_dc_config_get_item_format(zbx_uint64_t itemid,  unsigned char *value_type, zbx_uint64_t *valuemapid,
+		char *units, size_t units_alloc);
 
 int	zbx_dc_get_proxy_group_hostmap_revision(zbx_uint64_t proxy_groupid, zbx_uint64_t *hostmap_revision);
 void	zbx_dc_set_proxy_failover_delay(const char *failover_delay);
