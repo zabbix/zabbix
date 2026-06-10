@@ -159,7 +159,7 @@ class CSettingsHelper {
 					'auditlog_enabled', 'auditlog_mode',
 
 					// Read-only parameters.
-					'ha_failover_delay'
+					'ha_failover_delay', 'serverid'
 				]
 			]);
 
@@ -199,7 +199,7 @@ class CSettingsHelper {
 		}
 
 		$supported_params = array_intersect_key(self::$params_private,
-			array_flip([self::SERVER_ID, self::SESSION_KEY, self::SOFTWARE_UPDATE_CHECKID])
+			array_flip([self::SESSION_KEY, self::SOFTWARE_UPDATE_CHECKID])
 		);
 
 		return $supported_params[$field];

@@ -223,7 +223,7 @@ class CSystemInfoHelper {
 			],
 			'serverid' => [
 				'id' => _('Zabbix server ID'),
-				'value' => CSettingsHelper::getPrivate(CSettingsHelper::SERVER_ID)
+				'value' => CSettingsHelper::get(CSettingsHelper::SERVER_ID)
 			],
 			'server_running' => [
 				'id' => _('Zabbix server is running'),
