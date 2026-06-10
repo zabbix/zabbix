@@ -54,6 +54,12 @@ class CWidgetGeoMap extends CWidget {
 		this._severity_levels = new Map();
 	}
 
+	onResize() {
+		if (this._map !== null) {
+			this._map.invalidateSize();
+		}
+	}
+
 	promiseReady() {
 		if (this._map === null){
 			return super.promiseReady();
