@@ -2091,7 +2091,7 @@ class testTriggerCEP extends CIntegrationTest {
 				if ($missing > 0 || $wrong_value > 0 || $wrong_state > 0 || $wrong_lastchange > 0) {
 					return 'of '.count($triggerids).' triggers: '.$missing.' missing, '.$wrong_value.
 							' wrong value (expected '.$expected_trigger_value.'), '.$wrong_state.
-							' wrong state (expected NORMAL), '.$wrong_lastchange.' lastchange not updated';
+							' wrong state (expected NORMAL), '.$wrong_lastchange.' lastchange not updated now:'.$now;
 				}
 				return true;
 			}
