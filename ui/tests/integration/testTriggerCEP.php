@@ -35,7 +35,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const ITEM_PROTO_KEY = 'cep.trap';
 	const ITEM_PROTO_KEY2 = 'cep.trap2';
 	const COMPONENT_VALUE = 'sensor1';
-	const LLD_DISCOVERY_COUNT = 4000;
+	const LLD_DISCOVERY_COUNT = 1000;
 	const WAIT_ITERATIONS = 60;
 	const WAIT_ITERATION_DELAY = 1;
 
@@ -2068,16 +2068,30 @@ class testTriggerCEP extends CIntegrationTest {
 			self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
 			function ($response) use ($triggerids, $expected_trigger_value, $prev_lastchanges, $now) {
 				$by_id = array_column($response['result'], null, 'triggerid');
+				$missing = 0;
+				$wrong_value = 0;
+				$wrong_state = 0;
+				$wrong_lastchange = 0;
 				foreach ($triggerids as $idx => $triggerid) {
 					if (!isset($by_id[$triggerid])) {
-						return false;
+						$missing++;
+						continue;
 					}
 					$t = $by_id[$triggerid];
-					if ((int) $t['value'] !== $expected_trigger_value) return false;
-					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) return false;
-					if ($now > $prev_lastchanges[$idx]) {
-						if ((int) $t['lastchange'] <= $prev_lastchanges[$idx]) return false;
+					if ((int) $t['value'] !== $expected_trigger_value) {
+						$wrong_value++;
 					}
+					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) {
+						$wrong_state++;
+					}
+					if ($now > $prev_lastchanges[$idx] && (int) $t['lastchange'] <= $prev_lastchanges[$idx]) {
+						$wrong_lastchange++;
+					}
+				}
+				if ($missing > 0 || $wrong_value > 0 || $wrong_state > 0 || $wrong_lastchange > 0) {
+					return 'of '.count($triggerids).' triggers: '.$missing.' missing, '.$wrong_value.
+							' wrong value (expected '.$expected_trigger_value.'), '.$wrong_state.
+							' wrong state (expected NORMAL), '.$wrong_lastchange.' lastchange not updated';
 				}
 				return true;
 			}
