@@ -18,12 +18,17 @@
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 
+#define TQ_FORMULA_SAMPLE_FS "\"%.50s\""
+#define TQ_FORMULA_MAX_NESTING_LEVEL 32
+
 ZBX_VECTOR_IMPL(tq_formula_node_ptr, zbx_tq_formula_node_t *)
 
 typedef struct
 {
 	const char	*p;
-	const char	*err_pos;
+	int		level; /* expression nesting level */
+	char		*err;
+	size_t		err_size;
 }
 tq_formula_parse_ctx_t;
 
@@ -79,13 +84,13 @@ static int	parse_uint(tq_formula_parse_ctx_t *ctx, int *num)
 
 	if (0 == n)
 	{
-		ctx->err_pos = ctx->p;
+		zbx_snprintf(ctx->err, ctx->err_size, "index expected at " TQ_FORMULA_SAMPLE_FS, ctx->p);
 		return FAIL;
 	}
 
 	if (SUCCEED != zbx_is_uint_n_range(ctx->p, n, num, sizeof(*num), 0, INT32_MAX))
 	{
-		ctx->err_pos = ctx->p;
+		zbx_snprintf(ctx->err, ctx->err_size, "failed to parse index at " TQ_FORMULA_SAMPLE_FS, ctx->p);
 		return FAIL;
 	}
 
@@ -103,7 +108,7 @@ static zbx_tq_formula_node_t	*parse_leaf(tq_formula_parse_ctx_t *ctx)
 
 	if ('{' != *ctx->p)
 	{
-		ctx->err_pos = ctx->p;
+		zbx_snprintf(ctx->err, ctx->err_size, "invalid character at " TQ_FORMULA_SAMPLE_FS, ctx->p);
 		return NULL;
 	}
 
@@ -114,7 +119,7 @@ static zbx_tq_formula_node_t	*parse_leaf(tq_formula_parse_ctx_t *ctx)
 
 	if ('}' != *ctx->p)
 	{
-		ctx->err_pos = ctx->p;
+		zbx_snprintf(ctx->err, ctx->err_size, "invalid character at " TQ_FORMULA_SAMPLE_FS, ctx->p);
 		return NULL;
 	}
 
@@ -122,7 +127,7 @@ static zbx_tq_formula_node_t	*parse_leaf(tq_formula_parse_ctx_t *ctx)
 
 	if (SUCCEED != is_leaf_delim(*ctx->p))
 	{
-		ctx->err_pos = ctx->p;
+		zbx_snprintf(ctx->err, ctx->err_size, "invalid character at " TQ_FORMULA_SAMPLE_FS, ctx->p);
 		return NULL;
 	}
 
@@ -149,7 +154,7 @@ static zbx_tq_formula_node_t	*parse_atom(tq_formula_parse_ctx_t *ctx)
 
 		if (')' != *ctx->p)
 		{
-			ctx->err_pos = ctx->p;
+			zbx_snprintf(ctx->err, ctx->err_size, "invalid character at " TQ_FORMULA_SAMPLE_FS, ctx->p);
 			tq_formula_node_free(node);
 			return NULL;
 		}
@@ -238,6 +243,16 @@ static zbx_tq_formula_node_t	*parse_or(tq_formula_parse_ctx_t *ctx)
 
 	node = tq_formula_node_init(TQ_FORMULA_NODE_TYPE_OR);
 
+	ctx->level++;
+
+	if (TQ_FORMULA_MAX_NESTING_LEVEL < ctx->level)
+	{
+		zbx_snprintf(ctx->err, ctx->err_size,
+				"maximum nesting level of %d exceeded at at "TQ_FORMULA_SAMPLE_FS,
+				TQ_FORMULA_MAX_NESTING_LEVEL, ctx->p);
+		goto fail;
+	}
+
 	if (NULL == (child = parse_and(ctx)))
 		goto fail;
 
@@ -272,28 +287,26 @@ fail:
 	return NULL;
 }
 
-/* TODO: add depth limit */
-zbx_tq_formula_node_t	*tq_formula_parse(const char *formula, const char **err_pos)
+zbx_tq_formula_node_t	*tq_formula_parse(const char *formula, char *error, size_t max_error_len)
 {
 	zbx_tq_formula_node_t	*node;
 
 	tq_formula_parse_ctx_t	ctx = {
-		.p 		= formula,
-		.err_pos	= NULL,
+		.p		= formula,
+		.level		= 0,
+		.err		= error,
+		.err_size	= max_error_len,
 	};
 
 	if (NULL == (node = parse_or(&ctx)))
-	{
-		*err_pos = ctx.err_pos;
 		return NULL;
-	}
 
 	skip_whitespace(&ctx);
 
 	if ('\0' != *ctx.p)
 	{
 		tq_formula_node_free(node);
-		*err_pos = ctx.p;
+		zbx_snprintf(error, max_error_len, "invalid character at " TQ_FORMULA_SAMPLE_FS, ctx.p);
 		return NULL;
 	}
 

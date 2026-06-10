@@ -734,9 +734,9 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 
 				if (SUCCEED != zbx_tq_parse_query(items[i].telemetry_query, items[i].query,
 						items[i].time_shift, items[i].lookback_limit, items[i].granularity,
-						NULL, NULL))
+						NULL, NULL, error, sizeof(error)))
 				{
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query format"));
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
 					zbx_free(items[i].telemetry_query);
 					zbx_free(timeout);
@@ -1119,12 +1119,11 @@ void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int
 
 		items[i].telemetry_query = zbx_malloc(NULL, sizeof(zbx_tq_query_t));
 
-		/* TODO: get some error */
 		if (SUCCEED != zbx_tq_parse_query(items[i].telemetry_query, items[i].query, items[i].time_shift,
 				items[i].lookback_limit, items[i].granularity, telemetry_query_macro_expand_cb,
-				&query_macro_expand_ctx))
+				&query_macro_expand_ctx, error, sizeof(error)))
 		{
-			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query format"));
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = CONFIG_ERROR;
 			zbx_free(items[i].telemetry_query);
 			continue;

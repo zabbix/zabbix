@@ -149,7 +149,7 @@ ZBX_PTR_VECTOR_DECL(tq_condition_ptr, zbx_tq_condition_t *)
 
 int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, const char *time_shift,
 		const char *lookback_limit, const char *granularity, zbx_tq_macro_expand_func_t macro_expand_cb,
-		void *macro_expand_ctx);
+		void *macro_expand_ctx, char *error, size_t max_error_len);
 void	zbx_tq_query_clean(zbx_tq_query_t *query);
 
 void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql,
