@@ -107,6 +107,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 				]
 			],
 			'redirection_url' => ['db media_type_oauth.redirection_url', 'required', 'not_empty',
+				'use' => [CUrlValidator::class, ['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_EMAIL]],
 					['smtp_authentication', 'in' => [SMTP_AUTHENTICATION_OAUTH]],
@@ -129,6 +130,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 				]
 			],
 			'authorization_url' => ['db media_type_oauth.authorization_url', 'required', 'not_empty',
+				'use' => [CUrlValidator::class, ['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_EMAIL]],
 					['smtp_authentication', 'in' => [SMTP_AUTHENTICATION_OAUTH]],
@@ -137,6 +139,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 				'messages' => ['not_empty' => _('Invalid OAuth configuration')]
 			],
 			'token_url' => ['db media_type_oauth.token_url', 'required', 'not_empty',
+				'use' => [CUrlValidator::class, ['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_EMAIL]],
 					['smtp_authentication', 'in' => [SMTP_AUTHENTICATION_OAUTH]],
