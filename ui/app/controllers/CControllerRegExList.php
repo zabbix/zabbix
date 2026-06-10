@@ -22,10 +22,23 @@ class CControllerRegExList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'uncheck' => 'in 1'
+			'filter_name' =>		'string',
+			'filter_description'=>	'string',
+			'filter_set' =>			'in 1',
+			'filter_rst' =>			'in 1',
+			'sort' => 				'in name',
+			'sortorder'	=>			'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN,
+			'page' =>				'ge 1',
+			'uncheck' => 			'in 1'
 		];
 
-		return $this->validateInput($fields);
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			$this->setResponse(new CControllerResponseFatal());
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -33,16 +46,55 @@ class CControllerRegExList extends CController {
 	}
 
 	protected function doAction(): void {
+		if ($this->hasInput('filter_set')) {
+			CProfile::update('web.regex.filter.name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.regex.filter.description',
+				$this->getInput('filter_description', ''), PROFILE_TYPE_STR);
+		}
+		elseif ($this->hasInput('filter_rst')) {
+			CProfile::delete('web.regex.filter.name');
+			CProfile::delete('web.regex.filter.description');
+		}
+
+		$filter = [
+			'name' => CProfile::get('web.regex.filter.name', ''),
+			'description' => CProfile::get('web.regex.filter.description', '')
+		];
+
+		$sort_field = $this->getInput('sort', CProfile::get('web.regex.list.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.regex.list.sortorder', ZBX_SORT_UP));
+
+		CProfile::update('web.regex.list.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.regex.list.sortorder', $sort_order, PROFILE_TYPE_STR);
+
 		$data = [
-			'regexps' => API::Regexp()->get([
-				'output' => ['regexpid', 'name'],
-				'selectExpressions' => ['expression', 'expression_type'],
-				'preservekeys' => true
-			]),
+			'filter' => $filter,
+			'sort' => $sort_field,
+			'sortorder' => $sort_order,
+			'profileIdx' => 'web.regex.filter',
+			'active_tab' => CProfile::get('web.regex.filter.active', 1),
 			'uncheck' => $this->hasInput('uncheck')
 		];
 
-		order_result($data['regexps'], 'name');
+		$data['regexps'] = API::Regexp()->get([
+			'output' => ['regexpid', 'name', 'description'],
+			'selectExpressions' => ['expression', 'expression_type'],
+			'search' => [
+				'name' => $filter['name'] !== '' ? $filter['name'] : null,
+				'description' => $filter['description'] !== '' ? $filter['description'] : null
+			],
+			'searchByAny' => false,
+			'sortfield' => $sort_field,
+			'sortorder' => $sort_order,
+			'limit' => 3 + 1,
+			'preservekeys' => true
+		]);
+
+		$page_num = $this->getInput('page', 1);
+		CPagerHelper::savePage('regex.list', $page_num);
+		$data['paging'] = CPagerHelper::paginate($page_num, $data['regexps'], $sort_order,
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
+		);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of regular expressions'));

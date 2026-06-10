@@ -48,13 +48,13 @@ class CRegexp extends CApiService {
 			// filter
 			'regexpids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['regexpid', 'name']],
-			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name', 'test_string']],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name', 'description', 'test_string']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['regexpid', 'name', 'test_string']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['regexpid', 'name', 'description', 'test_string']), 'default' => API_OUTPUT_EXTEND],
 			'selectExpressions' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['expression', 'expression_type', 'exp_delimiter', 'case_sensitive']), 'default' => null],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit
@@ -129,6 +129,7 @@ class CRegexp extends CApiService {
 	protected function validateCreate(array &$regexs): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('regexps', 'name')],
+			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('regexps', 'description')],
 			'test_string' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('regexps', 'test_string')],
 			'expressions' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['expression_type', 'expression']], 'fields' => [
 				'expression_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED, EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])],
@@ -324,6 +325,7 @@ class CRegexp extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['regexpid'], ['name']], 'fields' => [
 			'regexpid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('regexps', 'name')],
+			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('regexps', 'description')],
 			'test_string' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('regexps', 'test_string')],
 			'expressions' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['expression_type', 'expression']], 'fields' => [
 				'expression_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED, EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])],
@@ -344,7 +346,7 @@ class CRegexp extends CApiService {
 		}
 
 		$db_regexs = $this->get([
-			'output' => ['regexpid', 'name', 'test_string'],
+			'output' => ['regexpid', 'name', 'description', 'test_string'],
 			'regexpids' => array_column($regexs, 'regexpid'),
 			'preservekeys' => true
 		]);

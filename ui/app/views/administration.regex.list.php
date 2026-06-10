@@ -36,16 +36,46 @@ $html_page = (new CHtmlPage())
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
+$filter = (new CFilter())
+	->addVar('action', 'regex.list')
+	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'regex.list'))
+	->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab'])
+	->addFilterTab(_('Filter'), [
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				new CLabel(_('Name'), 'filter_name'),
+				new CFormField(
+					(new CTextBox('filter_name', $data['filter']['name']))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+						->setAttribute('autofocus', 'autofocus')
+				)
+			])
+			->addItem([
+				new CLabel(_('Description'), 'filter_description'),
+				new CFormField(
+					(new CTextBox('filter_description', $data['filter']['description']))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+						->setAttribute('autofocus', 'autofocus')
+				)
+			])
+	]);
+
 $form = (new CForm())->setName('regularExpressionsForm');
+
+$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'regex.list')->getUrl();
 
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all-regexes'))->onClick("checkAll('".$form->getName()."', 'all-regexes', 'regexpids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		_('Name'),
-		_('Expressions')
-	]);
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
+		_('Expressions'),
+		_('Description')
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['regexps'] as $regexpid => $regexp) {
 	$numb = 1;
@@ -69,7 +99,8 @@ foreach ($data['regexps'] as $regexpid => $regexp) {
 					->setArgument('regexpid', $regexpid)
 			)
 		))->addClass(ZBX_STYLE_WORDBREAK),
-		$expressions
+		$expressions,
+		(new CCol($regexp['description']))->addClass(ZBX_STYLE_WORDBREAK)
 	]);
 }
 
@@ -85,4 +116,4 @@ $form->addItem([
 	], 'regexp')
 ]);
 
-$html_page->addItem($form)->show();
+$html_page->addItem($filter)->addItem($form)->show();
