@@ -22,6 +22,7 @@ class CLldRuleHelper extends CItemGeneralHelper {
 	public static function getDefaults(): array {
 		$item = parent::getDefaults();
 
+		$item['delay'] = ZBX_LLD_RULE_DELAY_DEFAULT;
 		$item['overrides'] = [];
 		$item['lld_macro_paths'] = [];
 		$item['filter'] = [
