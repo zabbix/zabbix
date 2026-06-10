@@ -280,6 +280,21 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
+					'name' => 'zabbix-admin-allowed-systeminfo',
+					'type' => '2', // USER_TYPE_ZABBIX_ADMIN
+					'rules' => [
+						'ui' => [
+							[
+								'name' => 'reports.system_info',
+								'status' => '1'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'role' => [
 					'name' => 'New role',
 					'type' => '1' // USER_TYPE_ZABBIX_USER
 				],
@@ -378,6 +393,21 @@ class testRole extends CAPITest {
 				],
 				'expected_error' =>
 					'UI element "configuration.actions" is not available for user role "role-with-invalid-ui-elements".'
+			],
+			[
+				'role' => [
+					'name' => 'zabbix-user-not-allowed-systeminfo',
+					'type' => '1', // USER_TYPE_ZABBIX_USER
+					'rules' => [
+						'ui' => [
+							[
+								'name' => 'reports.system_info',
+								'status' => '1'
+							]
+						]
+					]
+				],
+				'expected_error' => 'UI element "reports.system_info" is not available for user role "zabbix-user-not-allowed-systeminfo".'
 			]
 		];
 	}
@@ -503,6 +533,22 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
+					'roleid' => 'zabbix-admin-role',
+					'name' => 'zabbix-admin-role',
+					'type' => 2, // USER_TYPE_ADMIN_USER
+					'rules' => [
+						'ui' => [
+							[
+								'name' => 'reports.system_info',
+								'status' => '1'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'role' => [
 					'roleid' => 'roleid_3',
 					'name' => 'non existent parameter',
 					'type' => '4'
@@ -595,6 +641,22 @@ class testRole extends CAPITest {
 				],
 				'expected_error' =>
 					'UI element "services.actions" is not available for user role "Unknown ui element".'
+			],
+			[
+				'role' => [
+					'roleid' => 'zabbix-user-role',
+					'name' => 'zabbix-user-role',
+					'type' => 1, // USER_TYPE_ZABBIX_USER
+					'rules' => [
+						'ui' => [
+							[
+								'name' => 'reports.system_info',
+								'status' => '1'
+							]
+						]
+					]
+				],
+				'expected_error' => 'UI element "reports.system_info" is not available for user role "zabbix-user-role".'
 			]
 		];
 	}
@@ -602,12 +664,9 @@ class testRole extends CAPITest {
 	/**
 	* @dataProvider role_update
 	*/
-	public function testRole_Update($role, $expected_error) {
-		if (isset($role['roleid'])) {
-			if (isset($role['roleid']) && $role['roleid'] === 'roleid_3' ||
-				isset($role['roleid']) && $role['roleid'] === 'roleid_4') {
-				$role['roleid'] = (int) self::$data['roleids'][$role['roleid']];
-			}
+	public function testRole_Update(array $role, ?string $expected_error) {
+		if (array_key_exists('roleid', $role) && array_key_exists($role['roleid'], self::$data['roleids'])) {
+			$role['roleid'] = self::$data['roleids'][$role['roleid']];
 		}
 
 		$result = $this->call('role.update', $role, $expected_error);
@@ -916,7 +975,7 @@ class testRole extends CAPITest {
 	 * Test data used by tests.
 	 */
 	protected static $data = [
-		'roleids' => ['roleid_1', 'roleid_2', 'roleid_3', 'roleid_4', 'roleid_5'],
+		'roleids' => ['roleid_1', 'roleid_2', 'roleid_3', 'roleid_4', 'roleid_5', 'zabbix-user-role', 'zabbix-admin-role'],
 		'usergroupids' => ['usergroupid_1']
 	];
 
@@ -942,34 +1001,58 @@ class testRole extends CAPITest {
 				'name' => 'second-role-for-update',
 				'type' => 3,
 				'rules' => [
-						'ui' => [
-							[
-								'name' => 'administration.macros',
-								'status' => '0'
-							],
-							[
-								'name' => 'administration.housekeeping',
-								'status' => '1'
-							]
+					'ui' => [
+						[
+							'name' => 'administration.macros',
+							'status' => '0'
 						],
+						[
+							'name' => 'administration.housekeeping',
+							'status' => '1'
+						]
+					],
 					'ui.default_access' => '0'
 				]
 			],
-						[
+			[
 				'name' => 'role-for-get',
 				'type' => 3,
 				'rules' => [
-						'ui' => [
-							[
-								'name' => 'configuration.discovery_actions',
-								'status' => '0'
-							],
-							[
-								'name' => 'configuration.internal_actions',
-								'status' => '1'
-							]
+					'ui' => [
+						[
+							'name' => 'configuration.discovery_actions',
+							'status' => '0'
 						],
+						[
+							'name' => 'configuration.internal_actions',
+							'status' => '1'
+						]
+					],
 					'ui.default_access' => '0'
+				]
+			],
+			[
+				'name' => 'zabbix-user-role',
+				'type' => 1, // USER_TYPE_ZABBIX_USER
+				'rules' => [
+					'ui' => [
+						[
+							'name' => 'monitoring.dashboard',
+							'status' => '1'
+						]
+					]
+				]
+			],
+			[
+				'name' => 'zabbix-admin-role',
+				'type' => 2, // USER_TYPE_ZABBIX_ADMIN
+				'rules' => [
+					'ui' => [
+						[
+							'name' => 'monitoring.dashboard',
+							'status' => '1'
+						]
+					]
 				]
 			]
 		]);
