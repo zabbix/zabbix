@@ -64,7 +64,7 @@ zabbix_export:
         3. Set the login and password in the host wizard configuration fields `Username` and `Password`. If you don't need an authentication - remove headers from HTTP-Agent type items.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Databases
       items:
@@ -1844,58 +1844,58 @@ zabbix_export:
             required: 'YES'
         - macro: '{$CLICKHOUSE.LLD.FILTER.DB.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable databases'
+          description: 'Filter of discoverable databases.'
           config:
             type: TEXT
             priority: '7'
             section_name: Filters
             label: 'Databases filter (include)'
-            description: 'Filter of discoverable databases'
+            description: 'Filter of discoverable databases.'
         - macro: '{$CLICKHOUSE.LLD.FILTER.DB.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered databases'
+          description: 'Filter to exclude discovered databases.'
           config:
             type: TEXT
             priority: '8'
             section_name: Filters
             label: 'Databases filter (exclude)'
-            description: 'Filter to exclude discovered databases'
+            description: 'Filter to exclude discovered databases.'
         - macro: '{$CLICKHOUSE.LLD.FILTER.DICT.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable dictionaries'
+          description: 'Filter of discoverable dictionaries.'
           config:
             type: TEXT
             priority: '9'
             section_name: Filters
             label: 'Dictionaries filter (include)'
-            description: 'Filter of discoverable dictionaries'
+            description: 'Filter of discoverable dictionaries.'
         - macro: '{$CLICKHOUSE.LLD.FILTER.DICT.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered dictionaries'
+          description: 'Filter to exclude discovered dictionaries.'
           config:
             type: TEXT
             priority: '10'
             section_name: Filters
             label: 'Dictionaries filter (exclude)'
-            description: 'Filter to exclude discovered dictionaries'
+            description: 'Filter to exclude discovered dictionaries.'
         - macro: '{$CLICKHOUSE.LLD.FILTER.TABLE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable tables'
+          description: 'Filter of discoverable tables.'
           config:
             type: TEXT
             priority: '11'
             section_name: Filters
             label: 'Tables filter (include)'
-            description: 'Filter of discoverable tables'
+            description: 'Filter of discoverable tables.'
         - macro: '{$CLICKHOUSE.LLD.FILTER.TABLE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered tables'
+          description: 'Filter to exclude discovered tables.'
           config:
             type: TEXT
             priority: '12'
             section_name: Filters
             label: 'Tables filter (exclude)'
-            description: 'Filter to exclude discovered tables'
+            description: 'Filter to exclude discovered tables.'
         - macro: '{$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN}'
           value: '30'
           description: 'Maximum diff between log_pointer and log_max_index.'
@@ -1908,13 +1908,13 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN}'
           value: '5'
-          description: 'Maximum number of network errors for trigger expression'
+          description: 'Maximum number of network errors for trigger expression.'
           config:
             type: TEXT
             priority: '3'
             section_name: Thresholds
             label: 'Max network errors'
-            description: 'Maximum number of network errors for trigger expression'
+            description: 'Maximum number of network errors for trigger expression.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$CLICKHOUSE.PARTS.PER.PARTITION.WARN}'
           value: '300'
@@ -1927,31 +1927,33 @@ zabbix_export:
             description: 'Maximum number of parts per partition for trigger expression.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$CLICKHOUSE.PASSWORD}'
-          value: zabbix_pass
+          type: SECRET_TEXT
+          description: 'ClickHouse password.'
           config:
             type: TEXT
             priority: '2'
             label: Password
+            description: 'ClickHouse password.'
             required: 'YES'
         - macro: '{$CLICKHOUSE.PORT}'
           value: '8123'
-          description: 'The port of ClickHouse HTTP endpoint'
+          description: 'ClickHouse HTTP port.'
           config:
             type: TEXT
             priority: '5'
             label: 'ClickHouse port'
-            description: 'The port of ClickHouse HTTP endpoint In the range from 1 to 65535 inclusive.'
+            description: 'ClickHouse HTTP port. In the range from 1 to 65535 inclusive.'
             required: 'YES'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$CLICKHOUSE.QUERY_TIME.MAX.WARN}'
           value: '600'
-          description: 'Maximum ClickHouse query time in seconds for trigger expression'
+          description: 'Maximum ClickHouse query time in seconds for trigger expression.'
           config:
             type: TEXT
             priority: '13'
             section_name: Thresholds
             label: 'Max query time (sec)'
-            description: 'Maximum ClickHouse query time in seconds for trigger expression'
+            description: 'Maximum ClickHouse query time in seconds for trigger expression.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$CLICKHOUSE.QUEUE.SIZE.MAX.WARN}'
           value: '20'
@@ -1975,12 +1977,12 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$CLICKHOUSE.SCHEME}'
           value: http
-          description: 'Request scheme which may be http or https'
+          description: 'Request scheme which may be http or https.'
           config:
             type: LIST
             priority: '6'
             label: 'ClickHouse scheme'
-            description: 'Request scheme which may be http or https'
+            description: 'Request scheme which may be http or https.'
             options:
               - value: http
                 text: http
@@ -1988,10 +1990,12 @@ zabbix_export:
                 text: https
         - macro: '{$CLICKHOUSE.USER}'
           value: zabbix
+          description: 'ClickHouse username.'
           config:
             type: TEXT
             priority: '1'
             label: Username
+            description: 'ClickHouse username.'
             required: 'YES'
       dashboards:
         - uuid: c642000e289649e8913e0d644b914ecb

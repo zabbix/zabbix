@@ -713,4 +713,61 @@ class testPageAdministrationProxies extends CWebTest {
 			}
 		}
 	}
+
+	/**
+	 * Verify that visited host links in the proxy list display the correct text color for enabled and disabled hosts
+	 * across all available UI themes (blue, dark, high-contrast).
+	 *
+	 * @onAfter resetUserTheme
+	 */
+	public function testPageAdministrationProxies_VisitedHostColor() {
+		// Check enabled and disabled host-link color for multiple themes.
+		$themes = [
+			'blue-theme' => [
+				'active_proxy2' => ['host_name' => 'enabled_host2', 'host_color' => 'rgba(2, 117, 184, 1)'],
+				'active_proxy4' => ['host_name' => 'disabled_host6', 'host_color' => 'rgba(227, 55, 52, 1)']
+			],
+			'dark-theme' => [
+				'active_proxy2' => ['host_name' => 'enabled_host2', 'host_color' => 'rgba(71, 150, 196, 1)'],
+				'active_proxy4' => ['host_name' => 'disabled_host6', 'host_color' => 'rgba(228, 89, 89, 1)']
+			],
+			'hc-light' => [
+				'active_proxy2' => ['host_name' => 'enabled_host2', 'host_color' => 'rgba(85, 85, 85, 1)'],
+				'active_proxy4' => ['host_name' => 'disabled_host6', 'host_color' => 'rgba(153, 0, 0, 1)']
+			],
+			'hc-dark' => [
+				'active_proxy2' => ['host_name' => 'enabled_host2', 'host_color' => 'rgba(248, 248, 248, 1)'],
+				'active_proxy4' => ['host_name' => 'disabled_host6', 'host_color' => 'rgba(255, 80, 80, 1)']
+			]
+		];
+
+		foreach ($themes as $theme => $proxies) {
+			CDataHelper::call('user.update', [['userid' => 1, 'theme' => $theme]]);
+
+			$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
+			$table = $this->query('class:list-table')->asTable()->one();
+
+			foreach ($proxies as $proxy => $host_parameter) {
+				$host_link = $table->findRow('Name', $proxy)->query('link', $host_parameter['host_name'])->one();
+
+				// Check host-link text color.
+				$this->assertEquals($host_parameter['host_color'], $host_link->getCSSValue('color'));
+
+				// Open and close host-link dialog form.
+				$host_link->waitUntilClickable()->click();
+				COverlayDialogElement::find()->waitUntilReady()->one()->close();
+				$this->page->refresh()->waitUntilReady();
+
+				// Check visited host-link text color.
+				$this->assertEquals($host_parameter['host_color'], $host_link->getCSSValue('color'));
+			}
+		}
+	}
+
+	/**
+	 * Restore users the default theme after test.
+	 */
+	public function resetUserTheme() {
+		CDataHelper::call('user.update', [['userid' => 1, 'theme' => 'default']]);
+	}
 }

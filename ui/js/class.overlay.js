@@ -448,6 +448,15 @@ Overlay.prototype.unmount = function() {
 
 		wrapper.scrollTo(this._wrapper_scroll_x, this._wrapper_scroll_y);
 	}
+
+	const unmount_event = new CEventHubEvent({
+		descriptor: {
+			context: EVENT_CONTEXT_OVERLAY,
+			event: EVENT_UNMOUNT
+		}
+	});
+
+	ZABBIX.EventHub.publish(unmount_event);
 };
 
 /**

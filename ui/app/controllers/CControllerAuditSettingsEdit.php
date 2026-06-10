@@ -21,37 +21,34 @@ class CControllerAuditSettingsEdit extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'auditlog_enabled'	=> 'setting auditlog_enabled',
-			'auditlog_mode'		=> 'setting auditlog_mode',
-			'hk_audit_mode'		=> 'setting hk_audit_mode',
-			'hk_audit'			=> 'setting hk_audit'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
-
-		return $ret;
+		return true;
 	}
 
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_AUDIT_LOG);
 	}
 
+	private function getDefaultValues(): array {
+		return [
+			'auditlog_enabled' => CSettingsSchema::getDefault('auditlog_enabled'),
+			'auditlog_mode' => CSettingsSchema::getDefault('auditlog_mode'),
+			'hk_audit_mode' => CSettingsSchema::getDefault('hk_audit_mode'),
+			'hk_audit' => CSettingsSchema::getDefault('hk_audit')
+		];
+	}
+
 	protected function doAction(): void {
 		$data = [
-			'auditlog_enabled' => $this->getInput('auditlog_enabled',
-				CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED)
-			),
-			'auditlog_mode' => $this->getInput('auditlog_mode', CSettingsHelper::get(CSettingsHelper::AUDITLOG_MODE)),
-			'hk_audit_mode' => $this->getInput('hk_audit_mode', CHousekeepingHelper::get(
-				CHousekeepingHelper::HK_AUDIT_MODE
-			)),
-			'hk_audit' => $this->getInput('hk_audit', CHousekeepingHelper::get(CHousekeepingHelper::HK_AUDIT))
+			'auditlog_enabled' => CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED),
+			'auditlog_mode' => CSettingsHelper::get(CSettingsHelper::AUDITLOG_MODE),
+			'hk_audit_mode' =>CHousekeepingHelper::get(CHousekeepingHelper::HK_AUDIT_MODE),
+			'hk_audit' => CHousekeepingHelper::get(CHousekeepingHelper::HK_AUDIT)
 		];
+
+		$data['js_validation_rules'] = (new CFormValidator(CControllerAuditSettingsUpdate::getValidationRules()))
+			->getRules();
+
+		$data['default_values'] = $this->getDefaultValues();
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of audit log'));

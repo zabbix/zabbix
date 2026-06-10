@@ -369,7 +369,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'id:sparkline_time_period_data_source' => ['value' => 'Custom', 'labels' => ['Dashboard', 'Widget', 'Custom'],
 				'visible' => false, 'enabled' => false
 			],
-			'id:sparkline_time_period_reference' => ['value' => '', 'visible' => false],
+			'id:sparkline_time_period_reference' => ['value' => '', 'visible' => false, 'enabled' => false],
 			'id:sparkline_time_period_from' => ['value' => 'now-1h', 'placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255,
 				'visible' => false, 'enabled' => false
 			],

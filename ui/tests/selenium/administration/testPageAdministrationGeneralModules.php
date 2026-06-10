@@ -1146,7 +1146,17 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	}
 
 	/**
+	 * Remove the record, responsible for opening dashboard in kiosk mode, from profiles table in order to prevent
+	 * failures in cases with kiosk mode to cause errors in following tests.
+	 */
+	protected function exitKioskModeFromProfiles() {
+		DBexecute('DELETE FROM profiles WHERE idx=\'web.layout.mode\'');
+	}
+
+	/**
 	 * @onBeforeOnce prepareDashboardData
+	 *
+	 * @onAfter exitKioskModeFromProfiles
 	 *
 	 * @depends testPageAdministrationGeneralModules_Layout
 	 *
@@ -1322,6 +1332,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->checkWidgetStatusOnDashboard($dashboard, $module, $status, 'kiosk');
 		$this->query('xpath://button[@title="Normal view"]')->one()->click();
 		$this->page->waitUntilReady();
+		$dashboard->waitUntilReady();
 
 		// Open dashboard in edit mode or open dashboard on template and check widget display again.
 		if (array_key_exists('template', $module)) {
@@ -1368,6 +1379,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		if ($mode === 'kiosk') {
 			$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 			$this->page->waitUntilReady();
+			$dashboard->waitUntilReady();
 		}
 
 		if ($status === 'enabled') {

@@ -384,8 +384,9 @@ class C64ImportConverter extends CConverter {
 						$widget['fields'][] = [
 							'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
 							'name' => 'reference',
-							'value' => $reference++
+							'value' => $reference
 						];
+						$reference = PHP_VERSION_ID >= 80300 ? str_increment($reference) : ++$reference;
 					}
 
 					if ($widget['type'] === 'plaintext') {
@@ -403,9 +404,10 @@ class C64ImportConverter extends CConverter {
 							[
 								'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
 								'name' => 'reference',
-								'value' => $reference++
+								'value' => $reference
 							]
 						];
+						$reference = PHP_VERSION_ID >= 80300 ? str_increment($reference) : ++$reference;
 
 						foreach ($old_fields as $field) {
 							switch ($field['name']) {

@@ -11,7 +11,7 @@ What's included:
 * `tests` - Test cases
 
 ## Getting started
-This library requires PHP 7.4 or later
+This library requires PHP 8.2 or later
 
 To use SDK in your existing developing environment, install it from Packagist
 ```

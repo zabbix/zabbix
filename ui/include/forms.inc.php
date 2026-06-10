@@ -54,7 +54,7 @@ JAVASCRIPT;
 		'type' => getRequest('type', ITEM_TYPE_ZABBIX),
 		'snmp_oid' => getRequest('snmp_oid', ''),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
-		'trapper_hosts' => getRequest('trapper_hosts', ''),
+		'trapper_hosts' => getRequest('trapper_hosts', ZBX_DEFAULT_TRAPPER_HOSTS),
 		'units' => getRequest('units', ''),
 		'valuemapid' => getRequest('valuemapid', 0),
 		'params' => getRequest('params', ''),

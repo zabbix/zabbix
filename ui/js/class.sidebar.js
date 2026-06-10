@@ -158,6 +158,7 @@ class CSidebar extends CBaseComponent {
 	setViewMode(view_mode) {
 		if (view_mode === SIDEBAR_VIEW_MODE_FULL) {
 			this._is_opened = false;
+			this._target.style.zIndex = '';
 			this.removeClass('is-opened');
 		}
 		this.toggleClass('is-compact', view_mode === SIDEBAR_VIEW_MODE_COMPACT);

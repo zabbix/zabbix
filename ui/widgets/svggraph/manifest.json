@@ -33,6 +33,6 @@
 		}
 	},
 	"assets": {
-		"js": ["class.widget.js"]
+		"js": ["class.csvggraph.js", "class.widget.js"]
 	}
 }

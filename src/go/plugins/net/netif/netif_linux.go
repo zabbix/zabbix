@@ -16,14 +16,18 @@ package netif
 
 import (
 	"encoding/json"
+	"regexp"
 
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (
-	errorCannotFindIf = "Cannot find information for this network interface in /proc/net/dev."
-	netDevFilepath    = "/proc/net/dev"
+	errorCannotFindIf  = "Cannot find information for this network interface in /proc/net/dev."
+	netDevFilepath     = "/proc/net/dev"
+	netDevStatsCount   = 16
+	sysClassNetDirpath = "/sys/class/net/"
 )
 
 func init() { //nolint:gochecknoinits // legacy implementation
@@ -36,35 +40,26 @@ func init() { //nolint:gochecknoinits // legacy implementation
 		"net.if.out", "Returns outgoing traffic statistics on network interface.",
 		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface.",
 		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.",
+		"net.if.get", "Returns list of network interfaces with detailed information.",
 	)
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 
 	impl.netDevFilepath = netDevFilepath
+	impl.netDevStatsCount = netDevStatsCount
+	impl.sysClassNetDirpath = sysClassNetDirpath
 }
 
 // Export implements plugin.Exporter interface.
-//
-//nolint:cyclop // export function delegates its requests, so high cyclo is expected.
 func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
 	switch key {
 	case "net.if.discovery":
-		if len(params) > 0 {
-			return nil, errs.New(errorParametersNotAllowed)
-		}
+		return p.exportDiscovery(params)
 
-		devices, err := p.getDevDiscovery()
-		if err != nil {
-			return nil, err
-		}
+	case "net.if.get":
+		return p.exportGet(params)
 
-		b, err := json.Marshal(devices)
-		if err != nil {
-			return nil, errs.Wrap(err, "failed to marshal devices")
-		}
-
-		return string(b), nil
 	case "net.if.collisions":
 		err := validateParams(params, 1, 1)
 		if err != nil {
@@ -85,6 +80,54 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 		/* SHOULD_NEVER_HAPPEN */
 		return nil, errs.New(errorUnsupportedMetric)
 	}
+}
+
+func (p *Plugin) exportDiscovery(params []string) (string, error) {
+	if len(params) > 0 {
+		return "", errs.New(errorParametersNotAllowed)
+	}
+
+	devices, err := p.getDevDiscovery()
+	if err != nil {
+		return "", err
+	}
+
+	b, err := json.Marshal(devices)
+	if err != nil {
+		return "", errs.Wrap(err, "failed to marshal devices")
+	}
+
+	return string(b), nil
+}
+
+func (p *Plugin) exportGet(params []string) (string, error) {
+	var (
+		err error
+		rgx *regexp.Regexp
+	)
+
+	if len(params) > 1 {
+		return "", zbxerr.ErrorTooManyParameters
+	}
+
+	if len(params) > 0 && params[0] != "" {
+		rgx, err = regexp.Compile(params[0])
+		if err != nil {
+			return "", errs.Wrapf(err, "invalid regular expression %q", params[0])
+		}
+	}
+
+	devices, err := p.getIfGet(rgx)
+	if err != nil {
+		return "", err
+	}
+
+	b, err := json.Marshal(devices)
+	if err != nil {
+		return "", errs.Wrap(err, "failed to marshal devices")
+	}
+
+	return string(b), nil
 }
 
 func (p *Plugin) handleNetIfMetric(
@@ -109,7 +152,7 @@ func validateParams(params []string, minParams, maxParams int) error {
 	}
 
 	if len(params) > maxParams {
-		return errs.New(errorTooManyParams)
+		return zbxerr.ErrorTooManyParameters
 	}
 
 	if params[0] == "" {

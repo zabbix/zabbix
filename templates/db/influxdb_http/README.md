@@ -32,10 +32,10 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$INFLUXDB.URL}|<p>InfluxDB instance URL</p>|`http://localhost:8086`|
-|{$INFLUXDB.API.TOKEN}|<p>InfluxDB API Authorization Token</p>||
-|{$INFLUXDB.ORG_NAME.MATCHES}|<p>Filter of discoverable organizations</p>|`.*`|
-|{$INFLUXDB.ORG_NAME.NOT_MATCHES}|<p>Filter to exclude discovered organizations</p>|`CHANGE_IF_NEEDED`|
+|{$INFLUXDB.URL}|<p>InfluxDB instance URL.</p>|`http://localhost:8086`|
+|{$INFLUXDB.API.TOKEN}|<p>InfluxDB API Authorization Token.</p>||
+|{$INFLUXDB.ORG_NAME.MATCHES}|<p>Filter of discoverable organizations.</p>|`.*`|
+|{$INFLUXDB.ORG_NAME.NOT_MATCHES}|<p>Filter to exclude discovered organizations.</p>|`CHANGE_IF_NEEDED`|
 |{$INFLUXDB.TASK.RUN.FAIL.MAX.WARN}|<p>Maximum number of tasks runs failures for trigger expression.</p>|`2`|
 |{$INFLUXDB.REQ.FAIL.MAX.WARN}|<p>Maximum number of query requests failures for trigger expression.</p>|`2`|
 

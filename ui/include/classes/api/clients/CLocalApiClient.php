@@ -233,6 +233,8 @@ class CLocalApiClient extends CApiClient {
 	 * @return bool
 	 */
 	protected function isAllowedMethod(string $api, string $method): bool {
+		global $ZBX_FEATURE_FLAGS;
+
 		$api_service = $this->serviceFactory->getObject($api);
 		$user_data = $api_service::$userData;
 		$method_rules = $api_service::ACCESS_RULES[$method];
@@ -240,6 +242,11 @@ class CLocalApiClient extends CApiClient {
 		if (!array_key_exists('min_user_type', $method_rules)
 				|| !in_array($user_data['type'], [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 				|| $user_data['type'] < $method_rules['min_user_type']) {
+			return false;
+		}
+
+		if (array_key_exists('feature_flag', $method_rules)
+				&& !$ZBX_FEATURE_FLAGS[$method_rules['feature_flag']]) {
 			return false;
 		}
 

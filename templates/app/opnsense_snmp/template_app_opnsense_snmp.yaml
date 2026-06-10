@@ -45,7 +45,7 @@ zabbix_export:
         5. Link the template to a host.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -1245,7 +1245,7 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
+                    2. `{ $IFCONTROL:"{#IFNAME}" }=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
                   tags:
                     - tag: scope
                       value: availability

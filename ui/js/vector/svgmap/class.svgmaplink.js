@@ -139,7 +139,7 @@ class SVGMapLink {
 
 			element.element.dataset.hintbox = '1';
 			element.element.dataset.hintboxStatic = '1';
-			element.element.dataset.hintboxContents = rows;
+			element.element.dataset.hintboxHtml = rows;
 			element.element.style.cursor = 'pointer';
 		}
 		else {

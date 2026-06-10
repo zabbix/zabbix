@@ -2232,20 +2232,22 @@ class testManualActionScripts extends CWebTest {
 			$scope = (array_key_exists('host', $data)) ? 'host' : 'event';
 
 			if ($content === 'Latest data') {
+				$table = $this->query('id:latest')->asDatatable()->one()->waitUntilReady();
+				$headers = $table->getHeaders();
 				CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['Hosts' => $data[$scope]]);
-				$table = $this->query('xpath://table[contains(@class, "list-table fixed")]')->asTable()->one();
-				$this->query('button:Apply')->one()->click();
+				$this->query('button:Apply')->one()->waitUntilClickable()->click();
 				$this->page->waitUntilReady();
-				$table->waitUntilReloaded();
+				$headers->waitUntilStalled();
+				$table->waitUntilReady()->invalidate();
 			}
 			elseif ($content === 'Global view') {
 				$table = CDashboardElement::find()->one()->getWidget('Current problems');
 			}
 			else {
-				$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
+				$table = $this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
 			}
 
-			$table->query('link', $data[$scope])->one()->click();
+			$table->query('link', $data[$scope])->waitUntilClickable()->one()->scrollIntoView(50)->click();
 			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 			$popup->fill($data['fields']['Name']);
 			$manual_input_dialog = COverlayDialogElement::find()->waitUntilReady()->one();

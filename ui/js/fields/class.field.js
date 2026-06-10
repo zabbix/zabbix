@@ -23,7 +23,7 @@ class CField {
 	_changed = false;
 	_error_msg = null;
 	_error_level = -1;
-	_global_errors = {};
+	_global_errors = Object.create(null);
 	_error_container = null;
 	_error_label;
 	_allow_trim;
@@ -82,12 +82,12 @@ class CField {
 		return this._changed;
 	}
 
-	setGlobalError(message) {
-		this._global_errors[this.getName()] = message;
-	}
-
 	getGlobalErrors() {
 		return this._global_errors;
+	}
+
+	getField() {
+		return this._field;
 	}
 
 	getName() {
@@ -139,7 +139,7 @@ class CField {
 			if (this._error_level >= level) {
 				this._error_msg = null;
 				this._error_level = -1;
-				this._global_errors = {};
+				this._global_errors = Object.create(null);
 			}
 		}
 		else {

@@ -26,6 +26,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	}
 
 	protected function checkInput(): bool {
+		global $ZBX_FEATURE_FLAGS;
+
 		$fields = [
 			'roleid' => 									'db users.roleid',
 			'name' => 										'db role.name',
@@ -91,9 +93,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'actions_edit_own_media' =>						'in 0,1',
 			'actions_edit_user_media' =>					'in 0,1',
 			'ui_default_access' => 							'in 0,1',
-			'modules_default_access' => 					'in 0,1',
+			'modules_default_access' =>						'in 0,1',
 			'actions_default_access' => 					'in 0,1',
-			'modules' => 									'array',
+			'modules' =>									'array',
 			'api_access' => 								'in 0,1',
 			'api_mode' => 									'in '.implode(',', [ZBX_ROLE_RULE_API_MODE_DENY, ZBX_ROLE_RULE_API_MODE_ALLOW]),
 			'api_methods' => 								'array',
@@ -108,6 +110,10 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'form_refresh' => 								'int32',
 			'super_admin_role_clone' =>						'in 1'
 		];
+
+		if (!$ZBX_FEATURE_FLAGS['modules_config_enabled']) {
+			unset($fields['fields']['modules'], $fields['fields']['modules_default_access']);
+		}
 
 		$ret = $this->validateInput($fields);
 
@@ -147,6 +153,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	 * @throws APIException
 	 */
 	protected function doAction(): void {
+		global $ZBX_FEATURE_FLAGS;
+
 		$db_defaults = DB::getDefaults('role');
 
 		if ($this->hasInput('super_admin_role_clone')) {
@@ -216,12 +224,16 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			}
 		}
 
-		$db_modules = API::Module()->get([
-			'output' => ['moduleid', 'relative_path', 'status']
-		]);
+		$data['rules']['modules_config_enabled'] = $ZBX_FEATURE_FLAGS['modules_config_enabled'];
+
+		$db_modules = $data['rules']['modules_config_enabled']
+			? API::Module()->get([
+				'output' => ['moduleid', 'relative_path', 'status']
+			])
+			: [];
 
 		$disabled_modules = array_filter($db_modules,
-			static function(array $db_module): bool {
+			static function (array $db_module): bool {
 				return $db_module['status'] == MODULE_STATUS_DISABLED;
 			}
 		);
@@ -400,12 +412,20 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	 * @throws APIException
 	 */
 	private function getRulesByRoleid(string $roleid): array {
+		global $ZBX_FEATURE_FLAGS;
+
+		$select_rules = ['ui', 'ui.default_access', 'api', 'api.access', 'api.mode', 'actions',
+			'actions.default_access', 'services.read.mode', 'services.read.list', 'services.read.tag',
+			'services.write.mode', 'services.write.list', 'services.write.tag'
+		];
+
+		if ($ZBX_FEATURE_FLAGS['modules_config_enabled']) {
+			$select_rules = array_merge($select_rules, ['modules', 'modules.default_access']);
+		}
+
 		$roles = API::Role()->get([
 			'output' => ['roleid'],
-			'selectRules' => ['ui', 'ui.default_access', 'modules', 'modules.default_access', 'api', 'api.access',
-				'api.mode', 'actions', 'actions.default_access', 'services.read.mode', 'services.read.list',
-				'services.read.tag', 'services.write.mode', 'services.write.list', 'services.write.tag'
-			],
+			'selectRules' => $select_rules,
 			'roleids' => $roleid
 		]);
 
@@ -413,6 +433,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	}
 
 	private function getRules(array $input): array {
+		global $ZBX_FEATURE_FLAGS;
+
 		$rules = [];
 
 		foreach ($input['ui'] as $rule) {
@@ -445,8 +467,12 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		$rules['service_write_list'] = $input['services.write.list'];
 		$rules['service_write_tag'] = $input['services.write.tag'];
 
-		foreach ($input['modules'] as $rule) {
-			$rules['modules'][$rule['moduleid']] = $rule['status'];
+		if ($ZBX_FEATURE_FLAGS['modules_config_enabled']) {
+			foreach ($input['modules'] as $rule) {
+				$rules['modules'][$rule['moduleid']] = $rule['status'];
+			}
+
+			$rules['modules.default_access'] = $input['modules.default_access'];
 		}
 
 		if ($input['api']) {
@@ -466,7 +492,6 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		}
 
 		$rules['ui.default_access'] = $input['ui.default_access'];
-		$rules['modules.default_access'] = $input['modules.default_access'];
 		$rules['api.access'] = $input['api.access'];
 		$rules['api.mode'] = $input['api.mode'];
 		$rules['actions.default_access'] = $input['actions.default_access'];

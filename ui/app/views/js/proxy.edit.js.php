@@ -32,6 +32,8 @@ window.proxy_edit_popup = new class {
 		this.form = new CForm(this.form_element, rules);
 		this.footer = this.overlay.$dialogue.$footer[0];
 
+		this.dialogue.classList.add('modal-popup-proxy-edit')
+
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'proxy.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);

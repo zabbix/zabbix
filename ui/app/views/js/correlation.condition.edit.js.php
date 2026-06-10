@@ -21,49 +21,48 @@
 
 window.correlation_condition_popup = new class {
 
-	init() {
+	init({rules}) {
 		this.overlay = overlays_stack.getById('correlation-condition-form');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.footer = this.overlay.$dialogue.$footer[0];
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 
-		this.form.querySelector('#condition-type')
-			.onchange = () => reloadPopup(this.form, 'correlation.condition.edit');
+		this.form_element.querySelector('#condition-type')
+			.onchange = () => reloadPopup(this.form_element, 'correlation.condition.edit');
 
-		const $event_ms = $('#groupids_');
+		const $event_ms = $('#groupid_');
 
 		$event_ms.on('change', () => {
 			$event_ms.multiSelect('setDisabledEntries',
-				[...this.form.querySelectorAll('[name^="groupids[]"]')].map((input) => input.value)
+				[...this.form_element.querySelectorAll('[name^="groupid[]"]')].map((input) => input.value)
 			);
 		});
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
 	}
 
-	submit() {
-		const fields = getFormFields(this.form);
+	#submit() {
+		this.#removePopupMessages();
+		const fields = this.form.getAllValues();
 
-		switch (parseInt(fields.conditiontype)) {
-			case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>:
-			case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>:
-				fields.tag = fields.tag.trim();
-				break;
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.overlay.unsetLoading();
 
-			case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
-			case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE ?>:
-				fields.tag = fields.tag.trim();
-				fields.value = fields.value.trim();
-				break;
+					return;
+				}
 
-			case <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?>:
-				fields.oldtag = fields.oldtag.trim();
-				fields.newtag = fields.newtag.trim();
-				break;
-		}
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'correlation.condition.check');
 
-		const curl = new Curl('zabbix.php');
+				this.#post(curl.getUrl(), fields, (response) => {
+					overlayDialogueDestroy(this.overlay.dialogueid);
 
-		curl.setArgument('action', 'correlation.condition.check');
-
-		this.#post(curl.getUrl(), fields);
+					this.dialogue.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
+				});
+			});
 	}
 
 	/**
@@ -72,7 +71,7 @@ window.correlation_condition_popup = new class {
 	 * @param {string} url   The URL to send the POST request to.
 	 * @param {object} data  The data to send with the POST request.
 	 */
-	#post(url, data) {
+	#post(url, data, success_callback) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -83,33 +82,41 @@ window.correlation_condition_popup = new class {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
-				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				document.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
-				this.dialogue.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+
+					return;
+				}
+
+				success_callback(response);
 			})
-			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
-				let title,
-					messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title)[0];
-
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => this.overlay.unsetLoading());
 	}
-}
+
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
+	}
+};

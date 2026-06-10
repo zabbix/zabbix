@@ -47,6 +47,8 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	socketPath := strings.Split(p.options.Endpoint, "://")[1]
 	transport := &http.Transport{
 		DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
+			//nolint:noctx // as this function is intentionally ran
+			// without context needs to be looked at during refactor.
 			return net.Dial("unix", socketPath)
 		},
 	}

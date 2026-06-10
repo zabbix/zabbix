@@ -26,7 +26,7 @@
 		});
 
 		$('#filter-task').on('change', () => {
-			document.forms['zbx_filter'].submit();
+			document.forms['<?= CFilter::FORM_NAME; ?>'].submit();
 		});
 	});
 </script>

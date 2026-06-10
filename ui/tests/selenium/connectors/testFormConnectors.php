@@ -399,7 +399,7 @@ class testFormConnectors extends CWebTest {
 						'Concurrent sessions' => '0'
 					],
 					'inline_errors' => [
-						'Concurrent sessions' => 'This value must be no less than "1".'
+						'Concurrent sessions' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -444,7 +444,7 @@ class testFormConnectors extends CWebTest {
 						'Concurrent sessions' => '101'
 					],
 					'inline_errors' => [
-						'Concurrent sessions' => 'This value must be no greater than "100".'
+						'Concurrent sessions' => 'Value must be less than or equal to 100.'
 					]
 				]
 			],
@@ -459,7 +459,7 @@ class testFormConnectors extends CWebTest {
 						'Attempts' => '0'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no less than "1".'
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -489,7 +489,7 @@ class testFormConnectors extends CWebTest {
 						'Attempts' => '6'
 					],
 					'inline_errors' => [
-						'Attempts' => 'This value must be no greater than "5".'
+						'Attempts' => 'Value must be less than or equal to 5.'
 					]
 				]
 			],
@@ -774,8 +774,8 @@ class testFormConnectors extends CWebTest {
 						'Attempts' => '0'
 					],
 					'inline_errors' => [
-						'Concurrent sessions' => 'This value must be no less than "1".',
-						'Attempts' => 'This value must be no less than "1".'
+						'Concurrent sessions' => 'Value must be greater than or equal to 1.',
+						'Attempts' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -796,8 +796,8 @@ class testFormConnectors extends CWebTest {
 						'Name' => 'This field cannot be empty.',
 						'URL' => 'This field cannot be empty.',
 						'id:max_records' => 'This value is not a valid integer.',
-						'Concurrent sessions' => 'This value must be no less than "1".',
-						'Attempts' => 'This value must be no greater than "5".'
+						'Concurrent sessions' => 'Value must be greater than or equal to 1.',
+						'Attempts' => 'Value must be less than or equal to 5.'
 					]
 				]
 			],

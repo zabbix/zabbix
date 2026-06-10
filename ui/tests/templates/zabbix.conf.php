@@ -25,6 +25,8 @@ $ZBX_SERVER_NAME		= 'TEST_SERVER_NAME';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 
+$ZBX_FEATURE_FLAGS['banners_enabled'] = false;
+
 // PHP runtime error log file for unit tests.
 define('PHPUNIT_ERROR_LOG', '{PHPUNIT_ERROR_LOG}');
 

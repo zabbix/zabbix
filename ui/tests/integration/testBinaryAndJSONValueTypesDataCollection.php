@@ -188,13 +188,15 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 					'name' => 'JSON_TRAPPER',
 					'key_' => 'JSON_TRAPPER',
 					'type' => ITEM_TYPE_TRAPPER,
-					'value_type' => ITEM_VALUE_TYPE_JSON
+					'value_type' => ITEM_VALUE_TYPE_JSON,
+					'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 				],
 				[
 					'name' => 'JSON_TRAPPER_PREPROC_THROTTLING',
 					'key_' => 'JSON_TRAPPER_PREPROC_THROTTLING',
 					'type' => ITEM_TYPE_TRAPPER,
 					'value_type' => ITEM_VALUE_TYPE_JSON,
+					'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 					'preprocessing' =>
 					[[
 						'type' => ZBX_PREPROC_THROTTLE_VALUE
@@ -703,8 +705,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'resuming Zabbix agent checks on host "agent": connection restored'
 		]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		// Retrieve history data from API as soon it is available.
 		// image

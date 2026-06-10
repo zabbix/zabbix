@@ -52,7 +52,7 @@ zabbix_export:
         Please, refer to the [vendor documentation](https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/399023/rest-api-administrator) about the FortiGate REST API Authentication.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -202,7 +202,7 @@ zabbix_export:
                 
                 This trigger expression works as follows:
                 1. It can be triggered if there are one or more available firmware versions.
-                2. `{$FIRMWARE.UPDATES.CONTROL}=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if new firmware is found.
+                2. `{ $FIRMWARE.UPDATES.CONTROL }=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if new firmware is found.
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -1933,8 +1933,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the interface link status is down.
-                    2. `{$NET.IF.CONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface link is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the interface link status was up to (1) sometime before.
+                    2. `{ $NET.IF.CONTROL:"{#IFNAME}" }=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface link is down.
+                    3. The trigger fires only if the interface link status was up to (1) sometime before.
                     
                     WARNING: If closed manually, it will not fire again on the next poll because of .diff.
                   manual_close: 'YES'
@@ -2296,8 +2296,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the interface status is down.
-                    2. `{$SDWAN.HEALTH.IF.CONTROL:"{#NAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down/error.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the interface status was up to (1) sometime before.
+                    2. `{ $SDWAN.HEALTH.IF.CONTROL:"{#NAME}" }=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down/error.
+                    3. The trigger fires only if the interface status was up to (1) sometime before.
                     
                     WARNING: If closed manually, it will not fire again on the next poll because of .diff.
                   manual_close: 'YES'
@@ -2314,8 +2314,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the interface status is error.
-                    2. `{$SDWAN.HEALTH.IF.CONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down/error.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the interface status was up to (1) sometime before.
+                    2. `{ $SDWAN.HEALTH.IF.CONTROL:"{#IFNAME}" }=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down/error.
+                    3. The trigger fires only if the interface status was up to (1) sometime before.
                     
                     WARNING: If closed manually, it will not fire again on the next poll because of .diff.
                   manual_close: 'YES'
@@ -2465,8 +2465,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the interface status is down.
-                    2. `{$SDWAN.MEMBER.IF.CONTROL:"{#NAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the interface status was up to (1) sometime before.
+                    2. `{ $SDWAN.MEMBER.IF.CONTROL:"{#NAME}" }=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
+                    3. The trigger fires only if the interface status was up to (1) sometime before.
                     
                     WARNING: If closed manually, it will not fire again on the next poll because of .diff.
                   manual_close: 'YES'
@@ -2737,7 +2737,7 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the license expires soon.
-                    2. `{$SERVICE.LICENSE.CONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks the license of this service as not important. No new trigger will be fired if this license expires.
+                    2. `{ $SERVICE.LICENSE.CONTROL:"{#IFNAME}" }=1` - a user can redefine context macro to value - 0. That marks the license of this service as not important. No new trigger will be fired if this license expires.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -2828,7 +2828,7 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the license status is unsuccessful.
-                    2. `{$SERVICE.LICENSE.CONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks the license of this service as not important. No new trigger will be fired if this license is unsuccessful.
+                    2. `{ $SERVICE.LICENSE.CONTROL:"{#IFNAME}" }=1` - a user can redefine context macro to value - 0. That marks the license of this service as not important. No new trigger will be fired if this license is unsuccessful.
                   manual_close: 'YES'
                   tags:
                     - tag: scope

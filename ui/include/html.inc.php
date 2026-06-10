@@ -1083,15 +1083,19 @@ function makeMaintenanceIcon($type, string $name, string $description): CButtonI
 }
 
 /**
- * Renders an icon for suppressed problem.
+ * Render icon for suppressed problem with suppression details in hint.
  *
- * @param array  $icon_data
- *        string $icon_data[]['suppress_until']    Time until the problem is suppressed.
- *        string $icon_data[]['maintenance_name']  Name of the maintenance.
- *        string $icon_data[]['username']          User who created manual suppression.
- * @param bool   $blink                            Add 'blink' CSS class for jqBlink.
+ * @param array $icon_data  Array with suppression data.
  *
- * @throws Exception
+ * $icon_data = [[
+ *     'suppress_until' =>   (string)  Time until the problem is suppressed.
+ *     'maintenance_name' => (string)  Name of the maintenance (only for maintenance suppressions).
+ *     'username' =>         (string)  User who created manual suppression (only for manual suppressions).
+ * ]]
+ *
+ * @param bool $blink  Add 'blink' CSS class for jqBlink.
+ *
+ * @return CSimpleButton
  */
 function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimpleButton {
 	$suppress_until_values = array_column($icon_data, 'suppress_until');
@@ -1121,10 +1125,15 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 	}
 
 	$maintenances = implode(', ', $maintenance_names);
+	$is_suppressed_by_maintenance = $maintenances !== '' && $username === '';
 
 	return (new CButtonIcon(ZBX_ICON_EYE_OFF))
-		->addClass(ZBX_STYLE_COLOR_ICON)
+		->addClass($is_suppressed_by_maintenance ? ZBX_STYLE_COLOR_WARNING : ZBX_STYLE_COLOR_ICON)
 		->addClass($blink ? 'js-blink' : null)
+		->setAttribute('aria-label', $is_suppressed_by_maintenance
+			? _('Suppressed by maintenance')
+			: _('Manually suppressed')
+		)
 		->setHint(
 			_s('Suppressed till: %1$s', $suppressed_till).
 			($username !== '' ? "\n"._s('Manually by: %1$s', $username) : '').

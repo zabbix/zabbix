@@ -47,6 +47,8 @@ $table = (new CTable())
 
 (new CDiv($table))
 	->setId('subscriptions')
+	->setAttribute('data-field-type', 'set')
+	->setAttribute('data-field-name', 'subscriptions')
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->show();

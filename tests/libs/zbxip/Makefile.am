@@ -11,7 +11,8 @@ BINARIES_tests = \
 	zbx_iprange_ip2str \
 	zbx_iprange_uniq_next \
 	zbx_portrange_uniq_next \
-	zbx_join_hostport
+	zbx_join_hostport \
+	zbx_is_rfc_extended_hostname
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
@@ -195,3 +196,18 @@ zbx_join_hostport_LDADD += @SERVER_LIBS@
 zbx_join_hostport_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_join_hostport_CFLAGS = $(IP_COMPILER_FLAGS)
+
+#zbx_is_rfc_extended_hostname
+
+zbx_is_rfc_extended_hostname_SOURCES = \
+	zbx_is_rfc_extended_hostname.c \
+	$(COMMON_SRC_FILES)
+
+zbx_is_rfc_extended_hostname_LDADD = \
+	$(IP_LIBS)
+
+zbx_is_rfc_extended_hostname_LDADD += @SERVER_LIBS@
+
+zbx_is_rfc_extended_hostname_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_is_rfc_extended_hostname_CFLAGS = $(IP_COMPILER_FLAGS)

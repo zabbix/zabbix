@@ -127,7 +127,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 					'width' => 20,
 					'height' => 6,
 					'x' => 32,
-					'y' => 20,
+					'y' => 23,
 					'fields' => [
 						[
 							'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -439,7 +439,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 				[
 					'page' => 'Hostgroups page',
 					'listeners' => [
-						'Data listener for Map hostgroup broadcaster' => self::FIRST_HOSTGROUP_NAME,
+						'Data listener for Map hostgroup broadcaster' => self::THIRD_HOSTGROUP_NAME,
 						'Data listener for Problem hosts hostgroup broadcaster' => self::FIRST_HOSTGROUP_NAME,
 						'Data listener for Problems by severity hostgroup broadcaster' => self::FIRST_HOSTGROUP_NAME,
 						'Data listener for Web monitoring hostgroup broadcaster' => self::FIRST_HOSTGROUP_NAME

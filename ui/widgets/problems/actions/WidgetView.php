@@ -63,8 +63,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'acknowledgement_status' => $this->fields_values['acknowledgement_status'],
 				'acknowledged_by_me' => $this->fields_values['acknowledgement_status'] == ZBX_ACK_STATUS_ACK
 					? $this->fields_values['acknowledged_by_me']
-					: 0,
-				'show_opdata' => $this->fields_values['show_opdata']
+					: 0
+			], [
+				'show_opdata' => in_array($this->fields_values['show_opdata'],
+					[OPERATIONAL_DATA_SHOW_SEPARATELY, OPERATIONAL_DATA_SHOW_WITH_PROBLEM])
+						? 1
+						: 0
 			], $search_limit);
 
 			[$sortfield, $sortorder] = self::getSorting($this->fields_values['sort_triggers']);
@@ -83,10 +87,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$data['problems'] = array_slice($data['problems'], 0, $this->fields_values['show_lines'], true);
 
-			$data = CScreenProblem::makeData($data, [
-				'show' => $this->fields_values['show'],
+			$data = CScreenProblem::makeData($data, ['show' => $this->fields_values['show']], [
 				'details' => 0,
-				'show_opdata' => $this->fields_values['show_opdata']
+				'show_opdata' => in_array($this->fields_values['show_opdata'],
+					[OPERATIONAL_DATA_SHOW_SEPARATELY, OPERATIONAL_DATA_SHOW_WITH_PROBLEM])
+					? 1
+					: 0
 			]);
 
 			$data += [
@@ -150,8 +156,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 							'show_symptoms' => true,
 							'show_suppressed' => true,
 							'cause_eventid' => $cause_eventid,
-							'show' => $this->fields_values['show'],
-							'show_opdata' => $this->fields_values['show_opdata']
+							'show' => $this->fields_values['show']
+						], [
+							'show_opdata' => in_array($this->fields_values['show_opdata'],
+								[OPERATIONAL_DATA_SHOW_SEPARATELY, OPERATIONAL_DATA_SHOW_WITH_PROBLEM])
+									? 1
+									: 0
 						], ZBX_PROBLEM_SYMPTOM_LIMIT, true);
 
 						if ($_symptom_data['problems']) {
@@ -170,9 +180,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 							// Filter does not matter.
 							$_symptom_data = CScreenProblem::makeData($_symptom_data, [
-								'show' => $this->fields_values['show'],
-								'show_opdata' => $this->fields_values['show_opdata'],
-								'details' => 0
+								'show' => $this->fields_values['show']
+							], [
+								'details' => 0,
+								'show_opdata' => in_array($this->fields_values['show_opdata'],
+									[OPERATIONAL_DATA_SHOW_SEPARATELY, OPERATIONAL_DATA_SHOW_WITH_PROBLEM])
+									? 1
+									: 0
 							], true);
 
 							$data['users'] += $_symptom_data['users'];

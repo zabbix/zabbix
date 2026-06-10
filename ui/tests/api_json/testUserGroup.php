@@ -18,7 +18,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
 /**
- * @onBefore getConfFileContent, setSamlCertificatesStorage, prepareTestData
+ * @onBefore setSamlCertificatesStorage, prepareTestData
  * @onAfter   cleanTestData, revertConfFile
  *
  * @backup usrgrp, userdirectory, mfa

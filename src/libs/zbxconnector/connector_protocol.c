@@ -13,6 +13,8 @@
 **/
 
 #include "zbxconnector.h"
+#include "zbxcommon.h"
+#include "zbxtypes.h"
 #include "zbxserialize.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
