@@ -39,8 +39,6 @@ const (
 	emptyParameters    = 0
 )
 
-var impl = New()
-
 type Output struct {
 	X509              Cert             `json:"x509"`
 	Result            ValidationResult `json:"result"`
@@ -84,8 +82,10 @@ func New() *Plugin {
 }
 
 func init() {
+	webCertificatePlugin := New()
+
 	err := plugin.RegisterMetrics(
-		impl,
+		webCertificatePlugin,
 		"WebCertificate",
 		"web.certificate.get",
 		"Get TLS/SSL website certificate.",
