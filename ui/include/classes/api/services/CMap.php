@@ -1033,18 +1033,18 @@ class CMap extends CMapElement {
 						);
 					}
 
-					$url_validate_options = ['allow_user_macro' => false];
+					$url_validate_options = ['schemes' => CSettingsHelper::getAllowedUriSchemes()];
+
 					if ($url['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_HOST;
+						$url_validate_options['inventory_macro'] = INVENTORY_URL_MACRO_HOST;
 					}
 					elseif ($url['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_TRIGGER;
+						$url_validate_options['inventory_macro'] = INVENTORY_URL_MACRO_TRIGGER;
 					}
 					else {
-						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_NONE;
+						$url_validate_options['inventory_macro'] = INVENTORY_URL_MACRO_NONE;
 					}
-
-					if (!CHtmlUrlValidator::validate($url['url'], $url_validate_options)) {
+					if (!(new CUrlValidator($url_validate_options))->validate($url['url'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for "url" field.'));
 					}
 
@@ -1528,18 +1528,19 @@ class CMap extends CMapElement {
 						);
 					}
 
-					$url_validate_options = ['allow_user_macro' => false];
+					$url_validate_options = ['schemes' => CSettingsHelper::getAllowedUriSchemes()];
+
 					if ($url['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_HOST;
+						$url_validate_options['inventory_macro'] = INVENTORY_URL_MACRO_HOST;
 					}
 					elseif ($url['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_TRIGGER;
+						$url_validate_options['inventory_macro'] = INVENTORY_URL_MACRO_TRIGGER;
 					}
 					else {
-						$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_NONE;
+						$url_validate_options['inventory_macro'] = INVENTORY_URL_MACRO_NONE;
 					}
 
-					if (!CHtmlUrlValidator::validate($url['url'], $url_validate_options)) {
+					if (!(new CUrlValidator($url_validate_options))->validate($url['url'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for "url" field.'));
 					}
 
