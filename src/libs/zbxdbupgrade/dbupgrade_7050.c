@@ -1110,16 +1110,16 @@ static int	DBpatch_7050085(void)
 	const char	*values[] = {
 			"0,0,"
 				"'{HOST.NAME} - {EVENT.NAME}',"
-				"'Started at {EVENT.TIME} on {EVENT.DATE}&eol;"
+				"'Started on {{EVENT.TIMESTAMP}.fmttime(\"%x %X\")}&eol;"
 				"Data: {EVENT.OPDATA}'",
 			"0,1,"
 				"'[RESOLVED] {HOST.NAME} - {EVENT.NAME}',"
-				"'Resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&eol;"
+				"'Resolved on {{EVENT.RECOVERY.TIMESTAMP}.fmttime(\"%x %X\")}&eol;"
 				"Duration: {EVENT.DURATION}'",
 			"0,2,"
 				"'[UPDATED] {HOST.NAME} - {EVENT.NAME}',"
-				"'{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} "
-				"{EVENT.UPDATE.TIME}&eol;{EVENT.UPDATE.MESSAGE}'",
+				"'{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem on "
+				"{{EVENT.UPDATE.TIMESTAMP}.fmttime(\"%x %X\")}&eol;{EVENT.UPDATE.MESSAGE}'",
 			NULL
 	};
 
