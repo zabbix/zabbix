@@ -521,7 +521,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 
 		if ($wait_for_cache_stats) {
 			$this->waitForLogLineToBePresent(self::COMPONENT_PROXY,
-					'memory statistics for configuration cache', true, 90, 1);
+					'End of DCdump_config()', true, 90, 1);
 		}
 	}
 
