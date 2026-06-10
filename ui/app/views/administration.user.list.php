@@ -292,7 +292,7 @@ foreach ($data['users'] as $user) {
 	if (CSettingsHelper::isMobileDevicesEnabled()) {
 		$row[] = CRoleHelper::checkAccess(CRoleHelper::DEVICES_ACCESS, $user['roleid'])
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
-			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_ORANGE);
+			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
 	}
 
 	$row = array_merge($row, [
