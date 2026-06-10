@@ -18,7 +18,7 @@ class CControllerHostViewData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['hostid', 'data_actions', 'name', 'status', 'maintenance', 'maintenanceid',
 		'maintenance_type', 'maintenance_status', 'interface', 'availability', 'active_available', 'status',
-		'items_count', 'problems', 'graphs', 'dashboards', 'httpTests', 'tags'];
+		'items_count', 'problems', 'graphs', 'dashboards', 'httpTests', 'tags', 'custom_text'];
 
 	protected function init(): void {
 		parent::init();
