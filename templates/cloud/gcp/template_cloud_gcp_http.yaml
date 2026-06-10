@@ -42,6 +42,12 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
+                - '0'
+                - '.*Request had invalid authentication credentials.*'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'There was an authentication error while requesting data from GCP API.'
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
                 - '-1'
             - type: JSONPATH
               parameters:
@@ -78,6 +84,12 @@ zabbix_export:
           units: '!ms'
           description: 'P95 latencies for application load balancer.'
           preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '0'
+                - '.*Request had invalid authentication credentials.*'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'There was an authentication error while requesting data from GCP API.'
             - type: CHECK_NOT_SUPPORTED
               parameters:
                 - '-1'
@@ -127,6 +139,12 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
+                - '0'
+                - '.*Request had invalid authentication credentials.*'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'There was an authentication error while requesting data from GCP API.'
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
                 - '-1'
             - type: JSONPATH
               parameters:
@@ -162,6 +180,12 @@ zabbix_export:
           units: rps
           description: 'Total average request rate for application load balancer.'
           preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '0'
+                - '.*Request had invalid authentication credentials.*'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'There was an authentication error while requesting data from GCP API.'
             - type: CHECK_NOT_SUPPORTED
               parameters:
                 - '-1'
@@ -239,6 +263,12 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
+                - '0'
+                - '.*Request had invalid authentication credentials.*'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'There was an authentication error while requesting data from GCP API.'
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
                 - '-1'
             - type: JSONPATH
               parameters:
@@ -274,6 +304,12 @@ zabbix_export:
           units: '%'
           description: 'Request success rate calculated based on the ratio of successful requests (HTTP response codes 2xx and 3xx) to total requests.'
           preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '0'
+                - '.*Request had invalid authentication credentials.*'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'There was an authentication error while requesting data from GCP API.'
             - type: JSONPATH
               parameters:
                 - '$.data.result[0].value[1]'
