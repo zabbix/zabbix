@@ -122,8 +122,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 					'triggerid' => $trigger['triggerid'],
 					'expression' => $trigger['expression'],
 					'opdata' => $trigger['opdata'],
-					'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
-					'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
+					'clock' => $problem['r_eventid'] != 0 ? $problem['r_clock'] : $problem['clock'],
+					'ns' => $problem['r_eventid'] != 0 ? $problem['r_ns'] : $problem['ns']
 				];
 			}
 		}
@@ -437,8 +437,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 					'triggerid' => $trigger['triggerid'],
 					'expression' => $trigger['expression'],
 					'opdata' => $trigger['opdata'],
-					'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
-					'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
+					'clock' => $problem['r_eventid'] != 0 ? $problem['r_clock'] : $problem['clock'],
+					'ns' => $problem['r_eventid'] != 0 ? $problem['r_ns'] : $problem['ns']
 				];
 			}
 		}
@@ -820,8 +820,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$problems[$eventid] = [
 				'triggerid' => $problem['objectid'],
 				'expression' => $trigger['expression'],
-				'clock' => $problem['clock'],
-				'ns' => $problem['ns']
+				'clock' => $problem['r_eventid'] != 0 ? $problem['r_clock'] : $problem['clock'],
+				'ns' => $problem['r_eventid'] != 0 ? $problem['r_ns'] : $problem['ns']
 			] + $custom_text;
 		}
 
