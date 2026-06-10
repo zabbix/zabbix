@@ -189,7 +189,8 @@ $form
 			'testable_item_types' => $data['testable_item_types'],
 			'type_with_key_select' => $type_with_key_select,
 			'value_type_keys' => $data['value_type_keys'],
-			'return_url' => $return_url
+			'return_url' => $return_url,
+			'test_rules' =>$data['js_test_validation_rules']
 		]).');'))->setOnDocumentReady()
 	);
 $output = [
