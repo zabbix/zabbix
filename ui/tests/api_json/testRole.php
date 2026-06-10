@@ -535,7 +535,7 @@ class testRole extends CAPITest {
 				'role' => [
 					'roleid' => 'zabbix-admin-role',
 					'name' => 'zabbix-admin-role',
-					'type' => 2, // USER_TYPE_ADMIN_USER
+					'type' => 2, // USER_TYPE_ZABBIX_ADMIN
 					'rules' => [
 						'ui' => [
 							[
