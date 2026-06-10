@@ -452,7 +452,6 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 		}
 
 		zbx_json_adduint64(&json, "triggerid", triggerid);
-		zbx_json_adduint64(&json, "userid", userid);
 		zbx_json_addint64(&json, "severity", event->severity);
 
 		zbx_json_close(&json); /* payload.data */

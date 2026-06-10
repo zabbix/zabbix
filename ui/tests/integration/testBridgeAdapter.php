@@ -566,7 +566,7 @@ class testBridgeAdapter extends CIntegrationTest {
 
 		$data = $payload['data'];
 
-		if (array_keys($data) !== ['title', 'body', 'eventid', 'hostids', 'triggerid', 'userid', 'severity']) {
+		if (array_keys($data) !== ['title', 'body', 'eventid', 'hostids', 'triggerid', 'severity']) {
 			return false;
 		}
 
@@ -576,7 +576,6 @@ class testBridgeAdapter extends CIntegrationTest {
 			&& $payload['subject'] === 'event/'.$data['eventid']
 			&& $data['hostids'] === [(int) self::$real_notify_hostid]
 			&& $data['triggerid'] === (int) self::$triggerids[0]
-			&& $data['userid'] === 1
 			&& $data['severity'] === TRIGGER_SEVERITY_HIGH;
 	}
 
