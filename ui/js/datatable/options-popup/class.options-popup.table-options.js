@@ -132,12 +132,14 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 		const icon = document.createElement('div');
 		icon.classList.add(ZBX_STYLE_DRAG_ICON);
 
+		const overrides = column.getOverrides();
+
 		const input = document.createElement('input');
 		input.classList.add(ZBX_STYLE_CHECKBOX_RADIO);
 		input.setAttribute('id', id);
 		input.setAttribute('type', 'checkbox');
 		input.setAttribute('data-field-type', 'checkbox');
-		input.checked = column.isVisible();
+		input.checked = overrides?.visible ?? column.isVisible();
 		input.disabled = !column.isTogglable();
 		input.value = '1';
 		input.addEventListener('change', e => {

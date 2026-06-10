@@ -623,7 +623,7 @@
 					requestAnimationFrame(() => this.#initExpandables());
 				})
 				.on(CDataTable.EVENT_COLUMN_TOGGLE, e => {
-					const {column_index} = e.detail;
+					const {column_index, visible} = e.detail;
 
 					const column = this.#datatable.getColumn(column_index);
 					if (!column) {
@@ -638,9 +638,13 @@
 					if (this.#show_problems_hidden_column_ids.includes(column.getId())) {
 						e.preventDefault();
 
-						column.setVisible(false);
+						const overrides = column.getOverrides();
 
-						this.#datatable.updateUserConfig();
+						column.setOverrides({...overrides, visible})
+							.setVisible(false);
+
+						this.#datatable.updateUserConfig()
+							.dispatchEvent(CDataTable.EVENT_SAVE);
 					}
 				})
 				.on(CDataTable.EVENT_DATA_SORT, () => this.#scheduleRefresh())
