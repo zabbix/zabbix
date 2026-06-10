@@ -272,12 +272,12 @@ abstract class CControllerCepRuleGeneral extends CController {
 			'event_name' => ['db cep_operation.event_name', 'required', 'not_empty', 'when' => ['type',
 				'in' => [CCepRuleHelper::OP_SET_NAME]
 			]],
-			'tag' => ['db cep_operation.tag', 'required', 'when' => ['type', 'in' => [
+			'tag' => ['db cep_operation.tag', 'required', 'not_empty', 'when' => ['type', 'in' => [
 				CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG, CCepRuleHelper::OP_SET_TAG_VALUE,
 				CCepRuleHelper::OP_INCREASE_TAG_VALUE, CCepRuleHelper::OP_DECREASE_TAG_VALUE,
 				CCepRuleHelper::OP_RENAME_TAG, CCepRuleHelper::OP_REMOVE_TAG
 			]]],
-			'new_tag' => ['db cep_operation.new_tag', 'required', 'when' => ['type', 'in' => [
+			'new_tag' => ['db cep_operation.new_tag', 'required', 'not_empty', 'when' => ['type', 'in' => [
 				CCepRuleHelper::OP_RENAME_TAG
 			]]],
 			'tag_value' => ['db cep_operation.tag_value', 'required', 'when' => ['type', 'in' => [
@@ -308,10 +308,10 @@ abstract class CControllerCepRuleGeneral extends CController {
 				]
 			],
 			'past_tag' => ['db cep_window_condition.past_tag', 'required', 'not_empty'],
-			'tag' => ['db cep_window_condition.tag', 'required', 'not_empty',
+			'tag' => ['db cep_window_condition.tag', 'required',
 				'when' => ['type', 'in' => [CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR]]
 			],
-			'tag_value' => ['db cep_window_condition.tag_value', 'required', 'not_empty',
+			'tag_value' => ['db cep_window_condition.tag_value', 'required',
 				'when' => ['type', 'in' => [CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE]]
 			]
 		];
@@ -359,11 +359,11 @@ abstract class CControllerCepRuleGeneral extends CController {
 			'host' => ['db cep_condition.host', 'required', 'not_empty',
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST]]
 			],
-			'host_group' => ['db cep_condition.tag_value', 'required', 'not_empty',
+			'host_group' => ['db cep_condition.host_group', 'required', 'not_empty',
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST_GROUP]]
 			],
 			'severity' => ['db cep_condition.severity', 'required',
-				'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER, TRIGGER_SEVERITY_COUNT],
+				'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_SEVERITY]]
 			],
 			'time_period' => ['db cep_condition.time_period', 'required', 'not_empty',
