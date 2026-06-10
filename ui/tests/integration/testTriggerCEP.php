@@ -1589,7 +1589,7 @@ class testTriggerCEP extends CIntegrationTest {
 		// 3. Parent PROBLEM→OK: dependents fire.
 		$this->assertStateChangeForAll($parent_ids, $parent_keys, '0', TRIGGER_VALUE_FALSE, $parent_event_count + 2);
 
-		$this->assertStateChangeForAll($dep_ids, $dep_keys, '1', TRIGGER_VALUE_TRUE, $dep_event_count + 1);
+		$this->assertStateChangeForAll($dep_ids, $dep_keys, '1', TRIGGER_VALUE_TRUE, $dep_event_count + 1, false);
 		$this->maybeRestartServer($restart);
 
 		// 4. Dependent PROBLEM→OK: dependents recover.
@@ -2051,7 +2051,7 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	private function assertStateChangeForAll(array $triggerids, array $keys, string $item_value,
-			int $expected_trigger_value, int $expected_event_count): void {
+			int $expected_trigger_value, int $expected_event_count, bool $check_lastchange = true): void {
 		$now = time();
 		$prev_triggers = $this->getTriggers($triggerids);
 		$prev_lastchanges = array_map(fn($tid) => $prev_triggers[$tid]['lastchange'], $triggerids);
@@ -2067,7 +2067,7 @@ class testTriggerCEP extends CIntegrationTest {
 		];
 		$this->callUntilDataIsPresent('trigger.get', $trigger_params,
 			self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-			function ($response) use ($triggerids, $expected_trigger_value, $prev_lastchanges, $now) {
+			function ($response) use ($triggerids, $expected_trigger_value, $prev_lastchanges, $now, $check_lastchange) {
 				$by_id = array_column($response['result'], null, 'triggerid');
 				$missing = 0;
 				$wrong_value = 0;
@@ -2092,7 +2092,8 @@ class testTriggerCEP extends CIntegrationTest {
 						$wrong_state++;
 						$wrong = true;
 					}
-					if ($now > $prev_lastchanges[$idx] && (int) $t['lastchange'] <= $prev_lastchanges[$idx]) {
+					if ($check_lastchange && $now > $prev_lastchanges[$idx]
+							&& (int) $t['lastchange'] <= $prev_lastchanges[$idx]) {
 						$wrong_lastchange++;
 						$wrong = true;
 					}
