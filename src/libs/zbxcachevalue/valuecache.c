@@ -259,11 +259,19 @@ zbx_vc_item_update_t;
 ZBX_VECTOR_DECL(vc_itemupdate, zbx_vc_item_update_t)
 ZBX_VECTOR_IMPL(vc_itemupdate, zbx_vc_item_update_t)
 
-static zbx_vector_vc_itemupdate_t	vc_itemupdates;
+static ZBX_THREAD_LOCAL zbx_vector_vc_itemupdate_t	vc_itemupdates;
+int ZBX_THREAD_LOCAL					vc_itemupdates_initialized = 0;
 
 static void	vc_cache_item_update(zbx_uint64_t itemid, zbx_vc_item_update_type_t type, int arg1, int arg2)
 {
 	zbx_vc_item_update_t	*update;
+
+	if (0 == vc_itemupdates_initialized)
+	{
+		zbx_vector_vc_itemupdate_create(&vc_itemupdates);
+		zbx_vector_vc_itemupdate_reserve(&vc_itemupdates, 256);
+		vc_itemupdates_initialized = 1;
+	}
 
 	if (vc_itemupdates.values_num == vc_itemupdates.values_alloc)
 		zbx_vector_vc_itemupdate_reserve(&vc_itemupdates, (size_t)(vc_itemupdates.values_alloc * 1.5));
@@ -2343,9 +2351,6 @@ int	zbx_vc_init(zbx_uint64_t value_cache_size, char **error)
 	if (vc_cache->min_free_request > 128 * ZBX_KIBIBYTE)
 		vc_cache->min_free_request = 128 * ZBX_KIBIBYTE;
 
-	zbx_vector_vc_itemupdate_create(&vc_itemupdates);
-	zbx_vector_vc_itemupdate_reserve(&vc_itemupdates, 256);
-
 	ret = SUCCEED;
 out:
 	zbx_vc_enable();
@@ -2366,8 +2371,6 @@ void	zbx_vc_destroy(void)
 
 	if (NULL != vc_cache)
 	{
-		zbx_vector_vc_itemupdate_destroy(&vc_itemupdates);
-
 		zbx_hashset_destroy(&vc_cache->items);
 		zbx_hashset_destroy(&vc_cache->strpool);
 
@@ -3192,7 +3195,7 @@ void	zbx_vc_flush_stats(void)
 	zbx_vc_item_t	*item = NULL;
 	zbx_uint64_t	itemid = 0;
 
-	if (ZBX_VC_DISABLED == vc_state || 0 == vc_itemupdates.values_num)
+	if (ZBX_VC_DISABLED == vc_state || 0 == vc_itemupdates_initialized || 0 == vc_itemupdates.values_num)
 		return;
 
 	zbx_vector_vc_itemupdate_sort(&vc_itemupdates, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -3229,7 +3232,8 @@ void	zbx_vc_flush_stats(void)
 
 	UNLOCK_CACHE;
 
-	zbx_vector_vc_itemupdate_clear(&vc_itemupdates);
+	zbx_vector_vc_itemupdate_destroy(&vc_itemupdates);
+	vc_itemupdates_initialized = 0;
 }
 
 
