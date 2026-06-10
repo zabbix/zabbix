@@ -86,7 +86,6 @@ $formgrid
 							new CVar('conditions[#{rowNum}][formulaid]', '#{formulaid}')
 						],
 						(new CTextAreaFlexible('conditions[#{rowNum}][macro]', '#{macro}'))
-							->removeId()
 							->setAttribute('placeholder', '{#MACRO}')
 							->addClass('macro')
 							->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
@@ -99,7 +98,6 @@ $formgrid
 							->addOptions($operators),
 						(new CDiv(
 							(new CTextAreaFlexible('conditions[#{rowNum}][value]', '#{value}'))
-								->removeId()
 								->setAttribute('placeholder', _('regular expression'))
 								->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 								->setMaxlength(DB::getFieldLength('item_condition', 'value'))

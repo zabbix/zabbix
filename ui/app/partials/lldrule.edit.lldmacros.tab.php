@@ -47,7 +47,6 @@ $formgrid
 					(new CRow([
 						(new CCol(
 							(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][lld_macro]', '#{lld_macro}'))
-								->removeId()
 								->setReadonly($readonly)
 								->setMaxlength(DB::getFieldLength('lld_macro_path', 'lld_macro'))
 								->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
@@ -59,7 +58,6 @@ $formgrid
 							->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 						(new CCol(
 							(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][path]', '#{path}'))
-								->removeId()
 								->setReadonly($readonly)
 								->setAttribute('placeholder', _('$.path.to.node'))
 								->setMaxlength(DB::getFieldLength('lld_macro_path', 'path'))
