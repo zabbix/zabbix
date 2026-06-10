@@ -199,7 +199,6 @@ typedef struct
 	int			timeout;
 	char			*url;
 	char			*query_fields;
-	zbx_tq_query_t		*telemetry_query;
 	char			*posts;
 	char			*status_codes;
 	char			*http_proxy;
@@ -211,6 +210,11 @@ typedef struct
 	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	unsigned char		*formula_bin;
 	int			snmp_max_repetitions;
+	char			*query;
+	char			*time_shift;
+	char			*lookback_limit;
+	char			*granularity;
+	zbx_tq_query_t		*telemetry_query;
 	unsigned char		preprocessing;
 }
 zbx_dc_item_t;
@@ -308,8 +312,11 @@ typedef struct
 	int			mtime;
 	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
 	int			timeout;
-	/* TODO: change query_fields to query + other fields, implement lld for it */
-	char			*query_fields;
+	/* TODO: implement lld */
+	char			*query;
+	char			*time_shift;
+	char			*lookback_limit;
+	char			*granularity;
 	zbx_tq_query_t		*telemetry_query;
 	time_t			lasttimestamp;
 	zbx_timespec_t		min_free_ts;

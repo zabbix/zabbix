@@ -22,7 +22,7 @@ typedef int	(*zbx_tq_macro_expand_func_t)(char **text, void *ctx);
 
 typedef enum
 {
-	ZBX_TQ_COLUMN_TYPE_UNKNOWN,
+	ZBX_TQ_COLUMN_TYPE_UNKNOWN = -1,
 	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,
 	ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,
 	ZBX_TQ_COLUMN_TYPE_STR,
@@ -34,26 +34,26 @@ zbx_tq_column_type_t;
 
 typedef enum
 {
-	ZBX_TQ_CATEGORY_UNKNOWN = 0,
-	ZBX_TQ_CATEGORY_APM_TRACES,
-	ZBX_TQ_CATEGORY_APM_METRICS,
-	ZBX_TQ_CATEGORY_APM_LOGS,
+	ZBX_TQ_CATEGORY_UNKNOWN		= -1,
+	ZBX_TQ_CATEGORY_APM_TRACES	= 0,
+	ZBX_TQ_CATEGORY_APM_METRICS	= 1,
+	ZBX_TQ_CATEGORY_APM_LOGS	= 2,
 }
 zbx_tq_category_t;
 
 typedef enum
 {
-	ZBX_TQ_METRIC_TYPE_UNKNOWN = 0,
-	ZBX_TQ_METRIC_TYPE_SUM,
-	ZBX_TQ_METRIC_TYPE_GAUGE,
-	ZBX_TQ_METRIC_TYPE_HISTOGRAM,
-	ZBX_TQ_METRIC_TYPE_EXPONENTIAL_HISTOGRAM,
+	ZBX_TQ_METRIC_TYPE_UNKNOWN			= -1,
+	ZBX_TQ_METRIC_TYPE_SUM				= 0,
+	ZBX_TQ_METRIC_TYPE_GAUGE			= 1,
+	ZBX_TQ_METRIC_TYPE_HISTOGRAM			= 2,
+	ZBX_TQ_METRIC_TYPE_EXPONENTIAL_HISTOGRAM	= 3,
 }
 zbx_tq_metric_type_t;
 
 typedef enum
 {
-	ZBX_TQ_FUNCTION_UNKNOWN = 0,
+	ZBX_TQ_FUNCTION_UNKNOWN = -1,
 	ZBX_TQ_FUNCTION_COUNT,
 	ZBX_TQ_FUNCTION_MIN,
 	ZBX_TQ_FUNCTION_MAX,
@@ -65,22 +65,22 @@ zbx_tq_function_type_t;
 
 typedef enum
 {
-	ZBX_TQ_EVAL_TYPE_UNKNOWN = 0,
-	ZBX_TQ_EVAL_TYPE_AND_OR,
-	ZBX_TQ_EVAL_TYPE_AND,
-	ZBX_TQ_EVAL_TYPE_OR,
-	ZBX_TQ_EVAL_TYPE_EXPRESSION,
+	ZBX_TQ_EVAL_TYPE_UNKNOWN	= -1,
+	ZBX_TQ_EVAL_TYPE_AND_OR		= 0,
+	ZBX_TQ_EVAL_TYPE_AND		= 1,
+	ZBX_TQ_EVAL_TYPE_OR		= 2,
+	ZBX_TQ_EVAL_TYPE_EXPRESSION	= 3,
 }
 zbx_tq_eval_type_t;
 
 typedef enum
 {
-	ZBX_TQ_OPERATOR_UNKNOWN = 0,
-	ZBX_TQ_OPERATOR_EQUAL,
-	ZBX_TQ_OPERATOR_NOT_EQUAL,
-	ZBX_TQ_OPERATOR_CONTAINS,
-	ZBX_TQ_OPERATOR_NOT_CONTAINS,
-	ZBX_TQ_OPERATOR_EXISTS,
+	ZBX_TQ_OPERATOR_UNKNOWN		= -1,
+	ZBX_TQ_OPERATOR_EQUAL		= 0,
+	ZBX_TQ_OPERATOR_NOT_EQUAL	= 1,
+	ZBX_TQ_OPERATOR_CONTAINS	= 2,
+	ZBX_TQ_OPERATOR_NOT_CONTAINS	= 3,
+	ZBX_TQ_OPERATOR_EXISTS		= 12,
 }
 zbx_tq_operator_t;
 
@@ -118,6 +118,8 @@ zbx_tq_condition_t;
 
 ZBX_VECTOR_DECL(tq_condition, zbx_tq_condition_t)
 
+typedef struct tq_formula_node zbx_tq_formula_node_t;
+
 typedef struct
 {
 	zbx_tq_category_t		category;
@@ -126,10 +128,11 @@ typedef struct
 	zbx_vector_tq_aggr_column_t	aggregated_columns;
 	zbx_tq_eval_type_t		evaltype;
 	char				*formula;
+	zbx_tq_formula_node_t		*formula_parsed;
 	zbx_vector_tq_condition_t	conditions;
 	int				time_shift;
-	int				loopback_limit;
-	int				aggregation_size;
+	int				lookback_limit;
+	int				granularity;
 }
 zbx_tq_query_t;
 
@@ -144,7 +147,8 @@ zbx_tq_db_type_t;
 
 ZBX_PTR_VECTOR_DECL(tq_condition_ptr, zbx_tq_condition_t *)
 
-int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query, zbx_tq_macro_expand_func_t macro_expand_cb,
+int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, const char *time_shift,
+		const char *lookback_limit, const char *granularity, zbx_tq_macro_expand_func_t macro_expand_cb,
 		void *macro_expand_ctx);
 void	zbx_tq_query_clean(zbx_tq_query_t *query);
 

@@ -2932,7 +2932,10 @@ static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type, zbx_uint6
 		case ITEM_TYPE_NESTED_LLD:
 			break;
 		case ITEM_TYPE_TELEMETRY_QUERY:
-			dc_strpool_release(item->itemtype.tqitem->query_fields);
+			dc_strpool_release(item->itemtype.tqitem->query);
+			dc_strpool_release(item->itemtype.tqitem->time_shift);
+			dc_strpool_release(item->itemtype.tqitem->lookback_limit);
+			dc_strpool_release(item->itemtype.tqitem->granularity);
 
 			__config_shmem_free_func(item->itemtype.tqitem);
 			break;
@@ -3204,7 +3207,10 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 				item->itemtype.tqitem->min_free_ts.ns = 0;
 			}
 
-			dc_strpool_replace(found, &item->itemtype.tqitem->query_fields, row[32]);
+			dc_strpool_replace(found, &item->itemtype.tqitem->query, row[50]);
+			dc_strpool_replace(found, &item->itemtype.tqitem->time_shift, row[51]);
+			dc_strpool_replace(found, &item->itemtype.tqitem->lookback_limit, row[52]);
+			dc_strpool_replace(found, &item->itemtype.tqitem->granularity, row[53]);
 			break;
 	}
 
@@ -9973,7 +9979,10 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->password = NULL;
 			break;
 		case ITEM_TYPE_TELEMETRY_QUERY:
-			dst_item->query_fields = zbx_strdup(NULL, src_item->itemtype.tqitem->query_fields);
+			dst_item->query = zbx_strdup(NULL, src_item->itemtype.tqitem->query);
+			dst_item->time_shift = zbx_strdup(NULL, src_item->itemtype.tqitem->time_shift);
+			dst_item->lookback_limit = zbx_strdup(NULL, src_item->itemtype.tqitem->lookback_limit);
+			dst_item->granularity = zbx_strdup(NULL, src_item->itemtype.tqitem->granularity);
 			dst_item->telemetry_query = NULL;
 			break;
 		case ITEM_TYPE_SCRIPT:
@@ -10233,7 +10242,10 @@ static void	DCget_telemetry_query_item(zbx_dc_telemetry_query_item_t *dst_item, 
 	else
 		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
 
-	dst_item->query_fields = zbx_strdup(NULL, src_item->itemtype.tqitem->query_fields);
+	dst_item->query = zbx_strdup(NULL, src_item->itemtype.tqitem->query);
+	dst_item->time_shift = zbx_strdup(NULL, src_item->itemtype.tqitem->time_shift);
+	dst_item->lookback_limit = zbx_strdup(NULL, src_item->itemtype.tqitem->lookback_limit);
+	dst_item->granularity = zbx_strdup(NULL, src_item->itemtype.tqitem->granularity);
 	dst_item->telemetry_query = NULL;
 	dst_item->lasttimestamp = src_item->itemtype.tqitem->lasttimestamp;
 	dst_item->min_free_ts = src_item->itemtype.tqitem->min_free_ts;
@@ -10275,7 +10287,10 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 				zbx_free(items[i].formula_bin);
 				break;
 			case ITEM_TYPE_TELEMETRY_QUERY:
-				zbx_free(items[i].query_fields);
+				zbx_free(items[i].query);
+				zbx_free(items[i].time_shift);
+				zbx_free(items[i].lookback_limit);
+				zbx_free(items[i].granularity);
 				break;
 		}
 

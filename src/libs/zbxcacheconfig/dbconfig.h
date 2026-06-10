@@ -241,7 +241,10 @@ ZBX_DC_BROWSERITEM;
 
 typedef struct
 {
-	const char	*query_fields;
+	const char	*query;
+	const char	*time_shift;
+	const char	*lookback_limit;
+	const char	*granularity;
 	time_t		lasttimestamp;
 	zbx_timespec_t	min_free_ts;
 }

@@ -29,10 +29,11 @@ void	tq_query_init(zbx_tq_query_t *query)
 	zbx_vector_tq_aggr_column_create(&query->aggregated_columns);
 	query->evaltype		= ZBX_TQ_EVAL_TYPE_UNKNOWN;
 	query->formula		= NULL;
+	query->formula_parsed	= NULL;
 	zbx_vector_tq_condition_create(&query->conditions);
 	query->time_shift	= TQ_TIME_INTERVAL_INVALID;
-	query->loopback_limit	= TQ_TIME_INTERVAL_INVALID;
-	query->aggregation_size	= TQ_TIME_INTERVAL_INVALID;
+	query->lookback_limit	= TQ_TIME_INTERVAL_INVALID;
+	query->granularity	= TQ_TIME_INTERVAL_INVALID;
 }
 
 void	tq_column_init(zbx_tq_column_t *column)
@@ -98,24 +99,16 @@ void	zbx_tq_query_clean(zbx_tq_query_t *query)
 
 	zbx_free(query->formula);
 
+	if (NULL != query->formula_parsed)
+	{
+		tq_formula_node_free(query->formula_parsed);
+		query->formula_parsed = NULL;
+	}
+
 	for (int i = 0; i < query->conditions.values_num; i++) {
 		tq_condition_clean(&query->conditions.values[i]);
 	}
 	zbx_vector_tq_condition_destroy(&query->conditions);
-}
-
-int	tq_formula_constant_to_condition_idx(const char *p, int len)
-{
-	int res = 0;
-	int mult = 1;
-
-	for (int i = len - 1; i >= 0; i--)
-	{
-		res += (p[i] - 'A') * mult;
-		mult *= ('Z' - 'A') + 1;
-	}
-
-	return res;
 }
 
 static void	tq_get_timestamp_filter_bounds_unshifted(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
@@ -129,22 +122,22 @@ static void	tq_get_timestamp_filter_bounds_unshifted(const zbx_tq_query_t *query
 		lasttimestamp = now;
 	}
 
-	if (query->aggregation_size > now - lasttimestamp)
+	if (query->granularity > now - lasttimestamp)
 	{
 		if (NULL != out_lower)
-			*out_lower = now - query->aggregation_size;
+			*out_lower = now - query->granularity;
 		if (NULL != out_upper)
 			*out_upper = now;
 	}
 	else
 	{
-		time_t	start = MAX(lasttimestamp, now - (time_t)query->loopback_limit);
+		time_t	start = MAX(lasttimestamp, now - (time_t)query->lookback_limit);
 
 		if (NULL != out_lower)
 			*out_lower = start;
 		if (NULL != out_upper)
-			*out_upper = start + ((now - start) / (time_t)query->aggregation_size) *
-					(time_t)query->aggregation_size;
+			*out_upper = start + ((now - start) / (time_t)query->granularity) *
+					(time_t)query->granularity;
 	}
 }
 

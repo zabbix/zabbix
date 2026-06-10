@@ -732,7 +732,8 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			case ITEM_TYPE_TELEMETRY_QUERY:
 				items[i].telemetry_query = zbx_malloc(NULL, sizeof(zbx_tq_query_t));
 
-				if (SUCCEED != zbx_tq_query_from_json(items[i].query_fields, items[i].telemetry_query,
+				if (SUCCEED != zbx_tq_parse_query(items[i].telemetry_query, items[i].query,
+						items[i].time_shift, items[i].lookback_limit, items[i].granularity,
 						NULL, NULL))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query format"));
@@ -741,9 +742,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					zbx_free(timeout);
 					continue;
 				}
-
-				/* query_fields are not needed after the query has been parsed */
-				zbx_free(items[i].query_fields);
 				break;
 		}
 
@@ -1061,7 +1059,9 @@ static int	telemetry_query_macro_expand_cb(char **text, void *ctx)
 {
 	telemetry_query_macro_expand_ctx_t	*pctx = (telemetry_query_macro_expand_ctx_t *)ctx;
 
-	return zbx_dc_expand_user_and_func_macros(pctx->um_handle, text, &pctx->item->hostid, 1, NULL);
+	zbx_dc_expand_user_and_func_macros(pctx->um_handle, text, &pctx->item->hostid, 1, NULL);
+
+	return SUCCEED;
 }
 
 void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int *errcodes, int num,
@@ -1113,11 +1113,16 @@ void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int
 			items[i].timeout = timeout_sec;
 		}
 
+		zbx_dc_expand_user_and_func_macros(um_handle, &items[i].time_shift, &items[i].hostid, 1, NULL);
+		zbx_dc_expand_user_and_func_macros(um_handle, &items[i].lookback_limit, &items[i].hostid, 1, NULL);
+		zbx_dc_expand_user_and_func_macros(um_handle, &items[i].granularity, &items[i].hostid, 1, NULL);
+
 		items[i].telemetry_query = zbx_malloc(NULL, sizeof(zbx_tq_query_t));
 
-		/* TODO: maybe detect if failed because of a macro expansion failure and set different message */
-		if (SUCCEED != zbx_tq_query_from_json(items[i].query_fields, items[i].telemetry_query,
-				telemetry_query_macro_expand_cb, &query_macro_expand_ctx))
+		/* TODO: get some error */
+		if (SUCCEED != zbx_tq_parse_query(items[i].telemetry_query, items[i].query, items[i].time_shift,
+				items[i].lookback_limit, items[i].granularity, telemetry_query_macro_expand_cb,
+				&query_macro_expand_ctx))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query format"));
 			errcodes[i] = CONFIG_ERROR;
@@ -1125,8 +1130,11 @@ void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int
 			continue;
 		}
 
-		/* query_fields are not needed after the query has been parsed */
-		zbx_free(items[i].query_fields);
+		/* query, time_shift, lookback_limit and granularity are not needed after the query has been parsed */
+		zbx_free(items[i].query);
+		zbx_free(items[i].time_shift);
+		zbx_free(items[i].lookback_limit);
+		zbx_free(items[i].granularity);
 	}
 
 	zbx_free(timeout);
@@ -1235,7 +1243,10 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 				zbx_free(items[i].jmx_endpoint);
 				break;
 			case ITEM_TYPE_TELEMETRY_QUERY:
-				zbx_free(items[i].query_fields);
+				zbx_free(items[i].query);
+				zbx_free(items[i].time_shift);
+				zbx_free(items[i].lookback_limit);
+				zbx_free(items[i].granularity);
 				if (NULL != items[i].telemetry_query)
 				{
 					zbx_tq_query_clean(items[i].telemetry_query);
@@ -1311,7 +1322,10 @@ void	zbx_clean_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int n
 		zbx_free(items[i].key_orig);
 		zbx_free(items[i].key);
 
-		zbx_free(items[i].query_fields);
+		zbx_free(items[i].query);
+		zbx_free(items[i].time_shift);
+		zbx_free(items[i].lookback_limit);
+		zbx_free(items[i].granularity);
 
 		if (NULL != items[i].telemetry_query)
 		{

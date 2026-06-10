@@ -78,6 +78,10 @@ static void	dump_item(const zbx_dc_item_t *item)
 		zbx_log_handle(LOG_LEVEL_TRACE, "  ssl_cert_file:'%s'", item->ssl_cert_file);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  ssl_key_file:'%s'", item->ssl_key_file);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  ssl_key_password:'%s'", item->ssl_key_password);
+		zbx_log_handle(LOG_LEVEL_TRACE, "  query:'%s'", item->query);
+		zbx_log_handle(LOG_LEVEL_TRACE, "  time_shift:'%s'", item->time_shift);
+		zbx_log_handle(LOG_LEVEL_TRACE, "  lookback_limit:'%s'", item->lookback_limit);
+		zbx_log_handle(LOG_LEVEL_TRACE, "  granularity:'%s'", item->granularity);
 		zbx_log_handle(LOG_LEVEL_TRACE, "interfaceid: " ZBX_FS_UI64, item->interface.interfaceid);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  useip: %u", item->interface.useip);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  address:'%s'", ZBX_NULL2STR(item->interface.addr));
@@ -260,6 +264,12 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	item.ssl_key_file = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_KEY_FILE, table_items, "ssl_key_file");
 	item.ssl_key_password = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_KEY_PASSWORD, table_items,
 			"ssl_key_password");
+
+	item.query = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_QUERY, table_items, "query");
+	item.time_shift = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_TIME_SHIFT, table_items, "time_shift");
+	item.lookback_limit = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_LOOKBACK_LIMIT, table_items,
+			"lookback_limit");
+	item.granularity = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_GRANULARITY, table_items, "granularity");
 
 	zbx_vector_ptr_pair_create(&item.script_params);
 	if ((ITEM_TYPE_SCRIPT == item.type || ITEM_TYPE_BROWSER == item.type) &&
@@ -502,6 +512,10 @@ out:
 	zbx_free(item.snmpv3_authpassphrase);
 	zbx_free(item.snmpv3_privpassphrase);
 	zbx_free(item.snmpv3_contextname);
+	zbx_free(item.query);
+	zbx_free(item.time_shift);
+	zbx_free(item.lookback_limit);
+	zbx_free(item.granularity);
 	for (int i = 0; i < item.script_params.values_num; i++)
 	{
 		zbx_free(item.script_params.values[i].first);

@@ -861,6 +861,34 @@ static int	DBpatch_7050061(void)
 	return DBadd_field("proxy", &field);
 }
 
+static int	DBpatch_7050062(void)
+{
+	const zbx_db_field_t	field = {"query", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_7050063(void)
+{
+	const zbx_db_field_t	field = {"time_shift", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_7050064(void)
+{
+	const zbx_db_field_t	field = {"lookback_limit", "10m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_7050065(void)
+{
+	const zbx_db_field_t	field = {"granularity", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -929,5 +957,9 @@ DBPATCH_ADD(7050058, 0, 1)
 DBPATCH_ADD(7050059, 0, 1)
 DBPATCH_ADD(7050060, 0, 1)
 DBPATCH_ADD(7050061, 0, 1)
+DBPATCH_ADD(7050062, 0, 1)
+DBPATCH_ADD(7050063, 0, 1)
+DBPATCH_ADD(7050064, 0, 1)
+DBPATCH_ADD(7050065, 0, 1)
 
 DBPATCH_END()

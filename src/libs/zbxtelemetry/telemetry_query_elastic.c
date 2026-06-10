@@ -205,8 +205,8 @@ static void	tq_es_add_conditions_and_or(const zbx_tq_query_t *query, struct zbx_
 	zbx_vector_tq_condition_ptr_destroy(&conditions_sorted);
 }
 
-static void	tq_es_add_condition_node(const zbx_tq_query_t *query, const tq_formula_node_t *node, struct zbx_json *j,
-		char *buf, size_t buf_size)
+static void	tq_es_add_condition_node(const zbx_tq_query_t *query, const zbx_tq_formula_node_t *node,
+		struct zbx_json *j, char *buf, size_t buf_size)
 {
 	if (TQ_FORMULA_NODE_TYPE_OR == node->type || TQ_FORMULA_NODE_TYPE_AND == node->type)
 	{
@@ -247,19 +247,7 @@ static void	tq_es_add_condition_node(const zbx_tq_query_t *query, const tq_formu
 static void	tq_es_add_conditions_expression(const zbx_tq_query_t *query, struct zbx_json *j, char *buf,
 		size_t buf_size)
 {
-	tq_formula_node_t	*node;
-	const char		*err_pos;
-
-	if (NULL == (node = tq_formula_parse(query->formula, &err_pos)))
-	{
-		THIS_SHOULD_NEVER_HAPPEN_MSG("failed to parse formula at pos %d: \"%s\"",
-				(int)(err_pos - query->formula), err_pos);
-		return;
-	}
-
-	tq_es_add_condition_node(query, node, j, buf, buf_size);
-
-	tq_formula_node_free(node);
+	tq_es_add_condition_node(query, query->formula_parsed, j, buf, buf_size);
 }
 
 static void	tq_es_add_conditions(const zbx_tq_query_t *query, struct zbx_json *j, char *buf, size_t buf_size)
@@ -379,15 +367,12 @@ static void	tq_es_add_aggr_columns(const zbx_vector_tq_aggr_column_t *aggr_cols,
 
 		if (ZBX_TQ_FUNCTION_PERCENTILE == col->function)
 		{
-			double fraction = 0;
-
-			if (SUCCEED != zbx_is_double(col->args.values[0], &fraction))
-				THIS_SHOULD_NEVER_HAPPEN;
+			double percentage = strtod(col->args.values[0], NULL);
 
 			zbx_json_addarray(j, "percents");
 
-			/* "percentiles" expects percents, not fraction */
-			zbx_json_addfloat(j, NULL, fraction * 100);
+			/* "percentiles" expects a percentage, not fraction */
+			zbx_json_addfloat(j, NULL, percentage);
 
 			zbx_json_close(j); /* percents */
 		}
@@ -413,7 +398,7 @@ static void	tq_es_add_aggs(const zbx_tq_query_t *query, struct zbx_json *j, time
 
 	zbx_json_addstring(j, "field", "Timestamp", ZBX_JSON_TYPE_STRING);
 
-	zbx_snprintf(buf, buf_size, "%ds", query->aggregation_size);
+	zbx_snprintf(buf, buf_size, "%ds", query->granularity);
 	zbx_json_addstring(j, "fixed_interval", buf, ZBX_JSON_TYPE_STRING);
 
 	zbx_snprintf(buf, buf_size, "+" ZBX_FS_TIME_T "s", timestamp_lo);

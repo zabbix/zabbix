@@ -13,10 +13,11 @@
 **/
 
 #include "telemetry.h"
+#include "zbxnum.h"
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 
-ZBX_VECTOR_IMPL(tq_formula_node_ptr, tq_formula_node_t *)
+ZBX_VECTOR_IMPL(tq_formula_node_ptr, zbx_tq_formula_node_t *)
 
 typedef struct
 {
@@ -25,9 +26,9 @@ typedef struct
 }
 tq_formula_parse_ctx_t;
 
-static tq_formula_node_t	*tq_formula_node_init(tq_formula_node_type_t	type)
+static zbx_tq_formula_node_t	*tq_formula_node_init(tq_formula_node_type_t	type)
 {
-	tq_formula_node_t	*node = zbx_malloc(NULL, sizeof(tq_formula_node_t));
+	zbx_tq_formula_node_t	*node = zbx_malloc(NULL, sizeof(zbx_tq_formula_node_t));
 
 	node->type = type;
 
@@ -37,7 +38,7 @@ static tq_formula_node_t	*tq_formula_node_init(tq_formula_node_type_t	type)
 	return node;
 }
 
-void	tq_formula_node_free(tq_formula_node_t *node)
+void	tq_formula_node_free(zbx_tq_formula_node_t *node)
 {
 	if (TQ_FORMULA_NODE_TYPE_LEAF != node->type)
 	{
@@ -52,55 +53,91 @@ void	tq_formula_node_free(tq_formula_node_t *node)
 
 static int	is_op_delim(char c)
 {
-	return ' ' == c || '(' == c || '\r' == c || '\n' == c || '\t' == c || ')' == c || '\0' == c ? SUCCEED : FAIL;
+	return isspace((unsigned char)c) || '(' == c  || ')' == c || '\0' == c ? SUCCEED : FAIL;
 }
 
-static int	is_whitespace(char c)
+static int	is_leaf_delim(char c)
 {
-	return ' ' == c || '\r' == c || '\n' == c || '\t' == c ? SUCCEED : FAIL;
+	return isspace((unsigned char)c) || '(' == c  || ')' == c || '\0' == c ? SUCCEED : FAIL;
 }
 
 static void	skip_whitespace(tq_formula_parse_ctx_t *ctx)
 {
-	while (SUCCEED == is_whitespace(*ctx->p))
+	while (0 != isspace((unsigned char)*ctx->p))
 		ctx->p++;
 }
 
-static tq_formula_node_t	*parse_or(tq_formula_parse_ctx_t *ctx);
+static zbx_tq_formula_node_t	*parse_or(tq_formula_parse_ctx_t *ctx);
 
-static tq_formula_node_t	*parse_leaf(tq_formula_parse_ctx_t *ctx)
+static int	parse_uint(tq_formula_parse_ctx_t *ctx, int *num)
 {
-	tq_formula_node_t	*node;
-	int			len;
+	int	n = 0;
+
+	while (isdigit((unsigned int)ctx->p[n]))
+		n++;
+
+	if (0 == n)
+	{
+		ctx->err_pos = ctx->p;
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_is_uint_n_range(ctx->p, n, num, sizeof(*num), 0, INT32_MAX))
+	{
+		ctx->err_pos = ctx->p;
+		return FAIL;
+	}
+
+	ctx->p += n;
+
+	return SUCCEED;
+}
+
+static zbx_tq_formula_node_t	*parse_leaf(tq_formula_parse_ctx_t *ctx)
+{
+	zbx_tq_formula_node_t	*node;
+	int			num;
 
 	skip_whitespace(ctx);
 
-	if (!isupper((unsigned char)*ctx->p))
+	if ('{' != *ctx->p)
 	{
 		ctx->err_pos = ctx->p;
 		return NULL;
 	}
 
-	len = 0;
+	ctx->p++;
 
-	while (isupper((unsigned char)ctx->p[len]))
-		len++;
+	if (SUCCEED != parse_uint(ctx, &num))
+		return NULL;
+
+	if ('}' != *ctx->p)
+	{
+		ctx->err_pos = ctx->p;
+		return NULL;
+	}
+
+	ctx->p++;
+
+	if (SUCCEED != is_leaf_delim(*ctx->p))
+	{
+		ctx->err_pos = ctx->p;
+		return NULL;
+	}
 
 	node = tq_formula_node_init(TQ_FORMULA_NODE_TYPE_LEAF);
-	node->condition_idx = tq_formula_constant_to_condition_idx(ctx->p, len);
-
-	ctx->p += len;
+	node->condition_idx = num;
 
 	return node;
 }
 
-static tq_formula_node_t	*parse_atom(tq_formula_parse_ctx_t *ctx)
+static zbx_tq_formula_node_t	*parse_atom(tq_formula_parse_ctx_t *ctx)
 {
 	skip_whitespace(ctx);
 
 	if ('(' == *ctx->p)
 	{
-		tq_formula_node_t	*node;
+		zbx_tq_formula_node_t	*node;
 
 		ctx->p++;
 
@@ -124,13 +161,13 @@ static tq_formula_node_t	*parse_atom(tq_formula_parse_ctx_t *ctx)
 		return parse_leaf(ctx);
 }
 
-static tq_formula_node_t	*parse_not(tq_formula_parse_ctx_t *ctx)
+static zbx_tq_formula_node_t	*parse_not(tq_formula_parse_ctx_t *ctx)
 {
 	skip_whitespace(ctx);
 
 	if ('n' == ctx->p[0] && 'o' == ctx->p[1] && 't' == ctx->p[2] && SUCCEED == is_op_delim(ctx->p[3]))
 	{
-		tq_formula_node_t	*node, *atom;
+		zbx_tq_formula_node_t	*node, *atom;
 
 		ctx->p += 3;
 
@@ -145,7 +182,7 @@ static tq_formula_node_t	*parse_not(tq_formula_parse_ctx_t *ctx)
 	}
 	else
 	{
-		tq_formula_node_t	*atom;
+		zbx_tq_formula_node_t	*atom;
 
 		if (NULL == (atom = parse_atom(ctx)))
 			return NULL;
@@ -154,9 +191,9 @@ static tq_formula_node_t	*parse_not(tq_formula_parse_ctx_t *ctx)
 	}
 }
 
-static tq_formula_node_t	*parse_and(tq_formula_parse_ctx_t *ctx)
+static zbx_tq_formula_node_t	*parse_and(tq_formula_parse_ctx_t *ctx)
 {
-	tq_formula_node_t	*node, *child;
+	zbx_tq_formula_node_t	*node, *child;
 
 	node = tq_formula_node_init(TQ_FORMULA_NODE_TYPE_AND);
 
@@ -194,9 +231,9 @@ fail:
 	return NULL;
 }
 
-static tq_formula_node_t	*parse_or(tq_formula_parse_ctx_t *ctx)
+static zbx_tq_formula_node_t	*parse_or(tq_formula_parse_ctx_t *ctx)
 {
-	tq_formula_node_t	*node, *child;
+	zbx_tq_formula_node_t	*node, *child;
 
 	node = tq_formula_node_init(TQ_FORMULA_NODE_TYPE_OR);
 
@@ -234,9 +271,10 @@ fail:
 	return NULL;
 }
 
-tq_formula_node_t	*tq_formula_parse(const char *formula, const char **err_pos)
+/* TODO: add depth limit */
+zbx_tq_formula_node_t	*tq_formula_parse(const char *formula, const char **err_pos)
 {
-	tq_formula_node_t	*node;
+	zbx_tq_formula_node_t	*node;
 
 	tq_formula_parse_ctx_t	ctx = {
 		.p 		= formula,
