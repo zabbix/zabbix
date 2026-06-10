@@ -1583,11 +1583,12 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->maybeRestartServer($restart);
 
 		// 2. Dependents suppressed while parents are PROBLEM.
-		$this->assertNoStateChangeForAll($dep_ids, $dep_keys, '1', TRIGGER_VALUE_FALSE, $dep_event_count);
+		$this->assertNoStateChangeForAll($dep_ids, $dep_keys, '2', TRIGGER_VALUE_FALSE, $dep_event_count);
 		$this->maybeRestartServer($restart);
 
 		// 3. Parent PROBLEM→OK: dependents fire.
 		$this->assertStateChangeForAll($parent_ids, $parent_keys, '0', TRIGGER_VALUE_FALSE, $parent_event_count + 2);
+
 		$this->assertStateChangeForAll($dep_ids, $dep_keys, '1', TRIGGER_VALUE_TRUE, $dep_event_count + 1);
 		$this->maybeRestartServer($restart);
 
@@ -2072,26 +2073,51 @@ class testTriggerCEP extends CIntegrationTest {
 				$wrong_value = 0;
 				$wrong_state = 0;
 				$wrong_lastchange = 0;
+				$failing_triggerid = null;
 				foreach ($triggerids as $idx => $triggerid) {
 					if (!isset($by_id[$triggerid])) {
 						$missing++;
+						if ($failing_triggerid === null) {
+							$failing_triggerid = $triggerid;
+						}
 						continue;
 					}
 					$t = $by_id[$triggerid];
+					$wrong = false;
 					if ((int) $t['value'] !== $expected_trigger_value) {
 						$wrong_value++;
+						$wrong = true;
 					}
 					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) {
 						$wrong_state++;
+						$wrong = true;
 					}
 					if ($now > $prev_lastchanges[$idx] && (int) $t['lastchange'] <= $prev_lastchanges[$idx]) {
 						$wrong_lastchange++;
+						$wrong = true;
+					}
+					if ($wrong && $failing_triggerid === null) {
+						$failing_triggerid = $triggerid;
 					}
 				}
 				if ($missing > 0 || $wrong_value > 0 || $wrong_state > 0 || $wrong_lastchange > 0) {
+					$last_event_name = '<none>';
+					$events = $this->call('event.get', [
+						'objectids' => [$failing_triggerid],
+						'source' => EVENT_SOURCE_TRIGGERS,
+						'object' => EVENT_OBJECT_TRIGGER,
+						'output' => ['name'],
+						'sortfield' => ['clock', 'eventid'],
+						'sortorder' => ZBX_SORT_DOWN,
+						'limit' => 1
+					]);
+					if (!empty($events['result'])) {
+						$last_event_name = $events['result'][0]['name'];
+					}
 					return 'of '.count($triggerids).' triggers: '.$missing.' missing, '.$wrong_value.
 							' wrong value (expected '.$expected_trigger_value.'), '.$wrong_state.
-							' wrong state (expected NORMAL), '.$wrong_lastchange.' lastchange not updated now:'.$now;
+							' wrong state (expected NORMAL), '.$wrong_lastchange.' lastchange not updated now:'.$now.
+							'; last event of failing trigger '.$failing_triggerid.': "'.$last_event_name.'"';
 				}
 				return true;
 			}
