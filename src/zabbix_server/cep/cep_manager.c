@@ -528,7 +528,14 @@ void	*zbx_cep_manager_thread(void *args)
 		cep_manager_process_pending(manager);
 
 		if (0 != tasks.values_num)
+		{
+			int	commits_num = manager->commits.values_num;
+
 			cep_manager_process_finished(manager, &tasks);
+
+			if (0 == commits_num && 0 != manager->commits.values_num)
+				time_flush = time_now;
+		}
 
 		if (0 != manager->commits.values_num)
 		{
@@ -538,7 +545,6 @@ void	*zbx_cep_manager_thread(void *args)
 					CEP_MANAGER_FLUSH_TIMEOUT < time_now - time_flush)
 			{
 				cep_manager_flush_commmits(manager);
-				time_flush = time_now;
 			}
 		}
 	}
