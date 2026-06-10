@@ -1792,7 +1792,8 @@ class testTriggerCEP extends CIntegrationTest {
 		$response = $this->call('problem.get', [
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
-			'source' => EVENT_SOURCE_TRIGGERS
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'output' => ['eventid']
 		]);
 		$this->assertCount(count($triggerids), $response['result'], 'Expected exactly one open problem per trigger: '.json_encode($response));
 		$problem_eventids = array_column($response['result'], 'eventid');
@@ -2012,13 +2013,13 @@ class testTriggerCEP extends CIntegrationTest {
 			'eventid_from' => $this->event_baseline_id + 1,
 			'sortfield' => 'eventid',
 			'sortorder' => 'DESC',
-			'output' => ['eventid', 'value', 'clock', 'objectid']
+			'output' => ['value', 'objectid']
 		];
 
 		if ($expected_count === 0) {
 			// callUntilDataIsPresent requires a non-empty result, so it can never
 			// succeed when we expect zero events. Call the API once directly instead.
-			$response = $this->call('event.get', $params);
+			$response = $this->call('event.get', ['limit' => 1] + $params);
 		}
 		else {
 			$response = $this->callUntilDataIsPresent('event.get', $params,
@@ -2180,20 +2181,14 @@ class testTriggerCEP extends CIntegrationTest {
 
 	private function waitForNoOpenProblems(array $triggerids, string $message = ''): void {
 		// Wait for all problems to have a recovery event.
-		$this->callUntilDataIsPresent('problem.get', [
+		// Wait until no unresolved problems remain. Using countOutput avoids fetching/decoding any
+		// problem rows: the server returns just a count, and we poll until it reaches zero. (Default
+		// problem.get without 'recent' returns only open problems, so count 0 means all recovered.)
+		$this->callUntilCountIsPresent('problem.get', [
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'recent' => true,
-			'output' => ['r_eventid']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-			foreach ($response['result'] as $problem) {
-				if ((int) $problem['r_eventid'] === 0) {
-					return false;
-				}
-			}
-			return true;
-		});
+			'source' => EVENT_SOURCE_TRIGGERS
+		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		// Wait for all triggers to return to OK.
 		$this->callUntilDataIsPresent('trigger.get', [
@@ -2230,7 +2225,8 @@ class testTriggerCEP extends CIntegrationTest {
 		$response = $this->call('problem.get', [
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
-			'source' => EVENT_SOURCE_TRIGGERS
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'output' => ['eventid']
 		]);
 		$this->assertEmpty($response['result'],
 			$prefix.'Expected no open problems: '.json_encode($response));
