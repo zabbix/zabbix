@@ -174,7 +174,6 @@ window.lldrule_prototype_edit = new class {
 		this.#removePopupMessages();
 		const fields = this.#formGetAllValues();
 		fields.interfaceid = fields.interfaceid ? fields.interfaceid : null;
-		this.#overlay.unsetLoading();
 
 		this.#form.validateSubmit(fields)
 			.then((result) => {
