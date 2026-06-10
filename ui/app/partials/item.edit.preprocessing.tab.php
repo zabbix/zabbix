@@ -90,14 +90,14 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 			->addClass('error-container-row')
 	]))->addClass('js-preprocessing-steps-tmpl'),
 	(new CTemplateTag('', [
-		(new CTextBox('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
 			->setErrorLabel(_('Number'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
 			->setAttribute('placeholder', _('number'))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH)
 	]))->addClass('preprocessing-steps-parameters-multiplier-tmpl'),
 	(new CTemplateTag('', [
-		(new CTextBox('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
 			->setAttribute('data-notrim', '')
 			->setErrorLabel(_('List of characters'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
@@ -126,18 +126,18 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 			->setAttribute('placeholder', _('$.path.to.node'))
 	]))->addClass('preprocessing-steps-parameters-json-path-tmpl'),
 	(new CTemplateTag('', [
-		(new CTextBox('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
 			->setErrorLabel(_('Seconds'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
 			->setAttribute('placeholder', _('seconds'))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH)
 	]))->addClass('preprocessing-steps-parameters-throttle-timed-value-tmpl'),
 	(new CTemplateTag('', [
-		(new CTextBox('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
 			->setErrorLabel(_('Min'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
 			->setAttribute('placeholder', _('min')),
-		(new CTextBox('preprocessing[#{rowNum}][params_1]', '#{params[1]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_1]', '#{params[1]}'))
 			->setErrorLabel(_('Max'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
 			->setAttribute('placeholder', _('max'))
@@ -167,14 +167,14 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 			->setAttribute('placeholder', _('output'))
 	]))->addClass('preprocessing-steps-parameters-regsub-tmpl'),
 	(new CTemplateTag('', [
-		(new CTextBox('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
 			->setAttribute('placeholder', _('delimiter'))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAttribute('maxlength', 1)
 			->setAttribute('data-notrim', '')
 			->setErrorLabel(_('Delimiter'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container'),
-		(new CTextBox('preprocessing[#{rowNum}][params_1]', '#{params[1]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_1]', '#{params[1]}'))
 			->setAttribute('placeholder', _('qualifier'))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAttribute('maxlength', 1)

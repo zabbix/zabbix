@@ -320,7 +320,7 @@ var ItemEditPreprocessingTab = class {
 	}
 
 	#readonlyAllInputs(row) {
-		row.querySelectorAll('input, z-select').forEach(input => {
+		row.querySelectorAll('input, z-select, z-textarea-flexible').forEach(input => {
 			input.setAttribute('readonly', 'readonly');
 		});
 	}
