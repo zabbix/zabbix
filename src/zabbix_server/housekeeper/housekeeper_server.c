@@ -1398,7 +1398,7 @@ static int	housekeeping_group_sets(int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 != last_exec_time && SEC_PER_WEEK > now - last_exec_time)
+	if (SEC_PER_WEEK > now - last_exec_time)
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "Skipping %s(), last time executed at %d", __func__, last_exec_time);
 		goto skip;
