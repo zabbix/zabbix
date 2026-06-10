@@ -38,6 +38,7 @@ require_once __DIR__.'/js/report.status.js.php';
 	->addItem(
 		(new CDiv(
 			new CPartial('administration.system.info', [
+				'serverid' => $data['serverid'],
 				'system_info' => $data['system_info'],
 				'show_software_update_check_details' => true,
 				'user_type' => $data['user_type']
@@ -59,8 +60,9 @@ require_once __DIR__.'/js/report.status.js.php';
 
 (new CScriptTag(
 	'view.init('.json_encode([
+		'serverid' => $data['serverid'],
 		'export_file_name' => $data['export_file_name'],
-		'export_payload' => $data['export_payload']
+		'export_data' => $data['export_data']
 	]).');'
 ))
 	->setOnDocumentReady()

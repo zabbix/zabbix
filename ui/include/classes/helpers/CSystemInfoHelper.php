@@ -192,9 +192,10 @@ class CSystemInfoHelper {
 
 	/**
 	 * Get system information export data.
+	 *
+	 * @param array $system_info  System information array received from self::getData method
 	 */
-	public static function getExportData(): array {
-		$system_info = CSystemInfoHelper::getData();
+	public static function getExportData(array $system_info): array {
 		$status = array_replace([
 			'server_version' => null,
 			'triggers_count_disabled' => null,

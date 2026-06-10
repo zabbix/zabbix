@@ -26,16 +26,15 @@ $info_table = (new CTableInfo())
 	->setHeadingColumn(0)
 	->addClass(ZBX_STYLE_LIST_TABLE_STICKY_HEADER);
 
-if (array_key_exists('serverid', $data['system_info']) && $data['system_info']['serverid'] !== '') {
+if (array_key_exists('serverid', $data) && $data['serverid'] !== '') {
 	$info_table->addRow([
 		_('Zabbix server ID'),
 		[
-			(new CSpan($data['system_info']['serverid']))
-				->setHint($data['system_info']['serverid'])
-				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-				->addClass('js-serverid')
-				->addStyle('display: inline-block; max-width: 110px'),
-			' ',
+			(new CTrim($data['serverid'], 8))
+				->setHint($data['serverid'])
+				->addClass(ZBX_STYLE_MIDDLE)
+				->addClass('js-serverid'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton())
 				->removeId()
 				->setTitle(_('Copy to clipboard'))
@@ -74,7 +73,7 @@ if ($data['system_info']['is_software_update_check_enabled']) {
 
 		$frontend_version_details = $version_details;
 	}
-	elseif ($check_data['latest_release'] !== null) {
+	elseif (array_key_exists('latest_release', $check_data)) {
 		if ($status['has_status']) {
 			$server_version_details = version_compare($server_version, $check_data['latest_release'], '<')
 				? (new CSpan(_('New update available')))->addClass(ZBX_STYLE_COLOR_WARNING)

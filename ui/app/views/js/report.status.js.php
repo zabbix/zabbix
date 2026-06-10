@@ -21,16 +21,17 @@
 
 <script>
 const view = new class {
-	init({export_file_name, export_payload}) {
+	init({serverid, export_file_name, export_data}) {
+		this.serverid = serverid;
 		this.export_file_name = export_file_name;
-		this.export_payload = export_payload;
+		this.export_data = export_data;
 
 		this.#initEvents();
 	}
 
 	#initEvents() {
 		document.querySelector('.js-copy-button')?.addEventListener('click', (e) => {
-			writeTextClipboard(document.querySelector('.js-serverid').textContent);
+			writeTextClipboard(this.serverid);
 
 			e.target.focus();
 		});
@@ -38,7 +39,7 @@ const view = new class {
 		document.querySelector('.js-export-system-information').addEventListener('click', (e) => {
 			e.preventDefault();
 
-			const data_url = URL.createObjectURL(new Blob([this.export_payload], {type: 'application/json'}));
+			const data_url = URL.createObjectURL(new Blob([this.export_data], {type: 'application/json'}));
 			const a = Object.assign(document.createElement('a'), {download: this.export_file_name, href: data_url});
 
 			a.click();
