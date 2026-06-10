@@ -412,7 +412,7 @@ final class CSettingsSchema {
 		'serverid' => [
 			'column' => 'value_str',
 			'default' => '',
-			'length' => 65535
+			'length' => 36
 		],
 		'session_key' => [
 			'column' => 'value_str',

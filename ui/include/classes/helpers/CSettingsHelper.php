@@ -106,11 +106,11 @@ class CSettingsHelper {
 	public const SESSION_KEY = 'session_key';
 	public const DBVERSION_STATUS = 'dbversion_status';
 	public const SERVER_STATUS = 'server_status';
-	public const SERVER_ID = 'serverid';
 	public const SOFTWARE_UPDATE_CHECKID = 'software_update_checkid';
 	public const SOFTWARE_UPDATE_CHECK_DATA = 'software_update_check_data';
 	public const BANNER_DATA = 'banner_data';
 	public const HA_FAILOVER_DELAY = 'ha_failover_delay';
+	public const SERVER_ID = 'serverid';
 
 	private static $params = [];
 	private static $params_public = [];
