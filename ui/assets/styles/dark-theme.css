@@ -3135,7 +3135,10 @@ output {
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.9); }
   output > span {
-    font-size: 1.167em; }
+    font-size: 1.167em;
+    padding-right: 10px;
+    word-break: break-all;
+    white-space: normal; }
   output .msg-buttons {
     margin-top: 4px;
     text-align: right; }
@@ -3155,7 +3158,7 @@ output {
         output .msg-details li:only-child::before {
           display: none; }
   output.collapsible {
-    grid-template: 16.8px 1fr / max-content 1fr;
+    grid-template: minmax(16.8px, max-content) 1fr/max-content 1fr;
     grid-gap: 6px 10px;
     transition: grid-template-rows 0.3s, grid-row-gap 0.3s; }
     output.collapsible .link-action {
@@ -3175,7 +3178,7 @@ output {
       transform: scaleY(1) translateY(0);
       transition: padding-top 0.3s, opacity 0.3s, transform 0.3s; }
     output.collapsible.collapsed {
-      grid-template-rows: 32px 0fr;
+      grid-template-rows: minmax(32px, max-content) 0fr;
       grid-row-gap: 0; }
       output.collapsible.collapsed .msg-details {
         padding-top: 0;
