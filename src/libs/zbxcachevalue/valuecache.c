@@ -2486,6 +2486,18 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, zbx_uint64_t *flush_
 			continue;
 		}
 
+		if (NULL != item)
+		{
+			/* If the new value type does not match the item's type in cache remove it, */
+			/* so it's cached with the correct type from correct tables when accessed   */
+			/* next time or now if it has trigger.                                      */
+			if (item->value_type != h->entry.value_type)
+			{
+				vc_remove_item(item);
+				item = NULL;
+			}
+		}
+
 		if (NULL == item && 0 != (h->flags & ZBX_DC_FLAG_HASTRIGGER) && ZBX_VC_MODE_NORMAL == vc_cache->mode)
 		{
 			zbx_vc_item_t	item_local = {
@@ -2510,14 +2522,9 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, zbx_uint64_t *flush_
 			else
 				last_value_timestamp = (int)time(NULL);
 
-			/* If the new value type does not match the item's type in cache remove it, */
-			/* so it's cached with the correct type from correct tables when accessed   */
-			/* next time.                                                               */
-			/* Also remove item if the value adding failed. In this case we             */
-			/* won't have the latest data in cache - so the requests must go directly   */
-			/* to the database.                                                         */
-			if (item->value_type != h->entry.value_type ||
-					FAIL == vch_item_add_value_at_head(item, &record))
+			/* Remove item if the value adding failed. In this case we won't have the   */
+			/* latest data in cache - so the requests must go directly to the database. */
+			if (FAIL == vch_item_add_value_at_head(item, &record))
 			{
 				vc_remove_item(item);
 				continue;

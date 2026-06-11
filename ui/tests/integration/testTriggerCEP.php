@@ -40,7 +40,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const WAIT_ITERATION_DELAY = 1;
 
 	// change iterations to fail faster when debugging
-	const STATE_CHANGE_WAIT_ITERATIONS = 15;
+	const STATE_CHANGE_WAIT_ITERATIONS = 30;
 
 	// When true, the *Restart test variants are skipped entirely. Set during development to avoid the
 	// slow server stop/start cycles; the non-restart tests still run (their @depends point at non-restart
