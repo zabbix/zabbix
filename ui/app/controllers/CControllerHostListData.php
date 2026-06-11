@@ -35,7 +35,7 @@ class CControllerHostListData extends CControllerDataTable {
 
 	protected function getData(): array {
 		$data_fields = $this->getDataFields();
-		$options = $this->getInput('options', []);
+		$options = $this->getInput('options');
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', (int) CPagerHelper::loadPage('host.list'));
 

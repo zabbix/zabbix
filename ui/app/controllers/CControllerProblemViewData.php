@@ -530,7 +530,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 	private function prepareData(): array {
 		$data_fields = $this->getDataFields();
-		$options = $this->getInput('options', []);
+		$options = $this->getInput('options');
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
 		$export = $this->getInput('export_file', '');
