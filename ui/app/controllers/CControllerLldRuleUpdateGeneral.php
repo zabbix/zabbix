@@ -321,7 +321,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			'lifetime_type' => ['db items.lifetime_type',
 				'in' => [ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY, ZBX_LLD_DELETE_AFTER]
 			],
-			'lifetime' => ['db items.enabled_lifetime',
+			'lifetime' => ['db items.enabled_lifetime', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_HOUR, 'max' => 25 * SEC_PER_YEAR,
 					'usermacros' => true, 'lldmacros' => static::isPrototype()
 				]],
@@ -330,7 +330,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			'enabled_lifetime_type' => ['db items.enabled_lifetime_type',
 				'in' => [ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY, ZBX_LLD_DELETE_AFTER]
 			],
-			'enabled_lifetime' => ['db items.enabled_lifetime',
+			'enabled_lifetime' => ['db items.enabled_lifetime',  'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_HOUR, 'max' => 25 * SEC_PER_YEAR,
 					'usermacros' => true, 'lldmacros' => static::isPrototype()
 				]],
