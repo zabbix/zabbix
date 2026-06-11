@@ -45,7 +45,7 @@ class testTriggerCEP extends CIntegrationTest {
 	// When true, the *Restart test variants are skipped entirely. Set during development to avoid the
 	// slow server stop/start cycles; the non-restart tests still run (their @depends point at non-restart
 	// siblings, so they do not cascade-skip).
-	const SKIP_RESTART_TESTS = true;
+	const SKIP_RESTART_TESTS = false;
 
 
 	private static $hostid;
