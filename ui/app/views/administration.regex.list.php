@@ -19,6 +19,8 @@
  * @var array $data
  */
 
+$this->includeJsFile('administration.regex.list.js.php');
+
 if ($data['uncheck']) {
 	uncheckTableRows('regexp');
 }
@@ -30,9 +32,7 @@ $html_page = (new CHtmlPage())
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
-				->addItem(new CRedirectButton(_('New regular expression'),
-					(new CUrl('zabbix.php'))->setArgument('action', 'regex.edit')
-				))
+				->addItem((new CSimpleButton(_('Create regular expression')))->addClass('js-create-regexp'))
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
@@ -90,14 +90,16 @@ foreach ($data['regexps'] as $regexpid => $regexp) {
 		]);
 	}
 
+	$regexp_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'regex.edit')
+		->setArgument('regexpid', $regexpid)
+		->getUrl();
+
 	$table->addRow([
 		new CCheckBox('regexpids['.$regexpid.']', $regexpid),
 		(new CCol(
-			new CLink($regexp['name'],
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'regex.edit')
-					->setArgument('regexpid', $regexpid)
-			)
+			new CLink($regexp['name'], $regexp_url)
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		$expressions,
 		(new CCol($regexp['description']))->addClass(ZBX_STYLE_WORDBREAK)
@@ -116,4 +118,8 @@ $form->addItem([
 	], 'regexp')
 ]);
 
-$html_page->addItem($filter)->addItem($form)->show();
+$html_page
+	->addItem($filter)
+	->addItem($form)
+	->addItem((new CScriptTag('view.init();'))->setOnDocumentReady())
+	->show();

@@ -28,6 +28,7 @@ class CControllerRegExCreate extends CController {
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'name' => ['db regexps.name', 'required', 'not_empty'],
+			'description' => ['db regexps.description'],
 			'test_string' => ['db regexps.test_string'],
 			'expressions' => ['objects', 'required', 'not_empty', 'uniq' => [['expression_type', 'expression']],
 				'fields' => [
@@ -84,6 +85,7 @@ class CControllerRegExCreate extends CController {
 	protected function doAction(): void {
 		$regexp = [
 			'name' => $this->getInput('name'),
+			'description' => $this->getInput('description', ''),
 			'test_string' => $this->getInput('test_string', ''),
 			'expressions' => $this->getInput('expressions')
 		];

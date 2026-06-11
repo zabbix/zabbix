@@ -29,6 +29,7 @@ class CControllerRegExUpdate extends CController {
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'regexpid' => ['db regexps.regexpid', 'required'],
 			'name' => ['db regexps.name', 'required', 'not_empty'],
+			'description' => ['db regexps.description'],
 			'test_string' => ['db regexps.test_string'],
 			'expressions' => ['objects', 'required', 'not_empty', 'uniq' => [['expression_type', 'expression']],
 				'fields' => [
@@ -95,6 +96,7 @@ class CControllerRegExUpdate extends CController {
 		$result = API::Regexp()->update([
 			'regexpid' => $this->getInput('regexpid'),
 			'name' => $this->getInput('name'),
+			'description' => $this->getInput('description', ''),
 			'test_string' => $this->getInput('test_string', ''),
 			'expressions' => $expressions
 		]);

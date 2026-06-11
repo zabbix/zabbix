@@ -18,11 +18,11 @@ class CRegexHelper {
 
 	public static function expression_type2str(?int $type = null) {
 		$types = [
-			EXPRESSION_TYPE_INCLUDED => _('Character string included'),
-			EXPRESSION_TYPE_ANY_INCLUDED => _('Any character string included'),
-			EXPRESSION_TYPE_NOT_INCLUDED => _('Character string not included'),
-			EXPRESSION_TYPE_TRUE => _('Result is TRUE'),
-			EXPRESSION_TYPE_FALSE => _('Result is FALSE')
+			EXPRESSION_TYPE_INCLUDED => _('Contains string'),
+			EXPRESSION_TYPE_ANY_INCLUDED => _('String is in list'),
+			EXPRESSION_TYPE_NOT_INCLUDED => _('Does not contain string'),
+			EXPRESSION_TYPE_TRUE => _('Matches regular expression'),
+			EXPRESSION_TYPE_FALSE => _('Does not match regular expression')
 		];
 
 		if ($type === null) {
