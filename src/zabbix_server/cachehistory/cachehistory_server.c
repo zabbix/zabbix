@@ -132,7 +132,7 @@ static void	process_triggers(zbx_vector_dc_trigger_t *triggers, zbx_add_event_fu
 	zbx_vector_cep_assessment_query_t	event_queries;
 	unsigned char				*results = NULL;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() values_num:%d", __func__, triggers->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, triggers->values_num);
 
 	if (0 == triggers->values_num)
 		goto out;
