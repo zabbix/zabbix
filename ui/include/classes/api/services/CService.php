@@ -2445,6 +2445,8 @@ class CService extends CApiService {
 			}
 
 			if (!$is_rw_service) {
+				$name = $db_services !== null ? $db_services[$service['serviceid']]['name'] : $service['name'];
+
 				$error_detail = $db_services !== null
 					? _('read-write access to the service must be retained')
 					: _('read-write access to the service is required');
