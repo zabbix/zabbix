@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxhistory.h"
 #include "zbxstr.h"
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
@@ -1176,6 +1177,9 @@ out:
 
 	supervisor_clear(&sv);
 	zabbix_log(LOG_LEVEL_INFORMATION, "[%s #%d] stopped", get_process_type_string(process_type), process_num);
+
+	if (0 != (info->program_type & ZBX_PROGRAM_TYPE_SERVER))
+		zbx_history_destroy();
 
 	zbx_ipc_service_close(&service);
 	zbx_proc_startup_free(runlevels);
