@@ -936,7 +936,7 @@ final class CItemData {
 					'publickey',
 					'js-item-passphrase-label',
 					'js-item-passphrase-field',
-					'password'
+					'passphrase'
 				]
 			],
 			'for_http_auth_type' => [
