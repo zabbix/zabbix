@@ -719,7 +719,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 					foreach ($data['problems'] as &$problem) {
 						foreach ($_symptom_data['problems'] as $symptom) {
 							if (bccomp($symptom['cause_eventid'], $problem['eventid']) == 0) {
-								$problem['symptoms'][] = $symptom;
+								$problem['symptoms'][$symptom['eventid']] = $symptom;
 							}
 						}
 					}
@@ -823,12 +823,29 @@ class CControllerProblemViewData extends CControllerDataTable {
 				'clock' => $problem['r_eventid'] != 0 ? $problem['r_clock'] : $problem['clock'],
 				'ns' => $problem['r_eventid'] != 0 ? $problem['r_ns'] : $problem['ns']
 			] + $custom_text;
+
+
+			foreach ($problem['symptoms'] as $s_eventid => $s_problem) {
+				$trigger = $data['triggers'][$s_problem['objectid']];
+				$problems[$s_eventid] = [
+					'triggerid' => $s_problem['objectid'],
+					'expression' => $trigger['expression'],
+					'clock' => $s_problem['r_eventid'] != 0 ? $s_problem['r_clock'] : $s_problem['clock'],
+					'ns' => $s_problem['r_eventid'] != 0 ? $s_problem['r_ns'] : $s_problem['ns']
+				] + $custom_text;
+			}
 		}
 
 		$problems = CMacrosResolverHelper::resolveEventCustomTexts($problems, ['sources' => array_keys($custom_text)]);
 
-		foreach ($problems as $eventid => $problem) {
-			$data['problems'][$eventid]['custom_text'] = array_intersect_key($problem, $custom_text);
+		foreach ($data['problems'] as $eventid => &$problem) {
+			$problem['custom_text'] = array_intersect_key($problems[$eventid], $custom_text);
+
+			foreach ($problem['symptoms'] as $s_eventid => &$s_problem) {
+				$s_problem['custom_text'] = array_intersect_key($problems[$s_eventid], $custom_text);
+			}
+			unset($s_problem);
 		}
+		unset($problem);
 	}
 }
