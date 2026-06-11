@@ -59,11 +59,11 @@ static int	tq_read_string(const char *p, char **out, const char *tag, char *erro
 	zbx_json_type_t	type;
 
 	if (NULL != *out)
-		return ret_errf(FAIL, error, max_error_len, "duplicate \"%s\" tag", tag);
+		return ret_errf(FAIL, error, max_error_len, "Duplicate \"%s\" tag", tag);
 
 	if (NULL == zbx_json_decodevalue_dyn(p, out, &out_alloc, &type) || ZBX_JSON_TYPE_STRING != type)
 	{
-		zbx_snprintf(error, max_error_len, "failed to read \"%s\"", tag);
+		zbx_snprintf(error, max_error_len, "Failed to read \"%s\"", tag);
 		zbx_free(*out);
 
 		return FAIL;
@@ -84,13 +84,13 @@ static int	tq_read_string_enum(const char *p, char *buf, size_t buf_size, tq_str
 	zbx_json_type_t	type;
 
 	if (cur_val != val_unknown)
-		return ret_errf(FAIL, error, max_error_len, "duplicate \"%s\" tag", tag);
+		return ret_errf(FAIL, error, max_error_len, "Duplicate \"%s\" tag", tag);
 
 	if (NULL == zbx_json_decodevalue(p, buf, buf_size, &type) || ZBX_JSON_TYPE_STRING != type)
-		return ret_errf(FAIL, error, max_error_len, "failed to read \"%s\"", tag);
+		return ret_errf(FAIL, error, max_error_len, "Failed to read \"%s\"", tag);
 
 	if (set_func(buf, out) == val_unknown)
-		return ret_errf(FAIL, error, max_error_len, "invalid \"%s\" value: \"%s\"", tag, buf);
+		return ret_errf(FAIL, error, max_error_len, "Invalid \"%s\" value: \"%s\"", tag, buf);
 
 	return SUCCEED;
 }
@@ -101,13 +101,13 @@ static int	tq_read_int_enum(const char *p, char *buf, size_t buf_size, tq_int_en
 	int	new_val;
 
 	if (cur_val != val_unknown)
-		return ret_errf(FAIL, error, max_error_len, "duplicate \"%s\" tag", tag);
+		return ret_errf(FAIL, error, max_error_len, "Duplicate \"%s\" tag", tag);
 
 	if (NULL == zbx_json_decodevalue(p, buf, buf_size, NULL) || SUCCEED != zbx_is_int(buf, &new_val))
-		return ret_errf(FAIL, error, max_error_len, "failed to read \"%s\"", tag);
+		return ret_errf(FAIL, error, max_error_len, "Failed to read \"%s\"", tag);
 
 	if (set_func(new_val, out) == val_unknown)
-		return ret_errf(FAIL, error, max_error_len, "invalid \"%s\" value: %d", tag, new_val);
+		return ret_errf(FAIL, error, max_error_len, "Invalid \"%s\" value: %d", tag, new_val);
 
 	return SUCCEED;
 }
@@ -327,7 +327,7 @@ static int	tq_parse_aggr_col(struct zbx_json_parse *jp, zbx_tq_aggr_column_t *ag
 		{
 			if (0 != aggr_col->args.values_num)
 			{
-				zbx_snprintf(error, max_error_len, "duplicate \"parameters\" tag");
+				zbx_snprintf(error, max_error_len, "Duplicate \"parameters\" tag");
 				goto out;
 			}
 
@@ -495,7 +495,8 @@ static int	tq_parse_filter(struct zbx_json_parse *jp, zbx_tq_query_t *query, cha
 
 			if (0 != query->conditions.values_num)
 			{
-				zbx_snprintf(error, max_error_len, "duplicate \"conditions\" tag");
+				zbx_snprintf(error, max_error_len, "Duplicate \"conditions\" tag");
+				goto out;
 			}
 
 			if (FAIL == zbx_json_brackets_open(p, &jp_conditions))
@@ -557,7 +558,7 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query,
 
 			if (0 != query->columns.values_num)
 			{
-				zbx_snprintf(error, max_error_len, "duplicate \"columns\" tag");
+				zbx_snprintf(error, max_error_len, "Duplicate \"columns\" tag");
 				goto out;
 			}
 
@@ -572,7 +573,7 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query,
 
 			if (0 != query->aggregated_columns.values_num)
 			{
-				zbx_snprintf(error, max_error_len, "duplicate \"aggregated_columns\" tag");
+				zbx_snprintf(error, max_error_len, "Duplicate \"aggregated_columns\" tag");
 				goto out;
 			}
 
@@ -629,9 +630,6 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query,
 					macro_expand_ctx))
 				goto out;
 		}
-
-		if (SUCCEED != tq_expand_macros(&query->formula, macro_expand_cb, macro_expand_ctx))
-			goto out;
 	}
 
 	ret = SUCCEED;
@@ -676,7 +674,7 @@ static int	tq_validate_formula_node_indices(const zbx_tq_formula_node_t *node, i
 	if (TQ_FORMULA_NODE_TYPE_LEAF == node->type)
 	{
 		if (0 > node->condition_idx || node->condition_idx >= condition_count)
-			return ret_errf(FAIL, error, max_error_len, "invalid condition id in formula: %d",
+			return ret_errf(FAIL, error, max_error_len, "Invalid condition id in formula: %d",
 					node->condition_idx);
 
 		return SUCCEED;
@@ -696,31 +694,31 @@ static int	tq_validate_formula_node_indices(const zbx_tq_formula_node_t *node, i
 static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t max_error_len)
 {
 	if (ZBX_TQ_CATEGORY_UNKNOWN == query->category)
-		return ret_errf(FAIL, error, max_error_len, "category is not set");
+		return ret_errf(FAIL, error, max_error_len, "Category is not set");
 
 	if (ZBX_TQ_CATEGORY_APM_METRICS == query->category && ZBX_TQ_METRIC_TYPE_UNKNOWN == query->metric_type)
 		return ret_errf(FAIL, error, max_error_len,
-				"metric type is not set (when category is \"APM metrics\")");
+				"Metric type is not set (when category is \"APM metrics\")");
 
 	for (int i = 0; i < query->columns.values_num; i++)
 	{
 		const zbx_tq_column_t	*col = &query->columns.values[i];
 
 		if (NULL == col->name)
-			return ret_errf(FAIL, error, max_error_len, "column name is not set for column #%d", i);
+			return ret_errf(FAIL, error, max_error_len, "Column name is not set for column #%d", i);
 
 		if (ZBX_TQ_COLUMN_TYPE_UNKNOWN == col->col_type)
-			return ret_errf(FAIL, error, max_error_len, "column name is invalid for column #%d", i);
+			return ret_errf(FAIL, error, max_error_len, "Column name is invalid for column #%d", i);
 
 		if (NULL == col->key && SUCCEED == tq_column_type_is_attributes(col->col_type))
-			return ret_errf(FAIL, error, max_error_len, "key is not set for attribute column #%d", i);
+			return ret_errf(FAIL, error, max_error_len, "Key is not set for attribute column #%d", i);
 
 		if (FAIL == tq_validate_str(col->key))
-			return ret_errf(FAIL, error, max_error_len, "key is not valid UTF-8 for column #%d", i);
+			return ret_errf(FAIL, error, max_error_len, "Key is not valid UTF-8 for column #%d", i);
 	}
 
 	if (0 == query->aggregated_columns.values_num)
-		return ret_errf(FAIL, error, max_error_len, "aggregated columns are not set");
+		return ret_errf(FAIL, error, max_error_len, "Aggregated columns are not set");
 
 	for (int i = 0; i < query->aggregated_columns.values_num; i++)
 	{
@@ -730,25 +728,25 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 		{
 			if (NULL == aggr_col->column_name)
 				return ret_errf(FAIL, error, max_error_len,
-					"column name is not set for aggregated column #%d", i);
+					"Column name is not set for aggregated column #%d", i);
 
 			if (ZBX_TQ_COLUMN_TYPE_UNKNOWN == aggr_col->col_type)
 				return ret_errf(FAIL, error, max_error_len,
-						"column name is invalid for aggregated column #%d", i);
+						"Column name is invalid for aggregated column #%d", i);
 
 			if (ZBX_TQ_COLUMN_TYPE_NUM != aggr_col->col_type)
 				return ret_errf(FAIL, error, max_error_len,
-						"invalid column type for aggregated column #%d", i);
+						"Invalid column type for aggregated column #%d", i);
 		}
 
 		if (NULL == aggr_col->alias)
-			return ret_errf(FAIL, error, max_error_len, "alias is not set for aggregated column #%d", i);
+			return ret_errf(FAIL, error, max_error_len, "Alias is not set for aggregated column #%d", i);
 
 		if (FAIL == tq_validate_str(aggr_col->alias))
-			return ret_errf(FAIL, error, max_error_len, "alias is not valid UTF-8 for column #%d", i);
+			return ret_errf(FAIL, error, max_error_len, "Alias is not valid UTF-8 for column #%d", i);
 
 		if (ZBX_TQ_FUNCTION_UNKNOWN == aggr_col->function)
-			return ret_errf(FAIL, error, max_error_len, "function is not set for aggregated column #%d", i);
+			return ret_errf(FAIL, error, max_error_len, "Function is not set for aggregated column #%d", i);
 
 		if (ZBX_TQ_FUNCTION_PERCENTILE == aggr_col->function)
 		{
@@ -757,7 +755,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 			/* TODO: check if 0 and 100 (and other edge values) work on all dbs */
 			if (1 != aggr_col->args.values_num || NULL == aggr_col->args.values[0] ||
 					FAIL == zbx_is_double(aggr_col->args.values[0], &x) || x < 0.0 || x > 100.0)
-				return ret_errf(FAIL, error, max_error_len, "invalid arguments for \"percentile\" "
+				return ret_errf(FAIL, error, max_error_len, "Invalid arguments for \"percentile\" "
 						"function in aggregated column #%d", i);
 		}
 	}
@@ -765,13 +763,13 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 	if (0 != query->conditions.values_num)
 	{
 		if (ZBX_TQ_EVAL_TYPE_UNKNOWN == query->evaltype)
-			return ret_errf(FAIL, error, max_error_len, "evaltype is not set");
+			return ret_errf(FAIL, error, max_error_len, "Evaltype is not set");
 
 		if (ZBX_TQ_EVAL_TYPE_EXPRESSION == query->evaltype)
 		{
 			if (NULL == query->formula_parsed)
 				return ret_errf(FAIL, error, max_error_len,
-						"formula is not set (when evaltype is \"expression\")");
+						"Formula is not set (when evaltype is \"expression\")");
 
 			if (SUCCEED != tq_validate_formula_node_indices(query->formula_parsed,
 					query->conditions.values_num, error, max_error_len))
@@ -784,59 +782,59 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 
 			if (NULL == condition->column_name)
 				return ret_errf(FAIL, error, max_error_len,
-						"column name is not set for condition #%d", i);
+						"Column name is not set for condition #%d", i);
 
 			if (ZBX_TQ_COLUMN_TYPE_UNKNOWN == condition->col_type)
 				return ret_errf(FAIL, error, max_error_len,
-						"column name is invalid for condition #%d", i);
+						"Column name is invalid for condition #%d", i);
 
 			if (ZBX_TQ_OPERATOR_UNKNOWN == condition->operator)
-				return ret_errf(FAIL, error, max_error_len, "operator is not set for condition #%d", i);
+				return ret_errf(FAIL, error, max_error_len, "Operator is not set for condition #%d", i);
 
 			if (NULL == condition->key && SUCCEED == tq_column_type_is_attributes(condition->col_type))
 				return ret_errf(FAIL, error, max_error_len,
-						"key is not set for attribute condition #%d", i);
+						"Key is not set for attribute condition #%d", i);
 
 			if (FAIL == tq_validate_str(condition->key))
 				return ret_errf(FAIL, error, max_error_len,
-						"key is not valid UTF-8 for condition #%d", i);
+						"Key is not valid UTF-8 for condition #%d", i);
 
 			if (NULL == condition->value && ZBX_TQ_OPERATOR_EXISTS != condition->operator)
 				return ret_errf(FAIL, error, max_error_len, "value is not set for condition #%d", i);
 
 			if (FAIL == tq_validate_str(condition->value))
 				return ret_errf(FAIL, error, max_error_len,
-						"value is not valid UTF-8 for condition #%d", i);
+						"Value is not valid UTF-8 for condition #%d", i);
 
 			if (ZBX_TQ_OPERATOR_EXISTS == condition->operator
 					&& SUCCEED != tq_column_type_is_attributes(condition->col_type))
 				return ret_errf(FAIL, error, max_error_len,
-						"operator \"exists\" selected for non-attribute condition #%d", i);
+						"Operator \"exists\" selected for non-attribute condition #%d", i);
 
 			if (SUCCEED == tq_column_type_is_attributes(condition->col_type) &&
 					(ZBX_TQ_OPERATOR_CONTAINS == condition->operator ||
 					ZBX_TQ_OPERATOR_NOT_CONTAINS == condition->operator))
 				return ret_errf(FAIL, error, max_error_len,
-						"operator \"%s\" selected for attribute condition #%d",
+						"Operator \"%s\" selected for attribute condition #%d",
 						(ZBX_TQ_OPERATOR_CONTAINS == condition->operator ? "contains" :
 						"not contains"), i);
 		}
 	}
 
 	if (TQ_TIME_INTERVAL_INVALID == query->time_shift)
-		return ret_errf(FAIL, error, max_error_len, "time shift is not set");
+		return ret_errf(FAIL, error, max_error_len, "Time shift is not set");
 
 	if (TQ_TIME_INTERVAL_INVALID == query->lookback_limit)
-		return ret_errf(FAIL, error, max_error_len, "lookback limit is not set");
+		return ret_errf(FAIL, error, max_error_len, "Lookback limit is not set");
 
 	if (TQ_TIME_INTERVAL_INVALID == query->granularity)
-		return ret_errf(FAIL, error, max_error_len, "aggregation size is not set");
+		return ret_errf(FAIL, error, max_error_len, "Aggregation size is not set");
 
 	if (0 == query->granularity)
-		return ret_errf(FAIL, error, max_error_len, "aggregation cannot be 0");
+		return ret_errf(FAIL, error, max_error_len, "Aggregation size cannot be 0");
 
 	if (query->granularity > query->lookback_limit)
-		return ret_errf(FAIL, error, max_error_len, "aggregation size cannot be larger than lookback limit");
+		return ret_errf(FAIL, error, max_error_len, "Aggregation size cannot be larger than lookback limit");
 
 	return SUCCEED;
 }
@@ -857,6 +855,8 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
  *                                     (macros in time_shift, lookback_limit  *
  *                                     and granularity are not expanded)      *
  *             macro_expand_ctx - [IN] context passed to macro_expand_cb      *
+ *             error            - [OUT]                                       *
+ *             max_error_len    - [IN]                                        *
  *                                                                            *
  * Return value: SUCCEED - json_str parsed successfully, query is valid;      *
  *                         query must be cleaned after use                    *
@@ -879,8 +879,8 @@ int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, const char
 
 	if (FAIL == zbx_json_open(query_json, &jp))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "%s(): cannot open JSON: %s", __func__, zbx_json_strerror());
-		zbx_snprintf(error, max_error_len, "cannot open query JSON");
+		zabbix_log(LOG_LEVEL_ERR, "%s(): Cannot open JSON: %s", __func__, zbx_json_strerror());
+		zbx_snprintf(error, max_error_len, "Cannot open query JSON");
 		goto out;
 	}
 
@@ -891,7 +891,7 @@ int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, const char
 	{
 		if (FAIL == zbx_is_time_suffix(time_shift, &query->time_shift, ZBX_LENGTH_UNLIMITED))
 		{
-			zbx_snprintf(error, max_error_len, "unsupported time shift value");
+			zbx_snprintf(error, max_error_len, "Unsupported time shift value");
 			goto out;
 		}
 	}
@@ -900,7 +900,7 @@ int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, const char
 	{
 		if (FAIL == zbx_is_time_suffix(lookback_limit, &query->lookback_limit, ZBX_LENGTH_UNLIMITED))
 		{
-			zbx_snprintf(error, max_error_len, "unsupported lookback limit value");
+			zbx_snprintf(error, max_error_len, "Unsupported lookback limit value");
 			goto out;
 		}
 	}
@@ -909,7 +909,7 @@ int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, const char
 	{
 		if (FAIL == zbx_is_time_suffix(granularity, &query->granularity, ZBX_LENGTH_UNLIMITED))
 		{
-			zbx_snprintf(error, max_error_len, "unsupported granularity limit value");
+			zbx_snprintf(error, max_error_len, "Unsupported granularity limit value");
 			goto out;
 		}
 	}
@@ -919,7 +919,11 @@ int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, const char
 	if (NULL != query->formula)
 	{
 		if (NULL == (query->formula_parsed = tq_formula_parse(query->formula, error, max_error_len)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Failed to parse formula: %s", error);
+			zbx_snprintf(error, max_error_len, "Failed to parse formula");
 			goto out;
+		}
 	}
 
 	if (FAIL == tq_validate_query(query, error, max_error_len))
@@ -931,7 +935,7 @@ out:
 		zbx_tq_query_clean(query);
 
 	if (FAIL == ret && 0 != max_error_len && '\0' == error[0])
-		zbx_snprintf(error, max_error_len, "failed to parse query");
+		zbx_snprintf(error, max_error_len, "Failed to parse query");
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%d", __func__, ret);
 

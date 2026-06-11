@@ -299,30 +299,28 @@ static char	*tq_sql_dyn_get_percentile(const char *name, double fraction, const 
 {
 	/* TODO: test correctness on all dbs */
 	char	*str;
-	char	*name_esc_unquoted = tq_sql_dyn_escape_string_unquoted(name, ctx);
+	char	*name_esc = tq_sql_dyn_escape_name(name, ctx);
 
-	switch (ctx->db_type)
+	if (ZBX_TQ_DB_TYPE_POSTGRESQL == ctx->db_type)
 	{
-		case ZBX_TQ_DB_TYPE_POSTGRESQL:
-			str = zbx_dsprintf(NULL, "(percentile_cont(" ZBX_FS_DBL_EXT(4)
-					") WITHIN GROUP (ORDER BY \"%s\"))", fraction, name_esc_unquoted);
-			break;
-		case ZBX_TQ_DB_TYPE_MYSQL:
-			str = zbx_dsprintf(NULL, "MIN(CASE WHEN `__cd_%s` >= " ZBX_FS_DBL_EXT(4) " THEN `%s` END)",
-					name_esc_unquoted,
-					fraction, name_esc_unquoted);
-			break;
-		case ZBX_TQ_DB_TYPE_CLICKHOUSE:
-			str = zbx_dsprintf(NULL, "quantileTDigest(" ZBX_FS_DBL_EXT(4) ")(\"%s\")", fraction,
-					name_esc_unquoted);
-			break;
+		str = zbx_dsprintf(NULL, "(percentile_cont(" ZBX_FS_DBL_EXT(4) ") WITHIN GROUP (ORDER BY %s))",
+				fraction, name_esc);
+	}
+	else if (ZBX_TQ_DB_TYPE_MYSQL == ctx->db_type)
+	{
+		char	*name_str_esc_unquoted = tq_sql_dyn_escape_string_unquoted(name, ctx);
 
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			str = zbx_strdup(NULL, "");
+		str = zbx_dsprintf(NULL, "MIN(CASE WHEN `__cd_%s` >= " ZBX_FS_DBL_EXT(4) " THEN %s END)",
+				name_str_esc_unquoted, fraction, name_esc);
+
+		zbx_free(name_str_esc_unquoted);
+	}
+	else /* clickhouse */
+	{
+		str = zbx_dsprintf(NULL, "quantileTDigest(" ZBX_FS_DBL_EXT(4) ")(%s)", fraction, name_esc);
 	}
 
-	zbx_free(name_esc_unquoted);
+	zbx_free(name_esc);
 
 	return str;
 }
@@ -398,7 +396,7 @@ static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, co
 {
 	/* TODO: replace with actual table names (or probably macros) */
 
-	char	*str;
+	char	*str = NULL;
 	char	*str_esc;
 
 	switch (query->category)
@@ -423,9 +421,8 @@ static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, co
 					str = zbx_strdup(NULL, "apm_metrics_exponentialhistogram");
 					break;
 
-				case ZBX_TQ_CATEGORY_UNKNOWN:
+				case ZBX_TQ_METRIC_TYPE_UNKNOWN:
 					THIS_SHOULD_NEVER_HAPPEN;
-					str = zbx_strdup(NULL, "");
 			}
 			break;
 
@@ -435,7 +432,6 @@ static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, co
 
 		case ZBX_TQ_CATEGORY_UNKNOWN:
 			THIS_SHOULD_NEVER_HAPPEN;
-			str = zbx_strdup(NULL, "");
 	}
 
 	str_esc = tq_sql_dyn_escape_name(str, ctx);
@@ -800,19 +796,22 @@ static char	*tq_sql_dyn_get_cume_dists_mysql(const zbx_tq_query_t *query, const 
 	for (int i = 0; i < percentile_cols_sorted.values_num; i++)
 	{
 		const char	*name = percentile_cols_sorted.values[i]->column_name;
-		char		*name_esc_unquoted;
+		char		*name_str_esc_unquoted;
+		char		*name_esc;
 
 		if (0 != i && 0 == strcmp(percentile_cols_sorted.values[i-1]->column_name, name))
 			continue;
 
-		name_esc_unquoted = tq_sql_dyn_escape_string_unquoted(name, ctx);
+		name_str_esc_unquoted = tq_sql_dyn_escape_string_unquoted(name, ctx);
+		name_esc = tq_sql_dyn_escape_name(name, ctx);
 
 		zbx_snprintf_alloc(&str, &alloc, &offset,
-				"CUME_DIST() OVER (PARTITION BY %s%s%s ORDER BY `%s`) AS `__cd_%s`,",
+				"CUME_DIST() OVER (PARTITION BY %s%s%s ORDER BY %s) AS `__cd_%s`,",
 				rounded_time_expr, (0 != query->columns.values_num ? "," : ""), columns_to_select,
-				name_esc_unquoted, name_esc_unquoted);
+				name_esc, name_str_esc_unquoted);
 
-		zbx_free(name_esc_unquoted);
+		zbx_free(name_str_esc_unquoted);
+		zbx_free(name_esc);
 	}
 
 	offset--;
@@ -1024,7 +1023,7 @@ void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, time_t now, time_t l
 void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
 {
 	tq_sql_ctx_t	ctx = {
-		.db_type = ZBX_TQ_DB_TYPE_POSTGRESQL,
+		.db_type = ZBX_TQ_DB_TYPE_CLICKHOUSE,
 		.db = NULL,
 	};
 

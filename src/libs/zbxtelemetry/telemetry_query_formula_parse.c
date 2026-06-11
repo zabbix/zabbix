@@ -79,7 +79,7 @@ static int	parse_uint(tq_formula_parse_ctx_t *ctx, int *num)
 {
 	int	n = 0;
 
-	while (isdigit((unsigned int)ctx->p[n]))
+	while (isdigit((unsigned char)ctx->p[n]))
 		n++;
 
 	if (0 == n)
@@ -248,7 +248,7 @@ static zbx_tq_formula_node_t	*parse_or(tq_formula_parse_ctx_t *ctx)
 	if (TQ_FORMULA_MAX_NESTING_LEVEL < ctx->level)
 	{
 		zbx_snprintf(ctx->err, ctx->err_size,
-				"maximum nesting level of %d exceeded at at "TQ_FORMULA_SAMPLE_FS,
+				"maximum nesting level of %d exceeded at "TQ_FORMULA_SAMPLE_FS,
 				TQ_FORMULA_MAX_NESTING_LEVEL, ctx->p);
 		goto fail;
 	}
@@ -280,9 +280,13 @@ static zbx_tq_formula_node_t	*parse_or(tq_formula_parse_ctx_t *ctx)
 		node = child; /* child is already set */
 	}
 
+	ctx->level--;
+
 	return node;
 fail:
 	tq_formula_node_free(node);
+
+	ctx->level--;
 
 	return NULL;
 }

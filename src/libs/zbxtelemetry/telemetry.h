@@ -17,6 +17,7 @@
 
 #include "zbxtelemetry.h"
 #include "zbxalgo.h"
+#include "zbxjson.h"
 
 #define TQ_TIME_INTERVAL_INVALID -1
 
@@ -68,5 +69,8 @@ void	tq_get_conditions_and_or_sorted(const zbx_tq_query_t *query, zbx_vector_tq_
 
 zbx_tq_formula_node_t	*tq_formula_parse(const char *formula, char *error, size_t max_error_len);
 void			tq_formula_node_free(zbx_tq_formula_node_t *node);
+
+int	tq_validate_result_column_type(zbx_json_type_t type);
+int	tq_validate_result_aggr_column_type(zbx_json_type_t type);
 
 #endif

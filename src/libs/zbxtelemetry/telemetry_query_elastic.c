@@ -369,6 +369,8 @@ static void	tq_es_add_aggr_columns(const zbx_vector_tq_aggr_column_t *aggr_cols,
 		{
 			double percentage = strtod(col->args.values[0], NULL);
 
+			zbx_json_addstring(j, "keyed", "false", ZBX_JSON_TYPE_FALSE);
+
 			zbx_json_addarray(j, "percents");
 
 			/* "percentiles" expects a percentage, not fraction */
@@ -527,7 +529,8 @@ static char	*tq_elastic_parse_bucket(const zbx_tq_query_t *query, struct zbx_jso
 		zbx_json_type_t		type;
 		char			*col_name = zbx_dsprintf(NULL, "col_%d", i);
 
-		if (SUCCEED != zbx_json_value_by_name(&jp_key, col_name, buf, sizeof(buf), &type))
+		if (SUCCEED != zbx_json_value_by_name(&jp_key, col_name, buf, sizeof(buf), &type) ||
+				SUCCEED != tq_validate_result_column_type(type))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse column \"%s\" from bucket %d", field_name,
 					bucket_id);
@@ -549,7 +552,12 @@ static char	*tq_elastic_parse_bucket(const zbx_tq_query_t *query, struct zbx_jso
 
 		if (ZBX_TQ_FUNCTION_COUNT == aggr_col->function)
 		{
-			zbx_json_value_by_name(jp, "doc_count", buf, sizeof(buf), &type);
+			if (SUCCEED != zbx_json_value_by_name(jp, "doc_count", buf, sizeof(buf), &type))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse column \"%s\" from bucket %d",
+						aggr_col->alias, bucket_id);
+				goto out;
+			}
 		}
 		else
 		{
@@ -567,21 +575,37 @@ static char	*tq_elastic_parse_bucket(const zbx_tq_query_t *query, struct zbx_jso
 			if (ZBX_TQ_FUNCTION_PERCENTILE == aggr_col->function)
 			{
 				struct zbx_json_parse	jp_values;
+				struct zbx_json_parse	jp_val;
 				const char		*pvalue;
 
-				zbx_json_brackets_by_name(&jp_res, "values", &jp_values);
-
-				/* name of the value varies, so, to extract it, the first value is taken */
-				/* (as there should be only one value) */
-				if (NULL == (pvalue = zbx_json_pair_next(&jp_values, NULL, buf, sizeof(buf))) ||
-						NULL == zbx_json_decodevalue(pvalue, buf, sizeof(buf), &type))
+				if (SUCCEED != zbx_json_brackets_by_name(&jp_res, "values", &jp_values))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "cannot parse column \"%s\" from bucket %d",
 							aggr_col->alias, bucket_id);
 					goto out;
 				}
 
+				/* only one value is expected, so the first one is taken */
+				if (NULL == (pvalue = zbx_json_next(&jp_values, NULL)))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "cannot parse column \"%s\" from bucket %d",
+							aggr_col->alias, bucket_id);
+					goto out;
+				}
 
+				if (SUCCEED != zbx_json_brackets_open(pvalue, &jp_val))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "cannot parse column \"%s\" from bucket %d",
+							aggr_col->alias, bucket_id);
+					goto out;
+				}
+
+				if (SUCCEED != zbx_json_value_by_name(&jp_val, "value", buf, sizeof(buf), &type))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "cannot parse column \"%s\" from bucket %d",
+							aggr_col->alias, bucket_id);
+					goto out;
+				}
 			}
 			else
 			{
@@ -592,6 +616,13 @@ static char	*tq_elastic_parse_bucket(const zbx_tq_query_t *query, struct zbx_jso
 					goto out;
 				}
 			}
+		}
+
+		if (SUCCEED != tq_validate_result_aggr_column_type(type))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot parse column \"%s\" from bucket %d", aggr_col->alias,
+					bucket_id);
+			goto out;
 		}
 
 		zbx_json_addstring(&j, aggr_col->alias, buf, type);

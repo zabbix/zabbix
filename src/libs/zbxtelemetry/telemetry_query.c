@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxjson.h"
 #include "zbxtelemetry.h"
 #include "telemetry.h"
 #include "zbxalgo.h"
@@ -200,4 +201,29 @@ void	tq_get_conditions_and_or_sorted(const zbx_tq_query_t *query, zbx_vector_tq_
 		zbx_vector_tq_condition_ptr_append(conditions_sorted, &query->conditions.values[i]);
 
 	zbx_vector_tq_condition_ptr_sort(conditions_sorted, tq_condition_ptr_compare_by_column_and_key);
+}
+
+int	tq_validate_result_column_type(zbx_json_type_t type)
+{
+	switch (type)
+	{
+		case ZBX_JSON_TYPE_STRING:
+		case ZBX_JSON_TYPE_INT:
+		case ZBX_JSON_TYPE_NUMBER:
+			return SUCCEED;
+		default:
+			return FAIL;
+	}
+}
+
+int	tq_validate_result_aggr_column_type(zbx_json_type_t type)
+{
+	switch (type)
+	{
+		case ZBX_JSON_TYPE_INT:
+		case ZBX_JSON_TYPE_NUMBER:
+			return SUCCEED;
+		default:
+			return FAIL;
+	}
 }

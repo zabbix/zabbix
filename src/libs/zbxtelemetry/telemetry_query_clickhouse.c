@@ -58,7 +58,8 @@ static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_jso
 		char			*field_name = tq_get_result_field_name_dyn(col);
 		zbx_json_type_t		type;
 
-		if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), &type)))
+		if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), &type)) ||
+				SUCCEED != tq_validate_result_column_type(type))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse column \"%s\" from row \"%s\"", field_name,
 					jp->start);
@@ -76,7 +77,8 @@ static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_jso
 		const char	*field_name = query->aggregated_columns.values[i].alias;
 		zbx_json_type_t	type;
 
-		if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), &type)))
+		if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), &type)) ||
+				SUCCEED != tq_validate_result_aggr_column_type(type))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse column \"%s\" from row \"%s\"", field_name,
 					jp->start);
