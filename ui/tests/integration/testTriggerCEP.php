@@ -78,6 +78,19 @@ class testTriggerCEP extends CIntegrationTest {
 		// Disable audit log so the bulk of API operations below do not flood it.
 		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
 
+		// Disable every pre-existing monitored host so they don't interfere with the suite; this
+		// suite's own hosts are (re-)set to monitored after prepareData() by onBeforeTestSuite().
+		$response = $this->call('host.get', [
+			'filter' => ['status' => HOST_STATUS_MONITORED],
+			'output' => ['hostid']
+		]);
+		foreach ($response['result'] as $h) {
+			$this->call('host.update', [
+				'hostid' => $h['hostid'],
+				'status' => HOST_STATUS_NOT_MONITORED
+			]);
+		}
+
 		// Retrieve template group ID.
 		$response = $this->call('templategroup.get', [
 			'filter' => ['name' => 'Templates']
