@@ -101,6 +101,11 @@ var LldRuleEditPrototypeTab = class {
 	}
 
 	#initEvents() {
+		new CViewSwitcher('allow_traps', 'change', this.#field_switches.for_traps);
+		new CViewSwitcher('authtype', 'change', this.#field_switches.for_authtype);
+		new CViewSwitcher('http_authtype', 'change', this.#field_switches.for_http_auth_type);
+		new CViewSwitcher('type', 'change', this.#field_switches.for_type);
+
 		const input_selectors = ['[name="authtype"]', '[name="custom_timeout"]', '[name="lifetime_type"]',
 			'[name="enabled_lifetime_type"]', '[name="key"]', '[name="request_method"]'
 		];
@@ -120,12 +125,11 @@ var LldRuleEditPrototypeTab = class {
 			this.#container.dispatchEvent(new CustomEvent('update'))
 		);
 
-		this.#container.querySelector('.js-parseurl').addEventListener('click', (e) => this.#parseUrl(e.target));
+		this.#container.querySelector('[name="snmp_oid"]').addEventListener('keyup', () =>
+			this.#update()
+		);
 
-		new CViewSwitcher('allow_traps', 'change', this.#field_switches.for_traps);
-		new CViewSwitcher('authtype', 'change', this.#field_switches.for_authtype);
-		new CViewSwitcher('http_authtype', 'change', this.#field_switches.for_http_auth_type);
-		new CViewSwitcher('type', 'change', this.#field_switches.for_type);
+		this.#container.querySelector('.js-parseurl').addEventListener('click', (e) => this.#parseUrl(e.target));
 
 		this.#container.querySelector('#delay-flex-table').addEventListener('click', e => {
 			if (e.target.type === 'radio') {
