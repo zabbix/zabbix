@@ -32,7 +32,7 @@ $html_page = (new CHtmlPage())
 		(new CList())
 			->addItem(
 				(new CSimpleButton(_('Create template')))
-					->setAttribute('data-groupids', json_encode(array_keys($data['filter']['groups'])))
+					->setAttribute('data-groupids', json_encode($data['groupids']))
 					->setId('js-create'))
 			->addItem((new CSimpleButton(_('Import')))->setId('js-import'))
 	))->setAttribute('aria-label', _('Content controls')));
