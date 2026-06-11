@@ -475,6 +475,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'triggerid' => self::$trigger_prototypeid,
 			'correlation_mode' => ZBX_TRIGGER_CORRELATION_TAG,
 			'correlation_tag' => 'type',
+			'type' => TRIGGER_MULT_EVENT_ENABLED,
 			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
 		]);
 
@@ -482,6 +483,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'triggerid' => self::$dep_trigger_prototypeid,
 			'correlation_mode' => ZBX_TRIGGER_CORRELATION_TAG,
 			'correlation_tag' => 'type',
+			'type' => TRIGGER_MULT_EVENT_ENABLED,
 			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
 		]);
 
@@ -497,14 +499,15 @@ class testTriggerCEP extends CIntegrationTest {
 		// Verify the discovered triggers reflect the updated correlation mode.
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
-			'output' => ['triggerid', 'correlation_mode', 'correlation_tag']
+			'output' => ['triggerid', 'correlation_mode', 'correlation_tag', 'type']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			if (count($response['result']) !== 2) {
 				return false;
 			}
 			foreach ($response['result'] as $trigger) {
 				if ((int) $trigger['correlation_mode'] !== ZBX_TRIGGER_CORRELATION_TAG
-						|| $trigger['correlation_tag'] !== 'type') {
+						|| $trigger['correlation_tag'] !== 'type'
+						|| (int) $trigger['type'] !== TRIGGER_MULT_EVENT_ENABLED) {
 					return false;
 				}
 			}
@@ -516,6 +519,8 @@ class testTriggerCEP extends CIntegrationTest {
 				'Discovered trigger '.$trigger['triggerid'].' was not updated to tag-correlation mode.');
 			$this->assertEquals('type', $trigger['correlation_tag'],
 				'Discovered trigger '.$trigger['triggerid'].' has unexpected correlation tag.');
+			$this->assertEquals(TRIGGER_MULT_EVENT_ENABLED, $trigger['type'],
+				'Discovered trigger '.$trigger['triggerid'].' was not updated to multiple-event mode.');
 		}
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -1173,7 +1178,11 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
-	 * @depends testTriggerCEP_DependentTriggerMultipleEvent
+	 * prepareDataTagCorrelation() switches the prototypes to tag-correlation mode and resends LLD;
+	 * the post-LLD defaults (numeric items, last()<>0 expression) are exactly what this scenario
+	 * needs, so it only depends on the LLD step and can run in isolation together with the other
+	 * tag-correlation variants and the service-correlation tests (see the regexp below).
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_EventAssessmentTagCorrelation() {
 		$this->prepareDataTagCorrelation();
@@ -1211,7 +1220,9 @@ class testTriggerCEP extends CIntegrationTest {
 	/**
 	 * prepareDataServiceCorrelation() fully reconfigures the prototypes and resends LLD, so this
 	 * test is self-contained and only needs the discovered host/triggers from the LLD step.
-	 * Run in isolation as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentServiceCorrelation)
+	 * Run in isolation as
+	 * (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_.*TagCorrelation.*|testTriggerCEP_EventAssessmentServiceCorrelation.*)
+	 * (the .* options also pull in the Restart, dependent-trigger and ManualClose variants that chain to these tests)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_EventAssessmentServiceCorrelation() {
