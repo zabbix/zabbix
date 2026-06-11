@@ -211,8 +211,8 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 			],
 			'event_menu_url' =>	['db media_type.event_menu_url', 'required', 'not_empty',
 				'use' => [CUrlValidator::class, [
-					'schemes' => CSettingsHelper::getAllowedUriSchemes(),
-					'event_tags_macro' => true
+					'event_tags_macro' => true,
+					'schemes' => CSettingsHelper::getAllowedUriSchemes()
 				]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_WEBHOOK]],
