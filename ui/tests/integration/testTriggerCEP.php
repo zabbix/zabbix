@@ -38,6 +38,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const LLD_DISCOVERY_COUNT = 4000;
 	const WAIT_ITERATIONS = 60;
 	const WAIT_ITERATION_DELAY = 1;
+	const STATE_CHANGE_WAIT_ITERATIONS = 15;
 
 	private static $hostid;
 	private static $disc_hostid;
@@ -66,6 +67,9 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+		// Disable audit log so the bulk of API operations below do not flood it.
+		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
+
 		// Retrieve template group ID.
 		$response = $this->call('templategroup.get', [
 			'filter' => ['name' => 'Templates']
@@ -2092,7 +2096,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'output' => ['triggerid', 'value', 'lastchange', 'state', 'recovery_mode', 'type', 'correlation_mode']
 		];
 		$this->callUntilDataIsPresent('trigger.get', $trigger_params,
-			120, self::WAIT_ITERATION_DELAY,
+			self::STATE_CHANGE_WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
 			function ($response) use ($triggerids, $expected_trigger_value, $prev_lastchanges, $now, $check_lastchange) {
 				$by_id = array_column($response['result'], null, 'triggerid');
 				$missing = 0;
@@ -2325,5 +2329,8 @@ class testTriggerCEP extends CIntegrationTest {
 			CDataHelper::call('template.delete', [self::$templateid]);
 			self::$templateid = null;
 		}
+
+		// Re-enable audit log disabled in prepareData().
+		CDataHelper::call('settings.update', ['auditlog_enabled' => 1, 'auditlog_mode' => 1]);
 	}
 }
