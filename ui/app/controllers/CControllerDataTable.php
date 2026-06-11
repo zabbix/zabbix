@@ -39,7 +39,7 @@ abstract class CControllerDataTable extends CController {
 
 		$this->setValidationRules([
 			'data_fields' =>		'required|array',
-			'options' =>			'array',
+			'options' =>			'required|array',
 			'filter' =>				'array',
 			'filter_counters' =>	'in 1',
 			'page' =>				'int32',
@@ -51,6 +51,12 @@ abstract class CControllerDataTable extends CController {
 
 	protected function checkInput(): bool {
 		$ret = $this->validateInput($this->validation_rules);
+
+		if ($ret) {
+			$options = $this->getInput('options');
+
+			$ret = array_key_exists('columns', $options) && is_array($options['columns']);
+		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -173,10 +179,6 @@ abstract class CControllerDataTable extends CController {
 	}
 
 	protected function extractCustomText(array &$options): array {
-		if (!array_key_exists('columns', $options) || !is_array($options['columns'])) {
-			return [];
-		}
-
 		$custom_text = [];
 
 		foreach ($options['columns'] as $column_index => &$column_options) {
@@ -191,11 +193,8 @@ abstract class CControllerDataTable extends CController {
 	}
 
 	protected function flattenColumnOptions(array &$options): void {
-		if (!array_key_exists('columns', $options) || !is_array($options['columns'])) {
-			return;
-		}
-
 		$column_options = [];
+
 		if (!empty($options['columns'])) {
 			$column_options = array_merge(...array_values($options['columns']));
 		}
