@@ -24,6 +24,7 @@ import (
 
 	"golang.zabbix.com/agent2/pkg/wildcard"
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin/itemutil"
 )
@@ -46,8 +47,8 @@ const (
 )
 
 var (
-	errInvalidRule                 = errors.New("invalid key access rule")
-	errRegexpPatternMustNotBeEmpty = errors.New("regular expression pattern must not be empty")
+	errInvalidRule                 = errs.New("invalid key access rule")
+	errRegexpPatternMustNotBeEmpty = errs.New("regular expression pattern must not be empty")
 
 	//nolint:gochecknoglobals // rules are loaded once and used across checks.
 	rules []*Rule
@@ -231,9 +232,9 @@ func addConfiguredRules(records []Record) error {
 	for _, r := range records {
 		err := addRule(r)
 		if err != nil {
-			return fmt.Errorf(
-				"%w: %s %q %s",
-				errInvalidRule,
+			return errs.Errorf(
+				"%s: %s %q %s",
+				errInvalidRule.Error(),
 				r.permissionName(),
 				r.Pattern,
 				err.Error(),
