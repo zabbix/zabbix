@@ -38,12 +38,14 @@ class testTriggerCEP extends CIntegrationTest {
 	const LLD_DISCOVERY_COUNT = 4000;
 	const WAIT_ITERATIONS = 60;
 	const WAIT_ITERATION_DELAY = 1;
+
+	// change iterations to fail faster when debugging
 	const STATE_CHANGE_WAIT_ITERATIONS = 15;
 
 	// When true, the *Restart test variants are skipped entirely. Set during development to avoid the
 	// slow server stop/start cycles; the non-restart tests still run (their @depends point at non-restart
 	// siblings, so they do not cascade-skip).
-	const SKIP_RESTART_TESTS = false;
+	const SKIP_RESTART_TESTS = true;
 
 
 	private static $hostid;
@@ -549,6 +551,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'recovery_expression' => '',
 			'correlation_mode' => ZBX_TRIGGER_CORRELATION_TAG,
 			'correlation_tag' => 'service',
+			'type' => TRIGGER_MULT_EVENT_ENABLED,
 			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 			'tags' => [
 				['tag' => 'component_{ITEM.VALUE}', 'value' => self::LLD_MACRO],
@@ -570,6 +573,7 @@ class testTriggerCEP extends CIntegrationTest {
 			],
 			'correlation_mode' => ZBX_TRIGGER_CORRELATION_TAG,
 			'correlation_tag' => 'service',
+			'type' => TRIGGER_MULT_EVENT_ENABLED,
 			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 			'tags' => [
 				['tag' => 'component_{ITEM.VALUE}', 'value' => self::LLD_MACRO],
@@ -611,7 +615,7 @@ class testTriggerCEP extends CIntegrationTest {
 		// Verify the discovered triggers reflect the updated expression and correlation config.
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
-			'output' => ['triggerid', 'correlation_mode', 'correlation_tag', 'manual_close', 'expression']
+			'output' => ['triggerid', 'correlation_mode', 'correlation_tag', 'manual_close', 'type', 'expression']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			if (count($response['result']) !== 2) {
 				return false;
@@ -619,7 +623,8 @@ class testTriggerCEP extends CIntegrationTest {
 			foreach ($response['result'] as $trigger) {
 				if ((int) $trigger['correlation_mode'] !== ZBX_TRIGGER_CORRELATION_TAG
 						|| $trigger['correlation_tag'] !== 'service'
-						|| (int) $trigger['manual_close'] !== ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED) {
+						|| (int) $trigger['manual_close'] !== ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
+						|| (int) $trigger['type'] !== TRIGGER_MULT_EVENT_ENABLED) {
 					return false;
 				}
 			}
@@ -633,6 +638,8 @@ class testTriggerCEP extends CIntegrationTest {
 				'Discovered trigger '.$trigger['triggerid'].' has unexpected correlation tag.');
 			$this->assertEquals(ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, $trigger['manual_close'],
 				'Discovered trigger '.$trigger['triggerid'].' has unexpected manual_close setting.');
+			$this->assertEquals(TRIGGER_MULT_EVENT_ENABLED, $trigger['type'],
+				'Discovered trigger '.$trigger['triggerid'].' was not updated to multiple-event mode.');
 		}
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -1202,7 +1209,10 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
-	 * @depends testTriggerCEP_DependentTriggerTagCorrelation
+	 * prepareDataServiceCorrelation() fully reconfigures the prototypes and resends LLD, so this
+	 * test is self-contained and only needs the discovered host/triggers from the LLD step.
+	 * Run in isolation as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentServiceCorrelation)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_EventAssessmentServiceCorrelation() {
 		$this->prepareDataServiceCorrelation();
@@ -2055,15 +2065,15 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 		else {
 			$response = $this->callUntilDataIsPresent('event.get', $params,
-				self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
+				self::STATE_CHANGE_WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
 				function ($response) use ($triggerids, $expected_count) {
 					$counts = array_fill_keys($triggerids, 0);
 					foreach ($response['result'] as $event) {
 						$counts[(int) $event['objectid']]++;
 					}
-					foreach ($counts as $count) {
+					foreach ($counts as $triggerid => $count) {
 						if ($count !== $expected_count) {
-							return false;
+							return 'expected '.$expected_count.' events for trigger '.$triggerid.', got '.$count;
 						}
 					}
 					return true;
