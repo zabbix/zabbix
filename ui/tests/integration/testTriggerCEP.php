@@ -239,7 +239,10 @@ class testTriggerCEP extends CIntegrationTest {
 				'CacheSize' => '128M',
 				'HistoryCacheSize' => '32M',
 				'HistoryIndexCacheSize' => '32M',
-				'ValueCacheSize' => '128M'
+				'ValueCacheSize' => '128M',
+				'HistoryProvider'=> [
+					'clickhouse;value_types="uint,dbl,str,log,text,json",url=http://localhost:8123,db=zabbix,username=zabbix,password=zabbix'
+				]
 			]
 		];
 	}
