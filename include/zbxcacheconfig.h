@@ -1298,7 +1298,8 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 /* special item key used for ICMP ping loss packages */
 #define ZBX_SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
 
-void	zbx_dc_drules_get_monitored(const zbx_uint64_t proxyid, zbx_vector_dc_drule_ptr_t *drules);
+int	zbx_dc_drule_get_monitored(const zbx_uint64_t druleid, const zbx_uint64_t proxyid, zbx_dc_drule_t *drule_out);
+int	zbx_dc_dcheck_get_uniq(const zbx_uint64_t dcheckid, unsigned char *uniq);
 void	zbx_dc_drules_get(time_t now, zbx_vector_dc_drule_ptr_t *drules, time_t *nextcheck);
 void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
 int	zbx_dc_drule_revisions_get(zbx_uint64_t *rev_last, zbx_vector_uint64_pair_t *revisions);
