@@ -172,7 +172,7 @@ abstract class CControllerDataTable extends CController {
 		return array_merge(...array_column($user_configs[$tabfilter_index]['columns'] ?? [], 'column_options'));
 	}
 
-	protected function extractCustomText(array $options): array {
+	protected function extractCustomText(array &$options): array {
 		if (!array_key_exists('columns', $options) || !is_array($options['columns'])) {
 			return [];
 		}
