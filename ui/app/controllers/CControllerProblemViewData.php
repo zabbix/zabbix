@@ -825,7 +825,6 @@ class CControllerProblemViewData extends CControllerDataTable {
 				'ns' => $problem['r_eventid'] != 0 ? $problem['r_ns'] : $problem['ns']
 			] + $custom_text;
 
-
 			foreach ($problem['symptoms'] as $s_eventid => $s_problem) {
 				$trigger = $data['triggers'][$s_problem['objectid']];
 				$problems[$s_eventid] = [
