@@ -51,7 +51,7 @@ class CControllerPopupActionOperationEdit extends CController {
 
 	protected function validateInputConstraints(): bool {
 		$eventsource = $this->getInput('eventsource');
-		$recovery = $this->getInput('recovery');
+		$recovery = $this->getInput('recovery', ACTION_OPERATION);
 		$allowed_operations = getAllowedOperations($eventsource);
 
 		if (!array_key_exists($recovery, $allowed_operations)) {
