@@ -256,6 +256,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 		unset($item);
 
 		$custom_text = $this->extractCustomText($options);
+		$this->flattenColumnOptions($options);
 
 		if ($custom_text) {
 			$this->resolveCustomText($data, $custom_text);

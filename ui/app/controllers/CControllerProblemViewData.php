@@ -565,6 +565,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 		}
 
 		$custom_text = $this->extractCustomText($options);
+		$this->flattenColumnOptions($options);
 
 		$show_opdata = in_array('opdata', $data_fields) ? OPERATIONAL_DATA_SHOW_SEPARATELY : OPERATIONAL_DATA_SHOW_NONE;
 

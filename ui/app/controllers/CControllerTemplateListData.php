@@ -172,6 +172,7 @@ class CControllerTemplateListData extends CControllerDataTable {
 		unset($template);
 
 		$custom_text = $this->extractCustomText($options);
+		$this->flattenColumnOptions($options);
 
 		if ($custom_text) {
 			$this->resolveCustomText($templates, $custom_text);

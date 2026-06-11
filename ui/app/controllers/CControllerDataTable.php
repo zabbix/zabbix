@@ -172,10 +172,14 @@ abstract class CControllerDataTable extends CController {
 		return array_merge(...array_column($user_configs[$tabfilter_index]['columns'] ?? [], 'column_options'));
 	}
 
-	protected function extractCustomText(array &$options): array {
+	protected function extractCustomText(array $options): array {
+		if (!array_key_exists('columns', $options) || !is_array($options['columns'])) {
+			return [];
+		}
+
 		$custom_text = [];
 
-		foreach ($options['columns'] ?? [] as $column_index => &$column_options) {
+		foreach ($options['columns'] as $column_index => &$column_options) {
 			if (array_key_exists('custom_text', $column_options)) {
 				$custom_text[$column_index] = $column_options['custom_text'];
 				unset($column_options['custom_text']);
@@ -183,11 +187,21 @@ abstract class CControllerDataTable extends CController {
 		}
 		unset($column_options);
 
-		$column_options = array_merge(...array_values($options['columns']));
-		unset($options['columns']);
-		$options = array_merge($options, $column_options);
-
 		return $custom_text;
+	}
+
+	protected function flattenColumnOptions(array &$options): void {
+		if (!array_key_exists('columns', $options) || !is_array($options['columns'])) {
+			return;
+		}
+
+		$column_options = [];
+		if (!empty($options['columns'])) {
+			$column_options = array_merge(...array_values($options['columns']));
+		}
+		unset($options['columns']);
+
+		$options = array_merge($options, $column_options);
 	}
 
 	protected function resolveCustomText(array &$objects, array $custom_text): void {

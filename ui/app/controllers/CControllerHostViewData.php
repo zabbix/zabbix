@@ -286,6 +286,7 @@ class CControllerHostViewData extends CControllerDataTable {
 		unset($host);
 
 		$custom_text = $this->extractCustomText($options);
+		$this->flattenColumnOptions($options);
 
 		if ($custom_text) {
 			$this->resolveCustomText($hosts, $custom_text);
