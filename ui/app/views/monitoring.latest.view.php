@@ -89,7 +89,7 @@ $html_page
 			->setName('items')
 			->addItem(new CVar('action', HISTORY_BATCH_GRAPH))
 			->addItem([
-				(new CDataTable())->setId('latest'),
+				(new CDataTable())->setId('datatable-latest'),
 				(new CActionButtonList('graphtype', 'itemids', [
 					GRAPH_TYPE_STACKED => [
 						'name' => _('Display stacked graph'),

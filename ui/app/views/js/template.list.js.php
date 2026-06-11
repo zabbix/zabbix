@@ -111,7 +111,7 @@
 
 			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
 
-			this.datatable = new CDataTable(document.getElementById('templates'), data_provider)
+			this.datatable = new CDataTable(document.getElementById('datatable-templates'), data_provider)
 				.setColumns([
 					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
 						.setFields(['templateid', 'name'])
