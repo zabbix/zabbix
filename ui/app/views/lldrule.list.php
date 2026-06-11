@@ -55,8 +55,8 @@ $filter = (new CFilter())
 	)
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
-	->addVar('action', $data['action'])
-	->addVar('context', $data['context'], uniqid('lldrule_'));
+	->addFormItem((new CVar('action', $data['action']))->removeId())
+	->addFormItem((new CVar('context', $data['context']))->removeId());
 
 $hg_ms_params = $data['context'] === 'host' ? ['with_hosts' => true] : ['with_templates' => true];
 
@@ -198,9 +198,12 @@ $url = (new CUrl('zabbix.php'))
 // create form
 $discoveryForm = (new CForm())
 	->setName('lldrule_list')
-	->addVar('context', $data['context'], uniqid('lldrule_'))
-	->addVar('hostid', $data['hostid'] != 0 ? $data['hostid'] : null)
+	->addItem((new CVar('context', $data['context']))->removeId())
 	->setName('discovery');
+
+if ($data['hostid'] != 0) {
+	$discoveryForm->addItem((new CVar('hostid', $data['hostid']))->removeId());
+}
 
 // create table
 $discoveryTable = (new CTableInfo())

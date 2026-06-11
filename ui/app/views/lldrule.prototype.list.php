@@ -49,7 +49,7 @@ $url = (new CUrl('zabbix.php'))
 $discoveryForm = (new CForm('post', $url))->setName('discovery_prototype');
 
 if ($data['hostid'] != 0) {
-	$discoveryForm->addVar('hostid', $data['hostid']);
+	$discoveryForm->addItem((new CVar('hostid', $data['hostid']))->removeId());
 }
 
 // create table
