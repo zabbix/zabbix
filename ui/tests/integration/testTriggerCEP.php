@@ -40,6 +40,12 @@ class testTriggerCEP extends CIntegrationTest {
 	const WAIT_ITERATION_DELAY = 1;
 	const STATE_CHANGE_WAIT_ITERATIONS = 15;
 
+	// When true, the *Restart test variants are skipped entirely. Set during development to avoid the
+	// slow server stop/start cycles; the non-restart tests still run (their @depends point at non-restart
+	// siblings, so they do not cascade-skip).
+	const SKIP_RESTART_TESTS = false;
+
+
 	private static $hostid;
 	private static $disc_hostid;
 	private static $templateid;
@@ -1016,6 +1022,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessment
 	 */
 	public function testTriggerCEP_EventAssessmentRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->runEventAssessmentTest(true);
 		$this->assertNoOpenProblems(self::$discovered_triggerids);
 	}
@@ -1050,6 +1057,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_DependentTriggerRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
 		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
@@ -1079,6 +1087,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessmentNone
 	 */
 	public function testTriggerCEP_EventAssessmentNoneRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataNoneOkEvent();
 		$this->runEventAssessmentTest(true);
 		$this->prepareDataRestoreRecovery();
@@ -1086,7 +1095,7 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
-	 * @depends testTriggerCEP_EventAssessmentNoneRestart
+	 * @depends testTriggerCEP_EventAssessmentNone
 	 */
 	public function testTriggerCEP_EventAssessmentRecoveryExpression() {
 		$this->clearDiscoveredItemHistory();
@@ -1099,12 +1108,13 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessmentRecoveryExpression
 	 */
 	public function testTriggerCEP_EventAssessmentRecoveryExpressionRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->runEventAssessmentTest(true);
 		$this->assertNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
-	 * @depends testTriggerCEP_EventAssessmentRecoveryExpressionRestart
+	 * @depends testTriggerCEP_EventAssessmentRecoveryExpression
 	 */
 	public function testTriggerCEP_DependentTriggerRecoveryExpression() {
 		$this->runDependentTriggerTest(false);
@@ -1115,12 +1125,13 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_DependentTriggerRecoveryExpression
 	 */
 	public function testTriggerCEP_DependentTriggerRecoveryExpressionRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
 		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
-	 * @depends testTriggerCEP_DependentTriggerRecoveryExpressionRestart
+	 * @depends testTriggerCEP_DependentTriggerRecoveryExpression
 	 */
 	public function testTriggerCEP_EventAssessmentMultipleEvent() {
 		$this->prepareDataMultipleEventsRecoveryExpression();
@@ -1132,12 +1143,13 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessmentMultipleEvent
 	 */
 	public function testTriggerCEP_EventAssessmentMultipleEventRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->runEventAssessmentTest(true);
 		$this->assertNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
-	 * @depends testTriggerCEP_EventAssessmentMultipleEventRestart
+	 * @depends testTriggerCEP_EventAssessmentMultipleEvent
 	 */
 	public function testTriggerCEP_DependentTriggerMultipleEvent() {
 		$this->runDependentTriggerTest(false);
@@ -1148,12 +1160,13 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_DependentTriggerMultipleEvent
 	 */
 	public function testTriggerCEP_DependentTriggerMultipleEventRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
 		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
-	 * @depends testTriggerCEP_DependentTriggerMultipleEventRestart
+	 * @depends testTriggerCEP_DependentTriggerMultipleEvent
 	 */
 	public function testTriggerCEP_EventAssessmentTagCorrelation() {
 		$this->prepareDataTagCorrelation();
@@ -1165,13 +1178,14 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessmentTagCorrelation
 	 */
 	public function testTriggerCEP_EventAssessmentTagCorrelationRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataTagCorrelation();
 		$this->runEventAssessmentTest(true);
 		$this->assertNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
-	 * @depends testTriggerCEP_EventAssessmentTagCorrelationRestart
+	 * @depends testTriggerCEP_EventAssessmentTagCorrelation
 	 */
 	public function testTriggerCEP_DependentTriggerTagCorrelation() {
 		$this->runDependentTriggerTest(false);
@@ -1182,12 +1196,13 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_DependentTriggerTagCorrelation
 	 */
 	public function testTriggerCEP_DependentTriggerTagCorrelationRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
 		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
-	 * @depends testTriggerCEP_DependentTriggerTagCorrelationRestart
+	 * @depends testTriggerCEP_DependentTriggerTagCorrelation
 	 */
 	public function testTriggerCEP_EventAssessmentServiceCorrelation() {
 		$this->prepareDataServiceCorrelation();
@@ -1199,6 +1214,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessmentServiceCorrelation
 	 */
 	public function testTriggerCEP_EventAssessmentServiceCorrelationRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataServiceCorrelation();
 		$this->runEventAssessmentTestCorrelation(true);
 		$this->assertNoOpenProblems(self::$discovered_triggerids);
@@ -1208,7 +1224,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * Same scenario as testTriggerCEP_EventAssessmentServiceCorrelation but the remaining
 	 * "down_1" problem is closed via manual close rather than an automatic recovery event.
 	 *
-	 * @depends testTriggerCEP_EventAssessmentServiceCorrelationRestart
+	 * @depends testTriggerCEP_EventAssessmentServiceCorrelation
 	 */
 	public function testTriggerCEP_EventAssessmentServiceCorrelationManualClose() {
 		$this->prepareDataServiceCorrelation();
@@ -1223,6 +1239,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessmentServiceCorrelationManualClose
 	 */
 	public function testTriggerCEP_EventAssessmentServiceCorrelationManualCloseRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataServiceCorrelation();
 		$this->runEventAssessmentTestCorrelationManualClose(true);
 		$this->assertNoOpenProblems(self::$discovered_triggerids);
@@ -1252,6 +1269,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCrossTrigger
 	 */
 	public function testTriggerCEP_EventAssessmentGlobalCorrelationCrossTriggerRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataGlobalCorrelation();
 		$this->runEventAssessmentTestGlobalCorrelationCrossTrigger(true);
 		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
@@ -1261,10 +1279,10 @@ class testTriggerCEP extends CIntegrationTest {
 	 * Send empty LLD data to delete all resources that were discovered during the test run
 	 * and verify the discovered triggers are actually removed.
 	 *
-	 * @depends testTriggerCEP_DependentTriggerRestart
-	 * @depends testTriggerCEP_EventAssessmentNoneRestart
-	 * @depends testTriggerCEP_EventAssessmentServiceCorrelationManualCloseRestart
-	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCrossTriggerRestart
+	 * @depends testTriggerCEP_DependentTrigger
+	 * @depends testTriggerCEP_EventAssessmentNone
+	 * @depends testTriggerCEP_EventAssessmentServiceCorrelationManualClose
+	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCrossTrigger
 	 */
 	public function testTriggerCEP_Cleanup() {
 		self::triggerCEP_Cleanup();
@@ -1925,6 +1943,16 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
+	}
+
+	/**
+	 * Skip the calling *Restart test when SKIP_RESTART_TESTS is enabled. The non-restart sibling
+	 * leaves the system in the same asserted state, so dependents can rely on it instead.
+	 */
+	private function skipIfRestartTestsDisabled(): void {
+		if (self::SKIP_RESTART_TESTS) {
+			$this->markTestSkipped('Restart test variants disabled via SKIP_RESTART_TESTS.');
+		}
 	}
 
 	private function buildItemLLDData(): string {
