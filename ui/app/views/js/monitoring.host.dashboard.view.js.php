@@ -174,20 +174,12 @@
 					this.#updateHistory({page, add_new: false});
 				})
 
-				ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_START, e => {
-					const {manually_toggled} = e.detail;
-
-					if (manually_toggled) {
-						this.#updateHistory({slideshow: DASHBOARD_SLIDESHOW_ON, add_new: false});
-					}
+				ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_START, () => {
+					this.#updateHistory({slideshow: DASHBOARD_SLIDESHOW_ON, add_new: false});
 				});
 
-				ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_STOP, e => {
-					const {manually_toggled} = e.detail;
-
-					if (manually_toggled) {
-						this.#updateHistory({slideshow: DASHBOARD_SLIDESHOW_OFF, add_new: false});
-					}
+				ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_STOP, () => {
+					this.#updateHistory({slideshow: DASHBOARD_SLIDESHOW_OFF, add_new: false});
 				});
 			}
 

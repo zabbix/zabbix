@@ -275,7 +275,7 @@ class CDashboard {
 		});
 	}
 
-	_startSlideshow(manually_toggled = false) {
+	_startSlideshow() {
 		if (this._slideshow_timeout_id !== null) {
 			clearTimeout(this._slideshow_timeout_id);
 		}
@@ -302,11 +302,9 @@ class CDashboard {
 
 		this._slideshow_switch_time = Date.now() + timeout_ms;
 		this._slideshow_timeout_id = setTimeout(() => this._switchSlideshow(), timeout_ms);
-
-		this.fire(CDashboard.EVENT_SLIDESHOW_START, {manually_toggled});
 	}
 
-	_stopSlideshow(manually_toggled = false) {
+	_stopSlideshow() {
 		if (this._slideshow_timeout_id === null) {
 			return;
 		}
@@ -329,8 +327,6 @@ class CDashboard {
 
 		this._slideshow_switch_time = null;
 		this._slideshow_timeout_id = null;
-
-		this.fire(CDashboard.EVENT_SLIDESHOW_STOP, {manually_toggled});
 	}
 
 	_switchSlideshow() {
@@ -2364,10 +2360,14 @@ class CDashboard {
 				}
 
 				if (this._isSlideshowRunning()) {
-					this._stopSlideshow(true);
+					this._stopSlideshow();
+
+					this.fire(CDashboard.EVENT_SLIDESHOW_STOP);
 				}
 				else {
-					this._startSlideshow(true);
+					this._startSlideshow();
+
+					this.fire(CDashboard.EVENT_SLIDESHOW_START);
 				}
 			},
 
