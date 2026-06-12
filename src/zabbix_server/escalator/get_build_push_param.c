@@ -417,7 +417,7 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 
 		if (0 == strcmp(event_value, "0"))
 		{
-			zbx_json_addstring(&json, "type", "problem.recovered", ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, "type", "problem.resolved", ZBX_JSON_TYPE_STRING);
 		}
 		else if (0 == strcmp(event_value, "1") && 0 != strcmp(event_update_action, "{EVENT.UPDATE.ACTION}"))
 		{
