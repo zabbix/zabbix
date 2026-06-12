@@ -38,7 +38,10 @@ class CControllerRegExCreate extends CController {
 						]
 					],
 					'expression' => [
-						['db expressions.expression', 'required', 'not_empty', 'use' => [CRegexValidator::class, []],
+						['db expressions.expression', 'required', 'not_empty', 'use' => [CRegexValidator::class, [
+							'messageInvalid' => _('Regular expression must be a string'),
+							'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
+						]],
 							'when' => ['expression_type', 'in' => [EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE]]
 						],
 						['db expressions.expression', 'required', 'not_empty', 'when' => ['expression_type', 'in' => [

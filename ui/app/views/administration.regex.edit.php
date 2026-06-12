@@ -37,6 +37,7 @@ $table = (new CTable())
 		_('Expression'),
 		_('Delimiter'),
 		_('Case sensitive'),
+		_('Result'),
 		''
 	]);
 
@@ -103,21 +104,9 @@ $form_grid = (new CFormGrid())
 		)
 	)
 	->addItem([
-		null,
-		new CFormField((new CButton('test-expression', _('Test')))->addClass(ZBX_STYLE_BTN_ALT))
+		new Clabel(_('Combined result')),
+		new CFormField((new CSpan())->setId('test-result-combined'))
 	])
-	->addItem(new CLabel(_('Result')))
-	->addItem((new CFormField())
-		->addItem((new CDiv())
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-			->addItem((new CTable())
-				->setHeader([_('Expression type'), _('Expression'), _('Result')])
-				->setId('test-result-table')
-				->setAttribute('style', 'width: 100%;')
-			)
-		)
-	)
 	->addItem((new CTemplateTag('row-expression-template'))
 		->addItem(new CPartial('administration.regex.entry', [
 			'index' => '#{index}',
@@ -128,20 +117,7 @@ $form_grid = (new CFormGrid())
 			'options_delimiter' => $options_delimiter,
 			'options_expression_type' => $options_expression_type
 		]))
-	)
-	->addItem((new CTemplateTag('combined-result-template'))
-		->addItem((new CRow())
-			->addClass('js-expression-result-row')
-			->addItem((new CCol(_('Combined result')))->setColspan(2))
-			->addItem((new CSpan('#{result}'))->addClass('#{result_class}'))
-		))
-	->addItem((new CTemplateTag('result-row-template'))
-		->addItem((new CRow())
-			->addClass('js-expression-result-row')
-			->addItem(new CCol('#{type}'))
-			->addItem(new CCol('#{expression}'))
-			->addItem(new CCol((new CSpan('#{result}'))->addClass('#{result_class}')))
-		));
+	);
 
 $form->addItem($form_grid);
 
@@ -157,6 +133,12 @@ if ($data['regexp']['regexpid'] != 0) {
 		[
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
+			'keepOpen' => true,
+			'isSubmit' => false
+		],
+		[
+			'title' => _('Test'),
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test']),
 			'keepOpen' => true,
 			'isSubmit' => false
 		],
@@ -177,7 +159,13 @@ else {
 			'class' => 'js-submit',
 			'keepOpen' => true,
 			'isSubmit' => true
-		]
+		],
+		[
+			'title' => _('Test'),
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test']),
+			'keepOpen' => true,
+			'isSubmit' => false
+		],
 	];
 }
 

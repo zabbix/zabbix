@@ -57,6 +57,11 @@
 		->setErrorLabel(_('Case sensitive'))
 	)
 	->addItem((new CCol())
+		->setId('expressions_'.$data['index'].'_result')
+		->addClass('js-expression-result')
+		->addClass(ZBX_STYLE_NOWRAP)
+	)
+	->addItem((new CCol())
 		->addClass(ZBX_STYLE_NOWRAP)
 		->addItem((new CButton('remove', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
@@ -68,5 +73,5 @@
 (new CRow())->addItem((new CCol())
 	->setId('expressions-'.$data['index'].'-error-container')
 	->addClass(ZBX_STYLE_ERROR_CONTAINER)
-	->setAttribute('colspan', 5))
+	->setAttribute('colspan', 6))
 	->show();

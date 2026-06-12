@@ -63,8 +63,6 @@ window.regex_edit_popup = new class {
 		return_url.searchParams.set('action', 'regex.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
-		this.#test_results = document.getElementById('test-result-table').querySelector('tbody');
-
 		this.#initActions();
 	}
 
@@ -72,6 +70,7 @@ window.regex_edit_popup = new class {
 		this.#footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
 		this.#footer.querySelector('.js-clone')?.addEventListener('click', () => this.#clone());
 		this.#footer.querySelector('.js-delete')?.addEventListener('click', () => this.#delete());
+		this.#footer.querySelector('.js-test').addEventListener('click', () => this.#testExpression());
 
 		const table = document.getElementById('regular-expressions-table');
 
@@ -83,8 +82,21 @@ window.regex_edit_popup = new class {
 			node.addEventListener('change', e => this.#updateRow(e))
 		);
 
-		document.getElementById('test-expression').addEventListener('click', () => this.#testExpression());
-		//document.getElementById('tab_test').addEventListener('click', () => this.#testExpression());
+		table.querySelectorAll('textarea').forEach(node =>
+			node.addEventListener('change', e => this.#clearRowResult(e))
+		);
+
+		document.getElementById('test-string').addEventListener('input', () => {
+			table.querySelectorAll('.js-expression-result')
+				.forEach(cell => {
+					cell.textContent = '';
+					cell.classList.remove(ZBX_STYLE_GREEN, ZBX_STYLE_RED);
+				})
+
+			this.#hideCombinedResult();
+		})
+
+		this.#hideCombinedResult();
 	}
 
 	#submit() {
@@ -92,8 +104,6 @@ window.regex_edit_popup = new class {
 
 		const fields = this.#form.getAllValues();
 		const curl = new Curl('zabbix.php');
-		console.log(document.getElementById('regexpid'));
-		console.log(this.#regexpid);
 
 		curl.setArgument('action', document.getElementById('regexpid') !== null ? 'regex.update' : 'regex.create');
 
@@ -117,6 +127,12 @@ window.regex_edit_popup = new class {
 			{
 				title: <?= json_encode(_('Add')) ?>,
 				class: 'js-submit',
+				keepOpen: true,
+				isSubmit: true
+			},
+			{
+				title: <?= json_encode(_('Test')) ?>,
+				class: 'js-test',
 				keepOpen: true,
 				isSubmit: true
 			},
@@ -168,7 +184,6 @@ window.regex_edit_popup = new class {
 				return;
 			}
 
-
 			overlayDialogueDestroy(this.#overlay.dialogueid);
 			this.#overlay.$dialogue[0].dispatchEvent(
 				new CustomEvent('dialogue.submit', {detail: response})
@@ -203,9 +218,10 @@ window.regex_edit_popup = new class {
 
 	#removeRow(e) {
 		const row = e.target.closest('tr');
-
 		row.nextSibling.remove();
 		row.remove();
+
+		this.#hideCombinedResult();
 	}
 
 	#addRow() {
@@ -223,118 +239,94 @@ window.regex_edit_popup = new class {
 
 		row.querySelector('button[name="remove"]').addEventListener('click', e => this.#removeRow(e));
 		row.querySelector('.js-expression-type-select').addEventListener('change', e => this.#updateRow(e));
+		row.querySelector('textarea').addEventListener('input', e => this.#clearRowResult(e));
+
+		this.#hideCombinedResult();
 	}
 
 	#testExpression() {
-		Object.values(this.#form.findFieldByName('expressions').getFields())
-			.forEach(field => field.setChanged());
-		this.#form.validateChanges(['expressions']);
+		const fields = this.#form.getAllValues();
 
-		const {expressions, test_string} = this.#form.getAllValues();
-		const curl = new Curl(this.#form_element.getAttribute('action'));
+		this.#form.validateSubmit(fields)
+			.then(result => {
+				if (!result) {
+					this.#overlay.unsetLoading();
+					return;
+				}
 
-		curl.setArgument('action', 'regex.test');
+				const {expressions, test_string} = fields;
+				const curl = new Curl('zabbix.php');
 
-		this.#setTestLoadingStatus();
+				curl.setArgument('action', 'regex.test');
 
-		clearMessages();
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({expressions, test_string})
-		})
-			.then(response => response.json())
-			.then(response => this.#showTestResult(response, expressions))
-			.catch(exception => this.#ajaxExceptionHandler(exception))
-			.finally(() => this.#unsetTestLoadingStatus());
+				this.#setTestLoadingStatus();
+
+				clearMessages();
+				fetch(curl.getUrl(), {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify({expressions, test_string})
+				})
+					.then(response => response.json())
+					.then(response => this.#showTestResult(response, expressions))
+					.catch(exception => this.#ajaxExceptionHandler(exception))
+					.finally(() => this.#unsetTestLoadingStatus());
+			});
 	}
 
 	#setTestLoadingStatus() {
-		const button = document.getElementById('test-expression');
+		// TODO:: need to use the this.#form.lock() method after the merge task ZBXNEXT-10393
 		const textarea = document.getElementById('test-string');
 
-		button.classList.add('is-loading');
-		button.disabled = true;
 		textarea.disabled = true;
 	}
 
 	#unsetTestLoadingStatus() {
-		const button = document.getElementById('test-expression');
+		// TODO:: need to use the this.#form.unlock() method after the merge task ZBXNEXT-10393
 		const textarea = document.getElementById('test-string');
 
-		button.classList.remove('is-loading');
-		button.disabled = false;
 		textarea.disabled = false;
+
+		this.#overlay.unsetLoading();
 	}
 
 	#showTestResult(response, expressions) {
-		this.#test_results.querySelectorAll('.js-expression-result-row').forEach(row => row.remove());
+		document.querySelectorAll('#regular-expressions-table .js-expression-result')
+			.forEach(cell => {
+				cell.textContent = '';
+				cell.className = cell.className.replace(ZBX_STYLE_GREEN, '').replace(ZBX_STYLE_RED, '')
+			})
 
-		const indexes = Object.keys(expressions);
-		const message = response.final ? <?= json_encode(_('TRUE')) ?> : <?= json_encode(_('FALSE')) ?>;
-		const combined_result = {message, result: response.final};
-
-		if (indexes.length == 0) {
-			return this.#addTestResultCombined(false, <?= json_encode(_('UNKNOWN')) ?>);
-		}
-
-		for (let index of indexes) {
+		for (const index of Object.keys(expressions)) {
 			const result = response.expressions[index];
-			const error = response.errors[index];
-			const expression = expressions[index];
+			const cell = document.getElementById(`expressions_${index}_result`);
 
-			if (error !== undefined) {
-				combined_result.message = <?= json_encode(_('UNKNOWN')) ?>;
-				this.#addTestResult(expression, result, error);
+			if (!cell) {
+				continue;
 			}
-			else {
-				this.#addTestResult(expression, result, result
-					? <?= json_encode(_('TRUE')) ?>
-					: <?= json_encode(_('FALSE')) ?>
-				);
-			}
+
+			cell.textContent = result ? <?= json_encode(_('TRUE')) ?> : <?= json_encode(_('FALSE')) ?>;
+			cell.classList.add(result ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 		}
 
-		this.#addTestResultCombined(combined_result.result, combined_result.message);
+		this.#setCombinedResult(response.final);
 	}
 
-	#addTestResultCombined(result, message) {
-		const template = new Template(document.getElementById('combined-result-template').innerHTML);
+	#setCombinedResult(result) {
+		const span = document.getElementById('test-result-combined');
 
-		this.#test_results.append(template.evaluateToElement({
-			result_class: result ? '<?= ZBX_STYLE_GREEN ?>' : '<?= ZBX_STYLE_RED ?>',
-			result: message
-		}));
-	}
+		span.textContent = result ? <?= json_encode(_('TRUE')) ?> : <?= json_encode(_('FALSE')) ?>;
+		span.className = '';
 
-	#addTestResult({expression_type, expression}, result, message) {
-		const template = new Template(document.getElementById('result-row-template').innerHTML);
+		span.classList.add(result ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 
-		this.#test_results.append(template.evaluateToElement({
-			expression,
-			type: this.#expressionTypeToString(expression_type),
-			result: message,
-			result_class: result ? '<?= ZBX_STYLE_GREEN ?>' : '<?= ZBX_STYLE_RED ?>'
-		}));
-	}
-
-	#expressionTypeToString(type) {
-		switch (+type) {
-			case <?= EXPRESSION_TYPE_INCLUDED ?>:
-				return <?= json_encode(_('Contains string')) ?>;
-			case <?= EXPRESSION_TYPE_ANY_INCLUDED ?>:
-				return <?= json_encode(_('String is in list')) ?>;
-			case <?= EXPRESSION_TYPE_NOT_INCLUDED ?>:
-				return <?= json_encode(_('Does not contain string')) ?>;
-			case <?= EXPRESSION_TYPE_TRUE ?>:
-				return <?= json_encode(_('Matches regular expression')) ?>;
-			case <?= EXPRESSION_TYPE_FALSE ?>:
-				return <?= json_encode(_('Does not match regular expression')) ?>;
-		}
+		span.closest('.form-field').previousElementSibling.style.display = '';
+		span.closest('.form-field').style.display = '';
 	}
 
 	#updateRow({target}) {
 		if (target.classList.contains('js-expression-type-select')) {
+			const row = target.closest('tr');
 			const delimiter = target.closest('tr').querySelector('.js-expression-delimiter-select');
 
 			if (target.value == <?= EXPRESSION_TYPE_ANY_INCLUDED ?>) {
@@ -345,6 +337,34 @@ window.regex_edit_popup = new class {
 				delimiter.disabled = true;
 				delimiter.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 			}
+
+			const cell = row.querySelector('.js-expression-result');
+
+			if (cell) {
+				cell.textContent = '';
+				cell.classList.remove(ZBX_STYLE_GREEN, ZBX_STYLE_RED);
+			}
+
+			this.#hideCombinedResult();
 		}
+	}
+
+	#hideCombinedResult() {
+		const span = document.getElementById('test-result-combined');
+
+		span.textContent = '';
+		span.closest('.form-field').previousElementSibling.style.display = 'none';
+		span.closest('.form-field').style.display = 'none';
+	}
+
+	#clearRowResult(e) {
+		const cell = e.target.closest('tr').querySelector('.js-expression-result');
+
+		if(cell) {
+			cell.textContent = '';
+			cell.classList.remove(ZBX_STYLE_GREEN, ZBX_STYLE_RED);
+		}
+
+		this.#hideCombinedResult();
 	}
 };
