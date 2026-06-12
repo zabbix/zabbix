@@ -88,6 +88,13 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 			return FAIL;
 		}
 
+		if (NULL != config_vault->app_role_id)
+		{
+			*error = zbx_dsprintf(*error, "configuration parameter \"VaultAppRoleID\" cannot be used"
+					" with CyberArk vault");
+			return FAIL;
+		}
+
 		zbx_vault_get_kvs_cb = zbx_vault_get_kvs_cyberark;
 		zbx_vault_dbuser_key = ZBX_CYBERARK_DBUSER_KEY;
 		zbx_vault_dbpassword_key = ZBX_CYBERARK_DBPASSWORD_KEY;
