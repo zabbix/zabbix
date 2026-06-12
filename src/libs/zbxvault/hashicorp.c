@@ -189,7 +189,13 @@ int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const
 			}
 
 			if (ZBX_HTTP_STATUS_CODE_FORBIDDEN == response_code && NULL != vault_ret)
+			{
+				*error = zbx_dsprintf(*error,
+						"AppRole token is likely expired or revoked, re-login initiated");
+
 				*vault_ret = FAIL;
+				goto fail;
+			}
 		}
 		*error = zbx_dsprintf(*error, "unsuccessful response code \"%ld\"", response_code);
 		goto fail;
@@ -315,7 +321,9 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "renewable", &value, &value_alloc, NULL) ||
 				0 != strcmp(value, "true"))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot renew vault token: token is not renewable");
+			int	log_level = (NULL == app_role_id) ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG;
+
+			zabbix_log(log_level, "cannot renew vault token: token is not renewable");
 			status = SUCCEED;
 			renewable = 0;
 			goto out;
