@@ -24,7 +24,6 @@ static void	cep_task_event_free(void *mw_task);
 static void	cep_task_close_event_free(void *mw_task);
 static void	cep_task_event_commit_free(void *mw_task);
 static void	cep_task_add_tags_free(void *mw_task);
-static void	cep_task_set_event_name_free(void *mw_task);
 static void	cep_task_sync_event_free(void *mw_task);
 
 /******************************************************************************
@@ -286,19 +285,6 @@ static void	cep_task_add_tags_free(void *mw_task)
 		zbx_cep_event_handle_release(task->updates.values[i].handle);
 	zbx_vector_cep_event_update_destroy(&task->updates);
 
-	zbx_free(task);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: free 'set event name' task                                        *
- *                                                                            *
- ******************************************************************************/
-static void	cep_task_set_event_name_free(void *mw_task)
-{
-	zbx_cep_task_set_event_name_t	*task = (zbx_cep_task_set_event_name_t *)mw_task;
-
-	zbx_free(task->name);
 	zbx_free(task);
 }
 

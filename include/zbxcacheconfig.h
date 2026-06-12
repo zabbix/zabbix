@@ -1902,7 +1902,7 @@ typedef struct
 
 	zbx_vector_cep_window_condition_t	conditions;
 }
-zbx_cep_window_t;
+zbx_cep_rule_window_t;
 
 typedef struct
 {
@@ -1913,7 +1913,7 @@ typedef struct
 	int			stop;
 	int			sortorder;
 
-	zbx_cep_window_t	*window;
+	zbx_cep_rule_window_t	*window;
 
 	zbx_vector_cep_condition_t	conditions;
 	zbx_vector_cep_operation_t	operations;

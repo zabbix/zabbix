@@ -220,7 +220,7 @@ static void	cep_window_condition_clear(zbx_cep_window_condition_t *condition)
  * Purpose: free CEP window                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	cep_window_free(zbx_cep_window_t *window)
+static void	cep_window_free(zbx_cep_rule_window_t *window)
 {
 	for (int i = 0; i < window->conditions.values_num; i++)
 		cep_window_condition_clear(&window->conditions.values[i]);
@@ -242,11 +242,11 @@ static void	cep_window_free(zbx_cep_window_t *window)
  * Return value: pointer to the created CEP window                            *
  *                                                                            *
  ******************************************************************************/
-static zbx_cep_window_t	*cep_window_create(void)
+static zbx_cep_rule_window_t	*cep_window_create(void)
 {
-	zbx_cep_window_t	*window;
+	zbx_cep_rule_window_t	*window;
 
-	window = (zbx_cep_window_t *)zbx_calloc(NULL, 1, sizeof(zbx_cep_window_t));
+	window = (zbx_cep_rule_window_t *)zbx_calloc(NULL, 1, sizeof(zbx_cep_rule_window_t));
 	zbx_vector_cep_window_condition_create(&window->conditions);
 
 	return window;
@@ -261,9 +261,9 @@ static zbx_cep_window_t	*cep_window_create(void)
  * Return value: pointer to the cloned CEP window                             *
  *                                                                            *
  ******************************************************************************/
-static zbx_cep_window_t	*cep_window_clone(const zbx_cep_window_t *window)
+static zbx_cep_rule_window_t	*cep_window_clone(const zbx_cep_rule_window_t *window)
 {
-	zbx_cep_window_t	*clone;
+	zbx_cep_rule_window_t	*clone;
 
 	if (NULL == window)
 		return NULL;
@@ -807,7 +807,7 @@ static void	cep_window_condition_dump(zbx_cep_window_condition_t *condition)
  * Purpose: dump a CEP window to log                                          *
  *                                                                            *
  ******************************************************************************/
-static void	cep_window_dump(zbx_cep_window_t *window)
+static void	cep_window_dump(zbx_cep_rule_window_t *window)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "  window type:%d duration:%s capacity:%s evaltype:%d formula:%s group_by:%x"
 			" group_tag:%s event_count_tag:%s",
@@ -1232,7 +1232,7 @@ static void	cep_sync_windows(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, z
 	{
 		zbx_cep_rule_t		*rule;
 		zbx_uint64_t		ruleid;
-		zbx_cep_window_t	*window;
+		zbx_cep_rule_window_t	*window;
 		zbx_uint32_t		group_by = ZBX_CEP_GROUP_BY_NONE;
 
 		/* removed rows will be always added at the end */

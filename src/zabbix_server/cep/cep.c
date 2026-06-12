@@ -13,6 +13,7 @@
 **/
 
 #include "cep.h"
+#include "cep_window.h"
 #include "zbxcep.h"
 #include "zbxcep_client.h"
 
@@ -98,6 +99,8 @@ struct zbx_cep
 
 	/* object -> events index */
 	zbx_hashset_t			objects;
+
+	zbx_hashset_t			windows;
 
 	zbx_uint64_t			eventid_next;
 	zbx_uint64_t			eventid_last;
@@ -340,11 +343,14 @@ zbx_cep_t	*cep_create(void)
 	zbx_hashset_create_ext(&cep->objects, 100, cep_object_hash, cep_object_compare, cep_object_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
+	cep_window_index_init(&cep->windows);
+
 	return cep;
 }
 
 void	cep_destroy(zbx_cep_t *cep)
 {
+	zbx_hashset_destroy(&cep->windows);
 	zbx_hashset_destroy(&cep->objects);
 
 	zbx_hashset_iter_t	iter;
@@ -355,7 +361,6 @@ void	cep_destroy(zbx_cep_t *cep)
 	{
 		zbx_cep_event_release(h->event);
 	}
-
 	zbx_hashset_destroy(&cep->events);
 
 	zbx_free(cep);

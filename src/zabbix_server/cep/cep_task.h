@@ -90,14 +90,6 @@ typedef struct
 }
 zbx_cep_task_commit_t;
 
-typedef struct
-{
-	zbx_mw_task_t	base;
-	zbx_uint64_t	eventid;
-	char		*name;
-}
-zbx_cep_task_set_event_name_t;
-
 #define CEP_SYNC_EVENT_NAME		0x01
 #define CEP_SYNC_EVENT_SEVERITY		0x02
 #define CEP_SYNC_EVENT_TAGS		0x04

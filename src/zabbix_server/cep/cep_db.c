@@ -922,16 +922,6 @@ typedef struct
 }
 zbx_cep_event_sync_t;
 
-static int	cep_event_sync_compare(const void *a1, const void *a2)
-{
-	const zbx_cep_event_sync_t *s1 = (const zbx_cep_event_sync_t *)a1;
-	const zbx_cep_event_sync_t *s2 = (const zbx_cep_event_sync_t *)a2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(s1->hevent, s2->hevent);
-
-	return 0;
-}
-
 ZBX_VECTOR_DECL(cep_event_sync, zbx_cep_event_sync_t)
 ZBX_VECTOR_IMPL(cep_event_sync, zbx_cep_event_sync_t)
 
