@@ -185,9 +185,7 @@
 							this.#edit();
 						});
 
-					const url = new Curl();
-
-					this.#updateHistory({page: url.getArgument('page'), add_new: false});
+					this.#updateHistory({add_new: false});
 				}
 			}
 
