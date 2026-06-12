@@ -4924,7 +4924,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			$parameters = [
 				'Name' => 'New dashboard',
 				'Default slideshow interval' => '30 seconds',
-				'Start slideshow' => true
+				'Start slideshow' => false
 			];
 			$buttons = ['Apply', 'Cancel'];
 			$display_periods = ['10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'];

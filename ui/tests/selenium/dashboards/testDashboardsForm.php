@@ -66,7 +66,7 @@ class testDashboardsForm extends CWebTest {
 		'Owner' => 'Admin (Zabbix Administrator)',
 		'Name' => 'New dashboard',
 		'Default slideshow interval' => '30 seconds',
-		'Start slideshow' => true
+		'Start slideshow' => false
 	];
 
 	/**
