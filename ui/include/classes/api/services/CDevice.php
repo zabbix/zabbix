@@ -183,7 +183,8 @@ class CDevice extends CApiService {
 		$device = [
 			'deviceid' => $deviceid,
 			'name' => '',
-			'userid' => $data['userid']
+			'userid' => $data['userid'],
+			'uuid'=> $uuid
 		];
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_DEVICE, [$device]);
