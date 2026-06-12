@@ -2318,7 +2318,7 @@ int	zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 
 	if (NULL == (peer_cert = zbx_ssl_get_peer_cert(s->tls_ctx->ctx)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "no peer certificate, SSL_get_peer_certificate() returned NULL");
+		zabbix_log(LOG_LEVEL_WARNING, "no peer certificate, zbx_ssl_get_peer_cert() returned NULL");
 		return FAIL;
 	}
 
