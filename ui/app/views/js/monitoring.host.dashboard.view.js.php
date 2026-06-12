@@ -172,7 +172,7 @@
 					const page = dashboard_page_index > 0 ? dashboard_page_index + 1 : 1;
 
 					this.#updateHistory({page, add_new: false});
-				})
+				});
 
 				ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_START, () => {
 					this.#updateHistory({slideshow: DASHBOARD_SLIDESHOW_ON, add_new: false});
@@ -220,6 +220,9 @@
 
 			if (page !== null) {
 				curl.setArgument('page', page);
+			}
+			else {
+				curl.unsetArgument('page');
 			}
 
 			slideshow = slideshow || url.getArgument('slideshow');
