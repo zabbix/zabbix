@@ -990,6 +990,39 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Smoke test (part 1/2): a discovered trigger opens a problem on OK→PROBLEM.
+	 * The problem is left open and closed by testTriggerCEP_CloseProblem.
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenProblem() {
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		// OK→PROBLEM: one PROBLEM event per trigger; trigger value goes TRUE.
+		$this->captureEventBaseline($triggerids);
+		$this->assertStateChangeForAll($triggerids, $keys, '1', TRIGGER_VALUE_TRUE, 1);
+	}
+
+	/**
+	 * Smoke test (part 2/2): the problem opened by testTriggerCEP_OpenProblem closes on PROBLEM→OK.
+	 * Runs as a separate test so the open problem persists across the test boundary before recovery.
+	 *
+	 * @depends testTriggerCEP_OpenProblem
+	 */
+	public function testTriggerCEP_CloseProblem() {
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		// PROBLEM→OK: one RESOLVED event per trigger. The baseline is per-test-instance, so it is
+		// recaptured here (now past the open event) and the close adds exactly one more event.
+		$this->captureEventBaseline($triggerids);
+		$this->assertStateChangeForAll($triggerids, $keys, '0', TRIGGER_VALUE_FALSE, 1);
+		$this->waitForNoOpenProblems($triggerids, 'close problem');
+		$this->assertNoOpenProblems(self::$discovered_triggerids);
+	}
+
+	/**
 	 * Verify CEP behaviour on the discovered trigger:
 	 *
 	 *   1. Send value 1        → trigger fires   (NORMAL / PROBLEM)
