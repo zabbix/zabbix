@@ -133,12 +133,13 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->query('button:Reset')->one()->click();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getTable();
 		$filter->getField('Linked templates')->fill([
 				'values' => 'Template ZBX6663 Second',
 				'context' => 'Templates'
 		]);
 		$filter->submit();
-		$this->zbxTestWaitForPageToLoad();
+		$table->waitUntilReloaded();
 		$this->assertTableDataColumn(['Template ZBX6663 First']);
 		$this->assertTableDataColumn(['Template ZBX6663 Second'], 'Linked templates');
 		$this->assertTableStats(1);

@@ -314,10 +314,12 @@ class testPagesWithoutData extends CWebTest {
 		$this->page->login()->open($url);
 
 		if (array_key_exists('filter', $data)) {
+			$table = $this->getTable();
 			$form = $this->query('name:zbx_filter')->asForm()->one();
 			CFilterElement::find()->one()->selectTab('Filter');
 			$form->fill($data['filter']);
 			$form->submit();
+			$table->waitUntilReloaded();
 		}
 
 		if (CTestArrayHelper::get($data, 'page') === 'SLA report') {
