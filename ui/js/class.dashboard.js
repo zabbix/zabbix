@@ -1273,9 +1273,8 @@ class CDashboard {
 
 	_setInitialDashboardPage(dashboard_page) {
 		const dashboard_page_index = this.getDashboardPageIndex(dashboard_page);
-		const page = dashboard_page_index > 0 ? dashboard_page_index + 1 : 1;
 
-		this.fire(CDashboard.EVENT_PAGE_SELECTED, {page});
+		this.fire(CDashboard.EVENT_PAGE_SELECTED, {dashboard_page_index});
 	}
 
 	_getInitialDashboardPage() {

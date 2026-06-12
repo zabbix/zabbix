@@ -168,16 +168,17 @@
 				});
 
 				ZABBIX.Dashboard.on(CDashboard.EVENT_PAGE_SELECTED, e => {
-					const {page} = e.detail;
+					const {dashboard_page_index} = e.detail;
+					const page = dashboard_page_index > 0 ? dashboard_page_index + 1 : 1;
 
-					new CState(location.href).setParams({page: page === 1 ? null : page});
+					this.#updateHistory({page, add_new: false});
 				})
 
 				ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_STARTED, e => {
 					const {manually_toggled} = e.detail;
 
 					if (manually_toggled) {
-						new CState(location.href).setParams({slideshow: DASHBOARD_SLIDESHOW_ON});
+						this.#updateHistory({slideshow: DASHBOARD_SLIDESHOW_ON, add_new: false});
 					}
 				});
 
@@ -185,7 +186,7 @@
 					const {manually_toggled} = e.detail;
 
 					if (manually_toggled) {
-						new CState(location.href).setParams({slideshow: DASHBOARD_SLIDESHOW_OFF});
+						this.#updateHistory({slideshow: DASHBOARD_SLIDESHOW_OFF, add_new: false});
 					}
 				});
 			}
@@ -210,6 +211,37 @@
 			}
 
 			this.#initPopupListeners();
+		}
+
+		#updateHistory({slideshow = null, page = null, add_new = true} = {})  {
+			const curl = new Curl('zabbix.php');
+
+			curl.setArgument('action', 'host.dashboard.view');
+			curl.setArgument('hostid', this.#hostid);
+			curl.setArgument('dashboardid', this.#dashboardid);
+
+			const state = {};
+
+			const url = new Curl();
+
+			page = page || url.getArgument('page');
+
+			if (page !== null) {
+				curl.setArgument('page', page);
+			}
+
+			slideshow = slideshow || url.getArgument('slideshow');
+
+			if (slideshow !== null) {
+				curl.setArgument('slideshow', slideshow);
+			}
+
+			if (add_new) {
+				history.pushState(state, '', curl.getUrl());
+			}
+			else {
+				history.replaceState(state, '', curl.getUrl());
+			}
 		}
 
 		#activateHostDashboardNavigation() {
