@@ -2004,13 +2004,19 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 					activechks_args_in->config_buffer_size))
 			{
 				retry_after = 0 == retry_after ? RETRY_INTERVAL_MIN : retry_after * 2;
-				nextrefresh = time(NULL) + (retry_after > RETRY_INTERVAL_MAX ?
-						RETRY_INTERVAL_MAX : retry_after);
+
+				if (retry_after > RETRY_INTERVAL_MAX)
+					retry_after = RETRY_INTERVAL_MAX;
+
+				nextrefresh = time(NULL) + retry_after;
 			}
 			else
 			{
 				nextrefresh = time(NULL) + activechks_args_in->config_refresh_active_checks;
 				nextcheck = 0;
+
+				if (0 != retry_after)
+					retry_after = 0;
 			}
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 			zbx_remove_inactive_persistent_files(&persistent_inactive_vec);

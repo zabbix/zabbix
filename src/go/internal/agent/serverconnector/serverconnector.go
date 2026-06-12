@@ -420,6 +420,10 @@ run:
 					nextRefresh += retryAfter
 				} else {
 					nextRefresh += int64(c.options.RefreshActiveChecks)
+
+					if retryAfter != 0 {
+						retryAfter = 0
+					}
 				}
 			} else if !c.resultCache.IsUploadEnabled() && (now+retryIntervalMax) < nextRefresh {
 				retryAfter = retryIntervalMin
