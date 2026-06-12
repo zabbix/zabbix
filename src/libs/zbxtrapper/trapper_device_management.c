@@ -212,29 +212,30 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 		goto out;
 	}
 
+	if (SUCCEED != zbx_curl_setopt_https(curl, &error_curl))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL HTTPS options: %s",
+				ZBX_NULL2EMPTY_STR(error_curl));
+		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		goto out;
+	}
+
+	if (SUCCEED != zbx_curl_setopt_ssl_version(curl, &error_curl))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL SSL version: %s",
+				ZBX_NULL2EMPTY_STR(error_curl));
+		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		goto out;
+	}
+
 	if (NULL != config_tls->ca_file && NULL != config_tls->cert_file && NULL != config_tls->key_file)
 	{
-		if (SUCCEED != zbx_curl_setopt_https(curl, &error_curl))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL HTTPS options: %s",
-					ZBX_NULL2EMPTY_STR(error_curl));
-			*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
-			goto out;
-		}
-
-		if (SUCCEED != zbx_curl_setopt_ssl_version(curl, &error_curl))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL SSL version: %s",
-					ZBX_NULL2EMPTY_STR(error_curl));
-			*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
-			goto out;
-		}
-
 		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_tls->ca_file)) ||
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT,
 				config_tls->cert_file)) ||
-				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_tls->key_file))
-				|| CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
+				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY,
+				config_tls->key_file)) ||
+				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYHOST, 2L)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
@@ -242,11 +243,6 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 			*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
 			goto out;
 		}
-	}
-	else
-	{
-		if (NULL != config_tls->ca_file || NULL != config_tls->cert_file || NULL != config_tls->key_file)
-			THIS_SHOULD_NEVER_HAPPEN;
 	}
 
 	if (NULL != config_bridge_adapter_connect_to)

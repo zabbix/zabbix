@@ -595,26 +595,27 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		goto out;
 	}
 
+	if (SUCCEED != zbx_curl_setopt_https(curl, &error_curl))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL HTTPS options: %s",
+				ZBX_NULL2EMPTY_STR(error_curl));
+		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		goto out;
+	}
+
+	if (SUCCEED != zbx_curl_setopt_ssl_version(curl, &error_curl))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL SSL version: %s",
+				ZBX_NULL2EMPTY_STR(error_curl));
+		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		goto out;
+	}
+
 	if (NULL != config_bridge_adapter_ca_file && NULL != config_bridge_adapter_cert_file &&
 			NULL != config_bridge_adapter_key_file)
 	{
-		if (SUCCEED != zbx_curl_setopt_https(curl, &error_curl))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL HTTPS options: %s",
-					ZBX_NULL2EMPTY_STR(error_curl));
-			error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
-			goto out;
-		}
-
-		if (SUCCEED != zbx_curl_setopt_ssl_version(curl, &error_curl))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL SSL version: %s",
-					ZBX_NULL2EMPTY_STR(error_curl));
-			error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
-			goto out;
-		}
-
-		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_bridge_adapter_ca_file)) ||
+		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO,
+				config_bridge_adapter_ca_file)) ||
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT,
 				config_bridge_adapter_cert_file)) ||
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY,
