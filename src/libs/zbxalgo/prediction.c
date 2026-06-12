@@ -424,7 +424,7 @@ static int	zbx_regression(double *t, double *x, int n, zbx_fit_t fit, int k, zbx
 	{
 		if (0 == isfinite(coefficients->elements[i]))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "regression produced non-finite coefficient");
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): regression produced non-finite coefficient", __func__);
 			res = FAIL;
 			goto out;
 		}
@@ -979,7 +979,7 @@ static void	zbx_log_expression(double now, zbx_fit_t fit, int k, zbx_matrix_t *c
 double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fit_t fit, unsigned k, zbx_mode_t mode)
 {
 	zbx_matrix_t	*coefficients = NULL;
-	double		left, right, result;
+	double		result;
 	int		res;
 
 	if (1 == n)
@@ -1007,20 +1007,32 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 		/* linear 2-point estimate for linear and logarithmic fits in value mode.     */
 		if ((FIT_LINEAR == fit || FIT_LOGARITHMIC == fit) && MODE_VALUE == mode)
 		{
-			int	i_min_t = 0, i_max_t = 0;
-			double	t_span;
+			int	i_min_t, i_max_t;
+			double	delta_t;
 
-			for (int i = 1; i < n; i++)
+			/* The value cache may return data in either ascending or descending */
+			/* time order. Find indices of min and max timestamp.                */
+
+			if (t[0] < t[n-1])
 			{
-				if (t[i] < t[i_min_t])	i_min_t = i;
-				if (t[i] > t[i_max_t])	i_max_t = i;
+				i_min_t = 0;
+				i_max_t = n - 1;
 			}
-
-			if (0.0 < (t_span = t[i_max_t] - t[i_min_t]))
+			else if (t[0] > t[n-1])
 			{
-				double	slope = (x[i_max_t] - x[i_min_t]) / t_span;
+				i_min_t = n - 1;
+				i_max_t = 0;
+			}
+			else
+				i_min_t = i_max_t = 0;
+
+			if (0.0 < (delta_t = t[i_max_t] - t[i_min_t]))
+			{
+				double	slope = (x[i_max_t] - x[i_min_t]) / delta_t;
 
 				result = x[i_max_t] + slope * (now + time - t[i_max_t]);
+
+				/* NaN and +/-Inf in 'result' are handled below, on return */
 				res = SUCCEED;
 			}
 		}
@@ -1058,6 +1070,8 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 
 	if (FIT_LINEAR == fit || FIT_EXPONENTIAL == fit || FIT_LOGARITHMIC == fit || FIT_POWER == fit)
 	{
+		double	left, right;
+
 		/* fit is monotone, therefore maximum and minimum are either at now or at now + time */
 		if (SUCCEED != zbx_calculate_value(now, coefficients, fit, &left) ||
 				SUCCEED != zbx_calculate_value(now + time, coefficients, fit, &right))
@@ -1178,42 +1192,75 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 
 	if (SUCCEED != (res = zbx_regression(t, x, n, fit, k, coefficients)))
 	{
-		/* When regression fails due to overflow with extreme values, fall back to a linear        */
-		/* 2-point slope estimate using the oldest and newest data points. The value cache may    */
-		/* return data in either ascending or descending time order, so scan for the actual       */
-		/* min-t and max-t indices rather than assuming array ordering.                           */
+		/* When regression fails due to overflow with extreme values, fall back to a linear */
+		/* 2-point slope estimate using the oldest and newest data points.                  */
+
 		if (FIT_LINEAR == fit || FIT_LOGARITHMIC == fit)
 		{
-			int	i_min_t = 0, i_max_t = 0;
-			double	t_span, slope, val_now;
+			int	i_min_t, i_max_t;
+			double	delta_t;
 
-			for (int i = 1; i < n; i++)
+			/* The value cache may return data in either ascending or descending */
+			/* time order. Find indices of min and max timestamp.                */
+
+			if (t[0] < t[n-1])
 			{
-				if (t[i] < t[i_min_t])	i_min_t = i;
-				if (t[i] > t[i_max_t])	i_max_t = i;
+				i_min_t = 0;
+				i_max_t = n - 1;
 			}
-
-			if (0.0 < (t_span = t[i_max_t] - t[i_min_t]))
+			else if (t[0] > t[n-1])
 			{
-				slope = (x[i_max_t] - x[i_min_t]) / t_span;
+				i_min_t = n - 1;
+				i_max_t = 0;
+			}
+			else
+				i_min_t = i_max_t = 0;
+
+			if (0.0 < (delta_t = t[i_max_t] - t[i_min_t]))
+			{
+				double	slope = (x[i_max_t] - x[i_min_t]) / delta_t;
 
 				if (0 == isfinite(slope))
 				{
 					/* Slope overflowed — use trend direction and newest value to decide. */
 					result = (x[i_max_t] > x[i_min_t]) ?
 							((x[i_max_t] >= threshold) ? DBL_MAX : 0.0) :
-							((x[i_max_t] <= threshold) ? 0.0 : DBL_MAX);
+							((x[i_max_t] <= threshold) ? DBL_MAX : 0.0);
 				}
 				else
 				{
-					val_now = x[i_max_t] + slope * (now - t[i_max_t]);
+					double	val_now = x[i_max_t] + slope * (now - t[i_max_t]);
 
-					if (0 != isfinite(val_now) && val_now > threshold && 0.0 > slope)
-						result = (threshold - val_now) / slope;
-					else if (val_now > threshold)
-						result = DBL_MAX;
+					if (0 != isnan(val_now))
+						goto out;
+
+					if (0 != isfinite(val_now))
+					{
+						if (val_now > threshold)
+						{
+							if (0.0 > slope)
+								result = (threshold - val_now) / slope;
+							else
+								result = DBL_MAX;
+						}
+						else if (val_now < threshold)
+						{
+							if (0.0 < slope)
+								result = (threshold - val_now) / slope;
+							else
+								result = DBL_MAX;
+						}
+						else
+							result = 0.0;
+					}
 					else
-						result = 0.0;
+					{
+						/* val_now overflowed — use trend direction and newest */
+						/* value to decide. */
+						result = (x[i_max_t] > x[i_min_t]) ?
+								((x[i_max_t] >= threshold) ? DBL_MAX : 0.0) :
+								((x[i_max_t] <= threshold) ? DBL_MAX : 0.0);
+					}
 				}
 
 				res = SUCCEED;
