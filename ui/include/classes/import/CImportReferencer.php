@@ -51,6 +51,7 @@ class CImportReferencer {
 	protected $host_prototypes = [];
 	protected $httptests = [];
 	protected $httpsteps = [];
+	protected $dashboards = [];
 
 	protected $db_template_groups;
 	protected $db_host_groups;
@@ -78,6 +79,9 @@ class CImportReferencer {
 	protected $db_host_prototypes;
 	protected $db_httptests;
 	protected $db_httpsteps;
+	protected $db_dashboards;
+	protected $db_dashboard_pages;
+	protected $db_widgets;
 
 	/**
 	 * Get template group ID by group UUID.
@@ -894,6 +898,71 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Get global dashboard ID by dashboard name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findDashboardidByName(string $name): ?string {
+		if ($this->db_dashboards === null) {
+			$this->selectDashboards();
+		}
+
+		foreach ($this->db_dashboards as $dashboardid => $dashboard) {
+			if ($dashboard['name'] === $name) {
+				return $dashboardid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get global dashboard page ID by dashboard ID and dashboard page index.
+	 *
+	 * @param string $dashboardid
+	 * @param int    $index
+	 *
+	 * @return string|null
+	 */
+	public function findDashboardPageidByIndex(string $dashboardid, int $index): ?string {
+		if ($this->db_dashboard_pages === null) {
+			$this->selectDashboards();
+		}
+
+		if (array_key_exists($dashboardid, $this->db_dashboard_pages)
+				&& array_key_exists($index, $this->db_dashboard_pages[$dashboardid])) {
+			return $this->db_dashboard_pages[$dashboardid][$index]['dashboard_pageid'];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get global dashboard widget ID by dashboard page ID and widget position on the dashboard.
+	 *
+	 * @param string $dashboard_pageid
+	 * @param int    $x
+	 * @param int    $y
+	 *
+	 * @return string|null
+	 */
+	public function findWidgetidByPosition(string $dashboard_pageid, int $x, int $y): ?string {
+		if ($this->db_widgets === null) {
+			$this->selectDashboards();
+		}
+
+		if (array_key_exists($dashboard_pageid, $this->db_widgets)
+				&& array_key_exists($x, $this->db_widgets[$dashboard_pageid])
+				&& array_key_exists($y, $this->db_widgets[$dashboard_pageid][$x])) {
+			return $this->db_widgets[$dashboard_pageid][$x][$y]['widgetid'];
+		}
+
+		return null;
+	}
+
+	/**
 	 * Add template group names that need association with a database group ID.
 	 *
 	 * @param array $groups
@@ -1231,6 +1300,17 @@ class CImportReferencer {
 	 */
 	public function addHttpSteps(array $httpsteps): void {
 		$this->httpsteps = $httpsteps;
+	}
+
+	/**
+	 * Add global dashboard names that need association with a database dashboard ID.
+	 *
+	 * Will associate dashboard pages and widgets with the related database object IDs.
+	 *
+	 * @param array $dashboards
+	 */
+	public function addDashboards(array $dashboards): void {
+		$this->dashboards = $dashboards;
 	}
 
 	/**
@@ -2057,5 +2137,49 @@ class CImportReferencer {
 				];
 			}
 		}
+	}
+
+	/**
+	 * Select global dashboards, dashboard pages and widgets for previously added dashboard names.
+	 *
+	 * @throws APIException
+	 */
+	protected function selectDashboards(): void {
+		$this->db_dashboards = [];
+		$this->db_dashboard_pages = [];
+		$this->db_widgets = [];
+
+		if (!$this->dashboards) {
+			return;
+		}
+
+		$this->db_dashboards = API::Dashboard()->get([
+			'output' => ['name'],
+			'selectPages' => ['dashboard_pageid', 'widgets'],
+			'filter' => [
+				'name' => array_keys($this->dashboards)
+			],
+			'searchByAny' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($this->db_dashboards as $dashboardid => &$dashboard) {
+			foreach ($dashboard['pages'] as $index => $dashboard_page) {
+				$this->db_dashboard_pages[$dashboardid][$index] = [
+					'dashboard_pageid' => $dashboard_page['dashboard_pageid']
+				];
+
+				foreach ($dashboard_page['widgets'] as $widget) {
+					$this->db_widgets[$dashboard_page['dashboard_pageid']][$widget['x']][$widget['y']] = [
+						'widgetid' => $widget['widgetid']
+					];
+				}
+			}
+
+			unset($dashboard['pages']);
+		}
+		unset($dashboard);
+
+		$this->dashboards = [];
 	}
 }

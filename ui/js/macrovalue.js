@@ -39,10 +39,9 @@
 	function btnUndoClickEventHandle() {
 		var $this = $(this),
 			$container = $this.closest('.macro-input-group'),
-			$input_container = $('.input-secret, .textarea-flexible', $container),
-			$input = $('.input-secret input[type=password], .textarea-flexible', $container),
+			$input_container = $('.input-secret, z-textarea-flexible', $container),
+			$input = $('.input-secret input[type=password], z-textarea-flexible', $container),
 			$dropdown_value = $('.dropdown-value', $container);
-
 		$input_container.replaceWith(
 			$('<div>')
 				.addClass('input-secret')
@@ -113,7 +112,7 @@
 		else {
 			$container.removeClass(ZBX_STYLE_MACRO_VALUE_TEXT + ' ' + ZBX_STYLE_MACRO_VALUE_VAULT);
 
-			var $curr_control = $('.textarea-flexible', $container),
+			var $curr_control = $('z-textarea-flexible', $container),
 				$input = $curr_control;
 		}
 
@@ -157,8 +156,7 @@
 				$curr_control.data('is-activated', true);
 			}
 
-			const $textarea = $('<textarea>')
-				.addClass('textarea-flexible')
+			const $textarea = $('<z-textarea-flexible>')
 				.attr({
 					id: $input.attr('id'),
 					name: $input.attr('name'),
@@ -169,14 +167,12 @@
 					'data-error-container': $input.attr('data-error-container'),
 					'data-error-label': $input.attr('data-error-label')
 				})
-				.text($input.is(':disabled') ? '' : $input.val())
+				.val($input.is(':disabled') ? '' : $input.val())
 				.on('focus blur', btnUndoFocusEventHandle)
 
 			$curr_control.replaceWith($textarea);
 
 			$textarea[0].dispatchEvent(new Event('input', {bubbles: true}));
-
-			$('.textarea-flexible', $container).textareaFlexible();
 		}
 	}
 
@@ -192,7 +188,6 @@
 				$('.dropdown-value', $(this))
 					.off('change', inputDropdownValueChangeEventHandle)
 					.on('change', inputDropdownValueChangeEventHandle);
-				$('.textarea-flexible', $(this)).textareaFlexible();
 			});
 		}
 	};

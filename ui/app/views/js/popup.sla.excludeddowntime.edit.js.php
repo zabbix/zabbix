@@ -17,30 +17,46 @@
 
 window.sla_excluded_downtime_edit_popup = new class {
 
-	init() {
+	init({rules}) {
 		this.overlay = overlays_stack.getById('sla_excluded_downtime_edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
+
+		this.form.findFieldByName('duration_hours')._field.onchange = () => {
+			this.form.findFieldByName('duration_minutes').setChanged();
+			this.form.validateChanges(['duration_minutes']);
+		};
+
+		this.form.findFieldByName('duration_days')._field.onchange = () => {
+			this.form.findFieldByName('duration_minutes').setChanged();
+			this.form.validateChanges(['duration_minutes']);
+		};
 	}
 
 	submit() {
-		const fields = getFormFields(this.form);
+		this.#removePopupMessages();
 
-		fields.name = fields.name.trim();
+		const fields = this.form.getAllValues();
 
 		this.overlay.setLoading();
 
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'sla.excludeddowntime.validate');
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.overlay.unsetLoading();
 
-		this._post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+					return;
+				}
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
-		});
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'sla.excludeddowntime.validate');
+
+				this.#post(curl.getUrl(), fields);
+			});
 	}
 
-	_post(url, data, success_callback) {
+	#post(url, data) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -52,32 +68,42 @@ window.sla_excluded_downtime_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				return response;
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+
+					return;
+				}
+
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
 			})
-			.then(success_callback)
-			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => this.overlay.unsetLoading());
+	}
 
-				let title, messages;
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
 
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
 
-				const message_box = makeMessageBox('bad', messages, title)[0];
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
 
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
 };

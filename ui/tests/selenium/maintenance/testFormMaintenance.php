@@ -17,8 +17,6 @@ require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * Tests for "Configuration -> Maintenance".
  *
@@ -165,14 +163,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$form->getField('Periods')->query('button:Add')->one()->waitUntilClickable()->click();
 		$period_overlay = COverlayDialogElement::find(1)->waitUntilReady()->one();
 
-		$periods = [
-			'One time only',
-			'Daily',
-			'Weekly',
-			'Monthly',
-			'Monthly with Day of week period'
-		];
-
+		$periods = ['One time only', 'Daily', 'Weekly', 'Monthly', 'Monthly with Day of week period'];
 		foreach ($periods as $period_type) {
 			if ($period_type === 'Monthly with Day of week period') {
 				$period_overlay->asForm()->fill(['Period type' => 'Monthly', 'Date' => 'Day of week']);
@@ -190,6 +181,12 @@ class testFormMaintenance extends CLegacyWebTest {
 				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;',
 					[$dialog_footer->query('button', $button)->one()]
 				);
+			}
+
+			// Remove border radius from Date field segment.
+			if ($period_type === 'Monthly with Day of week period') {
+				$segment = $period_overlay->asForm()->getField('Date')->query('xpath:.//label[text()="Day of week"]')->one();
+				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;', [$segment]);
 			}
 
 			if ($period_type === 'One time only') {

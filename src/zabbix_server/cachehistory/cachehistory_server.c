@@ -432,8 +432,8 @@ static void	recalculate_triggers(const zbx_dc_history_t *history, int history_nu
 			if (0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
 				continue;
 
-			itemids[item_num] = h->itemid;
-			timespecs[item_num] = h->ts;
+			itemids[item_num] = h->entry.itemid;
+			timespecs[item_num] = h->entry.ts;
 			item_num++;
 		}
 	}
@@ -507,26 +507,27 @@ static void	DCinventory_value_add(zbx_vector_inventory_value_ptr_t *inventory_va
 		return;
 	}
 
-	switch (h->value_type)
+	switch (h->entry.value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_print_double(value, sizeof(value), h->value.dbl);
+			zbx_print_double(value, sizeof(value), h->entry.value.dbl);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, h->value.ui64);
+			zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, h->entry.value.ui64);
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			zbx_strscpy(value, h->value.str);
+			zbx_strscpy(value, h->entry.value.str);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			return;
 	}
 
-	zbx_format_value(value, sizeof(value), item->valuemapid, ZBX_NULL2EMPTY_STR(item->units), h->value_type);
+	zbx_format_value(value, sizeof(value), item->valuemapid, ZBX_NULL2EMPTY_STR(item->units), h->entry.value_type);
 
 	inventory_value = (zbx_inventory_value_t *)zbx_malloc(NULL, sizeof(zbx_inventory_value_t));
 
@@ -558,7 +559,7 @@ static void	DCinventory_value_free(zbx_inventory_value_t *inventory_value)
 static void	dc_history_set_error(zbx_dc_history_t *hdata, char *errmsg)
 {
 	zbx_dc_history_clean_value(hdata);
-	hdata->value.err = errmsg;
+	hdata->entry.value.err = errmsg;
 	hdata->state = ITEM_STATE_NOTSUPPORTED;
 	hdata->flags |= ZBX_DC_FLAG_UNDEF;
 }
@@ -575,6 +576,7 @@ static void	dc_history_set_error(zbx_dc_history_t *hdata, char *errmsg)
 static void	dc_history_set_value(zbx_dc_history_t *hdata, unsigned char value_type, zbx_variant_t *value)
 {
 	char	*errmsg = NULL;
+	size_t	value_len;
 
 	if (FAIL == zbx_variant_to_value_type(value, value_type, &errmsg))
 	{
@@ -586,44 +588,54 @@ static void	dc_history_set_value(zbx_dc_history_t *hdata, unsigned char value_ty
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
 			zbx_dc_history_clean_value(hdata);
-			hdata->value.dbl = value->data.dbl;
+			hdata->entry.value.dbl = value->data.dbl;
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_dc_history_clean_value(hdata);
-			hdata->value.ui64 = value->data.ui64;
+			hdata->entry.value.ui64 = value->data.ui64;
 			break;
 		case ITEM_VALUE_TYPE_STR:
 			zbx_dc_history_clean_value(hdata);
-			hdata->value.str = value->data.str;
-			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_STR_VALUE_LEN)] = '\0';
+			hdata->entry.value.str = value->data.str;
+			value_len = zbx_db_strlen_n(hdata->entry.value.str, ZBX_HISTORY_STR_VALUE_LEN);
+			hdata->entry.value.str[value_len] = '\0';
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
 			zbx_dc_history_clean_value(hdata);
-			hdata->value.str = value->data.str;
-			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_TEXT_VALUE_LEN)] = '\0';
+			hdata->entry.value.str = value->data.str;
+			value_len = zbx_db_strlen_n(hdata->entry.value.str, ZBX_HISTORY_TEXT_VALUE_LEN);
+			hdata->entry.value.str[value_len] = '\0';
 			break;
 		case ITEM_VALUE_TYPE_BIN:
 			zbx_dc_history_clean_value(hdata);
-			hdata->value.str = value->data.str;
-			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_BIN_VALUE_LEN)] = '\0';
+			hdata->entry.value.str = value->data.str;
+			value_len = zbx_db_strlen_n(hdata->entry.value.str, ZBX_HISTORY_BIN_VALUE_LEN);
+			hdata->entry.value.str[value_len] = '\0';
+			break;
+		case ITEM_VALUE_TYPE_JSON:
+			zbx_dc_history_clean_value(hdata);
+			hdata->entry.value.str = value->data.str;
+			value_len = zbx_db_strlen_n(hdata->entry.value.str, ZBX_HISTORY_JSON_VALUE_LEN);
+			hdata->entry.value.str[value_len] = '\0';
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			if (ITEM_VALUE_TYPE_LOG != hdata->value_type)
+			if (ITEM_VALUE_TYPE_LOG != hdata->entry.value_type)
 			{
 				zbx_dc_history_clean_value(hdata);
-				hdata->value.log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
-				memset(hdata->value.log, 0, sizeof(zbx_log_value_t));
+				hdata->entry.value.log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
+				memset(hdata->entry.value.log, 0, sizeof(zbx_log_value_t));
 			}
-			hdata->value.log->value = value->data.str;
-			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
+			hdata->entry.value.log->value = value->data.str;
+			value_len = zbx_db_strlen_n(hdata->entry.value.str, ZBX_HISTORY_LOG_VALUE_LEN);
+			hdata->entry.value.str[value_len] = '\0';
 			break;
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
-	hdata->value_type = value_type;
+	hdata->entry.value_type = value_type;
 	zbx_variant_set_none(value);
 }
 
@@ -648,57 +660,67 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, zbx_dc_his
 		return;
 
 	if (0 == (hdata->flags & ZBX_DC_FLAG_NOHISTORY))
-		hdata->ttl = item->history_sec;
+		hdata->entry.ttl = item->history_sec;
 
-	if (item->value_type == hdata->value_type)
+	if (item->value_type == hdata->entry.value_type)
 	{
+		size_t	value_len;
+
 		/* truncate text based values if necessary */
-		switch (hdata->value_type)
+		switch (hdata->entry.value_type)
 		{
 			case ITEM_VALUE_TYPE_STR:
-				hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_STR_VALUE_LEN)] = '\0';
+				value_len = zbx_db_strlen_n(hdata->entry.value.str, ZBX_HISTORY_STR_VALUE_LEN);
+				hdata->entry.value.str[value_len] = '\0';
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
-				hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_TEXT_VALUE_LEN)] = '\0';
+				value_len = zbx_db_strlen_n(hdata->entry.value.str, ZBX_HISTORY_TEXT_VALUE_LEN);
+				hdata->entry.value.str[value_len] = '\0';
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				logvalue = hdata->value.log->value;
+				logvalue = hdata->entry.value.log->value;
 				logvalue[zbx_db_strlen_n(logvalue, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
+				break;
+			case ITEM_VALUE_TYPE_JSON:
+				/* JSON values do not need to be truncated since their sizes are already checked */
+				/* before inserting them into history cache. */
 				break;
 			case ITEM_VALUE_TYPE_BIN:
 				/* in history cache binary values are stored as ITEM_VALUE_TYPE_STR */
 				THIS_SHOULD_NEVER_HAPPEN;
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
-				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl))
+				if (FAIL == zbx_validate_value_dbl(hdata->entry.value.dbl))
 				{
 					char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
 					dc_history_set_error(hdata, zbx_dsprintf(NULL,
 							"Value %s is too small or too large.",
-							zbx_print_double(buffer, sizeof(buffer), hdata->value.dbl)));
+							zbx_print_double(buffer, sizeof(buffer),
+									hdata->entry.value.dbl)));
 				}
 				break;
 		}
 		return;
 	}
 
-	switch (hdata->value_type)
+	switch (hdata->entry.value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_variant_set_dbl(&value_var, hdata->value.dbl);
+			zbx_variant_set_dbl(&value_var, hdata->entry.value.dbl);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			zbx_variant_set_ui64(&value_var, hdata->value.ui64);
+			zbx_variant_set_ui64(&value_var, hdata->entry.value.ui64);
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			zbx_variant_set_str(&value_var, hdata->value.str);
-			hdata->value.str = NULL;
+		case ITEM_VALUE_TYPE_JSON:
+			zbx_variant_set_str(&value_var, hdata->entry.value.str);
+			hdata->entry.value.str = NULL;
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			zbx_variant_set_str(&value_var, hdata->value.log->value);
-			hdata->value.log->value = NULL;
+			zbx_variant_set_str(&value_var, hdata->entry.value.log->value);
+			hdata->entry.value.log->value = NULL;
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -746,18 +768,19 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 		if (ITEM_STATE_NOTSUPPORTED == h->state)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" became not supported: %s",
-					item->host.host, item->key_orig, h->value.str);
+					item->host.host, item->key_orig, h->entry.value.str);
 
 			if (NULL != add_event_cb)
 			{
-				add_event_cb(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state,
-						NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, h->value.err);
+				add_event_cb(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->entry.ts,
+						h->state, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL,
+						h->entry.value.err);
 			}
 
-			zbx_sha512_hash(h->value.err, error_hash);
+			zbx_sha512_hash(h->entry.value.err, error_hash);
 
 			if (0 != memcmp(item->error_hash, error_hash, sizeof(error_hash)))
-				item_error = h->value.err;
+				item_error = h->entry.value.err;
 		}
 		else
 		{
@@ -768,8 +791,8 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 			{
 				/* we know it's EVENT_OBJECT_ITEM because LLDRULE that becomes */
 				/* supported is handled in lld_process_discovery_rule()        */
-				add_event_cb(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state,
-						NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, NULL);
+				add_event_cb(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->entry.ts,
+						h->state, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, NULL);
 			}
 
 			item_error = "";
@@ -778,13 +801,13 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 	}
 	else if (ITEM_STATE_NOTSUPPORTED == h->state)
 	{
-		zbx_sha512_hash(h->value.err, error_hash);
+		zbx_sha512_hash(h->entry.value.err, error_hash);
 		if (0 != memcmp(item->error_hash, error_hash, sizeof(item->error_hash)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "error reason for \"%s:%s\" changed: %s", item->host.host,
-					item->key_orig, h->value.err);
+					item->key_orig, h->entry.value.err);
 
-			item_error = h->value.err;
+			item_error = h->entry.value.err;
 		}
 	}
 
@@ -832,17 +855,18 @@ static int	history_value_compare_func(const void *d1, const void *d2)
 	const zbx_dc_history_t	*i1 = *(const zbx_dc_history_t * const *)d1;
 	const zbx_dc_history_t	*i2 = *(const zbx_dc_history_t * const *)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(i1->itemid, i2->itemid);
-	ZBX_RETURN_IF_NOT_EQUAL(i1->value_type, i2->value_type);
-	ZBX_RETURN_IF_NOT_EQUAL(i1->ts.sec, i2->ts.sec);
-	ZBX_RETURN_IF_NOT_EQUAL(i1->ts.ns, i2->ts.ns);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->entry.itemid, i2->entry.itemid);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->entry.value_type, i2->entry.value_type);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->entry.ts.sec, i2->entry.ts.sec);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->entry.ts.ns, i2->entry.ts.ns);
 
 	return 0;
 }
 
-static void	vc_flag_duplicates(zbx_vector_dc_history_ptr_t *history_index, zbx_vector_dc_history_ptr_t *duplicates)
+static int	vc_remove_duplicates(zbx_vector_dc_history_ptr_t *history_index,
+		zbx_vector_dc_history_ptr_t *duplicates)
 {
-	int	i;
+	int	i, dup_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -857,10 +881,14 @@ static void	vc_flag_duplicates(zbx_vector_dc_history_ptr_t *history_index, zbx_v
 
 			zbx_dc_history_clean_value(cached_value);
 			cached_value->flags |= ZBX_DC_FLAGS_NOT_FOR_HISTORY;
+			dup_num++;
+			zbx_vector_dc_history_ptr_remove(history_index, idx_cached);
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): duplicates:%d", __func__, dup_num);
+
+	return dup_num;
 }
 
 static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, unsigned char value_type,
@@ -878,11 +906,11 @@ static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, unsigned char 
 	{
 		zbx_dc_history_t	*d = (zbx_dc_history_t *)zbx_malloc(NULL, sizeof(zbx_dc_history_t));
 
-		ZBX_STR2UINT64(d->itemid, row[0]);
-		d->ts.sec = atoi(row[1]);
-		d->ts.ns = atoi(row[2]);
+		ZBX_STR2UINT64(d->entry.itemid, row[0]);
+		d->entry.ts.sec = atoi(row[1]);
+		d->entry.ts.ns = atoi(row[2]);
 
-		d->value_type = value_type;
+		d->entry.value_type = value_type;
 
 		zbx_vector_dc_history_ptr_append(duplicates, d);
 	}
@@ -891,43 +919,44 @@ static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, unsigned char 
 	zbx_free(query->sql);
 }
 
-static void	remove_history_duplicates(zbx_vector_dc_history_ptr_t *history)
+static int	remove_history_duplicates(zbx_vector_dc_history_ptr_t *history)
 {
-	int				i;
+	int				i, dup_num;
 	zbx_history_dupl_select_t	select_flt = {.table_name = "history"},
 					select_uint = {.table_name = "history_uint"},
 					select_str = {.table_name = "history_str"},
 					select_log = {.table_name = "history_log"},
 					select_text = {.table_name = "history_text"},
-					select_bin = {.table_name = "history_bin"};
-	zbx_vector_dc_history_ptr_t	duplicates, history_index;
+					select_bin = {.table_name = "history_bin"},
+					select_json = {.table_name = "history_json"};
+	zbx_vector_dc_history_ptr_t	duplicates;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_dc_history_ptr_create(&duplicates);
-	zbx_vector_dc_history_ptr_create(&history_index);
 
-	zbx_vector_dc_history_ptr_append_array(&history_index, history->values, history->values_num);
-	zbx_vector_dc_history_ptr_sort(&history_index, history_value_compare_func);
+	zbx_vector_dc_history_ptr_sort(history, history_value_compare_func);
 
-	for (i = 0; i < history_index.values_num; i++)
+	for (i = 0; i < history->values_num; i++)
 	{
-		zbx_dc_history_t		*h = history_index.values[i];
+		zbx_dc_history_t		*h = history->values[i];
 		zbx_history_dupl_select_t	*select_ptr;
 		char				*separator = " or";
 
-		if (h->value_type == ITEM_VALUE_TYPE_FLOAT)
+		if (h->entry.value_type == ITEM_VALUE_TYPE_FLOAT)
 			select_ptr = &select_flt;
-		else if (h->value_type == ITEM_VALUE_TYPE_UINT64)
+		else if (h->entry.value_type == ITEM_VALUE_TYPE_UINT64)
 			select_ptr = &select_uint;
-		else if (h->value_type == ITEM_VALUE_TYPE_STR)
+		else if (h->entry.value_type == ITEM_VALUE_TYPE_STR)
 			select_ptr = &select_str;
-		else if (h->value_type == ITEM_VALUE_TYPE_LOG)
+		else if (h->entry.value_type == ITEM_VALUE_TYPE_LOG)
 			select_ptr = &select_log;
-		else if (h->value_type == ITEM_VALUE_TYPE_TEXT)
+		else if (h->entry.value_type == ITEM_VALUE_TYPE_TEXT)
 			select_ptr = &select_text;
-		else if (h->value_type == ITEM_VALUE_TYPE_BIN)
+		else if (h->entry.value_type == ITEM_VALUE_TYPE_BIN)
 			select_ptr = &select_bin;
+		else if (h->entry.value_type == ITEM_VALUE_TYPE_JSON)
+			select_ptr = &select_json;
 		else
 			continue;
 
@@ -941,8 +970,8 @@ static void	remove_history_duplicates(zbx_vector_dc_history_ptr_t *history)
 		}
 
 		zbx_snprintf_alloc(&select_ptr->sql, &select_ptr->sql_alloc, &select_ptr->sql_offset,
-				"%s (itemid=" ZBX_FS_UI64 " and clock=%d and ns=%d)", separator , h->itemid,
-				h->ts.sec, h->ts.ns);
+				"%s (itemid=" ZBX_FS_UI64 " and clock=%d and ns=%d)", separator, h->entry.itemid,
+				h->entry.ts.sec, h->entry.ts.ns);
 	}
 
 	db_fetch_duplicates(&select_flt, ITEM_VALUE_TYPE_FLOAT, &duplicates);
@@ -951,18 +980,20 @@ static void	remove_history_duplicates(zbx_vector_dc_history_ptr_t *history)
 	db_fetch_duplicates(&select_log, ITEM_VALUE_TYPE_LOG, &duplicates);
 	db_fetch_duplicates(&select_text, ITEM_VALUE_TYPE_TEXT, &duplicates);
 	db_fetch_duplicates(&select_bin, ITEM_VALUE_TYPE_BIN, &duplicates);
+	db_fetch_duplicates(&select_json, ITEM_VALUE_TYPE_JSON, &duplicates);
 
-	vc_flag_duplicates(&history_index, &duplicates);
+	dup_num = vc_remove_duplicates(history, &duplicates);
 
 	zbx_vector_dc_history_ptr_clear_ext(&duplicates, zbx_dc_history_shallow_free);
 	zbx_vector_dc_history_ptr_destroy(&duplicates);
-	zbx_vector_dc_history_ptr_destroy(&history_index);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): duplicates:%d", __func__, dup_num);
+
+	return dup_num;
 }
 
 static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_dc_history_ptr_t *history_values,
-		int *ret_flush, int config_history_storage_pipelines)
+		zbx_uint64_t *flush_err)
 {
 	int	i, ret = SUCCEED;
 
@@ -977,7 +1008,7 @@ static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_dc
 	}
 
 	if (0 != history_values->values_num)
-		ret = zbx_vc_add_values(history_values, ret_flush, config_history_storage_pipelines);
+		ret = zbx_vc_add_values(history_values, flush_err);
 
 	return ret;
 }
@@ -990,12 +1021,12 @@ static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_dc
  * Parameters:                                                                *
  *    history                          - [IN] array of history data           *
  *    history_num                      - [IN] number of history structures    *
- *    config_history_storage_pipelines - [IN]                                 *
  *                                                                            *
  ******************************************************************************/
-static int	DBmass_add_history(zbx_dc_history_t *history, int history_num, int config_history_storage_pipelines)
+static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
 {
-	int				ret, ret_flush = FLUSH_SUCCEED, num;
+	int				ret, num;
+	zbx_uint64_t			flush_err;
 	zbx_vector_dc_history_ptr_t	history_values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1003,22 +1034,37 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num, int co
 	zbx_vector_dc_history_ptr_create(&history_values);
 	zbx_vector_dc_history_ptr_reserve(&history_values, history_num);
 
-	if (FAIL == (ret = add_history(history, history_num, &history_values, &ret_flush,
-			config_history_storage_pipelines)) && FLUSH_DUPL_REJECTED == ret_flush)
+	if (FAIL == (ret = add_history(history, history_num, &history_values, &flush_err)))
 	{
-		num = history_values.values_num;
-		remove_history_duplicates(&history_values);
-		zbx_vector_dc_history_ptr_clear(&history_values);
+		zbx_vector_dc_history_ptr_t	values;
 
-		if (SUCCEED == (ret = add_history(history, history_num, &history_values, &ret_flush,
-				config_history_storage_pipelines)))
+		zbx_vector_dc_history_ptr_create(&values);
+		zbx_vector_dc_history_ptr_reserve(&values, history_num);
+
+		for (int i = 0; i < history_values.values_num; i++)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "skipped %d duplicates", num - history_values.values_num);
+			unsigned char	value_type = history_values.values[i]->entry.value_type;
+
+			if (ZBX_HISTORY_FLUSH_DUPL_REJECTED == zbx_history_get_flush_error(flush_err, value_type))
+				zbx_vector_dc_history_ptr_append(&values, history_values.values[i]);
 		}
+
+		if (0 < values.values_num)
+		{
+			num = remove_history_duplicates(&values);
+
+			if (SUCCEED == (ret = zbx_vc_add_values(&values, &flush_err)))
+				zabbix_log(LOG_LEVEL_WARNING, "skipped %d duplicates", num);
+
+			zbx_vector_dc_history_ptr_clear(&values);
+		}
+
+		zbx_vector_dc_history_ptr_destroy(&values);
 	}
 
 	zbx_vps_monitor_add_written((zbx_uint64_t)history_values.values_num);
 
+	zbx_vector_dc_history_ptr_clear(&history_values);
 	zbx_vector_dc_history_ptr_destroy(&history_values);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1053,10 +1099,13 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 	static time_t	last_history_discard = 0;
 	time_t		now;
 	int		i;
+	zbx_uint64_t	default_type_flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, history_num);
 
 	now = time(NULL);
+
+	default_type_flags = zbx_history_get_default_type_flags();
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1064,34 +1113,38 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 		zbx_history_sync_item_t	*item;
 		zbx_item_diff_t		*diff;
 
-		/* discard history items that are older than compression age */
-		if (0 != compression_age && h->ts.sec < compression_age)
-		{
-			if (SEC_PER_HOUR < (now - last_history_discard)) /* log once per hour */
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "discarding history that is pointing to"
-							" compressed history period");
-				last_history_discard = now;
-			}
-
-			zbx_dc_history_clean_value(h);
-			h->state = ITEM_STATE_NORMAL;
-			h->flags |= ZBX_DC_FLAG_NOVALUE;
-			continue;
-		}
-
 		if (SUCCEED != errcodes[i])
 		{
 			h->flags |= ZBX_DC_FLAG_UNDEF;
-			zbx_hc_clear_item_middle(h->itemid);
+			zbx_hc_clear_item_middle(h->entry.itemid);
 			continue;
 		}
 
 		item = &items[i];
 
+		/* compression checks are supported only for the default (sql) history provider */
+		if (SUCCEED == ZBX_HISTORY_CHECK_TYPE_FLAGS(default_type_flags, item->value_type))
+		{
+			/* discard history items that are older than compression age */
+			if (0 != compression_age && h->entry.ts.sec < compression_age)
+			{
+				if (SEC_PER_HOUR < (now - last_history_discard)) /* log once per hour */
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "discarding history that is pointing to"
+								" compressed history period");
+					last_history_discard = now;
+				}
+
+				zbx_dc_history_clean_value(h);
+				h->state = ITEM_STATE_NORMAL;
+				h->flags |= ZBX_DC_FLAG_NOVALUE;
+				continue;
+			}
+		}
+
 		if (ITEM_STATUS_ACTIVE != item->status || HOST_STATUS_MONITORED != item->host.status)
 		{
-			zbx_hc_clear_item_middle(h->itemid);
+			zbx_hc_clear_item_middle(h->entry.itemid);
 			h->flags |= ZBX_DC_FLAG_UNDEF;
 			continue;
 		}
@@ -1100,15 +1153,16 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 		{
 			h->flags |= ZBX_DC_FLAG_NOHISTORY;
 		}
-		else if (now - h->ts.sec > item->history_sec)
+		else if (now - h->entry.ts.sec > item->history_sec)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" value timestamp \"%s %s\" is outside history "
 					"storage period", item->host.host, item->key_orig,
-					zbx_date2str(h->ts.sec, NULL), zbx_time2str(h->ts.sec, NULL));
+					zbx_date2str(h->entry.ts.sec, NULL), zbx_time2str(h->entry.ts.sec, NULL));
 
 			zbx_dc_history_clean_value(h);
 			h->state = ITEM_STATE_NORMAL;
 			h->flags |= ZBX_DC_FLAG_NOVALUE;
+
 			continue;
 		}
 
@@ -1118,15 +1172,17 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 			{
 				h->flags |= ZBX_DC_FLAG_NOTRENDS;
 			}
-			else if (now - h->ts.sec > item->trends_sec)
+			else if (now - h->entry.ts.sec > item->trends_sec)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" value timestamp \"%s %s\" is outside "
 						"trends storage period", item->host.host, item->key_orig,
-						zbx_date2str(h->ts.sec, NULL), zbx_time2str(h->ts.sec, NULL));
+						zbx_date2str(h->entry.ts.sec, NULL),
+						zbx_time2str(h->entry.ts.sec, NULL));
 
 				zbx_dc_history_clean_value(h);
 				h->state = ITEM_STATE_NORMAL;
 				h->flags |= ZBX_DC_FLAG_NOVALUE;
+
 				continue;
 			}
 		}
@@ -1143,7 +1199,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 		if (0 != item->host.proxyid && FAIL == zbx_is_item_processed_by_server(item->type, item->key_orig))
 		{
-			zbx_uint64_pair_t	p = {item->host.proxyid, h->ts.sec};
+			zbx_uint64_pair_t	p = {item->host.proxyid, h->entry.ts.sec};
 
 			zbx_vector_uint64_pair_append(proxy_subscriptions, p);
 		}
@@ -1199,57 +1255,57 @@ static void	DCmodule_prepare_history(zbx_dc_history_t *history, int history_num,
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
 			continue;
 
-		switch (h->value_type)
+		switch (h->entry.value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
 				if (NULL == history_float_cbs)
 					continue;
 
 				h_float = &history_float[(*history_float_num)++];
-				h_float->itemid = h->itemid;
-				h_float->clock = h->ts.sec;
-				h_float->ns = h->ts.ns;
-				h_float->value = h->value.dbl;
+				h_float->itemid = h->entry.itemid;
+				h_float->clock = h->entry.ts.sec;
+				h_float->ns = h->entry.ts.ns;
+				h_float->value = h->entry.value.dbl;
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
 				if (NULL == history_integer_cbs)
 					continue;
 
 				h_integer = &history_integer[(*history_integer_num)++];
-				h_integer->itemid = h->itemid;
-				h_integer->clock = h->ts.sec;
-				h_integer->ns = h->ts.ns;
-				h_integer->value = h->value.ui64;
+				h_integer->itemid = h->entry.itemid;
+				h_integer->clock = h->entry.ts.sec;
+				h_integer->ns = h->entry.ts.ns;
+				h_integer->value = h->entry.value.ui64;
 				break;
 			case ITEM_VALUE_TYPE_STR:
 				if (NULL == history_string_cbs)
 					continue;
 
 				h_string = &history_string[(*history_string_num)++];
-				h_string->itemid = h->itemid;
-				h_string->clock = h->ts.sec;
-				h_string->ns = h->ts.ns;
-				h_string->value = h->value.str;
+				h_string->itemid = h->entry.itemid;
+				h_string->clock = h->entry.ts.sec;
+				h_string->ns = h->entry.ts.ns;
+				h_string->value = h->entry.value.str;
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
 				if (NULL == history_text_cbs)
 					continue;
 
 				h_text = &history_text[(*history_text_num)++];
-				h_text->itemid = h->itemid;
-				h_text->clock = h->ts.sec;
-				h_text->ns = h->ts.ns;
-				h_text->value = h->value.str;
+				h_text->itemid = h->entry.itemid;
+				h_text->clock = h->entry.ts.sec;
+				h_text->ns = h->entry.ts.ns;
+				h_text->value = h->entry.value.str;
 				break;
 			case ITEM_VALUE_TYPE_LOG:
 				if (NULL == history_log_cbs)
 					continue;
 
-				log = h->value.log;
+				log = h->entry.value.log;
 				h_log = &history_log[(*history_log_num)++];
-				h_log->itemid = h->itemid;
-				h_log->clock = h->ts.sec;
-				h_log->ns = h->ts.ns;
+				h_log->itemid = h->entry.itemid;
+				h_log->clock = h->entry.ts.sec;
+				h_log->ns = h->entry.ts.ns;
 				h_log->value = log->value;
 				h_log->source = ZBX_NULL2EMPTY_STR(log->source);
 				h_log->timestamp = log->timestamp;
@@ -1257,10 +1313,11 @@ static void	DCmodule_prepare_history(zbx_dc_history_t *history, int history_num,
 				h_log->severity = log->severity;
 				break;
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_JSON:
 			case ITEM_VALUE_TYPE_NONE:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 		}
 	}
 }
@@ -1354,23 +1411,22 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
  * Parameters:                                                                         *
  *   events_cbs                       - [IN]                                           *
  *   rtc                              - [IN] RTC socket                                *
- *   config_history_storage_pipelines - [IN]                                           *
- *   stats                             - [OUT] flag indicating the cache emptiness:    *
+ *   stats                            - [OUT] flag indicating the cache emptiness:     *
  *                                            ZBX_SYNC_DONE - nothing to sync, go idle *
  *                                            ZBX_SYNC_MORE - more data to sync        *
  *                                                                                     *
- * Comments: This function loops syncing history values by 1k batches and              *
- *           processing timer triggers by batches of 500 triggers.                     *
+ * Comments: This function loops syncing history values by 2k batches and              *
+ *           processing timer triggers by batches of 1000 triggers.                    *
  *           Unless full sync is being done the loop is aborted if either              *
  *           timeout has passed or there are no more data to process.                  *
  *           The last is assumed when the following is true:                           *
  *            a) history cache is empty or less than 10% of batch values were          *
  *               processed (the other items were locked by triggers)                   *
- *            b) less than 500 (full batch) timer triggers were processed              *
+ *            b) less than 1000 (full batch) timer triggers were processed             *
  *                                                                                     *
  ***************************************************************************************/
 void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
-		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats)
+		zbx_history_sync_stats_t *stats)
 {
 /* the minimum processed item percentage of item candidates to continue synchronizing */
 #define ZBX_HC_SYNC_MIN_PCNT	10
@@ -1528,7 +1584,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 			zbx_vector_uint64_reserve(&itemids, history_num);
 
 			for (i = 0; i < history_num; i++)
-				zbx_vector_uint64_append(&itemids, history[i].itemid);
+				zbx_vector_uint64_append(&itemids, history[i].entry.itemid);
 
 			zbx_dc_config_history_sync_get_items_by_itemids(items, itemids.values, errcodes,
 					(size_t)history_num, item_retrieve_mode);
@@ -1541,7 +1597,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 
 			start_time = zbx_time();
 
-			if (FAIL != (ret = DBmass_add_history(history, history_num, config_history_storage_pipelines)))
+			if (FAIL != (ret = DBmass_add_history(history, history_num)))
 			{
 				end_time = zbx_time();
 				stats->time_write_history += end_time - start_time;

@@ -47,7 +47,7 @@ class testFormFilterProblems extends testFormFilter {
 	protected static $time;
 
 	public $url = 'zabbix.php?action=problem.view&show_timeline=0';
-	public $table_selector = 'class:list-table';
+	public $table_selector = 'id:problems';
 
 	public function prepareProblemsData() {
 		// Create hostgroup for hosts with items triggers.
@@ -111,6 +111,17 @@ class testFormFilterProblems extends testFormFilter {
 		foreach ($trigger_data as $params) {
 			CDBHelper::setTriggerProblem($params['name'], TRIGGER_VALUE_TRUE, ['clock' => $params['time']]);
 		}
+
+		// Change width of Info column so that it would be possible to filter by Tags header without horizontal scrolling.
+		$layout = '{"columns":[{"id":"time","resized":true,"width":"9.6%"},{"id":"severity","resized":true,"width":"8.38%"},'.
+				'{"id":"recovery","resized":true,"width":"10.2%"},{"id":"status","resized":true,"width":"7.9%"},'.
+				'{"id":"info","resized":true,"width":"7.9%"},{"id":"host","resized":true,"width":"7.9%"},'.
+				'{"id":"problem","resized":true,"width":"10.2%"},{"id":"duration","resized":true,"width":"8.3%"},'.
+				'{"id":"update","resized":true,"width":"4.8%"},{"id":"actions","resized":true,"width":"8%"},'.
+				'{"id":"opdata"},{"id":"tags","resized":true,"width":"9%"},{"id":"tagvalue"}],'.
+				'"options":{"compact_view":"0","highlight_row":"0"}}';
+
+		$this->updateDatatableLayout($layout, 'web.monitoring.problem.datatable');
 	}
 
 	public static function getCheckCreatedFilterData() {
@@ -149,8 +160,13 @@ class testFormFilterProblems extends testFormFilter {
 				[
 					'expected' => TEST_GOOD,
 					'filter_form' => [
-						'Hosts' => ['Host for tag permissions'],
-						'Show timeline' => true
+						'Hosts' => ['Host for tag permissions']
+
+					],
+					'header_settings' => [
+						'Time' => [
+							'Show timeline' => true
+						]
 					],
 					'filter' => [
 						'Show number of records' => true
@@ -186,6 +202,11 @@ class testFormFilterProblems extends testFormFilter {
 					'expected' => TEST_GOOD,
 					'filter_form' => [
 						'Severity' => 'High'
+					],
+					'header_settings' => [
+						'Time' => [
+							'Show timeline' => false
+						]
 					],
 					'filter' => [
 						'Name' => '*;%№:?(',
@@ -233,7 +254,11 @@ class testFormFilterProblems extends testFormFilter {
 	 * @dataProvider getCheckCreatedFilterData
 	 */
 	public function testFormFilterProblems_CheckCreatedFilter($data) {
-		$this->createFilter($data, 'filter-create', 'zabbix');
+		$this->createFilter($data, 'filter-create', 'zabbix', $this->table_selector);
+
+		if (array_key_exists('header_settings', $data)) {
+			$this->changeLayoutFromHeader($data['header_settings']);
+		}
 		$this->checkFilters($data, $this->table_selector);
 	}
 
@@ -241,20 +266,31 @@ class testFormFilterProblems extends testFormFilter {
 		return [
 			[
 				[
-					'Hosts' => ['Host for triggers filtering'],
-					'Average' => true,
-					'Show tags' => '1'
+					'filter' => [
+						'Hosts' => ['Host for triggers filtering'],
+						'Average' => true
+					],
+					'header_settings' => [
+						'Tags' => [
+							'Number of tags' => '1'
+						]
+					]
 				]
 			],
 			[
 				[
-					'Host groups' => ['Zabbix servers'],
-					'Hosts' => ['ЗАББИКС Сервер'],
-					'Not classified' => true,
-					'Warning' => true,
-					'Average' => true,
-					'Show tags' => '3',
-					'Compact view' => true
+					'filter' => [
+						'Host groups' => ['Zabbix servers'],
+						'Hosts' => ['ЗАББИКС Сервер'],
+						'Not classified' => true,
+						'Warning' => true,
+						'Average' => true
+					],
+					'header_settings' => [
+						'Tags' => [
+							'Number of tags' => '3'
+						]
+					]
 				]
 			]
 		];
@@ -266,7 +302,7 @@ class testFormFilterProblems extends testFormFilter {
 	 * @dataProvider getCheckRememberedFilterData
 	 */
 	public function testFormFilterProblems_CheckRememberedFilter($data) {
-		$this->checkRememberedFilters($data);
+		$this->checkRememberedFilters($data, $this->table_selector);
 	}
 
 	/**
@@ -322,10 +358,10 @@ class testFormFilterProblems extends testFormFilter {
 	 * @dataProvider getCustomTimePeriodData
 	 */
 	public function testFormFilterProblems_TimePeriod($data) {
-		$this->createFilter($data, 'Admin', 'zabbix');
+		$this->createFilter($data, 'Admin', 'zabbix', $this->table_selector);
 		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
 		$form = $filter->getForm();
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query($this->table_selector)->asDatatable()->one()->waitUntilReady();
 
 		// Checking result amount before changing time period.
 		$this->assertEquals($table->getRows()->count(), 2);
@@ -333,12 +369,12 @@ class testFormFilterProblems extends testFormFilter {
 		if ($data['filter']['Name'] === 'Timeselect_1') {
 			// Enable Set custom time period option.
 			$filter->editProperties();
-			$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+			$dialog = COverlayDialogElement::get('Filter properties')->asForm();
 			$dialog->fill(['Override time period selector' => true, 'From' => 'now-2y']);
 			$dialog->submit();
 			COverlayDialogElement::ensureNotPresent();
 			$this->page->waitUntilReady();
-			$table->waitUntilReloaded();
+			$table->waitUntilReady();
 		}
 		else {
 			// Changing time period from timeselector tab.
@@ -350,7 +386,7 @@ class testFormFilterProblems extends testFormFilter {
 			$filter->setContext(CFilterElement::CONTEXT_LEFT)->selectTab($data['filter']['Name']);
 			$this->query('button:Update')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
-			$table->waitUntilReloaded();
+			$table->waitUntilReady();
 		}
 
 		// Checking that Show field tabs are disabled or enabled.

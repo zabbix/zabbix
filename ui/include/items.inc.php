@@ -128,6 +128,8 @@ function itemValueTypeString($value_type): string {
 			return _('Text');
 		case ITEM_VALUE_TYPE_BINARY:
 			return _('Binary');
+		case ITEM_VALUE_TYPE_JSON:
+			return _('JSON');
 	}
 
 	return _('Unknown');
@@ -333,6 +335,39 @@ function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
 		$sortedItems[$key] = $items[$key];
 	}
 	$items = $sortedItems;
+}
+
+/**
+ * Filters and sorts threshold values in ascending order.
+ *
+ * @param array $thresholds
+ * @param bool  $is_binary_size
+ *
+ * @return array
+ */
+function filterAndSortThresholds(array $thresholds, bool $is_binary_size = false): array {
+	$number_parser = new CNumberParser([
+		'with_size_suffix' => true,
+		'with_time_suffix' => true,
+		'is_binary_size' => $is_binary_size
+	]);
+
+	$filtered_thresholds = [];
+
+	foreach ($thresholds as $index => $threshold) {
+		if ($number_parser->parse(trim($threshold['threshold'])) == CParser::PARSE_SUCCESS) {
+			$filtered_thresholds[$index] = ['order_threshold' => $number_parser->calcValue()] + $threshold;
+		}
+	}
+
+	uasort($filtered_thresholds, static fn (array $t1, array $t2) => $t1['order_threshold'] <=> $t2['order_threshold']);
+
+	foreach ($filtered_thresholds as &$threshold) {
+		unset($threshold['order_threshold']);
+	}
+	unset($threshold);
+
+	return $filtered_thresholds;
 }
 
 /**
@@ -909,6 +944,7 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
+		case ITEM_VALUE_TYPE_JSON:
 			if ($trim && mb_strlen($value) > 20) {
 				$value = mb_substr($value, 0, 20).'...';
 			}

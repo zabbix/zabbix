@@ -28,6 +28,7 @@
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
 #include "zbxcalc.h"
+#include "zbxhistory.h"
 
 static void	extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector_dc_trigger_t *triggers)
 {
@@ -95,6 +96,10 @@ typedef struct
 	char		*parameter;
 	zbx_timespec_t	timespec;
 	unsigned char	type;
+
+	/* cached data */
+	zbx_history_selector_t	selector;
+	zbx_dc_evaluate_item_t	item;
 
 	/* output data */
 	zbx_variant_t	value;
@@ -173,12 +178,12 @@ static void	populate_function_items(const zbx_vector_uint64_t *functionids, zbx_
 	zbx_dc_function_t	*functions = NULL;
 	int			*errcodes = NULL;
 	zbx_ifunc_t		ifunc_local;
-	zbx_func_t		*func, func_local;
+	zbx_func_t		*func, func_local = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __func__, functionids->values_num);
 
 	zbx_variant_set_none(&func_local.value);
-	func_local.error = NULL;
+	func_local.selector.type = ZBX_VALUE_UNKNOWN;
 
 	functions = (zbx_dc_function_t *)zbx_malloc(functions, sizeof(zbx_dc_function_t) * functionids->values_num);
 	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids->values_num);
@@ -229,39 +234,54 @@ static void	populate_function_items(const zbx_vector_uint64_t *functionids, zbx_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ifuncs_num:%d", __func__, ifuncs->num_data);
 }
 
-static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint64_t *history_itemids,
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare item data for function evaluation and validate items      *
+ *                                                                            *
+ * Parameters: funcs            - [IN/OUT] hashset of functions to evaluate   *
+ *             history_itemids  - [IN] item identifiers from history cache    *
+ *             history_items    - [IN] items from history cache               *
+ *             history_errcodes - [IN] error codes for history items          *
+ *             itemids          - [OUT] additional item identifiers to fetch  *
+ *             items            - [OUT] fetched items                         *
+ *             items_err        - [OUT] error codes for fetched items         *
+ *                                                                            *
+ * Comments: This function retrieves item data needed for function evaluation *
+ *           and performs validation checks. For items not in history cache,  *
+ *           it fetches them from configuration cache. Invalid items or       *
+ *           functions are marked with appropriate error messages.            *
+ *                                                                            *
+ ******************************************************************************/
+static void	prepare_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint64_t *history_itemids,
 		const zbx_history_sync_item_t *history_items, const int *history_errcodes,
-		zbx_history_sync_item_t **items, int **items_err, int *items_num)
+		zbx_vector_uint64_t *itemids, zbx_history_sync_item_t **items, int **items_err)
 {
 	char			*error = NULL;
 	int			i;
 	zbx_func_t		*func;
-	zbx_vector_uint64_t	itemids;
 	zbx_hashset_iter_t	iter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() funcs_num:%d", __func__, funcs->num_data);
 
-	zbx_vector_uint64_create(&itemids);
 
 	zbx_hashset_iter_reset(funcs, &iter);
 	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (FAIL == zbx_vector_uint64_bsearch(history_itemids, func->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			zbx_vector_uint64_append(&itemids, func->itemid);
+			zbx_vector_uint64_append(itemids, func->itemid);
 	}
 
-	if (0 != itemids.values_num)
+	if (0 != itemids->values_num)
 	{
-		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		*items_num = itemids.values_num;
 		*items = (zbx_history_sync_item_t *)zbx_calloc(NULL, 1, sizeof(zbx_history_sync_item_t) *
-				(size_t)itemids.values_num);
-		*items_err = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)itemids.values_num);
+				(size_t)itemids->values_num);
+		*items_err = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)itemids->values_num);
 
-		zbx_dc_config_history_sync_get_items_by_itemids(*items, itemids.values, *items_err,
-				(size_t)itemids.values_num, ZBX_ITEM_GET_SYNC);
+		zbx_dc_config_history_sync_get_items_by_itemids(*items, itemids->values, *items_err,
+				(size_t)itemids->values_num, ZBX_ITEM_GET_SYNC);
 	}
 
 	zbx_hashset_iter_reset(funcs, &iter);
@@ -270,7 +290,6 @@ static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint6
 		int				errcode, ret;
 		const zbx_history_sync_item_t	*item;
 		char				*params;
-		zbx_dc_evaluate_item_t		evaluate_item;
 
 		/* avoid double copying from configuration cache if already retrieved when saving history */
 		if (FAIL != (i = zbx_vector_uint64_bsearch(history_itemids, func->itemid,
@@ -281,7 +300,7 @@ static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint6
 		}
 		else
 		{
-			i = zbx_vector_uint64_bsearch(&itemids, func->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			i = zbx_vector_uint64_bsearch(itemids, func->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			item = *items + i;
 			errcode = (*items_err)[i];
 		}
@@ -299,6 +318,14 @@ static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint6
 			zbx_free(func->error);
 			func->error = zbx_eval_format_function_error(func->function, item->host.host, item->key_orig,
 					func->parameter, "binary-type items are not supported in functions");
+			continue;
+		}
+
+		if (ITEM_VALUE_TYPE_JSON == item->value_type)
+		{
+			zbx_free(func->error);
+			func->error = zbx_eval_format_function_error(func->function, item->host.host, item->key_orig,
+					func->parameter, "json-type items are not supported in functions");
 			continue;
 		}
 
@@ -359,14 +386,17 @@ static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint6
 		}
 
 		params = zbx_dc_expand_user_macros_in_func_params(func->parameter, item->host.hostid);
+		zbx_free(func->parameter);
+		func->parameter = params;
 
-		evaluate_item.itemid = item->itemid;
-		evaluate_item.value_type = item->value_type;
-		evaluate_item.proxyid = item->host.proxyid;
-		evaluate_item.host = item->host.host;
-		evaluate_item.key_orig = item->key_orig;
+		func->item.itemid = item->itemid;
+		func->item.value_type = item->value_type;
+		func->item.proxyid = item->host.proxyid;
+		func->item.host = item->host.host;
+		func->item.key_orig = item->key_orig;
 
-		ret = zbx_evaluate_function(&func->value, &evaluate_item, func->function, params, &func->timespec, &error);
+		ret = zbx_evaluate_function(NULL, &func->item, func->function, params, &func->timespec, &func->selector,
+				&error);
 
 		if (SUCCEED != ret)
 		{
@@ -376,8 +406,172 @@ static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint6
 							item->key_orig, params, error));
 			zbx_free(error);
 		}
+	}
 
-		zbx_free(params);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update item query history range                                   *
+ *                                                                            *
+ * Parameters: query    - [IN/OUT] item query to update                       *
+ *             selector - [IN] new history selector                           *
+ *                                                                            *
+ * Comments: If item is used in trigger expression in different functions or  *
+ *           with different history ranges it will have multiple function     *
+ *           calculation queries. This function is used to 'upmerge' ranges.  *
+ *                                                                            *
+ ******************************************************************************/
+static void	precache_history_range_update(zbx_vc_query_t *query, const zbx_history_selector_t *selector)
+{
+	if (query->selector->type == selector->type)
+	{
+		if (query->selector->value < selector->value)
+			query->selector = selector;
+
+		return;
+	}
+
+	if (ZBX_VALUE_NODATA == query->selector->type || ZBX_VALUE_SECONDS == selector->type)
+		query->selector = selector;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: precache item history values for functions that will be evaluated *
+ *                                                                            *
+ * Parameters: funcs - [IN] hashset of functions to be evaluated              *
+ *                                                                            *
+ ******************************************************************************/
+static void	precache_item_history(zbx_hashset_t *funcs)
+{
+/* maximum number of values per single item to precache */
+#define PRECACHE_LIMIT	60
+
+	typedef struct
+	{
+		zbx_uint64_t	itemid;
+		int		index;
+	}
+	zbx_vc_query_index_t;
+
+	zbx_func_t		*func;
+	zbx_hashset_iter_t	iter;
+	zbx_vector_vc_query_t	queries;
+	zbx_uint64_t		precache_flags;
+	zbx_hashset_t		item_queries;
+
+	if (0 == (precache_flags = zbx_history_get_precache_flags()))
+		return;
+
+	zbx_hashset_create(&item_queries, funcs->num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_vector_vc_query_create(&queries);
+	zbx_vector_vc_query_reserve(&queries, funcs->num_data);
+
+	zbx_hashset_iter_reset(funcs, &iter);
+	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_vc_query_index_t	*ref, ref_local;
+		int			refs_num;
+
+		/* skip functions with errors */
+		if (NULL != func->error || ZBX_VARIANT_NONE != func->value.type)
+			continue;
+
+		if (ZBX_FUNCTION_TYPE_TRENDS == func->type)
+			continue;
+
+		if (0 == (precache_flags & (UINT64_C(1) << func->item.value_type)))
+			continue;
+
+		if (0 != func->selector.timeshift)
+			continue;
+
+		/* skip functions requesting too many values/large range */
+		switch (func->selector.type)
+		{
+			case ZBX_VALUE_NVALUES:
+				if (PRECACHE_LIMIT < func->selector.value)
+					continue;
+				break;
+			case ZBX_VALUE_SECONDS:
+				if (PRECACHE_LIMIT < func->selector.value / SEC_PER_MIN)
+					continue;
+				break;
+			default:
+				break;
+		}
+
+		refs_num = item_queries.num_data;
+		ref_local.itemid = func->item.itemid;
+
+		ref = (zbx_vc_query_index_t *)zbx_hashset_insert(&item_queries, &ref_local, sizeof(ref_local));
+		if (refs_num != item_queries.num_data)
+		{
+			zbx_vc_query_t	query_local = {
+					.itemid = func->item.itemid,
+					.value_type = func->item.value_type,
+					.selector = &func->selector,
+					.ts_end = func->timespec.sec
+			};
+
+			ref->index = queries.values_num;
+			zbx_vector_vc_query_append_ptr(&queries, &query_local);
+		}
+		else
+			precache_history_range_update(&queries.values[ref->index], &func->selector);
+	}
+
+	if (0 != queries.values_num)
+		zbx_vc_precache_queries(&queries);
+
+	zbx_vector_vc_query_destroy(&queries);
+	zbx_hashset_destroy(&item_queries);
+
+#undef PRECACHE_LIMIT
+}
+
+static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint64_t *history_itemids,
+		const zbx_history_sync_item_t *history_items, const int *history_errcodes,
+		zbx_history_sync_item_t **items, int **items_err, int *items_num)
+{
+	char			*error = NULL;
+	zbx_func_t		*func;
+	zbx_vector_uint64_t	itemids;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() funcs_num:%d", __func__, funcs->num_data);
+
+	zbx_vector_uint64_create(&itemids);
+
+	prepare_item_functions(funcs, history_itemids, history_items, history_errcodes, &itemids, items, items_err);
+	*items_num = itemids.values_num;
+
+	precache_item_history(funcs);
+
+	zbx_hashset_iter_reset(funcs, &iter);
+	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
+	{
+		int	ret;
+
+		/* skip functions with errors */
+		if (NULL != func->error || ZBX_VARIANT_NONE != func->value.type)
+			continue;
+
+		ret = zbx_evaluate_function(&func->value, &func->item, func->function, func->parameter, &func->timespec,
+				&func->selector, &error);
+
+		if (SUCCEED != ret)
+		{
+			/* compose and store error message for future use */
+			zbx_variant_set_error(&func->value,
+					zbx_eval_format_function_error(func->function, func->item.host,
+						func->item.key_orig, func->parameter, error));
+			zbx_free(error);
+		}
 	}
 
 	zbx_vc_flush_stats();

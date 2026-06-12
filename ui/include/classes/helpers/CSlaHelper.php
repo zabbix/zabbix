@@ -23,9 +23,6 @@ final class CSlaHelper {
 	public const SCHEDULE_MODE_24X7		= 0;
 	public const SCHEDULE_MODE_CUSTOM 	= 1;
 
-	/**
-	 * @return array
-	 */
 	public static function getPeriodNames(): array {
 		static $period_names;
 
@@ -267,5 +264,35 @@ final class CSlaHelper {
 				->setAttribute('data-content', '?')
 				->setHint($hint)
 		];
+	}
+
+	public static function prepareSchedulePeriods(array $schedules): array {
+		$result = [];
+
+		foreach ($schedules as $schedule) {
+			if (!array_key_exists('enabled', $schedule) || !$schedule['enabled']) {
+				continue;
+			}
+
+			foreach (explode(',', $schedule['period']) as $schedule_period) {
+				$schedule_period = trim($schedule_period);
+				$period_time_parser = new CTimeRangeParser();
+
+				if ($period_time_parser->parse($schedule_period) != CParser::PARSE_FAIL) {
+
+					[$h_from, $m_from, $h_till, $m_till] = $period_time_parser->getTokens();
+
+					$day_period_from = $h_from * SEC_PER_HOUR + $m_from * SEC_PER_MIN;
+					$day_period_to = $h_till * SEC_PER_HOUR + $m_till * SEC_PER_MIN;
+
+					$result[] = [
+						'period_from' => SEC_PER_DAY * $schedule['day'] + $day_period_from,
+						'period_to' => SEC_PER_DAY * $schedule['day'] + $day_period_to
+					];
+				}
+			}
+		}
+
+		return $result;
 	}
 }

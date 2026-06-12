@@ -18,11 +18,28 @@
 
 #include "zbxcommon.h"
 
-static void	zbx_log_impl(int level, const char *fmt, va_list args)
+#ifndef _WINDOWS
+#	include "zbxnix.h"
+#else
+#	include "zbxwin32.h"
+#endif
+
+static void	log_impl(int level, const char *fmt, va_list args)
 {
 	ZBX_UNUSED(level);
 	ZBX_UNUSED(fmt);
 	ZBX_UNUSED(args);
+}
+
+static int	get_log_level_impl(void)
+{
+	return LOG_LEVEL_TRACE;
+}
+
+static void	zbx_backtrace_with_exit(void)
+{
+	zbx_backtrace();
+	exit(1);
 }
 
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "common_mock_progname")
@@ -31,5 +48,5 @@ void	zbx_mock_test_entry(void **state)
 {
 	ZBX_UNUSED(state);
 
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname, NULL);
+	zbx_init_library_common(log_impl, get_log_level_impl, get_zbx_progname, zbx_backtrace_with_exit);
 }

@@ -91,12 +91,12 @@ class testPageTriggerDescription extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=problem.view');
 
 		// Find rows from the data provider and check the description if such should exist.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$row = $table->findRow('Problem', $data['Event name'], true);
+		$row = $this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady()
+				->findRow('Problem', $data['Event name'], true);
 
 		if (CTestArrayHelper::get($data, 'description', false)) {
-			$row->query('xpath:.//button['.CXPathHelper::fromClass('zi-alert-with-content').']')->one()->click();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->one()->waitUntilReady();
+			$row->query('xpath:.//button['.CXPathHelper::fromClass('zi-alert-with-content').']')->one()->scrollIntoView(50)->click();
+			$overlay = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->one()->waitUntilReady();
 			$this->assertEquals($data['description'], $overlay->getText());
 
 			// Check urls in description.
@@ -111,7 +111,7 @@ class testPageTriggerDescription extends CWebTest {
 		}
 
 		// Check trigger description in event details of the corresponding problem.
-		$row->getColumn('Time')->query('xpath:./a')->one()->click();
+		$row->getColumn('Time')->query('xpath:./div/div/a')->one()->scrollIntoView(50)->click();
 		$this->page->waitUntilReady();
 
 		// Check the URL of the opened page to make sure that correct event is opened.

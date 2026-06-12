@@ -494,43 +494,44 @@ class CDBHelper {
 		return implode(',', $result);
 	}
 
-	/**
-	 * Add host groups to user group with these rights.
-	 *
-	 * @param string  $usergroup_name    user group name
-	 * @param string  $hostgroup_name    host group name
-	 * @param integer $permission        PERM_READ_WRITE / PERM_READ / PERM_DENY / PERM_NONE
-	 * @param boolean $subgroups         include host subgroups (true) or not (false)
-	 */
-	public static function setHostGroupPermissions($usergroup_name, $hostgroup_name, $permission, $subgroups = false) {
-		$usergroup = DB::find('usrgrp', ['name' => $usergroup_name]);
-		$hostgroups = DB::find('hstgrp', ['name' => $hostgroup_name]);
-
-		if ($usergroup && $hostgroups) {
-			$usergroup = $usergroup[0];
-
-			if ($subgroups) {
-				$hostgroups = array_merge($hostgroups, DBfetchArray(DBselect(
-					'SELECT * FROM hstgrp WHERE name LIKE '.zbx_dbstr($hostgroups[0]['name'].'/%')
-				)));
-			}
-
-			$rights_old = DB::find('rights', [
-				'groupid' => $usergroup['usrgrpid'],
-				'id' => array_column($hostgroups, 'groupid')
-			]);
-
-			$rights_new = [];
-			foreach ($hostgroups as $hostgroup) {
-				$rights_new[] = [
-					'groupid' => $usergroup['usrgrpid'],
-					'permission' => $permission,
-					'id' => $hostgroup['groupid']
-				];
-			}
-			DB::replace('rights', $rights_old, $rights_new);
-		}
-	}
+	// Unused method. It was commented out due to the removal of DB::replace() in ZBXNEXT-10076.
+//	/**
+//	 * Add host groups to user group with these rights.
+//	 *
+//	 * @param string  $usergroup_name    user group name
+//	 * @param string  $hostgroup_name    host group name
+//	 * @param integer $permission        PERM_READ_WRITE / PERM_READ / PERM_DENY / PERM_NONE
+//	 * @param boolean $subgroups         include host subgroups (true) or not (false)
+//	 */
+//	public static function setHostGroupPermissions($usergroup_name, $hostgroup_name, $permission, $subgroups = false) {
+//		$usergroup = DB::find('usrgrp', ['name' => $usergroup_name]);
+//		$hostgroups = DB::find('hstgrp', ['name' => $hostgroup_name]);
+//
+//		if ($usergroup && $hostgroups) {
+//			$usergroup = $usergroup[0];
+//
+//			if ($subgroups) {
+//				$hostgroups = array_merge($hostgroups, DBfetchArray(DBselect(
+//					'SELECT * FROM hstgrp WHERE name LIKE '.zbx_dbstr($hostgroups[0]['name'].'/%')
+//				)));
+//			}
+//
+//			$rights_old = DB::find('rights', [
+//				'groupid' => $usergroup['usrgrpid'],
+//				'id' => array_column($hostgroups, 'groupid')
+//			]);
+//
+//			$rights_new = [];
+//			foreach ($hostgroups as $hostgroup) {
+//				$rights_new[] = [
+//					'groupid' => $usergroup['usrgrpid'],
+//					'permission' => $permission,
+//					'id' => $hostgroup['groupid']
+//				];
+//			}
+//			DB::replace('rights', $rights_old, $rights_new);
+//		}
+//	}
 
 	/**
 	 * Create problem or resolved events of trigger.

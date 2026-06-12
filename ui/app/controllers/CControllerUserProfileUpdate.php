@@ -19,57 +19,74 @@
  */
 class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'userid' => ['db users.userid', 'required'],
+			'change_password' => ['boolean'],
+			'allow_empty_password' => ['boolean'],
+			'password1' => [
+				[
+					'string', 'required', 'not_empty',
+					'when' => [['allow_empty_password', 'in' => [0]], ['change_password', 'in' => [1]]]
+				],
+				[
+					'string', 'required',
+					'use' => [CPasswordComplexityValidator::class, [
+						'passwd_min_length' => CAuthenticationHelper::get(CAuthenticationHelper::PASSWD_MIN_LENGTH),
+						'passwd_check_rules' => CAuthenticationHelper::get(CAuthenticationHelper::PASSWD_CHECK_RULES)
+					]],
+					'when' => ['change_password', 'in' => [1]]
+				]
+			],
+			'password2' => ['string', 'required', 'when' => ['change_password', 'in' => [1]]],
+			'current_password' => [
+				['string'],
+				[
+					'string', 'required', 'not_empty',
+					'when' => [['allow_empty_password', 'in' => [0]], ['change_password', 'in' => [1]]]
+				]
+			],
+			'lang' => ['db users.lang', 'in' => self::getAllowedLocales()],
+			'timezone' => ['db users.timezone', 'in' => self::getAllowedTimezones()],
+			'theme' => ['db users.theme', 'in' => self::getAllowedThemes()],
+			'autologin' => ['boolean'],
+			'autologout_visible' => ['boolean'],
+			'autologout' => ['db users.autologout', 'not_empty',
+				'use' => [CTimeUnitValidator::class, ['min' => 90, 'max' => SEC_PER_DAY, 'accept_zero' => true]],
+				'when' => [
+					['autologin', 'in' => [0]],
+					['autologout_visible', 'in' => [1]]
+				]
+			],
+			'refresh' => ['db users.refresh', 'not_empty',
+				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_HOUR]]
+			],
+			'rows_per_page' => ['db users.rows_per_page', 'required', 'min' => 1, 'max' => 999999],
+			'url' => ['db users.url'
+				// 'use' => [CHtmlUrlValidator::class, ['allow_user_macro' => false]]
+			]
+		]];
+	}
+
 	protected function checkInput(): bool {
-		$locales = array_keys(getLocales());
-		$locales[] = LANG_DEFAULT;
-		$themes = array_keys(APP::getThemes());
-		$themes[] = THEME_DEFAULT;
+		$ret = $this->validateInput(self::getValidationRules());
 
-		$fields = [
-			'userid' =>				'fatal|required|db users.userid',
-			'current_password' =>	'string',
-			'password1' =>			'string',
-			'password2' =>			'string',
-			'lang' =>				'db users.lang|in '.implode(',', $locales),
-			'timezone' =>			'db users.timezone|in '.implode(',', $this->timezones),
-			'theme' =>				'db users.theme|in '.implode(',', $themes),
-			'autologin' =>			'db users.autologin|in 0,1',
-			'autologout' =>			'db users.autologout|not_empty',
-			'refresh' =>			'db users.refresh|not_empty',
-			'rows_per_page' =>		'db users.rows_per_page',
-			'url' =>				'db users.url',
-			'messages' =>			'array',
-			'form_refresh' =>		'int32'
-		];
-
-		$ret = $this->validateInput($fields);
-		$result = $this->getValidationResult();
-
-		if ($ret && !$this->validateCurrentPassword()) {
-			$result = self::VALIDATION_ERROR;
-			$ret = false;
-		}
-
-		if ($ret && !$this->validatePassword()) {
-			$result = self::VALIDATION_ERROR;
+		if ($ret && (!$this->validateCurrentPassword() || !$this->validatePassword())) {
 			$ret = false;
 		}
 
 		if (!$ret) {
-			switch ($result) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect(
-						(new CUrl('zabbix.php'))->setArgument('action', 'userprofile.edit')
-					);
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot update user'));
-					$this->setResponse($response);
-					break;
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot update user'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
 
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode($response)])
+			);
 		}
 
 		return $ret;
@@ -89,6 +106,11 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		$this->getInputs($user, ['lang', 'timezone', 'theme', 'autologin', 'autologout', 'refresh', 'rows_per_page',
 			'url'
 		]);
+
+		if ($this->getInput('autologout_visible') == 0) {
+			$user['autologout'] = 0;
+		}
+
 		$user['userid'] = CWebUser::$data['userid'];
 
 		if ($this->getInput('current_password', '') !== ''
@@ -106,22 +128,20 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		$result = DBend($result);
 
 		if ($result) {
-			if (array_key_exists('passwd', $user)) {
-				redirect('index.php');
-			}
-			$response = new CControllerResponseRedirect(
-				new CUrl(CMenuHelper::getFirstUrl())
-			);
-			CMessageHelper::setSuccessTitle(_('User updated'));
+			$response = ['success' => [
+				'title' => _('User updated'),
+				'redirect' => array_key_exists('passwd', $user)
+					? (new CUrl('index.php'))->getUrl()
+					: (new CUrl(CMenuHelper::getFirstUrl()))->getUrl()
+			]];
 		}
 		else {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))->setArgument('action', 'userprofile.edit')
-			);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot update user'));
+			$response = ['error' => [
+				'title' => _('Cannot update user'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			]];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 	}
 }

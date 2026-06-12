@@ -24,10 +24,11 @@ typedef void (*zbx_async_notify_cb_t)(void *data);
 
 typedef struct
 {
-	zbx_dc_item_t	*items;
-	AGENT_RESULT	*results;
-	int		*errcodes;
-	int		num;
+	unsigned char		poller_type;
+	zbx_dc_poller_item_t	items;
+	AGENT_RESULT		*results;
+	int			*errcodes;
+	int			num;
 }
 zbx_poller_item_t;
 

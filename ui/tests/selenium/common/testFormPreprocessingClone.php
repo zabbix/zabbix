@@ -293,12 +293,13 @@ class testFormPreprocessingClone extends CWebTest {
 		// Open host or template via breadcrumb and make a clone of it.
 		$this->query('xpath://li[1]/ul[@class="breadcrumbs"]/li[2]//a')->one()->click();
 		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
-		$modal->query('button:Clone')->waitUntilClickable()->one()->click();
+		$modal->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 		$form = $modal->asForm();
 
 		$new_host_name = 'Cloned host name'.time();
 		$form->fill([($template) ? 'Template name' : 'Host name' => $new_host_name]);
 		$form->submit();
+		$modal->ensureNotPresent();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, ($template) ? 'Template added' : 'Host added');
 

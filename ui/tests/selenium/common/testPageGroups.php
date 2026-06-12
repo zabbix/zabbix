@@ -136,7 +136,7 @@ class testPageGroups extends CWebTest {
 			$icon = $row->getColumn('Info')->query('tag:button')->one();
 			$this->assertTrue($icon->hasClass('zi-i-warning'));
 			$icon->click();
-			$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible();
+			$hintbox = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilVisible();
 			$this->assertEquals('The host group is not discovered anymore and will be deleted the next time discovery'.
 					' rule is processed.',
 					$hintbox->one()->getText()
@@ -185,8 +185,8 @@ class testPageGroups extends CWebTest {
 			? $links['lld'].': '.$links['host_template']
 			: $links['host_template'];
 
-		$host_row = $this->query('class:list-table')->asTable()->one()->findRow('Name',  $name);
-		$this->assertEquals($name, $host_row->getColumn('Name')->getText());
+		$host_row = $this->query('class:datatable')->asDatatable()->one()->findRow('Name',  $name);
+		$this->assertEquals($name, $host_row->getColumn('Name')->getAllText());
 		$this->page->open($this->link)->waitUntilReady();
 
 		// Check link to host prototype from host group name.

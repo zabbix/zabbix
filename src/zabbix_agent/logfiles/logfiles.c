@@ -1991,7 +1991,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 	size_t				szbyte;
 	zbx_offset_t			offset;
 	const int			is_count_item = (0 != (ZBX_METRIC_FLAG_LOG_COUNT & flags)) ? 1 : 0;
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
+#if !defined(_WINDOWS) && !defined(__MINGW32__) && !defined(WITH_AGENT2_METRICS)
 	int				prep_vec_idx = -1;	/* index in 'prep_vec' vector */
 #endif
 	zbx_uint64_t			processed_size;
@@ -2086,7 +2086,12 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 						}
 					}
 					else
+					{
+#ifndef PCRE2_MATCH_INVALID_UTF
+						zbx_replace_invalid_utf8(buf);
+#endif
 						value = buf;
+					}
 
 					zabbix_log(LOG_LEVEL_WARNING, "Logfile contains a large record: \"%.64s\""
 							" (showing only the first 64 characters). Only the first 256 kB"
@@ -2099,7 +2104,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					regexp_ret = zbx_regexp_sub_ex2(regexps, value, pattern, ZBX_CASE_SENSITIVE,
 							(0 == is_count_item) ? output_template : NULL,
 							(0 == is_count_item) ? &item_value : NULL, err_msg);
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
+#if !defined(_WINDOWS) && !defined(__MINGW32__) && !defined(WITH_AGENT2_METRICS)
 					if (NULL != persistent_file_name && (ZBX_REGEXP_MATCH == regexp_ret ||
 							ZBX_REGEXP_NO_MATCH == regexp_ret ||
 							ZBX_REGEXP_RUNTIME_FAIL == regexp_ret))
@@ -2229,7 +2234,12 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 						}
 					}
 					else
+					{
+#ifndef PCRE2_MATCH_INVALID_UTF
+						zbx_replace_invalid_utf8(p_start);
+#endif
 						value = p_start;
+					}
 
 					processed_size = (size_t)offset + (size_t)(p_next - buf);
 					send_err = FAIL;
@@ -2237,7 +2247,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					regexp_ret = zbx_regexp_sub_ex2(regexps, value, pattern, ZBX_CASE_SENSITIVE,
 							(0 == is_count_item) ? output_template : NULL,
 							(0 == is_count_item) ? &item_value : NULL, err_msg);
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
+#if !defined(_WINDOWS) && !defined(__MINGW32__) && !defined(WITH_AGENT2_METRICS)
 					if (NULL != persistent_file_name && (ZBX_REGEXP_MATCH == regexp_ret ||
 							ZBX_REGEXP_NO_MATCH == regexp_ret ||
 							ZBX_REGEXP_RUNTIME_FAIL == regexp_ret))
@@ -3774,6 +3784,7 @@ err:
 	return FAIL;
 }
 
+#if !defined(WITH_AGENT2_METRICS)
 static int	init_persistent_dir_parameter(const char *server, unsigned short port, const char *item_key,
 		int is_count_item, const AGENT_REQUEST *request, char **persistent_file_name, char **error)
 {
@@ -3823,6 +3834,7 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
 	return SUCCEED;
 #endif
 }
+#endif /* not WITH_AGENT2_METRICS */
 
 /******************************************************************************
  *                                                                            *
@@ -3936,6 +3948,7 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 		goto out;
 
 	/* parameter 'persistent_dir' */
+#if !defined(WITH_AGENT2_METRICS)
 	if (NULL != addrs)	/* When process_log_check() is called in C agent it receives 'addrs' argument with  */
 				/* server hostname or IP address and port number where to send matching records.    */
 				/* When process_log_check() is called in Agent2 (Golang) the 'addrs' argument is    */
@@ -3950,6 +3963,7 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 			goto out;
 		}
 	}
+#endif
 
 	/* jumping over fast growing log files is not supported with 'copytruncate' */
 	if (ZBX_LOG_ROTATION_LOGCPT == rotation_type && 0.0f != max_delay)
@@ -3990,7 +4004,7 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 		/* not be sent to server. */
 	}
 
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
+#if !defined(_WINDOWS) && !defined(__MINGW32__) && !defined(WITH_AGENT2_METRICS)
 	/* recover state from persistent file only if agent has no already established state */
 	if (0 != (ZBX_METRIC_FLAG_NEW & metric->flags) && NULL != metric->persistent_file_name &&
 			0 == metric->logfiles_num)

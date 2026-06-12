@@ -20,7 +20,7 @@ class CFieldSet extends CField {
 	 *
 	 * @type {Object}
 	 */
-	#fields = {};
+	#fields = Object.create(null);
 
 	init() {
 		super.init();
@@ -74,8 +74,29 @@ class CFieldSet extends CField {
 		}}));
 	}
 
+	/**
+	 * Attaches blur handling to a button. Validation is done when the button loses focus, unless the blur
+	 * was caused by opening the related overlay.
+	 *
+	 * @param {string} button_class	 Class name for the button.
+	 * @param {string} dialogue_id   ID for a dialogue opened by the button.
+	 */
+	setButtonOnBlur(button_class, dialogue_id) {
+		const button = this._field.querySelector('.' + button_class);
+		let timeout_id = null;
+
+		button.addEventListener('blur', () => {
+			clearTimeout(timeout_id);
+			timeout_id = setTimeout(() => {
+				if (document.activeElement !== button && overlays_stack.getById(dialogue_id) === undefined) {
+					this.onBlur();
+				}
+			}, 250);
+		});
+	}
+
 	#discoverAllFields() {
-		const fields = {};
+		const fields = Object.create(null);
 		const fields_rediscovered = [];
 
 		for (const discovered_field of CForm.findAllFields(this._field)) {
@@ -124,27 +145,44 @@ class CFieldSet extends CField {
 		return this._field.getAttribute('data-field-name');
 	}
 
+	#subFieldNameParts(sub_field_name) {
+		if (!sub_field_name.startsWith(this.getName())) {
+			return false;
+		}
+
+		return sub_field_name
+			.slice(this.getName().length)
+			.replace(/^\[|]$/g, '')
+			.split(/\]\[/);
+	}
+
 	getInnerValue(trim_value) {
-		let result = {};
+		let result = Object.create(null);
+		let simple_fields = Object.create(null);
 
 		for (const field of Object.values(this.#fields)) {
 			if (field._field.hasAttribute('data-skip-from-submit') || field.isDisabled()) {
 				continue;
 			}
 
-			/*
-			 * This code converts name of the simple field (belonged to the fieldset) to the array of name keys.
-			 * The main part that matches fieldset name is skipped.
-			 *
-			 * For example, field name: interfaces[0][port] must be converted to following array: ['0', 'port'].
-			 */
-			const name_parts = field.getName().replace(/]$/, '').split(/\]\[|\[/);
+			if (typeof field.getExtraFields === 'function') {
+				for (const [field_name, field_value] of Object.entries(field.getExtraFields())) {
+					simple_fields[field_name] = field_value;
+				}
+			}
+			else {
+				simple_fields[field.getName()] = trim_value ? field.getValueTrimmed() : field.getValue();
+			}
+		}
 
-			if (name_parts[0] === this.getName()) {
-				name_parts.shift();
+		for (const [key, value] of Object.entries(simple_fields)) {
+			const name_parts = this.#subFieldNameParts(key);
+
+			if (name_parts === false) {
+				continue;
 			}
 
-			result = objectSetDeepValue(result, name_parts, trim_value ? field.getValueTrimmed() : field.getValue());
+			result = objectSetDeepValue(result, name_parts, value);
 		}
 
 		return result;
@@ -156,6 +194,10 @@ class CFieldSet extends CField {
 
 	getValueTrimmed() {
 		return this.getInnerValue(true);
+	}
+
+	updateState() {
+		this.#discoverAllFields();
 	}
 
 	hasErrors() {
@@ -178,9 +220,8 @@ class CFieldSet extends CField {
 	}
 
 	unsetErrors() {
-		const errors = {
-			'': [{message: '', level: -1}]
-		};
+		const errors = Object.create(null);
+		errors[''] = [{message: '', level: -1}];
 
 		for (const field of Object.values(this.#fields)) {
 			errors[field.getName().replace(new RegExp(`^${this.getName()}`), '')] = [{message: '', level: -1}];
@@ -206,14 +247,17 @@ class CFieldSet extends CField {
 	}
 
 	#fieldsSetErrors(errors, force_display_errors) {
-		let missing_field_errors = {};
-
 		for (const [key, field_errors] of Object.entries(errors)) {
 			const key_full = key.charAt(0) === '[' ? key : `[${key}]`;
 
 			if (key_full in this.#fields) {
+				// These errors need to be added even if field is not changed, but smaller index one was.
+				const error_levels = [CFormValidator.ERROR_LEVEL_UNIQ,
+					CFormValidator.ERROR_LEVEL_OBJECTS_COUNT
+				];
+
 				if (this.#fields[key_full].hasChanged() || this.#hasObjectChanged(key_full) || force_display_errors
-						|| field_errors.some((error) => error.message === '' || error.level == CFormValidator.ERROR_LEVEL_UNIQ)) {
+						|| field_errors.some((error) => error.message === '' || error_levels.includes(error.level))) {
 					field_errors.forEach((error) => this.#fields[key_full].setErrors(error));
 
 					this._global_errors = {...this._global_errors, ...this.#fields[key_full].getGlobalErrors()};

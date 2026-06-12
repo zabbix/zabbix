@@ -286,7 +286,8 @@ static char	*email_encode_part(const char *data, size_t data_size)
 }
 
 static char	*smtp_prepare_payload(zbx_vector_mailaddr_ptr_t *from_mails, zbx_vector_mailaddr_ptr_t *to_mails,
-		const char *inreplyto, const char *mailsubject, const char *mailbody, unsigned char message_format)
+		const char *messageid, const char *inreplyto, const char *mailsubject, const char *mailbody,
+		unsigned char message_format)
 {
 	char		*tmp = NULL, *base64 = NULL;
 	char		*localsubject = NULL, *localbody = NULL, *from = NULL, *to = NULL;
@@ -359,11 +360,21 @@ static char	*smtp_prepare_payload(zbx_vector_mailaddr_ptr_t *from_mails, zbx_vec
 	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
 			"From: %s\r\n"
 			"To: %s\r\n"
-			"In-Reply-To: %s\r\n"
+			"Message-ID: %s\r\n",
+			from, to, messageid);
+
+	if (NULL != inreplyto)
+	{
+		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
+				"In-Reply-To: %s\r\n",
+				inreplyto);
+	}
+
+	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
 			"Date: %s\r\n"
 			"Subject: %s\r\n"
 			"MIME-Version: 1.0\r\n",
-			from, to, inreplyto, str_time, localsubject);
+			str_time, localsubject);
 
 	if (ZBX_MEDIA_MESSAGE_FORMAT_MULTI == message_format)
 	{
@@ -527,9 +538,9 @@ static const char	*socket_error(zbx_socket_t *s, int socket_errno)
 }
 
 static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
-		zbx_vector_mailaddr_ptr_t *from_mails, zbx_vector_mailaddr_ptr_t *to_mails, const char *inreplyto,
-		const char *mailsubject, const char *mailbody, unsigned char message_format, int timeout,
-		const char *config_source_ip, char **error)
+		zbx_vector_mailaddr_ptr_t *from_mails, zbx_vector_mailaddr_ptr_t *to_mails, const char *messageid,
+		const char *inreplyto, const char *mailsubject, const char *mailbody, unsigned char message_format,
+		int timeout, const char *config_source_ip, char **error)
 {
 #define OK_220	"220"
 #define OK_251	"251"
@@ -649,7 +660,7 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 		goto close;
 	}
 
-	cmdp = smtp_prepare_payload(from_mails, to_mails, inreplyto, mailsubject, mailbody, message_format);
+	cmdp = smtp_prepare_payload(from_mails, to_mails, messageid, inreplyto, mailsubject, mailbody, message_format);
 	err = zbx_tcp_send_raw(&s, cmdp);
 	zbx_free(cmdp);
 
@@ -731,9 +742,9 @@ static void	handle_curl_error(CURLcode err, unsigned char auth_type, const char 
 #define SMTP_SECURITY_SSL	2
 
 static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
-		zbx_vector_mailaddr_ptr_t *from_mails, zbx_vector_mailaddr_ptr_t *to_mails, const char *inreplyto,
-		const char *mailsubject, const char *mailbody, unsigned char smtp_security, unsigned char
-		smtp_verify_peer, unsigned char smtp_verify_host, unsigned char smtp_authentication,
+		zbx_vector_mailaddr_ptr_t *from_mails, zbx_vector_mailaddr_ptr_t *to_mails, const char *messageid,
+		const char *inreplyto, const char *mailsubject, const char *mailbody, unsigned char smtp_security,
+		unsigned char smtp_verify_peer, unsigned char smtp_verify_host, unsigned char smtp_authentication,
 		const char *smtp_username, const char *smtp_password, unsigned char message_format, int timeout,
 		const char *config_source_ip, const char *config_ssl_ca_location, char **error)
 {
@@ -882,7 +893,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAIL_RCPT, recipients)))
 		goto error;
 
-	payload_status.payload = smtp_prepare_payload(from_mails, to_mails, inreplyto, mailsubject, mailbody,
+	payload_status.payload = smtp_prepare_payload(from_mails, to_mails, messageid, inreplyto, mailsubject, mailbody,
 			message_format);
 	payload_status.payload_len = strlen(payload_status.payload);
 
@@ -932,6 +943,7 @@ out:
 	ZBX_UNUSED(smtp_helo);
 	ZBX_UNUSED(from_mails);
 	ZBX_UNUSED(to_mails);
+	ZBX_UNUSED(messageid);
 	ZBX_UNUSED(inreplyto);
 	ZBX_UNUSED(mailsubject);
 	ZBX_UNUSED(mailbody);
@@ -968,10 +980,10 @@ static void	zbx_mailaddr_free(zbx_mailaddr_t *mailaddr)
 }
 
 int	send_email(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo, const char *smtp_email,
-		const char *mailto, const char *inreplyto, const char *mailsubject, const char *mailbody,
-		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
-		unsigned char smtp_authentication, const char *smtp_username, const char *smtp_password,
-		unsigned char message_format, int timeout, const char *config_source_ip,
+		const char *mailto, const char *messageid, const char *inreplyto, const char *mailsubject,
+		const char *mailbody, unsigned char smtp_security, unsigned char smtp_verify_peer,
+		unsigned char smtp_verify_host, unsigned char smtp_authentication, const char *smtp_username,
+		const char *smtp_password, unsigned char message_format, int timeout, const char *config_source_ip,
 		const char *config_ssl_ca_location, char **error)
 {
 	int				ret = FAIL;
@@ -993,15 +1005,15 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	/* choose appropriate method for sending the email */
 	if (SMTP_SECURITY_NONE == smtp_security && SMTP_AUTHENTICATION_NONE == smtp_authentication)
 	{
-		ret = send_email_plain(smtp_server, smtp_port, smtp_helo, &from_mails, &to_mails, inreplyto,
+		ret = send_email_plain(smtp_server, smtp_port, smtp_helo, &from_mails, &to_mails, messageid, inreplyto,
 				mailsubject, mailbody, message_format, timeout, config_source_ip, error);
 	}
 	else
 	{
-		ret = send_email_curl(smtp_server, smtp_port, smtp_helo, &from_mails, &to_mails, inreplyto, mailsubject,
-				mailbody, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication,
-				smtp_username, smtp_password, message_format, timeout, config_source_ip,
-				config_ssl_ca_location, error);
+		ret = send_email_curl(smtp_server, smtp_port, smtp_helo, &from_mails, &to_mails, messageid, inreplyto,
+				mailsubject, mailbody, smtp_security, smtp_verify_peer, smtp_verify_host,
+				smtp_authentication, smtp_username, smtp_password, message_format, timeout,
+				config_source_ip, config_ssl_ca_location, error);
 	}
 
 clean:

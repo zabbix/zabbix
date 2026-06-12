@@ -27,14 +27,12 @@ $form = (new CForm())
 	->addVar('userid', $data['userid'])
 	->addVar('provisioned', $data['provisioned'])
 	->addStyle('display: none;')
+	->addVar('mediaid', $data['mediaid'])
+	->addVar('mediatype_type', 0)
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
-
-if ($data['mediaid'] !== null) {
-	$form->addVar('mediaid', $data['mediaid']);
-}
 
 $mediatype_select = (new CSelect('mediatypeid'))
 	->setId('mediatypeid')
@@ -72,10 +70,10 @@ $form_grid = (new CFormGrid())
 			->setAsteriskMark()
 			->addClass('js-field-sendto'),
 		(new CFormField(
-			(new CTextBox('sendto', $data['form']['sendto'], $data['provisioned'] == CUser::PROVISION_STATUS_YES,
-				DB::getFieldLength('media', 'sendto')
-			))
+			(new CTextAreaFlexible('sendto', $data['form']['sendto']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('media', 'sendto'))
+				->setReadonly($data['provisioned'] == CUser::PROVISION_STATUS_YES)
 				->setAriaRequired()
 		))->addClass('js-field-sendto')
 	])
@@ -86,6 +84,8 @@ $form_grid = (new CFormGrid())
 		(new CFormField([
 			(new CTable())
 				->setId('sendto_emails')
+				->setAttribute('data-field-type', 'array')
+				->setAttribute('data-field-name', 'sendto_emails')
 				->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
 				->setFooter(
 					(new CCol(
@@ -97,10 +97,9 @@ $form_grid = (new CFormGrid())
 				),
 			(new CTemplateTag('sendto-emails-row-tmpl'))->addItem(
 				(new CRow([
-					(new CTextBox('sendto_emails[#{rowNum}]', '#{email}',
-						$data['provisioned'] == CUser::PROVISION_STATUS_YES
-					))
+					(new CTextAreaFlexible('sendto_emails[#{rowNum}]', '#{email}'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setReadonly($data['provisioned'] == CUser::PROVISION_STATUS_YES)
 						->setAriaRequired(),
 					(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						->setEnabled($data['provisioned'] == CUser::PROVISION_STATUS_NO)
@@ -129,7 +128,9 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enabled'), 'active'),
 		new CFormField(
-			(new CCheckBox('active', MEDIA_STATUS_ACTIVE))->setChecked($data['form']['active'] == MEDIA_STATUS_ACTIVE)
+			(new CCheckBox('active', MEDIA_STATUS_ACTIVE))
+				->setUncheckedValue(MEDIA_STATUS_DISABLED)
+				->setChecked($data['form']['active'] == MEDIA_STATUS_ACTIVE)
 		)
 	]);
 
@@ -138,6 +139,7 @@ $form
 	->addItem(
 		(new CScriptTag('
 			media_edit_popup.init('.json_encode([
+				'rules' => $data['js_validation_rules'],
 				'mediatypes' => $data['mediatypes'],
 				'sendto_emails' => $data['form']['sendto_emails']
 			]).');

@@ -40,6 +40,7 @@ window.host_prototype_edit_popup = new class {
 		this.all_templateids = null;
 		this.show_inherited_tags = false;
 		this.tags_table = this.form_element.querySelector('.tags-table');
+		this.tags_abort_controller = null;
 		this.show_inherited_macros = false;
 		this.parent_hostid = parent_hostid;
 
@@ -398,12 +399,20 @@ window.host_prototype_edit_popup = new class {
 			templateids: this.#getAllTemplates(),
 			show_inherited_tags: fields.show_inherited_tags,
 			tags: fields.tags
+		};
+
+		if (this.tags_abort_controller !== null) {
+			this.tags_abort_controller.abort();
 		}
+
+		const abort_controller = new AbortController();
+		this.tags_abort_controller = abort_controller;
 
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
+			body: JSON.stringify(data),
+			signal: abort_controller.signal
 		})
 			.then(response => response.json())
 			.then(response => {
@@ -414,15 +423,22 @@ window.host_prototype_edit_popup = new class {
 				if (!this.readonly) {
 					$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
 				}
-
-				$tags_table.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`).textareaFlexible();
 			})
 			.catch((message) => {
+				if (abort_controller.signal.aborted) {
+					return;
+				}
+
 				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});
 				this.form.renderErrors();
 				throw message;
 			})
 			.finally(() => {
+				if (this.tags_abort_controller !== abort_controller) {
+					return;
+				}
+
+				this.tags_abort_controller = null;
 				this.overlay.unsetLoading();
 			});
 	}
@@ -431,8 +447,11 @@ window.host_prototype_edit_popup = new class {
 	 * Set up of macros functionality.
 	 */
 	#initMacrosTab() {
+		const container = $('#macros_container');
+		const show_inherited_macros_element = document.getElementById('show_inherited_macros');
+
 		this.macros_manager = new HostMacrosManager({
-			container: $('#macros_container'),
+			container: container,
 			readonly: this.readonly,
 			parent_hostid: this.parent_hostid,
 			load_callback: () => {
@@ -451,7 +470,13 @@ window.host_prototype_edit_popup = new class {
 			}
 		});
 
-		const show_inherited_macros_element = document.getElementById('show_inherited_macros');
+		container
+			.bind('loader.start', () => show_inherited_macros_element.querySelectorAll('input')
+				.forEach(radio_input => radio_input.setAttribute('readonly', 'readonly'))
+			)
+			.bind('loader.stop', () => show_inherited_macros_element.querySelectorAll('input')
+				.forEach(radio_input => radio_input.removeAttribute('readonly'))
+			);
 
 		this.show_inherited_macros = show_inherited_macros_element.querySelector('input:checked').value == 1;
 		this.macros_manager.initMacroTable(this.show_inherited_macros);

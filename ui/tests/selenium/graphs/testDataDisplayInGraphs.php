@@ -1225,7 +1225,7 @@ class testDataDisplayInGraphs extends CWebTest {
 						]
 					],
 					[
-						'name' => 'SVG graphs with axes scale',
+						'name' => 'SVG graphs with axes scale with host name',
 						'widgets' => [
 							[
 								'type' => 'svggraph',
@@ -1285,6 +1285,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0 // disabled Right Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -1356,6 +1361,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'lefty',
 										'value' => 0 // disabled Left Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -1437,6 +1447,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'lefty',
 										'value' => 0 // disabled Left Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -1508,6 +1523,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0 // disabled Right Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -1579,6 +1599,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0 // disabled Right Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -1670,6 +1695,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'lefty',
 										'value' => 0 // disabled Left Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -1751,6 +1781,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'lefty',
 										'value' => 0 // disabled Left Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -1822,6 +1857,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0 // disabled Right Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -1888,6 +1928,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0 // disabled Right Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -1964,6 +2009,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'lefty',
 										'value' => 0 // disabled Left Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -2045,6 +2095,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'lefty',
 										'value' => 0 // disabled Left Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -2116,6 +2171,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0 // disabled Right Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -2187,6 +2247,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0 // disabled Right Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -2268,6 +2333,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'lefty',
 										'value' => 0 // disabled Left Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -2349,6 +2419,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'lefty',
 										'value' => 0 // disabled Left Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -2420,6 +2495,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0 // disabled Right Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -2491,6 +2571,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 1 // Right Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],
@@ -2562,6 +2647,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 1 // Right Y (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							]
@@ -2633,6 +2723,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE
 									]
 								]
 							],
@@ -2699,6 +2794,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE
 									]
 								]
 							],
@@ -2770,6 +2870,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE
 									]
 								]
 							],
@@ -2841,6 +2946,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE
 									]
 								]
 							],
@@ -2937,6 +3047,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'axisx',
 										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE
 									]
 								]
 							],
@@ -3038,6 +3153,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'axisx',
 										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE
 									]
 								]
 							],
@@ -3104,6 +3224,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'legend',
 										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE
 									]
 								]
 							],
@@ -3185,6 +3310,11 @@ class testDataDisplayInGraphs extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE
 									]
 								]
 							]
@@ -5480,7 +5610,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		// Switch to filter tab and fill in the name pattern to return only graphs with certain type.
 		CFilterElement::find()->one()->selectTab('Filter');
-		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
+		$filter_form = $this->query('name:zbx_filter')->waitUntilVisible()->asForm()->one();
 		$filter_form->fill(['Name' => $data['type']]);
 
 		$screenshot_string = (CTestArrayHelper::get($data, 'kiosk_mode'))
@@ -5533,6 +5663,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
 				$this->query('xpath://button[@title="Normal view"]')->one()->click();
 				$this->page->waitUntilReady();
+				$this->query('class:btn-kiosk')->waitUntilVisible();
 			}
 		}
 	}
@@ -5610,7 +5741,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			],
 			[
 				[
-					'page' => 'SVG graphs with axes scale'
+					'page' => 'SVG graphs with axes scale with host name'
 				]
 			],
 			[
@@ -5689,6 +5820,7 @@ class testDataDisplayInGraphs extends CWebTest {
 		}
 		else {
 			$object->asDashboard()->waitUntilReady();
+			$this->query('class:dashboard-is-multipage')->one()->waitUntilClassesPresent('is-ready');
 		}
 
 		$this->assertScreenshotExcept($object, $this->query('class:header-kioskmode-controls')->one(), $id.'_kiosk');

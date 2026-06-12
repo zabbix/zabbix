@@ -179,8 +179,16 @@ static void	dc_items_convert_hk_periods(const zbx_dc_um_handle_t *um_handle, con
 				item->history_sec = ZBX_HK_PERIOD_MAX;
 		}
 
-		if (0 != item->history_sec && ZBX_HK_OPTION_ENABLED == config_hk->history_global)
-			item->history_sec = config_hk->history;
+		if (0 != item->history_sec)
+		{
+			if (0 != config_hk->history_override[item->value_type])
+			{
+				item->history_sec = config_hk->history_override[item->value_type];
+				item->history = 1;
+			}
+			else if (ZBX_HK_OPTION_ENABLED == config_hk->history_global)
+				item->history_sec = config_hk->history;
+		}
 
 		item->history = (0 != item->history_sec);
 	}
@@ -1004,7 +1012,7 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 	zbx_uint64_t		global_revision;
 	zbx_dc_config_t		*dc_config = get_dc_config();
 
-	if (get_dc_config()->revision.config == *config_revision)
+	if (zbx_dc_config_get_config_revision() == *config_revision)
 		return;
 
 	global_revision = *config_revision;
@@ -1082,7 +1090,7 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 	if (global_revision > *config_revision)
 		global_macro_updated = SUCCEED;
 
-	*config_revision = dc_config->revision.config;
+	*config_revision = dc_config_get_config_revision();
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 

@@ -46,6 +46,7 @@ static zbx_history_table_compression_options_t	compression_tables[] = {
 	{"history_text",	"itemid",	"clock,ns",	POLICY_COMPRESS_AFTER},
 	{"history_log",		"itemid",	"clock,ns",	POLICY_COMPRESS_AFTER},
 	{"history_bin",		"itemid",	"clock,ns",	POLICY_COMPRESS_AFTER},
+	{"history_json",	"itemid",	"clock,ns",	POLICY_COMPRESS_AFTER},
 	{"trends",		"itemid",	"clock",	POLICY_COMPRESS_AFTER},
 	{"trends_uint",		"itemid",	"clock",	POLICY_COMPRESS_AFTER},
 	/* Since auditlog table uses CUID from auditid field to partition table into chunks we need to use different */

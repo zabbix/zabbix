@@ -110,16 +110,16 @@ class testFormWebScenarioStep extends CWebTest {
 		$step_fields = [
 			'Name' => ['maxlength' => 64],
 			'id:url' => [],
-			'xpath:(.//table[@id="step-query-fields"]//textarea)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
-			'xpath:(.//table[@id="step-query-fields"]//textarea)[2]' => ['placeholder' => 'value', 'maxlength' => 255],
-			'xpath:(.//table[@id="step-post-fields"]//textarea)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
-			'xpath:(.//table[@id="step-post-fields"]//textarea)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
+			'xpath:(.//table[@id="step-query-fields"]//z-textarea-flexible)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(.//table[@id="step-query-fields"]//z-textarea-flexible)[2]' => ['placeholder' => 'value', 'maxlength' => 255],
+			'xpath:(.//table[@id="step-post-fields"]//z-textarea-flexible)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(.//table[@id="step-post-fields"]//z-textarea-flexible)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
 			'Post type' => ['value' => 'Form data'],
 			'Raw post' => ['visible' => false],
-			'xpath:(.//table[@id="step-variables"]//textarea)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
-			'xpath:(.//table[@id="step-variables"]//textarea)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
-			'xpath:(.//table[@id="step-headers"]//textarea)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
-			'xpath:(.//table[@id="step-headers"]//textarea)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
+			'xpath:(.//table[@id="step-variables"]//z-textarea-flexible)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(.//table[@id="step-variables"]//z-textarea-flexible)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
+			'xpath:(.//table[@id="step-headers"]//z-textarea-flexible)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(.//table[@id="step-headers"]//z-textarea-flexible)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
 			'Follow redirects' => ['value' => false],
 			'Retrieve mode' => ['value' => 'Body'],
 			'Timeout' => ['value' => '15s', 'maxlength' => 255],
@@ -141,7 +141,7 @@ class testFormWebScenarioStep extends CWebTest {
 			$post_fields = ['Post type', 'Raw post'];
 
 			foreach (['[1]', '[2]'] as $element_index) {
-				$xpath = 'xpath:(.//table[@id="step-post-fields"]//textarea)'.$element_index;
+				$xpath = 'xpath:(.//table[@id="step-post-fields"]//z-textarea-flexible)'.$element_index;
 
 				unset($step_fields[$xpath]);
 				$this->assertFalse($step_form->query($xpath)->one(false)->isValid());
@@ -212,7 +212,13 @@ class testFormWebScenarioStep extends CWebTest {
 				if ($post_field === 'Post fields') {
 					$post_fields_table = $step_form->getField($post_field);
 
-					foreach (['xpath:(.//textarea)[1]', 'xpath:(.//textarea)[2]', 'button:Add', 'button:Remove'] as $element) {
+					$elements = [
+						'xpath:(.//textarea)[1]',
+						'xpath:(.//textarea)[2]',
+						'button:Add',
+						'button:Remove'
+					];
+					foreach ($elements as $element) {
 						$this->assertTrue($post_fields_table->query($element)->one()->isEnabled($enabled));
 					}
 				}
@@ -258,7 +264,7 @@ class testFormWebScenarioStep extends CWebTest {
 
 			// Fill in some data in first row and check that Remove buttons and draggable icon became enabled.
 			foreach(['Name', 'Value'] as $column) {
-				$row->getColumn($column)->query('xpath:./textarea')->one()->fill('zabbix');
+				$row->getColumn($column)->query('xpath:./z-textarea-flexible')->one()->fill('zabbix');
 			}
 			$this->assertTrue($row->query('button:Remove')->one()->isClickable());
 

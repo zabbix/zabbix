@@ -19,6 +19,7 @@
 #include "zbxipcservice.h"
 #include "zbxthreads.h"
 #include "zbxjson.h"
+#include "zbxnix.h"
 
 #define ZBX_IPC_SERVICE_RTC	"rtc"
 
@@ -38,11 +39,19 @@ zbx_rtc_sub_source_t;
 
 typedef struct
 {
+	unsigned char	process_type;
+	int		process_num;
+	zbx_uint32_t	code;
+}
+zbx_rtc_msg_t;
+
+ZBX_VECTOR_DECL(rtc_msg, zbx_rtc_msg_t)
+
+typedef struct
+{
 	zbx_rtc_sub_type_t	type;
 	zbx_rtc_sub_source_t	source;
-	unsigned char		process_type;
-	int			process_num;
-	zbx_vector_uint32_t	msgs;
+	zbx_vector_rtc_msg_t	msgs;
 }
 zbx_rtc_sub_t;
 
@@ -68,16 +77,16 @@ zbx_rtc_t;
 typedef int	(*zbx_rtc_process_request_ex_func_t)(zbx_rtc_t *, zbx_uint32_t, const unsigned char *, char **);
 
 /* provider API */
-int	zbx_rtc_init(zbx_rtc_t *rtc ,char **error);
+int	zbx_rtc_init(zbx_rtc_t *rtc, zbx_get_threads_f get_threads_cb, zbx_get_config_int_f get_threads_num_cb,
+		zbx_get_config_forks_f get_config_forks_cb,
+		zbx_get_process_info_by_thread_f get_process_info_by_thread_cb, char **error);
 void 	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_t *message,
 		zbx_rtc_process_request_ex_func_t cb_proc_req);
-int	zbx_rtc_wait_for_sync_finish(zbx_rtc_t *rtc, zbx_rtc_process_request_ex_func_t cb_proc_req);
 void	zbx_rtc_shutdown_subs(zbx_rtc_t *rtc);
 
 /* client API */
 void	zbx_rtc_notify_finished_sync(int config_timeout, zbx_uint32_t code, const char *process_name,
-		zbx_ipc_async_socket_t *rtc);
-
+	zbx_ipc_async_socket_t *rtc);
 void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs, int msgs_num, int config_timeout,
 		zbx_ipc_async_socket_t *rtc);
 void	zbx_rtc_subscribe_service(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs, int msgs_num,

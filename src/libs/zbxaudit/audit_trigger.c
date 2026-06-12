@@ -35,7 +35,7 @@ static int	trigger_flag_to_resource_type(int flag)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "unexpected audit trigger flag detected: ->%d<-", flag);
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -330,7 +330,7 @@ void	zbx_audit_trigger_update_json_add_tags_and_values(int audit_context_mode, z
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "unexpected audit trigger resource type detected: ->%d<-", resource_type);
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 #define AUDIT_TABLE_NAME	"trigger_tag"

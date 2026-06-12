@@ -20,40 +20,7 @@
 class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 	protected function checkInput(): bool {
-		$locales = array_keys(getLocales());
-		$locales[] = LANG_DEFAULT;
-		$themes = array_keys(APP::getThemes());
-		$themes[] = THEME_DEFAULT;
-
-		$fields = [
-			'change_password' =>	'in 1',
-			'current_password' =>	'string',
-			'password1' =>			'string',
-			'password2' =>			'string',
-			'lang' =>				'db users.lang|in '.implode(',', $locales),
-			'timezone' =>			'db users.timezone|in '.implode(',', array_keys($this->timezones)),
-			'theme' =>				'db users.theme|in '.implode(',', $themes),
-			'autologin' =>			'db users.autologin|in 0,1',
-			'autologout' =>			'db users.autologout',
-			'refresh' =>			'db users.refresh',
-			'rows_per_page' =>		'db users.rows_per_page',
-			'url' =>				'db users.url',
-			'messages' =>			'array',
-			'form_refresh' =>		'int32'
-		];
-
-		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$fields += [
-				'medias' =>			'array'
-			];
-		}
-
-		$ret = $this->validateInput($fields);
-		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
-
-		return $ret;
+		return true;
 	}
 
 	protected function checkPermissions(): bool {
@@ -82,7 +49,14 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 	 * Set user medias if user is at least admin and set messages in data.
 	 */
 	protected function doAction(): void {
+		$usrgrps = API::UserGroup()->get([
+			'output' => ['gui_access'],
+			'userids' => CWebUser::$data['userid']
+		]);
+
 		$data = [
+			'change_password' => 0,
+			'allow_empty_password' => !CControllerUserUpdateGeneral::hasInternalAuth($usrgrps),
 			'current_password' => '',
 			'password1' => '',
 			'password2' => '',
@@ -94,23 +68,16 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'refresh' => $this->user['refresh'],
 			'rows_per_page' => $this->user['rows_per_page'],
 			'url' => $this->user['url'],
-			'form_refresh' => 0
-		];
-
-		// Overwrite with input variables.
-		$this->getInputs($data, array_keys($data));
-
-		$data += [
 			'userid' => CWebUser::$data['userid'],
 			'username' => $this->user['username'],
 			'name' => $this->user['name'],
 			'surname' => $this->user['surname'],
-			'change_password' => $this->hasInput('change_password') || $this->hasInput('password1'),
 			'timezones' => $this->timezones,
-			'action' => $this->getAction(),
 			'internal_auth' => CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL,
 			'password_requirements' => $this->getPasswordRequirements(),
-			'readonly' => $this->user['provisioned'] == CUser::PROVISION_STATUS_YES
+			'readonly' => $this->user['provisioned'] == CUser::PROVISION_STATUS_YES,
+			'js_validation_rules' => (new CFormValidator(CControllerUserProfileUpdate::getValidationRules()))
+				->getRules()
 		];
 
 		$response = new CControllerResponseData($data);

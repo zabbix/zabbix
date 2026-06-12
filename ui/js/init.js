@@ -123,10 +123,6 @@ jQuery(function($) {
 		var sections;
 
 		switch (data.type) {
-			case 'history':
-				sections = getMenuPopupHistory(data);
-				break;
-
 			case 'host':
 				sections = getMenuPopupHost(data, $obj);
 				break;
@@ -414,10 +410,7 @@ jQuery(function($) {
 	// Initialize hintBox event handlers.
 	hintBox.bindEvents();
 
-	// Simulate Safari behaviour when text in a text field with autofocus becomes selected after page has loaded.
-	if (!SF) {
-		$('input[type=text][autofocus=autofocus]').filter(':visible').select();
-	}
+	Focuser.focus(document.querySelector('[autofocus]'));
 
 	/**
 	 * @param {boolean} preserve_state  Preserve current state of the debug button.

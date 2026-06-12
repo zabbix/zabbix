@@ -36,6 +36,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldUrl('url', _('URL')))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+					->setMaxLength(2048)
 			)
 			->addField(
 				new CWidgetFieldMultiSelectOverrideHost()

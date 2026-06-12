@@ -17,6 +17,7 @@
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -25,14 +26,15 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 class testFormHost extends CWebTest {
 
 	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
+	 * Attach MessageBehavior, DatatableBehaviour and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
 			CMessageBehavior::class,
-			CTableBehavior::class
+			CTableBehavior::class,
+			CDatatableBehavior::class
 		];
 	}
 
@@ -253,8 +255,9 @@ class testFormHost extends CWebTest {
 		}
 		// Interface fields maxlength attribute.
 		foreach (['IP address' => 64, 'DNS name' => 255, 'Port' => 64] as $field => $maxlength) {
+			$tag = ($field === 'Port') ? 'input' : 'z-textarea-flexible';
 			$this->assertEquals($maxlength, $interfaces_form->getRow(0)->getColumn($field)
-					->query('tag:input')->one()->getAttribute('maxlength')
+					->query('tag', $tag)->one()->getAttribute('maxlength')
 			);
 		}
 
@@ -592,11 +595,40 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:interfaces_1_port' => 'Port: Incorrect port.'
+						'id:interfaces_1_port' => 'Port: Value must be less than or equal to 65535.'
 					]
 				]
 			],
-			// #16.
+			// #16 Agent port validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'default_values' => true,
+					'host_fields' => [
+						'Host name' => 'Host for port validation',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'Agent',
+							'ip' => '127.1.1.1',
+							'port' => '1023'
+						],
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'Agent',
+							'ip' => '127.2.2.2',
+							'port' => '32768'
+						]
+					],
+					'inline_errors' => [
+						'id:interfaces_1_port' => 'Port: Value must be greater than or equal to 1024.',
+						'id:interfaces_2_port' => 'Port: Value must be less than or equal to 32767.'
+					]
+				]
+			],
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -612,11 +644,11 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:interfaces_1_port' => 'Port: Incorrect port.'
+						'id:interfaces_1_port' => 'Port: Value is not a valid integer.'
 					]
 				]
 			],
-			// #17.
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -632,11 +664,11 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:interfaces_1_port' => 'Port: Incorrect port.'
+						'id:interfaces_1_port' => 'Port: Value is not a valid integer.'
 					]
 				]
 			],
-			// #18 Empty SNMP community.
+			// #19 Empty SNMP community.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -656,7 +688,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #19 Too low max repetition count.
+			// #20 Too low max repetition count.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -676,7 +708,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #20 Empty proxy multiselect.
+			// #21 Empty proxy multiselect.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -691,7 +723,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #21 Empty proxy group multiselect.
+			// #22 Empty proxy group multiselect.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -706,7 +738,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #22 Too high value in Max repetition count.
+			// #23 Too high value in Max repetition count.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -725,7 +757,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #23 Host without interface.
+			// #24 Host without interface.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -735,7 +767,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #24 UTF8MB4 check.
+			// #25 UTF8MB4 check.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -747,7 +779,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #25 Default values of all interfaces.
+			// #26 Default values of all interfaces.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -775,7 +807,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #26 Change default host interface.
+			// #27 Change default host interface.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -789,19 +821,19 @@ class testFormHost extends CWebTest {
 							'action' => USER_ACTION_ADD,
 							'type' => 'Agent',
 							'ip' => '127.1.1.1',
-							'port' => '111'
+							'port' => '1024'
 						],
 						[
 							'action' => USER_ACTION_ADD,
 							'type' => 'Agent',
 							'ip' => '127.2.2.2',
-							'port' => '222',
+							'port' => '32767',
 							'Default' => true
 						]
 					]
 				]
 			],
-			// #27 Different versions of SNMP interface and encryption.
+			// #28 Different versions of SNMP interface and encryption.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -859,7 +891,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #28 All interfaces and all fields in form.
+			// #29 All interfaces and all fields in form.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -879,7 +911,7 @@ class testFormHost extends CWebTest {
 							'ip' => '::1',
 							'dns' => '1211',
 							'Connect to' => 'DNS',
-							'port' => '100'
+							'port' => '1025'
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -952,7 +984,7 @@ class testFormHost extends CWebTest {
 		$this->page->login()->open($this->link)->waitUntilReady();
 
 		$this->query('button:Create host')->one()->waitUntilClickable()->click();
-		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
@@ -1293,11 +1325,11 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:interfaces_{id}_port' => 'Port: Incorrect port.'
+						'id:interfaces_{id}_port' => 'Port: Value must be less than or equal to 32767.'
 					]
 				]
 			],
-			// #17.
+			// #17 Port validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1308,11 +1340,11 @@ class testFormHost extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'port' => 'test'
+							'port' => '1'
 						]
 					],
 					'inline_errors' => [
-						'id:interfaces_{id}_port' => 'Port: Incorrect port.'
+						'id:interfaces_{id}_port' => 'Port: Value must be greater than or equal to 1024.'
 					]
 				]
 			],
@@ -1327,15 +1359,34 @@ class testFormHost extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
+							'port' => 'test'
+						]
+					],
+					'inline_errors' => [
+						'id:interfaces_{id}_port' => 'Port: Value is not a valid integer.'
+					]
+				]
+			],
+			// #19.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Invalid port'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
 							'port' => '10.5'
 						]
 					],
 					'inline_errors' => [
-						'id:interfaces_{id}_port' => 'Port: Incorrect port.'
+						'id:interfaces_{id}_port' => 'Port: Value is not a valid integer.'
 					]
 				]
 			],
-			// #19 Empty SNMP community.
+			// #20 Empty SNMP community.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1354,7 +1405,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #20 Zero Max repetition count.
+			// #21 Zero Max repetition count.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1375,7 +1426,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #21 Too high value in Max repetition count.
+			// #22 Too high value in Max repetition count.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1396,7 +1447,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #22 Empty proxy.
+			// #23 Empty proxy.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1410,7 +1461,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #23 Empty proxy group.
+			// #24 Empty proxy group.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2192,23 +2243,26 @@ class testFormHost extends CWebTest {
 	 * @return CFormElement
 	 */
 	public function filterAndSelectHost($host) {
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table').']')->asTable()->waitUntilVisible(25)->one();
 		$this->query('button:Reset')->one()->click();
-		$table->waitUntilReloaded();
-		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);
+		$this->page->waitUntilReady();
+		$table = $this->getDatatable();
+		$headers = $table->getHeaders();
+		$this->query('name:zbx_filter')->asForm()->one()->waitUntilReady()->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
+		$headers->waitUntilStalled();
+		$table->waitUntilReady()->invalidate();
 
-		$host_link = $table->findRow('Name', $host, true)->getColumn('Name')->query('link', $host)->waitUntilClickable();
+		$host_link = $table->findRow('Name', $host, true)->getColumn('Name')->query('link', $host)->waitUntilPresent();
 
 		if ($this->monitoring) {
 			$host_link->asPopupButton()->one()->select('Host');
 		}
 		else {
-			$host_link->one()->click();
+			$host_link->one()->click(true);
 		}
 
-		return COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		return COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 	}
 
 	/**
@@ -2261,13 +2315,14 @@ class testFormHost extends CWebTest {
 						['name' => 'id:interface_main_'.$discovered_interface_id , 'value' => $discovered_interface_id,
 								'enabled' => false],
 						['name' => 'Description', 'value' => '', 'maxlength' => 65535, 'enabled' => true],
-						['name' => 'id:monitored_by', 'value' => 'Server', 'enabled' => false],
+						['name' => 'Monitored by', 'value' => 'Server', 'enabled' => false],
 						['name' => 'Enabled', 'value' => true, 'enabled' => true]
 					];
 
 					foreach ($host_fields as $field) {
 						$this->assertTrue($form->getField($field['name'])->isEnabled($field['enabled']));
 						$this->assertEquals($field['value'], $form->getField($field['name'])->getValue());
+
 						if (CTestArrayHelper::get($field, 'maxlength')) {
 							$this->assertEquals($field['maxlength'], $form->getField($field['name'])->getAttribute('maxlength'));
 						}
@@ -2324,16 +2379,16 @@ class testFormHost extends CWebTest {
 
 					$expected_tags = [
 						[
-							'tag' => 'action',
-							'value' => 'update'
+							'Name' => 'action',
+							'Value' => 'update'
 						],
 						[
-							'tag' => 'tag without value',
-							'value' => ''
+							'Name' => 'tag without value',
+							'Value' => ''
 						],
 						[
-							'tag' => 'test',
-							'value' => 'update'
+							'Name' => 'test',
+							'Value' => 'update'
 						]
 					];
 					$tags_table->checkValue($expected_tags);
@@ -2350,7 +2405,7 @@ class testFormHost extends CWebTest {
 				case 'Macros':
 					$radio_switcher = $this->query('id:show_inherited_macros')->asSegmentedRadio()->waitUntilPresent()->one();
 					$macros_table = $this->query('id:tbl_macros')->asMultifieldTable()->one();
-					$macros_table->checkValue([['Macro' => '','Value' => '', 'Description' => '']]);
+					$macros_table->checkValue([['Macro' => '', 'Value' => '', 'description' => '']]);
 					$radio_switcher->select('Inherited and host macros');
 					$macros_table->waitUntilReloaded();
 					$this->assertSame(['Macro', 'Effective value', '', '', 'Template value', '', 'Global value (configure)'],

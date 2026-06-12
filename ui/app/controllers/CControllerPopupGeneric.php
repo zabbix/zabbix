@@ -1599,6 +1599,14 @@ class CControllerPopupGeneric extends CController {
 					$options['templateids'] = $this->templateids;
 				}
 
+				$value_types = $this->hasInput('value_types')
+					? $this->getInput('value_types')
+					: ($this->hasInput('numeric') ? [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] : null);
+
+				if ($value_types !== null) {
+					$options['filter']['value_type'] = $value_types;
+				}
+
 				$records = !$this->template_preselect_required || $this->templateids
 					? API::Item()->get($options + ['webitems' => true])
 					: [];

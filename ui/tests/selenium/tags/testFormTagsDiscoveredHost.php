@@ -125,12 +125,14 @@ class testFormTagsDiscoveredHost extends testFormTags {
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($this->clone_name).' AND flags=4');
 		$all_tags = CDBHelper::getAll('SELECT tag, value FROM host_tag WHERE hostid='.$hostid.' ORDER BY tag, value');
 		$inherited_tags = CDBHelper::getAll('SELECT tag, value FROM host_tag WHERE automatic=1 AND hostid='.
-				$hostid.' ORDER BY tag, value');
+				$hostid.' ORDER BY tag, value'
+		);
+
 		$this->page->login()->open($this->link);
 		$this->query('button:Reset')->one()->click();
 		$this->page->waitUntilReady();
 
-		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
+		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->scrollIntoView(50)->click();
 		$form = COverlayDialogElement::find()->waitUntilVisible()->asForm()->one();
 		$form->selectTab('Tags');
 		$tags_table = $this->query('class:tags-table')->asMultifieldTable()->one();

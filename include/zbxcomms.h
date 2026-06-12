@@ -99,18 +99,7 @@ int	zbx_ip_cmp(int prefix_size, const struct sockaddr *ai_addr, int ai_family, c
 	int ipv6v4_mode);
 int	zbx_validate_peer_list(const char *peer_list, char **error);
 int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *peer_list);
-int	validate_cidr(const char *ip, const char *cidr, void *value);
-
-#if !defined(WITH_AGENT2_METRICS)
-typedef enum
-{
-	ZBX_BUF_TYPE_STAT = 0,
-	ZBX_BUF_TYPE_DYN
-}
-zbx_buf_type_t;
-
-#define ZBX_SOCKET_COUNT	256
-#define ZBX_STAT_BUF_LEN	2048
+int	zbx_validate_cidr(const char *ip, const char *cidr, void *value);
 
 typedef struct
 {
@@ -143,6 +132,17 @@ typedef struct
 	char		*frontend_accept;
 	char		*tls_listen;
 } zbx_config_tls_t;
+
+#if !defined(WITH_AGENT2_METRICS)
+typedef enum
+{
+	ZBX_BUF_TYPE_STAT = 0,
+	ZBX_BUF_TYPE_DYN
+}
+zbx_buf_type_t;
+
+#define ZBX_SOCKET_COUNT	256
+#define ZBX_STAT_BUF_LEN	2048
 
 zbx_config_tls_t	*zbx_config_tls_new(void);
 void	zbx_config_tls_free(zbx_config_tls_t *config_tls);

@@ -27,6 +27,7 @@
 #include "libs/zbxpreproc/preproc_snmp.h"
 #include "libs/zbxpreproc/pp_cache.h"
 #include "libs/zbxpreproc/pp_error.h"
+#include "zbxsnmp.h"
 
 #ifdef HAVE_NETSNMP
 #define SNMP_NO_DEBUGGING
@@ -274,12 +275,10 @@ static int	check_mib_existence(zbx_pp_step_t *op)
 }
 #endif
 
-#ifdef HAVE_NETSNMP
-ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "preproc_mock_progname")
-#endif
-
 void	zbx_mock_test_entry(void **state)
 {
+#define TEST_SUITE	"zbx_item_preproc"
+
 	zbx_variant_t		value, value_in, history_value_in;
 	unsigned char		value_type;
 	zbx_timespec_t		ts, history_ts, history_ts_in, expected_history_ts;
@@ -294,7 +293,7 @@ void	zbx_mock_test_entry(void **state)
 #ifdef HAVE_NETSNMP
 	int			mib_translation_case = 0;
 
-	zbx_init_library_preproc(NULL, NULL, get_zbx_progname);
+	zbx_init_library_preproc(NULL, NULL);
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.netsnmp_required"))
 		mib_translation_case = 1;
@@ -314,12 +313,12 @@ void	zbx_mock_test_entry(void **state)
 	duplicate_step(&step_orig, &step);
 
 #ifdef HAVE_NETSNMP
-	preproc_init_snmp();
+	zbx_snmp_init(TEST_SUITE);
 
 	/* MIB translation test cases will fail if system lacks MIBs - in this case test case should be skipped */
 	if (1 == mib_translation_case && FAIL == check_mib_existence(&step))
 	{
-		preproc_shutdown_snmp();
+		zbx_snmp_clear(TEST_SUITE);
 		release_step(&step);
 		skip();
 	}
@@ -474,7 +473,9 @@ void	zbx_mock_test_entry(void **state)
 
 	pp_context_destroy(&ctx);
 #ifdef HAVE_NETSNMP
-	preproc_shutdown_snmp();
+	zbx_snmp_init(TEST_SUITE);
 #endif
 	release_step(&step);
+
+#undef TEST_SUITE
 }

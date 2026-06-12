@@ -36,7 +36,7 @@ void	zbx_check_psk_identity_len(size_t psk_identity_len)
 		zabbix_log(LOG_LEVEL_CRIT, "PSK identity length " ZBX_FS_SIZE_T " exceeds the maximum length of %d"
 				" bytes.", (zbx_fs_size_t)psk_identity_len, HOST_TLS_PSK_IDENTITY_LEN);
 		zbx_tls_free();
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -121,7 +121,7 @@ out:
 		return;
 
 	zbx_tls_free();
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 /******************************************************************************

@@ -17,8 +17,6 @@
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @onBefore prepareHTTPItemData
  *
@@ -99,7 +97,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$this->query('link:'.$rows['Name'])->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
+		$this->query('id:name')->waitUntilVisible()->one();
 
 		foreach ($rows as $field_name => $value) {
 			$form_field = $form->getField($field_name);
@@ -578,7 +576,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Required status codes' => '*'
 					],
 					'inline_errors' => [
-						'Required status codes' => 'Invalid range expression.'
+						'Required status codes' => 'Invalid HTTP status code or range.'
 					]
 				]
 			],
@@ -591,7 +589,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Required status codes' => 'test'
 					],
 					'inline_errors' => [
-						'Required status codes' => 'Invalid range expression.'
+						'Required status codes' => 'Invalid HTTP status code or range.'
 					]
 				]
 			]
@@ -697,7 +695,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Required status codes' => '*'
 					],
 					'inline_errors' => [
-						'Required status codes' => 'Invalid range expression.'
+						'Required status codes' => 'Invalid HTTP status code or range.'
 					]
 				]
 			],
@@ -707,7 +705,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Required status codes' => 'test'
 					],
 					'inline_errors' => [
-						'Required status codes' => 'Invalid range expression.'
+						'Required status codes' => 'Invalid HTTP status code or range.'
 					]
 				]
 			]

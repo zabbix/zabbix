@@ -1288,7 +1288,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			$legend_name = CTestArrayHelper::get($data, 'expected_dataset_name', $legend_name);
 
 			// Locate sector for checking.
-			$sector = $widget->query('xpath:.//*[contains(@data-hintbox-contents, '.
+			$sector = $widget->query('xpath:.//*[contains(@data-hintbox-html, '.
 					CXPathHelper::escapeQuotes($legend_name).')]/*[@class="svg-pie-chart-arc"]')->one();
 
 			// Assert sector fill color.
@@ -1379,9 +1379,9 @@ class testDashboardPieChartWidget extends testWidgets {
 		// For each hintbox - open, assert text, close.
 		foreach ($hints as $field => $text) {
 			$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
+			$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilPresent()->one();
 			$this->assertEquals($text, $hint->getText());
-			$hint->query('xpath:./button')->one()->click();
+			$hint->query('xpath:.//button')->one()->click();
 		}
 	}
 

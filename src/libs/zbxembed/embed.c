@@ -27,7 +27,7 @@
 #include "browser_element.h"
 #include "browser_alert.h"
 
-#define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 512)
+#define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 1024)	/* 1GiB */
 #define ZBX_ES_STACK_LIMIT	1000
 
 /* maximum number of consequent runtime errors after which it's treated as fatal error */
@@ -631,7 +631,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 	if (NULL != es->env->json)
 	{
-		zbx_json_clean(es->env->json);
+		zbx_json_reset(es->env->json);
 		zbx_json_addarray(es->env->json, "logs");
 	}
 
@@ -664,7 +664,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 		{
 			/* try to get 'stack' property of the object on stack, assuming it's an Error object */
 			if (0 != (rc = duk_get_prop_string(es->env->ctx, -1, "stack")))
-				*error = zbx_strdup(*error, duk_get_string(es->env->ctx, -1));
+				*error = zbx_strdup(*error, duk_safe_to_string(es->env->ctx, -1));
 
 			duk_pop(es->env->ctx);
 		}

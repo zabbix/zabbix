@@ -17,6 +17,8 @@
 #include "zbxtypes.h"
 #ifndef _WINDOWS
 #	include "zbxnix.h"
+#else
+#	include "zbxwin32.h"
 #endif
 /* unresolved symbols needed for linking */
 
@@ -124,6 +126,12 @@ int	get_zbx_config_enable_remote_commands(void)
 	return zbx_config_enable_remote_commands;
 }
 
+static void	zbx_backtrace_with_exit(void)
+{
+	zbx_backtrace();
+	_exit(1);
+}
+
 /* test itself */
 
 int	main (void)
@@ -133,8 +141,10 @@ int	main (void)
 		cmocka_unit_test_setup_teardown(zbx_mock_test_entry, zbx_mock_data_init, zbx_mock_data_free)
 	};
 
-	zbx_set_log_level(LOG_LEVEL_TRACE);
-	zbx_init_library_common(zbx_mock_log_impl, get_zbx_progname, zbx_backtrace);
+	zbx_mock_set_log_level(LOG_LEVEL_TRACE);
+	zbx_init_library_common(zbx_mock_log_impl, zbx_mock_get_log_level_impl, get_zbx_progname,
+			zbx_backtrace_with_exit);
+
 #ifndef _WINDOWS
 	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif

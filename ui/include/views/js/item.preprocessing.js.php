@@ -18,29 +18,27 @@
  * @var CView $this
  * @var array $data
  */
-?>
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-tmpl">
-	<?php
-	$preproc_types_select = (new CSelect('preprocessing[#{rowNum}][type]'))
-		->setErrorLabel(_('Name'))
-		->setErrorContainer('preprocessing-#{rowNum}-error-container')
-		->setId('preprocessing_#{rowNum}_type')
-		->setValue(ZBX_PREPROC_REGSUB)
-		->setAttribute('data-prevent-validation-on-change', '')
-		->setWidthAuto();
+$preproc_types_select = (new CSelect('preprocessing[#{rowNum}][type]'))
+	->setErrorLabel(_('Name'))
+	->setErrorContainer('preprocessing-#{rowNum}-error-container')
+	->setId('preprocessing_#{rowNum}_type')
+	->setValue(ZBX_PREPROC_REGSUB)
+	->setAttribute('data-prevent-validation-on-change', '')
+	->setWidthAuto();
 
-	foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $group) {
-		$opt_group = new CSelectOptionGroup($group['label']);
+foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $group) {
+	$opt_group = new CSelectOptionGroup($group['label']);
 
-		foreach ($group['types'] as $type => $label) {
-			$opt_group->addOption(new CSelectOption($type, $label));
-		}
-
-		$preproc_types_select->addOptionGroup($opt_group);
+	foreach ($group['types'] as $type => $label) {
+		$opt_group->addOption(new CSelectOption($type, $label));
 	}
 
-	echo (new CListItem([
+	$preproc_types_select->addOptionGroup($opt_group);
+}
+
+(new CTemplateTag('preprocessing-steps-tmpl', [
+	(new CListItem([
 		(new CDiv([
 			(new CDiv(new CVar('preprocessing[#{rowNum}][sortorder]', '#{sortorder}')))->addClass(ZBX_STYLE_DRAG_ICON),
 			(new CDiv($preproc_types_select))
@@ -72,7 +70,7 @@
 					ZBX_PREPROC_FAIL_SET_ERROR => _('Set error to')
 				]))
 				->setDisabled(),
-			(new CTextBox('preprocessing[#{rowNum}][error_handler_params]'))
+			(new CTextAreaFlexible('preprocessing[#{rowNum}][error_handler_params]'))
 				->setErrorLabel(_('Error message'))
 				->setErrorContainer('preprocessing-#{rowNum}-error-container')
 				->setEnabled(false)
@@ -83,168 +81,162 @@
 		(new CDiv())->setId("preprocessing-#{rowNum}-error-container")
 	]))
 		->addClass('preprocessing-list-item')
-		->setAttribute('data-step', '#{rowNum}');
-
-	echo (new CListItem(''))
+		->setAttribute('data-step', '#{rowNum}'),
+	(new CListItem(''))
 		->setId("preprocessing-#{rowNum}-error-container")
-		->addClass('error-container-row');
-	?>
-</script>
+		->addClass('error-container-row')
+]))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-multiplier-tmpl">
-	<?= (new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
+(new CTemplateTag('preprocessing-steps-parameters-multiplier-tmpl',
+	(new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
 		->setErrorLabel(_('Number'))
 		->setErrorContainer('preprocessing-#{rowNum}-error-container')
-		->setAttribute('placeholder', _('number')) ?>
-</script>
+		->setAttribute('placeholder', _('number'))
+))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-prometheus-to-json-tmpl">
-	<?= (new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
+(new CTemplateTag('preprocessing-steps-parameters-prometheus-to-json-tmpl',
+	(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', ''))
 		->setErrorLabel(_('Pattern'))
 		->setErrorContainer('preprocessing-#{rowNum}-error-container')
-		->setAttribute('placeholder', _('<metric name>{<label name>="<label value>", ...} == <value>')) ?>
-</script>
+		->setAttribute('placeholder', _('<metric name>{<label name>="<label value>", ...} == <value>'))
+		->addClass('js-preproc-param-prometheus-placeholder')
+))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-trim-tmpl">
-	<?= (new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
+(new CTemplateTag('preprocessing-steps-parameters-trim-tmpl',
+	(new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
 		->setAttribute('data-notrim', '')
 		->setErrorLabel(_('List of characters'))
 		->setErrorContainer('preprocessing-#{rowNum}-error-container')
-		->setAttribute('placeholder', _('list of characters')) ?>
-</script>
+		->setAttribute('placeholder', _('list of characters'))
+))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-xpath-tmpl">
-	<?= (new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
+(new CTemplateTag('preprocessing-steps-parameters-xpath-tmpl',
+	(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', ''))
 		->setAttribute('data-notrim', '')
 		->setErrorLabel(_('XPath'))
 		->setErrorContainer('preprocessing-#{rowNum}-error-container')
-		->setAttribute('placeholder', _('XPath')) ?>
-</script>
+		->setAttribute('placeholder', _('XPath'))
+))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-regex-tmpl">
-	<?= (new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
+(new CTemplateTag('preprocessing-steps-parameters-regex-tmpl',
+	(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', ''))
 		->setAttribute('data-notrim', '')
 		->setErrorLabel(_('Pattern'))
 		->setErrorContainer('preprocessing-#{rowNum}-error-container')
-		->setAttribute('placeholder', _('pattern')) ?>
-</script>
+		->setAttribute('placeholder', _('pattern'))
+))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-json-path-tmpl">
-	<?= (new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
+(new CTemplateTag('preprocessing-steps-parameters-json-path-tmpl',
+	(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', ''))
 		->setAttribute('data-notrim', '')
 		->setErrorLabel(_('JSON path'))
 		->setErrorContainer('preprocessing-#{rowNum}-error-container')
-		->setAttribute('placeholder', _('$.path.to.node')) ?>
-</script>
+		->setAttribute('placeholder', _('$.path.to.node'))
+))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-throttle-timed-value-tmpl">
-	<?= (new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
+(new CTemplateTag('preprocessing-steps-parameters-throttle-timed-value-tmpl',
+	(new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
 		->setErrorLabel(_('Seconds'))
 		->setErrorContainer('preprocessing-#{rowNum}-error-container')
-		->setAttribute('placeholder', _('seconds')) ?>
-</script>
+		->setAttribute('placeholder', _('seconds'))
+))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-regsub-tmpl">
-<?= (new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
-			->setAttribute('data-notrim', '')
-			->setErrorLabel(_('Pattern'))
-			->setErrorContainer('preprocessing-#{rowNum}-error-container')
-			->setAttribute('placeholder', _('pattern')).
-		(new CTextBox('preprocessing[#{rowNum}][params_1]', ''))
-			->setAttribute('data-notrim', '')
-			->setErrorLabel(_('Output'))
-			->setErrorContainer('preprocessing-#{rowNum}-error-container')
-			->setAttribute('placeholder', _('output'))
-	?>
-</script>
+(new CTemplateTag('preprocessing-steps-parameters-regsub-tmpl', [
+	(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', ''))
+		->setAttribute('data-notrim', '')
+		->setErrorLabel(_('Pattern'))
+		->setErrorContainer('preprocessing-#{rowNum}-error-container')
+		->setAttribute('placeholder', _('pattern')),
+	(new CTextAreaFlexible('preprocessing[#{rowNum}][params_1]', ''))
+		->setAttribute('data-notrim', '')
+		->setErrorLabel(_('Output'))
+		->setErrorContainer('preprocessing-#{rowNum}-error-container')
+		->setAttribute('placeholder', _('output'))
+]))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-replace-tmpl">
-<?= (new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
-			->setAttribute('data-notrim', '')
-			->setErrorLabel(_('Search string'))
-			->setErrorContainer('preprocessing-#{rowNum}-error-container')
-			->setAttribute('placeholder', _('search string')).
-		(new CTextBox('preprocessing[#{rowNum}][params_1]', ''))
-			->setAttribute('data-notrim', '')
-			->setErrorLabel(_('Replacement'))
-			->setErrorContainer('preprocessing-#{rowNum}-error-container')
-			->setAttribute('placeholder', _('replacement'))
-	?>
-</script>
+(new CTemplateTag('preprocessing-steps-parameters-replace-tmpl', [
+	(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', ''))
+		->setAttribute('data-notrim', '')
+		->setErrorLabel(_('Search string'))
+		->setErrorContainer('preprocessing-#{rowNum}-error-container')
+		->setAttribute('placeholder', _('search string')),
+	(new CTextAreaFlexible('preprocessing[#{rowNum}][params_1]', ''))
+		->setAttribute('data-notrim', '')
+		->setErrorLabel(_('Replacement'))
+		->setErrorContainer('preprocessing-#{rowNum}-error-container')
+		->setAttribute('placeholder', _('replacement'))
+]))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-validate-range-tmpl">
-<?= (new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
-			->setErrorLabel(_('Min'))
-			->setErrorContainer('preprocessing-#{rowNum}-error-container')
-			->setAttribute('placeholder', _('min')).
-		(new CTextBox('preprocessing[#{rowNum}][params_1]', ''))
-			->setErrorLabel(_('Max'))
-			->setErrorContainer('preprocessing-#{rowNum}-error-container')
-			->setAttribute('placeholder', _('max'))
-	?>
-</script>
+(new CTemplateTag('preprocessing-steps-parameters-validate-range-tmpl', [
+	(new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
+		->setErrorLabel(_('Min'))
+		->setErrorContainer('preprocessing-#{rowNum}-error-container')
+		->setAttribute('placeholder', _('min')),
+	(new CTextBox('preprocessing[#{rowNum}][params_1]', ''))
+		->setErrorLabel(_('Max'))
+		->setErrorContainer('preprocessing-#{rowNum}-error-container')
+		->setAttribute('placeholder', _('max'))
+]))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-script-tmpl">
-	<?= (new CMultilineInput('preprocessing[#{rowNum}][params_0]', '', ['add_post_js' => false, 'use_tab' => false]))
+(new CTemplateTag('preprocessing-steps-parameters-script-tmpl',
+	(new CMultilineInput('preprocessing[#{rowNum}][params_0]', '', ['add_post_js' => false, 'use_tab' => false]))
 		->setAttribute('data-notrim', '')
 		->setErrorLabel(_('Script'))
 		->setErrorContainer('preprocessing-#{rowNum}-error-container')
-	?>
-</script>
+))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-custom-width-chkbox-tmpl">
-	<?= implode('', [(new CTextBox('preprocessing[#{rowNum}][params_0]', ','))
-			->setAttribute('placeholder', _('delimiter'))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-			->setAttribute('maxlength', 1)
-			->setAttribute('data-notrim', '')
-			->setErrorLabel(_('Delimiter'))
-			->setErrorContainer('preprocessing-#{rowNum}-error-container'),
-		(new CTextBox('preprocessing[#{rowNum}][params_1]', '"'))
-			->setAttribute('placeholder', _('qualifier'))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-			->setAttribute('maxlength', 1)
-			->setAttribute('data-notrim', '')
-			->setErrorLabel(_('Qualifier'))
-			->setErrorContainer('preprocessing-#{rowNum}-error-container'),
-		(new CCheckBox('preprocessing[#{rowNum}][params_2]', ZBX_PREPROC_CSV_HEADER))
-			->setLabel(_('With header row'))
-			->setUncheckedValue(ZBX_PREPROC_CSV_NO_HEADER)
-			->setChecked(true)
-	]) ?>
-</script>
+(new CTemplateTag('preprocessing-steps-parameters-custom-width-chkbox-tmpl', [
+	(new CTextBox('preprocessing[#{rowNum}][params_0]', ','))
+		->setAttribute('placeholder', _('delimiter'))
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		->setAttribute('maxlength', 1)
+		->setAttribute('data-notrim', '')
+		->setErrorLabel(_('Delimiter'))
+		->setErrorContainer('preprocessing-#{rowNum}-error-container'),
+	(new CTextBox('preprocessing[#{rowNum}][params_1]', '"'))
+		->setAttribute('placeholder', _('qualifier'))
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		->setAttribute('maxlength', 1)
+		->setAttribute('data-notrim', '')
+		->setErrorLabel(_('Qualifier'))
+		->setErrorContainer('preprocessing-#{rowNum}-error-container'),
+	(new CCheckBox('preprocessing[#{rowNum}][params_2]', ZBX_PREPROC_CSV_HEADER))
+		->setLabel(_('With header row'))
+		->setUncheckedValue(ZBX_PREPROC_CSV_NO_HEADER)
+		->setChecked(true)
+]))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-prometheus-pattern-tmpl">
-	<?= implode('', [(new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
-			->setErrorLabel(_('Pattern'))
-			->setErrorContainer('preprocessing-#{rowNum}-error-container')
-			->setAttribute('placeholder', _('<metric name>{<label name>="<label value>", ...} == <value>')),
-		(new CSelect('preprocessing[#{rowNum}][params_1]'))
-			->setAttribute('data-prevent-validation-on-change', '')
-			->addOptions(CSelect::createOptionsFromArray([
-				ZBX_PREPROC_PROMETHEUS_VALUE => _('value'),
-				ZBX_PREPROC_PROMETHEUS_LABEL => _('label'),
-				ZBX_PREPROC_PROMETHEUS_SUM => 'sum',
-				ZBX_PREPROC_PROMETHEUS_MIN => 'min',
-				ZBX_PREPROC_PROMETHEUS_MAX => 'max',
-				ZBX_PREPROC_PROMETHEUS_AVG => 'avg',
-				ZBX_PREPROC_PROMETHEUS_COUNT => 'count'
-			]))
-			->addClass('js-preproc-param-prometheus-pattern-function'),
-		(new CTextBox('preprocessing[#{rowNum}][params_2]', ''))
-			->setErrorLabel(_('Label'))
-			->setErrorContainer('preprocessing-#{rowNum}-error-container')
-			->setAttribute('placeholder', _('<label name>'))
-			->setEnabled(false)])
-	?>
-</script>
+(new CTemplateTag('preprocessing-steps-parameters-prometheus-pattern-tmpl', [
+	(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', ''))
+		->setErrorLabel(_('Pattern'))
+		->setErrorContainer('preprocessing-#{rowNum}-error-container')
+		->setAttribute('placeholder', _('<metric name>{<label name>="<label value>", ...} == <value>'))
+		->addClass('js-preproc-param-prometheus-placeholder'),
+	(new CSelect('preprocessing[#{rowNum}][params_1]'))
+		->setAttribute('data-prevent-validation-on-change', '')
+		->addOptions(CSelect::createOptionsFromArray([
+			ZBX_PREPROC_PROMETHEUS_VALUE => _('value'),
+			ZBX_PREPROC_PROMETHEUS_LABEL => _('label'),
+			ZBX_PREPROC_PROMETHEUS_SUM => 'sum',
+			ZBX_PREPROC_PROMETHEUS_MIN => 'min',
+			ZBX_PREPROC_PROMETHEUS_MAX => 'max',
+			ZBX_PREPROC_PROMETHEUS_AVG => 'avg',
+			ZBX_PREPROC_PROMETHEUS_COUNT => 'count'
+		]))
+		->addClass('js-preproc-param-prometheus-pattern-function'),
+	(new CTextBox('preprocessing[#{rowNum}][params_2]', ''))
+		->setErrorLabel(_('Label'))
+		->setErrorContainer('preprocessing-#{rowNum}-error-container')
+		->setAttribute('placeholder', _('<label name>'))
+		->setEnabled(false)
+]))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-snmp-walk-value-tmpl">
-<?= (new CTextBox('preprocessing[#{rowNum}][params_0]', ''))
+(new CTemplateTag('preprocessing-steps-parameters-snmp-walk-value-tmpl', [
+	(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', ''))
 		->setAttribute('data-notrim', '')
 		->setErrorLabel(_('OID'))
 		->setErrorContainer('preprocessing-#{rowNum}-error-container')
-		->setAttribute('placeholder', _('OID')).
+		->setAttribute('placeholder', _('OID')),
 	(new CSelect('preprocessing[#{rowNum}][params_1]'))
 		->setValue(ZBX_PREPROC_SNMP_UNCHANGED)
 		->setAdaptiveWidth(202)
@@ -254,152 +246,146 @@
 			new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
 			new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
 		])
-	?>
-</script>
+]))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-snmp-walk-to-json-tmpl">
-	<?php
-		echo (new CDiv(
-				(new CTable())
-					->addClass('group-json-mapping')
-					->setHeader(
-						(new CRowHeader([
-							new CColHeader(_('Field name')),
-							new CColHeader(_('OID prefix')),
-							new CColHeader(_('Format')),
-							(new CColHeader(''))->addClass(ZBX_STYLE_NOWRAP)
-						]))->addClass(ZBX_STYLE_GREY)
-					)
+(new CTemplateTag('preprocessing-steps-parameters-snmp-walk-to-json-tmpl',
+	(new CDiv(
+		(new CTable())
+			->addClass('group-json-mapping')
+			->setHeader(
+				(new CRowHeader([
+					new CColHeader(_('Field name')),
+					new CColHeader(_('OID prefix')),
+					new CColHeader(_('Format')),
+					(new CColHeader(''))->addClass(ZBX_STYLE_NOWRAP)
+				]))->addClass(ZBX_STYLE_GREY)
+			)
+			->addItem(
+				(new CRow([
+					new CCol(
+						(new CTextBox('preprocessing[#{rowNum}][params_set_snmp][0][name]', ''))
+							->setAttribute('data-notrim', '')
+							->setErrorLabel(_('Field name'))
+							->setErrorContainer('preprocessing-#{rowNum}-params_set_snmp-0-error-container')
+							->removeId()
+							->setAttribute('placeholder', _('Field name'))
+					),
+					new CCol(
+						(new CTextBox('preprocessing[#{rowNum}][params_set_snmp][0][oid_prefix]', ''))
+							->setAttribute('data-notrim', '')
+							->setErrorLabel(_('OID prefix'))
+							->setErrorContainer('preprocessing-#{rowNum}-params_set_snmp-0-error-container')
+							->removeId()
+							->setAttribute('placeholder', _('OID prefix'))
+					),
+					new CCol(
+						(new CSelect('preprocessing[#{rowNum}][params_set_snmp][0][format]'))
+							->setValue(ZBX_PREPROC_SNMP_UNCHANGED)
+							->setWidth(ZBX_TEXTAREA_PREPROC_TREAT_SELECT)
+							->addOptions([
+								new CSelectOption(ZBX_PREPROC_SNMP_UNCHANGED, _('Unchanged')),
+								new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+								new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+								new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
+							])
+					),
+					(new CCol(
+						(new CButtonLink(_('Remove')))
+							->addClass('js-group-json-action-delete')
+							->setEnabled(false)
+					))->addClass(ZBX_STYLE_NOWRAP)
+				]))->setAttribute('data-index', '0')->addClass('group-json-row')
+			)
+			->addItem((new CRow(
+				(new CCol())
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
+					->setId('preprocessing-#{rowNum}-params_set_snmp-0-error-container')
+					->setColSpan(4)
+			)))
+			->addItem(
+				(new CTag('tfoot', true))
 					->addItem(
-						(new CRow([
-							new CCol(
-								(new CTextBox('preprocessing[#{rowNum}][params_set_snmp][0][name]', ''))
-									->setAttribute('data-notrim', '')
-									->setErrorLabel(_('Field name'))
-									->setErrorContainer('preprocessing-#{rowNum}-params_set_snmp-0-error-container')
-									->removeId()
-									->setAttribute('placeholder', _('Field name'))
-							),
-							new CCol(
-								(new CTextBox('preprocessing[#{rowNum}][params_set_snmp][0][oid_prefix]', ''))
-									->setAttribute('data-notrim', '')
-									->setErrorLabel(_('OID prefix'))
-									->setErrorContainer('preprocessing-#{rowNum}-params_set_snmp-0-error-container')
-									->removeId()
-									->setAttribute('placeholder', _('OID prefix'))
-							),
-							new CCol(
-								(new CSelect('preprocessing[#{rowNum}][params_set_snmp][0][format]'))
-									->setValue(ZBX_PREPROC_SNMP_UNCHANGED)
-									->setWidth(ZBX_TEXTAREA_PREPROC_TREAT_SELECT)
-									->addOptions([
-										new CSelectOption(ZBX_PREPROC_SNMP_UNCHANGED, _('Unchanged')),
-										new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
-										new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
-										new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
-									])
-							),
-							(new CCol(
-								(new CButtonLink(_('Remove')))
-									->addClass('js-group-json-action-delete')
-									->setEnabled(false)
-							))->addClass(ZBX_STYLE_NOWRAP)
-						]))->setAttribute('data-index', '0')->addClass('group-json-row')
+						(new CCol(
+							(new CButtonLink(_('Add')))->addClass('js-group-json-action-add')
+						))->setColSpan(4)
 					)
-					->addItem((new CRow(
-						(new CCol())
-							->addClass(ZBX_STYLE_ERROR_CONTAINER)
-							->setId('preprocessing-#{rowNum}-params_set_snmp-0-error-container')
-							->setColSpan(4)
-					)))
-					->addItem(
-						(new CTag('tfoot', true))
-							->addItem(
-								(new CCol(
-									(new CButtonLink(_('Add')))->addClass('js-group-json-action-add')
-								))->setColSpan(4)
-							)
-					)
-					->setAttribute('data-index', '#{rowNum}')
-			))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
-	?>
-</script>
+			)
+			->setAttribute('data-index', '#{rowNum}')
+	))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-snmp-walk-to-json-row-tmpl">
-	<?php
-		echo (new CRow([
-			new CCol(
-				(new CTextBox('preprocessing[#{rowNum}][params_set_snmp][#{rowIndex}][name]', ''))
-					->setAttribute('data-notrim', '')
-					->setErrorLabel(_('Field name'))
-					->setErrorContainer('preprocessing-#{rowNum}-params_set_snmp-#{rowIndex}-error-container')
-					->removeId()
-					->setAttribute('placeholder', _('Field name'))
-			),
-			new CCol(
-				(new CTextBox('preprocessing[#{rowNum}][params_set_snmp][#{rowIndex}][oid_prefix]', ''))
-					->setAttribute('data-notrim', '')
-					->setErrorLabel(_('OID prefix'))
-					->setErrorContainer('preprocessing-#{rowNum}-params_set_snmp-#{rowIndex}-error-container')
-					->removeId()
-					->setAttribute('placeholder', _('OID prefix'))
-			),
-			new CCol(
-				(new CSelect('preprocessing[#{rowNum}][params_set_snmp][#{rowIndex}][format]'))
-					->setValue(ZBX_PREPROC_SNMP_UNCHANGED)
-					->setWidth(ZBX_TEXTAREA_PREPROC_TREAT_SELECT)
-					->addOptions([
-						new CSelectOption(ZBX_PREPROC_SNMP_UNCHANGED, _('Unchanged')),
-						new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
-						new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
-						new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
-					])
-			),
-			(new CCol(
-				(new CButtonLink(_('Remove')))->addClass('js-group-json-action-delete')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))->setAttribute('data-index', '#{rowIndex}')->addClass('group-json-row');
-		echo (new CRow(
-			(new CCol())
-				->addClass(ZBX_STYLE_ERROR_CONTAINER)
-				->setId('preprocessing-#{rowNum}-params_set_snmp-#{rowIndex}-error-container')
-				->setColSpan(4)
-		))
-	?>
-</script>
+(new CTemplateTag('preprocessing-steps-parameters-snmp-walk-to-json-row-tmpl', [
+	(new CRow([
+		new CCol(
+			(new CTextBox('preprocessing[#{rowNum}][params_set_snmp][#{rowIndex}][name]', ''))
+				->setAttribute('data-notrim', '')
+				->setErrorLabel(_('Field name'))
+				->setErrorContainer('preprocessing-#{rowNum}-params_set_snmp-#{rowIndex}-error-container')
+				->removeId()
+				->setAttribute('placeholder', _('Field name'))
+		),
+		new CCol(
+			(new CTextBox('preprocessing[#{rowNum}][params_set_snmp][#{rowIndex}][oid_prefix]', ''))
+				->setAttribute('data-notrim', '')
+				->setErrorLabel(_('OID prefix'))
+				->setErrorContainer('preprocessing-#{rowNum}-params_set_snmp-#{rowIndex}-error-container')
+				->removeId()
+				->setAttribute('placeholder', _('OID prefix'))
+		),
+		new CCol(
+			(new CSelect('preprocessing[#{rowNum}][params_set_snmp][#{rowIndex}][format]'))
+				->setValue(ZBX_PREPROC_SNMP_UNCHANGED)
+				->setWidth(ZBX_TEXTAREA_PREPROC_TREAT_SELECT)
+				->addOptions([
+					new CSelectOption(ZBX_PREPROC_SNMP_UNCHANGED, _('Unchanged')),
+					new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+					new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+					new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
+				])
+		),
+		(new CCol(
+			(new CButtonLink(_('Remove')))->addClass('js-group-json-action-delete')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))->setAttribute('data-index', '#{rowIndex}')->addClass('group-json-row'),
+	(new CRow(
+		(new CCol())
+			->addClass(ZBX_STYLE_ERROR_CONTAINER)
+			->setId('preprocessing-#{rowNum}-params_set_snmp-#{rowIndex}-error-container')
+			->setColSpan(4)
+	))
+]))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-check-not-supported-row-tmpl">
-	<?= (new CSelect('preprocessing[#{rowNum}][params_0_not_supported]'))
-			->addOptions(CSelect::createOptionsFromArray([
-				ZBX_PREPROC_MATCH_ERROR_ANY => _('any error'),
-				ZBX_PREPROC_MATCH_ERROR_REGEX => _('error matches'),
-				ZBX_PREPROC_MATCH_ERROR_NOT_REGEX => _('error does not match')
-			]))
-				->setAttribute('data-prevent-validation-on-change', '')
-				->setAttribute('placeholder', _('error-matching'))
-				->addClass('js-preproc-param-error-matching')
-				->setValue(ZBX_PREPROC_MATCH_ERROR_ANY).
-		(new CTextBox('preprocessing[#{rowNum}][params_1_not_supported]', ''))
-			->setAttribute('data-notrim', '')
-			->setErrorLabel(_('Pattern'))
-			->setErrorContainer('preprocessing-#{rowNum}-error-container')
-			->removeId()
-			->setAttribute('placeholder', _('pattern'))
-			->addClass(ZBX_STYLE_VISIBILITY_HIDDEN);
-	?>
-</script>
+(new CTemplateTag('preprocessing-steps-parameters-check-not-supported-row-tmpl', [
+	(new CSelect('preprocessing[#{rowNum}][params_0_not_supported]'))
+		->addOptions(CSelect::createOptionsFromArray([
+			ZBX_PREPROC_MATCH_ERROR_ANY => _('any error'),
+			ZBX_PREPROC_MATCH_ERROR_REGEX => _('error matches'),
+			ZBX_PREPROC_MATCH_ERROR_NOT_REGEX => _('error does not match')
+		]))
+		->setAttribute('placeholder', _('error-matching'))
+		->addClass('js-preproc-param-error-matching')
+		->setErrorContainer('preprocessing-#{rowNum}-error-container')
+		->setValue(ZBX_PREPROC_MATCH_ERROR_ANY),
+	(new CTextAreaFlexible('preprocessing[#{rowNum}][params_1_not_supported]', ''))
+		->setAttribute('data-notrim', '')
+		->setErrorLabel(_('Pattern'))
+		->setErrorContainer('preprocessing-#{rowNum}-error-container')
+		->removeId()
+		->setAttribute('placeholder', _('pattern'))
+		->addClass(ZBX_STYLE_DISPLAY_NONE)
+]))->show();
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-snmp-get-value-tmpl">
-	<?= (new CSelect('preprocessing[#{rowNum}][params_0]'))
-			->setValue(ZBX_PREPROC_SNMP_UTF8_FROM_HEX)
-			->setAdaptiveWidth(202)
-			->addOptions([
-				new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
-				new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
-				new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
-			])
-	?>
-</script>
+(new CTemplateTag('preprocessing-steps-parameters-snmp-get-value-tmpl',
+	(new CSelect('preprocessing[#{rowNum}][params_0]'))
+		->setValue(ZBX_PREPROC_SNMP_UTF8_FROM_HEX)
+		->setAdaptiveWidth(202)
+		->addOptions([
+			new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+			new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+			new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
+		])
+))->show();
+?>
 
 <script type="text/javascript">
 	jQuery(function($) {
@@ -695,7 +681,9 @@
 				if (window.item_edit_form) {
 					const {step} = this.closest('[data-step]').dataset;
 
-					window.item_edit_form.form.validateChanges([`preprocessing[${step}][on_fail]`]);
+					window.item_edit_form.form.validateChanges(['preprocessing',
+						`preprocessing[${step}][on_fail]`]
+					);
 				}
 
 				var $row = $(this).closest('.preprocessing-list-item'),
@@ -754,13 +742,13 @@
 
 				if ($(this).is(':checked')) {
 					$on_fail_options
-						.find('z-select[name*="[error_handler]"], input[name*="error_handler_params"]')
+						.find('z-select[name*="[error_handler]"], z-textarea-flexible[name*="error_handler_params"]')
 						.prop('disabled', false);
 					$on_fail_options.show();
 				}
 				else {
 					$on_fail_options
-						.find('z-select[name*="[error_handler]"], input[name*="error_handler_params"]')
+						.find('z-select[name*="[error_handler]"], z-textarea-flexible[name*="error_handler_params"]')
 						.prop('disabled', true);
 					$on_fail_options.hide();
 				}
@@ -815,8 +803,8 @@
 				}
 			})
 			.on('change', '.js-preproc-param-error-matching', function() {
-				$(this).next('input')
-					.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN ?>', this.value == <?= ZBX_PREPROC_MATCH_ERROR_ANY ?>);
+				$(this).next('z-textarea-flexible')
+					.toggleClass('<?= ZBX_STYLE_DISPLAY_NONE ?>', this.value == <?= ZBX_PREPROC_MATCH_ERROR_ANY ?>);
 			})
 			.on('click', '.js-group-json-action-delete', function() {
 				const table = this.closest('.group-json-mapping');

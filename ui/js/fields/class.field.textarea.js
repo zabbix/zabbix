@@ -54,16 +54,6 @@ class CFieldTextarea extends CField {
 	}
 
 	_appendErrorHint(error_hint) {
-		if (this.#isFlexible()) {
-			this._field.closest('.' + ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT).appendChild(error_hint);
-		}
-		else {
-			this._field.parentNode.insertBefore(error_hint, this._field.nextSibling);
-		}
-	}
-
-	#isFlexible() {
-		return this._field.classList.contains(ZBX_STYLE_TEXTAREA_FLEXIBLE)
-			&& this._field.closest('.' + ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT);
+		this._field.parentNode.insertBefore(error_hint, this._field.nextSibling);
 	}
 }

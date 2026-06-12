@@ -12,8 +12,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_HOUSEKEEPER_H
-#define ZABBIX_HOUSEKEEPER_H
+#ifndef ZABBIX_HOUSEKEEPER_PROXY_H
+#define ZABBIX_HOUSEKEEPER_PROXY_H
 
 #include "zbxthreads.h"
 
