@@ -367,7 +367,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			'evaltype' => ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND,
 				CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]
 			],
-			'formula' => ['db items.formula', 'required',
+			'formula' => ['db items.formula', 'required', 'not_empty',
 				'use' => [CConditionFormulaParser::class],
 				'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 			],
