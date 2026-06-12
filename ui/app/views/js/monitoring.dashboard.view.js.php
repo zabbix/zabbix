@@ -185,7 +185,9 @@
 							this.#edit();
 						});
 
-					this.#updateHistory({add_new: false});
+					const url = new Curl();
+
+					this.#updateHistory({page: url.getArgument('page'), add_new: false});
 				}
 			}
 
@@ -199,7 +201,7 @@
 
 			ZABBIX.Dashboard.on(CDashboard.EVENT_PAGE_SELECT, e => {
 				const {dashboard_page_index} = e.detail;
-				const page = dashboard_page_index > 0 ? dashboard_page_index + 1 : 1;
+				const page = dashboard_page_index > 0 ? dashboard_page_index + 1 : null;
 
 				this.#updateHistory({page, add_new: false});
 			});
@@ -378,7 +380,7 @@
 			document.getElementById('dashboard-save').disabled = do_disable;
 		}
 
-		#updateHistory({slideshow = null, page = null, add_new = true} = {})  {
+		#updateHistory({slideshow = null, page = undefined, add_new = true} = {})  {
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.view');
@@ -404,7 +406,9 @@
 
 			const url = new Curl();
 
-			page = page || url.getArgument('page');
+			if (page === undefined) {
+				page = url.getArgument('page');
+			}
 
 			if (page !== null) {
 				curl.setArgument('page', page);
