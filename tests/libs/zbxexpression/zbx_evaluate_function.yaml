@@ -1654,6 +1654,40 @@ out:
   return: SUCCEED
   value: 1.7976931348623158e+308
 ---
+test case: Evaluate timeleft(#2,-1) from DBL_MAX to 0, threshold -1 practically instantly reached
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.7976931348623158e+308
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 0.0
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+  time: 2017-01-10 10:02:00.000000001 +00:00
+  function: timeleft
+  params: '#2,-1'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate timeleft(#2,-1) from 0 to DBL_MAX, threshold -1 never
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.0
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 1.7976931348623158e+308
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+  time: 2017-01-10 10:03:00.000000000 +00:00
+  function: timeleft
+  params: '#2,-1'
+out:
+  return: SUCCEED
+  value: 1.7976931348623158e+308
+---
 test case: Evaluate timeleft(5m,65)
 in:
   history:
@@ -4826,6 +4860,26 @@ in:
 out:
   return: SUCCEED
   value: 272384191.768584
+---
+test case: Evaluate timeleft(#3,1.7976931348623158e+308,"logarithmic") returning 0
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.7976931348623155e+308
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 1.7976931348623156e+308
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 1.7976931348623157e+308
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+  time: 2017-01-10 10:04:00.000000000 +00:00
+  function: timeleft
+  params: '#3,1.7976931348623158e+308,"logarithmic"'
+out:
+  return: SUCCEED
+  value: 0
+---
 test case: Evaluate timeleft(#3,1.7976931348623158e+308,"logarithmic")
 in:
   history:
@@ -5702,4 +5756,96 @@ db data:
   - [10.0, 9]
   trends (10):
   - [2.2250738585072014e-308, 10]
+---
+test case: Evaluate timeleft(#5,6.0, 60)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.0
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2.0
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3.0
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4.0
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5.0
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: timeleft
+  params: '#5,6.0'
+out:
+  return: SUCCEED
+  value: 60
+---
+test case: Evaluate timeleft(#5,6.0, 1)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.0
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2.0
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3.0
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4.0
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5.0
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:59.000000000 +00:00
+  function: timeleft
+  params: '#5,6.0'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate timeleft(#5,6.0, 0)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.0
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2.0
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3.0
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4.0
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5.0
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:06:00.000000000 +00:00
+  function: timeleft
+  params: '#5,6.0'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate timeleft(#5,6.0, 1.7976931348623158e+308)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.0
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2.0
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3.0
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4.0
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5.0
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:06:01.000000000 +00:00
+  function: timeleft
+  params: '#5,6.0'
+out:
+  return: SUCCEED
+  value: 1.7976931348623158e+308
 ...
