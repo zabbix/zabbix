@@ -96,7 +96,7 @@ class CVaultHashiCorp extends CVault {
 				'secret_id' => $this->secret_id
 			];
 
-			$fetch_token = file_get_contents($login_url, false, stream_context_create([
+			$fetch_token = @file_get_contents($login_url, false, stream_context_create([
 				'http' => [
 					'method' => 'POST',
 					'header' => "Content-Type: application/json\r\n",
