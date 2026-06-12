@@ -15,7 +15,7 @@ zabbix_export:
       template: 'GCP Application Load Balancer by HTTP'
       name: 'GCP Application Load Balancer by HTTP'
       description: |
-        The template discovers GCP App Load Balancing forwarding rules by HTTP using script items.
+        The template discovers GCP Application Load Balancing forwarding rules by HTTP using script items.
         This template will be automatically connected to discovered entities with all their required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
@@ -38,7 +38,7 @@ zabbix_export:
           key: gcp.app.lb.average.latency
           value_type: FLOAT
           units: '!ms'
-          description: 'Average latencies for application load balancer.'
+          description: 'Average latencies for the application load balancer.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -82,7 +82,7 @@ zabbix_export:
           key: gcp.app.lb.p95.latency
           value_type: FLOAT
           units: '!ms'
-          description: 'P95 latencies for application load balancer.'
+          description: 'P95 latencies for the application load balancer.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -135,7 +135,7 @@ zabbix_export:
           key: gcp.app.lb.request.bytes
           value_type: FLOAT
           units: Bps
-          description: 'Request bytes count for application load balancer.'
+          description: 'Request bytes count for the application load balancer.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -178,7 +178,7 @@ zabbix_export:
           key: gcp.app.lb.request.rate
           value_type: FLOAT
           units: rps
-          description: 'Total average request rate for application load balancer.'
+          description: 'Total average request rate for the application load balancer.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -221,7 +221,7 @@ zabbix_export:
           key: gcp.app.lb.requests.count
           history: 1h
           value_type: TEXT
-          description: 'Request rates by response code for application load balancer.'
+          description: 'Request rates by response code for the application load balancer.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -248,7 +248,7 @@ zabbix_export:
               name: 'GCP Application Load Balancer: No request rate data'
               event_name: 'GCP Application Load Balancer: No traffic detected for {HOST.NAME}'
               priority: WARNING
-              description: 'No request rate data received for {$GCP.APP.LB.NODATA.TIME}. Possible reasons could be that the load balancer is not receiving traffic or there is an issue with data collection.'
+              description: 'No request rate data received for `{$GCP.APP.LB.NODATA.TIME}`. The load balancer may not be receiving traffic or there may be an issue with data collection.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -259,7 +259,7 @@ zabbix_export:
           key: gcp.app.lb.response.bytes
           value_type: FLOAT
           units: Bps
-          description: 'Response bytes count for application load balancer.'
+          description: 'Response bytes count for the application load balancer.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -348,6 +348,7 @@ zabbix_export:
               - macro: '{#RESPONSE_CODE}'
                 value: '{$GCP.APP.LB.RESPONSE.CODE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+          description: 'Discovery of HTTP response codes for the application load balancer.'
           item_prototypes:
             - uuid: ccaec15f04f94bf89a15c5834a14961c
               name: 'Requests rate: HTTP {#RESPONSE_CODE}'
@@ -355,6 +356,7 @@ zabbix_export:
               key: 'gcp.app.lb.request.count[{#RESPONSE_CODE}]'
               value_type: FLOAT
               units: rps
+              description: 'Request rate for HTTP `{#RESPONSE_CODE}` responses.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -485,11 +487,11 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$GCP.APP.LB.TYPE.PREFIX}'
           description: |
-            Load balancer metric prefix for metric name construction.
+            Metric prefix for load balancer type.
             Possible values:
-            - 'https' for global external load balancers
-            - 'https/external/regional' for regional external load balancers
-            - 'https/internal' for internal load balancers
+            - `https` for global external load balancers
+            - `https/external/regional` for regional external load balancers
+            - `https/internal` for internal load balancers
           config:
             type: TEXT
             priority: '5'
@@ -514,7 +516,7 @@ zabbix_export:
             description: 'Google Cloud Platform project ID.'
             required: 'YES'
         - macro: '{$GCP.PROXY}'
-          description: 'Sets HTTP proxy value. If this macro is empty, then no proxy is used.'
+          description: 'HTTP proxy. If this macro is empty, then no proxy is used.'
           config:
             type: TEXT
             priority: '4'
@@ -536,7 +538,7 @@ zabbix_export:
             description: 'Time interval used in API requests and as default update interval for items.'
       dashboards:
         - uuid: 46afdd814acb409aaacbf91d7ffa12a4
-          name: 'GCP App Load Balancing: Application Load Balancer overview'
+          name: 'GCP Application Load Balancing: Application Load Balancer overview'
           pages:
             - name: Overview
               widgets:
@@ -1599,7 +1601,7 @@ zabbix_export:
           key: gcp.lb.forwarding_rules.get
           history: '0'
           value_type: TEXT
-          description: 'GCP App Load Balancing: Forwarding rules get.'
+          description: 'GCP Application Load Balancing forwarding rules.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -1826,7 +1828,7 @@ zabbix_export:
           name: 'Global load balancers total'
           type: DEPENDENT
           key: gcp.lb.forwarding_rules.global.total
-          description: 'GCP App Load Balancing global forwarding rules total count.'
+          description: 'GCP Application Load Balancing global forwarding rules total count.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1838,7 +1840,7 @@ zabbix_export:
           name: 'Regional load balancers total'
           type: DEPENDENT
           key: gcp.lb.forwarding_rules.regional.total
-          description: 'GCP App Load Balancing regional forwarding rules total count.'
+          description: 'GCP Application Load Balancing regional forwarding rules total count.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -2729,7 +2731,7 @@ zabbix_export:
               parameters:
                 - 3h
         - uuid: b210e8e38c194c65b30e74610ec2b86f
-          name: 'GCP App Load Balancing: Load balancer discovery'
+          name: 'GCP Application Load Balancing: Load balancer discovery'
           type: DEPENDENT
           key: gcp.lb.discovery
           filter:
@@ -12975,7 +12977,7 @@ zabbix_export:
       opdata: 'Current value: {ITEM.LASTVALUE1}'
       priority: HIGH
       description: |
-        Request success rate dropped below {$GCP.APP.LB.SUCCESS.RATE.HIGH}%.
+        Request success rate has dropped below {$GCP.APP.LB.SUCCESS.RATE.HIGH}%.
         
         Severe service degradation or outage is likely occurring.
       manual_close: 'YES'
@@ -12993,7 +12995,7 @@ zabbix_export:
       opdata: 'Current value: {ITEM.LASTVALUE1}'
       priority: WARNING
       description: |
-        Request success rate dropped below {$GCP.APP.LB.SUCCESS.RATE.WARN}%.
+        Request success rate has dropped below {$GCP.APP.LB.SUCCESS.RATE.WARN}%.
         
         This may indicate elevated client or backend errors.
       manual_close: 'YES'
@@ -13011,7 +13013,7 @@ zabbix_export:
       opdata: 'Current value: {ITEM.LASTVALUE1}'
       priority: AVERAGE
       description: |
-        Request success rate dropped below {$GCP.APP.LB.SUCCESS.RATE.AVERAGE}%.
+        Request success rate has dropped below {$GCP.APP.LB.SUCCESS.RATE.AVERAGE}%.
         
         Users are likely experiencing failed requests.
       manual_close: 'YES'
