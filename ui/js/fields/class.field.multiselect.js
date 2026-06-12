@@ -83,14 +83,12 @@ class CFieldMultiselect extends CField {
 
 	getExtraFields() {
 		const return_id = $(this._field).multiSelect('getOption', 'selectedLimit') == 1;
-		const values = $(this._field).multiSelect('getOption', 'addNew')
-			? {
-				[this.getName()]: return_id ? null : [],
-				[this.getNameNew()]: return_id ? null : []
-			}
-			: {
-				[this.getName()]: return_id ? null : []
-			};
+		const values = Object.create(null);
+		values[this.getName()] = return_id ? null : [];
+
+		if ($(this._field).multiSelect('getOption', 'addNew')) {
+			values[this.getNameNew()] = return_id ? null : [];
+		}
 
 		if (this.isDisabled()) {
 			return null;

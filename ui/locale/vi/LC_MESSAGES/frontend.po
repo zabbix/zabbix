@@ -145,6 +145,12 @@ msgstr "%1$s ký tự"
 msgid "%1$s characters remaining"
 msgstr "%1$s ký tự còn lại"
 
+#: app/views/administration.housekeeping.edit.php:165
+#: app/views/administration.housekeeping.edit.php:166
+#, c-format
+msgid "%1$s data storage period"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
 #, c-format
@@ -5013,6 +5019,15 @@ msgstr "Nhấp và kéo đến kích thước mong muốn."
 msgid "Click to view or edit"
 msgstr "Kích để xem hoặc sửa"
 
+#: app/views/administration.housekeeping.edit.php:165
+msgid "ClickHouse"
+msgstr ""
+
+#: include/classes/api/managers/history/CClickHouseStorage.php:118
+#, c-format
+msgid "ClickHouse error: %1$s."
+msgstr ""
+
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
 msgstr ""
@@ -8257,6 +8272,10 @@ msgstr ""
 #: app/partials/hostmacros.inherited.list.html.php:50
 msgid "Effective value"
 msgstr "Giá trị hiệu quả"
+
+#: app/views/administration.housekeeping.edit.php:166
+msgid "Elasticsearch"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1449
 #: include/classes/api/managers/CHistoryManager.php:1458
@@ -11708,6 +11727,16 @@ msgstr "Tải lên tập tin không chính xác."
 #: include/triggers.inc.php:768
 msgid "Incorrect function is used"
 msgstr "Hàm được sử dụng không chính xác."
+
+#: include/classes/core/CConfigFile.php:211
+#: include/classes/core/CConfigFile.php:219
+#: include/classes/core/CConfigFile.php:557
+#: include/classes/core/CConfigFile.php:563
+#: include/classes/core/CConfigFile.php:569
+#: include/classes/core/CConfigFile.php:579
+#, c-format
+msgid "Incorrect history storage configuration %1$s: %2$s."
+msgstr ""
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -15747,6 +15776,10 @@ msgstr ""
 msgid "Next dashboard"
 msgstr ""
 
+#: jsLoader.php:416
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15760,6 +15793,10 @@ msgstr ""
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Bước tiếp theo"
+
+#: jsLoader.php:414
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -16463,6 +16500,12 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:175
 msgid "Not linked"
+msgstr ""
+
+#: app/views/item.list.php:233 app/views/item.list.php:234
+#: include/classes/helpers/CItemHelper.php:386
+#: include/classes/helpers/CItemHelper.php:416
+msgid "Not stored"
 msgstr ""
 
 #: app/controllers/CControllerLatest.php:546
@@ -22517,6 +22560,10 @@ msgstr ""
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr ""
 
+#: app/views/administration.housekeeping.edit.php:145
+msgid "This setting does not affect Elasticsearch and ClickHouse storage periods."
+msgstr ""
+
 #: app/partials/administration.system.info.php:212
 #: app/views/administration.housekeeping.edit.php:132
 msgid "This setting should be enabled, because history tables contain compressed chunks."
@@ -22913,6 +22960,11 @@ msgctxt "compact table header"
 msgid "Total"
 msgstr ""
 
+#: include/classes/debug/CProfiler.php:172
+#, c-format
+msgid "Total ClickHouse time: %1$s"
+msgstr ""
+
 #: include/classes/debug/CProfiler.php:153
 #, c-format
 msgid "Total Elasticsearch time: %1$s"
@@ -23002,6 +23054,11 @@ msgstr ""
 #: widgets/tophosts/views/column.edit.php:206
 msgid "Trends"
 msgstr "Các khuynh hướng "
+
+#: app/partials/item.edit.item.tab.php:774
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse."
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:257
 #: app/views/reports.toptriggers.list.php:120 app/views/trigger.edit.php:54
@@ -27164,6 +27221,10 @@ msgstr "fuzzytime () - Chênh lệch giữa giá trị item (dưới dạng dấ
 msgid "geographical coordinates (values of comma separated latitude and longitude) are expected"
 msgstr ""
 
+#: app/views/item.edit.php:224 app/views/item.edit.php:228
+msgid "global housekeeping settings"
+msgstr ""
+
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.edit.php:891
 #: include/views/configuration.item.edit.php:918
@@ -27321,6 +27382,11 @@ msgstr "số phần tử không chính xác"
 #: include/classes/parsers/CExpressionParser.php:140
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
+msgstr ""
+
+#: include/classes/core/CConfigFile.php:212
+#: include/classes/core/CConfigFile.php:220
+msgid "incorrect format"
 msgstr ""
 
 #: jsLoader.php:298
