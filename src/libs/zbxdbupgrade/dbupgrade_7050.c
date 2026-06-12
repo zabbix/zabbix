@@ -861,6 +861,13 @@ static int	DBpatch_7050061(void)
 	return DBadd_field("regexps", &field);
 }
 
+static int	DBpatch_7050062(void)
+{
+	const zbx_db_field_t	field = {"expression", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("expressions", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -929,5 +936,6 @@ DBPATCH_ADD(7050058, 0, 1)
 DBPATCH_ADD(7050059, 0, 1)
 DBPATCH_ADD(7050060, 0, 1)
 DBPATCH_ADD(7050061, 0, 1)
+DBPATCH_ADD(7050062, 0, 1)
 
 DBPATCH_END()
