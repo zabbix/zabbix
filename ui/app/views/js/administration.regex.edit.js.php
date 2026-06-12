@@ -132,9 +132,9 @@ window.regex_edit_popup = new class {
 			},
 			{
 				title: <?= json_encode(_('Test')) ?>,
-				class: 'js-test',
+				class: <?= json_encode(ZBX_STYLE_BTN_ALT) ?> + ' js-test',
 				keepOpen: true,
-				isSubmit: true
+				isSubmit: false
 			},
 			{
 				title: <?= json_encode(_('Cancel')) ?>,
