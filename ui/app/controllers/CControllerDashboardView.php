@@ -16,11 +16,11 @@
 
 class CControllerDashboardView extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'dashboardid' =>		'db dashboard.dashboardid',
 			'hostid' =>				'db hosts.hostid',
@@ -55,7 +55,7 @@ class CControllerDashboardView extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)) {
 			return false;
 		}
@@ -78,7 +78,7 @@ class CControllerDashboardView extends CController {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$widget_defaults = APP::ModuleManager()->getWidgetsDefaults();
 
 		[$dashboard, $stats, $error] = $this->getDashboard($widget_defaults);
