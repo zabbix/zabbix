@@ -1448,7 +1448,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zbx_snprintf(msg, sizeof(msg), "%s [deleted " ZBX_FS_I64 " hist/trends, " ZBX_FS_I64 " events, "
 				ZBX_FS_I64 " problems, %d sessions, %d alarms, %d audit, %d autoreg_host,"
-				" %d records, %s sets in " ZBX_FS_DBL " sec, %s]",
+				" %d records, %d sets in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_events, d_problems,
 				d_sessions, d_services, d_audit, d_autoreg_host, records, d_sets, sec, sleeptext);
 
