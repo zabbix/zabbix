@@ -142,7 +142,7 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 	event = (zbx_cep_event_t *)zbx_malloc(NULL, sizeof(zbx_cep_event_t));
 	event->eventid = eventid;
 	event->r_event = NULL;
-	event->refcount = 0;
+	event->refcount = 1;
 	event->origin.source = source;
 	event->origin.object = object;
 	event->origin.objectid = objectid;
@@ -226,7 +226,7 @@ static zbx_cep_event_handle_t	cep_create_event_handle(zbx_cep_t *cep, zbx_cep_ev
 {
 	zbx_cep_event_ptr_t	handle_local = {
 			.eventid = event->eventid,
-			.event = cep_event_addref(event),
+			.event = event,
 			.state = CEP_EVENT_STATE_ACTIVE,
 			.refcount = 1
 		};
@@ -471,25 +471,19 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 
 		if (NULL == event || eventid != event->eventid)
 		{
-			event = (zbx_cep_event_t *)zbx_malloc(NULL, sizeof(zbx_cep_event_t));
-			event->eventid = eventid;
-			event->r_event = NULL;
-			event->clock = atoi(row[1]);
-			event->ns = atoi(row[5]);
-			event->severity = atoi(row[2]);
-			event->suppress_mtime = 0;
-			event->refcount = 0;
-			zbx_vector_tag_create(&event->tags);
-			zbx_vector_uint64_create(&event->maintenanceids);
-
-			zbx_cep_object_t	*obj;
-			zbx_cep_event_handle_t	h;
+			zbx_cep_origin_t	origin;
 
 			ZBX_STR2UCHAR(event->origin.source, row[6]);
 			ZBX_STR2UCHAR(event->origin.object, row[7]);
 			ZBX_STR2UINT64(event->origin.objectid, row[8]);
 
-			event->value = cep_origin_problem(&event->origin);
+			event = cep_event_create(eventid, origin.source, origin.object, origin.objectid, atoi(row[1]),
+					atoi(row[5]), TRIGGER_VALUE_PROBLEM, atoi(row[2]), NULL, NULL);
+
+			zbx_cep_object_t	*obj;
+			zbx_cep_event_handle_t	h;
+
+			event->value = cep_origin_problem(&origin);
 
 			obj = cep_get_object_or_create(cep, &event->origin);
 			h = cep_create_event_handle(cep, event);

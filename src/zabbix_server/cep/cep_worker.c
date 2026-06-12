@@ -513,6 +513,8 @@ static void	cep_worker_resolve_trigger_events(zbx_db_event *db_event, zbx_uint64
 	cep_resolve_trigger_events(cep, r_event, handles);
 	cep_cache_release(&cep);
 
+	zbx_cep_event_release(r_event);
+
 	task->event_op = CEP_EVENT_CLOSE;
 	zbx_cep_get_eventids_from_handles(handles->values, handles->values_num, &task->eventids);
 
