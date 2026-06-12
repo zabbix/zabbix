@@ -132,7 +132,6 @@ class CControllerScriptCreate extends CController {
 					'manualinput_macro' => true,
 					'scheme' => CSettingsHelper::getAllowedUriSchemes()
 				]],
-				'messages' => ['use' => _('Invalid URL')],
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_URL]]
 			],
 			'new_window' => ['db scripts.new_window', 'required',
