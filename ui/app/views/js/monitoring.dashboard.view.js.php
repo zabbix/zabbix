@@ -378,7 +378,7 @@
 			document.getElementById('dashboard-save').disabled = do_disable;
 		}
 
-		#updateHistory({slideshow = null, page = undefined, add_new = true} = {})  {
+		#updateHistory({slideshow = null, page = undefined, add_new} = {})  {
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.view');
