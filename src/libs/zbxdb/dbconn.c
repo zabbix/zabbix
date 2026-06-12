@@ -53,7 +53,7 @@ static const zbx_db_config_t	*db_config = NULL;
 static zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
 
 #if defined(HAVE_POSTGRESQL)
-static char	ZBX_PG_ESCAPE_BACKSLASH = 1;
+static ZBX_THREAD_LOCAL char	ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
 static zbx_mutex_t		db_sqlite_access = ZBX_MUTEX_NULL;
 #endif
@@ -108,42 +108,6 @@ int	dbconn_init(char **error)
 
 		return (ZBX_DB_OK == ret ? SUCCEED : FAIL);
 	}
-#elif defined(HAVE_POSTGRESQL)
-	zbx_dbconn_t	*db;
-	int		ret = SUCCEED;;
-
-	db = zbx_dbconn_create();
-
-	if (ZBX_DB_OK != (ret = dbconn_open(db)))
-	{
-		*error = zbx_strdup(*error, "cannot open database");
-		ret = FAIL;
-	}
-	else
-	{
-		zbx_db_result_t	result;
-		zbx_db_row_t	row;
-
-		result = dbconn_select(db, "show standard_conforming_strings");
-
-		if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
-		{
-			ret = FAIL;
-		}
-		else
-		{
-			if (NULL != (row = zbx_db_fetch(result)))
-				ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
-		}
-
-		zbx_db_free_result(result);
-		dbconn_close(db);
-	}
-
-	zbx_dbconn_free(db);
-
-	if (FAIL == ret)
-		return FAIL;
 #else
 	ZBX_UNUSED(error);
 #endif
@@ -729,6 +693,19 @@ static int	dbconn_open(zbx_dbconn_t *db)
 
 	if (ZBX_DB_OK != ret)
 		goto out;
+
+	result = dbconn_select(db, "show standard_conforming_strings");
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
+	{
+		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
+		goto out;
+	}
+
+	if (NULL != (row = zbx_db_fetch(result)))
+		ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
+
+	zbx_db_free_result(result);
 
 	result = dbconn_select(db, "show default_transaction_read_only");
 
