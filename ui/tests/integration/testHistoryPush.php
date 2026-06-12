@@ -225,18 +225,6 @@ class testHistoryPush extends CIntegrationTest {
 		// to a restricted user, in which case the cleanup would silently see nothing to delete.
 		CAPIHelper::authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
 
-		// Explicitly delete history for all test items. The housekeeper removes orphaned rows
-		// asynchronously after host.delete, which is too late for a subsequent test run
-		// against the same DB. Deleting before host.delete keeps referential integrity.
-		if (!empty(self::$itemids)) {
-			$itemids = array_values(self::$itemids);
-			DB::delete('history',      ['itemid' => $itemids]);
-			DB::delete('history_uint', ['itemid' => $itemids]);
-			DB::delete('history_str',  ['itemid' => $itemids]);
-			DB::delete('history_text', ['itemid' => $itemids]);
-			DB::delete('history_log',  ['itemid' => $itemids]);
-		}
-
 		// Maintenances must be removed first — a host can't be deleted while it is the only
 		// host/group of an existing maintenance (see testHistoryPush_hostUnderMaintenance).
 		$maintenances = CDataHelper::call('maintenance.get', [
