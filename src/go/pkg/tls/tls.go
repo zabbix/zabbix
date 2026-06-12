@@ -63,6 +63,13 @@ const char	*tls_crypto_init_msg;
 #define TLS_EX_DATA_IDENTITY	1
 #define TLS_EX_DATA_KEY		2
 
+/* OpenSSL 3.0 renamed SSL_get_peer_certificate() to SSL_get1_peer_certificate(). */
+#if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_MAJOR >= 3
+#	define zbx_ssl_get_peer_cert(ssl)	SSL_get1_peer_certificate(ssl)
+#else
+#	define zbx_ssl_get_peer_cert(ssl)	SSL_get_peer_certificate(ssl)
+#endif
+
 typedef SSL_CTX * SSL_CTX_LP;
 
 typedef struct {
@@ -680,7 +687,7 @@ static int tls_validate_issuer_and_subject(tls_t *tls, const char *issuer, const
 	char *peer_issuer = NULL, *peer_subject = NULL;
 	int ret = -1;
 
-	if (NULL == (cert = SSL_get_peer_certificate(tls->ssl)))
+	if (NULL == (cert = zbx_ssl_get_peer_cert(tls->ssl)))
 	{
 		BIO_printf(tls->err, "cannot obtain peer certificate");
 		goto out;
@@ -724,7 +731,7 @@ static void tls_description(tls_t *tls, char **desc)
 
 	ptr += snprintf(ptr, sizeof(buf), "%s %s", SSL_get_version(tls->ssl), SSL_get_cipher(tls->ssl));
 
-	if ((sizeof(buf) - 1 > (size_t)(ptr - buf)) && NULL != (cert = SSL_get_peer_certificate(tls->ssl)))
+	if ((sizeof(buf) - 1 > (size_t)(ptr - buf)) && NULL != (cert = zbx_ssl_get_peer_cert(tls->ssl)))
 	{
 		char	*peer_issuer = NULL, *peer_subject = NULL;
 
@@ -801,7 +808,7 @@ static int	tls_has_peer_certificate(tls_t *tls)
 {
 	X509	*cert;
 
-	if (NULL == (cert = SSL_get_peer_certificate(tls->ssl)))
+	if (NULL == (cert = zbx_ssl_get_peer_cert(tls->ssl)))
 		return 0;
 
 	X509_free(cert);
