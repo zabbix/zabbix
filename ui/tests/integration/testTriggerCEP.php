@@ -64,6 +64,25 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $sessionid = null;
 
 	/**
+	 * Component configuration provider.
+	 *
+	 * @return array
+	 */
+	public function configurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'LogFileSize' => 0,
+				'DebugLevel' => 3,
+				'CacheSize' => '128M',
+				'HistoryCacheSize' => '32M',
+				'HistoryIndexCacheSize' => '32M',
+				'ValueCacheSize' => '128M',
+				'LogSlowQueries' => 10
+			]
+		];
+	}
+
+	/**
 	 * Lower bound (max eventid captured at the start of the current scenario) used to limit
 	 * every event.get to only the events generated during the scenario. Without this bound the
 	 * queries would re-fetch the entire, ever-growing event history of all discovered triggers
@@ -245,24 +264,6 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 
 		return true;
-	}
-
-	/**
-	 * Component configuration provider.
-	 *
-	 * @return array
-	 */
-	public function configurationProvider() {
-		return [
-			self::COMPONENT_SERVER => [
-				'LogFileSize' => 0,
-				'DebugLevel' => 3,
-				'CacheSize' => '128M',
-				'HistoryCacheSize' => '32M',
-				'HistoryIndexCacheSize' => '32M',
-				'ValueCacheSize' => '128M'
-			]
-		];
 	}
 
 	/**
