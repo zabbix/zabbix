@@ -197,14 +197,14 @@
 				location.href = location.href;
 			});
 
-			ZABBIX.Dashboard.on(CDashboard.EVENT_PAGE_SELECTED, e => {
+			ZABBIX.Dashboard.on(CDashboard.EVENT_PAGE_SELECT, e => {
 				const {dashboard_page_index} = e.detail;
 				const page = dashboard_page_index > 0 ? dashboard_page_index + 1 : 1;
 
 				this.#updateHistory({page, add_new: false});
 			})
 
-			ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_STARTED, e => {
+			ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_START, e => {
 				const {manually_toggled} = e.detail;
 
 				if (manually_toggled) {
@@ -212,7 +212,7 @@
 				}
 			});
 
-			ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_STOPPED, e => {
+			ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_STOP, e => {
 				const {manually_toggled} = e.detail;
 
 				if (manually_toggled) {

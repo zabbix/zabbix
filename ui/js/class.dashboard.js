@@ -40,9 +40,9 @@ class CDashboard {
 
 	static EVENT_REFERRED_UPDATE = 'dashboard-referred-update';
 	static EVENT_FEEDBACK = 'dashboard-feedback';
-	static EVENT_PAGE_SELECTED = 'dashboard-page-selected';
-	static EVENT_SLIDESHOW_STARTED = 'dashboard-slideshow-started';
-	static EVENT_SLIDESHOW_STOPPED = 'dashboard-slideshow-stopped';
+	static EVENT_PAGE_SELECT = 'dashboard-page-select';
+	static EVENT_SLIDESHOW_START = 'dashboard-slideshow-start';
+	static EVENT_SLIDESHOW_STOP = 'dashboard-slideshow-stop';
 
 	#broadcast_options;
 
@@ -303,7 +303,7 @@ class CDashboard {
 		this._slideshow_switch_time = Date.now() + timeout_ms;
 		this._slideshow_timeout_id = setTimeout(() => this._switchSlideshow(), timeout_ms);
 
-		this.fire(CDashboard.EVENT_SLIDESHOW_STARTED, {manually_toggled});
+		this.fire(CDashboard.EVENT_SLIDESHOW_START, {manually_toggled});
 	}
 
 	_stopSlideshow(manually_toggled = false) {
@@ -330,7 +330,7 @@ class CDashboard {
 		this._slideshow_switch_time = null;
 		this._slideshow_timeout_id = null;
 
-		this.fire(CDashboard.EVENT_SLIDESHOW_STOPPED, {manually_toggled});
+		this.fire(CDashboard.EVENT_SLIDESHOW_STOP, {manually_toggled});
 	}
 
 	_switchSlideshow() {
@@ -1274,7 +1274,7 @@ class CDashboard {
 	_setInitialDashboardPage(dashboard_page) {
 		const dashboard_page_index = this.getDashboardPageIndex(dashboard_page);
 
-		this.fire(CDashboard.EVENT_PAGE_SELECTED, {dashboard_page_index});
+		this.fire(CDashboard.EVENT_PAGE_SELECT, {dashboard_page_index});
 	}
 
 	_getInitialDashboardPage() {
