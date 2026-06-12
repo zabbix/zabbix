@@ -16762,10 +16762,10 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 void	zbx_recalc_time_period(time_t *ts_from, int table_group, unsigned char value_type)
 {
 #define HK_CFG_UPDATE_INTERVAL	5
-	time_t			least_ts = 0, now;
-	zbx_config_t		cfg;
-	static time_t		last_cfg_retrieval = 0;
-	static zbx_config_hk_t	hk;
+	time_t					least_ts = 0, now;
+	zbx_config_t				cfg;
+	static ZBX_THREAD_LOCAL time_t		last_cfg_retrieval = 0;
+	static ZBX_THREAD_LOCAL zbx_config_hk_t	hk;
 
 	now = time(NULL);
 
