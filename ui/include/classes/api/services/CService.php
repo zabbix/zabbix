@@ -46,14 +46,14 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @param array      $options
-	 * @param array|null $permissions
+	 * @param array $options
+	 * @param array $permissions
 	 *
 	 * @throws APIException
 	 *
 	 * @return array|string
 	 */
-	private function doGet(array $options = [], ?array $permissions = null) {
+	private function doGet(array $options, array $permissions) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'serviceids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -105,10 +105,7 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if ($permissions === null) {
-			$accessible_services = null;
-		}
-		elseif ($options['editable']) {
+		if ($options['editable']) {
 			$accessible_services = $permissions['rw_services'];
 		}
 		elseif ($permissions['r_services'] === null || $permissions['rw_services'] === null) {
@@ -139,7 +136,7 @@ class CService extends CApiService {
 			$limit_services = $accessible_services;
 		}
 
-		$options['root_services'] = $permissions !== null ? $permissions['root_services'] : null;
+		$options['root_services'] = $permissions['root_services'];
 
 		$count_output = $options['countOutput'];
 
@@ -158,7 +155,7 @@ class CService extends CApiService {
 			}
 
 			if (!$count_output && $this->outputIsRequested('readonly', $options['output'])) {
-				$row['readonly'] = $permissions !== null && $permissions['rw_services'] !== null
+				$row['readonly'] = $permissions['rw_services'] !== null
 					&& !array_key_exists($row['serviceid'], $permissions['rw_services']);
 			}
 
@@ -626,15 +623,15 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @param array      $options
-	 * @param array      $result
-	 * @param array|null $permissions
+	 * @param array $options
+	 * @param array $result
+	 * @param array $permissions
 	 *
 	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	protected function addRelatedObjects(array $options, array $result, ?array $permissions = null): array {
+	protected function addRelatedObjects(array $options, array $result, array $permissions = []): array {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$this->addRelatedParents($options, $result, $permissions);
@@ -649,13 +646,13 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @param array      $options
-	 * @param array      $result
-	 * @param array|null $permissions
+	 * @param array $options
+	 * @param array $result
+	 * @param array $permissions
 	 *
 	 * @throws APIException
 	 */
-	private function addRelatedParents(array $options, array &$result, ?array $permissions): void {
+	private function addRelatedParents(array $options, array &$result, array $permissions): void {
 		if ($options['selectParents'] === null) {
 			return;
 		}
@@ -698,13 +695,13 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @param array      $options
-	 * @param array      $result
-	 * @param array|null $permissions
+	 * @param array $options
+	 * @param array $result
+	 * @param array $permissions
 	 *
 	 * @throws APIException
 	 */
-	private function addRelatedChildren(array $options, array &$result, ?array $permissions): void {
+	private function addRelatedChildren(array $options, array &$result, array $permissions): void {
 		if ($options['selectChildren'] === null) {
 			return;
 		}
