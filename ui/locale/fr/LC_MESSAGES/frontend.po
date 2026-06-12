@@ -15935,6 +15935,10 @@ msgstr "Suivant"
 msgid "Next dashboard"
 msgstr "Tableau de bord suivant"
 
+#: jsLoader.php:416
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15948,6 +15952,10 @@ msgstr "Page suivante"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Prochaine étape"
+
+#: jsLoader.php:414
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
