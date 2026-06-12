@@ -22,7 +22,7 @@ class CControllerValidateApiExists extends CController {
 		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 	}
 
-	public static function getValidationRules(): array {
+	private static function getValidationRules(): array {
 		$api_services = ['host', 'template', 'item', 'itemprototype'];
 
 		return ['object', 'fields' => [
@@ -49,7 +49,7 @@ class CControllerValidateApiExists extends CController {
 	}
 
 	protected function checkInput() {
-		$ret = $this->validateInput($this->getValidationRules());
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
 			$this->setResponse(
