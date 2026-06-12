@@ -855,7 +855,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'id:enabled_lifetime' => ''
 					],
 					'inline_errors' => [
-						'id:lifetime' => 'A time unit is expected.',
+						'id:lifetime' => 'This field cannot be empty.',
 						'id:enabled_lifetime' => 'This field cannot be empty.'
 					]
 				]
@@ -999,11 +999,8 @@ class testLowLevelDiscovery extends CWebTest {
 						'id:enabled_lifetime_type' => 'After',
 						'id:enabled_lifetime' => '1d'
 					],
-					'inline_errors' => [
-						'id:enabled_lifetime' => 'Value cannot be greater than the value in "Delete lost resources" field.'
-					]
-//					'error_details' => 'Incorrect value for field "Disable lost resources":'.
-//						' cannot be greater than or equal to the value of field "Delete lost resources".'
+					'error_details' => 'Invalid parameter "/1/enabled_lifetime": cannot be greater than or equal to the'.
+							' value of parameter "/1/lifetime".'
 				]
 			],
 			// #20.
@@ -1687,9 +1684,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'LLD macros' => [
 						['LLD macro' => '{#MACRO}', 'JSONPath' => '']
 					],
-					'inline_errors' => [
-						'id:lld_macro_paths_0_path' => 'This field cannot be empty.'
-					]
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
 				]
 			],
 			// #62.
@@ -2758,15 +2753,18 @@ class testLowLevelDiscovery extends CWebTest {
 			? static::$templateid.'&context=template'
 			: static::$hostid.'&context=host';
 
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
+		$this->page->login()->open('zabbix.php?action=lldrule.list&filter_set=1&filter_hostids%5B0%5D='.$url);
 		$lld_name = 'LLD for delete scenario';
 		$this->query('link', $lld_name)->waitUntilClickable()->one()->click();
-		$this->query('button:Delete')->waitUntilClickable()->one()->click();
+
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
 
 		// Check alert.
 		$this->assertTrue($this->page->isAlertPresent());
 		$this->assertEquals('Delete discovery rule?', $this->page->getAlertText());
 		$this->page->acceptAlert();
+		$dialog->ensureNotPresent();
 		$this->assertMessage(TEST_GOOD, 'Discovery rule deleted');
 
 		// Check DB.
