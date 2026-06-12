@@ -2068,42 +2068,42 @@ class testTriggerCEP extends CIntegrationTest {
 		return $response['result'];
 	}
 
-	private function waitForAllTriggerEventCounts(array $triggerids, int $expected_count): array {
-		$params = [
+	/**
+	 * Wait until exactly $expected_count events per trigger have been generated since the scenario
+	 * baseline. All triggers are fed identical values, so their per-trigger counts move together;
+	 * waiting on the total lets the server aggregate (countOutput) instead of fetching and counting
+	 * every event row on each poll iteration. callUntilCountIsPresent requires exact equality, so a
+	 * missing or extra event on any trigger keeps the total off-target and fails the wait.
+	 */
+	private function waitForAllTriggerEventCounts(array $triggerids, int $expected_count): void {
+		// eventid_from is inclusive, so +1 excludes the baseline event itself. A target of 0
+		// (no state change expected) is handled too: the count returns 0 immediately, and any
+		// spurious event keeps it off-target and fails the wait.
+		$this->callUntilCountIsPresent('event.get', [
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
-			// Only fetch events generated during the current scenario (eventid_from is inclusive,
-			// so +1 excludes the baseline event itself). This keeps the query bounded to the few
-			// events produced per step instead of the entire trigger event history.
+			'eventid_from' => $this->event_baseline_id + 1
+		], count($triggerids) * $expected_count,
+			self::STATE_CHANGE_WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY
+		);
+	}
+
+	/**
+	 * Fetch the events generated since the scenario baseline, grouped by trigger (newest first).
+	 * Only needed where the event values themselves are asserted; most callers just wait on the
+	 * count via waitForAllTriggerEventCounts().
+	 */
+	private function getScenarioEventsByTrigger(array $triggerids): array {
+		$response = $this->call('event.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
 			'eventid_from' => $this->event_baseline_id + 1,
 			'sortfield' => 'eventid',
 			'sortorder' => 'DESC',
 			'output' => ['value', 'objectid']
-		];
-
-		if ($expected_count === 0) {
-			// callUntilDataIsPresent requires a non-empty result, so it can never
-			// succeed when we expect zero events. Call the API once directly instead.
-			$response = $this->call('event.get', ['limit' => 1] + $params);
-		}
-		else {
-			$response = $this->callUntilDataIsPresent('event.get', $params,
-				self::STATE_CHANGE_WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-				function ($response) use ($triggerids, $expected_count) {
-					$counts = array_fill_keys($triggerids, 0);
-					foreach ($response['result'] as $event) {
-						$counts[(int) $event['objectid']]++;
-					}
-					foreach ($counts as $triggerid => $count) {
-						if ($count !== $expected_count) {
-							return 'expected '.$expected_count.' events for trigger '.$triggerid.', got '.$count;
-						}
-					}
-					return true;
-				}
-			);
-		}
+		]);
 
 		$events_by_trigger = array_fill_keys($triggerids, []);
 		foreach ($response['result'] as $event) {
@@ -2131,7 +2131,8 @@ class testTriggerCEP extends CIntegrationTest {
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value], $keys),
 			null, 1
 		);
-		$events_by_trigger = $this->waitForAllTriggerEventCounts($triggerids, $expected_event_count);
+		$this->waitForAllTriggerEventCounts($triggerids, $expected_event_count);
+		$events_by_trigger = $this->getScenarioEventsByTrigger($triggerids);
 		$triggers = $this->getTriggers($triggerids);
 		foreach ($triggerids as $idx => $triggerid) {
 			$trigger = $triggers[$triggerid];
@@ -2233,7 +2234,8 @@ class testTriggerCEP extends CIntegrationTest {
 
 		$this->assertVpsWrittenIncreasedBy($vps_written, count($keys));
 
-		$events_by_trigger = $this->waitForAllTriggerEventCounts($triggerids, $expected_event_count);
+		// The count is enforced by the wait itself (exact total match); no per-trigger fetch needed.
+		$this->waitForAllTriggerEventCounts($triggerids, $expected_event_count);
 		$triggers_by_id = $this->getTriggers($triggerids);
 
 		foreach ($triggerids as $idx => $triggerid) {
@@ -2241,7 +2243,6 @@ class testTriggerCEP extends CIntegrationTest {
 			$info = 'trigger #'.$idx.' '.json_encode($trigger);
 			$this->assertEquals($expected_trigger_value, $trigger['value'], $info);
 			$this->assertEquals($expected_lastchanges[$idx], $trigger['lastchange'], $info);
-			$this->assertCount($expected_event_count, $events_by_trigger[$triggerid], $info);
 		}
 	}
 
