@@ -21,9 +21,6 @@
 static ZBX_THREAD_LOCAL	zbx_dbconn_t	*dbconn  = NULL;
 static int				db_autoincrement = 0;
 
-static zbx_dbconn_pool_t	*dbpool_default = NULL;
-static int			dbconn_ref_num = 0;
-
 void	zbx_db_init_autoincrement_options(void)
 {
 	db_autoincrement = 1;
