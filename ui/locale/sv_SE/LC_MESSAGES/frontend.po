@@ -14374,6 +14374,10 @@ msgstr "Nya värden"
 msgid "Next dashboard"
 msgstr "Nästa instrumentpanel"
 
+#: jsLoader.php:260
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -14387,6 +14391,10 @@ msgstr "Nästa sida"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Nästa steg"
+
+#: jsLoader.php:258
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131

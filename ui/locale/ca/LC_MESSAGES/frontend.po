@@ -14373,6 +14373,10 @@ msgstr "Nous valors"
 msgid "Next dashboard"
 msgstr "Tauler següent"
 
+#: jsLoader.php:260
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -14386,6 +14390,10 @@ msgstr "Següent pàgina"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Passa següent"
+
+#: jsLoader.php:258
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
