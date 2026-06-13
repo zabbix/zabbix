@@ -50,7 +50,7 @@ struct zbx_db_result
 
 static const zbx_db_config_t	*db_config = NULL;
 
-static zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
+static ZBX_THREAD_LOCAL zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
 
 #if defined(HAVE_SQLITE3)
 static zbx_mutex_t		db_sqlite_access = ZBX_MUTEX_NULL;
