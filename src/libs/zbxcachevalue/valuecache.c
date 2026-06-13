@@ -260,7 +260,7 @@ ZBX_VECTOR_DECL(vc_itemupdate, zbx_vc_item_update_t)
 ZBX_VECTOR_IMPL(vc_itemupdate, zbx_vc_item_update_t)
 
 static ZBX_THREAD_LOCAL zbx_vector_vc_itemupdate_t	vc_itemupdates;
-int ZBX_THREAD_LOCAL					vc_itemupdates_initialized = 0;
+ZBX_THREAD_LOCAL int 					vc_itemupdates_initialized = 0;
 
 static void	vc_cache_item_update(zbx_uint64_t itemid, zbx_vc_item_update_type_t type, int arg1, int arg2)
 {
