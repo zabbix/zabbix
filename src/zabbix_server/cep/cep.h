@@ -15,8 +15,10 @@
 #ifndef ZABBIX_CEP_H
 #define ZABBIX_CEP_H
 
+#include "cep_window.h"
 #include "zbxcep.h"
 #include "zbxcep_client.h"
+#include "zbxcacheconfig.h"
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
@@ -27,14 +29,8 @@ int	cep_origin_compare(const zbx_cep_origin_t *o1, const zbx_cep_origin_t *o2);
 /* complex event processing */
 typedef struct zbx_cep zbx_cep_t;
 
-zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, unsigned char object,
-	zbx_uint64_t objectid, const char *name, int clock, int ns, int value, int serverity,
-	const zbx_vector_tags_ptr_t *tags, const zbx_vector_db_event_suppress_t *suppress);
 zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event);
 
-void	cep_event_clear(zbx_cep_event_t *event);
-zbx_cep_event_t	*cep_event_addref(zbx_cep_event_t *event);
-zbx_cep_event_t	*cep_event_get_mutable(zbx_cep_event_t *event);
 zbx_uint32_t	cep_event_handle_release(zbx_cep_event_handle_t h);
 zbx_cep_event_t	*cep_event_handle_remove(zbx_cep_t *cep, zbx_cep_event_handle_t h);
 int	cep_event_handle_compare(const void *a1, const void *a2);
@@ -86,5 +82,7 @@ void	cep_update_events_accessed(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_update_events_processed(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_update_events_discarded(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats);
+
+zbx_cep_window_t	*cep_acquire_window(zbx_cep_t *cep, zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx);
 
 #endif /* ZABBIX_CEP_CACHE_H */

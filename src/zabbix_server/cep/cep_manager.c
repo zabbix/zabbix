@@ -14,6 +14,7 @@
 
 #include "cep_manager.h"
 #include "cep.h"
+#include "cep_event.h"
 #include "cep_task.h"
 #include "cep_worker.h"
 #include "cep_queue.h"
@@ -25,6 +26,7 @@
 
 #include "zbxcommon.h"
 #include "zbxipcservice.h"
+#include "zbxlog.h"
 #include "zbxmw.h"
 #include "zbxsupervisor_client.h"
 #include "zbxtimekeeper.h"
@@ -546,11 +548,15 @@ void	*zbx_cep_manager_thread(void *args)
 			time_idle = 0;
 			stats = stats_tmp;
 
+			/* WDN remove debug logging */
 			zbx_cep_t	*cep;
+			int	loglevel = zbx_set_log_level(LOG_LEVEL_TRACE);
 
 			cep_cache_acquire(&cep);
-			cep_dump(cep, "...");
+			cep_dump(cep, "========");
 			cep_cache_release(&cep);
+
+			zbx_set_log_level(loglevel);
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);

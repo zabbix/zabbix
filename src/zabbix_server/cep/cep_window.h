@@ -15,6 +15,7 @@
 #ifndef ZABBIX_CEP_WINDOW_H
 #define ZABBIX_CEP_WINDOW_H
 
+#include "cep_rule.h"
 #include "zbxcacheconfig.h"
 #include "zbxcep.h"
 #include "zbxtypes_ext.h"
@@ -38,8 +39,8 @@ typedef struct
 {
 	zbx_uint64_t		ruleid;
 	int			key_type;
-	const char		*key_value;
-	const char		*key_tag;
+	char			*key_value;
+	char			*key_tag;
 
 	zbx_cep_window_t	*window;
 }
@@ -50,8 +51,9 @@ void	cep_window_index_init(zbx_hashset_t *windows);
 zbx_cep_window_t	*cep_window_addref(zbx_cep_window_t *window);
 void	cep_window_release(zbx_cep_window_t *window);
 
-zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, const zbx_cep_rule_t *rule, int group_by,
-	const char *tag, const char *value);
+zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, zbx_cep_rule_t *rule,
+		zbx_cep_event_context_t *ctx);
 
+void	cep_event_add_to_window(zbx_cep_event_handle_t hevent, zbx_cep_event_context_t *ctx, zbx_cep_rule_t *rule);
 #endif
 

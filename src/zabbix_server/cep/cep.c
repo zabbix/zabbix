@@ -13,6 +13,7 @@
 **/
 
 #include "cep.h"
+#include "cep_event.h"
 #include "cep_window.h"
 #include "zbxcep.h"
 #include "zbxcep_client.h"
@@ -111,121 +112,6 @@ struct zbx_cep
 	zbx_atomic_uint64_t		events_processed_num;
 	zbx_atomic_uint64_t		events_discarded_num;
 };
-
-void	cep_event_clear(zbx_cep_event_t *event)
-{
-	if (NULL != event->r_event)
-		zbx_cep_event_release(event->r_event);
-
-	for (int i = 0; i < event->tags.values_num; i++)
-	{
-		zbx_free(event->tags.values[i].tag);
-		zbx_free(event->tags.values[i].value);
-	}
-	zbx_vector_tag_destroy(&event->tags);
-
-	zbx_vector_db_event_suppress_destroy(&event->suppress);
-
-	zbx_free(event->name);
-}
-
-void	zbx_cep_event_release(zbx_cep_event_t *event)
-{
-	if (1 != atomic_fetch_sub(&event->refcount, 1))
-		return;
-
-	cep_event_clear(event);
-	zbx_free(event);
-}
-
-zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, unsigned char object,
-		zbx_uint64_t objectid, const char *name, int clock, int ns, int value, int serverity,
-		const zbx_vector_tags_ptr_t *tags, const zbx_vector_db_event_suppress_t *suppress)
-{
-	zbx_cep_event_t	*event;
-
-	event = (zbx_cep_event_t *)zbx_malloc(NULL, sizeof(zbx_cep_event_t));
-	event->eventid = eventid;
-	event->r_event = NULL;
-	event->refcount = 0;
-	event->origin.source = source;
-	event->origin.object = object;
-	event->origin.objectid = objectid;
-	event->clock = clock;
-	event->ns = ns;
-	event->value = value;
-	event->severity = serverity;
-	event->suppress_mtime = 0;
-	event->name = zbx_strdup(NULL, name);
-
-	zbx_vector_tag_create(&event->tags);
-	if (NULL != tags)
-	{
-		zbx_vector_tag_reserve(&event->tags, (size_t)tags->values_num);
-		for (int i = 0; i < tags->values_num; i++)
-		{
-			zbx_tag_t	tag;
-
-			tag.tag = zbx_strdup(NULL, tags->values[i]->tag);
-			tag.value = zbx_strdup(NULL, tags->values[i]->value);
-			zbx_vector_tag_append(&event->tags, tag);
-		}
-	}
-
-	zbx_vector_db_event_suppress_create(&event->suppress);
-	if (NULL != suppress)
-		zbx_vector_db_event_suppress_append_array(&event->suppress, suppress->values, suppress->values_num);
-
-	return event;
-}
-
-static zbx_cep_event_t	*cep_event_clone(const zbx_cep_event_t *event)
-{
-	zbx_cep_event_t	*clone;
-
-	clone = (zbx_cep_event_t *)zbx_malloc(NULL, sizeof(zbx_cep_event_t));
-	clone->eventid = event->eventid;
-	clone->r_event = (NULL != event->r_event ? cep_event_addref(event->r_event) : NULL);
-	clone->refcount = 1;
-	clone->origin = event->origin;
-	clone->clock = event->clock;
-	clone->ns = event->ns;
-	clone->value = event->value;
-	clone->severity = event->severity;
-	clone->suppress_mtime = event->suppress_mtime;
-	clone->name = zbx_strdup(NULL, event->name);
-
-	zbx_vector_tag_create(&clone->tags);
-	zbx_vector_tag_reserve(&clone->tags, (size_t)event->tags.values_num);
-	for (int i = 0; i < event->tags.values_num; i++)
-	{
-		zbx_tag_t	tag_local;
-
-		tag_local.tag = zbx_strdup(NULL, event->tags.values[i].tag);
-		tag_local.value = zbx_strdup(NULL, event->tags.values[i].value);
-		zbx_vector_tag_append(&clone->tags, tag_local);
-	}
-
-	zbx_vector_db_event_suppress_create(&clone->suppress);
-	zbx_vector_db_event_suppress_append_array(&clone->suppress, event->suppress.values, event->suppress.values_num);
-
-	return clone;
-}
-
-zbx_cep_event_t	*cep_event_get_mutable(zbx_cep_event_t *event)
-{
-	if (1 == atomic_load(&event->refcount))
-		return cep_event_addref(event);
-
-	return cep_event_clone(event);
-}
-
-zbx_cep_event_t	*cep_event_addref(zbx_cep_event_t *event)
-{
-	atomic_fetch_add(&event->refcount, 1);
-
-	return event;
-}
 
 static zbx_hash_t	cep_event_ptr_hash(const void *a)
 {
@@ -1634,6 +1520,46 @@ static void	cep_dump_event(const char *indent, zbx_cep_event_t *event)
 	zbx_set_log_level(log_level);
 }
 
+static void	cep_window_ref_dump(const char *prefix, const zbx_cep_window_ref_t *ref)
+{
+	zbx_queue_ptr_iter_t	iter;
+	zbx_cep_event_handle_t	hevent;
+	const zbx_cep_window_t	*window = ref->window;
+
+	zabbix_log(LOG_LEVEL_TRACE, "%sruleid:" ZBX_FS_UI64 " type:%d [group_by:%d key:%s value:%s] created:"
+			ZBX_FS_TIME_T,
+			prefix, window->ruleid, window->type, ref->key_type, ZBX_NULL2STR(ref->key_tag),
+			ZBX_NULL2STR(ref->key_value), window->time_created);
+
+	if (SUCCEED != zbx_queue_ptr_empty(&window->hevents))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "%s  eventids:", prefix);
+		zbx_queue_ptr_iter_reset(&window->hevents, &iter);
+		while (NULL != (hevent = (zbx_cep_event_handle_t)zbx_queue_ptr_iter_next(&iter)))
+		{
+			if (CEP_EVENT_STATE_ACTIVE == hevent->state)
+				zabbix_log(LOG_LEVEL_TRACE, "%s    " ZBX_FS_UI64, prefix, hevent->eventid);
+		}
+	}
+}
+
+static void	cep_dump_windows(const char *prefix, zbx_cep_t *cep)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_cep_window_ref_t	*ref;
+	char			buf[128];
+
+	if (0 == cep->windows.num_data)
+		return;
+
+	zabbix_log(LOG_LEVEL_TRACE, "%swindows:", prefix);
+	zbx_snprintf(buf, sizeof(buf), "%s  ", prefix);
+
+	zbx_hashset_iter_reset(&cep->windows, &iter);
+	while (NULL != (ref = (zbx_cep_window_ref_t *)zbx_hashset_iter_next(&iter)))
+		cep_window_ref_dump(buf, ref);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: dump event cache contents for debugging                           *
@@ -1648,9 +1574,9 @@ void	cep_dump(zbx_cep_t *cep, const char *msg)
 	zbx_cep_object_t	*obj;
 
 	/* WDN remove */
-	int	log_level = zbx_set_log_level(LOG_LEVEL_DEBUG);
+	int	log_level = zbx_set_log_level(LOG_LEVEL_TRACE);
 
-	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		return;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "CEP cache, changed by %s", msg);
@@ -1667,6 +1593,8 @@ void	cep_dump(zbx_cep_t *cep, const char *msg)
 			cep_dump_event("    ", obj->events.values[i]->event);
 		}
 	}
+
+	cep_dump_windows("", cep);
 
 	/* WDN remove */
 	zbx_set_log_level(log_level);
@@ -1693,4 +1621,10 @@ void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats)
 	stats->events_processed = atomic_load(&cep->events_processed_num);
 	stats->events_discarded = atomic_load(&cep->events_discarded_num);
 }
+
+zbx_cep_window_t	*cep_acquire_window(zbx_cep_t *cep, zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx)
+{
+	return cep_get_window_or_create(&cep->windows, rule, ctx);
+}
+
 

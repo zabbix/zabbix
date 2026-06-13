@@ -13,6 +13,7 @@
 **/
 
 #include "cep_rule_op_event.h"
+#include "cep_api.h"
 #include "cep_rule.h"
 #include "cep.h"
 #include "zbx_trigger_constants.h"
@@ -130,17 +131,6 @@ static int	cep_event_validate_tag(zbx_cep_event_t *event, const char *tag, const
 	}
 
 	return SUCCEED;
-}
-
-static int	cep_event_find_tag(zbx_cep_event_t *event, const char *tag)
-{
-	for (int i = 0; i < event->tags.values_num; i++)
-	{
-		if (0 == strcmp(event->tags.values[i].tag, tag))
-			return i;
-	}
-
-	return FAIL;
 }
 
 static void	cep_operation_event_add_tag(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
@@ -402,14 +392,18 @@ void	cep_event_execute_ops(const zbx_cep_rule_t **matched_rules, int matched_rul
 		cep_rule_event_execute_ops(matched_rules[i], execute_when, ctx, event);
 }
 
-
-void	cep_event_add_to_rules(zbx_cep_event_handle_t hevent, const zbx_cep_rule_t **matched_rules,
-		int matched_rules_num)
+void	cep_event_add_to_rules(zbx_cep_event_handle_t hevent, zbx_cep_event_context_t *ctx,
+		const zbx_cep_rule_t **matched_rules, int matched_rules_num)
 {
 	ZBX_UNUSED(hevent);
 	ZBX_UNUSED(matched_rules);
 	ZBX_UNUSED(matched_rules_num);
 
+	for (int i = 0; i < matched_rules_num; i++)
+	{
+		if (NULL != matched_rules[i]->window)
+			cep_event_add_to_window(hevent, ctx, matched_rules[i]);
+	}
 	/* TODO: implementation */
 }
 

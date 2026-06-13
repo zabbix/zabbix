@@ -13,19 +13,17 @@
 **/
 
 #include "cep_window.h"
+#include "cep.h"
+#include "cep_api.h"
+#include "cep_rule.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
 #include "zbxexpr.h"
+#include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxtypes_ext.h"
 #include <stdatomic.h>
-
-/* TODO: sync naming with spec */
-#define CEP_WINDOW_GROUP_NONE		0
-#define CEP_WINDOW_GROUP_HOST		1
-#define CEP_WINDOW_GROUP_HOSTGROUP	2
-#define CEP_WINDOW_GROUP_TAG		3
 
 static zbx_hash_t	cep_window_ref_hash(const void *a)
 {
@@ -33,15 +31,19 @@ static zbx_hash_t	cep_window_ref_hash(const void *a)
 
 	zbx_hash_t	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&ref->ruleid);
 
-	if (CEP_WINDOW_GROUP_NONE == ref->key_type)
+	if (ZBX_CEP_GROUP_BY_NONE == ref->key_type)
 		return hash;
 
-	hash = ZBX_DEFAULT_STRING_HASH_ALGO(ref->key_value, strlen(ref->key_value), hash);
+	if (NULL != ref->key_value)
+		hash = ZBX_DEFAULT_STRING_HASH_ALGO(ref->key_value, strlen(ref->key_value), hash);
 
-	if (CEP_WINDOW_GROUP_TAG != ref->key_type)
+	if (ZBX_CEP_GROUP_BY_TAG != ref->key_type)
 		return hash;
 
-	return ZBX_DEFAULT_STRING_HASH_ALGO(ref->key_tag, strlen(ref->key_tag), hash);
+	if (NULL != ref->key_tag)
+		hash = ZBX_DEFAULT_STRING_HASH_ALGO(ref->key_tag, strlen(ref->key_tag), hash);
+
+	return hash;
 }
 
 static int	cep_window_ref_compare(const void *a1, const void *a2)
@@ -53,16 +55,16 @@ static int	cep_window_ref_compare(const void *a1, const void *a2)
 	ZBX_RETURN_IF_NOT_EQUAL(ref1->ruleid, ref2->ruleid);
 	ZBX_RETURN_IF_NOT_EQUAL(ref1->key_type, ref2->key_type);
 
-	if (CEP_WINDOW_GROUP_NONE == ref1->key_type)
+	if (ZBX_CEP_GROUP_BY_NONE == ref1->key_type)
 		return 0;
 
-	if (0 != (ret = strcmp(ref1->key_value, ref2->key_value)))
+	if (0 != (ret = zbx_strcmp_null(ref1->key_value, ref2->key_value)))
 		return ret;
 
-	if (CEP_WINDOW_GROUP_TAG != ref1->key_type)
+	if (ZBX_CEP_GROUP_BY_TAG != ref1->key_type)
 		return 0;
 
-	return strcmp(ref1->key_tag, ref2->key_tag);
+	return zbx_strcmp_null(ref1->key_tag, ref2->key_tag);
 }
 
 zbx_cep_window_t	*cep_window_addref(zbx_cep_window_t *window)
@@ -76,11 +78,17 @@ void	cep_window_release(zbx_cep_window_t *window)
 {
 	zbx_cep_event_handle_t	h;
 
+	zabbix_log(LOG_LEVEL_ERR, "[WDN] cep_window_release()");
+
 	if (1 != atomic_fetch_sub(&window->refcount, 1))
 		return;
 
+	zabbix_log(LOG_LEVEL_ERR, "[WDN]   free window");
+
 	while (NULL != (h = (zbx_cep_event_handle_t)zbx_queue_ptr_pop(&window->hevents)))
 		zbx_cep_event_handle_release(h);
+
+	zbx_queue_ptr_destroy(&window->hevents);
 
 	pthread_mutex_destroy(&window->lock);
 
@@ -109,6 +117,8 @@ static zbx_cep_window_t	*cep_window_create(const zbx_cep_rule_t *rule)
 		window->duration = SEC_PER_HOUR;
 	}
 
+	zbx_free(duration);
+
 	window->time_created = time(NULL);
 	zbx_queue_ptr_create(&window->hevents);
 
@@ -128,6 +138,9 @@ static void	cep_window_ref_clear(void *a)
 	zbx_cep_window_ref_t	*ref = (zbx_cep_window_ref_t *)a;
 
 	cep_window_release(ref->window);
+
+	zbx_free(ref->key_tag);
+	zbx_free(ref->key_value);
 }
 
 void	cep_window_index_init(zbx_hashset_t *windows)
@@ -136,25 +149,49 @@ void	cep_window_index_init(zbx_hashset_t *windows)
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 }
 
-zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, const zbx_cep_rule_t *rule, int group_by,
-		const char *tag, const char *value)
+zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, zbx_cep_rule_t *rule,
+		zbx_cep_event_context_t *ctx)
 {
 	zbx_cep_window_ref_t	*ref, ref_local = {
 		.ruleid = rule->ruleid,
-		.key_type = group_by,
-		.key_tag = tag,
-		.key_value = value
+		.key_type = rule->window->group_by,
 	};
+	int		index;
+	zbx_cep_event_t	*event;
+
+	switch (ref_local.key_type)
+	{
+		case ZBX_CEP_GROUP_BY_NONE:
+			break;
+		case ZBX_CEP_GROUP_BY_HOST:
+			cep_event_context_load_hosts(ctx);
+			if (0 != ctx->hosts.values_num)
+				ref_local.key_value = ctx->hosts.values[0];
+			break;
+		case ZBX_CEP_GROUP_BY_HOSTGROUP:
+			cep_event_context_load_groups(ctx);
+			if (0 != ctx->groups.values_num)
+				ref_local.key_value = ctx->groups.values[0];
+			break;
+		case ZBX_CEP_GROUP_BY_TAG:
+			event = cep_event_context_acquire_event(ctx);
+			if (FAIL != (index = cep_event_find_tag(event, rule->window->group_tag)))
+			{
+				ref_local.key_tag = rule->window->group_tag;
+				ref_local.key_value = event->tags.values[index].value;
+			}
+			break;
+	}
 
 	ref = (zbx_cep_window_ref_t *)zbx_hashset_insert(windows, &ref_local, sizeof(ref_local));
 
 	if (NULL == ref->window)
 	{
-		if (NULL != tag)
-			ref->key_tag = zbx_strdup(NULL, tag);
+		if (NULL != ref_local.key_tag)
+			ref->key_tag = zbx_strdup(NULL, ref_local.key_tag);
 
-		if (NULL != value)
-			ref->key_value = zbx_strdup(NULL, value);
+		if (NULL != ref_local.key_value)
+			ref->key_value = zbx_strdup(NULL, ref_local.key_value);
 
 		ref->window = cep_window_create(rule);
 	}
@@ -162,3 +199,16 @@ zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, const zbx_cep
 	return cep_window_addref(ref->window);
 }
 
+void	cep_event_add_to_window(zbx_cep_event_handle_t hevent, zbx_cep_event_context_t *ctx, zbx_cep_rule_t *rule)
+{
+	zbx_cep_t		*cep;
+	zbx_cep_window_t	*window;
+
+	cep_cache_acquire(&cep);
+	window = cep_acquire_window(cep, rule, ctx);
+	cep_cache_release(&cep);
+
+	zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(hevent));
+
+	cep_window_release(window);
+}
