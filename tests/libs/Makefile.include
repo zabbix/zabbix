@@ -163,6 +163,7 @@ ZBX_SERVER_LIBS = \
 
 ZBX_PROXY_LIBS = \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
+	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
 	$(top_builddir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a \
 	$(top_builddir)/src/zabbix_proxy/taskmanager/libzbxtaskmanager_proxy.a \
 	$(top_builddir)/src/zabbix_proxy/datasender/libzbxdatasender.a \
