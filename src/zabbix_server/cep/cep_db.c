@@ -1039,8 +1039,6 @@ void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_
 	{
 		zbx_dbconn_begin(db);
 
-		/* update event severity */
-
 		if (0 != sync.values_num)
 			cep_db_sync_event(db, &sync);
 

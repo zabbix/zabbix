@@ -35,6 +35,8 @@ typedef struct
 
 	zbx_vector_str_t	hosts;
 	zbx_vector_str_t	groups;
+
+	zbx_uint32_t		sync_flags;
 }
 zbx_cep_event_context_t;
 
@@ -43,5 +45,6 @@ zbx_cep_event_t *cep_event_context_acquire_event(zbx_cep_event_context_t *ctx);
 zbx_cep_event_t *cep_event_context_acquire_mutable_event(zbx_cep_event_context_t *ctx);
 void	cep_event_context_load_hosts(zbx_cep_event_context_t *ctx);
 void	cep_event_context_load_groups(zbx_cep_event_context_t *ctx);
+void	cep_event_context_set_handle(zbx_cep_event_context_t *ctx, zbx_cep_event_handle_t hevent);
 
 #endif

@@ -16,6 +16,7 @@
 #include "cep_api.h"
 #include "cep_rule.h"
 #include "cep.h"
+#include "cep_task.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
@@ -34,6 +35,7 @@ static void	cep_operation_event_execute_set_name(const zbx_cep_operation_t *op, 
 	if (NULL != *event)
 		(*event)->name = zbx_strdup((*event)->name, op->args.set_name.name);
 
+	ctx->sync_flags |= CEP_SYNC_EVENT_NAME;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -49,6 +51,7 @@ static void	cep_operation_event_execute_set_severity(const zbx_cep_operation_t *
 	if (NULL != *event)
 		(*event)->severity = op->args.set_severity.level;
 
+	ctx->sync_flags |= CEP_SYNC_EVENT_SEVERITY;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -68,6 +71,8 @@ static void	cep_operation_event_execute_increase_severity(const zbx_cep_operatio
 
 		(*event)->severity++;
 	}
+
+	ctx->sync_flags |= CEP_SYNC_EVENT_SEVERITY;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -87,6 +92,8 @@ static void	cep_operation_event_execute_decrease_severity(const zbx_cep_operatio
 
 		(*event)->severity++;
 	}
+
+	ctx->sync_flags |= CEP_SYNC_EVENT_SEVERITY;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -148,6 +155,8 @@ static void	cep_operation_event_add_tag(const zbx_cep_operation_t *op, zbx_cep_e
 		tag_local.tag = zbx_strdup(NULL, op->args.add_tag.tag);
 		tag_local.value = zbx_strdup(NULL, op->args.add_tag.value);
 		zbx_vector_tag_append(&(*event)->tags, tag_local);
+
+		ctx->sync_flags |= CEP_SYNC_EVENT_TAGS;
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -179,6 +188,8 @@ static void	cep_operation_event_set_tag(const zbx_cep_operation_t *op, zbx_cep_e
 
 			tag->value = zbx_strdup(tag->value, op->args.set_tag.value);
 		}
+
+		ctx->sync_flags |= CEP_SYNC_EVENT_TAGS;
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -201,7 +212,7 @@ static void	cep_operation_event_set_tag_value(const zbx_cep_operation_t *op, zbx
 			zbx_tag_t	*tag = &(*event)->tags.values[index];
 
 			tag->value = zbx_strdup(tag->value, op->args.set_tag_value.value);
-
+			ctx->sync_flags |= CEP_SYNC_EVENT_TAGS;
 		}
 	}
 out:
@@ -227,6 +238,7 @@ static void	cep_operation_event_increase_tag_value(const zbx_cep_operation_t *op
 		{
 			zbx_free(tag->value);
 			tag->value = value;
+			ctx->sync_flags |= CEP_SYNC_EVENT_TAGS;
 		}
 	}
 out:
@@ -252,6 +264,7 @@ static void	cep_operation_event_decrease_tag_value(const zbx_cep_operation_t *op
 		{
 			zbx_free(tag->value);
 			tag->value = value;
+			ctx->sync_flags |= CEP_SYNC_EVENT_TAGS;
 		}
 	}
 out:
@@ -273,7 +286,10 @@ static void	cep_operation_event_rename_tag(const zbx_cep_operation_t *op, zbx_ce
 		zbx_tag_t	*tag = &(*event)->tags.values[index];
 
 		if (SUCCEED == cep_event_validate_tag(*event, op->args.rename_tag.new_tag, tag->value, NULL))
+		{
 			tag->tag = zbx_strdup(tag->tag, op->args.rename_tag.new_tag);
+			ctx->sync_flags |= CEP_SYNC_EVENT_TAGS;
+		}
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -296,6 +312,7 @@ static void	cep_operation_event_remove_tag(const zbx_cep_operation_t *op, zbx_ce
 		zbx_free(tag->tag);
 		zbx_free(tag->value);
 		zbx_vector_tag_remove_noorder(&(*event)->tags, index);
+		ctx->sync_flags |= CEP_SYNC_EVENT_TAGS;
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -385,6 +402,34 @@ void	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zb
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+void	cep_rule_event_handle_execute_ops(const zbx_cep_rule_t *rule, zbx_cep_event_handle_t hevent, int execute_when,
+		zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
+
+	zbx_cep_event_t	*event = NULL;
+
+	cep_event_context_set_handle(ctx, hevent);
+	cep_rule_event_execute_ops(rule, execute_when, ctx, &event);
+
+	if (NULL != event)
+	{
+		zbx_cep_t	*cep;
+
+		cep_cache_acquire(&cep);
+		cep_event_handle_set(hevent, event);
+		cep_cache_release(&cep);
+
+		zbx_cep_event_release(event);
+
+		zbx_mw_task_t	*t = cep_create_task_sync_event(hevent, ctx->sync_flags);
+
+		zbx_vector_mw_task_ptr_append(tasks, t);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 void	cep_event_execute_ops(const zbx_cep_rule_t **matched_rules, int matched_rules_num, int execute_when,
 		zbx_cep_event_context_t *ctx, zbx_cep_event_t **event)
 {
@@ -393,16 +438,23 @@ void	cep_event_execute_ops(const zbx_cep_rule_t **matched_rules, int matched_rul
 }
 
 void	cep_event_add_to_rules(zbx_cep_event_handle_t hevent, zbx_cep_event_context_t *ctx,
-		const zbx_cep_rule_t **matched_rules, int matched_rules_num)
+		const zbx_cep_rule_t **matched_rules, int matched_rules_num, zbx_vector_mw_task_ptr_t *tasks)
 {
-	ZBX_UNUSED(hevent);
-	ZBX_UNUSED(matched_rules);
-	ZBX_UNUSED(matched_rules_num);
-
 	for (int i = 0; i < matched_rules_num; i++)
 	{
-		if (NULL != matched_rules[i]->window)
-			cep_event_add_to_window(hevent, ctx, matched_rules[i]);
+		const zbx_cep_rule_t	*rule = matched_rules[i];
+
+		switch (rule->window->type)
+		{
+			case ZBX_CEP_WINDOW_SIMPLE:
+				cep_window_simple_process_event(rule, hevent, ctx, tasks);
+				break;
+			case ZBX_CEP_WINDOW_CAUSE_SYMPTOM:
+			case ZBX_CEP_WINDOW_TAG_MATCH:
+			case ZBX_CEP_WINDOW_PATTERN_MATCH:
+				/* TODO: implement */
+				break;
+		}
 	}
 	/* TODO: implementation */
 }

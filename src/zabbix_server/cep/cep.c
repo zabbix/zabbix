@@ -820,6 +820,12 @@ static zbx_cep_event_t	*cep_event_handle_mutable(zbx_cep_event_handle_t h)
 	return event;
 }
 
+void	cep_event_handle_set(zbx_cep_event_handle_t h, zbx_cep_event_t *event)
+{
+	zbx_cep_event_release(h->event);
+	h->event = cep_event_addref(event);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: resolve trigger events with result event                          *
@@ -1622,7 +1628,7 @@ void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats)
 	stats->events_discarded = atomic_load(&cep->events_discarded_num);
 }
 
-zbx_cep_window_t	*cep_acquire_window(zbx_cep_t *cep, zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx)
+zbx_cep_window_t	*cep_acquire_window(zbx_cep_t *cep, const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx)
 {
 	return cep_get_window_or_create(&cep->windows, rule, ctx);
 }

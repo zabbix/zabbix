@@ -16,6 +16,7 @@
 #include "cep.h"
 #include "cep_api.h"
 #include "cep_rule.h"
+#include "cep_rule_op_event.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
@@ -78,12 +79,8 @@ void	cep_window_release(zbx_cep_window_t *window)
 {
 	zbx_cep_event_handle_t	h;
 
-	zabbix_log(LOG_LEVEL_ERR, "[WDN] cep_window_release()");
-
 	if (1 != atomic_fetch_sub(&window->refcount, 1))
 		return;
-
-	zabbix_log(LOG_LEVEL_ERR, "[WDN]   free window");
 
 	while (NULL != (h = (zbx_cep_event_handle_t)zbx_queue_ptr_pop(&window->hevents)))
 		zbx_cep_event_handle_release(h);
@@ -99,16 +96,19 @@ static zbx_cep_window_t	*cep_window_create(const zbx_cep_rule_t *rule)
 {
 	zbx_cep_window_t	*window;
 	int			err;
-	char			*duration;
+	char			*duration, *capacity;
 
 	window = (zbx_cep_window_t *)zbx_malloc(NULL, sizeof(zbx_cep_window_t));
 	window->ruleid = rule->ruleid;
 	window->type = rule->window->type;
 
 	duration = zbx_strdup(NULL, rule->window->duration);
+	capacity = zbx_strdup(NULL, rule->window->capacity);
 
 	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
+
 	zbx_dc_expand_user_and_func_macros(um_handle, &duration, NULL, 0, NULL);
+	zbx_dc_expand_user_and_func_macros(um_handle, &capacity, NULL, 0, NULL);
 	zbx_dc_close_user_macros(um_handle);
 
 	if (SUCCEED != zbx_is_time_suffix(duration, &window->duration, ZBX_LENGTH_UNLIMITED))
@@ -117,7 +117,14 @@ static zbx_cep_window_t	*cep_window_create(const zbx_cep_rule_t *rule)
 		window->duration = SEC_PER_HOUR;
 	}
 
+	if (SUCCEED != zbx_is_int(capacity, &window->capacity))
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("invalid CEP window capacity %s", capacity);
+		window->capacity = 0;
+	}
+
 	zbx_free(duration);
+	zbx_free(capacity);
 
 	window->time_created = time(NULL);
 	zbx_queue_ptr_create(&window->hevents);
@@ -149,7 +156,7 @@ void	cep_window_index_init(zbx_hashset_t *windows)
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 }
 
-zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, zbx_cep_rule_t *rule,
+zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, const zbx_cep_rule_t *rule,
 		zbx_cep_event_context_t *ctx)
 {
 	zbx_cep_window_ref_t	*ref, ref_local = {
@@ -177,8 +184,8 @@ zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, zbx_cep_rule_
 			event = cep_event_context_acquire_event(ctx);
 			if (FAIL != (index = cep_event_find_tag(event, rule->window->group_tag)))
 			{
-				ref_local.key_tag = rule->window->group_tag;
-				ref_local.key_value = event->tags.values[index].value;
+				ref_local.key_tag = (char *)rule->window->group_tag;
+				ref_local.key_value = (char *)event->tags.values[index].value;
 			}
 			break;
 	}
@@ -199,7 +206,8 @@ zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, zbx_cep_rule_
 	return cep_window_addref(ref->window);
 }
 
-void	cep_event_add_to_window(zbx_cep_event_handle_t hevent, zbx_cep_event_context_t *ctx, zbx_cep_rule_t *rule)
+void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_handle_t hevent,
+		zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_cep_t		*cep;
 	zbx_cep_window_t	*window;
@@ -208,7 +216,10 @@ void	cep_event_add_to_window(zbx_cep_event_handle_t hevent, zbx_cep_event_contex
 	window = cep_acquire_window(cep, rule, ctx);
 	cep_cache_release(&cep);
 
-	zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(hevent));
+	if (zbx_queue_ptr_values_num(&window->hevents) == window->capacity)
+		cep_rule_event_handle_execute_ops(rule, hevent, ZBX_CEP_ON_EVENT_EVICTED, ctx, tasks);
+	else
+		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(hevent));
 
 	cep_window_release(window);
 }

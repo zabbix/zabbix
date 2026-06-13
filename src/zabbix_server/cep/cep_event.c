@@ -13,6 +13,7 @@
 **/
 
 #include "cep_event.h"
+#include "zbxcep.h"
 #include "zbxdbwrap.h"
 
 void	cep_event_clear(zbx_cep_event_t *event)
@@ -167,6 +168,9 @@ void	cep_event_context_clear(zbx_cep_event_context_t *ctx)
 	if (NULL != ctx->event)
 		zbx_cep_event_release(ctx->event);
 
+	if (NULL != ctx->hevent)
+		zbx_cep_event_handle_release(ctx->hevent);
+
 	/* db_event is owned by the task, not event context */
 }
 
@@ -239,5 +243,42 @@ zbx_cep_event_t *cep_event_context_acquire_mutable_event(zbx_cep_event_context_t
 		return cep_event_get_mutable(ctx->event);
 
 	return NULL;
+}
+
+static int	cep_event_context_same_event(zbx_cep_event_context_t *ctx, zbx_cep_event_handle_t hevent)
+{
+	if (NULL != ctx->hevent)
+		return (ctx->hevent == hevent ? SUCCEED : FAIL);
+
+	if (NULL != ctx->event)
+	{
+		zbx_uint64_t	eventid = zbx_cep_event_handle_eventid(hevent);
+
+		return (eventid == ctx->event->eventid ? SUCCEED : FAIL);
+	}
+
+	return FAIL;
+}
+
+void	cep_event_context_set_handle(zbx_cep_event_context_t *ctx, zbx_cep_event_handle_t hevent)
+{
+	if (SUCCEED == cep_event_context_same_event(ctx, hevent))
+	{
+		if (NULL != ctx->hevent)
+			zbx_cep_event_handle_release(ctx->hevent);
+
+		if (NULL != ctx->event)
+		{
+			zbx_cep_event_release(ctx->event);
+			ctx->event = NULL;
+		}
+	}
+	else
+	{
+		cep_event_context_clear(ctx);
+		memset(ctx, 0, sizeof(zbx_cep_event_context_t));
+	}
+
+	ctx->hevent = zbx_cep_event_handle_addref(hevent);
 }
 

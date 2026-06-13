@@ -26,6 +26,7 @@ typedef struct
 
 	int			type;
 	int			duration;
+	int			capacity;
 	time_t			time_created;
 	zbx_queue_ptr_t		hevents;
 
@@ -51,9 +52,10 @@ void	cep_window_index_init(zbx_hashset_t *windows);
 zbx_cep_window_t	*cep_window_addref(zbx_cep_window_t *window);
 void	cep_window_release(zbx_cep_window_t *window);
 
-zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, zbx_cep_rule_t *rule,
+zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, const zbx_cep_rule_t *rule,
 		zbx_cep_event_context_t *ctx);
 
-void	cep_event_add_to_window(zbx_cep_event_handle_t hevent, zbx_cep_event_context_t *ctx, zbx_cep_rule_t *rule);
+void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_handle_t hevent,
+		zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks);
 #endif
 

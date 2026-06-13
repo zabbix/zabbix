@@ -482,7 +482,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	cep_cache_release(&cep);
 
 	if (0 != rules_num)
-		cep_event_add_to_rules(h, &event_ctx, rules, rules_num);
+		cep_event_add_to_rules(h, &event_ctx, rules, rules_num, &tasks);
 
 	int	corr_ret;
 

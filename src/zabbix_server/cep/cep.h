@@ -34,6 +34,7 @@ zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event);
 zbx_uint32_t	cep_event_handle_release(zbx_cep_event_handle_t h);
 zbx_cep_event_t	*cep_event_handle_remove(zbx_cep_t *cep, zbx_cep_event_handle_t h);
 int	cep_event_handle_compare(const void *a1, const void *a2);
+void	cep_event_handle_set(zbx_cep_event_handle_t h, zbx_cep_event_t *event);
 
 zbx_cep_t	*cep_create(void);
 void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool);
@@ -83,6 +84,6 @@ void	cep_update_events_processed(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_update_events_discarded(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats);
 
-zbx_cep_window_t	*cep_acquire_window(zbx_cep_t *cep, zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx);
+zbx_cep_window_t	*cep_acquire_window(zbx_cep_t *cep, const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx);
 
 #endif /* ZABBIX_CEP_CACHE_H */
