@@ -86,7 +86,6 @@ ZBX_SERVER_PROXY_LIBS = \
 	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
 	$(top_builddir)/src/libs/zbxsupervisor_client/libzbxsupervisor_client.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
-	$(top_builddir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxpgservice/libzbxpgservice.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
@@ -129,6 +128,7 @@ ZBX_SERVER_PROXY_LIBS = \
 
 # alerter,media and service should not be public libraries..
 ZBX_SERVER_LIBS = \
+	$(top_builddir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_builddir)/src/libs/zbxalerter/libzbxalerter.a \
 	$(top_builddir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_builddir)/src/libs/zbxservice/libzbxservice.a \
@@ -162,6 +162,7 @@ ZBX_SERVER_LIBS = \
 	@SERVER_LIBS@
 
 ZBX_PROXY_LIBS = \
+	$(top_builddir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
 	$(top_builddir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a \
 	$(top_builddir)/src/zabbix_proxy/taskmanager/libzbxtaskmanager_proxy.a \
 	$(top_builddir)/src/zabbix_proxy/datasender/libzbxdatasender.a \
