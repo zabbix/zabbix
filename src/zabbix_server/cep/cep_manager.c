@@ -522,7 +522,8 @@ void	*zbx_cep_manager_thread(void *args)
 			break;
 
 		zbx_mw_queue_lock(manager->base.queue);
-		pending_num = zbx_mw_queue_drain_completed(manager->base.queue, &tasks);
+		(void)zbx_mw_queue_drain_completed(manager->base.queue, &tasks);
+		pending_num = cep_queue_pending_commits_num((zbx_cep_queue_t *)manager->base.queue);
 		zbx_mw_queue_unlock(manager->base.queue);
 
 		cep_manager_process_pending(manager);
