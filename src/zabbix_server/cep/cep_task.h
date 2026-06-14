@@ -15,6 +15,7 @@
 #ifndef ZABBIX_CEP_TASK_H
 #define ZABBIX_CEP_TASK_H
 
+#include "cep_window.h"
 #include "zbxcep.h"
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
@@ -35,7 +36,8 @@ typedef enum
 	CEP_TASK_CLOSE_EVENT,
 	CEP_TASK_COMMIT,
 	CEP_TASK_ADD_TAGS,
-	CEP_TASK_SYNC_EVENT
+	CEP_TASK_SYNC_EVENT,
+	CEP_TASK_WINDOW,
 }
 zbx_cep_task_type_t;
 
@@ -100,7 +102,15 @@ typedef struct
 	zbx_cep_event_handle_t	hevent;
 	zbx_uint64_t		flags;
 }
-zbx_cep_task_update_event_t;
+zbx_cep_task_sync_event_t;
+
+typedef struct
+{
+	zbx_mw_task_t		base;
+	zbx_cep_window_t	*window;
+	time_t			now;
+}
+zbx_cep_task_window_t;
 
 typedef struct
 {
@@ -116,6 +126,7 @@ zbx_mw_task_t	*cep_create_task_close_event(zbx_db_event *event, zbx_uint64_t eve
 		zbx_uint64_t correlationid, zbx_uint64_t cep_ruleid);
 zbx_mw_task_t	*cep_create_task_add_tags(zbx_vector_event_tags_t *event_tags, zbx_vector_uint64_t *eventids);
 zbx_mw_task_t	*cep_create_task_sync_event(zbx_cep_event_handle_t event, zbx_uint32_t flags);
+zbx_mw_task_t	*cep_create_task_window(zbx_cep_window_t *window, time_t now);
 
 void	cep_task_free(zbx_mw_task_t *mw_task);
 

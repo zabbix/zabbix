@@ -22,6 +22,7 @@
 #include "cep_correlation.h"
 #include "cep_rule_op_event.h"
 #include "cep_rule_op_db_event.h"
+#include "cep_window.h"
 #include "zbxcep.h"
 #include "zbxcep_client.h"
 #include "zbxmw.h"
@@ -799,8 +800,8 @@ static void	cep_worker_process_task_close_event(zbx_cep_task_close_event_t *task
 
 static int	cep_task_update_event_compare(const void *a1, const void *a2)
 {
-	const zbx_cep_task_update_event_t	*t1 = (const zbx_cep_task_update_event_t *)a1;
-	const zbx_cep_task_update_event_t	*t2 = (const zbx_cep_task_update_event_t *)a2;
+	const zbx_cep_task_sync_event_t	*t1 = (const zbx_cep_task_sync_event_t *)a1;
+	const zbx_cep_task_sync_event_t	*t2 = (const zbx_cep_task_sync_event_t *)a2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(zbx_cep_event_handle_eventid(t1->hevent), zbx_cep_event_handle_eventid(t2->hevent));
 
@@ -897,6 +898,21 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 	zbx_vector_mw_task_ptr_destroy(&event_tasks);
 }
 
+static void	cep_worker_process_task_window(zbx_cep_worker_t *worker, zbx_cep_task_window_t *task)
+{
+	zbx_vector_mw_task_ptr_t	tasks;
+
+	zbx_vector_mw_task_ptr_create(&tasks);
+
+	cep_window_process(task->window, task->now, &tasks);
+
+	zbx_mw_queue_lock(worker->base.queue);
+	cep_queue_push_batch((zbx_cep_queue_t *)worker->base.queue, &tasks);
+	zbx_mw_queue_unlock(worker->base.queue);
+
+	zbx_vector_mw_task_ptr_destroy(&tasks);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: event processor thread entry point                                *
@@ -957,6 +973,9 @@ void	*cep_worker_entry(void *args)
 					break;
 				case CEP_TASK_COMMIT:
 					cep_worker_process_task_commit(worker, (zbx_cep_task_commit_t *)task);
+					break;
+				case CEP_TASK_WINDOW:
+					cep_worker_process_task_window(worker, (zbx_cep_task_window_t *)task);
 					break;
 				case CEP_TASK_SYNC_EVENT:
 					/* nop tasks, contains data for commit */

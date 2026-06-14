@@ -38,7 +38,7 @@ void	cep_event_handle_set(zbx_cep_event_handle_t h, zbx_cep_event_t *event);
 
 zbx_cep_t	*cep_create(void);
 void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool);
-void	cep_destroy(zbx_cep_t *cep);
+void	cep_destroy(void *a);
 
 void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_query_t *queries,
 		unsigned char *results);

@@ -1953,3 +1953,13 @@ const zbx_vector_cep_rule_ptr_t	*zbx_cep_config_get_rules(zbx_cep_config_handle_
 	return &handle->rules;
 }
 
+const zbx_cep_rule_t	*zbx_cep_config_get_rule(zbx_cep_config_handle_t handle, zbx_uint64_t ruleid)
+{
+	for (int i = 0; i < handle->rules.values_num; i++)
+	{
+		if (handle->rules.values[i]->ruleid == ruleid)
+			return handle->rules.values[i];
+	}
+
+	return NULL;
+}

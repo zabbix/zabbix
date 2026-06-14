@@ -15,16 +15,20 @@
 #include "cep_window.h"
 #include "cep.h"
 #include "cep_api.h"
+#include "cep_event.h"
 #include "cep_rule.h"
 #include "cep_rule_op_event.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
+#include "zbxcep.h"
 #include "zbxcommon.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxtypes_ext.h"
 #include <stdatomic.h>
+
+ZBX_PTR_VECTOR_IMPL(cep_window_ptr, zbx_cep_window_t *)
 
 static zbx_hash_t	cep_window_ref_hash(const void *a)
 {
@@ -126,6 +130,7 @@ static zbx_cep_window_t	*cep_window_create(const zbx_cep_rule_t *rule)
 	zbx_free(duration);
 	zbx_free(capacity);
 
+	window->nextcheck = 0;
 	window->time_created = time(NULL);
 	zbx_queue_ptr_create(&window->hevents);
 
@@ -138,6 +143,16 @@ static zbx_cep_window_t	*cep_window_create(const zbx_cep_rule_t *rule)
 	window->refcount = 1;
 
 	return window;
+}
+
+static void	cep_window_lock(zbx_cep_window_t *window)
+{
+	pthread_mutex_lock(&window->lock);
+}
+
+static void	cep_window_unlock(zbx_cep_window_t *window)
+{
+	pthread_mutex_unlock(&window->lock);
 }
 
 static void	cep_window_ref_clear(void *a)
@@ -211,15 +226,229 @@ void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_h
 {
 	zbx_cep_t		*cep;
 	zbx_cep_window_t	*window;
+	int			windows_num;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
 
 	cep_cache_acquire(&cep);
 	window = cep_acquire_window(cep, rule, ctx);
 	cep_cache_release(&cep);
 
+	cep_window_lock(window);
+
 	if (zbx_queue_ptr_values_num(&window->hevents) == window->capacity)
+	{
+		cep_window_unlock(window);
+
 		cep_rule_event_handle_execute_ops(rule, hevent, ZBX_CEP_ON_EVENT_EVICTED, ctx, tasks);
+	}
 	else
+	{
+		windows_num = zbx_queue_ptr_values_num(&window->hevents);
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(hevent));
+		if (0 == windows_num)
+			atomic_store(&window->nextcheck, (zbx_uint64_t)(ctx->event->clock + window->duration));
+
+		cep_window_unlock(window);
+
+		/* first event added to window - schedule window processing */
+		if (0 == windows_num)
+		{
+			zbx_cep_window_scheduler_t	*scheduler;
+			cep_window_scheduler_acquire(&scheduler);
+			cep_window_scheduler_add(scheduler, window);
+			cep_window_scheduler_release(&scheduler);
+		}
+	}
 
 	cep_window_release(window);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+
+void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks)
+{
+	zbx_cep_config_handle_t	cfg;
+	const zbx_cep_rule_t	*rule = NULL;
+	int			pending_num;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, window->ruleid);
+
+	cfg = zbx_cep_config_open();
+
+	cep_window_lock(window);
+
+	while (SUCCEED != zbx_queue_ptr_empty(&window->hevents))
+	{
+		zbx_cep_event_handle_t	h;
+		zbx_cep_event_context_t	ctx = {0};
+
+		h = (zbx_cep_event_handle_t)zbx_queue_ptr_peek(&window->hevents);
+		ctx.hevent = zbx_cep_event_handle_addref(h);
+
+		if (NULL != cep_event_context_acquire_event(&ctx))
+		{
+			if (ctx.event->clock + window->duration > now)
+			{
+				cep_event_context_clear(&ctx);
+				break;
+			}
+
+			if (NULL == rule)
+				rule = zbx_cep_config_get_rule(cfg, window->ruleid);
+
+			if (NULL != rule)
+			{
+				cep_rule_event_handle_execute_ops(rule, ctx.hevent, ZBX_CEP_ON_EVENT_EVICTED, &ctx,
+						tasks);
+			}
+		}
+
+		zbx_cep_event_handle_release(h);
+		zbx_queue_ptr_pop(&window->hevents);
+		cep_event_context_clear(&ctx);
+	}
+
+	if (0 != (pending_num = zbx_queue_ptr_values_num(&window->hevents)))
+	{
+		zbx_cep_event_handle_t	h = (zbx_cep_event_handle_t)zbx_queue_ptr_peek(&window->hevents);
+		zbx_cep_event_t		*event;
+
+		zbx_cep_get_events_by_handles(&h, 1, &event);
+		atomic_store(&window->nextcheck, (zbx_uint64_t)(event->clock + window->duration));
+		zbx_cep_event_release(event);
+	}
+
+	cep_window_unlock(window);
+
+	if (0 != pending_num)
+	{
+		zbx_cep_window_scheduler_t	*scheduler;
+
+		cep_window_scheduler_acquire(&scheduler);
+		cep_window_scheduler_add(scheduler, window);
+		cep_window_scheduler_release(&scheduler);
+	}
+
+	zbx_cep_config_close(cfg);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+void	cep_window_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks)
+{
+	switch (window->type)
+	{
+		case ZBX_CEP_WINDOW_SIMPLE:
+			cep_window_simple_process(window, now, tasks);
+			break;
+		case ZBX_CEP_WINDOW_CAUSE_SYMPTOM:
+		case ZBX_CEP_WINDOW_TAG_MATCH:
+		case ZBX_CEP_WINDOW_PATTERN_MATCH:
+			/* TODO: implement */
+			break;
+	}
+}
+
+/*
+ * window scheduler
+ */
+
+struct zbx_cep_window_scheduler
+{
+	zbx_binary_heap_t		alarm_pool;
+	zbx_vector_cep_window_ptr_t	tick_pool;
+};
+
+static int	cep_window_compare_by_nextcheck(const void *a1, const void *a2)
+{
+	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)a1;
+	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)a2;
+	const zbx_cep_window_t		*w1 = (const zbx_cep_window_t *)e1->data;
+	const zbx_cep_window_t		*w2 = (const zbx_cep_window_t *)e2->data;
+	zbx_uint64_t			t1, t2;
+
+	t1 = atomic_load(&w1->nextcheck);
+	t2 = atomic_load(&w2->nextcheck);
+
+	ZBX_RETURN_IF_NOT_EQUAL(t1, t2);
+
+	return 0;
+}
+
+zbx_cep_window_scheduler_t	*cep_window_scheduler_create(void)
+{
+	zbx_cep_window_scheduler_t	*scheduler;
+
+	scheduler = (zbx_cep_window_scheduler_t *)zbx_malloc(NULL, sizeof(zbx_cep_window_scheduler_t));
+	zbx_binary_heap_create(&scheduler->alarm_pool, cep_window_compare_by_nextcheck, ZBX_BINARY_HEAP_OPTION_EMPTY);
+	zbx_vector_cep_window_ptr_create(&scheduler->tick_pool);
+
+	return scheduler;
+}
+
+void	cep_window_scheduler_destroy(void *a)
+{
+	zbx_cep_window_scheduler_t	*scheduler = (zbx_cep_window_scheduler_t *)a;
+
+	while (FAIL == zbx_binary_heap_empty(&scheduler->alarm_pool))
+	{
+		zbx_binary_heap_elem_t	*elem = zbx_binary_heap_find_min(&scheduler->alarm_pool);
+
+		cep_window_release((zbx_cep_window_t *)elem->data);
+		zbx_binary_heap_remove_min(&scheduler->alarm_pool);
+	}
+	zbx_binary_heap_destroy(&scheduler->alarm_pool);
+
+	for (int i = 0; i < scheduler->tick_pool.values_num; i++)
+		cep_window_release(scheduler->tick_pool.values[i]);
+	zbx_vector_cep_window_ptr_destroy(&scheduler->tick_pool);
+
+	zbx_free(scheduler);
+}
+
+int	cep_window_scheduler_next(zbx_cep_window_scheduler_t *scheduler, time_t now,
+		zbx_vector_cep_window_ptr_t *windows)
+{
+	for (int i = scheduler->tick_pool.values_num ; 0 < i &&
+			atomic_load(&scheduler->tick_pool.values[i - 1]->nextcheck) <= (zbx_uint64_t)now; i--)
+	{
+		zbx_vector_cep_window_ptr_append(windows, scheduler->tick_pool.values[i - 1]);
+		zbx_vector_cep_window_ptr_remove_noorder(&scheduler->tick_pool, i - 1);
+
+		if (windows->values_num == windows->values_alloc)
+			return windows->values_num;
+	}
+
+	while (FAIL == zbx_binary_heap_empty(&scheduler->alarm_pool))
+	{
+		zbx_binary_heap_elem_t	*elem = zbx_binary_heap_find_min(&scheduler->alarm_pool);
+		zbx_cep_window_t	*window = (zbx_cep_window_t *)elem->data;
+
+		if (atomic_load(&window->nextcheck) > (zbx_uint64_t)now || windows->values_num == windows->values_alloc)
+			return windows->values_num;
+
+		zbx_vector_cep_window_ptr_append(windows, window);
+		zbx_binary_heap_remove_min(&scheduler->alarm_pool);
+	}
+
+	return windows->values_num;
+}
+
+void	cep_window_scheduler_add(zbx_cep_window_scheduler_t *scheduler, zbx_cep_window_t *window)
+{
+	zbx_binary_heap_elem_t	elem;
+
+	switch (window->type)
+	{
+		case ZBX_CEP_WINDOW_SIMPLE:
+		case ZBX_CEP_WINDOW_CAUSE_SYMPTOM:
+			elem.data = cep_window_addref(window);
+			zbx_binary_heap_insert(&scheduler->alarm_pool, &elem);
+			break;
+		case ZBX_CEP_WINDOW_PATTERN_MATCH:
+			zbx_vector_cep_window_ptr_append(&scheduler->tick_pool, cep_window_addref(window));
+			break;
+	}
+}
+

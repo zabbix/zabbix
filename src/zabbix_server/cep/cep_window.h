@@ -30,11 +30,13 @@ typedef struct
 	time_t			time_created;
 	zbx_queue_ptr_t		hevents;
 
+	zbx_atomic_uint64_t	nextcheck;
 	zbx_atomic_uint32_t	refcount;
 	pthread_mutex_t		lock;
 }
 zbx_cep_window_t;
 
+ZBX_PTR_VECTOR_DECL(cep_window_ptr, zbx_cep_window_t *)
 
 typedef struct
 {
@@ -57,5 +59,23 @@ zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, const zbx_cep
 
 void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_handle_t hevent,
 		zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks);
+void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks);
+void	cep_window_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks);
+
+/*
+ * window scheduler
+ */
+
+typedef struct zbx_cep_window_scheduler zbx_cep_window_scheduler_t;
+
+zbx_cep_window_scheduler_t	*cep_window_scheduler_create(void);
+void	cep_window_scheduler_destroy(void *a);
+
+int	cep_window_scheduler_next(zbx_cep_window_scheduler_t *scheduler, time_t now,
+		zbx_vector_cep_window_ptr_t *windows);
+void	cep_window_scheduler_add(zbx_cep_window_scheduler_t *scheduler, zbx_cep_window_t *window);
+
+
+
 #endif
 

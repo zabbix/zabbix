@@ -22,6 +22,9 @@ int	cep_api_init(char **error);
 void	cep_api_destroy(void);
 void	cep_cache_acquire(zbx_cep_t **);
 void	cep_cache_release(zbx_cep_t **);
+void	cep_window_scheduler_acquire(zbx_cep_window_scheduler_t **scheduler);
+void	cep_window_scheduler_release(zbx_cep_window_scheduler_t **scheduler);
+
 void	cep_post_event_updates(zbx_cep_event_update_t *updates, int updates_num);
 void	cep_post_event_handle_action(zbx_cep_event_handle_t *handles, int handles_num, zbx_cep_event_op_t action);
 

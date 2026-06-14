@@ -25,6 +25,7 @@ static void	cep_task_close_event_free(void *mw_task);
 static void	cep_task_event_commit_free(void *mw_task);
 static void	cep_task_add_tags_free(void *mw_task);
 static void	cep_task_sync_event_free(void *mw_task);
+static void	cep_task_window_free(void *mw_task);
 
 /******************************************************************************
  *                                                                            *
@@ -300,10 +301,10 @@ static void	cep_task_add_tags_free(void *mw_task)
  ******************************************************************************/
 zbx_mw_task_t	*cep_create_task_sync_event(zbx_cep_event_handle_t event, zbx_uint32_t flags)
 {
-	zbx_cep_task_update_event_t	*task;
+	zbx_cep_task_sync_event_t	*task;
 
-	task = (zbx_cep_task_update_event_t *)zbx_mw_task_create(CEP_TASK_SYNC_EVENT, cep_task_sync_event_free,
-			sizeof(zbx_cep_task_update_event_t));
+	task = (zbx_cep_task_sync_event_t *)zbx_mw_task_create(CEP_TASK_SYNC_EVENT, cep_task_sync_event_free,
+			sizeof(zbx_cep_task_sync_event_t));
 
 	task->hevent = zbx_cep_event_handle_addref(event);
 	task->flags = flags;
@@ -313,14 +314,49 @@ zbx_mw_task_t	*cep_create_task_sync_event(zbx_cep_event_handle_t event, zbx_uint
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free 'set event name' task                                        *
+ * Purpose: free 'sync event' task                                            *
  *                                                                            *
  ******************************************************************************/
 static void	cep_task_sync_event_free(void *mw_task)
 {
-	zbx_cep_task_update_event_t	*task = (zbx_cep_task_update_event_t *)mw_task;
+	zbx_cep_task_sync_event_t	*task = (zbx_cep_task_sync_event_t *)mw_task;
 
 	zbx_cep_event_handle_release(task->hevent);
+	zbx_free(task);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create task process event window                                  *
+ *                                                                            *
+ * Parameters: widnow - [IN] window to process                                *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_window(zbx_cep_window_t *window, time_t now)
+{
+	zbx_cep_task_window_t	*task;
+
+	task = (zbx_cep_task_window_t *)zbx_mw_task_create(CEP_TASK_WINDOW, cep_task_window_free,
+			sizeof(zbx_cep_task_window_t));
+
+	task->window = window;
+	task->now = now;
+
+	return (zbx_mw_task_t *)task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free 'process window' task                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_task_window_free(void *mw_task)
+{
+	zbx_cep_task_window_t	*task = (zbx_cep_task_window_t *)mw_task;
+
+	cep_window_release(task->window);
 	zbx_free(task);
 }
 
@@ -352,7 +388,10 @@ void	cep_task_free(zbx_mw_task_t *mw_task)
 			cep_task_add_tags_free((zbx_cep_task_add_tags_t *)task);
 			break;
 		case CEP_TASK_SYNC_EVENT:
-			cep_task_sync_event_free((zbx_cep_task_update_event_t *)task);
+			cep_task_sync_event_free((zbx_cep_task_sync_event_t *)task);
+			break;
+		case CEP_TASK_WINDOW:
+			cep_task_window_free((zbx_cep_task_window_t *)task);
 			break;
 	}
 }

@@ -234,8 +234,10 @@ zbx_cep_t	*cep_create(void)
 	return cep;
 }
 
-void	cep_destroy(zbx_cep_t *cep)
+void	cep_destroy(void *a)
 {
+	zbx_cep_t	*cep = (zbx_cep_t *)a;
+
 	zbx_hashset_destroy(&cep->windows);
 	zbx_hashset_destroy(&cep->objects);
 

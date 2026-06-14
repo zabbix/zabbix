@@ -1009,7 +1009,7 @@ void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_
 
 	for (int i = 0; i < tasks->values_num; i++)
 	{
-		const zbx_cep_task_update_event_t	*task = (const zbx_cep_task_update_event_t *)tasks->values[i];
+		const zbx_cep_task_sync_event_t	*task = (const zbx_cep_task_sync_event_t *)tasks->values[i];
 
 		if (0 != (task->flags & (CEP_SYNC_EVENT_SEVERITY | CEP_SYNC_EVENT_NAME)))
 		{

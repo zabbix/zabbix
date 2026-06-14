@@ -16,6 +16,7 @@
 #include "cep.h"
 #include "cep_event.h"
 #include "cep_task.h"
+#include "cep_window.h"
 #include "cep_worker.h"
 #include "cep_queue.h"
 #include "cep_api.h"
@@ -327,7 +328,7 @@ static int	cep_manager_is_task_pending(zbx_cep_manager_t *manager, const zbx_mw_
 			return cep_manager_is_task_event_pending(manager,
 					&((zbx_cep_task_close_event_t *)task)->parent);
 		case CEP_TASK_SYNC_EVENT:
-			eventid = zbx_cep_event_handle_eventid(((zbx_cep_task_update_event_t *)task)->hevent);
+			eventid = zbx_cep_event_handle_eventid(((zbx_cep_task_sync_event_t *)task)->hevent);
 			return cep_manager_is_event_pending(manager, eventid);
 	}
 
@@ -411,7 +412,7 @@ static void	cep_manager_process_pending(zbx_cep_manager_t *manager)
  ******************************************************************************/
 static void	cep_manager_process_finished(zbx_cep_manager_t *manager, zbx_vector_mw_task_ptr_t *tasks)
 {
-	zbx_cep_task_update_event_t	*task_update;
+	zbx_cep_task_sync_event_t	*task_update;
 	zbx_uint64_t			eventid;
 
 	for (int i = 0; i < tasks->values_num; i++)
@@ -433,7 +434,7 @@ static void	cep_manager_process_finished(zbx_cep_manager_t *manager, zbx_vector_
 				zbx_vector_mw_task_ptr_append(&manager->commits, tasks->values[i]);
 				continue;
 			case CEP_TASK_SYNC_EVENT:
-				task_update = (zbx_cep_task_update_event_t *)tasks->values[i];
+				task_update = (zbx_cep_task_sync_event_t *)tasks->values[i];
 				eventid = zbx_cep_event_handle_eventid(task_update->hevent);
 				cep_manager_commit_task(manager, eventid, tasks->values[i]);
 				continue;
@@ -462,6 +463,43 @@ static void	cep_manager_flush_commmits(zbx_cep_manager_t *manager)
 	zbx_mw_queue_lock(manager->base.queue);
 	cep_queue_push((zbx_cep_queue_t *)manager->base.queue, task);
 	zbx_mw_queue_unlock(manager->base.queue);
+}
+
+static int	cep_manager_process_windows(int now, zbx_vector_mw_task_ptr_t *tasks)
+{
+#define	CEP_WINDOW_BATCH	1000
+
+	zbx_cep_window_scheduler_t	*scheduler;
+	zbx_vector_cep_window_ptr_t	windows;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_cep_window_ptr_create(&windows);
+	zbx_vector_cep_window_ptr_reserve(&windows, CEP_WINDOW_BATCH);
+
+	do
+	{
+		zbx_vector_cep_window_ptr_clear(&windows);
+		cep_window_scheduler_acquire(&scheduler);
+		cep_window_scheduler_next(scheduler, now, &windows);
+		cep_window_scheduler_release(&scheduler);
+
+		for (int i = 0; i < windows.values_num; i++)
+		{
+			zbx_mw_task_t	*t = cep_create_task_window(windows.values[i], now);
+
+			zbx_vector_mw_task_ptr_append(tasks, t);
+		}
+	}
+	while (CEP_WINDOW_BATCH == windows.values_num);
+
+
+	zbx_vector_cep_window_ptr_destroy(&windows);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() tasks:%d", __func__, tasks->values_num);
+
+	return tasks->values_num;
+#undef CEP_WINDOW_BATCH
 }
 
 /******************************************************************************
@@ -628,6 +666,15 @@ void	*zbx_cep_manager_thread(void *args)
 				cep_manager_flush_commmits(manager);
 				time_flush = time_now;
 			}
+		}
+
+		if (0 != cep_manager_process_windows((int)time_now, &tasks))
+		{
+			zbx_mw_queue_lock(manager->base.queue);
+			cep_queue_push_batch((zbx_cep_queue_t *)manager->base.queue, &tasks);
+			zbx_mw_queue_unlock(manager->base.queue);
+
+			zbx_vector_mw_task_ptr_clear(&tasks);
 		}
 	}
 

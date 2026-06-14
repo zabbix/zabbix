@@ -123,7 +123,7 @@ void	zbx_mw_queue_notify_all(zbx_mw_queue_t *queue);
 int	zbx_mw_queue_wait(zbx_mw_queue_t *queue, char **error);
 
 void	zbx_mw_queue_push_priority(zbx_mw_queue_t *queue, zbx_mw_task_t *task);
-void	zbx_mw_queue_push_normal(zbx_mw_queue_t *queue, zbx_mw_task_t *tasks);
+void	zbx_mw_queue_push_normal(zbx_mw_queue_t *queue, zbx_mw_task_t *task);
 
 void	zbx_mw_queue_lock(zbx_mw_queue_t *queue);
 void	zbx_mw_queue_unlock(zbx_mw_queue_t *queue);
