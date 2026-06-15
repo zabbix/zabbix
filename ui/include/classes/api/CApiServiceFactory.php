@@ -65,6 +65,7 @@ class CApiServiceFactory extends CRegistryFactory {
 		'report' => CReport::class,
 		'regexp' => CRegexp::class,
 		'role' => CRole::class,
+		'serverinfo' => CServerInfo::class,
 		'service' => CService::class,
 		'sla' => CSla::class,
 		'script' => CScript::class,
