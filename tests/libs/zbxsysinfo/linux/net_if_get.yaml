@@ -92,7 +92,7 @@ files:
     docker0| 12415150  
 ---
 # boundary conditions for interface name buffer
-test case: extremely long interface name
+test case: long interface name
 out:
   json: '{"config":[{"name":"veth_very_long_name_123456789","type":"virtual"}],"values":[{"name":"veth_very_long_name_123456789","in":{"bytes":0,"packets":0,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":0,"packets":0,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}}]}'
 files:
@@ -100,6 +100,16 @@ files:
     Inter-|   Receive                                                |  Transmit
      face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
     veth_very_long_name_123456789:       0       0    0    0    0     0          0         0       0       0    0    0    0     0       0          0
+---
+# extremely long interface name 256 chars
+test case: 256b interface name
+out:
+  json: '{"config":[{"name":"veth_12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901","type":"virtual"}],"values":[{"name":"veth_12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901","in":{"bytes":0,"packets":0,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":0,"packets":0,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}}]}'
+files:
+  /proc/net/dev: |
+    Inter-|   Receive                                                |  Transmit
+     face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    veth_12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901:       0       0    0    0    0     0          0         0       0       0    0    0    0     0       0          0
 ---
 test case: missing /proc/net/dev file
 out:
