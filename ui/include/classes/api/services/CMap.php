@@ -1043,6 +1043,7 @@ class CMap extends CMapElement {
 					else {
 						$url_validate_options['inventory_macro'] = INVENTORY_URL_MACRO_NONE;
 					}
+
 					if (!(new CUrlValidator($url_validate_options))->validate($url['url'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for "url" field.'));
 					}
