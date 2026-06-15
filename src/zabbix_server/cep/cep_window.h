@@ -49,8 +49,6 @@ typedef struct
 }
 zbx_cep_window_ref_t;
 
-void	cep_window_index_init(zbx_hashset_t *windows);
-
 zbx_cep_window_t	*cep_window_addref(zbx_cep_window_t *window);
 void	cep_window_release(zbx_cep_window_t *window);
 
@@ -63,19 +61,21 @@ void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 void	cep_window_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks);
 
 /*
- * window scheduler
+ * window pool
  */
 
-typedef struct zbx_cep_window_scheduler zbx_cep_window_scheduler_t;
+typedef struct zbx_cep_window_pool zbx_cep_window_pool_t;
 
-zbx_cep_window_scheduler_t	*cep_window_scheduler_create(void);
-void	cep_window_scheduler_destroy(void *a);
+zbx_cep_window_pool_t	*cep_window_pool_create(void);
+void	cep_window_pool_destroy(void *a);
 
-int	cep_window_scheduler_next(zbx_cep_window_scheduler_t *scheduler, time_t now,
+zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *pool, const zbx_cep_rule_t *rule,
+		zbx_cep_event_context_t *ctx);
+int	cep_window_pool_next_batch(zbx_cep_window_pool_t *pool, time_t now,
 		zbx_vector_cep_window_ptr_t *windows);
-void	cep_window_scheduler_add(zbx_cep_window_scheduler_t *scheduler, zbx_cep_window_t *window);
+void	cep_window_pool_add(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window);
 
-
+void	cep_window_pool_dump(zbx_cep_window_pool_t *pool);
 
 #endif
 

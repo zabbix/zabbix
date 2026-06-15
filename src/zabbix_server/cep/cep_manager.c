@@ -469,7 +469,7 @@ static int	cep_manager_process_windows(int now, zbx_vector_mw_task_ptr_t *tasks)
 {
 #define	CEP_WINDOW_BATCH	1000
 
-	zbx_cep_window_scheduler_t	*scheduler;
+	zbx_cep_window_pool_t		*pool;
 	zbx_vector_cep_window_ptr_t	windows;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -480,9 +480,9 @@ static int	cep_manager_process_windows(int now, zbx_vector_mw_task_ptr_t *tasks)
 	do
 	{
 		zbx_vector_cep_window_ptr_clear(&windows);
-		cep_window_scheduler_acquire(&scheduler);
-		cep_window_scheduler_next(scheduler, now, &windows);
-		cep_window_scheduler_release(&scheduler);
+		cep_window_pool_acquire(&pool);
+		cep_window_pool_next_batch(pool, now, &windows);
+		cep_window_pool_release(&pool);
 
 		for (int i = 0; i < windows.values_num; i++)
 		{

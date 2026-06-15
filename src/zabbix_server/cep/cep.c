@@ -101,8 +101,6 @@ struct zbx_cep
 	/* object -> events index */
 	zbx_hashset_t			objects;
 
-	zbx_hashset_t			windows;
-
 	zbx_uint64_t			eventid_next;
 	zbx_uint64_t			eventid_last;
 
@@ -229,8 +227,6 @@ zbx_cep_t	*cep_create(void)
 	zbx_hashset_create_ext(&cep->objects, 100, cep_object_hash, cep_object_compare, cep_object_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-	cep_window_index_init(&cep->windows);
-
 	return cep;
 }
 
@@ -238,7 +234,6 @@ void	cep_destroy(void *a)
 {
 	zbx_cep_t	*cep = (zbx_cep_t *)a;
 
-	zbx_hashset_destroy(&cep->windows);
 	zbx_hashset_destroy(&cep->objects);
 
 	zbx_hashset_iter_t	iter;
@@ -1528,46 +1523,6 @@ static void	cep_dump_event(const char *indent, zbx_cep_event_t *event)
 	zbx_set_log_level(log_level);
 }
 
-static void	cep_window_ref_dump(const char *prefix, const zbx_cep_window_ref_t *ref)
-{
-	zbx_queue_ptr_iter_t	iter;
-	zbx_cep_event_handle_t	hevent;
-	const zbx_cep_window_t	*window = ref->window;
-
-	zabbix_log(LOG_LEVEL_TRACE, "%sruleid:" ZBX_FS_UI64 " type:%d [group_by:%d key:%s value:%s] created:"
-			ZBX_FS_TIME_T,
-			prefix, window->ruleid, window->type, ref->key_type, ZBX_NULL2STR(ref->key_tag),
-			ZBX_NULL2STR(ref->key_value), window->time_created);
-
-	if (SUCCEED != zbx_queue_ptr_empty(&window->hevents))
-	{
-		zabbix_log(LOG_LEVEL_TRACE, "%s  eventids:", prefix);
-		zbx_queue_ptr_iter_reset(&window->hevents, &iter);
-		while (NULL != (hevent = (zbx_cep_event_handle_t)zbx_queue_ptr_iter_next(&iter)))
-		{
-			if (CEP_EVENT_STATE_ACTIVE == hevent->state)
-				zabbix_log(LOG_LEVEL_TRACE, "%s    " ZBX_FS_UI64, prefix, hevent->eventid);
-		}
-	}
-}
-
-static void	cep_dump_windows(const char *prefix, zbx_cep_t *cep)
-{
-	zbx_hashset_iter_t	iter;
-	zbx_cep_window_ref_t	*ref;
-	char			buf[128];
-
-	if (0 == cep->windows.num_data)
-		return;
-
-	zabbix_log(LOG_LEVEL_TRACE, "%swindows:", prefix);
-	zbx_snprintf(buf, sizeof(buf), "%s  ", prefix);
-
-	zbx_hashset_iter_reset(&cep->windows, &iter);
-	while (NULL != (ref = (zbx_cep_window_ref_t *)zbx_hashset_iter_next(&iter)))
-		cep_window_ref_dump(buf, ref);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: dump event cache contents for debugging                           *
@@ -1602,8 +1557,6 @@ void	cep_dump(zbx_cep_t *cep, const char *msg)
 		}
 	}
 
-	cep_dump_windows("", cep);
-
 	/* WDN remove */
 	zbx_set_log_level(log_level);
 }
@@ -1629,10 +1582,4 @@ void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats)
 	stats->events_processed = atomic_load(&cep->events_processed_num);
 	stats->events_discarded = atomic_load(&cep->events_discarded_num);
 }
-
-zbx_cep_window_t	*cep_acquire_window(zbx_cep_t *cep, const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx)
-{
-	return cep_get_window_or_create(&cep->windows, rule, ctx);
-}
-
 

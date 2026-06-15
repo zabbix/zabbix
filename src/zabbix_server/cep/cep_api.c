@@ -36,9 +36,8 @@ static zbx_channel_t	event_update_channel;
 /* CEP cache guard instance */
 static zbx_cep_guard_t	*cache_guard;
 
-/* CEP window scheduler guard instance */
-static zbx_cep_guard_t	*window_scheduler_guard;
-
+/* CEP window pool guard instance */
+static zbx_cep_guard_t	*window_pool_guard;
 
 /******************************************************************************
  *                                                                            *
@@ -131,8 +130,8 @@ int	cep_api_init(char **error)
 	if (NULL == (cache_guard = cep_guard_create(cep_create(), (zbx_mem_free_func_t)cep_destroy, error)))
 		return FAIL;
 
-	if (NULL == (window_scheduler_guard = cep_guard_create(cep_window_scheduler_create(),
-			(zbx_mem_free_func_t)cep_window_scheduler_destroy, error)))
+	if (NULL == (window_pool_guard = cep_guard_create(cep_window_pool_create(),
+			(zbx_mem_free_func_t)cep_window_pool_destroy, error)))
 	{
 		cep_guard_destroy(cache_guard);
 		return FAIL;
@@ -152,7 +151,7 @@ void	cep_api_destroy(void)
 {
 	zbx_chan_destroy(&event_update_channel);
 	cep_guard_destroy(cache_guard);
-	cep_guard_destroy(window_scheduler_guard);
+	cep_guard_destroy(window_pool_guard);
 }
 
 /******************************************************************************
@@ -185,26 +184,26 @@ void	cep_cache_release(zbx_cep_t **cep)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: acquire the CEP window scheduler and lock its guard               *
+ * Purpose: acquire the CEP window pool and lock its guard                    *
  *                                                                            *
- * Parameters: scheduler - [OUT] pointer to the window scheduler              *
+ * Parameters: pool - [OUT] pointer to the window pool                        *
  *                                                                            *
  ******************************************************************************/
-void	cep_window_scheduler_acquire(zbx_cep_window_scheduler_t **scheduler)
+void	cep_window_pool_acquire(zbx_cep_window_pool_t **pool)
 {
-	cep_guard_acquire(window_scheduler_guard, (void **)scheduler);
+	cep_guard_acquire(window_pool_guard, (void **)pool);
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: release the CEP window scheduler and unlock its guard             *
+ * Purpose: release the CEP window pool and unlock its guard                  *
  *                                                                            *
- * Parameters: scheduler - [IN/OUT] pointer to the window scheduler           *
+ * Parameters: pool - [IN/OUT] pointer to the window pool                     *
  *                                                                            *
  ******************************************************************************/
-void	cep_window_scheduler_release(zbx_cep_window_scheduler_t **scheduler)
+void	cep_window_pool_release(zbx_cep_window_pool_t **pool)
 {
-	cep_guard_release(window_scheduler_guard, (void **)scheduler);
+	cep_guard_release(window_pool_guard, (void **)pool);
 }
 
 #define CEP_UPDATE_BATCH_SIZE  1000

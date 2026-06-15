@@ -165,74 +165,18 @@ static void	cep_window_ref_clear(void *a)
 	zbx_free(ref->key_value);
 }
 
-void	cep_window_index_init(zbx_hashset_t *windows)
-{
-	zbx_hashset_create_ext(windows, 0, cep_window_ref_hash, cep_window_ref_compare, cep_window_ref_clear,
-			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
-}
-
-zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, const zbx_cep_rule_t *rule,
-		zbx_cep_event_context_t *ctx)
-{
-	zbx_cep_window_ref_t	*ref, ref_local = {
-		.ruleid = rule->ruleid,
-		.key_type = rule->window->group_by,
-	};
-	int		index;
-	zbx_cep_event_t	*event;
-
-	switch (ref_local.key_type)
-	{
-		case ZBX_CEP_GROUP_BY_NONE:
-			break;
-		case ZBX_CEP_GROUP_BY_HOST:
-			cep_event_context_load_hosts(ctx);
-			if (0 != ctx->hosts.values_num)
-				ref_local.key_value = ctx->hosts.values[0];
-			break;
-		case ZBX_CEP_GROUP_BY_HOSTGROUP:
-			cep_event_context_load_groups(ctx);
-			if (0 != ctx->groups.values_num)
-				ref_local.key_value = ctx->groups.values[0];
-			break;
-		case ZBX_CEP_GROUP_BY_TAG:
-			event = cep_event_context_acquire_event(ctx);
-			if (FAIL != (index = cep_event_find_tag(event, rule->window->group_tag)))
-			{
-				ref_local.key_tag = (char *)rule->window->group_tag;
-				ref_local.key_value = (char *)event->tags.values[index].value;
-			}
-			break;
-	}
-
-	ref = (zbx_cep_window_ref_t *)zbx_hashset_insert(windows, &ref_local, sizeof(ref_local));
-
-	if (NULL == ref->window)
-	{
-		if (NULL != ref_local.key_tag)
-			ref->key_tag = zbx_strdup(NULL, ref_local.key_tag);
-
-		if (NULL != ref_local.key_value)
-			ref->key_value = zbx_strdup(NULL, ref_local.key_value);
-
-		ref->window = cep_window_create(rule);
-	}
-
-	return cep_window_addref(ref->window);
-}
-
 void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_handle_t hevent,
 		zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks)
 {
-	zbx_cep_t		*cep;
+	zbx_cep_window_pool_t	*pool;
 	zbx_cep_window_t	*window;
 	int			windows_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
 
-	cep_cache_acquire(&cep);
-	window = cep_acquire_window(cep, rule, ctx);
-	cep_cache_release(&cep);
+	cep_window_pool_acquire(&pool);
+	window = cep_window_pool_get_or_create_window(pool, rule, ctx);
+	cep_window_pool_acquire(&pool);
 
 	cep_window_lock(window);
 
@@ -254,10 +198,9 @@ void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_h
 		/* first event added to window - schedule window processing */
 		if (0 == windows_num)
 		{
-			zbx_cep_window_scheduler_t	*scheduler;
-			cep_window_scheduler_acquire(&scheduler);
-			cep_window_scheduler_add(scheduler, window);
-			cep_window_scheduler_release(&scheduler);
+			cep_window_pool_acquire(&pool);
+			cep_window_pool_add(pool, window);
+			cep_window_pool_release(&pool);
 		}
 	}
 
@@ -323,11 +266,11 @@ void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 
 	if (0 != pending_num)
 	{
-		zbx_cep_window_scheduler_t	*scheduler;
+		zbx_cep_window_pool_t	*pool;
 
-		cep_window_scheduler_acquire(&scheduler);
-		cep_window_scheduler_add(scheduler, window);
-		cep_window_scheduler_release(&scheduler);
+		cep_window_pool_acquire(&pool);
+		cep_window_pool_add(pool, window);
+		cep_window_pool_release(&pool);
 	}
 
 	zbx_cep_config_close(cfg);
@@ -351,13 +294,14 @@ void	cep_window_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task
 }
 
 /*
- * window scheduler
+ * window pool
  */
 
-struct zbx_cep_window_scheduler
+struct zbx_cep_window_pool
 {
-	zbx_binary_heap_t		alarm_pool;
-	zbx_vector_cep_window_ptr_t	tick_pool;
+	zbx_hashset_t			windows;
+	zbx_binary_heap_t		alarm_queue;
+	zbx_vector_cep_window_ptr_t	tick_queue;
 };
 
 static int	cep_window_compare_by_nextcheck(const void *a1, const void *a2)
@@ -376,66 +320,122 @@ static int	cep_window_compare_by_nextcheck(const void *a1, const void *a2)
 	return 0;
 }
 
-zbx_cep_window_scheduler_t	*cep_window_scheduler_create(void)
+zbx_cep_window_pool_t	*cep_window_pool_create(void)
 {
-	zbx_cep_window_scheduler_t	*scheduler;
+	zbx_cep_window_pool_t	*pool;
 
-	scheduler = (zbx_cep_window_scheduler_t *)zbx_malloc(NULL, sizeof(zbx_cep_window_scheduler_t));
-	zbx_binary_heap_create(&scheduler->alarm_pool, cep_window_compare_by_nextcheck, ZBX_BINARY_HEAP_OPTION_EMPTY);
-	zbx_vector_cep_window_ptr_create(&scheduler->tick_pool);
+	pool = (zbx_cep_window_pool_t *)zbx_malloc(NULL, sizeof(zbx_cep_window_pool_t));
 
-	return scheduler;
+	zbx_binary_heap_create(&pool->alarm_queue, cep_window_compare_by_nextcheck, ZBX_BINARY_HEAP_OPTION_EMPTY);
+	zbx_vector_cep_window_ptr_create(&pool->tick_queue);
+
+	zbx_hashset_create_ext(&pool->windows, 0, cep_window_ref_hash, cep_window_ref_compare,
+			cep_window_ref_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	return pool;
 }
 
-void	cep_window_scheduler_destroy(void *a)
+void	cep_window_pool_destroy(void *a)
 {
-	zbx_cep_window_scheduler_t	*scheduler = (zbx_cep_window_scheduler_t *)a;
+	zbx_cep_window_pool_t	*pool = (zbx_cep_window_pool_t *)a;
 
-	while (FAIL == zbx_binary_heap_empty(&scheduler->alarm_pool))
+	while (FAIL == zbx_binary_heap_empty(&pool->alarm_queue))
 	{
-		zbx_binary_heap_elem_t	*elem = zbx_binary_heap_find_min(&scheduler->alarm_pool);
+		zbx_binary_heap_elem_t	*elem = zbx_binary_heap_find_min(&pool->alarm_queue);
 
 		cep_window_release((zbx_cep_window_t *)elem->data);
-		zbx_binary_heap_remove_min(&scheduler->alarm_pool);
+		zbx_binary_heap_remove_min(&pool->alarm_queue);
 	}
-	zbx_binary_heap_destroy(&scheduler->alarm_pool);
+	zbx_binary_heap_destroy(&pool->alarm_queue);
 
-	for (int i = 0; i < scheduler->tick_pool.values_num; i++)
-		cep_window_release(scheduler->tick_pool.values[i]);
-	zbx_vector_cep_window_ptr_destroy(&scheduler->tick_pool);
+	for (int i = 0; i < pool->tick_queue.values_num; i++)
+		cep_window_release(pool->tick_queue.values[i]);
+	zbx_vector_cep_window_ptr_destroy(&pool->tick_queue);
 
-	zbx_free(scheduler);
+	zbx_hashset_destroy(&pool->windows);
+
+	zbx_free(pool);
 }
 
-int	cep_window_scheduler_next(zbx_cep_window_scheduler_t *scheduler, time_t now,
-		zbx_vector_cep_window_ptr_t *windows)
+zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *pool, const zbx_cep_rule_t *rule,
+		zbx_cep_event_context_t *ctx)
 {
-	for (int i = scheduler->tick_pool.values_num ; 0 < i &&
-			atomic_load(&scheduler->tick_pool.values[i - 1]->nextcheck) <= (zbx_uint64_t)now; i--)
+	zbx_cep_window_ref_t	*ref, ref_local = {
+		.ruleid = rule->ruleid,
+		.key_type = rule->window->group_by,
+	};
+	int		index;
+	zbx_cep_event_t	*event;
+
+	switch (ref_local.key_type)
 	{
-		zbx_vector_cep_window_ptr_append(windows, scheduler->tick_pool.values[i - 1]);
-		zbx_vector_cep_window_ptr_remove_noorder(&scheduler->tick_pool, i - 1);
+		case ZBX_CEP_GROUP_BY_NONE:
+			break;
+		case ZBX_CEP_GROUP_BY_HOST:
+			cep_event_context_load_hosts(ctx);
+			if (0 != ctx->hosts.values_num)
+				ref_local.key_value = ctx->hosts.values[0];
+			break;
+		case ZBX_CEP_GROUP_BY_HOSTGROUP:
+			cep_event_context_load_groups(ctx);
+			if (0 != ctx->groups.values_num)
+				ref_local.key_value = ctx->groups.values[0];
+			break;
+		case ZBX_CEP_GROUP_BY_TAG:
+			event = cep_event_context_acquire_event(ctx);
+			if (FAIL != (index = cep_event_find_tag(event, rule->window->group_tag)))
+			{
+				ref_local.key_tag = (char *)rule->window->group_tag;
+				ref_local.key_value = (char *)event->tags.values[index].value;
+			}
+			break;
+	}
+
+	ref = (zbx_cep_window_ref_t *)zbx_hashset_insert(&pool->windows, &ref_local, sizeof(ref_local));
+
+	if (NULL == ref->window)
+	{
+		if (NULL != ref_local.key_tag)
+			ref->key_tag = zbx_strdup(NULL, ref_local.key_tag);
+
+		if (NULL != ref_local.key_value)
+			ref->key_value = zbx_strdup(NULL, ref_local.key_value);
+
+		ref->window = cep_window_create(rule);
+	}
+
+	return cep_window_addref(ref->window);
+}
+
+int	cep_window_pool_next_batch(zbx_cep_window_pool_t *pool, time_t now, zbx_vector_cep_window_ptr_t *windows)
+{
+	for (int i = pool->tick_queue.values_num ; 0 < i &&
+			atomic_load(&pool->tick_queue.values[i - 1]->nextcheck) <= (zbx_uint64_t)now; i--)
+	{
+		zbx_vector_cep_window_ptr_append(windows, pool->tick_queue.values[i - 1]);
+		zbx_vector_cep_window_ptr_remove_noorder(&pool->tick_queue, i - 1);
 
 		if (windows->values_num == windows->values_alloc)
 			return windows->values_num;
 	}
 
-	while (FAIL == zbx_binary_heap_empty(&scheduler->alarm_pool))
+	while (FAIL == zbx_binary_heap_empty(&pool->alarm_queue))
 	{
-		zbx_binary_heap_elem_t	*elem = zbx_binary_heap_find_min(&scheduler->alarm_pool);
+		zbx_binary_heap_elem_t	*elem = zbx_binary_heap_find_min(&pool->alarm_queue);
 		zbx_cep_window_t	*window = (zbx_cep_window_t *)elem->data;
 
 		if (atomic_load(&window->nextcheck) > (zbx_uint64_t)now || windows->values_num == windows->values_alloc)
 			return windows->values_num;
 
 		zbx_vector_cep_window_ptr_append(windows, window);
-		zbx_binary_heap_remove_min(&scheduler->alarm_pool);
+		zbx_binary_heap_remove_min(&pool->alarm_queue);
 	}
 
 	return windows->values_num;
 }
 
-void	cep_window_scheduler_add(zbx_cep_window_scheduler_t *scheduler, zbx_cep_window_t *window)
+void	cep_window_pool_add(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window)
 {
 	zbx_binary_heap_elem_t	elem;
 
@@ -444,11 +444,69 @@ void	cep_window_scheduler_add(zbx_cep_window_scheduler_t *scheduler, zbx_cep_win
 		case ZBX_CEP_WINDOW_SIMPLE:
 		case ZBX_CEP_WINDOW_CAUSE_SYMPTOM:
 			elem.data = cep_window_addref(window);
-			zbx_binary_heap_insert(&scheduler->alarm_pool, &elem);
+			zbx_binary_heap_insert(&pool->alarm_queue, &elem);
 			break;
 		case ZBX_CEP_WINDOW_PATTERN_MATCH:
-			zbx_vector_cep_window_ptr_append(&scheduler->tick_pool, cep_window_addref(window));
+			zbx_vector_cep_window_ptr_append(&pool->tick_queue, cep_window_addref(window));
 			break;
 	}
+}
+
+static void	cep_window_ref_dump(const char *prefix, const zbx_cep_window_ref_t *ref)
+{
+	zbx_queue_ptr_iter_t		iter;
+	zbx_cep_event_handle_t		hevent;
+	const zbx_cep_window_t		*window = ref->window;
+
+	zabbix_log(LOG_LEVEL_TRACE, "%sruleid:" ZBX_FS_UI64 " type:%d [group_by:%d key:%s value:%s] created:"
+			ZBX_FS_TIME_T,
+			prefix, window->ruleid, window->type, ref->key_type, ZBX_NULL2STR(ref->key_tag),
+			ZBX_NULL2STR(ref->key_value), window->time_created);
+
+	if (SUCCEED != zbx_queue_ptr_empty(&window->hevents))
+	{
+		zbx_vector_cep_event_handle_t	hevents;
+		zbx_cep_event_t			**events;
+
+		zbx_vector_cep_event_handle_create(&hevents);
+		zbx_vector_cep_event_handle_reserve(&hevents, (size_t)zbx_queue_ptr_values_num(&window->hevents));
+
+		zabbix_log(LOG_LEVEL_TRACE, "%s  eventids:", prefix);
+
+		zbx_queue_ptr_iter_reset(&window->hevents, &iter);
+		while (NULL != (hevent = (zbx_cep_event_handle_t)zbx_queue_ptr_iter_next(&iter)))
+			zbx_vector_cep_event_handle_append(&hevents, hevent);
+
+		events = (zbx_cep_event_t **)zbx_malloc(NULL, hevents.values_num);
+		zbx_cep_get_events_by_handles(hevents.values, hevents.values_num, events);
+
+		for (int i = 0; i < hevents.values_num; i++)
+		{
+			if (NULL == events[i])
+				continue;
+
+			zabbix_log(LOG_LEVEL_TRACE, "%s    " ZBX_FS_UI64, prefix, events[i]->eventid);
+
+			zbx_cep_event_release(events[i]);
+		}
+
+		zbx_free(events);
+		zbx_vector_cep_event_handle_destroy(&hevents);
+	}
+}
+
+void	cep_window_pool_dump(zbx_cep_window_pool_t *pool)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_cep_window_ref_t	*ref;
+
+	if (0 == pool->windows.num_data)
+		return;
+
+	zabbix_log(LOG_LEVEL_TRACE, "windows:");
+
+	zbx_hashset_iter_reset(&pool->windows, &iter);
+	while (NULL != (ref = (zbx_cep_window_ref_t *)zbx_hashset_iter_next(&iter)))
+		cep_window_ref_dump("  ", ref);
 }
 
