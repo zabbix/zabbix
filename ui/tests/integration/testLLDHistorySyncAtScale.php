@@ -71,13 +71,16 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	public function prepareData() {
 		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
 
+		// Disable every pre-existing monitored host so they don't conflict with the tests:
+		// the global zabbix[queue,15,] metric used to verify delayed-item drain must reflect
+		// only this suite's host (created below).
 		$response = $this->call('host.get', [
-			'filter' => ['host' => 'Zabbix server'],
+			'filter' => ['status' => HOST_STATUS_MONITORED],
 			'output' => ['hostid']
 		]);
-		if (!empty($response['result'])) {
+		foreach ($response['result'] as $h) {
 			$this->call('host.update', [
-				'hostid' => $response['result'][0]['hostid'],
+				'hostid' => $h['hostid'],
 				'status' => HOST_STATUS_NOT_MONITORED
 			]);
 		}
