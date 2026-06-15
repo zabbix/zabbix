@@ -17017,37 +17017,28 @@ static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get active drule for specified proxy                              *
+ * Purpose: get drule values                                                  *
  *                                                                            *
- * Parameter: druleid - [IN] id of drule to get                               *
- *            proxyid - [IN] id of proxy to get drule for                     *
- *            drule   - [OUT] drule                                           *
+ * Parameter: dc_drule - [IN/OUT] drule                                       *
  *                                                                            *
- * Return value: SUCCEED - drule exists and is active                         *
+ * Return value: SUCCEED - drule exists                                       *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_drule_get_monitored(const zbx_uint64_t druleid, const zbx_uint64_t proxyid, zbx_dc_drule_t *drule_out)
+int	zbx_dc_drule_get_values(zbx_dc_drule_t *dc_drule)
 {
 	int			ret = FAIL;
 	zbx_dc_drule_t		*drule;
 
 	RDLOCK_CACHE;
 
-	if (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_search(&config->drules, &druleid)))
+	if (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_search(&config->drules, &dc_drule->druleid)))
 	{
-		if (DRULE_STATUS_MONITORED == drule->status && drule->proxyid == proxyid)
-		{
-			drule_out = zbx_malloc(NULL, sizeof(zbx_dc_drule_t));
-			drule_out->druleid = drule->druleid;
-			drule_out->proxyid = drule->proxyid;
-			drule_out->name = zbx_strdup(NULL, drule->name);
-			drule_out->iprange = zbx_strdup(NULL, drule->iprange);
-			drule_out->status = drule->status;
-			drule_out->unique_dcheckid = 0;
-
-			ret = SUCCEED;
-		}
+		dc_drule->proxyid = drule->proxyid;
+		dc_drule->name = zbx_strdup(NULL, drule->name);
+		dc_drule->iprange = zbx_strdup(NULL, drule->iprange);
+		dc_drule->status = drule->status;
+		ret = SUCCEED;
 	}
 
 	UNLOCK_CACHE;

@@ -2077,19 +2077,21 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_u
 		ZBX_STR2UINT64(druleid, tmp);
 		tmp_drule.druleid = druleid;
 
-		idx = zbx_vector_dc_drule_ptr_search(&dc_drules, &tmp_drule, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		idx = zbx_vector_dc_drule_ptr_bsearch(&dc_drules, &tmp_drule, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 		if (FAIL == idx)
 		{
-			if (FAIL == zbx_dc_drule_get_monitored(druleid, proxyid, &dc_drule))
-			{
-				dc_drule = zbx_malloc(NULL, sizeof(zbx_dc_drule_t));
-				dc_drule->druleid = druleid;
-				dc_drule->status = DRULE_STATUS_NOT_MONITORED;
-			}
-
+			dc_drule = zbx_malloc(NULL, sizeof(zbx_dc_drule_t));
+			memset(dc_drule, 0, sizeof(zbx_dc_drule_t));
 			zbx_vector_dc_dcheck_ptr_create(&dc_drule->dchecks);
 
-			zbx_vector_dc_drule_ptr_append(&dc_drules, &dc_drule);
+			dc_drule->druleid = druleid;
+
+			if (FAIL == zbx_dc_drule_get_values(dc_drule) || dc_drule->proxyid != proxyid)
+				dc_drule->status = DRULE_STATUS_NOT_MONITORED;
+
+			idx = zbx_vector_dc_drule_ptr_nearestindex(&dc_drules, dc_drule,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+			zbx_vector_dc_drule_ptr_insert(&dc_drules, dc_drule, idx);
 		}
 		else
 			dc_drule = dc_drules.values[idx];
@@ -2124,7 +2126,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_u
 			ZBX_STR2UINT64(dcheckid, tmp);
 			tmp_dcheck.dcheckid = dcheckid;
 
-			if (0 != dcheckid && FAIL == zbx_vector_dc_dcheck_ptr_search(&dc_drule->dchecks, &tmp_dcheck,
+			if (0 != dcheckid && FAIL == zbx_vector_dc_dcheck_ptr_bsearch(&dc_drule->dchecks, &tmp_dcheck,
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
 			{
 				if (FAIL == zbx_dc_dcheck_get_uniq(tmp_dcheck.dcheckid, &tmp_dcheck.uniq))
@@ -2146,6 +2148,8 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_u
 				else
 				{
 					dc_dcheck = zbx_malloc(NULL, sizeof(zbx_dc_dcheck_t));
+					memset(dc_dcheck, 0, sizeof(zbx_dc_dcheck_t));
+
 					dc_dcheck->dcheckid = tmp_dcheck.dcheckid;
 					dc_dcheck->uniq = tmp_dcheck.uniq;
 
@@ -2154,7 +2158,9 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_u
 						dc_drule->unique_dcheckid = dc_dcheck->dcheckid;
 					}
 
-					zbx_vector_dc_dcheck_ptr_append(&dc_drule->dchecks, dc_dcheck);
+					idx = zbx_vector_dc_dcheck_ptr_nearestindex(&dc_drule->dchecks, dc_dcheck,
+							ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+					zbx_vector_dc_dcheck_ptr_insert(&dc_drule->dchecks, dc_dcheck, idx);
 				}
 			}
 		}
@@ -2204,7 +2210,6 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_u
 
 			drule = (zbx_drule_t *)zbx_malloc(NULL, sizeof(zbx_drule_t));
 			drule->druleid = druleid;
-			drule->unique_dcheckid = dc_drule->unique_dcheckid;
 			zbx_vector_ptr_create(&drule->ips);
 			zbx_vector_uint64_create(&drule->dcheckids);
 			zbx_iprange_uniq_last(ipranges.values, ipranges.values_num,
@@ -2246,6 +2251,10 @@ json_parse_error:
 		int		ret2 = SUCCEED;
 
 		drule = (zbx_drule_t *)drules.values[i];
+
+		tmp_drule.druleid = drule->druleid;
+		idx = zbx_vector_dc_drule_ptr_bsearch(&dc_drules, &tmp_drule, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		drule->unique_dcheckid = dc_drules.values[idx]->unique_dcheckid;
 
 		zbx_db_begin();
 
