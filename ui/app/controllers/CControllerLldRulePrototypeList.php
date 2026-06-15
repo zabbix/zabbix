@@ -120,7 +120,7 @@ class CControllerLldRulePrototypeList extends CController {
 		}
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Configuration of discovery rules'));
+		$response->setTitle(_('Configuration of discovery prototypes'));
 		$this->setResponse($response);
 	}
 
