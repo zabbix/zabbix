@@ -63,48 +63,58 @@ $hg_ms_params = $data['context'] === 'host' ? ['with_hosts' => true] : ['with_te
 $filter_column1 = (new CFormGrid())
 	->addItem([
 		new CLabel($data['context'] === 'host' ? _('Host groups') : _('Template groups'), 'filter_groupids__ms'),
-		(new CMultiSelect([
-			'name' => 'filter_groupids[]',
-			'object_name' => $data['context'] === 'host' ? 'hostGroup' : 'templateGroup',
-			'data' => $data['filter']['ms_groups'],
-			'popup' => [
-				'parameters' => [
-					'srctbl' => $data['context'] === 'host' ? 'host_groups' : 'template_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => CFilter::FORM_NAME,
-					'dstfld1' => 'filter_groupids_',
-					'editable' => true,
-					'enrich_parent_groups' => true
-				] + $hg_ms_params
-			]
-		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		new CFormField(
+			(new CMultiSelect([
+				'name' => 'filter_groupids[]',
+				'object_name' => $data['context'] === 'host' ? 'hostGroup' : 'templateGroup',
+				'data' => $data['filter']['ms_groups'],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => $data['context'] === 'host' ? 'host_groups' : 'template_groups',
+						'srcfld1' => 'groupid',
+						'dstfrm' => CFilter::FORM_NAME,
+						'dstfld1' => 'filter_groupids_',
+						'editable' => true,
+						'enrich_parent_groups' => true
+					] + $hg_ms_params
+				]
+			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		)
 	])
 	->addItem([
 		new CLabel($data['context'] === 'host' ? _('Hosts') : _('Templates'), 'filter_hostids__ms'),
-		(new CMultiSelect([
-			'name' => 'filter_hostids[]',
-			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
-			'data' => $data['filter']['ms_hosts'],
-			'popup' => [
-				'filter_preselect' => [
-					'id' => 'filter_groupids_',
-					'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
-				],
-				'parameters' => [
-					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
-					'srcfld1' => 'hostid',
-					'dstfrm' => CFilter::FORM_NAME,
-					'dstfld1' => 'filter_hostids_',
-					'editable' => true
+		new CFormField(
+			(new CMultiSelect([
+				'name' => 'filter_hostids[]',
+				'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
+				'data' => $data['filter']['ms_hosts'],
+				'popup' => [
+					'filter_preselect' => [
+						'id' => 'filter_groupids_',
+						'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
+					],
+					'parameters' => [
+						'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
+						'srcfld1' => 'hostid',
+						'dstfrm' => CFilter::FORM_NAME,
+						'dstfld1' => 'filter_hostids_',
+						'editable' => true
+					]
 				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		)
 	])
 	->addItem([new CLabel(_('Name'), 'filter_name'),
-		(new CTextBox('filter_name', $data['filter']['filter_name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		new CFormField(
+			(new CTextBox('filter_name', $data['filter']['filter_name']))
+				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		)
 	])
 	->addItem([new CLabel(_('Key'), 'filter_key'),
-		(new CTextBox('filter_key', $data['filter']['filter_key']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		new CFormField(
+			(new CTextBox('filter_key', $data['filter']['filter_key']))
+				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		)
 	]);
 
 // type select
@@ -122,12 +132,14 @@ $type_select->addOptions(CSelect::createOptionsFromArray($lld_types));
 $filter_column2 = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Type'), $type_select->getFocusableElementId()),
-		$type_select
+		new CFormField($type_select)
 	])
 	->addItem([
 		new CLabel(_('Update interval'), 'filter_delay'),
-		(new CTextBox('filter_delay', $data['filter']['filter_delay']))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		new CFormField(
+			(new CTextBox('filter_delay', $data['filter']['filter_delay']))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		)
 	])
 	->addItem([
 		new CLabel(_('Delete lost resources'), 'filter_lifetime'),
@@ -161,29 +173,35 @@ $filter_column2 = (new CFormGrid())
 	])
 	->addItem([
 		new CLabel(_('SNMP OID'), 'filter_snmp_oid'),
-		(new CTextBox('filter_snmp_oid', $data['filter']['filter_snmp_oid']))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		new CFormField(
+			(new CTextBox('filter_snmp_oid', $data['filter']['filter_snmp_oid']))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		)
 	]);
 
 if ($data['context'] === 'host') {
 	$filter_column2->addItem([
 		new CLabel(_('State'), 'filter_state'),
-		(new CRadioButtonList('filter_state', (int) $data['filter']['filter_state']))
-			->addValue(_('All'), -1)
-			->addValue(_('Normal'), ITEM_STATE_NORMAL)
-			->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED)
-			->setModern(true)
+		new CFormField(
+			(new CRadioButtonList('filter_state', (int) $data['filter']['filter_state']))
+				->addValue(_('All'), -1)
+				->addValue(_('Normal'), ITEM_STATE_NORMAL)
+				->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED)
+				->setModern(true)
+		)
 	]);
 }
 
 $filter_column2->addItem([
 	new CLabel(_('Status'), 'filter_status'),
-	(new CRadioButtonList('filter_status', (int) $data['filter']['filter_status']))
-		->addValue(_('All'), -1)
-		->addValue(_('Enabled'), ITEM_STATUS_ACTIVE)
-		->addValue(_('Disabled'), ITEM_STATUS_DISABLED)
-		->setEnabled($data['context'] !== 'host' || $data['filter']['filter_state'] == -1)
-		->setModern(true)
+	new CFormField(
+			(new CRadioButtonList('filter_status', (int) $data['filter']['filter_status']))
+			->addValue(_('All'), -1)
+			->addValue(_('Enabled'), ITEM_STATUS_ACTIVE)
+			->addValue(_('Disabled'), ITEM_STATUS_DISABLED)
+			->setEnabled($data['context'] !== 'host' || $data['filter']['filter_state'] == -1)
+			->setModern(true)
+	)
 ]);
 
 $filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);

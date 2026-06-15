@@ -93,7 +93,7 @@ const view = new class {
 			enabled_lifetime_type != <?= ZBX_LLD_DISABLE_AFTER ?>
 			|| lifetime_type == <?= ZBX_LLD_DELETE_IMMEDIATELY ?>;
 
-		const filter_snmp_oid = document.getElementById('filter_snmp_oid');
+		const filter_snmp_oid = document.getElementById('filter_snmp_oid').parentNode;
 
 		if (type == <?= ITEM_TYPE_SNMP ?>) {
 			filter_snmp_oid.style.display = '';
@@ -104,7 +104,7 @@ const view = new class {
 			filter_snmp_oid.previousSibling.style.display = 'none';
 		}
 
-		const filter_delay = document.getElementById('filter_delay');
+		const filter_delay = document.getElementById('filter_delay').parentNode;
 
 		if (type == <?= ITEM_TYPE_TRAPPER ?>) {
 			filter_delay.style.display = 'none';
