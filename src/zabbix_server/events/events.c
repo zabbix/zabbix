@@ -877,7 +877,7 @@ static void	save_discovery_events(zbx_db_event **db_events, int events_num)
 	process_actions(zbx_db_dbconn(), &events, NULL, NULL);
 }
 
-int	zbx_process_events(void	)
+int	zbx_process_events(void)
 {
 	int	processed_num = 0;
 

@@ -263,6 +263,12 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 
+		// Enable the internal event actions for the whole suite so the server generates internal
+		// item-not-supported and trigger-unknown events (verified by the *Unknown tests). They are
+		// disabled again in clearData(). The configuration cache is reloaded by the first test.
+		$this->setInternalActionStatus('Report unknown triggers', ACTION_STATUS_ENABLED);
+		$this->setInternalActionStatus('Report not supported items', ACTION_STATUS_ENABLED);
+
 		return true;
 	}
 
@@ -1024,6 +1030,59 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Smoke test (part 1/2): a discovered item becomes unsupported and its trigger enters the UNKNOWN
+	 * state. The internal "Report unknown triggers" and "Report not supported items" actions are enabled
+	 * for the whole suite in prepareData(), so the server opens an internal problem for every unsupported
+	 * item and every unknown trigger. The trigger value stays OK (it was not in a problem) while the state
+	 * becomes UNKNOWN; the UNKNOWN state and the open internal problems are left in place and cleared by
+	 * testTriggerCEP_CloseUnknown.
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenUnknown() {
+		$this->runOpenUnknownTest();
+	}
+
+	/**
+	 * Smoke test (part 2/2): the UNKNOWN state entered by testTriggerCEP_OpenUnknown clears when a
+	 * numeric value is sent again. The triggers return to NORMAL/OK, the items become supported, and
+	 * all internal problems (item-not-supported and trigger-unknown) are resolved. Runs as a separate
+	 * test so the UNKNOWN state persists across the test boundary before recovery.
+	 *
+	 * @depends testTriggerCEP_OpenUnknown
+	 */
+	public function testTriggerCEP_CloseUnknown() {
+		$this->runCloseUnknownTest();
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_OpenUnknown but the server component is stopped and restarted
+	 * before the test runs, to verify the UNKNOWN state and internal problems are produced correctly
+	 * after a fresh restart.
+	 *
+	 * @depends testTriggerCEP_CloseUnknown
+	 */
+	public function testTriggerCEP_OpenUnknownRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
+		$this->runOpenUnknownTest();
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_CloseUnknown but the server component is stopped and restarted
+	 * before the test runs, to verify recovery and internal-problem resolution after a fresh restart.
+	 *
+	 * @depends testTriggerCEP_OpenUnknownRestart
+	 */
+	public function testTriggerCEP_CloseUnknownRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
+		$this->runCloseUnknownTest();
+	}
+
+	/**
 	 * Verify CEP behaviour on the discovered trigger:
 	 *
 	 *   1. Send value 1        → trigger fires   (NORMAL / PROBLEM)
@@ -1408,6 +1467,68 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	public function testTriggerCEP_ClearData(): void {
 		self::clearData();
+	}
+
+	/**
+	 * Drive all discovered items into the unsupported state (triggers become UNKNOWN) and verify that
+	 * an internal problem is opened for every unsupported item and every unknown trigger.
+	 */
+	private function runOpenUnknownTest(): void {
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+
+		// Push a non-numeric value to flip all items into unsupported state; CEP keeps the trigger
+		// value unchanged (OK) while the state becomes UNKNOWN.
+		$this->sendSenderValues(
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'not_a_number'], $keys),
+			null, 0
+		);
+
+		$this->validateTriggerParams(TRIGGER_STATE_UNKNOWN, TRIGGER_VALUE_FALSE);
+
+		// An internal problem must be opened for every unknown trigger.
+		$this->callUntilCountIsPresent('problem.get', [
+			'objectids' => self::$discovered_triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_INTERNAL
+		], self::LLD_DISCOVERY_COUNT, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+
+		// An internal problem must be opened for every unsupported item on the discovered host.
+		$this->callUntilCountIsPresent('problem.get', [
+			'hostids' => [self::$disc_hostid],
+			'object' => EVENT_OBJECT_ITEM,
+			'source' => EVENT_SOURCE_INTERNAL
+		], self::LLD_DISCOVERY_COUNT, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Restore all discovered items to the supported state (triggers return to NORMAL/OK) and verify that
+	 * every internal problem opened by runOpenUnknownTest is resolved.
+	 */
+	private function runCloseUnknownTest(): void {
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+
+		// Send a numeric value of 0 to restore all items to supported state; the trigger returns to
+		// the NORMAL state and stays OK.
+		$this->sendSenderValues(
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'], $keys),
+			null, 0
+		);
+
+		$this->validateTriggerParams(TRIGGER_STATE_NORMAL, TRIGGER_VALUE_FALSE);
+
+		// Every internal trigger-unknown problem must be resolved once the triggers leave UNKNOWN.
+		$this->callUntilCountIsPresent('problem.get', [
+			'objectids' => self::$discovered_triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_INTERNAL
+		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+
+		// Every internal item-not-supported problem must be resolved once the items become supported.
+		$this->callUntilCountIsPresent('problem.get', [
+			'hostids' => [self::$disc_hostid],
+			'object' => EVENT_OBJECT_ITEM,
+			'source' => EVENT_SOURCE_INTERNAL
+		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	private function runEventAssessmentTest(bool $restart): void {
@@ -2041,6 +2162,22 @@ class testTriggerCEP extends CIntegrationTest {
 		return $keys;
 	}
 
+	/**
+	 * Enable or disable a built-in action by name (used for the internal "Report unknown triggers"
+	 * and "Report not supported items" actions).
+	 */
+	private function setInternalActionStatus(string $name, int $status): void {
+		$response = $this->call('action.get', [
+			'output' => ['actionid'],
+			'filter' => ['name' => $name]
+		]);
+		$this->assertNotEmpty($response['result'], 'Action "'.$name.'" not found.');
+		$this->call('action.update', [
+			'actionid' => $response['result'][0]['actionid'],
+			'status' => $status
+		]);
+	}
+
 	private function validateTriggerParams($expected_state, $expected_value) {
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => self::$discovered_triggerids,
@@ -2425,6 +2562,20 @@ class testTriggerCEP extends CIntegrationTest {
 		if (!empty(self::$templateid)) {
 			CDataHelper::call('template.delete', [self::$templateid]);
 			self::$templateid = null;
+		}
+
+		// Disable the internal actions again in case a test enabled them and aborted before restoring.
+		foreach (['Report unknown triggers', 'Report not supported items'] as $action_name) {
+			$result = CDataHelper::call('action.get', [
+				'output' => ['actionid'],
+				'filter' => ['name' => $action_name]
+			]);
+			if (!empty($result)) {
+				CDataHelper::call('action.update', [
+					'actionid' => $result[0]['actionid'],
+					'status' => ACTION_STATUS_DISABLED
+				]);
+			}
 		}
 
 		// Re-enable audit log disabled in prepareData().
