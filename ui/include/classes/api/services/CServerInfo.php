@@ -23,20 +23,20 @@ class CServerInfo extends CApiService {
 		'get' => []
 	];
 
-	public const OUTPUT_FIELDS = ['serverid', 'status'];
+	public const OUTPUT_FIELDS = ['serverid', 'lastaccess'];
 
 	public function get(array $options = []): array {
 		self::validateGet($options);
 
-		$server_status = [];
+		$server_data = [];
 
-		if (array_key_exists('status', array_flip($options['output']))) {
-			$server_status['status'] = (int) $this->isServerRunning();
+		if (array_key_exists('lastaccess', array_flip($options['output']))) {
+			$server_data['lastaccess'] = self::getServerLastAccess();
 		}
 
 		unset($options['output']);
 
-		return $options + $server_status;
+		return $options + $server_data;
 	}
 
 	private static function validateGet(array &$options): void {
@@ -56,14 +56,21 @@ class CServerInfo extends CApiService {
 		}
 	}
 
-	private function isServerRunning(): bool {
+	private static function getServerLastAccess(): int {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
-			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
-			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::DEVICE_LINK_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
-		);
+		$active_node = API::getApiService('hanode')->get([
+			'output' => ['port', 'lastaccess'],
+			'filter' => ['address' => $ZBX_SERVER, 'status' => ZBX_NODE_STATUS_ACTIVE],
+			'sortfield' => 'lastaccess',
+			'sortorder' => 'DESC',
+			'limit' => 1
+		], false);
 
-		return $server->isRunning();
+		if ($active_node && $active_node[0]['port'] == $ZBX_SERVER_PORT) {
+			return $active_node[0]['lastaccess'];
+		}
+
+		return 0;
 	}
 }
