@@ -1688,6 +1688,23 @@ out:
   return: SUCCEED
   value: -1
 ---
+test case: Evaluate timeleft(#2,9.003e307) regression fallback, val_now below threshold with positive slope
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 9.0e307
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 9.001e307
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+  time: 2017-01-10 10:03:00.000000000 +00:00
+  function: timeleft
+  params: '#2,9.003e307'
+out:
+  return: SUCCEED
+  value: 60
+---
 test case: Evaluate timeleft(5m,65)
 in:
   history:
