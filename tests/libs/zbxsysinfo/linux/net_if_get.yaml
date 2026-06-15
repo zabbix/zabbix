@@ -70,6 +70,21 @@ files:
   /sys/class/net/lo/type: |
     772
 
+  /sys/class/net/eth1/ifalias: |
+    eth1_test
+  /sys/class/net/eth1/address: |
+    52:54:00:12:34:56
+  /sys/class/net/eth1/speed: |
+    1000
+  /sys/class/net/eth1/duplex: |
+    full
+  /sys/class/net/eth1/operstate: |
+    up
+  /sys/class/net/eth1/carrier: |
+    1
+  /sys/class/net/eth1/type: |
+    1
+
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit
     face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
