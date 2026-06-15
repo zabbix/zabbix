@@ -1705,6 +1705,91 @@ out:
   return: SUCCEED
   value: 60
 ---
+test case: Evaluate timeleft(#2,3.0e300) 1ns-apart data, slope overflow increasing, threshold above current
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.0
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2.0e300
+      ts: 2017-01-10 10:01:00.000000001 +00:00
+  time: 2017-01-10 10:01:01.000000000 +00:00
+  function: timeleft
+  params: '#2,3.0e300'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate timeleft(#2,-1) 1ns-apart data, slope overflow increasing, threshold below current
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.0
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2.0e300
+      ts: 2017-01-10 10:01:00.000000001 +00:00
+  time: 2017-01-10 10:01:01.000000000 +00:00
+  function: timeleft
+  params: '#2,-1'
+out:
+  return: SUCCEED
+  value: 1.7976931348623158e+308
+---
+test case: Evaluate timeleft(#2,-1) 1ns-apart data, slope overflow decreasing, threshold below current (instant)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.0e300
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 0.0
+      ts: 2017-01-10 10:01:00.000000001 +00:00
+  time: 2017-01-10 10:01:01.000000000 +00:00
+  function: timeleft
+  params: '#2,-1'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate timeleft(#2,1.0) 1ns-apart data, slope overflow decreasing, threshold above current (never)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.0e300
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 0.0
+      ts: 2017-01-10 10:01:00.000000001 +00:00
+  time: 2017-01-10 10:01:01.000000000 +00:00
+  function: timeleft
+  params: '#2,1.0'
+out:
+  return: SUCCEED
+  value: 1.7976931348623158e+308
+---
+test case: Evaluate timeleft(#2,threshold) identical nanosecond timestamps, delta_t=0 in fallback
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.0
+      ts: 2017-01-10 10:01:00.500000000 +00:00
+    - value: 100.0
+      ts: 2017-01-10 10:01:00.500000000 +00:00
+  time: 2017-01-10 10:01:01.000000000 +00:00
+  function: timeleft
+  params: '#2,-1'
+out:
+  return: SUCCEED
+  value: -1
+---
 test case: Evaluate timeleft(5m,65)
 in:
   history:
@@ -4762,6 +4847,40 @@ out:
     out:
       return: SUCCEED
       value: 1.7976931348623158e+308
+---
+    test case: Evaluate forecast(#2,1s) 1ns-apart data, slope overflow increasing, result clamped to DBL_MAX
+    in:
+      history:
+      - itemid: 1
+        value type: ITEM_VALUE_TYPE_FLOAT
+        data:
+        - value: 0.0
+          ts: 2017-01-10 10:01:00.000000000 +00:00
+        - value: 2.0e300
+          ts: 2017-01-10 10:01:00.000000001 +00:00
+      time: 2017-01-10 10:01:01.000000000 +00:00
+      function: forecast
+      params: '#2,1s,'
+    out:
+      return: SUCCEED
+      value: 1.7976931348623158e+308
+---
+    test case: Evaluate forecast(#2,1s) 1ns-apart data, slope overflow decreasing, result clamped to -DBL_MAX
+    in:
+      history:
+      - itemid: 1
+        value type: ITEM_VALUE_TYPE_FLOAT
+        data:
+        - value: 2.0e300
+          ts: 2017-01-10 10:01:00.000000000 +00:00
+        - value: 0.0
+          ts: 2017-01-10 10:01:00.000000001 +00:00
+      time: 2017-01-10 10:01:01.000000000 +00:00
+      function: forecast
+      params: '#2,1s,'
+    out:
+      return: SUCCEED
+      value: -1.7976931348623157e+308
 ---
 test case: Evaluate timeleft(5m,65,power)
 in:
