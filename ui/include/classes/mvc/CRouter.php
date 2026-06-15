@@ -114,6 +114,7 @@ class CRouter {
 		'export.sysmaps'							=> [CControllerExport::class,										'layout.export',		null],
 		'export.templates'							=> [CControllerExport::class,										'layout.export',		null],
 		'export.dashboards'							=> [CControllerExport::class,										'layout.export',		null],
+		'export.regexes'							=> [CControllerExport::class,										'layout.export',		null],
 		'favorite.create'							=> [CControllerFavoriteCreate::class,								'layout.javascript',	null],
 		'favorite.delete'							=> [CControllerFavoriteDelete::class,								'layout.javascript',	null],
 		'geomaps.edit'								=> [CControllerGeomapsEdit::class,									'layout.htmlpage',		'administration.geomaps.edit'],

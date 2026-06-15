@@ -430,6 +430,24 @@ class CImportDataAdapter {
 		return $media_types;
 	}
 
+	public function getGlobalRegexes(): array {
+		$regexps = [];
+
+		if (array_key_exists('global_regexes', $this->data)) {
+			foreach ($this->data['global_regexes'] as $regexp) {
+				foreach ($regexp['expressions'] as &$expression) {
+					$expression['expression_type'] = $expression['type'];
+					unset($expression['type']);
+				}
+				unset($expression);
+
+				$regexps[$regexp['name']] = $regexp;
+			}
+		}
+
+		return $regexps;
+	}
+
 	/**
 	 * Format discovery rule.
 	 *

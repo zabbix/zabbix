@@ -33,6 +33,19 @@ $html_page = (new CHtmlPage())
 		(new CTag('nav', true,
 			(new CList())
 				->addItem((new CSimpleButton(_('Create regular expression')))->addClass('js-create-regexp'))
+				->addItem(
+					(new CSimpleButton(_('Import')))
+						->onClick(
+							'return PopUp("popup.import", {
+								rules_preset: "regex", '.
+								CSRF_TOKEN_NAME.': "'.CCsrfTokenHelper::get('import').
+							'"},{
+								dialogueid: "popup_import",
+								dialogue_class: "modal-popup-generic"
+							});'
+						)
+						->setEnabled((bool) CMediatypeHelper::getSupportedMediaTypes())
+				)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
@@ -109,6 +122,14 @@ foreach ($data['regexps'] as $regexpid => $regexp) {
 $form->addItem([
 	$table,
 	new CActionButtonList('action', 'regexpids', [
+		'regex.export' => [
+			'content' => new CButtonExport('export.regexes',
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'regex.list')
+					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
+					->getUrl()
+			)
+		],
 		'regex.delete' => [
 			'name' => _('Delete'),
 			'confirm_singular' => _('Delete selected regular expression?'),

@@ -151,6 +151,11 @@ class CConfigurationImportcompare {
 						]
 					]
 				]
+			],
+			'global_regexes' => [
+				'options' => $this->getOptions('global_regexes'),
+				'uuid' => false,
+				'unique' => ['name']
 			]
 		];
 	}

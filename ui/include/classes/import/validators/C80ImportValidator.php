@@ -3422,6 +3422,24 @@ class C80ImportValidator extends CImportValidatorGeneral {
 						]]
 					]]
 				]]
+			]],
+			'global_regexes' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'global_regex', 'rules' => [
+				'global_regex' =>				['type' => XML_ARRAY, 'rules' => [
+					'name' =>					['type' => XML_STRING | XML_REQUIRED],
+					'description' =>				['type' => XML_STRING, 'default' => ''],
+					'expressions' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'expression', 'rules' => [
+						'expression' =>						['type' => XML_ARRAY, 'rules' => [
+							'type' =>						['type' => XML_STRING, 'in' => [CXmlConstantValue::GLOBAL_REGEX_TYPE_INCLUDED => CXmlConstantName::GLOBAL_REGEX_TYPE_INCLUDED, CXmlConstantValue::GLOBAL_REGEX_TYPE_ANY_INCLUDED => CXmlConstantName::GLOBAL_REGEX_TYPE_ANY_INCLUDED, CXmlConstantValue::GLOBAL_REGEX_TYPE_NOT_INCLUDED => CXmlConstantName::GLOBAL_REGEX_TYPE_NOT_INCLUDED, CXmlConstantValue::GLOBAL_REGEX_TYPE_TRUE => CXmlConstantName::GLOBAL_REGEX_TYPE_TRUE, CXmlConstantValue::GLOBAL_REGEX_TYPE_FALSE => CXmlConstantName::GLOBAL_REGEX_TYPE_FALSE]],
+							'expression' =>					['type' => XML_STRING, 'default' => ''],
+							'exp_delimiter' =>				['type' => XML_STRING, 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::GLOBAL_REGEX_TYPE_ANY_INCLUDED => CXmlConstantName::GLOBAL_REGEX_TYPE_ANY_INCLUDED]], 'type' => XML_STRING, 'in' => '\\,,.,/'],
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::GLOBAL_REGEX_TYPE_INCLUDED => CXmlConstantName::GLOBAL_REGEX_TYPE_INCLUDED, CXmlConstantValue::GLOBAL_REGEX_TYPE_NOT_INCLUDED => CXmlConstantName::GLOBAL_REGEX_TYPE_NOT_INCLUDED, CXmlConstantValue::GLOBAL_REGEX_TYPE_TRUE => CXmlConstantName::GLOBAL_REGEX_TYPE_TRUE, CXmlConstantValue::GLOBAL_REGEX_TYPE_FALSE => CXmlConstantName::GLOBAL_REGEX_TYPE_FALSE]], 'type' => XML_STRING, 'default' => ''],
+								['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'case_sensitive' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
+						]]
+					]]
+				]]
 			]]
 		]];
 	}

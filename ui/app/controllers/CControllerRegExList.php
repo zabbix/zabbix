@@ -76,6 +76,8 @@ class CControllerRegExList extends CController {
 			'uncheck' => $this->hasInput('uncheck')
 		];
 
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
+
 		$data['regexps'] = API::Regexp()->get([
 			'output' => ['regexpid', 'name', 'description'],
 			'selectExpressions' => ['expression', 'expression_type'],
@@ -86,13 +88,13 @@ class CControllerRegExList extends CController {
 			'searchByAny' => false,
 			'sortfield' => $sort_field,
 			'sortorder' => $sort_order,
-			'limit' => 3 + 1,
+			'limit' => $limit,
 			'preservekeys' => true
 		]);
 
-		$page_num = $this->getInput('page', 1);
-		CPagerHelper::savePage('regex.list', $page_num);
-		$data['paging'] = CPagerHelper::paginate($page_num, $data['regexps'], $sort_order,
+		$data['page'] = $this->getInput('page', 1);
+		CPagerHelper::savePage('regex.list', $data['page']);
+		$data['paging'] = CPagerHelper::paginate($data['page'], $data['regexps'], $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
