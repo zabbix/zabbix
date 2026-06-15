@@ -100,10 +100,10 @@ $filter_column1 = (new CFormGrid())
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	])
-	->addItem([new CLabel(_('Name')),
+	->addItem([new CLabel(_('Name'), 'filter_name'),
 		(new CTextBox('filter_name', $data['filter']['filter_name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	])
-	->addItem([new CLabel(_('Key')),
+	->addItem([new CLabel(_('Key'), 'filter_key'),
 		(new CTextBox('filter_key', $data['filter']['filter_key']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	]);
 
