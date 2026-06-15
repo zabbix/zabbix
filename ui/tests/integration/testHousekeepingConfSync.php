@@ -135,8 +135,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 				'LogFileSize' => 20,
 				'Hostname' => self::PROXY_NAME,
 				'ProxyMode' => PROXY_OPERATING_MODE_ACTIVE,
-				'Server' => '127.0.0.1:'.
-					self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
+				'Server' => '127.0.0.1:'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX
 			]
 		];
 	}
