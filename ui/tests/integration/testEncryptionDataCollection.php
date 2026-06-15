@@ -476,6 +476,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'Hostname'             => 'enc_agent2',
 				'ServerActive'         => '127.0.0.1',
 				'DebugLevel'           => 4,
+				'RefreshActiveChecks'  => 1,
 				'TLSConnect'           => 'cert',
 				'TLSAccept'            => 'cert',
 				'TLSCAFile'            => $c['ca_crt'],
@@ -892,6 +893,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 			'tls_issuer' => 'CN=ZabbixTestCA',
 			'tls_subject'=> 'CN=zabbix_agent',
 		]);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		// Resolve cert paths from the last entry in self::$certDirs (set by configProviderSenderCert)
 		$dir       = end(self::$certDirs).'/';
