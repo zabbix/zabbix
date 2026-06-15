@@ -15,7 +15,7 @@ test case: multiple network interaces emulation
 in:
   key: 'net.if.get'
 out:
-  json: '{"config":[{"name":"lo","ifalias":"ifalias_test","mac":"08:00:27:6f:91:5f","type":"loopback","speed":1000,"duplex":"full","operational_state":"up","carrier":1},{"name":"eth1","type":"virtual"},{"name":"veth992d5b0","type":"virtual"},{"name":"docker0","type":"virtual"}],"values":[{"name":"lo","ifalias":"ifalias_test","mac":"08:00:27:6f:91:5f","carrier":1,"in":{"bytes":938127155,"packets":5510432,"errors":1,"dropped":2,"overruns":3,"frame":4,"compressed":5,"multicast":6},"out":{"bytes":938127155,"packets":5510432,"errors":7,"dropped":8,"overruns":9,"collisions":10,"carrier":11,"compressed":12}},{"name":"eth1","in":{"bytes":152319974560,"packets":161303225,"errors":0,"dropped":1,"overruns":0,"frame":0,"compressed":0,"multicast":838940},"out":{"bytes":10084803503,"packets":69799848,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}},{"name":"veth992d5b0","in":{"bytes":0,"packets":0,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":67805,"packets":765,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}},{"name":"docker0","in":{"bytes":12415150,"packets":226131,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":694372013,"packets":399033,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}}]}'
+  json: '{"config":[{"name":"lo","ifalias":"ifalias_test","mac":"08:00:27:6f:91:5f","type":"loopback","speed":1000,"duplex":"full","operational_state":"up","carrier":1},{"name":"eth1","ifalias":"eth1_test","mac":"12:14:10:12:31:16","type":"virtual","speed":1000,"duplex":"full","operational_state":"up","carrier":1},{"name":"veth992d5b0","type":"virtual"},{"name":"docker0","type":"virtual"}],"values":[{"name":"lo","ifalias":"ifalias_test","mac":"08:00:27:6f:91:5f","carrier":1,"in":{"bytes":938127155,"packets":5510432,"errors":1,"dropped":2,"overruns":3,"frame":4,"compressed":5,"multicast":6},"out":{"bytes":938127155,"packets":5510432,"errors":7,"dropped":8,"overruns":9,"collisions":10,"carrier":11,"compressed":12}},{"name":"eth1","ifalias":"eth1_test","mac":"12:14:10:12:31:16","carrier":1,"in":{"bytes":152319974560,"packets":161303225,"errors":0,"dropped":1,"overruns":0,"frame":0,"compressed":0,"multicast":838940},"out":{"bytes":10084803503,"packets":69799848,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}},{"name":"veth992d5b0","in":{"bytes":0,"packets":0,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":67805,"packets":765,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}},{"name":"docker0","in":{"bytes":12415150,"packets":226131,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":694372013,"packets":399033,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}}]}'
 files:
   /sys/class/net/lo/ifalias: |
     ifalias_test
@@ -37,6 +37,21 @@ files:
 
   /sys/class/net/lo/type: |
     772
+
+  /sys/class/net/eth1/ifalias: |
+    eth1_test
+  /sys/class/net/eth1/address: |
+    12:14:10:12:31:16
+  /sys/class/net/eth1/speed: |
+    1000
+  /sys/class/net/eth1/duplex: |
+    full
+  /sys/class/net/eth1/operstate: |
+    up
+  /sys/class/net/eth1/carrier: |
+    1
+  /sys/class/net/eth1/type: |
+    1
 
   /proc/net/dev: |
     Inter-|   Receive                                                |  Transmit
