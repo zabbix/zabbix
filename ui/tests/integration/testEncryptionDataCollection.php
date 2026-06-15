@@ -23,11 +23,20 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  *  1. Passive Zabbix agent data collection with certificate encryption
  *  2. Active + passive Zabbix Agent 2 with certificate encryption
  *  3. TLSCRLFile: empty CRL (connection succeeds); revoked cert CRL (connection rejected)
- *  4. TLSCipherCert / TLSCipherCert13 for certificate-based auth
- *  5. TLSCipherPSK / TLSCipherPSK13 for PSK-based auth
- *  6. TLSCipherAll / TLSCipherAll13 for all auth types
+ *  4. TLSCipherCert / TLSCipherCert13 for certificate-based auth (AES-128)
+ *  5. TLSCipherPSK / TLSCipherPSK13 for PSK-based auth (AES-128)
+ *  6. TLSCipherAll / TLSCipherAll13 for all auth types (AES-128)
  *  7. Zabbix sender with certificate encryption
  *  8. libgnutls certificate encryption (skipped when compiled with OpenSSL)
+ *  9. AES-256 cert ciphers – ECDHE-RSA-AES256-GCM-SHA384 / TLS_AES_256_GCM_SHA384
+ *       (preferred by newer OpenSSL 3.x defaults)
+ * 10. CHACHA20-POLY1305 PSK ciphers – hardware-independent modern cipher preference
+ * 11. AES-256 TLSCipherAll – cert + PSK with stronger ciphers
+ * 12. Cipher mismatch: non-overlapping server/agent lists → handshake rejected (negative)
+ * 13. libgnutls TLS 1.2 + TLS 1.3 combined priority for cert
+ *       (upgrade path from TLS 1.2-only; skipped when compiled with OpenSSL)
+ * 14. libgnutls PSK with AES-128 priority string (skipped when compiled with OpenSSL)
+ * 15. libgnutls AES-256 priority string for cert (skipped when compiled with OpenSSL)
  *
  * @onAfter clearData
  */
@@ -57,6 +66,30 @@ class testEncryptionDataCollection extends CIntegrationTest {
 		'NONE:+VERS-TLS1.2:+ECDHE-PSK:+PSK:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL';
 	const GNUTLS_CIPHER_ALL  =
 		'NONE:+VERS-TLS1.2:+ECDHE-RSA:+RSA:+ECDHE-PSK:+PSK:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL:+CTYPE-X.509';
+
+	// OpenSSL – AES-256 variants (preferred by newer OpenSSL 3.x defaults)
+	const CIPHER_CERT_TLS12_AES256 = 'ECDHE-RSA-AES256-GCM-SHA384:RSA+AES256';
+	const CIPHER_CERT_TLS13_AES256 = 'TLS_AES_256_GCM_SHA384';
+	const CIPHER_PSK_TLS12_CHACHA  = 'kECDHEPSK+CHACHA20:kPSK+CHACHA20:kECDHEPSK+AES256:kPSK+AES256';
+	const CIPHER_PSK_TLS13_CHACHA  = 'TLS_CHACHA20_POLY1305_SHA256:TLS_AES_256_GCM_SHA384';
+	const CIPHER_ALL_TLS12_AES256  = 'ECDHE-RSA-AES256-GCM-SHA384:RSA+AES256:kECDHEPSK+AES256:kPSK+AES256';
+	const CIPHER_ALL_TLS13_AES256  = 'TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256';
+
+	// OpenSSL – non-overlapping cipher sets; pairing server + agent produces a handshake failure
+	const CIPHER_MISMATCH_SERVER_TLS12 = 'ECDHE-RSA-AES256-GCM-SHA384';
+	const CIPHER_MISMATCH_SERVER_TLS13 = 'TLS_AES_256_GCM_SHA384';
+	const CIPHER_MISMATCH_AGENT_TLS12  = 'ECDHE-RSA-AES128-GCM-SHA256';
+	const CIPHER_MISMATCH_AGENT_TLS13  = 'TLS_AES_128_GCM_SHA256';
+
+	// GnuTLS – TLS 1.2 + TLS 1.3 combined priority (covers the upgrade path)
+	const GNUTLS_CIPHER_CERT_TLS12_TLS13 =
+		'NONE:+VERS-TLS1.2:+VERS-TLS1.3:+ECDHE-RSA:+RSA:+AES-256-GCM:+AES-128-GCM:+AEAD:+SHA384:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL:+CTYPE-X.509';
+	// GnuTLS – AES-256-only cert priority (newer-cipher preference of GnuTLS 3.7+)
+	const GNUTLS_CIPHER_CERT_AES256 =
+		'NONE:+VERS-TLS1.2:+ECDHE-RSA:+RSA:+AES-256-GCM:+AEAD:+SHA384:+SHA256:+CURVE-ALL:+COMP-NULL:+SIGN-ALL:+CTYPE-X.509';
+	// GnuTLS – PSK with AES-256
+	const GNUTLS_CIPHER_PSK_AES256 =
+		'NONE:+VERS-TLS1.2:+ECDHE-PSK:+PSK:+AES-256-GCM:+AEAD:+SHA384:+CURVE-ALL:+COMP-NULL:+SIGN-ALL';
 
 	// =========================================================================
 	// Setup / teardown
@@ -974,5 +1007,468 @@ class testEncryptionDataCollection extends CIntegrationTest {
 		]);
 		$this->assertNotEmpty($data2['result'],
 			'No Agent 2 data collected in libgnutls test');
+	}
+
+	// =========================================================================
+	// Test 9 – AES-256 cert ciphers (newer OpenSSL 3.x default preference)
+	// =========================================================================
+
+	/**
+	 * @return array
+	 */
+	public function configProviderCipherCertAES256(): array {
+		$c = self::generateCertificates();
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel'        => 4,
+				'UnreachablePeriod' => 5,
+				'UnavailableDelay'  => 5,
+				'UnreachableDelay'  => 1,
+				'TLSCAFile'         => $c['ca_crt'],
+				'TLSCertFile'       => $c['server_crt'],
+				'TLSKeyFile'        => $c['server_key'],
+				'TLSCipherCert'     => self::CIPHER_CERT_TLS12_AES256,
+				'TLSCipherCert13'   => self::CIPHER_CERT_TLS13_AES256,
+			],
+			self::COMPONENT_AGENT => [
+				'Hostname'             => 'enc_agent',
+				'ServerActive'         => '127.0.0.1',
+				'DebugLevel'           => 4,
+				'TLSConnect'           => 'cert',
+				'TLSAccept'            => 'cert',
+				'TLSCAFile'            => $c['ca_crt'],
+				'TLSCertFile'          => $c['agent_crt'],
+				'TLSKeyFile'           => $c['agent_key'],
+				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
+				'TLSServerCertSubject' => 'CN=zabbix_server',
+				'TLSCipherCert'        => self::CIPHER_CERT_TLS12_AES256,
+				'TLSCipherCert13'      => self::CIPHER_CERT_TLS13_AES256,
+			],
+		];
+	}
+
+	/**
+	 * Certificate auth succeeds with AES-256 cipher suites matching the stronger
+	 * defaults preferred by newer OpenSSL 3.x deployments.
+	 *
+	 * @required-components server, agent
+	 * @configurationDataProvider configProviderCipherCertAES256
+	 * @hosts enc_agent
+	 * @backup hosts
+	 */
+	public function testEncryption_cipherCertAES256(): void {
+		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
+			'enabling Zabbix agent checks on host "enc_agent": interface became available',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+		]);
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_tls_connect():SUCCEED (established TLS');
+
+		$data = $this->callUntilDataIsPresent('history.get', [
+			'itemids' => self::$itemids['enc_agent:agent.ping'],
+			'history' => ITEM_VALUE_TYPE_UINT64,
+		]);
+		$this->assertNotEmpty($data['result'],
+			'No data collected with AES-256 TLSCipherCert / TLSCipherCert13');
+	}
+
+	// =========================================================================
+	// Test 10 – CHACHA20-POLY1305 PSK (modern hardware-independent cipher)
+	// =========================================================================
+
+	/**
+	 * @return array
+	 */
+	public function configProviderCipherPSKChacha(): array {
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel'        => 4,
+				'UnreachablePeriod' => 5,
+				'UnavailableDelay'  => 5,
+				'UnreachableDelay'  => 1,
+				'TLSCipherPSK'      => self::CIPHER_PSK_TLS12_CHACHA,
+				'TLSCipherPSK13'    => self::CIPHER_PSK_TLS13_CHACHA,
+			],
+			self::COMPONENT_AGENT => [
+				'Hostname'       => 'enc_agent',
+				'ServerActive'   => '127.0.0.1',
+				'DebugLevel'     => 4,
+				'TLSConnect'     => 'psk',
+				'TLSAccept'      => 'psk',
+				'TLSPSKIdentity' => self::PSK_IDENTITY,
+				'TLSPSKFile'     => self::$pskFile,
+				'TLSCipherPSK'   => self::CIPHER_PSK_TLS12_CHACHA,
+				'TLSCipherPSK13' => self::CIPHER_PSK_TLS13_CHACHA,
+			],
+		];
+	}
+
+	/**
+	 * PSK auth succeeds with CHACHA20-POLY1305 ciphers preferred by newer TLS
+	 * stacks on platforms without hardware AES acceleration; AES-256 is included
+	 * as a fallback so the test is not platform-sensitive.
+	 *
+	 * @required-components server, agent
+	 * @configurationDataProvider configProviderCipherPSKChacha
+	 * @hosts enc_agent
+	 * @backup hosts
+	 */
+	public function testEncryption_cipherPSKChacha(): void {
+		$this->updateHostPSKTLS('enc_agent');
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
+			'enabling Zabbix agent checks on host "enc_agent": interface became available',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+		]);
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_tls_connect():SUCCEED (established TLS');
+
+		$data = $this->callUntilDataIsPresent('history.get', [
+			'itemids' => self::$itemids['enc_agent:agent.ping'],
+			'history' => ITEM_VALUE_TYPE_UINT64,
+		]);
+		$this->assertNotEmpty($data['result'],
+			'No data collected with CHACHA20-POLY1305 TLSCipherPSK / TLSCipherPSK13');
+	}
+
+	// =========================================================================
+	// Test 11 – AES-256 TLSCipherAll (cert + PSK combined, stronger ciphers)
+	// =========================================================================
+
+	/**
+	 * @return array
+	 */
+	public function configProviderCipherAllAES256(): array {
+		$c = self::generateCertificates();
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel'        => 4,
+				'UnreachablePeriod' => 5,
+				'UnavailableDelay'  => 5,
+				'UnreachableDelay'  => 1,
+				'TLSCAFile'         => $c['ca_crt'],
+				'TLSCertFile'       => $c['server_crt'],
+				'TLSKeyFile'        => $c['server_key'],
+				'TLSCipherAll'      => self::CIPHER_ALL_TLS12_AES256,
+				'TLSCipherAll13'    => self::CIPHER_ALL_TLS13_AES256,
+			],
+			self::COMPONENT_AGENT => [
+				'Hostname'             => 'enc_agent',
+				'ServerActive'         => '127.0.0.1',
+				'DebugLevel'           => 4,
+				'TLSConnect'           => 'cert',
+				'TLSAccept'            => 'cert',
+				'TLSCAFile'            => $c['ca_crt'],
+				'TLSCertFile'          => $c['agent_crt'],
+				'TLSKeyFile'           => $c['agent_key'],
+				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
+				'TLSServerCertSubject' => 'CN=zabbix_server',
+				'TLSCipherAll'         => self::CIPHER_ALL_TLS12_AES256,
+				'TLSCipherAll13'       => self::CIPHER_ALL_TLS13_AES256,
+			],
+		];
+	}
+
+	/**
+	 * TLSCipherAll / TLSCipherAll13 restricted to AES-256 suites; verifies
+	 * cert auth still succeeds when the cipher list is tightened after an upgrade.
+	 *
+	 * @required-components server, agent
+	 * @configurationDataProvider configProviderCipherAllAES256
+	 * @hosts enc_agent
+	 * @backup hosts
+	 */
+	public function testEncryption_cipherAllAES256(): void {
+		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
+			'enabling Zabbix agent checks on host "enc_agent": interface became available',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+		]);
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_tls_connect():SUCCEED (established TLS');
+
+		$data = $this->callUntilDataIsPresent('history.get', [
+			'itemids' => self::$itemids['enc_agent:agent.ping'],
+			'history' => ITEM_VALUE_TYPE_UINT64,
+		]);
+		$this->assertNotEmpty($data['result'],
+			'No data collected with AES-256 TLSCipherAll / TLSCipherAll13');
+	}
+
+	// =========================================================================
+	// Test 12 – Cipher mismatch: non-overlapping lists → handshake failure
+	// =========================================================================
+
+	/**
+	 * @return array
+	 */
+	public function configProviderCipherMismatch(): array {
+		$c = self::generateCertificates();
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel'        => 4,
+				'UnreachablePeriod' => 5,
+				'UnavailableDelay'  => 5,
+				'UnreachableDelay'  => 1,
+				'TLSCAFile'         => $c['ca_crt'],
+				'TLSCertFile'       => $c['server_crt'],
+				'TLSKeyFile'        => $c['server_key'],
+				'TLSCipherCert'     => self::CIPHER_MISMATCH_SERVER_TLS12,
+				'TLSCipherCert13'   => self::CIPHER_MISMATCH_SERVER_TLS13,
+			],
+			self::COMPONENT_AGENT => [
+				'Hostname'             => 'enc_agent',
+				'ServerActive'         => '127.0.0.1',
+				'DebugLevel'           => 4,
+				'TLSConnect'           => 'cert',
+				'TLSAccept'            => 'cert',
+				'TLSCAFile'            => $c['ca_crt'],
+				'TLSCertFile'          => $c['agent_crt'],
+				'TLSKeyFile'           => $c['agent_key'],
+				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
+				'TLSServerCertSubject' => 'CN=zabbix_server',
+				'TLSCipherCert'        => self::CIPHER_MISMATCH_AGENT_TLS12,
+				'TLSCipherCert13'      => self::CIPHER_MISMATCH_AGENT_TLS13,
+			],
+		];
+	}
+
+	/**
+	 * Server locked to AES-256 and agent locked to AES-128 cipher suites:
+	 * no cipher is shared across TLS 1.2 or TLS 1.3, so every handshake is
+	 * rejected and no data is collected.  Models a broken upgrade where the
+	 * server and agent cipher configurations are changed independently.
+	 *
+	 * @required-components server, agent
+	 * @configurationDataProvider configProviderCipherMismatch
+	 * @hosts enc_agent
+	 * @backup hosts
+	 */
+	public function testEncryption_cipherMismatch(): void {
+		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
+			'no shared cipher',
+			'no cipher can be selected',
+			'handshake failure',
+			'SSL_accept() failed',
+			'failed to accept an incoming connection',
+			'zbx_tls_accept(): handshake',
+		], true, 30);
+
+		$data = $this->call('history.get', [
+			'itemids' => self::$itemids['enc_agent:agent.ping'],
+			'history' => ITEM_VALUE_TYPE_UINT64,
+		]);
+		$this->assertEmpty($data['result'],
+			'Data was collected despite non-overlapping cipher lists on server and agent');
+	}
+
+	// =========================================================================
+	// Test 13 – libgnutls: TLS 1.2 + TLS 1.3 combined priority for cert
+	// =========================================================================
+
+	/**
+	 * @return array
+	 */
+	public function configProviderGnutlsCertTLS13(): array {
+		$c = self::generateCertificates();
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel'        => 4,
+				'UnreachablePeriod' => 5,
+				'UnavailableDelay'  => 5,
+				'UnreachableDelay'  => 1,
+				'TLSCAFile'         => $c['ca_crt'],
+				'TLSCertFile'       => $c['server_crt'],
+				'TLSKeyFile'        => $c['server_key'],
+				'TLSCipherCert'     => self::GNUTLS_CIPHER_CERT_TLS12_TLS13,
+				'TLSCipherAll'      => self::GNUTLS_CIPHER_CERT_TLS12_TLS13,
+			],
+			self::COMPONENT_AGENT => [
+				'Hostname'             => 'enc_agent',
+				'ServerActive'         => '127.0.0.1',
+				'DebugLevel'           => 4,
+				'TLSConnect'           => 'cert',
+				'TLSAccept'            => 'cert',
+				'TLSCAFile'            => $c['ca_crt'],
+				'TLSCertFile'          => $c['agent_crt'],
+				'TLSKeyFile'           => $c['agent_key'],
+				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
+				'TLSServerCertSubject' => 'CN=zabbix_server',
+				'TLSCipherCert'        => self::GNUTLS_CIPHER_CERT_TLS12_TLS13,
+				'TLSCipherAll'         => self::GNUTLS_CIPHER_CERT_TLS12_TLS13,
+			],
+		];
+	}
+
+	/**
+	 * GnuTLS priority string that enables both TLS 1.2 and TLS 1.3 with AES-256
+	 * and AES-128; covers the common upgrade path of adding TLS 1.3 support to a
+	 * TLS 1.2-only deployment without dropping existing cipher compatibility.
+	 * Automatically skipped when the server binary was compiled with OpenSSL.
+	 *
+	 * @required-components server, agent
+	 * @configurationDataProvider configProviderGnutlsCertTLS13
+	 * @hosts enc_agent
+	 * @backup hosts
+	 */
+	public function testEncryption_gnutlsCertTLS13(): void {
+		if ('gnutls' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS TLS 1.2+1.3 test.');
+		}
+
+		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
+			'enabling Zabbix agent checks on host "enc_agent": interface became available',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+		]);
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_tls_connect():SUCCEED (established TLS');
+
+		$data = $this->callUntilDataIsPresent('history.get', [
+			'itemids' => self::$itemids['enc_agent:agent.ping'],
+			'history' => ITEM_VALUE_TYPE_UINT64,
+		]);
+		$this->assertNotEmpty($data['result'],
+			'No data collected with GnuTLS TLS 1.2+1.3 combined priority string');
+	}
+
+	// =========================================================================
+	// Test 14 – libgnutls: PSK priority string (AES-128)
+	// =========================================================================
+
+	/**
+	 * @return array
+	 */
+	public function configProviderGnutlsPSK(): array {
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel'        => 4,
+				'UnreachablePeriod' => 5,
+				'UnavailableDelay'  => 5,
+				'UnreachableDelay'  => 1,
+				'TLSCipherPSK'      => self::GNUTLS_CIPHER_PSK,
+				'TLSCipherAll'      => self::GNUTLS_CIPHER_PSK,
+			],
+			self::COMPONENT_AGENT => [
+				'Hostname'       => 'enc_agent',
+				'ServerActive'   => '127.0.0.1',
+				'DebugLevel'     => 4,
+				'TLSConnect'     => 'psk',
+				'TLSAccept'      => 'psk',
+				'TLSPSKIdentity' => self::PSK_IDENTITY,
+				'TLSPSKFile'     => self::$pskFile,
+				'TLSCipherPSK'   => self::GNUTLS_CIPHER_PSK,
+				'TLSCipherAll'   => self::GNUTLS_CIPHER_PSK,
+			],
+		];
+	}
+
+	/**
+	 * PSK data collection using a GnuTLS priority string; complements test 8
+	 * which only covered certificate auth with GnuTLS priority strings.
+	 * Automatically skipped when the server binary was compiled with OpenSSL.
+	 *
+	 * @required-components server, agent
+	 * @configurationDataProvider configProviderGnutlsPSK
+	 * @hosts enc_agent
+	 * @backup hosts
+	 */
+	public function testEncryption_gnutlsPSK(): void {
+		if ('gnutls' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS PSK test.');
+		}
+
+		$this->updateHostPSKTLS('enc_agent');
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
+			'enabling Zabbix agent checks on host "enc_agent": interface became available',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+		]);
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_tls_connect():SUCCEED (established TLS');
+
+		$data = $this->callUntilDataIsPresent('history.get', [
+			'itemids' => self::$itemids['enc_agent:agent.ping'],
+			'history' => ITEM_VALUE_TYPE_UINT64,
+		]);
+		$this->assertNotEmpty($data['result'],
+			'No data collected with GnuTLS PSK AES-128 priority string');
+	}
+
+	// =========================================================================
+	// Test 15 – libgnutls: AES-256 priority string for cert (stronger cipher)
+	// =========================================================================
+
+	/**
+	 * @return array
+	 */
+	public function configProviderGnutlsCertAES256(): array {
+		$c = self::generateCertificates();
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel'        => 4,
+				'UnreachablePeriod' => 5,
+				'UnavailableDelay'  => 5,
+				'UnreachableDelay'  => 1,
+				'TLSCAFile'         => $c['ca_crt'],
+				'TLSCertFile'       => $c['server_crt'],
+				'TLSKeyFile'        => $c['server_key'],
+				'TLSCipherCert'     => self::GNUTLS_CIPHER_CERT_AES256,
+				'TLSCipherAll'      => self::GNUTLS_CIPHER_CERT_AES256,
+			],
+			self::COMPONENT_AGENT => [
+				'Hostname'             => 'enc_agent',
+				'ServerActive'         => '127.0.0.1',
+				'DebugLevel'           => 4,
+				'TLSConnect'           => 'cert',
+				'TLSAccept'            => 'cert',
+				'TLSCAFile'            => $c['ca_crt'],
+				'TLSCertFile'          => $c['agent_crt'],
+				'TLSKeyFile'           => $c['agent_key'],
+				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
+				'TLSServerCertSubject' => 'CN=zabbix_server',
+				'TLSCipherCert'        => self::GNUTLS_CIPHER_CERT_AES256,
+				'TLSCipherAll'         => self::GNUTLS_CIPHER_CERT_AES256,
+			],
+		];
+	}
+
+	/**
+	 * GnuTLS certificate auth restricted to AES-256-GCM only; models the
+	 * stronger-cipher preference of GnuTLS 3.7+ deployments where AES-128
+	 * suites have been administratively removed.
+	 * Automatically skipped when the server binary was compiled with OpenSSL.
+	 *
+	 * @required-components server, agent
+	 * @configurationDataProvider configProviderGnutlsCertAES256
+	 * @hosts enc_agent
+	 * @backup hosts
+	 */
+	public function testEncryption_gnutlsCertAES256(): void {
+		if ('gnutls' !== $this->detectTLSLibrary()) {
+			$this->markTestSkipped('Server not compiled with GnuTLS; skipping GnuTLS AES-256 test.');
+		}
+
+		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
+
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
+			'enabling Zabbix agent checks on host "enc_agent": interface became available',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+		]);
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_tls_connect():SUCCEED (established TLS');
+
+		$data = $this->callUntilDataIsPresent('history.get', [
+			'itemids' => self::$itemids['enc_agent:agent.ping'],
+			'history' => ITEM_VALUE_TYPE_UINT64,
+		]);
+		$this->assertNotEmpty($data['result'],
+			'No data collected with GnuTLS AES-256 priority string');
 	}
 }
