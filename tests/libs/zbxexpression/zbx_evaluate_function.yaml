@@ -1654,7 +1654,7 @@ out:
   return: SUCCEED
   value: 1.7976931348623158e+308
 ---
-test case: Evaluate timeleft(#2,-1) from DBL_MAX to 0, threshold -1 practically instantly reached
+test case: Evaluate timeleft(#2,-1) from DBL_MAX to 0, threshold -1 practically instantly reached, insufficient Inf handling, fixed in 7.5
 in:
   history:
   - itemid: 1
@@ -1671,7 +1671,7 @@ out:
   return: SUCCEED
   value: 1.7976931348623158e+308
 ---
-test case: Evaluate timeleft(#2,-1) from 0 to DBL_MAX, returning -1 due to NaN
+test case: Evaluate timeleft(#2,-1) from 0 to DBL_MAX, returning -1 due to NaN, fixed in 7.5
 in:
   history:
   - itemid: 1
@@ -1688,7 +1688,7 @@ out:
   return: SUCCEED
   value: -1
 ---
-test case: Evaluate timeleft(#2,9.003e307) regression fallback, val_now below threshold with positive slope
+test case: Evaluate timeleft(#2,9.003e307) regression fallback, val_now below threshold with positive slope, case is processed and fixed in 7.5
 in:
   history:
   - itemid: 1
@@ -1703,7 +1703,7 @@ in:
   params: '#2,9.003e307'
 out:
   return: SUCCEED
-  value: 60
+  value: -1
 ---
 test case: Evaluate timeleft(5m,65)
 in:
@@ -4878,7 +4878,7 @@ out:
   return: SUCCEED
   value: 272384191.768584
 ---
-test case: Evaluate timeleft(#3,1.7976931348623158e+308,"logarithmic") returning error due NaN
+test case: Evaluate timeleft(#3,1.7976931348623158e+308,"logarithmic") returning error due NaN, fixed in 7.5
 in:
   history:
   - itemid: 1
