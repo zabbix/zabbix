@@ -1,6 +1,6 @@
 ---
 # single interface
-test case: signle interface
+test case: single interface
 in:
   key: 'net.if.get'
 out:
@@ -11,7 +11,7 @@ files:
     face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
     lo: 938127155 5510432    0    0    0     0          0         0 938127155 5510432    0    0    0     0       0          0
 ---
-test case: multiple network interaces emulation
+test case: multiple network interfaces emulation
 in:
   key: 'net.if.get'
 out:
