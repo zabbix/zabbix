@@ -1,4 +1,14 @@
 ---
+# single interface
+test case: signle interface
+out:
+  json: '{"config":[{"name":"lo","type":"virtual"}],"values":[{"name":"lo","in":{"bytes":938127155,"packets":5510432,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":938127155,"packets":5510432,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}}]}'
+files:
+  /proc/net/dev: |
+    Inter-|   Receive                                                |  Transmit
+    face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo: 938127155 5510432    0    0    0     0          0         0 938127155 5510432    0    0    0     0       0          0
+---
 test case: multiple network interaces emulation
 out:
   json: '{"config":[{"name":"lo","ifalias":"ifalias_test","mac":"08:00:27:6f:91:5f","type":"loopback","speed":1000,"duplex":"full","operational_state":"up","carrier":1},{"name":"eth1","type":"virtual"},{"name":"veth992d5b0","type":"virtual"},{"name":"docker0","type":"virtual"}],"values":[{"name":"lo","ifalias":"ifalias_test","mac":"08:00:27:6f:91:5f","carrier":1,"in":{"bytes":938127155,"packets":5510432,"errors":1,"dropped":2,"overruns":3,"frame":4,"compressed":5,"multicast":6},"out":{"bytes":938127155,"packets":5510432,"errors":7,"dropped":8,"overruns":9,"collisions":10,"carrier":11,"compressed":12}},{"name":"eth1","in":{"bytes":152319974560,"packets":161303225,"errors":0,"dropped":1,"overruns":0,"frame":0,"compressed":0,"multicast":838940},"out":{"bytes":10084803503,"packets":69799848,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}},{"name":"veth992d5b0","in":{"bytes":0,"packets":0,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":67805,"packets":765,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}},{"name":"docker0","in":{"bytes":12415150,"packets":226131,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":694372013,"packets":399033,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}}]}'
@@ -67,16 +77,6 @@ files:
     eth1: 152319974560 161303225    0    1    0     0          0    838940 10084803503 69799848    0    0    0     0       0          0
     veth992d5b0:       0       0    0    0    0     0          0         0    67805     765    0    0    0     0       0          0
     docker0: 12415150  226131    0    0    0     0          0         0 694372013  399033    0    0    0     0       0          0
----
-# single interface
-test case: signle interface
-out:
-  json: '{"config":[{"name":"lo","type":"virtual"}],"values":[{"name":"lo","in":{"bytes":938127155,"packets":5510432,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":938127155,"packets":5510432,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}}]}'
-files:
-  /proc/net/dev: |
-    Inter-|   Receive                                                |  Transmit
-    face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
-    lo: 938127155 5510432    0    0    0     0          0         0 938127155 5510432    0    0    0     0       0          0
 ---
 # input file is missing delimiter - semicolon
 test case: invalid /proc/net/dev content
