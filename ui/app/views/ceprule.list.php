@@ -89,7 +89,8 @@ $table = (new CTableInfo())
 		_('Operations'),
 		_('Stop after this rule'),
 		make_sorting_header(_('Sort order'), 'sortorder', $data['sort'], $data['sortorder'], $url),
-		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url)
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
+		_('Info')
 	])
 	->setPageNavigation($data['paging']);
 
@@ -157,6 +158,18 @@ foreach ($data['ceprules'] as $ceprule) {
 		return new CCheckBox("cepruleids[$id]", $id);
 	};
 
+	$make_info_cell = function (array $ceprule): array {
+		$result = [];
+
+		foreach ($ceprule['information_object']['errors'] as $error_code) {
+			$result[] = makeErrorIcon(match ($error_code) {
+				8798724 => _('Macro value missconfiguration.')
+			});
+		}
+
+		return $result;
+	};
+
 	$table->addRow([
 		$make_row_checkbox($ceprule, $is_legacy),
 		$is_legacy
@@ -177,7 +190,8 @@ foreach ($data['ceprules'] as $ceprule) {
 		$operations,
 		$is_legacy ? '' : $make_stop_indicator($ceprule),
 		$is_legacy ? '' : $ceprule['sortorder'],
-		$make_status_toggle_button($ceprule, $is_legacy)
+		$make_status_toggle_button($ceprule, $is_legacy),
+		$make_info_cell($ceprule)
 	]);
 }
 

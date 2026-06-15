@@ -131,6 +131,12 @@ class CControllerCepRuleList extends CController {
 		}
 
 		return array_map(function(array $record) {
+
+			// TODO: temporary stub before API adds the property.
+			$record['information_object'] = [
+				'errors' => [8798724]
+			];
+
 			if (array_key_exists('filter', $record)) {
 				$record['filter'] += [
 					'conditions' => []
