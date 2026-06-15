@@ -474,7 +474,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 			],
 			self::COMPONENT_AGENT2 => [
 				'Hostname'             => 'enc_agent2',
-				'ServerActive'         => '127.0.0.1',
+				'ServerActive'         => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'DebugLevel'           => 4,
 				'RefreshActiveChecks'  => 1,
 				'TLSConnect'           => 'cert',
@@ -897,7 +897,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		// Resolve cert paths from the last entry in self::$certDirs (set by configProviderSenderCert)
-		$dir       = end(self::$certDirs).'/';
+		$dir       = end(self::$certDirs);
 		$ca_crt    = $dir.'ca.crt';
 		$agent_crt = $dir.'agent.crt';
 		$agent_key = $dir.'agent.key';
