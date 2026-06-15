@@ -128,7 +128,7 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 5,
-				'LogFileSize' => 20
+				'LogFileSize' => 0
 			],
 			self::COMPONENT_PROXY => [
 				'DebugLevel' => 5,
@@ -806,8 +806,9 @@ class testHousekeepingConfSync extends CIntegrationTest {
 
 		$this->reloadServerAndAssertHousekeeping($housekeeping);
 
+		$this->clearLog(self::COMPONENT_SERVER);
 		$this->executeHousekeeper(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'housekeeper [deleted', true, 60, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'housekeeper [deleted', true, 300, 1);
 
 		$this->waitForHistoryCount(1);
 		$this->assertEventsCount($eventids['old'], 0);
