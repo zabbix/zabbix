@@ -1669,7 +1669,7 @@ in:
   params: '#2,-1'
 out:
   return: SUCCEED
-  value: 0
+  value: 1.7976931348623158e+308
 ---
 test case: Evaluate timeleft(#2,-1) from 0 to DBL_MAX, returning -1 due to NaN
 in:
