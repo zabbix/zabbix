@@ -14,6 +14,7 @@
 
 #include "cep_db.h"
 #include "cep.h"
+#include "cep_api.h"
 #include "cep_task.h"
 #include "zbxcep.h"
 
@@ -883,12 +884,16 @@ static void	cep_db_update_event_tags(zbx_dbconn_t *db, const zbx_vector_cep_even
 	zbx_vector_uint64_t	eventids;
 	zbx_cep_event_t		**events;
 	int			events_num = 0;
+	zbx_cep_t		*cep;
 
 	zbx_vector_uint64_create(&eventids);
 	zbx_vector_uint64_reserve(&eventids, (size_t)htags->values_num);
 
 	events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * htags->values_num);
-	zbx_cep_get_events_by_handles(htags->values, htags->values_num, events);
+
+	cep_cache_acquire(&cep);
+	cep_get_events_by_handles(cep, htags->values, htags->values_num, events);
+	cep_cache_release(&cep);
 
 	for (int i = 0; i < htags->values_num; i++)
 	{
@@ -932,6 +937,7 @@ static void	cep_db_sync_event(zbx_dbconn_t *db, const zbx_vector_cep_event_sync_
 	size_t				sql_events_alloc = 0, sql_events_offset = 0, sql_problem_alloc = 0,
 					sql_problem_offset = 0;
 	zbx_vector_cep_event_handle_t	hevents;
+	zbx_cep_t			*cep;
 
 	zbx_vector_cep_event_handle_create(&hevents);
 	zbx_vector_cep_event_handle_reserve(&hevents, (size_t)sync->values_num);
@@ -939,7 +945,10 @@ static void	cep_db_sync_event(zbx_dbconn_t *db, const zbx_vector_cep_event_sync_
 		zbx_vector_cep_event_handle_append(&hevents, sync->values[i].hevent);
 
 	events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * sync->values_num);
-	zbx_cep_get_events_by_handles(hevents.values, hevents.values_num, events);
+
+	cep_cache_acquire(&cep);
+	cep_get_events_by_handles(cep, hevents.values, hevents.values_num, events);
+	cep_cache_release(&cep);
 
 	for (int i = 0; i < sync->values_num; i++)
 	{

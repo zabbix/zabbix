@@ -13,6 +13,7 @@
 **/
 
 #include "cep_event.h"
+#include "cep_api.h"
 #include "zbxcep.h"
 #include "zbxdbwrap.h"
 
@@ -231,7 +232,13 @@ zbx_cep_event_t *cep_event_context_acquire_event(zbx_cep_event_context_t *ctx)
 	if (NULL == ctx->event)
 	{
 		if (NULL != ctx->hevent)
-			zbx_cep_get_events_by_handles(&ctx->hevent, 1, &ctx->event);
+		{
+			zbx_cep_t	*cep;
+
+			cep_cache_acquire(&cep);
+			cep_get_events_by_handles(cep, &ctx->hevent, 1, &ctx->event);
+			cep_cache_release(&cep);
+		}
 	}
 
 	return ctx->event;

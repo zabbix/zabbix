@@ -256,8 +256,12 @@ void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 	{
 		zbx_cep_event_handle_t	h = (zbx_cep_event_handle_t)zbx_queue_ptr_peek(&window->hevents);
 		zbx_cep_event_t		*event;
+		zbx_cep_t		*cep;
 
-		zbx_cep_get_events_by_handles(&h, 1, &event);
+		cep_cache_acquire(&cep);
+		cep_get_events_by_handles(cep, &h, 1, &event);
+		cep_cache_release(&cep);
+
 		atomic_store(&window->nextcheck, (zbx_uint64_t)(event->clock + window->duration));
 		zbx_cep_event_release(event);
 	}
@@ -467,6 +471,7 @@ static void	cep_window_ref_dump(const char *prefix, const zbx_cep_window_ref_t *
 	{
 		zbx_vector_cep_event_handle_t	hevents;
 		zbx_cep_event_t			**events;
+		zbx_cep_t			*cep;
 
 		zbx_vector_cep_event_handle_create(&hevents);
 		zbx_vector_cep_event_handle_reserve(&hevents, (size_t)zbx_queue_ptr_values_num(&window->hevents));
@@ -478,7 +483,10 @@ static void	cep_window_ref_dump(const char *prefix, const zbx_cep_window_ref_t *
 			zbx_vector_cep_event_handle_append(&hevents, hevent);
 
 		events = (zbx_cep_event_t **)zbx_malloc(NULL, hevents.values_num);
-		zbx_cep_get_events_by_handles(hevents.values, hevents.values_num, events);
+
+		cep_cache_acquire(&cep);
+		cep_get_events_by_handles(cep, hevents.values, hevents.values_num, events);
+		cep_cache_release(&cep);
 
 		for (int i = 0; i < hevents.values_num; i++)
 		{
