@@ -288,6 +288,10 @@ abstract class CControllerCepRuleGeneral extends CController {
 			'severity' => ['db cep_operation.severity', 'required', 'when' => ['type', 'in' => [
 				CCepRuleHelper::OP_SET_SEVERITY
 			]]],
+			'suppress_until' => ['string',
+				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
+				'when' => ['type', 'in' => [CCepRuleHelper::OP_SUPPRESS]]
+			],
 			'sortorder' => ['db cep_operation.sortorder', 'required']
 		];
 	}

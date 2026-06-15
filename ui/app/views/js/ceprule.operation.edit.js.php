@@ -180,24 +180,32 @@ window.ceprule_operation_edit_popup = new class {
 		const name = window['ceprule-operation-name-argument'];
 		const tag = window['ceprule-operation-tag-argument'];
 		const severity = window['ceprule-operation-severity-argument'];
+		const period = window['ceprule-operation-period-argument'];
 		const tag_pair = window['ceprule-operation-tag-pair-argument'];
 		const tag_rename = window['ceprule-operation-tag-rename-argument'];
 
 		name.style.display = 'none';
 		tag.style.display = 'none';
 		severity.style.display = 'none';
+		period.style.display = 'none';
 		tag_pair.style.display = 'none';
 		tag_rename.style.display = 'none';
 
 		if ([
 			<?= CCepRuleHelper::OP_COPY_FIRST ?>,
 			<?= CCepRuleHelper::OP_COPY_LAST ?>,
-			<?= CCepRuleHelper::OP_SUPPRESS ?>,
 			<?= CCepRuleHelper::OP_DECREASE_SEVERITY ?>,
 			<?= CCepRuleHelper::OP_INCREASE_SEVERITY ?>,
 			<?= CCepRuleHelper::OP_DISCARD ?>,
 			<?= CCepRuleHelper::OP_CLOSE ?>
 		].includes(value)) {
+			return;
+		}
+
+		if ([
+			<?= CCepRuleHelper::OP_SUPPRESS ?>
+		].includes(value)) {
+			period.style.display = '';
 			return;
 		}
 

@@ -9553,6 +9553,9 @@ svg {
   float: left;
   line-height: 24px; }
 
+#ceprule-operation-period-argument {
+  display: inline; }
+
 #ceprule-operations-table .text,
 #ceprule-window-condition-table .text,
 #ceprule-filter-conditions .text {
