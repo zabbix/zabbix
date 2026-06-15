@@ -77,7 +77,7 @@ class testTriggerCEP extends CIntegrationTest {
 				'HistoryCacheSize' => '32M',
 				'HistoryIndexCacheSize' => '32M',
 				'ValueCacheSize' => '128M',
-				'LogSlowQueries' => 10
+				'LogSlowQueries' => 10000
 			]
 		];
 	}
