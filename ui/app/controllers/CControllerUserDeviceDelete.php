@@ -65,22 +65,22 @@ class CControllerUserDeviceDelete extends CController {
 
 		$devices = API::Device()->get($filter);
 
-		if (!$devices) {
-			return false;
-		}
-
-		$this->device = reset($devices);
-
-		if ($this->device['userid'] == CWebUser::$data['userid']
-				&& !$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
-			return false;
+		if ($devices) {
+			$this->device = reset($devices);
 		}
 
 		return true;
 	}
 
 	protected function doAction(): void {
-		$result = API::Device()->offboard(['uuid' => $this->device['uuid']]);
+		$result = false;
+
+		if ($this->device !== null) {
+			$result = API::Device()->offboard(['uuid' => $this->device['uuid']]);
+		}
+		else {
+			error(_('No permissions to referred object or it does not exist!'));
+		}
 
 		$output = $result
 			? ['success' => [
