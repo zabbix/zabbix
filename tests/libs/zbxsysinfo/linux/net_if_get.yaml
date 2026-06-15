@@ -1,0 +1,194 @@
+---
+# single interface
+test case: signle interface
+in:
+  key: 'net.if.get'
+out:
+  json: '{"config":[{"name":"lo","type":"virtual"}],"values":[{"name":"lo","in":{"bytes":938127155,"packets":5510432,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":938127155,"packets":5510432,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}}]}'
+files:
+  /proc/net/dev: |
+    Inter-|   Receive                                                |  Transmit
+    face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo: 938127155 5510432    0    0    0     0          0         0 938127155 5510432    0    0    0     0       0          0
+---
+test case: multiple network interaces emulation
+in:
+  key: 'net.if.get'
+out:
+  json: '{"config":[{"name":"lo","ifalias":"ifalias_test","mac":"08:00:27:6f:91:5f","type":"loopback","speed":1000,"duplex":"full","operational_state":"up","carrier":1},{"name":"eth1","ifalias":"eth1_test","mac":"12:14:10:12:31:16","type":"virtual","speed":1000,"duplex":"full","operational_state":"up","carrier":1},{"name":"veth992d5b0","type":"virtual"},{"name":"docker0","type":"virtual"}],"values":[{"name":"lo","ifalias":"ifalias_test","mac":"08:00:27:6f:91:5f","carrier":1,"in":{"bytes":938127155,"packets":5510432,"errors":1,"dropped":2,"overruns":3,"frame":4,"compressed":5,"multicast":6},"out":{"bytes":938127155,"packets":5510432,"errors":7,"dropped":8,"overruns":9,"collisions":10,"carrier":11,"compressed":12}},{"name":"eth1","ifalias":"eth1_test","mac":"12:14:10:12:31:16","carrier":1,"in":{"bytes":152319974560,"packets":161303225,"errors":0,"dropped":1,"overruns":0,"frame":0,"compressed":0,"multicast":838940},"out":{"bytes":10084803503,"packets":69799848,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}},{"name":"veth992d5b0","in":{"bytes":0,"packets":0,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":67805,"packets":765,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}},{"name":"docker0","in":{"bytes":12415150,"packets":226131,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":694372013,"packets":399033,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}}]}'
+files:
+  /sys/class/net/lo/ifalias: |
+    ifalias_test
+
+  /sys/class/net/lo/address: |
+    08:00:27:6f:91:5f
+
+  /sys/class/net/lo/speed: |
+    1000
+
+  /sys/class/net/lo/duplex: |
+    full
+
+  /sys/class/net/lo/operstate: |
+    up
+
+  /sys/class/net/lo/carrier: |
+    1
+
+  /sys/class/net/lo/type: |
+    772
+
+  /sys/class/net/eth1/ifalias: |
+    eth1_test
+  /sys/class/net/eth1/address: |
+    12:14:10:12:31:16
+  /sys/class/net/eth1/speed: |
+    1000
+  /sys/class/net/eth1/duplex: |
+    full
+  /sys/class/net/eth1/operstate: |
+    up
+  /sys/class/net/eth1/carrier: |
+    1
+  /sys/class/net/eth1/type: |
+    1
+
+  /proc/net/dev: |
+    Inter-|   Receive                                                |  Transmit
+    face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo: 938127155 5510432    1    2    3     4          5         6 938127155 5510432    7    8    9     10       11          12
+    eth1: 152319974560 161303225    0    1    0     0          0    838940 10084803503 69799848    0    0    0     0       0          0
+    veth992d5b0:       0       0    0    0    0     0          0         0    67805     765    0    0    0     0       0          0
+    docker0: 12415150  226131    0    0    0     0          0         0 694372013  399033    0    0    0     0       0          0
+---
+# Test interface filtering via item parameter (regex)
+test case: filter specific interface by regex ^lo
+in:
+  key: 'net.if.get[^lo]'
+out:
+  json: '{"config":[{"name":"lo","ifalias":"ifalias_test","mac":"08:00:27:6f:91:5f","type":"loopback","speed":2000,"duplex":"full","operational_state":"up","carrier":1}],"values":[{"name":"lo","ifalias":"ifalias_test","mac":"08:00:27:6f:91:5f","carrier":1,"in":{"bytes":938127155,"packets":5510432,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":938127155,"packets":5510432,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}}]}'
+files:
+  /sys/class/net/lo/ifalias: |
+    ifalias_test
+
+  /sys/class/net/lo/address: |
+    08:00:27:6f:91:5f
+
+  /sys/class/net/lo/speed: |
+    2000
+
+  /sys/class/net/lo/duplex: |
+    full
+
+  /sys/class/net/lo/operstate: |
+    up
+
+  /sys/class/net/lo/carrier: |
+    1
+
+  /sys/class/net/lo/type: |
+    772
+
+  /sys/class/net/eth1/ifalias: |
+    eth1_test
+  /sys/class/net/eth1/address: |
+    52:54:00:12:34:56
+  /sys/class/net/eth1/speed: |
+    1000
+  /sys/class/net/eth1/duplex: |
+    full
+  /sys/class/net/eth1/operstate: |
+    up
+  /sys/class/net/eth1/carrier: |
+    1
+  /sys/class/net/eth1/type: |
+    1
+
+  /proc/net/dev: |
+    Inter-|   Receive                                                |  Transmit
+    face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo: 938127155 5510432    0    0    0     0          0         0 938127155 5510432    0    0    0     0       0          0
+    eth1: 152319974560 161303225    0    1    0     0          0    838940 10084803503 69799848    0    0    0     0       0          0
+    veth992d5b0:       0       0    0    0    0     0          0         0    67805     765    0    0    0     0       0          0
+    docker0: 12415150  226131    0    0    0     0          0         0 694372013  399033    0    0    0     0       0          0
+---
+# input file is missing delimiter - semicolon
+test case: invalid /proc/net/dev content
+in:
+  key: 'net.if.get'
+out:
+  json: '{"config":[],"values":[]}'
+files:
+  /proc/net/dev: |
+    Inter-|   Receive                                                |  Transmit
+    face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo| 
+    eth1| 
+    veth992d5b0|       
+    docker0| 12415150  
+---
+# Mixed valid and invalid lines to ensure the parser doesn't break the read loop
+test case: mixed valid and invalid procfs lines
+in:
+  key: 'net.if.get'
+out:
+  json: '{"config":[{"name":"eth0","type":"virtual"},{"name":"eth1","type":"virtual"}],"values":[{"name":"eth0","in":{"bytes":100,"packets":10,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":200,"packets":20,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}},{"name":"eth1","in":{"bytes":300,"packets":30,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":400,"packets":40,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}}]}'
+files:
+  /proc/net/dev: |
+    Inter-|   Receive                                                |  Transmit
+     face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+      eth0:      100      10    0    0    0     0          0         0      200      20    0    0    0     0       0          0
+    broken_line_without_colon 0 0 0
+    eth_broken: text instead of numbers here
+      eth1:      300      30    0    0    0     0          0         0      400      40    0    0    0     0       0          0
+---
+# boundary conditions for interface name buffer
+test case: long interface name
+out:
+  json: '{"config":[{"name":"veth_very_long_name_123456789","type":"virtual"}],"values":[{"name":"veth_very_long_name_123456789","in":{"bytes":0,"packets":0,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":0,"packets":0,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}}]}'
+files:
+  /proc/net/dev: |
+    Inter-|   Receive                                                |  Transmit
+     face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    veth_very_long_name_123456789:       0       0    0    0    0     0          0         0       0       0    0    0    0     0       0          0
+---
+# extremely long interface name 256 chars
+test case: 256b interface name
+in:
+  key: 'net.if.get'
+out:
+  json: '{"config":[{"name":"veth_12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901","type":"virtual"}],"values":[{"name":"veth_12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901","in":{"bytes":0,"packets":0,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":0,"packets":0,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}}]}'
+files:
+  /proc/net/dev: |
+    Inter-|   Receive                                                |  Transmit
+     face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    veth_12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901:       0       0    0    0    0     0          0         0       0       0    0    0    0     0       0          0
+---
+test case: missing /proc/net/dev file
+in:
+  key: 'net.if.get'
+out:
+  error: 'cannot open /proc/net/dev: [2] No such file or directory'
+---
+#  sysfs files with corrupted, negative, and non-numeric data
+test case: invalid and garbage data in sysfs files
+in:
+  key: 'net.if.get'
+out:
+  json: '{"config":[{"name":"lo","type":"virtual"}],"values":[{"name":"lo","in":{"bytes":938127155,"packets":5510432,"errors":0,"dropped":0,"overruns":0,"frame":0,"compressed":0,"multicast":0},"out":{"bytes":938127155,"packets":5510432,"errors":0,"dropped":0,"overruns":0,"collisions":0,"carrier":0,"compressed":0}}]}'
+
+files:
+
+  /sys/class/net/lo/speed: |
+    -1
+
+  /sys/class/net/lo/carrier: |
+    not_a_number
+
+  /sys/class/net/lo/type: |
+    999999
+
+  /proc/net/dev: |
+    Inter-|   Receive                                                |  Transmit
+    face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo: 938127155 5510432    0    0    0     0          0         0 938127155 5510432    0    0    0     0       0          0
