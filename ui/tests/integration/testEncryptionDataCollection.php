@@ -508,8 +508,10 @@ class testEncryptionDataCollection extends CIntegrationTest {
 			'zbx_tls_connect() peer certificate issuer:"CN=ZabbixTestCA" subject:"CN=zabbix_agent2"');
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_tls_connect():SUCCEED (established TLS');
+		// Agent 2 is Go-based and does not emit C-style "zbx_tls_accept()" messages;
+		// it logs "connection established using <cipher>" on both accept and connect.
 		self::waitForLogLineToBePresent(self::COMPONENT_AGENT2,
-			'End of zbx_tls_accept():SUCCEED (established TLS');
+			'connection established using');
 
 		$passive = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent2:agent.ping'],
@@ -522,7 +524,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		// Active: agent2 → server
 		self::waitForLogLineToBePresent(self::COMPONENT_AGENT2,
-			'End of zbx_tls_connect():SUCCEED (established TLS');
+			'connection established using');
 
 		$active = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent2:agent.hostname'],
@@ -803,17 +805,23 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCipherAll'      => self::CIPHER_ALL_TLS12,
 				'TLSCipherAll13'    => self::CIPHER_ALL_TLS13,
 			],
+			// TLSCipherAll on agentd requires ctx_all (the combined cert+PSK SSL context), which is
+			// only created when both cert AND PSK are configured.  Without a PSK file the agent has
+			// no ctx_psk, ctx_all stays NULL, and zbx_tls_init_child() calls zbx_exit(EXIT_FAILURE).
+			// Add PSK alongside cert so that ctx_all is built and TLSCipherAll is actually applied.
 			self::COMPONENT_AGENT => [
 				'Hostname'             => 'enc_agent',
 				'ServerActive'         => '127.0.0.1',
 				'DebugLevel'           => 4,
 				'TLSConnect'           => 'cert',
-				'TLSAccept'            => 'cert',
+				'TLSAccept'            => 'cert,psk',
 				'TLSCAFile'            => $c['ca_crt'],
 				'TLSCertFile'          => $c['agent_crt'],
 				'TLSKeyFile'           => $c['agent_key'],
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
 				'TLSServerCertSubject' => 'CN=zabbix_server',
+				'TLSPSKIdentity'       => self::PSK_IDENTITY,
+				'TLSPSKFile'           => self::$pskFile,
 				'TLSCipherAll'         => self::CIPHER_ALL_TLS12,
 				'TLSCipherAll13'       => self::CIPHER_ALL_TLS13,
 			],
@@ -918,8 +926,16 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function configProviderLibgnutls(): array {
-		$c = self::generateCertificates();
-		return [
+		$c       = self::generateCertificates();
+		$isGnutls = ('gnutls' === $this->detectTLSLibrary());
+
+		// GnuTLS priority strings are only valid when the binaries are compiled against GnuTLS.
+		// Passing them to an OpenSSL build makes TLS initialisation fail: for the C agent the
+		// listener child exits after logging "started [listener #1]" (startup check still passes,
+		// but the interface never becomes available); for Agent 2 the whole process exits before
+		// writing its PID file, so waitForStartup() times out.  Only set the cipher strings when
+		// GnuTLS is actually in use; the test body will call markTestSkipped() on OpenSSL builds.
+		$config = [
 			self::COMPONENT_SERVER => [
 				'DebugLevel'        => 4,
 				'UnreachablePeriod' => 5,
@@ -928,8 +944,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCAFile'         => $c['ca_crt'],
 				'TLSCertFile'       => $c['server_crt'],
 				'TLSKeyFile'        => $c['server_key'],
-				'TLSCipherCert'     => self::GNUTLS_CIPHER_CERT,
-				'TLSCipherAll'      => self::GNUTLS_CIPHER_ALL,
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname'             => 'enc_agent',
@@ -942,8 +956,6 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSKeyFile'           => $c['agent_key'],
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
 				'TLSServerCertSubject' => 'CN=zabbix_server',
-				'TLSCipherCert'        => self::GNUTLS_CIPHER_CERT,
-				'TLSCipherAll'         => self::GNUTLS_CIPHER_ALL,
 			],
 			self::COMPONENT_AGENT2 => [
 				'Hostname'             => 'enc_agent2',
@@ -956,10 +968,19 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSKeyFile'           => $c['agent2_key'],
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
 				'TLSServerCertSubject' => 'CN=zabbix_server',
-				'TLSCipherCert'        => self::GNUTLS_CIPHER_CERT,
-				'TLSCipherAll'         => self::GNUTLS_CIPHER_ALL,
 			],
 		];
+
+		if ($isGnutls) {
+			$config[self::COMPONENT_SERVER]['TLSCipherCert'] = self::GNUTLS_CIPHER_CERT;
+			$config[self::COMPONENT_SERVER]['TLSCipherAll']  = self::GNUTLS_CIPHER_ALL;
+			$config[self::COMPONENT_AGENT]['TLSCipherCert']  = self::GNUTLS_CIPHER_CERT;
+			$config[self::COMPONENT_AGENT]['TLSCipherAll']   = self::GNUTLS_CIPHER_ALL;
+			$config[self::COMPONENT_AGENT2]['TLSCipherCert'] = self::GNUTLS_CIPHER_CERT;
+			$config[self::COMPONENT_AGENT2]['TLSCipherAll']  = self::GNUTLS_CIPHER_ALL;
+		}
+
+		return $config;
 	}
 
 	/**
@@ -1154,17 +1175,21 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCipherAll'      => self::CIPHER_ALL_TLS12_AES256,
 				'TLSCipherAll13'    => self::CIPHER_ALL_TLS13_AES256,
 			],
+			// Same ctx_all requirement as configProviderCipherAll: PSK must be present so that
+			// the combined cert+PSK SSL context is built and TLSCipherAll is actually applied.
 			self::COMPONENT_AGENT => [
 				'Hostname'             => 'enc_agent',
 				'ServerActive'         => '127.0.0.1',
 				'DebugLevel'           => 4,
 				'TLSConnect'           => 'cert',
-				'TLSAccept'            => 'cert',
+				'TLSAccept'            => 'cert,psk',
 				'TLSCAFile'            => $c['ca_crt'],
 				'TLSCertFile'          => $c['agent_crt'],
 				'TLSKeyFile'           => $c['agent_key'],
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
 				'TLSServerCertSubject' => 'CN=zabbix_server',
+				'TLSPSKIdentity'       => self::PSK_IDENTITY,
+				'TLSPSKFile'           => self::$pskFile,
 				'TLSCipherAll'         => self::CIPHER_ALL_TLS12_AES256,
 				'TLSCipherAll13'       => self::CIPHER_ALL_TLS13_AES256,
 			],
