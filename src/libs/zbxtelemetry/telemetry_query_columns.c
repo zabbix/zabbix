@@ -15,6 +15,8 @@
 #include "zbxtelemetry.h"
 #include "telemetry.h"
 
+/* TODO: sync with real schema */
+
 static const tq_column_info_t	column_info_apm_traces[] = {
 	{"Timestamp",		ZBX_TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
 	{"TraceId",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
@@ -25,9 +27,9 @@ static const tq_column_info_t	column_info_apm_traces[] = {
 	{"SpanKind",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
 	{"ServiceName",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
 	{"ResourceAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL			},
+	{"SpanAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL			},
 	{"ScopeName",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
 	{"ScopeVersion",	ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
-	{"SpanAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL			},
 	{"Duration",		ZBX_TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
 	{"StatusCode",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
 	{"StatusMessage",	ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
@@ -42,21 +44,22 @@ static const tq_column_info_t	column_info_apm_traces[] = {
 };
 
 static const tq_column_info_t	column_info_apm_logs[] = {
-	{"Timestamp",			ZBX_TQ_COLUMN_TYPE_NUM,		NULL,		NULL	},
-	{"TraceId",			ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
-	{"SpanId",			ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
-	{"TraceFlags",			ZBX_TQ_COLUMN_TYPE_NUM,		NULL,		NULL	},
-	{"SeverityText",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
-	{"SeverityNumber",		ZBX_TQ_COLUMN_TYPE_NUM,		NULL,		NULL	},
-	{"ServiceName",			ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
-	{"Body",			ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
-	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
-	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL	},
-	{"ScopeSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
-	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
-	{"ScopeVersion",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
-	{"ScopeAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL	},
-	{"LogAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL	},
+	{"Timestamp",		ZBX_TQ_COLUMN_TYPE_NUM,		NULL,		NULL	},
+	{"TraceId",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"SpanId",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"TraceFlags",		ZBX_TQ_COLUMN_TYPE_NUM,		NULL,		NULL	},
+	{"SeverityText",	ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"SeverityNumber",	ZBX_TQ_COLUMN_TYPE_NUM,		NULL,		NULL	},
+	{"ServiceName",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"Body",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"ResourceSchemaUrl",	ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"ResourceAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL	},
+	{"ScopeSchemaUrl",	ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"ScopeName",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"ScopeVersion",	ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
+	{"ScopeAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL	},
+	{"LogAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,	NULL,		NULL	},
+	{"EventName",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL	},
 	{0}
 };
 

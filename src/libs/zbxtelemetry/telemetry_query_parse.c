@@ -600,6 +600,8 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query,
 
 	if (NULL != macro_expand_cb)
 	{
+		/* TODO: decide where macro expansion is needed */
+
 		for (int i = 0; i < query->columns.values_num; i++)
 		{
 			if (SUCCEED != tq_expand_macros(&query->columns.values[i].key, macro_expand_cb,
@@ -752,7 +754,6 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 		{
 			double	x;
 
-			/* TODO: check if 0 and 100 (and other edge values) work on all dbs */
 			if (1 != aggr_col->args.values_num || NULL == aggr_col->args.values[0] ||
 					FAIL == zbx_is_double(aggr_col->args.values[0], &x) || x < 0.0 || x > 100.0)
 				return ret_errf(FAIL, error, max_error_len, "Invalid arguments for \"percentile\" "
