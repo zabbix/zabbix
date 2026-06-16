@@ -971,8 +971,7 @@ class CImportReferencer {
 	 *
 	 * @return string|null
 	 */
-	public function findGlobalRegexByName(string $name): ?string
-	{
+	public function findGlobalRegexByName(string $name): ?string {
 		if ($this->db_global_regexes === null) {
 			$this->selectGlobalRegexes();
 		}
@@ -2219,11 +2218,18 @@ class CImportReferencer {
 	/**
 	 * Select global regex IDs for previously added global regex names.
 	 */
-	protected function selectGlobalRegexes(): void
-	{
+	protected function selectGlobalRegexes(): void {
+		$this->db_global_regexes = [];
+
+		if (!$this->global_regexes) {
+			return;
+		}
+
 		$this->db_global_regexes = API::Regexp()->get([
 			'output' => ['regexpid', 'name'],
 			'preservekeys' => true
 		]);
+
+		$this->global_regexes = [];
 	}
 }

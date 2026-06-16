@@ -38,7 +38,10 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: () => uncheckTableRows('regexp')
+				callback: () => {
+					uncheckTableRows('regexp');
+					location.href = location.href;
+				}
 			});
 		}
 	};

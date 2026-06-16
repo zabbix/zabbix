@@ -2380,18 +2380,19 @@ class CConfigurationImport {
 	 * Import global regexes.
 	 */
 	protected function processGlobalRegexes(): void {
-		if ($this->options['global_regexes']['updateExisting']
-			|| $this->options['global_regexes']['createMissing']) {
-			$regexps = $this->getFormattedGlobalRegexes();
-
-			if ($regexps) {
-				$regexp_importer = new CGlobalRegexImporter($this->options, $this->referencer,
-					$this->importedObjectContainer
-				);
-
-				$regexp_importer->import($regexps);
-			}
+		if (!$this->options['global_regexes']['updateExisting'] && !$this->options['global_regexes']['createMissing']) {
+			return;
 		}
+
+		$regexps = $this->getFormattedGlobalRegexes();
+
+		if (!$regexps) {
+			return;
+		}
+
+		$regexp_importer = new CGlobalRegexImporter($this->options, $this->referencer, $this->importedObjectContainer);
+
+		$regexp_importer->import($regexps);
 	}
 
 	/**
@@ -3147,8 +3148,7 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getFormattedGlobalRegexes(): array
-	{
+	protected function getFormattedGlobalRegexes(): array {
 		if (!array_key_exists('global_regexes', $this->formattedData)) {
 			$this->formattedData['global_regexes'] = $this->adapter->getGlobalRegexes();
 		}

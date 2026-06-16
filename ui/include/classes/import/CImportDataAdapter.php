@@ -430,6 +430,11 @@ class CImportDataAdapter {
 		return $media_types;
 	}
 
+	/**
+	 * Get global regexes from the imported data.
+	 *
+	 * @return array
+	 */
 	public function getGlobalRegexes(): array {
 		$regexps = [];
 

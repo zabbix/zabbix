@@ -43,11 +43,6 @@ window.regex_edit_popup = new class {
 	/** @type {string|null} */
 	#regexpid;
 
-	/**
-	 * @type {HTMLElement}
-	 */
-	#test_results;
-
 	/** @type {Object} */
 	#clone_rules;
 
@@ -83,7 +78,7 @@ window.regex_edit_popup = new class {
 		);
 
 		table.querySelectorAll('textarea').forEach(node =>
-			node.addEventListener('change', e => this.#clearRowResult(e))
+			node.addEventListener('input', e => this.#clearRowResult(e))
 		);
 
 		document.getElementById('test-string').addEventListener('input', () => {
@@ -91,10 +86,10 @@ window.regex_edit_popup = new class {
 				.forEach(cell => {
 					cell.textContent = '';
 					cell.classList.remove(ZBX_STYLE_GREEN, ZBX_STYLE_RED);
-				})
+				});
 
 			this.#hideCombinedResult();
-		})
+		});
 
 		this.#hideCombinedResult();
 	}
@@ -105,7 +100,7 @@ window.regex_edit_popup = new class {
 		const fields = this.#form.getAllValues();
 		const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', document.getElementById('regexpid') !== null ? 'regex.update' : 'regex.create');
+		curl.setArgument('action', this.#regexpid !== null ? 'regex.update' : 'regex.create');
 
 		this.#form.validateSubmit(fields)
 			.then(result => {
@@ -149,10 +144,9 @@ window.regex_edit_popup = new class {
 		this.#overlay.unsetLoading();
 		this.#overlay.setProperties({title, buttons});
 
-		this.#footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
-
 		this.#overlay.recoverFocus();
 		this.#overlay.containFocus();
+        this.#initActions();
 		this.#form.reload(this.#clone_rules);
 	}
 
@@ -295,7 +289,7 @@ window.regex_edit_popup = new class {
 			.forEach(cell => {
 				cell.textContent = '';
 				cell.className = cell.className.replace(ZBX_STYLE_GREEN, '').replace(ZBX_STYLE_RED, '')
-			})
+			});
 
 		for (const index of Object.keys(expressions)) {
 			const result = response.expressions[index];
@@ -318,7 +312,7 @@ window.regex_edit_popup = new class {
 		span.textContent = result ? <?= json_encode(_('TRUE')) ?> : <?= json_encode(_('FALSE')) ?>;
 		span.className = '';
 
-		span.classList.add(result ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+		span.classList.add(result ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
 
 		span.closest('.form-field').previousElementSibling.style.display = '';
 		span.closest('.form-field').style.display = '';
@@ -360,7 +354,7 @@ window.regex_edit_popup = new class {
 	#clearRowResult(e) {
 		const cell = e.target.closest('tr').querySelector('.js-expression-result');
 
-		if(cell) {
+		if (cell) {
 			cell.textContent = '';
 			cell.classList.remove(ZBX_STYLE_GREEN, ZBX_STYLE_RED);
 		}

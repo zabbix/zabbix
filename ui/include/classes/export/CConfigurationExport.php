@@ -1638,8 +1638,6 @@ class CConfigurationExport {
 	 * Get global regexes for export builder from database.
 	 *
 	 * @param array $regexids
-	 *
-	 * return array
 	 */
 	protected function gatherGlobalRegexes(array $regexids): void {
 		$this->data['global_regexes'] = API::Regexp()->get([

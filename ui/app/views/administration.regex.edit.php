@@ -25,8 +25,11 @@ $form = (new CForm('post'))
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('regexp-form')
 	->setName('regexp_form')
-	->addItem(getMessages())
-	->addVar('regexpid', $data['regexp']['regexpid']);
+	->addItem(getMessages());
+
+if ($data['regexp']['regexpid'] != 0) {
+	$form->addVar('regexpid', $data['regexp']['regexpid']);
+}
 
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
@@ -60,10 +63,6 @@ foreach ($data['regexp']['expressions'] as $index => $expression) {
 $table->addRow((new CRow((new CCol(
 	(new CButton('add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)->removeId()
 ))->setColSpan(5)))->setId('expression-list-footer'));
-
-$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
-	->setArgument('action', 'regex.list')
-))->addClass('js-cancel');
 
 $form_grid = (new CFormGrid())
 	->addItem((new CLabel(_('Name'), 'name'))->setAsteriskMark())
@@ -104,7 +103,7 @@ $form_grid = (new CFormGrid())
 		)
 	)
 	->addItem([
-		new Clabel(_('Combined result')),
+		new CLabel(_('Combined result')),
 		new CFormField((new CSpan())->setId('test-result-combined'))
 	])
 	->addItem((new CTemplateTag('row-expression-template'))

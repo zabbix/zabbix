@@ -23,7 +23,7 @@ class CControllerRegExList extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'filter_name' =>		'string',
-			'filter_description'=>	'string',
+			'filter_description' =>	'string',
 			'filter_set' =>			'in 1',
 			'filter_rst' =>			'in 1',
 			'sort' => 				'in name',
@@ -41,7 +41,7 @@ class CControllerRegExList extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
@@ -85,7 +85,6 @@ class CControllerRegExList extends CController {
 				'name' => $filter['name'] !== '' ? $filter['name'] : null,
 				'description' => $filter['description'] !== '' ? $filter['description'] : null
 			],
-			'searchByAny' => false,
 			'sortfield' => $sort_field,
 			'sortorder' => $sort_order,
 			'limit' => $limit,

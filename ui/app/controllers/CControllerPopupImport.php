@@ -145,7 +145,7 @@ class CControllerPopupImport extends CController {
 
 			case 'regex':
 				$rules = [
-					'global_regexes' => ['updateExisting' => false, 'createMissing' => false]
+					'global_regexes' => ['updateExisting' => true, 'createMissing' => true]
 				];
 				break;
 		}

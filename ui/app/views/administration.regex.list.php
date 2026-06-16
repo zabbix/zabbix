@@ -44,7 +44,6 @@ $html_page = (new CHtmlPage())
 								dialogue_class: "modal-popup-generic"
 							});'
 						)
-						->setEnabled((bool) CMediatypeHelper::getSupportedMediaTypes())
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
@@ -70,7 +69,6 @@ $filter = (new CFilter())
 				new CFormField(
 					(new CTextBox('filter_description', $data['filter']['description']))
 						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-						->setAttribute('autofocus', 'autofocus')
 				)
 			])
 	]);
