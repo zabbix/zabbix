@@ -76,8 +76,7 @@ class CControllerPopup extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			/** @var CRouter $router */
-			$router = clone APP::Component()->get('router');
+			$router = clone CRouter::getInstance();
 
 			$this->action = $this->getInput('popup');
 			$router->setAction($this->action);

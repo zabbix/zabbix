@@ -195,7 +195,6 @@ class ZBase {
 				$this->initComponents();
 				$this->initModuleManager();
 
-				/** @var CRouter $router */
 				$router = CRouter::getInstance();
 				$router->addActions($this->module_manager->getActions());
 
