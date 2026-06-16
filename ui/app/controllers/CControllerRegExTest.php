@@ -71,8 +71,8 @@ class CControllerRegExTest extends CController {
 		]);
 
 		switch ($expression['expression_type']) {
-			case EXPRESSION_TYPE_TRUE:
-			case EXPRESSION_TYPE_FALSE:
+			case REGEX_TYPE_MATCHES_REGEX:
+			case REGEX_TYPE_NOT_MATCHES_REGEX:
 				if (!$validator->validate($expression['expression'])) {
 					throw new Exception($validator->getError());
 				}

@@ -34,8 +34,8 @@ class CControllerRegExUpdate extends CController {
 			'expressions' => ['objects', 'required', 'not_empty', 'uniq' => [['expression_type', 'expression']],
 				'fields' => [
 					'expression_type' => ['db expressions.expression_type', 'required',
-						'in' => [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED,
-							EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE
+						'in' => [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_STRING_IN_LIST, REGEX_TYPE_NOT_CONTAINS_STRING,
+							REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX
 						]
 					],
 					'expression' => [
@@ -43,14 +43,14 @@ class CControllerRegExUpdate extends CController {
 							'messageInvalid' => _('Regular expression must be a string'),
 							'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
 						]],
-							'when' => ['expression_type', 'in' => [EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE]]
+							'when' => ['expression_type', 'in' => [REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX]]
 						],
 						['db expressions.expression', 'required', 'not_empty', 'when' => ['expression_type', 'in' => [
-							EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED
+							REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_STRING_IN_LIST, REGEX_TYPE_NOT_CONTAINS_STRING
 						]]]
 					],
 					'exp_delimiter' => ['db expressions.exp_delimiter', 'in' => [',', '.', '/'], 'when' => [
-						'expression_type', 'in' => [EXPRESSION_TYPE_ANY_INCLUDED]
+						'expression_type', 'in' => [REGEX_TYPE_STRING_IN_LIST]
 					]],
 					'case_sensitive' => ['db expressions.case_sensitive', 'in' => [0, 1]]
 				],
@@ -90,7 +90,7 @@ class CControllerRegExUpdate extends CController {
 		$expressions = $this->getInput('expressions');
 
 		foreach ($expressions as &$expression) {
-			if ($expression['expression_type'] != EXPRESSION_TYPE_ANY_INCLUDED) {
+			if ($expression['expression_type'] != REGEX_TYPE_STRING_IN_LIST) {
 				$expression['exp_delimiter'] = '';
 			}
 		}

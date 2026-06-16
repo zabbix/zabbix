@@ -583,6 +583,14 @@ class C80ImportValidator extends CImportValidatorGeneral {
 		CXmlConstantValue::DASHED_LINE => CXmlConstantName::DASHED_LINE
 	];
 
+	protected array $REGEX_TYPES = [
+		CXmlConstantValue::REGEX_TYPE_CONTAINS_STRING => CXmlConstantName::REGEX_TYPE_CONTAINS_STRING,
+		CXmlConstantValue::REGEX_TYPE_STRING_IN_LIST => CXmlConstantName::REGEX_TYPE_STRING_IN_LIST,
+		CXmlConstantValue::REGEX_TYPE_NOT_CONTAINS_STRING => CXmlConstantName::REGEX_TYPE_NOT_CONTAINS_STRING,
+		CXmlConstantValue::REGEX_TYPE_MATCHES_REGEX => CXmlConstantName::REGEX_TYPE_MATCHES_REGEX,
+		CXmlConstantValue::REGEX_TYPE_NOT_MATCHES_REGEX => CXmlConstantName::REGEX_TYPE_NOT_MATCHES_REGEX
+	];
+
 	/**
 	 * Get validation rules schema.
 	 *
@@ -3429,13 +3437,9 @@ class C80ImportValidator extends CImportValidatorGeneral {
 					'description' =>				['type' => XML_STRING, 'default' => ''],
 					'expressions' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'expression', 'rules' => [
 						'expression' =>						['type' => XML_ARRAY, 'rules' => [
-							'type' =>						['type' => XML_STRING, 'in' => [CXmlConstantValue::GLOBAL_REGEX_TYPE_INCLUDED => CXmlConstantName::GLOBAL_REGEX_TYPE_INCLUDED, CXmlConstantValue::GLOBAL_REGEX_TYPE_ANY_INCLUDED => CXmlConstantName::GLOBAL_REGEX_TYPE_ANY_INCLUDED, CXmlConstantValue::GLOBAL_REGEX_TYPE_NOT_INCLUDED => CXmlConstantName::GLOBAL_REGEX_TYPE_NOT_INCLUDED, CXmlConstantValue::GLOBAL_REGEX_TYPE_TRUE => CXmlConstantName::GLOBAL_REGEX_TYPE_TRUE, CXmlConstantValue::GLOBAL_REGEX_TYPE_FALSE => CXmlConstantName::GLOBAL_REGEX_TYPE_FALSE]],
-							'expression' =>					['type' => XML_STRING, 'default' => ''],
-							'exp_delimiter' =>				['type' => XML_STRING, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::GLOBAL_REGEX_TYPE_ANY_INCLUDED => CXmlConstantName::GLOBAL_REGEX_TYPE_ANY_INCLUDED]], 'type' => XML_STRING, 'in' => '\\,,.,/'],
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::GLOBAL_REGEX_TYPE_INCLUDED => CXmlConstantName::GLOBAL_REGEX_TYPE_INCLUDED, CXmlConstantValue::GLOBAL_REGEX_TYPE_NOT_INCLUDED => CXmlConstantName::GLOBAL_REGEX_TYPE_NOT_INCLUDED, CXmlConstantValue::GLOBAL_REGEX_TYPE_TRUE => CXmlConstantName::GLOBAL_REGEX_TYPE_TRUE, CXmlConstantValue::GLOBAL_REGEX_TYPE_FALSE => CXmlConstantName::GLOBAL_REGEX_TYPE_FALSE]], 'type' => XML_STRING, 'default' => ''],
-								['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
+							'type' =>						['type' => XML_STRING | XML_REQUIRED, 'in' => $this->REGEX_TYPES, 'default' => '0'],
+							'expression' =>					['type' => XML_STRING | XML_REQUIRED, 'default' => ''],
+							'exp_delimiter' =>				['type' => XML_STRING],
 							'case_sensitive' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 						]]
 					]]

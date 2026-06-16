@@ -132,14 +132,14 @@ class CRegexp extends CApiService {
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('regexps', 'description')],
 			'test_string' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('regexps', 'test_string')],
 			'expressions' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['expression_type', 'expression']], 'fields' => [
-				'expression_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED, EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])],
+				'expression_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_STRING_IN_LIST, REGEX_TYPE_NOT_CONTAINS_STRING, REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX])],
 				'expression' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])], 'type' => API_REGEX, 'length' => DB::getFieldLength('expressions', 'expression')],
-											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('expressions', 'expression')]
+											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX])], 'type' => API_REGEX, 'length' => DB::getFieldLength('expressions', 'expression')],
+											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_STRING_IN_LIST, REGEX_TYPE_NOT_CONTAINS_STRING])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('expressions', 'expression')]
 				]],
 				'exp_delimiter' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_ANY_INCLUDED])], 'type' => API_STRING_UTF8, 'in' => '\\,,.,/'],
-											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED, EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])], 'type' => API_STRING_UTF8, 'in' => '']
+											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_STRING_IN_LIST])], 'type' => API_STRING_UTF8, 'in' => '\\,,.,/'],
+											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_NOT_CONTAINS_STRING, REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX])], 'type' => API_STRING_UTF8, 'in' => '']
 				]],
 				'case_sensitive' =>		['type' => API_INT32, 'in' => '0,1']
 			]]
@@ -239,7 +239,7 @@ class CRegexp extends CApiService {
 				/**
 				 * Unset exp_delimiter from array for audit log records.
 				 */
-				if ($expression['expression_type'] != EXPRESSION_TYPE_ANY_INCLUDED) {
+				if ($expression['expression_type'] != REGEX_TYPE_STRING_IN_LIST) {
 					unset($expression['exp_delimiter']);
 				}
 			}
@@ -328,14 +328,14 @@ class CRegexp extends CApiService {
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('regexps', 'description')],
 			'test_string' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('regexps', 'test_string')],
 			'expressions' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['expression_type', 'expression']], 'fields' => [
-				'expression_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED, EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])],
+				'expression_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_STRING_IN_LIST, REGEX_TYPE_NOT_CONTAINS_STRING, REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX])],
 				'expression' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])], 'type' => API_REGEX, 'length' => DB::getFieldLength('expressions', 'expression')],
-											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('expressions', 'expression')]
+											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX])], 'type' => API_REGEX, 'length' => DB::getFieldLength('expressions', 'expression')],
+											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_STRING_IN_LIST, REGEX_TYPE_NOT_CONTAINS_STRING])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('expressions', 'expression')]
 				]],
 				'exp_delimiter' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_ANY_INCLUDED])], 'type' => API_STRING_UTF8, 'in' => '\\,,.,/'],
-											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED, EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])], 'type' => API_STRING_UTF8, 'in' => '']
+											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_STRING_IN_LIST])], 'type' => API_STRING_UTF8, 'in' => '\\,,.,/'],
+											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_NOT_CONTAINS_STRING, REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX])], 'type' => API_STRING_UTF8, 'in' => '']
 				]],
 				'case_sensitive' =>		['type' => API_INT32, 'in' => '0,1']
 			]]

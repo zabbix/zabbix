@@ -323,7 +323,7 @@ window.regex_edit_popup = new class {
 			const row = target.closest('tr');
 			const delimiter = target.closest('tr').querySelector('.js-expression-delimiter-select');
 
-			if (target.value == <?= EXPRESSION_TYPE_ANY_INCLUDED ?>) {
+			if (target.value == <?= REGEX_TYPE_STRING_IN_LIST ?>) {
 				delimiter.disabled = false;
 				delimiter.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 			}

@@ -44,7 +44,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 				'expressions' => [
 					[
 						'expression' => 'test 🙂🙃 ZaBbiX зАБбИкс āēīõšŗ \n <br/>',
-						'expression_type' => EXPRESSION_TYPE_INCLUDED
+						'expression_type' => REGEX_TYPE_CONTAINS_STRING
 					]
 				]
 			],
@@ -53,12 +53,12 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 				'expressions' => [
 					[
 						'expression' => 'test',
-						'expression_type' => EXPRESSION_TYPE_ANY_INCLUDED,
+						'expression_type' => REGEX_TYPE_STRING_IN_LIST,
 						'case_sensitive' => 1
 					],
 					[
 						'expression' => 'test',
-						'expression_type' => EXPRESSION_TYPE_NOT_INCLUDED,
+						'expression_type' => REGEX_TYPE_NOT_CONTAINS_STRING,
 						'case_sensitive' => 0
 					]
 				]
@@ -68,15 +68,15 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 				'expressions' => [
 					[
 						'expression' => 'test',
-						'expression_type' => EXPRESSION_TYPE_INCLUDED
+						'expression_type' => REGEX_TYPE_CONTAINS_STRING
 					],
 					[
 						'expression' => 'test',
-						'expression_type' => EXPRESSION_TYPE_TRUE
+						'expression_type' => REGEX_TYPE_MATCHES_REGEX
 					],
 					[
 						'expression' => 'test',
-						'expression_type' => EXPRESSION_TYPE_FALSE
+						'expression_type' => REGEX_TYPE_NOT_MATCHES_REGEX
 					]
 				]
 			],
@@ -85,7 +85,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 				'expressions' => [
 					[
 						'expression' => 'test',
-						'expression_type' => EXPRESSION_TYPE_INCLUDED
+						'expression_type' => REGEX_TYPE_CONTAINS_STRING
 					]
 				]
 			]
