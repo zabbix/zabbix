@@ -357,3 +357,17 @@ int	cep_queue_pending_commits_num(zbx_cep_queue_t *queue)
 {
 	return queue->pending_commits_num;
 }
+
+int	cep_queue_is_empty(zbx_cep_queue_t *queue)
+{
+	if (0 != queue->base.pending_num || 0 != queue->base.processing_num)
+		return FAIL;
+
+	if (0 != queue->group_tasks_num)
+		return FAIL;
+
+	if (0 != zbx_queue_ptr_values_num(&queue->base.completed))
+		return FAIL;
+
+	return SUCCEED;
+}

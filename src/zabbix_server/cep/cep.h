@@ -40,7 +40,7 @@ zbx_cep_t	*cep_create(void);
 void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool);
 void	cep_destroy(zbx_cep_t *cep);
 
-void	cep_sync_runtime_state(zbx_cep_t *cep, zbx_dbconn_t *db);
+void	cep_sync_object_state(zbx_cep_t *cep, zbx_dbconn_t *db);
 
 void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_query_t *queries,
 		unsigned char *results);

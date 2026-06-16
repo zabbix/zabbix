@@ -30,6 +30,7 @@ void	cep_queue_push_batch(zbx_cep_queue_t *queue, zbx_vector_mw_task_ptr_t *task
 void	cep_queue_push_completed(zbx_cep_queue_t *queue, zbx_mw_task_t *task);
 
 int	cep_queue_pending_commits_num(zbx_cep_queue_t *queue);
+int	cep_queue_is_empty(zbx_cep_queue_t *queue);
 
 #endif
 

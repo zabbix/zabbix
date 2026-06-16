@@ -262,7 +262,7 @@ static void	cep_manager_sync_object_state(zbx_dbconn_pool_t *dbpool, zbx_ipc_cli
 	db = zbx_dbconn_pool_acquire_connection(dbpool);
 
 	cep_cache_acquire(&cep);
-	cep_sync_runtime_state(cep, db);
+	cep_sync_object_state(cep, db);
 	cep_cache_release(&cep);
 
 	zbx_dbconn_pool_release_connection(dbpool, db);
@@ -547,7 +547,16 @@ void	*zbx_cep_manager_thread(void *args)
 
 		/* only stop cep when history syncers no longer require it */
 		if ((!ZBX_IS_RUNNING() || 1 == shutdown) && 0 == zbx_hc_refcount_peek())
-			break;
+		{
+			int	is_empty;
+
+			zbx_mw_queue_lock(manager->base.queue);
+			is_empty = cep_queue_is_empty((zbx_cep_queue_t *)manager->base.queue);
+			zbx_mw_queue_unlock(manager->base.queue);
+
+			if (SUCCEED == is_empty)
+				break;
+		}
 
 		zbx_mw_queue_lock(manager->base.queue);
 		(void)zbx_mw_queue_drain_completed(manager->base.queue, &tasks);
