@@ -454,36 +454,43 @@ int	cep_origin_problem(const zbx_cep_origin_t *origin)
  ******************************************************************************/
 static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 {
-	zbx_cep_event_t	*event = NULL;
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
+#define CEP_PROBLEM_BATCH	5000
 
-	result = zbx_dbconn_select(db, "select p.eventid,p.clock,p.severity,t.tag,t.value,p.ns,p.source,p.object,"
-			"p.objectid,p.name"
-		" from problem p"
-		" left join problem_tag t"
-			" on p.eventid=t.eventid"
-		" where r_eventid is null"
-			" and (p.source=%d or p.source=%d)"
-		" order by p.eventid",
-		EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL);
+	zbx_cep_event_t		*event = NULL;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	zbx_vector_uint64_t	eventids;
+	zbx_uint64_t		eventid = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset;
 
-	while (NULL != (row = zbx_db_fetch(result)))
+	zbx_vector_uint64_create(&eventids);
+
+	do
 	{
-		zbx_uint64_t	eventid;
+		zbx_cep_origin_t	origin;
 
-		ZBX_STR2UINT64(eventid, row[0]);
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select p.eventid,p.clock,p.severity,p.ns,p.source,p.object,p.objectid,p.name"
+				" from problem p"
+				" where eventid>" ZBX_FS_UI64
+					" and r_eventid is null"
+					" and (p.source=%d or p.source=%d)"
+				" order by p.eventid",
+				eventid, EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL);
 
-		if (NULL == event || eventid != event->eventid)
+		result = zbx_dbconn_select_n(db, sql, CEP_PROBLEM_BATCH);
+
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			zbx_cep_origin_t	origin;
+			ZBX_STR2UINT64(eventid, row[0]);
+			ZBX_STR2UCHAR(origin.source, row[4]);
+			ZBX_STR2UCHAR(origin.object, row[5]);
+			ZBX_STR2UINT64(origin.objectid, row[6]);
 
-			ZBX_STR2UCHAR(origin.source, row[6]);
-			ZBX_STR2UCHAR(origin.object, row[7]);
-			ZBX_STR2UINT64(origin.objectid, row[8]);
-
-			event = cep_event_create(eventid, origin.source, origin.object, origin.objectid, row[9],
-					atoi(row[1]), atoi(row[5]), TRIGGER_VALUE_PROBLEM, atoi(row[2]), NULL, NULL);
+			event = cep_event_create(eventid, origin.source, origin.object, origin.objectid, row[7],
+					atoi(row[1]), atoi(row[3]), TRIGGER_VALUE_PROBLEM, atoi(row[2]), NULL, NULL);
 
 			zbx_cep_object_t	*obj;
 			zbx_cep_event_handle_t	h;
@@ -493,19 +500,49 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 			obj = cep_get_object_or_create(cep, &event->origin);
 			h = cep_create_event_handle(cep, event);
 			zbx_vector_cep_event_handle_append(&obj->events, zbx_cep_event_handle_addref(h));
-		}
 
-		if (FAIL == zbx_db_is_null(row[3]))
+			zbx_vector_uint64_append(&eventids, eventid);
+		}
+		zbx_db_free_result(result);
+	}
+	while (0 != eventids.values_num && 0 == (eventids.values_num % CEP_PROBLEM_BATCH));
+
+	if (0 != eventids.values_num)
+	{
+		zbx_db_large_query_t	query;
+
+		event = NULL;
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select eventid,tag,value from problem_tag where");
+		zbx_dbconn_large_query_prepare_uint(&query, db, &sql, &sql_alloc, &sql_offset, "eventid", &eventids);
+
+		while (NULL != (row = zbx_db_large_query_fetch(&query)))
 		{
 			zbx_tag_t	tag;
 
-			tag.tag = zbx_strdup(NULL, row[3]);
-			tag.value = zbx_strdup(NULL, row[4]);
+			ZBX_STR2UINT64(eventid, row[0]);
+
+			if (NULL == event || event->eventid != eventid)
+			{
+				zbx_cep_event_handle_t	h = cep_get_event(cep, eventid);
+
+				if (NULL == h)
+					continue;
+
+				event = h->event;
+			}
+
+			tag.tag = zbx_strdup(NULL, row[1]);
+			tag.value = zbx_strdup(NULL, row[2]);
 			zbx_vector_tag_append(&event->tags, tag);
 		}
+		zbx_db_large_query_clear(&query);
 	}
 
-	zbx_db_free_result(result);
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&eventids);
+
+#undef CEP_PROBLEM_BATCH
 }
 
 /******************************************************************************
