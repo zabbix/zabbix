@@ -176,7 +176,7 @@ void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_h
 
 	cep_window_pool_acquire(&pool);
 	window = cep_window_pool_get_or_create_window(pool, rule, ctx);
-	cep_window_pool_acquire(&pool);
+	cep_window_pool_release(&pool);
 
 	cep_window_lock(window);
 

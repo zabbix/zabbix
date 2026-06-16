@@ -444,6 +444,9 @@ void	cep_event_add_to_rules(zbx_cep_event_handle_t hevent, zbx_cep_event_context
 	{
 		const zbx_cep_rule_t	*rule = matched_rules[i];
 
+		if (NULL == rule->window)
+			continue;
+
 		switch (rule->window->type)
 		{
 			case ZBX_CEP_WINDOW_SIMPLE:
