@@ -167,7 +167,8 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=regex.list');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
-		$this->query('button:Clone')->waitUntilClickable()->one()->click();
+		$this->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
+		$this->page->waitUntilReady();
 		$this->query('id:name')->one()->fill($this->regexp.'_clone');
 		$this->zbxTestClickXpathWait('//button[contains(@class,"js-submit")]');
 		$this->assertMessage(TEST_GOOD, 'Regular expression added');

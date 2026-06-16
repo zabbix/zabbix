@@ -1,9 +1,26 @@
 Changes for 8.0.0beta2
 
 New features:
+.........T [ZBXNEXT-10211] updated alarms discovery in vmware template (abakaldin)
+...G...... [ZBXNEXT-7704] added AllowKeyRegexp/DenyKeyRegexp keys for Zabbix agents to use regular expressions for pattern matching (vsmelovs)
+..F....... [ZBXNEXT-10495] implemented inline form validation for Media type test form (msnihach)
+A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
+A.F.....S. [ZBXNEXT-10347] added ClickHouse history backend; improved server startup by enabling history bulk fetch with per-item limits for ClickHouse, Elasticsearch, MySQL, and PostgreSQL; optimized Elasticsearch by removing scroll context and reusing connections; fixed potential hang when using multi-handle in Elasticsearch (gcalenko, Sasha, vso, wczerneha, wiper)
+A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
+.......PS. [ZBXNEXT-10611] added real host name for native vmware.*.alarms.get item keys (MVekslers)
 A.F.....S. [ZBXNEXT-1150] implemented storage and display of maintenance-related event suppressions and unsuppressions (aetatsu, Ivo)
 
 Bug fixes:
+..F....... [ZBX-26048] fixed long error titles visibility on the Frontend in modal window (isharha)
+..F....... [ZBX-26788] fixed duplicate announcement of month and year in the datepicker by assistive technologies (aluchko)
+..F....... [ZBX-25461] fixed contrast problems with severity icons in high contrast themes (kastafjevs)
+..F....... [ZBX-24054] fixed template cloning with extended amount of mappings (gklavins)
+..F....... [ZBX-27698] fixed the Clock widget 'Server time' displaying the same time as the browser local time (aluchko)
+..F....... [ZBX-27103] fixed incorrect label color contrast in the Item value widget in the dark theme (aluchko)
+.........T [ZBX-27777] fixed dashboard widgets decimals for Azure SQL Managed Instance by HTTP template (kbruvers)
+..F....... [ZBX-27809] fixed QR code generation by using integer pixel alignment to eliminate module distortion (gberzina)
+..F....... [ZBX-27510] fixed Geomap widget not resizing the map on container resize (averza)
+.......PS. [ZBX-27832] fixed changelog not being flushed (vso)
 ........S. [ZBX-22504] improved memory usage in lld worker proecesses with large low level discovery (vso)
 A......... [ZBX-27780] restored support of LLD macros in LLD rule override operations 'Update interval', 'History' and 'Trends' (dpankins)
 ........S. [ZBX-27736] fixed no_data trigger flickering into unknown state for unsupported items (arimdjonoks)
@@ -346,6 +363,38 @@ Bug fixes:
 .......PS. [ZBX-25752] reduced memory allocations in preprocessing manager (wiper)
 A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
 .......PS. [ZBX-27638] prohibited to modify or override global system JavaScript objects via user script for preprocessing subsystem and zabbix_js (MVekslers)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.12rc1
+
+New features:
+.........T [ZBXNEXT-10211] updated alarms discovery in vmware template (abakaldin)
+.......PS. [ZBXNEXT-10611] added real host name for native vmware.*.alarms.get item keys (MVekslers)
+A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
+A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
+
+Bug fixes:
+..F....... [ZBX-27732] fixed auto refresh to continue running in monitoring latest data view (uolekss)
+..F....... [ZBX-26048] fixed long error titles visibility on the Frontend in modal window (isharha)
+..F....... [ZBX-26788] fixed duplicate announcement of month and year in the datepicker by assistive technologies (aluchko)
+..F....... [ZBX-25461] fixed contrast problems with severity icons in high contrast themes (kastafjevs)
+..F....... [ZBX-24054] fixed template cloning with extended amount of mappings (gklavins)
+..F....... [ZBX-27698] fixed the Clock widget 'Server time' displaying the same time as the browser local time (aluchko)
+..F....... [ZBX-27103] fixed incorrect label color contrast in the Item value widget in the dark theme (aluchko)
+.........T [ZBX-27777] fixed dashboard widgets decimals for Azure SQL Managed Instance by HTTP template (kbruvers)
+..F....... [ZBX-27809] fixed QR code generation by using integer pixel alignment to eliminate module distortion (gberzina)
+..F....... [ZBX-27510] fixed Geomap widget not resizing the map on container resize (averza)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.11
+
+7.4.11rc2 was released as 7.4.11 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.4.11rc2
+
+Bug fixes:
+.......PS. [ZBX-27832] fixed changelog not being flushed (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.11rc1
@@ -1788,6 +1837,31 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.28rc1
+
+New features:
+.........T [ZBXNEXT-10211] updated alarms discovery in vmware template (abakaldin)
+.......PS. [ZBXNEXT-10611] added real host name for native vmware.*.alarms.get item keys (MVekslers)
+A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
+A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
+
+Bug fixes:
+..F....... [ZBX-27732] fixed auto refresh to continue running in monitoring latest data view (uolekss)
+..F....... [ZBX-26048] fixed long error titles visibility on the Frontend in modal window (isharha)
+..F....... [ZBX-25461] fixed contrast problems with severity icons in high contrast themes (kastafjevs)
+..F....... [ZBX-26788] fixed duplicate announcement of month and year in the datepicker by assistive technologies (aluchko)
+.........T [ZBX-27777] fixed dashboard widgets decimals for Azure SQL Managed Instance by HTTP template (kbruvers)
+..F....... [ZBX-27698] fixed the Clock widget 'Server time' displaying the same time as the browser local time (aluchko)
+..F....... [ZBX-24054] fixed template cloning with extended amount of mappings (gklavins)
+..F....... [ZBX-27809] fixed QR code generation by using integer pixel alignment to eliminate module distortion (gberzina)
+..F....... [ZBX-27510] fixed Geomap widget not resizing the map on container resize (averza)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.27
+
+7.0.27rc1 was released as 7.0.27 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.27rc1
@@ -5879,6 +5953,8 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.47rc1
 
 New features:
+A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
+A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
 
 Bug fixes:
 ........S. [ZBX-22504] improved memory usage in lld worker proecesses with large low level discovery (vso)
