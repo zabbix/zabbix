@@ -334,17 +334,21 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 	->addClass('js-templates')
 	->show();
 
+$helper_icon_texts = [
+	_('Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.')
+];
+
+if ($data['show_full_hint']) {
+	$helper_icon_texts = array_merge($helper_icon_texts, [
+		BR(), BR(),
+		_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (with "any error" being the last of them).')
+	]);
+}
+
 $formgrid = (new CFormGrid())
 	->setId('item_preproc_list')
 	->addItem([
-		new CLabel([
-			_('Preprocessing steps'),
-			makeHelpIcon([
-				_('Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.'),
-				BR(), BR(),
-				_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (with "any error" being the last of them).')
-			])
-		]),
+		new CLabel([_('Preprocessing steps'), makeHelpIcon($helper_icon_texts)]),
 		new CFormField(
 			(new CList())
 				->setId('preprocessing')
