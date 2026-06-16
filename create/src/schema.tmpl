@@ -1134,6 +1134,8 @@ FIELD		|new_severity	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|suppress_until	|t_time		|'0'	|NOT NULL	|0
 FIELD		|taskid		|t_id		|	|NULL		|0			|-|task
 FIELD		|maintenanceid	|t_id		|	|NULL		|0			|-|maintenances
+FIELD		|details	|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|cep_ruleid	|t_id		|	|NULL		|0			|-|cep_rule
 INDEX		|1		|userid
 INDEX		|2		|eventid
 INDEX		|3		|clock
@@ -2313,6 +2315,7 @@ FIELD		|formula	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|stop		|t_integer	|'1'	|NOT NULL	|0
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|error		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 CHANGELOG	|23
 
 TABLE|cep_condition|cep_conditionid|ZBX_DATA
