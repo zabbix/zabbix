@@ -370,7 +370,7 @@ window.drule_edit_popup = new class {
 		table.querySelectorAll('.js-remove').forEach(element => element.disabled = false);
 		table.querySelectorAll('.btn-icon').forEach(element => element.remove());
 
-		const title = <?= json_encode(_('New media type')) ?>;
+		const title = <?= json_encode(_('New discovery rule')) ?>;
 		const buttons = [
 			{
 				title: <?= json_encode(_('Add')) ?>,
@@ -386,11 +386,13 @@ window.drule_edit_popup = new class {
 			}
 		];
 
+		this.overlay.$dialogue.$footer[0].querySelector('.js-submit')
+			.addEventListener('click', () => this.#submit());
+
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();
 		this.overlay.recoverFocus();
 		this.overlay.containFocus();
-		this.form.reload(this.clone_rules);
 	}
 
 	#delete() {

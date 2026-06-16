@@ -33,7 +33,13 @@ class CControllerDiscoveryUpdate extends CController {
 			'proxyid' => ['db drules.proxyid', 'required',
 				'when' => ['discovery_by', 'in' => [ZBX_DISCOVERY_BY_PROXY]]
 			],
-			'iprange' => ['db drules.iprange', 'required', 'not_empty'],
+			'iprange' => ['db drules.iprange', 'required', 'not_empty',
+				'use' => [CIPRangeParser::class, [
+					'v6' => ZBX_HAVE_IPV6,
+					'dns' => false,
+					'max_ipv4_cidr' => 30
+				]]
+			],
 			'delay' => ['db drules.delay', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, [
 					'min' => 1,
@@ -55,21 +61,47 @@ class CControllerDiscoveryUpdate extends CController {
 				'objects', 'required', 'not_empty',
 				'uniq' => [['type', 'ports', 'key_']],
 				'fields' => [
-					'dcheckid' =>              ['string'],
-					'type' =>                  ['db dchecks.type', 'required'],
-					'ports' =>                 ['db dchecks.ports'],
-					'key_' =>                  ['db dchecks.key_'],
-					'snmp_community' =>        ['db dchecks.snmp_community'],
-					'snmpv3_securityname' =>   ['db dchecks.snmpv3_securityname'],
-					'snmpv3_securitylevel' =>  ['db dchecks.snmpv3_securitylevel'],
+					'dcheckid' => ['string'],
+					'type' => ['db dchecks.type', 'required'],
+					'ports' => ['db dchecks.ports',
+						'use' => [CPortRangeParser::class, []]
+					],
+					'key_' => [
+						['db dchecks.key_', 'required', 'not_empty',
+							'use' => [CItemKey::class, []],
+							'when' => ['type', 'in' => [SVC_AGENT]]
+						],
+						['db dchecks.key_', 'required', 'not_empty',
+							'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
+						],
+						['db dchecks.key_']
+					],
+					'snmp_community' => ['db dchecks.snmp_community', 'required', 'not_empty',
+						'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c]]
+					],
+					'snmpv3_securityname' => ['db dchecks.snmpv3_securityname'],
+					'snmpv3_securitylevel' => ['db dchecks.snmpv3_securitylevel'],
 					'snmpv3_authpassphrase' => ['db dchecks.snmpv3_authpassphrase'],
 					'snmpv3_privpassphrase' => ['db dchecks.snmpv3_privpassphrase'],
-					'snmpv3_authprotocol' =>   ['db dchecks.snmpv3_authprotocol'],
-					'snmpv3_privprotocol' =>   ['db dchecks.snmpv3_privprotocol'],
+					'snmpv3_authprotocol' => ['db dchecks.snmpv3_authprotocol',
+						'in' => array_keys(getSnmpV3AuthProtocols()),
+						'when' => ['snmpv3_securitylevel', 'in' => [
+							ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,
+							ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+						]]
+					],
+					'snmpv3_privprotocol' => ['db dchecks.snmpv3_privprotocol',
+						'in' => array_keys(getSnmpV3PrivProtocols()),
+						'when' => ['snmpv3_securitylevel', 'in' => [
+							ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+						]]
+					],
 					'snmpv3_contextname' =>    ['db dchecks.snmpv3_contextname'],
-					'allow_redirect' =>        ['db dchecks.allow_redirect'],
-					'host_source' =>           ['db dchecks.host_source'],
-					'name_source' =>           ['db dchecks.name_source']
+					'allow_redirect' => ['db dchecks.allow_redirect', 'in' => [0, 1],
+						'when' => ['type', 'in' => [SVC_ICMPPING]]
+					],
+					'host_source' => ['db dchecks.host_source'],
+					'name_source' => ['db dchecks.name_source']
 				],
 				'messages' => [
 					'uniq' => _('An identical discovery check already exists for this rule.')

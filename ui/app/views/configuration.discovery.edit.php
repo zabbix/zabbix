@@ -232,6 +232,7 @@ $form
 		(new CScriptTag('
 			drule_edit_popup.init('.json_encode([
 				'rules' => $data['js_validation_rules'],
+				'clone_rules' => $data['js_clone_validation_rules'],
 				'druleid' => $data['drule']['druleid'],
 				'dchecks' => array_values($data['drule']['dchecks']),
 				'drule' => $data['drule']
