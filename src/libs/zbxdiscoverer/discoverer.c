@@ -547,13 +547,6 @@ static void	process_results_del_druleids_update(zbx_hashset_t *incomplete_checks
 			continue;
 		}
 
-		if (0 == del_druleids->values_num)
-		{
-			zbx_vector_uint64_append(del_druleids, dcc->druleid);
-			n++;
-			continue;
-		}
-
 		if (FAIL == zbx_vector_uint64_bsearch(del_druleids, dcc->druleid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		{
 			i = zbx_vector_uint64_nearestindex(del_druleids, dcc->druleid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
