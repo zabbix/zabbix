@@ -904,7 +904,7 @@ static int	cep_check_trigger_deps(zbx_vector_uint64_t *depids)
 
 	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_CHECK_TRIGGER_DEPS, data, data_len))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot send delete events message to CEP service");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send check trigger dependencies message to CEP service");
 		zbx_exit(EXIT_FAILURE);
 	}
 
@@ -978,13 +978,13 @@ int	zbx_cep_get_stats(zbx_cep_stats_t *stats, char **error)
 		return ret;
 	}
 
-	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_GET_STATS, NULL, 0))
+	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_CEP_GET_STATS, NULL, 0))
 	{
-		*error = zbx_strdup(NULL, "cannot send delete events message to CEP service");
+		*error = zbx_strdup(NULL, "cannot send get stats message to CEP service");
 		goto out;
 	}
 
-	if (FAIL == zbx_ipc_socket_read(cep_client_socket(), &response))
+	if (FAIL == zbx_ipc_socket_read(&socket, &response))
 	{
 		*error = zbx_strdup(NULL, "cannot send delete events message to CEP service");
 		goto out;
@@ -997,6 +997,50 @@ int	zbx_cep_get_stats(zbx_cep_stats_t *stats, char **error)
 	ptr += zbx_deserialize_value(ptr, &stats->task_remote_num);
 	ptr += zbx_deserialize_value(ptr, &stats->task_internal_num);
 	(void)zbx_deserialize_value(ptr, &stats->task_completed_num);
+
+	zbx_ipc_message_clean(&response);
+
+	ret = SUCCEED;
+out:
+	zbx_ipc_socket_close(&socket);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: send sync object state request to CEP service and await response  *
+ *                                                                            *
+ * Parameters: error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED on success, FAIL otherwise                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cep_sync_object_state(char **error)
+{
+	zbx_ipc_socket_t	socket;
+	char			*errmsg = NULL;
+	int			ret = FAIL;
+	zbx_ipc_message_t	response = {0};
+
+	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_CEP, SEC_PER_MIN, &errmsg))
+	{
+		*error = zbx_dsprintf(NULL, "cannot connect to CEP service: %s", errmsg);
+		zbx_free(errmsg);
+		return ret;
+	}
+
+	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_CEP_SYNC_OBJECT_STATE, NULL, 0))
+	{
+		*error = zbx_strdup(NULL, "cannot send sync object state message to CEP service");
+		goto out;
+	}
+
+	if (FAIL == zbx_ipc_socket_read(&socket, &response))
+	{
+		*error = zbx_strdup(NULL, "cannot send delete events message to CEP service");
+		goto out;
+	}
 
 	zbx_ipc_message_clean(&response);
 

@@ -16,6 +16,7 @@
 
 #include "../db_lengths_constants.h"
 
+#include "zbx_cep_client.h"
 #include "zbx_trigger_constants.h"
 #include "zbxcommon.h"
 #include "zbxtypes.h"
@@ -527,6 +528,11 @@ int	zbx_check_postinit_tasks(char **error)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	int		type, ret = SUCCEED;
+
+	/* after startup item/trigger state in rtdata tables needs to be synced with open internal problems */
+	/* to clean up possible desyncs made by abnormal server shutdown                                    */
+	if (SUCCEED != zbx_cep_sync_object_state(error))
+		return FAIL;
 
 	/* avoid filling value cache with unnecessary data during event name update */
 	zbx_vc_disable();

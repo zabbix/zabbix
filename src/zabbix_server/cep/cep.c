@@ -546,6 +546,133 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: update runtime state to problem for internal CEP objects that     *
+ *          have an open problem but are marked as ok in the database         *
+ *                                                                            *
+ * Parameters: cep       - [IN] CEP data                                      *
+ *             object    - [IN] object type (item, LLD rule, or trigger)      *
+ *             ok        - [IN] ok state value for the object type            *
+ *             problem   - [IN] problem state value for the object type       *
+ *             objectids - [IN] object IDs to check                           *
+ *             table     - [IN] runtime data table name                       *
+ *             field     - [IN] object ID field name in the table             *
+ *             db        - [IN] database connection                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_sync_object_state(zbx_cep_t *cep, unsigned char object, unsigned char ok, unsigned char problem,
+		zbx_vector_uint64_t *objectids, const char *table, const char *field, zbx_dbconn_t *db)
+{
+	zbx_db_row_t		row;
+	char			*sql_query = NULL, *sql = NULL;
+	size_t			sql_query_alloc = 0, sql_query_offset = 0, sql_alloc = 0, sql_offset = 0;
+	zbx_db_large_query_t	query;
+	zbx_cep_origin_t	origin = {.source = EVENT_SOURCE_INTERNAL, .object = object};
+
+	zbx_vector_uint64_sort(objectids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(objectids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_snprintf_alloc(&sql_query, &sql_query_alloc, &sql_query_offset,
+			"select %s from %s where state=%u and", field, table, ok);
+
+	zbx_dbconn_large_query_prepare_uint(&query, db, &sql_query, &sql_query_alloc, &sql_query_offset, field,
+			objectids);
+
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
+	{
+		zbx_cep_object_t	*obj;
+		char			*error_esc;
+
+		ZBX_STR2UINT64(origin.objectid, row[0]);
+
+		if (NULL == (obj = (zbx_cep_object_t *)zbx_hashset_search(&cep->objects, &origin)) ||
+				0 == obj->events.values_num)
+		{
+			error_esc = zbx_strdup(NULL, "Unknown error.");
+		}
+		else
+			error_esc = zbx_dbconn_dyn_escape_string(db, obj->events.values[0]->event->name);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update %s set state=%u,error='%s' where %s=" ZBX_FS_UI64 ";\n",
+				table, problem, error_esc, field, origin.objectid);
+
+		zbx_dbconn_execute_overflowed_sql(db, &sql, &sql_alloc, &sql_offset, NULL);
+		zbx_free(error_esc);
+	}
+	zbx_db_large_query_clear(&query);
+
+	zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset);
+
+	zbx_free(sql_query);
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sync item and trigger runtime state with open internal problems   *
+ *          to correct desyncs caused by abnormal server shutdown             *
+ *                                                                            *
+ * Parameters: cep - [IN/OUT] CEP data                                        *
+ *             db  - [IN] database connection                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_sync_runtime_state(zbx_cep_t *cep, zbx_dbconn_t *db)
+{
+	zbx_vector_uint64_t	itemids;
+	zbx_vector_uint64_t	lldruleids;
+	zbx_vector_uint64_t	triggerids;
+	zbx_hashset_iter_t	iter;
+	zbx_cep_object_t	*obj;
+
+	zbx_vector_uint64_create(&itemids);
+	zbx_vector_uint64_create(&lldruleids);
+	zbx_vector_uint64_create(&triggerids);
+
+	zbx_hashset_iter_reset(&cep->objects, &iter);
+	while (NULL != (obj = (zbx_cep_object_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (EVENT_SOURCE_INTERNAL != obj->origin.source)
+			continue;
+
+		switch (obj->origin.object)
+		{
+			case EVENT_OBJECT_ITEM:
+				zbx_vector_uint64_append(&itemids, obj->origin.objectid);
+				break;
+			case EVENT_OBJECT_LLDRULE:
+				zbx_vector_uint64_append(&lldruleids, obj->origin.objectid);
+				break;
+			case EVENT_OBJECT_TRIGGER:
+				zbx_vector_uint64_append(&triggerids, obj->origin.objectid);
+				break;
+		}
+	}
+
+	if (0 != itemids.values_num)
+	{
+		cep_sync_object_state(cep, EVENT_OBJECT_ITEM, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED, &itemids,
+				"item_rtdata", "itemid", db);
+	}
+
+	if (0 != lldruleids.values_num)
+	{
+		cep_sync_object_state(cep, EVENT_OBJECT_LLDRULE, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED,
+				&lldruleids, "item_rtdata", "itemid", db);
+	}
+
+	if (0 != triggerids.values_num)
+	{
+		cep_sync_object_state(cep, EVENT_OBJECT_TRIGGER, TRIGGER_STATE_NORMAL, TRIGGER_STATE_UNKNOWN,
+				&triggerids, "trigger_rtdata", "triggerid", db);
+	}
+
+	zbx_vector_uint64_destroy(&triggerids);
+	zbx_vector_uint64_destroy(&lldruleids);
+	zbx_vector_uint64_destroy(&itemids);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: initialize cache                                                  *
  *                                                                            *
  * Parameters: cep   - [IN/OUT] cep cache                                     *

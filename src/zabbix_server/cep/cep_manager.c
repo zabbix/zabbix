@@ -24,6 +24,7 @@
 #include "zbx_cep.h"
 
 #include "zbxcommon.h"
+#include "zbxdb.h"
 #include "zbxipcservice.h"
 #include "zbxmw.h"
 #include "zbxsupervisor_client.h"
@@ -243,6 +244,30 @@ static void	cep_manager_get_stats(zbx_cep_manager_t *manager, zbx_ipc_client_t *
 	response = (unsigned char*)zbx_malloc(NULL, reponse_len);
 
 	cep_manager_add_remote_task(manager, client, message, response, reponse_len);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sync CEP object runtime state and notify the requesting client    *
+ *                                                                            *
+ * Parameters: dbpool  - [IN] database connection pool                        *
+ *             client  - [IN] requesting IPC client to notify on completion   *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_manager_sync_object_state(zbx_dbconn_pool_t *dbpool, zbx_ipc_client_t **client)
+{
+	zbx_cep_t	*cep;
+	zbx_dbconn_t	*db;
+
+	db = zbx_dbconn_pool_acquire_connection(dbpool);
+
+	cep_cache_acquire(&cep);
+	cep_sync_runtime_state(cep, db);
+	cep_cache_release(&cep);
+
+	zbx_dbconn_pool_release_connection(dbpool, db);
+
+	zbx_ipc_client_send(*client, ZBX_CEP_SYNC_OBJECT_STATE, NULL, 0);
 }
 
 /******************************************************************************
@@ -504,6 +529,9 @@ void	*zbx_cep_manager_thread(void *args)
 				case ZBX_CEP_ADD_EVENT_TAGS:
 				case ZBX_CEP_DELETE_EVENTS:
 					cep_manager_add_remote_task(manager, &client, &message, NULL, 0);
+					break;
+				case ZBX_CEP_SYNC_OBJECT_STATE:
+				cep_manager_sync_object_state(unit_args->shared->dbpool, &client);
 					break;
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
