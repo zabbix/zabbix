@@ -146,7 +146,7 @@ window.regex_edit_popup = new class {
 
 		this.#overlay.recoverFocus();
 		this.#overlay.containFocus();
-        this.#initActions();
+		this.#initActions();
 		this.#form.reload(this.#clone_rules);
 	}
 
