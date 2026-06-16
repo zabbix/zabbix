@@ -168,8 +168,13 @@ int	cep_operation_match_event(const zbx_cep_operation_t *op, zbx_cep_event_conte
 {
 	int	ret = FAIL;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
+
 	if (0 == op->tags.values_num)
-		return SUCCEED;
+	{
+		ret = SUCCEED;
+		goto out;
+	}
 
 	switch (op->evaltype)
 	{
@@ -183,6 +188,8 @@ int	cep_operation_match_event(const zbx_cep_operation_t *op, zbx_cep_event_conte
 			THIS_SHOULD_NEVER_HAPPEN_MSG("invalid CEP operation evaltype %d", op->evaltype);
 			break;
 	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }

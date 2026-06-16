@@ -321,6 +321,8 @@ out:
 static void	cep_operation_event_execute(const zbx_cep_operation_t *op, int execute_when, zbx_uint64_t ruleid,
 		zbx_cep_event_context_t *ctx, zbx_cep_event_t **event)
 {
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64 " type:%d", __func__, op->operationid, op->type);
+
 	if (SUCCEED != cep_operation_match_event(op, ctx))
 		return;
 
@@ -383,12 +385,15 @@ static void	cep_operation_event_execute(const zbx_cep_operation_t *op, int execu
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported operation type %d", op->type);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 void	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_cep_event_context_t *ctx,
 		zbx_cep_event_t **event)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64 " operations:%d", __func__, rule->ruleid,
+			rule->operations.values_num);
 
 	for (int i = 0; i < rule->operations.values_num; i++)
 	{
