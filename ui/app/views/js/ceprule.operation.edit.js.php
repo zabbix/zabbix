@@ -71,12 +71,28 @@ window.ceprule_operation_edit_popup = new class {
 	}
 
 	#addTagRow(tag) {
-		tag.row_index = this.form_element.querySelectorAll('#ceprule-operation-tags-table tbody tr').length;
+		const row_index = this.form_element.querySelectorAll('#ceprule-operation-tags-table tbody tr').length;
 
 		this.form_element.querySelector('#ceprule-operation-tags-table tbody')
-			.insertAdjacentElement('beforeend', this.#tag_template.evaluateToElement(tag));
+			.insertAdjacentElement('beforeend', this.#buildTagRow(tag, row_index));
 		this.form_element.querySelector('#ceprule-operation-tags-table tbody')
 			.insertAdjacentHTML('beforeend', `<tr><td class="<?= ZBX_STYLE_ERROR_CONTAINER ?>"></td></tr>`);
+	}
+
+	#buildTagRow(tag, row_index) {
+		const tag_row = this.#tag_template.evaluateToElement({...tag, row_index});
+		const textbox = tag_row.querySelector(`[name="tags[${row_index}][value]"]`);
+		const on_operator_change = value => {
+			const hidden = [<?= TAG_OPERATOR_EXISTS ?>, <?= TAG_OPERATOR_NOT_EXISTS ?>].includes(value);
+
+			textbox.style.display = hidden ? 'none' : '';
+			textbox.style.disabled = hidden;
+		};
+
+		tag_row.querySelector('z-select').addEventListener('change', e => on_operator_change(Number(e.target.value)));
+		on_operator_change(Number(tag.operator));
+
+		return tag_row;
 	}
 
 	#setAvailableExecuteWhenOptions() {
