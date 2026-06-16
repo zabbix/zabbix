@@ -95,8 +95,10 @@ static int	trapper_build_push_test_params(const char *sendto, const char *subjec
 	zbx_json_close(&json);
 
 	zbx_json_addint64(&json, "priority", 0);
-	zbx_json_addraw(&json, "mobile_encryption_key",
-			NULL != mobile_encryption_key ? mobile_encryption_key : "{}");
+	if (NULL != mobile_encryption_key)
+		zbx_json_addraw(&json, "mobile_encryption_key", mobile_encryption_key);
+	else
+		zbx_json_addstring(&json, "mobile_encryption_key", NULL, ZBX_JSON_TYPE_NULL);
 
 	zbx_json_close(&json);
 

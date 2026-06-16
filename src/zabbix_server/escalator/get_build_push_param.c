@@ -462,7 +462,10 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 
 		zbx_json_addint64(&json, "priority", event->severity);
 
-		zbx_json_addraw(&json, "mobile_encryption_key", NULL != t->enc_key ? t->enc_key : "{}");
+		if (NULL != t->enc_key)
+			zbx_json_addraw(&json, "mobile_encryption_key", t->enc_key);
+		else
+			zbx_json_addstring(&json, "mobile_encryption_key", NULL, ZBX_JSON_TYPE_NULL);
 
 		zbx_json_close(&json); /* params */
 
