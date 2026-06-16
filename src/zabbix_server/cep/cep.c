@@ -122,6 +122,8 @@ static void	cep_event_clear(zbx_cep_event_t *event)
 	zbx_vector_tag_destroy(&event->tags);
 
 	zbx_vector_uint64_destroy(&event->maintenanceids);
+
+	zbx_free(event->name);
 }
 
 void	zbx_cep_event_release(zbx_cep_event_t *event)
@@ -134,7 +136,7 @@ void	zbx_cep_event_release(zbx_cep_event_t *event)
 }
 
 zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, unsigned char object,
-		zbx_uint64_t objectid, int clock, int ns, int value, int severity,
+		zbx_uint64_t objectid, const char *name, int clock, int ns, int value, int severity,
 		const zbx_vector_tags_ptr_t *tags, const zbx_vector_db_event_suppress_t *suppress)
 {
 	zbx_cep_event_t	*event;
@@ -151,6 +153,7 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 	event->value = value;
 	event->severity = severity;
 	event->suppress_mtime = 0;
+	event->name = zbx_strdup(NULL, name);
 
 	zbx_vector_tag_create(&event->tags);
 	if (NULL != tags)
@@ -454,7 +457,7 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 	zbx_db_row_t	row;
 
 	result = zbx_dbconn_select(db, "select p.eventid,p.clock,p.severity,t.tag,t.value,p.ns,p.source,p.object,"
-			"p.objectid"
+			"p.objectid,p.name"
 		" from problem p"
 		" left join problem_tag t"
 			" on p.eventid=t.eventid"
@@ -477,8 +480,8 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 			ZBX_STR2UCHAR(origin.object, row[7]);
 			ZBX_STR2UINT64(origin.objectid, row[8]);
 
-			event = cep_event_create(eventid, origin.source, origin.object, origin.objectid, atoi(row[1]),
-					atoi(row[5]), TRIGGER_VALUE_PROBLEM, atoi(row[2]), NULL, NULL);
+			event = cep_event_create(eventid, origin.source, origin.object, origin.objectid, row[9],
+					atoi(row[1]), atoi(row[5]), TRIGGER_VALUE_PROBLEM, atoi(row[2]), NULL, NULL);
 
 			zbx_cep_object_t	*obj;
 			zbx_cep_event_handle_t	h;
@@ -865,6 +868,7 @@ static zbx_cep_event_t	*cep_event_handle_replace_event(zbx_cep_event_handle_t h)
 	*event = *e;
 	event->refcount = 0;
 	event->suppress_mtime = 0;
+	event->name = zbx_strdup(NULL, e->name);
 
 	zbx_vector_tag_create(&event->tags);
 	zbx_vector_tag_reserve(&event->tags, (size_t)e->tags.values_num);
@@ -1554,7 +1558,7 @@ void	cep_delete_events(zbx_cep_t *cep, const zbx_vector_uint64_t *eventids, zbx_
  ******************************************************************************/
 static void	cep_dump_event(const char *indent, zbx_cep_event_t *event)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "%seventid:" ZBX_FS_UI64, indent, event->eventid);
+	zabbix_log(LOG_LEVEL_DEBUG, "%seventid:" ZBX_FS_UI64 " name:%s", indent, event->eventid, event->name);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s  clock:%d ns:%d severity:%d refs:%u tags:",
 			indent, event->clock, event->ns, event->severity, event->refcount);
 

@@ -442,8 +442,8 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	db_event->eventid = eventid;
 
 	zbx_cep_event_t	*event = cep_event_create(db_event->eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
-			db_event->trigger.triggerid, db_event->clock, db_event->ns, TRIGGER_VALUE_PROBLEM,
-			db_event->severity, &db_event->tags, db_event->suppress);
+			db_event->trigger.triggerid, db_event->name, db_event->clock, db_event->ns,
+			TRIGGER_VALUE_PROBLEM, db_event->severity, &db_event->tags, db_event->suppress);
 
 	cep_cache_acquire(&cep);
 	h = zbx_cep_event_handle_addref(cep_add_event(cep, event));
@@ -506,7 +506,7 @@ static void	cep_worker_resolve_trigger_events(zbx_db_event *db_event, zbx_uint64
 	db_event->eventid = r_eventid;
 
 	zbx_cep_event_t	*r_event = cep_event_create(db_event->eventid, EVENT_SOURCE_TRIGGERS,
-		EVENT_OBJECT_TRIGGER, db_event->trigger.triggerid, db_event->clock, db_event->ns,
+		EVENT_OBJECT_TRIGGER, db_event->trigger.triggerid, db_event->name, db_event->clock, db_event->ns,
 		TRIGGER_VALUE_OK, db_event->severity, &db_event->tags, db_event->suppress);
 
 	cep_cache_acquire(&cep);
@@ -616,7 +616,8 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 
 	/* don't cache tags for internal events since they are not used */
 	zbx_cep_event_t	*event = cep_event_create(db_event->eventid, EVENT_SOURCE_INTERNAL, db_event->object,
-			db_event->objectid, db_event->clock, db_event->ns, db_event->value, 0, NULL, NULL);
+			db_event->objectid, db_event->name, db_event->clock, db_event->ns, db_event->value, 0, NULL,
+			NULL);
 
 	cep_cache_acquire(&cep);
 	(void)cep_add_event(cep, event);

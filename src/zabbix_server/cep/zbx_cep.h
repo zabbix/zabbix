@@ -46,6 +46,7 @@ struct zbx_cep_event
 	int			value;
 	int			severity;
 	time_t			suppress_mtime;
+	char			*name;
 
 	zbx_cep_event_t		*r_event;
 
