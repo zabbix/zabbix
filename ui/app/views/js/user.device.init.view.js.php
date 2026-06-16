@@ -127,7 +127,9 @@ window.user_device_create_popup = new class {
 					return;
 				}
 
-				success_callback(response);
+				if (this.#overlay.$dialogue[0].isConnected) {
+					success_callback(response);
+				}
 			})
 			.catch((exception) => {
 				if (this.#admin_mode) {
