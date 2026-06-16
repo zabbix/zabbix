@@ -2455,7 +2455,9 @@ class CService extends CApiService {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 			}
 
-			$rw_services[$service['serviceid']] = null;
+			if ($db_services !== null) {
+				$rw_services[$service['serviceid']] = null;
+			}
 		}
 
 		if ($db_services !== null) {
