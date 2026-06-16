@@ -161,8 +161,11 @@ class testEncryptionDataCollection extends CIntegrationTest {
 					'type' => INTERFACE_TYPE_AGENT, 'main' => 1, 'useip' => 1,
 					'ip'   => '127.0.0.1', 'dns' => '', 'port' => $agent_port,
 				],
-				'groups' => $groups,
-				'status' => HOST_STATUS_NOT_MONITORED,
+				'groups'      => $groups,
+				'status'      => HOST_STATUS_NOT_MONITORED,
+				'tls_accept'  => HOST_ENCRYPTION_CERTIFICATE,
+				'tls_issuer'  => 'CN=ZabbixTestCA',
+				'tls_subject' => 'CN=zabbix_agent',
 				'items'  => [
 					[
 						'name'       => 'Enc trapper',
@@ -317,7 +320,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 */
 	private function runSenderWithCert(string $zbx_host, string $key, string $value,
 			string $ca_crt, string $cert_file, string $key_file,
-			string $issuer, string $subject): bool {
+			string $issuer, string $subject, ?string &$output = null): bool {
 		$port = $this->getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort');
 		$cmd  = sprintf(
 			'%s -z 127.0.0.1 -p %d -s %s -k %s -o %s'.
@@ -337,7 +340,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 			escapeshellarg($subject)
 		);
 
-		$out = shell_exec($cmd);
+		$out    = shell_exec($cmd);
+		$output = $out;
 
 		return $out !== null && strpos($out, 'processed: 1') !== false;
 	}
@@ -885,31 +889,24 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_senderCert(): void {
-		$r = $this->call('host.get', ['filter' => ['host' => 'enc_trapper'], 'output' => ['hostid']]);
-		$this->assertNotEmpty($r['result'], 'Trapper host not found');
-		$this->call('host.update', [
-			'hostid'     => $r['result'][0]['hostid'],
-			'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
-			'tls_issuer' => 'CN=ZabbixTestCA',
-			'tls_subject'=> 'CN=zabbix_agent',
-		]);
-
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
-
-		// Resolve cert paths from the last entry in self::$certDirs (set by configProviderSenderCert)
+		// TLS settings are pre-configured on enc_trapper in prepareData so the
+		// server loads them at startup without needing a runtime host.update + reload.
 		$dir       = end(self::$certDirs);
 		$ca_crt    = $dir.'ca.crt';
 		$agent_crt = $dir.'agent.crt';
 		$agent_key = $dir.'agent.key';
 
-		$value = 'sender_cert_'.time();
-		$sent  = $this->runSenderWithCert(
+		$value  = 'sender_cert_'.time();
+		$sender_out = null;
+		$sent   = $this->runSenderWithCert(
 			'enc_trapper', self::TRAPPER_ITEM_KEY, $value,
 			$ca_crt, $agent_crt, $agent_key,
-			'CN=ZabbixTestCA', 'CN=zabbix_server'
+			'CN=ZabbixTestCA', 'CN=zabbix_server',
+			$sender_out
 		);
 
-		$this->assertTrue($sent, 'zabbix_sender with cert TLS did not report "processed: 1"');
+		$this->assertTrue($sent,
+			'zabbix_sender with cert TLS did not report "processed: 1"; output: '.(string)$sender_out);
 
 		$data = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_trapper:'.self::TRAPPER_ITEM_KEY],
