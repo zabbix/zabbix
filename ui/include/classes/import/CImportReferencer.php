@@ -2227,6 +2227,7 @@ class CImportReferencer {
 
 		$this->db_global_regexes = API::Regexp()->get([
 			'output' => ['regexpid', 'name'],
+			'filter' => ['name' => array_keys($this->global_regexes)],
 			'preservekeys' => true
 		]);
 

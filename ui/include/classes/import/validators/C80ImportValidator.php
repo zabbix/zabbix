@@ -3437,9 +3437,9 @@ class C80ImportValidator extends CImportValidatorGeneral {
 					'description' =>				['type' => XML_STRING, 'default' => ''],
 					'expressions' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'expression', 'rules' => [
 						'expression' =>						['type' => XML_ARRAY, 'rules' => [
-							'type' =>						['type' => XML_STRING | XML_REQUIRED, 'in' => $this->REGEX_TYPES, 'default' => '0'],
-							'expression' =>					['type' => XML_STRING | XML_REQUIRED, 'default' => ''],
-							'exp_delimiter' =>				['type' => XML_STRING],
+							'type' =>						['type' => XML_STRING | XML_REQUIRED, 'in' => $this->REGEX_TYPES],
+							'expression' =>					['type' => XML_STRING | XML_REQUIRED],
+							'exp_delimiter' =>				['type' => XML_STRING, 'default' => ''],
 							'case_sensitive' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 						]]
 					]]

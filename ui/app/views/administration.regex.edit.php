@@ -164,7 +164,7 @@ else {
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test']),
 			'keepOpen' => true,
 			'isSubmit' => false
-		],
+		]
 	];
 }
 

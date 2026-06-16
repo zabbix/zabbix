@@ -130,7 +130,7 @@ class CControllerPopupImportCompare extends CController {
 
 			case 'regex':
 				$title = _('Regular expressions');
-				$rules['global_regexes'] = ['updateExisting' => true, 'createMissing' => true];
+				$rules['global_regexes'] = ['updateExisting' => false, 'createMissing' => false];
 
 				break;
 		}
