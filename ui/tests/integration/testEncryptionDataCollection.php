@@ -328,7 +328,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 			' --tls-ca-file %s --tls-cert-file %s --tls-key-file %s'.
 			' --tls-server-cert-issuer %s --tls-server-cert-subject %s'.
 			' 2>&1',
-			escapeshellarg(PHPUNIT_BINARY_DIR.'zabbix_sender'),
+			escapeshellarg(dirname(rtrim(PHPUNIT_BINARY_DIR, '/')).'/bin/zabbix_sender'),
 			(int)$port,
 			escapeshellarg($zbx_host),
 			escapeshellarg($key),
