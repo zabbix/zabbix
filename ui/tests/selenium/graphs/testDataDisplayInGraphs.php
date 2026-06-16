@@ -5827,6 +5827,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		$this->query('xpath://button[@title="Normal view"]')->one()->click();
 		$this->page->waitUntilReady();
+		$this->query('xpath://button[@title="Kiosk mode"]')->waitUntilPresent();
 	}
 
 	/**
