@@ -187,7 +187,7 @@ class CMediatypeHelper {
 					],
 					MEDIA_TYPE_PUSH => [
 						'subject' => '{HOST.NAME} - {EVENT.NAME}',
-						'message' => "Started at {EVENT.TIME} on {EVENT.DATE}\nData: {EVENT.OPDATA}"
+						'message' => "Started on {{EVENT.TIMESTAMP}.fmttime(\"%x %X\")}\nData: {EVENT.OPDATA}"
 					]
 				]
 			],
@@ -216,7 +216,7 @@ class CMediatypeHelper {
 					],
 					MEDIA_TYPE_PUSH => [
 						'subject' => '[RESOLVED] {HOST.NAME} - {EVENT.NAME}',
-						'message' => "Resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\nDuration: {EVENT.DURATION}"
+						'message' => "Resolved on {{EVENT.RECOVERY.TIMESTAMP}.fmttime(\"%x %X\")}\nDuration: {EVENT.DURATION}"
 					]
 				]
 			],
@@ -245,7 +245,7 @@ class CMediatypeHelper {
 					],
 					MEDIA_TYPE_PUSH => [
 						'subject' => '[UPDATED] {HOST.NAME} - {EVENT.NAME}',
-						'message' => "{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}\n{EVENT.UPDATE.MESSAGE}"
+						'message' => "{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem on {{EVENT.UPDATE.TIMESTAMP}.fmttime(\"%x %X\")}\n{EVENT.UPDATE.MESSAGE}"
 					]
 				]
 			],
