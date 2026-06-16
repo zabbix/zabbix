@@ -40,7 +40,7 @@ $table = (new CTable())
 		_('Expression'),
 		_('Delimiter'),
 		_('Case sensitive'),
-		_('Result'),
+		_('Test Result'),
 		''
 	]);
 
