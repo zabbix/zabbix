@@ -119,9 +119,11 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 			goto out;
 		}
 
-		/* this item is alowed only on hosts monitored by server */
 		if (HOST_MONITORED_BY_SERVER != host.monitored_by)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Can be monitored only by server."));
 			goto out;
+		}
 
 		if (2 > nparams || 3 < nparams)
 		{
@@ -331,9 +333,11 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 			goto out;
 		}
 
-		/* this item is alowed only on hosts monitored by server */
 		if (HOST_MONITORED_BY_SERVER != host.monitored_by)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Can be monitored only by server."));
 			goto out;
+		}
 
 		if (2 != nparams && 3 != nparams)
 		{
