@@ -30,18 +30,20 @@ class CServerInfo extends CApiService {
 
 		$server_data = [];
 
+		if (array_key_exists('serverid', array_flip($options['output']))) {
+			$server_data['serverid'] = $options['serverid'];
+		}
+
 		if (array_key_exists('lastaccess', array_flip($options['output']))) {
 			$server_data['lastaccess'] = self::getServerLastAccess();
 		}
 
-		unset($options['output']);
-
-		return $options + $server_data;
+		return $server_data;
 	}
 
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'serverid' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'serverid' => ['type' => API_UUID_V7, 'flags' => API_REQUIRED],
 			'output' =>	  ['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND]
 		]];
 
@@ -51,7 +53,7 @@ class CServerInfo extends CApiService {
 
 		if ($options['serverid'] !== CApiDpopHelper::getServerId()) {
 			self::exception(ZBX_API_ERROR_NO_ENTITY, _s('Invalid parameter "%1$s": %2$s.', '/serverid',
-				_('referred object does not exist')
+				_('object does not exist')
 			));
 		}
 	}
