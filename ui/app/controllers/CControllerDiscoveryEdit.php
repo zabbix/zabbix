@@ -141,6 +141,11 @@ class CControllerDiscoveryEdit extends CController {
 			]), ['proxyid' => 'id']);
 		}
 
+		$data['js_validation_rules'] = $data['drule']['druleid'] == null
+			? CControllerDiscoveryCreate::getValidationRules()
+			: CControllerDiscoveryUpdate::getValidationRules();
+
+		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of discovery rules'));
 		$this->setResponse($response);

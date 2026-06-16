@@ -109,6 +109,8 @@ $form_grid->addItem([
 		(new CTable())
 			->setAttribute('style', 'width: 100%;')
 			->setHeader([_('Type'), _('Actions')])
+			->setAttribute('data-field-type', 'set')
+			->setAttribute('data-field-name', 'dchecks')
 			->addItem(
 				(new CTag('tfoot', true))
 					->addItem(
@@ -229,6 +231,7 @@ $form
 	->addItem(
 		(new CScriptTag('
 			drule_edit_popup.init('.json_encode([
+				'rules' => $data['js_validation_rules'],
 				'druleid' => $data['drule']['druleid'],
 				'dchecks' => array_values($data['drule']['dchecks']),
 				'drule' => $data['drule']
@@ -240,41 +243,22 @@ if ($data['drule']['druleid']) {
 	$buttons = [
 		[
 			'title' => _('Update'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'drule_edit_popup.submit();'
 		],
 		[
 			'title' => _('Clone'),
-			'class' => ZBX_STYLE_BTN_ALT,
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'drule_edit_popup.clone('.json_encode([
-					'title' => _('New discovery rule'),
-					'buttons' => [
-						[
-							'title' => _('Add'),
-							'class' => 'js-add',
-							'keepOpen' => true,
-							'isSubmit' => true,
-							'action' => 'drule_edit_popup.submit();'
-						],
-						[
-							'title' => _('Cancel'),
-							'class' => ZBX_STYLE_BTN_ALT,
-							'cancel' => true,
-							'action' => ''
-						]
-					]
-				]).');'
 		],
 		[
 			'title' => _('Delete'),
 			'confirmation' => _('Delete discovery rule?'),
-			'class' => ZBX_STYLE_BTN_ALT,
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'drule_edit_popup.delete();'
 		]
 	];
 }
@@ -282,10 +266,9 @@ else {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => 'js-add',
+			'class' => 'js-submit',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'drule_edit_popup.submit();'
 		]
 	];
 }
