@@ -787,13 +787,12 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	public function testCalculatedExpression_TrendAvg()
 	{
-		/* Testing that no inf appear in trends transactions when using trendavg() */
-		/* inf value for doubles in DB commands results into failed transactions.  */
-		/* (Jenkins checks fails transactions and turns yellow in that case).      */
+		/* Trying to store Inf values into DB can result in failed transactions.   */
+		/* (Jenkins checks for failed transactions and turns yellow in that case). */
 		/* Note, that although history trends and new trends are DBL_MAX the       */
 		/* resulting trendAvg is actually smaller than DBL_MAX due to rounding     */
-		/* errors appearing as a result of scaling introduces to safeguard against */
-		/* double overflow into inf.                                               */
+		/* errors appearing as a result of scaling introduced to safeguard against */
+		/* double overflow into 'inf'.                                             */
 
 		$trapId = $this->createTrap();
 
