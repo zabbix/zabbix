@@ -44,8 +44,9 @@ window.item_edit_form = new class {
 	#host_interface_selector;
 
 	init({
-		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly, testable_item_types,
-		type_with_key_select, value_type_keys, source, return_url
+		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly,
+		testable_item_types, type_with_key_select, value_type_keys, source, return_url, history_override,
+		history_override_hint_html, storage_value_types
 	}) {
 		this.actions = actions;
 		this.form_data = form_data;
@@ -57,6 +58,9 @@ window.item_edit_form = new class {
 		this.type_with_key_select = type_with_key_select;
 		this.value_type_keys = value_type_keys;
 		this.last_inferred_type = null;
+		this.history_override = source === 'item' ? history_override : [];
+		this.history_override_hint_html = history_override_hint_html;
+		this.storage_value_types = source === 'item' ? storage_value_types : [];
 
 		this.overlay = overlays_stack.end();
 		this.dialogue = this.overlay.$dialogue[0];
@@ -72,6 +76,7 @@ window.item_edit_form = new class {
 
 		this.footer = this.overlay.$dialogue.$footer[0];
 		this.tags_table = this.form_element.querySelector('.tags-table');
+		this.tags_abort_controller = null;
 
 		ZABBIX.PopupManager.setReturnUrl(return_url);
 
@@ -128,8 +133,9 @@ window.item_edit_form = new class {
 			value_type_hint: this.form_element.querySelector('[for="label-value-type"] .js-hint'),
 			username: this.form_element.querySelector('[for=username]'),
 			ipmi_sensor: this.form_element.querySelector('[for="ipmi_sensor"]'),
-			history_hint: this.form_element.querySelector('[for="history"] .js-hint'),
-			trends_hint: this.form_element.querySelector('[for="trends"] .js-hint')
+			history_hint: this.form_element.querySelector('[for="history"] .js-history-hint'),
+			trends_hint: this.form_element.querySelector('[for="trends"] .js-trends-hint'),
+			trends_storage_hint: this.form_element.querySelector('[for="trends"] .js-trends-storage-hint'),
 		};
 		jQuery('#parameters-table').dynamicRows({
 			template: '#parameter-row-tmpl',
@@ -628,16 +634,25 @@ window.item_edit_form = new class {
 			show_inherited_tags,
 			itemid: fields.itemid,
 			hostid: fields.hostid
-		}
+		};
 
 		const url = new Curl('zabbix.php');
 		url.setArgument('action', 'item.tags.list');
+
+		if (this.tags_abort_controller !== null) {
+			this.tags_abort_controller.abort();
+		}
+
+		const abort_controller = new AbortController();
+		this.tags_abort_controller = abort_controller;
+
 		this.overlay.setLoading();
 
 		fetch(url.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
+			body: JSON.stringify(data),
+			signal: abort_controller.signal
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -648,11 +663,20 @@ window.item_edit_form = new class {
 				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
 			})
 			.catch((message) => {
+				if (abort_controller.signal.aborted) {
+					return;
+				}
+
 				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});
 				this.form.renderErrors();
 				throw message;
 			})
 			.finally(() => {
+				if (this.tags_abort_controller !== abort_controller) {
+					return;
+				}
+
+				this.tags_abort_controller = null;
 				this.overlay.unsetLoading();
 				this.#updateActionButtons();
 			});
@@ -718,20 +742,28 @@ window.item_edit_form = new class {
 
 	#updateHistoryModeVisibility() {
 		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop(),
-			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.history.readOnly);
+			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.history.readOnly),
+			override = this.history_override[parseInt(this.field.value_type.value, 10)];
 
 		this.field.history.toggleAttribute('disabled', disabled);
 		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-		this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+
+		if (this.label.history_hint !== null) {
+			this.label.history_hint.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || override === undefined);
+			this.label.history_hint.querySelector('[data-hintbox="1"]').dataset.hintboxHtml =
+				this.history_override_hint_html + (override === '' ? '' : ` (${override})`);
+		}
 	}
 
 	#updateTrendsModeVisibility() {
 		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop(),
-			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.trends.readOnly);
+			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.trends.readOnly),
+			storage_value_type = this.storage_value_types.indexOf(parseInt(this.field.value_type.value, 10)) !== -1;
 
 		this.field.trends.toggleAttribute('disabled', disabled);
 		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-		this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+		this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || storage_value_type);
+		this.label.trends_storage_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || !storage_value_type);
 	}
 
 	#updateValueTypeOptionVisibility() {

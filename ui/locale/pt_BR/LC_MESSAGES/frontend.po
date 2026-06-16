@@ -148,6 +148,12 @@ msgstr "%1$s caracteres"
 msgid "%1$s characters remaining"
 msgstr "%1$s caracteres restantes"
 
+#: app/views/administration.housekeeping.edit.php:165
+#: app/views/administration.housekeeping.edit.php:166
+#, c-format
+msgid "%1$s data storage period"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
 #, c-format
@@ -1679,6 +1685,11 @@ msgstr "Arc background"
 #: widgets/gauge/includes/WidgetForm.php:305
 msgid "Arc size"
 msgstr "Tamanho do arco"
+
+#: jsLoader.php:267
+#, c-format
+msgid "Are you sure you want to delete %1$s? This action cannot be undone."
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -4766,6 +4777,11 @@ msgstr "Não é possível atualizar o cenário web"
 msgid "Cannot update web scenario step"
 msgstr "Não é possível atualizar a etapa do cenário web"
 
+#: include/classes/core/CConfigFile.php:192
+#, c-format
+msgid "Cannot use both %1$s and %2$s at the same time."
+msgstr ""
+
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
 msgstr "Distinguir maiúscula/minúscula"
@@ -4809,6 +4825,10 @@ msgstr "Centro"
 #: include/views/configuration.host.prototype.edit.php:505
 msgid "Certificate"
 msgstr "Certificado"
+
+#: app/views/js/monitoring.latest.view.js.php:211
+msgid "Change"
+msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:78
 #: app/partials/monitoring.latest.view.html.php:91 include/items.inc.php:1577
@@ -5104,6 +5124,15 @@ msgstr "Clique e arraste até o tamanho desejado."
 msgid "Click to view or edit"
 msgstr "Clique para visualizar ou editar"
 
+#: app/views/administration.housekeeping.edit.php:165
+msgid "ClickHouse"
+msgstr ""
+
+#: include/classes/api/managers/history/CClickHouseStorage.php:118
+#, c-format
+msgid "ClickHouse error: %1$s."
+msgstr ""
+
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
 msgstr "Cliente ID"
@@ -5263,6 +5292,14 @@ msgstr "Cores"
 
 #: widgets/topitems/views/column.edit.php:293
 msgid "Column aggregation function"
+msgstr ""
+
+#: jsLoader.php:304
+msgid "Column list"
+msgstr ""
+
+#: jsLoader.php:273
+msgid "Column name"
 msgstr ""
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
@@ -6361,6 +6398,10 @@ msgstr "Tamanho personalizado"
 msgid "Custom templates are not supported."
 msgstr ""
 
+#: jsLoader.php:270
+msgid "Customize table"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -6953,6 +6994,10 @@ msgstr "Excluir e limpar templates selecionados? (Aviso: todos os hosts associad
 #: app/views/template.edit.php:309
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Excluir e limpar template? (Aviso: todos os hosts associados terão as entidades herdadas dos templates excluídas, bem como os dados coletados!)"
+
+#: jsLoader.php:275
+msgid "Delete column"
+msgstr ""
 
 #: app/views/popup.action.edit.php:292
 msgid "Delete current action?"
@@ -8250,6 +8295,10 @@ msgstr "O valor informado para o \"nome\" do mapa \"%1$s\" está duplicado."
 msgid "Duplicate \"usrgrpid\" \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Duplicar \"usrgrpid\" \"%1$s\" em grupos de usuários para o mapa \"%2$s\"."
 
+#: jsLoader.php:274
+msgid "Duplicate column"
+msgstr ""
+
 #: include/classes/api/services/CHost.php:2096
 #: include/classes/api/services/CHost.php:2396
 #, c-format
@@ -8353,6 +8402,10 @@ msgstr "Data de vigência"
 #: app/partials/hostmacros.inherited.list.html.php:50
 msgid "Effective value"
 msgstr "Valor real"
+
+#: app/views/administration.housekeeping.edit.php:166
+msgid "Elasticsearch"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1449
 #: include/classes/api/managers/CHistoryManager.php:1458
@@ -11776,6 +11829,12 @@ msgstr ""
 msgid "Incorrect characters used for template name."
 msgstr ""
 
+#: include/classes/core/CConfigFile.php:215
+#: include/classes/core/CConfigFile.php:411
+#, c-format
+msgid "Incorrect configuration %1$s: %2$s."
+msgstr ""
+
 #: include/classes/api/services/CUser.php:482
 msgid "Incorrect current password."
 msgstr "Senha atual incorreta."
@@ -11810,6 +11869,16 @@ msgstr "Upload de arquivo inválido."
 #: include/triggers.inc.php:768
 msgid "Incorrect function is used"
 msgstr "Usada função incorreta"
+
+#: include/classes/core/CConfigFile.php:211
+#: include/classes/core/CConfigFile.php:219
+#: include/classes/core/CConfigFile.php:557
+#: include/classes/core/CConfigFile.php:563
+#: include/classes/core/CConfigFile.php:569
+#: include/classes/core/CConfigFile.php:579
+#, c-format
+msgid "Incorrect history storage configuration %1$s: %2$s."
+msgstr ""
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -12349,12 +12418,20 @@ msgstr "Macros herdadas e do host"
 msgid "Inherited and host prototype macros"
 msgstr "Macros de protótipo herdadas e de host"
 
+#: jsLoader.php:260
+msgid "Inherited and host prototype tag"
+msgstr ""
+
 #: include/classes/helpers/CTagHelper.php:230
 msgid "Inherited and host tag"
 msgstr ""
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Inherited and host tags"
+msgstr ""
+
+#: jsLoader.php:262
+msgid "Inherited and item prototype tag"
 msgstr ""
 
 #: include/classes/helpers/CTagHelper.php:231
@@ -12379,6 +12456,10 @@ msgstr ""
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Inherited and template tags"
+msgstr ""
+
+#: jsLoader.php:264
+msgid "Inherited and trigger prototype tag"
 msgstr ""
 
 #: include/classes/helpers/CTagHelper.php:232
@@ -13016,6 +13097,11 @@ msgstr ""
 #: app/controllers/CControllerTemplateCreate.php:102
 #: app/controllers/CControllerTemplateUpdate.php:104
 msgid "Invalid range."
+msgstr ""
+
+#: app/controllers/CControllerDataTable.php:59
+#: app/controllers/CControllerDataTable.php:138
+msgid "Invalid request"
 msgstr ""
 
 #: include/classes/core/CJsonRpc.php:205
@@ -14396,6 +14482,21 @@ msgstr "Manualmente por: %1$s"
 #: include/actions.inc.php:1987
 msgid "Manually closed"
 msgstr "Fechado manualmente"
+
+#: app/controllers/CControllerProblemViewData.php:472
+#: include/actions.inc.php:1660 include/actions.inc.php:1661
+#: include/actions.inc.php:1698 include/actions.inc.php:2195
+#: include/html.inc.php:1135
+msgid "Manually suppressed"
+msgstr ""
+
+#: app/controllers/CControllerProblemViewData.php:475
+#: include/actions.inc.php:1674 include/actions.inc.php:1675
+#: include/actions.inc.php:1698 include/actions.inc.php:2200
+#: include/actions.inc.php:2201 include/blocks.inc.php:692
+#: widgets/problems/includes/WidgetProblems.php:280
+msgid "Manually unsuppressed"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: include/classes/data/CWidgetsData.php:110
@@ -15838,6 +15939,10 @@ msgstr ""
 msgid "Next dashboard"
 msgstr "Próximo dashboard"
 
+#: jsLoader.php:416
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15851,6 +15956,10 @@ msgstr "Próxima página"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Próximo passo"
+
+#: jsLoader.php:414
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -16556,6 +16665,12 @@ msgstr "Itens não herdados"
 msgid "Not linked"
 msgstr ""
 
+#: app/views/item.list.php:233 app/views/item.list.php:234
+#: include/classes/helpers/CItemHelper.php:386
+#: include/classes/helpers/CItemHelper.php:416
+msgid "Not stored"
+msgstr ""
+
 #: app/controllers/CControllerLatest.php:546
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.latest.filter.php:191
@@ -16710,6 +16825,10 @@ msgstr "Numero de temporada"
 #: include/views/configuration.httpconf.list.php:143
 msgid "Number of steps"
 msgstr "Número de passos"
+
+#: jsLoader.php:291
+msgid "Number of tags"
+msgstr ""
 
 #: app/partials/administration.system.info.php:60
 msgid "Number of templates"
@@ -19313,6 +19432,10 @@ msgstr "Confirmação de restauração"
 msgid "Reset defaults"
 msgstr "Restaurar padrões"
 
+#: jsLoader.php:305
+msgid "Reset layout"
+msgstr ""
+
 #: widgets/geomap/Widget.php:37
 msgid "Reset to initial view"
 msgstr "Redefinir para a visualização inicial"
@@ -20827,6 +20950,10 @@ msgstr "Exibir cabeçalho"
 msgid "Show hosts in maintenance"
 msgstr "Mostrar hosts em manutenção"
 
+#: jsLoader.php:281
+msgid "Show item key"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:158
 #: include/views/js/monitoring.sysmaps.js.php:698
 #: include/views/js/monitoring.sysmaps.js.php:813
@@ -20954,6 +21081,10 @@ msgstr "Exibe carimbo de data/hora"
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
 msgstr "Mostrar valor total"
+
+#: jsLoader.php:285
+msgid "Show trigger expression"
+msgstr ""
 
 #: include/views/configuration.graph.edit.php:131
 msgid "Show triggers"
@@ -21691,6 +21822,10 @@ msgstr "Suprimir até"
 msgid "Suppressed"
 msgstr "Suprimido"
 
+#: include/actions.inc.php:2241 include/html.inc.php:1134
+msgid "Suppressed by maintenance"
+msgstr ""
+
 #: include/actions.inc.php:2019 include/html.inc.php:1000
 #, c-format
 msgid "Suppressed till: %1$s"
@@ -21853,6 +21988,10 @@ msgstr "A tabela \"%1$s\" não existe."
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr "A tabela \"%1$s\" não possui um campo chamado \"%2$s\"."
 
+#: jsLoader.php:303
+msgid "Table options"
+msgstr ""
+
 #: app/controllers/CControllerActionOperationCheck.php:210
 #: app/controllers/CControllerActionOperationCheck.php:216
 #: app/controllers/CControllerActionOperationCheck.php:228
@@ -21910,6 +22049,10 @@ msgstr "Nome da etiqueta"
 #: app/controllers/CControllerTriggerPrototypeUpdate.php:61
 #: app/controllers/CControllerTriggerUpdate.php:61
 msgid "Tag name and value combination is not unique."
+msgstr ""
+
+#: jsLoader.php:292
+msgid "Tag name display"
 msgstr ""
 
 #: app/controllers/CControllerMaintenanceCreate.php:93
@@ -22595,6 +22738,10 @@ msgstr "Essa configuração se aplica somente a dados numéricos."
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "Essa configuração se aplica somente a dados numéricos. Os dados não numéricos sempre serão retirados do histórico."
 
+#: app/views/administration.housekeeping.edit.php:145
+msgid "This setting does not affect Elasticsearch and ClickHouse storage periods."
+msgstr ""
+
 #: app/partials/administration.system.info.php:212
 #: app/views/administration.housekeeping.edit.php:132
 msgid "This setting should be enabled, because history tables contain compressed chunks."
@@ -22993,6 +23140,11 @@ msgctxt "compact table header"
 msgid "Total"
 msgstr "Total"
 
+#: include/classes/debug/CProfiler.php:172
+#, c-format
+msgid "Total ClickHouse time: %1$s"
+msgstr ""
+
 #: include/classes/debug/CProfiler.php:153
 #, c-format
 msgid "Total Elasticsearch time: %1$s"
@@ -23082,6 +23234,11 @@ msgstr "Estatísticas de cache da função de tendência. Os parâmetros válido
 #: widgets/tophosts/views/column.edit.php:206
 msgid "Trends"
 msgstr "Estatísticas"
+
+#: app/partials/item.edit.item.tab.php:774
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse."
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:257
 #: app/views/reports.toptriggers.list.php:120 app/views/trigger.edit.php:54
@@ -24017,6 +24174,10 @@ msgstr "Não suprimir"
 msgid "Unsuppressed"
 msgstr "Não suprimido"
 
+#: include/actions.inc.php:2257
+msgid "Unsuppressed by maintenance"
+msgstr ""
+
 #: include/blocks.inc.php:670 include/classes/screens/CScreenProblem.php:1425
 #: widgets/problems/includes/WidgetProblems.php:278
 #, c-format
@@ -24197,6 +24358,11 @@ msgstr "Tempo em execução em segudos do processo do Zabbix."
 #: include/actions.inc.php:61
 msgid "Uptime/Downtime"
 msgstr "Uptime/Downtime"
+
+#: app/partials/administration.system.info.php:328
+#, c-format
+msgid "Use %1$s instead"
+msgstr ""
 
 #: app/views/popup.ldap.edit.php:173
 msgid "Use %{ref} in group filter to reference value of this user attribute."
@@ -26060,6 +26226,10 @@ msgstr "Seu banco de dados não está funcionando corretamente. Aguarde alguns m
 msgid "Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?"
 msgstr ""
 
+#: jsLoader.php:307
+msgid "Your table settings will be reset to default and duplicated columns will be removed."
+msgstr ""
+
 #: include/page_header.php:122
 msgid "Zabbix"
 msgstr "Zabbix"
@@ -27138,6 +27308,10 @@ msgstr "não existe"
 msgid "does not match"
 msgstr "não corresponde"
 
+#: jsLoader.php:268
+msgid "duplicate"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr "e() - Retorna o número de Euler"
@@ -27242,6 +27416,10 @@ msgstr "fuzzytime() - A diferença entre o valor do item (como registro de data 
 #: include/classes/validators/CApiInputValidator.php:3317
 msgid "geographical coordinates (values of comma separated latitude and longitude) are expected"
 msgstr "são esperadas coordenadas geográficas (valores de latitude e longitude separados por vírgula)"
+
+#: app/views/item.edit.php:224 app/views/item.edit.php:228
+msgid "global housekeeping settings"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.edit.php:891
@@ -27401,6 +27579,11 @@ msgstr "contagem de elementos incorreta"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "expressão incorreta começando em \"%1$s\""
+
+#: include/classes/core/CConfigFile.php:212
+#: include/classes/core/CConfigFile.php:220
+msgid "incorrect format"
+msgstr ""
 
 #: jsLoader.php:298
 msgid "incorrect item value type"

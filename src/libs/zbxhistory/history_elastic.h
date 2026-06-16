@@ -1,4 +1,3 @@
-<?php
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -13,18 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-$output = [
-	'body' => (new CPartial('monitoring.host.view.html', $data))->getOutput(),
-	'groupids' => $data['filter']['groupids']
-];
+#ifndef ZABBIX_HISTORY_ELASTIC_H
+#define ZABBIX_HISTORY_ELASTIC_H
 
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
-}
+#include "history.h"
 
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
+zbx_history_provider_t	*history_elastic_open(const zbx_history_option_t *options, int options_num, char **error);
 
-echo json_encode($output);
+#endif
