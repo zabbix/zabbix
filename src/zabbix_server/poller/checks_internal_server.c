@@ -19,7 +19,7 @@
 
 #include "zbxcachevalue.h"
 #include "zbxcacheconfig.h"
-#include "zbxcep_client.h"
+#include "zbx_cep_client.h"
 #include "zbxconnector.h"
 #include "zbxjson.h"
 #include "zbxproxybuffer.h"

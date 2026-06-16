@@ -15,11 +15,11 @@
 #ifndef ZABBIX_CEP_EVENT_H
 #define ZABBIX_CEP_EVENT_H
 
-#include "zbxcep.h"
+#include "zbx_cep.h"
 
 zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, unsigned char object,
-	zbx_uint64_t objectid, const char *name, int clock, int ns, int value, int serverity,
-	const zbx_vector_tags_ptr_t *tags, const zbx_vector_db_event_suppress_t *suppress);
+		zbx_uint64_t objectid, const char *name, int clock, int ns, int value, int severity,
+		const zbx_vector_tags_ptr_t *tags, const zbx_vector_db_event_suppress_t *suppress);
 
 zbx_cep_event_t	*cep_event_clone(const zbx_cep_event_t *event);
 void	cep_event_clear(zbx_cep_event_t *event);

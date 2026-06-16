@@ -86,7 +86,6 @@ JSON_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdummy.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
-	$(top_srcdir)/src/libs/zbxexit/libzbxexit.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 zbx_item_preproc_SOURCES = \

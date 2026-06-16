@@ -1805,7 +1805,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Host' => 'Visible host name for Item Card widget',
 					'Interval and storage' => [
 						'column' => '15m',
-						'center-column' => '',
+						'center-column' => 'Not stored',
 						'right-column' => ''
 					],
 					'Type of information' => 'Log',

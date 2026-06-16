@@ -425,7 +425,6 @@ typedef struct _DC_TRIGGER
 	unsigned char		*expression_bin;
 	unsigned char		*recovery_expression_bin;
 	zbx_timespec_t		timespec;
-	int			lastchange;
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -559,6 +558,10 @@ typedef struct
 	int	trends_global;
 	int	history_mode;
 	int	history_global;
+
+	/* History overrides by external database settings, like ClickHouse table TTL. */
+	/* Overrides all history housekeeping settings for a value type if not 0.      */
+	int	history_override[ITEM_VALUE_TYPE_COUNT];
 }
 zbx_config_hk_t;
 
@@ -691,20 +694,6 @@ typedef struct
 zbx_correlation_t;
 
 ZBX_PTR_VECTOR_DECL(correlation_ptr, zbx_correlation_t *)
-
-int	zbx_correlation_compare_func(const void *d1, const void *d2);
-
-typedef struct
-{
-	zbx_vector_correlation_ptr_t	correlations;
-	zbx_hashset_t			conditions;
-
-	/* Configuration synchronization timestamp of the rules. */
-	/* Update the cache if this timestamp is less than the   */
-	/* current configuration synchronization timestamp.      */
-	int			sync_ts;
-}
-zbx_correlation_rules_t;
 
 /* item queue data */
 typedef struct
@@ -909,28 +898,6 @@ int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid);
 
 int	zbx_dc_get_host_value(zbx_uint64_t itemid, char **replace_to, int request);
 
-/* zbx_dc_get_history_log_value() */
-#define ZBX_DC_REQUEST_ITEM_LOG_DATE		201
-#define ZBX_DC_REQUEST_ITEM_LOG_TIME		202
-#define ZBX_DC_REQUEST_ITEM_LOG_AGE		203
-#define ZBX_DC_REQUEST_ITEM_LOG_SOURCE		204
-#define ZBX_DC_REQUEST_ITEM_LOG_SEVERITY	205
-#define ZBX_DC_REQUEST_ITEM_LOG_NSEVERITY	206
-#define ZBX_DC_REQUEST_ITEM_LOG_EVENTID		207
-#define ZBX_DC_REQUEST_ITEM_LOG_TIMESTAMP	208
-
-typedef enum
-{
-	ZBX_VALUE_PROPERTY_VALUE,
-	ZBX_VALUE_PROPERTY_TIME,
-	ZBX_VALUE_PROPERTY_DATE,
-	ZBX_VALUE_PROPERTY_AGE,
-	ZBX_VALUE_PROPERTY_TIMESTAMP
-}
-zbx_expr_db_item_value_property_t;
-
-int	zbx_dc_get_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns,
-		const char *tz);
 int	zbx_dc_get_item_key(zbx_uint64_t itemid, char **replace_to);
 
 int	zbx_dc_get_host_host(zbx_uint64_t itemid, char **replace_to);
@@ -1517,7 +1484,7 @@ zbx_maintenance_type_t;
 
 #define ZBX_RECALC_TIME_PERIOD_HISTORY	1
 #define ZBX_RECALC_TIME_PERIOD_TRENDS	2
-void	zbx_recalc_time_period(time_t *ts_from, int table_group);
+void	zbx_recalc_time_period(time_t *ts_from, int table_group, unsigned char value_type);
 
 /* vps tracker */
 typedef struct
@@ -1670,6 +1637,8 @@ int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock,
 		zbx_comms_redirect_t *redirect);
 int	zbx_dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock, zbx_history_recv_host_t *recv_host,
 		zbx_comms_redirect_t *redirect);
+int	zbx_dc_config_get_item_format(zbx_uint64_t itemid,  unsigned char *value_type, zbx_uint64_t *valuemapid,
+		char *units, size_t units_alloc);
 
 int	zbx_dc_get_proxy_group_hostmap_revision(zbx_uint64_t proxy_groupid, zbx_uint64_t *hostmap_revision);
 void	zbx_dc_set_proxy_failover_delay(const char *failover_delay);

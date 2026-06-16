@@ -296,6 +296,20 @@ class CZabbixServer {
 	}
 
 	/**
+	 * Request server to reset CEP rule.
+	 * This involves CEP rule time window reset.
+	 *
+	 * @param string[] $data  Array of CEP rule IDs.
+	 */
+	public function resetCepRule(array $data, string $sid): array|bool {
+		return $this->request([
+			'request' => 'cep.rule.reset',
+			'data' => $data,
+			'sid' => $sid
+		]);
+	}
+
+	/**
 	 * Retrieve System information.
 	 *
 	 * @param $sid

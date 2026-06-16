@@ -35,9 +35,18 @@ class testTriggerCEP extends CIntegrationTest {
 	const ITEM_PROTO_KEY = 'cep.trap';
 	const ITEM_PROTO_KEY2 = 'cep.trap2';
 	const COMPONENT_VALUE = 'sensor1';
-	const LLD_DISCOVERY_COUNT = 1000;
+	const LLD_DISCOVERY_COUNT = 4000;
 	const WAIT_ITERATIONS = 60;
 	const WAIT_ITERATION_DELAY = 1;
+
+	// change iterations to fail faster when debugging
+	const STATE_CHANGE_WAIT_ITERATIONS = 30;
+
+	// When true, the *Restart test variants are skipped entirely. Set during development to avoid the
+	// slow server stop/start cycles; the non-restart tests still run (their @depends point at non-restart
+	// siblings, so they do not cascade-skip).
+	const SKIP_RESTART_TESTS = false;
+
 
 	private static $hostid;
 	private static $disc_hostid;
@@ -55,9 +64,52 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $sessionid = null;
 
 	/**
+	 * Component configuration provider.
+	 *
+	 * @return array
+	 */
+	public function configurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'LogFileSize' => 0,
+				'DebugLevel' => 3,
+				'CacheSize' => '128M',
+				'HistoryCacheSize' => '32M',
+				'HistoryIndexCacheSize' => '32M',
+				'ValueCacheSize' => '128M',
+				'LogSlowQueries' => 10000
+			]
+		];
+	}
+
+	/**
+	 * Lower bound (max eventid captured at the start of the current scenario) used to limit
+	 * every event.get to only the events generated during the scenario. Without this bound the
+	 * queries would re-fetch the entire, ever-growing event history of all discovered triggers
+	 * on every poll iteration, which does not scale with LLD_DISCOVERY_COUNT.
+	 */
+	private $event_baseline_id = 0;
+
+	/**
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+		// Disable audit log so the bulk of API operations below do not flood it.
+		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
+
+		// Disable every pre-existing monitored host so they don't interfere with the suite; this
+		// suite's own hosts are (re-)set to monitored after prepareData() by onBeforeTestSuite().
+		$response = $this->call('host.get', [
+			'filter' => ['status' => HOST_STATUS_MONITORED],
+			'output' => ['hostid']
+		]);
+		foreach ($response['result'] as $h) {
+			$this->call('host.update', [
+				'hostid' => $h['hostid'],
+				'status' => HOST_STATUS_NOT_MONITORED
+			]);
+		}
+
 		// Retrieve template group ID.
 		$response = $this->call('templategroup.get', [
 			'filter' => ['name' => 'Templates']
@@ -211,21 +263,13 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 
-		return true;
-	}
+		// Enable the internal event actions for the whole suite so the server generates internal
+		// item-not-supported and trigger-unknown events (verified by the *Unknown tests). They are
+		// disabled again in clearData(). The configuration cache is reloaded by the first test.
+		$this->setInternalActionStatus('Report unknown triggers', ACTION_STATUS_ENABLED);
+		$this->setInternalActionStatus('Report not supported items', ACTION_STATUS_ENABLED);
 
-	/**
-	 * Component configuration provider.
-	 *
-	 * @return array
-	 */
-	public function configurationProvider() {
-		return [
-			self::COMPONENT_SERVER => [
-				'LogFileSize' => 0,
-				'DebugLevel' => 4,
-			]
-		];
+		return true;
 	}
 
 	/**
@@ -451,6 +495,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'triggerid' => self::$trigger_prototypeid,
 			'correlation_mode' => ZBX_TRIGGER_CORRELATION_TAG,
 			'correlation_tag' => 'type',
+			'type' => TRIGGER_MULT_EVENT_ENABLED,
 			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
 		]);
 
@@ -458,6 +503,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'triggerid' => self::$dep_trigger_prototypeid,
 			'correlation_mode' => ZBX_TRIGGER_CORRELATION_TAG,
 			'correlation_tag' => 'type',
+			'type' => TRIGGER_MULT_EVENT_ENABLED,
 			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
 		]);
 
@@ -473,14 +519,15 @@ class testTriggerCEP extends CIntegrationTest {
 		// Verify the discovered triggers reflect the updated correlation mode.
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
-			'output' => ['triggerid', 'correlation_mode', 'correlation_tag']
+			'output' => ['triggerid', 'correlation_mode', 'correlation_tag', 'type']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			if (count($response['result']) !== 2) {
 				return false;
 			}
 			foreach ($response['result'] as $trigger) {
 				if ((int) $trigger['correlation_mode'] !== ZBX_TRIGGER_CORRELATION_TAG
-						|| $trigger['correlation_tag'] !== 'type') {
+						|| $trigger['correlation_tag'] !== 'type'
+						|| (int) $trigger['type'] !== TRIGGER_MULT_EVENT_ENABLED) {
 					return false;
 				}
 			}
@@ -492,6 +539,8 @@ class testTriggerCEP extends CIntegrationTest {
 				'Discovered trigger '.$trigger['triggerid'].' was not updated to tag-correlation mode.');
 			$this->assertEquals('type', $trigger['correlation_tag'],
 				'Discovered trigger '.$trigger['triggerid'].' has unexpected correlation tag.');
+			$this->assertEquals(TRIGGER_MULT_EVENT_ENABLED, $trigger['type'],
+				'Discovered trigger '.$trigger['triggerid'].' was not updated to multiple-event mode.');
 		}
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -527,6 +576,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'recovery_expression' => '',
 			'correlation_mode' => ZBX_TRIGGER_CORRELATION_TAG,
 			'correlation_tag' => 'service',
+			'type' => TRIGGER_MULT_EVENT_ENABLED,
 			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 			'tags' => [
 				['tag' => 'component_{ITEM.VALUE}', 'value' => self::LLD_MACRO],
@@ -548,6 +598,7 @@ class testTriggerCEP extends CIntegrationTest {
 			],
 			'correlation_mode' => ZBX_TRIGGER_CORRELATION_TAG,
 			'correlation_tag' => 'service',
+			'type' => TRIGGER_MULT_EVENT_ENABLED,
 			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 			'tags' => [
 				['tag' => 'component_{ITEM.VALUE}', 'value' => self::LLD_MACRO],
@@ -589,14 +640,16 @@ class testTriggerCEP extends CIntegrationTest {
 		// Verify the discovered triggers reflect the updated expression and correlation config.
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
-			'output' => ['triggerid', 'correlation_mode', 'correlation_tag', 'expression']
+			'output' => ['triggerid', 'correlation_mode', 'correlation_tag', 'manual_close', 'type', 'expression']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			if (count($response['result']) !== 2) {
 				return false;
 			}
 			foreach ($response['result'] as $trigger) {
 				if ((int) $trigger['correlation_mode'] !== ZBX_TRIGGER_CORRELATION_TAG
-						|| $trigger['correlation_tag'] !== 'service') {
+						|| $trigger['correlation_tag'] !== 'service'
+						|| (int) $trigger['manual_close'] !== ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
+						|| (int) $trigger['type'] !== TRIGGER_MULT_EVENT_ENABLED) {
 					return false;
 				}
 			}
@@ -608,6 +661,10 @@ class testTriggerCEP extends CIntegrationTest {
 				'Discovered trigger '.$trigger['triggerid'].' was not updated to tag-correlation mode.');
 			$this->assertEquals('service', $trigger['correlation_tag'],
 				'Discovered trigger '.$trigger['triggerid'].' has unexpected correlation tag.');
+			$this->assertEquals(ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, $trigger['manual_close'],
+				'Discovered trigger '.$trigger['triggerid'].' has unexpected manual_close setting.');
+			$this->assertEquals(TRIGGER_MULT_EVENT_ENABLED, $trigger['type'],
+				'Discovered trigger '.$trigger['triggerid'].' was not updated to multiple-event mode.');
 		}
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -922,6 +979,110 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Sanity check: send a numeric value of 0 to all discovered items and verify the values were
+	 * written to the history cache (zabbix[vps,written] advanced), without asserting any trigger
+	 * state or event changes.
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_VpsWritten() {
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+
+		$vps_written = $this->getVpsWritten();
+		$this->sendSenderValues(
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'], $keys),
+			null, 0
+		);
+		$this->assertVpsWrittenIncreasedBy($vps_written, count($keys));
+	}
+
+	/**
+	 * Smoke test (part 1/2): a discovered trigger opens a problem on OK→PROBLEM.
+	 * The problem is left open and closed by testTriggerCEP_CloseProblem.
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenProblem() {
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		// OK→PROBLEM: one PROBLEM event per trigger; trigger value goes TRUE.
+		$this->captureEventBaseline($triggerids);
+		$this->assertStateChangeForAll($triggerids, $keys, '1', TRIGGER_VALUE_TRUE, 1);
+	}
+
+	/**
+	 * Smoke test (part 2/2): the problem opened by testTriggerCEP_OpenProblem closes on PROBLEM→OK.
+	 * Runs as a separate test so the open problem persists across the test boundary before recovery.
+	 *
+	 * @depends testTriggerCEP_OpenProblem
+	 */
+	public function testTriggerCEP_CloseProblem() {
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		// PROBLEM→OK: one RESOLVED event per trigger. The baseline is per-test-instance, so it is
+		// recaptured here (now past the open event) and the close adds exactly one more event.
+		$this->captureEventBaseline($triggerids);
+		$this->assertStateChangeForAll($triggerids, $keys, '0', TRIGGER_VALUE_FALSE, 1);
+		$this->waitForNoOpenProblems($triggerids, 'close problem');
+		$this->assertNoOpenProblems(self::$discovered_triggerids);
+	}
+
+	/**
+	 * Smoke test (part 1/2): a discovered item becomes unsupported and its trigger enters the UNKNOWN
+	 * state. The internal "Report unknown triggers" and "Report not supported items" actions are enabled
+	 * for the whole suite in prepareData(), so the server opens an internal problem for every unsupported
+	 * item and every unknown trigger. The trigger value stays OK (it was not in a problem) while the state
+	 * becomes UNKNOWN; the UNKNOWN state and the open internal problems are left in place and cleared by
+	 * testTriggerCEP_CloseUnknown.
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenUnknown() {
+		$this->runOpenUnknownTest();
+	}
+
+	/**
+	 * Smoke test (part 2/2): the UNKNOWN state entered by testTriggerCEP_OpenUnknown clears when a
+	 * numeric value is sent again. The triggers return to NORMAL/OK, the items become supported, and
+	 * all internal problems (item-not-supported and trigger-unknown) are resolved. Runs as a separate
+	 * test so the UNKNOWN state persists across the test boundary before recovery.
+	 *
+	 * @depends testTriggerCEP_OpenUnknown
+	 */
+	public function testTriggerCEP_CloseUnknown() {
+		$this->runCloseUnknownTest();
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_OpenUnknown but the server component is stopped and restarted
+	 * before the test runs, to verify the UNKNOWN state and internal problems are produced correctly
+	 * after a fresh restart.
+	 *
+	 * @depends testTriggerCEP_CloseUnknown
+	 */
+	public function testTriggerCEP_OpenUnknownRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
+		$this->runOpenUnknownTest();
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_CloseUnknown but the server component is stopped and restarted
+	 * before the test runs, to verify recovery and internal-problem resolution after a fresh restart.
+	 *
+	 * @depends testTriggerCEP_OpenUnknownRestart
+	 */
+	public function testTriggerCEP_CloseUnknownRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
+		$this->runCloseUnknownTest();
+	}
+
+	/**
 	 * Verify CEP behaviour on the discovered trigger:
 	 *
 	 *   1. Send value 1        → trigger fires   (NORMAL / PROBLEM)
@@ -965,7 +1126,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 *   4. Trigger A: PROBLEM→PROBLEM    – item supported again; no new event, lastchange not updated
 	 *   5. Trigger A: PROBLEM→OK         – RESOLVED event generated
 	 *
-	 * @depends testTriggerCEP_TriggerStateTransitions
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_EventAssessment() {
 		$this->runEventAssessmentTest(false);
@@ -979,6 +1140,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessment
 	 */
 	public function testTriggerCEP_EventAssessmentRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->runEventAssessmentTest(true);
 		$this->assertNoOpenProblems(self::$discovered_triggerids);
 	}
@@ -1013,6 +1175,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_DependentTriggerRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
 		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
@@ -1042,6 +1205,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessmentNone
 	 */
 	public function testTriggerCEP_EventAssessmentNoneRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataNoneOkEvent();
 		$this->runEventAssessmentTest(true);
 		$this->prepareDataRestoreRecovery();
@@ -1049,7 +1213,7 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
-	 * @depends testTriggerCEP_EventAssessmentNoneRestart
+	 * @depends testTriggerCEP_EventAssessmentNone
 	 */
 	public function testTriggerCEP_EventAssessmentRecoveryExpression() {
 		$this->clearDiscoveredItemHistory();
@@ -1062,12 +1226,13 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessmentRecoveryExpression
 	 */
 	public function testTriggerCEP_EventAssessmentRecoveryExpressionRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->runEventAssessmentTest(true);
 		$this->assertNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
-	 * @depends testTriggerCEP_EventAssessmentRecoveryExpressionRestart
+	 * @depends testTriggerCEP_EventAssessmentRecoveryExpression
 	 */
 	public function testTriggerCEP_DependentTriggerRecoveryExpression() {
 		$this->runDependentTriggerTest(false);
@@ -1078,12 +1243,13 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_DependentTriggerRecoveryExpression
 	 */
 	public function testTriggerCEP_DependentTriggerRecoveryExpressionRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
 		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
-	 * @depends testTriggerCEP_DependentTriggerRecoveryExpressionRestart
+	 * @depends testTriggerCEP_DependentTriggerRecoveryExpression
 	 */
 	public function testTriggerCEP_EventAssessmentMultipleEvent() {
 		$this->prepareDataMultipleEventsRecoveryExpression();
@@ -1095,12 +1261,13 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessmentMultipleEvent
 	 */
 	public function testTriggerCEP_EventAssessmentMultipleEventRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->runEventAssessmentTest(true);
 		$this->assertNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
-	 * @depends testTriggerCEP_EventAssessmentMultipleEventRestart
+	 * @depends testTriggerCEP_EventAssessmentMultipleEvent
 	 */
 	public function testTriggerCEP_DependentTriggerMultipleEvent() {
 		$this->runDependentTriggerTest(false);
@@ -1111,12 +1278,17 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_DependentTriggerMultipleEvent
 	 */
 	public function testTriggerCEP_DependentTriggerMultipleEventRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
 		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
-	 * @depends testTriggerCEP_DependentTriggerMultipleEventRestart
+	 * prepareDataTagCorrelation() switches the prototypes to tag-correlation mode and resends LLD;
+	 * the post-LLD defaults (numeric items, last()<>0 expression) are exactly what this scenario
+	 * needs, so it only depends on the LLD step and can run in isolation together with the other
+	 * tag-correlation variants and the service-correlation tests (see the regexp below).
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_EventAssessmentTagCorrelation() {
 		$this->prepareDataTagCorrelation();
@@ -1128,13 +1300,14 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessmentTagCorrelation
 	 */
 	public function testTriggerCEP_EventAssessmentTagCorrelationRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataTagCorrelation();
 		$this->runEventAssessmentTest(true);
 		$this->assertNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
-	 * @depends testTriggerCEP_EventAssessmentTagCorrelationRestart
+	 * @depends testTriggerCEP_EventAssessmentTagCorrelation
 	 */
 	public function testTriggerCEP_DependentTriggerTagCorrelation() {
 		$this->runDependentTriggerTest(false);
@@ -1145,12 +1318,18 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_DependentTriggerTagCorrelation
 	 */
 	public function testTriggerCEP_DependentTriggerTagCorrelationRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
 		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
-	 * @depends testTriggerCEP_DependentTriggerTagCorrelationRestart
+	 * prepareDataServiceCorrelation() fully reconfigures the prototypes and resends LLD, so this
+	 * test is self-contained and only needs the discovered host/triggers from the LLD step.
+	 * Run in isolation as
+	 * (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_.*TagCorrelation.*|testTriggerCEP_EventAssessmentServiceCorrelation.*)
+	 * (the .* options also pull in the Restart, dependent-trigger and ManualClose variants that chain to these tests)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_EventAssessmentServiceCorrelation() {
 		$this->prepareDataServiceCorrelation();
@@ -1162,6 +1341,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessmentServiceCorrelation
 	 */
 	public function testTriggerCEP_EventAssessmentServiceCorrelationRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataServiceCorrelation();
 		$this->runEventAssessmentTestCorrelation(true);
 		$this->assertNoOpenProblems(self::$discovered_triggerids);
@@ -1171,7 +1351,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * Same scenario as testTriggerCEP_EventAssessmentServiceCorrelation but the remaining
 	 * "down_1" problem is closed via manual close rather than an automatic recovery event.
 	 *
-	 * @depends testTriggerCEP_EventAssessmentServiceCorrelationRestart
+	 * @depends testTriggerCEP_EventAssessmentServiceCorrelation
 	 */
 	public function testTriggerCEP_EventAssessmentServiceCorrelationManualClose() {
 		$this->prepareDataServiceCorrelation();
@@ -1186,6 +1366,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessmentServiceCorrelationManualClose
 	 */
 	public function testTriggerCEP_EventAssessmentServiceCorrelationManualCloseRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataServiceCorrelation();
 		$this->runEventAssessmentTestCorrelationManualClose(true);
 		$this->assertNoOpenProblems(self::$discovered_triggerids);
@@ -1215,6 +1396,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCrossTrigger
 	 */
 	public function testTriggerCEP_EventAssessmentGlobalCorrelationCrossTriggerRestart() {
+		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataGlobalCorrelation();
 		$this->runEventAssessmentTestGlobalCorrelationCrossTrigger(true);
 		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
@@ -1224,10 +1406,10 @@ class testTriggerCEP extends CIntegrationTest {
 	 * Send empty LLD data to delete all resources that were discovered during the test run
 	 * and verify the discovered triggers are actually removed.
 	 *
-	 * @depends testTriggerCEP_DependentTriggerRestart
-	 * @depends testTriggerCEP_EventAssessmentNoneRestart
-	 * @depends testTriggerCEP_EventAssessmentServiceCorrelationManualCloseRestart
-	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCrossTriggerRestart
+	 * @depends testTriggerCEP_DependentTrigger
+	 * @depends testTriggerCEP_EventAssessmentNone
+	 * @depends testTriggerCEP_EventAssessmentServiceCorrelationManualClose
+	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCrossTrigger
 	 */
 	public function testTriggerCEP_Cleanup() {
 		self::triggerCEP_Cleanup();
@@ -1287,6 +1469,68 @@ class testTriggerCEP extends CIntegrationTest {
 		self::clearData();
 	}
 
+	/**
+	 * Drive all discovered items into the unsupported state (triggers become UNKNOWN) and verify that
+	 * an internal problem is opened for every unsupported item and every unknown trigger.
+	 */
+	private function runOpenUnknownTest(): void {
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+
+		// Push a non-numeric value to flip all items into unsupported state; CEP keeps the trigger
+		// value unchanged (OK) while the state becomes UNKNOWN.
+		$this->sendSenderValues(
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'not_a_number'], $keys),
+			null, 0
+		);
+
+		$this->validateTriggerParams(TRIGGER_STATE_UNKNOWN, TRIGGER_VALUE_FALSE);
+
+		// An internal problem must be opened for every unknown trigger.
+		$this->callUntilCountIsPresent('problem.get', [
+			'objectids' => self::$discovered_triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_INTERNAL
+		], self::LLD_DISCOVERY_COUNT, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+
+		// An internal problem must be opened for every unsupported item on the discovered host.
+		$this->callUntilCountIsPresent('problem.get', [
+			'hostids' => [self::$disc_hostid],
+			'object' => EVENT_OBJECT_ITEM,
+			'source' => EVENT_SOURCE_INTERNAL
+		], self::LLD_DISCOVERY_COUNT, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Restore all discovered items to the supported state (triggers return to NORMAL/OK) and verify that
+	 * every internal problem opened by runOpenUnknownTest is resolved.
+	 */
+	private function runCloseUnknownTest(): void {
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+
+		// Send a numeric value of 0 to restore all items to supported state; the trigger returns to
+		// the NORMAL state and stays OK.
+		$this->sendSenderValues(
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'], $keys),
+			null, 0
+		);
+
+		$this->validateTriggerParams(TRIGGER_STATE_NORMAL, TRIGGER_VALUE_FALSE);
+
+		// Every internal trigger-unknown problem must be resolved once the triggers leave UNKNOWN.
+		$this->callUntilCountIsPresent('problem.get', [
+			'objectids' => self::$discovered_triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_INTERNAL
+		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+
+		// Every internal item-not-supported problem must be resolved once the items become supported.
+		$this->callUntilCountIsPresent('problem.get', [
+			'hostids' => [self::$disc_hostid],
+			'object' => EVENT_OBJECT_ITEM,
+			'source' => EVENT_SOURCE_INTERNAL
+		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
 	private function runEventAssessmentTest(bool $restart): void {
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$triggerids = self::$discovered_triggerids;
@@ -1300,7 +1544,8 @@ class testTriggerCEP extends CIntegrationTest {
 		$tag_correlation = ((int) $trigger['correlation_mode'] === ZBX_TRIGGER_CORRELATION_TAG);
 		$mult_event = ((int) $trigger['type'] === TRIGGER_MULT_EVENT_ENABLED);
 
-		$expected_events = $this->getTriggerEventCount(self::$discovered_triggerid);
+		$this->captureEventBaseline($triggerids);
+		$expected_events = 0;
 
 		// 1. OK→OK: no new event, no lastchange update.
 		$this->assertNoStateChangeForAll($triggerids, $keys, '0', TRIGGER_VALUE_FALSE, $expected_events);
@@ -1364,7 +1609,8 @@ class testTriggerCEP extends CIntegrationTest {
 				'All triggers must start in OK state for service correlation assessment.');
 		}
 
-		$expected_events = $this->getTriggerEventCount(self::$discovered_triggerid);
+		$this->captureEventBaseline($triggerids);
+		$expected_events = 0;
 
 		// 1. "down_0": expression true, service tag = "0" → PROBLEM event; trigger goes TRUE.
 		$expected_events++;
@@ -1419,7 +1665,8 @@ class testTriggerCEP extends CIntegrationTest {
 				'All triggers must start in OK state for service correlation manual-close assessment.');
 		}
 
-		$expected_events = $this->getTriggerEventCount(self::$discovered_triggerid);
+		$this->captureEventBaseline($triggerids);
+		$expected_events = 0;
 
 		// 1. "down_0": expression true, service tag = "0" → PROBLEM event; trigger goes TRUE.
 		$expected_events++;
@@ -1472,7 +1719,8 @@ class testTriggerCEP extends CIntegrationTest {
 				'All triggers must start in OK state for service correlation assessment.');
 		}
 
-		$expected_events = $this->getTriggerEventCount(self::$discovered_triggerid);
+		$this->captureEventBaseline($triggerids);
+		$expected_events = 0;
 
 		// 1. "down_0": expression true, service tag = "0" → PROBLEM event; trigger goes TRUE.
 		$expected_events++;
@@ -1531,7 +1779,8 @@ class testTriggerCEP extends CIntegrationTest {
 				'Proto 2 triggers must start in OK state for cross-trigger global correlation test.');
 		}
 
-		$expected_events1 = $this->getTriggerEventCount(self::$discovered_triggerid);
+		$this->captureEventBaseline(array_merge($triggerids1, $triggerids2));
+		$expected_events1 = 0;
 
 		// 1. "down" → proto 1: PROBLEM, service="down"; proto 1 triggers go TRUE.
 		$expected_events1++;
@@ -1561,20 +1810,22 @@ class testTriggerCEP extends CIntegrationTest {
 				'All triggers must start in OK state.');
 		}
 
-		$parent_event_count = $this->getTriggerEventCount($parent_ids[0]);
-		$dep_event_count = $this->getTriggerEventCount($dep_ids[0]);
+		$this->captureEventBaseline(array_merge($parent_ids, $dep_ids));
+		$parent_event_count = 0;
+		$dep_event_count = 0;
 
 		// 1. Parent OK→PROBLEM.
 		$this->assertStateChangeForAll($parent_ids, $parent_keys, '1', TRIGGER_VALUE_TRUE, $parent_event_count + 1);
 		$this->maybeRestartServer($restart);
 
 		// 2. Dependents suppressed while parents are PROBLEM.
-		$this->assertNoStateChangeForAll($dep_ids, $dep_keys, '1', TRIGGER_VALUE_FALSE, $dep_event_count);
+		$this->assertNoStateChangeForAll($dep_ids, $dep_keys, '2', TRIGGER_VALUE_FALSE, $dep_event_count);
 		$this->maybeRestartServer($restart);
 
 		// 3. Parent PROBLEM→OK: dependents fire.
 		$this->assertStateChangeForAll($parent_ids, $parent_keys, '0', TRIGGER_VALUE_FALSE, $parent_event_count + 2);
-		$this->assertStateChangeForAll($dep_ids, $dep_keys, '1', TRIGGER_VALUE_TRUE, $dep_event_count + 1);
+
+		$this->assertStateChangeForAll($dep_ids, $dep_keys, '1', TRIGGER_VALUE_TRUE, $dep_event_count + 1, false);
 		$this->maybeRestartServer($restart);
 
 		// 4. Dependent PROBLEM→OK: dependents recover.
@@ -1730,7 +1981,8 @@ class testTriggerCEP extends CIntegrationTest {
 			$this->assertEquals(TRIGGER_VALUE_TRUE, $triggers[$triggerid]['value'],
 				'trigger #'.$idx.' must still be PROBLEM before recovery-after-restore check.');
 		}
-		$event_count = $this->getTriggerEventCount($triggerids[0]);
+		$this->captureEventBaseline($triggerids);
+		$event_count = 0;
 
 		$this->maybeRestartServer($restart);
 
@@ -1752,6 +2004,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
+			'output' => ['eventid']
 		]);
 		$this->assertCount(count($triggerids), $response['result'], 'Expected exactly one open problem per trigger: '.json_encode($response));
 		$problem_eventids = array_column($response['result'], 'eventid');
@@ -1763,7 +2016,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'message' => 'Manual close for tag-correlation mode test'
 		]);
 		$this->assertArrayHasKey('error', $ack_response,
-			'Expected manual close to be rejected, but it succeeded.');
+			'Expected manual close to be rejected, but it succeeded: '.json_encode($ack_response));
 
 		// Enable manual close on the trigger prototypes so the setting propagates to all
 		// discovered triggers after LLD re-discovery.
@@ -1881,6 +2134,16 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->startComponent(self::COMPONENT_SERVER);
 	}
 
+	/**
+	 * Skip the calling *Restart test when SKIP_RESTART_TESTS is enabled. The non-restart sibling
+	 * leaves the system in the same asserted state, so dependents can rely on it instead.
+	 */
+	private function skipIfRestartTestsDisabled(): void {
+		if (self::SKIP_RESTART_TESTS) {
+			$this->markTestSkipped('Restart test variants disabled via SKIP_RESTART_TESTS.');
+		}
+	}
+
 	private function buildItemLLDData(): string {
 		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
 		$data = [];
@@ -1897,6 +2160,22 @@ class testTriggerCEP extends CIntegrationTest {
 			$keys[] = $proto_key.'['.$base.$i.']';
 		}
 		return $keys;
+	}
+
+	/**
+	 * Enable or disable a built-in action by name (used for the internal "Report unknown triggers"
+	 * and "Report not supported items" actions).
+	 */
+	private function setInternalActionStatus(string $name, int $status): void {
+		$response = $this->call('action.get', [
+			'output' => ['actionid'],
+			'filter' => ['name' => $name]
+		]);
+		$this->assertNotEmpty($response['result'], 'Action "'.$name.'" not found.');
+		$this->call('action.update', [
+			'actionid' => $response['result'][0]['actionid'],
+			'status' => $status
+		]);
 	}
 
 	private function validateTriggerParams($expected_state, $expected_value) {
@@ -1922,14 +2201,27 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 	}
 
-	private function getTriggerEventCount(int $triggerid): int {
+	/**
+	 * Capture the highest eventid currently recorded for the given triggers. The returned value
+	 * is stored as the scenario baseline so that subsequent event.get queries only retrieve events
+	 * generated after this point (see $event_baseline_id and waitForAllTriggerEventCounts), keeping
+	 * the queries bounded regardless of how much event history has accumulated. Per-trigger event
+	 * counts are then expressed as deltas relative to this baseline (so they start at 0).
+	 */
+	private function captureEventBaseline(array $triggerids): int {
 		$response = $this->call('event.get', [
-			'objectids' => [$triggerid],
+			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
-			'countOutput' => true
+			'sortfield' => 'eventid',
+			'sortorder' => 'DESC',
+			'limit' => 1,
+			'output' => ['eventid']
 		]);
-		return (int) $response['result'];
+
+		$this->event_baseline_id = empty($response['result']) ? 0 : (int) $response['result'][0]['eventid'];
+
+		return $this->event_baseline_id;
 	}
 
 	private function waitForTriggerEventCount(int $triggerid, int $expected_count): array {
@@ -1937,6 +2229,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'objectids' => [$triggerid],
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1,
 			'sortfield' => 'eventid',
 			'sortorder' => 'DESC',
 			'output' => ['eventid', 'name', 'value', 'clock']
@@ -1946,38 +2239,42 @@ class testTriggerCEP extends CIntegrationTest {
 		return $response['result'];
 	}
 
-	private function waitForAllTriggerEventCounts(array $triggerids, int $expected_count): array {
-		$params = [
+	/**
+	 * Wait until exactly $expected_count events per trigger have been generated since the scenario
+	 * baseline. All triggers are fed identical values, so their per-trigger counts move together;
+	 * waiting on the total lets the server aggregate (countOutput) instead of fetching and counting
+	 * every event row on each poll iteration. callUntilCountIsPresent requires exact equality, so a
+	 * missing or extra event on any trigger keeps the total off-target and fails the wait.
+	 */
+	private function waitForAllTriggerEventCounts(array $triggerids, int $expected_count): void {
+		// eventid_from is inclusive, so +1 excludes the baseline event itself. A target of 0
+		// (no state change expected) is handled too: the count returns 0 immediately, and any
+		// spurious event keeps it off-target and fails the wait.
+		$this->callUntilCountIsPresent('event.get', [
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1
+		], count($triggerids) * $expected_count,
+			self::STATE_CHANGE_WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY
+		);
+	}
+
+	/**
+	 * Fetch the events generated since the scenario baseline, grouped by trigger (newest first).
+	 * Only needed where the event values themselves are asserted; most callers just wait on the
+	 * count via waitForAllTriggerEventCounts().
+	 */
+	private function getScenarioEventsByTrigger(array $triggerids): array {
+		$response = $this->call('event.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1,
 			'sortfield' => 'eventid',
 			'sortorder' => 'DESC',
-			'output' => ['eventid', 'value', 'clock', 'objectid', /* name */]
-		];
-
-		if ($expected_count === 0) {
-			// callUntilDataIsPresent requires a non-empty result, so it can never
-			// succeed when we expect zero events. Call the API once directly instead.
-			$response = $this->call('event.get', $params);
-		}
-		else {
-			$response = $this->callUntilDataIsPresent('event.get', $params,
-				self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-				function ($response) use ($triggerids, $expected_count) {
-					$counts = array_fill_keys($triggerids, 0);
-					foreach ($response['result'] as $event) {
-						$counts[(int) $event['objectid']]++;
-					}
-					foreach ($counts as $count) {
-						if ($count !== $expected_count) {
-							return false;
-						}
-					}
-					return true;
-				}
-			);
-		}
+			'output' => ['value', 'objectid']
+		]);
 
 		$events_by_trigger = array_fill_keys($triggerids, []);
 		foreach ($response['result'] as $event) {
@@ -2005,7 +2302,8 @@ class testTriggerCEP extends CIntegrationTest {
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value], $keys),
 			null, 1
 		);
-		$events_by_trigger = $this->waitForAllTriggerEventCounts($triggerids, $expected_event_count);
+		$this->waitForAllTriggerEventCounts($triggerids, $expected_event_count);
+		$events_by_trigger = $this->getScenarioEventsByTrigger($triggerids);
 		$triggers = $this->getTriggers($triggerids);
 		foreach ($triggerids as $idx => $triggerid) {
 			$trigger = $triggers[$triggerid];
@@ -2017,7 +2315,7 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	private function assertStateChangeForAll(array $triggerids, array $keys, string $item_value,
-			int $expected_trigger_value, int $expected_event_count): void {
+			int $expected_trigger_value, int $expected_event_count, bool $check_lastchange = true): void {
 		$now = time();
 		$prev_triggers = $this->getTriggers($triggerids);
 		$prev_lastchanges = array_map(fn($tid) => $prev_triggers[$tid]['lastchange'], $triggerids);
@@ -2032,19 +2330,59 @@ class testTriggerCEP extends CIntegrationTest {
 			'output' => ['triggerid', 'value', 'lastchange', 'state', 'recovery_mode', 'type', 'correlation_mode']
 		];
 		$this->callUntilDataIsPresent('trigger.get', $trigger_params,
-			self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-			function ($response) use ($triggerids, $expected_trigger_value, $prev_lastchanges, $now) {
+			self::STATE_CHANGE_WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
+			function ($response) use ($triggerids, $expected_trigger_value, $prev_lastchanges, $now, $check_lastchange) {
 				$by_id = array_column($response['result'], null, 'triggerid');
+				$missing = 0;
+				$wrong_value = 0;
+				$wrong_state = 0;
+				$wrong_lastchange = 0;
+				$failing_triggerid = null;
 				foreach ($triggerids as $idx => $triggerid) {
 					if (!isset($by_id[$triggerid])) {
-						return false;
+						$missing++;
+						if ($failing_triggerid === null) {
+							$failing_triggerid = $triggerid;
+						}
+						continue;
 					}
 					$t = $by_id[$triggerid];
-					if ((int) $t['value'] !== $expected_trigger_value) return false;
-					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) return false;
-					if ($now > $prev_lastchanges[$idx]) {
-						if ((int) $t['lastchange'] <= $prev_lastchanges[$idx]) return false;
+					$wrong = false;
+					if ((int) $t['value'] !== $expected_trigger_value) {
+						$wrong_value++;
+						$wrong = true;
 					}
+					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) {
+						$wrong_state++;
+						$wrong = true;
+					}
+					if ($check_lastchange && $now > $prev_lastchanges[$idx]
+							&& (int) $t['lastchange'] <= $prev_lastchanges[$idx]) {
+						$wrong_lastchange++;
+						$wrong = true;
+					}
+					if ($wrong && $failing_triggerid === null) {
+						$failing_triggerid = $triggerid;
+					}
+				}
+				if ($missing > 0 || $wrong_value > 0 || $wrong_state > 0 || $wrong_lastchange > 0) {
+					$last_event_name = '<none>';
+					$events = $this->call('event.get', [
+						'objectids' => [$failing_triggerid],
+						'source' => EVENT_SOURCE_TRIGGERS,
+						'object' => EVENT_OBJECT_TRIGGER,
+						'output' => ['name'],
+						'sortfield' => ['clock', 'eventid'],
+						'sortorder' => ZBX_SORT_DOWN,
+						'limit' => 1
+					]);
+					if (!empty($events['result'])) {
+						$last_event_name = $events['result'][0]['name'];
+					}
+					return 'of '.count($triggerids).' triggers: '.$missing.' missing, '.$wrong_value.
+							' wrong value (expected '.$expected_trigger_value.'), '.$wrong_state.
+							' wrong state (expected NORMAL), '.$wrong_lastchange.' lastchange not updated now:'.$now.
+							'; last event of failing trigger '.$failing_triggerid.': "'.$last_event_name.'"';
 				}
 				return true;
 			}
@@ -2067,7 +2405,8 @@ class testTriggerCEP extends CIntegrationTest {
 
 		$this->assertVpsWrittenIncreasedBy($vps_written, count($keys));
 
-		$events_by_trigger = $this->waitForAllTriggerEventCounts($triggerids, $expected_event_count);
+		// The count is enforced by the wait itself (exact total match); no per-trigger fetch needed.
+		$this->waitForAllTriggerEventCounts($triggerids, $expected_event_count);
 		$triggers_by_id = $this->getTriggers($triggerids);
 
 		foreach ($triggerids as $idx => $triggerid) {
@@ -2075,26 +2414,19 @@ class testTriggerCEP extends CIntegrationTest {
 			$info = 'trigger #'.$idx.' '.json_encode($trigger);
 			$this->assertEquals($expected_trigger_value, $trigger['value'], $info);
 			$this->assertEquals($expected_lastchanges[$idx], $trigger['lastchange'], $info);
-			$this->assertCount($expected_event_count, $events_by_trigger[$triggerid], $info);
 		}
 	}
 
 	private function waitForNoOpenProblems(array $triggerids, string $message = ''): void {
 		// Wait for all problems to have a recovery event.
-		$this->callUntilDataIsPresent('problem.get', [
+		// Wait until no unresolved problems remain. Using countOutput avoids fetching/decoding any
+		// problem rows: the server returns just a count, and we poll until it reaches zero. (Default
+		// problem.get without 'recent' returns only open problems, so count 0 means all recovered.)
+		$this->callUntilCountIsPresent('problem.get', [
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'recent' => true,
-			'output' => ['r_eventid']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-			foreach ($response['result'] as $problem) {
-				if ((int) $problem['r_eventid'] === 0) {
-					return false;
-				}
-			}
-			return true;
-		});
+			'source' => EVENT_SOURCE_TRIGGERS
+		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 		// Wait for all triggers to return to OK.
 		$this->callUntilDataIsPresent('trigger.get', [
@@ -2132,6 +2464,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
+			'output' => ['eventid']
 		]);
 		$this->assertEmpty($response['result'],
 			$prefix.'Expected no open problems: '.json_encode($response));
@@ -2197,11 +2530,15 @@ class testTriggerCEP extends CIntegrationTest {
 
 	private function assertVpsWrittenIncreasedBy(int $baseline, int $min_increase): void {
 		$expected = $baseline + $min_increase;
-		for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
+
+		// Poll every 100 ms; keep the same overall timeout as the 1 s-based waits by scaling the
+		// iteration count up by 10x (WAIT_ITERATIONS * WAIT_ITERATION_DELAY seconds total).
+		$iterations = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY * 10;
+		for ($i = 0; $i < $iterations; $i++) {
 			if ($this->getVpsWritten() >= $expected) {
 				break;
 			}
-			sleep(self::WAIT_ITERATION_DELAY);
+			usleep(100000);
 		}
 		$this->assertGreaterThanOrEqual($expected, $this->getVpsWritten());
 	}
@@ -2226,5 +2563,22 @@ class testTriggerCEP extends CIntegrationTest {
 			CDataHelper::call('template.delete', [self::$templateid]);
 			self::$templateid = null;
 		}
+
+		// Disable the internal actions again in case a test enabled them and aborted before restoring.
+		foreach (['Report unknown triggers', 'Report not supported items'] as $action_name) {
+			$result = CDataHelper::call('action.get', [
+				'output' => ['actionid'],
+				'filter' => ['name' => $action_name]
+			]);
+			if (!empty($result)) {
+				CDataHelper::call('action.update', [
+					'actionid' => $result[0]['actionid'],
+					'status' => ACTION_STATUS_DISABLED
+				]);
+			}
+		}
+
+		// Re-enable audit log disabled in prepareData().
+		CDataHelper::call('settings.update', ['auditlog_enabled' => 1, 'auditlog_mode' => 1]);
 	}
 }

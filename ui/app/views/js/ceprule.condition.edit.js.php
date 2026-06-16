@@ -27,29 +27,15 @@ window.ceprule_condition_edit_popup = new class {
 	/** @type {CForm} */
 	form;
 
-	/** @type {Overlay} */
-	#overlay;
-
-	/** @type {Object} */
-	#templates;
-
-	/** @type {Array} */
-	#live_nodes = [];
-
-	/** @type {DocumentFragment} */
-	#template;
-
 	init({rules, condition, overlay}) {
-		this.#overlay = overlay;
-		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
-
-		this.#templates = Object.fromEntries([...this.form_element.querySelectorAll('template[for-type]')]
-			.map(template => [template.getAttribute('for-type'), template.content]));
 
 		this.#setValues(condition);
 		this.#initActions();
 		window['ceprule-condition-type'].dispatchEvent(new Event('change'));
+
+		window.requestAnimationFrame(() => this.form_element.style.display = '');
 	}
 
 	#initActions() {
@@ -57,7 +43,7 @@ window.ceprule_condition_edit_popup = new class {
 	}
 
 	#setValues(condition) {
-		[...this.#templates[condition.type].querySelectorAll('[name]')].map((node) => {
+		[...this.form_element.querySelectorAll('[name]')].map((node) => {
 			if (node.type === 'radio') {
 				node.checked = node.value === condition[node.name];
 			}
@@ -71,18 +57,76 @@ window.ceprule_condition_edit_popup = new class {
 	}
 
 	#handleTypeChanged(type) {
-		const content = this.#templates[type];
-		const form_grid = this.form_element.querySelector('.form-grid');
+		const condition_type_operators = {
+			[<?= CCepRuleHelper::CONDITION_EVENT_NAME ?>]: [
+				<?= CONDITION_OPERATOR_NOT_LIKE ?>,
+				<?= CONDITION_OPERATOR_LIKE ?>,
+				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
+				<?= CONDITION_OPERATOR_EQUAL ?>
+			],
+			[<?= CCepRuleHelper::CONDITION_HOST ?>]: [
+				<?= CONDITION_OPERATOR_EQUAL ?>,
+				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
+				<?= CONDITION_OPERATOR_LIKE ?>,
+				<?= CONDITION_OPERATOR_NOT_LIKE ?>
+			],
+			[<?= CCepRuleHelper::CONDITION_HOST_GROUP ?>]: [
+				<?= CONDITION_OPERATOR_EQUAL ?>,
+				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
+				<?= CONDITION_OPERATOR_LIKE ?>,
+				<?= CONDITION_OPERATOR_NOT_LIKE ?>
+			],
+			[<?= CCepRuleHelper::CONDITION_HOST ?>]: [
+				<?= CONDITION_OPERATOR_EQUAL ?>,
+				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
+				<?= CONDITION_OPERATOR_LIKE ?>,
+				<?= CONDITION_OPERATOR_NOT_LIKE ?>
+			],
+			[<?= CCepRuleHelper::CONDITION_TAG_NAME ?>]: [
+				<?= CONDITION_OPERATOR_EQUAL ?>,
+				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
+				<?= CONDITION_OPERATOR_LIKE ?>,
+				<?= CONDITION_OPERATOR_NOT_LIKE ?>,
+				<?= CONDITION_OPERATOR_NOT_EXISTS ?>
+			],
+			[<?= CCepRuleHelper::CONDITION_TAG_VALUE ?>]: [
+				<?= CONDITION_OPERATOR_EQUAL ?>,
+				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
+				<?= CONDITION_OPERATOR_LIKE ?>,
+				<?= CONDITION_OPERATOR_NOT_LIKE ?>,
+				<?= CONDITION_OPERATOR_MORE_EQUAL ?>,
+				<?= CONDITION_OPERATOR_LESS_EQUAL ?>
+			],
+			[<?= CCepRuleHelper::CONDITION_SEVERITY ?>]: [
+				<?= CONDITION_OPERATOR_EQUAL ?>,
+				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
+				<?= CONDITION_OPERATOR_MORE_EQUAL ?>,
+				<?= CONDITION_OPERATOR_LESS_EQUAL ?>
+			],
+			[<?= CCepRuleHelper::CONDITION_TIME_PERIOD ?>]: [
+				<?= CONDITION_OPERATOR_IN ?>,
+				<?= CONDITION_OPERATOR_NOT_IN ?>
+			]
+		};
+		[...window['ceprule-condition-operator'].querySelectorAll('input')].map((node) => {
+			const is_type_option = condition_type_operators[Number(type)].includes(Number(node.value));
 
-		this.#live_nodes.forEach(node => {
-			this.#template.append(node);
+			node.disabled = !is_type_option;
+			node.closest('li').style.display = is_type_option ? '' : 'none';
 		});
-		this.#live_nodes = [];
-		Array.from(content.children).forEach(node => {
-			form_grid.appendChild(node);
-			this.#live_nodes.push(node);
+
+		const radio_inputs = [...window['ceprule-condition-operator'].querySelectorAll('input:not([disabled])')];
+
+		if (!radio_inputs.filter(node => node.checked).length) {
+			radio_inputs[0].checked = true;
+		}
+
+		[...this.form_element.querySelectorAll('[for-type]')].map((field) => {
+			const is_visible = Number(type) === Number(field.getAttribute('for-type'));
+
+			field.style.display = is_visible ? '' : 'none';
+			field.previousElementSibling.style.display = is_visible ? '' : 'none';
+			field.querySelector('input').disabled = !is_visible;
 		});
-		this.#template = content;
-		this.form.discoverAllFields();
 	}
 };

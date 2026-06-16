@@ -103,7 +103,7 @@ class CControllerAcknowledgeEdit extends CController {
 		$events = API::Event()->get([
 			'output' => ['eventid', 'name', 'objectid', 'acknowledged', 'value', 'r_eventid', 'cause_eventid'],
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
-				'suppress_until'
+				'suppress_until', 'maintenanceid'
 			],
 			'selectSuppressionData' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
 				? ['maintenanceid', 'suppress_until']
@@ -124,6 +124,12 @@ class CControllerAcknowledgeEdit extends CController {
 				'preservekeys' => true
 			]);
 			$data['problem_name'] = $event['name'];
+
+			$data['maintenances'] = API::Maintenance()->get([
+				'output' => ['name'],
+				'maintenanceids' => array_column($event['acknowledges'], 'maintenanceid', 'maintenanceid'),
+				'preservekeys' => true
+			]);
 		}
 		else {
 			$data['problem_name'] = _s('%1$d problems selected.', count($events));

@@ -15,15 +15,17 @@
 #include "cep.h"
 #include "cep_event.h"
 #include "cep_window.h"
-#include "zbxcep.h"
-#include "zbxcep_client.h"
+#include "zbx_cep.h"
+#include "zbx_cep_client.h"
 
+#include "zbxcacheconfig.h"
 #include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxdbhigh.h"
+#include "zbxhash.h"
 #include "zbxlog.h"
 #include "zbxnum.h"
 #include "zbxtypes_ext.h"
@@ -52,7 +54,7 @@
 ZBX_VECTOR_IMPL(cep_event, zbx_cep_event_t)
 ZBX_PTR_VECTOR_IMPL(cep_event_ptr, zbx_cep_event_t *)
 
-/* Ehen CEP is notified about deleted events it might not be able to remove them from cache */
+/* When CEP is notified about deleted events it might not be able to remove them from cache */
 /* if their handles are held by other entities. In this case mark them as deleted in cache  */
 /* and pretend those events are not cached when requested.                                  */
 typedef enum
@@ -153,7 +155,7 @@ static zbx_cep_event_handle_t	cep_create_event_handle(zbx_cep_t *cep, zbx_cep_ev
 {
 	zbx_cep_event_ptr_t	handle_local = {
 			.eventid = event->eventid,
-			.event = cep_event_addref(event),
+			.event = event,
 			.state = CEP_EVENT_STATE_ACTIVE,
 			.refcount = 1
 		};
@@ -387,64 +389,95 @@ int	cep_origin_problem(const zbx_cep_origin_t *origin)
  ******************************************************************************/
 static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 {
-	zbx_cep_event_t	*event = NULL;
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
+#define CEP_PROBLEM_BATCH	5000
 
-	result = zbx_dbconn_select(db, "select p.eventid,p.clock,p.severity,t.tag,t.value,p.ns,p.source,p.object,"
-			"p.objectid"
-		" from problem p"
-		" left join problem_tag t"
-			" on p.eventid=t.eventid"
-		" where r_eventid is null"
-			" and (p.source=%d or p.source=%d)"
-		" order by p.eventid",
-		EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL);
+	zbx_cep_event_t		*event = NULL;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	zbx_vector_uint64_t	eventids;
+	zbx_uint64_t		eventid = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset;
 
-	while (NULL != (row = zbx_db_fetch(result)))
+	zbx_vector_uint64_create(&eventids);
+
+	do
 	{
-		zbx_uint64_t	eventid;
+		zbx_cep_origin_t	origin;
 
-		ZBX_STR2UINT64(eventid, row[0]);
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select p.eventid,p.clock,p.severity,p.ns,p.source,p.object,p.objectid,p.name"
+				" from problem p"
+				" where eventid>" ZBX_FS_UI64
+					" and r_eventid is null"
+					" and (p.source=%d or p.source=%d)"
+				" order by p.eventid",
+				eventid, EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL);
 
-		if (NULL == event || eventid != event->eventid)
+		result = zbx_dbconn_select_n(db, sql, CEP_PROBLEM_BATCH);
+
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			event = (zbx_cep_event_t *)zbx_malloc(NULL, sizeof(zbx_cep_event_t));
-			event->eventid = eventid;
-			event->r_event = NULL;
-			event->clock = atoi(row[1]);
-			event->ns = atoi(row[5]);
-			event->severity = atoi(row[2]);
-			event->suppress_mtime = 0;
-			event->refcount = 0;
-			zbx_vector_tag_create(&event->tags);
-			zbx_vector_db_event_suppress_create(&event->suppress);
+			ZBX_STR2UINT64(eventid, row[0]);
+			ZBX_STR2UCHAR(origin.source, row[4]);
+			ZBX_STR2UCHAR(origin.object, row[5]);
+			ZBX_STR2UINT64(origin.objectid, row[6]);
+
+			event = cep_event_create(eventid, origin.source, origin.object, origin.objectid, row[7],
+					atoi(row[1]), atoi(row[3]), TRIGGER_VALUE_PROBLEM, atoi(row[2]), NULL, NULL);
 
 			zbx_cep_object_t	*obj;
 			zbx_cep_event_handle_t	h;
 
-			ZBX_STR2UCHAR(event->origin.source, row[6]);
-			ZBX_STR2UCHAR(event->origin.object, row[7]);
-			ZBX_STR2UINT64(event->origin.objectid, row[8]);
-
-			event->value = cep_origin_problem(&event->origin);
+			event->value = cep_origin_problem(&origin);
 
 			obj = cep_get_object_or_create(cep, &event->origin);
 			h = cep_create_event_handle(cep, event);
 			zbx_vector_cep_event_handle_append(&obj->events, zbx_cep_event_handle_addref(h));
-		}
 
-		if (FAIL == zbx_db_is_null(row[3]))
+			zbx_vector_uint64_append(&eventids, eventid);
+		}
+		zbx_db_free_result(result);
+	}
+	while (0 != eventids.values_num && 0 == (eventids.values_num % CEP_PROBLEM_BATCH));
+
+	if (0 != eventids.values_num)
+	{
+		zbx_db_large_query_t	query;
+
+		event = NULL;
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select eventid,tag,value from problem_tag where");
+		zbx_dbconn_large_query_prepare_uint(&query, db, &sql, &sql_alloc, &sql_offset, "eventid", &eventids);
+
+		while (NULL != (row = zbx_db_large_query_fetch(&query)))
 		{
 			zbx_tag_t	tag;
 
-			tag.tag = zbx_strdup(NULL, row[3]);
-			tag.value = zbx_strdup(NULL, row[4]);
+			ZBX_STR2UINT64(eventid, row[0]);
+
+			if (NULL == event || event->eventid != eventid)
+			{
+				zbx_cep_event_handle_t	h = cep_get_event(cep, eventid);
+
+				if (NULL == h)
+					continue;
+
+				event = h->event;
+			}
+
+			tag.tag = zbx_strdup(NULL, row[1]);
+			tag.value = zbx_strdup(NULL, row[2]);
 			zbx_vector_tag_append(&event->tags, tag);
 		}
+		zbx_db_large_query_clear(&query);
 	}
 
-	zbx_db_free_result(result);
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&eventids);
+
+#undef CEP_PROBLEM_BATCH
 }
 
 /******************************************************************************
@@ -488,6 +521,259 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
 	}
 
 	zbx_db_free_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create item diff record marking an item as not supported          *
+ *                                                                            *
+ * Parameters: itemid - [IN] item ID                                          *
+ *             error  - [IN] error message                                    *
+ *                                                                            *
+ * Return value: allocated item diff record                                   *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_item_diff_t	*item_diff_create_error(zbx_uint64_t itemid, const char *error)
+{
+	zbx_item_diff_t	*diff;
+
+	diff = (zbx_item_diff_t *)zbx_calloc(NULL, 1, sizeof(zbx_item_diff_t));
+	diff->itemid = itemid;
+	diff->flags = ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+	diff->state = ITEM_STATE_NOTSUPPORTED;
+	zbx_sha512_hash(error, diff->error_hash);
+	diff->error = zbx_strdup(NULL, error);
+
+	return diff;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: collect item diff records for internal CEP items that have an     *
+ *          open problem but are marked as ok in the database                 *
+ *                                                                            *
+ * Parameters: cep        - [IN] CEP data                                     *
+ *             object     - [IN] object type (item or LLD rule)               *
+ *             itemids    - [IN] item IDs to check                            *
+ *             db         - [IN] database connection                          *
+ *             item_diffs - [OUT] collected item diff records                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_sync_item_state(zbx_cep_t *cep, unsigned char object, zbx_vector_uint64_t *itemids,
+		zbx_dbconn_t *db, zbx_vector_item_diff_ptr_t *item_diffs)
+{
+	zbx_db_row_t			row;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_db_large_query_t		query;
+	zbx_cep_origin_t		origin = {.source = EVENT_SOURCE_INTERNAL, .object = object};
+
+	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select itemid from item_rtdata where state=%d and", ITEM_STATE_NORMAL);
+
+	zbx_dbconn_large_query_prepare_uint(&query, db, &sql, &sql_alloc, &sql_offset, "itemid", itemids);
+
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
+	{
+		zbx_cep_object_t	*obj;
+		zbx_item_diff_t		*diff;
+
+		ZBX_STR2UINT64(origin.objectid, row[0]);
+
+		if (NULL == (obj = cep_get_object(cep, &origin)))
+			continue;
+
+		if (0 == obj->events.values_num)
+			diff = item_diff_create_error(origin.objectid, "Unknown error.");
+		else
+			diff = item_diff_create_error(origin.objectid, obj->events.values[0]->event->name);
+
+		zbx_vector_item_diff_ptr_append(item_diffs, diff);
+	}
+	zbx_db_large_query_clear(&query);
+
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create trigger diff record marking a trigger as unknown           *
+ *                                                                            *
+ * Parameters: triggerid - [IN] trigger ID                                    *
+ *             error     - [IN] error message                                 *
+ *                                                                            *
+ * Return value: allocated trigger diff record                                *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_trigger_diff_t	*trigger_diff_create_error(zbx_uint64_t triggerid, const char *error)
+{
+	zbx_trigger_diff_t	*diff;
+
+	diff = (zbx_trigger_diff_t *)zbx_calloc(NULL, 1, sizeof(zbx_trigger_diff_t));
+	diff->triggerid = triggerid;
+	diff->flags = ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR;
+	diff->state = TRIGGER_STATE_UNKNOWN;
+	diff->error = zbx_strdup(NULL, error);
+
+	return diff;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: collect trigger diff records for internal CEP triggers that have  *
+ *          an open problem but are marked as ok in the database              *
+ *                                                                            *
+ * Parameters: cep           - [IN] CEP data                                  *
+ *             triggerids    - [IN] trigger IDs to check                      *
+ *             db            - [IN] database connection                       *
+ *             trigger_diffs - [OUT] collected trigger diff records           *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_sync_trigger_state(zbx_cep_t *cep, zbx_vector_uint64_t *triggerids, zbx_dbconn_t *db,
+		zbx_vector_trigger_diff_ptr_t *trigger_diffs)
+{
+	zbx_db_row_t			row;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_db_large_query_t		query;
+	zbx_cep_origin_t		origin = {.source = EVENT_SOURCE_INTERNAL, .object = EVENT_OBJECT_TRIGGER};
+
+	zbx_vector_uint64_sort(triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select triggerid from trigger_rtdata where state=%d and", TRIGGER_STATE_NORMAL);
+
+	zbx_dbconn_large_query_prepare_uint(&query, db, &sql, &sql_alloc, &sql_offset, "triggerid", triggerids);
+
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
+	{
+		zbx_cep_object_t	*obj;
+		zbx_trigger_diff_t	*diff;
+
+		ZBX_STR2UINT64(origin.objectid, row[0]);
+
+		if (NULL == (obj = cep_get_object(cep, &origin)))
+			continue;
+
+		if (0 == obj->events.values_num)
+			diff = trigger_diff_create_error(origin.objectid, "Unknown error.");
+		else
+			diff = trigger_diff_create_error(origin.objectid, obj->events.values[0]->event->name);
+
+		zbx_vector_trigger_diff_ptr_append(trigger_diffs, diff);
+	}
+	zbx_db_large_query_clear(&query);
+
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sync item and trigger runtime state with open internal problems   *
+ *          to correct desyncs caused by abnormal server shutdown             *
+ *                                                                            *
+ * Parameters: cep - [IN/OUT] CEP data                                        *
+ *             db  - [IN] database connection                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_sync_object_state(zbx_cep_t *cep, zbx_dbconn_t *db)
+{
+	zbx_vector_uint64_t		itemids;
+	zbx_vector_uint64_t		lldruleids;
+	zbx_vector_uint64_t		triggerids;
+	zbx_hashset_iter_t		iter;
+	zbx_cep_object_t		*obj;
+	zbx_vector_item_diff_ptr_t	item_diffs;
+	zbx_vector_trigger_diff_ptr_t	trigger_diffs;
+
+	zbx_vector_uint64_create(&itemids);
+	zbx_vector_uint64_create(&lldruleids);
+	zbx_vector_uint64_create(&triggerids);
+
+	zbx_vector_item_diff_ptr_create(&item_diffs);
+	zbx_vector_trigger_diff_ptr_create(&trigger_diffs);
+
+	zbx_hashset_iter_reset(&cep->objects, &iter);
+	while (NULL != (obj = (zbx_cep_object_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (EVENT_SOURCE_INTERNAL != obj->origin.source)
+			continue;
+
+		switch (obj->origin.object)
+		{
+			case EVENT_OBJECT_ITEM:
+				zbx_vector_uint64_append(&itemids, obj->origin.objectid);
+				break;
+			case EVENT_OBJECT_LLDRULE:
+				zbx_vector_uint64_append(&lldruleids, obj->origin.objectid);
+				break;
+			case EVENT_OBJECT_TRIGGER:
+				zbx_vector_uint64_append(&triggerids, obj->origin.objectid);
+				break;
+		}
+	}
+
+	if (0 != itemids.values_num)
+		cep_sync_item_state(cep, EVENT_OBJECT_ITEM, &itemids, db, &item_diffs);
+
+	if (0 != lldruleids.values_num)
+		cep_sync_item_state(cep, EVENT_OBJECT_LLDRULE, &lldruleids, db, &item_diffs);
+
+	if (0 != triggerids.values_num)
+		cep_sync_trigger_state(cep, &triggerids, db, &trigger_diffs);
+
+	if (0 != item_diffs.values_num || 0 != trigger_diffs.values_num)
+	{
+		int	tnx_error;
+		char	*sql = NULL;
+		size_t	sql_alloc = 0;
+
+		zbx_db_stash_connection(db);
+
+		do
+		{
+			size_t	sql_offset = 0;
+
+			zbx_dbconn_begin(db);
+
+			if (0 != item_diffs.values_num)
+			{
+				zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &item_diffs,
+						ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
+				(void)zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset);
+			}
+
+			if (0 != trigger_diffs.values_num)
+			{
+				zbx_db_save_trigger_changes(&trigger_diffs);
+			}
+		}
+		while (ZBX_DB_DOWN == (tnx_error = zbx_dbconn_commit(db)));
+
+		zbx_db_unstash_connection(db);
+
+		if (ZBX_DB_OK == tnx_error)
+		{
+			zbx_dc_config_items_apply_changes(&item_diffs);
+			zbx_dc_config_triggers_apply_changes(trigger_diffs.values, trigger_diffs.values_num);
+		}
+
+		zbx_free(sql);
+	}
+
+	zbx_vector_trigger_diff_ptr_clear_ext(&trigger_diffs, zbx_trigger_diff_free);
+	zbx_vector_trigger_diff_ptr_destroy(&trigger_diffs);
+
+	zbx_vector_item_diff_ptr_clear_ext(&item_diffs, zbx_item_diff_free);
+	zbx_vector_item_diff_ptr_destroy(&item_diffs);
+
+	zbx_vector_uint64_destroy(&triggerids);
+	zbx_vector_uint64_destroy(&lldruleids);
+	zbx_vector_uint64_destroy(&itemids);
 }
 
 /******************************************************************************
@@ -626,7 +912,7 @@ void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_q
 		{
 			if (CEP_EVENT_DEPENDENCY_DENY == result)
 			{
-				/* trigger depdency check fail, drop any event */
+				/* trigger dependency check fail, drop event */
 				results[i] = CEP_EVENT_DEPENDENCY_DENY;
 				dropped_num++;
 
@@ -1495,10 +1781,7 @@ void	cep_delete_events(zbx_cep_t *cep, const zbx_vector_uint64_t *eventids, zbx_
  ******************************************************************************/
 static void	cep_dump_event(const char *indent, zbx_cep_event_t *event)
 {
-	/* WDN remove */
-	int	log_level = zbx_set_log_level(LOG_LEVEL_DEBUG);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%seventid:" ZBX_FS_UI64, indent, event->eventid);
+	zabbix_log(LOG_LEVEL_DEBUG, "%seventid:" ZBX_FS_UI64 " name:%s", indent, event->eventid, event->name);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s  clock:%d ns:%d severity:%d refs:%u tags:",
 			indent, event->clock, event->ns, event->severity, event->refcount);
 
@@ -1518,9 +1801,6 @@ static void	cep_dump_event(const char *indent, zbx_cep_event_t *event)
 					event->suppress.values[i].cep_ruleid);
 		}
 	}
-
-	/* WDN remove */
-	zbx_set_log_level(log_level);
 }
 
 /******************************************************************************
@@ -1535,9 +1815,6 @@ void	cep_dump(zbx_cep_t *cep, const char *msg)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_cep_object_t	*obj;
-
-	/* WDN remove */
-	int	log_level = zbx_set_log_level(LOG_LEVEL_TRACE);
 
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		return;
@@ -1556,9 +1833,6 @@ void	cep_dump(zbx_cep_t *cep, const char *msg)
 			cep_dump_event("    ", obj->events.values[i]->event);
 		}
 	}
-
-	/* WDN remove */
-	zbx_set_log_level(log_level);
 }
 
 void	cep_update_events_accessed(zbx_cep_t *cep, zbx_uint64_t value)

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -95,7 +95,7 @@ echo (new CObject())
 	]))->setId('ceprule-window-groupby')))
 
 	->addItem((new CLabel(_('Event count tag'), 'ceprule-window-counttag'))->setAsteriskMark())
-	->addItem(new CFormField()
+	->addItem((new CFormField())
 		->addItem((new CRadioButtonList(
 			name: 'window[event_count_tag_enabled]',
 			value: ($data['window']['event_count_tag'] !== '') ? '1' : '0'

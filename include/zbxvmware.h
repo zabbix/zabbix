@@ -264,6 +264,7 @@ typedef struct
 	char	*entity_id;
 	char	*entity_uuid;
 	char	*entity_type;
+	char	*entity_name;
 }
 zbx_vmware_alarm_t;
 ZBX_PTR_VECTOR_DECL(vmware_alarm_ptr, zbx_vmware_alarm_t *)

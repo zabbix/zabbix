@@ -359,15 +359,16 @@ static void	correlation_execute_operations(const zbx_correlation_t *correlation,
  *             tag         - [IN] tag to match                                     *
  *             value       - [IN] tag value to match                               *
  *             op          - [IN] matching operation (ZBX_CONDITION_OPERATOR_)     *
+ *             db          - [IN] database connection                              *
  *                                                                                 *
  ***********************************************************************************/
 static void	correlation_condition_add_tag_match(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *tag,
-		const char *value, unsigned char op)
+		const char *value, unsigned char op, zbx_dbconn_t *db)
 {
 	char	*tag_esc, *value_esc;
 
-	tag_esc = zbx_db_dyn_escape_string(tag);
-	value_esc = zbx_db_dyn_escape_string(value);
+	tag_esc = zbx_dbconn_dyn_escape_string(db, tag);
+	value_esc = zbx_dbconn_dyn_escape_string(db, value);
 
 	switch (op)
 	{
@@ -435,7 +436,7 @@ static char	*correlation_condition_get_event_filter(const zbx_corr_condition_t *
 	switch (condition->type)
 	{
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
-			tag_esc = zbx_db_dyn_escape_string(condition->data.tag.tag);
+			tag_esc = zbx_dbconn_dyn_escape_string(db, condition->data.tag.tag);
 			zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 					"exists (select null from problem_tag pt"
 						" where p.eventid=pt.eventid"
@@ -461,7 +462,7 @@ static char	*correlation_condition_get_event_filter(const zbx_corr_condition_t *
 			}
 			else
 			{
-				tag_esc = zbx_db_dyn_escape_string(condition->data.tag_pair.oldtag);
+				tag_esc = zbx_dbconn_dyn_escape_string(db, condition->data.tag_pair.oldtag);
 
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 						"exists (select null from problem_tag pt"
@@ -470,8 +471,8 @@ static char	*correlation_condition_get_event_filter(const zbx_corr_condition_t *
 								" and",
 						tag_esc);
 
-				zbx_db_add_str_condition_alloc(&filter, &filter_alloc, &filter_offset, "pt.value",
-						(const char **)values.values, values.values_num);
+				zbx_dbconn_add_str_condition_alloc(db, &filter, &filter_alloc, &filter_offset,
+						"pt.value", (const char **)values.values, values.values_num);
 
 				zbx_chrcpy_alloc(&filter, &filter_alloc, &filter_offset, ')');
 
@@ -485,7 +486,7 @@ static char	*correlation_condition_get_event_filter(const zbx_corr_condition_t *
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
 			correlation_condition_add_tag_match(&filter, &filter_alloc, &filter_offset,
 					condition->data.tag_value.tag, condition->data.tag_value.value,
-					condition->data.tag_value.op);
+					condition->data.tag_value.op, db);
 			return filter;
 	}
 

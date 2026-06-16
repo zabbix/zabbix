@@ -31,9 +31,6 @@ window.ceprule_edit_popup = new class {
 	#overlay;
 
 	/** @type {Object} */
-	#initial_form_fields;
-
-	/** @type {Object} */
 	#condition_rules;
 
 	/** @type {Object} */
@@ -99,10 +96,6 @@ window.ceprule_edit_popup = new class {
 		window['ceprule-window-groupby-opt-tag'].dispatchEvent(new Event('change'));
 
 		this.#handleWindowTypeChanged();
-
-		this.#initial_form_fields = this.form.getAllValues(); // TODO: use at on-before page unload confirmation
-		console.log([ceprule, '===', this.#initial_form_fields]);
-
 		this.form_element.style.display = '';
 	}
 
@@ -186,6 +179,7 @@ window.ceprule_edit_popup = new class {
 					<input data-field-type="hidden" name="operations[#{sortorder}][new_tag]" type="hidden" value="#{new_tag_name}"/>
 					<input data-field-type="hidden" name="operations[#{sortorder}][tag_value]" type="hidden" value="#{tag_value}"/>
 					<input data-field-type="hidden" name="operations[#{sortorder}][severity]" type="hidden" value="#{severity}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][suppress_until]" type="hidden" value="#{suppress_until}"/>
 				</td>
 			</tr>
 		`);
@@ -307,7 +301,7 @@ window.ceprule_edit_popup = new class {
 				}
 			}
 			else if (class_list.contains('js-delete')) {
-				window.confirm(<?= json_encode('Delete	complex event processing rule?') ?>) && this.#delete();
+				window.confirm(<?= json_encode('Delete complex event processing rule?') ?>) && this.#delete();
 			}
 			else if (class_list.contains('js-clone')) {
 				this.#clone();
@@ -398,7 +392,7 @@ window.ceprule_edit_popup = new class {
 			headers: {'Content-Type': 'application/json; charset=UTF-8'},
 			body: JSON.stringify({
 				cepruleids: [this.form.findFieldByName('cepruleid').getValue()],
-				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule.edit')) ?>
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>
 			})
 		})
 			.then((response) => response.json())
@@ -407,9 +401,20 @@ window.ceprule_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				overlayDialogueDestroy(this.#overlay.dialogueid);
+				if ('success' in response) {
+					postMessageOk(response.success.title);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+					if ('messages' in response.success) {
+						postMessageDetails('success', response.success.messages);
+					}
+
+					overlayDialogueDestroy(this.#overlay.dialogueid);
+					this.#overlay.$dialogue[0]
+						.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				}
+				else {
+					throw new Error();
+				}
 			})
 			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => {
@@ -443,7 +448,8 @@ window.ceprule_edit_popup = new class {
 
 	#submit(force_sumbit) {
 		const fields = this.form.getAllValues();
-		fields[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('ceprule.edit')) ?>;
+		fields[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>;
+		fields._cep_rule_reset = force_sumbit ? 1 : 0;
 
 		// Correct the sortorder.
 		const operations = {};
@@ -506,7 +512,7 @@ window.ceprule_edit_popup = new class {
 	 *	- type of calculation row.
 	 */
 	#handleFilterChanged() {
-		const evaltype_select = window['ceprule-filter-evaltype']; // TODO fix IDs to static string cep -> ceprule ..
+		const evaltype_select = window['ceprule-filter-evaltype'];
 		const evaltype_field = evaltype_select.closest('.form-field');
 
 		const conditions = Object.values(this.form.findFieldByName('filter[conditions]').getValue() ?? {});
@@ -591,6 +597,7 @@ window.ceprule_edit_popup = new class {
 			buttons: [
 				{
 					title: is_new ? t('Add') : t('Edit'),
+					isSubmit: true,
 					action: (overlay) => {
 						const form = ceprule_condition_edit_popup.form;
 						const fields = form.getAllValues();
@@ -653,6 +660,7 @@ window.ceprule_edit_popup = new class {
 			buttons: [
 				{
 					title: is_new ? t('Add') : t('Edit'),
+					isSubmit: true,
 					action: (overlay) => {
 						const form = ceprule_window_condition_edit_popup.form;
 						const fields = form.getAllValues();
@@ -688,8 +696,6 @@ window.ceprule_edit_popup = new class {
 		});
 
 		ceprule_window_condition_edit_popup.init({rules: this.#window_condition_rules, window_condition, overlay});
-
-		console.warn('openWindowConditionPopup', window_condition);
 	}
 
 	#openOperationPopup(operation, trigger_element) {
@@ -700,8 +706,9 @@ window.ceprule_edit_popup = new class {
 				sortorder: 1 + Math.max(0, ...Object.keys(this.form.findFieldByName('operations').getValue())),
 				evaltype: '<?= CONDITION_EVAL_TYPE_AND_OR ?>',
 				event_name: '',
-				execute_when: '<?= CCepRuleHelper::OP_WHEN_EVENT_OCCURRED ?>',
+				execute_when: '<?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>',
 				new_tag: '',
+				suppress_until: '',
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
 				tag: '',
 				tag_value: '',
@@ -719,6 +726,7 @@ window.ceprule_edit_popup = new class {
 			buttons: [
 				{
 					title: is_new ? t('Add') : t('Edit'),
+					isSubmit: true,
 					action: (overlay) => {
 						const form = ceprule_operation_edit_popup.form;
 						const fields = form.getAllValues();
@@ -809,7 +817,7 @@ window.ceprule_edit_popup = new class {
 			TRIGGER_SEVERITY_WARNING => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_2)),
 			TRIGGER_SEVERITY_AVERAGE => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_3)),
 			TRIGGER_SEVERITY_HIGH => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_4)),
-			TRIGGER_SEVERITY_DISASTER => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_5)),
+			TRIGGER_SEVERITY_DISASTER => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_5))
 		]) ?>';
 		const severity_names = JSON.parse(severity_names_json);
 
@@ -817,13 +825,19 @@ window.ceprule_edit_popup = new class {
 		if ([
 			<?= CCepRuleHelper::OP_INCREASE_SEVERITY ?>,
 			<?= CCepRuleHelper::OP_DECREASE_SEVERITY ?>,
-			<?= CCepRuleHelper::OP_SUPPRESS ?>,
 			<?= CCepRuleHelper::OP_COPY_FIRST ?>,
 			<?= CCepRuleHelper::OP_COPY_LAST ?>,
 			<?= CCepRuleHelper::OP_DISCARD ?>,
 			<?= CCepRuleHelper::OP_CLOSE ?>
 		].includes(operation.type)) {
 			arguments_str = '';
+		}
+		else if ([
+			<?= CCepRuleHelper::OP_SUPPRESS ?>
+		].includes(operation.type)) {
+			arguments_str = operation.suppress_until
+				? <?= json_encode(_('until')) ?> + ' ' + operation.suppress_until
+				: <?= json_encode(_('Indefinately')) ?>;
 		}
 		else if ([
 			<?= CCepRuleHelper::OP_INCREASE_TAG_VALUE ?>,

@@ -23,6 +23,7 @@
 typedef struct
 {
 	zbx_hashset_t			item_tag_links;
+	zbx_hashset_t			trigger_depends_links;
 	zbx_atomic_int_t		itservices_num;
 
 	zbx_correlation_config_t	*correlation_config;

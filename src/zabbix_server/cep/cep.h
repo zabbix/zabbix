@@ -16,8 +16,8 @@
 #define ZABBIX_CEP_H
 
 #include "cep_window.h"
-#include "zbxcep.h"
-#include "zbxcep_client.h"
+#include "zbx_cep.h"
+#include "zbx_cep_client.h"
 #include "zbxcacheconfig.h"
 #include "zbxtypes.h"
 #include "zbxalgo.h"
@@ -39,6 +39,8 @@ void	cep_event_handle_set(zbx_cep_event_handle_t h, zbx_cep_event_t *event);
 zbx_cep_t	*cep_create(void);
 void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool);
 void	cep_destroy(void *a);
+
+void	cep_sync_object_state(zbx_cep_t *cep, zbx_dbconn_t *db);
 
 void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_query_t *queries,
 		unsigned char *results);
@@ -84,6 +86,4 @@ void	cep_update_events_processed(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_update_events_discarded(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats);
 
-zbx_cep_window_t	*cep_acquire_window(zbx_cep_t *cep, const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx);
-
-#endif /* ZABBIX_CEP_CACHE_H */
+#endif /* ZABBIX_CEP_H */

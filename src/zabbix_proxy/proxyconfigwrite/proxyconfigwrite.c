@@ -702,7 +702,7 @@ static int	proxyconfig_delete_rows(const zbx_table_data_t *td, zbx_dbconn_t *db,
 				zbx_vector_str_append(&ids, (char *)id);
 		}
 
-		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, td->table->recid,
+		zbx_dbconn_add_str_condition_alloc(db, &sql, &sql_alloc, &sql_offset, td->table->recid,
 				(const char * const*)ids.values, ids.values_num);
 
 		zbx_vector_str_destroy(&ids);
@@ -843,7 +843,7 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, zbx_dbconn_t *db, id_u
 				zbx_vector_str_append(&ids, (char *)id);
 		}
 
-		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, td->table->recid,
+		zbx_dbconn_add_str_condition_alloc(db, &sql, &sql_alloc, &sql_offset, td->table->recid,
 				(const char * const*)ids.values, ids.values_num);
 
 		zbx_vector_str_destroy(&ids);

@@ -1,7 +1,6 @@
 <?php declare(strict_types = 0);
-
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -42,7 +41,7 @@ echo (new CObject())
 				->setAttribute('placeholder', 'A or (B and C) ...')
 		]))->addClass(ZBX_STYLE_CELL)
 	]))
-	->addItem(new CLabel(_('Historical conditions')))
+	->addItem((new CLabel(_('Historical conditions')))->setAsteriskMark())
 	->addItem((new CFormField())
 		->addItem((new CDiv())
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

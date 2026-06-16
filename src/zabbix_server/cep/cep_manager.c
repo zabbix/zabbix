@@ -22,10 +22,11 @@
 #include "cep_api.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
-#include "zbxcep_client.h"
-#include "zbxcep.h"
+#include "zbx_cep_client.h"
+#include "zbx_cep.h"
 
 #include "zbxcommon.h"
+#include "zbxdb.h"
 #include "zbxipcservice.h"
 #include "zbxlog.h"
 #include "zbxmw.h"
@@ -246,6 +247,30 @@ static void	cep_manager_get_stats(zbx_cep_manager_t *manager, zbx_ipc_client_t *
 	response = (unsigned char*)zbx_malloc(NULL, reponse_len);
 
 	cep_manager_add_remote_task(manager, client, message, response, reponse_len);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sync CEP object runtime state and notify the requesting client    *
+ *                                                                            *
+ * Parameters: dbpool  - [IN] database connection pool                        *
+ *             client  - [IN] requesting IPC client to notify on completion   *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_manager_sync_object_state(zbx_dbconn_pool_t *dbpool, zbx_ipc_client_t **client)
+{
+	zbx_cep_t	*cep;
+	zbx_dbconn_t	*db;
+
+	db = zbx_dbconn_pool_acquire_connection(dbpool);
+
+	cep_cache_acquire(&cep);
+	cep_sync_object_state(cep, db);
+	cep_cache_release(&cep);
+
+	zbx_dbconn_pool_release_connection(dbpool, db);
+
+	zbx_ipc_client_send(*client, ZBX_CEP_SYNC_OBJECT_STATE, NULL, 0);
 }
 
 /******************************************************************************
@@ -631,6 +656,9 @@ void	*zbx_cep_manager_thread(void *args)
 				case ZBX_CEP_DELETE_EVENTS:
 					cep_manager_add_remote_task(manager, &client, &message, NULL, 0);
 					break;
+				case ZBX_CEP_SYNC_OBJECT_STATE:
+				cep_manager_sync_object_state(unit_args->shared->dbpool, &client);
+					break;
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
 					shutdown = 1;
@@ -645,16 +673,33 @@ void	*zbx_cep_manager_thread(void *args)
 
 		/* only stop cep when history syncers no longer require it */
 		if ((!ZBX_IS_RUNNING() || 1 == shutdown) && 0 == zbx_hc_refcount_peek())
-			break;
+		{
+			int	is_empty;
+
+			zbx_mw_queue_lock(manager->base.queue);
+			is_empty = cep_queue_is_empty((zbx_cep_queue_t *)manager->base.queue);
+			zbx_mw_queue_unlock(manager->base.queue);
+
+			if (SUCCEED == is_empty)
+				break;
+		}
 
 		zbx_mw_queue_lock(manager->base.queue);
-		pending_num = zbx_mw_queue_drain_completed(manager->base.queue, &tasks);
+		(void)zbx_mw_queue_drain_completed(manager->base.queue, &tasks);
+		pending_num = cep_queue_pending_commits_num((zbx_cep_queue_t *)manager->base.queue);
 		zbx_mw_queue_unlock(manager->base.queue);
 
 		cep_manager_process_pending(manager);
 
 		if (0 != tasks.values_num)
+		{
+			int	commits_num = manager->commits.values_num;
+
 			cep_manager_process_finished(manager, &tasks);
+
+			if (0 == commits_num && 0 != manager->commits.values_num)
+				time_flush = time_now;
+		}
 
 		if (0 != manager->commits.values_num)
 		{
@@ -664,7 +709,6 @@ void	*zbx_cep_manager_thread(void *args)
 					CEP_MANAGER_FLUSH_TIMEOUT < time_now - time_flush)
 			{
 				cep_manager_flush_commmits(manager);
-				time_flush = time_now;
 			}
 		}
 

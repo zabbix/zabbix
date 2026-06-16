@@ -617,7 +617,7 @@ Overlay.prototype.makeButtons = function(arr) {
 		}
 
 		if (obj.isSubmit) {
-			this.$btn_submit = $button;
+			this.$btn_submit = obj.withChevron ? $button.find('button').first() : $button;
 		}
 
 		if (obj.focused) {

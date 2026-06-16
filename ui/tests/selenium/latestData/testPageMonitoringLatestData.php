@@ -820,11 +820,11 @@ class testPageMonitoringLatestData extends CWebTest {
 				for ($i = 1; $i < 2; $i++) {
 					$this->assertFalse($this->query('link', $host['host'])->one(false)->isValid());
 					$this->query('class:arrow-right')->waitUntilClickable()->one()->scrollIntoView(50)->click();
-					$this->page->waitUntilReady();
+					$table->waitUntilReady();
 				}
 
 				$this->query('class:paging-btn-container')->query('link:1')->waitUntilClickable()->one()->click();
-				$this->page->waitUntilReady();
+				$table->waitUntilReady();
 			}
 		}
 

@@ -749,7 +749,7 @@ class CCepRule extends CApiService {
 				$operation_path = $path.'/'.($j + 1);
 
 				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-					'execute_when' =>	['type' => API_INT32, 'in' => implode(',', CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE[$cep_rule['window_type']]), 'flags' => API_REQUIRED],
+					'execute_when' =>	['type' => API_INT32, 'in' => implode(',', CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE[$cep_rule['window_type']]), 'flags' => API_REQUIRED]
 				]];
 
 				if (!CApiInputValidator::validate($api_input_rules, $operation, $operation_path, $error)) {
@@ -814,7 +814,8 @@ class CCepRule extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
-				if (array_key_exists('tags', $operation) && $cep_rule['window_type'] != CCepRuleHelper::WINDOW_CAUSE_SYMPTOM) {
+				if (array_key_exists('tags', $operation)
+						&& $cep_rule['window_type'] != CCepRuleHelper::WINDOW_CAUSE_SYMPTOM) {
 					foreach ($operation['tags'] as $k => $tag) {
 						if ($tag['tag'] === '$RANK') {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
@@ -975,11 +976,13 @@ class CCepRule extends CApiService {
 			$cep_ruleid = $cep_rule['cep_ruleid'];
 
 			if ($cep_rule['window_type'] == CCepRuleHelper::WINDOW_NONE) {
-				if ($db_cep_rules !== null && $db_cep_rules[$cep_ruleid]['window_type'] != CCepRuleHelper::WINDOW_NONE) {
+				if ($db_cep_rules !== null
+						&& $db_cep_rules[$cep_ruleid]['window_type'] != CCepRuleHelper::WINDOW_NONE) {
 					$del_windows[] = $cep_ruleid;
 				}
 			}
-			elseif ($db_cep_rules === null || $db_cep_rules[$cep_ruleid]['window_type'] == CCepRuleHelper::WINDOW_NONE) {
+			elseif ($db_cep_rules === null
+					|| $db_cep_rules[$cep_ruleid]['window_type'] == CCepRuleHelper::WINDOW_NONE) {
 				$ins_windows[] = [
 					'cep_ruleid' => $cep_ruleid,
 					'type' => $cep_rule['window_type']
@@ -1082,7 +1085,8 @@ class CCepRule extends CApiService {
 			}
 
 			$upd_window = DB::getUpdatedValues('cep_window', $upd_window,
-				$db_cep_rules !== null && $db_cep_rules[$cep_rule['cep_ruleid']]['window_type'] != CCepRuleHelper::WINDOW_NONE
+				$db_cep_rules !== null
+						&& $db_cep_rules[$cep_rule['cep_ruleid']]['window_type'] != CCepRuleHelper::WINDOW_NONE
 					? $db_cep_rules[$cep_rule['cep_ruleid']]['window']
 					: $db_filter_defaults
 			);
@@ -1118,7 +1122,8 @@ class CCepRule extends CApiService {
 				continue;
 			}
 
-			$db_conditions = $db_cep_rules !== null && array_key_exists('window', $db_cep_rules[$cep_rule['cep_ruleid']])
+			$db_conditions = $db_cep_rules !== null
+					&& array_key_exists('window', $db_cep_rules[$cep_rule['cep_ruleid']])
 					&& array_key_exists('filter', $db_cep_rules[$cep_rule['cep_ruleid']]['window'])
 					&& array_key_exists('conditions', $db_cep_rules[$cep_rule['cep_ruleid']]['window']['filter'])
 				? $db_cep_rules[$cep_rule['cep_ruleid']]['window']['filter']['conditions']

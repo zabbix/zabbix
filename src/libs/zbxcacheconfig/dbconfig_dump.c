@@ -68,6 +68,11 @@ static void	DCdump_config(void)
 	zabbix_log(LOG_LEVEL_TRACE, "  history, mode:%d global:%d period:%d", config->config->hk.history_mode,
 			config->config->hk.history_global, config->config->hk.history);
 
+	zabbix_log(LOG_LEVEL_TRACE, "  history, overrides: %d, %d, %d, %d, %d, %d",
+			config->config->hk.history_override[0], config->config->hk.history_override[1],
+			config->config->hk.history_override[2], config->config->hk.history_override[3],
+			config->config->hk.history_override[4], config->config->hk.history_override[5]);
+
 	zabbix_log(LOG_LEVEL_TRACE, "  trends, mode:%d global:%d period:%d", config->config->hk.trends_mode,
 			config->config->hk.trends_global, config->config->hk.trends);
 
@@ -928,8 +933,8 @@ static void	DCdump_triggers(void)
 				trigger->event_name, trigger->type, trigger->status, trigger->priority);
 		zabbix_log(LOG_LEVEL_TRACE, "  expression:'%s' recovery_expression:'%s'", trigger->expression,
 				trigger->recovery_expression);
-		zabbix_log(LOG_LEVEL_TRACE, "  value:%u state:%u error:'%s' lastchange:%d", trigger->value,
-				trigger->state, ZBX_NULL2EMPTY_STR(trigger->error), trigger->lastchange);
+		zabbix_log(LOG_LEVEL_TRACE, "  value:%u state:%u error:'%s'", trigger->value,
+				trigger->state, ZBX_NULL2EMPTY_STR(trigger->error));
 		zabbix_log(LOG_LEVEL_TRACE, "  correlation_tag:'%s' recovery_mode:'%u' correlation_mode:'%u'",
 				trigger->correlation_tag, trigger->recovery_mode, trigger->correlation_mode);
 		zabbix_log(LOG_LEVEL_TRACE, "  topoindex:%u functional:%u locked:%u", trigger->topoindex,

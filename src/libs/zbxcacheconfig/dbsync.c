@@ -769,6 +769,8 @@ void	zbx_dbsync_init_changelog(zbx_dbsync_t *sync, const char *name, unsigned ch
  *                                                                            *
  * Purpose: frees resources allocated by changeset                            *
  *                                                                            *
+ * Comments:  must not be called before zbx_dbsync_env_flush_changelog()      *
+ *                                                                            *
  ******************************************************************************/
 void	zbx_dbsync_clear(zbx_dbsync_t *sync)
 {
@@ -2012,7 +2014,7 @@ int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync)
 
 	zbx_dcsync_sql_start(sync);
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select triggerdepid, triggerid_down,triggerid_up from trigger_depends");
+			"select triggerdepid,triggerid_down,triggerid_up from trigger_depends");
 	dbsync_prepare(sync, 3, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)

@@ -16,7 +16,7 @@
 #define ZABBIX_CEP_TASK_H
 
 #include "cep_window.h"
-#include "zbxcep.h"
+#include "zbx_cep.h"
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
@@ -71,7 +71,7 @@ typedef struct
 	zbx_cep_task_event_t	parent;
 	zbx_uint64_t		eventid;	/* in - eventid to close */
 	zbx_uint64_t		userid;		/* in - userid when closed manually by a user */
-	zbx_uint64_t		correlationid;	/* in - correllationid when closed by correlation rules*/
+	zbx_uint64_t		correlationid;	/* in - correlationid when closed by correlation rules*/
 	zbx_uint64_t		cep_ruleid;	/* in - cep_ruleid when closed by cep rule */
 }
 zbx_cep_task_close_event_t;

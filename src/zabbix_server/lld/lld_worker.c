@@ -149,7 +149,7 @@ static void	lld_flush_value(zbx_lld_value_t *lld_value, unsigned char state, con
 			zbx_add_event(event);
 
 			zbx_db_begin();
-			zbx_process_events(NULL, NULL, NULL);
+			zbx_process_events();
 			zbx_db_commit();
 
 			zbx_clean_events();
@@ -434,6 +434,9 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 		}
 
 		zbx_ipc_message_clean(&message);
+#ifdef HAVE_MALLOC_TRIM
+		zbx_malloc_trim(time(NULL), 0, ZBX_MEBIBYTE * 8);
+#endif
 	}
 
 	if (0 != lld_value.item.itemid)

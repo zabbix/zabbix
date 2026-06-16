@@ -158,8 +158,8 @@ zbx_evaluate_function_LDADD += @SERVER_LIBS@
 zbx_evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=zbx_baseline_get_data \
 	-Wl,--wrap=zbx_recalc_time_period \
+	-Wl,--wrap=zbx_history_get_trends_flags \
 	$(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
-
 
 zbx_STL_SOURCES = \
 	zbx_STL.c \

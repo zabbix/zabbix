@@ -16,7 +16,7 @@
 #define ZABBIX_CEP_API_H
 
 #include "cep.h"
-#include "zbxcep.h"
+#include "zbx_cep.h"
 
 int	cep_api_init(char **error);
 void	cep_api_destroy(void);

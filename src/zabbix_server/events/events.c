@@ -19,6 +19,7 @@
 
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
+#include "zbxevent.h"
 #include "zbxexport.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
@@ -30,21 +31,8 @@
 #include "zbxconnector.h"
 #include "zbxtagfilter.h"
 #include "zbx_expression_constants.h"
-#include "zbxcep_client.h"
+#include "zbx_cep_client.h"
 #include "zbxtime.h"
-
-/* event recovery data */
-typedef struct
-{
-	zbx_uint64_t	eventid;
-	zbx_uint64_t	objectid;
-	zbx_db_event	*r_event;
-	zbx_uint64_t	correlationid;
-	zbx_uint64_t	c_eventid;
-	zbx_uint64_t	userid;
-	zbx_timespec_t	ts;
-}
-zbx_event_recovery_t;
 
 typedef enum
 {
@@ -889,16 +877,11 @@ static void	save_discovery_events(zbx_db_event **db_events, int events_num)
 	process_actions(zbx_db_dbconn(), &events, NULL, NULL);
 }
 
-int	zbx_process_events(zbx_vector_trigger_diff_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock,
-		zbx_vector_escalation_new_ptr_t *escalations)
+int	zbx_process_events(void)
 {
 	int	processed_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)events.values_num);
-
-	ZBX_UNUSED(trigger_diff);
-	ZBX_UNUSED(triggerids_lock);
-	ZBX_UNUSED(escalations);
 
 	if (0 != events.values_num)
 	{

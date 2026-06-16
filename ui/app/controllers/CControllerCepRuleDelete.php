@@ -16,13 +16,13 @@
 
 class CControllerCepRuleDelete extends CControllerCepRuleGeneral {
 	protected function init(): void {
-		$this->disableCsrfValidation(); // TODO: TEMP
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
 	protected function checkInput(): bool {
 		$fields = [
-			'cepruleids' => 'required|array_db cep_rule.cep_ruleid'
+			'cepruleids' => 'array_db cep_rule.cep_ruleid',
+			'correlationids' => 'array_db correlation.correlationid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -41,11 +41,16 @@ class CControllerCepRuleDelete extends CControllerCepRuleGeneral {
 	}
 
 	protected function doAction(): void {
-		$cepruleids = $this->getInput('cepruleids');
-		$deleted = count($cepruleids);
+		$cepruleids = $this->getInput('cepruleids', []);
+		$correlationids = $this->getInput('correlationids', []);
+
+		$deleted = count($cepruleids) + count($correlationids);
 		$output = [];
 
-		$result = API::CepRule()->delete($cepruleids);
+		$result_cep = !$cepruleids || API::CepRule()->delete($cepruleids);
+		$result_correlation = !$correlationids || API::Correlation()->delete($correlationids);
+
+		$result = $result_cep && $result_correlation;
 
 		if ($result) {
 			$output['success']['title'] = _n('Complex event processing rule deleted',
@@ -62,6 +67,24 @@ class CControllerCepRuleDelete extends CControllerCepRuleGeneral {
 					'Cannot delete complex event processing rules', $deleted
 				),
 				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+
+			$keep_cepruleids = array_keys(API::CepRule()->get([
+				'output' => [],
+				'correlationids' => $cepruleids,
+				'editable' => true,
+				'preservekeys' => true
+			]));
+
+			$keep_correlationids = array_keys(API::Correlation()->get([
+				'output' => [],
+				'correlationids' => $correlationids,
+				'editable' => true,
+				'preservekeys' => true
+			]));
+
+			$output['keepids'] = [...$keep_cepruleids,
+				...array_map(fn(string $correlationid) => "legacy-$correlationid", $keep_correlationids)
 			];
 		}
 

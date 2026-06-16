@@ -125,7 +125,8 @@ class CControllerCepRuleEdit extends CController {
 
 		$ceprule['window'] += DB::getDefaults('cep_window');
 		if (!array_key_exists('filter', $ceprule['window'])) {
-			$ceprule['window']['filter'] = ['conditions' => []];
+			$ceprule['window']['filter'] = ['conditions' => [], 'evaltype' => DB::getDefault('cep_window', 'evaltype'),
+				'formula' => DB::getDefault('cep_window', 'formula')];
 		}
 
 		// Unlimited capacity's default value is "0".
@@ -141,16 +142,10 @@ class CControllerCepRuleEdit extends CController {
 			$ceprule['window']['duration'] = '';
 		}
 
-		// Consistant naming with URL and fields.
+		// Consistent naming with URL and fields.
 		$ceprule['cepruleid'] = $ceprule['cep_ruleid'] ?? null;
 		unset($ceprule['cep_ruleid']);
 		unset($ceprule['window']['filter']['eval_formula']);
-
-		/* // Key by step value. */
-		/* $ceprule['operations'] = array_reduce($ceprule['operations'], */
-		/* 	static fn (array $carry, array $operation) => [$operation['step'] => $operation, ...$carry], [] */
-		/* ); */
-		/**/
 
 		// Key by formula ID value.
 		$ceprule['filter']['conditions'] = array_reduce($ceprule['filter']['conditions'],
@@ -167,36 +162,20 @@ class CControllerCepRuleEdit extends CController {
 	}
 
 	protected static function getWindowConditionValidationRules(): array {
-		$rules = CControllerCepRuleGeneral::getValidationRules();
-
-		$condition_fields = $rules
-			['fields']['window']
-			['fields']['filter']
-			['fields']['conditions']
-			['fields'];
-
 		return (new CFormValidator([
-			'object', 'fields' => $condition_fields
-		]))->getRules();
-	}
-
-	protected static function getConditionValidationRules(): array {
-		$rules = CControllerCepRuleGeneral::getValidationRules();
-
-		$condition_fields = $rules['fields']['filter']['fields']['conditions']['fields'];
-
-		return (new CFormValidator([
-			'object', 'fields' => $condition_fields
+			'object', 'fields' => CControllerCepRuleGeneral::getWindowConditionValidationFields()
 		]))->getRules();
 	}
 
 	protected static function getOperationValidationRules(): array {
-		$rules = CControllerCepRuleGeneral::getValidationRules();
-
-		$operation_fields = $rules['fields']['operations']['fields'];
-
 		return (new CFormValidator([
-			'object', 'fields' => $operation_fields
+			'object', 'fields' => CControllerCepRuleGeneral::getOperationValidationFields()
+		]))->getRules();
+	}
+
+	protected static function getConditionValidationRules(): array {
+		return (new CFormValidator([
+			'object', 'fields' => CControllerCepRuleGeneral::getConditionValidationFields()
 		]))->getRules();
 	}
 }

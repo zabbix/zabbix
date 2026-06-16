@@ -63,15 +63,6 @@ class CControllerCorrelationDelete extends CController {
 				'title' => _n('Cannot delete event correlation', 'Cannot delete event correlations', $deleted),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
-
-			$correlations = API::Correlation()->get([
-				'output' => [],
-				'correlationids' => $correlationids,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			$output['keepids'] = array_keys($correlations);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

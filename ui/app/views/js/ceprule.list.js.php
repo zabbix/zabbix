@@ -21,14 +21,10 @@
 
 <script>
 	const view = new class {
-
 		init() {
 			this.#initActions();
 		}
 
-		/**
-		 * Creates the event listeners for create, edit, delete, enable, disable single and mass operations.
-		 */
 		#initActions() {
 			document.getElementById('js-create-cep').addEventListener('click', () => {
 				ZABBIX.PopupManager.open('ceprule.edit');
@@ -36,153 +32,199 @@
 			document.getElementById('js-create').addEventListener('click', () => {
 				ZABBIX.PopupManager.open('correlation.edit');
 			});
-			document.getElementById('js-massdelete').addEventListener('click',
-				(e) => this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()))
-			);
-			document.getElementById('js-massenable').addEventListener('click',
-				(e) => this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
-			);
-			document.getElementById('js-massdisable').addEventListener('click',
-				(e) => this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
-			);
 
-			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-enable')) {
-					this.#enable(e.target, [e.target.dataset.correlationid]);
-				}
-				else if (e.target.classList.contains('js-disable')) {
-					this.#disable(e.target, [e.target.dataset.correlationid]);
-				}
+			window['js-massdelete'].addEventListener('click', (e) => {
+				clearMessages();
+				this.#setLoadingActionButtons(e.target);
+				this.#massdelete(Object.keys(chkbxRange.getSelectedIds()))
+					.then(response => this.#ajaxResponseHandler(response))
+					.then(response => uncheckTableRows('ceprules', response.keepids ?? []))
+					.then(() => location.href = location.href)
+					.catch(exception => exception !== AbortSignal && this.#ajaxExceptionHandler(exception))
+					.finally(() => this.#unsetLoadingActionButtons(e.target));
 			});
+
+			window['js-massenable'].addEventListener('click', (e) => {
+				clearMessages();
+				this.#setLoadingActionButtons(e.target);
+				this.#massenable(Object.keys(chkbxRange.getSelectedIds()))
+					.then(response => this.#ajaxResponseHandler(response))
+					.then(response => uncheckTableRows('ceprules', response.keepids ?? []))
+					.then(() => location.href = location.href)
+					.catch(exception => exception !== AbortSignal && this.#ajaxExceptionHandler(exception))
+					.finally(() => this.#unsetLoadingActionButtons(e.target));
+			});
+
+			window['js-massdisable'].addEventListener('click', (e) => {
+				clearMessages();
+				this.#setLoadingActionButtons(e.target);
+				this.#massdisable(Object.keys(chkbxRange.getSelectedIds()))
+					.then(response => this.#ajaxResponseHandler(response))
+					.then(response => uncheckTableRows('ceprules', response.keepids ?? []))
+					.then(() => location.href = location.href)
+					.catch(exception => exception !== AbortSignal && this.#ajaxExceptionHandler(exception))
+					.finally(() => this.#unsetLoadingActionButtons(e.target));
+			});
+
+			[...document.querySelectorAll('.js-toggle-disabled')]
+				.forEach(node => node.addEventListener('click', () => this.#toggleEnabled(node)));
 
 			this.#initPopupListeners();
 		}
 
-		/**
-		 * Shows confirmation window if multiple records are selected for deletion and sends a POST request to
-		 * delete action.
-		 *
-		 * @param {element} target          The target element that will be passed to post.
-		 * @param {array}   correlationids  Event correlation IDs to delete.
-		 */
-		#delete(target, correlationids) {
-			const confirmation = correlationids.length > 1
-				? <?= json_encode(_('Delete selected event processing rules?')) ?>
-				: <?= json_encode(_('Delete selected event processing rule?')) ?>;
+		#setLoadingActionButtons(target) {
+			target.classList.add('is-loading');
+			[...window['action_buttons'].querySelectorAll('button')].map(node => node.disabled = true);
+		}
+
+		#unsetLoadingActionButtons(target) {
+			target.classList.remove('is-loading');
+			[...window['action_buttons'].querySelectorAll('button')].map(node => node.disabled = false);
+		}
+
+		#branchLegacyIds(cepruleids_mixed) {
+			const correlationids = [];
+			const cepruleids = [];
+
+			cepruleids_mixed.map(id => {
+				if (id.startsWith('legacy-')) {
+					correlationids.push(id.replace('legacy-', ''));
+				}
+				else {
+					cepruleids.push(id);
+				}
+			});
+
+			return {correlationids, cepruleids};
+		}
+
+		#massdelete(cepruleids_mixed) {
+			const {correlationids, cepruleids} = this.#branchLegacyIds(cepruleids_mixed);
+			const confirmation = (correlationids.length + cepruleids.length) > 1
+				? <?= json_encode(_('Delete selected complex event processing rules?')) ?>
+				: <?= json_encode(_('Delete selected complex event processing rule?')) ?>;
 
 			if (!window.confirm(confirmation)) {
-				return;
+				return Promise.reject(AbortSignal);
 			}
 
-			const curl = new Curl('zabbix.php');
+			const payload = {cepruleids, correlationids,
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>
+			};
 
-			curl.setArgument('action', 'correlation.delete');
-			// TODO: or..
-			curl.setArgument('action', 'ceprule.delete');
-			this.#post(target, correlationids, curl);
-		}
-
-		/**
-		 * Shows confirmation window if multiple records are selected for enabling and sends a POST request to enable
-		 * action.
-		 *
-		 * @param {element} target          The target element that will be passed to post.
-		 * @param {array}   correlationids  Event correlation IDs to enable.
-		 * @param {bool}    massenable      True if footer button is pressed for mass enable action which brings up
-		 *                                  confirmation menu. False if only one element with single link is clicked.
-		 */
-		#enable(target, correlationids, massenable = false) {
-			if (massenable) {
-				const confirmation = correlationids.length > 1
-					? <?= json_encode(_('Enable selected event correlations?')) ?>
-					: <?= json_encode(_('Enable selected event correlation?')) ?>;
-
-				if (!window.confirm(confirmation)) {
-					return;
-				}
-			}
-
-			const curl = new Curl('zabbix.php');
-
-			curl.setArgument('action', 'correlation.enable');
-			this.#post(target, correlationids, curl);
-		}
-
-		/**
-		 * Shows confirmation window if multiple records are selected for disabling and sends a POST request to disable
-		 * action.
-		 *
-		 * @param {element} target          The target element that will be passed to post.
-		 * @param {array}   correlationids  Event correlation IDs to disable.
-		 * @param {bool}    massdisable     True if footer button is pressed for mass disable action which brings up
-		 *                                  confirmation menu. False if only one element with single link is clicked.
-		 */
-		#disable(target, correlationids, massdisable = false) {
-			if (massdisable) {
-				const confirmation = correlationids.length > 1
-					? <?= json_encode(_('Disable selected event correlations?')) ?>
-					: <?= json_encode(_('Disable selected event correlation?')) ?>;
-
-				if (!window.confirm(confirmation)) {
-					return;
-				}
-			}
-
-			const curl = new Curl('zabbix.php');
-
-			curl.setArgument('action', 'correlation.disable');
-			this.#post(target, correlationids, curl);
-		}
-
-		/**
-		 * Sends a POST request to the specified URL with the provided data and handles the response.
-		 *
-		 * @param {element} target          The target element that will display a loading state during the request.
-		 * @param {array}   correlationids  Event correlation IDs to send with the POST request.
-		 * @param {object}  url             The URL to send the POST request to.
-		 */
-		#post(target, correlationids, url) {
-			url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('correlation')) ?>);
-
-			target.classList.add('is-loading');
-
-			return fetch(url.getUrl(), {
+			return fetch(zabbixUrl({action: 'ceprule.delete'}), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({correlationids: correlationids})
+				body: JSON.stringify(payload)
+			}).then(response => response.json());
+		}
+
+		#massenable(cepruleids_mixed) {
+			const {correlationids, cepruleids} = this.#branchLegacyIds(cepruleids_mixed);
+			const confirmation = (correlationids.length + cepruleids.length) > 1
+				? <?= json_encode(_('Enable selected complex event processing rules?')) ?>
+				: <?= json_encode(_('Enable selected complex event processing rule?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return Promise.reject(AbortSignal);
+			}
+
+			const payload = {cepruleids, correlationids,
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>
+			};
+
+			return fetch(zabbixUrl({action: 'ceprule.enable'}), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(payload)
+			}).then(response => response.json());
+		}
+
+		#massdisable(cepruleids_mixed) {
+			const {correlationids, cepruleids} = this.#branchLegacyIds(cepruleids_mixed);
+			const confirmation = (correlationids.length + cepruleids.length) > 1
+				? <?= json_encode(_('Disable selected complex event processing rules?')) ?>
+				: <?= json_encode(_('Disable selected complex event processing rule?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return Promise.reject(AbortSignal);
+			}
+
+			const payload = {cepruleids, correlationids,
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>
+			};
+
+			return fetch(zabbixUrl({action: 'ceprule.disable'}), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(payload)
+			}).then(response => response.json());
+		}
+
+		#toggleEnabled(target) {
+			const {action, id} = target.dataset;
+			const payload = {[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>};
+
+			if (id.startsWith('legacy-')) {
+				payload.correlationids = [id.replace('legacy-', '')];
+			}
+			else {
+				payload.cepruleids = [id];
+			}
+
+			target.classList.add('is-loading');
+			fetch(zabbixUrl({action}), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(payload)
 			})
-				.then((response) => response.json())
-				.then((response) => {
-					if ('error' in response) {
-						if ('title' in response.error) {
-							postMessageError(response.error.title);
-						}
-
-						uncheckTableRows('correlation', response.keepids ?? []);
-						postMessageDetails('error', response.error.messages);
-					}
-					else if ('success' in response) {
-						postMessageOk(response.success.title);
-
-						if ('messages' in response.success) {
-							postMessageDetails('success', response.success.messages);
-						}
-
-						uncheckTableRows('correlation');
-					}
-
-					location.href = location.href;
-				})
-				.catch(() => {
-					clearMessages();
-
-					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
-
-					addMessage(message_box);
-
+				.then(response => response.json())
+				.then(response => this.#ajaxResponseHandler(response))
+				.then(() => location.href = location.href)
+				.finally(() => {
 					target.classList.remove('is-loading');
 					target.blur();
-				});
+					clearMessages();
+				})
+				.catch((exception) => this.#ajaxExceptionHandler(exception));
+		}
+
+		#ajaxResponseHandler(response) {
+			if ('error' in response) {
+				if ('title' in response.error) {
+					postMessageError(response.error.title);
+				}
+
+				postMessageDetails('error', response.error.messages);
+			}
+			else if ('success' in response) {
+				postMessageOk(response.success.title);
+
+				if ('messages' in response.success) {
+					postMessageDetails('success', response.success.messages);
+				}
+			}
+			else {
+				throw new Error();
+			}
+
+			return response;
+		}
+
+		#ajaxExceptionHandler(exception) {
+			let title, messages;
+
+			if (typeof exception === 'object' && 'error' in exception) {
+				title = exception.error.title;
+				messages = exception.error.messages;
+			}
+			else {
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+			}
+
+			const message_box = makeMessageBox('bad', messages, title)[0];
+
+			addMessage(message_box);
 		}
 
 		#initPopupListeners() {
@@ -191,7 +233,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: () => uncheckTableRows('correlation') // TODO: complex ID checkbox rows
+				callback: () => uncheckTableRows('ceprules')
 			});
 		}
 	};

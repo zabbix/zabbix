@@ -16,8 +16,8 @@
 #define ZABBIX_CEP_WINDOW_H
 
 #include "cep_rule.h"
+#include "zbx_cep.h"
 #include "zbxcacheconfig.h"
-#include "zbxcep.h"
 #include "zbxtypes_ext.h"
 
 typedef struct

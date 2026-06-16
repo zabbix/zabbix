@@ -18,7 +18,16 @@ class CControllerCepRuleUpdate extends CControllerCepRuleGeneral {
 
 	protected function doAction() {
 		$result = API::CepRule()->update($this->prepareApiRequest());
+
 		$output = [];
+		if ($result && $this->getInput('_cep_rule_reset', false) == 1) {
+			$response = $this->requestCepRuleReset($this->getInput('cepruleid'));
+
+			if (!$response['success']) {
+				error(_('Complex event processing rule reset failed.'));
+				error($response['error']);
+			}
+		}
 
 		if ($result) {
 			$output['success']['title'] = _('Complex event processing rule updated');
@@ -39,5 +48,21 @@ class CControllerCepRuleUpdate extends CControllerCepRuleGeneral {
 		}
 
 		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+	}
+
+	protected function requestCepRuleReset(string $cepruleid): array {
+		['ZBX_SERVER' => $host, 'ZBX_SERVER_PORT' => $port] = ZBase::getConfig();
+		$server = new CZabbixServer($host, $port,
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+		);
+
+		$result = $server->resetCepRule((array) $cepruleid, CSessionHelper::getId());
+
+		return [
+			'success' => $result,
+			'error' => $server->getError(),
+			'debug' => $server->getDebug()
+		];
 	}
 }

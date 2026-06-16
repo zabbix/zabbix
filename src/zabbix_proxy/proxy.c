@@ -75,6 +75,7 @@
 #include "zbxbincommon.h"
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
+#include "zbxcurl.h"
 
 #ifdef HAVE_OPENIPMI
 #include "zbxipmi.h"
@@ -131,7 +132,7 @@ static const char	*help_message[] = {
 	"        process-type             All processes of specified type",
 	"                                 (availability manager, browser poller, configuration syncer,",
 	"                                 data sender, discovery manager, discovery worker, event manager,",
-	"                                 evet processor, history syncer, housekeeper, http poller, icmp pinger,",
+	"                                 event processor, history syncer, housekeeper, http poller, icmp pinger,",
 	"                                 internal poller, ipmi manager, ipmi poller, java poller, odbc poller,",
 	"                                 poller, agent poller, http agent poller, snmp poller, preprocessing manager,",
 	"                                 preprocessing worker, self-monitoring, snmp trapper, task manager, trapper,",
@@ -1195,7 +1196,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 
 	int	sync_mode = (0 == proxy_has_started ? ZBX_SYNC_NONE : ZBX_SYNC_ALL);
 
-	zbx_free_database_cache(sync_mode, &events_cbs, config_history_storage_pipelines);
+	zbx_free_database_cache(sync_mode, &events_cbs);
 	zbx_pb_flush();
 	zbx_pb_destroy();
 	zbx_free_configuration_cache();
@@ -1670,6 +1671,8 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 	thread_args.info.program_type = zbx_program_type;
 
 	/* prepare supervisor unit definitions */
+
+	zbx_curl_cleanup();
 
 	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_PREPROCMAN] = (zbx_supervisor_unit_def_t){
 			.entry = zbx_pp_manager_thread,

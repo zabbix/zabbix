@@ -14,7 +14,7 @@
 
 #include "cep_api.h"
 #include "cep.h"
-#include "zbxcep.h"
+#include "zbx_cep.h"
 #include "zbxalgo.h"
 
 ZBX_VECTOR_IMPL(cep_event_update, zbx_cep_event_update_t)

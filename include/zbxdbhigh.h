@@ -500,8 +500,7 @@ ZBX_PTR_VECTOR_DECL(connector_filter, zbx_connector_filter_t)
 /* events callbacks */
 typedef void	(*zbx_add_event_func_t)(zbx_db_event *event);
 
-typedef int	(*zbx_process_events_func_t)(zbx_vector_trigger_diff_ptr_t *trigger_diff,
-		zbx_vector_uint64_t *triggerids_lock, zbx_vector_escalation_new_ptr_t *escalations);
+typedef int	(*zbx_process_events_func_t)(void);
 typedef void	(*zbx_clean_events_func_t)(void);
 
 typedef struct
@@ -779,6 +778,8 @@ void	zbx_lld_filter_clean(zbx_lld_filter_t *filter);
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 
+int	zbx_db_verify_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
+		unsigned char program_type);
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
 		unsigned char program_type);
 void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
@@ -899,5 +900,7 @@ void	zbx_db_validate_tags(zbx_dbconn_t *db, zbx_vector_event_tags_ptr_t *event_t
 
 void	zbx_event_tags_clear(zbx_event_tags_t *event_tags);
 int	zbx_event_tags_compare(const void *d1, const void *d2);
+
+int	zbx_db_settings_set_value(const char *name, const void *value, int type);
 
 #endif

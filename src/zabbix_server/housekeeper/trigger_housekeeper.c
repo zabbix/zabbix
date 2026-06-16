@@ -28,7 +28,7 @@
 #include "zbxdb.h"
 #include "zbxipcservice.h"
 #include "zbxcacheconfig.h"
-#include "zbxcep_client.h"
+#include "zbx_cep_client.h"
 
 static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 {

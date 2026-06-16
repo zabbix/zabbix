@@ -21,9 +21,6 @@
 static ZBX_THREAD_LOCAL	zbx_dbconn_t	*dbconn  = NULL;
 static int				db_autoincrement = 0;
 
-static zbx_dbconn_pool_t	*dbpool_default = NULL;
-static int			dbconn_ref_num = 0;
-
 void	zbx_db_init_autoincrement_options(void)
 {
 	db_autoincrement = 1;
@@ -344,15 +341,17 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
  * Purpose: connects to DB and tries to detect DB version                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
+int	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
 {
 	if (NULL == dbconn)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		return;
+		return FAIL;
 	}
 
 	zbx_dbconn_extract_version_info(dbconn, version_info);
+
+	return SUCCEED;
 }
 
 #ifdef HAVE_POSTGRESQL
@@ -826,83 +825,11 @@ zbx_dbconn_t	*zbx_db_dbconn(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set the default database connection pool                          *
- *                                                                            *
- * Parameters: dbpool - [IN] database connection pool to set as default       *
- *                                                                            *
- ******************************************************************************/
-void	zbx_db_set_default_pool(zbx_dbconn_pool_t *dbpool)
-{
-	dbpool_default = dbpool;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: acquire a database connection                                     *
- *                                                                            *
- * Return value: acquired database connection                                 *
- *                                                                            *
- * Comments: In thread-based components the default pool is set and the       *
- *           connection is acquired from it. Otherwise, a legacy single       *
- *           shared connection is used, which does not support concurrent     *
- *           acquisition.                                                     *
- *                                                                            *
- ******************************************************************************/
-zbx_dbconn_t	*zbx_db_acquire_connection(void)
-{
-	if (NULL != dbpool_default)
-		return zbx_dbconn_pool_acquire_connection(dbpool_default);
-
-	if (0 != dbconn_ref_num)
-	{
-		THIS_SHOULD_NEVER_HAPPEN_MSG("attempted to acquire already acquired db connection");
-		exit(EXIT_FAILURE);
-	}
-
-	if (NULL == dbconn)
-	{
-		THIS_SHOULD_NEVER_HAPPEN_MSG("attempted to acquire closed db connection");
-		exit(EXIT_FAILURE);
-	}
-	dbconn_ref_num++;
-
-	return dbconn;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: release a database connection                                     *
- *                                                                            *
- * Parameters: db - [IN] database connection to release                       *
- *                                                                            *
- * Comments: In thread-based components the default pool is set and the       *
- *           connection is released back to it. Otherwise, the legacy shared  *
- *           connection reference count is decremented.                       *
- *                                                                            *
- ******************************************************************************/
-void	zbx_db_release_connection(zbx_dbconn_t *db)
-{
-	if (NULL != dbpool_default)
-	{
-		zbx_dbconn_pool_release_connection(dbpool_default, db);
-		return;
-	}
-
-	if (0 == dbconn_ref_num)
-	{
-		THIS_SHOULD_NEVER_HAPPEN_MSG("attempted to release unacquired db connection");
-		exit(EXIT_FAILURE);
-	}
-	dbconn_ref_num--;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: stash database connection for legacy db api usage                 *
  *                                                                            *
  * Parameters: db - [IN] database connection to stash                         *
  *                                                                            *
- * Comments: Use stash/unstash approach when callinng functions that uses     *
+ * Comments: Use stash/unstash approach when calling functions that uses      *
  *           old (process) database access somewhere deep inside,             *
  *           for example resolves macros.                                     *
  *                                                                            *
@@ -940,3 +867,71 @@ void	zbx_db_unstash_connection(zbx_dbconn_t *db)
 
 	dbconn = NULL;
 }
+char	*zbx_db_dyn_escape_like_pattern(const char *src)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return zbx_strdup(NULL, "");
+	}
+
+	return zbx_dbconn_dyn_escape_like_pattern(dbconn, src);
+}
+
+char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return zbx_strdup(NULL, "");
+	}
+
+	return zbx_dbconn_dyn_escape_field(dbconn, table_name, field_name, src);
+}
+
+char	*zbx_db_dyn_escape_string(const char *src)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return zbx_strdup(NULL, "");
+	}
+
+	return zbx_dbconn_dyn_escape_string(dbconn, src);
+}
+
+char	*zbx_db_dyn_escape_string_len(const char *src, size_t length)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return zbx_strdup(NULL, "");
+	}
+
+	return zbx_dbconn_dyn_escape_string_len(dbconn, src, length);
+}
+
+void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const char * const *values, const int num)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
+	zbx_dbconn_add_str_condition_alloc(dbconn, sql, sql_alloc, sql_offset, fieldname, values, num);
+}
+
+#if defined(HAVE_POSTGRESQL)
+char	*zbx_db_get_schema_esc(void)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return zbx_strdup(NULL, "");
+	}
+
+	return zbx_dbconn_get_schema_esc(dbconn);
+}
+#endif

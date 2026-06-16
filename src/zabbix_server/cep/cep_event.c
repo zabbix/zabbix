@@ -14,7 +14,7 @@
 
 #include "cep_event.h"
 #include "cep_api.h"
-#include "zbxcep.h"
+#include "zbx_cep.h"
 #include "zbxdbwrap.h"
 
 void	cep_event_clear(zbx_cep_event_t *event)
@@ -44,7 +44,7 @@ void	zbx_cep_event_release(zbx_cep_event_t *event)
 }
 
 zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, unsigned char object,
-		zbx_uint64_t objectid, const char *name, int clock, int ns, int value, int serverity,
+		zbx_uint64_t objectid, const char *name, int clock, int ns, int value, int severity,
 		const zbx_vector_tags_ptr_t *tags, const zbx_vector_db_event_suppress_t *suppress)
 {
 	zbx_cep_event_t	*event;
@@ -52,14 +52,14 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 	event = (zbx_cep_event_t *)zbx_malloc(NULL, sizeof(zbx_cep_event_t));
 	event->eventid = eventid;
 	event->r_event = NULL;
-	event->refcount = 0;
+	event->refcount = 1;
 	event->origin.source = source;
 	event->origin.object = object;
 	event->origin.objectid = objectid;
 	event->clock = clock;
 	event->ns = ns;
 	event->value = value;
-	event->severity = serverity;
+	event->severity = severity;
 	event->suppress_mtime = 0;
 	event->name = zbx_strdup(NULL, name);
 

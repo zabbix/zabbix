@@ -282,7 +282,7 @@ zbx_mw_task_t	*zbx_mw_queue_pop_completed(zbx_mw_queue_t *queue)
  * Parameters: queue - [IN/OUT] queue                                         *
  *             tasks - [OUT] vector to append completed tasks to              *
  *                                                                            *
- * Return value: number of tasks moved                                        *
+ * Return value: number of pending tasks                                      *
  *                                                                            *
  * Comments: Must be called with the queue lock held.                         *
  *                                                                            *
@@ -290,6 +290,7 @@ zbx_mw_task_t	*zbx_mw_queue_pop_completed(zbx_mw_queue_t *queue)
 int	zbx_mw_queue_drain_completed(zbx_mw_queue_t *queue, zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_mw_task_t	*task;
+	int		pending_num;
 
 	zbx_vector_mw_task_ptr_reserve(tasks, (size_t)zbx_queue_ptr_values_num(&queue->completed));
 
@@ -298,7 +299,9 @@ int	zbx_mw_queue_drain_completed(zbx_mw_queue_t *queue, zbx_vector_mw_task_ptr_t
 		zbx_vector_mw_task_ptr_append(tasks, task);
 	}
 
-	return tasks->values_num;
+	pending_num = zbx_queue_ptr_values_num(&queue->priority) + zbx_queue_ptr_values_num(&queue->normal);
+
+	return pending_num;
 }
 
 /******************************************************************************

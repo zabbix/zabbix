@@ -27,8 +27,7 @@ void	zbx_add_event(zbx_db_event *event);
 
 int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t userid);
 
-int	zbx_process_events(zbx_vector_trigger_diff_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock,
-		zbx_vector_escalation_new_ptr_t *escalations);
+int	zbx_process_events(void);
 void	zbx_clean_events(void);
 void	zbx_export_events(zbx_dbconn_t *db, const zbx_vector_db_event_t *problems,
 		const zbx_vector_db_event_recovery_t *recovery, zbx_export_file_t *problem_export,

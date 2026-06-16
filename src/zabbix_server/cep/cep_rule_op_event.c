@@ -17,10 +17,10 @@
 #include "cep_rule.h"
 #include "cep.h"
 #include "cep_task.h"
+#include "zbx_cep.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
-#include "zbxcep.h"
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
 

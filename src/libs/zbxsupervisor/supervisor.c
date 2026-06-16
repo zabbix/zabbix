@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxhistory.h"
 #include "zbxstr.h"
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
@@ -716,7 +717,7 @@ static void	*supervisor_thread_entry(void *args)
  *             thread_entry - [IN] thread entry function                      *
  *             args         - [IN] thread arguments structure                 *
  *             shared       - [IN] data shared between units                  *
- *              unit_exit_num - [IN] counter of exited (stoped/crashed) units *
+ *              unit_exit_num - [IN] counter of exited (stopped/crashed) units*
  *                                                                            *
  ******************************************************************************/
 static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_entry)(void *),
@@ -999,8 +1000,6 @@ static int	supervisor_init_shared(zbx_supervisor_unit_shared_t *shared, char **e
 		return FAIL;
 	}
 
-	zbx_db_set_default_pool(shared->dbpool);
-
 	return SUCCEED;
 }
 
@@ -1176,6 +1175,9 @@ out:
 
 	supervisor_clear(&sv);
 	zabbix_log(LOG_LEVEL_INFORMATION, "[%s #%d] stopped", get_process_type_string(process_type), process_num);
+
+	if (0 != (info->program_type & ZBX_PROGRAM_TYPE_SERVER))
+		zbx_history_destroy();
 
 	zbx_ipc_service_close(&service);
 	zbx_proc_startup_free(runlevels);

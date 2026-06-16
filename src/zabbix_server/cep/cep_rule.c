@@ -16,7 +16,7 @@
 #include "cep.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
-#include "zbxcep.h"
+#include "zbx_cep.h"
 #include "zbxcommon.h"
 #include "zbxdbwrap.h"
 #include "zbxeval.h"

@@ -18,7 +18,6 @@
 #include "zbxtypes.h"
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
-#include "zbxcep_client.h"
 
 ZBX_PTR_VECTOR_DECL(db_service, zbx_db_service *)
 
@@ -35,8 +34,6 @@ void	zbx_service_reload_cache(void);
 
 void	zbx_service_serialize_problem_tags(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		zbx_uint64_t eventid, const zbx_vector_tags_ptr_t *tags);
-void	zbx_service_deserialize_problem_tags(const unsigned char *data, zbx_uint32_t size,
-		zbx_vector_events_ptr_t *events);
 void	zbx_service_serialize_id(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t id);
 void	zbx_service_deserialize_ids(const unsigned char *data, zbx_uint32_t size, zbx_vector_uint64_t *ids);
 void	zbx_service_serialize_rootcause(unsigned char **data, size_t *data_alloc, size_t *data_offset,

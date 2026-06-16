@@ -15,7 +15,7 @@
 #include "cep_queue.h"
 #include "cep_task.h"
 #include "cep.h"
-#include "zbxcep.h"
+#include "zbx_cep.h"
 
 #include "zbxalgo.h"
 #include "zbxcommon.h"
@@ -41,6 +41,9 @@ struct zbx_cep_queue
 
 	/* number of pending tasks in groups */
 	int		group_tasks_num;
+
+	/* number of tasks that might require commit */
+	int		pending_commits_num;
 };
 
 /******************************************************************************
@@ -89,6 +92,7 @@ zbx_cep_queue_t	*cep_queue_create(void)
 		ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	queue->group_tasks_num = 0;
+	queue->pending_commits_num = 0;
 
 	return queue;
 }
@@ -173,6 +177,8 @@ static void	cep_queue_push_event(zbx_cep_queue_t *queue, zbx_mw_task_t *task, co
 		pending_num = zbx_queue_ptr_values_num(&group->tasks);
 		queue->group_tasks_num++;
 	}
+
+	queue->pending_commits_num++;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() pending:%d", __func__, pending_num);
 }
@@ -333,9 +339,11 @@ void	cep_queue_push_completed(zbx_cep_queue_t *queue, zbx_mw_task_t *task)
 	{
 		case CEP_TASK_EVENT:
 			cep_queue_push_next_event_task(queue, (zbx_cep_task_event_t *)task);
+			queue->pending_commits_num--;
 			break;
 		case CEP_TASK_CLOSE_EVENT:
 			cep_queue_push_next_event_task(queue, &((zbx_cep_task_close_event_t *)task)->parent);
+			queue->pending_commits_num--;
 			break;
 		default:
 			break;
@@ -345,4 +353,21 @@ void	cep_queue_push_completed(zbx_cep_queue_t *queue, zbx_mw_task_t *task)
 			zbx_queue_ptr_values_num(&queue->base.completed));
 }
 
+int	cep_queue_pending_commits_num(zbx_cep_queue_t *queue)
+{
+	return queue->pending_commits_num;
+}
 
+int	cep_queue_is_empty(zbx_cep_queue_t *queue)
+{
+	if (0 != queue->base.pending_num || 0 != queue->base.processing_num)
+		return FAIL;
+
+	if (0 != queue->group_tasks_num)
+		return FAIL;
+
+	if (0 != zbx_queue_ptr_values_num(&queue->base.completed))
+		return FAIL;
+
+	return SUCCEED;
+}

@@ -31,7 +31,6 @@ ICMPPING_LIBS = \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
-	$(top_srcdir)/src/libs/zbxexit/libzbxexit.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS) $(ZLIB_LIBS) $(ARES_LIBS)
 
 line_process_SOURCES = \

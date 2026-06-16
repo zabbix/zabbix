@@ -34,7 +34,7 @@
 #include "zbxinterface.h"
 #include "zbxtimekeeper.h"
 #include "zbxdb.h"
-#include "zbxcep_client.h"
+#include "zbx_cep_client.h"
 
 static int	compare_interfaces(const void *p1, const void *p2)
 {

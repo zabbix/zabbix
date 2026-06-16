@@ -23,8 +23,8 @@
 #include "cep_rule_op_event.h"
 #include "cep_rule_op_db_event.h"
 #include "cep_window.h"
-#include "zbxcep.h"
-#include "zbxcep_client.h"
+#include "zbx_cep.h"
+#include "zbx_cep_client.h"
 #include "zbxmw.h"
 
 #include "zbx_item_constants.h"
@@ -45,7 +45,7 @@
  *                                                                            *
  * Purpose: initialize event processor worker                                 *
  *                                                                            *
- * Parameters: dboool           - [IN] database connection pool               *
+ * Parameters: dbpool           - [IN] database connection pool               *
  *                                                                            *
  * Return value: created worker                                               *
  *                                                                            *
@@ -89,7 +89,7 @@ static void	cep_worker_assess_trigger_events(zbx_cep_task_remote_t *task)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check trigger depdendency status                                  *
+ * Purpose: check trigger dependency status                                   *
  *                                                                            *
  * Parameters: task - [IN] task containing trigger status                     *
  *                                                                            *
@@ -553,6 +553,8 @@ static void	cep_worker_resolve_trigger_events(zbx_db_event *db_event, zbx_uint64
 	cep_cache_acquire(&cep);
 	cep_resolve_trigger_events(cep, r_event, handles);
 	cep_cache_release(&cep);
+
+	zbx_cep_event_release(r_event);
 
 	task->event_op = CEP_EVENT_CLOSE;
 	zbx_cep_get_eventids_from_handles(handles->values, handles->values_num, &task->eventids);

@@ -16,7 +16,7 @@
 #define ZABBIX_CEP_RULE_OP_EVENT_H
 
 #include "cep_rule.h"
-#include "zbxcep.h"
+#include "zbx_cep.h"
 #include "zbxcacheconfig.h"
 
 void	cep_event_execute_ops(const zbx_cep_rule_t **matched_rules, int matched_rules_num, int execute_when,

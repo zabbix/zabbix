@@ -60,7 +60,6 @@
 #include "zbx_expression_constants.h"
 #include "module.h"
 #include "zbxhash.h"
-#include "zbxcep_client.h"
 
 #define	ZBX_VECTOR_ARRAY_RESERVE	3
 
@@ -3899,7 +3898,6 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_vector_trigger_ptr_t *trigge
 			dc_strpool_replace(found, &trigger->error, row[3]);
 			trigger->value = 0;
 			ZBX_STR2UCHAR(trigger->state, row[6]);
-			trigger->lastchange = atoi(row[7]);
 			trigger->locked = 0;
 			trigger->timer_revision = 0;
 
@@ -4063,7 +4061,7 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(triggerdepid, row[0]);
 
-		td = (zbx_dc_trigger_depends_t *)DCfind_id(&config->trigger_depends, triggerdepid,
+		td = (zbx_dc_trigger_depends_t *)DCfind_id(&dc_local()->trigger_depends_links, triggerdepid,
 				sizeof(zbx_dc_trigger_depends_t), &found);
 
 		ZBX_STR2UINT64(td->triggerid_down, row[1]);
@@ -4102,13 +4100,16 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 	/* remove deleted trigger dependencies from buffer */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		if (NULL == (td = (zbx_dc_trigger_depends_t *)zbx_hashset_search(&config->trigger_depends, &rowid)))
+		if (NULL == (td = (zbx_dc_trigger_depends_t *)zbx_hashset_search(&dc_local()->trigger_depends_links,
+				&rowid)))
+		{
 			continue;
+		}
 
 		if (NULL == (trigdep_down = (ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_search(&config->trigdeps,
 				&td->triggerid_down)))
 		{
-			zbx_hashset_remove_direct(&config->trigger_depends, td);
+			zbx_hashset_remove_direct(&dc_local()->trigger_depends_links, td);
 			continue;
 		}
 
@@ -4123,7 +4124,7 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 			if (FAIL == (index = zbx_vector_ptr_search(&trigdep_down->dependencies, &td->triggerid_up,
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
-				zbx_hashset_remove_direct(&config->trigger_depends, td);
+				zbx_hashset_remove_direct(&dc_local()->trigger_depends_links, td);
 				continue;
 			}
 
@@ -4132,6 +4133,8 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 			else
 				zbx_vector_ptr_remove_noorder(&trigdep_down->dependencies, index);
 		}
+
+		zbx_hashset_remove_direct(&dc_local()->trigger_depends_links, td);
 	}
 
 	zbx_dcsync_sync_end(sync, dbconfig_used_size());
@@ -7411,6 +7414,7 @@ static void	dc_add_new_items_to_trends(const zbx_vector_dc_item_ptr_t *items)
 	{
 		zbx_vector_uint64_t	itemids;
 		int			i;
+		zbx_uint64_t		trends_flags = zbx_history_get_trends_flags();
 
 		zbx_vector_uint64_create(&itemids);
 		zbx_vector_uint64_reserve(&itemids, (size_t)items->values_num);
@@ -7420,6 +7424,9 @@ static void	dc_add_new_items_to_trends(const zbx_vector_dc_item_ptr_t *items)
 			ZBX_DC_ITEM	*item = items->values[i];
 
 			if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
+				continue;
+
+			if (0 == (trends_flags & (__UINT64_C(1) << item->value_type)))
 				continue;
 
 			ZBX_DC_NUMITEM	*numitem;
@@ -7789,14 +7796,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 
 	FINISH_SYNC;
 
-	/* make memory available to sync triggers, trigger tags and item tags */
-	zbx_dbsync_clear(&if_sync);
-	zbx_dbsync_clear(&items_sync);
-	zbx_dbsync_clear(&item_discovery_sync);
-	zbx_dbsync_clear(&itempp_sync);
-	zbx_dbsync_clear(&itemscrp_sync);
-	zbx_dbsync_clear(&func_sync);
-
 	if (NULL != pnew_items)
 	{
 		dc_add_new_items_to_valuecache(pnew_items);
@@ -8020,6 +8019,9 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 				config->functions.num_data, config->functions.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __func__,
 				config->triggers.num_data, config->triggers.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() trigger_depends   : %d (%d slots)", __func__,
+				dc_local()->trigger_depends_links.num_data,
+				dc_local()->trigger_depends_links.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : %d (%d slots)", __func__,
 				config->trigdeps.num_data, config->trigdeps.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() trig. tags : %d (%d slots)", __func__,
@@ -8656,7 +8658,6 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	CREATE_HASHSET(config->functions, 0);
 	CREATE_HASHSET(config->triggers, 0);
 	CREATE_HASHSET(config->trigdeps, 0);
-	CREATE_HASHSET(config->trigger_depends, 0);
 	CREATE_HASHSET(config->hosts, 10);
 	CREATE_HASHSET(config->proxies, 0);
 	CREATE_HASHSET(config->host_inventories, 0);
@@ -9815,7 +9816,6 @@ void	DCget_trigger(zbx_dc_trigger_t *dst_trigger, const ZBX_DC_TRIGGER *src_trig
 	dst_trigger->value = src_trigger->value;
 	dst_trigger->state = src_trigger->state;
 	dst_trigger->new_value = TRIGGER_VALUE_UNKNOWN;
-	dst_trigger->lastchange = src_trigger->lastchange;
 	dst_trigger->topoindex = src_trigger->topoindex;
 	dst_trigger->status = src_trigger->status;
 	dst_trigger->recovery_mode = src_trigger->recovery_mode;
@@ -12487,9 +12487,6 @@ void	zbx_dc_config_triggers_apply_changes(zbx_trigger_diff_t **trigger_diffs, in
 		if (NULL == (dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &diff->triggerid)))
 			continue;
 
-		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE))
-			dc_trigger->lastchange = diff->lastchange;
-
 		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE))
 			dc_trigger->value = diff->value;
 
@@ -13854,11 +13851,11 @@ unsigned int	zbx_dc_get_internal_action_count(void)
 {
 	unsigned int count;
 
-	RDLOCK_CACHE;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	count = config->internal_actions;
 
-	UNLOCK_CACHE;
+	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	return count;
 }
@@ -13867,11 +13864,11 @@ unsigned int	zbx_dc_get_auto_registration_action_count(void)
 {
 	unsigned int count;
 
-	RDLOCK_CACHE;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	count = config->auto_registration_actions;
 
-	UNLOCK_CACHE;
+	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	return count;
 }
@@ -16935,13 +16932,13 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() templateids_num:%d", __func__, templateids->values_num);
 }
 
-void	zbx_recalc_time_period(time_t *ts_from, int table_group)
+void	zbx_recalc_time_period(time_t *ts_from, int table_group, unsigned char value_type)
 {
 #define HK_CFG_UPDATE_INTERVAL	5
-	time_t			least_ts = 0, now;
-	zbx_config_t		cfg;
-	static time_t		last_cfg_retrieval = 0;
-	static zbx_config_hk_t	hk;
+	time_t					least_ts = 0, now;
+	zbx_config_t				cfg;
+	static ZBX_THREAD_LOCAL time_t		last_cfg_retrieval = 0;
+	static ZBX_THREAD_LOCAL zbx_config_hk_t	hk;
 
 	now = time(NULL);
 
@@ -16955,10 +16952,17 @@ void	zbx_recalc_time_period(time_t *ts_from, int table_group)
 
 	if (ZBX_RECALC_TIME_PERIOD_HISTORY == table_group)
 	{
-		if (1 != hk.history_global)
-			return;
+		int	hk_period;
 
-		least_ts = now - hk.history;
+		if (0 == (hk_period = hk.history_override[value_type]))
+		{
+			if (1 != hk.history_global)
+				return;
+
+			hk_period = hk.history;
+		}
+
+		least_ts = now - hk_period;
 	}
 	else if (ZBX_RECALC_TIME_PERIOD_TRENDS == table_group)
 	{
@@ -17179,7 +17183,7 @@ static void	dc_get_trigger_deps_rec(const ZBX_DC_TRIGGER_DEPLIST *trigdep, int l
 
 void	zbx_dc_get_trigger_deps(zbx_vector_dc_trigger_t *triggers)
 {
-	RDLOCK_CACHE;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	ZBX_DC_TRIGGER_DEPLIST	*trigdep;
 
@@ -17193,7 +17197,7 @@ void	zbx_dc_get_trigger_deps(zbx_vector_dc_trigger_t *triggers)
 		dc_get_trigger_deps_rec(trigdep, 0, &triggers->values[i]->dep_triggerids);
 	}
 
-	UNLOCK_CACHE;
+	UNLOCK_CACHE_CONFIG_HISTORY;
 }
 
 void	zbx_dc_get_trigger_deps_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uint64_t *depids)

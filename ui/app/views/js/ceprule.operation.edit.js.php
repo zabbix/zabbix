@@ -49,7 +49,7 @@ window.ceprule_operation_edit_popup = new class {
 		this.#setAvailableExecuteWhenOptions();
 		this.#setAvailableOperationOptions();
 		window['ceprule-operation-execute-when'].dispatchEvent(new Event('change'));
-		window['ceprule-operation-action'].dispatchEvent(new Event('change'));
+		window['ceprule-operation-type'].dispatchEvent(new Event('change'));
 
 		window.requestAnimationFrame(() => this.form_element.style.display = '');
 	}
@@ -57,7 +57,7 @@ window.ceprule_operation_edit_popup = new class {
 	#initActions() {
 		this.form_element.addEventListener('change', (e) => {
 			e.target.id === 'ceprule-operation-execute-when' && this.#handleExecuteWhenChanged(e.target.value);
-			e.target.id === 'ceprule-operation-action' && this.#handleActionChanged(e.target.value);
+			e.target.id === 'ceprule-operation-type' && this.#handleActionChanged(e.target.value);
 		}, {capture: true});
 
 		this.form_element.addEventListener('click', (e) => {
@@ -71,12 +71,28 @@ window.ceprule_operation_edit_popup = new class {
 	}
 
 	#addTagRow(tag) {
-		tag.row_index = this.form_element.querySelectorAll('#ceprule-operation-tags-table tbody tr').length;
+		const row_index = this.form_element.querySelectorAll('#ceprule-operation-tags-table tbody tr').length;
 
 		this.form_element.querySelector('#ceprule-operation-tags-table tbody')
-			.insertAdjacentElement('beforeend', this.#tag_template.evaluateToElement(tag));
+			.insertAdjacentElement('beforeend', this.#buildTagRow(tag, row_index));
 		this.form_element.querySelector('#ceprule-operation-tags-table tbody')
 			.insertAdjacentHTML('beforeend', `<tr><td class="<?= ZBX_STYLE_ERROR_CONTAINER ?>"></td></tr>`);
+	}
+
+	#buildTagRow(tag, row_index) {
+		const tag_row = this.#tag_template.evaluateToElement({...tag, row_index});
+		const textbox = tag_row.querySelector(`[name="tags[${row_index}][value]"]`);
+		const on_operator_change = value => {
+			const hidden = [<?= TAG_OPERATOR_EXISTS ?>, <?= TAG_OPERATOR_NOT_EXISTS ?>].includes(value);
+
+			textbox.style.display = hidden ? 'none' : '';
+			textbox.style.disabled = hidden;
+		};
+
+		tag_row.querySelector('z-select').addEventListener('change', e => on_operator_change(Number(e.target.value)));
+		on_operator_change(Number(tag.operator));
+
+		return tag_row;
 	}
 
 	#setAvailableExecuteWhenOptions() {
@@ -89,19 +105,19 @@ window.ceprule_operation_edit_popup = new class {
 
 			option.disabled = false;
 
-			if (value == <?= CCepRuleHelper::OP_WHEN_EVENT_OCCURRED ?>) {
+			if (value == <?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>) {
 				option.disabled = false;
 			}
-			else if (value == <?= CCepRuleHelper::OP_WHEN_EVENT_EVICTED ?>) {
+			else if (value == <?= CCepRuleHelper::WHEN_EVENT_EVICTED ?>) {
 				option.disabled = this.#window_type === '<?= CCepRuleHelper::WINDOW_NONE ?>';
 			}
-			else if (value == <?= CCepRuleHelper::OP_WHEN_WINDOW_CLOSED ?>) {
+			else if (value == <?= CCepRuleHelper::WHEN_WINDOW_CLOSED ?>) {
 				option.disabled = this.#window_type !== '<?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>';
 			}
-			else if (value == <?= CCepRuleHelper::OP_WHEN_TAGS_CORRELATED ?>) {
+			else if (value == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>) {
 				option.disabled = this.#window_type !== '<?= CCepRuleHelper::WINDOW_TAG_MATCH ?>';
 			}
-			else if (value == <?= CCepRuleHelper::OP_WHEN_PATTERN_MATCHED ?>) {
+			else if (value == <?= CCepRuleHelper::WHEN_PATTERN_MATCHED ?>) {
 				option.disabled = this.#window_type !== '<?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?>';
 			}
 
@@ -116,7 +132,7 @@ window.ceprule_operation_edit_popup = new class {
 	#setAvailableOperationOptions() {
 		const type = Number(this.form.findFieldByName('type').getValue());
 		const execute_when = Number(this.form.findFieldByName('execute_when').getValue());
-		const zselect = window['ceprule-operation-action'];
+		const zselect = window['ceprule-operation-type'];
 
 		const events_options = [];
 		const tags_options = [];
@@ -129,8 +145,8 @@ window.ceprule_operation_edit_popup = new class {
 			}
 
 			if (value == <?= CCepRuleHelper::OP_DISCARD ?>) {
-				option.is_disabled = (execute_when == <?= CCepRuleHelper::OP_WHEN_TAGS_CORRELATED ?>)
-					|| (execute_when == <?= CCepRuleHelper::OP_WHEN_EVENT_EVICTED ?>);
+				option.is_disabled = (execute_when == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>)
+					|| (execute_when == <?= CCepRuleHelper::WHEN_EVENT_EVICTED ?>);
 			}
 		};
 
@@ -143,7 +159,7 @@ window.ceprule_operation_edit_popup = new class {
 		zselect.addOptionGroup({label: <?= json_encode(_('Events')) ?>, options: events_options});
 		zselect.addOptionGroup({label: <?= json_encode(_('Tags')) ?>, options: tags_options});
 
-		// Select first enabled optioin, if previous selection got disabled.
+		// Select first enabled option, if previous selection got disabled.
 		zselect.value = type;
 		if (!zselect.value.length) {
 			zselect.value = [...events_options, ...tags_options]
@@ -180,24 +196,32 @@ window.ceprule_operation_edit_popup = new class {
 		const name = window['ceprule-operation-name-argument'];
 		const tag = window['ceprule-operation-tag-argument'];
 		const severity = window['ceprule-operation-severity-argument'];
+		const period = window['ceprule-operation-period-argument'];
 		const tag_pair = window['ceprule-operation-tag-pair-argument'];
 		const tag_rename = window['ceprule-operation-tag-rename-argument'];
 
 		name.style.display = 'none';
 		tag.style.display = 'none';
 		severity.style.display = 'none';
+		period.style.display = 'none';
 		tag_pair.style.display = 'none';
 		tag_rename.style.display = 'none';
 
 		if ([
 			<?= CCepRuleHelper::OP_COPY_FIRST ?>,
 			<?= CCepRuleHelper::OP_COPY_LAST ?>,
-			<?= CCepRuleHelper::OP_SUPPRESS ?>,
 			<?= CCepRuleHelper::OP_DECREASE_SEVERITY ?>,
 			<?= CCepRuleHelper::OP_INCREASE_SEVERITY ?>,
 			<?= CCepRuleHelper::OP_DISCARD ?>,
 			<?= CCepRuleHelper::OP_CLOSE ?>
 		].includes(value)) {
+			return;
+		}
+
+		if ([
+			<?= CCepRuleHelper::OP_SUPPRESS ?>
+		].includes(value)) {
+			period.style.display = '';
 			return;
 		}
 
@@ -248,7 +272,7 @@ window.ceprule_operation_edit_popup = new class {
 
 		[...this.form_element.querySelectorAll('[is="z-cep-tagsuggest"]')]
 			.map(node => {
-				if (value == <?= CCepRuleHelper::OP_WHEN_TAGS_CORRELATED ?>) {
+				if (value == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>) {
 					node.setAttribute('disable-position-tags', '');
 				}
 				else {
@@ -265,7 +289,7 @@ if (window.customElements.get('z-cep-tagsuggest') === undefined) {
 		#position_tags = ['$IS.FIRST', '$IS.LAST'];
 
 		/** @type {Array} */
-		#property_tags = ['$IS.COPIED', '$RANK', '$STATUS.CODE', '$CAUSE'];
+		#property_tags = ['$IS.COPIED', '$RANK', '$STATUS.CODE', '$EVICTION'];
 
 		/** @type {Function} */
 		#handler;

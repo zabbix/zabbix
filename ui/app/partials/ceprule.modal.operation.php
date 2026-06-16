@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -28,9 +28,9 @@ $events_operations = new CSelectOptionGroup(_('Events'));
 $tags_operations = new CSelectOptionGroup(_('Tags'));
 $labels = CCepRuleHelper::getOperationLabelStrings();
 
-$events_group_opts = [CCepRuleHelper::OP_SET_NAME, CCepRuleHelper::OP_CLOSE, CCepRuleHelper::OP_DISCARD, CCepRuleHelper::OP_SET_SEVERITY,
-	CCepRuleHelper::OP_INCREASE_SEVERITY, CCepRuleHelper::OP_DECREASE_SEVERITY, CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_COPY_LAST,
-	CCepRuleHelper::OP_COPY_FIRST
+$events_group_opts = [CCepRuleHelper::OP_SET_NAME, CCepRuleHelper::OP_CLOSE, CCepRuleHelper::OP_DISCARD,
+	CCepRuleHelper::OP_SET_SEVERITY, CCepRuleHelper::OP_INCREASE_SEVERITY, CCepRuleHelper::OP_DECREASE_SEVERITY,
+	CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_COPY_LAST, CCepRuleHelper::OP_COPY_FIRST
 ];
 
 foreach ($labels as $option => $label) {
@@ -47,19 +47,21 @@ foreach ($labels as $option => $label) {
 }
 
 echo (new CForm())
+	// Enable form submitting on Enter.
+	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
 	->addVar('sortorder', '0')
 	->addStyle('display: none;')
 	->addItem((new CFormGrid())
 		->addItem((new CTemplateTag('ceprule-operation-tag-template'))
 			->addItem((new CRow())
 				->setAttribute('data-row_index', '#{row_index}')
-				->addItem((new CCol()
+				->addItem((new CCol())
 					->addItem((new CTextBox('tags[#{row_index}][tag]', '#{tag}'))
 						->setAttribute('is', 'z-cep-tagsuggest')
 						->setAttribute('placeholder', _('tag or $'))
 					)
-				))
-				->addItem((new CCol()
+				)
+				->addItem((new CCol())
 					->addItem((new CSelect('tags[#{row_index}][operator]'))
 						->setValue('#{operator}')
 						->addOptions(CSelect::createOptionsFromArray([
@@ -70,13 +72,13 @@ echo (new CForm())
 							TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
 							TAG_OPERATOR_NOT_LIKE => _('Does not contain')
 						]))
-				))
-				->addItem((new CCol()
+				)
+				->addItem((new CCol())
 					->addItem((new CTextBox('tags[#{row_index}][value]', '#{value}'))->setAttribute('placeholder', _('value')))
-				))
-				->addItem((new CCol()
+				)
+				->addItem((new CCol())
 					->addItem((new CButtonLink(_('Remove')))->addClass('js-tag-remove'))
-				)))
+				))
 			)
 		)
 		->addItem(new CLabel(_('Execute when'), 'ceprule-operation-execute-when-label'))
@@ -102,11 +104,11 @@ echo (new CForm())
 					(new CButtonLink(_('Add')))->addClass('js-tag-add')
 				))->setColSpan(4)))
 		))
-		->addItem(new CLabel('Operation', 'ceprule-operation-action-label'))
+		->addItem(new CLabel('Operation', 'ceprule-operation-type-label'))
 		->addItem((new CFormField())
 			->addItem((new CSelect('type'))
-				->setFocusableElementId('ceprule-operation-action-label')
-				->setId('ceprule-operation-action') // TODO: rename "action" -> "type"
+				->setFocusableElementId('ceprule-operation-type-label')
+				->setId('ceprule-operation-type')
 				->addOptionGroup($events_operations)
 				->addOptionGroup($tags_operations)
 			)
@@ -118,6 +120,12 @@ echo (new CForm())
 			->addItem((new CTextBox('tag'))
 				->setId('ceprule-operation-tag-argument')
 				->setAttribute('placeholder', 'tag')
+			)
+			->addItem((new CDateSelector('suppress_until'))
+				->setId('ceprule-operation-period-argument')
+				->setDateFormat(ZBX_DATE_TIME)
+				->setPlaceholder(_('YYYY-MM-DD hh:mm'))
+				->setAriaRequired()
 			)
 		)
 		->addItem((new CFormField())
