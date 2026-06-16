@@ -56,8 +56,10 @@ class testMultiselects extends CWebTest {
 
 		// Unstable screenshots on Jenkins. Added border radius 0 for buttons in host form.
 		if ($query === 'host-form') {
-			$this->page->getDriver()->executeScript('document.querySelectorAll(\'button[class="btn-grey multiselect-button"]\')'.
-					'.forEach(function (e){ e.style.borderRadius = 0; });'
+			$this->page->getDriver()->executeScript(
+				'document.querySelectorAll(\'button[class="btn-grey multiselect-button"],' .
+				' .radio-list-control li, .radio-list-control label\')' .
+				'.forEach(function (e){ e.style.borderRadius = 0; });'
 			);
 		}
 
