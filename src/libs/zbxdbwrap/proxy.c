@@ -1823,14 +1823,13 @@ static void	zbx_drule_free(void *ptr)
  * Purpose: process services discovered on IP address                         *
  *                                                                            *
  ******************************************************************************/
-static int	process_services(const zbx_vector_dservice_ptr_t *services, const char *ip,
+static int	process_services(const zbx_vector_dservice_ptr_t *services, const char *ip, zbx_db_dhost *dhost,
 		const zbx_add_event_func_t add_event_cb, zbx_uint64_t druleid, zbx_vector_uint64_t *dcheckids,
 		zbx_uint64_t unique_dcheckid, int *processed_num, int ip_idx,
 		zbx_discovery_update_service_func_t discovery_update_service_cb,
 		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
 		zbx_discovery_find_host_func_t discovery_find_host_cb)
 {
-	zbx_db_dhost			dhost;
 	zbx_dservice_t			*service;
 	int				services_num, ret = FAIL, i, dchecks = 0;
 	zbx_vector_dservice_ptr_t	services_old;
@@ -1838,8 +1837,6 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 	zbx_db_drule			drule = {.druleid = druleid, .unique_dcheckid = unique_dcheckid};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	memset(&dhost, 0, sizeof(dhost));
 
 	zbx_vector_dservice_ptr_create(&services_old);
 	zbx_vector_uint64_create(&dserviceids);
@@ -1946,9 +1943,9 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 
 	if (0 == dchecks)
 	{
-		discovery_find_host_cb(druleid, ip, &dhost);	/* we will mark all services as DOWN */
+		discovery_find_host_cb(druleid, ip, dhost);	/* we will mark all services as DOWN */
 
-		if (0 == dhost.dhostid)
+		if (0 == dhost->dhostid)
 		{
 			(*processed_num)++;
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot process update of unknown host without services");
@@ -1970,7 +1967,7 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 			}
 
 			discovery_update_service_cb(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid,
-					&dhost, ip, service->dns, service->port, service->status, service->value,
+					dhost, ip, service->dns, service->port, service->status, service->value,
 					service->itemtime, &dserviceids, add_event_cb);
 		}
 
@@ -1987,15 +1984,15 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 			}
 
 			discovery_update_service_cb(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid,
-					&dhost, ip, service->dns, service->port, service->status, service->value,
+					dhost, ip, service->dns, service->port, service->status, service->value,
 					service->itemtime, &dserviceids, add_event_cb);
 		}
 	}
 
 	service = services->values[(*processed_num)++];
 
-	if (0 != dhost.dhostid)
-		discovery_update_service_down_cb(dhost.dhostid, ip, service->itemtime, &dserviceids, add_event_cb);
+	if (0 != dhost->dhostid)
+		discovery_update_service_down_cb(dhost->dhostid, ip, service->itemtime, &dserviceids, add_event_cb);
 out:
 	ret = SUCCEED;
 fail:
@@ -2008,24 +2005,33 @@ fail:
 	return ret;
 }
 
+static int proxy_has_forced_last_ip(int proxy_version)
+{
+	if (ZBX_COMPONENT_VERSION(7, 1, 0) > proxy_version && ZBX_COMPONENT_VERSION(7, 0, 26) <= proxy_version)
+		return SUCCEED;
+	else
+		return FAIL;
+}
+
 /*********************************************************************************
  *                                                                               *
  * Purpose: parses discovery data contents and processes it                      *
  *                                                                               *
  * Parameters:                                                                   *
- *    jp_data                     - [IN] JSON with discovery data                *
- *    proxyid                     - [IN]                                         *
- *    events_cbs                  - [IN]                                         *
- *    ...                         - [IN]                                         *
- *    error                       - [OUT] address of pointer to info string      *
- *                                        (should be freed by the caller)        *
+ *    jp_data       - [IN] JSON with discovery data                              *
+ *    proxy         - [IN]                                                       *
+ *    events_cbs    - [IN]                                                       *
+ *    ...           - [IN]                                                       *
+ *    error         - [OUT] address of pointer to info string                    *
+ *                          (should be freed by the caller)                      *
  *                                                                               *
  * Return value:  SUCCEED - processed successfully                               *
  *                FAIL - error occurred                                          *
  *                                                                               *
  *********************************************************************************/
-static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxyid,
-		const zbx_events_funcs_t *events_cbs, zbx_discovery_update_hosts_func_t discovery_update_hosts_cb,
+static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const zbx_dc_proxy_t *proxy,
+		const zbx_events_funcs_t *events_cbs, zbx_discovery_update_host_func_t discovery_update_host_cb,
+		zbx_discovery_update_hosts_func_t discovery_update_hosts_cb,
 		zbx_discovery_update_service_func_t discovery_update_service_cb,
 		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
 		zbx_discovery_find_host_func_t discovery_find_host_cb,
@@ -2086,7 +2092,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_u
 
 			dc_drule->druleid = druleid;
 
-			if (FAIL == zbx_dc_drule_get_values(dc_drule) || dc_drule->proxyid != proxyid)
+			if (FAIL == zbx_dc_drule_get_values(dc_drule) || dc_drule->proxyid != proxy->proxyid)
 				dc_drule->status = DRULE_STATUS_NOT_MONITORED;
 
 			idx = zbx_vector_dc_drule_ptr_nearestindex(&dc_drules, dc_drule,
@@ -2260,13 +2266,15 @@ json_parse_error:
 
 		for (j = 0; j < drule->ips.values_num && SUCCEED == ret2; j++)
 		{
-			int	processed_num = 0;
+			zbx_db_dhost	dhost;
+			int		processed_num = 0;
 
+			memset(&dhost, 0, sizeof(dhost));
 			drule_ip = (zbx_drule_ip_t *)drule->ips.values[j];
 
 			while (processed_num != drule_ip->services.values_num)
 			{
-				if (FAIL == (ret2 = process_services(&drule_ip->services, drule_ip->ip,
+				if (FAIL == (ret2 = process_services(&drule_ip->services, drule_ip->ip, &dhost,
 						events_cbs->add_event_cb, drule->druleid, &drule->dcheckids,
 						drule->unique_dcheckid, &processed_num, j,
 						discovery_update_service_cb, discovery_update_service_down_cb,
@@ -2276,11 +2284,25 @@ json_parse_error:
 				}
 			}
 
+			if (0 == processed_num)
+				continue;
+
+			service = drule_ip->services.values[processed_num - 1];
+
+			if (FAIL == proxy_has_forced_last_ip(proxy->version_int))
+			{
+				if (0 != dhost.dhostid)
+				{
+					discovery_update_host_cb(&dhost, service->status, service->itemtime,
+							events_cbs->add_event_cb);
+				}
+
+				continue;
+			}
+
 			if (0 == strcmp(drule_ip->ip, drule->last_ip))
 			{
-				discovery_update_hosts_cb(drule->druleid,
-						drule_ip->services.values[drule_ip->services.values_num - 1]->itemtime,
-						events_cbs->add_event_cb);
+				discovery_update_hosts_cb(drule->druleid, service->itemtime, events_cbs->add_event_cb);
 			}
 		}
 
@@ -2594,6 +2616,7 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
  *    proxy_status                - [IN] active or passive proxy mode        *
  *    events_cbs                  - [IN]                                     *
  *    proxydata_frequency         - [IN]                                     *
+ *    discovery_update_host_cb    - [IN]                                     *
  *    discovery_update_hosts_cb   - [IN]                                     *
  *    discovery_update_service_cb - [IN]                                     *
  *    autoreg_host_free_cb        - [IN]                                     *
@@ -2609,6 +2632,7 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
  *****************************************************************************/
 int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
 		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
+		zbx_discovery_update_host_func_t discovery_update_host_cb,
 		zbx_discovery_update_hosts_func_t discovery_update_hosts_cb,
 		zbx_discovery_update_service_func_t discovery_update_service_cb,
 		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
@@ -2717,8 +2741,8 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DISCOVERY_DATA, &jp_data))
 	{
-		if (SUCCEED != (ret = process_discovery_data_contents(&jp_data, proxy->proxyid, events_cbs,
-				discovery_update_hosts_cb, discovery_update_service_cb,
+		if (SUCCEED != (ret = process_discovery_data_contents(&jp_data, proxy, events_cbs,
+				discovery_update_host_cb, discovery_update_hosts_cb, discovery_update_service_cb,
 				discovery_update_service_down_cb, discovery_find_host_cb, discovery_update_drule_cb,
 				&error_step)))
 		{

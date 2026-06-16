@@ -563,7 +563,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, const zbx_vector_u
 		zbx_hashset_t *incomplete_druleids, zbx_uint64_t *unsaved_checks,
 		zbx_vector_discoverer_drule_error_t *drule_errors, const zbx_events_funcs_t *events_cbs,
 		zbx_discovery_open_func_t discovery_open_cb, zbx_discovery_close_func_t discovery_close_cb,
-		zbx_discovery_update_host_func_t discovery_update_host_cb,
+		zbx_discovery_update_interface_func_t discovery_update_interface_cb,
 		zbx_discovery_update_hosts_func_t discovery_update_hosts_cb,
 		zbx_discovery_update_service_func_t discovery_update_service_cb,
 		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
@@ -666,7 +666,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, const zbx_vector_u
 					events_cbs->add_event_cb, discovery_update_service_cb,
 					discovery_update_service_down_cb, discovery_find_host_cb);
 
-			discovery_update_host_cb(handle, result->druleid, result->ip, result->dnsname, host_status,
+			discovery_update_interface_cb(handle, result->druleid, result->ip, result->dnsname, host_status,
 					result->now);
 
 			if (0 != (result->status & ZBX_DISCOVERER_RESULT_CHECK_LAST))
@@ -1834,7 +1834,7 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 		more_results = process_results(&dmanager, &revisions, &del_jobs, &del_druleids, &incomplete_druleids,
 				&unsaved_checks, &drule_errors, discoverer_args_in->events_cbs,
 				discoverer_args_in->discovery_open_cb, discoverer_args_in->discovery_close_cb,
-				discoverer_args_in->discovery_update_host_cb,
+				discoverer_args_in->discovery_update_interface_cb,
 				discoverer_args_in->discovery_update_hosts_cb,
 				discoverer_args_in->discovery_update_service_cb,
 				discoverer_args_in->discovery_update_service_down_cb,

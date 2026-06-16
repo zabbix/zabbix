@@ -19,8 +19,10 @@
 
 void	*zbx_discovery_open_proxy(void);
 void	zbx_discovery_find_host_proxy(const zbx_uint64_t druleid, const char *ip, zbx_db_dhost *dhost);
-void	zbx_discovery_update_host_proxy(void *handle, zbx_uint64_t druleid, const char *ip, const char *dns,
+void	zbx_discovery_update_interface_proxy(void *handle, zbx_uint64_t druleid, const char *ip, const char *dns,
 		int status, time_t now);
+void	zbx_discovery_update_host_proxy(zbx_db_dhost *dhost, int status, time_t now,
+		zbx_add_event_func_t add_event_cb);
 void	zbx_discovery_update_hosts_proxy(const zbx_uint64_t druleid, const time_t now,
 		zbx_add_event_func_t add_event_cb);
 void	zbx_discovery_update_service_proxy(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,

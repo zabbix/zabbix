@@ -541,10 +541,10 @@ void	zbx_discovery_find_host_server(const zbx_uint64_t druleid, const char *ip, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process new host status                                           *
+ * Purpose: process new interface status                                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_update_host_server(void *handle, zbx_uint64_t druleid, const char *ip, const char *dns,
+void	zbx_discovery_update_interface_server(void *handle, zbx_uint64_t druleid, const char *ip, const char *dns,
 		int status, time_t now)
 {
 	ZBX_UNUSED(handle);
@@ -553,6 +553,21 @@ void	zbx_discovery_update_host_server(void *handle, zbx_uint64_t druleid, const 
 	ZBX_UNUSED(dns);
 	ZBX_UNUSED(status);
 	ZBX_UNUSED(now);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process new host status                                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_discovery_update_host_server(zbx_db_dhost *dhost, int status, time_t now,
+		zbx_add_event_func_t add_event_cb)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	discovery_update_host_status(dhost, status, (int)now, add_event_cb);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
