@@ -14,10 +14,13 @@
 
 #include "cep_task.h"
 #include "cep.h"
+#include "zabbix_server/cep/cep_rule_op_event.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
+#include "zbxcommon.h"
 #include "zbxipcservice.h"
 #include "zbxdbwrap.h"
+#include "zbxjson.h"
 
 static void	cep_task_request_remote_free(void *mw_task);
 static void	cep_task_event_free(void *mw_task);
@@ -26,6 +29,7 @@ static void	cep_task_event_commit_free(void *mw_task);
 static void	cep_task_add_tags_free(void *mw_task);
 static void	cep_task_sync_event_free(void *mw_task);
 static void	cep_task_window_free(void *mw_task);
+static void	cep_task_acknowledge_free(void *mw_task);
 
 /******************************************************************************
  *                                                                            *
@@ -360,6 +364,42 @@ static void	cep_task_window_free(void *mw_task)
 	zbx_free(task);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create task process event window                                  *
+ *                                                                            *
+ * Parameters: widnow - [IN] window to process                                *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_acknowledge(zbx_cep_acknowledge_t *ack, zbx_uint64_t ruleid, zbx_uint64_t eventid)
+{
+	zbx_cep_task_acknowledge_t	*task;
+
+	task = (zbx_cep_task_acknowledge_t *)zbx_mw_task_create(CEP_TASK_ACKNOWLEDGE, cep_task_acknowledge_free,
+			sizeof(zbx_cep_task_acknowledge_t));
+
+	task->ruleid = ruleid;
+	task->eventid = eventid;
+	zbx_json_copy(&task->details, &ack->json);
+	memset(ack, 0, sizeof(zbx_cep_acknowledge_t));
+
+	return (zbx_mw_task_t *)task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free 'process window' task                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_task_acknowledge_free(void *mw_task)
+{
+	zbx_cep_task_acknowledge_t	*task = (zbx_cep_task_acknowledge_t *)mw_task;
+
+	zbx_json_free(&task->details);
+	zbx_free(task);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -392,6 +432,12 @@ void	cep_task_free(zbx_mw_task_t *mw_task)
 			break;
 		case CEP_TASK_WINDOW:
 			cep_task_window_free((zbx_cep_task_window_t *)task);
+			break;
+		case CEP_TASK_ACKNOWLEDGE:
+			cep_task_acknowledge_free((zbx_cep_task_acknowledge_t *)task);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown CEP task %d", task->type);
 			break;
 	}
 }

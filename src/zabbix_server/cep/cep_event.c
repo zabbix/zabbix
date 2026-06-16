@@ -289,3 +289,12 @@ void	cep_event_context_set_handle(zbx_cep_event_context_t *ctx, zbx_cep_event_ha
 	ctx->hevent = zbx_cep_event_handle_addref(hevent);
 }
 
+zbx_uint64_t	cep_event_context_eventid(zbx_cep_event_context_t *ctx)
+{
+	if (NULL != cep_event_context_acquire_event(ctx))
+		return ctx->event->eventid;
+
+	return 0;
+}
+
+

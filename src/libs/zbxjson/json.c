@@ -1339,3 +1339,21 @@ struct zbx_json	*zbx_json_clone(const struct zbx_json *src)
 
 	return dst;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copy JSON object from source to destination                       *
+ *                                                                            *
+ * Parameters: dst - [OUT] destination JSON object                            *
+ *             src - [IN] source JSON object                                  *
+ *                                                                            *
+ * Comments: This function transfers ownership of any allocated resources     *
+ *           from source to destination object.                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_json_copy(struct zbx_json *dst, const struct zbx_json *src)
+{
+	*dst = *src;
+	if (src->buffer == src->buf_stat)
+		dst->buffer = dst->buf_stat;
+}

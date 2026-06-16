@@ -16,6 +16,7 @@
 #define ZABBIX_CEP_TASK_H
 
 #include "cep_window.h"
+#include "zabbix_server/cep/cep_rule_op_event.h"
 #include "zbx_cep.h"
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
@@ -38,6 +39,7 @@ typedef enum
 	CEP_TASK_ADD_TAGS,
 	CEP_TASK_SYNC_EVENT,
 	CEP_TASK_WINDOW,
+	CEP_TASK_ACKNOWLEDGE
 }
 zbx_cep_task_type_t;
 
@@ -114,6 +116,15 @@ zbx_cep_task_window_t;
 
 typedef struct
 {
+	zbx_mw_task_t		base;
+	zbx_uint64_t		ruleid;
+	zbx_uint64_t		eventid;
+	struct zbx_json		details;
+}
+zbx_cep_task_acknowledge_t;
+
+typedef struct
+{
 	zbx_mw_task_t	base;
 }
 zbx_cep_task_prune_events_t;
@@ -127,6 +138,7 @@ zbx_mw_task_t	*cep_create_task_close_event(zbx_db_event *event, zbx_uint64_t eve
 zbx_mw_task_t	*cep_create_task_add_tags(zbx_vector_event_tags_t *event_tags, zbx_vector_uint64_t *eventids);
 zbx_mw_task_t	*cep_create_task_sync_event(zbx_cep_event_handle_t event, zbx_uint32_t flags);
 zbx_mw_task_t	*cep_create_task_window(zbx_cep_window_t *window, time_t now);
+zbx_mw_task_t	*cep_create_task_acknowledge(zbx_cep_acknowledge_t *ack, zbx_uint64_t ruleid, zbx_uint64_t eventid);
 
 void	cep_task_free(zbx_mw_task_t *mw_task);
 

@@ -438,6 +438,7 @@ static void	cep_manager_process_pending(zbx_cep_manager_t *manager)
 static void	cep_manager_process_finished(zbx_cep_manager_t *manager, zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_cep_task_sync_event_t	*task_update;
+	zbx_cep_task_acknowledge_t	*task_ack;
 	zbx_uint64_t			eventid;
 
 	for (int i = 0; i < tasks->values_num; i++)
@@ -462,6 +463,10 @@ static void	cep_manager_process_finished(zbx_cep_manager_t *manager, zbx_vector_
 				task_update = (zbx_cep_task_sync_event_t *)tasks->values[i];
 				eventid = zbx_cep_event_handle_eventid(task_update->hevent);
 				cep_manager_commit_task(manager, eventid, tasks->values[i]);
+				continue;
+			case CEP_TASK_ACKNOWLEDGE:
+				task_ack = (zbx_cep_task_acknowledge_t *)tasks->values[i];
+				cep_manager_commit_task(manager, task_ack->eventid, tasks->values[i]);
 				continue;
 		}
 
@@ -657,7 +662,7 @@ void	*zbx_cep_manager_thread(void *args)
 					cep_manager_add_remote_task(manager, &client, &message, NULL, 0);
 					break;
 				case ZBX_CEP_SYNC_OBJECT_STATE:
-				cep_manager_sync_object_state(unit_args->shared->dbpool, &client);
+					cep_manager_sync_object_state(unit_args->shared->dbpool, &client);
 					break;
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");

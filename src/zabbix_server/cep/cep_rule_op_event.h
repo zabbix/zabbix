@@ -19,12 +19,18 @@
 #include "zbx_cep.h"
 #include "zbxcacheconfig.h"
 
+typedef struct
+{
+	struct zbx_json	json;
+}
+zbx_cep_acknowledge_t;
+
+void	cep_acknowledge_clear(zbx_cep_acknowledge_t *ack);
+
 void	cep_event_execute_ops(const zbx_cep_rule_t **matched_rules, int matched_rules_num, int execute_when,
-		zbx_cep_event_context_t *ctx, zbx_cep_event_t **event);
-
+		zbx_cep_event_context_t *ctx, zbx_cep_event_t **event, zbx_vector_mw_task_ptr_t *tasks);
 void	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_cep_event_context_t *ctx,
-		zbx_cep_event_t **event);
-
+		zbx_cep_event_t **event, zbx_vector_mw_task_ptr_t *tasks);
 void	cep_rule_event_handle_execute_ops(const zbx_cep_rule_t *rule, zbx_cep_event_handle_t hevent, int execute_when,
 		zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks);
 

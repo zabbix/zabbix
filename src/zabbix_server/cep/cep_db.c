@@ -33,6 +33,7 @@
 #include "../actions/actions.h"
 #include "../events/events.h"
 #include "zbxevent.h"
+#include <stdint.h>
 
 typedef struct
 {
@@ -1090,6 +1091,36 @@ void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_
 
 	zbx_vector_cep_event_sync_destroy(&sync);
 	zbx_vector_cep_event_handle_destroy(&htags);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+void	cep_db_add_acknowledges(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks)
+{
+	zbx_db_insert_t	db_insert;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
+
+	int		now = (int)time(NULL);
+	zbx_dbconn_t	*db = zbx_dbconn_pool_acquire_connection(dbpool);
+
+	zbx_dbconn_prepare_insert(db, &db_insert, "acknowledges", "acknowledgeid", "eventid", "clock", "action",
+			"cep_ruleid", "details", NULL);
+
+	for (int i = 0; i < tasks->values_num; i++)
+	{
+		const zbx_cep_task_acknowledge_t	*task = (const zbx_cep_task_acknowledge_t *)tasks->values[i];
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), task->eventid, now, ZBX_PROBLEM_UPDATE_CEP,
+				task->ruleid, task->details.buffer);
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, "acknowledgeid");
+	zbx_db_insert_execute(&db_insert);
+
+	zbx_dbconn_pool_release_connection(dbpool, db);
+
+	zbx_db_insert_clean(&db_insert);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

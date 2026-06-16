@@ -43,6 +43,7 @@ zbx_cep_event_context_t;
 void	cep_event_context_clear(zbx_cep_event_context_t *ctx);
 zbx_cep_event_t *cep_event_context_acquire_event(zbx_cep_event_context_t *ctx);
 zbx_cep_event_t *cep_event_context_acquire_mutable_event(zbx_cep_event_context_t *ctx);
+zbx_uint64_t	cep_event_context_eventid(zbx_cep_event_context_t *ctx);
 void	cep_event_context_load_hosts(zbx_cep_event_context_t *ctx);
 void	cep_event_context_load_groups(zbx_cep_event_context_t *ctx);
 void	cep_event_context_set_handle(zbx_cep_event_context_t *ctx, zbx_cep_event_handle_t hevent);
