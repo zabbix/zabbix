@@ -649,6 +649,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_crlRevokedCert(): void {
+		$start_time = time();
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -657,10 +658,11 @@ class testEncryptionDataCollection extends CIntegrationTest {
 			'TLS handshake',
 		], true, 30);
 
-		// No history must have been collected
+		// No history must have been collected during this test run
 		$data = $this->call('history.get', [
-			'itemids' => self::$itemids['enc_agent:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'itemids'   => self::$itemids['enc_agent:agent.ping'],
+			'history'   => ITEM_VALUE_TYPE_UINT64,
+			'time_from' => $start_time,
 		]);
 		$this->assertEmpty($data['result'],
 			'Data was collected despite a revoked agent certificate in TLSCRLFile');
@@ -1273,6 +1275,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 	 * @backup hosts
 	 */
 	public function testEncryption_cipherMismatch(): void {
+		$start_time = time();
 		$this->updateHostCertTLS('enc_agent', 'CN=ZabbixTestCA', 'CN=zabbix_agent');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
@@ -1285,8 +1288,9 @@ class testEncryptionDataCollection extends CIntegrationTest {
 		], true, 30);
 
 		$data = $this->call('history.get', [
-			'itemids' => self::$itemids['enc_agent:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'itemids'   => self::$itemids['enc_agent:agent.ping'],
+			'history'   => ITEM_VALUE_TYPE_UINT64,
+			'time_from' => $start_time,
 		]);
 		$this->assertEmpty($data['result'],
 			'Data was collected despite non-overlapping cipher lists on server and agent');
