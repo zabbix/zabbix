@@ -614,7 +614,7 @@ class testDashboardsPages extends CWebTest {
 	public function testDashboardsPages_KioskMode() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for kiosk'])
 				->waitUntilReady();
-		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
 		$this->page->waitUntilReady();
 
 		// Switch pages next/previous.

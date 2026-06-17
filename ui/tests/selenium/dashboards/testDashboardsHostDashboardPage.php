@@ -142,7 +142,7 @@ class testDashboardsHostDashboardPage extends CWebTest {
 		$this->openDashboardsForHost(self::HOST_NAME);
 
 		// Test Kiosk mode.
-		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter disappeared.

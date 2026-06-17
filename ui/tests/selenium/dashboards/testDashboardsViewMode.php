@@ -99,7 +99,7 @@ class testDashboardsViewMode extends CLegacyWebTest {
 
 		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-kiosk')]");
 		$this->zbxTestWaitForPageToLoad();
-		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one();
+		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->waitUntilPresent()->one();
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementNotPresentXpath("//header[@class='header-title']");
 		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
@@ -118,7 +118,7 @@ class testDashboardsViewMode extends CLegacyWebTest {
 		// Set layout mode to kiosk view.
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view&kiosk=1', false);
 		$this->zbxTestWaitForPageToLoad();
-		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one();
+		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->waitUntilPresent()->one();
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementNotPresentXpath("//header[@class='header-title']");
 		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");

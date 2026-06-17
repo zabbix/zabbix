@@ -4600,7 +4600,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 			if (array_key_exists('Advanced configuration', $reference_data)) {
 				$reopened_form->fill(['Advanced configuration' => true]);
-				$this->assertTrue($reopened_form->query('xpath:.//button[@title="Collapse"]')->one()->isVisible());
+				$this->assertTrue($reopened_form->query('xpath:.//button[@title="S_COLLAPSE"]')->one()->isVisible());
 			}
 
 			$this->assertEquals($created_values, $reopened_form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))
