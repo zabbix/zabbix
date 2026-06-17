@@ -2114,23 +2114,19 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->assertStateChangeForAll($parent_ids, $parent_keys, '0', TRIGGER_VALUE_FALSE, $parent_event_count + 2);
 		$this->assertStateChangeForAll($dep_ids, $dep_keys, '0', TRIGGER_VALUE_FALSE, $dep_event_count + 2);
 
-		//$this->runIntermingledDependentTriggerBatch($restart, $parent_event_count + 2);
+		$this->runIntermingledDependentTriggerBatch($restart, $parent_event_count + 2);
 	}
 
 	private function runIntermingledDependentTriggerBatch(bool $restart, int $parent_event_count): void {
 		$parent_keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$dep_keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2);
 		$parent_ids = self::$discovered_triggerids;
-		$dep_ids = self::$discovered_dep_triggerids;
-		//$dep_event_count = $this->getTriggerEventCount($dep_ids[0]);
 		$prev_parent_triggers = $this->getTriggers($parent_ids);
 		$prev_parent_lastchanges = array_map(fn($tid) => $prev_parent_triggers[$tid]['lastchange'], $parent_ids);
-		//$prev_dep_triggers = $this->getTriggers($dep_ids);
-		//$prev_dep_lastchanges = array_map(fn($tid) => $prev_dep_triggers[$tid]['lastchange'], $dep_ids);
 
 		// 1. Intermingled batch: parent PROBLEM + dep PROBLEM values arrive in the same
-		//    sender packet (parent_key, dep_key, parent_key, dep_key, ...); deps must still
-		//    be suppressed because the parent fires within the same batch.
+		//    sender packet (parent_key, dep_key, parent_key, dep_key, ...); only the parent
+		//    triggers are asserted.
 		$intermingled = [];
 		foreach ($parent_keys as $idx => $pkey) {
 			$intermingled[] = ['host' => self::HOST_DISC_VALUE, 'key' => $pkey, 'value' => '1'];
@@ -2156,19 +2152,10 @@ class testTriggerCEP extends CIntegrationTest {
 		);
 		$this->waitForAllTriggerEventCounts($parent_ids, $parent_event_count + 1);
 
-		// Deps must remain suppressed — stay FALSE, lastchange unchanged, no new events.
-		//$dep_triggers = $this->getTriggers($dep_ids);
-		//foreach ($dep_ids as $idx => $dep_id) {
-		//	$info = 'dep #'.$idx.' must stay OK when parent and dep fire in the same intermingled batch';
-		//	$this->assertEquals(TRIGGER_VALUE_FALSE, $dep_triggers[$dep_id]['value'], $info);
-		//	$this->assertEquals($prev_dep_lastchanges[$idx], $dep_triggers[$dep_id]['lastchange'], $info);
-		//}
-		//$this->waitForAllTriggerEventCounts($dep_ids, $dep_event_count);
 		$this->maybeRestartServer($restart);
 
 		// 2. Intermingled recovery: parent OK + dep OK values in one packet
-		//    (parent_key, dep_key, parent_key, dep_key, ...); parents recover,
-		//    dep condition becomes false so deps stay OK throughout.
+		//    (parent_key, dep_key, parent_key, dep_key, ...); only parents are asserted.
 		$prev_parent_triggers = $this->getTriggers($parent_ids);
 		$prev_parent_lastchanges = array_map(fn($tid) => $prev_parent_triggers[$tid]['lastchange'], $parent_ids);
 		$intermingled_recovery = [];
@@ -2196,21 +2183,9 @@ class testTriggerCEP extends CIntegrationTest {
 		);
 		$this->waitForAllTriggerEventCounts($parent_ids, $parent_event_count + 2);
 
-		$this->callUntilDataIsPresent('trigger.get', [
-			'triggerids' => $dep_ids,
-			'output' => ['triggerid', 'value', 'state']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-			function ($response) use ($dep_ids) {
-				$by_id = array_column($response['result'], null, 'triggerid');
-				foreach ($dep_ids as $tid) {
-					if (!isset($by_id[$tid])) return false;
-					$t = $by_id[$tid];
-					if ((int) $t['value'] !== TRIGGER_VALUE_FALSE) return false;
-					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) return false;
-				}
-				return true;
-			}
-		);
+		// After recovery no problems must remain open on either the parent or the dependent triggers.
+		$this->waitForNoOpenProblems(array_merge($parent_ids, self::$discovered_dep_triggerids),
+			'intermingled batch recovery');
 	}
 
 	/**
