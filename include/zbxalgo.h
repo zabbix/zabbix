@@ -312,13 +312,19 @@ typedef struct													\
 }														\
 zbx_vector_ ## __id ## _t;
 
+#define ZBX_VECTOR_LITE_STRUCT_DECL(__id, __type)								\
+														\
+typedef struct													\
+{														\
+	__type			*values;									\
+	int			values_num;									\
+	int			values_alloc;									\
+}														\
+zbx_vector_ ## __id ## _t;
+
 #define ZBX_VECTOR_FUNC_DECL(__id, __type, __const)								\
 														\
 void	zbx_vector_ ## __id ## _create(zbx_vector_ ## __id ## _t *vector);					\
-void	zbx_vector_ ## __id ## _create_ext(zbx_vector_ ## __id ## _t *vector,					\
-						zbx_mem_malloc_func_t mem_malloc_func,				\
-						zbx_mem_realloc_func_t mem_realloc_func,			\
-						zbx_mem_free_func_t mem_free_func);				\
 void	zbx_vector_ ## __id ## _destroy(zbx_vector_ ## __id ## _t *vector);					\
 														\
 void	zbx_vector_ ## __id ## _append(zbx_vector_ ## __id ## _t *vector, __type value);			\
@@ -344,24 +350,47 @@ void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, const zbx_
 									zbx_compare_func_t compare_func);	\
 														\
 void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size);			\
-void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);
+void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);					\
+void	zbx_vector_ ## __id ## _reset(zbx_vector_ ## __id ## _t *vector);
+
+#define ZBX_VECTOR_FUNC_DECL_EXT(__id, __type, __const)								\
+														\
+void	zbx_vector_ ## __id ## _create_ext(zbx_vector_ ## __id ## _t *vector,					\
+						zbx_mem_malloc_func_t mem_malloc_func,				\
+						zbx_mem_realloc_func_t mem_realloc_func,			\
+						zbx_mem_free_func_t mem_free_func);
+
+#define ZBX_VECTOR_LITE_DECL(__id, __type)	ZBX_VECTOR_LITE_STRUCT_DECL(__id, __type)			\
+						ZBX_VECTOR_FUNC_DECL(__id, __type, const)
 
 #define ZBX_VECTOR_DECL(__id, __type)	ZBX_VECTOR_STRUCT_DECL(__id, __type)					\
-					ZBX_VECTOR_FUNC_DECL(__id, __type, const)
+					ZBX_VECTOR_FUNC_DECL(__id, __type, const)				\
+					ZBX_VECTOR_FUNC_DECL_EXT(__id, __type, const)
 
-#define ZBX_PTR_VECTOR_FUNC_DECL(__id, __type, __const)									\
+#define ZBX_PTR_VECTOR_LITE_FUNC_DECL(__id, __type, __const)							\
 														\
-ZBX_VECTOR_FUNC_DECL(__id, __type, __const)										\
+ZBX_VECTOR_FUNC_DECL(__id, __type, __const)									\
 														\
 typedef void (*zbx_ ## __id ## _free_func_t)(__type data);							\
 														\
 void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_ ## __id ## _free_func_t free_func);
+
+#define ZBX_PTR_VECTOR_FUNC_DECL(__id, __type, __const)							\
+													\
+ZBX_PTR_VECTOR_LITE_FUNC_DECL(__id, __type, __const)							\
+ZBX_VECTOR_FUNC_DECL_EXT(__id, __type, const)
 
 #define ZBX_PTR_VECTOR_DECL(__id, __type)	ZBX_VECTOR_STRUCT_DECL(__id, __type)				\
 						ZBX_PTR_VECTOR_FUNC_DECL(__id, __type, const)
 
 #define ZBX_CONST_PTR_VECTOR_DECL(__id, __type)	ZBX_VECTOR_STRUCT_DECL(__id, __type)				\
 						ZBX_PTR_VECTOR_FUNC_DECL(__id, __type, )
+
+#define ZBX_PTR_VECTOR_LITE_DECL(__id, __type)	ZBX_VECTOR_LITE_STRUCT_DECL(__id, __type)			\
+						ZBX_PTR_VECTOR_LITE_FUNC_DECL(__id, __type, const)
+
+#define ZBX_CONST_PTR_VECTOR_LITE_DECL(__id, __type)	ZBX_VECTOR_LITE_STRUCT_DECL(__id, __type)		\
+							ZBX_PTR_VECTOR_LITE_FUNC_DECL(__id, __type, )
 
 ZBX_VECTOR_DECL(uint64, zbx_uint64_t)
 ZBX_VECTOR_DECL(uint32, zbx_uint32_t)
@@ -377,7 +406,7 @@ ZBX_VECTOR_DECL(tag, zbx_tag_t)
 
 #define	ZBX_VECTOR_ARRAY_GROWTH_FACTOR	3/2
 
-#define	ZBX_VECTOR_FUNC_IMPL(__id, __type, __const)										\
+#define	ZBX_VECTOR_FUNC_ALLOC_IMPL(__id, __type, __const, __malloc, __realloc, __free)				\
 														\
 static void	__vector_ ## __id ## _ensure_free_space(zbx_vector_ ## __id ## _t *vector)			\
 {														\
@@ -385,54 +414,40 @@ static void	__vector_ ## __id ## _ensure_free_space(zbx_vector_ ## __id ## _t *v
 	{													\
 		vector->values_num = 0;										\
 		vector->values_alloc = 32;									\
-		vector->values = (__type *)vector->mem_malloc_func(NULL, (size_t)vector->values_alloc *		\
+		vector->values = (__type *)__malloc(NULL, (size_t)vector->values_alloc *			\
 				sizeof(__type));								\
 	}													\
 	else if (vector->values_num == vector->values_alloc)							\
 	{													\
 		vector->values_alloc = MAX(vector->values_alloc + 1, vector->values_alloc *			\
 				ZBX_VECTOR_ARRAY_GROWTH_FACTOR);						\
-		vector->values = (__type *)vector->mem_realloc_func(vector->values,				\
+		vector->values = (__type *)__realloc(vector->values,						\
 				(size_t)vector->values_alloc * sizeof(__type));					\
 	}													\
 }														\
 														\
-void	zbx_vector_ ## __id ## _create(zbx_vector_ ## __id ## _t *vector)					\
+void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size)				\
 {														\
-	zbx_vector_ ## __id ## _create_ext(vector,								\
-						ZBX_DEFAULT_MEM_MALLOC_FUNC,					\
-						ZBX_DEFAULT_MEM_REALLOC_FUNC,					\
-						ZBX_DEFAULT_MEM_FREE_FUNC);					\
+	if ((int)size > vector->values_alloc)									\
+	{													\
+		vector->values_alloc = (int)size;								\
+		vector->values = (__type *)__realloc(vector->values,						\
+				(size_t)vector->values_alloc * sizeof(__type));					\
+	}													\
 }														\
 														\
-void	zbx_vector_ ## __id ## _create_ext(zbx_vector_ ## __id ## _t *vector,					\
-						zbx_mem_malloc_func_t mem_malloc_func,				\
-						zbx_mem_realloc_func_t mem_realloc_func,			\
-						zbx_mem_free_func_t mem_free_func)				\
-{														\
-	vector->values = NULL;											\
-	vector->values_num = 0;											\
-	vector->values_alloc = 0;										\
-														\
-	vector->mem_malloc_func = mem_malloc_func;								\
-	vector->mem_realloc_func = mem_realloc_func;								\
-	vector->mem_free_func = mem_free_func;									\
-}														\
-														\
-void	zbx_vector_ ## __id ## _destroy(zbx_vector_ ## __id ## _t *vector)					\
+void	zbx_vector_ ## __id ## _reset(zbx_vector_ ## __id ## _t *vector)					\
 {														\
 	if (NULL != vector->values)										\
 	{													\
-		vector->mem_free_func(vector->values);								\
+		__free(vector->values);										\
 		vector->values = NULL;										\
 		vector->values_num = 0;										\
 		vector->values_alloc = 0;									\
 	}													\
-														\
-	vector->mem_malloc_func = NULL;										\
-	vector->mem_realloc_func = NULL;									\
-	vector->mem_free_func = NULL;										\
-}														\
+}
+
+#define	ZBX_VECTOR_FUNC_COMMON_IMPL(__id, __type, __const)							\
 														\
 void	zbx_vector_ ## __id ## _append(zbx_vector_ ## __id ## _t *vector, __type value)				\
 {														\
@@ -630,26 +645,81 @@ void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, const zbx_
 	}													\
 }														\
 														\
-void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size)				\
-{														\
-	if ((int)size > vector->values_alloc)									\
-	{													\
-		vector->values_alloc = (int)size;								\
-		vector->values = (__type *)vector->mem_realloc_func(vector->values,				\
-				(size_t)vector->values_alloc * sizeof(__type));					\
-	}													\
-}														\
-														\
 void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 {														\
 	vector->values_num = 0;											\
+}														\
+
+#define	ZBX_VECTOR_LITE_FUNC_IMPL(__id, __type, __const)							\
+ZBX_VECTOR_FUNC_ALLOC_IMPL(__id, __type, __const, zbx_default_mem_malloc_func, zbx_default_mem_realloc_func,	\
+		zbx_default_mem_free_func)									\
+ZBX_VECTOR_FUNC_COMMON_IMPL(__id, __type, __const)								\
+														\
+void	zbx_vector_ ## __id ## _create(zbx_vector_ ## __id ## _t *vector)					\
+{														\
+	vector->values = NULL;											\
+	vector->values_num = 0;											\
+	vector->values_alloc = 0;										\
+}														\
+														\
+void	zbx_vector_ ## __id ## _destroy(zbx_vector_ ## __id ## _t *vector)					\
+{														\
+	if (NULL != vector->values)										\
+	{													\
+		zbx_default_mem_free_func(vector->values);							\
+		vector->values = NULL;										\
+		vector->values_num = 0;										\
+		vector->values_alloc = 0;									\
+	}													\
 }
+
+#define	ZBX_VECTOR_FUNC_IMPL(__id, __type, __const)							\
+ZBX_VECTOR_FUNC_ALLOC_IMPL(__id, __type, __const, vector->mem_malloc_func, vector->mem_realloc_func,	\
+		vector->mem_free_func)									\
+ZBX_VECTOR_FUNC_COMMON_IMPL(__id, __type, __const)							\
+													\
+void	zbx_vector_ ## __id ## _create(zbx_vector_ ## __id ## _t *vector)				\
+{													\
+	zbx_vector_ ## __id ## _create_ext(vector,							\
+						ZBX_DEFAULT_MEM_MALLOC_FUNC,				\
+						ZBX_DEFAULT_MEM_REALLOC_FUNC,				\
+						ZBX_DEFAULT_MEM_FREE_FUNC);				\
+}													\
+													\
+void	zbx_vector_ ## __id ## _create_ext(zbx_vector_ ## __id ## _t *vector,				\
+						zbx_mem_malloc_func_t mem_malloc_func,			\
+						zbx_mem_realloc_func_t mem_realloc_func,		\
+						zbx_mem_free_func_t mem_free_func)			\
+{													\
+	vector->values = NULL;										\
+	vector->values_num = 0;										\
+	vector->values_alloc = 0;									\
+													\
+	vector->mem_malloc_func = mem_malloc_func;							\
+	vector->mem_realloc_func = mem_realloc_func;							\
+	vector->mem_free_func = mem_free_func;								\
+}													\
+													\
+void	zbx_vector_ ## __id ## _destroy(zbx_vector_ ## __id ## _t *vector)				\
+{													\
+	if (NULL != vector->values)									\
+	{												\
+		vector->mem_free_func(vector->values);							\
+		vector->values = NULL;									\
+		vector->values_num = 0;									\
+		vector->values_alloc = 0;								\
+	}												\
+													\
+	vector->mem_malloc_func = NULL;									\
+	vector->mem_realloc_func = NULL;								\
+	vector->mem_free_func = NULL;									\
+}													\
 
 #define	ZBX_VECTOR_IMPL(__id, __type)	ZBX_VECTOR_FUNC_IMPL(__id, __type, const)
 
-#define	ZBX_PTR_VECTOR_IMPL(__id, __type)									\
-														\
-ZBX_VECTOR_FUNC_IMPL(__id, __type, const)									\
+#define	ZBX_VECTOR_LITE_IMPL(__id, __type)	ZBX_VECTOR_LITE_FUNC_IMPL(__id, __type, const)
+
+#define	ZBX_PTR_VECTOR_COMMON_IMPL(__id, __type)								\
 														\
 void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector,					\
 		zbx_ ## __id ## _free_func_t free_func)								\
@@ -665,9 +735,17 @@ void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector,					\
 	}													\
 }
 
-#define	ZBX_CONST_PTR_VECTOR_IMPL(__id, __type)									\
+#define	ZBX_PTR_VECTOR_IMPL(__id, __type)									\
 														\
-ZBX_VECTOR_FUNC_IMPL(__id, __type, )										\
+ZBX_VECTOR_FUNC_IMPL(__id, __type, const)									\
+ZBX_PTR_VECTOR_COMMON_IMPL(__id, __type)
+
+#define	ZBX_PTR_VECTOR_LITE_IMPL(__id, __type)									\
+														\
+ZBX_VECTOR_LITE_FUNC_IMPL(__id, __type, const)									\
+ZBX_PTR_VECTOR_COMMON_IMPL(__id, __type)
+
+#define	ZBX_CONST_PTR_VECTOR_COMMON_IMPL(__id, __type)								\
 														\
 void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector,					\
 		zbx_ ## __id ## _free_func_t free_func)								\
@@ -676,6 +754,17 @@ void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector,					\
 	ZBX_UNUSED(free_func);											\
 	THIS_SHOULD_NEVER_HAPPEN_MSG("constant pointer vector contents must not be freed");			\
 }
+
+#define	ZBX_CONST_PTR_VECTOR_IMPL(__id, __type)									\
+														\
+ZBX_VECTOR_FUNC_IMPL(__id, __type, )										\
+ZBX_CONST_PTR_VECTOR_COMMON_IMPL(__id, __type)
+
+#define	ZBX_CONST_PTR_VECTOR_LITE_IMPL(__id, __type)								\
+														\
+ZBX_VECTOR_LITE_FUNC_IMPL(__id, __type, )									\
+ZBX_CONST_PTR_VECTOR_COMMON_IMPL(__id, __type)
+
 /* vector implementation end */
 
 /* these functions are only for use with zbx_vector_XXX_clear_ext() */

@@ -49,6 +49,9 @@
  *   and release the old zbx_cep_event_t.
  */
 
+ZBX_VECTOR_LITE_IMPL(lite_tag, zbx_tag_t)
+ZBX_VECTOR_LITE_IMPL(lite_uint64, zbx_uint64_t)
+
 ZBX_VECTOR_IMPL(cep_event, zbx_cep_event_t)
 ZBX_PTR_VECTOR_IMPL(cep_event_ptr, zbx_cep_event_t *)
 
@@ -121,9 +124,9 @@ static void	cep_event_clear(zbx_cep_event_t *event)
 		zbx_free(event->tags.values[i].tag);
 		zbx_free(event->tags.values[i].value);
 	}
-	zbx_vector_tag_destroy(&event->tags);
+	zbx_vector_lite_tag_destroy(&event->tags);
 
-	zbx_vector_uint64_destroy(&event->maintenanceids);
+	zbx_vector_lite_uint64_destroy(&event->maintenanceids);
 
 	zbx_free(event->name);
 }
@@ -157,26 +160,26 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 	event->suppress_mtime = 0;
 	event->name = zbx_strdup(NULL, name);
 
-	zbx_vector_tag_create(&event->tags);
+	zbx_vector_lite_tag_create(&event->tags);
 	if (NULL != tags)
 	{
-		zbx_vector_tag_reserve(&event->tags, (size_t)tags->values_num);
+		zbx_vector_lite_tag_reserve(&event->tags, (size_t)tags->values_num);
 		for (int i = 0; i < tags->values_num; i++)
 		{
 			zbx_tag_t	tag;
 
 			tag.tag = zbx_strdup(NULL, tags->values[i]->tag);
 			tag.value = zbx_strdup(NULL, tags->values[i]->value);
-			zbx_vector_tag_append(&event->tags, tag);
+			zbx_vector_lite_tag_append(&event->tags, tag);
 		}
 	}
 
-	zbx_vector_uint64_create(&event->maintenanceids);
+	zbx_vector_lite_uint64_create(&event->maintenanceids);
 	if (NULL != suppress)
 	{
-		zbx_vector_uint64_reserve(&event->maintenanceids, (size_t)suppress->values_num);
+		zbx_vector_lite_uint64_reserve(&event->maintenanceids, (size_t)suppress->values_num);
 		for (int i = 0; i < suppress->values_num; i++)
-			zbx_vector_uint64_append(&event->maintenanceids, suppress->values[i].maintenanceid);
+			zbx_vector_lite_uint64_append(&event->maintenanceids, suppress->values[i].maintenanceid);
 	}
 
 	return event;
@@ -534,7 +537,7 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 
 			tag.tag = zbx_strdup(NULL, row[1]);
 			tag.value = zbx_strdup(NULL, row[2]);
-			zbx_vector_tag_append(&event->tags, tag);
+			zbx_vector_lite_tag_append(&event->tags, tag);
 		}
 		zbx_db_large_query_clear(&query);
 	}
@@ -577,7 +580,7 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
 				continue;
 			}
 		}
-		zbx_vector_uint64_append(&h->event->maintenanceids, maintenanceid);
+		zbx_vector_lite_uint64_append(&h->event->maintenanceids, maintenanceid);
 	}
 
 	zbx_db_free_result(result);
@@ -1162,19 +1165,20 @@ static zbx_cep_event_t	*cep_event_handle_replace_event(zbx_cep_event_handle_t h)
 	event->suppress_mtime = 0;
 	event->name = zbx_strdup(NULL, e->name);
 
-	zbx_vector_tag_create(&event->tags);
-	zbx_vector_tag_reserve(&event->tags, (size_t)e->tags.values_num);
+	zbx_vector_lite_tag_create(&event->tags);
+	zbx_vector_lite_tag_reserve(&event->tags, (size_t)e->tags.values_num);
 	for (int i = 0; i < e->tags.values_num; i++)
 	{
 		zbx_tag_t	tag_local;
 
 		tag_local.tag = zbx_strdup(NULL, e->tags.values[i].tag);
 		tag_local.value = zbx_strdup(NULL, e->tags.values[i].value);
-		zbx_vector_tag_append(&event->tags, tag_local);
+		zbx_vector_lite_tag_append(&event->tags, tag_local);
 	}
 
-	zbx_vector_uint64_create(&event->maintenanceids);
-	zbx_vector_uint64_append_array(&event->maintenanceids, e->maintenanceids.values, e->maintenanceids.values_num);
+	zbx_vector_lite_uint64_create(&event->maintenanceids);
+	zbx_vector_lite_uint64_append_array(&event->maintenanceids, e->maintenanceids.values,
+			e->maintenanceids.values_num);
 
 	zbx_cep_event_release(e);
 	h->event = cep_event_addref(event);
@@ -1458,7 +1462,7 @@ static void	cep_event_add_maintenaces(zbx_cep_event_handle_t h, zbx_vector_uint6
 	if (0 == event->maintenanceids.values_num)
 		event->suppress_mtime = time(NULL);
 
-	zbx_vector_uint64_append_array(&event->maintenanceids, maintenanceids->values, maintenanceids->values_num);
+	zbx_vector_lite_uint64_append_array(&event->maintenanceids, maintenanceids->values, maintenanceids->values_num);
 }
 
 /******************************************************************************
@@ -1490,13 +1494,12 @@ static void	cep_event_remove_maintenaces(zbx_cep_event_handle_t h, zbx_vector_ui
 
 		if (0 != ids.values_num)
 		{
-			zbx_vector_uint64_clear(&event->maintenanceids);
-			zbx_vector_uint64_append_array(&event->maintenanceids, ids.values, ids.values_num);
+			zbx_vector_lite_uint64_clear(&event->maintenanceids);
+			zbx_vector_lite_uint64_append_array(&event->maintenanceids, ids.values, ids.values_num);
 		}
 		else
 		{
-			zbx_vector_uint64_destroy(&event->maintenanceids);
-			zbx_vector_uint64_create(&event->maintenanceids);
+			zbx_vector_lite_uint64_reset(&event->maintenanceids);
 		}
 
 		if (0 == event->maintenanceids.values_num)
@@ -1624,7 +1627,7 @@ static int	cep_event_validate_new_tags(zbx_cep_event_handle_t h, zbx_vector_tag_
 {
 	for (int i = 0; i < tags->values_num;)
 	{
-		if (FAIL != zbx_vector_tag_search(&h->event->tags, tags->values[i], tag_compare))
+		if (FAIL != zbx_vector_lite_tag_search(&h->event->tags, tags->values[i], tag_compare))
 		{
 			zbx_free(tags->values[i].tag);
 			zbx_free(tags->values[i].value);
@@ -1656,7 +1659,7 @@ static void	cep_event_add_tags(zbx_cep_event_handle_t h, const zbx_vector_tag_t 
 			.value = zbx_strdup(NULL, tags->values[i].value),
 		};
 
-		zbx_vector_tag_append(&event->tags, tag_local);
+		zbx_vector_lite_tag_append(&event->tags, tag_local);
 	}
 }
 

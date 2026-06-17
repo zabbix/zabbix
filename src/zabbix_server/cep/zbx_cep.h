@@ -38,24 +38,27 @@ zbx_cep_origin_t;
 
 typedef struct zbx_cep_event zbx_cep_event_t;
 
+ZBX_VECTOR_LITE_DECL(lite_tag, zbx_tag_t)
+ZBX_VECTOR_LITE_DECL(lite_uint64, zbx_uint64_t)
+
 struct zbx_cep_event
 {
-	zbx_uint64_t		eventid;
-	int			clock;
-	int			ns;
-	int			value;
-	int			severity;
-	time_t			suppress_mtime;
-	char			*name;
+	zbx_uint64_t			eventid;
+	int				clock;
+	int				ns;
+	int				value;
+	int				severity;
+	time_t				suppress_mtime;
+	char				*name;
 
-	zbx_cep_event_t		*r_event;
+	zbx_cep_event_t			*r_event;
 
-	zbx_cep_origin_t	origin;
+	zbx_cep_origin_t		origin;
 
-	zbx_vector_tag_t	tags;
-	zbx_vector_uint64_t	maintenanceids;
+	zbx_vector_lite_tag_t		tags;
+	zbx_vector_lite_uint64_t	maintenanceids;
 
-	zbx_atomic_uint32_t	refcount;
+	zbx_atomic_uint32_t		refcount;
 
 };
 
