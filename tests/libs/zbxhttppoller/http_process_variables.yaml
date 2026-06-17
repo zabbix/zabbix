@@ -7,6 +7,76 @@ out:
   return: SUCCEED
   macro_value: 'hello'
 ---
+test case: 'plain literal stored when data is present'
+in:
+  key: '{myvar}'
+  value: 'hello'
+  data: 'some response data'
+out:
+  return: SUCCEED
+  macro_value: 'hello'
+---
+test case: 'value with whitespace stored literally'
+in:
+  key: '{myvar}'
+  value: 'hello world'
+out:
+  return: SUCCEED
+  macro_value: 'hello world'
+---
+test case: 'value with special characters stored literally'
+in:
+  key: '{myvar}'
+  value: '!@#$%^'
+out:
+  return: SUCCEED
+  macro_value: '!@#$%^'
+---
+test case: 'value containing curly braces stored literally'
+in:
+  key: '{myvar}'
+  value: '{not_a_macro}'
+out:
+  return: SUCCEED
+  macro_value: '{not_a_macro}'
+---
+test case: 'numeric string stored literally'
+in:
+  key: '{myvar}'
+  value: '12345'
+out:
+  return: SUCCEED
+  macro_value: '12345'
+---
+test case: 'key missing opening brace fails'
+in:
+  key: 'myvar}'
+  value: 'hello'
+out:
+  return: FAIL
+---
+test case: 'key missing closing brace fails'
+in:
+  key: '{myvar'
+  value: 'hello'
+out:
+  return: FAIL
+---
+test case: 'key without braces fails'
+in:
+  key: 'myvar'
+  value: 'hello'
+out:
+  return: FAIL
+---
+test case: 'minimal key with empty name passes'
+in:
+  key: '{}'
+  value: 'hello'
+out:
+  return: SUCCEED
+  macro_value: 'hello'
+---
 test case: 'regex: prefix with null data must not crash (ZBX-27770)'
 in:
   key: '{myvar}'
@@ -14,19 +84,13 @@ in:
 out:
   return: SUCCEED
 ---
-test case: 'jsonpath: prefix with null data must not crash (ZBX-27770)'
+test case: 'regex prefix stored literally when data is null'
 in:
   key: '{myvar}'
-  value: 'jsonpath:$.key'
+  value: 'regex:(captured)'
 out:
   return: SUCCEED
----
-test case: 'xmlxpath: prefix with null data must not crash (ZBX-27770)'
-in:
-  key: '{myvar}'
-  value: 'xmlxpath://node'
-out:
-  return: SUCCEED
+  macro_value: 'regex:(captured)'
 ---
 test case: 'regex: extracts first capture group from response data'
 in:
@@ -36,4 +100,206 @@ in:
 out:
   return: SUCCEED
   macro_value: 'world'
+---
+test case: 'regex no match with data fails'
+in:
+  key: '{myvar}'
+  value: 'regex:(xyz_not_present)'
+  data: 'hello world'
+out:
+  return: FAIL
+---
+test case: 'regex pattern without capture group fails'
+in:
+  key: '{myvar}'
+  value: 'regex:hello'
+  data: 'hello world'
+out:
+  return: FAIL
+---
+test case: 'regex multiple capture groups returns first group'
+in:
+  key: '{myvar}'
+  value: 'regex:(hel)(lo)'
+  data: 'hello'
+out:
+  return: SUCCEED
+  macro_value: 'hel'
+---
+test case: 'regex extracts digit sequence from data'
+in:
+  key: '{myvar}'
+  value: 'regex:([0-9]+)'
+  data: 'value=42'
+out:
+  return: SUCCEED
+  macro_value: '42'
+---
+test case: 'regex greedy wildcard captures entire string'
+in:
+  key: '{myvar}'
+  value: 'regex:(.*)'
+  data: 'full string'
+out:
+  return: SUCCEED
+  macro_value: 'full string'
+---
+test case: 'regex on empty data captures empty string'
+in:
+  key: '{myvar}'
+  value: 'regex:(.*)'
+  data: ''
+out:
+  return: SUCCEED
+  macro_value: ''
+---
+test case: 'regex match in the middle of data'
+in:
+  key: '{myvar}'
+  value: 'regex:(is)'
+  data: 'this is a test'
+out:
+  return: SUCCEED
+  macro_value: 'is'
+---
+test case: 'jsonpath: prefix with null data must not crash (ZBX-27770)'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.key'
+out:
+  return: SUCCEED
+---
+test case: 'jsonpath prefix stored literally when data is null'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.name'
+out:
+  return: SUCCEED
+  macro_value: 'jsonpath:$.name'
+---
+test case: 'jsonpath extracts string value from JSON'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.name'
+  data: '{"name":"zabbix"}'
+out:
+  return: SUCCEED
+  macro_value: 'zabbix'
+---
+test case: 'jsonpath extracts value from nested JSON object'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.outer.inner'
+  data: '{"outer":{"inner":"deep"}}'
+out:
+  return: SUCCEED
+  macro_value: 'deep'
+---
+test case: 'jsonpath extracts numeric value as string'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.count'
+  data: '{"count":42}'
+out:
+  return: SUCCEED
+  macro_value: '42'
+---
+test case: 'jsonpath extracts boolean true as string'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.active'
+  data: '{"active":true}'
+out:
+  return: SUCCEED
+  macro_value: 'true'
+---
+test case: 'jsonpath non-existent key fails'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.missing'
+  data: '{"name":"zabbix"}'
+out:
+  return: FAIL
+---
+test case: 'jsonpath on invalid JSON fails'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.key'
+  data: 'not valid json'
+out:
+  return: FAIL
+---
+test case: 'jsonpath on empty JSON object fails for missing key'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.key'
+  data: '{}'
+out:
+  return: FAIL
+---
+test case: 'xmlxpath: prefix with null data must not crash (ZBX-27770)'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath://node'
+out:
+  return: SUCCEED
+---
+test case: 'xmlxpath prefix stored literally when data is null'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath://root'
+out:
+  return: SUCCEED
+  macro_value: 'xmlxpath://root'
+---
+test case: 'xmlxpath extracts text content of element'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath:/root/text()'
+  data: '<?xml version="1.0"?><root>hello</root>'
+out:
+  return: SUCCEED
+  macro_value: 'hello'
+---
+test case: 'xmlxpath extracts nested element text content'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath:/root/child/text()'
+  data: '<?xml version="1.0"?><root><child>nested</child></root>'
+out:
+  return: SUCCEED
+  macro_value: 'nested'
+---
+test case: 'xmlxpath string() function returns element text'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath:string(/root)'
+  data: '<?xml version="1.0"?><root>hello</root>'
+out:
+  return: SUCCEED
+  macro_value: 'hello'
+---
+test case: 'xmlxpath non-existent element returns empty nodeset and fails'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath://missing'
+  data: '<?xml version="1.0"?><root>hello</root>'
+out:
+  return: FAIL
+---
+test case: 'xmlxpath text() on empty element returns empty nodeset and fails'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath://empty/text()'
+  data: '<?xml version="1.0"?><root><empty/></root>'
+out:
+  return: FAIL
+---
+test case: 'xmlxpath on invalid XML fails'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath://root'
+  data: 'not valid xml'
+out:
+  return: FAIL
 ...
