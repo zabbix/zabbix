@@ -956,20 +956,31 @@ class CSvgGraphHelper {
 			if ($metric['points']) {
 				switch ($metric['options']['approximation']) {
 					case APPROXIMATION_MIN:
-						$values = array_column($metric['points'], 'min');
+						$min_values = array_column($metric['points'], 'min');
+						$avg_values = $min_values;
+						$max_values = $min_values;
 						break;
 					case APPROXIMATION_MAX:
-						$values = array_column($metric['points'], 'max');
+						$max_values = array_column($metric['points'], 'max');
+						$min_values = $max_values;
+						$avg_values = $max_values;
+						break;
+					case APPROXIMATION_ALL:
+						$min_values = array_column($metric['points'], 'min');
+						$avg_values = array_column($metric['points'], 'avg');
+						$max_values = array_column($metric['points'], 'max');
 						break;
 					default:
-						$values = array_column($metric['points'], 'avg');
+						$avg_values = array_column($metric['points'], 'avg');
+						$min_values = $avg_values;
+						$max_values = $avg_values;
 				}
 
 				$item += [
 					'units' => $metric['units'],
-					'min' => min($values),
-					'avg' => array_sum($values) / count($values),
-					'max' => max($values)
+					'min' => min($min_values),
+					'avg' => array_sum($avg_values) / count($avg_values),
+					'max' => max($max_values)
 				];
 			}
 
