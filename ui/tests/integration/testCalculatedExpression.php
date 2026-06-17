@@ -789,7 +789,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		/* Note, that although history trends and new trends are DBL_MAX the       */
 		/* resulting trendAvg is actually smaller than DBL_MAX due to rounding     */
 		/* errors appearing as a result of scaling introduced to safeguard against */
-		/* double overflow into 'inf'.                                             */
+		/* overflow of double into 'inf'.                                          */
 
 		$trapId = $this->createTrap();
 
