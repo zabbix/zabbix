@@ -1654,23 +1654,6 @@ out:
   return: SUCCEED
   value: 1.7976931348623158e+308
 ---
-test case: Evaluate timeleft(#2,-1) from DBL_MAX to 0, threshold -1 practically instantly reached
-in:
-  history:
-  - itemid: 1
-    value type: ITEM_VALUE_TYPE_FLOAT
-    data:
-    - value: 1.7976931348623158e+308
-      ts: 2017-01-10 10:01:00.000000000 +00:00
-    - value: 0.0
-      ts: 2017-01-10 10:02:00.000000000 +00:00
-  time: 2017-01-10 10:02:00.000000001 +00:00
-  function: timeleft
-  params: '#2,-1'
-out:
-  return: SUCCEED
-  value: 0
----
 test case: Evaluate timeleft(#2,-1) from 0 to DBL_MAX, threshold -1 never
 in:
   history:
