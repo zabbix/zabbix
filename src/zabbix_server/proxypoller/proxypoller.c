@@ -248,6 +248,7 @@ out:
  *             config_ssl_ca_location   - [IN]                                *
  *             config_ssl_cert_location - [IN]                                *
  *             config_ssl_key_location  - [IN]                                *
+ *             vault_ret                - [OUT]                               *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
  *               other code - an error occurred                               *
