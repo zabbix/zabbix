@@ -2438,24 +2438,25 @@ class CUser extends CApiService {
 	}
 
 	public static function findUsersByUsername(string $username, bool $case_sensitive = true): array {
-		$db_users = [];
-
 		$fields = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
 			'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid',
 			'userdirectoryid', 'ts_provisioned'
 		];
 
 		if ($case_sensitive) {
-			$db_users = DB::select('users', [
-				'output' => $fields,
-				'filter' => ['username' => $username]
-			]);
+			$db_users = DBfetchArray(DBselect(
+				'SELECT '.implode(',', $fields).
+				' FROM users'.
+				' WHERE username='.zbx_dbstr($username).
+				' FOR UPDATE'
+			));
 		}
 		else {
 			$db_users = DBfetchArray(DBselect(
 				'SELECT '.implode(',', $fields).
 				' FROM users'.
-				' WHERE LOWER(username)='.zbx_dbstr(mb_strtolower($username))
+				' WHERE LOWER(username)='.zbx_dbstr(mb_strtolower($username)).
+				' FOR UPDATE'
 			));
 		}
 
