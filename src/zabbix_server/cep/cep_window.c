@@ -184,7 +184,7 @@ void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_h
 	{
 		cep_window_unlock(window);
 
-		cep_rule_event_handle_execute_ops(rule, hevent, ZBX_CEP_ON_EVENT_EVICTED, ctx, tasks);
+		cep_rule_event_handle_execute_ops(rule, hevent, ZBX_CEP_WHEN_EVENT_EVICTED, ctx, tasks);
 	}
 	else
 	{
@@ -242,7 +242,7 @@ void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 
 			if (NULL != rule)
 			{
-				cep_rule_event_handle_execute_ops(rule, ctx.hevent, ZBX_CEP_ON_EVENT_EVICTED, &ctx,
+				cep_rule_event_handle_execute_ops(rule, ctx.hevent, ZBX_CEP_WHEN_EVENT_EVICTED, &ctx,
 						tasks);
 			}
 		}

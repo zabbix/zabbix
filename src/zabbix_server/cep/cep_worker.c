@@ -472,8 +472,9 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 
 		if (0 != rules_num)
 		{
-			cep_event_execute_ops(rules, rules_num, ZBX_CEP_ON_EVENT_OCCURRED, &event_ctx, &event, &tasks);
-			cep_db_event_execute_ops(rules, rules_num, ZBX_CEP_ON_EVENT_OCCURRED, &event_ctx, db_event,
+			cep_event_execute_ops(rules, rules_num, ZBX_CEP_WHEN_EVENT_OCCURRED, &event_ctx, &event,
+					&tasks);
+			cep_db_event_execute_ops(rules, rules_num, ZBX_CEP_WHEN_EVENT_OCCURRED, &event_ctx, db_event,
 					&tasks);
 		}
 	}

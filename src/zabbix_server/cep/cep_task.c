@@ -14,7 +14,7 @@
 
 #include "cep_task.h"
 #include "cep.h"
-#include "zabbix_server/cep/cep_rule_op_event.h"
+#include "cep_rule_op_event.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxcommon.h"

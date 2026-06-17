@@ -16,7 +16,7 @@
 #define ZABBIX_CEP_TASK_H
 
 #include "cep_window.h"
-#include "zabbix_server/cep/cep_rule_op_event.h"
+#include "cep_rule_op_event.h"
 #include "zbx_cep.h"
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
