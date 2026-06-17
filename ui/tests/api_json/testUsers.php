@@ -2908,7 +2908,7 @@ class testUsers extends CAPITest {
 
 		$user = DB::find('users', ['username' => $username])[0];
 
-		$auiditlogs_update = CDBHelper::getAll(
+		$auditlogs_update = CDBHelper::getAll(
 			'SELECT details'.
 			' FROM auditlog a'.
 			' WHERE '.dbConditionId('a.userid', [$user['userid']]).
@@ -2916,9 +2916,9 @@ class testUsers extends CAPITest {
 			' ORDER BY a.clock ASC'
 		);
 
-		$this->assertEquals(5, count($auiditlogs_update));
+		$this->assertEquals(5, count($auditlogs_update));
 
-		foreach ($auiditlogs_update as $i => $auditlog) {
+		foreach ($auditlogs_update as $i => $auditlog) {
 			$details = json_decode($auditlog['details'], true);
 
 			$this->assertEquals('update', $details['user.attempt_failed'][0]);
