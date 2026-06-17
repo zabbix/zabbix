@@ -144,7 +144,7 @@ window.user_device_create_popup = new class {
 						postMessageDetails('error', exception.error.messages);
 					}
 					else {
-						postMessageDetails('error', [exception]);
+						postMessageDetails('error', [<?= json_encode(_('Unexpected server error.')) ?>]);
 					}
 
 					overlayDialogueDestroy(this.#overlay.dialogueid);
