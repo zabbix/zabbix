@@ -55,5 +55,6 @@ declare -A BASELINE_TIMES=(
   [testAutoregistration]=10
   [testUserMacrosWithContext]=10
   [testGraphLinking]=8
+  [testWebScenarioDynamicVariables]=5
   [testFunctions]=3
 )
