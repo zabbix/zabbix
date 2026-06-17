@@ -1705,6 +1705,40 @@ out:
   return: SUCCEED
   value: 60
 ---
+test case: Evaluate timeleft(#2,1.0e308) finite slope, val_now overflows to +inf, threshold above x_max
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.0
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 9.9e307
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+  time: 2017-01-10 10:03:00.000000000 +00:00
+  function: timeleft
+  params: '#2,1.0e308'
+out:
+  return: SUCCEED
+  value: 1.7976931348623158e+308
+---
+test case: Evaluate timeleft(#2,-1.0e308) finite slope, val_now overflows to -inf, threshold below x_max
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.0
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: -9.9e307
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+  time: 2017-01-10 10:03:00.000000000 +00:00
+  function: timeleft
+  params: '#2,-1.0e308'
+out:
+  return: SUCCEED
+  value: 1.7976931348623158e+308
+---
 test case: Evaluate timeleft(#2,3.0e300) 1ns-apart data, slope overflow increasing, threshold above current
 in:
   history:

@@ -1253,14 +1253,12 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 						else
 							result = 0.0;
 					}
-					else
+					else if (INFINITY == val_now || (-INFINITY) == val_now)
 					{
-						/* val_now overflowed — use trend direction and newest */
-						/* value to decide. */
-						result = (x[i_max_t] > x[i_min_t]) ?
-								((x[i_max_t] >= threshold) ? DBL_MAX : 0.0) :
-								((x[i_max_t] <= threshold) ? DBL_MAX : 0.0);
+						result = DBL_MAX;
 					}
+					else
+						result = ZBX_MATH_ERROR;
 				}
 
 				res = SUCCEED;
