@@ -363,7 +363,7 @@ static zbx_cep_rule_t	*cep_rule_addref(zbx_cep_rule_t *rule)
  * Parameters: rule - [IN/OUT] rule to release                                *
  *                                                                            *
  ******************************************************************************/
-static void	cep_rule_release(zbx_cep_rule_t *rule)
+void	zbx_cep_rule_release(zbx_cep_rule_t *rule)
 {
 	if (1 != atomic_fetch_sub(&rule->refcount, 1))
 		return;
@@ -551,7 +551,7 @@ static zbx_cep_rule_t	*cep_acquire_rule(zbx_cep_rule_ref_t *ref, zbx_uint64_t re
 	{
 		zbx_cep_rule_t	*rule = cep_rule_clone(ref->rule);
 
-		cep_rule_release(ref->rule);
+		zbx_cep_rule_release(ref->rule);
 		ref->rule = rule;
 	}
 
@@ -592,7 +592,7 @@ static void	cep_rule_ref_clear(void *a)
 {
 	zbx_cep_rule_ref_t	*ref = (zbx_cep_rule_ref_t *)a;
 
-	cep_rule_release(ref->rule);
+	zbx_cep_rule_release(ref->rule);
 }
 
 static int	cep_rule_compare_by_sortorder(const void *a1, const void *a2)
@@ -617,7 +617,7 @@ static void	cep_config_handle_release(zbx_cep_config_handle_t handle)
 		return;
 
 	for (int i = 0; i < handle->rules.values_num; i++)
-		cep_rule_release(handle->rules.values[i]);
+		zbx_cep_rule_release(handle->rules.values[i]);
 
 	zbx_vector_cep_rule_ptr_destroy(&handle->rules);
 
@@ -1953,13 +1953,30 @@ const zbx_vector_cep_rule_ptr_t	*zbx_cep_config_get_rules(zbx_cep_config_handle_
 	return &handle->rules;
 }
 
-const zbx_cep_rule_t	*zbx_cep_config_get_rule(zbx_cep_config_handle_t handle, zbx_uint64_t ruleid)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get CEP rule by ID with an incremented reference count            *
+ *                                                                            *
+ * Parameters: ruleid - [IN] rule ID to look up                               *
+ *                                                                            *
+ * Return value: referenced rule pointer, or NULL if not found                *
+ *                                                                            *
+ * Comments: Caller must release the returned rule with zbx_cep_rule_release. *
+ *                                                                            *
+ ******************************************************************************/
+zbx_cep_rule_t	*zbx_cep_config_get_rule(zbx_uint64_t ruleid)
 {
-	for (int i = 0; i < handle->rules.values_num; i++)
-	{
-		if (handle->rules.values[i]->ruleid == ruleid)
-			return handle->rules.values[i];
-	}
+	zbx_cep_config_t	*cep_config = dc_local()->cep_config;
+	zbx_cep_rule_t		*rule = NULL;
+	zbx_cep_rule_ref_t	*ref;
 
-	return NULL;
+	pthread_mutex_lock(&cep_config->lock);
+
+	if (NULL != (ref = (zbx_cep_rule_ref_t *)zbx_hashset_search(&cep_config->rules, &ruleid)))
+		rule = cep_rule_addref(ref->rule);
+
+	pthread_mutex_unlock(&cep_config->lock);
+
+	return rule;
 }
+

@@ -211,13 +211,12 @@ void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_h
 
 void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks)
 {
-	zbx_cep_config_handle_t	cfg;
-	const zbx_cep_rule_t	*rule = NULL;
-	int			pending_num;
+	zbx_cep_rule_t	*rule;
+	int		pending_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, window->ruleid);
 
-	cfg = zbx_cep_config_open();
+	rule = zbx_cep_config_get_rule(window->ruleid);
 
 	cep_window_lock(window);
 
@@ -236,9 +235,6 @@ void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 				cep_event_context_clear(&ctx);
 				break;
 			}
-
-			if (NULL == rule)
-				rule = zbx_cep_config_get_rule(cfg, window->ruleid);
 
 			if (NULL != rule)
 			{
@@ -277,7 +273,7 @@ void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 		cep_window_pool_release(&pool);
 	}
 
-	zbx_cep_config_close(cfg);
+	zbx_cep_rule_release(rule);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
