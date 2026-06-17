@@ -59,6 +59,7 @@ window.regex_edit_popup = new class {
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.#initActions();
+		this.#initTableActions();
 	}
 
 	#initActions() {
@@ -66,7 +67,9 @@ window.regex_edit_popup = new class {
 		this.#footer.querySelector('.js-clone')?.addEventListener('click', () => this.#clone());
 		this.#footer.querySelector('.js-delete')?.addEventListener('click', () => this.#delete());
 		this.#footer.querySelector('.js-test').addEventListener('click', () => this.#testExpression());
+	}
 
+	#initTableActions() {
 		const table = document.getElementById('regular-expressions-table');
 
 		table.querySelector('button[name="add"]').addEventListener('click', () => this.#addRow());
