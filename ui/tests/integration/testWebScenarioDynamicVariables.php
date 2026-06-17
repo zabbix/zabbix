@@ -123,7 +123,15 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 			'End of process_httptests()', true, 120, 2);
 
 		// Confirm the server is still alive and responding after processing the scenarios.
-		$version = $this->call('apiinfo.version', []);
+		// apiinfo.version must be called without an Authorization header.
+		$version = $this->callRaw([
+			'jsonrpc' => '2.0',
+			'method' => 'apiinfo.version',
+			'params' => [],
+			'id' => 1
+		]);
+		$this->assertArrayHasKey('result', $version,
+			'Server became unresponsive — possible crash in http_process_variables()');
 		$this->assertNotEmpty($version['result'],
 			'Server became unresponsive — possible crash in http_process_variables()');
 
