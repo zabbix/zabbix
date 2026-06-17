@@ -30,6 +30,7 @@ window.user_device_create_popup = new class {
 	#device_uuid = null;
 	#admin_mode = false;
 	#countdown = null;
+	#abort_controller = null;
 
 	init({rules, admin_mode}) {
 		this.#overlay = overlays_stack.getById('user.device.init.view');
@@ -39,6 +40,7 @@ window.user_device_create_popup = new class {
 		this.#form = new CForm(this.#form_element, rules);
 		this.#device_uuid = null;
 		this.#admin_mode = admin_mode;
+		this.#abort_controller = new AbortController();
 
 		this.#initEvents();
 
@@ -51,6 +53,7 @@ window.user_device_create_popup = new class {
 	#initEvents() {
 		this.#footer.querySelector('.js-submit')?.addEventListener('click', () => this.#submit());
 		this.#dialogue.addEventListener('dialogue.close', () => {
+			this.#abort_controller.abort();
 			this.#countdown?.destroy();
 			this.#device_uuid = null;
 			const redirect_url = zabbixUrl({action: this.#admin_mode ? 'user.device.list': 'userprofile.device.list'});
@@ -112,7 +115,8 @@ window.user_device_create_popup = new class {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
+			body: JSON.stringify(data),
+			signal: this.#abort_controller.signal
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -135,7 +139,7 @@ window.user_device_create_popup = new class {
 				if (this.#admin_mode) {
 					this.#ajaxExceptionHandler(exception)
 				}
-				else {
+				else if (this.#overlay.$dialogue[0].isConnected) {
 					if (typeof exception === 'object' && 'error' in exception) {
 						if ('title' in exception.error) {
 							postMessageError(exception.error.title);
