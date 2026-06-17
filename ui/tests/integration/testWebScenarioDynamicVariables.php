@@ -150,12 +150,12 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 
 		$laststep_itemids = array_column(
 			array_filter($items['result'],
-				fn($item) => $item['value_type'] == ITEM_VALUE_TYPE_UINT64),
+				fn($item) => str_starts_with($item['key_'], 'web.test.fail[')),
 			'itemid'
 		);
 
 		$this->assertNotEmpty($laststep_itemids,
-			'No LASTSTEP items (UINT64) found for the web scenarios');
+			'No LASTSTEP items (web.test.fail) found for the web scenarios');
 
 		// Poll until history appears, confirming the poller actually processed the scenarios.
 		$history = $this->callUntilDataIsPresent('history.get', [
