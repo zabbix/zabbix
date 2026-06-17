@@ -302,4 +302,190 @@ in:
   data: 'not valid xml'
 out:
   return: FAIL
+---
+test case: 'regex: anchored at start extracts prefix'
+in:
+  key: '{myvar}'
+  value: 'regex:^(start[^ ]*)'
+  data: 'startvalue rest'
+out:
+  return: SUCCEED
+  macro_value: 'startvalue'
+---
+test case: 'regex: anchored at end extracts suffix'
+in:
+  key: '{myvar}'
+  value: 'regex:(end)$'
+  data: 'reach the end'
+out:
+  return: SUCCEED
+  macro_value: 'end'
+---
+test case: 'regex: character class extracts word'
+in:
+  key: '{myvar}'
+  value: 'regex:([A-Za-z]+)'
+  data: 'hello 123'
+out:
+  return: SUCCEED
+  macro_value: 'hello'
+---
+test case: 'regex: non-whitespace sequence extracts first token'
+in:
+  key: '{myvar}'
+  value: 'regex:([^ ]+)'
+  data: 'first second third'
+out:
+  return: SUCCEED
+  macro_value: 'first'
+---
+test case: 'regex: URL query parameter extraction'
+in:
+  key: '{myvar}'
+  value: 'regex:value=([^&]+)'
+  data: 'key=x&value=42&end=y'
+out:
+  return: SUCCEED
+  macro_value: '42'
+---
+test case: 'regex: zero-or-more quantifier captures empty string'
+in:
+  key: '{myvar}'
+  value: 'regex:(a*)'
+  data: 'bbb'
+out:
+  return: SUCCEED
+  macro_value: ''
+---
+test case: 'regex: fixed-width digit group'
+in:
+  key: '{myvar}'
+  value: 'regex:([0-9][0-9][0-9][0-9])'
+  data: 'year 2024 here'
+out:
+  return: SUCCEED
+  macro_value: '2024'
+---
+test case: 'regex: anchored-start no match fails'
+in:
+  key: '{myvar}'
+  value: 'regex:^(missing)'
+  data: 'not at start missing'
+out:
+  return: FAIL
+---
+test case: 'jsonpath: first element of JSON array'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.items[0]'
+  data: '{"items":["alpha","beta","gamma"]}'
+out:
+  return: SUCCEED
+  macro_value: 'alpha'
+---
+test case: 'jsonpath: second element of JSON array'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.items[1]'
+  data: '{"items":["alpha","beta","gamma"]}'
+out:
+  return: SUCCEED
+  macro_value: 'beta'
+---
+test case: 'jsonpath: float value returned as string'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.pi'
+  data: '{"pi":3.14}'
+out:
+  return: SUCCEED
+  macro_value: '3.14'
+---
+test case: 'jsonpath: boolean false returned as string'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.flag'
+  data: '{"flag":false}'
+out:
+  return: SUCCEED
+  macro_value: 'false'
+---
+test case: 'jsonpath: integer zero returned as string'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.count'
+  data: '{"count":0}'
+out:
+  return: SUCCEED
+  macro_value: '0'
+---
+test case: 'jsonpath: empty string value'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.msg'
+  data: '{"msg":""}'
+out:
+  return: SUCCEED
+  macro_value: ''
+---
+test case: 'jsonpath: nested object in array'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.items[0].name'
+  data: '{"items":[{"name":"first"},{"name":"second"}]}'
+out:
+  return: SUCCEED
+  macro_value: 'first'
+---
+test case: 'jsonpath: out-of-bounds array index fails'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.items[9]'
+  data: '{"items":["only"]}'
+out:
+  return: FAIL
+---
+test case: 'xmlxpath: attribute value extraction via string()'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath:string(//item/@id)'
+  data: '<?xml version="1.0"?><root><item id="123"/></root>'
+out:
+  return: SUCCEED
+  macro_value: '123'
+---
+test case: 'xmlxpath: element selected by attribute predicate'
+in:
+  key: '{myvar}'
+  value: "xmlxpath://item[@id='1']/text()"
+  data: '<?xml version="1.0"?><root><item id="1">match</item><item id="2">no</item></root>'
+out:
+  return: SUCCEED
+  macro_value: 'match'
+---
+test case: 'xmlxpath: first element of multiple siblings'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath://item[1]/text()'
+  data: '<?xml version="1.0"?><root><item>first</item><item>second</item></root>'
+out:
+  return: SUCCEED
+  macro_value: 'first'
+---
+test case: 'xmlxpath: three-level deep element text'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath://a/b/c/text()'
+  data: '<?xml version="1.0"?><root><a><b><c>deep</c></b></a></root>'
+out:
+  return: SUCCEED
+  macro_value: 'deep'
+---
+test case: 'xmlxpath: predicate on non-matching attribute fails'
+in:
+  key: '{myvar}'
+  value: "xmlxpath://item[@id='99']/text()"
+  data: '<?xml version="1.0"?><root><item id="1">only</item></root>'
+out:
+  return: FAIL
 ...
