@@ -157,15 +157,23 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 		$this->assertNotEmpty($laststep_itemids,
 			'No LASTSTEP items (web.test.fail) found for the web scenarios');
 
-		// Poll until history appears, confirming the poller actually processed the scenarios.
+		// Poll until ALL scenarios have history — not just the first one to arrive.
+		// callUntilDataIsPresent returns as soon as any result appears; the callback
+		// ensures we only stop once every expected item has at least one history entry.
+		$expected_count = count($laststep_itemids);
 		$history = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => $laststep_itemids,
 			'history' => ITEM_VALUE_TYPE_UINT64,
 			'output' => 'extend',
 			'sortfield' => 'clock',
 			'sortorder' => 'DESC',
-			'limit' => count($laststep_itemids)
-		], 60, 2);
+			'limit' => $expected_count * 10
+		], 60, 2, function($response) use ($expected_count) {
+			$unique = count(array_unique(array_column($response['result'], 'itemid')));
+			return $unique >= $expected_count
+				? true
+				: "waiting for all scenarios ({$unique}/{$expected_count} have history)";
+		});
 
 		$this->assertNotEmpty($history['result'],
 			'No LASTSTEP history found — web scenarios may not have been executed');
