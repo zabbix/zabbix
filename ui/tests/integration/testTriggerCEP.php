@@ -2159,7 +2159,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->assertStateChangeForAll($parent_ids, $parent_keys, '0', TRIGGER_VALUE_FALSE, $parent_event_count + 2);
 		$this->assertStateChangeForAll($dep_ids, $dep_keys, '0', TRIGGER_VALUE_FALSE, $dep_event_count + 2);
 
-		//$this->runIntermingledDependentTriggerBatch($restart, $parent_event_count + 2);
+		$this->runIntermingledDependentTriggerBatch($restart, $parent_event_count + 2);
 	}
 
 	private function runIntermingledDependentTriggerBatch(bool $restart, int $parent_event_count): void {
@@ -2725,14 +2725,23 @@ class testTriggerCEP extends CIntegrationTest {
 			'triggerids' => $triggerids,
 			'output' => ['value', 'state']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($triggerids) {
-			if (count($response['result']) !== count($triggerids)) {
-				return false;
+			$expected = count($triggerids);
+
+			if (count($response['result']) !== $expected) {
+				return 'expected '.$expected.' triggers, got '.count($response['result']);
 			}
+
+			$ok = 0;
 			foreach ($response['result'] as $trigger) {
-				if ((int) $trigger['value'] !== TRIGGER_VALUE_FALSE) {
-					return false;
+				if ((int) $trigger['value'] === TRIGGER_VALUE_FALSE) {
+					$ok++;
 				}
 			}
+
+			if ($ok !== $expected) {
+				return 'expected '.$expected.' triggers in OK state, got '.$ok;
+			}
+
 			return true;
 		});
 
