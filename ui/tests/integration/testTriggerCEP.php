@@ -2228,6 +2228,16 @@ class testTriggerCEP extends CIntegrationTest {
 		);
 		$this->waitForAllTriggerEventCounts($parent_ids, $parent_event_count + 2);
 
+		// When the parent recovered in the intermingled batch above, dependency suppression lifted while a
+		// dependent's last value could still be '1' (processed before its own '0' in the same packet), so a
+		// dependent problem may have opened. Send a final dep '0' to deterministically clear any such
+		// leftover before asserting no open problems.
+		$dep_recovery = [];
+		foreach ($dep_keys as $dkey) {
+			$dep_recovery[] = ['host' => self::HOST_DISC_VALUE, 'key' => $dkey, 'value' => '0'];
+		}
+		$this->sendSenderValues($dep_recovery, null, 1);
+
 		// After recovery no problems must remain open on either the parent or the dependent triggers.
 		$this->waitForNoOpenProblems(array_merge($parent_ids, self::$discovered_dep_triggerids),
 			'intermingled batch recovery');
