@@ -50,7 +50,7 @@ void	zbx_mock_test_entry(void **state)
 			? zbx_mock_get_parameter_string("in.data") : NULL;
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 #ifndef HAVE_LIBXML2
-	if (NULL != strstr(val, "xmlxpath:") && NULL != data)
+	if (NULL != strstr(val, "xmlxpath:") && NULL != data && SUCCEED == expected_ret)
 		skip();
 #endif
 
