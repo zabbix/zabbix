@@ -49,6 +49,10 @@ void	zbx_mock_test_entry(void **state)
 	data = (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.data"))
 			? zbx_mock_get_parameter_string("in.data") : NULL;
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
+#ifndef HAVE_LIBXML2
+	if (NULL != strstr(val, "xmlxpath:") && NULL != data)
+		skip();
+#endif
 
 	memset(&ht, 0, sizeof(ht));
 	zbx_vector_ptr_pair_create(&ht.macros);
