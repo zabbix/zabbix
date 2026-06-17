@@ -2007,7 +2007,7 @@ fail:
 
 static int proxy_has_forced_last_ip(int proxy_version)
 {
-	if (ZBX_COMPONENT_VERSION(7, 1, 0) > proxy_version && ZBX_COMPONENT_VERSION(7, 0, 26) <= proxy_version)
+	if (ZBX_COMPONENT_VERSION(7, 0, 26) <= proxy_version)
 		return SUCCEED;
 	else
 		return FAIL;
