@@ -1,3 +1,23 @@
+Changes for 7.0.28rc1
+
+New features:
+.........T [ZBXNEXT-10211] updated alarms discovery in vmware template (abakaldin)
+.......PS. [ZBXNEXT-10611] added real host name for native vmware.*.alarms.get item keys (MVekslers)
+A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
+A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
+
+Bug fixes:
+..F....... [ZBX-27732] fixed auto refresh to continue running in monitoring latest data view (uolekss)
+..F....... [ZBX-26048] fixed long error titles visibility on the Frontend in modal window (isharha)
+..F....... [ZBX-25461] fixed contrast problems with severity icons in high contrast themes (kastafjevs)
+..F....... [ZBX-26788] fixed duplicate announcement of month and year in the datepicker by assistive technologies (aluchko)
+.........T [ZBX-27777] fixed dashboard widgets decimals for Azure SQL Managed Instance by HTTP template (kbruvers)
+..F....... [ZBX-27698] fixed the Clock widget 'Server time' displaying the same time as the browser local time (aluchko)
+..F....... [ZBX-24054] fixed template cloning with extended amount of mappings (gklavins)
+..F....... [ZBX-27809] fixed QR code generation by using integer pixel alignment to eliminate module distortion (gberzina)
+..F....... [ZBX-27510] fixed Geomap widget not resizing the map on container resize (averza)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.27
 
 7.0.27rc1 was released as 7.0.27 without any changes
