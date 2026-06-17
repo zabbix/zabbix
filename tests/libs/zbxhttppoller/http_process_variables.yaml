@@ -1,0 +1,39 @@
+---
+test case: 'plain literal stored without response data'
+in:
+  key: '{myvar}'
+  value: 'hello'
+out:
+  return: SUCCEED
+  macro_value: 'hello'
+---
+test case: 'regex: prefix with null data must not crash (ZBX-27770)'
+in:
+  key: '{myvar}'
+  value: 'regex:(.*)'
+out:
+  return: SUCCEED
+---
+test case: 'jsonpath: prefix with null data must not crash (ZBX-27770)'
+in:
+  key: '{myvar}'
+  value: 'jsonpath:$.key'
+out:
+  return: SUCCEED
+---
+test case: 'xmlxpath: prefix with null data must not crash (ZBX-27770)'
+in:
+  key: '{myvar}'
+  value: 'xmlxpath://node'
+out:
+  return: SUCCEED
+---
+test case: 'regex: extracts first capture group from response data'
+in:
+  key: '{myvar}'
+  value: 'regex:(world)'
+  data: 'hello world'
+out:
+  return: SUCCEED
+  macro_value: 'world'
+...
