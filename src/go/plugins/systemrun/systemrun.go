@@ -15,6 +15,7 @@
 package systemrun
 
 import (
+	"sync"
 	"time"
 
 	"golang.zabbix.com/agent2/internal/agent"
@@ -23,8 +24,6 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 )
-
-var impl Plugin
 
 type Options struct {
 	LogRemoteCommands int `conf:"optional,range=0:1,default=0"`
@@ -36,21 +35,28 @@ type Plugin struct {
 	options          Options
 	executor         zbxcmd.Executor
 	executorInitFunc func() (zbxcmd.Executor, error)
+	executorInitMu   sync.Mutex
+}
+
+func NewPlugin() *Plugin {
+	return &Plugin{
+		executorInitFunc: zbxcmd.InitExecutor,
+	}
 }
 
 func init() {
-	err := plugin.RegisterMetrics(&impl, "SystemRun", "system.run", "Run specified command.")
+	systemrunPlugin := NewPlugin()
+
+	err := plugin.RegisterMetrics(systemrunPlugin, "SystemRun", "system.run", "Run specified command.")
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 
-	impl.SetHandleTimeout(true)
+	systemrunPlugin.SetHandleTimeout(true)
 }
 
 // Configure configures plugin based on options and other required initialization.
 func (p *Plugin) Configure(_ *plugin.GlobalOptions, options any) {
-	p.executorInitFunc = zbxcmd.InitExecutor
-
 	err := conf.UnmarshalStrict(options, &p.options)
 	if err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
@@ -84,16 +90,30 @@ func (p *Plugin) Export(_ string, params []string, ctx plugin.ContextProvider) (
 
 	// Needed so the executor is initialized once, this should be done in configure, but then Zabbix agent 2
 	// will not start if there are issues with finding cmd.exe on windows, and that will break backwards compatibility.
-	if p.executor == nil {
-		var err error
-
-		p.executor, err = p.executorInitFunc()
-		if err != nil {
-			return nil, errs.Wrap(err, "command init failed")
-		}
+	err = p.initExecutor()
+	if err != nil {
+		return nil, err
 	}
 
 	return p.runCommand(command, wait, ctx.Timeout())
+}
+
+func (p *Plugin) initExecutor() error {
+	p.executorInitMu.Lock()
+	defer p.executorInitMu.Unlock()
+
+	if p.executor != nil {
+		return nil
+	}
+
+	executor, err := p.executorInitFunc()
+	if err != nil {
+		return errs.Wrap(err, "command init failed")
+	}
+
+	p.executor = executor
+
+	return nil
 }
 
 func (p *Plugin) runCommand(command string, wait bool, timeout int) (any, error) {
