@@ -412,7 +412,7 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 		zbx_json_addstring(&json, "id", message_uuid7, ZBX_JSON_TYPE_STRING);
 
 		char	clock_str[32];
-		zbx_snprintf(clock_str, sizeof(clock_str), "%u", event->clock);
+		zbx_snprintf(clock_str, sizeof(clock_str), "%d", event->clock);
 		zbx_json_addstring(&json, "time", clock_str, ZBX_JSON_TYPE_STRING);
 
 		if (0 == strcmp(event_value, "0"))

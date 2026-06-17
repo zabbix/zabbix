@@ -549,9 +549,10 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	struct curl_slist	*headers = NULL, *connect_to = NULL;
 	zbx_http_response_t	body = {0}, response_header = {0};
 	struct zbx_json_parse	jp_body, jp_result;
-	char			*payload = NULL, *error = NULL, *error_curl = NULL, errbuf[CURL_ERROR_SIZE],
+	char			*payload = NULL, *error = NULL, *error_curl = NULL, *error_data = NULL,
+				errbuf[CURL_ERROR_SIZE],
 				code[ZBX_BRIDGE_ERROR_CODE_LEN], message[ZBX_BRIDGE_MESSAGE_LEN],
-				error_data[ZBX_BRIDGE_MESSAGE_LEN], jsonrpc[ZBX_MAX_UINT64_LEN];
+				jsonrpc[ZBX_MAX_UINT64_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -665,6 +666,16 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		goto out;
 	}
 
+	if (ZBX_MAX_RECV_2KB_DATA_SIZE < body.offset)
+	{
+		body.data[ZBX_MAX_RECV_2KB_DATA_SIZE] = '\0';
+		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned too large response body for "
+				ZBX_PROTO_VALUE_DEVICE_NOTIFY " request: size:" ZBX_FS_SIZE_T " body:'%s'",
+				(zbx_fs_size_t)body.offset, body.data);
+		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		goto out;
+	}
+
 	if (http_code < 200 || http_code >= 300)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
@@ -701,12 +712,11 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	{
 		if (SUCCEED == zbx_json_value_by_name(&jp_result, "code", code, sizeof(code), NULL) &&
 				SUCCEED == zbx_json_value_by_name(&jp_result, "message", message,
-				sizeof(message), NULL) &&
-				SUCCEED == zbx_json_value_by_name(&jp_result, "data", error_data,
-				sizeof(error_data), NULL))
+				sizeof(message), NULL))
 		{
+			error_data = zbx_json_raw_value_by_path_dyn(&jp_result, "$.data");
 			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s data: %s",
-					code, message, error_data);
+					code, message, ZBX_NULL2EMPTY_STR(error_data));
 			error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
 		}
 		else
@@ -725,6 +735,7 @@ out:
 	curl_easy_cleanup(curl);
 	zbx_free(params);
 	zbx_free(error_curl);
+	zbx_free(error_data);
 	zbx_free(error);
 	zbx_free(response_header.data);
 	zbx_free(body.data);

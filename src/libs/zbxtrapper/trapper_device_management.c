@@ -280,7 +280,16 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 		goto out;
 	}
 
-	if (http_code < 200 || http_code >= 300)
+	if (ZBX_MAX_RECV_2KB_DATA_SIZE < body.offset)
+	{
+		body.data[ZBX_MAX_RECV_2KB_DATA_SIZE] = '\0';
+		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned too large response body for %s request: size:"
+				ZBX_FS_SIZE_T " body:'%s'", request, (zbx_fs_size_t)body.offset, body.data);
+		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		goto out;
+	}
+
+	if (200 > http_code || 300 <= http_code)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
 				ZBX_NULL2EMPTY_STR(body.data));
@@ -351,11 +360,10 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 #else
 	struct zbx_json			request;
 	struct zbx_json_parse		jp_body, jp_result, jp_bek;
-	char				*body_data = NULL, *bek_raw = NULL,
+	char				*body_data = NULL, *bek_raw = NULL, *error_data = NULL,
 					device_id[ZBX_UUID_LEN], met[ZBX_ENROLL_TOKEN_LEN],
 					enroll_url[ZBX_ENROLL_URL_LEN], code[ZBX_BRIDGE_ERROR_CODE_LEN],
-					message[ZBX_BRIDGE_MESSAGE_LEN], error_data[ZBX_BRIDGE_MESSAGE_LEN],
-					*uuid7id = NULL;
+					message[ZBX_BRIDGE_MESSAGE_LEN], *uuid7id = NULL;
 	int				ret = FAIL;
 	size_t				bek_len;
 
@@ -393,11 +401,11 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 	{
 		if (SUCCEED == zbx_json_value_by_name(&jp_result, "code", code, sizeof(code), NULL) &&
 				SUCCEED == zbx_json_value_by_name(&jp_result, "message", message, sizeof(message),
-				NULL) && SUCCEED == zbx_json_value_by_name(&jp_result, "data", error_data,
-				sizeof(error_data), NULL))
+				NULL))
 		{
+			error_data = zbx_json_raw_value_by_path_dyn(&jp_result, "$.data");
 			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s data: %s",
-					code, message, error_data);
+					code, message, ZBX_NULL2EMPTY_STR(error_data));
 			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
 		}
 		else
@@ -447,6 +455,7 @@ out:
 out2:
 	zbx_free(body_data);
 	zbx_free(bek_raw);
+	zbx_free(error_data);
 	zbx_free(uuid7id);
 
 	return ret;
@@ -579,10 +588,9 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 #else
 	struct zbx_json			request;
 	struct zbx_json_parse		jp_body, jp_result;
-	char				*body_data = NULL,
+	char				*body_data = NULL, *error_data = NULL,
 					device_id[ZBX_UUID_LEN], code[ZBX_BRIDGE_ERROR_CODE_LEN],
-					message[ZBX_BRIDGE_MESSAGE_LEN], error_data[ZBX_BRIDGE_MESSAGE_LEN],
-					*uuid7id = NULL;
+					message[ZBX_BRIDGE_MESSAGE_LEN], *uuid7id = NULL;
 	int				ret = FAIL;
 
 	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_body))
@@ -619,11 +627,11 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 	{
 		if (SUCCEED == zbx_json_value_by_name(&jp_result, "code", code, sizeof(code), NULL) &&
 				SUCCEED == zbx_json_value_by_name(&jp_result, "message", message,
-				sizeof(message), NULL) && SUCCEED == zbx_json_value_by_name(&jp_result, "data",
-				error_data, sizeof(error_data), NULL))
+				sizeof(message), NULL))
 		{
+			error_data = zbx_json_raw_value_by_path_dyn(&jp_result, "$.data");
 			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s data: %s",
-					code, message, error_data);
+					code, message, ZBX_NULL2EMPTY_STR(error_data));
 			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
 		}
 		else
@@ -642,6 +650,7 @@ out:
 	zbx_json_free(&request);
 out2:
 	zbx_free(body_data);
+	zbx_free(error_data);
 	zbx_free(uuid7id);
 
 	return ret;

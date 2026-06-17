@@ -39,7 +39,7 @@ static int	trapper_build_push_test_params(const char *sendto, const char *subjec
 	zbx_db_row_t		row;
 	struct zbx_json		json;
 	const char		*device_id, *push_token, *mobile_encryption_key;
-	char			*sendto_esc = NULL, *message_uuid7 = NULL, *request_uuid7 = NULL;
+	char			*sendto_esc = NULL, *message_uuid7 = NULL, *request_uuid7 = NULL, clock_str[32];
 	int			ret = FAIL;
 
 	sendto_esc = zbx_db_dyn_escape_string(sendto);
@@ -81,11 +81,12 @@ static int	trapper_build_push_test_params(const char *sendto, const char *subjec
 
 	message_uuid7 = zbx_gen_uuid7_hyphenated();
 	zbx_json_addstring(&json, "id", message_uuid7, ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(&json, "time", (zbx_int64_t)time(NULL));
+	zbx_snprintf(clock_str, sizeof(clock_str), "%d", (int)time(NULL));
+	zbx_json_addstring(&json, "time", clock_str, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, "type", "notification.test", ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, "source", "zabbix/server", ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, "subject", "mediatype/test", ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&json, "schema", "urn:zabbix:server:test:1", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "dataschema", "urn:zabbix:server:test:1", ZBX_JSON_TYPE_STRING);
 
 	zbx_json_addobject(&json, "data");
 	zbx_json_addstring(&json, "title", subject, ZBX_JSON_TYPE_STRING);
