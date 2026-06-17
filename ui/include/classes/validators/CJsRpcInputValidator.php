@@ -284,9 +284,7 @@ class CJsRpcInputValidator {
 					'real_hosts' => ['type' => API_INT32],
 					'resolve_macros' => ['type' => API_INT32],
 					'filter' => ['type' => API_OBJECT, 'fields' => [
-						'value_type' => ['type' => API_INTS32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT,
-							ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT
-						])],
+						'value_type' => ['type' => API_INTS32],
 						'flags' => ['type' => API_INT32, 'in' => ZBX_FLAG_DISCOVERY_NORMAL]
 					]],
 
@@ -300,9 +298,7 @@ class CJsRpcInputValidator {
 					'hostid' => ['type' => API_ID],
 					'real_hosts' => ['type' => API_INT32],
 					'filter' => ['type' => API_OBJECT, 'fields' => [
-						'value_type' => ['type' => API_INTS32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT,
-							ITEM_VALUE_TYPE_UINT64
-						])]
+						'value_type' => ['type' => API_INTS32]
 					]],
 
 					// Option not relevant to item prototype API and is not passed either.
@@ -458,9 +454,7 @@ class CJsRpcInputValidator {
 					'real_hosts' => ['type' => API_INT32],
 					'resolve_macros' => ['type' => API_INT32],
 					'filter' => ['type' => API_OBJECT, 'fields' => [
-						'value_type' => ['type' => API_INTS32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT,
-							ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT
-						])]
+						'value_type' => ['type' => API_INTS32]
 					]],
 					'host_pattern' => ['type' => API_STRINGS_UTF8],
 					'host_pattern_multiple' => ['type' => API_INT32],
