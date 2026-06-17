@@ -2279,16 +2279,19 @@ class CUser extends CApiService {
 		];
 
 		if ($case_sensitive) {
-			$db_users = DB::select('users', [
-				'output' => $fields,
-				'filter' => ['username' => $username]
-			]);
+			$db_users = DBfetchArray(DBselect(
+				'SELECT '.implode(',', $fields).
+				' FROM users'.
+				' WHERE username='.zbx_dbstr($username).
+				' FOR UPDATE'
+			));
 		}
 		else {
 			$db_users_rows = DBfetchArray(DBselect(
 				'SELECT '.implode(',', $fields).
 				' FROM users'.
-					' WHERE LOWER(username)='.zbx_dbstr(strtolower($username))
+				' WHERE LOWER(username)='.zbx_dbstr(strtolower($username)).
+				' FOR UPDATE'
 			));
 
 			if ($do_group_check) {
