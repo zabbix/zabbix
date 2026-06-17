@@ -56,7 +56,7 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
-		self::$hostid = $response['result']['hostids'][0];
+		self::$hostid = (int)$response['result']['hostids'][0];
 
 		$scenarios = [
 			[
