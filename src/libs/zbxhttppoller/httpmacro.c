@@ -140,14 +140,14 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	/* get macro value */
 	zbx_strncpy_alloc(&value_str, &value_size, &value_offset, pvalue, nvalue);
 
-	if (/*NULL != data &&*/ 0 == strncmp(REGEXP_PREFIX, value_str, REGEXP_PREFIX_SIZE))
+	if (NULL != data && 0 == strncmp(REGEXP_PREFIX, value_str, REGEXP_PREFIX_SIZE))
 	{
 		/* The value contains regexp pattern, retrieve the first captured group or fail. */
 		zbx_mregexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\1", ZBX_REGEXP_GROUP_CHECK_ENABLE,
 				(char **)&pair.second);
 		zbx_free(value_str);
 	}
-	else if (/*NULL != data &&*/ 0 == strncmp(JSONPATH_PREFIX, value_str, JSONPATH_PREFIX_SIZE))
+	else if (NULL != data && 0 == strncmp(JSONPATH_PREFIX, value_str, JSONPATH_PREFIX_SIZE))
 	{
 		zbx_jsonobj_t	obj;
 
@@ -164,7 +164,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 		zbx_jsonobj_clear(&obj);
 		zbx_free(value_str);
 	}
-	else if (/*NULL != data &&*/ 0 == strncmp(XMLXPATH_PREFIX, value_str, XMLXPATH_PREFIX_SIZE))
+	else if (NULL != data && 0 == strncmp(XMLXPATH_PREFIX, value_str, XMLXPATH_PREFIX_SIZE))
 	{
 		zbx_variant_t	value;
 		int		is_empty;
