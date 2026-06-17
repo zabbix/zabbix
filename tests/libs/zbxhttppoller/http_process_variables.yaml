@@ -120,11 +120,11 @@ out:
 test case: 'regex multiple capture groups returns first group'
 in:
   key: '{myvar}'
-  value: 'regex:(hel)(lo)'
-  data: 'hello'
+  value: 'regex:(hell)(lo)'
+  data: 'helllo'
 out:
   return: SUCCEED
-  macro_value: 'hel'
+  macro_value: 'hell'
 ---
 test case: 'regex extracts digit sequence from data'
 in:
