@@ -21,6 +21,7 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxstats.h"
+#include "zbxip.h"
 
 #define DISCOVERER_INITIALIZED_YES	1
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
