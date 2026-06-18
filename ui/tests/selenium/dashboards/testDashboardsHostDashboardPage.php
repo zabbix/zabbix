@@ -173,7 +173,7 @@ class testDashboardsHostDashboardPage extends CWebTest {
 					CXPathHelper::fromClass('btn-dashboard-kioskmode-toggle-slideshow').']')->one()->click();
 		}
 
-		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->hoverMouse()->click();
+		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->waitUntilPresent()->one()->hoverMouse()->click();
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter are visible again.

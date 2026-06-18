@@ -641,7 +641,7 @@ class testDashboardsPages extends CWebTest {
 //		}
 
 		// Check that returned from kiosk view.
-		$this->query('xpath://button[@title="Normal view"]')->one()->click();
+		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->one()->click();
 		$this->page->waitUntilReady();
 		$this->page->assertHeader('Dashboard for kiosk');
 	}

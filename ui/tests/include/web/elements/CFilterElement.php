@@ -118,7 +118,7 @@ class CFilterElement extends CElement {
 	public function getTab($name = null) {
 		if ($this->context === self::CONTEXT_LEFT) {
 			if ($name === null) {
-				return $this->query('xpath:.//a[('.CXPathHelper::fromClass('tabfilter-item-link').') and @aria-label="Home"]')
+				return $this->query('xpath:.//a[('.CXPathHelper::fromClass('tabfilter-item-link').') and @aria-label="Default filter tab"]')
 						->one();
 			}
 
