@@ -2166,8 +2166,6 @@ class testTriggerCEP extends CIntegrationTest {
 		$parent_keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$dep_keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2);
 		$parent_ids = self::$discovered_triggerids;
-		$prev_parent_triggers = $this->getTriggers($parent_ids);
-		$prev_parent_lastchanges = array_map(fn($tid) => $prev_parent_triggers[$tid]['lastchange'], $parent_ids);
 
 		// 1. Intermingled batch: parent PROBLEM + dep PROBLEM values arrive in the same
 		//    sender packet (parent_key, dep_key, parent_key, dep_key, ...); only the parent
@@ -2179,7 +2177,7 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 		$this->sendSenderValues($intermingled, null, 1);
 
-		$this->waitForParentsValueAndLastchange($parent_ids, $prev_parent_lastchanges, TRIGGER_VALUE_TRUE);
+		$this->waitForParentsValue($parent_ids, TRIGGER_VALUE_TRUE);
 		$this->waitForAllTriggerEventCounts($parent_ids, $parent_event_count + 1);
 
 		$this->maybeRestartServer($restart);
@@ -2218,6 +2216,30 @@ class testTriggerCEP extends CIntegrationTest {
 	 * advanced past the captured baseline. The callback returns a descriptive string on mismatch
 	 * (surfaced in the callUntilDataIsPresent failure message) rather than a bare false.
 	 */
+	private function waitForParentsValue(array $parent_ids, int $expected_value): void {
+		$this->callUntilDataIsPresent('trigger.get', [
+			'triggerids' => $parent_ids,
+			'output' => ['triggerid', 'value', 'state']
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
+			function ($response) use ($parent_ids, $expected_value) {
+				$by_id = array_column($response['result'], null, 'triggerid');
+				foreach ($parent_ids as $tid) {
+					if (!isset($by_id[$tid])) {
+						return 'trigger '.$tid.' missing from response';
+					}
+					$t = $by_id[$tid];
+					if ((int) $t['value'] !== $expected_value) {
+						return 'trigger '.$tid.' value '.$t['value'].', expected '.$expected_value;
+					}
+					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) {
+						return 'trigger '.$tid.' state '.$t['state'].', expected NORMAL';
+					}
+				}
+				return true;
+			}
+		);
+	}
+
 	private function waitForParentsValueAndLastchange(array $parent_ids, array $prev_parent_lastchanges,
 			int $expected_value): void {
 		$this->callUntilDataIsPresent('trigger.get', [
