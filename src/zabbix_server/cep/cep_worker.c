@@ -21,7 +21,6 @@
 #include "cep_task.h"
 #include "cep_correlation.h"
 #include "cep_rule_op_event.h"
-#include "cep_rule_op_db_event.h"
 #include "cep_window.h"
 #include "zbx_cep.h"
 #include "zbx_cep_client.h"
@@ -473,8 +472,6 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 		if (0 != rules_num)
 		{
 			cep_event_execute_ops(rules, rules_num, ZBX_CEP_WHEN_EVENT_OCCURRED, &event_ctx, &event,
-					&tasks);
-			cep_db_event_execute_ops(rules, rules_num, ZBX_CEP_WHEN_EVENT_OCCURRED, &event_ctx, db_event,
 					&tasks);
 		}
 	}

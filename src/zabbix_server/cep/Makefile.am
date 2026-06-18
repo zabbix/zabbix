@@ -26,8 +26,6 @@ libzbxcep_a_SOURCES = \
 	cep_rule.h \
 	cep_rule_op_event.c \
 	cep_rule_op_event.h \
-	cep_rule_op_db_event.c \
-	cep_rule_op_db_event.h \
 	cep_rule_op_db.c \
 	cep_rule_op_db.h \
 	cep_window.c \
