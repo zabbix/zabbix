@@ -715,8 +715,13 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 				sizeof(message), NULL))
 		{
 			error_data = zbx_json_raw_value_by_path_dyn(&jp_result, "$.data");
+#ifdef ZBX_DEBUG
 			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s data: %s",
 					code, message, ZBX_NULL2EMPTY_STR(error_data));
+#else
+			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s",
+					code, message);
+#endif
 			error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
 		}
 		else
