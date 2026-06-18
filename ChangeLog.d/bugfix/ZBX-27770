@@ -1,1 +1,1 @@
-........S. [ZBX-27770] fixed Zabbix server crash in web monitoring when using dynamic variables at scenario level (sboidenko)
+........S. [ZBX-27770] fixed validation of HTTP response data for scenario-level dynamic variables in web monitoring (sboidenko)
