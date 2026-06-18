@@ -239,8 +239,7 @@ class CSystemInfoHelper {
 				'id' => _('Zabbix server version'),
 				'value' => $status['server_version'],
 				'details' => [
-					'outdated' => null,
-					'last_checked' => null
+					'outdated' => null
 				]
 			],
 			'frontend_version' => [
@@ -248,6 +247,9 @@ class CSystemInfoHelper {
 				'value' => ZABBIX_VERSION,
 				'details' => [
 					'update_check_enabled' => $system_info['is_software_update_check_enabled'],
+					'last_checked' => array_key_exists('lastcheck', $system_info['software_update_check_data'])
+						? $system_info['software_update_check_data']['lastcheck']
+						: null,
 					'outdated' => null,
 					'encoding_warning' => $system_info['encoding_warning'] !== ''
 						? $system_info['encoding_warning']
@@ -327,11 +329,9 @@ class CSystemInfoHelper {
 			]
 		];
 
-		if ($system_info['is_software_update_check_enabled']
-				&& array_key_exists('latest_release', $system_info['software_update_check_data'])) {
+		if (array_key_exists('latest_release', $system_info['software_update_check_data'])) {
 			$latest_release = $system_info['software_update_check_data']['latest_release'];
 			$result['frontend_version']['details']['outdated'] = version_compare(ZABBIX_VERSION, $latest_release, '<');
-			$result['server_version']['details']['last_checked'] = $system_info['software_update_check_data']['lastcheck'];
 
 			if ($status['server_version'] !== null) {
 				$result['server_version']['details']['outdated'] = version_compare(
