@@ -35,7 +35,13 @@ class testTriggerCEP extends CIntegrationTest {
 	const ITEM_PROTO_KEY = 'cep.trap';
 	const ITEM_PROTO_KEY2 = 'cep.trap2';
 	const COMPONENT_VALUE = 'sensor1';
+	// Stable per-trigger tag (fixed name, value resolved from the LLD macro to the component, e.g.
+	// 'sensor1') used to map each discovered trigger to its own service. Unlike 'component_{ITEM.VALUE}'
+	// the tag name does not contain {ITEM.VALUE}, so it is not rewritten at event time and the service
+	// problem-tag match is stable across all scenarios.
+	const SERVICE_TAG = 'cep_service';
 	const LLD_DISCOVERY_COUNT = 4000;
+	const LOG_EVENT_COUNT = 10000;
 
 	// Separate template used to stress single-trigger event generation. The template (linked directly to
 	// the HOST_NAME host) carries a master log item plus an LLD rule with a dependent log item prototype.
@@ -48,7 +54,6 @@ class testTriggerCEP extends CIntegrationTest {
 	const LOG_MASTER_ITEM_KEY = 'cep.log.master';
 	const LOG_ITEM_PROTO_KEY = 'cep.log.proto';
 	const LOG_COMPONENT_VALUE = 'logsensor1';
-	const LOG_EVENT_COUNT = 10000;
 	const WAIT_ITERATIONS = 60;
 	const WAIT_ITERATION_DELAY = 1;
 
@@ -80,6 +85,8 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $discovered_triggerids = [];
 	private static $discovered_dep_triggerids = [];
 	private static $correlationid;
+	private static $serviceids = [];
+	private static $service_actionid;
 	private static $sessionid = null;
 
 	/**
@@ -186,9 +193,11 @@ class testTriggerCEP extends CIntegrationTest {
 			'expression' => 'last(/'.self::TEMPLATE_NAME.'/'.self::ITEM_PROTO_KEY
 				.'['.self::LLD_MACRO.'])<>0',
 			'event_name' => 'CEP trigger '.self::LLD_MACRO.' {ITEM.VALUE}',
+			'priority' => TRIGGER_SEVERITY_DISASTER,
 			'tags' => [
 				['tag' => 'component_{ITEM.VALUE}', 'value' => self::LLD_MACRO],
 				['tag' => 'type', 'value' => 'cep'],
+				['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO],
 				['tag' => 'service', 'value' => '{{ITEM.VALUE}.regsub("([0-9]+)$", "\\1")}']
 			]
 		]);
@@ -223,12 +232,14 @@ class testTriggerCEP extends CIntegrationTest {
 			'expression' => 'last(/'.self::TEMPLATE_NAME.'/'.self::ITEM_PROTO_KEY2
 				.'['.self::LLD_MACRO.'])<>0',
 			'event_name' => 'CEP trigger '.self::LLD_MACRO.' {ITEM.VALUE}',
+			'priority' => TRIGGER_SEVERITY_DISASTER,
 			'dependencies' => [
 				['triggerid' => self::$trigger_prototypeid]
 			],
 			'tags' => [
 				['tag' => 'component_{ITEM.VALUE}', 'value' => self::LLD_MACRO],
-				['tag' => 'type', 'value' => 'cep-dep']
+				['tag' => 'type', 'value' => 'cep-dep'],
+				['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO]
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $response['result']);
@@ -295,6 +306,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'expression' => 'find(/'.self::LOG_TEMPLATE_NAME.'/'.self::LOG_ITEM_PROTO_KEY
 				.'['.self::LOG_LLD_MACRO.'],,"like","problem")=1',
 			'event_name' => 'CEP log trigger '.self::LOG_LLD_MACRO.' {ITEM.VALUE}',
+			'priority' => TRIGGER_SEVERITY_DISASTER,
 			'type' => TRIGGER_MULT_EVENT_ENABLED,
 			'tags' => [
 				['tag' => 'type', 'value' => 'cep-log']
@@ -672,6 +684,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'tags' => [
 				['tag' => 'component_{ITEM.VALUE}', 'value' => self::LLD_MACRO],
 				['tag' => 'type', 'value' => 'cep'],
+				['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO],
 				['tag' => 'service', 'value' => '{{ITEM.VALUE}.regsub("([0-9]+)$", "\\1")}']
 			]
 		]);
@@ -693,7 +706,8 @@ class testTriggerCEP extends CIntegrationTest {
 			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 			'tags' => [
 				['tag' => 'component_{ITEM.VALUE}', 'value' => self::LLD_MACRO],
-				['tag' => 'type', 'value' => 'cep-dep']
+				['tag' => 'type', 'value' => 'cep-dep'],
+				['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO]
 			]
 		]);
 
@@ -804,6 +818,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'tags' => [
 				['tag' => 'component', 'value' => self::LLD_MACRO],
 				['tag' => 'type', 'value' => 'cep'],
+				['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO],
 				['tag' => 'service', 'value' => '{ITEM.VALUE}']
 			]
 		]);
@@ -824,6 +839,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'tags' => [
 				['tag' => 'component', 'value' => self::LLD_MACRO],
 				['tag' => 'type', 'value' => 'cep-dep'],
+				['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO],
 				['tag' => 'service', 'value' => '{ITEM.VALUE}']
 			]
 		]);
@@ -1019,13 +1035,107 @@ class testTriggerCEP extends CIntegrationTest {
 		$tags = $primary_trigger['tags'];
 		$tags_json = json_encode($tags);
 		$tags_tv = array_map(fn($t) => ['tag' => $t['tag'], 'value' => $t['value']], $tags);
-		$this->assertCount(3, $tags_tv, 'Discovered trigger must have 3 tags, got: '.$tags_json);
+		$this->assertCount(4, $tags_tv, 'Discovered trigger must have 4 tags, got: '.$tags_json);
 		$this->assertContains(['tag' => 'component_{ITEM.VALUE}', 'value' => self::COMPONENT_VALUE], $tags_tv,
 			'Tag component='.self::COMPONENT_VALUE.' not found in: '.$tags_json);
 		$this->assertContains(['tag' => 'type', 'value' => 'cep'], $tags_tv,
 			'Tag type=cep not found in: '.$tags_json);
+		$this->assertContains(['tag' => self::SERVICE_TAG, 'value' => self::COMPONENT_VALUE], $tags_tv,
+			'Tag '.self::SERVICE_TAG.'='.self::COMPONENT_VALUE.' not found in: '.$tags_json);
 		$this->assertContains(['tag' => 'service', 'value' => '{{ITEM.VALUE}.regsub("([0-9]+)$", "\\1")}'], $tags_tv,
 			'Tag service=regsub not found in: '.$tags_json);
+
+		// Create one service per discovered trigger, each mapped to its trigger via the trigger's
+		// stable per-trigger SERVICE_TAG problem tag (value '<component>'), plus a single service action
+		// that fires on those services (service name like 'CEP service'). This drives the CEP event
+		// stream through the service manager and the service action/escalator pipeline. Both are removed
+		// in clearData().
+		$services = [];
+		foreach ($response['result'] as $trigger) {
+			$service_tag = current(array_filter($trigger['tags'],
+				fn($t) => $t['tag'] === self::SERVICE_TAG
+			));
+			$this->assertNotFalse($service_tag,
+				'Discovered trigger '.$trigger['triggerid'].' has no '.self::SERVICE_TAG.' tag.');
+
+			$services[] = [
+				'name' => 'CEP service '.$trigger['triggerid'],
+				'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
+				'sortorder' => 0,
+				'problem_tags' => [
+					[
+						'tag' => $service_tag['tag'],
+						'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL,
+						'value' => $service_tag['value']
+					]
+				]
+			];
+		}
+
+		$response = $this->call('service.create', $services);
+		$this->assertArrayHasKey('serviceids', $response['result']);
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']['serviceids'],
+			'Not all CEP services were created.');
+		self::$serviceids = $response['result']['serviceids'];
+
+		// Service action without real notifications: problem, recovery and update message operations
+		// targeting user group 7 with mediatypeid 0, so the escalator processes the service action
+		// without sending anything externally.
+		$response = $this->call('action.create', [
+			'name' => 'CEP service action',
+			'eventsource' => EVENT_SOURCE_SERVICE,
+			'status' => ACTION_STATUS_ENABLED,
+			'esc_period' => '1h',
+			'filter' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => [
+					[
+						'conditiontype' => ZBX_CONDITION_TYPE_SERVICE_NAME,
+						'operator' => CONDITION_OPERATOR_LIKE,
+						'value' => 'CEP service'
+					]
+				]
+			],
+			'operations' => [
+				[
+					'esc_period' => 0,
+					'esc_step_from' => 1,
+					'esc_step_to' => 1,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => 0,
+						'message' => 'Problem', 'subject' => 'Problem'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			],
+			'recovery_operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => 0,
+						'message' => 'Recovery', 'subject' => 'Recovery'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			],
+			'update_operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => 0,
+						'message' => 'Update', 'subject' => 'Update'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			]
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['actionids']);
+		self::$service_actionid = $response['result']['actionids'][0];
 
 		// Verify all LLD_DISCOVERY_COUNT items from proto2 were created.
 		$response = $this->callUntilDataIsPresent('item.get', [
@@ -1060,11 +1170,13 @@ class testTriggerCEP extends CIntegrationTest {
 		$dep_tags = $primary_dep_trigger['tags'];
 		$dep_tags_json = json_encode($dep_tags);
 		$dep_tags_tv = array_map(fn($t) => ['tag' => $t['tag'], 'value' => $t['value']], $dep_tags);
-		$this->assertCount(2, $dep_tags_tv, 'Discovered dependent trigger must have 2 tags, got: '.$dep_tags_json);
+		$this->assertCount(3, $dep_tags_tv, 'Discovered dependent trigger must have 3 tags, got: '.$dep_tags_json);
 		$this->assertContains(['tag' => 'component_{ITEM.VALUE}', 'value' => self::COMPONENT_VALUE], $dep_tags_tv,
 			'Tag component='.self::COMPONENT_VALUE.' not found in: '.$dep_tags_json);
 		$this->assertContains(['tag' => 'type', 'value' => 'cep-dep'], $dep_tags_tv,
 			'Tag type=cep-dep not found in: '.$dep_tags_json);
+		$this->assertContains(['tag' => self::SERVICE_TAG, 'value' => self::COMPONENT_VALUE], $dep_tags_tv,
+			'Tag '.self::SERVICE_TAG.'='.self::COMPONENT_VALUE.' not found in: '.$dep_tags_json);
 
 		// Discover the single log trigger up front (reloads the configuration cache before and after) so
 		// the server is aware of all newly discovered items and the log event tests can drive it directly.
@@ -1102,6 +1214,9 @@ class testTriggerCEP extends CIntegrationTest {
 		// OK→PROBLEM: one PROBLEM event per trigger; trigger value goes TRUE.
 		$this->captureEventBaseline($triggerids);
 		$this->assertStateChangeForAll($triggerids, $keys, '1', TRIGGER_VALUE_TRUE, 1);
+
+		// Each per-trigger service goes to PROBLEM (disaster) with one open service problem.
+		$this->assertServicesStatus(TRIGGER_SEVERITY_DISASTER, count(self::$serviceids));
 	}
 
 	/**
@@ -1120,6 +1235,9 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->assertStateChangeForAll($triggerids, $keys, '0', TRIGGER_VALUE_FALSE, 1);
 		$this->waitForNoOpenProblems($triggerids, 'close problem');
 		$this->assertNoOpenProblems(self::$discovered_triggerids);
+
+		// All services recover to OK with no open service problems.
+		$this->assertServicesStatus(ZBX_SEVERITY_OK, 0);
 	}
 
 	/**
@@ -2813,6 +2931,36 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 	}
 
+	/**
+	 * Poll the per-trigger CEP services until every one reports the expected status, then assert the
+	 * status and the number of open service problems. Each service has a single problem tag
+	 * (SERVICE_TAG=<component>) matching its trigger's events, so the service status and its service
+	 * problem events follow the trigger's problem state through the service manager:
+	 * TRIGGER_SEVERITY_DISASTER with one open problem per service while the trigger problem is open,
+	 * and ZBX_SEVERITY_OK with no open problems once it recovers.
+	 *
+	 * @param int    $expected_status        ZBX_SEVERITY_* expected for every service
+	 * @param int    $expected_open_problems open service problems expected across all services
+	 */
+	private function assertServicesStatus(int $expected_status, int $expected_open_problems): void {
+		$serviceids = self::$serviceids;
+
+		// Service status reflects the matched trigger problem severity (or OK after recovery). The poll
+		// fails if all services do not reach $expected_status in time.
+		$this->callUntilCountIsPresent('service.get', [
+			'serviceids' => $serviceids,
+			'filter' => ['status' => $expected_status]
+		], count($serviceids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+
+		// One open service problem per service while in problem state; none after recovery. The poll
+		// fails if the open service problem count does not reach $expected_open_problems in time.
+		$this->callUntilCountIsPresent('problem.get', [
+			'objectids' => $serviceids,
+			'object' => EVENT_OBJECT_SERVICE,
+			'source' => EVENT_SOURCE_SERVICE
+		], $expected_open_problems, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
 	private function currentNs(): int {
 		return (int)(fmod(microtime(true), 1) * 1e9);
 	}
@@ -2881,6 +3029,16 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	public static function clearData(): void {
+		if (!empty(self::$service_actionid)) {
+			CDataHelper::call('action.delete', [self::$service_actionid]);
+			self::$service_actionid = null;
+		}
+
+		if (!empty(self::$serviceids)) {
+			CDataHelper::call('service.delete', self::$serviceids);
+			self::$serviceids = [];
+		}
+
 		if (!empty(self::$correlationid)) {
 			CDataHelper::call('correlation.delete', [self::$correlationid]);
 			self::$correlationid = null;
