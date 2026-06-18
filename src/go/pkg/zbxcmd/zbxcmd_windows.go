@@ -27,7 +27,6 @@ import (
 
 	"golang.org/x/sys/windows"
 	"golang.zabbix.com/sdk/errs"
-	"golang.zabbix.com/sdk/log"
 )
 
 const cmd = "cmd.exe"
@@ -53,6 +52,8 @@ func InitExecutor() (Executor, error) {
 
 func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string, strict bool) (string, error) {
 	job, err := createWinJob()
+
+	defer windows.CloseHandle(job)
 	if err != nil {
 		return "", err
 	}
@@ -90,6 +91,8 @@ func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string,
 
 		return "", errs.Errorf("open process failed: %s", err)
 	}
+
+	defer windows.CloseHandle(procHandle)
 
 	err = windows.AssignProcessToJobObject(job, procHandle)
 	if err != nil {
@@ -147,10 +150,6 @@ func jobDoneListener(done chan<- error, cmd *exec.Cmd) {
 func timeoutListener(ctx context.Context, job windows.Handle) {
 	<-ctx.Done()
 
-	err := windows.CloseHandle(job)
-	if err != nil {
-		log.Debugf("failed to kill cmd processes %s", err)
-	}
 }
 
 func createWinJob() (windows.Handle, error) {
