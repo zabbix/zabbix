@@ -2108,13 +2108,14 @@ button {
 .dashboard-grid-widget {
   position: absolute; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
-    height: 0;
+    height: var(--surface-border-radius);
     z-index: 11;
-    transition: height 300ms ease-out, margin-top 300ms ease-out, box-shadow 300ms ease-out, opacity 300ms ease-out; }
+    transition: height 300ms ease-out, margin-top 300ms ease-out, box-shadow 300ms ease-out; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents {
     margin-top: 0;
     height: 100%;
     padding-top: 8px;
+    border-top-color: transparent;
     border-top-left-radius: var(--surface-border-radius);
     border-top-right-radius: var(--surface-border-radius);
     transition-property: border-radius;

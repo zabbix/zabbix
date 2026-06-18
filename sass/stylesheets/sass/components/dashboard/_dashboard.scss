@@ -492,14 +492,13 @@
 
 	&.dashboard-grid-widget-hidden-header {
 		.dashboard-grid-widget-header {
-			height: 0;
+			height: var(--surface-border-radius);
 			z-index: 11;
 
 			@if $ui-transitions {
 				transition: height $ui-transition-duration ease-out,
 							margin-top $ui-transition-duration ease-out,
-							box-shadow $ui-transition-duration ease-out,
-							opacity $ui-transition-duration ease-out;
+							box-shadow $ui-transition-duration ease-out;
 			}
 		}
 
@@ -507,6 +506,7 @@
 			margin-top: 0;
 			height: 100%;
 			padding-top: 8px;
+			border-top-color: transparent;
 			border-top-left-radius: var(--surface-border-radius);
 			border-top-right-radius: var(--surface-border-radius);
 			transition-property: border-radius;
