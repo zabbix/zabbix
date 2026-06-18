@@ -411,12 +411,8 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	else
 	{
 		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_NOBODY, 0L, err);
-
-		if (0 != contents_len)
-		{
-			ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, contents, err);
-			ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDSIZE, (long)contents_len, err);
-		}
+		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, ZBX_NULL2EMPTY_STR(contents), err);
+		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDSIZE, (long)contents_len, err);
 	}
 
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_ACCEPT_ENCODING, "", err);
