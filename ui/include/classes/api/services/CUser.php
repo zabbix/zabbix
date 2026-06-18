@@ -1647,13 +1647,14 @@ class CUser extends CApiService {
 	private static function createUserUgSets(array $ugsets): void {
 		$ins_user_ugsets = [];
 
-		$options = [
-			'output' => ['ugsetid', 'hash'],
-			'filter' => ['hash' => array_keys($ugsets)]
-		];
-		$result = DBselect(DB::makeSql('ugset', $options));
+		$resource = DBselect(
+			'SELECT us.hash,MIN(us.ugsetid) AS ugsetid'.
+			' FROM ugset us'.
+			' WHERE '.dbConditionString('us.hash', array_keys($ugsets)).
+			' GROUP BY us.hash'
+		);
 
-		while ($row = DBfetch($result)) {
+		while ($row = DBfetch($resource)) {
 			foreach ($ugsets[$row['hash']]['userids'] as $userid) {
 				$ins_user_ugsets[] = [
 					'userid' => $userid,
@@ -1694,11 +1695,12 @@ class CUser extends CApiService {
 		}
 
 		if ($ugsets) {
-			$options = [
-				'output' => ['ugsetid', 'hash'],
-				'filter' => ['hash' => array_keys($ugsets)]
-			];
-			$result = DBselect(DB::makeSql('ugset', $options));
+			$result = DBselect(
+				'SELECT us.hash,MIN(us.ugsetid) AS ugsetid'.
+				' FROM ugset us'.
+				' WHERE '.dbConditionString('us.hash', array_keys($ugsets)).
+				' GROUP BY us.hash'
+			);
 
 			while ($row = DBfetch($result)) {
 				$upd_userids = [];
@@ -2381,24 +2383,25 @@ class CUser extends CApiService {
 	}
 
 	public static function findUsersByUsername(string $username, bool $case_sensitive = true): array {
-		$db_users = [];
-
 		$fields = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
 			'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid',
 			'userdirectoryid', 'ts_provisioned'
 		];
 
 		if ($case_sensitive) {
-			$db_users = DB::select('users', [
-				'output' => $fields,
-				'filter' => ['username' => $username]
-			]);
+			$db_users = DBfetchArray(DBselect(
+				'SELECT '.implode(',', $fields).
+				' FROM users'.
+				' WHERE username='.zbx_dbstr($username).
+				' FOR UPDATE'
+			));
 		}
 		else {
 			$db_users = DBfetchArray(DBselect(
 				'SELECT '.implode(',', $fields).
 				' FROM users'.
-				' WHERE LOWER(username)='.zbx_dbstr(mb_strtolower($username))
+				' WHERE LOWER(username)='.zbx_dbstr(mb_strtolower($username)).
+				' FOR UPDATE'
 			));
 		}
 
