@@ -3115,7 +3115,9 @@ button {
     padding: 0 10px; }
   .filter-container .list-table {
     margin-bottom: -10px;
-    border: 0; }
+    border: 0;
+    border-bottom-left-radius: var(--surface-border-radius);
+    border-bottom-right-radius: var(--surface-border-radius); }
     .filter-container .list-table thead th {
       color: initial;
       padding: 8px 5px 5px;

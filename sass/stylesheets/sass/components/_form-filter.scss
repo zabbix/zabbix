@@ -52,6 +52,8 @@
 	.list-table {
 		margin-bottom: -10px;
 		border: 0;
+		border-bottom-left-radius: var(--surface-border-radius);
+		border-bottom-right-radius: var(--surface-border-radius);
 
 		thead {
 			th {
