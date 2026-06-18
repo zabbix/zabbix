@@ -116,7 +116,7 @@ class CControllerCepRuleList extends CController {
 
 		if ($filter['type'] == CCepRuleHelper::FILTER_SHOW_ALL || $filter['type'] == CCepRuleHelper::FILTER_SHOW_CEP) {
 			$result_cep = API::CepRule()->get([
-				'output' => ['cep_ruleid', 'name', 'window_type', 'stop', 'sortorder', 'status'],
+				'output' => ['cep_ruleid', 'name', 'window_type', 'stop', 'sortorder', 'status', 'error'],
 				'selectFilter' => ['conditions'],
 				'selectOperations' => ['execute_when', 'type', 'event_name', 'tag', 'new_tag', 'tag_value', 'severity'],
 				'search' => ['name' => $filter['name'] === '' ? null : $filter['name']],
@@ -131,11 +131,9 @@ class CControllerCepRuleList extends CController {
 		}
 
 		return array_map(function(array $record) {
-
-			// TODO: temporary stub before API adds the property.
-			$record['information_object'] = [
-				'errors' => [8798724]
-			];
+			if (!array_key_exists('error', $record)) {
+				$record['error'] = '';
+			}
 
 			if (array_key_exists('filter', $record)) {
 				$record['filter'] += [
@@ -143,7 +141,7 @@ class CControllerCepRuleList extends CController {
 				];
 			}
 
-			$record['cepruleid'] = $record['cep_ruleid'] ?? null;
+			$record['cepruleid'] = array_key_exists('cep_ruleid', $record) ? $record['cep_ruleid'] : null;
 
 			return $record;
 		}, array_merge($result_cep, $result_legacy));

@@ -143,22 +143,41 @@ class CControllerCepRuleEdit extends CController {
 		}
 
 		// Consistent naming with URL and fields.
-		$ceprule['cepruleid'] = $ceprule['cep_ruleid'] ?? null;
+		$ceprule['cepruleid'] = array_key_exists('cep_ruleid', $ceprule) ? $ceprule['cep_ruleid'] : null;
 		unset($ceprule['cep_ruleid']);
 		unset($ceprule['window']['filter']['eval_formula']);
 
-		// Key by formula ID value.
-		$ceprule['filter']['conditions'] = array_reduce($ceprule['filter']['conditions'],
-			static fn (array $carry, array $condition) => [$condition['formulaid'] => $condition, ...$carry], []
-		);
-		ksort($ceprule['filter']['conditions']);
-
-		$ceprule['window']['filter']['conditions'] = array_reduce($ceprule['window']['filter']['conditions'],
-			static fn (array $carry, array $condition) => [$condition['formulaid'] => $condition, ...$carry], []
-		);
-		ksort($ceprule['window']['filter']['conditions']);
+		$ceprule['filter']['conditions'] = self::prepareFilterConditions($ceprule['filter']['conditions']);
 
 		return $ceprule;
+	}
+
+	protected static function prepareWindowFilterConditions(array $conditions): array {
+		$conditions = self::prepareConditionsFormula($conditions);
+
+		return $conditions;
+	}
+
+	protected static function prepareFilterConditions(array $conditions): array {
+		$conditions = self::prepareConditionsFormula($conditions);
+		$conditions = array_map(function(array $condition): array {
+			if ($condition['type'] == CCepRuleHelper::CONDITION_TAG) {
+				$condition['tag_operator'] = $condition['operator'];
+			}
+
+			return $condition;
+		}, $conditions);
+
+		return $conditions;
+	}
+
+	protected static function prepareConditionsFormula(array $conditions): array {
+		$conditions = array_reduce($conditions,
+			static fn (array $carry, array $condition) => [$condition['formulaid'] => $condition, ...$carry], []
+		);
+		ksort($conditions);
+
+		return $conditions;
 	}
 
 	protected static function getWindowConditionValidationRules(): array {

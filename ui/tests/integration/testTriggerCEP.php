@@ -35,7 +35,25 @@ class testTriggerCEP extends CIntegrationTest {
 	const ITEM_PROTO_KEY = 'cep.trap';
 	const ITEM_PROTO_KEY2 = 'cep.trap2';
 	const COMPONENT_VALUE = 'sensor1';
+	// Stable per-trigger tag (fixed name, value resolved from the LLD macro to the component, e.g.
+	// 'sensor1') used to map each discovered trigger to its own service. Unlike 'component_{ITEM.VALUE}'
+	// the tag name does not contain {ITEM.VALUE}, so it is not rewritten at event time and the service
+	// problem-tag match is stable across all scenarios.
+	const SERVICE_TAG = 'cep_service';
 	const LLD_DISCOVERY_COUNT = 4000;
+	const LOG_EVENT_COUNT = 10000;
+
+	// Separate template used to stress single-trigger event generation. The template (linked directly to
+	// the HOST_NAME host) carries a master log item plus an LLD rule with a dependent log item prototype.
+	// The trigger prototype references the dependent discovered item and has multiple problem event
+	// generation enabled, so every log value pushed to the master item is propagated to the dependent
+	// item and opens a new problem on the one discovered trigger.
+	const LOG_TEMPLATE_NAME = 'template_trigger_cep_log';
+	const LOG_LLD_RULE_KEY = 'lld.cep.log.trapper';
+	const LOG_LLD_MACRO = '{#LOGNUM}';
+	const LOG_MASTER_ITEM_KEY = 'cep.log.master';
+	const LOG_ITEM_PROTO_KEY = 'cep.log.proto';
+	const LOG_COMPONENT_VALUE = 'logsensor1';
 	const WAIT_ITERATIONS = 60;
 	const WAIT_ITERATION_DELAY = 1;
 
@@ -51,6 +69,12 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $hostid;
 	private static $disc_hostid;
 	private static $templateid;
+	private static $log_templateid;
+	private static $log_lld_ruleid;
+	private static $log_master_itemid;
+	private static $log_item_prototypeid;
+	private static $log_trigger_prototypeid;
+	private static $discovered_log_triggerid;
 	private static $lld_ruleid;
 	private static $item_prototypeid;
 	private static $dep_item_prototypeid;
@@ -61,6 +85,8 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $discovered_triggerids = [];
 	private static $discovered_dep_triggerids = [];
 	private static $correlationid;
+	private static $serviceids = [];
+	private static $service_actionid;
 	private static $sessionid = null;
 
 	/**
@@ -167,9 +193,11 @@ class testTriggerCEP extends CIntegrationTest {
 			'expression' => 'last(/'.self::TEMPLATE_NAME.'/'.self::ITEM_PROTO_KEY
 				.'['.self::LLD_MACRO.'])<>0',
 			'event_name' => 'CEP trigger '.self::LLD_MACRO.' {ITEM.VALUE}',
+			'priority' => TRIGGER_SEVERITY_DISASTER,
 			'tags' => [
 				['tag' => 'component_{ITEM.VALUE}', 'value' => self::LLD_MACRO],
 				['tag' => 'type', 'value' => 'cep'],
+				['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO],
 				['tag' => 'service', 'value' => '{{ITEM.VALUE}.regsub("([0-9]+)$", "\\1")}']
 			]
 		]);
@@ -204,17 +232,89 @@ class testTriggerCEP extends CIntegrationTest {
 			'expression' => 'last(/'.self::TEMPLATE_NAME.'/'.self::ITEM_PROTO_KEY2
 				.'['.self::LLD_MACRO.'])<>0',
 			'event_name' => 'CEP trigger '.self::LLD_MACRO.' {ITEM.VALUE}',
+			'priority' => TRIGGER_SEVERITY_DISASTER,
 			'dependencies' => [
 				['triggerid' => self::$trigger_prototypeid]
 			],
 			'tags' => [
 				['tag' => 'component_{ITEM.VALUE}', 'value' => self::LLD_MACRO],
-				['tag' => 'type', 'value' => 'cep-dep']
+				['tag' => 'type', 'value' => 'cep-dep'],
+				['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO]
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['triggerids']);
 		self::$dep_trigger_prototypeid = $response['result']['triggerids'][0];
+
+		// Create the separate log template with an LLD rule, a master log item, a dependent log item
+		// prototype and a trigger prototype with multiple problem event generation enabled. The value
+		// burst is pushed to the master item and propagated to the dependent discovered item, on which the
+		// trigger prototype fires. This template is linked directly to the host below so that a single
+		// discovered trigger can be exercised with a large value burst.
+		$response = $this->call('template.create', [
+			'host' => self::LOG_TEMPLATE_NAME,
+			'groups' => [
+				['groupid' => $templategroupid]
+			]
+		]);
+		$this->assertArrayHasKey('templateids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['templateids']);
+		self::$log_templateid = $response['result']['templateids'][0];
+
+		$response = $this->call('discoveryrule.create', [
+			'hostid' => self::$log_templateid,
+			'name' => 'CEP Log LLD Discovery Rule',
+			'key_' => self::LOG_LLD_RULE_KEY,
+			'type' => ITEM_TYPE_TRAPPER,
+			'lifetime_type' => 2
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['itemids']);
+		self::$log_lld_ruleid = $response['result']['itemids'][0];
+
+		// Master (normal) log item that receives the value burst via trapper.
+		$response = $this->call('item.create', [
+			'hostid' => self::$log_templateid,
+			'name' => 'CEP log master item',
+			'key_' => self::LOG_MASTER_ITEM_KEY,
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_LOG
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['itemids']);
+		self::$log_master_itemid = $response['result']['itemids'][0];
+
+		// Dependent log item prototype: each value pushed to the master item is propagated here and drives
+		// the trigger prototype on the discovered item.
+		$response = $this->call('itemprototype.create', [
+			'hostid' => self::$log_templateid,
+			'ruleid' => self::$log_lld_ruleid,
+			'name' => 'CEP log item ['.self::LOG_LLD_MACRO.']',
+			'key_' => self::LOG_ITEM_PROTO_KEY.'['.self::LOG_LLD_MACRO.']',
+			'type' => ITEM_TYPE_DEPENDENT,
+			'master_itemid' => self::$log_master_itemid,
+			'value_type' => ITEM_VALUE_TYPE_LOG
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['itemids']);
+		self::$log_item_prototypeid = $response['result']['itemids'][0];
+
+		// Multiple problem event generation: every log value matching the pattern opens a new problem,
+		// so a burst of N values produces N problem events on the single discovered trigger.
+		$response = $this->call('triggerprototype.create', [
+			'description' => 'CEP log trigger for '.self::LOG_LLD_MACRO,
+			'expression' => 'find(/'.self::LOG_TEMPLATE_NAME.'/'.self::LOG_ITEM_PROTO_KEY
+				.'['.self::LOG_LLD_MACRO.'],,"like","problem")=1',
+			'event_name' => 'CEP log trigger '.self::LOG_LLD_MACRO.' {ITEM.VALUE}',
+			'priority' => TRIGGER_SEVERITY_DISASTER,
+			'type' => TRIGGER_MULT_EVENT_ENABLED,
+			'tags' => [
+				['tag' => 'type', 'value' => 'cep-log']
+			]
+		]);
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['triggerids']);
+		self::$log_trigger_prototypeid = $response['result']['triggerids'][0];
 
 		// Create host — template will be linked via host prototype discovery, not directly.
 		$response = $this->call('host.create', [
@@ -231,6 +331,9 @@ class testTriggerCEP extends CIntegrationTest {
 			],
 			'groups' => [
 				['groupid' => 4]
+			],
+			'templates' => [
+				['templateid' => self::$log_templateid]
 			]
 		]);
 		$this->assertArrayHasKey('hostids', $response['result']);
@@ -581,6 +684,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'tags' => [
 				['tag' => 'component_{ITEM.VALUE}', 'value' => self::LLD_MACRO],
 				['tag' => 'type', 'value' => 'cep'],
+				['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO],
 				['tag' => 'service', 'value' => '{{ITEM.VALUE}.regsub("([0-9]+)$", "\\1")}']
 			]
 		]);
@@ -602,7 +706,8 @@ class testTriggerCEP extends CIntegrationTest {
 			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 			'tags' => [
 				['tag' => 'component_{ITEM.VALUE}', 'value' => self::LLD_MACRO],
-				['tag' => 'type', 'value' => 'cep-dep']
+				['tag' => 'type', 'value' => 'cep-dep'],
+				['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO]
 			]
 		]);
 
@@ -713,6 +818,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'tags' => [
 				['tag' => 'component', 'value' => self::LLD_MACRO],
 				['tag' => 'type', 'value' => 'cep'],
+				['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO],
 				['tag' => 'service', 'value' => '{ITEM.VALUE}']
 			]
 		]);
@@ -733,6 +839,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'tags' => [
 				['tag' => 'component', 'value' => self::LLD_MACRO],
 				['tag' => 'type', 'value' => 'cep-dep'],
+				['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO],
 				['tag' => 'service', 'value' => '{ITEM.VALUE}']
 			]
 		]);
@@ -928,13 +1035,107 @@ class testTriggerCEP extends CIntegrationTest {
 		$tags = $primary_trigger['tags'];
 		$tags_json = json_encode($tags);
 		$tags_tv = array_map(fn($t) => ['tag' => $t['tag'], 'value' => $t['value']], $tags);
-		$this->assertCount(3, $tags_tv, 'Discovered trigger must have 3 tags, got: '.$tags_json);
+		$this->assertCount(4, $tags_tv, 'Discovered trigger must have 4 tags, got: '.$tags_json);
 		$this->assertContains(['tag' => 'component_{ITEM.VALUE}', 'value' => self::COMPONENT_VALUE], $tags_tv,
 			'Tag component='.self::COMPONENT_VALUE.' not found in: '.$tags_json);
 		$this->assertContains(['tag' => 'type', 'value' => 'cep'], $tags_tv,
 			'Tag type=cep not found in: '.$tags_json);
+		$this->assertContains(['tag' => self::SERVICE_TAG, 'value' => self::COMPONENT_VALUE], $tags_tv,
+			'Tag '.self::SERVICE_TAG.'='.self::COMPONENT_VALUE.' not found in: '.$tags_json);
 		$this->assertContains(['tag' => 'service', 'value' => '{{ITEM.VALUE}.regsub("([0-9]+)$", "\\1")}'], $tags_tv,
 			'Tag service=regsub not found in: '.$tags_json);
+
+		// Create one service per discovered trigger, each mapped to its trigger via the trigger's
+		// stable per-trigger SERVICE_TAG problem tag (value '<component>'), plus a single service action
+		// that fires on those services (service name like 'CEP service'). This drives the CEP event
+		// stream through the service manager and the service action/escalator pipeline. Both are removed
+		// in clearData().
+		$services = [];
+		foreach ($response['result'] as $trigger) {
+			$service_tag = current(array_filter($trigger['tags'],
+				fn($t) => $t['tag'] === self::SERVICE_TAG
+			));
+			$this->assertNotFalse($service_tag,
+				'Discovered trigger '.$trigger['triggerid'].' has no '.self::SERVICE_TAG.' tag.');
+
+			$services[] = [
+				'name' => 'CEP service '.$trigger['triggerid'],
+				'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
+				'sortorder' => 0,
+				'problem_tags' => [
+					[
+						'tag' => $service_tag['tag'],
+						'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL,
+						'value' => $service_tag['value']
+					]
+				]
+			];
+		}
+
+		$response = $this->call('service.create', $services);
+		$this->assertArrayHasKey('serviceids', $response['result']);
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']['serviceids'],
+			'Not all CEP services were created.');
+		self::$serviceids = $response['result']['serviceids'];
+
+		// Service action without real notifications: problem, recovery and update message operations
+		// targeting user group 7 with mediatypeid 0, so the escalator processes the service action
+		// without sending anything externally.
+		$response = $this->call('action.create', [
+			'name' => 'CEP service action',
+			'eventsource' => EVENT_SOURCE_SERVICE,
+			'status' => ACTION_STATUS_ENABLED,
+			'esc_period' => '1h',
+			'filter' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => [
+					[
+						'conditiontype' => ZBX_CONDITION_TYPE_SERVICE_NAME,
+						'operator' => CONDITION_OPERATOR_LIKE,
+						'value' => 'CEP service'
+					]
+				]
+			],
+			'operations' => [
+				[
+					'esc_period' => 0,
+					'esc_step_from' => 1,
+					'esc_step_to' => 1,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => 0,
+						'message' => 'Problem', 'subject' => 'Problem'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			],
+			'recovery_operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => 0,
+						'message' => 'Recovery', 'subject' => 'Recovery'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			],
+			'update_operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => 0,
+						'message' => 'Update', 'subject' => 'Update'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			]
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['actionids']);
+		self::$service_actionid = $response['result']['actionids'][0];
 
 		// Verify all LLD_DISCOVERY_COUNT items from proto2 were created.
 		$response = $this->callUntilDataIsPresent('item.get', [
@@ -969,13 +1170,17 @@ class testTriggerCEP extends CIntegrationTest {
 		$dep_tags = $primary_dep_trigger['tags'];
 		$dep_tags_json = json_encode($dep_tags);
 		$dep_tags_tv = array_map(fn($t) => ['tag' => $t['tag'], 'value' => $t['value']], $dep_tags);
-		$this->assertCount(2, $dep_tags_tv, 'Discovered dependent trigger must have 2 tags, got: '.$dep_tags_json);
+		$this->assertCount(3, $dep_tags_tv, 'Discovered dependent trigger must have 3 tags, got: '.$dep_tags_json);
 		$this->assertContains(['tag' => 'component_{ITEM.VALUE}', 'value' => self::COMPONENT_VALUE], $dep_tags_tv,
 			'Tag component='.self::COMPONENT_VALUE.' not found in: '.$dep_tags_json);
 		$this->assertContains(['tag' => 'type', 'value' => 'cep-dep'], $dep_tags_tv,
 			'Tag type=cep-dep not found in: '.$dep_tags_json);
-		// Reload configuration cache so server is aware of the newly discovered items.
-		$this->reloadConfigurationCacheAndWaitForLogLine();
+		$this->assertContains(['tag' => self::SERVICE_TAG, 'value' => self::COMPONENT_VALUE], $dep_tags_tv,
+			'Tag '.self::SERVICE_TAG.'='.self::COMPONENT_VALUE.' not found in: '.$dep_tags_json);
+
+		// Discover the single log trigger up front (reloads the configuration cache before and after) so
+		// the server is aware of all newly discovered items and the log event tests can drive it directly.
+		$this->discoverLogTrigger();
 	}
 
 	/**
@@ -1009,6 +1214,9 @@ class testTriggerCEP extends CIntegrationTest {
 		// OK→PROBLEM: one PROBLEM event per trigger; trigger value goes TRUE.
 		$this->captureEventBaseline($triggerids);
 		$this->assertStateChangeForAll($triggerids, $keys, '1', TRIGGER_VALUE_TRUE, 1);
+
+		// Each per-trigger service goes to PROBLEM (disaster) with one open service problem.
+		$this->assertServicesStatus(TRIGGER_SEVERITY_DISASTER, count(self::$serviceids));
 	}
 
 	/**
@@ -1027,6 +1235,54 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->assertStateChangeForAll($triggerids, $keys, '0', TRIGGER_VALUE_FALSE, 1);
 		$this->waitForNoOpenProblems($triggerids, 'close problem');
 		$this->assertNoOpenProblems(self::$discovered_triggerids);
+
+		// All services recover to OK with no open service problems.
+		$this->assertServicesStatus(ZBX_SEVERITY_OK, 0);
+	}
+
+	/**
+	 * Open a problem and send the recovery immediately afterwards, without waiting for the problem to be
+	 * confirmed first, and verify CEP still generates both events per trigger: one PROBLEM event followed
+	 * by one RESOLVED event. Guards against the open and close collapsing into a single event (or the
+	 * problem being dropped) when they arrive back-to-back.
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecovery() {
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		$this->captureEventBaseline($triggerids);
+
+		// Push the PROBLEM value (1) and then the recovery value (0) back-to-back. The recovery carries a
+		// later clock so the problem is evaluated first, but the test does not wait between the two sends.
+		$now = time();
+		$this->sendSenderValues(
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '1',
+					'clock' => $now, 'ns' => $this->currentNs()], $keys),
+			null, 0
+		);
+		$this->sendSenderValues(
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0',
+					'clock' => $now + 1, 'ns' => $this->currentNs()], $keys),
+			null, 0
+		);
+
+		// Each trigger must produce exactly two events: one PROBLEM and one RESOLVED.
+		$this->waitForAllTriggerEventCounts($triggerids, 2);
+
+		// Newest event is the recovery (OK); the one before it is the problem (PROBLEM).
+		$events_by_trigger = $this->getScenarioEventsByTrigger($triggerids);
+		foreach ($triggerids as $idx => $triggerid) {
+			$events = $events_by_trigger[$triggerid];
+			$info = 'trigger #'.$idx.': '.json_encode($events);
+			$this->assertCount(2, $events, $info);
+			$this->assertEquals(TRIGGER_VALUE_FALSE, (int) $events[0]['value'], $info);
+			$this->assertEquals(TRIGGER_VALUE_TRUE, (int) $events[1]['value'], $info);
+		}
+
+		$this->waitForNoOpenProblems($triggerids, 'open and immediate recovery');
+		$this->assertNoOpenProblems($triggerids);
 	}
 
 	/**
@@ -1403,6 +1659,158 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Discover a single log trigger from the dedicated log template (linked directly to the host) and
+	 * verify that a burst of LOG_EVENT_COUNT log values, all matching the trigger pattern, produces
+	 * exactly LOG_EVENT_COUNT problem events. The trigger prototype has multiple problem event
+	 * generation enabled, so every matching value opens a new problem on the same trigger.
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_LogMultipleEvents() {
+		$this->openLogProblemBurst(false);
+	}
+
+	/**
+	 * Recover the single log trigger: a single value that does not match the "problem" pattern turns
+	 * the expression false, so the trigger goes back to OK and every problem opened by
+	 * testTriggerCEP_LogMultipleEvents is resolved.
+	 *
+	 * @depends testTriggerCEP_LogMultipleEvents
+	 */
+	public function testTriggerCEP_LogRecovery() {
+		$this->recoverLogTrigger(false);
+	}
+
+	/**
+	 * Same as testTriggerCEP_LogMultipleEvents but the server is restarted before the burst is opened.
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_LogMultipleEventsRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->openLogProblemBurst(true);
+	}
+
+	/**
+	 * Same as testTriggerCEP_LogRecovery but the server is restarted before recovery. The restart forces
+	 * the LOG_EVENT_COUNT problems opened by testTriggerCEP_LogMultipleEventsRestart to be reloaded into
+	 * the event cache (exercising the batched initial event cache loading) before they are resolved.
+	 *
+	 * @depends testTriggerCEP_LogMultipleEventsRestart
+	 */
+	public function testTriggerCEP_LogRecoveryRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->recoverLogTrigger(true);
+	}
+
+	/**
+	 * Push a burst of LOG_EVENT_COUNT log values to the discovered item in a single request and wait until
+	 * every value has opened a problem event on the log trigger. Each value matches the "problem" pattern
+	 * and carries a distinct timestamp so none collapse; with multiple problem event generation enabled
+	 * every value opens a new problem on the discovered trigger. When $restart is true, the server is
+	 * restarted before the burst is sent.
+	 */
+	private function openLogProblemBurst(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
+		$triggerids = [self::$discovered_log_triggerid];
+		$this->captureEventBaseline($triggerids);
+
+		// Values are pushed to the master item; the dependent discovered item receives a copy of each.
+		$item_key = self::LOG_MASTER_ITEM_KEY;
+		$base_clock = time();
+		$values = [];
+		for ($i = 0; $i < self::LOG_EVENT_COUNT; $i++) {
+			$values[] = [
+				'host' => self::HOST_NAME,
+				'key' => $item_key,
+				'value' => 'problem '.$i,
+				'clock' => $base_clock,
+				'ns' => $i + 1
+			];
+		}
+		$this->sendSenderValues($values, null, 0);
+
+		// Every one of the LOG_EVENT_COUNT values must have generated a problem event on the trigger.
+		$this->callUntilCountIsPresent('event.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1
+		], self::LOG_EVENT_COUNT, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Send a single non-matching log value so the trigger expression turns false, then wait until all open
+	 * problems on the log trigger are resolved and the trigger is back to OK. When $restart is true, the
+	 * server is restarted before the recovery value is sent.
+	 */
+	private function recoverLogTrigger(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
+		$triggerids = [self::$discovered_log_triggerid];
+
+		$this->sendSenderValues([
+			[
+				'host' => self::HOST_NAME,
+				'key' => self::LOG_MASTER_ITEM_KEY,
+				'value' => 'recovered',
+				'clock' => time(),
+				'ns' => $this->currentNs()
+			]
+		], null, 0);
+
+		$this->waitForNoOpenProblems($triggerids, 'log recovery');
+		$this->assertNoOpenProblems($triggerids);
+	}
+
+	/**
+	 * Discover exactly one log trigger from the dedicated log template by sending LLD data with a single
+	 * entry. Asserts the trigger has multiple problem event generation enabled and stores the discovered
+	 * trigger id.
+	 */
+	private function discoverLogTrigger(): void {
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		$this->sendSenderValues([
+			[
+				'host' => self::HOST_NAME,
+				'key' => self::LOG_LLD_RULE_KEY,
+				'value' => json_encode(['data' => [
+					[self::LOG_LLD_MACRO => self::LOG_COMPONENT_VALUE]
+				]])
+			]
+		], null, 0);
+
+		$item_key = self::LOG_ITEM_PROTO_KEY.'['.self::LOG_COMPONENT_VALUE.']';
+
+		// Wait for the discovered log item.
+		$this->callUntilDataIsPresent('item.get', [
+			'hostids' => [self::$hostid],
+			'filter' => ['key_' => $item_key],
+			'output' => ['itemid']
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			return count($r['result']) === 1;
+		});
+
+		// Wait for the single discovered log trigger.
+		$response = $this->callUntilDataIsPresent('trigger.get', [
+			'hostids' => [self::$hostid],
+			'search' => ['description' => 'CEP log trigger for '],
+			'output' => ['triggerid', 'type']
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			return count($r['result']) === 1;
+		});
+		$this->assertCount(1, $response['result'], 'Discovered log trigger was not created.');
+		$this->assertEquals(TRIGGER_MULT_EVENT_ENABLED, (int) $response['result'][0]['type'],
+			'Discovered log trigger must have multiple problem event generation enabled.');
+		self::$discovered_log_triggerid = $response['result'][0]['triggerid'];
+
+		// Reload config so the server is aware of the newly discovered item and trigger.
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+	}
+
+	/**
 	 * Send empty LLD data to delete all resources that were discovered during the test run
 	 * and verify the discovered triggers are actually removed.
 	 *
@@ -1410,6 +1818,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_EventAssessmentNone
 	 * @depends testTriggerCEP_EventAssessmentServiceCorrelationManualClose
 	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCrossTrigger
+	 * @depends testTriggerCEP_LogRecovery
 	 */
 	public function testTriggerCEP_Cleanup() {
 		self::triggerCEP_Cleanup();
@@ -1868,23 +2277,17 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->assertStateChangeForAll($parent_ids, $parent_keys, '0', TRIGGER_VALUE_FALSE, $parent_event_count + 2);
 		$this->assertStateChangeForAll($dep_ids, $dep_keys, '0', TRIGGER_VALUE_FALSE, $dep_event_count + 2);
 
-		//$this->runIntermingledDependentTriggerBatch($restart, $parent_event_count + 2);
+		$this->runIntermingledDependentTriggerBatch($restart, $parent_event_count + 2);
 	}
 
 	private function runIntermingledDependentTriggerBatch(bool $restart, int $parent_event_count): void {
 		$parent_keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$dep_keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2);
 		$parent_ids = self::$discovered_triggerids;
-		$dep_ids = self::$discovered_dep_triggerids;
-		//$dep_event_count = $this->getTriggerEventCount($dep_ids[0]);
-		$prev_parent_triggers = $this->getTriggers($parent_ids);
-		$prev_parent_lastchanges = array_map(fn($tid) => $prev_parent_triggers[$tid]['lastchange'], $parent_ids);
-		//$prev_dep_triggers = $this->getTriggers($dep_ids);
-		//$prev_dep_lastchanges = array_map(fn($tid) => $prev_dep_triggers[$tid]['lastchange'], $dep_ids);
 
 		// 1. Intermingled batch: parent PROBLEM + dep PROBLEM values arrive in the same
-		//    sender packet (parent_key, dep_key, parent_key, dep_key, ...); deps must still
-		//    be suppressed because the parent fires within the same batch.
+		//    sender packet (parent_key, dep_key, parent_key, dep_key, ...); only the parent
+		//    triggers are asserted.
 		$intermingled = [];
 		foreach ($parent_keys as $idx => $pkey) {
 			$intermingled[] = ['host' => self::HOST_DISC_VALUE, 'key' => $pkey, 'value' => '1'];
@@ -1892,37 +2295,13 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 		$this->sendSenderValues($intermingled, null, 1);
 
-		$this->callUntilDataIsPresent('trigger.get', [
-			'triggerids' => $parent_ids,
-			'output' => ['triggerid', 'value', 'lastchange', 'state']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-			function ($response) use ($parent_ids, $prev_parent_lastchanges) {
-				$by_id = array_column($response['result'], null, 'triggerid');
-				foreach ($parent_ids as $idx => $tid) {
-					if (!isset($by_id[$tid])) return false;
-					$t = $by_id[$tid];
-					if ((int) $t['value'] !== TRIGGER_VALUE_TRUE) return false;
-					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) return false;
-					if ((int) $t['lastchange'] <= $prev_parent_lastchanges[$idx]) return false;
-				}
-				return true;
-			}
-		);
+		$this->waitForParentsValue($parent_ids, TRIGGER_VALUE_TRUE);
 		$this->waitForAllTriggerEventCounts($parent_ids, $parent_event_count + 1);
 
-		// Deps must remain suppressed — stay FALSE, lastchange unchanged, no new events.
-		//$dep_triggers = $this->getTriggers($dep_ids);
-		//foreach ($dep_ids as $idx => $dep_id) {
-		//	$info = 'dep #'.$idx.' must stay OK when parent and dep fire in the same intermingled batch';
-		//	$this->assertEquals(TRIGGER_VALUE_FALSE, $dep_triggers[$dep_id]['value'], $info);
-		//	$this->assertEquals($prev_dep_lastchanges[$idx], $dep_triggers[$dep_id]['lastchange'], $info);
-		//}
-		//$this->waitForAllTriggerEventCounts($dep_ids, $dep_event_count);
 		$this->maybeRestartServer($restart);
 
 		// 2. Intermingled recovery: parent OK + dep OK values in one packet
-		//    (parent_key, dep_key, parent_key, dep_key, ...); parents recover,
-		//    dep condition becomes false so deps stay OK throughout.
+		//    (parent_key, dep_key, parent_key, dep_key, ...); only parents are asserted.
 		$prev_parent_triggers = $this->getTriggers($parent_ids);
 		$prev_parent_lastchanges = array_map(fn($tid) => $prev_parent_triggers[$tid]['lastchange'], $parent_ids);
 		$intermingled_recovery = [];
@@ -1932,35 +2311,76 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 		$this->sendSenderValues($intermingled_recovery, null, 1);
 
+		$this->waitForParentsValueAndLastchange($parent_ids, $prev_parent_lastchanges, TRIGGER_VALUE_FALSE);
+		$this->waitForAllTriggerEventCounts($parent_ids, $parent_event_count + 2);
+
+		// When the parent recovered in the intermingled batch above, dependency suppression lifted while a
+		// dependent's last value could still be '1' (processed before its own '0' in the same packet), so a
+		// dependent problem may have opened. Send a final dep '0' to deterministically clear any such
+		// leftover before asserting no open problems.
+		$dep_recovery = [];
+		foreach ($dep_keys as $dkey) {
+			$dep_recovery[] = ['host' => self::HOST_DISC_VALUE, 'key' => $dkey, 'value' => '0'];
+		}
+		$this->sendSenderValues($dep_recovery, null, 1);
+
+		// After recovery no problems must remain open on either the parent or the dependent triggers.
+		$this->waitForNoOpenProblems(array_merge($parent_ids, self::$discovered_dep_triggerids),
+			'intermingled batch recovery');
+	}
+
+	/**
+	 * Wait until every parent trigger reached $expected_value in NORMAL state with its lastchange
+	 * advanced past the captured baseline. The callback returns a descriptive string on mismatch
+	 * (surfaced in the callUntilDataIsPresent failure message) rather than a bare false.
+	 */
+	private function waitForParentsValue(array $parent_ids, int $expected_value): void {
 		$this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => $parent_ids,
-			'output' => ['triggerid', 'value', 'lastchange', 'state']
+			'output' => ['triggerid', 'value', 'state']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-			function ($response) use ($parent_ids, $prev_parent_lastchanges) {
+			function ($response) use ($parent_ids, $expected_value) {
 				$by_id = array_column($response['result'], null, 'triggerid');
-				foreach ($parent_ids as $idx => $tid) {
-					if (!isset($by_id[$tid])) return false;
+				foreach ($parent_ids as $tid) {
+					if (!isset($by_id[$tid])) {
+						return 'trigger '.$tid.' missing from response';
+					}
 					$t = $by_id[$tid];
-					if ((int) $t['value'] !== TRIGGER_VALUE_FALSE) return false;
-					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) return false;
-					if ((int) $t['lastchange'] <= $prev_parent_lastchanges[$idx]) return false;
+					if ((int) $t['value'] !== $expected_value) {
+						return 'trigger '.$tid.' value '.$t['value'].', expected '.$expected_value;
+					}
+					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) {
+						return 'trigger '.$tid.' state '.$t['state'].', expected NORMAL';
+					}
 				}
 				return true;
 			}
 		);
-		$this->waitForAllTriggerEventCounts($parent_ids, $parent_event_count + 2);
+	}
 
+	private function waitForParentsValueAndLastchange(array $parent_ids, array $prev_parent_lastchanges,
+			int $expected_value): void {
 		$this->callUntilDataIsPresent('trigger.get', [
-			'triggerids' => $dep_ids,
-			'output' => ['triggerid', 'value', 'state']
+			'triggerids' => $parent_ids,
+			'output' => ['triggerid', 'value', 'lastchange', 'state']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-			function ($response) use ($dep_ids) {
+			function ($response) use ($parent_ids, $prev_parent_lastchanges, $expected_value) {
 				$by_id = array_column($response['result'], null, 'triggerid');
-				foreach ($dep_ids as $tid) {
-					if (!isset($by_id[$tid])) return false;
+				foreach ($parent_ids as $idx => $tid) {
+					if (!isset($by_id[$tid])) {
+						return 'trigger '.$tid.' missing from response';
+					}
 					$t = $by_id[$tid];
-					if ((int) $t['value'] !== TRIGGER_VALUE_FALSE) return false;
-					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) return false;
+					if ((int) $t['value'] !== $expected_value) {
+						return 'trigger '.$tid.' value '.$t['value'].', expected '.$expected_value;
+					}
+					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) {
+						return 'trigger '.$tid.' state '.$t['state'].', expected NORMAL';
+					}
+					if ((int) $t['lastchange'] <= $prev_parent_lastchanges[$idx]) {
+						return 'trigger '.$tid.' lastchange '.$t['lastchange'].
+								' not advanced past '.$prev_parent_lastchanges[$idx];
+					}
 				}
 				return true;
 			}
@@ -2079,6 +2499,32 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	public function triggerCEP_Cleanup() {
+		// Send empty log LLD data to remove the discovered log item and trigger.
+		if (!empty(self::$discovered_log_triggerid)) {
+			$this->sendSenderValues([
+				[
+					'host' => self::HOST_NAME,
+					'key' => self::LOG_LLD_RULE_KEY,
+					'value' => json_encode(['data' => []])
+				]
+			], null, 0);
+
+			for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
+				$response = $this->call('trigger.get',
+					['triggerids' => [self::$discovered_log_triggerid], 'countOutput' => true]
+				);
+				if ($response['result'] == 0) {
+					self::$discovered_log_triggerid = null;
+					$this->reloadConfigurationCacheAndWaitForLogLine();
+					break;
+				}
+				sleep(self::WAIT_ITERATION_DELAY);
+			}
+
+			$this->assertNull(self::$discovered_log_triggerid,
+				'Discovered log trigger was not deleted after sending empty log LLD data.');
+		}
+
 		$triggerids = array_filter([self::$discovered_triggerid, self::$discovered_dep_triggerid]);
 
 		if (!$triggerids) {
@@ -2433,14 +2879,23 @@ class testTriggerCEP extends CIntegrationTest {
 			'triggerids' => $triggerids,
 			'output' => ['value', 'state']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) use ($triggerids) {
-			if (count($response['result']) !== count($triggerids)) {
-				return false;
+			$expected = count($triggerids);
+
+			if (count($response['result']) !== $expected) {
+				return 'expected '.$expected.' triggers, got '.count($response['result']);
 			}
+
+			$ok = 0;
 			foreach ($response['result'] as $trigger) {
-				if ((int) $trigger['value'] !== TRIGGER_VALUE_FALSE) {
-					return false;
+				if ((int) $trigger['value'] === TRIGGER_VALUE_FALSE) {
+					$ok++;
 				}
 			}
+
+			if ($ok !== $expected) {
+				return 'expected '.$expected.' triggers in OK state, got '.$ok;
+			}
+
 			return true;
 		});
 
@@ -2474,6 +2929,36 @@ class testTriggerCEP extends CIntegrationTest {
 			$this->assertEquals(TRIGGER_VALUE_FALSE, $triggers[$triggerid]['value'],
 				$prefix.'Expected trigger '.$triggerid.' to have value OK (0).');
 		}
+	}
+
+	/**
+	 * Poll the per-trigger CEP services until every one reports the expected status, then assert the
+	 * status and the number of open service problems. Each service has a single problem tag
+	 * (SERVICE_TAG=<component>) matching its trigger's events, so the service status and its service
+	 * problem events follow the trigger's problem state through the service manager:
+	 * TRIGGER_SEVERITY_DISASTER with one open problem per service while the trigger problem is open,
+	 * and ZBX_SEVERITY_OK with no open problems once it recovers.
+	 *
+	 * @param int    $expected_status        ZBX_SEVERITY_* expected for every service
+	 * @param int    $expected_open_problems open service problems expected across all services
+	 */
+	private function assertServicesStatus(int $expected_status, int $expected_open_problems): void {
+		$serviceids = self::$serviceids;
+
+		// Service status reflects the matched trigger problem severity (or OK after recovery). The poll
+		// fails if all services do not reach $expected_status in time.
+		$this->callUntilCountIsPresent('service.get', [
+			'serviceids' => $serviceids,
+			'filter' => ['status' => $expected_status]
+		], count($serviceids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+
+		// One open service problem per service while in problem state; none after recovery. The poll
+		// fails if the open service problem count does not reach $expected_open_problems in time.
+		$this->callUntilCountIsPresent('problem.get', [
+			'objectids' => $serviceids,
+			'object' => EVENT_OBJECT_SERVICE,
+			'source' => EVENT_SOURCE_SERVICE
+		], $expected_open_problems, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
 	private function currentNs(): int {
@@ -2544,6 +3029,16 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	public static function clearData(): void {
+		if (!empty(self::$service_actionid)) {
+			CDataHelper::call('action.delete', [self::$service_actionid]);
+			self::$service_actionid = null;
+		}
+
+		if (!empty(self::$serviceids)) {
+			CDataHelper::call('service.delete', self::$serviceids);
+			self::$serviceids = [];
+		}
+
 		if (!empty(self::$correlationid)) {
 			CDataHelper::call('correlation.delete', [self::$correlationid]);
 			self::$correlationid = null;
@@ -2557,6 +3052,12 @@ class testTriggerCEP extends CIntegrationTest {
 		if (!empty(self::$hostid)) {
 			CDataHelper::call('host.delete', [self::$hostid]);
 			self::$hostid = null;
+		}
+
+		// Deleted after the host it is linked to (self::$hostid) has been removed.
+		if (!empty(self::$log_templateid)) {
+			CDataHelper::call('template.delete', [self::$log_templateid]);
+			self::$log_templateid = null;
 		}
 
 		if (!empty(self::$templateid)) {

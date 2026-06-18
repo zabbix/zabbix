@@ -251,7 +251,7 @@ static void	cep_operation_event_add_tag(const zbx_cep_operation_t *op, zbx_cep_e
 		cep_acknowledge_update_tag(ack, op->type, NULL, NULL, op->args.add_tag.tag, op->args.add_tag.value);
 		tag_local.tag = zbx_strdup(NULL, op->args.add_tag.tag);
 		tag_local.value = zbx_strdup(NULL, op->args.add_tag.value);
-		zbx_vector_tag_append(&(*event)->tags, tag_local);
+		zbx_vector_lite_tag_append(&(*event)->tags, tag_local);
 
 		ctx->sync_flags |= CEP_SYNC_EVENT_TAGS;
 	}
@@ -279,7 +279,7 @@ static void	cep_operation_event_set_tag(const zbx_cep_operation_t *op, zbx_cep_e
 					op->args.add_tag.value);
 			tag_local.tag = zbx_strdup(NULL, op->args.set_tag.tag);
 			tag_local.value = zbx_strdup(NULL, op->args.set_tag.value);
-			zbx_vector_tag_append(&(*event)->tags, tag_local);
+			zbx_vector_lite_tag_append(&(*event)->tags, tag_local);
 		}
 		else
 		{
@@ -416,7 +416,7 @@ static void	cep_operation_event_remove_tag(const zbx_cep_operation_t *op, zbx_ce
 		cep_acknowledge_update_tag(ack, op->type, tag->tag, tag->value, NULL, NULL);
 		zbx_free(tag->tag);
 		zbx_free(tag->value);
-		zbx_vector_tag_remove_noorder(&(*event)->tags, index);
+		zbx_vector_lite_tag_remove_noorder(&(*event)->tags, index);
 		ctx->sync_flags |= CEP_SYNC_EVENT_TAGS;
 	}
 out:

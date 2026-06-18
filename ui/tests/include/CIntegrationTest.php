@@ -1265,10 +1265,15 @@ class CIntegrationTest extends CAPITest {
 		$count_params = array_merge($params, ['countOutput' => true]);
 		$exception = null;
 		$usleep_total = 0;
+		$last_count = null;
 		$start = microtime(true);
 		for ($i = 0; $i < $iterations; $i++) {
 			try {
 				$response = $this->call($method, $count_params);
+
+				if (isset($response['result'])) {
+					$last_count = $response['result'];
+				}
 
 				$callback_ok = ($callback === null || call_user_func($callback, $response) === true);
 
@@ -1301,7 +1306,8 @@ class CIntegrationTest extends CAPITest {
 			throw $exception;
 		}
 
-		$message = 'Count requested from '.$method.' API did not match expected count ('.$expected_count.') within '.
+		$message = 'Count requested from '.$method.' API did not match expected count ('.$expected_count.', '.
+				'last count '.($last_count === null ? 'unknown' : $last_count).') within '.
 				'specified interval. Params used:'."\n".json_encode($params);
 		if (isset($response)) {
 			$message .= "\nLast response:\n".json_encode($response);

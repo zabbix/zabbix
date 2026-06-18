@@ -145,6 +145,7 @@ window.ceprule_edit_popup = new class {
 					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][operator]" type="hidden" value="#{operator}"/>
 					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][severity]" type="hidden" value="#{severity}"/>
 					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][event_name]" type="hidden" value="#{event_name}"/>
+					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][tag_operator]" type="hidden" value="#{tag_operator}"/>
 					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][tag]" type="hidden" value="#{tag}"/>
 					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][tag_value]" type="hidden" value="#{tag_value}"/>
 					<input type="hidden" data-field-type="hidden" name="filter[conditions][#{formulaid}][host]" type="hidden" value="#{host}"/>
@@ -206,7 +207,7 @@ window.ceprule_edit_popup = new class {
 				e.target.closest('tr').remove();
 				this.form.discoverAllFields();
 
-				if (this.form.findFieldByName('filter[conditions]').getValue() === undefined) {
+				if (!window['ceprule-filter-conditions'].querySelector('[data-formulaid]')) {
 					this.#condition_row_index = 0;
 				}
 
@@ -575,12 +576,13 @@ window.ceprule_edit_popup = new class {
 
 		if (is_new) {
 			condition = {
-				formulaid: this.#indexToFormulaId(this.#condition_row_index++),
+				formulaid: this.#indexToFormulaId(this.#condition_row_index),
 				type: '<?= CCepRuleHelper::CONDITION_EVENT_NAME ?>',
 				operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
 				host_group: '',
 				host: '',
 				severity: '<?= TRIGGER_SEVERITY_INFORMATION ?>',
+				tag_operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
 				tag: '',
 				tag_value: '',
 				time_period: ''
@@ -612,6 +614,7 @@ window.ceprule_edit_popup = new class {
 								overlayDialogueDestroy(overlay.dialogueid);
 
 								is_new && this.#addConditionRow(fields) || this.#editConditionRow(fields);
+								is_new && (this.#condition_row_index++);
 
 								this.form.discoverAllFields();
 								this.form_element.dispatchEvent(new Event('filter.change'));
@@ -897,14 +900,18 @@ window.ceprule_edit_popup = new class {
 			array_column(CSeverityHelper::getSeverities(), 'label', 'value')
 		) ?>');
 
-		const operator_name = operator_names[condition.operator];
+		const operator_name = condition.type == <?= CCepRuleHelper::CONDITION_TAG ?>
+			? operator_names[condition.tag_operator]
+			: operator_names[condition.operator];
 		const arguments_name = (function condition_arguments(condition) {
 			if (condition.type == <?= CCepRuleHelper::CONDITION_EVENT_NAME ?>) {
 				return condition.event_name;
 			}
 
-			if (condition.type == <?= CCepRuleHelper::CONDITION_TAG_NAME ?>) {
-				return condition.tag;
+			if (condition.type == <?= CCepRuleHelper::CONDITION_TAG ?>) {
+				return (condition.tag_operator == <?= CONDITION_OPERATOR_EXISTS ?> ||
+						condition.tag_operator == <?= CONDITION_OPERATOR_NOT_EXISTS ?>)
+					? condition.tag : `${condition.tag}:${condition.tag_value}`;
 			}
 
 			if (condition.type == <?= CCepRuleHelper::CONDITION_TAG_VALUE ?>) {

@@ -37,7 +37,7 @@ ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
 ZBX_PTR_VECTOR_IMPL(escalation_new_ptr, zbx_escalation_new_t *)
 ZBX_PTR_VECTOR_IMPL(item_diff_ptr, zbx_item_diff_t *)
 ZBX_PTR_VECTOR_IMPL(trigger_diff_ptr, zbx_trigger_diff_t *)
-ZBX_VECTOR_IMPL(db_event_suppress, zbx_db_event_suppress_t)
+ZBX_VECTOR_LITE_IMPL(db_event_suppress, zbx_db_event_suppress_t)
 
 void	zbx_item_diff_free(zbx_item_diff_t *item_diff)
 {

@@ -90,7 +90,7 @@ static void	cep_manager_free(zbx_cep_manager_t *manager)
 		}
 	}
 
-	cep_api_destroy();
+	zbx_cep_api_release();
 
 	zbx_vector_mw_task_ptr_clear_ext(&manager->commits, cep_task_free);
 	zbx_vector_mw_task_ptr_destroy(&manager->commits);
@@ -144,8 +144,10 @@ static zbx_cep_manager_t	*cep_manager_create(const zbx_thread_info_t *info, zbx_
 		goto out;
 	}
 
-	if (FAIL == cep_api_init(error))
+	if (FAIL == cep_api_create(error))
 		goto out;
+
+	zbx_cep_api_acquire();
 
 	cep_cache_acquire(&cep);
 	cep_init(cep, dbpool);

@@ -19,6 +19,7 @@
 
 #include "../server_constants.h"
 
+#include "zabbix_server/cep/cep_api.h"
 #include "zabbix_server/cep/zbx_cep.h"
 #include "zbx_cep_client.h"
 #include "zbxcommon.h"
@@ -3504,7 +3505,8 @@ void	*zbx_service_manager_thread(void *args)
 	recalculate_services(&service_manager, unit_args->shared->dbpool);
 	zbx_dbconn_pool_release_connection(unit_args->shared->dbpool, db);
 
-	zbx_dc_config_local_addref();
+	zbx_dc_config_local_acquire();
+	zbx_cep_api_acquire();
 
 	zbx_supervisor_update_activity("%s #%d started", get_process_type_string(process_type), process_num);
 	zbx_supervisor_set_process_running(server_num);
@@ -3652,6 +3654,7 @@ void	*zbx_service_manager_thread(void *args)
 			break;
 	}
 
+	zbx_cep_api_release();
 	zbx_dc_config_local_release();
 
 	zbx_ipc_service_close(&service);

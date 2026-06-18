@@ -176,7 +176,7 @@ typedef struct
 }
 zbx_db_event_suppress_t;
 
-ZBX_VECTOR_DECL(db_event_suppress, zbx_db_event_suppress_t)
+ZBX_VECTOR_LITE_DECL(db_event_suppress, zbx_db_event_suppress_t)
 
 typedef struct
 {

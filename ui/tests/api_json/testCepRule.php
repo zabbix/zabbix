@@ -999,7 +999,7 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/type": value must be one of '.implode(', ', [
 					CCepRuleHelper::CONDITION_EVENT_NAME,
-					CCepRuleHelper::CONDITION_TAG_NAME,
+					CCepRuleHelper::CONDITION_TAG,
 					CCepRuleHelper::CONDITION_TAG_VALUE,
 					CCepRuleHelper::CONDITION_SEVERITY,
 					CCepRuleHelper::CONDITION_HOST,
@@ -1062,7 +1062,7 @@ class testCepRule extends CAPITest {
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TAG_NAME,
+							'type' => CCepRuleHelper::CONDITION_TAG,
 							'tag' => 123
 						]
 					]
@@ -1081,7 +1081,7 @@ class testCepRule extends CAPITest {
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TAG_NAME,
+							'type' => CCepRuleHelper::CONDITION_TAG,
 							'tag' => ''
 						]
 					]
@@ -1158,7 +1158,7 @@ class testCepRule extends CAPITest {
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TAG_NAME,
+							'type' => CCepRuleHelper::CONDITION_TAG,
 							'tag' => 'abc',
 							'tag_value' => 'abc'
 						]
@@ -1373,7 +1373,7 @@ class testCepRule extends CAPITest {
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TAG_NAME
+							'type' => CCepRuleHelper::CONDITION_TAG
 						]
 					]
 				],
@@ -3111,7 +3111,7 @@ class testCepRule extends CAPITest {
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TAG_NAME,
+							'type' => CCepRuleHelper::CONDITION_TAG,
 							'operator' => CONDITION_OPERATOR_LIKE,
 							'tag' => ''
 						]
@@ -3135,7 +3135,7 @@ class testCepRule extends CAPITest {
 					'filter' => [
 						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TAG_NAME,
+							'type' => CCepRuleHelper::CONDITION_TAG,
 							'operator' => CONDITION_OPERATOR_NOT_LIKE,
 							'tag' => ''
 						]

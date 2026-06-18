@@ -73,18 +73,37 @@ window.ceprule_window_condition_edit_popup = new class {
 	}
 
 	#handleTypeChanged(type) {
-		const content = this.#templates[type];
-		const form_grid = this.form_element.querySelector('.form-grid');
+		const condition_type_operators = {
+			[<?= CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR ?>]: [
+				<?= CONDITION_OPERATOR_EQUAL ?>
+			],
+			[<?= CCepRuleHelper::WINDOW_CONDITION_OLD_TAG ?>]: [
+				<?= CONDITION_OPERATOR_EQUAL ?>
+			],
+			[<?= CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE ?>]: [
+				<?= CONDITION_OPERATOR_EQUAL ?>,
+				<?= CONDITION_OPERATOR_NOT_EQUAL ?>
+			]
+		};
+		[...window['ceprule-window-condition-operator'].querySelectorAll('input')].map((node) => {
+			const is_type_option = condition_type_operators[Number(type)].includes(Number(node.value));
 
-		this.#live_nodes.forEach(node => {
-			this.#template.append(node);
+			node.disabled = !is_type_option;
+			node.closest('li').style.display = is_type_option ? '' : 'none';
 		});
-		this.#live_nodes = [];
-		Array.from(content.children).forEach(node => {
-			form_grid.appendChild(node);
-			this.#live_nodes.push(node);
+
+		const radio_inputs = [...window['ceprule-window-condition-operator'].querySelectorAll('input:not([disabled])')];
+
+		if (!radio_inputs.filter(node => node.checked).length) {
+			radio_inputs[0].checked = true;
+		}
+
+		[...this.form_element.querySelectorAll('[for-type]')].map((field) => {
+			const is_visible = Number(type) === Number(field.getAttribute('for-type'));
+
+			field.style.display = is_visible ? '' : 'none';
+			field.previousElementSibling.style.display = is_visible ? '' : 'none';
+			field.querySelector('input').disabled = !is_visible;
 		});
-		this.#template = content;
-		this.form.discoverAllFields();
 	}
 };

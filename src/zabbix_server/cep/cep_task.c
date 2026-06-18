@@ -15,6 +15,7 @@
 #include "cep_task.h"
 #include "cep.h"
 #include "cep_rule_op_event.h"
+#include "zabbix_server/cep/zbx_cep.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxcommon.h"
@@ -91,6 +92,7 @@ static void	cep_task_event_init(zbx_cep_task_event_t *task, zbx_db_event *event)
 	task->obj_value = TRIGGER_VALUE_NONE;
 	task->userid = 0;
 	zbx_vector_cep_event_update_create(&task->updates);
+	task->event = NULL;
 }
 
 /******************************************************************************
@@ -129,6 +131,9 @@ static void	cep_task_event_clear(zbx_cep_task_event_t *task)
 	zbx_vector_cep_event_update_destroy(&task->updates);
 
 	zbx_db_free_event(task->db_event);
+
+	if (NULL != task->event)
+		zbx_cep_event_release(task->event);
 }
 
 /******************************************************************************

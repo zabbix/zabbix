@@ -46,7 +46,7 @@ void	zbx_dc_config_local_init(void)
  *           that uses the configuration cache.                               *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_config_local_addref(void)
+void	zbx_dc_config_local_acquire(void)
 {
 	atomic_fetch_add(&config_local_refcount, 1);
 }

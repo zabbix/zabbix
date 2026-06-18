@@ -28,6 +28,7 @@
 #include "zbxhash.h"
 #include "zbxlog.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
 #include "zbxtypes_ext.h"
 
 /*
@@ -50,6 +51,9 @@
  * - Under the same mutex, replace the handle’s zbx_cep_event_t * with the new one
  *   and release the old zbx_cep_event_t.
  */
+
+ZBX_VECTOR_LITE_IMPL(lite_tag, zbx_tag_t)
+ZBX_VECTOR_LITE_IMPL(lite_uint64, zbx_uint64_t)
 
 ZBX_VECTOR_IMPL(cep_event, zbx_cep_event_t)
 ZBX_PTR_VECTOR_IMPL(cep_event_ptr, zbx_cep_event_t *)
@@ -104,7 +108,7 @@ struct zbx_cep
 	zbx_hashset_t			objects;
 
 	zbx_uint64_t			eventid_next;
-	zbx_uint64_t			eventid_last;
+	zbx_uint64_t			eventid_max;
 
 	zbx_dbconn_pool_t		*dbpool;
 
@@ -268,13 +272,15 @@ static zbx_uint64_t	cep_eventid_next(zbx_cep_t *cep)
 {
 #define CEP_EVENTID_BATCH_SIZE	1000
 
-	if (cep->eventid_next == cep->eventid_last)
+	if (cep->eventid_next == cep->eventid_max)
 	{
 		zbx_dbconn_t	*db = zbx_dbconn_pool_acquire_connection(cep->dbpool);
 
 		cep->eventid_next = zbx_dbconn_get_maxid_num(db, "events", CEP_EVENTID_BATCH_SIZE);
 
 		zbx_dbconn_pool_release_connection(cep->dbpool, db);
+
+		cep->eventid_max = cep->eventid_next + CEP_EVENTID_BATCH_SIZE;
 	}
 
 	return cep->eventid_next++;
@@ -398,6 +404,7 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 	zbx_uint64_t		eventid = 0;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
+	int			events_num;
 
 	zbx_vector_uint64_create(&eventids);
 
@@ -405,6 +412,7 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 	{
 		zbx_cep_origin_t	origin;
 
+		events_num = 0;
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select p.eventid,p.clock,p.severity,p.ns,p.source,p.object,p.objectid,p.name"
@@ -437,10 +445,11 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 			zbx_vector_cep_event_handle_append(&obj->events, zbx_cep_event_handle_addref(h));
 
 			zbx_vector_uint64_append(&eventids, eventid);
+			events_num++;
 		}
 		zbx_db_free_result(result);
 	}
-	while (0 != eventids.values_num && 0 == (eventids.values_num % CEP_PROBLEM_BATCH));
+	while (CEP_PROBLEM_BATCH == events_num);
 
 	if (0 != eventids.values_num)
 	{
@@ -469,7 +478,7 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 
 			tag.tag = zbx_strdup(NULL, row[1]);
 			tag.value = zbx_strdup(NULL, row[2]);
-			zbx_vector_tag_append(&event->tags, tag);
+			zbx_vector_lite_tag_append(&event->tags, tag);
 		}
 		zbx_db_large_query_clear(&query);
 	}
@@ -542,7 +551,7 @@ static zbx_item_diff_t	*item_diff_create_error(zbx_uint64_t itemid, const char *
 	diff->flags = ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
 	diff->state = ITEM_STATE_NOTSUPPORTED;
 	zbx_sha512_hash(error, diff->error_hash);
-	diff->error = zbx_strdup(NULL, error);
+	diff->error = error;
 
 	return diff;
 }
@@ -1550,7 +1559,7 @@ static int	cep_event_validate_new_tags(zbx_cep_event_handle_t h, zbx_vector_tag_
 {
 	for (int i = 0; i < tags->values_num;)
 	{
-		if (FAIL != zbx_vector_tag_search(&h->event->tags, tags->values[i], tag_compare))
+		if (FAIL != zbx_vector_lite_tag_search(&h->event->tags, tags->values[i], tag_compare))
 		{
 			zbx_free(tags->values[i].tag);
 			zbx_free(tags->values[i].value);
@@ -1582,7 +1591,7 @@ static void	cep_event_add_tags(zbx_cep_event_handle_t h, const zbx_vector_tag_t 
 			.value = zbx_strdup(NULL, tags->values[i].value),
 		};
 
-		zbx_vector_tag_append(&event->tags, tag_local);
+		zbx_vector_lite_tag_append(&event->tags, tag_local);
 	}
 }
 

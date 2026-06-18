@@ -11,6 +11,6 @@
 [x] Event details -> Event details. If CEP rule closed this problem "Resolved by": "complex event processing rule" "link to correlation rule" or "complex event processing rule"
 [x] Problems view. The info column shows the same green [i] icon and upon hover either one of messages is shown: Resolved by event correlation rule "<name>". Resolved by complex event processing rule "<name>". (this is new translation string)
 [ ] In conditions merge tag-name and tag-value similar as in problems filter
-[ ] In tags list, hide input for exists operator
+[x] In tags list, hide input for exists operator
 [x] PR review
 [ ] PR review 2

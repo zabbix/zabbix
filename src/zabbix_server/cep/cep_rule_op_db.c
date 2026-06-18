@@ -38,7 +38,7 @@
  *                                                                            *
  ******************************************************************************/
 static zbx_db_event	*cep_db_event_create(const zbx_cep_origin_t *origin, const char *name, int clock, int ns,
-		int serverity, int value, const zbx_vector_tag_t *tags)
+		int serverity, int value, const zbx_vector_lite_tag_t *tags)
 {
 	zbx_db_event	*db_event;
 

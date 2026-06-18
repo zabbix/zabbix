@@ -505,6 +505,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	zbx_vector_mw_task_ptr_destroy(&tasks);
 
 	task->event_op = CEP_EVENT_OPEN;
+	task->event = cep_event_addref(event);
 
 	if (0 != zbx_dc_local_get_itservices_num() && CEP_ACTION_DISABLED != task->action_state)
 	{
@@ -548,16 +549,16 @@ static void	cep_worker_resolve_trigger_events(zbx_db_event *db_event, zbx_uint64
 	db_event->eventid = r_eventid;
 
 	zbx_cep_event_t	*r_event = cep_event_create(db_event->eventid, EVENT_SOURCE_TRIGGERS,
-		EVENT_OBJECT_TRIGGER, db_event->trigger.triggerid, db_event->name, db_event->clock, db_event->ns,
+		EVENT_OBJECT_TRIGGER, db_event->objectid, db_event->name, db_event->clock, db_event->ns,
 		TRIGGER_VALUE_OK, db_event->severity, &db_event->tags, db_event->suppress);
 
 	cep_cache_acquire(&cep);
 	cep_resolve_trigger_events(cep, r_event, handles);
 	cep_cache_release(&cep);
 
-	zbx_cep_event_release(r_event);
-
+	task->event = r_event;
 	task->event_op = CEP_EVENT_CLOSE;
+
 	zbx_cep_get_eventids_from_handles(handles->values, handles->values_num, &task->eventids);
 
 	if (0 != zbx_dc_local_get_itservices_num() && CEP_ACTION_DISABLED != task->action_state)
@@ -668,6 +669,7 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 	cep_stats_update_events_processed(1);
 
 	task->event_op = CEP_EVENT_OPEN;
+	task->event = cep_event_addref(event);
 
 	return;
 }
@@ -699,6 +701,9 @@ static void	cep_worker_close_internal_event(zbx_cep_task_event_t *task)
 
 	db_event->eventid = eventid;
 	task->event_op = CEP_EVENT_CLOSE;
+	task->event = cep_event_create(db_event->eventid, db_event->source, db_event->object,
+			db_event->objectid, db_event->name, db_event->clock, db_event->ns,
+			db_event->value, db_event->severity, &db_event->tags, db_event->suppress);
 
 	return;
 }
@@ -967,7 +972,7 @@ void	*cep_worker_entry(void *args)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		worker->problem_export = zbx_problems_export_init("event-processor", worker->base.id);
 
-	zbx_dc_config_local_addref();
+	zbx_dc_config_local_acquire();
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 	zbx_supervisor_update_activity("%s running", worker->base.name);

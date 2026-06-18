@@ -86,6 +86,10 @@ abstract class CControllerCepRuleGeneral extends CController {
 		if (array_key_exists('filter', $request)) {
 			if (array_key_exists('conditions', $request['filter'])) {
 				array_walk($request['filter']['conditions'], function (array &$condition) {
+					$condition['operator'] = $condition['type'] == CCepRuleHelper::CONDITION_TAG
+						? $condition['tag_operator']
+						: $condition['operator'];
+					unset($condition['tag_operator']);
 					unset($condition['formulaid']);
 				});
 				$request['filter']['conditions'] = array_values($request['filter']['conditions']);
@@ -323,26 +327,23 @@ abstract class CControllerCepRuleGeneral extends CController {
 
 	public static function getConditionValidationFields(): array {
 		return [
-			'type' => ['integer', 'required', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME, CCepRuleHelper::CONDITION_TAG_NAME, CCepRuleHelper::CONDITION_TAG_VALUE, CCepRuleHelper::CONDITION_SEVERITY, CCepRuleHelper::CONDITION_HOST, CCepRuleHelper::CONDITION_HOST_GROUP, CCepRuleHelper::CONDITION_TIME_PERIOD]],
+			'type' => ['integer', 'required', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME,
+				CCepRuleHelper::CONDITION_TAG, CCepRuleHelper::CONDITION_SEVERITY, CCepRuleHelper::CONDITION_HOST,
+				CCepRuleHelper::CONDITION_HOST_GROUP, CCepRuleHelper::CONDITION_TIME_PERIOD
+			]],
 			'operator' => [
 				[
-					'integer', 'required',
-					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE],
-					'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME, CCepRuleHelper::CONDITION_HOST, CCepRuleHelper::CONDITION_HOST_GROUP]]
+					'integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
+						CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
+					],
+					'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME,
+						CCepRuleHelper::CONDITION_HOST, CCepRuleHelper::CONDITION_HOST_GROUP
+					]]
 				],
 				[
-					'integer', 'required',
-					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EXISTS],
-					'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_NAME]]
-				],
-				[
-					'integer', 'required',
-					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_MORE_EQUAL],
-					'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]]
-				],
-				[
-					'integer', 'required',
-					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_MORE_EQUAL],
+					'integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
+						CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_MORE_EQUAL
+					],
 					'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_SEVERITY]]
 				],
 				[
@@ -354,11 +355,17 @@ abstract class CControllerCepRuleGeneral extends CController {
 			'event_name' => ['db cep_condition.event_name', 'required', 'not_empty',
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME]]
 			],
-			'tag' => ['db cep_condition.tag', 'required', 'not_empty', // tag name can never be empty, whilst such case may be still be evaluated correctly with CEP condition operators.
-				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_NAME]]
+			'tag_operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
+					CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS,
+					CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL
+				],
+				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
 			],
-			'tag_value' => ['db cep_condition.tag_value', 'required',
-				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG_VALUE]]
+			'tag' => ['db cep_condition.tag', 'required', 'not_empty',
+				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
+			],
+			'tag_value' => ['db cep_condition.tag_value',
+				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
 			],
 			'host' => ['db cep_condition.host', 'required', 'not_empty',
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST]]
@@ -367,18 +374,15 @@ abstract class CControllerCepRuleGeneral extends CController {
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST_GROUP]]
 			],
 			'severity' => ['db cep_condition.severity', 'required',
-				'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
+				'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
+					TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_SEVERITY]]
 			],
 			'time_period' => ['db cep_condition.time_period', 'required', 'not_empty',
 				'use' => [CTimePeriodParser::class, ['usermacros' => false, 'lldmacros' => false]],
 				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
 			],
-			'formulaid' => ['string', 'required', 'not_empty',
-				// DEV ticket on relative order in depth:
-				// [RULES ERROR] Only fields defined prior to this can be used for "when" checks (Path: /formulaid)
-				/* 'when' => ['../evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]] */
-			]
+			'formulaid' => ['string', 'required', 'not_empty']
 		];
 	}
 }

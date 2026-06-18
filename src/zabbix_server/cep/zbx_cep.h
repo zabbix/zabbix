@@ -39,6 +39,9 @@ zbx_cep_origin_t;
 
 typedef struct zbx_cep_event zbx_cep_event_t;
 
+ZBX_VECTOR_LITE_DECL(lite_tag, zbx_tag_t)
+ZBX_VECTOR_LITE_DECL(lite_uint64, zbx_uint64_t)
+
 struct zbx_cep_event
 {
 	zbx_uint64_t			eventid;
@@ -53,7 +56,7 @@ struct zbx_cep_event
 
 	zbx_cep_origin_t		origin;
 
-	zbx_vector_tag_t		tags;
+	zbx_vector_lite_tag_t		tags;
 	zbx_vector_db_event_suppress_t	suppress;
 
 	zbx_atomic_uint32_t		refcount;
@@ -90,6 +93,8 @@ zbx_cep_event_update_t;
 
 ZBX_VECTOR_DECL(cep_event_update, zbx_cep_event_update_t)
 
+void	zbx_cep_release_update_channel(void);
+void	zbx_cep_acquire_update_channel(void);
 int	zbx_cep_recv_event_updates(zbx_cep_event_update_t *updates, int updates_num);
 
 void	zbx_cep_event_release(zbx_cep_event_t *event);
