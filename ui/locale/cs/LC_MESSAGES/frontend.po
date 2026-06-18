@@ -151,6 +151,12 @@ msgstr "%1$s znaků"
 msgid "%1$s characters remaining"
 msgstr "%1$s zbývá znaků"
 
+#: app/views/administration.housekeeping.edit.php:165
+#: app/views/administration.housekeeping.edit.php:166
+#, c-format
+msgid "%1$s data storage period"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
 #, c-format
@@ -1701,6 +1707,11 @@ msgstr "Pozadí oblouku"
 #: widgets/gauge/includes/WidgetForm.php:305
 msgid "Arc size"
 msgstr "Velikost oblouku"
+
+#: jsLoader.php:267
+#, c-format
+msgid "Are you sure you want to delete %1$s? This action cannot be undone."
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -4871,6 +4882,11 @@ msgstr "Nelze aktualizovat web scénář"
 msgid "Cannot update web scenario step"
 msgstr "Krok webového scénáře nelze aktualizovat"
 
+#: include/classes/core/CConfigFile.php:192
+#, c-format
+msgid "Cannot use both %1$s and %2$s at the same time."
+msgstr ""
+
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
 msgstr "Rozlišovat velikost"
@@ -4914,6 +4930,10 @@ msgstr "Vprostřed"
 #: include/views/configuration.host.prototype.edit.php:505
 msgid "Certificate"
 msgstr "Certifikát"
+
+#: app/views/js/monitoring.latest.view.js.php:211
+msgid "Change"
+msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:78
 #: app/partials/monitoring.latest.view.html.php:91 include/items.inc.php:1577
@@ -5209,6 +5229,15 @@ msgstr "Kliknout a roztáhnout do požadované velikosti."
 msgid "Click to view or edit"
 msgstr "Kliknout pro zobrazení či úpravu"
 
+#: app/views/administration.housekeeping.edit.php:165
+msgid "ClickHouse"
+msgstr ""
+
+#: include/classes/api/managers/history/CClickHouseStorage.php:118
+#, c-format
+msgid "ClickHouse error: %1$s."
+msgstr ""
+
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
 msgstr "ID klienta"
@@ -5369,6 +5398,14 @@ msgstr "Barvy"
 #: widgets/topitems/views/column.edit.php:293
 msgid "Column aggregation function"
 msgstr "Sloupec agregační funkce"
+
+#: jsLoader.php:304
+msgid "Column list"
+msgstr ""
+
+#: jsLoader.php:273
+msgid "Column name"
+msgstr ""
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
@@ -6472,6 +6509,10 @@ msgstr "Vlastní velikost"
 msgid "Custom templates are not supported."
 msgstr "Vlastní šablony nejsou podporovány."
 
+#: jsLoader.php:270
+msgid "Customize table"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -7065,6 +7106,10 @@ msgstr "Smazat a vyčistit zvolené šablony? (Upozornění: tímto smažete vyb
 #: app/views/template.edit.php:309
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Smazat a vyčistit šablonu? (Pozor: všechny připojené hosty budou také vyčištěné!)"
+
+#: jsLoader.php:275
+msgid "Delete column"
+msgstr ""
 
 #: app/views/popup.action.edit.php:292
 msgid "Delete current action?"
@@ -8366,6 +8411,10 @@ msgstr "Duplicitní \"name\" hodnota \"%1$s\" pro mapu."
 msgid "Duplicate \"usrgrpid\" \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Duplicitní \"usrgrpid\" \"%1$s\" v uživatelských skupinách v mapě \"%2$s\"."
 
+#: jsLoader.php:274
+msgid "Duplicate column"
+msgstr ""
+
 #: include/classes/api/services/CHost.php:2096
 #: include/classes/api/services/CHost.php:2396
 #, c-format
@@ -8469,6 +8518,10 @@ msgstr "Datum účinnosti"
 #: app/partials/hostmacros.inherited.list.html.php:50
 msgid "Effective value"
 msgstr "Efektivní hodnota"
+
+#: app/views/administration.housekeeping.edit.php:166
+msgid "Elasticsearch"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1449
 #: include/classes/api/managers/CHistoryManager.php:1458
@@ -11909,6 +11962,12 @@ msgstr "Pro název proxy byly použity nesprávné znaky."
 msgid "Incorrect characters used for template name."
 msgstr "V názvu šablony byly použity nesprávné znaky."
 
+#: include/classes/core/CConfigFile.php:215
+#: include/classes/core/CConfigFile.php:411
+#, c-format
+msgid "Incorrect configuration %1$s: %2$s."
+msgstr ""
+
 #: include/classes/api/services/CUser.php:482
 msgid "Incorrect current password."
 msgstr "Nesprávné aktuální heslo."
@@ -11943,6 +12002,16 @@ msgstr "Nahraný neplatný soubor."
 #: include/triggers.inc.php:768
 msgid "Incorrect function is used"
 msgstr "Použití nesprávné funkce"
+
+#: include/classes/core/CConfigFile.php:211
+#: include/classes/core/CConfigFile.php:219
+#: include/classes/core/CConfigFile.php:557
+#: include/classes/core/CConfigFile.php:563
+#: include/classes/core/CConfigFile.php:569
+#: include/classes/core/CConfigFile.php:579
+#, c-format
+msgid "Incorrect history storage configuration %1$s: %2$s."
+msgstr ""
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -12482,6 +12551,10 @@ msgstr "Makra zděděná a makra hosta"
 msgid "Inherited and host prototype macros"
 msgstr "Makra zděděná a makra prototypu hosta"
 
+#: jsLoader.php:260
+msgid "Inherited and host prototype tag"
+msgstr ""
+
 #: include/classes/helpers/CTagHelper.php:230
 msgid "Inherited and host tag"
 msgstr "Zděděný tag a tag itemu"
@@ -12489,6 +12562,10 @@ msgstr "Zděděný tag a tag itemu"
 #: app/partials/configuration.tags.tab.php:42
 msgid "Inherited and host tags"
 msgstr "Zděděné tagy a tagy hosta"
+
+#: jsLoader.php:262
+msgid "Inherited and item prototype tag"
+msgstr ""
 
 #: include/classes/helpers/CTagHelper.php:231
 msgid "Inherited and item tag"
@@ -12513,6 +12590,10 @@ msgstr "Zděděná šablona a šablona itemu"
 #: app/partials/configuration.tags.tab.php:33
 msgid "Inherited and template tags"
 msgstr "Zděděné tagy a tagy itemů"
+
+#: jsLoader.php:264
+msgid "Inherited and trigger prototype tag"
+msgstr ""
 
 #: include/classes/helpers/CTagHelper.php:232
 msgid "Inherited and trigger tag"
@@ -13149,6 +13230,11 @@ msgstr "Neplatný výraz rozsahu."
 #: app/controllers/CControllerTemplateUpdate.php:104
 msgid "Invalid range."
 msgstr "Neplatný rozsah."
+
+#: app/controllers/CControllerDataTable.php:59
+#: app/controllers/CControllerDataTable.php:138
+msgid "Invalid request"
+msgstr ""
 
 #: include/classes/core/CJsonRpc.php:205
 msgid "Invalid request."
@@ -14542,6 +14628,21 @@ msgstr "Manuálně z: %1$s"
 #: include/actions.inc.php:1987
 msgid "Manually closed"
 msgstr "Manuál zavřen"
+
+#: app/controllers/CControllerProblemViewData.php:472
+#: include/actions.inc.php:1660 include/actions.inc.php:1661
+#: include/actions.inc.php:1698 include/actions.inc.php:2195
+#: include/html.inc.php:1135
+msgid "Manually suppressed"
+msgstr ""
+
+#: app/controllers/CControllerProblemViewData.php:475
+#: include/actions.inc.php:1674 include/actions.inc.php:1675
+#: include/actions.inc.php:1698 include/actions.inc.php:2200
+#: include/actions.inc.php:2201 include/blocks.inc.php:692
+#: widgets/problems/includes/WidgetProblems.php:280
+msgid "Manually unsuppressed"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: include/classes/data/CWidgetsData.php:110
@@ -15994,6 +16095,10 @@ msgstr "Další"
 msgid "Next dashboard"
 msgstr "Další dashboard"
 
+#: jsLoader.php:416
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -16007,6 +16112,10 @@ msgstr "Další stránka"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Další krok"
+
+#: jsLoader.php:414
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -16712,6 +16821,12 @@ msgstr "Žádné zděděné položky"
 msgid "Not linked"
 msgstr "Není propojeno"
 
+#: app/views/item.list.php:233 app/views/item.list.php:234
+#: include/classes/helpers/CItemHelper.php:386
+#: include/classes/helpers/CItemHelper.php:416
+msgid "Not stored"
+msgstr ""
+
 #: app/controllers/CControllerLatest.php:546
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.latest.filter.php:191
@@ -16866,6 +16981,10 @@ msgstr "Počet sezón"
 #: include/views/configuration.httpconf.list.php:143
 msgid "Number of steps"
 msgstr "Počet kroků"
+
+#: jsLoader.php:291
+msgid "Number of tags"
+msgstr ""
 
 #: app/partials/administration.system.info.php:60
 msgid "Number of templates"
@@ -19473,6 +19592,10 @@ msgstr "Potvrzení obnovení"
 msgid "Reset defaults"
 msgstr "Obnovit původní hodnoty"
 
+#: jsLoader.php:305
+msgid "Reset layout"
+msgstr ""
+
 #: widgets/geomap/Widget.php:37
 msgid "Reset to initial view"
 msgstr "Obnovit výchozí zobrazení"
@@ -20995,6 +21118,10 @@ msgstr "Zobrazit záhlaví"
 msgid "Show hosts in maintenance"
 msgstr "Zobrazit hostitele v servisním okně"
 
+#: jsLoader.php:281
+msgid "Show item key"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:158
 #: include/views/js/monitoring.sysmaps.js.php:698
 #: include/views/js/monitoring.sysmaps.js.php:813
@@ -21122,6 +21249,10 @@ msgstr "Zobrazit časové razítko"
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
 msgstr "Zobrazit celkovou hodnotu"
+
+#: jsLoader.php:285
+msgid "Show trigger expression"
+msgstr ""
 
 #: include/views/configuration.graph.edit.php:131
 msgid "Show triggers"
@@ -21859,6 +21990,10 @@ msgstr "Potlačit do"
 msgid "Suppressed"
 msgstr "Potlačeno"
 
+#: include/actions.inc.php:2241 include/html.inc.php:1134
+msgid "Suppressed by maintenance"
+msgstr ""
+
 #: include/actions.inc.php:2019 include/html.inc.php:1000
 #, c-format
 msgid "Suppressed till: %1$s"
@@ -22021,6 +22156,10 @@ msgstr "Tabulka \"%1$s\" neexistuje."
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr "Tabulka \"%1$s\" neobsahuje pole se jménem \"%2$s\"."
 
+#: jsLoader.php:303
+msgid "Table options"
+msgstr ""
+
 #: app/controllers/CControllerActionOperationCheck.php:210
 #: app/controllers/CControllerActionOperationCheck.php:216
 #: app/controllers/CControllerActionOperationCheck.php:228
@@ -22079,6 +22218,10 @@ msgstr "Jméno značky"
 #: app/controllers/CControllerTriggerUpdate.php:61
 msgid "Tag name and value combination is not unique."
 msgstr "Kombinace názvu a hodnoty tagu není jedinečná."
+
+#: jsLoader.php:292
+msgid "Tag name display"
+msgstr ""
 
 #: app/controllers/CControllerMaintenanceCreate.php:93
 #: app/controllers/CControllerMaintenanceUpdate.php:94
@@ -22769,6 +22912,10 @@ msgstr "Toto nastavení platí pouze pro číselná data."
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "Toto nastavení platí pouze pro číselná data. Nečíselná data budou vždy braná z historie."
 
+#: app/views/administration.housekeeping.edit.php:145
+msgid "This setting does not affect Elasticsearch and ClickHouse storage periods."
+msgstr ""
+
 #: app/partials/administration.system.info.php:212
 #: app/views/administration.housekeeping.edit.php:132
 msgid "This setting should be enabled, because history tables contain compressed chunks."
@@ -23169,6 +23316,11 @@ msgctxt "compact table header"
 msgid "Total"
 msgstr "Celkem"
 
+#: include/classes/debug/CProfiler.php:172
+#, c-format
+msgid "Total ClickHouse time: %1$s"
+msgstr ""
+
 #: include/classes/debug/CProfiler.php:153
 #, c-format
 msgid "Total Elasticsearch time: %1$s"
@@ -23258,6 +23410,11 @@ msgstr "Statistika mezipaměti funkce trendu. Platné parametry jsou: all, hits,
 #: widgets/tophosts/views/column.edit.php:206
 msgid "Trends"
 msgstr "Trendy"
+
+#: app/partials/item.edit.item.tab.php:774
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse."
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:257
 #: app/views/reports.toptriggers.list.php:120 app/views/trigger.edit.php:54
@@ -24202,6 +24359,10 @@ msgstr "Zrušit potlačení"
 msgid "Unsuppressed"
 msgstr "Nepotlačeno"
 
+#: include/actions.inc.php:2257
+msgid "Unsuppressed by maintenance"
+msgstr ""
+
 #: include/blocks.inc.php:670 include/classes/screens/CScreenProblem.php:1425
 #: widgets/problems/includes/WidgetProblems.php:278
 #, c-format
@@ -24382,6 +24543,11 @@ msgstr "Doba provozu Zabbix server procesů v sekundách."
 #: include/actions.inc.php:61
 msgid "Uptime/Downtime"
 msgstr "Doba dostupnosti/nedostupnosti"
+
+#: app/partials/administration.system.info.php:328
+#, c-format
+msgid "Use %1$s instead"
+msgstr ""
 
 #: app/views/popup.ldap.edit.php:173
 msgid "Use %{ref} in group filter to reference value of this user attribute."
@@ -26253,6 +26419,10 @@ msgstr "Vaše databáze nefunguje správně. Počkejte prosím několik minut a 
 msgid "Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?"
 msgstr "Váš postup bude zahozen a Průvodce hostem bude ukončen. Opravdu chcete zrušit?"
 
+#: jsLoader.php:307
+msgid "Your table settings will be reset to default and duplicated columns will be removed."
+msgstr ""
+
 #: include/page_header.php:122
 msgid "Zabbix"
 msgstr "Zabbix"
@@ -27331,6 +27501,10 @@ msgstr "neexistuje"
 msgid "does not match"
 msgstr "nesouhlasí"
 
+#: jsLoader.php:268
+msgid "duplicate"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr "e() - Vrátí Eulerovo číslo"
@@ -27435,6 +27609,10 @@ msgstr "fuzzytime() - Rozdíl mezi hodnotou položky (časovou značkou) a časo
 #: include/classes/validators/CApiInputValidator.php:3317
 msgid "geographical coordinates (values of comma separated latitude and longitude) are expected"
 msgstr "očekávají se zeměpisné souřadnice (hodnoty zemepisné šířky a delky oddělené čárkou)"
+
+#: app/views/item.edit.php:224 app/views/item.edit.php:228
+msgid "global housekeeping settings"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.edit.php:891
@@ -27594,6 +27772,11 @@ msgstr "neplatný počet prvků"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "nesprávný výraz začínající od \"%1$s\""
+
+#: include/classes/core/CConfigFile.php:212
+#: include/classes/core/CConfigFile.php:220
+msgid "incorrect format"
+msgstr ""
 
 #: jsLoader.php:298
 msgid "incorrect item value type"

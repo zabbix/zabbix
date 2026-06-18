@@ -65,7 +65,7 @@ class CFieldMultiline extends CField {
 	}
 
 	lock() {
-		if ($(this._field).prop('disabled')) {
+		if ($(this._field).data().multilineInput.options.disabled) {
 			return false;
 		}
 

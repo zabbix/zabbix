@@ -403,15 +403,15 @@ window.itemtestedit_view_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-
 				if ('form_errors' in response) {
 					this.#form.setErrors(response.form_errors, true, true);
 					this.#form.renderErrors();
 
 					return;
+				}
+
+				if ('error' in response) {
+					this.#ajaxExceptionHandler(response)
 				}
 
 				success_callback(response);
@@ -505,7 +505,7 @@ window.itemtestedit_view_popup = new class {
 			const template = new Template(this.#form_element.querySelector('#preprocessing-step-error-icon').innerHTML);
 
 			return template.evaluateToElement({
-				error: escapeHtml(step.error) || <?= json_encode(_('<empty string>')) ?>
+				error: escapeHtml(step.error || <?= json_encode(_('<empty string>')) ?>)
 			});
 		}
 

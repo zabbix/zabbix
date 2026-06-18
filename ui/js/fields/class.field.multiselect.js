@@ -18,7 +18,7 @@ class CFieldMultiselect extends CField {
 	init() {
 		super.init();
 
-		$('button, input[type="text"]', this._field.parentNode).on('blur', () => {
+		$(this._field.parentNode).on('blur', 'button, input[type="text"]', () => {
 			this.validate_if_no_focus = setTimeout(() => {
 				if (!this._field.isConnected || $(this._field).multiSelect('getOption', 'disabled') === true) {
 					return;
@@ -34,7 +34,7 @@ class CFieldMultiselect extends CField {
 			}, 250);
 		});
 
-		$('input[type="text"]', this._field.parentNode).on('focusin', () => {
+		$(this._field.parentNode).on('focusin', 'input[type="text"]', () => {
 			clearTimeout(this.validate_if_no_focus);
 			this.validate_if_no_focus = null;
 		});
@@ -83,14 +83,12 @@ class CFieldMultiselect extends CField {
 
 	getExtraFields() {
 		const return_id = $(this._field).multiSelect('getOption', 'selectedLimit') == 1;
-		const values = $(this._field).multiSelect('getOption', 'addNew')
-			? {
-				[this.getName()]: return_id ? null : [],
-				[this.getNameNew()]: return_id ? null : []
-			}
-			: {
-				[this.getName()]: return_id ? null : []
-			};
+		const values = Object.create(null);
+		values[this.getName()] = return_id ? null : [];
+
+		if ($(this._field).multiSelect('getOption', 'addNew')) {
+			values[this.getNameNew()] = return_id ? null : [];
+		}
 
 		if (this.isDisabled()) {
 			return null;

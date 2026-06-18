@@ -73,7 +73,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'show_final_result' => ['boolean'],
 			'get_value' => ['boolean'],
 			'test_with' => ['integer', 'in' => [self::TEST_WITH_SERVER, self::TEST_WITH_PROXY]],
-			'proxyid' => ['db proxy.proxyid', 'required', 'when' => ['test_with', 'in'  => [self::TEST_WITH_PROXY]]],
+			'proxyid' => ['db proxy.proxyid', 'required', 'when' => [
+				['get_value', 'in' => [1]],
+				['test_with', 'in'  => [self::TEST_WITH_PROXY]]
+			]],
 			'interface' => ['object',
 				'fields' => [
 					'useip' => ['boolean'],
@@ -83,7 +86,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							'community' => ['string', 'required', 'not_empty',
 								'when' => ['version', 'in' => [SNMP_V1, SNMP_V2C]]
 							],
-							'max_repetitions' => ['db interface_snmp.max_repetitions', 'required',
+							'max_repetitions' => ['db interface_snmp.max_repetitions', 'required', 'not_empty',
 								'min' => 1, 'max' => ZBX_MAX_INT32,
 								'when' => ['version', 'in' => [SNMP_V2C, SNMP_V3]]
 							],
@@ -125,12 +128,15 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						],
 						'when' => ['../item_type', 'in' => [ITEM_TYPE_SNMP]]
 					],
-					'address' => ['string', 'not_empty', 'required',
+					'address' => ['db interface.dns', 'not_empty', 'required',
 						'when' => ['../item_type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SIMPLE,
 							ITEM_TYPE_SNMP, ITEM_TYPE_SSH, ITEM_TYPE_TELNET
 						]]
 					],
-					'port' => ['string', 'not_empty', 'required',
+					'port' => ['db interface.port', 'not_empty', 'required',
+						'use' => [CNumberValidator::class, ['usermacros' => true, 'with_float' => false,
+							'min' => ZBX_MIN_PORT_NUMBER, 'max' => ZBX_MAX_PORT_NUMBER
+						]],
 						'when' => ['../item_type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SNMP]]
 					]
 				],
@@ -147,8 +153,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			],
 			'eol' => ['integer', 'in' => [ZBX_EOL_LF, ZBX_EOL_CRLF]],
 			'macros' => ['objects', 'fields' => [
-				'name' => ['string', 'required'],
-				'value' => ['string', 'required']
+				'name' => ['db globalmacro.macro', 'required'],
+				'value' => ['db globalmacro.value', 'required']
 			]],
 			'time_change' => ['integer'],
 
@@ -179,6 +185,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			],
 			'follow_redirects' => ['boolean'],
 			'key' => [
+				['db items.key_'],
 				[
 					'db items.key_', 'required', 'not_empty', 'use' => [CItemKey::class, []],
 					'when' => [
