@@ -454,7 +454,7 @@ class CCepRule extends CApiService {
 		return [
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [
 									CCepRuleHelper::CONDITION_EVENT_NAME,
-									CCepRuleHelper::CONDITION_TAG_NAME,
+									CCepRuleHelper::CONDITION_TAG,
 									CCepRuleHelper::CONDITION_TAG_VALUE,
 									CCepRuleHelper::CONDITION_SEVERITY,
 									CCepRuleHelper::CONDITION_HOST,
@@ -472,7 +472,7 @@ class CCepRule extends CApiService {
 										CONDITION_OPERATOR_LIKE,
 										CONDITION_OPERATOR_NOT_LIKE
 									])],
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG_NAME])], 'type' => API_INT32, 'in' => implode(',', [
+									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG])], 'type' => API_INT32, 'in' => implode(',', [
 										CONDITION_OPERATOR_EQUAL,
 										CONDITION_OPERATOR_NOT_EQUAL,
 										CONDITION_OPERATOR_LIKE,
@@ -504,7 +504,7 @@ class CCepRule extends CApiService {
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'event_name')]
 			]],
 			'tag' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG_NAME])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'tag')],
+									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'tag')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'tag')]
 			]],
 			'tag_value' =>		['type' => API_MULTIPLE, 'rules' => [

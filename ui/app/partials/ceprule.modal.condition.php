@@ -27,6 +27,14 @@ foreach (CCepRuleHelper::getConditionLabelStrings() as $value => $name) {
 	$condition_type->addOption(new CSelectOption($value, $name));
 }
 
+$tag_operators = (new CSelect('tag_operator'))
+	->setId('ceprule-condition-type')
+	->setFocusableElementId('ceprule-condition-type-focus');
+
+foreach (CCepRuleHelper::getConditionTagOperators() as $value => $name) {
+	$tag_operators->addOption(new CSelectOption($value, $name));
+}
+
 echo (new CForm())
 	// Enable form submitting on Enter.
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
@@ -35,6 +43,20 @@ echo (new CForm())
 		->addItem([
 			new CLabel('Type', 'ceprule-condition-type-focus'),
 			new CFormField($condition_type)
+		])
+		->addItem([
+			new CLabel('Tag', 'ceprule-condition-tag-name'),
+			(new CFormField([
+				(new CTextBox('tag'))
+					->setId('ceprule-condition-tag-name')
+					->setAttribute('placeholder', 'tag'),
+				new CObject('&nbsp;'),
+				$tag_operators->setId('ceprule-condition-tag-operator'),
+				new CObject('&nbsp;'),
+				(new CTextBox('tag_value'))
+					->setId('ceprule-condition-tag-value')
+					->setAttribute('placeholder', 'value')
+			]))->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG)
 		])
 		->addItem([
 			new CLabel('Operator'),
@@ -72,20 +94,6 @@ echo (new CForm())
 				->setId('ceprule-condition-host-group')
 				->setAttribute('placeholder', 'host group name')
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST_GROUP)
-		])
-		->addItem([
-			new CLabel('Tag', 'ceprule-condition-tag'),
-			(new CFormField((new CTextBox('tag'))
-				->setId('ceprule-condition-tag')
-				->setAttribute('placeholder', 'tag')
-			))->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG_NAME)
-		])
-		->addItem([
-			new CLabel('Tag value', 'ceprule-condition-tag-value'),
-			(new CFormField((new CTextBox('tag_value'))
-				->setId('ceprule-condition-tag-value')
-				->setAttribute('placeholder', 'tag value')
-			))->setAttribute('for-type', CCepRuleHelper::CONDITION_TAG_VALUE)
 		])
 		->addItem([
 			new CLabel('Severity'),

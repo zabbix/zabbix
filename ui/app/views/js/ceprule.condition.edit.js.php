@@ -34,12 +34,23 @@ window.ceprule_condition_edit_popup = new class {
 		this.#setValues(condition);
 		this.#initActions();
 		window['ceprule-condition-type'].dispatchEvent(new Event('change'));
+		window['ceprule-condition-tag-operator'].dispatchEvent(new Event('change'));
 
 		window.requestAnimationFrame(() => this.form_element.style.display = '');
 	}
 
 	#initActions() {
 		window['ceprule-condition-type'].addEventListener('change', (e) => this.#handleTypeChanged(e.target.value));
+		window['ceprule-condition-tag-operator'].addEventListener('change', (e) => {
+			const value = Number(e.target.value);
+
+			if (value == <?= CONDITION_OPERATOR_EXISTS ?> || value == <?= CONDITION_OPERATOR_NOT_EXISTS ?>) {
+				window['ceprule-condition-tag-value'].style.display = 'none';
+			}
+			else {
+				window['ceprule-condition-tag-value'].style.display = '';
+			}
+		});
 	}
 
 	#setValues(condition) {
@@ -57,6 +68,24 @@ window.ceprule_condition_edit_popup = new class {
 	}
 
 	#handleTypeChanged(type) {
+		const operator_field = window['ceprule-condition-operator'].closest('.form-field');
+		const operator_field_label = operator_field.previousElementSibling;
+		const tag_operator_field = window['ceprule-condition-tag-operator'].closest('.form-field');
+		const tag_operator_field_label = tag_operator_field.previousElementSibling;
+
+		if (Number(type) == <?= CCepRuleHelper::CONDITION_TAG ?>) {
+			operator_field.style.display = 'none';
+			operator_field_label.style.display = 'none';
+			tag_operator_field.style.display = '';
+			tag_operator_field_label.style.display = '';
+		}
+		else {
+			operator_field.style.display = '';
+			operator_field_label.style.display = '';
+			tag_operator_field.style.display = 'none';
+			tag_operator_field_label.style.display = 'none';
+		}
+
 		const condition_type_operators = {
 			[<?= CCepRuleHelper::CONDITION_EVENT_NAME ?>]: [
 				<?= CONDITION_OPERATOR_NOT_LIKE ?>,
@@ -82,18 +111,13 @@ window.ceprule_condition_edit_popup = new class {
 				<?= CONDITION_OPERATOR_LIKE ?>,
 				<?= CONDITION_OPERATOR_NOT_LIKE ?>
 			],
-			[<?= CCepRuleHelper::CONDITION_TAG_NAME ?>]: [
+			[<?= CCepRuleHelper::CONDITION_TAG ?>]: [
 				<?= CONDITION_OPERATOR_EQUAL ?>,
 				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
 				<?= CONDITION_OPERATOR_LIKE ?>,
 				<?= CONDITION_OPERATOR_NOT_LIKE ?>,
-				<?= CONDITION_OPERATOR_NOT_EXISTS ?>
-			],
-			[<?= CCepRuleHelper::CONDITION_TAG_VALUE ?>]: [
-				<?= CONDITION_OPERATOR_EQUAL ?>,
-				<?= CONDITION_OPERATOR_NOT_EQUAL ?>,
-				<?= CONDITION_OPERATOR_LIKE ?>,
-				<?= CONDITION_OPERATOR_NOT_LIKE ?>,
+				<?= CONDITION_OPERATOR_EXISTS ?>,
+				<?= CONDITION_OPERATOR_NOT_EXISTS ?>,
 				<?= CONDITION_OPERATOR_MORE_EQUAL ?>,
 				<?= CONDITION_OPERATOR_LESS_EQUAL ?>
 			],

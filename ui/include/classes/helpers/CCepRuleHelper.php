@@ -28,8 +28,8 @@ class CCepRuleHelper {
 	public const EXECUTION_STOP =		1;
 
 	public const CONDITION_EVENT_NAME = 	ZBX_CONDITION_TYPE_EVENT_NAME;
-	public const CONDITION_TAG_NAME =		ZBX_CONDITION_TYPE_EVENT_TAG;
-	public const CONDITION_TAG_VALUE =		ZBX_CONDITION_TYPE_EVENT_TAG_VALUE;
+	public const CONDITION_TAG =			ZBX_CONDITION_TYPE_EVENT_TAG;
+	public const CONDITION_TAG_VALUE =		ZBX_CONDITION_TYPE_EVENT_TAG_VALUE; // TODO remove from API
 	public const CONDITION_SEVERITY =		ZBX_CONDITION_TYPE_TRIGGER_SEVERITY;
 	public const CONDITION_HOST =			ZBX_CONDITION_TYPE_HOST;
 	public const CONDITION_HOST_GROUP =		ZBX_CONDITION_TYPE_HOST_GROUP;
@@ -170,20 +170,7 @@ class CCepRuleHelper {
 	public static function getConditionLabelStrings(): array {
 		return [
 			self::CONDITION_EVENT_NAME => _('Event name'),
-			self::CONDITION_TAG_NAME => _('Tag name'),
-			self::CONDITION_TAG_VALUE => _('Tag value'),
-			self::CONDITION_SEVERITY => _('Severity'),
-			self::CONDITION_HOST => _('Host'),
-			self::CONDITION_HOST_GROUP => _('Host group'),
-			self::CONDITION_TIME_PERIOD => _('Time period')
-		];
-	}
-
-	public static function getConditionTypes(): array {
-		return [
-			self::CONDITION_EVENT_NAME => _('Event name'),
-			self::CONDITION_TAG_NAME => _('Tag'),
-			self::CONDITION_TAG_VALUE => _('Tag value'),
+			self::CONDITION_TAG => _('Tag'),
 			self::CONDITION_SEVERITY => _('Severity'),
 			self::CONDITION_HOST => _('Host'),
 			self::CONDITION_HOST_GROUP => _('Host group'),
@@ -193,6 +180,19 @@ class CCepRuleHelper {
 
 	public static function getConditionLabelString(array $ceprule_condition): string {
 		return self::getConditionLabelStrings()[$ceprule_condition['type']];
+	}
+
+	public static function getConditionTagOperators(): array {
+		return [
+			CONDITION_OPERATOR_EQUAL => _('Equals'),
+			CONDITION_OPERATOR_NOT_EQUAL => _('Does not equal'),
+			CONDITION_OPERATOR_LIKE => _('Contains'),
+			CONDITION_OPERATOR_NOT_LIKE => _('Does not contain'),
+			CONDITION_OPERATOR_MORE_EQUAL => _('Is more than or equal'),
+			CONDITION_OPERATOR_LESS_EQUAL => _('Is less than or equal'),
+			CONDITION_OPERATOR_EXISTS => _('Exists'),
+			CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist')
+		];
 	}
 
 	public static function getConditionOperatorStrings(): array {
@@ -205,19 +205,26 @@ class CCepRuleHelper {
 			CONDITION_OPERATOR_NOT_LIKE => _('Does not contain'),
 			CONDITION_OPERATOR_MORE_EQUAL => _('Is more than or equal'),
 			CONDITION_OPERATOR_LESS_EQUAL => _('Is less than or equal'),
+			CONDITION_OPERATOR_EXISTS => _('Exists'),
 			CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist')
 		];
 	}
 
 	public static function getConditionOperatorString(array $ceprule_condition): string {
+		if ($ceprule_condition['type'] == CCepRuleHelper::CONDITION_TAG) {
+			return static::getConditionOperatorStrings()[$ceprule_condition['tag_operator']];
+		}
+
 		return static::getConditionOperatorStrings()[$ceprule_condition['operator']];
 	}
 
 	public static function getConditionArgumentsString(array $ceprule_condition): string {
 		return match((int) $ceprule_condition['type']) {
 			self::CONDITION_EVENT_NAME => $ceprule_condition['event_name'],
-			self::CONDITION_TAG_NAME => $ceprule_condition['tag'],
-			self::CONDITION_TAG_VALUE => $ceprule_condition['tag'].':'.$ceprule_condition['tag_value'],
+			self::CONDITION_TAG => match ($ceprule_condition['operator']) {
+				CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS => $ceprule_condition['tag'],
+				default => $ceprule_condition['tag'].':'.$ceprule_condition['tag_value']
+			},
 			self::CONDITION_SEVERITY => CSeverityHelper::getName($ceprule_condition['severity']),
 			self::CONDITION_HOST => $ceprule_condition['host'],
 			self::CONDITION_HOST_GROUP => $ceprule_condition['host_group'],
@@ -226,6 +233,16 @@ class CCepRuleHelper {
 	}
 
 	public static function getConditionDescription(array $ceprule_condition): array {
+		if ($ceprule_condition['operator'] == CONDITION_OPERATOR_EXISTS
+				|| $ceprule_condition['operator'] == CONDITION_OPERATOR_NOT_EXISTS) {
+
+			return [
+				CCepRuleHelper::getConditionLabelString($ceprule_condition),
+				' ',
+				italic(CCepRuleHelper::getConditionOperatorString($ceprule_condition))
+			];
+		}
+
 		return [
 			CCepRuleHelper::getConditionLabelString($ceprule_condition),
 			' ',
