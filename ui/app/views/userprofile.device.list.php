@@ -24,7 +24,7 @@ $this->includeJsFile('userprofile.device.list.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Devices'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_DEVICE_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERPROFILE_DEVICE))
 	->setControls((new CList([
 		(new CTag('nav', true,
 			(new CList())->addItem(
