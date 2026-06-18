@@ -119,7 +119,6 @@ class CControllerTemplateList extends CController {
 				'vendor_version' => $filter['vendor_version']
 			], 'strlen'),
 			'parentTemplateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
-			'groupids' => $filter_groupids,
 			'editable' => true,
 			'sortfield' => $sort_field,
 			'limit' => $limit
