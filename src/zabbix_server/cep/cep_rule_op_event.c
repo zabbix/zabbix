@@ -574,6 +574,8 @@ void	cep_event_add_to_rules(zbx_cep_event_handle_t hevent, zbx_cep_event_context
 				cep_window_simple_process_event(rule, hevent, ctx, tasks);
 				break;
 			case ZBX_CEP_WINDOW_CAUSE_SYMPTOM:
+				cep_window_cause_symptom_process_event(rule, hevent, ctx, tasks);
+				break;
 			case ZBX_CEP_WINDOW_TAG_MATCH:
 			case ZBX_CEP_WINDOW_PATTERN_MATCH:
 				/* TODO: implement */

@@ -20,6 +20,13 @@
 #include "zbxcacheconfig.h"
 #include "zbxtypes_ext.h"
 
+typedef enum
+{
+	CEP_LOCATION_UNKNOWN,
+	CEP_LOCATION_QUEUE
+}
+zbx_cep_location_t;
+
 typedef struct
 {
 	zbx_uint64_t		ruleid;
@@ -27,6 +34,7 @@ typedef struct
 	int			type;
 	int			duration;
 	int			capacity;
+	zbx_cep_location_t	location;	/* window location is read/written only within window pool lock */
 	time_t			time_created;
 	zbx_queue_ptr_t		hevents;
 
@@ -40,10 +48,12 @@ ZBX_PTR_VECTOR_DECL(cep_window_ptr, zbx_cep_window_t *)
 
 typedef struct
 {
-	zbx_uint64_t		ruleid;
-	int			key_type;
-	char			*key_value;
-	char			*key_tag;
+	zbx_uint64_t	ruleid;
+	unsigned char	group_by;
+	char		*host;
+	char		*hostgroup;
+	char		*tag;
+	char		*tag_value;
 
 	zbx_cep_window_t	*window;
 }
@@ -58,6 +68,10 @@ zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, const zbx_cep
 void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_handle_t hevent,
 		zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks);
 void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks);
+
+void	cep_window_cause_symptom_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_handle_t hevent,
+	zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks);
+
 void	cep_window_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks);
 
 /*

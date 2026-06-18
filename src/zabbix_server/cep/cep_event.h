@@ -27,11 +27,20 @@ zbx_cep_event_t	*cep_event_addref(zbx_cep_event_t *event);
 zbx_cep_event_t	*cep_event_get_mutable(zbx_cep_event_t *event);
 int	cep_event_find_tag(zbx_cep_event_t *event, const char *tag);
 
+typedef enum
+{
+	CEP_POS_FIRST,
+	CEP_POS_LAST
+}
+zbx_cep_event_pos_t;
+
 typedef struct
 {
 	zbx_db_event		*db_event;
 	zbx_cep_event_t		*event;
 	zbx_cep_event_handle_t	hevent;
+
+	zbx_cep_event_pos_t	pos;
 
 	zbx_vector_str_t	hosts;
 	zbx_vector_str_t	groups;
@@ -44,6 +53,8 @@ void	cep_event_context_clear(zbx_cep_event_context_t *ctx);
 zbx_cep_event_t *cep_event_context_acquire_event(zbx_cep_event_context_t *ctx);
 zbx_cep_event_t *cep_event_context_acquire_mutable_event(zbx_cep_event_context_t *ctx);
 zbx_uint64_t	cep_event_context_eventid(zbx_cep_event_context_t *ctx);
+const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, const char *tag);
+
 void	cep_event_context_load_hosts(zbx_cep_event_context_t *ctx);
 void	cep_event_context_load_groups(zbx_cep_event_context_t *ctx);
 void	cep_event_context_set_handle(zbx_cep_event_context_t *ctx, zbx_cep_event_handle_t hevent);

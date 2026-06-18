@@ -188,14 +188,14 @@ static void	cep_db_write_problems(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
 		if (SUCCEED != zbx_db_insert_is_prepared(&db_insert_problem))
 		{
 			zbx_dbconn_prepare_insert(db, &db_insert_problem, "problem", "eventid", "source", "object",
-					"objectid", "clock", "ns", "name", "severity", (char *)NULL);
+					"objectid", "clock", "ns", "name", "severity", "cause_eventid", (char *)NULL);
 		}
 
 		zbx_cep_event_t	*event = task->event;
 
 		zbx_db_insert_add_values(&db_insert_problem, event->eventid, event->origin.source, event->origin.object,
 				event->origin.objectid, event->clock, event->ns, ZBX_NULL2EMPTY_STR(event->name),
-				event->severity);
+				event->severity, event->cause_eventid);
 
 		if (0 == event->tags.values_num)
 			continue;
@@ -228,6 +228,52 @@ static void	cep_db_write_problems(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() problems:%d", __func__, problems_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: write symptom->cause links to database                            *
+ *                                                                            *
+ * Parameters: db     - [IN]  database connection                             *
+ *             tasks  - [IN]  list of tasks containing events                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_db_write_symptoms(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
+
+	zbx_db_insert_t	db_insert = {0};
+	int		symptoms_num = 0;
+
+	for (int i = 0; i < tasks->values_num; i++)
+	{
+		const zbx_cep_task_event_t	*task = cep_get_event_task(tasks->values[i]);
+
+		if (CEP_EVENT_OPEN != task->event_op)
+			continue;
+
+		zbx_cep_event_t	*event = task->event;
+
+		if (0 == event->cause_eventid)
+			continue;
+
+		if (SUCCEED != zbx_db_insert_is_prepared(&db_insert))
+		{
+			zbx_dbconn_prepare_insert(db, &db_insert, "event_symptom", "eventid", "cause_eventid",
+					(char *)NULL);
+		}
+
+		zbx_db_insert_add_values(&db_insert, event->eventid, event->cause_eventid);
+	}
+
+	if (SUCCEED == zbx_db_insert_is_prepared(&db_insert))
+	{
+		symptoms_num =  zbx_db_insert_get_row_count(&db_insert);
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() symptoms:%d", __func__, symptoms_num);
 }
 
 /******************************************************************************
@@ -506,6 +552,7 @@ void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr
 
 		cep_db_write_events(db, tasks);
 		cep_db_write_problems(db, tasks);
+		cep_db_write_symptoms(db, tasks);
 		cep_db_write_event_recovery(db, tasks);
 		cep_db_write_event_suppress(db, tasks);
 		cep_db_write_trigger_rtdata(db, tasks, &trigger_diffs);

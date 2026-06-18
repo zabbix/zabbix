@@ -52,6 +52,7 @@ struct zbx_cep_event
 	time_t				suppress_mtime;
 	char				*name;
 
+	zbx_uint64_t			cause_eventid;
 	zbx_cep_event_t			*r_event;
 
 	zbx_cep_origin_t		origin;

@@ -15,6 +15,7 @@
 #include "cep_event.h"
 #include "cep_api.h"
 #include "zbx_cep.h"
+#include "zbxcommon.h"
 #include "zbxdbwrap.h"
 
 void	cep_event_clear(zbx_cep_event_t *event)
@@ -62,6 +63,7 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 	event->severity = severity;
 	event->suppress_mtime = 0;
 	event->name = zbx_strdup(NULL, name);
+	event->cause_eventid = 0;
 
 	zbx_vector_lite_tag_create(&event->tags);
 	if (NULL != tags)
@@ -99,6 +101,7 @@ zbx_cep_event_t	*cep_event_clone(const zbx_cep_event_t *event)
 	clone->severity = event->severity;
 	clone->suppress_mtime = event->suppress_mtime;
 	clone->name = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(event->name));
+	clone->cause_eventid = 0;
 
 	zbx_vector_lite_tag_create(&clone->tags);
 	zbx_vector_lite_tag_reserve(&clone->tags, (size_t)event->tags.values_num);
@@ -247,7 +250,14 @@ zbx_cep_event_t *cep_event_context_acquire_event(zbx_cep_event_context_t *ctx)
 zbx_cep_event_t *cep_event_context_acquire_mutable_event(zbx_cep_event_context_t *ctx)
 {
 	if (NULL != cep_event_context_acquire_event(ctx))
-		return cep_event_get_mutable(ctx->event);
+	{
+		zbx_cep_event_t	*event = cep_event_get_mutable(ctx->event);
+
+		zbx_cep_event_release(ctx->event);
+		ctx->event = event;
+
+		return ctx->event;
+	}
 
 	return NULL;
 }
@@ -295,6 +305,59 @@ zbx_uint64_t	cep_event_context_eventid(zbx_cep_event_context_t *ctx)
 		return ctx->event->eventid;
 
 	return 0;
+}
+
+const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, const char *tag)
+{
+#define CEP_TAG_IS_COPIED	"$IS.COPIED"
+#define CEP_TAG_IS_FIRST	"$IS.FIRST"
+#define CEP_TAG_IS_LAST		"$IS.LAST"
+#define CEP_TAG_RANK		"$RANK"
+#define CEP_TAG_IS_OPEN		"$IS_OPEN"
+#define CEP_VALUE_TRUE		"true"
+#define CEP_VALUE_FALSE		"false"
+#define CEP_VALUE_UNKNOWN	"unknown"
+
+	zbx_cep_event_t	*event;
+
+	if (0 == !strcmp(CEP_TAG_IS_COPIED, tag))
+	{
+		if (NULL != (event = cep_event_context_acquire_event(ctx)))
+		{
+			/* check event->flags */
+			THIS_SHOULD_NEVER_HAPPEN_MSG("not implemented");
+		}
+	}
+	else if( 0 == !strcmp(CEP_TAG_IS_FIRST, tag))
+	{
+		return (ctx->pos == CEP_POS_FIRST ? CEP_VALUE_TRUE : CEP_VALUE_FALSE);
+	}
+	else if( 0 == !strcmp(CEP_TAG_IS_LAST, tag))
+	{
+		return (ctx->pos == CEP_POS_LAST ? CEP_VALUE_TRUE : CEP_VALUE_FALSE);
+	}
+	else if( 0 == !strcmp(CEP_TAG_RANK, tag))
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("not implemented");
+	}
+	else if( 0 == !strcmp(CEP_TAG_IS_OPEN, tag))
+	{
+		if (NULL != (event = cep_event_context_acquire_event(ctx)))
+		{
+			return (NULL == event->r_event ? CEP_VALUE_TRUE : CEP_VALUE_FALSE);
+		}
+	}
+
+	return NULL;
+
+	#undef CEP_VALUE_UNKNOWN
+	#undef CEP_VALUE_FALSE
+	#undef CEP_VALUE_TRUE
+	#undef CEP_TAG_IS_OPEN
+	#undef CEP_TAG_RANK
+	#undef CEP_TAG_IS_LAST
+	#undef CEP_TAG_IS_FIRST
+	#undef CEP_TAG_IS_COPIED
 }
 
 

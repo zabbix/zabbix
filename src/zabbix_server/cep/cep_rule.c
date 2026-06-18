@@ -34,28 +34,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get built-in tag value for event                                  *
- *                                                                            *
- * Parameters: event - [IN] event to retrieve tag value for                   *
- *             tag   - [IN] built-in tag name                                 *
- *                                                                            *
- * Return value: tag value string                                             *
- *                                                                            *
- * Comments: The resolved value is cached in context and reused on            *
- *           subsequent requests for the same tag.                            *
- *                                                                            *
- ******************************************************************************/
-static const char	*cep_event_get_builtin_tag(zbx_cep_event_context_t *ctx, const char *tag)
-{
-	/* TODO: resolve builin tags, cache in context and return */
-	ZBX_UNUSED(ctx);
-	ZBX_UNUSED(tag);
-
-	return "";
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: evaluate operation tag filter condition for event                 *
  *                                                                            *
  * Parameters: tag   - [IN] tag filter condition to evaluate                  *
@@ -71,9 +49,9 @@ static int	cep_operation_tag_eval(const zbx_cep_operation_tag_t *tag, zbx_cep_ev
 
 	if ('$' == *tag->tag)
 	{
-		const char	*value = cep_event_get_builtin_tag(ctx, tag->tag);
+		const char	*value = cep_event_context_get_builtin_tag(ctx, tag->tag);
 
-		if (0 == strcmp(value, tag->value))
+		if (NULL != value && 0 == strcmp(value, tag->value))
 			ret = 1;
 	}
 	else
@@ -475,7 +453,7 @@ static int	cep_condition_eval_host(int operator, const zbx_cep_args_name_t *args
  *           matches; for negative operators no event host group must match.  *
  *                                                                            *
  ******************************************************************************/
-static int	cep_condition_eval_host_group(int operator, const zbx_cep_args_name_t *args,
+static int	cep_condition_eval_hostgroup(int operator, const zbx_cep_args_name_t *args,
 		zbx_cep_event_context_t *ctx)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operator:%d host:%s", __func__, operator, args->name);
@@ -571,7 +549,7 @@ static int	cep_condition_eval(const zbx_cep_condition_t *cond, zbx_cep_event_con
 			ret = cep_condition_eval_host(cond->operator, &cond->args.host, ctx);
 			break;
 		case ZBX_CONDITION_TYPE_HOST_GROUP:
-			ret = cep_condition_eval_host_group(cond->operator, &cond->args.host_group, ctx);
+			ret = cep_condition_eval_hostgroup(cond->operator, &cond->args.host_group, ctx);
 			break;
 		case ZBX_CONDITION_TYPE_TIME_PERIOD:
 			ret = cep_condition_eval_time_period(cond->operator, &cond->args.time_period, ctx);

@@ -453,7 +453,8 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	const zbx_cep_rule_t		**rules = NULL;
 	int				rules_num = 0;
 	zbx_cep_config_handle_t		hconfig;
-	zbx_cep_event_context_t		event_ctx = {.db_event = db_event, .event = cep_event_addref(event)};
+	zbx_cep_event_context_t		event_ctx = {.db_event = db_event, .event = cep_event_addref(event),
+						.pos = CEP_POS_LAST};
 	zbx_vector_mw_task_ptr_t	tasks;
 
 	zbx_vector_mw_task_ptr_create(&tasks);
@@ -502,7 +503,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	zbx_vector_mw_task_ptr_destroy(&tasks);
 
 	task->event_op = CEP_EVENT_OPEN;
-	task->event = cep_event_addref(event);
+	task->event = cep_event_addref(event_ctx.event);
 
 	if (0 != zbx_dc_local_get_itservices_num() && CEP_ACTION_DISABLED != task->action_state)
 	{
