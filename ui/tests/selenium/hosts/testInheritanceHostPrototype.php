@@ -460,6 +460,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		if (array_key_exists('cloned_name', $data)) {
 			$this->zbxTestInputTypeOverwrite('host', $data['cloned_name']);
+			// Remove focus to avoid inline error "This object already exists." appearing from the original clone name.
+			$this->query('id:host')->one()->removeFocus();
 		}
 		if (array_key_exists('cloned_visible_name', $data)) {
 			$this->zbxTestInputTypeOverwrite('name', $data['cloned_visible_name']);
