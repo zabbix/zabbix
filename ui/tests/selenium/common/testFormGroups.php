@@ -154,7 +154,7 @@ class testFormGroups extends CWebTest {
 				? 'Search: Group created from host prototype 1'
 				: 'Host groups';
 			$this->page->assertHeader($header);
-			$this->query('id:host')->one()->checkValue(self::HOST_PROTOTYPE);
+			$this->query('id:datatable-host')->one()->checkValue(self::HOST_PROTOTYPE);
 
 			return;
 		}

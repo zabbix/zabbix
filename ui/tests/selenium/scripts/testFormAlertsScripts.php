@@ -2281,7 +2281,7 @@ class testFormAlertsScripts extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Script added');
 
 		$this->page->open('zabbix.php?action=problem.view');
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$table = $this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
 
 		$with_script = ($data['fields']['Scope'] === 'Manual host action') ? $data['host'] : $data['trigger'];
 		$without_script = ($data['fields']['Scope'] === 'Manual host action') ? $data['trigger'] : $data['host'];

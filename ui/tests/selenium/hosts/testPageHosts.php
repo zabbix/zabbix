@@ -156,7 +156,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
 
-		$datatable = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$datatable = $this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 		$this->query('link', $name)->waitUntilVisible()->one()->scrollIntoView(50)->click();
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		$form->submit();
@@ -237,7 +237,7 @@ class testPageHosts extends CLegacyWebTest {
 		$form->fill($data['filter']);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 		if (array_key_exists('expected', $data)) {
 			// Using column Name check that only the expected Hosts are returned in the list.
@@ -258,7 +258,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestClickButtonText('Disable');
@@ -283,7 +283,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 		$this->zbxTestCheckboxSelect('hostids_'.$hostid);
 		$this->zbxTestClickButtonText('Disable');
@@ -307,7 +307,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 
 		$this->zbxTestCheckboxSelect('hostids_'.$hostid);
 		$this->zbxTestClickButtonText('Enable');
@@ -327,7 +327,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
 
-		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady();
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestClickButtonText('Enable');
 		$this->zbxTestAcceptAlert();
@@ -902,7 +902,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->getField('Name')->fill('Host for t');
 		$filter->submit();
 
-		$table_rows_count = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady()->getRows()->count();
+		$table_rows_count = $this->query('id:datatable-hosts')->asDatatable()->one()->waitUntilReady()->getRows()->count();
 		$this->assertDatatableStats($table_rows_count);
 		$delete_button = $this->query('button:Delete')->one();
 
