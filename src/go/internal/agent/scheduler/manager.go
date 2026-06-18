@@ -67,7 +67,7 @@ type Request struct {
 	Mtime       *int    `json:"mtime"`
 	Timeout     any     `json:"timeout"`
 
-	// Server doesn't send this value. It's used to mark plaintext passive checks requests.
+	// Server doesn't send this value. It's used to mark plaintext passive and active checks requests.
 	LegacyTimeout bool
 }
 

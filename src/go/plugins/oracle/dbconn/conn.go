@@ -202,8 +202,12 @@ func (c *ConnManager) housekeeper(ctx context.Context) {
 
 // createConn creates a new connection for given credentials in cd.
 func (c *ConnManager) createConn(cd *ConnDetails, connectionTimeout int) (*OraConn, error) {
+	ctxTimeout, cancel := context.WithTimeout(context.Background(), time.Duration(connectionTimeout)*time.Second)
+
+	defer cancel()
+
 	ctx := godror.ContextWithTraceTag(
-		context.Background(),
+		ctxTimeout,
 		godror.TraceTag{
 			ClientInfo: "zbx_monitor",
 			Module:     godror.DriverName,
