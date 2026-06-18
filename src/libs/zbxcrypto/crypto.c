@@ -206,6 +206,7 @@ char	*zbx_gen_uuid7_hyphenated(void)
 			1);	/* terminating '\0' */
 
 	zbx_timespec(&ts);
+	srand((unsigned int)time(NULL) + (unsigned int)getpid());
 
 	ts_ms = (uint64_t)ts.sec * 1000 + (uint64_t)ts.ns / 1000000;
 
