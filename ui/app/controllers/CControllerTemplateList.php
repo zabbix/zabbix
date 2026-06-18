@@ -104,7 +104,7 @@ class CControllerTemplateList extends CController {
 		$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
 
 		if ($filter_groupids) {
-			$filter_groupids = array_map('strval', getTemplateSubGroups($filter_groupids));
+			$filter_groupids = getTemplateSubGroups($filter_groupids);
 		}
 
 		// Select templates.
