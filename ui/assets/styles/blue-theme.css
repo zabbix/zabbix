@@ -4601,18 +4601,17 @@ output {
     position: relative;
     display: inline-block;
     padding: 0; }
-    .radio-list-control li:not(:last-child) {
-      margin-right: -1px; }
-    .radio-list-control li:first-child {
+    .radio-list-control li:nth-child(1 of .radio-list-control li:not([hidden])) label {
       border-top-left-radius: var(--input-border-radius);
       border-bottom-left-radius: var(--input-border-radius); }
-      .radio-list-control li:first-child label {
+      .radio-list-control li:nth-child(1 of .radio-list-control li:not([hidden])) label label {
         border-top-left-radius: calc(var(--input-border-radius) - 1px);
         border-bottom-left-radius: calc(var(--input-border-radius) - 1px); }
-    .radio-list-control li:last-child {
+    .radio-list-control li:nth-last-child(1 of .radio-list-control li:not([hidden])) label {
+      margin-right: -1px;
       border-top-right-radius: var(--input-border-radius);
       border-bottom-right-radius: var(--input-border-radius); }
-      .radio-list-control li:last-child label {
+      .radio-list-control li:nth-last-child(1 of .radio-list-control li:not([hidden])) label label {
         border-top-right-radius: calc(var(--input-border-radius) - 1px);
         border-bottom-right-radius: calc(var(--input-border-radius) - 1px); }
   .radio-list-control label {

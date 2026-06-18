@@ -9,11 +9,7 @@
 		display: inline-block;
 		padding: 0;
 
-		&:not(:last-child) {
-			margin-right: -1px;
-		}
-
-		&:first-child {
+		&:nth-child(1 of &:not([hidden])) label {
 			border-top-left-radius: var(--input-border-radius);
 			border-bottom-left-radius: var(--input-border-radius);
 
@@ -23,7 +19,8 @@
 			}
 		}
 
-		&:last-child {
+		&:nth-last-child(1 of &:not([hidden])) label {
+			margin-right: -1px;
 			border-top-right-radius: var(--input-border-radius);
 			border-bottom-right-radius: var(--input-border-radius);
 
