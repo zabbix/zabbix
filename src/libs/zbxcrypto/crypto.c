@@ -211,7 +211,7 @@ char	*zbx_gen_uuid7_hyphenated(void)
 
 	if (0 == seeded)
 	{
-		srand((unsigned int)time(NULL) + (unsigned int)getpid());
+		srand((unsigned int)ts.sec ^ (unsigned int)ts.ns ^ (unsigned int)getpid());
 		seeded = 1;
 	}
 
