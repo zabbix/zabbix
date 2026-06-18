@@ -2179,22 +2179,7 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 		$this->sendSenderValues($intermingled, null, 1);
 
-		$this->callUntilDataIsPresent('trigger.get', [
-			'triggerids' => $parent_ids,
-			'output' => ['triggerid', 'value', 'lastchange', 'state']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-			function ($response) use ($parent_ids, $prev_parent_lastchanges) {
-				$by_id = array_column($response['result'], null, 'triggerid');
-				foreach ($parent_ids as $idx => $tid) {
-					if (!isset($by_id[$tid])) return false;
-					$t = $by_id[$tid];
-					if ((int) $t['value'] !== TRIGGER_VALUE_TRUE) return false;
-					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) return false;
-					if ((int) $t['lastchange'] <= $prev_parent_lastchanges[$idx]) return false;
-				}
-				return true;
-			}
-		);
+		$this->waitForParentsValueAndLastchange($parent_ids, $prev_parent_lastchanges, TRIGGER_VALUE_TRUE);
 		$this->waitForAllTriggerEventCounts($parent_ids, $parent_event_count + 1);
 
 		$this->maybeRestartServer($restart);
@@ -2210,22 +2195,7 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 		$this->sendSenderValues($intermingled_recovery, null, 1);
 
-		$this->callUntilDataIsPresent('trigger.get', [
-			'triggerids' => $parent_ids,
-			'output' => ['triggerid', 'value', 'lastchange', 'state']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-			function ($response) use ($parent_ids, $prev_parent_lastchanges) {
-				$by_id = array_column($response['result'], null, 'triggerid');
-				foreach ($parent_ids as $idx => $tid) {
-					if (!isset($by_id[$tid])) return false;
-					$t = $by_id[$tid];
-					if ((int) $t['value'] !== TRIGGER_VALUE_FALSE) return false;
-					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) return false;
-					if ((int) $t['lastchange'] <= $prev_parent_lastchanges[$idx]) return false;
-				}
-				return true;
-			}
-		);
+		$this->waitForParentsValueAndLastchange($parent_ids, $prev_parent_lastchanges, TRIGGER_VALUE_FALSE);
 		$this->waitForAllTriggerEventCounts($parent_ids, $parent_event_count + 2);
 
 		// When the parent recovered in the intermingled batch above, dependency suppression lifted while a
@@ -2241,6 +2211,40 @@ class testTriggerCEP extends CIntegrationTest {
 		// After recovery no problems must remain open on either the parent or the dependent triggers.
 		$this->waitForNoOpenProblems(array_merge($parent_ids, self::$discovered_dep_triggerids),
 			'intermingled batch recovery');
+	}
+
+	/**
+	 * Wait until every parent trigger reached $expected_value in NORMAL state with its lastchange
+	 * advanced past the captured baseline. The callback returns a descriptive string on mismatch
+	 * (surfaced in the callUntilDataIsPresent failure message) rather than a bare false.
+	 */
+	private function waitForParentsValueAndLastchange(array $parent_ids, array $prev_parent_lastchanges,
+			int $expected_value): void {
+		$this->callUntilDataIsPresent('trigger.get', [
+			'triggerids' => $parent_ids,
+			'output' => ['triggerid', 'value', 'lastchange', 'state']
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
+			function ($response) use ($parent_ids, $prev_parent_lastchanges, $expected_value) {
+				$by_id = array_column($response['result'], null, 'triggerid');
+				foreach ($parent_ids as $idx => $tid) {
+					if (!isset($by_id[$tid])) {
+						return 'trigger '.$tid.' missing from response';
+					}
+					$t = $by_id[$tid];
+					if ((int) $t['value'] !== $expected_value) {
+						return 'trigger '.$tid.' value '.$t['value'].', expected '.$expected_value;
+					}
+					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) {
+						return 'trigger '.$tid.' state '.$t['state'].', expected NORMAL';
+					}
+					if ((int) $t['lastchange'] <= $prev_parent_lastchanges[$idx]) {
+						return 'trigger '.$tid.' lastchange '.$t['lastchange'].
+								' not advanced past '.$prev_parent_lastchanges[$idx];
+					}
+				}
+				return true;
+			}
+		);
 	}
 
 	/**
