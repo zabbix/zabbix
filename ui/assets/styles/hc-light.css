@@ -4683,7 +4683,8 @@ section {
       color: #262626; }
     section .section-head .toggle {
       max-height: 24px;
-      padding: 0 5px 0 10px;
+      padding: 0 2px 0 10px;
+      margin: 2px;
       border: none;
       background-color: transparent; }
       section .section-head .toggle::before {
