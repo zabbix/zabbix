@@ -80,10 +80,10 @@ window.user_device_create_popup = new class {
 					this.#qr_expires_at_ms = response.expires_at * 1000;
 					this.#refresh_interval_countdown = setInterval(() => this.#updateCountdownMessage(), 200);
 
-					this.#form_element.querySelector('.form-grid').classList.add('d-none');
-					this.#form_element.querySelector('.js-qr-code-loading').classList.add('d-none');
-					this.#form_element.querySelector('.js-qr-code-wrapper').classList.remove('d-none');
-					this.#form_element.querySelector('.qr-code-container').classList.remove('d-none');
+					this.#form_element.querySelector('.form-grid').classList.add('hidden');
+					this.#form_element.querySelector('.js-qr-code-loading').classList.add('hidden');
+					this.#form_element.querySelector('.js-qr-code-wrapper').classList.remove('hidden');
+					this.#form_element.querySelector('.qr-code-container').classList.remove('hidden');
 					this.#displayQRCode(response.url);
 					this.#device_uuid = response.uuid;
 

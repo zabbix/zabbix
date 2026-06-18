@@ -57,7 +57,7 @@ if ($data['admin_mode']) {
 }
 else {
 	$form->addVar('userid', CWebUser::$data['userid']);
-	$form_grid->addClass('d-none');
+	$form_grid->addClass('hidden');
 }
 
 $form->addItem($form_grid);
@@ -71,14 +71,14 @@ $form->addItem(
 			new CDiv(_('Generating secure QR code...'))
 		]))
 			->addClass('js-qr-code-loading')
-			->addClass($data['admin_mode'] ? 'd-none' : null),
+			->addClass($data['admin_mode'] ? 'hidden' : null),
 		(new CDiv([
 			(new CDiv())->addClass('qr-code'),
 			new CDiv(_('Scan this QR code to add your device and setup your notifications.')),
 			(new CDiv())->addClass('qr-code-expiration')
 		]))
 			->addClass('js-qr-code-wrapper')
-			->addClass('d-none')
+			->addClass('hidden')
 	]))
 		->addClass('qr-code-container')
 );
