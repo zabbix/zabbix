@@ -1684,7 +1684,7 @@ void	zbx_dc_get_trigger_deps(zbx_vector_dc_trigger_t *triggers);
 
 /* local configuration cache initialization, must be called by configuration syncers */
 void	zbx_dc_config_local_init(void);
-void	zbx_dc_config_local_addref(void);
+void	zbx_dc_config_local_acquire(void);
 void	zbx_dc_config_local_release(void);
 
 /* local configuration cache API - must be used only by thread based components hosted by supervisor */

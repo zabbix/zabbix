@@ -92,6 +92,8 @@ zbx_cep_event_update_t;
 
 ZBX_VECTOR_DECL(cep_event_update, zbx_cep_event_update_t)
 
+void	zbx_cep_release_update_channel(void);
+void	zbx_cep_acquire_update_channel(void);
 int	zbx_cep_recv_event_updates(zbx_cep_event_update_t *updates, int updates_num);
 
 void	zbx_cep_event_release(zbx_cep_event_t *event);

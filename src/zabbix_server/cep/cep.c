@@ -26,6 +26,7 @@
 #include "zbxhash.h"
 #include "zbxlog.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
 #include "zbxtypes_ext.h"
 
 /*
@@ -158,7 +159,7 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 	event->value = value;
 	event->severity = severity;
 	event->suppress_mtime = 0;
-	event->name = zbx_strdup(NULL, name);
+	event->name = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(name));
 
 	zbx_vector_lite_tag_create(&event->tags);
 	if (NULL != tags)
@@ -610,7 +611,7 @@ static zbx_item_diff_t	*item_diff_create_error(zbx_uint64_t itemid, const char *
 	diff->flags = ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
 	diff->state = ITEM_STATE_NOTSUPPORTED;
 	zbx_sha512_hash(error, diff->error_hash);
-	diff->error = zbx_strdup(NULL, error);
+	diff->error = error;
 
 	return diff;
 }

@@ -16,8 +16,10 @@
 #include "cep.h"
 #include "zbx_cep.h"
 #include "zbxalgo.h"
+#include "zbxcommon.h"
 
 ZBX_VECTOR_IMPL(cep_event_update, zbx_cep_event_update_t)
+
 
 /* guards access to CEP cache which can be accessed only by acquiring with */
 /* cep_cache_acquire() and releasing afterwards with cep_cache_release()   */
@@ -28,11 +30,16 @@ typedef struct
 }
 zbx_cep_guard_t;
 
-/* channel were event updates for IT service manager are posted */
-static zbx_channel_t	event_update_channel;
+typedef struct
+{
+	zbx_cep_guard_t	*cache_guard;
 
-/* CEP cache guard instance */
-static zbx_cep_guard_t	*cache_guard;
+	zbx_channel_t		*update_channel;
+	zbx_atomic_uint32_t	refcount;
+}
+zbx_cep_api_t;
+
+static zbx_cep_api_t	*cep_api = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -78,32 +85,94 @@ static void	cep_guard_destroy(zbx_cep_guard_t *guard)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize the CEP API and its associated resources               *
+ * Purpose: free CEP API handle and its associated resources                  *
  *                                                                            *
- * Parameters: error - [OUT] error message if initialization fails            *
- *                                                                            *
- * Return value: SUCCEED on success, FAIL otherwise                           *
+ * Parameters: api - [IN] CEP API handle to free                              *
  *                                                                            *
  ******************************************************************************/
-int	cep_api_init(char **error)
+static void	cep_api_free(zbx_cep_api_t *api)
 {
-	if (NULL == (cache_guard = cep_guard_create(error)))
+	if (NULL != api->cache_guard)
+		cep_guard_destroy(api->cache_guard);
+
+	if (NULL != api->update_channel)
+	{
+		zbx_chan_destroy(api->update_channel);
+		zbx_free(api->update_channel);
+	}
+
+	zbx_free(api);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize CEP API                                                *
+ *                                                                            *
+ * Parameters: api   - [IN/OUT] CEP API to initialize                         *
+ *             error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	cep_api_init(zbx_cep_api_t *api, char **error)
+{
+	if (NULL == (api->cache_guard = cep_guard_create(error)))
 		return FAIL;
 
-	zbx_chan_init(&event_update_channel, sizeof(zbx_cep_event_update_t), 10);
+	api->update_channel = (zbx_channel_t *)zbx_malloc(NULL, sizeof(zbx_channel_t));
+	zbx_chan_init(api->update_channel, sizeof(zbx_cep_event_update_t), 10);
 
 	return SUCCEED;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: destroy the CEP API and free all associated resources             *
+ * Purpose: create and initialize the global CEP API handle                   *
+ *                                                                            *
+ * Parameters: error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-void	cep_api_destroy(void)
+int	cep_api_create(char **error)
 {
-	zbx_chan_destroy(&event_update_channel);
-	cep_guard_destroy(cache_guard);
+	zbx_cep_api_t	*api = (zbx_cep_api_t *)zbx_calloc(NULL, 1, sizeof(zbx_cep_api_t));
+
+	if (FAIL == cep_api_init(api, error))
+	{
+		cep_api_free(api);
+		return FAIL;
+	}
+
+	cep_api = api;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire a reference to the CEP API                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_cep_api_acquire(void)
+{
+	if (NULL == cep_api)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("trying to open uninitialized cep api");
+		exit(EXIT_FAILURE);
+	}
+	atomic_fetch_add(&cep_api->refcount, 1);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: release a reference to the CEP API handle                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_cep_api_release(void)
+{
+	if (1 == atomic_fetch_sub(&cep_api->refcount, 1))
+		cep_api_free(cep_api);
 }
 
 /******************************************************************************
@@ -117,8 +186,8 @@ void	cep_api_destroy(void)
  ******************************************************************************/
 void	cep_cache_acquire(zbx_cep_t **cep)
 {
-	pthread_mutex_lock(&cache_guard->lock);
-	*cep = cache_guard->cep;
+	pthread_mutex_lock(&cep_api->cache_guard->lock);
+	*cep = cep_api->cache_guard->cep;
 }
 
 /******************************************************************************
@@ -133,7 +202,7 @@ void	cep_cache_acquire(zbx_cep_t **cep)
 void	cep_cache_release(zbx_cep_t **cep)
 {
 	*cep = NULL;
-	pthread_mutex_unlock(&cache_guard->lock);
+	pthread_mutex_unlock(&cep_api->cache_guard->lock);
 }
 
 #define CEP_UPDATE_BATCH_SIZE  1000
@@ -155,7 +224,7 @@ void	cep_post_event_updates(zbx_cep_event_update_t *updates, int updates_num)
 		if (i + send_num > updates_num)
 			send_num = updates_num - i;
 
-		zbx_chan_send_batch(&event_update_channel, updates + i, send_num);
+		zbx_chan_send_batch(cep_api->update_channel, updates + i, send_num);
 	}
 }
 
@@ -186,7 +255,7 @@ void	cep_post_event_handle_action(zbx_cep_event_handle_t *handles, int handles_n
 			updates[j].op = action;
 		}
 
-		zbx_chan_send_batch(&event_update_channel, updates, send_num);
+		zbx_chan_send_batch(cep_api->update_channel, updates, send_num);
 	}
 }
 
@@ -204,7 +273,7 @@ void	cep_post_event_handle_action(zbx_cep_event_handle_t *handles, int handles_n
  ******************************************************************************/
 int	zbx_cep_recv_event_updates(zbx_cep_event_update_t *updates, int updates_num)
 {
-	return zbx_chan_recv_batch(&event_update_channel, updates, updates_num);
+	return zbx_chan_recv_batch(cep_api->update_channel, updates, updates_num);
 }
 
 /******************************************************************************
@@ -290,21 +359,21 @@ void	zbx_cep_event_handle_release(zbx_cep_event_handle_t h)
 
 void	cep_stats_update_events_accessed(zbx_uint64_t value)
 {
-	cep_update_events_accessed(cache_guard->cep, value);
+	cep_update_events_accessed(cep_api->cache_guard->cep, value);
 }
 
 void	cep_stats_update_events_processed(zbx_uint64_t value)
 {
-	cep_update_events_processed(cache_guard->cep, value);
+	cep_update_events_processed(cep_api->cache_guard->cep, value);
 }
 
 void	cep_stats_update_events_discarded(zbx_uint64_t value)
 {
-	cep_update_events_discarded(cache_guard->cep, value);
+	cep_update_events_discarded(cep_api->cache_guard->cep, value);
 }
 
 void	cep_stats_collect(zbx_cep_stats_t *stats)
 {
-	cep_get_stats(cache_guard->cep, stats);
+	cep_get_stats(cep_api->cache_guard->cep, stats);
 }
 

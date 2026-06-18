@@ -18,8 +18,10 @@
 #include "cep.h"
 #include "zbx_cep.h"
 
-int	cep_api_init(char **error);
-void	cep_api_destroy(void);
+int	cep_api_create(char **error);
+void	zbx_cep_api_acquire(void);
+void	zbx_cep_api_release(void);
+
 void	cep_cache_acquire(zbx_cep_t **);
 void	cep_cache_release(zbx_cep_t **);
 void	cep_post_event_updates(zbx_cep_event_update_t *updates, int updates_num);

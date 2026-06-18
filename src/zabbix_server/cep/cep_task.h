@@ -51,7 +51,7 @@ zbx_cep_task_remote_t;
 typedef struct
 {
 	zbx_mw_task_t			base;
-	zbx_db_event			*db_event;	/* in - event data, out - eventid */
+	zbx_db_event			*db_event;	/* in - event data */
 	zbx_uint64_t			userid;		/* in - userid for manually closed event */
 	zbx_cep_event_op_t		event_op;	/* out - created event state - open/close */
 	zbx_cep_action_state_t		action_state;	/* out - specifies if actions must be processed */
@@ -60,6 +60,7 @@ typedef struct
 	zbx_vector_cep_event_update_t	updates;	/* out - updated events + actions:     */
 							/*       open event - created event     */
 							/*       close event - closed events    */
+	zbx_cep_event_t			*event;		/* out - created event */
 }
 zbx_cep_task_event_t;
 
