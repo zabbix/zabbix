@@ -19,6 +19,7 @@
  * @var array $data
  */
 
+$this->addJsFile('qrcode.js');
 $this->includeJsFile('user.device.list.js.php');
 
 $html_page = (new CHtmlPage())

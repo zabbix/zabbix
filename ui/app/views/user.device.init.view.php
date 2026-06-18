@@ -21,8 +21,8 @@
 
 $form = (new CForm('post'))
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('user')))->removeId())
-	->setId('user-device-form')
-	->setName('user_device_form')
+	->setId('user-device-init-form')
+	->setName('user_device_init_form')
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
@@ -57,7 +57,7 @@ if ($data['admin_mode']) {
 }
 else {
 	$form->addVar('userid', CWebUser::$data['userid']);
-	$form_grid->addStyle('display: none');
+	$form_grid->addClass('d-none');
 }
 
 $form->addItem($form_grid);
@@ -71,18 +71,14 @@ $form->addItem(
 			new CDiv(_('Generating secure QR code...'))
 		]))
 			->addClass('js-qr-code-loading')
-			->addStyle($data['admin_mode'] ? 'display: none' : ''),
+			->addClass($data['admin_mode'] ? 'd-none' : null),
 		(new CDiv([
 			(new CDiv())->addClass('qr-code'),
 			new CDiv(_('Scan this QR code to add your device and setup your notifications.')),
-			(new CDiv())->addClass('qr-code-expiration'),
-			(new CTemplateTag('qr-expires-in-tmpl'))
-				->addItem(_('QR code will expire in'))
-				->addItem((new CTag('b'))->addItem(' #{expires_in}.')),
-			(new CTemplateTag('qr-expired-tmpl'))->addItem(_('QR code has expired.'))
+			(new CDiv())->addClass('qr-code-expiration')
 		]))
 			->addClass('js-qr-code-wrapper')
-			->addStyle('display: none')
+			->addClass('d-none')
 	]))
 		->addClass('qr-code-container')
 );
@@ -105,7 +101,6 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('../../../js/vendors/qrcode/qrcode.js').
 		$this->readJsFile('user.device.init.view.js.php').
 		'user_device_create_popup.init('.json_encode([
 			'rules' => $data['js_validation_rules'],
