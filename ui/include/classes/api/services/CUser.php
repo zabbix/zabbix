@@ -1653,13 +1653,14 @@ class CUser extends CApiService {
 	private static function createUserUgSets(array $ugsets): void {
 		$ins_user_ugsets = [];
 
-		$options = [
-			'output' => ['ugsetid', 'hash'],
-			'filter' => ['hash' => array_keys($ugsets)]
-		];
-		$result = DBselect(DB::makeSql('ugset', $options));
+		$resource = DBselect(
+			'SELECT us.hash,MIN(us.ugsetid) AS ugsetid'.
+			' FROM ugset us'.
+			' WHERE '.dbConditionString('us.hash', array_keys($ugsets)).
+			' GROUP BY us.hash'
+		);
 
-		while ($row = DBfetch($result)) {
+		while ($row = DBfetch($resource)) {
 			foreach ($ugsets[$row['hash']]['userids'] as $userid) {
 				$ins_user_ugsets[] = [
 					'userid' => $userid,
@@ -1701,11 +1702,12 @@ class CUser extends CApiService {
 		}
 
 		if ($ugsets) {
-			$options = [
-				'output' => ['ugsetid', 'hash'],
-				'filter' => ['hash' => array_keys($ugsets)]
-			];
-			$result = DBselect(DB::makeSql('ugset', $options));
+			$result = DBselect(
+				'SELECT us.hash,MIN(us.ugsetid) AS ugsetid'.
+				' FROM ugset us'.
+				' WHERE '.dbConditionString('us.hash', array_keys($ugsets)).
+				' GROUP BY us.hash'
+			);
 
 			while ($row = DBfetch($result)) {
 				$upd_userids = [];
