@@ -110,6 +110,15 @@ class CDRule extends CApiService {
 			}
 		}
 
+// proxy
+		if (self::$userData['type'] < USER_TYPE_SUPER_ADMIN) {
+			$sqlParts['join']['p'] = ['left' => true, 'table' => 'proxy', 'using' => 'proxyid'];
+			$sqlParts['where'][] = '('.
+				'dr.proxyid IS NULL'.
+				' OR '.CApiUserGroupHelper::getProxyPermissionsCondition('p').
+			')';
+		}
+
 // search
 		if (!is_null($options['search'])) {
 			zbx_db_search('drules dr', $options, $sqlParts);
@@ -183,6 +192,14 @@ class CDRule extends CApiService {
 
 		if (!$drules) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['druleid']], 'fields' => [
+			'proxyid' =>	['type' => API_ID, 'flags' => API_ALLOW_NULL]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $drules, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$proxyids = [];
@@ -299,11 +316,11 @@ class CDRule extends CApiService {
 				'preservekeys' => true
 			]);
 
-			foreach ($proxyids as $proxyid) {
+			foreach ($proxyids as $i => $proxyid) {
 				if (!array_key_exists($proxyid, $db_proxies)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $proxyid, 'proxyid')
-					);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/'.$proxyid,_("object does not exist, or you have no permissions to it")
+					));
 				}
 			}
 		}
@@ -323,7 +340,8 @@ class CDRule extends CApiService {
 		}
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['druleid']], 'fields' => [
-			'druleid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+			'druleid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'proxyid' =>	['type' => API_ID, 'flags' => API_ALLOW_NULL]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $drules, '/', $error)) {
@@ -466,11 +484,11 @@ class CDRule extends CApiService {
 				'preservekeys' => true
 			]);
 
-			foreach ($proxyids as $proxyid) {
+			foreach ($proxyids as $i => $proxyid) {
 				if (!array_key_exists($proxyid, $db_proxies)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $proxyid, 'proxyid')
-					);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/'.$proxyid,_("object does not exist, or you have no permissions to it")
+					));
 				}
 			}
 		}

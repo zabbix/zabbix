@@ -510,7 +510,11 @@ class CAudit {
 		'usergroup.hostgroup_rights' => 'rights',
 		'usergroup.templategroup_rights' => 'rights',
 		'usergroup.tag_filters' => 'tag_filter',
-		'usergroup.users' => 'users_groups'
+		'usergroup.users' => 'users_groups',
+		'usergroup.proxies' => 'usrgrp_proxy',
+		'usergroup.proxy_groups' => 'usrgrp_proxy_group',
+		'usergroup.proxy_mode' => 'proxy_mode',
+		'usergroup.proxy_group_mode' => 'proxy_group_mode'
 	];
 
 	/**
@@ -625,7 +629,11 @@ class CAudit {
 		'usergroup.hostgroup_rights' => 'rightid',
 		'usergroup.templategroup_rights' => 'rightid',
 		'usergroup.tag_filters' => 'tag_filterid',
-		'usergroup.users' => 'id'
+		'usergroup.users' => 'id',
+		'usergroup.proxies' => 'proxyid',
+		'usergroup.proxy_groups' => 'proxy_groupid',
+		'usergroup.proxy_mode' => 'proxy_mode',
+		'usergroup.proxy_group_mode' => 'proxy_group_mode'
 	];
 
 	/**

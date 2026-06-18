@@ -1580,7 +1580,7 @@ class CHost extends CHostGeneral {
 	 */
 	protected function validateCreate(array &$hosts) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
-			'monitored_by' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP]), 'default' => DB::getDefault('hosts', 'monitored_by')],
+			'monitored_by' =>	['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP]), 'default' => DB::getDefault('hosts', 'monitored_by')],
 			'proxyid' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY], 'type' => API_ID, 'flags' => API_REQUIRED],
 									['else' => true, 'type' => API_ID, 'in' => '0']
@@ -1632,6 +1632,7 @@ class CHost extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		self::checkMonitoredByField($hosts);
 		self::checkProxiesAndProxyGroups($hosts);
 		self::checkTlsPskPairs($hosts);
 		$this->checkGroups($hosts);
@@ -1926,6 +1927,8 @@ class CHost extends CHostGeneral {
 		unset($host);
 
 		self::checkProxiesAndProxyGroups($hosts, $db_hosts);
+		$this->checkMonitoredByField($hosts, $db_hosts);
+		$this->checkProxiesAndProxyGroupsAccessibility($hosts, $db_hosts);
 		self::checkTlsPskPairs($hosts, $db_hosts);
 
 		foreach ($hosts as $host) {
@@ -2106,6 +2109,108 @@ class CHost extends CHostGeneral {
 
 			$update_discovered_validator->setObjectName($host_name);
 			$this->checkPartialValidator($host, $update_discovered_validator, $db_host);
+		}
+	}
+
+	private function checkMonitoredByField(array $hosts, ?array $db_hosts = null): void {
+		$select_server_for_monitoring = self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING);
+
+		if ($select_server_for_monitoring) {
+			return;
+		}
+
+		foreach ($hosts as $i => $host) {
+			if (array_key_exists('monitored_by', $host)) {
+				if ($host['monitored_by'] === ZBX_MONITORED_BY_SERVER) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/monitored_by/',
+						_("you don't have permission to select server for monitoring")
+					));
+				}
+
+				if ($host['monitored_by'] === ZBX_MONITORED_BY_SERVER && $db_hosts !== null
+						&& $host['monitored_by'] !== $db_hosts[$host['hostid']]['monitored_by']) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/monitored_by/',
+						_("parameter is readonly while you don't have permission to select server for monitoring")
+					));
+				}
+			}
+		}
+	}
+
+	private function checkProxiesAndProxyGroupsAccessibility(array $hosts, array $db_hosts): void {
+		$host_indexes = [
+			'proxyids' => [],
+			'proxy_groupids' => []
+		];
+
+		foreach ($hosts as $i => $host) {
+			if ($db_hosts !== null && $db_hosts[$host['hostid']]['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
+				continue;
+			}
+
+			if (array_key_exists('proxyid', $host)) {
+				if (($db_hosts !== null && bccomp($host['proxyid'], $db_hosts[$host['hostid']]['proxyid']) != 0)
+						&& !array_key_exists($host['proxyid'], $host_indexes['proxyids'])) {
+					$host_indexes['proxyids'][$db_hosts[$host['hostid']]['proxyid']] = $i;
+				}
+			}
+
+			if (array_key_exists('proxy_groupid', $host)) {
+				if (($db_hosts !== null && bccomp($host['proxy_groupid'], $db_hosts[$host['hostid']]['proxy_groupid']) != 0)
+						&& !array_key_exists($host['proxy_groupid'], $host_indexes['proxy_groupids'])) {
+					$host_indexes['proxy_groupids'][$db_hosts[$host['hostid']]['proxy_groupid']] = $i;
+				}
+			}
+		}
+
+		if ($host_indexes['proxyids']) {
+			$db_proxies = API::Proxy()->get([
+				'output' => [],
+				'proxyids' => array_keys($host_indexes['proxyids']),
+				'preservekeys' => true
+			]);
+
+			foreach ($host_indexes['proxyids'] as $proxyid => $i) {
+				if (!array_key_exists($proxyid, $db_proxies)
+						&& ($host['proxyid'] !== $db_hosts[$host['hostid']]['proxyid']
+							|| $host['monitored_by'] !== $db_hosts[$host['hostid']]['monitored_by'])) {
+					$field = array_key_exists('monitored_by', $host)
+						? 'monitored_by'
+						: 'proxyid';
+
+					$path = '/'.($i + 1).'/'.$field;
+
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',$path,
+						_("parameter is readonly while you don't have permission to current proxy")
+					));
+				}
+			}
+		}
+
+		if ($host_indexes['proxy_groupids']) {
+			$db_proxy_groups = API::ProxyGroup()->get([
+				'output' => [],
+				'proxy_groupids' => array_keys($host_indexes['proxy_groupids']),
+				'preservekeys' => true
+			]);
+
+			foreach ($host_indexes['proxy_groupids'] as $proxyid => $i) {
+				if (!array_key_exists($proxyid, $db_proxy_groups)
+						&& ($host['proxy_groupid'] !== $db_hosts[$host['hostid']]['proxy_groupid']
+							|| $host['monitored_by'] !== $db_hosts[$host['hostid']]['monitored_by'])) {
+					$field = array_key_exists('monitored_by', $host)
+						? 'monitored_by'
+						: 'proxy_groupid';
+
+					$path = '/'.($i + 1).'/'.$field;
+
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',$path,
+						_("parameter is readonly while you don't have permission to current proxy group")
+					));
+				}
+			}
 		}
 	}
 

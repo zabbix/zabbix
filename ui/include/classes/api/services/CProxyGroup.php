@@ -107,6 +107,12 @@ class CProxyGroup extends CApiService {
 	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			if (!$options['editable']) {
+				$sql_parts['where'][] = CApiUserGroupHelper::getProxyGroupPermissionsCondition('pg');
+			}
+		}
+
 		// proxyids
 		if ($options['proxyids'] !== null) {
 			$sql_parts['join']['p'] = ['table' => 'proxy', 'using' => 'proxy_groupid'];

@@ -184,6 +184,25 @@ class CAction extends CApiService {
 					' AND p.hgsetid IS NULL'.
 			')';
 
+			// Check permissions of proxies used in filter conditions.
+			$sqlParts['where'][] = '('.
+				'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM conditions c'.
+					' JOIN proxy p ON '.zbx_dbcast_2bigint('c.value').'=p.proxyid'.
+					' WHERE a.actionid=c.actionid'.
+						' AND c.conditiontype='.ZBX_CONDITION_TYPE_PROXY.
+				')'.
+				' OR EXISTS ('.
+					'SELECT NULL'.
+					' FROM conditions c'.
+					' JOIN proxy p ON '.zbx_dbcast_2bigint('c.value').'=p.proxyid'.
+					' WHERE a.actionid=c.actionid'.
+						' AND c.conditiontype='.ZBX_CONDITION_TYPE_PROXY.
+						' AND '.CApiUserGroupHelper::getProxyPermissionsCondition('p').
+				')'.
+			')';
+
 			// Check permissions of user groups mentioned for "send message" operations.
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.
@@ -3314,15 +3333,22 @@ class CAction extends CApiService {
 
 		$proxyids = array_keys($proxyids);
 
-		$count = API::Proxy()->get([
-			'countOutput' => true,
-			'proxyids' => $proxyids
+		$proxies = API::Proxy()->get([
+			'output' => ['proxyid'],
+			'proxyids' => $proxyids,
+			'preservekeys' => true
+
 		]);
 
-		if ($count != count($proxyids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
-			);
+		foreach ($actions as $i1 => $action) {
+			foreach ($action['filter']['conditions'] as $i2 => $condition) {
+				if (!array_key_exists($condition['value'], $proxies)) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,_s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i1 + 1).'/filter/conditions/'.($i2 + 1).'/value/',
+						_('object does not exist, or you have no permissions to it')
+					));
+				}
+			}
 		}
 	}
 
