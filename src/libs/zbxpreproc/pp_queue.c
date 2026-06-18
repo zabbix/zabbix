@@ -14,6 +14,7 @@
 
 #include "pp_queue.h"
 #include "pp_task.h"
+#include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-05-17 20:24+0000\n"
+"PO-Revision-Date: 2026-06-02 17:27+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -146,6 +146,12 @@ msgstr "%1$s caràcters"
 #, c-format
 msgid "%1$s characters remaining"
 msgstr "Queden %1$s caràcters"
+
+#: app/views/administration.housekeeping.edit.php:165
+#: app/views/administration.housekeeping.edit.php:166
+#, c-format
+msgid "%1$s data storage period"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -1681,7 +1687,7 @@ msgstr "Mida de l'arc"
 #: jsLoader.php:267
 #, c-format
 msgid "Are you sure you want to delete %1$s? This action cannot be undone."
-msgstr ""
+msgstr "Segur que voleu esborrar %1$s? Aquesta acció no es pot desfer."
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -4772,7 +4778,7 @@ msgstr "No es pot pas actualitzar la passa d'escenari web"
 #: include/classes/core/CConfigFile.php:192
 #, c-format
 msgid "Cannot use both %1$s and %2$s at the same time."
-msgstr ""
+msgstr "No es poden utilitzar %1$s i %2$s alhora."
 
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
@@ -4820,7 +4826,7 @@ msgstr "Certificat"
 
 #: app/views/js/monitoring.latest.view.js.php:211
 msgid "Change"
-msgstr ""
+msgstr "Canvi"
 
 #: app/partials/monitoring.latest.view.html.php:78
 #: app/partials/monitoring.latest.view.html.php:91 include/items.inc.php:1577
@@ -5116,6 +5122,15 @@ msgstr "Cliqueu i arrossegueu a la mida desitjada."
 msgid "Click to view or edit"
 msgstr "Feu clic per veure o editar"
 
+#: app/views/administration.housekeeping.edit.php:165
+msgid "ClickHouse"
+msgstr ""
+
+#: include/classes/api/managers/history/CClickHouseStorage.php:118
+#, c-format
+msgid "ClickHouse error: %1$s."
+msgstr ""
+
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
 msgstr "ID del client"
@@ -5279,11 +5294,11 @@ msgstr "Funció d'afegir columnes"
 
 #: jsLoader.php:304
 msgid "Column list"
-msgstr ""
+msgstr "Llistat de columnes"
 
 #: jsLoader.php:273
 msgid "Column name"
-msgstr ""
+msgstr "Nom de columna"
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
@@ -6383,7 +6398,7 @@ msgstr "No s'admeten plantilles personalitzades."
 
 #: jsLoader.php:270
 msgid "Customize table"
-msgstr ""
+msgstr "Taula personalitzada"
 
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
@@ -6980,7 +6995,7 @@ msgstr "Vols esborrar i netejar la plantilla? (Avís: tots els equips enllaçats
 
 #: jsLoader.php:275
 msgid "Delete column"
-msgstr ""
+msgstr "Esborrar columna"
 
 #: app/views/popup.action.edit.php:292
 msgid "Delete current action?"
@@ -8278,7 +8293,7 @@ msgstr "Duplica \"usrgrpid\" \"%1$s\" als grups d'usuaris per al mapa \"%2$s\"."
 
 #: jsLoader.php:274
 msgid "Duplicate column"
-msgstr ""
+msgstr "Duplicar columna"
 
 #: include/classes/api/services/CHost.php:2096
 #: include/classes/api/services/CHost.php:2396
@@ -8383,6 +8398,10 @@ msgstr "Data efectiva"
 #: app/partials/hostmacros.inherited.list.html.php:50
 msgid "Effective value"
 msgstr "Valor efectiu"
+
+#: app/views/administration.housekeeping.edit.php:166
+msgid "Elasticsearch"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1449
 #: include/classes/api/managers/CHistoryManager.php:1458
@@ -11810,7 +11829,7 @@ msgstr "S'empren caràcters incorrectes com a nom de plantilla."
 #: include/classes/core/CConfigFile.php:411
 #, c-format
 msgid "Incorrect configuration %1$s: %2$s."
-msgstr ""
+msgstr "Configuració incorrecta %1$s: %2$s."
 
 #: include/classes/api/services/CUser.php:482
 msgid "Incorrect current password."
@@ -11846,6 +11865,16 @@ msgstr "Càrrega incorrecta del fitxer."
 #: include/triggers.inc.php:768
 msgid "Incorrect function is used"
 msgstr "S'empra una funció incorrecta"
+
+#: include/classes/core/CConfigFile.php:211
+#: include/classes/core/CConfigFile.php:219
+#: include/classes/core/CConfigFile.php:557
+#: include/classes/core/CConfigFile.php:563
+#: include/classes/core/CConfigFile.php:569
+#: include/classes/core/CConfigFile.php:579
+#, c-format
+msgid "Incorrect history storage configuration %1$s: %2$s."
+msgstr ""
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -12387,7 +12416,7 @@ msgstr "Macros prototip i equips heretats"
 
 #: jsLoader.php:260
 msgid "Inherited and host prototype tag"
-msgstr ""
+msgstr "Etiqueta de prototip i equips heretats"
 
 #: include/classes/helpers/CTagHelper.php:230
 msgid "Inherited and host tag"
@@ -12399,7 +12428,7 @@ msgstr "Etiquetes d'equip i heretades"
 
 #: jsLoader.php:262
 msgid "Inherited and item prototype tag"
-msgstr ""
+msgstr "Etiqueta de prototip i elements heretats"
 
 #: include/classes/helpers/CTagHelper.php:231
 msgid "Inherited and item tag"
@@ -12427,7 +12456,7 @@ msgstr "Plantilles d'etiquetes d'equip i heretades"
 
 #: jsLoader.php:264
 msgid "Inherited and trigger prototype tag"
-msgstr ""
+msgstr "Etiqueta de prototip i triggers heretats"
 
 #: include/classes/helpers/CTagHelper.php:232
 msgid "Inherited and trigger tag"
@@ -13068,7 +13097,7 @@ msgstr "Interval no vàlid."
 #: app/controllers/CControllerDataTable.php:59
 #: app/controllers/CControllerDataTable.php:138
 msgid "Invalid request"
-msgstr ""
+msgstr "Petició no vàlida"
 
 #: include/classes/core/CJsonRpc.php:205
 msgid "Invalid request."
@@ -14454,7 +14483,7 @@ msgstr "Tancat manualment"
 #: include/actions.inc.php:1698 include/actions.inc.php:2195
 #: include/html.inc.php:1135
 msgid "Manually suppressed"
-msgstr ""
+msgstr "Esborrat manualment"
 
 #: app/controllers/CControllerProblemViewData.php:475
 #: include/actions.inc.php:1674 include/actions.inc.php:1675
@@ -14462,7 +14491,7 @@ msgstr ""
 #: include/actions.inc.php:2201 include/blocks.inc.php:692
 #: widgets/problems/includes/WidgetProblems.php:280
 msgid "Manually unsuppressed"
-msgstr ""
+msgstr "Desesborrat manualment"
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: include/classes/data/CWidgetsData.php:110
@@ -15905,6 +15934,10 @@ msgstr "Següent"
 msgid "Next dashboard"
 msgstr "Tauler següent"
 
+#: jsLoader.php:416
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15918,6 +15951,10 @@ msgstr "Següent pàgina"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Passa següent"
+
+#: jsLoader.php:414
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -16623,6 +16660,12 @@ msgstr "Elements no heretats"
 msgid "Not linked"
 msgstr "Sense enllaçar"
 
+#: app/views/item.list.php:233 app/views/item.list.php:234
+#: include/classes/helpers/CItemHelper.php:386
+#: include/classes/helpers/CItemHelper.php:416
+msgid "Not stored"
+msgstr ""
+
 #: app/controllers/CControllerLatest.php:546
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.latest.filter.php:191
@@ -16780,7 +16823,7 @@ msgstr "Nombre de passes"
 
 #: jsLoader.php:291
 msgid "Number of tags"
-msgstr ""
+msgstr "Nombre d'etiquetes"
 
 #: app/partials/administration.system.info.php:60
 msgid "Number of templates"
@@ -19386,7 +19429,7 @@ msgstr "Restableix els valors per defecte"
 
 #: jsLoader.php:305
 msgid "Reset layout"
-msgstr ""
+msgstr "Disseny de reinicialització"
 
 #: widgets/geomap/Widget.php:37
 msgid "Reset to initial view"
@@ -20904,7 +20947,7 @@ msgstr "Mostra els equips que són en manteniment"
 
 #: jsLoader.php:281
 msgid "Show item key"
-msgstr ""
+msgstr "Veure la clau de l'element"
 
 #: include/views/js/monitoring.sysmaps.js.php:158
 #: include/views/js/monitoring.sysmaps.js.php:698
@@ -21036,7 +21079,7 @@ msgstr "Veure el valor total"
 
 #: jsLoader.php:285
 msgid "Show trigger expression"
-msgstr ""
+msgstr "Veure la expressió de trigger"
 
 #: include/views/configuration.graph.edit.php:131
 msgid "Show triggers"
@@ -21776,7 +21819,7 @@ msgstr "Esborrat"
 
 #: include/actions.inc.php:2241 include/html.inc.php:1134
 msgid "Suppressed by maintenance"
-msgstr ""
+msgstr "Esborrat per manteniment"
 
 #: include/actions.inc.php:2019 include/html.inc.php:1000
 #, c-format
@@ -21942,7 +21985,7 @@ msgstr "La taula \"%1$s\" no té pas cap camp anomenat \"%2$s\"."
 
 #: jsLoader.php:303
 msgid "Table options"
-msgstr ""
+msgstr "Opcions de la taula"
 
 #: app/controllers/CControllerActionOperationCheck.php:210
 #: app/controllers/CControllerActionOperationCheck.php:216
@@ -22005,7 +22048,7 @@ msgstr "La combinació de nom i valor de l'etiqueta no és única."
 
 #: jsLoader.php:292
 msgid "Tag name display"
-msgstr ""
+msgstr "Veure el nom d'etiqueta"
 
 #: app/controllers/CControllerMaintenanceCreate.php:93
 #: app/controllers/CControllerMaintenanceUpdate.php:94
@@ -22690,6 +22733,10 @@ msgstr "Aquesta configuració només aplica a dades numèriques."
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "Aquesta configuració només s'aplica a les dades numèriques. Les dades no numèriques es prendran sempre de l'historial."
 
+#: app/views/administration.housekeeping.edit.php:145
+msgid "This setting does not affect Elasticsearch and ClickHouse storage periods."
+msgstr ""
+
 #: app/partials/administration.system.info.php:212
 #: app/views/administration.housekeeping.edit.php:132
 msgid "This setting should be enabled, because history tables contain compressed chunks."
@@ -23088,6 +23135,11 @@ msgctxt "compact table header"
 msgid "Total"
 msgstr "Total"
 
+#: include/classes/debug/CProfiler.php:172
+#, c-format
+msgid "Total ClickHouse time: %1$s"
+msgstr ""
+
 #: include/classes/debug/CProfiler.php:153
 #, c-format
 msgid "Total Elasticsearch time: %1$s"
@@ -23177,6 +23229,11 @@ msgstr "Estadístiques de memòria cau de la funció de la tendència. Els parà
 #: widgets/tophosts/views/column.edit.php:206
 msgid "Trends"
 msgstr "Tendències"
+
+#: app/partials/item.edit.item.tab.php:774
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse."
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:257
 #: app/views/reports.toptriggers.list.php:120 app/views/trigger.edit.php:54
@@ -24114,7 +24171,7 @@ msgstr "Restaurat"
 
 #: include/actions.inc.php:2257
 msgid "Unsuppressed by maintenance"
-msgstr ""
+msgstr "Desesborrat per manteniment"
 
 #: include/blocks.inc.php:670 include/classes/screens/CScreenProblem.php:1425
 #: widgets/problems/includes/WidgetProblems.php:278
@@ -24300,7 +24357,7 @@ msgstr "Temps d'activitat/temps d'inactivitat"
 #: app/partials/administration.system.info.php:328
 #, c-format
 msgid "Use %1$s instead"
-msgstr ""
+msgstr "Millor empreu %1$s"
 
 #: app/views/popup.ldap.edit.php:173
 msgid "Use %{ref} in group filter to reference value of this user attribute."
@@ -26166,7 +26223,7 @@ msgstr "El vostre progrés es descartarà i sortireu de l'Auxiliar d'eequips. Se
 
 #: jsLoader.php:307
 msgid "Your table settings will be reset to default and duplicated columns will be removed."
-msgstr ""
+msgstr "La configuració de la taula es restablirà per defecte i s'esborraran les columnes duplicades."
 
 #: include/page_header.php:122
 msgid "Zabbix"
@@ -27248,7 +27305,7 @@ msgstr "no coincideix"
 
 #: jsLoader.php:268
 msgid "duplicate"
-msgstr ""
+msgstr "duplicat"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
@@ -27354,6 +27411,10 @@ msgstr "fuzzytime() - La diferència entre el valor de l'element (com a marca de
 #: include/classes/validators/CApiInputValidator.php:3317
 msgid "geographical coordinates (values of comma separated latitude and longitude) are expected"
 msgstr "s'esperen coordenades geogràfiques (valors de latitud i longitud separats per comes)"
+
+#: app/views/item.edit.php:224 app/views/item.edit.php:228
+msgid "global housekeeping settings"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.edit.php:891
@@ -27513,6 +27574,11 @@ msgstr "recompte d'elements incorrecta"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "expressió incorrecta a partir de \"%1$s\""
+
+#: include/classes/core/CConfigFile.php:212
+#: include/classes/core/CConfigFile.php:220
+msgid "incorrect format"
+msgstr ""
 
 #: jsLoader.php:298
 msgid "incorrect item value type"
