@@ -27,6 +27,7 @@ import (
 
 	"golang.org/x/sys/windows"
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 )
 
 const cmd = "cmd.exe"
@@ -52,8 +53,6 @@ func InitExecutor() (Executor, error) {
 
 func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string, strict bool) (string, error) {
 	job, err := createWinJob()
-
-	defer windows.CloseHandle(job)
 	if err != nil {
 		return "", err
 	}
@@ -74,6 +73,8 @@ func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string,
 
 	err = cmd.Start()
 	if err != nil {
+		windows.CloseHandle(job)
+
 		return "", errs.Errorf("failed to start command (%s, path: %s): %s", command, execDir, err)
 	}
 
@@ -82,8 +83,9 @@ func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string,
 		false,
 		uint32(cmd.Process.Pid),
 	)
-
 	if err != nil {
+		windows.CloseHandle(job)
+
 		perr := cmd.Process.Kill()
 		if perr != nil {
 			return "", errs.Errorf("open process failed: %s and process kill failed: %s", err, perr)
@@ -96,6 +98,8 @@ func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string,
 
 	err = windows.AssignProcessToJobObject(job, procHandle)
 	if err != nil {
+		windows.CloseHandle(job)
+
 		perr := cmd.Process.Kill()
 		if perr != nil {
 			return "", errs.Errorf("process job assignment failed: %s and process kill failed: %s", err, perr)
@@ -150,6 +154,10 @@ func jobDoneListener(done chan<- error, cmd *exec.Cmd) {
 func timeoutListener(ctx context.Context, job windows.Handle) {
 	<-ctx.Done()
 
+	err := windows.CloseHandle(job)
+	if err != nil {
+		log.Debugf("failed to kill cmd processes %s", err)
+	}
 }
 
 func createWinJob() (windows.Handle, error) {
@@ -169,6 +177,9 @@ func createWinJob() (windows.Handle, error) {
 		windows.JobObjectExtendedLimitInformation,
 		uintptr(unsafe.Pointer(&info)),
 		uint32(unsafe.Sizeof(info))); err != nil {
+
+		windows.CloseHandle(job)
+
 		return 0, errs.Errorf("failed to populate win job: %s", err)
 	}
 
