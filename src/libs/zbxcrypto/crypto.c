@@ -206,7 +206,14 @@ char	*zbx_gen_uuid7_hyphenated(void)
 			1);	/* terminating '\0' */
 
 	zbx_timespec(&ts);
-	srand((unsigned int)time(NULL) + (unsigned int)getpid());
+
+	static int	seeded = 0;
+
+	if (0 == seeded)
+	{
+		srand((unsigned int)time(NULL) + (unsigned int)getpid());
+		seeded = 1;
+	}
 
 	ts_ms = (uint64_t)ts.sec * 1000 + (uint64_t)ts.ns / 1000000;
 
