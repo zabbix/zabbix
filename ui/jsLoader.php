@@ -409,7 +409,11 @@ $translate_strings = [
 		'S_THURSDAY_SHORT_BIG' => _x('T', 'Thursday short'),
 		'S_FRIDAY_SHORT_BIG' => _x('F', 'Friday short'),
 		'S_SATURDAY_SHORT_BIG' => _x('S', 'Saturday short'),
-		'S_SUNDAY_SHORT_BIG' => _x('S', 'Sunday short')
+		'S_SUNDAY_SHORT_BIG' => _x('S', 'Sunday short'),
+		'Previous year' => _('Previous year'),
+		'Next year' => _('Next year'),
+		'Previous month' => _('Previous month'),
+		'Next month' => _('Next month')
 	],
 	'class.linkform.js' => [
 		'S_CANNOT_BE_EMPTY' => _('cannot be empty'),

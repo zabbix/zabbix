@@ -1,0 +1,1 @@
+.......PS. [ZBX-27200] fixed invalid statuses for hosts and services during network discovery when host is found on several IP addresses (aetatsu)

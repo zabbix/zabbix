@@ -6243,6 +6243,48 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: retrieves IP of main interface of correct type for specified host *
+ *                                                                            *
+ * Parameters:                                                                *
+ *             hostid             - [IN] host id from database                *
+ *             type               - [IN] interface type                       *
+ *             ip_buffer          - [OUT] buffer for main interface IP        *
+ *             sz_ip_buffer       - [IN] size of ip_buffer                    *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_main_interface_ip(const zbx_uint64_t hostid, const unsigned char type,
+			char *ip_buffer, const size_t sz_ip_buffer)
+{
+	char		*sql;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		ret = FAIL;
+
+	sql = zbx_dsprintf(NULL,
+			"select ip"
+			" from interface"
+			" where hostid=" ZBX_FS_UI64
+				" and type=%d"
+				" and main<>0",
+			hostid, (int)type);
+
+	result = zbx_db_select_n(sql, 1);
+	zbx_free(sql);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_strlcpy(ip_buffer, row[0], sz_ip_buffer);
+		ret = SUCCEED;
+	}
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: adds new interface to specified host                              *
  *          or update main interface of this type for specified host          *
  *                                                                            *

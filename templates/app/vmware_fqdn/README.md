@@ -87,13 +87,13 @@ Additional resources:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#VMWARE.ALARMS.NAME}|<p>VMware alarm status.</p>|Dependent item|vmware.alarms.status["{#VMWARE.ALARMS.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.key == "{#VMWARE.ALARMS.KEY}")].key.first()`</p><p>⛔️Custom on fail: Set value to: `-1`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|{#VMWARE.ALARMS.NAME} {#VMWARE.ALARMS.ENTITY.NAME}|<p>VMware alarm status.</p>|Dependent item|vmware.alarms.status["{#VMWARE.ALARMS.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.key == "{#VMWARE.ALARMS.KEY}")].key.first()`</p><p>⛔️Custom on fail: Set value to: `-1`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for VMware alarm discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|VMware FQDN: {#VMWARE.ALARMS.NAME}|<p>{#VMWARE.ALARMS.DESC}</p>|`last(/VMware FQDN/vmware.alarms.status["{#VMWARE.ALARMS.KEY}"])<>-1`|Not_classified||
+|VMware FQDN: {#VMWARE.ALARMS.NAME} {#VMWARE.ALARMS.ENTITY.NAME}|<p>'{#VMWARE.ALARMS.DESC}'<br>Type: {#VMWARE.ALARMS.ENTITY.TYPE} <br>UUID: {#VMWARE.ALARMS.ENTITY.UUID}<br>ID: {#VMWARE.ALARMS.ENTITY.ID}</p>|`last(/VMware FQDN/vmware.alarms.status["{#VMWARE.ALARMS.KEY}"])<>-1`|Not_classified||
 
 ### LLD rule VMware cluster discovery
 

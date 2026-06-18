@@ -47,7 +47,7 @@ zabbix_export:
         - How to get all supported counters and [generate a path for the custom performance counter](https://www.zabbix.com/documentation/8.0/manual/appendix/items/perf_counters).
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -388,7 +388,7 @@ zabbix_export:
           description: 'Discovery of alarms.'
           item_prototypes:
             - uuid: 8e08a252b7344e10850bd177045e9a55
-              name: '{#VMWARE.ALARMS.NAME}'
+              name: '{#VMWARE.ALARMS.NAME} {#VMWARE.ALARMS.ENTITY.NAME}'
               type: DEPENDENT
               key: 'vmware.alarms.status["{#VMWARE.ALARMS.KEY}"]'
               value_type: CHAR
@@ -410,8 +410,12 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 156400a8c7c04b25b99c540824168a36
                   expression: 'last(/VMware FQDN/vmware.alarms.status["{#VMWARE.ALARMS.KEY}"])<>-1'
-                  name: 'VMware FQDN: {#VMWARE.ALARMS.NAME}'
-                  description: '{#VMWARE.ALARMS.DESC}'
+                  name: 'VMware FQDN: {#VMWARE.ALARMS.NAME} {#VMWARE.ALARMS.ENTITY.NAME}'
+                  description: |
+                    '{#VMWARE.ALARMS.DESC}'
+                    Type: {#VMWARE.ALARMS.ENTITY.TYPE} 
+                    UUID: {#VMWARE.ALARMS.ENTITY.UUID}
+                    ID: {#VMWARE.ALARMS.ENTITY.ID}
                   tags:
                     - tag: scope
                       value: notice
@@ -420,6 +424,14 @@ zabbix_export:
           lld_macro_paths:
             - lld_macro: '{#VMWARE.ALARMS.DESC}'
               path: $.description
+            - lld_macro: '{#VMWARE.ALARMS.ENTITY.ID}'
+              path: $.entity.id
+            - lld_macro: '{#VMWARE.ALARMS.ENTITY.NAME}'
+              path: $.entity.name
+            - lld_macro: '{#VMWARE.ALARMS.ENTITY.TYPE}'
+              path: $.entity.type
+            - lld_macro: '{#VMWARE.ALARMS.ENTITY.UUID}'
+              path: $.entity.uuid
             - lld_macro: '{#VMWARE.ALARMS.KEY}'
               path: $.key
             - lld_macro: '{#VMWARE.ALARMS.NAME}'
