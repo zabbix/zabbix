@@ -105,7 +105,7 @@ struct zbx_cep
 	zbx_hashset_t			objects;
 
 	zbx_uint64_t			eventid_next;
-	zbx_uint64_t			eventid_last;
+	zbx_uint64_t			eventid_max;
 
 	zbx_dbconn_pool_t		*dbpool;
 
@@ -336,13 +336,15 @@ static zbx_uint64_t	cep_eventid_next(zbx_cep_t *cep)
 {
 #define CEP_EVENTID_BATCH_SIZE	1000
 
-	if (cep->eventid_next == cep->eventid_last)
+	if (cep->eventid_next == cep->eventid_max)
 	{
 		zbx_dbconn_t	*db = zbx_dbconn_pool_acquire_connection(cep->dbpool);
 
 		cep->eventid_next = zbx_dbconn_get_maxid_num(db, "events", CEP_EVENTID_BATCH_SIZE);
 
 		zbx_dbconn_pool_release_connection(cep->dbpool, db);
+
+		cep->eventid_max = cep->eventid_next + CEP_EVENTID_BATCH_SIZE;
 	}
 
 	return cep->eventid_next++;
