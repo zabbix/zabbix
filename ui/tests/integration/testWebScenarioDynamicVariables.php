@@ -214,6 +214,86 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 				'name'      => 'xmlxpath scenario level with status code check',
 				'variables' => [['name' => '{XML_VAL}', 'value' => 'xmlxpath://document/item/value/text()']],
 				'steps'     => [array_merge($base_step, ['status_codes' => '200'])]
+			],
+
+			// --- Static variable after dynamic variable at scenario level (ZBX-27770 side effect) ---
+			//
+			// On master, processing scenario-level variables with NULL data caused an early-exit
+			// (regex: → FAIL) or a crash (jsonpath:/xmlxpath:) before reaching any subsequent
+			// plain variables.  After the fix, all variables are processed: dynamic ones are
+			// stored as literal placeholders and plain ones are stored normally.
+			//
+			// This scenario exercises that ordering: {DYNAMIC_VAR} (regex:) is defined first in
+			// DB insertion order, {BASE_PATH} (plain) is defined second.  Step 1 uses {BASE_PATH}
+			// in its URL.  On master, {BASE_PATH} would not be in the macro cache when step 1's
+			// URL is expanded, leaving the literal token "{BASE_PATH}" in the URL string.  After
+			// the fix, {BASE_PATH} = "/" is in the cache and the URL is correctly "http://localhost/".
+
+			'static_after_dynamic' => [
+				'name'      => 'static variable after dynamic at scenario level (ZBX-27770)',
+				'variables' => [
+					['name' => '{DYNAMIC_VAR}', 'value' => 'regex:hostid is ([0-9]+)'],
+					['name' => '{BASE_PATH}',   'value' => '/']
+				],
+				'steps' => [array_merge($base_step, ['url' => 'http://localhost{BASE_PATH}'])]
+			],
+
+			// --- Plain string variables (doc examples: {username}=Alexei, {password}=kj3h5kJ34bd) ---
+			// The most basic variable type — no extraction prefix, value is stored as-is and
+			// substituted directly into step URLs and POST data.  These are the doc's first two
+			// examples and represent the most common real-world use-case.
+
+			'plain_variables' => [
+				'name'      => 'plain string variables - scenario level',
+				'variables' => [
+					['name' => '{username}', 'value' => 'Alexei'],
+					['name' => '{password}', 'value' => 'kj3h5kJ34bd']
+				],
+				'steps' => [$base_step]
+			],
+
+			// --- Doc-exact regex pattern: {hostid}=regex:hostid is ([0-9]+) ---
+			// The existing regex_scenario_level test uses regex:(.*).  This exercises the
+			// specific doc pattern where the capture group is preceded by literal text.
+
+			'regex_doc_pattern' => [
+				'name'      => 'doc example: regex:hostid is ([0-9]+) - scenario level',
+				'variables' => [['name' => '{hostid}', 'value' => 'regex:hostid is ([0-9]+)']],
+				'steps'     => [$base_step]
+			],
+
+			// --- Doc-exact jsonpath pattern: {url}=jsonpath:$.host_url ---
+			// Exercises a nested-key jsonpath expression matching the documented example.
+
+			'jsonpath_doc_pattern' => [
+				'name'      => 'doc example: jsonpath:$.host_url - scenario level',
+				'variables' => [['name' => '{url}', 'value' => 'jsonpath:$.host_url']],
+				'steps'     => [$base_step]
+			],
+
+			// --- Doc-exact xmlxpath pattern: {status}=xmlxpath://host/response/status ---
+			// Exercises a multi-level xmlxpath expression matching the documented example.
+
+			'xmlxpath_doc_pattern' => [
+				'name'      => 'doc example: xmlxpath://host/response/status - scenario level',
+				'variables' => [['name' => '{status}', 'value' => 'xmlxpath://host/response/status']],
+				'steps'     => [$base_step]
+			],
+
+			// --- Macro function variable: {newvar}={{myvar}.btoa()} ---
+			// The sixth variable form in the docs.  {myvar} is a plain scenario-level variable;
+			// {newvar} stores the literal expression {{myvar}.btoa()}.
+			// The step URL uses {{myvar}.btoa()} directly, exercising the VAR_FUNC_MACRO token
+			// path in http_substitute_variables() where the cached value of {myvar} has btoa()
+			// applied before being substituted into the URL.
+
+			'macro_function_variable' => [
+				'name'      => 'macro function variable {{myvar}.btoa()} - scenario level',
+				'variables' => [
+					['name' => '{myvar}',  'value' => 'Alexei'],
+					['name' => '{newvar}', 'value' => '{{myvar}.btoa()}']
+				],
+				'steps' => [array_merge($base_step, ['url' => 'http://localhost/?v={{myvar}.btoa()}'])]
 			]
 		];
 
@@ -347,6 +427,28 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 	}
 
 	/**
+	 * Verifies the ZBX-27770 side effect: a plain (static) variable defined after a dynamic
+	 * variable at scenario level is correctly stored in the macro cache during scenario
+	 * initialization and is therefore available for step 1's URL substitution.
+	 *
+	 * The scenario defines {DYNAMIC_VAR}=regex:... first and {BASE_PATH}=/ second.
+	 * Step 1's URL is http://localhost{BASE_PATH}.  After the fix, {BASE_PATH} is in
+	 * the cache when step 1 runs and the URL resolves to http://localhost/.  Before the
+	 * fix (master), the regex: variable caused an early exit at init, leaving {BASE_PATH}
+	 * absent from the cache and the URL unresolved.
+	 *
+	 * The assertion only requires LASTSTEP history (server survived and executed the
+	 * scenario), not step success, since localhost reachability is not guaranteed.
+	 */
+	public function testWebScenarioDynamicVariables_StaticAfterDynamic(): void {
+		$this->assertLASTSTEPHistoryPresent(
+			[self::$enabled_names['static_after_dynamic']],
+			1,
+			'static variable after dynamic at scenario level'
+		);
+	}
+
+	/**
 	 * Verifies that a scenario with multiple scenario-level variables using
 	 * mixed prefix types (jsonpath:, regex:, xmlxpath:) is processed without
 	 * crashing and produces LASTSTEP history.
@@ -368,6 +470,44 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 			[self::$enabled_names['multi_retry_scenario']],
 			1,
 			'multi-retry scenario'
+		);
+	}
+
+	/**
+	 * Verifies that plain string variables ({username}=Alexei, {password}=kj3h5kJ34bd)
+	 * are processed without errors and produce LASTSTEP history.  Plain variables are the
+	 * most common real-world use-case and the first two examples in the documentation.
+	 */
+	public function testWebScenarioDynamicVariables_PlainVariables(): void {
+		$this->assertLASTSTEPHistoryPresent(
+			[self::$enabled_names['plain_variables']],
+			1,
+			'plain string variables at scenario level'
+		);
+	}
+
+	/**
+	 * Verifies that the doc-exact variable patterns — regex:hostid is ([0-9]+),
+	 * jsonpath:$.host_url, and xmlxpath://host/response/status — are processed at
+	 * scenario level (with NULL data) without crashing and produce LASTSTEP history.
+	 */
+	public function testWebScenarioDynamicVariables_DocPatterns(): void {
+		$labels = ['regex_doc_pattern', 'jsonpath_doc_pattern', 'xmlxpath_doc_pattern'];
+		$names  = array_values(array_intersect_key(self::$enabled_names, array_flip($labels)));
+
+		$this->assertLASTSTEPHistoryPresent($names, count($names), 'doc-exact variable patterns');
+	}
+
+	/**
+	 * Verifies that a macro function variable ({newvar}={{myvar}.btoa()}) at scenario level
+	 * is processed without crashing.  The step URL directly references {{myvar}.btoa()},
+	 * exercising the VAR_FUNC_MACRO substitution path in http_substitute_variables().
+	 */
+	public function testWebScenarioDynamicVariables_MacroFunctionVariable(): void {
+		$this->assertLASTSTEPHistoryPresent(
+			[self::$enabled_names['macro_function_variable']],
+			1,
+			'macro function variable {{myvar}.btoa()}'
 		);
 	}
 

@@ -488,4 +488,165 @@ in:
   data: '<?xml version="1.0"?><root><item id="1">only</item></root>'
 out:
   return: FAIL
+---
+# ----------------------------------------------------------------------------
+# Doc examples: Variables that may be used in scenario steps
+# {username}=Alexei  {password}=kj3h5kJ34bd  {hostid}=regex:hostid is ([0-9]+)
+# {url}=jsonpath:$.host_url  {status}=xmlxpath://host/response/status
+# {newvar}={{myvar}.btoa()}
+# ----------------------------------------------------------------------------
+test case: 'doc example: {username}=Alexei plain literal without response data'
+in:
+  key: '{username}'
+  value: 'Alexei'
+out:
+  return: SUCCEED
+  macro_value: 'Alexei'
+---
+test case: 'doc example: {password}=kj3h5kJ34bd plain literal without response data'
+in:
+  key: '{password}'
+  value: 'kj3h5kJ34bd'
+out:
+  return: SUCCEED
+  macro_value: 'kj3h5kJ34bd'
+---
+test case: 'doc example: {hostid}=regex:hostid is ([0-9]+) extracts id from response'
+in:
+  key: '{hostid}'
+  value: 'regex:hostid is ([0-9]+)'
+  data: 'hostid is 42'
+out:
+  return: SUCCEED
+  macro_value: '42'
+---
+test case: 'doc example: {hostid}=regex:hostid is ([0-9]+) stored literally when data is null'
+in:
+  key: '{hostid}'
+  value: 'regex:hostid is ([0-9]+)'
+out:
+  return: SUCCEED
+  macro_value: 'regex:hostid is ([0-9]+)'
+---
+test case: 'doc example: {url}=jsonpath:$.host_url extracts URL from JSON response'
+in:
+  key: '{url}'
+  value: 'jsonpath:$.host_url'
+  data: '{"host_url":"https://example.com"}'
+out:
+  return: SUCCEED
+  macro_value: 'https://example.com'
+---
+test case: 'doc example: {url}=jsonpath:$.host_url stored literally when data is null'
+in:
+  key: '{url}'
+  value: 'jsonpath:$.host_url'
+out:
+  return: SUCCEED
+  macro_value: 'jsonpath:$.host_url'
+---
+test case: 'doc example: {status}=xmlxpath://host/response/status/text() extracts text from XML response'
+in:
+  key: '{status}'
+  value: 'xmlxpath://host/response/status/text()'
+  data: '<?xml version="1.0"?><host><response><status>OK</status></response></host>'
+out:
+  return: SUCCEED
+  macro_value: 'OK'
+---
+test case: 'doc example: {status}=xmlxpath://host/response/status stored literally when data is null'
+in:
+  key: '{status}'
+  value: 'xmlxpath://host/response/status'
+out:
+  return: SUCCEED
+  macro_value: 'xmlxpath://host/response/status'
+---
+test case: 'doc example: {newvar}={{myvar}.btoa()} stored literally (not a recognized extraction prefix)'
+in:
+  key: '{newvar}'
+  value: '{{myvar}.btoa()}'
+out:
+  return: SUCCEED
+  macro_value: '{{myvar}.btoa()}'
+---
+# ----------------------------------------------------------------------------
+# ZBX-27770 side effect: static variable after dynamic variable
+#
+# On master: a regex: variable at scenario init (data=NULL) returned FAIL and
+# exited the loop early, leaving any subsequent plain variables un-stored.
+# jsonpath:/xmlxpath: crashed the server before getting that far.
+#
+# After the fix: all variables are processed regardless of order — dynamic
+# ones are stored literally as placeholders, plain ones are stored normally.
+# This means a static variable defined after a dynamic one in the scenario
+# variable list is now correctly available for step 1's URL/POST substitution.
+# ----------------------------------------------------------------------------
+test case: 'ZBX-27770 side effect: static variable after regex variable both stored when data is null'
+in:
+  variables:
+    - key: '{hostid}'
+      value: 'regex:hostid is ([0-9]+)'
+    - key: '{BASE_URL}'
+      value: 'https://example.com'
+out:
+  return: SUCCEED
+  macro_values:
+    - key: '{hostid}'
+      value: 'regex:hostid is ([0-9]+)'
+    - key: '{BASE_URL}'
+      value: 'https://example.com'
+---
+test case: 'ZBX-27770 side effect: static variable after jsonpath variable both stored when data is null'
+in:
+  variables:
+    - key: '{url}'
+      value: 'jsonpath:$.host_url'
+    - key: '{username}'
+      value: 'Alexei'
+out:
+  return: SUCCEED
+  macro_values:
+    - key: '{url}'
+      value: 'jsonpath:$.host_url'
+    - key: '{username}'
+      value: 'Alexei'
+---
+test case: 'ZBX-27770 side effect: static variable after xmlxpath variable both stored when data is null'
+in:
+  variables:
+    - key: '{status}'
+      value: 'xmlxpath://host/response/status'
+    - key: '{password}'
+      value: 'kj3h5kJ34bd'
+out:
+  return: SUCCEED
+  macro_values:
+    - key: '{status}'
+      value: 'xmlxpath://host/response/status'
+    - key: '{password}'
+      value: 'kj3h5kJ34bd'
+---
+test case: 'ZBX-27770 side effect: multiple dynamic variables followed by static all stored when data is null'
+in:
+  variables:
+    - key: '{hostid}'
+      value: 'regex:hostid is ([0-9]+)'
+    - key: '{url}'
+      value: 'jsonpath:$.host_url'
+    - key: '{status}'
+      value: 'xmlxpath://host/response/status'
+    - key: '{username}'
+      value: 'Alexei'
+out:
+  return: SUCCEED
+  macro_values:
+    - key: '{hostid}'
+      value: 'regex:hostid is ([0-9]+)'
+    - key: '{url}'
+      value: 'jsonpath:$.host_url'
+    - key: '{status}'
+      value: 'xmlxpath://host/response/status'
+    - key: '{username}'
+      value: 'Alexei'
 ...
