@@ -142,6 +142,7 @@ $uniqueness_template = (new CTemplateTag('unique-row-tmpl'))->addItem(
 	(new CListItem([
 		(new CInput('radio', 'uniqueness_criteria', '#{dcheckid}'))
 			->addClass(ZBX_STYLE_CHECKBOX_RADIO)
+			->setAttribute('data-id', '#{dcheckid}')
 			->setId('uniqueness_criteria_#{dcheckid}'),
 		(new CLabel([new CSpan(), '#{name}'], 'uniqueness_criteria_#{dcheckid}'))->addClass(ZBX_STYLE_WORDWRAP)
 	]))->setId('uniqueness_criteria_row_#{dcheckid}')

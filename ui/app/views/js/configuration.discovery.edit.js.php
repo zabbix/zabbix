@@ -21,18 +21,29 @@
 
 window.drule_edit_popup = new class {
 
-	init({rules, clone_rules, druleid, dchecks, drule}) {
-		this.overlay = overlays_stack.getById('discovery.edit');
-		this.dialogue = this.overlay.$dialogue[0];
-		this.form_element  = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.form = new CForm(this.form_element, rules);
-		this.clone_rules = clone_rules;
+	#overlay;
+	#dialogue;
+	#form_element;
+	#form;
+	#clone_rules;
+	#druleid;
+	#dchecks;
+	#drule;
+	#dcheckid;
+	#available_device_types;
 
-		this.druleid = druleid;
-		this.dchecks = dchecks;
-		this.drule = drule;
-		this.dcheckid = getUniqueId();
-		this.available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
+	init({rules, clone_rules, druleid, dchecks, drule}) {
+		this.#overlay = overlays_stack.getById('discovery.edit');
+		this.#dialogue = this.#overlay.$dialogue[0];
+		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#form = new CForm(this.#form_element, rules);
+		this.#clone_rules = clone_rules;
+
+		this.#druleid = druleid;
+		this.#dchecks = dchecks;
+		this.#drule = drule;
+		this.#dcheckid = getUniqueId();
+		this.#available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'discovery.list');
@@ -51,12 +62,12 @@ window.drule_edit_popup = new class {
 		this.#addRadioButtonValues(drule);
 		this.#initEvents();
 		this.#updateForm();
-		this.form_element.style.display = '';
-		this.overlay.recoverFocus();
+		this.#form_element.style.display = '';
+		this.#overlay.recoverFocus();
 	}
 
 	#initEvents() {
-		this.dialogue.addEventListener('click', (e) => {
+		this.#dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-check-add')) {
 				this.#editCheck();
 			}
@@ -69,16 +80,16 @@ window.drule_edit_popup = new class {
 			}
 		});
 
-		this.overlay.$dialogue.$footer[0].querySelector('.js-submit')
+		this.#overlay.$dialogue.$footer[0].querySelector('.js-submit')
 			.addEventListener('click', () => this.#submit());
 
-		this.overlay.$dialogue.$footer[0].querySelector('.js-clone')
+		this.#overlay.$dialogue.$footer[0].querySelector('.js-clone')
 			?.addEventListener('click', () => this.#clone());
 
-		this.overlay.$dialogue.$footer[0].querySelector('.js-delete')
+		this.#overlay.$dialogue.$footer[0].querySelector('.js-delete')
 			?.addEventListener('click', () => this.#delete());
 
-		const max_sessions = this.form_element.querySelector('#concurrency_max_type');
+		const max_sessions = this.#form_element.querySelector('#concurrency_max_type');
 
 		max_sessions.onchange = () => {
 			this.#updateForm();
@@ -88,14 +99,14 @@ window.drule_edit_popup = new class {
 	}
 
 	#updateForm() {
-		const discovery_by = this.form_element.querySelector('[name="discovery_by"]:checked').value;
+		const discovery_by = this.#form_element.querySelector('[name="discovery_by"]:checked').value;
 
-		this.form_element.querySelector('.js-field-proxy').style.display = discovery_by == <?= ZBX_DISCOVERY_BY_PROXY ?>
+		this.#form_element.querySelector('.js-field-proxy').style.display = discovery_by == <?= ZBX_DISCOVERY_BY_PROXY ?>
 			? ''
 			: 'none';
 
-		const concurrency_max_type = this.form_element.querySelector('[name="concurrency_max_type"]:checked').value;
-		const concurrency_max = this.form_element.querySelector('#concurrency_max');
+		const concurrency_max_type = this.#form_element.querySelector('[name="concurrency_max_type"]:checked').value;
+		const concurrency_max = this.#form_element.querySelector('#concurrency_max');
 		const is_custom = concurrency_max_type == <?= ZBX_DISCOVERY_CHECKS_CUSTOM ?>;
 
 		concurrency_max.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_custom);
@@ -116,12 +127,12 @@ window.drule_edit_popup = new class {
 
 	#editCheck(row = null) {
 		let params = {
-			dcheckid: this.dcheckid
+			dcheckid: this.#dcheckid
 		};
 
 		if (row !== null) {
 			params = {
-				dcheckid: this.dcheckid,
+				dcheckid: this.#dcheckid,
 				update: 1
 			};
 
@@ -147,7 +158,7 @@ window.drule_edit_popup = new class {
 				this.#updateCheck(row, e.detail);
 			}
 			else {
-				this.dcheckid = getUniqueId()
+				this.#dcheckid = getUniqueId()
 				this.#addCheck(e.detail, null);
 			}
 		});
@@ -161,7 +172,7 @@ window.drule_edit_popup = new class {
 		jQuery('input:radio[name="name_source"][value='+jQuery.escapeSelector(drule.name_source)+']')
 			.attr('checked', 'checked');
 
-		document.querySelectorAll('#host_source, #name_source').forEach((element) => {
+		document.querySelectorAll('#device-uniqueness-list, #host_source, #name_source').forEach((element) => {
 			element.addEventListener('change', (e) => {
 				this.#updateRadioButtonValues(e);
 			});
@@ -171,6 +182,19 @@ window.drule_edit_popup = new class {
 	#updateRadioButtonValues(event) {
 		let target = event.target;
 		let name = target.getAttribute('name');
+
+		if (name === 'uniqueness_criteria') {
+			document.querySelectorAll('[name^=dchecks][name$="[uniq]"]')
+				.forEach((dcheck) => {
+					dcheck.value = 0;
+				});
+
+			if (typeof target.dataset.id !== 'undefined') {
+				document.querySelector(`[name="dchecks[${target.dataset.id}][uniq]"]`).value = 1;
+			}
+
+			return;
+		}
 
 		if (typeof target.dataset.id !== 'undefined') {
 			document.querySelectorAll(`[name^=dchecks][name$="[${name}]"]`)
@@ -195,6 +219,15 @@ window.drule_edit_popup = new class {
 		delete input.dchecks;
 
 		if (update === false) {
+			if (typeof input.uniq === 'undefined') {
+				const checked_uniqueness_criteria = document.querySelector('[name="uniqueness_criteria"]:checked');
+
+				input.uniq = checked_uniqueness_criteria !== null
+				&& checked_uniqueness_criteria.value === input.dcheckid
+					? 1
+					: 0;
+			}
+
 			if (typeof input.host_source === 'undefined') {
 				const checked_host_source = document.querySelector('[name="host_source"]:checked:not([data-id])');
 				input.host_source = checked_host_source === null
@@ -210,10 +243,15 @@ window.drule_edit_popup = new class {
 			}
 		}
 		else {
-			if (this.available_device_types.includes(parseInt(input.type))) {
+			if (this.#available_device_types.includes(parseInt(input.type))) {
 				input.host_source = document.querySelector('input[name=host_source]:checked').value;
 				input.name_source = document.querySelector('input[name=name_source]:checked').value;
-				input.uniqueness_criteria = document.querySelector('input[name=uniqueness_criteria]:checked').value;
+				const checked_uniqueness_criteria = document.querySelector('input[name=uniqueness_criteria]:checked');
+
+				input.uniq = checked_uniqueness_criteria !== null
+				&& checked_uniqueness_criteria.value === input.dcheckid
+					? 1
+					: 0;
 			}
 		}
 
@@ -247,7 +285,7 @@ window.drule_edit_popup = new class {
 			warning_icon.remove();
 		}
 
-		this.dchecks.forEach(dcheck => {
+		this.#dchecks.forEach(dcheck => {
 			if (dcheck.dcheckid === input.dcheckid) {
 				dcheck.warning === '' ? warning_icon.remove() : row.querySelector('.js-remove').disabled = true;
 			}
@@ -257,6 +295,10 @@ window.drule_edit_popup = new class {
 	#addInputFields(input) {
 		for (let field_name in input) {
 			if (input.hasOwnProperty(field_name)) {
+				if (field_name === 'dcheckid' && !/^\d+$/.test(String(input[field_name]))) {
+					continue;
+				}
+
 				const input_element = document.createElement('input');
 				input_element.name = `dchecks[${input.dcheckid}][${field_name}]`;
 				input_element.type = 'hidden';
@@ -276,7 +318,7 @@ window.drule_edit_popup = new class {
 			name_template: ['name-source-row-tmpl', 'name_source', 'name_source_', 'chk_host']
 		};
 
-		const need_to_add_row = this.available_device_types.includes(parseInt(input.type));
+		const need_to_add_row = this.#available_device_types.includes(parseInt(input.type));
 
 		for (const [template_id, list_id, key, def] of Object.values(templates)) {
 			if (need_to_add_row) {
@@ -310,7 +352,7 @@ window.drule_edit_popup = new class {
 		}
 
 		if (update === false) {
-			this.#addRadioButtonValues(this.drule);
+			this.#addRadioButtonValues(this.#drule);
 		}
 		else {
 			this.#addRadioButtonValues(input);
@@ -333,8 +375,6 @@ window.drule_edit_popup = new class {
 
 			setInputSource('host_source', <?= ZBX_DISCOVERY_DNS ?>);
 			setInputSource('name_source', <?= ZBX_DISCOVERY_UNSPEC ?>);
-
-			delete input.uniqueness_criteria;
 		}
 	}
 
@@ -361,7 +401,7 @@ window.drule_edit_popup = new class {
 	}
 
 	#clone() {
-		this.druleid = null;
+		this.#druleid = null;
 		document.getElementById('druleid').remove();
 
 		// Remove all warning icons and enable all Remove buttons in Checks table.
@@ -386,44 +426,46 @@ window.drule_edit_popup = new class {
 			}
 		];
 
-		this.overlay.$dialogue.$footer[0].querySelector('.js-submit')
-			.addEventListener('click', () => this.#submit());
+		this.#overlay.unsetLoading();
+		this.#overlay.setProperties({title, buttons});
 
-		this.overlay.setProperties({title, buttons});
-		this.overlay.unsetLoading();
-		this.overlay.recoverFocus();
-		this.overlay.containFocus();
+		this.#overlay.$dialogue.$footer[0].querySelector('.js-submit').addEventListener('click', () => this.#submit());
+
+		this.#overlay.recoverFocus();
+		this.#overlay.containFocus();
+		this.#form.reload(this.clone_rules);
 	}
 
 	#delete() {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'discovery.delete');
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('discovery')) ?>);
+		const url_params = {
+			action: 'discovery.delete',
+			[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('discovery')) ?>
+		};
+		alert(this.#druleid);
 
-		this.#post(curl.getUrl(), {druleids: [this.druleid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+		this.#post(zabbixUrl({url_params}), {druleids: [this.#druleid]}, (response) => {
+			overlayDialogueDestroy(this.#overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
 	}
 
 	#submit() {
-		const fields = this.form.getAllValues();
+		const fields = this.#form.getAllValues();
 
-		this.form.validateSubmit(fields)
+		this.#form.validateSubmit(fields)
 			.then((result) => {
 				if (!result) {
-					this.overlay.unsetLoading();
+					this.#overlay.unsetLoading();
 					return;
 				}
 
-				const curl = new Curl('zabbix.php');
-				curl.setArgument('action', this.druleid === null ? 'discovery.create' : 'discovery.update');
+				const action = document.getElementById('druleid') !== null ? 'discovery.update' : 'discovery.create';
 
-				this.#post(curl.getUrl(), fields, (response) => {
-					overlayDialogueDestroy(this.overlay.dialogueid);
+				this.#post(zabbixUrl({action}), fields, (response) => {
+					overlayDialogueDestroy(this.#overlay.dialogueid);
 
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				});
 			})
 	}
@@ -449,8 +491,8 @@ window.drule_edit_popup = new class {
 				}
 
 				if ('form_errors' in response) {
-					this.form.setErrors(response.form_errors, true, true);
-					this.form.renderErrors();
+					this.#form.setErrors(response.form_errors, true, true);
+					this.#form.renderErrors();
 
 					return;
 				}
@@ -458,11 +500,10 @@ window.drule_edit_popup = new class {
 				return success_callback(response);
 			})
 			.catch((exception) => this.#ajaxExceptionHandler(exception))
-			.finally(() => this.overlay.unsetLoading());
+			.finally(() => this.#overlay.unsetLoading());
 	}
 
 	#ajaxExceptionHandler(exception) {
-		console.log('exception');
 		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
@@ -475,6 +516,6 @@ window.drule_edit_popup = new class {
 
 		const message_box = makeMessageBox('bad', messages, title)[0];
 
-		this.form_element.parentNode.insertBefore(message_box, this.form_element);
+		this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
 	}
 }

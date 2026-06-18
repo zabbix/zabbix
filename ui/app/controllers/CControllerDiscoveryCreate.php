@@ -29,46 +29,42 @@ class CControllerDiscoveryCreate extends CController {
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'name' => ['db drules.name', 'required', 'not_empty'],
-			'discovery_by' => ['integer', 'in' => [ZBX_DISCOVERY_BY_SERVER, ZBX_DISCOVERY_BY_PROXY]],
+			'discovery_by' => ['integer', 'required', 'in' => [ZBX_DISCOVERY_BY_SERVER, ZBX_DISCOVERY_BY_PROXY]],
 			'proxyid' => ['db drules.proxyid', 'required',
 				'when' => ['discovery_by', 'in' => [ZBX_DISCOVERY_BY_PROXY]]
 			],
 			'iprange' => ['db drules.iprange', 'required', 'not_empty',
-				'use' => [CIPRangeParser::class, [
-					'v6' => ZBX_HAVE_IPV6,
-					'dns' => false,
-					'max_ipv4_cidr' => 30
-				]]
+				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]]
 			],
 			'delay' => ['db drules.delay', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, [
-					'min' => 1,
-					'max' => SEC_PER_WEEK,
-					'usermacros' => true
-				]]
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => SEC_PER_WEEK, 'usermacros' => true]]
 			],
-			'status' => ['db drules.status', 'in' => [DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED]],
-			'concurrency_max_type' => ['integer',
+			'status' => ['db drules.status', 'required', 'in' => [DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED]],
+			'concurrency_max_type' => ['integer', 'required',
 				'in' => [ZBX_DISCOVERY_CHECKS_ONE, ZBX_DISCOVERY_CHECKS_UNLIMITED, ZBX_DISCOVERY_CHECKS_CUSTOM]
 			],
-			'concurrency_max' => [
-				'integer', 'required',
-				'min' => ZBX_DISCOVERY_CHECKS_UNLIMITED,
-				'max' => ZBX_DISCOVERY_CHECKS_MAX,
+			'concurrency_max' => ['integer', 'required',
+				'min' => ZBX_DISCOVERY_CHECKS_UNLIMITED, 'max' => ZBX_DISCOVERY_CHECKS_MAX,
 				'when' => ['concurrency_max_type', 'in' => [ZBX_DISCOVERY_CHECKS_CUSTOM]]
 			],
-			'dchecks' => [
-				'objects', 'required', 'not_empty',
-				'uniq' => [['type', 'ports', 'key_']],
+			'dchecks' => ['objects', 'required', 'not_empty',
+				'uniq' => ['type', 'ports', 'key_', 'snmp_community', 'snmp_oid'],
 				'fields' => [
-					'dcheckid' => ['string'],
-					'type' => ['db dchecks.type', 'required'],
+					'dcheckid' => ['db dchecks.type'],
+					'type' => ['db dchecks.type', 'required', 'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP,
+						SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c,
+						SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET
+					]],
 					'ports' => ['db dchecks.ports', 'required', 'not_empty',
-						'use' => [CPortRangeParser::class]
+						'use' => [CPortRangeParser::class, []],
+						'when' => ['type',
+							'in' => [SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_IMAP, SVC_LDAP, SVC_NNTP, SVC_POP, SVC_SMTP,
+								SVC_SSH, SVC_TCP, SVC_TELNET, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_AGENT
+						]]
 					],
 					'key_' => [
 						['db dchecks.key_', 'required', 'not_empty',
-							'use' => [CItemKey::class],
+							'use' => [CItemKey::class, []],
 							'when' => ['type', 'in' => [SVC_AGENT]]
 						],
 						['db dchecks.key_', 'required', 'not_empty',
@@ -79,27 +75,58 @@ class CControllerDiscoveryCreate extends CController {
 					'snmp_community' => ['db dchecks.snmp_community', 'required', 'not_empty',
 						'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c]]
 					],
-					'snmpv3_securityname' => ['db dchecks.snmpv3_securityname'],
-					'snmpv3_securitylevel' => ['db dchecks.snmpv3_securitylevel'],
-					'snmpv3_authpassphrase' => ['db dchecks.snmpv3_authpassphrase'],
-					'snmpv3_privpassphrase' => ['db dchecks.snmpv3_privpassphrase'],
-					'snmpv3_authprotocol' => ['db dchecks.snmpv3_authprotocol',
-						'in' => array_keys(getSnmpV3AuthProtocols()),
-						'when' => ['snmpv3_securitylevel', 'in' => [
-							ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,
+					'snmpv3_securityname' => ['db dchecks.snmpv3_securityname',
+						'when' => ['type', 'in' => [SVC_SNMPv3]]
+					],
+					'snmpv3_securitylevel' => ['db dchecks.snmpv3_securitylevel',
+						'in' => [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,
 							ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+						],
+						'when' => ['type', 'in' => [SVC_SNMPv3]]
+					],
+					'snmpv3_authpassphrase' => ['db dchecks.snmpv3_authpassphrase',
+						'when' => [
+							['type', 'in' => [SVC_SNMPv3]],
+							['snmpv3_securitylevel',
+								'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+							]]
+						]
+					],
+					'snmpv3_privpassphrase' => ['db dchecks.snmpv3_privpassphrase', 'required', 'not_empty',
+						'when' => [
+							['type', 'in' => [SVC_SNMPv3]],
+							['snmpv3_securitylevel', 'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]]
+						]
+					],
+					'snmpv3_authprotocol' => ['db dchecks.snmpv3_authprotocol',
+						'in' => [ITEM_SNMPV3_AUTHPROTOCOL_MD5, ITEM_SNMPV3_AUTHPROTOCOL_SHA1,
+							ITEM_SNMPV3_AUTHPROTOCOL_SHA224, ITEM_SNMPV3_AUTHPROTOCOL_SHA256,
+							ITEM_SNMPV3_AUTHPROTOCOL_SHA384, ITEM_SNMPV3_AUTHPROTOCOL_SHA512
+						],
+						'when' => [
+							['type', 'in' => [SVC_SNMPv3]],
+							['snmpv3_securitylevel', 'in' => [
+								ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+							]
 						]]
 					],
 					'snmpv3_privprotocol' => ['db dchecks.snmpv3_privprotocol',
-						'in' => array_keys(getSnmpV3PrivProtocols()),
-						'when' => ['snmpv3_securitylevel', 'in' => [
-							ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+						'in' => [ITEM_SNMPV3_PRIVPROTOCOL_DES, ITEM_SNMPV3_PRIVPROTOCOL_AES128,
+							ITEM_SNMPV3_PRIVPROTOCOL_AES192, ITEM_SNMPV3_PRIVPROTOCOL_AES256,
+							ITEM_SNMPV3_PRIVPROTOCOL_AES192C, ITEM_SNMPV3_PRIVPROTOCOL_AES256C
+						],
+						'when' => [
+							['type', 'in' => [SVC_SNMPv3]],
+							['snmpv3_securitylevel', 'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]
 						]]
 					],
-					'snmpv3_contextname' => ['db dchecks.snmpv3_contextname'],
-					'allow_redirect' => ['db dchecks.allow_redirect', 'in' => [0, 1],
+					'snmpv3_contextname' => ['db dchecks.snmpv3_contextname',
+						'when' => ['type', 'in' => [SVC_SNMPv3]]
+					],
+					'allow_redirect' => ['db dchecks.allow_redirect', 'required', 'in' => [0, 1],
 						'when' => ['type', 'in' => [SVC_ICMPPING]]
 					],
+					'uniq' => ['integer', 'in' => [0, 1]],
 					'host_source' => ['db dchecks.host_source'],
 					'name_source' => ['db dchecks.name_source']
 				],
@@ -135,14 +162,14 @@ class CControllerDiscoveryCreate extends CController {
 	}
 
 	protected function doAction(): void {
-		$discovery = $this->getInputAll() + [
+		$drule = $this->getInputAll() + [
 				'proxyid' => 0
 			];
 
-		unset($discovery['discovery_by']);
-		unset($discovery['concurrency_max_type']);
+		unset($drule['discovery_by']);
+		unset($drule['concurrency_max_type']);
 
-		$result = API::DRule()->create($discovery);
+		$result = API::DRule()->create($drule);
 
 		$output = [];
 
