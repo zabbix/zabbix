@@ -2022,6 +2022,8 @@ button {
 
 .dashboard-grid-widget-body {
   display: contents; }
+  .dashboard-grid-widget-body .rounded-surface {
+    border-radius: 0; }
 
 .dashboard-grid-widget-debug .debug-output {
   margin: 8px 10px 0;

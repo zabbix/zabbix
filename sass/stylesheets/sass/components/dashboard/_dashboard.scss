@@ -376,6 +376,10 @@
 
 .dashboard-grid-widget-body {
 	display: contents;
+
+	.rounded-surface {
+		border-radius: 0;
+	}
 }
 
 .dashboard-grid-widget-debug {
