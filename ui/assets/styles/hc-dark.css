@@ -1243,7 +1243,8 @@ footer {
   .form-grid .fields-group {
     grid-column: 2 / -1;
     padding: 5px;
-    border: 1px solid #333333; }
+    border: 1px solid #333333;
+    border-radius: var(--surface-border-radius); }
   .form-grid > .form-field,
   .form-grid > .field-fluid,
   .form-grid fieldset > .form-field,
