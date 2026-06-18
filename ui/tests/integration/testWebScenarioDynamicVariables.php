@@ -257,7 +257,7 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 			// specific doc pattern where the capture group is preceded by literal text.
 
 			'regex_doc_pattern' => [
-				'name'      => 'doc example: regex:hostid is ([0-9]+) - scenario level',
+				'name'      => 'doc example - regex hostid pattern - scenario level',
 				'variables' => [['name' => '{hostid}', 'value' => 'regex:hostid is ([0-9]+)']],
 				'steps'     => [$base_step]
 			],
@@ -266,7 +266,7 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 			// Exercises a nested-key jsonpath expression matching the documented example.
 
 			'jsonpath_doc_pattern' => [
-				'name'      => 'doc example: jsonpath:$.host_url - scenario level',
+				'name'      => 'doc example - jsonpath host url - scenario level',
 				'variables' => [['name' => '{url}', 'value' => 'jsonpath:$.host_url']],
 				'steps'     => [$base_step]
 			],
@@ -275,7 +275,7 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 			// Exercises a multi-level xmlxpath expression matching the documented example.
 
 			'xmlxpath_doc_pattern' => [
-				'name'      => 'doc example: xmlxpath://host/response/status - scenario level',
+				'name'      => 'doc example - xmlxpath response status - scenario level',
 				'variables' => [['name' => '{status}', 'value' => 'xmlxpath://host/response/status']],
 				'steps'     => [$base_step]
 			],
