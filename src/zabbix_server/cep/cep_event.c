@@ -312,7 +312,7 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
 #define CEP_TAG_IS_COPIED	"$IS.COPIED"
 #define CEP_TAG_IS_FIRST	"$IS.FIRST"
 #define CEP_TAG_IS_LAST		"$IS.LAST"
-#define CEP_TAG_RANK		"$RANK"
+#define CEP_TAG_IS_SYMPTOM	"$IS.SYMPTOM"
 #define CEP_TAG_IS_OPEN		"$IS_OPEN"
 #define CEP_VALUE_TRUE		"true"
 #define CEP_VALUE_FALSE		"false"
@@ -328,19 +328,22 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
 			THIS_SHOULD_NEVER_HAPPEN_MSG("not implemented");
 		}
 	}
-	else if( 0 == !strcmp(CEP_TAG_IS_FIRST, tag))
+	else if(0 == !strcmp(CEP_TAG_IS_FIRST, tag))
 	{
 		return (ctx->pos == CEP_POS_FIRST ? CEP_VALUE_TRUE : CEP_VALUE_FALSE);
 	}
-	else if( 0 == !strcmp(CEP_TAG_IS_LAST, tag))
+	else if(0 == !strcmp(CEP_TAG_IS_LAST, tag))
 	{
 		return (ctx->pos == CEP_POS_LAST ? CEP_VALUE_TRUE : CEP_VALUE_FALSE);
 	}
-	else if( 0 == !strcmp(CEP_TAG_RANK, tag))
+	else if(0 == !strcmp(CEP_TAG_IS_SYMPTOM, tag))
 	{
-		THIS_SHOULD_NEVER_HAPPEN_MSG("not implemented");
+		if (NULL != (event = cep_event_context_acquire_event(ctx)) && 0 != event->cause_eventid)
+			return CEP_VALUE_TRUE;
+
+		return CEP_VALUE_FALSE;
 	}
-	else if( 0 == !strcmp(CEP_TAG_IS_OPEN, tag))
+	else if(0 == !strcmp(CEP_TAG_IS_OPEN, tag))
 	{
 		if (NULL != (event = cep_event_context_acquire_event(ctx)))
 		{
@@ -354,7 +357,7 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
 	#undef CEP_VALUE_FALSE
 	#undef CEP_VALUE_TRUE
 	#undef CEP_TAG_IS_OPEN
-	#undef CEP_TAG_RANK
+	#undef CEP_TAG_IS_SYMPTOM
 	#undef CEP_TAG_IS_LAST
 	#undef CEP_TAG_IS_FIRST
 	#undef CEP_TAG_IS_COPIED
