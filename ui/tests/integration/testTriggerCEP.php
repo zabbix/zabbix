@@ -1418,31 +1418,42 @@ class testTriggerCEP extends CIntegrationTest {
 
 		$this->captureEventBaseline($triggerids);
 
-		// Push the PROBLEM value (1) and then the recovery value (0) back-to-back. The recovery carries a
-		// later clock so the problem is evaluated first, but the test does not wait between the two sends.
+		// Build a long alternating PROBLEM/recovery burst (1,0,1,0,...) for every discovered item and send
+		// it in a single batch. All values share the same clock and are ordered only by their nanoseconds
+		// (the value index), so CEP must process the whole rapid burst in order and emit one event per
+		// transition without collapsing or dropping any. The sequence ends on 0 so the triggers finish OK.
 		$now = time();
-		$this->sendSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '1',
-					'clock' => $now, 'ns' => $this->currentNs()], $keys),
-			null, 0
-		);
-		$this->sendSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0',
-					'clock' => $now + 1, 'ns' => $this->currentNs()], $keys),
-			null, 0
-		);
+		$values = [];
+		for ($i = 0; $i < 3; $i++) {
+			$values[] = '1';
+			$values[] = '0';
+		}
 
-		// Each trigger must produce exactly two events: one PROBLEM and one RESOLVED.
-		$this->waitForAllTriggerEventCounts($triggerids, 2);
+		$data = [];
+		foreach ($keys as $key) {
+			foreach ($values as $ns => $value) {
+				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value,
+						'clock' => $now, 'ns' => $ns];
+			}
+		}
+		$this->sendSenderValues($data, null, 0);
 
-		// Newest event is the recovery (OK); the one before it is the problem (PROBLEM).
+		$expected_events = count($values);
+
+		// Each trigger must produce one event per transition: PROBLEM, RESOLVED, PROBLEM, RESOLVED, ...
+		$this->waitForAllTriggerEventCounts($triggerids, $expected_events);
+
+		// Events are newest-first, so they alternate RESOLVED, PROBLEM, RESOLVED, PROBLEM, ... (the burst
+		// ends on a recovery, so the newest event is RESOLVED).
 		$events_by_trigger = $this->getScenarioEventsByTrigger($triggerids);
 		foreach ($triggerids as $idx => $triggerid) {
 			$events = $events_by_trigger[$triggerid];
-			$info = 'trigger #'.$idx.': '.json_encode($events);
-			$this->assertCount(2, $events, $info);
-			$this->assertEquals(TRIGGER_VALUE_FALSE, (int) $events[0]['value'], $info);
-			$this->assertEquals(TRIGGER_VALUE_TRUE, (int) $events[1]['value'], $info);
+			$info = 'trigger #'.$idx.': '.count($events).' events';
+			$this->assertCount($expected_events, $events, $info);
+			foreach ($events as $pos => $event) {
+				$expected_value = ($pos % 2 === 0) ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
+				$this->assertEquals($expected_value, (int) $event['value'], $info.' at pos '.$pos);
+			}
 		}
 
 		$this->waitForNoOpenProblems($triggerids, 'open and immediate recovery');
