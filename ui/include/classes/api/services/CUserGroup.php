@@ -432,10 +432,10 @@ class CUserGroup extends CApiService {
 				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'proxies' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['proxyid']], 'fields' => [
-				'proxyid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+				'proxyid' =>				['type' => API_ID, 'flags' => API_UNEXPECTED]
 			]],
 			'proxy_groups' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['proxy_groupid']], 'fields' => [
-				'proxy_groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+				'proxy_groupid' =>			['type' => API_ID, 'flags' => API_UNEXPECTED]
 			]],
 			'proxy_mode' =>				['type' => API_MULTIPLE, 'rules' => [
 											['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_INT32, 'in' => implode(',', [PROXY_MODE_ALLOW, PROXY_MODE_DENY])],
