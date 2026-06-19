@@ -77,7 +77,7 @@ out:
   return: SUCCEED
   macro_value: 'hello'
 ---
-test case: 'regex: prefix with null data must not crash (ZBX-27770)'
+test case: 'regex: prefix with null data'
 in:
   key: '{myvar}'
   value: 'regex:(.*)'
@@ -162,7 +162,7 @@ out:
   return: SUCCEED
   macro_value: 'is'
 ---
-test case: 'jsonpath: prefix with null data must not crash (ZBX-27770)'
+test case: 'jsonpath: prefix with null data'
 in:
   key: '{myvar}'
   value: 'jsonpath:$.key'
@@ -237,7 +237,7 @@ in:
 out:
   return: FAIL
 ---
-test case: 'xmlxpath: prefix with null data must not crash (ZBX-27770)'
+test case: 'xmlxpath: prefix with null data'
 in:
   key: '{myvar}'
   value: 'xmlxpath://node'
@@ -1182,12 +1182,6 @@ out:
     - key: '{username}'
       value: 'Alexei'
 ---
-# ----------------------------------------------------------------------------
-# Doc examples: Variables that may be used in scenario steps
-# {username}=Alexei  {password}=kj3h5kJ34bd  {hostid}=regex:hostid is ([0-9]+)
-# {url}=jsonpath:$.host_url  {status}=xmlxpath://host/response/status
-# {newvar}={{myvar}.btoa()}
-# ----------------------------------------------------------------------------
 test case: 'doc example: {username}=Alexei plain literal without response data'
 in:
   key: '{username}'
@@ -1263,19 +1257,7 @@ out:
   return: SUCCEED
   macro_value: '{{myvar}.btoa()}'
 ---
-# ----------------------------------------------------------------------------
-# ZBX-27770 side effect: static variable after dynamic variable
-#
-# On master: a regex: variable at scenario init (data=NULL) returned FAIL and
-# exited the loop early, leaving any subsequent plain variables un-stored.
-# jsonpath:/xmlxpath: crashed the server before getting that far.
-#
-# After the fix: all variables are processed regardless of order — dynamic
-# ones are stored literally as placeholders, plain ones are stored normally.
-# This means a static variable defined after a dynamic one in the scenario
-# variable list is now correctly available for step 1's URL/POST substitution.
-# ----------------------------------------------------------------------------
-test case: 'ZBX-27770 side effect: static variable after regex variable both stored when data is null'
+test case: 'static variable after regex variable both stored when data is null'
 in:
   variables:
     - key: '{hostid}'
@@ -1290,7 +1272,7 @@ out:
     - key: '{BASE_URL}'
       value: 'https://example.com'
 ---
-test case: 'ZBX-27770 side effect: static variable after jsonpath variable both stored when data is null'
+test case: 'static variable after jsonpath variable both stored when data is null'
 in:
   variables:
     - key: '{url}'
@@ -1305,7 +1287,7 @@ out:
     - key: '{username}'
       value: 'Alexei'
 ---
-test case: 'ZBX-27770 side effect: static variable after xmlxpath variable both stored when data is null'
+test case: 'static variable after xmlxpath variable both stored when data is null'
 in:
   variables:
     - key: '{status}'
@@ -1320,7 +1302,7 @@ out:
     - key: '{password}'
       value: 'kj3h5kJ34bd'
 ---
-test case: 'ZBX-27770 side effect: multiple dynamic variables followed by static all stored when data is null'
+test case: 'multiple dynamic variables followed by static all stored when data is null'
 in:
   variables:
     - key: '{hostid}'
