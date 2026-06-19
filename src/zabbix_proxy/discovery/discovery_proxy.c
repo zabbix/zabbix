@@ -27,13 +27,27 @@ void	zbx_discovery_close_proxy(void *handle)
 	zbx_pb_discovery_close((zbx_pb_discovery_data_t *)handle);
 }
 
-void	zbx_discovery_update_host_proxy(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
-		const char *dns, int status, time_t now, zbx_add_event_func_t add_event_cb)
+void	zbx_discovery_update_interface_proxy(void *handle, zbx_uint64_t druleid, const char *ip, const char *dns,
+		int status, time_t now)
+{
+	zbx_pb_discovery_write_host((zbx_pb_discovery_data_t *)handle, druleid, ip, dns, status, (int)now, "");
+}
+
+void	zbx_discovery_update_host_proxy(zbx_db_dhost *dhost, int status, time_t now,
+		zbx_add_event_func_t add_event_cb)
 {
 	ZBX_UNUSED(dhost);
+	ZBX_UNUSED(status);
+	ZBX_UNUSED(now);
 	ZBX_UNUSED(add_event_cb);
+}
 
-	zbx_pb_discovery_write_host((zbx_pb_discovery_data_t *)handle, druleid, ip, dns, status, (int)now, "");
+void	zbx_discovery_update_hosts_proxy(const zbx_uint64_t druleid, const time_t now,
+		zbx_add_event_func_t add_event_cb)
+{
+	ZBX_UNUSED(druleid);
+	ZBX_UNUSED(now);
+	ZBX_UNUSED(add_event_cb);
 }
 
 void	zbx_discovery_update_service_proxy(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,

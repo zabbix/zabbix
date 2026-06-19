@@ -8887,7 +8887,9 @@ clean:
 		DCdump_configuration();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
+#ifdef	HAVE_MALLOC_TRIM
+	malloc_trim(128 * ZBX_MEBIBYTE);
+#endif
 	return new_revision;
 }
 
@@ -17015,89 +17017,62 @@ static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get active drules for specified proxy                             *
+ * Purpose: get drule values                                                  *
  *                                                                            *
- * Parameter: proxyid - [IN] id of proxy to get drules for                    *
- *            drules  - [OUT] active drules                                   *
+ * Parameter: dc_drule - [IN/OUT] drule                                       *
+ *                                                                            *
+ * Return value: SUCCEED - drule exists                                       *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_drules_get_monitored(const zbx_uint64_t proxyid, zbx_vector_dc_drule_ptr_t *drules)
+int	zbx_dc_drule_get_values(zbx_dc_drule_t *dc_drule)
 {
-	zbx_hashset_iter_t	iter_drule, iter_dcheck;
-	zbx_dc_drule_t		*drule, *drule_out;
-	zbx_dc_dcheck_t		*dcheck, *dcheck_out;
+	int			ret = FAIL;
+	zbx_dc_drule_t		*drule;
 
 	RDLOCK_CACHE;
 
-	zbx_hashset_iter_reset(&config->drules, &iter_drule);
-
-	while (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_iter_next(&iter_drule)))
+	if (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_search(&config->drules, &dc_drule->druleid)))
 	{
-		if (DRULE_STATUS_MONITORED == drule->status && drule->proxyid == proxyid)
-		{
-			drule_out = zbx_malloc(NULL, sizeof(zbx_dc_drule_t));
-			drule_out->druleid = drule->druleid;
-			drule_out->proxyid = drule->proxyid;
-			drule_out->nextcheck = drule->nextcheck;
-			drule_out->delay = drule->delay;
-			drule_out->delay_str = zbx_strdup(NULL, drule->delay_str);
-			drule_out->name = zbx_strdup(NULL, drule->name);
-			drule_out->iprange = zbx_strdup(NULL, drule->iprange);
-			drule_out->status = drule->status;
-			drule_out->location = drule->location;
-			drule_out->revision = drule->revision;
-			drule_out->unique_dcheckid = 0;
-			drule_out->concurrency_max = drule->concurrency_max;
-
-			zbx_vector_dc_dcheck_ptr_create(&drule_out->dchecks);
-			zbx_hashset_iter_reset(&config->dchecks, &iter_dcheck);
-
-			while (NULL != (dcheck = (zbx_dc_dcheck_t *)zbx_hashset_iter_next(&iter_dcheck)))
-			{
-				if (dcheck->druleid != drule->druleid)
-					continue;
-
-				dcheck_out = zbx_malloc(NULL, sizeof(zbx_dc_dcheck_t));
-				dcheck_out->druleid = dcheck->druleid;
-				dcheck_out->dcheckid = dcheck->dcheckid;
-				dcheck_out->key_ = zbx_strdup(NULL, dcheck->key_);
-				dcheck_out->ports = zbx_strdup(NULL, dcheck->ports);
-				dcheck_out->uniq = dcheck->uniq;
-				dcheck_out->type = dcheck->type;
-				dcheck_out->allow_redirect = dcheck->allow_redirect;
-				dcheck_out->timeout = 0;
-
-				if (1 == dcheck_out->uniq)
-				{
-					drule_out->unique_dcheckid = dcheck_out->dcheckid;
-				}
-
-				if (SVC_SNMPv1 == dcheck_out->type || SVC_SNMPv2c == dcheck_out->type ||
-						SVC_SNMPv3 == dcheck_out->type)
-				{
-					dcheck_out->snmp_community = zbx_strdup(NULL, dcheck->snmp_community);
-					dcheck_out->snmpv3_securityname = zbx_strdup(NULL, dcheck->snmpv3_securityname);
-					dcheck_out->snmpv3_securitylevel = dcheck->snmpv3_securitylevel;
-					dcheck_out->snmpv3_authpassphrase = zbx_strdup(NULL,
-							dcheck->snmpv3_authpassphrase);
-					dcheck_out->snmpv3_privpassphrase = zbx_strdup(NULL,
-							dcheck->snmpv3_privpassphrase);
-					dcheck_out->snmpv3_authprotocol = dcheck->snmpv3_authprotocol;
-					dcheck_out->snmpv3_privprotocol = dcheck->snmpv3_privprotocol;
-					dcheck_out->snmpv3_contextname = zbx_strdup(NULL, dcheck->snmpv3_contextname);
-				}
-
-				zbx_vector_dc_dcheck_ptr_append(&drule_out->dchecks, dcheck_out);
-			}
-
-			zbx_vector_dc_dcheck_ptr_sort(&drule_out->dchecks, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-			zbx_vector_dc_drule_ptr_append(drules, drule_out);
-		}
+		dc_drule->proxyid = drule->proxyid;
+		dc_drule->name = zbx_strdup(NULL, drule->name);
+		dc_drule->iprange = zbx_strdup(NULL, drule->iprange);
+		dc_drule->status = drule->status;
+		ret = SUCCEED;
 	}
 
-	zbx_vector_dc_drule_ptr_sort(drules, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
 	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve value of uniq if dcheck exists                           *
+ *                                                                            *
+ * Parameter: dcheckid - [IN] id of dcheck                                    *
+ *                uniq - [OUT] value of uniq                                  *
+ *                                                                            *
+ * Return value: SUCCEED - value of uniq retrieved                            *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_dcheck_get_uniq(const zbx_uint64_t dcheckid, unsigned char *uniq)
+{
+	int			ret = FAIL;
+	zbx_dc_dcheck_t		*dcheck;
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	if (NULL != (dcheck = (zbx_dc_dcheck_t *)zbx_hashset_search(&config->dchecks, &dcheckid)))
+	{
+		*uniq =  dcheck->uniq;
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
+
+	return ret;
 }
 
 /******************************************************************************
