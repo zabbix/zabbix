@@ -98,6 +98,122 @@ static zbx_uint64_t	cep_get_close_event_task_correlationid(const zbx_mw_task_t *
 	}
 }
 
+static void	cep_db_write_event(const zbx_cep_event_t *event, zbx_dbconn_t *db, zbx_db_insert_t *db_insert_events,
+		zbx_db_insert_t *db_insert_tag)
+{
+	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_events))
+	{
+		zbx_dbconn_prepare_insert(db, db_insert_events, "events", "eventid", "source", "object",
+				"objectid", "clock", "ns", "value", "name", "severity", (char *)NULL);
+	}
+
+	zbx_db_insert_add_values(db_insert_events, event->eventid, event->origin.source, event->origin.object,
+			event->origin.objectid, event->clock, event->ns, event->value,
+			ZBX_NULL2EMPTY_STR(event->name), event->severity);
+
+	if (0 == event->tags.values_num)
+		return;
+
+	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_tag))
+	{
+		zbx_dbconn_prepare_insert(db, db_insert_tag, "event_tag", "eventtagid", "eventid", "tag", "value",
+				(char *)NULL);
+	}
+
+	for (int j = 0; j < event->tags.values_num; j++)
+	{
+		zbx_db_insert_add_values(db_insert_tag, __UINT64_C(0), event->eventid,
+				event->tags.values[j].tag, event->tags.values[j].value);
+	}
+}
+
+static void	cep_db_write_problem(const zbx_cep_event_t *event, zbx_dbconn_t *db, zbx_db_insert_t *db_insert_problem,
+		zbx_db_insert_t *db_insert_tag)
+{
+	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_problem))
+	{
+		zbx_dbconn_prepare_insert(db, db_insert_problem, "problem", "eventid", "source", "object",
+				"objectid", "clock", "ns", "name", "severity", (char *)NULL);
+	}
+
+	zbx_db_insert_add_values(db_insert_problem, event->eventid, event->origin.source, event->origin.object,
+			event->origin.objectid, event->clock, event->ns, ZBX_NULL2EMPTY_STR(event->name),
+			event->severity);
+
+	if (0 == event->tags.values_num)
+		return;
+
+	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_tag))
+	{
+		zbx_dbconn_prepare_insert(db, db_insert_tag, "problem_tag", "problemtagid", "eventid", "tag", "value",
+				(char *)NULL);
+	}
+
+	for (int j = 0; j < event->tags.values_num; j++)
+	{
+		zbx_db_insert_add_values(db_insert_tag, __UINT64_C(0), event->eventid,
+				event->tags.values[j].tag, event->tags.values[j].value);
+	}
+}
+
+static void	cep_db_write_db_event(const zbx_db_event *db_event, zbx_dbconn_t *db, zbx_db_insert_t *db_insert_events,
+		zbx_db_insert_t *db_insert_tag)
+{
+	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_events))
+	{
+		zbx_dbconn_prepare_insert(db, db_insert_events, "events", "eventid", "source", "object",
+				"objectid", "clock", "ns", "value", "name", "severity", (char *)NULL);
+	}
+
+	zbx_db_insert_add_values(db_insert_events, db_event->eventid, db_event->source, db_event->object,
+			db_event->objectid, db_event->clock, db_event->ns, db_event->value,
+			ZBX_NULL2EMPTY_STR(db_event->name), db_event->severity);
+
+	if (0 == db_event->tags.values_num)
+		return;
+
+	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_tag))
+	{
+		zbx_dbconn_prepare_insert(db, db_insert_tag, "event_tag", "eventtagid", "eventid", "tag", "value",
+				(char *)NULL);
+	}
+
+	for (int j = 0; j < db_event->tags.values_num; j++)
+	{
+		zbx_db_insert_add_values(db_insert_tag, __UINT64_C(0), db_event->eventid,
+				db_event->tags.values[j]->tag, db_event->tags.values[j]->value);
+	}
+}
+
+static void	cep_db_write_db_problem(const zbx_db_event *db_event, zbx_dbconn_t *db,
+		zbx_db_insert_t *db_insert_problem, zbx_db_insert_t *db_insert_tag)
+{
+	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_problem))
+	{
+		zbx_dbconn_prepare_insert(db, db_insert_problem, "problem", "eventid", "source", "object",
+				"objectid", "clock", "ns", "name", "severity", (char *)NULL);
+	}
+
+	zbx_db_insert_add_values(db_insert_problem, db_event->eventid, db_event->source, db_event->object,
+			db_event->objectid, db_event->clock, db_event->ns, ZBX_NULL2EMPTY_STR(db_event->name),
+			db_event->severity);
+
+	if (0 == db_event->tags.values_num)
+		return;
+
+	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_tag))
+	{
+		zbx_dbconn_prepare_insert(db, db_insert_tag, "problem_tag", "problemtagid", "eventid", "tag", "value",
+				(char *)NULL);
+	}
+
+	for (int j = 0; j < db_event->tags.values_num; j++)
+	{
+		zbx_db_insert_add_values(db_insert_tag, __UINT64_C(0), db_event->eventid,
+				db_event->tags.values[j]->tag, db_event->tags.values[j]->value);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: write events created by tasks and their tags to the database      *
@@ -115,32 +231,13 @@ static void	cep_db_write_events(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t
 	for (int i = 0; i < tasks->values_num; i++)
 	{
 		const zbx_cep_task_event_t	*task = cep_get_event_task(tasks->values[i]);
-		zbx_cep_event_t			*event = task->event;
 
-		if (SUCCEED != zbx_db_insert_is_prepared(&db_insert_events))
-		{
-			zbx_dbconn_prepare_insert(db, &db_insert_events, "events", "eventid", "source", "object",
-					"objectid", "clock", "ns", "value", "name", "severity", (char *)NULL);
-		}
-
-		zbx_db_insert_add_values(&db_insert_events, event->eventid, event->origin.source, event->origin.object,
-				event->origin.objectid, event->clock, event->ns, event->value,
-				ZBX_NULL2EMPTY_STR(event->name), event->severity);
-
-		if (0 == event->tags.values_num)
-			continue;
-
-		if (SUCCEED != zbx_db_insert_is_prepared(&db_insert_event_tag))
-		{
-			zbx_dbconn_prepare_insert(db, &db_insert_event_tag, "event_tag", "eventtagid", "eventid",
-					"tag", "value", (char *)NULL);
-		}
-
-		for (int j = 0; j < event->tags.values_num; j++)
-		{
-			zbx_db_insert_add_values(&db_insert_event_tag, __UINT64_C(0), event->eventid,
-					event->tags.values[j].tag, event->tags.values[j].value);
-		}
+		/* trigger event might have been changed by CEP - need to commit from cache                  */
+		/* while other (internal) event tags are not cached - need to commit from received db_event  */
+		if (EVENT_SOURCE_TRIGGERS == task->db_event->source)
+			cep_db_write_event(task->event, db, &db_insert_events, &db_insert_event_tag);
+		else
+			cep_db_write_db_event(task->db_event, db, &db_insert_events, &db_insert_event_tag);
 	}
 
 	if (SUCCEED == zbx_db_insert_is_prepared(&db_insert_events))
@@ -181,32 +278,12 @@ static void	cep_db_write_problems(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
 		if (CEP_EVENT_OPEN != task->event_op)
 			continue;
 
-		if (SUCCEED != zbx_db_insert_is_prepared(&db_insert_problem))
-		{
-			zbx_dbconn_prepare_insert(db, &db_insert_problem, "problem", "eventid", "source", "object",
-					"objectid", "clock", "ns", "name", "severity", (char *)NULL);
-		}
-
-		zbx_cep_event_t	*event = task->event;
-
-		zbx_db_insert_add_values(&db_insert_problem, event->eventid, event->origin.source, event->origin.object,
-				event->origin.objectid, event->clock, event->ns, ZBX_NULL2EMPTY_STR(event->name),
-				event->severity);
-
-		if (0 == event->tags.values_num)
-			continue;
-
-		if (SUCCEED != zbx_db_insert_is_prepared(&db_insert_problem_tag))
-		{
-			zbx_dbconn_prepare_insert(db, &db_insert_problem_tag, "problem_tag", "problemtagid", "eventid",
-					"tag", "value", (char *)NULL);
-		}
-
-		for (int j = 0; j < event->tags.values_num; j++)
-		{
-			zbx_db_insert_add_values(&db_insert_problem_tag, __UINT64_C(0), event->eventid,
-					event->tags.values[j].tag, event->tags.values[j].value);
-		}
+		/* trigger event might have been changed by CEP - need to commit from cache                  */
+		/* while other (internal) event tags are not cached - need to commit from received db_event  */
+		if (EVENT_SOURCE_TRIGGERS == task->db_event->source)
+			cep_db_write_problem(task->event, db, &db_insert_problem, &db_insert_problem_tag);
+		else
+			cep_db_write_db_problem(task->db_event, db, &db_insert_problem, &db_insert_problem_tag);
 	}
 
 	if (SUCCEED == zbx_db_insert_is_prepared(&db_insert_problem))
@@ -260,9 +337,9 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 		{
 			zbx_cep_db_event_recovery_t	recovery_local = {
 				.p_eventid = task->eventids.values[j],
-				.r_eventid = task->event->eventid,
-				.clock = task->event->clock,
-				.ns = task->event->ns,
+				.r_eventid = task->db_event->eventid,
+				.clock = task->db_event->clock,
+				.ns = task->db_event->ns,
 				.userid = cep_get_close_event_task_userid(tasks->values[i]),
 				.correlationid = cep_get_close_event_task_correlationid(tasks->values[i])
 			};
@@ -432,12 +509,12 @@ static void	cep_db_write_trigger_rtdata(zbx_dbconn_t *db, const zbx_vector_mw_ta
 	{
 		const zbx_cep_task_event_t	*task = cep_get_event_task(tasks->values[i]);
 
-		if (EVENT_SOURCE_TRIGGERS == task->event->origin.source && TRIGGER_VALUE_NONE != task->obj_value)
+		if (EVENT_SOURCE_TRIGGERS == task->db_event->source && TRIGGER_VALUE_NONE != task->obj_value)
 		{
 			zbx_cep_object_value_t	update_local = {
-					.objectid = task->event->origin.objectid,
+					.objectid = task->db_event->objectid,
 					.value = task->obj_value,
-					.lastchange = task->event->clock
+					.lastchange = task->db_event->clock
 				};
 
 			zbx_vector_cep_object_value_append(&updates, update_local);
@@ -553,7 +630,7 @@ void	cep_db_process_actions(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_
 		if (CEP_EVENT_CLOSE != task->event_op)
 			continue;
 
-		pair.second = task->event->eventid;
+		pair.second = task->db_event->eventid;
 
 		for (int j = 0; j < task->eventids.values_num; j++)
 		{
@@ -612,7 +689,7 @@ void	cep_db_export_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_pt
 	{
 		const zbx_cep_task_event_t	*task = cep_get_event_task(tasks->values[i]);
 
-		if (EVENT_SOURCE_TRIGGERS != task->event->origin.source)
+		if (EVENT_SOURCE_TRIGGERS != task->db_event->source)
 			continue;
 
 		if (CEP_EVENT_OPEN == task->event_op)

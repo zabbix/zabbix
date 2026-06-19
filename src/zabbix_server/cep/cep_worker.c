@@ -627,7 +627,7 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 	cep_stats_update_events_processed(1);
 
 	task->event_op = CEP_EVENT_OPEN;
-	task->event = cep_event_addref(event);
+	task->event = NULL;
 
 	return;
 }
@@ -659,9 +659,7 @@ static void	cep_worker_close_internal_event(zbx_cep_task_event_t *task)
 
 	db_event->eventid = eventid;
 	task->event_op = CEP_EVENT_CLOSE;
-	task->event = cep_event_create(db_event->eventid, db_event->source, db_event->object,
-			db_event->objectid, db_event->name, db_event->clock, db_event->ns,
-			db_event->value, db_event->severity, &db_event->tags, db_event->suppress);
+	task->event = NULL;
 
 	return;
 }
