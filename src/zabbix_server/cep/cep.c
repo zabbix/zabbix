@@ -1339,7 +1339,7 @@ zbx_uint64_t	cep_close_internal_event(zbx_cep_t *cep, unsigned char object, zbx_
 	/* update event if something holds reference to it, otherwise just remove from cache */
 	if (1 != cep_event_handle_release(h))
 	{
-		zbx_cep_event_t		*event;
+		zbx_cep_event_t	*event;
 
 		event = cep_event_handle_mutable(h);
 
@@ -1432,9 +1432,7 @@ static void	cep_event_remove_suppress(zbx_cep_event_t *event, const zbx_db_event
 
 	if (0 == event->suppress.values_num)
 	{
-		zbx_vector_db_event_suppress_destroy(&event->suppress);
-		zbx_vector_db_event_suppress_create(&event->suppress);
-
+		zbx_vector_db_event_suppress_reset(&event->suppress);
 		event->suppress_mtime = time(NULL);
 	}
 }
@@ -1864,5 +1862,7 @@ void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats)
 	stats->events_accessed = atomic_load(&cep->events_accessed_num);
 	stats->events_processed = atomic_load(&cep->events_processed_num);
 	stats->events_discarded = atomic_load(&cep->events_discarded_num);
+
+	stats->events_num = cep->events.num_data;
 }
 

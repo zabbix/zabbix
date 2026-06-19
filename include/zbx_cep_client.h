@@ -119,6 +119,8 @@ typedef struct
 	int		task_remote_num;
 	int		task_internal_num;
 	int		task_completed_num;
+
+	int		events_num;
 }
 zbx_cep_stats_t;
 

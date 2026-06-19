@@ -87,6 +87,8 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $correlationid;
 	private static $serviceids = [];
 	private static $service_actionid;
+	private static $trigger_actionid;
+	private static $mediatypeid;
 	private static $sessionid = null;
 
 	/**
@@ -366,6 +368,10 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 
+		// Create the webhook media type used by all action operations and attach it to the Admin user
+		// before enabling the internal actions below, so their notifications route through it too.
+		$this->prepareWebhookMediaType();
+
 		// Enable the internal event actions for the whole suite so the server generates internal
 		// item-not-supported and trigger-unknown events (verified by the *Unknown tests). They are
 		// disabled again in clearData(). The configuration cache is reloaded by the first test.
@@ -373,6 +379,32 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->setInternalActionStatus('Report not supported items', ACTION_STATUS_ENABLED);
 
 		return true;
+	}
+
+	/**
+	 * Create a simple webhook media type whose script just returns 1, so the escalator exercises the
+	 * alerter end-to-end without contacting anything external, and attach it to the Admin user (a member
+	 * of user group 7) so the action operations actually generate alerts. As it is the user's only media,
+	 * the built-in internal actions (which send to group 7 with the default "all media types") also route
+	 * their notifications through it. Removed in clearData().
+	 */
+	private function prepareWebhookMediaType(): void {
+		$response = $this->call('mediatype.create', [
+			'name' => 'CEP webhook',
+			'type' => MEDIA_TYPE_WEBHOOK,
+			'script' => 'return 1;',
+			'status' => MEDIA_TYPE_STATUS_ACTIVE
+		]);
+		$this->assertArrayHasKey('mediatypeids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['mediatypeids']);
+		self::$mediatypeid = $response['result']['mediatypeids'][0];
+
+		$this->call('user.update', [
+			'userid' => 1,
+			'medias' => [
+				['mediatypeid' => self::$mediatypeid, 'sendto' => 'cep']
+			]
+		]);
 	}
 
 	/**
@@ -1078,9 +1110,8 @@ class testTriggerCEP extends CIntegrationTest {
 			'Not all CEP services were created.');
 		self::$serviceids = $response['result']['serviceids'];
 
-		// Service action without real notifications: problem, recovery and update message operations
-		// targeting user group 7 with mediatypeid 0, so the escalator processes the service action
-		// without sending anything externally.
+		// Service action: problem, recovery and update message operations targeting user group 7 via the
+		// CEP webhook media type (created in prepareData), so the escalator runs the action through the alerter.
 		$response = $this->call('action.create', [
 			'name' => 'CEP service action',
 			'eventsource' => EVENT_SOURCE_SERVICE,
@@ -1102,7 +1133,7 @@ class testTriggerCEP extends CIntegrationTest {
 					'esc_step_from' => 1,
 					'esc_step_to' => 1,
 					'operationtype' => OPERATION_TYPE_MESSAGE,
-					'opmessage' => ['default_msg' => 0, 'mediatypeid' => 0,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$mediatypeid,
 						'message' => 'Problem', 'subject' => 'Problem'
 					],
 					'opmessage_grp' => [
@@ -1113,7 +1144,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'recovery_operations' => [
 				[
 					'operationtype' => OPERATION_TYPE_MESSAGE,
-					'opmessage' => ['default_msg' => 0, 'mediatypeid' => 0,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$mediatypeid,
 						'message' => 'Recovery', 'subject' => 'Recovery'
 					],
 					'opmessage_grp' => [
@@ -1124,7 +1155,7 @@ class testTriggerCEP extends CIntegrationTest {
 			'update_operations' => [
 				[
 					'operationtype' => OPERATION_TYPE_MESSAGE,
-					'opmessage' => ['default_msg' => 0, 'mediatypeid' => 0,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$mediatypeid,
 						'message' => 'Update', 'subject' => 'Update'
 					],
 					'opmessage_grp' => [
@@ -1136,6 +1167,55 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['actionids']);
 		self::$service_actionid = $response['result']['actionids'][0];
+
+		// Trigger action firing on the discovered triggers (event tag type=cep), with problem and
+		// recovery message operations routed through the same CEP webhook media type.
+		$response = $this->call('action.create', [
+			'name' => 'CEP trigger action',
+			'eventsource' => EVENT_SOURCE_TRIGGERS,
+			'status' => ACTION_STATUS_ENABLED,
+			'esc_period' => '1h',
+			'pause_suppressed' => 0,
+			'filter' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => [
+					[
+						'conditiontype' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'value2' => 'type',
+						'value' => 'cep'
+					]
+				]
+			],
+			'operations' => [
+				[
+					'esc_period' => 0,
+					'esc_step_from' => 1,
+					'esc_step_to' => 1,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$mediatypeid,
+						'message' => 'Problem', 'subject' => 'Problem'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			],
+			'recovery_operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$mediatypeid,
+						'message' => 'Recovery', 'subject' => 'Recovery'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			]
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['actionids']);
+		self::$trigger_actionid = $response['result']['actionids'][0];
 
 		// Verify all LLD_DISCOVERY_COUNT items from proto2 were created.
 		$response = $this->callUntilDataIsPresent('item.get', [
@@ -3032,6 +3112,18 @@ class testTriggerCEP extends CIntegrationTest {
 		if (!empty(self::$service_actionid)) {
 			CDataHelper::call('action.delete', [self::$service_actionid]);
 			self::$service_actionid = null;
+		}
+
+		if (!empty(self::$trigger_actionid)) {
+			CDataHelper::call('action.delete', [self::$trigger_actionid]);
+			self::$trigger_actionid = null;
+		}
+
+		// Detach the media from the Admin user before deleting the media type it references.
+		if (!empty(self::$mediatypeid)) {
+			CDataHelper::call('user.update', ['userid' => 1, 'medias' => []]);
+			CDataHelper::call('mediatype.delete', [self::$mediatypeid]);
+			self::$mediatypeid = null;
 		}
 
 		if (!empty(self::$serviceids)) {
