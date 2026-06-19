@@ -39,6 +39,7 @@ if (array_key_exists('serverid', $data) && $data['serverid'] !== '') {
 				->setTitle(_('Copy to clipboard'))
 				->addClass(ZBX_ICON_COPY)
 				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('btn-medium')
 				->addClass('js-copy-button')
 		],
 		''
