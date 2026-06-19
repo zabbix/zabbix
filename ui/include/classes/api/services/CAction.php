@@ -3341,7 +3341,15 @@ class CAction extends CApiService {
 		]);
 
 		foreach ($actions as $i1 => $action) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
+
 			foreach ($action['filter']['conditions'] as $i2 => $condition) {
+				if ($condition['conditiontype'] != ZBX_CONDITION_TYPE_PROXY) {
+					continue;
+				}
+
 				if (!array_key_exists($condition['value'], $proxies)) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS,_s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i1 + 1).'/filter/conditions/'.($i2 + 1).'/value/',
