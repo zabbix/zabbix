@@ -791,7 +791,7 @@ static int	cep_rule_discard_event(const zbx_cep_rule_t *rule, zbx_cep_event_cont
 int	cep_event_match_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t ***matched_rules,
 		int *matched_rules_num, zbx_cep_event_context_t *ctx)
 {
-	int				ret = FAIL;
+	int				ret = FAIL, cause_symptom_num = 0;
 	const zbx_vector_cep_rule_ptr_t	*rules;
 
 	if (NULL == ctx->db_event)
@@ -810,6 +810,15 @@ int	cep_event_match_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t *
 	{
 		if (SUCCEED != cep_rule_match_event(rules->values[i], ctx))
 			continue;
+
+		/* only first matching cause-symptom rule can be processed */
+		if (NULL != rules->values[i]->window && ZBX_CEP_WINDOW_CAUSE_SYMPTOM == rules->values[i]->window->type)
+		{
+			if (0 != cause_symptom_num)
+				continue;
+
+			cause_symptom_num = 1;
+		}
 
 		if (SUCCEED == cep_rule_discard_event(rules->values[i], ctx))
 		{
