@@ -1315,6 +1315,9 @@ class testTriggerCEP extends CIntegrationTest {
 
 		// CEP processed the opened problem events (one per trigger).
 		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, count($keys));
+
+		// CEP cached one event per opened problem (one per trigger).
+		$this->assertCepStatEquals('tasks', 'cached_events', count($keys));
 	}
 
 	/**
@@ -1354,6 +1357,7 @@ class testTriggerCEP extends CIntegrationTest {
 
 		// CEP processed the recovered events (one per trigger).
 		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, count($keys));
+		$this->assertCepStatEquals('tasks', 'cached_events', 0);
 	}
 
 	/**
@@ -3255,6 +3259,23 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 		$this->assertGreaterThanOrEqual($expected, $this->getCepStat($group, $name),
 			'CEP '.$group.'.'.$name.' did not increase by at least '.$min_increase.' (baseline '.$baseline.').');
+	}
+
+	/**
+	 * Poll the zabbix["cep"] statistics until the given counter equals $expected, then assert it.
+	 */
+	private function assertCepStatEquals(string $group, string $name, int $expected): void {
+		// Poll every 100 ms; keep the same overall timeout as the 1 s-based waits by scaling the
+		// iteration count up by 10x (WAIT_ITERATIONS * WAIT_ITERATION_DELAY seconds total).
+		$iterations = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY * 10;
+		for ($i = 0; $i < $iterations; $i++) {
+			if ($this->getCepStat($group, $name) == $expected) {
+				break;
+			}
+			usleep(100000);
+		}
+		$this->assertEquals($expected, $this->getCepStat($group, $name),
+			'CEP '.$group.'.'.$name.' did not reach '.$expected.'.');
 	}
 
 	public static function clearData(): void {
