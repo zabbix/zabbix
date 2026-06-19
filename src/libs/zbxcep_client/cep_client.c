@@ -1055,4 +1055,24 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: send event cause to CEP service                                   *
+ *                                                                            *
+ * Parameters: eventid       - [IN] event ID                                  *
+ *             cause_eventid - [IN] cause event ID                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_cep_set_event_cause(zbx_uint64_t eventid, zbx_uint64_t cause_eventid)
+{
+	unsigned char	buf[sizeof(eventid) + sizeof(cause_eventid)], *ptr = buf;
 
+	ptr += zbx_serialize_value(ptr, eventid);
+	(void)zbx_serialize_value(ptr, cause_eventid);
+
+	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_SET_EVENT_CAUSE, buf, sizeof(buf)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send check trigger dependencies message to CEP service");
+		zbx_exit(EXIT_FAILURE);
+	}
+}

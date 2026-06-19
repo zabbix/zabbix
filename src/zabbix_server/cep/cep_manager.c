@@ -661,6 +661,7 @@ void	*zbx_cep_manager_thread(void *args)
 				case ZBX_CEP_UPDATE_SEVERITIES:
 				case ZBX_CEP_ADD_EVENT_TAGS:
 				case ZBX_CEP_DELETE_EVENTS:
+				case ZBX_CEP_SET_EVENT_CAUSE:
 					cep_manager_add_remote_task(manager, &client, &message, NULL, 0);
 					break;
 				case ZBX_CEP_SYNC_OBJECT_STATE:

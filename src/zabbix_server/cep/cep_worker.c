@@ -328,7 +328,6 @@ static void	cep_worker_delete_events(zbx_cep_task_remote_t *task)
 	zbx_vector_cep_event_handle_create(&handles);
 	zbx_vector_cep_event_handle_reserve(&handles, (size_t)eventids.values_num);
 
-
 	cep_cache_acquire(&cep);
 	cep_delete_events(cep, &eventids, &handles);
 	cep_cache_release(&cep);
@@ -366,7 +365,20 @@ static void	cep_worker_get_stats(zbx_cep_worker_t *worker, zbx_cep_task_remote_t
 	ptr += zbx_serialize_value(ptr, stats.task_internal_num);
 	ptr += zbx_serialize_value(ptr, stats.task_completed_num);
 	(void)zbx_serialize_value(ptr, stats.events_num);
+}
 
+static void	cep_worker_set_event_cause(zbx_cep_task_remote_t *task)
+{
+	zbx_cep_t	*cep;
+	unsigned char	*ptr = task->message->data;
+	zbx_uint64_t	eventid, cause_eventid;
+
+	ptr += zbx_deserialize_value(ptr, &eventid);
+	(void)zbx_deserialize_value(ptr, &cause_eventid);
+
+	cep_cache_acquire(&cep);
+	cep_set_event_cause(cep, eventid, cause_eventid);
+	cep_cache_release(&cep);
 }
 
 /******************************************************************************
@@ -412,6 +424,9 @@ static void	cep_worker_process_task_remote(zbx_cep_worker_t *worker, zbx_cep_tas
 			break;
 		case ZBX_CEP_GET_STATS:
 			cep_worker_get_stats(worker, task);
+			break;
+		case ZBX_CEP_SET_EVENT_CAUSE:
+			cep_worker_set_event_cause(task);
 			break;
 	}
 

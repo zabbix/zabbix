@@ -415,7 +415,8 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 		events_num = 0;
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select p.eventid,p.clock,p.severity,p.ns,p.source,p.object,p.objectid,p.name"
+				"select p.eventid,p.clock,p.severity,p.ns,p.source,p.object,p.objectid,p.name,"
+					"p.cause_eventid"
 				" from problem p"
 				" where eventid>" ZBX_FS_UI64
 					" and r_eventid is null"
@@ -1789,8 +1790,8 @@ void	cep_delete_events(zbx_cep_t *cep, const zbx_vector_uint64_t *eventids, zbx_
 static void	cep_dump_event(const char *indent, zbx_cep_event_t *event)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "%seventid:" ZBX_FS_UI64 " name:%s", indent, event->eventid, event->name);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s  clock:%d ns:%d severity:%d refs:%u tags:",
-			indent, event->clock, event->ns, event->severity, event->refcount);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s  clock:%d ns:%d severity:%d cause:" ZBX_FS_UI64 " refs:%u tags:",
+			indent, event->clock, event->ns, event->severity, event->cause_eventid, event->refcount);
 
 	for (int i = 0; i < event->tags.values_num; i++)
 	{
@@ -1866,3 +1867,14 @@ void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats)
 	stats->events_num = cep->events.num_data;
 }
 
+void	cep_set_event_cause(zbx_cep_t *cep, zbx_uint64_t eventid, zbx_uint64_t cause_eventid)
+{
+	zbx_cep_event_handle_t	h = cep_get_event(cep, eventid);
+
+	if (CEP_EVENT_STATE_ACTIVE == h->state)
+	{
+		zbx_cep_event_t	*e = cep_event_handle_mutable(h);
+
+		e->cause_eventid = cause_eventid;
+	}
+}

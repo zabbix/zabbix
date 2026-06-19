@@ -329,6 +329,9 @@ static int	tm_rank_event_as_cause(zbx_uint64_t eventid)
 		ret = FAIL;
 	}
 out:
+	if (SUCCEED == ret)
+		zbx_cep_set_event_cause(eventid, 0);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -389,6 +392,9 @@ static int	tm_rank_event_as_symptom(zbx_uint64_t eventid, zbx_uint64_t cause_eve
 		ret = FAIL;
 	}
 out:
+	if (SUCCEED == ret)
+		zbx_cep_set_event_cause(eventid, cause_eventid);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
