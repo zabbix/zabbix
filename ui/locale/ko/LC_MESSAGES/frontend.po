@@ -15254,6 +15254,10 @@ msgstr ""
 msgid "Next dashboard"
 msgstr "다음 대시보드"
 
+#: jsLoader.php:328
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15267,6 +15271,10 @@ msgstr "다음 페이지"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "다음 스텝"
+
+#: jsLoader.php:326
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -15456,6 +15464,11 @@ msgstr "맵이 추가되어 있지 않습니다."
 #: include/classes/html/CMultiSelect.php:66 jsLoader.php:328
 msgid "No matches found"
 msgstr "조건에 일치하는 데이터가 없습니다"
+
+#: app/controllers/CControllerValidateApiExists.php:118
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr ""
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"

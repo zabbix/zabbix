@@ -15253,6 +15253,10 @@ msgstr "次"
 msgid "Next dashboard"
 msgstr "次のダッシュボード"
 
+#: jsLoader.php:328
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15266,6 +15270,10 @@ msgstr "次のページ"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "次のステップ"
+
+#: jsLoader.php:326
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -15455,6 +15463,11 @@ msgstr "マップが追加されていません。"
 #: include/classes/html/CMultiSelect.php:66 jsLoader.php:328
 msgid "No matches found"
 msgstr "条件に一致するデータはありません"
+
+#: app/controllers/CControllerValidateApiExists.php:118
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr ""
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
