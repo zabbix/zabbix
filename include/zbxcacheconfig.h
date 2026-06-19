@@ -1705,7 +1705,7 @@ zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correl
 /* CEP */
 
 #define ZBX_CEP_WINDOW_SIMPLE		1
-#define ZBX_CEP_WINDOW_CAUSE_SYMPTOM	2
+#define ZBX_CEP_WINDOW_CAUSAL		2
 #define ZBX_CEP_WINDOW_TAG_MATCH	3
 #define ZBX_CEP_WINDOW_PATTERN_MATCH	4
 

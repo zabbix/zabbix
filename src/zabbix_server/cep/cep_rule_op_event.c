@@ -502,14 +502,13 @@ void	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zb
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	cep_rule_event_handle_execute_ops(const zbx_cep_rule_t *rule, zbx_cep_event_handle_t hevent, int execute_when,
-		zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks)
+void	cep_rule_event_context_execute_ops(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx, int execute_when,
+		zbx_vector_mw_task_ptr_t *tasks)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
 
 	zbx_cep_event_t	*event = NULL;
 
-	cep_event_context_set_handle(ctx, hevent);
 	cep_rule_event_execute_ops(rule, execute_when, ctx, &event, tasks);
 
 	if (NULL != event)
@@ -517,10 +516,10 @@ void	cep_rule_event_handle_execute_ops(const zbx_cep_rule_t *rule, zbx_cep_event
 		zbx_cep_t	*cep;
 
 		cep_cache_acquire(&cep);
-		cep_event_handle_set(hevent, event);
+		cep_event_handle_set(ctx->hevent, event);
 		cep_cache_release(&cep);
 
-		zbx_mw_task_t	*t = cep_create_task_sync_event(hevent, ctx->sync_flags);
+		zbx_mw_task_t	*t = cep_create_task_sync_event(ctx->hevent, ctx->sync_flags);
 
 		zbx_vector_mw_task_ptr_append(tasks, t);
 	}
@@ -535,7 +534,7 @@ void	cep_event_execute_ops(const zbx_cep_rule_t **matched_rules, int matched_rul
 		cep_rule_event_execute_ops(matched_rules[i], execute_when, ctx, event, tasks);
 }
 
-void	cep_event_add_to_rules(zbx_cep_event_handle_t hevent, zbx_cep_event_context_t *ctx,
+void	cep_event_add_to_rules(zbx_cep_event_context_t *ctx,
 		const zbx_cep_rule_t **matched_rules, int matched_rules_num, zbx_vector_mw_task_ptr_t *tasks)
 {
 	for (int i = 0; i < matched_rules_num; i++)
@@ -548,10 +547,10 @@ void	cep_event_add_to_rules(zbx_cep_event_handle_t hevent, zbx_cep_event_context
 		switch (rule->window->type)
 		{
 			case ZBX_CEP_WINDOW_SIMPLE:
-				cep_window_simple_process_event(rule, hevent, ctx, tasks);
+				cep_window_simple_process_event(rule, ctx, tasks);
 				break;
-			case ZBX_CEP_WINDOW_CAUSE_SYMPTOM:
-				cep_window_cause_symptom_process_event(rule, hevent, ctx, tasks);
+			case ZBX_CEP_WINDOW_CAUSAL:
+				cep_window_causal_process_event(rule, ctx, tasks);
 				break;
 			case ZBX_CEP_WINDOW_TAG_MATCH:
 			case ZBX_CEP_WINDOW_PATTERN_MATCH:

@@ -446,7 +446,6 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	zbx_cep_t		*cep;
 	zbx_db_event		*db_event = task->db_event;
 	zbx_uint64_t		eventid;
-	zbx_cep_event_handle_t	h;
 
 	cep_cache_acquire(&cep);
 	eventid = cep_open_trigger_event(cep, db_event->objectid, db_event->trigger.type,
@@ -495,11 +494,11 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	}
 
 	cep_cache_acquire(&cep);
-	h = zbx_cep_event_handle_addref(cep_add_event(cep, event));
+	event_ctx.hevent = zbx_cep_event_handle_addref(cep_add_event(cep, event));
 	cep_cache_release(&cep);
 
 	if (0 != rules_num)
-		cep_event_add_to_rules(h, &event_ctx, rules, rules_num, &tasks);
+		cep_event_add_to_rules(&event_ctx, rules, rules_num, &tasks);
 
 	int	corr_ret;
 
@@ -525,15 +524,13 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	if (0 != zbx_dc_local_get_itservices_num() && CEP_ACTION_DISABLED != task->action_state)
 	{
 		zbx_cep_event_update_t	update_local = {
-			.handle = h,
+			.handle = zbx_cep_event_handle_addref(event_ctx.hevent),
 			.op = CEP_EVENT_OPEN
 		};
 
 		zbx_vector_cep_event_update_reserve(&task->updates, 1);
 		zbx_vector_cep_event_update_append(&task->updates, update_local);
 	}
-	else
-		zbx_cep_event_handle_release(h);
 out:
 	cep_event_context_clear(&event_ctx);
 
@@ -821,8 +818,8 @@ static void	cep_worker_process_task_close_event(zbx_cep_task_close_event_t *task
 
 static int	cep_task_sync_event_compare(const void *a1, const void *a2)
 {
-	const zbx_cep_task_sync_event_t	*t1 = (const zbx_cep_task_sync_event_t *)a1;
-	const zbx_cep_task_sync_event_t	*t2 = (const zbx_cep_task_sync_event_t *)a2;
+	const zbx_cep_task_sync_event_t	*t1 = *(const zbx_cep_task_sync_event_t * const *)a1;
+	const zbx_cep_task_sync_event_t	*t2 = *(const zbx_cep_task_sync_event_t * const *)a2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(zbx_cep_event_handle_eventid(t1->hevent), zbx_cep_event_handle_eventid(t2->hevent));
 
@@ -831,8 +828,8 @@ static int	cep_task_sync_event_compare(const void *a1, const void *a2)
 
 static int	cep_task_ack_compare(const void *a1, const void *a2)
 {
-	const zbx_cep_task_acknowledge_t	*ack1 = (const zbx_cep_task_acknowledge_t *)a1;
-	const zbx_cep_task_acknowledge_t	*ack2 = (const zbx_cep_task_acknowledge_t *)a2;
+	const zbx_cep_task_acknowledge_t	*ack1 = *(const zbx_cep_task_acknowledge_t * const *)a1;
+	const zbx_cep_task_acknowledge_t	*ack2 = *	(const zbx_cep_task_acknowledge_t * const *)a2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(ack1->eventid, ack2->eventid);
 

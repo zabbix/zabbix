@@ -881,7 +881,6 @@ static int	cep_db_sync_event_tags(const char *table, const char *field, const zb
 		zbx_db_insert_t *db_insert, char **sql, size_t *sql_alloc, size_t *sql_offset,
 		zbx_vector_uint64_t *deleteids)
 {
-	char			eventid_str[MAX_ID_LEN];
 	zbx_sync_rowset_t	cache_tags;
 
 	while (event_index < events_num)
@@ -889,14 +888,13 @@ static int	cep_db_sync_event_tags(const char *table, const char *field, const zb
 		if (events[event_index]->eventid == eventid)
 			break;
 
-		zbx_snprintf(eventid_str, sizeof(eventid_str), ZBX_FS_UI64, events[event_index]->eventid);
-
 		/* there are no tags for this event in database, insert them */
 		for (int i = 0; i < events[event_index]->tags.values_num; i++)
 		{
 			zbx_tag_t	*tag = &events[event_index]->tags.values[i];
 
-			zbx_db_insert_add_values(db_insert, __UINT64_C(0), eventid_str, tag->tag, tag->value);
+			zbx_db_insert_add_values(db_insert, __UINT64_C(0), events[event_index]->eventid, tag->tag,
+					tag->value);
 		}
 		event_index++;
 	}
@@ -904,15 +902,13 @@ static int	cep_db_sync_event_tags(const char *table, const char *field, const zb
 	if (event_index == events_num || NULL == db_tags)
 		return event_index;
 
-	zbx_sync_rowset_init(&cache_tags, 3);
-
-	zbx_snprintf(eventid_str, sizeof(eventid_str), ZBX_FS_UI64, events[event_index]->eventid);
+	zbx_sync_rowset_init(&cache_tags, 2);
 
 	for (int i = 0; i < events[event_index]->tags.values_num; i++)
 	{
 		zbx_tag_t	*tag = &events[event_index]->tags.values[i];
 
-		zbx_sync_rowset_add_row(&cache_tags, NULL, eventid_str, tag->tag, tag->value);
+		zbx_sync_rowset_add_row(&cache_tags, NULL, tag->tag, tag->value);
 	}
 
 	zbx_sync_rowset_merge(db_tags, &cache_tags);
@@ -927,16 +923,16 @@ static int	cep_db_sync_event_tags(const char *table, const char *field, const zb
 		}
 		else if (0 != (row->flags & ZBX_SYNC_ROW_INSERT))
 		{
-			zbx_db_insert_add_values(db_insert, __UINT64_C(0), eventid, row->cols[1], row->cols[2]);
+			zbx_db_insert_add_values(db_insert, __UINT64_C(0), eventid, row->cols[0], row->cols[1]);
 		}
 		else if (0 != (row->flags & ZBX_SYNC_ROW_UPDATE))
 		{
-			const char	*fields[] = {NULL, "tag", "value"};
+			const char	*fields[] = {"tag", "value"};
 			char		delim = ' ';
 
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update %s set", table);
 
-			for (int j = 1; j < row->cols_num; j++)
+			for (int j = 0; j < row->cols_num; j++)
 			{
 				if (0 == (row->flags & (UINT32_C(1) << j)))
 					continue;
@@ -975,7 +971,7 @@ static void	cep_db_sync_event_tags_table(zbx_dbconn_t *db, const char *table, co
 	zbx_db_insert_t				db_insert;
 
 	zbx_vector_uint64_create(&deleteids);
-	zbx_sync_rowset_init(&db_tags, 3);
+	zbx_sync_rowset_init(&db_tags, 2);
 	zbx_dbconn_prepare_insert(db, &db_insert, table, field, "eventid", "tag", "value", NULL);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s,eventid,tag,value from %s where",
@@ -998,12 +994,12 @@ static void	cep_db_sync_event_tags_table(zbx_dbconn_t *db, const char *table, co
 						last_eventid, &db_tags, db, &db_insert, &sql, &sql_alloc, &sql_offset,
 						&deleteids);
 				zbx_sync_rowset_clear(&db_tags);
-				zbx_sync_rowset_init(&db_tags, 3);
+				zbx_sync_rowset_init(&db_tags, 2);
 			}
 			last_eventid = eventid;
 		}
 
-		zbx_sync_rowset_add_row(&db_tags, row[0], row[1], row[2], row[3]);
+		zbx_sync_rowset_add_row(&db_tags, row[0], row[2], row[3]);
 	}
 	zbx_db_free_result(result);
 

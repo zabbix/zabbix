@@ -30,6 +30,7 @@ zbx_cep_location_t;
 #define CEP_WINDOW_FLAGS_NONE			0x0000
 #define CEP_WINDOW_FLAGS_SYMPTOM_TAG_SET	0x0001
 
+typedef struct zbx_cep_window_ref zbx_cep_window_ref_t;
 typedef struct
 {
 	zbx_uint64_t		ruleid;
@@ -44,13 +45,14 @@ typedef struct
 
 	zbx_atomic_uint64_t	nextcheck;
 	zbx_atomic_uint32_t	refcount;
+	zbx_cep_window_ref_t	*ref;
 	pthread_mutex_t		lock;
 }
 zbx_cep_window_t;
 
 ZBX_PTR_VECTOR_DECL(cep_window_ptr, zbx_cep_window_t *)
 
-typedef struct
+struct zbx_cep_window_ref
 {
 	zbx_uint64_t	ruleid;
 	unsigned char	group_by;
@@ -60,8 +62,7 @@ typedef struct
 	char		*tag_value;
 
 	zbx_cep_window_t	*window;
-}
-zbx_cep_window_ref_t;
+};
 
 zbx_cep_window_t	*cep_window_addref(zbx_cep_window_t *window);
 void	cep_window_release(zbx_cep_window_t *window);
@@ -69,12 +70,13 @@ void	cep_window_release(zbx_cep_window_t *window);
 zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, const zbx_cep_rule_t *rule,
 		zbx_cep_event_context_t *ctx);
 
-void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_handle_t hevent,
-		zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks);
+void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
+		zbx_vector_mw_task_ptr_t *tasks);
 void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks);
 
-void	cep_window_cause_symptom_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_handle_t hevent,
-	zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks);
+void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
+		zbx_vector_mw_task_ptr_t *tasks);
+void	cep_window_causal_process(zbx_cep_window_t *window, zbx_vector_mw_task_ptr_t *tasks);
 
 void	cep_window_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks);
 
@@ -89,6 +91,7 @@ void	cep_window_pool_destroy(void *a);
 
 zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *pool, const zbx_cep_rule_t *rule,
 		zbx_cep_event_context_t *ctx);
+void	cep_window_pool_remove_window(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window);
 int	cep_window_pool_next_batch(zbx_cep_window_pool_t *pool, time_t now,
 		zbx_vector_cep_window_ptr_t *windows);
 void	cep_window_pool_add(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window);

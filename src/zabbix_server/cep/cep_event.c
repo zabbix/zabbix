@@ -342,7 +342,7 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
 
 	zbx_cep_event_t	*event;
 
-	if (0 == !strcmp(CEP_TAG_IS_COPIED, tag))
+	if (0 == strcmp(CEP_TAG_IS_COPIED, tag))
 	{
 		if (NULL != (event = cep_event_context_acquire_event(ctx)))
 		{
@@ -350,22 +350,22 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
 			THIS_SHOULD_NEVER_HAPPEN_MSG("not implemented");
 		}
 	}
-	else if(0 == !strcmp(CEP_TAG_IS_FIRST, tag))
+	else if(0 == strcmp(CEP_TAG_IS_FIRST, tag))
 	{
 		return (ctx->pos == CEP_POS_FIRST ? CEP_VALUE_TRUE : CEP_VALUE_FALSE);
 	}
-	else if(0 == !strcmp(CEP_TAG_IS_LAST, tag))
+	else if(0 == strcmp(CEP_TAG_IS_LAST, tag))
 	{
 		return (ctx->pos == CEP_POS_LAST ? CEP_VALUE_TRUE : CEP_VALUE_FALSE);
 	}
-	else if(0 == !strcmp(CEP_TAG_IS_SYMPTOM, tag))
+	else if(0 == strcmp(CEP_TAG_IS_SYMPTOM, tag))
 	{
 		if (NULL != (event = cep_event_context_acquire_event(ctx)) && 0 != event->cause_eventid)
 			return CEP_VALUE_TRUE;
 
 		return CEP_VALUE_FALSE;
 	}
-	else if(0 == !strcmp(CEP_TAG_IS_OPEN, tag))
+	else if(0 == strcmp(CEP_TAG_IS_OPEN, tag))
 	{
 		if (NULL != (event = cep_event_context_acquire_event(ctx)))
 		{
