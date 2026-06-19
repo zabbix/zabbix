@@ -61,15 +61,19 @@ class CServerInfo extends CApiService {
 	private static function getServerLastAccess(): int {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		$active_node = API::getApiService('hanode')->get([
-			'output' => ['port', 'lastaccess'],
-			'filter' => ['address' => $ZBX_SERVER, 'status' => ZBX_NODE_STATUS_ACTIVE],
+		if ($ZBX_SERVER === null) {
+			return 0;
+		}
+
+		$active_node = DB::select('ha_node', [
+			'output' => ['lastaccess'],
+			'filter' => ['address' => $ZBX_SERVER, 'port' => $ZBX_SERVER_PORT],
 			'sortfield' => 'lastaccess',
 			'sortorder' => 'DESC',
 			'limit' => 1
-		], false);
+		]);
 
-		if ($active_node && $active_node[0]['port'] == $ZBX_SERVER_PORT) {
+		if ($active_node) {
 			return $active_node[0]['lastaccess'];
 		}
 
