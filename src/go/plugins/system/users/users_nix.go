@@ -31,13 +31,9 @@ import (
 )
 
 func (p *Plugin) getUsersNum() (int, error) {
-	if p.executor == nil {
-		var err error
-
-		p.executor, err = zbxcmd.InitExecutor()
-		if err != nil {
-			return 0, errs.Wrap(err, "command init failed")
-		}
+	err := p.initExecutor()
+	if err != nil {
+		return 0, err
 	}
 
 	out, err := p.executor.Execute("who | wc -l", time.Second*time.Duration(p.options.Timeout), "")
@@ -46,4 +42,22 @@ func (p *Plugin) getUsersNum() (int, error) {
 	}
 
 	return strconv.Atoi(out)
+}
+
+func (p *Plugin) initExecutor() error {
+	p.executorInitMu.Lock()
+	defer p.executorInitMu.Unlock()
+
+	if p.executor != nil {
+		return nil
+	}
+
+	executor, err := zbxcmd.InitExecutor()
+	if err != nil {
+		return errs.Wrap(err, "command init failed")
+	}
+
+	p.executor = executor
+
+	return nil
 }
