@@ -262,8 +262,8 @@ class testFormFilter extends CWebTest {
 		$this->page->open($this->url)->waitUntilReady();
 		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
 
-		// Checking if home tab is selected.
-		if ($filter->getSelectedTabName() !== 'Home') {
+		// Checking if Default filter tab is selected.
+		if ($filter->getSelectedTabName() !== 'Default filter tab') {
 			$filter->selectTab();
 			$this->page->waitUntilReady();
 		}
