@@ -1832,5 +1832,7 @@ void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats)
 	stats->events_accessed = atomic_load(&cep->events_accessed_num);
 	stats->events_processed = atomic_load(&cep->events_processed_num);
 	stats->events_discarded = atomic_load(&cep->events_discarded_num);
+
+	stats->events_num = cep->events.num_data;
 }
 

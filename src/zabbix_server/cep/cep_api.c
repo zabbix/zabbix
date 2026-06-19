@@ -374,6 +374,10 @@ void	cep_stats_update_events_discarded(zbx_uint64_t value)
 
 void	cep_stats_collect(zbx_cep_stats_t *stats)
 {
-	cep_get_stats(cep_api->cache_guard->cep, stats);
+	zbx_cep_t	*cep;
+
+	cep_cache_acquire(&cep);
+	cep_get_stats(cep, stats);
+	cep_cache_release(&cep);
 }
 
