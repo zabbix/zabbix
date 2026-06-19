@@ -243,8 +243,7 @@ static zbx_history_provider_t	*history_manager_get_provider(zbx_history_manager_
 	zbx_history_provider_t			*provider = NULL;
 	zbx_vector_history_provider_ptr_t	*providers = &manager->providers[index];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() name:%s opened:%d", __func__, manager->registry.values[index]->name,
-			providers->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() name:%s", __func__, manager->registry.values[index]->name);
 
 	pthread_mutex_lock(&manager->lock);
 
