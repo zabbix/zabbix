@@ -432,10 +432,10 @@ class CUserGroup extends CApiService {
 				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'proxies' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['proxyid']], 'fields' => [
-				'proxyid' =>				['type' => API_ID, 'flags' => API_UNEXPECTED]
+				'proxyid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'proxy_groups' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['proxy_groupid']], 'fields' => [
-				'proxy_groupid' =>			['type' => API_ID, 'flags' => API_UNEXPECTED]
+				'proxy_groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'proxy_mode' =>				['type' => API_MULTIPLE, 'rules' => [
 											['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_INT32, 'in' => implode(',', [PROXY_MODE_ALLOW, PROXY_MODE_DENY])],
@@ -1855,7 +1855,8 @@ class CUserGroup extends CApiService {
 	 * @param array $db_usrgrps
 	 */
 	private static function addAffectedObjects(array $usrgrps, array &$db_usrgrps): void {
-		$usrgrpids = ['hostgroup_rights' => [], 'templategroup_rights' => [], 'tag_filters' => [], 'users' => []];
+		$usrgrpids = ['hostgroup_rights' => [], 'templategroup_rights' => [], 'tag_filters' => [], 'users' => [],
+			'proxies' => [], 'proxy_groups' => []];
 
 		foreach ($usrgrps as $usrgrp) {
 			if (array_key_exists('hostgroup_rights', $usrgrp)) {
