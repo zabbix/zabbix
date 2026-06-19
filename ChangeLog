@@ -1,12 +1,19 @@
 Changes for 7.0.28rc1
 
 New features:
+A......PS. [ZBXNEXT-10478] updated maximum supported MariaDB version to 12.3 (mprihodko)
 .........T [ZBXNEXT-10211] updated alarms discovery in vmware template (abakaldin)
 .......PS. [ZBXNEXT-10611] added real host name for native vmware.*.alarms.get item keys (MVekslers)
 A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
 A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-27770] fixed validation of HTTP response data for scenario-level dynamic variables in web monitoring (sboidenko)
+A.......S. [ZBX-27561] mitigated recurring system errors when editing groups for users or hosts in parallel API requests (kkuzmina, mprihodko)
+A......... [ZBX-26766] fixed code error when updating host, template or user groups with duplicate group set entries (jfreibergs)
+A......... [ZBX-27382] fixed incorrect tag-based service permission check (averza)
+.......PS. [ZBX-27200] fixed invalid statuses for hosts and services during network discovery when host is found on several IP addresses (aetatsu)
+..F....... [ZBX-27144] fixed legend text clipping at the bottom in downloaded widget images (aluchko)
 ..F....... [ZBX-27732] fixed auto refresh to continue running in monitoring latest data view (uolekss)
 ..F....... [ZBX-26048] fixed long error titles visibility on the Frontend in modal window (isharha)
 ..F....... [ZBX-25461] fixed contrast problems with severity icons in high contrast themes (kastafjevs)
@@ -4112,6 +4119,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.47rc1
 
 New features:
+A......PS. [ZBXNEXT-10478] updated maximum supported MariaDB version to 12.3 (mprihodko)
 A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
 
