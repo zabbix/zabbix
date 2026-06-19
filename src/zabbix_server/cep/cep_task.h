@@ -138,7 +138,7 @@ zbx_mw_task_t	*cep_create_task_commit(zbx_vector_mw_task_ptr_t *tasks);
 zbx_mw_task_t	*cep_create_task_close_event(zbx_db_event *event, zbx_uint64_t eventid, zbx_uint64_t userid,
 		zbx_uint64_t correlationid, zbx_uint64_t cep_ruleid);
 zbx_mw_task_t	*cep_create_task_add_tags(zbx_vector_event_tags_t *event_tags, zbx_vector_uint64_t *eventids);
-zbx_mw_task_t	*cep_create_task_sync_event(zbx_cep_event_handle_t event, zbx_uint32_t flags);
+zbx_mw_task_t	*cep_create_task_sync_event(zbx_cep_event_handle_t hevent, zbx_uint32_t flags);
 zbx_mw_task_t	*cep_create_task_window(zbx_cep_window_t *window, time_t now);
 zbx_mw_task_t	*cep_create_task_acknowledge(zbx_cep_acknowledge_t *ack, zbx_uint64_t ruleid, zbx_uint64_t eventid);
 

@@ -302,20 +302,20 @@ static void	cep_task_add_tags_free(void *mw_task)
  *                                                                            *
  * Purpose: create task to sync event changes from cache to db                *
  *                                                                            *
- * Parameters: event - [IN] event to sync                                     *
- *             flags - [IN] update flags specifying what should be updated    *
+ * Parameters: hevent - [IN] event to sync                                    *
+ *             flags  - [IN] update flags specifying what should be updated   *
  *                                                                            *
  * Return value: created task                                                 *
  *                                                                            *
  ******************************************************************************/
-zbx_mw_task_t	*cep_create_task_sync_event(zbx_cep_event_handle_t event, zbx_uint32_t flags)
+zbx_mw_task_t	*cep_create_task_sync_event(zbx_cep_event_handle_t hevent, zbx_uint32_t flags)
 {
 	zbx_cep_task_sync_event_t	*task;
 
 	task = (zbx_cep_task_sync_event_t *)zbx_mw_task_create(CEP_TASK_SYNC_EVENT, cep_task_sync_event_free,
 			sizeof(zbx_cep_task_sync_event_t));
 
-	task->hevent = zbx_cep_event_handle_addref(event);
+	task->hevent = zbx_cep_event_handle_addref(hevent);
 	task->flags = flags;
 
 	return (zbx_mw_task_t *)task;

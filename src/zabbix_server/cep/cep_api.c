@@ -131,11 +131,11 @@ static void	cep_guard_release(zbx_cep_guard_t *guard, void **ptr)
  ******************************************************************************/
 static void	cep_api_free(zbx_cep_api_t *api)
 {
-	if (NULL != api->cache_guard)
-		cep_guard_destroy(api->cache_guard);
-
 	if (NULL != api->window_pool_guard)
 		cep_guard_destroy(api->window_pool_guard);
+
+	if (NULL != api->cache_guard)
+		cep_guard_destroy(api->cache_guard);
 
 	if (NULL != api->update_channel)
 	{

@@ -27,6 +27,9 @@ typedef enum
 }
 zbx_cep_location_t;
 
+#define CEP_WINDOW_FLAGS_NONE			0x0000
+#define CEP_WINDOW_FLAGS_SYMPTOM_TAG_SET	0x0001
+
 typedef struct
 {
 	zbx_uint64_t		ruleid;
@@ -37,6 +40,7 @@ typedef struct
 	zbx_cep_location_t	location;	/* window location is read/written only within window pool lock */
 	time_t			time_created;
 	zbx_queue_ptr_t		hevents;
+	unsigned char		flags;
 
 	zbx_atomic_uint64_t	nextcheck;
 	zbx_atomic_uint32_t	refcount;

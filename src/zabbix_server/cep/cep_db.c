@@ -943,7 +943,7 @@ static int	cep_db_sync_event_tags(const char *table, const char *field, const zb
 
 				char	*value_esc;
 
-				value_esc = zbx_db_dyn_escape_string(row->cols[j]);
+				value_esc = zbx_dbconn_dyn_escape_string(db, row->cols[j]);
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%c%s='%s'", delim, fields[j],
 						value_esc);
 				zbx_free(value_esc);
@@ -1127,7 +1127,7 @@ static void	cep_db_sync_event(zbx_dbconn_t *db, const zbx_vector_cep_event_sync_
 
 		if (0 != (sync->values[i].flags & CEP_SYNC_EVENT_NAME))
 		{
-			char	*name_esc = zbx_db_dyn_escape_string(events[i]->name);
+			char	*name_esc = zbx_dbconn_dyn_escape_string(db, events[i]->name);
 
 			zbx_snprintf_alloc(&sql_events, &sql_events_alloc, &sql_events_offset,
 					"%cname='%s'", delim, name_esc);

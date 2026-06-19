@@ -122,6 +122,7 @@ zbx_cep_event_t	*cep_event_clone(const zbx_cep_event_t *event)
 
 zbx_cep_event_t	*cep_event_get_mutable(zbx_cep_event_t *event)
 {
+	/* with 1 refcount event is not yet added to cache, so other threads cannot access it */
 	if (1 == atomic_load(&event->refcount))
 		return cep_event_addref(event);
 
@@ -144,6 +145,27 @@ int	cep_event_find_tag(zbx_cep_event_t *event, const char *tag)
 	}
 
 	return FAIL;
+}
+
+int	cep_event_validate_tag(zbx_cep_event_t *event, const char *tag, const char *value,
+		int *match_index)
+{
+	if (NULL != match_index)
+		*match_index = FAIL;
+
+	for (int i = 0; i < event->tags.values_num; i++)
+	{
+		if (0 == strcmp(event->tags.values[i].tag, tag))
+		{
+			if (0 == strcmp(event->tags.values[i].value, value))
+				return FAIL;
+
+			if (NULL != match_index && FAIL == *match_index)
+				*match_index = i;
+		}
+	}
+
+	return SUCCEED;
 }
 
 /*
@@ -230,7 +252,7 @@ void	cep_event_context_load_groups(zbx_cep_event_context_t *ctx)
 	zbx_vector_uint64_destroy(&functionids);
 }
 
-zbx_cep_event_t *cep_event_context_acquire_event(zbx_cep_event_context_t *ctx)
+zbx_cep_event_t	*cep_event_context_acquire_event(zbx_cep_event_context_t *ctx)
 {
 	if (NULL == ctx->event)
 	{

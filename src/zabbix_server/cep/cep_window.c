@@ -162,6 +162,7 @@ static zbx_cep_window_t	*cep_window_create(const zbx_cep_rule_t *rule)
 
 	window->nextcheck = 0;
 	window->time_created = time(NULL);
+	window->flags = CEP_WINDOW_FLAGS_NONE;
 	zbx_queue_ptr_create(&window->hevents);
 	window->location = CEP_LOCATION_UNKNOWN;
 
@@ -303,6 +304,63 @@ void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	cep_window_set_event_tag(zbx_cep_window_t *window, zbx_cep_event_handle_t h, const char *tag, int value,
+		zbx_vector_mw_task_ptr_t *tasks)
+{
+	int			index;
+	zbx_cep_event_t		*event;
+	zbx_cep_event_context_t	ctx = {.hevent = zbx_cep_event_handle_addref(h)};
+	char			buf[MAX_ID_LEN];
+	zbx_mw_task_t		*task;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64 " tag:%s value:%d", __func__,
+			zbx_cep_event_handle_eventid(h), tag, value);
+
+	if (NULL == (event = cep_event_context_acquire_event(&ctx)))
+		goto out;
+
+	if (FAIL != (index = cep_event_find_tag(event, tag)) && 0 == (window->flags & CEP_WINDOW_FLAGS_SYMPTOM_TAG_SET))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set event " ZBX_FS_UI64 "tag \"%s\": tag already exists",
+				event->eventid, tag);
+		goto out;
+	}
+
+	zbx_snprintf(buf, sizeof(buf), "%d", value);
+
+	if (NULL == (event = cep_event_context_acquire_mutable_event(&ctx)))
+		goto out;
+
+	if (FAIL == index)
+	{
+		zbx_tag_t	tag_local;
+
+		tag_local.tag = zbx_strdup(NULL, tag);
+		tag_local.value = zbx_strdup(NULL, buf);
+		zbx_vector_lite_tag_append(&event->tags, tag_local);
+	}
+	else
+	{
+		zbx_tag_t	*t = &event->tags.values[index];
+
+		t->value = zbx_strdup(t->value, buf);
+	}
+
+	zbx_cep_t	*cep;
+
+	cep_cache_acquire(&cep);
+	cep_event_handle_set(h, event);
+	cep_cache_release(&cep);
+
+	task = cep_create_task_sync_event(h, CEP_SYNC_EVENT_TAGS);
+	zbx_vector_mw_task_ptr_append(tasks, task);
+	window->flags |= CEP_WINDOW_FLAGS_SYMPTOM_TAG_SET;
+out:
+	cep_event_context_clear(&ctx);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 void	cep_window_cause_symptom_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_handle_t hevent,
 		zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks)
 {
@@ -331,6 +389,12 @@ void	cep_window_cause_symptom_process_event(const zbx_cep_rule_t *rule, zbx_cep_
 			zbx_cep_event_handle_t	h = (zbx_cep_event_handle_t)zbx_queue_ptr_peek(&window->hevents);
 
 			event->cause_eventid = zbx_cep_event_handle_eventid(h);
+
+			if ('\0' != *rule->window->event_count_tag)
+			{
+				cep_window_set_event_tag(window, h, rule->window->event_count_tag,
+						zbx_queue_ptr_values_num(&window->hevents), tasks);
+			}
 		}
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(hevent));

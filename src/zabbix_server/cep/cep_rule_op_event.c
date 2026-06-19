@@ -215,27 +215,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	cep_event_validate_tag(zbx_cep_event_t *event, const char *tag, const char *value,
-		int *match_index)
-{
-	if (NULL != match_index)
-		*match_index = FAIL;
-
-	for (int i = 0; i < event->tags.values_num; i++)
-	{
-		if (0 == strcmp(event->tags.values[i].tag, tag))
-		{
-			if (0 == strcmp(event->tags.values[i].value, value))
-				return FAIL;
-
-			if (NULL != match_index && FAIL == *match_index)
-				*match_index = i;
-		}
-	}
-
-	return SUCCEED;
-}
-
 static void	cep_operation_event_add_tag(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_acknowledge_t *ack, zbx_cep_event_t **event)
 {
@@ -540,8 +519,6 @@ void	cep_rule_event_handle_execute_ops(const zbx_cep_rule_t *rule, zbx_cep_event
 		cep_cache_acquire(&cep);
 		cep_event_handle_set(hevent, event);
 		cep_cache_release(&cep);
-
-		zbx_cep_event_release(event);
 
 		zbx_mw_task_t	*t = cep_create_task_sync_event(hevent, ctx->sync_flags);
 
