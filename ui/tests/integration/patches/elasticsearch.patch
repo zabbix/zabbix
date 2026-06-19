@@ -1,26 +1,32 @@
 diff --git a/src/libs/zbxhistory/history_elastic.c b/src/libs/zbxhistory/history_elastic.c
-index 763785e870a..8f8bb83ab4a 100644
+index c90fdd110f2..6b84f66d776 100644
 --- a/src/libs/zbxhistory/history_elastic.c
 +++ b/src/libs/zbxhistory/history_elastic.c
-@@ -36,7 +36,7 @@
- #define		ZBX_JSON_ALLOCATE		2048
+@@ -84,11 +84,11 @@ zbx_history_elastic_data_t;
+  ******************************************************************************/
+ static const char	*elastic_get_index_name(unsigned char value_type)
+ {
+-	static const char	*value_type_str[ITEM_VALUE_TYPE_COUNT] = {"dbl", "str", "log", "uint", "text", "bin",
+-				"json"};
++	static const char	*value_type_str[ITEM_VALUE_TYPE_COUNT] = {"{DBNAME}_dbl", "{DBNAME}_str", "{DBNAME}_log", "{DBNAME}_uint", "{DBNAME}_text", "{DBNAME}_bin",
++				"{DBNAME}_json"};
  
- /* bin is not used for elastic, but is needed for mapping consistency */
--const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text", "bin", "json"};
-+const char	*value_type_str[] = {"{DBNAME}_dbl", "{DBNAME}_str", "{DBNAME}_log", "{DBNAME}_uint", "{DBNAME}_text", "{DBNAME}_bin", "{DBNAME}_json"};
+ 	if (value_type >= ARRSIZE(value_type_str))
+-		return "unknown";
++		return "{DBNAME}_unknown";
  
- static zbx_uint32_t	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
- 
+ 	return value_type_str[value_type];
+ }
 diff --git a/ui/include/classes/api/managers/CHistoryManager.php b/ui/include/classes/api/managers/CHistoryManager.php
-index 55a6640c2cc..c398262f67d 100644
+index e89571b21e4..153cd9d624d 100644
 --- a/ui/include/classes/api/managers/CHistoryManager.php
 +++ b/ui/include/classes/api/managers/CHistoryManager.php
-@@ -1723,7 +1723,7 @@ class CHistoryManager {
+@@ -1839,7 +1839,7 @@ class CHistoryManager {
  
- 		foreach ($indices as $type => $index) {
- 			if (($url = self::getElasticsearchUrl($index)) !== null) {
--				$endpoints[$type] = $url.$index.'*/'.$action;
-+				$endpoints[$type] = $url."{DBNAME}_".$index.'*/'.$action;
+ 		foreach ($this->value_type_config as $value_type => $config) {
+ 			if ($config['provider'] === ZBX_HISTORY_SOURCE_ELASTIC && in_array($value_type, $value_types)) {
+-				$endpoints[$value_type] = $config['url'].'/'.$value_type_index[$value_type].'/'.$action;
++				$endpoints[$value_type] = $config['url'].'/'."{DBNAME}_".$value_type_index[$value_type].'/'.$action;
  			}
  		}
  

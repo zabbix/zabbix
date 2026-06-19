@@ -68,6 +68,8 @@ More on metrics and used API methods:
 
   - [Cloud Storage](https://docs.cloud.google.com/monitoring/api/metrics_gcp_p_z#gcp-storage)
 
+  - [Cloud Load Balancing](https://docs.cloud.google.com/monitoring/api/metrics_gcp_i_o#gcp-loadbalancing)
+
 
 ### Macros used
 
@@ -113,6 +115,14 @@ More on metrics and used API methods:
 |{$GCP.CLOUD.RUN.SERVICE.CONDITION.NOT_MATCHES}|<p>The filter to exclude GCP Cloud Run services by condition.</p>|`CHANGE_IF_NEEDED`|
 |{$GCP.BUCKET.NAME.MATCHES}|<p>The filter to include GCP Cloud Storage buckets by name.</p>|`.*`|
 |{$GCP.BUCKET.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Cloud Storage buckets by name.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.LB.NAME.MATCHES}|<p>The filter to include load balancers by name.</p>|`.*`|
+|{$GCP.LB.NAME.NOT_MATCHES}|<p>The filter to exclude load balancers by name.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.LB.SCHEME.MATCHES}|<p>The filter to include load balancers by scheme.</p>|`.*`|
+|{$GCP.LB.SCHEME.NOT_MATCHES}|<p>The filter to exclude load balancers by scheme.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.LB.PROTOCOL.MATCHES}|<p>The filter to include load balancers by protocol.</p>|`.*`|
+|{$GCP.LB.PROTOCOL.NOT_MATCHES}|<p>The filter to exclude load balancers by protocol.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.LB.SCOPE.MATCHES}|<p>The filter to include load balancers by scope.</p>|`.*`|
+|{$GCP.LB.SCOPE.NOT_MATCHES}|<p>The filter to exclude load balancers by scope.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
@@ -134,6 +144,9 @@ More on metrics and used API methods:
 |Cloud Run service total|<p>GCP Cloud Run services total count.</p>|Dependent item|gcp.run.service.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[*].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Cloud Storage buckets get|<p>GCP Cloud Storage: Buckets get.</p>|Dependent item|gcp.storage.buckets.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Cloud Storage buckets total|<p>GCP Cloud Storage buckets total count.</p>|Dependent item|gcp.storage.buckets.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[*].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Load balancers (forwarding rules) get|<p>GCP Application Load Balancing forwarding rules.</p>|Dependent item|gcp.lb.forwarding_rules.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Global load balancers total|<p>GCP Application Load Balancing global forwarding rules total count.</p>|Dependent item|gcp.lb.forwarding_rules.global.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.scope=="global")].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Regional load balancers total|<p>GCP Application Load Balancing regional forwarding rules total count.</p>|Dependent item|gcp.lb.forwarding_rules.regional.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.scope=="regional")].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Triggers
 
@@ -199,6 +212,12 @@ More on metrics and used API methods:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |GCP Cloud Storage: Buckets discovery|<p>GCP Cloud Storage: Buckets discovery.</p>|Dependent item|gcp.storage.buckets.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### LLD rule GCP Application Load Balancing: Load balancer discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|GCP Application Load Balancing: Load balancer discovery|<p>Discovers GCP forwarding rules representing Load Balancers</p><p>using the Compute Engine aggregated forwardingRules API.</p><p></p><p>The discovery automatically creates monitored hosts for:</p><p>  - Global external Application Load Balancers</p><p>  - Regional external Application Load Balancers</p><p>  - Internal Application Load Balancers</p><p>It also supports discovery of Network Load Balancers.</p>|Dependent item|gcp.lb.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 # GCP Compute Engine Instance by HTTP
 
@@ -942,6 +961,81 @@ This template will be automatically connected to discovered entities with all th
 |GCP Cloud Storage: High ingress traffic|<p>Incoming network traffic to the bucket exceeds the threshold.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.network.received_bytes,5m)>{$GCS.INGRESS.MAX}`|Info||
 |GCP Cloud Storage: GCP API is failing (bucket requests)|<p>No data received from GCP API for the last 30 minutes. Possible query error or API failure.</p>|`nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.requests.get,30m)=1`|High|**Manual close**: Yes|
 |GCP Cloud Storage: High API error rate|<p>GCP Cloud Storage bucket API error rate exceeds the configured threshold.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.request.error.rate,5m)>{$GCS.API.ERROR.MAX}`|Average||
+
+# GCP Application Load Balancer by HTTP
+
+## Overview
+
+This template is designed to monitor GCP Application Load Balancing using Zabbix.
+
+
+## Requirements
+
+Zabbix version: 8.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- GCP Application Load Balancing
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$GCP.PROJECT.ID}|<p>GCP project ID.</p>||
+|{$GCP.DATA.TIMEOUT}|<p>Response timeout for API.</p>|`15s`|
+|{$GCP.TIME.WINDOW}|<p>Time interval for data requests.</p><p>Supported usage types:</p><p>- Default update interval for most items.</p><p>- Minimal time window for data requested in Monitoring Query Language REST API request.</p>|`1h`|
+|{$GCP.PROXY}|<p>HTTP proxy. If this macro is empty, then no proxy is used.</p>||
+|{$GCP.APP.LB.TYPE.PREFIX}|<p>Metric prefix for load balancer type.</p><p>Possible values:</p><p>- `https` for global external load balancers</p><p>- `https/external/regional` for regional external load balancers</p><p>- `https/internal` for internal load balancers</p>||
+|{$GCP.APP.LB.P95.LATENCY.MAX}|<p>Sets the maximum latency threshold for alerts.</p>|`1000`|
+|{$GCP.APP.LB.NODATA.TIME}|<p>Time threshold for no data trigger.</p>|`30m`|
+|{$GCP.APP.LB.SUCCESS.RATE.WARN}|<p>Warning severity threshold for request success rate (%).</p>|`95`|
+|{$GCP.APP.LB.SUCCESS.RATE.AVERAGE}|<p>Average severity threshold for request success rate (%).</p>|`90`|
+|{$GCP.APP.LB.SUCCESS.RATE.HIGH}|<p>High severity threshold for request success rate (%).</p>|`75`|
+|{$GCP.APP.LB.RESPONSE.CODE.MATCHES}|<p>Filter to include HTTP response codes for discovery.</p>|`.*`|
+|{$GCP.APP.LB.RESPONSE.CODE.NOT_MATCHES}|<p>Filter to exclude HTTP response codes for discovery.</p>|`CHANGE_IF_NEEDED`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Request bytes count|<p>Request bytes count for the application load balancer.</p>|HTTP agent|gcp.app.lb.request.bytes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set error to: `There was an authentication error while requesting data from GCP API.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.data.result[0].value[1]`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Response bytes count|<p>Response bytes count for the application load balancer.</p>|HTTP agent|gcp.app.lb.response.bytes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set error to: `There was an authentication error while requesting data from GCP API.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.data.result[0].value[1]`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Average latency|<p>Average latencies for the application load balancer.</p>|HTTP agent|gcp.app.lb.average.latency<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set error to: `There was an authentication error while requesting data from GCP API.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.data.result[0].value[1]`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|P95 latency|<p>P95 latencies for the application load balancer.</p>|HTTP agent|gcp.app.lb.p95.latency<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set error to: `There was an authentication error while requesting data from GCP API.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.data.result[0].value[1]`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Request success rate|<p>Request success rate calculated based on the ratio of successful requests (HTTP response codes 2xx and 3xx) to total requests.</p>|HTTP agent|gcp.app.lb.success.rate<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set error to: `There was an authentication error while requesting data from GCP API.`</p></li><li><p>JSON Path: `$.data.result[0].value[1]`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Total average request rate|<p>Total average request rate for the application load balancer.</p>|HTTP agent|gcp.app.lb.request.rate<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set error to: `There was an authentication error while requesting data from GCP API.`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.data.result[0].value[1]`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Request rates by response code|<p>Request rates by response code for the application load balancer.</p>|HTTP agent|gcp.app.lb.requests.count<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|GCP Application Load Balancer: High P95 latency|<p>The 95th percentile latency is above {$GCP.APP.LB.P95.LATENCY.MAX}ms (avg over 5 minutes).</p>|`avg(/GCP Application Load Balancer by HTTP/gcp.app.lb.p95.latency,5m) > {$GCP.APP.LB.P95.LATENCY.MAX}`|Average|**Manual close**: Yes|
+|GCP Application Load Balancer: Request success rate is below warning threshold|<p>Request success rate has dropped below {$GCP.APP.LB.SUCCESS.RATE.WARN}%.<br><br>This may indicate elevated client or backend errors.</p>|`avg(/GCP Application Load Balancer by HTTP/gcp.app.lb.success.rate,5m)<{$GCP.APP.LB.SUCCESS.RATE.WARN} and avg(/GCP Application Load Balancer by HTTP/gcp.app.lb.request.rate,5m)>0`|Warning|**Manual close**: Yes|
+|GCP Application Load Balancer: Request success rate is critically low|<p>Request success rate has dropped below {$GCP.APP.LB.SUCCESS.RATE.AVERAGE}%.<br><br>Users are likely experiencing failed requests.</p>|`avg(/GCP Application Load Balancer by HTTP/gcp.app.lb.success.rate,5m)<{$GCP.APP.LB.SUCCESS.RATE.AVERAGE} and avg(/GCP Application Load Balancer by HTTP/gcp.app.lb.request.rate,5m)>1`|Average|**Manual close**: Yes|
+|GCP Application Load Balancer: Request success rate indicates major outage|<p>Request success rate has dropped below {$GCP.APP.LB.SUCCESS.RATE.HIGH}%.<br><br>Severe service degradation or outage is likely occurring.</p>|`avg(/GCP Application Load Balancer by HTTP/gcp.app.lb.success.rate,5m)<{$GCP.APP.LB.SUCCESS.RATE.HIGH} and avg(/GCP Application Load Balancer by HTTP/gcp.app.lb.request.rate,5m)>5`|High|**Manual close**: Yes|
+|GCP Application Load Balancer: No request rate data|<p>No request rate data received for `{$GCP.APP.LB.NODATA.TIME}`. The load balancer may not be receiving traffic or there may be an issue with data collection.</p>|`nodata(/GCP Application Load Balancer by HTTP/gcp.app.lb.requests.count,{$GCP.APP.LB.NODATA.TIME})=1`|Warning|**Manual close**: Yes|
+
+### LLD rule Response code discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Response code discovery|<p>Discovery of HTTP response codes for the application load balancer.</p>|Dependent item|gcp.app.lb.request.count.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `2h`</p></li></ul>|
+
+### Item prototypes for Response code discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Requests rate: HTTP {#RESPONSE_CODE}|<p>Request rate for HTTP `{#RESPONSE_CODE}` responses.</p>|Dependent item|gcp.app.lb.request.count[{#RESPONSE_CODE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `2h`</p></li></ul>|
 
 ## Feedback
 
