@@ -788,7 +788,7 @@ class CFormValidator {
 						rule_value.forEach((when) => {
 							// Add fields that relates on current lookup field.
 							if (lookup_rule_path === this.#getFieldAbsolutePath(when[0], current_rule_path)) {
-								related_fields.push(this.#getFieldAbsolutePath(current_field_name, lookup_field_path));
+								related_fields.push(current_rule_path);
 							}
 						});
 					}
@@ -1599,7 +1599,14 @@ class CFormValidator {
 	 * @returns {string}
 	 */
 	#getFieldAbsolutePath(field_name, field_path) {
-		const target_path = [...field_path.split('/').slice(0, -1), field_name];
+		const target_path = field_path.split('/').slice(0, -1);
+
+		while (field_name.startsWith('../')) {
+			field_name = field_name.substring(3);
+			target_path.pop();
+		}
+
+		target_path.push(field_name);
 
 		return `/${target_path.join('/')}`.replace(/\/\/+/g, '/');
 	}
