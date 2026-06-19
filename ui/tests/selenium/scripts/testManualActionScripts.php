@@ -2292,7 +2292,7 @@ class testManualActionScripts extends CWebTest {
 
 				if ($data['fields']['Type'] === 'URL') {
 					$host_name = (array_key_exists('host', $data)) ? $data['host'] : self::HOST;
-					$this->assertEquals($host_name, $this->query('id:datatable-host')->waitUntilVisible()->one()->getValue());
+					$this->assertEquals($host_name, $this->query('id:host')->waitUntilVisible()->one()->getValue());
 					COverlayDialogElement::find()->one()->close();
 				}
 				else {
