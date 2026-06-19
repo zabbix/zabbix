@@ -33,13 +33,12 @@ if (array_key_exists('serverid', $data) && $data['serverid'] !== '') {
 			(new CTrim($data['serverid'], 8))
 				->setHint($data['serverid'])
 				->addClass(ZBX_STYLE_MIDDLE)
-				->addClass('js-serverid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton())
 				->removeId()
 				->setTitle(_('Copy to clipboard'))
 				->addClass(ZBX_ICON_COPY)
-				->addClass(ZBX_STYLE_BTN_GREY_ICON)
+				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-copy-button')
 		],
 		''
