@@ -13,6 +13,7 @@
 **/
 
 #include "cep.h"
+#include "cep_event.h"
 #include "zbx_cep.h"
 #include "zbx_cep_client.h"
 
@@ -114,84 +115,6 @@ struct zbx_cep
 	zbx_atomic_uint64_t		events_processed_num;
 	zbx_atomic_uint64_t		events_discarded_num;
 };
-
-static void	cep_event_clear(zbx_cep_event_t *event)
-{
-	if (NULL != event->r_event)
-		zbx_cep_event_release(event->r_event);
-
-	for (int i = 0; i < event->tags.values_num; i++)
-	{
-		zbx_free(event->tags.values[i].tag);
-		zbx_free(event->tags.values[i].value);
-	}
-	zbx_vector_lite_tag_destroy(&event->tags);
-
-	zbx_vector_lite_uint64_destroy(&event->maintenanceids);
-
-	zbx_free(event->name);
-}
-
-void	zbx_cep_event_release(zbx_cep_event_t *event)
-{
-	if (1 != atomic_fetch_sub(&event->refcount, 1))
-		return;
-
-	cep_event_clear(event);
-	zbx_free(event);
-}
-
-zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, unsigned char object,
-		zbx_uint64_t objectid, const char *name, int clock, int ns, int value, int severity,
-		const zbx_vector_tags_ptr_t *tags, const zbx_vector_db_event_suppress_t *suppress)
-{
-	zbx_cep_event_t	*event;
-
-	event = (zbx_cep_event_t *)zbx_malloc(NULL, sizeof(zbx_cep_event_t));
-	event->eventid = eventid;
-	event->r_event = NULL;
-	event->refcount = 1;
-	event->origin.source = source;
-	event->origin.object = object;
-	event->origin.objectid = objectid;
-	event->clock = clock;
-	event->ns = ns;
-	event->value = value;
-	event->severity = severity;
-	event->suppress_mtime = 0;
-	event->name = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(name));
-
-	zbx_vector_lite_tag_create(&event->tags);
-	if (NULL != tags)
-	{
-		zbx_vector_lite_tag_reserve(&event->tags, (size_t)tags->values_num);
-		for (int i = 0; i < tags->values_num; i++)
-		{
-			zbx_tag_t	tag;
-
-			tag.tag = zbx_strdup(NULL, tags->values[i]->tag);
-			tag.value = zbx_strdup(NULL, tags->values[i]->value);
-			zbx_vector_lite_tag_append(&event->tags, tag);
-		}
-	}
-
-	zbx_vector_lite_uint64_create(&event->maintenanceids);
-	if (NULL != suppress)
-	{
-		zbx_vector_lite_uint64_reserve(&event->maintenanceids, (size_t)suppress->values_num);
-		for (int i = 0; i < suppress->values_num; i++)
-			zbx_vector_lite_uint64_append(&event->maintenanceids, suppress->values[i].maintenanceid);
-	}
-
-	return event;
-}
-
-zbx_cep_event_t	*cep_event_addref(zbx_cep_event_t *event)
-{
-	atomic_fetch_add(&event->refcount, 1);
-
-	return event;
-}
 
 static zbx_hash_t	cep_event_ptr_hash(const void *a)
 {
@@ -1147,7 +1070,7 @@ zbx_uint64_t	cep_open_trigger_event(zbx_cep_t *cep, zbx_uint64_t triggerid, unsi
 
 /******************************************************************************
  *                                                                            *
- * Purpose: ensure writable event instance for handle                         *
+ * Purpose: ensure mutable event instance for handle                          *
  *                                                                            *
  * Parameters: h - [IN/OUT] event handle                                      *
  *                                                                            *
@@ -1158,34 +1081,14 @@ zbx_uint64_t	cep_open_trigger_event(zbx_cep_t *cep, zbx_uint64_t triggerid, unsi
  *           instance.                                                        *
  *                                                                            *
  ******************************************************************************/
-static zbx_cep_event_t	*cep_event_handle_replace_event(zbx_cep_event_handle_t h)
+static zbx_cep_event_t	*cep_event_handle_mutable(zbx_cep_event_handle_t h)
 {
 	zbx_cep_event_t	*event, *e = h->event;
 
 	if (1 == atomic_load(&h->event->refcount))
 		return h->event;
 
-	event = (zbx_cep_event_t *)zbx_malloc(NULL, sizeof(zbx_cep_event_t));
-	*event = *e;
-	event->refcount = 0;
-	event->suppress_mtime = 0;
-	event->name = zbx_strdup(NULL, e->name);
-
-	zbx_vector_lite_tag_create(&event->tags);
-	zbx_vector_lite_tag_reserve(&event->tags, (size_t)e->tags.values_num);
-	for (int i = 0; i < e->tags.values_num; i++)
-	{
-		zbx_tag_t	tag_local;
-
-		tag_local.tag = zbx_strdup(NULL, e->tags.values[i].tag);
-		tag_local.value = zbx_strdup(NULL, e->tags.values[i].value);
-		zbx_vector_lite_tag_append(&event->tags, tag_local);
-	}
-
-	zbx_vector_lite_uint64_create(&event->maintenanceids);
-	zbx_vector_lite_uint64_append_array(&event->maintenanceids, e->maintenanceids.values,
-			e->maintenanceids.values_num);
-
+	event = cep_event_clone(e);
 	zbx_cep_event_release(e);
 	h->event = cep_event_addref(event);
 
@@ -1214,7 +1117,7 @@ void	cep_resolve_trigger_events(zbx_cep_t *cep, zbx_cep_event_t *r_event, zbx_ve
 		zbx_cep_event_handle_t	h = events->values[i];
 		zbx_cep_event_t		*event;
 
-		event = cep_event_handle_replace_event(h);
+		event = cep_event_handle_mutable(h);
 		event->r_event = cep_event_addref(r_event);
 		event->value = TRIGGER_VALUE_OK;
 	}
@@ -1413,9 +1316,9 @@ zbx_uint64_t	cep_close_internal_event(zbx_cep_t *cep, unsigned char object, zbx_
 	/* update event if something holds reference to it, otherwise just remove from cache */
 	if (1 != cep_event_handle_release(h))
 	{
-		zbx_cep_event_t		*event;
+		zbx_cep_event_t	*event;
 
-		event = cep_event_handle_replace_event(h);
+		event = cep_event_handle_mutable(h);
 
 		switch (object)
 		{
@@ -1463,7 +1366,7 @@ static void	cep_event_add_maintenaces(zbx_cep_event_handle_t h, zbx_vector_uint6
 	if (0 == maintenanceids->values_num)
 		return;
 
-	zbx_cep_event_t	*event = cep_event_handle_replace_event(h);
+	zbx_cep_event_t	*event = cep_event_handle_mutable(h);
 
 	if (0 == event->maintenanceids.values_num)
 		event->suppress_mtime = time(NULL);
@@ -1496,7 +1399,7 @@ static void	cep_event_remove_maintenaces(zbx_cep_event_handle_t h, zbx_vector_ui
 
 	if (ids.values_num != h->event->maintenanceids.values_num)
 	{
-		zbx_cep_event_t	*event = cep_event_handle_replace_event(h);
+		zbx_cep_event_t	*event = cep_event_handle_mutable(h);
 
 		if (0 != ids.values_num)
 		{
@@ -1595,7 +1498,7 @@ void	cep_update_event_severities(zbx_cep_t *cep, const zbx_vector_event_severity
 		if (NULL == (h = cep_get_event(cep, events->values[i].eventid)))
 			continue;
 
-		zbx_cep_event_t	*event = cep_event_handle_replace_event(h);
+		zbx_cep_event_t	*event = cep_event_handle_mutable(h);
 
 		event->severity = events->values[i].severity;
 		zbx_vector_cep_event_handle_append(handles, zbx_cep_event_handle_addref(h));
@@ -1656,7 +1559,7 @@ static int	cep_event_validate_new_tags(zbx_cep_event_handle_t h, zbx_vector_tag_
  ******************************************************************************/
 static void	cep_event_add_tags(zbx_cep_event_handle_t h, const zbx_vector_tag_t *tags)
 {
-	zbx_cep_event_t	*event = cep_event_handle_replace_event(h);
+	zbx_cep_event_t	*event = cep_event_handle_mutable(h);
 
 	for (int i = 0; i < tags->values_num; i++)
 	{

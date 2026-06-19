@@ -19,6 +19,7 @@
 #include "cep_queue.h"
 #include "cep_task.h"
 #include "cep_correlation.h"
+#include "cep_event.h"
 #include "zbx_cep.h"
 #include "zbx_cep_client.h"
 #include "zbxmw.h"
