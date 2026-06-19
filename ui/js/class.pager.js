@@ -133,7 +133,7 @@ class CPager {
 				current.addEventListener('click', () => this.dispatchEvent(CPager.EVENT_SELECT, {page: i}));
 
 				if (i == page) {
-					current.classList.add('paging-selected');
+					current.classList.add('selected');
 					current.setAttribute('aria-label', sprintf(t('Go to page %1$s, current page'), i));
 					current.setAttribute('aria-current', 'true');
 				}
