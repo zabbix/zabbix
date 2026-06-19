@@ -7026,7 +7026,11 @@ form.dashboard-widget-scatterplot {
       position: sticky;
       top: 0;
       background: #070707;
+      border-top-left-radius: var(--surface-border-radius);
+      border-top-right-radius: var(--surface-border-radius);
       z-index: 3; }
+      form.dashboard-widget-scatterplot .scatter-plot-widget-config-tabs .ui-tabs-nav > li:first-child a:hover {
+        border-top-left-radius: var(--surface-border-radius); }
   form.dashboard-widget-scatterplot .thresholds-tab-grid {
     display: grid;
     gap: 10px; }
@@ -7202,7 +7206,11 @@ form.dashboard-widget-svggraph {
     position: sticky;
     top: 0;
     background: #070707;
+    border-top-left-radius: var(--surface-border-radius);
+    border-top-right-radius: var(--surface-border-radius);
     z-index: 3; }
+    form.dashboard-widget-svggraph .graph-widget-config-tabs .ui-tabs-nav > li:first-child a:hover {
+      border-top-left-radius: var(--surface-border-radius); }
   form.dashboard-widget-svggraph .table-forms-container, form.dashboard-widget-svggraph .browser-warning-container {
     border: 1px solid #444444;
     border-top: none; }
