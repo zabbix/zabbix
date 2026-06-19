@@ -38,6 +38,7 @@ type Plugin struct {
 	executorInitMu   sync.Mutex
 }
 
+// NewPlugin creates new systemrun plugin with default values.
 func NewPlugin() *Plugin {
 	return &Plugin{
 		executorInitFunc: zbxcmd.InitExecutor,
