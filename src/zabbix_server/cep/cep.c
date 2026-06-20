@@ -466,6 +466,7 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 	zbx_uint64_t		eventid = 0;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
+	int			events_num;
 
 	zbx_vector_uint64_create(&eventids);
 
@@ -473,6 +474,7 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 	{
 		zbx_cep_origin_t	origin;
 
+		events_num = 0;
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select p.eventid,p.clock,p.severity,p.ns,p.source,p.object,p.objectid,p.name"
@@ -505,10 +507,11 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 			zbx_vector_cep_event_handle_append(&obj->events, zbx_cep_event_handle_addref(h));
 
 			zbx_vector_uint64_append(&eventids, eventid);
+			events_num++;
 		}
 		zbx_db_free_result(result);
 	}
-	while (0 != eventids.values_num && 0 == (eventids.values_num % CEP_PROBLEM_BATCH));
+	while (CEP_PROBLEM_BATCH == events_num);
 
 	if (0 != eventids.values_num)
 	{
