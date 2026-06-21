@@ -626,6 +626,12 @@ void	*zbx_cep_manager_thread(void *args)
 			cep_dump(cep, "========");
 			cep_cache_release(&cep);
 
+			zbx_cep_window_pool_t	*pool;
+
+			cep_window_pool_acquire(&pool);
+			cep_window_pool_dump(pool);
+			cep_window_pool_release(&pool);
+
 			zbx_set_log_level(loglevel);
 		}
 

@@ -423,13 +423,13 @@ static void	cep_operation_event_copy(const zbx_cep_operation_t *op, zbx_cep_even
 			zbx_mw_task_t	*t;
 			zbx_db_event	*db_event;
 
+			zbx_timespec(&ts);
 			cep_acknowledge_update(ack, op->type);
 
 			db_event = cep_db_event_create(&event->origin, event->name, ts.sec, ts.ns, event->severity,
 				event->value, &event->tags);
 
-			zbx_timespec(&ts);
-
+			db_event->trigger.triggerid = dc_trigger.triggerid;
 			db_event->trigger.type = dc_trigger.type;
 			db_event->trigger.recovery_mode = dc_trigger.recovery_mode;
 			db_event->trigger.expression = dc_trigger.expression;

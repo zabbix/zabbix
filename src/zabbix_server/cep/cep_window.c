@@ -473,7 +473,7 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	cep_window_causal_process(zbx_cep_window_t *window, zbx_vector_mw_task_ptr_t *tasks)
+void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_cep_rule_t	*rule;
 	int		duration, capacity, limit_update, events_num;
@@ -519,6 +519,7 @@ void	cep_window_causal_process(zbx_cep_window_t *window, zbx_vector_mw_task_ptr_
 		cep_event_context_clear(&ctx);
 	}
 
+	window->time_created = now;
 	window->nextcheck += window->duration;
 	window->flags = CEP_WINDOW_FLAGS_NONE;
 
@@ -544,7 +545,7 @@ void	cep_window_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task
 			cep_window_simple_process(window, now, tasks);
 			break;
 		case ZBX_CEP_WINDOW_CAUSAL:
-			cep_window_causal_process(window, tasks);
+			cep_window_causal_process(window, now, tasks);
 			break;
 		case ZBX_CEP_WINDOW_TAG_MATCH:
 		case ZBX_CEP_WINDOW_PATTERN_MATCH:
@@ -738,8 +739,9 @@ static void	cep_window_ref_dump(const char *prefix, const zbx_cep_window_ref_t *
 
 	zabbix_log(LOG_LEVEL_TRACE, "%sruleid:" ZBX_FS_UI64 " type:%d [group_by:%x host:%s hostgroup:%s tag:%s=%s]"
 			" created:" ZBX_FS_TIME_T,
-			prefix, window->ruleid, window->type, ZBX_NULL2STR(ref->host), ZBX_NULL2STR(ref->hostgroup),
-			ZBX_NULL2STR(ref->tag), ZBX_NULL2STR(ref->tag_value), window->time_created);
+			prefix, window->ruleid, window->type, ref->group_by, ZBX_NULL2STR(ref->host),
+			ZBX_NULL2STR(ref->hostgroup), ZBX_NULL2STR(ref->tag), ZBX_NULL2STR(ref->tag_value),
+			window->time_created);
 
 	if (SUCCEED != zbx_queue_ptr_empty(&window->hevents))
 	{
@@ -756,7 +758,7 @@ static void	cep_window_ref_dump(const char *prefix, const zbx_cep_window_ref_t *
 		while (NULL != (hevent = (zbx_cep_event_handle_t)zbx_queue_ptr_iter_next(&iter)))
 			zbx_vector_cep_event_handle_append(&hevents, hevent);
 
-		events = (zbx_cep_event_t **)zbx_malloc(NULL, hevents.values_num);
+		events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * hevents.values_num);
 
 		cep_cache_acquire(&cep);
 		cep_get_events_by_handles(cep, hevents.values, hevents.values_num, events);
