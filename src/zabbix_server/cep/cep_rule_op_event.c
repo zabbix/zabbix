@@ -411,23 +411,37 @@ static void	cep_operation_event_copy(const zbx_cep_operation_t *op, zbx_cep_even
 
 	if (ctx->pos == pos)
 	{
-		zbx_timespec_t	ts;
+		zbx_dc_trigger_t	dc_trigger;
+		int			err;
+		zbx_cep_event_t		*event = cep_event_context_acquire_event(ctx);
 
-		zbx_timespec(&ts);
+		zbx_dc_config_get_triggers_by_triggerids(&dc_trigger, &event->origin.objectid, &err, 1);
 
-		cep_acknowledge_update(ack, op->type);
+		if (SUCCEED == err)
+		{
+			zbx_timespec_t	ts;
+			zbx_mw_task_t	*t;
+			zbx_db_event	*db_event;
 
-		zbx_mw_task_t	*t;
-		zbx_db_event	*db_event;
-		zbx_cep_event_t	*event = cep_event_context_acquire_event(ctx);
+			cep_acknowledge_update(ack, op->type);
 
-		db_event = cep_db_event_create(&event->origin, event->name, ts.sec, ts.ns, event->severity,
+			db_event = cep_db_event_create(&event->origin, event->name, ts.sec, ts.ns, event->severity,
 				event->value, &event->tags);
-		/* force event generation by CEP */
-		db_event->trigger.type = TRIGGER_TYPE_MULTIPLE_TRUE;
 
-		t = cep_create_task_event(db_event, ZBX_EVENT_COPIED);
-		zbx_vector_mw_task_ptr_append(tasks, t);
+			zbx_timespec(&ts);
+
+			db_event->trigger.type = dc_trigger.type;
+			db_event->trigger.recovery_mode = dc_trigger.recovery_mode;
+			db_event->trigger.expression = dc_trigger.expression;
+			db_event->trigger.recovery_expression = dc_trigger.recovery_expression;
+
+			dc_trigger.expression = NULL;
+			dc_trigger.recovery_expression = NULL;
+			zbx_dc_config_clean_triggers(&dc_trigger, &err, 1);
+
+			t = cep_create_task_event(db_event, ZBX_EVENT_COPIED);
+			zbx_vector_mw_task_ptr_append(tasks, t);
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
