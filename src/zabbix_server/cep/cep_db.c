@@ -108,12 +108,12 @@ static void	cep_db_write_event(const zbx_cep_event_t *event, zbx_dbconn_t *db, z
 	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_events))
 	{
 		zbx_dbconn_prepare_insert(db, db_insert_events, "events", "eventid", "source", "object",
-				"objectid", "clock", "ns", "value", "name", "severity", (char *)NULL);
+				"objectid", "clock", "ns", "value", "name", "severity", "flags", (char *)NULL);
 	}
 
 	zbx_db_insert_add_values(db_insert_events, event->eventid, event->origin.source, event->origin.object,
 			event->origin.objectid, event->clock, event->ns, event->value,
-			ZBX_NULL2EMPTY_STR(event->name), event->severity);
+			ZBX_NULL2EMPTY_STR(event->name), event->severity, (int)event->flags);
 
 	if (0 == event->tags.values_num)
 		return;
@@ -137,12 +137,12 @@ static void	cep_db_write_problem(const zbx_cep_event_t *event, zbx_dbconn_t *db,
 	if (SUCCEED != zbx_db_insert_is_prepared(db_insert_problem))
 	{
 		zbx_dbconn_prepare_insert(db, db_insert_problem, "problem", "eventid", "source", "object",
-				"objectid", "clock", "ns", "name", "severity", "cause_eventid", (char *)NULL);
+				"objectid", "clock", "ns", "name", "severity", "cause_eventid", "flags", (char *)NULL);
 	}
 
 	zbx_db_insert_add_values(db_insert_problem, event->eventid, event->origin.source, event->origin.object,
 			event->origin.objectid, event->clock, event->ns, ZBX_NULL2EMPTY_STR(event->name),
-			event->severity, event->cause_eventid);
+			event->severity, event->cause_eventid, (int)event->flags);
 
 	if (0 == event->tags.values_num)
 		return;

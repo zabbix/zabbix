@@ -58,6 +58,7 @@ typedef struct
 	zbx_mw_task_t			base;
 	zbx_db_event			*db_event;	/* in - event data */
 	zbx_uint64_t			userid;		/* in - userid for manually closed event */
+	unsigned char			flags;		/* in - event flags */
 	zbx_cep_event_op_t		event_op;	/* out - created event state - open/close */
 	zbx_cep_action_state_t		action_state;	/* out - specifies if actions must be processed */
 	zbx_vector_uint64_t		eventids;	/* out - recovered problems for recovery event */
@@ -133,7 +134,7 @@ zbx_cep_task_prune_events_t;
 
 zbx_mw_task_t	*cep_create_task_remote(zbx_ipc_client_t *client, zbx_ipc_message_t *message, unsigned char *response,
 		zbx_uint32_t response_len);
-zbx_mw_task_t	*cep_create_task_event(zbx_db_event *event);
+zbx_mw_task_t	*cep_create_task_event(zbx_db_event *event, unsigned char flags);
 zbx_mw_task_t	*cep_create_task_commit(zbx_vector_mw_task_ptr_t *tasks);
 zbx_mw_task_t	*cep_create_task_close_event(zbx_db_event *event, zbx_uint64_t eventid, zbx_uint64_t userid,
 		zbx_uint64_t correlationid, zbx_uint64_t cep_ruleid);

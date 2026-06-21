@@ -46,7 +46,8 @@ void	zbx_cep_event_release(zbx_cep_event_t *event)
 
 zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, unsigned char object,
 		zbx_uint64_t objectid, const char *name, int clock, int ns, int value, int severity,
-		const zbx_vector_tags_ptr_t *tags, const zbx_vector_db_event_suppress_t *suppress)
+		unsigned char flags, zbx_uint64_t cause_eventid, const zbx_vector_tags_ptr_t *tags,
+		const zbx_vector_db_event_suppress_t *suppress)
 {
 	zbx_cep_event_t	*event;
 
@@ -64,6 +65,8 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 	event->suppress_mtime = 0;
 	event->name = zbx_strdup(NULL, name);
 	event->cause_eventid = 0;
+	event->flags = flags;
+	event->cause_eventid = cause_eventid;
 
 	zbx_vector_lite_tag_create(&event->tags);
 	if (NULL != tags)
@@ -102,6 +105,7 @@ zbx_cep_event_t	*cep_event_clone(const zbx_cep_event_t *event)
 	clone->suppress_mtime = event->suppress_mtime;
 	clone->name = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(event->name));
 	clone->cause_eventid = 0;
+	clone->flags = event->flags;
 
 	zbx_vector_lite_tag_create(&clone->tags);
 	zbx_vector_lite_tag_reserve(&clone->tags, (size_t)event->tags.values_num);
@@ -345,10 +349,7 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
 	if (0 == strcmp(CEP_TAG_IS_COPIED, tag))
 	{
 		if (NULL != (event = cep_event_context_acquire_event(ctx)))
-		{
-			/* check event->flags */
-			THIS_SHOULD_NEVER_HAPPEN_MSG("not implemented");
-		}
+			return (event->flags == ZBX_EVENT_COPIED ? CEP_VALUE_TRUE : CEP_VALUE_FALSE);
 	}
 	else if(0 == strcmp(CEP_TAG_IS_FIRST, tag))
 	{
@@ -368,9 +369,7 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
 	else if(0 == strcmp(CEP_TAG_IS_OPEN, tag))
 	{
 		if (NULL != (event = cep_event_context_acquire_event(ctx)))
-		{
 			return (NULL == event->r_event ? CEP_VALUE_TRUE : CEP_VALUE_FALSE);
-		}
 	}
 
 	return NULL;
@@ -383,6 +382,61 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
 	#undef CEP_TAG_IS_LAST
 	#undef CEP_TAG_IS_FIRST
 	#undef CEP_TAG_IS_COPIED
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create db event                                                   *
+ *                                                                            *
+ * Parameters: origin   - [IN] CEP event origin                               *
+ *             name     - [IN] event name                                     *
+ *             clock    - [IN] event timestamp (seconds)                      *
+ *             ns       - [IN] event timestamp (nanoseconds)                  *
+ *             severity - [IN] event severity                                 *
+ *             value    - [IN] event value                                    *
+ *             tags     - [IN] event tags (optional)                          *
+ *                                                                            *
+ * Return value: pointer to the created db event                              *
+ *                                                                            *
+ ******************************************************************************/
+zbx_db_event	*cep_db_event_create(const zbx_cep_origin_t *origin, const char *name, int clock, int ns,
+		int serverity, int value, const zbx_vector_lite_tag_t *tags)
+{
+	zbx_db_event	*db_event;
+
+	db_event = (zbx_db_event *)zbx_calloc(NULL, 1, sizeof(zbx_db_event));
+
+	db_event->source = origin->source;
+	db_event->object = origin->object;
+	db_event->objectid = origin->objectid;
+	db_event->clock = clock;
+	db_event->ns = ns;
+	db_event->severity = serverity;
+	db_event->value = value;
+	db_event->name = zbx_strdup(NULL, name);
+
+	zbx_vector_tags_ptr_create(&db_event->tags);
+	if (NULL != tags)
+	{
+		zbx_vector_tags_ptr_reserve(&db_event->tags, (size_t)tags->values_num);
+		for (int i = 0; i < tags->values_num; i++)
+		{
+			zbx_tag_t	*tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
+
+			tag->tag = zbx_strdup(NULL, tags->values[i].tag);
+			tag->value = zbx_strdup(NULL, tags->values[i].value);
+
+			zbx_vector_tags_ptr_append(&db_event->tags, tag);
+		}
+	}
+
+	if (EVENT_SOURCE_TRIGGERS == db_event->source)
+	{
+		db_event->trigger.triggerid = db_event->objectid;
+		zbx_vector_uint64_create(&db_event->trigger.dep_triggerids);
+	}
+
+	return db_event;
 }
 
 

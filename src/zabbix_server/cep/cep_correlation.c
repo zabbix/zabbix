@@ -15,6 +15,7 @@
 #include "cep_correlation.h"
 #include "cep_task.h"
 
+#include "zabbix_server/cep/cep_event.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxcalc.h"
@@ -569,18 +570,12 @@ out:
 static zbx_db_event	*cep_create_close_event(const zbx_db_event *problem)
 {
 	zbx_db_event	*ok;
+	zbx_cep_origin_t	origin = {.source = problem->source, .object = problem->object,
+					.objectid = problem->objectid};
 
-	ok = (zbx_db_event *)zbx_malloc(NULL, sizeof(zbx_db_event));
-	memset(ok, 0, sizeof(zbx_db_event));
-	ok->clock = problem->clock;
-	ok->ns = problem->ns;
-	ok->source = problem->source;
-	ok->object = problem->object;
-	ok->objectid = problem->objectid;
-	ok->name = zbx_strdup(NULL, problem->name);
-	ok->value = TRIGGER_VALUE_OK;
+	ok = cep_db_event_create(&origin, problem->name, problem->clock, problem->ns, problem->severity,
+		TRIGGER_VALUE_OK, NULL);
 
-	zbx_vector_tags_ptr_create(&ok->tags);
 	if (0 != problem->tags.values_num)
 	{
 		zbx_vector_tags_ptr_reserve(&ok->tags, (size_t)problem->tags.values_num);

@@ -17,6 +17,8 @@
 #include "cep_rule.h"
 #include "cep.h"
 #include "cep_task.h"
+#include "zabbix_server/cep/cep_event.h"
+#include "zabbix_server/cep/cep_window.h"
 #include "zbx_cep.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
@@ -402,8 +404,38 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	cep_operation_event_copy(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
+		zbx_cep_event_pos_t pos, zbx_cep_acknowledge_t *ack, zbx_vector_mw_task_ptr_t *tasks)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64 " pos:%d", __func__, op->operationid, pos);
+
+	if (ctx->pos == pos)
+	{
+		zbx_timespec_t	ts;
+
+		zbx_timespec(&ts);
+
+		cep_acknowledge_update(ack, op->type);
+
+		zbx_mw_task_t	*t;
+		zbx_db_event	*db_event;
+		zbx_cep_event_t	*event = cep_event_context_acquire_event(ctx);
+
+		db_event = cep_db_event_create(&event->origin, event->name, ts.sec, ts.ns, event->severity,
+				event->value, &event->tags);
+		/* force event generation by CEP */
+		db_event->trigger.type = TRIGGER_TYPE_MULTIPLE_TRUE;
+
+		t = cep_create_task_event(db_event, ZBX_EVENT_COPIED);
+		zbx_vector_mw_task_ptr_append(tasks, t);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 static void	cep_operation_event_execute(const zbx_cep_operation_t *op, int execute_when, zbx_uint64_t ruleid,
-		zbx_cep_event_context_t *ctx, zbx_cep_acknowledge_t *ack, zbx_cep_event_t **event)
+		zbx_cep_event_context_t *ctx, zbx_cep_acknowledge_t *ack, zbx_vector_mw_task_ptr_t *tasks,
+		zbx_cep_event_t **event)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64 " type:%d", __func__, op->operationid, op->type);
 
@@ -462,10 +494,15 @@ static void	cep_operation_event_execute(const zbx_cep_operation_t *op, int execu
 			break;
 		case ZBX_CEP_OP_CLOSE:
 		case ZBX_CEP_OP_DISCARD:
-		case ZBX_CEP_OP_COPY_FIRST:
-		case ZBX_CEP_OP_COPY_LAST:
 			cep_acknowledge_update(ack, op->type);
-			/* non event ops are handled elsewhere */
+			break;
+		case ZBX_CEP_OP_COPY_FIRST:
+			if (0 != (CEP_OP_COPY_EVENT & CEP_FLAG(execute_when)))
+				cep_operation_event_copy(op, ctx, CEP_POS_FIRST, ack, tasks);
+			break;
+		case ZBX_CEP_OP_COPY_LAST:
+			if (0 != (CEP_OP_COPY_EVENT & CEP_FLAG(execute_when)))
+				cep_operation_event_copy(op, ctx, CEP_POS_LAST, ack, tasks);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported operation type %d", op->type);
@@ -487,7 +524,7 @@ void	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zb
 		if (rule->operations.values[i].execute_when == execute_when)
 		{
 			cep_operation_event_execute(&rule->operations.values[i], execute_when,  rule->ruleid, ctx,
-					&ack, event);
+					&ack, tasks, event);
 		}
 	}
 

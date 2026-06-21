@@ -37,6 +37,9 @@ typedef struct
 }
 zbx_cep_origin_t;
 
+#define ZBX_EVENT_NORMAL	0
+#define ZBX_EVENT_COPIED	1
+
 typedef struct zbx_cep_event zbx_cep_event_t;
 
 ZBX_VECTOR_LITE_DECL(lite_tag, zbx_tag_t)
@@ -49,6 +52,7 @@ struct zbx_cep_event
 	int				ns;
 	int				value;
 	int				severity;
+	unsigned char			flags;
 	time_t				suppress_mtime;
 	char				*name;
 

@@ -133,7 +133,10 @@ static void	cep_worker_add_events(zbx_cep_worker_t *worker, zbx_cep_task_remote_
 		zbx_vector_mw_task_ptr_create(&tasks);
 
 		for (int i = 0; i < events.values_num; i++)
-			zbx_vector_mw_task_ptr_append(&tasks, cep_create_task_event(events.values[i]));
+		{
+			zbx_vector_mw_task_ptr_append(&tasks, cep_create_task_event(events.values[i],
+					ZBX_EVENT_NORMAL));
+		}
 
 		zbx_mw_queue_lock(worker->base.queue);
 		cep_queue_push_batch((zbx_cep_queue_t *)worker->base.queue, &tasks);
@@ -463,8 +466,8 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	db_event->eventid = eventid;
 
 	zbx_cep_event_t	*event = cep_event_create(db_event->eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
-			db_event->trigger.triggerid, db_event->name, db_event->clock, db_event->ns,
-			TRIGGER_VALUE_PROBLEM, db_event->severity, &db_event->tags, db_event->suppress);
+			db_event->objectid, db_event->name, db_event->clock, db_event->ns, TRIGGER_VALUE_PROBLEM,
+			db_event->severity, task->flags, 0, &db_event->tags, db_event->suppress);
 
 	const zbx_cep_rule_t		**rules = NULL;
 	int				rules_num = 0;
@@ -562,7 +565,7 @@ static void	cep_worker_resolve_trigger_events(zbx_db_event *db_event, zbx_uint64
 
 	zbx_cep_event_t	*r_event = cep_event_create(db_event->eventid, EVENT_SOURCE_TRIGGERS,
 		EVENT_OBJECT_TRIGGER, db_event->objectid, db_event->name, db_event->clock, db_event->ns,
-		TRIGGER_VALUE_OK, db_event->severity, &db_event->tags, db_event->suppress);
+		TRIGGER_VALUE_OK, db_event->severity, ZBX_EVENT_NORMAL, 0, &db_event->tags, db_event->suppress);
 
 	cep_cache_acquire(&cep);
 	cep_resolve_trigger_events(cep, r_event, handles);
@@ -671,8 +674,8 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 
 	/* don't cache tags for internal events since they are not used */
 	zbx_cep_event_t	*event = cep_event_create(db_event->eventid, EVENT_SOURCE_INTERNAL, db_event->object,
-			db_event->objectid, db_event->name, db_event->clock, db_event->ns, db_event->value, 0, NULL,
-			NULL);
+			db_event->objectid, db_event->name, db_event->clock, db_event->ns, db_event->value, 0,
+			ZBX_EVENT_NORMAL, 0, NULL, NULL);
 
 	cep_cache_acquire(&cep);
 	(void)cep_add_event(cep, event);

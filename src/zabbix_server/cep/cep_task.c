@@ -104,13 +104,14 @@ static void	cep_task_event_init(zbx_cep_task_event_t *task, zbx_db_event *event)
  * Return value: created task                                                 *
  *                                                                            *
  ******************************************************************************/
-zbx_mw_task_t	*cep_create_task_event(zbx_db_event *event)
+zbx_mw_task_t	*cep_create_task_event(zbx_db_event *event, unsigned char flags)
 {
 	zbx_cep_task_event_t	*task;
 
 	task = (zbx_cep_task_event_t *)zbx_mw_task_create(CEP_TASK_EVENT, cep_task_event_free,
 			sizeof(zbx_cep_task_event_t));
 	cep_task_event_init(task, event);
+	task->flags = flags;
 
 	return (zbx_mw_task_t *)task;
 }

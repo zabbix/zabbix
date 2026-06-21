@@ -19,7 +19,8 @@
 
 zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, unsigned char object,
 		zbx_uint64_t objectid, const char *name, int clock, int ns, int value, int severity,
-		const zbx_vector_tags_ptr_t *tags, const zbx_vector_db_event_suppress_t *suppress);
+		unsigned char flags, zbx_uint64_t cause_eventid, const zbx_vector_tags_ptr_t *tags,
+		const zbx_vector_db_event_suppress_t *suppress);
 
 zbx_cep_event_t	*cep_event_clone(const zbx_cep_event_t *event);
 void	cep_event_clear(zbx_cep_event_t *event);
@@ -31,6 +32,7 @@ int	cep_event_validate_tag(zbx_cep_event_t *event, const char *tag, const char *
 
 typedef enum
 {
+	CEP_POS_UNKNOWN,
 	CEP_POS_FIRST,
 	CEP_POS_LAST
 }
@@ -60,5 +62,8 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
 void	cep_event_context_load_hosts(zbx_cep_event_context_t *ctx);
 void	cep_event_context_load_groups(zbx_cep_event_context_t *ctx);
 void	cep_event_context_set_handle(zbx_cep_event_context_t *ctx, zbx_cep_event_handle_t hevent);
+
+zbx_db_event	*cep_db_event_create(const zbx_cep_origin_t *origin, const char *name, int clock, int ns,
+	int serverity, int value, const zbx_vector_lite_tag_t *tags);
 
 #endif

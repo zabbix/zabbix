@@ -416,7 +416,7 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select p.eventid,p.clock,p.severity,p.ns,p.source,p.object,p.objectid,p.name,"
-					"p.cause_eventid"
+					"p.cause_eventid,p.flags"
 				" from problem p"
 				" where eventid>" ZBX_FS_UI64
 					" and r_eventid is null"
@@ -428,13 +428,19 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
+			unsigned char	flags;
+			zbx_uint64_t	cause_eventid;
+
 			ZBX_STR2UINT64(eventid, row[0]);
 			ZBX_STR2UCHAR(origin.source, row[4]);
 			ZBX_STR2UCHAR(origin.object, row[5]);
 			ZBX_STR2UINT64(origin.objectid, row[6]);
+			ZBX_STR2UINT64(cause_eventid, row[8]);
+			ZBX_STR2UCHAR(flags, row[9]);
 
 			event = cep_event_create(eventid, origin.source, origin.object, origin.objectid, row[7],
-					atoi(row[1]), atoi(row[3]), TRIGGER_VALUE_PROBLEM, atoi(row[2]), NULL, NULL);
+					atoi(row[1]), atoi(row[3]), TRIGGER_VALUE_PROBLEM, atoi(row[2]), flags,
+					cause_eventid, NULL, NULL);
 
 			zbx_cep_object_t	*obj;
 			zbx_cep_event_handle_t	h;

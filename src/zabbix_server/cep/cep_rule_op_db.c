@@ -22,55 +22,6 @@
 #include "zbxmw.h"
 #include "zbxdbhigh.h"
 
-/******************************************************************************
- *                                                                            *
- * Purpose: create db event                                                   *
- *                                                                            *
- * Parameters: origin   - [IN] CEP event origin                               *
- *             name     - [IN] event name                                     *
- *             clock    - [IN] event timestamp (seconds)                      *
- *             ns       - [IN] event timestamp (nanoseconds)                  *
- *             severity - [IN] event severity                                 *
- *             value    - [IN] event value                                    *
- *             tags     - [IN] event tags (optional)                          *
- *                                                                            *
- * Return value: pointer to the created db event                              *
- *                                                                            *
- ******************************************************************************/
-static zbx_db_event	*cep_db_event_create(const zbx_cep_origin_t *origin, const char *name, int clock, int ns,
-		int serverity, int value, const zbx_vector_lite_tag_t *tags)
-{
-	zbx_db_event	*db_event;
-
-	db_event = (zbx_db_event *)zbx_calloc(NULL, 1, sizeof(zbx_db_event));
-
-	db_event->source = origin->source;
-	db_event->object = origin->object;
-	db_event->objectid = origin->objectid;
-	db_event->clock = clock;
-	db_event->ns = ns;
-	db_event->severity = serverity;
-	db_event->value = value;
-	db_event->name = zbx_strdup(NULL, name);
-
-	zbx_vector_tags_ptr_create(&db_event->tags);
-	if (NULL != tags)
-	{
-		zbx_vector_tags_ptr_reserve(&db_event->tags, (size_t)tags->values_num);
-		for (int i = 0; i < tags->values_num; i++)
-		{
-			zbx_tag_t	*tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
-
-			tag->tag = zbx_strdup(NULL, tags->values[i].tag);
-			tag->value = zbx_strdup(NULL, tags->values[i].value);
-
-			zbx_vector_tags_ptr_append(&db_event->tags, tag);
-		}
-	}
-
-	return db_event;
-}
-
 void	cep_operation_db_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_context_t *ctx,
 		zbx_vector_mw_task_ptr_t *tasks)
 {

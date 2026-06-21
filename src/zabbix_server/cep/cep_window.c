@@ -476,9 +476,9 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 void	cep_window_causal_process(zbx_cep_window_t *window, zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_cep_rule_t	*rule;
-	int		duration, capacity, limit_update;
+	int		duration, capacity, limit_update, events_num;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, window->ruleid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64 " events:%d", __func__, window->ruleid);
 
 	if (NULL == (rule = zbx_cep_config_get_rule(window->ruleid)))
 	{
@@ -502,13 +502,20 @@ void	cep_window_causal_process(zbx_cep_window_t *window, zbx_vector_mw_task_ptr_
 		window->capacity = capacity;
 	}
 
-	while (SUCCEED != zbx_queue_ptr_empty(&window->hevents))
+	events_num = zbx_queue_ptr_values_num(&window->hevents);
+
+	for (int i = 0; i < events_num; i++)
 	{
-		zbx_cep_event_context_t	ctx = {.hevent = (zbx_cep_event_handle_t)zbx_queue_ptr_pop(&window->hevents),
-						.pos = CEP_POS_FIRST};
+		zbx_cep_event_context_t	ctx = {.hevent = (zbx_cep_event_handle_t)zbx_queue_ptr_pop(&window->hevents)};
+
+		if (0 == i)
+			ctx.pos = CEP_POS_FIRST;
+		else if (events_num == i)
+			ctx.pos = CEP_POS_LAST;
+		else
+			ctx.pos = CEP_POS_UNKNOWN;
 
 		cep_rule_event_context_execute_ops(rule, &ctx, ZBX_CEP_WHEN_WINDOW_CLOSED, tasks);
-
 		cep_event_context_clear(&ctx);
 	}
 
