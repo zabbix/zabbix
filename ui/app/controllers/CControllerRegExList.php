@@ -85,11 +85,11 @@ class CControllerRegExList extends CController {
 				'name' => $filter['name'] !== '' ? $filter['name'] : null,
 				'description' => $filter['description'] !== '' ? $filter['description'] : null
 			],
-			'sortfield' => $sort_field,
-			'sortorder' => $sort_order,
 			'limit' => $limit,
 			'preservekeys' => true
 		]);
+
+		order_result($data['regexps'], $sort_field, $sort_order);
 
 		$data['page'] = $this->getInput('page', 1);
 		CPagerHelper::savePage('regex.list', $data['page']);
