@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -34,7 +34,8 @@ class CSystemInfoHelper {
 			'is_software_update_check_enabled' => CSettingsHelper::isSoftwareUpdateCheckEnabled(),
 			'status' => static::getServerStatus($ZBX_SERVER, $ZBX_SERVER_PORT),
 			'server_details' => '',
-			'failover_delay' => 0
+			'failover_delay' => 0,
+			'http_auth_warning' => array_key_exists('ALLOW_HTTP_AUTH', APP::getConfig())
 		];
 
 		if ($data['is_software_update_check_enabled']) {

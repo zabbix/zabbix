@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -73,8 +73,9 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Cancel');
 
 		// checking that image has not been changed after clicking on the "Cancel" button in the confirm dialog box
-		$this->assertEquals($oldHashIcons, CDBHelper::getHash($sqlIcons), 'Chuck Norris: No-change images update should not update data in table "images"');
-
+		$this->assertEquals($oldHashIcons, CDBHelper::getHash($sqlIcons),
+				'Chuck Norris: No-change images update should not update data in table "images"'
+		);
 	}
 
 	public function testFormAdministrationGeneralImages_UpdateImage() {

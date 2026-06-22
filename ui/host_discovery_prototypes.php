@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -804,6 +804,10 @@ if (hasRequest('form')) {
 
 	if ($data['type'] != ITEM_TYPE_JMX) {
 		$data['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+	}
+
+	if ($data['type'] != ITEM_TYPE_TRAPPER && ($data['type'] != ITEM_TYPE_HTTPAGENT || $data['allow_traps'] == 0)) {
+		$data['trapper_hosts'] = ZBX_DEFAULT_TRAPPER_HOSTS;
 	}
 
 	$data['counter'] = null;

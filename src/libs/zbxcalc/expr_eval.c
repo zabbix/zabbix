@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -966,7 +966,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 
 	if (0 == args_num)
 	{
-		ret = zbx_evaluate_function(value, &evaluate_item, func_name, "", ts, error);
+		ret = zbx_evaluate_function(value, &evaluate_item, func_name, "", ts, NULL, error);
 		goto out;
 	}
 
@@ -998,7 +998,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 		}
 	}
 
-	ret = zbx_evaluate_function(value, &evaluate_item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
+	ret = zbx_evaluate_function(value, &evaluate_item, func_name, ZBX_NULL2EMPTY_STR(params), ts, NULL, error);
 out:
 	zbx_free(params);
 
@@ -1230,6 +1230,7 @@ static void	var_vector_append_history_record(zbx_vector_history_record_t *values
 		case ITEM_VALUE_TYPE_NONE:
 			return;
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return;

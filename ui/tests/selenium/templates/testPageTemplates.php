@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,7 +16,7 @@
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
-require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 require_once __DIR__.'/../behaviors/CTagBehavior.php';
 
 /**
@@ -27,14 +27,14 @@ require_once __DIR__.'/../behaviors/CTagBehavior.php';
 class testPageTemplates extends CLegacyWebTest {
 
 	/**
-	 * Attach MessageBehavior, TagBehavior and TableBehavior to the test.
+	 * Attach MessageBehavior, TagBehavior and DatatableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
 			CMessageBehavior::class,
-			CTableBehavior::class,
+			CDatatableBehavior::class,
 			CTagBehavior::class
 		];
 	}
@@ -51,11 +51,12 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestCheckHeader('Templates');
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query('id:templates')->asDatatable()->one()->waitUntilReady();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Template groups')->select('Templates/SAN');
 		$filter->submit();
-		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
+		$table->waitUntilReloaded()->waitUntilReady();
 		$this->zbxTestTextPresent($this->templateName);
 
 		$headers = ['', 'Name', 'Hosts', 'Items', 'Triggers', 'Graphs', 'Dashboards', 'Discovery', 'Web', 'Vendor',
@@ -99,11 +100,14 @@ class testPageTemplates extends CLegacyWebTest {
 
 		// Filter necessary Template name.
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
-		$table = $this->getTable();
+		$table = $this->getDatatable();
 		$form->fill(['Name' => $name]);
+		$headers = $table->getHeaders();
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$table->waitUntilReloaded();
-		$table->findRow('Name', $name)->getColumn('Name')->query('link', $name)->one()->click();
+		$this->page->waitUntilReady();
+		$headers->waitUntilStalled();
+		$table->waitUntilReady()->invalidate();
+		$table->findRow('Name', $name)->getColumn('Name')->query('link', $name)->one()->scrollIntoView(50)->click();
 
 		$modal = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->assertEquals('Template', $modal->getTitle());
@@ -119,43 +123,47 @@ class testPageTemplates extends CLegacyWebTest {
 
 	public function testPageTemplates_FilterTemplateByName() {
 		$this->zbxTestLogin('zabbix.php?action=template.list');
+		$table = $this->getDatatable();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Template groups')->select('Templates/SAN');
 		$filter->getField('Name')->fill($this->templateName);
 		$filter->submit();
-		$this->assertTableDataColumn([$this->templateName]);
-		$this->assertTableStats(1);
+		$table->waitUntilReloaded();
+		$this->assertDatatableDataColumn([$this->templateName]);
+		$this->assertDatatableStats(1);
 	}
 
 	public function testPageTemplates_FilterByLinkedTemplate() {
 		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->query('button:Reset')->one()->click();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getDatatable();
 		$filter->getField('Linked templates')->fill([
 				'values' => 'Template ZBX6663 Second',
 				'context' => 'Templates'
 		]);
 		$filter->submit();
-		$this->zbxTestWaitForPageToLoad();
-		$this->assertTableDataColumn(['Template ZBX6663 First']);
-		$this->assertTableDataColumn(['Template ZBX6663 Second'], 'Linked templates');
-		$this->assertTableStats(1);
+		$table->waitUntilReloaded();
+		$this->assertDatatableDataColumn(['Template ZBX6663 First']);
+		$this->assertDatatableDataColumn(['Template ZBX6663 Second'], 'Linked templates');
+		$this->assertDatatableStats(1);
 	}
 
 	public function testPageTemplates_FilterNone() {
 		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$table = $this->getTable();
+		$table = $this->getDatatable();
 		$filter->fill([
 			'Template groups' => 'Templates',
 			'Name' => '123template!@#$%^&*()_"='
 		]);
 		$filter->submit();
 		$table->waitUntilReloaded();
-		$this->assertTableStats(0);
+		$this->assertDatatableStats(0);
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
 		$this->zbxTestClickButtonText('Apply');
-		$this->assertTableStats(0);
+		$table->waitUntilReloaded();
+		$this->assertDatatableStats(0);
 	}
 
 	public function testPageTemplates_FilterReset() {
@@ -401,7 +409,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->page->login()->open('zabbix.php?action=template.list&filter_name=template+for+tags&filter_evaltype=0&filter_tags%5B0%5D%5Btag%5D='.
 				'&filter_tags%5B0%5D%5Boperator%5D=0&filter_tags%5B0%5D%5Bvalue%5D=&filter_set=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$table = $this->getTable();
+		$table = $this->getDatatable();
 
 		if (array_key_exists('Name', $data)) {
 			$form->fill(['Name' => $data['Name']]);
@@ -409,23 +417,25 @@ class testPageTemplates extends CLegacyWebTest {
 
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
 		$this->setTags($data['tags']);
+		$headers = $table->getHeaders();
 		$form->submit();
-		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
+		$headers->waitUntilStalled();
+		$table->waitUntilReady()->invalidate();
 
 		// Check that correct result displayed.
 		if (array_key_exists('absent_templates', $data)) {
-			$filtering = $this->getTableColumnData('Name');
+			$filtering = $this->getDatatableColumnData('Name');
 			foreach ($data['absent_templates'] as $absence) {
 				if (($key = array_search($absence, $filtering))) {
 					unset($filtering[$key]);
 				}
 			}
 			$filtering = array_values($filtering);
-			$this->assertTableDataColumn($filtering, 'Name');
+			$this->assertDatatableDataColumn($filtering, 'Name');
 		}
 		else {
-			$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected_templates', []));
+			$this->assertDatatableDataColumn(CTestArrayHelper::get($data, 'expected_templates', []));
 		}
 
 		// Reset filter due to not influence further tests.
@@ -442,22 +452,58 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->page->login()->open('zabbix.php?action=template.list&page=4');
 
 		// Click on Hosts link in Template row.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$table->findRow('Name', $template)->query('link:Hosts')->one()->click();
+		$table = $this->getDatatable();
+		$table->findRow('Name', $template)->query('link:Hosts')->one()->scrollIntoView(50)->click();
 		// Check that Hosts page is opened.
 		$this->page->assertHeader('Hosts');
 		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$table->invalidate();
 		// Check that correct Hosts are filtered.
 		$this->assertEquals([$template], $filter->getField('Templates')->getValue());
-		$this->assertTableDataColumn($hosts);
-		$this->assertTableStats(count($hosts));
+		$this->assertDatatableDataColumn($hosts);
+		$this->assertDatatableStats(count($hosts));
 		// Reset Hosts filter after scenario.
-		$this->resetFilter();
+		$filter->query('button:Reset')->one()->click();
 	}
 
-	private function resetFilter() {
-		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+	public function testPageTemplates_Delete() {
+		$this->page->login()->open('zabbix.php?action=template.list')->waitUntilReady();
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
+		$filter->getField('Name')->fill('Template for');
+		$filter->submit();
+		$table = $this->query('id:templates')->asDatatable()->one()->waitUntilReady();
+
+		$table_rows_count = $table->getRows()->count();
+		$this->assertDatatableStats($table_rows_count);
+		$delete_button = $this->query('button:Delete')->one();
+
+		// Cancel delete.
+		$all_templates = $this->query('id:all_templates')->asCheckbox()->one();
+		$all_templates->check();
+		$delete_button->click();
+		$this->page->dismissAlert();
+		$this->assertDatatableStats($table_rows_count);
+		$this->assertSelectedCount($table_rows_count);
+		$all_templates->uncheck();
+
+		$delete_templates = [
+			['Template for tags filtering'],
+			['Template for tags filtering - clone', 'Template for tags filtering - update']
+		];
+
+		// Delete single/multiple templates.
+		foreach ($delete_templates as $selection) {
+			$template_count = count($selection);
+			$this->selectDatatableRows($selection);
+			$delete_button->click();
+			$this->page->acceptAlert();
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, ($template_count > 1) ? 'Templates deleted' : 'Template deleted');
+			CMessageElement::find()->one()->close();
+			$table_rows_count = $table_rows_count - $template_count;
+			$this->assertDatatableStats($table_rows_count);
+			$this->assertSelectedCount(0);
+		}
 	}
 }

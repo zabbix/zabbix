@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -289,7 +289,7 @@ func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 		if err == nil { //nolint:nestif
 			p, ok = m.plugins[key]
 			if ok && update.clientID != agent.LocalChecksClientID {
-				ok = keyaccess.CheckRules(key, params)
+				ok = keyaccess.CheckRules(r.Key, key, params)
 			}
 			if !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
@@ -392,8 +392,9 @@ func (m *Manager) processCommandRequest(update *commandRequest) {
 			wait = "nowait"
 		}
 		params := []string{rc.Command, wait}
+		rawMetric := fmt.Sprintf("system.run[%s,%s]", rc.Command, wait)
 
-		if !keyaccess.CheckRules("system.run", params) {
+		if !keyaccess.CheckRules(rawMetric, "system.run", params) {
 			log.Debugf("Remote command '%s' is not allowed", rc.Command)
 
 			update.sink.WriteCommand(

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -220,7 +220,7 @@ void	zbx_lld_queue_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *v
 	if (0 == socket.fd && FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_LLD, SEC_PER_MIN, &errmsg))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to LLD manager service: %s", errmsg);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	data_len = zbx_lld_serialize_item_value(&data, itemid, hostid, value, ts, meta, lastlogsize, mtime, error);
@@ -228,7 +228,7 @@ void	zbx_lld_queue_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *v
 	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_IPC_LLD_REQUEST, data, data_len))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to LLD manager service");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_free(data);

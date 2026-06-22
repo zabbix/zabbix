@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,8 +21,8 @@ class CControllerTimeSelectorUpdate extends CController {
 
 	public static $profiles = ['web.dashboard.filter', 'web.charts.filter', 'web.httpdetails.filter',
 		'web.problem.filter', 'web.auditlog.filter', 'web.actionlog.filter', 'web.item.graph.filter',
-		'web.toptriggers.filter', 'web.availabilityreport.filter', CControllerHost::FILTER_IDX,
-		CControllerProblem::FILTER_IDX
+		'web.toptriggers.filter', 'web.availabilityreport.filter', 'web.monitoring.hosts',
+		'web.monitoring.problem'
 	];
 
 	public function init() {

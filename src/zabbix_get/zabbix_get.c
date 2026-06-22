@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -229,7 +229,7 @@ static void	get_signal_handler(int sig)
 	if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 		zbx_tls_free_on_signal();
 #endif
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 #endif /* not WINDOWS */
@@ -273,7 +273,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	}
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, config_get_timeout + 1,
-			zbx_config_tls->connect_mode, tls_arg1, tls_arg2)))
+			zbx_config_tls->connect_mode, tls_arg1, tls_arg2, ZBX_DNS_FAILOVER_ENABLED)))
 	{
 		struct zbx_json	j;
 		const char	*ptr;
@@ -374,7 +374,7 @@ int	main(int argc, char **argv)
 
 	zbx_progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
+	zbx_init_library_common(zabbix_log_impl, zbx_get_log_level_impl, get_zbx_progname, zbx_backtrace);
 #ifndef _WINDOWS
 	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif
@@ -382,7 +382,7 @@ int	main(int argc, char **argv)
 	if (SUCCEED != zbx_coredump_disable())
 	{
 		zbx_error("cannot disable core dump, exiting...");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 	zbx_config_tls = zbx_config_tls_new();
@@ -417,19 +417,19 @@ int	main(int argc, char **argv)
 				{
 					zbx_error("Invalid timeout, valid range %d:%d seconds", CONFIG_GET_TIMEOUT_MIN,
 							CONFIG_GET_TIMEOUT_MAX);
-					exit(EXIT_FAILURE);
+					zbx_exit(EXIT_FAILURE);
 				}
 				break;
 			case 'h':
 				zbx_print_help(zbx_progname, help_message, usage_message, NULL);
-				exit(EXIT_SUCCESS);
+				zbx_exit(EXIT_SUCCESS);
 			case 'V':
 				zbx_print_version(title_message);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				printf("\n");
 				zbx_tls_version();
 #endif
-				exit(EXIT_SUCCESS);
+				zbx_exit(EXIT_SUCCESS);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			case '1':
 				zbx_config_tls->connect = zbx_strdup(zbx_config_tls->connect,
@@ -474,7 +474,7 @@ int	main(int argc, char **argv)
 #elif defined(HAVE_GNUTLS)
 				zbx_error("parameter \"--tls-cipher13\" can be used with OpenSSL 1.1.1 or newer."
 						" zabbix_get was compiled with GnuTLS");
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 #endif
 				break;
 			case 'B':
@@ -495,7 +495,7 @@ int	main(int argc, char **argv)
 			case 'B':
 				zbx_error("TLS parameters cannot be used: 'zabbix_get' was compiled without TLS"
 						" support");
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 				break;
 #endif
 			case 'P':
@@ -514,12 +514,12 @@ int	main(int argc, char **argv)
 				else
 				{
 					zbx_error("Invalid protocol \"%s\"", zbx_optarg);
-					exit(EXIT_FAILURE);
+					zbx_exit(EXIT_FAILURE);
 				}
 				break;
 			default:
 				zbx_print_usage(zbx_progname, usage_message);
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -528,7 +528,7 @@ int	main(int argc, char **argv)
 	{
 		zbx_error(error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 

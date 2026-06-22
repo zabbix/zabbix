@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -257,7 +257,10 @@ func setHostname() error {
 		return fmt.Errorf("cannot initialize logger: %s", err)
 	}
 
-	if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+	if err := keyaccess.LoadRules(
+		agent.Options.AllowKey, agent.Options.DenyKey,
+		agent.Options.AllowKeyRegexp, agent.Options.DenyKeyRegexp,
+	); err != nil {
 		return fmt.Errorf("failed to load key access rules: %s", err)
 	}
 

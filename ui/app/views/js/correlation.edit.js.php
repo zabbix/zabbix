@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,17 +21,31 @@
 
 window.correlation_edit_popup = new class {
 
-	init({correlation}) {
+	init({rules, clone_rules, conditions}) {
 		this.overlay = overlays_stack.getById('correlation.edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.correlation = correlation;
-		this.correlationid = correlation.correlationid;
+		this.footer = this.overlay.$dialogue.$footer[0];
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
+		this.clone_rules = clone_rules;
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'correlation.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
+		this.row_templates = {}
+		for (const template of document.getElementById('condition-templates').querySelectorAll('template')) {
+			const type = parseInt(template.content.querySelector('[data-conditiontype]').dataset.conditiontype, 10);
+			this.row_templates[type] = new Template(template.innerHTML);
+		}
+
+		conditions.forEach((condition, index) => this.#addConditionRow(condition, index));
+		this.#processTypeOfCalculation();
+
+		this.#initActions();
+	}
+
+	#initActions() {
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-condition-add')) {
 				const overlay = PopUp('correlation.condition.edit', {}, {
@@ -51,29 +65,30 @@ window.correlation_edit_popup = new class {
 			}
 		});
 
-		for (let i = 0; i < Object.values(correlation.conditions).length; i++) {
-			this.#addConditionRow(correlation.conditions[i]);
-		}
+		this.form.findFieldByName('conditions').setButtonOnBlur('js-condition-add', 'correlation-condition-form');
 
-		this.form.querySelector('#evaltype').onchange = () => this.#processTypeOfCalculation();
-		this.#processTypeOfCalculation();
+		document.getElementById('evaltype').onchange = () => this.#processTypeOfCalculation();
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+		this.footer.querySelector('.js-clone')?.addEventListener('click', () => this.#clone());
+		this.footer.querySelector('.js-delete')?.addEventListener('click', () => this.#delete());
 	}
 
 	/**
 	 * Checks the conditions list and shows either expression or custom input formula field.
 	 */
 	#processTypeOfCalculation() {
-		const condition_count = this.form.querySelectorAll('#condition_table tr[id^=conditions_]').length;
-		const evaltype = this.form.querySelector('#evaltype');
+		const condition_count = this.form_element.querySelectorAll('#condition_table>tbody>tr').length;
+		const evaltype = this.form_element.querySelector('#evaltype');
 
 		if (condition_count <= 1) {
 			evaltype.value = <?= CONDITION_EVAL_TYPE_AND_OR ?>;
 		}
 
 		const show_formula = condition_count > 1 && evaltype.value == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
-		const evaltype_label = this.form.querySelector('#label-evaltype');
-		const expression = this.form.querySelector('#expression');
-		const formula = this.form.querySelector('#formula');
+		const evaltype_label = this.form_element.querySelector('#label-evaltype');
+		const expression = this.form_element.querySelector('#expression');
+		const formula = this.form_element.querySelector('#formula');
 
 		if (condition_count > 1) {
 			evaltype.closest('.form-field').style.display = '';
@@ -87,16 +102,16 @@ window.correlation_edit_popup = new class {
 		if (show_formula) {
 			expression.style.display = 'none';
 			formula.style.display = '';
-			formula.removeAttribute('disabled');
+			formula.disabled = false;
 		}
 		else {
 			expression.style.display = '';
 			formula.style.display = 'none';
-			formula.setAttribute('disabled', true);
+			formula.disabled = true;
 		}
 
 		const conditions = [];
-		const labels = this.form.querySelectorAll('#condition_table .label');
+		const labels = this.form_element.querySelectorAll('#condition_table [data-conditiontype]');
 
 		[...labels].forEach((label) => {
 			conditions.push({
@@ -108,253 +123,153 @@ window.correlation_edit_popup = new class {
 		expression.innerHTML = getConditionFormula(conditions, + evaltype.value);
 	}
 
-	/**
-	 * Adds a correlation condition row when condition popup is closed.
-	 *
-	 * @param {object} condition  Condition object.
-	 */
+	#getConditionNextIndex() {
+		let next_index = 0;
+
+		while (this.form_element.querySelector(`#condition_table [data-row_index="${next_index}"]`) !== null) {
+			next_index++;
+		}
+
+		return next_index;
+	}
+
 	#addConditionRow(condition) {
-		const row_ids = [];
-
-		this.form.querySelectorAll('#condition_table tr[id^=conditions_]').forEach((row) => row_ids.push(row.id));
-
-		condition.row_index ??= 0;
-
-		/*
-		 * When controller passes data ir gives only one group ID for each condition. Condition popup can give multiple
-		 * IDs and then they are split into rows.
-		 */
-		if (condition.groupid) {
-			condition.groupids = condition.groupid;
-		}
-
-		if (condition.groupids) {
-			Object.keys(condition.groupids).forEach((key) => {
-				let element = {...condition, name: condition.groupids[key], value: key};
-
-				element.groupid = key;
-
-				let has_row = this.#checkConditionRow(element);
-				const result = [has_row.some((element) => element === true)];
-
-				if (result[0] === true) {
-					return;
-				}
-				else {
-					while (row_ids.some((id) => id === `conditions_${condition.row_index}`)) {
-						element.row_index++;
-						condition.row_index++;
-					}
-
-					element.condition_name = this.#getConditionData(condition);
-					element.data = element.name;
-					element.conditiontype = condition.conditiontype;
-					element.label = num2letter(element.row_index);
-					element.groupid = key;
-					condition.row_index++;
-
-					const template = new Template(this.form.querySelector('#condition-hostgr-row-tmpl').innerHTML);
-
-					this.form
-						.querySelector('#condition_table tbody')
-						.insertAdjacentHTML('beforeend', template.evaluate(element));
-				}
-			});
-		}
-		else {
-			let has_row = this.#checkConditionRow(condition);
-			let template;
-			const result = [has_row.some((element) => element === true)];
-
-			if (result[0] === true) {
-				return;
+		// Multiple entries added per host group type condition.
+		if (is_object(condition.groupid)) {
+			for (const groupid of Object.keys(condition.groupid)) {
+				this.#addConditionRow({...condition, groupid, group_name: condition.groupid[groupid]});
 			}
-			else {
-				while (row_ids.some((id) => id === `conditions_${condition.row_index}`)) {
-					condition.row_index++;
-				}
 
-				condition.label = num2letter(condition.row_index);
-
-				switch (parseInt(condition.conditiontype)) {
-					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>:
-					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>:
-						template = new Template(this.form.querySelector('#condition-tag-row-tmpl').innerHTML);
-						break;
-
-					case <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?>:
-						condition.condition_name2 = this.#getConditionData(condition)[1];
-						condition.condition_operator = this.#getConditionData(condition)[2];
-						condition.data_old_tag = this.#getConditionData(condition)[3];
-						condition.data_new_tag = this.#getConditionData(condition)[4];
-						template = new Template(this.form.querySelector('#condition-tag-pair-row-tmpl').innerHTML);
-						break;
-
-					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
-					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE ?>:
-						condition.condition_name = this.#getConditionData(condition)[0];
-						condition.condition_operator = this.#getConditionData(condition)[1];
-						condition.tag = this.#getConditionData(condition)[2];
-						condition.value = this.#getConditionData(condition)[3];
-						template = new Template(this.form.querySelector('#condition-old-new-tag-row-tmpl').innerHTML);
-						break;
-				}
-
-				condition.condition_name = this.#getConditionData(condition)[0];
-				condition.data = this.#getConditionData(condition)[1];
-				condition.conditiontype = condition.conditiontype;
-
-				this.form
-					.querySelector('#condition_table tbody')
-					.insertAdjacentHTML('beforeend', template.evaluate(condition));
-
-				condition.row_index++;
-			}
+			return;
 		}
+
+		if (this.#hasConditionDuplicate(condition)) {
+			return;
+		}
+
+		const template = this.row_templates[condition.type];
+
+		condition.row_index = this.#getConditionNextIndex();
+		condition.formulaid = num2letter(condition.row_index);
+
+		this.form_element
+			.querySelector('#condition_table tbody')
+			.insertAdjacentHTML('beforeend', template.evaluate(condition));
 	}
 
-	/**
-	 * Returns condition name, value and operator depending on condition type.
-	 *
-	 * @param {object} condition  Condition object.
-	 *
-	 * @return {array}
-	 */
-	#getConditionData(condition) {
-		let condition_name;
-		let condition_name2;
-		let condition_data;
-		let operator;
-		let value;
-		let value2;
+	#hasConditionDuplicate(condition) {
+		for (const element of this.form_element.querySelectorAll('#condition_table>tbody>tr')) {
+			const sibling_type = parseInt(element.querySelector('input[name*="type"]').value, 10);
+			const condition_type = parseInt(condition.type, 10);
 
-		switch (parseInt(condition.conditiontype)) {
-			case <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?>:
-				condition_name = <?= json_encode(_('Value of old event tag')) ?>;
-				condition_name2 = <?= json_encode(_('value of new event tag')) ?>;
-				operator = condition.operator_name;
-				value = condition.oldtag;
-				value2 = condition.newtag;
+			if (sibling_type != condition_type) {
+				continue;
+			}
 
-				return [condition_name, condition_name2, operator, value, value2];
-
-			case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>:
-				condition_name = <?= json_encode(_('Old event tag name')) ?> + ' ' + condition.operator_name;
-				condition_data = condition.tag;
-
-				return [condition_name, condition_data];
-
-			case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>:
-				condition_name = <?= json_encode(_('New event tag name')) ?> + ' ' + condition.operator_name;
-				condition_data = condition.tag;
-
-				return [condition_name, condition_data];
-
-			case <?= ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP ?>:
-				condition_name = <?= json_encode(_('New event host group')) ?> + ' ' + condition.operator_name;
-
-				return [condition_name];
-
-			case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE ?>:
-				condition_name = <?= json_encode(_('Value of old event tag')) ?>;
-				value = condition.tag;
-				operator = condition.operator_name;
-				value2 = condition.value;
-
-				return [condition_name, operator, value, value2];
-
-			case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
-				condition_name = <?= json_encode(_('Value of new event tag')) ?>;
-				value = condition.tag;
-				operator = condition.operator_name;
-				value2 = condition.value;
-
-				return [condition_name, operator, value, value2];
-		}
-	}
-
-	/**
-	 * Checks if given condition already exists.
-	 *
-	 * @param {object} condition  Condition object.
-	 *
-	 * @return {array}
-	 */
-	#checkConditionRow(condition) {
-		const result = [];
-
-		[...this.form.querySelectorAll('#condition_table tr[id^=conditions_]')].forEach((element) => {
-			const type = element.querySelector('input[name*="type"]').value;
-
-			switch (parseInt(type)) {
+			switch (sibling_type) {
 				case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>:
 				case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>:
-					result.push(condition.conditiontype === type
-						&& condition.tag === element.querySelector('input[name*="tag"]').value
-					);
+					if (condition.tag === element.querySelector('input[name*="tag"]').value) {
+						return true;
+					}
 					break;
 
 				case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
 				case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE ?>:
-					result.push(condition.conditiontype === type
-						&& condition.tag === element.querySelector('input[name*="tag"]').value
-						&& condition.value === element.querySelector('input[name*="value"]').value
-					);
+					if (condition.tag === element.querySelector('input[name*="tag"]').value
+							&& condition.value === element.querySelector('input[name*="value"]').value) {
+						return true;
+					}
 					break;
 
 				case <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?>:
-					result.push(condition.conditiontype === type
-						&& condition.oldtag === element.querySelector('input[name*="oldtag"]').value
-						&& condition.newtag === element.querySelector('input[name*="newtag"]').value
-					);
+					if (condition.oldtag === element.querySelector('input[name*="oldtag"]').value
+							&& condition.newtag === element.querySelector('input[name*="newtag"]').value) {
+						return true;
+					}
 					break;
 
 				case <?= ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP ?>:
-					result.push(condition.conditiontype === type
-						&& condition.groupid === element.querySelector('input[name*="groupid"]').value
-					);
+					if (condition.groupid === element.querySelector('input[name*="groupid"]').value) {
+						return true;
+					}
 					break;
 			}
-		});
+		}
 
-		return result;
+		return false;
 	}
 
-	clone({title, buttons}) {
-		this.correlationid = null;
+	#clone() {
+		document.getElementById('correlationid').remove();
 
-		this.overlay.setProperties({title, buttons});
+		const title = <?= json_encode(_('New event correlation')) ?>;
+		const buttons = [
+			{
+				title: <?= json_encode(_('Add')) ?>,
+				class: 'js-submit',
+				keepOpen: true,
+				isSubmit: true
+			},
+			{
+				title: <?= json_encode(_('Cancel')) ?>,
+				class: ZBX_STYLE_BTN_ALT,
+				cancel: true,
+				action: ''
+			}
+		];
+
 		this.overlay.unsetLoading();
+		this.overlay.setProperties({title, buttons});
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+
 		this.overlay.recoverFocus();
 		this.overlay.containFocus();
+		this.form.reload(this.clone_rules);
 	}
 
-	delete() {
-		const curl = new Curl('zabbix.php');
+	#delete() {
+		if (window.confirm(<?= json_encode(_('Delete event correlation?')) ?>)) {
+			this.#removePopupMessages();
+			const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', 'correlation.delete');
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('correlation')) ?>);
+			curl.setArgument('action', 'correlation.delete');
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('correlation')) ?>);
 
-		this.#post(curl.getUrl(), {correlationids: [this.correlationid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+			const correlationid = this.form.findFieldByName('correlationid').getValue();
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+			this.#post(curl.getUrl(), {correlationids: [correlationid]}, (response) => {
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			});
+		}
+		else {
+			this.overlay.unsetLoading();
+		}
 	}
 
-	submit() {
-		const fields = getFormFields(this.form);
+	#submit() {
+		this.#removePopupMessages();
 
-		['name', 'description'].forEach((field) => fields[field] = fields[field].trim());
-
+		const fields = this.form.getAllValues();
 		const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', this.correlationid === null ? 'correlation.create' : 'correlation.update');
+		curl.setArgument('action', fields.correlationid ? 'correlation.update' : 'correlation.create');
 
-		this.#post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.overlay.unsetLoading();
+					return;
+				}
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				this.#post(curl.getUrl(), fields, (response) => {
+					overlayDialogueDestroy(this.overlay.dialogueid);
+
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				});
 		});
 	}
 
@@ -377,31 +292,40 @@ window.correlation_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				return response;
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+
+					return;
+				}
+
+				success_callback(response);
 			})
-			.then(success_callback)
-			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
-				let title,
-					messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title)[0];
-
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => this.overlay.unsetLoading());
 	}
-}
+
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
+	}
+};

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -45,7 +45,7 @@ function getLocales(): array {
 		'it_IT' => ['name' => _('Italian (it_IT)'),	'display' => true],
 		'ko_KR' => ['name' => _('Korean (ko_KR)'),	'display' => true],
 		'ja_JP' => ['name' => _('Japanese (ja_JP)'),	'display' => true],
-		'lv_LV' => ['name' => _('Latvian (lv_LV)'),	'display' => false],
+		'lv_LV' => ['name' => _('Latvian (lv_LV)'),	'display' => true],
 		'lt_LT' => ['name' => _('Lithuanian (lt_LT)'),	'display' => false],
 		'nb_NO' => ['name' => _('Norwegian (nb_NO)'),	'display' => true],
 		'fa_IR' => ['name' => _('Persian (fa_IR)'),	'display' => false],
@@ -67,11 +67,11 @@ function getLocales(): array {
 /**
  * Get support URL for specified language.
  *
- * @param string|null $language  ISO639-1 code or null for English support URL.
+ * @param string $language  ISO639-1 code.
  *
- * @return string
+ * @return string  Fallback to English support URL.
  */
-function getSupportUrl(?string $language = null): string {
+function getSupportUrl(string $language): string {
 	$urls = [
 		'cs' => 'https://www.zabbix.com/cz/support',
 		'fr' => 'https://www.zabbix.com/fr/support',
@@ -87,11 +87,11 @@ function getSupportUrl(?string $language = null): string {
 /**
  * Get integrations URL for specified language.
  *
- * @param string|null $language  ISO639-1 code or null for English integrations URL.
+ * @param string $language  ISO639-1 code.
  *
- * @return string
+ * @return string  Fallback to English integrations URL.
  */
-function getIntegrationsUrl(?string $language = null): string {
+function getIntegrationsUrl(string $language): string {
 	$urls = [
 		'cs' => 'https://www.zabbix.com/cz/integrations',
 		'fr' => 'https://www.zabbix.com/fr/integrations',

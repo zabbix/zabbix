@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,24 +19,28 @@ class CForm {
 		'array': CFieldArray,
 		'checkbox': CFieldCheckBox,
 		'hidden': CFieldHidden,
+		'menu-path': CFieldMenuPath,
 		'multiline': CFieldMultiline,
 		'multiselect': CFieldMultiselect,
 		'radio-list': CFieldRadioList,
 		'set': CFieldSet,
 		'text-box': CFieldTextBox,
 		'textarea': CFieldTextarea,
-		'z-select': CFieldZSelect
+		'z-select': CFieldZSelect,
+		'z-color-picker': CFieldZColorPicker,
+		'z-textarea-flexible': CFieldZTextareaFlexible,
+		'file': CFieldFile
 	};
 	#form = null;
 	#rules = null;
 	#validators = [];
-	#fields = {};
+	#fields = Object.create(null);
 	#tabs;
 	#listeners = {};
 	#validate_changes_call = null;
 	#validate_changes_timeout = null;
 	#mousedown_registered = false;
-	#general_errors = {};
+	#general_errors = Object.create(null);
 	#message_box = null;
 	#custom_validation = [];
 	#form_ready = false;
@@ -111,7 +115,7 @@ class CForm {
 	}
 
 	discoverAllFields() {
-		const fields = {};
+		const fields = Object.create(null);
 
 		for (const discovered_field of CForm.findAllFields(this.#form)) {
 			let field_instance = null;
@@ -119,6 +123,7 @@ class CForm {
 			// If instance is already created.
 			for (const existing_field of Object.values(this.#fields)) {
 				if (existing_field.isSameField(discovered_field)) {
+					existing_field.updateState();
 					field_instance = existing_field;
 					break;
 				}
@@ -164,46 +169,31 @@ class CForm {
 	}
 
 	getAllValues() {
-		const fields = {};
+		let result = Object.create(null);
+		let simple_fields = Object.create(null);
 
 		for (const [key, field] of Object.entries(this.#fields)) {
 			field.cancelDelayedValidation();
 
-			const key_parts = [...key.matchAll(/[^\[\]]+|\[\]/g)];
+			if (field.isDisabled()) {
+				continue;
+			}
 
-			let key_fields = fields;
-
-			for (let i = 0; i < key_parts.length; i++) {
-				const key_part = key_parts[i][0];
-
-				if (i === key_parts.length - 1) {
-					if (typeof field.getExtraFields === 'function') {
-						for (const [extra_key, values] of Object.entries(field.getExtraFields())) {
-							if (values !== null) {
-								key_fields[extra_key] = values;
-							}
-						}
-					}
-					else {
-						let trimmed_value = field.getValueTrimmed();
-
-						if (trimmed_value !== null) {
-							key_fields[key_part] = trimmed_value;
-						}
-					}
-
-					break;
+			if (typeof field.getExtraFields === 'function') {
+				for (const [field_name, field_value] of Object.entries(field.getExtraFields())) {
+					simple_fields[field_name] = field_value;
 				}
-
-				if (!(key_part in key_fields)) {
-					key_fields[key_part] = {};
-				}
-
-				key_fields = key_fields[key_part];
+			}
+			else {
+				simple_fields[key] = field.getValueTrimmed();
 			}
 		}
 
-		return fields;
+		for (const [key, value] of Object.entries(simple_fields)) {
+			result = objectSetDeepValue(result, [...key.matchAll(/[^\[\]]+/g)], value);
+		}
+
+		return result;
 	}
 
 	validateChanges(fields, force_display_errors = false) {
@@ -403,7 +393,7 @@ class CForm {
 	 * @returns {Object}
 	 */
 	convertRawErrors(raw_errors) {
-		const field_errors = {};
+		const field_errors = Object.create(null);
 
 		Object.values(this.#fields).forEach((field) => {
 			const field_name = field.getName();
@@ -412,7 +402,7 @@ class CForm {
 
 			if (field instanceof CFieldMultiselect) {
 				const affixed_path = '/' + field_name + '_new';
-				const affixed_subfield = new RegExp('^/' + field_name + '_new/');
+				const affixed_subfield = new RegExp(`^/(${field_name}|${field_name}_new)/`);
 
 				for (const error_path in raw_errors) {
 					const affixed = error_path === affixed_path || affixed_subfield.test(error_path);
@@ -424,7 +414,7 @@ class CForm {
 					if (raw_errors[error_path].length) {
 						raw_errors[field_path] = [...raw_errors[field_path], ...raw_errors[error_path]]
 							.filter(({message}) => message.length);
-						raw_errors[error_path] = [];
+						delete raw_errors[error_path];
 					}
 				}
 			}
@@ -433,7 +423,7 @@ class CForm {
 				return field_path === path || subfield_path.test(path);
 			}).forEach(([path, errors]) => {
 				if (!(field_name in field_errors)) {
-					field_errors[field_name] = {};
+					field_errors[field_name] = Object.create(null);
 				}
 
 				delete raw_errors[path];
@@ -461,9 +451,13 @@ class CForm {
 				}
 				else {
 					if (Array.isArray(field_errors[field_name])) {
-						field_errors[field_name] = field_errors[field_name].length
-							? {'': field_errors[field_name]}
-							: {};
+						const set_errors = Object.create(null);
+
+						if (field_errors[field_name].length) {
+							set_errors[''] = field_errors[field_name];
+						}
+
+						field_errors[field_name] = set_errors;
 					}
 
 					field_errors[field_name][subfield_name] = errors;

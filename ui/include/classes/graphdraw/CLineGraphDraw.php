@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,8 +15,7 @@
 
 
 class CLineGraphDraw extends CGraphDraw {
-	const GRAPH_WIDTH_MIN = 20;
-	const GRAPH_HEIGHT_MIN = 20;
+
 	const LEGEND_OFFSET_Y = 90;
 
 	private $cell_height_min;
@@ -220,6 +219,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->itemsHost = null;
 
 		$items = [];
+		$this->items = CMacrosResolverHelper::resolveTimeUnitMacros($this->items, ['history', 'trends']);
 
 		for ($i = 0; $i < $this->num; $i++) {
 			$item = $this->items[$i];
@@ -233,56 +233,37 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->itemsHost = false;
 			}
 
-			$to_resolve = [];
+			[
+				'keep_history' => $item['history'],
+				'history_has_errors' => $history_has_errors,
+				'keep_trends' => $item['trends'],
+				'trends_has_errors' => $trends_has_errors
+			] = CItemHelper::getStoragePeriods((int) $item['value_type'], $item['history'], $item['trends']);
 
-			// Override item history setting with housekeeping settings, if they are enabled in config.
-			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
-				if ($item['history'] != 0) {
-					$item['history'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
-				}
-			}
-			else {
-				$to_resolve[] = 'history';
-			}
-
-			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
-				if ($item['trends'] != 0) {
-					$item['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
-				}
-			}
-			else {
-				$to_resolve[] = 'trends';
+			if ($history_has_errors) {
+				show_error_message(_s('Incorrect value for field "%1$s": %2$s.', 'history',
+					_('invalid history storage period')
+				));
+				exit;
 			}
 
-			// Otherwise, resolve user macro and parse the string. If successful, convert to seconds.
-			if ($to_resolve) {
-				$item = CMacrosResolverHelper::resolveTimeUnitMacros([$item], $to_resolve)[0];
-
-				$simple_interval_parser = new CSimpleIntervalParser();
-
-				if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
-					if ($simple_interval_parser->parse($item['history']) != CParser::PARSE_SUCCESS) {
-						show_error_message(_s('Incorrect value for field "%1$s": %2$s.', 'history',
-							_('invalid history storage period')
-						));
-						exit;
-					}
-					$item['history'] = timeUnitToSeconds($item['history']);
-				}
-
-				if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
-					if ($simple_interval_parser->parse($item['trends']) != CParser::PARSE_SUCCESS) {
-						show_error_message(_s('Incorrect value for field "%1$s": %2$s.', 'trends',
-							_('invalid trend storage period')
-						));
-						exit;
-					}
-					$item['trends'] = timeUnitToSeconds($item['trends']);
-				}
+			if ($trends_has_errors) {
+				show_error_message(_s('Incorrect value for field "%1$s": %2$s.', 'trends',
+					_('invalid trend storage period')
+				));
+				exit;
 			}
 
-			$item['source'] = ($item['trends'] == 0 || (($time_now - $item['history']) < $this->from_time
-					&& ($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))
+			if ($item['history'] === null) {
+				$item['history'] = 25 * SEC_PER_YEAR;
+			}
+
+			if ($item['trends'] === null) {
+				$item['trends'] = 25 * SEC_PER_YEAR;
+			}
+
+			$item['source'] = $item['trends'] == 0 || ($time_now - $item['history'] < $this->from_time
+					&& $this->period / $this->sizeX <= ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)
 				? 'history'
 				: 'trends';
 
@@ -451,6 +432,10 @@ class CLineGraphDraw extends CGraphDraw {
 
 			if ($item['throttling_type'] == ZBX_PREPROC_THROTTLE_TIMED_VALUE
 					&& ($throttling_delay = timeUnitToSeconds($item['throttling_delay'])) === null) {
+				continue;
+			}
+
+			if (!array_key_exists($item['itemid'], $results)) {
 				continue;
 			}
 
@@ -836,12 +821,8 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->shiftXleft + 3, $this->shiftY - 5,
 				$this->shiftXleft, $this->shiftY - 10
 			];
-			if (PHP_VERSION_ID >= 80100) {
-				imagefilledpolygon($this->im, $points, $this->getColor('White'));
-			}
-			else {
-				imagefilledpolygon($this->im, $points, 3, $this->getColor('White'));
-			}
+
+			imagefilledpolygon($this->im, $points, $this->getColor('White'));
 
 			/* draw left axis triangle */
 			zbx_imageline($this->im, $this->shiftXleft - 3, $this->shiftY - 5, $this->shiftXleft + 3, $this->shiftY - 5,
@@ -877,12 +858,8 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->sizeX + $this->shiftXleft + 3, $this->shiftY - 5,
 				$this->sizeX + $this->shiftXleft, $this->shiftY - 10
 			];
-			if (PHP_VERSION_ID >= 80100) {
-				imagefilledpolygon($this->im, $points, $this->getColor('White'));
-			}
-			else {
-				imagefilledpolygon($this->im, $points, 3, $this->getColor('White'));
-			}
+
+			imagefilledpolygon($this->im, $points, $this->getColor('White'));
 
 			/* draw right axis triangle */
 			zbx_imageline($this->im, $this->sizeX + $this->shiftXleft - 3, $this->shiftY - 5,
@@ -917,12 +894,8 @@ class CLineGraphDraw extends CGraphDraw {
 			$this->sizeX + $this->shiftXleft + 5, $this->sizeY + $this->shiftY + 4,
 			$this->sizeX + $this->shiftXleft + 10, $this->sizeY + $this->shiftY + 1
 		];
-		if (PHP_VERSION_ID >= 80100) {
-			imagefilledpolygon($this->im, $points, $this->getColor('White'));
-		}
-		else {
-			imagefilledpolygon($this->im, $points, 3, $this->getColor('White'));
-		}
+
+		imagefilledpolygon($this->im, $points, $this->getColor('White'));
 
 		/* draw X axis triangle */
 		zbx_imageline($this->im, $this->sizeX + $this->shiftXleft + 5, $this->sizeY + $this->shiftY - 2,
@@ -1626,7 +1599,9 @@ class CLineGraphDraw extends CGraphDraw {
 						: '-';
 					$side_str = ($side == GRAPH_YAXIS_SIDE_LEFT) ? _('left') : _('right');
 					$legend->addCell($rowNum, [
-						'text' => $percentile['percent'].'th percentile: '.$convertedUnit.' ('.$side_str.')',
+						'text' => _s('Percentile %1$s: %2$s', $percentile['percent'],
+							$convertedUnit.' ('.$side_str.')'
+						),
 						ITEM_CONVERT_NO_UNITS
 					]);
 					$color = ($side == GRAPH_YAXIS_SIDE_LEFT)
@@ -1638,24 +1613,16 @@ class CLineGraphDraw extends CGraphDraw {
 						$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
 						$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y - 10
 					];
-					if (PHP_VERSION_ID >= 80100) {
-						imagefilledpolygon($this->im, $points, $this->getColor($color));
-					}
-					else {
-						imagefilledpolygon($this->im, $points, 3, $this->getColor($color));
-					}
+
+					imagefilledpolygon($this->im, $points, $this->getColor($color));
 
 					$points = [
 						$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
 						$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
 						$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y - 10
 					];
-					if (PHP_VERSION_ID >= 80100) {
-						imagepolygon($this->im, $points, $this->getColor('Black No Alpha'));
-					}
-					else {
-						imagepolygon($this->im, $points, 3, $this->getColor('Black No Alpha'));
-					}
+
+					imagepolygon($this->im, $points, $this->getColor('Black No Alpha'));
 
 					$rowNum++;
 				}
@@ -1858,12 +1825,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$style = $drawtype == DRAWTYPE_BOLD_LINE ? LINE_TYPE_BOLD : LINE_TYPE_NORMAL;
 
 				if ($calc_fnc == CALC_FNC_ALL) {
-					if (PHP_VERSION_ID >= 80100) {
-						imagefilledpolygon($this->im, $a, $minmax_color);
-					}
-					else {
-						imagefilledpolygon($this->im, $a, 4, $minmax_color);
-					}
+					imagefilledpolygon($this->im, $a, $minmax_color);
 
 					if (!$y1x || !$y2x) {
 						zbx_imagealine($this->im, $x1, $y1max, $x2, $y2max, $max_color, $style);
@@ -1907,12 +1869,7 @@ class CLineGraphDraw extends CGraphDraw {
 					$a[6] = $x2;
 					$a[7] = $y2;
 
-					if (PHP_VERSION_ID >= 80100) {
-						imagefilledpolygon($this->im, $a, $avg_color);
-					}
-					else {
-						imagefilledpolygon($this->im, $a, 4, $avg_color);
-					}
+					imagefilledpolygon($this->im, $a, $avg_color);
 				}
 				else {
 					imageLine($this->im, $x1, $y1, $x2, $y2, $avg_color); // draw the initial line
@@ -2026,6 +1983,10 @@ class CLineGraphDraw extends CGraphDraw {
 			$y_offsets -= ($this->show_triggers && count($this->triggers) > 0)
 				? static::DEFAULT_TOP_BOTTOM_PADDING / 2
 				: static::DEFAULT_TOP_BOTTOM_PADDING;
+		}
+
+		if ($this->with_bottom_padding) {
+			$y_offsets += static::DEFAULT_TOP_BOTTOM_PADDING / 2;
 		}
 
 		// Actual outer dimensions, regardless $this->outer setting.

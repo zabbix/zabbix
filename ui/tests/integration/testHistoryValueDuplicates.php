@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -35,7 +35,8 @@ class testHistoryValueDuplicates extends CIntegrationTest {
 			'name' => $item,
 			'key_' => $item,
 			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => $type
+			'value_type' => $type,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
@@ -219,9 +220,15 @@ class testHistoryValueDuplicates extends CIntegrationTest {
 			$this->sendDataValues('sender', $sender_values1, self::COMPONENT_SERVER);
 			$this->sendDataValues('sender', $sender_values2, self::COMPONENT_SERVER);
 
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, '[Z3008]', true, 5, 5);
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'skipped', true, 5, 5);
+			global $HISTORY_PROVIDERS;
+			$has_history_provider = isset($HISTORY_PROVIDERS);
+			if (!$has_history_provider)
+			{
+				$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, '[Z3008]', true, 5, 5);
+				$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'skipped', true, 5, 5);
+			}
 
+			$expected_count = $has_history_provider ? 16 : 8;
 			$response = $this->callUntilDataIsPresent('history.get', [
 				'history' => $d['value_type'],
 				'itemids' => [
@@ -229,8 +236,10 @@ class testHistoryValueDuplicates extends CIntegrationTest {
 					$d['items'][1]['itemid']
 				],
 				'sortfield' => 'itemid'
-			], 5, 5);
-			$this->assertEquals(8, count($response['result']));
+			], 5, 5, function ($response) use ($expected_count) {
+				return count($response['result']) === $expected_count;
+			});
+			$this->assertEquals($expected_count, count($response['result']));
 		}
 
 		return true;

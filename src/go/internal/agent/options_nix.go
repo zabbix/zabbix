@@ -1,7 +1,7 @@
 //go:build !windows
 
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -67,8 +67,10 @@ type AgentOptions struct {
 	ForceActiveChecksOnStart int      `conf:"optional,nonempty,range=0:1,default=0"`
 	HeartbeatFrequency       int      `conf:"optional,nonempty,range=0:3600,default=60"`
 
-	AllowKey interface{} `conf:"optional"`
-	DenyKey  interface{} `conf:"optional"`
+	AllowKey       any `conf:"optional"`
+	DenyKey        any `conf:"optional"`
+	AllowKeyRegexp any `conf:"optional"`
+	DenyKeyRegexp  any `conf:"optional"`
 
 	Plugins map[string]any `conf:"optional"`
 }

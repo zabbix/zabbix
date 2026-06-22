@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -250,7 +250,7 @@ clean:
 	{
 		zbx_error("unable to create mutex for cpu collector: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	pcpus->cpu[0].cpu_num = ZBX_CPUNUM_ALL;
@@ -269,7 +269,7 @@ clean:
 	if (NULL == (kc = kstat_open()))
 	{
 		zbx_error("kstat_open() failed");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	kc_id = kc->kc_chain_id;
@@ -280,7 +280,7 @@ clean:
 	if (SUCCEED != refresh_kstat(pcpus))
 	{
 		zbx_error("kstat_chain_update() failed");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif	/* HAVE_KSTAT_H */
 
@@ -910,7 +910,7 @@ static void	update_cpustats_physical(ZBX_CPUS_UTIL_DATA_AIX *cpus_phys_util)
 		if (max_cpu_count < new_cpu_count)
 		{
 			zbx_error("number of CPUs has increased. Restart agent to adjust configuration.");
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		if (old_cpu_count != new_cpu_count)
@@ -1014,19 +1014,19 @@ copy_to_old:
 		if (-1 == perfstat_cpu_total(NULL, &old_cpu_total, sizeof(perfstat_cpu_total_t), 1))
 		{
 			zbx_error("the first call of perfstat_cpu_total() failed: %s", zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		if (-1 == (old_cpu_count = perfstat_cpu(NULL, NULL, sizeof(perfstat_cpu_t), 0)))
 		{
 			zbx_error("the first call of perfstat_cpu() failed: %s", zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		if (max_cpu_count < old_cpu_count)
 		{
 			zbx_error("number of CPUs has increased. Restart agent to adjust configuration.");
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		old_cpu_stats = (perfstat_cpu_t *)zbx_calloc(old_cpu_stats, max_cpu_count, sizeof(perfstat_cpu_t));
@@ -1040,7 +1040,7 @@ copy_to_old:
 				max_cpu_count)))
 		{
 			zbx_error("perfstat_cpu() for getting all CPU statistics failed: %s", zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		initialized = 1;

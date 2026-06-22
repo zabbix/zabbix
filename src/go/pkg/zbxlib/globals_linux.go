@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,7 +20,6 @@ package zbxlib
 #cgo pcre2 LDFLAGS: -lz -lpcre2-8 -lresolv
 
 #include "zbxsysinfo.h"
-#include "zbxcomms.h"
 #include "zbxlog.h"
 #include "../src/zabbix_agent/metrics/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"

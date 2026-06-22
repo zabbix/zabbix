@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,6 +23,7 @@
 const INTERFACE_TYPE_OPT = <?= INTERFACE_TYPE_OPT ?>;
 const ITEM_DELAY_FLEXIBLE = <?= ITEM_DELAY_FLEXIBLE ?>;
 const ITEM_STORAGE_OFF = <?= ITEM_STORAGE_OFF ?>;
+const ITEM_TYPE_CALCULATED = <?= ITEM_TYPE_CALCULATED ?>;
 const ITEM_TYPE_DEPENDENT = <?= ITEM_TYPE_DEPENDENT ?>;
 const ITEM_TYPE_IPMI = <?= ITEM_TYPE_IPMI ?>;
 const ITEM_TYPE_SIMPLE = <?= ITEM_TYPE_SIMPLE ?>;
@@ -30,7 +31,6 @@ const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
 const ITEM_TYPE_SNMP = <?= ITEM_TYPE_SNMP ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
-const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY ?>;
 const HTTPCHECK_REQUEST_HEAD = <?= HTTPCHECK_REQUEST_HEAD ?>;
 const ZBX_PROPERTY_OWN = <?= ZBX_PROPERTY_OWN ?>;
 const ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED = <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED ?>;
@@ -41,53 +41,42 @@ const ZBX_STYLE_TEXTAREA_FLEXIBLE = <?= json_encode(ZBX_STYLE_TEXTAREA_FLEXIBLE)
 
 window.item_edit_form = new class {
 
+	#host_interface_selector;
+
 	init({
-		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly, testable_item_types,
-		type_with_key_select, value_type_keys, source, return_url
+		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly,
+		testable_item_types, type_with_key_select, value_type_keys, source, return_url, history_override,
+		history_override_hint_html, storage_value_types
 	}) {
 		this.actions = actions;
 		this.form_data = form_data;
 		this.form_readonly = readonly;
 		this.host = host;
-		this.interface_types = interface_types;
 		this.inherited_timeouts = inherited_timeouts;
-		this.optional_interfaces = [];
 		this.source = source;
 		this.testable_item_types = testable_item_types;
-		this.type_interfaceids = {};
 		this.type_with_key_select = type_with_key_select;
 		this.value_type_keys = value_type_keys;
 		this.last_inferred_type = null;
-
-		for (const type in interface_types) {
-			if (interface_types[type] == INTERFACE_TYPE_OPT) {
-				this.optional_interfaces.push(parseInt(type, 10));
-			}
-		}
-
-		for (const host_interface of Object.values(host.interfaces)) {
-			if (host_interface.type in this.type_interfaceids) {
-				this.type_interfaceids[host_interface.type].push(host_interface.interfaceid);
-			}
-			else {
-				this.type_interfaceids[host_interface.type] = [host_interface.interfaceid];
-			}
-		}
+		this.history_override = source === 'item' ? history_override : [];
+		this.history_override_hint_html = history_override_hint_html;
+		this.storage_value_types = source === 'item' ? storage_value_types : [];
 
 		this.overlay = overlays_stack.end();
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 
-		const interface_field = this.form.findFieldByName('interfaceid');
-
-		if (interface_field) {
-			interface_field.setChanged();
-			this.form.validateChanges(['interfaceid']);
-		}
+		this.#host_interface_selector = new HostInterfaceSelector({
+			container: document.getElementById('items-tab'),
+			interface_types,
+			host_interfaces: host.interfaces,
+			type: this.form_data.type
+		});
 
 		this.footer = this.overlay.$dialogue.$footer[0];
-		this.tags_table = document.getElementById('tagsFormList').querySelector('[data-field-name="tags"]');
+		this.tags_table = this.form_element.querySelector('.tags-table');
+		this.tags_abort_controller = null;
 
 		ZABBIX.PopupManager.setReturnUrl(return_url);
 
@@ -103,12 +92,14 @@ window.item_edit_form = new class {
 
 		this.updateFieldsVisibility();
 
-		this.initial_tags_state = {
-			tags: Object.values(this.form.findFieldByName('tags')?.getValue() || [{tag: '', value: ''}]),
-			show_inherited_tags: this.form.findFieldByName('show_inherited_tags')?.getValue() || '0'
-		};
+		this.form.discoverAllFields();
+		this.initial_form_fields = this.#getFormFields();
 		this.form_element.style.display = '';
 		this.overlay.recoverFocus();
+
+		this.form.findFieldByName('interfaceid')?.setChanged();
+		this.form.findFieldByName('type').setChanged();
+		this.form.validateChanges(['interfaceid', 'type']);
 	}
 
 	initForm(field_switches) {
@@ -122,7 +113,6 @@ window.item_edit_form = new class {
 			custom_timeout: this.form_element.querySelectorAll('[name="custom_timeout"]'),
 			history: this.form_element.querySelector('[name="history"]'),
 			history_mode: this.form_element.querySelectorAll('[name="history_mode"]'),
-			interfaceid: this.form_element.querySelector('[name="interfaceid"]'),
 			key: this.form_element.querySelector('[name="key"]'),
 			key_button: this.form_element.querySelector('[name="key"] ~ .js-select-key'),
 			inherited_timeout: this.form_element.querySelector('[name="inherited_timeout"]'),
@@ -140,12 +130,12 @@ window.item_edit_form = new class {
 			retrieve_mode: this.form_element.querySelectorAll('[name="retrieve_mode"]')
 		};
 		this.label = {
-			interfaceid: this.form_element.querySelector('[for="interfaceid"]'),
 			value_type_hint: this.form_element.querySelector('[for="label-value-type"] .js-hint'),
 			username: this.form_element.querySelector('[for=username]'),
 			ipmi_sensor: this.form_element.querySelector('[for="ipmi_sensor"]'),
-			history_hint: this.form_element.querySelector('[for="history"] .js-hint'),
-			trends_hint: this.form_element.querySelector('[for="trends"] .js-hint')
+			history_hint: this.form_element.querySelector('[for="history"] .js-history-hint'),
+			trends_hint: this.form_element.querySelector('[for="trends"] .js-trends-hint'),
+			trends_storage_hint: this.form_element.querySelector('[for="trends"] .js-trends-storage-hint'),
 		};
 		jQuery('#parameters-table').dynamicRows({
 			template: '#parameter-row-tmpl',
@@ -240,7 +230,7 @@ window.item_edit_form = new class {
 
 	initEvents() {
 		// Item tab events.
-		this.field.key.addEventListener('help_items.paste', this.#keyChangeHandler.bind(this));
+		this.field.key.addEventListener('help_items.paste', this.#keyChangeHandlerPopUp.bind(this));
 		this.field.key.addEventListener('keyup', this.#keyChangeHandler.bind(this));
 		this.field.key_button?.addEventListener('click', this.#keySelectClickHandler.bind(this));
 		this.field.snmp_oid.addEventListener('keyup', this.updateFieldsVisibility.bind(this));
@@ -276,8 +266,8 @@ window.item_edit_form = new class {
 
 						dynamic_rows.addRows(url.pairs);
 						dynamic_rows.removeRows(row => [].filter.call(
-								row.querySelectorAll('[type="text"]'),
-								input => input.value === ''
+								row.querySelectorAll('z-textarea-flexible'),
+								textarea => textarea.value === ''
 							).length == 2
 						);
 					}
@@ -285,7 +275,6 @@ window.item_edit_form = new class {
 					this.field.url.value = url.url;
 
 					if (has_pairs) {
-						this.form.discoverAllFields();
 						setTimeout(() => {
 							const fields = this.form.findFieldByName('query_fields').getFields();
 							Object.values(fields).entries().forEach(([index, field]) => field.setChanged());
@@ -360,10 +349,7 @@ window.item_edit_form = new class {
 	}
 
 	#isConfirmed() {
-		const tags = Object.values(this.form.findFieldByName('tags')?.getValue() || [{tag: '', value: ''}]);
-		const show_inherited_tags = this.form.findFieldByName('show_inherited_tags')?.getValue() || '';
-
-		return JSON.stringify(this.initial_tags_state) === JSON.stringify({tags, show_inherited_tags})
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(this.#getFormFields())
 			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
@@ -431,16 +417,17 @@ window.item_edit_form = new class {
 		for (const field of Object.values(this.form.findFieldByName('preprocessing').getFields())) {
 			field.setChanged();
 		}
-		this.form.validateFieldsForAction(['key', 'preprocessing', 'params_f'], rules).then((result) => {
-			this.overlay.unsetLoading();
-			this.#updateActionButtons();
+		this.form.validateFieldsForAction(['key', 'preprocessing', 'params_f'], rules)
+			.then((result) => {
+				this.overlay.unsetLoading();
+				this.#updateActionButtons();
 
-			if (!result) {
-				return;
-			}
+				if (!result) {
+					return;
+				}
 
-			this.#testDialog();
-		});
+				this.#testDialog();
+			});
 	}
 
 	delete() {
@@ -481,7 +468,6 @@ window.item_edit_form = new class {
 		const key = this.field.key.value;
 		const username_required = type == ITEM_TYPE_SSH || type == ITEM_TYPE_TELNET;
 		const ipmi_sensor_required = type == ITEM_TYPE_IPMI && key !== 'ipmi.get';
-		const interface_optional = this.optional_interfaces.indexOf(type) != -1;
 		const preprocessing_active = this.form_element.querySelector('[name^="preprocessing"][name$="[type]"]') !== null;
 
 		this.#updateActionButtons();
@@ -496,11 +482,9 @@ window.item_edit_form = new class {
 		this.field.key_button?.toggleAttribute('disabled', this.type_with_key_select.indexOf(type) == -1);
 		this.field.username[username_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.username.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, username_required);
-		this.field.interfaceid?.toggleAttribute('aria-required', !interface_optional);
-		this.label.interfaceid?.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !interface_optional);
 		this.field.ipmi_sensor[ipmi_sensor_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.ipmi_sensor.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, ipmi_sensor_required);
-		organizeInterfaces(this.type_interfaceids, this.interface_types, parseInt(this.field.type.value, 10));
+		this.#host_interface_selector.setType(type);
 		this.form_element.querySelectorAll('.js-item-preprocessing-type').forEach(
 			node => node.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !preprocessing_active)
 		);
@@ -525,27 +509,13 @@ window.item_edit_form = new class {
 
 	#getFormFields() {
 		const values = this.form.getAllValues();
+		values.interfaceid = values.interfaceid ? values.interfaceid : null;
 
 		if (values.delay === undefined) {
 			values.delay = '';
 		}
 
-		if (values.preprocessing) {
-			for (let index in values.preprocessing) {
-				const step = values.preprocessing[index];
-
-				if (step.error_handler_params === null) {
-					step.error_handler_params = '';
-				}
-
-				if (step.on_fail === null) {
-					delete step.error_handler;
-					delete step.error_handler_params;
-				}
-			}
-		}
-
-		const delay_flex = [];
+		const delay_flex = {};
 		for (let key in values.delay_flex) {
 			let { schedule, period, type, delay } = values.delay_flex[key];
 			type = parseInt(type);
@@ -558,40 +528,10 @@ window.item_edit_form = new class {
 				continue;
 			}
 
-			delay_flex.push(values.delay_flex[key]);
+			delay_flex[key] = values.delay_flex[key]
 		}
 
-		const query_fields = [];
-		for (let key in values.query_fields) {
-			let {name, value} = values.query_fields[key];
-
-			if (name === '' && value === '') {
-				continue;
-			}
-			query_fields.push({name, value});
-		}
-
-		const parameters = [];
-		for (let key in values.parameters) {
-			let {name, value} = values.parameters[key];
-
-			if (name === '' && value === '') {
-				continue;
-			}
-			parameters.push({name, value});
-		}
-
-		const headers = [];
-		for (let key in values.headers) {
-			let {name, value} = values.headers[key];
-
-			if (name === '' && value === '') {
-				continue;
-			}
-			headers.push({name, value});
-		}
-
-		return {...values, ...{query_fields, headers, delay_flex, parameters}};
+		return {...values, ...{delay_flex}};
 	}
 
 	#post(url, data, keep_open = false) {
@@ -691,30 +631,52 @@ window.item_edit_form = new class {
 		const fields = this.#getFormFields();
 		const data = {
 			tags: fields.tags,
-			show_inherited_tags: fields.show_inherited_tags,
+			show_inherited_tags,
 			itemid: fields.itemid,
 			hostid: fields.hostid
-		}
+		};
 
 		const url = new Curl('zabbix.php');
 		url.setArgument('action', 'item.tags.list');
+
+		if (this.tags_abort_controller !== null) {
+			this.tags_abort_controller.abort();
+		}
+
+		const abort_controller = new AbortController();
+		this.tags_abort_controller = abort_controller;
+
 		this.overlay.setLoading();
 
 		fetch(url.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
+			body: JSON.stringify(data),
+			signal: abort_controller.signal
 		})
 			.then((response) => response.json())
 			.then((response) => {
 				this.tags_table.innerHTML = response.body;
+
+				const $tags_table = jQuery(this.tags_table);
+
+				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
 			})
 			.catch((message) => {
+				if (abort_controller.signal.aborted) {
+					return;
+				}
+
 				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});
 				this.form.renderErrors();
 				throw message;
 			})
 			.finally(() => {
+				if (this.tags_abort_controller !== abort_controller) {
+					return;
+				}
+
+				this.tags_abort_controller = null;
 				this.overlay.unsetLoading();
 				this.#updateActionButtons();
 			});
@@ -780,24 +742,33 @@ window.item_edit_form = new class {
 
 	#updateHistoryModeVisibility() {
 		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop(),
-			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.history.readOnly);
+			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.history.readOnly),
+			override = this.history_override[parseInt(this.field.value_type.value, 10)];
 
 		this.field.history.toggleAttribute('disabled', disabled);
 		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-		this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+
+		if (this.label.history_hint !== null) {
+			this.label.history_hint.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || override === undefined);
+			this.label.history_hint.querySelector('[data-hintbox="1"]').dataset.hintboxHtml =
+				this.history_override_hint_html + (override === '' ? '' : ` (${override})`);
+		}
 	}
 
 	#updateTrendsModeVisibility() {
 		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop(),
-			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.trends.readOnly);
+			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.trends.readOnly),
+			storage_value_type = this.storage_value_types.indexOf(parseInt(this.field.value_type.value, 10)) !== -1;
 
 		this.field.trends.toggleAttribute('disabled', disabled);
 		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-		this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+		this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || storage_value_type);
+		this.label.trends_storage_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || !storage_value_type);
 	}
 
 	#updateValueTypeOptionVisibility() {
 		const disable_binary = this.field.type.value != ITEM_TYPE_DEPENDENT;
+		const disable_json = this.field.type.value == ITEM_TYPE_CALCULATED;
 
 		if (disable_binary && this.field.value_type.value == ITEM_VALUE_TYPE_BINARY) {
 			const value = this.field.value_type.getOptions().find(o => o.value != ITEM_VALUE_TYPE_BINARY).value;
@@ -808,6 +779,16 @@ window.item_edit_form = new class {
 
 		this.field.value_type.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
 		this.field.value_type_steps.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
+
+		if (disable_json && this.field.value_type.value == ITEM_VALUE_TYPE_JSON) {
+			const value = this.field.value_type.getOptions().find(o => o.value != ITEM_VALUE_TYPE_JSON).value;
+
+			this.field.value_type.value = value;
+			this.field.value_type_steps.value = value;
+		}
+
+		this.field.value_type.getOptionByValue(ITEM_VALUE_TYPE_JSON).hidden = disable_json;
+		this.field.value_type_steps.getOptionByValue(ITEM_VALUE_TYPE_JSON).hidden = disable_json;
 	}
 
 	#getInferredValueType(key) {
@@ -862,6 +843,11 @@ window.item_edit_form = new class {
 		this.updateFieldsVisibility();
 	}
 
+	#keyChangeHandlerPopUp() {
+		this.#keyChangeHandler();
+		this.form.validateChanges(['key']);
+	}
+
 	#keyChangeHandler() {
 		const inferred_type = this.#getInferredValueType(this.field.key.value);
 
@@ -872,10 +858,10 @@ window.item_edit_form = new class {
 		this.last_inferred_type = inferred_type;
 
 		this.updateFieldsVisibility();
-		this.form.validateChanges(['key']);
 	}
 
 	#keySelectClickHandler() {
+		// This will emit a custom "help_items.paste" event on the key choice.
 		PopUp('popup.generic', {
 			srctbl: 'help_items',
 			srcfld1: 'key',

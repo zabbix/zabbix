@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -62,14 +62,15 @@ $table->addRow((new CRow((new CCol(
 
 $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 	->setArgument('action', 'regex.list')
-))->setId('cancel');
+))->addClass('js-cancel');
 
 $tabs = (new CTabView())
 	->addTab('expr', _('Expressions'), (new CFormGrid())
 		->addItem((new CLabel(_('Name'), 'name'))->setAsteriskMark())
 		->addItem((new CFormField())
-			->addItem((new CTextBox('name', $data['regexp']['name'], false, DB::getFieldLength('regexps', 'name')))
+			->addItem((new CTextAreaFlexible('name', $data['regexp']['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('regexps', 'name'))
 				->setAttribute('autofocus', 'autofocus')
 				->setAriaRequired()
 			)
@@ -113,18 +114,12 @@ $tabs = (new CTabView())
 		)
 	)
 	->setFooter($data['regexp']['regexpid'] != 0
-		? makeFormFooter(new CSubmit('update', _('Update')), [
-			(new CSimpleButton(_('Clone')))->setId('clone'),
-			(new CSimpleButton(_('Delete')))
-				->setAttribute('data-redirect-url', (new CUrl('zabbix.php'))
-					->setArgument('action', 'regex.delete')
-					->setArgument('regexpids', (array) $data['regexp']['regexpid'])
-					->setArgument(CSRF_TOKEN_NAME, $csrf_token)
-				)
-				->setId('delete'),
+		? makeFormFooter((new CSubmit('', _('Update')))->addClass('js-submit'), [
+			(new CSimpleButton(_('Clone')))->addClass('js-clone'),
+			(new CSimpleButton(_('Delete')))->addClass('js-delete'),
 			$cancel_button
 		])
-		: makeFormFooter(new CSubmit('add', _('Add')), [$cancel_button])
+		: makeFormFooter((new CSubmit('', _('Add')))->addClass('js-submit'), [$cancel_button])
 	)
 	->setSelected(0);
 

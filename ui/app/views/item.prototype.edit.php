@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -31,7 +31,8 @@ $value_types = [
 	ITEM_VALUE_TYPE_STR => _('Character'),
 	ITEM_VALUE_TYPE_LOG => _('Log'),
 	ITEM_VALUE_TYPE_TEXT => _('Text'),
-	ITEM_VALUE_TYPE_BINARY => _('Binary')
+	ITEM_VALUE_TYPE_BINARY => _('Binary'),
+	ITEM_VALUE_TYPE_JSON => _('JSON')
 ];
 $type_with_key_select = [
 	ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,
@@ -144,11 +145,11 @@ $tabs = (new CTabView(['id' => $tabsid]))
 	)
 	->addTab('tags-tab', _('Tags'),
 		new CPartial('configuration.tags.tab', [
-			'readonly' => $item['discovered'],
-			'show_inherited_tags' => $item['show_inherited_tags'],
-			'source' => 'item',
-			'tabs_id' => $tabsid,
+			'source' => 'item_prototype',
 			'tags' => $item['tags'],
+			'show_inherited_tags' => $item['show_inherited_tags'],
+			'readonly' => $item['discovered'],
+			'tabs_id' => $tabsid,
 			'tags_tab_id' => 'tags-tab',
 			'has_inline_validation' => true
 		]),
@@ -199,7 +200,9 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_PROTOTYPE_EDIT),
 	'body' => $form->toString().implode('', $scripts),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('item.edit.js.php'),
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('item.edit.js.php').
+		$this->readJsFile('host.interface.selector.js.php', null, '/../partials/js'),
 	'dialogue_class' => 'modal-popup-large'
 ];
 

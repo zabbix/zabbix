@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,11 +21,11 @@ class CControllerImageEdit extends CController {
 	 */
 	private $image = [];
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'imageid'   => 'db images.imageid',
 			'imagetype' => 'db images.imagetype|in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND,
@@ -45,14 +45,14 @@ class CControllerImageEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
 
 		if (!$this->hasInput('imageid')) {
 			$this->image = [
-				'imageid'   => 0,
+				'imageid'   => null,
 				'imagetype' => $this->getInput('imagetype'),
 				'name'      => $this->getInput('name', '')
 			];
@@ -70,8 +70,14 @@ class CControllerImageEdit extends CController {
 		return true;
 	}
 
-	protected function doAction() {
-		$response = new CControllerResponseData($this->getInputAll() + $this->image);
+	protected function doAction(): void {
+		$data = $this->getInputAll() + $this->image;
+		$data['js_validation_rules'] = $this->image['imageid'] == null
+			? CControllerImageCreate::getValidationRules()
+			: CControllerImageUpdate::getValidationRules();
+		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();
+
+		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of images'));
 		$this->setResponse($response);
 	}

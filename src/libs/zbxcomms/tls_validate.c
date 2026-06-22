@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -123,7 +123,7 @@ static const char	*zbx_tls_parameter_name(int type, char * const *param, const z
 	THIS_SHOULD_NEVER_HAPPEN;
 
 	zbx_tls_free();
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -179,7 +179,7 @@ static void	zbx_tls_parameter_not_empty(char * const *param, const zbx_config_tl
 		}
 
 		zbx_tls_free();
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -314,7 +314,7 @@ static void	zbx_tls_validation_error(int type, char **param1, char **param2, con
 		THIS_SHOULD_NEVER_HAPPEN;
 
 	zbx_tls_free();
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -366,7 +366,7 @@ static void	zbx_tls_validation_error2(int type, char **param1, char **param2, ch
 		THIS_SHOULD_NEVER_HAPPEN;
 
 	zbx_tls_free();
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 #undef ZBX_TLS_PARAMETER_CONFIG_FILE
 #undef ZBX_TLS_PARAMETER_COMMAND_LINE
@@ -789,7 +789,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 		zabbix_log(LOG_LEVEL_CRIT, "value of parameter \"TLSListen\" requires support of encrypted"
 			" connection but it conflicts with unencrypted config of parameter \"TLSAccept\"");
 		zbx_tls_free();
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (NULL != config_tls->tls_listen && 0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER) &&
@@ -798,7 +798,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 		zabbix_log(LOG_LEVEL_CRIT, "value of parameter \"TLSListen\" requires support of encrypted"
 			" connection but it conflicts with unencrypted config of parameter \"TLSFrontendAccept\"");
 		zbx_tls_free();
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 #endif

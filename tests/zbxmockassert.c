@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,7 +18,11 @@
 
 #include "zbxnum.h"
 
-void cm_print_error(const char * const format, ...);
+/* in newer versions of cmocka cm_print_error is declared in header */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+void cm_print_error(const char* const format, ...) CMOCKA_PRINTF_ATTRIBUTE(1, 2);
+#pragma GCC diagnostic pop
 
 #define _FAIL(file, line, prefix, message, ...)						\
 											\
@@ -89,6 +93,14 @@ void	__zbx_mock_assert_int_ne(const char *file, int line, const char *prefix_msg
 void	__zbx_mock_assert_double_eq(const char *file, int line, const char *prefix_msg, double expected_value,
 		double returned_value)
 {
+	if (isinf(expected_value) && isinf(returned_value))
+	{
+		if (expected_value == returned_value)
+			return;
+
+		_FAIL(file, line, prefix_msg, "Expected value \"%f\" while got \"%f\"", expected_value, returned_value);
+	}
+
 	if (zbx_get_double_epsilon() >= fabs(returned_value - expected_value))
 		return;
 

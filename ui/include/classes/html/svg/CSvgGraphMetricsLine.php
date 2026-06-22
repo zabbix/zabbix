@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,10 +19,9 @@
  */
 class CSvgGraphMetricsLine extends CSvgGroup {
 
-	private $metric_paths;
-	private $metric;
-
-	private $options;
+	private array $metric_paths;
+	private array $metric;
+	private array $options;
 
 	public function __construct(array $metric_paths, array $metric) {
 		parent::__construct();
@@ -126,6 +125,9 @@ class CSvgGraphMetricsLine extends CSvgGroup {
 	public function toString($destroy = true): string {
 		$this
 			->setAttribute('data-set', $this->options['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
+			->setAttribute('data-itemid', $this->metric['itemid'])
+			->setAttribute('data-itemids', $this->metric['itemids'])
+			->setAttribute('data-ds', $this->metric['data_set'])
 			->setAttribute('data-metric', $this->metric['name'])
 			->setAttribute('data-color', $this->options['color'])
 			->draw();

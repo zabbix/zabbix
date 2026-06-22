@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -102,7 +102,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=trigger.list&context=template&filter_rst=1&filter_hostids[0]='.$this->templateid);
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$this->zbxTestInputType('name', $data['description']);
+		$dialog->query('id:name')->waitUntilVisible()->one()->fill($data['description']);
 		$this->zbxTestInputType('expression', $data['expression']);
 		$dialog->getFooter()->query('button:Add')->one()->click();
 

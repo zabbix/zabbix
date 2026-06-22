@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,6 +19,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxdiscovery.h"
 #include "zbxautoreg.h"
+#include "zbxhistory.h"
 
 #define ZBX_PROXYMODE_ACTIVE	0
 #define ZBX_PROXYMODE_PASSIVE	1
@@ -35,13 +36,13 @@ typedef enum
 zbx_host_template_link_type;
 
 typedef int (*zbx_evaluate_function_trigger_t)(zbx_variant_t *, const zbx_dc_evaluate_item_t *, const char *,
-		const char *, const zbx_timespec_t *, char **);
+		const char *, const zbx_timespec_t *, zbx_history_selector_t *selector, char **);
 typedef void (*zbx_lld_process_agent_result_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
 		zbx_timespec_t *ts, char *error);
 typedef void (*zbx_preprocess_item_value_func_t)(zbx_uint64_t itemid, unsigned char item_value_type,
 		unsigned char item_flags, unsigned char preprocessing, AGENT_RESULT *result, zbx_timespec_t *ts,
 		unsigned char state, char *error);
-typedef void (*zbx_preprocessor_flush_func_t)(void);
+typedef size_t (*zbx_preprocessor_flush_func_t)(void);
 
 void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func,
 		zbx_preprocess_item_value_func_t preprocess_item_value_func,
@@ -59,19 +60,23 @@ int	zbx_proxy_get_host_active_availability(struct zbx_json *j);
 
 int	zbx_proxy_get_delay(zbx_uint64_t lastid);
 
-int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
-		size_t values_num, zbx_proxy_suppress_t *nodata_win);
+int	zbx_process_history_data(zbx_ipc_async_socket_t *rtc, zbx_history_recv_item_t *items, zbx_agent_value_t *values,
+		int *errcodes, size_t values_num, zbx_proxy_suppress_t *nodata_win);
 int	zbx_get_history_log_value(const char *m, const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
 		int clock, int ns, const char *tz);
 
 void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version_int, time_t lastaccess,
 		int pending_history, zbx_uint64_t flags_add);
 
-int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
-int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
-int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
+int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
+		zbx_timespec_t *ts, char **info);
+int	zbx_process_sender_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
+		zbx_timespec_t *ts, char **info);
+int	zbx_process_proxy_data(zbx_ipc_async_socket_t *rtc, const zbx_dc_proxy_t *proxy,
+		const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
 		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
 		zbx_discovery_update_host_func_t discovery_update_host_cb,
+		zbx_discovery_update_hosts_func_t discovery_update_hosts_cb,
 		zbx_discovery_update_service_func_t discovery_update_service_cb,
 		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
 		zbx_discovery_find_host_func_t discovery_find_host_cb,
@@ -110,6 +115,8 @@ void	zbx_host_groups_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
 void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str, size_t hash_len);
 void	zbx_delete_lld_rule_host_prototypes(zbx_vector_uint64_t *lldrule_itemids, int audit_context_mode);
 
+int	zbx_db_get_main_interface_ip(const zbx_uint64_t hostid, const unsigned char type,
+		char *ip_buffer, const size_t sz_ip_buffer);
 zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
 		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags, int audit_context_mode);
 void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version,
@@ -158,6 +165,16 @@ const char	*zbx_permission_string(int perm);
 int	zbx_get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_timezone);
 int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **user_timezone);
 int	zbx_get_host_permission(const zbx_user_t *user, zbx_uint64_t hostid);
+
+typedef enum
+{
+	ZBX_VALUE_PROPERTY_VALUE,
+	ZBX_VALUE_PROPERTY_TIME,
+	ZBX_VALUE_PROPERTY_DATE,
+	ZBX_VALUE_PROPERTY_AGE,
+	ZBX_VALUE_PROPERTY_TIMESTAMP
+}
+zbx_expr_db_item_value_property_t;
 
 int	zbx_db_get_proxy_value(zbx_uint64_t proxyid, char **replace_to, const char *field_name);
 int	zbx_db_item_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_timespec_t *ts, time_t *tstamp);

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -71,7 +71,7 @@ if ($data['mode'] == AVAILABILITY_REPORT_BY_TEMPLATE) {
 							'parameters' => [
 								'srctbl' => 'template_groups',
 								'srcfld1' => 'groupid',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_template_groups_',
 								'with_triggers' => true,
 								'enrich_parent_groups' => true
@@ -97,7 +97,7 @@ if ($data['mode'] == AVAILABILITY_REPORT_BY_TEMPLATE) {
 								'srctbl' => 'templates',
 								'srcfld1' => 'hostid',
 								'srcfld2' => 'host',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_templates_',
 								'editable' => true,
 								'with_triggers' => true
@@ -122,7 +122,7 @@ if ($data['mode'] == AVAILABILITY_REPORT_BY_TEMPLATE) {
 							'parameters' => [
 								'srctbl' => 'template_triggers',
 								'srcfld1' => 'triggerid',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_triggers_',
 								'with_monitored_triggers' => true
 							]
@@ -142,7 +142,7 @@ if ($data['mode'] == AVAILABILITY_REPORT_BY_TEMPLATE) {
 							'parameters' => [
 								'srctbl' => 'host_groups',
 								'srcfld1' => 'groupid',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_host_groups_',
 								'with_monitored_triggers' => true,
 								'enrich_parent_groups' => true
@@ -167,7 +167,7 @@ else {
 							'parameters' => [
 								'srctbl' => 'host_groups',
 								'srcfld1' => 'groupid',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_host_groups_',
 								'with_monitored_triggers' => true,
 								'enrich_parent_groups' => true
@@ -191,7 +191,7 @@ else {
 							'parameters' => [
 								'srctbl' => 'hosts',
 								'srcfld1' => 'hostid',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_hosts_',
 								'with_monitored_triggers' => true,
 								'real_hosts' => 1

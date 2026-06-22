@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,25 +15,73 @@
 package keyaccess
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"math"
-	"sort"
+	"regexp"
+	"slices"
 
 	"golang.zabbix.com/agent2/pkg/wildcard"
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
-// RuleType Access rule permission type
-type RuleType int
-
-// Rule access types
 const (
-	ALLOW RuleType = iota
+	// matchAllRegexpPattern is the only regexp form treated as unconditional match-all for rule trimming.
+	matchAllRegexpPattern = ".*"
+)
+
+// PatternWildcard and PatternRegexp are pattern kinds (C: zbx_key_access_pattern_type_t).
+const (
+	PatternWildcard = iota
+	PatternRegexp
+)
+
+// ALLOW and DENY are AllowKey and DenyKey rule permissions.
+const (
+	ALLOW = iota
 	DENY
 )
+
+var (
+	errInvalidRule                 = errs.New("invalid key access rule")
+	errRegexpPatternMustNotBeEmpty = errs.New("regular expression pattern must not be empty")
+
+	//nolint:gochecknoglobals // rules are loaded once and used across checks.
+	rules []*Rule
+)
+
+// PatternType key access rule pattern.
+type PatternType int
+
+// RuleType Access rule permission type.
+type RuleType int
+
+// BasePattern holds the common fields shared by Record and Rule.
+type BasePattern struct {
+	Pattern     string
+	Permission  RuleType
+	PatternType PatternType
+}
+
+// Record is a key access record.
+type Record struct {
+	BasePattern
+
+	Line int
+}
+
+// Rule is a key access rule definition.
+type Rule struct {
+	BasePattern
+
+	Key    string
+	Params []string
+	Regexp *regexp.Regexp
+}
 
 func (t RuleType) String() string {
 	switch t {
@@ -46,27 +94,47 @@ func (t RuleType) String() string {
 	}
 }
 
-// Record key access record
-type Record struct {
-	Pattern    string
-	Permission RuleType
-	Line       int
+// permissionName returns the config parameter name corresponding to a pattern's permission type and kind.
+func (b BasePattern) permissionName() string {
+	if b.PatternType == PatternRegexp {
+		if b.Permission == ALLOW {
+			return "AllowKeyRegexp"
+		}
+
+		return "DenyKeyRegexp"
+	}
+
+	return b.Permission.String()
 }
 
-// Rule key access rule definition
-type Rule struct {
-	Pattern    string
-	Permission RuleType
-	Key        string
-	Params     []string
+func (r Record) permissionName() string {
+	return r.BasePattern.permissionName()
 }
 
-var rules []*Rule
+func (r *Rule) permissionName() string {
+	if r == nil {
+		return "unknown"
+	}
+
+	return r.BasePattern.permissionName()
+}
 
 func parse(rec Record) (r *Rule, err error) {
 	r = &Rule{
-		Permission: rec.Permission,
-		Pattern:    rec.Pattern,
+		BasePattern: rec.BasePattern,
+	}
+
+	if rec.PatternType == PatternRegexp {
+		if rec.Pattern == "" {
+			return nil, errRegexpPatternMustNotBeEmpty
+		}
+
+		r.Regexp, err = regexp.Compile(rec.Pattern)
+		if err != nil {
+			return nil, fmt.Errorf("failed to compile regular expression: %w", err)
+		}
+
+		return r, nil
 	}
 
 	if r.Key, r.Params, err = itemutil.ParseWildcardKey(rec.Pattern); err != nil {
@@ -92,8 +160,22 @@ func parse(rec Record) (r *Rule, err error) {
 	return r, nil
 }
 
+// findRule returns a matching rule from the current list.
+// Regexp rules match by pattern; wildcard rules match by parsed key and params.
+// Regexp and wildcard rules are compared separately.
 func findRule(proto *Rule) (rule *Rule, index int) {
 	for j, r := range rules {
+		if proto.PatternType != r.PatternType {
+			continue
+		}
+
+		if proto.PatternType == PatternRegexp {
+			if proto.Pattern == r.Pattern {
+				return r, j
+			}
+
+			continue
+		}
 		if proto.Key != r.Key || len(proto.Params) != len(r.Params) {
 			continue
 		}
@@ -122,96 +204,174 @@ func addRule(rec Record) (err error) {
 			desc = "conflicts"
 		}
 		log.Warningf(`%s access rule "%s" was not added because it %s with another rule defined above`,
-			rec.Permission, rec.Pattern, desc)
+			rec.permissionName(), rec.Pattern, desc)
 		return
 	}
 	rules = append(rules, rule)
 	return
 }
 
-// GetNumberOfRules returns a number of access rules configured
-func GetNumberOfRules() int {
-	return len(rules)
+func appendRecordsFromNode(records *[]Record, node any, permission RuleType, patternType PatternType) {
+	if cfgNode, ok := node.(*conf.Node); ok {
+		for _, v := range cfgNode.Nodes {
+			if value, ok := v.(*conf.Value); ok {
+				*records = append(*records, Record{
+					BasePattern: BasePattern{
+						Pattern:     string(value.Value),
+						Permission:  permission,
+						PatternType: patternType,
+					},
+					Line: value.Line,
+				})
+			}
+		}
+	}
 }
 
-// LoadRules adds key access records to access rule list
-func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
-	rules = rules[:0]
-	var records []Record
-	sysrunIndex := math.MaxInt32
-
-	// load AllowKey/DenyKey parameters
-	if node, ok := allowRecords.(*conf.Node); ok {
-		for _, v := range node.Nodes {
-			if value, ok := v.(*conf.Value); ok {
-				records = append(records, Record{Pattern: string(value.Value), Permission: ALLOW, Line: value.Line})
-			}
-		}
-	}
-	if node, ok := denyRecords.(*conf.Node); ok {
-		for _, v := range node.Nodes {
-			if value, ok := v.(*conf.Value); ok {
-				records = append(records, Record{Pattern: string(value.Value), Permission: DENY, Line: value.Line})
-			}
-		}
-	}
-
-	sort.SliceStable(records, func(i, j int) bool {
-		return records[i].Line < records[j].Line
-	})
-
+func addConfiguredRules(records []Record) error {
 	for _, r := range records {
-		if err = addRule(r); err != nil {
-			err = fmt.Errorf("\"%s\" %s", r.Pattern, err.Error())
-			return
+		err := addRule(r)
+		if err != nil {
+			return errs.Errorf(
+				"%s: %s %q %s",
+				errInvalidRule.Error(),
+				r.permissionName(),
+				r.Pattern,
+				err.Error(),
+			)
 		}
 	}
 
+	return nil
+}
+
+func prepareSystemRunRule() (*Rule, int, int, error) {
+	sysrunIndex := math.MaxInt32
 	rulesNum := len(rules)
+
 	// create system.run[*] deny rule to be appended at the end of rule list unless other
 	// system.run[*] rules are present
-	sysrunRule, err := parse(Record{Pattern: "system.run[*]", Permission: DENY, Line: 0})
+	sysrunRule, err := parse(Record{
+		BasePattern: BasePattern{
+			Pattern:     "system.run[*]",
+			Permission:  DENY,
+			PatternType: PatternWildcard,
+		},
+	})
 	if err != nil {
-		return
+		return nil, sysrunIndex, rulesNum, err
 	}
+
 	if r, i := findRule(sysrunRule); r != nil {
 		sysrunIndex = i
 		rulesNum--
 	}
 
-	if rulesNum != 0 {
-		// remove rules after 'full match' rule
-		for i, r := range rules {
-			if len(r.Params) == 0 && r.Key == "*" {
-				if i < sysrunIndex {
-					sysrunIndex = i
-				}
-				for j := i + 1; j < len(rules); j++ {
-					log.Warningf(`removed unreachable %s "%s" rule`, rules[j].Permission, rules[j].Pattern)
-				}
-				rules = rules[:i+1]
+	return sysrunRule, sysrunIndex, rulesNum, nil
+}
+
+func isUnconditionalMatchAll(r *Rule) bool {
+	if r.PatternType == PatternRegexp {
+		return r.Pattern == matchAllRegexpPattern
+	}
+
+	return len(r.Params) == 0 && r.Key == "*"
+}
+
+func trimRulesAfterMatchAll(sysrunIndex *int) {
+	for i, r := range rules {
+		if !isUnconditionalMatchAll(r) {
+			continue
+		}
+
+		if i < *sysrunIndex {
+			*sysrunIndex = i
+		}
+
+		for j := i + 1; j < len(rules); j++ {
+			log.Warningf(`removed unreachable %s "%s" rule`, rules[j].permissionName(), rules[j].Pattern)
+		}
+
+		rules = rules[:i+1]
+
+		return
+	}
+}
+
+func trimTrailingAllowRules(sysrunIndex int) {
+	cutoff := len(rules)
+
+	for i := len(rules) - 1; i >= 0; i-- {
+		r := rules[i]
+		if r.Permission != ALLOW {
+			break
+		}
+
+		if !isUnconditionalMatchAll(r) {
+			if r.PatternType == PatternRegexp {
 				break
+			}
+
+			if r.Key == "system.run" {
+				// system.run allow rules are not redundant because of default system.run[*] deny rule
+				continue
 			}
 		}
 
-		// remove trailing 'allow' rules
-		cutoff := len(rules)
-		for i := len(rules) - 1; i >= 0; i-- {
-			if rules[i].Permission != ALLOW {
-				break
-			}
-			// system.run allow rules are not redundant because of default system.run[*] deny rule
-			if rules[i].Key != "system.run" {
-				if i != sysrunIndex {
-					log.Warningf(`removed redundant trailing AllowKey "%s" rule`, rules[i].Pattern)
-				}
-				for j := i; j < len(rules)-1; j++ {
-					rules[j] = rules[j+1]
-				}
-				cutoff--
-			}
+		if i != sysrunIndex {
+			log.Warningf(`removed redundant trailing %s "%s" rule`, r.permissionName(), r.Pattern)
 		}
-		rules = rules[:cutoff]
+
+		for j := i; j < len(rules)-1; j++ {
+			rules[j] = rules[j+1]
+		}
+
+		cutoff--
+	}
+
+	rules = rules[:cutoff]
+}
+
+// GetNumberOfRules returns a number of access rules configured.
+func GetNumberOfRules() int {
+	return len(rules)
+}
+
+// LoadRules adds key access records to access rule list.
+// LoadRules merges AllowKey/DenyKey/AllowKeyRegexp/DenyKeyRegexp in config order.
+// Regexp patterns are compiled at load time; invalid or empty patterns fail loading.
+func LoadRules(allowRecords, denyRecords, allowRegexpRecords, denyRegexpRecords any) error {
+	rules = rules[:0]
+	records := make([]Record, 0)
+
+	appendRecordsFromNode(&records, allowRecords, ALLOW, PatternWildcard)
+	appendRecordsFromNode(&records, denyRecords, DENY, PatternWildcard)
+	appendRecordsFromNode(&records, allowRegexpRecords, ALLOW, PatternRegexp)
+	appendRecordsFromNode(&records, denyRegexpRecords, DENY, PatternRegexp)
+
+	slices.SortStableFunc(records, func(a, b Record) int {
+		return cmp.Compare(a.Line, b.Line)
+	})
+
+	err := addConfiguredRules(records)
+	if err != nil {
+		return err
+	}
+
+	var (
+		sysrunRule  *Rule
+		sysrunIndex int
+		rulesNum    int
+	)
+
+	sysrunRule, sysrunIndex, rulesNum, err = prepareSystemRunRule()
+	if err != nil {
+		return err
+	}
+
+	if rulesNum != 0 {
+		trimRulesAfterMatchAll(&sysrunIndex)
+		trimTrailingAllowRules(sysrunIndex)
 
 		if len(rules) == 0 {
 			return errors.New("Item key access rules are configured to match all keys," +
@@ -227,65 +387,100 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 	return nil
 }
 
-// CheckRules checks if specified key and parameters are not restricted by defined rules
-func CheckRules(key string, params []string) (result bool) {
-	result = true
+// matchWildcardRule evaluates a wildcard rule and reports whether it matched and, if so, whether it allows access.
+func matchWildcardRule(r *Rule, key string, params []string, emptyParams bool) (bool, bool) {
+	numParamsRule := len(r.Params)
+	numParams := len(params)
 
-	emptyParams := len(params) == 1 && len(params[0]) == 0
+	// match all rule
+	if r.Key == "*" && numParamsRule == 0 {
+		return true, r.Permission == ALLOW
+	}
+
+	if !wildcardParamCountMatches(r, numParamsRule, numParams) {
+		return false, false
+	}
+
+	if !wildcard.Match(key, r.Key) {
+		return false, false // key doesn't match
+	}
+
+	if numParamsRule == 0 {
+		if emptyParams {
+			return false, false // no parameters expected by rule
+		}
+
+		if numParams == 0 {
+			return true, r.Permission == ALLOW
+		}
+	}
+
+	if !wildcardParamsMatch(r, params, numParamsRule, numParams) {
+		return false, false
+	}
+
+	return true, r.Permission == ALLOW
+}
+
+func wildcardParamCountMatches(r *Rule, numParamsRule, numParams int) bool {
+	if numParamsRule == 0 {
+		return true
+	}
+
+	if r.Params[numParamsRule-1] == "*" {
+		// rule: key[*], request: key
+		return numParamsRule != 1 || numParams != 0
+	}
+
+	if numParams < numParamsRule {
+		return false // too few parameters
+	}
+
+	if numParams > numParamsRule {
+		return false // too many params
+	}
+
+	return true
+}
+
+func wildcardParamsMatch(r *Rule, params []string, numParamsRule, numParams int) bool {
+	for i, p := range r.Params {
+		if i == numParamsRule-1 { // last parameter
+			if p == "*" {
+				return true // skip next parameter checks
+			}
+
+			if numParams <= i {
+				return false // out of parameters
+			}
+
+			return wildcard.Match(params[i], p)
+		}
+
+		if numParams <= i || !wildcard.Match(params[i], p) {
+			return false // parameter doesn't match pattern
+		}
+	}
+
+	return false
+}
+
+// CheckRules checks if specified key and parameters are not restricted by defined rules.
+func CheckRules(rawMetric, key string, params []string) bool {
+	emptyParams := len(params) == 1 && params[0] == ""
 
 	for _, r := range rules {
-		numParamsRule := len(r.Params)
-		numParams := len(params)
-
-		// match all rule
-		if r.Key == "*" && numParamsRule == 0 {
-			return r.Permission == ALLOW
-		}
-
-		if numParamsRule > 0 {
-			if r.Params[numParamsRule-1] == "*" {
-				if numParamsRule == 1 && numParams == 0 {
-					continue // rule: key[*], request: key
-				}
-			} else {
-				if numParams < numParamsRule {
-					continue // too few parameters
-				}
-				if numParams > numParamsRule {
-					continue // too many params
-				}
-			}
-		}
-
-		if !wildcard.Match(key, r.Key) {
-			continue // key doesn't match
-		}
-
-		if numParamsRule == 0 {
-			if emptyParams {
-				continue // no parameters expected by rule
-			}
-			if numParams == 0 {
+		if r.PatternType == PatternRegexp {
+			if r.Regexp.MatchString(rawMetric) {
 				return r.Permission == ALLOW
 			}
+
+			continue
 		}
 
-		for i, p := range r.Params {
-			if i == numParamsRule-1 { // last parameter
-				if p == "*" {
-					return r.Permission == ALLOW // skip next parameter checks
-				}
-				if numParams <= i {
-					break // out of parameters
-				}
-				if !wildcard.Match(params[i], p) {
-					break // parameter doesn't match pattern
-				}
-				return r.Permission == ALLOW
-			}
-			if numParams <= i || !wildcard.Match(params[i], p) {
-				break // parameter doesn't match pattern
-			}
+		matched, allowed := matchWildcardRule(r, key, params, emptyParams)
+		if matched {
+			return allowed
 		}
 	}
 

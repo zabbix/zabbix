@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -746,7 +746,7 @@ error:
 	zbx_free(envvar_value);
 
 	if (0 == noexit)
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 
 	return FAIL;
 #undef ZBX_MAX_INCLUDE_LEVEL

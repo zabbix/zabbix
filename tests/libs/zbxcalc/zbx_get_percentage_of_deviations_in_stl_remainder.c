@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -55,7 +55,7 @@ int	__wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds)
 void	zbx_mock_test_entry(void **state)
 {
 	time_t				start_evaluate_period, end_evaluate_period;
-	int				start_detect_period, end_detect_period, detect_period_season_shift, err,
+	int				start_detect_period, end_detect_period, err,
 					detect_period, evaluate_seconds = 0,
 					evaluate_nvalues = 0;
 	double				deviations_count, result;
@@ -66,7 +66,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_timespec_t			ts, ts_evaluate_end;
 	zbx_mock_handle_t		handle;
 	zbx_vector_history_record_t	values_in;
-	zbx_value_type_t		detect_period_season_type;
+	zbx_history_selector_t		selector = {0};
 
 	/* ZBX_DOUBLE_EPSILON = 0.000001; results into output that is different from python test case output */
 	zbx_update_epsilon_to_python_compatible_precision();
@@ -113,12 +113,13 @@ void	zbx_mock_test_entry(void **state)
 	ts_evaluate_end.sec = end_evaluate_period;
 	evaluate_seconds = end_evaluate_period - start_evaluate_period;
 
-	if (SUCCEED != get_function_parameter_hist_range(ts.sec, params, 2, &detect_period, &detect_period_season_type,
-			&detect_period_season_shift))
+	if (SUCCEED != get_function_parameter_history_selector(ts.sec, params, 2, &selector))
 	{
 		fail_msg("invalid third parameter");
 		goto out;
 	}
+
+	detect_period = selector.value;
 
 	start_detect_period = ts_evaluate_end.sec - detect_period;
 	end_detect_period = ts_evaluate_end.sec;

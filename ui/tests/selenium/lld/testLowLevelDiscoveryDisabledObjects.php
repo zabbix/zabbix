@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,6 +15,7 @@
 
 
 require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 
 /**
  * Test checks the objects created by LLD and then no more discovered or/and disabled.
@@ -28,6 +29,15 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 	const HINT_HOST = 'Host for LLD hint';
 
 	protected static $hint_hostid;
+
+	/**
+	 * Attach DatatableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CDatatableBehavior::class];
+	}
 
 	public static function prepareLLDData() {
 		// Create hostgroup for hosts with LLD.
@@ -424,7 +434,13 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 	public function testLowLevelDiscoveryDisabledObjects_TestPages($data) {
 		$url = ($data['object'] === 'host') ? $data['url'] : $data['url'].self::$hint_hostid;
 		$this->page->login()->open($url)->waitUntilReady();
-		$table = $this->query('xpath://form/table')->asTable()->waitUntilVisible()->one();
+
+		if (in_array($data['object'], ['host'])) {
+			$table = $this->getDatatable();
+		}
+		else {
+			$table = $this->query('xpath://form/table')->asTable()->waitUntilVisible()->one();
+		}
 
 		$lld_objects = [
 			'1 Delete - never, disable - never' => [

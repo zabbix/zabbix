@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,8 +16,6 @@
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
-
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @onBefore prepareHTTPItemData
@@ -99,7 +97,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$this->query('link:'.$rows['Name'])->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
+		$this->query('id:name')->waitUntilVisible()->one();
 
 		foreach ($rows as $field_name => $value) {
 			$form_field = $form->getField($field_name);
@@ -558,20 +556,6 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'item with wrong JSON request body',
-						'Key' => 'check-json',
-						'URL' => 'zabbix.com',
-						'Request body' => '{"<key>": "<value>"'
-					],
-					'request_type' => 'JSON data',
-					'inline_errors' => [
-						'Request body' => 'JSON is expected.'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
 						'Name' => 'item with XML empty request body',
 						'Key' => 'check-empty-xml',
 						'URL' => 'zabbix.com'
@@ -579,34 +563,6 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'XML data',
 					'inline_errors' => [
 						'Request body' => 'This field cannot be empty.'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'item with wrong XML request body',
-						'Key' => 'check-wrong-xml',
-						'URL' => 'zabbix.com',
-						'Request body' => 'test'
-					],
-					'request_type' => 'XML data',
-					'inline_errors' => [
-						'Request body' => '(4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'item with wrong XML request body',
-						'Key' => 'check-xml',
-						'URL' => 'zabbix.com',
-						'Request body' => '<foo>bar</foo'
-					],
-					'request_type' => 'XML data',
-					'inline_errors' => [
-						'Request body' => '(73) expected \'>\' [Line: 1 | Column: 14].'
 					]
 				]
 			],
@@ -620,7 +576,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Required status codes' => '*'
 					],
 					'inline_errors' => [
-						'Required status codes' => 'Invalid range expression.'
+						'Required status codes' => 'Invalid HTTP status code or range.'
 					]
 				]
 			],
@@ -633,7 +589,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Required status codes' => 'test'
 					],
 					'inline_errors' => [
-						'Required status codes' => 'Invalid range expression.'
+						'Required status codes' => 'Invalid HTTP status code or range.'
 					]
 				]
 			]
@@ -732,17 +688,6 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					]
 				]
 			],
-			[
-				[
-					'fields' => [
-						'Request body' => 'test'
-					],
-					'request_type' => 'XML data',
-					'inline_errors' => [
-						'Request body' => '(4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
-					]
-				]
-			],
 			// Check required status codes.
 			[
 				[
@@ -750,7 +695,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Required status codes' => '*'
 					],
 					'inline_errors' => [
-						'Required status codes' => 'Invalid range expression.'
+						'Required status codes' => 'Invalid HTTP status code or range.'
 					]
 				]
 			],
@@ -760,7 +705,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Required status codes' => 'test'
 					],
 					'inline_errors' => [
-						'Required status codes' => 'Invalid range expression.'
+						'Required status codes' => 'Invalid HTTP status code or range.'
 					]
 				]
 			]
@@ -785,7 +730,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$this->executeValidation($data, 'clone');
 	}
 
-	public static function getCreataData() {
+	public static function getCreateData() {
 		return [
 			// Fill required fields and check default values.
 			[
@@ -811,7 +756,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
-			// Symbols in query and headers field
+			// Symbols in query and headers field.
 			[
 				[
 					'fields' => [
@@ -829,7 +774,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					]
 				]
 			],
-			// JSON body
+			// JSON body.
 			[
 				[
 					'fields' => [
@@ -841,7 +786,20 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'JSON data'
 				]
 			],
-			// XML body
+			// ZBXNEXT-9595: Invalid JSON structure in "Request body" field.
+			[
+				[
+					'fields' => [
+						'Name' => 'item with invalid JSON body',
+						'Key' => 'http.json.123',
+						'URL' => 'zabbix.com',
+						'Request body' => '{"{{{KEY}}}}}{VALUE}"}'
+					],
+					'request_type' => 'JSON data',
+					'check_form' => true
+				]
+			],
+			// XML body.
 			[
 				[
 					'fields' => [
@@ -851,6 +809,19 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Request body' => '<data><macro>{$MACRO}</macro><![CDATA[{$MACRO}<foo></bar>]]></data>'
 					],
 					'request_type' => 'XML data'
+				]
+			],
+			// ZBXNEXT-9595: Invalid XML structure in "Request body" field.
+			[
+				[
+					'fields' => [
+						'Name' => 'item with invalid XML body',
+						'Key' => 'http.xml.123',
+						'URL' => 'zabbix.com',
+						'Request body' => '<data><macro>KEY<ma'
+					],
+					'request_type' => 'XML data',
+					'check_form' => true
 				]
 			],
 			// All possible fields.
@@ -895,7 +866,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'screenshot' => true
 				]
 			],
-			// Empty Basic authentication user/password
+			// Empty Basic authentication user/password.
 			[
 				[
 					'fields' => [
@@ -907,7 +878,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
-			// Empty NTLM authentication user/password
+			// Empty NTLM authentication user/password.
 			[
 				[
 					'fields' => [
@@ -951,7 +922,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	/**
 	 * Test creation of a HTTP agent item.
 	 *
-	 * @dataProvider getCreataData
+	 * @dataProvider getCreateData
 	 */
 	public function testFormItemHttpAgent_Create($data) {
 		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::$hostid);
@@ -971,8 +942,10 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		// Take a screenshot to test draggable object position of query and headers fields.
 		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
-			$this->assertScreenshot($this->query('id:query-fields-table')->one(), 'Query fields');
-			$this->assertScreenshot($this->query('id:headers-table')->one(), 'Headers fields');
+			// It is necessary because of unexpected viewport shift on Jenkins.
+			$this->page->updateViewport();
+			$this->assertScreenshot($form->query('id:query-fields-table')->one(), 'Query fields');
+			$this->assertScreenshot($form->query('id:headers-table')->one(), 'Headers fields');
 		}
 
 		if (array_key_exists('request_type', $data)) {
@@ -1076,6 +1049,16 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
+			// ZBXNEXT-9595: Invalid JSON structure in "Request body" field.
+			[
+				[
+					'fields' => [
+						'Request body' => '{"KEY":"{'
+					],
+					'request_type' => 'JSON data',
+					'check_form' => true
+				]
+			],
 			// XML body with macro.
 			[
 				[
@@ -1086,7 +1069,17 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
-			// Empty Basic authentication user/password
+			// ZBXNEXT-9595: Invalid XML structure in "Request body" field.
+			[
+				[
+					'fields' => [
+						'Request body' => '<data><macro>KEY<'
+					],
+					'request_type' => 'XML data',
+					'check_form' => true
+				]
+			],
+			// Empty Basic authentication user/password.
 			[
 				[
 					'fields' => [
@@ -1095,7 +1088,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
-			// Empty NTLM authentication user/password
+			// Empty NTLM authentication user/password.
 			[
 				[
 					'fields' => [

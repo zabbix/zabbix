@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -278,6 +278,17 @@ class testPageScheduledReport extends CWebTest {
 						'Name' => 'No data'
 					]
 				]
+			],
+			// Multiple spaces in filter field "Name".
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'result' => [
+						'Report for filter - disabled'
+					]
+				]
 			]
 		];
 	}
@@ -313,7 +324,7 @@ class testPageScheduledReport extends CWebTest {
 			],
 			[
 				[
-					'Name' => 'Report for filter - disabled',
+					'Name' => 'Report for filter -   disabled',
 					'Status' => 'Disabled'
 				]
 			],
@@ -425,6 +436,7 @@ class testPageScheduledReport extends CWebTest {
 			$names = [$names];
 		}
 		foreach ($names as $name) {
+			$name = ($name === 'Report for filter - disabled') ? 'Report for filter -   disabled' : $name;
 			$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM report WHERE name='.zbx_dbstr($name)));
 		}
 	}
@@ -436,7 +448,9 @@ class testPageScheduledReport extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=scheduledreport.list');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$header = $table->query('xpath:.//a[text()="Name"]')->one();
-		$names = $this->getAllReportNames();
+
+		// In the HTML structure the names have several spaces, they need to be removed.
+		$names = preg_replace('/\s+/', ' ',$this->getAllReportNames());
 
 		foreach(['asc', 'desc'] as $sorting) {
 			$expected = ($sorting === 'asc') ? $names : array_reverse($names);
@@ -486,6 +500,11 @@ class testPageScheduledReport extends CWebTest {
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
+
+		$message = is_string(CTestArrayHelper::get($data, 'Name'))
+			? 'Scheduled report deleted'
+			: 'Scheduled reports deleted';
+		$this->assertMessage(TEST_GOOD, $message);
 		$this->assertEquals('0 selected', $this->query('id:selected_count')->one()->getText());
 
 		if (array_key_exists('delete_all', $data)) {

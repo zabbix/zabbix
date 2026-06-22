@@ -1,6 +1,6 @@
 <?php declare(strict_types=0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -152,6 +152,23 @@ class CControllerItemEdit extends CControllerItem {
 			$item['discoveryData']['lldruleid'] = $parent_lld['itemid'];
 		}
 
+		$history_override = [];
+
+		foreach (Manager::History()->getValueTypesStorageTtls() as $value_type => $storage) {
+			$history_override[$value_type] = $storage['value_ttl'] !== null
+				? convertSecondsToTimeUnits($storage['value_ttl'])
+				: '';
+		}
+
+		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
+			$history_override += array_fill_keys([
+					ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+					ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON
+				],
+				CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY)
+			);
+		}
+
 		$data = [
 			'js_test_validation_rules' => (new CFormValidator(
 				CControllerPopupItemTestSend::getValidationRules(allow_lld_macro: false)
@@ -180,6 +197,8 @@ class CControllerItemEdit extends CControllerItem {
 				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
 				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
 			],
+			'history_override' => $history_override,
+			'storage_value_types' => array_keys(Manager::History()->getValueTypesStorageTtls()),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 

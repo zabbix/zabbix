@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,8 +27,10 @@ class CControllerGraphEdit extends CController {
 			'hostid' =>				'db hosts.hostid',
 			'graphid' =>			'db graphs.graphid',
 			'name' =>				'string',
-			'width' =>				'db graphs.width',
-			'height' => 			'db graphs.height',
+			'width' =>				'db graphs.width|ge '.CGraphDraw::GRAPH_WIDTH_MIN.
+				'|le '. CGraphDraw::GRAPH_WIDTH_MAX,
+			'height' => 			'db graphs.height|ge '.CGraphDraw::GRAPH_HEIGHT_MIN.
+				'|le '.CGraphDraw::GRAPH_HEIGHT_MAX,
 			'graphtype' =>			'db graphs.graphtype|in '.implode(',', [
 				GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED, GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED
 			]),
@@ -297,6 +299,10 @@ class CControllerGraphEdit extends CController {
 			'is_template' => $data['hostid'] == 0 ? false : isTemplate($data['hostid']),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
+
+		$data['js_validation_rules'] = $data['graphid'] != 0
+			? (new CFormValidator(CControllerGraphUpdate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerGraphCreate::getValidationRules()))->getRules();
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

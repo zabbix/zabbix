@@ -11,6 +11,41 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+AC_DEFUN([ARES_TRY_RUN],
+[
+	AC_RUN_IFELSE(
+	[
+		AC_LANG_SOURCE(
+			#include <ares.h>
+			#include "string.h"
+			int	main(void)
+			{
+				ares_channel_t		*channel = NULL;
+				struct ares_options	options = {0};
+				int			optmask = ARES_OPT_EVENT_THREAD|ARES_OPT_QUERY_CACHE;
+
+				options.evsys = ARES_EVSYS_DEFAULT;
+
+				if (ARES_SUCCESS !=  ares_library_init(ARES_LIB_INIT_ALL))
+					return 1;
+
+				if (0 == ares_threadsafety())
+					return 1;
+
+				if (ARES_SUCCESS != ares_init_options(&channel, &options, optmask))
+					return 1;
+
+				return 0;
+			}
+		)
+	]
+	,
+	found_ares_query_cache="yes",
+	found_ares_query_cache="no",
+	found_ares_query_cache="no" dnl action-if-cross-compiling
+	)
+])
+
 AC_DEFUN([ARES_TRY_LINK],
 [
 found_ares=$1
@@ -18,7 +53,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <ares.h>
 #include "string.h"
 ]], [[
-	struct ares_channeldata		*channel;
+	struct ares_channeldata		*channel = NULL;
 	struct ares_addrinfo_hints	hints;
 
 	ares_library_init(ARES_LIB_INIT_ALL);
@@ -102,6 +137,7 @@ AS_HELP_STRING([--with-ares@<:@=ARG@:>@], [use c-ares library @<:@default=no@:>@
 			LDFLAGS="$LDFLAGS $ARES_LDFLAGS"
 			LIBS="$LIBS $ARES_LIBS"
 
+			ARES_TRY_RUN([no])
 			ARES_TRY_LINK([no])
 			AC_CHECK_FUNCS([ares_reinit])
 
@@ -111,6 +147,9 @@ AS_HELP_STRING([--with-ares@<:@=ARG@:>@], [use c-ares library @<:@default=no@:>@
 		fi
 
 		if test "x$found_ares" = "xyes"; then
+			if test "x$found_ares_query_cache" = "xyes"; then
+				AC_DEFINE([HAVE_ARES_QUERY_CACHE], 1, [Define to 1 if you have the 'c-ares' library that supports query cache (-lcares)])
+			fi
 			AC_DEFINE([HAVE_ARES], 1, [Define to 1 if you have the 'c-ares' library (-lcares)])
 			AC_MSG_RESULT(yes)
 		else

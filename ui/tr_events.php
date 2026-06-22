@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -59,7 +59,7 @@ $events = API::Event()->get([
 		'cause_eventid'
 	],
 	'selectAcknowledges' => ['clock', 'message', 'action', 'userid', 'old_severity', 'new_severity',
-		'suppress_until'
+		'suppress_until', 'maintenanceid'
 	],
 	'selectTags' => ['tag', 'value'],
 	'source' => EVENT_SOURCE_TRIGGERS,
@@ -129,6 +129,7 @@ else {
 }
 
 $actions = getEventDetailsActions($event);
+
 $users = API::User()->get([
 	'output' => ['username', 'name', 'surname'],
 	'userids' => array_keys($actions['userids']),
@@ -137,6 +138,11 @@ $users = API::User()->get([
 $mediatypes = API::Mediatype()->get([
 	'output' => ['maxattempts'],
 	'mediatypeids' => array_keys($actions['mediatypeids']),
+	'preservekeys' => true
+]);
+$maintenances = API::Maintenance()->get([
+	'output' => ['name'],
+	'maintenanceids' => array_keys($actions['maintenanceids']),
 	'preservekeys' => true
 ]);
 
@@ -152,9 +158,6 @@ $allowed = [
 	'rank_change' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
 ];
 
-/*
- * Display
- */
 require_once dirname(__FILE__).'/include/views/js/tr_events.js.php';
 
 $event_tab = (new CDiv([
@@ -167,7 +170,7 @@ $event_tab = (new CDiv([
 			->setHeader(new CTag('h4', true, _('Event details')))
 	]),
 	new CDiv([
-		(new CSectionCollapsible(makeEventDetailsActionsTable($actions, $users, $mediatypes)))
+		(new CSectionCollapsible(makeEventDetailsActionsTable($actions, $users, $mediatypes, $maintenances)))
 			->setId(SECTION_HAT_EVENTACTIONS)
 			->setHeader(new CTag('h4', true, _('Actions')))
 			->setProfileIdx('web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state')

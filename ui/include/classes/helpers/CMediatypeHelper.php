@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -38,14 +38,6 @@ class CMediatypeHelper {
 	public const EMAIL_PROVIDER_GMAIL_RELAY = 2;
 	public const EMAIL_PROVIDER_OFFICE365 = 3;
 	public const EMAIL_PROVIDER_OFFICE365_RELAY = 4;
-
-	public const EMAIL_PROVIDER_AUTHENTICATIONS = [
-		CMediatypeHelper::EMAIL_PROVIDER_SMTP => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
-		CMediatypeHelper::EMAIL_PROVIDER_GMAIL => [SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
-		CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
-		CMediatypeHelper::EMAIL_PROVIDER_OFFICE365 => [SMTP_AUTHENTICATION_PASSWORD, SMTP_AUTHENTICATION_OAUTH],
-		CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_PASSWORD]
-	];
 
 	/**
 	 * Returns an array of Email providers default settings.
@@ -147,6 +139,20 @@ class CMediatypeHelper {
 		}
 
 		return $types[$type];
+	}
+
+	/**
+	 * Returns supported media types values.
+	 *
+	 * @return array
+	 */
+	public static function getSupportedMediaTypes(): array {
+		global $ZBX_FEATURE_FLAGS;
+
+		$types = [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK];
+		$media_type_denylist = $ZBX_FEATURE_FLAGS['media_type_denylist'];
+
+		return array_diff($types, $media_type_denylist);
 	}
 
 	/**

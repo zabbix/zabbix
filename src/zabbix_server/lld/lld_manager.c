@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -188,7 +188,7 @@ static zbx_lld_worker_t	*lld_get_worker_by_client(zbx_lld_manager_t *manager, zb
 	if (NULL == worker)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return *worker;
@@ -223,11 +223,12 @@ static void	lld_register_worker(zbx_lld_manager_t *manager, zbx_ipc_client_t *cl
 		if (manager->next_worker_index == manager->workers.values_num)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		worker = manager->workers.values[manager->next_worker_index++];
 		worker->client = client;
+		zbx_ipc_client_addref(worker->client);
 
 		zbx_hashset_insert(&manager->workers_client, &worker, sizeof(zbx_lld_worker_t *));
 		zbx_queue_ptr_push(&manager->free_workers, worker);
@@ -592,6 +593,17 @@ static void	lld_process_top_items(zbx_lld_manager_t *manager, zbx_ipc_client_t *
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	lld_manager_shutdown_workers(zbx_lld_manager_t *manager)
+{
+	for (int i = 0; i < manager->workers.values_num; i++)
+	{
+		if (NULL == manager->workers.values[i]->client)
+			continue;
+
+		zbx_ipc_client_send(manager->workers.values[i]->client, ZBX_RTC_SHUTDOWN, NULL, 0);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: main processing loop                                              *
@@ -626,7 +638,7 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start LLD manager service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_LLDMANAGER, 0, NULL, 0, SEC_PER_MIN, ZBX_IPC_SERVICE_LLD);
@@ -712,6 +724,7 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 			break;
 	}
 
+	lld_manager_shutdown_workers(&manager);
 	zbx_ipc_service_close(&lld_service);
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

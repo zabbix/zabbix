@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -22,73 +22,68 @@ include __DIR__.'/common.item.edit.js.php';
 include __DIR__.'/item.preprocessing.js.php';
 include __DIR__.'/itemtest.js.php';
 include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
-?>
-<script type="text/x-jquery-tmpl" id="condition-row">
-	<?=
-		(new CRow([[
-				new CSpan('#{formulaId}'),
-				new CVar('conditions[#{rowNum}][formulaid]', '#{formulaId}')
-			],
-			(new CTextBox('conditions[#{rowNum}][macro]', '', false, 64))
-				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-				->addClass(ZBX_STYLE_UPPERCASE)
-				->addClass('macro')
-				->setAttribute('placeholder', '{#MACRO}')
-				->setAttribute('data-formulaid', '#{formulaId}'),
-			(new CSelect('conditions[#{rowNum}][operator]'))
-				->setValue(CONDITION_OPERATOR_REGEXP)
-				->addClass('js-operator')
-				->addOptions(CSelect::createOptionsFromArray([
-					CONDITION_OPERATOR_REGEXP => _('matches'),
-					CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
-					CONDITION_OPERATOR_EXISTS => _('exists'),
-					CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
-				])),
-			(new CDiv(
-				(new CTextBox('conditions[#{rowNum}][value]', '', false, 255))
-					->addClass('js-value')
-					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-					->setAttribute('placeholder', _('regular expression'))
-			))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
-			(new CCol(
-				(new CButton('conditions_#{rowNum}_remove', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('form_row')
-			->toString()
-	?>
-</script>
-<script type="text/x-jquery-tmpl" id="lld_macro_path-row">
-	<?= (new CRow([
-			(new CCol(
-				(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][lld_macro]', '', [
-					'add_post_js' => false,
-					'maxlength' => DB::getFieldLength('lld_macro_path', 'lld_macro')
-				]))
-					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-					->addClass(ZBX_STYLE_UPPERCASE)
-					->setAttribute('placeholder', '{#MACRO}')
-					->disableSpellcheck()
-			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-			(new CCol(
-				(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][path]', '', [
-					'add_post_js' => false,
-					'maxlength' => DB::getFieldLength('lld_macro_path', 'path')
-				]))
-					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-					->setAttribute('placeholder', _('$.path.to.node'))
-					->disableSpellcheck()
-			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-			(new CButton('lld_macro_paths[#{rowNum}][remove]', _('Remove')))
+
+(new CTemplateTag('condition-row-tmpl',
+	(new CRow([[
+		new CSpan('#{formulaId}'),
+		new CVar('conditions[#{rowNum}][formulaid]', '#{formulaId}')
+	],
+		(new CTextAreaFlexible('conditions[#{rowNum}][macro]', ''))
+			->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+			->addClass(ZBX_STYLE_UPPERCASE)
+			->addClass('macro')
+			->setMaxlength(DB::getFieldLength('item_condition', 'macro'))
+			->setAttribute('placeholder', '{#MACRO}')
+			->setAttribute('data-formulaid', '#{formulaId}'),
+		(new CSelect('conditions[#{rowNum}][operator]'))
+			->setValue(CONDITION_OPERATOR_REGEXP)
+			->addClass('js-operator')
+			->addOptions(CSelect::createOptionsFromArray([
+				CONDITION_OPERATOR_REGEXP => _('matches'),
+				CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
+				CONDITION_OPERATOR_EXISTS => _('exists'),
+				CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
+			])),
+		(new CDiv(
+			(new CTextAreaFlexible('conditions[#{rowNum}][value]', ''))
+				->addClass('js-value')
+				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				->setMaxlength(DB::getFieldLength('item_condition', 'value'))
+				->setAttribute('placeholder', _('regular expression'))
+		))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
+		(new CCol(
+			(new CButton('conditions_#{rowNum}_remove', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
-		]))
-			->addClass('form_row')
-			->toString()
-	?>
-</script>
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->addClass('form_row')
+))->show();
+
+(new CTemplateTag('lld_macro_path-row-tmpl',
+	(new CRow([
+		(new CCol(
+			(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][lld_macro]', ''))
+				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+				->addClass(ZBX_STYLE_UPPERCASE)
+				->setMaxlength(DB::getFieldLength('lld_macro_path', 'lld_macro'))
+				->setAttribute('placeholder', '{#MACRO}')
+				->disableSpellcheck()
+		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol(
+			(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][path]', ''))
+				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				->setMaxlength(DB::getFieldLength('lld_macro_path', 'path'))
+				->setAttribute('placeholder', _('$.path.to.node'))
+				->disableSpellcheck()
+		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CButton('lld_macro_paths[#{rowNum}][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	]))
+		->addClass('form_row')
+))->show();
+?>
 
 <script>
 	const view = {
@@ -105,7 +100,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 
 			$('#conditions')
 				.dynamicRows({
-					template: '#condition-row',
+					template: '#condition-row-tmpl',
 					counter: counter,
 					allow_empty: true,
 					dataCallback: (data) => {
@@ -169,10 +164,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			}).trigger('change');
 
 			$('#lld_macro_paths')
-				.dynamicRows({template: '#lld_macro_path-row', allow_empty: true})
-				.on('click', 'button.element-table-add', () => {
-					$('#lld_macro_paths .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
-				});
+				.dynamicRows({template: '#lld_macro_path-row-tmpl', allow_empty: true});
 
 			let button = document.querySelector(`[name="${this.form_name}"] .js-execute-item`);
 

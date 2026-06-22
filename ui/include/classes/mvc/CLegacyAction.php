@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -31,10 +31,6 @@ class CLegacyAction extends CAction {
 	 * @return bool
 	 */
 	public function checkInput(): bool {
-		if ($this->getAction() === 'host_prototypes.php' && array_key_exists('formdata_json', $_REQUEST)) {
-			$_REQUEST = json_decode($_REQUEST['formdata_json'], true);
-		}
-
 		return true;
 	}
 
@@ -53,7 +49,7 @@ class CLegacyAction extends CAction {
 		 * sure to hide left menu and display error in case user has no access to templates or hosts.
 		 */
 		if (in_array(getRequest('context', ''), ['host', 'template'])
-				&& in_array($action, ['host_discovery.php', 'httpconf.php', 'host_prototypes.php'])) {
+				&& in_array($action, ['host_discovery.php', 'httpconf.php'])) {
 			$action = (getRequest('context') === 'host') ? 'host.list' : 'template.list';
 		}
 
@@ -66,7 +62,7 @@ class CLegacyAction extends CAction {
 
 		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
 			$denied = array_merge($denied, ['host_discovery.php', 'host_discovery_prototypes.php',
-				'host_prototypes.php', 'host.list', 'httpconf.php', 'report4.php', 'template.list'
+				'host.list', 'httpconf.php', 'report4.php', 'template.list'
 			]);
 		}
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -43,7 +43,7 @@ void	load_aliases(char **lines)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add alias \"%s\": invalid character at position %d",
 					*pline, (int)((r - *pline) + 1));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		c = (char *)r++;
@@ -52,7 +52,7 @@ void	load_aliases(char **lines)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add alias \"%s\": invalid character at position %d",
 					*pline, (int)((r - *pline) + 1));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		*c++ = '\0';
@@ -114,7 +114,15 @@ int	load_user_parameters(char **lines, char **err)
  ******************************************************************************/
 int	load_key_access_rule(const char *value, const zbx_cfg_line_t *cfg)
 {
-	unsigned char	rule_type;
+	int	rule_type = FAIL;
+
+	if (0 == strcmp(cfg->parameter, "AllowKeyRegexp"))
+		rule_type = ZBX_KEY_ACCESS_ALLOW;
+	else if (0 == strcmp(cfg->parameter, "DenyKeyRegexp"))
+		rule_type = ZBX_KEY_ACCESS_DENY;
+
+	if (FAIL != rule_type)
+		return zbx_add_key_access_rule_regexp(cfg->parameter, (char *)value, rule_type);
 
 	if (0 == strcmp(cfg->parameter, "AllowKey"))
 		rule_type = ZBX_KEY_ACCESS_ALLOW;
@@ -203,7 +211,7 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add performance counter \"%s\": %s", *pline, error);
 			zbx_free(error);
 
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		if (lines == eng_lines)

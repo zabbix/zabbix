@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,6 +16,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
+#include "zbxmockdb.h"
 
 #include "zbxcachevalue.h"
 #include "zbxvariant.h"
@@ -27,9 +28,20 @@
 #include "zbxnum.h"
 
 #include "mocks/valuecache/valuecache_mock.h"
+#include "../../../src/libs/zbxtrends/trends.h"
 
 int	__wrap_zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
 		zbx_macro_resolv_func_t resolver, va_list args);
+
+int	__wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
+
+int	__wrap_zbx_baseline_get_data(uint64_t itemid, unsigned char value_type, time_t now, const char *period,
+		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values,
+		zbx_vector_uint64_t *index, char **error);
+
+void	__wrap_zbx_recalc_time_period(time_t *ts_from, int table_group);
+
+zbx_uint64_t	__wrap_zbx_history_get_trends_flags(void);
 
 int	__wrap_zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
 		zbx_macro_resolv_func_t resolver, va_list args)
@@ -44,13 +56,42 @@ int	__wrap_zbx_substitute_macros_args(zbx_token_search_t search, char **data, ch
 	return SUCCEED;
 }
 
-int __wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
-
-int __wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds)
+int	__wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds)
 {
 	ZBX_UNUSED(itemid);
 	*seconds = zbx_vcmock_get_ts().sec - 600;
 	return SUCCEED;
+}
+
+int	__wrap_zbx_baseline_get_data(uint64_t itemid, unsigned char value_type, time_t now, const char *period,
+		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *baseline_get_data_values,
+		zbx_vector_uint64_t *baseline_get_data_index, char **error)
+{
+	ZBX_UNUSED(itemid);
+	ZBX_UNUSED(value_type);
+	ZBX_UNUSED(now);
+	ZBX_UNUSED(period);
+	ZBX_UNUSED(season_num);
+	ZBX_UNUSED(season_unit);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(skip);
+
+	zbx_mock_extract_yaml_values_dbl(zbx_mock_get_parameter_handle("in.baseline_values"), baseline_get_data_values);
+	zbx_mock_extract_yaml_values_uint64(zbx_mock_get_parameter_handle("in.baseline_index"),
+			baseline_get_data_index);
+
+	return SUCCEED;
+}
+
+void	__wrap_zbx_recalc_time_period(time_t *ts_from, int table_group)
+{
+	ZBX_UNUSED(table_group);
+	ZBX_UNUSED(ts_from);
+}
+
+zbx_uint64_t	__wrap_zbx_history_get_trends_flags(void)
+{
+	return 0xFF;
 }
 
 void	zbx_mock_test_entry(void **state)
@@ -64,6 +105,9 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	handle;
 	zbx_variant_t		returned_value;
 	zbx_dc_evaluate_item_t	evaluate_item;
+	zbx_history_selector_t	selector = {0};
+
+	ZBX_UNUSED(state);
 
 	zbx_update_epsilon_to_float_precision();
 
@@ -73,6 +117,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vc_enable();
 
 	zbx_vcmock_ds_init();
+
+	zbx_mockdb_init();
 
 	memset(&item, 0, sizeof(zbx_dc_item_t));
 
@@ -94,7 +140,7 @@ void	zbx_mock_test_entry(void **state)
 	evaluate_item.key_orig = item.key_orig;
 
 	if (SUCCEED != (returned_ret = zbx_evaluate_function(&returned_value, &evaluate_item, function, params, &ts,
-			&error)))
+			&selector, &error)))
 	{
 		printf("zbx_evaluate_function returned error: %s\n", error);
 		zbx_free(error);
@@ -145,5 +191,5 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_vcmock_ds_destroy();
 
-	ZBX_UNUSED(state);
+	zbx_mockdb_destroy();
 }

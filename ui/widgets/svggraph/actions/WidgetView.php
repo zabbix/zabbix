@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,7 +19,8 @@ namespace Widgets\SvgGraph\Actions;
 use CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CNumberParser,
-	CParser;
+	CParser,
+	CRangeTimeParser;
 
 use Widgets\SvgGraph\Includes\{
 	CSvgGraphHelper,
@@ -29,9 +30,10 @@ use Widgets\SvgGraph\Includes\{
 class WidgetView extends CControllerDashboardWidgetView {
 
 	private const GRAPH_WIDTH_MIN = 1;
-	private const GRAPH_WIDTH_MAX = 65535;
+	private const GRAPH_WIDTH_MAX = 8000;
+
 	private const GRAPH_HEIGHT_MIN = 1;
-	private const GRAPH_HEIGHT_MAX = 65535;
+	private const GRAPH_HEIGHT_MAX = 4500;
 
 	protected function init(): void {
 		parent::init();
@@ -84,14 +86,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'displaying' => [
 				'show_simple_triggers' => $this->fields_values['simple_triggers'] == SVG_GRAPH_SIMPLE_TRIGGERS_ON,
 				'show_working_time' => $this->fields_values['working_time'] == SVG_GRAPH_WORKING_TIME_ON,
+				'show_hostnames' => $this->isTemplateDashboard()
+					? SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE
+					: $this->fields_values['show_hostnames'],
 				'show_percentile_left' => $this->fields_values['percentile_left'] == SVG_GRAPH_PERCENTILE_LEFT_ON,
 				'percentile_left_value' => $percentile_left_value,
 				'show_percentile_right' => $this->fields_values['percentile_right'] == SVG_GRAPH_PERCENTILE_RIGHT_ON,
 				'percentile_right_value' => $percentile_right_value
 			],
 			'time_period' => [
-				'time_from' => $this->fields_values['time_period']['from_ts'],
-				'time_to' => $this->fields_values['time_period']['to_ts']
+				'time_from' => null,
+				'time_to' => null
 			],
 			'axes' => [
 				'show_left_y_axis' => $this->fields_values['lefty'] == SVG_GRAPH_AXIS_ON,
@@ -134,6 +139,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 				: ''
 		];
 
+		$range_time_parser = new CRangeTimeParser();
+
+		$range_time_parser->parse($this->fields_values['time_period']['from']);
+		$graph_data['time_period']['time_from'] = $range_time_parser->getDateTime(true)->getTimestamp();
+
+		$range_time_parser->parse($this->fields_values['time_period']['to']);
+		$graph_data['time_period']['time_to'] = $range_time_parser->getDateTime(false)->getTimestamp();
+
 		$svg_options = CSvgGraphHelper::get($graph_data, $width, $height);
 		if ($svg_options['errors']) {
 			error($svg_options['errors']);
@@ -145,8 +158,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					&& !$has_custom_time_period,
 				'show_problems' => $graph_data['problems']['show_problems'],
 				'show_simple_triggers' => $graph_data['displaying']['show_simple_triggers'],
-				'time_period' => $this->fields_values['time_period'],
-				'hint_max_rows' => ZBX_WIDGET_ROWS
+				'time_period' => $this->fields_values['time_period']
 			]);
 		}
 

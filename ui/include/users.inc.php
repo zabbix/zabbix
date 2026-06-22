@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -72,46 +72,6 @@ function user_auth_type2str($authType) {
 	];
 
 	return isset($authUserType[$authType]) ? $authUserType[$authType] : _('Unknown');
-}
-
-/**
- * Get users ids by groups ids.
- *
- * @param array $userGroupIds
- *
- * @return array
- */
-function get_userid_by_usrgrpid($userGroupIds) {
-	zbx_value2array($userGroupIds);
-
-	$userIds = [];
-
-	$dbUsers = DBselect(
-		'SELECT DISTINCT u.userid'.
-		' FROM users u,users_groups ug'.
-		' WHERE u.userid=ug.userid'.
-			' AND '.dbConditionInt('ug.usrgrpid', $userGroupIds)
-	);
-	while ($user = DBFetch($dbUsers)) {
-		$userIds[$user['userid']] = $user['userid'];
-	}
-
-	return $userIds;
-}
-
-/**
- * Check if group has permissions for update.
- *
- * @param array $userGroupIds
- *
- * @return bool
- */
-function granted2update_group($userGroupIds) {
-	zbx_value2array($userGroupIds);
-
-	$users = get_userid_by_usrgrpid($userGroupIds);
-
-	return !isset($users[CWebUser::$data['userid']]);
 }
 
 /**
@@ -387,75 +347,4 @@ function permissionText($perm) {
 		case PERM_NONE:
 			return _('None');
 	}
-}
-
-/**
- * Formats host or template group rights for writing in the database.
- * Filters out duplicates, and applies the most strict permission type for duplicates.
- *
- * @param array  $rights          An array of host or template group rights.
- * @param string $groupid_key     The key in the rights array for the group IDs.
- * @param string $permission_key  The key in the rights array for the permissions.
- *
- * @return array
- */
-function processRights(array $rights, string $groupid_key, string $permission_key): array {
-	$groupids = $rights[$groupid_key]['groupids'] ?? [];
-	$permissions = $rights[$permission_key]['permission'] ?? [];
-
-	$processed_rights = [];
-	$unique_rights = [];
-
-	foreach ($groupids as $index => $group) {
-		foreach ($group as $groupid) {
-			$permission = $permissions[$index] ?? PERM_DENY;
-
-			if ($groupid != 0) {
-				// If duplicates submitted, saves the one with most strict permission type.
-				$unique_rights[$groupid] = array_key_exists($groupid, $unique_rights)
-					? min($unique_rights[$groupid], $permission)
-					: $permission;
-			}
-		}
-	}
-
-	foreach ($unique_rights as $groupid => $permission) {
-		$processed_rights[] = [
-			'id' => (string) $groupid,
-			'permission' => $permission
-		];
-	}
-
-	return $processed_rights;
-}
-
-/**
- * Checks if the groups specified in the $rights parameter exist in the provided $db_groups.
- *
- * @param array  $rights      Host or template groups submitted for permission update/creation.
- * @param array  $db_groups   Array of host or template groups fetched from the database.
- * @param string $group_name  Key in the $rights array for the list of groupids
- *                            ('ms_hostgroup_right' or 'ms_templategroup_right').
- *
- * @return bool
- */
-function checkGroupsExist(array $rights, array $db_groups, string $group_name): bool {
-	if (!array_key_exists($group_name, $rights)
-			|| !array_key_exists('groupids', $rights[$group_name])
-			|| !is_array($rights[$group_name]['groupids'])) {
-
-		return true;
-	}
-
-	$all_groupids = array_merge(...$rights[$group_name]['groupids']);
-	$existing_groupids = array_column($db_groups, 'groupid');
-
-	foreach ($all_groupids as $groupid) {
-		if (!in_array($groupid, $existing_groupids)) {
-
-			return false;
-		}
-	}
-
-	return true;
 }

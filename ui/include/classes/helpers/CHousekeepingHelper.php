@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -76,6 +76,23 @@ class CHousekeepingHelper {
 		}
 
 		return self::$params[$field];
+	}
+
+	/**
+	 * Get array of value types supported by housekeeper trends.
+	 *
+	 * @return array
+	 */
+	public static function getValueTypesWithTrends(): array {
+		$value_types_with_trends = [];
+
+		foreach ([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] as $value_type) {
+			if (Manager::History()->getDataSourceType($value_type) == ZBX_HISTORY_SOURCE_SQL) {
+				$value_types_with_trends[] = $value_type;
+			}
+		}
+
+		return $value_types_with_trends;
 	}
 
 	/**

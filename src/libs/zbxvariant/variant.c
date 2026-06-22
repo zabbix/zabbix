@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -85,7 +85,7 @@ void	zbx_variant_clear(zbx_variant_t *value)
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	value->type = ZBX_VARIANT_NONE;
@@ -190,6 +190,9 @@ void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source)
 
 			zbx_variant_set_vector(value, var_vector);
 			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 }
 
@@ -448,7 +451,12 @@ zbx_uint64_t	zbx_variant_size(const zbx_variant_t *value)
 				size += sizeof(zbx_variant_t) * (value->data.vector->values_alloc - i);
 			}
 			break;
+		case ZBX_VARIANT_DBL:
+		case ZBX_VARIANT_UI64:
+			break;
 		default:
+			zabbix_log(LOG_LEVEL_CRIT, "%s(): unexpected value->type:%hhu", __func__, value->type);
+			THIS_SHOULD_NEVER_HAPPEN;
 			break;
 	}
 
@@ -585,7 +593,7 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	switch (value2->type)
@@ -601,7 +609,7 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED == zbx_double_compare(value1_dbl, value2_dbl))

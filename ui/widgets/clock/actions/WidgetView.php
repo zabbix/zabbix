@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -144,13 +144,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return null;
 		}
 
-		$now = new DateTime();
+		$zone = $time_zone === ZBX_DEFAULT_TIMEZONE ? CTimezoneHelper::getSystemTimezone() : $time_zone;
 
-		if ($time_zone !== ZBX_DEFAULT_TIMEZONE) {
-			$now->setTimezone(new DateTimeZone($time_zone));
-		}
-
-		return $now;
+		return new DateTime('now', new DateTimeZone($zone));
 	}
 
 	private function configureHostTime(): array {
@@ -171,7 +167,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$item = $items[0];
 			$clock['name'] = $item['hosts'][0]['name'];
 
-			$last_value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+			$last_value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY || $item['value_type'] == ITEM_VALUE_TYPE_JSON
 				? []
 				: Manager::History()->getLastValues([$item]);
 

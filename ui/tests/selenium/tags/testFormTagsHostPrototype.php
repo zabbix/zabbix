@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -36,8 +36,8 @@ class testFormTagsHostPrototype extends testFormTags {
 	 */
 	public function testFormTagsHostPrototype_Create($data) {
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.Host for tags testing:trap_discovery');
-		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
-		$this->saved_link = 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$discoveryruleid.'&hostid=';
+		$this->link = 'zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$discoveryruleid;
+		$this->saved_link = 'zabbix.php?action=popup&popup=host.prototype.edit&context=host&parent_discoveryid='.$discoveryruleid.'&hostid=';
 		$this->checkTagsCreate($data, 'host prototype');
 	}
 
@@ -48,8 +48,8 @@ class testFormTagsHostPrototype extends testFormTags {
 	 */
 	public function testFormTagsHostPrototype_Update($data) {
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.Host for tags testing:trap_discovery');
-		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
-		$this->saved_link = 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$discoveryruleid.'&hostid=';
+		$this->link = 'zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$discoveryruleid;
+		$this->saved_link = 'zabbix.php?action=popup&popup=host.prototype.edit&context=host&parent_discoveryid='.$discoveryruleid.'&hostid=';
 		$this->checkTagsUpdate($data, 'host prototype');
 	}
 
@@ -58,7 +58,7 @@ class testFormTagsHostPrototype extends testFormTags {
 	 */
 	public function testFormTagsHostPrototype_Clone() {
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.Host with tags for cloning:trap_discovery');
-		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
+		$this->link = 'zabbix.php?action=host.prototype.list&parent_discoveryid='.$discoveryruleid.'&context=host';
 		$this->executeCloning('host prototype');
 	}
 
@@ -68,7 +68,7 @@ class testFormTagsHostPrototype extends testFormTags {
 	public function testFormTagsHostPrototype_HostClone() {
 		$this->host = 'Host with tags for cloning';
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->host.':trap_discovery');
-		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
+		$this->link = 'zabbix.php?action=host.prototype.list&parent_discoveryid='.$discoveryruleid.'&context=host';
 		$this->executeCloningByParent('host prototype', 'Host');
 	}
 
@@ -77,7 +77,7 @@ class testFormTagsHostPrototype extends testFormTags {
 	 */
 	public function testFormTagsHostPrototype_TemplateClone() {
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->template.':template_trap_discovery');
-		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=template';
+		$this->link = 'zabbix.php?action=host.prototype.list&parent_discoveryid='.$discoveryruleid.'&context=template';
 		$this->clone_name = '{#TEMPLATE} prototype with tags for cloning';
 		$this->executeCloningByParent('host prototype', 'Template');
 	}
@@ -90,8 +90,8 @@ class testFormTagsHostPrototype extends testFormTags {
 	public function testFormTagsHostPrototype_InheritedElementTags($data) {
 		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->template.':template_trap_discovery');
-		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=template';
-		$this->saved_link = 'host_prototypes.php?form=update&context=template&parent_discoveryid='.$discoveryruleid.'&hostid=';
+		$this->link = 'zabbix.php?action=host.prototype.list&parent_discoveryid='.$discoveryruleid.'&context=template';
+		$this->saved_link = 'zabbix.php?action=popup&popup=host.prototype.edit&context=host&parent_discoveryid='.$discoveryruleid.'&hostid=';
 		$host_link = 'host_discovery.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
 
 		$form = $this->checkTagsCreate($data, 'host prototype');
@@ -110,7 +110,7 @@ class testFormTagsHostPrototype extends testFormTags {
 		// Check disabled fields.
 		foreach ($tags_table->getRows() as $row) {
 			foreach (['Name', 'Value', ''] as $field) {
-				$this->assertFalse($row->getColumn($field)->children()->one()->detect()->isEnabled());
+				$this->assertFalse($row->getColumn($field)->children()->one()->isEnabled());
 			}
 		}
 	}
@@ -120,8 +120,8 @@ class testFormTagsHostPrototype extends testFormTags {
 	 */
 	public function testFormTagsHostPrototype_RemoveTags() {
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.Host for tags testing:trap_discovery');
-		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
-		$this->saved_link = 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$discoveryruleid.'&hostid=';
+		$this->link = 'zabbix.php?action=host.prototype.list&parent_discoveryid='.$discoveryruleid.'&context=host';
+		$this->saved_link = 'zabbix.php?action=popup&popup=host.prototype.edit&context=host&parent_discoveryid='.$discoveryruleid.'&hostid=';
 		$this->clearTags('host prototype');
 	}
 }

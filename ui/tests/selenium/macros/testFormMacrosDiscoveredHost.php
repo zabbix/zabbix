@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -404,6 +404,16 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 				$j++;
 			}
 		}
+
+		// Change the width of datatable columns so that the whole host name would be visible.
+		$layout = '{"columns":[{"id":"name","width":"270px"},{"id":"interface","width":"100px"},'.
+				'{"id":"availability","width":"148px"},{"id":"tags","resized":true,"width":"142px"},{"id":"tagvalue"},'.
+				'{"id":"status","width":"66px"},{"id":"latest_data","width":"98px"},'.
+				'{"id":"problems","resized":true,"width":"116px"},{"id":"graphs","width":"68px"},'.
+				'{"id":"dashboards","width":"95px"},{"id":"web","width":"82px"}],"options":{},'.
+				'"sort_field":"name","sort_order":"ASC"}';
+
+		$this->updateDatatableLayout($layout, 'web.monitoring.hosts.datatable');
 	}
 
 	public static function getDiscoveredHostUpdateMacrosData() {
@@ -600,7 +610,8 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 */
 	public function testFormMacrosDiscoveredHost_CheckInheritedMacros() {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
-		$this->query('link', self::$hosts[8]['name'])->asPopupButton()->one()->select('Host');
+		$this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$this->query('link', self::$hosts[8]['name'])->asPopupButton()->one()->waitUntilPresent()->select('Host');
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->selectTab('Macros');
 

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -277,6 +277,7 @@ class WidgetProblems extends CTableInfo {
 					$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE))
 						->addClass(ZBX_STYLE_COLOR_ICON)
 						->addClass('js-blink')
+						->setAttribute('aria-label', _('Manually unsuppressed'))
 						->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
 				}
 				elseif ($problem['suppression_data']) {

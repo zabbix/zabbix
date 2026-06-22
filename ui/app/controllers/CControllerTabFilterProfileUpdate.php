@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -24,9 +24,9 @@
 class CControllerTabFilterProfileUpdate extends CController {
 
 	public static $namespaces = [
-		CControllerHost::FILTER_IDX => CControllerHost::FILTER_FIELDS_DEFAULT,
-		CControllerProblem::FILTER_IDX => CControllerProblem::FILTER_FIELDS_DEFAULT,
-		CControllerLatest::FILTER_IDX => CControllerLatest::FILTER_FIELDS_DEFAULT
+		'web.monitoring.hosts' => CControllerHost::FILTER_FIELDS_DEFAULT,
+		'web.monitoring.problem' => CControllerProblem::FILTER_FIELDS_DEFAULT,
+		'web.monitoring.latest' => CControllerLatest::FILTER_FIELDS_DEFAULT
 	];
 
 	protected function checkPermissions() {

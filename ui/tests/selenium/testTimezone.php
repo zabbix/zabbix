@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,6 +18,8 @@ require_once __DIR__.'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup users, settings
+ *
+ * @dataSource MonitoringOverview
  */
 class testTimezone extends CWebTest {
 
@@ -193,7 +195,7 @@ class testTimezone extends CWebTest {
 		}
 		$form->fill($data['fields']);
 		$form->selectTab('Permissions');
-		$form->fill(['Role' => 'Super admin role']);
+		$form->fill(['Role' => CFormElement::RELOADABLE_FILL('Super admin role')]);
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'User added');
 		$this->page->logout();
@@ -240,7 +242,7 @@ class testTimezone extends CWebTest {
 	 * @param string $problem   problem name from monitoring->problems
 	 */
 	private function getProblemTime($problem) {
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 		$row = $table->findRow('Problem', $problem);
 		return date_create($row->getColumn('Time')->getText());
 	}

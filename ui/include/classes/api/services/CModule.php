@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,10 +20,10 @@
 class CModule extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'feature_flag' => 'modules_config_enabled'],
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN, 'feature_flag' => 'modules_config_enabled'],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN, 'feature_flag' => 'modules_config_enabled'],
+		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN, 'feature_flag' => 'modules_config_enabled']
 	];
 
 	protected $tableName = 'module';

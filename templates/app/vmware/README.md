@@ -25,23 +25,23 @@ This template has been tested on:
 
 ## Setup
 
-1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`)
-2. Set the `StartVMwareCollectors` option in the Zabbix server configuration file to "1" or more
-3. Create a new host
-4. If you want to use a separate user for monitoring, make sure that the user is a member of the `SystemConfiguration.ReadOnly` and `vStatsGroup` groups
+1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`).
+2. Set the `StartVMwareCollectors` option in the Zabbix server configuration file to "1" or more.
+3. Create a new host.
+4. If you want to use a separate user for monitoring, make sure that the user is a member of the `SystemConfiguration.ReadOnly` and `vStatsGroup` groups.
 Set the host macros (on the host or template level) required for VMware authentication:
 ```text
 {$VMWARE.URL}
 {$VMWARE.USERNAME}
 {$VMWARE.PASSWORD}
 ```
-5. Link the template to the host created earlier
+5. Link the template to the host created earlier.
 
 Note: To enable discovery of hardware sensors of VMware hypervisors, set the macro `{$VMWARE.HV.SENSOR.DISCOVERY}` to the value `true` on the discovered host level.
 
 Additional resources:
-- How to [create a custom performance counter](https://www.zabbix.com/documentation/8.0/manual/vm_monitoring/vmware_keys#footnotes)
-- How to get all supported counters and [generate a path for the custom performance counter](https://www.zabbix.com/documentation/8.0/manual/appendix/items/perf_counters)
+- How to [create a custom performance counter](https://www.zabbix.com/documentation/8.0/manual/vm_monitoring/vmware_keys#footnotes).
+- How to get all supported counters and [generate a path for the custom performance counter](https://www.zabbix.com/documentation/8.0/manual/appendix/items/perf_counters).
 
 ### Macros used
 
@@ -87,13 +87,13 @@ Additional resources:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#VMWARE.ALARMS.NAME}|<p>VMware alarm status.</p>|Dependent item|vmware.alarms.status["{#VMWARE.ALARMS.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.key == "{#VMWARE.ALARMS.KEY}")].key.first()`</p><p>⛔️Custom on fail: Set value to: `-1`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|{#VMWARE.ALARMS.NAME} {#VMWARE.ALARMS.ENTITY.NAME}|<p>VMware alarm status.</p>|Dependent item|vmware.alarms.status["{#VMWARE.ALARMS.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.key == "{#VMWARE.ALARMS.KEY}")].key.first()`</p><p>⛔️Custom on fail: Set value to: `-1`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for VMware alarm discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|VMware: {#VMWARE.ALARMS.NAME}|<p>{#VMWARE.ALARMS.DESC}</p>|`last(/VMware/vmware.alarms.status["{#VMWARE.ALARMS.KEY}"])<>-1`|Not_classified||
+|VMware: {#VMWARE.ALARMS.NAME} {#VMWARE.ALARMS.ENTITY.NAME}|<p>'{#VMWARE.ALARMS.DESC}'<br>Type: {#VMWARE.ALARMS.ENTITY.TYPE} <br>UUID: {#VMWARE.ALARMS.ENTITY.UUID}<br>ID: {#VMWARE.ALARMS.ENTITY.ID}</p>|`last(/VMware/vmware.alarms.status["{#VMWARE.ALARMS.KEY}"])<>-1`|Not_classified||
 
 ### LLD rule VMware cluster discovery
 
@@ -300,9 +300,9 @@ This template has been tested on:
 ## Setup
 
 To use this template as manually linked to a host:
-  1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`)
-  2. Set the `StartVMwareCollectors` option in the Zabbix server configuration file to "1" or more
-  3. Create a new host
+  1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`).
+  2. Set the `StartVMwareCollectors` option in the Zabbix server configuration file to "1" or more.
+  3. Create a new host.
   4. Set the host macros (on the host or template level) required for VMware authentication:
   ```text
   {$VMWARE.URL}
@@ -314,8 +314,8 @@ To use this template as manually linked to a host:
   ```text
   vim-cmd hostsvc/hostsummary | grep uuid
   ```
-  7. Add the agent interface on the host with the address (IP or DNS) of the VMware hypervisor
-  8. Link the template to the host created earlier
+  7. Add the agent interface on the host with the address (IP or DNS) of the VMware hypervisor.
+  8. Link the template to the host created earlier.
 
 ### Macros used
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,6 +17,7 @@
 #include "template.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
+#include "tag_cache.h"
 
 #include "zbxcacheconfig.h"
 #include "audit/zbxaudit_host.h"
@@ -1115,15 +1116,15 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 
 		sql_offset = 0;
 
+		/* check if items from template require interfaces and */
+		/* are interfaces of required types configured for host */
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct type"
 				" from items"
-				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)"
+				" where type in (%d,%d,%d,%d,%d)"
 					" and",
-				/* item types with interface types INTERFACE_TYPE_OPT or INTERFACE_TYPE_UNKNOWN */
-				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
-				ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED_LLD);
+				ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_SNMP);
+
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				templateids->values, templateids->values_num);
 
@@ -1134,21 +1135,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 			type = (unsigned char)atoi(trow[0]);
 			type = zbx_get_interface_type_by_item_type(type);
 
-			if (INTERFACE_TYPE_ANY == type)
-			{
-				for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
-				{
-					if (0 != interfaceids[i])
-						break;
-				}
-
-				if (INTERFACE_TYPE_COUNT == i)
-				{
-					zbx_strlcpy(error, "cannot find any interfaces on host", max_error_len);
-					ret = FAIL;
-				}
-			}
-			else if (0 == interfaceids[type - 1])
+			if ((INTERFACE_TYPE_AGENT == type || INTERFACE_TYPE_SNMP == type ||
+					INTERFACE_TYPE_IPMI == type || INTERFACE_TYPE_JMX == type) &&
+					0 == interfaceids[type - 1])
 			{
 				zbx_snprintf(error, max_error_len, "cannot find \"%s\" host interface",
 						zbx_interface_type_string((zbx_interface_type_t)type));
@@ -1188,46 +1177,6 @@ static void	DBupdate_action_conditions(int conditiontype, const zbx_vector_uint6
 
 /******************************************************************************
  *                                                                            *
- * Purpose:  adds table and field with specific id to housekeeper list        *
- *                                                                            *
- * Parameters: ids       - [IN] identifiers for data removal                  *
- *             field     - [IN] field name from table                         *
- *             tables_hk - [IN] table name to delete information from         *
- *             count     - [IN] number of tables in tables array              *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-static void	DBadd_to_housekeeper(const zbx_vector_uint64_t *ids, const char *field, const char * const *tables_hk,
-		int count)
-{
-	int		i, j;
-	zbx_uint64_t	housekeeperid;
-	zbx_db_insert_t	db_insert;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, ids->values_num);
-
-	if (0 == ids->values_num)
-		goto out;
-
-	housekeeperid = zbx_db_get_maxid_num("housekeeper", count * ids->values_num);
-
-	zbx_db_insert_prepare(&db_insert, "housekeeper", "housekeeperid", "tablename", "field", "value", (char *)NULL);
-
-	for (i = 0; i < ids->values_num; i++)
-	{
-		for (j = 0; j < count; j++)
-			zbx_db_insert_add_values(&db_insert, housekeeperid++, tables_hk[j], field, ids->values[i]);
-	}
-
-	zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: deletes trigger from database                                     *
  *                                                                            *
  * Parameters:                                                                *
@@ -1238,7 +1187,6 @@ out:
 void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_mode)
 {
 	zbx_vector_uint64_t	selementids;
-	const char		*event_tables[] = {"events"};
 	zbx_vector_uint64_t	linkids;
 
 	if (0 == triggerids->values_num)
@@ -1271,9 +1219,6 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 					" and",
 				"selementid", &selementids);
 	}
-
-	/* add housekeeper task to delete problems associated with trigger, this allows old events to be deleted */
-	DBadd_to_housekeeper(triggerids, "triggerid", event_tables, ARRSIZE(event_tables));
 
 	DBupdate_trigger_map_links(&linkids);
 
@@ -1668,10 +1613,7 @@ static void	db_get_item_prototypes(const zbx_vector_uint64_t *itemids, zbx_vecto
 void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 {
 	zbx_vector_uint64_t	profileids;
-	const char		*event_tables[] = {"events"};
 	const char		*profile_idx = "web.favorite.graphids";
-	int			history_mode, trends_mode;
-	zbx_vector_str_t	hk_history;
 	zbx_vector_uint64_t	itemids_linked, linked_llruleids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, itemids->values_num);
@@ -1713,35 +1655,6 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 
 	DBdelete_graphs_by_itemids(itemids, audit_context_mode);
 	DBdelete_triggers_by_itemids(itemids, audit_context_mode);
-
-	zbx_config_get_hk_mode(&history_mode, &trends_mode);
-
-	zbx_vector_str_create(&hk_history);
-
-	if (ZBX_HK_MODE_REGULAR == history_mode)
-	{
-		zbx_vector_str_append(&hk_history, "history");
-		zbx_vector_str_append(&hk_history, "history_str");
-		zbx_vector_str_append(&hk_history, "history_uint");
-		zbx_vector_str_append(&hk_history, "history_log");
-		zbx_vector_str_append(&hk_history, "history_text");
-		zbx_vector_str_append(&hk_history, "history_bin");
-	}
-
-	if (ZBX_HK_MODE_REGULAR == trends_mode)
-	{
-		zbx_vector_str_append(&hk_history, "trends");
-		zbx_vector_str_append(&hk_history, "trends_uint");
-	}
-
-	if (0 != hk_history.values_num)
-		DBadd_to_housekeeper(itemids, "itemid", (const char * const *)hk_history.values, hk_history.values_num);
-
-	zbx_vector_str_destroy(&hk_history);
-
-	/* add housekeeper task to delete problems associated with item, this allows old events to be deleted */
-	DBadd_to_housekeeper(itemids, "itemid", event_tables, ARRSIZE(event_tables));
-	DBadd_to_housekeeper(itemids, "lldruleid", event_tables, ARRSIZE(event_tables));
 
 	/* delete from profiles */
 	DBget_profiles_by_source_idxs_values(&profileids, "itemid", &profile_idx, 1, itemids);
@@ -2410,6 +2323,9 @@ int	zbx_db_delete_template_elements(zbx_uint64_t hostid, const char *hostname, z
 	zbx_db_execute("%s", sql);
 
 	zbx_free(sql);
+
+	if (SUCCEED != (res = zbx_db_delete_host_template_cache(hostid, del_templateids)))
+		*error = zbx_dsprintf(NULL, "failed to delete host tag cache for hostid: " ZBX_FS_UI64, hostid);
 clean:
 	zbx_vector_uint64_destroy(&templateids);
 
@@ -4126,7 +4042,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 				zbx_audit_host_update_json_add_hostmacro(audit_context_mode,
 						host_prototype->hostid, ZBX_AUDIT_RESOURCE_HOST_PROTOTYPE,
 						new_hostmacroid, hostmacro->macro, (ZBX_MACRO_VALUE_SECRET ==
-						(int)hostmacro->type) ? ZBX_MACRO_SECRET_MASK : hostmacro->value,
+						(int)hostmacro->type) ? ZBX_SECRET_MASK : hostmacro->value,
 						hostmacro->description, (int)hostmacro->type,
 						(int)hostmacro->automatic);
 				new_hostmacroid++;
@@ -4154,9 +4070,9 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type_orig) ||
 							(0 == (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE_TYPE) &&
 							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type)) ?
-							ZBX_MACRO_SECRET_MASK : hostmacro->value_orig,
+							ZBX_SECRET_MASK : hostmacro->value_orig,
 							(ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type) ?
-							ZBX_MACRO_SECRET_MASK : hostmacro->value);
+							ZBX_SECRET_MASK : hostmacro->value);
 				}
 
 				if (0 != (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE_DESCRIPTION))
@@ -5443,8 +5359,8 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 			zbx_free(str_esc);									\
 														\
 			zbx_audit_httptest_update_json_update_##field(audit_context_mode, httptest->httptestid, \
-					(0 == strcmp("", httptest->field##_orig) ? "" :ZBX_MACRO_SECRET_MASK),	\
-					(0 == strcmp("", httptest->field) ? "" : ZBX_MACRO_SECRET_MASK));	\
+					(0 == strcmp("", httptest->field##_orig) ? "" :ZBX_SECRET_MASK),	\
+					(0 == strcmp("", httptest->field) ? "" : ZBX_SECRET_MASK));	\
 		}
 
 #define PREPARE_UPDATE_HTTPTEST_INT(FLAG, field)								\
@@ -5870,6 +5786,12 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 	if (0 == lnk_templateids->values_num)
 		goto clean;
 
+	if (FAIL == (res = zbx_db_copy_host_template_cache(hostid, lnk_templateids)))
+	{
+		*error = zbx_dsprintf(NULL, "failed to copy host tag cache for hostid: " ZBX_FS_UI64, hostid);
+		goto clean;
+	}
+
 	hosttemplateid = zbx_db_get_maxid_num("hosts_templates", lnk_templateids->values_num);
 
 	db_insert_htemplates = zbx_malloc(NULL, sizeof(zbx_db_insert_t));
@@ -5900,7 +5822,6 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 		DBcopy_template_httptests(hostid, lnk_templateids, audit_context_mode);
 	}
 clean:
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
 	return res;
@@ -6001,21 +5922,6 @@ static zbx_uint64_t	permission_hgset_add(const char *hash_str, zbx_vector_uint64
 	return hgsetid;
 }
 
-static void	permission_hgset_remove(zbx_uint64_t hgsetid)
-{
-	char		*sql;
-	zbx_db_result_t	result;
-
-	sql = zbx_dsprintf(NULL, "select null from host_hgset where hgsetid=" ZBX_FS_UI64, hgsetid);
-	result = zbx_db_select_n(sql, 1);
-	zbx_free(sql);
-
-	if (NULL == zbx_db_fetch(result))
-		zbx_db_execute("delete from hgset where hgsetid=" ZBX_FS_UI64, hgsetid);
-
-	zbx_db_free_result(result);
-}
-
 static void	host_permissions_update(zbx_uint64_t hostid)
 {
 	zbx_uint64_t		hgsetid = 0, hgsetid_old = 0;
@@ -6053,11 +5959,9 @@ static void	host_permissions_update(zbx_uint64_t hostid)
 
 	if (0 != hgsetid_old)
 	{
-		if (ZBX_DB_OK <= zbx_db_execute("update host_hgset set hgsetid=" ZBX_FS_UI64
-				" where hostid=" ZBX_FS_UI64, hgsetid, hostid))
-		{
-			permission_hgset_remove(hgsetid_old);
-		}
+		/* cleanup of hgset will be performed by housekeeper because hgset becomes unlinked from hosts */
+		zbx_db_execute("update host_hgset set hgsetid=" ZBX_FS_UI64 " where hostid=" ZBX_FS_UI64, hgsetid,
+				hostid);
 	}
 	else
 	{
@@ -6250,10 +6154,10 @@ static void	db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-	/* delete host groups sets */
+	/* mark host group sets for complete removal by housekeeper by unlinking host group sets from hosts */
 	if (0 < hgsetids_del.values_num)
 	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_hgset where");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids_del.values,
 				hgsetids_del.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
@@ -6318,6 +6222,48 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 	zbx_vector_str_destroy(&host_prototype_names);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieves IP of main interface of correct type for specified host *
+ *                                                                            *
+ * Parameters:                                                                *
+ *             hostid             - [IN] host id from database                *
+ *             type               - [IN] interface type                       *
+ *             ip_buffer          - [OUT] buffer for main interface IP        *
+ *             sz_ip_buffer       - [IN] size of ip_buffer                    *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_main_interface_ip(const zbx_uint64_t hostid, const unsigned char type,
+			char *ip_buffer, const size_t sz_ip_buffer)
+{
+	char		*sql;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		ret = FAIL;
+
+	sql = zbx_dsprintf(NULL,
+			"select ip"
+			" from interface"
+			" where hostid=" ZBX_FS_UI64
+				" and type=%d"
+				" and main<>0",
+			hostid, (int)type);
+
+	result = zbx_db_select_n(sql, 1);
+	zbx_free(sql);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_strlcpy(ip_buffer, row[0], sz_ip_buffer);
+		ret = SUCCEED;
+	}
+	zbx_db_free_result(result);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -6552,7 +6498,7 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 		if (NULL == (tbl = zbx_db_get_table("interface_snmp")))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		max_repetitions = atoi(zbx_db_get_field(tbl, "max_repetitions")->default_value);
@@ -7140,11 +7086,18 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	if (SUCCEED == ret)
 		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
-	/* delete hgsets */
+	/* mark hgsets for complete removal by housekeeper by unlinking hgsets from hosts */
 
 	sql_offset = 0;
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset where");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_hgset where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids.values,
+			hgsetids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	/* hgset_group has to be deleted to prevent error: */
+	/* update or delete on table "hstgrp" violates foreign key constraint on table "hgset_group" */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset_group where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids.values,
 			hgsetids.values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");

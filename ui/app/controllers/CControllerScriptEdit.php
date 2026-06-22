@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -185,7 +185,16 @@ class CControllerScriptEdit extends CController {
 
 		$data['is_global_scripts_enabled'] = CSettingsHelper::isGlobalScriptsEnabled();
 
-		$response = new CControllerResponseData($data);
+		$create_rules = (new CFormValidator(CControllerScriptCreate::getValidationRules()))->getRules();
+		$rules = $this->hasInput('scriptid')
+			? (new CFormValidator(CControllerScriptUpdate::getValidationRules()))->getRules()
+			: $create_rules;
+
+		$response = new CControllerResponseData([
+			'form' => $data,
+			'js_validation_rules' => $rules,
+			'js_clone_validation_rules' => $create_rules
+		]);
 		$response->setTitle(_('Configuration of scripts'));
 		$this->setResponse($response);
 	}

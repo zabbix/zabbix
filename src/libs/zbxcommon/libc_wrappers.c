@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -26,4 +26,17 @@ char	*zbx_strerror(int errnum)
 	zbx_snprintf(utf8_string, sizeof(utf8_string), "[%d] %s", errnum, strerror(errnum));
 
 	return utf8_string;
+}
+
+void	zbx_malloc_trim(time_t now, int period, size_t pad)
+{
+#ifdef HAVE_MALLOC_TRIM
+	static time_t	time_trim;
+
+	if (time_trim + period <= now)
+	{
+		malloc_trim(pad);
+		time_trim = now;
+	}
+#endif
 }

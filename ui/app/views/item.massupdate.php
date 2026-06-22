@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -144,7 +144,8 @@ $item_form_list
 				ITEM_VALUE_TYPE_STR => _('Character'),
 				ITEM_VALUE_TYPE_LOG => _('Log'),
 				ITEM_VALUE_TYPE_TEXT => _('Text'),
-				ITEM_VALUE_TYPE_BINARY => _('Binary')
+				ITEM_VALUE_TYPE_BINARY => _('Binary'),
+				ITEM_VALUE_TYPE_JSON => _('JSON')
 			]))
 	)
 	// Append units to form list.
@@ -384,7 +385,7 @@ $item_form_list->addRow(
 	)
 	->addRow(
 		(new CVisibilityBox('visible[trapper_hosts]', 'trapper_hosts', _('Original')))->setLabel(_('Allowed hosts')),
-		(new CTextBox('trapper_hosts', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('trapper_hosts', ZBX_DEFAULT_TRAPPER_HOSTS))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
 // Append master item select to form list.

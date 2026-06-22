@@ -41,11 +41,14 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "layout/grid-columns";
 @import "layout/form-grid";
 
+@import "components/banner";
 @import "components/buttons";
 @import "components/icons-extended";
+@import "components/calendar";
 @import "components/checkbox-list";
 @import "components/columns-wrapper";
 @import "components/dashboard/dashboard";
+@import "components/datatable";
 @import "components/diff";
 @import "components/entity-count";
 @import "components/expandable-subfilter";
@@ -79,6 +82,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/z-color-picker";
 @import "components/z-select";
 @import "components/z-sparkline";
+@import "components/z-textarea-flexible";
 
 @import "components/dashboard/widget-field-sparkline";
 
@@ -746,13 +750,25 @@ form {
 		white-space: nowrap;
 
 		label {
+			box-sizing: border-box;
 			display: block;
 			height: 24px;
 			line-height: 24px;
 			overflow: hidden;
 			text-overflow: ellipsis;
 
-			.btn-icon,
+			&:has(.btn-icon) {
+				position: relative;
+				margin-right: -2px;
+				padding-right: 23px;
+
+				.btn-icon {
+					position: absolute;
+					top: 4px;
+					right: 2px;
+				}
+			}
+
 			.icon {
 				margin-left: 5px;
 			}
@@ -846,6 +862,18 @@ form {
 		}
 	}
 
+	[aria-label] {
+		@if $ui-transitions {
+			transition: box-shadow $ui-controls-transition-duration ease-out;
+		}
+
+		&:focus {
+			border-radius: 2px;
+			outline: none;
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
+		}
+	}
+
 	.btn-icon {
 		&.btn-small {
 			top: 1px;
@@ -882,17 +910,6 @@ form {
 
 .border-left {
 	border-left: 1px solid $table-border-color;
-}
-
-.drag-drop-area {
-	@extend %found-bg;
-}
-
-.form-new-group {
-	border: 5px solid $lighter-green;
-	border-radius: 2px;
-	margin-left: -5px;
-	padding: 4px 0;
 }
 
 .list-check-radio {
@@ -1073,12 +1090,6 @@ select {
 		color: $font-color !important;
 		pointer-events: none;
 		@extend %form-disabled;
-	}
-}
-
-div {
-	.overlay-dialogue.wordbreak {
-		white-space: normal;
 	}
 }
 
@@ -1692,13 +1703,8 @@ div {
 	width: 100%;
 }
 
-.qr-code {
-	height: 190px;
-	width: 190px;
-	margin: 20px auto;
-}
-
 .qr-code img {
+	margin: 20px auto;
 	image-rendering: pixelated;
 }
 
@@ -1821,10 +1827,6 @@ div {
 	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 
-	.wordbreak {
-		white-space: normal;
-	}
-
 	.overlay-dialogue-header {
 		margin: -8px -10px 6px -10px;
 		padding: 8px 10px;
@@ -1900,12 +1902,6 @@ div {
 					}
 				}
 			}
-
-			.columns-wrapper {
-				.column-50:last-of-type {
-					margin-left: 10px;
-				}
-			}
 		}
 
 		.overlay-dialogue-controls {
@@ -1972,6 +1968,39 @@ div {
 		}
 	}
 
+	&.hintbox {
+		display: flex;
+		flex-direction: column;
+		box-sizing: border-box;
+		overflow: hidden;
+		padding-top: 20px;
+
+		&.hintbox-position-fixed {
+			position: fixed;
+		}
+
+		&:not(.hintbox-static) {
+			pointer-events: none;
+		}
+
+		&.hintbox-static {
+			padding-top: 0;
+
+			.hintbox-draggable-handle {
+				height: 20px;
+				width: 100%;
+				cursor: grab;
+			}
+		}
+
+		.hintbox-container {
+			overflow: auto;
+			padding-bottom: 1px; // for table correct size
+
+			@extend %webkit-scrollbar;
+		}
+	}
+
 	.hintbox-raw-data {
 		white-space: pre-wrap;
 	}
@@ -2029,6 +2058,13 @@ div {
 		}
 	}
 
+	#lldoperation_form {
+		.table-forms-td-right:has(z-textarea-flexible) {
+			display: flex;
+			align-items: flex-start;
+		}
+	}
+
 	.maps-container {
 		max-height: 128px;
 		overflow-y: auto;
@@ -2039,6 +2075,15 @@ div {
 	.table-forms-second-column {
 		float: right;
 		line-height: 24px;
+	}
+}
+
+// Modals.
+.modal-popup.modal-popup-static {
+	&.modal-popup-sla-edit,
+	&.modal-popup-proxy-edit,
+	&.modal-popup-connector-edit {
+		--modal-max-width: 750px;
 	}
 }
 
@@ -2196,16 +2241,6 @@ div {
 	}
 }
 
-.textarea-flexible {
-	min-height: 24px;
-	overflow: hidden;
-	resize: none;
-	word-break: break-word;
-	height: 24px;
-	line-height: 14px;
-	white-space: break-spaces;
-}
-
 .overlay-dialogue-body {
 	margin: 0 0 25px;
 	white-space: nowrap;
@@ -2236,119 +2271,8 @@ div {
 	opacity: .35;
 }
 
-.calendar {
-	width: 200px;
-
-	.calendar-year,
-	.calendar-month {
-		&.highlighted {
-			background-color: $action-hover-color;
-		}
-
-		&:focus {
-			outline: none;
-		}
-	}
-
-	table {
-		width: 100%;
-		margin: 5px 0;
-
-		thead {
-			text-transform: uppercase;
-			color: $font-alt-color;
-		}
-
-		tbody {
-			text-align: center;
-
-			td {
-				@if $ui-transitions {
-					transition: background-color $ui-controls-transition-duration ease-out;
-				}
-
-				&.selected {
-					background-color: $ui-bg-selected-color;
-					color: $white;
-
-					&:hover {
-						background-color: darken($ui-bg-selected-color, 4%);
-					}
-				}
-
-				&:hover {
-					background-color: $action-hover-color;
-					cursor: pointer;
-				}
-
-				&.highlighted {
-					@include btn-hover-active($btn-color, $btn-bg-color);
-					cursor: pointer;
-				}
-
-				&:focus {
-					outline: none;
-				}
-
-				span {
-					z-index: -1;
-					padding: 4px;
-					display: block;
-				}
-			}
-		}
-	}
-}
-
-.calendar-header {
-	text-align: center;
-
-	.btn-grey {
-		border: 0;
-		background-color: transparent;
-	}
-}
-
-.calendar-year {
-	height: 24px;
-	line-height: 26px;
-	display: table;
-	width: 100%;
-
-	button:first-child {
-		float: left;
-	}
-
-	button:last-child {
-		float: right;
-	}
-
-	button:hover {
-		background-color: $action-hover-color;
-		cursor: pointer;
-	}
-}
-
-.calendar-month {
-	@extend .calendar-year;
-}
-
-.calendar-time {
-	text-align: center;
-
-	input[type="text"] {
-		width: 32px;
-	}
-}
-
-.calendar-footer {
-	margin: 26px 0 0;
-	text-align: right;
-
-	.btn-grey {
-		float: left;
-		margin-top: 0;
-	}
+.hintbox-wrap {
+	display: block;
 }
 
 // Problem notification overlay.
@@ -2420,12 +2344,6 @@ div {
 	}
 }
 
-.dashed-border {
-	td {
-		border: 1px dashed $table-border-color;
-	}
-}
-
 .top {
 	vertical-align: top !important;
 }
@@ -2481,7 +2399,7 @@ div {
 	font-size: 12px;
 	line-height: 18px;
 	white-space: nowrap;
-	min-width: 145px;
+	min-width: 160px;
 
 	.table-paging {
 		min-height: 18px;
@@ -2499,27 +2417,58 @@ div {
 		box-shadow: none;
 	}
 
-	li {
-		padding-left: 23px;
+	.has-broadcast-data {
+		cursor: pointer;
 
-		.svg-graph-hintbox-icon-color {
-			@extend %icon-small;
-
-			display: inline-block;
-			float: left;
-			width: 12px;
-			height: 12px;
-			margin-left: -20px;
-			margin-top: -1px;
+		&:hover {
+			background-color: $action-hover-color;
 		}
+
+		&.selected {
+			@extend %found-bg;
+
+			&:hover {
+				@extend %found-bg;
+			}
+		}
+	}
+
+	.scatter-plot-hintbox-row {
+		&:not(:first-child) {
+			margin-top: 10px;
+		}
+
+		.scatter-plot-hintbox-row-axis {
+			display: flex;
+			flex-wrap: nowrap;
+			align-items: center;
+			white-space: pre;
+
+			.scatter-plot-hintbox-icon-color {
+				display: inline-block;
+				width: 12px;
+				height: 18px;
+				margin-right: 10px;
+
+				&::before {
+					font-size: 14px;
+				}
+			}
+		}
+	}
+
+	li {
+		display: flex;
+		width: fit-content;
+		align-items: center;
 
 		.svg-graph-hintbox-item-color,
 		.svg-graph-hintbox-trigger-color {
-			margin: 3px 10px 3px -20px;
-			width: 10px;
+			display: inline-block;
+			min-width: 10px;
 			height: 10px;
-			float: left;
-			display: block;
+			margin-left: 3px;
+			margin-right: 10px
 		}
 
 		.svg-graph-hintbox-trigger-color {
@@ -2560,6 +2509,10 @@ div {
 	background-color: $lighter-yellow;
 	border: 1px solid $ui-border-color;
 	@extend %webkit-scrollbar;
+
+	&.debug-output-table-refresh {
+		margin: 10px 0 0 0;
+	}
 }
 
 .overlay-descr {
@@ -2607,6 +2560,13 @@ div {
 		margin-top: 1px;
 		margin-bottom: 1px;
 	}
+
+	&.form-field {
+		.tag {
+			margin-top: 4px;
+			margin-bottom: 4px;
+		}
+	}
 }
 
 .tag {
@@ -2634,25 +2594,29 @@ div {
 		margin-right: 0;
 	}
 
-	&.green-bg {
-		color: darken($alt-green, 45%);
+	&.tag-inherited::before,
+	&.tag-inherited-duplicate::before {
+		@extend %icons-font;
+
+		margin-right: 3px;
+		font-size: $icon-smaller-size;
+		line-height: 12px;
+		vertical-align: top;
+		opacity: .6;
 	}
 
-	&.yellow-bg {
-		color: darken($alt-yellow, 45%);
+	&.tag-inherited::before {
+		content: $zi-file;
+	}
+
+	&.tag-inherited-duplicate::before {
+		content: $zi-file-filled;
 	}
 }
 
-.green-bg {
-	background-color: $alt-green;
-}
-
-.red-bg {
-	background-color: $alt-red;
-}
-
-.yellow-bg {
-	background-color: $alt-yellow;
+.tag-inherited-title {
+	margin-bottom: 3px;
+	color: $font-alt-color;
 }
 
 @each $severity-type, $color in (
@@ -3051,10 +3015,6 @@ main {
 	}
 }
 
-.graph-wrapper {
-	display: inline;
-}
-
 // Analog Clock.
 .clock {
 	display: flex;
@@ -3065,16 +3025,6 @@ main {
 
 .clock-svg {
 	flex-grow: 1;
-}
-
-.time-zone {
-	margin: 0 0 .5em;
-	white-space: nowrap;
-}
-
-.local-clock {
-	margin: .5em 0 0;
-	white-space: nowrap;
 }
 
 .clock-face {
@@ -3260,7 +3210,8 @@ svg {
 	}
 
 	input[type=text],
-	select {
+	select,
+	z-textarea-flexible {
 		width: 100%;
 		min-width: 0; // https://stackoverflow.com/a/43361500
 	}
@@ -3314,6 +3265,13 @@ svg {
 		}
 	}
 
+	.preprocessing-list-item {
+		.step-parameters {
+			align-items: baseline;
+			line-height: 22px;
+		}
+	}
+
 	.step-parameters {
 		flex: 1;
 
@@ -3322,7 +3280,8 @@ svg {
 		}
 
 		> input[type=text],
-		z-select {
+		z-select,
+		z-textarea-flexible {
 			&:not(:last-child) {
 				margin-right: 5px;
 			}
@@ -3343,14 +3302,18 @@ svg {
 	}
 
 	.on-fail-options {
+		display: flex;
+		align-items: flex-start;
 		padding-right: $on-fail-width + $action-width + 5px;
-		margin-bottom: 5px;
+		margin-top: 6px;
+		line-height: 24px;
 
 		> label {
+			padding-top: 0;
 			padding-left: 30px;
 		}
 
-		input[type=text] {
+		z-textarea-flexible {
 			flex: 1;
 
 			&:not(:first-child) {
@@ -3619,6 +3582,7 @@ svg {
 
 	.btn-undo {
 		display: none;
+		height: auto;
 		color: $icon-color;
 		background-color: $form-bg-color;
 		border-width: 1px 0;
@@ -3637,6 +3601,28 @@ svg {
 
 		&.is-focused {
 			border-color: $form-focus-border-color;
+		}
+	}
+
+	z-textarea-flexible {
+		flex: 1;
+
+		textarea {
+			border-right: 0;
+
+			&:focus {
+				+ .btn-undo {
+					border-color: $form-focus-border-color;
+				}
+			}
+		}
+	}
+}
+
+.macro-value-secret {
+	z-textarea-flexible {
+		textarea {
+			-webkit-text-security: disc;
 		}
 	}
 }
@@ -4010,11 +3996,6 @@ z-select {
 		background: $header-bg-color;
 		z-index: 3;
 	}
-
-	.textarea-flexible {
-		max-height: 200px;
-		overflow-y: auto;
-	}
 }
 
 .global-macro-table,
@@ -4242,6 +4223,10 @@ z-select {
 		}
 
 		&.link-alt:not(:hover):not(:focus) {
+			@extend .#{$class};
+		}
+
+		&.link:not(:hover):not(:focus) {
 			@extend .#{$class};
 		}
 	}

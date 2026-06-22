@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -28,10 +28,13 @@ window.valuemap_edit_popup = {
 	init({rules, mappings}) {
 		this.overlay = overlays_stack.getById('valuemap_edit');
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.footer = this.overlay.$dialogue.$footer[0];
 		this.form = rules !== null ? new CForm(this.form_element, rules) : null;
 		this.mappings = mappings;
 
 		this.initMappingTable();
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.submit());
 	},
 
 	submit() {
@@ -69,14 +72,15 @@ window.valuemap_edit_popup = {
 		})
 			.then(response => response.json())
 			.then(response => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
 				if ('form_errors' in response) {
 					this.form.setErrors(response.form_errors, true, true);
 					this.form.renderErrors();
 
 					return;
-				}
-				else if ('error' in response) {
-					throw {error: response.error};
 				}
 
 				new AddValueMap(response, 'edit' in fields ? this.overlay.element.closest('tr') : null);
@@ -146,15 +150,15 @@ window.valuemap_edit_popup = {
 
 		this.table.querySelectorAll('tr').forEach((row) => {
 			const select = row.querySelector('z-select[name$="[type]"]');
-			const input = row.querySelector('input[name$="[value]"]');
+			const textarea = row.querySelector('z-textarea-flexible[name$="[value]"]');
 
 			if (select) {
 				select.getOptionByValue(<?= VALUEMAP_MAPPING_TYPE_DEFAULT ?>).disabled = (default_select
 					&& select !== default_select
 				);
-				input.classList.toggle('visibility-hidden', (select === default_select));
-				input.disabled = (select === default_select);
-				input.setAttribute('placeholder', this.type_placeholder[select.value] || '');
+				textarea.classList.toggle('visibility-hidden', select === default_select);
+				textarea.disabled = select === default_select;
+				textarea.placeholder = this.type_placeholder[select.value] || '';
 			}
 		});
 	},

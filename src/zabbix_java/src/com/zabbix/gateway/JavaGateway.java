@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,6 +16,7 @@ package com.zabbix.gateway;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.*;
 import java.util.Map;
 import java.util.HashMap;
@@ -59,6 +60,15 @@ public class JavaGateway
 		{
 			ConfigurationManager.parseConfiguration();
 
+			String serverList = (String)ConfigurationManager.getParameter(ConfigurationManager.SERVER).getValue();
+			int timeout = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.TIMEOUT);
+			AllowedPeers allowedPeers = AllowedPeers.parse(serverList, timeout);
+
+			if (allowedPeers.isEmpty())
+				logger.warn("allowed hosts list is empty (or has no valid entries); all incoming connections will be rejected");
+			else
+				logger.info("accepting connections only from allowed hosts: {}", serverList);
+
 			InetAddress listenIP = (InetAddress)ConfigurationManager.getParameter(ConfigurationManager.LISTEN_IP).getValue();
 			int listenPort = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.LISTEN_PORT);
 
@@ -76,7 +86,23 @@ public class JavaGateway
 			logger.debug("created a thread pool of {} pollers", startPollers);
 
 			while (true)
-				threadPool.execute(new SocketProcessor(socket.accept()));
+			{
+				Socket client = socket.accept();
+				InetAddress peer = client.getInetAddress();
+
+				if (!allowedPeers.check(peer))
+				{
+					logger.warn("connection from {} rejected, allowed hosts: {}",
+							peer.getHostAddress(), serverList);
+
+					try { client.close(); }
+					catch (Exception e) { logger.debug("failed to close rejected connection", e); }
+
+					continue;
+				}
+
+				threadPool.execute(new SocketProcessor(client));
+			}
 		}
 		catch (Exception e)
 		{

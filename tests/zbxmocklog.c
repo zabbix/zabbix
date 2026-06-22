@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,6 +15,18 @@
 #include "zbxmocktest.h"
 
 #include "zbxcommon.h"
+
+static int	mock_log_level = LOG_LEVEL_TRACE;
+
+int	zbx_mock_get_log_level_impl(void)
+{
+	return mock_log_level;
+}
+
+void	zbx_mock_set_log_level(int level)
+{
+	mock_log_level = level;
+}
 
 void	zbx_mock_log_impl(int level, const char *fmt, va_list args)
 {

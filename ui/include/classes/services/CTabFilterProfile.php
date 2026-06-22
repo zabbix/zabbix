@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,12 +19,14 @@
  */
 class CTabFilterProfile {
 
+	private const SOURCE_NAMES = ['tabfilters', 'datatables'];
+
 	/**
 	 * Profile Idx value base, additional settings will be used with this string as prefix.
 	 *
-	 * @var array
+	 * @var string
 	 */
-	protected $namespace;
+	protected string $namespace;
 
 	/**
 	 * Index of selected tab, zero when no tabs are selected.
@@ -69,6 +71,11 @@ class CTabFilterProfile {
 	public $tabfilters;
 
 	/**
+	 * @var array
+	 */
+	private array $datatables = [];
+
+	/**
 	 * Array of tabs filter arrays with default data but without user modified input.
 	 * Tab filter properties:
 	 * @property string []['filter_name']          Tab label.
@@ -88,7 +95,11 @@ class CTabFilterProfile {
 
 	public function __construct($idx, array $filter_defaults) {
 		$this->namespace = $idx;
-		$this->tabfilters = [];
+
+		foreach (self::SOURCE_NAMES as $source_name) {
+			$this->{$source_name} = [];
+		}
+
 		$filter_defaults = array_intersect_key([
 			'from' => 'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT),
 			'to' => 'now'
@@ -125,6 +136,7 @@ class CTabFilterProfile {
 	public function setTabFilter($index, array $input) {
 		$input = array_intersect_key($input, $this->filter_defaults);
 		$this->tabfilters[$index] = $input;
+		$this->datatables[$index] = [];
 		$this->selected = $index;
 
 		return $this;
@@ -220,14 +232,17 @@ class CTabFilterProfile {
 	 *
 	 * @param string $taborder  Comma separated string of tab indexes.
 	 */
-	public function sort(string $taborder) {
-		$source = $this->tabfilters;
-		$this->tabfilters = [];
+	public function sort(string $taborder): self {
 		$taborder = explode(',', $taborder);
 
-		foreach ($taborder as $index) {
-			if (array_key_exists($index, $source)) {
-				$this->tabfilters[$index] = $source[$index];
+		foreach (self::SOURCE_NAMES as $source_name) {
+			$source = $this->$source_name;
+			$this->$source_name = [];
+
+			foreach ($taborder as $index) {
+				if (array_key_exists($index, $source)) {
+					$this->{$source_name}[$index] = $source[$index];
+				}
 			}
 		}
 
@@ -248,7 +263,9 @@ class CTabFilterProfile {
 	 */
 	public function deleteTab(int $index) {
 		if ($index > 0) {
-			unset($this->tabfilters[$index]);
+			foreach (self::SOURCE_NAMES as $source_name) {
+				unset($this->{$source_name}[$index]);
+			}
 
 			if ($this->selected == $index) {
 				$this->selected = $index - 1;
@@ -290,6 +307,7 @@ class CTabFilterProfile {
 
 		// CProfile::updateArray assign new idx2 values do not need to store order in profile
 		$this->tabfilters = CProfile::getArray($this->namespace.'.properties', []);
+		$this->datatables = CProfile::getArray($this->namespace.'.datatable', []);
 
 		foreach ($this->tabfilters as &$tabfilter) {
 			$tabfilter = json_decode($tabfilter, true);
@@ -312,6 +330,11 @@ class CTabFilterProfile {
 		$tabfilters = $this->getTabFiltersProperties();
 
 		CProfile::updateArray($this->namespace.'.properties', array_map('json_encode', $tabfilters), PROFILE_TYPE_STR);
+
+		if ($this->datatables) {
+			CProfile::updateArray($this->namespace . '.datatable', $this->datatables, PROFILE_TYPE_STR);
+		}
+
 		CProfile::update($this->namespace.'.selected', $this->selected, PROFILE_TYPE_INT);
 		CProfile::update($this->namespace.'.expanded', (int) $this->expanded, PROFILE_TYPE_INT);
 		CProfile::update($this->namespace.'.expanded_timeselector', (int) $this->expanded_timeselector,

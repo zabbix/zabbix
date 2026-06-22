@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -522,7 +522,7 @@ void	zbx_list_init_pool(zbx_list_t *list, int slots_num)
 	if (NULL != list->item_pool)
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("memory pool has been already initialized");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	list->item_pool = list_item_pool_create(list, slots_num);

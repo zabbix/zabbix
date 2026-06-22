@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,8 +15,7 @@
 
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
-
-use Facebook\WebDriver\WebDriverBy;
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 
 /**
  * Test tag based permissions.
@@ -29,7 +28,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 	public function getBehaviors() {
 		return [
-			CTableBehavior::class
+			CDatatableBehavior::class
 		];
 	}
 
@@ -340,9 +339,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						$this->query('link', $hostgroup)->waitUntilVisible()->one()->click();
 
 						if ($tag !== '' || $value !== '') {
-							$form->fill(['Filter' => 'Tag list', 'id:new_tag_filter_0_tag' => $tag,
-									'id:new_tag_filter_0_value' => $value]
-							);
+							$form->fill(['id:new_tag_filters_0_tag' => $tag, 'id:new_tag_filters_0_value' => $value]);
 						}
 
 						$form->submit();
@@ -351,11 +348,11 @@ class testTagBasedPermissions extends CLegacyWebTest {
 				}
 
 				$xpath = '//table[@id="tag-filter-table"]//tbody//tr['.$i.']//td/button[text()="Remove"]';
-				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
+				$this->query('xpath:'.$xpath)->waitUntilVisible()->one();
 				$i++;
 			}
 
-			$this->zbxTestClick('update');
+			$this->zbxTestClickButtonText('Update');
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group updated');
 		}
 
@@ -464,9 +461,9 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Check problem displaying on Problem page
 		$this->zbxTestOpen(self::URL);
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table').']')->asTable()->one()->waitUntilVisible();
+		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 		$this->zbxTestTextNotPresent($data['trigger_names']);
-		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
+		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isDisplayed());
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 
 		// Check trigger filter on Problem page
@@ -479,9 +476,9 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			COverlayDialogElement::ensureNotPresent();
 			// Apply filter
 			$this->query('name:filter_apply')->one()->click();
-			$table->waitUntilReloaded();
+			$table->waitUntilReady();
 			$this->zbxTestTextPresent($name);
-			$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
+			$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isDisplayed());
 			$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 			// Reset filter.
 			$this->zbxTestClickButtonText('Reset');
@@ -574,7 +571,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Check problem displaying on Problem page
 		$this->zbxTestOpen(self::URL);
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
+		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 		$this->zbxTestTextPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$countTriggers.' of '.$countTriggers.' found');
 
@@ -587,8 +584,10 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			COverlayDialogElement::find()->one()->setDataContext(self::TRIGGER_HOST);
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
+			$headers = $table->getHeaders();
 			$this->query('name:filter_apply')->one()->click();
-			$table->waitUntilReloaded();
+			$headers->waitUntilStalled();
+			$table->waitUntilReady()->invalidate();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
 			// Reset filter.
@@ -678,7 +677,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Check problem displaying on Problem page
 		$this->zbxTestOpen(self::URL);
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
+		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 		$this->zbxTestTextPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$countTriggers.' of '.$countTriggers.' found');
 
@@ -690,13 +689,15 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			COverlayDialogElement::find()->one()->setDataContext(self::TRIGGER_HOST);
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
+			$headers = $table->getHeaders();
 			$this->query('name:filter_apply')->one()->click();
-			$table->waitUntilReloaded();
+			$headers->waitUntilStalled();
+			$table->waitUntilReady()->invalidate();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
 			// Reset filter.
 			$this->zbxTestClickButtonText('Reset');
-			$table->waitUntilReloaded();
+			$table->waitUntilReady();
 		}
 
 		// Check Event details page
@@ -862,6 +863,6 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->page->userLogin($data['user'], $data['password'])->open($url)->waitUntilReady();
 		}
 
-		$this->assertTableData($data['result']);
+		$this->assertDatatableData($data['result']);
 	}
 }

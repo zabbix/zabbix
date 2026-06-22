@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,6 +27,7 @@ class ConfigurationManager
 	private static final Logger logger = LoggerFactory.getLogger(ConfigurationManager.class);
 
 	static final String PID_FILE = "pidFile"; // has to be parsed first so that we remove the file if other parameters are bad
+	static final String SERVER = "server";
 	static final String LISTEN_IP = "listenIP";
 	static final String LISTEN_PORT = "listenPort";
 	static final String START_POLLERS = "startPollers";
@@ -60,6 +61,9 @@ class ConfigurationManager
 						}
 					}
 				}),
+		new ConfigurationParameter(SERVER, ConfigurationParameter.TYPE_STRING, "127.0.0.1,::1",
+				null,
+				null),
 		new ConfigurationParameter(LISTEN_IP, ConfigurationParameter.TYPE_INETADDRESS, null,
 				null,
 				null),

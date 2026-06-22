@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -335,12 +335,9 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 			$id = $widget.' '.$data['Tile provider'];
 			$element = $this->query("xpath://div[".CXPathHelper::fromClass('dashboard-grid-widget')."]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
-			// TODO: unstable screenshot on Jenkins. Remove border radius from zoom in element.
-			if ($widget === 'Geomap for screenshots, 10') {
-				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;',
-						[$element->query('class:leaflet-control-zoom-in')->one()]
-				);
-			}
+			// TODO: unstable screenshot on Jenkins. Added border radius and color for zoom elements.
+			$this->page->getDriver()->executeScript('arguments[0].style.cssText +=\'border-radius: 0; border-color: #000;\';',
+				[$element->query('class:leaflet-control-zoom')->one()]);
 
 			$count = count($this->errors);
 			$this->assertScreenshot($element, $id);

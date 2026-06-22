@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -113,6 +113,8 @@
 
 /* Binary item type can only be as a dependent item. */
 #define ZBX_HISTORY_BIN_VALUE_LEN		(ZBX_MEBIBYTE * 16)
+
+#define ZBX_HISTORY_JSON_VALUE_LEN		(ZBX_MEBIBYTE * 128)
 
 #define ZBX_HISTORY_LOG_SOURCE_LEN		64
 #define ZBX_HISTORY_LOG_SOURCE_LEN_MAX		(ZBX_HISTORY_LOG_SOURCE_LEN + 1)
@@ -313,15 +315,6 @@ typedef struct
 	char		*message;
 }
 zbx_db_alert;
-
-typedef struct
-{
-	zbx_uint64_t	housekeeperid;
-	char		*tablename;
-	char		*field;
-	zbx_uint64_t	value;
-}
-zbx_db_housekeeper;
 
 typedef struct
 {
@@ -779,6 +772,8 @@ void	zbx_lld_filter_clean(zbx_lld_filter_t *filter);
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 
+int	zbx_db_verify_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
+		unsigned char program_type);
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
 		unsigned char program_type);
 void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
@@ -876,5 +871,7 @@ const zbx_sync_row_t	*zbx_sync_rowset_search_by_id(const zbx_sync_rowset_t *rows
 zbx_sync_row_t	*zbx_sync_rowset_search_by_parent(zbx_sync_rowset_t *rowset, zbx_uint64_t parent_rowid);
 void	zbx_sync_rowset_rollback(zbx_sync_rowset_t *rowset);
 void	zbx_sync_rowset_copy(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src);
+
+int	zbx_db_settings_set_value(const char *name, const void *value, int type);
 
 #endif

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,7 +19,8 @@ namespace Widgets\HostCard\Actions;
 use API,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
-	CControllerResponseData;
+	CControllerResponseData,
+	CTagHelper;
 
 use Widgets\HostCard\Includes\CWidgetFieldHostSections;
 
@@ -253,32 +254,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if (in_array(CWidgetFieldHostSections::SECTION_TAGS, $this->fields_values['sections'])) {
-			// Merge host tags with template tags, and skip duplicate tags and values.
-			if (!$host['inheritedTags']) {
-				$tags = $host['tags'];
-			}
-			elseif (!$host['tags']) {
-				$tags = $host['inheritedTags'];
-			}
-			else {
-				$tags = $host['tags'];
+			CTagHelper::mergeOwnAndInheritedTagsForObject($host);
 
-				foreach ($host['inheritedTags'] as $template_tag) {
-					foreach ($tags as $host_tag) {
-						// Skip tags with same name and value.
-						if ($host_tag['tag'] === $template_tag['tag']
-								&& $host_tag['value'] === $template_tag['value']) {
-							continue 2;
-						}
-					}
-
-					$tags[] = $template_tag;
-				}
-			}
-
-			CArrayHelper::sort($tags, ['tag', 'value']);
-
-			$host['tags'] = $tags;
+			CArrayHelper::sort($host['tags'], ['tag', 'value']);
 		}
 
 		return $host;

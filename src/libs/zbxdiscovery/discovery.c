@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,10 +21,14 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxstats.h"
+#include "zbxip.h"
 
 #define DISCOVERER_INITIALIZED_YES	1
+#define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 
 static int	discoverer_initialized = 0;
+
+ZBX_VECTOR_IMPL(iprange, zbx_iprange_t)
 
 void	zbx_discoverer_init(void)
 {
@@ -92,19 +96,19 @@ static void	discovery_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t 
 			&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to discoverer service: %s", error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == zbx_ipc_socket_write(&socket, code, data, size))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to discoverer service");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (NULL != response && FAIL == zbx_ipc_socket_read(&socket, response))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot receive data from discoverer service");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -285,4 +289,89 @@ void	zbx_discovery_stats_procinfo(zbx_process_info_t *info)
 	info->count = usage.values_num;
 out:
 	zbx_vector_dbl_destroy(&usage);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parses IP ranges from drule                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_discovery_process_drule_iprange(const zbx_dc_drule_t *drule, zbx_vector_iprange_t *ipranges,
+		char *err, int sz_err)
+{
+	char	*comma, *start = drule->iprange;
+	int	i, ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __func__, drule->name, drule->iprange);
+
+	zbx_vector_iprange_clear(ipranges);
+
+	/* i = 1 to guarantee at least 1 iprange */
+	for (i = 1; NULL != (start = strchr(start, ',')); i++, start++);
+
+	zbx_vector_iprange_reserve(ipranges, (size_t)i);
+
+	for (start = drule->iprange; '\0' != *start;)
+	{
+		zbx_iprange_t	ipr;
+		int		res, ip_first[ZBX_IPRANGE_GROUPS_V6], z[ZBX_IPRANGE_GROUPS_V6] = {0};
+
+		if (NULL != (comma = strchr(start, ',')))
+			*comma = '\0';
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() range:'%s'", __func__, start);
+
+		if (SUCCEED == (res = zbx_iprange_parse(&ipr, start)))
+			zbx_iprange_first(&ipr, ip_first);
+
+		if (SUCCEED != res || 0 == memcmp(ip_first, z, sizeof(int) *
+				(ZBX_IPRANGE_V4 == ipr.type ? ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6)))
+		{
+			if (NULL != err)
+				zbx_snprintf(err, sz_err, "Wrong format of IP range \"%s\"", start);
+
+			ret = FAIL;
+			goto out;
+		}
+
+		if (ZBX_DISCOVERER_IPRANGE_LIMIT < zbx_iprange_volume(&ipr))
+		{
+			if (NULL != err)
+			{
+				zbx_snprintf(err, sz_err, "IP range \"%s\" exceeds %d address limit",
+						start, ZBX_DISCOVERER_IPRANGE_LIMIT);
+			}
+
+			ret = FAIL;
+			goto out;
+		}
+#ifndef HAVE_IPV6
+		if (ZBX_IPRANGE_V6 == ipr.type)
+		{
+			if (NULL != err)
+			{
+				zbx_snprintf(err, sz_err,
+						"Encountered IP range \"%s\", but IPv6 support not compiled in",
+						start);
+			}
+
+			ret = FAIL;
+			goto out;
+		}
+#endif
+		zbx_vector_iprange_append(ipranges, ipr);
+
+		if (NULL != comma)
+		{
+			*comma = ',';
+			start = comma + 1;
+		}
+		else
+			break;
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() drule:" ZBX_FS_UI64,
+			__func__, drule->druleid);
+
+	return ret;
 }

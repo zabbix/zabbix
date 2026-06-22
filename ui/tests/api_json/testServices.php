@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -2696,8 +2696,7 @@ class testServices extends CAPITest {
 					'tags' => null
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/tags": an array is expected.',
-					'result' => []
+					'error' => null
 				]
 			],
 			[
@@ -2776,8 +2775,7 @@ class testServices extends CAPITest {
 					'tags' => ['tag' => 'foo']
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/tags/1": an array is expected.',
-					'result' => []
+					'error' => null
 				]
 			],
 			[
@@ -3004,8 +3002,7 @@ class testServices extends CAPITest {
 					'problem_tags' => null
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/problem_tags": an array is expected.',
-					'result' => []
+					'error' => null
 				]
 			],
 			[
@@ -3084,8 +3081,7 @@ class testServices extends CAPITest {
 					'problem_tags' => ['tag' => 'foo']
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/problem_tags/1": an array is expected.',
-					'result' => []
+					'error' => null
 				]
 			],
 			[
@@ -4265,11 +4261,11 @@ class testServices extends CAPITest {
 	public function testServices_Get(array $request, array $expected): void {
 		$response = $this->call('service.get', $request, $expected['error']);
 
-		if ($expected['error'] !== null) {
+		if ($expected['error'] !== null || !array_key_exists('result', $expected)) {
 			return;
 		}
 
-		$this->assertEquals($response['result'], $expected['result']);
+		$this->assertEquals($expected['result'], $response['result']);
 	}
 
 	public static function service_update_data_invalid(): array {

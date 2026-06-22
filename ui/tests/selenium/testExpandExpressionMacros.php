@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -185,12 +185,12 @@ class testExpandExpressionMacros extends CWebTest {
 	public function testExpandExpressionMacros_Graph($data) {
 		$this->page->login()->open('zabbix.php?action=host.view&groupids%5B%5D='.self::$data['hostgroupid'])
 				->waitUntilReady();
-		$table = $this->query('xpath://form[@name="host_view"]/table[@class="list-table"]')->asTable()
-				->waitUntilReady()->one();
+		$table = $this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
 		$table->findRow('Name', $data['host_name'])->getColumn('Graphs')->query('tag:a')->one()->click();
 		$this->page->waitUntilReady();
 		$this->waitUntilGraphIsLoaded();
 		// TODO: This sleep is added here because of DEV-1908.
+		$this->page->updateViewPort();
 		sleep(1);
 		$covered_region = [
 			'x' => 78,

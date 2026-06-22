@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -163,16 +163,18 @@ class testGraphAxis extends CWebTest {
 
 		// Go to Graphs and set time period.
 		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
-		$table = $this->query('xpath://form[@name="host_view"]/table[@class="list-table"]')
-				->waitUntilReady()->asTable()->one();
-		$table->findRow('Name', 'Dynamic widgets H2')->getColumn('Graphs')->query('tag:a')->one()->click();
+		$table = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
+		$table->findRow('Name', 'Dynamic widgets H2')->getColumn('Graphs')->query('tag:a')->waitUntilClickable()->one()
+				->scrollIntoView(50)->click();
 		$this->page->waitUntilReady();
 		$this->waitUntilGraphIsLoaded();
 		$this->query('id:from')->one()->fill($data['start_period']);
 		$this->query('id:to')->one()->fill($data['end_period']);
 		$this->query('id:apply')->one()->waitUntilClickable()->click();
+
 		$this->page->waitUntilReady();
 		// TODO: This sleep is added here because of DEV-1908.
+		$this->page->updateViewPort();
 		sleep(1);
 		$this->assertScreenshot($this->waitUntilGraphIsLoaded(), $data['name']);
 	}

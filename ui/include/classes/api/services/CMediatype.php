@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -161,9 +161,8 @@ class CMediatype extends CApiService {
 				$options['mediaids'] = array_intersect($options['mediaids'], $accessible_mediaids);
 			}
 
-			$sql_parts['from']['media'] = 'media m';
+			$sql_parts['join']['m'] = ['table' => 'media', 'using' => 'mediatypeid'];
 			$sql_parts['where'][] = dbConditionId('m.mediaid', $options['mediaids']);
-			$sql_parts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
 		}
 
 		if ($options['userids'] !== null) {
@@ -171,19 +170,15 @@ class CMediatype extends CApiService {
 				$options['userids'] = array_intersect($options['userids'], [self::$userData['userid']]);
 			}
 
-			$sql_parts['from']['media'] = 'media m';
+			$sql_parts['join']['m'] = ['table' => 'media', 'using' => 'mediatypeid'];
 			$sql_parts['where'][] = dbConditionId('m.userid', $options['userids']);
-			$sql_parts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
 		}
 
 		if ($options['filter'] !== null) {
 			$oauth_filter = array_intersect_key($options['filter'], array_flip(self::OAUTH_OUTPUT_FIELDS));
 
 			if ($oauth_filter) {
-				$sql_parts['left_join']['media_type_oauth'] =
-					['alias' => 'mto', 'table' => 'media_type_oauth', 'using' => 'mediatypeid'];
-				$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-
+				$sql_parts['join']['mto'] = ['type' => 'left', 'table' => 'media_type_oauth', 'using' => 'mediatypeid'];
 				$this->dbFilter('media_type_oauth mto', ['filter' => $oauth_filter] + $options, $sql_parts);
 			}
 		}
@@ -192,10 +187,7 @@ class CMediatype extends CApiService {
 			$oauth_search = array_intersect_key($options['search'], array_flip(self::OAUTH_OUTPUT_FIELDS));
 
 			if ($oauth_search) {
-				$sql_parts['left_join']['media_type_oauth'] =
-					['alias' => 'mto', 'table' => 'media_type_oauth', 'using' => 'mediatypeid'];
-				$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-
+				$sql_parts['join']['mto'] = ['type' => 'left', 'table' => 'media_type_oauth', 'using' => 'mediatypeid'];
 				zbx_db_search('media_type_oauth mto', ['search' => $oauth_search] + $options, $sql_parts);
 			}
 		}
@@ -213,9 +205,7 @@ class CMediatype extends CApiService {
 		$oauth_output = array_intersect($options['output'], self::OAUTH_OUTPUT_FIELDS);
 
 		if ($oauth_output) {
-			$sql_parts['left_join']['media_type_oauth'] =
-				['alias' => 'mto', 'table' => 'media_type_oauth', 'using' => 'mediatypeid'];
-			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sql_parts['join']['mto'] = ['type' => 'left', 'table' => 'media_type_oauth', 'using' => 'mediatypeid'];
 
 			foreach ($oauth_output as $oauth_field) {
 				$sql_parts['select'][] = dbConditionCoalesce('mto.'.$oauth_field,
@@ -408,7 +398,7 @@ class CMediatype extends CApiService {
 	 * @return array
 	 */
 	public function create(array $mediatypes): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (!CMediatypeHelper::getSupportedMediaTypes() || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'mediatype', __FUNCTION__)
 			);
@@ -456,7 +446,7 @@ class CMediatype extends CApiService {
 	 * @return array
 	 */
 	public function update(array $mediatypes): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (!CMediatypeHelper::getSupportedMediaTypes() || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'mediatype', __FUNCTION__)
 			);
@@ -508,6 +498,7 @@ class CMediatype extends CApiService {
 		$db_mediatypes = $this->get([
 			'output' => array_diff(self::OUTPUT_FIELDS, ['parameters']),
 			'mediatypeids' => array_column($mediatypes, 'mediatypeid'),
+			'filter' => ['type' => CMediatypeHelper::getSupportedMediaTypes()],
 			'preservekeys' => true
 		]);
 
@@ -534,7 +525,7 @@ class CMediatype extends CApiService {
 			: [];
 
 		return ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['name']], 'fields' => $specific_fields + [
-			'type' =>					['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK])],
+			'type' =>					['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', CMediatypeHelper::getSupportedMediaTypes())],
 			'name' =>					['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'name')],
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED])],
 			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
@@ -863,6 +854,15 @@ class CMediatype extends CApiService {
 				_('both "access_token" and "access_expires_in" should be either present or absent')
 			));
 		}
+
+		if ($is_update
+				&& !array_key_exists('client_secret', $mediatype)
+				&& array_key_exists('token_url', $mediatype)
+				&& $mediatype['token_url'] !== $db_mediatype['token_url']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('the parameter "%1$s" is missing', 'client_secret')
+			));
+		}
 	}
 
 	private static function getSmsTypeValidationFields(bool $is_update = false): array {
@@ -1080,6 +1080,12 @@ class CMediatype extends CApiService {
 					$_upd_media_type_oauth = DB::getUpdatedValues('media_type_oauth', $mediatype, $db_mediatype);
 
 					if ($_upd_media_type_oauth) {
+						if (array_key_exists('authorization_url', $_upd_media_type_oauth)
+								|| array_key_exists('token_url', $_upd_media_type_oauth)) {
+							$_upd_media_type_oauth['tokens_status'] = array_key_exists('tokens_status', $mediatype)
+								? $mediatype['tokens_status'] : 0;
+						}
+
 						$upd_media_type_oauth[] = [
 							'values' => $_upd_media_type_oauth,
 							'where' => ['mediatypeid' => $mediatype['mediatypeid']]
@@ -1276,6 +1282,7 @@ class CMediatype extends CApiService {
 		$db_mediatypes = DB::select('media_type', [
 			'output' => ['mediatypeid', 'name'],
 			'mediatypeids' => $mediatypeids,
+			'filter' => ['type' => CMediatypeHelper::getSupportedMediaTypes()],
 			'preservekeys' => true
 		]);
 
@@ -1311,7 +1318,6 @@ class CMediatype extends CApiService {
 			}
 		}
 
-		DB::delete('media_type_oauth', ['mediatypeid' => $mediatypeids]);
 		DB::delete('media_type', ['mediatypeid' => $mediatypeids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MEDIA_TYPE, $db_mediatypes);

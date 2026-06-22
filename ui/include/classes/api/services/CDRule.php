@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -42,7 +42,7 @@ class CDRule extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['drules' => 'dr.druleid'],
-			'from'		=> ['drules' => 'drules dr'],
+			'from'		=> 'drules dr',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],
@@ -89,9 +89,8 @@ class CDRule extends CApiService {
 		if (!is_null($options['dhostids'])) {
 			zbx_value2array($options['dhostids']);
 
-			$sqlParts['from']['dhosts'] = 'dhosts dh';
+			$sqlParts['join']['dh'] = ['table' => 'dhosts', 'using' => 'druleid'];
 			$sqlParts['where']['dhostid'] = dbConditionInt('dh.dhostid', $options['dhostids']);
-			$sqlParts['where']['dhdr'] = 'dh.druleid=dr.druleid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['dhostid'] = 'dh.dhostid';
@@ -102,12 +101,9 @@ class CDRule extends CApiService {
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 
-			$sqlParts['from']['dhosts'] = 'dhosts dh';
-			$sqlParts['from']['dservices'] = 'dservices ds';
-
+			$sqlParts['join']['dh'] = ['table' => 'dhosts', 'using' => 'druleid'];
+			$sqlParts['join']['ds'] = ['left_table' => 'dh', 'table' => 'dservices', 'using' => 'dhostid'];
 			$sqlParts['where']['dserviceid'] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
-			$sqlParts['where']['dhdr'] = 'dh.druleid=dr.druleid';
-			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['dserviceid'] = 'ds.dserviceid';
@@ -326,16 +322,13 @@ class CDRule extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		if (!$drules) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['druleid']], 'fields' => [
+			'druleid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+		]];
 
-		// Validate given IDs.
-		$this->checkObjectIds($drules, 'druleid',
-			_('Field "%1$s" is mandatory.'),
-			_s('Incorrect value for field "%1$s": %2$s.', 'druleid', _('cannot be empty')),
-			_s('Incorrect value for field "%1$s": %2$s.', 'druleid', _('a numeric value is expected'))
-		);
+		if (!CApiInputValidator::validate($api_input_rules, $drules, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		$db_drules = $this->get([
 			'output' => ['druleid', 'name'],
@@ -880,41 +873,91 @@ class CDRule extends CApiService {
 			'preservekeys' => true
 		]);
 
-		$default_values = DB::getDefaults('dchecks');
+		$upd_drules = [];
 
 		foreach ($drules as $drule) {
-			$db_drule = $db_drules[$drule['druleid']];
+			$upd_drule = DB::getUpdatedValues('drules', $drule, $db_drules[$drule['druleid']]);
 
-			// Update drule if it's modified.
-			if (DB::recordModified('drules', $db_drule, $drule)) {
-				DB::updateByPk('drules', $drule['druleid'], $drule);
-			}
-
-			if (array_key_exists('dchecks', $drule)) {
-				// Update dchecks.
-				$db_dchecks = $db_drule['dchecks'];
-
-				$new_dchecks = [];
-				$old_dchecks = [];
-
-				foreach ($drule['dchecks'] as $check) {
-					$check['druleid'] = $drule['druleid'];
-
-					if (!isset($check['dcheckid'])) {
-						$new_dchecks[] = array_merge($default_values, $check);
-					}
-					else {
-						$old_dchecks[] = $check;
-					}
-				}
-
-				DB::replace('dchecks', $db_dchecks, array_merge($old_dchecks, $new_dchecks));
+			if ($upd_drule) {
+				$upd_drules[] = [
+					'values' => $upd_drule,
+					'where' => ['druleid' => $drule['druleid']]
+				];
 			}
 		}
+
+		if ($upd_drules) {
+			DB::update('drules', $upd_drules);
+		}
+
+		self::updateDchecks($drules, $db_drules);
 
 		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_DISCOVERY_RULE, $drules, $db_drules);
 
 		return ['druleids' => $druleids];
+	}
+
+	private static function updateDchecks(array $drules, ?array $db_drules = null): void {
+		$ins_dchecks = [];
+		$upd_dchecks = [];
+		$del_dcheckids = [];
+
+		foreach ($drules as $drule) {
+			if (!array_key_exists('dchecks', $drule)) {
+				continue;
+			}
+
+			$db_dchecks = $db_drules !== null
+				? array_column($db_drules[$drule['druleid']]['dchecks'], null, 'dcheckid')
+				: [];
+
+			foreach ($drule['dchecks'] as $dcheck) {
+				if (array_key_exists('dcheckid', $dcheck)) {
+					$upd_dcheck = DB::getUpdatedValues('dchecks', $dcheck, $db_dchecks[$dcheck['dcheckid']]);
+
+					if ($upd_dcheck) {
+						$upd_dchecks[] = [
+							'values' => $upd_dcheck,
+							'where' => ['dcheckid' => $dcheck['dcheckid']]
+						];
+					}
+
+					unset($db_dchecks[$dcheck['dcheckid']]);
+				}
+				else {
+					$ins_dchecks[] = ['druleid' => $drule['druleid']] + $dcheck;
+				}
+			}
+
+			$del_dcheckids = array_merge($del_dcheckids, array_keys($db_dchecks));
+		}
+
+		if ($del_dcheckids) {
+			DB::delete('dservices', ['dcheckid' => $del_dcheckids]);
+			DB::delete('dchecks', ['dcheckid' => $del_dcheckids]);
+		}
+
+		if ($upd_dchecks) {
+			DB::update('dchecks', $upd_dchecks);
+		}
+
+		if ($ins_dchecks) {
+			$dcheckids = DB::insert('dchecks', $ins_dchecks);
+
+			foreach ($drules as &$drule) {
+				if (!array_key_exists('dchecks', $drule)) {
+					continue;
+				}
+
+				foreach ($drule['dchecks'] as &$dcheck) {
+					if (!array_key_exists('dcheckid', $dcheck)) {
+						$dcheck['dcheckid'] = array_shift($dcheckids);
+					}
+				}
+				unset($dcheck);
+			}
+			unset($drule);
+		}
 	}
 
 	/**
@@ -925,6 +968,17 @@ class CDRule extends CApiService {
 	public function delete(array $druleids): array {
 		$this->validateDelete($druleids, $db_drules);
 
+		DBexecute(
+			'DELETE FROM dservices'.
+			' WHERE EXISTS ('.
+				'SELECT NULL'.
+				' FROM dhosts dh'.
+				' WHERE dservices.dhostid=dh.dhostid'.
+					' AND '.dbConditionId('dh.druleid', $druleids).
+			')'
+		);
+
+		DB::delete('dhosts', ['druleid' => $druleids]);
 		DB::delete('dchecks', ['druleid' => $druleids]);
 		DB::delete('drules', ['druleid' => $druleids]);
 

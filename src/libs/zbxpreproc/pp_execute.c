@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1142,7 +1142,8 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 			ret = pp_error_from_regex(value, params);
 			goto out;
 		case ZBX_PREPROC_THROTTLE_VALUE:
-			ret = item_preproc_throttle_value(value, &ts, history_value_in, history_value_out, history_ts);
+			ret = item_preproc_throttle_value(value_type, value, &ts, history_value_in, history_value_out,
+					history_ts);
 			goto out;
 		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			ret = pp_throttle_timed_value(value, ts, params, history_value_in, history_value_out, history_ts);

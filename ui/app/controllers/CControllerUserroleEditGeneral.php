@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,22 +23,26 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	 * @throws APIException
 	 */
 	protected function getRulesInput(int $user_type): array {
+		global $ZBX_FEATURE_FLAGS;
+
 		return array_merge(
 			$this->getUiSectionRules($user_type),
 			$this->getServiceSectionRules(),
-			$this->getModuleSectionRules(),
+			$ZBX_FEATURE_FLAGS['modules_config_enabled'] ? $this->getModuleSectionRules() : [],
 			$this->getApiSectionRules(),
 			$this->getActionSectionRules($user_type)
 		);
 	}
 
 	private function getUiSectionRules(int $user_type): array {
+		$ui_rules = array_flip($this->getInput('ui'));
+
 		return [
 			'ui' => array_map(
-				function (string $rule): array {
+				function (string $rule) use ($ui_rules): array {
 					return [
 						'name' => str_replace('ui.', '', $rule),
-						'status' => $this->getInput(str_replace('.', '_', $rule))
+						'status' => array_key_exists($rule, $ui_rules) ? 1 : 0
 					];
 				},
 				CRoleHelper::getUiElementsByUserType($user_type)
@@ -91,25 +95,30 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	 * @throws APIException
 	 */
 	private function getModuleSectionRules(): array {
-		$db_modules = API::Module()->get([
-			'output' => [],
-			'preservekeys' => true
-		]);
+		$fields = [];
 
-		$modules = $this->getInput('modules', []);
+		if ($this->hasInput('modules_default_access')) {
+			$fields['modules.default_access'] = $this->getInput('modules_default_access');
+		}
 
-		return [
-			'modules' => array_map(
-				static function (string $moduleid) use ($modules): array {
-					return [
-						'moduleid' => $moduleid,
-						'status' => $modules[$moduleid]
-					];
-				},
-				array_keys($db_modules)
-			),
-			'modules.default_access' => $this->getInput('modules_default_access')
-		];
+		if ($this->hasInput('modules')) {
+			$db_modules = API::Module()->get([
+				'output' => [],
+				'preservekeys' => true
+			]);
+
+			$modules = $this->getInput('modules', []);
+			$fields['modules'] = [];
+
+			foreach (array_keys($db_modules) as $moduleid) {
+				$fields['modules'][] = [
+					'moduleid' => $moduleid,
+					'status' => array_key_exists($moduleid, $modules) ? $modules[$moduleid] : 0
+				];
+			}
+		}
+
+		return $fields;
 	}
 
 	private function getApiSectionRules() : array {
@@ -121,12 +130,14 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	}
 
 	private function getActionSectionRules(int $user_type): array {
+		$action_rules = array_flip($this->getInput('actions'));
+
 		return [
 			'actions' => array_map(
-				function (string $rule): array {
+				function (string $rule) use ($action_rules): array {
 					return [
 						'name' => str_replace('actions.', '', $rule),
-						'status' => $this->getInput(str_replace('.', '_', $rule))
+						'status' => array_key_exists($rule, $action_rules) ? 1 : 0
 					];
 				},
 				CRoleHelper::getActionsByUserType($user_type)

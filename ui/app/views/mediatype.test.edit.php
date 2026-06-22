@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,6 +25,7 @@ $form = (new CForm())
 	->setId('mediatype_test_edit')
 	->addVar('action', 'mediatype.test.send')
 	->addVar('mediatypeid', $data['mediatypeid'])
+	->addVar('type', $data['type'])
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
@@ -45,6 +46,7 @@ switch ($data['type']) {
 						: null,
 					new CFormField(
 						(new CTextBox('parameters['.$parameter['sortorder'].'][value]', $parameter['value']))
+							->setAttribute('maxlength', DB::getFieldLength('media_type_param', 'value'))
 							->setAttribute('autofocus', 'autofocus')
 							->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					)
@@ -88,8 +90,7 @@ switch ($data['type']) {
 			->addItem([
 				new CLabel(_('Response')),
 				new CFormField([
-					(new CTextArea(''))
-						->setId('webhook_response_value')
+					(new CTextArea('webhook_response_value'))
 						->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 						->setEnabled(false),
 					(new CDiv(''))->setId('webhook_response_type'),
@@ -133,26 +134,25 @@ switch ($data['type']) {
 			]);
 }
 
-$form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag('mediatype_test_edit_popup.init('.json_encode([
-		]).');'))->setOnDocumentReady()
-	);
+$form->addItem($form_grid);
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => getPagePostJs().$this->readJsFile('mediatype.test.edit.js.php'),
 	'body' => $form->toString(),
 	'buttons' => [
 		[
 			'title' => _('Test'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'enabled' => $data['enabled'],
-			'action' => 'mediatype_test_edit_popup.submit();'
+			'enabled' => $data['enabled']
 		]
-	]
+	],
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('mediatype.test.edit.js.php').
+		'mediatype_test_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules']
+		]).');'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

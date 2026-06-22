@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,9 +18,10 @@
 #include "zbxcomms.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
+#include "zbxipcservice.h"
 
-void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
-		const zbx_events_funcs_t *events_cbs, int config_timeout, int proxydata_frequency);
-
+void	recv_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, const struct zbx_json_parse *jp,
+		const zbx_timespec_t *ts, const zbx_events_funcs_t *events_cbs, int config_timeout,
+		int proxydata_frequency);
 
 #endif

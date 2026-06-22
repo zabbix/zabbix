@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,6 +17,7 @@
 #if defined(HAVE_LIBCURL) && defined(HAVE_LIBEVENT)
 
 #include "zbxasynchttppoller.h"
+#include "zbxcurl.h"
 
 typedef struct
 {
@@ -201,14 +202,7 @@ static int	handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 
 void	zbx_async_httpagent_init(void)
 {
-	CURLcode	err;
-
-	if (CURLE_OK != (err = curl_global_init(CURL_GLOBAL_ALL)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL: %s", curl_easy_strerror(err));
-
-		exit(EXIT_FAILURE);
-	}
+	zbx_curl_init();
 }
 
 zbx_asynchttppoller_config	*zbx_async_httpagent_create(struct event_base *ev,

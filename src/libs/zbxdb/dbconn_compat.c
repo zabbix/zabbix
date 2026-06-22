@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -73,6 +73,27 @@ void	zbx_db_close(void)
 
 	zbx_dbconn_free(dbconn);
 	dbconn = NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: defer start of transaction till actual query is present           *
+ *                                                                            *
+ * Comments: for performance reasons it is better not to start empty          *
+ *           transactions                                                     *
+*                                                                             *
+ ******************************************************************************/
+void	zbx_db_begin_deferred(void)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
+	zbx_dbconn_begin_deferred(dbconn);
+
+	return;
 }
 
 /******************************************************************************
@@ -320,15 +341,17 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
  * Purpose: connects to DB and tries to detect DB version                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
+int	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
 {
 	if (NULL == dbconn)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		return;
+		return FAIL;
 	}
 
 	zbx_dbconn_extract_version_info(dbconn, version_info);
+
+	return SUCCEED;
 }
 
 #ifdef HAVE_POSTGRESQL

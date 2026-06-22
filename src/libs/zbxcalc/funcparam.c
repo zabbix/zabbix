@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,6 +18,7 @@
 #include "zbxnum.h"
 #include "zbxexpr.h"
 #include "zbxtime.h"
+#include "eval.h"
 
 int	get_function_parameter_uint64(const char *parameters, int Nparam, zbx_uint64_t *value)
 {
@@ -86,23 +87,22 @@ out:
  * Parameters: from       - [IN] function calculation time                    *
  *             parameters - [IN] trigger function parameters                  *
  *             Nparam     - [IN] specifies which parameter to extract         *
- *             value      - [OUT] parameter value (preserved as is if the     *
- *                                parameter is optional and empty)            *
- *             type       - [OUT] parameter value type (number of seconds     *
- *                                or number of values)                        *
- *             timeshift  - [OUT] timeshift value (0 if absent)               *
+ *             selector   - [IN/OUT] parameter value range                    *
  *                                                                            *
  * Return value: SUCCEED - parameter is valid                                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	get_function_parameter_hist_range(int from, const char *parameters, int Nparam, int *value,
-		zbx_value_type_t *type, int *timeshift)
+int	get_function_parameter_history_selector(int from, const char *parameters, int Nparam,
+		zbx_history_selector_t *selector)
 {
 	char	*parameter = NULL, *shift;
 	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __func__, parameters, Nparam);
+
+	if (ZBX_VALUE_UNKNOWN != selector->type)
+		goto ok;
 
 	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
 		goto out;
@@ -112,21 +112,24 @@ int	get_function_parameter_hist_range(int from, const char *parameters, int Npar
 
 	if ('\0' == *parameter)
 	{
-		*value = 0;
-		*type = ZBX_VALUE_NONE;
+		selector->value = 0;
+		selector->type = ZBX_VALUE_NONE;
 	}
 	else if ('#' != *parameter)
 	{
-		if (SUCCEED != zbx_is_time_suffix(parameter, value, ZBX_LENGTH_UNLIMITED) || 0 > *value)
+		if (SUCCEED != zbx_is_time_suffix(parameter, &selector->value, ZBX_LENGTH_UNLIMITED) ||
+				0 > selector->value)
+		{
 			goto out;
+		}
 
-		*type = ZBX_VALUE_SECONDS;
+		selector->type = ZBX_VALUE_SECONDS;
 	}
 	else
 	{
-		if (SUCCEED != zbx_is_uint31(parameter + 1, value) || 0 >= *value)
+		if (SUCCEED != zbx_is_uint31(parameter + 1, &selector->value) || 0 >= selector->value)
 			goto out;
-		*type = ZBX_VALUE_NVALUES;
+		selector->type = ZBX_VALUE_NVALUES;
 	}
 
 	if (NULL != shift)
@@ -149,14 +152,14 @@ int	get_function_parameter_hist_range(int from, const char *parameters, int Npar
 			goto out;
 		}
 
-		*timeshift = from - end;
+		selector->timeshift = from - end;
 	}
 	else
-		*timeshift = 0;
-
+		selector->timeshift = 0;
+ok:
 	ret = SUCCEED;
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s value:%d timeshift:%d", __func__, zbx_type_string(*type),
-			*value, *timeshift);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s value:%d timeshift:%d", __func__, zbx_type_string(selector->type),
+			selector->value, selector->timeshift);
 out:
 	zbx_free(parameter);
 
@@ -171,52 +174,61 @@ out:
  *                                                                            *
  * Parameters: parameters - [IN] trigger function parameters                  *
  *             Nparam     - [IN] specifies which parameter to extract         *
- *             value      - [OUT] parameter value (preserved as is if the     *
- *                                parameter is optional and empty)            *
- *             type       - [OUT] parameter value type (number of seconds     *
- *                                or number of values, preserved as is if the *
- *                                parameter is optional and empty)            *
+ *             selector   - [IN/OUT] parameter history selector               *
  *                                                                            *
  * Return value: SUCCEED - parameter is valid                                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	get_function_parameter_period(const char *parameters, int Nparam, int *value, zbx_value_type_t *type)
+int	get_function_parameter_period(const char *parameters, int Nparam, zbx_history_selector_t *selector)
 {
-	char	*parameter;
+	char	*parameter = NULL;
 	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __func__, parameters, Nparam);
 
+	if (ZBX_VALUE_UNKNOWN != selector->type)
+	{
+		ret = SUCCEED;
+		goto ok;
+	}
+
 	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
 		goto out;
+
+	selector->timeshift = 0;
 
 	if ('\0' != *parameter)
 	{
 		if ('#' == *parameter)
 		{
-			*type = ZBX_VALUE_NVALUES;
-			if (SUCCEED == zbx_is_uint31(parameter + 1, value) && 0 < *value)
-				ret = SUCCEED;
-		}
-		else if ('-' == *parameter)
-		{
-			if (SUCCEED == zbx_is_time_suffix(parameter + 1, value, ZBX_LENGTH_UNLIMITED))
+			if (SUCCEED == zbx_is_uint31(parameter + 1, &selector->value) && 0 < selector->value)
 			{
-				*value = -(*value);
-				*type = ZBX_VALUE_SECONDS;
+				selector->type = ZBX_VALUE_NVALUES;
 				ret = SUCCEED;
 			}
 		}
-		else if (SUCCEED == zbx_is_time_suffix(parameter, value, ZBX_LENGTH_UNLIMITED))
+		else if ('-' == *parameter)
 		{
-			*type = ZBX_VALUE_SECONDS;
+			if (SUCCEED == zbx_is_time_suffix(parameter + 1, &selector->value, ZBX_LENGTH_UNLIMITED))
+			{
+				selector->value = -(selector->value);
+				selector->type = ZBX_VALUE_SECONDS;
+				ret = SUCCEED;
+			}
+		}
+		else if (SUCCEED == zbx_is_time_suffix(parameter, &selector->value, ZBX_LENGTH_UNLIMITED))
+		{
+			selector->type = ZBX_VALUE_SECONDS;
 			ret = SUCCEED;
 		}
 	}
-
+ok:
 	if (SUCCEED == ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s value:%d", __func__, zbx_type_string(*type), *value);
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s value:%d", __func__, zbx_type_string(selector->type),
+				selector->value);
+	}
 
 	zbx_free(parameter);
 out:

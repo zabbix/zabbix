@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -56,8 +56,9 @@ if (!$data['dashboard']['template']) {
 }
 
 $form_list->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-	(new CTextBox('name', $data['dashboard']['name'], false, DB::getFieldLength('dashboard', 'name')))
+	(new CTextAreaFlexible('name', $data['dashboard']['name']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setMaxlength(DB::getFieldLength('dashboard', 'name'))
 		->setAriaRequired()
 		->setAttribute('autofocus', 'autofocus')
 );

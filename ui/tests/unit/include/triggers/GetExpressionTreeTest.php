@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -99,7 +99,8 @@ class GetExpressionTreeTest extends TestCase {
 	public function test($expression, $expected_parsed) {
 		$this->assertSame(CParser::PARSE_SUCCESS, $this->expression_parser->parse($expression));
 
-		$result = getExpressionTree($this->expression_parser, 0, $this->expression_parser->getLength() - 1);
+		$tokens = array_column($this->expression_parser->getResult()->getTokens(), null, 'pos');
+		$result = getExpressionTree($expression, $tokens, 0, $this->expression_parser->getLength() - 1);
 
 		if (!is_array($result)) {
 			$this->fail('getExpressionTree did not return an array');

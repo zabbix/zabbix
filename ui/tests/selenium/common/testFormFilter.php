@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,6 +16,7 @@
 
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 
 /**
  * Base class for "Hosts and Problems filter save" function tests.
@@ -26,12 +27,15 @@ class testFormFilter extends CWebTest {
 	public $url;
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and DatatableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CDatatableBehavior::class
+		];
 	}
 
 	/**
@@ -44,7 +48,7 @@ class testFormFilter extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$table = $this->query($table_selector)->asTable()->waitUntilReady()->one();
+				$table = $this->query($table_selector)->asDatatable()->one()->waitUntilReady();
 				$rows = $table->getRows();
 
 				// If rows are expected, info rows, like date indication row in Problems page, should not be counted.
@@ -67,6 +71,7 @@ class testFormFilter extends CWebTest {
 				// Checking that hosts/problems amount displayed near name in filter tab.
 				if (array_key_exists('Show number of records', $data['filter'])) {
 					$filter->selectTab();
+					$table->waitUntilReady();
 					$this->assertEquals($filtered_rows_count,
 							$filter->getTabDataCounter(CTestArrayHelper::get($data, 'tab', $data['filter']['Name']))
 					);
@@ -92,7 +97,7 @@ class testFormFilter extends CWebTest {
 	 * @param array  $data				given data provider
 	 * @param string $table_selector	selector of a table with filtered data
 	 */
-	public function checkRememberedFilters($data, $table_selector = 'class:list-table') {
+	public function checkRememberedFilters($data, $table_selector) {
 		$this->page->login()->open($this->url.'&filter_reset=1')->waitUntilReady();
 		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
 
@@ -103,11 +108,19 @@ class testFormFilter extends CWebTest {
 		}
 
 		$home_form = $filter->getForm();
-		$home_form->fill($data);
-
-		$result_table = $this->query($table_selector)->asTable()->waitUntilPresent()->one();
+		$home_form->fill($data['filter']);
+		$result_table = $this->query($table_selector)->asDatatable()->one()->waitUntilReady();
+		$headers = $result_table->getHeaders();
 		$this->query('name:filter_apply')->waitUntilClickable()->one()->click();
-		$result_table->waitUntilReloaded();
+		$this->page->waitUntilReady();
+		$headers->waitUntilStalled();
+
+		if (array_key_exists('header_settings', $data)) {
+			$this->changeLayoutFromHeader($data['header_settings']);
+			$result_table->waitUntilReady()->invalidate();
+		}
+
+		$result_table->waitUntilReady()->invalidate();
 		$filter_result = $result_table->getRows()->asText();
 
 		// Go to another page, to check saved filter after.
@@ -117,7 +130,8 @@ class testFormFilter extends CWebTest {
 		$this->page->open($this->url)->waitUntilReady();
 
 		// Check that filter form fields and table result match.
-		$home_form->invalidate()->checkValue($data);
+		$home_form->invalidate()->checkValue($data['filter']);
+		$result_table->waitUntilReady()->invalidate();
 		$this->assertEquals($filter_result, $result_table->getRows()->asText());
 
 		// Reset filter not to interfere next tests.
@@ -141,7 +155,7 @@ class testFormFilter extends CWebTest {
 		$filter->selectTab('update_tab');
 		$form = $filter->getForm();
 		$result_before = $this->getTableResults($table_selector);
-		$table = $this->query($table_selector)->asTable()->waitUntilPresent()->one();
+		$table = $this->query($table_selector)->asDatatable()->one()->waitUntilReady();
 
 		for ($i = 0; $i < 2; ++$i) {
 			$form->fill(['Host groups' => ['Group to check Overview', 'Another group to check Overview']]);
@@ -152,27 +166,32 @@ class testFormFilter extends CWebTest {
 			}
 
 			$filter->selectTab();
-			$table->waitUntilReloaded();
-
 			$filter->selectTab('update_tab');
-			$table->waitUntilReloaded();
+
+			$table->waitUntilReady()->invalidate();
+			$headers = $table->getHeaders();
 
 			if ($i === 0) {
 				$this->query('button:Reset')->one()->click();
-				$this->page->waitUntilReady();
-				$table->waitUntilReloaded();
 			}
 			else {
 				$this->assertTrue($result_before === $this->getTableResults($table_selector));
 				$this->query('button:Update')->one()->click();
-				$table->waitUntilReloaded();
 			}
+
+			$this->page->waitUntilReady();
+			$headers->waitUntilStalled();
+			$table->waitUntilReady()->invalidate();
 		}
 
 		// Getting changed host/problem result and then comparing it with displayed result from dropdown.
 		$result = $this->getTableResults($table_selector);
 		$filter->selectTab();
-		$table->waitUntilReloaded();
+
+		// Wait for button that is present only in Home and non-saved tabs to be clickable before clicking on toggle.
+		$this->query('button:Save as')->one()->waitUntilClickable();
+		$table->waitUntilReady()->invalidate();
+
 		$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
 		$popup_item = CPopupMenuElement::find()->waitUntilVisible()->one()->getItem('update_tab');
 		$this->assertEquals($result, $popup_item->getAttribute('data-counter'));
@@ -257,15 +276,15 @@ class testFormFilter extends CWebTest {
 	 * @param string $user        test user with saved filters
 	 * @param string $password    password for user with saved filters
 	 */
-	public function createFilter($data, $user, $password, $table_selector = 'class:list-table') {
+	public function createFilter($data, $user, $password, $table_selector) {
 		$this->page->userLogin($user, $password);
 		$this->page->open($this->url)->waitUntilReady();
 		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
-
+		$result_table = $this->query($table_selector)->asDatatable()->one()->waitUntilReady();
 		// Checking if home tab is selected.
 		if ($filter->getSelectedTabName() !== 'Home') {
 			$filter->selectTab();
-			$this->page->waitUntilReady();
+			$result_table->waitUntilReady();
 		}
 
 		if (array_key_exists('filter_form', $data)) {
@@ -273,7 +292,7 @@ class testFormFilter extends CWebTest {
 			$home_form->fill($data['filter_form']);
 		}
 
-		$result_table = $this->query($table_selector)->one();
+		$result_table->invalidate();
 		$this->query('button:Save as')->one()->click();
 		$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 		$dialog->fill($data['filter']);
@@ -281,8 +300,8 @@ class testFormFilter extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			COverlayDialogElement::ensureNotPresent();
-			$result_table->waitUntilReloaded();
 			$this->page->waitUntilReady();
+			$result_table->waitUntilReloaded()->waitUntilReady();
 		}
 	}
 
@@ -294,9 +313,10 @@ class testFormFilter extends CWebTest {
 	 * @return int
 	 */
 	public function getTableResults($table_selector) {
-		$table = $this->query($table_selector)->asTable()->waitUntilReady()->one();
-		$text = $table->query('xpath:.//tbody/tr/td')->one()->getText();
-		$result = ($text === 'No data found') ? 0 : $table->getRows()->count();
+		$table = $this->query($table_selector)->asDatatable()->one()->waitUntilReady();
+		$result = ($table->query('class:datatable-body')->one()->getText() === 'No data found')
+			? 0
+			: $table->getRows()->count();
 
 		return $result;
 	}

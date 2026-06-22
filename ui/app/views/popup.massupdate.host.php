@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -203,10 +203,7 @@ $inventory_tab->addRow(
 		->setModern(true)
 );
 
-$tags_tab = new CFormList('tagsFormList');
-
-// append tags table to form list
-$tags_tab->addRow(
+$tags_tab = (new CFormList())->addRow(
 	(new CVisibilityBox('visible[tags]', 'tags-field', _('Original')))->setLabel(_('Tags')),
 	(new CDiv([
 		(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))

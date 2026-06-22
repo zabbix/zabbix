@@ -1,5 +1,17 @@
 .svg-graph {
 	display: block;
+
+	&.highlighted {
+		.svg-graph-points,
+		.svg-graph-line,
+		.svg-graph-bar {
+			opacity: 0.15;
+
+			&.highlighted {
+				opacity: 1;
+			}
+		}
+	}
 }
 
 .svg-point-highlight {

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -70,6 +70,12 @@ class CControllerProxyGroupEdit extends CController {
 	protected function doAction(): void {
 		if ($this->proxy_group !== null) {
 			$data = [
+				'js_validation_rules' => (new CFormValidator(
+					CControllerProxyGroupUpdate::getValidationRules()
+				))->getRules(),
+				'js_validation_rules_for_clone' => (new CFormValidator(
+					CControllerProxyGroupCreate::getValidationRules()
+				))->getRules(),
 				'proxy_groupid' => $this->proxy_group['proxy_groupid'],
 				'proxies' => $this->proxy_group['proxies'],
 				'proxy_count_total' => count($this->proxy_group['proxies']),
@@ -88,6 +94,9 @@ class CControllerProxyGroupEdit extends CController {
 		}
 		else {
 			$data = [
+				'js_validation_rules' => (new CFormValidator(
+					CControllerProxyGroupCreate::getValidationRules()
+				))->getRules(),
 				'proxy_groupid' => null,
 				'proxies' => [],
 				'proxy_count_total' => 0,
@@ -98,6 +107,8 @@ class CControllerProxyGroupEdit extends CController {
 					'description' => DB::getDefault('proxy_group', 'description')
 				]
 			];
+
+			$data['js_validation_rules_for_clone'] = $data['js_validation_rules'];
 		}
 
 		$data['user'] = [

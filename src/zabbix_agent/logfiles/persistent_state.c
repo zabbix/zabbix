@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,10 +16,13 @@
 #include "logfiles.h"
 
 #include "zbxalgo.h"
+
+#if !defined(_WINDOWS) && !defined(__MINGW32__) && !defined(WITH_AGENT2_METRICS)
 #include "zbxhash.h"
 #include "zbxnum.h"
 #include "zbxjson.h"
 #include "zbxcrypto.h"
+#endif
 
 /* tags for agent persistent storage files */
 #define ZBX_PERSIST_TAG_FILENAME		"filename"
@@ -40,7 +43,7 @@
 ZBX_VECTOR_IMPL(pre_persistent, zbx_pre_persistent_t)
 ZBX_VECTOR_IMPL(persistent_inactive, zbx_persistent_inactive_t)
 
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
+#if !defined(_WINDOWS) && !defined(__MINGW32__) && !defined(WITH_AGENT2_METRICS)
 static int	zbx_persistent_inactive_compare_func(const void *d1, const void *d2)
 {
 	const zbx_persistent_inactive_t	*p1 = (const zbx_persistent_inactive_t *)d1;
@@ -379,7 +382,12 @@ static int	zbx_write_persistent_file(const char *filename, const char *data, cha
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): filename:[%s] data:[%s]", __func__, filename, data);
 
-	if (NULL == (fp = fopen(filename, "w")))
+	mode_t	old_umask = umask(0026);
+
+	fp = fopen(filename, "w");
+	umask(old_umask);
+
+	if (NULL == fp)
 	{
 		zbx_snprintf_alloc(error, &alloc_bytes, &offset, "cannot open file: %s", zbx_strerror(errno));
 		return FAIL;
@@ -931,4 +939,4 @@ int	zbx_restore_file_details(const char *str, struct st_logfile **logfiles, int 
 
 	return SUCCEED;
 }
-#endif	/* not WINDOWS */
+#endif	/* not WINDOWS, not WITH_AGENT2_METRICS */

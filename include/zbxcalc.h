@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,7 +16,7 @@
 #define ZABBIX_CALC_H
 
 #include "zbxcacheconfig.h"
-
+#include "zbxhistory.h"
 #include "zbx_discoverer_constants.h"
 
 #define ZBX_ITEM_QUERY_UNSET		0x0000
@@ -127,7 +127,7 @@ int	zbx_evaluate(double *value, const char *expression, char *error, size_t max_
 		zbx_vector_str_t *unknown_msgs);
 int	zbx_evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len);
 int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *function,
-		const char *parameter, const zbx_timespec_t *ts, char **error);
+		const char *parameter, const zbx_timespec_t *ts, zbx_history_selector_t *selector, char **error);
 
 int	zbx_evaluable_for_notsupported(const char *fn);
 

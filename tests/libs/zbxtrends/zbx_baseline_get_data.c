@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -38,6 +38,12 @@ void	__wrap_zbx_recalc_time_period(time_t *tm_start, int table_group)
 {
 	ZBX_UNUSED(tm_start);
 	ZBX_UNUSED(table_group);
+}
+
+zbx_uint64_t	__wrap_zbx_history_get_trends_flags(void);
+zbx_uint64_t	__wrap_zbx_history_get_trends_flags(void)
+{
+	return 0xFFFF;
 }
 
 static	zbx_mock_handle_t	hout;

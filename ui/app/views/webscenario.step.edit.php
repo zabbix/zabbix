@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -36,8 +36,10 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('name', $data['form']['name'], $data['templated'], DB::getFieldLength('httpstep', 'name')))
+			(new CTextAreaFlexible('name', $data['form']['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('httpstep', 'name'))
+				->setReadonly($data['templated'])
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 		)
@@ -45,8 +47,9 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
 		new CFormField([
-			(new CTextBox('url', $data['form']['url'], false, DB::getFieldLength('httpstep', 'url')))
+			(new CTextAreaFlexible('url', $data['form']['url']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('httpstep', 'url'))
 				->setAriaRequired(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CSimpleButton(_('Parse')))
@@ -71,13 +74,13 @@ $form_grid = (new CFormGrid())
 						(new CCol(
 							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextAreaFlexible('query_fields[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
+						(new CTextAreaFlexible('query_fields[#{rowNum}][name]', '#{name}'))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
 							->setAttribute('placeholder', _('name'))
 							->disableSpellcheck(),
 						RARR(),
-						(new CTextAreaFlexible('query_fields[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
+						(new CTextAreaFlexible('query_fields[#{rowNum}][value]', '#{value}'))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
 							->setAttribute('placeholder', _('value'))
@@ -118,13 +121,13 @@ $form_grid = (new CFormGrid())
 						(new CCol(
 							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextAreaFlexible('post_fields[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
+						(new CTextAreaFlexible('post_fields[#{rowNum}][name]', '#{name}'))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
 							->setAttribute('placeholder', _('name'))
 							->disableSpellcheck(),
 						RARR(),
-						(new CTextAreaFlexible('post_fields[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
+						(new CTextAreaFlexible('post_fields[#{rowNum}][value]', '#{value}'))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
 							->setMaxlength(DB::getFieldLength('httpstep_field', 'value'))
@@ -164,13 +167,13 @@ $form_grid = (new CFormGrid())
 				(new CTemplateTag('step-variable-row-tmpl'))->addItem(
 					(new CRow([
 						'',
-						(new CTextAreaFlexible('variables[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
+						(new CTextAreaFlexible('variables[#{rowNum}][name]', '#{name}'))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
 							->setAttribute('placeholder', _('name'))
 							->disableSpellcheck(),
 						RARR(),
-						(new CTextAreaFlexible('variables[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
+						(new CTextAreaFlexible('variables[#{rowNum}][value]', '#{value}'))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
 							->setMaxlength(DB::getFieldLength('httpstep_field', 'value'))
@@ -203,13 +206,13 @@ $form_grid = (new CFormGrid())
 						(new CCol(
 							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextAreaFlexible('headers[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
+						(new CTextAreaFlexible('headers[#{rowNum}][name]', '#{name}'))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
 							->setAttribute('placeholder', _('name'))
 							->disableSpellcheck(),
 						RARR(),
-						(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
+						(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}'))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
 							->setMaxlength(DB::getFieldLength('httpstep_field', 'value'))
@@ -253,8 +256,9 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Required string'), 'required'),
 		new CFormField(
-			(new CTextBox('required', $data['form']['required'], false, DB::getFieldLength('httpstep', 'required')))
+			(new CTextAreaFlexible('required', $data['form']['required']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('httpstep', 'required'))
 				->setAttribute('placeholder', _('pattern'))
 		)
 	])

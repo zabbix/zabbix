@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -505,7 +505,7 @@ static int	get_ipv6_support(const char *fping, const char *dst)
  *             host        - [OUT] found correspondent host from array        *
  *                                                                            *
  * Return value: SUCCEED - successfully processed hosts                       *
- *               NOTSUPPORTED - otherwise                                     *
+ *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
 static int	check_hostip_response(char *resp, zbx_fping_host_t *hosts, const int hosts_count, const int rdns,
@@ -543,12 +543,24 @@ static int	check_hostip_response(char *resp, zbx_fping_host_t *hosts, const int 
 
 	for (i = 0; i < hosts_count; i++)
 	{
-		if ((0 != rdns && SUCCEED == zbx_ip_in_list(tmp, hosts[i].addr)) ||
-				(0 == rdns && 0 == strcmp(tmp, hosts[i].addr)))
+		if (0 == strcmp(tmp, hosts[i].addr))
 		{
 			*host = &hosts[i];
 			ret = SUCCEED;
 			break;
+		}
+	}
+
+	if (FAIL == ret && 0 != rdns)
+	{
+		for (i = 0; i < hosts_count; i++)
+		{
+			if (SUCCEED == zbx_ip_in_list(tmp, hosts[i].addr))
+			{
+				*host = &hosts[i];
+				ret = SUCCEED;
+				break;
+			}
 		}
 	}
 
@@ -770,7 +782,9 @@ out:
  ******************************************************************************/
 static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 {
+#define ZBX_ITEM_TIMEOUT_MAX	600
 	int	i, ret = NOTSUPPORTED;
+	time_t	start_time = time(NULL);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -788,6 +802,14 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 
 		do
 		{
+			if (time(NULL) - start_time > ZBX_ITEM_TIMEOUT_MAX)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "fping execution time limit (%ds) exceeded, "
+						"stopping output processing", ZBX_ITEM_TIMEOUT_MAX);
+				ret = NOTSUPPORTED;
+				break;
+			}
+
 			zbx_rtrim(resp->linebuf, "\n");
 			line_process(resp, args);
 			ret = SUCCEED;
@@ -801,6 +823,7 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#undef ZBX_ITEM_TIMEOUT_MAX
 }
 
 static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_count, int interval, int size,
@@ -818,6 +841,7 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 	sigset_t	mask, orig_mask;
 	zbx_fping_args	fping_args;
 	zbx_fping_resp	fping_resp;
+	mode_t		old_umask = 0026;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -1049,8 +1073,7 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 #ifdef HAVE_IPV6
 	if (NULL != config_icmpping->get_source_ip())
 	{
-		if (SUCCEED != zbx_get_address_family(config_icmpping->get_source_ip(), &family, error,
-				(int)max_error_len))
+		if (SUCCEED != zbx_get_ip_family(config_icmpping->get_source_ip(), &family, error, (int)max_error_len))
 			goto out;
 
 		if (family == PF_INET)
@@ -1107,7 +1130,11 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 	zbx_snprintf(linebuf, linebuf_size, "%s %s 2>&1 <%s", config_icmpping->get_fping_location(), params, filename);
 #endif	/* HAVE_IPV6 */
 
-	if (NULL == (f = fopen(filename, "w")))
+	old_umask = umask(0026);
+	f = fopen(filename, "w");
+	umask(old_umask);
+
+	if (NULL == f)
 	{
 		zbx_snprintf(error, max_error_len, "%s: %s", filename, zbx_strerror(errno));
 		goto out;
@@ -1229,7 +1256,7 @@ void	zbx_init_icmpping_env(const char *prefix, long int id)
  *             backoff        - [IN]  backoff time between retries            *
  *             allow_redirect - [IN]  treat redirected response as host up:   *
  *                                    0 - no, 1 - yes                         *
- *             rdns          - [IN]  flag required rdns option                *
+ *             rdns           - [IN]  flag required rdns option               *
  *                                   (fping option -dA)                       *
  *             error          - [OUT] error string if function fails          *
  *             max_error_len  - [IN]  length of error buffer                  *

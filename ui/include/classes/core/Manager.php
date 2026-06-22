@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -47,23 +47,7 @@ class Manager extends CRegistryFactory {
 	 * @return CHistoryManager
 	 */
 	public static function History() {
-		static $instance;
-
-		if ($instance === null) {
-			$instance = self::getInstance()->getObject('history');
-
-			foreach (CSettingsHelper::getDbVersionStatus() as $dbversion) {
-				if (array_key_exists('history_pk', $dbversion)) {
-					if ($dbversion['history_pk'] == 1) {
-						$instance->setPrimaryKeysEnabled();
-					}
-
-					break;
-				}
-			}
-		}
-
-		return $instance;
+		return self::getInstance()->getObject('history');
 	}
 
 	/**

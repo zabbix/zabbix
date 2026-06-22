@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,6 +25,10 @@ class CHost extends CHostGeneral {
 		'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'maintenanceid',
 		'maintenance_status', 'maintenance_type', 'maintenance_from', 'name', 'flags', 'description', 'tls_connect',
 		'tls_accept', 'tls_issuer', 'tls_subject', 'inventory_mode', 'active_available'
+	];
+
+	private const HOST_INTERFACE_QUERY_FIELDS = ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port',
+		'available', 'error', 'errors_from', 'disable_until'
 	];
 
 	/**
@@ -59,22 +63,16 @@ class CHost extends CHostGeneral {
 	 * @param bool          $options['withProblemsSuppressed']             Select hosts that have suppressed problems. (null - all, true - only suppressed, false - unsuppressed)
 	 * @param bool          $options['editable']                           Select hosts only with read-write permission. Ignored for Super admins.
 	 * @param bool          $options['nopermissions']                      Select hosts by ignoring all permissions. Only available inside API calls.
-	 * @param bool          $options['evaltype']                           Operator for tag filter 0 - AND/OR; 2 - OR.
-	 * @param bool          $options['tags']                               Select hosts by given tags.
 	 * @param bool          $options['severities']                         Select hosts that have only problems with given severities.
-	 * @param bool          $options['inheritedTags']                      Select hosts that have given tags also in their linked templates.
 	 * @param string|array  $options['selectHostGroups']                   Return a "hostgroups" property with host groups data that the host belongs to.
 	 * @param string|array  $options['selectParentTemplates']              Return a "parentTemplates" property with templates that the host is linked to.
 	 * @param string|array  $options['selectItems']                        Return an "items" property with host items.
 	 * @param string|array  $options['selectTriggers']                     Return a "triggers" property with host triggers.
 	 * @param string|array  $options['selectGraphs']                       Return a "graphs" property with host graphs.
-	 * @param string|array  $options['selectMacros']                       Return a "macros" property with host macros.
 	 * @param string|array  $options['selectDashboards']                   Return a "dashboards" property with host dashboards.
 	 * @param string|array  $options['selectInterfaces']                   Return an "interfaces" property with host interfaces.
 	 * @param string|array  $options['selectInventory']                    Return an "inventory" property with host inventory data.
 	 * @param string|array  $options['selectHttpTests']                    Return an "httpTests" property with host web scenarios.
-	 * @param string|array  $options['selectTags']                         Return a "tags" property with host tags.
-	 * @param string|array  $options['selectInheritedTags']                Return an "inheritedTags" property with tags that are on templates which are linked to host.
 	 * @param bool          $options['countOutput']                        Return host count as output.
 	 * @param bool          $options['groupCount']                         Group the host count.
 	 * @param bool          $options['preservekeys']                       Return host IDs as array keys.
@@ -89,7 +87,7 @@ class CHost extends CHostGeneral {
 
 		$sqlParts = [
 			'select'	=> ['hosts' => 'h.hostid'],
-			'from'		=> ['hosts' => 'hosts h'],
+			'from'		=> 'hosts h',
 			'where'		=> ['flags' => 'h.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'],
 			'group'		=> [],
 			'order'		=> [],
@@ -126,10 +124,7 @@ class CHost extends CHostGeneral {
 			'editable'							=> false,
 			'nopermissions'						=> null,
 			// filter
-			'evaltype'							=> TAG_EVAL_TYPE_AND_OR,
-			'tags'								=> null,
 			'severities'						=> null,
-			'inheritedTags'						=> false,
 			'filter'							=> null,
 			'search'							=> null,
 			'searchInventory'					=> null,
@@ -148,8 +143,6 @@ class CHost extends CHostGeneral {
 			'selectInterfaces'					=> null,
 			'selectInventory'					=> null,
 			'selectHttpTests'					=> null,
-			'selectTags'						=> null,
-			'selectInheritedTags'				=> null,
 			'selectValueMaps'					=> null,
 			'countOutput'						=> false,
 			'groupCount'						=> false,
@@ -168,10 +161,8 @@ class CHost extends CHostGeneral {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sqlParts['from'][] = 'host_hgset hh';
-			$sqlParts['from'][] = 'permission p1';
-			$sqlParts['where'][] = 'h.hostid=hh.hostid';
-			$sqlParts['where'][] = 'hh.hgsetid=p1.hgsetid';
+			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
+			$sqlParts['join']['p1'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sqlParts['where'][] = 'p1.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -189,9 +180,8 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
-			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['groupid'] = 'hg.groupid';
@@ -216,9 +206,8 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['templateids'])) {
 			zbx_value2array($options['templateids']);
 
-			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
+			$sqlParts['join']['ht'] = ['table' => 'hosts_templates', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['templateids']);
-			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['templateid'] = 'ht.templateid';
@@ -229,9 +218,7 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
 
-			$sqlParts['left_join']['interface'] = ['alias' => 'hi', 'table' => 'interface', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-
+			$sqlParts['join']['hi'] = ['type' => 'left', 'table' => 'interface', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('hi.interfaceid', $options['interfaceids']);
 		}
 
@@ -239,51 +226,43 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('i.itemid', $options['itemids']);
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 		}
 
 		// triggerids
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'hostid'];
+			$sqlParts['join']['f'] = ['left_table' => 'i', 'table' => 'functions', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
 		// httptestids
 		if (!is_null($options['httptestids'])) {
 			zbx_value2array($options['httptestids']);
 
-			$sqlParts['from']['httptest'] = 'httptest ht';
+			$sqlParts['join']['ht'] = ['table' => 'httptest', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('ht.httptestid', $options['httptestids']);
-			$sqlParts['where']['aht'] = 'ht.hostid=h.hostid';
 		}
 
 		// graphids
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'hostid'];
+			$sqlParts['join']['gi'] = ['left_table' => 'i', 'table' => 'graphs_items', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 		}
 
 		// dserviceids
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 
-			$sqlParts['from']['dservices'] = 'dservices ds';
-			$sqlParts['from']['interface'] = 'interface i';
+			$sqlParts['join']['hi2'] = ['table' => 'interface', 'using' => 'hostid'];
+			$sqlParts['join']['ds'] = ['left_table' => 'hi2', 'table' => 'dservices', 'using' => 'ip'];
 			$sqlParts['where'][] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
-			$sqlParts['where']['dsh'] = 'ds.ip=i.ip';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['dserviceid'] = 'ds.dserviceid';
@@ -294,9 +273,8 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['maintenanceids'])) {
 			zbx_value2array($options['maintenanceids']);
 
-			$sqlParts['from']['maintenances_hosts'] = 'maintenances_hosts mh';
+			$sqlParts['join']['mh'] = ['table' => 'maintenances_hosts', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('mh.maintenanceid', $options['maintenanceids']);
-			$sqlParts['where']['hmh'] = 'h.hostid=mh.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['maintenanceid'] = 'mh.maintenanceid';
@@ -430,15 +408,13 @@ class CHost extends CHostGeneral {
 			zbx_db_search('hosts h', $options, $sqlParts);
 
 			if (zbx_db_search('interface hi', $options, $sqlParts)) {
-				$sqlParts['left_join']['interface'] = ['alias' => 'hi', 'table' => 'interface', 'using' => 'hostid'];
-				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+				$sqlParts['join']['hi'] = ['type' => 'left', 'table' => 'interface', 'using' => 'hostid'];
 			}
 		}
 
 		// search inventory
 		if ($options['searchInventory'] !== null) {
-			$sqlParts['from']['host_inventory'] = 'host_inventory hii';
-			$sqlParts['where']['hii'] = 'h.hostid=hii.hostid';
+			$sqlParts['join']['hii'] = ['table' => 'host_inventory', 'using' => 'hostid'];
 
 			zbx_db_search('host_inventory hii',
 				[
@@ -461,8 +437,7 @@ class CHost extends CHostGeneral {
 			}
 
 			if ($this->dbFilter('interface hi', $options, $sqlParts)) {
-				$sqlParts['left_join']['interface'] = ['alias' => 'hi', 'table' => 'interface', 'using' => 'hostid'];
-				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+				$sqlParts['join']['hi'] = ['type' => 'left', 'table' => 'interface', 'using' => 'hostid'];
 			}
 
 			if (array_key_exists('active_available', $options['filter'])
@@ -476,19 +451,10 @@ class CHost extends CHostGeneral {
 		}
 
 		// tags
-		if ($options['tags'] !== null && $options['tags']) {
-			if ($options['inheritedTags']) {
-				$sqlParts['left_join'][] = ['alias' => 'ht2', 'table' => 'hosts_templates', 'using' => 'hostid'];
-				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-				$sqlParts['where'][] = CApiTagHelper::addInheritedHostTagsWhereCondition($options['tags'],
-					$options['evaltype']
-				);
-			}
-			else {
-				$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
-					'host_tag', 'hostid'
-				);
-			}
+		if ($options['tags'] !== null) {
+			$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'], ['h'],
+				'host_tag', 'hostid', $options['inheritedTags']
+			);
 		}
 
 		// limit
@@ -562,6 +528,40 @@ class CHost extends CHostGeneral {
 		return $result;
 	}
 
+	private static function validateGet(array &$options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			// Filters.
+			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
+			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
+				'value' =>					['type' => API_STRING_UTF8, 'default' => '']
+			]],
+			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
+			'severities' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true],
+			'withProblemsSuppressed' =>	['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getFilterFields('hosts', self::OUTPUT_FIELDS), DB::getFilterFields('interface', self::HOST_INTERFACE_QUERY_FIELDS), ['assigned_proxyid', 'inventory_mode', 'active_available'])],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getSearchFields('hosts', self::OUTPUT_FIELDS), DB::getSearchFields('interface', self::HOST_INTERFACE_QUERY_FIELDS))],
+			// Output.
+			'selectParentTemplates' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value', 'automatic']), 'default' => null],
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS), 'default' => null],
+			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CUserMacro::getOutputFieldsOnHost()), 'default' => null],
+			'selectValueMaps' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
+			'selectDiscoveryRule' => 	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::getOutputFieldsOnHost()), 'default' => null],
+			'selectHostDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveries' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', array_diff(CDiscoveryRule::getOutputFieldsOnHost(), ['hostid'])), 'default' => null],
+			'selectDiscoveryRules' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_NORMALIZE, 'in' => implode(',', array_diff(CDiscoveryRule::getOutputFieldsOnHost(), ['hostid'])), 'default' => null],
+			// Sort and limit.
+			'limitSelects' =>			['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		if (is_array($options['filter'])) {
 			if (array_key_exists('inventory_mode', $options['filter'])
@@ -587,7 +587,9 @@ class CHost extends CHostGeneral {
 
 			if (array_key_exists('assigned_proxyid', $options['filter'])
 					&& $options['filter']['assigned_proxyid'] !== null) {
-				$sqlParts['where'][] = dbConditionId('p.proxyid', $options['filter']['assigned_proxyid']);
+				$sqlParts['where'][] = dbConditionId('hp.proxyid', $options['filter']['assigned_proxyid']);
+				// Override host_proxy.proxyid with NULL if hosts.proxy_groupid and proxy.proxy_groupid do not match.
+				$sqlParts['where'][] = 'h.proxy_groupid=p.proxy_groupid';
 			}
 		}
 
@@ -605,25 +607,19 @@ class CHost extends CHostGeneral {
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
 				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
-			$sqlParts['left_join'][] = ['alias' => 'hinv', 'table' => 'host_inventory', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sqlParts['join']['hinv'] = ['type' => 'left', 'table' => 'host_inventory', 'using' => 'hostid'];
 		}
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('active_available', $options['output']))
 				|| (is_array($options['filter']) && array_key_exists('active_available', $options['filter']))) {
-			$sqlParts['left_join'][] = ['alias' => 'hr', 'table' => 'host_rtdata', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sqlParts['join']['hr'] = ['type' => 'left', 'table' => 'host_rtdata', 'using' => 'hostid'];
 		}
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('assigned_proxyid', $options['output']))
 				|| (is_array($options['filter']) && array_key_exists('assigned_proxyid', $options['filter'])
 					&& $options['filter']['assigned_proxyid'] !== null)) {
-			$sqlParts['left_join'][] = ['alias' => 'hp', 'table' => 'host_proxy', 'using' => 'hostid'];
-			// Override host_proxy.proxyid with NULL if hosts.proxy_groupid and proxy.proxy_groupid do not match.
-			$sqlParts['left_join'][] = ['alias' => 'p', 'table' => 'proxy', 'use_distinct' => false,
-				'condition' => 'h.proxy_groupid=p.proxy_groupid AND hp.proxyid=p.proxyid'
-			];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sqlParts['join']['hp'] = ['type' => 'left', 'table' => 'host_proxy', 'using' => 'hostid'];
+			$sqlParts['join']['p'] = ['type' => 'left', 'left_table' => 'hp', 'table' => 'proxy', 'using' => 'proxyid'];
 		}
 
 		if (!$options['countOutput']) {
@@ -637,7 +633,10 @@ class CHost extends CHostGeneral {
 			}
 
 			if ($this->outputIsRequested('assigned_proxyid', $options['output'])) {
-				$sqlParts = $this->addQuerySelect('p.proxyid AS assigned_proxyid', $sqlParts);
+				// Override host_proxy.proxyid with NULL if hosts.proxy_groupid and proxy.proxy_groupid do not match.
+				$sqlParts = $this->addQuerySelect('CASE WHEN h.proxy_groupid=p.proxy_groupid'.
+					' THEN hp.proxyid ELSE NULL END AS assigned_proxyid', $sqlParts
+				);
 			}
 		}
 
@@ -703,11 +702,17 @@ class CHost extends CHostGeneral {
 		$this->updateTags($hosts);
 		self::updateMacros($hosts);
 
+		$ins_host_template_cache = [];
 		$hosts_rtdata = [];
 		$hosts_interfaces = [];
 		$hosts_inventory = [];
 
-		foreach ($hosts as &$host) {
+		foreach ($hosts as $host) {
+			$ins_host_template_cache[] = [
+				'hostid' => $host['hostid'],
+				'link_hostid' => $host['hostid']
+			];
+
 			$hosts_rtdata[] = ['hostid' => $host['hostid']];
 
 			if (array_key_exists('interfaces', $host)) {
@@ -730,13 +735,15 @@ class CHost extends CHostGeneral {
 				$hosts_inventory[] = ['hostid' => $host['hostid']] + $host_inventory;
 			}
 		}
-		unset($host);
+
+		DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
 
 		if ($hosts_interfaces) {
 			API::HostInterface()->create($hosts_interfaces);
 		}
 
-		$this->updateTemplates($hosts);
+		self::updateTemplates($hosts);
+		self::updateHostTemplateCache($hosts);
 
 		if ($hosts_inventory) {
 			DB::insert('host_inventory', $hosts_inventory, false);
@@ -805,62 +812,25 @@ class CHost extends CHostGeneral {
 		$this->updateTags($hosts, $db_hosts);
 		self::updateMacros($hosts, $db_hosts);
 
-		$inventories = [];
 		foreach ($hosts as &$host) {
 			// If visible name is not given or empty it should be set to host name.
 			if (array_key_exists('host', $host) && (!array_key_exists('name', $host) || trim($host['name']) === '')) {
 				$host['name'] = $host['host'];
 			}
-
-			// Fetch fields required to update host inventory.
-			if (array_key_exists('inventory', $host)) {
-				$inventory = $host['inventory'];
-				$inventory['hostid'] = $host['hostid'];
-
-				$inventories[] = $inventory;
-			}
 		}
 		unset($host);
 
-		$inventories = $this->extendObjects('host_inventory', $inventories, ['inventory_mode']);
-		$inventories = zbx_toHash($inventories, 'hostid');
-
 		foreach ($hosts as $host) {
-			$host = array_diff_key($host, array_flip(['groups', 'tags', 'macros', 'templates', 'templates_clear']));
+			$host = array_intersect_key($host,
+				array_flip(['hostid', 'host', 'name', 'interfaces', 'description', 'monitored_by', 'proxyid',
+					'proxy_groupid', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
+					'inventory_mode', 'inventory', 'tls_connect', 'tls_accept', 'tls_psk_identity', 'tls_psk',
+					'tls_issuer', 'tls_subject'
+				])
+			);
 
-			// Extend host inventory with the required data.
-			if (array_key_exists('inventory', $host) && $host['inventory']) {
-				// If inventory mode is HOST_INVENTORY_DISABLED, database record is not created.
-				if (array_key_exists('inventory_mode', $inventories[$host['hostid']])
-						&& ($inventories[$host['hostid']]['inventory_mode'] == HOST_INVENTORY_MANUAL
-							|| $inventories[$host['hostid']]['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)) {
-					$host['inventory'] = $inventories[$host['hostid']];
-				}
-			}
-
-			if (array_key_exists('monitored_by', $host)) {
-				if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
-					$host += ['proxyid' => $db_hosts[$host['hostid']]['proxyid']];
-				}
-				elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
-					$host += ['proxy_groupid' => $db_hosts[$host['hostid']]['proxy_groupid']];
-				}
-			}
-
-			if (array_key_exists('tls_connect', $host)
-					&& ($host['tls_connect'] == HOST_ENCRYPTION_PSK || $host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
-				$host += [
-					'tls_psk_identity' => $db_hosts[$host['hostid']]['tls_psk_identity'],
-					'tls_psk' => $db_hosts[$host['hostid']]['tls_psk']
-				];
-			}
-
-			$data = array_diff_key($host, array_flip(['hostid']));
-			$data['hosts'] = ['hostid' => $host['hostid']];
-			$result = $this->massUpdate($data, ['skip_tls_psk_pair_check' => true]);
-
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
+			if (array_diff_key($host, array_flip(['hostid']))) {
+				$this->massUpdate($host, $db_hosts[$host['hostid']]);
 			}
 		}
 
@@ -869,7 +839,8 @@ class CHost extends CHostGeneral {
 		self::addHostGroupAuditLog($hosts, $db_hosts);
 
 		$this->updateHgSets($hosts, $db_hosts);
-		$this->updateTemplates($hosts, $db_hosts);
+		self::updateTemplates($hosts, $db_hosts);
+		self::updateHostTemplateCache($hosts, $db_hosts);
 	}
 
 	/**
@@ -984,47 +955,8 @@ class CHost extends CHostGeneral {
 		}
 	}
 
-	/**
-	 * Mass update hosts.
-	 *
-	 * @param array  $hosts								multidimensional array with Hosts data
-	 * @param array  $hosts['hosts']					Array of Host objects to update
-	 * @param string $hosts['fields']['host']			Host name.
-	 * @param array  $hosts['fields']['groupids']		HostGroup IDs add Host to.
-	 * @param int    $hosts['fields']['port']			Port. OPTIONAL
-	 * @param int    $hosts['fields']['status']			Host Status. OPTIONAL
-	 * @param int    $hosts['fields']['useip']			Use IP. OPTIONAL
-	 * @param string $hosts['fields']['dns']			DNS. OPTIONAL
-	 * @param string $hosts['fields']['ip']				IP. OPTIONAL
-	 * @param int    $hosts['fields']['details']		Details. OPTIONAL
-	 * @param int    $hosts['fields']['monitored_by']	Source of monitoring. OPTIONAL
-	 * @param string $hosts['fields']['proxyid']		Proxy ID. OPTIONAL
-	 * @param string $hosts['fields']['proxy_groupid']	Proxy group ID. OPTIONAL
-	 * @param int    $hosts['fields']['ipmi_authtype']	IPMI authentication type. OPTIONAL
-	 * @param int    $hosts['fields']['ipmi_privilege']	IPMI privilege. OPTIONAL
-	 * @param string $hosts['fields']['ipmi_username']	IPMI username. OPTIONAL
-	 * @param string $hosts['fields']['ipmi_password']	IPMI password. OPTIONAL
-	 * @param array  $options
-	 *
-	 * @return boolean
-	 */
-	public function massUpdate($data, array $options = []): array {
-		$this->validateMassUpdate($data, $hosts, $db_hosts, $options);
-
-		$hostids = array_column($data['hosts'], 'hostid');
-
-		sort($hostids);
-
-		// Check inventory mode value.
-		if (array_key_exists('inventory_mode', $data)) {
-			$valid_inventory_modes = [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC];
-			$inventory_mode = new CLimitedSetValidator([
-				'values' => $valid_inventory_modes,
-				'messageInvalid' => _s('Incorrect value for field "%1$s": %2$s.', 'inventory_mode',
-					_s('value must be one of %1$s', implode(', ', $valid_inventory_modes)))
-			]);
-			$this->checkValidator($data['inventory_mode'], $inventory_mode);
-		}
+	private function massUpdate(array $data, array $db_host): void {
+		$hostids = [$data['hostid']];
 
 		if (array_key_exists('monitored_by', $data)) {
 			if ($data['monitored_by'] != ZBX_MONITORED_BY_PROXY) {
@@ -1051,68 +983,11 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		// Property 'auto_compress' is not supported for hosts.
-		if (array_key_exists('auto_compress', $data)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
-		}
-
-		/*
-		 * Update hosts properties
-		 */
-		if (isset($data['name'])) {
-			if (count($data['hosts']) > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update visible host name.'));
-			}
-		}
-
-		if (array_key_exists('host', $data)) {
-			$host_name_parser = new CHostNameParser();
-
-			if ($host_name_parser->parse($data['host']) != CParser::PARSE_SUCCESS) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect characters used for host name "%1$s".', $data['host'])
-				);
-			}
-
-			if (count($data['hosts']) > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update host name.'));
-			}
-
-			$curHost = reset($data['hosts']);
-
-			$sameHostnameHost = $this->get([
-				'output' => ['hostid'],
-				'filter' => ['host' => $data['host']],
-				'nopermissions' => true,
-				'limit' => 1
-			]);
-			$sameHostnameHost = reset($sameHostnameHost);
-			if ($sameHostnameHost && (bccomp($sameHostnameHost['hostid'], $curHost['hostid']) != 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%1$s" already exists.', $data['host']));
-			}
-
-			// can't add host with the same name as existing template
-			$sameHostnameTemplate = API::Template()->get([
-				'output' => ['templateid'],
-				'filter' => ['host' => $data['host']],
-				'nopermissions' => true,
-				'limit' => 1
-			]);
-			if ($sameHostnameTemplate) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%1$s" already exists.', $data['host']));
-			}
-		}
-
 		if (isset($data['interfaces'])) {
 			$updateInterfaces = $data['interfaces'];
 		}
 
-		// second check is necessary, because import incorrectly inputs unset 'inventory' as empty string rather than null
 		if (isset($data['inventory']) && $data['inventory']) {
-			if (isset($data['inventory_mode']) && $data['inventory_mode'] == HOST_INVENTORY_DISABLED) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
-			}
-
 			$updateInventory = $data['inventory'];
 			$updateInventory['inventory_mode'] = null;
 		}
@@ -1124,8 +999,7 @@ class CHost extends CHostGeneral {
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
 		}
 
-		unset($data['hosts'], $data['groups'], $data['interfaces'], $data['templates_clear'], $data['templates'],
-			$data['macros'], $data['inventory'], $data['inventory_mode']);
+		unset($data['hostid'], $data['interfaces'], $data['inventory'], $data['inventory_mode']);
 
 		if ($data) {
 			DB::update('hosts', [
@@ -1134,18 +1008,10 @@ class CHost extends CHostGeneral {
 			]);
 
 			if (array_key_exists('status', $data) && $data['status'] == HOST_STATUS_NOT_MONITORED) {
-				$discovered_hostids = [];
-
-				foreach ($db_hosts as $db_host) {
-					if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $data['status'] != $db_host['status']) {
-						$discovered_hostids[] = $db_host['hostid'];
-					}
-				}
-
-				if ($discovered_hostids) {
+				if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $data['status'] != $db_host['status']) {
 					DB::update('host_discovery', [
 						'values' => ['disable_source' => ZBX_DISABLE_DEFAULT],
-						'where' => ['hostid' => $discovered_hostids]
+						'where' => ['hostid' => $db_host['hostid']]
 					]);
 				}
 			}
@@ -1249,200 +1115,12 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		if ($hosts) {
-			$this->updateForce($hosts, $db_hosts);
+		$new_host = $data + $db_host;
+		if ($new_host['status'] != $db_host['status']) {
+			info(_s('Updated status of host "%1$s".', $new_host['host']));
 		}
 
-		$new_hosts = [];
-		foreach ($db_hosts as $hostid => $db_host) {
-			$new_host = $data + $db_host;
-			if ($new_host['status'] != $db_host['status']) {
-				info(_s('Updated status of host "%1$s".', $new_host['host']));
-			}
-
-			$new_hosts[] = $new_host;
-		}
-
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST, $new_hosts, $db_hosts);
-
-		return ['hostids' => $hostids];
-	}
-
-	private function validateMassUpdate(array &$data, ?array &$hosts, ?array &$db_hosts, array $options): void {
-		self::checkProxyFields($data);
-		self::checkTlsFields($data);
-
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'hosts' =>				['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
-				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'monitored_by' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])],
-			'proxyid' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn(array $_data): bool => array_key_exists('monitored_by', $_data) && $_data['monitored_by'] == ZBX_MONITORED_BY_PROXY, 'type' => API_ID, 'flags' => API_REQUIRED],
-										['else' => true, 'type' => API_ID, 'in' => '0']
-			]],
-			'proxy_groupid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn(array $_data): bool => array_key_exists('monitored_by', $_data) && $_data['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP, 'type' => API_ID, 'flags' => API_REQUIRED],
-										['else' => true, 'type' => API_ID, 'in' => '0']
-			]],
-			'tls_connect' =>		['type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])],
-			'tls_accept' =>			['type' => API_INT32, 'in' => implode(':', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE])],
-			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn(array $_data): bool => (array_key_exists('tls_connect', $_data) && $_data['tls_connect'] == HOST_ENCRYPTION_PSK) || (array_key_exists('tls_accept', $_data) && ($_data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0), 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk_identity')]
-			]],
-			'tls_psk' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn(array $_data): bool => (array_key_exists('tls_connect', $_data) && $_data['tls_connect'] == HOST_ENCRYPTION_PSK) || (array_key_exists('tls_accept', $_data) && ($_data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0), 'type' => API_PSK, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk')]
-			]],
-			'tls_issuer' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn(array $_data): bool => (array_key_exists('tls_connect', $_data) && $_data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE) || (array_key_exists('tls_accept', $_data) && ($_data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0), 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_issuer')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_issuer')]
-			]],
-			'tls_subject' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn(array $_data): bool => (array_key_exists('tls_connect', $_data) && $_data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE) || (array_key_exists('tls_accept', $_data) && ($_data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0), 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_subject')]
-			]],
-			'groups' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
-				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
-				'macro' =>				['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
-				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
-				'value' =>				['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('hostmacro', 'value')],
-											['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
-				]],
-				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
-			]],
-			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'templates_clear' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
-			]]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$hostids = array_column($data['hosts'], 'hostid');
-
-		$count = $this->get([
-			'countOutput' => true,
-			'hostids' => $hostids,
-			'editable' => true
-		]);
-
-		if ($count != count($hostids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		$db_hosts = DBfetchArrayAssoc(DBselect(
-			'SELECT h.hostid,h.host,h.flags,h.status,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,'.
-				'h.ipmi_password,h.name,h.description,h.monitored_by,h.proxyid,h.proxy_groupid,h.tls_connect,'.
-				'h.tls_accept,h.tls_psk_identity,h.tls_psk,h.tls_issuer,h.tls_subject,'.
-				dbConditionCoalesce('hi.inventory_mode', HOST_INVENTORY_MANUAL, 'inventory_mode').
-			' FROM hosts h'.
-			' LEFT JOIN host_inventory hi ON h.hostid=hi.hostid'.
-			' WHERE '.dbConditionId('h.hostid', $hostids)
-		), 'hostid');
-
-		foreach ($data['hosts'] as $i => $host) {
-			if (!array_key_exists($host['hostid'], $db_hosts)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-					'/hosts/'.($i + 1), _('object does not exist, or you have no permissions to it')
-				));
-			}
-			elseif ($db_hosts[$host['hostid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-				$field_name = array_key_exists('groups', $data) ? 'groups' : null;
-
-				if ($field_name) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						'/hosts/'.($i + 1),
-						_s('cannot update readonly parameter "%1$s" of discovered object', $field_name)
-					));
-				}
-			}
-		}
-
-		if (array_key_exists('monitored_by', $data)) {
-			self::checkProxiesAndProxyGroups([$data], null, '');
-		}
-
-		if (!$options || !array_key_exists('skip_tls_psk_pair_check', $options)) {
-			$this->checkTlsPskPair($data, $db_hosts);
-		}
-
-		if (!array_key_exists('groups', $data) && !array_key_exists('macros', $data)
-				&& !array_key_exists('templates', $data) && !array_key_exists('templates_clear', $data)) {
-			return;
-		}
-
-		$hosts = $data['hosts'];
-
-		$this->addObjectsByData($data, $hosts);
-		$this->addAffectedObjects($hosts, $db_hosts);
-
-		if (array_key_exists('groups', $data)) {
-			$this->checkGroups($hosts, $db_hosts, '/groups', array_flip(array_column($data['groups'], 'groupid')));
-			$this->checkHostsWithoutGroups($hosts, $db_hosts);
-		}
-
-		if (array_key_exists('macros', $data) && $data['macros']) {
-			self::addHostMacroIds($hosts, $db_hosts);
-		}
-
-		if (array_key_exists('templates', $data)
-				|| (array_key_exists('templates_clear', $data) && $data['templates_clear'])) {
-			$path = array_key_exists('templates', $data) ? '/templates' : null;
-			$template_indexes = array_key_exists('templates', $data)
-				? array_flip(array_column($data['templates'], 'templateid'))
-				: null;
-
-			$path_clear = array_key_exists('templates_clear', $data) && $data['templates_clear']
-				? '/templates_clear'
-				: null;
-			$template_clear_indexes = array_key_exists('templates_clear', $data) && $data['templates_clear']
-				? array_flip(array_column($data['templates_clear'], 'templateid'))
-				: null;
-
-			$this->checkTemplates($hosts, $db_hosts, $path, $template_indexes, $path_clear,
-				$template_clear_indexes
-			);
-			$this->checkTemplatesLinks($hosts, $db_hosts);
-		}
-	}
-
-	private static function checkProxyFields(array $data): void {
-		$proxy_data = array_intersect_key($data, array_flip(['proxyid', 'proxy_groupid']));
-
-		if ($proxy_data && !array_key_exists('monitored_by', $data)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_('The field "monitored_by" must be specified when changing proxy or proxy group for host monitoring.')
-			);
-		}
-	}
-
-	private static function checkTlsFields(array $data): void {
-		$tls_fields =
-			array_flip(['tls_connect', 'tls_accept', 'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject']);
-
-		if (array_intersect_key($data, $tls_fields)) {
-			if (!array_key_exists('tls_connect', $data) || !array_key_exists('tls_accept', $data)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('Both "tls_connect" and "tls_accept" fields must be specified when changing settings of connection encryption.')
-				);
-			}
-
-			if (($data['tls_connect'] == HOST_ENCRYPTION_PSK || $data['tls_accept'] & HOST_ENCRYPTION_PSK)
-					&& (!array_key_exists('tls_psk_identity', $data) || !array_key_exists('tls_psk', $data))) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('Both "tls_psk_identity" and "tls_psk" fields must be specified when changing the PSK for connection encryption.')
-				);
-			}
-		}
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST, [$new_host], [$db_host['hostid'] => $db_host]);
 	}
 
 	/**
@@ -1534,7 +1212,7 @@ class CHost extends CHostGeneral {
 
 		if (array_key_exists('groupids', $data) && $data['groupids']) {
 			$this->checkGroups($hosts, $db_hosts, '/groupids', array_flip($data['groupids']));
-			$this->checkHostsWithoutGroups($hosts, $db_hosts);
+			self::checkHostsWithoutGroups($hosts, $db_hosts);
 		}
 
 		if ((array_key_exists('templateids', $data) && $data['templateids'])
@@ -1559,7 +1237,7 @@ class CHost extends CHostGeneral {
 	}
 
 	private function addUnchangedObjects(array &$hosts, array $db_hosts, array $del_objectids = []): void {
-		$this->addUnchangedGroups($hosts, $db_hosts, $del_objectids);
+		self::addUnchangedGroups($hosts, $db_hosts, $del_objectids);
 		$this->addUnchangedMacros($hosts, $db_hosts, $del_objectids);
 		$this->addUnchangedTemplates($hosts, $db_hosts, $del_objectids);
 	}
@@ -1739,8 +1417,6 @@ class CHost extends CHostGeneral {
 			'elementid' => $hostids
 		]);
 
-		self::deleteHgSets($db_hosts);
-
 		// delete host
 		DB::delete('host_proxy', ['hostid' => $hostids]);
 		DB::delete('host_tag', ['hostid' => $hostids]);
@@ -1760,6 +1436,8 @@ class CHost extends CHostGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		self::addRelatedTags($options, $result);
+		self::addRelatedInheritedTags($options, $result);
 		self::addRelatedMacros($options, $result);
 		$this->addRelatedHostGroups($options, $result);
 
@@ -1857,68 +1535,6 @@ class CHost extends CHostGeneral {
 		self::addRelatedChildDiscoveries($options, $result);
 		self::addRelatedChildDiscoveryRules($options, $result);
 
-		if ($options['selectTags'] !== null) {
-			foreach ($result as &$row) {
-				$row['tags'] = [];
-			}
-			unset($row);
-
-			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
-				$output = ['hosttagid', 'hostid', 'tag', 'value', 'automatic'];
-			}
-			else {
-				$output = array_unique(array_merge(['hosttagid', 'hostid'], $options['selectTags']));
-			}
-
-			$sql_options = [
-				'output' => $output,
-				'filter' => ['hostid' => $hostids]
-			];
-			$db_tags = DBselect(DB::makeSql('host_tag', $sql_options));
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$hostid = $db_tag['hostid'];
-
-				unset($db_tag['hosttagid'], $db_tag['hostid']);
-
-				$result[$hostid]['tags'][] = $db_tag;
-			}
-		}
-
-		if ($options['selectInheritedTags'] !== null && $options['selectInheritedTags'] != API_OUTPUT_COUNT) {
-			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
-
-			$templates = API::Template()->get([
-				'output' => [],
-				'selectTags' => ['tag', 'value'],
-				'templateids' => $templateids,
-				'preservekeys' => true,
-				'nopermissions' => true
-			]);
-
-			// Set "inheritedTags" for each host.
-			foreach ($result as &$host) {
-				$tags = [];
-
-				// Get IDs and template tag values from previously stored variables.
-				foreach ($hosts_templates[$host['hostid']] as $templateid) {
-					foreach ($templates[$templateid]['tags'] as $tag) {
-						foreach ($tags as $_tag) {
-							// Skip tags with same name and value.
-							if ($_tag['tag'] === $tag['tag'] && $_tag['value'] === $tag['value']) {
-								continue 2;
-							}
-						}
-						$tags[] = $tag;
-					}
-				}
-
-				$host['inheritedTags'] = $this->unsetExtraFields($tags, ['tag', 'value'],
-					$options['selectInheritedTags']
-				);
-			}
-		}
-
 		return $result;
 	}
 
@@ -1956,32 +1572,6 @@ class CHost extends CHostGeneral {
 		while ($host_discovery = DBfetch($resource)) {
 			$result[$host_discovery['hostid']]['hostDiscovery'] =
 				array_diff_key($host_discovery, array_flip(['hostid']));
-		}
-	}
-
-	private static function validateGet(array &$options) {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			// Filters.
-			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
-			'selectInheritedTags' =>	['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-			'severities' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true],
-			'withProblemsSuppressed' =>	['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
-			// Output.
-			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value', 'automatic'])],
-			'selectValueMaps' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
-			'selectParentTemplates' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
-			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CUserMacro::getOutputFieldsOnHost()), 'default' => null],
-			'selectDiscoveryRule' => 	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::getOutputFieldsOnHost()), 'default' => null],
-			'selectHostDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
-			'selectDiscoveries' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', array_diff(CDiscoveryRule::getOutputFieldsOnHost(), ['hostid'])), 'default' => null],
-			'selectDiscoveryRules' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_NORMALIZE, 'in' => implode(',', array_diff(CDiscoveryRule::getOutputFieldsOnHost(), ['hostid'])), 'default' => null],
-			// Sort and limit.
-			'limitSelects' =>			['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 
@@ -2198,12 +1788,10 @@ class CHost extends CHostGeneral {
 	/**
 	 * @param array       $hosts
 	 * @param array|null  $db_hosts
-	 * @param string|null $path
 	 *
 	 * @throws APIException
 	 */
-	private static function checkProxiesAndProxyGroups(array $hosts, ?array $db_hosts = null,
-			?string $path = null): void {
+	private static function checkProxiesAndProxyGroups(array $hosts, ?array $db_hosts = null): void {
 		$host_indexes = [
 			'proxyids' => [],
 			'proxy_groupids' => []
@@ -2220,10 +1808,8 @@ class CHost extends CHostGeneral {
 				}
 
 				if ($host['proxyid'] == 0) {
-					$path = $path === null ? '/'.($i + 1) : '';
-
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/proxyid', _('object does not exist, or you have no permissions to it')
+						'/'.($i + 1).'/proxyid', _('object does not exist, or you have no permissions to it')
 					));
 				}
 
@@ -2238,10 +1824,8 @@ class CHost extends CHostGeneral {
 				}
 
 				if ($host['proxy_groupid'] == 0) {
-					$path = $path === null ? '/'.($i + 1) : '';
-
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/proxy_groupid', _('object does not exist, or you have no permissions to it')
+						'/'.($i + 1).'/proxy_groupid', _('object does not exist, or you have no permissions to it')
 					));
 				}
 
@@ -2261,10 +1845,8 @@ class CHost extends CHostGeneral {
 
 			foreach ($host_indexes['proxyids'] as $proxyid => $i) {
 				if (!array_key_exists($proxyid, $db_proxies)) {
-					$path = $path === null ? '/'.($i + 1) : '';
-
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/proxyid', _('object does not exist, or you have no permissions to it')
+						'/'.($i + 1).'/proxyid', _('object does not exist, or you have no permissions to it')
 					));
 				}
 			}
@@ -2279,10 +1861,8 @@ class CHost extends CHostGeneral {
 
 			foreach ($host_indexes['proxy_groupids'] as $proxy_groupid => $i) {
 				if (!array_key_exists($proxy_groupid, $db_proxy_groups)) {
-					$path = $path === null ? '/'.($i + 1) : '';
-
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/proxy_groupid', _('object does not exist, or you have no permissions to it')
+						'/'.($i + 1).'/proxy_groupid', _('object does not exist, or you have no permissions to it')
 					));
 				}
 			}
@@ -2316,13 +1896,15 @@ class CHost extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$db_hosts = DB::select('hosts', [
-			'output' => ['hostid', 'host', 'flags', 'monitored_by', 'proxyid', 'proxy_groupid', 'tls_connect',
-				'tls_accept', 'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject'
-			],
-			'hostids' => array_column($hosts, 'hostid'),
-			'preservekeys' => true
-		]);
+		$db_hosts = DBfetchArrayAssoc(DBselect(
+			'SELECT h.hostid,h.host,h.name,h.description,h.monitored_by,h.proxyid,h.proxy_groupid,h.status,'.
+				'h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password,'.
+				dbConditionCoalesce('hi.inventory_mode', HOST_INVENTORY_MANUAL, 'inventory_mode').','.
+				'h.tls_connect,h.tls_accept,h.tls_psk_identity,h.tls_psk,h.tls_issuer,h.tls_subject,h.flags'.
+			' FROM hosts h'.
+			' LEFT JOIN host_inventory hi ON h.hostid=hi.hostid'.
+			' WHERE '.dbConditionId('h.hostid', array_column($hosts, 'hostid'))
+		), 'hostid');
 
 		$this->checkDiscoveredFields($hosts, $db_hosts);
 
@@ -2350,13 +1932,12 @@ class CHost extends CHostGeneral {
 		self::checkProxiesAndProxyGroups($hosts, $db_hosts);
 		self::checkTlsPskPairs($hosts, $db_hosts);
 
-		foreach ($hosts as &$host) {
+		foreach ($hosts as $host) {
 			// Property 'auto_compress' is not supported for hosts.
 			if (array_key_exists('auto_compress', $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 		}
-		unset($host);
 
 		$this->addAffectedObjects($hosts, $db_hosts);
 
@@ -2633,7 +2214,7 @@ class CHost extends CHostGeneral {
 	}
 
 	private function addAffectedObjects(array $hosts, array &$db_hosts): void {
-		$this->addAffectedGroups($hosts, $db_hosts);
+		self::addAffectedGroups($hosts, $db_hosts);
 		$this->addAffectedTemplates($hosts, $db_hosts);
 		$this->addAffectedTags($hosts, $db_hosts);
 		self::addAffectedMacros($hosts, $db_hosts);
@@ -2682,18 +2263,6 @@ class CHost extends CHostGeneral {
 			CApiPskHelper::checkPskOfIdentitiesAmongHosts($psk_pairs, $psk_hostids);
 			CApiPskHelper::checkPskOfIdentitiesAmongProxies($psk_pairs);
 		}
-	}
-
-	private function checkTlsPskPair(array $data, array $db_hosts): void {
-		$psk_pair = array_intersect_key($data, array_flip(['tls_psk_identity', 'tls_psk']));
-
-		if (!$psk_pair) {
-			return;
-		}
-
-		CApiPskHelper::checkPskOfIdentityInAutoregistration($psk_pair);
-		CApiPskHelper::checkPskOfIdentityAmongHosts($psk_pair, array_keys($db_hosts));
-		CApiPskHelper::checkPskOfIdentityAmongProxies($psk_pair);
 	}
 
 	protected function requiresPostSqlFiltering(array $options) {
@@ -2822,5 +2391,33 @@ class CHost extends CHostGeneral {
 		}
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST_GROUP, $host_groups, $db_host_groups);
+	}
+
+	public function unlinkGroups(array $groupids): void {
+		$db_hosts = $this->get([
+			'output' => ['host'],
+			'groupids' => $groupids,
+			'preservekeys' => true
+		]);
+
+		if (!$db_hosts) {
+			return;
+		}
+
+		$hosts = [];
+
+		foreach ($db_hosts as $hostid => $foo) {
+			$hosts[] = [
+				'hostid' => $hostid,
+				'groups' => []
+			];
+		}
+
+		self::addAffectedGroups($hosts, $db_hosts);
+		self::addUnchangedGroups($hosts, $db_hosts, ['groupids' => $groupids]);
+
+		self::checkHostsWithoutGroups($hosts, $db_hosts);
+
+		$this->updateForce($hosts, $db_hosts);
 	}
 }

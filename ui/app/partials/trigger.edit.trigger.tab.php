@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -56,8 +56,9 @@ if ($data['discovered_trigger'] || $data['is_discovered_prototype']) {
 $trigger_form_grid
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		new CFormField((new CTextBox('name', $data['description'], $readonly))
+		new CFormField((new CTextAreaFlexible('name', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setReadonly($readonly)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 		)])
@@ -71,7 +72,9 @@ $trigger_form_grid
 		)])
 	->addItem([
 		new CLabel(_('Operational data'), 'opdata'),
-		new CFormField((new CTextBox('opdata', $data['opdata'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+		new CFormField((new CTextAreaFlexible('opdata', $data['opdata']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setReadonly($readonly))
 	]);
 
 if ($data['discovered_trigger'] || $data['is_discovered_prototype']) {
@@ -292,6 +295,7 @@ $trigger_form_grid
 		new CFormField(
 			(new CCheckBox('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED))
 				->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+				->setUncheckedValue(ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
 				->setReadonly($readonly)
 		)
 	])
@@ -309,9 +313,10 @@ $trigger_form_grid
 	])
 	->addItem([new CLabel(_('Menu entry URL'), 'url'),
 		new CFormField(
-			(new CTextBox('url', array_key_exists('url', $data) ? $data['url'] : '',
-				$data['discovered_trigger'] || $data['is_discovered_prototype'], DB::getFieldLength('triggers', 'url')
-			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CTextAreaFlexible('url', array_key_exists('url', $data) ? $data['url'] : ''))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('triggers', 'url'))
+				->setReadonly($data['discovered_trigger'] || $data['is_discovered_prototype'])
 		)
 	])
 	->addItem([new CLabel(_('Description'), 'description'),

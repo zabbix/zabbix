@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -231,7 +231,8 @@ foreach ($data['discoveries'] as $discovery) {
 		],
 		[
 			new CLink(_('Host prototypes'),
-				(new CUrl('host_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'host.prototype.list')
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
 			),

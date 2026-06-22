@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -120,8 +120,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				}
 			);
 
-			$result = false;
-
 			try {
 				DBstart();
 
@@ -144,7 +142,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				}
 
 				if (array_key_exists('tags', $visible)) {
-					$options['selectTags'] = ['tag', 'value', 'automatic'];
+					$options['selectTags'] = ['tag', 'value'];
 				}
 
 				if (array_key_exists('macros', $visible)) {
@@ -372,14 +370,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 										continue;
 									}
 
-									if ($tags_map[$tag['tag']][$tag['value']]['automatic'] == ZBX_TAG_AUTOMATIC) {
-										error(_s(
-											'Cannot remove the tag with name "%1$s" and value "%2$s", defined in a host prototype, from host "%3$s".',
-											$tag['tag'], $tag['value'], $host['host']
-										));
-										throw new Exception();
-									}
-
 									unset($tags_map[$tag['tag']][$tag['value']]);
 								}
 
@@ -387,7 +377,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 								foreach ($tags_map as $tags_map_2) {
 									foreach ($tags_map_2 as $tag) {
-										unset($tag['automatic']);
 										$host['tags'][] = $tag;
 									}
 								}
@@ -436,14 +425,25 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 								break;
 
 							case ZBX_ACTION_REMOVE:
-								if ($macros) {
-									$except_selected = $this->getInput('macros_remove', 0);
-									$host_macros_by_macro = array_column($host['macros'], null, 'macro');
-									$macros_by_macro = array_column($macros, null, 'macro');
+								if ($host['macros'] && $macros) {
+									$host['macros'] = array_column($host['macros'], null, 'macro');
+									$matched_macros = [];
 
-									$host['macros'] = $except_selected
-										? array_intersect_key($host_macros_by_macro, $macros_by_macro)
-										: array_diff_key($host_macros_by_macro, $macros_by_macro);
+									foreach ($host['macros'] as $host_macro => $foo) {
+										$trimmed_macro = CApiInputValidator::trimMacro($host_macro);
+
+										foreach ($macros as $macro) {
+											if (CApiInputValidator::trimMacro($macro['macro']) === $trimmed_macro) {
+												$matched_macros[$host_macro] = true;
+
+												continue 2;
+											}
+										}
+									}
+
+									$host['macros'] = (bool) $this->getInput('macros_remove', 0)
+										? array_intersect_key($host['macros'], $matched_macros)
+										: array_diff_key($host['macros'], $matched_macros);
 								}
 								break;
 

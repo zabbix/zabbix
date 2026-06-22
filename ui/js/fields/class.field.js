@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,7 +23,7 @@ class CField {
 	_changed = false;
 	_error_msg = null;
 	_error_level = -1;
-	_global_errors = {};
+	_global_errors = Object.create(null);
 	_error_container = null;
 	_error_label;
 	_allow_trim;
@@ -82,12 +82,12 @@ class CField {
 		return this._changed;
 	}
 
-	setGlobalError(message) {
-		this._global_errors[this.getName()] = message;
-	}
-
 	getGlobalErrors() {
 		return this._global_errors;
+	}
+
+	getField() {
+		return this._field;
 	}
 
 	getName() {
@@ -106,8 +106,20 @@ class CField {
 		return '/' + this.getName().replaceAll('[', '/').replaceAll(']', '');
 	}
 
+	isDisabled() {
+		return false;
+	}
+
 	isSameField(field) {
 		return field == this._field;
+	}
+
+	/**
+	 * This method is called when field is rediscovered. Together with this.isSameField().
+	 * Its purpose is to update field's state if rediscovery could have been triggered by this change.
+	 */
+	updateState() {
+		// blank
 	}
 
 	setTabId(tab_id) {
@@ -127,7 +139,7 @@ class CField {
 			if (this._error_level >= level) {
 				this._error_msg = null;
 				this._error_level = -1;
-				this._global_errors = {};
+				this._global_errors = Object.create(null);
 			}
 		}
 		else {
@@ -176,10 +188,11 @@ class CField {
 	}
 
 	errorHint() {
+		const row_level_error_levels = [CFormValidator.ERROR_LEVEL_OBJECTS_COUNT, CFormValidator.ERROR_LEVEL_UNIQ];
 		const error_hint = document.createElement(this._error_container !== null ? 'li' : 'span');
 
 		error_hint.classList.add('error');
-		error_hint.textContent = this._error_label !== null && this._error_level != CFormValidator.ERROR_LEVEL_UNIQ
+		error_hint.textContent = this._error_label !== null && !row_level_error_levels.includes(this._error_level)
 			? sprintf(t('%1$s: %2$s'), this._error_label, this._error_msg)
 			: this._error_msg;
 

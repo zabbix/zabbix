@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -30,6 +30,7 @@
 #include "zbxipcservice.h"
 #include "zbxlog.h"
 #include "zbxhistory.h"
+#include "zbxcurl.h"
 
 static sigset_t			orig_mask;
 
@@ -123,7 +124,6 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 			server_num, (process_name = get_process_type_string(process_type)), process_num);
 
 	zbx_hc_acquire();
-
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -175,8 +175,7 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		zbx_block_signals(&orig_mask);
 
 		zbx_prof_start(__func__, ZBX_PROF_PROCESSING);
-		zbx_sync_history_cache(dbsyncer_args->events_cbs, &rtc, dbsyncer_args->config_history_storage_pipelines,
-				&sync_stats);
+		zbx_sync_history_cache(dbsyncer_args->events_cbs, &rtc, &sync_stats);
 		zbx_prof_end();
 
 		if (!ZBX_IS_RUNNING() && SUCCEED != zbx_db_trigger_queue_locked())
@@ -260,7 +259,6 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 			running = 0;
 	}
 
-
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 	zbx_block_signals(&orig_mask);
 	if (SUCCEED != zbx_db_trigger_queue_locked())
@@ -297,9 +295,9 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		zbx_export_deinit(problems_export);
 
 	zbx_ipc_async_socket_close(&rtc);
-
 	zbx_free(stats);
+	zbx_curl_cleanup();
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

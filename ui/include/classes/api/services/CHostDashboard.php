@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -39,7 +39,7 @@ class CHostDashboard extends CApiService {
 			'excludeSearch' =>			['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// Output.
-			'output' =>					['type' => API_OUTPUT, 'flags' => API_NOT_EMPTY, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'selectPages' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['dashboard_pageid', 'name', 'display_period', 'widgets']), 'default' => null],
 			'countOutput' =>			['type' => API_BOOLEAN, 'default' => false],
 			'groupCount' =>				['type' => API_BOOLEAN, 'default' => false],
@@ -279,8 +279,11 @@ class CHostDashboard extends CApiService {
 
 	private function getTemplateDashboardSelectQuery(array $options, array $templateids): string {
 		$sql_parts = [
-			'from' => ['dashboard' => 'dashboard d'],
-			'where' => [dbConditionId('d.templateid', $templateids)]
+			'select' => [],
+			'from' => 'dashboard d',
+			'where' => [dbConditionId('d.templateid', $templateids)],
+			'group' => [],
+			'order' => []
 		];
 
 		if ($options['dashboardids'] !== null) {

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -24,28 +24,48 @@ class CControllerMediatypeTestSend extends CController {
 	private $mediatype;
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'mediatypeid' =>	'fatal|required|db media_type.mediatypeid',
-			'sendto' =>			'string|not_empty',
-			'subject' =>		'string',
-			'message' =>		'string',
-			'parameters' =>		'array'
-		];
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'mediatypeid' => ['db media_type.mediatypeid', 'required'],
+			'type' => ['db media_type.type', 'required',
+				'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK]],
+			'sendto' => [
+				['string','required', 'not_empty',
+					'when' => ['type', 'in' => [MEDIA_TYPE_SMS]]
+				],
+				['string','required', 'not_empty', 'use' => [CEmailValidator::class],
+					'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL]]
+				]
+			],
+			'subject' => ['string', 'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_SMS]]],
+			'message' => ['string', 'required', 'not_empty',
+				'when' => ['type', 'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_SMS]]
+			],
+			'parameters' => ['objects', 'fields' => [
+				'name' => ['db media_type_param.name', 'required', 'not_empty',
+					'when' => ['../type', 'in' => [MEDIA_TYPE_WEBHOOK]]],
+				'value' => ['db media_type_param.value', 'required']
+			], 'when' => ['type', 'in' => [MEDIA_TYPE_EXEC, MEDIA_TYPE_WEBHOOK]]]
+		]];
+	}
 
-		$ret = $this->validateInput($fields) && $this->validateMediaType();
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules()) && $this->validateMediaType();
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'title' => _('Media type test failed.'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
+				new CControllerResponseData(['main_block' => json_encode($response)])
 			);
 		}
 
@@ -81,66 +101,21 @@ class CControllerMediatypeTestSend extends CController {
 			return false;
 		}
 
-		$ret = true;
-
-		if ($this->mediatype['type'] != MEDIA_TYPE_EXEC && $this->mediatype['type'] != MEDIA_TYPE_WEBHOOK) {
-			$validator = new CNewValidator(array_map('trim', $this->getInputAll()), [
-				'message' =>	'string|not_empty'
-			]);
-
-			foreach ($validator->getAllErrors() as $error) {
-				error($error);
-			}
-
-			$ret = !$validator->isError();
-
-			if ($ret && $this->mediatype['type'] == MEDIA_TYPE_EMAIL) {
-				$email_validator = new CEmailValidator();
-				$ret = $email_validator->validate($this->getInput('sendto'));
-
-				if (!$ret) {
-					error($email_validator->getError());
-				}
-			}
-		}
-
-		return $ret;
+		return true;
 	}
 
 	protected function doAction(): void {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		switch ($this->mediatype['type']) {
-			case MEDIA_TYPE_EXEC:
-				$parameters = [];
+		$params = $this->getInputAll();
 
-				foreach ($this->getInput('parameters', []) as $parameter) {
-					$parameters[] = $parameter['value'];
-				}
-
-				$params = ['parameters' => $parameters];
-				break;
-
-			case MEDIA_TYPE_WEBHOOK:
-				$parameters = [];
-
-				foreach ($this->getInput('parameters', []) as $parameter) {
-					$parameters[$parameter['name']] = $parameter['value'];
-				}
-
-				$params = ['parameters' => $parameters];
-				break;
-
-			default:
-				$params = [
-					'sendto' =>	$this->getInput('sendto'),
-					'subject' => $this->getInput('subject'),
-					'message' => $this->getInput('message')
-				];
-
+		if ($params['type'] == MEDIA_TYPE_EXEC) {
+			$params['parameters'] = array_column($params['parameters'] ?? [], 'value');
+		}
+		elseif ($params['type'] == MEDIA_TYPE_WEBHOOK) {
+			$params['parameters'] =  array_column($params['parameters'] ?? [], 'value', 'name');
 		}
 
-		$params['mediatypeid'] = $this->getInput('mediatypeid');
 		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::MEDIA_TYPE_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT

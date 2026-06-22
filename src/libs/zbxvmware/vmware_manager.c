@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -28,6 +28,7 @@
 #include "zbxself.h"
 #include "zbxtime.h"
 #include "zbxlog.h"
+#include "zbxcurl.h"
 
 /******************************************************************************
  *                                                                            *
@@ -261,6 +262,8 @@ ZBX_THREAD_ENTRY(zbx_vmware_thread, args)
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
+	zbx_curl_init();
+
 #define JOB_TIMEOUT	1
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -313,7 +316,7 @@ ZBX_THREAD_ENTRY(zbx_vmware_thread, args)
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 	xmlCleanupParser();
-	curl_global_cleanup();
+	zbx_curl_cleanup();
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
@@ -322,6 +325,6 @@ ZBX_THREAD_ENTRY(zbx_vmware_thread, args)
 #else
 	ZBX_UNUSED(args);
 	THIS_SHOULD_NEVER_HAPPEN;
-	zbx_thread_exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 #endif
 }

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,6 +27,8 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxcachevalue.h"
+#include "zbxhistory.h"
 
 /******************************************************************************
  *                                                                            *
@@ -299,6 +301,116 @@ static void	get_recovery_event_value(const char *macro, const zbx_db_event *r_ev
 	}
 }
 
+static const char	*item_logtype_string(unsigned char logtype)
+{
+	switch (logtype)
+	{
+		case ITEM_LOGTYPE_INFORMATION:
+			return "Information";
+		case ITEM_LOGTYPE_WARNING:
+			return "Warning";
+		case ITEM_LOGTYPE_ERROR:
+			return "Error";
+		case ITEM_LOGTYPE_FAILURE_AUDIT:
+			return "Failure Audit";
+		case ITEM_LOGTYPE_SUCCESS_AUDIT:
+			return "Success Audit";
+		case ITEM_LOGTYPE_CRITICAL:
+			return "Critical";
+		case ITEM_LOGTYPE_VERBOSE:
+			return "Verbose";
+		default:
+			return "unknown";
+	}
+}
+
+/* requests for get_history_log_value() */
+#define ZBX_DC_REQUEST_ITEM_LOG_DATE		201
+#define ZBX_DC_REQUEST_ITEM_LOG_TIME		202
+#define ZBX_DC_REQUEST_ITEM_LOG_AGE		203
+#define ZBX_DC_REQUEST_ITEM_LOG_SOURCE		204
+#define ZBX_DC_REQUEST_ITEM_LOG_SEVERITY	205
+#define ZBX_DC_REQUEST_ITEM_LOG_NSEVERITY	206
+#define ZBX_DC_REQUEST_ITEM_LOG_EVENTID		207
+#define ZBX_DC_REQUEST_ITEM_LOG_TIMESTAMP	208
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve a particular attribute of a log value.                   *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns,
+		const char *tz)
+{
+	zbx_dc_item_t		item;
+	int			ret = FAIL, errcode = FAIL;
+	zbx_timespec_t		ts = {clock, ns};
+	zbx_history_record_t	value;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_dc_config_get_items_by_itemids(&item, &itemid, &errcode, 1);
+
+	if (SUCCEED != errcode || ITEM_VALUE_TYPE_LOG != item.value_type)
+		goto out;
+
+	if (SUCCEED != zbx_vc_get_value(itemid, item.value_type, &ts, &value))
+		goto out;
+
+	zbx_vc_flush_stats();
+
+	switch (request)
+	{
+		case ZBX_DC_REQUEST_ITEM_LOG_DATE:
+			*replace_to = zbx_strdup(*replace_to, zbx_date2str((time_t)value.value.log->timestamp, tz));
+			goto success;
+		case ZBX_DC_REQUEST_ITEM_LOG_TIME:
+			*replace_to = zbx_strdup(*replace_to, zbx_time2str((time_t)value.value.log->timestamp, tz));
+			goto success;
+		case ZBX_DC_REQUEST_ITEM_LOG_AGE:
+			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - value.value.log->timestamp));
+			goto success;
+		case ZBX_DC_REQUEST_ITEM_LOG_TIMESTAMP:
+			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->timestamp);
+			goto success;
+	}
+
+	/* the following attributes are set only for windows eventlog items */
+	if (0 != strncmp(item.key_orig, "eventlog[", 9))
+		goto clean;
+
+	switch (request)
+	{
+		case ZBX_DC_REQUEST_ITEM_LOG_SOURCE:
+			*replace_to = zbx_strdup(*replace_to, (NULL == value.value.log->source ? "" :
+					value.value.log->source));
+			break;
+		case ZBX_DC_REQUEST_ITEM_LOG_SEVERITY:
+			*replace_to = zbx_strdup(*replace_to,
+					item_logtype_string((unsigned char)value.value.log->severity));
+			break;
+		case ZBX_DC_REQUEST_ITEM_LOG_NSEVERITY:
+			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->severity);
+			break;
+		case ZBX_DC_REQUEST_ITEM_LOG_EVENTID:
+			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->logeventid);
+			break;
+	}
+success:
+	ret = SUCCEED;
+clean:
+	zbx_history_record_clear(&value, ITEM_VALUE_TYPE_LOG);
+out:
+	zbx_dc_config_clean_items(&item, &errcode, 1);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve a particular attribute of a log value.                   *
@@ -351,7 +463,7 @@ int	zbx_get_history_log_value(const char *m, const zbx_db_trigger *trigger, char
 		goto out;
 
 	if (SUCCEED == (ret = zbx_db_trigger_get_itemid(trigger, N_functionid, &itemid)))
-		ret = zbx_dc_get_history_log_value(itemid, replace_to, request, clock, ns, tz);
+		ret = get_history_log_value(itemid, replace_to, request, clock, ns, tz);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -389,7 +501,7 @@ static int	macro_trigger_common_resolv(zbx_macro_resolv_data_t *p, const zbx_dc_
 				return SUCCEED_PARTIAL; /* move to the next macro */
 			}
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+		else if (0 == strcmp(p->macro, MVAR_HOST_HOST))
 		{
 			ret = zbx_db_with_trigger_itemid(&event->trigger, replace_to, p->index,
 					&zbx_dc_get_host_value, ZBX_DC_REQUEST_HOST_HOST);
@@ -399,7 +511,7 @@ static int	macro_trigger_common_resolv(zbx_macro_resolv_data_t *p, const zbx_dc_
 			ret = zbx_db_with_trigger_itemid(&event->trigger, replace_to, p->index,
 					&zbx_dc_get_host_value, ZBX_DC_REQUEST_HOST_NAME);
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+		else if (0 == strcmp(p->macro, MVAR_HOST_IP))
 		{
 			ret = zbx_db_with_trigger_itemid(&event->trigger, replace_to, p->index,
 					&zbx_dc_get_interface_value_itemid, ZBX_DC_REQUEST_HOST_IP);
@@ -799,6 +911,21 @@ fail:
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compare events to sort by highest severity and host name          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_eventdata_compare(const void *a1, const void *a2)
+{
+	const zbx_eventdata_t	*d1 = (const zbx_eventdata_t *)a1;
+	const zbx_eventdata_t	*d2 = (const zbx_eventdata_t *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(d2->nseverity, d1->nseverity);
+
+	return strcmp(d1->host, d2->host);
+}
+
 static int	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to)
 {
 	int			ret = FAIL;
@@ -833,7 +960,7 @@ static int	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_
 
 		zbx_db_get_events_by_eventids(&symptom_eventids, &symptom_events);
 		eventdata_compose(&symptom_events, &symptoms);
-		zbx_vector_eventdata_sort(&symptoms, (zbx_compare_func_t)zbx_eventdata_compare);
+		zbx_vector_eventdata_sort(&symptoms, zbx_eventdata_compare);
 		ret = zbx_eventdata_to_str(&symptoms, replace_to);
 
 		for (int i = 0; i < symptoms.values_num; i++)
@@ -1218,7 +1345,7 @@ static void	expr_db_get_rootcause(const zbx_db_service *service, char **replace_
 	zbx_vector_eventdata_create(&rootcauses);
 
 	eventdata_compose(&service->events, &rootcauses);
-	zbx_vector_eventdata_sort(&rootcauses, (zbx_compare_func_t)zbx_eventdata_compare);
+	zbx_vector_eventdata_sort(&rootcauses, zbx_eventdata_compare);
 	zbx_eventdata_to_str(&rootcauses, replace_to);
 
 	for (int i = 0; i < rootcauses.values_num; i++)
@@ -1487,7 +1614,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 			ret = zbx_db_with_trigger_itemid(&event->trigger, replace_to, p->index, &zbx_dc_get_host_value,
 					ZBX_DC_REQUEST_HOST_ID);
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+		else if (0 == strcmp(p->macro, MVAR_HOST_HOST))
 		{
 			ret = zbx_db_with_trigger_itemid(&c_event->trigger, replace_to, p->index,
 					&zbx_dc_get_host_value, ZBX_DC_REQUEST_HOST_HOST);
@@ -1502,7 +1629,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 			ret = zbx_db_with_trigger_itemid(&c_event->trigger, replace_to, p->index,
 					&zbx_db_get_item_value, ZBX_DB_REQUEST_HOST_DESCRIPTION);
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+		else if (0 == strcmp(p->macro, MVAR_HOST_IP))
 		{
 			ret = zbx_db_with_trigger_itemid(&c_event->trigger, replace_to, p->index,
 					&zbx_dc_get_interface_value_itemid, ZBX_DC_REQUEST_HOST_IP);
@@ -1522,8 +1649,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 			ret = zbx_db_with_trigger_itemid(&c_event->trigger, replace_to, p->index,
 					&zbx_dc_get_interface_value_itemid, ZBX_DC_REQUEST_HOST_PORT);
 		}
-		else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)) ||
-				0 == strncmp(p->macro, MVAR_PROFILE, ZBX_CONST_STRLEN(MVAR_PROFILE)))
+		else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
 		{
 			ret = zbx_dc_get_host_inventory(p->macro, &c_event->trigger, replace_to, p->index);
 		}
@@ -1550,7 +1676,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 			ret = zbx_db_with_trigger_itemid(&c_event->trigger, replace_to, p->index,
 					&zbx_db_get_item_value, ZBX_DB_REQUEST_ITEM_ID);
 		}
-		else if (0 == strcmp(p->macro, MVAR_ITEM_KEY) || 0 == strcmp(p->macro, MVAR_TRIGGER_KEY))
+		else if (0 == strcmp(p->macro, MVAR_ITEM_KEY))
 		{
 			uint64_t	itemid;
 
@@ -1661,8 +1787,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		{
 			*replace_to = zbx_dsprintf(*replace_to, "%ld", (long)time(NULL));
 		}
-		else if (0 == strcmp(p->macro, MVAR_TRIGGER_DESCRIPTION) ||
-				0 == strcmp(p->macro, MVAR_TRIGGER_COMMENT))
+		else if (0 == strcmp(p->macro, MVAR_TRIGGER_DESCRIPTION))
 		{
 			*replace_to = zbx_strdup(*replace_to, c_event->trigger.comments);
 			zbx_substitute_macros(replace_to, error, maxerrlen, &zbx_macro_trigger_desc_resolv, um_handle,
@@ -1743,7 +1868,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		{
 			*replace_to = zbx_dsprintf(*replace_to, "%d", (int)c_event->trigger.priority);
 		}
-		else if (0 == strcmp(p->macro, MVAR_TRIGGER_STATUS) || 0 == strcmp(p->macro, MVAR_STATUS))
+		else if (0 == strcmp(p->macro, MVAR_TRIGGER_STATUS))
 		{
 			*replace_to = zbx_strdup(*replace_to, trigger_value_string(c_event->trigger.value));
 		}
@@ -1836,7 +1961,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 			ret = zbx_db_with_trigger_itemid(&event->trigger, replace_to, p->index,
 					&zbx_dc_get_host_value, ZBX_DC_REQUEST_HOST_ID);
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+		else if (0 == strcmp(p->macro, MVAR_HOST_HOST))
 		{
 			ret = zbx_db_with_trigger_itemid(&c_event->trigger, replace_to, p->index,
 					&zbx_dc_get_host_value, ZBX_DC_REQUEST_HOST_HOST);
@@ -1851,7 +1976,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 			ret = zbx_db_with_trigger_itemid(&c_event->trigger, replace_to, p->index,
 					&zbx_db_get_item_value, ZBX_DB_REQUEST_HOST_DESCRIPTION);
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+		else if (0 == strcmp(p->macro, MVAR_HOST_IP))
 		{
 			ret = zbx_db_with_trigger_itemid(&c_event->trigger, replace_to, p->index,
 					&zbx_dc_get_interface_value_itemid, ZBX_DC_REQUEST_HOST_IP);
@@ -1871,8 +1996,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 			ret = zbx_db_with_trigger_itemid(&c_event->trigger, replace_to, p->index,
 					&zbx_dc_get_interface_value_itemid, ZBX_DC_REQUEST_HOST_PORT);
 		}
-		else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)) ||
-				0 == strncmp(p->macro, MVAR_PROFILE, ZBX_CONST_STRLEN(MVAR_PROFILE)))
+		else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
 		{
 			ret = zbx_dc_get_host_inventory(p->macro, &c_event->trigger, replace_to, p->index);
 		}
@@ -1899,7 +2023,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 			ret = zbx_db_with_trigger_itemid(&c_event->trigger, replace_to, p->index,
 					&zbx_db_get_item_value, ZBX_DB_REQUEST_ITEM_ID);
 		}
-		else if (0 == strcmp(p->macro, MVAR_ITEM_KEY) || 0 == strcmp(p->macro, MVAR_TRIGGER_KEY))
+		else if (0 == strcmp(p->macro, MVAR_ITEM_KEY))
 		{
 			uint64_t	itemid;
 
@@ -1955,8 +2079,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		{
 			*replace_to = zbx_dsprintf(*replace_to, "%ld", (long)time(NULL));
 		}
-		else if (0 == strcmp(p->macro, MVAR_TRIGGER_DESCRIPTION) ||
-				0 == strcmp(p->macro, MVAR_TRIGGER_COMMENT))
+		else if (0 == strcmp(p->macro, MVAR_TRIGGER_DESCRIPTION))
 		{
 			*replace_to = zbx_strdup(*replace_to, c_event->trigger.comments);
 			zbx_substitute_macros(replace_to, error, maxerrlen, &zbx_macro_trigger_desc_resolv, um_handle,
@@ -2234,7 +2357,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		{
 			ret = zbx_event_db_get_autoreg(c_event, replace_to, "host");
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+		else if (0 == strcmp(p->macro, MVAR_HOST_IP))
 		{
 			ret = zbx_event_db_get_autoreg(c_event, replace_to, "listen_ip");
 		}
@@ -2341,7 +2464,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		{
 			ret = zbx_dc_get_host_value(c_event->objectid, replace_to, ZBX_DC_REQUEST_HOST_ID);
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+		else if (0 == strcmp(p->macro, MVAR_HOST_HOST))
 		{
 			ret = zbx_dc_get_host_value(c_event->objectid, replace_to, ZBX_DC_REQUEST_HOST_HOST);
 		}
@@ -2353,7 +2476,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		{
 			ret = zbx_db_get_item_value(c_event->objectid, replace_to, ZBX_DB_REQUEST_HOST_DESCRIPTION);
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+		else if (0 == strcmp(p->macro, MVAR_HOST_IP))
 		{
 			ret = zbx_dc_get_interface_value(0, c_event->objectid, replace_to, ZBX_DC_REQUEST_HOST_IP);
 		}
@@ -2369,8 +2492,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		{
 			ret = zbx_dc_get_interface_value(0, c_event->objectid, replace_to, ZBX_DC_REQUEST_HOST_PORT);
 		}
-		else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)) ||
-				0 == strncmp(p->macro, MVAR_PROFILE, ZBX_CONST_STRLEN(MVAR_PROFILE)))
+		else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
 		{
 			ret = zbx_dc_get_host_inventory_by_itemid(p->macro, c_event->objectid, replace_to);
 		}
@@ -2391,7 +2513,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		{
 			*replace_to = zbx_dsprintf(*replace_to, ZBX_FS_UI64, c_event->objectid);
 		}
-		else if (0 == strcmp(p->macro, MVAR_ITEM_KEY) || 0 == strcmp(p->macro, MVAR_TRIGGER_KEY))
+		else if (0 == strcmp(p->macro, MVAR_ITEM_KEY))
 		{
 			ret = zbx_dc_get_item_key(c_event->objectid, replace_to);
 		}
@@ -2494,7 +2616,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		{
 			ret = zbx_dc_get_host_value(c_event->objectid, replace_to, ZBX_DC_REQUEST_HOST_ID);
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+		else if (0 == strcmp(p->macro, MVAR_HOST_HOST))
 		{
 			ret = zbx_dc_get_host_value(c_event->objectid, replace_to, ZBX_DC_REQUEST_HOST_HOST);
 		}
@@ -2506,7 +2628,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		{
 			ret = zbx_db_get_item_value(c_event->objectid, replace_to, ZBX_DB_REQUEST_HOST_DESCRIPTION);
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+		else if (0 == strcmp(p->macro, MVAR_HOST_IP))
 		{
 			ret = zbx_dc_get_interface_value(0, c_event->objectid, replace_to, ZBX_DC_REQUEST_HOST_IP);
 		}
@@ -2522,8 +2644,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		{
 			ret = zbx_dc_get_interface_value(0, c_event->objectid, replace_to, ZBX_DC_REQUEST_HOST_PORT);
 		}
-		else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)) ||
-				0 == strncmp(p->macro, MVAR_PROFILE, ZBX_CONST_STRLEN(MVAR_PROFILE)))
+		else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
 		{
 			ret = zbx_dc_get_host_inventory_by_itemid(p->macro, c_event->objectid, replace_to);
 		}

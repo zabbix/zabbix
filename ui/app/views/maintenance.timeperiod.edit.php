@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -236,14 +236,7 @@ $form_grid = (new CFormGrid())
 	]);
 
 $form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag('
-			maintenance_timeperiod_edit.init('.json_encode([
-				'rules' => $data['js_validation_rules']
-			]).');
-		'))->setOnDocumentReady()
-	);
+	->addItem($form_grid);
 
 $output = [
 	'header' => $data['title'],
@@ -251,13 +244,16 @@ $output = [
 	'buttons' => [
 		[
 			'title' => $data['is_edit'] ? _('Update') : _('Add'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'maintenance_timeperiod_edit.submit();'
+			'isSubmit' => true
 		]
 	],
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('maintenance.timeperiod.edit.js.php')
+		$this->readJsFile('maintenance.timeperiod.edit.js.php').
+		'maintenance_timeperiod_edit.init('.json_encode([
+			'rules' => $data['js_validation_rules']
+		]).');'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,7 +20,7 @@
 #include "zbxmockdata.h"
 
 typedef void	(*zbx_vc_test_add_values_setup_cb)(zbx_mock_handle_t *handle, zbx_vector_dc_history_ptr_t *history,
-		int *err, const char **data, int *ret_flush, int config_history_storage_pipelines);
+		int *err, const char **data, zbx_uint64_t *flush_err);
 typedef void	(*zbx_vc_test_get_value_setup_cb)(zbx_mock_handle_t *handle, zbx_uint64_t *itemid,
 		unsigned char *value_type, zbx_timespec_t *ts, int *err, zbx_vector_history_record_t *expected,
 		zbx_vector_history_record_t *returned);
@@ -29,7 +29,7 @@ typedef void	(*zbx_vc_test_get_values_setup_cb)(zbx_mock_handle_t *handle, zbx_u
 		zbx_vector_history_record_t *returned, int *seconds, int *count);
 
 void	zbx_vc_test_add_values_setup(zbx_mock_handle_t *handle, zbx_vector_dc_history_ptr_t *history, int *err,
-		const char **data, int *ret_flush, int config_history_storage_pipelines);
+		const char **data, zbx_uint64_t *flush_err);
 void	zbx_vc_test_get_value_setup(zbx_mock_handle_t *handle, zbx_uint64_t *itemid, unsigned char *value_type,
 		zbx_timespec_t *ts, int *err, zbx_vector_history_record_t *expected,
 		zbx_vector_history_record_t *returned);

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -56,8 +56,9 @@ class CUserGroup extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['usrgrp' => 'g.usrgrpid'],
-			'from'		=> ['usrgrp' => 'usrgrp g'],
+			'from'		=> 'usrgrp g',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];
@@ -141,9 +142,8 @@ class CUserGroup extends CApiService {
 		if (!is_null($options['userids'])) {
 			zbx_value2array($options['userids']);
 
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
+			$sqlParts['join']['ug'] = ['table' => 'users_groups', 'using' => 'usrgrpid'];
 			$sqlParts['where'][] = dbConditionInt('ug.userid', $options['userids']);
-			$sqlParts['where']['gug'] = 'g.usrgrpid=ug.usrgrpid';
 		}
 
 		if (array_key_exists('mfaids', $options) && $options['mfaids'] !== null) {
@@ -1186,8 +1186,8 @@ class CUserGroup extends CApiService {
 		$this->validateDelete($usrgrpids, $db_usrgrps);
 
 		self::unlinkUsers($db_usrgrps);
+		self::deleteUnusedUgSetGroups($usrgrpids);
 
-		DB::delete('rights', ['groupid' => $usrgrpids]);
 		DB::delete('usrgrp', ['usrgrpid' => $usrgrpids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER_GROUP, $db_usrgrps);
@@ -1347,6 +1347,14 @@ class CUserGroup extends CApiService {
 
 		self::addAffectedObjects($groups, $db_groups);
 		self::updateUsers($groups, $db_groups);
+	}
+
+	/**
+	 * Deletes ugset groups of user group sets that have no users linked to them.
+	 * This may happen during parallel deletion of users which have the same user group set.
+	 */
+	private static function deleteUnusedUgSetGroups(array $usrgrpids): void {
+		DB::delete('ugset_group', ['usrgrpid' => $usrgrpids]);
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {

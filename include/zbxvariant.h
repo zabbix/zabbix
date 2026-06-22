@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -86,15 +86,5 @@ int		zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, c
 
 void		zbx_variant_set_vector(zbx_variant_t *value, zbx_vector_var_t *vector);
 int		zbx_vector_var_get_type(zbx_vector_var_t *v);
-
-typedef union
-{
-	double		dbl;
-	zbx_uint64_t	ui64;
-	char		*str;
-	char		*err;
-	zbx_log_value_t	*log;
-}
-zbx_history_value_t;
 
 #endif

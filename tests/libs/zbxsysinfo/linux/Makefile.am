@@ -1,6 +1,7 @@
 if AGENT
 AGENT_tests = \
 	net_if_discovery \
+	net_if_get \
 	vfs_fs_discovery \
 	system_process \
 	kernel_maxproc \
@@ -36,6 +37,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_builddir)/src/libs/zbxresolver/libzbxresolver.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
@@ -86,6 +88,20 @@ net_if_discovery_LDADD += @AGENT_LIBS@
 net_if_discovery_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 net_if_discovery_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# net_if_get
+net_if_get_SOURCES = \
+	net_if_get.c \
+	$(COMMON_SRC_FILES)
+
+net_if_get_LDADD = \
+	$(COMMON_LIB_FILES)
+
+net_if_get_LDADD += @AGENT_LIBS@
+
+net_if_get_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+net_if_get_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 # vfs_fs_discovery
 vfs_fs_discovery_SOURCES = \

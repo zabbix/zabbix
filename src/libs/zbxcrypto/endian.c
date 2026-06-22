@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -24,6 +24,9 @@
  ******************************************************************************/
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data)
 {
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+	return data;
+#else
 	unsigned char	buf[8];
 
 	buf[0] = (unsigned char)data;	data >>= 8;
@@ -38,6 +41,7 @@ zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data)
 	memcpy(&data, buf, sizeof(buf));
 
 	return data;
+#endif
 }
 
 /******************************************************************************

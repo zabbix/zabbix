@@ -259,8 +259,12 @@ $arrow-fill-up: #FFFFFF;
 $arrow-fill-down: #FFFFFF;
 $arrow-fill-up-down: #FFFFFF;
 
+// Banners.
+$banner-color: #FFFFFF;
+
 // Important! @import string should come after variables.
 @import 'screen';
+@import "base/icons-severity";
 
 // layout/sidebar
 .sidebar {
@@ -643,10 +647,11 @@ a.link-action {
 .tag {
 	color: $ui-bg-color;
 
-	&.green-bg,
-	&.yellow-bg {
-		background-color: $ui-bg-selected-color;
-		color: $white;
+	&.tag-inherited,
+	&.tag-inherited-duplicate {
+		&::before {
+			opacity: 1;
+		}
 	}
 }
 
@@ -782,10 +787,9 @@ textarea.has-error {
 			&.average-bg,
 			&.high-bg,
 			&.disaster-bg {
-				&::before {
-					font-size: 22px;
-					padding-top: 0;
-					padding-bottom: 0;
+				&::after {
+					background-position: center 0;
+					background-size: 22px;
 				}
 			}
 		}
@@ -822,11 +826,6 @@ textarea.has-error {
 	}
 }
 
-// Filter checkboxes.
-.filter-highlight-row-cb {
-	display: none;
-}
-
 // Severity statuses.
 .status-container {
 	.status-na-bg,
@@ -841,59 +840,70 @@ textarea.has-error {
 	}
 }
 
-%severity-icon {
+.na-bg,
+.log-na-bg,
+.normal-bg,
+.info-bg,
+.log-info-bg,
+.average-bg,
+.warning-bg,
+.log-warning-bg,
+.high-bg,
+.log-high-bg,
+.disaster-bg,
+.log-disaster-bg,
+.inactive-bg {
 	background-color: rgba(0, 0, 0, .0) !important;
 
-	&::before {
+	&::before,
+	&::after {
 		position: absolute;
 		top: 0;
 		bottom: 0;
 		left: 0;
 		width: 34px;
-		padding-top: 2px;
-		padding-bottom: 2px;
-		font-size: 26px;
-		color: #000000;
-		text-align: center;
+		content: '';
+	}
+
+	&::after {
+		background-image: var(--severity-icon);
+		background-repeat: no-repeat;
+		background-position: center 2px;
+		background-size: 26px;
 	}
 }
 
-@each $type, $icon in (
-	na-bg: $zi-circle-question-filled,
-	normal-bg: $zi-circle-check-filled,
-	info-bg: $zi-circle-info-filled,
-	average-bg: $zi-triangle-warning,
-	warning-bg: $zi-circle-warning-filled,
-	high-bg: $zi-triangle-flipped-warning,
-	disaster-bg: $zi-stop-sign,
-	log-na-bg: $zi-circle-question-filled,
-	log-info-bg: $zi-circle-info-filled,
-	log-warning-bg: $zi-circle-warning-filled,
-	log-high-bg: $zi-triangle-flipped-warning,
-	log-disaster-bg: $zi-stop-sign
-) {
-	// Dynamically generated classes:
-	//  .na-bg,
-	//  .normal-bg,
-	//  .info-bg,
-	//  .average-bg,
-	//  .warning-bg,
-	//  .high-bg,
-	//  .disaster-bg,
-	//  .log-na-bg,
-	//  .log-info-bg,
-	//  .log-warning-bg,
-	//  .log-high-bg,
-	//  .log-disaster-bg
-	.#{$type} {
-		@extend %severity-icon;
+.na-bg,
+.log-na-bg {
+	--severity-icon: var(--severity-icon-na);
+}
 
-		&::before {
-			@extend %icons-font;
+.normal-bg {
+	--severity-icon: var(--severity-icon-normal);
+}
 
-			content: $icon;
-		}
-	}
+.info-bg,
+.log-info-bg {
+	--severity-icon: var(--severity-icon-info);
+}
+
+.average-bg {
+	--severity-icon: var(--severity-icon-average);
+}
+
+.warning-bg,
+.log-warning-bg {
+	--severity-icon: var(--severity-icon-warning);
+}
+
+.high-bg,
+.log-high-bg {
+	--severity-icon: var(--severity-icon-high);
+}
+
+.disaster-bg,
+.log-disaster-bg {
+	--severity-icon: var(--severity-icon-disaster);
 }
 
 .na-bg,
@@ -986,12 +996,9 @@ td.inactive-bg {
 }
 
 .inactive-bg {
-	@extend %severity-icon;
+	--severity-icon: var(--severity-icon-disaster);
 
 	&::before {
-		@extend %icons-font;
-
-		content: $zi-stop-sign;
 		background-color: $alt-red;
 	}
 }
@@ -1086,11 +1093,13 @@ td.inactive-bg {
 		background: transparent;
 
 		&::before {
-			@extend %icons-font;
-
+			display: inline-block;
+			width: $icon-medium-size;
+			height: $icon-medium-size;
+			vertical-align: top;
 			margin-right: 4px;
-			color: #000000;
 			border-radius: 3px;
+			content: '';
 		}
 	}
 
@@ -1102,18 +1111,49 @@ td.inactive-bg {
 	//  .status-warning-bg
 	//  .status-high-bg
 	//  .status-disaster-bg
-	@each $type, $icon in (
-		na-bg: $zi-circle-question-filled,
-		normal-bg: $zi-circle-check-filled,
-		info-bg: $zi-circle-info-filled,
-		average-bg: $zi-triangle-warning,
-		warning-bg: $zi-circle-warning-filled,
-		high-bg: $zi-triangle-flipped-warning,
-		disaster-bg: $zi-stop-sign
+	@each $type in (
+		na-bg,
+		normal-bg,
+		info-bg,
+		average-bg,
+		warning-bg,
+		high-bg,
+		disaster-bg,
 	) {
 		.status-#{$type}::before {
-			content: $icon;
+			background-image: var(--severity-icon);
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: contain;
 		}
+	}
+
+	.status-na-bg {
+		--severity-icon: var(--severity-icon-na);
+	}
+
+	.status-normal-bg {
+		--severity-icon: var(--severity-icon-normal);
+	}
+
+	.status-info-bg {
+		--severity-icon: var(--severity-icon-info);
+	}
+
+	.status-average-bg {
+		--severity-icon: var(--severity-icon-average);
+	}
+
+	.status-warning-bg {
+		--severity-icon: var(--severity-icon-warning);
+	}
+
+	.status-high-bg {
+		--severity-icon: var(--severity-icon-high);
+	}
+
+	.status-disaster-bg {
+		--severity-icon: var(--severity-icon-disaster);
 	}
 }
 
@@ -1146,6 +1186,74 @@ td.inactive-bg {
 	.tabfilter-item-label {
 		&.focused {
 			box-shadow: 0 0 0 2px $btn-focus-outline-color;
+		}
+	}
+}
+
+// Datatable.
+
+.datatable {
+	.datatable-body {
+		.row {
+			&:not(.row-disabled):hover {
+				.cell {
+					&.cell-data {
+						background-color: $ui-hover-bg-color !important;
+					}
+				}
+			}
+		}
+	}
+
+	.cell {
+		&.cell-data {
+			&.warning-bg,
+			&.average-bg,
+			&.high-bg,
+			&.disaster-bg {
+				border-bottom-color: $ui-border-color;
+				padding-left: 42px;
+
+				.cell-inner {
+					color: $font-color;
+				}
+			}
+		}
+	}
+
+	&.compact-view {
+		.cell {
+			&.cell-data {
+				&.warning-bg,
+				&.average-bg,
+				&.high-bg,
+				&.disaster-bg {
+					&:before {
+						font-size: 22px;
+						padding-top: 0;
+						padding-bottom: 0;
+					}
+				}
+			}
+		}
+	}
+
+	&.has-highlighted-rows {
+		.cell {
+			&.cell-data {
+				&:not(.cell-bg) {
+					&.warning-bg,
+					&.average-bg,
+					&.high-bg,
+					&.disaster-bg {
+						padding-left: 8px;
+
+						&:before {
+							display: none;
+						}
+					}
+				}
+			}
 		}
 	}
 }

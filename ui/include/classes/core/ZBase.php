@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -186,6 +186,7 @@ class ZBase {
 				$this->loadConfigFile();
 				$this->initVault();
 				$this->initDB();
+				$this->initHistoryManager();
 				$this->setServerAddress();
 				$this->authenticateUser();
 
@@ -232,6 +233,7 @@ class ZBase {
 				$this->loadConfigFile();
 				$this->initVault();
 				$this->initDB();
+				$this->initHistoryManager();
 				$this->setServerAddress();
 				$this->initLocales('en_us');
 				break;
@@ -308,6 +310,7 @@ class ZBase {
 			$this->root_dir.'/include/classes/api/helpers',
 			$this->root_dir.'/include/classes/api/item_types',
 			$this->root_dir.'/include/classes/api/managers',
+			$this->root_dir.'/include/classes/api/managers/history',
 			$this->root_dir.'/include/classes/api/clients',
 			$this->root_dir.'/include/classes/api/wrappers',
 			$this->root_dir.'/include/classes/core',
@@ -499,6 +502,42 @@ class ZBase {
 
 			throw new DBException($error, DB::INIT_ERROR);
 		}
+	}
+
+	/**
+	 * Initialize HistoryManager instance.
+	 */
+	protected function initHistoryManager(): void {
+		global $HISTORY_PROVIDERS;
+
+		$storages = CSettingsHelper::getDbVersionStatus();
+		$history_manager = Manager::History();
+		$value_type_ttl = [];
+
+		foreach ($storages as $storage) {
+			if (!array_key_exists('provider', $storage)) {
+				if (array_key_exists('history_pk', $storage) && $storage['history_pk'] == 1) {
+					$history_manager->setPrimaryKeysEnabled();
+				}
+
+				continue;
+			}
+
+			if (!array_key_exists('value_types', $storage)) {
+				continue;
+			}
+
+			foreach ($storage['value_types'] as $storage_value_type) {
+				if (!array_key_exists('ttl', $storage_value_type)) {
+					continue;
+				}
+
+				$value_type = array_search($storage_value_type['type'], CConfigFile::VALUE_TYPE_CONFIG_NAME);
+				$value_type_ttl[$value_type] = $storage_value_type['ttl'];
+			}
+		}
+
+		$history_manager->setStorageProviders($HISTORY_PROVIDERS, $value_type_ttl);
 	}
 
 	/**

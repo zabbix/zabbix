@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -31,7 +31,8 @@ $value_types = [
 	ITEM_VALUE_TYPE_STR => _('Character'),
 	ITEM_VALUE_TYPE_LOG => _('Log'),
 	ITEM_VALUE_TYPE_TEXT => _('Text'),
-	ITEM_VALUE_TYPE_BINARY => _('Binary')
+	ITEM_VALUE_TYPE_BINARY => _('Binary'),
+	ITEM_VALUE_TYPE_JSON => _('JSON')
 ];
 $type_with_key_select = [
 	ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,
@@ -164,16 +165,18 @@ $tabs = (new CTabView(['id' => $tabsid]))
 			'source' => 'item',
 			'types' => $data['types'],
 			'value_types' => $value_types,
+			'history_hint' => $data['config']['hk_history_global'] || $data['history_override'],
+			'trends_storage_hint' => (bool) $data['storage_value_types'],
 			'type_with_key_select' => $type_with_key_select
 		])
 	)
 	->addTab('tags-tab', _('Tags'),
 		new CPartial('configuration.tags.tab', [
-			'readonly' => $item['discovered'],
-			'show_inherited_tags' => $item['show_inherited_tags'],
 			'source' => 'item',
-			'tabs_id' => $tabsid,
 			'tags' => $item['tags'],
+			'show_inherited_tags' => $item['show_inherited_tags'],
+			'readonly' => $item['discovered'],
+			'tabs_id' => $tabsid,
 			'tags_tab_id' => 'tags-tab',
 			'has_inline_validation' => true
 		]),
@@ -215,6 +218,16 @@ $form
 			'testable_item_types' => $data['testable_item_types'],
 			'type_with_key_select' => $type_with_key_select,
 			'value_type_keys' => $data['value_type_keys'],
+			'history_override' => $data['history_override'],
+			'history_override_hint_html' => _x('Overridden by', 'item_form').' '.
+				(CWebUser::getType() == USER_TYPE_SUPER_ADMIN
+					? (new CLink(_('global housekeeping settings'), (new CUrl())
+							->setArgument('action', 'housekeeping.edit')
+							->getUrl()
+						))->setTarget('_blank')
+					: _('global housekeeping settings')
+				),
+			'storage_value_types' => $data['storage_value_types'],
 			'return_url' => $return_url
 		]).');'))->setOnDocumentReady()
 	);
@@ -223,7 +236,9 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_EDIT),
 	'body' => $form->toString().implode('', $scripts),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('item.edit.js.php'),
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('item.edit.js.php').
+		$this->readJsFile('host.interface.selector.js.php', null, '/../partials/js'),
 	'dialogue_class' => 'modal-popup-large'
 ];
 

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -82,7 +82,10 @@ class CControllerMediatypeTestEdit extends CController {
 			'parameters' => $mediatype[0]['parameters'],
 			'type' => $mediatype[0]['type'],
 			'enabled' => ($mediatype[0]['status'] == MEDIA_STATUS_ACTIVE),
-			'user' => ['debug_mode' => $this->getDebugMode()]
+			'user' => ['debug_mode' => $this->getDebugMode()],
+			'js_validation_rules' => (new CFormValidator(
+				CControllerMediatypeTestSend::getValidationRules()
+			))->getRules()
 		]));
 	}
 }

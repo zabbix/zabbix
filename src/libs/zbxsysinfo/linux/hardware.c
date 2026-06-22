@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -13,7 +13,6 @@
 **/
 
 #include "hardware.h"
-#include "../common/zbxsysinfo_common.h"
 #include "../sysinfo.h"
 
 #include "zbxalgo.h"
@@ -23,6 +22,10 @@
 #include <sys/mman.h>
 #include <setjmp.h>
 #include <signal.h>
+
+#if !defined(WITH_AGENT2_METRICS)
+#include "../common/zbxsysinfo_common.h"
+#endif
 
 static ZBX_THREAD_LOCAL volatile char	sigbus_handler_set;
 static ZBX_THREAD_LOCAL sigjmp_buf	sigbus_jmp_buf;
@@ -514,6 +517,7 @@ int	system_hw_cpu(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
+#if !defined(WITH_AGENT2_METRICS)
 int	system_hw_devices(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*type;
@@ -536,6 +540,7 @@ int	system_hw_devices(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 }
+#endif
 
 int	system_hw_macaddr(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

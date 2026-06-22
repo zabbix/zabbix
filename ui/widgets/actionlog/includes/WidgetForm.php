@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -58,7 +58,7 @@ class WidgetForm extends CWidgetForm {
 				])
 			)
 			->addField(
-				new CWidgetFieldTextBox('message', _('Search string'))
+				(new CWidgetFieldTextBox('message', _('Search string')))->setMaxLength(2048)
 			)
 			->addField(
 				(new CWidgetFieldTimePeriod('time_period', _('Time period')))

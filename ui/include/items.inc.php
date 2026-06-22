@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -128,6 +128,8 @@ function itemValueTypeString($value_type): string {
 			return _('Text');
 		case ITEM_VALUE_TYPE_BINARY:
 			return _('Binary');
+		case ITEM_VALUE_TYPE_JSON:
+			return _('JSON');
 	}
 
 	return _('Unknown');
@@ -333,6 +335,39 @@ function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
 		$sortedItems[$key] = $items[$key];
 	}
 	$items = $sortedItems;
+}
+
+/**
+ * Filters and sorts threshold values in ascending order.
+ *
+ * @param array $thresholds
+ * @param bool  $is_binary_size
+ *
+ * @return array
+ */
+function filterAndSortThresholds(array $thresholds, bool $is_binary_size = false): array {
+	$number_parser = new CNumberParser([
+		'with_size_suffix' => true,
+		'with_time_suffix' => true,
+		'is_binary_size' => $is_binary_size
+	]);
+
+	$filtered_thresholds = [];
+
+	foreach ($thresholds as $index => $threshold) {
+		if ($number_parser->parse(trim($threshold['threshold'])) == CParser::PARSE_SUCCESS) {
+			$filtered_thresholds[$index] = ['order_threshold' => $number_parser->calcValue()] + $threshold;
+		}
+	}
+
+	uasort($filtered_thresholds, static fn (array $t1, array $t2) => $t1['order_threshold'] <=> $t2['order_threshold']);
+
+	foreach ($filtered_thresholds as &$threshold) {
+		unset($threshold['order_threshold']);
+	}
+	unset($threshold);
+
+	return $filtered_thresholds;
 }
 
 /**
@@ -834,63 +869,14 @@ function formatAggregatedHistoryValue($value, array $item, int $function, bool $
  */
 function formatAggregatedHistoryValueRaw($value, array $item, int $function, bool $force_units = false,
 		bool $trim = true, array $convert_options = []): array {
-	$units = $force_units || CAggFunctionData::preservesUnits($function) ? $item['units'] : '';
-
-	$is_numeric_item = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
-	$is_numeric_data = $is_numeric_item || CAggFunctionData::isNumericResult($function);
-
-	if ($is_numeric_data) {
-		$converted_value = convertUnitsRaw([
-			'value' => $value,
-			'units' => $units
-		] + $convert_options);
-
-		$display_value = $converted_value['value'].
-			($converted_value['units'] !== '' ? ' '.$converted_value['units'] : '');
-	}
-	else {
-		switch ($item['value_type']) {
-			case ITEM_VALUE_TYPE_STR:
-			case ITEM_VALUE_TYPE_TEXT:
-			case ITEM_VALUE_TYPE_LOG:
-				$display_value = $trim && mb_strlen($value) > 20 ? mb_substr($value, 0, 20).'...' : $value;
-				break;
-
-			case ITEM_VALUE_TYPE_BINARY:
-				$display_value = _('binary value');
-				break;
-
-			default:
-				$display_value = _('Unknown value type');
-		}
-	}
-
-	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR])
-			&& CAggFunctionData::preservesValueMapping($function)) {
-		$mapped_value = CValueMapHelper::getMappedValue($item['value_type'], $value, $item['valuemap']);
-
-		if ($mapped_value !== false) {
-			return [
-				'value' => $mapped_value.' ('.$display_value.')',
-				'units' => '',
-				'is_mapped' => true
-			];
-		}
-	}
-
-	if ($is_numeric_data) {
-		return [
-			'value' => $converted_value['value'],
-			'units' => $converted_value['units'],
-			'is_mapped' => false
-		];
-	}
-
-	return [
-		'value' => $display_value,
-		'units' => $units,
-		'is_mapped' => false
+	$options = [
+		'force_units' => $force_units,
+		'trim' => $trim,
+		'convert_options' => $convert_options,
+		'valuemap' => $item['valuemap']
 	];
+
+	return CAggHelper::formatValue($value, $item['value_type'], $function, $item['units'], $options);
 }
 
 /**
@@ -958,6 +944,7 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
+		case ITEM_VALUE_TYPE_JSON:
 			if ($trim && mb_strlen($value) > 20) {
 				$value = mb_substr($value, 0, 20).'...';
 			}
@@ -1356,20 +1343,6 @@ function calculateItemNextCheck($seed, $delay, $flexible_intervals, $now) {
 	}
 
 	return $nextCheck;
-}
-
-/*
- * Description:
- *	Function returns true if http items exists in the $items array.
- *	The array should contain a field 'type'
- */
-function httpItemExists($items) {
-	foreach ($items as $item) {
-		if ($item['type'] == ITEM_TYPE_HTTPTEST) {
-			return true;
-		}
-	}
-	return false;
 }
 
 function getParamFieldNameByType($itemType) {

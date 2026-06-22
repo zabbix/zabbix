@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -523,7 +523,7 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start proxy group manager service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_unblock_signals(&orig_mask);
@@ -566,6 +566,5 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(info->process_type), info->process_num);
 
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
+	zbx_exit(SUCCEED == ZBX_EXIT_STATUS() ? EXIT_SUCCESS : EXIT_FAILURE);
 }

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -62,8 +62,8 @@ class CProblem extends CApiService {
 			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
-				'value' =>					['type' => API_STRING_UTF8]
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
+				'value' =>					['type' => API_STRING_UTF8, 'default' => '']
 			]],
 			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['eventid', 'source', 'object', 'objectid', 'r_eventid', 'correlationid', 'userid', 'name', 'acknowledged', 'severity', 'cause_eventid']],
 			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
@@ -74,9 +74,9 @@ class CProblem extends CApiService {
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
-			'selectAcknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity', 'new_severity', 'suppress_until', 'taskid']), 'default' => null],
+			'selectAcknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity', 'new_severity', 'suppress_until', 'taskid', 'maintenanceid']), 'default' => null],
 			'selectSuppressionData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid']), 'default' => null],
-			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
@@ -132,14 +132,10 @@ class CProblem extends CApiService {
 				$sql_parts['where'][] = '1=0';
 			}
 			elseif ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sql_parts['from']['f'] = 'functions f';
-				$sql_parts['from']['i'] = 'items i';
-				$sql_parts['from'][] = 'host_hgset hh';
-				$sql_parts['from'][] = 'permission pp';
-				$sql_parts['where']['p-f'] = 'p.objectid=f.triggerid';
-				$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
-				$sql_parts['where'][] = 'i.hostid=hh.hostid';
-				$sql_parts['where'][] = 'hh.hgsetid=pp.hgsetid';
+				$sql_parts['join']['f'] = ['table' => 'functions', 'on' => ['objectid' => 'triggerid']];
+				$sql_parts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+				$sql_parts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+				$sql_parts['join']['pp'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 				$sql_parts['where'][] = 'pp.ugsetid='.self::$userData['ugsetid'];
 
 				if ($options['editable']) {
@@ -164,12 +160,9 @@ class CProblem extends CApiService {
 				}
 			}
 			elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
-				$sql_parts['from']['i'] = 'items i';
-				$sql_parts['where']['p-i'] = 'p.objectid=i.itemid';
-				$sql_parts['from'][] = 'host_hgset hh';
-				$sql_parts['from'][] = 'permission pp';
-				$sql_parts['where'][] = 'i.hostid=hh.hostid';
-				$sql_parts['where'][] = 'hh.hgsetid=pp.hgsetid';
+				$sql_parts['join']['i'] = ['table' => 'items', 'on' => ['objectid' => 'itemid']];
+				$sql_parts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+				$sql_parts['join']['pp'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 				$sql_parts['where'][] = 'pp.ugsetid='.self::$userData['ugsetid'];
 
 				if ($options['editable']) {
@@ -178,59 +171,34 @@ class CProblem extends CApiService {
 			}
 		}
 
-		// eventids
-		if ($options['eventids'] !== null) {
-			$sql_parts['where'][] = dbConditionInt('p.eventid', $options['eventids']);
-		}
-
-		// objectids
 		if ($options['objectids'] !== null) {
 			$sql_parts['where'][] = dbConditionInt('p.objectid', $options['objectids']);
 		}
 
-		// groupids
 		if ($options['groupids'] !== null) {
-			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sql_parts['from']['f'] = 'functions f';
-				$sql_parts['from']['i'] = 'items i';
-				$sql_parts['from']['hg'] = 'hosts_groups hg';
-				$sql_parts['where']['p-f'] = 'p.objectid=f.triggerid';
-				$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
-				$sql_parts['where']['i-hg'] = 'i.hostid=hg.hostid';
-				$sql_parts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
+				$sql_parts['join']['f'] = ['table' => 'functions', 'on' => ['objectid' => 'triggerid']];
+				$sql_parts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
 			}
-			// lld rules and items
 			elseif ($options['object'] == EVENT_OBJECT_LLDRULE || $options['object'] == EVENT_OBJECT_ITEM) {
-				$sql_parts['from']['i'] = 'items i';
-				$sql_parts['from']['hg'] = 'hosts_groups hg';
-				$sql_parts['where']['p-i'] = 'p.objectid=i.itemid';
-				$sql_parts['where']['i-hg'] = 'i.hostid=hg.hostid';
-				$sql_parts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
+				$sql_parts['join']['i'] = ['table' => 'items', 'on' => ['objectid' => 'itemid']];
 			}
+			$sql_parts['join']['hg'] = ['left_table' => 'i', 'table' => 'hosts_groups', 'using' => 'hostid'];
+			$sql_parts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
 		}
 
-		// hostids
 		if ($options['hostids'] !== null) {
-			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sql_parts['from']['f'] = 'functions f';
-				$sql_parts['from']['i'] = 'items i';
-				$sql_parts['where']['p-f'] = 'p.objectid=f.triggerid';
-				$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
-				$sql_parts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
+				$sql_parts['join']['f'] = ['table' => 'functions', 'on' => ['objectid' => 'triggerid']];
+				$sql_parts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
 			}
-			// lld rules and items
 			elseif ($options['object'] == EVENT_OBJECT_LLDRULE || $options['object'] == EVENT_OBJECT_ITEM) {
-				$sql_parts['from']['i'] = 'items i';
-				$sql_parts['where']['p-i'] = 'p.objectid=i.itemid';
-				$sql_parts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
+				$sql_parts['join']['i'] = ['table' => 'items', 'on' => ['objectid' => 'itemid']];
 			}
+			$sql_parts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 		}
 
-		// severities
 		if ($options['severities'] !== null) {
-			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['object'] == EVENT_OBJECT_SERVICE) {
 				sort($options['severities']);
 
@@ -267,24 +235,22 @@ class CProblem extends CApiService {
 			')';
 		}
 
-		// suppressed
-		if ($options['suppressed'] !== null) {
-			$sql_parts['where'][] = (!$options['suppressed'] ? 'NOT ' : '').
-				'EXISTS ('.
-					'SELECT NULL'.
-					' FROM event_suppress es'.
-					' WHERE es.eventid=p.eventid'.
-				')';
+		if ($options['suppressed'] === true) {
+			$sql_parts['join']['esup'] = ['table' => 'event_suppress', 'using' => 'eventid'];
+		}
+		elseif ($options['suppressed'] === false) {
+			$sql_parts['join']['esup'] = ['type' => 'left', 'table' => 'event_suppress', 'using' => 'eventid'];
+			$sql_parts['where'][] = 'esup.eventid IS NULL';
 		}
 
 		// symptom
 		if ($options['symptom'] !== null) {
-			$sql_parts['where'][] = 'p.cause_eventid IS '.($options['symptom'] ? 'NOT ' : '').' NULL';
+			$sql_parts['where'][] = 'p.cause_eventid IS '.($options['symptom'] ? 'NOT ' : '').'NULL';
 		}
 
 		// tags
 		if ($options['tags'] !== null) {
-			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'p',
+			$sql_parts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'], ['p'],
 				'problem_tag', 'eventid'
 			);
 		}
@@ -322,6 +288,27 @@ class CProblem extends CApiService {
 		return $sql_parts;
 	}
 
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
+		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
+
+		if (!$options['countOutput'] && $this->outputIsRequested('suppressed', $options['output'])) {
+			if ($options['suppressed'] === true) {
+				$sql_parts['select'][] = zbx_dbstr((string) ZBX_PROBLEM_SUPPRESSED_TRUE).' AS suppressed';
+			}
+			else {
+				$sql_parts['select'][] = 'CASE WHEN esup.eventid IS NULL'.
+					' THEN '.zbx_dbstr((string) ZBX_PROBLEM_SUPPRESSED_FALSE).
+					' ELSE '.zbx_dbstr((string) ZBX_PROBLEM_SUPPRESSED_TRUE).' END AS suppressed';
+			}
+
+			if ($options['suppressed'] === null) {
+				$sql_parts['join']['esup'] = ['type' => 'left', 'table' => 'event_suppress', 'using' => 'eventid'];
+			}
+		}
+
+		return $sql_parts;
+	}
+
 	/**
 	 * Add SQL parts related to tag-based permissions.
 	 *
@@ -337,12 +324,9 @@ class CProblem extends CApiService {
 			return $sql_parts;
 		}
 
-		$sql_parts['from']['f'] = 'functions f';
-		$sql_parts['from']['i'] = 'items i';
-		$sql_parts['from']['hg'] = 'hosts_groups hg';
-		$sql_parts['where']['p-f'] = 'p.objectid=f.triggerid';
-		$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
-		$sql_parts['where']['i-hg'] = 'i.hostid=hg.hostid';
+		$sql_parts['join']['f'] = ['table' => 'functions', 'on' => ['objectid' => 'triggerid']];
+		$sql_parts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+		$sql_parts['join']['hg'] = ['left_table' => 'i', 'table' => 'hosts_groups', 'using' => 'hostid'];
 
 		$tag_conditions = [];
 		$full_access_groupids = [];
@@ -384,8 +368,7 @@ class CProblem extends CApiService {
 		}
 
 		if ($tag_conditions) {
-			$sql_parts['left_join'][] = ['alias' => 'pt', 'table' => 'problem_tag', 'using' => 'eventid'];
-			$sql_parts['left_table'] = ['alias' => 'p', 'table' => 'problem'];
+			$sql_parts['join']['pt'] = ['type' => 'left', 'table' => 'problem_tag', 'using' => 'eventid'];
 			if ($full_access_groupids || count($tag_conditions) > 1) {
 				foreach ($tag_conditions as &$tag_condition) {
 					$tag_condition = '('.$tag_condition.')';
@@ -411,7 +394,6 @@ class CProblem extends CApiService {
 		$this->addRelatedAcknowledges($options, $result);
 		$this->addRelatedOpdata($options, $result);
 		self::addRelatedSuppressionData($options, $result);
-		$this->addRelatedSuppressed($options, $result);
 		self::addRelatedTags($options, $result);
 		$this->addRelatedUrls($options, $result);
 
@@ -431,15 +413,15 @@ class CProblem extends CApiService {
 
 			$output = $options['selectAcknowledges'] === API_OUTPUT_EXTEND
 				? ['acknowledgeid', 'userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
-					'suppress_until', 'taskid'
+					'suppress_until', 'taskid', 'maintenanceid'
 				]
 				: array_unique(array_merge(['acknowledgeid', 'eventid'], $options['selectAcknowledges']));
 
 			$sql_options = [
 				'output' => $output,
 				'filter' => ['eventid' => array_keys($result)],
-				'sortfield' => ['clock'],
-				'sortorder' => [ZBX_SORT_DOWN]
+				'sortfield' => ['clock', 'acknowledgeid'],
+				'sortorder' => [ZBX_SORT_DOWN, ZBX_SORT_DOWN]
 			];
 			$db_acknowledges = DBselect(DB::makeSql('acknowledges', $sql_options));
 
@@ -520,68 +502,24 @@ class CProblem extends CApiService {
 		}
 	}
 
-	private function addRelatedSuppressed(array $options, array &$result): void {
-		if (!$this->outputIsRequested('suppressed', $options['output'])) {
-			return;
-		}
-
-		if ($options['selectSuppressionData'] !== null) {
-			foreach ($result as &$row) {
-				$row['suppressed'] = $row['suppression_data']
-					? (string) ZBX_PROBLEM_SUPPRESSED_TRUE
-					: (string) ZBX_PROBLEM_SUPPRESSED_FALSE;
-			}
-			unset($row);
-		}
-		else {
-			foreach ($result as &$row) {
-				$row['suppressed'] = (string) ZBX_PROBLEM_SUPPRESSED_FALSE;
-			}
-			unset($row);
-
-			$sql_options = [
-				'output' => ['eventid'],
-				'filter' => ['eventid' => array_keys($result)]
-			];
-			$db_event_suppress = DBselect(DB::makeSql('event_suppress', $sql_options));
-
-			while ($db_suppression_data = DBfetch($db_event_suppress)) {
-				$result[$db_suppression_data['eventid']]['suppressed'] = (string) ZBX_PROBLEM_SUPPRESSED_TRUE;
-			}
-		}
-	}
-
-	private static function addRelatedTags(array $options, array &$result): void {
+	private static function addRelatedTags(array $options, array &$problems): void {
 		if ($options['selectTags'] === null) {
 			return;
 		}
 
-		foreach ($result as &$row) {
-			$row['tags'] = [];
+		foreach ($problems as &$problem) {
+			$problem['tags'] = [];
 		}
-		unset($row);
-
-		$output = $options['selectTags'] === API_OUTPUT_EXTEND
-			? ['problemtagid', 'eventid', 'tag', 'value']
-			: array_unique(array_merge(['problemtagid', 'eventid'], $options['selectTags']));
+		unset($problem);
 
 		$sql_options = [
-			'output' => $output,
-			'filter' => ['eventid' => array_keys($result)]
+			'output' => array_merge(['problemtagid', 'eventid'], $options['selectTags']),
+			'filter' => ['eventid' => array_keys($problems)]
 		];
-		$db_tags = DBselect(DB::makeSql('problem_tag', $sql_options));
+		$resource = DBselect(DB::makeSql('problem_tag', $sql_options));
 
-		foreach ($result as &$event) {
-			$event['tags'] = [];
-		}
-		unset($event);
-
-		while ($db_tag = DBfetch($db_tags)) {
-			$eventid = $db_tag['eventid'];
-
-			unset($db_tag['problemtagid'], $db_tag['eventid']);
-
-			$result[$eventid]['tags'][] = $db_tag;
+		while ($row = DBfetch($resource)) {
+			$problems[$row['eventid']]['tags'][] = array_diff_key($row, array_flip(['problemtagid', 'eventid']));
 		}
 	}
 

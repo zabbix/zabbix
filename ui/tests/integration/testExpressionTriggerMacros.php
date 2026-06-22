@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -82,7 +82,8 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 			'name' => self::ITEM_NAME_1,
 			'key_' => self::ITEM_NAME_1,
 			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_UINT64
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
@@ -92,7 +93,8 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 			'name' => self::ITEM_NAME_2,
 			'key_' => self::ITEM_NAME_2,
 			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_UINT64
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
@@ -235,7 +237,7 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 	public function testExpressionTriggerMacros_testOperation() {
 		$this->createScripts();
 		$this->clearLog(self::COMPONENT_SERVER);
-		$this->reloadConfigurationCache();
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 
 		$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME_1, 51);
 		$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME_2, 50);

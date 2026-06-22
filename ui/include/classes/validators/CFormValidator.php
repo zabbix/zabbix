@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -34,10 +34,11 @@ class CFormValidator {
 	const ERROR_FATAL = 2;
 
 	const ERROR_LEVEL_PRIMARY = 0;
-	const ERROR_LEVEL_DELAYED = 1;
-	const ERROR_LEVEL_UNIQ = 2;
-	const ERROR_LEVEL_API = 3;
-	const ERROR_LEVEL_UNKNOWN = 4;
+	const ERROR_LEVEL_OBJECTS_COUNT = 1;
+	const ERROR_LEVEL_DELAYED = 2;
+	const ERROR_LEVEL_UNIQ = 3;
+	const ERROR_LEVEL_API = 4;
+	const ERROR_LEVEL_UNKNOWN = 1000;
 
 	public function __construct(array $rules) {
 		$this->rules = $this->normalizeRules($rules);
@@ -52,7 +53,8 @@ class CFormValidator {
 	 *
 	 * Supported rules:
 	 *   Data types:
-	 *     'boolean', 'string', 'integer', 'float', 'id', 'objects', 'object', 'array', 'db <table>.<field>'
+	 *     'boolean', 'string', 'integer', 'float', 'id', 'objects', 'object', 'array', 'db <table>.<field>',
+	 *     'file'
 	 *   Constraints:
 	 *     'not_empty', 'required', 'length', 'api_uniq'
 	 *   Value comparisons:
@@ -78,20 +80,32 @@ class CFormValidator {
 					throw new Exception('[RULES ERROR] For numeric keys, rule value should be a string: (Path: '.$rule_path.', Key: '.$key.')');
 				}
 
-				if (in_array($value, ['required', 'not_empty', 'allow_macro'], true)) {
+				if (in_array($value, ['required', 'not_empty'], true)) {
 					if (array_key_exists($value, $result)) {
 						throw new Exception('[RULES ERROR] Option "'.$value.'" is specified multiple times (Path: '.$rule_path.')');
 					}
 
 					$result[$value] = true;
 				}
-				elseif (in_array($value, ['id', 'integer', 'float', 'string', 'object', 'objects', 'array'], true)) {
+				else if ($value === 'allow_macro') {
+					if (array_key_exists($value, $result)) {
+						throw new Exception('[RULES ERROR] Option "'.$value.'" is specified multiple times (Path: '.$rule_path.')');
+					}
+
+					$result['allow_macro'] = ['usermacros' => true, 'lldmacros' => false];
+				}
+				elseif (in_array($value, ['id', 'integer', 'float', 'string', 'object', 'objects', 'array', 'file'],
+						true)) {
 					if (array_key_exists('type', $result)) {
 						// "type" is specified multiple times.
 						throw new Exception('[RULES ERROR] Rule "type" is specified multiple times (Path: '.$rule_path.')');
 					}
 
 					$result['type'] = $value;
+
+					if ($value === 'file') {
+						$result['file-type'] = 'file';
+					}
 				}
 				elseif ($value === 'boolean') {
 					if (array_key_exists('type', $result)) {
@@ -99,7 +113,6 @@ class CFormValidator {
 					}
 
 					$result['type'] = 'integer';
-					$result['in'] = [0, 1];
 				}
 				elseif (strncmp($value, 'db ', 3) === 0) {
 					if (array_key_exists('type', $result)) {
@@ -171,6 +184,13 @@ class CFormValidator {
 
 					$result['not_in'] = self::parseIn(substr($value, 7));
 				}
+				elseif ($value === 'rgb') {
+					if (array_key_exists('regex', $result)) {
+						throw new Exception('[RULES ERROR] Rule "regex" is specified multiple times (Path: '.$rule_path.')');
+					}
+
+					$result['regex'] = '/^[0-9a-f]{6}$/i';
+				}
 				else {
 					throw new Exception('[RULES ERROR] Unknown rule "'.$value.'" (Path: '.$rule_path.')');
 				}
@@ -187,7 +207,7 @@ class CFormValidator {
 							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain non-empty array (Path: '.$rule_path.')');
 						}
 
-						$result[$key] = $value;
+						$result[$key] = array_values($value);
 						break;
 
 					case 'fields':
@@ -225,6 +245,15 @@ class CFormValidator {
 						$result[$key] = $value;
 						break;
 
+					case 'decimal_limit':
+						if (!is_int($value)) {
+							// Value should be a number.
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain a number (Path: '.$rule_path.')');
+						}
+
+						$result[$key] = $value;
+						break;
+
 					case 'length':
 						if (array_key_exists($key, $result)) {
 							throw new Exception('[RULES ERROR] Rule "'.$key.'" is specified multiple times (Path: '.$rule_path.')');
@@ -238,31 +267,33 @@ class CFormValidator {
 						break;
 
 					case 'use':
+						if (!is_array($value) || count($value) > 2) {
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain an array with up to two elements (Path: '.$rule_path.')');
+						}
+
 						$result[$key] = $value;
 						break;
 
 					case 'allow_macro':
-						$result[$key] = true;
+						$allowed_macros = ['usermacros' => true, 'lldmacros' => false];
+
+						if (is_array($value)) {
+							foreach ($value as $macrotype => $enabled) {
+								if (!array_key_exists($macrotype, $allowed_macros)) {
+									throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain valid macro type ('.
+										implode(',', array_keys($allowed_macros)).') (Path: '.$rule_path.')');
+								}
+								else {
+									$allowed_macros[$macrotype] = $enabled;
+								}
+							}
+						}
+
+						$result[$key] = $allowed_macros;
 						break;
 
 					case 'api_uniq':
-						if (!is_array($value) || !array_key_exists(0, $value)) {
-							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain non-empty array (Path: '.$rule_path.')');
-						}
-
-						if (!is_array($value[0])) {
-							$value = [$value];
-						}
-
-						foreach ($value as &$api_uniq_check) {
-							if (count(explode('.', $api_uniq_check[0])) !== 2) {
-								throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain a valid API call (Path: '.$rule_path.', API call:'.$api_uniq_check[0].')');
-							}
-							$api_uniq_check += [1 => [], 2 => null, 3 => null];
-						}
-						unset($api_uniq_check);
-
-						$result[$key] = $value;
+						$result[$key] = self::normalizeApiUniqRule($value, $rule_path);
 						break;
 
 					case 'regex':
@@ -277,6 +308,23 @@ class CFormValidator {
 						$result[$key] = $value;
 						break;
 
+					case 'max-size':
+						$result[$key] = (int) $value;
+						$result['max-size-human-readable'] = convertUnits(['value' => $result[$key], 'units' => 'B']);
+
+						break;
+					case 'file-type':
+						if (!in_array($value, ['file', 'image'])) {
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" contains invalid value (Path: ' .$rule_path.')');
+						}
+
+						$result[$key] = $value;
+						break;
+
+					case 'count_values':
+						$result[$key] = $this->normalizeCountValuesRules($value, $rule_path);
+						break;
+
 					default:
 						throw new Exception('[RULES ERROR] Unknown rule "'.$key.'" (Path: '.$rule_path.')');
 				}
@@ -289,7 +337,7 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('not_empty', $result)) {
-			if (!in_array($result['type'], ['string', 'objects', 'array'])) {
+			if (!in_array($result['type'], ['string', 'objects', 'array', 'file', 'integer', 'float'])) {
 				throw new Exception('[RULES ERROR] Rule "not_empty" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
 			}
 		}
@@ -328,12 +376,17 @@ class CFormValidator {
 			throw new Exception('[RULES ERROR] Rule "min" or "max" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
 		}
 
+		if ((array_key_exists('decimal_limit', $result))
+				&& $result['type'] != 'float') {
+			throw new Exception('[RULES ERROR] Rule "decimal_limit" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
+		}
+
 		if (array_key_exists('length', $result) && $result['type'] !== 'string') {
 			throw new Exception('[RULES ERROR] Rule "length" is supported only by type "string" (Path: '.$rule_path.')');
 		}
 
 		if (array_key_exists('allow_macro', $result) && $result['type'] !== 'string') {
-			throw new Exception('[RULES ERROR] Rule "length" is supported only by type "string" (Path: '.$rule_path.')');
+			throw new Exception('[RULES ERROR] Rule "allow_macro" is supported only by type "string" (Path: '.$rule_path.')');
 		}
 
 		if (array_key_exists('when', $result)) {
@@ -358,14 +411,15 @@ class CFormValidator {
 		/*
 		 * Boolean rules are converted to 'integers' at this point but it may have some special conditions.
 		 *
-		 * If boolean is defined with 'required', the only allowed value remains '1' ('selected/checked/marked' if we
-		 * think about it as checkbox). It also comes with default 'custom' error message.
+		 * If boolean is defined with 'in', then we assume that is checked value.
+		 * It also comes with default 'custom' error message.
 		 */
-		if (in_array('boolean', $rules, true) && array_key_exists('required', $result)) {
-			$result['in'] = [1];
-
-			if (!array_key_exists('messages', $result) || !array_key_exists('in', $result['messages'])) {
-				$result['messages']['in'] = _('Must be selected.');
+		if (in_array('boolean', $rules, true)) {
+			if (!array_key_exists('in', $result)) {
+				$result['in'] = [0, 1];
+			}
+			else if (array_diff($result['in'], [0, 1]) !== []) {
+				throw new Exception('[RULES ERROR] Invalid value for rule "in" for type "boolean" (Path: '.$rule_path .')');
 			}
 		}
 
@@ -475,7 +529,7 @@ class CFormValidator {
 
 					case 'not_in':
 					case 'in':
-						$result[$key] = $value;
+						$result[$key] = array_values($value);
 						break;
 
 					default:
@@ -513,6 +567,145 @@ class CFormValidator {
 		}
 
 		return $result;
+	}
+
+	private static function normalizeApiUniqRule(array $value, string $rule_path): array {
+		if (!is_array($value) || !array_key_exists(0, $value)) {
+			throw new Exception('[RULES ERROR] Rule "api_uniq" should contain non-empty array (Path: '.$rule_path.')');
+		}
+
+		if (!is_array($value[0])) {
+			$value = [$value];
+		}
+
+		foreach ($value as &$api_uniq_check) {
+			if (count(explode('.', $api_uniq_check[0])) != 2) {
+				throw new Exception(
+					'[RULES ERROR] Rule "api_uniq" should contain a valid API call (Path: '.$rule_path.', API call:'.
+					$api_uniq_check[0].')'
+				);
+			}
+			$api_uniq_check += [1 => [], 2 => null, 3 => null, 4 => []];
+			$api_uniq_check[1] = ['filter' => $api_uniq_check[1]];
+			$api_uniq_check[1] += $api_uniq_check[4];
+			unset($api_uniq_check[4]);
+		}
+		unset($api_uniq_check);
+
+		return $value;
+	}
+
+	private function normalizeCountValuesCountFieldRules(array &$count_fields_rules, string $rule_path): array {
+		if (count($count_fields_rules) == 0 || !array_key_exists(0, $count_fields_rules)) {
+			throw new Exception('[RULES ERROR] Invalid number of parameters for "field_rules" option of "count_values" check (Path: ' . $rule_path . ')');
+		}
+
+		if (!is_array($count_fields_rules[0])) {
+			$count_fields_rules = [$count_fields_rules];
+		}
+
+		$results = [];
+
+		foreach ($count_fields_rules as $count_rule) {
+			if (!array_key_exists(0, $count_rule)) {
+				throw new Exception('[RULES ERROR] Missing field name parameter for "field_rules" option of "count_values" check (Path: ' . $rule_path . ')');
+			}
+
+			$result = [];
+
+			foreach ($count_rule as $key => $value) {
+				switch ($key) {
+					case 0:
+						if (!is_string($value) || $value == '') {
+							throw new Exception('[RULES ERROR] Invalid field name for "field_rules" option of "count_values" check (Path: ' . $rule_path . ')');
+						}
+
+						$field_path = $rule_path . '/' . $value;
+
+						if (!in_array($field_path, $this->existing_rule_paths)) {
+							throw new Exception('[RULES ERROR] Only fields defined prior to this can be used for "count_values" checks (Path: ' . $rule_path . ', Field path: '. $field_path .')');
+						}
+
+						$result[0] = $value;
+						break;
+
+					case 'in':
+					case 'not_in':
+						if (!is_array($value) || self::validateInOptions($value) === false) {
+							throw new Exception('[RULES ERROR] Invalid value for rule "in" or "not_in" in "count_values" check (Path: ' . $rule_path . ', Field path: '. $count_rule[0] .')');
+						}
+
+						$result[$key] = $value;
+						break;
+
+					default:
+						throw new Exception('[RULES ERROR] Unknown count values field rule "' . $key . '" (Path: ' . $rule_path . ')');
+				}
+			}
+
+			$results[] = $result;
+		}
+
+		return $results;
+	}
+
+	private function normalizeCountValuesRules($count_rules, string $rule_path): array {
+		if (!is_array($count_rules)) {
+			throw new Exception('[RULES ERROR] Count values condition should be an array (Path: ' . $rule_path . ')');
+		}
+
+		if (array_key_exists('field_rules', $count_rules)) {
+			$count_rules = [$count_rules];
+		}
+
+		foreach ($count_rules as &$count_rule) {
+			if (!is_array($count_rule)) {
+				throw new Exception('[RULES ERROR] Count values rule should be an array (Path: ' . $rule_path . ')');
+			}
+
+			$result = [];
+
+			foreach ($count_rule as $key => $value) {
+				switch ($key) {
+					case 'field_rules':
+						if (!is_array($value)) {
+							throw new Exception('[RULES ERROR] Count values field condition should be an array (Path: ' . $rule_path . ')');
+						}
+
+						$result['field_rules'] = $this->normalizeCountValuesCountFieldRules($value, $rule_path);
+						break;
+
+					case 'min':
+					case 'max':
+						if (!is_int($value)) {
+							throw new Exception('[RULES ERROR] Rule "' . $key . '" should contain a number (Path: ' . $rule_path . ')');
+						}
+
+						$result[$key] = $value;
+						break;
+
+					case 'message':
+						$result[$key] = $value;
+						break;
+
+					default:
+						throw new Exception('[RULES ERROR] Unknown count values rule "' . $key . '" (Path: ' . $rule_path . ')');
+				}
+			}
+
+			if (!array_key_exists('field_rules', $result)) {
+				throw new Exception('[RULES ERROR] Counted field_rules is required (Path: ' . $rule_path . ')');
+			}
+
+			if (count(array_intersect(array_keys($result), ['min', 'max'])) == 0) {
+				throw new Exception('[RULES ERROR] Counted field requires min or max rule (Path: ' . $rule_path . ')');
+			}
+
+			$count_rule = $result;
+		}
+		unset($count_rule);
+
+		return $count_rules;
 	}
 
 	/**
@@ -591,10 +784,15 @@ class CFormValidator {
 	 * Base validation function.
 	 *
 	 * @param array  $data  Form input data.
+	 * @param ?array  $files From files
 	 *
 	 * @return int
 	 */
-	public function validate(&$data): int {
+	public function validate(&$data, ?array &$files = null): int {
+		if ($files === null) {
+			$files = [];
+		}
+
 		$this->errors = [];
 
 		$this->has_fatal = false;
@@ -604,7 +802,7 @@ class CFormValidator {
 		$this->field_values = $this->resolveWhenFields($this->rules, $data);
 
 		$path = '';
-		if ($this->validateObject($this->rules, $data, $error, $path) === false) {
+		if ($this->validateObject($this->rules, $data, $error, $path, $files) === false) {
 			$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 		}
 
@@ -653,104 +851,119 @@ class CFormValidator {
 	}
 
 	/**
-	 * Base field validation method.
+	 * Base field validation method. Returns false if validation is not done.
 	 *
 	 * @param array  $rule    Validation rules.
 	 * @param array  $data    Data to validate.
 	 * @param string $field   Field to validate.
 	 * @param string $path    Path of field.
+	 * @param array $files    Files to validate
+	 *
+	 * @return bool
 	 */
-	private function validateField(array $rules, &$data, string $field, string $path): void {
+	private function validateField(array $rules, &$data, string $field, string $path, ?array &$files = []): bool {
 		if (array_key_exists('when', $rules)) {
 			foreach ($rules['when'] as $when) {
 				if ($this->testWhenCondition($when, $path) === false) {
-					return;
+					return false;
 				}
 			}
 		}
 
 		// Single value ID may be passed as null when value is not specified.
-		if (array_key_exists($field, $data) && $data[$field] === null) {
+		if ($rules['type'] !== 'file' && array_key_exists($field, $data) && $data[$field] === null) {
 			unset($data[$field]);
 		}
 
-		if (!array_key_exists($field, $data)) {
+		$field_exists = $rules['type'] === 'file'
+			? array_key_exists($field, $files)
+			: array_key_exists($field, $data);
+
+		if (!$field_exists) {
 			if (array_key_exists('required', $rules)) {
 				$this->addError(self::ERROR, $path,
 					self::getMessage($rules, 'required', _('Required field is missing.')), self::ERROR_LEVEL_PRIMARY
 				);
 			}
 
-			return;
+			return true;
 		}
 
-		if (array_key_exists('type', $rules)) {
-			switch ($rules['type']) {
-				case 'id':
-					if (!self::validateId($rules, $data[$field], $error)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+		switch ($rules['type']) {
+			case 'id':
+				if (!self::validateId($rules, $data[$field], $error)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return true;
+				}
+				break;
 
-				case 'integer':
-					if (!self::validateInt32($rules, $data[$field], $error)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'integer':
+				if (!self::validateInt32($rules, $data[$field], $error)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return true;
+				}
+				break;
 
-				case 'float':
-					if (!self::validateFloat($rules, $data[$field], $error)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'float':
+				if (!self::validateFloat($rules, $data[$field], $error)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return true;
+				}
+				break;
 
-				case 'string':
-					if (!self::validateStringUtf8($rules, $data[$field], $error)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'string':
+				if (!self::validateStringUtf8($rules, $data[$field], $error)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
+					return true;
+				}
 
-					if (!self::validateUse($rules, $data[$field], $error)) {
-						$error = self::getMessage($rules, 'use', $error);
+				if (!self::validateUse($rules, $data[$field], $error)) {
+					$error = self::getMessage($rules, 'use', $error);
 
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_DELAYED);
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_DELAYED);
 
-						return;
-					}
-					break;
+					return true;
+				}
+				break;
 
-				case 'array':
-					if (!$this->validateArray($rules, $data[$field], $error, $path)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'array':
+				if (!$this->validateArray($rules, $data[$field], $error, $path)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return true;
+				}
+				break;
 
-				case 'object':
-					if (!$this->validateObject($rules, $data[$field], $error, $path)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'object':
+				if (!$this->validateObject($rules, $data[$field], $error, $path)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return true;
+				}
+				break;
 
-				case 'objects':
-					if (!$this->validateObjects($rules, $data[$field], $error, $path)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'objects':
+				if (!$this->validateObjects($rules, $data[$field], $error, $path)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
-			}
+					return true;
+				}
+				break;
+
+			case 'file':
+				if (!$this->validateFile($rules, $files[$field], $error)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+
+					return true;
+				}
+				break;
 		}
+
+		return true;
 	}
 
 	/**
@@ -837,6 +1050,7 @@ class CFormValidator {
 	 * Integers validator.
 	 *
 	 * @param array  $rules
+	 * @param bool   $rules['not_empty']  (optional) pass if value must be filled.
 	 * @param array  $rules['in']         (optional) allowed ranges or list of allowed values.
 	 * @param int    $rules['min']        (optional) minimal allowed value length.
 	 * @param int    $rules['max']        (optional) maximum allowed value length.
@@ -847,6 +1061,12 @@ class CFormValidator {
 	 * @return bool
 	 */
 	private static function validateInt32(array $rules, &$value, ?string &$error = null): bool {
+		if (array_key_exists('not_empty', $rules) && $value === '') {
+			$error = self::getMessage($rules, 'not_empty', _('This field cannot be empty.'));
+
+			return false;
+		}
+
 		if (!self::isInt32($value)) {
 			$error = self::getMessage($rules, 'type', _('This value is not a valid integer.'));
 
@@ -866,13 +1086,13 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('min', $rules) && bccomp($value, $rules['min']) == -1) {
-			$error = self::getMessage($rules, 'min', _s('This value must be no less than "%1$s".', $rules['min']));
+			$error = self::getMessage($rules, 'min', _s('Value must be greater than or equal to %1$s.', $rules['min']));
 
 			return false;
 		}
 
 		if (array_key_exists('max', $rules) && bccomp($value, $rules['max']) == 1) {
-			$error = self::getMessage($rules, 'max', _s('This value must be no greater than "%1$s".', $rules['max']));
+			$error = self::getMessage($rules, 'max', _s('Value must be less than or equal to %1$s.', $rules['max']));
 
 			return false;
 		}
@@ -891,6 +1111,7 @@ class CFormValidator {
 	 * @param array  $rules['in']         (optional) allowed ranges or list of allowed values.
 	 * @param int    $rules['min']        (optional) minimal allowed value length.
 	 * @param int    $rules['max']        (optional) maximum allowed value length.
+	 * @param int    $rules['decimal_limit']
 	 * @param array  $rules['messages']   (optional) Error messages to use when some check fails.
 	 * @param mixed  $value
 	 * @param string $error
@@ -898,6 +1119,12 @@ class CFormValidator {
 	 * @return bool
 	 */
 	private static function validateFloat($rules, &$value, ?string &$error = null): bool {
+		if (array_key_exists('not_empty', $rules) && $value == '') {
+			$error = self::getMessage($rules, 'not_empty', _('This field cannot be empty.'));
+
+			return false;
+		}
+
 		if (!self::is_float($value)) {
 			$error = self::getMessage($rules, 'type', _('This value is not a valid floating-point value.'));
 
@@ -917,15 +1144,35 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('min', $rules) && bccomp($value, $rules['min']) == -1) {
-			$error = self::getMessage($rules, 'min', _s('This value must be no less than "%1$s".', $rules['min']));
+			$error = self::getMessage($rules, 'min', _s('Value must be greater than or equal to %1$s.', $rules['min']));
 
 			return false;
 		}
 
 		if (array_key_exists('max', $rules) && bccomp($value, $rules['max']) == 1) {
-			$error = self::getMessage($rules, 'max', _s('This value must be no greater than "%1$s".', $rules['max']));
+			$error = self::getMessage($rules, 'max', _s('Value must be less than or equal to %1$s.', $rules['max']));
 
 			return false;
+		}
+
+		if (array_key_exists('decimal_limit', $rules)) {
+			preg_match('/^'.ZBX_PREG_NUMBER.'/', $value, $matches);
+
+			$decimals_before_e = array_key_exists('frac', $matches)
+				? strlen($matches['frac'])
+				: (array_key_exists('frac_only', $matches) ? strlen($matches['frac_only']) : 0);
+
+			$exponent = array_key_exists('exp', $matches) ? (int) $matches['exp'] : 0;
+
+			$decimal_count = max(0, $decimals_before_e - $exponent);
+
+			if ($decimal_count > $rules['decimal_limit']) {
+				$error = self::getMessage($rules, 'decimal_limit',
+					_s('This value cannot have more than %1$s decimal places.', $rules['decimal_limit'])
+				);
+
+				return false;
+			}
 		}
 
 		return true;
@@ -960,7 +1207,7 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('allow_macro', $rules) && $value_check !== ''
-				&& (new CUserMacroParser)->parse($value_check) == CParser::PARSE_SUCCESS) {
+				&& self::validateMacro($rules['allow_macro'], $value)) {
 			return true;
 		}
 
@@ -970,19 +1217,19 @@ class CFormValidator {
 			return false;
 		}
 
-		if (array_key_exists('regex', $rules) && !preg_match($rules['regex'], $value)) {
+		if (array_key_exists('regex', $rules) && $value !== '' && !preg_match($rules['regex'], $value_check)) {
 			$error = self::getMessage($rules, 'regex', _('This value does not match pattern.'));
 
 			return false;
 		}
 
-		if (!self::checkStringIn($rules, $value, $error)) {
+		if (!self::checkStringIn($rules, $value_check, $error)) {
 			$error = self::getMessage($rules, 'in', $error);
 
 			return false;
 		}
 
-		if (!self::checkStringNotIn($rules, $value, $error)) {
+		if (!self::checkStringNotIn($rules, $value_check, $error)) {
 			$error = self::getMessage($rules, 'not_in', $error);
 
 			return false;
@@ -1005,35 +1252,13 @@ class CFormValidator {
 
 		$error = '';
 
-		[$class_name, $class_options, $more_options] = $rules['use'] + [1 => null, 2 => []];
+		$class = $rules['use'][0];
 
-		switch ($class_name) {
-			case 'CRegexValidator':
-				$class_options = $class_options ?: [
-					'messageInvalid' => _('invalid regular expression'),
-					'messageRegex' => _('invalid regular expression')
-				];
-				break;
+		if (is_subclass_of($class, CParser::class)) {
+			self::validateUseCParser($rules['use'], $class, $value, $error);
 		}
-
-		$instance = $class_options
-			? new $class_name($class_options)
-			: new $class_name();
-
-		if ($instance instanceof CParser) {
-			if (in_array($instance->parse($value), [CParser::PARSE_FAIL, CParser::PARSE_SUCCESS_CONT, false], true)) {
-				$error = $instance->getError();
-
-				// Some parsers may return empty string as error.
-				if ($error === '') {
-					$error = _('Invalid string.');
-				}
-			}
-		}
-		elseif ($instance instanceof CValidator) {
-			if ($instance->validate($value) === false) {
-				$error = $instance->getError() ?? _('Invalid string.');
-			}
+		elseif (is_subclass_of($class, CValidator::class)) {
+			self::validateUseCValidator($rules['use'], $class, $value, $error);
 		}
 		else {
 			throw new Exception('Method not found', -32601);
@@ -1048,31 +1273,49 @@ class CFormValidator {
 		}
 		$error = ucfirst($error);
 
-		// Parser specific checks not supported by parser itself.
-		if ($error === '') {
-			if ($instance instanceof CAbsoluteTimeParser) {
-				if (array_key_exists('min', $more_options)
-						&& $instance->getDateTime(true)->getTimestamp() < $more_options['min']) {
-					$error = _s('Value must be greater than %1$s.', date(ZBX_FULL_DATE_TIME, $more_options['min']));
-				}
+		return $error === '';
+	}
 
-				if (array_key_exists('max', $more_options)
-						&& $instance->getDateTime(true)->getTimestamp() > $more_options['max']) {
-					$error = _s('Value must be smaller than %1$s.', date(ZBX_FULL_DATE_TIME, $more_options['max']));
-				}
-			}
-			elseif ($instance instanceof CSimpleIntervalParser) {
-				if (array_key_exists('min', $more_options) && timeUnitToSeconds($value, true) < $more_options['min']) {
-					$error = _s('Value must be greater than %1$s.', $more_options['min']);
-				}
+	private static function validateUseCParser(array $use, string $parser_class, string $value, string &$error): void {
+		$parser_args = array_key_exists(1, $use) ? $use[1] : [];
 
-				if (array_key_exists('max', $more_options) && timeUnitToSeconds($value, true) > $more_options['max']) {
-					$error = _s('Value must be smaller than %1$s.', $more_options['max']);
-				}
+		$parser = $parser_args
+			? new $parser_class($parser_args)
+			: new $parser_class();
+
+		if (in_array($parser->parse($value), [CParser::PARSE_FAIL, CParser::PARSE_SUCCESS_CONT, false], true)) {
+			$error = $parser->getError();
+
+			// Some parsers may return empty string as error.
+			if ($error === '') {
+				$error = match ($parser_class) {
+					CAbsoluteTimeParser::class => _('Invalid date.'),
+					default => _('Invalid string.')
+				};
 			}
 		}
+	}
 
-		return $error === '';
+	private static function validateUseCValidator(array $use, string $validator_class, string $value, string &$error)
+			: void {
+		$validator_args = array_key_exists(1, $use) ? $use[1] : [];
+
+		switch ($validator_class) {
+			case CRegexValidator::class:
+				$validator_args = $validator_args ?: [
+					'messageInvalid' => _('invalid regular expression'),
+					'messageRegex' => _('invalid regular expression')
+				];
+				break;
+		}
+
+		$validator = $validator_args
+			? new $validator_class($validator_args)
+			: new $validator_class();
+
+		if ($validator->validate($value) === false) {
+			$error = $validator->getError() ?? _('Invalid string.');
+		}
 	}
 
 	/**
@@ -1081,26 +1324,45 @@ class CFormValidator {
 	 * @param array  $rules
 	 * @param array  $rules['fields']
 	 * @param string $rules['fields'][<field_name>][<role_name>]
+	 * @param bool   $rules['not_empty']
 	 * @param mixed  $value
 	 * @param string $error
 	 * @param string $path
+	 * @param array $files
 	 *
 	 * @return bool
 	 */
-	public function validateObject(array $rules, &$value, ?string &$error = null, string &$path = ''): bool {
+	public function validateObject(array $rules, &$value, ?string &$error = null, string &$path = '',
+			?array &$files = []): bool {
 		if (!is_array($value)) {
 			$error = self::getMessage($rules, 'type', _('An array is expected.'));
 
 			return false;
 		}
 
+		$value_fields = [];
+		$file_fields = [];
+
 		foreach ($rules['fields'] as $field => $rule_sets) {
+			if (!$rule_sets) {
+				$value_fields[$field] = true;
+				$file_fields[$field] = true;
+			}
+
 			foreach ($rule_sets as $rule_set) {
-				$this->validateField($rule_set, $value, $field, $path.'/'.$field);
+				if ($this->validateField($rule_set, $value, $field, $path.'/'.$field, $files)) {
+					if ($rule_set['type'] == 'file') {
+						$file_fields[$field] = true;
+					}
+					else {
+						$value_fields[$field] = true;
+					}
+				}
 			}
 		}
 
-		$value = array_intersect_key($value, $rules['fields']);
+		$value = array_intersect_key($value, $value_fields);
+		$files = $files ? array_intersect_key($files, $file_fields) : $files;
 
 		if (array_key_exists('api_uniq', $rules)) {
 			foreach ($rules['api_uniq'] as $api_check) {
@@ -1147,16 +1409,24 @@ class CFormValidator {
 			];
 		}
 
-		foreach ($objects_values as $index => &$value) {
-			$path_to_test = $path.'/'.$index;
-			if (!$this->validateObject(['fields' => $rules['fields']], $value, $error, $path_to_test)) {
-				// Through the reference, give back to the caller which field failed.
-				$path = $path_to_test;
+		if (array_key_exists('fields', $rules)) {
+			foreach ($objects_values as $index => &$value) {
+				$path_to_test = $path . '/' . $index;
+				if (!$this->validateObject(['fields' => $rules['fields']], $value, $error, $path_to_test)) {
+					// Through the reference, give back to the caller which field failed.
+					$path = $path_to_test;
 
-				return false;
+					return false;
+				}
+			}
+			unset($value);
+		}
+
+		if (array_key_exists('count_values', $rules)) {
+			foreach ($rules['count_values'] as $count_rule) {
+				$this->validateObjectsCount($count_rule, $objects_values, $path);
 			}
 		}
-		unset($value);
 
 		return true;
 	}
@@ -1182,17 +1452,19 @@ class CFormValidator {
 
 		$array_values = array_filter($array_values, fn ($value) => !is_null($value));
 
+		if (array_key_exists('field', $rules)) {
+			foreach (array_keys($array_values) as $index) {
+				if (!$this->validateField($rules['field'], $array_values, $index, $path.'/'.$index)) {
+					unset($array_values[$index]);
+				}
+			}
+			unset($value);
+		}
+
 		if (array_key_exists('not_empty', $rules) && count($array_values) == 0) {
 			$error = self::getMessage($rules, 'not_empty', _('This field cannot be empty.'));
 
 			return false;
-		}
-
-		if (array_key_exists('field', $rules)) {
-			foreach (array_keys($array_values) as $index) {
-				$this->validateField($rules['field'], $array_values, $index, $path.'/'.$index);
-			}
-			unset($value);
 		}
 
 		return true;
@@ -1215,7 +1487,7 @@ class CFormValidator {
 			$unique_values = [];
 
 			foreach ($values as $key => $entry) {
-				if (in_array($entry, $unique_values)) {
+				if (in_array($entry, $unique_values, true)) {
 					$value = implode(', ', array_map(fn ($k, $v) => $k.'='.$v, array_keys($entry), $entry));
 					$error = self::getMessage($rules, 'uniq', _s('Entry "%1$s" is not unique.', $value));
 					$path = $path.'/'.$key.'/'.$field_names[0];
@@ -1231,14 +1503,16 @@ class CFormValidator {
 	}
 
 	/**
-	 * Check via API if item exists, excluding provided id. Used for unique checks
+	 * Check via API if item exists, excluding provided ID. Used for unique checks.
 	 *
-	 * @param string $api
-	 * @param array $options
+	 * @param string      $api
+	 * @param array       $options
 	 * @param string|null $exclude_primary_id
+	 *
 	 * @return bool
 	 */
 	public static function existsAPIObject(string $api, array $options, ?string $exclude_primary_id = null): bool {
+		$options['output'] = [];
 		$options['preservekeys'] = true;
 		$auth = [
 			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
@@ -1264,6 +1538,22 @@ class CFormValidator {
 		return false;
 	}
 
+	private function resolveFieldReference(string $parameter, ?string $field_path, string $path): array {
+		if (substr($parameter, 0, 1) === '{' && substr($parameter, -1, 1) === '}') {
+			$field_data = $this->getWhenFieldValue(substr($parameter, 1, -1), $path);
+
+			if (in_array($field_data['type'], ['id', 'integer', 'float', 'string'])) {
+				$parameter = $field_data['value'];
+
+				if ($field_path === null && $path === '') {
+					$field_path = $field_data['path'];
+				}
+			}
+		}
+
+		return [$parameter, $field_path];
+	}
+
 	private function validateApiUniq(array $check, string &$path, ?string &$error = null): bool {
 		[$method, $parameters, $exclude_id] = $check;
 		[$api] = explode('.', $method);
@@ -1271,17 +1561,17 @@ class CFormValidator {
 		$field_path = null;
 
 		// Replace field references by real values in API request parameters.
-		foreach ($parameters as &$parameter) {
-			if (substr($parameter, 0, 1) === '{' && substr($parameter, -1, 1) === '}') {
-				$field_data = $this->getWhenFieldValue(substr($parameter, 1, -1), $path);
+		foreach ($parameters['filter'] as &$parameter) {
+			[$parameter, $field_path] = $this->resolveFieldReference($parameter, $field_path, $path);
+		}
+		unset($parameter);
 
-				if (in_array($field_data['type'], ['id', 'integer', 'float', 'string'])) {
-					$parameter = $field_data['value'];
-					if ($field_path === null && $path === '') {
-						$field_path = $field_data['path'];
-					}
-				}
+		foreach ($parameters as $name => &$parameter) {
+			if ($name === 'filter') {
+				continue;
 			}
+
+			[$parameter, $field_path] = $this->resolveFieldReference($parameter, $field_path, $path);
 		}
 		unset($parameter);
 
@@ -1296,10 +1586,6 @@ class CFormValidator {
 
 			$exclude_id = $exclude_id_field_data['type'] === 'id' ? $exclude_id_field_data['value'] : null;
 		}
-
-		$parameters = [
-			'filter' => $parameters
-		];
 
 		if (self::existsAPIObject($api, $parameters, $exclude_id)) {
 			$error = _('This object already exists.');
@@ -1316,6 +1602,70 @@ class CFormValidator {
 			}
 
 			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * File validator
+	 *
+	 * @param array  $rules
+	 * @param string $rules['file']['type']       File type (image or file).
+	 * @param int    $rules['file']['max-size']  (optional) Maximum size of file
+	 * @param array  $rules['messages']			 (optional) Error messages to use when some check fails.
+	 * @param mixed  $value
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateFile(array $rules, &$value, ?string &$error = null): bool {
+		$file = null;
+
+		try {
+			$file = new CUploadFile($value);
+		}
+		catch (Exception $e) {
+			$error = $e->getMessage();
+
+			return false;
+		}
+
+		if ($file->wasUploaded() || array_key_exists('not_empty', $rules)) {
+			$file_content = null;
+
+			try {
+				$file_content = $file->getContent();
+			}
+			catch (Exception $e) {
+				$error = $e->getMessage();
+
+				return false;
+			}
+
+			if (array_key_exists('max-size', $rules)) {
+				try {
+					$file->validateFileSize($rules['max-size'], $rules['file-type']);
+				}
+				catch (Exception $e) {
+					$error = self::getMessage($rules, 'max-size', $e->getMessage());
+
+					return false;
+				}
+			}
+
+			if ($rules['file-type'] === 'image') {
+				try {
+					if (@imageCreateFromString($file_content) === false) {
+						throw new Exception(_('File format is unsupported.'));
+					}
+				}
+				catch (Exception $e) {
+					$error = self::getMessage($rules, 'file-type', $e->getMessage());
+
+					return false;
+				}
+			}
 		}
 
 		return true;
@@ -1493,19 +1843,27 @@ class CFormValidator {
 	/**
 	 * Check if given value matches one of values inside $rules['in'].
 	 *
-	 * @param array  $rules
-	 * @param int    $rules['in']  (optional)
-	 * @param int    $value
-	 * @param string $error
+	 * @param array  	  $rules
+	 * @param array 	  $rules['in']  (optional)
+	 * @param string	  $value
+	 * @param string|null $error
 	 *
 	 * @return bool
 	 */
-	private static function checkStringIn(array $rules, $value, ?string &$error = null): bool {
-		if (array_key_exists('in', $rules) && !in_array($value, $rules['in'])) {
-			$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $rules['in']));
-			$error = _n('This value must be %1$s.', 'This value must be one of %1$s.',  $values, count($rules['in']));
+	private static function checkStringIn(array $rules, string $value, ?string &$error = null): bool {
+		if (array_key_exists('in', $rules)) {
+			$allowed = array_map('strval', $rules['in']);
 
-			return false;
+			if (!in_array($value, $allowed, true)) {
+				$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $allowed));
+				$error = _n(
+					'This value must be %1$s.',
+					'This value must be one of %1$s.',
+					$values, count($allowed)
+				);
+
+				return false;
+			}
 		}
 
 		return true;
@@ -1514,19 +1872,27 @@ class CFormValidator {
 	/**
 	 * Check if given value is not one of values inside $rules['not_in'].
 	 *
-	 * @param array  $rules
-	 * @param int    $rules['not_in']  (optional)
-	 * @param int    $value
-	 * @param string $error
+	 * @param array		  $rules
+	 * @param array		  $rules['not_in']  (optional)
+	 * @param string 	  $value
+	 * @param string|null $error
 	 *
 	 * @return bool
 	 */
-	private static function checkStringNotIn(array $rules, $value, ?string &$error = null): bool {
-		if (array_key_exists('not_in', $rules) && in_array($value, $rules['not_in'])) {
-			$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $rules['not_in']));
-			$error = _n('This value cannot be %1$s.', 'This value cannot be one of %1$s.',  $values, count($rules['not_in']));
+	private static function checkStringNotIn(array $rules, string $value, ?string &$error = null): bool {
+		if (array_key_exists('not_in', $rules)) {
+			$disallowed = array_map('strval', $rules['not_in']);
 
-			return false;
+			if (in_array($value, $disallowed, true)) {
+				$values = implode(', ', array_map(function ($val) {return '"'.$val.'"';}, $disallowed));
+				$error = _n(
+					'This value cannot be %1$s.',
+					'This value cannot be one of %1$s.',
+					$values, count($disallowed)
+				);
+
+				return false;
+			}
 		}
 
 		return true;
@@ -1696,7 +2062,18 @@ class CFormValidator {
 
 		if (array_key_exists('api_uniq', $rules)) {
 			foreach ($rules['api_uniq'] as $api_check) {
-				foreach ($api_check[1] as $param) {
+				foreach ($api_check[1]['filter'] as $param) {
+					if (substr($param, 0, 1) === '{' && substr($param, -1, 1) === '}') {
+						$this->when_resolved_data['fields_to_lookup'][]
+							= self::getWhenFieldAbsolutePath(substr($param, 1, -1), $path);
+					}
+				}
+
+				foreach ($api_check[1] as $name => $param) {
+					if ($name === 'filter') {
+						continue;
+					}
+
 					if (substr($param, 0, 1) === '{' && substr($param, -1, 1) === '}') {
 						$this->when_resolved_data['fields_to_lookup'][]
 							= self::getWhenFieldAbsolutePath(substr($param, 1, -1), $path);
@@ -1930,6 +2307,9 @@ class CFormValidator {
 			case 'string':
 				return self::validateStringUtf8($when_rules, $when_field['value']);
 
+			case 'file':
+				return self::validateFile($when_rules, $when_field['value']);
+
 			default:
 				/*
 				 * If specific field has not been passed to validate(), it is not also stored in
@@ -1944,5 +2324,99 @@ class CFormValidator {
 
 				return true;
 		}
+	}
+
+	private function validateObjectsCount(array $count_rules, array $objects, string $path): void {
+		$counted_fields = [];
+		$field_names = [];
+
+		foreach ($objects as $key => $object_values) {
+			$keep = true;
+
+			foreach ($count_rules['field_rules'] as $field_count_rules) {
+				$field_names[$field_count_rules[0]] = true;
+
+				if (array_key_exists($field_count_rules[0], $object_values)) {
+					if (array_key_exists('in', $field_count_rules)) {
+						$keep = $keep && in_array($object_values[$field_count_rules[0]], $field_count_rules['in']);
+					}
+
+					if (array_key_exists('not_in', $field_count_rules)) {
+						$keep = $keep && !in_array($object_values[$field_count_rules[0]], $field_count_rules['not_in']);
+					}
+				}
+				else {
+					$keep = false;
+				}
+
+				if (!$keep) {
+					break;
+				}
+			}
+
+			if ($keep) {
+				$counted_fields[$key] = true;
+			}
+		}
+
+		$counted_fields = array_keys($counted_fields);
+		$valid_count = count($counted_fields);
+
+		if (array_key_exists('min', $count_rules) && $count_rules['min'] > count($counted_fields)) {
+			$error = array_key_exists('message', $count_rules)
+				? $count_rules['message']
+				: _s('At least %1$d items based on field "%2$s" rules', $count_rules['min'],
+					implode('", "', array_keys($field_names))
+				);
+
+			$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_OBJECTS_COUNT);
+		}
+		elseif (array_key_exists('max', $count_rules) && $count_rules['max'] < $valid_count) {
+			$error = array_key_exists('message', $count_rules)
+				? $count_rules['message']
+				: _s('No more than %1$d items based on field "%2$s" rules', $count_rules['max'],
+					implode('", "', array_keys($field_names))
+				);
+
+			$field_name = array_keys($field_names)[0];
+
+			for ($i = $count_rules['max']; $i < $valid_count; $i++) {
+				$this->addError(self::ERROR, $path.'/'.$counted_fields[$i].'/'.$field_name, $error,
+					self::ERROR_LEVEL_OBJECTS_COUNT
+				);
+			}
+		}
+	}
+
+	/**
+	 * Validates if string is a macro or a macro function.
+	 *
+	 * @param array		$macro_rules
+	 * @param bool		$macro_rules['usermacros']
+	 * @param bool		$macro_rules['lldmacros']
+	 * @param string	$value
+	 *
+	 * @return bool
+	 */
+	public static function validateMacro(array $macro_rules, string $value): bool {
+		$macro_parsers = [];
+
+		if ($macro_rules['usermacros']) {
+			$macro_parsers[] = new CUserMacroParser();
+			$macro_parsers[] = new CUserMacroFunctionParser();
+		}
+
+		if ($macro_rules['lldmacros']) {
+			$macro_parsers[] = new CLLDMacroParser();
+			$macro_parsers[] = new CLLDMacroFunctionParser();
+		}
+
+		foreach ($macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($value) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

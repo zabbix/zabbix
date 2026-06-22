@@ -47,6 +47,7 @@ CACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_builddir)/src/libs/zbxresolver/libzbxresolver.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
@@ -98,8 +99,9 @@ COMMON_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_shmem_dump_stats \
 	-Wl,--wrap=zbx_history_get_values \
 	-Wl,--wrap=zbx_history_add_values \
-	-Wl,--wrap=zbx_history_sql_init \
-	-Wl,--wrap=zbx_history_elastic_init \
+	-Wl,--wrap=history_sql_open \
+	-Wl,--wrap=history_elastic_open \
+	-Wl,--wrap=history_clickhouse_open \
 	-Wl,--wrap=zbx_elastic_version_extract \
 	-Wl,--wrap=zbx_elastic_version_get \
 	-Wl,--wrap=time

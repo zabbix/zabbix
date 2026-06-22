@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,17 +18,19 @@
 #include "zbxcacheconfig.h"
 
 /* acknowledgment actions (flags) */
-#define ZBX_PROBLEM_UPDATE_CLOSE		0x0001
-#define ZBX_PROBLEM_UPDATE_ACKNOWLEDGE		0x0002
-#define ZBX_PROBLEM_UPDATE_MESSAGE		0x0004
-#define ZBX_PROBLEM_UPDATE_SEVERITY		0x0008
-#define ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE	0x0010
-#define ZBX_PROBLEM_UPDATE_SUPPRESS		0x0020
-#define ZBX_PROBLEM_UPDATE_UNSUPPRESS		0x0040
-#define ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE	0x0080
-#define ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM	0x0100
+#define ZBX_PROBLEM_UPDATE_CLOSE			0x0001
+#define ZBX_PROBLEM_UPDATE_ACKNOWLEDGE			0x0002
+#define ZBX_PROBLEM_UPDATE_MESSAGE			0x0004
+#define ZBX_PROBLEM_UPDATE_SEVERITY			0x0008
+#define ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE		0x0010
+#define ZBX_PROBLEM_UPDATE_SUPPRESS			0x0020
+#define ZBX_PROBLEM_UPDATE_UNSUPPRESS			0x0040
+#define ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE		0x0080
+#define ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM		0x0100
+#define ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS		0x0200
+#define ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS	0x0400
 
-#define ZBX_PROBLEM_UPDATE_ACTION_COUNT	9
+#define ZBX_PROBLEM_UPDATE_ACTION_COUNT			11
 
 typedef struct
 {
@@ -44,7 +46,6 @@ zbx_eventdata_t;
 ZBX_VECTOR_DECL(eventdata, zbx_eventdata_t)
 
 void	zbx_eventdata_free(zbx_eventdata_t *eventdata);
-int	zbx_eventdata_compare(const zbx_eventdata_t *d1, const zbx_eventdata_t *d2);
 int	zbx_eventdata_to_str(const zbx_vector_eventdata_t *eventdata, char **replace_to);
 
 void	zbx_event_get_macro_value(const char *macro, const zbx_db_event *event, char **replace_to,

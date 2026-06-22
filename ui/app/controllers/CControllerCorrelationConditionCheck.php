@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,39 +18,95 @@ class CControllerCorrelationConditionCheck extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'conditiontype' =>	'db corr_condition.type|in '.implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG,
-				ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP,
-				ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
-				ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
-			]),
-			'operator' =>		'in '.implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
-				CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
-			]),
-			'tag' =>			'db corr_condition_tagvalue.tag|string',
-			'oldtag' =>			'db corr_condition_tagpair.oldtag|string',
-			'newtag' =>			'db corr_condition_tagpair.newtag|string',
-			'value' =>			'db corr_condition_tagvalue.value|string',
-			'groupids' =>		'array_id'
-		];
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'type' => ['db corr_condition.type', 'required',
+				'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG,
+					ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
+					ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
+				]
+			],
+			'operator' => [
+				['db conditions.operator', 'required', 'in' => [CONDITION_OPERATOR_EQUAL],
+					'when' => ['type',
+						'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG,
+							ZBX_CORR_CONDITION_EVENT_TAG_PAIR
+						]
+					]
+				],
+				['db corr_condition_group.operator', 'required',
+					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
+					'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]
+				],
+				['db corr_condition_tagvalue.operator', 'required',
+					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+						CONDITION_OPERATOR_NOT_LIKE
+					],
+					'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
+						ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
+					]]
+				]
+			],
+			'tag' => [
+				['db corr_condition_tag.tag', 'required', 'not_empty',
+					'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+						ZBX_CORR_CONDITION_NEW_EVENT_TAG
+					]]
+				],
+				['db corr_condition_tagvalue.tag', 'required', 'not_empty',
+					'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
+						ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
+					]]
+				]
+			],
+			'oldtag' => ['db corr_condition_tagpair.oldtag', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ZBX_CORR_CONDITION_EVENT_TAG_PAIR]]
+			],
+			'newtag' => ['db corr_condition_tagpair.newtag', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ZBX_CORR_CONDITION_EVENT_TAG_PAIR]]
+			],
+			'value' => [
+				['db corr_condition_tagvalue.value', 'required',
+					'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
+						ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
+					]]
+				],
+				['db corr_condition_tagvalue.value', 'required', 'not_empty',
+					'when' => [
+						['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
+							ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
+						]],
+						['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]]
+					]
+				]
+			],
+			'groupid' => ['array', 'required', 'not_empty',
+				'field' => ['db corr_condition_group.groupid', 'required'],
+				'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]
+			],
+			'formulaid' => ['string']
+		]];
+	}
 
-		$ret = $this->validateInput($fields);
+	protected function checkInput(): bool {
+		$rules = self::getValidationRules();
+		$ret = $this->validateInput($rules);
 
 		if ($ret) {
 			$validator = new CEventCorrCondValidator();
 
 			$is_valid = $validator->validate([
-				'type' => $this->getInput('conditiontype'),
+				'type' => $this->getInput('type'),
 				'operator' => $this->getInput('operator'),
 				'tag' => $this->getInput('tag', ''),
 				'oldtag' => $this->getInput('oldtag', ''),
 				'newtag' => $this->getInput('newtag', ''),
 				'value' => $this->getInput('value', ''),
-				'groupids' => $this->getInput('groupids', '')
+				'groupids' => $this->getInput('groupid', '')
 			]);
 
 			if (!$is_valid) {
@@ -60,12 +116,15 @@ class CControllerCorrelationConditionCheck extends CController {
 		}
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
+				new CControllerResponseData(['main_block' => json_encode($response)])
 			);
 		}
 
@@ -78,13 +137,13 @@ class CControllerCorrelationConditionCheck extends CController {
 
 	protected function doAction(): void {
 		$output = [
-			'conditiontype' => $this->getInput('conditiontype'),
+			'type' => $this->getInput('type'),
 			'operator' => $this->getInput('operator'),
 			'tag' => $this->getInput('tag', ''),
 			'oldtag' => $this->getInput('oldtag', ''),
 			'newtag' => $this->getInput('newtag', ''),
 			'value' => $this->getInput('value', ''),
-			'groupids' => $this->hasInput('groupids') ? $this->getGroups($this->getInput('groupids')) : '',
+			'groupid' => $this->hasInput('groupid') ? $this->getGroups($this->getInput('groupid')) : '',
 			'operator_name' => CCorrelationHelper::getLabelByOperator($this->getInput('operator')),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
@@ -103,7 +162,7 @@ class CControllerCorrelationConditionCheck extends CController {
 	 */
 	protected function getGroups(array $groupids): array {
 		$groups = API::HostGroup()->get([
-			'output' => ['groupid','name'],
+			'output' => ['groupid', 'name'],
 			'groupids' => $groupids,
 			'preservekeys' => true
 		]);

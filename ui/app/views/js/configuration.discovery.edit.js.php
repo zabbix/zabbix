@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -95,7 +95,7 @@ window.drule_edit_popup = new class {
 
 	#updateCheck(row, input) {
 		delete input.dchecks;
-		input.warning = row.querySelector('.btn-icon')?.getAttribute('data-hintbox-contents');
+		input.warning = row.querySelector('.btn-icon')?.getAttribute('data-hintbox-html');
 
 		this.#addCheck(input, row, true);
 		row.remove();

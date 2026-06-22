@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -107,7 +107,7 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, unsigned char value_type, zbx_vector_
 int	zbx_vc_get_value(zbx_uint64_t itemid, unsigned char value_type, const zbx_timespec_t *ts,
 		zbx_history_record_t *value);
 
-int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int config_history_storage_pipelines);
+int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, zbx_uint64_t *flush_err);
 
 int	zbx_vc_get_statistics(zbx_vc_stats_t *stats);
 
@@ -119,5 +119,18 @@ void	zbx_vc_get_item_stats(zbx_vector_vc_item_stats_ptr_t *stats);
 void	zbx_vc_flush_stats(void);
 
 void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items);
+
+typedef struct
+{
+	zbx_uint64_t			itemid;
+	unsigned char			value_type;
+	int				ts_end;
+	const zbx_history_selector_t	*selector;
+}
+zbx_vc_query_t;
+
+ZBX_VECTOR_DECL(vc_query, zbx_vc_query_t)
+
+void	zbx_vc_precache_queries(zbx_vector_vc_query_t *queries);
 
 #endif

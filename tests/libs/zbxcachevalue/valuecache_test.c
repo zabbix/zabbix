@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,6 +16,7 @@
 
 #include "valuecache_test.h"
 #include "zbxmocktest.h"
+#include "zbxdb.h"
 
 void	zbx_vc_set_mode(int mode)
 {
@@ -142,5 +143,44 @@ int	zbx_vcmock_str_to_cache_mode(const char *mode)
 		return ZBX_VC_MODE_LOWMEM;
 
 	fail_msg("Unknown value cache mode \"%s\"", mode);
+	return FAIL;
+}
+
+/* mocks */
+
+int	__wrap_zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,
+		zbx_uint32_t max_version, zbx_uint32_t min_supported_version);
+int	__wrap_zbx_db_verify_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
+		unsigned char program_type);
+int	__wrap_zbx_db_settings_set_value(const char *name, const void *value, int type);
+
+int	__wrap_zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,
+		zbx_uint32_t max_version, zbx_uint32_t min_supported_version)
+{
+	ZBX_UNUSED(database);
+	ZBX_UNUSED(current_version);
+	ZBX_UNUSED(min_version);
+	ZBX_UNUSED(max_version);
+	ZBX_UNUSED(min_supported_version);
+
+	return FAIL;
+}
+
+int	__wrap_zbx_db_verify_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
+		unsigned char program_type)
+{
+	ZBX_UNUSED(info);
+	ZBX_UNUSED(allow_unsupported);
+	ZBX_UNUSED(program_type);
+
+	return FAIL;
+}
+
+int	__wrap_zbx_db_settings_set_value(const char *name, const void *value, int type)
+{
+	ZBX_UNUSED(name);
+	ZBX_UNUSED(value);
+	ZBX_UNUSED(type);
+
 	return FAIL;
 }

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1562,5 +1562,25 @@ clean:
 	xmlXPathFreeContext(xpathCtx);
 out:
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: logs outer XML string of specified node                           *
+ *                                                                            *
+ * Parameters: node      - [IN] XML node                                      *
+ *             log_level - [IN] debug, warning, etc                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_xml_node_dump(xmlNode *node, int log_level)
+{
+	xmlBufferPtr	buffer;
+
+	if (NULL == node || NULL == (buffer = xmlBufferCreate()))
+		return;
+
+	xmlNodeDump(buffer, node->doc, node, 0, 1);
+	zabbix_log(log_level, "outer XML:%s", (const char *)xmlBufferContent(buffer));
+	xmlBufferFree(buffer);
 }
 #endif // HAVE_LIBXML2 && HAVE_LIBCURL

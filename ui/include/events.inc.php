@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -168,7 +168,7 @@ function make_event_details(array $event, array $allowed) {
 		}
 	}
 
-	$tags = makeTags([$event]);
+	$tags = CTagHelper::getTagsHtml([$event], ZBX_TAG_OBJECT_EVENT);
 
 	$table
 		->addRow([_('Tags'), (new CDiv($tags[$event['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)])
@@ -312,21 +312,29 @@ function getEventStatusString(bool $in_closing, array $event): string {
 }
 
 /**
+ * Get table with list of events (Event list [previous 20) for "Event details" page.
  *
- * @param array  $startEvent                    An array of event data.
- * @param string $startEvent['eventid']         Event ID.
- * @param string $startEvent['objectid']        Object ID.
- * @param array  $allowed                       An array of user role rules.
- * @param bool   $allowed['add_comments']       Whether user is allowed to add problems comments.
- * @param bool   $allowed['change_severity']    Whether user is allowed to change problems severity.
- * @param bool   $allowed['acknowledge']        Whether user is allowed to acknowledge problems.
- * @param bool   $allowed['close']              Whether user is allowed to close problems.
- * @param bool   $allowed['suppress_problems']  Whether user is allowed to suppress/unsuppress problems.
- * @param bool   $allowed['rank_change']        Whether user is allowed to change problem ranking.
+ * @param array $start_event  Starting event data.
+ *
+ * $start_event = [
+ *     'eventid' =>  (string)  Event ID.
+ *     'objectid' => (string)  Object ID (trigger ID).
+ * ]
+ *
+ * @param array $allowed  User role rules.
+ *
+ * $allowed = [
+ *     'add_comments' =>      (bool)  Whether user is allowed to add problems comments.
+ *     'change_severity' =>   (bool)  Whether user is allowed to change problems severity.
+ *     'acknowledge' =>       (bool)  Whether user is allowed to acknowledge problems.
+ *     'close' =>             (bool)  Whether user is allowed to close problems.
+ *     'suppress_problems' => (bool)  Whether user is allowed to suppress/unsuppress problems.
+ *     'rank_change' =>       (bool)  Whether user is allowed to change problem ranking.
+ * ]
  *
  * @return CTableInfo
  */
-function make_small_eventlist(array $startEvent, array $allowed) {
+function make_small_eventlist(array $start_event, array $allowed): CTableInfo {
 	$table = (new CTableInfo())
 		->setHeader([
 			_('Time'),
@@ -348,8 +356,8 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'value' => TRIGGER_VALUE_TRUE,
-		'objectids' => $startEvent['objectid'],
-		'eventid_till' => $startEvent['eventid'],
+		'objectids' => $start_event['objectid'],
+		'eventid_till' => $start_event['eventid'],
 		'sortfield' => ['clock', 'eventid'],
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => 20,
@@ -393,6 +401,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		: [];
 
 	$actions = getEventsActionsIconsData($events, $triggers);
+
 	$users = API::User()->get([
 		'output' => ['username', 'name', 'surname'],
 		'userids' => array_keys($actions['userids']),
@@ -517,8 +526,6 @@ function hasEventCloseAction(array $acknowledges): bool {
  * @return bool
  */
 function isEventRecentlySuppressed(array $acknowledges, &$suppression_action = null): bool {
-	CArrayHelper::sort($acknowledges, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
-
 	foreach ($acknowledges as $ack) {
 		if (!array_key_exists('suppress_until', $ack)) {
 			continue;
@@ -541,17 +548,19 @@ function isEventRecentlySuppressed(array $acknowledges, &$suppression_action = n
 }
 
 /**
- * Returns true if event is unsuppressed and not suppressed after that.
+ * Check if event is unsuppressed and not suppressed after that.
  *
- * @param array  $acknowledges
- * @param int    $acknowledges['action']
- * @param ?array $unsuppression_action   [OUT] Variable to store unsuppression action data.
+ * @param array $acknowledges  Array of acknowledges.
+ *
+ * $acknowledges = [[
+ *     'action' => (string)  Action that was performed by problem update.
+ * ]]
+ *
+ * @param array $unsuppression_action  [OUT] Variable to store unsuppression action data.
  *
  * @return bool
  */
 function isEventRecentlyUnsuppressed(array $acknowledges, &$unsuppression_action = null): bool {
-	CArrayHelper::sort($acknowledges, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
-
 	foreach ($acknowledges as $ack) {
 		if (($ack['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
 			return false;
@@ -563,241 +572,6 @@ function isEventRecentlyUnsuppressed(array $acknowledges, &$unsuppression_action
 	}
 
 	return false;
-}
-
-/**
- * Place filter tags at the beginning of tags array.
- *
- * @param array  $event_tags
- * @param string $event_tags[]['tag']
- * @param string $event_tags[]['value']
- * @param array  $f_tags
- * @param int    $f_tags[<tag>][]['operator']
- * @param string $f_tags[<tag>][]['value']
- *
- * @return array
- */
-function orderEventTags(array $event_tags, array $f_tags) {
-	$first_tags = [];
-
-	foreach ($event_tags as $i => $tag) {
-		if (array_key_exists($tag['tag'], $f_tags)) {
-			foreach ($f_tags[$tag['tag']] as $f_tag) {
-				if (($f_tag['operator'] == TAG_OPERATOR_EQUAL && $tag['value'] === $f_tag['value'])
-						|| ($f_tag['operator'] == TAG_OPERATOR_LIKE
-							&& ($f_tag['value'] === '' || stripos($tag['value'], $f_tag['value']) !== false))) {
-					$first_tags[] = $tag;
-					unset($event_tags[$i]);
-					break;
-				}
-			}
-		}
-	}
-
-	return array_merge($first_tags, $event_tags);
-}
-
-/**
- * Place priority tags at the beginning of tags array.
- *
- * @param array  $event_tags             An array of event tags.
- * @param string $event_tags[]['tag']    Tag name.
- * @param string $event_tags[]['value']  Tag value.
- * @param array  $priorities             An array of priority tag names.
- *
- * @return array
- */
-function orderEventTagsByPriority(array $event_tags, array $priorities) {
-	$first_tags = [];
-
-	foreach ($priorities as $priority) {
-		foreach ($event_tags as $i => $tag) {
-			if ($tag['tag'] === $priority) {
-				$first_tags[] = $tag;
-				unset($event_tags[$i]);
-			}
-		}
-	}
-
-	return array_merge($first_tags, $event_tags);
-}
-
-/**
- * Create element with tags.
- *
- * @param array  $list
- * @param string $list[][$key]
- * @param array  $list[]['tags']
- * @param string $list[]['tags'][]['tag']
- * @param string $list[]['tags'][]['value']
- * @param bool   $html
- * @param string $key                        Name of tag source ID. Possible values:
- *                                            - 'eventid' - for events and problems (default);
- *                                            - 'hostid' - for hosts and host prototypes;
- *                                            - 'templateid' - for templates;
- *                                            - 'triggerid' - for triggers;
- *                                            - 'httptestid' - for web scenarios.
- * @param int    $list_tag_count             Maximum number of tags to display.
- * @param array  $filter_tags                An array of tag filtering data.
- * @param ?array $subfilter_tags             Array of selected sub-filter tags. Null when tags are not clickable.
- * @param array  $subfilter_tags[<tag>]
- * @param array  $subfilter_tags[<tag>][<value1>]
- * @param array  $subfilter_tags[<tag>][<value2>]
- * @param array  $subfilter_tags[<tag>][<value...>]
- * @param string $filter_tags[]['tag']
- * @param int    $filter_tags[]['operator']
- * @param string $filter_tags[]['value']
- * @param int    $tag_name_format            Tag name format. Possible values:
- *                                            - TAG_NAME_FULL (default);
- *                                            - TAG_NAME_SHORTENED;
- *                                            - TAG_NAME_NONE.
- * @param string $tag_priority               A list of comma-separated tag names.
- *
- * @return array
- */
-function makeTags(array $list, bool $html = true, string $key = 'eventid', int $list_tag_count = ZBX_TAG_COUNT_DEFAULT,
-		array $filter_tags = [], ?array $subfilter_tags = null, int $tag_name_format = TAG_NAME_FULL,
-		string $tag_priority = ''): array {
-	$tags = [];
-
-	if ($html) {
-		// Convert $filter_tags to a more usable format.
-
-		$f_tags = [];
-
-		foreach ($filter_tags as $tag) {
-			$f_tags[$tag['tag']][] = [
-				'operator' => $tag['operator'],
-				'value' => $tag['value']
-			];
-		}
-	}
-
-	if ($tag_priority !== '') {
-		$p_tags = explode(',', $tag_priority);
-		$p_tags = array_map('trim', $p_tags);
-	}
-
-	foreach ($list as $element) {
-		$tags[$element[$key]] = [];
-
-		if (!$element['tags']) {
-			continue;
-		}
-
-		CArrayHelper::sort($element['tags'], ['tag', 'value']);
-
-		if ($html) {
-			// Show first n tags and "..." with hint box if there are more.
-
-			$e_tags = $f_tags ? orderEventTags($element['tags'], $f_tags) : $element['tags'];
-
-			if ($tag_priority !== '') {
-				$e_tags = orderEventTagsByPriority($e_tags, $p_tags);
-			}
-
-			$tags_shown = 0;
-
-			foreach ($e_tags as $tag) {
-				$value = getTagString($tag, $tag_name_format);
-
-				if ($value !== '') {
-					if ($subfilter_tags !== null
-							&& !(array_key_exists($tag['tag'], $subfilter_tags)
-								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
-						$tags[$element[$key]][] = (new CSimpleButton($value))
-							->setAttribute('data-key', $tag['tag'])
-							->setAttribute('data-value', $tag['value'])
-							->onClick(
-								'view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
-									'this.dataset.value'.
-								']);'
-							)
-							->addClass(ZBX_STYLE_BTN_TAG)
-							->addClass(ZBX_STYLE_TAG)
-							->setHint(getTagString($tag), '', false);
-					}
-					else {
-						$tags[$element[$key]][] = (new CSpan($value))
-							->addClass(ZBX_STYLE_TAG)
-							->setHint(getTagString($tag));
-					}
-
-					$tags_shown++;
-
-					if ($tags_shown >= $list_tag_count) {
-						break;
-					}
-				}
-			}
-
-			if (count($element['tags']) > $tags_shown) {
-				// Display all tags in hint box.
-
-				$hint_content = [];
-
-				foreach ($element['tags'] as $tag) {
-					$value = getTagString($tag);
-
-					if ($subfilter_tags !== null
-							&& !(array_key_exists($tag['tag'], $subfilter_tags)
-								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
-						$hint_content[$element[$key]][] = (new CSimpleButton($value))
-							->setAttribute('data-key', $tag['tag'])
-							->setAttribute('data-value', $tag['value'])
-							->onClick(
-								'view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
-									'this.dataset.value'.
-								']);'
-							)
-							->addClass(ZBX_STYLE_BTN_TAG)
-							->addClass(ZBX_STYLE_TAG)
-							->setHint(getTagString($tag), '', false);
-					}
-					else {
-						$hint_content[$element[$key]][] = (new CSpan($value))
-							->addClass(ZBX_STYLE_TAG)
-							->setHint($value);
-					}
-				}
-
-				$tags[$element[$key]][] = (new CButtonIcon(ZBX_ICON_MORE))
-					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP . ' ' . ZBX_STYLE_TAGS_WRAPPER);
-			}
-		}
-		else {
-			// Show all and uncut for CSV.
-
-			foreach ($element['tags'] as $tag) {
-				$tags[$element[$key]][] = getTagString($tag);
-			}
-		}
-	}
-
-	return $tags;
-}
-
-/**
- * Returns tag name in selected format.
- *
- * @param array  $tag
- * @param string $tag['tag']
- * @param string $tag['value']
- * @param int    $tag_name_format  TAG_NAME_*
- *
- * @return string
- */
-function getTagString(array $tag, $tag_name_format = TAG_NAME_FULL) {
-	switch ($tag_name_format) {
-		case TAG_NAME_NONE:
-			return $tag['value'];
-
-		case TAG_NAME_SHORTENED:
-			return mb_substr($tag['tag'], 0, 3).(($tag['value'] === '') ? '' : ': '.$tag['value']);
-
-		default:
-			return $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);
-	}
 }
 
 /**

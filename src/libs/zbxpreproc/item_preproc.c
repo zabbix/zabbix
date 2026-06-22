@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -883,11 +883,10 @@ int	item_preproc_get_error_from_json(const zbx_variant_t *value, const char *par
 
 	if (FAIL == (ret = item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, error)))
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
 		goto out;
 	}
 
-	if (FAIL == zbx_json_open(value->data.str, &jp))
+	if (FAIL == zbx_json_open(value_str.data.str, &jp))
 		goto out;
 
 	if (FAIL == (ret = zbx_jsonpath_query(&jp, params, error)))
@@ -1170,7 +1169,8 @@ out:
  *                                                                            *
  * Purpose: throttles value by suppressing identical values                   *
  *                                                                            *
- * Parameters: value             - [IN/OUT] value to process                  *
+ * Parameters: value_type        - [IN] item value type                       *
+ *             value             - [IN/OUT] value to process                  *
  *             ts                - [IN] value timestamp                       *
  *             history_value_in  - [IN] historical (previous) data            *
  *             history_value_out - [OUT] historical (next) data               *
@@ -1180,12 +1180,20 @@ out:
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-int	item_preproc_throttle_value(zbx_variant_t *value, const zbx_timespec_t *ts,
+int	item_preproc_throttle_value(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
 		const zbx_variant_t *history_value_in, zbx_variant_t *history_value_out, zbx_timespec_t *history_ts)
 {
 	int	ret;
 
-	ret = zbx_variant_compare(value, history_value_in);
+	if (ZBX_VARIANT_NONE == item_preproc_numeric_type_hint(value_type) && ZBX_VARIANT_STR == value->type &&
+			ZBX_VARIANT_STR == history_value_in->type)
+	{
+		ret = strcmp(value->data.str, history_value_in->data.str);
+	}
+	else
+	{
+		ret = zbx_variant_compare(value, history_value_in);
+	}
 
 	if (0 == ret)
 	{
