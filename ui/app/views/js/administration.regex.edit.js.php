@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -62,11 +62,11 @@ window.regex_edit_popup = new class {
 		this.#initTableActions();
 	}
 
-	#initActions() {
+	#initActions(rules) {
 		this.#footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
 		this.#footer.querySelector('.js-clone')?.addEventListener('click', () => this.#clone());
 		this.#footer.querySelector('.js-delete')?.addEventListener('click', () => this.#delete());
-		this.#footer.querySelector('.js-test').addEventListener('click', () => this.#testExpression());
+		this.#footer.querySelector('.js-test').addEventListener('click', () => this.#testExpression(rules));
 	}
 
 	#initTableActions() {
@@ -101,9 +101,7 @@ window.regex_edit_popup = new class {
 		this.#removePopupMessages();
 
 		const fields = this.#form.getAllValues();
-		const curl = new Curl('zabbix.php');
-
-		curl.setArgument('action', this.#regexpid !== null ? 'regex.update' : 'regex.create');
+		const action = this.#regexpid !== null ? 'regex.update' : 'regex.create';
 
 		this.#form.validateSubmit(fields)
 			.then(result => {
@@ -112,7 +110,7 @@ window.regex_edit_popup = new class {
 				return;
 			}
 
-			this.#post(curl.getUrl(), fields);
+			this.#post(zabbixUrl({action}), fields);
 		});
 	}
 
@@ -156,11 +154,12 @@ window.regex_edit_popup = new class {
 	#delete() {
 		this.#removePopupMessages();
 
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'regex.delete');
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('regex')) ?>);
+		const url_params = {
+			action: 'regex.delete',
+			[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('regex')) ?>
+		};
 
-		this.#post(curl.getUrl(), {regexpids: [this.#regexpid]});
+		this.#post(zabbixUrl(url_params), {regexpids: [this.#regexpid]});
 	}
 
 	#post(url, data) {
@@ -241,25 +240,26 @@ window.regex_edit_popup = new class {
 		this.#hideCombinedResult();
 	}
 
-	#testExpression() {
-		const fields = this.#form.getAllValues();
+	#testExpression(rules) {
+		const test_fields = ['expressions', 'test_string'];
 
-		this.#form.validateSubmit(fields)
+		test_fields.forEach(test_field => {
+			this.#form.findFieldByName(test_field).setChanged();
+		})
+
+		this.#form.validateFieldsForAction(test_fields, rules)
 			.then(result => {
 				if (!result) {
 					this.#overlay.unsetLoading();
 					return;
 				}
 
-				const {expressions, test_string} = fields;
-				const curl = new Curl('zabbix.php');
-
-				curl.setArgument('action', 'regex.test');
+				const {expressions, test_string} = this.#form.getAllValues();
 
 				this.#setTestLoadingStatus();
 
 				clearMessages();
-				fetch(curl.getUrl(), {
+				fetch(zabbixUrl({action: 'regex.test'}), {
 					method: 'POST',
 					headers: {'Content-Type': 'application/json'},
 					body: JSON.stringify({expressions, test_string})
