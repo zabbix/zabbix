@@ -129,10 +129,10 @@ $form->addItem([
 			)
 		],
 		'regex.delete' => [
-			'name' => _('Delete'),
-			'confirm_singular' => _('Delete selected regular expression?'),
-			'confirm_plural' => _('Delete selected regular expressions?'),
-			'csrf_token' => CCsrfTokenHelper::get('regex')
+			'content' => (new CSimpleButton(_('Delete')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->setId('js-massdelete')
+				->addClass('js-no-chkbxrange')
 		]
 	], 'regexp')
 ]);

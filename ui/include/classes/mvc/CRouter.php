@@ -302,7 +302,7 @@ class CRouter {
 		'queue.overview'							=> [CControllerQueueOverview::class,								'layout.htmlpage',		'administration.queue.overview'],
 		'queue.overview.proxy'						=> [CControllerQueueOverviewProxy::class,							'layout.htmlpage',		'administration.queue.overview.proxy'],
 		'regex.create'								=> [CControllerRegExCreate::class,									'layout.json',			null],
-		'regex.delete'								=> [CControllerRegExDelete::class,									null,					null],
+		'regex.delete'								=> [CControllerRegExDelete::class,									'layout.json',			null],
 		'regex.edit'								=> [CControllerRegExEdit::class,									'layout.json',			'administration.regex.edit'],
 		'regex.list'								=> [CControllerRegExList::class,									'layout.htmlpage',		'administration.regex.list'],
 		'regex.test'								=> [CControllerRegExTest::class,									'layout.json',			null],

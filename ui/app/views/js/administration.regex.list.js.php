@@ -30,6 +30,10 @@
 			document.querySelector('.js-create-regexp').addEventListener('click', () => {
 				ZABBIX.PopupManager.open('regex.edit');
 			});
+
+			document.getElementById('js-massdelete').addEventListener('click', e => {
+				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+			});
 		}
 
 		#initPopupListeners() {
@@ -43,6 +47,66 @@
 					location.href = location.href;
 				}
 			});
+		}
+
+		#delete(target, regexpids) {
+			const confirmation = regexpids.length > 1
+				? <?= json_encode(_('Delete selected regular expressions?')) ?>
+				: <?= json_encode(_('Delete selected regular expression?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			const curl = new Curl('zabbix.php');
+
+			curl.setArgument('action', 'regex.delete');
+
+			this.#post(target, regexpids, curl);
+		}
+
+		#post(target, regexpids, url) {
+			url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('regex')) ?>);
+
+			target.classList.add('is-loading');
+
+			return fetch(url.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({regexpids: regexpids})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						if ('title' in response.error) {
+							postMessageError(response.error.title);
+						}
+						uncheckTableRows('regexp', response.keepids ?? []);
+
+						postMessageDetails('error', response.error.messages);
+					}
+					else if ('success' in response) {
+						postMessageOk(response.success.title);
+
+						if ('messages' in response.success) {
+							postMessageDetails('success', response.success.messages);
+						}
+
+						uncheckTableRows('regexp');
+					}
+
+					location.href = location.href;
+				})
+				.catch(() => {
+					clearMessages();
+
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+
+					addMessage(message_box);
+				})
+				.finally(() => {
+					target.classList.remove('is-loading');
+				});
 		}
 	};
 </script>
