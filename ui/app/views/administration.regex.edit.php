@@ -61,7 +61,7 @@ foreach ($data['regexp']['expressions'] as $index => $expression) {
 }
 
 $table->addRow((new CRow((new CCol(
-	(new CButton('add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)->removeId()
+	(new CButton('add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)->addClass('js-add')->removeId()
 ))->setColSpan(5)))->setId('expression-list-footer'));
 
 $form_grid = (new CFormGrid())

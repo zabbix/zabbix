@@ -72,13 +72,19 @@ window.regex_edit_popup = new class {
 	#initTableActions() {
 		const table = document.getElementById('regular-expressions-table');
 
-		table.querySelector('button[name="add"]').addEventListener('click', () => this.#addRow());
-		table.querySelectorAll('button[name="remove"]').forEach(node =>
+		table.querySelector('.js-add')?.addEventListener('click', () => this.#addRow());
+		table.querySelectorAll('.js-remove')?.forEach(node =>
 			node.addEventListener('click', e => this.#removeRow(e))
 		);
 		table.querySelectorAll('.js-expression-type-select').forEach(node =>
 			node.addEventListener('change', e => this.#updateRow(e))
 		);
+
+		table.addEventListener('change', e => {
+			if (e.target.classList.contains('js-clear-row-result')) {
+				this.#clearRowResult(e)
+			}
+		})
 
 		table.querySelectorAll('textarea').forEach(node =>
 			node.addEventListener('input', e => this.#clearRowResult(e))
@@ -181,9 +187,7 @@ window.regex_edit_popup = new class {
 			}
 
 			overlayDialogueDestroy(this.#overlay.dialogueid);
-			this.#overlay.$dialogue[0].dispatchEvent(
-				new CustomEvent('dialogue.submit', {detail: response})
-			);
+			this.#overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		})
 		.catch(exception => this.#ajaxExceptionHandler(exception))
 		.finally(() => this.#overlay.unsetLoading());
@@ -233,7 +237,7 @@ window.regex_edit_popup = new class {
 			.getElementById('regular-expressions-table')
 			.querySelector(`tr[data-index="${next_index}"]`);
 
-		row.querySelector('button[name="remove"]').addEventListener('click', e => this.#removeRow(e));
+		row.querySelector('.js-remove').addEventListener('click', e => this.#removeRow(e));
 		row.querySelector('.js-expression-type-select').addEventListener('change', e => this.#updateRow(e));
 		row.querySelector('textarea').addEventListener('input', e => this.#clearRowResult(e));
 
