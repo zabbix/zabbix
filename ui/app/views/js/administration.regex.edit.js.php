@@ -249,7 +249,7 @@ window.regex_edit_popup = new class {
 
 		test_fields.forEach(test_field => {
 			this.#form.findFieldByName(test_field).setChanged();
-		})
+		});
 
 		this.#form.validateFieldsForAction(test_fields, rules)
 			.then(result => {
@@ -262,7 +262,8 @@ window.regex_edit_popup = new class {
 
 				this.#setTestLoadingStatus();
 
-				clearMessages();
+				this.#removePopupMessages();
+
 				fetch(zabbixUrl({action: 'regex.test'}), {
 					method: 'POST',
 					headers: {'Content-Type': 'application/json'},
@@ -276,6 +277,9 @@ window.regex_edit_popup = new class {
 	}
 
 	#setTestLoadingStatus() {
+		if (!this.#form_element.isConnected) {
+			return;
+		}
 		// TODO:: need to use the this.#form.lock() method after the merge task ZBXNEXT-10393
 		const textarea = document.getElementById('test-string');
 
@@ -283,6 +287,9 @@ window.regex_edit_popup = new class {
 	}
 
 	#unsetTestLoadingStatus() {
+		if (!this.#form_element.isConnected) {
+			return;
+		}
 		// TODO:: need to use the this.#form.unlock() method after the merge task ZBXNEXT-10393
 		const textarea = document.getElementById('test-string');
 
