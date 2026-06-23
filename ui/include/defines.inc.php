@@ -2351,6 +2351,7 @@ define('ZBX_ICON_BULLET_RIGHT_WITH_CONTENT', 'zi-bullet-right-with-content');
 define('ZBX_ICON_CALENDAR', 'zi-calendar');
 define('ZBX_ICON_CALENDAR_CHECK', 'zi-calendar-check');
 define('ZBX_ICON_CALENDAR_WARNING', 'zi-calendar-warning');
+define('ZBX_ICON_CEP', 'zi-cep');
 define('ZBX_ICON_CHEVRON_DOUBLE_LEFT', 'zi-chevron-double-left');
 define('ZBX_ICON_CHECK', 'zi-check');
 define('ZBX_ICON_CHECKBOX', 'zi-checkbox');
