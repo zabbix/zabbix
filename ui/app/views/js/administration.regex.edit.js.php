@@ -245,6 +245,8 @@ window.regex_edit_popup = new class {
 	}
 
 	#testExpression(rules) {
+		this.#setTestLoadingStatus();
+
 		const test_fields = ['expressions', 'test_string'];
 
 		test_fields.forEach(test_field => {
@@ -259,8 +261,6 @@ window.regex_edit_popup = new class {
 				}
 
 				const {expressions, test_string} = this.#form.getAllValues();
-
-				this.#setTestLoadingStatus();
 
 				this.#removePopupMessages();
 
@@ -290,6 +290,10 @@ window.regex_edit_popup = new class {
 		const textarea = document.getElementById('test-string');
 
 		textarea.disabled = true;
+
+		document.getElementById('regular-expressions-table')
+			.querySelectorAll('.js-add, .js-remove')
+			.forEach(button => button.disabled = true);
 	}
 
 	#unsetTestLoadingStatus() {
@@ -300,6 +304,10 @@ window.regex_edit_popup = new class {
 		const textarea = document.getElementById('test-string');
 
 		textarea.disabled = false;
+
+		document.getElementById('regular-expressions-table')
+			.querySelectorAll('.js-add, .js-remove')
+			.forEach(button => button.disabled = false);
 
 		this.#overlay.unsetLoading();
 	}
