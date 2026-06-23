@@ -34,6 +34,16 @@
 			document.getElementById('js-massdelete').addEventListener('click', e => {
 				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
 			});
+
+			document.getElementById('js-import').addEventListener('click', () => {
+				PopUp("popup.import", {
+					rules_preset: "regex",
+					[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('import')); ?>
+				}, {
+					dialogueid: "popup_import",
+					dialogue_class: "modal-popup-generic"
+				});
+			});
 		}
 
 		#initPopupListeners() {

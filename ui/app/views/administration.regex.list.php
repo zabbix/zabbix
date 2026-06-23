@@ -34,17 +34,7 @@ $html_page = (new CHtmlPage())
 			(new CList())
 				->addItem((new CSimpleButton(_('Create regular expression')))->addClass('js-create-regexp'))
 				->addItem(
-					(new CSimpleButton(_('Import')))
-						->onClick(
-							'return PopUp("popup.import", {
-								rules_preset: "regex", '.
-								CSRF_TOKEN_NAME.': "'.CCsrfTokenHelper::get('import').
-							'"},{
-								dialogueid: "popup_import",
-								dialogue_class: "modal-popup-generic"
-							});'
-						)
-				)
+					(new CSimpleButton(_('Import')))->setId('js-import'))
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 

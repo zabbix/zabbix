@@ -40,7 +40,7 @@ $table = (new CTable())
 		_('Expression'),
 		_('Delimiter'),
 		_('Case sensitive'),
-		_('Test Result'),
+		_('Test result'),
 		''
 	]);
 
@@ -177,8 +177,7 @@ $output = [
 		$this->readJsFile('administration.regex.edit.js.php').
 		'regex_edit_popup.init('.json_encode([
 			'rules' => $data['js_validation_rules'],
-			'clone_rules' => $data['js_clone_validation_rules'],
-			'regexpid' => $data['regexp']['regexpid'] != 0 ? $data['regexp']['regexpid'] : null
+			'clone_rules' => $data['js_clone_validation_rules']
 		]).');',
 	'dialogue_class' => 'modal-popup-large'
 ];

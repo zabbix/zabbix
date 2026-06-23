@@ -40,14 +40,10 @@ window.regex_edit_popup = new class {
 	 */
 	#footer;
 
-	/** @type {string|null} */
-	#regexpid;
-
 	/** @type {Object} */
 	#clone_rules;
 
-	init({rules, clone_rules, regexpid}) {
-		this.#regexpid = regexpid;
+	init({rules, clone_rules}) {
 		this.#overlay = overlays_stack.getById('regex.edit');
 		this.#footer = this.#overlay.$dialogue.$footer[0];
 		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
@@ -107,7 +103,7 @@ window.regex_edit_popup = new class {
 		this.#removePopupMessages();
 
 		const fields = this.#form.getAllValues();
-		const action = this.#regexpid !== null ? 'regex.update' : 'regex.create';
+		const action = document.getElementById('regexpid') !== null ? 'regex.update' : 'regex.create';
 
 		this.#form.validateSubmit(fields)
 			.then(result => {
@@ -121,7 +117,6 @@ window.regex_edit_popup = new class {
 	}
 
 	#clone() {
-		this.#regexpid = null;
 		document.getElementById('regexpid').remove();
 
 		const title = <?= json_encode(_('New regular expression')) ?>;
@@ -165,7 +160,7 @@ window.regex_edit_popup = new class {
 			[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('regex')) ?>
 		};
 
-		this.#post(zabbixUrl(url_params), {regexpids: [this.#regexpid]});
+		this.#post(zabbixUrl(url_params), {regexpids: [document.getElementById('regexpid').value]});
 	}
 
 	#post(url, data) {

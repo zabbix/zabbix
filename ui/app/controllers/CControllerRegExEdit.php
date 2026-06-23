@@ -80,7 +80,7 @@ class CControllerRegExEdit extends CController {
 		];
 
 		$regexp = array_replace($regexp_default, $this->getInput('regexp', []), $this->db_regexp);
-		$js_validation_rules = !empty($this->db_regexp)
+		$js_validation_rules = $this->db_regexp !== null
 			? CControllerRegExUpdate::getValidationRules()
 			: CControllerRegExCreate::getValidationRules();
 
