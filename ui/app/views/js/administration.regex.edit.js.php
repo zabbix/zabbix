@@ -111,12 +111,12 @@ window.regex_edit_popup = new class {
 
 		this.#form.validateSubmit(fields)
 			.then(result => {
-			if (!result) {
-				this.#overlay.unsetLoading();
-				return;
-			}
+				if (!result) {
+					this.#overlay.unsetLoading();
+					return;
+				}
 
-			this.#post(zabbixUrl({action}), fields);
+				this.#post(zabbixUrl({action}), fields);
 		});
 	}
 
@@ -270,7 +270,13 @@ window.regex_edit_popup = new class {
 					body: JSON.stringify({expressions, test_string})
 				})
 					.then(response => response.json())
-					.then(response => this.#showTestResult(response, expressions))
+					.then(response => {
+						if ('error' in response) {
+							throw {error: response.error};
+						}
+
+						this.#showTestResult(response, expressions);
+					})
 					.catch(exception => this.#ajaxExceptionHandler(exception))
 					.finally(() => this.#unsetTestLoadingStatus());
 			});
