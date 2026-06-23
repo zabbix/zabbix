@@ -17,6 +17,7 @@
 #include "../db_lengths_constants.h"
 #include "../actions/actions.h"
 
+#include "zbxevent.h"
 #include "zbxexport.h"
 #include "zbxservice.h"
 #include "zbxnum.h"
@@ -2286,14 +2287,21 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 
 	if (0 != event_queries.values_num)
 	{
-		zbx_db_insert_t	db_insert;
+		zbx_db_insert_t	db_insert_es;
+		zbx_db_insert_t	db_insert_ack;
+		time_t		now;
 
 		/* get maintenance data and save it in database */
 		if (SUCCEED == zbx_dc_get_event_maintenances(&event_queries, maintenanceids) &&
 				SUCCEED == zbx_db_lock_maintenanceids(maintenanceids))
 		{
-			zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid",
+			zbx_db_insert_prepare(&db_insert_es, "event_suppress", "event_suppressid", "eventid",
 					"maintenanceid", "suppress_until", (char *)NULL);
+
+			zbx_db_insert_prepare(&db_insert_ack, "acknowledges", "acknowledgeid",
+					"eventid", "clock", "action", "suppress_until", "maintenanceid", (char *)NULL);
+
+			now = time(NULL);
 
 			for (int j = 0; j < event_queries.values_num; j++)
 			{
@@ -2312,17 +2320,26 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 						continue;
 					}
 
-					zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
+					zbx_db_insert_add_values(&db_insert_es, __UINT64_C(0), query->eventid,
 							query->maintenances.values[i].first,
 							(int)query->maintenances.values[i].second);
+
+					zbx_db_insert_add_values(&db_insert_ack, __UINT64_C(0), query->eventid,
+							(int)now, ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS,
+							(int)query->maintenances.values[i].second,
+							query->maintenances.values[i].first);
 
 					zbx_db_event_add_maintenanceid(event, query->maintenances.values[i].first);
 				}
 			}
 
-			zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
-			zbx_db_insert_execute(&db_insert);
-			zbx_db_insert_clean(&db_insert);
+			zbx_db_insert_autoincrement(&db_insert_es, "event_suppressid");
+			zbx_db_insert_execute(&db_insert_es);
+			zbx_db_insert_clean(&db_insert_es);
+
+			zbx_db_insert_autoincrement(&db_insert_ack, "acknowledgeid");
+			zbx_db_insert_execute(&db_insert_ack);
+			zbx_db_insert_clean(&db_insert_ack);
 		}
 
 		for (int j = 0; j < event_queries.values_num; j++)
