@@ -116,17 +116,17 @@
 			const fields = this.form.getAllValues();
 
 			this.form.validateSubmit(fields)
-			.then((result) => {
-				if (!result) {
-					this.#unsetLoadingStatus();
-					return;
-				}
+				.then((result) => {
+					if (!result) {
+						this.#unsetLoadingStatus();
+						return;
+					}
 
-				const url = new URL('zabbix.php', location.href);
-				url.searchParams.set('action', 'geomaps.update');
+					const url = new URL('zabbix.php', location.href);
+					url.searchParams.set('action', 'geomaps.update');
 
-				this.#post(url.href, fields);
-			});
+					this.#post(url.href, fields);
+				});
 		}
 
 		#post(url, data) {
@@ -135,30 +135,30 @@
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify(data)
 			})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-
-				if ('form_errors' in response) {
-					this.form.setErrors(response.form_errors, true, true);
-					this.form.renderErrors();
-					return;
-				}
-
-				if ('success' in response) {
-					postMessageOk(response.success.title);
-
-					if ('messages' in response.success) {
-						postMessageDetails('success', response.success.messages);
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						throw {error: response.error};
 					}
 
-					location.href = location.href;
-				}
-			})
-			.catch((exception) => this.#ajaxExceptionHandler(exception))
-			.finally(() => this.#unsetLoadingStatus());
+					if ('form_errors' in response) {
+						this.form.setErrors(response.form_errors, true, true);
+						this.form.renderErrors();
+						return;
+					}
+
+					if ('success' in response) {
+						postMessageOk(response.success.title);
+
+						if ('messages' in response.success) {
+							postMessageDetails('success', response.success.messages);
+						}
+
+						location.href = location.href;
+					}
+				})
+				.catch((exception) => this.#ajaxExceptionHandler(exception))
+				.finally(() => this.#unsetLoadingStatus());
 		}
 
 		#ajaxExceptionHandler(exception) {
