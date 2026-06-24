@@ -868,6 +868,21 @@ static int	DBpatch_7050062(void)
 	return DBmodify_field_type("expressions", &field, NULL);
 }
 
+static int	DBpatch_7050063(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 1  - REGEX_TYPE_STRING_IN_LIST   */
+	if (ZBX_DB_OK > zbx_db_execute("update expressions set exp_delimiter='' where expression_type<>1"
+			" and exp_delimiter<>''"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -937,5 +952,6 @@ DBPATCH_ADD(7050059, 0, 1)
 DBPATCH_ADD(7050060, 0, 1)
 DBPATCH_ADD(7050061, 0, 1)
 DBPATCH_ADD(7050062, 0, 1)
+DBPATCH_ADD(7050063, 0, 1)
 
 DBPATCH_END()
