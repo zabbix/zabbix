@@ -13,10 +13,9 @@
 **/
 
 #include "zbxcommon.h"
+#include "zbxcurl.h"
 
 #ifdef HAVE_LIBCURL
-
-#include "zbxcurl.h"
 
 /* See https://curl.se/libcurl/c/symbols-by-name.html for information in which version a symbol was added. */
 
@@ -24,6 +23,8 @@
 #if LIBCURL_VERSION_NUM < 0x075500
 #	define CURLOPT_PROTOCOLS_STR	10318L
 #endif
+
+static int	zbx_curl_has_multi_wait(char **error);
 
 static unsigned int	libcurl_version_num(void)
 {
@@ -55,18 +56,18 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 		short		revents;
 	};
 #endif
-	static void		*handle;
-	static CURLMcode	(*fptr)(CURLM *, struct curl_waitfd *, unsigned int, int, int *) = NULL;
+	static ZBX_THREAD_LOCAL void		*handle;
+	static ZBX_THREAD_LOCAL CURLMcode	(*fptr)(CURLM *, struct curl_waitfd *, unsigned int, int, int *) = NULL;
 
 	if (NULL == fptr)
 	{
 		/* this check must be performed before calling this function */
-		if (SUCCEED != zbx_curl_good_for_elasticsearch(NULL))
+		if (SUCCEED != zbx_curl_has_multi_wait(NULL))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "zbx_curl_multi_wait() should never be called when using"
 					" cURL library < 7.28.0 (using version %s)", libcurl_version_str());
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 #if (defined(_WINDOWS) || defined(STATIC_LINKING)) && LIBCURL_VERSION_NUM >= 0x071c00
 		else
@@ -75,7 +76,7 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 		if (NULL == (handle = dlopen(NULL, RTLD_LAZY | RTLD_NOLOAD)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot dlopen() Zabbix binary: %s", dlerror());
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		/* use *(void **)(&fptr) to silence the "-pedantic" warning */
@@ -83,7 +84,7 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot find cURL function curl_multi_wait(): %s", dlerror());
 			dlclose(handle);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 #endif
 	}
@@ -139,8 +140,9 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 		void		*anchor;
 	};
 #endif
-	static void		*handle;
-	static CURLHcode	(*fptr)(CURL *, const char *, size_t, unsigned int, int, struct curl_header **) = NULL;
+	static ZBX_THREAD_LOCAL void		*handle;
+	static ZBX_THREAD_LOCAL CURLHcode	(*fptr)(CURL *, const char *, size_t, unsigned int, int,
+			struct curl_header **) = NULL;
 
 	struct curl_header	*type;
 	unsigned int		origin;
@@ -158,7 +160,7 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 		if (NULL == (handle = dlopen(NULL, RTLD_LAZY | RTLD_NOLOAD)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot dlopen() Zabbix binary: %s", dlerror());
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		/* use *(void **)(&fptr) to silence the "-pedantic" warning */
@@ -166,7 +168,7 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot find cURL function curl_easy_header(): %s", dlerror());
 			dlclose(handle);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 #endif
 	}
@@ -421,15 +423,15 @@ int	zbx_curl_has_smtp_auth(char **error)
 	return SUCCEED;
 }
 
-int	zbx_curl_good_for_elasticsearch(char **error)
+static int	zbx_curl_has_multi_wait(char **error)
 {
-	/* Elasticsearch needs curl_multi_wait() which was added in 7.28.0 (0x071c00) */
+	/* History providers need curl_multi_wait() which was added in 7.28.0 (0x071c00) */
 	if (libcurl_version_num() < 0x071c00)
 	{
 		if (NULL != error)
 		{
-			*error = zbx_dsprintf(*error, "cURL library version %s is too old for Elasticsearch history"
-					" backend, 7.28.0 or newer is required", libcurl_version_str());
+			*error = zbx_dsprintf(*error, "cURL library version %s is too old,"
+					" 7.28.0 or newer is required", libcurl_version_str());
 		}
 
 		return FAIL;
@@ -437,4 +439,57 @@ int	zbx_curl_good_for_elasticsearch(char **error)
 
 	return SUCCEED;
 }
+
+static int	curl_initialized = 0;
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize cURL library global state                              *
+ *                                                                            *
+ * Comments: Safe to call multiple times.                                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_curl_init(void)
+{
+	if (0 == curl_initialized)
+	{
+		CURLcode	err;
+
+		if (CURLE_OK != (err = curl_global_init(CURL_GLOBAL_ALL)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL: %s", curl_easy_strerror(err));
+
+			exit(EXIT_FAILURE);
+		}
+
+		curl_initialized = 1;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: cleanup cURL library global state                                 *
+ *                                                                            *
+ * Comments: Safe to call without initialization.                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_curl_cleanup(void)
+{
+	if (0 != curl_initialized)
+	{
+		curl_global_cleanup();
+		curl_initialized = 0;
+	}
+}
+
+#else
+
+void	zbx_curl_init(void)
+{
+}
+
+void	zbx_curl_cleanup(void)
+{
+}
+
 #endif /* HAVE_LIBCURL */

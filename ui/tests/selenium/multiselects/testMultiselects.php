@@ -54,13 +54,17 @@ class testMultiselects extends CWebTest {
 		$element->type($string);
 		$this->query('class', $class)->waitUntilVisible();
 
-		// Cover proxy selection field, because it gets changed depending on proxy names' lengths in the dropdown.
-		$covered_region = ($query === 'host-form')
-			? [$element, ['x' => 111, 'y' => 338, 'width' => 452, 'height' => 22]]
-			: [$element];
+		// Unstable screenshots on Jenkins. Added border radius 0 for buttons in host form.
+		if ($query === 'host-form') {
+			$this->page->getDriver()->executeScript(
+				'document.querySelectorAll(\'button[class="btn-grey multiselect-button"],' .
+				' .radio-list-control li, .radio-list-control label\')' .
+				'.forEach(function (e){ e.style.borderRadius = 0; });'
+			);
+		}
 
 		$this->assertScreenshotExcept($element->parents('class', (($query === 'host-form') ? 'form-grid' : 'cell'))
-				->one(), $covered_region, $string
+				->one(), [$element], $string
 		);
 	}
 

@@ -43,7 +43,7 @@ class CFormValidator {
 	 * Map of field values, types and absolute paths in format {"/absolute/path": {"value": "abc", "type": "string"}}.
 	 *
 	 * Field type is taken from the first valid ruleset (one of multiple alternative rulesets provided in #rules for
-	 * particular field). #when_fields are collected before actual validation and  used during validation to get values
+	 * particular field). #when_fields are collected before actual validation and used during validation to get values
 	 * and types when field is referred in other field rulesets, e.g., in "when" condition.
 	 *
 	 * @type {Object}
@@ -373,7 +373,8 @@ class CFormValidator {
 			rule_set.api_uniq.forEach(api_uniq => {
 				const [method, api_params, id_field, error_msg] = api_uniq;
 				const referenced_fields = [];
-				const parameters = {filter: {}};
+				const parameters = Object.create(null);
+				parameters.filter = Object.create(null);
 				let exclude_id = null;
 
 				if (id_field !== null) {
@@ -445,7 +446,13 @@ class CFormValidator {
 
 			if (rule_set.type === 'objects' || rule_set.type === 'array') {
 				if (data[field] !== null) {
-					Object.entries(data[field]).forEach(([key, value]) => scanObject(value, field_path + '/' + key));
+					Object.entries(data[field]).forEach(([key, value]) => {
+						scanObject(value, field_path + '/' + key);
+
+						if (rule_set.field) {
+							checkUse(rule_set.field, field_path + '/' + key);
+						}
+					});
 				}
 			}
 			else if (rule_set.type === 'object') {
@@ -734,7 +741,7 @@ class CFormValidator {
 						rule_sets = rule_sets.filter(rule_set => rule_set);
 						if (rule_sets.length) {
 							if (!('fields' in rule)) {
-								rule.fields = {};
+								rule.fields = Object.create(null);
 							}
 
 							rule.fields[field_name] = rule_sets;
@@ -789,7 +796,7 @@ class CFormValidator {
 						return false;
 					}
 
-					if (!this.#isTypeObject(rule) || !(part in rule.fields)) {
+					if (!this.#isTypeObject(rule) || !Object.hasOwn(rule.fields, part)) {
 						return false;
 					}
 
@@ -933,7 +940,7 @@ class CFormValidator {
 			let data = all_values;
 
 			for (const part of field_path.split('/').slice(1)) {
-				if (!(part in data)) {
+				if (!Object.hasOwn(data, part)) {
 					return null;
 				}
 
@@ -943,7 +950,7 @@ class CFormValidator {
 			return data;
 		};
 
-		let subset = {};
+		let subset = Object.create(null);
 
 		fields_to_validate.forEach((field_path) => {
 			const parts = field_path.split('/').slice(1);
@@ -970,7 +977,7 @@ class CFormValidator {
 			return {result: CFormValidator.SUCCESS};
 		}
 
-		if (!(field in data) || data[field] === null) {
+		if (!Object.hasOwn(data, field) || data[field] === null) {
 			if ('required' in rules) {
 				this.#addError(path, this.#getMessage(rules, 'required', t('This field cannot be empty.')),
 					CFormValidator.ERROR_LEVEL_PRIMARY
@@ -1107,7 +1114,7 @@ class CFormValidator {
 			return {
 				result: CFormValidator.ERROR,
 				error: this.#getMessage(rules, 'min',
-					sprintf(t('This value must be no less than "%1$s".'), rules['min'])
+					sprintf(t('Value must be greater than or equal to %1$s.'), rules['min'])
 				)
 			};
 		}
@@ -1116,7 +1123,7 @@ class CFormValidator {
 			return {
 				result: CFormValidator.ERROR,
 				error: this.#getMessage(rules, 'max',
-					sprintf(t('This value must be no greater than "%1$s".'), rules['max'])
+					sprintf(t('Value must be less than or equal to %1$s.'), rules['max'])
 				)
 			};
 		}
@@ -1226,7 +1233,7 @@ class CFormValidator {
 			return {
 				result: CFormValidator.ERROR,
 				error: this.#getMessage(rules, 'min',
-					sprintf(t('This value must be no less than "%1$s".'),  rules['min'])
+					sprintf(t('Value must be greater than or equal to %1$s.'), rules['min'])
 				)
 			};
 		}
@@ -1235,7 +1242,7 @@ class CFormValidator {
 			return {
 				result: CFormValidator.ERROR,
 				error: this.#getMessage(rules, 'max',
-					sprintf(t('This value must be no greater than "%1$s".'),  rules['max'])
+					sprintf(t('Value must be less than or equal to %1$s.'), rules['max'])
 				)
 			};
 		}
@@ -1266,7 +1273,7 @@ class CFormValidator {
 			};
 		}
 
-		if (('allow_macro' in rules) && value !== '' && this.#isUserMacro(value)) {
+		if (('allow_macro' in rules) && value !== '' && this.#isMacro(rules['allow_macro'], value)) {
 			return {result: CFormValidator.SUCCESS};
 		}
 
@@ -1277,7 +1284,7 @@ class CFormValidator {
 			};
 		}
 
-		if ('regex' in rules) {
+		if ('regex' in rules && value !== '') {
 			const {pattern, flags} = this.#extractRegex(rules.regex);
 
 			const re = new RegExp(pattern, flags);
@@ -1345,7 +1352,7 @@ class CFormValidator {
 			 * Object without properties may arrive here as empty array.
 			 * That's not actually the error so simply normalize it.
 			 */
-			data = {};
+			data = Object.create(null);
 		}
 
 		if (!this.#isTypeObject(data)) {
@@ -1423,7 +1430,7 @@ class CFormValidator {
 			return {result: CFormValidator.ERROR};
 		}
 
-		const normalized_values = {};
+		const normalized_values = Object.create(null);
 		let has_error = false;
 
 		if ('fields' in rules) {
@@ -1442,8 +1449,8 @@ class CFormValidator {
 
 		if ('count_values' in rules) {
 			rules.count_values.forEach(count_rule => {
-				let counted_fields = {};
-				const field_names = {};
+				let counted_fields = Object.create(null);
+				const field_names = Object.create(null);
 
 				for (const [key, obj] of Object.entries(objects_values)) {
 					if (typeof(obj) !== 'object' || obj === null) {
@@ -1454,7 +1461,7 @@ class CFormValidator {
 					count_rule.field_rules.forEach((count_field_rule) => {
 						field_names[count_field_rule[0]] = true;
 
-						if (count_field_rule[0] in obj) {
+						if (Object.hasOwn(obj, count_field_rule[0])) {
 							if ('in' in count_field_rule) {
 								keep = keep && count_field_rule['in'].includes(obj[count_field_rule[0]]);
 							}
@@ -1761,15 +1768,50 @@ class CFormValidator {
 	}
 
 	/**
-	 * Check if value looks as user macro.
+	 * Check if value looks like macro based on allowed macro types
 	 *
-	 * @param {string} value  Value to check.
+	 * @param {array} macro_types
+	 * @param {string} value
 	 *
 	 * @returns {boolean}
 	 */
-	#isUserMacro(value) {
-		return value.match(/^\{\$[A-Z0-9._]+(:.*)?\}$/) !== null;
+	#isMacro(macro_types, value) {
+		const macro_name = '[A-Z0-9._]+';
+		const quoted_param = '(?:[ ]*"(?:\\\\.|[^"\\\\])*"[ ]*)';
+		const unquoted_context = '(?:[ ]*[^"} ][^}]*)';
+		const macro_context = `(?::(?:[ ]*|${unquoted_context}|${quoted_param}))?`;
+
+		const macro_regexps = [];
+
+		if (macro_types.usermacros) {
+			macro_regexps.push(`(?:{\\$${macro_name}${macro_context}})`);
+		}
+
+		if (macro_types.lldmacros) {
+			macro_regexps.push(`(?:{#${macro_name}})`);
+		}
+
+		if (macro_regexps.length == 0) {
+			return false;
+		}
+
+		const macro = `(?:${macro_regexps.join('|')})`;
+
+		if (value.match(new RegExp(`^${macro}$`))) {
+			return true;
+		}
+
+		const unquoted_param = '(?:[^"][^),]*)';
+		const single_param = `(?:[ ]*|${unquoted_param}|${quoted_param})`;
+		const params_regex = `(?:${single_param},)*${single_param}`;
+
+		if (value.match(new RegExp(`^{${macro}\\.[a-z]+\\((${params_regex})\\)}$`))) {
+			return true;
+		}
+
+		return false;
 	}
+
 
 	/**
 	 * Calculate result of 'when' conditions.
@@ -1811,7 +1853,14 @@ class CFormValidator {
 	 * @returns {string}
 	 */
 	#getFieldAbsolutePath(field_name, field_path) {
-		const target_path = [...field_path.split('/').slice(0, -1), field_name];
+		const target_path = field_path.split('/').slice(0, -1);
+
+		while (field_name.startsWith('../')) {
+			field_name = field_name.substring(3);
+			target_path.pop();
+		}
+
+		target_path.push(field_name);
 
 		return `/${target_path.join('/')}`.replace(/\/\/+/g, '/');
 	}
@@ -1901,7 +1950,7 @@ class CFormValidator {
 			let is_distinct = true;
 
 			for (const [index, data] of Object.entries(objects_values)) {
-				const data_new = {};
+				const data_new = Object.create(null);
 
 				for (const key in data) {
 					if (field_names.includes(key)) {

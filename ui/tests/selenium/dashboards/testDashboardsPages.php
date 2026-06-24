@@ -616,9 +616,10 @@ class testDashboardsPages extends CWebTest {
 				->waitUntilReady();
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 		$this->page->waitUntilReady();
+		$this->query('xpath://button[@title="Normal view"]')->waitUntilVisible()->one();
 
 		// Switch pages next/previous.
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		foreach (['btn-dashboard-kioskmode-next-page', 'btn-dashboard-kioskmode-previous-page'] as $direction) {
 			$widget_name = ($direction === 'btn-dashboard-kioskmode-next-page')
 				? ['First', 'Second', 'Third']
@@ -628,6 +629,7 @@ class testDashboardsPages extends CWebTest {
 				$this->assertEquals($widget.' page kiosk', $dashboard->getWidgets()->last()->getHeaderText());
 				$this->query('xpath://button[contains(@class, '.CXPathHelper::escapeQuotes($direction).')]')
 						->one()->hoverMouse()->click();
+				$dashboard->waitUntilReady();
 			}
 		}
 
@@ -641,8 +643,9 @@ class testDashboardsPages extends CWebTest {
 //		}
 
 		// Check that returned from kiosk view.
-		$this->query('xpath://button[@title="Normal view"]')->one()->click();
+		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->click();
 		$this->page->waitUntilReady();
+		$dashboard->waitUntilReady();
 		$this->page->assertHeader('Dashboard for kiosk');
 	}
 

@@ -32,6 +32,8 @@
 			this.initCharts();
 			this.initEvents();
 
+			timeControl.refreshPage = false;
+
 			timeControl.addObject('charts_view', timeline, {
 				id: 'timeline_1',
 				domid: 'charts_view',
@@ -95,6 +97,8 @@
 						subfilter.matches('.subfilter-enabled')
 					);
 
+					this.withTimelineRangeFilters(filters);
+
 					location.href = zabbixUrl(filters);
 				}
 			});
@@ -109,6 +113,8 @@
 						delete filters[key];
 					}
 				});
+
+				this.withTimelineRangeFilters(filters);
 
 				location.href = zabbixUrl(filters);
 			});
@@ -171,6 +177,8 @@
 						page: search_params.get('page') ?? 1
 					};
 
+					this.withTimelineRangeFilters(filters);
+
 					location.href = zabbixUrl(filters);
 				});
 			});
@@ -179,6 +187,14 @@
 		replaceSubfilter(subfilter) {
 			if (document.getElementById('subfilter') !== null) {
 				document.getElementById('subfilter').outerHTML = subfilter;
+			}
+		},
+
+		withTimelineRangeFilters(filters) {
+			const {from, to} = timeControl.objectList['charts_view'].timeline ?? {};
+
+			if (from && to) {
+				Object.assign(filters, {from, to});
 			}
 		}
 	};

@@ -4603,9 +4603,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 			0 != del_tagids.values_num || 0 != del_hgsetids->values_num)
 	{
 
+		/* mark host group sets for complete removal by housekeeper by unlinking host group sets from hosts */
 		if (0 != del_hgsetids->values_num)
 		{
-			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from hgset where");
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from host_hgset where");
 			zbx_db_add_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "hgsetid",
 					del_hgsetids->values, del_hgsetids->values_num);
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
@@ -6826,7 +6827,8 @@ static void	lld_proto_hash_clear(void *data)
  ******************************************************************************/
 void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows, char **error,
 		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck,
-		int dflags, zbx_hashset_t *rule_index, const zbx_vector_uint64_t *ruleids)
+		int dflags, zbx_hashset_t *rule_index, const zbx_vector_uint64_t *ruleids, int auditlog_enabled,
+		int auditlog_mode)
 {
 	zbx_db_result_t				result;
 	zbx_db_row_t				row;
@@ -6913,6 +6915,8 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 
 	zbx_hashset_create_ext(&protos, 10, lld_proto_hash, lld_proto_compare, lld_proto_hash_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	zbx_audit_init(auditlog_enabled, auditlog_mode, ZBX_AUDIT_LLD_CONTEXT);
 
 	result = zbx_db_select(
 			"select h.hostid,h.host,h.name,h.status,h.discover,hi.inventory_mode,h.custom_interfaces"
@@ -7074,6 +7078,8 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 			zbx_sync_rowset_clear(&group_proto_prototypes);
 	}
 	zbx_db_free_result(result);
+
+	zbx_audit_flush(ZBX_AUDIT_LLD_CONTEXT);
 
 	zbx_vector_lld_hostmacro_ptr_clear_ext(&masterhostmacros, lld_hostmacro_free);
 	zbx_vector_lld_interface_ptr_clear_ext(&interfaces, lld_interface_free);

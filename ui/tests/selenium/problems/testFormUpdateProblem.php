@@ -276,7 +276,7 @@ class testFormUpdateProblem extends CWebTest {
 	public function testFormUpdateProblem_Layout($data) {
 		// Open filtered Problems list.
 		$this->page->login()->open('zabbix.php?&action=problem.view&filter_set=1&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 		$table->findRows('Problem', $data['problems'])->select();
 		$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 
@@ -323,7 +323,7 @@ class testFormUpdateProblem extends CWebTest {
 		if (array_key_exists('history', $data)) {
 			$history = ($data['history'] === []) ? $data['history'] : [date('Y-m-d H:i:s', self::$acktime).$data['history'][0]];
 			$history_table = $form->getField('History')->asTable();
-			$this->assertEquals(['Time', 'User', 'User action', 'Message'], $history_table->getHeadersText());
+			$this->assertEquals(['Time', 'User', 'Action', 'Message'], $history_table->getHeadersText());
 			$this->assertEquals($history, $history_table->getRows()->asText());
 
 			if ($data['problems'] === ['Trigger for unsigned']) {
@@ -804,7 +804,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Open filtered Problems list.
 		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 
 		$count = count($data['problems']);
 		$table->findRows('Problem', $data['problems']);
@@ -897,8 +897,8 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Open filtered Problems list.
 		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Trigger for log')->getColumn('Update')
-				->query('tag:a')->waitUntilClickable()->one()->click();
+		$this->query('id:problems')->asDatatable()->one()->waitUntilReady()->findRow('Problem', 'Trigger for log')
+				->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->query('id:acknowledge_form')->asForm()->one()->fill([
 				'id:scope_1' => true,
@@ -919,7 +919,7 @@ class testFormUpdateProblem extends CWebTest {
 
 	public function testFormUpdateProblem_CheckSuppressIcon() {
 		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 
 		$row = $table->findRow('Problem', 'Trigger for icon test');
 		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
@@ -930,7 +930,7 @@ class testFormUpdateProblem extends CWebTest {
 		$form->submit();
 		$dialog->ensureNotPresent();
 		$this->page->waitUntilReady();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady()->invalidate();
 
 		// Check suppressed icon and hint.
 		$this->checkIconAndHint($row, 'zi-eye-off', "Suppressed till: Indefinitely".
@@ -946,10 +946,6 @@ class testFormUpdateProblem extends CWebTest {
 		$this->page->refresh();
 		$this->assertTrue($row->getColumn('Info')->query('xpath:.//button[not(contains(@class, "js-blink"))]')->exists());
 
-		// TODO: Remove sleep after fix ZBX-26128. Sometimes suppress and unsuppress events have the same acknowledege time and
-		// are displayed in the wrong order in history table in the acknowledege popup. Failure in checkHistoryTable()
-		sleep(1);
-
 		// Unsuppress problem.
 		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog->waitUntilReady();
@@ -957,7 +953,7 @@ class testFormUpdateProblem extends CWebTest {
 		$form->submit();
 		$dialog->ensureNotPresent();
 		$this->page->waitUntilReady();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady()->invalidate();
 
 		// Check unsuppressed icon and hint.
 		$this->checkIconAndHint($row, 'zi-eye', 'Unsuppressed by: Admin (Zabbix Administrator)');
@@ -975,7 +971,7 @@ class testFormUpdateProblem extends CWebTest {
 		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog->waitUntilReady();
 		$form->invalidate();
-		$this->checkHistoryTable($form->getField('History')->asTable(), 'User', 'User action');
+		$this->checkHistoryTable($form->getField('History')->asTable(), 'User', 'Action');
 		$dialog->close();
 		$this->page->waitUntilReady();
 
@@ -1016,7 +1012,7 @@ class testFormUpdateProblem extends CWebTest {
 			$action_row = $table->getRow($i);
 			$this->assertEquals('Admin (Zabbix Administrator)', $action_row->getColumn($user)->getText());
 			$query = ($i === 0)
-				? 'xpath:.//span[@title="Unsuppressed"]'
+				? 'xpath:.//span[@title="Manually unsuppressed"]'
 				: 'xpath:.//*['.CXPathHelper::fromClass('zi-eye-off').']';
 			$this->assertTrue($action_row->getColumn($action)->query($query)->exists());
 		}

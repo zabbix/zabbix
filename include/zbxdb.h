@@ -19,6 +19,8 @@
 #include "zbxjson.h"
 #include "zbxdbschema.h"
 
+#define ZBX_DBVERSION_UNDEFINED			0
+
 #define ZBX_DB_OK	0
 #define ZBX_DB_FAIL	-1
 #define ZBX_DB_DOWN	-2
@@ -57,6 +59,9 @@ typedef struct
 	char		*db_tls_ca_file;
 	char		*db_tls_cipher;
 	char		*db_tls_cipher_13;
+#if defined(HAVE_POSTGRESQL)
+	char		*dbports;
+#endif
 	unsigned int	dbport;
 	int		log_slow_queries;
 	int		read_only_recoverable;
@@ -526,7 +531,7 @@ zbx_db_result_t	zbx_db_select_n(const char *query, int n);
 void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *db_insert, const zbx_db_table_t *table,
 		const zbx_db_field_t **fields, int fields_num);
 void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
-void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
+int	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
 const char	*zbx_db_last_strerr(void);
 zbx_err_codes_t	zbx_db_last_errcode(void);
 int	zbx_db_lock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id);
@@ -576,6 +581,12 @@ void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql)
 
 zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag);
 zbx_db_query_mask_t	zbx_db_get_log_masked_values(void);
+
+/* connection pool settings */
+#define ZBX_SETTINGS_DBPOOL			"dbpool_"
+#define ZBX_SETTINGS_DBPOOL_MAX_IDLE		ZBX_SETTINGS_DBPOOL "max_idle"
+#define ZBX_SETTINGS_DBPOOL_MAX_OPEN		ZBX_SETTINGS_DBPOOL "max_open"
+#define ZBX_SETTINGS_DBPOOL_IDLE_TIMEOUT	ZBX_SETTINGS_DBPOOL "idle_timeout"
 
 #endif
 

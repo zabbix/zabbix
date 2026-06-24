@@ -256,43 +256,43 @@ $saml_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('IdP entity ID'), 'idp_entityid'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('idp_entityid', $data['idp_entityid'], !$saml_auth_enabled,
-				DB::getFieldLength('userdirectory_saml', 'idp_entityid')
-			))
+			(new CTextAreaFlexible('idp_entityid', $data['idp_entityid']))
 				->addClass('saml-enabled')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('userdirectory_saml', 'idp_entityid'))
+				->setReadonly(!$saml_auth_enabled)
 				->setAriaRequired()
 		)
 	])
 	->addItem([
 		(new CLabel(_('SSO service URL'), 'sso_url'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('sso_url', $data['sso_url'], !$saml_auth_enabled,
-				DB::getFieldLength('userdirectory_saml', 'sso_url'))
-			)
+			(new CTextAreaFlexible('sso_url', $data['sso_url']))
 				->addClass('saml-enabled')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('userdirectory_saml', 'sso_url'))
+				->setReadonly(!$saml_auth_enabled)
 				->setAriaRequired()
 		)
 	])
 	->addItem([
 		new CLabel(_('SLO service URL'), 'slo_url'),
 		new CFormField(
-			(new CTextBox('slo_url', $data['slo_url'], !$saml_auth_enabled,
-				DB::getFieldLength('userdirectory_saml', 'slo_url'))
-			)
+			(new CTextAreaFlexible('slo_url', $data['slo_url']))
 				->addClass('saml-enabled')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('userdirectory_saml', 'slo_url'))
+				->setReadonly(!$saml_auth_enabled)
 		)
 	])
 	->addItem([
 		(new CLabel(_('Username attribute'), 'username_attribute'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('username_attribute', $data['username_attribute'], !$saml_auth_enabled,
-				DB::getFieldLength('userdirectory_saml', 'username_attribute')
-			))
+			(new CTextAreaFlexible('username_attribute', $data['username_attribute']))
 				->addClass('saml-enabled')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('userdirectory_saml', 'username_attribute'))
+				->setReadonly(!$saml_auth_enabled)
 				->setAriaRequired()
 		)
 	])
@@ -310,11 +310,11 @@ $saml_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('SP name ID format'), 'nameid_format'),
 		new CFormField(
-			(new CTextBox('nameid_format', $data['nameid_format'], !$saml_auth_enabled,
-				DB::getFieldLength('userdirectory_saml', 'nameid_format')
-			))
+			(new CTextAreaFlexible('nameid_format', $data['nameid_format']))
 				->addClass('saml-enabled')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('userdirectory_saml', 'nameid_format'))
+				->setReadonly(!$saml_auth_enabled)
 				->setAttribute('placeholder', 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient')
 		)
 	]);
@@ -700,11 +700,10 @@ if ($data['is_http_auth_allowed']) {
 		->addItem([
 			new CLabel(_('Remove domain name'), 'http_strip_domains'),
 			new CFormField(
-				(new CTextBox('http_strip_domains', $data['http_strip_domains'], false,
-					CSettingsSchema::getFieldLength('http_strip_domains')
-				))
+				(new CTextAreaFlexible('http_strip_domains', $data['http_strip_domains']))
 					->setEnabled($data['http_auth_enabled'])
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setMaxlength(CSettingsSchema::getFieldLength('http_strip_domains'))
 			)
 		])
 		->addItem([
