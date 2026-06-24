@@ -738,7 +738,7 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_has
 	if (-1 == fld_type || -1 == fld_key || -1 == fld_master_itemid)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_json_addobject(j, table->table);

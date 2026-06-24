@@ -39,6 +39,7 @@
 #define ZBX_RTC_DBPOOL_SET_MAX_OPEN		24
 #define ZBX_RTC_DBPOOL_SET_IDLE_TIMEOUT		25
 #define ZBX_RTC_DBPOOL_STATUS			26
+#define ZBX_RTC_STATUS				27
 
 /* internal rtc messages */
 #define ZBX_RTC_SUBSCRIBE			100
@@ -80,5 +81,6 @@
 #define ZBX_DBPOOL_SET_MAX_OPEN		"dbpool_set_max_open"
 #define ZBX_DBPOOL_SET_IDLE_TIMEOUT	"dbpool_set_idle_timeout"
 #define ZBX_DBPOOL_STATUS		"dbpool_status"
+#define ZBX_STATUS			"status"
 
 #endif

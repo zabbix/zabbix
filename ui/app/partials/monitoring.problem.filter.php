@@ -25,7 +25,7 @@ $left_column = (new CFormList())
 			->addValue(_('Problems'), TRIGGERS_OPTION_IN_PROBLEM, 'show_3#{uniqid}')
 			->addValue(_('History'), TRIGGERS_OPTION_ALL, 'show_2#{uniqid}')
 			->setId('show_#{uniqid}')
-			->setModern(true)
+			->setModern()
 	)
 	->addRow((new CLabel(_('Host groups'), 'groupids_#{uniqid}_ms')),
 		(new CMultiSelect([
@@ -36,7 +36,7 @@ $left_column = (new CFormList())
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
-					'dstfrm' => 'zbx_filter',
+					'dstfrm' => CFilter::FORM_NAME,
 					'dstfld1' => 'groupids_',
 					'with_hosts' => true,
 					'enrich_parent_groups' => true
@@ -59,7 +59,7 @@ $left_column = (new CFormList())
 				'parameters' => [
 					'srctbl' => 'hosts',
 					'srcfld1' => 'hostid',
-					'dstfrm' => 'zbx_filter',
+					'dstfrm' => CFilter::FORM_NAME,
 					'dstfld1' => 'hostids_'
 				]
 			]
@@ -80,7 +80,7 @@ $left_column = (new CFormList())
 				'parameters' => [
 					'srctbl' => 'triggers',
 					'srcfld1' => 'triggerid',
-					'dstfrm' => 'zbx_filter',
+					'dstfrm' => CFilter::FORM_NAME,
 					'dstfld1' => 'triggerids_',
 					'monitored_hosts' => true,
 					'with_monitored_triggers' => true
@@ -121,36 +121,7 @@ $left_column
 		$filter_age,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		_('days')
-	])
-	->addRow(_('Show symptoms'), [
-		(new CCheckBox('show_symptoms'))
-			->setChecked($data['show_symptoms'] == 1)
-			->setUncheckedValue(0)
-			->setId('show_symptoms_#{uniqid}')
-	])
-	->addRow(_('Show suppressed problems'), [
-		(new CCheckBox('show_suppressed'))
-			->setChecked($data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
-			->setUncheckedValue(0)
-			->setId('show_suppressed_#{uniqid}')
-	])
-	->addRow(
-		_('Acknowledgement status'),
-		(new CHorList())
-			->addItem((new CRadioButtonList('acknowledgement_status', (int) $data['acknowledgement_status']))
-				->addValue(_('All'), ZBX_ACK_STATUS_ALL, 'acknowledgement_status_0_#{uniqid}')
-				->addValue(_('Unacknowledged'), ZBX_ACK_STATUS_UNACK, 'acknowledgement_status_1_#{uniqid}')
-				->addValue(_('Acknowledged'), ZBX_ACK_STATUS_ACK, 'acknowledgement_status_2_#{uniqid}')
-				->setModern(true)
-			)
-			->addItem((new CCheckBox('acknowledged_by_me', 1))
-				->setLabelPosition(CCheckBox::LABEL_POSITION_LEFT)
-				->setChecked($data['acknowledged_by_me'] == 1)
-				->setUncheckedValue(0)
-				->setLabel(_('By me'))
-				->setId('acknowledged_by_me_#{uniqid}')
-			)
-	);
+	]);
 
 $filter_inventory_table = (new CTable())->setId('filter-inventory_#{uniqid}');
 
@@ -193,7 +164,7 @@ $filter_tags_table->addRow(
 		(new CRadioButtonList('evaltype', (int) $data['evaltype']))
 			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR, 'evaltype_0#{uniqid}')
 			->addValue(_('Or'), TAG_EVAL_TYPE_OR, 'evaltype_2#{uniqid}')
-			->setModern(true)
+			->setModern()
 			->setId('evaltype_#{uniqid}')
 	))->setColSpan(4)
 );
@@ -243,77 +214,40 @@ $filter_tags_table->addRow(
 	))->setColSpan(3)
 );
 
-$tag_format_line = (new CHorList())
-	->addItem((new CRadioButtonList('show_tags', (int) $data['show_tags']))
-		->addValue(_('None'), SHOW_TAGS_NONE, 'show_tags_0#{uniqid}')
-		->addValue(SHOW_TAGS_1, SHOW_TAGS_1, 'show_tags_1#{uniqid}')
-		->addValue(SHOW_TAGS_2, SHOW_TAGS_2, 'show_tags_2#{uniqid}')
-		->addValue(SHOW_TAGS_3, SHOW_TAGS_3, 'show_tags_3#{uniqid}')
-		->setModern(true)
-		->setId('show_tags_#{uniqid}')
-	)
-	->addItem((new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
-	->addItem(new CLabel(_('Tag name')))
-	->addItem((new CRadioButtonList('tag_name_format', (int) $data['tag_name_format']))
-		->addValue(_('Full'), TAG_NAME_FULL, 'tag_name_format_0#{uniqid}')
-		->addValue(_('Shortened'), TAG_NAME_SHORTENED, 'tag_name_format_1#{uniqid}')
-		->addValue(_('None'), TAG_NAME_NONE, 'tag_name_format_2#{uniqid}')
-		->setModern(true)
-		->setEnabled((int) $data['show_tags'] !== SHOW_TAGS_NONE)
-		->setId('tag_name_format_#{uniqid}')
-	);
-
 $right_column = (new CFormList())
 	->addRow(_('Host inventory'), $filter_inventory_table)
 	->addRow(_('Tags'), $filter_tags_table)
-	->addRow(_('Show tags'), $tag_format_line)
-	->addRow(_('Tag display priority'),
-		(new CTextBox('tag_priority', $data['tag_priority']))
-			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-			->setAttribute('placeholder', _('comma-separated list'))
-			->setEnabled((int) $data['show_tags'] !== SHOW_TAGS_NONE)
-			->setId('tag_priority_#{uniqid}')
-	)
-	->addRow(_('Show operational data'), [
-		(new CRadioButtonList('show_opdata', (int) $data['show_opdata']))
-			->addValue(_('None'), OPERATIONAL_DATA_SHOW_NONE, 'show_opdata_0_#{uniqid}')
-			->addValue(_('Separately'), OPERATIONAL_DATA_SHOW_SEPARATELY, 'show_opdata_1_#{uniqid}')
-			->addValue(_('With problem name'), OPERATIONAL_DATA_SHOW_WITH_PROBLEM, 'show_opdata_2_#{uniqid}')
-			->setModern(true)
-			->setEnabled($data['compact_view'] == 0)
-			->removeId()
-	])
-
-	->addRow(_('Compact view'), [
-		(new CCheckBox('compact_view'))
-			->setChecked($data['compact_view'] == 1)
+	->addRow(_('Show symptoms'), [
+		(new CCheckBox('show_symptoms'))
+			->setChecked($data['show_symptoms'] == 1)
 			->setUncheckedValue(0)
-			->setId('compact_view_#{uniqid}'),
-		(new CDiv([
-			(new CLabel(_('Show timeline'), 'show_timeline_#{uniqid}'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
-			(new CCheckBox('show_timeline'))
-				->setChecked($data['show_timeline'] == ZBX_TIMELINE_ON)
-				->setEnabled($data['compact_view'] == 0)
-				->setUncheckedValue(0)
-				->setId('show_timeline_#{uniqid}')
-		]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+			->setId('show_symptoms_#{uniqid}')
 	])
-	->addRow(_('Show details'), [
-		(new CCheckBox('details'))
-			->setChecked($data['details'] == 1)
-			->setEnabled($data['compact_view'] == 0)
+	->addRow(_('Show suppressed problems'), [
+		(new CCheckBox('show_suppressed'))
+			->setChecked($data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 			->setUncheckedValue(0)
-			->setId('details_#{uniqid}'),
-		(new CDiv([
-			(new CLabel(_('Highlight whole row'), 'highlight_row_#{uniqid}'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
-			(new CCheckBox('highlight_row'))
-				->setChecked($data['highlight_row'] == ZBX_HIGHLIGHT_ON)
-				->setUncheckedValue(ZBX_HIGHLIGHT_OFF)
-				->setId('highlight_row_#{uniqid}')
-		]))
-			->addClass(ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB)
-			->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
-	]);
+			->setId('show_suppressed_#{uniqid}')
+	])
+	->addRow(
+		_('Acknowledgement status'),
+		(new CHorList())
+			->addItem(
+				(new CRadioButtonList('acknowledgement_status', (int) $data['acknowledgement_status']))
+					->addValue(_('All'), ZBX_ACK_STATUS_ALL, 'acknowledgement_status_0_#{uniqid}')
+					->addValue(_('Unacknowledged'), ZBX_ACK_STATUS_UNACK, 'acknowledgement_status_1_#{uniqid}')
+					->addValue(_('Acknowledged'), ZBX_ACK_STATUS_ACK, 'acknowledgement_status_2_#{uniqid}')
+					->setModern()
+			)
+			->addItem(
+				(new CCheckBox('acknowledged_by_me', 1))
+					->setLabelPosition(CCheckBox::LABEL_POSITION_LEFT)
+					->setChecked($data['acknowledged_by_me'] == 1)
+					->setUncheckedValue(0)
+					->setLabel(_('By me'))
+					->setId('acknowledged_by_me_#{uniqid}')
+			)
+	);
 
 $template = (new CDiv())
 	->addClass(ZBX_STYLE_TABLE)
@@ -323,15 +257,13 @@ $template = (new CDiv())
 		(new CDiv($right_column))->addClass(ZBX_STYLE_CELL)
 	]);
 $template = (new CForm('get'))
-	->setName('zbx_filter')
+	->setName(CFilter::FORM_NAME)
 	->addItem([
 		$template,
 		(new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN),
 		(new CVar('filter_name', '#{filter_name}'))->removeId(),
 		(new CVar('filter_show_counter', '#{filter_show_counter}'))->removeId(),
-		(new CVar('filter_custom_time', '#{filter_custom_time}'))->removeId(),
-		(new CVar('sort', '#{sort}'))->removeId(),
-		(new CVar('sortorder', '#{sortorder}'))->removeId()
+		(new CVar('filter_custom_time', '#{filter_custom_time}'))->removeId()
 	]);
 
 if (array_key_exists('render_html', $data)) {
@@ -407,12 +339,11 @@ if (array_key_exists('render_html', $data)) {
 
 	function render(data, container) {
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
-		$('[name="filter_new"],[name="filter_update"]').hide()
-			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
+		document.querySelector('[name="filter_new"]').style.display = data.filter_configurable ? 'none' : '';
+		document.querySelector('[name="filter_update"]').style.display = data.filter_configurable ? '' : 'none';
 
 		let fields = ['show', 'name', 'tag_priority', 'show_opdata', 'show_symptoms', 'show_suppressed', 'show_tags',
-				'acknowledgement_status', 'acknowledged_by_me', 'compact_view', 'show_timeline', 'details',
-				'highlight_row', 'age_state', 'age', 'tag_name_format', 'evaltype'
+				'acknowledgement_status', 'acknowledged_by_me', 'age_state', 'age', 'tag_name_format', 'evaltype'
 			],
 			eventHandler = {
 				show: () => {
@@ -444,19 +375,6 @@ if (array_key_exists('render_html', $data)) {
 				age_state: (ev) => {
 					$('[name="age"]', container).prop('disabled', !$('[name="age_state"]', container).is(':checked'));
 				},
-				compact_view: () => {
-					let checked = $('[name="compact_view"]', container).is(':checked');
-
-					$('[name="show_timeline"]', container).prop('disabled', checked);
-					$('[name="details"]', container).prop('disabled', checked);
-					$('[name="show_opdata"]', container).prop('disabled', checked);
-				},
-				show_tags: () => {
-					let disabled = ($('[name="show_tags"]:checked', container).val() == <?= SHOW_TAGS_NONE ?>);
-
-					$('[name="tag_priority"]', container).prop('disabled', disabled);
-					$('[name="tag_name_format"]', container).prop('disabled', disabled);
-				},
 				unack_by_me: () => {
 					const acknowledgement_status = container.querySelector('[name="acknowledgement_status"]:checked');
 					const disabled = acknowledgement_status.value != <?= ZBX_ACK_STATUS_ACK ?>;
@@ -484,7 +402,7 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Show timeline default value is checked and it will be rendered in template therefore initialize if unchecked.
-		$('[name="show_timeline"][unchecked-value="' + data['show_timeline'] + '"]', container).removeAttr('checked');
+		// $('[name="show_timeline"][unchecked-value="' + data['show_timeline'] + '"]', container).removeAttr('checked');
 
 		// Severities checkboxes.
 		for (const value in data.severities) {
@@ -545,7 +463,7 @@ if (array_key_exists('render_html', $data)) {
 				parameters: {
 					srctbl: 'host_groups',
 					srcfld1: 'groupid',
-					dstfrm: 'zbx_filter',
+					dstfrm: '<?= CFilter::FORM_NAME; ?>',
 					dstfld1: 'groupids_' + data.uniqid,
 					multiselect: 1,
 					with_hosts: 1,
@@ -569,7 +487,7 @@ if (array_key_exists('render_html', $data)) {
 					multiselect: 1,
 					srctbl: 'hosts',
 					srcfld1: 'hostid',
-					dstfrm: 'zbx_filter',
+					dstfrm: '<?= CFilter::FORM_NAME; ?>',
 					dstfld1: 'hostids_' + data.uniqid,
 				}
 			}
@@ -589,7 +507,7 @@ if (array_key_exists('render_html', $data)) {
 				parameters: {
 					srctbl: 'triggers',
 					srcfld1: 'triggerid',
-					dstfrm: 'zbx_filter',
+					dstfrm: '<?= CFilter::FORM_NAME; ?>',
 					dstfld1: 'triggerids_' + data.uniqid,
 					multiselect: 1,
 					monitored_hosts: 1,
@@ -600,8 +518,8 @@ if (array_key_exists('render_html', $data)) {
 
 		$('#show_' + data.uniqid, container).change(eventHandler.show).trigger('change');
 		$('[name="age_state"]').change(eventHandler.age_state).trigger('change');
-		$('[name="compact_view"]', container).change(eventHandler.compact_view).trigger('change');
-		$('[name="show_tags"]', container).change(eventHandler.show_tags).trigger('change');
+		// $('[name="compact_view"]', container).change(eventHandler.compact_view).trigger('change');
+		// $('[name="show_tags"]', container).change(eventHandler.show_tags).trigger('change');
 		$('[name="acknowledgement_status"]', container).change(eventHandler.unack_by_me).trigger('change');
 
 		// Initialize src_url.
@@ -638,8 +556,8 @@ if (array_key_exists('render_html', $data)) {
 
 	function expand(data, container) {
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
-		$('[name="filter_new"],[name="filter_update"]').hide()
-			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
+		document.querySelector('[name="filter_new"]').style.display = data.filter_configurable ? 'none' : '';
+		document.querySelector('[name="filter_update"]').style.display = data.filter_configurable ? '' : 'none';
 
 		// Trigger change to update timeselector ui disabled state.
 		$('#show_' + data.uniqid, container).trigger('change');
@@ -668,15 +586,6 @@ if (array_key_exists('render_html', $data)) {
 		if (action !== 'filter_apply' && action !== 'filter_update') {
 			return;
 		}
-
-		$('[name="details"],[name="show_timeline"]', container)
-			.filter(':disabled')
-			.prop('checked', false);
-
-		$('[name="show_opdata"]:disabled', container)
-			.prop('checked', false)
-			.filter('[value="' + <?= CControllerProblem::FILTER_FIELDS_DEFAULT['show_opdata'] ?> +'"]')
-			.prop('checked', true);
 
 		if ($('[name="age_state"]', container).not(':checked').length) {
 			$('[name="age"]').val(<?= CControllerProblem::FILTER_FIELDS_DEFAULT['age'] ?>);

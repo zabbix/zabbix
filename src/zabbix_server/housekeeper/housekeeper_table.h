@@ -29,4 +29,6 @@ int	hk_cfg_events_mode(void);
 
 int	hk_delete_from_table(const char *tablename, const char *filter, int limit);
 
+void	housekeeping_disable_unsupported_types(void);
+
 #endif
