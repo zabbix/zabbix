@@ -23,32 +23,44 @@ class CControllerValidateApiExists extends CController {
 	}
 
 	public static function getValidationRules(): array {
-		$api_services = ['dashboard', 'discoveryrule', 'discoveryruleprototype', 'host', 'hostgroup', 'hostprototype',
-			'httptest', 'image', 'iconmap', 'item', 'itemprototype', 'maintenance', 'mediatype', 'proxy', 'proxygroup',
-			'report', 'regexp', 'role', 'service', 'sla', 'template', 'templatedashboard', 'templategroup', 'token',
-			'user', 'usergroup', 'usermacro'
-		];
+		$api_services = ['host', 'template', 'item', 'itemprototype'];
 
 		return ['object', 'fields' => [
 			'validations' => ['objects', 'required', 'not_empty', 'fields' => [
 				'api' => ['string', 'required', 'in' => $api_services],
 				'method' => ['string', 'required', 'in' => ['get']],
 				'field' => ['string', 'required'],
-				'options' => ['array'],
-				'exclude_id' => ['integer'],
+				'options' => ['object', 'required', 'fields' => [
+					'filter' => [
+						['object', 'fields' => [
+							'name' => ['string'],
+							'host' => ['string']
+						], 'when' => ['../api', 'in' => ['host', 'template']]],
+						['object', 'fields' => [
+							'key_' => ['string', 'required', 'not_empty'],
+							'hostid' => ['id', 'required']
+						], 'when' => ['../api', 'in' => ['item', 'itemprototype']]]
+					]
+				]],
+				'exclude_id' => ['id'],
 				'error_msg' => ['string']
 			]]
 		]];
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$ret = $this->validateInput($this->getValidationRules());
+
+		if ($ret) {
+			$ret = $this->validateApiCount();
+		}
 
 		if (!$ret) {
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'messages' => $this->getValidationError()
+						'messages' => array_merge($this->getValidationError(),
+							array_column(get_and_clear_messages(), 'message'))
 					]
 				])]))->disableView()
 			);
@@ -99,5 +111,15 @@ class CControllerValidateApiExists extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
+	}
+
+	protected function validateApiCount(): bool {
+		if (count($this->getInput('validations', [])) > 20) {
+			error(_s('No more than %1$d items based on field "%2$s" rules', '20', 'api'));
+
+			return false;
+		}
+
+		return true;
 	}
 }

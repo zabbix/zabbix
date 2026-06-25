@@ -175,7 +175,10 @@ window.host_wizard_edit = new class {
 				fields: {
 					id: {
 						regex: /^<?= ZBX_PREG_HOST_FORMAT ?>$/,
-						maxlength: <?= DB::getFieldLength('hosts', 'host') ?>
+						maxlength: <?= DB::getFieldLength('hosts', 'host') ?>,
+						messages: {
+							regex: <?= json_encode(_('Incorrect characters used for host name.')) ?>
+						}
 					}
 				}
 			},
@@ -230,6 +233,8 @@ window.host_wizard_edit = new class {
 	#pending_form_update = false;
 	#changed_during_mouse = false;
 
+	#confirm_dialogue_close = false;
+
 	async init({templates, linked_templates, wizard_show_welcome, source_host, agent_script_server_host, csrf_token}) {
 		this.#templates = templates.reduce((templates_map, template) => {
 			return templates_map.set(template.templateid, template);
@@ -263,25 +268,37 @@ window.host_wizard_edit = new class {
 			}
 		});
 
-		this.#dialogue.addEventListener('dialogue.cancel', () => {
-			if (this.#getCurrentStep() === this.STEP_COMPLETE) {
-				overlayDialogueDestroy(this.#overlay.dialogueid);
+		this.#dialogue.addEventListener('dialogue.close', e => {
+			if (!this.#confirm_dialogue_close) {
+				return;
+			}
 
-				this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {
-					redirect_latest: false
-				}}));
+			// Bypass the popup manager.
+			e.stopImmediatePropagation();
+
+			if (this.#getCurrentStep() === this.STEP_COMPLETE) {
+				// Allow closing the dialogue gracefully before the submission.
+				setTimeout(() => {
+					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {
+						redirect_latest: false
+					}}));
+				});
+
+				return;
+			}
+
+			// Do not close the dialogue.
+			e.preventDefault();
+
+			if (this.#show_cancel_screen) {
+				this.#show_cancel_screen = false;
+
+				this.#gotoStep(this.#current_step);
 			}
 			else {
-				if (this.#show_cancel_screen) {
-					this.#show_cancel_screen = false;
+				this.#show_cancel_screen = true;
 
-					this.#gotoStep(this.#current_step);
-				}
-				else {
-					this.#show_cancel_screen = true;
-
-					this.#renderCancelScreen();
-				}
+				this.#renderCancelScreen();
 			}
 		});
 
@@ -303,6 +320,8 @@ window.host_wizard_edit = new class {
 
 			if (target.classList.contains('js-cancel')) {
 				if (this.#data.selected_template === null) {
+					this.#confirm_dialogue_close = false;
+
 					overlayDialogueDestroy(this.#overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
 				}
 
@@ -318,6 +337,8 @@ window.host_wizard_edit = new class {
 			}
 
 			if (target.classList.contains('js-cancel-yes')) {
+				this.#confirm_dialogue_close = false;
+
 				overlayDialogueDestroy(this.#overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
 			}
 		});
@@ -348,6 +369,8 @@ window.host_wizard_edit = new class {
 
 							ZABBIX.PopupManager.setReturnUrl(return_url.href);
 						}
+
+						this.#confirm_dialogue_close = false;
 
 						overlayDialogueDestroy(this.#overlay.dialogueid);
 
@@ -906,8 +929,12 @@ window.host_wizard_edit = new class {
 							row_index,
 							type: 'integer',
 							required: true,
-							min: <?= ZBX_MIN_PORT_NUMBER ?>,
-							max: <?= ZBX_MAX_PORT_NUMBER ?>
+							min: interface_type === <?= INTERFACE_TYPE_AGENT ?>
+								? <?= ZBX_AGENT_INTERFACE_MIN_PORT_NUMBER ?>
+								: <?= ZBX_MIN_PORT_NUMBER ?>,
+							max:  interface_type === <?= INTERFACE_TYPE_AGENT ?>
+								? <?= ZBX_AGENT_INTERFACE_MAX_PORT_NUMBER ?>
+								: <?= ZBX_MAX_PORT_NUMBER ?>
 						},
 						...(interface_type === <?= INTERFACE_TYPE_SNMP ?> && {
 							[`interfaces.${row_index}.details.community`]: {
@@ -1184,7 +1211,7 @@ window.host_wizard_edit = new class {
 	}
 
 	#updateForm(path, new_value, old_value) {
-		if (this.#form_update_locked) {
+		if (this.#form_update_locked || this.#show_cancel_screen) {
 			this.#pending_form_update = true;
 
 			return;
@@ -1219,7 +1246,8 @@ window.host_wizard_edit = new class {
 
 				if ((step_init || path === 'selected_template') && this.#getSelectedTemplate()) {
 					this.#updateProgress();
-					this.#overlay.has_custom_cancel = true;
+
+					this.#confirm_dialogue_close = true;
 				}
 
 				if (path === 'show_info_by_template') {
@@ -1244,7 +1272,11 @@ window.host_wizard_edit = new class {
 					);
 				}
 
-				this.#dialogue.querySelector('.js-groups-description').hidden = this.#data.host === null;
+				const groups_description = this.#dialogue.querySelector('.js-groups-description');
+
+				if (groups_description) {
+					groups_description.hidden = this.#data.host === null;
+				}
 
 				break;
 
@@ -2115,7 +2147,9 @@ window.host_wizard_edit = new class {
 				}
 
 				if (rule.regex && !rule.regex.test(value)) {
-					return <?= json_encode(_('This value does not match pattern.')) ?>;
+					return rule.messages && rule.messages.regex
+						? rule.messages.regex
+						: <?= json_encode(_('This value does not match pattern.')) ?>;
 				}
 			}
 

@@ -12359,6 +12359,11 @@ msgstr ""
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr ""
 
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
+
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
 msgstr ""
@@ -12740,6 +12745,11 @@ msgstr ""
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Geçersiz etiket \"%1$s\": %2$s."
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -15222,6 +15232,10 @@ msgstr ""
 msgid "New MFA method"
 msgstr ""
 
+#: app/views/oauth.edit.php:242
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr ""
@@ -15414,6 +15428,10 @@ msgstr ""
 msgid "Next dashboard"
 msgstr ""
 
+#: jsLoader.php:328
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15427,6 +15445,10 @@ msgstr ""
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Sonraki adım"
+
+#: jsLoader.php:326
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -15616,6 +15638,11 @@ msgstr "Hiçbir harita eklenmemiş."
 #: include/classes/html/CMultiSelect.php:66 jsLoader.php:328
 msgid "No matches found"
 msgstr "Hiçbir eşleşen bulunmadı"
+
+#: app/controllers/CControllerValidateApiExists.php:118
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr ""
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
@@ -21226,6 +21253,10 @@ msgstr "Bayt cinsinden veya toplamın yüzdesi olarak takas alanı boyutu. Bayt 
 msgid "Swedish (sv_SE)"
 msgstr "İsveççe (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Kimlik doğrulama yöntemini değiştirmek bu oturum dışındaki bütün oturumları sıfırlar! Devam edilsin mi?"
@@ -21851,6 +21882,10 @@ msgstr ""
 
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
 msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
@@ -23235,6 +23270,10 @@ msgstr ""
 
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
+msgstr ""
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
 msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
@@ -25086,6 +25125,10 @@ msgstr ""
 msgid "Widget is deprecated."
 msgstr ""
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr ""
@@ -25469,6 +25512,10 @@ msgstr ""
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Bu işlemi gerçekleştirmek için izniniz yok."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."

@@ -12348,6 +12348,11 @@ msgstr "Ogiltig e-postadress \"%1$s\"."
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Ogiltig e-postadress för medietyp med ID \"%1$s\"."
 
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
+
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
 msgstr "Ogiltigt värde"
@@ -12729,6 +12734,11 @@ msgstr "Ogiltig sträng."
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Ogiltig tagg \"%1$s\": %2$s."
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -15207,6 +15217,10 @@ msgstr "Ny LDAP-server"
 msgid "New MFA method"
 msgstr "Ny MFA-metod"
 
+#: app/views/oauth.edit.php:242
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "Ny SLA"
@@ -15399,6 +15413,10 @@ msgstr "Nästa"
 msgid "Next dashboard"
 msgstr "Nästa kontrollpanel"
 
+#: jsLoader.php:328
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15412,6 +15430,10 @@ msgstr "Nästa sida"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Nästa steg"
+
+#: jsLoader.php:326
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -15601,6 +15623,11 @@ msgstr "Inga kartor har lagts till."
 #: include/classes/html/CMultiSelect.php:66 jsLoader.php:328
 msgid "No matches found"
 msgstr "Ingen matchning hittad"
+
+#: app/controllers/CControllerValidateApiExists.php:118
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr ""
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
@@ -21209,6 +21236,10 @@ msgstr "Storlek på swaputrymme i byte eller i procent av totalt. Returnerar hel
 msgid "Swedish (sv_SE)"
 msgstr "Svenska (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Byte av autentiseringsmetod kommer att återställa alla utom denna session! Fortsätta?"
@@ -21833,6 +21864,10 @@ msgstr "Klientidentifieraren som registrerats i auktoriseringsservern."
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
 msgstr "Klientens hemlighet som registrerats i auktoriseringsservern."
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -23214,6 +23249,10 @@ msgstr "Ångra bekräftelse av problem."
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "Oväntad statuskod för HTTP-svar."
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
+msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -25063,6 +25102,10 @@ msgstr "Widgetkonfigurationen kommer att återställas."
 msgid "Widget is deprecated."
 msgstr "Widget är föråldrad."
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Widgeten är för liten för det angivna antalet kolumner och rader."
@@ -25446,6 +25489,10 @@ msgstr "Du kan inte byta mallar för aktuellt val."
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Du har inte behörighet att utföra den här åtgärden."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."

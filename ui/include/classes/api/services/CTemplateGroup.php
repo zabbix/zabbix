@@ -370,6 +370,7 @@ class CTemplateGroup extends CApiService {
 		$this->validateDelete($groupids, $db_groups);
 
 		$this->unlinkTemplates($db_groups);
+		self::deleteUnusedHgSetGroups($groupids);
 
 		DB::delete('hstgrp', ['groupid' => $groupids]);
 
@@ -473,6 +474,14 @@ class CTemplateGroup extends CApiService {
 		}
 
 		$this->massUpdate($data);
+	}
+
+	/**
+	 * Deletes hgset groups of template group sets that have no templates linked to them.
+	 * This may happen during parallel deletion of templates which have the same template group set.
+	 */
+	private static function deleteUnusedHgSetGroups(array $groupids): void {
+		DB::delete('hgset_group', ['groupid' => $groupids]);
 	}
 
 	/**

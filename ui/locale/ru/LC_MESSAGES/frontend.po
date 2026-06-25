@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-12-11 09:09+0000\n"
+"PO-Revision-Date: 2026-02-16 07:42+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -11832,12 +11832,12 @@ msgstr "Некорректное значение \"%1$s\" для \"%2$s\" по�
 #: include/validate.inc.php:362
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s, and have no more than %5$s digits after the decimal point."
-msgstr "Некорректное значение \"%1$s\" для \"%2$s\" поля: должно быть между %3$s и %4$s, и должно содержать не более %5$s цифр после десятичной точки."
+msgstr "Некорректное значение \"%1$s\" для \"%2$s\" поля: должно быть в пределах %3$s и %4$s, и должно содержать не более %5$s цифр после десятичной точки."
 
 #: include/validate.inc.php:367
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
-msgstr "Некорректное значение \"%1$s\" для \"%2$s\" поля: должно быть между %3$s и %4$s."
+msgstr "Некорректное значение \"%1$s\" для \"%2$s\" поля: должно быть в пределах %3$s и %4$s."
 
 #: include/classes/db/DB.php:422
 #, c-format
@@ -12484,6 +12484,11 @@ msgstr "Ошибочный email адрес \"%1$s\"."
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Ошибочный email адрес у способа оповещения с ID \"%1$s\"."
 
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
+
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
 msgstr "Ошибочный ввод"
@@ -12865,6 +12870,11 @@ msgstr "Ошибочная строка."
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Ошибочный тег \"%1$s\": %2$s."
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -15367,6 +15377,10 @@ msgstr "Новый сервер LDAP"
 msgid "New MFA method"
 msgstr "Новый MFA метод"
 
+#: app/views/oauth.edit.php:242
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "Новый SLA"
@@ -15559,6 +15573,10 @@ msgstr "Далее"
 msgid "Next dashboard"
 msgstr "Следующая панель"
 
+#: jsLoader.php:328
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15572,6 +15590,10 @@ msgstr "Следующая страница"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Далее"
+
+#: jsLoader.php:326
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -15761,6 +15783,11 @@ msgstr "Карты сети не добавлены."
 #: include/classes/html/CMultiSelect.php:66 jsLoader.php:328
 msgid "No matches found"
 msgstr "Совпадения не найдены"
+
+#: app/controllers/CControllerValidateApiExists.php:118
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr ""
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
@@ -21381,6 +21408,10 @@ msgstr "Размер файла подкачки в байтах или в пр�
 msgid "Swedish (sv_SE)"
 msgstr "Шведский (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Переключение метода аутентификации сбросит все сессии исключая эту! Продолжить?"
@@ -22008,6 +22039,10 @@ msgstr "Идентификатор клиента (client identifier), заре�
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
 msgstr "Секрет клиента (client secret), зарегистрированный на сервере авторизации."
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -23401,6 +23436,10 @@ msgstr "Отмена подтверждения проблемы."
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "Неожиданный код статуса HTTP-ответа."
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
+msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -25260,6 +25299,10 @@ msgstr "Конфигурация виджета будет возвращена 
 msgid "Widget is deprecated."
 msgstr "Устаревший виджет."
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Виджет слишком маленький для заданного количества колонок и строк."
@@ -25643,6 +25686,10 @@ msgstr "Вы не можете переключить шаблоны для те
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "У вас нет полномочий для выполнения этой операции."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -27052,7 +27099,7 @@ msgstr "ошибочный тип данных"
 #: include/classes/validators/CAbsoluteTimeValidator.php:45
 #: include/classes/validators/CAbsoluteTimeValidator.php:53
 msgid "invalid date"
-msgstr ""
+msgstr "ошибочная дата"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
@@ -28444,7 +28491,7 @@ msgstr[2] "значение должно быть одно из %1$s"
 #: widgets/svggraph/includes/WidgetForm.php:107
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
-msgstr "значение должно быть между \"%1$s\" и \"%2$s\""
+msgstr "значение должно быть в пределах \"%1$s\" и \"%2$s\""
 
 #: app/controllers/CControllerGraphCreate.php:208
 #: app/controllers/CControllerGraphPrototypeCreate.php:226
@@ -28452,12 +28499,12 @@ msgstr "значение должно быть между \"%1$s\" и \"%2$s\""
 #: app/controllers/CControllerGraphUpdate.php:228
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
-msgstr "значение должно быть между \"%1$s\" и \"%2$s\", и иметь не более \"%3$s\" цифр после десятичной точки"
+msgstr "значение должно быть в пределах \"%1$s\" и \"%2$s\", и иметь не более \"%3$s\" цифр после десятичной точки"
 
 #: include/classes/validators/CTimeUnitValidator.php:84
 #, c-format
 msgid "value must be between %1$s and %2$s"
-msgstr ""
+msgstr "значение должно быть в пределах %1$s и %2$s"
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
@@ -28480,12 +28527,12 @@ msgstr "значение должно быть больше \"%1$s\""
 #: include/classes/validators/CAbsoluteTimeValidator.php:59
 #, c-format
 msgid "value must be greater than or equal to %1$s"
-msgstr ""
+msgstr "значение должно быть больше или равно %1$s"
 
 #: include/classes/validators/CAbsoluteTimeValidator.php:64
 #, c-format
 msgid "value must be less than or equal to %1$s"
-msgstr ""
+msgstr "значение должно быть меньше или равно %1$s"
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220
@@ -28631,4 +28678,4 @@ msgstr "г"
 #: include/classes/validators/CApiInputValidator.php:3324
 #, c-format
 msgid "zoom level must be between \"%1$s\" and \"%2$s\""
-msgstr "уровень масштаба должен быть между \"%1$s\" и \"%2$s\""
+msgstr "уровень масштаба должен быть в пределах \"%1$s\" и \"%2$s\""

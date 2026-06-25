@@ -454,6 +454,10 @@ class CLineGraphDraw extends CGraphDraw {
 				continue;
 			}
 
+			if (!array_key_exists($item['itemid'], $results)) {
+				continue;
+			}
+
 			$delay = $item['source'] === 'trends' ? max($item['delay'], ZBX_MAX_TREND_DIFF) : $item['delay'];
 			$period = $time_to - $time_from;
 
@@ -2026,6 +2030,10 @@ class CLineGraphDraw extends CGraphDraw {
 			$y_offsets -= ($this->show_triggers && count($this->triggers) > 0)
 				? static::DEFAULT_TOP_BOTTOM_PADDING / 2
 				: static::DEFAULT_TOP_BOTTOM_PADDING;
+		}
+
+		if ($this->with_bottom_padding) {
+			$y_offsets += static::DEFAULT_TOP_BOTTOM_PADDING / 2;
 		}
 
 		// Actual outer dimensions, regardless $this->outer setting.
