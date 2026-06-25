@@ -26,6 +26,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
+#include "zbxexpr.h"
 #include "zbxjson.h"
 
 static int	cep_acknowledge_is_set(zbx_cep_acknowledge_t *ack)
@@ -129,8 +130,6 @@ static void	cep_operation_event_execute_set_name(const zbx_cep_operation_t *op, 
 		(*event)->name = zbx_strdup((*event)->name, op->args.set_name.name);
 		ctx->sync_flags |= CEP_SYNC_EVENT_NAME;
 	}
-
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -408,43 +407,31 @@ out:
 static void	cep_operation_event_copy(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_event_pos_t pos, zbx_cep_acknowledge_t *ack, zbx_vector_mw_task_ptr_t *tasks)
 {
+	zbx_cep_event_t	*event;
+	zbx_db_event	*db_event;
+	zbx_timespec_t	ts;
+	zbx_mw_task_t	*t;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64 " pos:%d", __func__, op->operationid, pos);
 
-	if (ctx->pos == pos)
+	if (ctx->pos != pos)
+		goto out;
+
+	if (NULL == (event = cep_event_context_acquire_event(ctx)))
+		goto out;
+
+	zbx_timespec(&ts);
+
+	if (NULL == (db_event = cep_db_event_create(&event->origin, event->name, ts.sec, ts.ns, event->severity,
+			event->value, &event->tags)))
 	{
-		zbx_dc_trigger_t	dc_trigger;
-		int			err;
-		zbx_cep_event_t		*event = cep_event_context_acquire_event(ctx);
-
-		zbx_dc_config_get_triggers_by_triggerids(&dc_trigger, &event->origin.objectid, &err, 1);
-
-		if (SUCCEED == err)
-		{
-			zbx_timespec_t	ts;
-			zbx_mw_task_t	*t;
-			zbx_db_event	*db_event;
-
-			zbx_timespec(&ts);
-			cep_acknowledge_update(ack, op->type);
-
-			db_event = cep_db_event_create(&event->origin, event->name, ts.sec, ts.ns, event->severity,
-				event->value, &event->tags);
-
-			db_event->trigger.triggerid = dc_trigger.triggerid;
-			db_event->trigger.type = dc_trigger.type;
-			db_event->trigger.recovery_mode = dc_trigger.recovery_mode;
-			db_event->trigger.expression = dc_trigger.expression;
-			db_event->trigger.recovery_expression = dc_trigger.recovery_expression;
-
-			dc_trigger.expression = NULL;
-			dc_trigger.recovery_expression = NULL;
-			zbx_dc_config_clean_triggers(&dc_trigger, &err, 1);
-
-			t = cep_create_task_event(db_event, ZBX_EVENT_COPIED);
-			zbx_vector_mw_task_ptr_append(tasks, t);
-		}
+		goto out;
 	}
 
+	cep_acknowledge_update(ack, op->type);
+	t = cep_create_task_event(db_event, ZBX_EVENT_COPIED);
+	zbx_vector_mw_task_ptr_append(tasks, t);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

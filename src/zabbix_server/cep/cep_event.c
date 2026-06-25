@@ -15,7 +15,9 @@
 #include "cep_event.h"
 #include "cep_api.h"
 #include "zbx_cep.h"
+#include "zbx_trigger_constants.h"
 #include "zbxcommon.h"
+#include "zbxdbhigh.h"
 #include "zbxdbwrap.h"
 
 void	cep_event_clear(zbx_cep_event_t *event)
@@ -434,6 +436,31 @@ zbx_db_event	*cep_db_event_create(const zbx_cep_origin_t *origin, const char *na
 	{
 		db_event->trigger.triggerid = db_event->objectid;
 		zbx_vector_uint64_create(&db_event->trigger.dep_triggerids);
+
+		/* created problem events might get processed by CEP rules - */
+		/* need to get more trigger data to expose hosts/groups      */
+		if (TRIGGER_VALUE_PROBLEM == value)
+		{
+			zbx_dc_trigger_t	dc_trigger;
+			int			err;
+
+			zbx_dc_config_get_triggers_by_triggerids(&dc_trigger, &origin->objectid, &err, 1);
+
+			if (SUCCEED != err)
+			{
+				zbx_db_free_event(db_event);
+				return NULL;
+			}
+
+			db_event->trigger.type = dc_trigger.type;
+			db_event->trigger.recovery_mode = dc_trigger.recovery_mode;
+			db_event->trigger.expression = dc_trigger.expression;
+			db_event->trigger.recovery_expression = dc_trigger.recovery_expression;
+
+			dc_trigger.expression = NULL;
+			dc_trigger.recovery_expression = NULL;
+			zbx_dc_config_clean_triggers(&dc_trigger, &err, 1);
+		}
 	}
 
 	return db_event;
