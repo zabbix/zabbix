@@ -1305,6 +1305,71 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_OpenProblem() {
+		$this->runOpenProblemTest(false);
+	}
+
+	/**
+	 * Smoke test (part 1.5/2): re-send the problem value while the single-event triggers are already in
+	 * PROBLEM. No new event is generated so the trigger state does not change, and CEP does not process
+	 * the already-open problem events. Runs between open and close so the problem is still open.
+	 *
+	 * @depends testTriggerCEP_OpenProblem
+	 */
+	public function testTriggerCEP_OpenAlreadyOpenedProblem() {
+		$this->runOpenAlreadyOpenedProblemTest(false);
+	}
+
+	/**
+	 * Smoke test (part 2/2): the problem opened by testTriggerCEP_OpenProblem closes on PROBLEM→OK.
+	 * Runs as a separate test so the open problem persists across the test boundary before recovery.
+	 *
+	 * @depends testTriggerCEP_OpenAlreadyOpenedProblem
+	 */
+	public function testTriggerCEP_CloseProblem() {
+		$this->runCloseProblemTest(false);
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_OpenProblem but the server component is stopped and restarted first,
+	 * to verify the problem opens and is cached correctly after a fresh restart. Depends on the non-restart
+	 * close so it starts from the recovered state.
+	 *
+	 * @depends testTriggerCEP_CloseProblem
+	 */
+	public function testTriggerCEP_OpenProblemRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->runOpenProblemTest(true);
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_OpenAlreadyOpenedProblem but the server component is stopped and
+	 * restarted first, to verify a re-sent problem value generates no new event after a fresh restart.
+	 *
+	 * @depends testTriggerCEP_OpenProblemRestart
+	 */
+	public function testTriggerCEP_OpenAlreadyOpenedProblemRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->runOpenAlreadyOpenedProblemTest(true);
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_CloseProblem but the server component is stopped and restarted first,
+	 * to verify recovery and cache draining after a fresh restart.
+	 *
+	 * @depends testTriggerCEP_OpenAlreadyOpenedProblemRestart
+	 */
+	public function testTriggerCEP_CloseProblemRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->runCloseProblemTest(true);
+	}
+
+	/**
+	 * Open a problem on OK→PROBLEM (one PROBLEM event per trigger) and verify CEP processed and cached it.
+	 * When $restart is true, the server is restarted first.
+	 */
+	private function runOpenProblemTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$triggerids = self::$discovered_triggerids;
 
@@ -1321,13 +1386,12 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
-	 * Smoke test (part 1.5/2): re-send the problem value while the single-event triggers are already in
-	 * PROBLEM. No new event is generated so the trigger state does not change, and CEP does not process
-	 * the already-open problem events. Runs between open and close so the problem is still open.
-	 *
-	 * @depends testTriggerCEP_OpenProblem
+	 * Re-send the problem value while the single-event triggers are already in PROBLEM and verify no new
+	 * event is generated. When $restart is true, the server is restarted first.
 	 */
-	public function testTriggerCEP_OpenAlreadyOpenedProblem() {
+	private function runOpenAlreadyOpenedProblemTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$triggerids = self::$discovered_triggerids;
 
@@ -1338,12 +1402,12 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
-	 * Smoke test (part 2/2): the problem opened by testTriggerCEP_OpenProblem closes on PROBLEM→OK.
-	 * Runs as a separate test so the open problem persists across the test boundary before recovery.
-	 *
-	 * @depends testTriggerCEP_OpenAlreadyOpenedProblem
+	 * Close the open problem on PROBLEM→OK (one RESOLVED event per trigger) and verify CEP processed it and
+	 * drained its cache. When $restart is true, the server is restarted first.
 	 */
-	public function testTriggerCEP_CloseProblem() {
+	private function runCloseProblemTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$triggerids = self::$discovered_triggerids;
 
