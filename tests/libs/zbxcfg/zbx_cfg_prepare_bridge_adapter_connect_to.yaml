@@ -1,0 +1,129 @@
+---
+test case: "HTTP URL default port with IPv4 connect_to"
+in:
+  url: "http://example.com"
+  connect_to: "192.168.1.1:9090"
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:80:192.168.1.1:9090"
+---
+test case: "HTTPS URL default port with IPv4 connect_to"
+in:
+  url: "https://example.com"
+  connect_to: "10.0.0.1:443"
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:443:10.0.0.1:443"
+---
+test case: "HTTP URL with custom port overrides default"
+in:
+  url: "http://proxy.local:8080"
+  connect_to: "backend.host:1234"
+out:
+  return: SUCCEED
+  curl_connect_to: "proxy.local:8080:backend.host:1234"
+---
+test case: "HTTPS URL with custom port and path"
+in:
+  url: "https://api.example.com:8443/some/path"
+  connect_to: "192.168.100.1:9090"
+out:
+  return: SUCCEED
+  curl_connect_to: "api.example.com:8443:192.168.100.1:9090"
+---
+test case: "IPv4 URL with IPv4 connect_to"
+in:
+  url: "http://192.168.0.1"
+  connect_to: "10.0.0.2:9090"
+out:
+  return: SUCCEED
+  curl_connect_to: "192.168.0.1:80:10.0.0.2:9090"
+---
+test case: "invalid URL scheme fails"
+in:
+  url: "ftp://example.com"
+  connect_to: "192.168.1.1:9090"
+out:
+  return: FAIL
+---
+test case: "connect_to without port fails"
+in:
+  url: "http://example.com"
+  connect_to: "192.168.1.1"
+out:
+  return: FAIL
+---
+test case: "connect_to with port zero fails"
+in:
+  url: "http://example.com"
+  connect_to: "192.168.1.1:0"
+out:
+  return: FAIL
+---
+test case: "port zero in URL fails"
+in:
+  url: "http://example.com:0"
+  connect_to: "192.168.1.1:9090"
+out:
+  return: FAIL
+---
+test case: "invalid hostname in connect_to fails"
+in:
+  url: "http://example.com"
+  connect_to: "!invalid!:9090"
+out:
+  return: FAIL
+---
+test case: "empty connect_to fails"
+in:
+  url: "http://example.com"
+  connect_to: ""
+out:
+  return: FAIL
+---
+test case: "connect_to with percent-encoded host fails hostname check"
+in:
+  url: "http://example.com"
+  connect_to: "host%20name:9090"
+out:
+  return: FAIL
+---
+test case: "connect_to with port at maximum valid value"
+in:
+  url: "http://example.com"
+  connect_to: "192.168.1.1:65535"
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:80:192.168.1.1:65535"
+---
+test case: "connect_to with port above maximum fails"
+in:
+  url: "http://example.com"
+  connect_to: "192.168.1.1:65536"
+out:
+  return: FAIL
+---
+test case: "connect_to with underscore hostname is valid"
+in:
+  url: "http://example.com"
+  connect_to: "my_backend:9090"
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:80:my_backend:9090"
+---
+test case: "URL with query string does not leak into curl_connect_to hostname"
+in:
+  url: "http://proxy.example.com:8080/api?key=value"
+  connect_to: "backend.host:443"
+out:
+  return: SUCCEED
+  curl_connect_to: "proxy.example.com:8080:backend.host:443"
+---
+test case: "connect_to with hyphenated hostname is valid"
+in:
+  url: "https://example.com"
+  connect_to: "my-backend.internal:9090"
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:443:my-backend.internal:9090"
+...
