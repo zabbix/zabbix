@@ -61,6 +61,10 @@ abstract class CGraphDraw {
 	 * Use top and bottom padding for graph image.
 	 */
 	public $with_vertical_padding = true;
+	/**
+	 * Add bottom padding for graph image when downloading.
+	 */
+	public $with_bottom_padding = false;
 
 	public function __construct($type = GRAPH_TYPE_NORMAL) {
 		$this->stime = null;
