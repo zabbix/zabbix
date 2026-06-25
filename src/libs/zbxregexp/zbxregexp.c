@@ -1425,7 +1425,7 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
 #define REGEX_TYPE_CONTAINS_STRING	0
 #define REGEX_TYPE_STRING_IN_LIST	1
 #define REGEX_TYPE_NOT_CONTAINS_STRING	2
-#define REGEX_TYPE_MATCHES_REGEX		3
+#define REGEX_TYPE_MATCHES_REGEX	3
 #define REGEX_TYPE_NOT_MATCHES_REGEX	4
 int	zbx_regexp_sub_ex(const zbx_vector_expression_t *regexps, const char *string, const char *pattern,
 		int case_sensitive, const char *output_template, char **output)
