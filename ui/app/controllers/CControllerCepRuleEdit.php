@@ -148,12 +148,30 @@ class CControllerCepRuleEdit extends CController {
 		unset($ceprule['window']['filter']['eval_formula']);
 
 		$ceprule['filter']['conditions'] = self::prepareFilterConditions($ceprule['filter']['conditions']);
+		$ceprule['window']['filter']['conditions'] = self::prepareWindowFilterConditions(
+			$ceprule['window']['filter']['conditions']
+		);
 
 		return $ceprule;
 	}
 
 	protected static function prepareWindowFilterConditions(array $conditions): array {
 		$conditions = self::prepareConditionsFormula($conditions);
+
+		$conditions = array_map(function(array $condition): array {
+			$condition += ['tag_pair_past_tag' => '', 'past_event_past_tag' => '', 'old_value_past_tag' => ''];
+			if ($condition['type'] == CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR) {
+				$condition['tag_pair_past_tag'] = $condition['past_tag'];
+			}
+			elseif ($condition['type'] == CCepRuleHelper::WINDOW_CONDITION_OLD_TAG) {
+				$condition['past_event_past_tag'] = $condition['past_tag'];
+			}
+			elseif ($condition['type'] == CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE) {
+				$condition['old_value_past_tag'] = $condition['past_tag'];
+			}
+
+			return $condition;
+		}, $conditions);
 
 		return $conditions;
 	}
