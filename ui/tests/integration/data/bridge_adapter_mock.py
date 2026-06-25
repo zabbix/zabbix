@@ -10,6 +10,7 @@ import argparse
 import json
 import os
 import signal
+import ssl
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -42,11 +43,20 @@ class BridgeAdapterMock(BaseHTTPRequestHandler):
 
 
 class AdapterServer(ThreadingHTTPServer):
-    def __init__(self, address, log_file, status_code, notify_error):
+    def __init__(self, address, log_file, status_code, notify_error, ssl_context=None):
         super().__init__(address, BridgeAdapterMock)
         self.log_file = log_file
         self.status_code = status_code
         self.notify_error = notify_error
+        self.ssl_context = ssl_context
+
+    def get_request(self):
+        sock, addr = self.socket.accept()
+
+        if self.ssl_context is None:
+            return sock, addr
+
+        return self.ssl_context.wrap_socket(sock, server_side=True), addr
 
     def write_request(self, body, raw_body):
         record = {
@@ -107,9 +117,34 @@ def main():
     parser.add_argument("--pid-file", required=True)
     parser.add_argument("--status-code", type=int, default=200)
     parser.add_argument("--notify-error", action="store_true")
+    parser.add_argument("--tls", action="store_true")
+    parser.add_argument("--mtls", action="store_true")
+    parser.add_argument("--cert")
+    parser.add_argument("--key")
+    parser.add_argument("--ca")
     args = parser.parse_args()
 
-    server = AdapterServer((args.host, args.port), args.log_file, args.status_code, args.notify_error)
+    if args.mtls and not args.tls:
+        parser.error("--mtls requires --tls")
+
+    if args.tls and (not args.cert or not args.key):
+        parser.error("--tls requires --cert and --key")
+
+    ssl_context = None
+
+    if args.tls:
+        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ssl_context.load_cert_chain(certfile=args.cert, keyfile=args.key)
+
+        if args.mtls:
+            if not args.ca:
+                parser.error("--mtls requires --ca")
+
+            ssl_context.verify_mode = ssl.CERT_REQUIRED
+            ssl_context.load_verify_locations(cafile=args.ca)
+
+    server = AdapterServer((args.host, args.port), args.log_file, args.status_code, args.notify_error,
+                           ssl_context)
 
     open(args.log_file, "a", encoding="utf-8").close()
 

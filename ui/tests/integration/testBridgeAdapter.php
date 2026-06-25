@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  */
 class testBridgeAdapter extends CIntegrationTest {
 	private const ADAPTER_HOST = '127.0.0.1';
+	private const ADAPTER_URL_HOST = 'bridge.example.com';
 	private const ADAPTER_SCRIPT = __DIR__.'/data/bridge_adapter_mock.py';
 	private const INIT_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000101';
 	private const NOTIFY_DEVICE_UUID = '019dde8a-4040-7000-8000-000000000102';
@@ -52,14 +53,22 @@ class testBridgeAdapter extends CIntegrationTest {
 	private static ?string $push_mediatypeid = null;
 	private static ?int $push_mediatype_status = null;
 	private static ?string $real_notify_hostid = null;
+	private static ?string $cert_base_dir = null;
 
 	public function serverConfigurationProvider(): array {
+		self::$cert_base_dir = self::generateCertificates();
+		$base_dir = self::$cert_base_dir;
+
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
 				'EnableMobileDevices' => 1,
-				'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc'
+				'TLSCAFile' => $base_dir.'zabbix_ca_file.crt',
+				'TLSCertFile' => $base_dir.'zabbix_server.crt',
+				'TLSKeyFile' => $base_dir.'zabbix_server.key',
+				'BridgeAdapterURL' => 'https://'.self::ADAPTER_URL_HOST.':443/rpc',
+				'BridgeAdapterConnectTo' => self::ADAPTER_HOST.':'.self::getAdapterPort()
 			]
 		];
 	}
@@ -211,6 +220,11 @@ class testBridgeAdapter extends CIntegrationTest {
 			@unlink(self::$adapter_log_file);
 		}
 
+		if (self::$cert_base_dir !== null && is_dir(self::$cert_base_dir)) {
+			shell_exec('rm -rf '.escapeshellarg(self::$cert_base_dir));
+			self::$cert_base_dir = null;
+		}
+
 		self::deleteRealNotificationMedia();
 
 		if (self::$deviceids) {
@@ -264,7 +278,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		$response = $this->call('host.create', [
 			'host' => self::REAL_NOTIFY_HOST,
 			'groups' => [
-				['groupid' => 4]
+				['groupid' => 4] // Zabbix servers
 			],
 			'status' => HOST_STATUS_MONITORED
 		]);
@@ -370,15 +384,32 @@ class testBridgeAdapter extends CIntegrationTest {
 		@unlink(self::$adapter_log_file);
 		@unlink(self::$adapter_pid_file);
 
+		if (self::$cert_base_dir === null) {
+			self::$cert_base_dir = self::generateCertificates();
+		}
+
+		$base_dir = self::$cert_base_dir;
+
 		self::executeCommand('python3', [
 			self::ADAPTER_SCRIPT,
 			'--host', self::ADAPTER_HOST,
 			'--port', (string) self::getAdapterPort(),
 			'--log-file', self::$adapter_log_file,
-			'--pid-file', self::$adapter_pid_file
+			'--pid-file', self::$adapter_pid_file,
+			'--tls',
+			'--mtls',
+			'--cert', $base_dir.'bridge_adapter.crt',
+			'--key', $base_dir.'bridge_adapter.key',
+			'--ca', $base_dir.'zabbix_ca_file.crt'
 		], true);
 
-		while (!file_exists(self::$adapter_log_file)) {
+		$deadline = time() + self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
+
+		while (!file_exists(self::$adapter_log_file) && time() < $deadline) {
+		}
+
+		if (!file_exists(self::$adapter_log_file)) {
+			throw new Exception('Failed to wait for bridge adapter mock log file.');
 		}
 	}
 
@@ -393,7 +424,13 @@ class testBridgeAdapter extends CIntegrationTest {
 			posix_kill((int) $pid, SIGTERM);
 		}
 
-		while (file_exists(self::$adapter_pid_file)) {
+		$deadline = time() + self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
+
+		while (file_exists(self::$adapter_pid_file) && time() < $deadline) {
+		}
+
+		if (file_exists(self::$adapter_pid_file)) {
+			throw new Exception('Failed to stop bridge adapter mock.');
 		}
 	}
 
@@ -420,7 +457,75 @@ class testBridgeAdapter extends CIntegrationTest {
 		return self::$adapter_port;
 	}
 
+	private static function generateCertificates(): string {
+		$base_dir = PHPUNIT_COMPONENT_DIR.'bridge_adapter_cert_'.time().'_'.mt_rand(10000, 99999).'/';
+
+		if (!is_dir($base_dir)) {
+			mkdir($base_dir, 0777, true);
+		}
+
+		$ca_key = $base_dir.'zabbix_ca_file.key';
+		$ca_cert = $base_dir.'zabbix_ca_file.crt';
+		$server_key = $base_dir.'zabbix_server.key';
+		$server_csr = $base_dir.'zabbix_server.csr';
+		$server_cert = $base_dir.'zabbix_server.crt';
+		$adapter_key = $base_dir.'bridge_adapter.key';
+		$adapter_csr = $base_dir.'bridge_adapter.csr';
+		$adapter_cert = $base_dir.'bridge_adapter.crt';
+		$adapter_ext = $base_dir.'bridge_adapter.ext';
+
+		file_put_contents($adapter_ext, "subjectAltName=DNS:".self::ADAPTER_URL_HOST."\n");
+
+		self::executeOpenSsl('openssl genrsa -out '.escapeshellarg($ca_key).' 4096');
+		self::executeOpenSsl('openssl req -x509 -new -nodes -key '.escapeshellarg($ca_key).
+				' -sha256 -days 1 -out '.escapeshellarg($ca_cert).' -subj '.escapeshellarg('/CN=ZabbixCA'));
+
+		self::executeOpenSsl('openssl genrsa -out '.escapeshellarg($server_key).' 2048');
+		self::executeOpenSsl('openssl req -new -key '.escapeshellarg($server_key).' -out '.
+				escapeshellarg($server_csr).' -subj '.escapeshellarg('/CN=zabbix_server'));
+		self::executeOpenSsl('openssl x509 -req -in '.escapeshellarg($server_csr).' -CA '.
+				escapeshellarg($ca_cert).' -CAkey '.escapeshellarg($ca_key).' -CAcreateserial -out '.
+				escapeshellarg($server_cert).' -days 1 -sha256');
+
+		self::executeOpenSsl('openssl genrsa -out '.escapeshellarg($adapter_key).' 2048');
+		self::executeOpenSsl('openssl req -new -key '.escapeshellarg($adapter_key).' -out '.
+				escapeshellarg($adapter_csr).' -subj '.escapeshellarg('/CN='.self::ADAPTER_URL_HOST));
+		self::executeOpenSsl('openssl x509 -req -in '.escapeshellarg($adapter_csr).' -CA '.
+				escapeshellarg($ca_cert).' -CAkey '.escapeshellarg($ca_key).' -CAcreateserial -out '.
+				escapeshellarg($adapter_cert).' -days 1 -sha256 -extfile '.escapeshellarg($adapter_ext));
+
+		self::verifyCertificate($ca_cert, $server_cert);
+		self::verifyCertificate($ca_cert, $adapter_cert);
+
+		return $base_dir;
+	}
+
+	private static function executeOpenSsl(string $command): void {
+		$output = [];
+		$result = 0;
+
+		exec($command.' 2>&1', $output, $result);
+
+		if ($result !== 0) {
+			throw new Exception('Failed to execute OpenSSL command: '.implode("\n", $output));
+		}
+	}
+
+	private static function verifyCertificate(string $ca_cert, string $cert): void {
+		$output = [];
+		$result = 0;
+
+		exec('openssl verify -CAfile '.escapeshellarg($ca_cert).' '.escapeshellarg($cert).' 2>&1',
+				$output, $result);
+
+		if ($result !== 0) {
+			throw new Exception('Certificate verification failed: '.implode("\n", $output));
+		}
+	}
+
 	private function assertAdapterRequest(string $method, callable $predicate): void {
+		$deadline = time() + self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
+
 		do {
 			foreach ($this->readAdapterRequests() as $request) {
 				if ($request['method'] === $method && $predicate($request)) {
@@ -429,7 +534,9 @@ class testBridgeAdapter extends CIntegrationTest {
 				}
 			}
 		}
-		while (true);
+		while (time() < $deadline);
+
+		$this->fail('Failed to wait for bridge adapter request with method "'.$method.'".');
 	}
 
 	private function readAdapterRequests(): array {
@@ -549,18 +656,18 @@ class testBridgeAdapter extends CIntegrationTest {
 		$payload = $params['payload'];
 
 		if (array_keys($payload) !== [
-			'specversion', 'id', 'time', 'type', 'source', 'subject', 'schema', 'data'
+			'specversion', 'id', 'time', 'type', 'source', 'subject', 'dataschema', 'data'
 		]) {
 			return false;
 		}
 
 		if ($payload['specversion'] !== '1'
 				|| !is_string($payload['id'])
-				|| !is_int($payload['time'])
+				|| !is_string($payload['time'])
 				|| $payload['type'] !== $type
 				|| $payload['source'] !== 'zabbix/server'
 				|| !preg_match('/^event\/[0-9]+$/', $payload['subject'])
-				|| $payload['schema'] !== 'urn:zabbix:server:event:1') {
+				|| $payload['dataschema'] !== 'urn:zabbix:server:event:1') {
 			return false;
 		}
 
@@ -706,11 +813,11 @@ class testBridgeAdapter extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
 
 		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
-			return self::isExpectedRealNotificationRequest($request, 'problem.recovered',
+			return self::isExpectedRealNotificationRequest($request, 'problem.resolved',
 					self::NOTIFY_DEVICE_UUID);
 		});
 		$this->assertAdapterRequest('device.notify', static function (array $request): bool {
-			return self::isExpectedRealNotificationRequest($request, 'problem.recovered',
+			return self::isExpectedRealNotificationRequest($request, 'problem.resolved',
 					self::OFFBOARD_DEVICE_UUID);
 		});
 		$this->assertRealNotificationActionLog(true);
