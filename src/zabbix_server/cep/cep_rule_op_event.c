@@ -18,6 +18,7 @@
 #include "cep.h"
 #include "cep_task.h"
 #include "zabbix_server/cep/cep_event.h"
+#include "zabbix_server/cep/cep_rule_op_db.h"
 #include "zabbix_server/cep/cep_window.h"
 #include "zbx_cep.h"
 #include "zbx_trigger_constants.h"
@@ -507,6 +508,9 @@ static void	cep_operation_event_execute(const zbx_cep_operation_t *op, int execu
 				cep_operation_event_remove_tag(op, ctx, ack, event);
 			break;
 		case ZBX_CEP_OP_CLOSE:
+			cep_operation_db_execute_close_event(ruleid, ctx, tasks);
+			cep_acknowledge_update(ack, op->type);
+			break;
 		case ZBX_CEP_OP_DISCARD:
 			cep_acknowledge_update(ack, op->type);
 			break;
