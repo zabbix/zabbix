@@ -134,5 +134,9 @@ void	zbx_audit_item_update_json_add_data(int audit_context_mode, const zbx_templ
 		lld_audit_item_add_uint64(item, "discover", item->discover);
 	}
 
-	/* TODO: telemetry query related fields */
+	/* TODO: log query as object, not as string */
+	lld_audit_item_add_string(item, "query", item->query);
+	lld_audit_item_add_string(item, "time_shift", item->time_shift);
+	lld_audit_item_add_string(item, "lookback_limit", item->lookback_limit);
+	lld_audit_item_add_string(item, "granularity", item->granularity);
 }

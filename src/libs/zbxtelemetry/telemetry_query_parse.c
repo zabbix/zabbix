@@ -787,6 +787,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 	return SUCCEED;
 }
 
+/* TODO: if macro support inside query is dropped, remove it */
 /******************************************************************************
  *                                                                            *
  * Purpose: parses json_str contents and stores them into query and validates *
