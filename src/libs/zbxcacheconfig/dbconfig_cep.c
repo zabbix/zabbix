@@ -29,7 +29,7 @@ ZBX_PTR_VECTOR_IMPL(cep_rule_ptr, zbx_cep_rule_t *)
 ZBX_VECTOR_IMPL(cep_condition, zbx_cep_condition_t)
 ZBX_VECTOR_IMPL(cep_window_condition, zbx_cep_window_condition_t)
 ZBX_VECTOR_IMPL(cep_operation, zbx_cep_operation_t)
-ZBX_VECTOR_IMPL(cep_operation_tag, zbx_cep_operation_tag_t)
+ZBX_VECTOR_IMPL(cep_op_condition, zbx_cep_op_condition_t)
 
 typedef struct
 {
@@ -38,32 +38,47 @@ typedef struct
 }
 zbx_object_rel_t;
 
-static void	cep_operation_tag_clear(zbx_cep_operation_tag_t *tag)
+static void	cep_operation_condition_clear(zbx_cep_op_condition_t *condition)
 {
-	zbx_free(tag->tag);
-	zbx_free(tag->value);
+	switch (condition->type)
+	{
+		case ZBX_CONDITION_TYPE_EVENT_TAG:
+			zbx_free(condition->args.tag_name.tag);
+			break;
+		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
+			zbx_free(condition->args.tag_value.tag);
+			zbx_free(condition->args.tag_value.value);
+			break;
+	}
 }
 
-static int	cep_operation_tag_compare_by_id(const void *a1, const void *a2)
+static int	cep_op_condition_compare_by_id(const void *a1, const void *a2)
 {
-	const zbx_cep_operation_tag_t *ot1 = (const zbx_cep_operation_tag_t *)a1;
-	const zbx_cep_operation_tag_t *ot2 = (const zbx_cep_operation_tag_t *)a2;
+	const zbx_cep_op_condition_t *ot1 = (const zbx_cep_op_condition_t *)a1;
+	const zbx_cep_op_condition_t *ot2 = (const zbx_cep_op_condition_t *)a2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(ot1->cep_operation_tagid, ot2->cep_operation_tagid);
+	ZBX_RETURN_IF_NOT_EQUAL(ot1->cep_op_conditionid, ot2->cep_op_conditionid);
 
 	return 0;
 }
 
-static int	cep_operation_tag_compare_by_tag(const void *a1, const void *a2)
+static int	cep_op_condition_compare_by_condition(const void *a1, const void *a2)
 {
-	const zbx_cep_operation_tag_t *ot1 = (const zbx_cep_operation_tag_t *)a1;
-	const zbx_cep_operation_tag_t *ot2 = (const zbx_cep_operation_tag_t *)a2;
+	const zbx_cep_op_condition_t *oc1 = (const zbx_cep_op_condition_t *)a1;
+	const zbx_cep_op_condition_t *oc2 = (const zbx_cep_op_condition_t *)a2;
 
-	return strcmp(ot1->tag, ot2->tag);
+	ZBX_RETURN_IF_NOT_EQUAL(oc1->type, oc2->type);
 
-	return 0;
+	switch (oc1->type)
+	{
+		case ZBX_CONDITION_TYPE_EVENT_TAG:
+			return strcmp(oc1->args.tag_name.tag, oc2->args.tag_name.tag);
+		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
+			return strcmp(oc1->args.tag_value.tag, oc2->args.tag_value.tag);
+		default:
+			return 0;
+	}
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -114,9 +129,9 @@ static void	cep_operation_clear(zbx_cep_operation_t *operation)
 {
 	cep_operation_clear_args(operation);
 
-	for (int i = 0; i < operation->tags.values_num; i++)
-		cep_operation_tag_clear(&operation->tags.values[i]);
-	zbx_vector_cep_operation_tag_destroy(&operation->tags);
+	for (int i = 0; i < operation->conditions.values_num; i++)
+		cep_operation_condition_clear(&operation->conditions.values[i]);
+	zbx_vector_cep_op_condition_destroy(&operation->conditions);
 }
 
 static int	cep_operation_compare_by_id(const void *a1, const void *a2)
@@ -429,24 +444,32 @@ static void	cep_rule_copy_conditions(zbx_vector_cep_condition_t *dst, const zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copy CEP operation tags from one vector to another                *
+ * Purpose: copy CEP operation conditions from one vector to another          *
  *                                                                            *
  * Parameters: dst - [OUT] destination vector                                 *
  *             src - [IN] source vector                                       *
  *                                                                            *
  ******************************************************************************/
-static void	cep_operation_copy_tags(zbx_vector_cep_operation_tag_t *dst,
-		const zbx_vector_cep_operation_tag_t *src)
+static void	cep_operation_copy_conditions(zbx_vector_cep_op_condition_t *dst,
+		const zbx_vector_cep_op_condition_t *src)
 {
-	zbx_vector_cep_operation_tag_create(dst);
-	zbx_vector_cep_operation_tag_append_array(dst, src->values, src->values_num);
+	zbx_vector_cep_op_condition_create(dst);
+	zbx_vector_cep_op_condition_append_array(dst, src->values, src->values_num);
 
 	for (int i = 0; i < dst->values_num; i++)
 	{
-		zbx_cep_operation_tag_t	*tag = &dst->values[i];
+		zbx_cep_op_condition_t	*condition = &dst->values[i];
 
-		tag->tag = zbx_strdup(NULL, tag->tag);
-		tag->value = zbx_strdup(NULL, tag->value);
+		switch (condition->type)
+		{
+			case ZBX_CONDITION_TYPE_EVENT_TAG:
+				condition->args.tag_name.tag = zbx_strdup(NULL, condition->args.tag_name.tag);
+				break;
+			case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
+				condition->args.tag_value.tag = zbx_strdup(NULL, condition->args.tag_value.tag);
+				condition->args.tag_value.value = zbx_strdup(NULL, condition->args.tag_value.value);
+				break;
+		}
 	}
 }
 
@@ -498,7 +521,7 @@ static void	cep_rule_copy_operations(zbx_vector_cep_operation_t *dst, const zbx_
 				break;
 		}
 
-		cep_operation_copy_tags(&op->tags, &src->values[i].tags);
+		cep_operation_copy_conditions(&op->conditions, &src->values[i].conditions);
 	}
 }
 
@@ -695,7 +718,7 @@ zbx_cep_config_t	*cep_config_create(void)
 	zbx_hashset_create(&cep_config->operation_rel, 0, ZBX_DEFAULT_ID_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_hashset_create(&cep_config->operation_tag_rel, 0, ZBX_DEFAULT_ID_HASH_FUNC,
+	zbx_hashset_create(&cep_config->operation_condition_rel, 0, ZBX_DEFAULT_ID_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	return cep_config;
@@ -712,7 +735,7 @@ void	cep_config_destroy(zbx_cep_config_t *cep_config)
 	zbx_hashset_destroy(&cep_config->condition_rel);
 	zbx_hashset_destroy(&cep_config->window_condition_rel);
 	zbx_hashset_destroy(&cep_config->operation_rel);
-	zbx_hashset_destroy(&cep_config->operation_tag_rel);
+	zbx_hashset_destroy(&cep_config->operation_condition_rel);
 
 	if (NULL != cep_config->handle)
 		cep_config_handle_release(cep_config->handle);
@@ -884,15 +907,31 @@ static void	cep_operation_dump(zbx_cep_operation_t *operation)
 			" sortorder:%d %s", operation->operationid, operation->type, operation->execute_when,
 			operation->evaltype, operation->sortorder, ZBX_NULL2EMPTY_STR(args));
 
-	if (0 != operation->tags.values_num)
+	if (0 != operation->conditions.values_num)
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "      tags:");
-		for (int i = 0; i < operation->tags.values_num; i++)
+		zabbix_log(LOG_LEVEL_TRACE, "      conditions:");
+		for (int i = 0; i < operation->conditions.values_num; i++)
 		{
-			zabbix_log(LOG_LEVEL_TRACE, "        tagid:" ZBX_FS_UI64 " operator:%d tag:%s value:%s",
-					operation->tags.values[i].cep_operation_tagid,
-					operation->tags.values[i].operator, operation->tags.values[i].tag,
-					operation->tags.values[i].value);
+			args_offset = 0;
+			switch (operation->conditions.values[i].type)
+			{
+				case ZBX_CONDITION_TYPE_EVENT_TAG:
+					zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s",
+							operation->args.set_tag.tag);
+					break;
+				case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
+					zbx_snprintf_alloc(&args, &args_alloc, &args_offset, "tag:%s value:%s",
+						operation->args.set_tag.tag, operation->args.set_tag.value);
+					break;
+				default:
+					zbx_strcpy_alloc(&args, &args_alloc, &args_offset, "unknown");
+					break;
+			}
+
+			zabbix_log(LOG_LEVEL_TRACE, "        conditionid:" ZBX_FS_UI64 " type:%d operator:%d %s",
+					operation->conditions.values[i].cep_op_conditionid,
+					operation->conditions.values[i].type, operation->conditions.values[i].operator,
+					args);
 		}
 	}
 
@@ -1470,7 +1509,7 @@ static zbx_cep_operation_t	*cep_acquire_operation(zbx_cep_config_t *cep_config, 
 
 		index = rule->operations.values_num;
 
-		zbx_vector_cep_operation_tag_create(&op_local.tags);
+		zbx_vector_cep_op_condition_create(&op_local.conditions);
 		zbx_vector_cep_operation_append(&rule->operations, op_local);
 
 		zbx_hashset_insert(&cep_config->operation_rel, &rel_local, sizeof(rel_local));
@@ -1626,22 +1665,22 @@ static void	cep_sync_operations(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync
 
 /******************************************************************************
  *                                                                            *
- * Purpose: acquire a mutable CEP operation tag instance by tag identifier    *
+ * Purpose: acquire a mutable CEP operation condition instance by its id      *
  *                                                                            *
  * Parameters: cep_config   - [IN/OUT] CEP configuration                      *
  *             operationid  - [IN] operation identifier                       *
- *             tagid        - [IN] tag identifier                             *
+ *             conditionid  - [IN] condition identifier                       *
  *             revision     - [IN] revision to assign to the tag              *
  *             rules        - [OUT] updated rules, can be NULL                *
  *                                                                            *
- * Return value: pointer to the acquired CEP operation tag                    *
+ * Return value: pointer to the acquired CEP operation condition              *
  *                                                                            *
  ******************************************************************************/
-static zbx_cep_operation_tag_t	*cep_acquire_operation_tag(zbx_cep_config_t *cep_config, zbx_uint64_t operationid,
-		zbx_uint64_t tagid, zbx_uint64_t revision, zbx_vector_cep_rule_ptr_t *rules)
+static zbx_cep_op_condition_t	*cep_acquire_operation_condition(zbx_cep_config_t *cep_config, zbx_uint64_t operationid,
+		zbx_uint64_t conditionid, zbx_uint64_t revision, zbx_vector_cep_rule_ptr_t *rules)
 {
 	zbx_cep_operation_t		*operation;
-	zbx_cep_operation_tag_t		tag_local = {.cep_operation_tagid = tagid};
+	zbx_cep_op_condition_t		tag_local = {.cep_op_conditionid = conditionid};
 	zbx_object_rel_t		rel_local = {.objectid = operationid}, *rel;
 	int				index;
 
@@ -1651,40 +1690,40 @@ static zbx_cep_operation_tag_t	*cep_acquire_operation_tag(zbx_cep_config_t *cep_
 	if (NULL == (operation = cep_acquire_operation(cep_config, rel->parentid, operationid, revision, rules)))
 		return NULL;
 
-	if (FAIL == (index = zbx_vector_cep_operation_tag_search(&operation->tags, tag_local,
-			cep_operation_tag_compare_by_id)))
+	if (FAIL == (index = zbx_vector_cep_op_condition_search(&operation->conditions, tag_local,
+			cep_op_condition_compare_by_id)))
 	{
-		zbx_object_rel_t	tag_rel = {.objectid = tagid, .parentid = operationid};
+		zbx_object_rel_t	tag_rel = {.objectid = conditionid, .parentid = operationid};
 
-		index = operation->tags.values_num;
-		zbx_vector_cep_operation_tag_append(&operation->tags, tag_local);
-		zbx_hashset_insert(&cep_config->operation_tag_rel, &tag_rel, sizeof(tag_rel));
+		index = operation->conditions.values_num;
+		zbx_vector_cep_op_condition_append(&operation->conditions, tag_local);
+		zbx_hashset_insert(&cep_config->operation_condition_rel, &tag_rel, sizeof(tag_rel));
 	}
 
-	return &operation->tags.values[index];
+	return &operation->conditions.values[index];
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: remove a CEP operation tag from configuration                     *
+ * Purpose: remove a CEP operation condition from configuration               *
  *                                                                            *
- * Parameters: cep_config - [IN/OUT] CEP configuration                        *
- *             tagid      - [IN] tag identifier                               *
- *             revision   - [IN] revision to assign to the affected           *
+ * Parameters: cep_config  - [IN/OUT] CEP configuration                       *
+ *             conditionid - [IN] condition identifier                        *
+ *             revision    - [IN] revision to assign to the affected          *
  *                              operation                                     *
- *             rules        - [OUT] updated rules, can be NULL                *
+ *             rules       - [OUT] updated rules, can be NULL                 *
  *                                                                            *
  ******************************************************************************/
-static void	cep_remove_operation_tag(zbx_cep_config_t *cep_config, zbx_uint64_t tagid, zbx_uint64_t revision,
-		zbx_vector_cep_rule_ptr_t *rules)
+static void	cep_remove_operation_condition(zbx_cep_config_t *cep_config, zbx_uint64_t conditionid,
+		zbx_uint64_t revision, zbx_vector_cep_rule_ptr_t *rules)
 {
 	zbx_cep_operation_t		*operation;
-	zbx_cep_operation_tag_t		tag_local = {.cep_operation_tagid = tagid};
-	zbx_object_rel_t		rel_local = {.objectid = tagid}, *rel;
+	zbx_cep_op_condition_t		tag_local = {.cep_op_conditionid = conditionid};
+	zbx_object_rel_t		rel_local = {.objectid = conditionid}, *rel;
 	zbx_object_rel_t		op_rel_local, *op_rel;
 	int				index;
 
-	if (NULL == (rel = (zbx_object_rel_t *)zbx_hashset_search(&cep_config->operation_tag_rel, &rel_local)))
+	if (NULL == (rel = (zbx_object_rel_t *)zbx_hashset_search(&cep_config->operation_condition_rel, &rel_local)))
 		return;
 
 	op_rel_local.objectid = rel->parentid;
@@ -1694,19 +1733,19 @@ static void	cep_remove_operation_tag(zbx_cep_config_t *cep_config, zbx_uint64_t 
 	if (NULL == (operation = cep_acquire_operation(cep_config, op_rel->parentid, rel->parentid, revision, rules)))
 		goto out;
 
-	if (FAIL != (index = zbx_vector_cep_operation_tag_search(&operation->tags, tag_local,
-			cep_operation_tag_compare_by_id)))
+	if (FAIL != (index = zbx_vector_cep_op_condition_search(&operation->conditions, tag_local,
+			cep_op_condition_compare_by_id)))
 	{
-		cep_operation_tag_clear(&operation->tags.values[index]);
-		zbx_vector_cep_operation_tag_remove(&operation->tags, index);
+		cep_operation_condition_clear(&operation->conditions.values[index]);
+		zbx_vector_cep_op_condition_remove(&operation->conditions, index);
 	}
 out:
-	zbx_hashset_remove_direct(&cep_config->operation_tag_rel, rel);
+	zbx_hashset_remove_direct(&cep_config->operation_condition_rel, rel);
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: cache CEP operation tags from database                            *
+ * Purpose: cache CEP operation conditions from database                      *
  *                                                                            *
  * Parameters: cep_config - [IN/OUT] CEP configuration                        *
  *             sync       - [IN/OUT] database synchronization data            *
@@ -1714,7 +1753,7 @@ out:
  *             rules      - [OUT] updated rules, can be NULL                  *
  *                                                                            *
  ******************************************************************************/
-static void	cep_sync_operation_tags(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, zbx_uint64_t revision,
+static void	cep_sync_operation_conditions(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, zbx_uint64_t revision,
 		zbx_vector_cep_rule_ptr_t *rules)
 {
 	char		**row;
@@ -1729,7 +1768,7 @@ static void	cep_sync_operation_tags(zbx_cep_config_t *cep_config, zbx_dbsync_t *
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
 		zbx_uint64_t		tagid, operationid;
-		zbx_cep_operation_tag_t	*operation_tag;
+		zbx_cep_op_condition_t	*op_condition;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -1738,20 +1777,29 @@ static void	cep_sync_operation_tags(zbx_cep_config_t *cep_config, zbx_dbsync_t *
 		ZBX_STR2UINT64(tagid, row[0]);
 		ZBX_STR2UINT64(operationid, row[1]);
 
-		if (NULL == (operation_tag = cep_acquire_operation_tag(cep_config, operationid, tagid, revision,
+		if (NULL == (op_condition = cep_acquire_operation_condition(cep_config, operationid, tagid, revision,
 			rules)))
 		{
 			continue;
 		}
 
-		operation_tag->operator = atoi(row[2]);
-		ZBX_DBROW2STR(operation_tag->tag, row[3]);
-		ZBX_DBROW2STR(operation_tag->value, row[4]);
+		op_condition->type = atoi(row[2]);
+		op_condition->operator = atoi(row[3]);
+
+		switch (op_condition->type)
+		{
+			case ZBX_CONDITION_TYPE_EVENT_TAG:
+				ZBX_DBROW2STR(op_condition->args.tag_name.tag, row[4]);
+				break;
+			case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
+				ZBX_DBROW2STR(op_condition->args.tag_value.tag, row[4]);
+				ZBX_DBROW2STR(op_condition->args.tag_value.value, row[5]);
+		}
 	}
 
-	/* remove deleted cep operation tags */
+	/* remove deleted cep operation conditions */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
-		cep_remove_operation_tag(cep_config, rowid, revision, rules);
+		cep_remove_operation_condition(cep_config, rowid, revision, rules);
 
 	if (0 != sync->add_num + sync->update_num + sync->remove_num)
 		cep_config->revision = revision;
@@ -1811,7 +1859,10 @@ static void	cep_rule_prepare_operations(zbx_cep_rule_t *rule)
 	zbx_vector_cep_operation_sort(&rule->operations, cep_operation_compare_by_sortorder);
 
 	for (int i = 0; i < rule->operations.values_num; i++)
-		zbx_vector_cep_operation_tag_sort(&rule->operations.values[i].tags, cep_operation_tag_compare_by_tag);
+	{
+		zbx_vector_cep_op_condition_sort(&rule->operations.values[i].conditions,
+				cep_op_condition_compare_by_condition);
+	}
 }
 
 /******************************************************************************
@@ -1869,12 +1920,12 @@ static void	cep_update_rules(zbx_cep_config_t *cep_config, zbx_vector_cep_rule_p
  *             window_sync          - [IN/OUT] window sync data               *
  *             window_condition_sync - [IN/OUT] window condition sync data    *
  *             operation_sync       - [IN/OUT] operation sync data            *
- *             operation_tag_sync   - [IN/OUT] operation tag sync data        *
+ *             op_condition_sync    - [IN/OUT] operation condition sync data  *
  *             revision             - [IN] current configuration revision     *
  *                                                                            *
  ******************************************************************************/
 void	cep_config_sync(zbx_dbsync_t *rule_sync, zbx_dbsync_t *condition_sync, zbx_dbsync_t *window_sync,
-		zbx_dbsync_t *window_condition_sync, zbx_dbsync_t *operation_sync, zbx_dbsync_t *operation_tag_sync,
+		zbx_dbsync_t *window_condition_sync, zbx_dbsync_t *operation_sync, zbx_dbsync_t *op_condition_sync,
 		zbx_uint64_t revision)
 {
 	zbx_vector_cep_rule_ptr_t	rules_cond, *prules_cond = NULL, rules_op, *prules_op = NULL;
@@ -1894,7 +1945,7 @@ void	cep_config_sync(zbx_dbsync_t *rule_sync, zbx_dbsync_t *condition_sync, zbx_
 	cep_sync_windows(cep_config, window_sync, revision);
 	cep_sync_window_conditions(cep_config, window_condition_sync, revision);
 	cep_sync_operations(cep_config, operation_sync, revision, prules_op);
-	cep_sync_operation_tags(cep_config, operation_tag_sync, revision, prules_op);
+	cep_sync_operation_conditions(cep_config, op_condition_sync, revision, prules_op);
 
 	cep_update_rules(cep_config, prules_cond, prules_op);
 	cep_config_update_handle(cep_config, revision);

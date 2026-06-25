@@ -78,7 +78,7 @@
 #define ZBX_DBSYNC_OBJ_CEP_WINDOW		25
 #define ZBX_DBSYNC_OBJ_CEP_WINDOW_CONDITION	26
 #define ZBX_DBSYNC_OBJ_CEP_OPERATION		27
-#define ZBX_DBSYNC_OBJ_CEP_OPERATION_TAG	28
+#define ZBX_DBSYNC_OBJ_CEP_OPERATION_CONDITION	28
 
 #define ZBX_DBSYNC_OBJ_ITEM_DISCOVERY	29	/* virtual object */
 /* number of dbsync objects - keep in sync with above defines */
@@ -274,7 +274,7 @@ int	zbx_dbsync_prepare_cep_condition(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_cep_window(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_cep_window_condition(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_cep_operation(zbx_dbsync_t *sync);
-int	zbx_dbsync_prepare_cep_operation_tag(zbx_dbsync_t *sync);
+int	zbx_dbsync_prepare_cep_operation_condition(zbx_dbsync_t *sync);
 
 void	zbx_dcsync_sql_start(zbx_dbsync_t *sync);
 void	zbx_dcsync_sql_end(zbx_dbsync_t *sync);

@@ -48,7 +48,7 @@ typedef struct
 	zbx_hashset_t		condition_rel;
 	zbx_hashset_t		window_condition_rel;
 	zbx_hashset_t		operation_rel;
-	zbx_hashset_t		operation_tag_rel;
+	zbx_hashset_t		operation_condition_rel;
 
 	zbx_uint64_t		revision;
 	zbx_atomic_int_t	rules_num;
@@ -59,7 +59,7 @@ zbx_cep_config_t	*cep_config_create(void);
 void	cep_config_destroy(zbx_cep_config_t *cep_config);
 
 void	cep_config_sync(zbx_dbsync_t *rule_sync, zbx_dbsync_t *condition_sync, zbx_dbsync_t *window_sync,
-		zbx_dbsync_t *window_condition_sync, zbx_dbsync_t *operation_sync, zbx_dbsync_t *operation_tag_sync,
+		zbx_dbsync_t *window_condition_sync, zbx_dbsync_t *operation_sync, zbx_dbsync_t *op_condition_sync,
 		zbx_uint64_t revision);
 
 #endif

@@ -14,6 +14,7 @@
 
 #include "cep_rule.h"
 #include "cep.h"
+#include "zabbix_server/cep/cep_event.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbx_cep.h"
@@ -28,59 +29,167 @@
 /* WDN placeholder for proper defines */
 #define ZBX_CEP_EXECUTE_ON_EVENT_OCCURRED	1
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate string condition operator against raw values             *
+ *                                                                            *
+ * Parameters: operator - [IN] condition operator to apply                    *
+ *             pattern  - [IN] condition pattern to compare against           *
+ *             value    - [IN] value to evaluate                              *
+ *                                                                            *
+ * Return value: 1 if condition is met, 0 otherwise                           *
+ *                                                                            *
+ * Comments: NOT_EQUAL and NOT_LIKE negation is expected to be handled by     *
+ *           the caller.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	cep_condition_eval_value_str_raw(int operator, const char *pattern, const char *value)
+{
+	switch (operator)
+	{
+		case ZBX_CONDITION_OPERATOR_EQUAL:
+		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
+			return (0 == strcmp(value, pattern) ? 1 : 0);
+		case ZBX_CONDITION_OPERATOR_LIKE:
+		case ZBX_CONDITION_OPERATOR_NOT_LIKE:
+			return (NULL != strstr(value, pattern) ? 1 : 0);
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported operator %d used with string values", operator);
+
+	return 0;
+}
+
+static int	cep_condition_compare_value_str(const char *pattern, const char *value)
+{
+	double	cond_dbl, event_dbl;
+
+	if (SUCCEED == zbx_is_double(pattern, &cond_dbl) && SUCCEED == zbx_is_double(value, &event_dbl))
+	{
+		ZBX_RETURN_IF_DBL_NOT_EQUAL(cond_dbl, event_dbl);
+		return 0;
+	}
+
+	return strcmp(pattern, value);
+}
+
+static int	cep_condition_eval_value(int operator, const char *pattern, const char *value)
+{
+	switch (operator)
+	{
+		case ZBX_CONDITION_OPERATOR_MORE_EQUAL:
+			if (0 >= cep_condition_compare_value_str(pattern, value))
+				return 1;
+			break;
+		case ZBX_CONDITION_OPERATOR_LESS_EQUAL:
+			if (0 <= cep_condition_compare_value_str(pattern, value))
+				return 1;
+			break;
+		default:
+			return cep_condition_eval_value_str_raw(operator, pattern, value);
+	}
+
+	return 0;
+}
+
 /*
  * operations
  */
 
-/******************************************************************************
- *                                                                            *
- * Purpose: evaluate operation tag filter condition for event                 *
- *                                                                            *
- * Parameters: tag   - [IN] tag filter condition to evaluate                  *
- *             event - [IN] event to evaluate against                         *
- *             ctx   - [IN/OUT] event context for caching resolved values     *
- *                                                                            *
- * Return value: 1 if condition is met, 0 otherwise                           *
- *                                                                            *
- ******************************************************************************/
-static int	cep_operation_tag_eval(const zbx_cep_operation_tag_t *tag, zbx_cep_event_context_t *ctx)
+static int	cep_operation_condition_eval_tag(const zbx_cep_op_condition_t *condition, zbx_cep_event_context_t *ctx)
 {
-	int	ret = 0;
+	zbx_cep_event_t	*event;
+	int		ret;
 
-	if ('$' == *tag->tag)
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tag:%s", __func__, condition->args.tag_name.tag);
+
+	event = cep_event_context_get_event(ctx);
+
+	ret = (FAIL == cep_event_find_tag(event, condition->args.tag_name.tag) ? 0 : 1);
+
+	if (ZBX_CONDITION_OPERATOR_NOT_EXIST == condition->operator)
+		ret = !ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%d", __func__, ret);
+
+	return ret;
+}
+
+static int	cep_operation_condition_eval_tag_value(const zbx_cep_op_condition_t *condition,
+		zbx_cep_event_context_t *ctx)
+{
+	const zbx_cep_args_tag_value_t	*args = &condition->args.tag_value;
+	int				ret = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tag:%s value:%s", __func__, args->tag, args->value);
+
+	if ('$' == *args->tag)
 	{
-		const char	*value = cep_event_context_get_builtin_tag(ctx, tag->tag);
+		const char	*value = cep_event_context_get_builtin_tag(ctx, args->tag);
 
-		if (NULL != value && 0 == strcmp(value, tag->value))
-			ret = 1;
+		if (NULL != value)
+			ret = cep_condition_eval_value(condition->operator, args->value, value);
 	}
 	else
 	{
 		zbx_cep_event_t	*event = cep_event_context_get_event(ctx);
 
-		for (int i = 0; i < event->tags.values_num; i++)
+		for (int i = 0; i < event->tags.values_num && 0 == ret; i++)
 		{
-			if (0 == strcmp(tag->tag, event->tags.values[i].tag))
-			{
-				if (0 == strcmp(tag->value, event->tags.values[i].value))
-				{
-					ret = 1;
-					break;
-				}
+			if (0 != strcmp(args->tag, event->tags.values[i].tag))
+				continue;
 
-			}
+			ret = cep_condition_eval_value(condition->operator, args->value,
+				event->tags.values[i].value);
 		}
 	}
 
-	if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == tag->operator)
-		ret = !ret;
+	switch (condition->operator)
+	{
+		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
+		case ZBX_CONDITION_OPERATOR_NOT_LIKE:
+			ret = !ret;
+			break;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%d", __func__, ret);
 
 	return ret;
 }
 
+static int	cep_operation_condition_eval(const zbx_cep_op_condition_t *condition, zbx_cep_event_context_t *ctx)
+{
+	switch (condition->type)
+	{
+		case ZBX_CONDITION_TYPE_EVENT_TAG:
+			return cep_operation_condition_eval_tag(condition, ctx);
+		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
+			return cep_operation_condition_eval_tag_value(condition, ctx);
+		default:
+			THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported operation condition type %d", condition->type);
+			return 0;
+	}
+}
+
+static int	cep_operation_condition_match_key(const zbx_cep_op_condition_t *oc1, const zbx_cep_op_condition_t *oc2)
+{
+	ZBX_RETURN_IF_NOT_EQUAL(oc1->type, oc2->type);
+
+	switch (oc1->type)
+	{
+		case ZBX_CONDITION_TYPE_EVENT_TAG:
+			return strcmp(oc1->args.tag_name.tag, oc2->args.tag_name.tag);
+		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
+			return strcmp(oc1->args.tag_value.tag, oc2->args.tag_value.tag);
+		default:
+			return 0;
+	}
+}
+
+
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate AND/OR operation tag filter conditions for event         *
+ * Purpose: evaluate AND/OR operation conditions for event                    *
  *                                                                            *
  * Parameters: op    - [IN] operation whose tag conditions to evaluate        *
  *             ctx   - [IN/OUT] event context for caching resolved values     *
@@ -92,14 +201,20 @@ static int	cep_operation_tag_eval(const zbx_cep_operation_tag_t *tag, zbx_cep_ev
  ******************************************************************************/
 static int	cep_operation_eval_and_or(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx)
 {
-	for (int i = 0, j = 0; i < op->tags.values_num; i = j)
+	for (int i = 0, j = 0; i < op->conditions.values_num; i = j)
 	{
 		int	ret = 0;
 
-		for (j = i; j < op->tags.values_num && 0 == strcmp(op->tags.values[j].tag, op->tags.values[i].tag); j++)
+		for (j = i; j < op->conditions.values_num; j++)
 		{
+			if (0 != cep_operation_condition_match_key(&op->conditions.values[j],
+					&op->conditions.values[i]))
+			{
+				break;
+			}
+
 			if (0 == ret)
-				ret = cep_operation_tag_eval(&op->tags.values[j], ctx);
+				ret = cep_operation_condition_eval(&op->conditions.values[j], ctx);
 		}
 
 		if (0 == ret)
@@ -111,7 +226,7 @@ static int	cep_operation_eval_and_or(const zbx_cep_operation_t *op, zbx_cep_even
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate OR operation tag filter conditions for event             *
+ * Purpose: evaluate OR operation conditions for event                        *
  *                                                                            *
  * Parameters: op    - [IN] operation whose tag conditions to evaluate        *
  *             ctx   - [IN/OUT] event context for caching resolved values     *
@@ -121,9 +236,9 @@ static int	cep_operation_eval_and_or(const zbx_cep_operation_t *op, zbx_cep_even
  ******************************************************************************/
 static int	cep_operation_eval_or(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx)
 {
-	for (int i = 0; i < op->tags.values_num; i++)
+	for (int i = 0; i < op->conditions.values_num; i++)
 	{
-		if (0 != cep_operation_tag_eval(&op->tags.values[i], ctx))
+		if (0 != cep_operation_condition_eval(&op->conditions.values[i], ctx))
 			return SUCCEED;
 	}
 
@@ -132,9 +247,9 @@ static int	cep_operation_eval_or(const zbx_cep_operation_t *op, zbx_cep_event_co
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if event matches operation tag filter                       *
+ * Purpose: check if event matches operation condition                        *
  *                                                                            *
- * Parameters: op    - [IN] operation whose tag filter to match               *
+ * Parameters: op    - [IN] operation to match                                *
  *             ctx   - [IN/OUT] event context for caching resolved values     *
  *                                                                            *
  * Return value: SUCCEED if event matches the filter, FAIL otherwise          *
@@ -148,7 +263,7 @@ int	cep_operation_match_event(const zbx_cep_operation_t *op, zbx_cep_event_conte
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, op->operationid);
 
-	if (0 == op->tags.values_num)
+	if (0 == op->conditions.values_num)
 	{
 		ret = SUCCEED;
 		goto out;
@@ -175,37 +290,6 @@ out:
 /*
  * conditions
  */
-
-/******************************************************************************
- *                                                                            *
- * Purpose: evaluate string condition operator against raw values             *
- *                                                                            *
- * Parameters: operator    - [IN] condition operator to apply                 *
- *             cond_value  - [IN] condition value to compare against          *
- *             event_value - [IN] event value to evaluate                     *
- *                                                                            *
- * Return value: 1 if condition is met, 0 otherwise                           *
- *                                                                            *
- * Comments: NOT_EQUAL and NOT_LIKE negation is expected to be handled by     *
- *           the caller.                                                      *
- *                                                                            *
- ******************************************************************************/
-static int	cep_condition_eval_value_str_raw(int operator, const char *cond_value, const char *event_value)
-{
-	switch (operator)
-	{
-		case ZBX_CONDITION_OPERATOR_EQUAL:
-		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
-			return (0 == strcmp(event_value, cond_value) ? 1 : 0);
-		case ZBX_CONDITION_OPERATOR_LIKE:
-		case ZBX_CONDITION_OPERATOR_NOT_LIKE:
-			return (NULL != strstr(event_value, cond_value) ? 1 : 0);
-	}
-
-	THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported operator %d used with string values", operator);
-
-	return 0;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -279,19 +363,6 @@ static int	cep_condition_eval_tag_name(int operator, const zbx_cep_args_tag_name
 	return ret;
 }
 
-static int	cep_condition_compare_value_str(const char *cond_value, const char *event_value)
-{
-	double	cond_dbl, event_dbl;
-
-	if (SUCCEED == zbx_is_double(cond_value, &cond_dbl) && SUCCEED == zbx_is_double(event_value, &event_dbl))
-	{
-		ZBX_RETURN_IF_DBL_NOT_EQUAL(cond_dbl, event_dbl);
-		return 0;
-	}
-
-	return strcmp(cond_value, event_value);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: evaluate event tag value condition                                *
@@ -320,27 +391,7 @@ static int	cep_condition_eval_tag_value(int operator, const zbx_cep_args_tag_val
 		if (0 != strcmp(args->tag, ctx->db_event->tags.values[i]->tag))
 			continue;
 
-		switch (operator)
-		{
-			case ZBX_CONDITION_OPERATOR_MORE_EQUAL:
-				if (0 >= cep_condition_compare_value_str(args->value,
-						ctx->db_event->tags.values[i]->value))
-				{
-					ret = 1;
-				}
-				break;
-			case ZBX_CONDITION_OPERATOR_LESS_EQUAL:
-				if (0 <= cep_condition_compare_value_str(args->value,
-						ctx->db_event->tags.values[i]->value))
-				{
-					ret = 1;
-				}
-				break;
-			default:
-				ret = cep_condition_eval_value_str_raw(operator, args->value,
-						ctx->db_event->tags.values[i]->value);
-				break;
-		}
+		ret = cep_condition_eval_value(operator, args->value, ctx->db_event->tags.values[i]->value);
 	}
 
 	switch (operator)

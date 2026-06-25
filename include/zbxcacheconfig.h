@@ -1780,16 +1780,23 @@ typedef struct
 }
 zbx_cep_args_time_period_t;
 
+typedef union
+{
+	zbx_cep_args_tag_name_t		tag_name;
+	zbx_cep_args_tag_value_t	tag_value;
+}
+zbx_cep_op_condition_args_t;
+
 typedef struct
 {
-	zbx_uint64_t	cep_operation_tagid;
-	int		operator;
-	char		*tag;
-	char		*value;
+	zbx_uint64_t			cep_op_conditionid;
+	int				type;
+	int				operator;
+	zbx_cep_op_condition_args_t	args;
 }
-zbx_cep_operation_tag_t;
+zbx_cep_op_condition_t;
 
-ZBX_VECTOR_DECL(cep_operation_tag, zbx_cep_operation_tag_t)
+ZBX_VECTOR_DECL(cep_op_condition, zbx_cep_op_condition_t)
 
 typedef union
 {
@@ -1804,7 +1811,7 @@ typedef union
 	zbx_cep_args_tag_pair_t		rename_tag;
 	zbx_cep_args_suppress_t		suppress;
 }
-zbx_cep_operation_args_t;
+zbx_cep_op_args_t;
 
 typedef struct
 {
@@ -1813,8 +1820,8 @@ typedef struct
 	int				execute_when;
 	int				evaltype;
 	int				sortorder;
-	zbx_cep_operation_args_t	args;
-	zbx_vector_cep_operation_tag_t	tags;
+	zbx_cep_op_args_t		args;
+	zbx_vector_cep_op_condition_t	conditions;
 }
 zbx_cep_operation_t;
 
