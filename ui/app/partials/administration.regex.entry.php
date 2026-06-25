@@ -73,7 +73,9 @@
 	)
 	->show();
 
-(new CRow())->addItem((new CCol())
+(new CRow())
+	->addClass('error-container-row')
+	->addItem((new CCol())
 	->setId('expressions-'.$data['index'].'-error-container')
 	->addClass(ZBX_STYLE_ERROR_CONTAINER)
 	->setAttribute('colspan', 6))

@@ -78,7 +78,7 @@ window.regex_edit_popup = new class {
 
 		table.addEventListener('change', e => {
 			if (e.target.classList.contains('js-clear-row-result')) {
-				this.#clearRowResult(e)
+				this.#clearRowResult(e);
 			}
 		})
 
