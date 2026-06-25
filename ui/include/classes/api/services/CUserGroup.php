@@ -320,14 +320,8 @@ class CUserGroup extends CApiService {
 			'proxy_groups' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['proxy_groupid']], 'fields' => [
 				'proxy_groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'proxy_mode' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'in' => implode(',', [PROXY_MODE_ALLOW, PROXY_MODE_DENY]), 'type' => API_INT32,],
-											['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'proxy_group_mode' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'in' => implode(',', [PROXY_GROUP_MODE_ALLOW, PROXY_GROUP_MODE_DENY]), 'type' => API_INT32,],
-											['else' => true, 'type' => API_UNEXPECTED]
-			]]
+			'proxy_mode' =>				['type' => API_INT32, 'in' => implode(',', [PROXY_MODE_ALLOW, PROXY_MODE_DENY])],
+			'proxy_group_mode' =>		['type' => API_INT32, 'in' => implode(',', [PROXY_GROUP_MODE_ALLOW, PROXY_GROUP_MODE_DENY])]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -437,14 +431,8 @@ class CUserGroup extends CApiService {
 			'proxy_groups' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['proxy_groupid']], 'fields' => [
 				'proxy_groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'proxy_mode' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_INT32, 'in' => implode(',', [PROXY_MODE_ALLOW, PROXY_MODE_DENY])],
-											['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'proxy_group_mode' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_INT32, 'in' => implode(',', [PROXY_GROUP_MODE_ALLOW, PROXY_GROUP_MODE_DENY])],
-											['else' => true, 'type' => API_UNEXPECTED]
-			]]
+			'proxy_mode' =>				['type' => API_INT32, 'in' => implode(',', [PROXY_MODE_ALLOW, PROXY_MODE_DENY])],
+			'proxy_group_mode' =>		['type' => API_INT32, 'in' => implode(',', [PROXY_GROUP_MODE_ALLOW, PROXY_GROUP_MODE_DENY])]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
@@ -712,13 +700,11 @@ class CUserGroup extends CApiService {
 			}
 
 			if (array_key_exists($proxyid, $db_proxies)) {
-				foreach ($db_proxies as $db_proxy) {
-					if (array_key_exists('proxy_groupid', $db_proxy) && $db_proxy['proxy_groupid'] != '0') {
-						self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-							'/'.($i1 + 1).'/proxies/'.($i2 + 1).'/proxyid',
-							_('access to this proxy is managed by its proxy group')
-						));
-					}
+				if ($db_proxies[$proxyid]['proxy_groupid'] != '0') {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i1 + 1).'/proxies/'.($i2 + 1).'/proxyid',
+						_('access to this proxy is managed by its proxy group')
+					));
 				}
 			}
 		}
