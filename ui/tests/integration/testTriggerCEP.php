@@ -1378,6 +1378,72 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_AddServices
 	 */
 	public function testTriggerCEP_OpenProblemWithServices() {
+		$this->runOpenProblemWithServicesTest(false);
+	}
+
+	/**
+	 * Repeat of testTriggerCEP_CloseProblem with the services and actions in place: the problem closes
+	 * and every per-trigger service recovers to OK with no open service problems.
+	 *
+	 * @depends testTriggerCEP_OpenProblemWithServices
+	 */
+	public function testTriggerCEP_CloseProblemWithServices() {
+		$this->runCloseProblemWithServicesTest(false);
+	}
+
+	/**
+	 * Open a problem and send the recovery immediately afterwards, without waiting for the problem to be
+	 * confirmed first, and verify CEP still generates both events per trigger: one PROBLEM event followed
+	 * by one RESOLVED event. Guards against the open and close collapsing into a single event (or the
+	 * problem being dropped) when they arrive back-to-back.
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecovery() {
+		$this->runOpenAndImmediateRecoveryTest(false);
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_OpenProblemWithServices but the server component is stopped and
+	 * restarted first, to verify the problem opens and the per-trigger services follow it to PROBLEM
+	 * after a fresh restart. Depends on the non-restart close so it starts from the recovered state.
+	 *
+	 * @depends testTriggerCEP_CloseProblemWithServices
+	 */
+	public function testTriggerCEP_OpenProblemWithServicesRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->runOpenProblemWithServicesTest(true);
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_CloseProblemWithServices but the server component is stopped and
+	 * restarted first, to verify recovery and service status after a fresh restart.
+	 *
+	 * @depends testTriggerCEP_OpenProblemWithServicesRestart
+	 */
+	public function testTriggerCEP_CloseProblemWithServicesRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->runCloseProblemWithServicesTest(true);
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_OpenAndImmediateRecovery but the server component is stopped and
+	 * restarted first, to verify CEP still emits one event per transition after a fresh restart.
+	 *
+	 * @depends testTriggerCEP_OpenAndImmediateRecovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecoveryRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->runOpenAndImmediateRecoveryTest(true);
+	}
+
+	/**
+	 * Open the problem and let every per-trigger service follow it to PROBLEM (disaster). When $restart is
+	 * true, the server is restarted first.
+	 */
+	private function runOpenProblemWithServicesTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$triggerids = self::$discovered_triggerids;
 
@@ -1389,12 +1455,12 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
-	 * Repeat of testTriggerCEP_CloseProblem with the services and actions in place: the problem closes
-	 * and every per-trigger service recovers to OK with no open service problems.
-	 *
-	 * @depends testTriggerCEP_OpenProblemWithServices
+	 * Close the problem and let every per-trigger service recover to OK with no open service problems.
+	 * When $restart is true, the server is restarted first.
 	 */
-	public function testTriggerCEP_CloseProblemWithServices() {
+	private function runCloseProblemWithServicesTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$triggerids = self::$discovered_triggerids;
 
@@ -1407,14 +1473,12 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
-	 * Open a problem and send the recovery immediately afterwards, without waiting for the problem to be
-	 * confirmed first, and verify CEP still generates both events per trigger: one PROBLEM event followed
-	 * by one RESOLVED event. Guards against the open and close collapsing into a single event (or the
-	 * problem being dropped) when they arrive back-to-back.
-	 *
-	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 * Open a problem and send the recovery immediately afterwards, verifying CEP emits one PROBLEM event
+	 * followed by one RESOLVED event per trigger. When $restart is true, the server is restarted first.
 	 */
-	public function testTriggerCEP_OpenAndImmediateRecovery() {
+	private function runOpenAndImmediateRecoveryTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$triggerids = self::$discovered_triggerids;
 
