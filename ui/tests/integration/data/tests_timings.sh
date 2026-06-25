@@ -48,6 +48,7 @@ declare -A BASELINE_TIMES=(
   [testUserMacrosInItemNames]=18
   [testBrowserMonitoring]=17
   [testAutoregistrationHostMetaDataItem]=16
+  [testWebScenarioDynamicVariables]=15
   [testAgentItems]=13
   [testTagInheritance]=11
   [testDiagInfo]=10
@@ -55,6 +56,5 @@ declare -A BASELINE_TIMES=(
   [testAutoregistration]=10
   [testUserMacrosWithContext]=10
   [testGraphLinking]=8
-  [testWebScenarioDynamicVariables]=5
   [testFunctions]=3
 )
