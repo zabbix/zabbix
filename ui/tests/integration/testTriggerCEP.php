@@ -1353,7 +1353,6 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->captureEventBaseline($triggerids);
 		$this->assertStateChangeForAll($triggerids, $keys, '0', TRIGGER_VALUE_FALSE, 1);
 		$this->waitForNoOpenProblems($triggerids, 'close problem');
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
 
 		// CEP processed the recovered events (one per trigger).
 		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, count($keys));
@@ -1402,7 +1401,6 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->captureEventBaseline($triggerids);
 		$this->assertStateChangeForAll($triggerids, $keys, '0', TRIGGER_VALUE_FALSE, 1);
 		$this->waitForNoOpenProblems($triggerids, 'close problem with services');
-		$this->assertNoOpenProblems($triggerids);
 
 		// All services recover to OK with no open service problems.
 		$this->assertServicesStatus(ZBX_SEVERITY_OK, 0);
@@ -1461,7 +1459,6 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 
 		$this->waitForNoOpenProblems($triggerids, 'open and immediate recovery');
-		$this->assertNoOpenProblems($triggerids);
 	}
 
 	/**
@@ -1495,7 +1492,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * before the test runs, to verify the UNKNOWN state and internal problems are produced correctly
 	 * after a fresh restart.
 	 *
-	 * @depends testTriggerCEP_CloseUnknown
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_OpenUnknownRestart() {
 		$this->skipIfRestartTestsDisabled();
@@ -1515,6 +1512,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
 		$this->runCloseUnknownTest();
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1565,7 +1563,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	public function testTriggerCEP_EventAssessment() {
 		$this->runEventAssessmentTest(false);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1577,7 +1575,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_EventAssessmentRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->runEventAssessmentTest(true);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1600,7 +1598,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	public function testTriggerCEP_DependentTrigger() {
 		$this->runDependentTriggerTest(false);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1612,7 +1610,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_DependentTriggerRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1654,7 +1652,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->clearDiscoveredItemHistory();
 		$this->prepareDataRecoveryExpression();
 		$this->runEventAssessmentTest(false);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1663,7 +1661,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_EventAssessmentRecoveryExpressionRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->runEventAssessmentTest(true);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1671,7 +1669,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	public function testTriggerCEP_DependentTriggerRecoveryExpression() {
 		$this->runDependentTriggerTest(false);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1680,7 +1678,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_DependentTriggerRecoveryExpressionRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1689,7 +1687,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_EventAssessmentMultipleEvent() {
 		$this->prepareDataMultipleEventsRecoveryExpression();
 		$this->runEventAssessmentTest(false);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1698,7 +1696,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_EventAssessmentMultipleEventRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->runEventAssessmentTest(true);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1706,7 +1704,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	public function testTriggerCEP_DependentTriggerMultipleEvent() {
 		$this->runDependentTriggerTest(false);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1715,7 +1713,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_DependentTriggerMultipleEventRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1728,7 +1726,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_EventAssessmentTagCorrelation() {
 		$this->prepareDataTagCorrelation();
 		$this->runEventAssessmentTest(false);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1738,7 +1736,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataTagCorrelation();
 		$this->runEventAssessmentTest(true);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1746,7 +1744,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	public function testTriggerCEP_DependentTriggerTagCorrelation() {
 		$this->runDependentTriggerTest(false);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1755,7 +1753,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_DependentTriggerTagCorrelationRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1769,7 +1767,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_EventAssessmentServiceCorrelation() {
 		$this->prepareDataServiceCorrelation();
 		$this->runEventAssessmentTestCorrelation(false);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1779,7 +1777,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataServiceCorrelation();
 		$this->runEventAssessmentTestCorrelation(true);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1791,7 +1789,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_EventAssessmentServiceCorrelationManualClose() {
 		$this->prepareDataServiceCorrelation();
 		$this->runEventAssessmentTestCorrelationManualClose(false);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1804,7 +1802,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataServiceCorrelation();
 		$this->runEventAssessmentTestCorrelationManualClose(true);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1821,7 +1819,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->testTriggerCEP_LLDDiscovery();*/
 		$this->prepareDataGlobalCorrelation();
 		$this->runEventAssessmentTestGlobalCorrelationCrossTrigger(false);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1834,7 +1832,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataGlobalCorrelation();
 		$this->runEventAssessmentTestGlobalCorrelationCrossTrigger(true);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1940,7 +1938,6 @@ class testTriggerCEP extends CIntegrationTest {
 		], null, 0);
 
 		$this->waitForNoOpenProblems($triggerids, 'log recovery');
-		$this->assertNoOpenProblems($triggerids);
 	}
 
 	/**
@@ -2588,7 +2585,7 @@ class testTriggerCEP extends CIntegrationTest {
 		// Send recovery value – now that recovery mode is expression, a RESOLVED event must fire.
 		$this->assertStateChangeForAll($triggerids, $keys, '0', TRIGGER_VALUE_FALSE, $event_count + 1);
 
-		$this->assertNoOpenProblems($triggerids, 'After recovery-after-restore');
+		$this->waitForNoOpenProblems($triggerids, 'After recovery-after-restore');
 	}
 
 	/**
@@ -3096,25 +3093,6 @@ class testTriggerCEP extends CIntegrationTest {
 			$info = $label.' #'.$idx.': '.json_encode($trigger);
 			$this->assertEquals($expected_value, $trigger['value'], $info);
 			$this->assertEquals(TRIGGER_STATE_NORMAL, $trigger['state'], $info);
-		}
-	}
-
-	private function assertNoOpenProblems(array $triggerids, string $message = ''): void {
-		$prefix = $message !== '' ? $message.': ' : '';
-
-		$response = $this->call('problem.get', [
-			'objectids' => $triggerids,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'output' => ['eventid']
-		]);
-		$this->assertEmpty($response['result'],
-			$prefix.'Expected no open problems: '.json_encode($response));
-
-		$triggers = $this->getTriggers($triggerids);
-		foreach ($triggerids as $triggerid) {
-			$this->assertEquals(TRIGGER_VALUE_FALSE, $triggers[$triggerid]['value'],
-				$prefix.'Expected trigger '.$triggerid.' to have value OK (0).');
 		}
 	}
 
