@@ -590,6 +590,8 @@ static zbx_db_event	*cep_create_close_event(const zbx_db_event *problem)
 		}
 	}
 
+	cep_event_expect(ok);
+
 	return ok;
 }
 

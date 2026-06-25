@@ -29,13 +29,15 @@ void	cep_operation_db_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_con
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL != (event = cep_event_context_acquire_event(ctx)))
+	if (NULL != (event = cep_event_context_get_event(ctx)))
 	{
 		zbx_mw_task_t	*t;
 		zbx_db_event	*db_event;
 
 		db_event = cep_db_event_create(&event->origin, event->name, event->clock, event->ns, event->severity,
 				TRIGGER_VALUE_OK, &event->tags);
+
+		cep_event_expect(db_event);
 
 		t = cep_create_task_close_event(db_event, event->eventid, 0, 0, ruleid);
 		zbx_vector_mw_task_ptr_append(tasks, t);

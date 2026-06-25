@@ -175,6 +175,107 @@ int	cep_event_validate_tag(zbx_cep_event_t *event, const char *tag, const char *
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create db event                                                   *
+ *                                                                            *
+ * Parameters: origin   - [IN] CEP event origin                               *
+ *             name     - [IN] event name                                     *
+ *             clock    - [IN] event timestamp (seconds)                      *
+ *             ns       - [IN] event timestamp (nanoseconds)                  *
+ *             severity - [IN] event severity                                 *
+ *             value    - [IN] event value                                    *
+ *             tags     - [IN] event tags (optional)                          *
+ *                                                                            *
+ * Return value: pointer to the created db event                              *
+ *                                                                            *
+ * Comments: The created event is registered as pending for its corresponding *
+ *           object as it will be processed later.                            *
+ *                                                                            *
+ ******************************************************************************/
+zbx_db_event	*cep_db_event_create(const zbx_cep_origin_t *origin, const char *name, int clock, int ns,
+		int serverity, int value, const zbx_vector_lite_tag_t *tags)
+{
+	zbx_db_event	*db_event;
+
+	db_event = (zbx_db_event *)zbx_calloc(NULL, 1, sizeof(zbx_db_event));
+
+	db_event->source = origin->source;
+	db_event->object = origin->object;
+	db_event->objectid = origin->objectid;
+	db_event->clock = clock;
+	db_event->ns = ns;
+	db_event->severity = serverity;
+	db_event->value = value;
+	db_event->name = zbx_strdup(NULL, name);
+
+	zbx_vector_tags_ptr_create(&db_event->tags);
+	if (NULL != tags)
+	{
+		zbx_vector_tags_ptr_reserve(&db_event->tags, (size_t)tags->values_num);
+		for (int i = 0; i < tags->values_num; i++)
+		{
+			zbx_tag_t	*tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
+
+			tag->tag = zbx_strdup(NULL, tags->values[i].tag);
+			tag->value = zbx_strdup(NULL, tags->values[i].value);
+
+			zbx_vector_tags_ptr_append(&db_event->tags, tag);
+		}
+	}
+
+	if (EVENT_SOURCE_TRIGGERS == db_event->source)
+	{
+		db_event->trigger.triggerid = db_event->objectid;
+		zbx_vector_uint64_create(&db_event->trigger.dep_triggerids);
+
+		/* created problem events might get processed by CEP rules - */
+		/* need to get more trigger data to expose hosts/groups      */
+		if (TRIGGER_VALUE_PROBLEM == value)
+		{
+			zbx_dc_trigger_t	dc_trigger;
+			int			err;
+
+			zbx_dc_config_get_triggers_by_triggerids(&dc_trigger, &origin->objectid, &err, 1);
+
+			if (SUCCEED != err)
+			{
+				zbx_db_free_event(db_event);
+				return NULL;
+			}
+
+			db_event->trigger.type = dc_trigger.type;
+			db_event->trigger.recovery_mode = dc_trigger.recovery_mode;
+			db_event->trigger.expression = dc_trigger.expression;
+			db_event->trigger.recovery_expression = dc_trigger.recovery_expression;
+
+			dc_trigger.expression = NULL;
+			dc_trigger.recovery_expression = NULL;
+			zbx_dc_config_clean_triggers(&dc_trigger, &err, 1);
+		}
+	}
+
+	return db_event;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: register a pending event for corresponding object                 *
+ *                                                                            *
+ * Parameters: db_event - [IN] database event to register                     *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_event_expect(const zbx_db_event *db_event)
+{
+	zbx_cep_t		*cep;
+	zbx_cep_origin_t	origin = {.source = db_event->source, .object = db_event->object,
+					.objectid = db_event->objectid};
+
+	cep_cache_acquire(&cep);
+	cep_object_inc_pending(cep, &origin);
+	cep_cache_release(&cep);
+}
+
 /*
  * event context
  */
@@ -301,8 +402,7 @@ zbx_uint64_t	cep_event_context_get_hostgroupid(zbx_cep_event_context_t *ctx)
 	return ctx->hostgroupid;
 }
 
-
-zbx_cep_event_t	*cep_event_context_acquire_event(zbx_cep_event_context_t *ctx)
+zbx_cep_event_t	*cep_event_context_get_event(zbx_cep_event_context_t *ctx)
 {
 	if (NULL == ctx->event)
 	{
@@ -319,9 +419,9 @@ zbx_cep_event_t	*cep_event_context_acquire_event(zbx_cep_event_context_t *ctx)
 	return ctx->event;
 }
 
-zbx_cep_event_t *cep_event_context_acquire_mutable_event(zbx_cep_event_context_t *ctx)
+zbx_cep_event_t *cep_event_context_get_mutable_event(zbx_cep_event_context_t *ctx)
 {
-	if (NULL != cep_event_context_acquire_event(ctx))
+	if (NULL != cep_event_context_get_event(ctx))
 	{
 		zbx_cep_event_t	*event = cep_event_get_mutable(ctx->event);
 
@@ -332,6 +432,22 @@ zbx_cep_event_t *cep_event_context_acquire_mutable_event(zbx_cep_event_context_t
 	}
 
 	return NULL;
+}
+
+zbx_db_event *cep_event_context_get_db_event(zbx_cep_event_context_t *ctx)
+{
+	if (NULL == ctx->db_event)
+	{
+		zbx_cep_event_t	*event = cep_event_context_get_event(ctx);
+
+		if (NULL != event)
+		{
+			ctx->db_event = cep_db_event_create(&event->origin, event->name, event->clock, event->ns,
+					event->severity, event->value, &event->tags);
+		}
+	}
+
+	return ctx->db_event;
 }
 
 static int	cep_event_context_same_event(zbx_cep_event_context_t *ctx, zbx_cep_event_handle_t hevent)
@@ -373,7 +489,7 @@ void	cep_event_context_set_handle(zbx_cep_event_context_t *ctx, zbx_cep_event_ha
 
 zbx_uint64_t	cep_event_context_eventid(zbx_cep_event_context_t *ctx)
 {
-	if (NULL != cep_event_context_acquire_event(ctx))
+	if (NULL != cep_event_context_get_event(ctx))
 		return ctx->event->eventid;
 
 	return 0;
@@ -394,7 +510,7 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
 
 	if (0 == strcmp(CEP_TAG_IS_COPIED, tag))
 	{
-		if (NULL != (event = cep_event_context_acquire_event(ctx)))
+		if (NULL != (event = cep_event_context_get_event(ctx)))
 			return (event->flags == ZBX_EVENT_COPIED ? CEP_VALUE_TRUE : CEP_VALUE_FALSE);
 	}
 	else if(0 == strcmp(CEP_TAG_IS_FIRST, tag))
@@ -407,14 +523,14 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
 	}
 	else if(0 == strcmp(CEP_TAG_IS_SYMPTOM, tag))
 	{
-		if (NULL != (event = cep_event_context_acquire_event(ctx)) && 0 != event->cause_eventid)
+		if (NULL != (event = cep_event_context_get_event(ctx)) && 0 != event->cause_eventid)
 			return CEP_VALUE_TRUE;
 
 		return CEP_VALUE_FALSE;
 	}
 	else if(0 == strcmp(CEP_TAG_IS_OPEN, tag))
 	{
-		if (NULL != (event = cep_event_context_acquire_event(ctx)))
+		if (NULL != (event = cep_event_context_get_event(ctx)))
 			return (NULL == event->r_event ? CEP_VALUE_TRUE : CEP_VALUE_FALSE);
 	}
 
@@ -430,92 +546,41 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
 	#undef CEP_TAG_IS_COPIED
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: create db event                                                   *
- *                                                                            *
- * Parameters: origin   - [IN] CEP event origin                               *
- *             name     - [IN] event name                                     *
- *             clock    - [IN] event timestamp (seconds)                      *
- *             ns       - [IN] event timestamp (nanoseconds)                  *
- *             severity - [IN] event severity                                 *
- *             value    - [IN] event value                                    *
- *             tags     - [IN] event tags (optional)                          *
- *                                                                            *
- * Return value: pointer to the created db event                              *
- *                                                                            *
- * Comments: The created event is registered as pending for its corresponding *
- *           object as it will be processed later.                            *
- *                                                                            *
- ******************************************************************************/
-zbx_db_event	*cep_db_event_create(const zbx_cep_origin_t *origin, const char *name, int clock, int ns,
-		int serverity, int value, const zbx_vector_lite_tag_t *tags)
+void	cep_event_context_resolve_name_macros(zbx_cep_event_context_t *ctx, char **str)
 {
-	zbx_db_event	*db_event;
+	zbx_db_event		*db_event;
+	zbx_dc_um_handle_t	*um_handle;
 
-	db_event = (zbx_db_event *)zbx_calloc(NULL, 1, sizeof(zbx_db_event));
+	if (NULL == strchr(*str, '{'))
+		return;
 
-	db_event->source = origin->source;
-	db_event->object = origin->object;
-	db_event->objectid = origin->objectid;
-	db_event->clock = clock;
-	db_event->ns = ns;
-	db_event->severity = serverity;
-	db_event->value = value;
-	db_event->name = zbx_strdup(NULL, name);
+	if (NULL == (db_event = cep_event_context_get_db_event(ctx)))
+		return;
 
-	zbx_vector_tags_ptr_create(&db_event->tags);
-	if (NULL != tags)
-	{
-		zbx_vector_tags_ptr_reserve(&db_event->tags, (size_t)tags->values_num);
-		for (int i = 0; i < tags->values_num; i++)
-		{
-			zbx_tag_t	*tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
+	um_handle = zbx_dc_open_user_macros();
 
-			tag->tag = zbx_strdup(NULL, tags->values[i].tag);
-			tag->value = zbx_strdup(NULL, tags->values[i].value);
+	zbx_substitute_macros_ext_search(ZBX_TOKEN_SEARCH_REFERENCES | ZBX_TOKEN_SEARCH_EXPRESSION_MACRO, str, NULL, 0,
+			zbx_macro_event_name_resolv, um_handle, db_event, NULL);
 
-			zbx_vector_tags_ptr_append(&db_event->tags, tag);
-		}
-	}
-
-	if (EVENT_SOURCE_TRIGGERS == db_event->source)
-	{
-		db_event->trigger.triggerid = db_event->objectid;
-		zbx_vector_uint64_create(&db_event->trigger.dep_triggerids);
-
-		/* created problem events might get processed by CEP rules - */
-		/* need to get more trigger data to expose hosts/groups      */
-		if (TRIGGER_VALUE_PROBLEM == value)
-		{
-			zbx_dc_trigger_t	dc_trigger;
-			int			err;
-
-			zbx_dc_config_get_triggers_by_triggerids(&dc_trigger, &origin->objectid, &err, 1);
-
-			if (SUCCEED != err)
-			{
-				zbx_db_free_event(db_event);
-				return NULL;
-			}
-
-			db_event->trigger.type = dc_trigger.type;
-			db_event->trigger.recovery_mode = dc_trigger.recovery_mode;
-			db_event->trigger.expression = dc_trigger.expression;
-			db_event->trigger.recovery_expression = dc_trigger.recovery_expression;
-
-			dc_trigger.expression = NULL;
-			dc_trigger.recovery_expression = NULL;
-			zbx_dc_config_clean_triggers(&dc_trigger, &err, 1);
-		}
-	}
-
-	zbx_cep_t	*cep;
-
-	cep_cache_acquire(&cep);
-	cep_object_inc_pending(cep, origin);
-	cep_cache_release(&cep);
-
-	return db_event;
+	zbx_dc_close_user_macros(um_handle);
 }
+
+void	cep_event_context_resolve_tag_macros(zbx_cep_event_context_t *ctx, char **str)
+{
+	zbx_db_event		*db_event;
+	zbx_dc_um_handle_t	*um_handle;
+
+	if (NULL == strchr(*str, '{'))
+		return;
+
+	if (NULL == (db_event = cep_event_context_get_db_event(ctx)))
+		return;
+
+	um_handle = zbx_dc_open_user_macros();
+
+	zbx_substitute_macros(str, NULL, 0, zbx_macro_trigger_tag_resolv, um_handle, db_event, NULL);
+
+	zbx_dc_close_user_macros(um_handle);
+}
+
 

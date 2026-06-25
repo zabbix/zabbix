@@ -304,7 +304,7 @@ void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 		zbx_cep_event_handle_t	h = (zbx_cep_event_handle_t)zbx_queue_ptr_peek(&window->hevents);
 		zbx_cep_event_context_t	ctx = {.hevent = zbx_cep_event_handle_addref(h), .pos = CEP_POS_FIRST};
 
-		if (NULL != cep_event_context_acquire_event(&ctx))
+		if (NULL != cep_event_context_get_event(&ctx))
 		{
 			if (ctx.event->clock + window->duration > now)
 			{
@@ -362,7 +362,7 @@ static void	cep_window_set_event_tag(zbx_cep_window_t *window, zbx_cep_event_han
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64 " tag:%s value:%d", __func__,
 			zbx_cep_event_handle_eventid(h), tag, value);
 
-	if (NULL == (event = cep_event_context_acquire_event(&ctx)))
+	if (NULL == (event = cep_event_context_get_event(&ctx)))
 		goto out;
 
 	if (FAIL != (index = cep_event_find_tag(event, tag)) && 0 == (window->flags & CEP_WINDOW_FLAGS_SYMPTOM_TAG_SET))
@@ -374,7 +374,7 @@ static void	cep_window_set_event_tag(zbx_cep_window_t *window, zbx_cep_event_han
 
 	zbx_snprintf(buf, sizeof(buf), "%d", value);
 
-	if (NULL == (event = cep_event_context_acquire_mutable_event(&ctx)))
+	if (NULL == (event = cep_event_context_get_mutable_event(&ctx)))
 		goto out;
 
 	if (FAIL == index)
@@ -432,7 +432,7 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 		if (0 != zbx_queue_ptr_values_num(&window->hevents))
 		{
 			zbx_cep_t		*cep;
-			zbx_cep_event_t		*event = cep_event_context_acquire_mutable_event(ctx);
+			zbx_cep_event_t		*event = cep_event_context_get_mutable_event(ctx);
 			zbx_cep_event_handle_t	h = (zbx_cep_event_handle_t)zbx_queue_ptr_peek(&window->hevents);
 
 			event->cause_eventid = zbx_cep_event_handle_eventid(h);
@@ -627,7 +627,7 @@ zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *po
 
 	if (0 != (ref_local.group_by & ZBX_CEP_GROUP_BY_TAG))
 	{
-		event = cep_event_context_acquire_event(ctx);
+		event = cep_event_context_get_event(ctx);
 		if (FAIL != (index = cep_event_find_tag(event, rule->window->group_tag)))
 		{
 			ref_local.tag = (char *)rule->window->group_tag;

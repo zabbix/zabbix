@@ -56,7 +56,7 @@ static int	cep_operation_tag_eval(const zbx_cep_operation_tag_t *tag, zbx_cep_ev
 	}
 	else
 	{
-		zbx_cep_event_t	*event = cep_event_context_acquire_event(ctx);
+		zbx_cep_event_t	*event = cep_event_context_get_event(ctx);
 
 		for (int i = 0; i < event->tags.values_num; i++)
 		{

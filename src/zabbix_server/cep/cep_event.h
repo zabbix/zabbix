@@ -58,10 +58,13 @@ typedef struct
 zbx_cep_event_context_t;
 
 void	cep_event_context_clear(zbx_cep_event_context_t *ctx);
-zbx_cep_event_t *cep_event_context_acquire_event(zbx_cep_event_context_t *ctx);
-zbx_cep_event_t *cep_event_context_acquire_mutable_event(zbx_cep_event_context_t *ctx);
+zbx_cep_event_t *cep_event_context_get_event(zbx_cep_event_context_t *ctx);
+zbx_cep_event_t *cep_event_context_get_mutable_event(zbx_cep_event_context_t *ctx);
+zbx_db_event *cep_event_context_get_db_event(zbx_cep_event_context_t *ctx);
 zbx_uint64_t	cep_event_context_eventid(zbx_cep_event_context_t *ctx);
 const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, const char *tag);
+void	cep_event_context_resolve_name_macros(zbx_cep_event_context_t *ctx, char **str);
+void	cep_event_context_resolve_tag_macros(zbx_cep_event_context_t *ctx, char **str);
 
 const zbx_vector_str_t	*cep_event_context_get_hosts(zbx_cep_event_context_t *ctx);
 const zbx_vector_str_t	*cep_event_context_get_groups(zbx_cep_event_context_t *ctx);
@@ -71,5 +74,6 @@ void	cep_event_context_set_handle(zbx_cep_event_context_t *ctx, zbx_cep_event_ha
 
 zbx_db_event	*cep_db_event_create(const zbx_cep_origin_t *origin, const char *name, int clock, int ns,
 	int serverity, int value, const zbx_vector_lite_tag_t *tags);
+void	cep_event_expect(const zbx_db_event *db_event);
 
 #endif
