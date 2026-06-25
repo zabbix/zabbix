@@ -244,14 +244,16 @@ window.regex_edit_popup = new class {
 
 		const test_fields = ['expressions', 'test_string'];
 
-		test_fields.forEach(test_field => {
-			this.#form.findFieldByName(test_field).setChanged();
+		Object.values(this.#form.findFieldByName('expressions').getFields()).forEach(field => {
+			field.setChanged();
 		});
+
+		this.#form.findFieldByName('test_string').setChanged();
 
 		this.#form.validateFieldsForAction(test_fields, rules)
 			.then(result => {
 				if (!result) {
-					this.#overlay.unsetLoading();
+					this.#unsetTestLoadingStatus()
 					return;
 				}
 
@@ -282,9 +284,6 @@ window.regex_edit_popup = new class {
 			return;
 		}
 		// TODO:: need to use the this.#form.lock() method after the merge task ZBXNEXT-10393
-		const textarea = document.getElementById('test-string');
-
-		textarea.disabled = true;
 
 		document.getElementById('regular-expressions-table')
 			.querySelectorAll('.js-add, .js-remove')
@@ -296,9 +295,6 @@ window.regex_edit_popup = new class {
 			return;
 		}
 		// TODO:: need to use the this.#form.unlock() method after the merge task ZBXNEXT-10393
-		const textarea = document.getElementById('test-string');
-
-		textarea.disabled = false;
 
 		document.getElementById('regular-expressions-table')
 			.querySelectorAll('.js-add, .js-remove')
