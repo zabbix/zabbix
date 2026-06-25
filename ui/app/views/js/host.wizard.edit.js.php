@@ -228,6 +228,7 @@ window.host_wizard_edit = new class {
 	#data_update_locked = false;
 	#form_update_locked = false;
 	#pending_form_update = false;
+	#changed_during_mouse = false;
 
 	async init({templates, linked_templates, wizard_show_welcome, source_host, agent_script_server_host, csrf_token}) {
 		this.#templates = templates.reduce((templates_map, template) => {
@@ -249,14 +250,16 @@ window.host_wizard_edit = new class {
 		this.#dialogue.addEventListener('input', this.#onInputChange.bind(this));
 		this.#dialogue.addEventListener('focusout', this.#onInputBlur.bind(this));
 		this.#dialogue.addEventListener('mousedown', () => {
-			this.#form_update_locked = this.#getCurrentStep() !== this.STEP_SELECT_TEMPLATE;
+			this.#form_update_locked = true;
+			this.#pending_form_update = true;
 		});
 		this.#dialogue.addEventListener('mouseup', () => {
 			this.#form_update_locked = false;
 
 			if (this.#pending_form_update) {
 				this.#pending_form_update = false;
-				this.#updateForm(null);
+				this.#updateForm(this.#changed_during_mouse ? undefined : null);
+				this.#changed_during_mouse = false;
 			}
 		});
 
@@ -1998,6 +2001,10 @@ window.host_wizard_edit = new class {
 	#onInputChange({target}) {
 		if (!target.name) {
 			return;
+		}
+
+		if (this.#form_update_locked) {
+			this.#changed_during_mouse = true;
 		}
 
 		const value = target.type === 'checkbox'
