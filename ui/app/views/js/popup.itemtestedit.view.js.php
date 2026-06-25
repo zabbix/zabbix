@@ -279,6 +279,7 @@ window.itemtestedit_view_popup = new class {
 
 	#getValue() {
 		this.#removePopupMessages();
+		this.#cleanPreviousTestResults();
 		const get_value_button = this.#form_element.querySelector('.js-get-value-submit');
 		const fields = this.#getFormFields(true);
 
