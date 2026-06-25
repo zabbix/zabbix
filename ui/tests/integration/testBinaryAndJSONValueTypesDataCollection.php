@@ -892,21 +892,27 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	}
 
 	/**
-	 * Test 1-byte heap overflow in MySQL during escaping (DEV-4949)
+	 * Test 1-byte heap overflow in MySQL during escaping
 	 *
 	 * @required-components server
 	 * @configurationDataProvider agentConfigurationProvider
 	 * @hosts agent
 	 */
-	public function testTrapper_BinaryItemCheckServerCrash() {
+	public function testTrapper_BinaryItemMySQLEscape() {
 		global $DB;
 
 		if (ZBX_DB_MYSQL !== $DB['TYPE']) {
 			return;
 		}
 
-		$this->reloadConfigurationCache();
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
 		$this->sendSenderValue('agent', 'BINARY_ITEM_TRAP', 'AAAAAAAAAAAAAAAA');
+
+		// 'A' is the only base64 digit that decodes to null bytes (0x00); null bytes are escaped
+		// by MySQL to two bytes each (e.g. 'AAAA' -> 3x 0x00 -> 6 escaped bytes + null terminator),
+		// filling the escape buffer to capacity and exposing off-by-one allocations.
+		// Minimum triggering input is 'AAAA' (3 null bytes); any multiple of 4 'A's works.
 
 		sleep(3);
 
