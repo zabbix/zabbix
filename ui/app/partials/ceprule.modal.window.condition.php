@@ -36,18 +36,19 @@ echo (new CForm())
 			new CFormField($condition_type)
 		])
 		->addItem([
-			new CLabel('Tag', 'ceprule-window-past-event-tag-name'),
-			(new CFormField((new CTextBox('past_tag'))
-				->setId('ceprule-window-past-event-tag-name')
-				->setAttribute('placeholder', _('tag name'))
-			))->setAttribute('for-type', CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE)
-		])
-		->addItem([
-			new CLabel('Past event tag name', 'ceprule-window-past-event-tag-name'),
-			(new CFormField((new CTextBox('past_tag'))
-				->setId('ceprule-window-past-event-tag-name')
+			new CLabel('Past event tag name', 'ceprule-window-past-event-tag-name-tag-pair'),
+			(new CFormField((new CTextBox('tag_pair_past_tag'))
+				->setId('ceprule-window-past-event-tag-name-tag-pair')
 				->setAttribute('placeholder', _('tag name'))
 			))->setAttribute('for-type', CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR)
+		])
+		->addItem([
+			new CLabel('Tag', 'ceprule-window-past-event-tag-name-old-value'),
+			(new CFormField(
+				(new CTextBox('old_value_past_tag'))
+					->setId('ceprule-window-past-event-tag-name-old-value')
+					->setAttribute('placeholder', _('tag name'))
+			))->setAttribute('for-type', CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE)
 		])
 		->addItem([
 			new CLabel('Operator'),
@@ -59,6 +60,13 @@ echo (new CForm())
 			)
 		])
 		->addItem([
+			new CLabel('Tag', 'ceprule-window-past-event-tag-name-past-event'),
+			(new CFormField((new CTextBox('past_event_past_tag'))
+				->setId('ceprule-window-past-event-tag-name-past-event')
+				->setAttribute('placeholder', _('tag name'))
+			))->setAttribute('for-type', CCepRuleHelper::WINDOW_CONDITION_OLD_TAG)
+		])
+		->addItem([
 			new CLabel('Current event tag name', 'ceprule-window-event-tag'),
 			(new CFormField((new CTextBox('tag'))
 				->setId('ceprule-window-past-event-tag')
@@ -66,14 +74,6 @@ echo (new CForm())
 			))->setAttribute('for-type', CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR)
 		])
 
-		->addItem([
-			new CLabel('Tag', 'ceprule-window-past-event-tag-name'),
-			(new CFormField(
-				(new CTextBox('past_tag'))
-					->setId('ceprule-window-past-event-tag-name')
-					->setAttribute('placeholder', _('tag name'))
-			))->setAttribute('for-type', CCepRuleHelper::WINDOW_CONDITION_OLD_TAG)
-		])
 		->addItem([
 			new CLabel(_('Value'), 'ceprule-window-past-event-tag-value'),
 			(new CFormField(

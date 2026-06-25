@@ -408,6 +408,163 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Create one service per discovered primary trigger (mapped to its trigger via the stable SERVICE_TAG
+	 * problem tag, value '<component>'), a service action firing on those services (service name like
+	 * 'CEP service') and a trigger action firing on the discovered triggers (event tag type=cep). Both
+	 * actions route through the CEP webhook media type, so the CEP event stream drives the service manager
+	 * and the action/escalator pipeline. The configuration cache is reloaded so the server picks up the
+	 * new actions. Everything is removed in clearData().
+	 */
+	private function createServicesAndActions(): void {
+		// Re-read the discovered primary triggers with their tags so each service can be mapped to its
+		// trigger via the trigger's own SERVICE_TAG value.
+		$response = $this->call('trigger.get', [
+			'triggerids' => self::$discovered_triggerids,
+			'output' => ['triggerid'],
+			'selectTags' => 'extend'
+		]);
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result'],
+			'Not all discovered triggers were found.');
+
+		$services = [];
+		foreach ($response['result'] as $trigger) {
+			$service_tag = current(array_filter($trigger['tags'],
+				fn($t) => $t['tag'] === self::SERVICE_TAG
+			));
+			$this->assertNotFalse($service_tag,
+				'Discovered trigger '.$trigger['triggerid'].' has no '.self::SERVICE_TAG.' tag.');
+
+			$services[] = [
+				'name' => 'CEP service '.$trigger['triggerid'],
+				'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
+				'sortorder' => 0,
+				'problem_tags' => [
+					[
+						'tag' => $service_tag['tag'],
+						'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL,
+						'value' => $service_tag['value']
+					]
+				]
+			];
+		}
+
+		$response = $this->call('service.create', $services);
+		$this->assertArrayHasKey('serviceids', $response['result']);
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']['serviceids'],
+			'Not all CEP services were created.');
+		self::$serviceids = $response['result']['serviceids'];
+
+		// Service action: problem, recovery and update message operations targeting user group 7 via the
+		// CEP webhook media type, so the escalator runs the service action through the alerter.
+		$response = $this->call('action.create', [
+			'name' => 'CEP service action',
+			'eventsource' => EVENT_SOURCE_SERVICE,
+			'status' => ACTION_STATUS_ENABLED,
+			'esc_period' => '1h',
+			'filter' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => [
+					[
+						'conditiontype' => ZBX_CONDITION_TYPE_SERVICE_NAME,
+						'operator' => CONDITION_OPERATOR_LIKE,
+						'value' => 'CEP service'
+					]
+				]
+			],
+			'operations' => [
+				[
+					'esc_period' => 0,
+					'esc_step_from' => 1,
+					'esc_step_to' => 1,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$mediatypeid,
+						'message' => 'Problem', 'subject' => 'Problem'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			],
+			'recovery_operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$mediatypeid,
+						'message' => 'Recovery', 'subject' => 'Recovery'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			],
+			'update_operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$mediatypeid,
+						'message' => 'Update', 'subject' => 'Update'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			]
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['actionids']);
+		self::$service_actionid = $response['result']['actionids'][0];
+
+		// Trigger action firing on the discovered triggers (event tag type=cep), with problem and
+		// recovery message operations routed through the same CEP webhook media type.
+		$response = $this->call('action.create', [
+			'name' => 'CEP trigger action',
+			'eventsource' => EVENT_SOURCE_TRIGGERS,
+			'status' => ACTION_STATUS_ENABLED,
+			'esc_period' => '1h',
+			'pause_suppressed' => 0,
+			'filter' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => [
+					[
+						'conditiontype' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'value2' => 'type',
+						'value' => 'cep'
+					]
+				]
+			],
+			'operations' => [
+				[
+					'esc_period' => 0,
+					'esc_step_from' => 1,
+					'esc_step_to' => 1,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$mediatypeid,
+						'message' => 'Problem', 'subject' => 'Problem'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			],
+			'recovery_operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$mediatypeid,
+						'message' => 'Recovery', 'subject' => 'Recovery'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			]
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['actionids']);
+		self::$trigger_actionid = $response['result']['actionids'][0];
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+	}
+
+	/**
 	 * Update all trigger prototypes on the LLD rule to use "None" ok event generation
 	 * and resend discovery data so the server picks up the updated prototype configuration.
 	 */
@@ -1077,146 +1234,6 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->assertContains(['tag' => 'service', 'value' => '{{ITEM.VALUE}.regsub("([0-9]+)$", "\\1")}'], $tags_tv,
 			'Tag service=regsub not found in: '.$tags_json);
 
-		// Create one service per discovered trigger, each mapped to its trigger via the trigger's
-		// stable per-trigger SERVICE_TAG problem tag (value '<component>'), plus a single service action
-		// that fires on those services (service name like 'CEP service'). This drives the CEP event
-		// stream through the service manager and the service action/escalator pipeline. Both are removed
-		// in clearData().
-		$services = [];
-		foreach ($response['result'] as $trigger) {
-			$service_tag = current(array_filter($trigger['tags'],
-				fn($t) => $t['tag'] === self::SERVICE_TAG
-			));
-			$this->assertNotFalse($service_tag,
-				'Discovered trigger '.$trigger['triggerid'].' has no '.self::SERVICE_TAG.' tag.');
-
-			$services[] = [
-				'name' => 'CEP service '.$trigger['triggerid'],
-				'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
-				'sortorder' => 0,
-				'problem_tags' => [
-					[
-						'tag' => $service_tag['tag'],
-						'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL,
-						'value' => $service_tag['value']
-					]
-				]
-			];
-		}
-
-		$response = $this->call('service.create', $services);
-		$this->assertArrayHasKey('serviceids', $response['result']);
-		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']['serviceids'],
-			'Not all CEP services were created.');
-		self::$serviceids = $response['result']['serviceids'];
-
-		// Service action: problem, recovery and update message operations targeting user group 7 via the
-		// CEP webhook media type (created in prepareData), so the escalator runs the action through the alerter.
-		$response = $this->call('action.create', [
-			'name' => 'CEP service action',
-			'eventsource' => EVENT_SOURCE_SERVICE,
-			'status' => ACTION_STATUS_ENABLED,
-			'esc_period' => '1h',
-			'filter' => [
-				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-				'conditions' => [
-					[
-						'conditiontype' => ZBX_CONDITION_TYPE_SERVICE_NAME,
-						'operator' => CONDITION_OPERATOR_LIKE,
-						'value' => 'CEP service'
-					]
-				]
-			],
-			'operations' => [
-				[
-					'esc_period' => 0,
-					'esc_step_from' => 1,
-					'esc_step_to' => 1,
-					'operationtype' => OPERATION_TYPE_MESSAGE,
-					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$mediatypeid,
-						'message' => 'Problem', 'subject' => 'Problem'
-					],
-					'opmessage_grp' => [
-						['usrgrpid' => 7]
-					]
-				]
-			],
-			'recovery_operations' => [
-				[
-					'operationtype' => OPERATION_TYPE_MESSAGE,
-					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$mediatypeid,
-						'message' => 'Recovery', 'subject' => 'Recovery'
-					],
-					'opmessage_grp' => [
-						['usrgrpid' => 7]
-					]
-				]
-			],
-			'update_operations' => [
-				[
-					'operationtype' => OPERATION_TYPE_MESSAGE,
-					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$mediatypeid,
-						'message' => 'Update', 'subject' => 'Update'
-					],
-					'opmessage_grp' => [
-						['usrgrpid' => 7]
-					]
-				]
-			]
-		]);
-		$this->assertArrayHasKey('actionids', $response['result']);
-		$this->assertArrayHasKey(0, $response['result']['actionids']);
-		self::$service_actionid = $response['result']['actionids'][0];
-
-		// Trigger action firing on the discovered triggers (event tag type=cep), with problem and
-		// recovery message operations routed through the same CEP webhook media type.
-		$response = $this->call('action.create', [
-			'name' => 'CEP trigger action',
-			'eventsource' => EVENT_SOURCE_TRIGGERS,
-			'status' => ACTION_STATUS_ENABLED,
-			'esc_period' => '1h',
-			'pause_suppressed' => 0,
-			'filter' => [
-				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-				'conditions' => [
-					[
-						'conditiontype' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
-						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value2' => 'type',
-						'value' => 'cep'
-					]
-				]
-			],
-			'operations' => [
-				[
-					'esc_period' => 0,
-					'esc_step_from' => 1,
-					'esc_step_to' => 1,
-					'operationtype' => OPERATION_TYPE_MESSAGE,
-					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$mediatypeid,
-						'message' => 'Problem', 'subject' => 'Problem'
-					],
-					'opmessage_grp' => [
-						['usrgrpid' => 7]
-					]
-				]
-			],
-			'recovery_operations' => [
-				[
-					'operationtype' => OPERATION_TYPE_MESSAGE,
-					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$mediatypeid,
-						'message' => 'Recovery', 'subject' => 'Recovery'
-					],
-					'opmessage_grp' => [
-						['usrgrpid' => 7]
-					]
-				]
-			]
-		]);
-		$this->assertArrayHasKey('actionids', $response['result']);
-		$this->assertArrayHasKey(0, $response['result']['actionids']);
-		self::$trigger_actionid = $response['result']['actionids'][0];
-
 		// Verify all LLD_DISCOVERY_COUNT items from proto2 were created.
 		$response = $this->callUntilDataIsPresent('item.get', [
 			'hostids' => [self::$disc_hostid],
@@ -1288,36 +1305,154 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_OpenProblem() {
-		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
-		$triggerids = self::$discovered_triggerids;
+		$this->runOpenProblemTest(false);
+	}
 
-		// OK→PROBLEM: one PROBLEM event per trigger; trigger value goes TRUE.
-		$this->captureEventBaseline($triggerids);
-		$this->assertStateChangeForAll($triggerids, $keys, '1', TRIGGER_VALUE_TRUE, 1);
-
-		// Each per-trigger service goes to PROBLEM (disaster) with one open service problem.
-		$this->assertServicesStatus(TRIGGER_SEVERITY_DISASTER, count(self::$serviceids));
+	/**
+	 * Smoke test (part 1.5/2): re-send the problem value while the single-event triggers are already in
+	 * PROBLEM. No new event is generated so the trigger state does not change, and CEP does not process
+	 * the already-open problem events. Runs between open and close so the problem is still open.
+	 *
+	 * @depends testTriggerCEP_OpenProblem
+	 */
+	public function testTriggerCEP_OpenAlreadyOpenedProblem() {
+		$this->runOpenAlreadyOpenedProblemTest(false);
 	}
 
 	/**
 	 * Smoke test (part 2/2): the problem opened by testTriggerCEP_OpenProblem closes on PROBLEM→OK.
 	 * Runs as a separate test so the open problem persists across the test boundary before recovery.
 	 *
-	 * @depends testTriggerCEP_OpenProblem
+	 * @depends testTriggerCEP_OpenAlreadyOpenedProblem
 	 */
 	public function testTriggerCEP_CloseProblem() {
+		$this->runCloseProblemTest(false);
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_OpenProblem but the server component is stopped and restarted first,
+	 * to verify the problem opens and is cached correctly after a fresh restart. Depends on the non-restart
+	 * close so it starts from the recovered state.
+	 *
+	 * @depends testTriggerCEP_CloseProblem
+	 */
+	public function testTriggerCEP_OpenProblemRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->runOpenProblemTest(true);
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_OpenAlreadyOpenedProblem but the server component is stopped and
+	 * restarted first, to verify a re-sent problem value generates no new event after a fresh restart.
+	 *
+	 * @depends testTriggerCEP_OpenProblemRestart
+	 */
+	public function testTriggerCEP_OpenAlreadyOpenedProblemRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->runOpenAlreadyOpenedProblemTest(true);
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_CloseProblem but the server component is stopped and restarted first,
+	 * to verify recovery and cache draining after a fresh restart.
+	 *
+	 * @depends testTriggerCEP_OpenAlreadyOpenedProblemRestart
+	 */
+	public function testTriggerCEP_CloseProblemRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->runCloseProblemTest(true);
+	}
+
+	/**
+	 * Open a problem on OK→PROBLEM (one PROBLEM event per trigger) and verify CEP processed and cached it.
+	 * When $restart is true, the server is restarted first.
+	 */
+	private function runOpenProblemTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		// OK→PROBLEM: one PROBLEM event per trigger; trigger value goes TRUE.
+		$cep_processed = $this->getCepStat('events', 'processed');
+		$this->captureEventBaseline($triggerids);
+		$this->assertStateChangeForAll($triggerids, $keys, '1', TRIGGER_VALUE_TRUE, 1);
+
+		// CEP processed the opened problem events (one per trigger).
+		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, count($keys));
+
+		// CEP cached one event per opened problem (one per trigger).
+		$this->assertCepStatEquals('tasks', 'cached_events', count($keys));
+	}
+
+	/**
+	 * Re-send the problem value while the single-event triggers are already in PROBLEM and verify no new
+	 * event is generated. When $restart is true, the server is restarted first.
+	 */
+	private function runOpenAlreadyOpenedProblemTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		// PROBLEM→PROBLEM: no new event (single-event triggers), trigger value/lastchange unchanged.
+		// assertNoStateChangeForAll also verifies CEP did not process the already-open problem events.
+		$this->captureEventBaseline($triggerids);
+		$this->assertNoStateChangeForAll($triggerids, $keys, '1', TRIGGER_VALUE_TRUE, 0);
+	}
+
+	/**
+	 * Close the open problem on PROBLEM→OK (one RESOLVED event per trigger) and verify CEP processed it and
+	 * drained its cache. When $restart is true, the server is restarted first.
+	 */
+	private function runCloseProblemTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$triggerids = self::$discovered_triggerids;
 
 		// PROBLEM→OK: one RESOLVED event per trigger. The baseline is per-test-instance, so it is
 		// recaptured here (now past the open event) and the close adds exactly one more event.
+		$cep_processed = $this->getCepStat('events', 'processed');
 		$this->captureEventBaseline($triggerids);
 		$this->assertStateChangeForAll($triggerids, $keys, '0', TRIGGER_VALUE_FALSE, 1);
 		$this->waitForNoOpenProblems($triggerids, 'close problem');
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
 
-		// All services recover to OK with no open service problems.
-		$this->assertServicesStatus(ZBX_SEVERITY_OK, 0);
+		// CEP processed the recovered events (one per trigger).
+		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, count($keys));
+		$this->assertCepStatEquals('tasks', 'cached_events', 0);
+	}
+
+	/**
+	 * Create one service per discovered trigger (each mapped to its trigger via the stable SERVICE_TAG
+	 * problem tag), a service action and a trigger action, all routed through the CEP webhook media type.
+	 * Runs after the minimal open/close smoke tests so the same OK→PROBLEM→OK scenario can be repeated
+	 * with the services and actions in place. The services and actions are removed in clearData().
+	 *
+	 * @depends testTriggerCEP_CloseProblem
+	 */
+	public function testTriggerCEP_AddServices() {
+		$this->createServicesAndActions();
+	}
+
+	/**
+	 * Repeat of testTriggerCEP_OpenProblem with the services and actions in place: the trigger opens a
+	 * problem and every per-trigger service follows it to PROBLEM (disaster) with one open service problem.
+	 *
+	 * @depends testTriggerCEP_AddServices
+	 */
+	public function testTriggerCEP_OpenProblemWithServices() {
+		$this->runOpenProblemWithServicesTest(false);
+	}
+
+	/**
+	 * Repeat of testTriggerCEP_CloseProblem with the services and actions in place: the problem closes
+	 * and every per-trigger service recovers to OK with no open service problems.
+	 *
+	 * @depends testTriggerCEP_OpenProblemWithServices
+	 */
+	public function testTriggerCEP_CloseProblemWithServices() {
+		$this->runCloseProblemWithServicesTest(false);
 	}
 
 	/**
@@ -1329,40 +1464,129 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_OpenAndImmediateRecovery() {
+		$this->runOpenAndImmediateRecoveryTest(false);
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_OpenProblemWithServices but the server component is stopped and
+	 * restarted first, to verify the problem opens and the per-trigger services follow it to PROBLEM
+	 * after a fresh restart. Depends on the non-restart close so it starts from the recovered state.
+	 *
+	 * @depends testTriggerCEP_CloseProblemWithServices
+	 */
+	public function testTriggerCEP_OpenProblemWithServicesRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->runOpenProblemWithServicesTest(true);
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_CloseProblemWithServices but the server component is stopped and
+	 * restarted first, to verify recovery and service status after a fresh restart.
+	 *
+	 * @depends testTriggerCEP_OpenProblemWithServicesRestart
+	 */
+	public function testTriggerCEP_CloseProblemWithServicesRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->runCloseProblemWithServicesTest(true);
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_OpenAndImmediateRecovery but the server component is stopped and
+	 * restarted first, to verify CEP still emits one event per transition after a fresh restart.
+	 *
+	 * @depends testTriggerCEP_OpenAndImmediateRecovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecoveryRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->runOpenAndImmediateRecoveryTest(true);
+	}
+
+	/**
+	 * Open the problem and let every per-trigger service follow it to PROBLEM (disaster). When $restart is
+	 * true, the server is restarted first.
+	 */
+	private function runOpenProblemWithServicesTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		$this->captureEventBaseline($triggerids);
+		$this->assertStateChangeForAll($triggerids, $keys, '1', TRIGGER_VALUE_TRUE, 1);
+
+		// Each per-trigger service goes to PROBLEM (disaster) with one open service problem.
+		$this->assertServicesStatus(TRIGGER_SEVERITY_DISASTER, count(self::$serviceids));
+	}
+
+	/**
+	 * Close the problem and let every per-trigger service recover to OK with no open service problems.
+	 * When $restart is true, the server is restarted first.
+	 */
+	private function runCloseProblemWithServicesTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		$this->captureEventBaseline($triggerids);
+		$this->assertStateChangeForAll($triggerids, $keys, '0', TRIGGER_VALUE_FALSE, 1);
+		$this->waitForNoOpenProblems($triggerids, 'close problem with services');
+
+		// All services recover to OK with no open service problems.
+		$this->assertServicesStatus(ZBX_SEVERITY_OK, 0);
+	}
+
+	/**
+	 * Open a problem and send the recovery immediately afterwards, verifying CEP emits one PROBLEM event
+	 * followed by one RESOLVED event per trigger. When $restart is true, the server is restarted first.
+	 */
+	private function runOpenAndImmediateRecoveryTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$triggerids = self::$discovered_triggerids;
 
 		$this->captureEventBaseline($triggerids);
 
-		// Push the PROBLEM value (1) and then the recovery value (0) back-to-back. The recovery carries a
-		// later clock so the problem is evaluated first, but the test does not wait between the two sends.
+		// Build a long alternating PROBLEM/recovery burst (1,0,1,0,...) for every discovered item and send
+		// it in a single batch. All values share the same clock and are ordered only by their nanoseconds
+		// (the value index), so CEP must process the whole rapid burst in order and emit one event per
+		// transition without collapsing or dropping any. The sequence ends on 0 so the triggers finish OK.
 		$now = time();
-		$this->sendSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '1',
-					'clock' => $now, 'ns' => $this->currentNs()], $keys),
-			null, 0
-		);
-		$this->sendSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0',
-					'clock' => $now + 1, 'ns' => $this->currentNs()], $keys),
-			null, 0
-		);
+		$values = [];
+		for ($i = 0; $i < 3; $i++) {
+			$values[] = '1';
+			$values[] = '0';
+		}
 
-		// Each trigger must produce exactly two events: one PROBLEM and one RESOLVED.
-		$this->waitForAllTriggerEventCounts($triggerids, 2);
+		$data = [];
+		foreach ($keys as $key) {
+			foreach ($values as $ns => $value) {
+				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value,
+						'clock' => $now, 'ns' => $ns];
+			}
+		}
+		$this->sendSenderValues($data, null, 0);
 
-		// Newest event is the recovery (OK); the one before it is the problem (PROBLEM).
+		$expected_events = count($values);
+
+		// Each trigger must produce one event per transition: PROBLEM, RESOLVED, PROBLEM, RESOLVED, ...
+		$this->waitForAllTriggerEventCounts($triggerids, $expected_events);
+
+		// Events are newest-first, so they alternate RESOLVED, PROBLEM, RESOLVED, PROBLEM, ... (the burst
+		// ends on a recovery, so the newest event is RESOLVED).
 		$events_by_trigger = $this->getScenarioEventsByTrigger($triggerids);
 		foreach ($triggerids as $idx => $triggerid) {
 			$events = $events_by_trigger[$triggerid];
-			$info = 'trigger #'.$idx.': '.json_encode($events);
-			$this->assertCount(2, $events, $info);
-			$this->assertEquals(TRIGGER_VALUE_FALSE, (int) $events[0]['value'], $info);
-			$this->assertEquals(TRIGGER_VALUE_TRUE, (int) $events[1]['value'], $info);
+			$info = 'trigger #'.$idx.': '.count($events).' events';
+			$this->assertCount($expected_events, $events, $info);
+			foreach ($events as $pos => $event) {
+				$expected_value = ($pos % 2 === 0) ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
+				$this->assertEquals($expected_value, (int) $event['value'], $info.' at pos '.$pos);
+			}
 		}
 
 		$this->waitForNoOpenProblems($triggerids, 'open and immediate recovery');
-		$this->assertNoOpenProblems($triggerids);
 	}
 
 	/**
@@ -1396,7 +1620,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * before the test runs, to verify the UNKNOWN state and internal problems are produced correctly
 	 * after a fresh restart.
 	 *
-	 * @depends testTriggerCEP_CloseUnknown
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_OpenUnknownRestart() {
 		$this->skipIfRestartTestsDisabled();
@@ -1416,6 +1640,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
 		$this->runCloseUnknownTest();
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1466,7 +1691,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	public function testTriggerCEP_EventAssessment() {
 		$this->runEventAssessmentTest(false);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1478,7 +1703,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_EventAssessmentRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->runEventAssessmentTest(true);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1501,7 +1726,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	public function testTriggerCEP_DependentTrigger() {
 		$this->runDependentTriggerTest(false);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1513,7 +1738,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_DependentTriggerRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1555,7 +1780,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->clearDiscoveredItemHistory();
 		$this->prepareDataRecoveryExpression();
 		$this->runEventAssessmentTest(false);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1564,7 +1789,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_EventAssessmentRecoveryExpressionRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->runEventAssessmentTest(true);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1572,7 +1797,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	public function testTriggerCEP_DependentTriggerRecoveryExpression() {
 		$this->runDependentTriggerTest(false);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1581,7 +1806,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_DependentTriggerRecoveryExpressionRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1590,7 +1815,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_EventAssessmentMultipleEvent() {
 		$this->prepareDataMultipleEventsRecoveryExpression();
 		$this->runEventAssessmentTest(false);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1599,7 +1824,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_EventAssessmentMultipleEventRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->runEventAssessmentTest(true);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1607,7 +1832,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	public function testTriggerCEP_DependentTriggerMultipleEvent() {
 		$this->runDependentTriggerTest(false);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1616,7 +1841,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_DependentTriggerMultipleEventRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1629,7 +1854,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_EventAssessmentTagCorrelation() {
 		$this->prepareDataTagCorrelation();
 		$this->runEventAssessmentTest(false);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1639,7 +1864,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataTagCorrelation();
 		$this->runEventAssessmentTest(true);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1647,7 +1872,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	public function testTriggerCEP_DependentTriggerTagCorrelation() {
 		$this->runDependentTriggerTest(false);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1656,7 +1881,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_DependentTriggerTagCorrelationRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->runDependentTriggerTest(true);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1670,7 +1895,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_EventAssessmentServiceCorrelation() {
 		$this->prepareDataServiceCorrelation();
 		$this->runEventAssessmentTestCorrelation(false);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1680,7 +1905,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataServiceCorrelation();
 		$this->runEventAssessmentTestCorrelation(true);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1692,7 +1917,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function testTriggerCEP_EventAssessmentServiceCorrelationManualClose() {
 		$this->prepareDataServiceCorrelation();
 		$this->runEventAssessmentTestCorrelationManualClose(false);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1705,7 +1930,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataServiceCorrelation();
 		$this->runEventAssessmentTestCorrelationManualClose(true);
-		$this->assertNoOpenProblems(self::$discovered_triggerids);
+		$this->waitForNoOpenProblems(self::$discovered_triggerids);
 	}
 
 	/**
@@ -1722,7 +1947,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->testTriggerCEP_LLDDiscovery();*/
 		$this->prepareDataGlobalCorrelation();
 		$this->runEventAssessmentTestGlobalCorrelationCrossTrigger(false);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1735,7 +1960,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataGlobalCorrelation();
 		$this->runEventAssessmentTestGlobalCorrelationCrossTrigger(true);
-		$this->assertNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
 
 	/**
@@ -1841,7 +2066,6 @@ class testTriggerCEP extends CIntegrationTest {
 		], null, 0);
 
 		$this->waitForNoOpenProblems($triggerids, 'log recovery');
-		$this->assertNoOpenProblems($triggerids);
 	}
 
 	/**
@@ -2406,7 +2630,7 @@ class testTriggerCEP extends CIntegrationTest {
 
 		// After recovery no problems must remain open on either the parent or the dependent triggers.
 		$this->waitForNoOpenProblems(array_merge($parent_ids, self::$discovered_dep_triggerids),
-			'intermingled batch recovery');
+			'intermingled batch recovery', false);
 	}
 
 	/**
@@ -2489,7 +2713,7 @@ class testTriggerCEP extends CIntegrationTest {
 		// Send recovery value – now that recovery mode is expression, a RESOLVED event must fire.
 		$this->assertStateChangeForAll($triggerids, $keys, '0', TRIGGER_VALUE_FALSE, $event_count + 1);
 
-		$this->assertNoOpenProblems($triggerids, 'After recovery-after-restore');
+		$this->waitForNoOpenProblems($triggerids, 'After recovery-after-restore');
 	}
 
 	/**
@@ -2922,6 +3146,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$current_triggers = $this->getTriggers($triggerids);
 
 		$vps_written = $this->getVpsWritten();
+		//$cep_processed = $this->getCepStat('events', 'assessed');
 		$expected_lastchanges = array_map(fn($tid) => $current_triggers[$tid]['lastchange'], $triggerids);
 		$this->sendSenderValues(
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value,
@@ -2930,6 +3155,7 @@ class testTriggerCEP extends CIntegrationTest {
 		);
 
 		$this->assertVpsWrittenIncreasedBy($vps_written, count($keys));
+		//$this->assertCepStatIncreasedBy('events', 'assessed', $cep_processed, count($keys));
 
 		// The count is enforced by the wait itself (exact total match); no per-trigger fetch needed.
 		$this->waitForAllTriggerEventCounts($triggerids, $expected_event_count);
@@ -2943,7 +3169,7 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 	}
 
-	private function waitForNoOpenProblems(array $triggerids, string $message = ''): void {
+	private function waitForNoOpenProblems(array $triggerids, string $message = '', bool $wait_cep_drained = true): void {
 		// Wait for all problems to have a recovery event.
 		// Wait until no unresolved problems remain. Using countOutput avoids fetching/decoding any
 		// problem rows: the server returns just a count, and we poll until it reaches zero. (Default
@@ -2980,6 +3206,12 @@ class testTriggerCEP extends CIntegrationTest {
 		});
 
 		$this->assertTriggersValueAndState($triggerids, TRIGGER_VALUE_FALSE, 'trigger after recovery');
+
+		// With no open problems left, CEP should have drained its cached events back to zero.
+		// Skip when other problems may still be open elsewhere in the system (cached_events is global).
+		if ($wait_cep_drained) {
+			$this->assertCepStatEquals('tasks', 'cached_events', 0);
+		}
 	}
 
 	private function assertTriggersValueAndState(array $triggerids, int $expected_value, string $label): void {
@@ -2989,25 +3221,6 @@ class testTriggerCEP extends CIntegrationTest {
 			$info = $label.' #'.$idx.': '.json_encode($trigger);
 			$this->assertEquals($expected_value, $trigger['value'], $info);
 			$this->assertEquals(TRIGGER_STATE_NORMAL, $trigger['state'], $info);
-		}
-	}
-
-	private function assertNoOpenProblems(array $triggerids, string $message = ''): void {
-		$prefix = $message !== '' ? $message.': ' : '';
-
-		$response = $this->call('problem.get', [
-			'objectids' => $triggerids,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'output' => ['eventid']
-		]);
-		$this->assertEmpty($response['result'],
-			$prefix.'Expected no open problems: '.json_encode($response));
-
-		$triggers = $this->getTriggers($triggerids);
-		foreach ($triggerids as $triggerid) {
-			$this->assertEquals(TRIGGER_VALUE_FALSE, $triggers[$triggerid]['value'],
-				$prefix.'Expected trigger '.$triggerid.' to have value OK (0).');
 		}
 	}
 
@@ -3106,6 +3319,87 @@ class testTriggerCEP extends CIntegrationTest {
 			usleep(100000);
 		}
 		$this->assertGreaterThanOrEqual($expected, $this->getVpsWritten());
+	}
+
+	/**
+	 * Query the server's internal zabbix["cep"] item and return the decoded CEP statistics:
+	 *   ['events' => ['assessed' => N, 'processed' => N, 'discarded' => N],
+	 *    'tasks'  => ['remote' => N, 'internal' => N, 'completed' => N]]
+	 */
+	private function getCepStats(): array {
+		$result = $this->testItemOnServer((string) self::$hostid, $this->getApiSessionId(),
+			['value_type' => '4', 'type' => '5', 'key' => 'zabbix["cep"]']
+		);
+		$this->assertNotFalse($result);
+		$this->assertArrayHasKey('item', $result);
+		$this->assertArrayNotHasKey('error', $result['item']);
+		$this->assertArrayHasKey('result', $result['item']);
+
+		$stats = json_decode($result['item']['result'], true);
+		$this->assertIsArray($stats, 'zabbix["cep"] did not return valid JSON: '.json_encode($result['item']));
+
+		return $stats;
+	}
+
+	/**
+	 * Read a single numeric CEP statistic, e.g. getCepStat('events', 'processed').
+	 */
+	private function getCepStat(string $group, string $name): int {
+		$stats = $this->getCepStats();
+		$this->assertArrayHasKey($group, $stats, 'zabbix["cep"] stats missing group: '.json_encode($stats));
+		$this->assertArrayHasKey($name, $stats[$group], 'zabbix["cep"] stats missing '.$group.'.'.$name);
+		$this->assertIsNumeric($stats[$group][$name]);
+
+		return (int) $stats[$group][$name];
+	}
+
+	/**
+	 * Poll the zabbix["cep"] statistics until the given counter reaches $baseline + $min_increase, then
+	 * assert it. Mirrors assertVpsWrittenIncreasedBy.
+	 */
+	private function assertCepStatIncreasedBy(string $group, string $name, int $baseline, int $min_increase): void {
+		$expected = $baseline + $min_increase;
+
+		// Poll every 100 ms; keep the same overall timeout as the 1 s-based waits by scaling the
+		// iteration count up by 10x (WAIT_ITERATIONS * WAIT_ITERATION_DELAY seconds total).
+		$iterations = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY * 10;
+		for ($i = 0; $i < $iterations; $i++) {
+			if ($this->getCepStat($group, $name) >= $expected) {
+				break;
+			}
+			usleep(100000);
+		}
+		$this->assertGreaterThanOrEqual($expected, $this->getCepStat($group, $name),
+			'CEP '.$group.'.'.$name.' did not increase by at least '.$min_increase.' (baseline '.$baseline.').');
+	}
+
+	/**
+	 * Poll the zabbix["cep"] statistics until the given counter equals $expected, then assert it.
+	 */
+	private function assertCepStatEquals(string $group, string $name, int $expected): void {
+		// Poll every 100 ms; keep the same overall timeout as the 1 s-based waits by scaling the
+		// iteration count up by 10x (WAIT_ITERATIONS * WAIT_ITERATION_DELAY seconds total).
+		$iterations = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY * 10;
+		for ($i = 0; $i < $iterations; $i++) {
+			if ($this->getCepStat($group, $name) == $expected) {
+				break;
+			}
+			usleep(100000);
+		}
+		$actual = $this->getCepStat($group, $name);
+		$info = '';
+		if ($actual != $expected) {
+			// Surface up to 10 still-open problems to help diagnose why the cache did not drain.
+			$response = $this->call('problem.get', [
+				'object' => EVENT_OBJECT_TRIGGER,
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'output' => ['eventid', 'objectid', 'name', 'clock'],
+				'limit' => 10
+			]);
+			$info = ' Open problems (max 10): '.json_encode($response['result']);
+		}
+		$this->assertEquals($expected, $actual,
+			'CEP '.$group.'.'.$name.' did not reach '.$expected.'.'.$info);
 	}
 
 	public static function clearData(): void {

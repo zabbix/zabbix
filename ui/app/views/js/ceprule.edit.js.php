@@ -124,7 +124,9 @@ window.ceprule_edit_popup = new class {
 					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-window-condition-remove"><?= _('Remove') ?></button>
 					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][type]" type="hidden" value="#{type}"/>
 					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][operator]" type="hidden" value="#{operator}"/>
-					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][past_tag]" type="hidden" value="#{past_tag}"/>
+					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][tag_pair_past_tag]" type="hidden" value="#{tag_pair_past_tag}"/>
+					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][past_event_past_tag]" type="hidden" value="#{past_event_past_tag}"/>
+					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][old_value_past_tag]" type="hidden" value="#{old_value_past_tag}"/>
 					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][tag]" type="hidden" value="#{tag}"/>
 					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][tag_value]" type="hidden" value="#{tag_value}"/>
 					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][formulaid]" type="hidden" value="#{formulaid}"/>
@@ -646,7 +648,9 @@ window.ceprule_edit_popup = new class {
 				formulaid: this.#indexToFormulaId(this.#window_condition_row_index++),
 				type: '<?= CCepRuleHelper::CONDITION_EVENT_NAME ?>',
 				type: '<?= CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR ?>',
-				past_tag: '',
+				tag_pair_past_tag: '',
+				past_event_past_tag: '',
+				old_value_past_tag: '',
 				operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
 				tag: '',
 				tag_value: ''
@@ -963,14 +967,14 @@ window.ceprule_edit_popup = new class {
 		let arg2 = '';
 
 		if (window_condition.type == <?= CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR ?>) {
-			arg1 = window_condition.past_tag;
+			arg1 = window_condition.tag_pair_past_tag;
 			arg2 = window_condition.tag;
 		}
 		else if (window_condition.type == <?= CCepRuleHelper::WINDOW_CONDITION_OLD_TAG ?>) {
-			arg2 = window_condition.past_tag;
+			arg2 = window_condition.past_event_past_tag;
 		}
 		else if (window_condition.type == <?= CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE ?>) {
-			arg1 = window_condition.past_tag;
+			arg1 = window_condition.old_value_past_tag;
 			arg2 = window_condition.tag_value;
 		}
 

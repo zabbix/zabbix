@@ -1190,6 +1190,7 @@ define('ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE',			0x080);
 define('ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM',		0x100);
 define('ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS',	0x200);
 define('ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS',	0x400);
+define('ZBX_PROBLEM_UPDATE_CEP',					0x800);
 
 define('ZBX_PROBLEM_SYMPTOM_LIMIT', 50);
 
@@ -2351,6 +2352,7 @@ define('ZBX_ICON_BULLET_RIGHT_WITH_CONTENT', 'zi-bullet-right-with-content');
 define('ZBX_ICON_CALENDAR', 'zi-calendar');
 define('ZBX_ICON_CALENDAR_CHECK', 'zi-calendar-check');
 define('ZBX_ICON_CALENDAR_WARNING', 'zi-calendar-warning');
+define('ZBX_ICON_CEP', 'zi-cep');
 define('ZBX_ICON_CHEVRON_DOUBLE_LEFT', 'zi-chevron-double-left');
 define('ZBX_ICON_CHECK', 'zi-check');
 define('ZBX_ICON_CHECKBOX', 'zi-checkbox');

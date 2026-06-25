@@ -499,7 +499,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getExDataEvents(array $eventids) {
 		$events = API::Event()->get([
-			'output' => ['eventid', 'r_eventid', 'acknowledged'],
+			'output' => ['eventid', 'r_eventid', 'acknowledged', 'cep_ruleid'],
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],

@@ -74,7 +74,14 @@ abstract class CControllerCepRuleGeneral extends CController {
 			if (array_key_exists('filter', $request['window'])) {
 				if (array_key_exists('conditions', $request['window']['filter'])) {
 					array_walk($request['window']['filter']['conditions'], function (array &$condition) {
-						unset($condition['formulaid']);
+						$condition['past_tag'] = match((int) $condition['type']) {
+							CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR => $condition['tag_pair_past_tag'],
+							CCepRuleHelper::WINDOW_CONDITION_OLD_TAG => $condition['past_event_past_tag'],
+							CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE => $condition['old_value_past_tag']
+						};
+						unset($condition['formulaid'], $condition['tag_pair_past_tag'],
+							$condition['old_value_past_tag'], $condition['past_event_past_tag']
+						);
 					});
 					$request['window']['filter']['conditions'] = array_values(
 						$request['window']['filter']['conditions']
@@ -302,12 +309,16 @@ abstract class CControllerCepRuleGeneral extends CController {
 
 	public static function getWindowConditionValidationFields(): array {
 		return [
-			'type' => ['integer', 'required', 'in' => [CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR, CCepRuleHelper::WINDOW_CONDITION_OLD_TAG, CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE]],
+			'type' => ['integer', 'required', 'in' => [CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR,
+				CCepRuleHelper::WINDOW_CONDITION_OLD_TAG, CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE
+			]],
 			'operator' => [
 				[
 					'integer', 'required',
 					'in' => [CONDITION_OPERATOR_EQUAL],
-					'when' => ['type', 'in' => [CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR, CCepRuleHelper::WINDOW_CONDITION_OLD_TAG]]
+					'when' => ['type', 'in' => [CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR,
+						CCepRuleHelper::WINDOW_CONDITION_OLD_TAG
+					]]
 				],
 				[
 					'integer', 'required',
@@ -315,7 +326,15 @@ abstract class CControllerCepRuleGeneral extends CController {
 					'when' => ['type', 'in' => [CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE]]
 				]
 			],
-			'past_tag' => ['db cep_window_condition.past_tag', 'required', 'not_empty'],
+			'tag_pair_past_tag' => ['db cep_window_condition.past_tag', 'required', 'not_empty',
+				'when' => ['type', 'in' => [CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR]]
+			],
+			'past_event_past_tag' => ['db cep_window_condition.past_tag', 'required', 'not_empty',
+				'when' => ['type', 'in' => [CCepRuleHelper::WINDOW_CONDITION_OLD_TAG]]
+			],
+			'old_value_past_tag' => ['db cep_window_condition.past_tag', 'required', 'not_empty',
+				'when' => ['type', 'in' => [CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE]]
+			],
 			'tag' => ['db cep_window_condition.tag', 'required',
 				'when' => ['type', 'in' => [CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR]]
 			],

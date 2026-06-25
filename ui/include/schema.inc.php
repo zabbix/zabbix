@@ -5029,6 +5029,19 @@ return [
 				'length' => 20,
 				'ref_table' => 'maintenances',
 				'ref_field' => 'maintenanceid'
+			],
+			'details' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
+			],
+			'cep_ruleid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'cep_rule',
+				'ref_field' => 'cep_ruleid'
 			]
 		]
 	],
@@ -10670,7 +10683,7 @@ return [
 			]
 		]
 	],
-	'cep_operation_tag' => [
+	'cep_operation_condition' => [
 		'key' => 'cep_operation_tagid',
 		'fields' => [
 			'cep_operation_tagid' => [
@@ -10685,11 +10698,17 @@ return [
 				'ref_table' => 'cep_operation',
 				'ref_field' => 'cep_operationid'
 			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => ZBX_CONDITION_TYPE_EVENT_TAG
+			],
 			'operator' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0'
+				'default' => CONDITION_OPERATOR_EXISTS
 			],
 			'tag' => [
 				'null' => false,

@@ -44,9 +44,6 @@ window.ceprule_window_condition_edit_popup = new class {
 		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 
-		this.#templates = Object.fromEntries([...this.form_element.querySelectorAll('template[for-type]')]
-			.map(template => [template.getAttribute('for-type'), template.content]));
-
 		this.#setValues(window_condition);
 		this.#initActions();
 		window['ceprule-window-condition-type'].dispatchEvent(new Event('change'));
@@ -57,16 +54,14 @@ window.ceprule_window_condition_edit_popup = new class {
 	}
 
 	#setValues(window_condition) {
-		[...this.#live_nodes, ...Object.values(this.#templates)]
-			.reduce((carry, fragment) => [...fragment.querySelectorAll('[name]'), ...carry], [])
-			.map((node) => {
-				if (node.type === 'radio') {
-					node.checked = node.value === window_condition[node.name];
-				}
-				else {
-					node.value = window_condition[node.name] ?? '';
-				}
-			});
+		[...this.form_element.querySelectorAll('[name]')].map((node) => {
+			if (node.type === 'radio') {
+				node.checked = node.value === window_condition[node.name];
+			}
+			else {
+				node.value = window_condition[node.name] ?? '';
+			}
+		});
 
 		this.form_element.querySelector('[name="type"]').value = window_condition.type;
 		this.form_element.querySelector('[name="formulaid"]').value = window_condition.formulaid;
