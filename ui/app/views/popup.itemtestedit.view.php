@@ -125,6 +125,7 @@ if ($data['is_item_testable']) {
 			(new CCheckBox('get_value', 1))
 				->setChecked($data['get_value'])
 				->setUncheckedValue(0)
+				->setAttribute('autofocus', 'autofocus')
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
 
 		(new CLabel(_('Host address'), 'interface_address'))
