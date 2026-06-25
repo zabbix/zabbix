@@ -15586,6 +15586,10 @@ msgstr ""
 msgid "Next dashboard"
 msgstr ""
 
+#: jsLoader.php:328
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15598,6 +15602,10 @@ msgstr ""
 #: include/classes/setup/CSetupWizard.php:698
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
+msgstr ""
+
+#: jsLoader.php:326
+msgid "Next year"
 msgstr ""
 
 #: app/partials/administration.system.info.php:35
@@ -15787,6 +15795,11 @@ msgstr ""
 
 #: include/classes/html/CMultiSelect.php:66 jsLoader.php:328
 msgid "No matches found"
+msgstr ""
+
+#: app/controllers/CControllerValidateApiExists.php:118
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
 msgstr ""
 
 #: app/controllers/CControllerModuleScan.php:130
