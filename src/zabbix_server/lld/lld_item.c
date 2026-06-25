@@ -153,6 +153,10 @@ static void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
 	zbx_free(item_prototype->ssl_cert_file);
 	zbx_free(item_prototype->ssl_key_file);
 	zbx_free(item_prototype->ssl_key_password);
+	zbx_free(item_prototype->query);
+	zbx_free(item_prototype->time_shift);
+	zbx_free(item_prototype->lookback_limit);
+	zbx_free(item_prototype->granularity);
 	zbx_free(item_prototype->lifetime);
 	zbx_free(item_prototype->enabled_lifetime);
 
@@ -233,6 +237,14 @@ static void	lld_item_full_free(zbx_lld_item_full_t *item)
 	zbx_free(item->logtimefmt_orig);
 	zbx_free(item->publickey_orig);
 	zbx_free(item->privatekey_orig);
+	zbx_free(item->query);
+	zbx_free(item->query_orig);
+	zbx_free(item->time_shift);
+	zbx_free(item->time_shift_orig);
+	zbx_free(item->lookback_limit);
+	zbx_free(item->lookback_limit_orig);
+	zbx_free(item->granularity);
+	zbx_free(item->granularity_orig);
 
 	zbx_free(item->lifetime_orig);
 	zbx_free(item->enabled_lifetime_orig);
@@ -473,7 +485,8 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 					"post_type,http_proxy,headers,retrieve_mode,request_method,output_format,"
 					"ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,"
 					"allow_traps,status,lifetime,lifetime_type,enabled_lifetime,"
-					"enabled_lifetime_type,evaltype,flags,discover"
+					"enabled_lifetime_type,evaltype,flags,discover,query,time_shift,lookback_limit,"
+					"granularity"
 				" from items"
 				" where");
 
@@ -757,6 +770,18 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 					item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_STATUS;
 				}
 			}
+
+			item->query = zbx_strdup(NULL, row[51]);
+			item->query_orig = NULL;
+
+			item->time_shift = zbx_strdup(NULL, row[52]);
+			item->time_shift_orig = NULL;
+
+			item->lookback_limit = zbx_strdup(NULL, row[53]);
+			item->lookback_limit_orig = NULL;
+
+			item->granularity = zbx_strdup(NULL, row[54]);
+			item->granularity_orig = NULL;
 
 			item->lld_row = NULL;
 
@@ -1672,6 +1697,14 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 				ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_FILE, ZBX_ITEM_SSL_KEY_FILE_LEN, error);
 		lld_validate_item_field(item, &item->ssl_key_password, &item->ssl_key_password_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD, ZBX_ITEM_SSL_KEY_PASSWORD_LEN, error);
+		lld_validate_item_field(item, &item->query, &item->query_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_QUERY, ZBX_ITEM_QUERY_LEN, error);
+		lld_validate_item_field(item, &item->time_shift, &item->time_shift_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_TIME_SHIFT, ZBX_ITEM_TIME_SHIFT_LEN, error);
+		lld_validate_item_field(item, &item->lookback_limit, &item->lookback_limit_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT, ZBX_ITEM_LOOKBACK_LIMIT_LEN, error);
+		lld_validate_item_field(item, &item->granularity, &item->granularity_orig,
+				ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY, ZBX_ITEM_GRANULARITY_LEN, error);
 	}
 
 	/* check duplicated item keys */
@@ -2011,6 +2044,30 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	item->ssl_key_password_orig = NULL;
 	zbx_substitute_lld_macros(&item->ssl_key_password, lld_obj, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
+
+	item->query = zbx_strdup(NULL, item_prototype->query);
+	item->query_orig = NULL;
+
+	if (SUCCEED == ret && FAIL == (ret = zbx_substitute_macros_in_telemetry_query(&item->query, lld_obj, err,
+			sizeof(err))))
+	{
+		*error = zbx_strdcatf(*error, "Cannot create item, error in telemetry query JSON: %s.\n", err);
+	}
+
+	item->time_shift = zbx_strdup(NULL, item_prototype->time_shift);
+	item->time_shift_orig = NULL;
+	zbx_substitute_lld_macros(&item->time_shift, lld_obj, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(item->time_shift, ZBX_WHITESPACE);
+
+	item->lookback_limit = zbx_strdup(NULL, item_prototype->lookback_limit);
+	item->lookback_limit_orig = NULL;
+	zbx_substitute_lld_macros(&item->lookback_limit, lld_obj, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(item->lookback_limit, ZBX_WHITESPACE);
+
+	item->granularity = zbx_strdup(NULL, item_prototype->granularity);
+	item->granularity_orig = NULL;
+	zbx_substitute_lld_macros(&item->granularity, lld_obj, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(item->granularity, ZBX_WHITESPACE);
 
 	item->trapper_hosts_orig = NULL;
 	item->formula = zbx_strdup(NULL, item_prototype->formula);
@@ -2409,6 +2466,56 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		item->ssl_key_password = buffer;
 		buffer = NULL;
 		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->query);
+
+	if (FAIL == zbx_substitute_macros_in_telemetry_query(&buffer, lld_obj, err, sizeof(err)))
+		*error = zbx_strdcatf(*error, "Cannot update item, error in telemetry query JSON: %s.\n", err);
+
+	/* since the query json object is always generated the same way during lld, we can just use strcmp */
+	if (0 != strcmp(item->query, buffer))
+	{
+		item->query_orig = item->query;
+		item->query = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_QUERY;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->time_shift);
+	zbx_substitute_lld_macros(&buffer, lld_obj, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(buffer, ZBX_WHITESPACE);
+
+	if (0 != strcmp(item->time_shift, buffer))
+	{
+		item->time_shift_orig = item->time_shift;
+		item->time_shift = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_TIME_SHIFT;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->lookback_limit);
+	zbx_substitute_lld_macros(&buffer, lld_obj, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(buffer, ZBX_WHITESPACE);
+
+	if (0 != strcmp(item->lookback_limit, buffer))
+	{
+		item->lookback_limit_orig = item->lookback_limit;
+		item->lookback_limit = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->granularity);
+	zbx_substitute_lld_macros(&buffer, lld_obj, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(buffer, ZBX_WHITESPACE);
+
+	if (0 != strcmp(item->granularity, buffer))
+	{
+		item->granularity_orig = item->granularity;
+		item->granularity = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY;
 	}
 
 	if (ZBX_PROTOTYPE_NO_DISCOVER != discover)
@@ -2977,7 +3084,9 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				item->ssl_key_password, item_prototype->verify_peer, item_prototype->verify_host,
 				item_prototype->allow_traps, item_prototype->lifetime, item_prototype->lifetime_type,
 				item_prototype->enabled_lifetime, item_prototype->enabled_lifetime_type,
-				item_prototype->evaltype, item_prototype->discover);
+				item_prototype->evaltype, item_prototype->discover, item->query,
+				item->time_shift, item->lookback_limit,
+				item->granularity);
 
 		/* In the case of prototype item discovery find the discovered LLD rule id */
 		if (NULL != rule_index)
@@ -3478,6 +3587,42 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_audit_item_update_json_update_discover(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
 				item->item_flags, item->discover_orig, item->discover);
 	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_QUERY))
+	{
+		value_esc = zbx_db_dyn_escape_string(item->query);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%squery='%s'", d, value_esc);
+		d = ",";
+		zbx_audit_item_update_json_update_query(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
+				item->item_flags, item->query_orig, item->query);
+		zbx_free(value_esc);
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TIME_SHIFT))
+	{
+		value_esc = zbx_db_dyn_escape_string(item->time_shift);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%stime_shift='%s'", d, value_esc);
+		d = ",";
+		zbx_audit_item_update_json_update_time_shift(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
+				item->item_flags, item->time_shift_orig, item->time_shift);
+		zbx_free(value_esc);
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT))
+	{
+		value_esc = zbx_db_dyn_escape_string(item->lookback_limit);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%slookback_limit='%s'", d, value_esc);
+		d = ",";
+		zbx_audit_item_update_json_update_lookback_limit(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
+				item->item_flags, item->lookback_limit_orig, item->lookback_limit);
+		zbx_free(value_esc);
+	}
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY))
+	{
+		value_esc = zbx_db_dyn_escape_string(item->granularity);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sgranularity='%s'", d, value_esc);
+		d = ",";
+		zbx_audit_item_update_json_update_granularity(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
+				item->item_flags, item->granularity_orig, item->granularity);
+		zbx_free(value_esc);
+	}
 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
 
@@ -3649,7 +3794,8 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				"retrieve_mode", "request_method", "output_format", "ssl_cert_file", "ssl_key_file",
 				"ssl_key_password", "verify_peer", "verify_host", "allow_traps",
 				"lifetime", "lifetime_type", "enabled_lifetime", "enabled_lifetime_type",
-				"evaltype", "discover", (char *)NULL);
+				"evaltype", "discover", "query", "time_shift", "lookback_limit", "granularity",
+				(char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
 				"parent_itemid", "key_", "lastcheck", "lldruleid", (char *)NULL);
@@ -4386,7 +4532,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 				"i.retrieve_mode,i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,"
 				"i.ssl_key_password,i.verify_peer,i.verify_host,i.allow_traps,i.discover,"
 				"i.lifetime,i.lifetime_type,i.enabled_lifetime,i.enabled_lifetime_type,i.evaltype,"
-				"i.flags"
+				"i.flags,i.query,i.time_shift,i.lookback_limit,i.granularity"
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
 				" and id.lldruleid=" ZBX_FS_UI64,
@@ -4452,6 +4598,11 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 		item_prototype->enabled_lifetime = zbx_strdup(NULL, row[47]);
 		item_prototype->enabled_lifetime_type = atoi(row[48]);
 		item_prototype->evaltype = atoi(row[49]);
+
+		item_prototype->query = zbx_strdup(NULL, row[51]);
+		item_prototype->time_shift = zbx_strdup(NULL, row[52]);
+		item_prototype->lookback_limit = zbx_strdup(NULL, row[53]);
+		item_prototype->granularity = zbx_strdup(NULL, row[54]);
 
 		zbx_vector_lld_row_ptr_create(&item_prototype->lld_rows);
 		zbx_vector_lld_item_preproc_ptr_create(&item_prototype->preproc_ops);
@@ -4784,6 +4935,9 @@ static void	lld_item_prototype_dump(zbx_lld_item_prototype_t *item_prototype)
 	zabbix_log(LOG_LEVEL_TRACE, "  verify_peer:%u verify_host:%u",
 			item_prototype->verify_peer, item_prototype->verify_host);
 	zabbix_log(LOG_LEVEL_TRACE, "  discover:%u", item_prototype->discover);
+	zabbix_log(LOG_LEVEL_TRACE, "  query:%s", item_prototype->query);
+	zabbix_log(LOG_LEVEL_TRACE, "  time_shift:%s lookback_limit:%s granularity:%s", item_prototype->time_shift,
+			item_prototype->lookback_limit, item_prototype->granularity);
 
 	if (0 != (item_prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 	{

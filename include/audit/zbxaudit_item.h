@@ -86,6 +86,10 @@ PREPARE_AUDIT_ITEM_UPDATE_H(verify_peer, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(verify_host, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(allow_traps, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(discover, int)
+PREPARE_AUDIT_ITEM_UPDATE_H(query, const char*)
+PREPARE_AUDIT_ITEM_UPDATE_H(time_shift, const char*)
+PREPARE_AUDIT_ITEM_UPDATE_H(lookback_limit, const char*)
+PREPARE_AUDIT_ITEM_UPDATE_H(granularity, const char*)
 PREPARE_AUDIT_ITEM_UPDATE_H(key_, const char*)
 
 void	zbx_audit_item_delete(int audit_context_mode, zbx_vector_uint64_t *itemids);

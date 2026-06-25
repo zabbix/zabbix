@@ -77,7 +77,8 @@ static int	send_query_http_raw(const char *posts, const telemetry_query_http_con
 	return ret;
 }
 
-static int	send_query_http(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, zbx_tq_db_type_t db_type,
+static int	send_query_http(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
+		time_t now, time_t lasttimestamp, zbx_tq_db_type_t db_type,
 		const telemetry_query_http_conn_params_t *conn_params, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, zbx_vector_str_t *values, char **error)
@@ -88,9 +89,10 @@ static int	send_query_http(const zbx_tq_query_t *query, time_t now, time_t lastt
 	int	parse_ret;
 
 	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type)
-		zbx_tq_sql_generate_clickhouse(query, now, lasttimestamp, &posts);
+		zbx_tq_sql_generate_clickhouse(query, time_shift, lookback_limit, granularity, now, lasttimestamp,
+				&posts);
 	else
-		zbx_tq_generate_elastic(query, now, lasttimestamp, &posts);
+		zbx_tq_generate_elastic(query, time_shift, lookback_limit, granularity, now, lasttimestamp, &posts);
 
 	if (SUCCEED != send_query_http_raw(posts, conn_params, config_source_ip,
 			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &resp, error))
@@ -157,8 +159,9 @@ static int	get_values_telemetry_http(const zbx_dc_item_t *item, zbx_tq_db_type_t
 	};
 	/* FIXME: placeholder end */
 
-	if (SUCCEED != send_query_http(item->telemetry_query, now, lasttimestamp, db_type, &conn_params,
-			config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+	if (SUCCEED != send_query_http(item->telemetry_query, item->time_shift, item->lookback_limit,
+			item->granularity, now, lasttimestamp, db_type, &conn_params, config_source_ip,
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
 			values, &send_error))
 	{
 		*error = zbx_dsprintf(NULL, "Query failed: '%s'", send_error);
@@ -187,8 +190,8 @@ static int	have_required_db(zbx_tq_db_type_t db_type)
 #endif
 }
 
-static zbx_db_result_t	sql_lib_execute_telemetry_query(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
-		zbx_tq_db_type_t db_type, char **error)
+static zbx_db_result_t	sql_lib_execute_telemetry_query(const zbx_tq_query_t *query, int time_shift, int lookback_limit,
+		int granularity, time_t now, time_t lasttimestamp, zbx_tq_db_type_t db_type, char **error)
 {
 	zbx_db_config_t	*db_config = zbx_db_config_create();
 	zbx_dbconn_t	*db;
@@ -224,9 +227,10 @@ static zbx_db_result_t	sql_lib_execute_telemetry_query(const zbx_tq_query_t *que
 	}
 
 	if (ZBX_TQ_DB_TYPE_POSTGRESQL == db_type)
-		zbx_tq_sql_generate_postgresql(query, now, lasttimestamp, &sql, db);
+		zbx_tq_sql_generate_postgresql(query, time_shift, lookback_limit, granularity, now, lasttimestamp, &sql,
+		db);
 	else
-		zbx_tq_sql_generate_mysql(query, now, lasttimestamp, &sql, db);
+		zbx_tq_sql_generate_mysql(query, time_shift, lookback_limit, granularity, now, lasttimestamp, &sql, db);
 
 	res = zbx_dbconn_select(db, "%s", sql);
 
@@ -258,7 +262,8 @@ static int	get_values_telemetry_sql_lib(const zbx_dc_item_t *item, zbx_tq_db_typ
 		return FAIL;
 	}
 
-	sql_result = sql_lib_execute_telemetry_query(item->telemetry_query, now, lasttimestamp, db_type, error);
+	sql_result = sql_lib_execute_telemetry_query(item->telemetry_query, item->time_shift,
+			item->lookback_limit, item->granularity, now, lasttimestamp, db_type, error);
 
 	if (NULL == sql_result)
 		goto clean;

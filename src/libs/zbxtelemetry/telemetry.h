@@ -19,8 +19,6 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 
-#define TQ_TIME_INTERVAL_INVALID -1
-
 typedef struct
 {
 	const char		*name;

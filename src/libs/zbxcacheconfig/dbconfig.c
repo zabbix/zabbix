@@ -9980,9 +9980,9 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			break;
 		case ITEM_TYPE_TELEMETRY_QUERY:
 			dst_item->query = zbx_strdup(NULL, src_item->itemtype.tqitem->query);
-			dst_item->time_shift = zbx_strdup(NULL, src_item->itemtype.tqitem->time_shift);
-			dst_item->lookback_limit = zbx_strdup(NULL, src_item->itemtype.tqitem->lookback_limit);
-			dst_item->granularity = zbx_strdup(NULL, src_item->itemtype.tqitem->granularity);
+			zbx_strscpy(dst_item->time_shift_orig, src_item->itemtype.tqitem->time_shift);
+			zbx_strscpy(dst_item->lookback_limit_orig, src_item->itemtype.tqitem->lookback_limit);
+			zbx_strscpy(dst_item->granularity_orig, src_item->itemtype.tqitem->granularity);
 			dst_item->telemetry_query = NULL;
 			break;
 		case ITEM_TYPE_SCRIPT:
@@ -10243,9 +10243,9 @@ static void	DCget_telemetry_query_item(zbx_dc_telemetry_query_item_t *dst_item, 
 		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
 
 	dst_item->query = zbx_strdup(NULL, src_item->itemtype.tqitem->query);
-	dst_item->time_shift = zbx_strdup(NULL, src_item->itemtype.tqitem->time_shift);
-	dst_item->lookback_limit = zbx_strdup(NULL, src_item->itemtype.tqitem->lookback_limit);
-	dst_item->granularity = zbx_strdup(NULL, src_item->itemtype.tqitem->granularity);
+	zbx_strscpy(dst_item->time_shift_orig, src_item->itemtype.tqitem->time_shift);
+	zbx_strscpy(dst_item->lookback_limit_orig, src_item->itemtype.tqitem->lookback_limit);
+	zbx_strscpy(dst_item->granularity_orig, src_item->itemtype.tqitem->granularity);
 	dst_item->telemetry_query = NULL;
 	dst_item->lasttimestamp = src_item->itemtype.tqitem->lasttimestamp;
 	dst_item->min_free_ts = src_item->itemtype.tqitem->min_free_ts;
@@ -10288,9 +10288,6 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 				break;
 			case ITEM_TYPE_TELEMETRY_QUERY:
 				zbx_free(items[i].query);
-				zbx_free(items[i].time_shift);
-				zbx_free(items[i].lookback_limit);
-				zbx_free(items[i].granularity);
 				break;
 		}
 

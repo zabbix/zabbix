@@ -54,12 +54,12 @@ zbx_tq_metric_type_t;
 typedef enum
 {
 	ZBX_TQ_FUNCTION_UNKNOWN = -1,
-	ZBX_TQ_FUNCTION_COUNT,
-	ZBX_TQ_FUNCTION_MIN,
-	ZBX_TQ_FUNCTION_MAX,
-	ZBX_TQ_FUNCTION_AVG,
-	ZBX_TQ_FUNCTION_SUM,
-	ZBX_TQ_FUNCTION_PERCENTILE,
+	ZBX_TQ_FUNCTION_MIN		= 1,
+	ZBX_TQ_FUNCTION_MAX		= 2,
+	ZBX_TQ_FUNCTION_AVG		= 3,
+	ZBX_TQ_FUNCTION_COUNT		= 4,
+	ZBX_TQ_FUNCTION_SUM		= 5,
+	ZBX_TQ_FUNCTION_PERCENTILE	= 8,
 }
 zbx_tq_function_type_t;
 
@@ -147,21 +147,28 @@ zbx_tq_db_type_t;
 
 ZBX_PTR_VECTOR_DECL(tq_condition_ptr, zbx_tq_condition_t *)
 
-int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, const char *time_shift,
-		const char *lookback_limit, const char *granularity, zbx_tq_macro_expand_func_t macro_expand_cb,
+int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, zbx_tq_macro_expand_func_t macro_expand_cb,
 		void *macro_expand_ctx, char *error, size_t max_error_len);
 void	zbx_tq_query_clean(zbx_tq_query_t *query);
 
-void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql,
-		const zbx_dbconn_t *db);
-void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql,
-		const zbx_dbconn_t *db);
-void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql);
-void	zbx_tq_generate_elastic(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **dsl);
+int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out, const char *lookback_limit_str,
+		int *lookback_limit_out, const char *granularity_str, int *granularity_out, char *error,
+		size_t max_error_len);
 
-void	zbx_tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
-		time_t *out_lower, time_t *out_upper);
-void	zbx_tq_get_newlasttimestamp(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
+char	*zbx_tq_serialize_query(const zbx_tq_query_t *query);
+
+void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
+		time_t now, time_t lasttimestamp, char **sql, const zbx_dbconn_t *db);
+void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
+		time_t now, time_t lasttimestamp, char **sql, const zbx_dbconn_t *db);
+void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
+		time_t now, time_t lasttimestamp, char **sql);
+void	zbx_tq_generate_elastic(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
+		time_t now, time_t lasttimestamp, char **dsl);
+
+void	zbx_tq_get_timestamp_filter_bounds(int time_shift, int lookback_limit, int granularity, time_t now,
+		time_t lasttimestamp, time_t *out_lower, time_t *out_upper);
+void	zbx_tq_get_newlasttimestamp(int lookback_limit, int granularity, time_t now, time_t lasttimestamp,
 		time_t *newlasttimestamp);
 
 int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_vector_str_t *values);

@@ -730,11 +730,20 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				}
 				break;
 			case ITEM_TYPE_TELEMETRY_QUERY:
+				if (FAIL == zbx_tq_validate_time_params(items[i].time_shift_orig,
+						&items[i].time_shift, items[i].lookback_limit_orig,
+						&items[i].lookback_limit, items[i].granularity_orig,
+						&items[i].granularity, error, sizeof(error)))
+				{
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+					errcodes[i] = CONFIG_ERROR;
+					continue;
+				}
+
 				items[i].telemetry_query = zbx_malloc(NULL, sizeof(zbx_tq_query_t));
 
-				if (SUCCEED != zbx_tq_parse_query(items[i].telemetry_query, items[i].query,
-						items[i].time_shift, items[i].lookback_limit, items[i].granularity,
-						NULL, NULL, error, sizeof(error)))
+				if (SUCCEED != zbx_tq_parse_query(items[i].telemetry_query, items[i].query, NULL, NULL,
+						error, sizeof(error)))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
@@ -1068,6 +1077,7 @@ void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int
 		AGENT_RESULT *results)
 {
 	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL;
+	char			*time_shift = NULL, *lookback_limit = NULL, *granularity = NULL;
 	zbx_dc_um_handle_t	*um_handle, *um_handle_secure;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, num);
@@ -1113,15 +1123,27 @@ void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int
 			items[i].timeout = timeout_sec;
 		}
 
-		zbx_dc_expand_user_and_func_macros(um_handle, &items[i].time_shift, &items[i].hostid, 1, NULL);
-		zbx_dc_expand_user_and_func_macros(um_handle, &items[i].lookback_limit, &items[i].hostid, 1, NULL);
-		zbx_dc_expand_user_and_func_macros(um_handle, &items[i].granularity, &items[i].hostid, 1, NULL);
+		ZBX_STRDUP(time_shift, items[i].time_shift_orig);
+		ZBX_STRDUP(lookback_limit, items[i].lookback_limit_orig);
+		ZBX_STRDUP(granularity, items[i].granularity_orig);
+
+		zbx_dc_expand_user_and_func_macros(um_handle, &time_shift, &items[i].hostid, 1, NULL);
+		zbx_dc_expand_user_and_func_macros(um_handle, &lookback_limit, &items[i].hostid, 1, NULL);
+		zbx_dc_expand_user_and_func_macros(um_handle, &granularity, &items[i].hostid, 1, NULL);
+
+		if (FAIL == zbx_tq_validate_time_params(time_shift, &items[i].time_shift, lookback_limit,
+				&items[i].lookback_limit, granularity, &items[i].granularity, error,
+				sizeof(error)))
+		{
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			errcodes[i] = CONFIG_ERROR;
+			continue;
+		}
 
 		items[i].telemetry_query = zbx_malloc(NULL, sizeof(zbx_tq_query_t));
 
-		if (SUCCEED != zbx_tq_parse_query(items[i].telemetry_query, items[i].query, items[i].time_shift,
-				items[i].lookback_limit, items[i].granularity, telemetry_query_macro_expand_cb,
-				&query_macro_expand_ctx, error, sizeof(error)))
+		if (SUCCEED != zbx_tq_parse_query(items[i].telemetry_query, items[i].query,
+				telemetry_query_macro_expand_cb, &query_macro_expand_ctx, error, sizeof(error)))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = CONFIG_ERROR;
@@ -1129,14 +1151,14 @@ void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int
 			continue;
 		}
 
-		/* query, time_shift, lookback_limit and granularity are not needed after the query has been parsed */
+		/* query is not needed after the query has been parsed */
 		zbx_free(items[i].query);
-		zbx_free(items[i].time_shift);
-		zbx_free(items[i].lookback_limit);
-		zbx_free(items[i].granularity);
 	}
 
 	zbx_free(timeout);
+	zbx_free(time_shift);
+	zbx_free(lookback_limit);
+	zbx_free(granularity);
 
 	zbx_dc_close_user_macros(um_handle_secure);
 	zbx_dc_close_user_macros(um_handle);
@@ -1243,9 +1265,6 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 				break;
 			case ITEM_TYPE_TELEMETRY_QUERY:
 				zbx_free(items[i].query);
-				zbx_free(items[i].time_shift);
-				zbx_free(items[i].lookback_limit);
-				zbx_free(items[i].granularity);
 				if (NULL != items[i].telemetry_query)
 				{
 					zbx_tq_query_clean(items[i].telemetry_query);
@@ -1322,9 +1341,6 @@ void	zbx_clean_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int n
 		zbx_free(items[i].key);
 
 		zbx_free(items[i].query);
-		zbx_free(items[i].time_shift);
-		zbx_free(items[i].lookback_limit);
-		zbx_free(items[i].granularity);
 
 		if (NULL != items[i].telemetry_query)
 		{

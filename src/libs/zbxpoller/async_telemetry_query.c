@@ -57,12 +57,15 @@ static int	async_send_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, 
 	telemetry_query_context->item_context.preprocessing = item->preprocessing;
 
 	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == db_type)
-		zbx_tq_sql_generate_clickhouse(query, now, lasttimestamp, &telemetry_query_context->item_context.posts);
+		zbx_tq_sql_generate_clickhouse(query, item->time_shift, item->lookback_limit, item->granularity, now,
+				lasttimestamp, &telemetry_query_context->item_context.posts);
 	else
-		zbx_tq_generate_elastic(query, now, lasttimestamp, &telemetry_query_context->item_context.posts);
+		zbx_tq_generate_elastic(query, item->time_shift, item->lookback_limit, item->granularity, now,
+				lasttimestamp, &telemetry_query_context->item_context.posts);
 
 	telemetry_query_context->item_context.query = query;
-	zbx_tq_get_newlasttimestamp(query, now, lasttimestamp, &telemetry_query_context->item_context.newlasttimestamp);
+	zbx_tq_get_newlasttimestamp(item->lookback_limit, item->granularity, now, lasttimestamp,
+			&telemetry_query_context->item_context.newlasttimestamp);
 	telemetry_query_context->item_context.min_free_ts = *min_free_ts;
 	telemetry_query_context->item_context.db_type = db_type;
 

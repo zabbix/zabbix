@@ -191,6 +191,10 @@ PREPARE_AUDIT_ITEM_UPDATE(verify_peer,		int,		int)
 PREPARE_AUDIT_ITEM_UPDATE(verify_host,		int,		int)
 PREPARE_AUDIT_ITEM_UPDATE(allow_traps,		int,		int)
 PREPARE_AUDIT_ITEM_UPDATE(discover,		int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(query,		const char*,	string) /* TODO: log as object, like query_fields */
+PREPARE_AUDIT_ITEM_UPDATE(time_shift,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(lookback_limit,	const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(granularity,		const char*,	string)
 PREPARE_AUDIT_ITEM_UPDATE(key_,			const char*,	string)
 
 #undef PREPARE_AUDIT_ITEM_UPDATE

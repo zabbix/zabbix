@@ -224,6 +224,10 @@ typedef struct
 	unsigned char				retrieve_mode;
 	unsigned char				request_method;
 	unsigned char				output_format;
+	char					*query;
+	char					*time_shift;
+	char					*lookback_limit;
+	char					*granularity;
 	unsigned char				type;
 	unsigned char				value_type;
 	unsigned char				status;
@@ -313,6 +317,10 @@ struct zbx_lld_item_full_s
 #define ZBX_FLAG_LLD_ITEM_UPDATE_EVALTYPE		__UINT64_C(0x0000800000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_STATUS			__UINT64_C(0x0001000000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_DISCOVER		__UINT64_C(0x0002000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_QUERY			__UINT64_C(0x0004000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_TIME_SHIFT		__UINT64_C(0x0008000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_LOOKBACK_LIMIT		__UINT64_C(0x0010000000000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_GRANULARITY		__UINT64_C(0x0020000000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE			(~ZBX_FLAG_LLD_ITEM_DISCOVERED)
 	zbx_uint64_t				flags;
 	char					*key_proto;
@@ -398,6 +406,14 @@ struct zbx_lld_item_full_s
 	unsigned char				verify_peer_orig;
 	unsigned char				verify_host_orig;
 	unsigned char				allow_traps_orig;
+	char					*query;
+	char					*query_orig;
+	char					*time_shift;
+	char					*time_shift_orig;
+	char					*lookback_limit;
+	char					*lookback_limit_orig;
+	char					*granularity;
+	char					*granularity_orig;
 
 	char					*lifetime_orig;
 	char					*enabled_lifetime_orig;
@@ -550,6 +566,8 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const zbx_lld_entry_t *lld_obj,
 		char **error);
 int	zbx_substitute_macros_in_json_pairs(char **data, const zbx_lld_entry_t *lld_obj, char *error, int maxerrlen);
+int	zbx_substitute_macros_in_telemetry_query(char **data, const zbx_lld_entry_t *lld_obj, char *error,
+		int maxerrlen);
 
 void	lld_sync_exported_macros(const zbx_vector_uint64_t *ruleids, const zbx_lld_entry_t *entry);
 void	lld_rule_get_exported_macros(zbx_uint64_t ruleid, zbx_vector_lld_macro_t *macros);

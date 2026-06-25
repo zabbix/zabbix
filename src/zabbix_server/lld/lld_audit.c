@@ -108,6 +108,17 @@ void	zbx_audit_item_update_json_add_lld_data(const zbx_lld_item_full_t *item,
 	zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "allow_traps", "allow_traps",
 			item_prototype->allow_traps);
 
+	/* TODO: log query as object, not as string */
+	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "query", "query",
+			item->query);
+
+	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "time_shift", "time_shift",
+			item->time_shift);
+	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "lookback_limit", "lookback_limit",
+			item->lookback_limit);
+	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "granularity", "granularity",
+			item->granularity);
+
 	if (0 != (item->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 	{
 		zbx_audit_entry_add_int(audit_entry, AUDIT_TABLE_NAME, "discover", "discover",

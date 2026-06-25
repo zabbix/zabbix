@@ -876,8 +876,8 @@ static char	*tq_sql_dyn_get_used_columns_mysql(const zbx_tq_query_t *query, cons
 	return str;
 }
 
-void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql,
-		const zbx_dbconn_t *db)
+void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
+		time_t now, time_t lasttimestamp, char **sql, const zbx_dbconn_t *db)
 {
 	tq_sql_ctx_t	ctx = {
 		.db_type = ZBX_TQ_DB_TYPE_POSTGRESQL,
@@ -898,8 +898,8 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, tim
 	char	*conditions		= tq_sql_dyn_get_conditions(query, &ctx);
 
 	time_t timestamp_filter_lower_bound, timestamp_filter_upper_bound;
-	zbx_tq_get_timestamp_filter_bounds(query, now, lasttimestamp, &timestamp_filter_lower_bound,
-		&timestamp_filter_upper_bound);
+	zbx_tq_get_timestamp_filter_bounds(time_shift, lookback_limit, granularity, now, lasttimestamp,
+			&timestamp_filter_lower_bound, &timestamp_filter_upper_bound);
 
 	/* select */
 	zbx_snprintf_alloc(sql, &alloc, &offset, "SELECT ");
@@ -940,8 +940,8 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, tim
 	zbx_free(conditions);
 }
 
-void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql,
-		const zbx_dbconn_t *db)
+void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
+		time_t now, time_t lasttimestamp, char **sql, const zbx_dbconn_t *db)
 {
 	tq_sql_ctx_t	ctx = {
 		.db_type = ZBX_TQ_DB_TYPE_MYSQL,
@@ -962,8 +962,8 @@ void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, time_t now, time_t l
 
 	*sql = NULL;
 
-	zbx_tq_get_timestamp_filter_bounds(query, now, lasttimestamp, &timestamp_filter_lower_bound,
-			&timestamp_filter_upper_bound);
+	zbx_tq_get_timestamp_filter_bounds(time_shift, lookback_limit, granularity, now, lasttimestamp,
+			&timestamp_filter_lower_bound, &timestamp_filter_upper_bound);
 
 	rounded_time_expr	= tq_sql_dyn_get_rounded_time_expr_mysql(query->granularity,
 			timestamp_filter_lower_bound);
@@ -1020,7 +1020,8 @@ void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, time_t now, time_t l
 	zbx_free(conditions);
 }
 
-void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
+void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
+		time_t now, time_t lasttimestamp, char **sql)
 {
 	tq_sql_ctx_t	ctx = {
 		.db_type = ZBX_TQ_DB_TYPE_CLICKHOUSE,
@@ -1041,8 +1042,8 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, tim
 	char	*conditions		= tq_sql_dyn_get_conditions(query, &ctx);
 
 	time_t timestamp_filter_lower_bound, timestamp_filter_upper_bound;
-	zbx_tq_get_timestamp_filter_bounds(query, now, lasttimestamp, &timestamp_filter_lower_bound,
-			&timestamp_filter_upper_bound);
+	zbx_tq_get_timestamp_filter_bounds(time_shift, lookback_limit, granularity, now, lasttimestamp,
+			&timestamp_filter_lower_bound, &timestamp_filter_upper_bound);
 
 	/* select */
 	zbx_snprintf_alloc(sql, &alloc, &offset, "SELECT ");

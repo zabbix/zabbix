@@ -26,13 +26,6 @@
  * Return value: resulting integer value of the enum that out points to       *
  *                                                                            *
  ******************************************************************************/
-typedef int	(*tq_string_enum_set_func_t)(const char *str, void *out);
-
-/******************************************************************************
- *                                                                            *
- * Return value: resulting integer value of the enum that out points to       *
- *                                                                            *
- ******************************************************************************/
 typedef int	(*tq_int_enum_set_func_t)(int x, void *out);
 
 __zbx_attr_format_printf(4, 5)
@@ -72,29 +65,6 @@ static int	tq_read_string(const char *p, char **out, const char *tag, char *erro
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Comments: val must be set to the integer value of the enum that out points *
- *           to                                                               *
- *                                                                            *
- ******************************************************************************/
-static int	tq_read_string_enum(const char *p, char *buf, size_t buf_size, tq_string_enum_set_func_t set_func,
-		void *out, int cur_val, int val_unknown, const char *tag, char *error, size_t max_error_len)
-{
-	zbx_json_type_t	type;
-
-	if (cur_val != val_unknown)
-		return ret_errf(FAIL, error, max_error_len, "Duplicate \"%s\" tag", tag);
-
-	if (NULL == zbx_json_decodevalue(p, buf, buf_size, &type) || ZBX_JSON_TYPE_STRING != type)
-		return ret_errf(FAIL, error, max_error_len, "Failed to read \"%s\"", tag);
-
-	if (set_func(buf, out) == val_unknown)
-		return ret_errf(FAIL, error, max_error_len, "Invalid \"%s\" value: \"%s\"", tag, buf);
-
-	return SUCCEED;
-}
-
 static int	tq_read_int_enum(const char *p, char *buf, size_t buf_size, tq_int_enum_set_func_t set_func,
 		void *out, int cur_val, int val_unknown, const char *tag, char *error, size_t max_error_len)
 {
@@ -110,12 +80,6 @@ static int	tq_read_int_enum(const char *p, char *buf, size_t buf_size, tq_int_en
 		return ret_errf(FAIL, error, max_error_len, "Invalid \"%s\" value: %d", tag, new_val);
 
 	return SUCCEED;
-}
-
-#define TQ_STRING_ENUM_SET_FUNC_DEF(__set_func_name, __match_func, __type)	\
-static int	__set_func_name(const char *__str, void *__out)	\
-{								\
-	return (int)(*(__type *)__out = __match_func(__str));	\
 }
 
 #define TQ_INT_ENUM_SET_FUNC_DEF(__set_func_name, __match_func, __type)	\
@@ -155,25 +119,23 @@ static zbx_tq_metric_type_t	tq_match_metric_type(int x)
 
 TQ_INT_ENUM_SET_FUNC_DEF(tq_set_metric_type, tq_match_metric_type, zbx_tq_metric_type_t)
 
-static zbx_tq_function_type_t	tq_match_function_type(const char *str)
+static zbx_tq_function_type_t	tq_match_function_type(int x)
 {
-	if (0 == strcmp(str, "count"))
-		return ZBX_TQ_FUNCTION_COUNT;
-	else if (0 == strcmp(str, "min"))
-		return ZBX_TQ_FUNCTION_MIN;
-	else if (0 == strcmp(str, "max"))
-		return ZBX_TQ_FUNCTION_MAX;
-	else if (0 == strcmp(str, "avg"))
-		return ZBX_TQ_FUNCTION_AVG;
-	else if (0 == strcmp(str, "sum"))
-		return ZBX_TQ_FUNCTION_SUM;
-	else if (0 == strcmp(str, "percentile"))
-		return ZBX_TQ_FUNCTION_PERCENTILE;
-
-	return ZBX_TQ_FUNCTION_UNKNOWN;
+	switch (x)
+	{
+		case ZBX_TQ_FUNCTION_COUNT:
+		case ZBX_TQ_FUNCTION_MIN:
+		case ZBX_TQ_FUNCTION_MAX:
+		case ZBX_TQ_FUNCTION_AVG:
+		case ZBX_TQ_FUNCTION_SUM:
+		case ZBX_TQ_FUNCTION_PERCENTILE:
+			return x;
+		default:
+			return ZBX_TQ_FUNCTION_UNKNOWN;
+	}
 }
 
-TQ_STRING_ENUM_SET_FUNC_DEF(tq_set_function_type, tq_match_function_type, zbx_tq_function_type_t)
+TQ_INT_ENUM_SET_FUNC_DEF(tq_set_function_type, tq_match_function_type, zbx_tq_function_type_t)
 
 static zbx_tq_eval_type_t	tq_match_eval_type(int x)
 {
@@ -319,7 +281,7 @@ static int	tq_parse_aggr_col(struct zbx_json_parse *jp, zbx_tq_aggr_column_t *ag
 		}
 		else if (0 == strcmp(buf, "function"))
 		{
-			if (FAIL == tq_read_string_enum(p, buf, buf_size, tq_set_function_type, &aggr_col->function,
+			if (FAIL == tq_read_int_enum(p, buf, buf_size, tq_set_function_type, &aggr_col->function,
 				aggr_col->function, ZBX_TQ_FUNCTION_UNKNOWN, "function", error, max_error_len))
 				goto out;
 		}
@@ -822,21 +784,6 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 		}
 	}
 
-	if (TQ_TIME_INTERVAL_INVALID == query->time_shift)
-		return ret_errf(FAIL, error, max_error_len, "Time shift is not set");
-
-	if (TQ_TIME_INTERVAL_INVALID == query->lookback_limit)
-		return ret_errf(FAIL, error, max_error_len, "Lookback limit is not set");
-
-	if (TQ_TIME_INTERVAL_INVALID == query->granularity)
-		return ret_errf(FAIL, error, max_error_len, "Aggregation size is not set");
-
-	if (0 == query->granularity)
-		return ret_errf(FAIL, error, max_error_len, "Aggregation size cannot be 0");
-
-	if (query->granularity > query->lookback_limit)
-		return ret_errf(FAIL, error, max_error_len, "Aggregation size cannot be larger than lookback limit");
-
 	return SUCCEED;
 }
 
@@ -848,13 +795,8 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
  * Parameters: query            - [OUT] parsed query, must not be initialized *
  *                                     beforehand                             *
  *             query_json       - [IN]                                        *
- *             time_shift       - [IN]                                        *
- *             lookback_limit   - [IN]                                        *
- *             granularity      - [IN]                                        *
  *             macro_expand_cb  - [IN] NULL or callback called on every field *
  *                                     in query where macros are supported    *
- *                                     (macros in time_shift, lookback_limit  *
- *                                     and granularity are not expanded)      *
  *             macro_expand_ctx - [IN] context passed to macro_expand_cb      *
  *             error            - [OUT]                                       *
  *             max_error_len    - [IN]                                        *
@@ -864,8 +806,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
  *               FAIL    - otherwise; query is not initialized                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, const char *time_shift,
-		const char *lookback_limit, const char *granularity, zbx_tq_macro_expand_func_t macro_expand_cb,
+int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, zbx_tq_macro_expand_func_t macro_expand_cb,
 		void *macro_expand_ctx, char *error, size_t max_error_len)
 {
 	int			ret = FAIL;
@@ -887,33 +828,6 @@ int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, const char
 
 	if (FAIL == tq_parse_query(&jp, query, macro_expand_cb, macro_expand_ctx, error, max_error_len))
 		goto out;
-
-	if (NULL != time_shift)
-	{
-		if (FAIL == zbx_is_time_suffix(time_shift, &query->time_shift, ZBX_LENGTH_UNLIMITED))
-		{
-			zbx_snprintf(error, max_error_len, "Unsupported time shift value");
-			goto out;
-		}
-	}
-
-	if (NULL != lookback_limit)
-	{
-		if (FAIL == zbx_is_time_suffix(lookback_limit, &query->lookback_limit, ZBX_LENGTH_UNLIMITED))
-		{
-			zbx_snprintf(error, max_error_len, "Unsupported lookback limit value");
-			goto out;
-		}
-	}
-
-	if (NULL != granularity)
-	{
-		if (FAIL == zbx_is_time_suffix(granularity, &query->granularity, ZBX_LENGTH_UNLIMITED))
-		{
-			zbx_snprintf(error, max_error_len, "Unsupported granularity limit value");
-			goto out;
-		}
-	}
 
 	tq_set_column_types(query);
 
@@ -941,4 +855,126 @@ out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%d", __func__, ret);
 
 	return ret;
+}
+
+int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out, const char *lookback_limit_str,
+		int *lookback_limit_out, const char *granularity_str, int *granularity_out, char *error,
+		size_t max_error_len)
+{
+	int	time_shift_tmp, lookback_limit_tmp, granularity_tmp;
+
+	if (NULL == time_shift_str)
+		return ret_errf(FAIL, error, max_error_len, "Time shift is not set");
+	if (NULL == lookback_limit_str)
+		return ret_errf(FAIL, error, max_error_len, "Lookback limit is not set");
+	if (NULL == granularity_str)
+		return ret_errf(FAIL, error, max_error_len, "Granularity is not set");
+
+	if (FAIL == zbx_is_time_suffix(time_shift_str, &time_shift_tmp, ZBX_LENGTH_UNLIMITED))
+		return ret_errf(FAIL, error, max_error_len, "Unsupported time shift value");
+	if (FAIL == zbx_is_time_suffix(lookback_limit_str, &lookback_limit_tmp, ZBX_LENGTH_UNLIMITED))
+		return ret_errf(FAIL, error, max_error_len, "Unsupported lookback limit value");
+	if (FAIL == zbx_is_time_suffix(granularity_str, &granularity_tmp, ZBX_LENGTH_UNLIMITED))
+		return ret_errf(FAIL, error, max_error_len, "Unsupported granularity value");
+
+	if (0 == granularity_tmp)
+		return ret_errf(FAIL, error, max_error_len, "Aggregation size cannot be 0");
+
+	if (granularity_tmp > lookback_limit_tmp)
+		return ret_errf(FAIL, error, max_error_len, "Aggregation size cannot be larger than lookback limit");
+
+	if (NULL != time_shift_out)
+		*time_shift_out = time_shift_tmp;
+	if (NULL != lookback_limit_out)
+		*lookback_limit_out = lookback_limit_tmp;
+	if (NULL != granularity_out)
+		*granularity_out = granularity_tmp;
+
+	return SUCCEED;
+}
+
+char	*zbx_tq_serialize_query(const zbx_tq_query_t *query)
+{
+	struct zbx_json	j;
+	char		*str;
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addint64(&j, "signal_type", query->category);
+
+	if (ZBX_TQ_METRIC_TYPE_UNKNOWN != query->metric_type)
+		zbx_json_addint64(&j, "metric_point_type", query->metric_type);
+
+	zbx_json_addarray(&j, "columns");
+
+	for (int i = 0; i < query->columns.values_num; i++)
+	{
+		const zbx_tq_column_t	*col = &query->columns.values[i];
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "column", col->name, ZBX_JSON_TYPE_STRING);
+
+		if (NULL != col->key)
+			zbx_json_addstring(&j, "attribute_key", col->key, ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&j);
+	}
+
+	zbx_json_close(&j); /* columns */
+
+	zbx_json_addarray(&j, "aggregated_columns");
+
+	for (int i = 0; i < query->aggregated_columns.values_num; i++)
+	{
+		const zbx_tq_aggr_column_t	*aggr_col = &query->aggregated_columns.values[i];
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "column", aggr_col->column_name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addint64(&j, "function", aggr_col->function);
+
+		zbx_json_addarray(&j, "parameters");
+
+		for (int ii = 0; ii < aggr_col->args.values_num; ii++)
+			zbx_json_addstring(&j, NULL, aggr_col->args.values[ii], ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&j); /* parameters */
+
+		zbx_json_addstring(&j, "alias", aggr_col->alias, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
+	}
+
+	zbx_json_close(&j); /* aggregated_columns */
+
+	zbx_json_addobject(&j, "filter");
+	zbx_json_addint64(&j, "evaltype", query->evaltype);
+
+	if (NULL != query->formula)
+		zbx_json_addstring(&j, "formula", query->formula, ZBX_JSON_TYPE_STRING);
+
+	zbx_json_addarray(&j, "conditions");
+
+	for (int i = 0; i < query->conditions.values_num; i++)
+	{
+		const zbx_tq_condition_t	*cond = &query->conditions.values[i];
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "column", cond->column_name, ZBX_JSON_TYPE_STRING);
+
+		if (NULL != cond->key)
+			zbx_json_addstring(&j, "attribute_key", cond->key, ZBX_JSON_TYPE_STRING);
+
+		zbx_json_addint64(&j, "operator", cond->operator);
+
+		if (NULL != cond->value)
+			zbx_json_addstring(&j, "value", cond->value, ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&j);
+	}
+
+	zbx_json_close(&j); /* conditions */
+	zbx_json_close(&j); /* filter */
+
+	str = zbx_strdup(NULL, j.buffer);
+	zbx_json_free(&j);
+
+	return str;
 }

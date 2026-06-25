@@ -32,9 +32,6 @@ void	tq_query_init(zbx_tq_query_t *query)
 	query->formula		= NULL;
 	query->formula_parsed	= NULL;
 	zbx_vector_tq_condition_create(&query->conditions);
-	query->time_shift	= TQ_TIME_INTERVAL_INVALID;
-	query->lookback_limit	= TQ_TIME_INTERVAL_INVALID;
-	query->granularity	= TQ_TIME_INTERVAL_INVALID;
 }
 
 void	tq_column_init(zbx_tq_column_t *column)
@@ -112,8 +109,8 @@ void	zbx_tq_query_clean(zbx_tq_query_t *query)
 	zbx_vector_tq_condition_destroy(&query->conditions);
 }
 
-static void	tq_get_timestamp_filter_bounds_unshifted(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
-		time_t *out_lower, time_t *out_upper)
+static void	tq_get_timestamp_filter_bounds_unshifted(int lookback_limit, int granularity, time_t now,
+		time_t lasttimestamp, time_t *out_lower, time_t *out_upper)
 {
 	if (lasttimestamp > now)
 	{
@@ -123,41 +120,42 @@ static void	tq_get_timestamp_filter_bounds_unshifted(const zbx_tq_query_t *query
 		lasttimestamp = now;
 	}
 
-	if (query->granularity > now - lasttimestamp)
+	if (granularity > now - lasttimestamp)
 	{
 		if (NULL != out_lower)
-			*out_lower = now - query->granularity;
+			*out_lower = now - granularity;
 		if (NULL != out_upper)
 			*out_upper = now;
 	}
 	else
 	{
-		time_t	start = MAX(lasttimestamp, now - (time_t)query->lookback_limit);
+		time_t	start = MAX(lasttimestamp, now - (time_t)lookback_limit);
 
 		if (NULL != out_lower)
 			*out_lower = start;
 		if (NULL != out_upper)
-			*out_upper = start + ((now - start) / (time_t)query->granularity) *
-					(time_t)query->granularity;
+			*out_upper = start + ((now - start) / (time_t)granularity) *
+					(time_t)granularity;
 	}
 }
 
-void	zbx_tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
-		time_t *out_lower, time_t *out_upper)
+void	zbx_tq_get_timestamp_filter_bounds(int time_shift, int lookback_limit, int granularity, time_t now,
+		time_t lasttimestamp, time_t *out_lower, time_t *out_upper)
 {
-	tq_get_timestamp_filter_bounds_unshifted(query, now, lasttimestamp, out_lower, out_upper);
+	tq_get_timestamp_filter_bounds_unshifted(lookback_limit, granularity, now, lasttimestamp, out_lower, out_upper);
 
 	if (NULL != out_lower)
-		*out_lower = MAX(*out_lower - query->time_shift, 0);
+		*out_lower = MAX(*out_lower - time_shift, 0);
 
 	if (NULL != out_upper)
-		*out_upper = MAX(*out_upper - query->time_shift, 0);
+		*out_upper = MAX(*out_upper - time_shift, 0);
 }
 
-void	zbx_tq_get_newlasttimestamp(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
+void	zbx_tq_get_newlasttimestamp(int lookback_limit, int granularity, time_t now, time_t lasttimestamp,
 		time_t *newlasttimestamp)
 {
-	tq_get_timestamp_filter_bounds_unshifted(query, now, lasttimestamp, NULL, newlasttimestamp);
+	tq_get_timestamp_filter_bounds_unshifted(lookback_limit, granularity, now, lasttimestamp, NULL,
+			newlasttimestamp);
 }
 
 char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col)

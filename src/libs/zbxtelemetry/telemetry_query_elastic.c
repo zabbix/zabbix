@@ -434,15 +434,16 @@ static void	tq_es_add_aggs(const zbx_tq_query_t *query, struct zbx_json *j, time
 	zbx_json_close(j); /* aggs */
 }
 
-void	zbx_tq_generate_elastic(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **dsl)
+void	zbx_tq_generate_elastic(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
+		time_t now, time_t lasttimestamp, char **dsl)
 {
 	struct zbx_json	j;
 	time_t		timestamp_filter_lower_bound, timestamp_filter_upper_bound;
 	char		buf[MAX_STRING_LEN];
 	size_t		buf_size = sizeof(buf);
 
-	zbx_tq_get_timestamp_filter_bounds(query, now, lasttimestamp, &timestamp_filter_lower_bound,
-		&timestamp_filter_upper_bound);
+	zbx_tq_get_timestamp_filter_bounds(time_shift, lookback_limit, granularity, now, lasttimestamp,
+			&timestamp_filter_lower_bound, &timestamp_filter_upper_bound);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 

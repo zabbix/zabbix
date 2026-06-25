@@ -211,9 +211,12 @@ typedef struct
 	unsigned char		*formula_bin;
 	int			snmp_max_repetitions;
 	char			*query;
-	char			*time_shift;
-	char			*lookback_limit;
-	char			*granularity;
+	char			time_shift_orig[ZBX_ITEM_TIME_SHIFT_LEN_MAX];
+	int			time_shift;
+	char			lookback_limit_orig[ZBX_ITEM_LOOKBACK_LIMIT_LEN_MAX];
+	int			lookback_limit;
+	char			granularity_orig[ZBX_ITEM_GRANULARITY_LEN_MAX];
+	int			granularity;
 	zbx_tq_query_t		*telemetry_query;
 	unsigned char		preprocessing;
 }
@@ -312,11 +315,13 @@ typedef struct
 	int			mtime;
 	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
 	int			timeout;
-	/* TODO: implement lld */
 	char			*query;
-	char			*time_shift;
-	char			*lookback_limit;
-	char			*granularity;
+	char			time_shift_orig[ZBX_ITEM_TIME_SHIFT_LEN_MAX];
+	int			time_shift;
+	char			lookback_limit_orig[ZBX_ITEM_LOOKBACK_LIMIT_LEN_MAX];
+	int			lookback_limit;
+	char			granularity_orig[ZBX_ITEM_GRANULARITY_LEN_MAX];
+	int			granularity;
 	zbx_tq_query_t		*telemetry_query;
 	time_t			lasttimestamp;
 	zbx_timespec_t		min_free_ts;
