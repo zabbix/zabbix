@@ -1502,6 +1502,20 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Like testTriggerCEP_OpenAndImmediateRecovery but the rapid burst also flips the item to an
+	 * unsupported state mid-sequence in several combinations (problem→unsupported→recover,
+	 * unsupported→problem→recover, problem→unsupported→problem→recover, and unsupported while already OK).
+	 * The unsupported value sends the trigger to UNKNOWN without changing its value, so it must emit no
+	 * trigger event; CEP must still emit exactly one event per real value transition without collapsing or
+	 * dropping any when the transitions and the unsupported state arrive back-to-back.
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecoveryUnsupported() {
+		$this->runOpenAndImmediateRecoveryUnsupportedTest(false);
+	}
+
+	/**
 	 * Open the problem and let every per-trigger service follow it to PROBLEM (disaster). When $restart is
 	 * true, the server is restarted first.
 	 */
@@ -1587,6 +1601,71 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 
 		$this->waitForNoOpenProblems($triggerids, 'open and immediate recovery');
+	}
+
+	/**
+	 * Open/recover burst that also flips the item to an unsupported state mid-cycle (1, unsupported, 0),
+	 * verifying CEP emits exactly one event per real value transition: the unsupported value changes only
+	 * the item state (trigger goes UNKNOWN), not the trigger value, so it emits no event. When $restart is
+	 * true, the server is restarted first.
+	 */
+	private function runOpenAndImmediateRecoveryUnsupportedTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		$this->captureEventBaseline($triggerids);
+
+		$unsupported = 'not_a_number';
+		$now = time();
+		$values = [];
+		for ($i = 0; $i < 3; $i++) {
+			$values[] = $unsupported;
+			$values[] = '0';
+		}
+
+		$data = [];
+		foreach ($keys as $key) {
+			foreach ($values as $ns => $value) {
+				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value,
+						'clock' => $now, 'ns' => $ns];
+			}
+		}
+		$this->sendSenderValues($data, null, 0);
+
+		$expected_values = [];
+		$current = TRIGGER_VALUE_FALSE;
+		foreach ($values as $value) {
+			if ($value === $unsupported) {
+				continue;
+			}
+			$new = ($value === '0') ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
+			if ($new !== $current) {
+				$expected_values[] = $new;
+				$current = $new;
+			}
+		}
+		$this->assertEquals(TRIGGER_VALUE_FALSE, $current, 'burst must leave the triggers OK');
+
+		$expected_events = count($expected_values);
+
+		// Each trigger must produce one event per value transition.
+		$this->waitForAllTriggerEventCounts($triggerids, $expected_events);
+
+		// Events are returned newest-first, so compare against the reversed expected sequence.
+		$expected_newest_first = array_reverse($expected_values);
+		$events_by_trigger = $this->getScenarioEventsByTrigger($triggerids);
+		foreach ($triggerids as $idx => $triggerid) {
+			$events = $events_by_trigger[$triggerid];
+			$info = 'trigger #'.$idx.': '.count($events).' events';
+			$this->assertCount($expected_events, $events, $info);
+			foreach ($events as $pos => $event) {
+				$this->assertEquals($expected_newest_first[$pos], (int) $event['value'], $info.' at pos '.$pos);
+			}
+		}
+
+		$this->waitForNoOpenProblems($triggerids, 'open and immediate recovery unsupported');
 	}
 
 	/**
@@ -3191,9 +3270,12 @@ class testTriggerCEP extends CIntegrationTest {
 				return 'expected '.$expected.' triggers, got '.count($response['result']);
 			}
 
+			// A trigger is only OK when its value is FALSE and its state is NORMAL: a trigger left in
+			// UNKNOWN (e.g. after an unsupported item) is not yet recovered even with value FALSE.
 			$ok = 0;
 			foreach ($response['result'] as $trigger) {
-				if ((int) $trigger['value'] === TRIGGER_VALUE_FALSE) {
+				if ((int) $trigger['value'] === TRIGGER_VALUE_FALSE
+						&& (int) $trigger['state'] === TRIGGER_STATE_NORMAL) {
 					$ok++;
 				}
 			}
@@ -3216,9 +3298,25 @@ class testTriggerCEP extends CIntegrationTest {
 
 	private function assertTriggersValueAndState(array $triggerids, int $expected_value, string $label): void {
 		$triggers = $this->getTriggers($triggerids);
+
+		// Count how many triggers are off so the failure message reports the scale of the mismatch, not
+		// just the first offending trigger.
+		$wrong_value = 0;
+		$wrong_state = 0;
+		foreach ($triggerids as $triggerid) {
+			if ((int) $triggers[$triggerid]['value'] !== $expected_value) {
+				$wrong_value++;
+			}
+			if ((int) $triggers[$triggerid]['state'] !== TRIGGER_STATE_NORMAL) {
+				$wrong_state++;
+			}
+		}
+
+		$total = count($triggerids);
 		foreach ($triggerids as $idx => $triggerid) {
 			$trigger = $triggers[$triggerid];
-			$info = $label.' #'.$idx.': '.json_encode($trigger);
+			$info = $label.' #'.$idx.' ('.$wrong_value.'/'.$total.' wrong value, '.$wrong_state.'/'.$total
+					.' wrong state): '.json_encode($trigger);
 			$this->assertEquals($expected_value, $trigger['value'], $info);
 			$this->assertEquals(TRIGGER_STATE_NORMAL, $trigger['state'], $info);
 		}
