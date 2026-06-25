@@ -202,6 +202,7 @@ window.itemtestedit_view_popup = new class {
 	}
 
 	#onClose () {
+		this.#form.unlock();
 		const fields = this.#getFormFields(false);
 
 		const remember_values = {
