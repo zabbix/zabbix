@@ -914,8 +914,6 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		// filling the escape buffer to capacity and exposing off-by-one allocations.
 		// Minimum triggering input is 'AAAA' (3 null bytes); any multiple of 4 'A's works.
 
-		sleep(3);
-
 		$this->sendSenderValue('agent', 'BINARY_ITEM_TRAP', 'AAAAAAAAAAAAAAAA');
 
 		$response = $this->callUntilDataIsPresent('history.get', [
