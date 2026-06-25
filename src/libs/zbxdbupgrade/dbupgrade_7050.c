@@ -1066,7 +1066,7 @@ static int	DBpatch_7050082(void)
 					{"cep_conditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"type", "25", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"operator", "12", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"event_name", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"tag_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -1263,11 +1263,12 @@ static int	DBpatch_7050105(void)
 static int	DBpatch_7050106(void)
 {
 	const zbx_db_table_t	table =
-			{"cep_operation_tag", "cep_operation_tagid", 0,
+			{"cep_operation_condition", "cep_operation_conditionid", 0,
 				{
-					{"cep_operation_tagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"cep_operation_conditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"cep_operationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"type", "25", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"operator", "12", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{0}
@@ -1280,7 +1281,7 @@ static int	DBpatch_7050106(void)
 
 static int	DBpatch_7050107(void)
 {
-	return DBcreate_index("cep_operation_tag", "cep_operation_tag_1", "cep_operationid", 0);
+	return DBcreate_index("cep_operation_condition", "cep_operation_condition_1", "cep_operationid", 0);
 }
 
 static int	DBpatch_7050108(void)
@@ -1288,22 +1289,22 @@ static int	DBpatch_7050108(void)
 	const zbx_db_field_t	field = {"cep_operationid", NULL, "cep_operation", "cep_operationid", 0, ZBX_TYPE_ID,
 			ZBX_NOTNULL, 0};
 
-	return DBadd_foreign_key("cep_operation_tag", 1, &field);
+	return DBadd_foreign_key("cep_operation_condition", 1, &field);
 }
 
 static int	DBpatch_7050109(void)
 {
-	return DBcreate_changelog_insert_trigger("cep_operation_tag", "cep_operation_tagid");
+	return DBcreate_changelog_insert_trigger("cep_operation_condition", "cep_operation_conditionid");
 }
 
 static int	DBpatch_7050110(void)
 {
-	return DBcreate_changelog_update_trigger("cep_operation_tag", "cep_operation_tagid");
+	return DBcreate_changelog_update_trigger("cep_operation_condition", "cep_operation_conditionid");
 }
 
 static int	DBpatch_7050111(void)
 {
-	return DBcreate_changelog_delete_trigger("cep_operation_tag", "cep_operation_tagid");
+	return DBcreate_changelog_delete_trigger("cep_operation_condition", "cep_operation_conditionid");
 }
 
 static int	DBpatch_7050112(void)
