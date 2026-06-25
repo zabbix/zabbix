@@ -6936,7 +6936,11 @@ form.dashboard-widget-piechart {
     position: sticky;
     top: 0;
     background: #2b2b2b;
+    border-top-left-radius: var(--surface-border-radius);
+    border-top-right-radius: var(--surface-border-radius);
     z-index: 3; }
+    form.dashboard-widget-piechart .pie-chart-widget-config-tabs .ui-tabs-nav > li:first-child a:hover {
+      border-top-left-radius: var(--surface-border-radius); }
   form.dashboard-widget-piechart .table-forms-container, form.dashboard-widget-piechart .browser-warning-container {
     margin: 0;
     border: 1px solid #303030;
