@@ -2060,8 +2060,6 @@ button {
 
 .dashboard-grid-widget-body {
   display: contents; }
-  .dashboard-grid-widget-body .rounded-surface {
-    border-radius: 0; }
 
 .dashboard-grid-widget-debug .debug-output {
   margin: 8px 10px 0;
@@ -7467,6 +7465,9 @@ form.dashboard-widget-svggraph {
 
 div.dashboard-widget-svggraph {
   overflow-x: hidden; }
+
+div.dashboard-widget-systeminfo .rounded-surface {
+  border-radius: 0; }
 
 form.dashboard-widget-tophosts #list_columns .text {
   max-width: 250px; }
