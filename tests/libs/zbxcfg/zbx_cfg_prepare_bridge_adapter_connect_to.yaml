@@ -126,4 +126,85 @@ in:
 out:
   return: SUCCEED
   curl_connect_to: "example.com:443:my-backend.internal:9090"
+---
+test case: "IPv6 loopback connect_to with brackets succeeds"
+in:
+  url: "http://example.com"
+  connect_to: "[::1]:9090"
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:80:[::1]:9090"
+---
+test case: "full IPv6 connect_to with brackets succeeds"
+in:
+  url: "https://example.com"
+  connect_to: "[2001:db8::1]:443"
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:443:[2001:db8::1]:443"
+---
+test case: "IPv6 connect_to with maximum port succeeds"
+in:
+  url: "http://example.com"
+  connect_to: "[::1]:65535"
+out:
+  return: SUCCEED
+  curl_connect_to: "example.com:80:[::1]:65535"
+---
+test case: "IPv6 connect_to with HTTPS URL produces correct curl connect_to"
+in:
+  url: "https://api.example.com:8443"
+  connect_to: "[::1]:443"
+out:
+  return: SUCCEED
+  curl_connect_to: "api.example.com:8443:[::1]:443"
+---
+test case: "IPv6 connect_to with port zero fails"
+in:
+  url: "http://example.com"
+  connect_to: "[::1]:0"
+out:
+  return: FAIL
+---
+test case: "IPv6 connect_to without port fails"
+in:
+  url: "http://example.com"
+  connect_to: "[::1]"
+out:
+  return: FAIL
+---
+test case: "bare IPv6 connect_to without brackets fails"
+in:
+  url: "http://example.com"
+  connect_to: "::1:9090"
+out:
+  return: FAIL
+---
+test case: "invalid IPv6 address in brackets fails"
+in:
+  url: "http://example.com"
+  connect_to: "[not-ipv6]:9090"
+out:
+  return: FAIL
+---
+test case: "IPv6 URL fails even with valid connect_to"
+in:
+  url: "http://[::1]:8080"
+  connect_to: "192.168.1.1:9090"
+out:
+  return: FAIL
+---
+test case: "emoji in connect_to host rejected by hostname validator"
+in:
+  url: "http://example.com"
+  connect_to: "\U0001F600:9090"
+out:
+  return: FAIL
+---
+test case: "empty host with valid port in connect_to fails"
+in:
+  url: "http://example.com"
+  connect_to: ":9090"
+out:
+  return: FAIL
 ...

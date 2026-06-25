@@ -208,4 +208,40 @@ in:
   url: "http://host..example.com"
 out:
   return: FAIL
+---
+test case: "IPv6 loopback in brackets without explicit port"
+in:
+  url: "http://[::1]"
+out:
+  return: FAIL
+---
+test case: "IPv6 full address in brackets with HTTPS"
+in:
+  url: "https://[2001:db8::1]:443"
+out:
+  return: FAIL
+---
+test case: "IPv6 loopback in brackets with path"
+in:
+  url: "http://[::1]/some/path"
+out:
+  return: FAIL
+---
+test case: "bare IPv6 without brackets rejected by regex"
+in:
+  url: "http://::1"
+out:
+  return: FAIL
+---
+test case: "IPv4-mapped IPv6 in brackets not supported"
+in:
+  url: "https://[::ffff:192.168.1.1]:8080"
+out:
+  return: FAIL
+---
+test case: "emoji in hostname rejected by hostname validator"
+in:
+  url: "http://\U0001F600.example.com"
+out:
+  return: FAIL
 ...
