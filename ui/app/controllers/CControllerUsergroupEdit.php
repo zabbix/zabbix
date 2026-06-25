@@ -40,7 +40,7 @@ class CControllerUsergroupEdit extends CController {
 			'proxy_mode' =>				'db usrgrp.proxy_mode|in '.PROXY_MODE_ALLOW.','.PROXY_MODE_DENY,
 			'proxies' =>				'array_db proxy.proxyid',
 			'proxy_group_mode' =>		'db usrgrp.proxy_group_mode|in '.PROXY_GROUP_MODE_ALLOW.','.PROXY_GROUP_MODE_DENY,
-			'proxy_groups' =>			'array_db proxy_groups.proxyid',
+			'proxy_groups' =>			'array_db proxy_group.proxy_groupid',
 			'tag_filters' =>			'array'
 		];
 

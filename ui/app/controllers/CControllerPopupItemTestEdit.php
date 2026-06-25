@@ -480,7 +480,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$ms_proxy = [];
 		$ms_proxy_inaccessible = false;
 
-		if($proxyid != 0) {
+		if ($proxyid != 0) {
 			$resolved_proxy = CProxyHelper::resolveProxyOption((int) $proxyid);
 			$ms_proxy = [$resolved_proxy];
 			$ms_proxy_inaccessible = $resolved_proxy['inaccessible'];

@@ -308,7 +308,7 @@ $host_permissions_form_grid->addItem($host_permissions_row_template);
 
 $proxy_access_list_form_grid = (new CFormGrid())
 	->addItem([
-		new CLabel(_('Proxies'), 'proxy.access'),
+		new CLabel(_('Proxies')),
 		new CFormField(
 			(new CRadioButtonList('proxy_mode', (int) $data['proxy_mode']))
 				->addValue(_('Allow list'), PROXY_MODE_ALLOW)
@@ -337,7 +337,7 @@ $proxy_access_list_form_grid = (new CFormGrid())
 		)
 	)
 	->addItem([
-		new CLabel(_('Proxy groups'), 'proxy_group.access'),
+		new CLabel(_('Proxy groups')),
 		new CFormField(
 			(new CRadioButtonList('proxy_group_mode', (int) $data['proxy_group_mode']))
 				->addValue(_('Allow list'), PROXY_GROUP_MODE_ALLOW)
