@@ -1256,11 +1256,11 @@ static void	cep_sync_windows(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, z
 		ZBX_DBROW2STR(window->script, row[6]);
 
 		if (0 != atoi(row[7]))
-			group_by = ZBX_CEP_GROUP_BY_HOSTGROUP;
-		else if (0 != atoi(row[8]))
-			group_by = ZBX_CEP_GROUP_BY_HOST;
-		else if (0 != atoi(row[9]))
-			group_by = ZBX_CEP_GROUP_BY_TAG;
+			group_by |= ZBX_CEP_GROUP_BY_HOSTGROUP;
+		if (0 != atoi(row[8]))
+			group_by |= ZBX_CEP_GROUP_BY_HOST;
+		if (0 != atoi(row[9]))
+			group_by |= ZBX_CEP_GROUP_BY_TAG;
 		window->group_by = group_by;
 		ZBX_DBROW2STR(window->group_tag, row[10]);
 		ZBX_DBROW2STR(window->event_count_tag, row[11]);

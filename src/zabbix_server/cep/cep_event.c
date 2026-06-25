@@ -16,6 +16,7 @@
 #include "cep_api.h"
 #include "zbx_cep.h"
 #include "zbx_trigger_constants.h"
+#include "zbxcacheconfig.h"
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
 #include "zbxdbwrap.h"
@@ -215,21 +216,23 @@ void	cep_event_context_clear(zbx_cep_event_context_t *ctx)
  * Comments: If host names are already loaded then do nothing.                *
  *                                                                            *
  ******************************************************************************/
-void	cep_event_context_load_hosts(zbx_cep_event_context_t *ctx)
+const zbx_vector_str_t	*cep_event_context_get_hosts(zbx_cep_event_context_t *ctx)
 {
 	zbx_vector_uint64_t	functionids;
 
-	if (NULL != ctx->hosts.values)
-		return;
+	if (NULL == ctx->hosts.values)
+	{
+		zbx_vector_uint64_create(&functionids);
 
-	zbx_vector_uint64_create(&functionids);
+		zbx_db_trigger_get_all_functionids(&ctx->db_event->trigger, &functionids);
 
-	zbx_db_trigger_get_all_functionids(&ctx->db_event->trigger, &functionids);
+		zbx_vector_str_create(&ctx->hosts);
+		zbx_dc_get_host_names_by_functionids(&functionids, &ctx->hosts);
 
-	zbx_vector_str_create(&ctx->hosts);
-	zbx_dc_get_host_names_by_functionids(&functionids, &ctx->hosts);
+		zbx_vector_uint64_destroy(&functionids);
+	}
 
-	zbx_vector_uint64_destroy(&functionids);
+	return &ctx->hosts;
 }
 
 /******************************************************************************
@@ -241,22 +244,63 @@ void	cep_event_context_load_hosts(zbx_cep_event_context_t *ctx)
  * Comments: If host grouup names are already loaded then do nothing.         *
  *                                                                            *
  ******************************************************************************/
-void	cep_event_context_load_groups(zbx_cep_event_context_t *ctx)
+const zbx_vector_str_t	*cep_event_context_get_groups(zbx_cep_event_context_t *ctx)
 {
 	zbx_vector_uint64_t	functionids;
 
-	if (NULL != ctx->groups.values)
-		return;
+	if (NULL == ctx->groups.values)
+	{
+		zbx_vector_uint64_create(&functionids);
 
-	zbx_vector_uint64_create(&functionids);
+		zbx_db_trigger_get_all_functionids(&ctx->db_event->trigger, &functionids);
 
-	zbx_db_trigger_get_all_functionids(&ctx->db_event->trigger, &functionids);
+		zbx_vector_str_create(&ctx->groups);
+		zbx_dc_get_hostgroup_names_by_functionids(&functionids, &ctx->groups);
 
-	zbx_vector_str_create(&ctx->groups);
-	zbx_dc_get_group_names_by_functionids(&functionids, &ctx->groups);
+		zbx_vector_uint64_destroy(&functionids);
+	}
 
-	zbx_vector_uint64_destroy(&functionids);
+	return &ctx->groups;
 }
+
+static zbx_uint64_t	cep_event_context_get_functionid(zbx_cep_event_context_t *ctx)
+{
+	if (0 == ctx->functionid)
+		ctx->functionid = zbx_db_trigger_get_first_functionid(&ctx->db_event->trigger);
+
+	return ctx->functionid;
+}
+
+zbx_uint64_t	cep_event_context_get_hostid(zbx_cep_event_context_t *ctx)
+{
+	if (0 == ctx->hostid)
+	{
+		zbx_uint64_t	functionid = cep_event_context_get_functionid(ctx);
+
+		if (0 != functionid)
+			ctx->hostid = zbx_dc_get_hostid_by_functionid(functionid);
+		else
+			ctx->hostid = 0;
+	}
+
+	return ctx->hostid;
+}
+
+zbx_uint64_t	cep_event_context_get_hostgroupid(zbx_cep_event_context_t *ctx)
+{
+	if (0 == ctx->hostgroupid)
+	{
+		zbx_uint64_t	functionid = cep_event_context_get_functionid(ctx);
+
+		if (0 != functionid)
+			ctx->hostgroupid = zbx_dc_get_hostgroupid_by_functionid(functionid);
+		else
+			ctx->hostgroupid = 0;
+	}
+
+	return ctx->hostgroupid;
+}
+
 
 zbx_cep_event_t	*cep_event_context_acquire_event(zbx_cep_event_context_t *ctx)
 {
@@ -400,6 +444,9 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
  *                                                                            *
  * Return value: pointer to the created db event                              *
  *                                                                            *
+ * Comments: The created event is registered as pending for its corresponding *
+ *           object as it will be processed later.                            *
+ *                                                                            *
  ******************************************************************************/
 zbx_db_event	*cep_db_event_create(const zbx_cep_origin_t *origin, const char *name, int clock, int ns,
 		int serverity, int value, const zbx_vector_lite_tag_t *tags)
@@ -463,7 +510,12 @@ zbx_db_event	*cep_db_event_create(const zbx_cep_origin_t *origin, const char *na
 		}
 	}
 
+	zbx_cep_t	*cep;
+
+	cep_cache_acquire(&cep);
+	cep_object_inc_pending(cep, origin);
+	cep_cache_release(&cep);
+
 	return db_event;
 }
-
 

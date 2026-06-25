@@ -121,7 +121,7 @@ static zbx_hash_t	cep_event_ptr_hash(const void *a)
 {
 	const zbx_cep_event_ptr_t	*ref = (const zbx_cep_event_ptr_t *)a;
 
-	return ZBX_DEFAULT_UINT64_HASH_FUNC(&ref->eventid);
+	return ZBX_DEFAULT_ID_HASH_FUNC(&ref->eventid);
 }
 
 static int	cep_event_ptr_compare(const void *a1, const void *a2)
@@ -182,8 +182,8 @@ zbx_hash_t	cep_origin_hash(const zbx_cep_origin_t *origin)
 	zbx_hash_t	hash;
 	unsigned char	stream[] = {origin->source, origin->object};
 
-	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&origin->objectid);
-	hash = ZBX_DEFAULT_STRING_HASH_ALGO(stream, sizeof(stream), hash);
+	hash = ZBX_DEFAULT_ID_HASH_FUNC(&origin->objectid);
+	hash = ZBX_DEFAULT_HASH_ALGO(stream, sizeof(stream), hash);
 
 	return hash;
 }
@@ -908,7 +908,7 @@ void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_q
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() queries:%d", __func__, queries->values_num);
 
-	zbx_hashset_create(&triggerids, (size_t)queries->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&triggerids, (size_t)queries->values_num, ZBX_DEFAULT_ID_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (int i = 0; i < queries->values_num; i++)
@@ -1883,4 +1883,20 @@ void	cep_set_event_cause(zbx_cep_t *cep, zbx_uint64_t eventid, zbx_uint64_t caus
 
 		e->cause_eventid = cause_eventid;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: increment pending event count for a CEP object                    *
+ *                                                                            *
+ * Parameters: cep    - [IN/OUT] CEP instance                                 *
+ *             origin - [IN] event origin identifying the CEP object          *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_object_inc_pending(zbx_cep_t *cep, const zbx_cep_origin_t *origin)
+{
+	zbx_cep_object_t	*obj;
+
+	obj = cep_get_object_or_create(cep, origin);
+	obj->pending_events_num++;
 }

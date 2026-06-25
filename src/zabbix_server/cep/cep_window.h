@@ -56,8 +56,8 @@ struct zbx_cep_window_ref
 {
 	zbx_uint64_t	ruleid;
 	unsigned char	group_by;
-	char		*host;
-	char		*hostgroup;
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	hostgroupid;
 	char		*tag;
 	char		*tag_value;
 

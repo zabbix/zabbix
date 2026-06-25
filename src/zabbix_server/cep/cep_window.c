@@ -35,24 +35,18 @@ static zbx_hash_t	cep_window_ref_hash(const void *a)
 {
 	const zbx_cep_window_ref_t	*ref = (const zbx_cep_window_ref_t *)a;
 
-	zbx_hash_t	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&ref->ruleid);
+	zbx_hash_t	hash = ZBX_DEFAULT_ID_HASH_FUNC(&ref->ruleid);
 
-	hash = ZBX_DEFAULT_STRING_HASH_ALGO(&ref->group_by, 1, hash);
+	hash = ZBX_DEFAULT_HASH_ALGO(&ref->group_by, 1, hash);
 
 	if (ZBX_CEP_GROUP_BY_NONE == ref->group_by)
 		return hash;
 
 	if (0 != (ref->group_by & ZBX_CEP_GROUP_BY_HOST))
-	{
-		if (NULL != ref->host)
-			hash = ZBX_DEFAULT_STRING_HASH_ALGO(ref->host, strlen(ref->host), hash);
-	}
+		hash = ZBX_DEFAULT_HASH_ALGO(&ref->hostid, sizeof(ref->hostid), hash);
 
 	if (0 != (ref->group_by & ZBX_CEP_GROUP_BY_HOSTGROUP))
-	{
-		if (NULL != ref->hostgroup)
-			hash = ZBX_DEFAULT_STRING_HASH_ALGO(ref->hostgroup, strlen(ref->hostgroup), hash);
-	}
+		hash = ZBX_DEFAULT_HASH_ALGO(&ref->hostgroupid, sizeof(ref->hostgroupid), hash);
 
 	if (0 != (ref->group_by & ZBX_CEP_GROUP_BY_TAG))
 	{
@@ -80,14 +74,12 @@ static int	cep_window_ref_compare(const void *a1, const void *a2)
 
 	if (0 != (ref1->group_by & ZBX_CEP_GROUP_BY_HOST))
 	{
-		if (0 != (ret = zbx_strcmp_null(ref1->host, ref2->host)))
-			return ret;
+		ZBX_RETURN_IF_NOT_EQUAL(ref1->hostid, ref2->hostid);
 	}
 
 	if (0 != (ref1->group_by & ZBX_CEP_GROUP_BY_HOSTGROUP))
 	{
-		if (0 != (ret = zbx_strcmp_null(ref1->hostgroup, ref2->hostgroup)))
-			return ret;
+		ZBX_RETURN_IF_NOT_EQUAL(ref1->hostgroupid, ref2->hostgroupid);
 	}
 
 	if (0 != (ref1->group_by & ZBX_CEP_GROUP_BY_TAG))
@@ -235,8 +227,6 @@ static void	cep_window_ref_clear(void *a)
 
 	cep_window_release(ref->window);
 
-	zbx_free(ref->host);
-	zbx_free(ref->hostgroup);
 	zbx_free(ref->tag);
 	zbx_free(ref->tag_value);
 }
@@ -630,18 +620,10 @@ zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *po
 	zbx_cep_event_t	*event;
 
 	if (0 != (ref_local.group_by & ZBX_CEP_GROUP_BY_HOST))
-	{
-		cep_event_context_load_hosts(ctx);
-		if (0 != ctx->hosts.values_num)
-			ref_local.host = ctx->hosts.values[0];
-	}
+		ref_local.hostid = cep_event_context_get_hostid(ctx);
 
 	if (0 != (ref_local.group_by & ZBX_CEP_GROUP_BY_HOSTGROUP))
-	{
-		cep_event_context_load_groups(ctx);
-		if (0 != ctx->groups.values_num)
-			ref_local.hostgroup = ctx->groups.values[0];
-	}
+		ref_local.hostgroupid = cep_event_context_get_hostgroupid(ctx);
 
 	if (0 != (ref_local.group_by & ZBX_CEP_GROUP_BY_TAG))
 	{
@@ -657,12 +639,6 @@ zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *po
 
 	if (NULL == ref->window)
 	{
-		if (NULL != ref_local.host)
-			ref->host = zbx_strdup(NULL, ref_local.host);
-
-		if (NULL != ref_local.hostgroup)
-			ref->hostgroup = zbx_strdup(NULL, ref_local.hostgroup);
-
 		if (NULL != ref_local.tag)
 			ref->tag = zbx_strdup(NULL, ref_local.tag);
 
@@ -737,11 +713,10 @@ static void	cep_window_ref_dump(const char *prefix, const zbx_cep_window_ref_t *
 	zbx_cep_event_handle_t		hevent;
 	const zbx_cep_window_t		*window = ref->window;
 
-	zabbix_log(LOG_LEVEL_TRACE, "%sruleid:" ZBX_FS_UI64 " type:%d [group_by:%x host:%s hostgroup:%s tag:%s=%s]"
-			" created:" ZBX_FS_TIME_T,
-			prefix, window->ruleid, window->type, ref->group_by, ZBX_NULL2STR(ref->host),
-			ZBX_NULL2STR(ref->hostgroup), ZBX_NULL2STR(ref->tag), ZBX_NULL2STR(ref->tag_value),
-			window->time_created);
+	zabbix_log(LOG_LEVEL_TRACE, "%sruleid:" ZBX_FS_UI64 " type:%d [group_by:%x hostid:" ZBX_FS_UI64 " hostgroupid:"
+			ZBX_FS_UI64 " tag:%s=%s] created:" ZBX_FS_TIME_T,
+			prefix, window->ruleid, window->type, ref->group_by, ref->hostid, ref->hostgroupid,
+			ZBX_NULL2STR(ref->tag), ZBX_NULL2STR(ref->tag_value), window->time_created);
 
 	if (SUCCEED != zbx_queue_ptr_empty(&window->hevents))
 	{

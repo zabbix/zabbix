@@ -415,15 +415,16 @@ static int	cep_condition_eval_severity(int operator, const zbx_cep_args_severity
 static int	cep_condition_eval_host(int operator, const zbx_cep_args_name_t *args,
 		zbx_cep_event_context_t *ctx)
 {
+	const zbx_vector_str_t	*hosts;
+	int			ret = 0;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operator:%d host:%s", __func__, operator, args->name);
 
-	cep_event_context_load_hosts(ctx);
+	hosts = cep_event_context_get_hosts(ctx);
 
-	int	ret = 0;
-
-	for (int i = 0; i < ctx->hosts.values_num && 0 == ret; i++)
+	for (int i = 0; i < hosts->values_num && 0 == ret; i++)
 	{
-		ret = cep_condition_eval_value_str_raw(operator, args->name, ctx->hosts.values[i]);
+		ret = cep_condition_eval_value_str_raw(operator, args->name, hosts->values[i]);
 	}
 
 	switch (operator)
@@ -456,15 +457,16 @@ static int	cep_condition_eval_host(int operator, const zbx_cep_args_name_t *args
 static int	cep_condition_eval_hostgroup(int operator, const zbx_cep_args_name_t *args,
 		zbx_cep_event_context_t *ctx)
 {
+	const zbx_vector_str_t	*groups;
+	int			ret = 0;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operator:%d host:%s", __func__, operator, args->name);
 
-	cep_event_context_load_groups(ctx);
+	groups = cep_event_context_get_groups(ctx);
 
-	int	ret = 0;
-
-	for (int i = 0; i < ctx->groups.values_num && 0 == ret; i++)
+	for (int i = 0; i < groups->values_num && 0 == ret; i++)
 	{
-		ret = cep_condition_eval_value_str_raw(operator, args->name, ctx->groups.values[i]);
+		ret = cep_condition_eval_value_str_raw(operator, args->name, groups->values[i]);
 	}
 
 	switch (operator)

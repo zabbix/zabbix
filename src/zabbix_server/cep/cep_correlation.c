@@ -714,7 +714,7 @@ int	cep_correlate_db_event(const zbx_db_event *db_event, zbx_dbconn_pool_t *dbpo
 	if (NULL == (handle = zbx_correlation_config_open()))
 		return op_result;
 
-	zbx_hashset_create(&results, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&results, 100, ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_correlation_ptr_create(&corr_old);
 	zbx_vector_correlation_ptr_create(&corr_new);

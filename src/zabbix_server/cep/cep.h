@@ -80,6 +80,7 @@ void	cep_get_events_by_updates(zbx_cep_t *cep, zbx_cep_event_update_t *updates, 
 void	cep_get_events(zbx_cep_t *cep, unsigned char source, zbx_vector_cep_event_handle_t *handles);
 void	cep_delete_events(zbx_cep_t *cep, const zbx_vector_uint64_t *eventids, zbx_vector_cep_event_handle_t *handles);
 void	cep_set_event_cause(zbx_cep_t *cep, zbx_uint64_t eventid, zbx_uint64_t cause_eventid);
+void	cep_object_inc_pending(zbx_cep_t *cep, const zbx_cep_origin_t *origin);
 
 /* statistics */
 void	cep_update_events_accessed(zbx_cep_t *cep, zbx_uint64_t value);

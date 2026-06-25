@@ -138,6 +138,7 @@ void	zbx_db_event_add_maintenanceid(zbx_db_event *event, zbx_uint64_t maintenanc
 
 void	zbx_db_trigger_get_all_functionids(const zbx_db_trigger *trigger, zbx_vector_uint64_t *functionids);
 void	zbx_db_trigger_get_functionids(const zbx_db_trigger *trigger, zbx_vector_uint64_t *functionids);
+zbx_uint64_t	zbx_db_trigger_get_first_functionid(const zbx_db_trigger *trigger);
 int	zbx_db_trigger_get_constant(const zbx_db_trigger *trigger, int index, char **out);
 int	zbx_db_trigger_get_all_hostids(const zbx_db_trigger *trigger, const zbx_vector_uint64_t **hostids);
 int	zbx_db_trigger_get_itemid(const zbx_db_trigger *trigger, int index, zbx_uint64_t *itemid);

@@ -13659,6 +13659,34 @@ void	zbx_dc_get_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vec
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get host ID by function ID from configuration cache               *
+ *                                                                            *
+ * Parameters: functionid - [IN] function ID                                  *
+ *                                                                            *
+ * Return value: host ID, or 0 if not found                                   *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_dc_get_hostid_by_functionid(zbx_uint64_t functionid)
+{
+	const ZBX_DC_FUNCTION	*function;
+	const ZBX_DC_ITEM	*item;
+	zbx_uint64_t		hostid = 0;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionid)))
+	{
+		if (NULL != (item = (const ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)))
+			hostid = item->hostid;
+	}
+
+	UNLOCK_CACHE;
+
+	return hostid;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get hosts for the specified list of functions                     *
  *                                                                            *
  * Parameters: functionids     - [IN]                                         *
@@ -13778,7 +13806,7 @@ void	zbx_dc_get_host_names_by_functionids(const zbx_vector_uint64_t *functionids
  *             groups      - [OUT] - vector of host group names               *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_group_names_by_functionids(const zbx_vector_uint64_t *functionids, zbx_vector_str_t *groups)
+void	zbx_dc_get_hostgroup_names_by_functionids(const zbx_vector_uint64_t *functionids, zbx_vector_str_t *groups)
 {
 	const ZBX_DC_FUNCTION	*dc_function;
 	const ZBX_DC_ITEM	*dc_item;
@@ -13839,6 +13867,65 @@ void	zbx_dc_get_group_names_by_functionids(const zbx_vector_uint64_t *functionid
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() groups:%d", __func__, groups->values_num);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host group ID by function ID from configuration cache         *
+ *                                                                            *
+ * Parameters: functionid - [IN] function ID                                  *
+ *                                                                            *
+ * Return value: alphabetically first host group ID, or 0 if not found        *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_dc_get_hostgroupid_by_functionid(zbx_uint64_t functionid)
+{
+	const ZBX_DC_FUNCTION	*dc_function;
+	const ZBX_DC_ITEM	*dc_item;
+	ZBX_DC_HOST		*dc_host;
+	zbx_vector_uint64_t	groupids;
+	const char		*name = NULL;
+	zbx_uint64_t		*groupid, first_groupid = 0;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&groupids);
+
+	RDLOCK_CACHE;
+
+	if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionid)))
+		goto unlock;
+
+	if (NULL == (dc_item = (const ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_function->itemid)))
+		goto unlock;
+
+	if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+		goto unlock;
+
+	zbx_hashset_iter_reset(&dc_host->groupids, &iter);
+	while (NULL != (groupid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_dc_hostgroup_t	*dc_group;
+
+		if (NULL == (dc_group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, groupid)))
+			continue;
+
+		if (NULL == name || 0 > strcmp(dc_group->name, name))
+		{
+			name = dc_group->name;
+			first_groupid = *groupid;
+		}
+	}
+unlock:
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_destroy(&groupids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return first_groupid;
+}
+
 
 /******************************************************************************
  *                                                                            *
