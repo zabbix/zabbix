@@ -14208,6 +14208,10 @@ msgstr ""
 msgid "Next dashboard"
 msgstr "ახალი სამუშაო დაფა"
 
+#: jsLoader.php:260
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -14221,6 +14225,10 @@ msgstr "შემდეგი გვერდი"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "შემდეგი ბიჯი"
+
+#: jsLoader.php:258
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131

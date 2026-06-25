@@ -281,8 +281,8 @@ class testFormFilter extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			COverlayDialogElement::ensureNotPresent();
-			$result_table->waitUntilReloaded();
 			$this->page->waitUntilReady();
+			$result_table->waitUntilReloaded()->waitUntilReady();
 		}
 	}
 

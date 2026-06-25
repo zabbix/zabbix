@@ -14249,6 +14249,10 @@ msgstr ""
 msgid "Next dashboard"
 msgstr ""
 
+#: jsLoader.php:260
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -14262,6 +14266,10 @@ msgstr ""
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "다음 스텝"
+
+#: jsLoader.php:258
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
