@@ -61,7 +61,6 @@ window.drule_edit_popup = new class {
 
 		this.#addRadioButtonValues(drule);
 		this.#initEvents();
-		this.#updateForm();
 		this.#form_element.style.display = '';
 		this.#overlay.recoverFocus();
 	}
@@ -95,7 +94,7 @@ window.drule_edit_popup = new class {
 			this.#updateForm();
 		};
 
-		max_sessions.dispatchEvent(new Event('change'));
+		this.#updateForm();
 	}
 
 	#updateForm() {

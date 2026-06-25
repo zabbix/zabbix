@@ -34,7 +34,10 @@ class CControllerDiscoveryUpdate extends CController {
 				'when' => ['discovery_by', 'in' => [ZBX_DISCOVERY_BY_PROXY]]
 			],
 			'iprange' => ['db drules.iprange', 'required', 'not_empty',
-				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]]
+				'use' => [CIPRangeValidator::class, [
+					'parser_options' => ['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30],
+					'max' => ZBX_DISCOVERER_IPRANGE_LIMIT
+				]]
 			],
 			'delay' => ['db drules.delay', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => SEC_PER_WEEK, 'usermacros' => true]]
