@@ -112,7 +112,7 @@ class CDRule extends CApiService {
 
 // proxy
 		if (self::$userData['type'] < USER_TYPE_SUPER_ADMIN) {
-			$sqlParts['join']['p'] = ['left' => true, 'table' => 'proxy', 'using' => 'proxyid'];
+			$sqlParts['join']['p'] = ['type' => 'left', 'table' => 'proxy', 'using' => 'proxyid'];
 			$sqlParts['where'][] = '('.
 				'dr.proxyid IS NULL'.
 				' OR '.CApiUserGroupHelper::getProxyPermissionsCondition('p').
