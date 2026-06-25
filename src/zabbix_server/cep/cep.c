@@ -424,13 +424,11 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 					atoi(row[1]), atoi(row[3]), TRIGGER_VALUE_PROBLEM, atoi(row[2]), NULL, NULL);
 
 			zbx_cep_object_t	*obj;
-			zbx_cep_event_handle_t	h;
 
 			event->value = cep_origin_problem(&origin);
 
 			obj = cep_get_object_or_create(cep, &event->origin);
-			h = cep_create_event_handle(cep, event);
-			zbx_vector_cep_event_handle_append(&obj->events, h);
+			zbx_vector_cep_event_handle_append(&obj->events, cep_create_event_handle(cep, event));
 
 			zbx_vector_uint64_append(&eventids, eventid);
 			events_num++;
