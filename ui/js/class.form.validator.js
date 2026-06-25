@@ -828,15 +828,28 @@ class CFormValidator {
 
 		const findRelatedFieldPaths = (lookup_field_path) => {
 			const scan = (lookup_rule_path, rules, current_rule_path) => {
-				const current_field_name = current_rule_path.split('/').at(-1);
 				let related_fields = [];
+
+				const getFieldNameByRefPath = (ref_field_path, current_rule_path) => {
+					let name_parts = 1;
+
+					while (ref_field_path.startsWith('../')) {
+						ref_field_path = ref_field_path.substring(3);
+						name_parts++;
+					}
+
+					return current_rule_path.split('/').splice(-name_parts).join('/');
+				}
 
 				Object.entries(rules).forEach(([rule_key, rule_value]) => {
 					if (rule_key === 'when') {
 						rule_value.forEach((when) => {
 							// Add fields that relates on current lookup field.
 							if (lookup_rule_path === this.#getFieldAbsolutePath(when[0], current_rule_path)) {
-								related_fields.push(current_rule_path);
+								related_fields.push(this.#getFieldAbsolutePath(
+									getFieldNameByRefPath(when[0], current_rule_path),
+									lookup_field_path
+								));
 							}
 						});
 					}
