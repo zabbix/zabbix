@@ -499,7 +499,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getExDataEvents(array $eventids) {
 		$events = API::Event()->get([
-			'output' => ['eventid', 'r_eventid', 'acknowledged'],
+			'output' => ['eventid', 'r_eventid', 'acknowledged', 'cep_ruleid'],
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
@@ -664,10 +664,6 @@ class CScreenProblem extends CScreenBase {
 		foreach ($data['problems'] as $eventid => &$problem) {
 			if (array_key_exists($eventid, $problems_data)) {
 				$problem_data = $problems_data[$eventid];
-
-				if (!array_key_exists('cep_ruleid', $problem_data)) {
-					$problem_data['cep_ruleid'] = '0'; // TODO API
-				}
 
 				$problem['cep_ruleid'] = $problem_data['cep_ruleid'];
 				$problem['r_eventid'] = $problem_data['r_eventid'];
