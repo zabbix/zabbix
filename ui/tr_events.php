@@ -56,7 +56,7 @@ $trigger = reset($triggers);
 
 $events = API::Event()->get([
 	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'name', 'acknowledged', 'severity',
-		'cause_eventid', 'cep_ruleid'
+		'cause_eventid', 'cep_ruleid', 'flags' // TODO API
 	],
 	'selectAcknowledges' => ['clock', 'message', 'action', 'userid', 'old_severity', 'new_severity',
 		'suppress_until', 'maintenanceid'

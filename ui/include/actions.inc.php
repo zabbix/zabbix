@@ -1420,7 +1420,7 @@ function getEventDetailsActions(array $event): array {
 		$alert_eventids[] = $event['r_eventid'];
 
 		$r_events = API::Event()->get([
-			'output' => ['clock'],
+			'output' => ['clock', 'flags'], // TODO API
 			'eventids' => $event['r_eventid'],
 			'preservekeys' => true
 		]);

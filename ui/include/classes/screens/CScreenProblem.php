@@ -665,6 +665,10 @@ class CScreenProblem extends CScreenBase {
 			if (array_key_exists($eventid, $problems_data)) {
 				$problem_data = $problems_data[$eventid];
 
+				if (!array_key_exists('cep_ruleid', $problem_data)) {
+					$problem_data['cep_ruleid'] = '0'; // TODO API
+				}
+
 				$problem['cep_ruleid'] = $problem_data['cep_ruleid'];
 				$problem['r_eventid'] = $problem_data['r_eventid'];
 				$problem['r_clock'] = $problem_data['r_clock'];
