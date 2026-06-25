@@ -54,7 +54,7 @@ class CProblem extends CApiService {
 			'time_from' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'time_till' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'acknowledged' =>			['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'action' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => ZBX_PROBLEM_UPDATE_CLOSE.':'.(ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE | ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SUPPRESS | ZBX_PROBLEM_UPDATE_UNSUPPRESS | ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM), 'default' => null],
+			'action' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => ZBX_PROBLEM_UPDATE_CLOSE.':'.(ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE | ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SUPPRESS | ZBX_PROBLEM_UPDATE_UNSUPPRESS | ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM | ZBX_PROBLEM_UPDATE_CEP), 'default' => null],
 			'action_userids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'suppressed' =>				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'symptom' =>				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
@@ -74,7 +74,7 @@ class CProblem extends CApiService {
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
-			'selectAcknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity', 'new_severity', 'suppress_until', 'taskid', 'maintenanceid']), 'default' => null],
+			'selectAcknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity', 'new_severity', 'suppress_until', 'taskid', 'maintenanceid', 'details', 'cep_ruleid']), 'default' => null],
 			'selectSuppressionData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid']), 'default' => null],
 			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -413,7 +413,7 @@ class CProblem extends CApiService {
 
 			$output = $options['selectAcknowledges'] === API_OUTPUT_EXTEND
 				? ['acknowledgeid', 'userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
-					'suppress_until', 'taskid', 'maintenanceid'
+					'suppress_until', 'taskid', 'maintenanceid', 'details', 'cep_ruleid'
 				]
 				: array_unique(array_merge(['acknowledgeid', 'eventid'], $options['selectAcknowledges']));
 
