@@ -52,10 +52,10 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 		}
 
 		$response = $this->call('host.create', [
-			'host'       => self::HOSTNAME,
+			'host' => self::HOSTNAME,
 			'interfaces' => [],
-			'groups'     => [['groupid' => 4]],
-			'status'     => HOST_STATUS_MONITORED
+			'groups' => [['groupid' => 4]],
+			'status' => HOST_STATUS_MONITORED
 		]);
 
 		$this->assertArrayHasKey('hostids', $response['result']);
@@ -63,103 +63,103 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 		self::$hostid = (int)$response['result']['hostids'][0];
 
 		$base_step = [
-			'no'            => 1,
-			'name'          => 'Step 1',
-			'url'           => 'http://localhost/',
-			'timeout'       => '5s',
+			'no' => 1,
+			'name' => 'Step 1',
+			'url' => 'http://localhost/',
+			'timeout' => '5s',
 			'retrieve_mode' => HTTPTEST_STEP_RETRIEVE_MODE_CONTENT
 		];
 
 		$enabled = [
 			'regex_scenario_level' => [
-				'name'      => 'regex prefix - scenario level',
+				'name' => 'regex prefix - scenario level',
 				'variables' => [['name' => '{REGEX_VAR}', 'value' => 'regex:(.*)']],
-				'steps'     => [$base_step]
+				'steps' => [$base_step]
 			],
 			'jsonpath_scenario_level' => [
-				'name'      => 'jsonpath prefix - scenario level',
+				'name' => 'jsonpath prefix - scenario level',
 				'variables' => [['name' => '{JSON_VAR}', 'value' => 'jsonpath:$.result']],
-				'steps'     => [$base_step]
+				'steps' => [$base_step]
 			],
 			'xmlxpath_scenario_level' => [
-				'name'      => 'xmlxpath prefix - scenario level',
+				'name' => 'xmlxpath prefix - scenario level',
 				'variables' => [['name' => '{XML_VAR}', 'value' => 'xmlxpath://result']],
-				'steps'     => [$base_step]
+				'steps' => [$base_step]
 			],
 			'regex_step_level' => [
-				'name'  => 'regex prefix - step level',
+				'name' => 'regex prefix - step level',
 				'steps' => [array_merge($base_step, [
-					'name'      => 'Extract with regex',
+					'name' => 'Extract with regex',
 					'variables' => [['name' => '{STEP_REGEX}', 'value' => 'regex:(.+)']]
 				])]
 			],
 			'jsonpath_step_level' => [
-				'name'  => 'jsonpath prefix - step level',
+				'name' => 'jsonpath prefix - step level',
 				'steps' => [array_merge($base_step, [
-					'name'      => 'Extract with jsonpath',
+					'name' => 'Extract with jsonpath',
 					'variables' => [['name' => '{STEP_JSON}', 'value' => 'jsonpath:$.ns']]
 				])]
 			],
 			'xmlxpath_step_level' => [
-				'name'  => 'xmlxpath prefix - step level',
+				'name' => 'xmlxpath prefix - step level',
 				'steps' => [array_merge($base_step, [
-					'name'      => 'Extract with xmlxpath',
+					'name' => 'Extract with xmlxpath',
 					'variables' => [
 						['name' => '{STEP_XML}', 'value' => 'xmlxpath://document/item/value/text()']
 					]
 				])]
 			],
 			'multi_variable_mixed' => [
-				'name'      => 'multiple variables - mixed prefixes',
+				'name' => 'multiple variables - mixed prefixes',
 				'variables' => [
-					['name' => '{NS}',      'value' => 'jsonpath:$.ns'],
+					['name' => '{NS}', 'value' => 'jsonpath:$.ns'],
 					['name' => '{PATTERN}', 'value' => 'regex:([0-9]+)'],
 					['name' => '{XML_VAL}', 'value' => 'xmlxpath://document/item/value/text()']
 				],
 				'steps' => [$base_step]
 			],
 			'multi_retry_scenario' => [
-				'name'    => 'multi-retry scenario',
+				'name' => 'multi-retry scenario',
 				'retries' => 2,
 				'variables' => [['name' => '{RETRY_VAR}', 'value' => 'jsonpath:$.retry']],
-				'steps'   => [$base_step]
+				'steps' => [$base_step]
 			],
 			'two_step_chain' => [
-				'name'  => 'two-step variable chain',
+				'name' => 'two-step variable chain',
 				'steps' => [
 					array_merge($base_step, [
-						'name'      => 'Step 1 - extract',
+						'name' => 'Step 1 - extract',
 						'variables' => [['name' => '{CHAIN_VAR}', 'value' => 'regex:(.+)']]
 					]),
 					[
-						'no'            => 2,
-						'name'          => 'Step 2 - consume',
-						'url'           => 'http://localhost/?v={CHAIN_VAR}',
-						'timeout'       => '5s',
+						'no' => 2,
+						'name' => 'Step 2 - consume',
+						'url' => 'http://localhost/?v={CHAIN_VAR}',
+						'timeout' => '5s',
 						'retrieve_mode' => HTTPTEST_STEP_RETRIEVE_MODE_CONTENT
 					]
 				]
 			],
 			'jsonpath_scenario_with_required' => [
-				'name'      => 'jsonpath scenario level with required pattern',
+				'name' => 'jsonpath scenario level with required pattern',
 				'variables' => [['name' => '{NS}', 'value' => 'jsonpath:$.ns']],
-				'steps'     => [array_merge($base_step, ['required' => 'ns'])]
+				'steps' => [array_merge($base_step, ['required' => 'ns'])]
 			],
 			'xmlxpath_scenario_with_status' => [
-				'name'      => 'xmlxpath scenario level with status code check',
+				'name' => 'xmlxpath scenario level with status code check',
 				'variables' => [['name' => '{XML_VAL}', 'value' => 'xmlxpath://document/item/value/text()']],
-				'steps'     => [array_merge($base_step, ['status_codes' => '200'])]
+				'steps' => [array_merge($base_step, ['status_codes' => '200'])]
 			],
 			'static_after_dynamic' => [
-				'name'      => 'static variable after dynamic at scenario level',
+				'name' => 'static variable after dynamic at scenario level',
 				'variables' => [
 					['name' => '{DYNAMIC_VAR}', 'value' => 'regex:hostid is ([0-9]+)'],
-					['name' => '{BASE_PATH}',   'value' => '/']
+					['name' => '{BASE_PATH}', 'value' => '/']
 				],
 				'steps' => [array_merge($base_step, ['url' => 'http://localhost{BASE_PATH}'])]
 			],
 			'plain_variables' => [
-				'name'      => 'plain string variables - scenario level',
+				'name' => 'plain string variables - scenario level',
 				'variables' => [
 					['name' => '{username}', 'value' => 'Alexei'],
 					['name' => '{password}', 'value' => 'kj3h5kJ34bd']
@@ -167,24 +167,24 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 				'steps' => [$base_step]
 			],
 			'regex_doc_pattern' => [
-				'name'      => 'doc example - regex hostid pattern - scenario level',
+				'name' => 'doc example - regex hostid pattern - scenario level',
 				'variables' => [['name' => '{hostid}', 'value' => 'regex:hostid is ([0-9]+)']],
-				'steps'     => [$base_step]
+				'steps' => [$base_step]
 			],
 			'jsonpath_doc_pattern' => [
-				'name'      => 'doc example - jsonpath host url - scenario level',
+				'name' => 'doc example - jsonpath host url - scenario level',
 				'variables' => [['name' => '{url}', 'value' => 'jsonpath:$.host_url']],
-				'steps'     => [$base_step]
+				'steps' => [$base_step]
 			],
 			'xmlxpath_doc_pattern' => [
-				'name'      => 'doc example - xmlxpath response status - scenario level',
+				'name' => 'doc example - xmlxpath response status - scenario level',
 				'variables' => [['name' => '{status}', 'value' => 'xmlxpath://host/response/status']],
-				'steps'     => [$base_step]
+				'steps' => [$base_step]
 			],
 			'macro_function_variable' => [
-				'name'      => 'macro function variable {{myvar}.btoa()} - scenario level',
+				'name' => 'macro function variable {{myvar}.btoa()} - scenario level',
 				'variables' => [
-					['name' => '{myvar}',  'value' => 'Alexei'],
+					['name' => '{myvar}', 'value' => 'Alexei'],
 					['name' => '{newvar}', 'value' => '{{myvar}.btoa()}']
 				],
 				'steps' => [array_merge($base_step, ['url' => 'http://localhost/?v={{myvar}.btoa()}'])]
@@ -193,21 +193,21 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 
 		$disabled = [
 			'disabled_jsonpath_scenario' => [
-				'name'      => 'DISABLED - jsonpath prefix - scenario level',
+				'name' => 'DISABLED - jsonpath prefix - scenario level',
 				'variables' => [['name' => '{DISABLED_JSON}', 'value' => 'jsonpath:$.ns']],
-				'steps'     => [$base_step]
+				'steps' => [$base_step]
 			],
 			'disabled_xmlxpath_scenario' => [
-				'name'      => 'DISABLED - xmlxpath prefix - scenario level',
+				'name' => 'DISABLED - xmlxpath prefix - scenario level',
 				'variables' => [
 					['name' => '{DISABLED_XML}', 'value' => 'xmlxpath://document/item/value/text()']
 				],
 				'steps' => [$base_step]
 			],
 			'disabled_regex_step' => [
-				'name'  => 'DISABLED - regex prefix - step level',
+				'name' => 'DISABLED - regex prefix - step level',
 				'steps' => [array_merge($base_step, [
-					'name'      => 'Extract',
+					'name' => 'Extract',
 					'variables' => [['name' => '{DISABLED_REGEX}', 'value' => 'regex:(.+)']]
 				])]
 			]
@@ -215,11 +215,11 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 
 		foreach ($enabled as $label => $def) {
 			$params = array_merge([
-				'hostid'    => self::$hostid,
-				'delay'     => '5s',
-				'status'    => HTTPTEST_STATUS_ACTIVE,
+				'hostid' => self::$hostid,
+				'delay' => '5s',
+				'status' => HTTPTEST_STATUS_ACTIVE,
 				'variables' => [],
-				'steps'     => []
+				'steps' => []
 			], $def);
 
 			$r = $this->call('httptest.create', $params);
@@ -231,11 +231,11 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 
 		foreach ($disabled as $label => $def) {
 			$params = array_merge([
-				'hostid'    => self::$hostid,
-				'delay'     => '5s',
-				'status'    => HTTPTEST_STATUS_DISABLED,
+				'hostid' => self::$hostid,
+				'delay' => '5s',
+				'status' => HTTPTEST_STATUS_DISABLED,
 				'variables' => [],
-				'steps'     => []
+				'steps' => []
 			], $def);
 
 			$r = $this->call('httptest.create', $params);
@@ -339,10 +339,10 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 		);
 
 		$items = $this->call('item.get', [
-			'hostids'  => [self::$hostid],
+			'hostids' => [self::$hostid],
 			'webitems' => true,
-			'filter'   => ['type' => [ITEM_TYPE_HTTPTEST]],
-			'output'   => ['itemid', 'key_']
+			'filter' => ['type' => [ITEM_TYPE_HTTPTEST]],
+			'output' => ['itemid', 'key_']
 		]);
 		$this->assertArrayHasKey('result', $items);
 
@@ -364,8 +364,8 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 		$history = $this->call('history.get', [
 			'itemids' => $disabled_itemids,
 			'history' => ITEM_VALUE_TYPE_UINT64,
-			'output'  => 'extend',
-			'limit'   => 1
+			'output' => 'extend',
+			'limit' => 1
 		]);
 
 		$this->assertEmpty($history['result'], 'Disabled web scenarios must not produce any LASTSTEP history');
@@ -373,10 +373,10 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 
 	private function assertLASTSTEPHistoryPresent(array $scenario_names, int $expected_count, string $context): void {
 		$items = $this->call('item.get', [
-			'hostids'  => [self::$hostid],
+			'hostids' => [self::$hostid],
 			'webitems' => true,
-			'filter'   => ['type' => [ITEM_TYPE_HTTPTEST]],
-			'output'   => ['itemid', 'key_', 'value_type']
+			'filter' => ['type' => [ITEM_TYPE_HTTPTEST]],
+			'output' => ['itemid', 'key_', 'value_type']
 		]);
 
 		$this->assertArrayHasKey('result', $items);
@@ -408,12 +408,12 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 			"No LASTSTEP (web.test.fail) items found — context: {$context}");
 
 		$history = $this->callUntilDataIsPresent('history.get', [
-			'itemids'   => $target_itemids,
-			'history'   => ITEM_VALUE_TYPE_UINT64,
-			'output'    => 'extend',
+			'itemids' => $target_itemids,
+			'history' => ITEM_VALUE_TYPE_UINT64,
+			'output' => 'extend',
 			'sortfield' => 'clock',
 			'sortorder' => 'DESC',
-			'limit'     => $expected_count * 10
+			'limit' => $expected_count * 10
 		], 60, 2, function ($response) use ($expected_count) {
 			$unique = count(array_unique(array_column($response['result'], 'itemid')));
 			return $unique >= $expected_count
