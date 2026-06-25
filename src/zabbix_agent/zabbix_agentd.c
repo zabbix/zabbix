@@ -1051,6 +1051,10 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"DenyKey",			&parser_load_key_access_rule,		ZBX_CFG_TYPE_CUSTOM,
 				ZBX_CONF_PARM_OPT,	0,			0},
+		{"AllowKeyRegexp",		&parser_load_key_access_rule,		ZBX_CFG_TYPE_CUSTOM,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"DenyKeyRegexp",		&parser_load_key_access_rule,		ZBX_CFG_TYPE_CUSTOM,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"ListenBacklog",		&config_tcp_max_backlog_size,		ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			INT_MAX},
 		{"HeartbeatFrequency",		&zbx_config_heartbeat_frequency,	ZBX_CFG_TYPE_INT,
@@ -1479,7 +1483,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 #else
 	zbx_set_child_pids(zbx_threads, zbx_threads_num);
-	zbx_unset_exit_on_terminate();
+	zbx_unset_exit_on_terminate(NULL);
 
 	while (ZBX_IS_RUNNING())
 	{

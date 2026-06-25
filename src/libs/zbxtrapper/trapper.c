@@ -53,6 +53,7 @@
 #ifdef HAVE_NETSNMP
 #	include "zbxipcservice.h"
 #endif
+#include "zbxcurl.h"
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
 #endif
@@ -1566,6 +1567,7 @@ out:
 	zbx_tcp_unaccept(&s);
 	zbx_ipc_async_socket_close(&rtc);
 	zbx_db_close();
+	zbx_curl_cleanup();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

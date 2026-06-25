@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package vfsdev
+package dev
 
 import (
 	"errors"
