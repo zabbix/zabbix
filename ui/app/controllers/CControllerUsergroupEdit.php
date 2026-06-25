@@ -145,14 +145,14 @@ class CControllerUsergroupEdit extends CController {
 		$data['ms_proxy'] = $this->hasInput('usrgrpid')
 			? CArrayHelper::renameObjectsKeys(API::Proxy()->get([
 				'output' => ['proxyid', 'name'],
-				'proxyids' => $this->user_group['proxies']
+				'proxyids' => array_column($this->user_group['proxies'], 'proxyid')
 			]), ['proxyid' => 'id'])
 			: [];
 
 		$data['ms_proxy_group'] = $this->hasInput('usrgrpid')
 			? CArrayHelper::renameObjectsKeys(API::ProxyGroup()->get([
 				'output' => ['proxy_groupid', 'name'],
-				'proxy_groupids' => $this->user_group['proxy_groups']
+				'proxy_groupids' => array_column($this->user_group['proxy_groups'], 'proxy_groupid')
 			]), ['proxy_groupid' => 'id'])
 			: [];
 

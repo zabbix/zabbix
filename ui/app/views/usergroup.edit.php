@@ -310,7 +310,7 @@ $proxy_access_list_form_grid = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Proxies'), 'proxy.access'),
 		new CFormField(
-			(new CRadioButtonList('proxy_access_mode', (int) $data['proxy_mode']))
+			(new CRadioButtonList('proxy_mode', (int) $data['proxy_mode']))
 				->addValue(_('Allow list'), PROXY_MODE_ALLOW)
 				->addValue(_('Deny list'), PROXY_MODE_DENY)
 				->setModern()
@@ -339,7 +339,7 @@ $proxy_access_list_form_grid = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Proxy groups'), 'proxy_group.access'),
 		new CFormField(
-			(new CRadioButtonList('proxy_group_access_mode', (int) $data['proxy_group_mode']))
+			(new CRadioButtonList('proxy_group_mode', (int) $data['proxy_group_mode']))
 				->addValue(_('Allow list'), PROXY_GROUP_MODE_ALLOW)
 				->addValue(_('Deny list'), PROXY_GROUP_MODE_DENY)
 				->setModern()

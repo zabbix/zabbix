@@ -21,7 +21,12 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 	protected function getUserGroupInputData(): array {
 		$user_group = $this->getInputAll();
 		$user_group['users'] = zbx_toObject($user_group['userids'], 'userid');
+		$user_group['proxies'] = zbx_toObject($user_group['proxyids'], 'proxyid');
+		$user_group['proxy_groups'] = zbx_toObject($user_group['proxy_groupids'], 'proxy_groupid');
+
 		unset($user_group['userids']);
+		unset($user_group['proxyids']);
+		unset($user_group['proxy_groupids']);
 
 		return $user_group;
 	}
