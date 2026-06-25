@@ -58,17 +58,17 @@
 			if (!tile_provider.value) {
 				const values = this.form.getAllValues();
 
-				for (let key of Object.keys(this.defaults)) {
+				for (const key of Object.keys(this.defaults)) {
 					this.tile_providers.other[key] = values[key] || '';
 				}
 			}
 
-			this.form_element.addEventListener('input', event => {
+			this.form_element.addEventListener('input', e => {
 				if (tile_provider.value) {
 					return;
 				}
 
-				this.tile_providers.other[event.target.name] = event.target.value;
+				this.tile_providers.other[e.target.name] = e.target.value;
 			});
 
 			this.form_element.addEventListener('submit', (e) => this.#submit(e));
