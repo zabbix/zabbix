@@ -1110,8 +1110,12 @@ static void	db_get_item_names_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,name from items where");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select i.itemid,coalesce(ir.name_resolved,i.name)"
+			" from items i"
+			" left join item_rtname ir on i.itemid=ir.itemid"
+			" where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids->values, itemids->values_num);
 
 	result = zbx_db_select("%s", sql);
 
