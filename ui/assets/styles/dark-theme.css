@@ -4617,12 +4617,13 @@ output {
         border-top-left-radius: calc(var(--input-border-radius) - 1px);
         border-bottom-left-radius: calc(var(--input-border-radius) - 1px); }
     .radio-list-control li:nth-last-child(1 of .radio-list-control li:not([hidden])) label {
-      margin-right: -1px;
       border-top-right-radius: var(--input-border-radius);
       border-bottom-right-radius: var(--input-border-radius); }
       .radio-list-control li:nth-last-child(1 of .radio-list-control li:not([hidden])) label label {
         border-top-right-radius: calc(var(--input-border-radius) - 1px);
         border-bottom-right-radius: calc(var(--input-border-radius) - 1px); }
+    .radio-list-control li:not(:last-child) {
+      margin-right: -1px; }
   .radio-list-control label {
     display: inline-block;
     border: 1px solid #4f4f4f;

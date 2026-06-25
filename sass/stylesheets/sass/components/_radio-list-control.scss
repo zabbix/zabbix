@@ -20,7 +20,6 @@
 		}
 
 		&:nth-last-child(1 of &:not([hidden])) label {
-			margin-right: -1px;
 			border-top-right-radius: var(--input-border-radius);
 			border-bottom-right-radius: var(--input-border-radius);
 
@@ -28,6 +27,10 @@
 				border-top-right-radius: calc(var(--input-border-radius) - 1px);
 				border-bottom-right-radius: calc(var(--input-border-radius) - 1px);
 			}
+		}
+
+		&:not(:last-child) {
+			margin-right: -1px;
 		}
 	}
 
