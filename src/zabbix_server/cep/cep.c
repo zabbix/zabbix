@@ -430,7 +430,7 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 
 			obj = cep_get_object_or_create(cep, &event->origin);
 			h = cep_create_event_handle(cep, event);
-			zbx_vector_cep_event_handle_append(&obj->events, zbx_cep_event_handle_addref(h));
+			zbx_vector_cep_event_handle_append(&obj->events, h);
 
 			zbx_vector_uint64_append(&eventids, eventid);
 			events_num++;
