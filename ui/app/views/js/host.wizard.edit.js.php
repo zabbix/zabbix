@@ -231,7 +231,8 @@ window.host_wizard_edit = new class {
 	#data_update_locked = false;
 	#form_update_locked = false;
 	#pending_form_update = false;
-	#changed_during_mouse = false;
+
+	#last_input_changed = null;
 
 	#confirm_dialogue_close = false;
 
@@ -254,17 +255,14 @@ window.host_wizard_edit = new class {
 
 		this.#dialogue.addEventListener('input', this.#onInputChange.bind(this));
 		this.#dialogue.addEventListener('focusout', this.#onInputBlur.bind(this));
-		this.#dialogue.addEventListener('mousedown', () => {
-			this.#form_update_locked = true;
-			this.#pending_form_update = true;
-		});
+		this.#dialogue.addEventListener('mousedown', () => this.#form_update_locked = true);
 		this.#dialogue.addEventListener('mouseup', () => {
 			this.#form_update_locked = false;
 
 			if (this.#pending_form_update) {
 				this.#pending_form_update = false;
-				this.#updateForm(this.#changed_during_mouse ? undefined : null);
-				this.#changed_during_mouse = false;
+				this.#updateForm(this.#last_input_changed ?? this.#inputNameToInputPath(this.#last_input_changed));
+				this.#last_input_changed = null;
 			}
 		});
 
@@ -2031,12 +2029,10 @@ window.host_wizard_edit = new class {
 	}
 
 	#onInputChange({target}) {
+		this.#last_input_changed = target.name;
+
 		if (!target.name) {
 			return;
-		}
-
-		if (this.#form_update_locked) {
-			this.#changed_during_mouse = true;
 		}
 
 		const value = target.type === 'checkbox'
