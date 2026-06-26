@@ -216,12 +216,12 @@ abstract class CControllerCepRuleGeneral extends CController {
 				CCepRuleHelper::WHEN_PATTERN_MATCHED
 			]],
 			'tags' => ['objects', 'fields' => [
-				'tag' => ['db cep_operation_tag.tag', 'required', 'not_empty'],
-				'operator' => ['db cep_operation_tag.operator', 'required', 'in' => [TAG_OPERATOR_EXISTS,
+				'tag' => ['db cep_operation_condition.tag', 'required', 'not_empty'],
+				'operator' => ['db cep_operation_condition.operator', 'required', 'in' => [TAG_OPERATOR_EXISTS,
 					TAG_OPERATOR_EQUAL, TAG_OPERATOR_LIKE, TAG_OPERATOR_NOT_EXISTS, TAG_OPERATOR_NOT_EQUAL,
 					TAG_OPERATOR_NOT_LIKE
 				]],
-				'value' => ['db cep_operation_tag.value', 'required']
+				'value' => ['db cep_operation_condition.value', 'required']
 			]],
 			'type' => [
 				['db cep_operation.type', 'required', 'in' => [CCepRuleHelper::OP_SET_NAME,
