@@ -272,7 +272,7 @@ window.webscenario_step_edit_popup = new class {
 	}
 
 	#showErrorDialog(message, trigger_element) {
-		let overlay = overlayDialogue({
+		const overlay = overlayDialogue({
 			title: <?= json_encode(_('Error')) ?>,
 			class: 'modal-popup position-middle',
 			content: jQuery('<span>').html(message),

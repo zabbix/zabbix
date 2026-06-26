@@ -38,7 +38,7 @@ $(document).ready(function() {
 		$content.append($logitems);
 		$footer.text(<?= json_encode(_('Time elapsed:')) ?> + " " + debug.ms + 'ms');
 
-		let overlay = overlayDialogue({
+		const overlay = overlayDialogue({
 			'title': <?= json_encode(_('Script execution log')) ?>,
 			'content': $content,
 			'class': 'modal-popup modal-popup-generic debug-modal position-middle',

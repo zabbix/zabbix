@@ -130,7 +130,7 @@
 
 			wrapper.appendChild(textarea)
 
-			let overlay = overlayDialogue({
+			const overlay = overlayDialogue({
 				title: <?= json_encode(_('Details')) ?>,
 				content: wrapper,
 				class: 'modal-popup modal-popup-generic',

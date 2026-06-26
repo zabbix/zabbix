@@ -270,7 +270,7 @@
 				url_node.val(url.url);
 			}
 			else {
-				let overlay = overlayDialogue({
+				const overlay = overlayDialogue({
 					'title': <?= json_encode(_('Error')); ?>,
 					'class': 'modal-popup position-middle',
 					'content': $('<span>').html(<?=

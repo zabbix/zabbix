@@ -56,7 +56,7 @@
 		}
 
 		#resetDefaults(reset_button) {
-			let overlay = overlayDialogue({
+			const overlay = overlayDialogue({
 				'title': <?= json_encode(_('Reset confirmation')) ?>,
 				'class': 'position-middle',
 				'content': document.createElement('span').innerText = <?= json_encode(

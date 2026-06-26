@@ -123,7 +123,7 @@
 			$footer.html(sprintf(t('S_N_CHAR_COUNT'), '<span>0</span>'));
 		}
 
-		let overlay = overlayDialogue({
+		const overlay = overlayDialogue({
 			'title': obj.options.title,
 			'class': 'modal-popup multilineinput-modal',
 			'content': $content,

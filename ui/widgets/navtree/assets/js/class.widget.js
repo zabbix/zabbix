@@ -754,7 +754,7 @@ class CWidgetNavTree extends CWidget {
 					content += response.debug;
 				}
 
-				let overlay = overlayDialogue({
+				const overlay = overlayDialogue({
 					'title': t('Edit tree element'),
 					'class': 'modal-popup',
 					'content': content,

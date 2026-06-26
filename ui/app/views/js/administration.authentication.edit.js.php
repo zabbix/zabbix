@@ -74,7 +74,7 @@
 						let form_fields = this.form.querySelectorAll('[name^=http_]');
 
 						const http_auth_enabled = document.getElementById('http_auth_enabled');
-						let overlay = overlayDialogue({
+						const overlay = overlayDialogue({
 							'title': <?= json_encode(_('Confirm changes')) ?>,
 							'class': 'position-middle',
 							'content': document.createElement('span').innerText = <?= json_encode(

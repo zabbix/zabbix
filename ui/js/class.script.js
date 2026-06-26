@@ -316,7 +316,7 @@ class Script {
 			content.classList.add('confirmation-msg');
 			content.textContent = confirmation;
 
-			let overlay = overlayDialogue({
+			const overlay = overlayDialogue({
 				title: dialogue_title,
 				content: content.outerHTML,
 				class: 'modal-popup modal-popup-small position-middle',

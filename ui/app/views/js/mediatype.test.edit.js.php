@@ -86,7 +86,7 @@ window.mediatype_test_edit_popup = new class {
 			content.appendChild(logitems);
 		}
 
-		let overlay = overlayDialogue({
+		const overlay = overlayDialogue({
 			'title': <?= json_encode(_('Media type test log')) ?>,
 			'content': content,
 			'class': 'modal-popup modal-popup-generic debug-modal position-middle',

@@ -109,7 +109,7 @@ window.popup_import = new class {
 				_('Any existing host entities not present in the import file will be deleted. Click OK to proceed.')
 			) ?>;
 
-		let overlay = overlayDialogue({
+		const overlay = overlayDialogue({
 			class: 'position-middle',
 			content: document.createElement('span').innerText = message,
 			buttons: [
@@ -153,7 +153,7 @@ window.popup_import = new class {
 					throw {error: response.error};
 				}
 
-				let overlay = overlayDialogue({
+				const overlay = overlayDialogue({
 					title: response.header,
 					class: response.no_changes ? 'position-middle' : 'modal-popup modal-popup-fullscreen',
 					dialogueid: 'popup_import_compare',
@@ -250,7 +250,7 @@ window.popup_import = new class {
 
 	updateWarning(obj, content) {
 		if (obj.checked) {
-			let overlay = overlayDialogue({
+			const overlay = overlayDialogue({
 				class: 'position-middle',
 				content: document.createElement('span').innerText = content,
 				buttons: [
