@@ -6555,18 +6555,18 @@ return [
 				'ref_table' => 'events',
 				'ref_field' => 'eventid'
 			],
-			'flags' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
 			'cep_ruleid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'cep_rule',
 				'ref_field' => 'cep_ruleid'
+			],
+			'flags' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],
@@ -7748,6 +7748,13 @@ return [
 				'length' => 20,
 				'ref_table' => 'users',
 				'ref_field' => 'userid'
+			],
+			'cep_ruleid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'cep_rule',
+				'ref_field' => 'cep_ruleid'
 			]
 		]
 	],
@@ -10357,6 +10364,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'error' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
 			]
 		]
 	],
@@ -10379,13 +10392,13 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0'
+				'default' => '25'
 			],
 			'operator' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0'
+				'default' => '12'
 			],
 			'event_name' => [
 				'null' => false,
@@ -10445,7 +10458,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0'
+				'default' => '1'
 			],
 			'duration' => [
 				'null' => false,
@@ -10528,7 +10541,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0'
+				'default' => '1'
 			],
 			'operator' => [
 				'null' => false,
@@ -10637,7 +10650,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0'
+				'default' => '1'
 			],
 			'evaltype' => [
 				'null' => false,
@@ -10675,6 +10688,12 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
+			'suppress_until' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
 			'sortorder' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -10702,13 +10721,13 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => ZBX_CONDITION_TYPE_EVENT_TAG
+				'default' => '25'
 			],
 			'operator' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => CONDITION_OPERATOR_EXISTS
+				'default' => '12'
 			],
 			'tag' => [
 				'null' => false,
