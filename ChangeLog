@@ -7,7 +7,7 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 
 Bug fixes:
 ...G...... [ZBX-27900] fixed Windows job handle not being closed on Zabbix agent 2 (esneiders)
-........S. [ZBX-22504] improved memory usage in lld worker processes with large low-level discovery (vso)
+........S. [ZBX-22504] improved memory usage in LLD worker processes with large low-level discovery (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.46
