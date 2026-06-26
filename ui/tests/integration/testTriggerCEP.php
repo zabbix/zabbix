@@ -17,7 +17,11 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 /**
  * Test suite to check if trigger CEP (Correlation Event Processing) works properly
- * when item state toggles between normal and unsupported
+ * when item state toggles between normal and unsupported.
+ *
+ * All item values are delivered to the server impersonating an active proxy (PROXY_NAME) that the host
+ * (and, by inheritance, the discovered host) is assigned to, rather than as direct sender/trapper data, so
+ * the whole suite exercises the proxy-delivery path. See dispatchSenderValues()/dispatchValues().
  *
  * @required-components server
  * @suite-components-reuse true
@@ -65,8 +69,21 @@ class testTriggerCEP extends CIntegrationTest {
 	// siblings, so they do not cascade-skip).
 	const SKIP_RESTART_TESTS = false;
 
+	// Active proxy whose name is spoofed when delivering item values. The host (and, by inheritance, the
+	// discovered host) is assigned to this proxy in prepareData(), and every value is sent to the server
+	// as a 'proxy data' request impersonating this proxy instead of as direct sender/trapper data, so the
+	// whole suite exercises the proxy-delivery path. See dispatchValues()/dispatchSenderValues().
+	const PROXY_NAME = 'test_trigger_cep_proxy';
+
 
 	private static $hostid;
+	private static $proxyid = null;
+
+	// host name -> hostid and "host\0key" -> itemid lookup caches used by the proxy dispatch helpers to
+	// translate the host/key based test values into the itemid based entries the proxy data protocol
+	// requires. Populated lazily and reset in clearData().
+	private static $hostid_cache = [];
+	private static $itemid_cache = [];
 	private static $disc_hostid;
 	private static $templateid;
 	private static $log_templateid;
@@ -342,6 +359,20 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid = $response['result']['hostids'][0];
 
+		// Create the active proxy and assign the host to it. The host prototype discovers its host with the
+		// parent host's proxy inherited, so the discovered host is monitored by this proxy too; every value
+		// is then delivered to the server impersonating this proxy (see dispatchValues()).
+		$response = $this->call('proxy.create', [
+			'name' => self::PROXY_NAME,
+			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+			'hosts' => [
+				['hostid' => self::$hostid]
+			]
+		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['proxyids']);
+		self::$proxyid = $response['result']['proxyids'][0];
+
 		// Create LLD rule on the host for host prototype discovery.
 		$response = $this->call('discoveryrule.create', [
 			'hostid' => self::$hostid,
@@ -585,7 +616,7 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 
 		// Resend LLD discovery data to re-instantiate discovered triggers with the new config.
-		$this->sendSenderValues([
+		$this->dispatchSenderValues([
 			[
 				'host' => self::HOST_DISC_VALUE,
 				'key' => self::LLD_RULE_KEY,
@@ -635,7 +666,7 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 
 		// Resend LLD discovery data to re-instantiate discovered triggers with the restored config.
-		$this->sendSenderValues([
+		$this->dispatchSenderValues([
 			[
 				'host' => self::HOST_DISC_VALUE,
 				'key' => self::LLD_RULE_KEY,
@@ -685,7 +716,7 @@ class testTriggerCEP extends CIntegrationTest {
 		]);
 
 		// Resend LLD discovery data to re-instantiate discovered triggers with the new config.
-		$this->sendSenderValues([
+		$this->dispatchSenderValues([
 			[
 				'host' => self::HOST_DISC_VALUE,
 				'key' => self::LLD_RULE_KEY,
@@ -740,7 +771,7 @@ class testTriggerCEP extends CIntegrationTest {
 		]);
 
 		// Resend LLD discovery data to re-instantiate discovered triggers with the new config.
-		$this->sendSenderValues([
+		$this->dispatchSenderValues([
 			[
 				'host' => self::HOST_DISC_VALUE,
 				'key' => self::LLD_RULE_KEY,
@@ -800,7 +831,7 @@ class testTriggerCEP extends CIntegrationTest {
 		]);
 
 		// Resend LLD discovery data to re-instantiate discovered triggers with the new config.
-		$this->sendSenderValues([
+		$this->dispatchSenderValues([
 			[
 				'host' => self::HOST_DISC_VALUE,
 				'key' => self::LLD_RULE_KEY,
@@ -901,7 +932,7 @@ class testTriggerCEP extends CIntegrationTest {
 		]);
 
 		// Resend LLD discovery data to re-instantiate discovered triggers and items with the new config.
-		$this->sendSenderValues([
+		$this->dispatchSenderValues([
 			[
 				'host' => self::HOST_DISC_VALUE,
 				'key' => self::LLD_RULE_KEY,
@@ -1034,7 +1065,7 @@ class testTriggerCEP extends CIntegrationTest {
 		]);
 
 		// Resend LLD discovery data to re-instantiate discovered triggers and items with the new config.
-		$this->sendSenderValues([
+		$this->dispatchSenderValues([
 			[
 				'host' => self::HOST_DISC_VALUE,
 				'key' => self::LLD_RULE_KEY,
@@ -1143,7 +1174,7 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
-	 * Send LLD data via sendSenderValues and verify that the item and trigger
+	 * Send LLD data via the proxy dispatch helper and verify that the item and trigger
 	 * prototypes are instantiated for the discovered component.
 	 *
 	 * @configurationDataProvider configurationProvider
@@ -1154,7 +1185,7 @@ class testTriggerCEP extends CIntegrationTest {
 
 		// Send host LLD discovery data so the host prototype creates the discovered host
 		// with the template linked.
-		$this->sendSenderValues([
+		$this->dispatchSenderValues([
 			[
 				'host' => self::HOST_NAME,
 				'key' => self::HOST_LLD_RULE_KEY,
@@ -1183,7 +1214,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
 		// Send item LLD discovery data to the discovered host's LLD rule (inherited from template).
-		$this->sendSenderValues([
+		$this->dispatchSenderValues([
 			[
 				'host' => self::HOST_DISC_VALUE,
 				'key' => self::LLD_RULE_KEY,
@@ -1291,7 +1322,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 
 		$vps_written = $this->getVpsWritten();
-		$this->sendSenderValues(
+		$this->dispatchSenderValues(
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'], $keys),
 			null, 0
 		);
@@ -1502,6 +1533,32 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Like testTriggerCEP_OpenAndImmediateRecovery but the rapid burst also flips the item to an
+	 * unsupported state mid-sequence in several combinations (problem→unsupported→recover,
+	 * unsupported→problem→recover, problem→unsupported→problem→recover, and unsupported while already OK).
+	 * The unsupported value sends the trigger to UNKNOWN without changing its value, so it must emit no
+	 * trigger event; CEP must still emit exactly one event per real value transition without collapsing or
+	 * dropping any when the transitions and the unsupported state arrive back-to-back.
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecoveryUnsupported() {
+		$this->runOpenAndImmediateRecoveryUnsupportedTest(false);
+	}
+
+	/**
+	 * Like testTriggerCEP_OpenAndImmediateRecovery but the whole burst lands on a single discovered item
+	 * (and its one trigger) instead of being spread across every discovered item, cycling PROBLEM → recover
+	 * (1, 0) a large number of times. Verifies CEP emits exactly one event per transition on that single
+	 * event stream under a long rapid burst, without collapsing or dropping any.
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecoverySingleItem() {
+		$this->runOpenAndImmediateRecoverySingleItemTest(false);
+	}
+
+	/**
 	 * Open the problem and let every per-trigger service follow it to PROBLEM (disaster). When $restart is
 	 * true, the server is restarted first.
 	 */
@@ -1566,7 +1623,7 @@ class testTriggerCEP extends CIntegrationTest {
 						'clock' => $now, 'ns' => $ns];
 			}
 		}
-		$this->sendSenderValues($data, null, 0);
+		$this->dispatchSenderValues($data, null, 0);
 
 		$expected_events = count($values);
 
@@ -1587,6 +1644,129 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 
 		$this->waitForNoOpenProblems($triggerids, 'open and immediate recovery');
+	}
+
+	/**
+	 * Open/recover burst that also flips the item to an unsupported state mid-cycle (1, unsupported, 0),
+	 * verifying CEP emits exactly one event per real value transition: the unsupported value changes only
+	 * the item state (trigger goes UNKNOWN), not the trigger value, so it emits no event. When $restart is
+	 * true, the server is restarted first.
+	 */
+	private function runOpenAndImmediateRecoveryUnsupportedTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		$this->captureEventBaseline($triggerids);
+
+		$unsupported = 'not_a_number';
+		$now = time();
+		$values = [];
+		for ($i = 0; $i < 3; $i++) {
+			$values[] = $unsupported;
+			$values[] = '0';
+		}
+
+		$data = [];
+		foreach ($keys as $key) {
+			foreach ($values as $ns => $value) {
+				$entry = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value,
+						'clock' => $now, 'ns' => $ns];
+				// The server skips preprocessing for proxy-delivered values, so the unsupported transition
+				// must be reported explicitly rather than relying on the non-numeric value failing.
+				if ($value === $unsupported) {
+					$entry['state'] = ITEM_STATE_NOTSUPPORTED;
+				}
+				$data[] = $entry;
+			}
+		}
+		$this->dispatchSenderValues($data, null, 0);
+
+		$expected_values = [];
+		$current = TRIGGER_VALUE_FALSE;
+		foreach ($values as $value) {
+			if ($value === $unsupported) {
+				continue;
+			}
+			$new = ($value === '0') ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
+			if ($new !== $current) {
+				$expected_values[] = $new;
+				$current = $new;
+			}
+		}
+		$this->assertEquals(TRIGGER_VALUE_FALSE, $current, 'burst must leave the triggers OK');
+
+		$expected_events = count($expected_values);
+
+		// Each trigger must produce one event per value transition.
+		$this->waitForAllTriggerEventCounts($triggerids, $expected_events);
+
+		// Events are returned newest-first, so compare against the reversed expected sequence.
+		$expected_newest_first = array_reverse($expected_values);
+		$events_by_trigger = $this->getScenarioEventsByTrigger($triggerids);
+		foreach ($triggerids as $idx => $triggerid) {
+			$events = $events_by_trigger[$triggerid];
+			$info = 'trigger #'.$idx.': '.count($events).' events';
+			$this->assertCount($expected_events, $events, $info);
+			foreach ($events as $pos => $event) {
+				$this->assertEquals($expected_newest_first[$pos], (int) $event['value'], $info.' at pos '.$pos);
+			}
+		}
+
+		$this->waitForNoOpenProblems($triggerids, 'open and immediate recovery unsupported');
+	}
+
+	/**
+	 * Same as runOpenAndImmediateRecoveryTest but the whole burst lands on a single discovered item (and
+	 * its one trigger), cycling PROBLEM → recover (1, 0) a large number of times, to stress CEP with a long
+	 * rapid back-to-back burst on one event stream. When $restart is true, the server is restarted first.
+	 */
+	private function runOpenAndImmediateRecoverySingleItemTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
+		// Drive a single discovered item (and its one trigger) so the whole burst lands on one event
+		// stream rather than being spread across every discovered item.
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::$discovered_triggerids[0];
+
+		$this->captureEventBaseline([$triggerid]);
+
+		// Build a long alternating PROBLEM/recovery burst (1,0,1,0,...) and send it in a single batch. All
+		// values share the same clock and are ordered only by their nanoseconds (the value index), so CEP
+		// must process the whole rapid burst in order and emit one event per transition without collapsing
+		// or dropping any. The sequence ends on 0 so the trigger finishes OK.
+		$cycles = 1000;
+		$now = time();
+		$values = [];
+		for ($i = 0; $i < $cycles; $i++) {
+			$values[] = '1';
+			$values[] = '0';
+		}
+
+		$data = [];
+		foreach ($values as $ns => $value) {
+			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value,
+					'clock' => $now, 'ns' => $ns];
+		}
+		$this->dispatchSenderValues($data, null, 0);
+
+		$expected_events = count($values);
+
+		// The trigger must produce one event per transition: PROBLEM, RESOLVED, PROBLEM, RESOLVED, ...
+		$this->waitForAllTriggerEventCounts([$triggerid], $expected_events);
+
+		// Events are newest-first, so they alternate RESOLVED, PROBLEM, RESOLVED, PROBLEM, ... (the burst
+		// ends on a recovery, so the newest event is RESOLVED).
+		$events = $this->getScenarioEventsByTrigger([$triggerid])[$triggerid];
+		$info = 'trigger '.$triggerid.': '.count($events).' events';
+		$this->assertCount($expected_events, $events, $info);
+		foreach ($events as $pos => $event) {
+			$expected_value = ($pos % 2 === 0) ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
+			$this->assertEquals($expected_value, (int) $event['value'], $info.' at pos '.$pos);
+		}
+
+		$this->waitForNoOpenProblems([$triggerid], 'open and immediate recovery single item');
 	}
 
 	/**
@@ -1656,7 +1836,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 
 		// Fire all triggers by sending a numeric value of 1 to all discovered items.
-		$this->sendSenderValues(
+		$this->dispatchSenderValues(
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '1'], $keys),
 			null, 0
 		);
@@ -1664,14 +1844,15 @@ class testTriggerCEP extends CIntegrationTest {
 
 		// Push a non-numeric value to flip all items into unsupported state.
 		// CEP must keep all trigger values as PROBLEM while state becomes UNKNOWN.
-		$this->sendSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'not_a_number'], $keys),
+		$this->dispatchSenderValues(
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'not_a_number',
+					'state' => ITEM_STATE_NOTSUPPORTED], $keys),
 			null, 0
 		);
 		$this->validateTriggerParams(TRIGGER_STATE_UNKNOWN, TRIGGER_VALUE_TRUE);
 
 		// Recover all triggers by sending a numeric value of 0 to all discovered items.
-		$this->sendSenderValues(
+		$this->dispatchSenderValues(
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'], $keys),
 			null, 0
 		);
@@ -2021,8 +2202,11 @@ class testTriggerCEP extends CIntegrationTest {
 		$triggerids = [self::$discovered_log_triggerid];
 		$this->captureEventBaseline($triggerids);
 
-		// Values are pushed to the master item; the dependent discovered item receives a copy of each.
-		$item_key = self::LOG_MASTER_ITEM_KEY;
+		// The trigger fires on the dependent discovered log item. A real proxy resolves dependent items
+		// itself and delivers their values directly, and the server does not propagate proxy-delivered
+		// master values to dependents, so the burst is pushed straight to the dependent item here rather
+		// than to the master.
+		$item_key = self::LOG_ITEM_PROTO_KEY.'['.self::LOG_COMPONENT_VALUE.']';
 		$base_clock = time();
 		$values = [];
 		for ($i = 0; $i < self::LOG_EVENT_COUNT; $i++) {
@@ -2034,7 +2218,7 @@ class testTriggerCEP extends CIntegrationTest {
 				'ns' => $i + 1
 			];
 		}
-		$this->sendSenderValues($values, null, 0);
+		$this->dispatchSenderValues($values, null, 0);
 
 		// Every one of the LOG_EVENT_COUNT values must have generated a problem event on the trigger.
 		$this->callUntilCountIsPresent('event.get', [
@@ -2055,10 +2239,12 @@ class testTriggerCEP extends CIntegrationTest {
 
 		$triggerids = [self::$discovered_log_triggerid];
 
-		$this->sendSenderValues([
+		// Sent directly to the dependent discovered log item (see openLogProblemBurst): the server does not
+		// propagate proxy-delivered master values to dependents.
+		$this->dispatchSenderValues([
 			[
 				'host' => self::HOST_NAME,
-				'key' => self::LOG_MASTER_ITEM_KEY,
+				'key' => self::LOG_ITEM_PROTO_KEY.'['.self::LOG_COMPONENT_VALUE.']',
 				'value' => 'recovered',
 				'clock' => time(),
 				'ns' => $this->currentNs()
@@ -2076,7 +2262,7 @@ class testTriggerCEP extends CIntegrationTest {
 	private function discoverLogTrigger(): void {
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
-		$this->sendSenderValues([
+		$this->dispatchSenderValues([
 			[
 				'host' => self::HOST_NAME,
 				'key' => self::LOG_LLD_RULE_KEY,
@@ -2134,7 +2320,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 * @depends testTriggerCEP_Cleanup
 	 */
 	public function testTriggerCEP_CleanupDiscoveredHost() {
-		$this->sendSenderValues([
+		$this->dispatchSenderValues([
 			[
 				'host' => self::HOST_NAME,
 				'key' => self::HOST_LLD_RULE_KEY,
@@ -2191,8 +2377,9 @@ class testTriggerCEP extends CIntegrationTest {
 
 		// Push a non-numeric value to flip all items into unsupported state; CEP keeps the trigger
 		// value unchanged (OK) while the state becomes UNKNOWN.
-		$this->sendSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'not_a_number'], $keys),
+		$this->dispatchSenderValues(
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'not_a_number',
+					'state' => ITEM_STATE_NOTSUPPORTED], $keys),
 			null, 0
 		);
 
@@ -2222,7 +2409,7 @@ class testTriggerCEP extends CIntegrationTest {
 
 		// Send a numeric value of 0 to restore all items to supported state; the trigger returns to
 		// the NORMAL state and stays OK.
-		$this->sendSenderValues(
+		$this->dispatchSenderValues(
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'], $keys),
 			null, 0
 		);
@@ -2270,8 +2457,9 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->maybeRestartServer($restart);
 
 		// 3. All items unsupported while PROBLEM: CEP keeps trigger values as PROBLEM, state becomes UNKNOWN.
-		$this->sendSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'not_a_number'], $keys),
+		$this->dispatchSenderValues(
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'not_a_number',
+					'state' => ITEM_STATE_NOTSUPPORTED], $keys),
 			null, 0
 		);
 		$this->validateTriggerParams(TRIGGER_STATE_UNKNOWN, TRIGGER_VALUE_TRUE);
@@ -2502,7 +2690,7 @@ class testTriggerCEP extends CIntegrationTest {
 		);
 		$this->maybeRestartServer($restart);
 
-		$this->sendSenderValues(
+		$this->dispatchSenderValues(
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down'], $keys2),
 			null, 0
 		);
@@ -2597,7 +2785,7 @@ class testTriggerCEP extends CIntegrationTest {
 			$intermingled[] = ['host' => self::HOST_DISC_VALUE, 'key' => $pkey, 'value' => '1'];
 			$intermingled[] = ['host' => self::HOST_DISC_VALUE, 'key' => $dep_keys[$idx], 'value' => '1'];
 		}
-		$this->sendSenderValues($intermingled, null, 1);
+		$this->dispatchSenderValues($intermingled, null, 1);
 
 		$this->waitForParentsValue($parent_ids, TRIGGER_VALUE_TRUE);
 		$this->waitForAllTriggerEventCounts($parent_ids, $parent_event_count + 1);
@@ -2613,7 +2801,7 @@ class testTriggerCEP extends CIntegrationTest {
 			$intermingled_recovery[] = ['host' => self::HOST_DISC_VALUE, 'key' => $pkey, 'value' => '0'];
 			$intermingled_recovery[] = ['host' => self::HOST_DISC_VALUE, 'key' => $dep_keys[$idx], 'value' => '0'];
 		}
-		$this->sendSenderValues($intermingled_recovery, null, 1);
+		$this->dispatchSenderValues($intermingled_recovery, null, 1);
 
 		$this->waitForParentsValueAndLastchange($parent_ids, $prev_parent_lastchanges, TRIGGER_VALUE_FALSE);
 		$this->waitForAllTriggerEventCounts($parent_ids, $parent_event_count + 2);
@@ -2626,7 +2814,7 @@ class testTriggerCEP extends CIntegrationTest {
 		foreach ($dep_keys as $dkey) {
 			$dep_recovery[] = ['host' => self::HOST_DISC_VALUE, 'key' => $dkey, 'value' => '0'];
 		}
-		$this->sendSenderValues($dep_recovery, null, 1);
+		$this->dispatchSenderValues($dep_recovery, null, 1);
 
 		// After recovery no problems must remain open on either the parent or the dependent triggers.
 		$this->waitForNoOpenProblems(array_merge($parent_ids, self::$discovered_dep_triggerids),
@@ -2767,7 +2955,7 @@ class testTriggerCEP extends CIntegrationTest {
 
 		// Resend LLD discovery data so the server re-instantiates discovered triggers
 		// with the updated prototype configuration.
-		$this->sendSenderValues([
+		$this->dispatchSenderValues([
 			[
 				'host' => self::HOST_DISC_VALUE,
 				'key' => self::LLD_RULE_KEY,
@@ -2805,7 +2993,7 @@ class testTriggerCEP extends CIntegrationTest {
 	public function triggerCEP_Cleanup() {
 		// Send empty log LLD data to remove the discovered log item and trigger.
 		if (!empty(self::$discovered_log_triggerid)) {
-			$this->sendSenderValues([
+			$this->dispatchSenderValues([
 				[
 					'host' => self::HOST_NAME,
 					'key' => self::LOG_LLD_RULE_KEY,
@@ -2835,7 +3023,7 @@ class testTriggerCEP extends CIntegrationTest {
 			return;
 		}
 
-		$this->sendSenderValues([
+		$this->dispatchSenderValues([
 			[
 				'host' => self::HOST_DISC_VALUE,
 				'key' => self::LLD_RULE_KEY,
@@ -2910,6 +3098,111 @@ class testTriggerCEP extends CIntegrationTest {
 			$keys[] = $proto_key.'['.$base.$i.']';
 		}
 		return $keys;
+	}
+
+	/**
+	 * Drop-in replacement for sendSenderValues() that delivers the values to the server as if they came
+	 * from the active proxy (PROXY_NAME) instead of as direct sender/trapper data. Each value is given as
+	 * ['host' => ..., 'key' => ..., 'value' => ...] (plus optional 'clock', 'ns' and 'state'); the host/key
+	 * pair is translated to the item id the proxy data protocol requires and the batch is handed to
+	 * dispatchValues(). The $component argument is accepted for call-site compatibility with
+	 * sendSenderValues() but ignored — values always target the server through the proxy.
+	 *
+	 * Because the server skips preprocessing for proxy-delivered values, an item can only be reported as
+	 * unsupported by setting 'state' => ITEM_STATE_NOTSUPPORTED explicitly (the value is then taken as the
+	 * error text); a non-numeric value alone would be dropped rather than turning the item unsupported.
+	 */
+	protected function dispatchSenderValues($values, $component = null, $delayOverride = null): void {
+		$this->ensureItemidsResolved($values);
+
+		$base_ns = (int) (microtime(true) * 1e9) % 1000000000;
+
+		$data = [];
+		foreach (array_values($values) as $i => $value) {
+			$entry = [
+				'itemid' => self::$itemid_cache[$value['host']."\0".$value['key']],
+				'value' => $value['value'],
+				'clock' => isset($value['clock']) ? $value['clock'] : time(),
+				'ns' => isset($value['ns']) ? $value['ns'] : ($base_ns + $i) % 1000000000
+			];
+			if (isset($value['state'])) {
+				$entry['state'] = $value['state'];
+			}
+			$data[] = $entry;
+		}
+
+		$this->dispatchValues($data, $delayOverride);
+	}
+
+	/**
+	 * Deliver item id based history values to the server impersonating the active proxy. Subclasses that
+	 * run a real proxy daemon can override this to route the values through the proxy instead.
+	 */
+	protected function dispatchValues(array $values, $delayOverride = null): void {
+		$this->sendAgentDataValues($values, self::HOST_NAME, self::COMPONENT_SERVER, $delayOverride,
+			self::PROXY_NAME);
+	}
+
+	/**
+	 * Populate self::$itemid_cache for every host/key pair in $values that is not cached yet, then return.
+	 * Idempotent and cheap to call on every dispatch: when all pairs are already cached it makes no API
+	 * call at all. Discovered items and the master/log items are resolved via item.get; LLD rules (which
+	 * item.get does not return) fall back to discoveryrule.get. Missing pairs are gathered first and
+	 * resolved in bulk per host, so a batch of thousands of discovered keys costs a couple of API calls on
+	 * first use and none afterwards.
+	 */
+	private function ensureItemidsResolved(array $values): void {
+		$need = [];
+		foreach ($values as $value) {
+			$ck = $value['host']."\0".$value['key'];
+			if (!isset(self::$itemid_cache[$ck])) {
+				$need[$value['host']][$value['key']] = true;
+			}
+		}
+
+		foreach ($need as $host => $keymap) {
+			$hostid = $this->hostidByName($host);
+
+			$response = $this->call('item.get', [
+				'hostids' => [$hostid],
+				'filter' => ['key_' => array_keys($keymap)],
+				'output' => ['itemid', 'key_'],
+				'webitems' => true
+			]);
+			foreach ($response['result'] as $item) {
+				self::$itemid_cache[$host."\0".$item['key_']] = (int) $item['itemid'];
+				unset($keymap[$item['key_']]);
+			}
+
+			if ($keymap) {
+				$response = $this->call('discoveryrule.get', [
+					'hostids' => [$hostid],
+					'filter' => ['key_' => array_keys($keymap)],
+					'output' => ['itemid', 'key_']
+				]);
+				foreach ($response['result'] as $rule) {
+					self::$itemid_cache[$host."\0".$rule['key_']] = (int) $rule['itemid'];
+					unset($keymap[$rule['key_']]);
+				}
+			}
+
+			$this->assertEmpty($keymap,
+				'Could not resolve item id(s) on host "'.$host.'" for proxy dispatch: '
+					.implode(', ', array_keys($keymap)));
+		}
+	}
+
+	private function hostidByName(string $host): int {
+		if (!isset(self::$hostid_cache[$host])) {
+			$response = $this->call('host.get', [
+				'filter' => ['host' => $host],
+				'output' => ['hostid']
+			]);
+			$this->assertCount(1, $response['result'], 'Host "'.$host.'" not found for proxy dispatch.');
+			self::$hostid_cache[$host] = (int) $response['result'][0]['hostid'];
+		}
+
+		return self::$hostid_cache[$host];
 	}
 
 	/**
@@ -3048,7 +3341,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 */
 	private function assertPartialRecoveryForAll(array $triggerids, array $keys, string $item_value,
 			int $expected_event_count): void {
-		$this->sendSenderValues(
+		$this->dispatchSenderValues(
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value], $keys),
 			null, 1
 		);
@@ -3069,7 +3362,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$now = time();
 		$prev_triggers = $this->getTriggers($triggerids);
 		$prev_lastchanges = array_map(fn($tid) => $prev_triggers[$tid]['lastchange'], $triggerids);
-		$this->sendSenderValues(
+		$this->dispatchSenderValues(
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value,
 					'clock' => $now , 'ns' => $this->currentNs()], $keys),
 			null, 0
@@ -3148,7 +3441,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$vps_written = $this->getVpsWritten();
 		//$cep_processed = $this->getCepStat('events', 'assessed');
 		$expected_lastchanges = array_map(fn($tid) => $current_triggers[$tid]['lastchange'], $triggerids);
-		$this->sendSenderValues(
+		$this->dispatchSenderValues(
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value,
 					'clock' => time(), 'ns' => $this->currentNs()], $keys),
 			null, 0
@@ -3191,9 +3484,12 @@ class testTriggerCEP extends CIntegrationTest {
 				return 'expected '.$expected.' triggers, got '.count($response['result']);
 			}
 
+			// A trigger is only OK when its value is FALSE and its state is NORMAL: a trigger left in
+			// UNKNOWN (e.g. after an unsupported item) is not yet recovered even with value FALSE.
 			$ok = 0;
 			foreach ($response['result'] as $trigger) {
-				if ((int) $trigger['value'] === TRIGGER_VALUE_FALSE) {
+				if ((int) $trigger['value'] === TRIGGER_VALUE_FALSE
+						&& (int) $trigger['state'] === TRIGGER_STATE_NORMAL) {
 					$ok++;
 				}
 			}
@@ -3216,9 +3512,25 @@ class testTriggerCEP extends CIntegrationTest {
 
 	private function assertTriggersValueAndState(array $triggerids, int $expected_value, string $label): void {
 		$triggers = $this->getTriggers($triggerids);
+
+		// Count how many triggers are off so the failure message reports the scale of the mismatch, not
+		// just the first offending trigger.
+		$wrong_value = 0;
+		$wrong_state = 0;
+		foreach ($triggerids as $triggerid) {
+			if ((int) $triggers[$triggerid]['value'] !== $expected_value) {
+				$wrong_value++;
+			}
+			if ((int) $triggers[$triggerid]['state'] !== TRIGGER_STATE_NORMAL) {
+				$wrong_state++;
+			}
+		}
+
+		$total = count($triggerids);
 		foreach ($triggerids as $idx => $triggerid) {
 			$trigger = $triggers[$triggerid];
-			$info = $label.' #'.$idx.': '.json_encode($trigger);
+			$info = $label.' #'.$idx.' ('.$wrong_value.'/'.$total.' wrong value, '.$wrong_state.'/'.$total
+					.' wrong state): '.json_encode($trigger);
 			$this->assertEquals($expected_value, $trigger['value'], $info);
 			$this->assertEquals(TRIGGER_STATE_NORMAL, $trigger['state'], $info);
 		}
@@ -3274,7 +3586,7 @@ class testTriggerCEP extends CIntegrationTest {
 			array $options = ['single' => false, 'state' => 0]): array|false {
 		$response = $this->call('host.get', [
 			'hostids' => [$hostid],
-			'output' => ['maintenance_status', 'maintenance_type', 'proxyid']
+			'output' => ['maintenance_status', 'maintenance_type']
 		]);
 		$this->assertCount(1, $response['result']);
 		$host = $response['result'][0];
@@ -3286,7 +3598,6 @@ class testTriggerCEP extends CIntegrationTest {
 				'hostid' => $hostid,
 				'maintenance_status' => $host['maintenance_status'],
 				'maintenance_type' => $host['maintenance_type'],
-				'proxyid' => (int) $host['proxyid']
 			]
 		];
 
@@ -3439,6 +3750,16 @@ class testTriggerCEP extends CIntegrationTest {
 			CDataHelper::call('host.delete', [self::$hostid]);
 			self::$hostid = null;
 		}
+
+		// Deleted after the hosts it monitors (self::$hostid and the discovered host) have been removed,
+		// since a proxy with assigned hosts cannot be deleted.
+		if (!empty(self::$proxyid)) {
+			CDataHelper::call('proxy.delete', [self::$proxyid]);
+			self::$proxyid = null;
+		}
+
+		self::$hostid_cache = [];
+		self::$itemid_cache = [];
 
 		// Deleted after the host it is linked to (self::$hostid) has been removed.
 		if (!empty(self::$log_templateid)) {

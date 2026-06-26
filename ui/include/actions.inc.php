@@ -1516,6 +1516,9 @@ function getSingleEventActions(array $event, array $r_events, array $alerts): ar
 			$ack['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 			$userids[$ack['userid']] = true;
 		}
+		elseif (($ack['action'] & ZBX_PROBLEM_UPDATE_CEP) == ZBX_PROBLEM_UPDATE_CEP) {
+			$ack['action_type'] = ZBX_EVENT_HISTORY_CEP_UPDATE;
+		}
 
 		if ($ack['maintenanceid'] != 0) {
 			$ack['action_type'] = ZBX_EVENT_HISTORY_MAINTENANCE;

@@ -27,7 +27,7 @@ class CControllerCepRuleEdit extends CController {
 			return false;
 		}
 
-		$this->ceprule = self::fetchCepRule($this->getInput('cepruleid', null));
+		$this->ceprule = self::fetchCepRule($this->hasInput('cepruleid') ? $this->getInput('cepruleid') : null);
 
 		if (!$this->ceprule) {
 			return false;
@@ -110,8 +110,13 @@ class CControllerCepRuleEdit extends CController {
 					'evaltype' => DB::getDefault('cep_rule', 'evaltype'),
 					'conditions' => []
 				],
+				'window_type' => CCepRuleHelper::WINDOW_NONE,
 				'window' => DB::getDefaults('cep_window') + [
-					'filter' => ['conditions' => []]
+					'filter' => [
+						'formula' => DB::getDefault('cep_window', 'formula'),
+						'evaltype' => DB::getDefault('cep_window', 'evaltype'),
+						'conditions' => []
+					]
 				],
 				'operations' => []
 			]];

@@ -65,7 +65,7 @@ class CCepRule extends CApiService {
 			'excludeSearch' =>			['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// Output.
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['cep_ruleid', 'name', 'window_type', 'stop', 'sortorder', 'description', 'status', 'error']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['cep_ruleid', 'name', 'window_type', 'stop', 'sortorder', 'description', 'status', 'error', 'type']), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_BOOLEAN, 'default' => false],
 			'selectFilter' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['conditions', 'evaltype', 'eval_formula', 'formula']), 'default' => null],
 			'selectWindow' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['duration', 'capacity', 'filter', 'script', 'group_by_host_group', 'group_by_host', 'group_by_tag', 'tag', 'event_count_tag']), 'default' => null],
@@ -310,12 +310,12 @@ class CCepRule extends CApiService {
 				'output' => ['cep_operationid', 'tag', 'operator', 'value'],
 				'filter' => ['cep_operationid' => array_keys($operation_ruleids)]
 			];
-			$resource = DBselect(DB::makeSql('cep_operation_tag', $operation_tags_options));
+			$resource = DBselect(DB::makeSql('cep_operation_condition', $operation_tags_options));
 			while ($row = DBfetch($resource)) {
 				$cep_ruleid = $operation_ruleids[$row['cep_operationid']];
 
 				$cep_rules[$cep_ruleid]['operations'][$row['cep_operationid']]['tags'][] =
-					array_diff_key($row, array_flip(['cep_operationid', 'cep_operation_tagid']));
+					array_diff_key($row, array_flip(['cep_operationid', 'cep_operation_conditionid']));
 			}
 		}
 
@@ -761,9 +761,9 @@ class CCepRule extends CApiService {
 					'execute_when' =>	['type' => API_ANY],
 					'evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR])],
 					'tags' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
-						'tag' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_operation_tag', 'tag')],
+						'tag' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_operation_condition', 'tag')],
 						'operator' =>		['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
-						'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('cep_operation_tag', 'value'), 'default' => '']
+						'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('cep_operation_condition', 'value'), 'default' => '']
 					]],
 					'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN[$operation['execute_when']])],
 					'event_name' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -1230,7 +1230,7 @@ class CCepRule extends CApiService {
 		unset($cep_rule);
 
 		if ($del_operationids) {
-			DB::delete('cep_operation_tag', ['cep_operationid' => $del_operationids]);
+			DB::delete('cep_operation_condition', ['cep_operationid' => $del_operationids]);
 			DB::delete('cep_operation', ['cep_operationid' => $del_operationids]);
 		}
 
@@ -1260,7 +1260,7 @@ class CCepRule extends CApiService {
 	}
 
 	private static function updateOperationTags(array &$cep_rules, ?array $db_cep_rules = null): void {
-		$db_defaults = DB::getDefaults('cep_operation_tag');
+		$db_defaults = DB::getDefaults('cep_operation_condition');
 		$del_tagids = [];
 		$upd_tags = [];
 		$ins_tags = [];
@@ -1284,14 +1284,14 @@ class CCepRule extends CApiService {
 
 				foreach ($operation['tags'] as &$tag) {
 					if ($db_tag = array_shift($db_tags)) {
-						$tag['cep_operation_tagid'] = $db_tag['cep_operation_tagid'];
+						$tag['cep_operation_conditionid'] = $db_tag['cep_operation_conditionid'];
 						$tag += $db_defaults;
-						$upd_tag = DB::getUpdatedValues('cep_operation_tag', $tag, $db_tag);
+						$upd_tag = DB::getUpdatedValues('cep_operation_condition', $tag, $db_tag);
 
 						if ($upd_tag) {
 							$upd_tags[] = [
 								'values' => $upd_tag,
-								'where' => ['cep_operation_tagid' => $db_tag['cep_operation_tagid']]
+								'where' => ['cep_operation_conditionid' => $db_tag['cep_operation_conditionid']]
 							];
 						}
 					}
@@ -1308,15 +1308,15 @@ class CCepRule extends CApiService {
 		unset($cep_rule);
 
 		if ($del_tagids) {
-			DB::delete('cep_operation_tag', ['cep_operation_tagid' => $del_tagids]);
+			DB::delete('cep_operation_condition', ['cep_operation_conditionid' => $del_tagids]);
 		}
 
 		if ($upd_tags) {
-			DB::update('cep_operation_tag', $upd_tags);
+			DB::update('cep_operation_condition', $upd_tags);
 		}
 
 		if ($ins_tags) {
-			$tagids = DB::insert('cep_operation_tag', $ins_tags);
+			$tagids = DB::insert('cep_operation_condition', $ins_tags);
 		}
 
 		foreach ($cep_rules as &$cep_rule) {
@@ -1324,8 +1324,8 @@ class CCepRule extends CApiService {
 				foreach ($cep_rule['operations'] as &$operation) {
 					if (array_key_exists('tags', $operation)) {
 						foreach ($operation['tags'] as &$tag) {
-							if (!array_key_exists('cep_operation_tagid', $tag)) {
-								$tag['cep_operation_tagid'] = array_shift($tagids);
+							if (!array_key_exists('cep_operation_conditionid', $tag)) {
+								$tag['cep_operation_conditionid'] = array_shift($tagids);
 							}
 						}
 						unset($tag);
@@ -1540,16 +1540,16 @@ class CCepRule extends CApiService {
 		}
 
 		$options = [
-			'output' => ['cep_operation_tagid', 'cep_operationid', 'tag', 'operator', 'value'],
+			'output' => ['cep_operation_conditionid', 'cep_operationid', 'tag', 'operator', 'value'],
 			'filter' => ['cep_operationid' => array_keys($operation_rules)],
-			'sortfield' => ['cep_operation_tagid']
+			'sortfield' => ['cep_operation_conditionid']
 		];
-		$resource = DBselect(DB::makeSql('cep_operation_tag', $options));
+		$resource = DBselect(DB::makeSql('cep_operation_condition', $options));
 
 		while ($row = DBfetch($resource)) {
 			$cep_ruleid = $operation_rules[$row['cep_operationid']];
 
-			$db_cep_rules[$cep_ruleid]['operations'][$row['cep_operationid']]['tags'][$row['cep_operation_tagid']] =
+			$db_cep_rules[$cep_ruleid]['operations'][$row['cep_operationid']]['tags'][$row['cep_operation_conditionid']] =
 				array_diff($row, array_flip(['cep_operationid']));
 		}
 	}
@@ -1620,7 +1620,7 @@ class CCepRule extends CApiService {
 		]));
 
 		if ($operationids) {
-			DB::delete('cep_operation_tag', ['cep_operationid' => $operationids]);
+			DB::delete('cep_operation_condition', ['cep_operationid' => $operationids]);
 			DB::delete('cep_operation', ['cep_operationid' => $operationids]);
 		}
 	}
