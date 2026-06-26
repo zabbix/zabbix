@@ -14,7 +14,9 @@
 
 #include "cep_rule.h"
 #include "cep.h"
+#include "zabbix_server/cep/cep_api.h"
 #include "zabbix_server/cep/cep_event.h"
+#include "zabbix_server/cep/cep_task.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbx_cep.h"
@@ -916,4 +918,22 @@ char	*cep_tag_value_shift(const char *value, int shift)
 	}
 
 	return NULL;
+}
+
+int	cep_rule_handle_error(const zbx_cep_rule_t *rule, char **error, zbx_vector_mw_task_ptr_t *tasks)
+{
+	zbx_cep_t	*cep;
+	int		ret, err = (NULL == *error ? SUCCEED : FAIL);
+
+	cep_cache_acquire(&cep);
+	ret = cep_rule_check_error(cep, rule->ruleid, *error);
+	cep_cache_release(&cep);
+
+	if (SUCCEED != ret)
+	{
+		zbx_vector_mw_task_ptr_append(tasks, cep_create_task_rule_error(rule->ruleid, *error));
+		*error = NULL;
+	}
+
+	return err;
 }

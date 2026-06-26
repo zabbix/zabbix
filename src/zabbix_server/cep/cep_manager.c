@@ -470,6 +470,10 @@ static void	cep_manager_process_finished(zbx_cep_manager_t *manager, zbx_vector_
 				task_ack = (zbx_cep_task_acknowledge_t *)tasks->values[i];
 				cep_manager_commit_task(manager, task_ack->eventid, tasks->values[i]);
 				continue;
+			case CEP_TASK_RULE_ERROR:
+				zbx_vector_mw_task_ptr_append(&manager->commits, tasks->values[i]);
+				continue;
+
 		}
 
 		cep_task_free(tasks->values[i]);

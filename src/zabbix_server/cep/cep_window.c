@@ -160,14 +160,14 @@ static int	cep_window_get_limits(const zbx_cep_rule_t *rule, int *duration, int 
 	if (SUCCEED != zbx_is_time_suffix(duration_str, duration, ZBX_LENGTH_UNLIMITED))
 	{
 		if (NULL != error)
-			*error = zbx_dsprintf(NULL, "invalid CEP window duration %s", duration_str);
+			*error = zbx_dsprintf(NULL, "Invalid CEP window duration %s.\n", duration_str);
 		goto out;
 	}
 
 	if (SUCCEED != zbx_is_int(capacity_str, capacity))
 	{
 		if (NULL != error)
-			*error = zbx_dsprintf(NULL, "invalid CEP window capacity %s", capacity_str);
+			*error = zbx_dsprintf(NULL, "Invalid CEP window capacity %s.\n", capacity_str);
 		goto out;
 	}
 
@@ -183,7 +183,6 @@ static zbx_cep_window_t	*cep_window_create(const zbx_cep_rule_t *rule, zbx_cep_w
 {
 	zbx_cep_window_t	*window;
 	int			err;
-	char			*error = NULL;
 
 	window = (zbx_cep_window_t *)zbx_malloc(NULL, sizeof(zbx_cep_window_t));
 	window->ruleid = rule->ruleid;
@@ -192,17 +191,8 @@ static zbx_cep_window_t	*cep_window_create(const zbx_cep_rule_t *rule, zbx_cep_w
 	window->js_code = NULL;
 	window->js_script = NULL;
 	window->js_codelen = 0;
-
-	if (SUCCEED != cep_window_get_limits(rule, &window->duration, &window->capacity, &error))
-	{
-		THIS_SHOULD_NEVER_HAPPEN_MSG("%s", error);
-		zbx_free(error);
-
-		/* TODO: instead of setting some defaults, stop rule processing and generate rule error */
-		window->duration = SEC_PER_HOUR;
-		window->capacity = 0;
-	}
-
+	window->duration = 0;
+	window->capacity = 0;
 	window->nextcheck = 0;
 	window->time_created = time(NULL);
 	window->flags = CEP_WINDOW_FLAGS_NONE;
@@ -245,12 +235,16 @@ void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 {
 	zbx_cep_window_pool_t	*pool;
 	zbx_cep_window_t	*window;
+	char			*error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
 
 	cep_window_pool_acquire(&pool);
-	window = cep_window_pool_get_or_create_window(pool, rule, ctx);
+	window = cep_window_pool_get_or_create_window(pool, rule, ctx, &error);
 	cep_window_pool_release(&pool);
+
+	if (SUCCEED != cep_rule_handle_error(rule, &error, tasks))
+		goto out;
 
 	cep_window_lock(window);
 
@@ -275,6 +269,8 @@ void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 	}
 
 	cep_window_release(window);
+out:
+	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -283,6 +279,7 @@ void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 {
 	zbx_cep_rule_t	*rule;
 	int		pending_num, duration, capacity, limit_update;
+	char		*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, window->ruleid);
 
@@ -298,7 +295,8 @@ void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 		goto out;
 	}
 
-	limit_update = cep_window_get_limits(rule, &duration, &capacity, NULL);
+	limit_update = cep_window_get_limits(rule, &duration, &capacity, &error);
+	(void)cep_rule_handle_error(rule, &error, tasks);
 
 	cep_window_lock(window);
 
@@ -356,6 +354,8 @@ void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 
 	zbx_cep_rule_release(rule);
 out:
+	zbx_free(error);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -421,12 +421,16 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 {
 	zbx_cep_window_pool_t	*pool;
 	zbx_cep_window_t	*window;
+	char			*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
 
 	cep_window_pool_acquire(&pool);
-	window = cep_window_pool_get_or_create_window(pool, rule, ctx);
+	window = cep_window_pool_get_or_create_window(pool, rule, ctx, &error);
 	cep_window_pool_release(&pool);
+
+	if (SUCCEED != cep_rule_handle_error(rule, &error, tasks))
+		goto out;
 
 	cep_window_lock(window);
 
@@ -468,6 +472,8 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 	}
 
 	cep_window_release(window);
+out:
+	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -476,6 +482,7 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 {
 	zbx_cep_rule_t	*rule;
 	int		duration, capacity, limit_update, events_num;
+	char		*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, window->ruleid);
 
@@ -491,7 +498,8 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 		goto out;
 	}
 
-	limit_update = cep_window_get_limits(rule, &duration, &capacity, NULL);
+	limit_update = cep_window_get_limits(rule, &duration, &capacity, &error);
+	(void)cep_rule_handle_error(rule, &error, tasks);
 
 	cep_window_lock(window);
 
@@ -509,7 +517,7 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 
 		if (0 == i)
 			ctx.pos = CEP_POS_FIRST;
-		else if (events_num == i)
+		else if (events_num == i - 1)
 			ctx.pos = CEP_POS_LAST;
 		else
 			ctx.pos = CEP_POS_UNKNOWN;
@@ -532,6 +540,8 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 
 	zbx_cep_rule_release(rule);
 out:
+	zbx_free(error);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -540,12 +550,16 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 {
 	zbx_cep_window_pool_t	*pool;
 	zbx_cep_window_t	*window;
+	char			*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
 
 	cep_window_pool_acquire(&pool);
-	window = cep_window_pool_get_or_create_window(pool, rule, ctx);
+	window = cep_window_pool_get_or_create_window(pool, rule, ctx, &error);
 	cep_window_pool_release(&pool);
+
+	if (SUCCEED != cep_rule_handle_error(rule, &error, tasks))
+		goto out;
 
 	cep_window_lock(window);
 
@@ -573,16 +587,18 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 	}
 
 	cep_window_release(window);
+out:
+	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	cep_window_js_process_script(zbx_cep_window_t *window, zbx_es_t *es)
+static int	cep_window_js_process_script(zbx_cep_window_t *window, zbx_es_t *es, char **error)
 {
 	zbx_vector_cep_event_handle_t	hevents;
 	zbx_queue_ptr_iter_t		iter;
 	zbx_cep_event_handle_t		hevent;
-	char				*result = NULL, *error = NULL;
+	char				*result = NULL, *errmsg = NULL;
 	int				ret = FAIL;
 	zbx_cep_js_ctx_t		js_ctx;
 
@@ -596,13 +612,16 @@ static int	cep_window_js_process_script(zbx_cep_window_t *window, zbx_es_t *es)
 	cep_js_ctx_init(&js_ctx, &hevents);
 	cep_js_set_ctx(es, &js_ctx);
 
-	if (FAIL == zbx_es_execute(es, NULL, window->js_code, window->js_codelen, "", &result, &error))
+	if (FAIL != zbx_es_execute(es, NULL, window->js_code, window->js_codelen, "", &result, &errmsg))
 	{
-		zabbix_log(LOG_LEVEL_WARNING,  "cannot execute script: %s", error);
-		zbx_free(error);
+		if (NULL != result && 0 == strcmp(result, "true"))
+			ret = SUCCEED;
 	}
-	else if (NULL != result && 0 == strcmp(result, "true"))
-		ret = SUCCEED;
+	else
+	{
+		*error = zbx_strdcatf(*error, "Cannot execute script: %s.\n", errmsg);
+		zbx_free(errmsg);
+	}
 
 	cep_js_ctx_clear(&js_ctx);
 
@@ -613,32 +632,53 @@ static int	cep_window_js_process_script(zbx_cep_window_t *window, zbx_es_t *es)
 	return ret;
 }
 
+static int	cep_window_js_prepare(zbx_cep_window_t *window, zbx_es_t *es, char **error)
+{
+	char	*errmsg = NULL;
+
+	if (SUCCEED != zbx_es_init_env(es, cep_config_get_source_ip(), &errmsg))
+	{
+		*error = zbx_strdcatf(*error, "Cannot initialize script environment: %s.\n", errmsg);
+		zbx_free(errmsg);
+
+		return FAIL;
+	}
+
+	cep_js_init(es);
+
+	if (SUCCEED != zbx_es_globals_make_readonly(es, &errmsg))
+	{
+		*error = zbx_strdcatf(*error, "Cannot force read-only globals: %s.\n", errmsg);
+		zbx_free(errmsg);
+
+		return FAIL;
+	}
+
+	if (NULL == window->js_code)
+	{
+		if (FAIL == zbx_es_compile(es, window->js_script, &window->js_code, &window->js_codelen, &errmsg))
+		{
+			*error = zbx_strdcatf(*error, "Cannot compile script: %s.\n", errmsg);
+			zbx_free(errmsg);
+
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
 void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks)
 {
-	char				*error = NULL;
-	zbx_es_t			es;
-	zbx_cep_window_pool_t		*pool;
-	zbx_cep_rule_t			*rule;
+	char			*error = NULL;
+	zbx_es_t		es ;
+	zbx_cep_window_pool_t	*pool;
+	zbx_cep_rule_t		*rule;
+	int			limit_update, duration, capacity;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, window->ruleid);
 
 	zbx_es_init(&es);
-
-	if (FAIL == zbx_es_init_env(&es, cep_config_get_source_ip(), &error))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize scripting environment: %s", error);
-		zbx_free(error);
-		goto out;
-	}
-
-	cep_js_init(&es);
-
-	if (SUCCEED != zbx_es_globals_make_readonly(&es, &error))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize read-only environment: %s", error);
-		zbx_free(error);
-		goto out;
-	}
 
 	if (NULL == (rule = zbx_cep_config_get_rule(window->ruleid)))
 	{
@@ -650,19 +690,20 @@ void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_t
 		goto out;
 	}
 
-	if (NULL == window->js_code)
-	{
-		if (FAIL == zbx_es_compile(&es, window->js_script, &window->js_code, &window->js_codelen, &error))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot compile script: %s", error);
-			zbx_free(error);
-			goto out;
-		}
-	}
+	limit_update = cep_window_get_limits(rule, &duration, &capacity, &error);
+
+	if (SUCCEED != cep_window_js_prepare(window, &es, &error))
+		goto out;
 
 	cep_window_lock(window);
 
-	if (SUCCEED == cep_window_js_process_script(window, &es))
+	if (SUCCEED == limit_update)
+	{
+		window->duration = duration;
+		window->capacity = capacity;
+	}
+
+	if (SUCCEED == cep_window_js_process_script(window, &es, &error))
 	{
 		zbx_queue_ptr_iter_t	iter;
 		int			events_num = zbx_queue_ptr_values_num(&window->hevents);
@@ -680,7 +721,7 @@ void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_t
 			ctx.hevent = zbx_cep_event_handle_addref(hevent);
 			if (0 == i)
 				ctx.pos = CEP_POS_FIRST;
-			else if (events_num == i)
+			else if (i == events_num - 1)
 				ctx.pos = CEP_POS_LAST;
 			else
 				ctx.pos = CEP_POS_UNKNOWN;
@@ -699,6 +740,11 @@ void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_t
 	cep_window_pool_add(pool, window);
 	cep_window_pool_release(&pool);
 out:
+	if (NULL != rule)
+		(void)cep_rule_handle_error(rule, &error, tasks);
+
+	zbx_free(error);
+
 	if (NULL != es.env && FAIL == zbx_es_destroy_env(&es, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot destroy embedded scripting engine environment: %s", error);
@@ -793,7 +839,7 @@ void	cep_window_pool_destroy(void *a)
 }
 
 zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *pool, const zbx_cep_rule_t *rule,
-		zbx_cep_event_context_t *ctx)
+		zbx_cep_event_context_t *ctx, char **error)
 {
 	zbx_cep_window_ref_t	*ref, ref_local = {
 		.ruleid = rule->ruleid,
@@ -829,6 +875,12 @@ zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *po
 			ref->tag_value = zbx_strdup(NULL, ref_local.tag_value);
 
 		ref->window = cep_window_create(rule, ref);
+
+		if (SUCCEED != cep_window_get_limits(rule, &ref->window->duration, &ref->window->capacity, error))
+		{
+			zbx_hashset_remove_direct(&pool->windows, ref);
+			return NULL;
+		}
 	}
 
 	return cep_window_addref(ref->window);

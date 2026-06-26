@@ -98,7 +98,7 @@ zbx_cep_window_pool_t	*cep_window_pool_create(void);
 void	cep_window_pool_destroy(void *a);
 
 zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *pool, const zbx_cep_rule_t *rule,
-		zbx_cep_event_context_t *ctx);
+		zbx_cep_event_context_t *ctx, char **error);
 void	cep_window_pool_remove_window(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window);
 int	cep_window_pool_next_batch(zbx_cep_window_pool_t *pool, time_t now,
 		zbx_vector_cep_window_ptr_t *windows);

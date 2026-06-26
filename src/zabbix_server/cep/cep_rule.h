@@ -65,5 +65,8 @@ int	cep_event_match_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t *
 void	cep_event_add_to_rules(zbx_cep_event_context_t *ctx, const zbx_cep_rule_t **matched_rules,
 		int matched_rules_num, zbx_vector_mw_task_ptr_t *tasks);
 
+
+int	cep_rule_handle_error(const zbx_cep_rule_t *rule, char **error, zbx_vector_mw_task_ptr_t *tasks);
+
 #endif
 

@@ -82,6 +82,10 @@ void	cep_delete_events(zbx_cep_t *cep, const zbx_vector_uint64_t *eventids, zbx_
 void	cep_set_event_cause(zbx_cep_t *cep, zbx_uint64_t eventid, zbx_uint64_t cause_eventid);
 void	cep_object_inc_pending(zbx_cep_t *cep, const zbx_cep_origin_t *origin);
 
+/* rule error caching */
+int	cep_rule_check_error(zbx_cep_t *cep, zbx_uint64_t ruleid, const char *error);
+void	cep_rule_set_error(zbx_cep_t *cep, zbx_uint64_t ruleid, char *error);
+
 /* statistics */
 void	cep_update_events_accessed(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_update_events_processed(zbx_cep_t *cep, zbx_uint64_t value);

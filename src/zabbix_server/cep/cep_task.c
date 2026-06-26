@@ -31,6 +31,7 @@ static void	cep_task_add_tags_free(void *mw_task);
 static void	cep_task_sync_event_free(void *mw_task);
 static void	cep_task_window_free(void *mw_task);
 static void	cep_task_acknowledge_free(void *mw_task);
+static void	cep_task_rule_error_free(void *mw_task);
 
 /******************************************************************************
  *                                                                            *
@@ -409,6 +410,43 @@ static void	cep_task_acknowledge_free(void *mw_task)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: create a rule error task                                          *
+ *                                                                            *
+ * Parameters: ruleid - [IN] rule identifier                                  *
+ *             error  - [IN] error string or NULL; ownership is transferred   *
+ *                          to task                                           *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_rule_error(zbx_uint64_t ruleid, char *error)
+{
+	zbx_cep_task_rule_error_t	*task;
+
+	task = (zbx_cep_task_rule_error_t *)zbx_mw_task_create(CEP_TASK_RULE_ERROR, cep_task_rule_error_free,
+			sizeof(zbx_cep_task_rule_error_t));
+
+	task->ruleid = ruleid;
+	task->error = error;
+
+	return (zbx_mw_task_t *)task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free 'set rule error' task                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_task_rule_error_free(void *mw_task)
+{
+	zbx_cep_task_rule_error_t	*task = (zbx_cep_task_rule_error_t *)mw_task;
+
+	zbx_free(task->error);
+	zbx_free(task);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: free a task                                                       *
  *                                                                            *
  ******************************************************************************/
@@ -441,6 +479,9 @@ void	cep_task_free(zbx_mw_task_t *mw_task)
 			break;
 		case CEP_TASK_ACKNOWLEDGE:
 			cep_task_acknowledge_free((zbx_cep_task_acknowledge_t *)task);
+			break;
+		case CEP_TASK_RULE_ERROR:
+			cep_task_rule_error_free((zbx_cep_task_rule_error_t *)task);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown CEP task %d", task->type);

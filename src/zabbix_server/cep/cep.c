@@ -100,12 +100,21 @@ typedef struct
 }
 zbx_cep_object_t;
 
+typedef struct
+{
+	zbx_uint64_t	ruleid;
+	char		*error;
+}
+zbx_cep_rule_error_t;
+
 struct zbx_cep
 {
 	zbx_hashset_t			events;
 
 	/* object -> events index */
 	zbx_hashset_t			objects;
+
+	zbx_hashset_t			rule_errors;
 
 	zbx_uint64_t			eventid_next;
 	zbx_uint64_t			eventid_max;
@@ -116,6 +125,13 @@ struct zbx_cep
 	zbx_atomic_uint64_t		events_processed_num;
 	zbx_atomic_uint64_t		events_discarded_num;
 };
+
+static void	cep_rule_error_clear(void *a)
+{
+	zbx_cep_rule_error_t	*rule_error = (zbx_cep_rule_error_t *)a;
+
+	zbx_free(rule_error->error);
+}
 
 static zbx_hash_t	cep_event_ptr_hash(const void *a)
 {
@@ -233,6 +249,10 @@ zbx_cep_t	*cep_create(void)
 	zbx_hashset_create_ext(&cep->objects, 100, cep_object_hash, cep_object_compare, cep_object_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
+	zbx_hashset_create_ext(&cep->rule_errors, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
+			cep_rule_error_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			ZBX_DEFAULT_MEM_FREE_FUNC);
+
 	return cep;
 }
 
@@ -251,6 +271,8 @@ void	cep_destroy(void *a)
 		zbx_cep_event_release(h->event);
 	}
 	zbx_hashset_destroy(&cep->events);
+
+	zbx_hashset_destroy(&cep->rule_errors);
 
 	zbx_free(cep);
 }
@@ -1898,3 +1920,51 @@ void	cep_object_inc_pending(zbx_cep_t *cep, const zbx_cep_origin_t *origin)
 	obj = cep_get_object_or_create(cep, origin);
 	obj->pending_events_num++;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate if the rule error matches the specified error string     *
+ *                                                                            *
+ * Parameters: cep    - [IN] CEP instance                                     *
+ *             ruleid - [IN] rule identifier                                  *
+ *             error  - [IN] error string to match or NULL if no error        *
+ *                                                                            *
+ * Return value: SUCCEED if rule has a matching error, FAIL otherwise         *
+ *                                                                            *
+ ******************************************************************************/
+int	cep_rule_check_error(zbx_cep_t *cep, zbx_uint64_t ruleid, const char *error)
+{
+	zbx_cep_rule_error_t	*re;
+
+	if (NULL == (re = (zbx_cep_rule_error_t *)zbx_hashset_search(&cep->rule_errors, &ruleid)))
+		return (NULL == error ? SUCCEED : FAIL);
+
+	if (NULL == error || 0 != strcmp(re->error, error))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: udpate rule error in cache                                        *
+ *                                                                            *
+ * Parameters: cep    - [IN] CEP instance                                     *
+ *             ruleid - [IN] rule identifier                                  *
+ *             error  - [IN] error string, NULL  clears the error             *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_rule_set_error(zbx_cep_t *cep, zbx_uint64_t ruleid, char *error)
+{
+	zbx_cep_rule_error_t	*re, re_local = {.ruleid = ruleid};
+
+	if (NULL == error)
+	{
+		zbx_hashset_remove(&cep->rule_errors, &re_local);
+		return;
+	}
+
+	re = (zbx_cep_rule_error_t *)zbx_hashset_insert(&cep->rule_errors, &re_local, sizeof(re_local));
+	re->error = zbx_strdup(re->error, error);
+}
+

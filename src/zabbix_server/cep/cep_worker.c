@@ -832,9 +832,19 @@ static int	cep_task_sync_event_compare(const void *a1, const void *a2)
 static int	cep_task_ack_compare(const void *a1, const void *a2)
 {
 	const zbx_cep_task_acknowledge_t	*ack1 = *(const zbx_cep_task_acknowledge_t * const *)a1;
-	const zbx_cep_task_acknowledge_t	*ack2 = *	(const zbx_cep_task_acknowledge_t * const *)a2;
+	const zbx_cep_task_acknowledge_t	*ack2 = *(const zbx_cep_task_acknowledge_t * const *)a2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(ack1->eventid, ack2->eventid);
+
+	return 0;
+}
+
+static int	cep_task_rule_error_compare(const void *a1, const void *a2)
+{
+	const zbx_cep_task_rule_error_t	*re1 = *(const zbx_cep_task_rule_error_t * const *)a1;
+	const zbx_cep_task_rule_error_t	*re2 = *(const zbx_cep_task_rule_error_t * const *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(re1->ruleid, re2->ruleid);
 
 	return 0;
 }
@@ -848,12 +858,13 @@ static int	cep_task_ack_compare(const void *a1, const void *a2)
  ******************************************************************************/
 static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_task_commit_t *task)
 {
-	zbx_vector_mw_task_ptr_t	event_tasks, add_tags_tasks, sync_tasks, ack_tasks;
+	zbx_vector_mw_task_ptr_t	event_tasks, add_tags_tasks, sync_tasks, ack_tasks, rule_tasks;
 
 	zbx_vector_mw_task_ptr_create(&event_tasks);
 	zbx_vector_mw_task_ptr_create(&add_tags_tasks);
 	zbx_vector_mw_task_ptr_create(&sync_tasks);
 	zbx_vector_mw_task_ptr_create(&ack_tasks);
+	zbx_vector_mw_task_ptr_create(&rule_tasks);
 
 	for (int i = 0; i < task->tasks.values_num; i++)
 	{
@@ -871,6 +882,9 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 				break;
 			case CEP_TASK_ACKNOWLEDGE:
 				zbx_vector_mw_task_ptr_append(&ack_tasks, task->tasks.values[i]);
+				break;
+			case CEP_TASK_RULE_ERROR:
+				zbx_vector_mw_task_ptr_append(&rule_tasks, task->tasks.values[i]);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported task %d in commit",
@@ -934,6 +948,13 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 		cep_db_add_acknowledges(worker->dbpool, &ack_tasks);
 	}
 
+	if (0 != rule_tasks.values_num)
+	{
+		zbx_vector_mw_task_ptr_sort(&rule_tasks, cep_task_rule_error_compare);
+		cep_db_update_rule_errors(worker->dbpool, &rule_tasks);
+	}
+
+	zbx_vector_mw_task_ptr_destroy(&rule_tasks);
 	zbx_vector_mw_task_ptr_destroy(&ack_tasks);
 	zbx_vector_mw_task_ptr_destroy(&sync_tasks);
 	zbx_vector_mw_task_ptr_destroy(&add_tags_tasks);
@@ -1021,6 +1042,7 @@ void	*cep_worker_entry(void *args)
 					break;
 				case CEP_TASK_SYNC_EVENT:
 				case CEP_TASK_ACKNOWLEDGE:
+				case CEP_TASK_RULE_ERROR:
 					/* nop tasks, contains data for commit */
 					break;
 				default:

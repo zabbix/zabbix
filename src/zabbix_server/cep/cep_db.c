@@ -1245,3 +1245,42 @@ void	cep_db_add_acknowledges(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+void	cep_db_update_rule_errors(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
+
+	zbx_dbconn_t	*db = zbx_dbconn_pool_acquire_connection(dbpool);
+	for (int i = 0; i < tasks->values_num; i++)
+	{
+		const zbx_cep_task_rule_error_t	*task = (const zbx_cep_task_rule_error_t *)tasks->values[i];
+		char				*error_dyn;
+
+		error_dyn = zbx_dbconn_dyn_escape_string(db, ZBX_NULL2EMPTY_STR(task->error));
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update cep_rule set error='%s' where cep_ruleid=" ZBX_FS_UI64 ";\n",
+				error_dyn, task->ruleid);
+		zbx_free(error_dyn);
+
+		zbx_dbconn_execute_overflowed_sql(db, &sql, &sql_alloc, &sql_offset, NULL);
+	}
+
+	(void)zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset);
+	zbx_free(sql);
+
+	zbx_cep_t	*cep;
+
+	cep_cache_acquire(&cep);
+	for (int i = 0; i < tasks->values_num; i++)
+	{
+		const zbx_cep_task_rule_error_t	*task = (const zbx_cep_task_rule_error_t *)tasks->values[i];
+
+		cep_rule_set_error(cep, task->ruleid, task->error);
+	}
+	cep_cache_release(&cep);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
