@@ -8,6 +8,8 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27900] fixed windows job handled not being closed on Zabbix agent 2 (esneiders)
+..F....... [ZBX-27594] fixed sorting of discovered hosts (msnihach)
 ........S. [ZBX-27770] fixed validation of HTTP response data for scenario-level dynamic variables in web monitoring (sboidenko)
 A.......S. [ZBX-27561] mitigated recurring system errors when editing groups for users or hosts in parallel API requests (kkuzmina, mprihodko)
 A......... [ZBX-26766] fixed code error when updating host, template or user groups with duplicate group set entries (jfreibergs)
@@ -1490,6 +1492,8 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27900] fixed windows job handled not being closed on Zabbix agent 2 (esneiders)
+..F....... [ZBX-27594] fixed sorting of discovered hosts (msnihach)
 ........S. [ZBX-27770] fixed validation of HTTP response data for scenario-level dynamic variables in web monitoring (sboidenko)
 A.......S. [ZBX-27561] mitigated recurring system errors when editing groups for users or hosts in parallel API requests (kkuzmina, mprihodko)
 A......... [ZBX-26766] fixed code error when updating host, template or user groups with duplicate group set entries (jfreibergs)
@@ -5606,6 +5610,7 @@ A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprih
 A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27900] fixed windows job handled not being closed on Zabbix agent 2 (esneiders)
 ........S. [ZBX-22504] improved memory usage in lld worker proecesses with large low level discovery (vso)
 
 --------------------------------------------------------------------------------
