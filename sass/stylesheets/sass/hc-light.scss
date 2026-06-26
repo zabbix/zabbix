@@ -457,7 +457,7 @@ a {
 		border-bottom: 1px solid $link-hover-color;
 	}
 
-	&:focus {
+	&:focus:not(.skip-link) {
 		border-bottom: 3px solid $link-hover-color;
 	}
 }

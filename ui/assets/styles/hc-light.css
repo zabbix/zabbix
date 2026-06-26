@@ -9915,7 +9915,7 @@ a:link {
   border-bottom: 1px solid rgba(0, 0, 0, 0.5); }
 a:visited, a:hover {
   border-bottom: 1px solid #000000; }
-a:focus {
+a:focus:not(.skip-link) {
   border-bottom: 3px solid #000000; }
 
 a.link-action {
