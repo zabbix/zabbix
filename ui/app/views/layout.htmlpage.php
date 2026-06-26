@@ -59,10 +59,10 @@ function local_showHeader(array $data): void {
 	]))->getOutput();
 }
 
-function local_showSkipToMainContentLink(): void {
+function local_showSkipToMainContentLink(array $data): void {
 	echo (new CLink(_('Skip to main content'), '#'.CHtmlPage::PAGE_TITLE_ID))
 		->addClass(ZBX_STYLE_BTN)
-		->addClass('skip-link');
+		->addClass($data['web_layout_mode'] == ZBX_LAYOUT_KIOSKMODE ? 'skip-kioskmode' : 'skip-link');
 }
 
 function local_showSidebar(array $data): void {
@@ -89,7 +89,7 @@ local_showHeader($data);
 
 echo '<body>';
 
-local_showSkipToMainContentLink();
+local_showSkipToMainContentLink($data);
 
 local_showSidebar($data);
 
