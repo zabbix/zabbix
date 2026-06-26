@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2026-06-18 18:38+0000\n"
+"PO-Revision-Date: 2026-06-24 10:55+0000\n"
 "Last-Translator: Udo <zabbix@inet-hamburg.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
@@ -14437,7 +14437,7 @@ msgstr "Problemausdruck"
 #: include/classes/widgets/CWidgetConfig.php:66
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:335
 msgid "Problem hosts"
-msgstr "Problem Hosts"
+msgstr "Problem-Hosts"
 
 #: include/actions.inc.php:360
 msgid "Problem is not suppressed"
@@ -16521,7 +16521,7 @@ msgstr "Zeiträume anzeigen"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:303
 msgid "Show problems"
-msgstr "Ziege Probleme"
+msgstr "Zeige Probleme"
 
 # Passive Form besser lesbar im Dropdown-Feld
 #: include/views/monitoring.history.php:173
