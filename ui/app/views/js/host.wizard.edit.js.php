@@ -251,7 +251,7 @@ window.host_wizard_edit = new class {
 		this.#overlay = overlays_stack.getById('host.wizard.edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
 
-		this.#data = this.#initReactiveData(this.#data, this.#onFormDataChange.bind(this));
+		this.#data = this.#initReactiveData(this.#data, this.#onFormDataChange);
 
 		this.#dialogue.addEventListener('input', this.#onInputChange);
 		this.#dialogue.addEventListener('focusout', this.#onInputBlur);
@@ -2017,7 +2017,7 @@ window.host_wizard_edit = new class {
 		return Promise.reject();
 	}
 
-	#onFormDataChange(path, new_value, old_value) {
+	#onFormDataChange = (path, new_value, old_value) => {
 		if (this.#data_update_locked) {
 			return;
 		}
