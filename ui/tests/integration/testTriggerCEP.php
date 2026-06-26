@@ -1516,6 +1516,18 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Like testTriggerCEP_OpenAndImmediateRecovery but the whole burst lands on a single discovered item
+	 * (and its one trigger) instead of being spread across every discovered item, cycling PROBLEM → recover
+	 * (1, 0) a large number of times. Verifies CEP emits exactly one event per transition on that single
+	 * event stream under a long rapid burst, without collapsing or dropping any.
+	 *
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecoverySingleItem() {
+		$this->runOpenAndImmediateRecoverySingleItemTest(false);
+	}
+
+	/**
 	 * Open the problem and let every per-trigger service follow it to PROBLEM (disaster). When $restart is
 	 * true, the server is restarted first.
 	 */
@@ -1666,6 +1678,58 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 
 		$this->waitForNoOpenProblems($triggerids, 'open and immediate recovery unsupported');
+	}
+
+	/**
+	 * Same as runOpenAndImmediateRecoveryTest but the whole burst lands on a single discovered item (and
+	 * its one trigger), cycling PROBLEM → recover (1, 0) a large number of times, to stress CEP with a long
+	 * rapid back-to-back burst on one event stream. When $restart is true, the server is restarted first.
+	 */
+	private function runOpenAndImmediateRecoverySingleItemTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
+		// Drive a single discovered item (and its one trigger) so the whole burst lands on one event
+		// stream rather than being spread across every discovered item.
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::$discovered_triggerids[0];
+
+		$this->captureEventBaseline([$triggerid]);
+
+		// Build a long alternating PROBLEM/recovery burst (1,0,1,0,...) and send it in a single batch. All
+		// values share the same clock and are ordered only by their nanoseconds (the value index), so CEP
+		// must process the whole rapid burst in order and emit one event per transition without collapsing
+		// or dropping any. The sequence ends on 0 so the trigger finishes OK.
+		$cycles = 1000;
+		$now = time();
+		$values = [];
+		for ($i = 0; $i < $cycles; $i++) {
+			$values[] = '1';
+			$values[] = '0';
+		}
+
+		$data = [];
+		foreach ($values as $ns => $value) {
+			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value,
+					'clock' => $now, 'ns' => $ns];
+		}
+		$this->sendSenderValues($data, null, 0);
+
+		$expected_events = count($values);
+
+		// The trigger must produce one event per transition: PROBLEM, RESOLVED, PROBLEM, RESOLVED, ...
+		$this->waitForAllTriggerEventCounts([$triggerid], $expected_events);
+
+		// Events are newest-first, so they alternate RESOLVED, PROBLEM, RESOLVED, PROBLEM, ... (the burst
+		// ends on a recovery, so the newest event is RESOLVED).
+		$events = $this->getScenarioEventsByTrigger([$triggerid])[$triggerid];
+		$info = 'trigger '.$triggerid.': '.count($events).' events';
+		$this->assertCount($expected_events, $events, $info);
+		foreach ($events as $pos => $event) {
+			$expected_value = ($pos % 2 === 0) ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
+			$this->assertEquals($expected_value, (int) $event['value'], $info.' at pos '.$pos);
+		}
+
+		$this->waitForNoOpenProblems([$triggerid], 'open and immediate recovery single item');
 	}
 
 	/**
