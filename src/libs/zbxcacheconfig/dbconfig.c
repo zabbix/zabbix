@@ -7566,7 +7566,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	zbx_dbsync_init_changelog(&cep_window_sync, "cep_window", changelog_sync_mode, db);
 	zbx_dbsync_init_changelog(&cep_window_condition_sync, "cep_window_condition", changelog_sync_mode, db);
 	zbx_dbsync_init_changelog(&cep_operation_sync, "cep_operation", changelog_sync_mode, db);
-	zbx_dbsync_init_changelog(&cep_op_condition_sync, "cep_operation_tag", changelog_sync_mode, db);
+	zbx_dbsync_init_changelog(&cep_op_condition_sync, "cep_operation_condition", changelog_sync_mode, db);
 
 	/* Action operation sync produces virtual rows with two columns - actionid, opflags. */
 	/* Because of this it cannot return the original database select and must always be  */
