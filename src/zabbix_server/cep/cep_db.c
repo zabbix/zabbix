@@ -1260,7 +1260,7 @@ void	cep_db_update_rule_errors(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_ta
 
 		error_dyn = zbx_dbconn_dyn_escape_string(db, ZBX_NULL2EMPTY_STR(task->error));
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update cep_rule set error='%s' where cep_ruleid=" ZBX_FS_UI64 ";\n",
+				"update cep_rule_rtdata set error='%s' where cep_ruleid=" ZBX_FS_UI64 ";\n",
 				error_dyn, task->ruleid);
 		zbx_free(error_dyn);
 
