@@ -79,10 +79,20 @@ abstract class CControllerCepRuleGeneral extends CController {
 							CCepRuleHelper::WINDOW_CONDITION_OLD_TAG => $condition['past_event_past_tag'],
 							CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE => $condition['old_value_past_tag']
 						};
-						unset($condition['formulaid'], $condition['tag_pair_past_tag'],
-							$condition['old_value_past_tag'], $condition['past_event_past_tag']
+
+						unset($condition['tag_pair_past_tag'], $condition['old_value_past_tag'],
+							$condition['past_event_past_tag']
 						);
 					});
+
+
+					if ($request['window']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+						unset($condition['formula']);
+						array_walk($request['window']['filter']['conditions'], function (array &$condition) {
+							unset($condition['formulaid']);
+						});
+					}
+
 					$request['window']['filter']['conditions'] = array_values(
 						$request['window']['filter']['conditions']
 					);
@@ -107,7 +117,6 @@ abstract class CControllerCepRuleGeneral extends CController {
 	}
 
 	public static function getValidationRules(bool $existing = true): array {
-		// TODO 2: 'conditions' => ['objects', using letters instead of numbers in field names may cause problems.
 		$api_uniq = !$existing
 			? ['ceprule.get', ['name' => '{name}']]
 			: ['ceprule.get', ['name' => '{name}'], 'cepruleid'];
@@ -340,7 +349,8 @@ abstract class CControllerCepRuleGeneral extends CController {
 			],
 			'tag_value' => ['db cep_window_condition.tag_value', 'required',
 				'when' => ['type', 'in' => [CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE]]
-			]
+			],
+			'formulaid' => ['string', 'required', 'not_empty']
 		];
 	}
 
