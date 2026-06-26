@@ -36,6 +36,7 @@ typedef struct
 	zbx_cep_guard_t		*cache_guard;
 	zbx_cep_guard_t		*window_pool_guard;
 
+	const char		*config_source_ip;
 
 	zbx_channel_t		*update_channel;
 	zbx_atomic_uint32_t	refcount;
@@ -156,7 +157,7 @@ static void	cep_api_free(zbx_cep_api_t *api)
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-static int	cep_api_init(zbx_cep_api_t *api, char **error)
+static int	cep_api_init(zbx_cep_api_t *api, const char *config_source_ip, char **error)
 {
 	if (NULL == (api->cache_guard = cep_guard_create(cep_create(), (zbx_mem_free_func_t)cep_destroy, error)))
 		return FAIL;
@@ -170,6 +171,8 @@ static int	cep_api_init(zbx_cep_api_t *api, char **error)
 	api->update_channel = (zbx_channel_t *)zbx_malloc(NULL, sizeof(zbx_channel_t));
 	zbx_chan_init(api->update_channel, sizeof(zbx_cep_event_update_t), 10);
 
+	api->config_source_ip = config_source_ip;
+
 	return SUCCEED;
 }
 
@@ -182,12 +185,12 @@ static int	cep_api_init(zbx_cep_api_t *api, char **error)
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-int	cep_api_create(char **error)
+int	cep_api_create(const char *config_source_ip, char **error)
 {
 
 	zbx_cep_api_t	*api = (zbx_cep_api_t *)zbx_calloc(NULL, 1, sizeof(zbx_cep_api_t));
 
-	if (FAIL == cep_api_init(api, error))
+	if (FAIL == cep_api_init(api, config_source_ip, error))
 	{
 		cep_api_free(api);
 		return FAIL;
@@ -492,3 +495,17 @@ void	cep_stats_collect(zbx_cep_stats_t *stats)
 	cep_cache_release(&cep);
 }
 
+/*
+ * server configuration parameter support
+ */
+
+const char	*cep_config_get_source_ip(void)
+{
+	if (NULL == cep_api)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("CEP api has not been initialized");
+		zbx_exit(EXIT_FAILURE);
+	}
+
+	return cep_api->config_source_ip;
+}

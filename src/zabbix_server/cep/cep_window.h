@@ -43,6 +43,10 @@ typedef struct
 	zbx_queue_ptr_t		hevents;
 	unsigned char		flags;
 
+	char			*js_script;
+	char			*js_code;
+	int			js_codelen;
+
 	zbx_atomic_uint64_t	nextcheck;
 	zbx_atomic_uint32_t	refcount;
 	zbx_cep_window_ref_t	*ref;
@@ -77,6 +81,10 @@ void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
 		zbx_vector_mw_task_ptr_t *tasks);
 void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks);
+
+void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
+	zbx_vector_mw_task_ptr_t *tasks);
+void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks);
 
 void	cep_window_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks);
 

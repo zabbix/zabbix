@@ -1879,6 +1879,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 		{
 			.workers_num = config_forks[ZBX_PROCESS_TYPE_CEP_WORKER],
 			.config_timeout = zbx_config_timeout,
+			.config_source_ip = zbx_config_source_ip
 		};
 
 	/* cleanup curl before forking to avoid issues with forked initialized state */

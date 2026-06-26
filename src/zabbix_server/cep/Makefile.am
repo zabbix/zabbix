@@ -31,5 +31,7 @@ libzbxcep_a_SOURCES = \
 	cep_window.c \
 	cep_window.h \
 	cep_event.c \
-	cep_event.h
+	cep_event.h \
+	cep_js.c \
+	cep_js.h
 

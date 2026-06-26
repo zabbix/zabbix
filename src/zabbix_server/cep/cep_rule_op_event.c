@@ -661,8 +661,10 @@ void	cep_event_add_to_rules(zbx_cep_event_context_t *ctx,
 			case ZBX_CEP_WINDOW_CAUSAL:
 				cep_window_causal_process_event(rule, ctx, tasks);
 				break;
-			case ZBX_CEP_WINDOW_TAG_MATCH:
 			case ZBX_CEP_WINDOW_PATTERN_MATCH:
+				cep_window_js_process_event(rule, ctx, tasks);
+				break;
+			case ZBX_CEP_WINDOW_TAG_MATCH:
 				/* TODO: implement */
 				break;
 		}

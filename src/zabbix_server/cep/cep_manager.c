@@ -109,6 +109,7 @@ static void	cep_manager_free(zbx_cep_manager_t *manager)
  *                                                                            *
  * Parameters: workers_num - [IN] initial number of workers                   *
  *             dbpool      - [IN] database connection pool                    *
+ *             config_source_ip - [IN] source ip from conf parameters         *
  *             error       - [OUT] error message                              *
  *                                                                            *
  * Return value: pointer to the created CEP manager instance or NULL on       *
@@ -116,7 +117,7 @@ static void	cep_manager_free(zbx_cep_manager_t *manager)
  *                                                                            *
  ******************************************************************************/
 static zbx_cep_manager_t	*cep_manager_create(const zbx_thread_info_t *info, zbx_dbconn_pool_t *dbpool,
-		char **error)
+		const char *config_source_ip, char **error)
 {
 	zbx_cep_manager_t	*manager;
 	int			ret = FAIL;
@@ -143,7 +144,7 @@ static zbx_cep_manager_t	*cep_manager_create(const zbx_thread_info_t *info, zbx_
 		goto out;
 	}
 
-	if (FAIL == cep_api_create(error))
+	if (FAIL == cep_api_create(config_source_ip, error))
 		goto out;
 
 	zbx_cep_api_acquire();
@@ -575,7 +576,7 @@ void	*zbx_cep_manager_thread(void *args)
 
 	zbx_vector_mw_task_ptr_create(&tasks);
 
-	if (NULL == (manager = cep_manager_create(info, unit_args->shared->dbpool, &error)))
+	if (NULL == (manager = cep_manager_create(info, unit_args->shared->dbpool, cep_args->config_source_ip, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize CEP manager: %s", error);
 		zbx_free(error);

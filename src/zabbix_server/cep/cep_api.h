@@ -18,7 +18,7 @@
 #include "cep.h"
 #include "zbx_cep.h"
 
-int	cep_api_create(char **error);
+int	cep_api_create(const char *config_source_ip, char **error);
 void	zbx_cep_api_acquire(void);
 void	zbx_cep_api_release(void);
 
@@ -35,5 +35,8 @@ void	cep_stats_update_events_accessed(zbx_uint64_t value);
 void	cep_stats_update_events_processed(zbx_uint64_t value);
 void	cep_stats_update_events_discarded(zbx_uint64_t value);
 void	cep_stats_collect(zbx_cep_stats_t *stats);
+
+/* server configuration parameters */
+const char	*cep_config_get_source_ip(void);
 
 #endif

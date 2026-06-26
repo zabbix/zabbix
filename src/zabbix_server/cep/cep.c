@@ -435,7 +435,7 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 			ZBX_STR2UCHAR(origin.source, row[4]);
 			ZBX_STR2UCHAR(origin.object, row[5]);
 			ZBX_STR2UINT64(origin.objectid, row[6]);
-			ZBX_STR2UINT64(cause_eventid, row[8]);
+			ZBX_DBROW2UINT64(cause_eventid, row[8]);
 			ZBX_STR2UCHAR(flags, row[9]);
 
 			event = cep_event_create(eventid, origin.source, origin.object, origin.objectid, row[7],

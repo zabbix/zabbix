@@ -21,8 +21,9 @@
 
 typedef struct
 {
-	int	workers_num;
-	int	config_timeout;
+	int		workers_num;
+	int		config_timeout;
+	const char	*config_source_ip;
 }
 zbx_thread_cep_manager_args_t;
 

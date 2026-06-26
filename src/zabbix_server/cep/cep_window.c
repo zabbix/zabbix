@@ -18,11 +18,13 @@
 #include "cep_event.h"
 #include "cep_rule.h"
 #include "cep_rule_op_event.h"
+#include "zabbix_server/cep/cep_js.h"
 #include "zabbix_server/cep/cep_task.h"
 #include "zbx_cep.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
+#include "zbxembed.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
@@ -113,7 +115,11 @@ void	cep_window_release(zbx_cep_window_t *window)
 
 	zbx_queue_ptr_destroy(&window->hevents);
 
+	zbx_free(window->js_script);
+	zbx_free(window->js_code);
+
 	pthread_mutex_destroy(&window->lock);
+
 
 	zbx_free(window);
 }
@@ -183,6 +189,9 @@ static zbx_cep_window_t	*cep_window_create(const zbx_cep_rule_t *rule, zbx_cep_w
 	window->ruleid = rule->ruleid;
 	window->type = rule->window->type;
 	window->ref = ref;
+	window->js_code = NULL;
+	window->js_script = NULL;
+	window->js_codelen = 0;
 
 	if (SUCCEED != cep_window_get_limits(rule, &window->duration, &window->capacity, &error))
 	{
@@ -468,7 +477,7 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 	zbx_cep_rule_t	*rule;
 	int		duration, capacity, limit_update, events_num;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64 " events:%d", __func__, window->ruleid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, window->ruleid);
 
 	if (NULL == (rule = zbx_cep_config_get_rule(window->ruleid)))
 	{
@@ -526,6 +535,157 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
+		zbx_vector_mw_task_ptr_t *tasks)
+{
+	zbx_cep_window_pool_t	*pool;
+	zbx_cep_window_t	*window;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
+
+	cep_window_pool_acquire(&pool);
+	window = cep_window_pool_get_or_create_window(pool, rule, ctx);
+	cep_window_pool_release(&pool);
+
+	cep_window_lock(window);
+
+	if (NULL == window->js_script)
+		window->js_script = zbx_strdup(NULL, rule->window->script);
+
+	if (0 != window->capacity && zbx_queue_ptr_values_num(&window->hevents) == window->capacity)
+	{
+		cep_window_unlock(window);
+
+		cep_rule_event_context_execute_ops(rule, ctx, ZBX_CEP_WHEN_EVENT_EVICTED, tasks);
+	}
+	else
+	{
+		if (0 == zbx_queue_ptr_values_num(&window->hevents))
+			atomic_store(&window->nextcheck, (zbx_uint64_t)(time(NULL) + 1));
+
+		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
+
+		cep_window_unlock(window);
+
+		cep_window_pool_acquire(&pool);
+		cep_window_pool_add(pool, window);
+		cep_window_pool_release(&pool);
+	}
+
+	cep_window_release(window);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks)
+{
+	char			*error = NULL, *result = NULL;
+	zbx_es_t		es;
+	zbx_cep_window_pool_t	*pool;
+	zbx_cep_rule_t		*rule;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, window->ruleid);
+
+	zbx_es_init(&es);
+
+	if (FAIL == zbx_es_init_env(&es, cep_config_get_source_ip(), &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize scripting environment: %s", error);
+		zbx_free(error);
+		goto out;
+	}
+
+	if (FAIL == cep_init_js(&es, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize CEP js interface: %s", error);
+		zbx_free(error);
+		goto out;
+	}
+
+	if (SUCCEED != zbx_es_globals_make_readonly(&es, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize read-only environment: %s", error);
+		zbx_free(error);
+		goto out;
+	}
+
+	if (NULL == (rule = zbx_cep_config_get_rule(window->ruleid)))
+	{
+		cep_window_pool_acquire(&pool);
+		cep_window_pool_remove_window(pool, window);
+		cep_window_pool_release(&pool);
+		cep_window_release(window);
+
+		goto out;
+	}
+
+	if (NULL == window->js_code)
+	{
+		if (FAIL == zbx_es_compile(&es, window->js_script, &window->js_code, &window->js_codelen, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot compile script: %s", error);
+			zbx_free(error);
+			goto out;
+		}
+	}
+
+	cep_window_lock(window);
+
+	/* TODO: prepare event list in parameters */
+	if (FAIL == zbx_es_execute(&es, NULL, window->js_code, window->js_codelen, "", &result, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING,  "cannot execute script: %s", error);
+		zbx_free(error);
+	}
+	else if (0 == strcmp(result, "true"))
+	{
+		zbx_queue_ptr_iter_t	iter;
+		int			events_num = zbx_queue_ptr_values_num(&window->hevents);
+
+		zbx_queue_ptr_iter_reset(&window->hevents, &iter);
+
+		for (int i = 0; i < events_num; i++)
+		{
+			zbx_cep_event_handle_t	hevent;
+			zbx_cep_event_context_t	ctx = {0};
+
+			if (NULL == (hevent = (zbx_cep_event_handle_t)zbx_queue_ptr_iter_next(&iter)))
+				break;
+
+			ctx.hevent = zbx_cep_event_handle_addref(hevent);
+			if (0 == i)
+				ctx.pos = CEP_POS_FIRST;
+			else if (events_num == i)
+				ctx.pos = CEP_POS_LAST;
+			else
+				ctx.pos = CEP_POS_UNKNOWN;
+
+			cep_rule_event_context_execute_ops(rule, &ctx, ZBX_CEP_WHEN_PATTERN_MATCH, tasks);
+			cep_event_context_clear(&ctx);
+		}
+	}
+
+	atomic_fetch_add(&window->nextcheck, 1);
+	cep_window_unlock(window);
+
+	zbx_cep_rule_release(rule);
+
+	cep_window_pool_acquire(&pool);
+	cep_window_pool_add(pool, window);
+	cep_window_pool_release(&pool);
+
+	zabbix_log(LOG_LEVEL_WARNING, "CEP_JS: %s", result);
+out:
+	if (NULL != es.env && FAIL == zbx_es_destroy_env(&es, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot destroy embedded scripting engine environment: %s", error);
+		zbx_free(error);
+	}
+
+	zbx_free(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
 
 void	cep_window_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks)
 {
@@ -538,8 +698,10 @@ void	cep_window_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task
 			cep_window_causal_process(window, now, tasks);
 			break;
 		case ZBX_CEP_WINDOW_TAG_MATCH:
-		case ZBX_CEP_WINDOW_PATTERN_MATCH:
 			/* TODO: implement */
+			break;
+		case ZBX_CEP_WINDOW_PATTERN_MATCH:
+			cep_window_js_process(window, now, tasks);
 			break;
 	}
 }
