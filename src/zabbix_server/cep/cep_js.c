@@ -15,6 +15,7 @@
 #include "cep_js.h"
 #include "libs/zbxembed/duktape.h"
 #include "libs/zbxembed/embed.h"
+#include "zabbix_server/cep/zbx_cep.h"
 #include "zbxalgo.h"
 #include "zbxembed.h"
 
@@ -27,6 +28,15 @@ typedef struct
 }
 zbx_cep_event_ref_t;
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve CEP JavaScript context from Duktape heap stash           *
+ *                                                                            *
+ * Parameters: ctx - [IN] Duktape context                                     *
+ *                                                                            *
+ * Return value: pointer to the CEP JavaScript context                        *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_cep_js_ctx_t	*cep_js_get_ctx(duk_context *ctx)
 {
 	zbx_cep_js_ctx_t	*js_ctx;
@@ -39,6 +49,18 @@ static zbx_cep_js_ctx_t	*cep_js_get_ctx(duk_context *ctx)
 	return js_ctx;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: handle property access on a CEP event JavaScript proxy object     *
+ *                                                                            *
+ * Parameters: ctx - [IN] Duktape context                                     *
+ *                        args: 0=target, 1=key, 2=receiver                   *
+ *                                                                            *
+ * Return value: number of Duktape return values (always 1)                   *
+ *                                                                            *
+ * Comments: Tag arrays are cached on the target object after first access.   *
+ *                                                                            *
+ ******************************************************************************/
 static duk_ret_t	cep_js_event_proxy_get(duk_context *ctx)
 {
 	/* args: 0=target, 1=key, 2=receiver */
@@ -102,11 +124,56 @@ static duk_ret_t	cep_js_event_proxy_get(duk_context *ctx)
 
 		return 1;
 	}
+	if (0 == strcmp(key, "is_open"))
+	{
+		duk_push_boolean(ctx, NULL == ref->event->r_event);
+		return 1;
+	}
+	if (0 == strcmp(key, "is_suppressed"))
+	{
+		duk_push_boolean(ctx, 0 != ref->event->suppress.values_num);
+		return 1;
+	}
+	if (0 == strcmp(key, "is_symptom"))
+	{
+		duk_push_boolean(ctx, 0 != ref->event->cause_eventid);
+		return 1;
+	}
+	if (0 == strcmp(key, "is_copied"))
+	{
+		duk_push_boolean(ctx, ZBX_EVENT_COPIED == ref->event->flags);
+		return 1;
+	}
 
 	duk_push_undefined(ctx);
 	return 1;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: reject property assignment on a CEP event JavaScript proxy object *
+ *                                                                            *
+ * Parameters: ctx - [IN] Duktape context                                     *
+ *                        args: 0=target, 1=key, 2=value, 3=receiver         *
+ *                                                                            *
+ * Return value: always throws a TypeError                                    *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	cep_js_event_proxy_set(duk_context *ctx)
+{
+	/* args: 0=target, 1=key, 2=value, 3=receiver */
+	return duk_error(ctx, DUK_ERR_TYPE_ERROR, "event properties are read-only");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: push a read-only JavaScript proxy for a CEP event onto the        *
+ *          Duktape stack                                                     *
+ *                                                                            *
+ * Parameters: ctx   - [IN] Duktape context                                   *
+ *             event - [IN] CEP event to wrap                                 *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_js_push_event_proxy(duk_context *ctx, zbx_cep_event_t *event)
 {
 	/* target object */
@@ -119,9 +186,22 @@ static void	cep_js_push_event_proxy(duk_context *ctx, zbx_cep_event_t *event)
 	duk_push_c_function(ctx, cep_js_event_proxy_get, 3);
 	duk_put_prop_string(ctx, -2, "get");
 
-	duk_push_proxy(ctx, 0);		/* [target handler] -> [proxy] */
+	/* force read-only  properties */
+	duk_push_c_function(ctx, cep_js_event_proxy_set, 4);
+	duk_put_prop_string(ctx, -2, "set");
+
+	duk_push_proxy(ctx, 0);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: push the CEP event array onto the Duktape stack                   *
+ *                                                                            *
+ * Parameters: ctx - [IN] Duktape context                                     *
+ *                                                                            *
+ * Return value: number of Duktape return values (always 1)                   *
+ *                                                                            *
+ ******************************************************************************/
 static duk_ret_t	cep_js_get_events(duk_context *ctx)
 {
 	zbx_cep_js_ctx_t	*js_ctx = cep_js_get_ctx(ctx);
@@ -138,12 +218,29 @@ static duk_ret_t	cep_js_get_events(duk_context *ctx)
 	return 1;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: register CEP JavaScript functions in the scripting environment    *
+ *                                                                            *
+ * Parameters: es - [IN/OUT] embedded scripting environment                   *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_js_init(zbx_es_t *es)
 {
 	duk_push_c_function(es->env->ctx, cep_js_get_events, 0);
 	duk_put_global_string(es->env->ctx, "cep_get_events");
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize CEP JavaScript context with events from handles        *
+ *                                                                            *
+ * Parameters: js      - [OUT] CEP JavaScript context to initialize           *
+ *             hevents - [IN] event handles to resolve and index              *
+ *                                                                            *
+ * Comments: Handles of deleted events are silently skipped.                  *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_js_ctx_init(zbx_cep_js_ctx_t *js, zbx_vector_cep_event_handle_t *hevents)
 {
 	js->events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * hevents->values_num);
@@ -166,6 +263,13 @@ void	cep_js_ctx_init(zbx_cep_js_ctx_t *js, zbx_vector_cep_event_handle_t *hevent
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: release resources held by a CEP JavaScript context                *
+ *                                                                            *
+ * Parameters: js - [IN/OUT] CEP JavaScript context to clear                  *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_js_ctx_clear(zbx_cep_js_ctx_t *js)
 {
 	zbx_hashset_destroy(&js->index);
@@ -175,6 +279,14 @@ void	cep_js_ctx_clear(zbx_cep_js_ctx_t *js)
 	zbx_free(js->events);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: store CEP JavaScript context pointer in the Duktape heap stash    *
+ *                                                                            *
+ * Parameters: es - [IN] embedded scripting environment                       *
+ *             js - [IN] CEP JavaScript context to store                      *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_js_set_ctx(zbx_es_t *es, zbx_cep_js_ctx_t *js)
 {
 	duk_push_heap_stash(es->env->ctx);

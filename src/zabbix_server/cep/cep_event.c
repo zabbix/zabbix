@@ -501,7 +501,7 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
 #define CEP_TAG_IS_FIRST	"$IS.FIRST"
 #define CEP_TAG_IS_LAST		"$IS.LAST"
 #define CEP_TAG_IS_SYMPTOM	"$IS.SYMPTOM"
-#define CEP_TAG_IS_OPEN		"$IS_OPEN"
+#define CEP_TAG_IS_OPEN		"$IS.OPEN"
 #define CEP_VALUE_TRUE		"true"
 #define CEP_VALUE_FALSE		"false"
 #define CEP_VALUE_UNKNOWN	"unknown"
