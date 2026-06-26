@@ -63,6 +63,7 @@ int	tq_column_type_is_array(zbx_tq_column_type_t type);
 int	tq_column_type_is_attributes(zbx_tq_column_type_t type);
 
 char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col);
+int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void *b);
 void	tq_get_conditions_and_or_sorted(const zbx_tq_query_t *query, zbx_vector_tq_condition_ptr_t *conditions_sorted);
 
 zbx_tq_formula_node_t	*tq_formula_parse(const char *formula, char *error, size_t max_error_len);

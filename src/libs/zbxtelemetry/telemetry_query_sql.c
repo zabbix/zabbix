@@ -22,12 +22,6 @@
 ZBX_PTR_VECTOR_DECL(tq_aggr_column_ptr, zbx_tq_aggr_column_t *)
 ZBX_PTR_VECTOR_IMPL(tq_aggr_column_ptr, zbx_tq_aggr_column_t *)
 
-/* because clickhouse does not support JSON columns to be arrays on top level, the array is located in a subcolumn */
-/* the code assumes it does not contain special symbols and, therefore, does not escape it */
-/* TODO: decide if this is the way to go, maybe just have the field be of Array(...) type (at least for clickhouse) */
-/* TODO: rename to something more generic, it isn't always attributes */
-#define TQ_SQL_ATTRIBUTES_ARRAY_JSON_KEY "attributes"
-
 typedef struct
 {
 	zbx_tq_db_type_t	db_type;
@@ -208,7 +202,7 @@ static const char	*tq_sql_key_or_null(const char *key, zbx_tq_column_type_t col_
  *           by the caller, before passing it to this function.               *
  *                                                                            *
  ******************************************************************************/
-static char	*tq_sql_dyn_get_json_subcolumn_raw(const char *operand, const char *key, const tq_sql_ctx_t *ctx)
+static char	*tq_sql_dyn_get_attribute_by_key_raw(const char *operand, const char *key, const tq_sql_ctx_t *ctx)
 {
 	char	*str;
 
@@ -216,7 +210,6 @@ static char	*tq_sql_dyn_get_json_subcolumn_raw(const char *operand, const char *
 	{
 		case ZBX_TQ_DB_TYPE_POSTGRESQL:
 		{
-			/* TODO: check that this is the correct escaping */
 			char	*key_esc = tq_sql_dyn_escape_string(key, ctx);
 
 			str = zbx_dsprintf(NULL, "%s->>%s", operand, key_esc);
@@ -235,13 +228,11 @@ static char	*tq_sql_dyn_get_json_subcolumn_raw(const char *operand, const char *
 		}
 		case ZBX_TQ_DB_TYPE_CLICKHOUSE:
 		{
-			/* TODO: check that this is the correct escaping */
-			char	*key_esc_unquoted = tq_sql_dyn_escape_string_unquoted(key, ctx);
+			char	*key_esc = tq_sql_dyn_escape_string(key, ctx);
 
-			/* casting to string so that it can be used in group by */
-			str = zbx_dsprintf(NULL, "%s.\"%s\".:String", operand, key_esc_unquoted);
+			str = zbx_dsprintf(NULL, "%s[%s]", operand, key_esc);
 
-			zbx_free(key_esc_unquoted);
+			zbx_free(key_esc);
 			break;
 		}
 
@@ -264,7 +255,7 @@ static char	*tq_sql_dyn_get_operand_raw(const char *x, const char *key, const tq
 	if (NULL == key)
 		return zbx_strdup(NULL, x);
 
-	return tq_sql_dyn_get_json_subcolumn_raw(x, key, ctx);
+	return tq_sql_dyn_get_attribute_by_key_raw(x, key, ctx);
 }
 
 static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
@@ -295,9 +286,17 @@ static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, const
 	return str;
 }
 
+static char	*tq_sql_dyn_get_cume_dist_alias_mysql(const char *name, const tq_sql_ctx_t *ctx)
+{
+	char	*alias = zbx_dsprintf(NULL, "__cd_%s", name);
+	char	*alias_esc = tq_sql_dyn_escape_name(alias, ctx);
+
+	zbx_free(alias);
+	return alias_esc;
+}
+
 static char	*tq_sql_dyn_get_percentile(const char *name, double fraction, const tq_sql_ctx_t *ctx)
 {
-	/* TODO: test correctness on all dbs */
 	char	*str;
 	char	*name_esc = tq_sql_dyn_escape_name(name, ctx);
 
@@ -308,12 +307,12 @@ static char	*tq_sql_dyn_get_percentile(const char *name, double fraction, const 
 	}
 	else if (ZBX_TQ_DB_TYPE_MYSQL == ctx->db_type)
 	{
-		char	*name_str_esc_unquoted = tq_sql_dyn_escape_string_unquoted(name, ctx);
+		char	*cd_alias = tq_sql_dyn_get_cume_dist_alias_mysql(name, ctx);
 
-		str = zbx_dsprintf(NULL, "MIN(CASE WHEN `__cd_%s` >= " ZBX_FS_DBL_EXT(4) " THEN %s END)",
-				name_str_esc_unquoted, fraction, name_esc);
+		str = zbx_dsprintf(NULL, "MIN(CASE WHEN %s >= " ZBX_FS_DBL_EXT(4) " THEN %s END)",
+				cd_alias, fraction, name_esc);
 
-		zbx_free(name_str_esc_unquoted);
+		zbx_free(cd_alias);
 	}
 	else /* clickhouse */
 	{
@@ -394,7 +393,7 @@ static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, 
  ******************************************************************************/
 static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
-	/* TODO: replace with actual table names (or probably macros) */
+	/* TODO: replace with actual table names (or probably macros), do we use apm_* or otel_* ? */
 
 	char	*str = NULL;
 	char	*str_esc;
@@ -493,11 +492,11 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 		}
 		case ZBX_TQ_DB_TYPE_CLICKHOUSE:
 		{
-			char	*key_esc_unquoted = tq_sql_dyn_escape_string_unquoted(key, ctx);
+			char	*key_esc = tq_sql_dyn_escape_string(key, ctx);
 
-			str = zbx_dsprintf(NULL, "isNotNull(%s.\"%s\")", atom, key_esc_unquoted);
+			str = zbx_dsprintf(NULL, "mapContainsKey(%s, %s)", atom, key_esc);
 
-			zbx_free(key_esc_unquoted);
+			zbx_free(key_esc);
 			break;
 		}
 
@@ -559,8 +558,8 @@ static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, cons
 		char	*elem_cond = tq_sql_dyn_get_atom_condition("e.elem",
 				tq_sql_key_or_null(cond->key, cond->col_type), cond->value, cond->operator, ctx);
 
-		str = zbx_dsprintf(NULL, "(EXISTS(SELECT 1 FROM %s(%s->'" TQ_SQL_ATTRIBUTES_ARRAY_JSON_KEY "')"
-				" AS e(elem) WHERE %s))", array_elems_func, col_esc, elem_cond);
+		str = zbx_dsprintf(NULL, "(EXISTS(SELECT 1 FROM %s(%s) AS e(elem) WHERE %s))", array_elems_func,
+				col_esc, elem_cond);
 
 		zbx_free(elem_cond);
 	}
@@ -570,8 +569,8 @@ static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, cons
 				tq_sql_key_or_null(cond->key, cond->col_type), cond->value, cond->operator, ctx);
 
 		str = zbx_dsprintf(NULL,
-				"(EXISTS(SELECT 1 FROM JSON_TABLE(JSON_EXTRACT(%s,'$." TQ_SQL_ATTRIBUTES_ARRAY_JSON_KEY
-				"'), '$[*]' COLUMNS(elem %s PATH '$')) AS e WHERE %s))",
+				"(EXISTS(SELECT 1 FROM JSON_TABLE(%s, '$[*]' COLUMNS(elem %s PATH '$')) "
+				"AS e WHERE %s))",
 				col_esc, (ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == cond->col_type ? "JSON" : "TEXT"),
 				elem_cond);
 
@@ -582,9 +581,7 @@ static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, cons
 		char	*elem_cond = tq_sql_dyn_get_atom_condition("x", tq_sql_key_or_null(cond->key, cond->col_type),
 				cond->value, cond->operator, ctx);
 
-		str = zbx_dsprintf(NULL, "arrayExists(x -> %s, %s." TQ_SQL_ATTRIBUTES_ARRAY_JSON_KEY ".:\"Array(%s)\")",
-				elem_cond, col_esc,
-				(ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == cond->col_type ? "JSON" : "String"));
+		str = zbx_dsprintf(NULL, "arrayExists(x -> %s, %s)", elem_cond, col_esc);
 
 		zbx_free(elem_cond);
 	}
@@ -666,7 +663,8 @@ static char	*tq_sql_dyn_get_conditions_and_or(const zbx_tq_query_t *query, const
 
 		if (conditions_sorted.values_num - 1 == i)
 			zbx_snprintf_alloc(&str, &alloc, &offset, ")");
-		else if (0 != strcmp(cond->column_name, conditions_sorted.values[i + 1]->column_name))
+		else if (0 != tq_condition_ptr_compare_by_column_and_key((void *)cond,
+				(void *)conditions_sorted.values[i + 1]))
 			zbx_snprintf_alloc(&str, &alloc, &offset, ")AND(");
 		else
 			zbx_snprintf_alloc(&str, &alloc, &offset, " OR ");
@@ -770,6 +768,11 @@ static int	tq_sql_aggr_column_ptr_compare_by_column(const void *a, const void *b
 	return strcmp(cond_a->column_name, cond_b->column_name);
 }
 
+static const char	*tq_sql_get_timestamp_column_raw(const zbx_tq_query_t *query)
+{
+	return (ZBX_TQ_CATEGORY_APM_METRICS == query->category ? "TimeUnix" : "Timestamp");
+}
+
 static char	*tq_sql_dyn_get_cume_dists_mysql(const zbx_tq_query_t *query, const char *rounded_time_expr,
 		const char *columns_to_select, const tq_sql_ctx_t *ctx)
 {
@@ -796,21 +799,21 @@ static char	*tq_sql_dyn_get_cume_dists_mysql(const zbx_tq_query_t *query, const 
 	for (int i = 0; i < percentile_cols_sorted.values_num; i++)
 	{
 		const char	*name = percentile_cols_sorted.values[i]->column_name;
-		char		*name_str_esc_unquoted;
+		char		*cd_alias;
 		char		*name_esc;
 
 		if (0 != i && 0 == strcmp(percentile_cols_sorted.values[i-1]->column_name, name))
 			continue;
 
-		name_str_esc_unquoted = tq_sql_dyn_escape_string_unquoted(name, ctx);
+		cd_alias = tq_sql_dyn_get_cume_dist_alias_mysql(name, ctx);
 		name_esc = tq_sql_dyn_escape_name(name, ctx);
 
 		zbx_snprintf_alloc(&str, &alloc, &offset,
-				"CUME_DIST() OVER (PARTITION BY %s%s%s ORDER BY %s) AS `__cd_%s`,",
+				"CUME_DIST() OVER (PARTITION BY %s%s%s ORDER BY %s) AS %s,",
 				rounded_time_expr, (0 != query->columns.values_num ? "," : ""), columns_to_select,
-				name_esc, name_str_esc_unquoted);
+				name_esc, cd_alias);
 
-		zbx_free(name_str_esc_unquoted);
+		zbx_free(cd_alias);
 		zbx_free(name_esc);
 	}
 
@@ -822,11 +825,13 @@ static char	*tq_sql_dyn_get_cume_dists_mysql(const zbx_tq_query_t *query, const 
 	return str;
 }
 
-static char	*tq_sql_dyn_get_rounded_time_expr_mysql(int granularity, time_t timestamp_filter_lower_bound)
+static char	*tq_sql_dyn_get_rounded_time_expr_mysql(const zbx_tq_query_t *query, int granularity,
+		time_t timestamp_filter_lower_bound)
 {
 	return zbx_dsprintf(NULL,
-			"FROM_UNIXTIME(FLOOR((UNIX_TIMESTAMP(`Timestamp`)-" ZBX_FS_TIME_T ")/%d)*%d+" ZBX_FS_TIME_T")",
-			timestamp_filter_lower_bound, granularity, granularity, timestamp_filter_lower_bound);
+			"FROM_UNIXTIME(FLOOR((UNIX_TIMESTAMP(`%s`)-" ZBX_FS_TIME_T ")/%d)*%d+" ZBX_FS_TIME_T")",
+			tq_sql_get_timestamp_column_raw(query), timestamp_filter_lower_bound, granularity,
+			granularity, timestamp_filter_lower_bound);
 }
 
 static char	*tq_sql_dyn_get_used_columns_mysql(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
@@ -838,7 +843,8 @@ static char	*tq_sql_dyn_get_used_columns_mysql(const zbx_tq_query_t *query, cons
 
 	zbx_vector_str_create(&col_names_sorted);
 
-	zbx_vector_str_append(&col_names_sorted, "Timestamp");
+	/* strings in col_names_sorted are not freed or modified */
+	zbx_vector_str_append(&col_names_sorted, (char *)tq_sql_get_timestamp_column_raw(query));
 
 	for (int i = 0; i < query->columns.values_num; i++)
 		zbx_vector_str_append(&col_names_sorted, query->columns.values[i].name);
@@ -886,18 +892,21 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, int time_shift,
 
 	const int	query_has_columns = (0 != query->columns.values_num) ? SUCCEED : FAIL;
 	const int	query_has_conditions = (0 != query->conditions.values_num) ? SUCCEED : FAIL;
-
-	size_t	alloc = 0;
-	size_t	offset = 0;
+	const char	*ts_col = tq_sql_get_timestamp_column_raw(query);
+	size_t		alloc = 0, offset = 0;
+	time_t		timestamp_filter_lower_bound, timestamp_filter_upper_bound;
+	char		*columns_to_select;
+	char		*aggr_columns_to_select;
+	char		*table_to_select_from;
+	char		*conditions;
 
 	*sql = NULL;
 
-	char	*columns_to_select	= tq_sql_dyn_get_columns_to_select(query, &ctx);
-	char	*aggr_columns_to_select	= tq_sql_dyn_get_aggr_columns_to_select(query, &ctx);
-	char	*table_to_select_from	= tq_sql_dyn_get_table_to_select_from(query, &ctx);
-	char	*conditions		= tq_sql_dyn_get_conditions(query, &ctx);
+	columns_to_select	= tq_sql_dyn_get_columns_to_select(query, &ctx);
+	aggr_columns_to_select	= tq_sql_dyn_get_aggr_columns_to_select(query, &ctx);
+	table_to_select_from	= tq_sql_dyn_get_table_to_select_from(query, &ctx);
+	conditions		= tq_sql_dyn_get_conditions(query, &ctx);
 
-	time_t timestamp_filter_lower_bound, timestamp_filter_upper_bound;
 	zbx_tq_get_timestamp_filter_bounds(time_shift, lookback_limit, granularity, now, lasttimestamp,
 			&timestamp_filter_lower_bound, &timestamp_filter_upper_bound);
 
@@ -905,11 +914,11 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, int time_shift,
 	zbx_snprintf_alloc(sql, &alloc, &offset, "SELECT ");
 	zbx_snprintf_alloc(sql, &alloc, &offset,
 			"to_timestamp("
-			"FLOOR((EXTRACT(EPOCH FROM \"Timestamp\")-" ZBX_FS_TIME_T ")/%d)*%d+" ZBX_FS_TIME_T") "
+			"FLOOR((EXTRACT(EPOCH FROM \"%s\")-" ZBX_FS_TIME_T ")/%d)*%d+" ZBX_FS_TIME_T") "
 			"AS rounded_time,",
-			timestamp_filter_lower_bound, granularity, granularity,
+			ts_col, timestamp_filter_lower_bound, granularity, granularity,
 			timestamp_filter_lower_bound);
-	zbx_snprintf_alloc(sql, &alloc, &offset, "EXTRACT(EPOCH FROM MIN(\"Timestamp\"))::bigint AS starttime,");
+	zbx_snprintf_alloc(sql, &alloc, &offset, "EXTRACT(EPOCH FROM MIN(\"%s\"))::bigint AS starttime,", ts_col);
 	if (SUCCEED == query_has_columns)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "%s,", columns_to_select);
 	zbx_snprintf_alloc(sql, &alloc, &offset, "%s ", aggr_columns_to_select);
@@ -920,9 +929,9 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, int time_shift,
 	/* where */
 	zbx_snprintf_alloc(sql, &alloc, &offset, "WHERE ");
 	zbx_snprintf_alloc(sql, &alloc, &offset,
-			"\"Timestamp\">=to_timestamp(" ZBX_FS_TIME_T ") "
-			"AND \"Timestamp\"<to_timestamp(" ZBX_FS_TIME_T ") ",
-			timestamp_filter_lower_bound, timestamp_filter_upper_bound);
+			"\"%s\">=to_timestamp(" ZBX_FS_TIME_T ") "
+			"AND \"%s\"<to_timestamp(" ZBX_FS_TIME_T ") ",
+			ts_col, timestamp_filter_lower_bound, ts_col, timestamp_filter_upper_bound);
 	if (SUCCEED == query_has_conditions)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "AND (%s) ", conditions);
 
@@ -950,6 +959,7 @@ void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, int time_shift, int 
 
 	const int	query_has_columns = (0 != query->columns.values_num) ? SUCCEED : FAIL;
 	const int	query_has_conditions = (0 != query->conditions.values_num) ? SUCCEED : FAIL;
+	const char	*ts_col = tq_sql_get_timestamp_column_raw(query);
 	size_t		alloc = 0, offset = 0;
 	time_t		timestamp_filter_lower_bound, timestamp_filter_upper_bound;
 	char		*rounded_time_expr;
@@ -965,7 +975,7 @@ void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, int time_shift, int 
 	zbx_tq_get_timestamp_filter_bounds(time_shift, lookback_limit, granularity, now, lasttimestamp,
 			&timestamp_filter_lower_bound, &timestamp_filter_upper_bound);
 
-	rounded_time_expr	= tq_sql_dyn_get_rounded_time_expr_mysql(granularity,
+	rounded_time_expr	= tq_sql_dyn_get_rounded_time_expr_mysql(query, granularity,
 			timestamp_filter_lower_bound);
 	columns_to_select	= tq_sql_dyn_get_columns_to_select(query, &ctx);
 	used_columns		= tq_sql_dyn_get_used_columns_mysql(query, &ctx);
@@ -978,7 +988,7 @@ void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, int time_shift, int 
 	/* outer select */
 	zbx_snprintf_alloc(sql, &alloc, &offset, "SELECT ");
 	zbx_snprintf_alloc(sql, &alloc, &offset, "rounded_time,");
-	zbx_snprintf_alloc(sql, &alloc, &offset, "UNIX_TIMESTAMP(MIN(`Timestamp`)) AS starttime,");
+	zbx_snprintf_alloc(sql, &alloc, &offset, "UNIX_TIMESTAMP(MIN(`%s`)) AS starttime,", ts_col);
 	if (SUCCEED == query_has_columns)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "%s,", columns_to_select);
 	zbx_snprintf_alloc(sql, &alloc, &offset, "%s ", aggr_columns_to_select);
@@ -986,7 +996,7 @@ void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, int time_shift, int 
 	/* inner select */
 	zbx_snprintf_alloc(sql, &alloc, &offset, "FROM(SELECT ");
 	zbx_snprintf_alloc(sql, &alloc, &offset, "%s AS rounded_time,", rounded_time_expr);
-	zbx_snprintf_alloc(sql, &alloc, &offset, "%s%s%s", used_columns,
+	zbx_snprintf_alloc(sql, &alloc, &offset, "%s%s%s ", used_columns,
 			(SUCCEED == tq_sql_query_has_percentiles(query) ? "," : ""), percentile_ranks);
 
 	/* inner from */
@@ -995,9 +1005,9 @@ void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, int time_shift, int 
 	/* inner where */
 	zbx_snprintf_alloc(sql, &alloc, &offset, "WHERE ");
 	zbx_snprintf_alloc(sql, &alloc, &offset,
-			"`Timestamp`>=FROM_UNIXTIME(" ZBX_FS_TIME_T ") "
-			"AND `Timestamp`<FROM_UNIXTIME(" ZBX_FS_TIME_T ") ",
-			timestamp_filter_lower_bound, timestamp_filter_upper_bound);
+			"`%s`>=FROM_UNIXTIME(" ZBX_FS_TIME_T ") "
+			"AND `%s`<FROM_UNIXTIME(" ZBX_FS_TIME_T ") ",
+			ts_col, timestamp_filter_lower_bound, ts_col, timestamp_filter_upper_bound);
 	if (SUCCEED == query_has_conditions)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "AND (%s) ", conditions);
 
@@ -1030,18 +1040,21 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift,
 
 	const int	query_has_columns = (0 != query->columns.values_num) ? SUCCEED : FAIL;
 	const int	query_has_conditions = (0 != query->conditions.values_num) ? SUCCEED : FAIL;
-
-	size_t	alloc = 0;
-	size_t	offset = 0;
+	const char	*ts_col = tq_sql_get_timestamp_column_raw(query);
+	size_t		alloc = 0, offset = 0;
+	time_t		timestamp_filter_lower_bound, timestamp_filter_upper_bound;
+	char		*columns_to_select;
+	char		*aggr_columns_to_select;
+	char		*table_to_select_from;
+	char		*conditions;
 
 	*sql = NULL;
 
-	char	*columns_to_select	= tq_sql_dyn_get_columns_to_select(query, &ctx);
-	char	*aggr_columns_to_select	= tq_sql_dyn_get_aggr_columns_to_select(query, &ctx);
-	char	*table_to_select_from	= tq_sql_dyn_get_table_to_select_from(query, &ctx);
-	char	*conditions		= tq_sql_dyn_get_conditions(query, &ctx);
+	columns_to_select	= tq_sql_dyn_get_columns_to_select(query, &ctx);
+	aggr_columns_to_select	= tq_sql_dyn_get_aggr_columns_to_select(query, &ctx);
+	table_to_select_from	= tq_sql_dyn_get_table_to_select_from(query, &ctx);
+	conditions		= tq_sql_dyn_get_conditions(query, &ctx);
 
-	time_t timestamp_filter_lower_bound, timestamp_filter_upper_bound;
 	zbx_tq_get_timestamp_filter_bounds(time_shift, lookback_limit, granularity, now, lasttimestamp,
 			&timestamp_filter_lower_bound, &timestamp_filter_upper_bound);
 
@@ -1049,10 +1062,10 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift,
 	zbx_snprintf_alloc(sql, &alloc, &offset, "SELECT ");
 	zbx_snprintf_alloc(sql, &alloc, &offset,
 			"toStartOfInterval ("
-			"\"Timestamp\" - INTERVAL " ZBX_FS_TIME_T " SECOND, INTERVAL %d SECOND"
+			"\"%s\" - INTERVAL " ZBX_FS_TIME_T " SECOND, INTERVAL %d SECOND"
 			") + INTERVAL " ZBX_FS_TIME_T " SECOND AS rounded_time,",
-			timestamp_filter_lower_bound, granularity, timestamp_filter_lower_bound);
-	zbx_snprintf_alloc(sql, &alloc, &offset, "toUnixTimestamp(MIN(\"Timestamp\")) AS starttime,");
+			ts_col, timestamp_filter_lower_bound, granularity, timestamp_filter_lower_bound);
+	zbx_snprintf_alloc(sql, &alloc, &offset, "toUnixTimestamp(MIN(\"%s\")) AS starttime,", ts_col);
 	if (SUCCEED == query_has_columns)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "%s,", columns_to_select);
 	zbx_snprintf_alloc(sql, &alloc, &offset, "%s ", aggr_columns_to_select);
@@ -1063,9 +1076,9 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift,
 	/* where */
 	zbx_snprintf_alloc(sql, &alloc, &offset, "WHERE ");
 	zbx_snprintf_alloc(sql, &alloc, &offset,
-			"\"Timestamp\">=toDateTime(" ZBX_FS_TIME_T ") "
-			"AND \"Timestamp\"<toDateTime(" ZBX_FS_TIME_T ") ",
-			timestamp_filter_lower_bound, timestamp_filter_upper_bound);
+			"\"%s\">=toDateTime(" ZBX_FS_TIME_T ") "
+			"AND \"%s\"<toDateTime(" ZBX_FS_TIME_T ") ",
+			ts_col, timestamp_filter_lower_bound, ts_col, timestamp_filter_upper_bound);
 	if (SUCCEED == query_has_conditions)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "AND (%s) ", conditions);
 

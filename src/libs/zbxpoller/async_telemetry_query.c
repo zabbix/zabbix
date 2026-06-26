@@ -200,7 +200,7 @@ int	zbx_async_check_telemetry_query(zbx_dc_telemetry_query_item_t *item, AGENT_R
 
 	/* FIXME: placeholder, also, when data store config is implemented, make sure to avoid race conditions */
 	/* if it can be changed at runtime */
-	zbx_tq_db_type_t	db_type = ZBX_TQ_DB_TYPE_ELASTIC;
+	zbx_tq_db_type_t	db_type = ZBX_TQ_DB_TYPE_CLICKHOUSE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s'", __func__, item->itemid, item->key);
 

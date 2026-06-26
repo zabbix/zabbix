@@ -292,7 +292,7 @@ int	get_value_telemetry(const zbx_dc_item_t *item, const char *config_source_ip,
 
 	/* FIXME: placeholder, also, when data store config is implemented, make sure to avoid race conditions */
 	/* if it can be changed at runtime */
-	zbx_tq_db_type_t	db_type = ZBX_TQ_DB_TYPE_POSTGRESQL;
+	zbx_tq_db_type_t	db_type = ZBX_TQ_DB_TYPE_CLICKHOUSE;
 
 	/* when testing the item, the time range being queried is restricted only by the lookback limit */
 	lasttimestamp = 0;

@@ -166,7 +166,7 @@ char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col)
 		return zbx_strdup(NULL, col->name);
 }
 
-static int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void *b)
+int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void *b)
 {
 	const zbx_tq_condition_t	*cond_a = *(const zbx_tq_condition_t * const *)a;
 	const zbx_tq_condition_t	*cond_b = *(const zbx_tq_condition_t * const *)b;
