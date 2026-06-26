@@ -150,9 +150,6 @@ class CControllerConnectorCreate extends CControllerConnectorUpdateGeneral {
 	protected function doAction(): void {
 		$connector = $this->getInputAll();
 
-		// TODO: remove when DEV-4580 is merged
-		self::removeInvalidWhenRuleInput($connector);
-
 		self::processConnectorInput($connector);
 		$result = API::Connector()->create($connector);
 
