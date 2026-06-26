@@ -10684,9 +10684,9 @@ return [
 		]
 	],
 	'cep_operation_condition' => [
-		'key' => 'cep_operation_tagid',
+		'key' => 'cep_operation_conditionid',
 		'fields' => [
-			'cep_operation_tagid' => [
+			'cep_operation_conditionid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
