@@ -253,8 +253,8 @@ window.host_wizard_edit = new class {
 
 		this.#data = this.#initReactiveData(this.#data, this.#onFormDataChange.bind(this));
 
-		this.#dialogue.addEventListener('input', this.#onInputChange.bind(this));
-		this.#dialogue.addEventListener('focusout', this.#onInputBlur.bind(this));
+		this.#dialogue.addEventListener('input', this.#onInputChange);
+		this.#dialogue.addEventListener('focusout', this.#onInputBlur);
 		this.#dialogue.addEventListener('mousedown', () => this.#form_update_locked = true);
 		this.#dialogue.addEventListener('mouseup', () => {
 			this.#form_update_locked = false;
@@ -2028,7 +2028,7 @@ window.host_wizard_edit = new class {
 		this.#updateFieldsAsterisk();
 	}
 
-	#onInputChange({target}) {
+	#onInputChange = ({target}) => {
 		this.#last_input_changed = target.name;
 
 		if (!target.name) {
@@ -2042,7 +2042,7 @@ window.host_wizard_edit = new class {
 		this.#setValueByName(this.#data, target.name, value);
 	}
 
-	#onInputBlur({target}) {
+	#onInputBlur = ({target}) => {
 		if (!target.name) {
 			return;
 		}
