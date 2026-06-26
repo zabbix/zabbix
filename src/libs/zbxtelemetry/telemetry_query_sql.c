@@ -907,7 +907,7 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, int time_shift,
 			"to_timestamp("
 			"FLOOR((EXTRACT(EPOCH FROM \"Timestamp\")-" ZBX_FS_TIME_T ")/%d)*%d+" ZBX_FS_TIME_T") "
 			"AS rounded_time,",
-			timestamp_filter_lower_bound, query->granularity, query->granularity,
+			timestamp_filter_lower_bound, granularity, granularity,
 			timestamp_filter_lower_bound);
 	zbx_snprintf_alloc(sql, &alloc, &offset, "EXTRACT(EPOCH FROM MIN(\"Timestamp\"))::bigint AS starttime,");
 	if (SUCCEED == query_has_columns)
@@ -965,7 +965,7 @@ void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, int time_shift, int 
 	zbx_tq_get_timestamp_filter_bounds(time_shift, lookback_limit, granularity, now, lasttimestamp,
 			&timestamp_filter_lower_bound, &timestamp_filter_upper_bound);
 
-	rounded_time_expr	= tq_sql_dyn_get_rounded_time_expr_mysql(query->granularity,
+	rounded_time_expr	= tq_sql_dyn_get_rounded_time_expr_mysql(granularity,
 			timestamp_filter_lower_bound);
 	columns_to_select	= tq_sql_dyn_get_columns_to_select(query, &ctx);
 	used_columns		= tq_sql_dyn_get_used_columns_mysql(query, &ctx);
@@ -1051,7 +1051,7 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift,
 			"toStartOfInterval ("
 			"\"Timestamp\" - INTERVAL " ZBX_FS_TIME_T " SECOND, INTERVAL %d SECOND"
 			") + INTERVAL " ZBX_FS_TIME_T " SECOND AS rounded_time,",
-			timestamp_filter_lower_bound, query->granularity, timestamp_filter_lower_bound);
+			timestamp_filter_lower_bound, granularity, timestamp_filter_lower_bound);
 	zbx_snprintf_alloc(sql, &alloc, &offset, "toUnixTimestamp(MIN(\"Timestamp\")) AS starttime,");
 	if (SUCCEED == query_has_columns)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "%s,", columns_to_select);

@@ -130,9 +130,6 @@ typedef struct
 	char				*formula;
 	zbx_tq_formula_node_t		*formula_parsed;
 	zbx_vector_tq_condition_t	conditions;
-	int				time_shift;
-	int				lookback_limit;
-	int				granularity;
 }
 zbx_tq_query_t;
 

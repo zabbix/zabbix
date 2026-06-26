@@ -384,7 +384,7 @@ static void	tq_es_add_aggr_columns(const zbx_vector_tq_aggr_column_t *aggr_cols,
 	}
 }
 
-static void	tq_es_add_aggs(const zbx_tq_query_t *query, struct zbx_json *j, time_t timestamp_lo,
+static void	tq_es_add_aggs(const zbx_tq_query_t *query, struct zbx_json *j, int granularity, time_t timestamp_lo,
 		char *buf, size_t buf_size)
 {
 	zbx_json_addobject(j, "aggs");
@@ -400,7 +400,7 @@ static void	tq_es_add_aggs(const zbx_tq_query_t *query, struct zbx_json *j, time
 
 	zbx_json_addstring(j, "field", "Timestamp", ZBX_JSON_TYPE_STRING);
 
-	zbx_snprintf(buf, buf_size, "%ds", query->granularity);
+	zbx_snprintf(buf, buf_size, "%ds", granularity);
 	zbx_json_addstring(j, "fixed_interval", buf, ZBX_JSON_TYPE_STRING);
 
 	zbx_snprintf(buf, buf_size, "+" ZBX_FS_TIME_T "s", timestamp_lo);
@@ -449,7 +449,7 @@ void	zbx_tq_generate_elastic(const zbx_tq_query_t *query, int time_shift, int lo
 
 	zbx_json_adduint64(&j, "size", 0);
 	tq_es_add_query(query, &j, buf, buf_size, timestamp_filter_lower_bound, timestamp_filter_upper_bound);
-	tq_es_add_aggs(query, &j, timestamp_filter_lower_bound, buf, buf_size);
+	tq_es_add_aggs(query, &j, granularity, timestamp_filter_lower_bound, buf, buf_size);
 
 	*dsl = zbx_strdup(NULL, j.buffer);
 	zbx_json_free(&j);
