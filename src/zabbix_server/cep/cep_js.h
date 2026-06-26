@@ -15,8 +15,20 @@
 #ifndef ZABBIX_CEP_JS_H
 #define ZABBIX_CEP_JS_H
 
+#include "zabbix_server/cep/zbx_cep.h"
 #include "zbxembed.h"
 
-int	cep_init_js(zbx_es_t *es, char **error);
+typedef struct
+{
+	zbx_cep_event_t	**events;
+	int		events_num;
+	zbx_hashset_t	index;
+}
+zbx_cep_js_ctx_t;
+
+void	cep_js_init(zbx_es_t *es);
+void	cep_js_ctx_init(zbx_cep_js_ctx_t *js, zbx_vector_cep_event_handle_t *hevents);
+void	cep_js_ctx_clear(zbx_cep_js_ctx_t *js);
+void	cep_js_set_ctx(zbx_es_t *es, zbx_cep_js_ctx_t *js);
 
 #endif

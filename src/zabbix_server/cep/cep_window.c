@@ -577,12 +577,48 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static int	cep_window_js_process_script(zbx_cep_window_t *window, zbx_es_t *es)
+{
+	zbx_vector_cep_event_handle_t	hevents;
+	zbx_queue_ptr_iter_t		iter;
+	zbx_cep_event_handle_t		hevent;
+	char				*result = NULL, *error = NULL;
+	int				ret = FAIL;
+	zbx_cep_js_ctx_t		js_ctx;
+
+	zbx_vector_cep_event_handle_create(&hevents);
+	zbx_vector_cep_event_handle_reserve(&hevents, (size_t)zbx_queue_ptr_values_num(&window->hevents));
+
+	zbx_queue_ptr_iter_reset(&window->hevents, &iter);
+	while (NULL != (hevent = (zbx_cep_event_handle_t)zbx_queue_ptr_iter_next(&iter)))
+		zbx_vector_cep_event_handle_append(&hevents, hevent);
+
+	cep_js_ctx_init(&js_ctx, &hevents);
+	cep_js_set_ctx(es, &js_ctx);
+
+	if (FAIL == zbx_es_execute(es, NULL, window->js_code, window->js_codelen, "", &result, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING,  "cannot execute script: %s", error);
+		zbx_free(error);
+	}
+	else if (NULL != result && 0 == strcmp(result, "true"))
+		ret = SUCCEED;
+
+	cep_js_ctx_clear(&js_ctx);
+
+	zbx_vector_cep_event_handle_destroy(&hevents);
+
+	zbx_free(result);
+
+	return ret;
+}
+
 void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks)
 {
-	char			*error = NULL, *result = NULL;
-	zbx_es_t		es;
-	zbx_cep_window_pool_t	*pool;
-	zbx_cep_rule_t		*rule;
+	char				*error = NULL;
+	zbx_es_t			es;
+	zbx_cep_window_pool_t		*pool;
+	zbx_cep_rule_t			*rule;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, window->ruleid);
 
@@ -595,12 +631,7 @@ void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_t
 		goto out;
 	}
 
-	if (FAIL == cep_init_js(&es, &error))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize CEP js interface: %s", error);
-		zbx_free(error);
-		goto out;
-	}
+	cep_js_init(&es);
 
 	if (SUCCEED != zbx_es_globals_make_readonly(&es, &error))
 	{
@@ -631,13 +662,7 @@ void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_t
 
 	cep_window_lock(window);
 
-	/* TODO: prepare event list in parameters */
-	if (FAIL == zbx_es_execute(&es, NULL, window->js_code, window->js_codelen, "", &result, &error))
-	{
-		zabbix_log(LOG_LEVEL_WARNING,  "cannot execute script: %s", error);
-		zbx_free(error);
-	}
-	else if (0 == strcmp(result, "true"))
+	if (SUCCEED == cep_window_js_process_script(window, &es))
 	{
 		zbx_queue_ptr_iter_t	iter;
 		int			events_num = zbx_queue_ptr_values_num(&window->hevents);
@@ -673,16 +698,12 @@ void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_t
 	cep_window_pool_acquire(&pool);
 	cep_window_pool_add(pool, window);
 	cep_window_pool_release(&pool);
-
-	zabbix_log(LOG_LEVEL_WARNING, "CEP_JS: %s", result);
 out:
 	if (NULL != es.env && FAIL == zbx_es_destroy_env(&es, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot destroy embedded scripting engine environment: %s", error);
 		zbx_free(error);
 	}
-
-	zbx_free(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

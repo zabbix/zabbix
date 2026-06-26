@@ -13,10 +13,174 @@
 **/
 
 #include "cep_js.h"
+#include "libs/zbxembed/duktape.h"
+#include "libs/zbxembed/embed.h"
+#include "zbxalgo.h"
 #include "zbxembed.h"
 
-int	cep_init_js(zbx_es_t *es, char **error)
+#define CEP_EVENTS_STASH_KEY	"cep_events"
+
+typedef struct
 {
-	return SUCCEED;
+	zbx_uint64_t	eventid;
+	zbx_cep_event_t	*event;
 }
+zbx_cep_event_ref_t;
+
+static zbx_cep_js_ctx_t	*cep_js_get_ctx(duk_context *ctx)
+{
+	zbx_cep_js_ctx_t	*js_ctx;
+
+	duk_push_heap_stash(ctx);
+	duk_get_prop_string(ctx, -1, CEP_EVENTS_STASH_KEY);
+	js_ctx = duk_require_pointer(ctx, -1);
+	duk_pop_2(ctx);
+
+	return js_ctx;
+}
+
+static duk_ret_t	cep_js_event_proxy_get(duk_context *ctx)
+{
+	/* args: 0=target, 1=key, 2=receiver */
+	zbx_cep_js_ctx_t	*js_ctx = cep_js_get_ctx(ctx);
+	zbx_cep_event_ref_t	*ref;
+	zbx_uint64_t		eventid;
+	const char		*key;
+
+	key = duk_require_string(ctx, 1);
+	if (1 == duk_has_prop_string(ctx, 0, key))
+	{
+		duk_get_prop_string(ctx, 0, key);
+		return 1;
+	}
+
+	/* look up backing event */
+	duk_get_prop_string(ctx, 0, "eventid");
+	eventid = (zbx_uint64_t)duk_require_number(ctx, -1);
+	duk_pop(ctx);
+
+	if (NULL == (ref = zbx_hashset_search(&js_ctx->index, &eventid)))
+		return duk_error(ctx, DUK_ERR_ERROR, "event not found: " ZBX_FS_UI64, eventid);
+
+	if (0 == strcmp(key, "name"))
+	{
+		duk_push_string(ctx, ref->event->name);
+		return 1;
+	}
+	if (0 == strcmp(key, "severity"))
+	{
+		duk_push_int(ctx, ref->event->severity);
+		return 1;
+	}
+	if (0 == strcmp(key, "clock"))
+	{
+		duk_push_int(ctx, ref->event->clock);
+		return 1;
+	}
+	if (0 == strcmp(key, "ns"))
+	{
+		duk_push_int(ctx, ref->event->ns);
+		return 1;
+	}
+	if (0 == strcmp(key, "tags"))
+	{
+		zbx_vector_lite_tag_t	*tags = &ref->event->tags;
+		duk_idx_t		obj_idx;
+
+		obj_idx = duk_push_object(ctx);
+
+		for (int i = 0; i < tags->values_num; i++)
+		{
+			zbx_tag_t	*tag = &tags->values[i];
+
+			duk_push_string(ctx, tag->value);
+			duk_put_prop_string(ctx, obj_idx, tag->tag);
+		}
+
+		duk_dup(ctx, -1);
+		duk_put_prop_string(ctx, 0, "tags");
+
+		return 1;
+	}
+
+	duk_push_undefined(ctx);
+	return 1;
+}
+
+static void	cep_js_push_event_proxy(duk_context *ctx, zbx_cep_event_t *event)
+{
+	/* target object */
+	duk_push_object(ctx);
+	duk_push_number(ctx, (double)event->eventid);
+	duk_put_prop_string(ctx, -2, "eventid");
+
+	/* handler object with get trap */
+	duk_push_object(ctx);
+	duk_push_c_function(ctx, cep_js_event_proxy_get, 3);
+	duk_put_prop_string(ctx, -2, "get");
+
+	duk_push_proxy(ctx, 0);		/* [target handler] -> [proxy] */
+}
+
+static duk_ret_t	cep_js_get_events(duk_context *ctx)
+{
+	zbx_cep_js_ctx_t	*js_ctx = cep_js_get_ctx(ctx);
+	duk_idx_t		arr_idx;
+
+	arr_idx = duk_push_array(ctx);
+
+	for (int i = 0; i < js_ctx->events_num; i++)
+	{
+		cep_js_push_event_proxy(ctx, js_ctx->events[i]);
+		duk_put_prop_index(ctx, arr_idx, (duk_uarridx_t)i);
+	}
+
+	return 1;
+}
+
+void	cep_js_init(zbx_es_t *es)
+{
+	duk_push_c_function(es->env->ctx, cep_js_get_events, 0);
+	duk_put_global_string(es->env->ctx, "cep_get_events");
+}
+
+void	cep_js_ctx_init(zbx_cep_js_ctx_t *js, zbx_vector_cep_event_handle_t *hevents)
+{
+	js->events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * hevents->values_num);
+	js->events_num = 0;
+	zbx_cep_get_events_by_handles(hevents->values, hevents->values_num, js->events);
+
+	for (int i = 0; i < hevents->values_num; i++)
+	{
+		if (NULL != js->events[i])
+			js->events[js->events_num++] = js->events[i];
+	}
+	zbx_hashset_create(&js->index, (size_t)js->events_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (int i = 0; i < js->events_num; i++)
+	{
+		zbx_cep_event_ref_t	ref_local = {.eventid = js->events[i]->eventid, .event = js->events[i]};
+
+		zbx_hashset_insert(&js->index, &ref_local, sizeof(ref_local));
+	}
+}
+
+void	cep_js_ctx_clear(zbx_cep_js_ctx_t *js)
+{
+	zbx_hashset_destroy(&js->index);
+
+	for (int i = 0; i < js->events_num; i++)
+		zbx_cep_event_release(js->events[i]);
+	zbx_free(js->events);
+}
+
+void	cep_js_set_ctx(zbx_es_t *es, zbx_cep_js_ctx_t *js)
+{
+	duk_push_heap_stash(es->env->ctx);
+	duk_push_pointer(es->env->ctx, js);
+	duk_put_prop_string(es->env->ctx, -2, CEP_EVENTS_STASH_KEY);
+	duk_pop(es->env->ctx);
+}
+
 
