@@ -30,7 +30,7 @@ class CEvent extends CApiService {
 
 	public const OUTPUT_FIELDS = ['eventid', 'source', 'object', 'objectid', 'clock', 'value', 'acknowledged', 'ns',
 		'name', 'severity', 'r_eventid', 'c_eventid', 'correlationid', 'userid', 'cep_ruleid', 'cause_eventid',
-		'opdata', 'suppressed', 'urls'
+		'opdata', 'suppressed', 'urls', 'flags'
 	];
 
 	/**
