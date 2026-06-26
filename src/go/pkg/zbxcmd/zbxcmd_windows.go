@@ -78,6 +78,8 @@ func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string,
 
 	err = cmd.Start()
 	if err != nil {
+		windows.CloseHandle(job)
+
 		return "", errs.Errorf("failed to start command (%s, path: %s): %s", command, execDir, err)
 	}
 
@@ -86,8 +88,9 @@ func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string,
 		false,
 		uint32(cmd.Process.Pid),
 	)
-
 	if err != nil {
+		windows.CloseHandle(job)
+
 		perr := cmd.Process.Kill()
 		if perr != nil {
 			return "", errs.Errorf("open process failed: %s and process kill failed: %s", err, perr)
@@ -96,8 +99,12 @@ func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string,
 		return "", errs.Errorf("open process failed: %s", err)
 	}
 
+	defer windows.CloseHandle(procHandle)
+
 	err = windows.AssignProcessToJobObject(job, procHandle)
 	if err != nil {
+		windows.CloseHandle(job)
+
 		perr := cmd.Process.Kill()
 		if perr != nil {
 			return "", errs.Errorf("process job assignment failed: %s and process kill failed: %s", err, perr)
@@ -175,6 +182,9 @@ func createWinJob() (windows.Handle, error) {
 		windows.JobObjectExtendedLimitInformation,
 		uintptr(unsafe.Pointer(&info)),
 		uint32(unsafe.Sizeof(info))); err != nil {
+
+		windows.CloseHandle(job)
+
 		return 0, errs.Errorf("failed to populate win job: %s", err)
 	}
 
