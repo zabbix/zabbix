@@ -681,7 +681,8 @@ class CConfigurationExport {
 			? DBfetchArray(DBselect(
 				'SELECT p.proxyid,p.name'.
 				' FROM proxy p'.
-				' WHERE '.dbConditionId('p.proxyid', array_keys($proxyids))
+				' WHERE '.dbConditionId('p.proxyid', array_keys($proxyids)).
+					' AND '.CApiUserGroupHelper::getProxyPermissionsCondition('p')
 			))
 			: [];
 		$db_proxies = array_column($db_proxies, null, 'proxyid');
@@ -716,7 +717,8 @@ class CConfigurationExport {
 			? DBfetchArray(DBselect(
 				'SELECT pg.proxy_groupid,pg.name'.
 				' FROM proxy_group pg'.
-				' WHERE '.dbConditionId('pg.proxy_groupid', array_keys($proxy_groupids))
+				' WHERE '.dbConditionId('pg.proxy_groupid', array_keys($proxy_groupids)).
+					' AND '.CApiUserGroupHelper::getProxyPermissionsCondition('p')
 			))
 			: [];
 		$db_proxy_groups = array_column($db_proxy_groups, null, 'proxy_groupid');
