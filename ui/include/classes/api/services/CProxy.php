@@ -85,15 +85,6 @@ class CProxy extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		// editable + PERMISSION CHECK
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			if ($permission == PERM_READ_WRITE) {
-				return $options['countOutput'] ? '0' : [];
-			}
-		}
-
 		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$options['output'] = $output_fields;
 		}
@@ -125,7 +116,8 @@ class CProxy extends CApiService {
 	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		// editable + PERMISSION CHECK
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (!$options['editable']) {
 				$sql_parts['where'][] = CApiUserGroupHelper::getProxyPermissionsCondition('p');
 			}
@@ -345,6 +337,7 @@ class CProxy extends CApiService {
 		}
 
 		self::updateHosts($proxies, $db_proxies);
+		self::unlinkProxies($proxies);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_PROXY, $proxies, $db_proxies);
 
@@ -397,6 +390,83 @@ class CProxy extends CApiService {
 		if ($upd_hosts) {
 			DB::update('hosts', array_values($upd_hosts));
 		}
+	}
+
+	/**
+	 * @param array $proxies
+	 */
+	private static function unlinkProxies(array $proxies): void {
+		$proxyids = [];
+
+		foreach ($proxies as $proxy) {
+			if ($proxy['proxy_groupid'] !== 0) {
+				$proxyids[$proxy['proxyid']] = true;
+			}
+		}
+
+		$db_usrgrps = [];
+
+		$resource = DBselect(
+			'SELECT ugp.usrgrpid,ugp.proxyid,ugp.usrgrp_proxyid,ug.name'.
+			' FROM usrgrp_proxy ugp'.
+			' JOIN usrgrp ug ON ug.usrgrpid=ugp.usrgrpid'.
+			' WHERE ugp.usrgrpid IN ('.
+				'SELECT DISTINCT ugp2.usrgrpid'.
+				' FROM usrgrp_proxy ugp2'.
+				' WHERE '.dbConditionId('ugp2.proxyid', array_keys($proxyids)).
+			')'
+		);
+
+		while ($row = DBfetch($resource)) {
+			if (!array_key_exists($row['usrgrpid'], $db_usrgrps)) {
+				$db_usrgrps[$row['usrgrpid']] = [
+					'name' => $row['name'],
+					'usrgrpid' => $row['usrgrpid'],
+					'proxies' => []
+				];
+			}
+
+			$db_usrgrps[$row['usrgrpid']]['proxies'][$row['usrgrp_proxyid']] = [
+				'usrgrp_proxyid' => $row['usrgrp_proxyid'],
+				'proxyid' => $row['proxyid']
+			];
+		}
+
+		$usrgrps = [];
+		$indexes = [];
+
+		foreach ($db_usrgrps as $db_usrgrpid => $db_usrgrp) {
+			$upd_user_group = false;
+
+			foreach ($db_usrgrp['proxies'] as $proxy) {
+				if (array_key_exists($proxy['proxyid'], $proxyids)) {
+					$upd_user_group = true;
+					break;
+				}
+			}
+
+			if (!$upd_user_group) {
+				continue;
+			}
+
+			$usrgrps[] = [
+				'name' => $db_usrgrp['name'],
+				'usrgrpid' => $db_usrgrp['usrgrpid'],
+				'proxies' => []
+			];
+
+			$indexes[$db_usrgrpid] = array_key_last($usrgrps);
+
+			foreach ($db_usrgrp['proxies'] as $proxy) {
+				if (!array_key_exists($proxy['proxyid'], $proxyids)) {
+					$usrgrps[$indexes[$db_usrgrpid]]['proxies'][] = [
+						'proxyid' => $proxy['proxyid']
+					];
+				}
+			}
+		}
+
+		CUserGroup::updateForce($usrgrps, $db_usrgrps);
 	}
 
 	/**
