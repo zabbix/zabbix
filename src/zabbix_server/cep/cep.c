@@ -104,8 +104,9 @@ typedef struct
 {
 	zbx_uint64_t	ruleid;
 	char		*error;
+	time_t		window_start;
 }
-zbx_cep_rule_error_t;
+zbx_cep_rule_rtdata_t;
 
 struct zbx_cep
 {
@@ -114,7 +115,7 @@ struct zbx_cep
 	/* object -> events index */
 	zbx_hashset_t			objects;
 
-	zbx_hashset_t			rule_errors;
+	zbx_hashset_t			rules;
 
 	zbx_uint64_t			eventid_next;
 	zbx_uint64_t			eventid_max;
@@ -128,7 +129,7 @@ struct zbx_cep
 
 static void	cep_rule_error_clear(void *a)
 {
-	zbx_cep_rule_error_t	*rule_error = (zbx_cep_rule_error_t *)a;
+	zbx_cep_rule_rtdata_t	*rule_error = (zbx_cep_rule_rtdata_t *)a;
 
 	zbx_free(rule_error->error);
 }
@@ -249,7 +250,7 @@ zbx_cep_t	*cep_create(void)
 	zbx_hashset_create_ext(&cep->objects, 100, cep_object_hash, cep_object_compare, cep_object_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-	zbx_hashset_create_ext(&cep->rule_errors, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
+	zbx_hashset_create_ext(&cep->rules, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
 			cep_rule_error_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 			ZBX_DEFAULT_MEM_FREE_FUNC);
 
@@ -272,7 +273,7 @@ void	cep_destroy(void *a)
 	}
 	zbx_hashset_destroy(&cep->events);
 
-	zbx_hashset_destroy(&cep->rule_errors);
+	zbx_hashset_destroy(&cep->rules);
 
 	zbx_free(cep);
 }
@@ -1934,12 +1935,12 @@ void	cep_object_inc_pending(zbx_cep_t *cep, const zbx_cep_origin_t *origin)
  ******************************************************************************/
 int	cep_rule_check_error(zbx_cep_t *cep, zbx_uint64_t ruleid, const char *error)
 {
-	zbx_cep_rule_error_t	*re;
+	zbx_cep_rule_rtdata_t	*rt;
 
-	if (NULL == (re = (zbx_cep_rule_error_t *)zbx_hashset_search(&cep->rule_errors, &ruleid)))
+	if (NULL == (rt = (zbx_cep_rule_rtdata_t *)zbx_hashset_search(&cep->rules, &ruleid)))
 		return (NULL == error ? SUCCEED : FAIL);
 
-	if (NULL == error || 0 != strcmp(re->error, error))
+	if (NULL == error || 0 != strcmp(rt->error, error))
 		return FAIL;
 
 	return SUCCEED;
@@ -1956,15 +1957,52 @@ int	cep_rule_check_error(zbx_cep_t *cep, zbx_uint64_t ruleid, const char *error)
  ******************************************************************************/
 void	cep_rule_set_error(zbx_cep_t *cep, zbx_uint64_t ruleid, char *error)
 {
-	zbx_cep_rule_error_t	*re, re_local = {.ruleid = ruleid};
+	zbx_cep_rule_rtdata_t	*rt, rt_local = {.ruleid = ruleid};
 
 	if (NULL == error)
 	{
-		zbx_hashset_remove(&cep->rule_errors, &re_local);
+		if (NULL != (rt = (zbx_cep_rule_rtdata_t *)zbx_hashset_search(&cep->rules, &ruleid)) &&
+				0 == rt->window_start)
+		{
+			zbx_hashset_remove_direct(&cep->rules, rt);
+		}
 		return;
 	}
 
-	re = (zbx_cep_rule_error_t *)zbx_hashset_insert(&cep->rule_errors, &re_local, sizeof(re_local));
-	re->error = zbx_strdup(re->error, error);
+	rt = (zbx_cep_rule_rtdata_t *)zbx_hashset_insert(&cep->rules, &rt_local, sizeof(rt_local));
+	rt->error = zbx_strdup(rt->error, error);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the current window start time for a rule                      *
+ *                                                                            *
+ * Parameters: cep      - [IN] CEP instance                                   *
+ *             ruleid   - [IN] rule identifier                                *
+ *             duration - [IN] window duration in seconds                     *
+ *                                                                            *
+ * Return value: window start timestamp                                       *
+ *                                                                            *
+ * Comments: If no window start has been registered, it is set to the         *
+ *           current time. If the window has expired, the start time is       *
+ *           advanced by duration steps until it covers the current time.     *
+ *                                                                            *
+ ******************************************************************************/
+time_t	cep_rule_get_window_start_time(zbx_cep_t *cep, zbx_uint64_t ruleid, int duration)
+{
+	zbx_cep_rule_rtdata_t	*rt, rt_local = {.ruleid = ruleid};
+	time_t			now = time(NULL);
+
+	rt = (zbx_cep_rule_rtdata_t *)zbx_hashset_insert(&cep->rules, &rt_local, sizeof(rt_local));
+	if (0 == rt->window_start)
+	{
+		rt->window_start = now;
+	}
+	else
+	{
+		while (rt->window_start + duration < now)
+			rt->window_start += duration;
+	}
+
+	return rt->window_start;
+}

@@ -422,6 +422,7 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 	zbx_cep_window_pool_t	*pool;
 	zbx_cep_window_t	*window;
 	char			*error = NULL;
+	time_t			start_time = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
 
@@ -431,6 +432,15 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 
 	if (SUCCEED != cep_rule_handle_error(rule, &error, tasks))
 		goto out;
+
+	if (0 == atomic_load(&window->nextcheck))
+	{
+		zbx_cep_t	*cep;
+
+		cep_cache_acquire(&cep);
+		start_time = cep_rule_get_window_start_time(cep, rule->ruleid, window->duration);
+		cep_cache_release(&cep);
+	}
 
 	cep_window_lock(window);
 
@@ -462,7 +472,7 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
 		if (0 == atomic_load(&window->nextcheck))
-			atomic_store(&window->nextcheck, (zbx_uint64_t)time(NULL) + window->duration);
+			atomic_store(&window->nextcheck, (zbx_uint64_t)start_time + window->duration);
 
 		cep_window_unlock(window);
 
@@ -989,9 +999,10 @@ static void	cep_window_ref_dump(const char *prefix, const zbx_cep_window_ref_t *
 	const zbx_cep_window_t		*window = ref->window;
 
 	zabbix_log(LOG_LEVEL_TRACE, "%sruleid:" ZBX_FS_UI64 " type:%d [group_by:%x hostid:" ZBX_FS_UI64 " hostgroupid:"
-			ZBX_FS_UI64 " tag:%s=%s] created:" ZBX_FS_TIME_T,
+			ZBX_FS_UI64 " tag:%s=%s] created:" ZBX_FS_TIME_T " nextcheck:" ZBX_FS_UI64,
 			prefix, window->ruleid, window->type, ref->group_by, ref->hostid, ref->hostgroupid,
-			ZBX_NULL2STR(ref->tag), ZBX_NULL2STR(ref->tag_value), window->time_created);
+			ZBX_NULL2STR(ref->tag), ZBX_NULL2STR(ref->tag_value), window->time_created,
+			atomic_load(&window->nextcheck));
 
 	if (SUCCEED != zbx_queue_ptr_empty(&window->hevents))
 	{

@@ -924,10 +924,14 @@ int	cep_rule_handle_error(const zbx_cep_rule_t *rule, char **error, zbx_vector_m
 {
 	zbx_cep_t	*cep;
 	int		ret, err = (NULL == *error ? SUCCEED : FAIL);
-	size_t		len = strlen(*error);
 
-	if ('\n' == (*error)[len - 1])
-		*(error)[len - 1] = '\0';
+	if (NULL != *error && '\0' != **error)
+	{
+		size_t	len = strlen(*error);
+
+		if ('\n' == (*error)[len - 1])
+			(*error)[len - 1] = '\0';
+	}
 
 	cep_cache_acquire(&cep);
 	ret = cep_rule_check_error(cep, rule->ruleid, *error);
