@@ -198,7 +198,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		$response = $this->call('role.create', [
 			'name' => 'bridge_adapter_restricted_role',
 			'type' => USER_TYPE_ZABBIX_USER,
-			'rules' => ['actions.manage_media_types' => 0]
+			'rules' => ['devices.actions.default_access' => ZBX_ROLE_RULE_DISABLED]
 		]);
 		$this->assertArrayHasKey('roleids', $response['result']);
 		self::$restricted_roleid = $response['result']['roleids'][0];
