@@ -100,10 +100,11 @@ static void	get_macro_secrets(const zbx_vector_keys_path_ptr_t *keys_paths, stru
 				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, vault_ret,
 				&error))
 		{
-			int	log_level = (vault_ret != NULL && SUCCEED == *vault_ret) ?
-					LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG;
+			int	log_level = (vault_ret != NULL && FAIL == *vault_ret) ?
+					LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
-			zabbix_log(log_level, "cannot get secrets for path \"%s\": %s", keys_path->path, error);
+			zabbix_log(log_level, "cannot get secrets for path \"%s\": %s",
+					keys_path->path, error);
 
 			zbx_free(error);
 			continue;
