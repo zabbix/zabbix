@@ -269,6 +269,7 @@
 #define ZBX_PROTO_VALUE_DEVICE_INIT		"device.init"
 #define ZBX_PROTO_VALUE_DEVICE_OFFBOARD		"device.offboard"
 #define ZBX_PROTO_VALUE_DEVICE_NOTIFY		"device.notify"
+#define ZBX_PROTO_VALUE_MEDIA_TEST		"media.test"
 
 #define ZBX_PROTO_VALUE_HISTORY_UPLOAD_ENABLED	"enabled"
 #define ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED	"disabled"
