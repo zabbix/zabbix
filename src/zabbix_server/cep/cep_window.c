@@ -668,7 +668,7 @@ static int	cep_window_js_prepare(zbx_cep_window_t *window, zbx_es_t *es, char **
 	return SUCCEED;
 }
 
-void	cep_window_js_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks)
+void	cep_window_js_process(zbx_cep_window_t *window, zbx_vector_mw_task_ptr_t *tasks)
 {
 	char			*error = NULL;
 	zbx_es_t		es ;
@@ -768,7 +768,7 @@ void	cep_window_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task
 			/* TODO: implement */
 			break;
 		case ZBX_CEP_WINDOW_PATTERN_MATCH:
-			cep_window_js_process(window, now, tasks);
+			cep_window_js_process(window, tasks);
 			break;
 	}
 }
