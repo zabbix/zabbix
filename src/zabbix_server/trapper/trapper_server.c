@@ -21,6 +21,7 @@
 #include "../reporter/reporter.h"
 
 #include "zbx_cep_client.h"
+#include "zbxcommon.h"
 #include "zbxtrapper.h"
 #include "zbxdbhigh.h"
 #include "zbxalerter.h"
@@ -267,7 +268,7 @@ static void	trapper_process_cep_rule_reset(zbx_socket_t *sock, const struct zbx_
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_user_init(&user);
 
-	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_ZABBIX_ADMIN > user.type)
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
 		error = zbx_strdup(NULL, "Permission denied.");
 		goto fail;

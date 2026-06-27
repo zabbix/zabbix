@@ -893,12 +893,22 @@ void	cep_window_pool_remove_window(zbx_cep_window_pool_t *pool, zbx_cep_window_t
 
 int	cep_window_pool_next_batch(zbx_cep_window_pool_t *pool, time_t now, zbx_vector_cep_window_ptr_t *windows)
 {
+	zbx_cep_window_t	*window;
+
 	for (int i = pool->tick_queue.values_num ; 0 < i &&
 			atomic_load(&pool->tick_queue.values[i - 1]->nextcheck) <= (zbx_uint64_t)now; i--)
 	{
-		zbx_vector_cep_window_ptr_append(windows, pool->tick_queue.values[i - 1]);
-		pool->tick_queue.values[i - 1]->location = CEP_LOCATION_UNKNOWN;
+		window = pool->tick_queue.values[i - 1];
 		zbx_vector_cep_window_ptr_remove_noorder(&pool->tick_queue, i - 1);
+
+		if (CEP_LOCATION_REMOVED == window->location)
+		{
+			cep_window_release(window);
+			continue;
+		}
+
+		zbx_vector_cep_window_ptr_append(windows, window);
+		window->location = CEP_LOCATION_UNKNOWN;
 
 		if (windows->values_num == windows->values_alloc)
 			return windows->values_num;
@@ -907,22 +917,52 @@ int	cep_window_pool_next_batch(zbx_cep_window_pool_t *pool, time_t now, zbx_vect
 	while (FAIL == zbx_binary_heap_empty(&pool->alarm_queue))
 	{
 		zbx_binary_heap_elem_t	*elem = zbx_binary_heap_find_min(&pool->alarm_queue);
-		zbx_cep_window_t	*window = (zbx_cep_window_t *)elem->data;
+
+		window = (zbx_cep_window_t *)elem->data;
 
 		if (atomic_load(&window->nextcheck) > (zbx_uint64_t)now || windows->values_num == windows->values_alloc)
 			return windows->values_num;
 
+		zbx_binary_heap_remove_min(&pool->alarm_queue);
+
+		if (CEP_LOCATION_REMOVED == window->location)
+		{
+			cep_window_release(window);
+			continue;
+		}
+
 		window->location = CEP_LOCATION_UNKNOWN;
 		zbx_vector_cep_window_ptr_append(windows, window);
-		zbx_binary_heap_remove_min(&pool->alarm_queue);
 	}
 
 	return windows->values_num;
 }
 
+void	cep_window_pool_reset_rule(zbx_cep_window_pool_t *pool, zbx_uint64_t ruleid)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_cep_window_ref_t	*ref;
+
+	zbx_hashset_iter_reset(&pool->windows, &iter);
+	while (NULL != (ref = (zbx_cep_window_ref_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (ref->ruleid == ruleid)
+		{
+			ref->window->location = CEP_LOCATION_REMOVED;
+			zbx_hashset_remove_direct(&pool->windows, ref);
+		}
+	}
+}
+
 void	cep_window_pool_add(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window)
 {
 	zbx_binary_heap_elem_t	elem;
+
+	if (CEP_LOCATION_REMOVED == window->location)
+	{
+		cep_window_release(window);
+		return;
+	}
 
 	if (CEP_LOCATION_QUEUE == window->location)
 		return;

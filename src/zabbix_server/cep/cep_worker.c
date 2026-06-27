@@ -976,9 +976,20 @@ static void	cep_worker_process_task_window(zbx_cep_worker_t *worker, zbx_cep_tas
 	zbx_vector_mw_task_ptr_destroy(&tasks);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process rule reset task                                           *
+ *                                                                            *
+ * Parameters: task - [IN] rule reset task                                    *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_worker_process_task_rule_reset(zbx_cep_task_rule_reset_t *task)
 {
-	zabbix_log(LOG_LEVEL_WARNING, "NOT IMPLEMENTED: reset rule:" ZBX_FS_UI64, task->ruleid);
+	zbx_cep_window_pool_t	*pool;
+
+	cep_window_pool_acquire(&pool);
+	cep_window_pool_reset_rule(pool, task->ruleid);
+	cep_window_pool_release(&pool);
 }
 
 /******************************************************************************

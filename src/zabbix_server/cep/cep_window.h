@@ -23,7 +23,8 @@
 typedef enum
 {
 	CEP_LOCATION_UNKNOWN,
-	CEP_LOCATION_QUEUE
+	CEP_LOCATION_QUEUE,
+	CEP_LOCATION_REMOVED
 }
 zbx_cep_location_t;
 
@@ -102,6 +103,7 @@ zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *po
 void	cep_window_pool_remove_window(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window);
 int	cep_window_pool_next_batch(zbx_cep_window_pool_t *pool, time_t now,
 		zbx_vector_cep_window_ptr_t *windows);
+void	cep_window_pool_reset_rule(zbx_cep_window_pool_t *pool, zbx_uint64_t ruleid);
 void	cep_window_pool_add(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window);
 
 void	cep_window_pool_dump(zbx_cep_window_pool_t *pool);
