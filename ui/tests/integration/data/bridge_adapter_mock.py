@@ -43,11 +43,12 @@ class BridgeAdapterMock(BaseHTTPRequestHandler):
 
 
 class AdapterServer(ThreadingHTTPServer):
-    def __init__(self, address, log_file, status_code, notify_error, ssl_context=None):
+    def __init__(self, address, log_file, status_code, notify_error, init_error, ssl_context=None):
         super().__init__(address, BridgeAdapterMock)
         self.log_file = log_file
         self.status_code = status_code
         self.notify_error = notify_error
+        self.init_error = init_error
         self.ssl_context = ssl_context
 
     def get_request(self):
@@ -80,6 +81,17 @@ class AdapterServer(ThreadingHTTPServer):
                     "code": "bridge.adapter.error",
                     "message": "Mock bridge-adapter rejected notification",
                     "data": "device.notify mock failure"
+                }
+            }
+
+        if method == "device.init" and self.init_error:
+            return {
+                "jsonrpc": "2.0",
+                "id": request_id,
+                "error": {
+                    "code": "bridge.adapter.error",
+                    "message": "Mock bridge-adapter rejected init",
+                    "data": "device.init mock failure"
                 }
             }
 
@@ -117,6 +129,7 @@ def main():
     parser.add_argument("--pid-file", required=True)
     parser.add_argument("--status-code", type=int, default=200)
     parser.add_argument("--notify-error", action="store_true")
+    parser.add_argument("--init-error", action="store_true")
     parser.add_argument("--tls", action="store_true")
     parser.add_argument("--mtls", action="store_true")
     parser.add_argument("--cert")
@@ -144,7 +157,7 @@ def main():
             ssl_context.load_verify_locations(cafile=args.ca)
 
     server = AdapterServer((args.host, args.port), args.log_file, args.status_code, args.notify_error,
-                           ssl_context)
+                           args.init_error, ssl_context)
 
     open(args.log_file, "a", encoding="utf-8").close()
 
