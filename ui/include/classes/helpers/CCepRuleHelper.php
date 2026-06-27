@@ -383,14 +383,15 @@ class CCepRuleHelper {
 					CSeverityHelper::getName($ceprule_operation['severity']['new'])
 				),
 
-
-				self::OP_RENAME_TAG,
-				self::OP_SET_TAG_VALUE,
-				self::OP_SET_TAG,
-				self::OP_INCREASE_TAG_VALUE,
-				self::OP_DECREASE_TAG_VALUE => sprintf('%s:%s > %s:%s', $ceprule_operation['tag']['tag']['old'],
+				self::OP_RENAME_TAG => sprintf('%s:%s > %s:%s', $ceprule_operation['tag']['tag']['old'],
 					$ceprule_operation['tag']['value']['old'], $ceprule_operation['tag']['tag']['new'],
 					$ceprule_operation['tag']['value']['new']
+				),
+
+				self::OP_DECREASE_TAG_VALUE,
+				self::OP_INCREASE_TAG_VALUE,
+				self::OP_SET_TAG_VALUE => sprintf('%s: %s > %s', $ceprule_operation['tag']['tag'],
+					$ceprule_operation['tag']['value']['old'], $ceprule_operation['tag']['value']['new']
 				),
 
 				self::OP_SET_NAME => sprintf('%s > %s', $ceprule_operation['name']['old'],
@@ -399,8 +400,9 @@ class CCepRuleHelper {
 				self::OP_REMOVE_TAG => sprintf('%s:%s', $ceprule_operation['tag']['tag']['old'],
 					$ceprule_operation['tag']['value']['old']
 				),
-				self::OP_ADD_TAG => sprintf('%s:%s', $ceprule_operation['tag']['tag']['new'],
-					$ceprule_operation['tag']['value']['new']
+				self::OP_SET_TAG,
+				self::OP_ADD_TAG => sprintf('%s:%s', $ceprule_operation['tag']['tag'],
+					$ceprule_operation['tag']['value']
 				)
 			};
 		}

@@ -2053,7 +2053,7 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
  *
  * @return CTable
  */
-function makeEventHistoryTable(array $actions, array $users, array $maintenances): CTable {
+function makeEventHistoryTable(array $actions, array $users, array $maintenances, array $ceprules): CTable {
 	$table = (new CTable())
 		->addStyle('width: 100%;')
 		->setHeader([_('Time'), _('User'), _('Action'), _('Message')]);
@@ -2071,7 +2071,7 @@ function makeEventHistoryTable(array $actions, array $users, array $maintenances
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 			makeActionTableUser($action, $users),
-			makeActionTableIcon($action, $maintenances),
+			makeActionTableIcon($action, $maintenances, $ceprules),
 			(new CCol(zbx_nl2br($action['message'])))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK)
 		]);
 	}

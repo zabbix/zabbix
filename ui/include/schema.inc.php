@@ -10364,6 +10364,18 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			]
+		]
+	],
+	'cep_rule_rtdata' => [
+		'key' => 'cep_ruleid',
+		'fields' => [
+			'cep_ruleid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'cep_rule',
+				'ref_field' => 'cep_ruleid'
 			],
 			'error' => [
 				'null' => false,
