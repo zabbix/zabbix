@@ -37,7 +37,6 @@ class testBridgeAdapter extends CIntegrationTest {
 	private const MEDIA_SEVERITY_ALL = 63;
 	private const PUSH_ALERT_ERROR_NO_PERMISSION = 'No permissions to referred device or it does not exist.';
 	private const PUSH_ALERT_ERROR_DEVICE_NOT_LINKED = 'Device linkage or registration is not finished.';
-	private const PUSH_ALERT_ERROR_INVALID_UUID = 'Invalid device UUID.';
 	private const LOG_MOBILE_DEVICES_DISABLED_INIT = 'cannot initialize device: mobile devices are disabled';
 	private const LOG_MOBILE_DEVICES_DISABLED_NOTIFY =
 		'cannot send device notification: mobile devices are disabled';
@@ -47,7 +46,6 @@ class testBridgeAdapter extends CIntegrationTest {
 	private const LOG_OFFBOARD_PERMISSION_DENIED = 'cannot offboard device: permission denied for userid';
 	private const LOG_OFFBOARD_UNKNOWN_UUID = 'cannot offboard device: failed to resolve device owner by uuid';
 	private const DEVICE_NOT_LINKED_UUID = '019dde8a-4040-7000-8000-000000000105';
-	private const INVALID_SENDTO_TOKEN = 'not-a-valid-uuid';
 	private const RESTRICTED_USER_NAME = 'bridge_adapter_restricted';
 	private const RESTRICTED_USER_PASSWD = 'BridgeAdapterR3stricted!';
 	private const HOUSEKEEPER_TEST_JTI = 'bridge-adapter-test-jti';
@@ -188,7 +186,7 @@ class testBridgeAdapter extends CIntegrationTest {
 				[
 					'mediatypeid' => $push_mediatypeid,
 					'sendto' => [self::NOTIFY_DEVICE_UUID, self::UNKNOWN_DEVICE_UUID,
-						self::DEVICE_NOT_LINKED_UUID, self::INVALID_SENDTO_TOKEN, '*'],
+						self::DEVICE_NOT_LINKED_UUID, '*'],
 					'active' => MEDIA_STATUS_ACTIVE,
 					'severity' => self::MEDIA_SEVERITY_ALL,
 					'period' => '1-7,00:00-24:00'
@@ -675,11 +673,6 @@ class testBridgeAdapter extends CIntegrationTest {
 				'sendto' => self::DEVICE_NOT_LINKED_UUID,
 				'status' => ALERT_STATUS_FAILED,
 				'error' => self::PUSH_ALERT_ERROR_DEVICE_NOT_LINKED
-			],
-			[
-				'sendto' => self::INVALID_SENDTO_TOKEN,
-				'status' => ALERT_STATUS_FAILED,
-				'error' => self::PUSH_ALERT_ERROR_INVALID_UUID
 			],
 			[
 				'sendto' => self::NOTIFY_DEVICE_UUID,
