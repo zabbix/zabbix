@@ -283,11 +283,6 @@ class testBridgeAdapter extends CIntegrationTest {
 			@unlink(self::$adapter_log_file);
 		}
 
-		if (self::$cert_base_dir !== null && is_dir(self::$cert_base_dir)) {
-			shell_exec('rm -rf '.escapeshellarg(self::$cert_base_dir));
-			self::$cert_base_dir = null;
-		}
-
 		self::deleteRealNotificationMedia();
 
 		if (self::$deviceids) {
@@ -1037,8 +1032,19 @@ class testBridgeAdapter extends CIntegrationTest {
 		];
 	}
 
+	public function noBridgeAdapterUrlConfigurationProvider(): array {
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 4,
+				'EnableMobileDevices' => 1,
+				'BridgeAdapterURL' => null,
+				'BridgeAdapterConnectTo' => null
+			]
+		];
+	}
+
 	/**
-	 * @configurationDataProvider mobileDevicesEnabledConfigurationProvider
+	 * @configurationDataProvider noBridgeAdapterUrlConfigurationProvider
 	 */
 	public function testBridgeAdapter_initNoBridgeAdapterUrl(): void {
 		[$client, $sid] = $this->getServerClientAndSid();
@@ -1106,7 +1112,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	}
 
 	/**
-	 * @configurationDataProvider mobileDevicesEnabledConfigurationProvider
+	 * @configurationDataProvider noBridgeAdapterUrlConfigurationProvider
 	 */
 	public function testBridgeAdapter_notifyNoBridgeAdapterUrl(): void {
 		[$client, $sid] = $this->getServerClientAndSid();
@@ -1146,7 +1152,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	}
 
 	/**
-	 * @configurationDataProvider mobileDevicesEnabledConfigurationProvider
+	 * @configurationDataProvider noBridgeAdapterUrlConfigurationProvider
 	 */
 	public function testBridgeAdapter_offboardNoBridgeAdapterUrl(): void {
 		[$client, $sid] = $this->getServerClientAndSid();
@@ -1169,7 +1175,10 @@ class testBridgeAdapter extends CIntegrationTest {
 				'LogFileSize' => 20,
 				'EnableMobileDevices' => 1,
 				'BridgeAdapterURL' => 'http://'.self::ADAPTER_URL_HOST.':80/rpc',
-				'BridgeAdapterConnectTo' => self::ADAPTER_HOST.':'.self::getAdapterPort()
+				'BridgeAdapterConnectTo' => self::ADAPTER_HOST.':'.self::getAdapterPort(),
+				'TLSCAFile' => null,
+				'TLSCertFile' => null,
+				'TLSKeyFile' => null
 			]
 		];
 	}
@@ -1275,8 +1284,8 @@ class testBridgeAdapter extends CIntegrationTest {
 			);
 
 			$this->assertNotFalse($init_response, $client->getError() ?? '');
-			$this->assertArrayHasKey('enrollment_token', $init_response);
-			$this->assertArrayHasKey('enroll_url', $init_response);
+			$this->assertArrayHasKey('mobile_enrollment_token', $init_response);
+			$this->assertArrayHasKey('bridge_enrollment_url', $init_response);
 
 			$this->assertAdapterRequest('device.init', static function (array $request): bool {
 				return $request['body']['params']['device_id'] === self::INIT_DEVICE_UUID;
