@@ -30,6 +30,7 @@
 #include "zbxipcservice.h"
 #include "zbxlog.h"
 #include "zbxmw.h"
+#include "zbxserialize.h"
 #include "zbxsupervisor_client.h"
 #include "zbxtimekeeper.h"
 #include "zbxself.h"
@@ -273,6 +274,25 @@ static void	cep_manager_sync_object_state(zbx_dbconn_pool_t *dbpool, zbx_ipc_cli
 	zbx_dbconn_pool_release_connection(dbpool, db);
 
 	zbx_ipc_client_send(*client, ZBX_CEP_SYNC_OBJECT_STATE, NULL, 0);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: push a rule reset task to the cep queue                           *
+ *                                                                            *
+ * Parameters: manager - [IN] cep manager                                     *
+ *             message - [IN] IPC message containing rule identifier          *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_manager_reset_rule(zbx_cep_manager_t *manager, const zbx_ipc_message_t *message)
+{
+	zbx_uint64_t	ruleid;
+
+	(void)zbx_deserialize_value(message->data, &ruleid);
+
+	zbx_mw_queue_lock(manager->base.queue);
+	cep_queue_push((zbx_cep_queue_t *)manager->base.queue, cep_create_task_rule_reset(ruleid));
+	zbx_mw_queue_unlock(manager->base.queue);
 }
 
 /******************************************************************************
@@ -676,6 +696,9 @@ void	*zbx_cep_manager_thread(void *args)
 					break;
 				case ZBX_CEP_SYNC_OBJECT_STATE:
 					cep_manager_sync_object_state(unit_args->shared->dbpool, &client);
+					break;
+				case ZBX_CEP_RESET_RULE:
+					cep_manager_reset_rule(manager, message);
 					break;
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");

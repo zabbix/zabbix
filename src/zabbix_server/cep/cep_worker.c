@@ -976,6 +976,11 @@ static void	cep_worker_process_task_window(zbx_cep_worker_t *worker, zbx_cep_tas
 	zbx_vector_mw_task_ptr_destroy(&tasks);
 }
 
+static void	cep_worker_process_task_rule_reset(zbx_cep_task_rule_reset_t *task)
+{
+	zabbix_log(LOG_LEVEL_WARNING, "NOT IMPLEMENTED: reset rule:" ZBX_FS_UI64, task->ruleid);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: event processor thread entry point                                *
@@ -1039,6 +1044,9 @@ void	*cep_worker_entry(void *args)
 					break;
 				case CEP_TASK_WINDOW:
 					cep_worker_process_task_window(worker, (zbx_cep_task_window_t *)task);
+					break;
+				case CEP_TASK_RULE_RESET:
+					cep_worker_process_task_rule_reset((zbx_cep_task_rule_reset_t *)task);
 					break;
 				case CEP_TASK_SYNC_EVENT:
 				case CEP_TASK_ACKNOWLEDGE:

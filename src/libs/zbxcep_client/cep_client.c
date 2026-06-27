@@ -1072,7 +1072,36 @@ void	zbx_cep_set_event_cause(zbx_uint64_t eventid, zbx_uint64_t cause_eventid)
 
 	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_SET_EVENT_CAUSE, buf, sizeof(buf)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot send check trigger dependencies message to CEP service");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send set event cause message to CEP service");
 		zbx_exit(EXIT_FAILURE);
 	}
+}
+
+int	zbx_cep_reset_rule(zbx_uint64_t cep_ruleid, char **error)
+{
+	unsigned char		buf[sizeof(cep_ruleid)];
+	int			ret = FAIL;
+	char			*errmsg = NULL;
+	zbx_ipc_socket_t	socket;
+
+	(void)zbx_serialize_value(buf, cep_ruleid);
+
+	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_CEP, SEC_PER_MIN, &errmsg))
+	{
+		*error = zbx_dsprintf(NULL, "cannot connect to CEP service: %s", errmsg);
+		zbx_free(errmsg);
+		return ret;
+	}
+
+	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_CEP_RESET_RULE, buf, sizeof(buf)))
+	{
+		*error = zbx_strdup(NULL, "cannot send reset rule message to CEP service");
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_ipc_socket_close(&socket);
+
+	return ret;
 }

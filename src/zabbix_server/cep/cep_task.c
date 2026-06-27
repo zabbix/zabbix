@@ -32,6 +32,7 @@ static void	cep_task_sync_event_free(void *mw_task);
 static void	cep_task_window_free(void *mw_task);
 static void	cep_task_acknowledge_free(void *mw_task);
 static void	cep_task_rule_error_free(void *mw_task);
+static void	cep_task_rule_reset_free(void *mw_task);
 
 /******************************************************************************
  *                                                                            *
@@ -373,9 +374,11 @@ static void	cep_task_window_free(void *mw_task)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create task process event window                                  *
+ * Purpose: create an acknowledge task                                        *
  *                                                                            *
- * Parameters: widnow - [IN] window to process                                *
+ * Parameters: ack     - [IN/OUT] acknowledge data; reset after transfer      *
+ *             ruleid  - [IN] rule identifier                                 *
+ *             eventid - [IN] event identifier                                *
  *                                                                            *
  * Return value: created task                                                 *
  *                                                                            *
@@ -434,7 +437,7 @@ zbx_mw_task_t	*cep_create_task_rule_error(zbx_uint64_t ruleid, char *error)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free 'set rule error' task                                        *
+ * Purpose: free 'rule error' task                                            *
  *                                                                            *
  ******************************************************************************/
 static void	cep_task_rule_error_free(void *mw_task)
@@ -443,6 +446,37 @@ static void	cep_task_rule_error_free(void *mw_task)
 
 	zbx_free(task->error);
 	zbx_free(task);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create a rule reset task                                          *
+ *                                                                            *
+ * Parameters: ruleid - [IN] rule identifier                                  *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_rule_reset(zbx_uint64_t ruleid)
+{
+	zbx_cep_task_rule_reset_t	*task;
+
+	task = (zbx_cep_task_rule_reset_t *)zbx_mw_task_create(CEP_TASK_RULE_RESET, cep_task_rule_reset_free,
+			sizeof(zbx_cep_task_rule_reset_t));
+
+	task->ruleid = ruleid;
+
+	return (zbx_mw_task_t *)task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free 'rule reset' task                                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_task_rule_reset_free(void *mw_task)
+{
+	zbx_free(mw_task);
 }
 
 /******************************************************************************
@@ -482,6 +516,9 @@ void	cep_task_free(zbx_mw_task_t *mw_task)
 			break;
 		case CEP_TASK_RULE_ERROR:
 			cep_task_rule_error_free((zbx_cep_task_rule_error_t *)task);
+			break;
+		case CEP_TASK_RULE_RESET:
+			cep_task_rule_reset_free((zbx_cep_task_rule_reset_t *)task);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown CEP task %d", task->type);

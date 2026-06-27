@@ -234,6 +234,8 @@
 #define ZBX_PROTO_TAG_IDLE_TIMEOUT		"idle_timeout"
 #define ZBX_PROTO_TAG_MAX_IDLE			"max_idle"
 #define ZBX_PROTO_TAG_MAX_OPEN			"max_open"
+#define ZBX_PROTO_TAG_CEP_RULEID		"cep_ruleid"
+
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -278,6 +280,8 @@
 #define ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS	"unsuppress"
 
 #define ZBX_PROTO_VALUE_TRUE			"true"
+
+#define ZBX_PROTO_VALUE_CEP_RULE_RESET		"cep.rule.reset"
 
 typedef enum
 {

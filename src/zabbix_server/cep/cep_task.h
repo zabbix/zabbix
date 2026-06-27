@@ -40,7 +40,8 @@ typedef enum
 	CEP_TASK_SYNC_EVENT,
 	CEP_TASK_WINDOW,
 	CEP_TASK_ACKNOWLEDGE,
-	CEP_TASK_RULE_ERROR
+	CEP_TASK_RULE_ERROR,
+	CEP_TASK_RULE_RESET
 }
 zbx_cep_task_type_t;
 
@@ -138,6 +139,13 @@ zbx_cep_task_rule_error_t;
 typedef struct
 {
 	zbx_mw_task_t	base;
+	zbx_uint64_t	ruleid;
+}
+zbx_cep_task_rule_reset_t;
+
+typedef struct
+{
+	zbx_mw_task_t	base;
 }
 zbx_cep_task_prune_events_t;
 
@@ -152,6 +160,7 @@ zbx_mw_task_t	*cep_create_task_sync_event(zbx_cep_event_handle_t hevent, zbx_uin
 zbx_mw_task_t	*cep_create_task_window(zbx_cep_window_t *window, time_t now);
 zbx_mw_task_t	*cep_create_task_acknowledge(zbx_cep_acknowledge_t *ack, zbx_uint64_t ruleid, zbx_uint64_t eventid);
 zbx_mw_task_t	*cep_create_task_rule_error(zbx_uint64_t ruleid, char *error);
+zbx_mw_task_t	*cep_create_task_rule_reset(zbx_uint64_t ruleid);
 
 void	cep_task_free(zbx_mw_task_t *mw_task);
 

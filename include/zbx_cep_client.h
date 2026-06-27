@@ -36,6 +36,7 @@
 #define ZBX_CEP_GET_STATS		(ZBX_IPC_RTC_MAX + 11)
 #define ZBX_CEP_SYNC_OBJECT_STATE	(ZBX_IPC_RTC_MAX + 12)
 #define ZBX_CEP_SET_EVENT_CAUSE		(ZBX_IPC_RTC_MAX + 13)
+#define ZBX_CEP_RESET_RULE		(ZBX_IPC_RTC_MAX + 14)
 
 typedef enum
 {
@@ -129,6 +130,7 @@ int	zbx_cep_get_stats(zbx_cep_stats_t *stats, char **error);
 
 int	zbx_cep_sync_object_state(char **error);
 void	zbx_cep_set_event_cause(zbx_uint64_t eventid, zbx_uint64_t cause_eventid);
+int	zbx_cep_reset_rule(zbx_uint64_t cep_ruleid, char **error);
 
 #endif
 
