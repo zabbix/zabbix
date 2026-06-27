@@ -42,11 +42,8 @@ class CUserGroup extends CApiService {
 	 * @param array  $options
 	 * @param array  $options['usrgrpids']
 	 * @param array  $options['userids']
-	 * @param array  $options['proxyids']
-	 * @param array  $options['proxy_groupids']
 	 * @param bool   $options['status']
 	 * @param bool   $options['selectUsers']
-	 * @param bool   $options['selectProxies']
 	 * @param int    $options['count']
 	 * @param string $options['pattern']
 	 * @param int    $options['limit']
@@ -1352,11 +1349,7 @@ class CUserGroup extends CApiService {
 			if ($db_usrgrps !== null
 					&& array_key_exists($usrgrp['usrgrpid'], $db_usrgrps)
 					&& array_key_exists('proxies', $db_usrgrps[$usrgrp['usrgrpid']])) {
-				$db_proxies = array_column(
-					$db_usrgrps[$usrgrp['usrgrpid']]['proxies'],
-					null,
-					'proxyid'
-				);
+				$db_proxies = array_column($db_usrgrps[$usrgrp['usrgrpid']]['proxies'],null,'proxyid');
 			}
 			else {
 				$db_proxies = [];
