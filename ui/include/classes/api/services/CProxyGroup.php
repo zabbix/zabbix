@@ -101,7 +101,7 @@ class CProxyGroup extends CApiService {
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (!$options['editable']) {
-				$sql_parts['where'][] = CApiUserGroupHelper::getProxyPermissionsCondition('p');
+				$sql_parts['where'][] = CApiUserGroupHelper::getProxyGroupPermissionsCondition('pg');
 			}
 		}
 

@@ -718,7 +718,7 @@ class CConfigurationExport {
 				'SELECT pg.proxy_groupid,pg.name'.
 				' FROM proxy_group pg'.
 				' WHERE '.dbConditionId('pg.proxy_groupid', array_keys($proxy_groupids)).
-					' AND '.CApiUserGroupHelper::getProxyPermissionsCondition('p')
+					' AND '.CApiUserGroupHelper::getProxyGroupPermissionsCondition('pg')
 			))
 			: [];
 		$db_proxy_groups = array_column($db_proxy_groups, null, 'proxy_groupid');
