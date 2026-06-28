@@ -920,10 +920,10 @@ char	*cep_tag_value_shift(const char *value, int shift)
 	return NULL;
 }
 
-void	cep_rule_handle_error(const zbx_cep_rule_t *rule, char **error, zbx_vector_mw_task_ptr_t *tasks)
+int	cep_rule_handle_error(const zbx_cep_rule_t *rule, char **error, zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_cep_t	*cep;
-	int		ret;
+	int		ret, err = (NULL == *error ? SUCCEED : FAIL);
 
 	if (NULL != *error && '\0' != **error)
 	{
@@ -942,4 +942,6 @@ void	cep_rule_handle_error(const zbx_cep_rule_t *rule, char **error, zbx_vector_
 		zbx_vector_mw_task_ptr_append(tasks, cep_create_task_rule_error(rule->ruleid, *error));
 		*error = NULL;
 	}
+
+	return err;
 }

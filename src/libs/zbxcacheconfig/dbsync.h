@@ -93,8 +93,8 @@
  * Return value: the preprocessed row                                         *
  *                                                                            *
  * Comments: The row preprocessing can be used to expand user macros in       *
- *                                                                            *
  *           some columns.                                                    *
+ *                                                                            *
  ******************************************************************************/
 typedef char **(*zbx_dbsync_preproc_row_func_t)(zbx_dbsync_t *sync, char **row);
 

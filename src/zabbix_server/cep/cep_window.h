@@ -42,7 +42,6 @@ typedef struct
 	zbx_cep_location_t	location;	/* window location is read/written only within window pool lock */
 	time_t			time_created;
 	zbx_queue_ptr_t		hevents;
-	int			ttl;
 	unsigned char		flags;
 
 	char			*js_script;
@@ -105,7 +104,7 @@ void	cep_window_pool_remove_window(zbx_cep_window_pool_t *pool, zbx_cep_window_t
 int	cep_window_pool_next_batch(zbx_cep_window_pool_t *pool, time_t now,
 		zbx_vector_cep_window_ptr_t *windows);
 void	cep_window_pool_reset_rule(zbx_cep_window_pool_t *pool, zbx_uint64_t ruleid);
-void	cep_window_pool_schedule(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window);
+void	cep_window_pool_add(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window);
 
 void	cep_window_pool_dump(zbx_cep_window_pool_t *pool);
 
