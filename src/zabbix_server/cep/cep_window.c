@@ -195,6 +195,7 @@ static zbx_cep_window_t	*cep_window_create(const zbx_cep_rule_t *rule, zbx_cep_w
 	window->capacity = 0;
 	window->nextcheck = 0;
 	window->time_created = time(NULL);
+	window->ttl = INT_MAX;
 	window->flags = CEP_WINDOW_FLAGS_NONE;
 	zbx_queue_ptr_create(&window->hevents);
 	window->location = CEP_LOCATION_UNKNOWN;
@@ -224,6 +225,7 @@ static void	cep_window_ref_clear(void *a)
 {
 	zbx_cep_window_ref_t	*ref = (zbx_cep_window_ref_t *)a;
 
+	ref->window->location = CEP_LOCATION_REMOVED;
 	cep_window_release(ref->window);
 
 	zbx_free(ref->tag);
@@ -243,8 +245,11 @@ void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 	window = cep_window_pool_get_or_create_window(pool, rule, ctx, &error);
 	cep_window_pool_release(&pool);
 
-	if (SUCCEED != cep_rule_handle_error(rule, &error, tasks))
+	if (NULL == window)
+	{
+		cep_rule_handle_error(rule, &error, tasks);
 		goto out;
+	}
 
 	cep_window_lock(window);
 
@@ -264,7 +269,7 @@ void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 		cep_window_unlock(window);
 
 		cep_window_pool_acquire(&pool);
-		cep_window_pool_add(pool, window);
+		cep_window_pool_schedule(pool, window);
 		cep_window_pool_release(&pool);
 	}
 
@@ -296,7 +301,7 @@ void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 	}
 
 	limit_update = cep_window_get_limits(rule, &duration, &capacity, &error);
-	(void)cep_rule_handle_error(rule, &error, tasks);
+	cep_rule_handle_error(rule, &error, tasks);
 
 	cep_window_lock(window);
 
@@ -348,7 +353,7 @@ void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 		zbx_cep_window_pool_t	*pool;
 
 		cep_window_pool_acquire(&pool);
-		cep_window_pool_add(pool, window);
+		cep_window_pool_schedule(pool, window);
 		cep_window_pool_release(&pool);
 	}
 
@@ -419,6 +424,8 @@ out:
 void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
 		zbx_vector_mw_task_ptr_t *tasks)
 {
+#define CEP_WINDOW_CAUSAL_TTL	5
+
 	zbx_cep_window_pool_t	*pool;
 	zbx_cep_window_t	*window;
 	char			*error = NULL;
@@ -426,12 +433,28 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
 
-	cep_window_pool_acquire(&pool);
-	window = cep_window_pool_get_or_create_window(pool, rule, ctx, &error);
-	cep_window_pool_release(&pool);
+	/* there is a chance that the acquired window is expired before */
+	/* locking it, so try until a valid window is acquired          */
+	for (;;)
+	{
+		cep_window_pool_acquire(&pool);
+		window = cep_window_pool_get_or_create_window(pool, rule, ctx, &error);
+		cep_window_pool_release(&pool);
 
-	if (SUCCEED != cep_rule_handle_error(rule, &error, tasks))
-		goto out;
+		if (NULL == window)
+		{
+			cep_rule_handle_error(rule, &error, tasks);
+			goto out;
+		}
+
+		cep_window_lock(window);
+
+		if (0 != window->ttl)
+			break;
+
+		cep_window_unlock(window);
+		cep_window_release(window);
+	}
 
 	if (0 == atomic_load(&window->nextcheck))
 	{
@@ -442,7 +465,9 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 		cep_cache_release(&cep);
 	}
 
-	cep_window_lock(window);
+	if (0 == atomic_load(&window->nextcheck))
+		atomic_store(&window->nextcheck, (zbx_uint64_t)start_time + window->duration);
+
 
 	if (0 != window->capacity && zbx_queue_ptr_values_num(&window->hevents) == window->capacity)
 	{
@@ -471,35 +496,36 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 		}
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));
-		if (0 == atomic_load(&window->nextcheck))
-			atomic_store(&window->nextcheck, (zbx_uint64_t)start_time + window->duration);
 
 		cep_window_unlock(window);
 
 		cep_window_pool_acquire(&pool);
-		cep_window_pool_add(pool, window);
+		cep_window_pool_schedule(pool, window);
 		cep_window_pool_release(&pool);
 	}
+
+	window->ttl = CEP_WINDOW_CAUSAL_TTL;
 
 	cep_window_release(window);
 out:
 	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+#undef CEP_WINDOW_CAUSAL_TTL
 }
 
 void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks)
 {
-	zbx_cep_rule_t	*rule;
-	int		duration, capacity, limit_update, events_num;
-	char		*error = NULL;
+	zbx_cep_rule_t		*rule;
+	int			duration, capacity, limit_update, events_num, ttl = 0;
+	char			*error = NULL;
+	zbx_cep_window_pool_t	*pool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, window->ruleid);
 
 	if (NULL == (rule = zbx_cep_config_get_rule(window->ruleid)))
 	{
-		zbx_cep_window_pool_t	*pool;
-
 		cep_window_pool_acquire(&pool);
 		cep_window_pool_remove_window(pool, window);
 		cep_window_pool_release(&pool);
@@ -509,7 +535,7 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 	}
 
 	limit_update = cep_window_get_limits(rule, &duration, &capacity, &error);
-	(void)cep_rule_handle_error(rule, &error, tasks);
+	cep_rule_handle_error(rule, &error, tasks);
 
 	cep_window_lock(window);
 
@@ -519,34 +545,47 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 		window->capacity = capacity;
 	}
 
-	events_num = zbx_queue_ptr_values_num(&window->hevents);
-
-	for (int i = 0; i < events_num; i++)
+	if (0 != (events_num = zbx_queue_ptr_values_num(&window->hevents)))
 	{
-		zbx_cep_event_context_t	ctx = {.hevent = (zbx_cep_event_handle_t)zbx_queue_ptr_pop(&window->hevents)};
+		for (int i = 0; i < events_num; i++)
+		{
+			zbx_cep_event_context_t	ctx = {
+					.hevent = (zbx_cep_event_handle_t)zbx_queue_ptr_pop(&window->hevents)};
 
-		if (0 == i)
-			ctx.pos = CEP_POS_FIRST;
-		else if (events_num == i - 1)
-			ctx.pos = CEP_POS_LAST;
-		else
-			ctx.pos = CEP_POS_UNKNOWN;
+			if (0 == i)
+				ctx.pos = CEP_POS_FIRST;
+			else if (i == events_num - 1)
+				ctx.pos = CEP_POS_LAST;
+			else
+				ctx.pos = CEP_POS_UNKNOWN;
 
-		cep_rule_event_context_execute_ops(rule, &ctx, ZBX_CEP_WHEN_WINDOW_CLOSED, tasks);
-		cep_event_context_clear(&ctx);
+			cep_rule_event_context_execute_ops(rule, &ctx, ZBX_CEP_WHEN_WINDOW_CLOSED, tasks);
+			cep_event_context_clear(&ctx);
+		}
+
+		window->time_created = now;
+		window->nextcheck += window->duration;
+		window->flags = CEP_WINDOW_FLAGS_NONE;
+	}
+	else
+	{
+		if (0 == --window->ttl)
+		{
+			cep_window_pool_acquire(&pool);
+			cep_window_pool_remove_window(pool, window);
+			cep_window_pool_release(&pool);
+		}
 	}
 
-	window->time_created = now;
-	window->nextcheck += window->duration;
-	window->flags = CEP_WINDOW_FLAGS_NONE;
-
+	ttl = window->ttl;
 	cep_window_unlock(window);
 
-	zbx_cep_window_pool_t	*pool;
-
-	cep_window_pool_acquire(&pool);
-	cep_window_pool_add(pool, window);
-	cep_window_pool_release(&pool);
+	if (0 != ttl)
+	{
+		cep_window_pool_acquire(&pool);
+		cep_window_pool_schedule(pool, window);
+		cep_window_pool_release(&pool);
+	}
 
 	zbx_cep_rule_release(rule);
 out:
@@ -568,8 +607,11 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 	window = cep_window_pool_get_or_create_window(pool, rule, ctx, &error);
 	cep_window_pool_release(&pool);
 
-	if (SUCCEED != cep_rule_handle_error(rule, &error, tasks))
+	if (NULL == window)
+	{
+		cep_rule_handle_error(rule, &error, tasks);
 		goto out;
+	}
 
 	cep_window_lock(window);
 
@@ -592,7 +634,7 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 		cep_window_unlock(window);
 
 		cep_window_pool_acquire(&pool);
-		cep_window_pool_add(pool, window);
+		cep_window_pool_schedule(pool, window);
 		cep_window_pool_release(&pool);
 	}
 
@@ -747,11 +789,11 @@ void	cep_window_js_process(zbx_cep_window_t *window, zbx_vector_mw_task_ptr_t *t
 	zbx_cep_rule_release(rule);
 
 	cep_window_pool_acquire(&pool);
-	cep_window_pool_add(pool, window);
+	cep_window_pool_schedule(pool, window);
 	cep_window_pool_release(&pool);
 out:
 	if (NULL != rule)
-		(void)cep_rule_handle_error(rule, &error, tasks);
+		cep_rule_handle_error(rule, &error, tasks);
 
 	zbx_free(error);
 
@@ -957,14 +999,11 @@ void	cep_window_pool_reset_rule(zbx_cep_window_pool_t *pool, zbx_uint64_t ruleid
 	while (NULL != (ref = (zbx_cep_window_ref_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (ref->ruleid == ruleid)
-		{
-			ref->window->location = CEP_LOCATION_REMOVED;
 			zbx_hashset_remove_direct(&pool->windows, ref);
-		}
 	}
 }
 
-void	cep_window_pool_add(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window)
+void	cep_window_pool_schedule(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window)
 {
 	zbx_binary_heap_elem_t	elem;
 
