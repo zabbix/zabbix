@@ -150,8 +150,6 @@
 				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 			});
 
-			ZABBIX.Dashboard.activate();
-
 			if (web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>) {
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, () => this.#edit());
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_APPLY_PROPERTIES, () => this.#applyProperties());
@@ -211,6 +209,8 @@
 			ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_STOP, () => {
 				this.#updateHistory({slideshow: DASHBOARD_SLIDESHOW_OFF, add_new: false});
 			});
+
+			ZABBIX.Dashboard.activate();
 
 			jqBlink.blink();
 		}

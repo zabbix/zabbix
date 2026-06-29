@@ -165,8 +165,6 @@
 					[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 				});
 
-				ZABBIX.Dashboard.activate();
-
 				ZABBIX.Dashboard.on(CDashboard.EVENT_FEEDBACK, (e) => this.#onFeedback(e));
 
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, () => {
@@ -187,6 +185,8 @@
 				ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_STOP, () => {
 					this.#updateHistory({slideshow: DASHBOARD_SLIDESHOW_OFF, add_new: false});
 				});
+
+				ZABBIX.Dashboard.activate();
 			}
 
 			if (CWidgetsData.DATA_TYPE_TIME_PERIOD in broadcast_requirements) {
