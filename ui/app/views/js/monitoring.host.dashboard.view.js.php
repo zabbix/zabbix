@@ -57,7 +57,12 @@
 		/**
 		 * @type {HTMLElement}
 		 */
-		#host_dashboard_navigation_tabs
+		#host_dashboard_navigation_tabs;
+
+		/**
+		 * @type {Object}
+		 */
+		#dashboard_time_period;
 
 		/**
 		 * @type {HTMLElement}
@@ -86,6 +91,7 @@
 		}) {
 			this.#hostid = dashboard_host.hostid;
 			this.#dashboardid = dashboard.dashboardid;
+			this.#dashboard_time_period = dashboard_time_period;
 
 			if (dashboard.pages.length > 1 || (dashboard.pages.length === 1 && dashboard.pages[0].widgets.length > 0)) {
 				timeControl.refreshPage = false;
@@ -213,6 +219,11 @@
 			curl.setArgument('dashboardid', this.#dashboardid);
 
 			const state = {};
+
+			if (ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_TIME_PERIOD)) {
+				curl.setArgument('from', this.#dashboard_time_period.from);
+				curl.setArgument('to', this.#dashboard_time_period.to);
+			}
 
 			const url = new Curl();
 
@@ -359,6 +370,8 @@
 		}
 
 		#onTimeSelectorRangeUpdate(data) {
+			this.#dashboard_time_period = data;
+
 			if (this.#skip_time_selector_range_update) {
 				this.#skip_time_selector_range_update = false;
 
