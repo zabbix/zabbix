@@ -1338,8 +1338,10 @@ static int	DBpatch_7050114(void)
 				{
 					{"cep_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"group_by", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"tag", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{"tag_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{0}
 				},
