@@ -306,9 +306,7 @@ class CSettings extends CApiService {
 	}
 
 	public static function updatePrivate(array $settings): array {
-		if (array_key_exists('software_update_check_data', $settings)) {
-			$settings['software_update_check_data'] = json_encode($settings['software_update_check_data']);
-		}
+		$settings['software_update_check_data'] = json_encode($settings['software_update_check_data']);
 
 		CApiSettingsHelper::updateParameters($settings);
 
