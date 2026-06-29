@@ -362,4 +362,51 @@ class CCepRuleHelper {
 			self::WINDOW_CONDITION_OLD_TAG_VALUE => _('Past event tag value')
 		];
 	}
+
+	public static function buildActionDetailsMessage(string $details): string {
+		$result = [];
+		$details = json_decode(json: $details, associative: true, flags: JSON_THROW_ON_ERROR|JSON_BIGINT_AS_STRING);
+
+		foreach ($details['cep'] as $ceprule_operation) {
+			$label = CCepRuleHelper::getOperationLabelString(['type' => $ceprule_operation['operation']]);
+			$result[] = $label.': '.match((int) $ceprule_operation['operation']) {
+				self::OP_SUPPRESS,
+				self::OP_COPY_FIRST,
+				self::OP_COPY_LAST,
+				self::OP_DISCARD,
+				self::OP_CLOSE => '',
+
+				self::OP_SET_SEVERITY,
+				self::OP_DECREASE_SEVERITY,
+				self::OP_INCREASE_SEVERITY => sprintf('%s -> %s',
+					CSeverityHelper::getName($ceprule_operation['severity']['old']),
+					CSeverityHelper::getName($ceprule_operation['severity']['new'])
+				),
+
+				self::OP_RENAME_TAG => sprintf('%s:%s > %s:%s', $ceprule_operation['tag']['tag']['old'],
+					$ceprule_operation['tag']['value']['old'], $ceprule_operation['tag']['tag']['new'],
+					$ceprule_operation['tag']['value']['new']
+				),
+
+				self::OP_DECREASE_TAG_VALUE,
+				self::OP_INCREASE_TAG_VALUE,
+				self::OP_SET_TAG_VALUE => sprintf('%s: %s > %s', $ceprule_operation['tag']['tag'],
+					$ceprule_operation['tag']['value']['old'], $ceprule_operation['tag']['value']['new']
+				),
+
+				self::OP_SET_NAME => sprintf('%s > %s', $ceprule_operation['name']['old'],
+					$ceprule_operation['name']['new']
+				),
+				self::OP_REMOVE_TAG => sprintf('%s:%s', $ceprule_operation['tag']['tag']['old'],
+					$ceprule_operation['tag']['value']['old']
+				),
+				self::OP_SET_TAG,
+				self::OP_ADD_TAG => sprintf('%s:%s', $ceprule_operation['tag']['tag'],
+					$ceprule_operation['tag']['value']
+				)
+			};
+		}
+
+		return implode(PHP_EOL, $result);
+	}
 }

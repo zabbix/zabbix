@@ -1420,7 +1420,7 @@ function getEventDetailsActions(array $event): array {
 		$alert_eventids[] = $event['r_eventid'];
 
 		$r_events = API::Event()->get([
-			'output' => ['clock', 'flags'], // TODO API
+			'output' => ['clock', 'flags', 'cep_ruleid'],
 			'eventids' => $event['r_eventid'],
 			'preservekeys' => true
 		]);
@@ -1858,7 +1858,8 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButtonIcon {
  *
  * @return CTableInfo
  */
-function makeEventActionsTable(array $actions, array $users, array $mediatypes, array $maintenances): CTableInfo {
+function makeEventActionsTable(array $actions, array $users, array $mediatypes, array $maintenances,
+		array $ceprules): CTableInfo {
 	$action_count = count($actions);
 
 	$table = (new CTableInfo())->setHeader([
@@ -1872,6 +1873,9 @@ function makeEventActionsTable(array $actions, array $users, array $mediatypes, 
 		if ($action['action_type'] == ZBX_EVENT_HISTORY_MANUAL_UPDATE
 				&& ($action['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE) {
 			$message = zbx_nl2br($action['message']);
+		}
+		elseif ($action['action_type'] == ZBX_EVENT_HISTORY_CEP_UPDATE) {
+			$message = zbx_nl2br(CCepRuleHelper::buildActionDetailsMessage($action['details']));
 		}
 		elseif ($action['action_type'] == ZBX_EVENT_HISTORY_ALERT) {
 			if ($action['alerttype'] == ALERT_TYPE_COMMAND) {
@@ -1887,7 +1891,7 @@ function makeEventActionsTable(array $actions, array $users, array $mediatypes, 
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 			makeActionTableUser($action, $users),
-			makeActionTableIcon($action, $maintenances),
+			makeActionTableIcon($action, $maintenances, $ceprules),
 			$message,
 			makeActionTableStatus($action),
 			makeActionTableInfo($action, $mediatypes)
@@ -1965,7 +1969,8 @@ function makeEventActionsIcon(array $data, string $eventid): ?CButtonIcon {
  *
  * @return CTableInfo
  */
-function makeEventDetailsActionsTable(array $data, array $users, array $mediatypes, array $maintenances): CTableInfo {
+function makeEventDetailsActionsTable(array $data, array $users, array $mediatypes, array $maintenances,
+		array $ceprules): CTableInfo {
 	$table = (new CTableInfo())->setHeader([
 		_('Step'), _('Time'), _('User/Recipient'), _('Action'), _('Message/Command'), _('Status'), _('Info')
 	]);
@@ -2007,6 +2012,10 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
 				}
 				break;
 
+			case ZBX_EVENT_HISTORY_CEP_UPDATE:
+				$message = zbx_nl2br(CCepRuleHelper::buildActionDetailsMessage($action['details']));
+				break;
+
 			case ZBX_EVENT_HISTORY_MANUAL_UPDATE:
 				if ($action['message'] !== '') {
 					$message = zbx_nl2br($action['message']);
@@ -2018,7 +2027,7 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
 			$esc_step,
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 			makeEventDetailsTableUser($action, $users),
-			makeActionTableIcon($action, $maintenances),
+			makeActionTableIcon($action, $maintenances, $ceprules),
 			$message,
 			makeActionTableStatus($action),
 			makeActionTableInfo($action, $mediatypes)
@@ -2044,7 +2053,7 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
  *
  * @return CTable
  */
-function makeEventHistoryTable(array $actions, array $users, array $maintenances): CTable {
+function makeEventHistoryTable(array $actions, array $users, array $maintenances, array $ceprules): CTable {
 	$table = (new CTable())
 		->addStyle('width: 100%;')
 		->setHeader([_('Time'), _('User'), _('Action'), _('Message')]);
@@ -2062,7 +2071,7 @@ function makeEventHistoryTable(array $actions, array $users, array $maintenances
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 			makeActionTableUser($action, $users),
-			makeActionTableIcon($action, $maintenances),
+			makeActionTableIcon($action, $maintenances, $ceprules),
 			(new CCol(zbx_nl2br($action['message'])))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK)
 		]);
 	}
@@ -2151,7 +2160,7 @@ function makeEventDetailsTableUser(array $action, array $users) {
  *
  * @return CTag|null
  */
-function makeActionTableIcon(array $action, array $maintenances): ?CTag {
+function makeActionTableIcon(array $action, array $maintenances, array $ceprules): ?CTag {
 	switch ($action['action_type']) {
 		case ZBX_EVENT_HISTORY_PROBLEM_EVENT:
 			return new CIcon(ZBX_ICON_CALENDAR_WARNING, _('Problem created'));
@@ -2228,6 +2237,13 @@ function makeActionTableIcon(array $action, array $maintenances): ?CTag {
 			return $action['alerttype'] == ALERT_TYPE_COMMAND
 				? new CIcon(ZBX_ICON_COMMAND, _('Remote command'))
 				: new CIcon(ZBX_ICON_ENVELOPE_FILLED, _('Alert message'));
+
+		case ZBX_EVENT_HISTORY_CEP_UPDATE:
+				$ceprule_name = $ceprules[$action['cep_ruleid']]['name'];
+				$title = _s('Event processing: %1$s', $ceprule_name);
+
+				return (new CCol((new CIcon(ZBX_ICON_CEP))->addClass(ZBX_STYLE_COLOR_ICON)->setTitle($title)))
+						->addClass(ZBX_STYLE_NOWRAP);
 
 		case ZBX_EVENT_HISTORY_MAINTENANCE:
 			$action_icons = [];
