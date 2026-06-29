@@ -108,10 +108,10 @@ class CBannerHelper {
 			if ($a_numeric && $b_numeric) {
 				return $a <=> $b;
 			}
-			else if ($a_numeric && !$b_numeric) {
+			elseif ($a_numeric && !$b_numeric) {
 				return -1;
 			}
-			else if (!$a_numeric && $b_numeric) {
+			elseif (!$a_numeric && $b_numeric) {
 				return 1;
 			}
 
