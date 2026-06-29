@@ -15,6 +15,7 @@
 #include "cep_correlation.h"
 #include "cep_task.h"
 
+#include "zabbix_server/cep/cep_event.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxcalc.h"
@@ -595,6 +596,8 @@ static zbx_db_event	*cep_create_close_event(const zbx_db_event *problem)
 		}
 	}
 
+	cep_event_expect(ok);
+
 	return ok;
 }
 
@@ -677,6 +680,7 @@ static void	correlation_add_close_old_tasks(zbx_dbconn_t *db, zbx_vector_mw_task
 			continue;
 
 		db_event = zbx_create_trigger_event(&triggers[index], result->clock, result->ns, TRIGGER_VALUE_OK);
+		cep_event_expect(db_event);
 		task = cep_create_task_close_event(db_event, result->eventid, 0, result->correlationid);
 		zbx_vector_mw_task_ptr_append(tasks, task);
 	}

@@ -89,6 +89,25 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 	return event;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: register a pending event for corresponding object                 *
+ *                                                                            *
+ * Parameters: db_event - [IN] database event to register                     *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_event_expect(const zbx_db_event *db_event)
+{
+	zbx_cep_t		*cep;
+	zbx_cep_origin_t	origin = {.source = db_event->source, .object = db_event->object,
+					.objectid = db_event->objectid};
+
+	cep_cache_acquire(&cep);
+	cep_object_inc_pending(cep, &origin);
+	cep_cache_release(&cep);
+}
+
+
 zbx_cep_event_t	*cep_event_clone(const zbx_cep_event_t *event)
 {
 	zbx_cep_event_t	*clone;

@@ -28,4 +28,7 @@ zbx_cep_event_t	*cep_event_addref(zbx_cep_event_t *event);
 zbx_cep_event_t	*cep_event_get_mutable(zbx_cep_event_t *event);
 int	cep_event_find_tag(zbx_cep_event_t *event, const char *tag);
 
+
+void	cep_event_expect(const zbx_db_event *db_event);
+
 #endif

@@ -1211,7 +1211,6 @@ zbx_uint64_t	cep_close_trigger_event_by_eventid(zbx_cep_t *cep, zbx_uint64_t tri
 			.objectid = triggerid
 	};
 
-
 	if (NULL == (obj = cep_get_object(cep, &origin)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("detected incoming trigger event without creation check");
@@ -1748,6 +1747,22 @@ void	cep_delete_events(zbx_cep_t *cep, const zbx_vector_uint64_t *eventids, zbx_
 		h->state = CEP_EVENT_STATE_DELETED;
 		zbx_vector_cep_event_handle_append(handles, h);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: increment pending event count for a CEP object                    *
+ *                                                                            *
+ * Parameters: cep    - [IN/OUT] CEP instance                                 *
+ *             origin - [IN] event origin identifying the CEP object          *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_object_inc_pending(zbx_cep_t *cep, const zbx_cep_origin_t *origin)
+{
+	zbx_cep_object_t	*obj;
+
+	obj = cep_get_object_or_create(cep, origin);
+	obj->pending_events_num++;
 }
 
 /******************************************************************************
