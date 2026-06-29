@@ -982,7 +982,7 @@ zbx_cep_window_t	*cep_window_pool_get_or_create_window(zbx_cep_window_pool_t *po
 	if (0 != (ref_local.group_by & ZBX_CEP_GROUP_BY_TAG))
 	{
 		event = cep_event_context_get_event(ctx);
-		if (FAIL != (index = cep_event_find_tag(event, rule->window->group_tag)))
+		if (FAIL != (index = cep_event_find_any_tag(event, rule->window->group_tag)))
 		{
 			ref_local.tag = (char *)rule->window->group_tag;
 			ref_local.tag_value = (char *)event->tags.values[index].value;
