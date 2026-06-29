@@ -458,10 +458,12 @@ static void	correlation_config_sync_correlations(zbx_dbsync_t *sync)
 		if (NULL == correlation->name || 0 != strcmp(correlation->name, row[1]))
 			correlation->name = zbx_strdup(correlation->name, row[1]);
 
+		ZBX_STR2UCHAR(correlation->evaltype, row[2]);
+
 		if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == correlation->evaltype)
 		{
-			if (NULL == correlation->formula || 0 != strcmp(correlation->formula, row[1]))
-				correlation->formula = zbx_strdup(correlation->formula, row[1]);
+			if (NULL == correlation->formula || 0 != strcmp(correlation->formula, row[3]))
+				correlation->formula = zbx_strdup(correlation->formula, row[3]);
 		}
 		else
 		{
@@ -469,8 +471,6 @@ static void	correlation_config_sync_correlations(zbx_dbsync_t *sync)
 			zbx_free(correlation->formula);
 			correlation->formula = correlation_basic_formula(correlation);
 		}
-
-		ZBX_STR2UCHAR(correlation->evaltype, row[2]);
 
 		correlation_ref_update(ref, correlation);
 	}

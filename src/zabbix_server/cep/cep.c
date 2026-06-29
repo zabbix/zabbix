@@ -1291,7 +1291,6 @@ zbx_uint64_t	cep_close_trigger_event_by_eventid(zbx_cep_t *cep, zbx_uint64_t tri
 			.objectid = triggerid
 	};
 
-
 	if (NULL == (obj = cep_get_object(cep, &origin)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("detected incoming trigger event without creation check");

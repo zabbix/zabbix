@@ -455,7 +455,6 @@ class CCepRule extends CApiService {
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [
 									CCepRuleHelper::CONDITION_EVENT_NAME,
 									CCepRuleHelper::CONDITION_TAG,
-									CCepRuleHelper::CONDITION_TAG_VALUE,
 									CCepRuleHelper::CONDITION_SEVERITY,
 									CCepRuleHelper::CONDITION_HOST,
 									CCepRuleHelper::CONDITION_HOST_GROUP,
@@ -477,15 +476,10 @@ class CCepRule extends CApiService {
 										CONDITION_OPERATOR_NOT_EQUAL,
 										CONDITION_OPERATOR_LIKE,
 										CONDITION_OPERATOR_NOT_LIKE,
-										CONDITION_OPERATOR_NOT_EXISTS
-									])],
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG_VALUE])], 'type' => API_INT32, 'in' => implode(',', [
-										CONDITION_OPERATOR_EQUAL,
-										CONDITION_OPERATOR_NOT_EQUAL,
-										CONDITION_OPERATOR_LIKE,
-										CONDITION_OPERATOR_NOT_LIKE,
-										CONDITION_OPERATOR_LESS_EQUAL,
-										CONDITION_OPERATOR_MORE_EQUAL
+										CONDITION_OPERATOR_EXISTS,
+										CONDITION_OPERATOR_NOT_EXISTS,
+										CONDITION_OPERATOR_MORE_EQUAL,
+										CONDITION_OPERATOR_LESS_EQUAL
 									])],
 									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_SEVERITY])], 'type' => API_INT32, 'in' => implode(',', [
 										CONDITION_OPERATOR_EQUAL,
@@ -508,8 +502,8 @@ class CCepRule extends CApiService {
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'tag')]
 			]],
 			'tag_value' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_condition', 'tag_value')],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'tag_value')]
+									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_condition', 'tag_value')],
+									['else' => true, 'type' => API_STRING_UTF8]
 			]],
 			'severity' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'type', 'in' => implode(',', [CCepRuleHelper::CONDITION_SEVERITY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
