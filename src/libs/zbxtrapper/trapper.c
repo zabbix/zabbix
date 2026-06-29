@@ -54,6 +54,7 @@
 #	include "zbxipcservice.h"
 #endif
 #include "zbxcurl.h"
+#include "zbxexpr.h"
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
 #endif
