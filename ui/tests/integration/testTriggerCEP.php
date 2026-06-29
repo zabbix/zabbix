@@ -3090,7 +3090,7 @@ class testTriggerCEP extends CIntegrationTest {
 		);
 		$this->waitForOpenProblemCountByTag($all, 'odd', '0', 0);
 		$this->waitForOpenProblemCountByTag($all, 'odd', '1', 2 * $odd_per_proto);
-	
+
 		$this->maybeRestartServer($restart);
 
 		// 3. Close the odd problems: add the odd rule, then drive fresh cep-dep events on the odd
