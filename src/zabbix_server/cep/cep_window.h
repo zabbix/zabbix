@@ -42,7 +42,8 @@ typedef struct
 
 	/* window location and access_num are read/written only within window pool lock */
 	zbx_cep_location_t	location;
-	int			access_num;
+	int			access_num;	/* number of workers adding events,                      */
+						/* window cannot be removed while events are being added */
 
 	time_t			time_created;
 	zbx_queue_ptr_t		hevents;
