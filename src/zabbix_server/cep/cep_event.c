@@ -154,6 +154,31 @@ int	cep_event_find_tag(zbx_cep_event_t *event, const char *tag)
 	return FAIL;
 }
 
+int	cep_event_find_any_tag(const zbx_cep_event_t *event, const char *tags)
+{
+	for (const char *tag = tags; '\0' != *tag;)
+	{
+		const char	*next_tag = strchr(tag, '\n');
+
+		size_t	len1 = (NULL == next_tag ? strlen(tag) : next_tag - tag);
+
+		for (int i = 0; i < event->tags.values_num; i++)
+		{
+			size_t	len2 = strlen(event->tags.values[i].tag);
+
+			if (len1 == len2 && 0 == memcmp(tag, event->tags.values[i].tag, len1))
+				return i;
+		}
+
+		if (NULL == next_tag)
+			break;
+
+		tag = next_tag + 1;
+	}
+
+	return FAIL;
+}
+
 int	cep_event_validate_tag(zbx_cep_event_t *event, const char *tag, const char *value,
 		int *match_index)
 {
