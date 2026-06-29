@@ -53,18 +53,13 @@ char	*cep_tag_value_shift(const char *value, int shift);
 					CEP_FLAG(ZBX_CEP_WHEN_EVENT_EVICTED) | CEP_FLAG(ZBX_CEP_WHEN_WINDOW_CLOSED))
 #define CEP_OP_REMOVE_TAG_MASK		(CEP_FLAG(ZBX_CEP_WHEN_EVENT_OCCURRED) | \
 					CEP_FLAG(ZBX_CEP_WHEN_EVENT_EVICTED) | CEP_FLAG(ZBX_CEP_WHEN_WINDOW_CLOSED))
-#define CEP_OP_COPY_EVENT		(CEP_FLAG(ZBX_CEP_WHEN_EVENT_EVICTED) | CEP_FLAG(ZBX_CEP_WHEN_PATTERN_MATCH) | \
+#define CEP_OP_COPY_EVENT_MASK		(CEP_FLAG(ZBX_CEP_WHEN_EVENT_EVICTED) | CEP_FLAG(ZBX_CEP_WHEN_PATTERN_MATCH) | \
 					CEP_FLAG(ZBX_CEP_WHEN_WINDOW_CLOSED))
-
 
 int	cep_operation_match_event(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx);
 
 int	cep_event_match_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t ***matched_rules,
 		int *matched_rules_num, zbx_cep_event_context_t *ctx);
-
-void	cep_event_add_to_rules(zbx_cep_event_context_t *ctx, const zbx_cep_rule_t **matched_rules,
-		int matched_rules_num, zbx_vector_mw_task_ptr_t *tasks);
-
 
 void	cep_rule_handle_error(const zbx_cep_rule_t *rule, char **error, zbx_vector_mw_task_ptr_t *tasks);
 

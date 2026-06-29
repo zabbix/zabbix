@@ -372,7 +372,7 @@ static void	cep_window_set_event_tag(zbx_cep_window_t *window, zbx_cep_event_han
 	zbx_cep_event_t		*event;
 	zbx_cep_event_context_t	ctx = {.hevent = zbx_cep_event_handle_addref(h)};
 	char			buf[MAX_ID_LEN];
-	zbx_mw_task_t		*task;
+	zbx_cep_acknowledge_t	ack = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64 " tag:%s value:%d", __func__,
 			zbx_cep_event_handle_eventid(h), tag, value);
@@ -396,6 +396,8 @@ static void	cep_window_set_event_tag(zbx_cep_window_t *window, zbx_cep_event_han
 	{
 		zbx_tag_t	tag_local;
 
+		cep_acknowledge_update_tag(&ack, ZBX_CEP_OP_ADD_TAG, NULL, NULL, tag, buf);
+
 		tag_local.tag = zbx_strdup(NULL, tag);
 		tag_local.value = zbx_strdup(NULL, buf);
 		zbx_vector_lite_tag_append(&event->tags, tag_local);
@@ -404,6 +406,7 @@ static void	cep_window_set_event_tag(zbx_cep_window_t *window, zbx_cep_event_han
 	{
 		zbx_tag_t	*t = &event->tags.values[index];
 
+		cep_acknowledge_update_tag(&ack, ZBX_CEP_OP_INCREASE_TAG_VALUE, t->tag, t->value, NULL, buf);
 		t->value = zbx_strdup(t->value, buf);
 	}
 
@@ -413,13 +416,33 @@ static void	cep_window_set_event_tag(zbx_cep_window_t *window, zbx_cep_event_han
 	cep_event_handle_set(h, event);
 	cep_cache_release(&cep);
 
-	task = cep_create_task_sync_event(h, CEP_SYNC_EVENT_TAGS);
-	zbx_vector_mw_task_ptr_append(tasks, task);
+	zbx_vector_mw_task_ptr_append(tasks, cep_create_task_sync_event(h, CEP_SYNC_EVENT_TAGS));
+	zbx_vector_mw_task_ptr_append(tasks, cep_create_task_acknowledge(&ack, window->ruleid, event->eventid));
+
 	window->flags |= CEP_WINDOW_FLAGS_SYMPTOM_TAG_SET;
 out:
 	cep_event_context_clear(&ctx);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	cep_window_set_event_cause(zbx_cep_window_t *window, zbx_cep_event_context_t *ctx,
+		zbx_cep_event_handle_t hcause, zbx_vector_mw_task_ptr_t *tasks)
+{
+	zbx_cep_t		*cep;
+	zbx_cep_event_t		*event = cep_event_context_get_mutable_event(ctx);
+	zbx_cep_acknowledge_t	ack = {0};
+
+	if (NULL == event)
+		return;
+
+	event->cause_eventid = zbx_cep_event_handle_eventid(hcause);
+	cep_cache_acquire(&cep);
+	cep_event_handle_set(ctx->hevent, event);
+	cep_cache_release(&cep);
+
+	cep_acknowledge_set_cause(&ack, event->cause_eventid);
+	zbx_vector_mw_task_ptr_append(tasks, cep_create_task_acknowledge(&ack, window->ruleid, event->eventid));
 }
 
 void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
@@ -462,20 +485,15 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 	{
 		if (0 != zbx_queue_ptr_values_num(&window->hevents))
 		{
-			zbx_cep_t		*cep;
-			zbx_cep_event_t		*event = cep_event_context_get_mutable_event(ctx);
 			zbx_cep_event_handle_t	h = (zbx_cep_event_handle_t)zbx_queue_ptr_peek(&window->hevents);
-
-			event->cause_eventid = zbx_cep_event_handle_eventid(h);
-			cep_cache_acquire(&cep);
-			cep_event_handle_set(ctx->hevent, event);
-			cep_cache_release(&cep);
 
 			if ('\0' != *rule->window->event_count_tag)
 			{
 				cep_window_set_event_tag(window, h, rule->window->event_count_tag,
 						zbx_queue_ptr_values_num(&window->hevents), tasks);
 			}
+
+			cep_window_set_event_cause(window, ctx, h, tasks);
 		}
 
 		zbx_queue_ptr_push(&window->hevents, zbx_cep_event_handle_addref(ctx->hevent));

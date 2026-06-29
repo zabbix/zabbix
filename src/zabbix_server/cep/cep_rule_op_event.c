@@ -107,12 +107,19 @@ static void	cep_acknowledge_update_name(zbx_cep_acknowledge_t *ack, int op, cons
 	cep_acknowledge_close(ack);
 }
 
-static void	cep_acknowledge_update_tag(zbx_cep_acknowledge_t *oplog, int op, const char *old_tag,
+void	cep_acknowledge_update_tag(zbx_cep_acknowledge_t *oplog, int op, const char *old_tag,
 		const char *old_value, const char *new_tag, const char *new_value)
 {
 	cep_acknowledge_open(oplog, op, "tag");
 	cep_acknowledge_add_detail(oplog, "tag", old_tag, new_tag);
 	cep_acknowledge_add_detail(oplog, "value", old_value, new_value);
+	cep_acknowledge_close(oplog);
+}
+
+void	cep_acknowledge_set_cause(zbx_cep_acknowledge_t *oplog, zbx_uint64_t cause_eventid)
+{
+	cep_acknowledge_open(oplog, ZBX_CEP_OP_SET_CAUSE, "cause");
+	zbx_json_addint64(&oplog->json, "eventid", cause_eventid);
 	cep_acknowledge_close(oplog);
 }
 
@@ -569,11 +576,11 @@ static void	cep_operation_event_execute(const zbx_cep_operation_t *op, int execu
 			cep_acknowledge_update(ack, op->type);
 			break;
 		case ZBX_CEP_OP_COPY_FIRST:
-			if (0 != (CEP_OP_COPY_EVENT & CEP_FLAG(execute_when)))
+			if (0 != (CEP_OP_COPY_EVENT_MASK & CEP_FLAG(execute_when)))
 				cep_operation_event_copy(op, ctx, CEP_POS_FIRST, ack, tasks);
 			break;
 		case ZBX_CEP_OP_COPY_LAST:
-			if (0 != (CEP_OP_COPY_EVENT & CEP_FLAG(execute_when)))
+			if (0 != (CEP_OP_COPY_EVENT_MASK & CEP_FLAG(execute_when)))
 				cep_operation_event_copy(op, ctx, CEP_POS_LAST, ack, tasks);
 			break;
 		default:
