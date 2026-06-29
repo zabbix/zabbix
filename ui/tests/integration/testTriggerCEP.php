@@ -2458,11 +2458,11 @@ class testTriggerCEP extends CIntegrationTest {
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationParityExpression$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
-	/*public function testTriggerCEP_EventAssessmentGlobalCorrelationParityExpression() {
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationParityExpression() {
 		$this->prepareDataGlobalCorrelationParity();
 		$this->runEventAssessmentTestGlobalCorrelationParity(false, CONDITION_EVAL_TYPE_EXPRESSION);
 		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
-	}*/
+	}
 
 	/**
 	 * Same scenario as testTriggerCEP_EventAssessmentGlobalCorrelationParityExpression but the server
@@ -2470,12 +2470,12 @@ class testTriggerCEP extends CIntegrationTest {
 	 *
 	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationParityExpression
 	 */
-	/*public function testTriggerCEP_EventAssessmentGlobalCorrelationParityExpressionRestart() {
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationParityExpressionRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataGlobalCorrelationParity();
 		$this->runEventAssessmentTestGlobalCorrelationParity(true, CONDITION_EVAL_TYPE_EXPRESSION);
 		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
-	}*/
+	}
 
 	/**
 	 * Discover a single log trigger from the dedicated log template (linked directly to the host) and
