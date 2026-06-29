@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-05-04 18:20+0000\n"
+"PO-Revision-Date: 2026-06-15 20:48+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -15415,7 +15415,7 @@ msgstr "Tableau de bord suivant"
 
 #: jsLoader.php:328
 msgid "Next month"
-msgstr ""
+msgstr "Mois suivant"
 
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
@@ -15433,7 +15433,7 @@ msgstr "Prochaine étape"
 
 #: jsLoader.php:326
 msgid "Next year"
-msgstr ""
+msgstr "Année suivante"
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -15627,7 +15627,7 @@ msgstr "Aucune correspondance trouvée"
 #: app/controllers/CControllerValidateApiExists.php:118
 #, c-format
 msgid "No more than %1$d items based on field \"%2$s\" rules"
-msgstr ""
+msgstr "Pas plus de %1$d éléments selon les règles du champ \"%2$s\""
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
