@@ -1344,6 +1344,9 @@ struct zbx_json	*zbx_json_clone(const struct zbx_json *src)
  *                                                                            *
  * Purpose: returns raw JSON value by definite json path                      *
  *                                                                            *
+ * Parameters: jp   - [IN] parsed JSON document                               *
+ *             path - [IN] definite JSON path                                 *
+ *                                                                            *
  * Return value: allocated raw JSON value or NULL if path cannot be opened    *
  *                                                                            *
  ******************************************************************************/

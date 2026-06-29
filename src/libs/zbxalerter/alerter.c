@@ -714,8 +714,8 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 				SUCCEED == zbx_json_value_by_name(&jp_result, "message", message,
 				sizeof(message), NULL))
 		{
-			error_data = zbx_json_raw_value_by_path_dyn(&jp_result, "$.data");
 #ifdef ZBX_DEBUG
+			error_data = zbx_json_raw_value_by_path_dyn(&jp_result, "$.data");
 			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s data: %s",
 					code, message, ZBX_NULL2EMPTY_STR(error_data));
 #else

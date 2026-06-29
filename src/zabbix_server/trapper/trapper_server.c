@@ -39,7 +39,8 @@ static int	trapper_build_push_test_params(const char *sendto, const char *subjec
 	zbx_db_row_t		row;
 	struct zbx_json		json;
 	const char		*device_id, *push_token, *mobile_encryption_key;
-	char			*sendto_esc = NULL, *message_uuid7 = NULL, *request_uuid7 = NULL, clock_str[32];
+	char			*sendto_esc = NULL, *message_uuid7 = NULL, *request_uuid7 = NULL,
+				clock_str[ZBX_BRIDGE_TIME_LEN];
 	int			ret = FAIL;
 
 	sendto_esc = zbx_db_dyn_escape_string(sendto);

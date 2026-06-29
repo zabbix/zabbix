@@ -932,10 +932,11 @@ fail:
 static int	bridge_adapter_parse_url_hostport(const char *url, char **host, unsigned short *port, char **error)
 {
 	char	*parsed = NULL, *host_start, *port_start;
+	size_t	host_alloc = 0, host_offset = 0;
 	int	ret = FAIL;
 
-	if (SUCCEED != zbx_regexp_sub(url,
-			"^([hH][tT][tT][pP][sS]?)://(\\[[^]]+\\]|[^:/?#]+)(?::([0-9]+))?(?:[/?#].*)?$",
+	if (SUCCEED != zbx_iregexp_sub(url,
+			"^(https?)://(\\[[^]]+\\]|[^:/?#]+)(?::([0-9]+))?/rpc$",
 			"\\1\n\\2\n\\3", &parsed) || NULL == parsed)
 	{
 		goto fail;
@@ -952,16 +953,18 @@ static int	bridge_adapter_parse_url_hostport(const char *url, char **host, unsig
 		host_start = parsed + ZBX_CONST_STRLEN("https\n");
 	}
 	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
 		goto fail;
+	}
 
 	if (NULL == (port_start = strchr(host_start, '\n')))
-		goto fail;
-
 	{
-		size_t	host_alloc = 0, host_offset = 0;
-
-		zbx_strncpy_alloc(host, &host_alloc, &host_offset, host_start, (size_t)(port_start - host_start));
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto fail;
 	}
+
+	zbx_strncpy_alloc(host, &host_alloc, &host_offset, host_start, (size_t)(port_start - host_start));
 	port_start++;
 
 	if (FAIL == zbx_is_supported_ip(*host) && FAIL == zbx_is_rfc_extended_hostname(*host))
@@ -971,13 +974,15 @@ static int	bridge_adapter_parse_url_hostport(const char *url, char **host, unsig
 		goto fail;
 
 	ret = SUCCEED;
+	goto out;
+
+fail:
+	*error = zbx_dsprintf(NULL, "invalid \"BridgeAdapterURL\" configuration parameter: %s", url);
+
 out:
 	zbx_free(parsed);
 
 	return ret;
-fail:
-	*error = zbx_dsprintf(NULL, "invalid \"BridgeAdapterURL\" configuration parameter: %s", url);
-	goto out;
 }
 
 static int	bridge_adapter_validate_connect_to(const char *connect_to, char **error)
@@ -995,17 +1000,30 @@ static int	bridge_adapter_validate_connect_to(const char *connect_to, char **err
 	}
 
 	ret = SUCCEED;
+	goto out;
+
+fail:
+	*error = zbx_dsprintf(NULL, "\"BridgeAdapterConnectTo\" must be in \"host:port\" format: %s",
+			connect_to);
+
 out:
 	zbx_free(connect_to_tmp);
 	zbx_free(host);
 
 	return ret;
-fail:
-	*error = zbx_dsprintf(NULL, "\"BridgeAdapterConnectTo\" must be in \"host:port\" format: %s",
-			connect_to);
-	goto out;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validates BridgeAdapterURL configuration parameter                *
+ *                                                                            *
+ * Parameters: url   - [IN] BridgeAdapterURL value, must not be NULL          *
+ *             error - [OUT] error message, must not be NULL                  *
+ *                                                                            *
+ * Return value: SUCCEED - valid configuration parameter value                *
+ *               FAIL    - invalid configuration parameter value              *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_cfg_validate_bridge_adapter_url(const char *url, char **error)
 {
 	char		*host = NULL;
