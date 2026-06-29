@@ -22,10 +22,11 @@
 #include "zbxmw.h"
 #include "zbxdbhigh.h"
 
-void	cep_operation_db_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_context_t *ctx,
+int	cep_operation_db_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_context_t *ctx,
 		zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_cep_event_t	*event;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -41,8 +42,11 @@ void	cep_operation_db_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_con
 
 		t = cep_create_task_close_event(db_event, event->eventid, 0, 0, ruleid);
 		zbx_vector_mw_task_ptr_append(tasks, t);
+		ret = SUCCEED;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 

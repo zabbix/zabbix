@@ -675,6 +675,7 @@ static void	correlation_add_close_old_tasks(zbx_dbconn_t *db, zbx_vector_mw_task
 			continue;
 
 		db_event = zbx_create_trigger_event(&triggers[index], result->clock, result->ns, TRIGGER_VALUE_OK);
+		cep_event_expect(db_event);
 		task = cep_create_task_close_event(db_event, result->eventid, 0, result->correlationid, 0);
 		zbx_vector_mw_task_ptr_append(tasks, task);
 	}

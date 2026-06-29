@@ -80,9 +80,9 @@ void	cep_window_release(zbx_cep_window_t *window);
 zbx_cep_window_t	*cep_get_window_or_create(zbx_hashset_t *windows, const zbx_cep_rule_t *rule,
 		zbx_cep_event_context_t *ctx);
 
-void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
+void	cep_window_sliding_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
 		zbx_vector_mw_task_ptr_t *tasks);
-void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks);
+void	cep_window_sliding_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task_ptr_t *tasks);
 
 void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
 		zbx_vector_mw_task_ptr_t *tasks);

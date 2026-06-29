@@ -18,7 +18,7 @@
 #include "cep_rule.h"
 #include "zbxmw.h"
 
-void	cep_operation_db_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_context_t *ctx,
+int	cep_operation_db_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_context_t *ctx,
 	zbx_vector_mw_task_ptr_t *tasks);
 
 
