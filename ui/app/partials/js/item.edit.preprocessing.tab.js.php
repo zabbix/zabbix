@@ -475,17 +475,20 @@ var ItemEditPreprocessingTab = class {
 			this.#container.querySelectorAll('.preprocessing-list-item').forEach(row => {
 				indexes.push(row.dataset.step);
 			});
+
+			validate_fields.push('preprocessing');
+		}
+		else {
+			validate_fields.push(`preprocessing/${step_obj_nr}`);
 		}
 
 		if (this.#form) {
-			validate_fields.push('preprocessing');
 			let validate_key = (step_obj_nr === -2);
 			const types_test_key = <?= json_encode(CControllerPopupItemTest::$item_types_has_key_mandatory) ?>;
 
 			for (const field of Object.values(this.#form.findFieldByName('preprocessing').getFields())) {
 				if (step_obj_nr < 0 || field.getPath().startsWith(`/preprocessing/${step_obj_nr}`)) {
 					field.setChanged();
-					validate_fields.push(field.getName());
 
 					if (!validate_key && field.getPath().endsWith('/type')) {
 						const type = parseInt(field.getValue());
