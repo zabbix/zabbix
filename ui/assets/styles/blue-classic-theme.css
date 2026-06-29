@@ -6084,7 +6084,8 @@ div.dashboard-widget-geomap {
     margin-top: 5px;
     margin-right: -2px;
     background-color: #ffffff;
-    border: 1px solid #ccd5d9; }
+    border: 1px solid #ccd5d9;
+    border-radius: var(--overlay-border-radius); }
     div.dashboard-widget-geomap .geomap-filter.collapsed {
       display: block; }
     div.dashboard-widget-geomap .geomap-filter li {
@@ -6116,6 +6117,8 @@ div.dashboard-widget-geomap {
     outline: none; }
   div.dashboard-widget-geomap .leaflet-control .navigate-home-button,
   div.dashboard-widget-geomap .leaflet-control .geomap-filter-button {
+    border-radius: var(--button-border-radius);
+    border: 0;
     cursor: pointer; }
     div.dashboard-widget-geomap .leaflet-control .navigate-home-button::before,
     div.dashboard-widget-geomap .leaflet-control .geomap-filter-button::before {
