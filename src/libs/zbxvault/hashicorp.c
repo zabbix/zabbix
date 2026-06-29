@@ -28,7 +28,6 @@
 #ifdef HAVE_LIBCURL
 
 #define ZBX_HTTP_STATUS_CODE_OK		200
-#define ZBX_HTTP_STATUS_CODE_NO_CONTENT	204
 #define ZBX_HTTP_STATUS_CODE_FORBIDDEN	403
 
 static int	zbx_vault_app_role_login_hashicorp(const char *url, const char *app_role_id, const char *app_secret_id,
@@ -55,7 +54,7 @@ static int	zbx_vault_app_role_login_hashicorp(const char *url, const char *app_r
 		goto fail;
 	}
 
-	if (ZBX_HTTP_STATUS_CODE_OK != response_code && ZBX_HTTP_STATUS_CODE_NO_CONTENT != response_code)
+	if (ZBX_HTTP_STATUS_CODE_OK != response_code)
 	{
 		*error = zbx_dsprintf(*error, "unsuccessful response code \"%ld\"", response_code);
 		goto fail;
@@ -174,7 +173,7 @@ int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const
 		goto fail;
 	}
 
-	if (ZBX_HTTP_STATUS_CODE_OK != response_code && ZBX_HTTP_STATUS_CODE_NO_CONTENT != response_code)
+	if (ZBX_HTTP_STATUS_CODE_OK != response_code)
 	{
 		if (NULL != approle && ZBX_HTTP_STATUS_CODE_FORBIDDEN == response_code)
 		{
@@ -297,7 +296,7 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 
 		zbx_free(url);
 
-		if (ZBX_HTTP_STATUS_CODE_OK != response_code && ZBX_HTTP_STATUS_CODE_NO_CONTENT != response_code)
+		if (ZBX_HTTP_STATUS_CODE_OK != response_code)
 		{
 			error = zbx_dsprintf(NULL, "unsuccessful response code \"%ld\"", response_code);
 			goto out;
@@ -346,7 +345,7 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 			goto out;
 		}
 
-		if (ZBX_HTTP_STATUS_CODE_OK != response_code && ZBX_HTTP_STATUS_CODE_NO_CONTENT != response_code)
+		if (ZBX_HTTP_STATUS_CODE_OK != response_code)
 		{
 			error = zbx_dsprintf(NULL, "unsuccessful response code \"%ld\"", response_code);
 			goto out;
@@ -409,4 +408,3 @@ out:
 	zbx_free(error);
 #endif
 }
-
