@@ -769,6 +769,13 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 				return ret_errf(FAIL, error, max_error_len,
 						"Value is not valid UTF-8 for condition #%d", i);
 
+			if (ZBX_TQ_OPERATOR_EQUAL != condition->operator
+					&& ZBX_TQ_OPERATOR_NOT_EQUAL != condition->operator
+					&& (ZBX_TQ_COLUMN_TYPE_NUM == condition->col_type
+					|| ZBX_TQ_COLUMN_TYPE_ARRAY_NUM == condition->col_type))
+				return ret_errf(FAIL, error, max_error_len,
+						"Invalid operator used with numeric column for condition #%d", i);
+
 			if (ZBX_TQ_OPERATOR_EXISTS == condition->operator
 					&& SUCCEED != tq_column_type_is_attributes(condition->col_type))
 				return ret_errf(FAIL, error, max_error_len,
