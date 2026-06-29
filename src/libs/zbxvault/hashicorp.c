@@ -201,7 +201,12 @@ int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const
 				*vault_ret = FAIL;
 				goto fail;
 			}
+
+			*error = zbx_dsprintf(*error, "access to Vault secret forbidden: token is valid "
+					"(lookup-self returned \"%ld\")", response_code);
+			goto fail;
 		}
+
 		*error = zbx_dsprintf(*error, "unsuccessful response code \"%ld\"", response_code);
 		goto fail;
 	}
