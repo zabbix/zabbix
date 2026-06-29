@@ -2522,6 +2522,13 @@ svg {
 	.item-test-result {
 		display: inline-flex;
 	}
+
+	.multilineinput-control {
+		input[type=text] {
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
+		}
+	}
 }
 
 #token_form {
