@@ -199,7 +199,9 @@
 				const {dashboard_page_index} = e.detail;
 				const page = dashboard_page_index > 0 ? dashboard_page_index + 1 : null;
 
-				this.#updateHistory({page, add_new: false});
+				if (this.#dashboard.dashboardid && !this.#clone) {
+					this.#updateHistory({page, add_new: false});
+				}
 			});
 
 			ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_START, () => {
