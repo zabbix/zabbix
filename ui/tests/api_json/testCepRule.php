@@ -1000,7 +1000,6 @@ class testCepRule extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/type": value must be one of '.implode(', ', [
 					CCepRuleHelper::CONDITION_EVENT_NAME,
 					CCepRuleHelper::CONDITION_TAG,
-					CCepRuleHelper::CONDITION_TAG_VALUE,
 					CCepRuleHelper::CONDITION_SEVERITY,
 					CCepRuleHelper::CONDITION_HOST,
 					CCepRuleHelper::CONDITION_HOST_GROUP,
@@ -1107,64 +1106,6 @@ class testCepRule extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/tag": value must be empty.'
-			],
-			'Filter conditions tag_value must be string' => [
-				'request' => [
-					'name' => 'ceprule.filter',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
-					],
-					'filter' => [
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TAG_VALUE,
-							'tag_value' => 123
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/tag_value": a character string is expected.'
-			],
-			'Filter conditions tag_value can be empty' => [
-				'request' => [
-					'name' => 'ceprule.filter.tag.value.empty',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
-					],
-					'filter' => [
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TAG_VALUE,
-							'tag_value' => ''
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			'Filter conditions tag_value must be empty when type!=CONDITION_TAG_VALUE' => [
-				'request' => [
-					'name' => 'ceprule.filter',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
-					],
-					'filter' => [
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TAG,
-							'tag' => 'abc',
-							'tag_value' => 'abc'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1/tag_value": value must be empty.'
 			],
 			'Filter conditions severity must be integer' => [
 				'request' => [
@@ -1378,24 +1319,6 @@ class testCepRule extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "tag" is missing.'
-			],
-			'Filter conditions requires tag_value when type=CONDITION_TAG_VALUE' => [
-				'request' => [
-					'name' => 'ceprule.filter',
-					'operations' => [
-						'sortorder' => 1,
-						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
-						'type' => CCepRuleHelper::OP_SET_NAME,
-						'event_name' => 'Event name'
-					],
-					'filter' => [
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'conditions' => [
-							'type' => CCepRuleHelper::CONDITION_TAG_VALUE
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/filter/conditions/1": the parameter "tag_value" is missing.'
 			],
 			'Filter conditions requires severity when type=CONDITION_SEVERITY' => [
 				'request' => [
