@@ -169,7 +169,7 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 
 			// Expand row for SNMP interface.
 			$button = $row->getColumn(0)->query('tag:button')->one();
-			if (in_array($button->getAttribute('title'), ['', 'Expand'])) {
+			if (in_array($button->getAttribute('aria-expanded'), ['', 'false'])) {
 				$button->click();
 			}
 
