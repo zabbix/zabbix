@@ -38,7 +38,9 @@ class CMenuItem extends CBaseComponent {
 			this._toggle.setAttribute('aria-expanded', this._is_expanded ? 'true' : 'false');
 		}
 
-		this._toggle.setAttribute('aria-role','button');
+		if (this._toggle) {
+			this._toggle.setAttribute('aria-role','button');
+		}
 	}
 
 	focus() {
