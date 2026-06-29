@@ -923,40 +923,40 @@ zabbix_export:
       macros:
         - macro: '{$BACKUP.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in backup discovery rule.'
+          description: 'Filter of discoverable backups by name.'
           config:
             type: TEXT
             priority: '9'
             section_name: Filters
             label: 'Backup name filter (include)'
-            description: 'This macro is used in backup discovery rule.'
+            description: 'A regex pattern to include backups by name.'
         - macro: '{$BACKUP.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in backup discovery rule.'
+          description: 'Filter to exclude discovered backups by name.'
           config:
             type: TEXT
             priority: '10'
             section_name: Filters
             label: 'Backup name filter (exclude)'
-            description: 'This macro is used in backup discovery rule.'
+            description: 'A regex pattern to exclude backups by name.'
         - macro: '{$BACKUP.TYPE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in backup discovery rule.'
+          description: 'Filter of discoverable backups by type.'
           config:
             type: TEXT
             priority: '7'
             section_name: Filters
             label: 'Backup type filter (include)'
-            description: 'This macro is used in backup discovery rule.'
+            description: 'A regex pattern to include backups by type.'
         - macro: '{$BACKUP.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in backup discovery rule.'
+          description: 'Filter to exclude discovered backups by type.'
           config:
             type: TEXT
             priority: '8'
             section_name: Filters
             label: 'Backup type filter (exclude)'
-            description: 'This macro is used in backup discovery rule.'
+            description: 'A regex pattern to exclude backups by type.'
         - macro: '{$VEEAM.MANAGER.API.URL}'
           value: 'https://localhost:9398'
           description: 'Veeam Backup Enterprise Manager API endpoint is a URL in the format: `<scheme>://<host>:<port>`.'
@@ -1052,22 +1052,22 @@ zabbix_export:
             required: 'YES'
         - macro: '{$VEEAM.REPOSITORY.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in repository discovery rule.'
+          description: 'Filter of discoverable repositories by name.'
           config:
             type: TEXT
             priority: '13'
             section_name: Filters
             label: 'Repository name filter (include)'
-            description: 'This macro is used in repository discovery rule.'
+            description: 'A regex pattern to include repositories by name.'
         - macro: '{$VEEAM.REPOSITORY.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in repository discovery rule.'
+          description: 'Filter to exclude discovered repositories by name.'
           config:
             type: TEXT
             priority: '14'
             section_name: Filters
             label: 'Repository name filter (exclude)'
-            description: 'This macro is used in repository discovery rule.'
+            description: 'A regex pattern to exclude repositories by name.'
       dashboards:
         - uuid: f2d401c5a82c43f3906c13d9498cbe38
           name: Overview

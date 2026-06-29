@@ -1549,40 +1549,40 @@ zabbix_export:
       macros:
         - macro: '{$AUTH_EVENTS.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in the authorization events discovery rule.'
+          description: 'Filter of discoverable authorization events by name.'
           config:
             type: TEXT
             priority: '41'
             section_name: Filters
             label: 'Authorization event name filter (include)'
-            description: 'This macro is used in the authorization events discovery rule.'
+            description: 'A regex pattern to include authorization events by name.'
         - macro: '{$AUTH_EVENTS.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in the authorization events discovery rule.'
+          description: 'Filter to exclude discovered authorization events by name.'
           config:
             type: TEXT
             priority: '42'
             section_name: Filters
             label: 'Authorization event name filter (exclude)'
-            description: 'This macro is used in the authorization events discovery rule.'
+            description: 'A regex pattern to exclude authorization events by name.'
         - macro: '{$AUTH_EVENTS.STATE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in the authorization events discovery rule.'
+          description: 'Filter of discoverable authorization events by state.'
           config:
             type: TEXT
             priority: '43'
             section_name: Filters
             label: 'Authorization event state filter (include)'
-            description: 'This macro is used in the authorization events discovery rule.'
+            description: 'A regex pattern to include authorization events by state.'
         - macro: '{$AUTH_EVENTS.STATE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in the authorization events discovery rule.'
+          description: 'Filter to exclude discovered authorization events by state.'
           config:
             type: TEXT
             priority: '44'
             section_name: Filters
             label: 'Authorization event state filter (exclude)'
-            description: 'This macro is used in the authorization events discovery rule.'
+            description: 'A regex pattern to exclude authorization events by state.'
         - macro: '{$CREATED.AFTER}'
           value: '7'
           description: 'Returns sessions that are created after chosen days.'
@@ -1595,274 +1595,274 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$JOB.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+          description: 'Filter of discoverable jobs by name.'
           config:
             type: TEXT
             priority: '24'
             section_name: Filters
             label: 'Job name filter (include)'
-            description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+            description: 'A regex pattern to include jobs by name.'
         - macro: '{$JOB.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+          description: 'Filter to exclude discovered jobs by name.'
           config:
             type: TEXT
             priority: '25'
             section_name: Filters
             label: 'Job name filter (exclude)'
-            description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+            description: 'A regex pattern to exclude jobs by name.'
         - macro: '{$JOB.STATUS.MATCHES}'
           value: '.*'
-          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+          description: 'Filter of discoverable jobs by status.'
           config:
             type: TEXT
             priority: '28'
             section_name: Filters
             label: 'Job status filter (include)'
-            description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+            description: 'A regex pattern to include jobs by status.'
         - macro: '{$JOB.STATUS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+          description: 'Filter to exclude discovered jobs by status.'
           config:
             type: TEXT
             priority: '29'
             section_name: Filters
             label: 'Job status filter (exclude)'
-            description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+            description: 'A regex pattern to exclude jobs by status.'
         - macro: '{$JOB.TYPE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+          description: 'Filter of discoverable jobs by type.'
           config:
             type: TEXT
             priority: '26'
             section_name: Filters
             label: 'Job type filter (include)'
-            description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+            description: 'A regex pattern to include jobs by type.'
         - macro: '{$JOB.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+          description: 'Filter to exclude discovered jobs by type.'
           config:
             type: TEXT
             priority: '27'
             section_name: Filters
             label: 'Job type filter (exclude)'
-            description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+            description: 'A regex pattern to exclude jobs by type.'
         - macro: '{$MALWARE_EVENTS.SEVERITY.MATCHES}'
           value: '.*'
-          description: 'This macro is used in the malware events discovery rule.'
+          description: 'Filter of discoverable malware events by severity.'
           config:
             type: TEXT
             priority: '33'
             section_name: Filters
             label: 'Malware event severity filter (include)'
-            description: 'This macro is used in the malware events discovery rule.'
+            description: 'A regex pattern to include malware events by severity.'
         - macro: '{$MALWARE_EVENTS.SEVERITY.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in the malware events discovery rule.'
+          description: 'Filter to exclude discovered malware events by severity.'
           config:
             type: TEXT
             priority: '34'
             section_name: Filters
             label: 'Malware event severity filter (exclude)'
-            description: 'This macro is used in the malware events discovery rule.'
+            description: 'A regex pattern to exclude malware events by severity.'
         - macro: '{$MALWARE_EVENTS.STATE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in the malware events discovery rule.'
+          description: 'Filter of discoverable malware events by state.'
           config:
             type: TEXT
             priority: '35'
             section_name: Filters
             label: 'Malware event state filter (include)'
-            description: 'This macro is used in the malware events discovery rule.'
+            description: 'A regex pattern to include malware events by state.'
         - macro: '{$MALWARE_EVENTS.STATE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in the malware events discovery rule.'
+          description: 'Filter to exclude discovered malware events by state.'
           config:
             type: TEXT
             priority: '36'
             section_name: Filters
             label: 'Malware event state filter (exclude)'
-            description: 'This macro is used in the malware events discovery rule.'
+            description: 'A regex pattern to exclude malware events by state.'
         - macro: '{$MALWARE_EVENTS.TYPE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in the malware events discovery rule.'
+          description: 'Filter of discoverable malware events by type.'
           config:
             type: TEXT
             priority: '31'
             section_name: Filters
             label: 'Malware event type filter (include)'
-            description: 'This macro is used in the malware events discovery rule.'
+            description: 'A regex pattern to include malware events by type.'
         - macro: '{$MALWARE_EVENTS.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in the malware events discovery rule.'
+          description: 'Filter to exclude discovered malware events by type.'
           config:
             type: TEXT
             priority: '32'
             section_name: Filters
             label: 'Malware event type filter (exclude)'
-            description: 'This macro is used in the malware events discovery rule.'
+            description: 'A regex pattern to exclude malware events by type.'
         - macro: '{$PROXIES.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in proxies discovery rule.'
+          description: 'Filter of discoverable proxies by name.'
           config:
             type: TEXT
             priority: '16'
             section_name: Filters
             label: 'Proxies name filter (include)'
-            description: 'This macro is used in proxies discovery rule.'
+            description: 'A regex pattern to include proxies by name.'
         - macro: '{$PROXIES.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in proxies discovery rule.'
+          description: 'Filter to exclude discovered proxies by name.'
           config:
             type: TEXT
             priority: '17'
             section_name: Filters
             label: 'Proxies name filter (exclude)'
-            description: 'This macro is used in proxies discovery rule.'
+            description: 'A regex pattern to exclude proxies by name.'
         - macro: '{$PROXIES.TYPE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in proxies discovery rule.'
+          description: 'Filter of discoverable proxies by type.'
           config:
             type: TEXT
             priority: '18'
             section_name: Filters
             label: 'Proxies type filter (include)'
-            description: 'This macro is used in proxies discovery rule.'
+            description: 'A regex pattern to include proxies by type.'
         - macro: '{$PROXIES.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in proxies discovery rule.'
+          description: 'Filter to exclude discovered proxies by type.'
           config:
             type: TEXT
             priority: '19'
             section_name: Filters
             label: 'Proxies type filter (exclude)'
-            description: 'This macro is used in proxies discovery rule.'
+            description: 'A regex pattern to exclude proxies by type.'
         - macro: '{$REPOSITORIES.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in repositories discovery rule.'
+          description: 'Filter of discoverable repositories by name.'
           config:
             type: TEXT
             priority: '20'
             section_name: Filters
             label: 'Repositories name filter (include)'
-            description: 'This macro is used in repositories discovery rule.'
+            description: 'A regex pattern to include repositories by name.'
         - macro: '{$REPOSITORIES.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in repositories discovery rule.'
+          description: 'Filter to exclude discovered repositories by name.'
           config:
             type: TEXT
             priority: '21'
             section_name: Filters
             label: 'Repositories name filter (exclude)'
-            description: 'This macro is used in repositories discovery rule.'
+            description: 'A regex pattern to exclude repositories by name.'
         - macro: '{$REPOSITORIES.TYPE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in repositories discovery rule.'
+          description: 'Filter of discoverable repositories by type.'
           config:
             type: TEXT
             priority: '22'
             section_name: Filters
             label: 'Repositories type filter (include)'
-            description: 'This macro is used in repositories discovery rule.'
+            description: 'A regex pattern to include repositories by type.'
         - macro: '{$REPOSITORIES.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in repositories discovery rule.'
+          description: 'Filter to exclude discovered repositories by type.'
           config:
             type: TEXT
             priority: '23'
             section_name: Filters
             label: 'Repositories type filter (exclude)'
-            description: 'This macro is used in repositories discovery rule.'
+            description: 'A regex pattern to exclude repositories by type.'
         - macro: '{$SECURITY_ANALYZER.BEST_PRACTICE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in the security analyzer discovery rule.'
+          description: 'Filter of discoverable security best practices by name.'
           config:
             type: TEXT
             priority: '39'
             section_name: Filters
             label: 'Security best practice name filter (include)'
-            description: 'This macro is used in the security analyzer discovery rule.'
+            description: 'A regex pattern to include security best practices by name.'
         - macro: '{$SECURITY_ANALYZER.BEST_PRACTICE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in the security analyzer discovery rule.'
+          description: 'Filter to exclude discovered security best practices by name.'
           config:
             type: TEXT
             priority: '40'
             section_name: Filters
             label: 'Security best practice name filter (exclude)'
-            description: 'This macro is used in the security analyzer discovery rule.'
+            description: 'A regex pattern to exclude security best practices by name.'
         - macro: '{$SECURITY_ANALYZER.STATUS.MATCHES}'
           value: '.*'
-          description: 'This macro is used in the security analyzer discovery rule.'
+          description: 'Filter of discoverable security best practices by status.'
           config:
             type: TEXT
             priority: '37'
             section_name: Filters
             label: 'Security best practice status filter (include)'
-            description: 'This macro is used in the security analyzer discovery rule.'
+            description: 'A regex pattern to include security best practices by status.'
         - macro: '{$SECURITY_ANALYZER.STATUS.NOT_MATCHES}'
           value: OK
-          description: 'This macro is used in the security analyzer discovery rule.'
+          description: 'Filter to exclude discovered security best practices by status.'
           config:
             type: TEXT
             priority: '38'
             section_name: Filters
             label: 'Security best practice status filter (exclude)'
-            description: 'This macro is used in the security analyzer discovery rule.'
+            description: 'A regex pattern to exclude security best practices by status.'
         - macro: '{$SESSION.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in discovery rule to evaluate sessions.'
+          description: 'Filter of discoverable sessions by name.'
           config:
             type: TEXT
             priority: '10'
             section_name: Filters
             label: 'Session name filter (include)'
-            description: 'This macro is used in discovery rule to evaluate sessions.'
+            description: 'A regex pattern to include sessions by name.'
         - macro: '{$SESSION.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in discovery rule to evaluate sessions.'
+          description: 'Filter to exclude discovered sessions by name.'
           config:
             type: TEXT
             priority: '11'
             section_name: Filters
             label: 'Session name filter (exclude)'
-            description: 'This macro is used in discovery rule to evaluate sessions.'
+            description: 'A regex pattern to exclude sessions by name.'
         - macro: '{$SESSION.RESULT.MATCHES}'
           value: '.*'
-          description: 'This macro is used in discovery rule to evaluate sessions.'
+          description: 'Filter of discoverable sessions by result.'
           config:
             type: TEXT
             priority: '14'
             section_name: Filters
             label: 'Session result filter (include)'
-            description: 'This macro is used in discovery rule to evaluate sessions.'
+            description: 'A regex pattern to include sessions by result.'
         - macro: '{$SESSION.RESULT.NOT_MATCHES}'
           value: Success
-          description: 'This macro is used in discovery rule to evaluate sessions.'
+          description: 'Filter to exclude discovered sessions by result.'
           config:
             type: TEXT
             priority: '15'
             section_name: Filters
             label: 'Session result filter (exclude)'
-            description: 'This macro is used in discovery rule to evaluate sessions.'
+            description: 'A regex pattern to exclude sessions by result.'
         - macro: '{$SESSION.TYPE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in discovery rule to evaluate sessions.'
+          description: 'Filter of discoverable sessions by type.'
           config:
             type: TEXT
             priority: '12'
             section_name: Filters
             label: 'Session type filter (include)'
-            description: 'This macro is used in discovery rule to evaluate sessions.'
+            description: 'A regex pattern to include sessions by type.'
         - macro: '{$SESSION.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in discovery rule to evaluate sessions.'
+          description: 'Filter to exclude discovered sessions by type.'
           config:
             type: TEXT
             priority: '13'
             section_name: Filters
             label: 'Session type filter (exclude)'
-            description: 'This macro is used in discovery rule to evaluate sessions.'
+            description: 'A regex pattern to exclude sessions by type.'
         - macro: '{$VEEAM.API.URL}'
           value: 'https://localhost:9419'
           description: 'The Veeam API endpoint is a URL in the format `<scheme>://<host>:<port>`.'

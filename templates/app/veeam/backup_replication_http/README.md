@@ -57,41 +57,41 @@ This template has been tested on:
 |{$VEEAM.SECURITY.DATA.FREQUENCY}|<p>The update interval for the security analyzer best practices item.</p>|`4h`|
 |{$VEEAM.DATA.TIMEOUT}|<p>A response timeout for the API.</p>|`30`|
 |{$CREATED.AFTER}|<p>Returns sessions that are created after chosen days.</p>|`7`|
-|{$SESSION.NAME.MATCHES}|<p>This macro is used in discovery rule to evaluate sessions.</p>|`.*`|
-|{$SESSION.NAME.NOT_MATCHES}|<p>This macro is used in discovery rule to evaluate sessions.</p>|`CHANGE_IF_NEEDED`|
-|{$SESSION.TYPE.MATCHES}|<p>This macro is used in discovery rule to evaluate sessions.</p>|`.*`|
-|{$SESSION.TYPE.NOT_MATCHES}|<p>This macro is used in discovery rule to evaluate sessions.</p>|`CHANGE_IF_NEEDED`|
-|{$SESSION.RESULT.MATCHES}|<p>This macro is used in discovery rule to evaluate sessions.</p>|`.*`|
-|{$SESSION.RESULT.NOT_MATCHES}|<p>This macro is used in discovery rule to evaluate sessions.</p>|`Success`|
-|{$PROXIES.NAME.MATCHES}|<p>This macro is used in proxies discovery rule.</p>|`.*`|
-|{$PROXIES.NAME.NOT_MATCHES}|<p>This macro is used in proxies discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$PROXIES.TYPE.MATCHES}|<p>This macro is used in proxies discovery rule.</p>|`.*`|
-|{$PROXIES.TYPE.NOT_MATCHES}|<p>This macro is used in proxies discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$REPOSITORIES.NAME.MATCHES}|<p>This macro is used in repositories discovery rule.</p>|`.*`|
-|{$REPOSITORIES.NAME.NOT_MATCHES}|<p>This macro is used in repositories discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$REPOSITORIES.TYPE.MATCHES}|<p>This macro is used in repositories discovery rule.</p>|`.*`|
-|{$REPOSITORIES.TYPE.NOT_MATCHES}|<p>This macro is used in repositories discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$JOB.NAME.MATCHES}|<p>This macro is used in discovery rule to evaluate the states of jobs.</p>|`.*`|
-|{$JOB.NAME.NOT_MATCHES}|<p>This macro is used in discovery rule to evaluate the states of jobs.</p>|`CHANGE_IF_NEEDED`|
-|{$JOB.TYPE.MATCHES}|<p>This macro is used in discovery rule to evaluate the states of jobs.</p>|`.*`|
-|{$JOB.TYPE.NOT_MATCHES}|<p>This macro is used in discovery rule to evaluate the states of jobs.</p>|`CHANGE_IF_NEEDED`|
-|{$JOB.STATUS.MATCHES}|<p>This macro is used in discovery rule to evaluate the states of jobs.</p>|`.*`|
-|{$JOB.STATUS.NOT_MATCHES}|<p>This macro is used in discovery rule to evaluate the states of jobs.</p>|`CHANGE_IF_NEEDED`|
+|{$SESSION.NAME.MATCHES}|<p>Filter of discoverable sessions by name.</p>|`.*`|
+|{$SESSION.NAME.NOT_MATCHES}|<p>Filter to exclude discovered sessions by name.</p>|`CHANGE_IF_NEEDED`|
+|{$SESSION.TYPE.MATCHES}|<p>Filter of discoverable sessions by type.</p>|`.*`|
+|{$SESSION.TYPE.NOT_MATCHES}|<p>Filter to exclude discovered sessions by type.</p>|`CHANGE_IF_NEEDED`|
+|{$SESSION.RESULT.MATCHES}|<p>Filter of discoverable sessions by result.</p>|`.*`|
+|{$SESSION.RESULT.NOT_MATCHES}|<p>Filter to exclude discovered sessions by result.</p>|`Success`|
+|{$PROXIES.NAME.MATCHES}|<p>Filter of discoverable proxies by name.</p>|`.*`|
+|{$PROXIES.NAME.NOT_MATCHES}|<p>Filter to exclude discovered proxies by name.</p>|`CHANGE_IF_NEEDED`|
+|{$PROXIES.TYPE.MATCHES}|<p>Filter of discoverable proxies by type.</p>|`.*`|
+|{$PROXIES.TYPE.NOT_MATCHES}|<p>Filter to exclude discovered proxies by type.</p>|`CHANGE_IF_NEEDED`|
+|{$REPOSITORIES.NAME.MATCHES}|<p>Filter of discoverable repositories by name.</p>|`.*`|
+|{$REPOSITORIES.NAME.NOT_MATCHES}|<p>Filter to exclude discovered repositories by name.</p>|`CHANGE_IF_NEEDED`|
+|{$REPOSITORIES.TYPE.MATCHES}|<p>Filter of discoverable repositories by type.</p>|`.*`|
+|{$REPOSITORIES.TYPE.NOT_MATCHES}|<p>Filter to exclude discovered repositories by type.</p>|`CHANGE_IF_NEEDED`|
+|{$JOB.NAME.MATCHES}|<p>Filter of discoverable jobs by name.</p>|`.*`|
+|{$JOB.NAME.NOT_MATCHES}|<p>Filter to exclude discovered jobs by name.</p>|`CHANGE_IF_NEEDED`|
+|{$JOB.TYPE.MATCHES}|<p>Filter of discoverable jobs by type.</p>|`.*`|
+|{$JOB.TYPE.NOT_MATCHES}|<p>Filter to exclude discovered jobs by type.</p>|`CHANGE_IF_NEEDED`|
+|{$JOB.STATUS.MATCHES}|<p>Filter of discoverable jobs by status.</p>|`.*`|
+|{$JOB.STATUS.NOT_MATCHES}|<p>Filter to exclude discovered jobs by status.</p>|`CHANGE_IF_NEEDED`|
 |{$VEEAM.LICENSE.EXPIRY.WARN}|<p>Number of days until the license expires.</p>|`7`|
-|{$MALWARE_EVENTS.TYPE.MATCHES}|<p>This macro is used in the malware events discovery rule.</p>|`.*`|
-|{$MALWARE_EVENTS.TYPE.NOT_MATCHES}|<p>This macro is used in the malware events discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$MALWARE_EVENTS.SEVERITY.MATCHES}|<p>This macro is used in the malware events discovery rule.</p>|`.*`|
-|{$MALWARE_EVENTS.SEVERITY.NOT_MATCHES}|<p>This macro is used in the malware events discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$MALWARE_EVENTS.STATE.MATCHES}|<p>This macro is used in the malware events discovery rule.</p>|`.*`|
-|{$MALWARE_EVENTS.STATE.NOT_MATCHES}|<p>This macro is used in the malware events discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$SECURITY_ANALYZER.STATUS.MATCHES}|<p>This macro is used in the security analyzer discovery rule.</p>|`.*`|
-|{$SECURITY_ANALYZER.STATUS.NOT_MATCHES}|<p>This macro is used in the security analyzer discovery rule.</p>|`OK`|
-|{$SECURITY_ANALYZER.BEST_PRACTICE.MATCHES}|<p>This macro is used in the security analyzer discovery rule.</p>|`.*`|
-|{$SECURITY_ANALYZER.BEST_PRACTICE.NOT_MATCHES}|<p>This macro is used in the security analyzer discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AUTH_EVENTS.NAME.MATCHES}|<p>This macro is used in the authorization events discovery rule.</p>|`.*`|
-|{$AUTH_EVENTS.NAME.NOT_MATCHES}|<p>This macro is used in the authorization events discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AUTH_EVENTS.STATE.MATCHES}|<p>This macro is used in the authorization events discovery rule.</p>|`.*`|
-|{$AUTH_EVENTS.STATE.NOT_MATCHES}|<p>This macro is used in the authorization events discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$MALWARE_EVENTS.TYPE.MATCHES}|<p>Filter of discoverable malware events by type.</p>|`.*`|
+|{$MALWARE_EVENTS.TYPE.NOT_MATCHES}|<p>Filter to exclude discovered malware events by type.</p>|`CHANGE_IF_NEEDED`|
+|{$MALWARE_EVENTS.SEVERITY.MATCHES}|<p>Filter of discoverable malware events by severity.</p>|`.*`|
+|{$MALWARE_EVENTS.SEVERITY.NOT_MATCHES}|<p>Filter to exclude discovered malware events by severity.</p>|`CHANGE_IF_NEEDED`|
+|{$MALWARE_EVENTS.STATE.MATCHES}|<p>Filter of discoverable malware events by state.</p>|`.*`|
+|{$MALWARE_EVENTS.STATE.NOT_MATCHES}|<p>Filter to exclude discovered malware events by state.</p>|`CHANGE_IF_NEEDED`|
+|{$SECURITY_ANALYZER.STATUS.MATCHES}|<p>Filter of discoverable security best practices by status.</p>|`.*`|
+|{$SECURITY_ANALYZER.STATUS.NOT_MATCHES}|<p>Filter to exclude discovered security best practices by status.</p>|`OK`|
+|{$SECURITY_ANALYZER.BEST_PRACTICE.MATCHES}|<p>Filter of discoverable security best practices by name.</p>|`.*`|
+|{$SECURITY_ANALYZER.BEST_PRACTICE.NOT_MATCHES}|<p>Filter to exclude discovered security best practices by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AUTH_EVENTS.NAME.MATCHES}|<p>Filter of discoverable authorization events by name.</p>|`.*`|
+|{$AUTH_EVENTS.NAME.NOT_MATCHES}|<p>Filter to exclude discovered authorization events by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AUTH_EVENTS.STATE.MATCHES}|<p>Filter of discoverable authorization events by state.</p>|`.*`|
+|{$AUTH_EVENTS.STATE.NOT_MATCHES}|<p>Filter to exclude discovered authorization events by state.</p>|`CHANGE_IF_NEEDED`|
 |{$VEEAM.REPOSITORY.SPACE.WARN}|<p>Repository space warning threshold, expressed in %.</p>|`80`|
 
 ### Items
