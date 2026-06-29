@@ -109,7 +109,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'host'       => 'enc_agent',
 				'interfaces' => [
 					'type' => INTERFACE_TYPE_AGENT, 'main' => 1, 'useip' => 1,
-					'ip'   => '127.0.0.1', 'dns' => '', 'port' => $agent_port,
+					'ip'   => '127.0.0.1', 'dns' => '', 'port' => $agent_port
 				],
 				'groups' => $groups,
 				'status' => HOST_STATUS_NOT_MONITORED,
@@ -119,22 +119,22 @@ class testEncryptionDataCollection extends CIntegrationTest {
 						'key_'       => 'agent.ping',
 						'type'       => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay'      => '1s',
+						'delay'      => '1s'
 					],
 					[
 						'name'       => 'Enc hostname active',
 						'key_'       => 'agent.hostname',
 						'type'       => ITEM_TYPE_ZABBIX_ACTIVE,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
-						'delay'      => '1s',
-					],
-				],
+						'delay'      => '1s'
+					]
+				]
 			],
 			[
 				'host'       => 'enc_agent2',
 				'interfaces' => [
 					'type' => INTERFACE_TYPE_AGENT, 'main' => 1, 'useip' => 1,
-					'ip'   => '127.0.0.1', 'dns' => '', 'port' => $agent2_port,
+					'ip'   => '127.0.0.1', 'dns' => '', 'port' => $agent2_port
 				],
 				'groups' => $groups,
 				'status' => HOST_STATUS_NOT_MONITORED,
@@ -144,22 +144,22 @@ class testEncryptionDataCollection extends CIntegrationTest {
 						'key_'       => 'agent.ping',
 						'type'       => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay'      => '1s',
+						'delay'      => '1s'
 					],
 					[
 						'name'       => 'Enc2 hostname active',
 						'key_'       => 'agent.hostname',
 						'type'       => ITEM_TYPE_ZABBIX_ACTIVE,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
-						'delay'      => '1s',
-					],
-				],
+						'delay'      => '1s'
+					]
+				]
 			],
 			[
 				'host'       => 'enc_trapper',
 				'interfaces' => [
 					'type' => INTERFACE_TYPE_AGENT, 'main' => 1, 'useip' => 1,
-					'ip'   => '127.0.0.1', 'dns' => '', 'port' => $agent_port,
+					'ip'   => '127.0.0.1', 'dns' => '', 'port' => $agent_port
 				],
 				'groups'      => $groups,
 				'status'      => HOST_STATUS_NOT_MONITORED,
@@ -172,9 +172,9 @@ class testEncryptionDataCollection extends CIntegrationTest {
 						'key_'       => self::TRAPPER_ITEM_KEY,
 						'type'       => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
-					],
-				],
-			],
+					]
+				]
+			]
 		]);
 
 		self::$hostids = $result['hostids'];
