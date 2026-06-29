@@ -204,11 +204,13 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			}
 			else {
 				$data += [
-					'name' => $this->getInput('name', $db_defaults['name']),
+					'name' => $this->getInput('name', $this->role['name']),
 					'type' => $this->getInput('type', $this->role['type']),
 					'rules' => array_merge(
-						$this->getRulesDefaults((int) $this->getInput('type', $this->role['type'])),
-						$this->getRules($this->getRulesInput($this->getInput('type', $this->role['type'])))
+						$this->getRulesByRoleid($this->role['roleid']),
+						$this->getRules(
+							$this->getRulesInput($this->getInput('type', $this->role['type']), $this->role['rules'])
+						)
 					)
 				];
 			}
@@ -305,7 +307,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'roleids' => $roleid
 		]);
 
-		return $this->getRules($roles[0]['rules']);
+		$this->role['rules'] = $this->getRules($roles[0]['rules']);
+
+		return $this->role['rules'];
 	}
 
 	private function getRules(array $input): array {
@@ -344,6 +348,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		foreach ($input['modules'] as $rule) {
 			$rules['modules'][$rule['moduleid']] = $rule['status'];
 		}
+
+		$rules['api'] = [];
 
 		if ($input['api']) {
 			$rules['api'] = array_map(
