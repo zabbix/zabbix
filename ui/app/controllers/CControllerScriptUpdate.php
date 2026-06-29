@@ -131,7 +131,7 @@ class CControllerScriptUpdate extends CController {
 				'use' => [CUrlValidator::class, [
 					'user_macro' => true,
 					'manualinput_macro' => true,
-					'scheme' => CSettingsHelper::getAllowedUriSchemes()
+					'schemes' => CSettingsHelper::getAllowedUriSchemes()
 				]],
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_URL]]
 			],
