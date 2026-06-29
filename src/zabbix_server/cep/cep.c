@@ -562,6 +562,32 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: load CEP rule errors from database into cache                     *
+ *                                                                            *
+ * Parameters: cache - [IN/OUT] cache context                                 *
+ *             db    - [IN]     database connection                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_load_rule_errors(zbx_cep_t *cep, zbx_dbconn_t *db)
+{
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+
+	result = zbx_dbconn_select(db, "select cep_ruleid,error from cep_rule_rtdata where error<>''");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	ruleid;
+
+		ZBX_STR2UINT64(ruleid, row[0]);
+		cep_rule_set_error(cep, ruleid, row[1]);
+	}
+
+	zbx_db_free_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: create item diff record marking an item as not supported          *
  *                                                                            *
  * Parameters: itemid - [IN] item ID                                          *
@@ -831,6 +857,7 @@ void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool)
 
 	cep_load_problems(cep, db);
 	cep_load_maintenances(cep, db);
+	cep_load_rule_errors(cep, db);
 
 	zbx_dbconn_pool_release_connection(dbpool, db);
 }

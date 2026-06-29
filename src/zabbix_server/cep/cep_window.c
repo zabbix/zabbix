@@ -252,11 +252,12 @@ void	cep_window_simple_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
 
 	cep_window_pool_acquire(&pool);
-	window = cep_window_pool_get_or_create_window(pool, rule, ctx, &error);
-	window->access_num++;
+	if (NULL != (window = cep_window_pool_get_or_create_window(pool, rule, ctx, &error)))
+		window->access_num++;
 	cep_window_pool_release(&pool);
 
-	if (SUCCEED != cep_rule_handle_error(rule, &error, tasks))
+	cep_rule_handle_error(rule, &error, tasks);
+	if (NULL == window)
 		goto out;
 
 	cep_window_lock(window);
@@ -309,7 +310,7 @@ void	cep_window_simple_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 	}
 
 	limit_update = cep_window_get_limits(rule, &duration, &capacity, &error);
-	(void)cep_rule_handle_error(rule, &error, tasks);
+	cep_rule_handle_error(rule, &error, tasks);
 
 	cep_window_lock(window);
 
@@ -432,11 +433,12 @@ void	cep_window_causal_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_c
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
 
 	cep_window_pool_acquire(&pool);
-	window = cep_window_pool_get_or_create_window(pool, rule, ctx, &error);
-	window->access_num++;
+	if (NULL != (window = cep_window_pool_get_or_create_window(pool, rule, ctx, &error)))
+		window->access_num++;
 	cep_window_pool_release(&pool);
 
-	if (SUCCEED != cep_rule_handle_error(rule, &error, tasks))
+	cep_rule_handle_error(rule, &error, tasks);
+	if (NULL == window)
 		goto out;
 
 	if (0 == atomic_load(&window->nextcheck))
@@ -515,7 +517,7 @@ void	cep_window_causal_process(zbx_cep_window_t *window, time_t now, zbx_vector_
 	}
 
 	limit_update = cep_window_get_limits(rule, &duration, &capacity, &error);
-	(void)cep_rule_handle_error(rule, &error, tasks);
+	cep_rule_handle_error(rule, &error, tasks);
 
 	cep_window_lock(window);
 
@@ -569,11 +571,12 @@ void	cep_window_js_process_event(const zbx_cep_rule_t *rule, zbx_cep_event_conte
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
 
 	cep_window_pool_acquire(&pool);
-	window = cep_window_pool_get_or_create_window(pool, rule, ctx, &error);
-	window->access_num++;
+	if (NULL != (window = cep_window_pool_get_or_create_window(pool, rule, ctx, &error)))
+		window->access_num++;
 	cep_window_pool_release(&pool);
 
-	if (SUCCEED != cep_rule_handle_error(rule, &error, tasks))
+	cep_rule_handle_error(rule, &error, tasks);
+	if (NULL == window)
 		goto out;
 
 	cep_window_lock(window);
@@ -757,7 +760,7 @@ enqueue:
 
 out:
 	if (NULL != rule)
-		(void)cep_rule_handle_error(rule, &error, tasks);
+		cep_rule_handle_error(rule, &error, tasks);
 
 	zbx_free(error);
 
