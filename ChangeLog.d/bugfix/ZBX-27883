@@ -1,0 +1,1 @@
+..F....... [ZBX-27883] fixed inability to copy trigger prototypes which depends on the same trigger prototype when cloning template or host (vmaksimovs)
