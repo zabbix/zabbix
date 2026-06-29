@@ -171,7 +171,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 						'name'       => 'Enc trapper',
 						'key_'       => self::TRAPPER_ITEM_KEY,
 						'type'       => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_TEXT,
+						'value_type' => ITEM_VALUE_TYPE_TEXT
 					]
 				]
 			]
@@ -227,7 +227,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 			'agent2_key' => $dir.'agent2.key', 'agent2_csr' => $dir.'agent2.csr',
 			'agent2_crt' => $dir.'agent2.crt',
 			'proxy_key'  => $dir.'proxy.key',  'proxy_csr'  => $dir.'proxy.csr',
-			'proxy_crt'  => $dir.'proxy.crt',
+			'proxy_crt'  => $dir.'proxy.crt'
 		];
 
 		shell_exec("openssl genrsa -out {$f['ca_key']} 4096 2>/dev/null");
@@ -238,7 +238,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 			['server', 'CN=zabbix_server'],
 			['agent',  'CN=zabbix_agent'],
 			['agent2', 'CN=zabbix_agent2'],
-			['proxy',  'CN=zabbix_proxy'],
+			['proxy',  'CN=zabbix_proxy']
 		] as [$name, $subj]) {
 			shell_exec("openssl genrsa -out {$f[$name.'_key']} 2048 2>/dev/null");
 			shell_exec("openssl req -new -key {$f[$name.'_key']} -out {$f[$name.'_csr']}".
@@ -285,7 +285,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 			'default_crl_days = 1',
 			'',
 			'[policy_anything]',
-			'commonName = supplied',
+			'commonName = supplied'
 		]));
 
 		if (null !== $revoke_crt) {
@@ -358,7 +358,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 			'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
 			'tls_accept'  => HOST_ENCRYPTION_CERTIFICATE,
 			'tls_issuer'  => $issuer,
-			'tls_subject' => $subject,
+			'tls_subject' => $subject
 		]);
 	}
 
@@ -374,7 +374,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 			'tls_connect'      => HOST_ENCRYPTION_PSK,
 			'tls_accept'       => HOST_ENCRYPTION_PSK,
 			'tls_psk_identity' => self::PSK_IDENTITY,
-			'tls_psk'          => self::PSK_KEY,
+			'tls_psk'          => self::PSK_KEY
 		]);
 	}
 
@@ -408,7 +408,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'UnreachableDelay'  => 1,
 				'TLSCAFile'         => $c['ca_crt'],
 				'TLSCertFile'       => $c['server_crt'],
-				'TLSKeyFile'        => $c['server_key'],
+				'TLSKeyFile'        => $c['server_key']
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname'             => 'enc_agent',
@@ -420,8 +420,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCertFile'          => $c['agent_crt'],
 				'TLSKeyFile'           => $c['agent_key'],
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
-				'TLSServerCertSubject' => 'CN=zabbix_server',
-			],
+				'TLSServerCertSubject' => 'CN=zabbix_server'
+			]
 		];
 	}
 
@@ -438,7 +438,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "enc_agent": interface became available',
-			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored'
 		]);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'zbx_tls_connect() peer certificate issuer:"CN=ZabbixTestCA" subject:"CN=zabbix_agent"');
@@ -449,7 +449,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		$data = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'history' => ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertNotEmpty($data['result'], 'No passive agent data collected with cert encryption');
 		foreach ($data['result'] as $row) {
@@ -474,7 +474,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'UnreachableDelay'  => 1,
 				'TLSCAFile'         => $c['ca_crt'],
 				'TLSCertFile'       => $c['server_crt'],
-				'TLSKeyFile'        => $c['server_key'],
+				'TLSKeyFile'        => $c['server_key']
 			],
 			self::COMPONENT_AGENT2 => [
 				'Hostname'             => 'enc_agent2',
@@ -487,8 +487,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCertFile'          => $c['agent2_crt'],
 				'TLSKeyFile'           => $c['agent2_key'],
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
-				'TLSServerCertSubject' => 'CN=zabbix_server',
-			],
+				'TLSServerCertSubject' => 'CN=zabbix_server'
+			]
 		];
 	}
 
@@ -505,7 +505,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "enc_agent2": interface became available',
-			'resuming Zabbix agent checks on host "enc_agent2": connection restored',
+			'resuming Zabbix agent checks on host "enc_agent2": connection restored'
 		]);
 
 		// Passive: server → agent2
@@ -520,7 +520,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		$passive = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent2:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'history' => ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertNotEmpty($passive['result'], 'No passive Agent 2 data collected');
 		foreach ($passive['result'] as $row) {
@@ -533,7 +533,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		$active = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent2:agent.hostname'],
-			'history' => ITEM_VALUE_TYPE_TEXT,
+			'history' => ITEM_VALUE_TYPE_TEXT
 		]);
 		$this->assertNotEmpty($active['result'], 'No active Agent 2 data collected');
 		foreach ($active['result'] as $row) {
@@ -560,7 +560,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCAFile'         => $c['ca_crt'],
 				'TLSCertFile'       => $c['server_crt'],
 				'TLSKeyFile'        => $c['server_key'],
-				'TLSCRLFile'        => $crl,
+				'TLSCRLFile'        => $crl
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname'             => 'enc_agent',
@@ -573,8 +573,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSKeyFile'           => $c['agent_key'],
 				'TLSCRLFile'           => $crl,
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
-				'TLSServerCertSubject' => 'CN=zabbix_server',
-			],
+				'TLSServerCertSubject' => 'CN=zabbix_server'
+			]
 		];
 	}
 
@@ -591,14 +591,14 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "enc_agent": interface became available',
-			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored'
 		]);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_tls_connect():SUCCEED (established TLS');
 
 		$data = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'history' => ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertNotEmpty($data['result'], 'No data collected with empty TLSCRLFile');
 	}
@@ -622,7 +622,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCAFile'         => $c['ca_crt'],
 				'TLSCertFile'       => $c['server_crt'],
 				'TLSKeyFile'        => $c['server_key'],
-				'TLSCRLFile'        => $crl,
+				'TLSCRLFile'        => $crl
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname'             => 'enc_agent',
@@ -635,8 +635,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSKeyFile'           => $c['agent_key'],
 				'TLSCRLFile'           => $crl,
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
-				'TLSServerCertSubject' => 'CN=zabbix_server',
-			],
+				'TLSServerCertSubject' => 'CN=zabbix_server'
+			]
 		];
 	}
 
@@ -655,14 +655,14 @@ class testEncryptionDataCollection extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'certificate revoked',
 			'failed to accept an incoming connection',
-			'TLS handshake',
+			'TLS handshake'
 		], true, 30);
 
 		// No history must have been collected during this test run
 		$data = $this->call('history.get', [
 			'itemids'   => self::$itemids['enc_agent:agent.ping'],
 			'history'   => ITEM_VALUE_TYPE_UINT64,
-			'time_from' => $start_time,
+			'time_from' => $start_time
 		]);
 		$this->assertEmpty($data['result'],
 			'Data was collected despite a revoked agent certificate in TLSCRLFile');
@@ -687,7 +687,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCertFile'       => $c['server_crt'],
 				'TLSKeyFile'        => $c['server_key'],
 				'TLSCipherCert'     => self::CIPHER_CERT_TLS12,
-				'TLSCipherCert13'   => self::CIPHER_CERT_TLS13,
+				'TLSCipherCert13'   => self::CIPHER_CERT_TLS13
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname'             => 'enc_agent',
@@ -701,8 +701,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
 				'TLSServerCertSubject' => 'CN=zabbix_server',
 				'TLSCipherCert'        => self::CIPHER_CERT_TLS12,
-				'TLSCipherCert13'      => self::CIPHER_CERT_TLS13,
-			],
+				'TLSCipherCert13'      => self::CIPHER_CERT_TLS13
+			]
 		];
 	}
 
@@ -720,14 +720,14 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "enc_agent": interface became available',
-			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored'
 		]);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_tls_connect():SUCCEED (established TLS');
 
 		$data = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'history' => ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertNotEmpty($data['result'],
 			'No data collected with TLSCipherCert / TLSCipherCert13 configured');
@@ -748,7 +748,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'UnavailableDelay'  => 5,
 				'UnreachableDelay'  => 1,
 				'TLSCipherPSK'      => self::CIPHER_PSK_TLS12,
-				'TLSCipherPSK13'    => self::CIPHER_PSK_TLS13,
+				'TLSCipherPSK13'    => self::CIPHER_PSK_TLS13
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname'       => 'enc_agent',
@@ -759,8 +759,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSPSKIdentity' => self::PSK_IDENTITY,
 				'TLSPSKFile'     => self::$pskFile,
 				'TLSCipherPSK'   => self::CIPHER_PSK_TLS12,
-				'TLSCipherPSK13' => self::CIPHER_PSK_TLS13,
-			],
+				'TLSCipherPSK13' => self::CIPHER_PSK_TLS13
+			]
 		];
 	}
 
@@ -778,14 +778,14 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "enc_agent": interface became available',
-			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored'
 		]);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_tls_connect():SUCCEED (established TLS');
 
 		$data = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'history' => ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertNotEmpty($data['result'],
 			'No data collected with TLSCipherPSK / TLSCipherPSK13 configured');
@@ -810,7 +810,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCertFile'       => $c['server_crt'],
 				'TLSKeyFile'        => $c['server_key'],
 				'TLSCipherAll'      => self::CIPHER_ALL_TLS12,
-				'TLSCipherAll13'    => self::CIPHER_ALL_TLS13,
+				'TLSCipherAll13'    => self::CIPHER_ALL_TLS13
 			],
 			// TLSCipherAll on agentd requires ctx_all (the combined cert+PSK SSL context), which is
 			// only created when both cert AND PSK are configured.  Without a PSK file the agent has
@@ -830,8 +830,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSPSKIdentity'       => self::PSK_IDENTITY,
 				'TLSPSKFile'           => self::$pskFile,
 				'TLSCipherAll'         => self::CIPHER_ALL_TLS12,
-				'TLSCipherAll13'       => self::CIPHER_ALL_TLS13,
-			],
+				'TLSCipherAll13'       => self::CIPHER_ALL_TLS13
+			]
 		];
 	}
 
@@ -849,14 +849,14 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "enc_agent": interface became available',
-			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored'
 		]);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_tls_connect():SUCCEED (established TLS');
 
 		$data = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'history' => ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertNotEmpty($data['result'],
 			'No data collected with TLSCipherAll / TLSCipherAll13 configured');
@@ -876,8 +876,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'DebugLevel' => 4,
 				'TLSCAFile'  => $c['ca_crt'],
 				'TLSCertFile'=> $c['server_crt'],
-				'TLSKeyFile' => $c['server_key'],
-			],
+				'TLSKeyFile' => $c['server_key']
+			]
 		];
 	}
 
@@ -912,7 +912,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		$data = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_trapper:'.self::TRAPPER_ITEM_KEY],
-			'history' => ITEM_VALUE_TYPE_TEXT,
+			'history' => ITEM_VALUE_TYPE_TEXT
 		]);
 		$this->assertNotEmpty($data['result'], 'No history from cert-encrypted sender');
 		$this->assertEquals($value, $data['result'][0]['value'],
@@ -945,7 +945,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'UnreachableDelay'  => 1,
 				'TLSCAFile'         => $c['ca_crt'],
 				'TLSCertFile'       => $c['server_crt'],
-				'TLSKeyFile'        => $c['server_key'],
+				'TLSKeyFile'        => $c['server_key']
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname'             => 'enc_agent',
@@ -957,7 +957,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCertFile'          => $c['agent_crt'],
 				'TLSKeyFile'           => $c['agent_key'],
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
-				'TLSServerCertSubject' => 'CN=zabbix_server',
+				'TLSServerCertSubject' => 'CN=zabbix_server'
 			],
 			self::COMPONENT_AGENT2 => [
 				'Hostname'             => 'enc_agent2',
@@ -969,8 +969,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCertFile'          => $c['agent2_crt'],
 				'TLSKeyFile'           => $c['agent2_key'],
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
-				'TLSServerCertSubject' => 'CN=zabbix_server',
-			],
+				'TLSServerCertSubject' => 'CN=zabbix_server'
+			]
 		];
 
 		if ($isGnutls) {
@@ -1006,14 +1006,14 @@ class testEncryptionDataCollection extends CIntegrationTest {
 		// Agent 1
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "enc_agent": interface became available',
-			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored'
 		]);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_tls_connect():SUCCEED (established TLS');
 
 		$data1 = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'history' => ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertNotEmpty($data1['result'],
 			'No agent data collected in libgnutls test');
@@ -1021,12 +1021,12 @@ class testEncryptionDataCollection extends CIntegrationTest {
 		// Agent 2
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "enc_agent2": interface became available',
-			'resuming Zabbix agent checks on host "enc_agent2": connection restored',
+			'resuming Zabbix agent checks on host "enc_agent2": connection restored'
 		]);
 
 		$data2 = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent2:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'history' => ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertNotEmpty($data2['result'],
 			'No Agent 2 data collected in libgnutls test');
@@ -1051,7 +1051,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCertFile'       => $c['server_crt'],
 				'TLSKeyFile'        => $c['server_key'],
 				'TLSCipherCert'     => self::CIPHER_CERT_TLS12_AES256,
-				'TLSCipherCert13'   => self::CIPHER_CERT_TLS13_AES256,
+				'TLSCipherCert13'   => self::CIPHER_CERT_TLS13_AES256
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname'             => 'enc_agent',
@@ -1065,8 +1065,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
 				'TLSServerCertSubject' => 'CN=zabbix_server',
 				'TLSCipherCert'        => self::CIPHER_CERT_TLS12_AES256,
-				'TLSCipherCert13'      => self::CIPHER_CERT_TLS13_AES256,
-			],
+				'TLSCipherCert13'      => self::CIPHER_CERT_TLS13_AES256
+			]
 		];
 	}
 
@@ -1084,14 +1084,14 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "enc_agent": interface became available',
-			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored'
 		]);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_tls_connect():SUCCEED (established TLS');
 
 		$data = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'history' => ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertNotEmpty($data['result'],
 			'No data collected with AES-256 TLSCipherCert / TLSCipherCert13');
@@ -1112,7 +1112,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'UnavailableDelay'  => 5,
 				'UnreachableDelay'  => 1,
 				'TLSCipherPSK'      => self::CIPHER_PSK_TLS12_CHACHA,
-				'TLSCipherPSK13'    => self::CIPHER_PSK_TLS13_CHACHA,
+				'TLSCipherPSK13'    => self::CIPHER_PSK_TLS13_CHACHA
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname'       => 'enc_agent',
@@ -1123,8 +1123,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSPSKIdentity' => self::PSK_IDENTITY,
 				'TLSPSKFile'     => self::$pskFile,
 				'TLSCipherPSK'   => self::CIPHER_PSK_TLS12_CHACHA,
-				'TLSCipherPSK13' => self::CIPHER_PSK_TLS13_CHACHA,
-			],
+				'TLSCipherPSK13' => self::CIPHER_PSK_TLS13_CHACHA
+			]
 		];
 	}
 
@@ -1143,14 +1143,14 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "enc_agent": interface became available',
-			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored'
 		]);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_tls_connect():SUCCEED (established TLS');
 
 		$data = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'history' => ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertNotEmpty($data['result'],
 			'No data collected with CHACHA20-POLY1305 TLSCipherPSK / TLSCipherPSK13');
@@ -1175,7 +1175,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCertFile'       => $c['server_crt'],
 				'TLSKeyFile'        => $c['server_key'],
 				'TLSCipherAll'      => self::CIPHER_ALL_TLS12_AES256,
-				'TLSCipherAll13'    => self::CIPHER_ALL_TLS13_AES256,
+				'TLSCipherAll13'    => self::CIPHER_ALL_TLS13_AES256
 			],
 			// Same ctx_all requirement as configProviderCipherAll: PSK must be present so that
 			// the combined cert+PSK SSL context is built and TLSCipherAll is actually applied.
@@ -1193,8 +1193,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSPSKIdentity'       => self::PSK_IDENTITY,
 				'TLSPSKFile'           => self::$pskFile,
 				'TLSCipherAll'         => self::CIPHER_ALL_TLS12_AES256,
-				'TLSCipherAll13'       => self::CIPHER_ALL_TLS13_AES256,
-			],
+				'TLSCipherAll13'       => self::CIPHER_ALL_TLS13_AES256
+			]
 		];
 	}
 
@@ -1212,14 +1212,14 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "enc_agent": interface became available',
-			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored'
 		]);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_tls_connect():SUCCEED (established TLS');
 
 		$data = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'history' => ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertNotEmpty($data['result'],
 			'No data collected with AES-256 TLSCipherAll / TLSCipherAll13');
@@ -1244,7 +1244,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCertFile'       => $c['server_crt'],
 				'TLSKeyFile'        => $c['server_key'],
 				'TLSCipherCert'     => self::CIPHER_MISMATCH_SERVER_TLS12,
-				'TLSCipherCert13'   => self::CIPHER_MISMATCH_SERVER_TLS13,
+				'TLSCipherCert13'   => self::CIPHER_MISMATCH_SERVER_TLS13
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname'             => 'enc_agent',
@@ -1258,8 +1258,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
 				'TLSServerCertSubject' => 'CN=zabbix_server',
 				'TLSCipherCert'        => self::CIPHER_MISMATCH_AGENT_TLS12,
-				'TLSCipherCert13'      => self::CIPHER_MISMATCH_AGENT_TLS13,
-			],
+				'TLSCipherCert13'      => self::CIPHER_MISMATCH_AGENT_TLS13
+			]
 		];
 	}
 
@@ -1284,13 +1284,13 @@ class testEncryptionDataCollection extends CIntegrationTest {
 			'handshake failure',
 			'SSL_accept() failed',
 			'failed to accept an incoming connection',
-			'zbx_tls_accept(): handshake',
+			'zbx_tls_accept(): handshake'
 		], true, 30);
 
 		$data = $this->call('history.get', [
 			'itemids'   => self::$itemids['enc_agent:agent.ping'],
 			'history'   => ITEM_VALUE_TYPE_UINT64,
-			'time_from' => $start_time,
+			'time_from' => $start_time
 		]);
 		$this->assertEmpty($data['result'],
 			'Data was collected despite non-overlapping cipher lists on server and agent');
@@ -1315,7 +1315,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCertFile'       => $c['server_crt'],
 				'TLSKeyFile'        => $c['server_key'],
 				'TLSCipherCert'     => self::GNUTLS_CIPHER_CERT_TLS12_TLS13,
-				'TLSCipherAll'      => self::GNUTLS_CIPHER_CERT_TLS12_TLS13,
+				'TLSCipherAll'      => self::GNUTLS_CIPHER_CERT_TLS12_TLS13
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname'             => 'enc_agent',
@@ -1329,8 +1329,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
 				'TLSServerCertSubject' => 'CN=zabbix_server',
 				'TLSCipherCert'        => self::GNUTLS_CIPHER_CERT_TLS12_TLS13,
-				'TLSCipherAll'         => self::GNUTLS_CIPHER_CERT_TLS12_TLS13,
-			],
+				'TLSCipherAll'         => self::GNUTLS_CIPHER_CERT_TLS12_TLS13
+			]
 		];
 	}
 
@@ -1354,14 +1354,14 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "enc_agent": interface became available',
-			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored'
 		]);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_tls_connect():SUCCEED (established TLS');
 
 		$data = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'history' => ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertNotEmpty($data['result'],
 			'No data collected with GnuTLS TLS 1.2+1.3 combined priority string');
@@ -1382,7 +1382,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'UnavailableDelay'  => 5,
 				'UnreachableDelay'  => 1,
 				'TLSCipherPSK'      => self::GNUTLS_CIPHER_PSK,
-				'TLSCipherAll'      => self::GNUTLS_CIPHER_PSK,
+				'TLSCipherAll'      => self::GNUTLS_CIPHER_PSK
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname'       => 'enc_agent',
@@ -1393,8 +1393,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSPSKIdentity' => self::PSK_IDENTITY,
 				'TLSPSKFile'     => self::$pskFile,
 				'TLSCipherPSK'   => self::GNUTLS_CIPHER_PSK,
-				'TLSCipherAll'   => self::GNUTLS_CIPHER_PSK,
-			],
+				'TLSCipherAll'   => self::GNUTLS_CIPHER_PSK
+			]
 		];
 	}
 
@@ -1417,14 +1417,14 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "enc_agent": interface became available',
-			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored'
 		]);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_tls_connect():SUCCEED (established TLS');
 
 		$data = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'history' => ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertNotEmpty($data['result'],
 			'No data collected with GnuTLS PSK AES-128 priority string');
@@ -1449,7 +1449,7 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSCertFile'       => $c['server_crt'],
 				'TLSKeyFile'        => $c['server_key'],
 				'TLSCipherCert'     => self::GNUTLS_CIPHER_CERT_AES256,
-				'TLSCipherAll'      => self::GNUTLS_CIPHER_CERT_AES256,
+				'TLSCipherAll'      => self::GNUTLS_CIPHER_CERT_AES256
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname'             => 'enc_agent',
@@ -1463,8 +1463,8 @@ class testEncryptionDataCollection extends CIntegrationTest {
 				'TLSServerCertIssuer'  => 'CN=ZabbixTestCA',
 				'TLSServerCertSubject' => 'CN=zabbix_server',
 				'TLSCipherCert'        => self::GNUTLS_CIPHER_CERT_AES256,
-				'TLSCipherAll'         => self::GNUTLS_CIPHER_CERT_AES256,
-			],
+				'TLSCipherAll'         => self::GNUTLS_CIPHER_CERT_AES256
+			]
 		];
 	}
 
@@ -1488,14 +1488,14 @@ class testEncryptionDataCollection extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "enc_agent": interface became available',
-			'resuming Zabbix agent checks on host "enc_agent": connection restored',
+			'resuming Zabbix agent checks on host "enc_agent": connection restored'
 		]);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_tls_connect():SUCCEED (established TLS');
 
 		$data = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['enc_agent:agent.ping'],
-			'history' => ITEM_VALUE_TYPE_UINT64,
+			'history' => ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertNotEmpty($data['result'],
 			'No data collected with GnuTLS AES-256 priority string');
