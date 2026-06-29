@@ -224,7 +224,7 @@
 				curl.setArgument('page', page);
 			}
 
-			slideshow = slideshow || url.getArgument('slideshow');
+			slideshow = slideshow ?? url.getArgument('slideshow');
 
 			if (slideshow !== null) {
 				curl.setArgument('slideshow', slideshow);
