@@ -84,7 +84,8 @@ var LldRuleEditLldRuleTab = class {
 
 		jQuery('#delay-flex-table').dynamicRows({
 			template: '#delay-flex-row-tmpl',
-			rows: lldrule.delay_flex
+			rows: lldrule.delay_flex,
+			allow_empty: true
 		});
 
 		this.#host_interface_selector = new HostInterfaceSelector({
