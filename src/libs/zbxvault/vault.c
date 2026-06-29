@@ -53,16 +53,17 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 				0 == zbx_strcmp_null(config_vault->name, ZBX_HASHICORP_NAME))
 		{
 			*error = zbx_dsprintf(*error, "at least one configuration parameter "
-				"(\"VaultToken\" or \"VaultAppRoleID\")"
-				" or corresponding environment variable is required");
+					"(\"VaultToken\" or \"VaultAppRoleID\")"
+					" or corresponding environment variable is required");
 			return FAIL;
 		}
 
 		if (NULL != config_vault->token && NULL != config_vault->app_role_id)
 		{
-			*error = zbx_dsprintf(*error, "either \"VaultToken\" or \"VaultAppRoleID\""
-				" configuration parameter or corresponding environment"
-				" variable can be defined but not both");
+			*error = zbx_dsprintf(*error, "invalid configuration:"
+					" either \"VaultToken\" or \"VaultAppRoleID\""
+					" configuration parameter or corresponding environment"
+					" variable can be defined but not both");
 			return FAIL;
 		}
 
@@ -175,7 +176,7 @@ int	zbx_vault_db_credentials_get(zbx_config_vault_t *config_vault, char **dbuser
 
 		if (NULL == config_vault->token)
 		{
-			*error = zbx_dsprintf(*error, "cannot login with AppRole method");
+			*error = zbx_dsprintf(*error, "cannot login with AppRole method (see Zabbix server logfile)");
 			goto fail;
 		}
 	}
