@@ -818,21 +818,28 @@ class testDocumentationLinks extends CWebTest {
 			// #71 Template LLD rule list view.
 			[
 				[
-					'url' => 'host_discovery.php?context=template',
+					'url' => 'zabbix.php?action=lldrule.list&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery'
 				]
 			],
 			// #72 Template LLD rule configuration form.
 			[
 				[
-					'url' => 'host_discovery.php?form=create&hostid=15000&context=template',
-					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
+					'url' => 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids[0]=15000&context=template',
+					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create discovery rule'
+						]
+					]
 				]
 			],
 			// #73 Template LLD rule test form.
 			[
 				[
-					'url' => 'host_discovery.php?form=update&itemid=15011&context=template',
+
+					'url' => 'zabbix.php?action=popup&popup=lldrule.edit&context=template&itemid=15011',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -988,7 +995,8 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?parent_discoveryid={template_discoveryid}&context=template',
+
+					'url' => 'zabbix.php?action=lldrule.prototype.list&parent_discoveryid={template_discoveryid}&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery'
 				]
 			],
@@ -996,26 +1004,32 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=create&hostid={templateid}'.
-						'&parent_discoveryid={template_discoveryid}&context=template',
-					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
+					'url' => 'zabbix.php?action=lldrule.prototype.list&parent_discoveryid={template_discoveryid}&context=template',
+					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create discovery prototype'
+						]
+					]
 				]
 			],
 			// #91 Template LLD rule prototype edit form.
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=update&itemid='.
-						'{template_item_prototypeid}&parent_discoveryid={template_discoveryid}&context=template',
+					'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&context=template'.
+							'&itemid={template_item_prototypeid}&parent_discoveryid={template_discoveryid}',
 					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
+
 				]
 			],
 			// #92 Template LLD rule prototype test form.
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=update&itemid='.
-						'{template_item_prototypeid}&parent_discoveryid={template_discoveryid}&context=template',
+					'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&context=template'.
+							'&itemid={template_item_prototypeid}&parent_discoveryid={template_discoveryid}',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -1218,21 +1232,28 @@ class testDocumentationLinks extends CWebTest {
 			// #114 Host LLD rule list view.
 			[
 				[
-					'url' => 'host_discovery.php?context=host',
+					'url' => 'zabbix.php?action=lldrule.list&context=host&filter_rst=1',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery'
 				]
 			],
 			// #115 Host LLD rule configuration form.
 			[
 				[
-					'url' => 'host_discovery.php?form=create&hostid=40001&context=host',
-					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
+
+					'url' => 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids[0]=40001&context=host',
+					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create discovery rule'
+						]
+					]
 				]
 			],
 			// #116 Host LLD rule test form.
 			[
 				[
-					'url' => 'host_discovery.php?form=update&itemid=90001&context=host',
+					'url' => 'zabbix.php?action=popup&popup=lldrule.edit&itemid=90001&context=host',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -1384,7 +1405,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?parent_discoveryid={discoveryid}&context=host',
+					'url' => 'zabbix.php?action=lldrule.prototype.list&parent_discoveryid={discoveryid}&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery'
 				]
 			],
@@ -1392,17 +1413,22 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=create&hostid={hostid}'.
-						'&parent_discoveryid={discoveryid}&context=host',
-					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
+					'url' => 'zabbix.php?action=lldrule.prototype.list&parent_discoveryid={discoveryid}&context=host',
+					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create discovery prototype'
+						]
+					]
 				]
 			],
 			// #134 Host LLD rule prototype edit form.
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=update&itemid={item_prototypeid}'.
-						'&parent_discoveryid={discoveryid}&context=host',
+					'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={item_prototypeid}'.
+							'&parent_discoveryid={discoveryid}&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
 				]
 			],
@@ -1410,8 +1436,8 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'host_discovery_prototypes.php?form=update&itemid={item_prototypeid}'.
-						'&parent_discoveryid={discoveryid}&context=host',
+					'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={item_prototypeid}'.
+							'&parent_discoveryid={discoveryid}&context=host',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',

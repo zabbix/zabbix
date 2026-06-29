@@ -3886,7 +3886,14 @@ abstract class testFormPreprocessing extends CWebTest {
 		$message = ($item === 'Discovery rule') ? $item.' created' : $item.' added';
 		$this->assertMessage(TEST_GOOD, $message);
 
-		// Open cloned item and check preprocessing steps in saved form.
+		// Open cloned item and check preprocessing steps in saved form. LLD list requires to remove filtering by host.
+		if ($item === 'Discovery rule') {
+			$filter = $this->query('name:zbx_filter')->one()->asForm();
+			$filter->getField('Hosts')->fill('');
+			$filter->submit();
+			$this->page->waitUntilReady();
+		}
+
 		$this->query('link', $cloned_values['Name'])->waitUntilCLickable()->one()->click();
 		$form->invalidate();
 		$this->assertEquals($cloned_values['Name'], $form->getField('Name')->getValue());

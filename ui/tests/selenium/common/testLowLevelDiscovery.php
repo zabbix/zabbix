@@ -1470,12 +1470,10 @@ class testLowLevelDiscovery extends CWebTest {
 						'HTTP proxy' => '      {$MACRO}           ',
 						'HTTP authentication' => 'Basic',
 						'id:http_username' => '         {$MACRO}        ',
-						'id:http_password' => '        {$MACRO}        ',
 						'SSL verify peer' => false,
 						'SSL verify host' => false,
 						'SSL certificate file' => '        {$MACRO}      ',
 						'SSL key file' => '       {$MACRO}          ',
-						'SSL key password' => '              {$MACRO}       ',
 						'Update interval' => '      {$MACRO}      ',
 						'id:custom_timeout' => 'Override',
 						'id:timeout' => '       {$MACRO}      ',
@@ -1538,10 +1536,10 @@ class testLowLevelDiscovery extends CWebTest {
 						'HTTP proxy' => '{HOST.HOST}',
 						'HTTP authentication' => 'Kerberos',
 						'id:http_username' => '{#LLD_MACRO}',
-						'id:http_password' => '{?EXPRESSION}',
+						'id:http_password' => '    {?EXPRESSION}    ',
 						'SSL certificate file' => '{#LLD_MACRO}',
 						'SSL key file' => '{#LLD_MACRO}',
-						'SSL key password' => '{#LLD_MACRO}',
+						'SSL key password' => '    {#LLD_MACRO}    ',
 						'Description' => '{?EXPRESSION}'
 					]
 				]
@@ -1579,7 +1577,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Type' => 'SSH agent',
 						'Key' => 'ssh_check[🙂🙃み け め 𒁥]       ',
 						'User name' => '         🙂🙃み け め 𒁥        ',
-						'Password' => '       🙂🙃み け め 𒁥       ',
+						'Password' => '🙂🙃み け め 𒁥',
 						'Executed script' => '        🙂🙃み け め 𒁥         '
 					],
 					'trim' => true
@@ -1593,7 +1591,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Type' => 'SSH agent',
 						'Key' => 'ssh_check[2]',
 						'User name' => '{$MACRO}',
-						'Password' => '{$MACRO}',
+						'Password' => '    {$MACRO}    ',
 						'Executed script' => '{$MACRO}'
 					]
 				]
@@ -1606,7 +1604,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Type' => 'TELNET agent',
 						'Key' => 'telnet_check[{$MACRO}]',
 						'User name' => '  {$MACRO}     ',
-						'Password' => '   {$MACRO}       ',
+						'Password' => '{$MACRO}',
 						'Executed script' => '      {$MACRO}  🙂🙃み け め 𒁥     '
 					],
 					'trim' => true

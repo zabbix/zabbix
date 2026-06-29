@@ -547,7 +547,8 @@ class testExecuteNow extends CWebTest {
 	 */
 	public function testExecuteNow_DiscoveryRulesList($data) {
 		$hostid = CDataHelper::get('ExecuteNowAction.hostids.Host for execute now permissions');
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='.$hostid)
+				->waitUntilReady();
 		$table = $this->query('xpath://form[@name="discovery"]//table')->asTable()->one()->waitUntilPresent();
 		$this->selectItemsAndExecuteNow($data, $table);
 	}
@@ -598,9 +599,10 @@ class testExecuteNow extends CWebTest {
 	 */
 	public function testExecuteNow_DiscoveryRulePage($data) {
 		$hostid = CDataHelper::get('ExecuteNowAction.hostids.Host for execute now permissions');
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='.$hostid)
+				->waitUntilReady();
 		$table = $this->query('xpath://form[@name="discovery"]//table')->asTable()->one()->waitUntilPresent();
-		$this->openItemAndExecuteNow($data, $table, true);
+		$this->openItemAndExecuteNow($data, $table);
 	}
 
 	/**
@@ -640,24 +642,18 @@ class testExecuteNow extends CWebTest {
 	 * @param array $data			data provider
 	 * @param CElement $table		table element
 	 */
-	private function openItemAndExecuteNow($data, $table, $lld = false) {
+	private function openItemAndExecuteNow($data, $table) {
 		$table->query('link', $data['name'])->waitUntilClickable()->one()->click();
 
-		if ($lld === false) {
-			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		}
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		// Disabled "Execute now" button.
 		if (!array_key_exists('expected', $data)) {
-			$lld
-				? $this->query('button:Execute now')->one()->isEnabled(false)
-				: $this->assertTrue($dialog->getFooter()->query('button:Execute now')->one()->isEnabled(false));
+			$this->assertTrue($dialog->getFooter()->query('button:Execute now')->one()->isEnabled(false));
 			return;
 		}
 
-		$lld
-			? $this->query('button:Execute now')->one()->click()
-			: $dialog->getFooter()->query('button:Execute now')->one()->click();
+		$dialog->getFooter()->query('button:Execute now')->one()->click();
 
 		if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
 			$this->assertMessage(TEST_GOOD, $data['message']);
