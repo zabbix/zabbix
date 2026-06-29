@@ -321,7 +321,7 @@ static zbx_uint64_t	cep_eventid_next(zbx_cep_t *cep)
  * Return value: event handle or NULL if not found                            *
  *                                                                            *
  ******************************************************************************/
-static zbx_cep_event_handle_t	cep_get_event(zbx_cep_t *cep, zbx_uint64_t eventid)
+zbx_cep_event_handle_t	cep_get_event(zbx_cep_t *cep, zbx_uint64_t eventid)
 {
 	zbx_cep_event_handle_t	h = (zbx_cep_event_handle_t)zbx_hashset_search(&cep->events, &eventid);
 

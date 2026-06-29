@@ -160,7 +160,7 @@ int	cep_event_find_any_tag(const zbx_cep_event_t *event, const char *tags)
 	{
 		const char	*next_tag = strchr(tag, '\n');
 
-		size_t	len1 = (NULL == next_tag ? strlen(tag) : next_tag - tag);
+		size_t	len1 = (NULL == next_tag ? strlen(tag) : (size_t)(next_tag - tag));
 
 		for (int i = 0; i < event->tags.values_num; i++)
 		{

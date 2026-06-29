@@ -110,6 +110,8 @@ int	cep_window_pool_next_batch(zbx_cep_window_pool_t *pool, time_t now,
 		zbx_vector_cep_window_ptr_t *windows);
 void	cep_window_pool_reset_rule(zbx_cep_window_pool_t *pool, zbx_uint64_t ruleid);
 void	cep_window_pool_enqueue(zbx_cep_window_pool_t *pool, zbx_cep_window_t *window);
+void	cep_window_pool_save(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool);
+void	cep_window_pool_load(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool);
 
 void	cep_window_pool_dump(zbx_cep_window_pool_t *pool);
 

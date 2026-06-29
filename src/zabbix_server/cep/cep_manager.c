@@ -558,6 +558,24 @@ static int	cep_manager_process_windows(int now, zbx_vector_mw_task_ptr_t *tasks)
 #undef CEP_WINDOW_BATCH
 }
 
+static void	cep_manager_load_window_groups(zbx_dbconn_pool_t *dbpool)
+{
+	zbx_cep_window_pool_t	*pool;
+
+	cep_window_pool_acquire(&pool);
+	cep_window_pool_load(pool, dbpool);
+	cep_window_pool_release(&pool);
+}
+
+static void	cep_manager_save_window_groups(zbx_dbconn_pool_t *dbpool)
+{
+	zbx_cep_window_pool_t	*pool;
+
+	cep_window_pool_acquire(&pool);
+	cep_window_pool_save(pool, dbpool);
+	cep_window_pool_release(&pool);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: CEP manager main thread function                                  *
@@ -606,6 +624,8 @@ void	*zbx_cep_manager_thread(void *args)
 		zbx_free(error);
 		zbx_exit(EXIT_FAILURE);
 	}
+
+	cep_manager_load_window_groups(unit_args->shared->dbpool);
 
 	/* initialize statistics */
 	time_stat = zbx_time();
@@ -769,6 +789,7 @@ void	*zbx_cep_manager_thread(void *args)
 	if (SUCCEED != ZBX_EXIT_STATUS())
 		zbx_rtc_unsubscribe_service(cep_args->config_timeout, ZBX_IPC_SERVICE_CEP);
 
+	cep_manager_save_window_groups(unit_args->shared->dbpool);
 	cep_manager_free(manager);
 
 	zbx_deinit_regexp_env();

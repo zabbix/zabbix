@@ -60,6 +60,8 @@ zbx_uint64_t	cep_open_internal_event(zbx_cep_t *cep, unsigned char object, zbx_u
 zbx_uint64_t	cep_close_internal_event(zbx_cep_t *cep, unsigned char object, zbx_uint64_t objectid,
 		zbx_vector_uint64_t *eventids);
 
+zbx_cep_event_handle_t	cep_get_event(zbx_cep_t *cep, zbx_uint64_t eventid);
+
 int	cep_origin_problem(const zbx_cep_origin_t *origin);
 
 void	cep_dump(zbx_cep_t *cep, const char *msg);
