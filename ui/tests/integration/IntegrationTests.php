@@ -49,6 +49,7 @@ require_once dirname(__FILE__).'/testAutoregistrationPSK.php';
 require_once dirname(__FILE__).'/testAutoregistrationHostMetaDataItem.php';
 require_once dirname(__FILE__).'/testHistoryGet.php';
 require_once dirname(__FILE__).'/testHistoryPush.php';
+require_once dirname(__FILE__).'/testWebScenarioDynamicVariables.php';
 require_once dirname(__FILE__).'/testItemTimeouts.php';
 require_once dirname(__FILE__).'/testUserMacrosInItemNames.php';
 require_once dirname(__FILE__).'/testScriptManualInput.php';
@@ -139,6 +140,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		$suite->addTestSuite('testHousekeepingConfSync');
+		$suite->addTestSuite('testWebScenarioDynamicVariables');
 		return $suite;
 	}
 }
