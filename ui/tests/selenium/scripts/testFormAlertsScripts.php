@@ -525,7 +525,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Name' => 'invalid uri schema',
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
-						'URL' => 'javascript:window.opener.alert("Malicious JS executed!"); //'
+						'URL' => 'javascript:window.opener.alert("XSS"); //'
 					],
 					'inline_errors' => [
 						'URL' => 'Unacceptable URL scheme.'
@@ -2171,8 +2171,7 @@ class testFormAlertsScripts extends CWebTest {
 				$this->openScriptForm(self::$ids['URI schemes'], false);
 			}
 			else {
-				$this->assertMessage(TEST_BAD, 'Cannot update script', 'Invalid parameter "/1/url": unacceptable URL scheme.');
-				CMessageElement::find()->one()->close();
+				$this->assertInlineError($form, ['URL' => 'Unacceptable URL scheme.']);
 			}
 		}
 	}
