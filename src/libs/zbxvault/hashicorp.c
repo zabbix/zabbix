@@ -82,9 +82,15 @@ static int	zbx_vault_app_role_login_hashicorp(const char *url, const char *app_r
 		goto fail;
 	}
 
-	if (NULL == *token || '\0' == **token)
+	if (NULL == *token)
 	{
-		*error = zbx_strdup(*error, "unable to receive token");
+		*error = zbx_strdup(*error, "received null token");
+		goto fail;
+	}
+
+	if ('\0' == **token)
+	{
+		*error = zbx_strdup(*error, "received empty token");
 		goto fail;
 	}
 
