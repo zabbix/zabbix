@@ -460,8 +460,8 @@ static void	correlation_config_sync_correlations(zbx_dbsync_t *sync)
 
 		if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == correlation->evaltype)
 		{
-			if (NULL == correlation->formula || 0 != strcmp(correlation->formula, row[1]))
-				correlation->formula = zbx_strdup(correlation->formula, row[1]);
+			if (NULL == correlation->formula || 0 != strcmp(correlation->formula, row[3]))
+				correlation->formula = zbx_strdup(correlation->formula, row[3]);
 		}
 		else
 		{
