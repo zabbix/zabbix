@@ -296,7 +296,7 @@ class CSystemInfoHelper {
 			],
 			'values_per_second' => [
 				'id' => _('Required server performance, new values per second'),
-				'value' => round($status['vps_total'], 2)
+				'value' => $status['vps_total'] !== null ? round($status['vps_total'], 2) : null
 			],
 			'global_scripts' => [
 				'id' => _('Global scripts on Zabbix server'),
