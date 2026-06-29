@@ -48,6 +48,8 @@ class testBridgeAdapter extends CIntegrationTest {
 	private const DEVICE_NOT_LINKED_UUID = '019dde8a-4040-7000-8000-000000000105';
 	private const RESTRICTED_USER_NAME = 'bridge_adapter_restricted';
 	private const RESTRICTED_USER_PASSWD = 'BridgeAdapterR3stricted!';
+	private const ACKNOWLEDGER_USER_NAME = 'bridge_adapter_acknowledger';
+	private const ACKNOWLEDGER_USER_PASSWD = 'BridgeAdapterAcknowledger#1';
 	private const HOUSEKEEPER_TEST_JTI = 'bridge-adapter-test-jti';
 
 	private static string $adapter_log_file;
@@ -65,6 +67,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	private static ?string $cert_base_dir = null;
 	private static ?string $restricted_userid = null;
 	private static ?string $restricted_roleid = null;
+	private static ?string $acknowledger_userid = null;
 
 	public function serverConfigurationProvider(): array {
 		self::$cert_base_dir = self::generateCertificates();
@@ -441,6 +444,21 @@ class testBridgeAdapter extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('actionids', $response['result']);
 		self::$actionids = $response['result']['actionids'];
+
+		// Create a dedicated acknowledger user (not admin/userid=1) so that admin is not excluded
+		// from update operation escalation targets due to being the acknowledge author.
+		$super_admin_roleid = CDBHelper::getValue(
+			'select min(roleid) from role where type='.USER_TYPE_SUPER_ADMIN
+		);
+
+		$response = $this->call('user.create', [
+			'username' => self::ACKNOWLEDGER_USER_NAME,
+			'passwd' => self::ACKNOWLEDGER_USER_PASSWD,
+			'roleid' => $super_admin_roleid,
+			'usrgrps' => [['usrgrpid' => 7]]
+		]);
+		$this->assertArrayHasKey('userids', $response['result']);
+		self::$acknowledger_userid = $response['result']['userids'][0];
 	}
 
 	private static function clearRealNotificationObjects(): void {
@@ -458,6 +476,11 @@ class testBridgeAdapter extends CIntegrationTest {
 
 		if (self::$hostids) {
 			CDataHelper::call('host.delete', self::$hostids);
+		}
+
+		if (self::$acknowledger_userid !== null) {
+			CDataHelper::call('user.delete', [self::$acknowledger_userid]);
+			self::$acknowledger_userid = null;
 		}
 	}
 
@@ -929,11 +952,16 @@ class testBridgeAdapter extends CIntegrationTest {
 
 		$eventid = CDBHelper::getValue('select eventid from events where objectid='.self::$triggerids[0].
 			' and value=1 order by eventid desc');
+
+		// Acknowledge as a different user so that admin (userid=1) is not excluded as the
+		// acknowledge author from the update operation escalation target list.
+		$this->authorize(self::ACKNOWLEDGER_USER_NAME, self::ACKNOWLEDGER_USER_PASSWD);
 		$this->call('event.acknowledge', [
 			'eventids' => [$eventid],
 			'action' => ZBX_PROBLEM_UPDATE_MESSAGE,
 			'message' => 'Bridge adapter update test message'
 		]);
+		$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of alerter_process_push()', true, 120, 1);
