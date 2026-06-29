@@ -1671,7 +1671,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			.discovery_open_cb = zbx_discovery_open_server,
 			.discovery_close_cb = zbx_discovery_close_server,
 			.discovery_find_host_cb = zbx_discovery_find_host_server,
+			.discovery_update_interface_cb = zbx_discovery_update_interface_server,
 			.discovery_update_host_cb = zbx_discovery_update_host_server,
+			.discovery_update_hosts_cb = zbx_discovery_update_hosts_server,
 			.discovery_update_service_cb = zbx_discovery_update_service_server,
 			.discovery_update_service_down_cb = zbx_discovery_update_service_down_server,
 			.discovery_update_drule_cb = zbx_discovery_update_drule_server

@@ -349,6 +349,10 @@ function PopUp(action, parameters, {
 		overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.reload'));
 	}
 
+	if (action === 'template.edit') {
+		parameters = JSON.stringify(parameters);
+	}
+
 	overlay
 		.load(action, parameters)
 		.then(function(resp) {
@@ -1214,8 +1218,8 @@ function objectSetDeepValue(object, path, value) {
 	while (path.length > 1) {
 		const key = path.shift();
 
-		if (!(key in tmp)) {
-			tmp[key] = {};
+		if (!Object.hasOwn(tmp, key)) {
+			tmp[key] = Object.create(null);
 		}
 
 		if (typeof tmp[key] !== 'object') {

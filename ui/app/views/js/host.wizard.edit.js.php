@@ -1206,7 +1206,7 @@ window.host_wizard_edit = new class {
 	}
 
 	#updateForm(path, new_value, old_value) {
-		if (this.#form_update_locked) {
+		if (this.#form_update_locked || this.#show_cancel_screen) {
 			this.#pending_form_update = true;
 
 			return;
