@@ -14,6 +14,10 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 A.F.....S. [ZBXNEXT-1150] implemented storage and display of maintenance-related event suppressions and unsuppressions (aetatsu, Ivo)
 
 Bug fixes:
+...G...... [ZBX-18840] fixed misleading comments in agent 2 (dbriedis)
+..F....... [ZBX-27883] fixed inability to copy trigger prototypes which depends on the same trigger prototype when cloning template or host (vmaksimovs)
+..F....... [ZBX-27128] increased width of the created_at field in service edit form (gklavins)
+..F....... [ZBX-27065] fixed JavaScript error when closing standalone edit form with inline validation that performs server side checks (vmurzins)
 ...G...... [ZBX-27900] fixed windows job handled not being closed on Zabbix agent 2 (esneiders)
 ..F....... [ZBX-27594] fixed sorting of discovered hosts (msnihach)
 ..F....... [ZBX-27835] fixed inline validation to display hidden input field error messages as general errors when there isn't error container (gberzina)
@@ -388,6 +392,8 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27883] fixed inability to copy trigger prototypes which depends on the same trigger prototype when cloning template or host (vmaksimovs)
+..F....... [ZBX-27065] fixed JavaScript error when closing standalone edit form with inline validation that performs server side checks (vmurzins)
 ...G...... [ZBX-27900] fixed windows job handled not being closed on Zabbix agent 2 (esneiders)
 ..F....... [ZBX-27594] fixed sorting of discovered hosts (msnihach)
 ........S. [ZBX-27770] fixed validation of HTTP response data for scenario-level dynamic variables in web monitoring (sboidenko)
@@ -1872,6 +1878,7 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27883] fixed inability to copy trigger prototypes which depends on the same trigger prototype when cloning template or host (vmaksimovs)
 ...G...... [ZBX-27900] fixed windows job handled not being closed on Zabbix agent 2 (esneiders)
 ..F....... [ZBX-27594] fixed sorting of discovered hosts (msnihach)
 ........S. [ZBX-27770] fixed validation of HTTP response data for scenario-level dynamic variables in web monitoring (sboidenko)
