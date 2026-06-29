@@ -36,6 +36,9 @@ class testTriggerCEP extends CIntegrationTest {
 	const HOST_LLD_RULE_KEY = 'host.lld.trapper';
 	const HOST_DISC_VALUE = 'discovered_host1';
 	const LLD_MACRO = '{#COMPONENT}';
+	// LLD macro carrying each discovered component's parity ('1' for odd index, '0' for even); used
+	// by the parity-based global correlation scenario to tag every problem with an 'odd' tag.
+	const PARITY_MACRO = '{#PARITY}';
 	const ITEM_PROTO_KEY = 'cep.trap';
 	const ITEM_PROTO_KEY2 = 'cep.trap2';
 	const COMPONENT_VALUE = 'sensor1';
@@ -102,6 +105,7 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $discovered_triggerids = [];
 	private static $discovered_dep_triggerids = [];
 	private static $correlationid;
+	private static $correlationid2;
 	private static $serviceids = [];
 	private static $service_actionid;
 	private static $trigger_actionid;
@@ -1008,7 +1012,7 @@ class testTriggerCEP extends CIntegrationTest {
 	 *     operation = CLOSE_OLD) is created so that a RESOLVED event with service="up" closes
 	 *     open problems whose service tag is "down", independently of trigger-level recovery.
 	 */
-	public function prepareDataGlobalCorrelation() {
+	public function prepareDataGlobalCorrelation($evaltype = CONDITION_EVAL_TYPE_AND_OR) {
 		// Switch item prototypes to text so the find() function can be used in expressions.
 		$this->call('itemprototype.update', [
 			'itemid' => self::$item_prototypeid,
@@ -1122,30 +1126,52 @@ class testTriggerCEP extends CIntegrationTest {
 		// Create a global event correlation rule: close old events whose 'service' tag value
 		// is 'down' when a new event arrives with 'service' tag value 'up'.
 		// This exercises the global-correlation path independently of trigger-level correlation.
+		$conditions = [
+			[
+				'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
+				'tag' => 'service',
+				'operator' => CONDITION_OPERATOR_EQUAL,
+				'value' => 'down'
+			],
+			[
+				'type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE,
+				'tag' => 'type',
+				'operator' => CONDITION_OPERATOR_EQUAL,
+				'value' => 'cep-dep'
+			],
+			[
+				'type' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
+				'oldtag' => 'component',
+				'newtag' => 'component'
+			]
+		];
+
+		if ($evaltype == CONDITION_EVAL_TYPE_EXPRESSION) {
+			// Assign a formula id to each condition and AND them together so the rule behaves
+			// identically to the CONDITION_EVAL_TYPE_AND_OR variant while exercising the
+			// custom expression evaluation path.
+			$formulaids = ['A', 'B', 'C'];
+			foreach ($conditions as $i => &$condition) {
+				$condition['formulaid'] = $formulaids[$i];
+			}
+			unset($condition);
+
+			$filter = [
+				'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+				'formula' => implode(' and ', $formulaids),
+				'conditions' => $conditions
+			];
+		}
+		else {
+			$filter = [
+				'evaltype' => $evaltype,
+				'conditions' => $conditions
+			];
+		}
+
 		$corr_params = [
 			'name' => 'CEP global event correlation',
-			'filter' => [
-				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-				'conditions' => [
-					[
-						'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
-						'tag' => 'service',
-						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => 'down'
-					],
-					[
-						'type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE,
-						'tag' => 'type',
-						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => 'cep-dep'
-					],
-					[
-						'type' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
-						'oldtag' => 'component',
-						'newtag' => 'component'
-					]
-				]
-			],
+			'filter' => $filter,
 			'operations' => [
 				[
 					'type' => ZBX_CORR_OPERATION_CLOSE_OLD
@@ -1156,21 +1182,258 @@ class testTriggerCEP extends CIntegrationTest {
 			]
 		];
 
-		$existing = $this->call('correlation.get', ['filter' => ['name' => $corr_params['name']], 'output' => ['correlationid']]);
+		self::$correlationid = $this->upsertCorrelation($corr_params);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Create the correlation rule described by $corr_params, or update it in place if one with the
+	 * same name already exists (prepareData* methods are re-run by every dependent test). Returns
+	 * the correlation id so the caller can track it for cleanup.
+	 */
+	private function upsertCorrelation(array $corr_params): string {
+		$existing = $this->call('correlation.get',
+			['filter' => ['name' => $corr_params['name']], 'output' => ['correlationid']]
+		);
 		if ($existing['result']) {
-			self::$correlationid = $existing['result'][0]['correlationid'];
-			$this->call('correlation.update', ['correlationid' => self::$correlationid] + $corr_params);
+			$correlationid = $existing['result'][0]['correlationid'];
+			$this->call('correlation.update', ['correlationid' => $correlationid] + $corr_params);
 		}
 		else {
 			$response = $this->call('correlation.create', $corr_params);
 			$this->assertArrayHasKey('correlationids', $response['result']);
 			$this->assertArrayHasKey(0, $response['result']['correlationids']);
-			self::$correlationid = $response['result']['correlationids'][0];
+			$correlationid = $response['result']['correlationids'][0];
 		}
+
+		return $correlationid;
+	}
+
+	/**
+	 * Build a global event correlation rule that closes the problems of one parity. The new event must
+	 * carry odd=$parity, and the rule matches old events with service="down" on the same component (tag
+	 * pair), then closes both the old and the new problem.
+	 *
+	 * The condition set depends on $evaltype:
+	 *   - CONDITION_EVAL_TYPE_AND_OR: service="down" (old) + odd=$parity (new) + component tag pair.
+	 *     A 'type=cep-dep' new-event condition is intentionally omitted — combined with the 'odd'
+	 *     new-event condition it would be OR'd (same type) and break parity selectivity. It is not
+	 *     needed for correctness: only proto 2 (where "down" is re-sent) produces new events that find
+	 *     a matching old problem, so service+parity+component already pinpoint the correlation.
+	 *   - CONDITION_EVAL_TYPE_EXPRESSION: additionally AND-s a 'type=cep-dep' new-event condition,
+	 *     exercising two same-type NEW_EVENT_TAG_VALUE conditions that only the expression evaltype can
+	 *     AND together.
+	 */
+	private function buildParityCorrelationParams(string $name, string $parity, $evaltype): array {
+		$service_down = [
+			'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
+			'tag' => 'service',
+			'operator' => CONDITION_OPERATOR_EQUAL,
+			'value' => 'down'
+		];
+		$new_type = [
+			'type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE,
+			'tag' => 'type',
+			'operator' => CONDITION_OPERATOR_EQUAL,
+			'value' => 'cep-dep'
+		];
+		$new_odd = [
+			'type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE,
+			'tag' => 'odd',
+			'operator' => CONDITION_OPERATOR_EQUAL,
+			'value' => $parity
+		];
+		$tag_pair = [
+			'type' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
+			'oldtag' => 'component',
+			'newtag' => 'component'
+		];
+
+		if ($evaltype == CONDITION_EVAL_TYPE_EXPRESSION) {
+			$service_down['formulaid'] = 'A';
+			$new_type['formulaid'] = 'B';
+			$new_odd['formulaid'] = 'C';
+			$tag_pair['formulaid'] = 'D';
+			$filter = [
+				'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+				'formula' => 'A and B and C and D',
+				'conditions' => [$service_down, $new_type, $new_odd, $tag_pair]
+			];
+		}
+		else {
+			$filter = [
+				'evaltype' => $evaltype,
+				'conditions' => [$service_down, $new_odd, $tag_pair]
+			];
+		}
+
+		return [
+			'name' => $name,
+			'filter' => $filter,
+			'operations' => [
+				['type' => ZBX_CORR_OPERATION_CLOSE_OLD],
+				['type' => ZBX_CORR_OPERATION_CLOSE_NEW]
+			]
+		];
+	}
+
+	/**
+	 * Reconfigure both trigger prototypes for the parity-based global correlation scenario: the same
+	 * find(regexp,"down") + multiple-event + global-correlation setup as prepareDataGlobalCorrelation,
+	 * but every discovered trigger additionally carries an 'odd' tag whose value is the component
+	 * parity ('1'/'0', from the {#PARITY} LLD macro). No correlation rule is created here; the run
+	 * method opens problems on all triggers first, then adds the "even" and "odd" rules one at a time.
+	 */
+	public function prepareDataGlobalCorrelationParity() {
+		// Switch item prototypes to text so the find() function can be used in expressions.
+		$this->call('itemprototype.update', [
+			'itemid' => self::$item_prototypeid,
+			'value_type' => ITEM_VALUE_TYPE_TEXT
+		]);
+
+		$this->call('itemprototype.update', [
+			'itemid' => self::$dep_item_prototypeid,
+			'value_type' => ITEM_VALUE_TYPE_TEXT
+		]);
+
+		// Both prototypes: find(regexp,"down") + multiple event generation + global correlation, plus
+		// a 'service'={ITEM.VALUE} tag (so "down" sets service="down"), a stable 'component' tag for
+		// the correlation tag pair and an 'odd' tag carrying the component parity.
+		$this->call('triggerprototype.update', [
+			'triggerid' => self::$trigger_prototypeid,
+			'description' => 'CEP trigger for '.self::LLD_MACRO,
+			'expression' => 'find(/'.self::TEMPLATE_NAME.'/'.self::ITEM_PROTO_KEY
+				.'['.self::LLD_MACRO.'],,"regexp","down")=1',
+			'event_name' => 'CEP trigger '.self::LLD_MACRO.' {ITEM.VALUE}',
+			'recovery_mode' => ZBX_RECOVERY_MODE_EXPRESSION,
+			'recovery_expression' => '',
+			'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
+			'correlation_tag' => '',
+			'type' => TRIGGER_MULT_EVENT_ENABLED,
+			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
+			'tags' => [
+				['tag' => 'component', 'value' => self::LLD_MACRO],
+				['tag' => 'type', 'value' => 'cep'],
+				['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO],
+				['tag' => 'service', 'value' => '{ITEM.VALUE}'],
+				['tag' => 'odd', 'value' => self::PARITY_MACRO]
+			]
+		]);
+
+		$this->call('triggerprototype.update', [
+			'triggerid' => self::$dep_trigger_prototypeid,
+			'description' => 'CEP dependent trigger for '.self::LLD_MACRO,
+			'expression' => 'find(/'.self::TEMPLATE_NAME.'/'.self::ITEM_PROTO_KEY2
+				.'['.self::LLD_MACRO.'],,"regexp","down")=1',
+			'event_name' => 'CEP trigger '.self::LLD_MACRO.' {ITEM.VALUE}',
+			'recovery_mode' => ZBX_RECOVERY_MODE_EXPRESSION,
+			'recovery_expression' => '',
+			'dependencies' => [],
+			'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
+			'correlation_tag' => '',
+			'type' => TRIGGER_MULT_EVENT_ENABLED,
+			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
+			'tags' => [
+				['tag' => 'component', 'value' => self::LLD_MACRO],
+				['tag' => 'type', 'value' => 'cep-dep'],
+				['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO],
+				['tag' => 'service', 'value' => '{ITEM.VALUE}'],
+				['tag' => 'odd', 'value' => self::PARITY_MACRO]
+			]
+		]);
+
+		// Resend LLD discovery data (now including the parity macro) to re-instantiate the discovered
+		// triggers and items with the new config.
+		$this->dispatchSenderValues([
+			[
+				'host' => self::HOST_DISC_VALUE,
+				'key' => self::LLD_RULE_KEY,
+				'value' => $this->buildItemLLDData(true)
+			]
+		], null, 0);
+
+		// Verify the discovered items reflect the updated value type.
+		$response = $this->callUntilDataIsPresent('item.get', [
+			'hostids' => [self::$disc_hostid],
+			'search' => ['key_' => self::ITEM_PROTO_KEY.'['],
+			'output' => ['itemid', 'value_type']
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+			if (count($response['result']) !== self::LLD_DISCOVERY_COUNT) {
+				return false;
+			}
+			foreach ($response['result'] as $item) {
+				if ((int) $item['value_type'] !== ITEM_VALUE_TYPE_TEXT) {
+					return false;
+				}
+			}
+			return true;
+		});
+		$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']);
+
+		// Verify the two primary discovered triggers reflect global correlation mode, multiple event
+		// generation and that the parity 'odd' tag resolved (component sensor1 → odd index → '1');
+		// poll until LLD has re-applied the new prototype config.
+		$response = $this->callUntilDataIsPresent('trigger.get', [
+			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
+			'output' => ['triggerid', 'correlation_mode', 'type'],
+			'selectTags' => 'extend'
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+			if (count($response['result']) !== 2) {
+				return false;
+			}
+			foreach ($response['result'] as $trigger) {
+				if ((int) $trigger['correlation_mode'] !== ZBX_TRIGGER_CORRELATION_NONE
+						|| (int) $trigger['type'] !== TRIGGER_MULT_EVENT_ENABLED) {
+					return false;
+				}
+				$odd = current(array_filter($trigger['tags'], fn($t) => $t['tag'] === 'odd'));
+				if ($odd === false || $odd['value'] !== '1') {
+					return false;
+				}
+			}
+			return true;
+		});
+		$this->assertCount(2, $response['result']);
+		foreach ($response['result'] as $trigger) {
+			$this->assertEquals(ZBX_TRIGGER_CORRELATION_NONE, $trigger['correlation_mode'],
+				'Discovered trigger '.$trigger['triggerid'].' was not updated to global correlation mode.');
+			$this->assertEquals(TRIGGER_MULT_EVENT_ENABLED, $trigger['type'],
+				'Discovered trigger '.$trigger['triggerid'].' was not updated to multiple-event mode.');
+			$odd = current(array_filter($trigger['tags'], fn($t) => $t['tag'] === 'odd'));
+			$this->assertNotFalse($odd,
+				'Discovered trigger '.$trigger['triggerid'].' is missing the parity "odd" tag.');
+			$this->assertEquals('1', $odd['value'],
+				'Discovered trigger '.$trigger['triggerid'].' has unexpected parity tag value.');
+		}
+
+		// Start from a clean correlation slate: remove any CEP correlation rules left over from earlier
+		// scenarios so that no rule is active while the run method opens the initial problems. The
+		// "even" and "odd" rules are then created one at a time during the run.
+		$this->deleteCepCorrelations();
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
 		return true;
+	}
+
+	/**
+	 * Delete every global correlation rule created by these CEP scenarios (their names all start with
+	 * "CEP global event correlation") and reset the tracked correlation ids.
+	 */
+	private function deleteCepCorrelations(): void {
+		$response = $this->call('correlation.get', [
+			'output' => ['correlationid'],
+			'search' => ['name' => 'CEP global event correlation']
+		]);
+		$ids = array_column($response['result'], 'correlationid');
+		if ($ids) {
+			$this->call('correlation.delete', $ids);
+		}
+		self::$correlationid = null;
+		self::$correlationid2 = null;
 	}
 
 	/**
@@ -2145,6 +2408,76 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Same cross-trigger-prototype global event correlation scenario as
+	 * testTriggerCEP_EventAssessmentGlobalCorrelationCrossTrigger, but the correlation rule uses
+	 * CONDITION_EVAL_TYPE_EXPRESSION with a custom formula ("A and B and C") instead of
+	 * CONDITION_EVAL_TYPE_AND_OR, exercising the custom expression evaluation path.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCrossTriggerExpression$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCrossTriggerExpression() {
+		$this->prepareDataGlobalCorrelation(CONDITION_EVAL_TYPE_EXPRESSION);
+		$this->runEventAssessmentTestGlobalCorrelationCrossTrigger(false);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
+	 * Verify parity-selective global event correlation (CONDITION_EVAL_TYPE_AND_OR). Every discovered
+	 * trigger carries an 'odd' tag ('1' for odd components, '0' for even). First a problem is opened on
+	 * every trigger; then an "even" correlation rule closes the even problems (the odd ones stay open),
+	 * and finally an "odd" correlation rule closes the odd problems, so no open problem remains.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationParity)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationParity() {
+		$this->prepareDataGlobalCorrelationParity();
+		$this->runEventAssessmentTestGlobalCorrelationParity(false, CONDITION_EVAL_TYPE_AND_OR);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_EventAssessmentGlobalCorrelationParity but the server component
+	 * is stopped and restarted between each step.
+	 *
+	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationParity
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationParityRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->prepareDataGlobalCorrelationParity();
+		$this->runEventAssessmentTestGlobalCorrelationParity(true, CONDITION_EVAL_TYPE_AND_OR);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
+	 * Same parity-selective global event correlation scenario as
+	 * testTriggerCEP_EventAssessmentGlobalCorrelationParity (open all, then close even, then odd), but
+	 * both correlation rules use CONDITION_EVAL_TYPE_EXPRESSION with a custom formula
+	 * ("A and B and C and D"). The expression variant additionally AND-s a 'type=cep-dep' new-event
+	 * condition alongside the 'odd' new-event condition — two same-type conditions that only the
+	 * expression evaltype can AND together.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationParityExpression$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	/*public function testTriggerCEP_EventAssessmentGlobalCorrelationParityExpression() {
+		$this->prepareDataGlobalCorrelationParity();
+		$this->runEventAssessmentTestGlobalCorrelationParity(false, CONDITION_EVAL_TYPE_EXPRESSION);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}*/
+
+	/**
+	 * Same scenario as testTriggerCEP_EventAssessmentGlobalCorrelationParityExpression but the server
+	 * component is stopped and restarted between each step.
+	 *
+	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationParityExpression
+	 */
+	/*public function testTriggerCEP_EventAssessmentGlobalCorrelationParityExpressionRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->prepareDataGlobalCorrelationParity();
+		$this->runEventAssessmentTestGlobalCorrelationParity(true, CONDITION_EVAL_TYPE_EXPRESSION);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}*/
+
+	/**
 	 * Discover a single log trigger from the dedicated log template (linked directly to the host) and
 	 * verify that a burst of LOG_EVENT_COUNT log values, all matching the trigger pattern, produces
 	 * exactly LOG_EVENT_COUNT problem events. The trigger prototype has multiple problem event
@@ -2698,6 +3031,95 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->waitForNoOpenProblems(array_merge($triggerids1, $triggerids2));
 	}
 
+	/**
+	 * Run the parity-based global event correlation scenario. The focus is parity: first open a problem
+	 * on every discovered trigger, then close them in two parity-selective waves — even first, then odd.
+	 *
+	 *   1. "down" → all proto 1 and proto 2 items → every discovered trigger goes PROBLEM
+	 *                 (service="down", odd=parity). No correlation rule is active yet, so nothing is
+	 *                 closed and every odd and even problem is open.
+	 *   2. Add the "even" rule (new odd="0") and re-send "down" to the even proto 2 keys: each fresh
+	 *                 cep-dep event matches old service="down" on the same component and closes the old
+	 *                 proto 1 + proto 2 problems (CLOSE_OLD) and itself (CLOSE_NEW). Every even problem
+	 *                 is closed; every odd problem stays open.
+	 *   3. Add the "odd" rule (new odd="1") and re-send "down" to the odd proto 2 keys: the same way,
+	 *                 every odd problem is closed, leaving nothing open.
+	 */
+	private function runEventAssessmentTestGlobalCorrelationParity(bool $restart,
+			$evaltype = CONDITION_EVAL_TYPE_AND_OR): void {
+		$keys1 = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$keys2 = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2);
+		$even_keys2 = $this->buildDiscoveredKeysByParity(self::ITEM_PROTO_KEY2, '0');
+		$odd_keys2 = $this->buildDiscoveredKeysByParity(self::ITEM_PROTO_KEY2, '1');
+		$triggerids1 = self::$discovered_triggerids;
+		$triggerids2 = self::$discovered_dep_triggerids;
+		$all = array_merge($triggerids1, $triggerids2);
+
+		// Per prototype: this many components carry odd="1" (odd index) and odd="0" (even index). With
+		// problems open on both prototypes, twice each count is open before the parity waves run.
+		$odd_per_proto = intdiv(self::LLD_DISCOVERY_COUNT + 1, 2);
+		$even_per_proto = intdiv(self::LLD_DISCOVERY_COUNT, 2);
+
+		// All triggers must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'All triggers must start in OK state for parity global correlation test.');
+		}
+
+		$this->captureEventBaseline($all);
+
+		// 1. Open a problem on every discovered trigger (both prototypes). No rule is active yet, so all
+		//    problems stay open.
+		$this->assertStateChangeForAll($triggerids1, $keys1, 'down', TRIGGER_VALUE_TRUE, 1);
+		$this->maybeRestartServer($restart);
+		$this->assertStateChangeForAll($triggerids2, $keys2, 'down', TRIGGER_VALUE_TRUE, 1);
+		$this->maybeRestartServer($restart);
+
+		$this->waitForOpenProblemCountByTag($all, 'odd', '1', 2 * $odd_per_proto);
+		$this->waitForOpenProblemCountByTag($all, 'odd', '0', 2 * $even_per_proto);
+
+		// 2. Close the even problems: add the even rule, then drive fresh cep-dep events on the even
+		//    proto 2 keys. Odd problems are untouched.
+		self::$correlationid = $this->upsertCorrelation(
+			$this->buildParityCorrelationParams('CEP global event correlation even', '0', $evaltype)
+		);
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+		$this->dispatchSenderValues(
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down'], $even_keys2),
+			null, 0
+		);
+		$this->waitForOpenProblemCountByTag($all, 'odd', '0', 0);
+		$this->waitForOpenProblemCountByTag($all, 'odd', '1', 2 * $odd_per_proto);
+	
+		$this->maybeRestartServer($restart);
+
+		// 3. Close the odd problems: add the odd rule, then drive fresh cep-dep events on the odd
+		//    proto 2 keys. Nothing remains open.
+		self::$correlationid2 = $this->upsertCorrelation(
+			$this->buildParityCorrelationParams('CEP global event correlation odd', '1', $evaltype)
+		);
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+		$this->dispatchSenderValues(
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down'], $odd_keys2),
+			null, 0
+		);
+
+		$this->waitForNoOpenProblems($all);
+	}
+
+	/**
+	 * Poll problem.get until the number of open problems on $triggerids carrying the exact tag
+	 * $tag=$value equals $expected.
+	 */
+	private function waitForOpenProblemCountByTag(array $triggerids, string $tag, string $value, int $expected): void {
+		$this->callUntilCountIsPresent('problem.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'tags' => [['tag' => $tag, 'value' => $value, 'operator' => TAG_OPERATOR_EQUAL]]
+		], $expected, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
 	private function runDependentTriggerTest(bool $restart): void {
 		$parent_keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$dep_keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2);
@@ -3082,11 +3504,17 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 	}
 
-	private function buildItemLLDData(): string {
+	private function buildItemLLDData(bool $with_parity = false): string {
 		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
 		$data = [];
 		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
-			$data[] = [self::LLD_MACRO => $base.$i];
+			$entry = [self::LLD_MACRO => $base.$i];
+			if ($with_parity) {
+				// Odd component index → '1', even → '0'. Consumed by the trigger prototype 'odd'
+				// tag so each discovered problem carries its parity for parity-based correlation.
+				$entry[self::PARITY_MACRO] = ($i % 2 === 1) ? '1' : '0';
+			}
+			$data[] = $entry;
 		}
 		return json_encode(['data' => $data]);
 	}
@@ -3096,6 +3524,21 @@ class testTriggerCEP extends CIntegrationTest {
 		$keys = [];
 		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
 			$keys[] = $proto_key.'['.$base.$i.']';
+		}
+		return $keys;
+	}
+
+	/**
+	 * Like buildDiscoveredKeys() but only the keys of components matching the given parity
+	 * ('1' = odd index, '0' = even index), matching the {#PARITY} macro emitted by buildItemLLDData().
+	 */
+	private function buildDiscoveredKeysByParity(string $proto_key, string $parity): array {
+		$base = rtrim(self::COMPONENT_VALUE, '0123456789');
+		$keys = [];
+		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
+			if ((($i % 2 === 1) ? '1' : '0') === $parity) {
+				$keys[] = $proto_key.'['.$base.$i.']';
+			}
 		}
 		return $keys;
 	}
@@ -3739,6 +4182,11 @@ class testTriggerCEP extends CIntegrationTest {
 		if (!empty(self::$correlationid)) {
 			CDataHelper::call('correlation.delete', [self::$correlationid]);
 			self::$correlationid = null;
+		}
+
+		if (!empty(self::$correlationid2)) {
+			CDataHelper::call('correlation.delete', [self::$correlationid2]);
+			self::$correlationid2 = null;
 		}
 
 		if (!empty(self::$disc_hostid)) {
