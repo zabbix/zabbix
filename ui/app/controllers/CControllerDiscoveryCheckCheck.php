@@ -160,21 +160,16 @@ class CControllerDiscoveryCheckCheck extends CController {
 			}
 
 			$compare_existing_dcheck = array_diff_key($existing_dcheck, array_flip($compare_exclude));
-			$is_duplicate = true;
 
 			foreach ($compare_existing_dcheck as $field => $value) {
 				if (array_key_exists($field, $compare_dcheck)
 					&& strcmp((string) $value, (string) $compare_dcheck[$field]) !== 0) {
-					$is_duplicate = false;
 
-					break;
+					return false;
 				}
 			}
 
-			if ($is_duplicate) {
-
-				return true;
-			}
+			return true;
 		}
 
 		return false;
