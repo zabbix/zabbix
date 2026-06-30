@@ -344,7 +344,7 @@ $form_grid->addItem([
 			'monospace_font' => false,
 			'readonly' => $data['not_supported'],
 			'use_tab' => false,
-			'autofocus' => true
+			'autofocus' => !$data['is_item_testable']
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	),
 
