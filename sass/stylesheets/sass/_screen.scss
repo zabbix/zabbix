@@ -1221,6 +1221,8 @@ select {
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		border-right: 0;
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
 		width: 100%;
 
 		&[readonly] {
@@ -2521,13 +2523,6 @@ svg {
 
 	.item-test-result {
 		display: inline-flex;
-	}
-
-	.multilineinput-control {
-		input[type=text] {
-			border-top-right-radius: 0;
-			border-bottom-right-radius: 0;
-		}
 	}
 }
 

@@ -8514,6 +8514,8 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     white-space: nowrap;
     text-overflow: ellipsis;
     border-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
     width: 100%; }
     .multilineinput-control input[type=text][readonly] {
       background: #ffffff !important;
@@ -9407,9 +9409,6 @@ svg {
     width: 250px; }
 #preprocessing-test-form .item-test-result {
   display: inline-flex; }
-#preprocessing-test-form .multilineinput-control input[type=text] {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0; }
 
 #token_form .btn-grey-icon {
   margin-left: 5px; }
