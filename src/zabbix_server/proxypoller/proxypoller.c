@@ -787,11 +787,14 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 		{
 			if (ZBX_RTC_VAULT_NEW_TOKEN == rtc_cmd)
 			{
-				zbx_free(proxy_poller_args_in->config_vault->token);
-				proxy_poller_args_in->config_vault->token = (char *)rtc_data;
+				proxy_poller_args_in->config_vault->token =
+						zbx_strdup(proxy_poller_args_in->config_vault->token,
+						(const char *)rtc_data);
 			}
 			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
+
+			zbx_free(rtc_data);
 		}
 	}
 

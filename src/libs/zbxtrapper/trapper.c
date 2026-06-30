@@ -1505,11 +1505,14 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 		{
 			if (ZBX_RTC_VAULT_NEW_TOKEN == rtc_cmd)
 			{
-				zbx_free(trapper_args_in->config_vault->token);
-				trapper_args_in->config_vault->token = (char *)rtc_data;
+				trapper_args_in->config_vault->token =
+						zbx_strdup(trapper_args_in->config_vault->token,
+						(const char *)rtc_data);
 			}
 			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				goto out;
+
+			zbx_free(rtc_data);
 		}
 
 		if (TIMEOUT_ERROR == ret)
