@@ -1281,6 +1281,46 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Build a global event correlation rule whose only condition is an old-event odd=$parity match, with
+	 * CLOSE_OLD + CLOSE_NEW operations. There is no component tag pair, so CLOSE_OLD is unrestricted: a
+	 * single matching new event closes every open problem of that parity across all components at once
+	 * (not just the same component's). Keeping the discriminator on the OLD event preserves parity
+	 * selectivity — an odd rule never touches even problems and vice-versa.
+	 */
+	private function buildParityCloseAllCorrelationParams(string $name, string $parity, $evaltype): array {
+		$old_odd = [
+			'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
+			'tag' => 'odd',
+			'operator' => CONDITION_OPERATOR_EQUAL,
+			'value' => $parity
+		];
+
+		if ($evaltype == CONDITION_EVAL_TYPE_EXPRESSION) {
+			$old_odd['formulaid'] = 'A';
+			$filter = [
+				'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+				'formula' => 'A',
+				'conditions' => [$old_odd]
+			];
+		}
+		else {
+			$filter = [
+				'evaltype' => $evaltype,
+				'conditions' => [$old_odd]
+			];
+		}
+
+		return [
+			'name' => $name,
+			'filter' => $filter,
+			'operations' => [
+				['type' => ZBX_CORR_OPERATION_CLOSE_OLD],
+				['type' => ZBX_CORR_OPERATION_CLOSE_NEW]
+			]
+		];
+	}
+
+	/**
 	 * Reconfigure both trigger prototypes for the parity-based global correlation scenario: the same
 	 * find(regexp,"down") + multiple-event + global-correlation setup as prepareDataGlobalCorrelation,
 	 * but every discovered trigger additionally carries an 'odd' tag whose value is the component
@@ -2478,6 +2518,32 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Same assessment as testTriggerCEP_EventAssessmentGlobalCorrelationParity, but the correlation rules
+	 * have a single old-event odd=$parity condition (no component tag pair), so each rule closes every
+	 * problem of its parity at once, and the order is flipped: odd problems are closed first, then even.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationParityCloseAll$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationParityCloseAll() {
+		$this->prepareDataGlobalCorrelationParity();
+		$this->runEventAssessmentTestGlobalCorrelationParity(false, CONDITION_EVAL_TYPE_AND_OR, true);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_EventAssessmentGlobalCorrelationParityCloseAll but the server
+	 * component is stopped and restarted between each step.
+	 *
+	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationParityCloseAll
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationParityCloseAllRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->prepareDataGlobalCorrelationParity();
+		$this->runEventAssessmentTestGlobalCorrelationParity(true, CONDITION_EVAL_TYPE_AND_OR, true);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
 	 * Discover a single log trigger from the dedicated log template (linked directly to the host) and
 	 * verify that a burst of LOG_EVENT_COUNT log values, all matching the trigger pattern, produces
 	 * exactly LOG_EVENT_COUNT problem events. The trigger prototype has multiple problem event
@@ -3032,33 +3098,45 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
-	 * Run the parity-based global event correlation scenario. The focus is parity: first open a problem
-	 * on every discovered trigger, then close them in two parity-selective waves — even first, then odd.
-	 *
-	 *   1. "down" → all proto 1 and proto 2 items → every discovered trigger goes PROBLEM
-	 *                 (service="down", odd=parity). No correlation rule is active yet, so nothing is
-	 *                 closed and every odd and even problem is open.
-	 *   2. Add the "even" rule (new odd="0") and re-send "down" to the even proto 2 keys: each fresh
-	 *                 cep-dep event matches old service="down" on the same component and closes the old
-	 *                 proto 1 + proto 2 problems (CLOSE_OLD) and itself (CLOSE_NEW). Every even problem
-	 *                 is closed; every odd problem stays open.
-	 *   3. Add the "odd" rule (new odd="1") and re-send "down" to the odd proto 2 keys: the same way,
-	 *                 every odd problem is closed, leaving nothing open.
+	 * Run the parity-based global event correlation scenario: open a problem on every discovered trigger,
+	 * then close them in two parity-selective waves (even first, then odd — the order does not matter).
+	 * The one differing knob is $close_all: false uses the per-component rules (old service="down" + new
+	 * odd=parity + component tag pair, closing each component 1:1); true uses the single old-event
+	 * odd=parity condition with no tag pair, so each event's unrestricted CLOSE_OLD closes the whole
+	 * parity at once. Everything else — opening all problems, the parity count checks between waves, the
+	 * final "nothing open" — is identical, which is the point of sharing one method.
 	 */
 	private function runEventAssessmentTestGlobalCorrelationParity(bool $restart,
-			$evaltype = CONDITION_EVAL_TYPE_AND_OR): void {
+			$evaltype = CONDITION_EVAL_TYPE_AND_OR, bool $close_all = false): void {
 		$keys1 = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$keys2 = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2);
-		$even_keys2 = $this->buildDiscoveredKeysByParity(self::ITEM_PROTO_KEY2, '0');
-		$odd_keys2 = $this->buildDiscoveredKeysByParity(self::ITEM_PROTO_KEY2, '1');
 		$triggerids1 = self::$discovered_triggerids;
 		$triggerids2 = self::$discovered_dep_triggerids;
 		$all = array_merge($triggerids1, $triggerids2);
 
 		// Per prototype: this many components carry odd="1" (odd index) and odd="0" (even index). With
 		// problems open on both prototypes, twice each count is open before the parity waves run.
-		$odd_per_proto = intdiv(self::LLD_DISCOVERY_COUNT + 1, 2);
-		$even_per_proto = intdiv(self::LLD_DISCOVERY_COUNT, 2);
+		$open_count = [
+			'1' => 2 * intdiv(self::LLD_DISCOVERY_COUNT + 1, 2),
+			'0' => 2 * intdiv(self::LLD_DISCOVERY_COUNT, 2)
+		];
+		$keys2_by_parity = [
+			'1' => $this->buildDiscoveredKeysByParity(self::ITEM_PROTO_KEY2, '1'),
+			'0' => $this->buildDiscoveredKeysByParity(self::ITEM_PROTO_KEY2, '0')
+		];
+
+		if ($close_all) {
+			$keys2_by_parity['1'] = array_slice($keys2_by_parity['1'], 0, 256);
+			$keys2_by_parity['0'] = array_slice($keys2_by_parity['0'], 0, 1);
+		}
+		$rule_name = ['1' => 'CEP global event correlation odd', '0' => 'CEP global event correlation even'];
+		$build = fn(string $parity) => $close_all
+			? $this->buildParityCloseAllCorrelationParams($rule_name[$parity], $parity, $evaltype)
+			: $this->buildParityCorrelationParams($rule_name[$parity], $parity, $evaltype);
+
+		// The two parities are closed in separate waves; the order between them is irrelevant.
+		$first_parity = '0';
+		$second_parity = '1';
 
 		// All triggers must start in OK state.
 		foreach ($this->getTriggers($all) as $t) {
@@ -3075,32 +3153,29 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->assertStateChangeForAll($triggerids2, $keys2, 'down', TRIGGER_VALUE_TRUE, 1);
 		$this->maybeRestartServer($restart);
 
-		$this->waitForOpenProblemCountByTag($all, 'odd', '1', 2 * $odd_per_proto);
-		$this->waitForOpenProblemCountByTag($all, 'odd', '0', 2 * $even_per_proto);
+		$this->waitForOpenProblemCountByTag($all, 'odd', '1', $open_count['1']);
+		$this->waitForOpenProblemCountByTag($all, 'odd', '0', $open_count['0']);
 
-		// 2. Close the even problems: add the even rule, then drive fresh cep-dep events on the even
-		//    proto 2 keys. Odd problems are untouched.
-		self::$correlationid = $this->upsertCorrelation(
-			$this->buildParityCorrelationParams('CEP global event correlation even', '0', $evaltype)
-		);
+		// 2. First wave: add the $first_parity rule and re-send "down" to that parity's proto 2 keys.
+		//    Those problems close; the other parity stays open.
+		self::$correlationid = $this->upsertCorrelation($build($first_parity));
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 		$this->dispatchSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down'], $even_keys2),
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down'],
+				$keys2_by_parity[$first_parity]),
 			null, 0
 		);
-		$this->waitForOpenProblemCountByTag($all, 'odd', '0', 0);
-		$this->waitForOpenProblemCountByTag($all, 'odd', '1', 2 * $odd_per_proto);
-
+		$this->waitForOpenProblemCountByTag($all, 'odd', $first_parity, 0);
+		$this->waitForOpenProblemCountByTag($all, 'odd', $second_parity, $open_count[$second_parity]);
 		$this->maybeRestartServer($restart);
 
-		// 3. Close the odd problems: add the odd rule, then drive fresh cep-dep events on the odd
-		//    proto 2 keys. Nothing remains open.
-		self::$correlationid2 = $this->upsertCorrelation(
-			$this->buildParityCorrelationParams('CEP global event correlation odd', '1', $evaltype)
-		);
+		// 3. Second wave: add the $second_parity rule and re-send "down" to its proto 2 keys. Nothing
+		//    remains open.
+		self::$correlationid2 = $this->upsertCorrelation($build($second_parity));
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 		$this->dispatchSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down'], $odd_keys2),
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down'],
+				$keys2_by_parity[$second_parity]),
 			null, 0
 		);
 
