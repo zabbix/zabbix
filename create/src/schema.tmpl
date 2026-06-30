@@ -2352,17 +2352,6 @@ FIELD		|event_count_tag|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|cep_ruleid
 CHANGELOG	|25
 
-TABLE|cep_window_condition|cep_window_conditionid|ZBX_DATA
-FIELD		|cep_window_conditionid|t_id	|	|NOT NULL	|0
-FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0			|1|cep_rule	|cep_ruleid	|RESTRICT
-FIELD		|type		|t_integer	|'1'	|NOT NULL	|0
-FIELD		|operator	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|past_tag	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|tag_value	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|tag		|t_varchar(255)	|''	|NOT NULL|0
-INDEX		|1		|cep_ruleid
-CHANGELOG	|26
-
 TABLE|cep_group|cep_groupid|ZBX_DATA
 FIELD		|cep_groupid	|t_id		|	|NOT NULL	|0
 FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0			|1|cep_rule	|cep_ruleid
@@ -2394,6 +2383,16 @@ FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|suppress_until	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|cep_ruleid
+CHANGELOG	|26
+
+TABLE|cep_operation_condition|cep_operation_conditionid|ZBX_DATA
+FIELD		|cep_operation_conditionid|t_id	|	|NOT NULL	|0
+FIELD		|cep_operationid|t_id		|	|NOT NULL	|0			|1|cep_operation	|cep_operationid	|RESTRICT
+FIELD		|type		|t_integer	|'25'	|NOT NULL	|0
+FIELD		|operator	|t_integer	|'12'	|NOT NULL	|0
+FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
+INDEX		|1		|cep_operationid
 CHANGELOG	|27
 
 TABLE|dbversion|dbversionid|
