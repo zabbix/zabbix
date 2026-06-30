@@ -800,8 +800,8 @@ class testLowLevelDiscovery extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Key' => 'test1',
 						'id:delay_flex_0_type' => 'Flexible',
-						'id:delay_flex_0_delay' => '60s',
-						'id:delay_flex_0_period' => '1-8,00:00-24:00'
+						'id:delay_flex_0_period' => '1-8,00:00-24:00',
+						'id:delay_flex_0_delay' => '60s'
 					],
 					'inline_errors' => [
 						'id:delay_flex_0_period' => 'Period: Invalid period.'
@@ -2156,7 +2156,7 @@ class testLowLevelDiscovery extends CWebTest {
 				->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
-
+sleep(10);
 		if (static::$context === 'template') {
 			unset($data['fields']['Host interface']);
 		}

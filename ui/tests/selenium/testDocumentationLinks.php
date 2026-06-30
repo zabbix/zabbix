@@ -840,6 +840,7 @@ class testDocumentationLinks extends CWebTest {
 				[
 
 					'url' => 'zabbix.php?action=popup&popup=lldrule.edit&context=template&itemid=15011',
+					'second_dialog' => true,
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -1438,6 +1439,7 @@ class testDocumentationLinks extends CWebTest {
 					'replace' => true,
 					'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={item_prototypeid}'.
 							'&parent_discoveryid={discoveryid}&context=host',
+					'second_dialog' => true,
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',

@@ -4186,10 +4186,16 @@ abstract class testFormPreprocessing extends CWebTest {
 		// Hint is present only for Items and Item prototypes.
 		$form->getLabel('Preprocessing steps')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
 		$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->waitUntilReady();
-		$this->assertEquals("Preprocessing is a transformation before saving the value to the database.".
-				" It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.".
-				"\n\nHowever, if \"Check for not supported value\" steps are configured, they are always placed and".
-				" executed first (with \"any error\" being the last of them).", $hint->getText()
+
+		$expected_text = ($lld)
+			? 'Preprocessing is a transformation before saving the value to the database. It is possible to define a'.
+				' sequence of preprocessing steps, and those are executed in the order they are set.'
+			: "Preprocessing is a transformation before saving the value to the database.".
+				" It is possible to define a sequence of preprocessing steps, and those are executed in the order they".
+				" are set.\n\nHowever, if \"Check for not supported value\" steps are configured, they are always placed and".
+				" executed first (with \"any error\" being the last of them).";
+
+		$this->assertEquals($expected_text, $hint->getText()
 		);
 		$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 

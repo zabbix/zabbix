@@ -1683,7 +1683,7 @@ class testDashboardItemCardWidget extends testWidgets {
 							],
 							'Create trigger' => 'menu-popup-item',
 							'Create dependent item' => 'menu-popup-item',
-							'Create dependent discovery rule' => 'host_discovery.php?form=create&hostid={hostid}&type=18'.
+							'Create dependent discovery rule' => 'zabbix.php?action=lldrule.edit&hostid={hostid}&type=18'.
 									'&master_itemid={itemid}&backurl=zabbix.php%3Faction%3Dlatest.view%26context%3Dhost'.
 									'&context=host'
 						],
@@ -1742,7 +1742,7 @@ class testDashboardItemCardWidget extends testWidgets {
 							],
 							'Create trigger' => 'menu-popup-item',
 							'Create dependent item' => 'menu-popup-item',
-							'Create dependent discovery rule' => 'host_discovery.php?form=create&hostid={hostid}&type=18'.
+							'Create dependent discovery rule' => 'zabbix.php?action=lldrule.edit&hostid={hostid}&type=18'.
 									'&master_itemid={itemid}&backurl=zabbix.php%3Faction%3Dlatest.view%26context%3Dhost'.
 									'&context=host'
 						],
