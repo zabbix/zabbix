@@ -2164,6 +2164,12 @@ class testFormAlertsScripts extends CWebTest {
 	private function assertUriScheme($form, $data, $expected = TEST_GOOD) {
 		foreach ($data as $scheme) {
 			$form->fill(['URL' => $scheme]);
+
+			// Wait for error not to be present for positive test cases before submitting the form.
+			if ($expected === TEST_GOOD) {
+				$form->getField('URL')->waitUntilClassesNotPresent('has-error');
+			}
+
 			$form->submit();
 
 			if ($expected === TEST_GOOD) {
