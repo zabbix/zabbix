@@ -36,7 +36,7 @@ static int	zbx_vault_app_role_login_hashicorp(const char *url, const char *app_r
 		const char *config_ssl_key_location, long timeout, char **error, char **token)
 {
 	struct zbx_json		json;
-	char			*out = NULL, *login_url;
+	char			*out = NULL, *login_url, *new_token = NULL;
 	struct zbx_json_parse	jp, jp_data;
 	int			ret = FAIL;
 	long			response_code;
@@ -73,27 +73,29 @@ static int	zbx_vault_app_role_login_hashicorp(const char *url, const char *app_r
 		goto fail;
 	}
 
-	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "client_token", token, &value_alloc, NULL))
+	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "client_token", &new_token, &value_alloc, NULL))
 	{
-		zbx_free(*token);
 		*error = zbx_strdup(*error, "cannot find the client_token object in the received JSON object.");
 		goto fail;
 	}
 
-	if (NULL == *token)
+	if (NULL == new_token)
 	{
 		*error = zbx_strdup(*error, "received null token");
 		goto fail;
 	}
 
-	if ('\0' == **token)
+	if ('\0' == *new_token)
 	{
 		*error = zbx_strdup(*error, "received empty token");
 		goto fail;
 	}
 
+	*token = new_token;
+	new_token = NULL;
 	ret = SUCCEED;
 fail:
+	zbx_free(new_token);
 	zbx_free(out);
 	zbx_free(login_url);
 	zbx_json_free(&json);
