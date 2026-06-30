@@ -381,6 +381,8 @@ static int	cep_manager_is_task_pending(zbx_cep_manager_t *manager, const zbx_mw_
 		case CEP_TASK_SYNC_EVENT:
 			eventid = zbx_cep_event_handle_eventid(((zbx_cep_task_sync_event_t *)task)->hevent);
 			return cep_manager_is_event_pending(manager, eventid);
+		case CEP_TASK_ACKNOWLEDGE:
+			return cep_manager_is_event_pending(manager, ((zbx_cep_task_acknowledge_t *)task)->eventid);
 	}
 
 	return FAIL;
