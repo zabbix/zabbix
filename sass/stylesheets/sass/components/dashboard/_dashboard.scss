@@ -510,8 +510,6 @@
 			border-top-left-radius: var(--surface-border-radius);
 			border-top-right-radius: var(--surface-border-radius);
 			transition-property: border-radius;
-			transition-duration: calc(#{$ui-transition-duration} * .25);
-			transition-delay: calc(#{$ui-transition-duration} * .75);
 
 			&.no-padding {
 				.dashboard-grid-widget-messages {
@@ -585,6 +583,7 @@
 
 	// Transition for opacity is set for best border disappearance on different themes.
 	@if $ui-transitions {
+		clip-path: inset(0 0 0 0 round var(--surface-border-radius));
 		transition: margin-top $ui-transition-duration ease-out,
 					height $ui-transition-duration ease-out,
 					opacity .15s .15s ease-out,
@@ -804,8 +803,7 @@
 
 	.dashboard-grid-widget .dashboard-grid-widget-header,
 	.dashboard-grid-iterator .dashboard-grid-iterator-header {
-		border-top-left-radius: var(--surface-border-radius);
-		border-top-right-radius: var(--surface-border-radius);
+		border-radius: var(--surface-border-radius);
 		cursor: auto;
 	}
 }

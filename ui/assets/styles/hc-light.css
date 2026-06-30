@@ -2084,9 +2084,7 @@ button {
     border-top-color: transparent;
     border-top-left-radius: var(--surface-border-radius);
     border-top-right-radius: var(--surface-border-radius);
-    transition-property: border-radius;
-    transition-duration: calc(300ms * .25);
-    transition-delay: calc(300ms * .75); }
+    transition-property: border-radius; }
     .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-bad,
     .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-good,
     .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-warning {
@@ -2256,8 +2254,7 @@ button {
 .dashboard-grid-widget.ui-draggable .dashboard-grid-iterator .dashboard-grid-iterator-header,
 .dashboard-grid-iterator.ui-draggable .dashboard-grid-widget .dashboard-grid-widget-header,
 .dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator .dashboard-grid-iterator-header {
-  border-top-left-radius: var(--surface-border-radius);
-  border-top-right-radius: var(--surface-border-radius);
+  border-radius: var(--surface-border-radius);
   cursor: auto; }
 
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget-actions {
