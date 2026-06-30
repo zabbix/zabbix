@@ -15,6 +15,7 @@
 
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../../include/classes/api/CAudit.php';
 
 /**
  * @onBefore prepareUsersData
@@ -3312,5 +3313,125 @@ class testUsers extends CAPITest {
 
 	public function addGuestToDisabledGroup() {
 		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
+	}
+
+	public function testUsers_loginHandlesParallelRequests(): void {
+		$usergroups = CDataHelper::call('usergroup.create', [[
+			'name' => 'Demo Group',
+			'users_status' => GROUP_STATUS_ENABLED
+		]]);
+
+		$roleids = CDataHelper::call('role.create', [[
+			'name' => 'Demo Role',
+			'type' => USER_TYPE_ZABBIX_ADMIN
+		]]);
+
+		$username = 'demo';
+		$users_data = [[
+			'username' => $username,
+			'roleid' => $roleids['roleids'][0],
+			'passwd' => 'zabbix123456',
+			'usrgrps' => [
+				['usrgrpid' => $usergroups['usrgrpids'][0]]
+			]
+		]];
+
+		CDataHelper::call('user.create', $users_data);
+
+		$payload = json_encode([
+			'jsonrpc' => '2.0',
+			'method' => 'user.login',
+			'params' => [
+				'username' => $username,
+				'password' => 'wrongpassword'
+			],
+			'id' => 1
+		]);
+
+		$multi_handle = curl_multi_init();
+		$handles = [];
+		$responses = [];
+
+		for ($i = 0; $i < 7; $i++) {
+			$curl = curl_init(PHPUNIT_URL.'api_jsonrpc.php');
+			curl_setopt_array($curl, [
+				CURLOPT_POST => true,
+				CURLOPT_POSTFIELDS => $payload,
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_HTTPHEADER => ['Content-Type: application/json']
+			]);
+
+			curl_multi_add_handle($multi_handle, $curl);
+			$handles[] = $curl;
+		}
+
+		do {
+			curl_multi_exec($multi_handle, $running);
+			curl_multi_select($multi_handle);
+		} while ($running);
+
+		foreach ($handles as $curl) {
+			$responses[] = curl_multi_getcontent($curl);
+			curl_multi_remove_handle($multi_handle, $curl);
+			curl_close($curl);
+		}
+
+		curl_multi_close($multi_handle);
+
+		foreach ($responses as $response) {
+			$data = json_decode($response, true);
+
+			$this->assertEquals([
+				'code' => -32500,
+				'message' => 'Application error.',
+				'data' => 'Incorrect user name or password or account is temporarily blocked.'
+			], $data['error']);
+		}
+
+		$response = CDataHelper::callRaw([
+			'jsonrpc' => '2.0',
+			'method' => 'user.login',
+			'params' => [
+				'username' => $username,
+				'password' => 'zabbix123456'
+			],
+			'id' => 1
+		]);
+
+		$this->assertEquals([
+			'code' => -32500,
+			'message' => 'Application error.',
+			'data' => 'Incorrect user name or password or account is temporarily blocked.'
+		], $response['error']);
+
+		$user = DB::find('users', ['username' => $username])[0];
+
+		$auditlogs_update = CDBHelper::getAll(
+			'SELECT details'.
+			' FROM auditlog a'.
+			' WHERE '.dbConditionId('a.userid', [$user['userid']]).
+				' AND a.action='.CAudit::ACTION_UPDATE.
+			' ORDER BY a.clock ASC'
+		);
+
+		$this->assertEquals(5, count($auditlogs_update));
+
+		foreach ($auditlogs_update as $i => $auditlog) {
+			$details = json_decode($auditlog['details'], true);
+
+			$this->assertEquals('update', $details['user.attempt_failed'][0]);
+			$this->assertEquals($i + 1, $details['user.attempt_failed'][1]);
+			$this->assertEquals($i, $details['user.attempt_failed'][2]);
+		}
+
+		$auditlogs_login_failed = CDBHelper::getAll(
+			'SELECT details'.
+			' FROM auditlog a'.
+			' WHERE '.dbConditionId('a.userid', [$user['userid']]).
+				' AND a.action='.CAudit::ACTION_LOGIN_FAILED.
+			' ORDER BY a.clock DESC'
+		);
+
+		$this->assertEquals(8, count($auditlogs_login_failed));
 	}
 }
