@@ -166,7 +166,7 @@ class CCepRuleHelper {
 		]
 	];
 
-	public static function getConditionLabelStrings(): array {
+	public static function getConditionLabels(): array {
 		return [
 			self::CONDITION_EVENT_NAME => _('Event name'),
 			self::CONDITION_TAG => _('Tag'),
@@ -177,8 +177,14 @@ class CCepRuleHelper {
 		];
 	}
 
-	public static function getConditionLabelString(array $ceprule_condition): string {
-		return self::getConditionLabelStrings()[$ceprule_condition['type']];
+	private static function getConditionLabel(int $type): string {
+		$labels = self::getConditionLabels();
+
+		if (!array_key_exists($type, $labels)) {
+			throw new LogicException("Uknown condition type $type.");
+		}
+
+		return $labels[$type];
 	}
 
 	public static function getConditionTagOperators(): array {
@@ -236,14 +242,14 @@ class CCepRuleHelper {
 				|| $ceprule_condition['operator'] == CONDITION_OPERATOR_NOT_EXISTS) {
 
 			return [
-				CCepRuleHelper::getConditionLabelString($ceprule_condition),
+				CCepRuleHelper::getConditionLabel($ceprule_condition['type']),
 				' ',
 				italic(CCepRuleHelper::getConditionOperatorString($ceprule_condition))
 			];
 		}
 
 		return [
-			CCepRuleHelper::getConditionLabelString($ceprule_condition),
+			CCepRuleHelper::getConditionLabel($ceprule_condition['type']),
 			' ',
 			italic(CCepRuleHelper::getConditionOperatorString($ceprule_condition)),
 			' ',
@@ -367,45 +373,77 @@ class CCepRuleHelper {
 		$details = json_decode(json: $details, associative: true, flags: JSON_THROW_ON_ERROR|JSON_BIGINT_AS_STRING);
 
 		foreach ($details['cep'] as $ceprule_operation) {
-			$label = CCepRuleHelper::getOperationLabelString(['type' => $ceprule_operation['operation']]);
-			$result[] = $label.': '.match((int) $ceprule_operation['operation']) {
-				self::OP_SUPPRESS,
-				self::OP_COPY_FIRST,
-				self::OP_COPY_LAST,
-				self::OP_DISCARD,
-				self::OP_CLOSE => '',
-
-				self::OP_SET_SEVERITY,
-				self::OP_DECREASE_SEVERITY,
-				self::OP_INCREASE_SEVERITY => sprintf('%s -> %s',
-					CSeverityHelper::getName($ceprule_operation['severity']['old']),
-					CSeverityHelper::getName($ceprule_operation['severity']['new'])
-				),
-
-				self::OP_RENAME_TAG => sprintf('%s:%s > %s:%s', $ceprule_operation['tag']['tag']['old'],
-					$ceprule_operation['tag']['value']['old'], $ceprule_operation['tag']['tag']['new'],
-					$ceprule_operation['tag']['value']['new']
-				),
-
-				self::OP_DECREASE_TAG_VALUE,
-				self::OP_INCREASE_TAG_VALUE,
-				self::OP_SET_TAG_VALUE => sprintf('%s: %s > %s', $ceprule_operation['tag']['tag'],
-					$ceprule_operation['tag']['value']['old'], $ceprule_operation['tag']['value']['new']
-				),
-
-				self::OP_SET_NAME => sprintf('%s > %s', $ceprule_operation['name']['old'],
-					$ceprule_operation['name']['new']
-				),
-				self::OP_REMOVE_TAG => sprintf('%s:%s', $ceprule_operation['tag']['tag']['old'],
-					$ceprule_operation['tag']['value']['old']
-				),
-				self::OP_SET_TAG,
-				self::OP_ADD_TAG => sprintf('%s:%s', $ceprule_operation['tag']['tag'],
-					$ceprule_operation['tag']['value']
-				)
-			};
+			try {
+				$result[] = self::formatOperationDetails($ceprule_operation);
+			} catch (Throwable $e) {
+				error_log($e->getMessage());
+				error_log($e->getTraceAsString());
+				$result[] = '*UNKNOWN*';
+			}
 		}
 
 		return implode(PHP_EOL, $result);
+	}
+
+	private static function formatOperationDetails(array $ceprule_operation): string {
+		$operation = (int) $ceprule_operation['operation'];
+		$target = match($operation) {
+			self::OP_SET_NAME
+				=> 'name',
+
+			self::OP_DECREASE_SEVERITY, self::OP_INCREASE_SEVERITY, self::OP_SET_SEVERITY
+				=> 'severity',
+
+			self::OP_ADD_TAG, self::OP_SET_TAG, self::OP_SET_TAG_VALUE, self::OP_INCREASE_TAG_VALUE,
+			self::OP_DECREASE_TAG_VALUE, self::OP_RENAME_TAG, self::OP_REMOVE_TAG
+				=> 'tag',
+
+			default => ''
+		};
+
+		$format_tag_pair = fn (array $value): string => sprintf('%s:%s', $value['tag'], $value['value']);
+		$format_value_added = fn (array $value): string => sprintf('> %s', $value['new']);
+		$format_value_changed = fn (array $value): string => array_key_exists('old', $value)
+			? sprintf('%s > %s', $value['old'], $value['new'])
+			: $format_value_added($value);
+
+		$target_details = $target ? $ceprule_operation[$target] : [];
+
+		$arguments = match($operation) {
+			self::OP_SET_NAME
+				=> $format_value_changed($target_details),
+
+			self::OP_RENAME_TAG
+				=> $format_value_changed($target_details['tag']),
+
+			self::OP_SET_SEVERITY, self::OP_DECREASE_SEVERITY, self::OP_INCREASE_SEVERITY
+				=> $format_value_changed([
+					'old' => CSeverityHelper::getName($target_details['old']),
+					'new' => CSeverityHelper::getName($target_details['new'])
+				]),
+
+			self::OP_ADD_TAG, self::OP_REMOVE_TAG
+				=> $format_tag_pair($target_details),
+
+			self::OP_DECREASE_TAG_VALUE, self::OP_INCREASE_TAG_VALUE, self::OP_SET_TAG_VALUE
+				=> $format_tag_pair([
+					'tag' => $target_details['tag'],
+					'value' => $format_value_changed($target_details['value'])
+				]),
+
+			self::OP_SET_TAG
+				=> $format_tag_pair([
+					'tag' => $target_details['tag'],
+					'value' => is_string($target_details['value'])
+						? $target_details['value']
+						: $format_value_changed($target_details['value'])
+				]),
+
+			default => ''
+		};
+
+		$label = CCepRuleHelper::getOperationLabelString(['type' => $operation]);
+
+		return $arguments !== '' ? "$label: $arguments." : "$label.";
 	}
 }
