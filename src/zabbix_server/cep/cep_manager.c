@@ -62,6 +62,8 @@ typedef struct
 	zbx_vector_mw_task_ptr_t	commits_pending;
 
 	zbx_hashset_t			events_pending;
+
+	int				commit_task_num;
 }
 zbx_cep_manager_t;
 
@@ -137,6 +139,8 @@ static zbx_cep_manager_t	*cep_manager_create(const zbx_thread_info_t *info, zbx_
 	zbx_vector_mw_task_ptr_create(&manager->commits);
 	zbx_vector_mw_task_ptr_create(&manager->commits_pending);
 	zbx_hashset_create(&manager->events_pending, 100, ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	manager->commit_task_num = 0;
 
 	if (SUCCEED != zbx_mw_manager_init(&manager->base, info, ZBX_IPC_SERVICE_CEP, ZBX_PROCESS_TYPE_CEP_WORKER,
 			(zbx_mw_worker_t **)workers, CEP_WORKERS_MAX, CEP_WORKERS_DEFAULT, cep_worker_entry,
@@ -477,6 +481,7 @@ static void	cep_manager_process_finished(zbx_cep_manager_t *manager, zbx_vector_
 				break;
 			case CEP_TASK_COMMIT:
 				cep_manager_remove_pending_events(manager, tasks->values[i]);
+				manager->commit_task_num--;
 				break;
 			case CEP_TASK_ADD_TAGS:
 				zbx_vector_mw_task_ptr_append(&manager->commits, tasks->values[i]);
@@ -519,6 +524,19 @@ static void	cep_manager_flush_commmits(zbx_cep_manager_t *manager)
 	zbx_mw_queue_lock(manager->base.queue);
 	cep_queue_push((zbx_cep_queue_t *)manager->base.queue, task);
 	zbx_mw_queue_unlock(manager->base.queue);
+
+	manager->commit_task_num++;
+}
+
+static int	cep_manager_commit_limit(zbx_cep_manager_t *manager, const zbx_thread_cep_manager_args_t *args)
+{
+	if (1 == manager->base.workers_num)
+		return 1;
+
+	if (args->commit_limit > manager->base.workers_num - 1)
+		return manager->base.workers_num - 1;
+
+	return args->commit_limit;
 }
 
 static int	cep_manager_process_windows(int now, zbx_vector_mw_task_ptr_t *tasks)
@@ -762,7 +780,8 @@ void	*zbx_cep_manager_thread(void *args)
 				time_flush = time_now;
 		}
 
-		if (0 != manager->commits.values_num)
+		if (0 != manager->commits.values_num &&
+				manager->commit_task_num < cep_manager_commit_limit(manager, cep_args))
 		{
 			int	commits_num = manager->commits.values_num + manager->commits_pending.values_num;
 

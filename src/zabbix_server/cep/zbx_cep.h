@@ -24,6 +24,7 @@ typedef struct
 	int		workers_num;
 	int		config_timeout;
 	const char	*config_source_ip;
+	int		commit_limit;
 }
 zbx_thread_cep_manager_args_t;
 
