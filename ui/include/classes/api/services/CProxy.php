@@ -432,41 +432,43 @@ class CProxy extends CApiService {
 			];
 		}
 
-		$usrgrps = [];
-		$indexes = [];
+		if ($db_usrgrps) {
+			$usrgrps = [];
+			$indexes = [];
 
-		foreach ($db_usrgrps as $db_usrgrpid => $db_usrgrp) {
-			$upd_user_group = false;
+			foreach ($db_usrgrps as $db_usrgrpid => $db_usrgrp) {
+				$upd_user_group = false;
 
-			foreach ($db_usrgrp['proxies'] as $proxy) {
-				if (array_key_exists($proxy['proxyid'], $proxyids)) {
-					$upd_user_group = true;
-					break;
+				foreach ($db_usrgrp['proxies'] as $proxy) {
+					if (array_key_exists($proxy['proxyid'], $proxyids)) {
+						$upd_user_group = true;
+						break;
+					}
+				}
+
+				if (!$upd_user_group) {
+					continue;
+				}
+
+				$usrgrps[] = [
+					'name' => $db_usrgrp['name'],
+					'usrgrpid' => $db_usrgrp['usrgrpid'],
+					'proxies' => []
+				];
+
+				$indexes[$db_usrgrpid] = array_key_last($usrgrps);
+
+				foreach ($db_usrgrp['proxies'] as $proxy) {
+					if (!array_key_exists($proxy['proxyid'], $proxyids)) {
+						$usrgrps[$indexes[$db_usrgrpid]]['proxies'][] = [
+							'proxyid' => $proxy['proxyid']
+						];
+					}
 				}
 			}
 
-			if (!$upd_user_group) {
-				continue;
-			}
-
-			$usrgrps[] = [
-				'name' => $db_usrgrp['name'],
-				'usrgrpid' => $db_usrgrp['usrgrpid'],
-				'proxies' => []
-			];
-
-			$indexes[$db_usrgrpid] = array_key_last($usrgrps);
-
-			foreach ($db_usrgrp['proxies'] as $proxy) {
-				if (!array_key_exists($proxy['proxyid'], $proxyids)) {
-					$usrgrps[$indexes[$db_usrgrpid]]['proxies'][] = [
-						'proxyid' => $proxy['proxyid']
-					];
-				}
-			}
+			CUserGroup::updateForce($usrgrps, $db_usrgrps);
 		}
-
-		CUserGroup::updateForce($usrgrps, $db_usrgrps);
 	}
 
 	/**
@@ -484,6 +486,14 @@ class CProxy extends CApiService {
 		}
 
 		$this->validateDelete($proxyids, $db_proxies);
+
+		$proxies = API::Proxy()->get([
+			'output' => ['proxyid', 'proxy_groupid'],
+			'proxyids' => $proxyids,
+			'preservekeys' => true
+		]);
+
+		self::unlinkProxies($proxies);
 
 		DB::delete('host_proxy', ['proxyid' => $proxyids]);
 		DB::delete('proxy', ['proxyid' => $proxyids]);

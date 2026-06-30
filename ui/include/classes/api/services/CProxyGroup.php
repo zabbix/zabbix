@@ -368,6 +368,14 @@ class CProxyGroup extends CApiService {
 
 		self::validateDelete($proxy_groupids, $db_proxy_groups);
 
+		$proxy_groups = API::ProxyGroup()->get([
+			'output' => ['proxy_groupid'],
+			'proxy_groupids' => $proxy_groupids,
+			'preservekeys' => true
+		]);
+
+		self::unlinkProxyGroups($proxy_groups);
+
 		DB::delete('proxy_group', ['proxy_groupid' => $proxy_groupids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_PROXY_GROUP, $db_proxy_groups);
@@ -400,6 +408,83 @@ class CProxyGroup extends CApiService {
 
 		self::checkUsedInProxies($db_proxy_groups);
 		self::checkUsedInHosts($db_proxy_groups);
+	}
+
+	/**
+	 * @param array $proxy_groups
+	 */
+	private static function unlinkProxyGroups(array $proxy_groups): void {
+		$proxy_groupids = [];
+
+		foreach ($proxy_groups as $proxy_group) {
+			$proxy_groupids[$proxy_group['proxy_groupid']] = true;
+		}
+
+		$db_usrgrps = [];
+
+		$resource = DBselect(
+			'SELECT ugpg.usrgrpid,ugpg.proxy_groupid,ugpg.usrgrp_proxy_groupid,ug.name'.
+			' FROM usrgrp_proxy_group ugpg'.
+			' JOIN usrgrp ug ON ug.usrgrpid=ugpg.usrgrpid'.
+			' WHERE ugpg.usrgrpid IN ('.
+				'SELECT DISTINCT ugpg2.usrgrpid'.
+				' FROM usrgrp_proxy_group ugpg2'.
+				' WHERE '.dbConditionId('ugpg2.proxy_groupid', array_keys($proxy_groupids)).
+			')'
+		);
+
+		while ($row = DBfetch($resource)) {
+			if (!array_key_exists($row['usrgrpid'], $db_usrgrps)) {
+				$db_usrgrps[$row['usrgrpid']] = [
+					'name' => $row['name'],
+					'usrgrpid' => $row['usrgrpid'],
+					'proxy_groups' => []
+				];
+			}
+
+			$db_usrgrps[$row['usrgrpid']]['proxy_groups'][$row['usrgrp_proxy_groupid']] = [
+				'usrgrp_proxy_groupid' => $row['usrgrp_proxy_groupid'],
+				'proxy_groupid' => $row['proxy_groupid']
+			];
+		}
+
+		if ($db_usrgrps) {
+			$usrgrps = [];
+			$indexes = [];
+
+			foreach ($db_usrgrps as $db_usrgrpid => $db_usrgrp) {
+				$upd_user_group = false;
+
+				foreach ($db_usrgrp['proxy_groups'] as $proxy_group) {
+					if (array_key_exists($proxy_group['proxy_groupid'], $proxy_groupids)) {
+						$upd_user_group = true;
+						break;
+					}
+				}
+
+				if (!$upd_user_group) {
+					continue;
+				}
+
+				$usrgrps[] = [
+					'name' => $db_usrgrp['name'],
+					'usrgrpid' => $db_usrgrp['usrgrpid'],
+					'proxy_groups' => []
+				];
+
+				$indexes[$db_usrgrpid] = array_key_last($usrgrps);
+
+				foreach ($db_usrgrp['proxy_groups'] as $proxy_group) {
+					if (!array_key_exists($proxy_group['proxy_groupid'], $proxy_groupids)) {
+						$usrgrps[$indexes[$db_usrgrpid]]['proxy_groups'][] = [
+							'proxy_groupid' => $proxy_group['proxy_groupid']
+						];
+					}
+				}
+			}
+
+			CUserGroup::updateForce($usrgrps, $db_usrgrps);
+		}
 	}
 
 	/**
