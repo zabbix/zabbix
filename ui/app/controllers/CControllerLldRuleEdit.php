@@ -265,9 +265,9 @@ class CControllerLldRuleEdit extends CController
 			$item['discoveryData']['lldruleid'] = $parent_lld['itemid'];
 		}
 
-		$inherited_timeouts = getInheritedTimeouts($host['proxyid'])['timeouts'];
-		$item['inherited_timeout'] = array_key_exists($item['type'], $inherited_timeouts)
-			? $inherited_timeouts[$item['type']] : '';
+		$item['inherited_timeouts'] = getInheritedTimeouts($host['proxyid'])['timeouts'];
+		$item['inherited_timeout'] = array_key_exists($item['type'], $item['inherited_timeouts'])
+			? $item['inherited_timeouts'][$item['type']] : '';
 
 		if ($item['timeout'] === DB::getDefault('items', 'timeout')) {
 			$item['timeout'] = $item['inherited_timeout'];

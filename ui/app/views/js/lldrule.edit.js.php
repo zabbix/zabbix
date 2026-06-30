@@ -51,7 +51,8 @@ window.lldrule_edit = new class {
 				interface_types: interface_types,
 				lldrule: lldrule,
 				host_interfaces: host.interfaces,
-				readonly: (lldrule.templated || lldrule.discovered)
+				readonly: (lldrule.templated || lldrule.discovered),
+				inherited_timeouts: lldrule.inherited_timeouts
 			}),
 			preprocessing: new ItemEditPreprocessingTab({
 				container: document.getElementById('processing-tab'),

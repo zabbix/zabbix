@@ -23,12 +23,14 @@ var LldRuleEditLldRuleTab = class {
 	#container;
 	#field_switches;
 	#host_interface_selector;
+	#inherited_timeouts;
 	#readonly;
 
-	constructor({container, field_switches, lldrule, interface_types, host_interfaces, readonly}) {
+	constructor({container, field_switches, lldrule, interface_types, host_interfaces, readonly, inherited_timeouts}) {
 		this.#container = container;
 		this.#field_switches = field_switches;
 		this.#readonly = readonly;
+		this.#inherited_timeouts = inherited_timeouts;
 
 		if (!(lldrule.templated || lldrule.discovered)) {
 			if (lldrule.parameters.length == 0) {
@@ -119,6 +121,15 @@ var LldRuleEditLldRuleTab = class {
 		this.#container.querySelector('[name="type"]').addEventListener('change', (e) => {
 			this.#host_interface_selector.setType(parseInt(e.target.value));
 			this.#container.dispatchEvent(new CustomEvent('update'));
+
+			const inherited_timeout_input = this.#container.querySelector('[name="inherited_timeout"]');
+			inherited_timeout_input.value = this.#inherited_timeouts[e.target.value] || '';
+			const custom_timeout_input = this.#container.querySelector('[name="custom_timeout"]:checked');
+
+			if (custom_timeout_input.value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>) {
+				this.#container.querySelector('[name="timeout"]').value = inherited_timeout_input.value;
+			}
+
 			this.#update();
 		});
 
