@@ -4298,36 +4298,6 @@ out:
 	return ret;
 }
 
-int	zbx_dbsync_prepare_cep_window_condition(zbx_dbsync_t *sync)
-{
-	char	*sql = NULL;
-	size_t	sql_alloc = 0, sql_offset = 0;
-	int	ret = SUCCEED;
-
-	zbx_dcsync_sql_start(sync);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select cep_window_conditionid,cep_ruleid,type,operator,past_tag,tag_value,tag"
-			" from cep_window_condition");
-
-	dbsync_prepare(sync, 7, NULL);
-
-	if (ZBX_DBSYNC_INIT == sync->mode)
-	{
-		if (NULL == (sync->dbresult = zbx_dbconn_select(sync->db, "%s", sql)))
-			ret = FAIL;
-		goto out;
-	}
-
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "cep_window_conditionid", "where", NULL,
-			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CEP_WINDOW_CONDITION)]);
-out:
-	zbx_free(sql);
-	zbx_dcsync_sql_end(sync);
-
-	return ret;
-}
-
 int	zbx_dbsync_prepare_cep_operation(zbx_dbsync_t *sync)
 {
 	char	*sql = NULL;

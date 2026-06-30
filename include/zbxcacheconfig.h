@@ -1853,25 +1853,6 @@ zbx_cep_condition_t;
 
 ZBX_VECTOR_DECL(cep_condition, zbx_cep_condition_t)
 
-typedef union
-{
-	zbx_cep_args_tag_pair_t		tag_pair;
-	zbx_cep_args_tag_name_t		old_tag;
-	zbx_cep_args_tag_value_t	old_tag_value;
-}
-zbx_cep_window_condition_args_t;
-
-typedef struct
-{
-	zbx_uint64_t			conditionid;
-	int				type;
-	int				operator;
-	zbx_cep_window_condition_args_t	args;
-}
-zbx_cep_window_condition_t;
-
-ZBX_VECTOR_DECL(cep_window_condition, zbx_cep_window_condition_t)
-
 typedef struct
 {
 	int		type;
@@ -1883,8 +1864,6 @@ typedef struct
 	char		*event_count_tag;
 	char		*script;
 	char		*group_tag;
-
-	zbx_vector_cep_window_condition_t	conditions;
 }
 zbx_cep_rule_window_t;
 
