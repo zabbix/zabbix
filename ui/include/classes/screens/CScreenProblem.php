@@ -520,7 +520,7 @@ class CScreenProblem extends CScreenBase {
 
 		$r_events = $r_eventids
 			? API::Event()->get([
-				'output' => ['clock', 'ns', 'correlationid', 'userid'],
+				'output' => ['clock', 'ns', 'correlationid', 'userid', 'cep_ruleid'],
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'object' => EVENT_OBJECT_TRIGGER,
 				'eventids' => array_keys($r_eventids),
@@ -534,12 +534,14 @@ class CScreenProblem extends CScreenBase {
 				$event['r_ns'] = $r_events[$event['r_eventid']]['ns'];
 				$event['correlationid'] = $r_events[$event['r_eventid']]['correlationid'];
 				$event['userid'] = $r_events[$event['r_eventid']]['userid'];
+				$event['cep_ruleid'] = $r_events[$event['r_eventid']]['cep_ruleid'];
 			}
 			else {
 				$event['r_clock'] = 0;
 				$event['r_ns'] = 0;
 				$event['correlationid'] = 0;
 				$event['userid'] = 0;
+				$event['cep_ruleid'] = '0';
 			}
 		}
 		unset($event);

@@ -23,7 +23,7 @@ $condition_type = (new CSelect('type'))
 	->setId('ceprule-condition-type')
 	->setFocusableElementId('ceprule-condition-type-focus');
 
-foreach (CCepRuleHelper::getConditionLabelStrings() as $value => $name) {
+foreach (CCepRuleHelper::getConditionLabels() as $value => $name) {
 	$condition_type->addOption(new CSelectOption($value, $name));
 }
 

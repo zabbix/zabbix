@@ -895,7 +895,7 @@ window.ceprule_edit_popup = new class {
 
 	#buildConditionRow(condition) {
 		const event_name_str = JSON.parse('<?= json_encode(
-			CCepRuleHelper::getConditionLabelStrings()
+			CCepRuleHelper::getConditionLabels()
 		) ?>')[condition.type];
 		const operator_names = JSON.parse('<?= json_encode(
 			CCepRuleHelper::getConditionOperatorStrings()
@@ -916,10 +916,6 @@ window.ceprule_edit_popup = new class {
 				return (condition.tag_operator == <?= CONDITION_OPERATOR_EXISTS ?> ||
 						condition.tag_operator == <?= CONDITION_OPERATOR_NOT_EXISTS ?>)
 					? condition.tag : `${condition.tag}:${condition.tag_value}`;
-			}
-
-			if (condition.type == <?= CCepRuleHelper::CONDITION_TAG_VALUE ?>) {
-				return condition.tag_value;
 			}
 
 			if (condition.type == <?= CCepRuleHelper::CONDITION_SEVERITY ?>) {

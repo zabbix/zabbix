@@ -2068,6 +2068,14 @@ function makeEventHistoryTable(array $actions, array $users, array $maintenances
 			$action['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 		}
 
+		if ($action['cep_ruleid'] !== '0') {
+			$action['action_type'] = ZBX_EVENT_HISTORY_CEP_UPDATE;
+
+			if ($action['details'] !== '') {
+				$action['message'] = CCepRuleHelper::buildActionDetailsMessage($action['details']);
+			}
+		}
+
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 			makeActionTableUser($action, $users),
@@ -2239,7 +2247,9 @@ function makeActionTableIcon(array $action, array $maintenances, array $ceprules
 				: new CIcon(ZBX_ICON_ENVELOPE_FILLED, _('Alert message'));
 
 		case ZBX_EVENT_HISTORY_CEP_UPDATE:
-				$ceprule_name = $ceprules[$action['cep_ruleid']]['name'];
+				$ceprule_name = array_key_exists($action['cep_ruleid'], $ceprules)
+					? $ceprules[$action['cep_ruleid']]['name']
+					: '*UNKNOWN*';
 				$title = _s('Event processing: %1$s', $ceprule_name);
 
 				return (new CCol((new CIcon(ZBX_ICON_CEP))->addClass(ZBX_STYLE_COLOR_ICON)->setTitle($title)))
