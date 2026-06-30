@@ -1584,7 +1584,7 @@ class CHost extends CHostGeneral {
 	 */
 	protected function validateCreate(array &$hosts) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
-			'monitored_by' =>	['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP]), 'default' => DB::getDefault('hosts', 'monitored_by')],
+			'monitored_by' =>	['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])],
 			'proxyid' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY], 'type' => API_ID, 'flags' => API_REQUIRED],
 									['else' => true, 'type' => API_ID, 'in' => '0']
@@ -2159,19 +2159,27 @@ class CHost extends CHostGeneral {
 				}
 			}
 
-			if (array_key_exists('proxyid', $host)) {
-				if (bccomp($host['proxyid'], $db_hosts[$host['hostid']]['proxyid']) != 0) {
+			if (array_key_exists('proxyid', $db_hosts[$host['hostid']])) {
+				if (bccomp($host['proxyid'], $db_hosts[$host['hostid']]['proxyid']) != 0
+						&& $db_hosts[$host['hostid']]['proxyid'] != 0) {
 					$proxyids[$host['hostid']] = (int) $db_hosts[$host['hostid']]['proxyid'];
+				}
+				else {
+					$proxyids[$host['hostid']] = (int) $host['proxyid'];
 				}
 			}
 
 			if (array_key_exists('proxy_groupid', $host)) {
-				if (bccomp($host['proxy_groupid'], $db_hosts[$host['hostid']]['proxy_groupid']) != 0) {
+				if (bccomp($host['proxy_groupid'], $db_hosts[$host['hostid']]['proxy_groupid']) != 0
+						&& $db_hosts[$host['hostid']]['proxy_groupid'] != 0) {
 					$proxy_groupids[$host['hostid']] = $db_hosts[$host['hostid']]['proxy_groupid'];
+				}
+				else {
+					$proxyids[$host['hostid']] = (int) $host['proxy_groupid'];
 				}
 			}
 
-			if ($monitored_by_upd || $proxyids) {
+			if ($proxyids) {
 				$accessible_proxy = API::Proxy()->get([
 					'output' => [],
 					'proxyids' => $proxyids,
@@ -2191,7 +2199,7 @@ class CHost extends CHostGeneral {
 				}
 			}
 
-			if ($monitored_by_upd || $proxy_groupids) {
+			if ($proxy_groupids) {
 				$accessible_proxy_group = API::ProxyGroup()->get([
 					'output' => [],
 					'proxy_groupids' => array_keys($proxy_groupids),
