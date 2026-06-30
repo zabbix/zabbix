@@ -73,8 +73,6 @@ static int	zbx_vault_app_role_login_hashicorp(const char *url, const char *app_r
 		goto fail;
 	}
 
-	zbx_free(*token);
-
 	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "client_token", token, &value_alloc, NULL))
 	{
 		zbx_free(*token);
