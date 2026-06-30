@@ -23,59 +23,203 @@ class CControllerDiscoveryCheckCheck extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'dcheckid' => ['string'],
+			'dchecks' => ['string'],
+			'type' => ['db dchecks.type', 'required', 'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP,
+				SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c,
+				SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET
+			]],
+			'ports' => ['db dchecks.ports', 'required', 'not_empty',
+				'use' => [CPortRangeParser::class, []],
+				'when' => ['type',
+					'in' => [SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_IMAP, SVC_LDAP, SVC_NNTP, SVC_POP, SVC_SMTP,
+						SVC_SSH, SVC_TCP, SVC_TELNET, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_AGENT
+					]]
+			],
+			'key_' => [
+				['db dchecks.key_', 'required', 'not_empty',
+					'use' => [CItemKey::class, []],
+					'when' => ['type', 'in' => [SVC_AGENT]]
+				],
+				['db dchecks.key_']
+			],
+			'snmp_community' => ['db dchecks.snmp_community', 'required', 'not_empty',
+				'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c]]
+			],
+			'snmp_oid' => ['string', 'required', 'not_empty',
+				'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
+			],
+			'snmpv3_securityname' => ['db dchecks.snmpv3_securityname',
+				'when' => ['type', 'in' => [SVC_SNMPv3]]
+			],
+			'snmpv3_securitylevel' => ['db dchecks.snmpv3_securitylevel',
+				'in' => [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,
+					ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+				],
+				'when' => ['type', 'in' => [SVC_SNMPv3]]
+			],
+			'snmpv3_authpassphrase' => ['db dchecks.snmpv3_authpassphrase',
+				'when' => [
+					['type', 'in' => [SVC_SNMPv3]],
+					['snmpv3_securitylevel',
+						'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+						]]
+				]
+			],
+			'snmpv3_privpassphrase' => ['db dchecks.snmpv3_privpassphrase', 'required', 'not_empty',
+				'when' => [
+					['type', 'in' => [SVC_SNMPv3]],
+					['snmpv3_securitylevel', 'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]]
+				]
+			],
+			'snmpv3_authprotocol' => ['db dchecks.snmpv3_authprotocol',
+				'in' => [ITEM_SNMPV3_AUTHPROTOCOL_MD5, ITEM_SNMPV3_AUTHPROTOCOL_SHA1,
+					ITEM_SNMPV3_AUTHPROTOCOL_SHA224, ITEM_SNMPV3_AUTHPROTOCOL_SHA256,
+					ITEM_SNMPV3_AUTHPROTOCOL_SHA384, ITEM_SNMPV3_AUTHPROTOCOL_SHA512
+				],
+				'when' => [
+					['type', 'in' => [SVC_SNMPv3]],
+					['snmpv3_securitylevel', 'in' => [
+						ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+					]
+					]]
+			],
+			'snmpv3_privprotocol' => ['db dchecks.snmpv3_privprotocol',
+				'in' => [ITEM_SNMPV3_PRIVPROTOCOL_DES, ITEM_SNMPV3_PRIVPROTOCOL_AES128,
+					ITEM_SNMPV3_PRIVPROTOCOL_AES192, ITEM_SNMPV3_PRIVPROTOCOL_AES256,
+					ITEM_SNMPV3_PRIVPROTOCOL_AES192C, ITEM_SNMPV3_PRIVPROTOCOL_AES256C
+				],
+				'when' => [
+					['type', 'in' => [SVC_SNMPv3]],
+					['snmpv3_securitylevel', 'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]
+					]]
+			],
+			'snmpv3_contextname' => ['db dchecks.snmpv3_contextname',
+				'when' => ['type', 'in' => [SVC_SNMPv3]]
+			],
+			'allow_redirect' => ['db dchecks.allow_redirect', 'in' => [0, 1],
+				'when' => ['type', 'in' => [SVC_ICMPPING]]
+			],
+			'host_source' => ['db dchecks.host_source'],
+			'name_source' => ['db dchecks.name_source']
+		]];
+	}
+
 	protected function checkInput(): bool {
-		$fields = [
-			'dcheckid' =>				'string',
-			'type' =>					'in '.implode(',', array_keys(discovery_check_type2str())),
-			'ports' =>					'string|not_empty|db dchecks.ports',
-			'snmp_community' =>			'string|not_empty|db dchecks.snmp_community',
-			'key_' =>					'string|not_empty|db dchecks.key_',
-			'snmp_oid' =>				'string|not_empty|db dchecks.key_',
-			'snmpv3_contextname' =>		'string|db dchecks.snmpv3_contextname',
-			'snmpv3_securityname' =>	'string|db dchecks.snmpv3_securityname',
-			'snmpv3_securitylevel' =>	'db dchecks.snmpv3_securitylevel|in '.implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]),
-			'snmpv3_authprotocol' =>	'db dchecks.snmpv3_authprotocol|in '.implode(',', array_keys(getSnmpV3AuthProtocols())),
-			'snmpv3_authpassphrase' =>	'string|db dchecks.snmpv3_authpassphrase',
-			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol|in '.implode(',', array_keys(getSnmpV3PrivProtocols())),
-			'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase',
-			'host_source' =>			'string',
-			'name_source' =>			'string',
-			'allow_redirect'=>			'db dchecks.allow_redirect|in 0,1'
-		];
+		$ret = $this->validateInput(self::getValidationRules());
+		CMessageHelper::setErrorTitle(_('Cannot update discovery check'));
 
-		$ret = $this->validateInput($fields);
-
-		if ($ret && $this->hasInput('ports')) {
-			$port_range_parser = new CPortRangeParser();
-
-			if ($port_range_parser->parse($this->getInput('ports')) != CParser::PARSE_SUCCESS) {
-				info(_('Incorrect port range.'));
-				$ret = false;
-			}
-		}
-
-		if ($ret && $this->hasInput('type') && $this->getInput('type') == SVC_AGENT) {
-			$item_key_parser = new CItemKey();
-			if ($item_key_parser->parse($this->getInput('key_')) != CParser::PARSE_SUCCESS) {
-				info(_s('Invalid key "%1$s": %2$s.', $this->getInput('key_'), $item_key_parser->getError()));
-				$ret = false;
-			}
+		if ($ret && $this->hasDuplicateDCheck()) {
+			CMessageHelper::setErrorTitle(_('Cannot add duplicate discovery check'));
+			$ret = false;
 		}
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => CMessageHelper::getTitle(),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
+				new CControllerResponseData(['main_block' => json_encode($response)])
 			);
 		}
 
 		return $ret;
+	}
+
+	private function hasDuplicateDCheck(): bool {
+		$existing_dchecks = json_decode($this->getInput('dchecks', '[]'), true);
+		$compare_exclude = ['dchecks', 'host_source', 'name_source', 'name', 'dcheckid', 'uniq', 'warning'];
+
+		if (!is_array($existing_dchecks)) {
+			return false;
+		}
+
+		$dcheck = $this->normalizeDCheck($this->getInputAll());
+		$compare_dcheck = array_diff_key($dcheck, array_flip($compare_exclude));
+
+		foreach ($existing_dchecks as $existing_dcheck) {
+			if (!is_array($existing_dcheck)) {
+				continue;
+			}
+
+			$existing_dcheck = $this->normalizeDCheck($existing_dcheck);
+
+			if ($existing_dcheck['type'] !== $dcheck['type']) {
+				continue;
+			}
+
+			$compare_existing_dcheck = array_diff_key($existing_dcheck, array_flip($compare_exclude));
+			$is_duplicate = true;
+
+			foreach ($compare_existing_dcheck as $field => $value) {
+				if (array_key_exists($field, $compare_dcheck)
+					&& strcmp((string) $value, (string) $compare_dcheck[$field]) !== 0) {
+					$is_duplicate = false;
+
+					break;
+				}
+			}
+
+			if ($is_duplicate) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private function normalizeDCheck(array $dcheck): array {
+		foreach ($dcheck as $field => $value) {
+			if (is_string($value)) {
+				$dcheck[$field] = trim($value);
+			}
+		}
+
+		if (array_key_exists('snmp_oid', $dcheck)) {
+			$dcheck['key_'] = $dcheck['snmp_oid'];
+			unset($dcheck['snmp_oid']);
+		}
+
+		if (!array_key_exists('snmpv3_securitylevel', $dcheck) || $dcheck['snmpv3_securitylevel'] === null) {
+			$dcheck['snmpv3_securitylevel'] = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
+		}
+
+		if ($dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+			$dcheck['snmpv3_authprotocol'] = ITEM_SNMPV3_AUTHPROTOCOL_MD5;
+			$dcheck['snmpv3_privprotocol'] = ITEM_SNMPV3_PRIVPROTOCOL_DES;
+			$dcheck['snmpv3_authpassphrase'] = '';
+			$dcheck['snmpv3_privpassphrase'] = '';
+		}
+		elseif ($dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
+			$dcheck['snmpv3_privprotocol'] = ITEM_SNMPV3_PRIVPROTOCOL_DES;
+			$dcheck['snmpv3_privpassphrase'] = '';
+		}
+
+		if (!array_key_exists('allow_redirect', $dcheck) && ($dcheck['type'] ?? null) == SVC_ICMPPING) {
+			$dcheck['allow_redirect'] = '0';
+		}
+
+		$dcheck += DB::getDefaults('dchecks');
+
+		foreach ($dcheck as $field => $value) {
+			if ($value !== null && !is_array($value)) {
+				$dcheck[$field] = (string) $value;
+			}
+		}
+
+		return $dcheck;
 	}
 
 	protected function checkPermissions(): bool {
@@ -92,6 +236,10 @@ class CControllerDiscoveryCheckCheck extends CController {
 		], $this->getInputAll());
 
 		$data['dcheckid'] = $this->getInput('dcheckid');
+
+		if ($data['type'] == SVC_ICMPPING) {
+			unset($data['ports']);
+		}
 
 		if ($data['type'] == SVC_SNMPv1 || $data['type'] == SVC_SNMPv2c || $data['type'] == SVC_SNMPv3) {
 			$data['key_'] = $data['snmp_oid'];

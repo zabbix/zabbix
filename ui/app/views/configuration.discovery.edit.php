@@ -105,24 +105,26 @@ $form_grid = (new CFormGrid())
 
 $form_grid->addItem([
 	(new CLabel(_('Checks'), 'dcheckList'))->setAsteriskMark(),
-	(new CFormField(
-		(new CTable())
-			->setAttribute('style', 'width: 100%;')
-			->setHeader([_('Type'), _('Actions')])
+	(new CDiv(
+		(new CFormField(
+			(new CTable())
+				->setAttribute('style', 'width: 100%;')
+				->setHeader([_('Type'), _('Actions')])
+				->addItem(
+					(new CTag('tfoot', true))
+						->addItem(
+							(new CCol(
+								(new CButtonLink(_('Add')))->addClass('js-check-add')
+							))->setColSpan(2)
+						)
+				)
+		))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			->setId('dcheckList')
 			->setAttribute('data-field-type', 'set')
 			->setAttribute('data-field-name', 'dchecks')
-			->addItem(
-				(new CTag('tfoot', true))
-					->addItem(
-						(new CCol(
-							(new CButtonLink(_('Add')))->addClass('js-check-add')
-						))->setColSpan(2)
-					)
-			)
-	))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		->setId('dcheckList')
+	))->addClass('form-field')
 ]);
 
 // Append uniqueness criteria to form list.

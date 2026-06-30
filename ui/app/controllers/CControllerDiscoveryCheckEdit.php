@@ -44,19 +44,14 @@ class CControllerDiscoveryCheckEdit extends CController {
 			'snmpv3_authpassphrase' =>	'string|db dchecks.snmpv3_authpassphrase',
 			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol|in '.implode(',', array_keys(getSnmpV3PrivProtocols())),
 			'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase',
-			'allow_redirect' =>			'db dchecks.allow_redirect|in 0,1'
+			'allow_redirect' =>			'db dchecks.allow_redirect|in 0,1',
+			'dchecks' =>				'string'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
-			);
+			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $ret;
@@ -73,13 +68,28 @@ class CControllerDiscoveryCheckEdit extends CController {
 		], $this->getInputAll());
 
 		$params = array_intersect_key($data, DB::getSchema('dchecks')['fields']);
+
+		if ($data['type'] == SVC_ICMPPING) {
+			unset($data['ports']);
+		}
+
+		if (array_key_exists('snmp_oid', $data)) {
+			$params['key_'] = $data['snmp_oid'];
+		}
+
 		$params['name'] = discovery_check_type2str($data['type']);
+
+		$dchecks_raw = $this->getInput('dchecks', '[]');
 
 		$output = [
 			'title' => _('Discovery check'),
 			'dcheckid' => $data['dcheckid'],
 			'params' => $params + DB::getDefaults('dchecks'),
 			'update' => $this->getInput('update', 0),
+			'dchecks' => $dchecks_raw,
+			'js_validation_rules' => (new CFormValidator(
+				CControllerDiscoveryCheckCheck::getValidationRules()
+			))->getRules(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

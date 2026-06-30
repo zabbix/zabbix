@@ -21,14 +21,20 @@
 
 window.check_popup = new class {
 
-	init() {
-		this.overlay = overlays_stack.getById('discovery-check');
-		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+	#overlay
+	#dialogue
+	#form_element
+	#form
+
+	init({rules}) {
+		this.#overlay = overlays_stack.getById('discovery-check');
+		this.#dialogue = this.#overlay.$dialogue[0];
+		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#form = new CForm(this.#form_element, rules);
 
 		this._loadViews();
-		this.form.style.display = '';
-		this.overlay.recoverFocus();
+		this.#form_element.style.display = '';
+		this.#overlay.recoverFocus();
 	}
 
 	_loadViews() {
@@ -107,106 +113,36 @@ window.check_popup = new class {
 		], JSON_THROW_ON_ERROR) ?>);
 	}
 
-	/**
-	 * Checks duplicate discovery checks.
-	 */
-	_hasDCheckDuplicates(dcheck) {
-		let results = [];
-		let fields = [
-			'dcheckid', 'type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
-			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
-			'snmpv3_privpassphrase', 'snmp_oid', 'allow_redirect'
-		];
+	submit() {
+		const curl = new Curl('zabbix.php');
+		let fields = this.#form.getAllValues();
 
-		if (dcheck.type == <?= SVC_ICMPPING ?>) {
-			if (typeof dcheck.allow_redirect === 'undefined') {
-				dcheck.allow_redirect = '0';
+		if (!('dchecks' in fields)) {
+			const dchecks = this.#form_element.querySelector('[name="dchecks"]');
+
+			if (dchecks !== null) {
+				fields.dchecks = dchecks.value;
 			}
 		}
 
-		[...document.getElementById('dcheckList').getElementsByTagName('tr')].map(element => {
-			let inputs = element.querySelectorAll('input');
-
-			let result = [];
-			for (const input of inputs) {
-				for (let i = 0; i < fields.length; i++) {
-					if (input.name.includes(fields[i])) {
-						result[fields[i]] = input.value;
-						break;
-					}
-				}
-			}
-
-			results.push(result);
-		});
-
-		const lookup = [
-			{
-				types: [
-					<?= SVC_SSH ?>, <?= SVC_LDAP ?>, <?= SVC_SMTP ?>, <?= SVC_FTP ?>, <?= SVC_HTTP ?>, <?= SVC_POP ?>,
-					<?= SVC_NNTP ?>, <?= SVC_IMAP ?>, <?= SVC_TCP ?>, <?= SVC_HTTPS ?>,
-					<?= SVC_TELNET ?>
-				],
-				keys: ['type', 'ports']
-			},
-			{
-				types: [<?= SVC_AGENT ?>],
-				keys: ['type', 'ports', 'key_']
-			},
-			{
-				types: [<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>],
-				keys: ['type', 'ports', 'snmp_community', 'snmp_oid']
-			},
-			{
-				types: [<?= SVC_SNMPv3 ?>],
-				keys: [
-					'type', 'ports', 'snmp_oid', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
-					'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase'
-				]
-			},
-			{
-				types: [<?= SVC_ICMPPING ?>],
-				keys: ['type', 'allow_redirect']
-			}
-		];
-
-		return results.some(result => {
-			if (!result.type || result.dcheckid === dcheck.dcheckid) {
-				return false;
-			}
-
-			if ([<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>].includes(parseInt(result.type))
-					&& "key_" in result) {
-				result.snmp_oid = result.key_;
-				delete result.key_;
-			}
-
-			const check = lookup.find(entry => entry.types.includes(parseInt(result.type)));
-
-			return Object.keys(result)
-				.filter(key => check.keys.includes(key))
-				.every(key => dcheck[key] === result[key]);
-		});
-	}
-
-	submit() {
-		const curl = new Curl('zabbix.php');
-		let fields = getFormFields(this.form);
-
-		for (const element of this.form.parentNode.children) {
+		for (const element of this.#form_element.parentNode.children) {
 			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 				element.parentNode.removeChild(element);
 			}
 		}
 
-		if (this._hasDCheckDuplicates(fields)) {
-			this._addDuplicateMessage();
-		}
-		else {
-			this._updateFields(fields);
-			curl.setArgument('action', 'discovery.check.check');
-			this._post(curl.getUrl(), fields);
-		}
+		this.#form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.#overlay.unsetLoading();
+
+					return;
+				}
+
+				this._updateFields(fields);
+				curl.setArgument('action', 'discovery.check.check');
+				this._post(curl.getUrl(), fields);
+			});
 	}
 
 	_post(url, data) {
@@ -221,11 +157,18 @@ window.check_popup = new class {
 					throw {error: response.error};
 				}
 
-				this.dialogue.dispatchEvent(new CustomEvent('check.submit', {detail: response}));
-				overlayDialogueDestroy(this.overlay.dialogueid);
+				if ('form_errors' in response) {
+					this.#form.setErrors(response.form_errors, true, true);
+					this.#form.renderErrors();
+
+					return;
+				}
+
+				this.#dialogue.dispatchEvent(new CustomEvent('check.submit', {detail: response}));
+				overlayDialogueDestroy(this.#overlay.dialogueid);
 			})
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this.#form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -242,24 +185,33 @@ window.check_popup = new class {
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
 			})
 			.finally(() => {
-				this.overlay.unsetLoading();
+				this.#overlay.unsetLoading();
 			});
-	}
-
-	_addDuplicateMessage() {
-		const messageBox = makeMessageBox('bad', [<?= json_encode(_('Check already exists.')) ?>])[0];
-		this.form.parentNode.insertBefore(messageBox, this.form);
-
-		this.overlay.unsetLoading();
 	}
 
 	/**
 	 * Updates form fields based on check type and trims string values.
 	 */
 	_updateFields(fields) {
+		if (fields.type == <?= SVC_ICMPPING ?>) {
+			for (const key in fields) {
+				if (key === 'ports') {
+					delete fields[key];
+				}
+			}
+		}
+
+		if (fields.type != <?= SVC_ICMPPING ?>) {
+			for (const key in fields) {
+				if (key === 'allow_redirect') {
+					delete fields[key];
+				}
+			}
+		}
+
 		if (fields.type != <?= SVC_AGENT ?>) {
 			for (const key in fields) {
 				if (key === 'key_') {
@@ -286,7 +238,10 @@ window.check_popup = new class {
 
 		if (fields.type != <?= SVC_SNMPv3 ?>) {
 			for (const key in fields) {
-				if (key === 'snmpv3_privpassphrase') {
+				if (key === 'snmpv3_privpassphrase' || key === 'snmpv3_privprotocol'
+					|| key === 'snmpv3_authpassphrase' || key === 'snmpv3_authprotocol'
+					|| key === 'snmpv3_securitylevel' || key === 'snmpv3_securityname'
+					|| key === 'snmpv3_contextname') {
 					delete fields[key];
 				}
 			}

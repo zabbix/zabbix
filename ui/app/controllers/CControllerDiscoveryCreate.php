@@ -51,7 +51,7 @@ class CControllerDiscoveryCreate extends CController {
 				'when' => ['concurrency_max_type', 'in' => [ZBX_DISCOVERY_CHECKS_CUSTOM]]
 			],
 			'dchecks' => ['objects', 'required', 'not_empty',
-				'uniq' => ['type', 'ports', 'key_', 'snmp_community', 'snmp_oid'],
+				'uniq' => ['type', 'ports', 'key_', 'snmp_community', 'snmp_oid', 'allow_redirect'],
 				'fields' => [
 					'dcheckid' => ['db dchecks.type'],
 					'type' => ['db dchecks.type', 'required', 'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP,

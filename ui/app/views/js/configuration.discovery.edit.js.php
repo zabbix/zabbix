@@ -60,6 +60,7 @@ window.drule_edit_popup = new class {
 		}
 
 		this.#addRadioButtonValues(drule);
+		this.#form.discoverAllFields();
 		this.#initEvents();
 		this.#form_element.style.display = '';
 		this.#overlay.recoverFocus();
@@ -73,6 +74,7 @@ window.drule_edit_popup = new class {
 			else if (e.target.classList.contains('js-remove')) {
 				this.#removeDCheckRow(e.target.closest('tr').id);
 				e.target.closest('tr').remove();
+				this.#form.discoverAllFields();
 			}
 			else if (e.target.classList.contains('js-edit')) {
 				this.#editCheck(e.target.closest('tr'));
@@ -122,6 +124,7 @@ window.drule_edit_popup = new class {
 		row.remove();
 		this.#updateCheckWarningIcon(input);
 		this.#addInputFields(input);
+		this.#form.discoverAllFields();
 	}
 
 	#editCheck(row = null) {
@@ -147,6 +150,20 @@ window.drule_edit_popup = new class {
 			}
 		}
 
+		const dchecks_field = this.#form.findFieldByName('dchecks');
+		let dchecks = dchecks_field !== null ? dchecks_field.getValue() : {};
+
+		if (row !== null) {
+			const current_dcheckid = row.id.substring(row.id.indexOf('_') + 1);
+
+			if (Object.prototype.hasOwnProperty.call(dchecks, current_dcheckid)) {
+				dchecks = {...dchecks};
+				delete dchecks[current_dcheckid];
+			}
+		}
+
+		params.dchecks = JSON.stringify(Object.values(dchecks));
+
 		const overlay = PopUp('discovery.check.edit', params, {
 			dialogueid: 'discovery-check',
 			dialogue_class: 'modal-popup-medium'
@@ -159,6 +176,7 @@ window.drule_edit_popup = new class {
 			else {
 				this.#dcheckid = getUniqueId()
 				this.#addCheck(e.detail, null);
+				this.#form.discoverAllFields();
 			}
 		});
 	}
@@ -432,7 +450,7 @@ window.drule_edit_popup = new class {
 
 		this.#overlay.recoverFocus();
 		this.#overlay.containFocus();
-		this.#form.reload(this.clone_rules);
+		this.#form.reload(this.#clone_rules);
 	}
 
 	#delete() {
@@ -440,7 +458,6 @@ window.drule_edit_popup = new class {
 			action: 'discovery.delete',
 			[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('discovery')) ?>
 		};
-		alert(this.#druleid);
 
 		this.#post(zabbixUrl({url_params}), {druleids: [this.#druleid]}, (response) => {
 			overlayDialogueDestroy(this.#overlay.dialogueid);

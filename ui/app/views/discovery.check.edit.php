@@ -26,6 +26,8 @@ $inline_js = getPagePostJs().$this->readJsFile('discovery.check.edit.js.php');
 
 $form = (new CForm())->addStyle('display: none;');
 
+$form->addVar('dchecks', $data['dchecks']);
+
 if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']) {
 	$form->addVar('dcheckid', $data['params']['dcheckid']);
 }
@@ -163,8 +165,10 @@ $form
 		$form_grid,
 		(new CInput('submit', 'submit'))->addStyle('display: none;'),
 		(new CScriptTag(
-			'check_popup.init();'
-		))->setOnDocumentReady()
+			'check_popup.init('.json_encode([
+				'rules' => $data['js_validation_rules']
+			], JSON_THROW_ON_ERROR).');
+		'))->setOnDocumentReady()
 	]);
 
 $output = [
