@@ -108,12 +108,12 @@ window.mediatype_edit_popup = new class {
 				event_menu_name.disabled = false;
 				event_menu_url.disabled = false;
 
-                if (!event_menu_name_label.classList.contains('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>')) {
-                    event_menu_name_label.classList.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-                }
-                if (!event_menu_url_label.classList.contains('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>')) {
-                    event_menu_url_label.classList.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-                }
+				if (!event_menu_name_label.classList.contains('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>')) {
+					event_menu_name_label.classList.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+				}
+				if (!event_menu_url_label.classList.contains('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>')) {
+					event_menu_url_label.classList.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+				}
 			}
 			else {
 				event_menu_name.classList.add('js-inactive');
@@ -121,12 +121,12 @@ window.mediatype_edit_popup = new class {
 				event_menu_name.disabled = true;
 				event_menu_url.disabled = true;
 
-                if (event_menu_name_label.classList.contains('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>')) {
-                    event_menu_name_label.classList.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-                }
-                if (event_menu_url_label.classList.contains('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>')) {
-                    event_menu_url_label.classList.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-                }
+				if (event_menu_name_label.classList.contains('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>')) {
+					event_menu_name_label.classList.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+				}
+				if (event_menu_url_label.classList.contains('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>')) {
+					event_menu_url_label.classList.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+				}
 			}
 		}
 
