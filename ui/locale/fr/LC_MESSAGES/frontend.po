@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-03-20 21:12+0000\n"
+"PO-Revision-Date: 2026-06-15 20:46+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -14376,7 +14376,7 @@ msgstr "Tableau de bord suivant"
 
 #: jsLoader.php:260
 msgid "Next month"
-msgstr ""
+msgstr "Mois suivant"
 
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
@@ -14394,7 +14394,7 @@ msgstr "Prochaine étape"
 
 #: jsLoader.php:258
 msgid "Next year"
-msgstr ""
+msgstr "Année suivante"
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
