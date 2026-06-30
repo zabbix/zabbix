@@ -81,7 +81,8 @@ class CSidebar extends CBaseComponent {
 		this._target.querySelector('.button-hide').setAttribute('aria-expanded', 'true');
 		this._target.querySelector('.button-show').setAttribute('aria-expanded', 'false');
 
-		if (this._sidebar_toggle) {
+		// For cases where the page has no header.
+		if (this._sidebar_toggle !== null) {
 			this._sidebar_toggle.setAttribute('aria-expanded', 'false');
 		}
 	}
