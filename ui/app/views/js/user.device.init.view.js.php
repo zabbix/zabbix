@@ -189,11 +189,11 @@ window.user_device_create_popup = new class {
 				}
 			})
 			.catch((exception) => {
-				this.#device_uuid = null;
+				this.#removePopupMessages();
 				this.#ajaxExceptionHandler(exception);
 			})
 			.finally(() => {
-				if (this.#device_uuid && new CDate().getTime() >= this.#qr_expires_at_ms) {
+				if (this.#device_uuid === null || new CDate().getTime() >= this.#qr_expires_at_ms) {
 					clearInterval(this.#refresh_interval_device_status);
 				}
 			});
