@@ -886,6 +886,7 @@ class testPageHosts extends CLegacyWebTest {
 			$host_row->invalidate();
 			$host_row->getColumn('Status')->scrollIntoView(50)->query('tag:a')->one()->click();
 			$this->page->waitUntilReady();
+			$host_row->invalidate();
 			$this->assertMessage(TEST_GOOD, 'Host '.strtolower($status));
 			$this->assertEquals($status, $host_row->getColumn('Status')->getText());
 			$this->assertEquals($id, CDBHelper::getValue('SELECT status FROM hosts WHERE host='.zbx_dbstr('Enabled status')));
