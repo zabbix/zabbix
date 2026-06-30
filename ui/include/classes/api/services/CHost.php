@@ -2159,7 +2159,7 @@ class CHost extends CHostGeneral {
 				}
 			}
 
-			if (array_key_exists('proxyid', $db_hosts[$host['hostid']])) {
+			if (array_key_exists('proxyid', $db_hosts[$host['hostid']]) && array_key_exists('proxyid', $host)) {
 				if (bccomp($host['proxyid'], $db_hosts[$host['hostid']]['proxyid']) != 0
 						&& $db_hosts[$host['hostid']]['proxyid'] != 0) {
 					$proxyids[$host['hostid']] = (int) $db_hosts[$host['hostid']]['proxyid'];
@@ -2169,13 +2169,13 @@ class CHost extends CHostGeneral {
 				}
 			}
 
-			if (array_key_exists('proxy_groupid', $host)) {
+			if (array_key_exists('proxy_groupid', $host) && array_key_exists('proxy_groupid', $host)) {
 				if (bccomp($host['proxy_groupid'], $db_hosts[$host['hostid']]['proxy_groupid']) != 0
 						&& $db_hosts[$host['hostid']]['proxy_groupid'] != 0) {
 					$proxy_groupids[$host['hostid']] = $db_hosts[$host['hostid']]['proxy_groupid'];
 				}
 				else {
-					$proxyids[$host['hostid']] = (int) $host['proxy_groupid'];
+					$proxy_groupids[$host['hostid']] = (int) $host['proxy_groupid'];
 				}
 			}
 
@@ -2202,7 +2202,7 @@ class CHost extends CHostGeneral {
 			if ($proxy_groupids) {
 				$accessible_proxy_group = API::ProxyGroup()->get([
 					'output' => [],
-					'proxy_groupids' => array_keys($proxy_groupids),
+					'proxy_groupids' => $proxy_groupids,
 					'preservekeys' => true
 				]);
 
