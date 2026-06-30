@@ -846,8 +846,11 @@ static int	cep_rule_discard_event(const zbx_cep_rule_t *rule, zbx_cep_event_cont
 int	cep_event_match_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t ***matched_rules,
 		int *matched_rules_num, zbx_cep_event_context_t *ctx)
 {
-	int				ret = FAIL, causal_num = 0;
+#define CEP_WINDOW_UNIQ	(CEP_FLAG(ZBX_CEP_WINDOW_CAUSAL) | CEP_FLAG(ZBX_CEP_WINDOW_TAG_MATCH))
+
+	int				ret = FAIL;
 	const zbx_vector_cep_rule_ptr_t	*rules;
+	zbx_uint32_t			window_mask = 0;
 
 	if (NULL == ctx->db_event)
 	{
@@ -866,13 +869,15 @@ int	cep_event_match_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t *
 		if (SUCCEED != cep_rule_match_event(rules->values[i], ctx))
 			continue;
 
-		/* only first matching cause-symptom rule can be processed */
-		if (NULL != rules->values[i]->window && ZBX_CEP_WINDOW_CAUSAL == rules->values[i]->window->type)
+		/* only first matching uniq window rules can be processed */
+		if (NULL != rules->values[i]->window)
 		{
-			if (0 != causal_num)
+			zbx_uint32_t	flag = CEP_FLAG(rules->values[i]->window->type);
+
+			if (0 != (flag & window_mask & CEP_WINDOW_UNIQ))
 				continue;
 
-			causal_num = 1;
+			window_mask |= flag;
 		}
 
 		if (SUCCEED == cep_rule_discard_event(rules->values[i], ctx))
@@ -892,6 +897,8 @@ int	cep_event_match_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t *
 	ret = SUCCEED;
 out:
 	return ret;
+
+#undef CEP_WINDOW_UNIQ
 }
 
 char	*cep_tag_value_shift(const char *value, int shift)
