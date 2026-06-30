@@ -85,6 +85,13 @@ typedef enum
 }
 zbx_key_access_rule_type_t;
 
+typedef enum
+{
+	ZBX_KEY_ACCESS_PATTERN_WILDCARD,
+	ZBX_KEY_ACCESS_PATTERN_REGEXP
+}
+zbx_key_access_pattern_type_t;
+
 void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get_config_int_f
 		get_config_enable_remote_commands_f, zbx_get_config_int_f get_config_log_remote_commands_f,
 		zbx_get_config_int_f get_config_unsafe_user_parameters_cb, zbx_get_config_str_f
@@ -101,8 +108,8 @@ void	zbx_init_key_access_rules(void);
 void	zbx_finalize_key_access_rules_configuration(void);
 
 int	zbx_add_key_access_rule(const char *parameter, char *pattern, zbx_key_access_rule_type_t type);
+int	zbx_add_key_access_rule_regexp(const char *parameter, char *pattern, zbx_key_access_rule_type_t type);
 int	zbx_check_key_access_rules(const char *metric);
-int	zbx_check_request_access_rules(AGENT_REQUEST *request);
 void	zbx_free_key_access_rules(void);
 
 int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result, int timeout);

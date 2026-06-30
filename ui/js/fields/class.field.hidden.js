@@ -60,7 +60,7 @@ class CFieldHidden extends CField {
 	}
 
 	setErrors({message, level}) {
-		if (super._error_container !== null) {
+		if (this._error_container !== null) {
 			super.setErrors({message, level});
 		}
 		else if (message !== '') {
@@ -71,7 +71,7 @@ class CFieldHidden extends CField {
 			if (this._error_level >= level) {
 				this._error_msg = null;
 				this._error_level = -1;
-				this._global_errors = {};
+				this._global_errors = Object.create(null);
 			}
 		}
 	}

@@ -66,8 +66,6 @@ class testConfigVariables extends CIntegrationTest {
 	}
 
 	public static function cleanupTestEnv(): void {
-		CDataHelper::call('history.clear', self::$itemids);
-		CDataHelper::call('item.delete', self::$itemids);
 		CDataHelper::call('host.delete', self::$hostids);
 		CDataHelper::call('proxy.delete', self::$proxyids);
 
