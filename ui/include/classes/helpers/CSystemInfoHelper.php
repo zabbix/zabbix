@@ -347,6 +347,10 @@ class CSystemInfoHelper {
 				'current_version' => $dbversion['current_version'],
 				'version_supported' => $dbversion['flag'] == DB_VERSION_SUPPORTED
 			] + array_intersect_key($dbversion, array_flip(['history_pk', 'value_types']));
+
+			if (array_key_exists('history_pk', $dbversion)) {
+				$result['history_primary_key']['value'] = $dbversion['history_pk'] == 1;
+			}
 		}
 
 		foreach ($system_info['ha_nodes'] as $ha_node) {
