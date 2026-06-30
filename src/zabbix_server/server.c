@@ -13,6 +13,7 @@
 **/
 
 #include "config.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_SQLITE3
 #	error SQLite is not supported as a main Zabbix database backend.
@@ -1879,6 +1880,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 		{
 			.workers_num = config_forks[ZBX_PROCESS_TYPE_CEP_WORKER],
 			.config_timeout = zbx_config_timeout,
+			.commit_limit = config_forks[ZBX_PROCESS_TYPE_HISTSYNCER]
 		};
 
 	/* cleanup curl before forking to avoid issues with forked initialized state */
