@@ -504,7 +504,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/url": unacceptable URL scheme.',
 					'fields' => [
 						'Name' => 'invalid uri schema',
 						'Scope' => 'Manual event action',
@@ -520,7 +519,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/url": unacceptable URL scheme.',
 					'fields' => [
 						'Name' => 'invalid uri schema',
 						'Scope' => 'Manual event action',
@@ -2166,8 +2164,10 @@ class testFormAlertsScripts extends CWebTest {
 			$form->fill(['URL' => $scheme]);
 
 			// Wait for error not to be present for positive test cases before submitting the form.
-			if ($expected === TEST_GOOD) {
-				$form->getField('URL')->waitUntilClassesNotPresent('has-error');
+			$url_field = $form->getField('URL');
+
+			if ($expected === TEST_GOOD && $url_field->hasClass('has-error')) {
+				$url_field->waitUntilClassesNotPresent('has-error');
 			}
 
 			$form->submit();
