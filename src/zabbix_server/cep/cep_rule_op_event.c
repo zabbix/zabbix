@@ -116,6 +116,13 @@ void	cep_acknowledge_update_tag(zbx_cep_acknowledge_t *oplog, int op, const char
 	cep_acknowledge_close(oplog);
 }
 
+static void	cep_acknowledge_rename_tag(zbx_cep_acknowledge_t *oplog, const char *old_tag, const char *new_tag)
+{
+	cep_acknowledge_open(oplog, ZBX_CEP_OP_RENAME_TAG, "tag");
+	cep_acknowledge_add_detail(oplog, "tag", old_tag, new_tag);
+	cep_acknowledge_close(oplog);
+}
+
 void	cep_acknowledge_set_cause(zbx_cep_acknowledge_t *oplog, zbx_uint64_t cause_eventid)
 {
 	cep_acknowledge_open(oplog, ZBX_CEP_OP_SET_CAUSE, "cause");
@@ -479,7 +486,7 @@ static int	cep_operation_event_rename_tag(const zbx_cep_operation_t *op, zbx_cep
 
 		if (SUCCEED == cep_event_validate_tag(*event, tag.value, t->value, NULL))
 		{
-			cep_acknowledge_update_tag(ack, op->type, t->tag, NULL, tag.value, NULL);
+			cep_acknowledge_rename_tag(ack, t->tag, tag.value);
 			zbx_free(t->tag);
 			t->tag = cep_str_detach(&tag.value);
 			ctx->sync_flags |= CEP_SYNC_EVENT_TAGS;
