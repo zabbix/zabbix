@@ -284,12 +284,12 @@ static zbx_uint64_t	cep_window_get_nextcheck(const zbx_cep_window_t *window, con
 	switch (window->type)
 	{
 		case ZBX_CEP_WINDOW_SIMPLE:
-		case ZBX_CEP_WINDOW_TAG_MATCH:
+		case ZBX_CEP_WINDOW_CORRELATION:
 			if (NULL != event)
 				return  (zbx_uint64_t)(event->clock + window->duration);
 			else
 				return  (zbx_uint64_t)time(NULL) + 1;
-		case ZBX_CEP_WINDOW_PATTERN_MATCH:
+		case ZBX_CEP_WINDOW_PATTERN:
 			return (zbx_uint64_t)time(NULL) + 1;
 		case ZBX_CEP_WINDOW_CAUSAL:
 			return (zbx_uint64_t)start_time + window->duration;
@@ -885,13 +885,13 @@ void	cep_window_process(zbx_cep_window_t *window, time_t now, zbx_vector_mw_task
 	switch (window->type)
 	{
 		case ZBX_CEP_WINDOW_SIMPLE:
-		case ZBX_CEP_WINDOW_TAG_MATCH:
+		case ZBX_CEP_WINDOW_CORRELATION:
 			cep_window_sliding_process(window, now, tasks);
 			break;
 		case ZBX_CEP_WINDOW_CAUSAL:
 			cep_window_causal_process(window, now, tasks);
 			break;
-		case ZBX_CEP_WINDOW_PATTERN_MATCH:
+		case ZBX_CEP_WINDOW_PATTERN:
 			cep_window_js_process(window, tasks);
 			break;
 	}
@@ -1102,7 +1102,7 @@ void	cep_window_pool_enqueue(zbx_cep_window_pool_t *pool, zbx_cep_window_t *wind
 			elem.data = cep_window_addref(window);
 			zbx_binary_heap_insert(&pool->alarm_queue, &elem);
 			break;
-		case ZBX_CEP_WINDOW_PATTERN_MATCH:
+		case ZBX_CEP_WINDOW_PATTERN:
 			zbx_vector_cep_window_ptr_append(&pool->tick_queue, cep_window_addref(window));
 			break;
 	}

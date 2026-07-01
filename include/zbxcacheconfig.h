@@ -1708,8 +1708,8 @@ zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correl
 
 #define ZBX_CEP_WINDOW_SIMPLE		1
 #define ZBX_CEP_WINDOW_CAUSAL		2
-#define ZBX_CEP_WINDOW_TAG_MATCH	3
-#define ZBX_CEP_WINDOW_PATTERN_MATCH	4
+#define ZBX_CEP_WINDOW_CORRELATION	3
+#define ZBX_CEP_WINDOW_PATTERN		4
 
 #define ZBX_CEP_WINDOW_CONDITION_TAG_PAIR	1
 #define ZBX_CEP_WINDOW_CONDITION_OLD_TAG	2
