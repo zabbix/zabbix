@@ -15,58 +15,58 @@
 
 
 class CCepRuleHelper {
-	public const WINDOW_NONE =			0;
-	public const WINDOW_SIMPLE =		1;
+	public const WINDOW_NONE =0;
+	public const WINDOW_SIMPLE =1;
 	public const WINDOW_CAUSE_SYMPTOM = 2;
-	public const WINDOW_TAG_MATCH =		3;
+	public const WINDOW_TAG_MATCH =3;
 	public const WINDOW_PATTERN_MATCH = 4;
 
-	public const STATUS_ENABLED =	0;
-	public const STATUS_DISABLED =	1;
+	public const STATUS_ENABLED = 0;
+	public const STATUS_DISABLED = 1;
 
-	public const EXECUTION_CONTINUE =	0;
-	public const EXECUTION_STOP =		1;
+	public const EXECUTION_CONTINUE = 0;
+	public const EXECUTION_STOP = 1;
 
-	public const CONDITION_EVENT_NAME = 	ZBX_CONDITION_TYPE_EVENT_NAME;
-	public const CONDITION_TAG =			ZBX_CONDITION_TYPE_EVENT_TAG;
-	public const CONDITION_SEVERITY =		ZBX_CONDITION_TYPE_TRIGGER_SEVERITY;
-	public const CONDITION_HOST =			ZBX_CONDITION_TYPE_HOST;
-	public const CONDITION_HOST_GROUP =		ZBX_CONDITION_TYPE_HOST_GROUP;
-	public const CONDITION_TIME_PERIOD =	ZBX_CONDITION_TYPE_TIME_PERIOD;
+	public const CONDITION_EVENT_NAME = ZBX_CONDITION_TYPE_EVENT_NAME;
+	public const CONDITION_TAG = ZBX_CONDITION_TYPE_EVENT_TAG;
+	public const CONDITION_SEVERITY = ZBX_CONDITION_TYPE_TRIGGER_SEVERITY;
+	public const CONDITION_HOST = ZBX_CONDITION_TYPE_HOST;
+	public const CONDITION_HOST_GROUP = ZBX_CONDITION_TYPE_HOST_GROUP;
+	public const CONDITION_TIME_PERIOD = ZBX_CONDITION_TYPE_TIME_PERIOD;
 
-	public const OP_SET_NAME =				1;
-	public const OP_CLOSE =					2;
-	public const OP_DISCARD =				3;
-	public const OP_SET_SEVERITY =			4;
-	public const OP_INCREASE_SEVERITY = 	5;
-	public const OP_DECREASE_SEVERITY = 	6;
-	public const OP_SUPPRESS =				7;
-	public const OP_COPY_FIRST =			8;
-	public const OP_COPY_LAST =				9;
-	public const OP_ADD_TAG =				10;
-	public const OP_SET_TAG =				11;
-	public const OP_SET_TAG_VALUE =			12;
-	public const OP_INCREASE_TAG_VALUE =	13;
-	public const OP_DECREASE_TAG_VALUE =	14;
-	public const OP_RENAME_TAG =			15;
-	public const OP_REMOVE_TAG =			16;
+	public const OP_SET_NAME = 1;
+	public const OP_CLOSE = 2;
+	public const OP_DISCARD = 3;
+	public const OP_SET_SEVERITY = 4;
+	public const OP_INCREASE_SEVERITY =  5;
+	public const OP_DECREASE_SEVERITY =  6;
+	public const OP_SUPPRESS = 7;
+	public const OP_COPY_FIRST = 8;
+	public const OP_COPY_LAST = 9;
+	public const OP_ADD_TAG = 10;
+	public const OP_SET_TAG = 11;
+	public const OP_SET_TAG_VALUE = 12;
+	public const OP_INCREASE_TAG_VALUE = 13;
+	public const OP_DECREASE_TAG_VALUE = 14;
+	public const OP_RENAME_TAG = 15;
+	public const OP_REMOVE_TAG = 16;
 
-	public const WHEN_EVENT_OCCURRED =	0;
-	public const WHEN_EVENT_EVICTED =	1;
-	public const WHEN_WINDOW_CLOSED =	2;
-	public const WHEN_TAGS_CORRELATED =	3;
-	public const WHEN_PATTERN_MATCHED =	4;
+	public const WHEN_EVENT_OCCURRED = 0;
+	public const WHEN_EVENT_EVICTED = 1;
+	public const WHEN_WINDOW_CLOSED = 2;
+	public const WHEN_TAGS_CORRELATED = 3;
+	public const WHEN_PATTERN_MATCHED = 4;
 
-	public const WINDOW_CONDITION_TAG_PAIR =		0;
-	public const WINDOW_CONDITION_OLD_TAG =			1;
-	public const WINDOW_CONDITION_OLD_TAG_VALUE =	2;
+	public const WINDOW_CONDITION_TAG_PAIR = 0;
+	public const WINDOW_CONDITION_OLD_TAG = 1;
+	public const WINDOW_CONDITION_OLD_TAG_VALUE = 2;
 
-	public const GROUP_BY_NO =	0;
-	public const GROUP_BY_YES =	1;
+	public const GROUP_BY_NO = 0;
+	public const GROUP_BY_YES = 1;
 
-	public const FILTER_SHOW_ALL =		0;
-	public const FILTER_SHOW_LEGACY =	1;
-	public const FILTER_SHOW_CEP =		2;
+	public const FILTER_SHOW_ALL = 0;
+	public const FILTER_SHOW_LEGACY = 1;
+	public const FILTER_SHOW_CEP = 2;
 
 	public const EXECUTE_WHEN_BY_WINDOW_TYPE = [
 		self::WINDOW_NONE => [
