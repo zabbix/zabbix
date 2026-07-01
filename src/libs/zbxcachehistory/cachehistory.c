@@ -1247,8 +1247,11 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 	zbx_host_info_t			*host_info;
 	zbx_item_info_t			*item_info;
 	zbx_uint128_t			avg;	/* calculate the trend average value */
+	zbx_dc_um_handle_t		*um_handle;
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	for (i = 0; i < trends_num; i++)
 	{
@@ -1284,10 +1287,17 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 		for (j = 0; j < item_info->item_tags.values_num; j++)
 		{
 			zbx_tag_t	*item_tag = item_info->item_tags.values[j];
+			char		*value_resolved;
 
 			zbx_json_addobject(&json, NULL);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_TAG, item_tag->tag, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, item_tag->value, ZBX_JSON_TYPE_STRING);
+
+			value_resolved = zbx_strdup(NULL, item_tag->value);
+			(void)zbx_dc_expand_user_and_func_macros(um_handle, &value_resolved, &item->host.hostid, 1,
+					NULL);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, value_resolved, ZBX_JSON_TYPE_STRING);
+			zbx_free(value_resolved);
+
 			zbx_json_close(&json);
 		}
 
@@ -1323,6 +1333,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 
 	zbx_trends_export_flush();
 	zbx_json_free(&json);
+	zbx_dc_close_user_macros(um_handle);
 }
 
 static int	match_item_value_type_by_mask(int mask, const zbx_history_sync_item_t *item)
@@ -1354,9 +1365,12 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 	zbx_item_info_t			*item_info;
 	struct zbx_json			json;
 	zbx_connector_object_t		connector_object;
+	zbx_dc_um_handle_t		*um_handle;
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_vector_uint64_create(&connector_object.ids);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1421,10 +1435,17 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 		for (j = 0; j < item_info->item_tags.values_num; j++)
 		{
 			zbx_tag_t	*item_tag = item_info->item_tags.values[j];
+			char		*value_resolved;
 
 			zbx_json_addobject(&json, NULL);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_TAG, item_tag->tag, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, item_tag->value, ZBX_JSON_TYPE_STRING);
+
+			value_resolved = zbx_strdup(NULL, item_tag->value);
+			(void)zbx_dc_expand_user_and_func_macros(um_handle, &value_resolved, &item->host.hostid, 1,
+					NULL);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, value_resolved, ZBX_JSON_TYPE_STRING);
+			zbx_free(value_resolved);
+
 			zbx_json_close(&json);
 		}
 
@@ -1487,6 +1508,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 
 	zbx_vector_uint64_destroy(&connector_object.ids);
 	zbx_json_free(&json);
+	zbx_dc_close_user_macros(um_handle);
 }
 
 /******************************************************************************
