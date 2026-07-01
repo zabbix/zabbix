@@ -70,8 +70,13 @@ class CControllerWebScenarioStepCheck extends CController {
 			$ret = false;
 		}
 
-		if (CHtmlUrlValidator::validate($this->getInput('url')) === false) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', 'url', _('unacceptable URL')));
+		$url_validator = new CUrlValidator([
+			'user_macro' => true,
+			'schemes' => CSettingsHelper::getAllowedUriSchemes()
+		]);
+
+		if (!$url_validator->validate($this->getInput('url'))) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'url', $url_validator->getError()));
 
 			$ret = false;
 		}
