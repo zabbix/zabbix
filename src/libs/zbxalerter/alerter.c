@@ -612,6 +612,13 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		goto out;
 	}
 
+	/*
+	 * Bridge-adapter connection mode is selected by URL scheme and TLS files:
+	 * - http:// uses unencrypted HTTP;
+	 * - https:// uses TLS with the default CA trust store;
+	 * - https:// with TLSCAFile overrides the CA trust store;
+	 * - https:// with TLSCAFile, TLSCertFile and TLSKeyFile uses mTLS.
+	 */
 	if (0 == zbx_strncasecmp(config_bridge_adapter_url, ZBX_BRIDGE_ADAPTER_HTTPS_SCHEME,
 			ZBX_CONST_STRLEN(ZBX_BRIDGE_ADAPTER_HTTPS_SCHEME)))
 	{
