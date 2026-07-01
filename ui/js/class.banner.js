@@ -183,6 +183,10 @@ class CBanner {
 
 		const active_banner = this.#banners
 			.filter(banner => {
+				if (!('id' in banner) || !banner.id) {
+					return false;
+				}
+
 				banner_ids.push(banner.id);
 
 				const from = new Date(banner.from);
@@ -198,7 +202,13 @@ class CBanner {
 				const b_numeric = !isNaN(b.id) && !isNaN(parseInt(b.id));
 
 				if (a_numeric && b_numeric) {
-					return Number(a.id) - Number(b.id);
+					const result = Number(a.id) - Number(b.id);
+
+					if (result === 0) {
+						return new Date(b.from) - new Date(a.from);
+					}
+
+					return result;
 				}
 				else if (a_numeric && !b_numeric) {
 					return -1;
@@ -207,7 +217,13 @@ class CBanner {
 					return 1;
 				}
 
-				return a.id.localeCompare(b.id);
+				const result = a.id.localeCompare(b.id);
+
+				if (result === 0) {
+					return new Date(b.from) - new Date(a.from);
+				}
+
+				return result;
 			})
 			.at(0);
 
@@ -284,7 +300,11 @@ class CBanner {
 		banners = banners.filter(banner => {
 			const to = new Date(banner.to);
 
-			return 'id' in banner && 'content' in banner && Object.keys(banner.content).length > 0 && now <= to;
+			return 'id' in banner
+				&& banner.id
+				&& 'content' in banner
+				&& Object.keys(banner.content).length > 0
+				&& now <= to;
 		});
 
 		const abort_controller = new AbortController();

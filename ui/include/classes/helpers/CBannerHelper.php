@@ -78,6 +78,10 @@ class CBannerHelper {
 	 */
 	public static function getActiveBanners(array $banners, array $data): array {
 		return array_filter($banners, static function (array $banner) use ($data) {
+			if (!array_key_exists('id', $banner) || strlen((string) $banner['id']) === 0) {
+				return false;
+			}
+
 			try {
 				$now = new DateTimeImmutable('now');
 				$from = array_key_exists('from', $banner) ? new DateTimeImmutable($banner['from']) : null;
@@ -106,7 +110,13 @@ class CBannerHelper {
 			$b_numeric = is_numeric($b['id']);
 
 			if ($a_numeric && $b_numeric) {
-				return $a <=> $b;
+				$result = $a['id'] <=> $b['id'];
+
+				if ($result === 0) {
+					return self::sortByDates($a['from'], $b['from']);
+				}
+
+				return $result;
 			}
 			elseif ($a_numeric && !$b_numeric) {
 				return -1;
@@ -115,7 +125,24 @@ class CBannerHelper {
 				return 1;
 			}
 
-			return strcasecmp($a['id'], $b['id']);
+			$result = strcasecmp($a['id'], $b['id']);
+
+			if ($result === 0) {
+				return self::sortByDates($a['from'], $b['from']);
+			}
+
+			return $result;
 		});
+	}
+
+	/**
+	 * Sorts by dates from "closest to now" to "furthest from now".
+	 */
+	private static function sortByDates(?string $a, ?string $b): int {
+		$now = strtotime('now');
+		$a_time = $a ? abs(strtotime($a) - $now) : PHP_INT_MAX;
+		$b_time = $b ? abs(strtotime($b) - $now) : PHP_INT_MAX;
+
+		return $a_time <=> $b_time;
 	}
 }
