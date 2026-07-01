@@ -368,14 +368,6 @@ class CCepRuleHelper {
 		return self::getWindowLabelStrings()[$ceprule['window_type']];
 	}
 
-	public static function getWindowConditionLabelStrings(): array {
-		return [
-			self::WINDOW_CONDITION_TAG_PAIR => _('Event tag pair'),
-			self::WINDOW_CONDITION_OLD_TAG => _('Past event tag name'),
-			self::WINDOW_CONDITION_OLD_TAG_VALUE => _('Past event tag value')
-		];
-	}
-
 	public static function buildActionDetailsMessage(string $details): string {
 		$result = [];
 		$details = json_decode(json: $details, associative: true, flags: JSON_THROW_ON_ERROR|JSON_BIGINT_AS_STRING);

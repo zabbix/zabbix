@@ -75,11 +75,6 @@ $form = (new CForm())
 			'filter' => $data['ceprule']['filter']
 		]))
 
-		->addItem((new CTemplateTag('ceprule-window-condition-modal-template'))->addItem(
-			new CPartial('ceprule.modal.window.condition', [
-				'filter' => $data['ceprule']['window']['filter']
-			])
-		))
 		->addItem(new CPartial('ceprule.window', [
 			'window_type' => $data['ceprule']['window_type'],
 			'window' => $data['ceprule']['window']
@@ -154,7 +149,6 @@ $output = [
 			'rules' => $data['js_validation_rules'],
 			'rules_for_clone' => $data['js_validation_rules_for_clone'],
 			'condition_rules' => $data['condition_js_validation_rules'],
-			'window_condition_rules' => $data['window_condition_js_validation_rules'],
 			'operation_rules' => $data['operation_js_validation_rules'],
 			'ceprule' => $data['ceprule']
 		]).');',

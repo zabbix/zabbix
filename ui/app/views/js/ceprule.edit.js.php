@@ -33,9 +33,6 @@ window.ceprule_edit_popup = new class {
 	/** @type {Object} */
 	#condition_rules;
 
-	/** @type {Object} */
-	#window_condition_rules;
-
 	/** @type {Template} */
 	#condition_row_template;
 
@@ -48,14 +45,8 @@ window.ceprule_edit_popup = new class {
 	/** @type {Template} */
 	#condition_row_template_tag_exists;
 
-	/** @type {Template} */
-	#window_condition_row_template;
-
 	/** @type {Number} */
 	#condition_row_index = 0;
-
-	/** @type {Number} */
-	#window_condition_row_index = 0;
 
 	/** @type {Template} */
 	#operation_row_template;
@@ -66,11 +57,10 @@ window.ceprule_edit_popup = new class {
 	/** @type {Object} */
 	#rules_for_clone;
 
-	init({rules, rules_for_clone, operation_rules, condition_rules, window_condition_rules, ceprule}) {
+	init({rules, rules_for_clone, operation_rules, condition_rules, ceprule}) {
 		this.#rules_for_clone = rules_for_clone;
 		this.#initTemplates();
 		this.#condition_rules = condition_rules;
-		this.#window_condition_rules = window_condition_rules;
 		this.#operation_rules = operation_rules;
 		this.#overlay = overlays_stack.getById('ceprule.edit');
 		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
@@ -79,12 +69,6 @@ window.ceprule_edit_popup = new class {
 			const formulaid = this.#indexToFormulaId(this.#condition_row_index++);
 
 			this.#addConditionRow({...condition, formulaid});
-		}
-
-		for (const window_condition of Object.values(ceprule.window.filter.conditions ?? {})) {
-			const formulaid = this.#indexToFormulaId(this.#window_condition_row_index++);
-
-			this.#addWindowConditionRow({...window_condition, formulaid});
 		}
 
 		for (const operation of Object.values(ceprule.operations)) {
@@ -99,7 +83,6 @@ window.ceprule_edit_popup = new class {
 		this.#initActions();
 		this.form = new CForm(this.form_element, rules);
 		this.#handleFilterChanged();
-		this.#handleWindowConditionsChanged();
 		window['ceprule-window-counttag-toggle'].dispatchEvent(new Event('change'));
 		window['ceprule-window-capacity-toggle'].dispatchEvent(new Event('change'));
 		window['ceprule-window-groupby-opt-tag'].dispatchEvent(new Event('change'));
@@ -122,27 +105,6 @@ window.ceprule_edit_popup = new class {
 	}
 
 	#initTemplates() {
-		this.#window_condition_row_template = new Template(`
-			<tr data-formulaid="#{formulaid}">
-				<td>#{formulaid}</td>
-				<td>
-					<div class="text">#{type_str} <em>#{arg1}</em>#{operator_name} <em>#{arg2}</em></div>
-				</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-window-condition-edit"><?= _('Edit') ?></button>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-window-condition-remove"><?= _('Remove') ?></button>
-					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][type]" type="hidden" value="#{type}"/>
-					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][operator]" type="hidden" value="#{operator}"/>
-					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][tag_pair_past_tag]" type="hidden" value="#{tag_pair_past_tag}"/>
-					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][past_event_past_tag]" type="hidden" value="#{past_event_past_tag}"/>
-					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][old_value_past_tag]" type="hidden" value="#{old_value_past_tag}"/>
-					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][tag]" type="hidden" value="#{tag}"/>
-					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][tag_value]" type="hidden" value="#{tag_value}"/>
-					<input type="hidden" data-field-type="hidden" name="window[filter][conditions][#{formulaid}][formulaid]" type="hidden" value="#{formulaid}"/>
-				</td>
-			</tr>
-		`);
-
 		this.#condition_row_template_value = new Template(`<div class="text">#{name} #{operator} <em>#{value}</em>.</div>`);
 		this.#condition_row_template_tag = new Template(`<div class="text">#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em>.</div>`);
 		this.#condition_row_template_tag_exists = new Template(`<div class="text">#{name} <em>#{tag_name}</em> #{operator}.</div>`);
@@ -225,25 +187,6 @@ window.ceprule_edit_popup = new class {
 
 				this.form_element.dispatchEvent(new Event('filter.change'));
 			}
-			else if (e.target.classList.contains('js-window-condition-add')) {
-				this.#openWindowConditionPopup(undefined, e.target);
-			}
-			else if (e.target.classList.contains('js-window-condition-edit')) {
-				const formulaid = e.target.closest('tr').dataset.formulaid;
-				const window_conditions = this.form.findFieldByName('window[filter][conditions]').getValue();
-
-				this.#openWindowConditionPopup(window_conditions[formulaid], e.target);
-			}
-			else if (e.target.classList.contains('js-window-condition-remove')) {
-				e.target.closest('tr').remove();
-				this.form.discoverAllFields();
-
-				if (this.form.findFieldByName('window[filter][conditions]').getValue() === undefined) {
-					this.#window_condition_row_index = 0;
-				}
-
-				this.form_element.dispatchEvent(new Event('window.filter.change'));
-			}
 			else if (e.target.classList.contains('js-operation-add')) {
 				this.#openOperationPopup(undefined, e.target);
 			}
@@ -264,14 +207,10 @@ window.ceprule_edit_popup = new class {
 			if (e.target.name === 'filter[evaltype]') {
 				this.form_element.dispatchEvent(new Event('filter.change'));
 			}
-			else if (e.target.name === 'window[filter][evaltype]') {
-				this.form_element.dispatchEvent(new Event('window.filter.change'));
-			}
 		});
 
 		// Add proxied form event handlers.
 		this.form_element.addEventListener('filter.change', () => this.#handleFilterChanged());
-		this.form_element.addEventListener('window.filter.change', () => this.#handleWindowConditionsChanged());
 
 		window['ceprule-window-counttag-toggle'].addEventListener('change', (e) => {
 			const enabled = window['ceprule-window-counttag-toggle'].querySelector('[value="1"]').checked;
@@ -336,23 +275,6 @@ window.ceprule_edit_popup = new class {
 
 			form_field.style.display = display;
 			form_field.previousSibling.style.display = display;
-		}
-		{
-			const form_field = window['ceprule-window-filter-evaltype'].closest('.form-field');
-			const display = type == <?= CCepRuleHelper::WINDOW_TAG_MATCH ?> ? '' : 'none';
-
-			form_field.style.display = display;
-			form_field.previousSibling.style.display = display;
-		}
-		{
-			const form_field = window['ceprule-window-condition-table'].closest('.form-field');
-			const display = type == <?= CCepRuleHelper::WINDOW_TAG_MATCH ?> ? '' : 'none';
-
-			form_field.style.display = display;
-			form_field.previousSibling.style.display = display;
-
-			type == <?= CCepRuleHelper::WINDOW_TAG_MATCH ?>
-				&& this.form_element.dispatchEvent(new Event('window.filter.change'));
 		}
 		{
 			const form_field = window['ceprule-window-counttag'].closest('.form-field');
@@ -551,38 +473,6 @@ window.ceprule_edit_popup = new class {
 		window['ceprule-filter-expression-preview'].innerText = getConditionFormula(identifiers, evaltype);
 	}
 
-	/**
-	 * Method ensures filter view is correct with data:
-	 *	- window conditions formula preview string.
-	 *	- type of calculation row.
-	 */
-	#handleWindowConditionsChanged() {
-		const evaltype_select = window['ceprule-window-filter-evaltype'];
-		const evaltype_field = evaltype_select.closest('.form-field');
-
-		const conditions = Object.values(this.form.findFieldByName('window[filter][conditions]').getValue() ?? {});
-
-		if (conditions.length < 2) {
-			evaltype_field.style.display = 'none';
-			evaltype_field.previousElementSibling.style.display = 'none';
-
-			return;
-		}
-
-		evaltype_field.style.display = '';
-		evaltype_field.previousElementSibling.style.display = '';
-
-		const evaltype = Number(evaltype_select.value);
-		const is_expression_evaltype = evaltype == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
-
-		window['ceprule-window-filter-expression'].style.display = is_expression_evaltype ? '' : 'none';
-		window['ceprule-window-filter-expression-preview'].style.display = !is_expression_evaltype ? '' : 'none';
-
-		const identifiers = Object.values(conditions).map(condition => ({id: condition.formulaid}));
-
-		window['ceprule-window-filter-expression-preview'].innerText = getConditionFormula(identifiers, evaltype);
-	}
-
 	#openConditionPopup(condition, trigger_element) {
 		const is_new = condition === undefined;
 
@@ -648,71 +538,6 @@ window.ceprule_edit_popup = new class {
 		});
 
 		ceprule_condition_edit_popup.init({rules: this.#condition_rules, condition, overlay});
-	}
-
-	#openWindowConditionPopup(window_condition, trigger_element) {
-		const is_new = window_condition === undefined;
-
-		if (is_new) {
-			window_condition = {
-				formulaid: this.#indexToFormulaId(this.#window_condition_row_index++),
-				type: '<?= CCepRuleHelper::CONDITION_EVENT_NAME ?>',
-				type: '<?= CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR ?>',
-				tag_pair_past_tag: '',
-				past_event_past_tag: '',
-				old_value_past_tag: '',
-				operator: '<?= CONDITION_OPERATOR_EQUAL ?>',
-				tag: '',
-				tag_value: ''
-			};
-		}
-
-		const template = document.getElementById('ceprule-window-condition-modal-template');
-		const form_element = template.content.querySelector('form').cloneNode(true);
-
-		const overlay = overlayDialogue({
-			class: 'modal-popup modal-popup-medium',
-			title: t('Historical condition details'),
-			content: form_element,
-			buttons: [
-				{
-					title: is_new ? t('Add') : t('Edit'),
-					isSubmit: true,
-					action: (overlay) => {
-						const form = ceprule_window_condition_edit_popup.form;
-						const fields = form.getAllValues();
-
-						form.validateSubmit(fields)
-							.then((result) => {
-								if (!result) {
-									overlay.unsetLoading();
-									return;
-								}
-
-								overlayDialogueDestroy(overlay.dialogueid);
-
-								is_new && this.#addWindowConditionRow(fields) || this.#editWindowConditionRow(fields);
-
-								this.form.discoverAllFields();
-								this.form_element.dispatchEvent(new Event('window.filter.change'));
-							});
-
-						return false;
-					}
-				},
-				{
-					title: t('Cancel'),
-					class: 'btn-alt',
-					cancel: true,
-					action: () => {}
-				}
-			]
-		}, {
-			dialogueid: 'ceprule.window.condition.edit',
-			trigger_element
-		});
-
-		ceprule_window_condition_edit_popup.init({rules: this.#window_condition_rules, window_condition, overlay});
 	}
 
 	#openOperationPopup(operation, trigger_element) {
@@ -959,45 +784,6 @@ window.ceprule_edit_popup = new class {
 			description_html: description_template.evaluate(description_view),
 			...condition
 		});
-	}
-
-	#editWindowConditionRow(window_condition) {
-		window['ceprule-window-condition-table'].querySelector(`[data-formulaid=${window_condition.formulaid}]`)
-			.replaceWith(this.#buildWindowConditionRow(window_condition));
-	}
-
-	#addWindowConditionRow(window_condition) {
-		window['ceprule-window-condition-table'].querySelector('tbody')
-			.insertAdjacentElement('beforeend', this.#buildWindowConditionRow(window_condition));
-	}
-
-	#buildWindowConditionRow(window_condition) {
-		const type_str = JSON.parse('<?=
-			json_encode(CCepRuleHelper::getWindowConditionLabelStrings())
-		?>')[window_condition.type];
-
-		const operator_name = JSON.parse('<?= json_encode([
-			CONDITION_OPERATOR_EQUAL => _('Equals'),
-			CONDITION_OPERATOR_NOT_EQUAL => _('Does not equal')
-		]) ?>')[window_condition.operator];
-
-		let arg1 = '';
-		let arg2 = '';
-
-		if (window_condition.type == <?= CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR ?>) {
-			arg1 = window_condition.tag_pair_past_tag;
-			arg2 = window_condition.tag;
-		}
-		else if (window_condition.type == <?= CCepRuleHelper::WINDOW_CONDITION_OLD_TAG ?>) {
-			arg2 = window_condition.past_event_past_tag;
-		}
-		else if (window_condition.type == <?= CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE ?>) {
-			arg1 = window_condition.old_value_past_tag;
-			arg2 = window_condition.tag_value;
-		}
-
-		return this.#window_condition_row_template
-			.evaluateToElement({arg1: `${arg1} `, arg2, operator_name, type_str, ...window_condition});
 	}
 
 	#removePopupMessages() {

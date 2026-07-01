@@ -76,7 +76,6 @@ class CControllerCepRuleEdit extends CController {
 			'js_validation_rules' => $rules,
 			'js_validation_rules_for_clone' => $rules_for_clone,
 			'condition_js_validation_rules' => self::getConditionValidationRules(),
-			'window_condition_js_validation_rules' => self::getWindowConditionValidationRules(),
 			'operation_js_validation_rules' => self::getOperationValidationRules(),
 			'ceprule' => $this->ceprule,
 			'user' => ['debug_mode' => $this->getDebugMode()]
@@ -100,7 +99,7 @@ class CControllerCepRuleEdit extends CController {
 					'tag_value', 'severity', 'tags'],
 				'selectFilter' => ['formula', 'evaltype', 'conditions'],
 				'selectWindow' => ['duration', 'capacity', 'script', 'group_by_host_group', 'group_by_host',
-					'group_by_tag', 'filter', 'event_count_tag', 'tag']
+					'group_by_tag', 'event_count_tag', 'tag']
 			]);
 		}
 		else {
@@ -111,13 +110,7 @@ class CControllerCepRuleEdit extends CController {
 					'conditions' => []
 				],
 				'window_type' => CCepRuleHelper::WINDOW_NONE,
-				'window' => DB::getDefaults('cep_window') + [
-					'filter' => [
-						'formula' => DB::getDefault('cep_window', 'formula'),
-						'evaltype' => DB::getDefault('cep_window', 'evaltype'),
-						'conditions' => []
-					]
-				],
+				'window' => DB::getDefaults('cep_window'),
 				'operations' => []
 			]];
 		}
@@ -129,10 +122,6 @@ class CControllerCepRuleEdit extends CController {
 		$ceprule = $ceprules[0];
 
 		$ceprule['window'] += DB::getDefaults('cep_window');
-		if (!array_key_exists('filter', $ceprule['window'])) {
-			$ceprule['window']['filter'] = ['conditions' => [], 'evaltype' => DB::getDefault('cep_window', 'evaltype'),
-				'formula' => DB::getDefault('cep_window', 'formula')];
-		}
 
 		// Unlimited capacity's default value is "0".
 		if ($ceprule['window']['capacity'] == 0) {
@@ -150,35 +139,10 @@ class CControllerCepRuleEdit extends CController {
 		// Consistent naming with URL and fields.
 		$ceprule['cepruleid'] = array_key_exists('cep_ruleid', $ceprule) ? $ceprule['cep_ruleid'] : null;
 		unset($ceprule['cep_ruleid']);
-		unset($ceprule['window']['filter']['eval_formula']);
 
 		$ceprule['filter']['conditions'] = self::prepareFilterConditions($ceprule['filter']['conditions']);
-		$ceprule['window']['filter']['conditions'] = self::prepareWindowFilterConditions(
-			$ceprule['window']['filter']['conditions']
-		);
 
 		return $ceprule;
-	}
-
-	protected static function prepareWindowFilterConditions(array $conditions): array {
-		$conditions = self::prepareConditionsFormula($conditions);
-
-		$conditions = array_map(function(array $condition): array {
-			$condition += ['tag_pair_past_tag' => '', 'past_event_past_tag' => '', 'old_value_past_tag' => ''];
-			if ($condition['type'] == CCepRuleHelper::WINDOW_CONDITION_TAG_PAIR) {
-				$condition['tag_pair_past_tag'] = $condition['past_tag'];
-			}
-			elseif ($condition['type'] == CCepRuleHelper::WINDOW_CONDITION_OLD_TAG) {
-				$condition['past_event_past_tag'] = $condition['past_tag'];
-			}
-			elseif ($condition['type'] == CCepRuleHelper::WINDOW_CONDITION_OLD_TAG_VALUE) {
-				$condition['old_value_past_tag'] = $condition['past_tag'];
-			}
-
-			return $condition;
-		}, $conditions);
-
-		return $conditions;
 	}
 
 	protected static function prepareFilterConditions(array $conditions): array {
@@ -205,12 +169,6 @@ class CControllerCepRuleEdit extends CController {
 		ksort($conditions);
 
 		return $conditions;
-	}
-
-	protected static function getWindowConditionValidationRules(): array {
-		return (new CFormValidator([
-			'object', 'fields' => CControllerCepRuleGeneral::getWindowConditionValidationFields()
-		]))->getRules();
 	}
 
 	protected static function getOperationValidationRules(): array {
