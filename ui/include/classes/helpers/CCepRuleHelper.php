@@ -206,7 +206,7 @@ class CCepRuleHelper {
 		];
 	}
 
-	public static function getConditionOperatorStrings(): array {
+	public static function getConditionOperatorLabels(): array {
 		return [
 			CONDITION_OPERATOR_IN => _('In'),
 			CONDITION_OPERATOR_NOT_IN => _('Not in'),
@@ -221,46 +221,43 @@ class CCepRuleHelper {
 		];
 	}
 
-	public static function getConditionOperatorString(array $ceprule_condition): string {
-		if ($ceprule_condition['type'] == CCepRuleHelper::CONDITION_TAG) {
-			return static::getConditionOperatorStrings()[$ceprule_condition['tag_operator']];
+	private static function getConditionOperatorLabel(int $operator): string {
+		$labels = self::getConditionOperatorLabels();
+
+		if (!array_key_exists($operator, $labels)) {
+			throw new LogicException("Uknown condition operator $operator.");
 		}
 
-		return static::getConditionOperatorStrings()[$ceprule_condition['operator']];
-	}
-
-	public static function getConditionArgumentsString(array $ceprule_condition): string {
-		return match((int) $ceprule_condition['type']) {
-			self::CONDITION_EVENT_NAME => $ceprule_condition['event_name'],
-			self::CONDITION_TAG => match ($ceprule_condition['operator']) {
-				CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS => $ceprule_condition['tag'],
-				default => $ceprule_condition['tag'].':'.$ceprule_condition['tag_value']
-			},
-			self::CONDITION_SEVERITY => CSeverityHelper::getName($ceprule_condition['severity']),
-			self::CONDITION_HOST => $ceprule_condition['host'],
-			self::CONDITION_HOST_GROUP => $ceprule_condition['host_group'],
-			self::CONDITION_TIME_PERIOD => $ceprule_condition['time_period']
-		};
+		return static::getConditionOperatorLabels()[$operator];
 	}
 
 	public static function getConditionDescription(array $ceprule_condition): array {
-		if ($ceprule_condition['operator'] == CONDITION_OPERATOR_EXISTS
-				|| $ceprule_condition['operator'] == CONDITION_OPERATOR_NOT_EXISTS) {
+		[$arg1, $arg2] = match((int) $ceprule_condition['type']) {
+			self::CONDITION_EVENT_NAME => [$ceprule_condition['event_name'], null],
+			self::CONDITION_SEVERITY => [CSeverityHelper::getName($ceprule_condition['severity']), null],
+			self::CONDITION_HOST => [$ceprule_condition['host'], null],
+			self::CONDITION_HOST_GROUP => [$ceprule_condition['host_group'], null],
+			self::CONDITION_TIME_PERIOD => [$ceprule_condition['time_period'], null],
+			self::CONDITION_TAG => match ($ceprule_condition['operator']) {
+				CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS => [$ceprule_condition['tag'], null],
+				default => [$ceprule_condition['tag'], $ceprule_condition['tag_value']]
+			}
+		};
 
-			return [
-				CCepRuleHelper::getConditionLabel($ceprule_condition['type']),
-				' ',
-				italic(CCepRuleHelper::getConditionOperatorString($ceprule_condition))
-			];
-		}
-
-		return [
+		$result = [
 			CCepRuleHelper::getConditionLabel($ceprule_condition['type']),
 			' ',
-			italic(CCepRuleHelper::getConditionOperatorString($ceprule_condition)),
+			italic($arg1),
 			' ',
-			CCepRuleHelper::getConditionArgumentsString($ceprule_condition)
+			mb_strtolower(CCepRuleHelper::getConditionOperatorLabel($ceprule_condition['operator']))
 		];
+
+		if ($arg2 !== null) {
+			$result[] = ' ';
+			$result[] = italic($arg2);
+		}
+
+		return $result;
 	}
 
 	public static function getOperationExecuteWhenStrings(): array {

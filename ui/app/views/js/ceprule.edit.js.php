@@ -40,6 +40,15 @@ window.ceprule_edit_popup = new class {
 	#condition_row_template;
 
 	/** @type {Template} */
+	#condition_row_template_value;
+
+	/** @type {Template} */
+	#condition_row_template_tag;
+
+	/** @type {Template} */
+	#condition_row_template_tag_exists;
+
+	/** @type {Template} */
 	#window_condition_row_template;
 
 	/** @type {Number} */
@@ -134,12 +143,13 @@ window.ceprule_edit_popup = new class {
 			</tr>
 		`);
 
+		this.#condition_row_template_value = new Template(`<div class="text">#{name} #{operator} <em>#{value}</em>.</div>`);
+		this.#condition_row_template_tag = new Template(`<div class="text">#{name} <em>#{tag_name}</em> #{operator} <em>#{tag_value}</em>.</div>`);
+		this.#condition_row_template_tag_exists = new Template(`<div class="text">#{name} <em>#{tag_name}</em> #{operator}.</div>`);
 		this.#condition_row_template = new Template(`
 			<tr data-formulaid="#{formulaid}">
 				<td>#{formulaid}</td>
-				<td>
-					<div class="text">#{event_name_str} #{operator_name} <em>#{arguments_name}</em></div>
-				</td>
+				<td>#{*description_html}</td>
 				<td>
 					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-condition-edit"><?= _('Edit') ?></button>
 					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-condition-remove"><?= _('Remove') ?></button>
@@ -894,49 +904,61 @@ window.ceprule_edit_popup = new class {
 	}
 
 	#buildConditionRow(condition) {
-		const event_name_str = JSON.parse('<?= json_encode(
+		const label_names = JSON.parse('<?= json_encode(
 			CCepRuleHelper::getConditionLabels()
-		) ?>')[condition.type];
-		const operator_names = JSON.parse('<?= json_encode(
-			CCepRuleHelper::getConditionOperatorStrings()
 		) ?>');
+
+		const operator_names = JSON.parse('<?= json_encode(
+			CCepRuleHelper::getConditionOperatorLabels()
+		) ?>');
+
 		const severity_names = JSON.parse('<?= json_encode(
 			array_column(CSeverityHelper::getSeverities(), 'label', 'value')
 		) ?>');
 
-		const operator_name = condition.type == <?= CCepRuleHelper::CONDITION_TAG ?>
-			? operator_names[condition.tag_operator]
-			: operator_names[condition.operator];
-		const arguments_name = (function condition_arguments(condition) {
-			if (condition.type == <?= CCepRuleHelper::CONDITION_EVENT_NAME ?>) {
-				return condition.event_name;
-			}
+		let description_template = this.#condition_row_template_value;
+		const description_view = {
+			name: label_names[condition.type],
+			operator: condition.type == <?= CCepRuleHelper::CONDITION_TAG ?>
+				? operator_names[condition.tag_operator]
+				: operator_names[condition.operator],
+			value: undefined,
+			tag_name: undefined,
+			tag_value: undefined
+		};
 
-			if (condition.type == <?= CCepRuleHelper::CONDITION_TAG ?>) {
-				return (condition.tag_operator == <?= CONDITION_OPERATOR_EXISTS ?> ||
-						condition.tag_operator == <?= CONDITION_OPERATOR_NOT_EXISTS ?>)
-					? condition.tag : `${condition.tag}:${condition.tag_value}`;
-			}
+		if (condition.type == <?= CCepRuleHelper::CONDITION_EVENT_NAME ?>) {
+			description_view.value = condition.event_name;
+		}
+		else if (condition.type == <?= CCepRuleHelper::CONDITION_SEVERITY ?>) {
+			description_view.value = severity_names[condition.severity];
+		}
+		else if (condition.type == <?= CCepRuleHelper::CONDITION_HOST ?>) {
+			description_view.value = condition.host;
+		}
+		else if (condition.type == <?= CCepRuleHelper::CONDITION_HOST_GROUP ?>) {
+			description_view.value = condition.host_group;
+		}
+		else if (condition.type == <?= CCepRuleHelper::CONDITION_TIME_PERIOD ?>) {
+			description_view.value = condition.time_period;
+		}
+		else if (condition.type == <?= CCepRuleHelper::CONDITION_TAG ?>) {
+			description_view.tag_name = condition.tag;
+			description_template = this.#condition_row_template_tag_exists;
 
-			if (condition.type == <?= CCepRuleHelper::CONDITION_SEVERITY ?>) {
-				return severity_names[condition.severity];
+			if (condition.tag_operator != <?= CONDITION_OPERATOR_EXISTS ?>
+					&& condition.tag_operator != <?= CONDITION_OPERATOR_NOT_EXISTS ?>) {
+				description_view.tag_value = condition.tag_value;
+				description_template = this.#condition_row_template_tag;
 			}
+		}
 
-			if (condition.type == <?= CCepRuleHelper::CONDITION_HOST ?>) {
-				return condition.host;
-			}
+		description_view.operator = description_view.operator.toLocaleLowerCase();
 
-			if (condition.type == <?= CCepRuleHelper::CONDITION_HOST_GROUP ?>) {
-				return condition.host_group;
-			}
-
-			if (condition.type == <?= CCepRuleHelper::CONDITION_TIME_PERIOD ?>) {
-				return condition.time_period;
-			}
-		})(condition);
-
-		return this.#condition_row_template
-			.evaluateToElement({arguments_name, operator_name, event_name_str, ...condition});
+		return this.#condition_row_template.evaluateToElement({
+			description_html: description_template.evaluate(description_view),
+			...condition
+		});
 	}
 
 	#editWindowConditionRow(window_condition) {
