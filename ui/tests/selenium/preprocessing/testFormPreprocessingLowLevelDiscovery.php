@@ -284,7 +284,6 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{#METRICNAME}==1']
-
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_params_0' => 'Pattern: Invalid Prometheus pattern.'

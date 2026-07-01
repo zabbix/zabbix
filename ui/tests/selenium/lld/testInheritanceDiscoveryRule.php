@@ -161,7 +161,6 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 				}
 
 				// Host form check.
-
 				$this->zbxTestLogin('zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='.$this->hostid);
 				$this->zbxTestClickLinkText($data['name']);
 				$host_dialog = COverlayDialogElement::find()->waitUntilReady()->one();

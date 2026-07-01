@@ -698,7 +698,6 @@ class testPageLowLevelDiscovery extends CWebTest {
 	 * @dataProvider getDeleteAllButtonData
 	 */
 	public function testPageLowLevelDiscovery_DeleteAllButton($data) {
-
 		$this->page->login()->open('zabbix.php?action=lldrule.list&context=host&filter_set=1&filter_hostids[0]='.$data['hostid']);
 		// Delete all discovery rules.
 		$form = $this->query('name:zbx_filter')->one()->asForm();

@@ -991,7 +991,7 @@ class testLowLevelDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Lifetime fields -disable larger than delete',
+						'Name' => 'Lifetime fields - disable larger than delete',
 						'Type' => 'Zabbix agent',
 						'Key' => 'test',
 						'id:lifetime_type' => 'After',
@@ -2156,7 +2156,7 @@ class testLowLevelDiscovery extends CWebTest {
 				->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
-sleep(10);
+
 		if (static::$context === 'template') {
 			unset($data['fields']['Host interface']);
 		}

@@ -3875,7 +3875,7 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		// Clone item.
 		$dialog->getFooter()->query('button:Clone')->one()->click();
-		COverlayDialogElement::find()->one()->waitUntilReady();
+		COverlayDialogElement::find()->waitUntilReady();
 
 		$form->invalidate();
 		$form->fill($cloned_values);
@@ -4194,8 +4194,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				" are set.\n\nHowever, if \"Check for not supported value\" steps are configured, they are always placed and".
 				" executed first (with \"any error\" being the last of them).";
 
-		$this->assertEquals($expected_text, $hint->getText()
-		);
+		$this->assertEquals($expected_text, $hint->getText());
 		$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 
 		// Check 'Type of information' options.

@@ -996,7 +996,6 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-
 					'url' => 'zabbix.php?action=lldrule.prototype.list&parent_discoveryid={template_discoveryid}&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery'
 				]
@@ -1022,7 +1021,6 @@ class testDocumentationLinks extends CWebTest {
 					'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&context=template'.
 							'&itemid={template_item_prototypeid}&parent_discoveryid={template_discoveryid}',
 					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
-
 				]
 			],
 			// #92 Template LLD rule prototype test form.
@@ -1241,7 +1239,6 @@ class testDocumentationLinks extends CWebTest {
 			// #115 Host LLD rule configuration form.
 			[
 				[
-
 					'url' => 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids[0]=40001&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule',
 					'actions' => [
