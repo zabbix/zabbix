@@ -212,6 +212,14 @@ JAVASCRIPT;
 		foreach ($item['preprocessing'] as &$step) {
 			$step['params'] = $step['type'] == ZBX_PREPROC_SCRIPT
 				? [$step['params'], ''] : explode("\n", $step['params']);
+
+			if ($step['type'] == ZBX_PREPROC_PROMETHEUS_PATTERN) {
+				if ($step['params'][1] == ZBX_PREPROC_PROMETHEUS_FUNCTION) {
+					$step['params'][1] = $step['params'][2];
+					$step['params'][2] = '';
+				}
+			}
+
 			$step['sortorder'] = $i++;
 		}
 		unset($step);
