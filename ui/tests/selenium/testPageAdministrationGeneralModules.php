@@ -454,6 +454,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$row = $table->findRow('Name', '2nd Module name !@#$%^&*()_+');
 		if ($row->getColumn('Status')->getText() !== 'Enabled') {
 			$row->query('link:Disabled')->one()->click();
+			$this->page->waitUntilReady();
 		}
 
 		// Apply and submit the filter from data provider.

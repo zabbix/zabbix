@@ -431,6 +431,9 @@ class CHost extends CHostGeneral {
 
 		// search
 		if (is_array($options['search'])) {
+			unset($options['search']['tls_psk_identity']);
+			unset($options['search']['tls_psk']);
+
 			zbx_db_search('hosts h', $options, $sqlParts);
 
 			if (zbx_db_search('interface hi', $options, $sqlParts)) {
@@ -458,6 +461,9 @@ class CHost extends CHostGeneral {
 
 		// filter
 		if (is_array($options['filter'])) {
+			unset($options['filter']['tls_psk_identity']);
+			unset($options['filter']['tls_psk']);
+
 			$this->dbFilter('hosts h', $options, $sqlParts);
 
 			if (array_key_exists('hostid', $options['filter'])) {

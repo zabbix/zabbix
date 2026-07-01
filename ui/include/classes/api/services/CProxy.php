@@ -99,11 +99,17 @@ class CProxy extends CApiService {
 
 		// filter
 		if (is_array($options['filter'])) {
+			unset($options['filter']['tls_psk_identity']);
+			unset($options['filter']['tls_psk']);
+
 			$this->dbFilter('hosts h', $options, $sqlParts);
 		}
 
 		// search
 		if (is_array($options['search'])) {
+			unset($options['search']['tls_psk_identity']);
+			unset($options['search']['tls_psk']);
+
 			zbx_db_search('hosts h', $options, $sqlParts);
 		}
 
