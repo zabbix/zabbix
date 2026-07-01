@@ -677,14 +677,20 @@ class CConfigurationExport {
 			}
 		}
 
-		$db_proxies = $proxyids
+		$accessible_proxyids = API::Proxy()->get([
+			'output' => ['proxyid'],
+			'proxyids' => array_keys($proxyids),
+			'preservekeys' => true
+		]);
+
+		$db_proxies = $accessible_proxyids
 			? DBfetchArray(DBselect(
 				'SELECT p.proxyid,p.name'.
 				' FROM proxy p'.
-				' WHERE '.dbConditionId('p.proxyid', array_keys($proxyids)).
-					' AND '.CApiUserGroupHelper::getProxyPermissionsCondition('p')
+				' WHERE '.dbConditionId('p.proxyid', array_keys($accessible_proxyids))
 			))
 			: [];
+
 		$db_proxies = array_column($db_proxies, null, 'proxyid');
 
 		foreach ($hosts as &$host) {
@@ -713,14 +719,20 @@ class CConfigurationExport {
 			}
 		}
 
-		$db_proxy_groups = $proxy_groupids
+		$accessible_proxy_groupids = API::ProxyGroup()->get([
+			'output' => ['proxy_groupid'],
+			'proxy_groupids' => array_keys($proxy_groupids),
+			'preservekeys' => true
+		]);
+
+		$db_proxy_groups = $accessible_proxy_groupids
 			? DBfetchArray(DBselect(
 				'SELECT pg.proxy_groupid,pg.name'.
 				' FROM proxy_group pg'.
-				' WHERE '.dbConditionId('pg.proxy_groupid', array_keys($proxy_groupids)).
-					' AND '.CApiUserGroupHelper::getProxyGroupPermissionsCondition('pg')
+				' WHERE '.dbConditionId('pg.proxy_groupid', array_keys($accessible_proxy_groupids))
 			))
 			: [];
+
 		$db_proxy_groups = array_column($db_proxy_groups, null, 'proxy_groupid');
 
 		foreach ($hosts as &$host) {

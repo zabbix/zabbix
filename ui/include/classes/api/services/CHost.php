@@ -2159,7 +2159,9 @@ class CHost extends CHostGeneral {
 				}
 			}
 
-			if (array_key_exists('proxyid', $db_hosts[$host['hostid']]) && array_key_exists('proxyid', $host)) {
+			if (array_key_exists('proxyid', $host)
+					&& array_key_exists('proxyid', $db_hosts[$host['hostid']])
+					&& $host['proxyid'] !== "0") {
 				if (bccomp($host['proxyid'], $db_hosts[$host['hostid']]['proxyid']) != 0
 						&& $db_hosts[$host['hostid']]['proxyid'] != 0) {
 					$proxyids[$host['hostid']] = (int) $db_hosts[$host['hostid']]['proxyid'];
@@ -2169,7 +2171,9 @@ class CHost extends CHostGeneral {
 				}
 			}
 
-			if (array_key_exists('proxy_groupid', $host) && array_key_exists('proxy_groupid', $host)) {
+			if (array_key_exists('proxy_groupid', $host)
+					&& array_key_exists('proxy_groupid', $db_hosts[$host['hostid']])
+					&& $host['proxy_groupid'] !== "0") {
 				if (bccomp($host['proxy_groupid'], $db_hosts[$host['hostid']]['proxy_groupid']) != 0
 						&& $db_hosts[$host['hostid']]['proxy_groupid'] != 0) {
 					$proxy_groupids[$host['hostid']] = $db_hosts[$host['hostid']]['proxy_groupid'];
