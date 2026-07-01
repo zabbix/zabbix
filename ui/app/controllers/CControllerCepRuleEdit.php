@@ -184,6 +184,10 @@ class CControllerCepRuleEdit extends CController {
 	protected static function prepareFilterConditions(array $conditions): array {
 		$conditions = self::prepareConditionsFormula($conditions);
 		$conditions = array_map(function(array $condition): array {
+			if ($condition['type'] == CCepRuleHelper::CONDITION_TAG_VALUE) {
+				$condition['type'] = CCepRuleHelper::CONDITION_TAG;
+			}
+
 			if ($condition['type'] == CCepRuleHelper::CONDITION_TAG) {
 				$condition['tag_operator'] = $condition['operator'];
 			}

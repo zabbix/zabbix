@@ -141,6 +141,10 @@ class CControllerCepRuleList extends CController {
 				];
 
 				$record['filter']['conditions'] = array_map(function(array $condition) {
+					if ($condition['type'] == CCepRuleHelper::CONDITION_TAG_VALUE) {
+						$condition['type'] = CCepRuleHelper::CONDITION_TAG;
+					}
+
 					if ($condition['type'] == CCepRuleHelper::CONDITION_TAG) {
 						$condition['tag_operator'] = $condition['operator'];
 					}
