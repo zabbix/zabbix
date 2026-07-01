@@ -28,9 +28,6 @@
 #include "zbxvariant.h"
 #include "zbxdbhigh.h"
 
-/* WDN placeholder for proper defines */
-#define ZBX_CEP_EXECUTE_ON_EVENT_OCCURRED	1
-
 /******************************************************************************
  *                                                                            *
  * Purpose: evaluate string condition operator against raw values             *
@@ -817,7 +814,7 @@ static int	cep_rule_discard_event(const zbx_cep_rule_t *rule, zbx_cep_event_cont
 	{
 		const zbx_cep_operation_t	*op = &rule->operations.values[i];
 
-		if (ZBX_CEP_EXECUTE_ON_EVENT_OCCURRED != op->execute_when)
+		if (ZBX_CEP_WHEN_EVENT_OCCURRED != op->execute_when)
 			continue;
 
 		if (ZBX_CEP_OP_DISCARD == op->type && SUCCEED == cep_operation_match_event(op, ctx))

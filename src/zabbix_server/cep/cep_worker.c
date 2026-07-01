@@ -483,9 +483,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	{
 		if (SUCCEED != cep_event_match_rules(hconfig, &rules, &rules_num, &event_ctx))
 		{
-			cep_event_clear(event);
-			zbx_free(event);
-
+			zbx_cep_event_release(event);
 			goto out;
 		}
 
