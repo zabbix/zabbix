@@ -9,7 +9,7 @@
 		display: inline-block;
 		padding: 0;
 
-		&:nth-child(1 of &:not([hidden])) label {
+		&:nth-child(1 of &:not([hidden])) {
 			border-top-left-radius: var(--input-border-radius);
 			border-bottom-left-radius: var(--input-border-radius);
 
@@ -19,7 +19,7 @@
 			}
 		}
 
-		&:nth-last-child(1 of &:not([hidden])) label {
+		&:nth-last-child(1 of &:not([hidden])) {
 			border-top-right-radius: var(--input-border-radius);
 			border-bottom-right-radius: var(--input-border-radius);
 

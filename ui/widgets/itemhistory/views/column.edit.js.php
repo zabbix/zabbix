@@ -250,6 +250,7 @@ window.item_history_column_edit = new class {
 			const row = this.#form.getElementsByClassName(class_name);
 
 			for (const element of row) {
+				console.log("1111")
 				element.style.display = rows[class_name] ? '' : 'none';
 			}
 		}
@@ -265,12 +266,12 @@ window.item_history_column_edit = new class {
 				];
 
 			for (const input of this.#form.querySelectorAll('[name=display]')) {
-				const show_input = visible_values.some((value) => value == input.value);
+				const hide_input = !visible_values.some((value) => value == input.value);
 
-				input.parentElement.style.display = show_input ? '' : 'none';
-				input.disabled = !show_input;
+				input.parentElement.hidden = hide_input;
+				input.disabled = hide_input;
 
-				if (!show_input && input.checked) {
+				if (hide_input && input.checked) {
 					input.checked = false;
 
 					this.#form.querySelector('[name=display][value="<?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>"]')
