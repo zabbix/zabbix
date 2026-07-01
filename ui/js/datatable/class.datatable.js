@@ -119,7 +119,7 @@ class CDataTable {
 	/**
 	 * @type {number}
 	 */
-	static TABLE_OPTIONS_BUTTON_WIDTH = 32;
+	static TABLE_OPTIONS_BUTTON_WIDTH = 34;
 
 	/**
 	 * Flag to determine when a component is initialized, to disallow any further modifications.
@@ -2279,7 +2279,11 @@ class CDataTable {
 			return;
 		}
 
-		const min_width = this.#getColumnMinWidth(column);
+		let min_width = this.#getColumnMinWidth(column);
+		if (this.#customizable && this.#visible_columns.at(-1) === column) {
+			min_width += CDataTable.TABLE_OPTIONS_BUTTON_WIDTH;
+		}
+
 		const header_width = column.getHeaderCell()?.target.getBoundingClientRect().width ?? 0;
 		const data_width = column.getDataCells().at(0)?.target.getBoundingClientRect().width ?? 0;
 
