@@ -1162,7 +1162,7 @@ static zbx_cep_event_t	*cep_event_handle_mutable(zbx_cep_event_handle_t h)
 
 	event = cep_event_clone(e);
 	zbx_cep_event_release(e);
-	h->event = cep_event_addref(event);
+	h->event = event;
 
 	return event;
 }
