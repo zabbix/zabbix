@@ -1,1 +1,0 @@
-..F....... [ZBX-27835] fixed inline validation to display hidden input field error messages as general errors when there isn't error container (gberzina)
