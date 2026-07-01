@@ -101,6 +101,19 @@ static zbx_uint64_t	cep_get_close_event_task_correlationid(const zbx_mw_task_t *
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare a CEP event and its tags for insertion into the database  *
+ *                                                                            *
+ * Parameters: event             - [IN] event to write                        *
+ *             db                - [IN] database connection used to prepare   *
+ *                                 the insert statements                      *
+ *             db_insert_events  - [IN/OUT] insert batch for the events       *
+ *                                 table                                      *
+ *             db_insert_tag     - [IN/OUT] insert batch for the event_tag    *
+ *                                 table                                      *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_db_write_event(const zbx_cep_event_t *event, zbx_dbconn_t *db, zbx_db_insert_t *db_insert_events,
 		zbx_db_insert_t *db_insert_tag)
 {
@@ -130,6 +143,20 @@ static void	cep_db_write_event(const zbx_cep_event_t *event, zbx_dbconn_t *db, z
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare a CEP problem and its tags for insertion into the         *
+ *          database                                                          *
+ *                                                                            *
+ * Parameters: event             - [IN] event to write                        *
+ *             db                - [IN] database connection used to prepare   *
+ *                                 the insert statements                      *
+ *             db_insert_problem - [IN/OUT] insert batch for the problem      *
+ *                                 table                                      *
+ *             db_insert_tag     - [IN/OUT] insert batch for the problem_tag  *
+ *                                 table                                      *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_db_write_problem(const zbx_cep_event_t *event, zbx_dbconn_t *db, zbx_db_insert_t *db_insert_problem,
 		zbx_db_insert_t *db_insert_tag)
 {
@@ -159,6 +186,20 @@ static void	cep_db_write_problem(const zbx_cep_event_t *event, zbx_dbconn_t *db,
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepares a database event and its tags for insertion into the     *
+ *          database                                                          *
+ *                                                                            *
+ * Parameters: db_event         - [IN] event to write                         *
+ *             db               - [IN] database connection used to prepare    *
+ *                                the insert statements                       *
+ *             db_insert_events - [IN/OUT] insert batch for the events        *
+ *                                table                                       *
+ *             db_insert_tag    - [IN/OUT] insert batch for the event_tag     *
+ *                                table                                       *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_db_write_db_event(const zbx_db_event *db_event, zbx_dbconn_t *db, zbx_db_insert_t *db_insert_events,
 		zbx_db_insert_t *db_insert_tag)
 {
@@ -188,6 +229,20 @@ static void	cep_db_write_db_event(const zbx_db_event *db_event, zbx_dbconn_t *db
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare a database problem and its tags for insertion into the    *
+ *          database                                                          *
+ *                                                                            *
+ * Parameters: db_event          - [IN] event to write                        *
+ *             db                - [IN] database connection used to           *
+ *                                 prepare the insert statements              *
+ *             db_insert_problem - [IN/OUT] insert batch for the problem      *
+ *                                 table                                      *
+ *             db_insert_tag     - [IN/OUT] insert batch for the problem_tag  *
+ *                                 table                                      *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_db_write_db_problem(const zbx_db_event *db_event, zbx_dbconn_t *db,
 		zbx_db_insert_t *db_insert_problem, zbx_db_insert_t *db_insert_tag)
 {
@@ -621,9 +676,10 @@ void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr
 
 	zbx_vector_trigger_diff_ptr_create(&trigger_diffs);
 
-	for (int ret = ZBX_DB_DOWN; ret == ZBX_DB_DOWN;)
+	db = zbx_dbconn_pool_acquire_connection(dbpool);
+
+	do
 	{
-		db = zbx_dbconn_pool_acquire_connection(dbpool);
 		zbx_dbconn_begin(db);
 
 		cep_db_write_events(db, tasks);
@@ -632,10 +688,10 @@ void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr
 		cep_db_write_event_recovery(db, tasks);
 		cep_db_write_event_suppress(db, tasks);
 		cep_db_write_trigger_rtdata(db, tasks, &trigger_diffs);
-
-		ret = zbx_dbconn_commit(db);
-		zbx_dbconn_pool_release_connection(dbpool, db);
 	}
+	while (ZBX_DB_DOWN == zbx_dbconn_commit(db));
+
+	zbx_dbconn_pool_release_connection(dbpool, db);
 
 	zbx_dc_config_triggers_apply_changes(trigger_diffs.values, trigger_diffs.values_num);
 	zbx_vector_trigger_diff_ptr_clear_ext(&trigger_diffs, zbx_trigger_diff_free);
@@ -690,16 +746,17 @@ void	cep_db_process_actions(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_
 	}
 	zbx_vector_uint64_pair_sort(&event_recovery, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	for (ret = ZBX_DB_DOWN; ret == ZBX_DB_DOWN;)
+	db = zbx_dbconn_pool_acquire_connection(dbpool);
 	{
 		zbx_vector_escalation_new_ptr_clear_ext(&escalations, zbx_escalation_new_ptr_free);
 
-		db = zbx_dbconn_pool_acquire_connection(dbpool);
 		zbx_dbconn_begin(db);
 		process_actions(db, &events, &event_recovery, &escalations);
-		ret = zbx_dbconn_commit(db);
-		zbx_dbconn_pool_release_connection(dbpool, db);
+		zbx_dbconn_commit(db);
 	}
+	while (ZBX_DB_DOWN == (ret = zbx_dbconn_commit(db)));
+
+	zbx_dbconn_pool_release_connection(dbpool, db);
 
 	if (ZBX_DB_OK == ret && 0 != escalations.values_num)
 			zbx_start_escalations(rtc, &escalations);
@@ -875,6 +932,37 @@ void	cep_db_add_tags(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: advance through the cached CEP events and synchronize their       *
+ *          tags with the database, up to and including the event that        *
+ *          matches eventid                                                   *
+ *                                                                            *
+ * Parameters: table       - [IN] name of the tag table used for update       *
+ *                           statements                                       *
+ *             field       - [IN] name of the eventid column in the tag       *
+ *                           table                                            *
+ *             events      - [IN] array of cached CEP events, sorted by       *
+ *                           eventid                                          *
+ *             events_num  - [IN] number of elements in events                *
+ *             event_index - [IN] index into events to start processing from  *
+ *             eventid     - [IN] event identifier of the database row to     *
+ *                           match against                                    *
+ *             db_tags     - [IN/OUT] tag rows read from the database for     *
+ *                           the matched event, merged with the cached        *
+ *                           tags in place; may be NULL                       *
+ *             db          - [IN] database connection                         *
+ *             db_insert   - [IN/OUT] insert batch for new tag rows           *
+ *             sql         - [IN/OUT] buffer used to accumulate update        *
+ *                           statements                                       *
+ *             sql_alloc   - [IN/OUT] allocated size of sql                   *
+ *             sql_offset  - [IN/OUT] current length of sql                   *
+ *             deleteids   - [OUT] deleted tag ids                            *
+ *                                                                            *
+ * Return value: index into events past the processed event, or               *
+ *               events_num if no more events remain                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_db_sync_event_tags(const char *table, const char *field, const zbx_cep_event_t **events,
 		int events_num, int event_index, zbx_uint64_t eventid, zbx_sync_rowset_t *db_tags, zbx_dbconn_t *db,
 		zbx_db_insert_t *db_insert, char **sql, size_t *sql_alloc, size_t *sql_offset,
@@ -956,6 +1044,20 @@ static int	cep_db_sync_event_tags(const char *table, const char *field, const zb
 	return ++event_index;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: synchronize cached event tag changes to database                  *
+ *                                                                            *
+ * Parameters: db         - [IN] database connection                          *
+ *             table      - [IN] name of the tag table to synchronize         *
+ *             field      - [IN] name of the eventid column in the tag        *
+ *                          table                                             *
+ *             events     - [IN] array of cached CEP events, sorted by        *
+ *                          eventid                                           *
+ *             events_num - [IN] number of elements in events                 *
+ *             eventids   - [IN] event identifiers to select tag rows for     *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_db_sync_event_tags_table(zbx_dbconn_t *db, const char *table, const char *field,
 		const zbx_cep_event_t **events, int events_num, const zbx_vector_uint64_t *eventids)
 {
@@ -1029,6 +1131,16 @@ static void	cep_db_sync_event_tags_table(zbx_dbconn_t *db, const char *table, co
 	zbx_vector_uint64_destroy(&deleteids);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: synchronize event and problem tag changes to database for the     *
+ *          given CEP events                                                  *
+ *                                                                            *
+ * Parameters: db    - [IN] database connection                               *
+ *             htags - [IN] handles of CEP events whose tags need to be       *
+ *                     synchronized                                           *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_db_update_event_tags(zbx_dbconn_t *db, const zbx_vector_cep_event_handle_t *htags)
 {
 	zbx_vector_uint64_t	eventids;
@@ -1080,6 +1192,18 @@ zbx_cep_event_sync_t;
 ZBX_VECTOR_DECL(cep_event_sync, zbx_cep_event_sync_t)
 ZBX_VECTOR_IMPL(cep_event_sync, zbx_cep_event_sync_t)
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: synchronize changed CEP event fields to the events and problem    *
+ *          tables                                                            *
+ *                                                                            *
+ * Parameters: db   - [IN] database connection                                *
+ *             sync - [IN] event handles with flags indicating which          *
+ *                    fields have changed                                     *
+ *                                                                            *
+ * Comments: Handles that no longer resolve to a cached event are skipped.    *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_db_sync_event(zbx_dbconn_t *db, const zbx_vector_cep_event_sync_t *sync)
 {
 	zbx_cep_event_t			**events;
@@ -1152,6 +1276,14 @@ static void	cep_db_sync_event(zbx_dbconn_t *db, const zbx_vector_cep_event_sync_
 	zbx_vector_cep_event_handle_destroy(&hevents);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: synchronize event changes to the database                         *
+ *                                                                            *
+ * Parameters: dbpool - [IN] database connection pool                         *
+ *             tasks  - [IN] sync tasks with changed events                   *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_vector_cep_event_handle_t	htags;
@@ -1214,6 +1346,15 @@ void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: insert acknowledge records into the database for CEP              *
+ *          acknowledge tasks                                                 *
+ *                                                                            *
+ * Parameters: dbpool - [IN] database connection pool                         *
+ *             tasks  - [IN] acknowledge tasks to write                       *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_db_add_acknowledges(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_db_insert_t	db_insert;
@@ -1235,7 +1376,12 @@ void	cep_db_add_acknowledges(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task
 	}
 
 	zbx_db_insert_autoincrement(&db_insert, "acknowledgeid");
-	zbx_db_insert_execute(&db_insert);
+
+	do
+	{
+		zbx_db_insert_execute(&db_insert);
+	}
+	while (ZBX_DB_DOWN == zbx_dbconn_commit(db));
 
 	zbx_dbconn_pool_release_connection(dbpool, db);
 
@@ -1244,29 +1390,44 @@ void	cep_db_add_acknowledges(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update CEP rule error messages in the database and cache          *
+ *                                                                            *
+ * Parameters: dbpool - [IN] database connection pool                         *
+ *             tasks  - [IN] rule error tasks to write                        *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_db_update_rule_errors(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks)
 {
 	char	*sql = NULL;
-	size_t	sql_alloc = 0, sql_offset = 0;
+	size_t	sql_alloc = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
 
 	zbx_dbconn_t	*db = zbx_dbconn_pool_acquire_connection(dbpool);
-	for (int i = 0; i < tasks->values_num; i++)
+
+	do
 	{
-		const zbx_cep_task_rule_error_t	*task = (const zbx_cep_task_rule_error_t *)tasks->values[i];
-		char				*error_dyn;
+		size_t	sql_offset = 0;
 
-		error_dyn = zbx_dbconn_dyn_escape_string(db, ZBX_NULL2EMPTY_STR(task->error));
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update cep_rule_rtdata set error='%s' where cep_ruleid=" ZBX_FS_UI64 ";\n",
-				error_dyn, task->ruleid);
-		zbx_free(error_dyn);
+		for (int i = 0; i < tasks->values_num; i++)
+		{
+			const zbx_cep_task_rule_error_t	*task = (const zbx_cep_task_rule_error_t *)tasks->values[i];
+			char				*error_dyn;
 
-		zbx_dbconn_execute_overflowed_sql(db, &sql, &sql_alloc, &sql_offset, NULL);
+			error_dyn = zbx_dbconn_dyn_escape_string(db, ZBX_NULL2EMPTY_STR(task->error));
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update cep_rule_rtdata set error='%s' where cep_ruleid=" ZBX_FS_UI64 ";\n",
+					error_dyn, task->ruleid);
+			zbx_free(error_dyn);
+
+			zbx_dbconn_execute_overflowed_sql(db, &sql, &sql_alloc, &sql_offset, NULL);
+		}
+		(void)zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset);
 	}
+	while (ZBX_DB_DOWN == zbx_dbconn_commit(db));
 
-	(void)zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset);
 	zbx_free(sql);
 
 	zbx_cep_t	*cep;

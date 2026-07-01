@@ -20,7 +20,6 @@
 
 ZBX_VECTOR_IMPL(cep_event_update, zbx_cep_event_update_t)
 
-
 /* guards access to CEP cache which can be accessed only by acquiring with */
 /* cep_cache_acquire() and releasing afterwards with cep_cache_release()   */
 typedef struct
@@ -205,6 +204,9 @@ int	cep_api_create(const char *config_source_ip, char **error)
  *                                                                            *
  * Purpose: acquire a reference to the CEP API                                *
  *                                                                            *
+ * Comments: Called on thread entry to keep the CEP API alive for the         *
+ *           duration of the thread's use of it                               *
+ *                                                                            *
  ******************************************************************************/
 void	zbx_cep_api_acquire(void)
 {
@@ -219,6 +221,8 @@ void	zbx_cep_api_acquire(void)
 /******************************************************************************
  *                                                                            *
  * Purpose: release a reference to the CEP API handle                         *
+ *                                                                            *
+ * Comments: Called before thread exit.                                       *
  *                                                                            *
  ******************************************************************************/
 void	zbx_cep_api_release(void)
@@ -261,6 +265,8 @@ void	cep_cache_release(zbx_cep_t **cep)
  *                                                                            *
  * Parameters: pool - [OUT] pointer to the window pool                        *
  *                                                                            *
+ * Comments: Must be paired with a call to cep_window_pool_release().         *
+ *                                                                            *
  ******************************************************************************/
 void	cep_window_pool_acquire(zbx_cep_window_pool_t **pool)
 {
@@ -272,6 +278,8 @@ void	cep_window_pool_acquire(zbx_cep_window_pool_t **pool)
  * Purpose: release the CEP window pool and unlock its guard                  *
  *                                                                            *
  * Parameters: pool - [IN/OUT] pointer to the window pool                     *
+ *                                                                            *
+ * Comments: Must be paired with a prior call to cep_window_pool_acquire().   *
  *                                                                            *
  ******************************************************************************/
 void	cep_window_pool_release(zbx_cep_window_pool_t **pool)
