@@ -817,8 +817,8 @@ class testLowLevelDiscovery extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Key' => 'test1',
 						'id:delay_flex_0_type' => 'Flexible',
-						'id:delay_flex_0_delay' => '1M',
-						'id:delay_flex_0_period' => '1-8,00:00-24:00'
+						'id:delay_flex_0_period' => '1-7,00:00-24:00',
+						'id:delay_flex_0_delay' => '1M'
 					],
 					'inline_errors' => [
 						'id:delay_flex_0_delay' => 'Interval: Invalid interval.'

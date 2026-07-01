@@ -683,7 +683,15 @@ class testUrlParameters extends CLegacyWebTest {
 								'popup: lldrule.prototype.edit'
 							]
 						],
-
+						[
+							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={template_lld_prototypeid}'.
+									'&context=template',
+							'text_not_present' => 'Discovery prototype',
+							'access_denied' => true,
+							'text_present' => [
+								'You are logged in as "Admin". You have no permissions to access this page.'
+							]
+						],
 						// Context = host, validate itemid.
 						[
 							'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid={host_lld_prototypeid}'.
