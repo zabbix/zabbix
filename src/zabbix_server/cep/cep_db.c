@@ -33,7 +33,6 @@
 #include "../actions/actions.h"
 #include "../events/events.h"
 #include "zbxevent.h"
-#include <stdint.h>
 
 typedef struct
 {

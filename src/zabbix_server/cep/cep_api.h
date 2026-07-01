@@ -16,6 +16,7 @@
 #define ZABBIX_CEP_API_H
 
 #include "cep.h"
+#include "cep_window.h"
 #include "zbx_cep.h"
 
 int	cep_api_create(const char *config_source_ip, char **error);

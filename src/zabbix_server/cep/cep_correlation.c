@@ -14,8 +14,7 @@
 
 #include "cep_correlation.h"
 #include "cep_task.h"
-
-#include "zabbix_server/cep/cep_event.h"
+#include "cep_event.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxcalc.h"

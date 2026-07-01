@@ -15,7 +15,7 @@
 #ifndef ZABBIX_CEP_DB_H
 #define ZABBIX_CEP_DB_H
 
-#include "cep_task.h"
+#include "zbxmw.h"
 #include "zbxexport.h"
 #include "zbxtypes.h"
 #include "zbxipcservice.h"

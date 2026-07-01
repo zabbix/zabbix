@@ -14,8 +14,8 @@
 
 #include "cep_js.h"
 #include "libs/zbxembed/duktape.h"
+#include "zbx_cep.h"
 #include "libs/zbxembed/embed.h"
-#include "zabbix_server/cep/zbx_cep.h"
 #include "zbxalgo.h"
 #include "zbxembed.h"
 

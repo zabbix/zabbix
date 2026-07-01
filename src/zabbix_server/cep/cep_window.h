@@ -15,8 +15,8 @@
 #ifndef ZABBIX_CEP_WINDOW_H
 #define ZABBIX_CEP_WINDOW_H
 
-#include "cep_rule.h"
-#include "zbx_cep.h"
+#include "cep_event.h"
+#include "zbxmw.h"
 #include "zbxcacheconfig.h"
 #include "zbxtypes_ext.h"
 

@@ -15,10 +15,8 @@
 #ifndef ZABBIX_CEP_H
 #define ZABBIX_CEP_H
 
-#include "cep_window.h"
 #include "zbx_cep.h"
 #include "zbx_cep_client.h"
-#include "zbxcacheconfig.h"
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"

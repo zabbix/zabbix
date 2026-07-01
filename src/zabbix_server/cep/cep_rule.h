@@ -16,9 +16,7 @@
 #define ZABBIX_CEP_RULE_H
 
 #include "cep_event.h"
-#include "zbx_cep.h"
 #include "zbxcacheconfig.h"
-#include "zbxdbhigh.h"
 #include "zbxmw.h"
 
 char	*cep_tag_value_shift(const char *value, int shift);

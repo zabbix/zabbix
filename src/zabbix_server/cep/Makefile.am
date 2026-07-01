@@ -24,10 +24,8 @@ libzbxcep_a_SOURCES = \
 	cep_correlation.h \
 	cep_rule.c \
 	cep_rule.h \
-	cep_rule_op_event.c \
-	cep_rule_op_event.h \
-	cep_rule_op_db.c \
-	cep_rule_op_db.h \
+	cep_rule_operation.c \
+	cep_rule_operation.h \
 	cep_window.c \
 	cep_window.h \
 	cep_event.c \

@@ -14,17 +14,16 @@
 
 #include "cep_manager.h"
 #include "cep.h"
-#include "cep_event.h"
 #include "cep_task.h"
 #include "cep_window.h"
 #include "cep_worker.h"
 #include "cep_queue.h"
 #include "cep_api.h"
+#include "zbx_cep.h"
+#include "zbx_cep_client.h"
+
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
-#include "zbx_cep_client.h"
-#include "zbx_cep.h"
-
 #include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxipcservice.h"

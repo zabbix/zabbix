@@ -17,22 +17,18 @@
 #include "cep_api.h"
 #include "cep_event.h"
 #include "cep_rule.h"
-#include "cep_rule_op_event.h"
-#include "zabbix_server/cep/cep_js.h"
-#include "zabbix_server/cep/cep_task.h"
+#include "cep_rule_operation.h"
+#include "cep_js.h"
+#include "cep_task.h"
 #include "zbx_cep.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxembed.h"
-#include "zbxexpr.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-#include "zbxtypes_ext.h"
-#include <stdatomic.h>
-#include <stdint.h>
 
 ZBX_PTR_VECTOR_IMPL(cep_window_ptr, zbx_cep_window_t *)
 

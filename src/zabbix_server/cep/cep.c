@@ -14,7 +14,6 @@
 
 #include "cep.h"
 #include "cep_event.h"
-#include "cep_window.h"
 #include "zbx_cep.h"
 #include "zbx_cep_client.h"
 
@@ -26,7 +25,6 @@
 #include "zbx_item_constants.h"
 #include "zbxdbhigh.h"
 #include "zbxhash.h"
-#include "zbxlog.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtypes_ext.h"

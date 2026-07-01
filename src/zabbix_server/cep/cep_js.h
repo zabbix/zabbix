@@ -15,7 +15,7 @@
 #ifndef ZABBIX_CEP_JS_H
 #define ZABBIX_CEP_JS_H
 
-#include "zabbix_server/cep/zbx_cep.h"
+#include "zbx_cep.h"
 #include "zbxembed.h"
 
 typedef struct

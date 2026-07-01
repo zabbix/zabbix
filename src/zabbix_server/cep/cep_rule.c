@@ -21,7 +21,6 @@
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
-#include "zbxdbwrap.h"
 #include "zbxeval.h"
 #include "zbxexpr.h"
 #include "zbxnum.h"
