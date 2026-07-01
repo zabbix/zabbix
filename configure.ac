@@ -2284,6 +2284,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxtasks/Makefile
 	src/libs/zbxhttppoller/Makefile
 	src/libs/zbxtelemetry/Makefile
+	src/libs/zbxconfigoption/Makefile
 	src/libs/zbxthreads/Makefile
 	src/libs/zbxtime/Makefile
 	src/libs/zbxtimekeeper/Makefile

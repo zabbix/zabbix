@@ -12,6 +12,7 @@ HISTORY_LIBS = \
 	$(top_builddir)/src/libs/zbxresolver/libzbxresolver.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
+	$(top_srcdir)/src/libs/zbxconfigoption/libzbxconfigoption.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
@@ -65,11 +66,12 @@ zbx_history_get_values_LDFLAGS = @SERVER_LDFLAGS@ \
 
 zbx_history_get_values_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxconfigoption \
 	-I@top_srcdir@/tests \
 	$(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS)
-	
-	
+
+
 history_clickhouse_parse_response_SOURCES = \
 	history_clickhouse_parse_response.c \
 	$(top_srcdir)/src/libs/zbxhistory/history_option.c \
@@ -97,10 +99,11 @@ history_clickhouse_parse_response_LDFLAGS = @SERVER_LDFLAGS@ \
 
 history_clickhouse_parse_response_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxconfigoption \
 	-I@top_srcdir@/tests \
 	$(CMOCKA_CFLAGS) \
-	$(YAML_CFLAGS)	
-	
+	$(YAML_CFLAGS)
+
 history_provider_parse_options_SOURCES = \
 	history_provider_parse_options.c \
 	$(top_srcdir)/src/libs/zbxhistory/history_option.c \
@@ -128,10 +131,11 @@ history_provider_parse_options_LDFLAGS = @SERVER_LDFLAGS@ \
 
 history_provider_parse_options_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxconfigoption \
 	-I@top_srcdir@/src \
 	-I@top_srcdir@/tests \
 	$(CMOCKA_CFLAGS) \
-	$(YAML_CFLAGS)		
-	
+	$(YAML_CFLAGS)
+
 endif
 endif

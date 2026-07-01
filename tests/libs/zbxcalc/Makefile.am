@@ -66,6 +66,7 @@ EVALUATE_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
+	$(top_srcdir)/src/libs/zbxconfigoption/libzbxconfigoption.a \
 	$(top_srcdir)/src/libs/zbxservice/libzbxservice.a \
 	$(top_srcdir)/src/libs/zbxexport/libzbxexport.a \
 	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
@@ -146,7 +147,8 @@ zbx_evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
-	-I@top_srcdir@/src/libs/zbxhistory
+	-I@top_srcdir@/src/libs/zbxhistory \
+	-I@top_srcdir@/src/libs/zbxconfigoption
 
 zbx_evaluate_function_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
@@ -170,7 +172,8 @@ zbx_STL_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
-	-I@top_srcdir@/src/libs/zbxhistory
+	-I@top_srcdir@/src/libs/zbxhistory \
+	-I@top_srcdir@/src/libs/zbxconfigoption
 
 zbx_STL_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
@@ -191,7 +194,8 @@ zbx_get_percentage_of_deviations_in_stl_remainder_CFLAGS = $(COMMON_COMPILER_FLA
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
-	-I@top_srcdir@/src/libs/zbxhistory
+	-I@top_srcdir@/src/libs/zbxhistory \
+	-I@top_srcdir@/src/libs/zbxconfigoption
 
 zbx_get_percentage_of_deviations_in_stl_remainder_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
@@ -213,7 +217,8 @@ evaluate_value_by_map_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
-	-I@top_srcdir@/src/libs/zbxhistory
+	-I@top_srcdir@/src/libs/zbxhistory \
+	-I@top_srcdir@/src/libs/zbxconfigoption
 
 evaluate_value_by_map_LDADD = $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
@@ -232,7 +237,8 @@ zbx_format_value_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
-	-I@top_srcdir@/src/libs/zbxhistory
+	-I@top_srcdir@/src/libs/zbxhistory \
+	-I@top_srcdir@/src/libs/zbxconfigoption
 
 zbx_format_value_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a

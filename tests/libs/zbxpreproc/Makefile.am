@@ -24,6 +24,7 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxsnmp/libzbxsnmp.a \
 	$(top_srcdir)/src/libs/zbxexport/libzbxexport.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
+	$(top_srcdir)/src/libs/zbxconfigoption/libzbxconfigoption.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxpgservice/libzbxpgservice.a \

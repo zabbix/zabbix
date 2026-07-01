@@ -94,6 +94,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_builddir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_builddir)/src/libs/zbxtelemetry/libzbxtelemetry.a \
+	$(top_builddir)/src/libs/zbxconfigoption/libzbxconfigoption.a \
 	$(top_builddir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_builddir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_builddir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \

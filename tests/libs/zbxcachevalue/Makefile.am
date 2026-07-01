@@ -41,6 +41,7 @@ VALUECACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
+	$(top_srcdir)/src/libs/zbxconfigoption/libzbxconfigoption.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 COMMON_WRAP_FUNCS = \
@@ -83,6 +84,7 @@ zbx_vc_get_values_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory \
+	-I@top_srcdir@/src/libs/zbxconfigoption \
 	-I@top_srcdir@/tests \
 	$(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS) \
@@ -107,6 +109,7 @@ zbx_vc_add_values_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory \
+	-I@top_srcdir@/src/libs/zbxconfigoption \
 	-I@top_srcdir@/tests \
 	$(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS) \
@@ -131,6 +134,7 @@ zbx_vc_get_value_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory \
+	-I@top_srcdir@/src/libs/zbxconfigoption \
 	-I@top_srcdir@/tests \
 	$(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS)  \

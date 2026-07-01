@@ -44,6 +44,7 @@ DIST_SUBDIRS = \
 	zbxhttp \
 	zbxhttppoller \
 	zbxtelemetry \
+	zbxconfigoption \
 	zbxicmpping \
 	zbxinterface \
 	zbxip \
@@ -129,6 +130,7 @@ SERVER_SUBDIRS = \
 	zbxhttp \
 	zbxhttppoller \
 	zbxtelemetry \
+	zbxconfigoption \
 	zbxicmpping \
 	zbxinterface \
 	zbxip \
@@ -206,6 +208,7 @@ PROXY_SUBDIRS = \
 	zbxhttp \
 	zbxhttppoller \
 	zbxtelemetry \
+	zbxconfigoption \
 	zbxicmpping \
 	zbxinterface \
 	zbxip \
