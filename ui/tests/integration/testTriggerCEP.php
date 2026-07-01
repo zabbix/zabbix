@@ -1190,6 +1190,125 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Reconfigure both trigger prototypes for the "close old down when new up" global correlation
+	 * scenario. The key difference from prepareDataGlobalCorrelation is that the trigger expression
+	 * matches both "down" and "up", so an "up_N" value is itself a PROBLEM event (not a recovery) that
+	 * can drive global correlation as the new event. Each trigger carries:
+	 *   - 'state'   = the leading letters of the value ("down"/"up"), the old/new discriminator;
+	 *   - 'service' = the trailing number of the value ("0"/"1"), the pairing key so "up_1" correlates
+	 *                 to "down_1".
+	 * A single global correlation rule (old state="down" + new state="up" + service tag pair,
+	 * CLOSE_OLD + CLOSE_NEW) is created; it stays silent while only "down" problems are opened and only
+	 * fires once "up" problems arrive.
+	 */
+	public function prepareDataGlobalCorrelationCloseOnUp($evaltype = CONDITION_EVAL_TYPE_AND_OR) {
+		// Switch item prototypes to text so the find() function can be used in expressions.
+		$this->call('itemprototype.update', [
+			'itemid' => self::$item_prototypeid,
+			'value_type' => ITEM_VALUE_TYPE_TEXT
+		]);
+
+		$this->call('itemprototype.update', [
+			'itemid' => self::$dep_item_prototypeid,
+			'value_type' => ITEM_VALUE_TYPE_TEXT
+		]);
+
+		// Both prototypes: find(regexp,"down|up") so "up" is a PROBLEM (not a recovery) + multiple event
+		// generation + global correlation, plus a 'state' tag ("down"/"up") and a 'service' tag (the
+		// trailing number) that pairs an "up_N" problem with its "down_N" problem.
+		$common_tags = [
+			['tag' => 'component', 'value' => self::LLD_MACRO],
+			['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO],
+			['tag' => 'state', 'value' => '{{ITEM.VALUE}.regsub("^([a-z]+)", "\\1")}'],
+			['tag' => 'service', 'value' => '{{ITEM.VALUE}.regsub("([0-9]+)$", "\\1")}']
+		];
+
+		$this->call('triggerprototype.update', [
+			'triggerid' => self::$trigger_prototypeid,
+			'description' => 'CEP trigger for '.self::LLD_MACRO,
+			'expression' => 'find(/'.self::TEMPLATE_NAME.'/'.self::ITEM_PROTO_KEY
+				.'['.self::LLD_MACRO.'],,"regexp","down|up")=1',
+			'event_name' => 'CEP trigger '.self::LLD_MACRO.' {ITEM.VALUE}',
+			'recovery_mode' => ZBX_RECOVERY_MODE_EXPRESSION,
+			'recovery_expression' => '',
+			'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
+			'correlation_tag' => '',
+			'type' => TRIGGER_MULT_EVENT_ENABLED,
+			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
+			'tags' => array_merge([['tag' => 'type', 'value' => 'cep']], $common_tags)
+		]);
+
+		$this->call('triggerprototype.update', [
+			'triggerid' => self::$dep_trigger_prototypeid,
+			'description' => 'CEP dependent trigger for '.self::LLD_MACRO,
+			'expression' => 'find(/'.self::TEMPLATE_NAME.'/'.self::ITEM_PROTO_KEY2
+				.'['.self::LLD_MACRO.'],,"regexp","down|up")=1',
+			'event_name' => 'CEP trigger '.self::LLD_MACRO.' {ITEM.VALUE}',
+			'recovery_mode' => ZBX_RECOVERY_MODE_EXPRESSION,
+			'recovery_expression' => '',
+			'dependencies' => [],
+			'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
+			'correlation_tag' => '',
+			'type' => TRIGGER_MULT_EVENT_ENABLED,
+			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
+			'tags' => array_merge([['tag' => 'type', 'value' => 'cep-dep']], $common_tags)
+		]);
+
+		// Resend LLD discovery data to re-instantiate the discovered triggers and items with the new config.
+		$this->dispatchSenderValues([
+			[
+				'host' => self::HOST_DISC_VALUE,
+				'key' => self::LLD_RULE_KEY,
+				'value' => $this->buildItemLLDData()
+			]
+		], null, 0);
+
+		// Wait for the discovered items to reflect the text value type and the discovered triggers to
+		// reflect global correlation mode + multiple event generation.
+		$this->callUntilDataIsPresent('item.get', [
+			'hostids' => [self::$disc_hostid],
+			'search' => ['key_' => self::ITEM_PROTO_KEY.'['],
+			'output' => ['itemid', 'value_type']
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+			if (count($response['result']) !== self::LLD_DISCOVERY_COUNT) {
+				return false;
+			}
+			foreach ($response['result'] as $item) {
+				if ((int) $item['value_type'] !== ITEM_VALUE_TYPE_TEXT) {
+					return false;
+				}
+			}
+			return true;
+		});
+
+		$this->callUntilDataIsPresent('trigger.get', [
+			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
+			'output' => ['triggerid', 'correlation_mode', 'type']
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+			if (count($response['result']) !== 2) {
+				return false;
+			}
+			foreach ($response['result'] as $trigger) {
+				if ((int) $trigger['correlation_mode'] !== ZBX_TRIGGER_CORRELATION_NONE
+						|| (int) $trigger['type'] !== TRIGGER_MULT_EVENT_ENABLED) {
+					return false;
+				}
+			}
+			return true;
+		});
+
+		// Start from a clean correlation slate, then create the single "close old down when new up" rule.
+		$this->deleteCepCorrelations();
+		self::$correlationid = $this->upsertCorrelation(
+			$this->buildCloseOnUpCorrelationParams('CEP global event correlation up', $evaltype)
+		);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
 	 * Create the correlation rule described by $corr_params, or update it in place if one with the
 	 * same name already exists (prepareData* methods are re-run by every dependent test). Returns
 	 * the correlation id so the caller can track it for cleanup.
@@ -1307,6 +1426,61 @@ class testTriggerCEP extends CIntegrationTest {
 			$filter = [
 				'evaltype' => $evaltype,
 				'conditions' => [$old_odd]
+			];
+		}
+
+		return [
+			'name' => $name,
+			'filter' => $filter,
+			'operations' => [
+				['type' => ZBX_CORR_OPERATION_CLOSE_OLD],
+				['type' => ZBX_CORR_OPERATION_CLOSE_NEW]
+			]
+		];
+	}
+
+	/**
+	 * Build a global event correlation rule that closes an old "down" problem when a new "up" problem
+	 * with the same sequence arrives. Unlike the parity/service rules that correlate a re-sent "down",
+	 * here the closing event is itself a PROBLEM ("up_N", so the trigger expression must match "up" too):
+	 *   - old event state="down"
+	 *   - new event state="up"
+	 *   - tag pair service=service (the trailing number, so "up_1" pairs with "down_1")
+	 * CLOSE_OLD closes the paired "down" problem and CLOSE_NEW closes the "up" problem itself.
+	 */
+	private function buildCloseOnUpCorrelationParams(string $name, $evaltype): array {
+		$old_down = [
+			'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
+			'tag' => 'state',
+			'operator' => CONDITION_OPERATOR_EQUAL,
+			'value' => 'down'
+		];
+		$new_up = [
+			'type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE,
+			'tag' => 'state',
+			'operator' => CONDITION_OPERATOR_EQUAL,
+			'value' => 'up'
+		];
+		$tag_pair = [
+			'type' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
+			'oldtag' => 'service',
+			'newtag' => 'service'
+		];
+
+		if ($evaltype == CONDITION_EVAL_TYPE_EXPRESSION) {
+			$old_down['formulaid'] = 'A';
+			$new_up['formulaid'] = 'B';
+			$tag_pair['formulaid'] = 'C';
+			$filter = [
+				'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+				'formula' => 'A and B and C',
+				'conditions' => [$old_down, $new_up, $tag_pair]
+			];
+		}
+		else {
+			$filter = [
+				'evaltype' => $evaltype,
+				'conditions' => [$old_down, $new_up, $tag_pair]
 			];
 		}
 
@@ -2544,6 +2718,62 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Verify "close old down when new up" global event correlation. Each discovered trigger opens two
+	 * "down" problems, each with a globally unique 'service' id; then the matching "up" values — themselves
+	 * PROBLEM events, since the trigger expression matches "up" too — close exactly the corresponding
+	 * "down" problem (and themselves) via a rule keyed on old state="down" + new state="up" + a service
+	 * tag pair. Unique ids make the closing strictly 1:1 rather than closing every problem at once. No
+	 * open problem remains.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp() {
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp but the server component
+	 * is stopped and restarted between each step.
+	 *
+	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
+	 * Same "close old down when new up" scenario as
+	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
+	 * CONDITION_EVAL_TYPE_EXPRESSION with a custom formula ("A and B and C") instead of
+	 * CONDITION_EVAL_TYPE_AND_OR, exercising the custom expression evaluation path.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpExpression$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpExpression() {
+		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_EXPRESSION);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpExpression but the server
+	 * component is stopped and restarted between each step.
+	 *
+	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpExpression
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpExpressionRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_EXPRESSION);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
 	 * Discover a single log trigger from the dedicated log template (linked directly to the host) and
 	 * verify that a burst of LOG_EVENT_COUNT log values, all matching the trigger pattern, produces
 	 * exactly LOG_EVENT_COUNT problem events. The trigger prototype has multiple problem event
@@ -3052,6 +3282,72 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Run the "close old down when new up" global event correlation scenario. Unlike
+	 * runEventAssessmentTestGlobalCorrelation (where "up" is a recovery that resolves the trigger), the
+	 * trigger expression here matches "up" too, so the "up_<id>" values are PROBLEM events that drive
+	 * the correlation.
+	 *
+	 * Every problem carries a globally unique 'service' id (the trailing number of the value), so the
+	 * service tag pair correlates an "up" event to exactly one "down" problem (1:1). Broadcasting a
+	 * reused id would instead let a single "up" close every problem sharing that id; unique ids make the
+	 * closing strictly corresponding. Both prototypes participate; with $m = total triggers, key index
+	 * $i opens problem id $i and, in a second wave, id $i+$m — so each trigger holds two problems:
+	 *
+	 *   1. "down_<i>"    → PROBLEM, state="down", service="<i>"; trigger goes TRUE.
+	 *   2. "down_<i+m>"  → PROBLEM, state="down", service="<i+m>" (mult_event); trigger stays TRUE.
+	 *                      Two problems are now open per trigger; the rule is silent (no "up" event yet).
+	 *   3. "up_<i>"      → PROBLEM, state="up", service="<i>"; global correlation (old state="down" + new
+	 *                      state="up" + service tag pair) closes exactly the paired "down_<i>" (CLOSE_OLD)
+	 *                      and the "up_<i>" itself (CLOSE_NEW). Each trigger's "down_<i+m>" stays open, so
+	 *                      triggers stay TRUE and exactly $m problems remain.
+	 *   4. "up_<i+m>"    → closes each trigger's remaining "down_<i+m>" and itself. Nothing stays open.
+	 */
+	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart): void {
+		$keys = array_merge(
+			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
+			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2)
+		);
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+		$m = count($keys);
+
+		// Build one sender value per key with a unique id: value "<prefix>_<offset + key index>".
+		$values = fn(string $prefix, int $offset) => array_map(
+			fn($key, $i) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $prefix.'_'.($offset + $i)],
+			$keys, array_keys($keys)
+		);
+
+		// All triggers must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'All triggers must start in OK state for close-on-up global correlation test.');
+		}
+
+		// 1. Open the first problem on every trigger (unique id per trigger); triggers go TRUE.
+		$this->dispatchSenderValues($values('down', 0), null, 0);
+		$this->waitForOpenProblemCount($all, $m);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->maybeRestartServer($restart);
+
+		// 2. Open a second problem on every trigger (a different unique id, mult_event); still TRUE.
+		$this->dispatchSenderValues($values('down', $m), null, 0);
+		$this->waitForOpenProblemCount($all, 2 * $m);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->maybeRestartServer($restart);
+
+		// 3. "up" for the first id set: each is a PROBLEM that closes only its corresponding "down"
+		//    (CLOSE_OLD) and itself (CLOSE_NEW). Each trigger's second problem stays open, so triggers
+		//    stay TRUE and exactly $m problems remain.
+		$this->dispatchSenderValues($values('up', 0), null, 0);
+		$this->waitForOpenProblemCount($all, $m);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->maybeRestartServer($restart);
+
+		// 4. "up" for the second id set closes each trigger's remaining problem; nothing stays open.
+		$this->dispatchSenderValues($values('up', $m), null, 0);
+		$this->waitForNoOpenProblems($all);
+	}
+
+	/**
 	 * Run the cross-trigger-prototype global event correlation scenario:
 	 *
 	 *   1. "down" → proto 1 items → find(regexp,"down") = true, service="down"
@@ -3192,6 +3488,17 @@ class testTriggerCEP extends CIntegrationTest {
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'tags' => [['tag' => $tag, 'value' => $value, 'operator' => TAG_OPERATOR_EQUAL]]
+		], $expected, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Poll problem.get until the total number of open problems on $triggerids equals $expected.
+	 */
+	private function waitForOpenProblemCount(array $triggerids, int $expected): void {
+		$this->callUntilCountIsPresent('problem.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS
 		], $expected, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
