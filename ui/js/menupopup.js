@@ -1123,18 +1123,17 @@ function getMenuPopupItem(options) {
 			}
 		});
 
-		url = new Curl('zabbix.php');
-		url.setArgument('action', 'lldrule.edit');
-		url.setArgument('hostid', options.hostid);
-		url.setArgument('type', 18); // ITEM_TYPE_DEPENDENT
-		url.setArgument('master_itemid', options.itemid);
-		url.setArgument('backurl', options.backurl);
-		url.setArgument('context', options.context);
-
 		config_urls.push({
 			label: t('Create dependent discovery rule'),
-			url: url.getUrl(),
-			disabled: options.isDiscovery
+			disabled: options.isDiscovery,
+			clickCallback: () => {
+				ZABBIX.PopupManager.open('lldrule.edit', {
+					context: options.context,
+					hostid: options.hostid,
+					master_itemid: options.itemid,
+					type: 18 // ITEM_TYPE_DEPENDENT
+				});
+			}
 		});
 
 		sections.push({

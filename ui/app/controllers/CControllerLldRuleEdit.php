@@ -248,6 +248,20 @@ class CControllerLldRuleEdit extends CController
 			$item = CLldRuleHelper::getDefaults();
 			$item['itemid'] = null;
 			$item['hostid'] = $host['hostid'];
+
+			if ($this->hasInput('master_itemid')) {
+				$item['type'] = ITEM_TYPE_DEPENDENT;
+				$master_item = API::Item()->get([
+					'output' => ['itemid', 'name'],
+					'itemids' => [$this->getInput('master_itemid')],
+					'webitems' => true
+				]);
+
+				if ($master_item) {
+					$item['master_itemid'] = $this->getInput('master_itemid');
+					$item['master_item'] =  reset($master_item);
+				}
+			}
 		}
 
 		$item['limited'] = $item['templated'];
