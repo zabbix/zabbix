@@ -32,6 +32,7 @@ class testHostInventory extends CAPITest {
 				'host.create',
 				[[
 					'host' => 'TEST.HOST.0001',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [['groupid' => '5']],
 					'interfaces' => $interfaces,
 					'inventory_mode' => HOST_INVENTORY_MANUAL,
@@ -43,6 +44,7 @@ class testHostInventory extends CAPITest {
 				'host.create',
 				[[
 					'host' => 'TEST.HOST.0002',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [['groupid' => '5']],
 					'interfaces' => $interfaces,
 					'inventory_mode' => HOST_INVENTORY_AUTOMATIC,
@@ -54,6 +56,7 @@ class testHostInventory extends CAPITest {
 				'host.create',
 				[[
 					'host' => 'TEST.HOST.0003',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [['groupid' => '5']],
 					'interfaces' => $interfaces,
 					'inventory_mode' => HOST_INVENTORY_MANUAL
@@ -64,6 +67,7 @@ class testHostInventory extends CAPITest {
 				'host.create',
 				[[
 					'host' => 'TEST.HOST.0004',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [['groupid' => '5']],
 					'interfaces' => $interfaces,
 					'inventory_mode' => HOST_INVENTORY_AUTOMATIC
@@ -74,6 +78,7 @@ class testHostInventory extends CAPITest {
 				'host.create',
 				[[
 					'host' => 'TEST.HOST.0005',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [['groupid' => '5']],
 					'interfaces' => $interfaces,
 					'inventory_mode' => HOST_INVENTORY_DISABLED
@@ -84,6 +89,7 @@ class testHostInventory extends CAPITest {
 				'host.create',
 				[[
 					'host' => 'TEST.HOST.0006',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [['groupid' => '5']],
 					'interfaces' => $interfaces,
 					'inventory_mode' => HOST_INVENTORY_DISABLED,
@@ -96,6 +102,7 @@ class testHostInventory extends CAPITest {
 				'host.create',
 				[[
 					'host' => 'TEST.HOST.0007',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [['groupid' => '5']],
 					'interfaces' => $interfaces,
 					'inventory' => ['inventory_mode' => HOST_INVENTORY_AUTOMATIC, 'type' => 'test']

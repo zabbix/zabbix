@@ -64,12 +64,14 @@ class testTagFiltering extends CAPITest {
 			'hosts' => [
 				[
 					'host' => 'Host without tags',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
 					]
 				],
 				[
 					'host' => 'Host with very general tags only',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
 					],
@@ -79,6 +81,7 @@ class testTagFiltering extends CAPITest {
 				],
 				[
 					'host' => 'Host Browser',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
 					],
@@ -88,6 +91,7 @@ class testTagFiltering extends CAPITest {
 				],
 				[
 					'host' => 'Host Browser - Chrome',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
 					],
@@ -97,6 +101,7 @@ class testTagFiltering extends CAPITest {
 				],
 				[
 					'host' => 'Host Browser - IE',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
 					],
@@ -106,6 +111,7 @@ class testTagFiltering extends CAPITest {
 				],
 				[
 					'host' => 'Host OS',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
 					],
@@ -115,6 +121,7 @@ class testTagFiltering extends CAPITest {
 				],
 				[
 					'host' => 'Host OS - Android',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
 					],
@@ -124,6 +131,7 @@ class testTagFiltering extends CAPITest {
 				],
 				[
 					'host' => 'Host OS - Mac',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
 					],
@@ -155,6 +163,7 @@ class testTagFiltering extends CAPITest {
 			'hosts' => [
 				[
 					'host' => 'Host Browser - Firefox',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
 					],
@@ -167,6 +176,7 @@ class testTagFiltering extends CAPITest {
 				],
 				[
 					'host' => 'Host OS - Linux',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
 					],
@@ -179,6 +189,7 @@ class testTagFiltering extends CAPITest {
 				],
 				[
 					'host' => 'Host OS - Windows',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
 					],

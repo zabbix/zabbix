@@ -66,10 +66,12 @@ class testAction extends CAPITest {
 			'hosts' => [
 				[
 					'host' => 'perm.filter.condition.h1',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => ['groupid' => ':host_group:perm.hg1']
 				],
 				[
 					'host' => 'perm.h1',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => ['groupid' => ':host_group:perm.hg2'],
 					'items' => [
 						['key_' => 'i1']
@@ -77,6 +79,7 @@ class testAction extends CAPITest {
 				],
 				[
 					'host' => 'perm.opcommand_hst.h1',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => ['groupid' => ':host_group:perm.hg6']
 				]
 			],

@@ -44,6 +44,7 @@ class testWebScenarioPermissions extends CAPITest {
 				[
 					'host' => 'perm.ht.host.rw',
 					'description' => 'Read-Write host',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => ['groupid' => ':host_group:perm.ht.hosts.rw'],
 					'httptests' => [
 						['name' => 'perm.ht.super-admin.del.rw'] + $steps,
@@ -60,6 +61,7 @@ class testWebScenarioPermissions extends CAPITest {
 				[
 					'host' => 'perm.ht.host.r',
 					'description' => 'Read-only host',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => ['groupid' => ':host_group:perm.ht.hosts.r'],
 					'httptests' => [
 						['name' => 'perm.ht.super-admin.del.r'] + $steps,
@@ -75,6 +77,7 @@ class testWebScenarioPermissions extends CAPITest {
 				[
 					'host' => 'perm.ht.host.d',
 					'description' => 'Denied host',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => ['groupid' => ':host_group:perm.ht.hosts.d'],
 					'httptests' => [
 						['name' => 'perm.ht.super-admin.del.d'] + $steps,
@@ -88,6 +91,7 @@ class testWebScenarioPermissions extends CAPITest {
 				[
 					'host' => 'perm.ht.host.n',
 					'description' => 'Host not linked to user groups',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => ['groupid' => ':host_group:perm.ht.hosts.n'],
 					'httptests' => [
 						['name' => 'perm.ht.super-admin.del.n'] + $steps,

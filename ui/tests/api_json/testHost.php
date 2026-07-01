@@ -112,6 +112,7 @@ class testHost extends CAPITest {
 			[
 				'host' => 'api_test_hosts_maintenance_1',
 				'name' => 'API test hosts - maintenance 1',
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['hostgroupid']
@@ -121,6 +122,7 @@ class testHost extends CAPITest {
 			[
 				'host' => 'api_test_hosts_maintenance_2',
 				'name' => 'API test hosts - maintenance 2',
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['hostgroupid']
@@ -132,6 +134,7 @@ class testHost extends CAPITest {
 			[
 				'host' => 'api_test_hosts_maintenance_3',
 				'name' => 'API test hosts - maintenance 3',
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['hostgroupid']
@@ -141,6 +144,7 @@ class testHost extends CAPITest {
 			[
 				'host' => 'api_test_hosts_maintenance_4',
 				'name' => 'API test hosts - maintenance 4',
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['hostgroupid']
@@ -152,6 +156,7 @@ class testHost extends CAPITest {
 			[
 				'host' => 'api_test_hosts_maintenance_5',
 				'name' => 'API test hosts - maintenance 5',
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['hostgroupid']
@@ -161,6 +166,7 @@ class testHost extends CAPITest {
 			[
 				'host' => 'api_test_hosts_maintenance_6',
 				'name' => 'API test hosts - maintenance 6',
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['hostgroupid']
@@ -172,6 +178,7 @@ class testHost extends CAPITest {
 			[
 				'host' => 'api_test_hosts_maintenance_7',
 				'name' => 'API test hosts - maintenance 7',
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['hostgroupid']
@@ -183,6 +190,7 @@ class testHost extends CAPITest {
 			[
 				'host' => 'api_test_hosts_tags',
 				'name' => 'API test hosts - tags',
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['hostgroupid']
@@ -200,6 +208,7 @@ class testHost extends CAPITest {
 			[
 				'host' => 'api_test_hosts_write_only_fields',
 				'name' => 'API test hosts - write-only fields',
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['hostgroupid']
@@ -211,6 +220,7 @@ class testHost extends CAPITest {
 			[
 				'host' => 'api_test_hosts_lld',
 				'name' => 'API test hosts - LLD',
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$data['hostgroupid']
@@ -626,6 +636,7 @@ class testHost extends CAPITest {
 		foreach ($host_prototypes_data as $idx => $host_prototype) {
 			$hosts_data[] = [
 				'host' => str_replace('{#HOST}', 'discovered', $host_prototype['host']),
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => $host_prototype['groupLinks'],
 				'macros' => array_key_exists('macros', $host_prototype) ? $host_prototype['macros'] : [],
 				'templates' => array_key_exists('templates', $host_prototype) ? $host_prototype['templates'] : []
@@ -928,19 +939,22 @@ class testHost extends CAPITest {
 			],
 			'Test host.create common error - wrong fields' => [
 				'request' => [
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => []
 				],
 				'expected_error' => 'Invalid parameter "/1/groups": cannot be empty.'
 			],
 			'Test host.create common error - missing "groups"' => [
 				'request' => [
-					'host' => 'API test hosts create fail'
+					'host' => 'API test hosts create fail',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "groups" is missing.'
 			],
 			'Test host.create common error - empty group' => [
 				'request' => [
 					'host' => 'API test hosts create fail',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => []
 				],
 				'expected_error' => 'Invalid parameter "/1/groups": cannot be empty.'
@@ -948,6 +962,7 @@ class testHost extends CAPITest {
 			'Test host.create common error - empty host name' => [
 				'request' => [
 					'host' => '',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						[
 							'groupid' => 'ID'
@@ -959,6 +974,7 @@ class testHost extends CAPITest {
 			'Test host.create common error - invalid host name' => [
 				'request' => [
 					'host' => '&^@%#&^',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						[
 							'groupid' => 'ID'
@@ -970,6 +986,7 @@ class testHost extends CAPITest {
 			'Test host.create common error - missing "groupid"' => [
 				'request' => [
 					'host' => 'API test hosts create fail',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						[]
 					]
@@ -979,6 +996,7 @@ class testHost extends CAPITest {
 			'Test host.create common error - invalid group' => [
 				'request' => [
 					'host' => 'API test hosts create fail',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						[
 							'groupid' => '01'
@@ -990,6 +1008,7 @@ class testHost extends CAPITest {
 			'Test host.create common error - host already exists' => [
 				'request' => [
 					'host' => 'Zabbix server',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						[
 							'groupid' => 'ID'
@@ -1012,6 +1031,7 @@ class testHost extends CAPITest {
 			'Test host.create interfaces (empty)' => [
 				'request' => [
 					'host' => 'API test hosts create fail',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						[
 							'groupid' => 'ID'
@@ -1024,6 +1044,7 @@ class testHost extends CAPITest {
 			'Test host.create interfaces (string)' => [
 				'request' => [
 					'host' => 'API test hosts create fail',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						[
 							'groupid' => 'ID'
@@ -1036,6 +1057,7 @@ class testHost extends CAPITest {
 			'Test host.create interfaces (integer)' => [
 				'request' => [
 					'host' => 'API test hosts create fail',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						[
 							'groupid' => 'ID'
@@ -1050,6 +1072,7 @@ class testHost extends CAPITest {
 			'Test host.create - macros (automatic)' => [
 				'request' => [
 					'host' => 'API test hosts create fail',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						[
 							'groupid' => 'ID'
@@ -1070,6 +1093,7 @@ class testHost extends CAPITest {
 			'Test host.create - macros (manual)' => [
 				'request' => [
 					'host' => 'API test hosts create fail',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						[
 							'groupid' => 'ID'
@@ -1100,6 +1124,7 @@ class testHost extends CAPITest {
 			'Test host.create minimal' => [
 				'request' => [
 					'host' => 'API test hosts create success minimal',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						[
 							'groupid' => 'ID'
@@ -1111,6 +1136,7 @@ class testHost extends CAPITest {
 			'Test host.create empty interfaces' => [
 				'request' => [
 					'host' => 'API test hosts create success empty interfaces',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [
 						[
 							'groupid' => 'ID'
@@ -3170,6 +3196,7 @@ class testHost extends CAPITest {
 			'hosts' => [
 				[
 					'host' => 'test.example.com',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [['groupid' => ':host_group:API tests hosts group']],
 					'tls_accept' => HOST_ENCRYPTION_PSK,
 					'tls_psk_identity' => 'public',
@@ -3193,6 +3220,7 @@ class testHost extends CAPITest {
 				'host' => [
 					[
 						'host' => 'example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_connect' => HOST_ENCRYPTION_PSK,
 						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
@@ -3204,6 +3232,7 @@ class testHost extends CAPITest {
 				'host' => [
 					[
 						'host' => 'example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_connect' => HOST_ENCRYPTION_PSK,
 						'tls_psk_identity' => ''
@@ -3215,6 +3244,7 @@ class testHost extends CAPITest {
 				'host' => [
 					[
 						'host' => 'example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_psk_identity' => 'identity'
 					]
@@ -3225,6 +3255,7 @@ class testHost extends CAPITest {
 				'host' => [
 					[
 						'host' => 'example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_accept' => HOST_ENCRYPTION_PSK,
 						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
@@ -3236,6 +3267,7 @@ class testHost extends CAPITest {
 				'host' => [
 					[
 						'host' => 'example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_accept' => HOST_ENCRYPTION_PSK,
 						'tls_psk_identity' => ''
@@ -3247,6 +3279,7 @@ class testHost extends CAPITest {
 				'host' => [
 					[
 						'host' => 'example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_connect' => HOST_ENCRYPTION_PSK,
 						'tls_psk_identity' => 'example'
@@ -3258,6 +3291,7 @@ class testHost extends CAPITest {
 				'host' => [
 					[
 						'host' => 'example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_connect' => HOST_ENCRYPTION_PSK,
 						'tls_psk_identity' => 'public',
@@ -3270,6 +3304,7 @@ class testHost extends CAPITest {
 				'host' => [
 					[
 						'host' => 'example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
 					]
@@ -3280,6 +3315,7 @@ class testHost extends CAPITest {
 				'host' => [
 					[
 						'host' => 'example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_accept' => HOST_ENCRYPTION_PSK,
 						'tls_psk_identity' => 'example'
@@ -3291,6 +3327,7 @@ class testHost extends CAPITest {
 				'host' => [
 					[
 						'host' => 'example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_accept' => HOST_ENCRYPTION_PSK,
 						'tls_psk_identity' => 'public',
@@ -3303,6 +3340,7 @@ class testHost extends CAPITest {
 				'host' => [
 					[
 						'host' => 'example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_accept' => HOST_ENCRYPTION_PSK,
 						'tls_psk_identity' => 'public',
@@ -3315,6 +3353,7 @@ class testHost extends CAPITest {
 				'host' => [
 					[
 						'host' => 'bca.example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_accept' => HOST_ENCRYPTION_PSK,
 						'tls_psk_identity' => 'public',
@@ -3322,6 +3361,7 @@ class testHost extends CAPITest {
 					],
 					[
 						'host' => 'abc.example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_connect' => HOST_ENCRYPTION_PSK,
 						'tls_psk_identity' => 'public',
@@ -3334,6 +3374,7 @@ class testHost extends CAPITest {
 				'host' => [
 					[
 						'host' => 'bca.example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_accept' => HOST_ENCRYPTION_PSK,
 						'tls_psk_identity' => 'public',
@@ -3346,6 +3387,7 @@ class testHost extends CAPITest {
 				'host' => [
 					[
 						'host' => 'bca.example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_accept' => HOST_ENCRYPTION_PSK,
 						'tls_psk_identity' => 'autoregistration',
@@ -3365,6 +3407,7 @@ class testHost extends CAPITest {
 				'host' => [
 					[
 						'host' => 'three.example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_connect' => HOST_ENCRYPTION_PSK,
 						'tls_psk_identity' => 'three.example.com',
@@ -3372,6 +3415,7 @@ class testHost extends CAPITest {
 					],
 					[
 						'host' => 'four.example.com',
+						'monitored_by' => ZBX_MONITORED_BY_SERVER,
 						'groups' => $groups,
 						'tls_accept' => HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK,
 						'tls_psk_identity' => 'four.example.com',
@@ -3400,6 +3444,7 @@ class testHost extends CAPITest {
 			'hosts' => [
 				[
 					'host' => 'psk1.example.com',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [['groupid' => ':host_group:API tests hosts group']],
 					'tls_accept' => HOST_ENCRYPTION_PSK,
 					'tls_psk_identity' => 'example.com',
@@ -3407,6 +3452,7 @@ class testHost extends CAPITest {
 				],
 				[
 					'host' => 'psk2.example.com',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [['groupid' => ':host_group:API tests hosts group']],
 					'tls_accept' => HOST_ENCRYPTION_PSK,
 					'tls_psk_identity' => 'example.com',
@@ -3414,6 +3460,7 @@ class testHost extends CAPITest {
 				],
 				[
 					'host' => 'psk3.example.com',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [['groupid' => ':host_group:API tests hosts group']],
 					'tls_connect' => HOST_ENCRYPTION_PSK,
 					'tls_psk_identity' => 'psk3.example.com',
@@ -3421,6 +3468,7 @@ class testHost extends CAPITest {
 				],
 				[
 					'host' => 'psk4.example.com',
+					'monitored_by' => ZBX_MONITORED_BY_SERVER,
 					'groups' => [['groupid' => ':host_group:API tests hosts group']],
 					'tls_connect' => HOST_ENCRYPTION_NONE
 				]
