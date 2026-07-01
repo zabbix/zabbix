@@ -2445,7 +2445,7 @@ static void	zbx_on_exit_rtc(int ret, void *on_exit_args)
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
-	char	*error = NULL, *smtp_auth_feature_status = NULL;
+	char	*error = NULL, *smtp_auth_feature_status = NULL, *old_token = NULL;
 	int	i, db_type, ha_status_old;
 	pid_t	pid;
 
@@ -2768,7 +2768,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_ipc_client_t	*client;
 		zbx_ipc_message_t	*message;
 		int			rtc_state;
-		static char		*old_token;
 
 		rtc_state = zbx_ipc_service_recv(&rtc.service, &rtc_timeout, &client, &message);
 
@@ -2812,10 +2811,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (0 != zbx_strcmp_null(old_token, zbx_config_vault.token) && NULL != zbx_config_vault.token)
 		{
+			old_token = zbx_strdup(old_token, zbx_config_vault.token);
+
 			zbx_rtc_notify(&rtc, ZBX_PROCESS_TYPE_UNKNOWN, 0, ZBX_RTC_VAULT_NEW_TOKEN,
 					(const char *)zbx_config_vault.token, strlen(zbx_config_vault.token) + 1);
-
-			old_token = zbx_strdup(old_token, zbx_config_vault.token);
 		}
 
 		if (NULL != client)
