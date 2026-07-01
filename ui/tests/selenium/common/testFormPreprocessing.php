@@ -3577,8 +3577,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				],
 				'inline_errors' => [
 					'id:preprocessing_1_error_handler_params' => 'Error message: This field cannot be empty.'
-				],
-//				'error' => 'Invalid parameter "/1/preprocessing/1/error_handler_params": cannot be empty.'
+				]
 			],
 			[
 				'expected' => TEST_GOOD,
