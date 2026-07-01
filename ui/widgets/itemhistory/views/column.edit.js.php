@@ -250,7 +250,6 @@ window.item_history_column_edit = new class {
 			const row = this.#form.getElementsByClassName(class_name);
 
 			for (const element of row) {
-				console.log("1111")
 				element.style.display = rows[class_name] ? '' : 'none';
 			}
 		}
