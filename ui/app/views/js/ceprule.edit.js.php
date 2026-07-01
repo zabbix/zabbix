@@ -288,6 +288,7 @@ window.ceprule_edit_popup = new class {
 			const display = [
 				<?= CCepRuleHelper::WINDOW_SIMPLE ?>,
 				<?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>,
+				<?= CCepRuleHelper::WINDOW_TAG_MATCH ?>,
 				<?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?>
 			].includes(type) ? '' : 'none';
 

@@ -135,13 +135,13 @@ abstract class CControllerCepRuleGeneral extends CController {
 					]
 				]],
 				'group_by_host_group' => ['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
-					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_PATTERN_MATCH]]
+					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH]]
 				],
 				'group_by_host' => ['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
-					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_PATTERN_MATCH]]
+					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH]]
 				],
 				'group_by_tag' => ['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
-					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_PATTERN_MATCH]]
+					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH]]
 				],
 				'tag' => ['db cep_window.tag', 'required', 'not_empty',
 					'when' => [
