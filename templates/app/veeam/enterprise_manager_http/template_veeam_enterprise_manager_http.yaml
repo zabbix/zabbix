@@ -932,7 +932,7 @@ zabbix_export:
             description: 'A regex pattern to include backups by name.'
         - macro: '{$BACKUP.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered backups by name.'
+          description: 'Filter to exclude discoverable backups by name.'
           config:
             type: TEXT
             priority: '10'
@@ -950,7 +950,7 @@ zabbix_export:
             description: 'A regex pattern to include backups by type.'
         - macro: '{$BACKUP.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered backups by type.'
+          description: 'Filter to exclude discoverable backups by type.'
           config:
             type: TEXT
             priority: '8'
@@ -1061,7 +1061,7 @@ zabbix_export:
             description: 'A regex pattern to include repositories by name.'
         - macro: '{$VEEAM.REPOSITORY.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered repositories by name.'
+          description: 'Filter to exclude discoverable repositories by name.'
           config:
             type: TEXT
             priority: '14'

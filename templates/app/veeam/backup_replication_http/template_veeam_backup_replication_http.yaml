@@ -1558,7 +1558,7 @@ zabbix_export:
             description: 'A regex pattern to include authorization events by name.'
         - macro: '{$AUTH_EVENTS.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered authorization events by name.'
+          description: 'Filter to exclude discoverable authorization events by name.'
           config:
             type: TEXT
             priority: '42'
@@ -1576,7 +1576,7 @@ zabbix_export:
             description: 'A regex pattern to include authorization events by state.'
         - macro: '{$AUTH_EVENTS.STATE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered authorization events by state.'
+          description: 'Filter to exclude discoverable authorization events by state.'
           config:
             type: TEXT
             priority: '44'
@@ -1604,7 +1604,7 @@ zabbix_export:
             description: 'A regex pattern to include jobs by name.'
         - macro: '{$JOB.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered jobs by name.'
+          description: 'Filter to exclude discoverable jobs by name.'
           config:
             type: TEXT
             priority: '25'
@@ -1622,7 +1622,7 @@ zabbix_export:
             description: 'A regex pattern to include jobs by status.'
         - macro: '{$JOB.STATUS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered jobs by status.'
+          description: 'Filter to exclude discoverable jobs by status.'
           config:
             type: TEXT
             priority: '29'
@@ -1640,7 +1640,7 @@ zabbix_export:
             description: 'A regex pattern to include jobs by type.'
         - macro: '{$JOB.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered jobs by type.'
+          description: 'Filter to exclude discoverable jobs by type.'
           config:
             type: TEXT
             priority: '27'
@@ -1658,7 +1658,7 @@ zabbix_export:
             description: 'A regex pattern to include malware events by severity.'
         - macro: '{$MALWARE_EVENTS.SEVERITY.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered malware events by severity.'
+          description: 'Filter to exclude discoverable malware events by severity.'
           config:
             type: TEXT
             priority: '34'
@@ -1676,7 +1676,7 @@ zabbix_export:
             description: 'A regex pattern to include malware events by state.'
         - macro: '{$MALWARE_EVENTS.STATE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered malware events by state.'
+          description: 'Filter to exclude discoverable malware events by state.'
           config:
             type: TEXT
             priority: '36'
@@ -1694,7 +1694,7 @@ zabbix_export:
             description: 'A regex pattern to include malware events by type.'
         - macro: '{$MALWARE_EVENTS.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered malware events by type.'
+          description: 'Filter to exclude discoverable malware events by type.'
           config:
             type: TEXT
             priority: '32'
@@ -1712,7 +1712,7 @@ zabbix_export:
             description: 'A regex pattern to include proxies by name.'
         - macro: '{$PROXIES.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered proxies by name.'
+          description: 'Filter to exclude discoverable proxies by name.'
           config:
             type: TEXT
             priority: '17'
@@ -1730,7 +1730,7 @@ zabbix_export:
             description: 'A regex pattern to include proxies by type.'
         - macro: '{$PROXIES.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered proxies by type.'
+          description: 'Filter to exclude discoverable proxies by type.'
           config:
             type: TEXT
             priority: '19'
@@ -1748,7 +1748,7 @@ zabbix_export:
             description: 'A regex pattern to include repositories by name.'
         - macro: '{$REPOSITORIES.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered repositories by name.'
+          description: 'Filter to exclude discoverable repositories by name.'
           config:
             type: TEXT
             priority: '21'
@@ -1766,7 +1766,7 @@ zabbix_export:
             description: 'A regex pattern to include repositories by type.'
         - macro: '{$REPOSITORIES.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered repositories by type.'
+          description: 'Filter to exclude discoverable repositories by type.'
           config:
             type: TEXT
             priority: '23'
@@ -1784,7 +1784,7 @@ zabbix_export:
             description: 'A regex pattern to include security best practices by name.'
         - macro: '{$SECURITY_ANALYZER.BEST_PRACTICE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered security best practices by name.'
+          description: 'Filter to exclude discoverable security best practices by name.'
           config:
             type: TEXT
             priority: '40'
@@ -1802,7 +1802,7 @@ zabbix_export:
             description: 'A regex pattern to include security best practices by status.'
         - macro: '{$SECURITY_ANALYZER.STATUS.NOT_MATCHES}'
           value: OK
-          description: 'Filter to exclude discovered security best practices by status.'
+          description: 'Filter to exclude discoverable security best practices by status.'
           config:
             type: TEXT
             priority: '38'
@@ -1820,7 +1820,7 @@ zabbix_export:
             description: 'A regex pattern to include sessions by name.'
         - macro: '{$SESSION.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered sessions by name.'
+          description: 'Filter to exclude discoverable sessions by name.'
           config:
             type: TEXT
             priority: '11'
@@ -1838,7 +1838,7 @@ zabbix_export:
             description: 'A regex pattern to include sessions by result.'
         - macro: '{$SESSION.RESULT.NOT_MATCHES}'
           value: Success
-          description: 'Filter to exclude discovered sessions by result.'
+          description: 'Filter to exclude discoverable sessions by result.'
           config:
             type: TEXT
             priority: '15'
@@ -1856,7 +1856,7 @@ zabbix_export:
             description: 'A regex pattern to include sessions by type.'
         - macro: '{$SESSION.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered sessions by type.'
+          description: 'Filter to exclude discoverable sessions by type.'
           config:
             type: TEXT
             priority: '13'

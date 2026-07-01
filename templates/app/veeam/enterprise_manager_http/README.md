@@ -61,13 +61,13 @@ This template has been tested on:
 |{$VEEAM.MANAGER.DATA.FREQUENCY}|<p>The update interval for the get metrics item.</p>|`1m`|
 |{$VEEAM.MANAGER.DATA.TIMEOUT}|<p>A response timeout for API.</p>|`15s`|
 |{$BACKUP.TYPE.MATCHES}|<p>Filter of discoverable backups by type.</p>|`.*`|
-|{$BACKUP.TYPE.NOT_MATCHES}|<p>Filter to exclude discovered backups by type.</p>|`CHANGE_IF_NEEDED`|
+|{$BACKUP.TYPE.NOT_MATCHES}|<p>Filter to exclude discoverable backups by type.</p>|`CHANGE_IF_NEEDED`|
 |{$BACKUP.NAME.MATCHES}|<p>Filter of discoverable backups by name.</p>|`.*`|
-|{$BACKUP.NAME.NOT_MATCHES}|<p>Filter to exclude discovered backups by name.</p>|`CHANGE_IF_NEEDED`|
+|{$BACKUP.NAME.NOT_MATCHES}|<p>Filter to exclude discoverable backups by name.</p>|`CHANGE_IF_NEEDED`|
 |{$VEEAM.MANAGER.JOB.MAX.WARN}|<p>The maximum score of warning jobs (for a trigger expression).</p>|`10`|
 |{$VEEAM.MANAGER.JOB.MAX.FAIL}|<p>The maximum score of failed jobs (for a trigger expression).</p>|`5`|
 |{$VEEAM.REPOSITORY.NAME.MATCHES}|<p>Filter of discoverable repositories by name.</p>|`.*`|
-|{$VEEAM.REPOSITORY.NAME.NOT_MATCHES}|<p>Filter to exclude discovered repositories by name.</p>|`CHANGE_IF_NEEDED`|
+|{$VEEAM.REPOSITORY.NAME.NOT_MATCHES}|<p>Filter to exclude discoverable repositories by name.</p>|`CHANGE_IF_NEEDED`|
 |{$VEEAM.MANAGER.REPO.PFREE.WARN}|<p>The minimum free space percentage for a warning trigger expression (percent).</p>|`20`|
 |{$VEEAM.MANAGER.REPO.PFREE.CRIT}|<p>The minimum free space percentage for a critical trigger expression (percent).</p>|`10`|
 
