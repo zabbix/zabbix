@@ -612,17 +612,34 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		goto out;
 	}
 
-	if (NULL != config_bridge_adapter_ca_file && NULL != config_bridge_adapter_cert_file &&
-			NULL != config_bridge_adapter_key_file)
+	if (0 == zbx_strncasecmp(config_bridge_adapter_url, ZBX_BRIDGE_ADAPTER_HTTPS_SCHEME,
+			ZBX_CONST_STRLEN(ZBX_BRIDGE_ADAPTER_HTTPS_SCHEME)))
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO,
-				config_bridge_adapter_ca_file)) ||
-				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT,
-				config_bridge_adapter_cert_file)) ||
-				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY,
-				config_bridge_adapter_key_file)) ||
-				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
+		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYHOST, 2L)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
+					curl_easy_strerror(err));
+			error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+			goto out;
+		}
+
+		if (NULL != config_bridge_adapter_ca_file &&
+				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO,
+				config_bridge_adapter_ca_file)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
+					curl_easy_strerror(err));
+			error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+			goto out;
+		}
+
+		if ((NULL != config_bridge_adapter_cert_file &&
+				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT,
+				config_bridge_adapter_cert_file))) ||
+				(NULL != config_bridge_adapter_key_file &&
+				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY,
+				config_bridge_adapter_key_file))))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
