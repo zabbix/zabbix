@@ -690,12 +690,14 @@ static int	cep_rule_eval_expression(const zbx_cep_rule_t *rule, zbx_cep_event_co
 {
 	zbx_eval_context_t	eval;
 	char			*error = NULL;
-	int			ret = FAIL;
+	int			j, ret = FAIL;
 	zbx_variant_t		value, value_fail;
 
+	zbx_variant_set_none(&value);
 	zbx_variant_set_dbl(&value_fail, 0.0);
 
-	if (SUCCEED != zbx_eval_parse_expression(&eval, rule->formula, ZBX_EVAL_PARSE_FUNCTIONID, &error))
+	if (SUCCEED != zbx_eval_parse_expression(&eval, rule->formula,
+			ZBX_EVAL_PARSE_FUNCTIONID | ZBX_EVAL_PARSE_LOGIC | ZBX_EVAL_PARSE_GROUP, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse CEP rule custom expression: %s", error);
 		zbx_free(error);
@@ -718,7 +720,7 @@ static int	cep_rule_eval_expression(const zbx_cep_rule_t *rule, zbx_cep_event_co
 			goto out;
 		}
 
-		for (int j = 0; j < rule->conditions.values_num; j++)
+		for (j = 0; j < rule->conditions.values_num; j++)
 		{
 			const zbx_cep_condition_t	*cond = &rule->conditions.values[j];
 
@@ -726,13 +728,16 @@ static int	cep_rule_eval_expression(const zbx_cep_rule_t *rule, zbx_cep_event_co
 			{
 				zbx_variant_clear(&token->value);
 				zbx_variant_set_ui64(&token->value, (zbx_uint64_t)cep_condition_eval(cond, ctx));
-				continue;
+				break;
 			}
 		}
 
-		zabbix_log(LOG_LEVEL_WARNING, "cannot find CEP condition " ZBX_FS_UI64 " set in expression",
-				conditionid);
-		goto out;
+		if (j == rule->conditions.values_num)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find CEP condition " ZBX_FS_UI64 " set in expression",
+					conditionid);
+			goto out;
+		}
 	}
 
 	if (SUCCEED != zbx_eval_execute(&eval, NULL, &value, &error))
