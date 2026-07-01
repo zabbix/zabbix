@@ -1636,7 +1636,7 @@ class CHost extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkMonitoredByField($hosts);
+		$this->checkMonitoredByField($hosts);
 		self::checkProxiesAndProxyGroups($hosts);
 		self::checkTlsPskPairs($hosts);
 		$this->checkGroups($hosts);

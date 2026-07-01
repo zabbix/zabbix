@@ -489,8 +489,7 @@ class CProxy extends CApiService {
 
 		$proxies = API::Proxy()->get([
 			'output' => ['proxyid', 'proxy_groupid'],
-			'proxyids' => $proxyids,
-			'preservekeys' => true
+			'proxyids' => $proxyids
 		]);
 
 		self::unlinkProxies($proxies);
