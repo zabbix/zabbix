@@ -80,8 +80,8 @@ class CBannerHelper {
 		return array_filter($banners, static function (array $banner) use ($data) {
 			try {
 				$now = new DateTimeImmutable('now');
-				$from = new DateTimeImmutable($banner['from']);
-				$to = new DateTimeImmutable($banner['to']);
+				$from = array_key_exists('from', $banner) ? new DateTimeImmutable($banner['from']) : null;
+				$to = array_key_exists('to', $banner) ? new DateTimeImmutable($banner['to']) : null;
 			} catch (Exception) {
 				return false;
 			}
