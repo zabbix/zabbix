@@ -406,7 +406,6 @@ struct zbx_lld_item_full_s
 	unsigned char				verify_peer_orig;
 	unsigned char				verify_host_orig;
 	unsigned char				allow_traps_orig;
-	char					*query;
 	char					*query_orig;
 	char					*time_shift;
 	char					*time_shift_orig;
@@ -566,8 +565,6 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const zbx_lld_entry_t *lld_obj,
 		char **error);
 int	zbx_substitute_macros_in_json_pairs(char **data, const zbx_lld_entry_t *lld_obj, char *error, int maxerrlen);
-int	zbx_substitute_macros_in_telemetry_query(char **data, const zbx_lld_entry_t *lld_obj, char *error,
-		int maxerrlen);
 
 void	lld_sync_exported_macros(const zbx_vector_uint64_t *ruleids, const zbx_lld_entry_t *entry);
 void	lld_rule_get_exported_macros(zbx_uint64_t ruleid, zbx_vector_lld_macro_t *macros);

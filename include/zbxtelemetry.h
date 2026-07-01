@@ -18,8 +18,6 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 
-typedef int	(*zbx_tq_macro_expand_func_t)(char **text, void *ctx);
-
 typedef enum
 {
 	ZBX_TQ_COLUMN_TYPE_UNKNOWN = -1,
@@ -144,15 +142,12 @@ zbx_tq_db_type_t;
 
 ZBX_PTR_VECTOR_DECL(tq_condition_ptr, zbx_tq_condition_t *)
 
-int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, zbx_tq_macro_expand_func_t macro_expand_cb,
-		void *macro_expand_ctx, char *error, size_t max_error_len);
+int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, char *error, size_t max_error_len);
 void	zbx_tq_query_clean(zbx_tq_query_t *query);
 
 int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out, const char *lookback_limit_str,
 		int *lookback_limit_out, const char *granularity_str, int *granularity_out, char *error,
 		size_t max_error_len);
-
-char	*zbx_tq_serialize_query(const zbx_tq_query_t *query);
 
 void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
 		time_t now, time_t lasttimestamp, char **sql, const zbx_dbconn_t *db);

@@ -742,8 +742,8 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 
 				items[i].telemetry_query = zbx_malloc(NULL, sizeof(zbx_tq_query_t));
 
-				if (SUCCEED != zbx_tq_parse_query(items[i].telemetry_query, items[i].query, NULL, NULL,
-						error, sizeof(error)))
+				if (SUCCEED != zbx_tq_parse_query(items[i].telemetry_query, items[i].query, error,
+						sizeof(error)))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
@@ -1057,22 +1057,6 @@ void	zbx_prepare_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-typedef struct
-{
-	zbx_dc_um_handle_t			*um_handle;
-	const zbx_dc_telemetry_query_item_t	*item;
-}
-telemetry_query_macro_expand_ctx_t;
-
-static int	telemetry_query_macro_expand_cb(char **text, void *ctx)
-{
-	telemetry_query_macro_expand_ctx_t	*pctx = (telemetry_query_macro_expand_ctx_t *)ctx;
-
-	zbx_dc_expand_user_and_func_macros(pctx->um_handle, text, &pctx->item->hostid, 1, NULL);
-
-	return SUCCEED;
-}
-
 void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int *errcodes, int num,
 		AGENT_RESULT *results)
 {
@@ -1087,11 +1071,6 @@ void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int
 
 	for (int i = 0; i < num; i++)
 	{
-		telemetry_query_macro_expand_ctx_t	query_macro_expand_ctx = {
-			.um_handle = um_handle,
-			.item = &items[i]
-		};
-
 		zbx_init_agent_result(&results[i]);
 		errcodes[i] = SUCCEED;
 
@@ -1142,8 +1121,7 @@ void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int
 
 		items[i].telemetry_query = zbx_malloc(NULL, sizeof(zbx_tq_query_t));
 
-		if (SUCCEED != zbx_tq_parse_query(items[i].telemetry_query, items[i].query,
-				telemetry_query_macro_expand_cb, &query_macro_expand_ctx, error, sizeof(error)))
+		if (SUCCEED != zbx_tq_parse_query(items[i].telemetry_query, items[i].query, error, sizeof(error)))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = CONFIG_ERROR;

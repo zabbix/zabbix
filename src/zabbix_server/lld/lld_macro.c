@@ -881,44 +881,6 @@ exit:
 	return ret;
 }
 
-static int	telemetry_query_lld_macro_expand_cb(char **text, void *ctx)
-{
-	const zbx_lld_entry_t *lld_obj = (const zbx_lld_entry_t *)ctx;
-
-	zbx_substitute_lld_macros(text, lld_obj, ZBX_MACRO_ANY, NULL, 0);
-
-	return SUCCEED;
-}
-
-int	zbx_substitute_macros_in_telemetry_query(char **data,  const zbx_lld_entry_t *lld_obj, char *error,
-		int maxerrlen)
-{
-	int		ret = FAIL;
-	zbx_tq_query_t	query;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if ('\0' == **data)
-	{
-		ret = SUCCEED;
-		goto out;
-	}
-
-	if (SUCCEED != zbx_tq_parse_query(&query, *data, telemetry_query_lld_macro_expand_cb, (void *)lld_obj, error,
-			maxerrlen))
-		goto out;
-
-	zbx_free(*data);
-	*data = zbx_tq_serialize_query(&query);
-	zbx_tq_query_clean(&query);
-
-	ret = SUCCEED;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: get value of LLD macro using json path if available or by         *

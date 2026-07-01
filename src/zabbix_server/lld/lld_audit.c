@@ -110,7 +110,7 @@ void	zbx_audit_item_update_json_add_lld_data(const zbx_lld_item_full_t *item,
 
 	/* TODO: log query as object, not as string */
 	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "query", "query",
-			item->query);
+			item_prototype->query);
 
 	zbx_audit_entry_add_string(audit_entry, AUDIT_TABLE_NAME, "time_shift", "time_shift",
 			item->time_shift);

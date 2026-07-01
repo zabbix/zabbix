@@ -480,16 +480,7 @@ out:
 	return ret;
 }
 
-static int tq_expand_macros(char **text, zbx_tq_macro_expand_func_t macro_expand_cb, void *macro_expand_ctx)
-{
-	if (NULL == *text)
-		return SUCCEED;
-
-	return macro_expand_cb(text, macro_expand_ctx);
-}
-
-static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query,
-		zbx_tq_macro_expand_func_t macro_expand_cb, void *macro_expand_ctx, char *error, size_t max_error_len)
+static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query, char *error, size_t max_error_len)
 {
 	/* in case of an error the query is cleaned by the calling function */
 	int		ret = FAIL;
@@ -557,42 +548,6 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query,
 		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): unknown tag: \"%s\"", __func__, buf);
-		}
-	}
-
-	if (NULL != macro_expand_cb)
-	{
-		/* TODO: decide where macro expansion is needed */
-
-		for (int i = 0; i < query->columns.values_num; i++)
-		{
-			if (SUCCEED != tq_expand_macros(&query->columns.values[i].key, macro_expand_cb,
-					macro_expand_ctx))
-				goto out;
-		}
-
-		for (int i = 0; i < query->aggregated_columns.values_num; i++)
-		{
-			zbx_tq_aggr_column_t *aggr_col = &query->aggregated_columns.values[i];
-
-			if (SUCCEED != tq_expand_macros(&aggr_col->alias, macro_expand_cb, macro_expand_ctx))
-				goto out;
-
-			for (int j = 0; j < aggr_col->args.values_num; j++)
-			{
-				if (SUCCEED != tq_expand_macros(&aggr_col->args.values[j], macro_expand_cb,
-						macro_expand_ctx))
-					goto out;
-			}
-		}
-
-		for (int i = 0; i < query->conditions.values_num; i++) {
-			if (SUCCEED != tq_expand_macros(&query->conditions.values[i].key, macro_expand_cb,
-					macro_expand_ctx))
-				goto out;
-			if (SUCCEED != tq_expand_macros(&query->conditions.values[i].value, macro_expand_cb,
-					macro_expand_ctx))
-				goto out;
 		}
 	}
 
@@ -794,7 +749,6 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 	return SUCCEED;
 }
 
-/* TODO: if macro support inside query is dropped, remove it */
 /******************************************************************************
  *                                                                            *
  * Purpose: parses json_str contents and stores them into query and validates *
@@ -814,8 +768,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
  *               FAIL    - otherwise; query is not initialized                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, zbx_tq_macro_expand_func_t macro_expand_cb,
-		void *macro_expand_ctx, char *error, size_t max_error_len)
+int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, char *error, size_t max_error_len)
 {
 	int			ret = FAIL;
 	struct zbx_json_parse	jp;
@@ -834,7 +787,7 @@ int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, zbx_tq_mac
 		goto out;
 	}
 
-	if (FAIL == tq_parse_query(&jp, query, macro_expand_cb, macro_expand_ctx, error, max_error_len))
+	if (FAIL == tq_parse_query(&jp, query, error, max_error_len))
 		goto out;
 
 	tq_set_column_types(query);
@@ -899,90 +852,4 @@ int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out,
 		*granularity_out = granularity_tmp;
 
 	return SUCCEED;
-}
-
-char	*zbx_tq_serialize_query(const zbx_tq_query_t *query)
-{
-	struct zbx_json	j;
-	char		*str;
-
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addint64(&j, "signal_type", query->category);
-
-	if (ZBX_TQ_METRIC_TYPE_UNKNOWN != query->metric_type)
-		zbx_json_addint64(&j, "metric_point_type", query->metric_type);
-
-	zbx_json_addarray(&j, "columns");
-
-	for (int i = 0; i < query->columns.values_num; i++)
-	{
-		const zbx_tq_column_t	*col = &query->columns.values[i];
-
-		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "column", col->name, ZBX_JSON_TYPE_STRING);
-
-		if (NULL != col->key)
-			zbx_json_addstring(&j, "attribute_key", col->key, ZBX_JSON_TYPE_STRING);
-
-		zbx_json_close(&j);
-	}
-
-	zbx_json_close(&j); /* columns */
-
-	zbx_json_addarray(&j, "aggregated_columns");
-
-	for (int i = 0; i < query->aggregated_columns.values_num; i++)
-	{
-		const zbx_tq_aggr_column_t	*aggr_col = &query->aggregated_columns.values[i];
-
-		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "column", aggr_col->column_name, ZBX_JSON_TYPE_STRING);
-		zbx_json_addint64(&j, "function", aggr_col->function);
-
-		zbx_json_addarray(&j, "parameters");
-
-		for (int ii = 0; ii < aggr_col->args.values_num; ii++)
-			zbx_json_addstring(&j, NULL, aggr_col->args.values[ii], ZBX_JSON_TYPE_STRING);
-
-		zbx_json_close(&j); /* parameters */
-
-		zbx_json_addstring(&j, "alias", aggr_col->alias, ZBX_JSON_TYPE_STRING);
-		zbx_json_close(&j);
-	}
-
-	zbx_json_close(&j); /* aggregated_columns */
-
-	zbx_json_addobject(&j, "filter");
-	zbx_json_addint64(&j, "evaltype", query->evaltype);
-
-	if (NULL != query->formula)
-		zbx_json_addstring(&j, "formula", query->formula, ZBX_JSON_TYPE_STRING);
-
-	zbx_json_addarray(&j, "conditions");
-
-	for (int i = 0; i < query->conditions.values_num; i++)
-	{
-		const zbx_tq_condition_t	*cond = &query->conditions.values[i];
-
-		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "column", cond->column_name, ZBX_JSON_TYPE_STRING);
-
-		if (NULL != cond->key)
-			zbx_json_addstring(&j, "attribute_key", cond->key, ZBX_JSON_TYPE_STRING);
-
-		zbx_json_addint64(&j, "operator", cond->operator);
-
-		if (NULL != cond->value)
-			zbx_json_addstring(&j, "value", cond->value, ZBX_JSON_TYPE_STRING);
-
-		zbx_json_close(&j);
-	}
-
-	zbx_json_close(&j); /* conditions */
-	zbx_json_close(&j); /* filter */
-
-	str = zbx_strdup(NULL, j.buffer);
-	zbx_json_free(&j);
-
-	return str;
 }
