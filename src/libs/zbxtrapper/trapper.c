@@ -1133,7 +1133,7 @@ static int	process_active_check_heartbeat(zbx_socket_t *sock, const struct zbx_j
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_is_uint31(hbfreq, &freq) || 0 == freq || ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX < freq)
+	if (SUCCEED != zbx_is_uint31(hbfreq, &freq) || 0 == freq || ZBX_AGENT_HEARTBEAT_FREQUENCY_MAX < freq)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid heartbeat frequency \"%s\" from \"%s\"", hbfreq,
 				sock->peer);
