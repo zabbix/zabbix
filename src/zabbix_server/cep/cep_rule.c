@@ -667,6 +667,9 @@ static int	cep_rule_eval_and(const zbx_cep_rule_t *rule, zbx_cep_event_context_t
  ******************************************************************************/
 static int	cep_rule_eval_or(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx)
 {
+	if (0 == rule->conditions.values_num)
+		return SUCCEED;
+
 	for (int i = 0; i < rule->conditions.values_num; i++)
 	{
 		if (0 != cep_condition_eval(&rule->conditions.values[i], ctx))
