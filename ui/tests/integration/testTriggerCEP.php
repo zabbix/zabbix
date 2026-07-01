@@ -1123,6 +1123,11 @@ class testTriggerCEP extends CIntegrationTest {
 				'Discovered trigger '.$trigger['triggerid'].' was not updated to multiple-event mode.');
 		}
 
+		// Start from a clean correlation slate so rules left over from other CEP scenarios (parity
+		// "odd"/"even", "close on up", ...) cannot stay active during this test. The rule below is then
+		// (re)created as the only CEP correlation rule.
+		$this->deleteCepCorrelations();
+
 		// Create a global event correlation rule: close old events whose 'service' tag value
 		// is 'down' when a new event arrives with 'service' tag value 'up'.
 		// This exercises the global-correlation path independently of trigger-level correlation.
@@ -1281,9 +1286,12 @@ class testTriggerCEP extends CIntegrationTest {
 			return true;
 		});
 
+		// Filter on the 'state' tag the updated prototype adds (the only genuinely new tag), so requiring
+		// both ids back confirms the new config was applied rather than the pre-update defaults.
 		$this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
-			'output' => ['triggerid', 'correlation_mode', 'type']
+			'output' => ['triggerid', 'correlation_mode', 'type'],
+			'tags' => [['tag' => 'state', 'operator' => TAG_OPERATOR_EXISTS]]
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 			if (count($response['result']) !== 2) {
 				return false;
@@ -2095,9 +2103,9 @@ class testTriggerCEP extends CIntegrationTest {
 
 		$data = [];
 		foreach ($keys as $key) {
-			foreach ($values as $ns => $value) {
+			foreach ($values as $value) {
 				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value,
-						'clock' => $now, 'ns' => $ns];
+						'clock' => $now];
 			}
 		}
 		$this->dispatchSenderValues($data, null, 0);
@@ -2147,9 +2155,9 @@ class testTriggerCEP extends CIntegrationTest {
 
 		$data = [];
 		foreach ($keys as $key) {
-			foreach ($values as $ns => $value) {
+			foreach ($values as $value) {
 				$entry = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value,
-						'clock' => $now, 'ns' => $ns];
+						'clock' => $now];
 				// The server skips preprocessing for proxy-delivered values, so the unsupported transition
 				// must be reported explicitly rather than relying on the non-numeric value failing.
 				if ($value === $unsupported) {
@@ -2222,9 +2230,9 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 
 		$data = [];
-		foreach ($values as $ns => $value) {
+		foreach ($values as $value) {
 			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value,
-					'clock' => $now, 'ns' => $ns];
+					'clock' => $now];
 		}
 		$this->dispatchSenderValues($data, null, 0);
 

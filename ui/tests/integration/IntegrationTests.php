@@ -108,7 +108,6 @@ class IntegrationTests {
 		$suite->addTestSuite('testHighAvailability');
 		$suite->addTestSuite('testUserParametersReload');
 		$suite->addTestSuite('testTriggerState');
-		$suite->addTestSuite('testTriggerCEP');
 		/* $suite->addTestSuite('testTlsRequest'); */
 		$suite->addTestSuite('testActiveAvailability');
 		$suite->addTestSuite('testProxyConfSync');
@@ -136,6 +135,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testDiagInfo');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
+		$suite->addTestSuite('testTriggerCEP');
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		return $suite;
 	}
