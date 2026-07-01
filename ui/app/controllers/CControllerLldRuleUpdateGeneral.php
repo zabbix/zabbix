@@ -256,7 +256,9 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 						['string', 'required', 'not_empty', 'when' => ['delay', 'not_empty']]
 					]
 				],
-				'when' => ['type', 'not_in' => [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER]]
+				'when' => ['type',
+					'not_in' => [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT, ITEM_TYPE_NESTED]
+				]
 			],
 			'delay' => [
 				['string',
@@ -264,7 +266,9 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 					'messages' => ['not_in' => _('This field cannot be set to "0" without defining custom intervals.')],
 					'when' => [
 						['delay_flex', 'empty'],
-						['type', 'not_in' => [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER]]
+						['type',
+							'not_in' => [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT, ITEM_TYPE_NESTED]
+						]
 					]
 				],
 				['db items.delay', 'required', 'not_empty',

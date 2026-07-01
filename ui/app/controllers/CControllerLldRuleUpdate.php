@@ -74,7 +74,7 @@ class CControllerLldRuleUpdate extends CControllerLldRuleUpdateGeneral {
 	}
 
 	private function getInputForApi(): array {
-		$input = CLldRuleHelper::normalizeFormData($this->getInputAll()) + ['overrides' => []];
+		$input = CLldRuleHelper::normalizeFormData($this->getInputAll() + ['overrides' => [], 'delay_flex' => []]);
 		$input = CLldRuleHelper::convertFormInputForApi($input);
 
 		[$db_item] = API::DiscoveryRule()->get([
