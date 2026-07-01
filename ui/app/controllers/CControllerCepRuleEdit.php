@@ -140,7 +140,7 @@ class CControllerCepRuleEdit extends CController {
 		}
 
 		if ($ceprule['sortorder'] == 0) {
-			$ceprule['sortorder'] = '';
+			$ceprule['sortorder'] = '1';
 		}
 
 		if ($ceprule['window']['duration'] == 0) {
