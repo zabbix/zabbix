@@ -150,7 +150,8 @@ class CScreenProblem extends CScreenBase {
 		$filter_triggerids = array_key_exists('triggerids', $filter) && $filter['triggerids']
 			? $filter['triggerids']
 			: null;
-		$show_opdata = $column_options['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
+		$show_opdata = array_key_exists('show_opdata', $column_options)
+			&& $column_options['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
 
 		if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
 			$exclude_groupids = getSubGroups($filter['exclude_groupids']);
@@ -602,7 +603,7 @@ class CScreenProblem extends CScreenBase {
 			&& $column_options['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
 
 		// resolve macros
-		if ($column_options['details'] == 1 || $show_opdata) {
+		if ((array_key_exists('details', $column_options) && $column_options['details'] == 1) || $show_opdata) {
 			foreach ($data['triggers'] as &$trigger) {
 				$trigger['expression_html'] = $trigger['expression'];
 				$trigger['recovery_expression_html'] = $trigger['recovery_expression'];
