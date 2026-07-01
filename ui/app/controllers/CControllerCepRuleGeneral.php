@@ -232,60 +232,10 @@ abstract class CControllerCepRuleGeneral extends CController {
 				]],
 				'value' => ['db cep_operation_condition.value', 'required']
 			]],
-			'type' => [
-				['db cep_operation.type', 'required', 'in' => [CCepRuleHelper::OP_SET_NAME,
-						CCepRuleHelper::OP_CLOSE, CCepRuleHelper::OP_DISCARD, CCepRuleHelper::OP_SET_SEVERITY,
-						CCepRuleHelper::OP_INCREASE_SEVERITY, CCepRuleHelper::OP_DECREASE_SEVERITY,
-						CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG,
-						CCepRuleHelper::OP_SET_TAG_VALUE, CCepRuleHelper::OP_INCREASE_TAG_VALUE,
-						CCepRuleHelper::OP_DECREASE_TAG_VALUE, CCepRuleHelper::OP_RENAME_TAG,
-						CCepRuleHelper::OP_REMOVE_TAG
-					],
-					'when' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]]
-				],
-				/* TODO: "3, 8, 9 - supported for execute_when "Event evicted" (1) with capacity restriction"
-				['db cep_operation.type', 'required',
-					'in' => [CCepRuleHelper::OP_DISCARD, CCepRuleHelper::OP_COPY_FIRST, CCepRuleHelper::OP_COPY_LAST],
-					'when' => [
-						['execute_when', 'in' => [CCepRuleHelper::WHEN_EVENT_EVICTED]],
-						['reason', 'in' => ['capacity']], // TODO: no mechanism yet - additional field or more detailed execute_when constants...
-					]
-				]*/
-				['db cep_operation.type', 'required', 'in' => [CCepRuleHelper::OP_SET_NAME,
-						CCepRuleHelper::OP_CLOSE, CCepRuleHelper::OP_SET_SEVERITY,
-						CCepRuleHelper::OP_INCREASE_SEVERITY, CCepRuleHelper::OP_DECREASE_SEVERITY,
-						CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG,
-						CCepRuleHelper::OP_SET_TAG_VALUE, CCepRuleHelper::OP_INCREASE_TAG_VALUE,
-						CCepRuleHelper::OP_DECREASE_TAG_VALUE, CCepRuleHelper::OP_RENAME_TAG,
-						CCepRuleHelper::OP_REMOVE_TAG
-					],
-					'when' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_EVENT_EVICTED]]
-				],
-				['db cep_operation.type', 'required', 'in' => [CCepRuleHelper::OP_SET_NAME,
-						CCepRuleHelper::OP_CLOSE, CCepRuleHelper::OP_DISCARD, CCepRuleHelper::OP_SET_SEVERITY,
-						CCepRuleHelper::OP_INCREASE_SEVERITY, CCepRuleHelper::OP_DECREASE_SEVERITY,
-						CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG,
-						CCepRuleHelper::OP_SET_TAG_VALUE, CCepRuleHelper::OP_INCREASE_TAG_VALUE,
-						CCepRuleHelper::OP_DECREASE_TAG_VALUE, CCepRuleHelper::OP_RENAME_TAG,
-						CCepRuleHelper::OP_REMOVE_TAG
-					],
-					'when' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_WINDOW_CLOSED]]
-				],
-				['db cep_operation.type', 'required', 'in' => [CCepRuleHelper::OP_SET_NAME,
-						CCepRuleHelper::OP_CLOSE, CCepRuleHelper::OP_SET_SEVERITY,
-						CCepRuleHelper::OP_INCREASE_SEVERITY, CCepRuleHelper::OP_DECREASE_SEVERITY,
-						CCepRuleHelper::OP_SUPPRESS, CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG,
-						CCepRuleHelper::OP_SET_TAG_VALUE, CCepRuleHelper::OP_INCREASE_TAG_VALUE,
-						CCepRuleHelper::OP_DECREASE_TAG_VALUE, CCepRuleHelper::OP_RENAME_TAG,
-						CCepRuleHelper::OP_REMOVE_TAG
-					],
-					'when' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_TAGS_CORRELATED]]
-				],
-				['db cep_operation.type', 'required',
-					'in' => [CCepRuleHelper::OP_COPY_FIRST, CCepRuleHelper::OP_COPY_LAST],
-					'when' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_PATTERN_MATCHED]]
-				]
-			],
+			'type' => array_map(fn(int $execute_when) => ['db cep_operation.type', 'required',
+				'in' => CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN[$execute_when],
+				'when' => ['execute_when', 'in' => [$execute_when]]
+			], array_keys(CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN)),
 			'evaltype' => ['db cep_operation.evaltype', 'required', 'in' => [CONDITION_EVAL_TYPE_AND_OR,
 				CONDITION_EVAL_TYPE_OR
 			]],

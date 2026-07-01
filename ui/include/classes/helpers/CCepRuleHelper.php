@@ -50,6 +50,8 @@ class CCepRuleHelper {
 	public const OP_DECREASE_TAG_VALUE = 14;
 	public const OP_RENAME_TAG = 15;
 	public const OP_REMOVE_TAG = 16;
+	public const OP_CLOSE_WINDOW = 17;
+	public const OP_SET_CAUSE = 18;
 
 	public const WHEN_EVENT_OCCURRED = 0;
 	public const WHEN_EVENT_EVICTED = 1;
@@ -108,7 +110,8 @@ class CCepRuleHelper {
 			self::OP_INCREASE_TAG_VALUE,
 			self::OP_DECREASE_TAG_VALUE,
 			self::OP_RENAME_TAG,
-			self::OP_REMOVE_TAG
+			self::OP_REMOVE_TAG,
+			self::OP_CLOSE_WINDOW
 		],
 		self::WHEN_EVENT_EVICTED => [
 			self::OP_SET_NAME,
@@ -126,7 +129,8 @@ class CCepRuleHelper {
 			self::OP_INCREASE_TAG_VALUE,
 			self::OP_DECREASE_TAG_VALUE,
 			self::OP_RENAME_TAG,
-			self::OP_REMOVE_TAG
+			self::OP_REMOVE_TAG,
+			self::OP_CLOSE_WINDOW
 		],
 		self::WHEN_WINDOW_CLOSED => [
 			self::OP_SET_NAME,
@@ -157,7 +161,8 @@ class CCepRuleHelper {
 			self::OP_INCREASE_TAG_VALUE,
 			self::OP_DECREASE_TAG_VALUE,
 			self::OP_RENAME_TAG,
-			self::OP_REMOVE_TAG
+			self::OP_REMOVE_TAG,
+			self::OP_CLOSE_WINDOW
 		],
 		self::WHEN_PATTERN_MATCHED => [
 			self::OP_DISCARD,
@@ -288,7 +293,8 @@ class CCepRuleHelper {
 			self::OP_INCREASE_TAG_VALUE => _('Increase tag value'),
 			self::OP_DECREASE_TAG_VALUE => _('Decrease tag value'),
 			self::OP_RENAME_TAG => _('Rename tag'),
-			self::OP_REMOVE_TAG => _('Remove tag')
+			self::OP_REMOVE_TAG => _('Remove tag'),
+			self::OP_CLOSE_WINDOW => _('Close window')
 		];
 	}
 
@@ -305,6 +311,10 @@ class CCepRuleHelper {
 	}
 
 	public static function getOperationLabelString(array $ceprule_operation): string {
+		if ($ceprule_operation['type'] === self::OP_SET_CAUSE) {
+			return _('Set cause');
+		}
+
 		return self::getOperationLabelStrings()[$ceprule_operation['type']];
 	}
 
