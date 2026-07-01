@@ -107,21 +107,22 @@ static duk_ret_t	cep_js_event_proxy_get(duk_context *ctx)
 	if (0 == strcmp(key, "tags"))
 	{
 		zbx_vector_lite_tag_t	*tags = &ref->event->tags;
-		duk_idx_t		obj_idx;
+		duk_idx_t		arr_idx;
 
-		obj_idx = duk_push_object(ctx);
-
+		arr_idx = duk_push_array(ctx);
 		for (int i = 0; i < tags->values_num; i++)
 		{
 			zbx_tag_t	*tag = &tags->values[i];
+			duk_idx_t	obj_idx;
 
+			obj_idx = duk_push_object(ctx);
+			duk_push_string(ctx, tag->tag);
+			duk_put_prop_string(ctx, obj_idx, "tag");
 			duk_push_string(ctx, tag->value);
-			duk_put_prop_string(ctx, obj_idx, tag->tag);
+			duk_put_prop_string(ctx, obj_idx, "value");
+
+			duk_put_prop_index(ctx, arr_idx, i);
 		}
-
-		duk_dup(ctx, -1);
-		duk_put_prop_string(ctx, 0, "tags");
-
 		return 1;
 	}
 	if (0 == strcmp(key, "is_open"))
