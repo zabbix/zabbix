@@ -129,7 +129,8 @@ class CControllerHostViewData extends CControllerDataTable {
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'objectids' => array_keys($triggers),
-			'suppressed' => $options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE ? null : false,
+			'suppressed' => array_key_exists('show_suppressed', $options)
+				&& $options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE ? null : false,
 			'symptom' => false
 		]);
 
