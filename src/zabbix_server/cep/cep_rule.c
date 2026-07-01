@@ -311,7 +311,7 @@ static int	cep_condition_eval_event_name(int operator, const zbx_cep_args_name_t
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operator:%d name:%s", __func__, operator, args->name);
 
-	ret =   cep_condition_eval_value_str_raw(operator, args->name, ctx->db_event->name);
+	ret =   cep_condition_eval_value_str_raw(operator, args->name, ctx->event->name);
 
 	switch (operator)
 	{
@@ -340,25 +340,17 @@ static int	cep_condition_eval_event_name(int operator, const zbx_cep_args_name_t
  *           matches; for negative operators no tag name must match.          *
  *                                                                            *
  ******************************************************************************/
-static int	cep_condition_eval_tag_name(int operator, const zbx_cep_args_tag_name_t *args,
+static int	cep_condition_eval_tag(int operator, const zbx_cep_args_tag_name_t *args,
 		const zbx_cep_event_context_t *ctx)
 {
-	int	ret = 0;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operator:%d tag:%s", __func__, operator, args->tag);
 
-	for (int i = 0; i < ctx->db_event->tags.values_num && 0 == ret; i++)
-	{
-		ret = cep_condition_eval_value_str_raw(operator, args->tag, ctx->db_event->tags.values[i]->tag);
-	}
+	ret = (FAIL == cep_event_find_tag(ctx->event, args->tag) ? 0 : 1);
 
-	switch (operator)
-	{
-		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
-		case ZBX_CONDITION_OPERATOR_NOT_LIKE:
-			ret = !ret;
-			break;
-	}
+	if (ZBX_CONDITION_OPERATOR_NOT_EXIST == operator)
+		ret = !ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:%d", __func__, ret);
 
@@ -388,12 +380,12 @@ static int	cep_condition_eval_tag_value(int operator, const zbx_cep_args_tag_val
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operator:%d tag:%s value:%s", __func__, operator, args->tag, args->value);
 
-	for (int i = 0; i < ctx->db_event->tags.values_num && 0 == ret; i++)
+	for (int i = 0; i < ctx->event->tags.values_num && 0 == ret; i++)
 	{
-		if (0 != strcmp(args->tag, ctx->db_event->tags.values[i]->tag))
+		if (0 != strcmp(args->tag, ctx->event->tags.values[i].tag))
 			continue;
 
-		ret = cep_condition_eval_value(operator, args->value, ctx->db_event->tags.values[i]->value);
+		ret = cep_condition_eval_value(operator, args->value, ctx->event->tags.values[i].value);
 	}
 
 	switch (operator)
@@ -430,16 +422,16 @@ static int	cep_condition_eval_severity(int operator, const zbx_cep_args_severity
 	switch (operator)
 	{
 		case ZBX_CONDITION_OPERATOR_EQUAL:
-			ret = ctx->db_event->severity == args->level;
+			ret = ctx->event->severity == args->level;
 			break;
 		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
-			ret = ctx->db_event->severity != args->level;
+			ret = ctx->event->severity != args->level;
 			break;
 		case ZBX_CONDITION_OPERATOR_MORE_EQUAL:
-			ret = ctx->db_event->severity >= args->level;
+			ret = ctx->event->severity >= args->level;
 			break;
 		case ZBX_CONDITION_OPERATOR_LESS_EQUAL:
-			ret =  ctx->db_event->severity <= args->level;
+			ret =  ctx->event->severity <= args->level;
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported operator %d used with severity condition", operator);
@@ -553,7 +545,7 @@ static int	cep_condition_eval_time_period(int operator, const zbx_cep_args_time_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operator:%d host:%s", __func__, operator, args->period);
 
-	if (SUCCEED == zbx_check_time_period(args->period, ctx->db_event->clock, NULL, &in))
+	if (SUCCEED == zbx_check_time_period(args->period, ctx->event->clock, NULL, &in))
 	{
 		if (SUCCEED == in)
 			ret = 1;
@@ -584,7 +576,7 @@ static int	cep_condition_eval(const zbx_cep_condition_t *cond, zbx_cep_event_con
 	int	ret = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() conditionid:" ZBX_FS_UI64 " type:%d eventid:" ZBX_FS_UI64, __func__,
-			cond->conditionid, cond->type, ctx->db_event->eventid);
+			cond->conditionid, cond->type, ctx->event->eventid);
 
 	switch (cond->type)
 	{
@@ -592,7 +584,7 @@ static int	cep_condition_eval(const zbx_cep_condition_t *cond, zbx_cep_event_con
 			ret = cep_condition_eval_event_name(cond->operator, &cond->args.event_name, ctx);
 			break;
 		case ZBX_CONDITION_TYPE_EVENT_TAG:
-			ret = cep_condition_eval_tag_name(cond->operator, &cond->args.tag_name, ctx);
+			ret = cep_condition_eval_tag(cond->operator, &cond->args.tag_name, ctx);
 			break;
 		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
 			ret = cep_condition_eval_tag_value(cond->operator, &cond->args.tag_value, ctx);
@@ -775,7 +767,7 @@ static int	cep_rule_match_event(const zbx_cep_rule_t *rule, zbx_cep_event_contex
 	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64, __func__, rule->ruleid,
-			ctx->db_event->eventid);
+			ctx->event->eventid);
 
 	switch (rule->evaltype)
 	{
@@ -852,7 +844,7 @@ int	cep_event_match_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t *
 	const zbx_vector_cep_rule_ptr_t	*rules;
 	zbx_uint32_t			window_mask = 0;
 
-	if (NULL == ctx->db_event)
+	if (NULL == ctx->event)
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("event not set when matching CEP rules");
 		return FAIL;
