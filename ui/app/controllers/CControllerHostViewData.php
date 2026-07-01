@@ -47,6 +47,9 @@ class CControllerHostViewData extends CControllerDataTable {
 
 		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
 
+		$custom_text = $this->extractCustomText($options);
+		$this->flattenColumnOptions($options);
+
 		$hosts = API::Host()->get([
 			'output' => ['hostid', $sort_field],
 			'evaltype' => $filter['evaltype'],
@@ -55,7 +58,8 @@ class CControllerHostViewData extends CControllerDataTable {
 			'groupids' => $groupids,
 			'severities' => $filter['severities'] ?: null,
 			'withProblemsSuppressed' => $filter['severities']
-				? ($options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE ? null : false)
+				? (array_key_exists('show_suppressed', $options)
+					&& $options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE ? null : false)
 				: null,
 			'search' => [
 				'name' => $filter['name'] === '' ? null : $filter['name'],
@@ -286,9 +290,6 @@ class CControllerHostViewData extends CControllerDataTable {
 		}
 		unset($host);
 
-		$custom_text = $this->extractCustomText($options);
-		$this->flattenColumnOptions($options);
-
 		if ($custom_text) {
 			$this->resolveCustomText($hosts, $custom_text);
 		}
@@ -339,19 +340,19 @@ class CControllerHostViewData extends CControllerDataTable {
 	/**
 	 * Get host list results count for passed filter.
 	 *
-	 * @param array  $filter                        Filter options.
-	 *        string $filter['name']                Filter hosts by name.
-	 *        array  $filter['groupids']            Filter hosts by host groups.
-	 *        string $filter['ip']                  Filter hosts by IP.
-	 *        string $filter['dns']	                Filter hosts by DNS.
-	 *        string $filter['port']                Filter hosts by port.
-	 *        string $filter['status']              Filter hosts by status.
-	 *        string $filter['evaltype']            Filter hosts by tags.
-	 *        string $filter['tags']                Filter hosts by tag names and values.
-	 *        string $filter['severities']          Filter problems on hosts by severities.
-	 *        string $filter['show_suppressed']     Filter suppressed problems.
-	 *        int    $filter['maintenance_status']  Filter hosts by maintenance.
-	 * @param array  $column_options                Column options.
+	 * @param array  $filter                            Filter options.
+	 *        string $filter['name']                    Filter hosts by name.
+	 *        array  $filter['groupids']                Filter hosts by host groups.
+	 *        string $filter['ip']                      Filter hosts by IP.
+	 *        string $filter['dns']	                    Filter hosts by DNS.
+	 *        string $filter['port']                    Filter hosts by port.
+	 *        string $filter['status']                  Filter hosts by status.
+	 *        string $filter['evaltype']                Filter hosts by tags.
+	 *        string $filter['tags']                    Filter hosts by tag names and values.
+	 *        string $filter['severities']              Filter problems on hosts by severities.
+	 *        int    $filter['maintenance_status']      Filter hosts by maintenance.
+	 * @param array  $column_options                    Column options.
+	 *        string $column_options['show_suppressed'] (optional) Show suppressed problems.
 	 *
 	 * @return int
 	 */
