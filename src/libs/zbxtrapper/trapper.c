@@ -55,6 +55,7 @@
 #endif
 #include "zbxcurl.h"
 #include "zbxexpr.h"
+#include "zbxcfg.h"
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
 #endif
@@ -1082,7 +1083,7 @@ static int	process_active_check_heartbeat(zbx_socket_t *sock, const struct zbx_j
 	zbx_uint64_t		hostid, revision;
 	unsigned char		status, monitored_by;
 	char			*error = NULL;
-	int			ret, freq;
+	int			freq;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
 		return FAIL;
@@ -1095,8 +1096,8 @@ static int	process_active_check_heartbeat(zbx_socket_t *sock, const struct zbx_j
 		return FAIL;
 	}
 
-	if (SUCCEED != (ret = zbx_dc_check_host_conn_permissions(host, sock, &hostid, &status, &monitored_by,
-			&revision, &redirect, 0, &error)))
+	if (SUCCEED != zbx_dc_check_host_conn_permissions(host, sock, &hostid, &status, &monitored_by,
+			&revision, &redirect, ZBX_AUTOREG_NO_CHANGES, &error))
 	{
 		if (0 != redirect.revision || ZBX_REDIRECT_NONE != redirect.reset)
 		{
@@ -1104,7 +1105,7 @@ static int	process_active_check_heartbeat(zbx_socket_t *sock, const struct zbx_j
 
 			zbx_json_init(&j, 1024);
 			zbx_add_redirect_response(&j, &redirect);
-			zbx_send_response_json(sock, FAIL, NULL, NULL, sock->protocol, config_timeout, j.buffer);
+			(void)zbx_send_response_json(sock, FAIL, NULL, NULL, sock->protocol, config_timeout, j.buffer);
 			zbx_json_free(&j);
 		}
 		else
@@ -1127,9 +1128,12 @@ static int	process_active_check_heartbeat(zbx_socket_t *sock, const struct zbx_j
 		return SUCCEED;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HEARTBEAT_FREQ, hbfreq, sizeof(hbfreq), NULL))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid heartbeat message \"%s\"", sock->peer);
 		return FAIL;
+	}
 
-	if (SUCCEED != zbx_is_uint31(hbfreq, &freq) || 0 == freq || SEC_PER_HOUR < freq)
+	if (SUCCEED != zbx_is_uint31(hbfreq, &freq) || 0 == freq || ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX < freq)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid heartbeat frequency \"%s\" from \"%s\"", hbfreq,
 				sock->peer);
