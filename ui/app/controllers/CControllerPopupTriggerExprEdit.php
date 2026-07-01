@@ -208,6 +208,7 @@ class CControllerPopupTriggerExprEdit extends CController {
 
 				$time_params = array_intersect(['last', 'shift', 'period_shift'], $key_map);
 				$param_index = count($time_params);
+				$key_map_index = $param_index;
 
 				foreach ($time_params as $time_param) {
 					$params[$time_param] = '';
@@ -229,32 +230,36 @@ class CControllerPopupTriggerExprEdit extends CController {
 						if ($param_index > 1) {
 							$params[$key_map[0]] = $parameters[1]['data']['time_shift'];
 						}
+						else {
+							$param_index++;
+						}
 					}
 
 					$param_count = min(count($key_map), count($parameters));
 
-					while ($param_index < $param_count) {
+					while ($key_map_index < $param_count) {
 						$parameter = $parameters[$param_index];
 
-						$params[$key_map[$param_index]] = str_starts_with($parameter['match'], '"')
+						$params[$key_map[$key_map_index]] = str_starts_with($parameter['match'], '"')
 							? CHistFunctionParser::unquoteParam($parameter['match'])
 							: $parameter['match'];
 
 						$param_index++;
+						$key_map_index++;
 					}
 				}
 
 				if ($function === 'in' && array_key_exists($param_index, $key_map)) {
-					$params[$key_map[$param_index]] = implode(',', array_column($outer_parameters, 'match'));
+					$params[$key_map[$key_map_index]] = implode(',', array_column($outer_parameters, 'match'));
 				}
 				else {
 					foreach ($outer_parameters as $parameter) {
-						if (array_key_exists($param_index, $key_map)) {
-							$params[$key_map[$param_index]] = str_starts_with($parameter['match'], '"')
+						if (array_key_exists($key_map_index, $key_map)) {
+							$params[$key_map[$key_map_index]] = str_starts_with($parameter['match'], '"')
 								? CHistFunctionParser::unquoteParam($parameter['match'])
 								: $parameter['match'];
 
-							$param_index++;
+							$key_map_index++;
 						}
 					}
 				}
