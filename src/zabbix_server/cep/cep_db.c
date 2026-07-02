@@ -752,7 +752,6 @@ void	cep_db_process_actions(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_
 
 		zbx_dbconn_begin(db);
 		process_actions(db, &events, &event_recovery, &escalations);
-		zbx_dbconn_commit(db);
 	}
 	while (ZBX_DB_DOWN == (ret = zbx_dbconn_commit(db)));
 
@@ -1184,6 +1183,179 @@ static void	cep_db_update_event_tags(zbx_dbconn_t *db, const zbx_vector_cep_even
 
 typedef struct
 {
+	zbx_uint64_t	event_suppressid;
+	zbx_uint64_t	ruleid;
+	int		suppress_until;
+}
+zbx_cep_event_suppress_t;
+
+ZBX_VECTOR_DECL(cep_event_suppress, zbx_cep_event_suppress_t)
+ZBX_VECTOR_IMPL(cep_event_suppress, zbx_cep_event_suppress_t)
+
+static int	cep_event_suppress_compare(const void *a1, const void *a2)
+{
+	const zbx_cep_event_suppress_t	*s1 = (const zbx_cep_event_suppress_t *)a1;
+	const zbx_cep_event_suppress_t	*s2 = (const zbx_cep_event_suppress_t *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(s1->ruleid, s2->ruleid);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: insert or update event suppress records in the database to        *
+ *          match an event's suppress data                                    *
+ *                                                                            *
+ * Parameters: db          - [IN] database connection                         *
+ *             sql         - [IN/OUT] sql statement buffer                    *
+ *             sql_alloc   - [IN/OUT] allocated size of sql                   *
+ *             sql_offset  - [IN/OUT] used size of sql                        *
+ *             db_insert   - [IN/OUT] insert accumulator for new suppress     *
+ *                           records                                          *
+ *             event       - [IN] event to sync suppress records for          *
+ *             suppress    - [IN] existing suppress records for the event     *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_db_update_event_suppress(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		zbx_db_insert_t *db_insert, const zbx_cep_event_t *event, zbx_vector_cep_event_suppress_t *suppress)
+{
+	for (int i = 0; i < event->suppress.values_num; i++)
+	{
+		zbx_db_event_suppress_t		*sup = &event->suppress.values[i];
+		zbx_cep_event_suppress_t	sup_local;
+		int				j;
+
+		if (0 == sup->cep_ruleid)
+			continue;
+
+		sup_local.ruleid = sup->cep_ruleid;
+
+		if (FAIL == (j = zbx_vector_cep_event_suppress_search(suppress, sup_local, cep_event_suppress_compare)))
+		{
+			zbx_db_insert_add_values(db_insert, __UINT64_C(0), event->eventid, sup_local.ruleid,
+					sup->until);
+		}
+		else
+		{
+			if (suppress->values[j].suppress_until != sup->until)
+			{
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
+						"update event_suppress set suppress_until=%d where event_suppressid="
+						ZBX_FS_UI64 ";\n", sup->until,  suppress->values[j].event_suppressid);
+				zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset, NULL);
+			}
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sync suppress records in the database for a set of events         *
+ *          referenced by handles                                             *
+ *                                                                            *
+ * Parameters: db    - [IN] database connection                               *
+ *             htags - [IN] handles of events to sync suppress records for    *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_db_update_events_suppress(zbx_dbconn_t *db, const zbx_vector_cep_event_handle_t *htags)
+{
+	zbx_vector_uint64_t		eventids;
+	zbx_cep_event_t			**events;
+	int				events_num = 0, index = 0;
+	zbx_cep_t			*cep;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_vector_cep_event_suppress_t	suppress;
+	zbx_db_insert_t			db_insert;
+
+	zbx_vector_uint64_create(&eventids);
+	zbx_vector_uint64_reserve(&eventids, (size_t)htags->values_num);
+
+	zbx_vector_cep_event_suppress_create(&suppress);
+
+	events = (zbx_cep_event_t **)zbx_malloc(NULL, sizeof(zbx_cep_event_t *) * htags->values_num);
+
+	cep_cache_acquire(&cep);
+	cep_get_events_by_handles(cep, htags->values, htags->values_num, events);
+	cep_cache_release(&cep);
+
+	for (int i = 0; i < htags->values_num; i++)
+	{
+		if (NULL == events[i])
+			continue;
+
+		events[events_num++] = events[i];
+		zbx_vector_uint64_append(&eventids, events[i]->eventid);
+	}
+
+	zbx_dbconn_prepare_insert(db, &db_insert, "event_suppress", "event_suppressid", "eventid", "cep_ruleid",
+		"suppress_until", NULL);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select event_suppressid,eventid,cep_ruleid,suppress_until"
+			" from event_suppress"
+			" where cep_ruleid is not null and");
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid",  eventids.values,
+			eventids.values_num);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by eventid");
+
+	result = zbx_dbconn_select(db, "%s", sql);
+	sql_offset = 0;
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_cep_event_suppress_t	sup_local;
+		zbx_uint64_t	eventid;
+
+		ZBX_STR2UINT64(eventid, row[1]);
+
+		while (events[index]->eventid != eventid)
+		{
+			cep_db_update_event_suppress(db, &sql, &sql_alloc, &sql_offset, &db_insert, events[index],
+					&suppress);
+			zbx_vector_cep_event_suppress_clear(&suppress);
+			index++;
+		}
+
+		ZBX_STR2UINT64(sup_local.event_suppressid, row[0]);
+		ZBX_STR2UINT64(sup_local.ruleid, row[2]);
+		sup_local.suppress_until = atoi(row[3]);
+		zbx_vector_cep_event_suppress_append(&suppress, sup_local);
+	}
+	zbx_db_free_result(result);
+
+	for (;index < events_num; index++)
+	{
+		cep_db_update_event_suppress(db, &sql, &sql_alloc, &sql_offset, &db_insert,
+				events[index], &suppress);
+		zbx_vector_cep_event_suppress_clear(&suppress);
+	}
+
+	zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset);
+
+	zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	zbx_free(sql);
+	zbx_vector_cep_event_suppress_destroy(&suppress);
+	zbx_vector_uint64_destroy(&eventids);
+
+	for (int i = 0; i < events_num; i++)
+	{
+		if (NULL != events[i])
+			zbx_cep_event_release(events[i]);
+	}
+	zbx_free(events);
+}
+
+typedef struct
+{
 	zbx_cep_event_handle_t	hevent;
 	zbx_uint32_t		flags;
 }
@@ -1286,17 +1458,15 @@ static void	cep_db_sync_event(zbx_dbconn_t *db, const zbx_vector_cep_event_sync_
  ******************************************************************************/
 void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks)
 {
-	zbx_vector_cep_event_handle_t	htags;
+	zbx_vector_cep_event_handle_t	htags, hsuppress;
 	zbx_vector_cep_event_sync_t	sync;
 	zbx_cep_event_handle_t		hsync_last = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
 
 	zbx_vector_cep_event_sync_create(&sync);
-	zbx_vector_cep_event_sync_reserve(&sync, (size_t)tasks->values_num);
-
 	zbx_vector_cep_event_handle_create(&htags);
-	zbx_vector_cep_event_handle_reserve(&htags, (size_t)tasks->values_num);
+	zbx_vector_cep_event_handle_create(&hsuppress);
 
 	for (int i = 0; i < tasks->values_num; i++)
 	{
@@ -1320,9 +1490,12 @@ void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_
 		if (0 != (task->flags & CEP_SYNC_EVENT_TAGS))
 			zbx_vector_cep_event_handle_append(&htags, task->hevent);
 
+		if (0 != (task->flags & CEP_SYNC_EVENT_SUPPRESS))
+			zbx_vector_cep_event_handle_append(&hsuppress, task->hevent);
 	}
 
 	zbx_vector_cep_event_handle_uniq(&htags, cep_event_handle_compare);
+	zbx_vector_cep_event_handle_uniq(&hsuppress, cep_event_handle_compare);
 
 	zbx_dbconn_t	*db = zbx_dbconn_pool_acquire_connection(dbpool);
 
@@ -1335,13 +1508,17 @@ void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_
 
 		if (0 != htags.values_num)
 			cep_db_update_event_tags(db, &htags);
+
+		if (0 != hsuppress.values_num)
+			cep_db_update_events_suppress(db, &hsuppress);
 	}
 	while (ZBX_DB_DOWN == zbx_dbconn_commit(db));
 
 	zbx_dbconn_pool_release_connection(dbpool, db);
 
-	zbx_vector_cep_event_sync_destroy(&sync);
+	zbx_vector_cep_event_handle_destroy(&hsuppress);
 	zbx_vector_cep_event_handle_destroy(&htags);
+	zbx_vector_cep_event_sync_destroy(&sync);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1379,6 +1556,7 @@ void	cep_db_add_acknowledges(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task
 
 	do
 	{
+		zbx_dbconn_begin(db);
 		zbx_db_insert_execute(&db_insert);
 	}
 	while (ZBX_DB_DOWN == zbx_dbconn_commit(db));
@@ -1410,6 +1588,8 @@ void	cep_db_update_rule_errors(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_ta
 	do
 	{
 		size_t	sql_offset = 0;
+
+		zbx_dbconn_begin(db);
 
 		for (int i = 0; i < tasks->values_num; i++)
 		{

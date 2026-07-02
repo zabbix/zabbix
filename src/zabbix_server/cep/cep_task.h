@@ -102,6 +102,7 @@ zbx_cep_task_commit_t;
 #define CEP_SYNC_EVENT_SEVERITY		0x02
 #define CEP_SYNC_EVENT_TAGS		0x04
 #define CEP_SYNC_EVENT_CAUSE		0x08
+#define CEP_SYNC_EVENT_SUPPRESS		0x10
 
 typedef struct
 {

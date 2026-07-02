@@ -1430,7 +1430,7 @@ static int	db_event_suppress_compare(const void *a1, const void *a2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add maintenance IDs to event and update suppression time          *
+ * Purpose: add suprpess records to event and update suppression time         *
  *                                                                            *
  * Parameters: h         - [IN/OUT] event handle                              *
  *             suppress  - [IN/OUT] event suppress data to add                *
