@@ -56,8 +56,10 @@ class CControllerBannerUpdate extends CController {
 
 		$banners = $this->getInput('banners');
 		foreach ($banners as &$banner) {
-			foreach ($banner['content'] ?? [] as $lang => $text) {
-				$banner['content'][$lang] = $parsedown->text($text);
+			if (array_key_exists('content', $banner) && is_array($banner['content'])) {
+				foreach ($banner['content'] as $lang => $text) {
+					$banner['content'][$lang] = $parsedown->text($text);
+				}
 			}
 		}
 		unset($banner);

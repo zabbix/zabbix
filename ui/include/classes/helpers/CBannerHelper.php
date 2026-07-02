@@ -79,7 +79,8 @@ class CBannerHelper {
 	public static function getActiveBanners(array $banners, array $data): array {
 		return array_filter($banners, static function (array $banner) use ($data) {
 			if (!array_key_exists('id', $banner) || strlen((string) $banner['id']) === 0
-					|| !array_key_exists('from', $banner) || !array_key_exists('to', $banner)) {
+					|| !array_key_exists('from', $banner) || !array_key_exists('to', $banner)
+					|| !is_array($banner['content'])) {
 				return false;
 			}
 
