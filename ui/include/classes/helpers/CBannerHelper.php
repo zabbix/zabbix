@@ -78,14 +78,15 @@ class CBannerHelper {
 	 */
 	public static function getActiveBanners(array $banners, array $data): array {
 		return array_filter($banners, static function (array $banner) use ($data) {
-			if (!array_key_exists('id', $banner) || strlen((string) $banner['id']) === 0) {
+			if (!array_key_exists('id', $banner) || strlen((string) $banner['id']) === 0
+					|| !array_key_exists('from', $banner) || !array_key_exists('to', $banner)) {
 				return false;
 			}
 
 			try {
 				$now = new DateTimeImmutable('now');
-				$from = array_key_exists('from', $banner) ? new DateTimeImmutable($banner['from']) : null;
-				$to = array_key_exists('to', $banner) ? new DateTimeImmutable($banner['to']) : null;
+				$from = new DateTimeImmutable($banner['from']);
+				$to = new DateTimeImmutable($banner['to']);
 			} catch (Exception) {
 				return false;
 			}

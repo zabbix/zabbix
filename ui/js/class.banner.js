@@ -183,7 +183,7 @@ class CBanner {
 
 		const active_banner = this.#banners
 			.filter(banner => {
-				if (!('id' in banner) || !banner.id) {
+				if (!('id' in banner) || !banner.id || !('from' in banner) || !('to' in banner)) {
 					return false;
 				}
 
@@ -302,6 +302,8 @@ class CBanner {
 
 			return 'id' in banner
 				&& banner.id
+				&& 'from' in banner
+				&& 'to' in banner
 				&& 'content' in banner
 				&& Object.keys(banner.content).length > 0
 				&& now <= to;
