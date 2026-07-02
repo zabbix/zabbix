@@ -91,9 +91,7 @@ class CBannerHelper {
 			}
 
 			$not_dismissed = !in_array($banner['id'], $data['dismissed_ids']);
-
-			$has_content = array_key_exists($data['user']['lang'], $banner['content'])
-				|| array_key_exists('all', $banner['content']);
+			$has_content = !empty($banner['content'][$data['user']['lang']]) || !empty($banner['content']['all']);
 
 			return $not_dismissed && $has_content && $from <= $now && $now <= $to;
 		});

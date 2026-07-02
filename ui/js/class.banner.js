@@ -193,7 +193,7 @@ class CBanner {
 				const to = new Date(banner.to);
 
 				return !this.#dismissed_banner_ids.has(banner.id)
-					&& [this.#language, 'all'].some(key => key in banner.content)
+					&& [this.#language, 'all'].some(key => key in banner.content && banner.content[key].length > 0)
 					&& from <= now
 					&& now <= to;
 			})
