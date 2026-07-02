@@ -404,7 +404,7 @@ class CProxy extends CApiService {
 		$proxyids = [];
 
 		foreach ($proxies as $proxy) {
-			if ($proxy['proxy_groupid'] !== 0) {
+			if ($proxy['proxy_groupid'] != 0) {
 				$proxyids[$proxy['proxyid']] = true;
 			}
 		}
