@@ -135,10 +135,10 @@ class IntegrationTests {
 		$suite->addTestSuite('testFunctions');
 		$suite->addTestSuite('testCalculatedExpression');
 		$suite->addTestSuite('testDiagInfo');
+		$suite->addTestSuite('testHousekeepingConfSync');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
-		$suite->addTestSuite('testHousekeepingConfSync');
 		$suite->addTestSuite('testWebScenarioDynamicVariables');
 		$suite->addTestSuite('testBridgeAdapter');
 		return $suite;

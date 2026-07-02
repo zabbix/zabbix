@@ -468,6 +468,8 @@ window.host_edit_popup = {
 				this.form_element.querySelector('#change_psk').closest('div').remove();
 				this.form_element.querySelector('[for="change_psk"]').remove();
 				this.updateEncryptionFields();
+
+				document.getElementById('tls_psk_identity').focus();
 			});
 		}
 
