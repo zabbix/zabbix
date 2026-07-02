@@ -2068,7 +2068,7 @@ abstract class CTriggerGeneral extends CApiService {
 			$event_name_validator = new CEventNameValidator([
 				'hostnames' => array_keys($hosts_keys),
 				'message_hostnames'
-					=> _('Only hosts referenced in problem or recovery expressions can be used in event name.'),
+					=> _('Only hosts referenced in problem or recovery expressions can be used in event name.')
 			]);
 
 			if (!$event_name_validator->validate($trigger['event_name'])) {
