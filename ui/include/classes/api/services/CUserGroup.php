@@ -1369,16 +1369,7 @@ class CUserGroup extends CApiService {
 			}
 			unset($proxy);
 
-			if ($ins_changed_proxies) {
-				foreach ($db_proxies as $db_proxy) {
-					$ins_changed_proxies[] = [
-						'usrgrpid' => $usrgrp['usrgrpid'],
-						'proxyid' => $db_proxy['proxyid']
-					];
-				}
-			}
-
-			if ($db_proxies) {
+			if ($db_proxies && !$ins_changed_proxies) {
 				$del_changed_proxies = array_merge($del_changed_proxies, array_column($db_proxies, 'usrgrp_proxyid'));
 			}
 		}
@@ -1444,16 +1435,7 @@ class CUserGroup extends CApiService {
 			}
 			unset($proxy_groups);
 
-			if ($ins_changed_proxy_groups) {
-				foreach ($db_proxy_groups as $db_proxy_group) {
-					$ins_changed_proxy_groups[] = [
-						'usrgrpid' => $usrgrp['usrgrpid'],
-						'proxy_groupid' => $db_proxy_group['proxy_groupid']
-					];
-				}
-			}
-
-			if ($db_proxy_groups) {
+			if ($db_proxy_groups && !$ins_changed_proxy_groups) {
 				$del_changed_proxy_groups = array_merge(
 					$del_changed_proxy_groups, array_column($db_proxy_groups, 'usrgrp_proxy_groupid')
 				);
