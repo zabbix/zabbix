@@ -577,6 +577,7 @@
 	box-sizing: border-box;
 	border: 1px solid $ui-border-color;
 	border-bottom: 0;
+	border-radius: var(--surface-border-radius);
 	background-color: $ui-bg-color;
 	opacity: 0;
 	z-index: 11;
@@ -719,7 +720,6 @@
 			margin-top: -2rem;
 			height: 2rem;
 			box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
-			border-radius: var(--surface-border-radius);
 			opacity: 1;
 
 			// Not inheriting opacity transition here.

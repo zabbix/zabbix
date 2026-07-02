@@ -2125,6 +2125,7 @@ button {
   box-sizing: border-box;
   border: 1px solid #444444;
   border-bottom: 0;
+  border-radius: var(--surface-border-radius);
   background-color: #000000;
   opacity: 0;
   z-index: 11; }
@@ -2213,7 +2214,6 @@ button {
     margin-top: -2rem;
     height: 2rem;
     box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
-    border-radius: var(--surface-border-radius);
     opacity: 1; }
   .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-actions {
     opacity: 1; }
