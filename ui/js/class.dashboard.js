@@ -1145,9 +1145,7 @@ class CDashboard {
 	}
 
 	_selectDashboardPage(dashboard_page, {is_async = false} = {}) {
-		if (this._data.templateid === null || !this._is_edit_mode) {
-			this._setInitialDashboardPage(dashboard_page);
-		}
+		this._setInitialDashboardPage(dashboard_page);
 
 		if (!this._is_edit_mode) {
 			this._keepSteadyConfigurationChecker();
