@@ -71,14 +71,14 @@ div.dashboard-widget-geomap {
 
 	.leaflet-marker-icon:focus {
 		box-shadow: 0 0 0 2px $btn-focus-outline-color;
-		border-radius: var(--button-border-radius);
+		border-radius: 2px;
 		outline: none;
 	}
 
 	.leaflet-control {
 		.navigate-home-button,
 		.geomap-filter-button {
-			border-radius: var(--button-border-radius);
+			border-radius: 2px;
 			border: 0;
 			cursor: pointer;
 
