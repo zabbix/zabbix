@@ -1369,7 +1369,7 @@ class CUserGroup extends CApiService {
 			}
 			unset($proxy);
 
-			if ($db_proxies && !$ins_changed_proxies) {
+			if ($db_proxies) {
 				$del_changed_proxies = array_merge($del_changed_proxies, array_column($db_proxies, 'usrgrp_proxyid'));
 			}
 		}
@@ -1435,7 +1435,7 @@ class CUserGroup extends CApiService {
 			}
 			unset($proxy_groups);
 
-			if ($db_proxy_groups && !$ins_changed_proxy_groups) {
+			if ($db_proxy_groups) {
 				$del_changed_proxy_groups = array_merge(
 					$del_changed_proxy_groups, array_column($db_proxy_groups, 'usrgrp_proxy_groupid')
 				);
