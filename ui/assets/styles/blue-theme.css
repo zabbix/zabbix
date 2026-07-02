@@ -8452,7 +8452,8 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
   margin: 0 auto;
   margin-top: 5%;
   padding: 42px 42px 39px;
-  border: 1px solid #dfe4e7; }
+  border: 1px solid #dfe4e7;
+  border-radius: var(--surface-border-radius); }
   .signin-container h1 {
     border: 0;
     margin: 0 0 17px;

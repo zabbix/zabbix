@@ -1036,6 +1036,7 @@ select {
 	margin-top: 5%;
 	padding: 42px 42px 39px;
 	border: 1px solid $ui-border-color;
+	border-radius: var(--surface-border-radius);
 
 	h1 {
 		border: 0;
