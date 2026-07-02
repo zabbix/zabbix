@@ -1145,7 +1145,9 @@ class CDashboard {
 	}
 
 	_selectDashboardPage(dashboard_page, {is_async = false} = {}) {
-		this._setInitialDashboardPage(dashboard_page);
+		const dashboard_page_index = this.getDashboardPageIndex(dashboard_page);
+
+		this.fire(CDashboard.EVENT_PAGE_SELECT, {dashboard_page_index});
 
 		if (!this._is_edit_mode) {
 			this._keepSteadyConfigurationChecker();
@@ -1263,12 +1265,6 @@ class CDashboard {
 		dashboard_page.off(CDashboardPage.EVENT_REQUIRE_DATA_SOURCE, this._events.dashboardPageRequireDataSource);
 
 		dashboard_page.destroy();
-	}
-
-	_setInitialDashboardPage(dashboard_page) {
-		const dashboard_page_index = this.getDashboardPageIndex(dashboard_page);
-
-		this.fire(CDashboard.EVENT_PAGE_SELECT, {dashboard_page_index});
 	}
 
 	_getInitialDashboardPage() {
@@ -2291,7 +2287,9 @@ class CDashboard {
 			},
 
 			tabsSort: () => {
-				this._setInitialDashboardPage(this._selected_dashboard_page);
+				const dashboard_page_index = this.getDashboardPageIndex(this._selected_dashboard_page);
+
+				this.fire(CDashboard.EVENT_PAGE_SELECT, {dashboard_page_index});
 
 				this._is_unsaved = true;
 			},
