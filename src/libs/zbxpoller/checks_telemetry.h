@@ -17,29 +17,6 @@
 
 #include "zbxcacheconfig.h"
 
-#ifdef HAVE_LIBCURL
-typedef struct telemetry_query_conn_params_clickhouse
-{
-	const char	*url;
-	const char	*http_proxy;
-	int		timeout;
-	int 		max_attempts;
-	const char	*ssl_cert_file;
-	const char	*ssl_key_file;
-	const char	*ssl_key_password;
-	unsigned char	verify_peer;
-	unsigned char	verify_host;
-	unsigned char	authtype;
-	const char	*username;
-	const char	*password;
-	const char	*token;
-	unsigned char	post_type;
-	unsigned char	output_format;
-}
-telemetry_query_http_conn_params_t;
-#endif
-
-int	get_value_telemetry(const zbx_dc_item_t *item, const char *config_source_ip, const char *config_ssl_ca_location,
-		const char *config_ssl_cert_location, const char *config_ssl_key_location, AGENT_RESULT *result);
+int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *apm_db_config, AGENT_RESULT *result);
 
 #endif

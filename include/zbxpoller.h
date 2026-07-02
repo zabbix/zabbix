@@ -18,6 +18,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxasyncpoller.h"
 #include "module.h"
+#include "zbxtelemetry.h"
 
 ZBX_PTR_VECTOR_DECL(agent_result_ptr, AGENT_RESULT*)
 
@@ -50,6 +51,7 @@ typedef struct
 	int				config_unreachable_period;
 	int				config_unreachable_delay;
 	int				config_max_concurrent_checks_per_poller;
+	const zbx_apm_db_config_t	*apm_db_config;
 	zbx_get_config_forks_f		get_config_forks;
 	const char			*config_java_gateway;
 	int				config_java_gateway_port;
@@ -77,7 +79,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
-		const char *config_webdriver_url);
+		const char *config_webdriver_url, const zbx_apm_db_config_t *apm_db_config);
 void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results);
 void	zbx_clean_agent_items(zbx_dc_agent_item_t *items, int num, AGENT_RESULT *results);
 void	zbx_clean_snmp_items(zbx_dc_snmp_item_t *items, int num, AGENT_RESULT *results);
@@ -159,26 +161,27 @@ typedef struct zbx_async_manager	zbx_async_manager_t;
 
 typedef struct
 {
-	zbx_async_manager_t	*manager;
-	const zbx_thread_info_t	*info;
-	int			state;
-	int			clear_cache;
-	int			process_num;
-	unsigned char		poller_type;
-	int			processed;
-	int			queued;
-	int			processing;
-	int			config_unavailable_delay;
-	int			config_unreachable_delay;
-	int			config_unreachable_period;
-	int			config_max_concurrent_checks_per_poller;
-	int			config_timeout;
-	const char		*config_source_ip;
-	const char		*config_ssl_ca_location;
-	const char		*config_ssl_cert_location;
-	const char		*config_ssl_key_location;
-	struct event		*async_wake_timer;
-	struct event		*async_timer;
+	zbx_async_manager_t		*manager;
+	const zbx_thread_info_t		*info;
+	int				state;
+	int				clear_cache;
+	int				process_num;
+	unsigned char			poller_type;
+	int				processed;
+	int				queued;
+	int				processing;
+	int				config_unavailable_delay;
+	int				config_unreachable_delay;
+	int				config_unreachable_period;
+	int				config_max_concurrent_checks_per_poller;
+	int				config_timeout;
+	const char			*config_source_ip;
+	const char			*config_ssl_ca_location;
+	const char			*config_ssl_cert_location;
+	const char			*config_ssl_key_location;
+	struct event			*async_wake_timer;
+	struct event			*async_timer;
+	const zbx_apm_db_config_t	*apm_db_config;
 #ifdef HAVE_ARES
 	struct event		*async_timeout_timer;
 #endif

@@ -24,7 +24,7 @@ ZBX_PTR_VECTOR_IMPL(tq_aggr_column_ptr, zbx_tq_aggr_column_t *)
 
 typedef struct
 {
-	zbx_tq_db_type_t	db_type;
+	zbx_apm_db_type_t	db_type;
 	const zbx_dbconn_t	*db;
 }
 tq_sql_ctx_t;
@@ -108,7 +108,7 @@ static char	*tq_sql_dyn_quote_generic(const char *src, char quote_char)
 
 static char	*tq_sql_dyn_escape_string_unquoted(const char *src, const tq_sql_ctx_t *ctx)
 {
-	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == ctx->db_type)
+	if (ZBX_APM_DB_TYPE_CLICKHOUSE == ctx->db_type)
 		return tq_sql_dyn_escape_with_backslash_generic(src, "'\"`\\");
 
 	return zbx_dbconn_dyn_escape_string(ctx->db, src);
@@ -138,14 +138,14 @@ static char	*tq_sql_dyn_escape_name(const char *src, const tq_sql_ctx_t *ctx)
 {
 	char	*src_esc, *out;
 
-	if (ZBX_TQ_DB_TYPE_POSTGRESQL == ctx->db_type)
+	if (ZBX_APM_DB_TYPE_POSTGRESQL == ctx->db_type)
 		src_esc = tq_sql_dyn_escape_with_doubling_generic(src, "\"");
-	else if (ZBX_TQ_DB_TYPE_MYSQL == ctx->db_type)
+	else if (ZBX_APM_DB_TYPE_MYSQL == ctx->db_type)
 		src_esc = tq_sql_dyn_escape_with_doubling_generic(src, "`");
 	else /* clickhouse */
 		src_esc = tq_sql_dyn_escape_string_unquoted(src, ctx);
 
-	out = tq_sql_dyn_quote_generic(src_esc, (ZBX_TQ_DB_TYPE_MYSQL == ctx->db_type ? '`' : '"'));
+	out = tq_sql_dyn_quote_generic(src_esc, (ZBX_APM_DB_TYPE_MYSQL == ctx->db_type ? '`' : '"'));
 
 	zbx_free(src_esc);
 	return out;
@@ -158,7 +158,7 @@ static char	*tq_sql_dyn_escape_name(const char *src, const tq_sql_ctx_t *ctx)
  ******************************************************************************/
 static char	*tq_sql_dyn_escape_like_pattern(const char *src, const tq_sql_ctx_t *ctx)
 {
-	if (ZBX_TQ_DB_TYPE_CLICKHOUSE == ctx->db_type)
+	if (ZBX_APM_DB_TYPE_CLICKHOUSE == ctx->db_type)
 	{
 		char	*src_esc_like = tq_sql_dyn_escape_with_backslash_generic(src, "_%\\");
 		char	*out;
@@ -208,7 +208,7 @@ static char	*tq_sql_dyn_get_attribute_by_key_raw(const char *operand, const char
 
 	switch (ctx->db_type)
 	{
-		case ZBX_TQ_DB_TYPE_POSTGRESQL:
+		case ZBX_APM_DB_TYPE_POSTGRESQL:
 		{
 			char	*key_esc = tq_sql_dyn_escape_string(key, ctx);
 
@@ -217,7 +217,7 @@ static char	*tq_sql_dyn_get_attribute_by_key_raw(const char *operand, const char
 			zbx_free(key_esc);
 			break;
 		}
-		case ZBX_TQ_DB_TYPE_MYSQL:
+		case ZBX_APM_DB_TYPE_MYSQL:
 		{
 			char	*key_esc = tq_sql_dyn_escape_json_path_key_mysql(key, ctx);
 
@@ -226,7 +226,7 @@ static char	*tq_sql_dyn_get_attribute_by_key_raw(const char *operand, const char
 			zbx_free(key_esc);
 			break;
 		}
-		case ZBX_TQ_DB_TYPE_CLICKHOUSE:
+		case ZBX_APM_DB_TYPE_CLICKHOUSE:
 		{
 			char	*key_esc = tq_sql_dyn_escape_string(key, ctx);
 
@@ -300,12 +300,12 @@ static char	*tq_sql_dyn_get_percentile(const char *name, double fraction, const 
 	char	*str;
 	char	*name_esc = tq_sql_dyn_escape_name(name, ctx);
 
-	if (ZBX_TQ_DB_TYPE_POSTGRESQL == ctx->db_type)
+	if (ZBX_APM_DB_TYPE_POSTGRESQL == ctx->db_type)
 	{
 		str = zbx_dsprintf(NULL, "(percentile_cont(" ZBX_FS_DBL_EXT(4) ") WITHIN GROUP (ORDER BY %s))",
 				fraction, name_esc);
 	}
-	else if (ZBX_TQ_DB_TYPE_MYSQL == ctx->db_type)
+	else if (ZBX_APM_DB_TYPE_MYSQL == ctx->db_type)
 	{
 		char	*cd_alias = tq_sql_dyn_get_cume_dist_alias_mysql(name, ctx);
 
@@ -447,12 +447,12 @@ static char	*tq_sql_dyn_get_condition_contains(const char *operand, const char *
 
 	switch (ctx->db_type)
 	{
-		case ZBX_TQ_DB_TYPE_POSTGRESQL:
-		case ZBX_TQ_DB_TYPE_MYSQL:
+		case ZBX_APM_DB_TYPE_POSTGRESQL:
+		case ZBX_APM_DB_TYPE_MYSQL:
 			str = zbx_dsprintf(NULL, "%s LIKE '%%%s%%' ESCAPE '%c'", operand, value_esc,
 					ZBX_SQL_LIKE_ESCAPE_CHAR);
 			break;
-		case ZBX_TQ_DB_TYPE_CLICKHOUSE:
+		case ZBX_APM_DB_TYPE_CLICKHOUSE:
 			str = zbx_dsprintf(NULL, "%s LIKE '%%%s%%'", operand, value_esc);
 			break;
 
@@ -472,7 +472,7 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 
 	switch (ctx->db_type)
 	{
-		case ZBX_TQ_DB_TYPE_POSTGRESQL:
+		case ZBX_APM_DB_TYPE_POSTGRESQL:
 		{
 			char	*key_esc = tq_sql_dyn_escape_string(key, ctx);
 
@@ -481,7 +481,7 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 			zbx_free(key_esc);
 			break;
 		}
-		case ZBX_TQ_DB_TYPE_MYSQL:
+		case ZBX_APM_DB_TYPE_MYSQL:
 		{
 			char	*key_esc = tq_sql_dyn_escape_json_path_key_mysql(key, ctx);
 
@@ -490,7 +490,7 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 			zbx_free(key_esc);
 			break;
 		}
-		case ZBX_TQ_DB_TYPE_CLICKHOUSE:
+		case ZBX_APM_DB_TYPE_CLICKHOUSE:
 		{
 			char	*key_esc = tq_sql_dyn_escape_string(key, ctx);
 
@@ -564,7 +564,7 @@ static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, cons
 	char	*str;
 	char	*col_esc = tq_sql_dyn_escape_name(cond->column_name, ctx);
 
-	if (ZBX_TQ_DB_TYPE_POSTGRESQL == ctx->db_type)
+	if (ZBX_APM_DB_TYPE_POSTGRESQL == ctx->db_type)
 	{
 		const char	*array_elems_func = (ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == cond->col_type
 				? "jsonb_array_elements" : "jsonb_array_elements_text");
@@ -576,7 +576,7 @@ static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, cons
 
 		zbx_free(elem_cond);
 	}
-	else if (ZBX_TQ_DB_TYPE_MYSQL == ctx->db_type)
+	else if (ZBX_APM_DB_TYPE_MYSQL == ctx->db_type)
 	{
 		char	*elem_cond = tq_sql_dyn_get_atom_condition("e.elem",
 				tq_sql_key_or_null(cond->key, cond->col_type), cond->value, cond->operator, ctx);
@@ -899,7 +899,7 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, int time_shift,
 		time_t now, time_t lasttimestamp, char **sql, const zbx_dbconn_t *db)
 {
 	tq_sql_ctx_t	ctx = {
-		.db_type = ZBX_TQ_DB_TYPE_POSTGRESQL,
+		.db_type = ZBX_APM_DB_TYPE_POSTGRESQL,
 		.db = db,
 	};
 
@@ -966,7 +966,7 @@ void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, int time_shift, int 
 		time_t now, time_t lasttimestamp, char **sql, const zbx_dbconn_t *db)
 {
 	tq_sql_ctx_t	ctx = {
-		.db_type = ZBX_TQ_DB_TYPE_MYSQL,
+		.db_type = ZBX_APM_DB_TYPE_MYSQL,
 		.db = db,
 	};
 
@@ -1047,7 +1047,7 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift,
 		time_t now, time_t lasttimestamp, char **sql)
 {
 	tq_sql_ctx_t	ctx = {
-		.db_type = ZBX_TQ_DB_TYPE_CLICKHOUSE,
+		.db_type = ZBX_APM_DB_TYPE_CLICKHOUSE,
 		.db = NULL,
 	};
 

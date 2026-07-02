@@ -16,6 +16,7 @@
 #include "zbxalgo.h"
 #include "zbxcommon.h"
 #include "zbxjson.h"
+#include "zbxstr.h"
 #include "zbxtelemetry.h"
 #include "zbxtypes.h"
 #include "zbxnum.h"
@@ -490,6 +491,16 @@ const char	*zbx_tq_elastic_get_index_name(zbx_tq_category_t category, zbx_tq_met
 			THIS_SHOULD_NEVER_HAPPEN;
 			return "";
 	}
+}
+
+void	zbx_tq_elastic_get_search_url(const char *base_url, zbx_tq_category_t category,
+		zbx_tq_metric_type_t metric_type, char **url)
+{
+	*url = zbx_strdup(NULL, base_url);
+
+	zbx_rtrim(*url, "/");
+
+	*url = zbx_dsprintf(*url, "%s/%s/_search", *url, zbx_tq_elastic_get_index_name(category, metric_type));
 }
 
 static char	*tq_elastic_parse_bucket(const zbx_tq_query_t *query, struct zbx_json_parse *jp, int bucket_id)

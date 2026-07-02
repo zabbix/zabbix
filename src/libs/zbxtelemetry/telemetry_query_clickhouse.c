@@ -14,7 +14,9 @@
 
 #include "telemetry.h"
 #include "zbxalgo.h"
+#include "zbxexpr.h"
 #include "zbxjson.h"
+#include "zbxstr.h"
 #include "zbxtelemetry.h"
 #include "zbxcommon.h"
 #include "zbxtypes.h"
@@ -148,4 +150,19 @@ int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_ve
 	}
 
 	return ret;
+}
+
+void	zbx_tq_clickhouse_get_query_url(const char *base_url, const char *db, char **url)
+{
+	char	*db_enc = NULL;
+
+	*url = zbx_strdup(NULL, base_url);
+
+	zbx_rtrim(*url, "/");
+
+	zbx_url_encode(db, &db_enc);
+
+	*url = zbx_dsprintf(*url, "%s?database=%s", *url, db_enc);
+
+	zbx_free(db_enc);
 }

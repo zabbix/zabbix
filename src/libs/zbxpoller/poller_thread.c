@@ -79,7 +79,8 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
 		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb,
-		const char *config_ssh_key_location, const char *config_webdriver_url)
+		const char *config_ssh_key_location, const char *config_webdriver_url,
+		const zbx_apm_db_config_t *apm_db_config)
 {
 	int	res = FAIL, version = item->interface.version;
 
@@ -144,9 +145,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent
 			res = get_value_browser(item, config_webdriver_url, config_comms->config_source_ip, result);
 			break;
 		case ITEM_TYPE_TELEMETRY_QUERY:
-			res = get_value_telemetry(item, config_comms->config_source_ip,
-					config_comms->config_ssl_ca_location, config_comms->config_ssl_cert_location,
-					config_comms->config_ssl_key_location, result);
+			res = get_value_telemetry(item, apm_db_config, result);
 			break;
 		default:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));
@@ -1152,7 +1151,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
 		int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
-		const char *config_webdriver_url)
+		const char *config_webdriver_url, const zbx_apm_db_config_t *apm_db_config)
 {
 	if (ITEM_TYPE_SNMP == items[0].type)
 	{
@@ -1188,7 +1187,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 			errcodes[0] = get_value(&items[0], &results[0], add_results, config_comms,
 					config_startup_time, program_type, get_config_forks, config_java_gateway,
 					config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb,
-					config_ssh_key_location, config_webdriver_url);
+					config_ssh_key_location, config_webdriver_url, apm_db_config);
 		}
 	}
 	else
@@ -1393,10 +1392,12 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zbx_vector_agent_result_ptr_create(&add_results);
 
 	zbx_prepare_items(items, errcodes, num, results, ZBX_MACRO_EXPAND_YES);
+
+	/* apm_db_config is not needed as telemetry query item is polled by a separate poller */
 	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, config_comms, config_startup_time,
 			program_type, progname, get_config_forks, config_java_gateway, config_java_gateway_port,
 			config_externalscripts, get_value_internal_ext_cb, config_ssh_key_location,
-			config_webdriver_url);
+			config_webdriver_url, NULL);
 
 	zbx_timespec(&timespec);
 

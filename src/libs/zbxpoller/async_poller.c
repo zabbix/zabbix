@@ -272,7 +272,7 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 
 		zabbix_log(LOG_LEVEL_TRACE, "%s(): response: '%s'", __func__, http_resp);
 
-		if (ZBX_TQ_DB_TYPE_CLICKHOUSE == item_context->db_type)
+		if (ZBX_APM_DB_TYPE_CLICKHOUSE == item_context->db_type)
 			parse_ret = zbx_tq_clickhouse_parse_resp(item_context->query, http_resp, &values);
 		else
 			parse_ret = zbx_tq_elastic_parse_resp(item_context->query, http_resp, &values);
@@ -664,6 +664,7 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 	poller_config->config_unreachable_period = poller_args_in->config_unreachable_period;
 	poller_config->config_max_concurrent_checks_per_poller =
 			poller_args_in->config_max_concurrent_checks_per_poller;
+	poller_config->apm_db_config = poller_args_in->apm_db_config;
 	poller_config->clear_cache = 0;
 	poller_config->process_num = process_num;
 	poller_config->channel = NULL;

@@ -1212,7 +1212,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
-		zbx_trapper_process_request_func_t trapper_process_request_cb,
+		const zbx_apm_db_config_t *apm_db_config, zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip,
 		zbx_ipc_async_socket_t *rtc)
 {
@@ -1325,7 +1325,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 						zbx_get_program_type_cb(), progname, get_config_forks,
 						config_java_gateway, config_java_gateway_port, config_externalscripts,
 						zbx_get_value_internal_ext_cb, config_ssh_key_location,
-						config_webdriver_url, config_comms->config_tls,
+						config_webdriver_url, apm_db_config, config_comms->config_tls,
 						config_frontend_allowed_ip);
 			}
 		}
@@ -1427,7 +1427,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
-		zbx_trapper_process_request_func_t trapper_process_request_cb,
+		const zbx_apm_db_config_t *apm_db_config, zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip,
 		zbx_ipc_async_socket_t *rtc)
 {
@@ -1438,7 +1438,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 			events_cbs, proxydata_frequency, get_config_forks, config_stats_allowed_ip, progname,
 			config_java_gateway, config_java_gateway_port, config_externalscripts,
 			config_enable_global_scripts, zbx_get_value_internal_ext_cb, config_ssh_key_location,
-			config_webdriver_url, trapper_process_request_cb, autoreg_update_host_cb,
+			config_webdriver_url, apm_db_config, trapper_process_request_cb, autoreg_update_host_cb,
 			config_frontend_allowed_ip, rtc);
 }
 
@@ -1533,6 +1533,7 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 					trapper_args_in->zbx_get_value_internal_ext_cb,
 					trapper_args_in->config_ssh_key_location,
 					trapper_args_in->config_webdriver_url,
+					trapper_args_in->apm_db_config,
 					trapper_args_in->trapper_process_request_func_cb,
 					trapper_args_in->autoreg_update_host_cb,
 					trapper_args_in->config_frontend_allowed_ip,

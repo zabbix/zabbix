@@ -18,6 +18,46 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 
+/* apm db */
+
+typedef enum zbx_apm_db_type
+{
+	ZBX_APM_DB_TYPE_POSTGRESQL = 0,
+	ZBX_APM_DB_TYPE_MYSQL,
+	ZBX_APM_DB_TYPE_CLICKHOUSE,
+	ZBX_APM_DB_TYPE_ELASTIC
+}
+zbx_apm_db_type_t;
+
+typedef struct zbx_apm_db_config
+{
+	int			have_local_config; /* 0 - disabled, 1 - enabled */
+	zbx_apm_db_type_t	db_type;
+	char			*url;
+	char			*username;
+	char			*password;
+	char			*db;
+	char			*source_ip;
+	char			*vault_path;
+	char			*ssl_cert_file;
+	char			*ssl_key_file;
+	char			*ssl_key_password;
+	unsigned char		ssl_verify_peer;
+	unsigned char		ssl_verify_host;
+	char			*ssl_ca_location;
+	char			*ssl_cert_location;
+	char			*ssl_key_location;
+}
+zbx_apm_db_config_t;
+
+int	zbx_apm_db_config_init(zbx_apm_db_config_t *apm_db_config, const char *config_apm_provider,
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, char **error);
+
+void	zbx_apm_db_config_clear(zbx_apm_db_config_t *config);
+
+/* telemetry query */
+
 typedef enum
 {
 	ZBX_TQ_COLUMN_TYPE_UNKNOWN = -1,
@@ -131,15 +171,6 @@ typedef struct
 }
 zbx_tq_query_t;
 
-typedef enum zbx_tq_db_type
-{
-	ZBX_TQ_DB_TYPE_POSTGRESQL = 0,
-	ZBX_TQ_DB_TYPE_MYSQL,
-	ZBX_TQ_DB_TYPE_CLICKHOUSE,
-	ZBX_TQ_DB_TYPE_ELASTIC
-}
-zbx_tq_db_type_t;
-
 ZBX_PTR_VECTOR_DECL(tq_condition_ptr, zbx_tq_condition_t *)
 
 int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, char *error, size_t max_error_len);
@@ -167,6 +198,10 @@ int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_ve
 int	zbx_tq_elastic_parse_resp(const zbx_tq_query_t *query, const char *resp, zbx_vector_str_t *values);
 int	zbx_tq_parse_sql_result(const zbx_tq_query_t *query, zbx_db_result_t result, zbx_vector_str_t *values);
 
+void	zbx_tq_clickhouse_get_query_url(const char *base_url, const char *db, char **url);
+
 const char	*zbx_tq_elastic_get_index_name(zbx_tq_category_t category, zbx_tq_metric_type_t metric_type);
+void		zbx_tq_elastic_get_search_url(const char *base_url, zbx_tq_category_t category,
+		zbx_tq_metric_type_t metric_type, char **url);
 
 #endif
