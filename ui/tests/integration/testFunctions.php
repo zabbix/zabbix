@@ -224,6 +224,7 @@ class testFunctions extends CIntegrationTest{
 		$response = $this->call('host.create', [
 			'host' => self::HOSTNAME_MAIN,
 			'interfaces' => [],
+			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'groups' => [
 				['groupid' => $groupid]
 			],

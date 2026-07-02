@@ -42,6 +42,7 @@ class testHistoryGet extends CIntegrationTest {
 			[
 				'host' => self::HOSTNAME,
 				'interfaces' => [],
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [['groupid' => $groupid]],
 				'status' => HOST_STATUS_MONITORED
 			]

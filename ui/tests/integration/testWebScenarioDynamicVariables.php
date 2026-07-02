@@ -54,6 +54,7 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 		$response = $this->call('host.create', [
 			'host' => self::HOSTNAME,
 			'interfaces' => [],
+			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'groups' => [['groupid' => 4]],
 			'status' => HOST_STATUS_MONITORED
 		]);

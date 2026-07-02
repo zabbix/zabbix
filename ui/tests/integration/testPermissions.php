@@ -275,6 +275,7 @@ class testPermissions extends CIntegrationTest {
 		$hosts = [
 			[
 				'host' => self::HOST_NAME_02,
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$hostgroupids[self::HOSTGROUP_NAME_01]
@@ -288,6 +289,7 @@ class testPermissions extends CIntegrationTest {
 			],
 			[
 				'host' => self::HOST_NAME_03,
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$hostgroupids[self::HOSTGROUP_NAME_01]
@@ -1033,6 +1035,7 @@ class testPermissions extends CIntegrationTest {
 		$hosts = [
 			[
 				'host' => self::HOST_NAME_12,
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$hostgroupids[self::HOSTGROUP_NAME_11]
@@ -1052,6 +1055,7 @@ class testPermissions extends CIntegrationTest {
 			],
 			[
 				'host' => self::HOST_NAME_13,
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$hostgroupids[self::HP01_HOSTGROUP_NAME_01]
@@ -1071,6 +1075,7 @@ class testPermissions extends CIntegrationTest {
 			],
 			[
 				'host' => self::HOST_NAME_14,
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [
 					[
 						'groupid' => self::$hostgroupids[self::HOSTGROUP_NAME_11]

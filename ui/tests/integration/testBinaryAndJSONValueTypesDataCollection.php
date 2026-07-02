@@ -224,6 +224,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			[
 				'host' => 'agent',
 				'interfaces' => $interfaces,
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => $groups,
 				'status' => HOST_STATUS_MONITORED,
 				'items' => $items
@@ -240,6 +241,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			[
 				'host' => 'simple',
 				'interfaces' => [],
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => $groups,
 				'status' => HOST_STATUS_MONITORED,
 				'items' => $items_simple

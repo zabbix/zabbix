@@ -42,6 +42,7 @@ class testHistoryPush extends CIntegrationTest {
 			[
 				'host' => self::HOSTNAME1,
 				'interfaces' => [],
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [['groupid' => 4]],
 				'status' => HOST_STATUS_MONITORED
 			]
@@ -56,6 +57,7 @@ class testHistoryPush extends CIntegrationTest {
 			[
 				'host' => "test_history_push_non_monitored",
 				'interfaces' => [],
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [['groupid' => 4]],
 				'status' => HOST_STATUS_NOT_MONITORED
 			]
@@ -70,6 +72,7 @@ class testHistoryPush extends CIntegrationTest {
 			[
 				'host' => "test_history_push_maintained",
 				'interfaces' => [],
+				'monitored_by' => ZBX_MONITORED_BY_SERVER,
 				'groups' => [['groupid' => 4]],
 				'status' => HOST_STATUS_MONITORED
 			]
