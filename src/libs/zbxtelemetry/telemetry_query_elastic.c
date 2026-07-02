@@ -81,6 +81,7 @@ static void	tq_es_add_condition(const zbx_tq_condition_t *cond, zbx_tq_category_
 		/* ensure that "not equal" results in false if attribute key is missing */
 		zbx_json_addobject(j, "filter");
 		zbx_json_addobject(j, "exists");
+		/* TODO: revisit when it is decided if attribute_key or value is used for exists condition */
 		zbx_json_addstring(j, "field", buf, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(j); /* exists */
 		zbx_json_close(j); /* filter */

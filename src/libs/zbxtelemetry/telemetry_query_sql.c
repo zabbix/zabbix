@@ -553,6 +553,7 @@ static char	*tq_sql_dyn_get_atom_condition(const char *atom, const char *key, co
 	}
 	else /* exists */
 	{
+		/* TODO: revisit when it is decided if attribute_key or value is used for exists condition */
 		return tq_sql_dyn_get_condition_exists(atom, key, ctx);
 	}
 }
