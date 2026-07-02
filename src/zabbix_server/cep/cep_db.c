@@ -35,6 +35,7 @@ typedef struct
 {
 	zbx_uint64_t	p_eventid;
 	zbx_uint64_t	r_eventid;
+	zbx_uint64_t	c_eventid;
 	int		clock;
 	int		ns;
 	zbx_uint64_t	userid;
@@ -72,6 +73,27 @@ static zbx_uint64_t	cep_get_close_event_task_userid(const zbx_mw_task_t *task)
 	{
 		case CEP_TASK_CLOSE_EVENT:
 			return ((zbx_cep_task_close_event_t *)task)->userid;
+		default:
+			return 0;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get correlation event ID associated with a task                   *
+ *                                                                            *
+ * Parameters: task - [IN]                                                    *
+ *                                                                            *
+ * Return value: correlation event ID for close event tasks if created by     *
+ *               correlation, 0 otherwise                                     *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint64_t	cep_get_close_event_task_c_eventid(const zbx_mw_task_t *task)
+{
+	switch (task->type)
+	{
+		case CEP_TASK_CLOSE_EVENT:
+			return ((zbx_cep_task_close_event_t *)task)->c_eventid;
 		default:
 			return 0;
 	}
@@ -341,7 +363,8 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 				.clock = task->db_event->clock,
 				.ns = task->db_event->ns,
 				.userid = cep_get_close_event_task_userid(tasks->values[i]),
-				.correlationid = cep_get_close_event_task_correlationid(tasks->values[i])
+				.correlationid = cep_get_close_event_task_correlationid(tasks->values[i]),
+				.c_eventid = cep_get_close_event_task_c_eventid(tasks->values[i])
 			};
 
 			zbx_vector_cep_db_event_recovery_append(&recoveries, recovery_local);
@@ -361,7 +384,7 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 		zbx_vector_cep_db_event_recovery_sort(&recoveries, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		zbx_dbconn_prepare_insert(db, &db_insert_event_recovery,  "event_recovery", "eventid",
-			"r_eventid", "userid", "correlationid", (char *)NULL);
+			"r_eventid", "userid", "correlationid", "c_eventid", (char *)NULL);
 
 		for (int i = 0; i < recoveries.values_num; i++)
 		{
@@ -374,7 +397,7 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 			}
 
 			zbx_db_insert_add_values(&db_insert_event_recovery, recovery->p_eventid, recovery->r_eventid,
-					recovery->userid, recovery->correlationid);
+					recovery->userid, recovery->correlationid, recovery->c_eventid);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update problem set r_eventid=" ZBX_FS_UI64 ",r_clock=%d,r_ns=%d",
