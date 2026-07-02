@@ -1086,7 +1086,7 @@ class testItemTest extends CWebTest {
 					$test_form->query('button:Get value')->one()->click();
 					$this->assertInlineError($test_form, $expected_errors);
 
-					// Check that inline erors ar removed after specifying valid values and removing focus.
+					// Check that inline errors ar removed after specifying valid values and removing focus.
 					foreach ($fields as $locator => $value) {
 						$field = $test_form->getField($locator);
 
