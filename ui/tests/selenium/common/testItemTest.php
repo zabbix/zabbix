@@ -1077,37 +1077,25 @@ class testItemTest extends CWebTest {
 				}
 				else {
 					$fields = ($data['fields']['Type'] === 'SNMP agent')
-						? ['interface_address' => '127.0.0.1', 'interface_details_community' => 'public']
-						: ['interface_address' => '127.0.0.1'];
+						? ['id:interface_address' => '127.0.0.1', 'id:interface_details_community' => 'public']
+						: ['id:interface_address' => '127.0.0.1'];
 
-					$expected_errors = [];
-					foreach ($fields as $name => $value) {
-						$expected_errors['id:'.$name] = 'This field cannot be empty.';
-					}
+					$expected_errors = array_fill_keys(array_keys($fields), 'This field cannot be empty.');
 
 					// Click Get value button and assert inline errors.
 					$test_form->query('button:Get value')->one()->click();
 					$this->assertInlineError($test_form, $expected_errors);
 
-					// Get field objects for further actions.
-					$field_objects = [];
-					foreach ($fields as $name => $value) {
-						$field_objects[$name] = $test_form->getField('id:'.$name);
-					}
+					// Check that inline erors ar removed after specifying valid values and removing focus.
+					foreach ($fields as $locator => $value) {
+						$field = $test_form->getField($locator);
 
-					// Fill fields with values to remove inline errors.
-					foreach ($field_objects as $name => $field) {
-						$field->fill($fields[$name]);
-					}
-
-					// Remove focus to trigger validation and wait for all errors do disappear.
-					$this->page->removeFocus();
-					foreach ($field_objects as $field) {
+						// Fill fields with values to remove inline errors.
+						$field->fill($value);
+						$this->page->removeFocus();
 						$field->waitUntilClassesNotPresent('has-error');
-					}
 
-					// Clear field values to invoke inline errors again.
-					foreach ($field_objects as $field) {
+						// Clear field values to invoke inline errors again.
 						$field->fill('');
 					}
 
@@ -1155,7 +1143,7 @@ class testItemTest extends CWebTest {
 					foreach (['address', 'port', 'proxy'] as $field) {
 						$elements[$field]->waitUntilNotVisible();
 					}
-					$test_form->query('button:Get value')->one()->waitUntilNotVisible();
+					$test_form->query('button:Get value')->waitUntilNotVisible();
 					// Check that Test button changed its name.
 					$this->assertFalse($overlay->query('button:Get value and test')->one(false)->isValid());
 					$overlay->query('button:Test')->waitUntilVisible()->one();
