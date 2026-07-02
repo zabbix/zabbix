@@ -199,9 +199,7 @@
 				const {dashboard_page_index} = e.detail;
 				const page = dashboard_page_index > 0 ? dashboard_page_index + 1 : null;
 
-				if (this.#dashboard.dashboardid && !this.#clone) {
-					this.#updateHistory({page, add_new: false});
-				}
+				this.#updateHistory({page, add_new: false});
 			});
 
 			ZABBIX.Dashboard.on(CDashboard.EVENT_SLIDESHOW_START, () => {
@@ -384,7 +382,13 @@
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.view');
-			curl.setArgument('dashboardid', this.#dashboard.dashboardid);
+
+			if (this.#dashboard.dashboardid) {
+				curl.setArgument('dashboardid', this.#dashboard.dashboardid);
+			}
+			else {
+				curl.setArgument('new', '1');
+			}
 
 			const state = {};
 
@@ -399,7 +403,10 @@
 				}
 			}
 
-			if (ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_TIME_PERIOD)) {
+			if (this.#clone) {
+				curl.setArgument('clone', '1');
+			}
+			else if (ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_TIME_PERIOD)) {
 				curl.setArgument('from', this.#dashboard_time_period.from);
 				curl.setArgument('to', this.#dashboard_time_period.to);
 			}
