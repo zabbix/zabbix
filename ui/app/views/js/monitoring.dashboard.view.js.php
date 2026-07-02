@@ -421,7 +421,7 @@
 				curl.setArgument('page', page);
 			}
 
-			const auto_start = this.#dashboard.auto_start === '1' ? 'on' : 'off';
+			const auto_start = this.#dashboard.auto_start === '1' ? DASHBOARD_SLIDESHOW_ON : DASHBOARD_SLIDESHOW_OFF;
 
 			slideshow = slideshow ?? url.getArgument('slideshow');
 
