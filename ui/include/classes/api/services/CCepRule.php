@@ -26,13 +26,13 @@ class CCepRule extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
-	public const OUTPUT_FIELDS = ['cep_ruleid'];
-
 	protected $tableName = 'cep_rule';
 	protected $tableAlias = 'cr';
 	protected $sortColumns = ['cep_ruleid', 'name', 'stop', 'sortorder', 'status'];
 
-	public function get($options = []): array|string {
+	public const OUTPUT_FIELDS = ['cep_ruleid', 'name', 'window_type', 'stop', 'sortorder', 'description', 'status', 'error'];
+
+	public function get(array $options = []): array|string {
 		$this->validateGet($options);
 
 		$resource = DBselect($this->createSelectQuery('cep_rule', $options));
