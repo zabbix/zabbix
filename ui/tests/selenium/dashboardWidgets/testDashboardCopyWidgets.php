@@ -223,7 +223,8 @@ class testDashboardCopyWidgets extends CWebTest {
 		$copied_widget = $dashboard->query('xpath:(.//div[contains(@class, "dashboard-grid-widget-header") or'.
 				' contains(@class, "dashboard-grid-iterator-header")]/h4[text()='.
 				CXPathHelper::escapeQuotes($widget_name).'])'.$name_index.'/../../..')
-				->waitUntilPresent()->asWidget()->waitUntilReady()->one();
+				->waitUntilPresent()->asWidget()->one();
+		$copied_widget->waitUntilReady();
 
 		// For Other dashboard and Map from Navigation tree case - add map source, because it is not being copied by design.
 		if (($new_dashboard || $new_page) && stristr($widget_name, 'Map from tree')) {
