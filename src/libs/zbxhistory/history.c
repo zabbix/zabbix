@@ -28,6 +28,7 @@
 #include "zbxprof.h"
 #include "zbxvariant.h"
 #include "zbxjson.h"
+#include "zbxconfigoption.h"
 
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 ZBX_PTR_VECTOR_IMPL(dc_history_ptr, zbx_dc_history_t *)

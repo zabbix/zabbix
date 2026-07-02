@@ -14,6 +14,7 @@
 
 #include "zbxconfigoption.h"
 #include "zbxstr.h"
+#include "zbxalgo.h"
 
 ZBX_VECTOR_IMPL(config_option, zbx_config_option_t)
 
