@@ -23,11 +23,15 @@
 #ifdef HAVE_LIBCURL
 void	zbx_async_check_telemetry_query_clean(zbx_telemetry_query_context *telemetry_query_context)
 {
-	zbx_free(telemetry_query_context->item_context.posts);
 	zbx_http_context_destroy(&telemetry_query_context->http_context);
 
-	zbx_tq_query_clean(telemetry_query_context->item_context.query);
-	zbx_free(telemetry_query_context->item_context.query);
+	zbx_free(telemetry_query_context->item_context.posts);
+
+	if (NULL != telemetry_query_context->item_context.query)
+	{
+		zbx_tq_query_clean(telemetry_query_context->item_context.query);
+		zbx_free(telemetry_query_context->item_context.query);
+	}
 }
 
 /******************************************************************************
@@ -49,6 +53,7 @@ static int	async_send_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, 
 
 	telemetry_query_context = zbx_malloc(NULL, sizeof(zbx_telemetry_query_context));
 
+	memset(&telemetry_query_context->item_context, 0, sizeof(telemetry_query_context->item_context));
 	zbx_http_context_create(&telemetry_query_context->http_context);
 
 	telemetry_query_context->item_context.itemid = item->itemid;
@@ -63,7 +68,6 @@ static int	async_send_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, 
 		zbx_tq_generate_elastic(query, item->time_shift, item->lookback_limit, item->granularity, now,
 				lasttimestamp, &telemetry_query_context->item_context.posts);
 
-	telemetry_query_context->item_context.query = query;
 	zbx_tq_get_newlasttimestamp(item->lookback_limit, item->granularity, now, lasttimestamp,
 			&telemetry_query_context->item_context.newlasttimestamp);
 	telemetry_query_context->item_context.min_free_ts = *min_free_ts;
@@ -99,6 +103,8 @@ static int	async_send_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, 
 
 		goto fail;
 	}
+
+	telemetry_query_context->item_context.query = query;
 
 	/* telemetry_query_context is associated with this curl handle and will be freed when handle is freed */
 	return SUCCEED;
