@@ -818,7 +818,13 @@ class testHousekeepingConfSync extends CIntegrationTest {
 
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->executeHousekeeper(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'housekeeper [deleted', true, 300, 1);
+
+		// Match on "hist/trends" specifically: the substring "housekeeper [deleted" alone also matches the
+		// unrelated "trigger housekeeper [deleted ...]" line, which that separate process logs on its own
+		// independent periodic schedule and can race ahead of the housekeeper cycle triggered here.
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'housekeeper \[deleted \d+ hist\/trends', true, 300,
+			1, true
+		);
 
 		$this->waitForHistoryCount(1);
 		$this->assertEventsCount($eventids['old'], 0);
