@@ -2025,7 +2025,9 @@ abstract class CTriggerGeneral extends CApiService {
 			$expressions_changed = ($db_triggers === null
 				|| $trigger['expression'] !== $db_triggers[$trigger['triggerid']]['expression']
 				|| $trigger['recovery_expression'] !== $db_triggers[$trigger['triggerid']]['recovery_expression']
-				|| $trigger['event_name'] !== $db_triggers[$trigger['triggerid']]['event_name']
+				|| (array_key_exists('event_name', $trigger)
+						&& $trigger['event_name'] !== $db_triggers[$trigger['triggerid']]['event_name']
+				)
 			);
 
 			if (!$expressions_changed) {
@@ -2065,14 +2067,20 @@ abstract class CTriggerGeneral extends CApiService {
 				];
 			}
 
-			$event_name_validator = new CEventNameValidator([
-				'hostnames' => array_keys($hosts_keys),
-				'message_hostnames'
-					=> _('Only hosts referenced in problem or recovery expressions can be used in event name.')
-			]);
+			$event_name = array_key_exists('event_name', $trigger)
+				? $trigger['event_name']
+				: ($db_triggers === null ? '' : $db_triggers[$trigger['triggerid']]['event_name']);
 
-			if (!$event_name_validator->validate($trigger['event_name'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $event_name_validator->getError());
+			if ($event_name !== '') {
+				$event_name_validator = new CEventNameValidator([
+					'hostnames' => array_keys($hosts_keys),
+					'message_hostnames'
+					=> _('Only hosts referenced in problem or recovery expressions can be used in event name.')
+				]);
+
+				if (!$event_name_validator->validate($event_name)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $event_name_validator->getError());
+				}
 			}
 		}
 
