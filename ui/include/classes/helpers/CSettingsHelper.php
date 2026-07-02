@@ -243,4 +243,17 @@ class CSettingsHelper {
 	public static function isSoftwareUpdateCheckEnabled(): bool {
 		return !CWebUser::isGuest() && self::getServerStatus()['configuration']['allow_software_update_check'];
 	}
+
+	/**
+	 * Get an array of allowed URI schemes if validation is required, or null otherwise.
+	 *
+	 * @return array|null
+	 */
+	public static function getAllowedUriSchemes(): ?array {
+		if (self::get(self::VALIDATE_URI_SCHEMES) != 1) {
+			return null;
+		}
+
+		return preg_split('/\s*,\s*/', strtolower(self::get(self::URI_VALID_SCHEMES)), -1, PREG_SPLIT_NO_EMPTY);
+	}
 }

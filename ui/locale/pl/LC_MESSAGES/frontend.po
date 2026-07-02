@@ -3855,7 +3855,7 @@ msgstr "Nie można dziedziczyć prototypu reguły LLD z kluczem \"%1$s\" z szabl
 #: include/classes/api/services/CItemGeneral.php:1001
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr "Nie można dziedziczyć prototypu reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" do szablonu \"%4$s\", ponieważ prototyp reguły LLD z tym samym kluczem już należy do reguły LLD \"%5$s\"."
+msgstr "Nie można dziedziczyć prototypu reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" i reguły LLD \"%3$s\" do szablonu \"%4$s\", ponieważ prototyp reguły LLD z tym samym kluczem już należy do reguły LLD \"%5$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:926
 #, c-format

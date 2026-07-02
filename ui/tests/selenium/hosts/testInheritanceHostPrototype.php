@@ -397,6 +397,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'host_prototype' => 'Host prototype for Clone {#TEST}',
 					'discovery' => 'Discovery rule for host prototype test',
 					'cloned_name' => 'Cloned host prototype without macro',
+					'create_enabled' => true,
 					'error_inline' => [
 						'id:host' => 'This field must contain at least one low-level discovery macro.'
 					]
@@ -408,6 +409,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'host_prototype' => 'Host prototype for Clone {#TEST}',
 					'discovery' => 'Discovery rule for host prototype test',
 					'cloned_name' => ' ',
+					'create_enabled' => true,
 					'error_inline' => [
 						'id:host' => 'This field cannot be empty.'
 					]
