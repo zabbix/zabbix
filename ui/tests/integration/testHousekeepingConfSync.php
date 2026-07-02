@@ -33,6 +33,16 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	const TSDB_COMPRESSION_TABLE = 'history_uint';
 	const MAX_TSDB_POLICY_ATTEMPTS = 10;
 
+	/**
+	 * Objectid used for fake discovery/autoregistration/service events that are not tied to a real
+	 * object. A low number such as 1 must not be used here: once a real dhost/dservice with that id is
+	 * deleted elsewhere in the shared test suite, the server housekeeper purges all "events" rows with
+	 * the same source/object/objectid regardless of their age (see hk_problem_cleanup() in
+	 * housekeeper_table.c), which would wipe out these fake events prematurely. The value is kept just
+	 * below PHP_INT_MAX/the bigint column range so it can never collide with a real autoincremented id.
+	 */
+	const FAKE_OBJECTID = 9000000000000000000;
+
 	private static $proxyid = null;
 	private static $hostid = null;
 	private static $agent_ping_itemid = null;
@@ -430,28 +440,28 @@ class testHousekeepingConfSync extends CIntegrationTest {
 			[
 				'source' => EVENT_SOURCE_DISCOVERY,
 				'object' => EVENT_OBJECT_DHOST,
-				'objectid' => 1,
+				'objectid' => self::FAKE_OBJECTID,
 				'value' => 1,
 				'name' => 'Old discovery host event'
 			],
 			[
 				'source' => EVENT_SOURCE_DISCOVERY,
 				'object' => EVENT_OBJECT_DSERVICE,
-				'objectid' => 1,
+				'objectid' => self::FAKE_OBJECTID,
 				'value' => 1,
 				'name' => 'Old discovery service event'
 			],
 			[
 				'source' => EVENT_SOURCE_AUTOREGISTRATION,
 				'object' => EVENT_OBJECT_AUTOREGHOST,
-				'objectid' => 1,
+				'objectid' => self::FAKE_OBJECTID,
 				'value' => 0,
 				'name' => 'Old autoregistration event'
 			],
 			[
 				'source' => EVENT_SOURCE_SERVICE,
 				'object' => EVENT_OBJECT_SERVICE,
-				'objectid' => 1,
+				'objectid' => self::FAKE_OBJECTID,
 				'value' => 1,
 				'name' => 'Old service event'
 			]
