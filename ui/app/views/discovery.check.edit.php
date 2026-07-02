@@ -163,17 +163,16 @@ $form_grid = (new CFormGrid())
 $form
 	->addItem([
 		$form_grid,
-		(new CInput('submit', 'submit'))->addStyle('display: none;'),
-		(new CScriptTag(
-			'check_popup.init('.json_encode([
-				'rules' => $data['js_validation_rules']
-			], JSON_THROW_ON_ERROR).');
-		'))->setOnDocumentReady()
+		(new CInput('submit', 'submit'))->addStyle('display: none;')
 	]);
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => getPagePostJs().$this->readJsFile('discovery.check.edit.js.php'),
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('discovery.check.edit.js.php').
+		'check_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules']
+		], JSON_THROW_ON_ERROR).');',
 	'body' => $form->toString(),
 	'buttons' => [
 		[

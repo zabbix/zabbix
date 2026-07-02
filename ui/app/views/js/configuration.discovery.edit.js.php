@@ -90,11 +90,7 @@ window.drule_edit_popup = new class {
 		this.#overlay.$dialogue.$footer[0].querySelector('.js-delete')
 			?.addEventListener('click', () => this.#delete());
 
-		const max_sessions = this.#form_element.querySelector('#concurrency_max_type');
-
-		max_sessions.onchange = () => {
-			this.#updateForm();
-		};
+		this.#form_element.querySelector('#concurrency_max_type').addEventListener('change', () => this.#updateForm());
 
 		this.#updateForm();
 	}
@@ -106,7 +102,7 @@ window.drule_edit_popup = new class {
 			? ''
 			: 'none';
 
-		const concurrency_max_type = this.#form_element.querySelector('[name="concurrency_max_type"]:checked').value;
+		const concurrency_max_type = this.#form.findFieldByName('concurrency_max_type').getValue()
 		const concurrency_max = this.#form_element.querySelector('#concurrency_max');
 		const is_custom = concurrency_max_type == <?= ZBX_DISCOVERY_CHECKS_CUSTOM ?>;
 
@@ -150,8 +146,7 @@ window.drule_edit_popup = new class {
 			}
 		}
 
-		const dchecks_field = this.#form.findFieldByName('dchecks');
-		let dchecks = dchecks_field !== null ? dchecks_field.getValue() : {};
+		let dchecks = this.#form.findFieldByName('dchecks').getValue();
 
 		if (row !== null) {
 			const current_dcheckid = row.id.substring(row.id.indexOf('_') + 1);
@@ -265,10 +260,7 @@ window.drule_edit_popup = new class {
 				input.name_source = document.querySelector('input[name=name_source]:checked').value;
 				const checked_uniqueness_criteria = document.querySelector('input[name=uniqueness_criteria]:checked');
 
-				input.uniq = checked_uniqueness_criteria !== null
-				&& checked_uniqueness_criteria.value === input.dcheckid
-					? 1
-					: 0;
+				input.uniq = checked_uniqueness_criteria.value === input.dcheckid ? 1 : 0;
 			}
 		}
 

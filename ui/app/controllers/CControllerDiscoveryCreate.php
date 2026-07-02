@@ -22,7 +22,6 @@ class CControllerDiscoveryCreate extends CController {
 	}
 
 	public static function getValidationRules(): array {
-
 		$api_uniq = [
 			'drule.get', ['name' => '{name}']
 		];
@@ -35,8 +34,7 @@ class CControllerDiscoveryCreate extends CController {
 			],
 			'iprange' => ['db drules.iprange', 'required', 'not_empty',
 				'use' => [CIPRangeValidator::class, [
-					'parser_options' => ['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30],
-					'max' => ZBX_DISCOVERER_IPRANGE_LIMIT
+					'v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30, 'max' => ZBX_DISCOVERER_IPRANGE_LIMIT
 				]]
 			],
 			'delay' => ['db drules.delay', 'required', 'not_empty',
@@ -51,23 +49,25 @@ class CControllerDiscoveryCreate extends CController {
 				'when' => ['concurrency_max_type', 'in' => [ZBX_DISCOVERY_CHECKS_CUSTOM]]
 			],
 			'dchecks' => ['objects', 'required', 'not_empty',
-				'uniq' => ['type', 'ports', 'key_', 'snmp_community', 'snmp_oid', 'allow_redirect'],
+				'uniq' => ['type', 'ports', 'key_', 'snmp_community', 'allow_redirect'],
 				'fields' => [
 					'dcheckid' => ['db dchecks.type'],
-					'type' => ['db dchecks.type', 'required', 'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP,
-						SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c,
-						SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET
-					]],
+					'type' => ['db dchecks.type', 'required',
+						'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,
+							SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET
+						]
+					],
 					'ports' => ['db dchecks.ports', 'required', 'not_empty',
-						'use' => [CPortRangeParser::class, []],
+						'use' => [CPortRangeParser::class],
 						'when' => ['type',
 							'in' => [SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_IMAP, SVC_LDAP, SVC_NNTP, SVC_POP, SVC_SMTP,
 								SVC_SSH, SVC_TCP, SVC_TELNET, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_AGENT
-						]]
+							]
+						]
 					],
 					'key_' => [
 						['db dchecks.key_', 'required', 'not_empty',
-							'use' => [CItemKey::class, []],
+							'use' => [CItemKey::class],
 							'when' => ['type', 'in' => [SVC_AGENT]]
 						],
 						['db dchecks.key_', 'required', 'not_empty',
@@ -91,8 +91,8 @@ class CControllerDiscoveryCreate extends CController {
 						'when' => [
 							['type', 'in' => [SVC_SNMPv3]],
 							['snmpv3_securitylevel',
-								'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
-							]]
+								'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]
+							]
 						]
 					],
 					'snmpv3_privpassphrase' => ['db dchecks.snmpv3_privpassphrase', 'required', 'not_empty',
@@ -108,10 +108,10 @@ class CControllerDiscoveryCreate extends CController {
 						],
 						'when' => [
 							['type', 'in' => [SVC_SNMPv3]],
-							['snmpv3_securitylevel', 'in' => [
-								ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+							['snmpv3_securitylevel',
+								'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]
 							]
-						]]
+						]
 					],
 					'snmpv3_privprotocol' => ['db dchecks.snmpv3_privprotocol',
 						'in' => [ITEM_SNMPV3_PRIVPROTOCOL_DES, ITEM_SNMPV3_PRIVPROTOCOL_AES128,
@@ -120,8 +120,8 @@ class CControllerDiscoveryCreate extends CController {
 						],
 						'when' => [
 							['type', 'in' => [SVC_SNMPv3]],
-							['snmpv3_securitylevel', 'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]
-						]]
+							['snmpv3_securitylevel', 'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]]
+						]
 					],
 					'snmpv3_contextname' => ['db dchecks.snmpv3_contextname',
 						'when' => ['type', 'in' => [SVC_SNMPv3]]
@@ -129,9 +129,39 @@ class CControllerDiscoveryCreate extends CController {
 					'allow_redirect' => ['db dchecks.allow_redirect', 'required', 'in' => [0, 1],
 						'when' => ['type', 'in' => [SVC_ICMPPING]]
 					],
-					'uniq' => ['integer', 'in' => [0, 1]],
-					'host_source' => ['db dchecks.host_source'],
-					'name_source' => ['db dchecks.name_source']
+					'uniq' => ['boolean', 'in' => [0, 1],
+						'when' => ['type', 'in' => [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
+					],
+					'host_source' => [
+						['db dchecks.host_source',
+							'in' => [ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP]
+						],
+						['db dchecks.host_source',
+							'in' => [ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE],
+							'when' => ['type', 'in' => [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
+						]
+					],
+					'name_source' => [
+						['db dchecks.name_source',
+							'in' => [ZBX_DISCOVERY_UNSPEC, ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP]
+						],
+						['db dchecks.name_source',
+							'in' => [ZBX_DISCOVERY_UNSPEC, ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE],
+							'when' => ['type', 'in' => [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
+						]
+					]
+				],
+				'count_values' => [
+					[
+						'field_rules' => ['host_source', 'in' => [ZBX_DISCOVERY_VALUE]],
+						'max' => 1,
+						'message' => _('Only one check can be used as host name source.')
+					],
+					[
+						'field_rules' => ['name_source', 'in' => [ZBX_DISCOVERY_VALUE]],
+						'max' => 1,
+						'message' => _('Only one check can be used as visible name source.')
+					]
 				],
 				'messages' => [
 					'uniq' => _('An identical discovery check already exists for this rule.')

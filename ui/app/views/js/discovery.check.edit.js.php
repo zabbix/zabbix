@@ -114,7 +114,6 @@ window.check_popup = new class {
 	}
 
 	submit() {
-		const curl = new Curl('zabbix.php');
 		let fields = this.#form.getAllValues();
 
 		if (!('dchecks' in fields)) {
@@ -140,8 +139,7 @@ window.check_popup = new class {
 				}
 
 				this._updateFields(fields);
-				curl.setArgument('action', 'discovery.check.check');
-				this._post(curl.getUrl(), fields);
+				this._post(zabbixUrl({action: 'discovery.check.check'}), fields);
 			});
 	}
 

@@ -31,16 +31,18 @@ class CControllerDiscoveryCheckCheck extends CController {
 		return ['object', 'fields' => [
 			'dcheckid' => ['string'],
 			'dchecks' => ['string'],
-			'type' => ['db dchecks.type', 'required', 'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP,
-				SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c,
-				SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET
-			]],
+			'type' => ['db dchecks.type', 'required',
+				'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,
+					SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET
+				]
+			],
 			'ports' => ['db dchecks.ports', 'required', 'not_empty',
 				'use' => [CPortRangeParser::class, []],
 				'when' => ['type',
 					'in' => [SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_IMAP, SVC_LDAP, SVC_NNTP, SVC_POP, SVC_SMTP,
 						SVC_SSH, SVC_TCP, SVC_TELNET, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_AGENT
-					]]
+					]
+				]
 			],
 			'key_' => [
 				['db dchecks.key_', 'required', 'not_empty',
@@ -68,8 +70,8 @@ class CControllerDiscoveryCheckCheck extends CController {
 				'when' => [
 					['type', 'in' => [SVC_SNMPv3]],
 					['snmpv3_securitylevel',
-						'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
-						]]
+						'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]
+					]
 				]
 			],
 			'snmpv3_privpassphrase' => ['db dchecks.snmpv3_privpassphrase', 'required', 'not_empty',
@@ -85,10 +87,10 @@ class CControllerDiscoveryCheckCheck extends CController {
 				],
 				'when' => [
 					['type', 'in' => [SVC_SNMPv3]],
-					['snmpv3_securitylevel', 'in' => [
-						ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+					['snmpv3_securitylevel',
+						'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]
 					]
-					]]
+				]
 			],
 			'snmpv3_privprotocol' => ['db dchecks.snmpv3_privprotocol',
 				'in' => [ITEM_SNMPV3_PRIVPROTOCOL_DES, ITEM_SNMPV3_PRIVPROTOCOL_AES128,
@@ -97,8 +99,10 @@ class CControllerDiscoveryCheckCheck extends CController {
 				],
 				'when' => [
 					['type', 'in' => [SVC_SNMPv3]],
-					['snmpv3_securitylevel', 'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]
-					]]
+					['snmpv3_securitylevel',
+						'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]
+					]
+				]
 			],
 			'snmpv3_contextname' => ['db dchecks.snmpv3_contextname',
 				'when' => ['type', 'in' => [SVC_SNMPv3]]
@@ -106,8 +110,24 @@ class CControllerDiscoveryCheckCheck extends CController {
 			'allow_redirect' => ['db dchecks.allow_redirect', 'in' => [0, 1],
 				'when' => ['type', 'in' => [SVC_ICMPPING]]
 			],
-			'host_source' => ['db dchecks.host_source'],
-			'name_source' => ['db dchecks.name_source']
+			'host_source' => [
+				['db dchecks.host_source',
+					'in' => [ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP]
+				],
+				['db dchecks.host_source',
+					'in' => [ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE],
+					'when' => ['type', 'in' => [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
+				]
+			],
+			'name_source' => [
+				['db dchecks.name_source',
+					'in' => [ZBX_DISCOVERY_UNSPEC, ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP]
+				],
+				['db dchecks.name_source',
+					'in' => [ZBX_DISCOVERY_UNSPEC, ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE],
+					'when' => ['type', 'in' => [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
+				]
+			]
 		]];
 	}
 
@@ -160,16 +180,19 @@ class CControllerDiscoveryCheckCheck extends CController {
 			}
 
 			$compare_existing_dcheck = array_diff_key($existing_dcheck, array_flip($compare_exclude));
+			$is_duplicate = true;
 
 			foreach ($compare_existing_dcheck as $field => $value) {
 				if (array_key_exists($field, $compare_dcheck)
 					&& strcmp((string) $value, (string) $compare_dcheck[$field]) !== 0) {
-
-					return false;
+					$is_duplicate = false;
+					break;
 				}
 			}
 
-			return true;
+			if ($is_duplicate) {
+				return true;
+			}
 		}
 
 		return false;
@@ -227,14 +250,9 @@ class CControllerDiscoveryCheckCheck extends CController {
 	protected function doAction(): void {
 		$data = array_merge([
 			'type' => self::DEFAULT_TYPE,
-			'ports' => svc_default_port(self::DEFAULT_TYPE)
 		], $this->getInputAll());
 
 		$data['dcheckid'] = $this->getInput('dcheckid');
-
-		if ($data['type'] == SVC_ICMPPING) {
-			unset($data['ports']);
-		}
 
 		if ($data['type'] == SVC_SNMPv1 || $data['type'] == SVC_SNMPv2c || $data['type'] == SVC_SNMPv3) {
 			$data['key_'] = $data['snmp_oid'];

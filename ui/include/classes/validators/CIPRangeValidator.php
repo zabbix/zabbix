@@ -17,11 +17,26 @@
 class CIPRangeValidator extends CValidator {
 
 	/**
-	 * Options passed to CIPRangeParser.
+	 * Support for IPv6 addresses.
 	 *
-	 * @var array
+	 * @var bool
 	 */
-	public array $parser_options = [];
+	protected bool $v6 = false;
+
+	/**
+	 * Support for DNS names.
+	 *
+	 * @var bool
+	 */
+	protected bool $dns = false;
+
+	/**
+	 * Maximum value for IPv4 CIDR subnet mask notations.
+	 *
+	 * @var int
+	 */
+	protected int $max_ipv4_cidr = 30;
+
 
 	/**
 	 * Maximum allowed IP count inside the range.
@@ -30,41 +45,22 @@ class CIPRangeValidator extends CValidator {
 	 *
 	 * @var int|null
 	 */
-	public $max = null;
-
-	/**
-	 * Parser for a range of IP addresses separated by a comma.
-	 *
-	 * @var CIPRangeParser
-	 */
-	private CIPRangeParser $ip_range_parser;
-
-	public function __construct(array $options = []) {
-		if (array_key_exists('max', $options)) {
-			$this->max = $options['max'];
-		}
-		if (array_key_exists('parser_options', $options) && is_array($options['parser_options'])) {
-			$this->parser_options = $options['parser_options'];
-		}
-		else {
-			$this->parser_options = $options;
-		}
-
-		$this->ip_range_parser = new CIPRangeParser($this->parser_options);
-	}
+	protected ?int $max = null;
 
 	public function validate($value): bool {
-		if ($this->ip_range_parser->parse($value) != CParser::PARSE_SUCCESS) {
-			$this->setError($this->ip_range_parser->getError());
+		$range_parser = new CIPRangeParser(['v6' => $this->v6, 'dns' => $this->dns,
+			'max_ipv4_cidr' => $this->max_ipv4_cidr
+		]);
+
+		if ($range_parser->parse($value) != CParser::PARSE_SUCCESS) {
+			$this->setError($range_parser->getError());
 
 			return false;
 		}
 
-		$max_ip_count = $this->ip_range_parser->getMaxIPCount();
-
-		if ($this->max !== null && bccomp($max_ip_count, (string)$this->max) > 0) {
+		if ($this->max !== null && bccomp($range_parser->getMaxIPCount(), (string)$this->max) > 0) {
 			$this->setError(_s('IP range "%1$s" exceeds "%2$s" address limit',
-				$this->ip_range_parser->getMaxIPRange(),
+				$range_parser->getMaxIPRange(),
 				$this->max
 			));
 

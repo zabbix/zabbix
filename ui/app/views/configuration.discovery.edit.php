@@ -230,18 +230,7 @@ $form
 	->addItem($check_template_default)
 	->addItem($uniqueness_template)
 	->addItem($host_source_template)
-	->addItem($name_source_template)
-	->addItem(
-		(new CScriptTag('
-			drule_edit_popup.init('.json_encode([
-				'rules' => $data['js_validation_rules'],
-				'clone_rules' => $data['js_clone_validation_rules'],
-				'druleid' => $data['drule']['druleid'],
-				'dchecks' => array_values($data['drule']['dchecks']),
-				'drule' => $data['drule']
-			], JSON_THROW_ON_ERROR).');
-		'))->setOnDocumentReady()
-	);
+	->addItem($name_source_template);
 
 if ($data['drule']['druleid']) {
 	$buttons = [
@@ -283,7 +272,14 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('configuration.discovery.edit.js.php'),
+		$this->readJsFile('configuration.discovery.edit.js.php').
+		'drule_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'clone_rules' => $data['js_clone_validation_rules'],
+			'druleid' => $data['drule']['druleid'],
+			'dchecks' => array_values($data['drule']['dchecks']),
+			'drule' => $data['drule']
+		]).');',
 	'dialogue_class' => 'modal-popup-large'
 ];
 
