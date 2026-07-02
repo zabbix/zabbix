@@ -1417,7 +1417,7 @@ static void	history_add_version_info(struct zbx_json *json, zbx_history_provider
 
 			zbx_json_addobject(json, NULL);
 
-			zbx_json_addstring(json, "type", zbx_config_option_value_type_str(type_info->value_type),
+			zbx_json_addstring(json, "type", zbx_history_option_value_type_str(type_info->value_type),
 					ZBX_JSON_TYPE_STRING);
 
 			if (0 != type_info->ttl)
@@ -1642,7 +1642,7 @@ const char	*history_value_type_desc(unsigned char value_type)
  ******************************************************************************/
 int	zbx_history_value_type_from_str(const char *value_type_str)
 {
-	return zbx_config_option_value_type_from_str(value_type_str);
+	return zbx_history_option_value_type_from_str(value_type_str);
 }
 
 /******************************************************************************

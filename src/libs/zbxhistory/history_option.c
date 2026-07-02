@@ -30,7 +30,7 @@ static const char	*history_options_value_types[ITEM_VALUE_TYPE_COUNT] = {
  * Return value: description of the history value type                        *
  *                                                                            *
  ******************************************************************************/
-const char	*zbx_config_option_value_type_str(unsigned char value_type)
+const char	*zbx_history_option_value_type_str(unsigned char value_type)
 {
 	if (value_type >= ARRSIZE(history_options_value_types))
 		return "unknown";
@@ -47,7 +47,7 @@ const char	*zbx_config_option_value_type_str(unsigned char value_type)
  * Return value: value type or FAIL if unknown                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_config_option_value_type_from_str(const char *value_type_str)
+int	zbx_history_option_value_type_from_str(const char *value_type_str)
 {
 	for (int i = 0; i < (int)ARRSIZE(history_options_value_types); i++)
 	{

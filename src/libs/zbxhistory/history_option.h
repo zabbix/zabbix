@@ -41,8 +41,8 @@
 #define HISTORY_PROVIDER_OPTION_SSL_CERT_LOCATION	"ssl_cert_location"
 #define HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION	"ssl_key_location"
 
-const char	*zbx_config_option_value_type_str(unsigned char value_type);
-int		zbx_config_option_value_type_from_str(const char *value_type_str);
+const char	*zbx_history_option_value_type_str(unsigned char value_type);
+int		zbx_history_option_value_type_from_str(const char *value_type_str);
 
 int	history_provider_parse_options(const char *conf, char **name, zbx_vector_config_option_t *options,
 		char **error);
