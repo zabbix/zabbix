@@ -169,7 +169,7 @@ static int	async_check_telemetry_query_http(zbx_dc_telemetry_query_item_t *item,
 
 	lasttimestamp = item->lasttimestamp;
 
-	if (item->mtime > (int)item->lasttimestamp)
+	if ((time_t)item->mtime > item->lasttimestamp)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): setting lasttimestamp to mtime", __func__);
 		lasttimestamp = item->mtime;
