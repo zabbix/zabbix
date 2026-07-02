@@ -258,13 +258,14 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			// #0 Verify widget data that is available for user with admin role.
 			[
 				[
+					'admin' => true,
 					'user' => 'admin for system information test',
 					'password' => 'z@$$ix!#%1',
 					'available_fields' => [
 						[
 							'Parameter' => 'Zabbix server is running',
 							'Value' => 'Yes',
-							'Details' => ''
+							'Details' => 'localhost:0'
 						],
 						[
 							'Parameter' => 'Zabbix frontend version',
@@ -341,6 +342,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		return [
 			[
 				[
+					'access_to_ha_cluster' => true,
 					'user' => 'admin for system information test',
 					'password' => 'z@$$ix!#%1'
 				]
@@ -371,9 +373,10 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		// No content of the widget in High availability nodes view should be visible to User and Admin user roles.
 		$this->assertEquals('No permissions to referred object or it does not exist!', $nodes_table->getText());
 
-		// HA cluster status should not be visible to User and Admin role users.
+		// HA cluster status should be visible to Admin role users, but should not be visible to User role users.
 		$info_table = $dashboard->getWidget('System stats view')->asTable();
-		$this->assertFalse($info_table->findRow('Parameter', 'High availability cluster')->isValid());
+		$is_ha_cluster_visible = ($data['access_to_ha_cluster'] ?? false) === true;
+		$this->assertSame($is_ha_cluster_visible, $info_table->findRow('Parameter', 'High availability cluster')->isValid());
 	}
 
 	/**
