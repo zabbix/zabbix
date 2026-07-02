@@ -1917,7 +1917,7 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 		{
 			if (NULL == dc_kvs_path->last_error || 0 != strcmp(dc_kvs_path->last_error, error))
 			{
-				int	log_level = (vault_ret != NULL && FAIL == *vault_ret) ?
+				int	log_level = (NULL != vault_ret && FAIL == *vault_ret) ?
 						LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
 				zabbix_log(log_level, "cannot get secrets for path \"%s\": %s",
