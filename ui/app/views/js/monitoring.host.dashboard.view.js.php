@@ -29,13 +29,13 @@
 		#hostid;
 
 		/**
-		 * Selected dashboard ID.
-		 * @type {string}
+		 * Selected dashboard
+		 * @type {Object}
 		 */
-		#dashboardid;
+		#dashboard;
 
 		/**
-		 * @tape {Object}
+		 * @type {Object}
 		 */
 		#host_dashboards;
 
@@ -90,7 +90,7 @@
 			web_layout_mode
 		}) {
 			this.#hostid = dashboard_host.hostid;
-			this.#dashboardid = dashboard.dashboardid;
+			this.#dashboard = dashboard;
 			this.#dashboard_time_period = dashboard_time_period;
 
 			if (dashboard.pages.length > 1 || (dashboard.pages.length === 1 && dashboard.pages[0].widgets.length > 0)) {
@@ -216,7 +216,7 @@
 
 			curl.setArgument('action', 'host.dashboard.view');
 			curl.setArgument('hostid', this.#hostid);
-			curl.setArgument('dashboardid', this.#dashboardid);
+			curl.setArgument('dashboardid', this.#dashboard.dashboardid);
 
 			const state = {};
 
@@ -235,9 +235,11 @@
 				curl.setArgument('page', page);
 			}
 
+			const auto_start = this.#dashboard.auto_start === '1' ? 'on' : 'off';
+
 			slideshow = slideshow ?? url.getArgument('slideshow');
 
-			if (slideshow !== null) {
+			if (slideshow !== null && slideshow !== auto_start) {
 				curl.setArgument('slideshow', slideshow);
 			}
 
@@ -283,7 +285,7 @@
 				this.#host_dashboard_tabs.set(host_dashboard.dashboardid, tab);
 			}
 
-			this.#selected_dashboard_tab = this.#host_dashboard_tabs.get(this.#dashboardid);
+			this.#selected_dashboard_tab = this.#host_dashboard_tabs.get(this.#dashboard.dashboardid);
 			this.#selected_dashboard_tab.firstElementChild.classList.add(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
 			this.#previous_dashboard.disabled = this.#selected_dashboard_tab.previousElementSibling === null;
 			this.#next_dashboard.disabled = this.#selected_dashboard_tab.nextElementSibling === null;
@@ -311,14 +313,14 @@
 
 			this.#previous_dashboard.addEventListener('click', () => {
 				const keys = [...this.#host_dashboard_tabs.keys()];
-				const previous_dashboardid = keys[keys.indexOf(this.#dashboardid) - 1];
+				const previous_dashboardid = keys[keys.indexOf(this.#dashboard.dashboardid) - 1];
 
 				this.#selectHostDashboardTab(this.#host_dashboard_tabs.get(previous_dashboardid));
 			});
 
 			this.#next_dashboard.addEventListener('click', () => {
 				const keys = [...this.#host_dashboard_tabs.keys()];
-				const next_dashboardid = keys[keys.indexOf(this.#dashboardid) + 1];
+				const next_dashboardid = keys[keys.indexOf(this.#dashboard.dashboardid) + 1];
 
 				this.#selectHostDashboardTab(this.#host_dashboard_tabs.get(next_dashboardid));
 			});

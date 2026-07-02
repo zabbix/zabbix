@@ -215,9 +215,11 @@
 				curl.setArgument('page', page);
 			}
 
+			const auto_start = this.dashboard.auto_start === '1' ? 'on' : 'off';
+
 			slideshow = slideshow ?? url.getArgument('slideshow');
 
-			if (slideshow !== null) {
+			if (slideshow !== null && slideshow !== auto_start) {
 				curl.setArgument('slideshow', slideshow);
 			}
 

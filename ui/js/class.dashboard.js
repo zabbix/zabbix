@@ -302,6 +302,8 @@ class CDashboard {
 
 		this._slideshow_switch_time = Date.now() + timeout_ms;
 		this._slideshow_timeout_id = setTimeout(() => this._switchSlideshow(), timeout_ms);
+
+		this.fire(CDashboard.EVENT_SLIDESHOW_START);
 	}
 
 	_stopSlideshow() {
@@ -327,6 +329,8 @@ class CDashboard {
 
 		this._slideshow_switch_time = null;
 		this._slideshow_timeout_id = null;
+
+		this.fire(CDashboard.EVENT_SLIDESHOW_STOP);
 	}
 
 	_switchSlideshow() {
@@ -2357,13 +2361,9 @@ class CDashboard {
 
 				if (this._isSlideshowRunning()) {
 					this._stopSlideshow();
-
-					this.fire(CDashboard.EVENT_SLIDESHOW_STOP);
 				}
 				else {
 					this._startSlideshow();
-
-					this.fire(CDashboard.EVENT_SLIDESHOW_START);
 				}
 			},
 
