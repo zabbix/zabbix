@@ -19,42 +19,56 @@ use PHPUnit\Framework\TestCase;
 class CEventNameValidatorTest extends TestCase {
 
 	/**
-	 * @var CEventNameValidator $validator
-	 */
-	protected $validator;
-
-	protected function setUp(): void {
-		$this->validator = new CEventNameValidator();
-	}
-
-	/**
-	 * An array of e-mails, results and error messages.
+	 * An array of event names, validator options and error messages
 	 */
 	public function dataProvider() {
 		return [
-			['', true, null],
-			['Macro except expression macro are ignored {ANY_MACRO_HERE}', true, null],
-			['Incorrect macro except expression macro are ignored {ANY_MACRO_HERE_ {}', true, null],
-			['Simple expression macro {?100+1} {{?100+1}} test', true, null],
-			['Expression macro with modificator {{?100+1-(2)}.anyfunc(2)}', true, null],
-			['Macro as host name {?func(/{HOST.HOST}/item)}', true, null],
-			['Expression macro with incorrect syntax {?123++321}', false, 'incorrect expression starting from "+321}"'],
-			['Missing closing curly bracket {?123+321', false, 'unexpected end of expression macro'],
-			['{?Expression macro without closing bracket', false, 'incorrect expression starting from "Expression macro without closing bracket"'],
-			['Expression macro without closing bracket at the end of event name {?', false, 'incorrect expression starting from ""'],
-			['Nested expression macro not supported {?100+{?20+1}}', false, 'incorrect expression starting from "{?20+1}}"'],
-			['Empty expression macro {?}', false, 'incorrect expression starting from "}"'],
-			['Function value macro {FUNCTION.VALUE} {FUNCTION.VALUE1} {?{FUNCTION.VALUE}+{FUNCTION.VALUE9}}', true, null],
-			['Function value macro {FUNCTION.RECOVERY.VALUE} {FUNCTION.RECOVERY.VALUE1} {?{FUNCTION.RECOVERY.VALUE}+{FUNCTION.RECOVERY.VALUE9}}', true, null],
-			['Function value macro {{?{FUNCTION.VALUE}}.regsub("{?", "a")}{{?{FUNCTION.VALUE}}.regsub("{?", "a")}', true, null]
+			['', [], null],
+			['Macro except expression macro are ignored {ANY_MACRO_HERE}', [], null],
+			['Incorrect macro except expression macro are ignored {ANY_MACRO_HERE_ {}', [], null],
+			['Simple expression macro {?100+1} {{?100+1}} test', [], null],
+			['Expression macro with modificator {{?100+1-(2)}.anyfunc(2)}', [], null],
+			['Macro as host name {?func(/{HOST.HOST}/item)}', [], null],
+			['Expression macro with incorrect syntax {?123++321}', [], 'incorrect expression starting from "+321}"'],
+			['Missing closing curly bracket {?123+321', [], 'unexpected end of expression macro'],
+			['{?Expression macro without closing bracket',
+				[], 'incorrect expression starting from "Expression macro without closing bracket"'
+			],
+			['Expression macro without closing bracket at the end of event name {?',
+				[], 'incorrect expression starting from ""'
+			],
+			['Nested expression macro not supported {?100+{?20+1}}',
+				[], 'incorrect expression starting from "{?20+1}}"'
+			],
+			['Empty expression macro {?}', [], 'incorrect expression starting from "}"'],
+			['Function value macro {FUNCTION.VALUE} {FUNCTION.VALUE1} {?{FUNCTION.VALUE}+{FUNCTION.VALUE9}}',
+				[], null
+			],
+			['Function value macro {FUNCTION.RECOVERY.VALUE} {FUNCTION.RECOVERY.VALUE1} {?{FUNCTION.RECOVERY.VALUE}+{FUNCTION.RECOVERY.VALUE9}}',
+				[], null
+			],
+			['Function value macro {{?{FUNCTION.VALUE}}.regsub("{?", "a")}{{?{FUNCTION.VALUE}}.regsub("{?", "a")}',
+				[], null
+			],
+			['test {?last(/Zabbix server/zabbix[wcache,index,pused])}', ['hostnames' => ['Zabbix server']], null],
+			['test {?last(/{HOST.HOST}/zabbix[wcache,index,pused])}', ['hostnames' => ['Zabbix server']], null],
+			['test {?last(/Zabbix server/zabbix[wcache,index,pused])}',
+				['hostnames' => ['Zabbix server2']], 'host "Zabbix server" is not allowed in event name'
+			],
+			['test {?last(/Zabbix server/zabbix[wcache,index,pused])}',
+				['hostnames' => ['Zabbix server2'], 'message_hostnames' => 'custom message'], 'custom message'
+			]
 		];
 	}
 
 	/**
 	 * @dataProvider dataProvider
 	 */
-	public function testValidateEmail($event_name, $expected, $error) {
-		$this->assertSame($this->validator->validate($event_name), $expected);
-		$this->assertSame($error, $this->validator->getError());
+	public function testEventNameValidator($event_name, $options, $expected_error): void {
+		$validator = new CEventNameValidator($options);
+
+		$expected_result = $expected_error === null;
+		$this->assertEquals($expected_result, $validator->validate($event_name));
+		$this->assertSame($expected_error, $validator->getError());
 	}
 }

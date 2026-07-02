@@ -2023,8 +2023,10 @@ abstract class CTriggerGeneral extends CApiService {
 
 		foreach ($triggers as $trigger) {
 			$expressions_changed = ($db_triggers === null
-				|| ($trigger['expression'] !== $db_triggers[$trigger['triggerid']]['expression']
-				|| $trigger['recovery_expression'] !== $db_triggers[$trigger['triggerid']]['recovery_expression']));
+				|| $trigger['expression'] !== $db_triggers[$trigger['triggerid']]['expression']
+				|| $trigger['recovery_expression'] !== $db_triggers[$trigger['triggerid']]['recovery_expression']
+				|| $trigger['event_name'] !== $db_triggers[$trigger['triggerid']]['event_name']
+			);
 
 			if (!$expressions_changed) {
 				continue;
@@ -2061,6 +2063,16 @@ abstract class CTriggerGeneral extends CApiService {
 					'value_type' => null,
 					'flags' => null
 				];
+			}
+
+			$event_name_validator = new CEventNameValidator([
+				'hostnames' => array_keys($hosts_keys),
+				'message_hostnames'
+					=> _('Only hosts referenced in problem or recovery expressions can be used in event name.'),
+			]);
+
+			if (!$event_name_validator->validate($trigger['event_name'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $event_name_validator->getError());
 			}
 		}
 
