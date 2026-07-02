@@ -6698,6 +6698,9 @@ div.dashboard-widget-map .sysmap-widget-container {
         fill: #4a4a4a;
         stroke: #383838;
         stroke-width: 1px; }
+    div.dashboard-widget-map .sysmap-widget-container svg .map-elements rect {
+      rx: var(--overlay-border-radius);
+      ry: var(--overlay-border-radius); }
 div.dashboard-widget-map .btn-back-map-container {
   text-align: left;
   position: absolute;

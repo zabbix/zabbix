@@ -19,6 +19,11 @@ div.dashboard-widget-map {
 						stroke-width: 1px;
 					}
 				}
+
+				rect {
+					rx: var(--overlay-border-radius);
+					ry: var(--overlay-border-radius);
+				}
 			}
 		}
 	}
