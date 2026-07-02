@@ -2144,18 +2144,18 @@ class CHost extends CHostGeneral {
 	}
 
 	private function checkProxiesAndProxyGroupsAccessibility(array $hosts, array $db_hosts): void {
+		$monitored_by_upd = [];
 		$proxyids = [];
 		$proxy_groupids = [];
-		$monitored_by_upd = false;
 
-		foreach ($hosts as $i => $host) {
+		foreach ($hosts as $host) {
 			if ($db_hosts !== null && $db_hosts[$host['hostid']]['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
 				continue;
 			}
 
 			if (array_key_exists('monitored_by', $host)) {
 				if (bccomp($host['monitored_by'], (int) $db_hosts[$host['hostid']]['monitored_by']) ) {
-					$monitored_by_upd = true;
+					$monitored_by_upd[$host['hostid']] = true;
 				}
 			}
 
@@ -2182,45 +2182,52 @@ class CHost extends CHostGeneral {
 					$proxy_groupids[$host['hostid']] = (int) $host['proxy_groupid'];
 				}
 			}
+		}
 
-			if ($proxyids) {
-				$accessible_proxy = API::Proxy()->get([
-					'output' => [],
-					'proxyids' => $proxyids,
-					'preservekeys' => true
-				]);
+		$accessible_proxy = [];
+		$accessible_proxy_group = [];
 
-				if (!$accessible_proxy) {
-					$field = $monitored_by_upd
-						? 'monitored_by'
-						: 'proxyid';
+		if ($proxyids) {
+			$accessible_proxy = API::Proxy()->get([
+				'output' => [],
+				'proxyids' => $proxyids,
+				'preservekeys' => true
+			]);
+		}
 
-					$path = '/'.($i + 1).'/'.$field;
+		if ($proxy_groupids) {
+			$accessible_proxy_group = API::ProxyGroup()->get([
+				'output' => [],
+				'proxy_groupids' => $proxy_groupids,
+				'preservekeys' => true
+			]);
+		}
 
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',$path,
-						_("parameter is readonly while you don't have permission to current proxy")
-					));
-				}
+		foreach ($hosts as $i => $host) {
+			if (array_key_exists($host['hostid'], $proxyids)
+					&& !array_key_exists($proxyids[$host['hostid']], $accessible_proxy)) {
+				$field = !empty($monitored_by_upd[$host['hostid']])
+					? 'monitored_by'
+					: 'proxyid';
+
+				$path = '/'.($i + 1).'/'.$field;
+
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',$path,
+					_("parameter is readonly while you don't have permission to current proxy")
+				));
 			}
 
-			if ($proxy_groupids) {
-				$accessible_proxy_group = API::ProxyGroup()->get([
-					'output' => [],
-					'proxy_groupids' => $proxy_groupids,
-					'preservekeys' => true
-				]);
+			if (array_key_exists($host['hostid'], $proxy_groupids)
+					&& !array_key_exists($proxy_groupids[$host['hostid']], $accessible_proxy_group)) {
+				$field = !empty($monitored_by_upd[$host['hostid']])
+					? 'monitored_by'
+					: 'proxy_groupid';
 
-				if (!$accessible_proxy_group) {
-					$field = $monitored_by_upd
-						? 'monitored_by'
-						: 'proxy_groupid';
+				$path = '/'.($i + 1).'/'.$field;
 
-					$path = '/'.($i + 1).'/'.$field;
-
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',$path,
-						_("parameter is readonly while you don't have permission to current proxy group")
-					));
-				}
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',$path,
+					_("parameter is readonly while you don't have permission to current proxy group")
+				));
 			}
 		}
 	}
