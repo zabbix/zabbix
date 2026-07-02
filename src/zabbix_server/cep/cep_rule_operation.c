@@ -31,6 +31,13 @@ static int	cep_acknowledge_is_set(zbx_cep_acknowledge_t *ack)
 	return (0 == ack->json.buffer_size ? FAIL : SUCCEED);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize an acknowledge if it has not already been initialized  *
+ *                                                                            *
+ * Parameters: ack - [IN/OUT] acknowledge                                     *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_acknowledge_init(zbx_cep_acknowledge_t *ack)
 {
 	if (SUCCEED != cep_acknowledge_is_set(ack))
@@ -40,11 +47,28 @@ static void	cep_acknowledge_init(zbx_cep_acknowledge_t *ack)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free resources allocated by an acknowledge                        *
+ *                                                                            *
+ * Parameters: ack - [IN/OUT] acknowledge                                     *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_acknowledge_clear(zbx_cep_acknowledge_t *ack)
 {
 	zbx_json_free(&ack->json);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: open a new operation entry in an acknowledge, initializing the    *
+ *          acknowledge if necessary                                          *
+ *                                                                            *
+ * Parameters: ack     - [IN/OUT] acknowledge                                 *
+ *             op      - [IN] operation type                                  *
+ *             details - [IN] name of the details object to open              *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_acknowledge_open(zbx_cep_acknowledge_t *ack, int op, const char *details)
 {
 	cep_acknowledge_init(ack);
@@ -54,6 +78,16 @@ static void	cep_acknowledge_open(zbx_cep_acknowledge_t *ack, int op, const char 
 	zbx_json_addobject(&ack->json, details);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add a detail entry to an acknowledge                              *
+ *                                                                            *
+ * Parameters: ack       - [IN/OUT] acknowledge                               *
+ *             detail    - [IN] detail name                                   *
+ *             old_value - [IN] old value, can be NULL                        *
+ *             new_value - [IN] new value, can be NULL                        *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_acknowledge_add_detail(zbx_cep_acknowledge_t *ack, const char *detail, const char *old_value,
 		const char *new_value)
 {
@@ -73,12 +107,26 @@ static void	cep_acknowledge_add_detail(zbx_cep_acknowledge_t *ack, const char *d
 		zbx_json_addstring(&ack->json, detail, new_value, ZBX_JSON_TYPE_STRING);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: close an operation entry in an acknowledge                        *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_acknowledge_close(zbx_cep_acknowledge_t *ack)
 {
 	zbx_json_close(&ack->json);
 	zbx_json_close(&ack->json);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add an operation entry to an acknowledge, initializing it if      *
+ *          necessary                                                         *
+ *                                                                            *
+ * Parameters: ack - [IN/OUT] acknowledge                                     *
+ *             op  - [IN] operation type                                      *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_acknowledge_update(zbx_cep_acknowledge_t *ack, int op)
 {
 	cep_acknowledge_init(ack);
@@ -87,6 +135,16 @@ static void	cep_acknowledge_update(zbx_cep_acknowledge_t *ack, int op)
 	zbx_json_close(&ack->json);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add a severity change entry to an acknowledge                     *
+ *                                                                            *
+ * Parameters: ack       - [IN/OUT] acknowledge                               *
+ *             op        - [IN] operation type                                *
+ *             old_value - [IN] old severity                                  *
+ *             new_value - [IN] new severity                                  *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_acknowledge_update_severity(zbx_cep_acknowledge_t *ack, int op, int old_value, int new_value)
 {
 	cep_acknowledge_open(ack, op, "severity");
@@ -95,6 +153,16 @@ static void	cep_acknowledge_update_severity(zbx_cep_acknowledge_t *ack, int op, 
 	cep_acknowledge_close(ack);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add a name change entry to an acknowledge                         *
+ *                                                                            *
+ * Parameters: ack       - [IN/OUT] acknowledge                               *
+ *             op        - [IN] operation type                                *
+ *             old_value - [IN] old name                                      *
+ *             new_value - [IN] new name                                      *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_acknowledge_update_name(zbx_cep_acknowledge_t *ack, int op, const char *old_value,
 		const char *new_value)
 {
@@ -104,6 +172,18 @@ static void	cep_acknowledge_update_name(zbx_cep_acknowledge_t *ack, int op, cons
 	cep_acknowledge_close(ack);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add a tag change entry to an acknowledge                          *
+ *                                                                            *
+ * Parameters: oplog     - [IN/OUT] acknowledge                               *
+ *             op        - [IN] operation type                                *
+ *             old_tag   - [IN] old tag name, can be NULL                     *
+ *             old_value - [IN] old tag value, can be NULL                    *
+ *             new_tag   - [IN] new tag name, can be NULL                     *
+ *             new_value - [IN] new tag value, can be NULL                    *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_acknowledge_update_tag(zbx_cep_acknowledge_t *oplog, int op, const char *old_tag,
 		const char *old_value, const char *new_tag, const char *new_value)
 {
@@ -113,6 +193,14 @@ void	cep_acknowledge_update_tag(zbx_cep_acknowledge_t *oplog, int op, const char
 	cep_acknowledge_close(oplog);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add a set-cause entry to an acknowledge                           *
+ *                                                                            *
+ * Parameters: oplog         - [IN/OUT] acknowledge                           *
+ *             cause_eventid - [IN] identifier of the cause event             *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_acknowledge_set_cause(zbx_cep_acknowledge_t *oplog, zbx_uint64_t cause_eventid)
 {
 	cep_acknowledge_open(oplog, ZBX_CEP_OP_SET_CAUSE, "cause");
@@ -148,6 +236,20 @@ static int	cep_operation_event_execute_set_name(const zbx_cep_operation_t *op, z
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a set-name operation on an event context's event          *
+ *                                                                            *
+ * Parameters: op    - [IN] operation to execute                              *
+ *             ctx   - [IN/OUT] event context                                 *
+ *             ack   - [IN/OUT] acknowledge                                   *
+ *             event - [IN/OUT] resolved mutable event, resolved from ctx if  *
+ *                     not already set                                        *
+ *                                                                            *
+ * Return value: SUCCEED - the event name was updated                         *
+ *               FAIL - the event could not be resolved                       *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_operation_event_execute_set_severity(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_acknowledge_t *ack, zbx_cep_event_t **event)
 {
@@ -171,6 +273,22 @@ static int	cep_operation_event_execute_set_severity(const zbx_cep_operation_t *o
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute an increase-severity operation on an event context's      *
+ *          event                                                             *
+ *                                                                            *
+ * Parameters: op    - [IN] operation to execute                              *
+ *             ctx   - [IN/OUT] event context                                 *
+ *             ack   - [IN/OUT] acknowledge                                   *
+ *             event - [IN/OUT] resolved mutable event, resolved from ctx if  *
+ *                     not already set                                        *
+ *                                                                            *
+ * Return value: SUCCEED - the event severity was increased                   *
+ *               FAIL - the event could not be resolved, or its severity is   *
+ *                      already at the maximum                                *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_operation_event_execute_increase_severity(const zbx_cep_operation_t *op,
 		zbx_cep_event_context_t *ctx, zbx_cep_acknowledge_t *ack, zbx_cep_event_t **event)
 {
@@ -197,6 +315,22 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a decrease-severity operation on an event context's       *
+ *          event                                                             *
+ *                                                                            *
+ * Parameters: op    - [IN] operation to execute                              *
+ *             ctx   - [IN/OUT] event context                                 *
+ *             ack   - [IN/OUT] acknowledge                                   *
+ *             event - [IN/OUT] resolved mutable event, resolved from ctx if  *
+ *                     not already set                                        *
+ *                                                                            *
+ * Return value: SUCCEED - the event severity was decreased                   *
+ *               FAIL - the event could not be resolved, or its severity is   *
+ *                      already at the minimum                                *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_operation_event_execute_decrease_severity(const zbx_cep_operation_t *op,
 		zbx_cep_event_context_t *ctx, zbx_cep_acknowledge_t *ack, zbx_cep_event_t **event)
 {
@@ -213,7 +347,7 @@ static int	cep_operation_event_execute_decrease_severity(const zbx_cep_operation
 			goto out;
 
 		cep_acknowledge_update_severity(ack, op->type, (*event)->severity, (*event)->severity - 1);
-		(*event)->severity++;
+		(*event)->severity--;
 		ctx->sync_flags |= CEP_SYNC_EVENT_SEVERITY;
 		ret = SUCCEED;
 	}
@@ -223,6 +357,22 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a suppress-event operation on an event context's event    *
+ *                                                                            *
+ * Parameters: ruleid - [IN] identifier of the rule the operation belongs to  *
+ *             op     - [IN] operation to execute                             *
+ *             ctx    - [IN/OUT] event context                                *
+ *             ack    - [IN/OUT] acknowledge                                  *
+ *             event  - [IN/OUT] resolved mutable event, resolved from ctx    *
+ *                      if not already set                                    *
+ *                                                                            *
+ * Return value: SUCCEED - the suppress entry was added                       *
+ *               FAIL - the suppress operation has already expired, or the    *
+ *                      event could not be resolved                           *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_operation_event_execute_suppress_event(zbx_uint64_t ruleid, const zbx_cep_operation_t *op,
 		zbx_cep_event_context_t *ctx, zbx_cep_acknowledge_t *ack, zbx_cep_event_t **event)
 {
@@ -258,29 +408,55 @@ static char	*cep_str_detach(char **src)
 	return str;
 }
 
-static zbx_tag_t	cep_event_tag_copy(zbx_cep_event_context_t *ctx, const char *tag, const char *value)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create a tag with macros resolved using an event context          *
+ *                                                                            *
+ * Parameters: ctx   - [IN/OUT] event context                                 *
+ *             name  - [IN] tag name, can be NULL                             *
+ *             value - [IN] tag value, can be NULL                            *
+ *                                                                            *
+ * Return value: the created tag                                              *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_tag_t	cep_event_tag_create(zbx_cep_event_context_t *ctx, const char *name, const char *value)
 {
-	zbx_tag_t	copy;
+	zbx_tag_t	tag;
 
-	if (NULL != tag)
+	if (NULL != name)
 	{
-		copy.tag = zbx_strdup(NULL, tag);
-		cep_event_context_resolve_tag_macros(ctx, &copy.tag);
+		tag.tag = zbx_strdup(NULL, name);
+		cep_event_context_resolve_tag_macros(ctx, &tag.tag);
 	}
 	else
-		copy.tag = NULL;
+		tag.tag = NULL;
 
 	if (NULL != value)
 	{
-		copy.value = zbx_strdup(NULL, value);
-		cep_event_context_resolve_tag_macros(ctx, &copy.value);
+		tag.value = zbx_strdup(NULL, value);
+		cep_event_context_resolve_tag_macros(ctx, &tag.value);
 	}
 	else
-		copy.value = NULL;
+		tag.value = NULL;
 
-	return copy;
+	return tag;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute an add-tag operation on an event context's event          *
+ *                                                                            *
+ * Parameters: op    - [IN] operation to execute                              *
+ *             ctx   - [IN/OUT] event context                                 *
+ *             ack   - [IN/OUT] acknowledge                                   *
+ *             event - [IN/OUT] resolved mutable event, resolved from ctx if  *
+ *                     not already set                                        *
+ *                                                                            *
+ * Return value: SUCCEED - the tag was added                                  *
+ *               FAIL - the event could not be resolved, or a tag with the    *
+ *                      same name and value already exists                    *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_operation_event_add_tag(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_acknowledge_t *ack, zbx_cep_event_t **event)
 {
@@ -292,7 +468,7 @@ static int	cep_operation_event_add_tag(const zbx_cep_operation_t *op, zbx_cep_ev
 	if (NULL == *event && NULL == (*event = cep_event_context_get_mutable_event(ctx)))
 		goto out;
 
-	tag = cep_event_tag_copy(ctx, op->args.add_tag.tag, op->args.add_tag.value);
+	tag = cep_event_tag_create(ctx, op->args.add_tag.tag, op->args.add_tag.value);
 
 	if (SUCCEED == cep_event_validate_tag(*event, tag.tag, tag.value, NULL))
 	{
@@ -310,6 +486,24 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a set-tag operation on an event context's event           *
+ *                                                                            *
+ * Parameters: op    - [IN] operation to execute                              *
+ *             ctx   - [IN/OUT] event context                                 *
+ *             ack   - [IN/OUT] acknowledge                                   *
+ *             event - [IN/OUT] resolved mutable event, resolved from ctx if  *
+ *                     not already set                                        *
+ *                                                                            *
+ * Return value: SUCCEED - the tag was added or updated                       *
+ *               FAIL - the event could not be resolved, or a tag with the    *
+ *                      same name and value already exists                    *
+ *                                                                            *
+ * Comments: If no tag with the given name exists, a new tag is added.        *
+ *           Otherwise the existing tag's value is updated.                   *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_operation_event_set_tag(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_acknowledge_t *ack, zbx_cep_event_t **event)
 {
@@ -321,7 +515,7 @@ static int	cep_operation_event_set_tag(const zbx_cep_operation_t *op, zbx_cep_ev
 	if (NULL == *event && NULL == (*event = cep_event_context_get_mutable_event(ctx)))
 		goto out;
 
-	tag = cep_event_tag_copy(ctx, op->args.set_tag.tag, op->args.set_tag.value);
+	tag = cep_event_tag_create(ctx, op->args.set_tag.tag, op->args.set_tag.value);
 
 	if (SUCCEED == cep_event_validate_tag(*event, tag.tag, tag.value, &index))
 	{
@@ -351,6 +545,22 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a set-tag-value operation on an event context's event     *
+ *                                                                            *
+ * Parameters: op    - [IN] operation to execute                              *
+ *             ctx   - [IN/OUT] event context                                 *
+ *             ack   - [IN/OUT] acknowledge                                   *
+ *             event - [IN/OUT] resolved mutable event, resolved from ctx if  *
+ *                     not already set                                        *
+ *                                                                            *
+ * Return value: SUCCEED - the tag value was updated                          *
+ *               FAIL - the event could not be resolved, or no tag with the   *
+ *                      given name exists, or a tag with the same name and    *
+ *                      value already exists                                  *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_operation_event_set_tag_value(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_acknowledge_t *ack, zbx_cep_event_t **event)
 {
@@ -362,7 +572,7 @@ static int	cep_operation_event_set_tag_value(const zbx_cep_operation_t *op, zbx_
 	if (NULL == *event && NULL == (*event = cep_event_context_get_mutable_event(ctx)))
 		goto out;
 
-	tag = cep_event_tag_copy(ctx, op->args.set_tag_value.tag, op->args.set_tag_value.value);
+	tag = cep_event_tag_create(ctx, op->args.set_tag_value.tag, op->args.set_tag_value.value);
 
 	if (SUCCEED == cep_event_validate_tag(*event, tag.tag, tag.value, &index))
 	{
@@ -385,6 +595,23 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute an increase-tag-value operation on an event context's     *
+ *          event                                                             *
+ *                                                                            *
+ * Parameters: op    - [IN] operation to execute                              *
+ *             ctx   - [IN/OUT] event context                                 *
+ *             ack   - [IN/OUT] acknowledge                                   *
+ *             event - [IN/OUT] resolved mutable event, resolved from ctx if  *
+ *                     not already set                                        *
+ *                                                                            *
+ * Return value: SUCCEED - the tag value was incremented                      *
+ *               FAIL - the event could not be resolved, no tag with the      *
+ *                      given name exists, or its value could not be          *
+ *                      incremented                                           *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_operation_event_increase_tag_value(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_acknowledge_t *ack, zbx_cep_event_t **event)
 {
@@ -396,7 +623,7 @@ static int	cep_operation_event_increase_tag_value(const zbx_cep_operation_t *op,
 	if (NULL == *event && NULL == (*event = cep_event_context_get_mutable_event(ctx)))
 		goto out;
 
-	tag = cep_event_tag_copy(ctx, op->args.increase_tag_value.tag, NULL);
+	tag = cep_event_tag_create(ctx, op->args.increase_tag_value.tag, NULL);
 
 	if (FAIL != (index = cep_event_find_tag(*event, tag.tag)))
 	{
@@ -421,6 +648,23 @@ out:
 
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a decrease-tag-value operation on an event context's      *
+ *          event                                                             *
+ *                                                                            *
+ * Parameters: op    - [IN] operation to execute                              *
+ *             ctx   - [IN/OUT] event context                                 *
+ *             ack   - [IN/OUT] acknowledge                                   *
+ *             event - [IN/OUT] resolved mutable event, resolved from ctx if  *
+ *                     not already set                                        *
+ *                                                                            *
+ * Return value: SUCCEED - the tag value was decremented                      *
+ *               FAIL - the event could not be resolved, no tag with the      *
+ *                      given name exists, or its value could not be          *
+ *                      decremented                                           *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_operation_event_decrease_tag_value(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_acknowledge_t *ack, zbx_cep_event_t **event)
 {
@@ -432,7 +676,7 @@ static int	cep_operation_event_decrease_tag_value(const zbx_cep_operation_t *op,
 	if (NULL == *event && NULL == (*event = cep_event_context_get_mutable_event(ctx)))
 		goto out;
 
-	tag = cep_event_tag_copy(ctx, op->args.decrease_tag_value.tag, NULL);
+	tag = cep_event_tag_create(ctx, op->args.decrease_tag_value.tag, NULL);
 
 	if (FAIL != (index = cep_event_find_tag(*event, tag.tag)))
 	{
@@ -456,6 +700,22 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a rename-tag operation on an event context's event        *
+ *                                                                            *
+ * Parameters: op    - [IN] operation to execute                              *
+ *             ctx   - [IN/OUT] event context                                 *
+ *             ack   - [IN/OUT] acknowledge                                   *
+ *             event - [IN/OUT] resolved mutable event, resolved from ctx if  *
+ *                     not already set                                        *
+ *                                                                            *
+ * Return value: SUCCEED - the tag was renamed                                *
+ *               FAIL - the event could not be resolved, no tag with the old  *
+ *                      name exists, or a tag with the new name and the       *
+ *                      existing tag's value already exists                   *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_operation_event_rename_tag(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_acknowledge_t *ack, zbx_cep_event_t **event)
 {
@@ -468,7 +728,7 @@ static int	cep_operation_event_rename_tag(const zbx_cep_operation_t *op, zbx_cep
 		goto out;
 
 	/* resolve new tag name into tag.value */
-	tag = cep_event_tag_copy(ctx, op->args.rename_tag.old_tag, op->args.rename_tag.new_tag);
+	tag = cep_event_tag_create(ctx, op->args.rename_tag.old_tag, op->args.rename_tag.new_tag);
 
 	if (FAIL != (index = cep_event_find_tag(*event, tag.tag)))
 	{
@@ -491,6 +751,21 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a remove-tag operation on an event context's event        *
+ *                                                                            *
+ * Parameters: op    - [IN] operation to execute                              *
+ *             ctx   - [IN/OUT] event context                                 *
+ *             ack   - [IN/OUT] acknowledge                                   *
+ *             event - [IN/OUT] resolved mutable event, resolved from ctx if  *
+ *                     not already set                                        *
+ *                                                                            *
+ * Return value: SUCCEED - the tag was removed                                *
+ *               FAIL - the event could not be resolved, or no tag with the   *
+ *                      given name exists                                     *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_operation_event_remove_tag(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_acknowledge_t *ack, zbx_cep_event_t **event)
 {
@@ -502,7 +777,7 @@ static int	cep_operation_event_remove_tag(const zbx_cep_operation_t *op, zbx_cep
 	if (NULL == *event && NULL == (*event = cep_event_context_get_mutable_event(ctx)))
 		goto out;
 
-	tag = cep_event_tag_copy(ctx, op->args.remove_tag.tag, NULL);
+	tag = cep_event_tag_create(ctx, op->args.remove_tag.tag, NULL);
 
 	if (FAIL != (index = cep_event_find_tag(*event, tag.tag)))
 	{
@@ -522,6 +797,23 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a copy operation, creating a copied event task from an    *
+ *          event context's event                                             *
+ *                                                                            *
+ * Parameters: op    - [IN] operation to execute                              *
+ *             ctx   - [IN] event context                                     *
+ *             pos   - [IN] position the operation applies to                 *
+ *             ack   - [IN/OUT] acknowledge                                   *
+ *             tasks - [OUT] vector to append the created event task to       *
+ *                                                                            *
+ * Return value: SUCCEED - the copy task was created                          *
+ *               FAIL - the context's position does not match pos, the        *
+ *                      event could not be resolved, or the db event could    *
+ *                      not be created                                        *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_operation_event_copy(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx,
 		zbx_cep_event_pos_t pos, zbx_cep_acknowledge_t *ack, zbx_vector_mw_task_ptr_t *tasks)
 {
@@ -558,6 +850,18 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create a close-event task for an event context's event            *
+ *                                                                            *
+ * Parameters: ruleid - [IN] identifier of the rule closing the event         *
+ *             ctx    - [IN] event context                                    *
+ *             tasks  - [OUT] vector to append the created task to            *
+ *                                                                            *
+ * Return value: SUCCEED - the close task was created                         *
+ *               FAIL - the event could not be resolved                       *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_operation_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_context_t *ctx,
 		zbx_vector_mw_task_ptr_t *tasks)
 {
@@ -586,6 +890,27 @@ static int	cep_operation_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a valid operation on a matching event                     *
+ *                                                                            *
+ * Parameters: op           - [IN] operation to execute                       *
+ *             execute_when - [IN] execution phase                            *
+ *             ruleid       - [IN] identifier of the rule the operation       *
+ *                            belongs to                                      *
+ *             ctx          - [IN/OUT] event context                          *
+ *             ack          - [IN/OUT] acknowledge                            *
+ *             tasks        - [OUT] vector to append tasks created by the     *
+ *                            operation to                                    *
+ *             event        - [IN/OUT] resolved mutable event, resolved and   *
+ *                            reused across calls as operations execute       *
+ *                                                                            *
+ * Return value: SUCCEED - the operation was executed, or does not apply at   *
+ *                         execute_when                                       *
+ *               FAIL - the operation did not match ctx, or its execution     *
+ *                      failed                                                *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_operation_event_execute(const zbx_cep_operation_t *op, int execute_when, zbx_uint64_t ruleid,
 		zbx_cep_event_context_t *ctx, zbx_cep_acknowledge_t *ack, zbx_vector_mw_task_ptr_t *tasks,
 		zbx_cep_event_t **event)
@@ -682,6 +1007,22 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a rule's operations that apply at a given execution       *
+ *          phase against an event context                                    *
+ *                                                                            *
+ * Parameters: rule         - [IN] rule whose operations are executed         *
+ *             execute_when - [IN] execution phase                            *
+ *             ctx          - [IN/OUT] event context                          *
+ *             event        - [IN/OUT] resolved mutable event, resolved and   *
+ *                            reused across operations                        *
+ *             tasks        - [OUT] vector to append tasks created by         *
+ *                            operations to                                   *
+ *                                                                            *
+ * Return value: bitmask of the types of operations successfully executed     *
+ *                                                                            *
+ ******************************************************************************/
 zbx_uint64_t	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_cep_event_context_t *ctx,
 		zbx_cep_event_t **event, zbx_vector_mw_task_ptr_t *tasks)
 {
@@ -716,6 +1057,19 @@ zbx_uint64_t	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_
 	return opmask;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check whether a rule has a matching close-window operation at a   *
+ *          given execution phase                                             *
+ *                                                                            *
+ * Parameters: rule         - [IN] rule whose operations are checked          *
+ *             execute_when - [IN] execution phase                            *
+ *             ctx          - [IN] event context                              *
+ *                                                                            *
+ * Return value: close window operation flag if window must be closed, 0      *
+ *               otherwise                                                    *
+ *                                                                            *
+ ******************************************************************************/
 zbx_uint64_t	cep_rule_event_execute_close_window(const zbx_cep_rule_t *rule, int execute_when,
 		zbx_cep_event_context_t *ctx)
 {
@@ -744,6 +1098,23 @@ zbx_uint64_t	cep_rule_event_execute_close_window(const zbx_cep_rule_t *rule, int
 	return opmask;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a rule's operations against an event context, syncing     *
+ *          the event if it was modified                                      *
+ *                                                                            *
+ * Parameters: rule         - [IN] rule whose operations are executed         *
+ *             ctx          - [IN/OUT] event context                          *
+ *             execute_when - [IN] execution phase                            *
+ *             tasks        - [OUT] vector to append tasks created by the     *
+ *                            operations to                                   *
+ *                                                                            *
+ * Return value: bitmask of the types of operations successfully executed     *
+ *                                                                            *
+ * Comments: If an operation resolved a mutable event, the event handle is    *
+ *           updated to reference it and a sync task is created.              *
+ *                                                                            *
+ ******************************************************************************/
 zbx_uint64_t	cep_rule_event_context_execute_ops(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
 		int execute_when, zbx_vector_mw_task_ptr_t *tasks)
 {
@@ -772,6 +1143,20 @@ zbx_uint64_t	cep_rule_event_context_execute_ops(const zbx_cep_rule_t *rule, zbx_
 	return opmask;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute the operations of multiple matched rules against an       *
+ *          event context at a given execution phase                          *
+ *                                                                            *
+ * Parameters: matched_rules     - [IN] array of matched rules                *
+ *             matched_rules_num - [IN] number of matched rules               *
+ *             execute_when      - [IN] execution phase                       *
+ *             ctx               - [IN/OUT] event context                     *
+ *             event             - [IN/OUT] resolved mutable event            *
+ *             tasks             - [OUT] vector to append tasks created by    *
+ *                                 the operations to                          *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_event_execute_ops(const zbx_cep_rule_t **matched_rules, int matched_rules_num, int execute_when,
 		zbx_cep_event_context_t *ctx, zbx_cep_event_t **event, zbx_vector_mw_task_ptr_t *tasks)
 {
@@ -779,6 +1164,19 @@ void	cep_event_execute_ops(const zbx_cep_rule_t **matched_rules, int matched_rul
 		(void)cep_rule_event_execute_ops(matched_rules[i], execute_when, ctx, event, tasks);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add an event to the windows of matched rules                      *
+ *                                                                            *
+ * Parameters: ctx               - [IN/OUT] event context                     *
+ *             matched_rules     - [IN] array of matched rules                *
+ *             matched_rules_num - [IN] number of matched rules               *
+ *             tasks             - [OUT] vector to append tasks created       *
+ *                                 while processing the event to              *
+ *                                                                            *
+ * Comments: Rules without a window are skipped.                              *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_event_add_to_rules(zbx_cep_event_context_t *ctx, const zbx_cep_rule_t **matched_rules,
 		int matched_rules_num, zbx_vector_mw_task_ptr_t *tasks)
 {

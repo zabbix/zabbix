@@ -21,8 +21,19 @@
 #include "zbxdbhigh.h"
 #include "zbxdbwrap.h"
 
-void	cep_event_clear(zbx_cep_event_t *event)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: release a reference to a cep event, freeing it once the last      *
+ *          reference is released                                             *
+ *                                                                            *
+ * Parameters: event - [IN] event to release                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_cep_event_release(zbx_cep_event_t *event)
 {
+	if (1 != atomic_fetch_sub(&event->refcount, 1))
+		return;
+
 	if (NULL != event->r_event)
 		zbx_cep_event_release(event->r_event);
 
@@ -36,17 +47,30 @@ void	cep_event_clear(zbx_cep_event_t *event)
 	zbx_vector_db_event_suppress_destroy(&event->suppress);
 
 	zbx_free(event->name);
-}
-
-void	zbx_cep_event_release(zbx_cep_event_t *event)
-{
-	if (1 != atomic_fetch_sub(&event->refcount, 1))
-		return;
-
-	cep_event_clear(event);
 	zbx_free(event);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create an  event                                                  *
+ *                                                                            *
+ * Parameters: eventid       - [IN] event identifier                          *
+ *             source        - [IN] event source                              *
+ *             object        - [IN] event object type                         *
+ *             objectid      - [IN] identifier of the related object          *
+ *             name          - [IN] event name                                *
+ *             clock         - [IN] event time, seconds                       *
+ *             ns            - [IN] event time, nanoseconds                   *
+ *             value         - [IN] event value                               *
+ *             severity      - [IN] event severity                            *
+ *             flags         - [IN] event flags                               *
+ *             cause_eventid - [IN] identifier of the cause event             *
+ *             tags          - [IN] event tags, can be NULL                   *
+ *             suppress      - [IN] event suppress data, can be NULL          *
+ *                                                                            *
+ * Return value: the created event                                            *
+ *                                                                            *
+ ******************************************************************************/
 zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, unsigned char object,
 		zbx_uint64_t objectid, const char *name, int clock, int ns, int value, int severity,
 		unsigned char flags, zbx_uint64_t cause_eventid, const zbx_vector_tags_ptr_t *tags,
@@ -92,6 +116,15 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 	return event;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clone an event                                                    *
+ *                                                                            *
+ * Parameters: event - [IN] event to clone                                    *
+ *                                                                            *
+ * Return value: the cloned event                                             *
+ *                                                                            *
+ ******************************************************************************/
 zbx_cep_event_t	*cep_event_clone(const zbx_cep_event_t *event)
 {
 	zbx_cep_event_t	*clone;
@@ -107,7 +140,7 @@ zbx_cep_event_t	*cep_event_clone(const zbx_cep_event_t *event)
 	clone->severity = event->severity;
 	clone->suppress_mtime = event->suppress_mtime;
 	clone->name = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(event->name));
-	clone->cause_eventid = 0;
+	clone->cause_eventid = event->cause_eventid;
 	clone->flags = event->flags;
 
 	zbx_vector_lite_tag_create(&clone->tags);
@@ -127,6 +160,16 @@ zbx_cep_event_t	*cep_event_clone(const zbx_cep_event_t *event)
 	return clone;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get a mutable reference to an event                               *
+ *                                                                            *
+ * Parameters: event - [IN] event to get a mutable reference for              *
+ *                                                                            *
+ * Return value: a reference to the event if it is not yet shared, or a       *
+ *               clone of the event otherwise                                 *
+ *                                                                            *
+ ******************************************************************************/
 zbx_cep_event_t	*cep_event_get_mutable(zbx_cep_event_t *event)
 {
 	/* with 1 refcount event is not yet added to cache, so other threads cannot access it */
@@ -136,6 +179,15 @@ zbx_cep_event_t	*cep_event_get_mutable(zbx_cep_event_t *event)
 	return cep_event_clone(event);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire a reference to an event                                   *
+ *                                                                            *
+ * Parameters: event - [IN] event to acquire a reference for                  *
+ *                                                                            *
+ * Return value: the same event, with its reference count incremented         *
+ *                                                                            *
+ ******************************************************************************/
 zbx_cep_event_t	*cep_event_addref(zbx_cep_event_t *event)
 {
 	atomic_fetch_add(&event->refcount, 1);
@@ -143,6 +195,16 @@ zbx_cep_event_t	*cep_event_addref(zbx_cep_event_t *event)
 	return event;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: find a tag by name in an event                                    *
+ *                                                                            *
+ * Parameters: event - [IN] event to search                                   *
+ *             tag   - [IN] tag name to search for                            *
+ *                                                                            *
+ * Return value: index of the tag if found, FAIL otherwise                    *
+ *                                                                            *
+ ******************************************************************************/
 int	cep_event_find_tag(zbx_cep_event_t *event, const char *tag)
 {
 	for (int i = 0; i < event->tags.values_num; i++)
@@ -154,6 +216,17 @@ int	cep_event_find_tag(zbx_cep_event_t *event, const char *tag)
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: find the first tag of an event matching any of a set of tag       *
+ *          names                                                             *
+ *                                                                            *
+ * Parameters: event - [IN] event to search                                   *
+ *             tags  - [IN] newline-separated list of tag names to match      *
+ *                                                                            *
+ * Return value: index of the first matching tag if found, FAIL otherwise     *
+ *                                                                            *
+ ******************************************************************************/
 int	cep_event_find_any_tag(const zbx_cep_event_t *event, const char *tags)
 {
 	for (const char *tag = tags; '\0' != *tag;)
@@ -179,8 +252,22 @@ int	cep_event_find_any_tag(const zbx_cep_event_t *event, const char *tags)
 	return FAIL;
 }
 
-int	cep_event_validate_tag(zbx_cep_event_t *event, const char *tag, const char *value,
-		int *match_index)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate that an event does not already have a tag matching a     *
+ *          given name and value                                              *
+ *                                                                            *
+ * Parameters: event       - [IN] event to validate                           *
+ *             tag         - [IN] tag name to validate                        *
+ *             value       - [IN] tag value to validate                       *
+ *             match_index - [OUT] index of the first tag matching by name    *
+ *                           but not by value, can be NULL                    *
+ *                                                                            *
+ * Return value: SUCCEED - no tag with the given name and value exists        *
+ *               FAIL - a tag with the given name and value already exists    *
+ *                                                                            *
+ ******************************************************************************/
+int	cep_event_validate_tag(zbx_cep_event_t *event, const char *tag, const char *value, int *match_index)
 {
 	if (NULL != match_index)
 		*match_index = FAIL;
@@ -397,6 +484,16 @@ static zbx_uint64_t	cep_event_context_get_functionid(zbx_cep_event_context_t *ct
 	return ctx->functionid;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: lazy load and return the function id of the first function of     *
+ *          an event context's trigger                                        *
+ *                                                                            *
+ * Parameters: ctx - [IN/OUT] event context                                   *
+ *                                                                            *
+ * Return value: the function id                                              *
+ *                                                                            *
+ ******************************************************************************/
 zbx_uint64_t	cep_event_context_get_hostid(zbx_cep_event_context_t *ctx)
 {
 	if (0 == ctx->hostid)
@@ -412,6 +509,16 @@ zbx_uint64_t	cep_event_context_get_hostid(zbx_cep_event_context_t *ctx)
 	return ctx->hostid;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: lazy load and return the host group id associated with an event   *
+ *          context's first function                                          *
+ *                                                                            *
+ * Parameters: ctx - [IN/OUT] event context                                   *
+ *                                                                            *
+ * Return value: the host group id, or 0 if it could not be determined        *
+ *                                                                            *
+ ******************************************************************************/
 zbx_uint64_t	cep_event_context_get_hostgroupid(zbx_cep_event_context_t *ctx)
 {
 	if (0 == ctx->hostgroupid)
@@ -427,6 +534,15 @@ zbx_uint64_t	cep_event_context_get_hostgroupid(zbx_cep_event_context_t *ctx)
 	return ctx->hostgroupid;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: lazy load and return the event associated with an event context   *
+ *                                                                            *
+ * Parameters: ctx - [IN/OUT] event context                                   *
+ *                                                                            *
+ * Return value: the associated event, or NULL if it could not be resolved    *
+ *                                                                            *
+ ******************************************************************************/
 zbx_cep_event_t	*cep_event_context_get_event(zbx_cep_event_context_t *ctx)
 {
 	if (NULL == ctx->event)
@@ -444,6 +560,19 @@ zbx_cep_event_t	*cep_event_context_get_event(zbx_cep_event_context_t *ctx)
 	return ctx->event;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get a mutable reference to the event associated with an event     *
+ *          context                                                           *
+ *                                                                            *
+ * Parameters: ctx - [IN/OUT] event context                                   *
+ *                                                                            *
+ * Return value: the mutable event, or NULL if it could not be resolved       *
+ *                                                                            *
+ * Comments: Replaces the context's stored event reference with the mutable   *
+ *           one.                                                             *
+ *                                                                            *
+ ******************************************************************************/
 zbx_cep_event_t *cep_event_context_get_mutable_event(zbx_cep_event_context_t *ctx)
 {
 	if (NULL != cep_event_context_get_event(ctx))
@@ -459,6 +588,19 @@ zbx_cep_event_t *cep_event_context_get_mutable_event(zbx_cep_event_context_t *ct
 	return NULL;
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: lazily create and return the db event associated with an event    *
+ *          context                                                           *
+ *                                                                            *
+ * Parameters: ctx - [IN/OUT] event context                                   *
+ *                                                                            *
+ * Return value: the db event, or NULL if it could not be resolved            *
+ *                                                                            *
+ * Comments: The db event is created from the event backed by with context.   *
+ *                                                                            *
+ ******************************************************************************/
 zbx_db_event *cep_event_context_get_db_event(zbx_cep_event_context_t *ctx)
 {
 	if (NULL == ctx->db_event)
@@ -490,6 +632,19 @@ static int	cep_event_context_same_event(zbx_cep_event_context_t *ctx, zbx_cep_ev
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check whether an event handle refers to the same event as an      *
+ *          event context                                                     *
+ *                                                                            *
+ * Parameters: ctx    - [IN] event context                                    *
+ *             hevent - [IN] event handle to compare against                  *
+ *                                                                            *
+ * Return value: SUCCEED - the handle refers to the same event                *
+ *               FAIL - the handle refers to a different event, or the        *
+ *                      context has neither a handle nor an event set         *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_event_context_set_handle(zbx_cep_event_context_t *ctx, zbx_cep_event_handle_t hevent)
 {
 	if (SUCCEED == cep_event_context_same_event(ctx, hevent))
@@ -512,6 +667,15 @@ void	cep_event_context_set_handle(zbx_cep_event_context_t *ctx, zbx_cep_event_ha
 	ctx->hevent = zbx_cep_event_handle_addref(hevent);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return the event id associated with an event context              *
+ *                                                                            *
+ * Parameters: ctx - [IN] event context                                       *
+ *                                                                            *
+ * Return value: the event id, or 0 if it could not be resolved               *
+ *                                                                            *
+ ******************************************************************************/
 zbx_uint64_t	cep_event_context_eventid(zbx_cep_event_context_t *ctx)
 {
 	if (NULL != cep_event_context_get_event(ctx))
@@ -520,6 +684,17 @@ zbx_uint64_t	cep_event_context_eventid(zbx_cep_event_context_t *ctx)
 	return 0;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the value of a builtin tag for an event context               *
+ *                                                                            *
+ * Parameters: ctx - [IN/OUT] event context                                   *
+ *             tag - [IN] builtin tag name                                    *
+ *                                                                            *
+ * Return value: the tag value, or NULL if the tag name is not recognized or  *
+ *               the value could not be resolved                              *
+ *                                                                            *
+ ******************************************************************************/
 const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, const char *tag)
 {
 #define CEP_TAG_IS_COPIED	"$IS.COPIED"
@@ -571,41 +746,58 @@ const char	*cep_event_context_get_builtin_tag(zbx_cep_event_context_t *ctx, cons
 	#undef CEP_TAG_IS_COPIED
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: resolve macros in a string using an event context, restricted     *
+ *          to a given macro search scope                                     *
+ *                                                                            *
+ * Parameters: ctx   - [IN/OUT] event context                                 *
+ *             scope - [IN] macro token search scope                          *
+ *             str   - [IN/OUT] string to resolve macros in                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_event_context_resolve_macros(zbx_cep_event_context_t *ctx, int scope, char **str)
+{
+	zbx_db_event		*db_event;
+	zbx_dc_um_handle_t	*um_handle;
+
+	if (NULL == strchr(*str, '{'))
+		return;
+
+	if (NULL == (db_event = cep_event_context_get_db_event(ctx)))
+		return;
+
+	um_handle = zbx_dc_open_user_macros();
+
+	zbx_substitute_macros_ext_search(scope, str, NULL, 0, zbx_macro_event_name_resolv, um_handle, db_event, NULL);
+
+	zbx_dc_close_user_macros(um_handle);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: resolve macros in an event name                                   *
+ *                                                                            *
+ * Parameters: ctx - [IN/OUT] event context                                   *
+ *             str - [IN/OUT] string to resolve macros in                     *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_event_context_resolve_name_macros(zbx_cep_event_context_t *ctx, char **str)
 {
-	zbx_db_event		*db_event;
-	zbx_dc_um_handle_t	*um_handle;
-
-	if (NULL == strchr(*str, '{'))
-		return;
-
-	if (NULL == (db_event = cep_event_context_get_db_event(ctx)))
-		return;
-
-	um_handle = zbx_dc_open_user_macros();
-
-	zbx_substitute_macros_ext_search(ZBX_TOKEN_SEARCH_REFERENCES | ZBX_TOKEN_SEARCH_EXPRESSION_MACRO, str, NULL, 0,
-			zbx_macro_event_name_resolv, um_handle, db_event, NULL);
-
-	zbx_dc_close_user_macros(um_handle);
+	return cep_event_context_resolve_macros(ctx,
+			ZBX_TOKEN_SEARCH_REFERENCES | ZBX_TOKEN_SEARCH_EXPRESSION_MACRO, str);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: resolve macros in a event tag                                     *
+ *                                                                            *
+ * Parameters: ctx - [IN/OUT] event context                                   *
+ *             str - [IN/OUT] string to resolve macros in                     *
+ *                                                                            *
+ ******************************************************************************/
 void	cep_event_context_resolve_tag_macros(zbx_cep_event_context_t *ctx, char **str)
 {
-	zbx_db_event		*db_event;
-	zbx_dc_um_handle_t	*um_handle;
-
-	if (NULL == strchr(*str, '{'))
-		return;
-
-	if (NULL == (db_event = cep_event_context_get_db_event(ctx)))
-		return;
-
-	um_handle = zbx_dc_open_user_macros();
-
-	zbx_substitute_macros(str, NULL, 0, zbx_macro_trigger_tag_resolv, um_handle, db_event, NULL);
-
-	zbx_dc_close_user_macros(um_handle);
+	return cep_event_context_resolve_macros(ctx, 0, str);
 }
-
 

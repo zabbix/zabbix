@@ -23,13 +23,12 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 		const zbx_vector_db_event_suppress_t *suppress);
 
 zbx_cep_event_t	*cep_event_clone(const zbx_cep_event_t *event);
-void	cep_event_clear(zbx_cep_event_t *event);
 zbx_cep_event_t	*cep_event_addref(zbx_cep_event_t *event);
 zbx_cep_event_t	*cep_event_get_mutable(zbx_cep_event_t *event);
+
 int	cep_event_find_tag(zbx_cep_event_t *event, const char *tag);
 int	cep_event_find_any_tag(const zbx_cep_event_t *event, const char *tags);
-int	cep_event_validate_tag(zbx_cep_event_t *event, const char *tag, const char *value,
-		int *match_index);
+int	cep_event_validate_tag(zbx_cep_event_t *event, const char *tag, const char *value, int *match_index);
 
 typedef enum
 {

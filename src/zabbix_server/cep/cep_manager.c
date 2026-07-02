@@ -54,14 +54,25 @@ zbx_cep_pool_state_t;
 
 typedef struct
 {
-	zbx_mw_manager_t	base;
+	zbx_mw_manager_t		base;
 
+	/* tasks drained from the completed queue that are ready to commit; */
+	/* when a task carrying a problem event is moved here, its eventid */
+	/* is registered in events_pending */
 	zbx_vector_mw_task_ptr_t	commits;
 
+	/* tasks drained from the completed queue whose eventid is currently */
+	/* in events_pending - i.e. an earlier task for the same event is */
+	/* still being committed. Held here so event-related data is never */
+	/* committed before the event itself has been committed */
 	zbx_vector_mw_task_ptr_t	commits_pending;
 
+	/* eventids of problem events currently being committed */
 	zbx_hashset_t			events_pending;
 
+	/* number of commit tasks currently queued/in progress - created when */
+	/* the manager decides to commit the tasks accumulated in "commits", */
+	/* moving them into a new commit task and queuing it */
 	int				commit_task_num;
 }
 zbx_cep_manager_t;
@@ -109,10 +120,10 @@ static void	cep_manager_free(zbx_cep_manager_t *manager)
  *                                                                            *
  * Purpose: create and initialize CEP manager instance                        *
  *                                                                            *
- * Parameters: workers_num - [IN] initial number of workers                   *
- *             dbpool      - [IN] database connection pool                    *
+ * Parameters: workers_num      - [IN] initial number of workers              *
+ *             dbpool           - [IN] database connection pool               *
  *             config_source_ip - [IN] source ip from conf parameters         *
- *             error       - [OUT] error message                              *
+ *             error            - [OUT] error message                         *
  *                                                                            *
  * Return value: pointer to the created CEP manager instance or NULL on       *
  *               error                                                        *
@@ -155,7 +166,6 @@ static zbx_cep_manager_t	*cep_manager_create(const zbx_thread_info_t *info, zbx_
 
 	cep_cache_acquire(&cep);
 	cep_init(cep, dbpool);
-	cep_dump(cep, "cache initialization");
 	cep_cache_release(&cep);
 
 	ret = SUCCEED;
@@ -387,6 +397,18 @@ static int	cep_manager_is_task_pending(zbx_cep_manager_t *manager, const zbx_mw_
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: queue an event task for commit, deferring it if a matching        *
+ *          resolve event is still pending                                    *
+ *                                                                            *
+ * Parameters: manager - [IN/OUT] cep manager                                 *
+ *             task    - [IN] event task to commit                            *
+ *                                                                            *
+ * Return value: SUCCEED - the task was queued for commit or deferred         *
+ *               FAIL - the task has no event operation                       *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_manager_commit_event_task(zbx_cep_manager_t *manager, zbx_mw_task_t *task)
 {
 	const zbx_cep_task_event_t	*event_task =  cep_get_event_task(task);
@@ -412,6 +434,17 @@ static int	cep_manager_commit_event_task(zbx_cep_manager_t *manager, zbx_mw_task
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: queue a task for commit, deferring it if its event commit is      *
+ *          currently pending                                                 *
+ *                                                                            *
+ * Parameters: manager - [IN/OUT] cep manager                                 *
+ *             eventid - [IN] identifier of the event associated with the     *
+ *                       task                                                 *
+ *             task    - [IN] task to commit                                  *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_manager_commit_task(zbx_cep_manager_t *manager, zbx_uint64_t eventid, zbx_mw_task_t *task)
 {
 	if (SUCCEED == cep_manager_is_event_pending(manager, eventid))
@@ -420,6 +453,15 @@ static void	cep_manager_commit_task(zbx_cep_manager_t *manager, zbx_uint64_t eve
 		zbx_vector_mw_task_ptr_append(&manager->commits, task);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove problem events committed by a commit task from the         *
+ *          pending events set                                                *
+ *                                                                            *
+ * Parameters: manager - [IN/OUT] cep manager                                 *
+ *             task    - [IN] commit task                                     *
+ *                                                                            *
+ ******************************************************************************/
 static  void	cep_manager_remove_pending_events(zbx_cep_manager_t *manager, zbx_mw_task_t *task)
 {
 	zbx_cep_task_commit_t	*commit = (zbx_cep_task_commit_t *)task;
@@ -436,6 +478,14 @@ static  void	cep_manager_remove_pending_events(zbx_cep_manager_t *manager, zbx_m
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: move deferred tasks that are no longer pending to the commit      *
+ *          queue                                                             *
+ *                                                                            *
+ * Parameters: manager - [IN/OUT] cep manager                                 *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_manager_process_pending(zbx_cep_manager_t *manager)
 {
 	for (int i = 0; i < manager->commits_pending.values_num; )
@@ -529,6 +579,17 @@ static void	cep_manager_flush_commmits(zbx_cep_manager_t *manager)
 	manager->commit_task_num++;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: determine the maximum number of concurrent commit tasks for the   *
+ *          cep manager                                                       *
+ *                                                                            *
+ * Parameters: manager - [IN] cep manager                                     *
+ *             args    - [IN] cep manager thread arguments                    *
+ *                                                                            *
+ * Return value: the commit limit                                             *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_manager_commit_limit(zbx_cep_manager_t *manager, const zbx_thread_cep_manager_args_t *args)
 {
 	if (1 == manager->base.workers_num)
@@ -540,6 +601,17 @@ static int	cep_manager_commit_limit(zbx_cep_manager_t *manager, const zbx_thread
 	return args->commit_limit;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create window tasks for windows scheduled to be processed at      *
+ *          the given time                                                    *
+ *                                                                            *
+ * Parameters: now   - [IN] current time                                      *
+ *             tasks - [OUT] vector to append created window tasks to         *
+ *                                                                            *
+ * Return value: the number of added tasks                                    *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_manager_process_windows(int now, zbx_vector_mw_task_ptr_t *tasks)
 {
 #define	CEP_WINDOW_BATCH	1000
@@ -577,6 +649,13 @@ static int	cep_manager_process_windows(int now, zbx_vector_mw_task_ptr_t *tasks)
 #undef CEP_WINDOW_BATCH
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: load window groups into the window pool                           *
+ *                                                                            *
+ * Parameters: dbpool - [IN] database connection pool                         *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_manager_load_window_groups(zbx_dbconn_pool_t *dbpool)
 {
 	zbx_cep_window_pool_t	*pool;
@@ -586,6 +665,13 @@ static void	cep_manager_load_window_groups(zbx_dbconn_pool_t *dbpool)
 	cep_window_pool_release(&pool);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: save window groups from the window pool                           *
+ *                                                                            *
+ * Parameters: dbpool - [IN] database connection pool                         *
+ *                                                                            *
+ ******************************************************************************/
 static void	cep_manager_save_window_groups(zbx_dbconn_pool_t *dbpool)
 {
 	zbx_cep_window_pool_t	*pool;
