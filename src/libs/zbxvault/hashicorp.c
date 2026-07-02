@@ -56,7 +56,7 @@ static int	zbx_vault_app_role_login_hashicorp(const char *url, const char *app_r
 
 	if (ZBX_HTTP_STATUS_CODE_OK != response_code)
 	{
-		*error = zbx_dsprintf(*error, "unsuccessful response code \"%ld\"", response_code);
+		*error = zbx_dsprintf(*error, "unsuccessful response code \"%ld\": %s", response_code, out);
 		goto fail;
 	}
 
@@ -207,7 +207,7 @@ int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const
 			goto fail;
 		}
 
-		*error = zbx_dsprintf(*error, "unsuccessful response code \"%ld\"", response_code);
+		*error = zbx_dsprintf(*error, "unsuccessful response code \"%ld\": %s", response_code, out);
 		goto fail;
 	}
 
@@ -309,7 +309,7 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 
 		if (ZBX_HTTP_STATUS_CODE_OK != response_code)
 		{
-			error = zbx_dsprintf(NULL, "unsuccessful response code \"%ld\"", response_code);
+			error = zbx_dsprintf(NULL, "unsuccessful response code \"%ld\": %s", response_code, out);
 			goto out;
 		}
 
@@ -358,7 +358,7 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 
 		if (ZBX_HTTP_STATUS_CODE_OK != response_code)
 		{
-			error = zbx_dsprintf(NULL, "unsuccessful response code \"%ld\"", response_code);
+			error = zbx_dsprintf(NULL, "unsuccessful response code \"%ld\": %s", response_code, out);
 			goto out;
 		}
 
