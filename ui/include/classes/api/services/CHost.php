@@ -2125,15 +2125,15 @@ class CHost extends CHostGeneral {
 
 		foreach ($hosts as $i => $host) {
 			if (array_key_exists('monitored_by', $host)) {
-				if ($host['monitored_by'] === ZBX_MONITORED_BY_SERVER) {
+				if ($host['monitored_by'] === ZBX_MONITORED_BY_SERVER
+						&& $db_hosts[$host['hostid']]['monitored_by'] != ZBX_MONITORED_BY_SERVER) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/monitored_by/',
 						_("you don't have permission to select server for monitoring")
 					));
 				}
 
-				if ($host['monitored_by'] === ZBX_MONITORED_BY_SERVER && $db_hosts !== null
-						&& $host['monitored_by'] !== $db_hosts[$host['hostid']]['monitored_by']) {
+				if ($db_hosts[$host['hostid']]['monitored_by'] === ZBX_MONITORED_BY_SERVER && $db_hosts !== null) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/monitored_by/',
 						_("parameter is readonly while you don't have permission to select server for monitoring")
