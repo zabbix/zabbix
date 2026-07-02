@@ -175,13 +175,14 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			// #1 Verify widget data that is available for user with admin role.
 			[
 				[
+					'admin' => true,
 					'user' => 'admin for system information test',
 					'password' => 'z@$$ix!#%1',
 					'available_fields' => [
 						[
 							'Parameter' => 'Zabbix server is running',
 							'Value' => 'No',
-							'Details' => ''
+							'Details' => 'localhost:10051'
 						],
 						[
 							'Parameter' => 'Zabbix frontend version',
@@ -479,7 +480,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 
 		CDashboardElement::find()->one()->waitUntilReady();
 
-		if (CTestArrayHelper::get($data, 'super_admin')) {
+		if (CTestArrayHelper::get($data, 'super_admin') || CTestArrayHelper::get($data, 'admin')) {
 			$this->assertTableHasData($data['available_fields']);
 		}
 		else {
