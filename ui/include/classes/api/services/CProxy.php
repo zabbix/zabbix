@@ -85,6 +85,13 @@ class CProxy extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		// editable + PERMISSION CHECK
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			if ($options['editable']) {
+				return $options['countOutput'] ? '0' : [];
+			}
+		}
+
 		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$options['output'] = $output_fields;
 		}
@@ -116,11 +123,9 @@ class CProxy extends CApiService {
 	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
-		// editable + PERMISSION CHECK
+		// editable
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			if (!$options['editable']) {
-				$sql_parts['where'][] = CApiUserGroupHelper::getProxyPermissionsCondition('p');
-			}
+			$sql_parts['where'][] = CApiUserGroupHelper::getProxyPermissionsCondition('p');
 		}
 
 		// proxy_groupids
