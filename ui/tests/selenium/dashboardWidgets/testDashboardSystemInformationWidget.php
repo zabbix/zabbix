@@ -162,7 +162,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			// #0 Verify user with super admin role. Check field that is not checked in screenshot with disabled HA.
 			[
 				[
-					'super_admin' => true,
+					'type' => 'Super admin',
 					'available_fields' => [
 						[
 							'Parameter' => 'Zabbix frontend version',
@@ -175,7 +175,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			// #1 Verify widget data that is available for user with admin role.
 			[
 				[
-					'admin' => true,
+					'type' => 'Admin',
 					'user' => 'admin for system information test',
 					'password' => 'z@$$ix!#%1',
 					'available_fields' => [
@@ -214,7 +214,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			// #3 Verify widget data that is available for guest role.
 			[
 				[
-					'guest' => true,
+					'type' => 'Guest',
 					'available_fields' => [
 						[
 							'Parameter' => 'Zabbix server is running',
@@ -258,7 +258,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			// #0 Verify widget data that is available for user with admin role.
 			[
 				[
-					'admin' => true,
+					'type' => 'Admin',
 					'user' => 'admin for system information test',
 					'password' => 'z@$$ix!#%1',
 					'available_fields' => [
@@ -297,7 +297,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			// #2 Verify widget data that is available for user with guest role.
 			[
 				[
-					'guest' => true,
+					'type' => 'Guest',
 					'available_fields' => [
 						[
 							'Parameter' => 'Zabbix server is running',
@@ -375,8 +375,8 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 
 		// HA cluster status should be visible to Admin role users, but should not be visible to User role users.
 		$info_table = $dashboard->getWidget('System stats view')->asTable();
-		$is_ha_cluster_visible = ($data['access_to_ha_cluster'] ?? false) === true;
-		$this->assertSame($is_ha_cluster_visible, $info_table->findRow('Parameter', 'High availability cluster')->isValid());
+		$ha_expected = CTestArrayHelper::get($data, 'access_to_ha_cluster', false);
+		$this->assertTrue($info_table->findRow('Parameter', 'High availability cluster')->isValid($ha_expected));
 	}
 
 	/**
@@ -469,7 +469,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	 * @param array $data	widget available data
 	 */
 	protected function assertAvailableDataByUserRole($data) {
-		if (CTestArrayHelper::get($data, 'guest')) {
+		if (CTestArrayHelper::get($data, 'type') === 'Guest') {
 			$this->page->open(self::URL.self::$dashboardid)->waitUntilReady();
 			$this->query('button:Login')->one()->click();
 			$this->query('link:sign in as guest')->one()->click();
@@ -483,7 +483,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 
 		CDashboardElement::find()->one()->waitUntilReady();
 
-		if (CTestArrayHelper::get($data, 'super_admin') || CTestArrayHelper::get($data, 'admin')) {
+		if (in_array(CTestArrayHelper::get($data, 'type'), ['Super admin', 'Admin'])) {
 			$this->assertTableHasData($data['available_fields']);
 		}
 		else {
