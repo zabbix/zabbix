@@ -35,7 +35,7 @@ class CCepRule extends CApiService {
 	public function get(array $options = []): array|string {
 		$this->validateGet($options);
 
-		$resource = DBselect($this->createSelectQuery('cep_rule', $options));
+		$resource = DBselect($this->createSelectQuery('cep_rule', $options), $options['limit']);
 
 		if ($options['countOutput']) {
 			return DBfetch($resource)['rowscount'];
