@@ -73,7 +73,7 @@ class testTriggerCEP extends CIntegrationTest {
 	// When true, the *Restart test variants are skipped entirely. Set during development to avoid the
 	// slow server stop/start cycles; the non-restart tests still run (their @depends point at non-restart
 	// siblings, so they do not cascade-skip).
-	const SKIP_RESTART_TESTS = true;
+	const SKIP_RESTART_TESTS = false;
 
 	// When true, prepareData() deletes every internal-source action instead of enabling the built-in
 	// "Report not supported items" / "Report unknown triggers" actions for the whole suite. The *Unknown
@@ -421,12 +421,12 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->prepareWebhookMediaType();
 
 		// Make the server generate internal item-not-supported and trigger-unknown events (verified by the
-		// *Unknown tests). With SCOPED_INTERNAL_ACTIONS the internal actions are deleted here and (re)created
+		// *Unknown tests). With SCOPED_INTERNAL_ACTIONS the internal actions are disabled here and re-enabled
 		// only for the *Unknown tests, so the rest of the suite runs without them; otherwise the built-in
 		// actions are enabled for the whole suite. Either way clearData() cleans up and the configuration
-		// cache is reloaded by the first test (or by createInternalActions()).
+		// cache is reloaded by the first test (or by enableInternalActions()).
 		if (self::SCOPED_INTERNAL_ACTIONS) {
-			$this->deleteInternalActions();
+			$this->disableInternalActions();
 		}
 		else {
 			$this->setInternalActionStatus('Report unknown triggers', ACTION_STATUS_ENABLED);
@@ -2261,10 +2261,9 @@ HEREDOC;
 		$this->captureEventBaseline($triggerids);
 
 		// Build a long alternating PROBLEM/recovery burst (1,0,1,0,...) for every discovered item and send
-		// it in a single batch. All values share the same clock and are ordered only by their nanoseconds
-		// (the value index), so CEP must process the whole rapid burst in order and emit one event per
-		// transition without collapsing or dropping any. The sequence ends on 0 so the triggers finish OK.
-		$now = time();
+		// it in a single batch. Every value gets a strictly increasing (clock, ns) so CEP must process the
+		// whole rapid burst in order and emit one event per transition without collapsing or dropping any.
+		// The sequence ends on 0 so the triggers finish OK.
 		$values = [];
 		for ($i = 0; $i < 3; $i++) {
 			$values[] = '1';
@@ -2274,8 +2273,7 @@ HEREDOC;
 		$data = [];
 		foreach ($keys as $key) {
 			foreach ($values as $value) {
-				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value,
-						'clock' => $now];
+				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
 			}
 		}
 		$this->dispatchSenderValues($data, null, 0);
@@ -2316,7 +2314,6 @@ HEREDOC;
 		$this->captureEventBaseline($triggerids);
 
 		$unsupported = 'not_a_number';
-		$now = time();
 		$values = [];
 		for ($i = 0; $i < 3; $i++) {
 			$values[] = $unsupported;
@@ -2326,8 +2323,7 @@ HEREDOC;
 		$data = [];
 		foreach ($keys as $key) {
 			foreach ($values as $value) {
-				$entry = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value,
-						'clock' => $now];
+				$entry = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
 				// The server skips preprocessing for proxy-delivered values, so the unsupported transition
 				// must be reported explicitly rather than relying on the non-numeric value failing.
 				if ($value === $unsupported) {
@@ -2387,12 +2383,11 @@ HEREDOC;
 
 		$this->captureEventBaseline([$triggerid]);
 
-		// Build a long alternating PROBLEM/recovery burst (1,0,1,0,...) and send it in a single batch. All
-		// values share the same clock and are ordered only by their nanoseconds (the value index), so CEP
-		// must process the whole rapid burst in order and emit one event per transition without collapsing
-		// or dropping any. The sequence ends on 0 so the trigger finishes OK.
+		// Build a long alternating PROBLEM/recovery burst (1,0,1,0,...) and send it in a single batch. Every
+		// value gets a strictly increasing (clock, ns) so CEP must process the whole rapid burst in order
+		// and emit one event per transition without collapsing or dropping any. The sequence ends on 0 so
+		// the trigger finishes OK.
 		$cycles = 1000;
-		$now = time();
 		$values = [];
 		for ($i = 0; $i < $cycles; $i++) {
 			$values[] = '1';
@@ -2401,8 +2396,7 @@ HEREDOC;
 
 		$data = [];
 		foreach ($values as $value) {
-			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value,
-					'clock' => $now];
+			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
 		}
 		$this->dispatchSenderValues($data, null, 0);
 
@@ -2954,12 +2948,12 @@ HEREDOC;
 	 *
 	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp
 	 */
-	/*public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpRestart() {
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataGlobalCorrelationCloseOnUp();
 		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true);
 		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
-	}*/
+	}
 
 	/**
 	 * Same "close old down when new up" scenario as
@@ -3051,15 +3045,12 @@ HEREDOC;
 		// master values to dependents, so the burst is pushed straight to the dependent item here rather
 		// than to the master.
 		$item_key = self::LOG_ITEM_PROTO_KEY.'['.self::LOG_COMPONENT_VALUE.']';
-		$base_clock = time();
 		$values = [];
 		for ($i = 0; $i < self::LOG_EVENT_COUNT; $i++) {
 			$values[] = [
 				'host' => self::HOST_NAME,
 				'key' => $item_key,
-				'value' => 'problem '.$i,
-				'clock' => $base_clock,
-				'ns' => $this->currentNs()
+				'value' => 'problem '.$i
 			];
 		}
 		$this->dispatchSenderValues($values, null, 0);
@@ -3088,15 +3079,12 @@ HEREDOC;
 		// openLogProblemBurst) to stress parallel recovery, even though a single value is enough to turn the
 		// trigger expression false and recover all open problems.
 		$item_key = self::LOG_ITEM_PROTO_KEY.'['.self::LOG_COMPONENT_VALUE.']';
-		$base_clock = time();
 		$values = [];
 		for ($i = 0; $i < self::LOG_EVENT_COUNT; $i++) {
 			$values[] = [
 				'host' => self::HOST_NAME,
 				'key' => $item_key,
-				'value' => 'recovered '.$i,
-				'clock' => $base_clock,
-				'ns' => $this->currentNs()
+				'value' => 'recovered '.$i
 			];
 		}
 		$this->dispatchSenderValues($values, null, 0);
@@ -3223,11 +3211,11 @@ HEREDOC;
 	 * an internal problem is opened for every unsupported item and every unknown trigger.
 	 */
 	private function runOpenUnknownTest(): void {
-		// With SCOPED_INTERNAL_ACTIONS the internal actions were deleted in prepareData(); create them here
+		// With SCOPED_INTERNAL_ACTIONS the internal actions were disabled in prepareData(); enable them here
 		// so the server starts generating internal item-not-supported / trigger-unknown events just for the
-		// *Unknown tests. They are removed again by runCloseUnknownTest().
+		// *Unknown tests. They are disabled again by runCloseUnknownTest().
 		if (self::SCOPED_INTERNAL_ACTIONS) {
-			$this->createInternalActions();
+			$this->enableInternalActions();
 		}
 
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
@@ -3287,10 +3275,10 @@ HEREDOC;
 			'source' => EVENT_SOURCE_INTERNAL
 		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
-		// Remove the internal actions created by runOpenUnknownTest() so the rest of the suite runs without
+		// Disable the internal actions enabled by runOpenUnknownTest() so the rest of the suite runs without
 		// the server generating internal events again.
 		if (self::SCOPED_INTERNAL_ACTIONS) {
-			$this->deleteInternalActions();
+			$this->disableInternalActions();
 			$this->reloadConfigurationCacheAndWaitForLogLine();
 		}
 	}
@@ -4175,15 +4163,16 @@ HEREDOC;
 	protected function dispatchSenderValues($values, $component = null, $delayOverride = null): void {
 		$this->ensureItemidsResolved($values);
 
-		$base_ns = (int) (microtime(true) * 1e9) % 1000000000;
-
 		$data = [];
-		foreach (array_values($values) as $i => $value) {
+		foreach (array_values($values) as $value) {
+			// Fall back to a strictly increasing (clock, ns) so any value without an explicit timestamp is
+			// still globally unique and ordered, even across batches.
+			$cn = (!isset($value['clock']) || !isset($value['ns'])) ? $this->currentClockNs() : null;
 			$entry = [
 				'itemid' => self::$itemid_cache[$value['host']."\0".$value['key']],
 				'value' => $value['value'],
-				'clock' => isset($value['clock']) ? $value['clock'] : time(),
-				'ns' => isset($value['ns']) ? $value['ns'] : ($base_ns + $i) % 1000000000
+				'clock' => isset($value['clock']) ? $value['clock'] : $cn['clock'],
+				'ns' => isset($value['ns']) ? $value['ns'] : $cn['ns']
 			];
 			if (isset($value['state'])) {
 				$entry['state'] = $value['state'];
@@ -4282,70 +4271,33 @@ HEREDOC;
 	}
 
 	/**
-	 * Create the internal "Report not supported items" and "Report unknown triggers" actions (enabled,
-	 * each filtered on its event type and messaging user group 7, mirroring the built-in ones) and reload
-	 * the configuration cache so the server starts generating internal item-not-supported /
-	 * trigger-unknown events. Used by the *Unknown tests when SCOPED_INTERNAL_ACTIONS deletes the built-in
+	 * Re-enable the built-in internal "Report not supported items" and "Report unknown triggers" actions
+	 * and reload the configuration cache so the server starts generating internal item-not-supported /
+	 * trigger-unknown events. Used by the *Unknown tests when SCOPED_INTERNAL_ACTIONS disables the built-in
 	 * internal actions in prepareData().
 	 */
-	private function createInternalActions(): void {
-		$actions = [
-			'Report not supported items' => EVENT_TYPE_ITEM_NOTSUPPORTED,
-			'Report unknown triggers' => EVENT_TYPE_TRIGGER_UNKNOWN
-		];
-
-		foreach ($actions as $name => $event_type) {
-			$this->call('action.create', [
-				'name' => $name,
-				'eventsource' => EVENT_SOURCE_INTERNAL,
-				'status' => ACTION_STATUS_ENABLED,
-				'esc_period' => '1h',
-				'filter' => [
-					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-					'conditions' => [
-						[
-							'conditiontype' => ZBX_CONDITION_TYPE_EVENT_TYPE,
-							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => (string) $event_type
-						]
-					]
-				],
-				'operations' => [
-					[
-						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'esc_period' => 0,
-						'esc_step_from' => 1,
-						'esc_step_to' => 1,
-						'opmessage' => ['default_msg' => 1],
-						'opmessage_grp' => [
-							['usrgrpid' => 7]
-						]
-					]
-				],
-				'recovery_operations' => [
-					[
-						'operationtype' => OPERATION_TYPE_RECOVERY_MESSAGE,
-						'opmessage' => ['default_msg' => 1]
-					]
-				]
-			]);
-		}
+	private function enableInternalActions(): void {
+		$this->setInternalActionStatus('Report not supported items', ACTION_STATUS_ENABLED);
+		$this->setInternalActionStatus('Report unknown triggers', ACTION_STATUS_ENABLED);
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 	}
 
 	/**
-	 * Delete every internal-source action so the server generates no internal item-not-supported /
+	 * Disable every internal-source action so the server generates no internal item-not-supported /
 	 * trigger-unknown events. Called from prepareData() (to clear the built-in actions for the whole
-	 * suite) and after the *Unknown tests to remove the actions they created via createInternalActions().
+	 * suite) and after the *Unknown tests to disable the actions they enabled via enableInternalActions().
 	 */
-	private function deleteInternalActions(): void {
+	private function disableInternalActions(): void {
 		$response = $this->call('action.get', [
 			'output' => ['actionid'],
 			'filter' => ['eventsource' => EVENT_SOURCE_INTERNAL]
 		]);
 		if (!empty($response['result'])) {
-			$this->call('action.delete', array_column($response['result'], 'actionid'));
+			$this->call('action.update', array_map(
+				fn($actionid) => ['actionid' => $actionid, 'status' => ACTION_STATUS_DISABLED],
+				array_column($response['result'], 'actionid')
+			));
 		}
 	}
 
@@ -4508,8 +4460,7 @@ HEREDOC;
 		$prev_triggers = $this->getTriggers($triggerids);
 		$prev_lastchanges = array_map(fn($tid) => $prev_triggers[$tid]['lastchange'], $triggerids);
 		$this->dispatchSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value,
-					'clock' => time(), 'ns' => $this->currentNs()], $keys),
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value], $keys),
 			null, 0
 		);
 
@@ -4587,8 +4538,7 @@ HEREDOC;
 		//$cep_processed = $this->getCepStat('events', 'assessed');
 		$expected_lastchanges = array_map(fn($tid) => $current_triggers[$tid]['lastchange'], $triggerids);
 		$this->dispatchSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value,
-					'clock' => time(), 'ns' => $this->currentNs()], $keys),
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value], $keys),
 			null, 0
 		);
 
@@ -4711,20 +4661,33 @@ HEREDOC;
 		], $expected_open_problems, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
-	private function currentNs(): int {
+	private function currentClockNs(): array {
+		static $last_clock = -1;
 		static $last_ns = -1;
 
+		$clock = time();
 		$ns = (int)(fmod(microtime(true), 1) * 1e9);
 
-		// Ensure the returned value is always strictly increasing, even when the sub-second fraction wraps
-		// or two calls land in the same nanosecond.
-		if ($ns <= $last_ns) {
-			$ns = $last_ns + 1;
+		// Ensure the returned (clock, ns) pair is always strictly increasing, so no two values ever collide,
+		// even when the clock stalls, the sub-second fraction wraps, or two calls land in the same nanosecond.
+		if ($clock < $last_clock) {
+			$clock = $last_clock;
 		}
 
+		if ($clock === $last_clock && $ns <= $last_ns) {
+			$ns = $last_ns + 1;
+
+			// Carry into the next second when the nanosecond field overflows.
+			if ($ns >= 1000000000) {
+				$ns = 0;
+				$clock++;
+			}
+		}
+
+		$last_clock = $clock;
 		$last_ns = $ns;
 
-		return $ns;
+		return ['clock' => $clock, 'ns' => $ns];
 	}
 
 	private function getApiSessionId(): string {
