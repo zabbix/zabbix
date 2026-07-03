@@ -289,6 +289,9 @@ window.host_edit_popup = {
 
 	updateTagsList() {
 		const fields = getFormFields(this.form_element);
+		if (fields.tags === undefined) {
+			return;
+		}
 
 		fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
 			if (!('type' in tag) || (tag.type & <?= ZBX_PROPERTY_OWN ?>)) {

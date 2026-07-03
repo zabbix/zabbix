@@ -1,0 +1,1 @@
+..F....... [ZBX-27663] fixed JS console error for undefined fields.tags when there is no rows in host tags table (scernisenko)
