@@ -21,10 +21,12 @@ window.proxy_edit_popup = new class {
 		this.clone_proxyid = null;
 		this.form = null;
 		this.form_element = null;
+		this.warnings = [];
 	}
 
 	init({proxyid, rules, warnings}) {
 		this.proxyid = proxyid;
+		this.warnings = warnings;
 
 		this.overlay = overlays_stack.getById('proxy.edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -52,7 +54,7 @@ window.proxy_edit_popup = new class {
 			}
 		}
 
-		jQuery('#proxy_groupid').on('change', () => this._update(warnings));
+		jQuery('#proxy_groupid').on('change', () => this._update());
 
 		for (const id of ['operating_mode', 'tls_connect', 'tls_accept_psk', 'tls_accept_certificate',
 				'custom_timeouts']) {
@@ -87,13 +89,13 @@ window.proxy_edit_popup = new class {
 		this.display_change_psk = false;
 	}
 
-	_update(warnings) {
+	_update() {
 		const $proxy_group = jQuery('#proxy_groupid').multiSelect('getData');
 		const hasSelection = $proxy_group.length > 0;
 
-		if (hasSelection && warnings?.length) {
+		if (hasSelection && this.warnings?.length) {
 			this.#removePopupMessages();
-			const message_box = makeMessageBox('warning', warnings, null, true, false)[0];
+			const message_box = makeMessageBox('warning', this.warnings, null, true, false)[0];
 
 			this.form_element.parentNode.insertBefore(message_box, this.form_element);
 		}
@@ -188,6 +190,7 @@ window.proxy_edit_popup = new class {
 	clone({title, buttons, rules}) {
 		this.#removePopupMessages();
 
+		this.warnings = [];
 		this.clone_proxyid = this.proxyid;
 		this.proxyid = null;
 
@@ -296,9 +299,6 @@ window.proxy_edit_popup = new class {
 			});
 	}
 
-	/**
-	 * Removes all popup message boxes above the form.
-	 */
 	#removePopupMessages() {
 		for (const el of this.form_element.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
