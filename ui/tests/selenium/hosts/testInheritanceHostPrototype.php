@@ -397,6 +397,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'host_prototype' => 'Host prototype for Clone {#TEST}',
 					'discovery' => 'Discovery rule for host prototype test',
 					'cloned_name' => 'Cloned host prototype without macro',
+					'create_enabled' => true,
 					'error_inline' => [
 						'id:host' => 'This field must contain at least one low-level discovery macro.'
 					]
@@ -408,6 +409,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'host_prototype' => 'Host prototype for Clone {#TEST}',
 					'discovery' => 'Discovery rule for host prototype test',
 					'cloned_name' => ' ',
+					'create_enabled' => true,
 					'error_inline' => [
 						'id:host' => 'This field cannot be empty.'
 					]
@@ -460,6 +462,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		if (array_key_exists('cloned_name', $data)) {
 			$this->zbxTestInputTypeOverwrite('host', $data['cloned_name']);
+			// Remove focus to avoid inline error "This object already exists." appearing from the original clone name.
+			$this->query('id:host')->one()->removeFocus();
 		}
 		if (array_key_exists('cloned_visible_name', $data)) {
 			$this->zbxTestInputTypeOverwrite('name', $data['cloned_visible_name']);
@@ -497,7 +501,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$dialog->getFooter()->query('button:Add')->one()->click();
+		$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 
 		if (array_key_exists('error_inline', $data)) {
 			$this->assertInlineError($dialog->waitUntilReady()->asForm(), $data['error_inline']);

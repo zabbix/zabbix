@@ -344,7 +344,7 @@ class testFormSetup extends CWebTest {
 		$this->query('button:Back')->one()->click();
 
 		// Fill in the Zabbix server name field and proceed with checking Pre-installation summary.
-		$this->query('id:zbx_server_name')->one()->fill('Zabbix server name');
+		$this->query('id:zbx_server_name')->waitUntilVisible()->one()->fill('Zabbix server name');
 		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		$db_parameters = $this->getDbParameters();
 		$text = 'Please check configuration parameters. If all is correct, press "Next step" button, or "Back" button '.
