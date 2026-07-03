@@ -1471,7 +1471,8 @@ void	cep_update_event_maintenances(zbx_cep_t *cep, const zbx_vector_event_mainte
 		zbx_vector_uint64_append(&maintenanceids, events->values[i].maintenanceid);
 	}
 
-	cep_event_update_maintenances(h, &maintenanceids, action);
+	if (NULL != h)
+		cep_event_update_maintenances(h, &maintenanceids, action);
 
 	zbx_vector_uint64_destroy(&maintenanceids);
 }
