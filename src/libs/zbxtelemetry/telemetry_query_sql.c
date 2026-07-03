@@ -393,8 +393,6 @@ static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, 
  ******************************************************************************/
 static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
 {
-	/* TODO: replace with actual table names (or probably macros), do we use apm_* or otel_* ? */
-
 	char	*str = NULL;
 	char	*str_esc;
 
@@ -560,7 +558,6 @@ static char	*tq_sql_dyn_get_atom_condition(const char *atom, const char *key, co
 
 static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, const tq_sql_ctx_t *ctx)
 {
-	/* TODO: test on non-attribute arrays on all dbs */
 	char	*str;
 	char	*col_esc = tq_sql_dyn_escape_name(cond->column_name, ctx);
 

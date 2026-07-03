@@ -943,7 +943,6 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 	}
 	else if (ZBX_POLLER_TYPE_TELEMETRY_QUERY == poller_type)
 	{
-		/* TODO: not initialize this if db type is postgresql/mysql */
 #ifdef HAVE_LIBCURL
 		char	*error = NULL;
 
@@ -1066,7 +1065,6 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 
 	if (ZBX_POLLER_TYPE_HTTPAGENT == poller_type || ZBX_POLLER_TYPE_TELEMETRY_QUERY == poller_type)
 	{
-		/* TODO: for telemetry query: not clean if db is postgresql/mysql */
 #ifdef HAVE_LIBCURL
 		zbx_async_httpagent_clean(asynchttppoller_config);
 		zbx_free(asynchttppoller_config);

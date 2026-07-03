@@ -113,12 +113,10 @@ fail:
 	return NOTSUPPORTED;
 }
 
-static int	async_check_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, AGENT_RESULT *result,
-		zbx_poller_config_t *poller_config)
+static int	async_check_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, time_t now, time_t lasttimestamp,
+		AGENT_RESULT *result, zbx_poller_config_t *poller_config)
 {
 	int		ret = NOTSUPPORTED;
-	time_t		now;
-	time_t		lasttimestamp;
 	char		*send_error = NULL;
 	zbx_tq_query_t	*query;
 	char		*url;
@@ -128,7 +126,6 @@ static int	async_check_telemetry_query_http(zbx_dc_telemetry_query_item_t *item,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s'", __func__, item->itemid, item->key);
 
-	now = time(NULL);
 	query = item->telemetry_query;
 	item->telemetry_query = NULL;
 
@@ -139,24 +136,6 @@ static int	async_check_telemetry_query_http(zbx_dc_telemetry_query_item_t *item,
 
 	post_type = (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type ? ZBX_POSTTYPE_RAW : ZBX_POSTTYPE_JSON);
 	output_format = (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type ? HTTP_STORE_RAW : HTTP_STORE_JSON);
-
-	/* mtime is used to store lasttimestamp persistently and throughout monitored_by changes */
-	/* TODO: test with proxy groups */
-
-	/* TODO: move out lasttimestamp logic to zbx_async_check_telemetry_query */
-	/* TODO: probably skip sending query if timestamp filter lower_bound == upper_bound, since
-	the result will always be empty, but probably should update lasttimestamp somehow */
-
-	lasttimestamp = item->lasttimestamp;
-
-	if ((time_t)item->mtime > item->lasttimestamp)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): setting lasttimestamp to mtime", __func__);
-		lasttimestamp = item->mtime;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): lasttimestamp: " ZBX_FS_TIME_T ", mtime: %d, max: " ZBX_FS_TIME_T,
-			__func__, item->lasttimestamp, item->mtime, lasttimestamp);
 
 	if (SUCCEED != async_send_telemetry_query_http(item, query, now, lasttimestamp, &item->min_free_ts,
 			apm_db_config, url, post_type, output_format, poller_config->curl_handle, &send_error))
@@ -181,9 +160,24 @@ out:
 int	zbx_async_check_telemetry_query(zbx_dc_telemetry_query_item_t *item, AGENT_RESULT *result,
 		zbx_poller_config_t *poller_config)
 {
-	int ret;
+	int	ret;
+	time_t	now, lasttimestamp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s'", __func__, item->itemid, item->key);
+
+	now = time(NULL);
+
+	lasttimestamp = item->lasttimestamp;
+
+	/* mtime is used to store lasttimestamp persistently throughout restarts and monitored_by changes */
+	if ((time_t)item->mtime > item->lasttimestamp)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): setting lasttimestamp to mtime", __func__);
+		lasttimestamp = item->mtime;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): lasttimestamp: " ZBX_FS_TIME_T ", mtime: %d, max: " ZBX_FS_TIME_T,
+			__func__, item->lasttimestamp, item->mtime, lasttimestamp);
 
 	if (0 == poller_config->apm_db_config->have_local_config)
 	{
@@ -196,7 +190,7 @@ int	zbx_async_check_telemetry_query(zbx_dc_telemetry_query_item_t *item, AGENT_R
 			|| ZBX_APM_DB_TYPE_ELASTIC == poller_config->apm_db_config->db_type)
 	{
 #ifdef HAVE_LIBCURL
-		ret = async_check_telemetry_query_http(item, result, poller_config);
+		ret = async_check_telemetry_query_http(item, now, lasttimestamp, result, poller_config);
 #else
 		ZBX_UNUSED(poller_config);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "cURL library was not compiled in"));

@@ -24,8 +24,6 @@
 #	include "zbxhttp.h"
 #endif
 
-/* TODO: support other db's */
-
 #ifdef HAVE_LIBCURL
 typedef struct
 {

@@ -15,8 +15,6 @@
 #include "zbxtelemetry.h"
 #include "telemetry.h"
 
-/* TODO: sync with real schema */
-
 static const tq_column_info_t	column_info_apm_traces[] = {
 	{"Timestamp",		ZBX_TQ_COLUMN_TYPE_NUM,		NULL,		NULL			},
 	{"TraceId",		ZBX_TQ_COLUMN_TYPE_STR,		NULL,		NULL			},
