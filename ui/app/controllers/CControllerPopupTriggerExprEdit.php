@@ -249,7 +249,7 @@ class CControllerPopupTriggerExprEdit extends CController {
 					}
 				}
 
-				if ($function === 'in' && array_key_exists($param_index, $key_map)) {
+				if ($function === 'in' && array_key_exists($key_map_index, $key_map)) {
 					$params[$key_map[$key_map_index]] = implode(',', array_column($outer_parameters, 'match'));
 				}
 				else {
