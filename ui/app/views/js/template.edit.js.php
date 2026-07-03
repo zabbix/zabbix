@@ -120,7 +120,7 @@ window.template_edit_popup = new class {
 	}
 
 	#updateTagsList() {
-		const fields = getFormFields(this.form_element);
+		const fields = this.form.getAllValues();
 
 		fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
 			if (!('type' in tag) || (tag.type & <?= ZBX_PROPERTY_OWN ?>)) {
