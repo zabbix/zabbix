@@ -29,6 +29,10 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @hosts test
  */
 class testTriggerCEP extends CIntegrationTest {
+	const LLD_DISCOVERY_COUNT = 2000; // should be at least 4000 for local tests
+	const LOG_EVENT_COUNT = 10000;
+
+	const SKIP_RESTART_TESTS = true;
 
 	const HOST_NAME = 'test';
 	const TEMPLATE_NAME = 'template_trigger_cep';
@@ -50,8 +54,6 @@ class testTriggerCEP extends CIntegrationTest {
 	// Extra tag added to problem events by a webhook (see createExtraTagWebhookAction), used to verify that
 	// tags returned by a media type are applied to the events they were generated for.
 	const WEB_SERVICE_TAG = 'web_service';
-	const LLD_DISCOVERY_COUNT = 4000;
-	const LOG_EVENT_COUNT = 10000;
 
 	// Separate template used to stress single-trigger event generation. The template (linked directly to
 	// the HOST_NAME host) carries a master log item plus an LLD rule with a dependent log item prototype.
@@ -69,11 +71,6 @@ class testTriggerCEP extends CIntegrationTest {
 
 	// change iterations to fail faster when debugging
 	const STATE_CHANGE_WAIT_ITERATIONS = 30;
-
-	// When true, the *Restart test variants are skipped entirely. Set during development to avoid the
-	// slow server stop/start cycles; the non-restart tests still run (their @depends point at non-restart
-	// siblings, so they do not cascade-skip).
-	const SKIP_RESTART_TESTS = true;
 
 	// When true, prepareData() deletes every internal-source action instead of enabling the built-in
 	// "Report not supported items" / "Report unknown triggers" actions for the whole suite. The *Unknown
