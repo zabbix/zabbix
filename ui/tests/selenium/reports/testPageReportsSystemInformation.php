@@ -38,6 +38,9 @@ class testPageReportsSystemInformation extends testSystemInformation {
 		];
 		$this->assertTableHasData($data);
 
+		// Check that system information export button is clickable.
+		$this->assertTrue($this->query('xpath://a[text() = "Export"]')->one()->isClickable());
+
 		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
@@ -50,6 +53,10 @@ class testPageReportsSystemInformation extends testSystemInformation {
 	 */
 	public function testPageReportsSystemInformation_checkEnabledHA() {
 		$this->assertEnabledHACluster();
+
+		// Check that system information export button is clickable.
+		$this->assertTrue($this->query('xpath://a[text() = "Export"]')->one()->isClickable());
+
 		$this->assertScreenshotExcept(null, self::$skip_fields, 'report_with_ha');
 	}
 
