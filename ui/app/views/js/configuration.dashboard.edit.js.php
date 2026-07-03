@@ -197,7 +197,7 @@
 			document.getElementById('dashboard-save').disabled = do_disable;
 		},
 
-		updateHistory({slideshow = null, page = undefined, add_new} = {})  {
+		updateHistory({page = undefined, add_new} = {})  {
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'template.dashboard.edit');
@@ -219,14 +219,6 @@
 
 			if (page !== null) {
 				curl.setArgument('page', page);
-			}
-
-			const auto_start = this.dashboard.auto_start === '1' ? DASHBOARD_SLIDESHOW_ON : DASHBOARD_SLIDESHOW_OFF;
-
-			slideshow = slideshow ?? url.getArgument('slideshow');
-
-			if (slideshow !== null && slideshow !== auto_start) {
-				curl.setArgument('slideshow', slideshow);
 			}
 
 			if (add_new) {
