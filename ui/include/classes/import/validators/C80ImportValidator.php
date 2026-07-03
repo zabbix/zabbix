@@ -3396,7 +3396,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 				'dashboard' =>				['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
 					'display_period' =>				['type' => XML_STRING, 'default' => '30'],
-					'auto_start' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'auto_start' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 					'pages' =>						['type' => XML_INDEXED_ARRAY, 'prefix' => 'page', 'rules' => [
 						'page' =>						['type' => XML_ARRAY, 'rules' => [
 							'name' =>						['type' => XML_STRING, 'default' => ''],

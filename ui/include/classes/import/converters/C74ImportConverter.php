@@ -35,9 +35,6 @@ class C74ImportConverter extends CConverter {
 		if (array_key_exists('templates', $data['zabbix_export'])) {
 			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
 		}
-		if (array_key_exists('dashboards', $data['zabbix_export'])) {
-			$data['zabbix_export']['dashboards'] = self::convertDashboards($data['zabbix_export']['dashboards']);
-		}
 
 		return $data;
 	}
@@ -64,28 +61,18 @@ class C74ImportConverter extends CConverter {
 			if (array_key_exists('items', $template)) {
 				$template['items'] = self::convertItems($template['items']);
 			}
+			if (array_key_exists('dashboards', $template)) {
+				foreach ($template['dashboards'] as &$dashboard) {
+					if (!array_key_exists('auto_start', $dashboard)) {
+						$dashboard['auto_start'] = CXmlConstantName::YES;
+					}
+				}
+				unset($dashboard);
+			}
 		}
 		unset($template);
 
 		return $templates;
-	}
-
-	/**
-	 * Convert dashboards.
-	 *
-	 * @param array $dashboards
-	 *
-	 * @return array
-	 */
-	private static function convertDashboards(array $dashboards): array {
-		foreach ($dashboards as &$dashboard) {
-			if (!array_key_exists('auto_start', $dashboard)) {
-				$dashboard['auto_start'] = CXmlConstantName::YES;
-			}
-		}
-		unset($dashboard);
-
-		return $dashboards;
 	}
 
 	private static function convertDiscoveryRules(array $discovery_rules): array {
