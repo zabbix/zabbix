@@ -93,6 +93,7 @@ static int	zbx_vault_app_role_login_hashicorp(const char *url, const char *app_r
 
 	*token = new_token;
 	new_token = NULL;
+	zabbix_log(LOG_LEVEL_DEBUG, "Vault AppRole login successful");
 	ret = SUCCEED;
 fail:
 	zbx_free(new_token);
