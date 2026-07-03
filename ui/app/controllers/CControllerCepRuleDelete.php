@@ -71,8 +71,7 @@ class CControllerCepRuleDelete extends CControllerCepRuleGeneral {
 
 			$keep_cepruleids = array_keys(API::CepRule()->get([
 				'output' => [],
-				'correlationids' => $cepruleids,
-				'editable' => true,
+				'cep_ruleids' => $cepruleids,
 				'preservekeys' => true
 			]));
 
