@@ -58,13 +58,25 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 			return FAIL;
 		}
 
-		if (NULL != config_vault->token && NULL != config_vault->app_role_id)
+		if (NULL != config_vault->token)
 		{
-			*error = zbx_dsprintf(*error, "invalid configuration:"
-					" either \"VaultToken\" or \"VaultAppRoleID\""
-					" configuration parameter or corresponding environment"
-					" variable can be defined but not both");
-			return FAIL;
+			if (NULL != config_vault->app_role_id)
+			{
+				*error = zbx_dsprintf(*error, "invalid configuration:"
+						" either \"VaultToken\" or \"VaultAppRoleID\""
+						" configuration parameter or corresponding environment"
+						" variable can be defined but not both");
+				return FAIL;
+			}
+
+			if (NULL != config_vault->app_secret_id)
+			{
+				*error = zbx_dsprintf(*error, "invalid configuration:"
+						" \"VaultToken\" and \"VaultAppSecretID\""
+						" configuration parameters or corresponding environment"
+						" variables cannot be defined at the same time");
+				return FAIL;
+			}
 		}
 
 		if (NULL != config_vault->app_role_id && NULL == config_vault->app_secret_id)
