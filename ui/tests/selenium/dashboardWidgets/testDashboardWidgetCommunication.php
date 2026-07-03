@@ -4121,13 +4121,20 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					break;
 
 				case 'geomap':
-					foreach ($values as $icon_index => $popup_values) {
-						$listener->query('xpath:.//img[contains(@class,"leaflet-marker-icon")]['.$icon_index.']')
-								->one()->click();
-						$this->assertTableData([$popup_values], 'xpath://div[@class="overlay-dialogue wordbreak"]');
-						$this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->query('class:btn-overlay-close')
-								->one()->click();
-					}
+						$overlay_selector = 'xpath://div[('.
+							CXPathHelper::fromClass('overlay-dialogue').
+							') and ('.
+							CXPathHelper::fromClass('wordbreak').
+							')]';
+						foreach ($values as $icon_index => $popup_values) {
+							$listener->query('xpath:.//img[contains(@class,"leaflet-marker-icon")]['.$icon_index.']')
+									->one()
+									->click();
+
+							$this->query($overlay_selector)->waitUntilVisible()->one();
+							$this->assertTableData([$popup_values], $overlay_selector);
+							$this->query($overlay_selector)->asOverlayDialog()->one()->close();
+						}
 					break;
 
 				case 'honeycomb':

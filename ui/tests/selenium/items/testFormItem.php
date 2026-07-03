@@ -2386,10 +2386,15 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->item);
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
+		$hintbox = "//div[@data-hintboxid and (".
+				CXPathHelper::fromClass('overlay-dialogue').
+				") and (".
+				CXPathHelper::fromClass('wordbreak').
+				")]";
 		$form->getLabel('History')->query("xpath:span[@class='js-hint']/button")->one()->click();
-		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue wordbreak']", 'Overridden by global housekeeping settings (99d)');
+		$this->zbxTestAssertElementText($hintbox, 'Overridden by global housekeeping settings (99d)');
 		$form->getLabel('Trends')->query("xpath:span[@class='js-hint']/button")->one()->click();
-		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue wordbreak'][2]", 'Overridden by global housekeeping settings (455d)');
+		$this->zbxTestAssertElementText('('.$hintbox.')[2]', 'Overridden by global housekeeping settings (455d)');
 		$dialog->close();
 
 		$this->zbxTestOpen('zabbix.php?action=housekeeping.edit');
