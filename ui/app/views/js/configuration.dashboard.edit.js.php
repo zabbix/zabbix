@@ -201,7 +201,13 @@
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'template.dashboard.edit');
-			curl.setArgument('dashboardid', this.dashboard.dashboardid);
+
+			if (this.dashboard.dashboardid) {
+				curl.setArgument('dashboardid', this.dashboard.dashboardid);
+			}
+			else if (this.dashboard.templateid) {
+				curl.setArgument('templateid', this.dashboard.templateid);
+			}
 
 			const state = {};
 
