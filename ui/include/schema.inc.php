@@ -10534,53 +10534,6 @@ return [
 			]
 		]
 	],
-	'cep_window_condition' => [
-		'key' => 'cep_window_conditionid',
-		'fields' => [
-			'cep_window_conditionid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
-			'cep_ruleid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'cep_rule',
-				'ref_field' => 'cep_ruleid'
-			],
-			'type' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1'
-			],
-			'operator' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'past_tag' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
-			'tag_value' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
-			'tag' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			]
-		]
-	],
 	'cep_group' => [
 		'key' => 'cep_groupid',
 		'fields' => [
@@ -10596,44 +10549,57 @@ return [
 				'ref_table' => 'cep_rule',
 				'ref_field' => 'cep_ruleid'
 			],
+			'group_by' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10
+			],
 			'groupid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'hstgrp',
-				'ref_field' => 'groupid'
+				'length' => 20
 			],
 			'hostid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid'
+				'length' => 20
+			],
+			'tag' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
+				'default' => ''
 			],
 			'tag_value' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
+			],
+			'nextcheck' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10
 			]
 		]
 	],
 	'cep_group_event' => [
-		'key' => 'cep_groupid,eventid',
+		'key' => 'cep_group_eventid',
 		'fields' => [
+			'cep_group_eventid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
 			'cep_groupid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'cep_group',
-				'ref_field' => 'cep_groupid'
+				'length' => 20
 			],
 			'eventid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'events',
-				'ref_field' => 'eventid'
+				'length' => 20
 			]
 		]
 	],

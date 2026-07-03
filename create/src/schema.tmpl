@@ -601,8 +601,8 @@ HOUSEKEEPER	|1
 
 TABLE|trigger_depends|triggerdepid|ZBX_TEMPLATE
 FIELD		|triggerdepid	|t_id		|	|NOT NULL	|0
-FIELD		|triggerid_down	|t_id		|	|NOT NULL	|0			|1|triggers	|triggerid		|RESTRICT
-FIELD		|triggerid_up	|t_id		|	|NOT NULL	|0			|2|triggers	|triggerid		|RESTRICT
+FIELD		|triggerid_down	|t_id		|	|NOT NULL	|0			|1|triggers	|triggerid	|RESTRICT
+FIELD		|triggerid_up	|t_id		|	|NOT NULL	|0			|2|triggers	|triggerid	|RESTRICT
 UNIQUE		|1		|triggerid_down,triggerid_up
 INDEX		|2		|triggerid_up
 CHANGELOG	|22
@@ -1482,7 +1482,7 @@ FIELD		|r_eventid	|t_id		|	|NOT NULL	|0			|2|events	|eventid	|RESTRICT
 FIELD		|c_eventid	|t_id		|	|NULL		|0			|3|events	|eventid
 FIELD		|correlationid	|t_id		|	|NULL		|0			|-|correlation
 FIELD		|userid		|t_id		|	|NULL		|0			|-|users
-FIELD		|cep_ruleid	|t_id		|	|NULL		|0|-|cep_rule
+FIELD		|cep_ruleid	|t_id		|	|NULL		|0			|-|cep_rule
 INDEX		|1		|r_eventid
 INDEX		|2		|c_eventid
 
@@ -1545,7 +1545,7 @@ FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0			|-|acknowledges
 
 TABLE|item_preproc|item_preprocid|ZBX_TEMPLATE
 FIELD		|item_preprocid	|t_id		|	|NOT NULL	|0
-FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_PROXY			|1|items	|		|RESTRICT
+FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|items	|		|RESTRICT
 FIELD		|step		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|params		|t_text		|''	|NOT NULL	|ZBX_PROXY
