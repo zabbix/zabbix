@@ -104,6 +104,8 @@ class CControllerDashboardView extends CController {
 			return;
 		}
 
+		$dashboard['default_auto_start'] = $dashboard['auto_start'];
+
 		if ($this->hasInput('slideshow')) {
 			$dashboard['auto_start'] = $this->getInput('slideshow') === DASHBOARD_SLIDESHOW_ON ? '1' : '0';
 		}

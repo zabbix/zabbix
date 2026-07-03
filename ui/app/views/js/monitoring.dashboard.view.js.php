@@ -422,7 +422,7 @@
 			}
 
 			if (!ZABBIX.Dashboard.isEditMode()) {
-				const auto_start = this.#dashboard.auto_start === '1'
+				const auto_start = this.#dashboard.default_auto_start === '1'
 					? DASHBOARD_SLIDESHOW_ON
 					: DASHBOARD_SLIDESHOW_OFF;
 
