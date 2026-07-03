@@ -54,6 +54,28 @@ type DiskCache struct {
 	historyUpload bool
 }
 
+// Start starts disk cache.
+func (c *DiskCache) Start() {
+	// register with secondary group to stop result cache after other components are stopped
+	monitor.Register(monitor.Output)
+
+	go c.run()
+}
+
+// SlotsAvailable returns available disk slots.
+func (*DiskCache) SlotsAvailable() int {
+	return int(^uint(0) >> 1) // Max int
+}
+
+// PersistSlotsAvailable returns persistent available disk slots.
+func (c *DiskCache) PersistSlotsAvailable() int {
+	if atomic.LoadUint32(&c.persistFlag) == 1 {
+		return 0
+	}
+
+	return int(^uint(0) >> 1) // Max int
+}
+
 func (c *DiskCache) resultFetch(rows *sql.Rows) (d *AgentData, err error) {
 	var tmp uint64
 	var LastLogSize int64
@@ -369,16 +391,30 @@ func (c *DiskCache) flushOutput(u Uploader) {
 }
 
 func (c *DiskCache) execWithRetry(query string, args ...any) {
-	var delay = 2 * time.Second
-	var maxDelay = 60 * time.Second
+	var (
+		delay    = 2 * time.Second
+		maxDelay = 60 * time.Second
+	)
 
 	for {
-		var stmt *sql.Stmt
-		var err error
+		var (
+			stmt *sql.Stmt
+			err  error
+		)
 
+		//nolint:noctx // legacy code, should be refactored
 		stmt, err = c.database.Prepare(query)
 		if err == nil {
+			//nolint:noctx // legacy code, should be refactored
 			_, err = stmt.Exec(args...)
+		}
+
+		if stmt != nil {
+			//nolint:sqlclosecheck // defer are not preferred in for loop
+			cerr := stmt.Close()
+			if cerr != nil {
+				c.Errf("failed to close statement %s", err)
+			}
 		}
 
 		if err != nil {
@@ -395,8 +431,6 @@ func (c *DiskCache) execWithRetry(query string, args ...any) {
 		}
 
 		c.Debugf("successfully executed persistent buffer write")
-
-		defer stmt.Close()
 
 		return
 	}
@@ -474,11 +508,15 @@ func (c *DiskCache) write(r *plugin.Result) {
 
 		if (now - c.oldestData) > c.storagePeriod+StorageTolerance {
 			query := fmt.Sprintf("DELETE FROM data_%d WHERE clock<?", c.serverID)
-			if _, err := c.database.Exec(query, now-c.storagePeriod); err != nil {
+
+			var err error
+
+			//nolint:noctx // legacy code, should be refactored
+			_, err = c.database.Exec(query, now-c.storagePeriod)
+			if err != nil {
 				c.Errf("cannot delete old data from data_%d : %s", c.serverID, err)
 			}
 
-			var err error
 			c.oldestData, err = c.getOldestWriteClock(tableName("data", c.serverID))
 			if err != nil {
 				c.Errf("cannot query minimum write clock from data_%d : %s", c.serverID, err)
@@ -525,11 +563,15 @@ func (c *DiskCache) writeCommand(cr *CommandResult) {
 
 	if (now - c.oldestCommand) > c.storagePeriod+StorageTolerance {
 		query := fmt.Sprintf("DELETE FROM command_%d WHERE write_clock<?", c.serverID)
-		if _, err := c.database.Exec(query, now-c.storagePeriod); err != nil {
+
+		var err error
+
+		//nolint:noctx // legacy code, should be refactored
+		_, err = c.database.Exec(query, now-c.storagePeriod)
+		if err != nil {
 			c.Errf("cannot delete old commands from command_%d : %s", c.serverID, err)
 		}
 
-		var err error
 		c.oldestCommand, err = c.getOldestWriteClock(tableName("command", c.serverID))
 		if err != nil {
 			c.Errf("cannot query minimum write clock from command_%d : %s", c.serverID, err)
@@ -628,22 +670,4 @@ func (c *DiskCache) init(options *agent.AgentOptions) {
 	if err = c.updateCommandRange(); err != nil {
 		c.Errf("cannot update command clock")
 	}
-}
-
-func (c *DiskCache) Start() {
-	// register with secondary group to stop result cache after other components are stopped
-	monitor.Register(monitor.Output)
-	go c.run()
-}
-
-func (c *DiskCache) SlotsAvailable() int {
-	return int(^uint(0) >> 1) //Max int
-}
-
-func (c *DiskCache) PersistSlotsAvailable() int {
-	if atomic.LoadUint32(&c.persistFlag) == 1 {
-		return 0
-	}
-
-	return int(^uint(0) >> 1) //Max int
 }
