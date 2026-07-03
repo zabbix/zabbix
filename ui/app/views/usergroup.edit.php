@@ -329,6 +329,7 @@ $proxy_access_list_form_grid = (new CFormGrid())
 						'srcfld2' => 'name',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'proxyids_',
+						'without_proxy_group' => '1',
 						'disable_selected' => true
 					]
 				]
