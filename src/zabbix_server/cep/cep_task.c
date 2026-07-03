@@ -160,13 +160,14 @@ static void	cep_task_event_free(void *mw_task)
  *             eventid       - [IN] identifier of the event to close          *
  *             userid        - [IN] user identifier performing the close      *
  *             correlationid - [IN] correlation identifier for the operation  *
+ *             c_eventid     - [IN] correleation event ID                     *
  *             cep_ruleid    - [IN] cep ruleid for the operation              *
  *                                                                            *
  * Return value: created task                                                 *
  *                                                                            *
  ******************************************************************************/
 zbx_mw_task_t	*cep_create_task_close_event(zbx_db_event *event, zbx_uint64_t eventid, zbx_uint64_t userid,
-		zbx_uint64_t correlationid, zbx_uint64_t cep_ruleid)
+		zbx_uint64_t correlationid, zbx_uint64_t c_eventid, zbx_uint64_t cep_ruleid)
 {
 	zbx_cep_task_close_event_t	*task;
 
@@ -177,6 +178,7 @@ zbx_mw_task_t	*cep_create_task_close_event(zbx_db_event *event, zbx_uint64_t eve
 	task->eventid = eventid;
 	task->userid = userid;
 	task->correlationid = correlationid;
+	task->c_eventid = c_eventid;
 	task->cep_ruleid = cep_ruleid;
 
 	return (zbx_mw_task_t *)task;

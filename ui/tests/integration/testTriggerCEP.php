@@ -29,6 +29,10 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @hosts test
  */
 class testTriggerCEP extends CIntegrationTest {
+	const LLD_DISCOVERY_COUNT = 2000; // should be at least 4000 for local tests
+	const LOG_EVENT_COUNT = 10000;
+
+	const SKIP_RESTART_TESTS = true;
 
 	const HOST_NAME = 'test';
 	const TEMPLATE_NAME = 'template_trigger_cep';
@@ -47,8 +51,9 @@ class testTriggerCEP extends CIntegrationTest {
 	// the tag name does not contain {ITEM.VALUE}, so it is not rewritten at event time and the service
 	// problem-tag match is stable across all scenarios.
 	const SERVICE_TAG = 'cep_service';
-	const LLD_DISCOVERY_COUNT = 4000;
-	const LOG_EVENT_COUNT = 10000;
+	// Extra tag added to problem events by a webhook (see createExtraTagWebhookAction), used to verify that
+	// tags returned by a media type are applied to the events they were generated for.
+	const WEB_SERVICE_TAG = 'web_service';
 
 	// Separate template used to stress single-trigger event generation. The template (linked directly to
 	// the HOST_NAME host) carries a master log item plus an LLD rule with a dependent log item prototype.
@@ -67,10 +72,12 @@ class testTriggerCEP extends CIntegrationTest {
 	// change iterations to fail faster when debugging
 	const STATE_CHANGE_WAIT_ITERATIONS = 30;
 
-	// When true, the *Restart test variants are skipped entirely. Set during development to avoid the
-	// slow server stop/start cycles; the non-restart tests still run (their @depends point at non-restart
-	// siblings, so they do not cascade-skip).
-	const SKIP_RESTART_TESTS = false;
+	// When true, prepareData() deletes every internal-source action instead of enabling the built-in
+	// "Report not supported items" / "Report unknown triggers" actions for the whole suite. The *Unknown
+	// tests then (re)create those two actions for their own run only and delete them again afterwards, so
+	// the rest of the suite runs without the server generating internal item-not-supported /
+	// trigger-unknown events. When false the historic behaviour (enabled for the whole suite) is used.
+	const SCOPED_INTERNAL_ACTIONS = true;
 
 	// Active proxy whose name is spoofed when delivering item values. The host (and, by inheritance, the
 	// discovered host) is assigned to this proxy in prepareData(), and every value is sent to the server
@@ -110,6 +117,8 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $service_actionid;
 	private static $trigger_actionid;
 	private static $mediatypeid;
+	private static $tag_mediatypeid;
+	private static $tag_actionid;
 	private static $sessionid = null;
 
 	/**
@@ -126,7 +135,8 @@ class testTriggerCEP extends CIntegrationTest {
 				'HistoryCacheSize' => '32M',
 				'HistoryIndexCacheSize' => '32M',
 				'ValueCacheSize' => '128M',
-				'LogSlowQueries' => 10000
+				'LogSlowQueries' => 10000,
+				'StartEscalators' => 8
 			]
 		];
 	}
@@ -407,11 +417,18 @@ class testTriggerCEP extends CIntegrationTest {
 		// before enabling the internal actions below, so their notifications route through it too.
 		$this->prepareWebhookMediaType();
 
-		// Enable the internal event actions for the whole suite so the server generates internal
-		// item-not-supported and trigger-unknown events (verified by the *Unknown tests). They are
-		// disabled again in clearData(). The configuration cache is reloaded by the first test.
-		$this->setInternalActionStatus('Report unknown triggers', ACTION_STATUS_ENABLED);
-		$this->setInternalActionStatus('Report not supported items', ACTION_STATUS_ENABLED);
+		// Make the server generate internal item-not-supported and trigger-unknown events (verified by the
+		// *Unknown tests). With SCOPED_INTERNAL_ACTIONS the internal actions are disabled here and re-enabled
+		// only for the *Unknown tests, so the rest of the suite runs without them; otherwise the built-in
+		// actions are enabled for the whole suite. Either way clearData() cleans up and the configuration
+		// cache is reloaded by the first test (or by enableInternalActions()).
+		if (self::SCOPED_INTERNAL_ACTIONS) {
+			$this->disableInternalActions();
+		}
+		else {
+			$this->setInternalActionStatus('Report unknown triggers', ACTION_STATUS_ENABLED);
+			$this->setInternalActionStatus('Report not supported items', ACTION_STATUS_ENABLED);
+		}
 
 		return true;
 	}
@@ -1123,6 +1140,11 @@ class testTriggerCEP extends CIntegrationTest {
 				'Discovered trigger '.$trigger['triggerid'].' was not updated to multiple-event mode.');
 		}
 
+		// Start from a clean correlation slate so rules left over from other CEP scenarios (parity
+		// "odd"/"even", "close on up", ...) cannot stay active during this test. The rule below is then
+		// (re)created as the only CEP correlation rule.
+		$this->deleteCepCorrelations();
+
 		// Create a global event correlation rule: close old events whose 'service' tag value
 		// is 'down' when a new event arrives with 'service' tag value 'up'.
 		// This exercises the global-correlation path independently of trigger-level correlation.
@@ -1187,6 +1209,260 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
 		return true;
+	}
+
+	/**
+	 * Reconfigure both trigger prototypes for the "close old down when new up" global correlation
+	 * scenario. The key difference from prepareDataGlobalCorrelation is that the trigger expression
+	 * matches both "down" and "up", so an "up_N" value is itself a PROBLEM event (not a recovery) that
+	 * can drive global correlation as the new event. Each trigger carries:
+	 *   - 'state'   = the leading letters of the value ("down"/"up"), the old/new discriminator;
+	 *   - 'service' = the trailing number of the value ("0"/"1"), the pairing key so "up_1" correlates
+	 *                 to "down_1".
+	 * A single global correlation rule (old state="down" + new state="up" + service tag pair,
+	 * CLOSE_OLD + CLOSE_NEW) is created; it stays silent while only "down" problems are opened and only
+	 * fires once "up" problems arrive.
+	 */
+	public function prepareDataGlobalCorrelationCloseOnUp($evaltype = CONDITION_EVAL_TYPE_AND_OR,
+			$extra_tag_via_webhook = false) {
+		// Switch item prototypes to text so the find() function can be used in expressions.
+		$this->call('itemprototype.update', [
+			'itemid' => self::$item_prototypeid,
+			'value_type' => ITEM_VALUE_TYPE_TEXT
+		]);
+
+		$this->call('itemprototype.update', [
+			'itemid' => self::$dep_item_prototypeid,
+			'value_type' => ITEM_VALUE_TYPE_TEXT
+		]);
+
+		// Both prototypes: find(regexp,"down|up") so "up" is a PROBLEM (not a recovery) + multiple event
+		// generation + global correlation, plus a 'state' tag ("down"/"up") and a 'service' tag (the
+		// trailing number) that pairs an "up_N" problem with its "down_N" problem.
+		//
+		// When $extra_tag_via_webhook is set, the correlation still uses the 'service' trigger tag as usual;
+		// additionally a webhook media type (see createExtraTagWebhookAction) adds a separate WEB_SERVICE_TAG
+		// tag to each problem event from JavaScript, so the test can verify that tags returned by a media
+		// type are applied to the events they were generated for.
+		$common_tags = [
+			['tag' => 'component', 'value' => self::LLD_MACRO],
+			['tag' => self::SERVICE_TAG, 'value' => self::LLD_MACRO],
+			['tag' => 'state', 'value' => '{{ITEM.VALUE}.regsub("^([a-z]+)", "\\1")}'],
+			['tag' => 'service', 'value' => '{{ITEM.VALUE}.regsub("([0-9]+)$", "\\1")}']
+		];
+
+		$this->call('triggerprototype.update', [
+			'triggerid' => self::$trigger_prototypeid,
+			'description' => 'CEP trigger for '.self::LLD_MACRO,
+			'expression' => 'find(/'.self::TEMPLATE_NAME.'/'.self::ITEM_PROTO_KEY
+				.'['.self::LLD_MACRO.'],,"regexp","down|up")=1',
+			'event_name' => 'CEP trigger '.self::LLD_MACRO.' {ITEM.VALUE}',
+			'recovery_mode' => ZBX_RECOVERY_MODE_EXPRESSION,
+			'recovery_expression' => '',
+			'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
+			'correlation_tag' => '',
+			'type' => TRIGGER_MULT_EVENT_ENABLED,
+			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
+			'tags' => array_merge([['tag' => 'type', 'value' => 'cep']], $common_tags)
+		]);
+
+		$this->call('triggerprototype.update', [
+			'triggerid' => self::$dep_trigger_prototypeid,
+			'description' => 'CEP dependent trigger for '.self::LLD_MACRO,
+			'expression' => 'find(/'.self::TEMPLATE_NAME.'/'.self::ITEM_PROTO_KEY2
+				.'['.self::LLD_MACRO.'],,"regexp","down|up")=1',
+			'event_name' => 'CEP trigger '.self::LLD_MACRO.' {ITEM.VALUE}',
+			'recovery_mode' => ZBX_RECOVERY_MODE_EXPRESSION,
+			'recovery_expression' => '',
+			'dependencies' => [],
+			'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
+			'correlation_tag' => '',
+			'type' => TRIGGER_MULT_EVENT_ENABLED,
+			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
+			'tags' => array_merge([['tag' => 'type', 'value' => 'cep-dep']], $common_tags)
+		]);
+
+		// Resend LLD discovery data to re-instantiate the discovered triggers and items with the new config.
+		$this->dispatchSenderValues([
+			[
+				'host' => self::HOST_DISC_VALUE,
+				'key' => self::LLD_RULE_KEY,
+				'value' => $this->buildItemLLDData()
+			]
+		], null, 0);
+
+		// Wait for the discovered items to reflect the text value type and the discovered triggers to
+		// reflect global correlation mode + multiple event generation.
+		$this->callUntilDataIsPresent('item.get', [
+			'hostids' => [self::$disc_hostid],
+			'search' => ['key_' => self::ITEM_PROTO_KEY.'['],
+			'output' => ['itemid', 'value_type']
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+			if (count($response['result']) !== self::LLD_DISCOVERY_COUNT) {
+				return false;
+			}
+			foreach ($response['result'] as $item) {
+				if ((int) $item['value_type'] !== ITEM_VALUE_TYPE_TEXT) {
+					return false;
+				}
+			}
+			return true;
+		});
+
+		// Filter on the 'state' tag the updated prototype adds (the only genuinely new tag), so requiring
+		// both ids back confirms the new config was applied rather than the pre-update defaults.
+		$this->callUntilDataIsPresent('trigger.get', [
+			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
+			'output' => ['triggerid', 'correlation_mode', 'type'],
+			'tags' => [['tag' => 'state', 'operator' => TAG_OPERATOR_EXISTS]]
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+			if (count($response['result']) !== 2) {
+				return false;
+			}
+			foreach ($response['result'] as $trigger) {
+				if ((int) $trigger['correlation_mode'] !== ZBX_TRIGGER_CORRELATION_NONE
+						|| (int) $trigger['type'] !== TRIGGER_MULT_EVENT_ENABLED) {
+					return false;
+				}
+			}
+			return true;
+		});
+
+		// Start from a clean correlation slate, then create the single "close old down when new up" rule.
+		$this->deleteCepCorrelations();
+		self::$correlationid = $this->upsertCorrelation(
+			$this->buildCloseOnUpCorrelationParams('CEP global event correlation up', $evaltype)
+		);
+
+		// Optionally add an extra webhook-computed tag to every problem event.
+		if ($extra_tag_via_webhook) {
+			$this->createExtraTagWebhookAction();
+		}
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return true;
+	}
+
+	/**
+	 * Create a webhook media type and a trigger action that together add an extra WEB_SERVICE_TAG tag (the
+	 * trailing number of the item value, e.g. "0" for "down_0") to every discovered CEP problem event using
+	 * JavaScript. This does not affect correlation (which still uses the 'service' trigger tag) — it lets
+	 * the test verify that tags returned by a media type are applied to the events they were generated for.
+	 *
+	 * The media type has process_tags enabled; its script parses the item value passed as a parameter,
+	 * extracts the trailing number and returns it in the {"tags": {...}} form the alerter applies to the
+	 * event. A second media is attached to the Admin user for this media type, and a trigger action firing
+	 * on the discovered CEP triggers (event tag type=cep / type=cep-dep) routes its problem operation
+	 * through the webhook, so each PROBLEM event ("down_N" and, since the expression matches "up", "up_N")
+	 * gets a WEB_SERVICE_TAG tag.
+	 *
+	 * Everything created here is removed in removeExtraTagWebhookAction() / clearData().
+	 */
+	private function createExtraTagWebhookAction(): void {
+		$tag = self::WEB_SERVICE_TAG;
+		$script_code = <<<HEREDOC
+var params = JSON.parse(value),
+	match = params.item_value.match(/([0-9]+)\$/);
+
+return JSON.stringify({tags: {'$tag': match === null ? '' : match[1]}});
+HEREDOC;
+
+		$response = $this->call('mediatype.create', [
+			'name' => 'CEP extra tag webhook',
+			'type' => MEDIA_TYPE_WEBHOOK,
+			'script' => $script_code,
+			'process_tags' => ZBX_MEDIA_TYPE_TAGS_ENABLED,
+			'status' => MEDIA_TYPE_STATUS_ACTIVE,
+			'parameters' => [
+				['name' => 'item_value', 'value' => '{ITEM.VALUE}']
+			]
+		]);
+		$this->assertArrayHasKey('mediatypeids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['mediatypeids']);
+		self::$tag_mediatypeid = $response['result']['mediatypeids'][0];
+
+		// Attach the tagging media type to the Admin user alongside the shared CEP webhook media, so the
+		// action's message operation actually generates an alert (and thus runs the webhook).
+		$this->call('user.update', [
+			'userid' => 1,
+			'medias' => [
+				['mediatypeid' => self::$mediatypeid, 'sendto' => 'cep'],
+				['mediatypeid' => self::$tag_mediatypeid, 'sendto' => 'cep']
+			]
+		]);
+
+		// Trigger action firing on every discovered CEP trigger event (both prototypes, type=cep and
+		// type=cep-dep are OR'd together), routing the problem operation through the tagging webhook.
+		$response = $this->call('action.create', [
+			'name' => 'CEP extra tag action',
+			'eventsource' => EVENT_SOURCE_TRIGGERS,
+			'status' => ACTION_STATUS_ENABLED,
+			'esc_period' => '1h',
+			'pause_suppressed' => 0,
+			/*'filter' => [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => [
+					[
+						'conditiontype' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'value2' => 'type',
+						'value' => 'cep'
+					],
+					[
+						'conditiontype' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'value2' => 'type',
+						'value' => 'cep-dep'
+					]
+				]
+			],*/
+			'operations' => [
+				[
+					'esc_period' => 0,
+					'esc_step_from' => 1,
+					'esc_step_to' => 1,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => ['default_msg' => 0, 'mediatypeid' => self::$tag_mediatypeid,
+						'message' => 'Problem', 'subject' => 'Problem'
+					],
+					'opmessage_grp' => [
+						['usrgrpid' => 7]
+					]
+				]
+			]
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['actionids']);
+		self::$tag_actionid = $response['result']['actionids'][0];
+
+		// The service/trigger actions are already disabled once the services-specific tests finish (see
+		// disableServicesActions), so only the tagging webhook fires in this scenario.
+	}
+
+	/**
+	 * Tear down the webhook media type, its user media and the trigger action created by
+	 * createExtraTagWebhookAction(), restoring the Admin user to only the shared CEP webhook media so the
+	 * tagging webhook does not leak into subsequent tests.
+	 */
+	private function removeExtraTagWebhookAction(): void {
+		if (!empty(self::$tag_actionid)) {
+			$this->call('action.delete', [self::$tag_actionid]);
+			self::$tag_actionid = null;
+		}
+
+		if (!empty(self::$tag_mediatypeid)) {
+			$this->call('user.update', [
+				'userid' => 1,
+				'medias' => [
+					['mediatypeid' => self::$mediatypeid, 'sendto' => 'cep']
+				]
+			]);
+			$this->call('mediatype.delete', [self::$tag_mediatypeid]);
+			self::$tag_mediatypeid = null;
+		}
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 	}
 
 	/**
@@ -1307,6 +1583,55 @@ class testTriggerCEP extends CIntegrationTest {
 			$filter = [
 				'evaltype' => $evaltype,
 				'conditions' => [$old_odd]
+			];
+		}
+
+		return [
+			'name' => $name,
+			'filter' => $filter,
+			'operations' => [
+				['type' => ZBX_CORR_OPERATION_CLOSE_OLD],
+				['type' => ZBX_CORR_OPERATION_CLOSE_NEW]
+			]
+		];
+	}
+
+	/**
+	 * Build a global event correlation rule that closes an old "down" problem when a new "up" problem
+	 * with the same sequence arrives. Unlike the parity/service rules that correlate a re-sent "down",
+	 * here the closing event is itself a PROBLEM ("up_N", so the trigger expression must match "up" too):
+	 *   - new event state="up"
+	 *   - tag pair service=service (the trailing number, so "up_1" pairs with "down_1")
+	 * CLOSE_OLD closes the paired "down" problem and CLOSE_NEW closes the "up" problem itself. No old-event
+	 * state="down" condition is needed: correlation only matches open problems and every "up" closes itself
+	 * via CLOSE_NEW, so the only open problem sharing a given service number is always its "down".
+	 */
+	private function buildCloseOnUpCorrelationParams(string $name, $evaltype): array {
+		$new_up = [
+			'type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE,
+			'tag' => 'state',
+			'operator' => CONDITION_OPERATOR_EQUAL,
+			'value' => 'up'
+		];
+		$tag_pair = [
+			'type' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
+			'oldtag' => 'service',
+			'newtag' => 'service'
+		];
+
+		if ($evaltype == CONDITION_EVAL_TYPE_EXPRESSION) {
+			$new_up['formulaid'] = 'A';
+			$tag_pair['formulaid'] = 'B';
+			$filter = [
+				'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+				'formula' => 'A and B',
+				'conditions' => [$new_up, $tag_pair]
+			];
+		}
+		else {
+			$filter = [
+				'evaltype' => $evaltype,
+				'conditions' => [$new_up, $tag_pair]
 			];
 		}
 
@@ -1894,6 +2219,30 @@ class testTriggerCEP extends CIntegrationTest {
 
 		// All services recover to OK with no open service problems.
 		$this->assertServicesStatus(ZBX_SEVERITY_OK, 0);
+
+		// This is the last services-specific test (the restart sibling is either the true last run or is
+		// skipped), so disable the service/trigger actions: they must not fire on the events generated by the
+		// later, non-services scenarios. The services and the actions are removed entirely in clearData().
+		if ($restart || self::SKIP_RESTART_TESTS) {
+			$this->disableServicesActions();
+		}
+	}
+
+	/**
+	 * Disable the service action created by createServicesAndActions() so it no longer fires on the events
+	 * of later (non-services) scenarios. The trigger action is left enabled so it keeps firing on the
+	 * discovered triggers in the later scenarios. Idempotent and guarded, so it is safe if the action was
+	 * never created. Both actions are deleted in clearData().
+	 */
+	private function disableServicesActions(): void {
+		if (!empty(self::$service_actionid)) {
+			$this->call('action.update', [
+				'actionid' => self::$service_actionid,
+				'status' => ACTION_STATUS_DISABLED
+			]);
+		}
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 	}
 
 	/**
@@ -1909,10 +2258,9 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->captureEventBaseline($triggerids);
 
 		// Build a long alternating PROBLEM/recovery burst (1,0,1,0,...) for every discovered item and send
-		// it in a single batch. All values share the same clock and are ordered only by their nanoseconds
-		// (the value index), so CEP must process the whole rapid burst in order and emit one event per
-		// transition without collapsing or dropping any. The sequence ends on 0 so the triggers finish OK.
-		$now = time();
+		// it in a single batch. Every value gets a strictly increasing (clock, ns) so CEP must process the
+		// whole rapid burst in order and emit one event per transition without collapsing or dropping any.
+		// The sequence ends on 0 so the triggers finish OK.
 		$values = [];
 		for ($i = 0; $i < 3; $i++) {
 			$values[] = '1';
@@ -1921,9 +2269,8 @@ class testTriggerCEP extends CIntegrationTest {
 
 		$data = [];
 		foreach ($keys as $key) {
-			foreach ($values as $ns => $value) {
-				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value,
-						'clock' => $now, 'ns' => $ns];
+			foreach ($values as $value) {
+				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
 			}
 		}
 		$this->dispatchSenderValues($data, null, 0);
@@ -1964,7 +2311,6 @@ class testTriggerCEP extends CIntegrationTest {
 		$this->captureEventBaseline($triggerids);
 
 		$unsupported = 'not_a_number';
-		$now = time();
 		$values = [];
 		for ($i = 0; $i < 3; $i++) {
 			$values[] = $unsupported;
@@ -1973,9 +2319,8 @@ class testTriggerCEP extends CIntegrationTest {
 
 		$data = [];
 		foreach ($keys as $key) {
-			foreach ($values as $ns => $value) {
-				$entry = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value,
-						'clock' => $now, 'ns' => $ns];
+			foreach ($values as $value) {
+				$entry = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
 				// The server skips preprocessing for proxy-delivered values, so the unsupported transition
 				// must be reported explicitly rather than relying on the non-numeric value failing.
 				if ($value === $unsupported) {
@@ -2035,12 +2380,11 @@ class testTriggerCEP extends CIntegrationTest {
 
 		$this->captureEventBaseline([$triggerid]);
 
-		// Build a long alternating PROBLEM/recovery burst (1,0,1,0,...) and send it in a single batch. All
-		// values share the same clock and are ordered only by their nanoseconds (the value index), so CEP
-		// must process the whole rapid burst in order and emit one event per transition without collapsing
-		// or dropping any. The sequence ends on 0 so the trigger finishes OK.
+		// Build a long alternating PROBLEM/recovery burst (1,0,1,0,...) and send it in a single batch. Every
+		// value gets a strictly increasing (clock, ns) so CEP must process the whole rapid burst in order
+		// and emit one event per transition without collapsing or dropping any. The sequence ends on 0 so
+		// the trigger finishes OK.
 		$cycles = 1000;
-		$now = time();
 		$values = [];
 		for ($i = 0; $i < $cycles; $i++) {
 			$values[] = '1';
@@ -2048,9 +2392,8 @@ class testTriggerCEP extends CIntegrationTest {
 		}
 
 		$data = [];
-		foreach ($values as $ns => $value) {
-			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value,
-					'clock' => $now, 'ns' => $ns];
+		foreach ($values as $value) {
+			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
 		}
 		$this->dispatchSenderValues($data, null, 0);
 
@@ -2074,9 +2417,10 @@ class testTriggerCEP extends CIntegrationTest {
 
 	/**
 	 * Smoke test (part 1/2): a discovered item becomes unsupported and its trigger enters the UNKNOWN
-	 * state. The internal "Report unknown triggers" and "Report not supported items" actions are enabled
-	 * for the whole suite in prepareData(), so the server opens an internal problem for every unsupported
-	 * item and every unknown trigger. The trigger value stays OK (it was not in a problem) while the state
+	 * state. The internal "Report unknown triggers" and "Report not supported items" actions are active for
+	 * this test (created by runOpenUnknownTest() when SCOPED_INTERNAL_ACTIONS is set, otherwise enabled for
+	 * the whole suite in prepareData()), so the server opens an internal problem for every unsupported item
+	 * and every unknown trigger. The trigger value stays OK (it was not in a problem) while the state
 	 * becomes UNKNOWN; the UNKNOWN state and the open internal problems are left in place and cleared by
 	 * testTriggerCEP_CloseUnknown.
 	 *
@@ -2258,7 +2602,7 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
-	 * @depends testTriggerCEP_EventAssessmentNone
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_EventAssessmentRecoveryExpression() {
 		$this->clearDiscoveredItemHistory();
@@ -2510,12 +2854,12 @@ class testTriggerCEP extends CIntegrationTest {
 	 *
 	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationParityExpression
 	 */
-	public function testTriggerCEP_EventAssessmentGlobalCorrelationParityExpressionRestart() {
+	/*public function testTriggerCEP_EventAssessmentGlobalCorrelationParityExpressionRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataGlobalCorrelationParity();
 		$this->runEventAssessmentTestGlobalCorrelationParity(true, CONDITION_EVAL_TYPE_EXPRESSION);
 		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
-	}
+	}*/
 
 	/**
 	 * Same assessment as testTriggerCEP_EventAssessmentGlobalCorrelationParity, but the correlation rules
@@ -2536,12 +2880,123 @@ class testTriggerCEP extends CIntegrationTest {
 	 *
 	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationParityCloseAll
 	 */
-	public function testTriggerCEP_EventAssessmentGlobalCorrelationParityCloseAllRestart() {
+	/*public function testTriggerCEP_EventAssessmentGlobalCorrelationParityCloseAllRestart() {
 		$this->skipIfRestartTestsDisabled();
 		$this->prepareDataGlobalCorrelationParity();
 		$this->runEventAssessmentTestGlobalCorrelationParity(true, CONDITION_EVAL_TYPE_AND_OR, true);
 		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}*/
+
+	/**
+	 * Verify "close old down when new up" global event correlation. Each discovered trigger opens two
+	 * "down" problems, each with a globally unique 'service' id; then the matching "up" values — themselves
+	 * PROBLEM events, since the trigger expression matches "up" too — close exactly the corresponding
+	 * "down" problem (and themselves) via a rule keyed on old state="down" + new state="up" + a service
+	 * tag pair. Unique ids make the closing strictly 1:1 rather than closing every problem at once. No
+	 * open problem remains.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp() {
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 	}
+
+	/**
+	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp
+	 * (correlation still pairs on the 'service' trigger tag), but a webhook media type with process_tags
+	 * enabled additionally adds a WEB_SERVICE_TAG tag to every problem event from JavaScript, driven by a
+	 * trigger action on the discovered CEP triggers. After the scenario the test asserts that every problem
+	 * event carries WEB_SERVICE_TAG whose value matches the trailing number of the event name, verifying that
+	 * tags returned by a media type are applied to the events they were generated for.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpJS$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpJS() {
+		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_AND_OR, true);
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		// The scenario opens two "down" problems per trigger (waves 1 and 2), which stay open long enough to
+		// escalate and run the tagging webhook. The two "up" waves are PROBLEM events too, but each is closed
+		// by correlation (CLOSE_NEW) on creation, so its escalation is cancelled and the webhook never fires —
+		// only the down problems get tagged. Hence 2 tagged problem events per trigger (key).
+		$m = count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY))
+			+ count($this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2));
+
+		try {
+			// Bound the event.get verification below to events generated by this run only.
+			$this->captureEventBaseline($all);
+
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
+			$this->waitForNoOpenProblems($all);
+
+			$this->waitForProblemEventsTagged($all, self::WEB_SERVICE_TAG, 2 * $m);
+		}
+		finally {
+			$this->removeExtraTagWebhookAction();
+		}
+	}
+
+	/**
+	 * Same scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp but the server component
+	 * is stopped and restarted between each step.
+	 *
+	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
+	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp,
+	 * but the discovered host is under data-collection maintenance for the whole run: every problem the
+	 * scenario opens must be suppressed while global correlation still closes it, so no open problem remains.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenance$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenance() {
+		$maintenanceid = $this->startDiscHostMaintenance();
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true);
+			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		}
+		finally {
+			$this->stopDiscHostMaintenance($maintenanceid);
+		}
+	}
+
+	/**
+	 * Same "close old down when new up" scenario as
+	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
+	 * CONDITION_EVAL_TYPE_EXPRESSION with a custom formula ("A and B and C") instead of
+	 * CONDITION_EVAL_TYPE_AND_OR, exercising the custom expression evaluation path.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpExpression$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	/*public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpExpression() {
+		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_EXPRESSION);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}*/
+
+	/**
+	 * Same scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpExpression but the server
+	 * component is stopped and restarted between each step.
+	 *
+	 * @depends testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpExpression
+	 */
+	/*public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpExpressionRestart() {
+		$this->skipIfRestartTestsDisabled();
+		$this->prepareDataGlobalCorrelationCloseOnUp(CONDITION_EVAL_TYPE_EXPRESSION);
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}*/
 
 	/**
 	 * Discover a single log trigger from the dedicated log template (linked directly to the host) and
@@ -2606,15 +3061,12 @@ class testTriggerCEP extends CIntegrationTest {
 		// master values to dependents, so the burst is pushed straight to the dependent item here rather
 		// than to the master.
 		$item_key = self::LOG_ITEM_PROTO_KEY.'['.self::LOG_COMPONENT_VALUE.']';
-		$base_clock = time();
 		$values = [];
 		for ($i = 0; $i < self::LOG_EVENT_COUNT; $i++) {
 			$values[] = [
 				'host' => self::HOST_NAME,
 				'key' => $item_key,
-				'value' => 'problem '.$i,
-				'clock' => $base_clock,
-				'ns' => $i + 1
+				'value' => 'problem '.$i
 			];
 		}
 		$this->dispatchSenderValues($values, null, 0);
@@ -2639,16 +3091,19 @@ class testTriggerCEP extends CIntegrationTest {
 		$triggerids = [self::$discovered_log_triggerid];
 
 		// Sent directly to the dependent discovered log item (see openLogProblemBurst): the server does not
-		// propagate proxy-delivered master values to dependents.
-		$this->dispatchSenderValues([
-			[
+		// propagate proxy-delivered master values to dependents. A burst of non-matching values is sent (as in
+		// openLogProblemBurst) to stress parallel recovery, even though a single value is enough to turn the
+		// trigger expression false and recover all open problems.
+		$item_key = self::LOG_ITEM_PROTO_KEY.'['.self::LOG_COMPONENT_VALUE.']';
+		$values = [];
+		for ($i = 0; $i < self::LOG_EVENT_COUNT; $i++) {
+			$values[] = [
 				'host' => self::HOST_NAME,
-				'key' => self::LOG_ITEM_PROTO_KEY.'['.self::LOG_COMPONENT_VALUE.']',
-				'value' => 'recovered',
-				'clock' => time(),
-				'ns' => $this->currentNs()
-			]
-		], null, 0);
+				'key' => $item_key,
+				'value' => 'recovered '.$i
+			];
+		}
+		$this->dispatchSenderValues($values, null, 0);
 
 		$this->waitForNoOpenProblems($triggerids, 'log recovery');
 	}
@@ -2772,6 +3227,13 @@ class testTriggerCEP extends CIntegrationTest {
 	 * an internal problem is opened for every unsupported item and every unknown trigger.
 	 */
 	private function runOpenUnknownTest(): void {
+		// With SCOPED_INTERNAL_ACTIONS the internal actions were disabled in prepareData(); enable them here
+		// so the server starts generating internal item-not-supported / trigger-unknown events just for the
+		// *Unknown tests. They are disabled again by runCloseUnknownTest().
+		if (self::SCOPED_INTERNAL_ACTIONS) {
+			$this->enableInternalActions();
+		}
+
 		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 
 		// Push a non-numeric value to flip all items into unsupported state; CEP keeps the trigger
@@ -2828,6 +3290,13 @@ class testTriggerCEP extends CIntegrationTest {
 			'object' => EVENT_OBJECT_ITEM,
 			'source' => EVENT_SOURCE_INTERNAL
 		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+
+		// Disable the internal actions enabled by runOpenUnknownTest() so the rest of the suite runs without
+		// the server generating internal events again.
+		if (self::SCOPED_INTERNAL_ACTIONS) {
+			$this->disableInternalActions();
+			$this->reloadConfigurationCacheAndWaitForLogLine();
+		}
 	}
 
 	private function runEventAssessmentTest(bool $restart): void {
@@ -3052,6 +3521,79 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Run the "close old down when new up" global event correlation scenario. Unlike
+	 * runEventAssessmentTestGlobalCorrelation (where "up" is a recovery that resolves the trigger), the
+	 * trigger expression here matches "up" too, so the "up_<id>" values are PROBLEM events that drive
+	 * the correlation.
+	 *
+	 * Every problem carries a globally unique 'service' id (the trailing number of the value), so the
+	 * service tag pair correlates an "up" event to exactly one "down" problem (1:1). Broadcasting a
+	 * reused id would instead let a single "up" close every problem sharing that id; unique ids make the
+	 * closing strictly corresponding. Both prototypes participate; with $m = total triggers, key index
+	 * $i opens problem id $i and, in a second wave, id $i+$m — so each trigger holds two problems:
+	 *
+	 *   1. "down_<i>"    → PROBLEM, state="down", service="<i>"; trigger goes TRUE.
+	 *   2. "down_<i+m>"  → PROBLEM, state="down", service="<i+m>" (mult_event); trigger stays TRUE.
+	 *                      Two problems are now open per trigger; the rule is silent (no "up" event yet).
+	 *   3. "up_<i>"      → PROBLEM, state="up", service="<i>"; global correlation (old state="down" + new
+	 *                      state="up" + service tag pair) closes exactly the paired "down_<i>" (CLOSE_OLD)
+	 *                      and the "up_<i>" itself (CLOSE_NEW). Each trigger's "down_<i+m>" stays open, so
+	 *                      triggers stay TRUE and exactly $m problems remain.
+	 *   4. "up_<i+m>"    → closes each trigger's remaining "down_<i+m>" and itself. Nothing stays open.
+	 */
+	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart, bool $maintenance = false): void {
+		$keys = array_merge(
+			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
+			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2)
+		);
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+		$m = count($keys);
+
+		// Build one sender value per key with a unique id: value "<prefix>_<offset + key index>".
+		$values = fn(string $prefix, int $offset) => array_map(
+			fn($key, $i) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $prefix.'_'.($offset + $i)],
+			$keys, array_keys($keys)
+		);
+
+		// All triggers must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'All triggers must start in OK state for close-on-up global correlation test.');
+		}
+
+		// 1. Open the first problem on every trigger (unique id per trigger); triggers go TRUE.
+		$this->dispatchSenderValues($values('down', 0), null, 0);
+		$this->waitForOpenProblemCount($all, $m);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		// Under data-collection maintenance every problem opened on the host must be suppressed, while
+		// global correlation still processes and closes it normally in the steps below.
+		if ($maintenance) {
+			$this->waitForOpenProblemsSuppressed($all, $m);
+		}
+
+		$this->maybeRestartServer($restart);
+
+		// 2. Open a second problem on every trigger (a different unique id, mult_event); still TRUE.
+		$this->dispatchSenderValues($values('down', $m), null, 0);
+		$this->waitForOpenProblemCount($all, 2 * $m);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->maybeRestartServer($restart);
+
+		// 3. "up" for the first id set: each is a PROBLEM that closes only its corresponding "down"
+		//    (CLOSE_OLD) and itself (CLOSE_NEW). Each trigger's second problem stays open, so triggers
+		//    stay TRUE and exactly $m problems remain.
+		$this->dispatchSenderValues($values('up', 0), null, 0);
+		$this->waitForOpenProblemCount($all, $m);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->maybeRestartServer($restart);
+
+		// 4. "up" for the second id set closes each trigger's remaining problem; nothing stays open.
+		$this->dispatchSenderValues($values('up', $m), null, 0);
+		$this->waitForNoOpenProblems($all);
+	}
+
+	/**
 	 * Run the cross-trigger-prototype global event correlation scenario:
 	 *
 	 *   1. "down" → proto 1 items → find(regexp,"down") = true, service="down"
@@ -3193,6 +3735,31 @@ class testTriggerCEP extends CIntegrationTest {
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'tags' => [['tag' => $tag, 'value' => $value, 'operator' => TAG_OPERATOR_EQUAL]]
 		], $expected, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Poll problem.get until the total number of open problems on $triggerids equals $expected.
+	 */
+	private function waitForOpenProblemCount(array $triggerids, int $expected): void {
+		$this->callUntilCountIsPresent('problem.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS
+		], $expected, 120, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Wait until exactly $expected open problems on the given triggers are suppressed. The 'suppressed'
+	 * filter returns only suppressed problems, so a matching count means every open problem is suppressed
+	 * (as expected while the host is under maintenance).
+	 */
+	private function waitForOpenProblemsSuppressed(array $triggerids, int $expected): void {
+		$this->callUntilCountIsPresent('problem.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'suppressed' => true
+		], $expected, 120, self::WAIT_ITERATION_DELAY);
 	}
 
 	private function runDependentTriggerTest(bool $restart): void {
@@ -3570,6 +4137,44 @@ class testTriggerCEP extends CIntegrationTest {
 	}
 
 	/**
+	 * Put the discovered host into data-collection maintenance and wait for the server to start it, so any
+	 * problem opened afterwards is suppressed. Returns the maintenance id for stopDiscHostMaintenance().
+	 */
+	private function startDiscHostMaintenance(): string {
+		$now = time();
+
+		$response = $this->call('maintenance.create', [
+			'name' => 'CEP close-on-up maintenance',
+			'hosts' => ['hostid' => self::$disc_hostid],
+			'active_since' => $now - 60,
+			'active_till' => $now + 3600,
+			'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
+			'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_AND_OR,
+			'timeperiods' => [
+				'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+				'period' => 3600,
+				'start_date' => $now - 60
+			]
+		]);
+		$this->assertArrayHasKey('maintenanceids', $response['result']);
+		$this->assertCount(1, $response['result']['maintenanceids']);
+		$maintenanceid = $response['result']['maintenanceids'][0];
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return $maintenanceid;
+	}
+
+	/**
+	 * Remove a maintenance created by startDiscHostMaintenance() and reload the configuration cache so the
+	 * host leaves maintenance before the rest of the suite runs.
+	 */
+	private function stopDiscHostMaintenance(string $maintenanceid): void {
+		$this->call('maintenance.delete', [$maintenanceid]);
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+	}
+
+	/**
 	 * Skip the calling *Restart test when SKIP_RESTART_TESTS is enabled. The non-restart sibling
 	 * leaves the system in the same asserted state, so dependents can rely on it instead.
 	 */
@@ -3633,15 +4238,16 @@ class testTriggerCEP extends CIntegrationTest {
 	protected function dispatchSenderValues($values, $component = null, $delayOverride = null): void {
 		$this->ensureItemidsResolved($values);
 
-		$base_ns = (int) (microtime(true) * 1e9) % 1000000000;
-
 		$data = [];
-		foreach (array_values($values) as $i => $value) {
+		foreach (array_values($values) as $value) {
+			// Fall back to a strictly increasing (clock, ns) so any value without an explicit timestamp is
+			// still globally unique and ordered, even across batches.
+			$cn = (!isset($value['clock']) || !isset($value['ns'])) ? $this->currentClockNs() : null;
 			$entry = [
 				'itemid' => self::$itemid_cache[$value['host']."\0".$value['key']],
 				'value' => $value['value'],
-				'clock' => isset($value['clock']) ? $value['clock'] : time(),
-				'ns' => isset($value['ns']) ? $value['ns'] : ($base_ns + $i) % 1000000000
+				'clock' => isset($value['clock']) ? $value['clock'] : $cn['clock'],
+				'ns' => isset($value['ns']) ? $value['ns'] : $cn['ns']
 			];
 			if (isset($value['state'])) {
 				$entry['state'] = $value['state'];
@@ -3737,6 +4343,37 @@ class testTriggerCEP extends CIntegrationTest {
 			'actionid' => $response['result'][0]['actionid'],
 			'status' => $status
 		]);
+	}
+
+	/**
+	 * Re-enable the built-in internal "Report not supported items" and "Report unknown triggers" actions
+	 * and reload the configuration cache so the server starts generating internal item-not-supported /
+	 * trigger-unknown events. Used by the *Unknown tests when SCOPED_INTERNAL_ACTIONS disables the built-in
+	 * internal actions in prepareData().
+	 */
+	private function enableInternalActions(): void {
+		$this->setInternalActionStatus('Report not supported items', ACTION_STATUS_ENABLED);
+		$this->setInternalActionStatus('Report unknown triggers', ACTION_STATUS_ENABLED);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+	}
+
+	/**
+	 * Disable every internal-source action so the server generates no internal item-not-supported /
+	 * trigger-unknown events. Called from prepareData() (to clear the built-in actions for the whole
+	 * suite) and after the *Unknown tests to disable the actions they enabled via enableInternalActions().
+	 */
+	private function disableInternalActions(): void {
+		$response = $this->call('action.get', [
+			'output' => ['actionid'],
+			'filter' => ['eventsource' => EVENT_SOURCE_INTERNAL]
+		]);
+		if (!empty($response['result'])) {
+			$this->call('action.update', array_map(
+				fn($actionid) => ['actionid' => $actionid, 'status' => ACTION_STATUS_DISABLED],
+				array_column($response['result'], 'actionid')
+			));
+		}
 	}
 
 	private function validateTriggerParams($expected_state, $expected_value) {
@@ -3844,6 +4481,23 @@ class testTriggerCEP extends CIntegrationTest {
 		return $events_by_trigger;
 	}
 
+	/**
+	 * Wait until exactly $expected PROBLEM events since the scenario baseline carry the $tag tag on
+	 * $triggerids. Used to verify that tags returned by a webhook media type are applied to the events they
+	 * were generated for. Uses a server-side count (countOutput + a tag-exists filter) instead of fetching
+	 * every event and its tags, so the query cost stays flat regardless of how many events were generated.
+	 */
+	private function waitForProblemEventsTagged(array $triggerids, string $tag, int $expected): void {
+		$this->callUntilCountIsPresent('event.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1,
+			'filter' => ['value' => TRIGGER_VALUE_TRUE],
+			'tags' => [['tag' => $tag, 'operator' => TAG_OPERATOR_EXISTS]]
+		], $expected, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
 	private function getTriggers(array $triggerids): array {
 		$response = $this->call('trigger.get', [
 			'triggerids' => $triggerids,
@@ -3881,8 +4535,7 @@ class testTriggerCEP extends CIntegrationTest {
 		$prev_triggers = $this->getTriggers($triggerids);
 		$prev_lastchanges = array_map(fn($tid) => $prev_triggers[$tid]['lastchange'], $triggerids);
 		$this->dispatchSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value,
-					'clock' => $now , 'ns' => $this->currentNs()], $keys),
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value], $keys),
 			null, 0
 		);
 
@@ -3960,8 +4613,7 @@ class testTriggerCEP extends CIntegrationTest {
 		//$cep_processed = $this->getCepStat('events', 'assessed');
 		$expected_lastchanges = array_map(fn($tid) => $current_triggers[$tid]['lastchange'], $triggerids);
 		$this->dispatchSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value,
-					'clock' => time(), 'ns' => $this->currentNs()], $keys),
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value], $keys),
 			null, 0
 		);
 
@@ -4084,8 +4736,33 @@ class testTriggerCEP extends CIntegrationTest {
 		], $expected_open_problems, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
-	private function currentNs(): int {
-		return (int)(fmod(microtime(true), 1) * 1e9);
+	private function currentClockNs(): array {
+		static $last_clock = -1;
+		static $last_ns = -1;
+
+		$clock = time();
+		$ns = (int)(fmod(microtime(true), 1) * 1e9);
+
+		// Ensure the returned (clock, ns) pair is always strictly increasing, so no two values ever collide,
+		// even when the clock stalls, the sub-second fraction wraps, or two calls land in the same nanosecond.
+		if ($clock < $last_clock) {
+			$clock = $last_clock;
+		}
+
+		if ($clock === $last_clock && $ns <= $last_ns) {
+			$ns = $last_ns + 1;
+
+			// Carry into the next second when the nanosecond field overflows.
+			if ($ns >= 1000000000) {
+				$ns = 0;
+				$clock++;
+			}
+		}
+
+		$last_clock = $clock;
+		$last_ns = $ns;
+
+		return ['clock' => $clock, 'ns' => $ns];
 	}
 
 	private function getApiSessionId(): string {
@@ -4242,11 +4919,26 @@ class testTriggerCEP extends CIntegrationTest {
 			self::$trigger_actionid = null;
 		}
 
-		// Detach the media from the Admin user before deleting the media type it references.
-		if (!empty(self::$mediatypeid)) {
+		// Remove the extra-tag webhook action (created by createExtraTagWebhookAction) in case a test
+		// aborted before its own teardown ran.
+		if (!empty(self::$tag_actionid)) {
+			CDataHelper::call('action.delete', [self::$tag_actionid]);
+			self::$tag_actionid = null;
+		}
+
+		// Detach the media from the Admin user before deleting the media types they reference.
+		if (!empty(self::$mediatypeid) || !empty(self::$tag_mediatypeid)) {
 			CDataHelper::call('user.update', ['userid' => 1, 'medias' => []]);
-			CDataHelper::call('mediatype.delete', [self::$mediatypeid]);
-			self::$mediatypeid = null;
+
+			if (!empty(self::$tag_mediatypeid)) {
+				CDataHelper::call('mediatype.delete', [self::$tag_mediatypeid]);
+				self::$tag_mediatypeid = null;
+			}
+
+			if (!empty(self::$mediatypeid)) {
+				CDataHelper::call('mediatype.delete', [self::$mediatypeid]);
+				self::$mediatypeid = null;
+			}
 		}
 
 		if (!empty(self::$serviceids)) {
@@ -4295,17 +4987,30 @@ class testTriggerCEP extends CIntegrationTest {
 			self::$templateid = null;
 		}
 
-		// Disable the internal actions again in case a test enabled them and aborted before restoring.
-		foreach (['Report unknown triggers', 'Report not supported items'] as $action_name) {
+		if (self::SCOPED_INTERNAL_ACTIONS) {
+			// Remove any internal-source actions left over from the *Unknown tests (in case one aborted
+			// before deleting them), restoring the empty-internal-actions state prepareData() set up.
 			$result = CDataHelper::call('action.get', [
 				'output' => ['actionid'],
-				'filter' => ['name' => $action_name]
+				'filter' => ['eventsource' => EVENT_SOURCE_INTERNAL]
 			]);
 			if (!empty($result)) {
-				CDataHelper::call('action.update', [
-					'actionid' => $result[0]['actionid'],
-					'status' => ACTION_STATUS_DISABLED
+				CDataHelper::call('action.delete', array_column($result, 'actionid'));
+			}
+		}
+		else {
+			// Disable the internal actions again in case a test enabled them and aborted before restoring.
+			foreach (['Report unknown triggers', 'Report not supported items'] as $action_name) {
+				$result = CDataHelper::call('action.get', [
+					'output' => ['actionid'],
+					'filter' => ['name' => $action_name]
 				]);
+				if (!empty($result)) {
+					CDataHelper::call('action.update', [
+						'actionid' => $result[0]['actionid'],
+						'status' => ACTION_STATUS_DISABLED
+					]);
+				}
 			}
 		}
 

@@ -82,7 +82,10 @@ void	zbx_db_validate_tags(zbx_dbconn_t *db, zbx_vector_event_tags_ptr_t *event_t
 			zbx_event_tags_t	*et = event_tags->values[i];
 
 			if (et->eventid != eventid)
+			{
+				i++;
 				continue;
+			}
 
 			for (int j = 0; j < et->tags.values_num; j++)
 			{

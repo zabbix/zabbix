@@ -15,58 +15,61 @@
 
 
 class CCepRuleHelper {
-	public const WINDOW_NONE =			0;
-	public const WINDOW_SIMPLE =		1;
+	public const WINDOW_NONE =0;
+	public const WINDOW_SIMPLE =1;
 	public const WINDOW_CAUSE_SYMPTOM = 2;
-	public const WINDOW_TAG_MATCH =		3;
+	public const WINDOW_TAG_MATCH =3;
 	public const WINDOW_PATTERN_MATCH = 4;
 
-	public const STATUS_ENABLED =	0;
-	public const STATUS_DISABLED =	1;
+	public const STATUS_ENABLED = 0;
+	public const STATUS_DISABLED = 1;
 
-	public const EXECUTION_CONTINUE =	0;
-	public const EXECUTION_STOP =		1;
+	public const EXECUTION_CONTINUE = 0;
+	public const EXECUTION_STOP = 1;
 
-	public const CONDITION_EVENT_NAME = 	ZBX_CONDITION_TYPE_EVENT_NAME;
-	public const CONDITION_TAG =			ZBX_CONDITION_TYPE_EVENT_TAG;
-	public const CONDITION_SEVERITY =		ZBX_CONDITION_TYPE_TRIGGER_SEVERITY;
-	public const CONDITION_HOST =			ZBX_CONDITION_TYPE_HOST;
-	public const CONDITION_HOST_GROUP =		ZBX_CONDITION_TYPE_HOST_GROUP;
-	public const CONDITION_TIME_PERIOD =	ZBX_CONDITION_TYPE_TIME_PERIOD;
+	public const CONDITION_EVENT_NAME = ZBX_CONDITION_TYPE_EVENT_NAME;
+	public const CONDITION_TAG = ZBX_CONDITION_TYPE_EVENT_TAG;
+	public const CONDITION_TAG_VALUE = ZBX_CONDITION_TYPE_EVENT_TAG_VALUE;
+	public const CONDITION_SEVERITY = ZBX_CONDITION_TYPE_TRIGGER_SEVERITY;
+	public const CONDITION_HOST = ZBX_CONDITION_TYPE_HOST;
+	public const CONDITION_HOST_GROUP = ZBX_CONDITION_TYPE_HOST_GROUP;
+	public const CONDITION_TIME_PERIOD = ZBX_CONDITION_TYPE_TIME_PERIOD;
 
-	public const OP_SET_NAME =				1;
-	public const OP_CLOSE =					2;
-	public const OP_DISCARD =				3;
-	public const OP_SET_SEVERITY =			4;
-	public const OP_INCREASE_SEVERITY = 	5;
-	public const OP_DECREASE_SEVERITY = 	6;
-	public const OP_SUPPRESS =				7;
-	public const OP_COPY_FIRST =			8;
-	public const OP_COPY_LAST =				9;
-	public const OP_ADD_TAG =				10;
-	public const OP_SET_TAG =				11;
-	public const OP_SET_TAG_VALUE =			12;
-	public const OP_INCREASE_TAG_VALUE =	13;
-	public const OP_DECREASE_TAG_VALUE =	14;
-	public const OP_RENAME_TAG =			15;
-	public const OP_REMOVE_TAG =			16;
+	public const OP_SET_NAME = 1;
+	public const OP_CLOSE = 2;
+	public const OP_DISCARD = 3;
+	public const OP_SET_SEVERITY = 4;
+	public const OP_INCREASE_SEVERITY =  5;
+	public const OP_DECREASE_SEVERITY =  6;
+	public const OP_SUPPRESS = 7;
+	public const OP_COPY_FIRST = 8;
+	public const OP_COPY_LAST = 9;
+	public const OP_ADD_TAG = 10;
+	public const OP_SET_TAG = 11;
+	public const OP_SET_TAG_VALUE = 12;
+	public const OP_INCREASE_TAG_VALUE = 13;
+	public const OP_DECREASE_TAG_VALUE = 14;
+	public const OP_RENAME_TAG = 15;
+	public const OP_REMOVE_TAG = 16;
+	public const OP_CLOSE_WINDOW = 17;
+	public const OP_SET_CAUSE = 18;
 
-	public const WHEN_EVENT_OCCURRED =	0;
-	public const WHEN_EVENT_EVICTED =	1;
-	public const WHEN_WINDOW_CLOSED =	2;
-	public const WHEN_TAGS_CORRELATED =	3;
-	public const WHEN_PATTERN_MATCHED =	4;
+	public const WHEN_EVENT_OCCURRED = 0;
+	public const WHEN_EVENT_EVICTED = 1;
+	public const WHEN_WINDOW_CLOSED = 2;
+	public const WHEN_TAGS_CORRELATED = 3;
+	public const WHEN_PATTERN_MATCHED = 4;
 
-	public const WINDOW_CONDITION_TAG_PAIR =		0;
-	public const WINDOW_CONDITION_OLD_TAG =			1;
-	public const WINDOW_CONDITION_OLD_TAG_VALUE =	2;
+	public const WINDOW_CONDITION_TAG_PAIR = 0;
+	public const WINDOW_CONDITION_OLD_TAG = 1;
+	public const WINDOW_CONDITION_OLD_TAG_VALUE = 2;
 
-	public const GROUP_BY_NO =	0;
-	public const GROUP_BY_YES =	1;
+	public const GROUP_BY_NO = 0;
+	public const GROUP_BY_YES = 1;
 
-	public const FILTER_SHOW_ALL =		0;
-	public const FILTER_SHOW_LEGACY =	1;
-	public const FILTER_SHOW_CEP =		2;
+	public const FILTER_SHOW_ALL = 0;
+	public const FILTER_SHOW_LEGACY = 1;
+	public const FILTER_SHOW_CEP = 2;
 
 	public const EXECUTE_WHEN_BY_WINDOW_TYPE = [
 		self::WINDOW_NONE => [
@@ -108,7 +111,8 @@ class CCepRuleHelper {
 			self::OP_INCREASE_TAG_VALUE,
 			self::OP_DECREASE_TAG_VALUE,
 			self::OP_RENAME_TAG,
-			self::OP_REMOVE_TAG
+			self::OP_REMOVE_TAG,
+			self::OP_CLOSE_WINDOW
 		],
 		self::WHEN_EVENT_EVICTED => [
 			self::OP_SET_NAME,
@@ -126,7 +130,8 @@ class CCepRuleHelper {
 			self::OP_INCREASE_TAG_VALUE,
 			self::OP_DECREASE_TAG_VALUE,
 			self::OP_RENAME_TAG,
-			self::OP_REMOVE_TAG
+			self::OP_REMOVE_TAG,
+			self::OP_CLOSE_WINDOW
 		],
 		self::WHEN_WINDOW_CLOSED => [
 			self::OP_SET_NAME,
@@ -157,7 +162,8 @@ class CCepRuleHelper {
 			self::OP_INCREASE_TAG_VALUE,
 			self::OP_DECREASE_TAG_VALUE,
 			self::OP_RENAME_TAG,
-			self::OP_REMOVE_TAG
+			self::OP_REMOVE_TAG,
+			self::OP_CLOSE_WINDOW
 		],
 		self::WHEN_PATTERN_MATCHED => [
 			self::OP_DISCARD,
@@ -200,7 +206,7 @@ class CCepRuleHelper {
 		];
 	}
 
-	public static function getConditionOperatorStrings(): array {
+	public static function getConditionOperatorLabels(): array {
 		return [
 			CONDITION_OPERATOR_IN => _('In'),
 			CONDITION_OPERATOR_NOT_IN => _('Not in'),
@@ -215,46 +221,43 @@ class CCepRuleHelper {
 		];
 	}
 
-	public static function getConditionOperatorString(array $ceprule_condition): string {
-		if ($ceprule_condition['type'] == CCepRuleHelper::CONDITION_TAG) {
-			return static::getConditionOperatorStrings()[$ceprule_condition['tag_operator']];
+	private static function getConditionOperatorLabel(int $operator): string {
+		$labels = self::getConditionOperatorLabels();
+
+		if (!array_key_exists($operator, $labels)) {
+			throw new LogicException("Uknown condition operator $operator.");
 		}
 
-		return static::getConditionOperatorStrings()[$ceprule_condition['operator']];
-	}
-
-	public static function getConditionArgumentsString(array $ceprule_condition): string {
-		return match((int) $ceprule_condition['type']) {
-			self::CONDITION_EVENT_NAME => $ceprule_condition['event_name'],
-			self::CONDITION_TAG => match ($ceprule_condition['operator']) {
-				CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS => $ceprule_condition['tag'],
-				default => $ceprule_condition['tag'].':'.$ceprule_condition['tag_value']
-			},
-			self::CONDITION_SEVERITY => CSeverityHelper::getName($ceprule_condition['severity']),
-			self::CONDITION_HOST => $ceprule_condition['host'],
-			self::CONDITION_HOST_GROUP => $ceprule_condition['host_group'],
-			self::CONDITION_TIME_PERIOD => $ceprule_condition['time_period']
-		};
+		return static::getConditionOperatorLabels()[$operator];
 	}
 
 	public static function getConditionDescription(array $ceprule_condition): array {
-		if ($ceprule_condition['operator'] == CONDITION_OPERATOR_EXISTS
-				|| $ceprule_condition['operator'] == CONDITION_OPERATOR_NOT_EXISTS) {
+		[$arg1, $arg2] = match((int) $ceprule_condition['type']) {
+			self::CONDITION_EVENT_NAME => [$ceprule_condition['event_name'], null],
+			self::CONDITION_SEVERITY => [CSeverityHelper::getName($ceprule_condition['severity']), null],
+			self::CONDITION_HOST => [$ceprule_condition['host'], null],
+			self::CONDITION_HOST_GROUP => [$ceprule_condition['host_group'], null],
+			self::CONDITION_TIME_PERIOD => [$ceprule_condition['time_period'], null],
+			self::CONDITION_TAG => match ($ceprule_condition['operator']) {
+				CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS => [$ceprule_condition['tag'], null],
+				default => [$ceprule_condition['tag'], $ceprule_condition['tag_value']]
+			}
+		};
 
-			return [
-				CCepRuleHelper::getConditionLabel($ceprule_condition['type']),
-				' ',
-				italic(CCepRuleHelper::getConditionOperatorString($ceprule_condition))
-			];
-		}
-
-		return [
+		$result = [
 			CCepRuleHelper::getConditionLabel($ceprule_condition['type']),
 			' ',
-			italic(CCepRuleHelper::getConditionOperatorString($ceprule_condition)),
+			italic($arg1),
 			' ',
-			CCepRuleHelper::getConditionArgumentsString($ceprule_condition)
+			mb_strtolower(CCepRuleHelper::getConditionOperatorLabel($ceprule_condition['operator']))
 		];
+
+		if ($arg2 !== null) {
+			$result[] = ' ';
+			$result[] = italic($arg2);
+		}
+
+		return $result;
 	}
 
 	public static function getOperationExecuteWhenStrings(): array {
@@ -288,7 +291,8 @@ class CCepRuleHelper {
 			self::OP_INCREASE_TAG_VALUE => _('Increase tag value'),
 			self::OP_DECREASE_TAG_VALUE => _('Decrease tag value'),
 			self::OP_RENAME_TAG => _('Rename tag'),
-			self::OP_REMOVE_TAG => _('Remove tag')
+			self::OP_REMOVE_TAG => _('Remove tag'),
+			self::OP_CLOSE_WINDOW => _('Close window')
 		];
 	}
 
@@ -305,6 +309,10 @@ class CCepRuleHelper {
 	}
 
 	public static function getOperationLabelString(array $ceprule_operation): string {
+		if ($ceprule_operation['type'] === self::OP_SET_CAUSE) {
+			return _('Set cause');
+		}
+
 		return self::getOperationLabelStrings()[$ceprule_operation['type']];
 	}
 
@@ -358,14 +366,6 @@ class CCepRuleHelper {
 
 	public static function getWindowLabelString(array $ceprule): string {
 		return self::getWindowLabelStrings()[$ceprule['window_type']];
-	}
-
-	public static function getWindowConditionLabelStrings(): array {
-		return [
-			self::WINDOW_CONDITION_TAG_PAIR => _('Event tag pair'),
-			self::WINDOW_CONDITION_OLD_TAG => _('Past event tag name'),
-			self::WINDOW_CONDITION_OLD_TAG_VALUE => _('Past event tag value')
-		];
 	}
 
 	public static function buildActionDetailsMessage(string $details): string {

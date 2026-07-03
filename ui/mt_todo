@@ -15,4 +15,5 @@
 [x] PR review
 [ ] historical conditions function expressed as tags and operations (remove table and submodal, add to main form)
 [ ] debug mode smoke-test: check heavy page loads db queries/query plans. (API)
+[.] template/data default cep rules in clean installation and DB upgrade
 [ ] PR review -> peer review..

@@ -881,7 +881,7 @@ static int	cep_operation_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_
 
 		cep_event_expect(db_event);
 
-		t = cep_create_task_close_event(db_event, event->eventid, 0, 0, ruleid);
+		t = cep_create_task_close_event(db_event, event->eventid, 0, 0, 0, ruleid);
 		zbx_vector_mw_task_ptr_append(tasks, t);
 		ret = SUCCEED;
 	}

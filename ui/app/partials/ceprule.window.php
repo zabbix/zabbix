@@ -122,8 +122,4 @@ echo (new CObject())
 		->addStyle('width: '.ZBX_TEXTAREA_BIG_WIDTH.'px')
 		->setAttribute('data-name', 'window[script]')
 		->setAttribute('data-field-type', 'multiline')
-	))
-
-	->addItem(new CPartial('ceprule.window.conditions', [
-		'filter' => $data['window']['filter']
-	]));
+	));

@@ -342,28 +342,6 @@ static int	cep_manager_is_event_pending(zbx_cep_manager_t *manager, zbx_uint64_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if event task is pending                                    *
- *                                                                            *
- * Parameters: manager - [IN] CEP manager                                     *
- *             task    - [IN] event task to check                             *
- *                                                                            *
- * Return value: SUCCEED - at least one event in the task is pending          *
- *               FAIL    - none of the task events are pending                *
- *                                                                            *
- ******************************************************************************/
-static int	cep_manager_is_task_event_pending(zbx_cep_manager_t *manager, const zbx_cep_task_event_t *task)
-{
-	for (int i = 0; i < task->eventids.values_num; i++)
-	{
-		if (SUCCEED == cep_manager_is_event_pending(manager, task->eventids.values[i]))
-			return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: check if task is pending                                          *
  *                                                                            *
  * Parameters: manager - [IN] CEP manager                                     *
@@ -378,20 +356,33 @@ static int	cep_manager_is_task_event_pending(zbx_cep_manager_t *manager, const z
  ******************************************************************************/
 static int	cep_manager_is_task_pending(zbx_cep_manager_t *manager, const zbx_mw_task_t *task)
 {
-	zbx_uint64_t	eventid;
+	const zbx_cep_task_event_t	*event_task;
+	zbx_uint64_t			eventid;
 
 	switch (task->type)
 	{
 		case CEP_TASK_EVENT:
-			return cep_manager_is_task_event_pending(manager, (const zbx_cep_task_event_t *)task);
+			event_task = (zbx_cep_task_event_t *)task;
+			break;
 		case CEP_TASK_CLOSE_EVENT:
-			return cep_manager_is_task_event_pending(manager,
-					&((zbx_cep_task_close_event_t *)task)->parent);
+			eventid = ((zbx_cep_task_close_event_t *)task)->c_eventid;
+			if (0 != eventid && SUCCEED == cep_manager_is_event_pending(manager, eventid))
+				return SUCCEED;
+			event_task = &((zbx_cep_task_close_event_t *)task)->parent;
+			break;
 		case CEP_TASK_SYNC_EVENT:
 			eventid = zbx_cep_event_handle_eventid(((zbx_cep_task_sync_event_t *)task)->hevent);
 			return cep_manager_is_event_pending(manager, eventid);
 		case CEP_TASK_ACKNOWLEDGE:
 			return cep_manager_is_event_pending(manager, ((zbx_cep_task_acknowledge_t *)task)->eventid);
+	}
+
+	/* check recovered problems for task_event and task_close_event */
+
+	for (int i = 0; i < event_task->eventids.values_num; i++)
+	{
+		if (SUCCEED == cep_manager_is_event_pending(manager, event_task->eventids.values[i]))
+			return SUCCEED;
 	}
 
 	return FAIL;
@@ -418,7 +409,7 @@ static int	cep_manager_commit_event_task(zbx_cep_manager_t *manager, zbx_mw_task
 
 	if (event_task->db_event->value == TRIGGER_VALUE_OK)
 	{
-		if (SUCCEED == cep_manager_is_task_event_pending(manager, event_task))
+		if (SUCCEED == cep_manager_is_task_pending(manager, task))
 		{
 			zbx_vector_mw_task_ptr_append(&manager->commits_pending, task);
 			return SUCCEED;
@@ -840,14 +831,17 @@ void	*zbx_cep_manager_thread(void *args)
 		/* only stop cep when history syncers no longer require it */
 		if ((!ZBX_IS_RUNNING() || 1 == shutdown) && 0 == zbx_hc_refcount_peek())
 		{
-			int	is_empty;
+			if (0 == manager->commits.values_num + manager->commits_pending.values_num)
+			{
+				int	is_empty;
 
-			zbx_mw_queue_lock(manager->base.queue);
-			is_empty = cep_queue_is_empty((zbx_cep_queue_t *)manager->base.queue);
-			zbx_mw_queue_unlock(manager->base.queue);
+				zbx_mw_queue_lock(manager->base.queue);
+				is_empty = cep_queue_is_empty((zbx_cep_queue_t *)manager->base.queue);
+				zbx_mw_queue_unlock(manager->base.queue);
 
-			if (SUCCEED == is_empty)
-				break;
+				if (SUCCEED == is_empty)
+					break;
+			}
 		}
 
 		zbx_mw_queue_lock(manager->base.queue);
