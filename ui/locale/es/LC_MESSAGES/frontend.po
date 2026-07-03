@@ -1330,7 +1330,7 @@ msgstr "Función agregada"
 #: widgets/tophosts/views/column.edit.php:330
 #: widgets/topitems/views/column.edit.php:256
 msgid "Aggregation function does not affect the sparkline."
-msgstr "La función de agregación no afecta al minigráfico."
+msgstr "La función de agregación no afecta a la minigráfica."
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:406
 #: widgets/tophosts/views/column.edit.php:165
@@ -2607,7 +2607,7 @@ msgstr[1] "No se pueden agregar módulos: %1$s."
 #: app/controllers/CControllerGraphPrototypeUpdate.php:123
 #: app/controllers/CControllerGraphUpdate.php:113
 msgid "Cannot add more than one item with type \"Graph sum\""
-msgstr "No se puede añadir más de un item con el tipo \"Suma de gráfico\""
+msgstr "No se puede añadir más de un item con el tipo \"Graph sum\""
 
 #: include/classes/api/services/CGraph.php:42
 #, c-format
@@ -3547,7 +3547,7 @@ msgstr "No se puede encontrar el grupo de equipos \"%1$s\" para el prototipo de 
 #: include/classes/import/importers/CDashboardImporterGeneral.php:57
 #, c-format
 msgid "Cannot find host group \"%1$s\" used in dashboard \"%2$s\"."
-msgstr "No se puede encontrar el grupo de host \"%1$s\" usado en el dashboard \"%2$s\"."
+msgstr "No se puede encontrar el grupo de host \"%1$s\" usado en el panel \"%2$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -4318,7 +4318,7 @@ msgstr "No se puede establecer \"Agregación de conjuntos de datos\" cuando se a
 
 #: include/classes/db/MysqlDbBackend.php:197
 msgid "Cannot set charset."
-msgstr "No se puede establecer el juego de caracteres."
+msgstr "No se puede establecer el conjunto de caracteres."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4905,7 +4905,7 @@ msgstr "Cambiar tipo"
 
 #: app/views/js/administration.authentication.edit.js.php:409
 msgid "Changing the authentication method will reset all sessions, except the current one."
-msgstr "Cambiar el método de autenticación restablecerá todas las sesiones, excepto la actual."
+msgstr "Al cambiar el método de autenticación se restablecerán todas las sesiones, excepto la actual."
 
 #: app/partials/configuration.filter.items.php:144
 #: app/views/popup.massupdate.item.php:149 include/items.inc.php:127
@@ -6302,7 +6302,7 @@ msgstr "Se eliminará el certificado SP actual."
 
 #: app/views/js/administration.authentication.edit.js.php:425
 msgid "Current SP private key will be deleted."
-msgstr "Se eliminará la clave privada de SP actual."
+msgstr "Se eliminará la clave privada SP actual."
 
 #: app/views/popup.operation.edit.php:256
 msgid "Current host"
@@ -9078,7 +9078,7 @@ msgstr "El tiempo de inactividad excluido no debe extenderse más allá de %1$s.
 #: app/controllers/CControllerSlaCreate.php:74
 #: app/controllers/CControllerSlaUpdate.php:75
 msgid "Excluded downtime periods must be unique."
-msgstr "Los períodos de tiempo de inactividad excluidos deben ser únicos."
+msgstr "Los períodos de inactividad excluidos deben ser únicos."
 
 #: app/views/popup.sla.edit.php:196 app/views/popup.sla.edit.php:207
 #: app/views/slareport.list.php:168
@@ -11325,7 +11325,7 @@ msgstr "Si menos de %2$s de servicios dependientes tienen el estado %1$s o infer
 
 #: include/classes/setup/CSetupWizard.php:614
 msgid "If no port is specified, the \"Database port\" value is used."
-msgstr "Si no se especifica ningún puerto, se usa el valor de \"Puerto de la base de datos\"."
+msgstr "Si no se especifica ningún puerto, se utiliza el valor de \"Puerto de la base de datos\"."
 
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -12771,7 +12771,7 @@ msgstr "Función no válida"
 #: app/controllers/CControllerHostGroupCreate.php:31
 #: app/controllers/CControllerHostGroupUpdate.php:34
 msgid "Invalid host group name."
-msgstr "Nombre de grupo de host no válido."
+msgstr "Nombre de grupo de hosts no válido."
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -13163,7 +13163,7 @@ msgstr "Etiqueta incorrecta \"%1$s\": %2$s."
 #: app/controllers/CControllerTemplateGroupCreate.php:31
 #: app/controllers/CControllerTemplateGroupUpdate.php:32
 msgid "Invalid template group name."
-msgstr "Nombre de grupo de template no válido."
+msgstr "Nombre de grupo de templates no válido."
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -14492,7 +14492,7 @@ msgstr "Suprimido manualmente"
 #: include/actions.inc.php:2201 include/blocks.inc.php:692
 #: widgets/problems/includes/WidgetProblems.php:280
 msgid "Manually unsuppressed"
-msgstr "Supresión manual cancelada"
+msgstr "Supresión manual desactivada"
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: include/classes/data/CWidgetsData.php:110
@@ -16212,31 +16212,31 @@ msgstr "No hay permisos para llamar a \"%1$s.%2$s\"."
 
 #: include/classes/api/services/CConfiguration.php:337
 msgid "No permissions to import dashboards."
-msgstr "No hay permisos para importar paneles."
+msgstr "No tiene permisos para importar dashboards."
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
-msgstr "No hay permisos para importar reglas de descubrimiento."
+msgstr "No tiene permisos para importar reglas de descubrimiento."
 
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
-msgstr "No hay permisos para importar gráficos."
+msgstr "No tiene permisos para importar gráficos."
 
 #: include/classes/api/services/CConfiguration.php:314
 msgid "No permissions to import host groups."
-msgstr "No hay permisos para importar grupos de hosts."
+msgstr "No tiene permisos para importar grupos de hosts."
 
 #: include/classes/api/services/CConfiguration.php:316
 msgid "No permissions to import hosts."
-msgstr "No hay permisos para importar hosts."
+msgstr "No tiene permisos para importar hosts."
 
 #: include/classes/api/services/CConfiguration.php:318
 msgid "No permissions to import images."
-msgstr "No hay permisos para importar imágenes."
+msgstr "No tiene permisos para importar imágenes."
 
 #: include/classes/api/services/CConfiguration.php:319
 msgid "No permissions to import items."
-msgstr "No hay permisos para importar items."
+msgstr "No tiene permisos para importar items."
 
 #: include/classes/api/services/CConfiguration.php:320
 msgid "No permissions to import maps."
@@ -17505,7 +17505,7 @@ msgstr "PHP curl"
 
 #: include/classes/setup/CFrontendSetup.php:733
 msgid "PHP curl extension is missing or outdated."
-msgstr "La extensión curl de PHP falta o está desactualizada."
+msgstr "La extensión curl de PHP falta o está obsoleta."
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
@@ -19597,7 +19597,7 @@ msgstr "Devuelve un objeto JSON que contiene métricas internas del servidor Zab
 
 #: include/classes/data/CItemData.php:2797
 msgid "Returns a JSON object containing database connection pool configuration and statistics."
-msgstr "Devuelve un objeto JSON que contiene la configuración y las estadísticas del grupo de conexiones de la base de datos."
+msgstr "Devuelve un objeto JSON que contiene la configuración y las estadísticas del pool de conexiones de la base de datos."
 
 #: include/classes/data/CItemData.php:2673
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
@@ -19979,7 +19979,7 @@ msgstr "Formato de ID de nombre de SP"
 
 #: app/views/administration.authentication.edit.php:338
 msgid "SP private key"
-msgstr "Clave privada SP"
+msgstr "Clave privada de SP"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -21845,7 +21845,7 @@ msgstr "Sueco (sv_SE)"
 
 #: index_sso.php:367
 msgid "Switch SSO user"
-msgstr "Cambiar usuario SSO"
+msgstr "Cambiar usuario de SSO"
 
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
@@ -23215,6 +23215,10 @@ msgstr "Tratar como 0"
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr "Estadísticas de caché de la función de tendencia. Los parámetros válidos son: all, hits, phits, misses, pmisses, items, pitems y requests."
 
+#: include/classes/data/CItemData.php:3013
+msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems, paccessed and requests."
+msgstr "Estadísticas de caché de la función de tendencias. Los parámetros válidos son: all, hits, phits, misses, pmisses, items, pitems, paccessed y requests."
+
 #: app/controllers/CControllerPopupLldOperation.php:226
 #: app/partials/configuration.filter.items.php:162
 #: app/partials/monitoring.latest.view.html.php:74
@@ -23234,7 +23238,7 @@ msgstr "Tendencias"
 #: app/partials/item.edit.item.tab.php:774
 #: app/views/administration.housekeeping.edit.php:204
 msgid "Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse."
-msgstr "Las tendencias no se calculan ni se almacenan para los items cuyo historial se guarda en Elasticsearch o ClickHouse."
+msgstr "Las tendencias no se calculan ni se almacenan para los items cuyo historial se conserva en Elasticsearch o ClickHouse."
 
 #: app/controllers/CControllerAuditLogList.php:257
 #: app/views/reports.toptriggers.list.php:120 app/views/trigger.edit.php:54
@@ -26200,7 +26204,7 @@ msgstr "No tiene permiso para realizar esta operación."
 
 #: index_sso.php:358
 msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
-msgstr "Ha sido autorizado mediante inicio de sesión único (SSO), pero el inicio de sesión en Zabbix falló."
+msgstr "Ha sido autorizado mediante inicio de sesión único (SSO), pero el inicio de sesión en Zabbix ha fallado."
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -27415,7 +27419,7 @@ msgstr "se esperan coordenadas geográficas (valores de latitud y longitud separ
 
 #: app/views/item.edit.php:224 app/views/item.edit.php:228
 msgid "global housekeeping settings"
-msgstr "configuración global de limpieza"
+msgstr "configuración global de limpieza interna"
 
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.edit.php:891
@@ -27423,7 +27427,7 @@ msgstr "configuración global de limpieza"
 #: include/views/configuration.item.edit.php:923
 msgctxt "item_form"
 msgid "global housekeeping settings"
-msgstr "configuración global de limpieza"
+msgstr "configuración global de limpieza interna"
 
 #: include/classes/api/services/CScript.php:726
 msgid "global script execution on Zabbix server is disabled by server configuration"

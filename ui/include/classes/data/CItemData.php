@@ -3010,7 +3010,7 @@ final class CItemData {
 				]
 			],
 			'zabbix[tcache, cache, <parameter>]' => [
-				'description' => _('Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests.'),
+				'description' => _('Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems, paccessed and requests.'),
 				'value_type' => null,
 				'documentation_link' => [
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#tcache'
