@@ -1,0 +1,820 @@
+<?php
+/*
+** Copyright (C) 2001-2026 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
+require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
+
+/**
+ * @onBefore clearData
+ * @onAfter clearData
+ * @suite-components-reuse true
+ * @required-components server, proxy
+ * @configurationDataProvider configurationProvider
+ */
+class testHousekeepingConfSync extends CIntegrationTest {
+	const PROXY_NAME = 'Housekeeping proxy';
+	const HOSTNAME = 'Housekeeping host';
+	const AGENT_PING_KEY = 'agent.ping';
+	const TRIGGER_NAME = 'Housekeeping trigger';
+	const HK_MODE_DISABLED = 0;
+	const HK_MODE_REGULAR = 1;
+	const HK_MODE_PARTITION = 2;
+	const TSDB_COMPRESSION_TABLE = 'history_uint';
+	const MAX_TSDB_POLICY_ATTEMPTS = 10;
+
+	private static $proxyid = null;
+	private static $hostid = null;
+	private static $agent_ping_itemid = null;
+	private static $triggerid = null;
+	private static $eventids = [];
+	private static $db_extension = null;
+
+	/**
+	 * @inheritdoc
+	 */
+	public function prepareData() {
+		$response = $this->call('host.create', [
+			'host' => self::HOSTNAME,
+			'groups' => [['groupid' => 4]],
+			'status' => HOST_STATUS_MONITORED
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['hostids']);
+
+		self::$hostid = $response['result']['hostids'][0];
+
+		$response = $this->call('item.create', [
+			'hostid' => self::$hostid,
+			'name' => 'Agent ping',
+			'key_' => self::AGENT_PING_KEY,
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'delay' => '1h',
+			'history' => '90d',
+			'trends' => '0'
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['itemids']);
+
+		self::$agent_ping_itemid = $response['result']['itemids'][0];
+
+		$response = $this->call('trigger.create', [
+			'description' => self::TRIGGER_NAME,
+			'expression' => 'last(/'.self::HOSTNAME.'/'.self::AGENT_PING_KEY.')=0'
+		]);
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['triggerids']);
+
+		self::$triggerid = $response['result']['triggerids'][0];
+
+		$response = $this->call('proxy.create', [
+			'name' => self::PROXY_NAME,
+			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+			'hosts' => [
+				['hostid' => self::$hostid]
+			]
+		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+		$this->assertCount(1, $response['result']['proxyids']);
+		self::$proxyid = $response['result']['proxyids'][0];
+
+		return true;
+	}
+
+	/**
+	 * Delete all data created by this test suite.
+	 */
+	public static function clearData(): void {
+		if (self::$agent_ping_itemid !== null) {
+			CDataHelper::call('history.clear', [self::$agent_ping_itemid]);
+		}
+
+		if (self::$eventids) {
+			DB::delete('events', ['eventid' => self::$eventids]);
+		}
+
+		if (self::$triggerid !== null) {
+			CDataHelper::call('trigger.delete', [self::$triggerid]);
+		}
+
+		if (self::$hostid !== null) {
+			CDataHelper::call('host.delete', [self::$hostid]);
+		}
+
+		if (self::$proxyid !== null) {
+			CDataHelper::call('proxy.delete', [self::$proxyid]);
+		}
+
+		CDataHelper::call('housekeeping.update', self::defaultHousekeeping());
+	}
+
+	/**
+	 * Component configuration provider.
+	 *
+	 * @return array
+	 */
+	public function configurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 5,
+				'LogFileSize' => 0
+			],
+			self::COMPONENT_PROXY => [
+				'DebugLevel' => 5,
+				'LogFileSize' => 20,
+				'Hostname' => self::PROXY_NAME,
+				'ProxyMode' => PROXY_OPERATING_MODE_ACTIVE,
+				'Server' => '127.0.0.1:'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX
+			]
+		];
+	}
+
+	/**
+	 * Extract a single DCdump_config() section from a component log.
+	 */
+	private function extractDCDumpSection(string $component, string $start_marker,
+			?string $stop_marker = null): array {
+		$log = file_get_contents(self::getLogPath($component));
+		$lines = explode("\n", $log);
+
+		$matching = [];
+		foreach ($lines as $i => $line) {
+			if ($start_marker === trim($this->stripDCDumpLogPrefix($line))) {
+				$matching[$i] = $line;
+			}
+		}
+
+		$this->assertNotEmpty($matching, "Section marker '$start_marker' not found in log.");
+
+		$start_idx = array_key_last($matching);
+		$pid = preg_quote(strtok($lines[$start_idx], ':'), '/');
+
+		$section = [];
+		for ($i = $start_idx + 1; $i < count($lines); $i++) {
+			if (!preg_match('/^'.$pid.':/', $lines[$i])) {
+				continue;
+			}
+
+			$line = $this->stripDCDumpLogPrefix($lines[$i]);
+
+			if ($stop_marker !== null && str_contains($line, $stop_marker)) {
+				break;
+			}
+
+			$section[] = $line;
+		}
+
+		return $section;
+	}
+
+	private function stripDCDumpLogPrefix(string $line): string {
+		$line = preg_replace('/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+\s+/', '', $line);
+
+		return preg_replace('/^\[[^]]+\]\s+/', '', $line);
+	}
+
+	/**
+	 * Extract housekeeping settings dumped by DCdump_config().
+	 */
+	private function extractSyncedHousekeeping($component) {
+		$section = $this->extractDCDumpSection($component, 'housekeeping:', 'default timezone');
+		$housekeeping = [];
+
+		foreach ($section as $line) {
+			$events_pattern = '/events, mode:(\d+) period:\[trigger:(\d+) internal:(\d+) '.
+				'autoreg:(\d+) discovery:(\d+) service:(\d+)\]/';
+
+			if (preg_match($events_pattern, $line, $matches)) {
+				$housekeeping['hk_events_mode'] = (int) $matches[1];
+				$housekeeping['hk_events_trigger'] = (int) $matches[2];
+				$housekeeping['hk_events_internal'] = (int) $matches[3];
+				$housekeeping['hk_events_autoreg'] = (int) $matches[4];
+				$housekeeping['hk_events_discovery'] = (int) $matches[5];
+				$housekeeping['hk_events_service'] = (int) $matches[6];
+			}
+			else if (preg_match('/audit, mode:(\d+) period:(\d+)/', $line, $matches)) {
+				$housekeeping['hk_audit_mode'] = (int) $matches[1];
+				$housekeeping['hk_audit'] = (int) $matches[2];
+			}
+			else if (preg_match('/it services, mode:(\d+) period:(\d+)/', $line, $matches)) {
+				$housekeeping['hk_services_mode'] = (int) $matches[1];
+				$housekeeping['hk_services'] = (int) $matches[2];
+			}
+			else if (preg_match('/user sessions, mode:(\d+) period:(\d+)/', $line, $matches)) {
+				$housekeeping['hk_sessions_mode'] = (int) $matches[1];
+				$housekeeping['hk_sessions'] = (int) $matches[2];
+			}
+			else if (preg_match('/history, mode:(\d+) global:(\d+) period:(\d+)/', $line, $matches)) {
+				$housekeeping['hk_history_mode'] = (int) $matches[1];
+				$housekeeping['hk_history_global'] = (int) $matches[2];
+				$housekeeping['hk_history'] = (int) $matches[3];
+			}
+			else if (preg_match('/trends, mode:(\d+) global:(\d+) period:(\d+)/', $line, $matches)) {
+				$housekeeping['hk_trends_mode'] = (int) $matches[1];
+				$housekeeping['hk_trends_global'] = (int) $matches[2];
+				$housekeeping['hk_trends'] = (int) $matches[3];
+			}
+		}
+
+		return $housekeeping;
+	}
+
+	/**
+	 * Extract database settings dumped by DCdump_config().
+	 */
+	private function extractSyncedDbSettings($component) {
+		$section = $this->extractDCDumpSection($component, 'db:', 'autoreg_tls_accept:');
+		$db_settings = [];
+
+		foreach ($section as $line) {
+			if (preg_match('/extension: (.*)/', $line, $matches)) {
+				$db_settings['db_extension'] = $matches[1];
+			}
+			else if (preg_match('/history_compression_status: (\d+)/', $line, $matches)) {
+				$db_settings['compression_status'] = (int) $matches[1];
+			}
+			else if (preg_match('/history_compress_older: (\d+)/', $line, $matches)) {
+				$db_settings['compress_older'] = (int) $matches[1];
+			}
+		}
+
+		$this->assertNotEmpty($db_settings);
+
+		return $db_settings;
+	}
+
+	private static function defaultHousekeeping() {
+		return [
+			'hk_events_mode' => 1,
+			'hk_events_trigger' => '365d',
+			'hk_events_internal' => '1d',
+			'hk_events_discovery' => '1d',
+			'hk_events_autoreg' => '1d',
+			'hk_events_service' => '1d',
+			'hk_services_mode' => 1,
+			'hk_services' => '365d',
+			'hk_sessions_mode' => 1,
+			'hk_sessions' => '31d',
+			'hk_audit_mode' => 1,
+			'hk_audit' => '31d',
+			'hk_history_mode' => 1,
+			'hk_history_global' => 0,
+			'hk_history' => '31d',
+			'hk_trends_mode' => 1,
+			'hk_trends_global' => 0,
+			'hk_trends' => '365d',
+			'compression_status' => 0,
+			'compress_older' => '7d'
+		];
+	}
+
+	private static function getDBExtension() {
+		if (self::$db_extension === null) {
+			self::$db_extension = CDBHelper::getValue(
+					"SELECT value_str FROM settings WHERE name='db_extension'"
+			);
+		}
+
+		return self::$db_extension;
+	}
+
+	private function getTimescaleDbCompressionPolicyAge() {
+		$sql = "SELECT extract(epoch from (config::json->>'compress_after')::interval) AS compress_after".
+			" FROM timescaledb_information.jobs".
+			" WHERE (application_name LIKE 'Columnstore Policy%' OR application_name LIKE 'Compression%')".
+				" AND hypertable_schema='public'".
+				" AND hypertable_name=".zbx_dbstr(self::TSDB_COMPRESSION_TABLE);
+
+		$res = DBfetch(DBselect($sql));
+		$this->assertNotFalse($res, 'TimescaleDB compression policy is not configured.');
+		$this->assertArrayHasKey('compress_after', $res);
+
+		return (int) $res['compress_after'];
+	}
+
+	private function assertTimescaleDbCompressionPolicyAge($expected) {
+		for ($attempt = 1; $attempt <= self::MAX_TSDB_POLICY_ATTEMPTS; $attempt++) {
+			try {
+				$this->assertEquals($expected, $this->getTimescaleDbCompressionPolicyAge(),
+						'Unexpected TimescaleDB compression policy age.');
+
+				return;
+			}
+			catch (Throwable $e) {
+				if ($attempt === self::MAX_TSDB_POLICY_ATTEMPTS) {
+					throw $e;
+				}
+			}
+
+			sleep(1);
+		}
+	}
+
+	private function expectedServerHousekeeping(array $housekeeping) {
+		return [
+			'hk_events_mode' => $housekeeping['hk_events_mode'],
+			'hk_events_trigger' => $this->timeToSeconds($housekeeping['hk_events_trigger']),
+			'hk_events_internal' => $this->timeToSeconds($housekeeping['hk_events_internal']),
+			'hk_events_autoreg' => $this->timeToSeconds($housekeeping['hk_events_autoreg']),
+			'hk_events_discovery' => $this->timeToSeconds($housekeeping['hk_events_discovery']),
+			'hk_audit_mode' => self::expectedPartitionableMode($housekeeping['hk_audit_mode']),
+			'hk_audit' => $this->timeToSeconds($housekeeping['hk_audit']),
+			'hk_services_mode' => $housekeeping['hk_services_mode'],
+			'hk_services' => $this->timeToSeconds($housekeeping['hk_services']),
+			'hk_sessions_mode' => $housekeeping['hk_sessions_mode'],
+			'hk_sessions' => $this->timeToSeconds($housekeeping['hk_sessions']),
+			'hk_history_mode' => $housekeeping['hk_history_global'] == self::HK_MODE_REGULAR
+				? self::expectedPartitionableMode($housekeeping['hk_history_mode'])
+				: $housekeeping['hk_history_mode'],
+			'hk_history_global' => $housekeeping['hk_history_global'],
+			'hk_history' => $this->timeToSeconds($housekeeping['hk_history']),
+			'hk_trends_mode' => $housekeeping['hk_trends_global'] == self::HK_MODE_REGULAR
+				? self::expectedPartitionableMode($housekeeping['hk_trends_mode'])
+				: $housekeeping['hk_trends_mode'],
+			'hk_trends_global' => $housekeeping['hk_trends_global'],
+			'hk_trends' => $this->timeToSeconds($housekeeping['hk_trends'])
+		];
+	}
+
+	private function expectedProxyHousekeeping(array $housekeeping) {
+		$default_housekeeping = self::defaultHousekeeping();
+		$expected = $this->expectedServerHousekeeping($default_housekeeping);
+
+		/* Proxy uses default housekeeping settings except for synced history configuration. */
+		$expected['hk_history_global'] = $housekeeping['hk_history_global'];
+		$expected['hk_trends'] = 0;
+
+		if ($housekeeping['hk_history_global'] == self::HK_MODE_REGULAR) {
+			$expected['hk_history'] = $this->timeToSeconds($housekeeping['hk_history']);
+		}
+		else {
+			unset($expected['hk_history']);
+		}
+
+		return $expected;
+	}
+
+	private function assertHousekeepingEquals(array $expected, array $actual) {
+		foreach ($expected as $name => $value) {
+			$this->assertArrayHasKey($name, $actual);
+
+			if (is_array($value)) {
+				$this->assertContains($actual[$name], $value, 'Unexpected synced value for '.$name.'.');
+			}
+			else {
+				$this->assertEquals($value, $actual[$name], 'Unexpected synced value for '.$name.'.');
+			}
+		}
+	}
+
+	/**
+	 * Send agent.ping history through proxy using itemid-based agent data.
+	 */
+	private function sendAgentPing($clock) {
+		$this->sendAgentDataValues([
+			[
+				'itemid' => self::$agent_ping_itemid,
+				'value' => '1',
+				'clock' => $clock,
+				'ns' => (int)(microtime(true) * 1e9) % 1000000000
+			]
+		], self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
+	}
+
+	private function waitForHistoryCount($expected) {
+		$this->callUntilDataIsPresent('history.get', [
+			'itemids' => self::$agent_ping_itemid,
+			'history' => ITEM_VALUE_TYPE_UINT64
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
+			function ($response) use ($expected) {
+				return array_key_exists('result', $response) && count($response['result']) == $expected;
+			}
+		);
+	}
+
+	private function createEventPairs($old_clock, $new_clock) {
+		$events = [];
+		$pairs = [
+			[
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'objectid' => self::$triggerid,
+				'value' => TRIGGER_VALUE_TRUE,
+				'name' => 'Old trigger event'
+			],
+			[
+				'source' => EVENT_SOURCE_INTERNAL,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'objectid' => self::$triggerid,
+				'value' => TRIGGER_STATE_UNKNOWN,
+				'name' => 'Old internal trigger event'
+			],
+			[
+				'source' => EVENT_SOURCE_INTERNAL,
+				'object' => EVENT_OBJECT_ITEM,
+				'objectid' => self::$agent_ping_itemid,
+				'value' => ITEM_STATE_NOTSUPPORTED,
+				'name' => 'Old internal item event'
+			],
+			[
+				'source' => EVENT_SOURCE_DISCOVERY,
+				'object' => EVENT_OBJECT_DHOST,
+				'objectid' => 1,
+				'value' => 1,
+				'name' => 'Old discovery host event'
+			],
+			[
+				'source' => EVENT_SOURCE_DISCOVERY,
+				'object' => EVENT_OBJECT_DSERVICE,
+				'objectid' => 1,
+				'value' => 1,
+				'name' => 'Old discovery service event'
+			],
+			[
+				'source' => EVENT_SOURCE_AUTOREGISTRATION,
+				'object' => EVENT_OBJECT_AUTOREGHOST,
+				'objectid' => 1,
+				'value' => 0,
+				'name' => 'Old autoregistration event'
+			],
+			[
+				'source' => EVENT_SOURCE_SERVICE,
+				'object' => EVENT_OBJECT_SERVICE,
+				'objectid' => 1,
+				'value' => 1,
+				'name' => 'Old service event'
+			]
+		];
+
+		foreach ($pairs as $event) {
+			foreach ([$old_clock, $new_clock] as $clock) {
+				$events[] = $event + [
+					'clock' => $clock,
+					'ns' => 0,
+					'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
+					'acknowledged' => EVENT_NOT_ACKNOWLEDGED
+				];
+			}
+		}
+
+		DB::refreshIds('events', count($events));
+
+		$eventids = DB::insert('events', $events);
+		self::$eventids = array_merge(self::$eventids, $eventids);
+
+		$result = ['old' => [], 'new' => []];
+		foreach ($eventids as $index => $eventid) {
+			$result[$index % 2 == 0 ? 'old' : 'new'][] = $eventid;
+		}
+
+		return $result;
+	}
+
+	private function assertEventsCount(array $eventids, $expected) {
+		$count = CDBHelper::getCount('SELECT NULL FROM events WHERE eventid IN ('.
+			implode(',', array_map('zbx_dbstr', $eventids)).')'
+		);
+
+		$this->assertEquals($expected, $count);
+	}
+
+	private function reloadServerAndAssertHousekeeping(array $housekeeping) {
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$server_hk = $this->extractSyncedHousekeeping(self::COMPONENT_SERVER);
+		$this->assertHousekeepingEquals($this->expectedServerHousekeeping($housekeeping), $server_hk);
+	}
+
+	private function reloadServerAndAssertDbSettings(array $expected) {
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->assertHousekeepingEquals($expected, $this->extractSyncedDbSettings(self::COMPONENT_SERVER));
+	}
+
+	private function reloadProxyAndWaitForConfiguration($wait_for_cache_stats = false) {
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
+
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->clearLog(self::COMPONENT_PROXY);
+
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER,
+				'proxy_config_cache_reload='.self::PROXY_NAME);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'reloading configuration on proxy "'.self::PROXY_NAME.'"', true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'sending configuration data to proxy "'.self::PROXY_NAME.'"', true, 90, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, "received configuration data from server", true,
+				90, 1);
+
+		if ($wait_for_cache_stats) {
+			$this->waitForLogLineToBePresent(self::COMPONENT_PROXY,
+					'End of DCdump_config()', true, 90, 1);
+		}
+	}
+
+	public static function housekeepingProvider() {
+		return [
+			'first update' => [[
+				'update' => [
+					'hk_events_mode' => 1,
+					'hk_events_trigger' => '43d',
+					'hk_events_internal' => '28d',
+					'hk_events_discovery' => '33d',
+					'hk_events_autoreg' => '115d',
+					'hk_events_service' => '213d',
+					'hk_services_mode' => 1,
+					'hk_services' => '213d',
+					'hk_sessions_mode' => 1,
+					'hk_sessions' => '151d',
+					'hk_audit_mode' => 1,
+					'hk_audit' => '45d',
+					'hk_history_mode' => 1,
+					'hk_history_global' => 1,
+					'hk_history' => '2d',
+					'hk_trends_mode' => 1,
+					'hk_trends_global' => 1,
+					'hk_trends' => '3d'
+				]
+			]],
+			'second update' => [[
+				'update' => [
+					'hk_events_mode' => 1,
+					'hk_events_trigger' => '52d',
+					'hk_events_internal' => '31d',
+					'hk_events_discovery' => '39d',
+					'hk_events_autoreg' => '121d',
+					'hk_events_service' => '217d',
+					'hk_services_mode' => 1,
+					'hk_services' => '217d',
+					'hk_sessions_mode' => 1,
+					'hk_sessions' => '157d',
+					'hk_audit_mode' => 1,
+					'hk_audit' => '49d',
+					'hk_history_mode' => 1,
+					'hk_history_global' => 1,
+					'hk_history' => '4d',
+					'hk_trends_mode' => 1,
+					'hk_trends_global' => 1,
+					'hk_trends' => '5d'
+				]
+			]],
+			'disabled modes' => [[
+				'update' => [
+					'hk_events_mode' => 0,
+					'hk_events_trigger' => '62d',
+					'hk_events_internal' => '38d',
+					'hk_events_discovery' => '47d',
+					'hk_events_autoreg' => '128d',
+					'hk_events_service' => '222d',
+					'hk_services_mode' => 0,
+					'hk_services' => '222d',
+					'hk_sessions_mode' => 0,
+					'hk_sessions' => '164d',
+					'hk_audit_mode' => 0,
+					'hk_audit' => '54d',
+					'hk_history_mode' => 0,
+					'hk_history_global' => 1,
+					'hk_history' => '8d',
+					'hk_trends_mode' => 0,
+					'hk_trends_global' => 1,
+					'hk_trends' => '9d'
+				],
+				'expected' => [
+					'hk_events_mode' => 0,
+					'hk_events_trigger' => '59d',
+					'hk_events_internal' => '35d',
+					'hk_events_discovery' => '44d',
+					'hk_events_autoreg' => '125d',
+					'hk_events_service' => '219d',
+					'hk_services_mode' => 0,
+					'hk_services' => '219d',
+					'hk_sessions_mode' => 0,
+					'hk_sessions' => '161d',
+					'hk_audit_mode' => 0,
+					'hk_audit' => '51d',
+					'hk_history_mode' => 0,
+					'hk_history_global' => 1,
+					'hk_history' => '8d',
+					'hk_trends_mode' => 0,
+					'hk_trends_global' => 1,
+					'hk_trends' => '9d'
+				],
+				'precondition' => [
+					'hk_events_mode' => 1,
+					'hk_events_trigger' => '59d',
+					'hk_events_internal' => '35d',
+					'hk_events_discovery' => '44d',
+					'hk_events_autoreg' => '125d',
+					'hk_events_service' => '219d',
+					'hk_services_mode' => 1,
+					'hk_services' => '219d',
+					'hk_sessions_mode' => 1,
+					'hk_sessions' => '161d',
+					'hk_audit_mode' => 1,
+					'hk_audit' => '51d',
+					'hk_history_mode' => 1,
+					'hk_history_global' => 1,
+					'hk_history' => '7d',
+					'hk_trends_mode' => 1,
+					'hk_trends_global' => 1,
+					'hk_trends' => '8d'
+				]
+			]]
+		];
+	}
+
+	private function timeToSeconds($period) {
+		$units = [
+			's' => 1,
+			'm' => SEC_PER_MIN,
+			'h' => SEC_PER_HOUR,
+			'd' => SEC_PER_DAY,
+			'w' => SEC_PER_WEEK
+		];
+
+		if (!preg_match('/^(\d+)([smhdw]?)$/', $period, $matches)) {
+			$this->fail('Unexpected housekeeping period: '.$period);
+		}
+
+		return (int) $matches[1] * ($matches[2] === '' ? 1 : $units[$matches[2]]);
+	}
+
+	private static function expectedPartitionableMode($mode) {
+		return $mode == self::HK_MODE_REGULAR ? [self::HK_MODE_REGULAR, self::HK_MODE_PARTITION] : $mode;
+	}
+
+	/**
+	 * Check that default housekeeping settings are propagated to server and proxy
+	 * runtime configuration caches without housekeeping.update API call.
+	 */
+	public function testHousekeepingConfSync_DefaultConfig() {
+		$housekeeping = self::defaultHousekeeping();
+
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$server_expected = $this->expectedServerHousekeeping($housekeeping);
+		$server_expected['hk_history'] = 0;
+		$server_expected['hk_trends'] = 0;
+		$this->assertHousekeepingEquals($server_expected,
+				$this->extractSyncedHousekeeping(self::COMPONENT_SERVER));
+
+		$this->reloadProxyAndWaitForConfiguration(true);
+		$this->assertHousekeepingEquals($this->expectedProxyHousekeeping($housekeeping),
+				$this->extractSyncedHousekeeping(self::COMPONENT_PROXY));
+	}
+
+	/**
+	 * Check that housekeeping.update changes are propagated to server and proxy
+	 * runtime configuration caches.
+	 *
+	 * @dataProvider housekeepingProvider
+	 */
+	public function testHousekeepingConfSync_ApiUpdate(array $data) {
+		if (array_key_exists('precondition', $data)) {
+			$response = $this->call('housekeeping.update', $data['precondition']);
+			$this->assertArrayHasKey('result', $response);
+
+			$this->reloadServerAndAssertHousekeeping($data['precondition']);
+		}
+
+		$response = $this->call('housekeeping.update', $data['update']);
+		$this->assertArrayHasKey('result', $response);
+
+		$expected_housekeeping = $data['expected'] ?? $data['update'];
+		$this->reloadServerAndAssertHousekeeping($expected_housekeeping);
+
+		$this->reloadProxyAndWaitForConfiguration(true);
+
+		$this->assertHousekeepingEquals($this->expectedProxyHousekeeping($data['update']),
+				$this->extractSyncedHousekeeping(self::COMPONENT_PROXY));
+
+		return true;
+	}
+
+	/**
+	 * Check that TimescaleDB compression settings are propagated to server
+	 * runtime configuration cache and applied to TimescaleDB compression policy.
+	 */
+	public function testHousekeepingConfSync_TimescaleDbCompressionSettings() {
+		if (self::getDBExtension() !== ZBX_DB_EXTENSION_TIMESCALEDB) {
+			$this->markTestSkipped('TimescaleDB extension is not available.');
+		}
+
+		$housekeeping = [
+			'compression_status' => 1,
+			'compress_older' => '14d'
+		];
+		$expected = [
+			'db_extension' => ZBX_DB_EXTENSION_TIMESCALEDB,
+			'compression_status' => $housekeeping['compression_status'],
+			'compress_older' => $this->timeToSeconds($housekeeping['compress_older'])
+		];
+
+		$response = $this->call('housekeeping.update', $housekeeping);
+		$this->assertArrayHasKey('result', $response);
+
+		$this->reloadServerAndAssertDbSettings($expected);
+		$this->executeHousekeeper(self::COMPONENT_SERVER);
+		$this->assertTimescaleDbCompressionPolicyAge($expected['compress_older'] + 2 * SEC_PER_HOUR);
+
+		return true;
+	}
+
+	/**
+	 * Check that the synced global history housekeeping period is used for old
+	 * history records received from proxy.
+	 *
+	 * @depends testHousekeepingConfSync_ApiUpdate
+	 */
+	public function testHousekeepingConfSync_OldHistoryCleanup() {
+		$housekeeping = [
+			'hk_events_mode' => 1,
+			'hk_events_trigger' => '90d',
+			'hk_events_internal' => '90d',
+			'hk_events_discovery' => '90d',
+			'hk_events_autoreg' => '90d',
+			'hk_events_service' => '90d',
+			'hk_services_mode' => 1,
+			'hk_services' => '90d',
+			'hk_sessions_mode' => 1,
+			'hk_sessions' => '90d',
+			'hk_audit_mode' => 1,
+			'hk_audit' => '90d',
+			'hk_history_mode' => 1,
+			'hk_history_global' => 1,
+			'hk_history' => '90d',
+			'hk_trends_mode' => 1,
+			'hk_trends_global' => 1,
+			'hk_trends' => '90d'
+		];
+
+		$response = $this->call('housekeeping.update', $housekeeping);
+		$this->assertArrayHasKey('result', $response);
+
+		$this->reloadServerAndAssertHousekeeping($housekeeping);
+
+		$this->reloadProxyAndWaitForConfiguration();
+
+		$eventids = $this->createEventPairs(time() - 2 * SEC_PER_DAY, time());
+		$this->assertEventsCount($eventids['old'], count($eventids['old']));
+		$this->assertEventsCount($eventids['new'], count($eventids['new']));
+
+		$this->sendAgentPing(time() - 2 * SEC_PER_DAY);
+		$this->sendAgentPing(time());
+
+		$this->waitForHistoryCount(2);
+
+		$housekeeping = [
+			'hk_events_mode' => 1,
+			'hk_events_trigger' => '1d',
+			'hk_events_internal' => '1d',
+			'hk_events_discovery' => '1d',
+			'hk_events_autoreg' => '1d',
+			'hk_events_service' => '1d',
+			'hk_services_mode' => 1,
+			'hk_services' => '1d',
+			'hk_sessions_mode' => 1,
+			'hk_sessions' => '1d',
+			'hk_audit_mode' => 1,
+			'hk_audit' => '1d',
+			'hk_history_mode' => 1,
+			'hk_history_global' => 1,
+			'hk_history' => '1d',
+			'hk_trends_mode' => 1,
+			'hk_trends_global' => 1,
+			'hk_trends' => '1d'
+		];
+
+		$response = $this->call('housekeeping.update', $housekeeping);
+		$this->assertArrayHasKey('result', $response);
+
+		$this->reloadServerAndAssertHousekeeping($housekeeping);
+
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->executeHousekeeper(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'housekeeper [deleted', true, 300, 1);
+
+		$this->waitForHistoryCount(1);
+		$this->assertEventsCount($eventids['old'], 0);
+		$this->assertEventsCount($eventids['new'], count($eventids['new']));
+
+		return true;
+	}
+
+}
