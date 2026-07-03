@@ -202,10 +202,10 @@
 
 			curl.setArgument('action', 'template.dashboard.edit');
 
-			if (this.dashboard.dashboardid) {
+			if (this.dashboard.dashboardid !== null) {
 				curl.setArgument('dashboardid', this.dashboard.dashboardid);
 			}
-			else if (this.dashboard.templateid) {
+			else if (this.dashboard.templateid !== null) {
 				curl.setArgument('templateid', this.dashboard.templateid);
 			}
 

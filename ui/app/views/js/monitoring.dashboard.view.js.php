@@ -383,7 +383,7 @@
 
 			curl.setArgument('action', 'dashboard.view');
 
-			if (this.#dashboard.dashboardid) {
+			if (this.#dashboard.dashboardid !== null) {
 				curl.setArgument('dashboardid', this.#dashboard.dashboardid);
 			}
 			else {
