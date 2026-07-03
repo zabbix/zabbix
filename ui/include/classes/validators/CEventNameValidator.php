@@ -105,7 +105,7 @@ class CEventNameValidator extends CValidator {
 		foreach ($hist_functions as $hist_function) {
 			$host = $hist_function['data']['parameters'][0]['data']['host'];
 
-			if ($host !== '{HOST.HOST}' && !in_array($host, $this->hostnames)) {
+			if (!preg_match('/^{HOST.HOST[1-9]?}$/i', $host) && !in_array($host, $this->hostnames)) {
 				$this->setError($this->message_hostnames === null
 					? _s('host "%1$s" is not allowed in event name', $host)
 					: $this->message_hostnames

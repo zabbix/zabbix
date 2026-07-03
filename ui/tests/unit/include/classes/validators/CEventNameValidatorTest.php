@@ -52,6 +52,11 @@ class CEventNameValidatorTest extends TestCase {
 			],
 			['test {?last(/Zabbix server/zabbix[wcache,index,pused])}', ['hostnames' => ['Zabbix server']], null],
 			['test {?last(/{HOST.HOST}/zabbix[wcache,index,pused])}', ['hostnames' => ['Zabbix server']], null],
+			['test {?last(/{HOST.HOST9}/zabbix[wcache,index,pused])}', [], null],
+			['test {?last(/{HOST.HOST10}/zabbix[wcache,index,pused])}', [],
+				'incorrect expression starting from "last(/{HOST.HOST10}/zabbix[wcache,index,pused])}"'
+			],
+			['test {?last(/{HOST.HOST9}/zabbix[wcache,index,pused])}', ['hostnames' => ['Zabbix server']], null],
 			['test {?last(/Zabbix server/zabbix[wcache,index,pused])}',
 				['hostnames' => ['Zabbix server2']], 'host "Zabbix server" is not allowed in event name'
 			],
