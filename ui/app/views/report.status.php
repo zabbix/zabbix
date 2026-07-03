@@ -20,13 +20,25 @@
  */
 
 require_once __DIR__.'/../../include/blocks.inc.php';
+require_once __DIR__.'/js/report.status.js.php';
 
 (new CHtmlPage())
 	->setTitle(_('System information'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORT_STATUS))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					(new CLink(_('Export')))
+						->addClass('js-export-system-information')
+						->addClass(ZBX_STYLE_BTN)
+				)
+		))->setAttribute('aria-label', _('Content controls'))
+	)
 	->addItem(
 		(new CDiv(
 			new CPartial('administration.system.info', [
+				'serverid' => $data['serverid'],
 				'system_info' => $data['system_info'],
 				'show_software_update_check_details' => true,
 				'user_type' => $data['user_type']
@@ -36,7 +48,8 @@ require_once __DIR__.'/../../include/blocks.inc.php';
 			->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 	)
 	->addItem(
-		($data['user_type'] == USER_TYPE_SUPER_ADMIN && $data['system_info']['ha_cluster_enabled'])
+		(($data['user_type'] == USER_TYPE_ZABBIX_ADMIN || $data['user_type'] == USER_TYPE_SUPER_ADMIN)
+			&& $data['system_info']['ha_cluster_enabled'])
 			? (new CDiv(
 				new CPartial('administration.ha.nodes', [
 					'ha_nodes' => $data['system_info']['ha_nodes'],
@@ -48,4 +61,14 @@ require_once __DIR__.'/../../include/blocks.inc.php';
 				->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 			: null
 	)
+	->show();
+
+(new CScriptTag(
+	'view.init('.json_encode([
+		'serverid' => $data['serverid'],
+		'export_file_name' => $data['export_file_name'],
+		'export_data' => $data['export_data']
+	]).');'
+))
+	->setOnDocumentReady()
 	->show();

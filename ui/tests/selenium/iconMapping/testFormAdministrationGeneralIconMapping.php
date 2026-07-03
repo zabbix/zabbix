@@ -878,9 +878,6 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 	/**
 	 * Test cancel cloning of icon mapping.
-	 *
-	 * TODO: Remove @ignoreBrowserErrors after the console.error for "Failed to fetch" is resolved in ZBX-27065
-	 * @ignoreBrowserErrors
 	 */
 	public function testFormAdministrationGeneralIconMapping_CancelCloning() {
 		$sql_hash = 'SELECT * FROM icon_map ORDER BY iconmapid';
