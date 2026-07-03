@@ -512,7 +512,7 @@ class testBridgeAdapter extends CIntegrationTest {
 			'--host', self::ADAPTER_HOST,
 			'--port', (string) self::getAdapterPort(),
 			'--log-file', self::$adapter_log_file,
-			'--pid-file', self::$adapter_pid_file,
+			'--pid-file', self::$adapter_pid_file
 		], $tls_args, $extra_args), true);
 
 		$deadline = time() + self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
