@@ -75,7 +75,7 @@
 			text-align: center;
 
 			td {
-				border-radius: var(--badge-border-radius);
+				border-radius: var(--button-border-radius);
 
 				&:hover {
 					background-color: $action-hover-color;

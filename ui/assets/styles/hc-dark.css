@@ -1694,7 +1694,7 @@ button {
     .calendar table tbody {
       text-align: center; }
       .calendar table tbody td {
-        border-radius: var(--badge-border-radius); }
+        border-radius: var(--button-border-radius); }
         .calendar table tbody td:hover {
           background-color: #454545;
           cursor: pointer; }
