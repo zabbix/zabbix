@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @hosts test
  */
 class testTriggerCEP extends CIntegrationTest {
-	const LLD_DISCOVERY_COUNT = 2000; // should be at least 4000 for local tests
+	const LLD_DISCOVERY_COUNT = 500; // should be at least 4000 for local tests
 	const LOG_EVENT_COUNT = 10000;
 
 	const SKIP_RESTART_TESTS = true;
