@@ -17,6 +17,7 @@
 
 #include "zbxalgo.h"
 #include "zbxdb.h"
+#include "zbxvault.h"
 
 /* apm db */
 
@@ -52,7 +53,7 @@ zbx_apm_db_config_t;
 
 int	zbx_apm_db_config_init(zbx_apm_db_config_t *apm_db_config, const char *config_apm_provider,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, char **error);
+		const char *config_ssl_key_location, const zbx_config_vault_t *config_vault, char **error);
 
 void	zbx_apm_db_config_clear(zbx_apm_db_config_t *config);
 

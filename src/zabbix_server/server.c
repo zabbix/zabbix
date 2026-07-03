@@ -2701,7 +2701,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	if (SUCCEED != zbx_apm_db_config_init(&apm_db_config, config_apm_provider, zbx_config_source_ip,
-			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &zbx_config_vault,
+			&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize APM database configuration: %s", error);
 		zbx_free(error);

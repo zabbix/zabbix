@@ -15,9 +15,9 @@
 #include "zbxcommon.h"
 #include "zbxconfigoption.h"
 #include "zbxnum.h"
-#include "zbxstr.h"
 #include "zbxtelemetry.h"
 #include "zbxtypes.h"
+#include "zbxvault.h"
 
 #define APM_PROVIDER_NAME_CLICKHOUSE	"clickhouse"
 
@@ -238,14 +238,12 @@ static int	validate_config(const zbx_apm_db_config_t *apm_db_config, char **erro
 
 int	zbx_apm_db_config_init(zbx_apm_db_config_t *apm_db_config, const char *config_apm_provider,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, char **error)
+		const char *config_ssl_key_location, const zbx_config_vault_t *config_vault, char **error)
 {
 	memset(apm_db_config, 0, sizeof(*apm_db_config));
 
 	if (NULL == config_apm_provider || '\0' == *config_apm_provider)
 		return SUCCEED;
-
-	/* TODO: get apm db creds from vault */
 
 	if (SUCCEED != parse_apm_provider(apm_db_config, config_apm_provider, config_source_ip, config_ssl_ca_location,
 			config_ssl_cert_location, config_ssl_key_location, error))
@@ -253,6 +251,15 @@ int	zbx_apm_db_config_init(zbx_apm_db_config_t *apm_db_config, const char *confi
 
 	if (SUCCEED != validate_config(apm_db_config, error))
 		goto fail;
+
+	if (NULL != apm_db_config->vault_path &&
+			SUCCEED != zbx_vault_apm_db_credentials_get(config_vault, &apm_db_config->username,
+			&apm_db_config->password, apm_db_config->vault_path, config_source_ip, config_ssl_ca_location,
+			config_ssl_cert_location, config_ssl_key_location, error))
+	{
+		*error = zbx_dsprintf(*error, "cannot initialize apm database credentials from vault: %s", *error);
+		goto fail;
+	}
 
 	apm_db_config->have_local_config = 1;
 
