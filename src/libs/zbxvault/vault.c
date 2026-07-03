@@ -21,6 +21,7 @@
 #include "zbxjson.h"
 
 #define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
+#define ZBX_HASHICORP_NAME	"HashiCorp"
 
 typedef	int (*zbx_vault_get_kvs_cb_t)(const char *vault_url, const char *prefix, const char *token, const char *approle,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
@@ -39,7 +40,6 @@ static const char			*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
 
 int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 {
-#define ZBX_HASHICORP_NAME		"HashiCorp"
 #define ZBX_HASHICORP_DBUSER_KEY	"username"
 #define ZBX_HASHICORP_DBPASSWORD_KEY	"password"
 
@@ -107,7 +107,6 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 	}
 
 	return SUCCEED;
-#undef ZBX_HASHICORP_NAME
 #undef ZBX_HASHICORP_DBUSER_KEY
 #undef ZBX_HASHICORP_DBPASSWORD_KEY
 
@@ -169,14 +168,14 @@ int	zbx_vault_db_credentials_get(zbx_config_vault_t *config_vault, char **dbuser
 
 	zbx_kvs_create(&kvs, 2);
 
-	if (NULL == config_vault->token)
+	if (NULL == config_vault->token && 0 == strcmp(config_vault->name, ZBX_HASHICORP_NAME))
 	{
 		zbx_vault_renew_token(config_vault, config_source_ip, config_ssl_ca_location,
 				config_ssl_cert_location, config_ssl_key_location, &config_vault->token);
 
 		if (NULL == config_vault->token)
 		{
-			*error = zbx_dsprintf(*error, "cannot login with AppRole method (see Zabbix server logfile)");
+			*error = zbx_dsprintf(*error, "cannot login with AppRole method");
 			goto fail;
 		}
 	}
