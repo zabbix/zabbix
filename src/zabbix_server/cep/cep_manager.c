@@ -289,11 +289,30 @@ static void	cep_manager_flush_remote_task(zbx_cep_task_remote_t *task)
 		zbx_ipc_client_send(task->client, task->message->code, task->response, task->response_len);
 }
 
-static int	cep_manager_is_task_pending(zbx_cep_manager_t *manager, const zbx_cep_task_event_t *task)
+static int	cep_manager_is_task_pending(zbx_cep_manager_t *manager, const zbx_mw_task_t *task)
 {
-	for (int i = 0; i < task->eventids.values_num; i++)
+	const zbx_cep_task_event_t	*event_task;
+	zbx_uint64_t			c_eventid;
+
+	switch (task->type)
 	{
-		if (NULL != zbx_hashset_search(&manager->events_pending, &task->eventids.values[i]))
+		case CEP_TASK_EVENT:
+			event_task = (zbx_cep_task_event_t *)task;
+			break;
+		case CEP_TASK_CLOSE_EVENT:
+			c_eventid = ((zbx_cep_task_close_event_t *)task)->c_eventid;
+			if (0 != c_eventid && NULL != zbx_hashset_search(&manager->events_pending, &c_eventid))
+				return SUCCEED;
+			event_task = &((zbx_cep_task_close_event_t *)task)->parent;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
+
+	for (int i = 0; i < event_task->eventids.values_num; i++)
+	{
+		if (NULL != zbx_hashset_search(&manager->events_pending, &event_task->eventids.values[i]))
 			return SUCCEED;
 	}
 
@@ -309,7 +328,7 @@ static int	cep_manager_commit_event_task(zbx_cep_manager_t *manager, zbx_mw_task
 
 	if (event_task->db_event->value == TRIGGER_VALUE_OK)
 	{
-		if (SUCCEED == cep_manager_is_task_pending(manager, event_task))
+		if (SUCCEED == cep_manager_is_task_pending(manager, task))
 		{
 			zbx_vector_mw_task_ptr_append(&manager->commits_pending, task);
 			return SUCCEED;
@@ -343,13 +362,9 @@ static  void	cep_manager_remove_pending_events(zbx_cep_manager_t *manager, zbx_m
 
 static void	cep_manager_process_pending(zbx_cep_manager_t *manager)
 {
-	const zbx_cep_task_event_t	*event_task;
-
 	for (int i = 0; i < manager->commits_pending.values_num; )
 	{
-		event_task = cep_get_event_task(manager->commits_pending.values[i]);
-
-		if (SUCCEED != cep_manager_is_task_pending(manager, event_task))
+		if (SUCCEED != cep_manager_is_task_pending(manager, manager->commits_pending.values[i]))
 		{
 			zbx_vector_mw_task_ptr_append(&manager->commits, manager->commits_pending.values[i]);
 			zbx_vector_mw_task_ptr_remove(&manager->commits_pending, i);
@@ -568,14 +583,17 @@ void	*zbx_cep_manager_thread(void *args)
 		/* only stop cep when history syncers no longer require it */
 		if ((!ZBX_IS_RUNNING() || 1 == shutdown) && 0 == zbx_hc_refcount_peek())
 		{
-			int	is_empty;
+			if (0 == manager->commits.values_num + manager->commits_pending.values_num)
+			{
+				int	is_empty;
 
-			zbx_mw_queue_lock(manager->base.queue);
-			is_empty = cep_queue_is_empty((zbx_cep_queue_t *)manager->base.queue);
-			zbx_mw_queue_unlock(manager->base.queue);
+				zbx_mw_queue_lock(manager->base.queue);
+				is_empty = cep_queue_is_empty((zbx_cep_queue_t *)manager->base.queue);
+				zbx_mw_queue_unlock(manager->base.queue);
 
-			if (SUCCEED == is_empty)
-				break;
+				if (SUCCEED == is_empty)
+					break;
+			}
 		}
 
 		zbx_mw_queue_lock(manager->base.queue);
