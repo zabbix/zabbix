@@ -211,7 +211,7 @@
 			this.#initPopupListeners();
 		}
 
-		#updateHistory({slideshow = null, page = undefined, add_new} = {})  {
+		#updateHistory({slideshow = null, page = undefined, add_new} = {}) {
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'host.dashboard.view');

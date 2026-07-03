@@ -197,7 +197,7 @@
 			document.getElementById('dashboard-save').disabled = do_disable;
 		},
 
-		updateHistory({page = undefined, add_new} = {})  {
+		updateHistory({page = undefined, add_new} = {}) {
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'template.dashboard.edit');
