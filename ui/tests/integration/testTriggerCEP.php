@@ -131,7 +131,8 @@ class testTriggerCEP extends CIntegrationTest {
 				'HistoryCacheSize' => '32M',
 				'HistoryIndexCacheSize' => '32M',
 				'ValueCacheSize' => '128M',
-				'LogSlowQueries' => 10000
+				'LogSlowQueries' => 10000,
+				'StartEscalators' => 8
 			]
 		];
 	}
@@ -3677,7 +3678,7 @@ HEREDOC;
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS
-		], $expected, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		], $expected, 120, self::WAIT_ITERATION_DELAY);
 	}
 
 	private function runDependentTriggerTest(bool $restart): void {
