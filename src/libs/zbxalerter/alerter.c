@@ -513,6 +513,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		zbx_ipc_message_t *ipc_message,
 		const char *config_bridge_adapter_url,
 		const char *config_bridge_adapter_ca_file,
+		const char *config_bridge_adapter_crl_file,
 		const char *config_bridge_adapter_cert_file,
 		const char *config_bridge_adapter_key_file,
 		const char *config_bridge_adapter_connect_to)
@@ -532,6 +533,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	ZBX_UNUSED(ipc_message);
 	ZBX_UNUSED(config_bridge_adapter_url);
 	ZBX_UNUSED(config_bridge_adapter_ca_file);
+	ZBX_UNUSED(config_bridge_adapter_crl_file);
 	ZBX_UNUSED(config_bridge_adapter_cert_file);
 	ZBX_UNUSED(config_bridge_adapter_key_file);
 	ZBX_UNUSED(config_bridge_adapter_connect_to);
@@ -617,6 +619,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	 * - http:// uses unencrypted HTTP;
 	 * - https:// uses TLS with the default CA trust store;
 	 * - https:// with TLSCAFile overrides the CA trust store;
+	 * - https:// with TLSCRLFile enables certificate revocation checks;
 	 * - https:// with TLSCAFile, TLSCertFile and TLSKeyFile uses mTLS.
 	 */
 	if (0 == zbx_strncasecmp(config_bridge_adapter_url, ZBX_BRIDGE_ADAPTER_HTTPS_SCHEME,
@@ -634,6 +637,16 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		if (NULL != config_bridge_adapter_ca_file &&
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO,
 				config_bridge_adapter_ca_file)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
+					curl_easy_strerror(err));
+			error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+			goto out;
+		}
+
+		if (NULL != config_bridge_adapter_crl_file &&
+				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CRLFILE,
+				config_bridge_adapter_crl_file)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
@@ -873,6 +886,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 				alerter_process_push(&alerter_socket, &message,
 						alerter_args_in->config_bridge_adapter_url,
 						alerter_args_in->config_bridge_adapter_ca_file,
+						alerter_args_in->config_bridge_adapter_crl_file,
 						alerter_args_in->config_bridge_adapter_cert_file,
 						alerter_args_in->config_bridge_adapter_key_file,
 						alerter_args_in->config_bridge_adapter_connect_to);

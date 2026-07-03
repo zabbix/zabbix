@@ -233,6 +233,7 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	 * - http:// uses unencrypted HTTP;
 	 * - https:// uses TLS with the default CA trust store;
 	 * - https:// with TLSCAFile overrides the CA trust store;
+	 * - https:// with TLSCRLFile enables certificate revocation checks;
 	 * - https:// with TLSCAFile, TLSCertFile and TLSKeyFile uses mTLS.
 	 */
 	if (0 == zbx_strncasecmp(config_bridge_adapter_url, ZBX_BRIDGE_ADAPTER_HTTPS_SCHEME,
@@ -249,6 +250,15 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 
 		if (NULL != config_tls->ca_file &&
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_tls->ca_file)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
+					curl_easy_strerror(err));
+			*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+			goto out;
+		}
+
+		if (NULL != config_tls->crl_file &&
+				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CRLFILE, config_tls->crl_file)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));

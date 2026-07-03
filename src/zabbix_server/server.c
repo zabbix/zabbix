@@ -1818,6 +1818,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.config_sms_devices = config_sms_devices,
 			.config_bridge_adapter_url = config_bridge_adapter_url,
 			.config_bridge_adapter_ca_file = zbx_config_tls->ca_file,
+			.config_bridge_adapter_crl_file = zbx_config_tls->crl_file,
 			.config_bridge_adapter_cert_file = zbx_config_tls->cert_file,
 			.config_bridge_adapter_key_file = zbx_config_tls->key_file,
 			.config_bridge_adapter_connect_to = config_bridge_adapter_curl_connect_to
