@@ -1345,13 +1345,13 @@ class CDashboard {
 		return data;
 	}
 
-	editProperties() {
+	editProperties({auto_start = null} = {}) {
 		const properties = {
 			template: this._data.templateid !== null ? 1 : undefined,
 			userid: this._data.templateid === null ? this._data.userid : undefined,
 			name: this._data.name,
 			display_period: this._data.display_period,
-			auto_start: this._data.auto_start
+			auto_start: auto_start ?? this._data.auto_start
 		};
 
 		PopUp('dashboard.properties.edit', properties, {

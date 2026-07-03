@@ -173,7 +173,7 @@
 
 				if (dashboard.dashboardid === null || clone) {
 					this.#edit();
-					ZABBIX.Dashboard.editProperties();
+					ZABBIX.Dashboard.editProperties(dashboard.default_auto_start);
 				}
 				else {
 					document
@@ -234,7 +234,7 @@
 
 			document
 				.getElementById('dashboard-config')
-				.addEventListener('click', () => ZABBIX.Dashboard.editProperties());
+				.addEventListener('click', () => ZABBIX.Dashboard.editProperties(this.#dashboard.default_auto_start));
 
 			document
 				.getElementById('dashboard-add-widget')
