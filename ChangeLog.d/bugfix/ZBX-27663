@@ -1,1 +1,1 @@
-..F....... [ZBX-27663] fixed JS console error for undefined host, host prototypes, and templates tags when there is no rows in tags table (scernisenko)
+..F....... [ZBX-27663] fixed switching between tag lists in host, host prototypes, and templates edit form in case there are no tags (scernisenko)
