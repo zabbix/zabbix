@@ -265,7 +265,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 						[
 							'Parameter' => 'Zabbix server is running',
 							'Value' => 'Yes',
-							'Details' => '{address}',
+							'Details' => '{address}'
 						],
 						[
 							'Parameter' => 'Zabbix frontend version',
