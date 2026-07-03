@@ -203,31 +203,27 @@ class CHistory extends CApiService {
 			zbx_db_search($sql_parts['from'], $options, $sql_parts);
 		}
 
-		$use_offsets = $options['limit'] !== null && reset($options['sortfield']) === 'clock';
+		$use_time_based_chunking = $options['limit'] !== null && reset($options['sortfield']) === 'clock'
+			&& $options['sortorder'] && ((array) $options['sortorder'])[0] === ZBX_SORT_DOWN;
 
-		if ($use_offsets) {
-			$sortorder = (array) $options['sortorder'];
-			$sortorder = $sortorder ? reset($sortorder) : ZBX_SORT_UP;
-
-			$use_offsets = $sortorder == ZBX_SORT_DOWN;
-		}
-
-		return $use_offsets
-			? $this->getIterativeResultFromSql($options, $sql_parts)
-			: $this->getResultFromSql($options, $sql_parts);
+		return $use_time_based_chunking
+			? $this->getFromSqlUsingTimeBasedChunking($options, $sql_parts)
+			: $this->getFromSqlDirectly($options, $sql_parts);
 	}
 
-	private function getIterativeResultFromSql(array $options, array $sql_parts) {
+	private function getFromSqlUsingTimeBasedChunking(array $options, array $sql_parts) {
 		$result = [];
 		$count = 0;
 
-		foreach (self::getOffsetPeriods($options) as $period) {
+		$segments = self::getTimeRangeSegments($options);
+
+		foreach ($segments as $segment) {
 			if ($options['countOutput']) {
-				$count += $this->getResultFromSql($period + $options, $sql_parts);
+				$count += $this->getFromSqlDirectly($segment + $options, $sql_parts);
 			}
 			else {
-				$result = array_merge($result, $this->getResultFromSql(
-					$period + ['limit' => $options['limit'] - count($result)] + $options,
+				$result = array_merge($result, $this->getFromSqlDirectly(
+					$segment + ['limit' => $options['limit'] - count($result)] + $options,
 					$sql_parts
 				));
 
@@ -240,63 +236,34 @@ class CHistory extends CApiService {
 		return $options['countOutput'] ? (string) $count : $result;
 	}
 
-	private static function getOffsetPeriods(array $options): array {
+	private static function getTimeRangeSegments(array $options): array {
 		$now = time();
-		$time_till = $options['time_till'] !== null ? $options['time_till'] : $now;
-		$offsets = [SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH];
+		$min_time_from = $options['time_from'] !== null ? $options['time_from'] : 0;
+		$max_time_till = $options['time_till'] !== null ? $options['time_till'] : time();
 
-		$periods = [];
-		foreach ($offsets as $offset) {
-			$period = ['time_from' => $time_till - $offset + 1];
-
-			if ($periods) {
-				$period['time_till'] = $time_till;
-			}
-
-			$periods[] = $period;
-
-			$time_till -= $offset;
+		if ($min_time_from > $max_time_till) {
+			return [];
 		}
 
-		if ($periods) {
-			$periods[] = ['time_till' => $time_till];
+		$window_sizes = [SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH];
+
+		$segments = [];
+		$time_from = null;
+
+		do {
+			$window_size = array_shift($window_sizes);
+			$time_till = $time_from === null ? $max_time_till : ($time_from - 1);
+			$time_from = $window_size !== null ? max($time_till - $window_size + 1, $min_time_from) : $min_time_from;
+
+			$segments[] = ($time_from > 0 ? ['time_from' => $time_from] : [])
+				+ ($time_till < $now ? ['time_till' => $time_till] : []);
 		}
+		while ($time_from != $min_time_from);
 
-		foreach ($periods as $i => &$period) {
-			if ($options['time_from'] !== null) {
-				if (array_key_exists('time_till', $period) && $period['time_till'] < $options['time_from']) {
-					unset($periods[$i]);
-
-					continue;
-				}
-
-				if (array_key_exists('time_from', $period) && $period['time_from'] < $options['time_from']) {
-					$period['time_from'] = $options['time_from'];
-				}
-			}
-
-			if ($options['time_till'] !== null) {
-				if (array_key_exists('time_till', $period) && $period['time_till'] > $options['time_till']) {
-					$period['time_till'] = $options['time_till'];
-				}
-			}
-
-			if (array_key_exists('time_from', $period) && array_key_exists('time_till', $period)) {
-				if ($period['time_from'] >= $period['time_till']) {
-					unset($periods[$i]);
-				}
-			}
-		}
-		unset($period);
-
-		if (!$periods) {
-			$periods[] = [];
-		}
-
-		return $periods;
+		return $segments;
 	}
 
-	private function getResultFromSql(array $options, array $sql_parts) {
+	private function getFromSqlDirectly(array $options, array $sql_parts) {
 		if ($options['time_from'] !== null) {
 			$sql_parts['where']['clock_from'] = 'h.clock>='.$options['time_from'];
 		}
