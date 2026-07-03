@@ -62,12 +62,7 @@ class C74ImportConverter extends CConverter {
 				$template['items'] = self::convertItems($template['items']);
 			}
 			if (array_key_exists('dashboards', $template)) {
-				foreach ($template['dashboards'] as &$dashboard) {
-					if (!array_key_exists('auto_start', $dashboard)) {
-						$dashboard['auto_start'] = CXmlConstantName::YES;
-					}
-				}
-				unset($dashboard);
+				$template['dashboards'] = self::convertDashboards($template['dashboards']);
 			}
 		}
 		unset($template);
@@ -99,6 +94,17 @@ class C74ImportConverter extends CConverter {
 		unset($item);
 
 		return $items;
+	}
+
+	private static function convertDashboards(array $dashboards): array {
+		foreach ($dashboards as &$dashboard) {
+			if (!array_key_exists('auto_start', $dashboard)) {
+				$dashboard['auto_start'] = CXmlConstantName::YES;
+			}
+		}
+		unset($dashboard);
+
+		return $dashboards;
 	}
 
 	/**
