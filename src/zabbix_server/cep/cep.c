@@ -1547,7 +1547,8 @@ void	cep_update_event_maintenances(zbx_cep_t *cep, const zbx_vector_event_mainte
 		zbx_vector_db_event_suppress_append(&suppress, suppress_local);
 	}
 
-	cep_event_update_maintenances(h, &suppress, action);
+	if (NULL != h)
+		cep_event_update_maintenances(h, &suppress, action);
 
 	zbx_vector_db_event_suppress_destroy(&suppress);
 }
