@@ -7200,6 +7200,10 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     height: 16px;
     line-height: 16px; }
 
+#ceprule-window-groupby .multiselect-control {
+  display: inline-block;
+  width: 300px; }
+
 .link-action {
   color: #ffffff;
   cursor: pointer; }

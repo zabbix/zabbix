@@ -87,11 +87,21 @@ echo (new CObject())
 			)
 			->addItem(new CLabel(_('Tag'), 'ceprule-window-groupby-opt-tag'))
 			->addItem(new CObject('&nbsp;'))
-			->addItem(new CObject('&nbsp;'))
-			->addItem((new CTextBox('window[tag]', $data['window']['tag']))
-				->addStyle('line-height: 16px;')
-				->setId('ceprule-window-groupby-tag')
+
+			->addItem(
+				(new CPatternSelect([
+					'name' => 'window[tags][]',
+					'data' => $data['window']['tags'],
+					'multiple' => true,
+					'popup' => false,
+					'add_new' => true,
+					'new_item_name' => 'window[tags][]',
+					'selectedLimit' => 0,
+					'placeholder' => _('tag names'),
+					'add_post_js' => false
+				]))->setId('ceprule-window-groupby-tag')
 			)
+
 	]))->setId('ceprule-window-groupby')))
 
 	->addItem((new CLabel(_('Event count tag'), 'ceprule-window-counttag'))->setAsteriskMark())

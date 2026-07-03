@@ -43,6 +43,11 @@ class CPatternSelect extends CMultiSelect {
 
 	protected function mapOptions(array $options): array {
 		$wildcard_allowed = false;
+		$popup_enabled = !array_key_exists('popup', $options) || $options['popup'] !== false;
+
+		if (array_key_exists('popup', $options) && $options['popup'] === false) {
+			unset($options['popup']);
+		}
 
 		if (array_key_exists('wildcard_allowed', $options) && $options['wildcard_allowed']) {
 			$wildcard_allowed = true;
@@ -50,7 +55,10 @@ class CPatternSelect extends CMultiSelect {
 		}
 
 		$options = parent::mapOptions($options);
-		$options['popup']['parameters']['patternselect'] = '1';
+
+		if ($popup_enabled) {
+			$options['popup']['parameters']['patternselect'] = '1';
+		}
 
 		if ($wildcard_allowed) {
 			$options['objectOptions']['wildcard_allowed'] = true;
