@@ -862,7 +862,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 			foreach ($data['check_tag_ellipsis'] as $problem => $ellipsis_text) {
 				$table->findRow('Problem • Severity', $problem)->getColumn('Tags')->query('class:zi-more')
 						->waitUntilClickable()->one()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+				$hint = $this->query('css:div.overlay-dialogue.wordbreak')->asOverlayDialog()
 						->waitUntilVisible()->one();
 				$this->assertEquals($ellipsis_text, $hint->getText());
 				$hint->close();

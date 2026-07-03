@@ -1339,7 +1339,6 @@ class testDashboardPieChartWidget extends testWidgets {
 			$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
 			$hint = $this->query('css:div.overlay-dialogue.wordbreak')->asOverlayDialog()->waitUntilPresent()->one();
 			$this->assertEquals($text, $hint->getText());
-			// $hint->query('xpath:./button')->one()->click();
 			$hint->query('xpath:.//button[contains(@class, "btn-overlay-close")]')->one()->click();
 		}
 	}
