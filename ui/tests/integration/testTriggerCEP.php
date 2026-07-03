@@ -73,7 +73,7 @@ class testTriggerCEP extends CIntegrationTest {
 	// When true, the *Restart test variants are skipped entirely. Set during development to avoid the
 	// slow server stop/start cycles; the non-restart tests still run (their @depends point at non-restart
 	// siblings, so they do not cascade-skip).
-	const SKIP_RESTART_TESTS = false;
+	const SKIP_RESTART_TESTS = true;
 
 	// When true, prepareData() deletes every internal-source action instead of enabling the built-in
 	// "Report not supported items" / "Report unknown triggers" actions for the whole suite. The *Unknown
@@ -2956,6 +2956,25 @@ HEREDOC;
 	}
 
 	/**
+	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp,
+	 * but the discovered host is under data-collection maintenance for the whole run: every problem the
+	 * scenario opens must be suppressed while global correlation still closes it, so no open problem remains.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenance$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenance() {
+		$maintenanceid = $this->startDiscHostMaintenance();
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true);
+			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		}
+		finally {
+			$this->stopDiscHostMaintenance($maintenanceid);
+		}
+	}
+
+	/**
 	 * Same "close old down when new up" scenario as
 	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
 	 * CONDITION_EVAL_TYPE_EXPRESSION with a custom formula ("A and B and C") instead of
@@ -3525,7 +3544,7 @@ HEREDOC;
 	 *                      triggers stay TRUE and exactly $m problems remain.
 	 *   4. "up_<i+m>"    → closes each trigger's remaining "down_<i+m>" and itself. Nothing stays open.
 	 */
-	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart): void {
+	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart, bool $maintenance = false): void {
 		$keys = array_merge(
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2)
@@ -3549,6 +3568,13 @@ HEREDOC;
 		$this->dispatchSenderValues($values('down', 0), null, 0);
 		$this->waitForOpenProblemCount($all, $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		// Under data-collection maintenance every problem opened on the host must be suppressed, while
+		// global correlation still processes and closes it normally in the steps below.
+		if ($maintenance) {
+			$this->waitForOpenProblemsSuppressed($all, $m);
+		}
+
 		$this->maybeRestartServer($restart);
 
 		// 2. Open a second problem on every trigger (a different unique id, mult_event); still TRUE.
@@ -3722,6 +3748,20 @@ HEREDOC;
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS
+		], $expected, 120, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Wait until exactly $expected open problems on the given triggers are suppressed. The 'suppressed'
+	 * filter returns only suppressed problems, so a matching count means every open problem is suppressed
+	 * (as expected while the host is under maintenance).
+	 */
+	private function waitForOpenProblemsSuppressed(array $triggerids, int $expected): void {
+		$this->callUntilCountIsPresent('problem.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'suppressed' => true
 		], $expected, 120, self::WAIT_ITERATION_DELAY);
 	}
 
@@ -4097,6 +4137,44 @@ HEREDOC;
 		}
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
+	}
+
+	/**
+	 * Put the discovered host into data-collection maintenance and wait for the server to start it, so any
+	 * problem opened afterwards is suppressed. Returns the maintenance id for stopDiscHostMaintenance().
+	 */
+	private function startDiscHostMaintenance(): string {
+		$now = time();
+
+		$response = $this->call('maintenance.create', [
+			'name' => 'CEP close-on-up maintenance',
+			'hosts' => ['hostid' => self::$disc_hostid],
+			'active_since' => $now - 60,
+			'active_till' => $now + 3600,
+			'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
+			'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_AND_OR,
+			'timeperiods' => [
+				'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+				'period' => 3600,
+				'start_date' => $now - 60
+			]
+		]);
+		$this->assertArrayHasKey('maintenanceids', $response['result']);
+		$this->assertCount(1, $response['result']['maintenanceids']);
+		$maintenanceid = $response['result']['maintenanceids'][0];
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return $maintenanceid;
+	}
+
+	/**
+	 * Remove a maintenance created by startDiscHostMaintenance() and reload the configuration cache so the
+	 * host leaves maintenance before the rest of the suite runs.
+	 */
+	private function stopDiscHostMaintenance(string $maintenanceid): void {
+		$this->call('maintenance.delete', [$maintenanceid]);
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 	}
 
 	/**
