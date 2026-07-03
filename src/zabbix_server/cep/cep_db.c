@@ -377,7 +377,7 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		zbx_dbconn_lock_ids(db,"problem", "eventid", &eventids);
+		zbx_dbconn_lock_ids(db, "events", "eventid", &eventids);
 
 		recoveries_num = recoveries.values_num;
 
