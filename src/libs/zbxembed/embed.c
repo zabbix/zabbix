@@ -1044,7 +1044,7 @@ void	es_put_function_list(duk_context *ctx, duk_idx_t obj_idx, const duk_functio
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve 'enumerable' state of property from prototype            *
+ * Purpose: retrieves 'enumerable' state of property from prototype           *
  *                                                                            *
  * Parameters: ctx - [IN] duktape context                                     *
  *             key - [IN] property name                                       *
@@ -1082,7 +1082,7 @@ static duk_bool_t	es_property_proto_is_enum(duk_context *ctx, const char *key)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: deep-freeze a single object on top of the stack using the         *
+ * Purpose: deep-freezes a single object on top of the stack using the        *
  *          ECMAScript Object.freeze() semantics provided by Duktape          *
  *                                                                            *
  * Parameters: ctx - [IN] duktape context                                     *
@@ -1102,7 +1102,7 @@ static void	es_object_freeze(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: recursively define read-only state for object and its properties  *
+ * Purpose: recursively defines read-only state for object and its properties *
  *                                                                            *
  * Parameters: ctx     - [IN] duktape context                                 *
  *             obj_idx - [IN] object index                                    *
@@ -1123,7 +1123,6 @@ static void	es_object_deep_ro_set(duk_context *ctx, const char *parent_key)
 	}
 
 	duk_pop(ctx);						/* pop prototype; [..., base, undefined] */
-
 
 	/* we don't use DUK_ENUM_OWN_PROPERTIES_ONLY because               */
 	/* duktape does not inherit conf of property from __proto__ object */
