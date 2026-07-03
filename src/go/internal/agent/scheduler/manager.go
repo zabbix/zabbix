@@ -562,6 +562,7 @@ func (m *Manager) run() {
 	lastTick := time.Now()
 	cleaned := lastTick
 	time.Sleep(time.Duration(1e9 - lastTick.Nanosecond()))
+
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
