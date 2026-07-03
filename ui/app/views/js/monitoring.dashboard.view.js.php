@@ -421,12 +421,16 @@
 				curl.setArgument('page', page);
 			}
 
-			const auto_start = this.#dashboard.auto_start === '1' ? DASHBOARD_SLIDESHOW_ON : DASHBOARD_SLIDESHOW_OFF;
+			if (!ZABBIX.Dashboard.isEditMode()) {
+				const auto_start = this.#dashboard.auto_start === '1'
+					? DASHBOARD_SLIDESHOW_ON
+					: DASHBOARD_SLIDESHOW_OFF;
 
-			slideshow = slideshow ?? url.getArgument('slideshow');
+				slideshow = slideshow ?? url.getArgument('slideshow');
 
-			if (slideshow !== null && slideshow !== auto_start) {
-				curl.setArgument('slideshow', slideshow);
+				if (slideshow !== null && slideshow !== auto_start) {
+					curl.setArgument('slideshow', slideshow);
+				}
 			}
 
 			if (add_new) {
