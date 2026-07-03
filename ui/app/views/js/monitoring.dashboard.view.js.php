@@ -266,6 +266,8 @@
 			});
 
 			this.#enableNavigationWarning();
+
+			this.#updateHistory({add_new: false});
 		}
 
 		#save() {

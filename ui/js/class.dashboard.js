@@ -308,8 +308,6 @@ class CDashboard {
 
 	_stopSlideshow() {
 		if (this._slideshow_timeout_id === null) {
-			this.fire(CDashboard.EVENT_SLIDESHOW_STOP);
-
 			return;
 		}
 
