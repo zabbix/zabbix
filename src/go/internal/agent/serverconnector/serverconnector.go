@@ -391,6 +391,7 @@ func (c *Connector) run() {
 	log.Debugf("[%d] starting server connector for %s", c.clientID, c.address)
 
 	time.Sleep(time.Duration(1e9 - time.Now().Nanosecond()))
+
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
