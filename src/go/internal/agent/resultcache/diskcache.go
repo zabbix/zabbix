@@ -368,8 +368,41 @@ func (c *DiskCache) flushOutput(u Uploader) {
 	}
 }
 
+func (c *DiskCache) execWithRetry(query string, args ...any) {
+	var delay = 2 * time.Second
+	var maxDelay = 60 * time.Second
+
+	for {
+		var stmt *sql.Stmt
+		var err error
+
+		stmt, err = c.database.Prepare(query)
+		if err == nil {
+			_, err = stmt.Exec(args...)
+		}
+
+		if err != nil {
+			c.Errf("persistent buffer execution failed, retrying in %s : %s", delay, err)
+
+			time.Sleep(delay)
+
+			delay *= 2
+			if delay > maxDelay {
+				delay = maxDelay
+			}
+
+			continue
+		}
+
+		c.Debugf("successfully executed persistent buffer write")
+
+		defer stmt.Close()
+
+		return
+	}
+}
+
 func (c *DiskCache) write(r *plugin.Result) {
-	var err error
 	c.lastDataID++
 
 	var LastLogsize int64 = DbVariableNotSet
@@ -418,27 +451,22 @@ func (c *DiskCache) write(r *plugin.Result) {
 		EventTimestamp = *r.EventTimestamp
 	}
 
-	var stmt *sql.Stmt
-
 	now := time.Now().Unix()
 	cacheLock.Lock()
+
 	defer cacheLock.Unlock()
 
+	var table string
 	if r.Persistent {
-
 		if c.oldestLog == 0 {
 			c.oldestLog = clock
 		}
+
 		if (now - c.oldestLog) > c.storagePeriod {
 			atomic.StoreUint32(&c.persistFlag, 1)
 		}
-		stmt, err = c.database.Prepare(c.insertResultTable(fmt.Sprintf("log_%d", c.serverID)))
 
-		if err != nil {
-			c.Errf("cannot prepare SQL query to insert history in log_%d : %s", c.serverID, err)
-		} else {
-			defer stmt.Close()
-		}
+		table = fmt.Sprintf("log_%d", c.serverID)
 	} else {
 		if c.oldestData == 0 {
 			c.oldestData = clock
@@ -446,37 +474,39 @@ func (c *DiskCache) write(r *plugin.Result) {
 
 		if (now - c.oldestData) > c.storagePeriod+StorageTolerance {
 			query := fmt.Sprintf("DELETE FROM data_%d WHERE clock<?", c.serverID)
-			if _, err = c.database.Exec(query, now-c.storagePeriod); err != nil {
+			if _, err := c.database.Exec(query, now-c.storagePeriod); err != nil {
 				c.Errf("cannot delete old data from data_%d : %s", c.serverID, err)
 			}
 
+			var err error
 			c.oldestData, err = c.getOldestWriteClock(tableName("data", c.serverID))
 			if err != nil {
 				c.Errf("cannot query minimum write clock from data_%d : %s", c.serverID, err)
 			}
 		}
-		stmt, err = c.database.Prepare(c.insertResultTable(fmt.Sprintf("data_%d", c.serverID)))
-		if err != nil {
-			c.Errf("cannot prepare SQL query to insert history in data_%d : %s", c.serverID, err)
-		} else {
-			defer stmt.Close()
-		}
+
+		table = fmt.Sprintf("data_%d", c.serverID)
 	}
-	if stmt != nil {
-		_, err = stmt.Exec(c.lastDataID, now, r.Itemid, LastLogsize, Mtime, State, Value,
-			EventSource, EventID, EventSeverity, EventTimestamp, clock, ns)
-		if err != nil {
-			c.Errf("cannot execute SQL statement : %s", err)
-		}
-	}
-	if err != nil {
-		panic(err)
-	}
+
+	c.execWithRetry(
+		c.insertResultTable(table),
+		c.lastDataID,
+		now,
+		r.Itemid,
+		LastLogsize,
+		Mtime,
+		State,
+		Value,
+		EventSource,
+		EventID,
+		EventSeverity,
+		EventTimestamp,
+		clock,
+		ns,
+	)
 }
 
 func (c *DiskCache) writeCommand(cr *CommandResult) {
-	var err error
-
 	log.Debugf("cache command(%d) result:%s error:%s", cr.ID, cr.Result, cr.Error)
 	c.lastCommandID++
 
@@ -484,8 +514,6 @@ func (c *DiskCache) writeCommand(cr *CommandResult) {
 	if cr.Error != nil {
 		ErrMsg = cr.Error.Error()
 	}
-
-	var stmt *sql.Stmt
 
 	now := time.Now().Unix()
 	cacheLock.Lock()
@@ -497,35 +525,24 @@ func (c *DiskCache) writeCommand(cr *CommandResult) {
 
 	if (now - c.oldestCommand) > c.storagePeriod+StorageTolerance {
 		query := fmt.Sprintf("DELETE FROM command_%d WHERE write_clock<?", c.serverID)
-		if _, err = c.database.Exec(query, now-c.storagePeriod); err != nil {
+		if _, err := c.database.Exec(query, now-c.storagePeriod); err != nil {
 			c.Errf("cannot delete old commands from command_%d : %s", c.serverID, err)
 		}
 
+		var err error
 		c.oldestCommand, err = c.getOldestWriteClock(tableName("command", c.serverID))
 		if err != nil {
 			c.Errf("cannot query minimum write clock from command_%d : %s", c.serverID, err)
 		}
 	}
-	stmt, err = c.database.Prepare(fmt.Sprintf(
+
+	query := fmt.Sprintf(
 		"INSERT INTO command_%d"+
 			"(id,write_clock,cmd_id,value,error)"+
 			"VALUES"+
-			"(?,?,?,?,?)", c.serverID))
-	if err != nil {
-		c.Errf("cannot prepare SQL query to insert commands in command_%d : %s", c.serverID, err)
-	} else {
-		defer stmt.Close()
-	}
+			"(?,?,?,?,?)", c.serverID)
 
-	if stmt != nil {
-		_, err = stmt.Exec(c.lastCommandID, now, cr.ID, cr.Result, ErrMsg)
-		if err != nil {
-			c.Errf("cannot execute SQL statement : %s", err)
-		}
-	}
-	if err != nil {
-		panic(err)
-	}
+	c.execWithRetry(query, c.lastCommandID, now, cr.ID, cr.Result, ErrMsg)
 }
 
 func (c *DiskCache) run() {
