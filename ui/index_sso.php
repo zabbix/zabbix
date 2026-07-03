@@ -81,6 +81,7 @@ if (array_key_exists('use_proxy_headers', $SSO['SETTINGS']) && (bool) $SSO['SETT
 
 $baseurl = Utils::getSelfURLNoQuery();
 $relay_state = null;
+$saml_data = null;
 $saml_settings = $provisioning->getIdpConfig();
 $settings = [
 	'sp' => [
@@ -218,23 +219,22 @@ try {
 			$saml_data['provisioned_user'] = $user;
 		}
 
-		$saml_data['sign'] = CEncryptHelper::sign(json_encode($saml_data));
-
-		CSessionHelper::set('saml_data', $saml_data);
-
 		if (hasRequest('RelayState') && strpos(getRequest('RelayState'), $baseurl) === false) {
 			$relay_state = getRequest('RelayState');
 		}
 	}
 
 	if ($saml_settings['slo_url'] !== '') {
-		if (hasRequest('slo') && CSessionHelper::has('saml_data')) {
-			$saml_data = CSessionHelper::get('saml_data');
+		if (hasRequest('slo') && ($saml_data !== null || CSessionHelper::has('saml_data'))) {
+			$saml_data_logout = CSessionHelper::has('saml_data')
+				? CSessionHelper::get('saml_data')
+				: $saml_data;
 
 			CWebUser::logout();
 
-			$auth->logout(null, [], $saml_data['nameid'], $saml_data['session_index'], false,
-				$saml_data['nameid_format'], $saml_data['nameid_name_qualifier'], $saml_data['nameid_sp_name_qualifier']
+			$auth->logout(null, [], $saml_data_logout['nameid'], $saml_data_logout['session_index'], false,
+				$saml_data_logout['nameid_format'], $saml_data_logout['nameid_name_qualifier'],
+				$saml_data_logout['nameid_sp_name_qualifier']
 			);
 		}
 
@@ -250,20 +250,7 @@ try {
 		redirect($redirect_to->toString());
 	}
 
-	if (CSessionHelper::has('saml_data')) {
-		$saml_data = CSessionHelper::get('saml_data');
-
-		if (!array_key_exists('sign', $saml_data)) {
-			throw new Exception(_('Session initialization error.'));
-		}
-
-		$saml_data_sign = $saml_data['sign'];
-		$saml_data_sign_check = CEncryptHelper::sign(json_encode(array_diff_key($saml_data, array_flip(['sign']))));
-
-		if (!CEncryptHelper::checkSign($saml_data_sign, $saml_data_sign_check)) {
-			throw new Exception(_('Session initialization error.'));
-		}
-
+	if ($saml_data !== null) {
 		// Temporary disabling wrapper for API requests.
 		$wrapper = API::getWrapper();
 		API::setWrapper();
@@ -302,7 +289,6 @@ try {
 			}
 
 			unset($saml_data['provisioned_user'], $saml_data['idp_groups']);
-			CSessionHelper::set('saml_data', $saml_data);
 		}
 
 		CWebUser::$data = CUser::loginByUsername($saml_data['username_attribute'],
@@ -314,6 +300,7 @@ try {
 			throw new Exception(_('GUI access disabled.'));
 		}
 
+		CSessionHelper::set('saml_data', $saml_data);
 		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
 		API::getWrapper()->auth = [
 			'type' => CJsonRpc::AUTH_TYPE_FRONTEND,
@@ -330,7 +317,7 @@ catch (Exception $e) {
 	error($e->getMessage());
 }
 
-$sso_authorized = CSessionHelper::has('saml_data');
+$sso_authorized = $saml_data !== null || CSessionHelper::has('saml_data');
 CSessionHelper::unset(['saml_data']);
 
 if ($sso_authorized) {
