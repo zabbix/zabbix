@@ -467,7 +467,6 @@ class testPageMaintenance extends CWebTest {
 					],
 					'expected' => [
 						self::ACTIVE_MAINTENANCE,
-						self::UPCOMING_MAINTENANCE,
 						self::DESCRIPTION_MAINTENANCE,
 						'Maintenance for Host availability widget',
 						'Maintenance for host group testing',
@@ -478,7 +477,8 @@ class testPageMaintenance extends CWebTest {
 						self::MULTIPLE_GROUPS_MAINTENANCE,
 						self::HOST_MAINTENANCE,
 						self::FILTER_NAME_MAINTENANCE,
-						'Multiple spaces in maintenance name'
+						'Multiple spaces in maintenance name',
+						self::UPCOMING_MAINTENANCE
 					]
 				]
 			],
