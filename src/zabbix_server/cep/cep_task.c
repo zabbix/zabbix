@@ -21,7 +21,6 @@
 
 static void	cep_task_request_remote_free(void *mw_task);
 static void	cep_task_event_free(void *mw_task);
-static void	cep_task_close_event_free(void *mw_task);
 static void	cep_task_event_commit_free(void *mw_task);
 static void	cep_task_add_tags_free(void *mw_task);
 
@@ -70,26 +69,6 @@ static void	cep_task_request_remote_free(void *mw_task)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize event creation task                                    *
- *                                                                            *
- * Parameters: task  - [OUT] event task to initialize                         *
- *             event - [IN]  event details                                    *
- *                                                                            *
- ******************************************************************************/
-static void	cep_task_event_init(zbx_cep_task_event_t *task, zbx_db_event *event)
-{
-	task->db_event = event;
-	zbx_vector_uint64_create(&task->eventids);
-	task->event_op = CEP_EVENT_NONE;
-	task->action_state = CEP_ACTION_ENABLED;
-	task->obj_value = TRIGGER_VALUE_NONE;
-	task->userid = 0;
-	zbx_vector_cep_event_update_create(&task->updates);
-	task->event = NULL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: create event creation task                                        *
  *                                                                            *
  * Parameters: event - [IN] event details                                     *
@@ -103,9 +82,66 @@ zbx_mw_task_t	*cep_create_task_event(zbx_db_event *event)
 
 	task = (zbx_cep_task_event_t *)zbx_mw_task_create(CEP_TASK_EVENT, cep_task_event_free,
 			sizeof(zbx_cep_task_event_t));
-	cep_task_event_init(task, event);
+
+	task->db_event = event;
+	zbx_vector_uint64_create(&task->eventids);
+	task->event_op = CEP_EVENT_NONE;
+	task->action_state = CEP_ACTION_ENABLED;
+	task->obj_value = TRIGGER_VALUE_NONE;
+	zbx_vector_cep_event_update_create(&task->updates);
+	task->event = NULL;
 
 	return (zbx_mw_task_t *)task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create task to close specified event by user                      *
+ *                                                                            *
+ * Parameters: event   - [IN] new event that will close the specified event   *
+ *             eventid - [IN] id of event to be closed                        *
+ *             userid  - [IN] id of user closing the event                    *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_event_closed_by_user(zbx_db_event *event, zbx_uint64_t eventid, zbx_uint64_t userid)
+{
+	zbx_mw_task_t		*task = cep_create_task_event(event);
+	zbx_cep_task_event_t	*event_task = (zbx_cep_task_event_t *)task;
+
+	event_task->target_eventid = eventid;
+	event_task->creator.userid = userid;
+
+	return task;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create task to close specified event by correlation               *
+ *                                                                            *
+ * Parameters: event         - [IN] new event that will close the specified   *
+ *                                  event                                     *
+ *             eventid       - [IN] id of event to be closed                  *
+ *             correlationid - [IN] id of correlation rule closing the        *
+ *                                  event                                     *
+ *             c_eventid     - [IN] id of event that caused correlation       *
+ *                                  match                                     *
+ *                                                                            *
+ * Return value: created task                                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mw_task_t	*cep_create_task_event_closed_by_correlation(zbx_db_event *event, zbx_uint64_t eventid,
+		zbx_uint64_t correlationid, zbx_uint64_t c_eventid)
+{
+	zbx_mw_task_t		*task = cep_create_task_event(event);
+	zbx_cep_task_event_t	*event_task = (zbx_cep_task_event_t *)task;
+
+	event_task->target_eventid = eventid;
+	event_task->creator.correlationid = correlationid;
+	event_task->creator.c_eventid = c_eventid;
+
+	return task;
 }
 
 /******************************************************************************
@@ -141,51 +177,6 @@ static void	cep_task_event_free(void *mw_task)
 	zbx_cep_task_event_t *task = (zbx_cep_task_event_t *)mw_task;
 
 	cep_task_event_clear(task);
-	zbx_free(task);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: create event closing task                                         *
- *                                                                            *
- * Parameters: event         - [IN] event details                             *
- *             eventid       - [IN] identifier of the event to close          *
- *             userid        - [IN] user identifier performing the close      *
- *             correlationid - [IN] correlation identifier for the operation  *
- *             c_eventid     - [IN] correleation event ID                     *
- *                                                                            *
- * Return value: created task                                                 *
- *                                                                            *
- ******************************************************************************/
-zbx_mw_task_t	*cep_create_task_close_event(zbx_db_event *event, zbx_uint64_t eventid, zbx_uint64_t userid,
-		zbx_uint64_t correlationid, zbx_uint64_t c_eventid)
-{
-	zbx_cep_task_close_event_t	*task;
-
-	task = (zbx_cep_task_close_event_t *)zbx_mw_task_create(CEP_TASK_CLOSE_EVENT, cep_task_close_event_free,
-			sizeof(zbx_cep_task_close_event_t));
-
-	cep_task_event_init(&task->parent, event);
-	task->eventid = eventid;
-	task->userid = userid;
-	task->correlationid = correlationid;
-	task->c_eventid = c_eventid;
-
-	return (zbx_mw_task_t *)task;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: free event closing task                                           *
- *                                                                            *
- * Parameters: task - [IN] event closing task to free                         *
- *                                                                            *
- ******************************************************************************/
-static void	cep_task_close_event_free(void *mw_task)
-{
-	zbx_cep_task_close_event_t	*task = (zbx_cep_task_close_event_t *)mw_task;
-
-	cep_task_event_clear(&task->parent);
 	zbx_free(task);
 }
 
@@ -308,9 +299,6 @@ void	cep_task_free(zbx_mw_task_t *mw_task)
 		case CEP_TASK_EVENT:
 			cep_task_event_free((zbx_cep_task_event_t *)task);
 			break;
-		case CEP_TASK_CLOSE_EVENT:
-			cep_task_close_event_free((zbx_cep_task_close_event_t *)task);
-			break;
 		case CEP_TASK_COMMIT:
 			cep_task_event_commit_free((zbx_cep_task_commit_t *)task);
 			break;
@@ -318,32 +306,5 @@ void	cep_task_free(zbx_mw_task_t *mw_task)
 			cep_task_add_tags_free((zbx_cep_task_add_tags_t *)task);
 			break;
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: obtain event task associated with the given task                  *
- *                                                                            *
- * Parameters: task - [IN]  pointer to task structure                         *
- *                                                                            *
- * Return value: pointer to associated event task                             *
- *                                                                            *
- * Comments: Returns the underlying event task for supported task types.      *
- *                                                                            *
- ******************************************************************************/
-const zbx_cep_task_event_t	*cep_get_event_task(const zbx_mw_task_t *task)
-{
-	switch (task->type)
-	{
-		case CEP_TASK_EVENT:
-			return (zbx_cep_task_event_t *)task;
-		case CEP_TASK_CLOSE_EVENT:
-			return &((zbx_cep_task_close_event_t *)task)->parent;
-		default:
-			break;
-	}
-
-	THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported CEP task of type %d is being accessed", task->type);
-	zbx_exit(EXIT_FAILURE);
 }
 

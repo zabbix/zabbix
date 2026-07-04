@@ -289,31 +289,71 @@ static void	cep_manager_flush_remote_task(zbx_cep_task_remote_t *task)
 		zbx_ipc_client_send(task->client, task->message->code, task->response, task->response_len);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if event is pending                                         *
+ *                                                                            *
+ * Parameters: manager - [IN] CEP manager                                     *
+ *             eventid - [IN] event identifier                                *
+ *                                                                            *
+ * Return value: SUCCEED - the event is pending                               *
+ *               FAIL    - the event is not pending                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	cep_manager_is_event_pending(zbx_cep_manager_t *manager, zbx_uint64_t eventid)
+{
+	if (NULL != zbx_hashset_search(&manager->events_pending, &eventid))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if event task is pending                                    *
+ *                                                                            *
+ * Parameters: manager - [IN] CEP manager                                     *
+ *             task    - [IN] event task to check                             *
+ *                                                                            *
+ * Return value: SUCCEED - at least one event in the task is pending          *
+ *               FAIL    - none of the task events are pending                *
+ *                                                                            *
+ ******************************************************************************/
+static int	cep_manager_is_task_event_pending(zbx_cep_manager_t *manager, const zbx_cep_task_event_t *task)
+{
+	if (0 != task->creator.c_eventid &&  SUCCEED == cep_manager_is_event_pending(manager, task->creator.c_eventid))
+		return SUCCEED;
+
+	for (int i = 0; i < task->eventids.values_num; i++)
+	{
+		if (SUCCEED == cep_manager_is_event_pending(manager, task->eventids.values[i]))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if task is pending                                          *
+ *                                                                            *
+ * Parameters: manager - [IN] CEP manager                                     *
+ *             task    - [IN] task to check                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the task is pending                                *
+ *               FAIL    - the task is not pending                            *
+ *                                                                            *
+ * Comments: Task is pending if it has to update an event and the event task  *
+ *           is not yet committed to the database.                            *
+ *                                                                            *
+ ******************************************************************************/
 static int	cep_manager_is_task_pending(zbx_cep_manager_t *manager, const zbx_mw_task_t *task)
 {
-	const zbx_cep_task_event_t	*event_task;
-	zbx_uint64_t			c_eventid;
-
 	switch (task->type)
 	{
 		case CEP_TASK_EVENT:
-			event_task = (zbx_cep_task_event_t *)task;
+			return cep_manager_is_task_event_pending(manager, (const zbx_cep_task_event_t *)task);
 			break;
-		case CEP_TASK_CLOSE_EVENT:
-			c_eventid = ((zbx_cep_task_close_event_t *)task)->c_eventid;
-			if (0 != c_eventid && NULL != zbx_hashset_search(&manager->events_pending, &c_eventid))
-				return SUCCEED;
-			event_task = &((zbx_cep_task_close_event_t *)task)->parent;
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-	}
-
-	for (int i = 0; i < event_task->eventids.values_num; i++)
-	{
-		if (NULL != zbx_hashset_search(&manager->events_pending, &event_task->eventids.values[i]))
-			return SUCCEED;
 	}
 
 	return FAIL;
@@ -321,7 +361,7 @@ static int	cep_manager_is_task_pending(zbx_cep_manager_t *manager, const zbx_mw_
 
 static int	cep_manager_commit_event_task(zbx_cep_manager_t *manager, zbx_mw_task_t *task)
 {
-	const zbx_cep_task_event_t	*event_task =  cep_get_event_task(task);
+	const zbx_cep_task_event_t	*event_task =  (const zbx_cep_task_event_t *)task;
 
 	if (CEP_EVENT_NONE == event_task->event_op)
 		return FAIL;
@@ -395,7 +435,6 @@ static void	cep_manager_process_finished(zbx_cep_manager_t *manager, zbx_vector_
 				cep_manager_flush_remote_task((zbx_cep_task_remote_t *)tasks->values[i]);
 				break;
 			case CEP_TASK_EVENT:
-			case CEP_TASK_CLOSE_EVENT:
 				if (SUCCEED == cep_manager_commit_event_task(manager, tasks->values[i]))
 					continue;
 				break;

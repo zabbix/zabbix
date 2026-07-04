@@ -617,11 +617,11 @@ static void	correlation_add_close_new_task(zbx_vector_mw_task_ptr_t *tasks, cons
 {
 	zbx_mw_task_t	*task;
 
-	task = cep_create_task_close_event(cep_create_close_event(db_event), result->eventid, 0, result->correlationid,
-			db_event->eventid);
+	task = cep_create_task_event_closed_by_correlation(cep_create_close_event(db_event), result->eventid,
+			result->correlationid, db_event->eventid);
 
 	/* 'close new' operations must skip actions for the problem and generated ok event */
-	((zbx_cep_task_close_event_t *)task)->parent.action_state = CEP_ACTION_DISABLED;
+	((zbx_cep_task_event_t *)task)->action_state = CEP_ACTION_DISABLED;
 
 	zbx_vector_mw_task_ptr_append(tasks, task);
 }
@@ -683,7 +683,8 @@ static void	correlation_add_close_old_tasks(zbx_dbconn_t *db, zbx_uint64_t c_eve
 
 		db_event = zbx_create_trigger_event(&triggers[index], result->clock, result->ns, TRIGGER_VALUE_OK);
 		cep_event_expect(db_event);
-		task = cep_create_task_close_event(db_event, result->eventid, 0, result->correlationid, c_eventid);
+		task = cep_create_task_event_closed_by_correlation(db_event, result->eventid, result->correlationid,
+				c_eventid);
 		zbx_vector_mw_task_ptr_append(tasks, task);
 	}
 
