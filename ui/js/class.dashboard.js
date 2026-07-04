@@ -163,7 +163,7 @@ class CDashboard {
 
 	// Logical state control methods.
 
-	activate() {
+	activate(start_slideshow = false) {
 		if (this._dashboard_pages.size === 0) {
 			throw new Error('Cannot activate dashboard without dashboard pages.');
 		}
@@ -185,7 +185,7 @@ class CDashboard {
 		if (!this._is_edit_mode) {
 			this._startConfigurationChecker();
 
-			if (this._data.auto_start === '1' && this._dashboard_pages.size > 1) {
+			if (start_slideshow && this._dashboard_pages.size > 1) {
 				this._startSlideshow();
 			}
 		}
@@ -1345,13 +1345,13 @@ class CDashboard {
 		return data;
 	}
 
-	editProperties({auto_start = null} = {}) {
+	editProperties() {
 		const properties = {
 			template: this._data.templateid !== null ? 1 : undefined,
 			userid: this._data.templateid === null ? this._data.userid : undefined,
 			name: this._data.name,
 			display_period: this._data.display_period,
-			auto_start: auto_start ?? this._data.auto_start
+			auto_start: this._data.auto_start
 		};
 
 		PopUp('dashboard.properties.edit', properties, {

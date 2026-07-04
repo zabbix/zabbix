@@ -71,17 +71,10 @@ $html_page = (new CHtmlPage())
 				)
 				->addItem(
 					(new CSimpleButton())
-						->addClass($data['dashboard']['auto_start'] == 1 ? ZBX_ICON_PAUSE : ZBX_ICON_PLAY)
+						->addClass($data['start_slideshow'] ? ZBX_ICON_PAUSE : ZBX_ICON_PLAY)
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW)
-						->setTitle(($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
-							? _s('Stop slideshow')
-							: _s('Start slideshow')
-						)
-						->addClass(
-							($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
-								? 'slideshow-state-started'
-								: 'slideshow-state-stopped'
-						)
+						->setTitle($data['start_slideshow'] ? _s('Stop slideshow') : _s('Start slideshow'))
+						->addClass($data['start_slideshow'] ? 'slideshow-state-started' : 'slideshow-state-stopped')
 				)
 				->addItem(
 					(new CSimpleButton())
@@ -173,9 +166,7 @@ if (count($data['dashboard']['pages']) > 1
 								->addClass(ZBX_STYLE_BTN_DASHBOARD_TOGGLE_SLIDESHOW)
 								->addClass(ZBX_STYLE_BTN_ALT)
 								->addClass(
-									($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
-										? 'slideshow-state-started'
-										: 'slideshow-state-stopped'
+									$data['start_slideshow'] ? 'slideshow-state-started' : 'slideshow-state-stopped'
 								)
 						])
 				)
@@ -202,6 +193,7 @@ else {
 		'dashboard' => $data['dashboard'],
 		'widget_defaults' => $data['widget_defaults'],
 		'configuration_hash' => $data['configuration_hash'],
+		'start_slideshow' => $data['start_slideshow'],
 		'broadcast_requirements' => $data['broadcast_requirements'],
 		'dashboard_host' => $data['dashboard_host'],
 		'dashboard_time_period' => $data['dashboard_time_period'],

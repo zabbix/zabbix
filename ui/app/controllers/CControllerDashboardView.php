@@ -104,12 +104,6 @@ class CControllerDashboardView extends CController {
 			return;
 		}
 
-		$dashboard['default_auto_start'] = $dashboard['auto_start'];
-
-		if ($this->hasInput('slideshow')) {
-			$dashboard['auto_start'] = $this->getInput('slideshow') === DASHBOARD_SLIDESHOW_ON ? '1' : '0';
-		}
-
 		$dashboard['can_edit_dashboards'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 
 		$hostid = $this->getInput('hostid', CProfile::get('web.dashboard.hostid', 0));
@@ -133,6 +127,10 @@ class CControllerDashboardView extends CController {
 		updateTimeSelectorPeriod($time_selector_options);
 
 		$dashboard_time_period = getTimeSelectorPeriod($time_selector_options);
+		$start_slideshow = $this->hasInput('slideshow')
+				? $this->getInput('slideshow') === DASHBOARD_SLIDESHOW_ON
+				: $dashboard['auto_start'] == 1;
+		$start_slideshow = $start_slideshow && $dashboard['dashboardid'] !== null;
 
 		$data = [
 			// The dashboard property shall only contain data used by the JavaScript framework.
@@ -140,6 +138,7 @@ class CControllerDashboardView extends CController {
 			'widget_defaults' => $widget_defaults,
 			'widget_last_type' => CDashboardHelper::getWidgetLastType(),
 			'configuration_hash' => $stats['configuration_hash'],
+			'start_slideshow' => $start_slideshow,
 			'can_view_reports' => $this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS),
 			'can_create_reports' => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS),
 			'has_related_reports' => $stats['has_related_reports'],

@@ -84,6 +84,7 @@
 			dashboard,
 			widget_defaults,
 			configuration_hash,
+			start_slideshow,
 			broadcast_requirements,
 			dashboard_host,
 			dashboard_time_period,
@@ -186,7 +187,7 @@
 					this.#updateHistory({slideshow: DASHBOARD_SLIDESHOW_OFF, add_new: false});
 				});
 
-				ZABBIX.Dashboard.activate();
+				ZABBIX.Dashboard.activate(start_slideshow);
 			}
 
 			if (CWidgetsData.DATA_TYPE_TIME_PERIOD in broadcast_requirements) {

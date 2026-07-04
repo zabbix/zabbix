@@ -66,6 +66,7 @@
 			widget_defaults,
 			widget_last_type,
 			configuration_hash,
+			start_slideshow,
 			dashboard_host,
 			dashboard_time_period,
 			web_layout_mode,
@@ -173,7 +174,7 @@
 
 				if (dashboard.dashboardid === null || clone) {
 					this.#edit();
-					ZABBIX.Dashboard.editProperties({auto_start: dashboard.default_auto_start});
+					ZABBIX.Dashboard.editProperties();
 				}
 				else {
 					document
@@ -210,7 +211,7 @@
 				this.#updateHistory({slideshow: DASHBOARD_SLIDESHOW_OFF, add_new: false});
 			});
 
-			ZABBIX.Dashboard.activate();
+			ZABBIX.Dashboard.activate(start_slideshow);
 
 			jqBlink.blink();
 		}
@@ -234,9 +235,7 @@
 
 			document
 				.getElementById('dashboard-config')
-				.addEventListener('click', () => {
-					ZABBIX.Dashboard.editProperties({auto_start: this.#dashboard.default_auto_start});
-				});
+				.addEventListener('click', () => ZABBIX.Dashboard.editProperties());
 
 			document
 				.getElementById('dashboard-add-widget')
@@ -426,7 +425,7 @@
 			}
 
 			if (!ZABBIX.Dashboard.isEditMode()) {
-				const auto_start = this.#dashboard.default_auto_start === '1'
+				const auto_start = this.#dashboard.auto_start === '1'
 					? DASHBOARD_SLIDESHOW_ON
 					: DASHBOARD_SLIDESHOW_OFF;
 

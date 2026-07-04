@@ -85,10 +85,6 @@ class CControllerHostDashboardView extends CController {
 			if ($db_dashboards) {
 				$dashboard = $db_dashboards[0];
 
-				if ($this->hasInput('slideshow')) {
-					$dashboard['auto_start'] = $this->getInput('slideshow') === DASHBOARD_SLIDESHOW_ON ? '1' : '0';
-				}
-
 				CProfile::update('web.host.dashboard.dashboardid', $dashboard['dashboardid'], PROFILE_TYPE_ID,
 					$this->getInput('hostid')
 				);
@@ -114,12 +110,16 @@ class CControllerHostDashboardView extends CController {
 				updateTimeSelectorPeriod($time_selector_options);
 
 				$dashboard_time_period = getTimeSelectorPeriod($time_selector_options);
+				$start_slideshow = $this->hasInput('slideshow')
+					? $this->getInput('slideshow') === DASHBOARD_SLIDESHOW_ON
+					: $dashboard['auto_start'] == 1;
 
 				$data = [
 					'host_dashboards' => $host_dashboards,
 					'dashboard' => $dashboard,
 					'widget_defaults' => $widget_defaults,
 					'configuration_hash' => $configuration_hash,
+					'start_slideshow' => $start_slideshow,
 					'broadcast_requirements' => $broadcast_requirements,
 					'dashboard_host' => $this->host,
 					'dashboard_time_period' => $dashboard_time_period,
