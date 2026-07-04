@@ -40,7 +40,7 @@ class testPageMaintenance extends CWebTest {
 	}
 
 	const MAINTENANCE_SQL = 'SELECT * FROM maintenances ORDER BY maintenanceid';
-	const APPROACHING_MAINTENANCE = 'Approaching maintenance';
+	const UPCOMING_MAINTENANCE = 'Upcoming maintenance';
 	const HOST_MAINTENANCE = 'Maintenance with assigned host';
 	const MULTIPLE_GROUPS_MAINTENANCE = 'Maintenance with 2 host groups';
 	const FILTER_NAME_MAINTENANCE = 'Maintenance для фильтра - ʍąɨɲţ€ɲąɲc€🙂';
@@ -54,7 +54,7 @@ class testPageMaintenance extends CWebTest {
 	public function prepareMaintenanceData() {
 		CDataHelper::call('maintenance.create', [
 			[
-				'name' => self::APPROACHING_MAINTENANCE,
+				'name' => self::UPCOMING_MAINTENANCE,
 				'maintenance_type' => MAINTENANCE_TYPE_NODATA,
 				'active_since' => 2017008000,
 				'active_till' => 2019600000,
@@ -241,11 +241,11 @@ class testPageMaintenance extends CWebTest {
 						'Description' => ''
 					],
 					[
-						'Name' => 'Approaching maintenance',
+						'Name' => 'Upcoming maintenance',
 						'Type' => 'No data collection',
 						'Active since' => '2033-12-01 02:00',
 						'Active till' => '2033-12-31 02:00',
-						'State' => 'Approaching',
+						'State' => 'Upcoming',
 						'Description' => ''
 					],
 					[
@@ -285,7 +285,7 @@ class testPageMaintenance extends CWebTest {
 						'Type' => 'No data collection',
 						'Active since' => '2033-12-01 02:00',
 						'Active till' => '2033-12-31 02:00',
-						'State' => 'Approaching',
+						'State' => 'Upcoming',
 						'Description' => ''
 					]
 				]
@@ -330,7 +330,7 @@ class testPageMaintenance extends CWebTest {
 				->getAttribute('placeholder')
 		);
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
-		$this->assertEquals(['Any', 'Active', 'Approaching', 'Expired'], $form->getField('State')->getLabels()
+		$this->assertEquals(['Any', 'Active', 'Upcoming', 'Expired'], $form->getField('State')->getLabels()
 				->asText()
 		);
 		$form->checkValue(['Host groups' => '', 'Name' => '', 'State' => 'Any']);
@@ -429,14 +429,14 @@ class testPageMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #6 State - Approaching.
+			// #6 State - Upcoming.
 			[
 				[
 					'filter' => [
-						'State' => 'Approaching'
+						'State' => 'Upcoming'
 					],
 					'expected' => [
-						self::APPROACHING_MAINTENANCE,
+						self::UPCOMING_MAINTENANCE,
 						'Multiple spaces in maintenance name'
 					]
 				]
@@ -467,7 +467,7 @@ class testPageMaintenance extends CWebTest {
 					],
 					'expected' => [
 						self::ACTIVE_MAINTENANCE,
-						self::APPROACHING_MAINTENANCE,
+						self::UPCOMING_MAINTENANCE,
 						self::DESCRIPTION_MAINTENANCE,
 						'Maintenance for Host availability widget',
 						'Maintenance for host group testing',
@@ -555,7 +555,7 @@ class testPageMaintenance extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => [self::APPROACHING_MAINTENANCE]
+					'name' => [self::UPCOMING_MAINTENANCE]
 				]
 			],
 			// Delete 2 maintenances.
