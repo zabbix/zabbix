@@ -436,8 +436,8 @@ class testPageMaintenance extends CWebTest {
 						'State' => 'Upcoming'
 					],
 					'expected' => [
-						self::UPCOMING_MAINTENANCE,
-						'Multiple spaces in maintenance name'
+						'Multiple spaces in maintenance name',
+						self::UPCOMING_MAINTENANCE
 					]
 				]
 			],
