@@ -157,7 +157,7 @@ static void	cep_worker_add_close_problem(zbx_cep_worker_t *worker, zbx_cep_task_
 	zbx_uint64_t	eventid, userid;
 
 	zbx_cep_deserialize_close_problem(task->message->data, &event, &eventid, &userid);
-	t = cep_create_task_event_closed_by_user(event, eventid, userid);
+	t = cep_create_task_event_by_user(event, eventid, userid);
 
 	zbx_mw_queue_lock(worker->base.queue);
 	cep_queue_push((zbx_cep_queue_t *)worker->base.queue, t);

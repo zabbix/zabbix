@@ -90,8 +90,8 @@ zbx_cep_task_prune_events_t;
 zbx_mw_task_t	*cep_create_task_remote(zbx_ipc_client_t *client, zbx_ipc_message_t *message, unsigned char *response,
 		zbx_uint32_t response_len);
 zbx_mw_task_t	*cep_create_task_event(zbx_db_event *event);
-zbx_mw_task_t	*cep_create_task_event_closed_by_user(zbx_db_event *event, zbx_uint64_t eventid, zbx_uint64_t userid);
-zbx_mw_task_t	*cep_create_task_event_closed_by_correlation(zbx_db_event *event, zbx_uint64_t eventid,
+zbx_mw_task_t	*cep_create_task_event_by_user(zbx_db_event *event, zbx_uint64_t eventid, zbx_uint64_t userid);
+zbx_mw_task_t	*cep_create_task_event_by_correlation(zbx_db_event *event, zbx_uint64_t eventid,
 		zbx_uint64_t correlationid, zbx_uint64_t c_eventid);
 zbx_mw_task_t	*cep_create_task_commit(zbx_vector_mw_task_ptr_t *tasks);
 zbx_mw_task_t	*cep_create_task_add_tags(zbx_vector_event_tags_t *event_tags, zbx_vector_uint64_t *eventids);

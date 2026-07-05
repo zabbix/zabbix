@@ -105,7 +105,7 @@ zbx_mw_task_t	*cep_create_task_event(zbx_db_event *event)
  * Return value: created task                                                 *
  *                                                                            *
  ******************************************************************************/
-zbx_mw_task_t	*cep_create_task_event_closed_by_user(zbx_db_event *event, zbx_uint64_t eventid, zbx_uint64_t userid)
+zbx_mw_task_t	*cep_create_task_event_by_user(zbx_db_event *event, zbx_uint64_t eventid, zbx_uint64_t userid)
 {
 	zbx_mw_task_t		*task = cep_create_task_event(event);
 	zbx_cep_task_event_t	*event_task = (zbx_cep_task_event_t *)task;
@@ -131,7 +131,7 @@ zbx_mw_task_t	*cep_create_task_event_closed_by_user(zbx_db_event *event, zbx_uin
  * Return value: created task                                                 *
  *                                                                            *
  ******************************************************************************/
-zbx_mw_task_t	*cep_create_task_event_closed_by_correlation(zbx_db_event *event, zbx_uint64_t eventid,
+zbx_mw_task_t	*cep_create_task_event_by_correlation(zbx_db_event *event, zbx_uint64_t eventid,
 		zbx_uint64_t correlationid, zbx_uint64_t c_eventid)
 {
 	zbx_mw_task_t		*task = cep_create_task_event(event);
