@@ -133,8 +133,7 @@ static void	cep_worker_add_events(zbx_cep_worker_t *worker, zbx_cep_task_remote_
 
 		for (int i = 0; i < events.values_num; i++)
 		{
-			zbx_vector_mw_task_ptr_append(&tasks, cep_create_task_event(events.values[i],
-					ZBX_EVENT_NORMAL));
+			zbx_vector_mw_task_ptr_append(&tasks, cep_create_task_event(events.values[i]));
 		}
 
 		zbx_mw_queue_lock(worker->base.queue);
@@ -162,7 +161,7 @@ static void	cep_worker_add_close_problem(zbx_cep_worker_t *worker, zbx_cep_task_
 	zbx_uint64_t	eventid, userid;
 
 	zbx_cep_deserialize_close_problem(task->message->data, &event, &eventid, &userid);
-	t = cep_create_task_close_event(event, eventid, userid, 0, 0, 0);
+	t = cep_create_task_event_by_user(event, eventid, userid);
 
 	zbx_mw_queue_lock(worker->base.queue);
 	cep_queue_push((zbx_cep_queue_t *)worker->base.queue, t);
@@ -610,9 +609,17 @@ static void	cep_worker_close_trigger_event(zbx_cep_task_event_t *task)
 	zbx_vector_cep_event_handle_create(&handles);
 
 	cep_cache_acquire(&cep);
-	r_eventid = cep_close_trigger_events(cep, db_event->objectid, &db_event->trigger.dep_triggerids,
-			db_event->trigger.correlation_mode, db_event->trigger.correlation_tag, &db_event->tags,
-			&handles, &task->obj_value);
+	if (0 == task->target_eventid)
+	{
+		r_eventid = cep_close_trigger_events(cep, db_event->objectid, &db_event->trigger.dep_triggerids,
+				db_event->trigger.correlation_mode, db_event->trigger.correlation_tag, &db_event->tags,
+				&handles, &task->obj_value);
+	}
+	else
+	{
+		r_eventid = cep_close_trigger_event_by_eventid(cep, db_event->objectid, task->target_eventid, &handles,
+			&task->obj_value);
+	}
 	cep_cache_release(&cep);
 
 	if (0 != r_eventid)
@@ -778,44 +785,6 @@ static void	cep_worker_process_task_event(zbx_cep_worker_t *worker, zbx_cep_task
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: create an OK event to close specified problem event               *
- *                                                                            *
- * Parameters: task - [IN]  close event task                                  *
- *                                                                            *
- ******************************************************************************/
-static void	cep_worker_process_task_close_event(zbx_cep_task_close_event_t *task)
-{
-	zbx_cep_t			*cep;
-	zbx_db_event			*db_event = task->parent.db_event;
-	zbx_uint64_t			r_eventid;
-	zbx_vector_cep_event_handle_t	handles;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:%d object:%d objectid:" ZBX_FS_UI64 " name:%s value:%d ts:%d.%09d",
-			__func__, db_event->source, db_event->object, db_event->objectid, db_event->name,
-			db_event->value, db_event->clock, db_event->ns);
-
-	zbx_vector_cep_event_handle_create(&handles);
-
-	cep_cache_acquire(&cep);
-	r_eventid = cep_close_trigger_event_by_eventid(cep, db_event->objectid, task->eventid, &handles,
-			&task->parent.obj_value);
-	cep_cache_release(&cep);
-
-	if (0 != r_eventid)
-	{
-		cep_worker_resolve_trigger_events(db_event, r_eventid, &handles, &task->parent);
-		cep_stats_update_events_processed(1);
-	}
-	else
-		cep_stats_update_events_discarded(1);
-
-	zbx_vector_cep_event_handle_destroy(&handles);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() r_eventid:" ZBX_FS_UI64, __func__, r_eventid);
-}
-
 static int	cep_task_sync_event_compare(const void *a1, const void *a2)
 {
 	const zbx_cep_task_sync_event_t	*t1 = *(const zbx_cep_task_sync_event_t * const *)a1;
@@ -868,7 +837,6 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 		switch (task->tasks.values[i]->type)
 		{
 			case CEP_TASK_EVENT:
-			case CEP_TASK_CLOSE_EVENT:
 				zbx_vector_mw_task_ptr_append(&event_tasks, task->tasks.values[i]);
 				break;
 			case CEP_TASK_ADD_TAGS:
@@ -900,10 +868,7 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 		{
 			zbx_vector_cep_event_update_t	*updates;
 
-			if (CEP_TASK_EVENT == event_tasks.values[i]->type)
-				updates = &((zbx_cep_task_event_t *)event_tasks.values[i])->updates;
-			else
-				updates = &((zbx_cep_task_close_event_t *)event_tasks.values[i])->parent.updates;
+			updates = &((zbx_cep_task_event_t *)event_tasks.values[i])->updates;
 
 			if (0 != updates->values_num)
 			{
@@ -1043,9 +1008,6 @@ void	*cep_worker_entry(void *args)
 					break;
 				case CEP_TASK_EVENT:
 					cep_worker_process_task_event(worker, (zbx_cep_task_event_t *)task);
-					break;
-				case CEP_TASK_CLOSE_EVENT:
-					cep_worker_process_task_close_event((zbx_cep_task_close_event_t *)task);
 					break;
 				case CEP_TASK_COMMIT:
 					cep_worker_process_task_commit(worker, (zbx_cep_task_commit_t *)task);

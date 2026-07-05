@@ -57,6 +57,9 @@ window.ceprule_edit_popup = new class {
 	/** @type {Object} */
 	#rules_for_clone;
 
+	/** @type {jQuery} */
+	#ms_group_tags;
+
 	init({rules, rules_for_clone, operation_rules, condition_rules, ceprule}) {
 		this.#rules_for_clone = rules_for_clone;
 		this.#initTemplates();
@@ -87,6 +90,14 @@ window.ceprule_edit_popup = new class {
 		window['ceprule-window-capacity-toggle'].dispatchEvent(new Event('change'));
 		window['ceprule-window-groupby-opt-tag'].dispatchEvent(new Event('change'));
 
+		this.#ms_group_tags = jQuery('#ceprule-window-groupby-tag');
+		this.#ms_group_tags.multiSelect();
+		this.#ms_group_tags.multiSelect('modify', {
+			suggest_list_modifier: available => new Map(
+				[...available].map(([key, value])=>[key, {...value, name: value.id}])
+			),
+			custom_suggest_list: () => new Map()
+		});
 		this.#handleWindowTypeChanged();
 		this.form_element.style.display = '';
 	}
@@ -395,6 +406,7 @@ window.ceprule_edit_popup = new class {
 			});
 
 		fields.operations = operations;
+		fields.window.tags = jQuery('#ceprule-window-groupby-tag').multiSelect('getData').map(({id}) => id);
 
 		this.#removePopupMessages();
 		this.form.validateSubmit(fields)

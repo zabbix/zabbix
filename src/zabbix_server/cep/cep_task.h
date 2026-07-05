@@ -17,6 +17,7 @@
 
 #include "cep_window.h"
 #include "cep_rule_operation.h"
+#include "cep_event.h"
 #include "zbx_cep.h"
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
@@ -34,7 +35,6 @@ typedef enum
 {
 	CEP_TASK_REMOTE,
 	CEP_TASK_EVENT,
-	CEP_TASK_CLOSE_EVENT,
 	CEP_TASK_COMMIT,
 	CEP_TASK_ADD_TAGS,
 	CEP_TASK_SYNC_EVENT,
@@ -59,8 +59,9 @@ typedef struct
 {
 	zbx_mw_task_t			base;
 	zbx_db_event			*db_event;	/* in - event data */
-	zbx_uint64_t			userid;		/* in - userid for manually closed event */
 	unsigned char			flags;		/* in - event flags */
+	zbx_uint64_t			target_eventid;	/* in - specific event to act on (0 if none) */
+	zbx_cep_event_actor_t		creator;	/* in - additional event creation information */
 	zbx_cep_event_op_t		event_op;	/* out - created event state - open/close */
 	zbx_cep_action_state_t		action_state;	/* out - specifies if actions must be processed */
 	zbx_vector_uint64_t		eventids;	/* out - recovered problems for recovery event */
@@ -71,17 +72,6 @@ typedef struct
 	zbx_cep_event_t			*event;		/* out - created event */
 }
 zbx_cep_task_event_t;
-
-typedef struct
-{
-	zbx_cep_task_event_t	parent;
-	zbx_uint64_t		eventid;	/* in - eventid to close */
-	zbx_uint64_t		userid;		/* in - userid when closed manually by a user */
-	zbx_uint64_t		correlationid;	/* in - correlationid when closed by correlation rules*/
-	zbx_uint64_t		c_eventid;	/* in - correlation event id */
-	zbx_uint64_t		cep_ruleid;	/* in - cep_ruleid when closed by cep rule */
-}
-zbx_cep_task_close_event_t;
 
 typedef struct
 {
@@ -153,10 +143,13 @@ zbx_cep_task_prune_events_t;
 
 zbx_mw_task_t	*cep_create_task_remote(zbx_ipc_client_t *client, zbx_ipc_message_t *message, unsigned char *response,
 		zbx_uint32_t response_len);
-zbx_mw_task_t	*cep_create_task_event(zbx_db_event *event, unsigned char flags);
+zbx_mw_task_t	*cep_create_task_event(zbx_db_event *event);
+zbx_mw_task_t	*cep_create_task_event_by_copy(zbx_db_event *event);
+zbx_mw_task_t	*cep_create_task_event_by_user(zbx_db_event *event, zbx_uint64_t eventid, zbx_uint64_t userid);
+zbx_mw_task_t	*cep_create_task_event_by_correlation(zbx_db_event *event, zbx_uint64_t eventid,
+		zbx_uint64_t correlationid, zbx_uint64_t c_eventid);
+zbx_mw_task_t	*cep_create_task_event_by_cep_rule(zbx_db_event *event, zbx_uint64_t eventid, zbx_uint64_t cep_ruleid);
 zbx_mw_task_t	*cep_create_task_commit(zbx_vector_mw_task_ptr_t *tasks);
-zbx_mw_task_t	*cep_create_task_close_event(zbx_db_event *event, zbx_uint64_t eventid, zbx_uint64_t userid,
-		zbx_uint64_t correlationid, zbx_uint64_t c_eventid, zbx_uint64_t cep_ruleid);
 zbx_mw_task_t	*cep_create_task_add_tags(zbx_vector_event_tags_t *event_tags, zbx_vector_uint64_t *eventids);
 zbx_mw_task_t	*cep_create_task_sync_event(zbx_cep_event_handle_t hevent, zbx_uint32_t flags);
 zbx_mw_task_t	*cep_create_task_window(zbx_cep_window_t *window, time_t now);
@@ -165,8 +158,6 @@ zbx_mw_task_t	*cep_create_task_rule_error(zbx_uint64_t ruleid, char *error);
 zbx_mw_task_t	*cep_create_task_rule_reset(zbx_uint64_t ruleid);
 
 void	cep_task_free(zbx_mw_task_t *mw_task);
-
-const zbx_cep_task_event_t	*cep_get_event_task(const zbx_mw_task_t *task);
 
 #endif
 

@@ -142,6 +142,10 @@ class CControllerCepRuleEdit extends CController {
 
 		$ceprule['filter']['conditions'] = self::prepareFilterConditions($ceprule['filter']['conditions']);
 
+		// TODO: await API to use "tag"->"tags"
+		$ceprule['window']['tags'] = $ceprule['window']['tag'] ? [$ceprule['window']['tag']] : [];
+		unset($ceprule['window']['tag']);
+
 		return $ceprule;
 	}
 

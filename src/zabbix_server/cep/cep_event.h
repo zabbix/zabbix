@@ -17,6 +17,15 @@
 
 #include "zbx_cep.h"
 
+typedef struct
+{
+	zbx_uint64_t	userid;
+	zbx_uint64_t	correlationid;
+	zbx_uint64_t	c_eventid;
+	zbx_uint64_t	cep_ruleid;
+}
+zbx_cep_event_actor_t;
+
 zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, unsigned char object,
 		zbx_uint64_t objectid, const char *name, int clock, int ns, int value, int severity,
 		unsigned char flags, zbx_uint64_t cause_eventid, const zbx_vector_tags_ptr_t *tags,

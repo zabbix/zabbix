@@ -842,7 +842,7 @@ static int	cep_operation_event_copy(const zbx_cep_operation_t *op, zbx_cep_event
 
 	cep_event_expect(db_event);
 	cep_acknowledge_update(ack, op->type);
-	t = cep_create_task_event(db_event, ZBX_EVENT_COPIED);
+	t = cep_create_task_event_by_copy(db_event);
 	zbx_vector_mw_task_ptr_append(tasks, t);
 	ret = SUCCEED;
 out:
@@ -881,7 +881,7 @@ static int	cep_operation_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_
 
 		cep_event_expect(db_event);
 
-		t = cep_create_task_close_event(db_event, event->eventid, 0, 0, 0, ruleid);
+		t = cep_create_task_event_by_cep_rule(db_event, event->eventid, ruleid);
 		zbx_vector_mw_task_ptr_append(tasks, t);
 		ret = SUCCEED;
 	}

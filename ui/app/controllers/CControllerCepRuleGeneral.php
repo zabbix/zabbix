@@ -143,20 +143,14 @@ abstract class CControllerCepRuleGeneral extends CController {
 				'group_by_tag' => ['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
 					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH]]
 				],
-				'tag' => ['db cep_window.tag', 'required', 'not_empty',
-					'when' => [
-						['group_by_tag', 'in' => [CCepRuleHelper::GROUP_BY_YES]],
-						['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_PATTERN_MATCH]]
-					]
+				'tags' => ['array', 'required', 'not_empty', 'field' => ['string', 'not_empty'],
+					'when' => ['group_by_tag', 'in' => [CCepRuleHelper::GROUP_BY_YES]]
 				],
 				'event_count_tag_enabled' => ['integer', 'required', 'in' => [0, 1],
 					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_CAUSE_SYMPTOM]]
 				],
 				'event_count_tag' => ['db cep_window.event_count_tag', 'required', 'not_empty',
-					'when' => [
-						['event_count_tag_enabled', 'in' => [1]],
-						['../window_type', 'in' => [CCepRuleHelper::WINDOW_CAUSE_SYMPTOM]]
-					]
+					'when' => ['event_count_tag_enabled', 'in' => [1]]
 				],
 				'script' => ['db cep_window.script', 'required', 'not_empty',
 					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_PATTERN_MATCH]]

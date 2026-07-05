@@ -58,14 +58,14 @@ class CCepRule extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// Filter.
 			'cep_ruleids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['cep_ruleid', 'name', 'window_type', 'stop', 'sortorder', 'status']],
-			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name', 'description']],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getFilterFields('cep_rule', self::OUTPUT_FIELDS)],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getSearchFields('cep_rule', self::OUTPUT_FIELDS), DB::getSearchFields('cep_rule_rtdata', ['error']))],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_BOOLEAN, 'default' => false],
 			'excludeSearch' =>			['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// Output.
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['cep_ruleid', 'name', 'window_type', 'stop', 'sortorder', 'description', 'status', 'error', 'type']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_BOOLEAN, 'default' => false],
 			'selectFilter' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['conditions', 'evaltype', 'eval_formula', 'formula']), 'default' => null],
 			'selectWindow' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['duration', 'capacity', 'filter', 'script', 'group_by_host_group', 'group_by_host', 'group_by_tag', 'tag', 'event_count_tag']), 'default' => null],
@@ -87,43 +87,57 @@ class CCepRule extends CApiService {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if (!$options['countOutput']) {
-			if ($this->outputIsRequested('window_type', $options['output'])) {
-				$sql_parts['join']['win'] = ['type' => 'left', 'table' => 'cep_window', 'using' => 'cep_ruleid'];
+			if (in_array('window_type', $options['output'])) {
+				$sql_parts['join']['cw'] = ['type' => 'left', 'table' => 'cep_window', 'using' => 'cep_ruleid'];
 				$sql_parts['select']['window_type'] =
-					dbConditionCoalesce('win.type', CCepRuleHelper::WINDOW_NONE, 'window_type');
+					dbConditionCoalesce('cw.type', CCepRuleHelper::WINDOW_NONE, 'window_type');
 			}
 
-			if ($this->outputIsRequested('formula', $options['selectFilter'])
-					|| $this->outputIsRequested('eval_formula', $options['selectFilter'])
-					|| $this->outputIsRequested('conditions', $options['selectFilter'])) {
-
-				$sql_parts = $this->addQuerySelect('cr.formula', $sql_parts);
-				$sql_parts = $this->addQuerySelect('cr.evaltype', $sql_parts);
+			if (in_array('error', $options['output'])) {
+				$sql_parts['join']['crr'] = ['type' => 'left', 'table' => 'cep_rule_rtdata', 'using' => 'cep_ruleid'];
+				$sql_parts = $this->addQuerySelect(dbConditionCoalesce('crr.error', '', 'error'), $sql_parts);
 			}
 
-			if ($this->outputIsRequested('evaltype', $options['selectFilter'])) {
-				$sql_parts = $this->addQuerySelect('cr.evaltype', $sql_parts);
+			if ($options['selectFilter'] !== null) {
+				if (in_array('formula', $options['selectFilter']) || in_array('eval_formula', $options['selectFilter'])
+						|| in_array('conditions', $options['selectFilter'])) {
+					$sql_parts = $this->addQuerySelect('cr.formula', $sql_parts);
+					$sql_parts = $this->addQuerySelect('cr.evaltype', $sql_parts);
+				}
+
+				if (in_array('evaltype', $options['selectFilter'])) {
+					$sql_parts = $this->addQuerySelect('cr.evaltype', $sql_parts);
+				}
 			}
 		}
 
 		return $sql_parts;
 	}
 
-	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
+	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts) {
+		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if ($options['filter'] !== null) {
 			if (array_key_exists('window_type', $options['filter']) && $options['filter']['window_type'] !== null) {
 				$window_type_values = (array) $options['filter']['window_type'];
 
 				if ($window_type_values) {
-					$sqlParts['join']['win'] = ['type' => 'left', 'table' => 'cep_window', 'using' => 'cep_ruleid'];
-					$sqlParts['where']['window_type'] = dbConditionInt('win.type', $window_type_values);
+					$sql_parts['join']['cw'] = ['type' => 'left', 'table' => 'cep_window', 'using' => 'cep_ruleid'];
+					$sql_parts['where']['window_type'] = dbConditionInt('cw.type', $window_type_values);
 				}
 			}
 		}
 
-		return $sqlParts;
+		if ($options['search'] !== null) {
+			if (array_key_exists('error', $options['search']) && $options['search']['error'] !== null) {
+				$sql_parts['join']['crr'] = ['type' => 'left', 'table' => 'cep_rule_rtdata', 'using' => 'cep_ruleid'];
+				zbx_db_search('cep_rule_rtdata crr', ['search' => ['error' => $options['search']['error']]] + $options,
+					$sql_parts
+				);
+			}
+		}
+
+		return $sql_parts;
 	}
 
 	protected function addRelatedObjects(array $options, array $cep_rules): array {
@@ -134,7 +148,7 @@ class CCepRule extends CApiService {
 		return $cep_rules;
 	}
 
-	private function addRelatedFilter(array $options, array &$cep_rules): void {
+	private static function addRelatedFilter(array $options, array &$cep_rules): void {
 		if ($options['selectFilter'] === null) {
 			return;
 		}

@@ -43,6 +43,7 @@ typedef struct
 	int		ns;
 	zbx_uint64_t	userid;
 	zbx_uint64_t	correlationid;
+	zbx_uint64_t	cep_ruleid;
 }
 zbx_cep_db_event_recovery_t;
 
@@ -60,82 +61,6 @@ zbx_cep_object_value_t;
 ZBX_VECTOR_DECL(cep_object_value, zbx_cep_object_value_t)
 ZBX_VECTOR_IMPL(cep_object_value, zbx_cep_object_value_t)
 
-/******************************************************************************
- *                                                                            *
- * Purpose: get user ID associated with a task                                *
- *                                                                            *
- * Parameters: task - [IN]                                                    *
- *                                                                            *
- * Return value: user ID for close event tasks if created by user,            *
- *               0 otherwise                                                  *
- *                                                                            *
- ******************************************************************************/
-static zbx_uint64_t	cep_get_close_event_task_userid(const zbx_mw_task_t *task)
-{
-	switch (task->type)
-	{
-		case CEP_TASK_CLOSE_EVENT:
-			return ((zbx_cep_task_close_event_t *)task)->userid;
-		default:
-			return 0;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get correlation event ID associated with a task                   *
- *                                                                            *
- * Parameters: task - [IN]                                                    *
- *                                                                            *
- * Return value: correlation event ID for close event tasks if created by     *
- *               correlation, 0 otherwise                                     *
- *                                                                            *
- ******************************************************************************/
-static zbx_uint64_t	cep_get_close_event_task_c_eventid(const zbx_mw_task_t *task)
-{
-	switch (task->type)
-	{
-		case CEP_TASK_CLOSE_EVENT:
-			return ((zbx_cep_task_close_event_t *)task)->c_eventid;
-		default:
-			return 0;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get correlation ID associated with a task                         *
- *                                                                            *
- * Parameters: task - [IN]                                                    *
- *                                                                            *
- * Return value: correlation ID for close event tasks if created by           *
- *               correlation, 0 otherwise                                     *
- *                                                                            *
- ******************************************************************************/
-static zbx_uint64_t	cep_get_close_event_task_correlationid(const zbx_mw_task_t *task)
-{
-	switch (task->type)
-	{
-		case CEP_TASK_CLOSE_EVENT:
-			return ((zbx_cep_task_close_event_t *)task)->correlationid;
-		default:
-			return 0;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: prepare a CEP event and its tags for insertion into the database  *
- *                                                                            *
- * Parameters: event             - [IN] event to write                        *
- *             db                - [IN] database connection used to prepare   *
- *                                 the insert statements                      *
- *             db_insert_events  - [IN/OUT] insert batch for the events       *
- *                                 table                                      *
- *             db_insert_tag     - [IN/OUT] insert batch for the event_tag    *
- *                                 table                                      *
- *                                                                            *
- ******************************************************************************/
 static void	cep_db_write_event(const zbx_cep_event_t *event, zbx_dbconn_t *db, zbx_db_insert_t *db_insert_events,
 		zbx_db_insert_t *db_insert_tag)
 {
@@ -310,7 +235,7 @@ static void	cep_db_write_events(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t
 
 	for (int i = 0; i < tasks->values_num; i++)
 	{
-		const zbx_cep_task_event_t	*task = cep_get_event_task(tasks->values[i]);
+		const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)tasks->values[i];
 
 		/* trigger event might have been changed by CEP - need to commit from cache                  */
 		/* while other (internal) event tags are not cached - need to commit from received db_event  */
@@ -353,7 +278,7 @@ static void	cep_db_write_problems(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
 
 	for (int i = 0; i < tasks->values_num; i++)
 	{
-		const zbx_cep_task_event_t	*task = cep_get_event_task(tasks->values[i]);
+		const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)tasks->values[i];
 
 		if (CEP_EVENT_OPEN != task->event_op)
 			continue;
@@ -400,7 +325,7 @@ static void	cep_db_write_symptoms(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
 
 	for (int i = 0; i < tasks->values_num; i++)
 	{
-		const zbx_cep_task_event_t	*task = cep_get_event_task(tasks->values[i]);
+		const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)tasks->values[i];
 
 		if (CEP_EVENT_OPEN != task->event_op)
 			continue;
@@ -454,7 +379,7 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 
 	for (int i = 0; i < tasks->values_num; i++)
 	{
-		const zbx_cep_task_event_t	*task = cep_get_event_task(tasks->values[i]);
+		const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)tasks->values[i];
 
 		if (CEP_EVENT_CLOSE != task->event_op)
 			continue;
@@ -466,9 +391,10 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 				.r_eventid = task->db_event->eventid,
 				.clock = task->db_event->clock,
 				.ns = task->db_event->ns,
-				.userid = cep_get_close_event_task_userid(tasks->values[i]),
-				.correlationid = cep_get_close_event_task_correlationid(tasks->values[i]),
-				.c_eventid = cep_get_close_event_task_c_eventid(tasks->values[i])
+				.userid = task->creator.userid,
+				.correlationid = task->creator.correlationid,
+				.c_eventid = task->creator.c_eventid,
+				.cep_ruleid = task->creator.cep_ruleid
 			};
 
 			zbx_vector_cep_db_event_recovery_append(&recoveries, recovery_local);
@@ -488,7 +414,7 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 		zbx_vector_cep_db_event_recovery_sort(&recoveries, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		zbx_dbconn_prepare_insert(db, &db_insert_event_recovery,  "event_recovery", "eventid",
-			"r_eventid", "userid", "correlationid", "c_eventid", (char *)NULL);
+			"r_eventid", "userid", "correlationid", "c_eventid", "cep_ruleid", (char *)NULL);
 
 		for (int i = 0; i < recoveries.values_num; i++)
 		{
@@ -501,7 +427,8 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 			}
 
 			zbx_db_insert_add_values(&db_insert_event_recovery, recovery->p_eventid, recovery->r_eventid,
-					recovery->userid, recovery->correlationid, recovery->c_eventid);
+					recovery->userid, recovery->correlationid, recovery->c_eventid,
+					recovery->cep_ruleid);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update problem set r_eventid=" ZBX_FS_UI64 ",r_clock=%d,r_ns=%d",
@@ -516,6 +443,12 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",correlationid=" ZBX_FS_UI64,
 						recovery->correlationid);
+			}
+
+			if (0 != recovery->cep_ruleid)
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",cep_ruleid=" ZBX_FS_UI64,
+						recovery->cep_ruleid);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where eventid=" ZBX_FS_UI64 ";\n",
@@ -564,7 +497,7 @@ static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_mw_ta
 
 	for (int i = 0; i < tasks->values_num; i++)
 	{
-		const zbx_cep_task_event_t	*task = cep_get_event_task(tasks->values[i]);
+		const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)tasks->values[i];
 		const zbx_db_event		*event = task->db_event;
 
 		if (CEP_EVENT_OPEN != task->event_op)
@@ -634,7 +567,7 @@ static void	cep_db_write_trigger_rtdata(zbx_dbconn_t *db, const zbx_vector_mw_ta
 
 	for (int i = 0; i < tasks->values_num; i++)
 	{
-		const zbx_cep_task_event_t	*task = cep_get_event_task(tasks->values[i]);
+		const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)tasks->values[i];
 
 		if (EVENT_SOURCE_TRIGGERS == task->db_event->source && TRIGGER_VALUE_NONE != task->obj_value)
 		{
@@ -749,7 +682,7 @@ void	cep_db_process_actions(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_
 	for (int i = 0; i < tasks->values_num; i++)
 	{
 		zbx_uint64_pair_t		pair;
-		const zbx_cep_task_event_t	*task = cep_get_event_task(tasks->values[i]);
+		const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)tasks->values[i];
 
 		if (CEP_ACTION_ENABLED != task->action_state)
 			continue;
@@ -816,7 +749,7 @@ void	cep_db_export_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_pt
 
 	for (int i = 0; i < tasks->values_num; i++)
 	{
-		const zbx_cep_task_event_t	*task = cep_get_event_task(tasks->values[i]);
+		const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)tasks->values[i];
 
 		if (EVENT_SOURCE_TRIGGERS != task->db_event->source)
 			continue;

@@ -13,7 +13,8 @@
 [x] In conditions merge tag-name and tag-value similar as in problems filter
 [x] In tags list, hide input for exists operator
 [x] PR review
-[ ] historical conditions function expressed as tags and operations (remove table and submodal, add to main form)
+[x] historical conditions function remove table and submodal
 [ ] debug mode smoke-test: check heavy page loads db queries/query plans. (API)
+[ ] problems table info column (if closed by cep -> add info icon)
 [.] template/data default cep rules in clean installation and DB upgrade
 [ ] PR review -> peer review..

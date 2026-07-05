@@ -206,9 +206,6 @@ void	cep_queue_push(zbx_cep_queue_t *queue, zbx_mw_task_t *task)
 		case CEP_TASK_EVENT:
 			cep_queue_push_event(queue, task, ((zbx_cep_task_event_t *)task)->db_event);
 			break;
-		case CEP_TASK_CLOSE_EVENT:
-			cep_queue_push_event(queue, task, ((zbx_cep_task_close_event_t *)task)->parent.db_event);
-			break;
 		default:
 			zbx_mw_queue_push_normal(&queue->base, task);
 			break;
@@ -247,10 +244,6 @@ void	cep_queue_push_batch(zbx_cep_queue_t *queue, zbx_vector_mw_task_ptr_t *task
 				break;
 			case CEP_TASK_EVENT:
 				cep_queue_push_event(queue, task, ((zbx_cep_task_event_t *)task)->db_event);
-				break;
-			case CEP_TASK_CLOSE_EVENT:
-				cep_queue_push_event(queue, task,
-						((zbx_cep_task_close_event_t *)task)->parent.db_event);
 				break;
 			default:
 				zbx_mw_queue_push_normal(&queue->base, task);
@@ -338,10 +331,6 @@ void	cep_queue_push_completed(zbx_cep_queue_t *queue, zbx_mw_task_t *task)
 	{
 		case CEP_TASK_EVENT:
 			cep_queue_push_next_event_task(queue, (zbx_cep_task_event_t *)task);
-			queue->pending_commits_num--;
-			break;
-		case CEP_TASK_CLOSE_EVENT:
-			cep_queue_push_next_event_task(queue, &((zbx_cep_task_close_event_t *)task)->parent);
 			queue->pending_commits_num--;
 			break;
 		default:
