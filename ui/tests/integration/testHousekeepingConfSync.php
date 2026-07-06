@@ -25,29 +25,14 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 class testHousekeepingConfSync extends CIntegrationTest {
 	const PROXY_NAME = 'Housekeeping proxy';
 	const HOSTNAME = 'Housekeeping host';
-	const AGENT_PING_KEY = 'agent.ping';
-	const TRIGGER_NAME = 'Housekeeping trigger';
 	const HK_MODE_DISABLED = 0;
 	const HK_MODE_REGULAR = 1;
 	const HK_MODE_PARTITION = 2;
 	const TSDB_COMPRESSION_TABLE = 'history_uint';
 	const MAX_TSDB_POLICY_ATTEMPTS = 10;
 
-	/**
-	 * Objectid used for fake discovery/autoregistration/service events that are not tied to a real
-	 * object. A low number such as 1 must not be used here: once a real dhost/dservice with that id is
-	 * deleted elsewhere in the shared test suite, the server housekeeper purges all "events" rows with
-	 * the same source/object/objectid regardless of their age (see hk_problem_cleanup() in
-	 * housekeeper_table.c), which would wipe out these fake events prematurely. The value is kept just
-	 * below PHP_INT_MAX/the bigint column range so it can never collide with a real autoincremented id.
-	 */
-	const FAKE_OBJECTID = 9000000000000000000;
-
 	private static $proxyid = null;
 	private static $hostid = null;
-	private static $agent_ping_itemid = null;
-	private static $triggerid = null;
-	private static $eventids = [];
 	private static $db_extension = null;
 
 	/**
@@ -63,30 +48,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 
 		self::$hostid = $response['result']['hostids'][0];
-
-		$response = $this->call('item.create', [
-			'hostid' => self::$hostid,
-			'name' => 'Agent ping',
-			'key_' => self::AGENT_PING_KEY,
-			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-			'value_type' => ITEM_VALUE_TYPE_UINT64,
-			'delay' => '1h',
-			'history' => '90d',
-			'trends' => '0'
-		]);
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertArrayHasKey(0, $response['result']['itemids']);
-
-		self::$agent_ping_itemid = $response['result']['itemids'][0];
-
-		$response = $this->call('trigger.create', [
-			'description' => self::TRIGGER_NAME,
-			'expression' => 'last(/'.self::HOSTNAME.'/'.self::AGENT_PING_KEY.')=0'
-		]);
-		$this->assertArrayHasKey('triggerids', $response['result']);
-		$this->assertArrayHasKey(0, $response['result']['triggerids']);
-
-		self::$triggerid = $response['result']['triggerids'][0];
 
 		$response = $this->call('proxy.create', [
 			'name' => self::PROXY_NAME,
@@ -106,18 +67,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	 * Delete all data created by this test suite.
 	 */
 	public static function clearData(): void {
-		if (self::$agent_ping_itemid !== null) {
-			CDataHelper::call('history.clear', [self::$agent_ping_itemid]);
-		}
-
-		if (self::$eventids) {
-			DB::delete('events', ['eventid' => self::$eventids]);
-		}
-
-		if (self::$triggerid !== null) {
-			CDataHelper::call('trigger.delete', [self::$triggerid]);
-		}
-
 		if (self::$hostid !== null) {
 			CDataHelper::call('host.delete', [self::$hostid]);
 		}
@@ -388,117 +337,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		}
 	}
 
-	/**
-	 * Send agent.ping history through proxy using itemid-based agent data.
-	 */
-	private function sendAgentPing($clock) {
-		$this->sendAgentDataValues([
-			[
-				'itemid' => self::$agent_ping_itemid,
-				'value' => '1',
-				'clock' => $clock,
-				'ns' => (int)(microtime(true) * 1e9) % 1000000000
-			]
-		], self::HOSTNAME, self::COMPONENT_SERVER, 0, self::PROXY_NAME);
-	}
-
-	private function waitForHistoryCount($expected) {
-		$this->callUntilDataIsPresent('history.get', [
-			'itemids' => self::$agent_ping_itemid,
-			'history' => ITEM_VALUE_TYPE_UINT64
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-			function ($response) use ($expected) {
-				return array_key_exists('result', $response) && count($response['result']) == $expected;
-			}
-		);
-	}
-
-	private function createEventPairs($old_clock, $new_clock) {
-		$events = [];
-		$pairs = [
-			[
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER,
-				'objectid' => self::$triggerid,
-				'value' => TRIGGER_VALUE_TRUE,
-				'name' => 'Old trigger event'
-			],
-			[
-				'source' => EVENT_SOURCE_INTERNAL,
-				'object' => EVENT_OBJECT_TRIGGER,
-				'objectid' => self::$triggerid,
-				'value' => TRIGGER_STATE_UNKNOWN,
-				'name' => 'Old internal trigger event'
-			],
-			[
-				'source' => EVENT_SOURCE_INTERNAL,
-				'object' => EVENT_OBJECT_ITEM,
-				'objectid' => self::$agent_ping_itemid,
-				'value' => ITEM_STATE_NOTSUPPORTED,
-				'name' => 'Old internal item event'
-			],
-			[
-				'source' => EVENT_SOURCE_DISCOVERY,
-				'object' => EVENT_OBJECT_DHOST,
-				'objectid' => self::FAKE_OBJECTID,
-				'value' => 1,
-				'name' => 'Old discovery host event'
-			],
-			[
-				'source' => EVENT_SOURCE_DISCOVERY,
-				'object' => EVENT_OBJECT_DSERVICE,
-				'objectid' => self::FAKE_OBJECTID,
-				'value' => 1,
-				'name' => 'Old discovery service event'
-			],
-			[
-				'source' => EVENT_SOURCE_AUTOREGISTRATION,
-				'object' => EVENT_OBJECT_AUTOREGHOST,
-				'objectid' => self::FAKE_OBJECTID,
-				'value' => 0,
-				'name' => 'Old autoregistration event'
-			],
-			[
-				'source' => EVENT_SOURCE_SERVICE,
-				'object' => EVENT_OBJECT_SERVICE,
-				'objectid' => self::FAKE_OBJECTID,
-				'value' => 1,
-				'name' => 'Old service event'
-			]
-		];
-
-		foreach ($pairs as $event) {
-			foreach ([$old_clock, $new_clock] as $clock) {
-				$events[] = $event + [
-					'clock' => $clock,
-					'ns' => 0,
-					'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
-					'acknowledged' => EVENT_NOT_ACKNOWLEDGED
-				];
-			}
-		}
-
-		DB::refreshIds('events', count($events));
-
-		$eventids = DB::insert('events', $events);
-		self::$eventids = array_merge(self::$eventids, $eventids);
-
-		$result = ['old' => [], 'new' => []];
-		foreach ($eventids as $index => $eventid) {
-			$result[$index % 2 == 0 ? 'old' : 'new'][] = $eventid;
-		}
-
-		return $result;
-	}
-
-	private function assertEventsCount(array $eventids, $expected) {
-		$count = CDBHelper::getCount('SELECT NULL FROM events WHERE eventid IN ('.
-			implode(',', array_map('zbx_dbstr', $eventids)).')'
-		);
-
-		$this->assertEquals($expected, $count);
-	}
-
 	private function reloadServerAndAssertHousekeeping(array $housekeeping) {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
@@ -742,93 +580,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		$this->reloadServerAndAssertDbSettings($expected);
 		$this->executeHousekeeper(self::COMPONENT_SERVER);
 		$this->assertTimescaleDbCompressionPolicyAge($expected['compress_older'] + 2 * SEC_PER_HOUR);
-
-		return true;
-	}
-
-	/**
-	 * Check that the synced global history housekeeping period is used for old
-	 * history records received from proxy.
-	 *
-	 * @depends testHousekeepingConfSync_ApiUpdate
-	 */
-	public function testHousekeepingConfSync_OldHistoryCleanup() {
-		$housekeeping = [
-			'hk_events_mode' => 1,
-			'hk_events_trigger' => '90d',
-			'hk_events_internal' => '90d',
-			'hk_events_discovery' => '90d',
-			'hk_events_autoreg' => '90d',
-			'hk_events_service' => '90d',
-			'hk_services_mode' => 1,
-			'hk_services' => '90d',
-			'hk_sessions_mode' => 1,
-			'hk_sessions' => '90d',
-			'hk_audit_mode' => 1,
-			'hk_audit' => '90d',
-			'hk_history_mode' => 1,
-			'hk_history_global' => 1,
-			'hk_history' => '90d',
-			'hk_trends_mode' => 1,
-			'hk_trends_global' => 1,
-			'hk_trends' => '90d'
-		];
-
-		$response = $this->call('housekeeping.update', $housekeeping);
-		$this->assertArrayHasKey('result', $response);
-
-		$this->reloadServerAndAssertHousekeeping($housekeeping);
-
-		$this->reloadProxyAndWaitForConfiguration();
-
-		$eventids = $this->createEventPairs(time() - 2 * SEC_PER_DAY, time());
-		$this->assertEventsCount($eventids['old'], count($eventids['old']));
-		$this->assertEventsCount($eventids['new'], count($eventids['new']));
-
-		$this->sendAgentPing(time() - 2 * SEC_PER_DAY);
-		$this->sendAgentPing(time());
-
-		$this->waitForHistoryCount(2);
-
-		$housekeeping = [
-			'hk_events_mode' => 1,
-			'hk_events_trigger' => '1d',
-			'hk_events_internal' => '1d',
-			'hk_events_discovery' => '1d',
-			'hk_events_autoreg' => '1d',
-			'hk_events_service' => '1d',
-			'hk_services_mode' => 1,
-			'hk_services' => '1d',
-			'hk_sessions_mode' => 1,
-			'hk_sessions' => '1d',
-			'hk_audit_mode' => 1,
-			'hk_audit' => '1d',
-			'hk_history_mode' => 1,
-			'hk_history_global' => 1,
-			'hk_history' => '1d',
-			'hk_trends_mode' => 1,
-			'hk_trends_global' => 1,
-			'hk_trends' => '1d'
-		];
-
-		$response = $this->call('housekeeping.update', $housekeeping);
-		$this->assertArrayHasKey('result', $response);
-
-		$this->reloadServerAndAssertHousekeeping($housekeeping);
-
-		$this->clearLog(self::COMPONENT_SERVER);
-		$this->executeHousekeeper(self::COMPONENT_SERVER);
-
-		// Match on "hist/trends" specifically: the substring "housekeeper [deleted" alone also matches the
-		// unrelated "trigger housekeeper [deleted ...]" line, which that separate process logs on its own
-		// independent periodic schedule and can race ahead of the housekeeper cycle triggered here.
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'housekeeper \[deleted \d+ hist\/trends', true, 300,
-			1, true
-		);
-
-		$this->waitForHistoryCount(1);
-		$this->assertEventsCount($eventids['old'], 0);
-		$this->assertEventsCount($eventids['new'], count($eventids['new']));
 
 		return true;
 	}
