@@ -135,7 +135,8 @@ if (hasRequest('httptestid')) {
 		access_deny();
 	}
 }
-elseif (hasRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
+elseif (hasRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])
+		&& !(hasRequest('group_httptestid') && is_array(getRequest('group_httptestid')))) {
 	access_deny();
 }
 
