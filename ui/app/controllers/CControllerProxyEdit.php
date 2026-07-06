@@ -105,7 +105,8 @@ class CControllerProxyEdit extends CController {
 					'tls_issuer' => $this->proxy['tls_issuer'],
 					'tls_subject' => $this->proxy['tls_subject'],
 					'custom_timeouts' => (int) $this->proxy['custom_timeouts']
-				]
+				],
+				'warnings' => []
 			];
 
 			$data['form'] += $this->proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED

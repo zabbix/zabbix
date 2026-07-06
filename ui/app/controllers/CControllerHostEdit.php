@@ -351,10 +351,12 @@ class CControllerHostEdit extends CController {
 				];
 			}
 
-			$proxy = CProxyHelper::resolveProxyOption((int) $data['host']['assigned_proxyid']);
+			if ($data['host']['assigned_proxyid'] != 0) {
+				$proxy = CProxyHelper::resolveProxyOption((int) $data['host']['assigned_proxyid']);
 
-			$data['host']['assigned_proxy_name'] = $proxy['name'];
-			$data['host']['assigned_proxy_inaccessible'] = $proxy['inaccessible'];
+				$data['host']['assigned_proxy_name'] = $proxy['name'];
+				$data['host']['assigned_proxy_inaccessible'] = $proxy['inaccessible'];
+			}
 		}
 
 		$data['is_discovery_rule_editable'] = $this->host['discoveryRule']

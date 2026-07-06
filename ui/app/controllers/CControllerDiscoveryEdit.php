@@ -128,10 +128,7 @@ class CControllerDiscoveryEdit extends CController {
 
 		$data = [
 			'drule' => $this->drule,
-			'discovery_by' => $this->drule['druleid'] ||
-					CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
-				? ZBX_DISCOVERY_BY_SERVER
-				: ZBX_DISCOVERY_BY_PROXY,
+			'discovery_by' => $this->drule['proxyid'] != 0 ? ZBX_DISCOVERY_BY_PROXY : ZBX_DISCOVERY_BY_SERVER,
 			'ms_proxy' => [],
 			'concurrency_max_type' => $concurrency_max_type,
 			'user' => [
