@@ -398,6 +398,7 @@ func (c *DiskCache) flushOutput(u Uploader) {
 	}
 }
 
+//nolint:cyclop // a single function to cover execution and retry easier to read as one.
 func (c *DiskCache) execWithRetry(query string, args ...any) {
 	var (
 		delay    = 2 * time.Second
