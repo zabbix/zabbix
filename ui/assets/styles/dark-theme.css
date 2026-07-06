@@ -2753,6 +2753,8 @@ button {
       .datatable .cell.cell-data .btn-icon {
         min-width: 18px;
         height: 18px; }
+        .datatable .cell.cell-data .btn-icon:not(.no-indent):not(:first-child) {
+          margin-left: 5px; }
       .datatable .cell.cell-data .symptoms {
         display: flex;
         justify-content: flex-start;

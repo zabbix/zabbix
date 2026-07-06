@@ -590,6 +590,10 @@
 			.btn-icon {
 				min-width: 18px;
 				height: 18px;
+
+				&:not(.no-indent):not(:first-child) {
+					margin-left: 5px;
+				}
 			}
 
 			.symptoms {
