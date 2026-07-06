@@ -1048,7 +1048,7 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_LOG_LEVEL_INCREASE, ZBX_RTC_LOG_LEVEL_DECREASE};
 	zbx_timespec_t			sleeptime = {1, 0};
 	zbx_supervisor_t		sv;
-	int				runlevel_last = 0;
+	int				runlevel_last = 0, shutdown = 0;
 	zbx_supervisor_unit_shared_t	shared = {0};
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
@@ -1135,7 +1135,8 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 					sypervisor_get_activities(client);
 					break;
 				case ZBX_RTC_SHUTDOWN:
-					goto out;
+					shutdown = 1;
+					break;
 				default:
 					continue;
 			}
@@ -1145,6 +1146,9 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
+
+		if (0 != shutdown)
+			break;
 
 		if (runlevel_last != sv.runlevel)
 		{

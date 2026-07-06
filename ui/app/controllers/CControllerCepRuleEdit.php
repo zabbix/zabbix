@@ -125,7 +125,7 @@ class CControllerCepRuleEdit extends CController {
 
 		// Unlimited capacity's default value is "0".
 		if ($ceprule['window']['capacity'] == 0) {
-			$ceprule['window']['capacity'] = '';
+			$ceprule['window']['capacity'] = '10';
 		}
 
 		if ($ceprule['sortorder'] == 0) {
@@ -133,7 +133,7 @@ class CControllerCepRuleEdit extends CController {
 		}
 
 		if ($ceprule['window']['duration'] == 0) {
-			$ceprule['window']['duration'] = '';
+			$ceprule['window']['duration'] = '10m';
 		}
 
 		// Consistent naming with URL and fields.

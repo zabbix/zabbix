@@ -83,13 +83,6 @@ window.ceprule_edit_popup = new class {
 			value: ceprule.window.script
 		});
 
-		this.#initActions();
-		this.form = new CForm(this.form_element, rules);
-		this.#handleFilterChanged();
-		window['ceprule-window-counttag-toggle'].dispatchEvent(new Event('change'));
-		window['ceprule-window-capacity-toggle'].dispatchEvent(new Event('change'));
-		window['ceprule-window-groupby-opt-tag'].dispatchEvent(new Event('change'));
-
 		this.#ms_group_tags = jQuery('#ceprule-window-groupby-tag');
 		this.#ms_group_tags.multiSelect();
 		this.#ms_group_tags.multiSelect('modify', {
@@ -98,6 +91,15 @@ window.ceprule_edit_popup = new class {
 			),
 			custom_suggest_list: () => new Map()
 		});
+
+		this.#initActions();
+		this.form = new CForm(this.form_element, rules);
+
+		this.#handleFilterChanged();
+		window['ceprule-window-counttag-toggle'].dispatchEvent(new Event('change'));
+		window['ceprule-window-capacity-toggle'].dispatchEvent(new Event('change'));
+		window['ceprule-window-groupby-opt-tag'].dispatchEvent(new Event('change'));
+
 		this.#handleWindowTypeChanged();
 		this.form_element.style.display = '';
 	}
@@ -406,7 +408,6 @@ window.ceprule_edit_popup = new class {
 			});
 
 		fields.operations = operations;
-		fields.window.tags = jQuery('#ceprule-window-groupby-tag').multiSelect('getData').map(({id}) => id);
 
 		this.#removePopupMessages();
 		this.form.validateSubmit(fields)

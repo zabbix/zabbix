@@ -334,7 +334,14 @@ static void	cep_worker_delete_events(zbx_cep_task_remote_t *task)
 	cep_cache_release(&cep);
 
 	if (0 != zbx_dc_local_get_itservices_num())
+	{
 		cep_post_event_handle_action(handles.values, handles.values_num, CEP_EVENT_DELETE);
+	}
+	else
+	{
+		for (int i = 0; i < handles.values_num; i++)
+			zbx_cep_event_handle_release(handles.values[i]);
+	}
 
 	zbx_vector_cep_event_handle_destroy(&handles);
 	zbx_vector_uint64_destroy(&eventids);

@@ -17,4 +17,5 @@
 [ ] debug mode smoke-test: check heavy page loads db queries/query plans. (API)
 [ ] problems table info column (if closed by cep -> add info icon)
 [.] template/data default cep rules in clean installation and DB upgrade
+[ ] Tags pattern-select multiselect will need new a component? The current one, can't be used.
 [ ] PR review -> peer review..
