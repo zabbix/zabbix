@@ -10514,13 +10514,13 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'group_by_tag' => [
+			'group_by_tags' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
 			],
-			'tag' => [
+			'tags' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
@@ -10545,9 +10545,7 @@ return [
 			'cep_ruleid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'cep_rule',
-				'ref_field' => 'cep_ruleid'
+				'length' => 20
 			],
 			'group_by' => [
 				'null' => false,
@@ -10564,13 +10562,13 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'tag' => [
+			'tags' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
 				'length' => 65535,
 				'default' => ''
 			],
-			'tag_value' => [
+			'tags_value' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
