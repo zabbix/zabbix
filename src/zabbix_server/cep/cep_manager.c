@@ -26,6 +26,7 @@
 #include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxipcservice.h"
+#include "zbxlog.h"
 #include "zbxmw.h"
 #include "zbxsupervisor_client.h"
 #include "zbxtimekeeper.h"
