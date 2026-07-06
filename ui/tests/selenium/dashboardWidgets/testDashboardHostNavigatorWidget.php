@@ -793,7 +793,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 			$header = ($data['fields']['Name'] === '') ? 'Host navigator' : $data['fields']['Name'];
 
 			COverlayDialogElement::ensureNotPresent();
-			$widget = $dashboard->getWidget($header);
+			$widget = $dashboard->getWidget($header)->waitUntilReady();
 
 			// Save Dashboard to ensure that widget is correctly saved.
 			$dashboard->save()->waitUntilReady();
@@ -812,7 +812,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				? '1 minute'
 				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
-			CPopupMenuElement::find()->waitUntilVisible()->one()->close();
+			CPopupMenuElement::find()->one()->close();
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();
