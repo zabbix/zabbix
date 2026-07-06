@@ -4182,16 +4182,18 @@ output {
     overflow: hidden;
     text-overflow: ellipsis;
     transition: background-color 200ms ease-out; }
-  .multiselect-suggest.multiselect-suggest-grouped li, .multiselect-suggest-grouped.multiselect-matches li {
-    padding-left: 25px; }
-    .multiselect-suggest.multiselect-suggest-grouped li.suggest-group, .multiselect-suggest-grouped.multiselect-matches li.suggest-group {
-      padding-left: 5px;
-      font-weight: bold; }
+  .multiselect-suggest li:first-child, .multiselect-matches li:first-child {
+    border-top: none; }
   .multiselect-suggest .suggest-hover, .multiselect-matches .suggest-hover {
     background-color: #454545; }
   .multiselect-suggest .suggest-new, .multiselect-matches .suggest-new {
     border-top: 1px solid #4f4f4f; }
     .multiselect-suggest .suggest-new span:first-child, .multiselect-matches .suggest-new span:first-child {
+      font-weight: bold; }
+  .multiselect-suggest.multiselect-suggest-grouped li, .multiselect-suggest-grouped.multiselect-matches li {
+    padding-left: 25px; }
+    .multiselect-suggest.multiselect-suggest-grouped li.suggest-group, .multiselect-suggest-grouped.multiselect-matches li.suggest-group {
+      padding-left: 5px;
       font-weight: bold; }
 
 .multiselect-matches {
@@ -4202,7 +4204,9 @@ output {
 .multiselect-available {
   position: absolute;
   z-index: 20000;
+  margin-top: 3px;
   border: 1px solid #383838;
+  border-radius: var(--input-border-radius);
   overflow-y: auto;
   box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5); }
 
