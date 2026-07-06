@@ -31,6 +31,7 @@ int	zbx_bin2hex(const unsigned char *bin, size_t bin_len, char *out, size_t out_
 
 char	*zbx_create_token(zbx_uint64_t seed);
 char	*zbx_gen_uuid4(const char *seed);
+char	*zbx_gen_uuid7_hyphenated(void);
 
 typedef enum
 {

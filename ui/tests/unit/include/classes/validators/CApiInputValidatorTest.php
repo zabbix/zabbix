@@ -4639,9 +4639,15 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 			],
 			[
 				['type' => API_URL],
-				'javascript:alert()',
+				'//',
 				'/1/url',
 				'Invalid parameter "/1/url": unacceptable URL.'
+			],
+			[
+				['type' => API_URL],
+				'javascript:alert()',
+				'/1/url',
+				'Invalid parameter "/1/url": unacceptable URL scheme.'
 			],
 			[
 				['type' => API_URL],
@@ -4662,6 +4668,12 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'javascript:{$URL}'
 			],
 			[
+				['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO],
+				'javascript:{$URL}',
+				'/1/url',
+				'javascript:{$URL}'
+			],
+			[
 				['type' => API_URL, 'flags' => API_ALLOW_EVENT_TAGS_MACRO],
 				'text{EVENT.TAGS."JIRAID"}text',
 				'/1/url',
@@ -4672,6 +4684,24 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'text{MANUALINPUT}text',
 				'/1/url',
 				'text{MANUALINPUT}text'
+			],
+			[
+				['type' => API_URL],
+				'invalid://user@host:8080',
+				'/1/url',
+				'Invalid parameter "/1/url": unacceptable URL scheme.'
+			],
+			[
+				['type' => API_URL],
+				'http://www.zabbix.com',
+				'/1/url',
+				'http://www.zabbix.com'
+			],
+			[
+				['type' => API_URL],
+				'zabbix.php',
+				'/1/url',
+				'zabbix.php'
 			],
 			[
 				['type' => API_IP],
