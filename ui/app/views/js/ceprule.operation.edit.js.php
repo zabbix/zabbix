@@ -98,28 +98,14 @@ window.ceprule_operation_edit_popup = new class {
 	#setAvailableExecuteWhenOptions() {
 		const zselect = window['ceprule-operation-execute-when'];
 		const options = zselect.options;
+		const execute_when_by_window_type = JSON.parse('<?=
+			json_encode(CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE)
+		?>');
+		const available_options = execute_when_by_window_type[Number(this.#window_type)];
 
 		zselect.clearOptions();
 		zselect.addOptions(options.map(option => {
-			const value = Number(option.value);
-
-			option.disabled = false;
-
-			if (value == <?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>) {
-				option.disabled = false;
-			}
-			else if (value == <?= CCepRuleHelper::WHEN_EVENT_EVICTED ?>) {
-				option.disabled = this.#window_type === '<?= CCepRuleHelper::WINDOW_NONE ?>';
-			}
-			else if (value == <?= CCepRuleHelper::WHEN_WINDOW_CLOSED ?>) {
-				option.disabled = this.#window_type === '<?= CCepRuleHelper::WINDOW_NONE ?>';
-			}
-			else if (value == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>) {
-				option.disabled = this.#window_type !== '<?= CCepRuleHelper::WINDOW_TAG_MATCH ?>';
-			}
-			else if (value == <?= CCepRuleHelper::WHEN_PATTERN_MATCHED ?>) {
-				option.disabled = this.#window_type !== '<?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?>';
-			}
+			option.disabled = !available_options.includes(Number(option.value));
 
 			return option;
 		}));
