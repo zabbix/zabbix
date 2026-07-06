@@ -34,6 +34,8 @@ class CControllerPopup extends CController {
 	 */
 	private string $action;
 
+	private bool $popup_has_errors = false;
+
 	protected function init(): void {
 		$this->disableCsrfValidation();
 
@@ -86,6 +88,31 @@ class CControllerPopup extends CController {
 			$this->popup_controller = new $popup_controller_class;
 
 			$ret = $this->popup_controller->checkInput();
+
+			if (!$ret) {
+				$response = $this->popup_controller->getResponse();
+
+				if ($response instanceof CControllerResponseData) {
+					$data = $response->getData();
+
+					if (array_key_exists('main_block', $data)) {
+						$main_block = json_decode($data['main_block'], true);
+
+						if (array_key_exists('error', $main_block)) {
+							if (array_key_exists('title', $main_block['error'])) {
+								CMessageHelper::setErrorTitle($main_block['error']['title']);
+							}
+
+							foreach ($main_block['error']['messages'] as $message) {
+								CMessageHelper::addError($message);
+							}
+
+							$this->popup_has_errors = true;
+							$ret = true;
+						}
+					}
+				}
+			}
 		}
 
 		if (!$ret) {
@@ -96,16 +123,20 @@ class CControllerPopup extends CController {
 	}
 
 	protected function checkPermissions(): bool {
+		if ($this->popup_has_errors) {
+			return true;
+		}
+
 		return $this->popup_controller->checkPermissions();
 	}
 
 	protected function doAction(): void {
-		$data = [
-			'popup' => [
+		$data = $this->popup_has_errors
+			? []
+			: ['popup' => [
 				'action' => $this->action,
 				'action_parameters' => $this->popup_controller->getInputAll()
-			]
-		];
+			]];
 
 		$response = (new CControllerResponseData($data));
 		$response->setTitle($this->supported_popups[$this->getInput('popup')]);

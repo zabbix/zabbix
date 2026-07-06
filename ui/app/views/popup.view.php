@@ -23,11 +23,13 @@ $this->includeJsFile('popup.view.js.php');
 
 $html_page = (new CHtmlPage())->show();
 
-(new CScriptTag('
-	view.init('.json_encode([
-		'action' => $data['popup']['action'],
-		'action_parameters' => $data['popup']['action_parameters']
-	]).');
-'))
-	->setOnDocumentReady()
-	->show();
+if (array_key_exists('popup', $data)) {
+	(new CScriptTag('
+		view.init('.json_encode([
+			'action' => $data['popup']['action'],
+			'action_parameters' => $data['popup']['action_parameters']
+		]).');
+	'))
+		->setOnDocumentReady()
+		->show();
+}
