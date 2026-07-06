@@ -99,7 +99,9 @@ echo (new CObject())
 					'selectedLimit' => 0,
 					'placeholder' => _('tag names'),
 					'add_post_js' => false
-				]))->setId('ceprule-window-groupby-tag')
+				]))
+					->setId('ceprule-window-groupby-tag')
+					->setAttribute('data-field-name', 'window[tags]')
 			)
 
 	]))->setId('ceprule-window-groupby')))
