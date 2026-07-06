@@ -2246,8 +2246,9 @@ window.host_wizard_edit = new class {
 				field.parentNode.insertBefore(message_element, field.nextSibling);
 			}
 			else if (parent.parentElement.classList.contains('<?= CMacroValue::ZBX_STYLE_MACRO_INPUT_GROUP ?>')) {
-				parent.parentElement.parentNode.insertBefore(message_element, field.nextSibling);
-			} else {
+				parent.parentElement.parentNode.insertBefore(message_element, parent.parentElement.nextSibling);
+			}
+			else {
 				parent.parentNode.insertBefore(message_element, parent.nextSibling);
 			}
 		});
