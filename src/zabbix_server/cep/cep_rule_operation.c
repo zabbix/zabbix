@@ -1146,27 +1146,6 @@ zbx_uint64_t	cep_rule_event_context_execute_ops(const zbx_cep_rule_t *rule, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: execute the operations of multiple matched rules against an       *
- *          event context at a given execution phase                          *
- *                                                                            *
- * Parameters: matched_rules     - [IN] array of matched rules                *
- *             matched_rules_num - [IN] number of matched rules               *
- *             execute_when      - [IN] execution phase                       *
- *             ctx               - [IN/OUT] event context                     *
- *             event             - [IN/OUT] resolved mutable event            *
- *             tasks             - [OUT] vector to append tasks created by    *
- *                                 the operations to                          *
- *                                                                            *
- ******************************************************************************/
-void	cep_event_execute_ops(const zbx_cep_rule_t **matched_rules, int matched_rules_num, int execute_when,
-		zbx_cep_event_context_t *ctx, zbx_cep_event_t **event, zbx_vector_mw_task_ptr_t *tasks)
-{
-	for (int i = 0; i < matched_rules_num; i++)
-		(void)cep_rule_event_execute_ops(matched_rules[i], execute_when, ctx, event, tasks);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: add an event to the windows of matched rules                      *
  *                                                                            *
  * Parameters: ctx               - [IN/OUT] event context                     *

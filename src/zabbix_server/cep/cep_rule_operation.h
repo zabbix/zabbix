@@ -37,8 +37,6 @@ void	cep_event_add_to_rules(zbx_cep_event_context_t *ctx, const zbx_cep_rule_t *
 
 zbx_uint64_t	cep_rule_event_execute_close_window(const zbx_cep_rule_t *rule, int execute_when,
 		zbx_cep_event_context_t *ctx);
-void	cep_event_execute_ops(const zbx_cep_rule_t **matched_rules, int matched_rules_num, int execute_when,
-		zbx_cep_event_context_t *ctx, zbx_cep_event_t **event, zbx_vector_mw_task_ptr_t *tasks);
 zbx_uint64_t	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_cep_event_context_t *ctx,
 		zbx_cep_event_t **event, zbx_vector_mw_task_ptr_t *tasks);
 zbx_uint64_t	cep_rule_event_context_execute_ops(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,

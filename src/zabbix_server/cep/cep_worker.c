@@ -486,16 +486,10 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	/* cep config returns NULL handle if there are no cep rules to process */
 	if (NULL != (hconfig = zbx_cep_config_open()))
 	{
-		if (SUCCEED != cep_event_match_rules(hconfig, &rules, &rules_num, &event_ctx))
+		if (SUCCEED != cep_event_process_rules(hconfig, &rules, &rules_num, &event_ctx, &tasks))
 		{
 			zbx_cep_event_release(event);
 			goto out;
-		}
-
-		if (0 != rules_num)
-		{
-			cep_event_execute_ops(rules, rules_num, ZBX_CEP_WHEN_EVENT_OCCURRED, &event_ctx, &event,
-					&tasks);
 		}
 	}
 

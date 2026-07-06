@@ -59,8 +59,8 @@ char	*cep_tag_value_shift(const char *value, int shift);
 
 int	cep_operation_match_event(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx);
 
-int	cep_event_match_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t ***matched_rules,
-		int *matched_rules_num, zbx_cep_event_context_t *ctx);
+int	cep_event_process_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t ***matched_rules,
+		int *matched_rules_num, zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks);
 
 void	cep_rule_handle_error(const zbx_cep_rule_t *rule, char **error, zbx_vector_mw_task_ptr_t *tasks);
 

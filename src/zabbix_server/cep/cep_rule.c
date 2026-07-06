@@ -833,14 +833,16 @@ static int	cep_rule_discard_event(const zbx_cep_rule_t *rule, zbx_cep_event_cont
  *             matched_rules_num - [OUT] number of matched rules              *
  *             ctx               - [IN/OUT] event context for caching         *
  *                                         resolved values                    *
+ *             tasks             - [OUT] vector to append tasks created by    *
+ *                                 the operations to                          *
  *                                                                            *
  * Return value: SUCCEED if event was matched, FAIL if it must be discarded   *
  *                                                                            *
  * Comments: Rule processing stops at the first rule with stop flag set.      *
  *                                                                            *
  ******************************************************************************/
-int	cep_event_match_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t ***matched_rules,
-		int *matched_rules_num, zbx_cep_event_context_t *ctx)
+int	cep_event_process_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t ***matched_rules,
+		int *matched_rules_num, zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks)
 {
 #define CEP_WINDOW_UNIQ	(CEP_FLAG(ZBX_CEP_WINDOW_CAUSAL) | CEP_FLAG(ZBX_CEP_WINDOW_CORRELATION))
 
@@ -885,6 +887,9 @@ int	cep_event_match_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t *
 		}
 
 		(*matched_rules)[(*matched_rules_num)++] = rules->values[i];
+
+		(void)cep_rule_event_execute_ops(rules->values[i], ZBX_CEP_WHEN_EVENT_OCCURRED, ctx, &ctx->event,
+				tasks);
 
 		if (0 != rules->values[i]->stop)
 			break;
