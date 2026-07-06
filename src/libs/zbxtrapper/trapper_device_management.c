@@ -467,10 +467,10 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 
 	if (FAIL == zbx_json_value_by_name(&jp_result, "enrollment_token", met, sizeof(met), NULL) ||
 			FAIL == zbx_json_brackets_by_name(&jp_result, "adapter_enc_key", &jp_bek) ||
-			FAIL == zbx_json_value_by_name(&jp_result, "enroll_url", enroll_url,
+			FAIL == zbx_json_value_by_name(&jp_result, "bridge_url", enroll_url,
 			sizeof(enroll_url), NULL))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "missing enrollment_token/adapter_enc_key/enroll_url in bridge-adapter"
+		zabbix_log(LOG_LEVEL_WARNING, "missing enrollment_token/adapter_enc_key/bridge_url in bridge-adapter"
 				" result: %s", ZBX_NULL2EMPTY_STR(body_data));
 		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
 		goto out;
