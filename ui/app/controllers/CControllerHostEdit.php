@@ -336,7 +336,7 @@ class CControllerHostEdit extends CController {
 				'proxy_groupids' => $proxy_groupid
 			]);
 
-			if (count($proxy_groups) > 0 && array_key_exists('proxy_groupid', $proxy_groups[0])) {
+			if ($proxy_groups) {
 				$data['ms_proxy_group'] = CArrayHelper::renameObjectsKeys($proxy_groups, ['proxy_groupid' => 'id']);
 			}
 			else {

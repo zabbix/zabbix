@@ -140,7 +140,7 @@ class CControllerProxyEdit extends CController {
 				'limit' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
 			]), 'name');
 
-			if(count($connected_usrgrps) > 0) {
+			if($connected_usrgrps) {
 				$data['warnings'][] = _s('By adding the proxy to a proxy group, it will be removed from proxy allow/deny lists of the following user groups: %1$s',
 						implode(', ', $connected_usrgrps)
 					);

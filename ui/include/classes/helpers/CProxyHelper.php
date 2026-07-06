@@ -91,54 +91,59 @@ class CProxyHelper {
 	}
 	private static function prepareAccessListData(array $all_objects, array $user_groups, string $mode_key,
 			string $object_key, string $id_key): array {
-		$show_objects_limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE);
 		$all_by_id = [];
 
 		foreach ($all_objects as $object) {
 			$all_by_id[$object[$id_key]] = $object['name'];
 		}
 
-		$allowed_ids = [];
-		$denied_ids = [];
-
-		$has_allow_rules = false;
+		$result_allow_ids = [];
+		$result_deny_ids = [];
+		$has_allow_list = false;
+		$has_deny_list = false;
 
 		foreach ($user_groups as $user_group) {
 			$object_ids = array_column($user_group[$object_key], $id_key);
-			$is_allow_mode = (int) $user_group[$mode_key] === PROXY_MODE_ALLOW;
 
-			if ($is_allow_mode && empty($object_ids)) {
-				return [
-					'list' => [],
-					'mode' => PROXY_MODE_DENY,
-					'more' => 0
-				];
-			}
-
-			if (!$is_allow_mode && empty($object_ids)) {
-				$allowed_ids = array_keys($all_by_id);
-				continue;
-			}
-
-			if ($is_allow_mode) {
-				$has_allow_rules = true;
-				$allowed_ids = array_merge($allowed_ids, $object_ids);
+			if ((int) $user_group[$mode_key] === PROXY_MODE_ALLOW) {
+				$has_allow_list = true;
+				$result_allow_ids = array_merge($result_allow_ids, $object_ids);
 			}
 			else {
-				$denied_ids = array_merge($denied_ids, $object_ids);
+				$has_deny_list = true;
+				$result_deny_ids = array_merge($result_deny_ids, $object_ids);
 			}
 		}
 
-		$allowed_ids = array_unique($allowed_ids);
-		$denied_ids = array_unique($denied_ids);
+		$result_allow_ids = array_unique($result_allow_ids);
+		$result_deny_ids = array_unique($result_deny_ids);
 
-		if (!$has_allow_rules && empty($allowed_ids)) {
-			$allowed_ids = array_keys($all_by_id);
+		if ($has_allow_list && $has_deny_list) {
+			$final_allowed_ids = array_diff($result_allow_ids, $result_deny_ids);
+		}
+		elseif ($has_allow_list) {
+			$final_allowed_ids = $result_allow_ids;
+		}
+		elseif ($has_deny_list) {
+			$final_allowed_ids = array_diff(array_keys($all_by_id), $result_deny_ids);
+		}
+		else {
+			$final_allowed_ids = array_keys($all_by_id);
 		}
 
-		$final_allowed_ids = array_diff($allowed_ids, $denied_ids);
-		$allowed_lookup = array_flip($final_allowed_ids);
+		$total_objects = count($all_objects);
+		$all_allowed = count($final_allowed_ids) === $total_objects;
+		$all_denied = count($final_allowed_ids) === 0;
 
+		if ($all_allowed || $all_denied) {
+			return [
+				'list' => [],
+				'mode' => $all_allowed ? PROXY_MODE_ALLOW : PROXY_MODE_DENY,
+				'more' => 0
+			];
+		}
+
+		$allowed_lookup = array_flip($final_allowed_ids);
 		$list = [];
 
 		foreach ($all_by_id as $object_id => $object_name) {
@@ -148,13 +153,10 @@ class CProxyHelper {
 			];
 		}
 
-		$total_objects = count($all_objects);
-		$all_allowed = count($final_allowed_ids) === $total_objects;
-
 		return [
-			'list' => $all_allowed ? [] : $list,
-			'mode' => $all_allowed ? PROXY_MODE_ALLOW : PROXY_MODE_DENY,
-			'more' => max(0, $total_objects - $show_objects_limit)
+			'list' => $list,
+			'mode' => PROXY_MODE_DENY,
+			'more' => max(0, $total_objects - CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE))
 		];
 	}
 
