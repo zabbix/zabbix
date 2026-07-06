@@ -52,6 +52,7 @@ type DiskCache struct {
 	database      *sql.DB
 	persistFlag   uint32
 	historyUpload bool
+	done          chan struct{}
 }
 
 // Start starts disk cache.
@@ -60,6 +61,13 @@ func (c *DiskCache) Start() {
 	monitor.Register(monitor.Output)
 
 	go c.run()
+}
+
+// Stop interrupts any in-progress persistent buffer write retry and stops disk cache.
+func (c *DiskCache) Stop() {
+	close(c.done)
+
+	c.cacheData.Stop()
 }
 
 // SlotsAvailable returns available disk slots.
@@ -397,6 +405,14 @@ func (c *DiskCache) execWithRetry(query string, args ...any) {
 	)
 
 	for {
+		select {
+		case <-c.done:
+			c.Debugf("aborting persistent buffer write, disk cache is stopping")
+
+			return
+		default:
+		}
+
 		var (
 			stmt *sql.Stmt
 			err  error
@@ -413,14 +429,20 @@ func (c *DiskCache) execWithRetry(query string, args ...any) {
 			//nolint:sqlclosecheck // defer are not preferred in for loop
 			cerr := stmt.Close()
 			if cerr != nil {
-				c.Errf("failed to close statement %s", err)
+				c.Errf("failed to close statement %s", cerr)
 			}
 		}
 
 		if err != nil {
 			c.Errf("persistent buffer execution failed, retrying in %s : %s", delay, err)
 
-			time.Sleep(delay)
+			select {
+			case <-time.After(delay):
+			case <-c.done:
+				c.Debugf("aborting persistent buffer write retry, disk cache is stopping")
+
+				return
+			}
 
 			delay *= 2
 			if delay > maxDelay {
@@ -630,6 +652,7 @@ func (c *DiskCache) insertResultTable(table string) string {
 
 func (c *DiskCache) init(options *agent.AgentOptions) {
 	c.updateOptions(options)
+	c.done = make(chan struct{})
 
 	var err error
 	cacheLock.Lock()
