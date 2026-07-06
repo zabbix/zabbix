@@ -58,8 +58,8 @@ class CCepRule extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// Filter.
 			'cep_ruleids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getFilterFields('cep_rule', self::OUTPUT_FIELDS)],
-			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getSearchFields('cep_rule', self::OUTPUT_FIELDS), DB::getSearchFields('cep_rule_rtdata', ['error']))],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getFilterFields('cep_rule', self::OUTPUT_FIELDS), ['window_type'])],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getSearchFields('cep_rule', self::OUTPUT_FIELDS), DB::getSearchFields('cep_rule_rtdata', self::OUTPUT_FIELDS))],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_BOOLEAN, 'default' => false],
 			'excludeSearch' =>			['type' => API_BOOLEAN, 'default' => false],
@@ -123,7 +123,9 @@ class CCepRule extends CApiService {
 
 				if ($window_type_values) {
 					$sql_parts['join']['cw'] = ['type' => 'left', 'table' => 'cep_window', 'using' => 'cep_ruleid'];
-					$sql_parts['where']['window_type'] = dbConditionInt('cw.type', $window_type_values);
+					$sql_parts['where']['window_type'] = in_array(CCepRuleHelper::WINDOW_NONE, $window_type_values)
+						? dbConditionInt('cw.type', $window_type_values).' OR cw.cep_ruleid IS NULL'
+						: dbConditionInt('cw.type', $window_type_values);
 				}
 			}
 		}
@@ -208,6 +210,7 @@ class CCepRule extends CApiService {
 				$filter['conditions'] = array_values($conditions);
 			}
 		}
+		unset($cep_rule);
 	}
 
 	private static function addRelatedWindow(array $options, array &$cep_rules): void {
