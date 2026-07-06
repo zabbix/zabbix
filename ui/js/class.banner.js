@@ -183,7 +183,7 @@ class CBanner {
 
 		const active_banner = this.#banners
 			.filter(banner => {
-				if (!('id' in banner) || !banner.id || !('from' in banner) || !('to' in banner)) {
+				if (!('id' in banner) || String(banner.id).length === 0 || !('from' in banner) || !('to' in banner)) {
 					return false;
 				}
 
@@ -302,7 +302,7 @@ class CBanner {
 			const to = new Date(banner.to);
 
 			return 'id' in banner
-				&& banner.id
+				&& String(banner.id).length > 0
 				&& 'from' in banner
 				&& 'to' in banner
 				&& 'content' in banner
