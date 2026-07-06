@@ -98,14 +98,11 @@ class CEventNameValidator extends CValidator {
 			return true;
 		}
 
-		$hist_functions = $expression_parser->getResult()->getTokensOfTypes(
-			[CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]
-		);
+		$macro_parser = new CMacroParser(['macros' => ['{HOST.HOST}'], 'ref_type' => CMacroParser::REFERENCE_NUMERIC]);
+		$hosts = $expression_parser->getResult()->getHosts();
 
-		foreach ($hist_functions as $hist_function) {
-			$host = $hist_function['data']['parameters'][0]['data']['host'];
-
-			if (!preg_match('/^{HOST.HOST[1-9]?}$/i', $host) && !in_array($host, $this->hostnames)) {
+		foreach ($hosts as $host) {
+			if ($macro_parser->parse($host) !== CParser::PARSE_SUCCESS && !in_array($host, $this->hostnames)) {
 				$this->setError($this->message_hostnames === null
 					? _s('host "%1$s" is not allowed in event name', $host)
 					: $this->message_hostnames
