@@ -102,7 +102,8 @@ class CEventNameValidator extends CValidator {
 		$hosts = $expression_parser->getResult()->getHosts();
 
 		foreach ($hosts as $host) {
-			if ($macro_parser->parse($host) !== CParser::PARSE_SUCCESS && !in_array($host, $this->hostnames)) {
+			if ($host !== '' && $macro_parser->parse($host) !== CParser::PARSE_SUCCESS
+					&& !in_array($host, $this->hostnames)) {
 				$this->setError($this->message_hostnames === null
 					? _s('host "%1$s" is not allowed in event name', $host)
 					: $this->message_hostnames

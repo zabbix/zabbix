@@ -62,6 +62,9 @@ class CEventNameValidatorTest extends TestCase {
 			],
 			['test {?last(/Zabbix server/zabbix[wcache,index,pused])}',
 				['hostnames' => ['Zabbix server2'], 'message_hostnames' => 'custom message'], 'custom message'
+			],
+			['test {?last(//zabbix[wcache,index,pused])}',
+				['hostnames' => ['Zabbix server2'], 'message_hostnames' => 'custom message'], null
 			]
 		];
 	}
