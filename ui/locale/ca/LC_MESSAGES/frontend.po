@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-04-19 05:28+0000\n"
+"PO-Revision-Date: 2026-06-14 06:42+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -15218,7 +15218,7 @@ msgstr "Nou mètode MFA"
 
 #: app/views/oauth.edit.php:242
 msgid "New OAuth"
-msgstr ""
+msgstr "Nova OAuth"
 
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
@@ -15412,6 +15412,10 @@ msgstr "Següent"
 msgid "Next dashboard"
 msgstr "Tauler següent"
 
+#: jsLoader.php:328
+msgid "Next month"
+msgstr "Mes vinent"
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15425,6 +15429,10 @@ msgstr "Següent pàgina"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Passa següent"
+
+#: jsLoader.php:326
+msgid "Next year"
+msgstr "Any vinent"
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -15614,6 +15622,11 @@ msgstr "No s'han afegit pas mapes."
 #: include/classes/html/CMultiSelect.php:66 jsLoader.php:328
 msgid "No matches found"
 msgstr "No s'han trobat pas coincidències"
+
+#: app/controllers/CControllerValidateApiExists.php:118
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr "No més de %1$d elements basats en les regles del camp \"%2$s\""
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"

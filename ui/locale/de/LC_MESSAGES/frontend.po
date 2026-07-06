@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-11-11 15:35+0000\n"
+"PO-Revision-Date: 2026-06-24 10:57+0000\n"
 "Last-Translator: Udo <zabbix@inet-hamburg.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
@@ -6289,7 +6289,7 @@ msgstr ""
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
-msgstr "Düster"
+msgstr "Dunkel"
 
 #: app/controllers/CControllerAuditLogList.php:227
 #: app/controllers/CControllerDashboardPrint.php:71
@@ -6438,7 +6438,7 @@ msgstr ""
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:325
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:449
 msgid "Data set label"
-msgstr ""
+msgstr "Beschriftung"
 
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
@@ -7913,7 +7913,7 @@ msgstr ""
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
-msgstr ""
+msgstr "Zeige Min/Avg/Max"
 
 #: widgets/svggraph/includes/WidgetForm.php:351
 msgid "Display min/max/avg"
@@ -10127,7 +10127,7 @@ msgstr "Kontrastreich dunkel"
 
 #: include/classes/core/ZBase.php:382
 msgid "High-contrast light"
-msgstr "Konotrastreich hell"
+msgstr "Kontrastreich hell"
 
 #: app/partials/monitoring.problem.filter.php:312
 msgid "Highlight whole row"
@@ -15449,6 +15449,10 @@ msgstr ""
 msgid "Next dashboard"
 msgstr ""
 
+#: jsLoader.php:328
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15462,6 +15466,10 @@ msgstr "Nächste Seite"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Nächster Schritt"
+
+#: jsLoader.php:326
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -15651,6 +15659,11 @@ msgstr "Keine Karten hinzugefügt."
 #: include/classes/html/CMultiSelect.php:66 jsLoader.php:328
 msgid "No matches found"
 msgstr "Keine Treffer gefunden"
+
+#: app/controllers/CControllerValidateApiExists.php:118
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr ""
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
@@ -17852,7 +17865,7 @@ msgstr "Problemausdruck"
 #: widgets/problemhosts/Widget.php:29
 #: widgets/svggraph/includes/WidgetForm.php:386
 msgid "Problem hosts"
-msgstr "Problem Hosts"
+msgstr "Problem-Hosts"
 
 #: app/views/js/popup.action.edit.js.php:289 include/actions.inc.php:365
 msgid "Problem is not suppressed"
@@ -20448,7 +20461,7 @@ msgstr "Zeiträume anzeigen"
 
 #: widgets/svggraph/includes/WidgetForm.php:377
 msgid "Show problems"
-msgstr "Ziege Probleme"
+msgstr "Zeige Probleme"
 
 # Passive Form besser lesbar im Dropdown-Feld
 #: include/views/monitoring.history.php:168

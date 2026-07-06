@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-04-20 18:50+0000\n"
+"PO-Revision-Date: 2026-06-15 20:48+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -15219,7 +15219,7 @@ msgstr "Nouvelle méthode d'authentification multi-facteur"
 
 #: app/views/oauth.edit.php:242
 msgid "New OAuth"
-msgstr ""
+msgstr "Nouvelle OAuth"
 
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
@@ -15413,6 +15413,10 @@ msgstr "Suivant"
 msgid "Next dashboard"
 msgstr "Tableau de bord suivant"
 
+#: jsLoader.php:328
+msgid "Next month"
+msgstr "Mois suivant"
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15426,6 +15430,10 @@ msgstr "Page suivante"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Prochaine étape"
+
+#: jsLoader.php:326
+msgid "Next year"
+msgstr "Année suivante"
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -15615,6 +15623,11 @@ msgstr "Aucune carte ajoutée."
 #: include/classes/html/CMultiSelect.php:66 jsLoader.php:328
 msgid "No matches found"
 msgstr "Aucune correspondance trouvée"
+
+#: app/controllers/CControllerValidateApiExists.php:118
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr "Pas plus de %1$d éléments selon les règles du champ \"%2$s\""
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
