@@ -398,7 +398,6 @@ func (c *DiskCache) flushOutput(u Uploader) {
 	}
 }
 
-//nolint:cyclop // a single function to cover execution and retry easier to read as one.
 func (c *DiskCache) execWithRetry(query string, args ...any) {
 	var (
 		delay    = 2 * time.Second
@@ -406,40 +405,18 @@ func (c *DiskCache) execWithRetry(query string, args ...any) {
 	)
 
 	for {
-		select {
-		case <-c.done:
+		if c.isStopping() {
 			c.Debugf("aborting persistent buffer write, disk cache is stopping")
 
 			return
-		default:
 		}
-
-		var (
-			stmt *sql.Stmt
-			err  error
-		)
 
 		//nolint:noctx // legacy code, should be refactored
-		stmt, err = c.database.Prepare(query)
-		if err == nil {
-			//nolint:noctx // legacy code, should be refactored
-			_, err = stmt.Exec(args...)
-		}
-
-		if stmt != nil {
-			//nolint:sqlclosecheck // defer are not preferred in for loop
-			cerr := stmt.Close()
-			if cerr != nil {
-				c.Errf("failed to close statement %s", cerr)
-			}
-		}
-
+		_, err := c.database.Exec(query, args...)
 		if err != nil {
 			c.Errf("persistent buffer execution failed, retrying in %s : %s", delay, err)
 
-			select {
-			case <-time.After(delay):
-			case <-c.done:
+			if c.waitRetry(delay) {
 				c.Debugf("aborting persistent buffer write retry, disk cache is stopping")
 
 				return
@@ -456,6 +433,24 @@ func (c *DiskCache) execWithRetry(query string, args ...any) {
 		c.Debugf("successfully executed persistent buffer write")
 
 		return
+	}
+}
+
+func (c *DiskCache) isStopping() bool {
+	select {
+	case <-c.done:
+		return true
+	default:
+		return false
+	}
+}
+
+func (c *DiskCache) waitRetry(delay time.Duration) bool {
+	select {
+	case <-time.After(delay):
+		return false
+	case <-c.done:
+		return true
 	}
 }
 
