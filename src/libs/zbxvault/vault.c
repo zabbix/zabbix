@@ -38,7 +38,9 @@ static zbx_vault_get_kvs_cb_t		zbx_vault_get_kvs_cb;
 static zbx_vault_renew_token_cb_t	zbx_vault_renew_token_cb;
 static const char			*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
 
-int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
+int	zbx_vault_init(zbx_config_vault_t *config_vault, const char *config_source_ip,
+		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, char **error)
 {
 #define ZBX_HASHICORP_DBUSER_KEY	"username"
 #define ZBX_HASHICORP_DBPASSWORD_KEY	"password"
@@ -90,6 +92,18 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 		zbx_vault_renew_token_cb = zbx_vault_renew_token_hashicorp;
 		zbx_vault_dbuser_key = ZBX_HASHICORP_DBUSER_KEY;
 		zbx_vault_dbpassword_key = ZBX_HASHICORP_DBPASSWORD_KEY;
+
+		if (NULL == config_vault->token)
+		{
+			zbx_vault_renew_token(config_vault, config_source_ip, config_ssl_ca_location,
+					config_ssl_cert_location, config_ssl_key_location, &config_vault->token);
+
+			if (NULL == config_vault->token)
+			{
+				*error = zbx_dsprintf(*error, "cannot login with AppRole method");
+				return FAIL;
+			}
+		}
 	}
 	else if (0 == strcmp(config_vault->name, ZBX_CYBERARK_NAME))
 	{
@@ -167,18 +181,6 @@ int	zbx_vault_db_credentials_get(zbx_config_vault_t *config_vault, char **dbuser
 	zbx_kvs_t	kvs;
 	const zbx_kv_t	*kv_username, *kv_password;
 	zbx_kv_t	kv_local;
-
-	if (NULL == config_vault->token && 0 == strcmp(config_vault->name, ZBX_HASHICORP_NAME))
-	{
-		zbx_vault_renew_token(config_vault, config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location, &config_vault->token);
-
-		if (NULL == config_vault->token)
-		{
-			*error = zbx_dsprintf(*error, "cannot login with AppRole method");
-			return FAIL;
-		}
-	}
 
 	if (NULL == config_vault->db_path)
 		return SUCCEED;
