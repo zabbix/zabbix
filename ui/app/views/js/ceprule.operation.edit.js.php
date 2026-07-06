@@ -112,7 +112,7 @@ window.ceprule_operation_edit_popup = new class {
 				option.disabled = this.#window_type === '<?= CCepRuleHelper::WINDOW_NONE ?>';
 			}
 			else if (value == <?= CCepRuleHelper::WHEN_WINDOW_CLOSED ?>) {
-				option.disabled = this.#window_type !== '<?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>';
+				option.disabled = this.#window_type === '<?= CCepRuleHelper::WINDOW_NONE ?>';
 			}
 			else if (value == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>) {
 				option.disabled = this.#window_type !== '<?= CCepRuleHelper::WINDOW_TAG_MATCH ?>';
@@ -141,7 +141,8 @@ window.ceprule_operation_edit_popup = new class {
 
 			option.is_disabled = false;
 			if (this.#window_type === '<?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?>') {
-				option.is_disabled = !(value == <?= CCepRuleHelper::OP_COPY_LAST ?> || value == <?= CCepRuleHelper::OP_COPY_FIRST ?>);
+				option.is_disabled = !(value == <?= CCepRuleHelper::OP_COPY_LAST ?>
+					|| value == <?= CCepRuleHelper::OP_COPY_FIRST ?>);
 			}
 
 			if (value == <?= CCepRuleHelper::OP_DISCARD ?>) {

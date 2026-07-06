@@ -70,6 +70,12 @@ abstract class CControllerCepRuleGeneral extends CController {
 			if (array_key_exists('event_count_tag_enabled', $request['window'])) {
 				unset($request['window']['event_count_tag_enabled']);
 			}
+
+
+			// TODO: awaiting API changes.. remapping.
+			if (array_key_exists(0, $request['window']['tags'])) {
+				$request['window']['tag'] =  $request['window']['tags'][0];
+			}
 		}
 
 		if (array_key_exists('filter', $request)) {
@@ -106,7 +112,9 @@ abstract class CControllerCepRuleGeneral extends CController {
 			'name' => ['db cep_rule.name', 'required', 'not_empty'],
 			'filter' => ['object', 'fields' => [
 				'evaltype' => ['db cep_rule.evaltype', 'required',
-					'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]
+					'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
+						CONDITION_EVAL_TYPE_EXPRESSION
+					]
 				],
 				'conditions' => ['objects', 'fields' => self::getConditionValidationFields()],
 				'formula' => ['db cep_rule.formula', 'required', 'not_empty',
