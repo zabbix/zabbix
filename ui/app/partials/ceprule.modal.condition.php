@@ -45,7 +45,7 @@ echo (new CForm())
 			new CFormField($condition_type)
 		])
 		->addItem([
-			new CLabel('Tag', 'ceprule-condition-tag-name'),
+			(new CLabel('Tag', 'ceprule-condition-tag-name'))->setAsteriskMark(),
 			(new CFormField([
 				(new CTextBox('tag'))
 					->setId('ceprule-condition-tag-name')
@@ -75,21 +75,21 @@ echo (new CForm())
 			)
 		])
 		->addItem([
-			new CLabel('Event name', 'ceprule-condition-event-name'),
+			(new CLabel('Event name', 'ceprule-condition-event-name'))->setAsteriskMark(),
 			(new CFormField((new CTextBox('event_name'))
 				->setId('ceprule-condition-event-name')
 				->setAttribute('placeholder', 'event name')
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_EVENT_NAME)
 		])
 		->addItem([
-			new CLabel('Host', 'ceprule-condition-host'),
+			(new CLabel('Host', 'ceprule-condition-host'))->setAsteriskMark(),
 			(new CFormField((new CTextBox('host'))
 				->setId('ceprule-condition-host')
 				->setAttribute('placeholder', 'host name')
 			))->setAttribute('for-type', CCepRuleHelper::CONDITION_HOST)
 		])
 		->addItem([
-			new CLabel('Host group', 'ceprule-condition-host-group'),
+			(new CLabel('Host group', 'ceprule-condition-host-group'))->setAsteriskMark(),
 			(new CFormField((new CTextBox('host_group'))
 				->setId('ceprule-condition-host-group')
 				->setAttribute('placeholder', 'host group name')
@@ -101,7 +101,7 @@ echo (new CForm())
 				->setAttribute('for-type', CCepRuleHelper::CONDITION_SEVERITY)
 		])
 		->addItem([
-			new CLabel('Time period', 'ceprule-condition-time-period'),
+			(new CLabel('Time period', 'ceprule-condition-time-period'))->setAsteriskMark(),
 			(new CFormField((new CTextBox('time_period'))
 				->setId('ceprule-condition-time-period')
 				->setAttribute('placeholder', '1-7,00:00-24:00')
