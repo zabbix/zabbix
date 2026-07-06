@@ -116,6 +116,7 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $discovered_dep_triggerids = [];
 	private static $correlationid;
 	private static $correlationid2;
+	private static $disc_maintenanceid;
 	private static $serviceids = [];
 	private static $service_actionid;
 	private static $trigger_actionid;
@@ -2983,6 +2984,29 @@ HEREDOC;
 
 	/**
 	 * Same "close old down when new up" scenario as
+	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenance, but the discovered host only
+	 * enters data-collection maintenance after the first wave of problems is already open: the maintenance
+	 * is created mid-run, so the already-open problems must be suppressed retroactively and every problem
+	 * opened afterwards suppressed too, while global correlation still closes them all, leaving nothing open.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirst$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirst() {
+		self::$disc_maintenanceid = null;
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, true);
+			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		}
+		finally {
+			if (self::$disc_maintenanceid !== null) {
+				$this->stopDiscHostMaintenance(self::$disc_maintenanceid);
+			}
+		}
+	}
+
+	/**
+	 * Same "close old down when new up" scenario as
 	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the correlation rule uses
 	 * CONDITION_EVAL_TYPE_EXPRESSION with a custom formula ("A and B and C") instead of
 	 * CONDITION_EVAL_TYPE_AND_OR, exercising the custom expression evaluation path.
@@ -3167,9 +3191,10 @@ HEREDOC;
 	/**
 	 * Same "close old down when new up" setup as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp,
 	 * but the scenario only OPENS problems: both "down" waves are sent (two open problems per trigger) and
-	 * the "up" values that would close them are deliberately never sent. The discovered host is then removed
-	 * via testTriggerCEP_CleanupDiscoveredHost(); deleting the host must delete its triggers and resolve every
-	 * open problem, so no open problem remains afterwards.
+	 * the "up" values that would close them are deliberately never sent. The discovered triggers are then
+	 * deleted via empty LLD (triggerCEP_Cleanup()) and the discovered host via testTriggerCEP_CleanupDiscoveredHost();
+	 * deleting them must resolve every open problem and drop their events from the CEP cache, so no open
+	 * problem remains afterwards.
 	 *
 	 * This is the terminal test that uses the discovered host, so it is declared last among the host-using
 	 * tests: the cleanup chain (testTriggerCEP_Cleanup, testTriggerCEP_CleanupDiscoveredHost) runs after it and
@@ -3185,7 +3210,12 @@ HEREDOC;
 		// Only open problems: send both "down" waves (no "up" values), so two problems stay open per trigger.
 		$this->openProblemsGlobalCorrelationCloseOnUp();
 
-		// Removing the discovered host must delete its triggers and resolve every open problem.
+		// Delete the discovered triggers via empty LLD while their problems are still open: this must resolve
+		// every open problem and drop their events from the CEP cache, exercising the trigger-deletion path
+		// before the host itself is removed.
+		$this->triggerCEP_Cleanup();
+
+		// Removing the discovered host must delete any remaining resources and resolve every open problem.
 		$this->testTriggerCEP_CleanupDiscoveredHost();
 
 		// Deleting the host queues its triggers' problem/event records for removal; force both the general and
@@ -3196,9 +3226,9 @@ HEREDOC;
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'forced execution of the trigger housekeeper',
 				true, 20, 3);
 
-		// The triggers were deleted with the host, so only the problem count can be checked here:
-		// waitForNoOpenProblems() additionally asserts the triggers are still present in OK state, which no
-		// longer holds. No open problem may remain on the now-deleted triggers.
+		// The triggers were deleted (by empty LLD and then with the host), so only the problem count can be
+		// checked here: waitForNoOpenProblems() additionally asserts the triggers are still present in OK
+		// state, which no longer holds. No open problem may remain on the now-deleted triggers.
 		$this->waitForOpenProblemCount($all, 0);
 
 		// Removing the host must also drop the discovered items' problem events from the CEP cache: no other
@@ -3647,7 +3677,8 @@ HEREDOC;
 		return $m;
 	}
 
-	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart, bool $maintenance = false): void {
+	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart, bool $maintenance = false,
+			bool $maintenance_after_first = false): void {
 		$keys = array_merge(
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2)
@@ -3675,6 +3706,14 @@ HEREDOC;
 		// Under data-collection maintenance every problem opened on the host must be suppressed, while
 		// global correlation still processes and closes it normally in the steps below.
 		if ($maintenance) {
+			$this->waitForOpenProblemsSuppressed($all, $m);
+		}
+
+		// Same suppression expectation, but the host only enters maintenance after the first problems are
+		// already open: creating the maintenance now must retroactively suppress those $m open problems
+		// (and every problem opened later), while global correlation still closes them normally below.
+		if ($maintenance_after_first) {
+			self::$disc_maintenanceid = $this->startDiscHostMaintenance();
 			$this->waitForOpenProblemsSuppressed($all, $m);
 		}
 
@@ -5069,13 +5108,23 @@ HEREDOC;
 		$actual = $this->getCepStat($group, $name);
 		$info = '';
 		if ($actual != $expected) {
-			// Surface up to 10 still-open problems to help diagnose why the cache did not drain.
+			// Surface up to 10 still-open trigger problems to help diagnose why the cache did not drain.
 			$response = $this->call('problem.get', [
 				'object' => EVENT_OBJECT_TRIGGER,
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'output' => ['eventid', 'objectid', 'name', 'clock'],
 				'limit' => 10
 			]);
+
+			// If no trigger-source problem is open, fall back to any open problem (e.g. internal-source) so
+			// the diagnostics are not empty when the cache is held open by a non-trigger problem.
+			if (empty($response['result'])) {
+				$response = $this->call('problem.get', [
+					'output' => ['eventid', 'source', 'object', 'objectid', 'name', 'clock'],
+					'limit' => 10
+				]);
+			}
+
 			$info = ' Open problems (max 10): '.json_encode($response['result']);
 		}
 		$this->assertEquals($expected, $actual,
