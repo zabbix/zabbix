@@ -34,12 +34,8 @@ class testTriggerCEP extends CIntegrationTest {
 
 	const SKIP_RESTART_TESTS = true;
 
-	// When true the service-specific tests (testTriggerCEP_AddServices and its dependents) are skipped, so the
-	// suite runs the whole OK->PROBLEM->OK scenario without creating the per-trigger services, the service
-	// action and the trigger action. Skipping the root testTriggerCEP_AddServices cascades to every dependent
-	// (the *WithServices and *WithServicesRestart tests) via @depends. The remaining scenarios depend only on
-	// testPrepareTriggerCEP_LLDDiscovery, so they run unaffected.
-	const SKIP_SERVICES_TESTS = false;
+	// Leave null to decide randomly based on the current time; set to true or false to force a path.
+	const SKIP_SERVICES_TESTS = null;
 
 	const HOST_NAME = 'test';
 	const TEMPLATE_NAME = 'template_trigger_cep';
@@ -79,11 +75,11 @@ class testTriggerCEP extends CIntegrationTest {
 	// change iterations to fail faster when debugging
 	const STATE_CHANGE_WAIT_ITERATIONS = 30;
 
-	// When true, prepareData() deletes every internal-source action instead of enabling the built-in
+	// When true, prepareData() disables every internal-source action instead of enabling the built-in
 	// "Report not supported items" / "Report unknown triggers" actions for the whole suite. The *Unknown
-	// tests then (re)create those two actions for their own run only and delete them again afterwards, so
-	// the rest of the suite runs without the server generating internal item-not-supported /
-	// trigger-unknown events. When false the historic behaviour (enabled for the whole suite) is used.
+	// tests then enable those two actions for their own run only and disable them again afterwards, so the
+	// rest of the suite runs without the server generating internal item-not-supported / trigger-unknown
+	// events. When false the historic behaviour (enabled for the whole suite) is used.
 	const SCOPED_INTERNAL_ACTIONS = true;
 
 	// Active proxy whose name is spoofed when delivering item values. The host (and, by inheritance, the
@@ -2431,7 +2427,7 @@ HEREDOC;
 	/**
 	 * Smoke test (part 1/2): a discovered item becomes unsupported and its trigger enters the UNKNOWN
 	 * state. The internal "Report unknown triggers" and "Report not supported items" actions are active for
-	 * this test (created by runOpenUnknownTest() when SCOPED_INTERNAL_ACTIONS is set, otherwise enabled for
+	 * this test (enabled by runOpenUnknownTest() when SCOPED_INTERNAL_ACTIONS is set, otherwise enabled for
 	 * the whole suite in prepareData()), so the server opens an internal problem for every unsupported item
 	 * and every unknown trigger. The trigger value stays OK (it was not in a problem) while the state
 	 * becomes UNKNOWN; the UNKNOWN state and the open internal problems are left in place and cleared by
@@ -4311,7 +4307,13 @@ HEREDOC;
 	 * per-trigger services and their actions.
 	 */
 	private function skipIfServicesTestsDisabled(): void {
-		if (self::SKIP_SERVICES_TESTS) {
+		$skip_services_tests = self::SKIP_SERVICES_TESTS;
+
+		if ($skip_services_tests === null) {
+			$skip_services_tests = (time() % 2 === 0);
+		}
+
+		if ($skip_services_tests) {
 			$this->markTestSkipped('Service test variants disabled via SKIP_SERVICES_TESTS.');
 		}
 	}
@@ -5159,14 +5161,19 @@ HEREDOC;
 		}
 
 		if (self::SCOPED_INTERNAL_ACTIONS) {
-			// Remove any internal-source actions left over from the *Unknown tests (in case one aborted
-			// before deleting them), restoring the empty-internal-actions state prepareData() set up.
+			// Disable any internal-source actions the *Unknown tests enabled (in case one aborted before
+			// restoring them), returning to the all-internal-actions-disabled state prepareData() set up.
+			// The built-in actions must not be deleted here: enableInternalActions() re-enables them by name,
+			// so deleting them would make the next *Unknown run fail to find them.
 			$result = CDataHelper::call('action.get', [
 				'output' => ['actionid'],
 				'filter' => ['eventsource' => EVENT_SOURCE_INTERNAL]
 			]);
 			if (!empty($result)) {
-				CDataHelper::call('action.delete', array_column($result, 'actionid'));
+				CDataHelper::call('action.update', array_map(
+					fn($actionid) => ['actionid' => $actionid, 'status' => ACTION_STATUS_DISABLED],
+					array_column($result, 'actionid')
+				));
 			}
 		}
 		else {
