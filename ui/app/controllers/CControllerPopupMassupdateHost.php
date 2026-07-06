@@ -125,7 +125,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 				// filter only normal and discovery created hosts
 				$options = [
-					'output' => ['hostid', 'host', 'inventory_mode', 'flags'],
+					'output' => ['hostid', 'host', 'inventory_mode', 'flags', 'monitored_by'],
 					'hostids' => $hostids,
 					'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]],
 					'editable' => true
@@ -461,12 +461,19 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 					unset($host['parentTemplates']);
 
+					$original_monitored_by = $host['monitored_by'];
+
 					$host = $new_values + $host;
 
 					/*
 					 * API prevents changing host inventory_mode for discovered hosts. However, inventory values can
 					 * still be updated if inventory mode allows it.
 					 */
+					if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
+							&& $original_monitored_by == ZBX_MONITORED_BY_SERVER) {
+						unset($host['monitored_by'], $host['proxyid'], $host['proxy_groupid']);
+					}
+
 					if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 						unset($host['inventory_mode']);
 					}
