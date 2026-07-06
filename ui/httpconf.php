@@ -137,6 +137,7 @@ if (hasRequest('httptestid')) {
 }
 elseif (hasRequest('hostid')) {
 	$hostid = getRequest('hostid');
+
 	if ($hostid != 0 && !isWritableHostTemplates([$hostid])) {
 		access_deny();
 	}
