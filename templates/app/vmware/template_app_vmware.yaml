@@ -3691,7 +3691,7 @@ zabbix_export:
         Note: To enable discovery of hardware sensors of VMware hypervisors, set the host wizard configuration field `Monitoring of hardware sensors` to the selected state.
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 7.4-4
       groups:
         - name: Templates/Applications
       items:
