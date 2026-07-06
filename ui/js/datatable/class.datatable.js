@@ -543,7 +543,13 @@ class CDataTable {
 				return;
 			}
 
-			tags = tags.filter(tag => tag.tag === column_options['tag_name']);
+			const tag_name = column_options['tag_name'] ?? '';
+			if (String(tag_name).length > 0) {
+				tags = tags.filter(tag => tag.tag === tag_name && String(tag.value).length > 0);
+			}
+
+			cell.innerHTML = '';
+
 			if (tags.length == 0) {
 				return;
 			}
@@ -754,6 +760,7 @@ class CDataTable {
 				tags_wrapper.appendChild(more_tags);
 			}
 
+			cell.innerHTML = '';
 			cell.appendChild(tags_wrapper);
 		});
 
@@ -1188,7 +1195,7 @@ class CDataTable {
 			onSuccess: () => {
 				requestAnimationFrame(() => {
 					const header_cell = this.getColumn(duplicate_column.getColumnIndex())?.getHeaderCell();
-					if (header_cell) {
+					if (header_cell !== null) {
 						this.#scrollBodyToTarget(header_cell.target);
 
 						header_cell.target.focus();
@@ -1216,7 +1223,7 @@ class CDataTable {
 		}
 
 		const header_cell = column.getHeaderCell();
-		if (header_cell) {
+		if (header_cell !== null) {
 			header_cell.target.remove();
 		}
 
@@ -1248,9 +1255,14 @@ class CDataTable {
 
 		column.setName(name);
 
+		this.updateUserConfig();
+
 		const header_cell = column.getHeaderCell();
-		if (header_cell) {
-			header_cell.target.textContent = name;
+		if (header_cell !== null) {
+			const header_name = header_cell.target.querySelector(`.${CDataTable.ZBX_STYLE_HEADER_NAME}`);
+			if (header_name !== null) {
+				header_name.textContent = name;
+			}
 		}
 	}
 
@@ -1521,13 +1533,15 @@ class CDataTable {
 		if (!deepCompare(column.getColumnOptions(), column_options)) {
 			column.setColumnOptions(column_options);
 
+			this.updateUserConfig();
+
 			this.#renderColumnDataCells(column);
 
 			this.#options_popup_updated = true;
 
 			requestAnimationFrame(() => {
 				const header_cell = column.getHeaderCell();
-				if (header_cell) {
+				if (header_cell !== null) {
 					this.#scrollBodyToTarget(header_cell.target);
 				}
 			});
@@ -1635,8 +1649,8 @@ class CDataTable {
 		this.#body.scrollTo({left: e.target.scrollLeft});
 	}
 
-	onBodyScroll = () => {
-		this.#body_scroll_left = this.#body.scrollLeft;
+	onBodyScroll = e => {
+		this.#body_scroll_left = e.target.scrollLeft;
 
 		this.dispatchEvent(CDataTable.EVENT_SCROLL);
 	}
@@ -1900,7 +1914,7 @@ class CDataTable {
 		this.#columns = this.#columns.filter(column => {
 			if (column.isDuplicate()) {
 				const header_cell = column.getHeaderCell();
-				if (header_cell) {
+				if (header_cell !== null) {
 					this.#element_remove_queue.push(header_cell.target);
 
 					column.setHeaderCell(null);
@@ -2353,7 +2367,7 @@ class CDataTable {
 		for (const column of this.#columns) {
 			const header_cell = column.getHeaderCell();
 
-			if (header_cell) {
+			if (header_cell !== null) {
 				header_cell.target.remove();
 
 				column.setHeaderCell(null);

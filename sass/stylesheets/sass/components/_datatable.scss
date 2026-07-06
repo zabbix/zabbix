@@ -577,19 +577,9 @@
 			}
 
 			.tags-wrapper {
-				display: flex;
-				align-items: center;
-				column-gap: 2px;
-				row-gap: 2px;
-
 				.tag {
 					margin: 0;
 					height: 16px;
-					min-width: 24px;
-
-					&.tag-inherited {
-						min-width: 35px;
-					}
 				}
 
 				.btn-icon {
