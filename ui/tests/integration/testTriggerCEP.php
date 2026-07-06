@@ -34,6 +34,13 @@ class testTriggerCEP extends CIntegrationTest {
 
 	const SKIP_RESTART_TESTS = true;
 
+	// When true the service-specific tests (testTriggerCEP_AddServices and its dependents) are skipped, so the
+	// suite runs the whole OK->PROBLEM->OK scenario without creating the per-trigger services, the service
+	// action and the trigger action. Skipping the root testTriggerCEP_AddServices cascades to every dependent
+	// (the *WithServices and *WithServicesRestart tests) via @depends. The remaining scenarios depend only on
+	// testPrepareTriggerCEP_LLDDiscovery, so they run unaffected.
+	const SKIP_SERVICES_TESTS = false;
+
 	const HOST_NAME = 'test';
 	const TEMPLATE_NAME = 'template_trigger_cep';
 	const LLD_RULE_KEY = 'lld.cep.trapper';
@@ -2093,9 +2100,10 @@ HEREDOC;
 	 * Runs after the minimal open/close smoke tests so the same OK→PROBLEM→OK scenario can be repeated
 	 * with the services and actions in place. The services and actions are removed in clearData().
 	 *
-	 * @depends testTriggerCEP_CloseProblem
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_AddServices() {
+		$this->skipIfServicesTestsDisabled();
 		$this->createServicesAndActions();
 	}
 
@@ -2103,7 +2111,7 @@ HEREDOC;
 	 * Repeat of testTriggerCEP_OpenProblem with the services and actions in place: the trigger opens a
 	 * problem and every per-trigger service follows it to PROBLEM (disaster) with one open service problem.
 	 *
-	 * @depends testTriggerCEP_AddServices
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_OpenProblemWithServices() {
 		$this->runOpenProblemWithServicesTest(false);
@@ -3160,6 +3168,48 @@ HEREDOC;
 	}
 
 	/**
+	 * Same "close old down when new up" setup as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp,
+	 * but the scenario only OPENS problems: both "down" waves are sent (two open problems per trigger) and
+	 * the "up" values that would close them are deliberately never sent. The discovered host is then removed
+	 * via testTriggerCEP_CleanupDiscoveredHost(); deleting the host must delete its triggers and resolve every
+	 * open problem, so no open problem remains afterwards.
+	 *
+	 * This is the terminal test that uses the discovered host, so it is declared last among the host-using
+	 * tests: the cleanup chain (testTriggerCEP_Cleanup, testTriggerCEP_CleanupDiscoveredHost) runs after it and
+	 * tolerates the already-removed host.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationOpenThenRemoveHost$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationOpenThenRemoveHost() {
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+
+		// Only open problems: send both "down" waves (no "up" values), so two problems stay open per trigger.
+		$this->openProblemsGlobalCorrelationCloseOnUp();
+
+		// Removing the discovered host must delete its triggers and resolve every open problem.
+		$this->testTriggerCEP_CleanupDiscoveredHost();
+
+		// Deleting the host queues its triggers' problem/event records for removal; force both the general and
+		// the trigger housekeeper so those records are actually deleted before verifying that nothing remains.
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'housekeeper_execute');
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'forced execution of the housekeeper', true, 20, 3);
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'trigger_housekeeper_execute');
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'forced execution of the trigger housekeeper',
+				true, 20, 3);
+
+		// The triggers were deleted with the host, so only the problem count can be checked here:
+		// waitForNoOpenProblems() additionally asserts the triggers are still present in OK state, which no
+		// longer holds. No open problem may remain on the now-deleted triggers.
+		$this->waitForOpenProblemCount($all, 0);
+
+		// Removing the host must also drop the discovered items' problem events from the CEP cache: no other
+		// problem is open in the system at this point, so cached_events must drain back to zero.
+		$this->assertCepStatEquals('tasks', 'cached_events', 0);
+	}
+
+	/**
 	 * Send empty LLD data to delete all resources that were discovered during the test run
 	 * and verify the discovered triggers are actually removed.
 	 *
@@ -3179,6 +3229,12 @@ HEREDOC;
 	 * @depends testTriggerCEP_Cleanup
 	 */
 	public function testTriggerCEP_CleanupDiscoveredHost() {
+		// The open-then-remove-host scenario already removes the discovered host mid-suite, so this may run
+		// with the host already gone. Nothing left to delete in that case.
+		if (self::$disc_hostid === null) {
+			return;
+		}
+
 		$this->dispatchSenderValues([
 			[
 				'host' => self::HOST_NAME,
@@ -3555,6 +3611,45 @@ HEREDOC;
 	 *                      triggers stay TRUE and exactly $m problems remain.
 	 *   4. "up_<i+m>"    → closes each trigger's remaining "down_<i+m>" and itself. Nothing stays open.
 	 */
+	/**
+	 * Open (but never close) the "close old down when new up" problems: send both "down" waves — a unique id
+	 * per trigger, then a second unique id per trigger (mult_event) — so two problems stay open on every
+	 * discovered trigger. The "up" values that would close them via global correlation are deliberately not
+	 * sent. Returns the per-wave problem count $m (so 2 * $m problems are open on return).
+	 */
+	private function openProblemsGlobalCorrelationCloseOnUp(): int {
+		$keys = array_merge(
+			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
+			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2)
+		);
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+		$m = count($keys);
+
+		// Build one sender value per key with a unique id: value "<prefix>_<offset + key index>".
+		$values = fn(string $prefix, int $offset) => array_map(
+			fn($key, $i) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $prefix.'_'.($offset + $i)],
+			$keys, array_keys($keys)
+		);
+
+		// All triggers must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'All triggers must start in OK state for open-then-remove-host global correlation test.');
+		}
+
+		// 1. Open the first problem on every trigger (unique id per trigger); triggers go TRUE.
+		$this->dispatchSenderValues($values('down', 0), null, 0);
+		$this->waitForOpenProblemCount($all, $m);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		// 2. Open a second problem on every trigger (a different unique id, mult_event); still TRUE.
+		$this->dispatchSenderValues($values('down', $m), null, 0);
+		$this->waitForOpenProblemCount($all, 2 * $m);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		return $m;
+	}
+
 	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart, bool $maintenance = false): void {
 		$keys = array_merge(
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
@@ -4207,6 +4302,17 @@ HEREDOC;
 	private function skipIfRestartTestsDisabled(): void {
 		if (self::SKIP_RESTART_TESTS) {
 			$this->markTestSkipped('Restart test variants disabled via SKIP_RESTART_TESTS.');
+		}
+	}
+
+	/**
+	 * Skip the calling service-specific test when SKIP_SERVICES_TESTS is enabled. Skipping the root
+	 * testTriggerCEP_AddServices cascades to its dependents via @depends, so the suite runs without the
+	 * per-trigger services and their actions.
+	 */
+	private function skipIfServicesTestsDisabled(): void {
+		if (self::SKIP_SERVICES_TESTS) {
+			$this->markTestSkipped('Service test variants disabled via SKIP_SERVICES_TESTS.');
 		}
 	}
 
