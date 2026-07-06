@@ -842,6 +842,11 @@ static int	DBpatch_7050059(void)
 	return DBdrop_foreign_key("event_suppress", 2);
 }
 
+static int	DBpatch_7050060(void)
+{
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -908,5 +913,6 @@ DBPATCH_ADD(7050056, 0, 1)
 DBPATCH_ADD(7050057, 0, 1)
 DBPATCH_ADD(7050058, 0, 1)
 DBPATCH_ADD(7050059, 0, 1)
+DBPATCH_ADD(7050060, 0, 1)
 
 DBPATCH_END()
