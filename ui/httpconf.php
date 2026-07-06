@@ -135,9 +135,11 @@ if (hasRequest('httptestid')) {
 		access_deny();
 	}
 }
-elseif (hasRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])
-		&& !(hasRequest('group_httptestid') && is_array(getRequest('group_httptestid')))) {
-	access_deny();
+elseif (hasRequest('hostid')) {
+	$hostid = getRequest('hostid');
+	if ($hostid != 0 && !isWritableHostTemplates([$hostid])) {
+		access_deny();
+	}
 }
 
 // Validate backurl.
