@@ -1990,7 +1990,7 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/window/group_by_host": value must be one of 0, 1.'
 			],
-			'Window group_by_tag must be int boolean' => [
+			'Window group_by_tags must be int boolean' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
@@ -2002,12 +2002,12 @@ class testCepRule extends CAPITest {
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
 						'duration' => '1h',
-						'group_by_tag' => 123
+						'group_by_tags' => 123
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/window/group_by_tag": value must be one of 0, 1.'
+				'expected_error' => 'Invalid parameter "/1/window/group_by_tags": value must be one of 0, 1.'
 			],
-			'Window tag required if group_by_tag=true' => [
+			'Window tag required if group_by_tags=true' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
@@ -2019,7 +2019,7 @@ class testCepRule extends CAPITest {
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
 						'duration' => '1h',
-						'group_by_tag' => CCepRuleHelper::GROUP_BY_YES
+						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/window": the parameter "tag" is missing.'
@@ -2036,7 +2036,7 @@ class testCepRule extends CAPITest {
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
 						'duration' => '1h',
-						'group_by_tag' => CCepRuleHelper::GROUP_BY_YES,
+						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
 						'tag' => 123
 					]
 				],
@@ -2054,13 +2054,13 @@ class testCepRule extends CAPITest {
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
 						'duration' => '1h',
-						'group_by_tag' => CCepRuleHelper::GROUP_BY_YES,
+						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
 						'tag' => ''
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/window/tag": cannot be empty.'
 			],
-			'Window tag not accepted if group_by_tag=no' => [
+			'Window tag not accepted if group_by_tags=no' => [
 				'request' => [
 					'name' => 'ceprule',
 					'operations' => [
@@ -2072,7 +2072,7 @@ class testCepRule extends CAPITest {
 					'window_type' => CCepRuleHelper::WINDOW_SIMPLE,
 					'window' => [
 						'duration' => '1h',
-						'group_by_tag' => CCepRuleHelper::GROUP_BY_NO,
+						'group_by_tags' => CCepRuleHelper::GROUP_BY_NO,
 						'tag' => 'abc'
 					]
 				],
@@ -2092,7 +2092,7 @@ class testCepRule extends CAPITest {
 						'duration' => '1h'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/window": at least one of "group_by_host_group", "group_by_host" or "group_by_tag" parameters must be enabled.'
+				'expected_error' => 'Invalid parameter "/1/window": at least one of "group_by_host_group", "group_by_host" or "group_by_tags" parameters must be enabled.'
 			],
 			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, test with group_by_host_group' => [
 				'request' => [
@@ -2128,9 +2128,9 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, test with group_by_tag' => [
+			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, test with group_by_tags' => [
 				'request' => [
-					'name' => 'ceprule.window.symptom.group_by_tag',
+					'name' => 'ceprule.window.symptom.group_by_tags',
 					'operations' => [
 						'sortorder' => 1,
 						'execute_when' => CCepRuleHelper::WHEN_EVENT_OCCURRED,
@@ -2140,7 +2140,7 @@ class testCepRule extends CAPITest {
 					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 					'window' => [
 						'duration' => '1h',
-						'group_by_tag' => CCepRuleHelper::GROUP_BY_YES,
+						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
 						'tag' => 'abc'
 					]
 				],
@@ -2152,7 +2152,7 @@ class testCepRule extends CAPITest {
 					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 					'window' => [
 						'duration' => '1h',
-						'group_by_tag' => CCepRuleHelper::GROUP_BY_YES,
+						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
 						'tag' => 'abc'
 					]
 				],
@@ -3175,7 +3175,7 @@ class testCepRule extends CAPITest {
 					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 					'window' => []
 				],
-				'expected_error' => 'Invalid parameter "/1/window": at least one of "group_by_host_group", "group_by_host" or "group_by_tag" parameters must be enabled.'
+				'expected_error' => 'Invalid parameter "/1/window": at least one of "group_by_host_group", "group_by_host" or "group_by_tags" parameters must be enabled.'
 			],
 			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, test with group_by_host_group' => [
 				'request' => [
@@ -3198,26 +3198,26 @@ class testCepRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, switch to group_by_tag requires tag' => [
+			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, switch to group_by_tags requires tag' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.fail',
 					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 					'window' => [
 						'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
 						'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
-						'group_by_tag' => CCepRuleHelper::GROUP_BY_YES
+						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/window": the parameter "tag" is missing.'
 			],
-			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, switch to group_by_tag' => [
+			'At least one group_by* required for window=WINDOW_CAUSE_SYMPTOM, switch to group_by_tags' => [
 				'request' => [
 					'cep_ruleid' => ':ceprule:update.success',
 					'window_type' => CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
 					'window' => [
 						'group_by_host_group' => CCepRuleHelper::GROUP_BY_NO,
 						'group_by_host' => CCepRuleHelper::GROUP_BY_NO,
-						'group_by_tag' => CCepRuleHelper::GROUP_BY_YES,
+						'group_by_tags' => CCepRuleHelper::GROUP_BY_YES,
 						'tag' => 'abc'
 					]
 				],

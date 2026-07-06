@@ -537,15 +537,15 @@ class CCepRule extends CApiService {
 				'group_by_host' =>			$grouping_allowed
 												? ['type' => API_INT32, 'in' => implode(',', [CCepRuleHelper::GROUP_BY_NO, CCepRuleHelper::GROUP_BY_YES])]
 												: ['type' => API_INT32, 'in' => DB::getDefault('cep_window', 'group_by_host')],
-				'group_by_tag' =>			$grouping_allowed
+				'group_by_tags' =>			$grouping_allowed
 												? ['type' => API_INT32, 'in' => implode(',', [CCepRuleHelper::GROUP_BY_NO, CCepRuleHelper::GROUP_BY_YES])]
-												: ['type' => API_INT32, 'in' => DB::getDefault('cep_window', 'group_by_tag')],
-				'tag' =>					$grouping_allowed
+												: ['type' => API_INT32, 'in' => DB::getDefault('cep_window', 'group_by_tags')],
+				'tags' =>					$grouping_allowed
 												? ['type' => API_MULTIPLE, 'rules' => [
-													['if' => ['field' => 'group_by_tag', 'in' => (string) CCepRuleHelper::GROUP_BY_YES], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_window', 'tag')],
-													['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window', 'tag')]
+													['if' => ['field' => 'group_by_tags', 'in' => (string) CCepRuleHelper::GROUP_BY_YES], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_window', 'tags')],
+													['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window', 'tags')]
 												]]
-												: ['type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window', 'tag')]
+												: ['type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window', 'tags')]
 			]];
 
 			if (!CApiInputValidator::validate($api_input_rules, $cep_rule['window'], $path, $error)) {
@@ -553,11 +553,11 @@ class CCepRule extends CApiService {
 			}
 
 			if ($cep_rule['window_type'] == CCepRuleHelper::WINDOW_CAUSE_SYMPTOM) {
-				$grouping_fields = array_flip(['group_by_host_group', 'group_by_host', 'group_by_tag']);
+				$grouping_fields = array_flip(['group_by_host_group', 'group_by_host', 'group_by_tags']);
 
 				if (!array_filter(array_intersect_key($cep_rule['window'], $grouping_fields))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						$path, _('at least one of "group_by_host_group", "group_by_host" or "group_by_tag" parameters must be enabled')
+						$path, _('at least one of "group_by_host_group", "group_by_host" or "group_by_tags" parameters must be enabled')
 					));
 				}
 			}
@@ -583,7 +583,7 @@ class CCepRule extends CApiService {
 				$rule_indexes[$cep_rule['cep_ruleid']] = $i;
 			}
 			else {
-				$cep_rule['window'] += ['group_by_tag' => DB::getDefault('cep_window', 'group_by_tag')];
+				$cep_rule['window'] += ['group_by_tags' => DB::getDefault('cep_window', 'group_by_tags')];
 			}
 		}
 		unset($cep_rule);
@@ -593,14 +593,14 @@ class CCepRule extends CApiService {
 		}
 
 		$options = [
-			'output' => ['cep_ruleid', 'group_by_host_group', 'group_by_host', 'group_by_tag', 'tag'],
+			'output' => ['cep_ruleid', 'group_by_host_group', 'group_by_host', 'group_by_tags', 'tags'],
 			'filter' => ['cep_ruleid' => array_keys($rule_indexes)]
 		];
 		$resource = DBselect(DB::makeSql('cep_window', $options));
 
 		while ($row = DBfetch($resource)) {
 			$cep_rules[$rule_indexes[$row['cep_ruleid']]]['window'] += array_intersect_key($row,
-				array_flip(['group_by_host_group', 'group_by_host', 'group_by_tag', 'tag'])
+				array_flip(['group_by_host_group', 'group_by_host', 'group_by_tags', 'tags'])
 			);
 		}
 	}
@@ -940,8 +940,8 @@ class CCepRule extends CApiService {
 			])) {
 				$allowed_fields[] = 'group_by_host_group';
 				$allowed_fields[] = 'group_by_host';
-				$allowed_fields[] = 'group_by_tag';
-				$allowed_fields[] = 'tag';
+				$allowed_fields[] = 'group_by_tags';
+				$allowed_fields[] = 'tags';
 			}
 
 			if ($cep_rule['window_type'] == CCepRuleHelper::WINDOW_CAUSE_SYMPTOM) {
@@ -1269,7 +1269,7 @@ class CCepRule extends CApiService {
 
 		$options = [
 			'output' => ['cep_ruleid', 'duration', 'capacity', 'evaltype', 'formula', 'script',
-				'group_by_host_group', 'group_by_host', 'group_by_tag', 'tag', 'event_count_tag'
+				'group_by_host_group', 'group_by_host', 'group_by_tags', 'tags', 'event_count_tag'
 			],
 			'filter' => ['cep_ruleid' => $cep_ruleids]
 		];
