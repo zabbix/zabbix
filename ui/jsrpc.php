@@ -637,12 +637,6 @@ switch ($data['method']) {
 					'limit' => $limit
 				]);
 
-				foreach ($valuemaps as &$valuemap) {
-					$valuemap['prefix'] = $hosts[$valuemap['hostid']]['name'].NAME_DELIMITER;
-					unset($valuemap['hostid']);
-				}
-				unset($valuemap);
-
 				$result = CArrayHelper::renameObjectsKeys($valuemaps, ['valuemapid' => 'id']);
 				CArrayHelper::sort($result, ['name']);
 				break;
