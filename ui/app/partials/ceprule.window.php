@@ -61,7 +61,7 @@ echo (new CObject())
 		)
 	)
 
-	->addItem(new CLabel(_('Group by')))
+	->addItem((new CLabel('Group by'))->setAsteriskMark()->setId('ceprule-groupby-label'))
 	->addItem(new CFormField((new CList([
 		(new CListItem())
 			->addItem((new CCheckBox('window[group_by_host_group]', CCepRuleHelper::GROUP_BY_YES))
