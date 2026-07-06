@@ -65,6 +65,12 @@ class CEventNameValidatorTest extends TestCase {
 			],
 			['test {?last(//zabbix[wcache,index,pused])}',
 				['hostnames' => ['Zabbix server2'], 'message_hostnames' => 'custom message'], null
+			],
+			['test {?last(/1e2/zabbix[wcache,index,pused])}',
+				['hostnames' => ['100']], 'host "1e2" is not allowed in event name'
+			],
+			['test {?last(/12/zabbix[wcache,index,pused])}',
+				['hostnames' => ['012']], 'host "12" is not allowed in event name'
 			]
 		];
 	}
