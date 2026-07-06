@@ -668,6 +668,18 @@ class CCepRule extends CApiService {
 											])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_operation', 'event_name')],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation', 'event_name')]
 					]],
+					'severity' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [
+												CCepRuleHelper::OP_SET_SEVERITY
+											])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
+											['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'severity')]
+					]],
+					'suppress_until' =>	['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [
+												CCepRuleHelper::OP_SUPPRESS
+											])], 'type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
+											['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'suppress_until')]
+					]],
 					'tag' =>			['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'type', 'in' => implode(',', [
 												CCepRuleHelper::OP_ADD_TAG,
@@ -697,12 +709,6 @@ class CCepRule extends CApiService {
 												CCepRuleHelper::OP_REMOVE_TAG
 											])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('cep_operation', 'tag_value')],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation', 'tag_value')]
-					]],
-					'severity' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [
-												CCepRuleHelper::OP_SET_SEVERITY
-											])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
-											['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'severity')]
 					]]
 				]];
 
