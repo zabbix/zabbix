@@ -948,7 +948,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp, int con
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 
-			if (USER_TYPE_SUPER_ADMIN == user.type)
+			if (USER_TYPE_SUPER_ADMIN == user.type || USER_TYPE_ZABBIX_ADMIN == user.type)
 				status_stats_export(&json);
 
 			zbx_json_close(&json);

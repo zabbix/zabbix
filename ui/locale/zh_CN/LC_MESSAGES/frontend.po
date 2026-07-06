@@ -15778,6 +15778,10 @@ msgstr "下一步"
 msgid "Next dashboard"
 msgstr "下一个仪表板"
 
+#: jsLoader.php:416
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15791,6 +15795,10 @@ msgstr "下一页"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "下一步"
+
+#: jsLoader.php:414
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -23029,6 +23037,10 @@ msgstr "视为 0"
 #: include/classes/data/CItemData.php:2792
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr "趋势函数缓存统计。有效参数：all、hits、phits、misses、pmisses、items、pitems 和 requests。"
+
+#: include/classes/data/CItemData.php:3013
+msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems, paccessed and requests."
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:226
 #: app/partials/configuration.filter.items.php:162

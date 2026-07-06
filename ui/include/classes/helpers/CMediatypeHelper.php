@@ -39,6 +39,8 @@ class CMediatypeHelper {
 	public const EMAIL_PROVIDER_OFFICE365 = 3;
 	public const EMAIL_PROVIDER_OFFICE365_RELAY = 4;
 
+	public const OAUTH_URL_SCHEMES = ['http', 'https'];
+
 	/**
 	 * Returns an array of Email providers default settings.
 	 *

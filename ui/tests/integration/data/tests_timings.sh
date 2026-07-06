@@ -1,7 +1,7 @@
 PERFORMANCE_RATIO_THRESHOLD=3.0
 
 declare -A BASELINE_TIMES=(
-  [Integration]=4268
+  [Integration]=4338
   [testEscalations]=443
   [testProxyHa]=417
   [testNestedLLD]=385
@@ -27,6 +27,7 @@ declare -A BASELINE_TIMES=(
   [testProxyConfSync]=70
   [testComplexServiceStatus]=66
   [testItemRate]=66
+  [testHousekeepingConfSync]=60
   [testUserParametersReload]=47
   [testEventsCauseAndSymptoms]=44
   [testTimescaleDb]=44
@@ -47,6 +48,7 @@ declare -A BASELINE_TIMES=(
   [testUserMacrosInItemNames]=18
   [testBrowserMonitoring]=17
   [testAutoregistrationHostMetaDataItem]=16
+  [testWebScenarioDynamicVariables]=15
   [testAgentItems]=13
   [testTagInheritance]=11
   [testDiagInfo]=10
