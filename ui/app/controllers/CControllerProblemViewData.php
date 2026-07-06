@@ -253,15 +253,15 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			$problem['opdata'] = $opdata?->toString(false);
 
-			$flex_wrapper = (new CDiv(
+			$problem_link_wrapper = (new CDiv(
 				array_key_exists($trigger['triggerid'], $data['dependencies'])
 					? makeTriggerDependencies($data['dependencies'][$trigger['triggerid']])
 					: []
 			))
-				->addStyle(ZBX_STYLE_FLEX_WRAPPER)
+				->addClass(ZBX_STYLE_NOWRAP)
 				->addItem(
 					(new CLinkAction($problem['name']))
-						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+						->addClass(ZBX_STYLE_WORDBREAK)
 						->setMenuPopup(CMenuPopupHelper::getTrigger([
 							'triggerid' => $trigger['triggerid'],
 							'backurl' => (new CUrl('zabbix.php'))
@@ -275,12 +275,12 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] != '' && !$options['compact_view']
 					&& $options['show_opdata'] == 1) {
-				$flex_wrapper->addItem(' ('.$opdata.') ');
+				$problem_link_wrapper->addItem([' (', $opdata, ') ']);
 			}
 
-			$flex_wrapper->addItem($problem['comments'] !== '' ? makeDescriptionIcon($problem['comments']) : null);
+			$problem_link_wrapper->addItem($problem['comments'] !== '' ? makeDescriptionIcon($problem['comments']) : null);
 
-			$description = [$flex_wrapper];
+			$description = [$problem_link_wrapper];
 
 			if (!$options['compact_view'] && $options['details'] == 1) {
 				if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
