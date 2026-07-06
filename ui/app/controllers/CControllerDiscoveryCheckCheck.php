@@ -243,7 +243,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 	 */
 	protected function doAction(): void {
 		$data = array_merge([
-			'type' => self::DEFAULT_TYPE,
+			'type' => self::DEFAULT_TYPE
 		], $this->getInputAll());
 
 		if ($data['type'] == SVC_SNMPv1 || $data['type'] == SVC_SNMPv2c || $data['type'] == SVC_SNMPv3) {

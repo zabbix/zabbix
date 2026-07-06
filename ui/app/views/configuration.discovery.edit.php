@@ -238,20 +238,20 @@ if ($data['drule']['druleid']) {
 			'title' => _('Update'),
 			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
+			'isSubmit' => true
 		],
 		[
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
-			'isSubmit' => false,
+			'isSubmit' => false
 		],
 		[
 			'title' => _('Delete'),
 			'confirmation' => _('Delete discovery rule?'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
-			'isSubmit' => false,
+			'isSubmit' => false
 		]
 	];
 }
@@ -261,7 +261,7 @@ else {
 			'title' => _('Add'),
 			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
+			'isSubmit' => true
 		]
 	];
 }

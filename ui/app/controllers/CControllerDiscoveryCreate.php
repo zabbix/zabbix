@@ -128,7 +128,7 @@ class CControllerDiscoveryCreate extends CController {
 					'allow_redirect' => ['db dchecks.allow_redirect', 'required', 'in' => [0, 1],
 						'when' => ['type', 'in' => [SVC_ICMPPING]]
 					],
-					'uniq' => ['boolean', 'in' => [0, 1],
+					'uniq' => ['boolean',
 						'when' => ['type', 'in' => [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
 					],
 					'host_source' => [

@@ -32,14 +32,14 @@ window.drule_edit_popup = new class {
 	#dcheckid;
 	#available_device_types;
 
-	init({rules, clone_rules, druleid, dchecks, drule}) {
+	init({rules, clone_rules, dchecks, drule}) {
 		this.#overlay = overlays_stack.getById('discovery.edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 		this.#form = new CForm(this.#form_element, rules);
 		this.#clone_rules = clone_rules;
 
-		this.#druleid = druleid;
+		this.#druleid = drule.druleid;
 		this.#dchecks = dchecks;
 		this.#drule = drule;
 		this.#dcheckid = getUniqueId();
@@ -446,7 +446,7 @@ window.drule_edit_popup = new class {
 			[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('discovery')) ?>
 		};
 
-		this.#post(zabbixUrl({url_params}), {druleids: [this.#druleid]}, (response) => {
+		this.#post(zabbixUrl(url_params), {druleids: [this.#druleid]}, (response) => {
 			overlayDialogueDestroy(this.#overlay.dialogueid);
 
 			this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
