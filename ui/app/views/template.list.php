@@ -32,7 +32,7 @@ $html_page = (new CHtmlPage())
 		(new CList())
 			->addItem(
 				(new CSimpleButton(_('Create template')))
-					->setAttribute('data-groupids', json_encode(array_keys($data['filter']['groups'])))
+					->setAttribute('data-groupids', json_encode(array_column($data['filter']['groups'], 'id')))
 					->setId('js-create'))
 			->addItem((new CSimpleButton(_('Import')))->setId('js-import'))
 	))->setAttribute('aria-label', _('Content controls')));
@@ -73,46 +73,46 @@ $filter = (new CFilter())
 					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				)
 			])
-		->addItem([
-			(new CLabel(_('Linked templates'), 'filter_templates__ms')),
-			new CFormField(
-				(new CMultiSelect([
-					'name' => 'filter_templates[]',
-					'object_name' => 'templates',
-					'data' => $data['filter']['templates'],
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'templates',
-							'srcfld1' => 'hostid',
-							'srcfld2' => 'host',
-							'dstfrm' => CFilter::FORM_NAME,
-							'dstfld1' => 'filter_templates_'
+			->addItem([
+				(new CLabel(_('Linked templates'), 'filter_templates__ms')),
+				new CFormField(
+					(new CMultiSelect([
+						'name' => 'filter_templates[]',
+						'object_name' => 'templates',
+						'data' => $data['filter']['templates'],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'templates',
+								'srcfld1' => 'hostid',
+								'srcfld2' => 'host',
+								'dstfrm' => CFilter::FORM_NAME,
+								'dstfld1' => 'filter_templates_'
+							]
 						]
-					]
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-		])
-		->addItem([
-			new CLabel(_('Name'), 'filter_name'),
-			new CFormField((new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
-		])
-		->addItem([
-			new CLabel(_('Vendor'), 'filter_vendor_name'),
-			new CFormField(
-				(new CTextBox('filter_vendor_name', $data['filter']['vendor_name'], false,
-					DB::getFieldLength('hosts', 'vendor_name')
-				))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-		])
-		->addItem([
-			new CLabel(_('Version'), 'filter_vendor_version'),
-			new CFormField(
-				(new CTextBox('filter_vendor_version', $data['filter']['vendor_version'], false,
-					DB::getFieldLength('hosts', 'vendor_version'))
-				)->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-		]),
-
+					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				)
+			])
+			->addItem([
+				new CLabel(_('Name'), 'filter_name'),
+				new CFormField((new CTextBox('filter_name', $data['filter']['name']))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
+			])
+			->addItem([
+				new CLabel(_('Vendor'), 'filter_vendor_name'),
+				new CFormField(
+					(new CTextBox('filter_vendor_name', $data['filter']['vendor_name'], false,
+						DB::getFieldLength('hosts', 'vendor_name')
+					))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				)
+			])
+			->addItem([
+				new CLabel(_('Version'), 'filter_vendor_version'),
+				new CFormField(
+					(new CTextBox('filter_vendor_version', $data['filter']['vendor_version'], false,
+						DB::getFieldLength('hosts', 'vendor_version')
+					))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				)
+			]),
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([new CLabel(_('Tags')), new CFormField($filter_tags_table)])
@@ -120,191 +120,18 @@ $filter = (new CFilter())
 
 $html_page->addItem($filter);
 
+$csrf_token = CCsrfTokenHelper::get('template');
+
 $form = (new CForm())
 	->setName('templates');
 
-// Create table.
-$table = (new CTableInfo())
-	->setHeader([
-		(new CColHeader(
-			(new CCheckBox('all_templates'))->onClick("checkAll('".$form->getName()."', 'all_templates', 'templates');")
-		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['sort_order'], $action_url->getUrl()),
-		_('Hosts'),
-		_('Items'),
-		_('Triggers'),
-		_('Graphs'),
-		_('Dashboards'),
-		_('Discovery'),
-		_('Web'),
-		_('Vendor'),
-		_('Version'),
-		_('Linked templates'),
-		_('Linked to templates'),
-		_('Tags')
-	])
-	->setPageNavigation($data['paging']);
-
-foreach ($data['templates'] as $template) {
-	$template_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'popup')
-		->setArgument('popup', 'template.edit')
-		->setArgument('templateid', $template['templateid'])
-		->getUrl();
-
-	$name = new CLink($template['name'], $template_url);
-
-	$linked_templates_output = [];
-	$linked_to_output = [];
-
-	$i = 0;
-	foreach ($template['parentTemplates'] as $parent_template) {
-		$i++;
-
-		if ($i > $data['config']['max_in_table']) {
-			$linked_templates_output[] = [' ', HELLIP()];
-
-			break;
-		}
-
-		if ($linked_templates_output) {
-			$linked_templates_output[] = ', ';
-		}
-
-		if (array_key_exists($parent_template['templateid'], $data['editable_templates'])) {
-			$linked_template_url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'popup')
-				->setArgument('popup', 'template.edit')
-				->setArgument('templateid', $parent_template['templateid'])
-				->getUrl();
-
-			$linked_templates_output[] = (new CLink($parent_template['name'], $linked_template_url))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
-		}
-		else {
-			$linked_templates_output[] = (new CSpan($parent_template['name']))
-				->addClass(ZBX_STYLE_GREY);
-		}
-	}
-
-	$i = 0;
-	foreach ($template['templates'] as $child_template) {
-		$i++;
-
-		if ($i > $data['config']['max_in_table']) {
-			$linked_to_output[] = [' ', HELLIP()];
-
-			break;
-		}
-
-		if ($linked_to_output) {
-			$linked_to_output[] = ', ';
-		}
-
-		if (array_key_exists($child_template['templateid'], $data['editable_templates'])) {
-			$linked_to_url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'popup')
-				->setArgument('popup', 'template.edit')
-				->setArgument('templateid', $child_template['templateid'])
-				->getUrl();
-
-			$linked_to_output[] = (new CLink($child_template['name'], $linked_to_url))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
-		}
-		else {
-			$linked_to_output[] = (new CSpan($child_template['name']))
-				->addClass(ZBX_STYLE_GREY);
-		}
-	}
-
-	$table->addRow([
-		new CCheckBox('templates['.$template['templateid'].']', $template['templateid']),
-		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		[
-			$data['allowed_ui_conf_hosts']
-				? new CLink(_('Hosts'),
-					(new CUrl('zabbix.php'))
-						->setArgument('action', 'host.list')
-						->setArgument('filter_set', '1')
-						->setArgument('filter_templates', [$template['templateid']])
-				)
-				: _('Hosts'),
-			CViewHelper::showNum(count(array_intersect_key($template['hosts'], $data['editable_hosts'])))
-		],
-		[
-			new CLink(_('Items'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'item.list')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$template['templateid']])
-					->setArgument('context', 'template')
-			),
-			CViewHelper::showNum($template['items'])
-		],
-		[
-			new CLink(_('Triggers'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'trigger.list')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$template['templateid']])
-					->setArgument('context', 'template')
-			),
-			CViewHelper::showNum($template['triggers'])
-		],
-		[
-			new CLink(_('Graphs'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'graph.list')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$template['templateid']])
-					->setArgument('context', 'template')
-			),
-			CViewHelper::showNum($template['graphs'])
-		],
-		[
-			new CLink(_('Dashboards'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'template.dashboard.list')
-					->setArgument('templateid', $template['templateid'])
-					->setArgument('context', 'template')
-			),
-			CViewHelper::showNum($template['dashboards'])
-		],
-		[
-			new CLink(_('Discovery'),
-				(new CUrl('host_discovery.php'))
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$template['templateid']])
-					->setArgument('context', 'template')
-			),
-			CViewHelper::showNum($template['discoveryRules'])
-		],
-		[
-			new CLink(_('Web'),
-				(new CUrl('httpconf.php'))
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$template['templateid']])
-					->setArgument('context', 'template')
-			),
-			CViewHelper::showNum($template['httpTests'])
-		],
-		$template['vendor_name'],
-		$template['vendor_version'],
-		$linked_templates_output,
-		$linked_to_output,
-		(new CDiv($data['tags'][$template['templateid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
-	]);
-}
-
 $form->addItem([
-	$table,
-	new CActionButtonList('action', 'templates', [
+	(new CDataTable())->setId('templates'),
+	(new CActionButtonList('action', 'templates', [
 		'template.export' => [
 			'content' => new CButtonExport('export.templates',
 				(new CUrl('zabbix.php'))
-					->setArgument('action', 'templates.list')
+					->setArgument('action', 'template.list')
 					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
 					->getUrl()
 			)
@@ -327,13 +154,29 @@ $form->addItem([
 				->addClass('js-massdelete-clear')
 				->addClass('js-no-chkbxrange')
 		]
-	], 'templates')
+	], 'templates'))->setAddSelectedCountElement(false)
 ]);
 
-$html_page
-	->addItem($form)
-	->show();
+$html_page->addItem($form);
 
-(new CScriptTag('view.init();'))
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	$html_page->addItem((new CPre())->addClass(ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH));
+}
+
+$html_page->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'csrf_token' => $csrf_token,
+		'default_sort_field' => $data['default_sort_field'],
+		'default_sort_order' => $data['default_sort_order'],
+		'filter' => $data['filter'],
+		'page' => $data['page'],
+		'sort_field' => $data['sort_field'],
+		'sort_order' => $data['sort_order'],
+		'storage_idx' => $data['storage_idx'],
+		'user_configs' => $data['user_configs']
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();

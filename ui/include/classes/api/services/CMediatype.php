@@ -398,7 +398,7 @@ class CMediatype extends CApiService {
 	 * @return array
 	 */
 	public function create(array $mediatypes): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (!CMediatypeHelper::getSupportedMediaTypes() || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'mediatype', __FUNCTION__)
 			);
@@ -446,7 +446,7 @@ class CMediatype extends CApiService {
 	 * @return array
 	 */
 	public function update(array $mediatypes): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (!CMediatypeHelper::getSupportedMediaTypes() || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'mediatype', __FUNCTION__)
 			);
@@ -498,6 +498,7 @@ class CMediatype extends CApiService {
 		$db_mediatypes = $this->get([
 			'output' => array_diff(self::OUTPUT_FIELDS, ['parameters']),
 			'mediatypeids' => array_column($mediatypes, 'mediatypeid'),
+			'filter' => ['type' => CMediatypeHelper::getSupportedMediaTypes()],
 			'preservekeys' => true
 		]);
 
@@ -524,7 +525,7 @@ class CMediatype extends CApiService {
 			: [];
 
 		return ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['name']], 'fields' => $specific_fields + [
-			'type' =>					['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK])],
+			'type' =>					['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', CMediatypeHelper::getSupportedMediaTypes())],
 			'name' =>					['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'name')],
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED])],
 			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
@@ -813,11 +814,11 @@ class CMediatype extends CApiService {
 		$api_required = $is_update ? 0 : API_REQUIRED;
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'redirection_url' =>		['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'redirection_url')],
+			'redirection_url' =>		['type' => API_URL, 'flags' => $api_required | API_NOT_EMPTY, 'schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES, 'length' => DB::getFieldLength('media_type_oauth', 'redirection_url')],
 			'client_id' =>				['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'client_id')],
 			'client_secret' =>			['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'client_secret')],
-			'authorization_url' =>		['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'authorization_url')],
-			'token_url' =>				['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'token_url')],
+			'authorization_url' =>		['type' => API_URL, 'flags' => $api_required | API_NOT_EMPTY, 'schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES, 'length' => DB::getFieldLength('media_type_oauth', 'authorization_url')],
+			'token_url' =>				['type' => API_URL, 'flags' => $api_required | API_NOT_EMPTY, 'schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES, 'length' => DB::getFieldLength('media_type_oauth', 'token_url')],
 			'tokens_status' =>			['type' => API_INT32, 'in' => implode(':', [0, OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID])],
 			'access_token' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_oauth', 'access_token')],
 			'access_token_updated' =>	['type' => API_TIMESTAMP],
@@ -1281,6 +1282,7 @@ class CMediatype extends CApiService {
 		$db_mediatypes = DB::select('media_type', [
 			'output' => ['mediatypeid', 'name'],
 			'mediatypeids' => $mediatypeids,
+			'filter' => ['type' => CMediatypeHelper::getSupportedMediaTypes()],
 			'preservekeys' => true
 		]);
 

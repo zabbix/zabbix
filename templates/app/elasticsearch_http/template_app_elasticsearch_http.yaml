@@ -42,7 +42,7 @@ zabbix_export:
         3. If you use an atypical location of ES API, don't forget to change the host wizard configuration fields `Elasticsearch scheme`,`Elasticsearch port`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
       items:
@@ -1696,12 +1696,12 @@ zabbix_export:
             description: 'The maximum percent in the use of JVM heap for warning trigger expression. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ELASTICSEARCH.HOST}'
-          description: 'The hostname or IP address of the Elasticsearch host.'
+          description: 'Elasticsearch host.'
           config:
             type: TEXT
             priority: '3'
             label: 'Elasticsearch host'
-            description: 'The hostname or IP address of the Elasticsearch host.'
+            description: 'Elasticsearch host.'
             required: 'YES'
         - macro: '{$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}'
           value: '100'
@@ -1714,21 +1714,22 @@ zabbix_export:
             description: 'Maximum of indexing latency in milliseconds for trigger expression.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ELASTICSEARCH.PASSWORD}'
-          description: 'The password of the Elasticsearch.'
+          type: SECRET_TEXT
+          description: 'Elasticsearch password.'
           config:
             type: TEXT
             priority: '2'
             label: 'Elasticsearch password'
-            description: 'The password of the Elasticsearch.'
+            description: 'Elasticsearch password.'
             required: 'YES'
         - macro: '{$ELASTICSEARCH.PORT}'
           value: '9200'
-          description: 'The port of the Elasticsearch host.'
+          description: 'Elasticsearch port.'
           config:
             type: TEXT
             priority: '4'
             label: 'Elasticsearch port'
-            description: 'The port of the Elasticsearch host. In the range from 1 to 65535 inclusive.'
+            description: 'Elasticsearch port. In the range from 1 to 65535 inclusive.'
             required: 'YES'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}'
@@ -1752,12 +1753,12 @@ zabbix_export:
             description: 'The ES cluster maximum response time in seconds for trigger expression.'
         - macro: '{$ELASTICSEARCH.SCHEME}'
           value: http
-          description: 'The scheme of the Elasticsearch (http/https).'
+          description: 'Elasticsearch HTTP scheme.'
           config:
             type: LIST
             priority: '5'
             label: 'Elasticsearch scheme'
-            description: 'The scheme of the Elasticsearch (http/https).'
+            description: 'Elasticsearch HTTP scheme.'
             required: 'YES'
             options:
               - value: http
@@ -1774,12 +1775,12 @@ zabbix_export:
             label: 'Single node JVM minimum space (bytes)'
             description: 'Minimum free space available to JVM in single node instance in bytes for trigger expression.'
         - macro: '{$ELASTICSEARCH.USERNAME}'
-          description: 'The username of the Elasticsearch.'
+          description: 'Elasticsearch username.'
           config:
             type: TEXT
             priority: '1'
             label: 'Elasticsearch username'
-            description: 'The username of the Elasticsearch.'
+            description: 'Elasticsearch username.'
             required: 'YES'
       valuemaps:
         - uuid: d651bdf75d0849d5ab2b0802fab76e22
