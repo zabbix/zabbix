@@ -235,7 +235,7 @@ class testSystemInformation extends CWebTest {
 
 		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
-				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
+				[$this->query('xpath://table[@class="list-table sticky-header rounded-surface"]/tbody/tr[3]/td[1]')->one()]
 		);
 
 		// Check and hide the text of messages, because they contain ip addresses of the current host.
@@ -265,7 +265,7 @@ class testSystemInformation extends CWebTest {
 		if ($dashboardid !== null) {
 			CDashboardElement::find()->waitUntilReady();
 		}
-		$table = $this->query('xpath://table[@class="list-table sticky-header"]')->asTable()->waitUntilVisible()->one();
+		$table = $this->query('xpath://table[@class="list-table sticky-header rounded-surface"]')->asTable()->waitUntilVisible()->one();
 
 		// Check that before failover delay passes frontend thinks that Zabbix server is running.
 		$this->assertEquals('Yes', $table->findRow('Parameter', 'Zabbix server is running')->getColumn('Value')->getText());
