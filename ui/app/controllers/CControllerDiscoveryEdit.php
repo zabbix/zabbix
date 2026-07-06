@@ -145,10 +145,10 @@ class CControllerDiscoveryEdit extends CController {
 			? CControllerDiscoveryCreate::getValidationRules()
 			: CControllerDiscoveryUpdate::getValidationRules();
 
+		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();
 		$data['js_clone_validation_rules'] = (new CFormValidator(CControllerDiscoveryCreate::getValidationRules()))
 			->getRules();
 
-		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of discovery rules'));
 		$this->setResponse($response);

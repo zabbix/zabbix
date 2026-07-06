@@ -114,6 +114,7 @@ window.drule_edit_popup = new class {
 
 	#updateCheck(row, input) {
 		delete input.dchecks;
+		input.dcheckid = row.id.substring(row.id.indexOf('_') + 1);
 		input.warning = row.querySelector('.btn-icon')?.getAttribute('data-hintbox-html');
 
 		this.#addCheck(input, row, true);
@@ -124,13 +125,10 @@ window.drule_edit_popup = new class {
 	}
 
 	#editCheck(row = null) {
-		let params = {
-			dcheckid: this.#dcheckid
-		};
+		let params = {};
 
 		if (row !== null) {
 			params = {
-				dcheckid: this.#dcheckid,
 				update: 1
 			};
 
@@ -157,7 +155,7 @@ window.drule_edit_popup = new class {
 			}
 		}
 
-		params.dchecks = JSON.stringify(Object.values(dchecks));
+		params.dchecks = dchecks;
 
 		const overlay = PopUp('discovery.check.edit', params, {
 			dialogueid: 'discovery-check',
@@ -169,7 +167,8 @@ window.drule_edit_popup = new class {
 				this.#updateCheck(row, e.detail);
 			}
 			else {
-				this.#dcheckid = getUniqueId()
+				e.detail.dcheckid = this.#dcheckid;
+				this.#dcheckid = getUniqueId();
 				this.#addCheck(e.detail, null);
 				this.#form.discoverAllFields();
 			}
@@ -304,10 +303,6 @@ window.drule_edit_popup = new class {
 	#addInputFields(input) {
 		for (let field_name in input) {
 			if (input.hasOwnProperty(field_name)) {
-				if (field_name === 'dcheckid' && !/^\d+$/.test(String(input[field_name]))) {
-					continue;
-				}
-
 				const input_element = document.createElement('input');
 				input_element.name = `dchecks[${input.dcheckid}][${field_name}]`;
 				input_element.type = 'hidden';

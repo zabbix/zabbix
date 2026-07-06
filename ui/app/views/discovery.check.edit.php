@@ -26,7 +26,23 @@ $inline_js = getPagePostJs().$this->readJsFile('discovery.check.edit.js.php');
 
 $form = (new CForm())->addStyle('display: none;');
 
-$form->addVar('dchecks', $data['dchecks']);
+$dchecks = array_values($data['dchecks'] ?? []);
+
+foreach ($dchecks as $index => $dcheck) {
+	if (!is_array($dcheck)) {
+		continue;
+	}
+
+	foreach ($dcheck as $key => $value) {
+		if ($key === 'dcheckid' || $key === 'uniq' || $key === 'host_source' || $key === 'name_source' || $key === 'warning') {
+			continue;
+		}
+
+		$name = sprintf('dchecks[%s][%s]', $index, $key);
+		$form->addVar($name, $value);
+	}
+}
+
 
 if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']) {
 	$form->addVar('dcheckid', $data['params']['dcheckid']);
@@ -156,7 +172,9 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Allow redirect'), 'allow_redirect'))->setId('allow_redirect_label'),
 		(new CFormField(
-			(new CCheckBox('allow_redirect'))->setChecked($data['params']['allow_redirect'] == 1)
+			(new CCheckBox('allow_redirect'))
+				->setChecked($data['params']['allow_redirect'] == 1)
+				->setUncheckedValue(0)
 		))->setId('allow_redirect_field')
 	]);
 

@@ -50,9 +50,8 @@ class CControllerDiscoveryUpdate extends CController {
 				'when' => ['concurrency_max_type', 'in' => [ZBX_DISCOVERY_CHECKS_CUSTOM]]
 			],
 			'dchecks' => ['objects', 'required', 'not_empty',
-				'uniq' => ['type', 'ports', 'key_', 'snmp_community', 'allow_redirect'],
+				'uniq' => ['type', 'ports', 'key_', 'snmp_community', 'snmpv3_privpassphrase', 'allow_redirect'],
 				'fields' => [
-					'dcheckid' => ['db dchecks.type'],
 					'type' => ['db dchecks.type', 'required',
 						'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,
 							SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET
@@ -130,25 +129,31 @@ class CControllerDiscoveryUpdate extends CController {
 					'allow_redirect' => ['db dchecks.allow_redirect', 'required', 'in' => [0, 1],
 						'when' => ['type', 'in' => [SVC_ICMPPING]]
 					],
-					'uniq' => ['boolean', 'in' => [0, 1],
+					'uniq' => ['boolean',
 						'when' => ['type', 'in' => [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
 					],
 					'host_source' => [
 						['db dchecks.host_source',
-							'in' => [ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP]
+							'in' => [ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE]
 						],
-						['db dchecks.host_source',
-							'in' => [ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE],
-							'when' => ['type', 'in' => [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
+						['db dchecks.host_source', 'not_in' => [ZBX_DISCOVERY_VALUE],
+							'when' => ['type',
+								'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP,
+									SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_ICMPPING, SVC_HTTPS, SVC_TELNET
+								]
+							]
 						]
 					],
 					'name_source' => [
 						['db dchecks.name_source',
-							'in' => [ZBX_DISCOVERY_UNSPEC, ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP]
+							'in' => [ZBX_DISCOVERY_UNSPEC, ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE]
 						],
-						['db dchecks.name_source',
-							'in' => [ZBX_DISCOVERY_UNSPEC, ZBX_DISCOVERY_DNS, ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE],
-							'when' => ['type', 'in' => [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
+						['db dchecks.name_source', 'not_in' => [ZBX_DISCOVERY_VALUE],
+							'when' => ['type',
+								'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP,
+									SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_ICMPPING, SVC_HTTPS, SVC_TELNET
+								]
+							]
 						]
 					]
 				],
