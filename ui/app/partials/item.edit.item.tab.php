@@ -23,9 +23,6 @@ $item = $data['item'];
 $readonly = $item['templated'] || $item['discovered'];
 $parent_lld_link = null;
 
-$valuemap_prefix = $item['parent_items'] ? $item['parent_items'][0]->items[0].NAME_DELIMITER
-	: ($item['context'] === 'host' ? '' : $data['host']['name'].NAME_DELIMITER);
-
 if ($item['discovered']) {
 	$parent_lld = $item['discoveryRule'] ?: $item['discoveryRulePrototype'];
 
@@ -814,7 +811,7 @@ $formgrid
 				'data' => $item['valuemap']
 					? [[
 						'id' => $item['valuemap']['valuemapid'],
-						'prefix' => $valuemap_prefix,
+						'prefix' => $item['valuemap']['prefix'] ?? '',
 						'name' => $item['valuemap']['name']
 					]]
 					: [],
