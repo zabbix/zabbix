@@ -1731,8 +1731,14 @@ int	zbx_ipc_client_send(zbx_ipc_client_t *client, zbx_uint32_t code, const unsig
 	{
 		client->tx_header[ZBX_IPC_MESSAGE_CODE] = code;
 		client->tx_header[ZBX_IPC_MESSAGE_SIZE] = size;
-		client->tx_data = (unsigned char *)zbx_malloc(NULL, size);
-		memcpy(client->tx_data, data, size);
+		if (0 != size)
+		{
+			client->tx_data = (unsigned char *)zbx_malloc(NULL, size);
+			memcpy(client->tx_data, data, size);
+		}
+		else
+			client->tx_data = NULL;
+
 		client->tx_bytes = ZBX_IPC_HEADER_SIZE + size - tx_size;
 		event_add(client->tx_event, NULL);
 	}

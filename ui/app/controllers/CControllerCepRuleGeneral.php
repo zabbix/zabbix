@@ -63,14 +63,15 @@ abstract class CControllerCepRuleGeneral extends CController {
 		}
 
 		if (array_key_exists('window', $request)) {
-			if (array_key_exists('capacity_enabled', $request['window'])) {
-				unset($request['window']['capacity_enabled']);
+			if ($request['window']['capacity_enabled'] == 0) {
+				$request['window']['capacity'] = '0';
 			}
+
+			unset($request['window']['capacity_enabled']);
 
 			if (array_key_exists('event_count_tag_enabled', $request['window'])) {
 				unset($request['window']['event_count_tag_enabled']);
 			}
-
 
 			// TODO: awaiting API changes.. remapping.
 			if (array_key_exists(0, $request['window']['tags'] ?? [])) {
