@@ -59,7 +59,7 @@ class CCepRule extends CApiService {
 			// Filter.
 			'cep_ruleids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getFilterFields('cep_rule', self::OUTPUT_FIELDS), ['window_type'])],
-			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getSearchFields('cep_rule', self::OUTPUT_FIELDS), DB::getSearchFields('cep_rule_rtdata', ['error']))],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getSearchFields('cep_rule', self::OUTPUT_FIELDS), DB::getSearchFields('cep_rule_rtdata', self::OUTPUT_FIELDS))],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_BOOLEAN, 'default' => false],
 			'excludeSearch' =>			['type' => API_BOOLEAN, 'default' => false],
@@ -210,6 +210,7 @@ class CCepRule extends CApiService {
 				$filter['conditions'] = array_values($conditions);
 			}
 		}
+		unset($cep_rule);
 	}
 
 	private static function addRelatedWindow(array $options, array &$cep_rules): void {
