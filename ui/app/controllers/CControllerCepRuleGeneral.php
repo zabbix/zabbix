@@ -167,11 +167,21 @@ abstract class CControllerCepRuleGeneral extends CController {
 						CCepRuleHelper::WINDOW_PATTERN_MATCH
 					]]
 				],
-				'group_by_tag' => ['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
-					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
-						CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
-						CCepRuleHelper::WINDOW_PATTERN_MATCH
-					]]
+				'group_by_tag' => [
+					['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
+						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
+							CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
+							CCepRuleHelper::WINDOW_PATTERN_MATCH
+						]]
+					],
+					['integer', 'required', 'in' => [CCepRuleHelper::GROUP_BY_YES],
+						'messages' => ['in' => _('At least one of "Group by" options must be selected.')],
+						'when' => [
+							['../window_type', 'in' => [CCepRuleHelper::WINDOW_CAUSE_SYMPTOM]],
+							['group_by_host', 'in' => [CCepRuleHelper::GROUP_BY_NO]],
+							['group_by_host_group', 'in' => [CCepRuleHelper::GROUP_BY_NO]]
+						]
+					]
 				],
 				'tags' => ['array', 'required', 'not_empty', 'field' => ['string', 'not_empty'],
 					'when' => ['group_by_tag', 'in' => [CCepRuleHelper::GROUP_BY_YES]]

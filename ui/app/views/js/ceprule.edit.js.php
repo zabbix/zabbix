@@ -279,6 +279,14 @@ window.ceprule_edit_popup = new class {
 			.find(node => node.checked);
 		const type = Number(input.value);
 
+
+		// TODO: why are these fields initally in changed state although no interaction yet?
+		if (this.form.findFieldByName('window[group_by_host]')._changed
+				|| this.form.findFieldByName('window[group_by_host_group]')._changed
+				|| this.form.findFieldByName('window[group_by_tag]')._changed) {
+			this.form.validateChanges(['window[group_by_tag]']);
+		}
+
 		window['ceprule-operations-label']
 			.classList.toggle('form-label-asterisk', type != <?= CCepRuleHelper::WINDOW_CAUSE_SYMPTOM ?>);
 
