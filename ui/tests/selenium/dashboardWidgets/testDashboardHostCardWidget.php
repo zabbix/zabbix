@@ -1329,7 +1329,7 @@ class testDashboardHostCardWidget extends testWidgets {
 
 			foreach ($availabilities as $availability) {
 				$availability->click();
-				$dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+				$dialog = $this->query('css:div.overlay-dialogue.wordbreak')->asOverlayDialog()
 						->waitUntilPresent()->one();
 				$this->assertTrue($dialog->isVisible());
 				$dialog->close();
