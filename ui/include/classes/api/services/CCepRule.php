@@ -223,36 +223,18 @@ class CCepRule extends CApiService {
 		}
 		unset($cep_rule);
 
-		$has_filter = in_array('filter', $options['selectWindow']);
-		$output_fields = ['cep_ruleid'];
-
-		if ($has_filter) {
-			$output_fields = array_merge($output_fields, ['evaltype', 'formula']);
-			unset($options['selectWindow'][array_search('filter', $options['selectWindow'])]);
-		}
-
 		$window_options = [
-			'output' => array_merge($output_fields, $options['selectWindow']),
+			'output' => array_merge(['cep_ruleid'], $options['selectWindow']),
 			'filter' => ['cep_ruleid' => array_keys($cep_rules)]
 		];
 		$resource = DBselect(DB::makeSql('cep_window', $window_options));
 
-		$window_ruleids = [];
 		while ($row = DBfetch($resource)) {
-			$window = array_diff_key($row, array_flip(['cep_ruleid', 'formula', 'evaltype']));
-
-			if ($has_filter) {
-				$window['filter'] = [
-					'evaltype' => $row['evaltype'],
-					'formula' => $row['formula'],
-					'eval_formula' => '',
-					'conditions' => []
-				];
-
-				$window_ruleids[$row['cep_ruleid']] = true;
+			if (array_key_exists('tags', $row)) {
+				$row['tags'] = $row['tags'] !== '' ? explode('\n', $row['tags']) : [];
 			}
 
-			$cep_rules[$row['cep_ruleid']]['window'] = $window;
+			$cep_rules[$row['cep_ruleid']]['window'] = array_diff_key($row, array_flip(['cep_ruleid']));
 		}
 	}
 
