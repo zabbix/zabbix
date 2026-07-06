@@ -4451,8 +4451,7 @@ section {
   .skip-link:focus-visible {
     left: 10px;
     overflow: visible;
-    height: auto;
-    border-bottom-width: 1px; }
+    height: auto; }
 
 .status-na-bg,
 .status-info-bg,

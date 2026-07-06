@@ -10,6 +10,13 @@
 		left: 10px;
 		overflow: visible;
 		height: auto;
-		border-bottom-width: 1px;
+	}
+}
+
+@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
+	.skip-link {
+		&:focus-visible {
+			border-bottom-width: 1px;
+		}
 	}
 }
