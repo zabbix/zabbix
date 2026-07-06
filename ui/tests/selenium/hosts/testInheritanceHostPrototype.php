@@ -397,7 +397,6 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'host_prototype' => 'Host prototype for Clone {#TEST}',
 					'discovery' => 'Discovery rule for host prototype test',
 					'cloned_name' => 'Cloned host prototype without macro',
-					'create_enabled' => true,
 					'error_inline' => [
 						'id:host' => 'This field must contain at least one low-level discovery macro.'
 					]
@@ -409,7 +408,6 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'host_prototype' => 'Host prototype for Clone {#TEST}',
 					'discovery' => 'Discovery rule for host prototype test',
 					'cloned_name' => ' ',
-					'create_enabled' => true,
 					'error_inline' => [
 						'id:host' => 'This field cannot be empty.'
 					]
@@ -504,6 +502,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 
 		if (array_key_exists('error_inline', $data)) {
+			$dialog->waitUntilTextPresent(array_values($data['error_inline'])[0]);
+
 			$this->assertInlineError($dialog->waitUntilReady()->asForm(), $data['error_inline']);
 		}
 		else {

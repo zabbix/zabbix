@@ -111,6 +111,7 @@ class CSettingsHelper {
 	public const SOFTWARE_UPDATE_CHECK_DATA = 'software_update_check_data';
 	public const BANNER_DATA = 'banner_data';
 	public const HA_FAILOVER_DELAY = 'ha_failover_delay';
+	public const SERVER_ID = 'serverid';
 
 	private static $params = [];
 	private static $params_public = [];
@@ -159,7 +160,7 @@ class CSettingsHelper {
 					'auditlog_enabled', 'auditlog_mode',
 
 					// Read-only parameters.
-					'ha_failover_delay'
+					'ha_failover_delay', 'serverid'
 				]
 			]);
 

@@ -78,7 +78,7 @@ class testRole extends CAPITest {
 			[
 				'role' => [
 					'name' => 'role-with-all-ui-elements',
-					'type' => '3',
+					'type' => '3', // USER_TYPE_SUPER_ADMIN
 					'rules' => [
 						'ui' => [
 							[
@@ -138,6 +138,10 @@ class testRole extends CAPITest {
 								'status' => '1'
 							],
 							[
+								'name' => 'reports.system_info',
+								'status' => '1'
+							],
+							[
 								'name' => 'reports.notifications',
 								'status' => '1'
 							],
@@ -183,10 +187,6 @@ class testRole extends CAPITest {
 							],
 							[
 								'name' => 'configuration.internal_actions',
-								'status' => '1'
-							],
-							[
-								'name' => 'reports.system_info',
 								'status' => '1'
 							],
 							[
@@ -329,15 +329,30 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
+					'name' => 'zabbix-admin-allowed-systeminfo',
+					'type' => '2', // USER_TYPE_ZABBIX_ADMIN
+					'rules' => [
+						'ui' => [
+							[
+								'name' => 'reports.system_info',
+								'status' => '1'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'role' => [
 					'name' => 'New role',
-					'type' => '1'
+					'type' => '1' // USER_TYPE_ZABBIX_USER
 				],
 				'expected_error' => null
 			],
 			[
 				'role' => [
 					'name' => '☺',
-					'type' => '2'
+					'type' => '2' // USER_TYPE_ZABBIX_ADMIN
 				],
 				'expected_error' => null
 			],
@@ -351,14 +366,14 @@ class testRole extends CAPITest {
 			[
 				'role' => [
 					'name' => 'Роль пользователя',
-					'type' => '1'
+					'type' => '1' // USER_TYPE_ZABBIX_USER
 				],
 				'expected_error' => null
 			],
 			[
 				'role' => [
 					'name' => 'New/Nested',
-					'type' => '1'
+					'type' => '1' // USER_TYPE_ZABBIX_USER
 				],
 				'expected_error' => null
 			],
@@ -374,14 +389,14 @@ class testRole extends CAPITest {
 			[
 				'role' => [
 					'name' => '',
-					'type' => '1'
+					'type' => '1' // USER_TYPE_ZABBIX_USER
 				],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
 				'role' => [
 					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
-					'type' => '1'
+					'type' => '1' // USER_TYPE_ZABBIX_USER
 				],
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
@@ -389,7 +404,7 @@ class testRole extends CAPITest {
 			[
 				'role' => [
 					'name' => 'Super admin role',
-					'type' => '1'
+					'type' => '1' // USER_TYPE_ZABBIX_USER
 				],
 				'expected_error' => 'User role "Super admin role" already exists.'
 			],
@@ -427,6 +442,21 @@ class testRole extends CAPITest {
 				],
 				'expected_error' =>
 					'UI element "configuration.actions" is not available for user role "role-with-invalid-ui-elements".'
+			],
+			[
+				'role' => [
+					'name' => 'zabbix-user-not-allowed-systeminfo',
+					'type' => '1', // USER_TYPE_ZABBIX_USER
+					'rules' => [
+						'ui' => [
+							[
+								'name' => 'reports.system_info',
+								'status' => '1'
+							]
+						]
+					]
+				],
+				'expected_error' => 'UI element "reports.system_info" is not available for user role "zabbix-user-not-allowed-systeminfo".'
 			]
 		];
 	}
@@ -522,7 +552,7 @@ class testRole extends CAPITest {
 				'role' => [
 					'roleid' => ':role:second-role-for-update',
 					'name' => 'Successfully updated role',
-					'type' => '2'
+					'type' => '2' // USER_TYPE_ZABBIX_ADMIN
 				],
 				'expected_error' => null
 			],
@@ -550,6 +580,23 @@ class testRole extends CAPITest {
 			[
 				'role' => [
 					'roleid' => ':role:first-role-for-update',
+					'roleid' => 'zabbix-admin-role',
+					'name' => 'zabbix-admin-role',
+					'type' => 2, // USER_TYPE_ZABBIX_ADMIN
+					'rules' => [
+						'ui' => [
+							[
+								'name' => 'reports.system_info',
+								'status' => '1'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'role' => [
+					'roleid' => 'roleid_3',
 					'name' => 'non existent parameter',
 					'type' => '4'
 				],
@@ -641,6 +688,22 @@ class testRole extends CAPITest {
 				],
 				'expected_error' =>
 					'UI element "services.actions" is not available for user role "Unknown ui element".'
+			],
+			[
+				'role' => [
+					'roleid' => 'zabbix-user-role',
+					'name' => 'zabbix-user-role',
+					'type' => 1, // USER_TYPE_ZABBIX_USER
+					'rules' => [
+						'ui' => [
+							[
+								'name' => 'reports.system_info',
+								'status' => '1'
+							]
+						]
+					]
+				],
+				'expected_error' => 'UI element "reports.system_info" is not available for user role "zabbix-user-role".'
 			]
 		];
 	}
@@ -769,6 +832,10 @@ class testRole extends CAPITest {
 									'status' => '1'
 								],
 								[
+									'name' => 'reports.system_info',
+									'status' => '1'
+								],
+								[
 									'name' => 'reports.notifications',
 									'status' => '1'
 								],
@@ -810,10 +877,6 @@ class testRole extends CAPITest {
 								],
 								[
 									'name' => 'configuration.internal_actions',
-									'status' => '1'
-								],
-								[
-									'name' => 'reports.system_info',
 									'status' => '1'
 								],
 								[
@@ -963,5 +1026,112 @@ class testRole extends CAPITest {
 
 	public static function cleanTestData(): void {
 		CTestDataHelper::cleanUp();
+	/**
+	 * Test data used by tests.
+	 */
+	protected static $data = [
+		'roleids' => ['roleid_1', 'roleid_2', 'roleid_3', 'roleid_4', 'roleid_5', 'zabbix-user-role', 'zabbix-admin-role'],
+		'usergroupids' => ['usergroupid_1']
+	];
+
+	/**
+	 * Prepare data for tests.
+	 */
+	public function prepareTestData() {
+
+		$response = CDataHelper::call('role.create', [
+			[
+				'name' => 'used-role',
+				'type' => 2
+			],
+			[
+				'name' => 'deletable-role',
+				'type' => 1
+			],
+			[
+				'name' => 'first-role-for-update',
+				'type' => 3
+			],
+			[
+				'name' => 'second-role-for-update',
+				'type' => 3,
+				'rules' => [
+					'ui' => [
+						[
+							'name' => 'administration.macros',
+							'status' => '0'
+						],
+						[
+							'name' => 'administration.housekeeping',
+							'status' => '1'
+						]
+					],
+					'ui.default_access' => '0'
+				]
+			],
+			[
+				'name' => 'role-for-get',
+				'type' => 3,
+				'rules' => [
+					'ui' => [
+						[
+							'name' => 'configuration.discovery_actions',
+							'status' => '0'
+						],
+						[
+							'name' => 'configuration.internal_actions',
+							'status' => '1'
+						]
+					],
+					'ui.default_access' => '0'
+				]
+			],
+			[
+				'name' => 'zabbix-user-role',
+				'type' => 1, // USER_TYPE_ZABBIX_USER
+				'rules' => [
+					'ui' => [
+						[
+							'name' => 'monitoring.dashboard',
+							'status' => '1'
+						]
+					]
+				]
+			],
+			[
+				'name' => 'zabbix-admin-role',
+				'type' => 2, // USER_TYPE_ZABBIX_ADMIN
+				'rules' => [
+					'ui' => [
+						[
+							'name' => 'monitoring.dashboard',
+							'status' => '1'
+						]
+					]
+				]
+			]
+		]);
+
+		$this->assertArrayHasKey('roleids', $response);
+		self::$data['roleids'] = array_combine(self::$data['roleids'], $response['roleids']);
+
+		$response = CDataHelper::call('usergroup.create', [
+			[
+				'name' => 'user-group-used-for-role.delete-tests'
+			]
+		]);
+
+		$userGroupId = (int) $response['usrgrpids'][0];
+
+		CDataHelper::call('user.create', [
+			[
+				'username' => 'user-used-for-role.delete-tests',
+				'roleid' => self::$data['roleids']['roleid_1'],
+				'passwd' => 'Z@bb1x1234',
+				'usrgrps' => [
+						['usrgrpid' => $userGroupId]
+					]
+			]
+		]);
 	}
 }
