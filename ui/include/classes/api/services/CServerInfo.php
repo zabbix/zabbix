@@ -51,7 +51,7 @@ class CServerInfo extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if ($options['serverid'] !== CApiDpopHelper::getServerId()) {
+		if ($options['serverid'] !== CSettingsHelper::get(CSettingsHelper::SERVER_ID)) {
 			self::exception(ZBX_API_ERROR_NO_ENTITY, _s('Invalid parameter "%1$s": %2$s.', '/serverid',
 				_('object does not exist')
 			));

@@ -128,8 +128,7 @@ class CApiDpopHelper {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Missing htu claim.');
 		}
 
-		// todo - use method get server_id
-		$expected_htu = 'urn:zbx:'.self::getServerId().':'.$requested_api_method;
+		$expected_htu = 'urn:zbx:'.CSettingsHelper::get(CSettingsHelper::SERVER_ID).':'.$requested_api_method;
 
 		if (!hash_equals($expected_htu, $payload['htu'])) {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Invalid htu value.');
@@ -227,12 +226,6 @@ class CApiDpopHelper {
 		}
 
 		return true;
-	}
-
-	// todo - REMOVE THIS AFTER REPLACING WITH ORIGINAL METHODS
-
-	public static function getServerId(): string {
-		return '018f9c6a-7c1b-7f3a-9b2d-5c4f8e6a1d90';
 	}
 
 	/**

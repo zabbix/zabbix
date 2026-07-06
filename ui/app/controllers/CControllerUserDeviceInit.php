@@ -70,8 +70,7 @@ class CControllerUserDeviceInit extends CController {
 				'uuid' => $device['uuid'],
 				'url' => (new CUrl('zabbix://v' . ZABBIX_MOBILE_VERSION . '/link_device'))
 					->setArgument('ver', ZABBIX_API_VERSION)
-					// TODO: CSettingsHelper::getPrivate(CSettingsHelper::SERVER_ID)
-					->setArgument('sid', '018f9c6a-7c1b-7f3a-9b2d-5c4f8e6a1d90')
+					->setArgument('sid', CSettingsHelper::get(CSettingsHelper::SERVER_ID))
 					->setArgument('name',
 						APP::getConfig()['ZBX_SERVER_NAME'] === '' ? 'Zabbix' : APP::getConfig()['ZBX_SERVER_NAME']
 					)

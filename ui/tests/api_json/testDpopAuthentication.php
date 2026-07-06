@@ -17,6 +17,7 @@
 require_once __DIR__.'/../include/CAPITest.php';
 require_once __DIR__.'/../../include/classes/api/helpers/CApiTokenHelper.php';
 require_once __DIR__.'/../../include/classes/api/helpers/CApiDpopHelper.php';
+require_once __DIR__.'/../../include/classes/helpers/CSettingsHelper.php';
 
 /**
  * @onBefore prepareTestData
@@ -665,7 +666,8 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 		$time = time();
 
 		if (array_key_exists('htu_api_method', $dpop_data)) {
-			$payload['htu'] = 'urn:zbx:'.CApiDpopHelper::getServerId().':'.$dpop_data['htu_api_method'];
+			$payload['htu'] =
+				'urn:zbx:'.CSettingsHelper::get(CSettingsHelper::SERVER_ID).':'.$dpop_data['htu_api_method'];
 		}
 
 		if (array_key_exists('iat', $dpop_data)) {
