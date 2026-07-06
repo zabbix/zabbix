@@ -23,7 +23,7 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'type' => ['db media_type.type', 'required',
-				'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK]
+				'in' => CMediatypeHelper::getSupportedMediaTypes()
 			],
 			'name' => ['db media_type.name', 'required', 'not_empty'],
 			'provider' => ['db media_type.provider', 'in' => array_keys(CMediatypeHelper::getEmailProviders()),
@@ -106,6 +106,7 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 				]
 			],
 			'redirection_url' => ['db media_type_oauth.redirection_url', 'required', 'not_empty',
+				'use' => [CUrlValidator::class, ['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_EMAIL]],
 					['smtp_authentication', 'in' => [SMTP_AUTHENTICATION_OAUTH]],
@@ -128,6 +129,7 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 				]
 			],
 			'authorization_url' => ['db media_type_oauth.authorization_url', 'required', 'not_empty',
+				'use' => [CUrlValidator::class, ['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_EMAIL]],
 					['smtp_authentication', 'in' => [SMTP_AUTHENTICATION_OAUTH]],
@@ -136,6 +138,7 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 				'messages' => ['not_empty' => _('Invalid OAuth configuration')]
 			],
 			'token_url' => ['db media_type_oauth.token_url', 'required', 'not_empty',
+				'use' => [CUrlValidator::class, ['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_EMAIL]],
 					['smtp_authentication', 'in' => [SMTP_AUTHENTICATION_OAUTH]],
@@ -207,7 +210,10 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 				'when' => ['type', 'in' => [MEDIA_TYPE_WEBHOOK]]
 			],
 			'event_menu_url' =>	['db media_type.event_menu_url', 'required', 'not_empty',
-				// 'use' => [CHtmlUrlValidator::class, ['allow_event_tags_macro' => true, 'allow_user_macro' => false]],
+				'use' => [CUrlValidator::class, [
+					'event_tags_macro' => true,
+					'schemes' => CSettingsHelper::getAllowedUriSchemes()
+				]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_WEBHOOK]],
 					['show_event_menu', 'in' => [ZBX_EVENT_MENU_SHOW]]
@@ -272,6 +278,11 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 		}
 
 		return $ret;
+	}
+
+	protected function checkPermissions(): bool {
+		return CMediatypeHelper::getSupportedMediaTypes()
+			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
 	}
 
 	protected function doAction(): void {

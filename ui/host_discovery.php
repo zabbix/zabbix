@@ -245,7 +245,7 @@ $fields = [
 												ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
 												ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
 												ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP,
-												ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
+												ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED
 											]),
 											null
 										],
@@ -883,6 +883,10 @@ if (hasRequest('form')) {
 
 	if ($data['type'] != ITEM_TYPE_JMX) {
 		$data['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+	}
+
+	if ($data['type'] != ITEM_TYPE_TRAPPER && ($data['type'] != ITEM_TYPE_HTTPAGENT || $data['allow_traps'] == 0)) {
+		$data['trapper_hosts'] = ZBX_DEFAULT_TRAPPER_HOSTS;
 	}
 
 	$data['counter'] = null;

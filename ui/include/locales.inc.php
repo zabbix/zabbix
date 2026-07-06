@@ -45,7 +45,7 @@ function getLocales(): array {
 		'it_IT' => ['name' => _('Italian (it_IT)'),	'display' => true],
 		'ko_KR' => ['name' => _('Korean (ko_KR)'),	'display' => true],
 		'ja_JP' => ['name' => _('Japanese (ja_JP)'),	'display' => true],
-		'lv_LV' => ['name' => _('Latvian (lv_LV)'),	'display' => false],
+		'lv_LV' => ['name' => _('Latvian (lv_LV)'),	'display' => true],
 		'lt_LT' => ['name' => _('Lithuanian (lt_LT)'),	'display' => false],
 		'nb_NO' => ['name' => _('Norwegian (nb_NO)'),	'display' => true],
 		'fa_IR' => ['name' => _('Persian (fa_IR)'),	'display' => false],

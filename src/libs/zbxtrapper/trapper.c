@@ -53,6 +53,7 @@
 #ifdef HAVE_NETSNMP
 #	include "zbxipcservice.h"
 #endif
+#include "zbxcurl.h"
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
 #endif
@@ -947,7 +948,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp, int con
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 
-			if (USER_TYPE_SUPER_ADMIN == user.type)
+			if (USER_TYPE_SUPER_ADMIN == user.type || USER_TYPE_ZABBIX_ADMIN == user.type)
 				status_stats_export(&json);
 
 			zbx_json_close(&json);
@@ -1550,6 +1551,7 @@ out:
 	zbx_tcp_unaccept(&s);
 	zbx_ipc_async_socket_close(&rtc);
 	zbx_db_close();
+	zbx_curl_cleanup();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

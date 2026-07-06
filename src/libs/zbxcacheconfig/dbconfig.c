@@ -7863,6 +7863,7 @@ static void	dc_add_new_items_to_trends(const zbx_vector_dc_item_ptr_t *items)
 	{
 		zbx_vector_uint64_t	itemids;
 		int			i;
+		zbx_uint64_t		trends_flags = zbx_history_get_trends_flags();
 
 		zbx_vector_uint64_create(&itemids);
 		zbx_vector_uint64_reserve(&itemids, (size_t)items->values_num);
@@ -7872,6 +7873,9 @@ static void	dc_add_new_items_to_trends(const zbx_vector_dc_item_ptr_t *items)
 			ZBX_DC_ITEM	*item = items->values[i];
 
 			if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
+				continue;
+
+			if (0 == (trends_flags & (__UINT64_C(1) << item->value_type)))
 				continue;
 
 			ZBX_DC_NUMITEM	*numitem;
@@ -8658,7 +8662,9 @@ clean:
 		DCdump_configuration();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
+#ifdef	HAVE_MALLOC_TRIM
+	malloc_trim(128 * ZBX_MEBIBYTE);
+#endif
 	return new_revision;
 }
 
@@ -17225,6 +17231,66 @@ static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get drule values                                                  *
+ *                                                                            *
+ * Parameter: dc_drule - [IN/OUT] drule                                       *
+ *                                                                            *
+ * Return value: SUCCEED - drule exists                                       *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_drule_get_values(zbx_dc_drule_t *dc_drule)
+{
+	int			ret = FAIL;
+	zbx_dc_drule_t		*drule;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_search(&config->drules, &dc_drule->druleid)))
+	{
+		dc_drule->proxyid = drule->proxyid;
+		dc_drule->name = zbx_strdup(NULL, drule->name);
+		dc_drule->iprange = zbx_strdup(NULL, drule->iprange);
+		dc_drule->status = drule->status;
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve value of uniq if dcheck exists                           *
+ *                                                                            *
+ * Parameter: dcheckid - [IN] id of dcheck                                    *
+ *                uniq - [OUT] value of uniq                                  *
+ *                                                                            *
+ * Return value: SUCCEED - value of uniq retrieved                            *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_dcheck_get_uniq(const zbx_uint64_t dcheckid, unsigned char *uniq)
+{
+	int			ret = FAIL;
+	zbx_dc_dcheck_t		*dcheck;
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	if (NULL != (dcheck = (zbx_dc_dcheck_t *)zbx_hashset_search(&config->dchecks, &dcheckid)))
+	{
+		*uniq =  dcheck->uniq;
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get drules ready to be processed                                  *
  *                                                                            *
  * Parameter: now       - [IN] the current timestamp                          *
@@ -17684,7 +17750,7 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() templateids_num:%d", __func__, templateids->values_num);
 }
 
-void	zbx_recalc_time_period(time_t *ts_from, int table_group)
+void	zbx_recalc_time_period(time_t *ts_from, int table_group, unsigned char value_type)
 {
 #define HK_CFG_UPDATE_INTERVAL	5
 	time_t			least_ts = 0, now;
@@ -17704,10 +17770,17 @@ void	zbx_recalc_time_period(time_t *ts_from, int table_group)
 
 	if (ZBX_RECALC_TIME_PERIOD_HISTORY == table_group)
 	{
-		if (1 != hk.history_global)
-			return;
+		int	hk_period;
 
-		least_ts = now - hk.history;
+		if (0 == (hk_period = hk.history_override[value_type]))
+		{
+			if (1 != hk.history_global)
+				return;
+
+			hk_period = hk.history;
+		}
+
+		least_ts = now - hk_period;
 	}
 	else if (ZBX_RECALC_TIME_PERIOD_TRENDS == table_group)
 	{

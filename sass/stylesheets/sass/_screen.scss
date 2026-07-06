@@ -41,11 +41,14 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "layout/grid-columns";
 @import "layout/form-grid";
 
+@import "components/banner";
 @import "components/buttons";
 @import "components/icons-extended";
+@import "components/calendar";
 @import "components/checkbox-list";
 @import "components/columns-wrapper";
 @import "components/dashboard/dashboard";
+@import "components/datatable";
 @import "components/diff";
 @import "components/entity-count";
 @import "components/expandable-subfilter";
@@ -747,13 +750,25 @@ form {
 		white-space: nowrap;
 
 		label {
+			box-sizing: border-box;
 			display: block;
 			height: 24px;
 			line-height: 24px;
 			overflow: hidden;
 			text-overflow: ellipsis;
 
-			.btn-icon,
+			&:has(.btn-icon) {
+				position: relative;
+				margin-right: -2px;
+				padding-right: 23px;
+
+				.btn-icon {
+					position: absolute;
+					top: 4px;
+					right: 2px;
+				}
+			}
+
 			.icon {
 				margin-left: 5px;
 			}
@@ -844,6 +859,18 @@ form {
 	.icon {
 		&:not(:first-child) {
 			margin-left: 5px;
+		}
+	}
+
+	[aria-label] {
+		@if $ui-transitions {
+			transition: box-shadow $ui-controls-transition-duration ease-out;
+		}
+
+		&:focus {
+			border-radius: 2px;
+			outline: none;
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
 		}
 	}
 
@@ -1676,13 +1703,8 @@ select {
 	width: 100%;
 }
 
-.qr-code {
-	height: 190px;
-	width: 190px;
-	margin: 20px auto;
-}
-
 .qr-code img {
+	margin: 20px auto;
 	image-rendering: pixelated;
 }
 
@@ -2056,6 +2078,15 @@ select {
 	}
 }
 
+// Modals.
+.modal-popup.modal-popup-static {
+	&.modal-popup-sla-edit,
+	&.modal-popup-proxy-edit,
+	&.modal-popup-connector-edit {
+		--modal-max-width: 750px;
+	}
+}
+
 // Multiline input control.
 .multilineinput-control {
 	display: flex;
@@ -2240,121 +2271,6 @@ select {
 	opacity: .35;
 }
 
-.calendar {
-	width: 200px;
-
-	.calendar-year,
-	.calendar-month {
-		&.highlighted {
-			background-color: $action-hover-color;
-		}
-
-		&:focus {
-			outline: none;
-		}
-	}
-
-	table {
-		width: 100%;
-		margin: 5px 0;
-
-		thead {
-			text-transform: uppercase;
-			color: $font-alt-color;
-		}
-
-		tbody {
-			text-align: center;
-
-			td {
-				@if $ui-transitions {
-					transition: background-color $ui-controls-transition-duration ease-out;
-				}
-
-				&.selected {
-					background-color: $ui-bg-selected-color;
-					color: $white;
-
-					&:hover {
-						background-color: darken($ui-bg-selected-color, 4%);
-					}
-				}
-
-				&:hover {
-					background-color: $action-hover-color;
-					cursor: pointer;
-				}
-
-				&.highlighted {
-					@include btn-hover-active($btn-color, $btn-bg-color);
-					cursor: pointer;
-				}
-
-				&:focus {
-					outline: none;
-				}
-
-				span {
-					z-index: -1;
-					padding: 4px;
-					display: block;
-				}
-			}
-		}
-	}
-}
-
-.calendar-header {
-	text-align: center;
-
-	.btn-grey {
-		border: 0;
-		background-color: transparent;
-	}
-}
-
-.calendar-year {
-	height: 24px;
-	line-height: 26px;
-	display: table;
-	width: 100%;
-
-	button:first-child {
-		float: left;
-	}
-
-	button:last-child {
-		float: right;
-	}
-
-	button:hover {
-		background-color: $action-hover-color;
-		cursor: pointer;
-	}
-}
-
-.calendar-month {
-	@extend .calendar-year;
-}
-
-.calendar-time {
-	text-align: center;
-
-	input[type="text"] {
-		width: 32px;
-	}
-}
-
-.calendar-footer {
-	margin: 26px 0 0;
-	text-align: right;
-
-	.btn-grey {
-		float: left;
-		margin-top: 0;
-	}
-}
-
 .hintbox-wrap {
 	display: block;
 }
@@ -2526,7 +2442,6 @@ select {
 			display: flex;
 			flex-wrap: nowrap;
 			align-items: center;
-			padding-left: 3px;
 			white-space: pre;
 
 			.scatter-plot-hintbox-icon-color {
