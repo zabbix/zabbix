@@ -2965,29 +2965,10 @@ HEREDOC;
 
 	/**
 	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp,
-	 * but the discovered host is under data-collection maintenance for the whole run: every problem the
-	 * scenario opens must be suppressed while global correlation still closes it, so no open problem remains.
-	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenance$)
-	 * @depends testPrepareTriggerCEP_LLDDiscovery
-	 */
-	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenance() {
-		$maintenanceid = $this->startDiscHostMaintenance();
-		$this->prepareDataGlobalCorrelationCloseOnUp();
-		try {
-			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true);
-			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
-		}
-		finally {
-			$this->stopDiscHostMaintenance($maintenanceid);
-		}
-	}
-
-	/**
-	 * Same "close old down when new up" scenario as
-	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenance, but the discovered host only
-	 * enters data-collection maintenance after the first wave of problems is already open: the maintenance
-	 * is created mid-run, so the already-open problems must be suppressed retroactively and every problem
-	 * opened afterwards suppressed too, while global correlation still closes them all, leaving nothing open.
+	 * but the discovered host only enters data-collection maintenance after the first wave of problems is
+	 * already open: the maintenance is created mid-run, so the already-open problems must be suppressed
+	 * retroactively, and every problem opened afterwards (while maintenance is active) suppressed at
+	 * creation time too, while global correlation still closes them all, leaving nothing open.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirst$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -2995,7 +2976,7 @@ HEREDOC;
 		self::$disc_maintenanceid = null;
 		$this->prepareDataGlobalCorrelationCloseOnUp();
 		try {
-			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, true);
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true);
 			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 		}
 		finally {
@@ -3677,7 +3658,7 @@ HEREDOC;
 		return $m;
 	}
 
-	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart, bool $maintenance = false,
+	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart,
 			bool $maintenance_after_first = false): void {
 		$keys = array_merge(
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
@@ -3703,15 +3684,9 @@ HEREDOC;
 		$this->waitForOpenProblemCount($all, $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
-		// Under data-collection maintenance every problem opened on the host must be suppressed, while
-		// global correlation still processes and closes it normally in the steps below.
-		if ($maintenance) {
-			$this->waitForOpenProblemsSuppressed($all, $m);
-		}
-
-		// Same suppression expectation, but the host only enters maintenance after the first problems are
-		// already open: creating the maintenance now must retroactively suppress those $m open problems
-		// (and every problem opened later), while global correlation still closes them normally below.
+		// The host only enters maintenance after the first problems are already open: creating the
+		// maintenance now must retroactively suppress those $m open problems (and every problem opened
+		// later), while global correlation still closes them normally below.
 		if ($maintenance_after_first) {
 			self::$disc_maintenanceid = $this->startDiscHostMaintenance();
 			$this->waitForOpenProblemsSuppressed($all, $m);
@@ -3723,6 +3698,13 @@ HEREDOC;
 		$this->dispatchSenderValues($values('down', $m), null, 0);
 		$this->waitForOpenProblemCount($all, 2 * $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		// The host is in maintenance by now, so this second wave (opened while maintenance is active) must
+		// be suppressed at creation time as well: all 2 * $m open problems suppressed.
+		if ($maintenance_after_first) {
+			$this->waitForOpenProblemsSuppressed($all, 2 * $m);
+		}
+
 		$this->maybeRestartServer($restart);
 
 		// 3. "up" for the first id set: each is a PROBLEM that closes only its corresponding "down"
