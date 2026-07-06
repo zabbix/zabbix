@@ -127,8 +127,8 @@ abstract class CControllerCepRuleGeneral extends CController {
 			],
 			'window' => ['object', 'fields' => [
 				'duration' => ['db cep_window.duration', 'required', 'not_empty',
-					'use' => [CTimeUnitValidator::class, [
-						'max' => null, 'min' => 1, 'usermacros' => true, 'lldmacros' => false, 'accept_zero' => false, 'with_year' => false
+					'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_YEAR, 'min' => 1, 'usermacros' => true,
+						'lldmacros' => false, 'accept_zero' => false, 'with_year' => false
 					]],
 					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH]]
 				],
