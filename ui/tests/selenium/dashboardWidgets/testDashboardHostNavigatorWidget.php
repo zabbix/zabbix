@@ -793,7 +793,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 			$header = ($data['fields']['Name'] === '') ? 'Host navigator' : $data['fields']['Name'];
 
 			COverlayDialogElement::ensureNotPresent();
-			$widget = $dashboard->getWidget($header)->waitUntilReady();
+			$widget = $dashboard->getWidget($header);
 
 			// Save Dashboard to ensure that widget is correctly saved.
 			$dashboard->save()->waitUntilReady();

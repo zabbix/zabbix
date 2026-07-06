@@ -807,7 +807,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->page->waitUntilReady();
 		CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['State' => 'Normal']);
 		$table = $this->query('id:latest')->one()->asDatatable();
-		$this->query('button:Ap-9922ply')->one()->click();
+		$this->query('button:Apply')->one()->click();
 		$this->page->waitUntilReady();
 		$table->waitUntilReady()->invalidate();
 
