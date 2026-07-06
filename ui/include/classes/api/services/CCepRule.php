@@ -231,7 +231,7 @@ class CCepRule extends CApiService {
 
 		while ($row = DBfetch($resource)) {
 			if (array_key_exists('tags', $row)) {
-				$row['tags'] = $row['tags'] !== '' ? explode('\n', $row['tags']) : [];
+				$row['tags'] = $row['tags'] !== '' ? explode("\n", $row['tags']) : [];
 			}
 
 			$cep_rules[$row['cep_ruleid']]['window'] = array_diff_key($row, array_flip(['cep_ruleid']));
@@ -542,7 +542,7 @@ class CCepRule extends CApiService {
 												: ['type' => API_INT32, 'in' => DB::getDefault('cep_window', 'group_by_tags')],
 				'tags' =>					$grouping_allowed
 												? ['type' => API_MULTIPLE, 'rules' => [
-													['if' => ['field' => 'group_by_tags', 'in' => (string) CCepRuleHelper::GROUP_BY_YES], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_window', 'tags')],
+													['if' => ['field' => 'group_by_tags', 'in' => (string) CCepRuleHelper::GROUP_BY_YES], 'type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
 													['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window', 'tags')]
 												]]
 												: ['type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window', 'tags')]
