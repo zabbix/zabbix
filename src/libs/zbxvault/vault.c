@@ -168,6 +168,18 @@ int	zbx_vault_db_credentials_get(zbx_config_vault_t *config_vault, char **dbuser
 	const zbx_kv_t	*kv_username, *kv_password;
 	zbx_kv_t	kv_local;
 
+	if (NULL == config_vault->token && 0 == strcmp(config_vault->name, ZBX_HASHICORP_NAME))
+	{
+		zbx_vault_renew_token(config_vault, config_source_ip, config_ssl_ca_location,
+				config_ssl_cert_location, config_ssl_key_location, &config_vault->token);
+
+		if (NULL == config_vault->token)
+		{
+			*error = zbx_dsprintf(*error, "cannot login with AppRole method");
+			return FAIL;
+		}
+	}
+
 	if (NULL == config_vault->db_path)
 		return SUCCEED;
 
@@ -186,18 +198,6 @@ int	zbx_vault_db_credentials_get(zbx_config_vault_t *config_vault, char **dbuser
 	}
 
 	zbx_kvs_create(&kvs, 2);
-
-	if (NULL == config_vault->token && 0 == strcmp(config_vault->name, ZBX_HASHICORP_NAME))
-	{
-		zbx_vault_renew_token(config_vault, config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location, &config_vault->token);
-
-		if (NULL == config_vault->token)
-		{
-			*error = zbx_dsprintf(*error, "cannot login with AppRole method");
-			goto fail;
-		}
-	}
 
 	if (SUCCEED != zbx_vault_get_kvs_cb(config_vault->url, config_vault->prefix, config_vault->token,
 			config_vault->app_role_id,
