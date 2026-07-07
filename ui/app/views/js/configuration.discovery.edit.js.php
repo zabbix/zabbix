@@ -405,6 +405,7 @@ window.drule_edit_popup = new class {
 	}
 
 	#clone() {
+		this.#removePopupMessages();
 		this.#druleid = null;
 		document.getElementById('druleid').remove();
 
@@ -441,6 +442,7 @@ window.drule_edit_popup = new class {
 	}
 
 	#delete() {
+		this.#removePopupMessages();
 		const url_params = {
 			action: 'discovery.delete',
 			[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('discovery')) ?>
@@ -454,6 +456,7 @@ window.drule_edit_popup = new class {
 	}
 
 	#submit() {
+		this.#removePopupMessages();
 		const fields = this.#form.getAllValues();
 
 		this.#form.validateSubmit(fields)
@@ -504,6 +507,14 @@ window.drule_edit_popup = new class {
 			})
 			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => this.#overlay.unsetLoading());
+	}
+
+	#removePopupMessages() {
+		for (const el of this.#form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
 	}
 
 	#ajaxExceptionHandler(exception) {

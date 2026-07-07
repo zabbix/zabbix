@@ -29,17 +29,12 @@ $form = (new CForm())->addStyle('display: none;');
 $dchecks = array_values($data['dchecks'] ?? []);
 
 foreach ($dchecks as $index => $dcheck) {
-	if (!is_array($dcheck)) {
-		continue;
-	}
-
 	foreach ($dcheck as $key => $value) {
-		if ($key === 'dcheckid' || $key === 'uniq' || $key === 'host_source' || $key === 'name_source' || $key === 'warning') {
-			continue;
+		if (in_array($key, ['type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
+			'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
+			'snmpv3_contextname', 'allow_redirect'])) {
+			$form->addVar('dchecks['.$index.']['.$key.']', $value);
 		}
-
-		$name = sprintf('dchecks[%s][%s]', $index, $key);
-		$form->addVar($name, $value);
 	}
 }
 
@@ -190,7 +185,7 @@ $output = [
 		$this->readJsFile('discovery.check.edit.js.php').
 		'check_popup.init('.json_encode([
 			'rules' => $data['js_validation_rules']
-		], JSON_THROW_ON_ERROR).');',
+		]).');',
 	'body' => $form->toString(),
 	'buttons' => [
 		[

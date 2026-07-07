@@ -30,7 +30,10 @@ class CControllerDiscoveryCheckCheck extends CController {
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
 			'dchecks' => ['objects',
-				'uniq' => ['type', 'ports', 'key_', 'snmp_community', 'snmpv3_privpassphrase', 'allow_redirect'],
+				'uniq' => ['type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
+					'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
+					'snmpv3_contextname', 'allow_redirect'
+				],
 				'fields' => [
 					'type' => ['db dchecks.type',
 						'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,
@@ -114,13 +117,13 @@ class CControllerDiscoveryCheckCheck extends CController {
 					'uniq' => _('An identical discovery check already exists for this rule.')
 				]
 			],
-			'type' => ['db dchecks.type', 'required',
+			'type' => ['db dchecks.type', 'required', 'not_empty',
 				'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,
 					SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET
 				]
 			],
 			'ports' => ['db dchecks.ports', 'required', 'not_empty',
-				'use' => [CPortRangeParser::class, []],
+				'use' => [CPortRangeParser::class],
 				'when' => ['type',
 					'in' => [SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_IMAP, SVC_LDAP, SVC_NNTP, SVC_POP, SVC_SMTP,
 						SVC_SSH, SVC_TCP, SVC_TELNET, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_AGENT
@@ -129,8 +132,11 @@ class CControllerDiscoveryCheckCheck extends CController {
 			],
 			'key_' => [
 				['db dchecks.key_', 'required', 'not_empty',
-					'use' => [CItemKey::class, []],
+					'use' => [CItemKey::class],
 					'when' => ['type', 'in' => [SVC_AGENT]]
+				],
+				['db dchecks.key_', 'required', 'not_empty',
+					'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
 				],
 				['db dchecks.key_']
 			],
@@ -217,21 +223,20 @@ class CControllerDiscoveryCheckCheck extends CController {
 		return $ret;
 	}
 
-	private function appendChecksForValidation(array $input): array {
-		if (!isset($input['dchecks']) || !is_array($input['dchecks'])) {
-			return [];
+	private function validateDuplicateDCheck(&$data): int {
+		if (!isset($data['dchecks']) || !is_array($data['dchecks'])) {
+			return false;
 		}
 
-		$dchecks =  $input['dchecks'];
+		$newDCheck = array_diff_key($data, array_flip(['dchecks']));
+		$data['dchecks'][] = $newDCheck;
 
-		if (isset($input['type'])) {
-			unset($input['dchecks']);
-			$newCheck = $input;
+		$validator = new CFormValidator(self::getValidationRules());
+		$is_valid = $validator->validate($data);
 
-			$dchecks[] = $newCheck;
-		}
+		unset($data['dchecks']);
 
-		return $dchecks;
+		return $is_valid;
 	}
 
 	protected function checkPermissions(): bool {
@@ -246,14 +251,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 			'type' => self::DEFAULT_TYPE
 		], $this->getInputAll());
 
-		if ($data['type'] == SVC_SNMPv1 || $data['type'] == SVC_SNMPv2c || $data['type'] == SVC_SNMPv3) {
-			$data['key_'] = $data['snmp_oid'];
-		}
-
-		$data['dchecks'] = $this->appendChecksForValidation($data);
-
-		$validator = new CFormValidator(self::getValidationRules());
-		$is_valid = $validator->validate($data);
+		$is_valid = self::validateDuplicateDCheck($data);
 
 		if ($is_valid !== CFormValidator::SUCCESS) {
 			$response = [
@@ -263,6 +261,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 				]
 			];
 			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
+
 			return;
 		}
 

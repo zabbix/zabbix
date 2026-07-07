@@ -114,19 +114,21 @@ window.check_popup = new class {
 	}
 
 	submit() {
+		this.#removePopupMessages();
 		let fields = this.#form.getAllValues();
-
-		if (!('dchecks' in fields)) {
-			const dchecks = this.#form_element.querySelector('[name="dchecks"]');
-
-			if (dchecks !== null) {
-				fields.dchecks = dchecks.value;
-			}
-		}
 
 		for (const element of this.#form_element.parentNode.children) {
 			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 				element.parentNode.removeChild(element);
+			}
+		}
+
+		if (fields.type !== [<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>, <?= SVC_AGENT ?>]) {
+			if (!fields['key_'] && !fields['snmp_oid']) {
+				delete fields['key_'];
+				delete fields['snmp_oid'];
+			} else if (!fields['key_']) {
+				fields['key_'] = fields['snmp_oid'];
 			}
 		}
 
@@ -138,7 +140,6 @@ window.check_popup = new class {
 					return;
 				}
 
-				this._updateFields(fields);
 				this._post(zabbixUrl({action: 'discovery.check.check'}), fields);
 			});
 	}
@@ -165,105 +166,32 @@ window.check_popup = new class {
 				this.#dialogue.dispatchEvent(new CustomEvent('check.submit', {detail: response}));
 				overlayDialogueDestroy(this.#overlay.dialogueid);
 			})
-			.catch((exception) => {
-				for (const element of this.#form_element.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
-				let title, messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title)[0];
-				this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
-			})
-			.finally(() => {
-				this.#overlay.unsetLoading();
-			});
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => this.#overlay.unsetLoading());
 	}
 
-	/**
-	 * Updates form fields based on check type and trims string values.
-	 */
-	_updateFields(fields) {
-		if (fields.type == <?= SVC_ICMPPING ?>) {
-			for (const key in fields) {
-				if (key === 'ports') {
-					delete fields[key];
-				}
+	#removePopupMessages() {
+		for (const el of this.#form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
 			}
 		}
+	}
 
-		if (fields.type != <?= SVC_ICMPPING ?>) {
-			for (const key in fields) {
-				if (key === 'allow_redirect') {
-					delete fields[key];
-				}
-			}
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
-		if (fields.type != <?= SVC_AGENT ?>) {
-			for (const key in fields) {
-				if (key === 'key_') {
-					delete fields[key];
-				}
-			}
-		}
+		const message_box = makeMessageBox('bad', messages, title)[0];
 
-		if (![<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>].includes(parseInt(fields.type))) {
-			for (const key in fields) {
-				if (key === 'snmp_community') {
-					delete fields[key];
-				}
-			}
-		}
-
-		if (![<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>].includes(parseInt(fields.type))) {
-			for (const key in fields) {
-				if (key === 'snmp_oid') {
-					delete fields[key];
-				}
-			}
-		}
-
-		if (fields.type != <?= SVC_SNMPv3 ?>) {
-			for (const key in fields) {
-				if (key === 'snmpv3_privpassphrase' || key === 'snmpv3_privprotocol'
-					|| key === 'snmpv3_authpassphrase' || key === 'snmpv3_authprotocol'
-					|| key === 'snmpv3_securitylevel' || key === 'snmpv3_securityname'
-					|| key === 'snmpv3_contextname') {
-					delete fields[key];
-				}
-			}
-		}
-
-		if (fields.type == <?= SVC_SNMPv3 ?>) {
-			let security_level = false;
-
-			for (const key in fields) {
-				if (key === 'snmpv3_securitylevel' && fields[key] != <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>) {
-					security_level = true;
-				}
-
-				if (key === 'snmpv3_privpassphrase' && security_level) {
-					delete fields[key];
-				}
-			}
-		}
-
-		for (let key in fields) {
-			if (typeof fields[key] === 'string') {
-				fields[key] = fields[key].trim();
-			}
-		}
+		this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
 	}
 
 	/**
