@@ -111,8 +111,9 @@ $filter = (new CFilter())
 			])
 	]);
 
-$table = (new CTableInfo())->setHeader([_('Host'), _('Trigger'), _('Severity'), _('Number of problems')])
-			->addClass(ZBX_STYLE_ROUNDED_SURFACE);
+$table = (new CTableInfo())
+	->setHeader([_('Host'), _('Trigger'), _('Severity'), _('Number of problems')])
+	->addClass(ZBX_STYLE_ROUNDED_SURFACE);
 
 foreach ($data['triggers'] as $triggerid => $trigger) {
 	$hosts = [];
