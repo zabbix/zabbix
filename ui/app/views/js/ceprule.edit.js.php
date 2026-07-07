@@ -283,8 +283,8 @@ window.ceprule_edit_popup = new class {
 		// TODO: why are these fields initally in changed state although no interaction yet?
 		if (this.form.findFieldByName('window[group_by_host]')._changed
 				|| this.form.findFieldByName('window[group_by_host_group]')._changed
-				|| this.form.findFieldByName('window[group_by_tag]')._changed) {
-			this.form.validateChanges(['window[group_by_tag]']);
+				|| this.form.findFieldByName('window[group_by_tags]')._changed) {
+			this.form.validateChanges(['window[group_by_tags]']);
 		}
 
 		window['ceprule-operations-label']

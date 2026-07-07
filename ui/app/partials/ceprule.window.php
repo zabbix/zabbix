@@ -80,9 +80,9 @@ echo (new CObject())
 			->addItem(new CLabel(_('Host'), 'ceprule-window-groupby-opt-host')),
 
 		(new CListItem())
-			->addItem((new CCheckBox('window[group_by_tag]', CCepRuleHelper::GROUP_BY_YES))
+			->addItem((new CCheckBox('window[group_by_tags]', CCepRuleHelper::GROUP_BY_YES))
 				->setUncheckedValue(CCepRuleHelper::GROUP_BY_NO)
-				->setChecked($data['window']['group_by_tag'] == CCepRuleHelper::GROUP_BY_YES)
+				->setChecked($data['window']['group_by_tags'] == CCepRuleHelper::GROUP_BY_YES)
 				->setId('ceprule-window-groupby-opt-tag')
 			)
 			->addItem(new CLabel(_('Tag'), 'ceprule-window-groupby-opt-tag'))
