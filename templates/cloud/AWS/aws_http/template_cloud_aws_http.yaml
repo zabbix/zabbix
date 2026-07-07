@@ -5672,7 +5672,7 @@ zabbix_export:
           key: aws.daily.average.cost
           value_type: FLOAT
           units: '!USD'
-          params: 'avg(avg_foreach(//aws.daily.service.total.cost,1w))'
+          params: 'avg(//aws.daily.service.total.cost,1w)'
           description: 'AWS service weekly average cost.'
           tags:
             - tag: component
