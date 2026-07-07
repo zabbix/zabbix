@@ -176,12 +176,13 @@ window.drule_edit_popup = new class {
 	}
 
 	#addRadioButtonValues(drule) {
-		jQuery('input:radio[name="uniqueness_criteria"][value='+jQuery.escapeSelector(drule.uniqueness_criteria)+']')
-			.attr('checked', 'checked');
-		jQuery('input:radio[name="host_source"][value='+jQuery.escapeSelector(drule.host_source)+']')
-			.attr('checked', 'checked');
-		jQuery('input:radio[name="name_source"][value='+jQuery.escapeSelector(drule.name_source)+']')
-			.attr('checked', 'checked');
+		['uniqueness_criteria', 'host_source', 'name_source'].forEach((field) => {
+			const radioButton = document.querySelector(`input[type="radio"][name="${field}"][value="${CSS.escape(drule[field])}"]`);
+
+			if (radioButton) {
+				radioButton.checked = true;
+			}
+		});
 
 		document.querySelectorAll('#device-uniqueness-list, #host_source, #name_source').forEach((element) => {
 			element.addEventListener('change', (e) => {
