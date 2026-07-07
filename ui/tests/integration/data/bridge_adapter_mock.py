@@ -110,7 +110,7 @@ class AdapterServer(ThreadingHTTPServer):
                         "x": "OV6uOpawdTTSC6QsLQSv9tCGVDyt3u0ZpdVCD95vogY",
                         "y": "bnJ86Qyj0HDCrzNo2GOyvOTJA9lCiUEmLUXLcwLZeOQ"
                     },
-                    "enroll_url": "enroll.zabbixmobile.com"
+                    "bridge_url": "enroll.zabbixmobile.com"
                 }
             }
 
