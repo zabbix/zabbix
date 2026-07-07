@@ -411,7 +411,7 @@ void	*zbx_proxyconfig_thread(void *args)
 				{
 					zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
 						(unsigned char *)proxyconfig_args_in->config_vault->token,
-						strlen(proxyconfig_args_in->config_vault->token) + 1);
+						(zbx_uint32_t)strlen(proxyconfig_args_in->config_vault->token) + 1);
 				}
 
 				zbx_hc_remove_items_by_ids(&deleted_itemids);
@@ -460,7 +460,7 @@ void	*zbx_proxyconfig_thread(void *args)
 		{
 			zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
 				(unsigned char *)proxyconfig_args_in->config_vault->token,
-				strlen(proxyconfig_args_in->config_vault->token) + 1);
+				(zbx_uint32_t)strlen(proxyconfig_args_in->config_vault->token) + 1);
 		}
 
 		nextcheck = time(NULL) + proxyconfig_args_in->config_proxyconfig_frequency;

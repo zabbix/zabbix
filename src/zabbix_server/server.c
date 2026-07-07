@@ -2815,7 +2815,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			old_token = zbx_strdup(old_token, zbx_config_vault.token);
 
 			zbx_rtc_notify(&rtc, ZBX_PROCESS_TYPE_UNKNOWN, 0, ZBX_RTC_VAULT_NEW_TOKEN,
-					(const char *)zbx_config_vault.token, strlen(zbx_config_vault.token) + 1);
+					(const char *)zbx_config_vault.token,
+					(zbx_uint32_t)strlen(zbx_config_vault.token) + 1);
 		}
 
 		if (NULL != client)

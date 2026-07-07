@@ -754,7 +754,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 		{
 			zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
 					(unsigned char *)proxy_poller_args_in->config_vault->token,
-					strlen(proxy_poller_args_in->config_vault->token) + 1);
+					(zbx_uint32_t)strlen(proxy_poller_args_in->config_vault->token) + 1);
 		}
 
 		total_sec += zbx_time() - sec;

@@ -194,7 +194,7 @@ void	*zbx_dbconfig_thread(void *args)
 			{
 				zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
 						(unsigned char *)dbconfig_args_in->config_vault->token,
-						strlen(dbconfig_args_in->config_vault->token) + 1);
+						(zbx_uint32_t)strlen(dbconfig_args_in->config_vault->token) + 1);
 			}
 
 			zbx_dc_config_get_hostids_by_revision(revision, &hostids);
@@ -225,7 +225,7 @@ void	*zbx_dbconfig_thread(void *args)
 			{
 				zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
 					(unsigned char *)dbconfig_args_in->config_vault->token,
-					strlen(dbconfig_args_in->config_vault->token) + 1);
+					(zbx_uint32_t)strlen(dbconfig_args_in->config_vault->token) + 1);
 			}
 
 			secrets_reload = 0;
