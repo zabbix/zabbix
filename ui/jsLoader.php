@@ -162,6 +162,10 @@ $translate_strings = [
 	'class.geomaps.js' => [
 		'Severity filter' => _('Severity filter')
 	],
+	'class.form.fieldset.collapsible.js' => [
+		'S_COLLAPSE' => _('Collapse'),
+		'S_EXPAND' => _('Expand')
+	],
 	'class.widget-base.js' => [
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
 		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
