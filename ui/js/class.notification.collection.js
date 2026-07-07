@@ -124,7 +124,7 @@ ZBX_NotificationCollection.prototype.makeNodes = function() {
 	this.node.className = `${ZBX_STYLE_OVERLAY_DIALOGUE} notif`;
 
 	this.btn_close = document.createElement('button');
-	this.btn_close.setAttribute('title', t['S_CLOSE']);
+	this.btn_close.setAttribute('title', t('S_CLOSE'));
 	this.btn_close.setAttribute('type', 'button');
 	this.btn_close.className = 'btn-overlay-close';
 
