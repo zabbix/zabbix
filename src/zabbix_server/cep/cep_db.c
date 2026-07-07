@@ -1453,6 +1453,8 @@ void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_
 		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+		zbx_vector_uint64_append_array(&problemids, eventids.values, eventids.values_num);
+
 		zbx_dbconn_lock_ids_pk(db, "events", "eventid", &eventids);
 		zbx_dbconn_lock_ids_pk(db, "problem", "eventid", &problemids);
 
@@ -1474,7 +1476,8 @@ void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_
 				}
 				else
 				{
-					zbx_cep_event_sync_t	sync_local = {.hevent = task->hevent, .flags = task->flags};
+					zbx_cep_event_sync_t	sync_local = {.hevent = task->hevent,
+							.flags = task->flags};
 
 					zbx_vector_cep_event_sync_append(&sync, sync_local);
 					hsync_last = task->hevent;
@@ -1488,10 +1491,8 @@ void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_
 				zbx_vector_cep_event_handle_append(&hsuppress, task->hevent);
 		}
 
-
 		zbx_vector_cep_event_handle_uniq(&htags, cep_event_handle_compare);
 		zbx_vector_cep_event_handle_uniq(&hsuppress, cep_event_handle_compare);
-
 
 		if (0 != sync.values_num)
 			cep_db_sync_event(db, &sync);
@@ -1532,36 +1533,64 @@ void	cep_db_sync_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_
  ******************************************************************************/
 void	cep_db_add_acknowledges(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks)
 {
-	zbx_db_insert_t	db_insert;
+	zbx_vector_uint64_t			eventids;
+	const zbx_cep_task_acknowledge_t	*task;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
 
-	int		now = (int)time(NULL);
 	zbx_dbconn_t	*db = zbx_dbconn_pool_acquire_connection(dbpool);
 
-	zbx_dbconn_prepare_insert(db, &db_insert, "acknowledges", "acknowledgeid", "eventid", "clock", "action",
-			"cep_ruleid", "details", NULL);
-
-	for (int i = 0; i < tasks->values_num; i++)
-	{
-		const zbx_cep_task_acknowledge_t	*task = (const zbx_cep_task_acknowledge_t *)tasks->values[i];
-
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), task->eventid, now, ZBX_PROBLEM_UPDATE_CEP,
-				task->ruleid, task->details.buffer);
-	}
-
-	zbx_db_insert_autoincrement(&db_insert, "acknowledgeid");
+	zbx_vector_uint64_create(&eventids);
 
 	do
 	{
+		for (int i = 0; i < tasks->values_num; i++)
+		{
+			task = (const zbx_cep_task_acknowledge_t *)tasks->values[i];
+
+			zbx_vector_uint64_append(&eventids, task->eventid);
+		}
+
+		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 		zbx_dbconn_begin(db);
-		zbx_db_insert_execute(&db_insert);
+
+		zbx_dbconn_lock_ids_pk(db, "events", "eventid", &eventids);
+
+		if (0 != eventids.values_num)
+		{
+			zbx_db_insert_t	db_insert;
+			int		now = (int)time(NULL);
+
+			zbx_dbconn_prepare_insert(db, &db_insert, "acknowledges", "acknowledgeid", "eventid", "clock",
+					"action", "cep_ruleid", "details", NULL);
+
+			for (int i = 0; i < tasks->values_num; i++)
+			{
+				task = (const zbx_cep_task_acknowledge_t *)tasks->values[i];
+
+				if (FAIL == zbx_vector_uint64_bsearch(&eventids, task->eventid,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				{
+					continue;
+				}
+
+				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), task->eventid, now,
+						ZBX_PROBLEM_UPDATE_CEP, task->ruleid, task->details.buffer);
+			}
+
+			zbx_db_insert_autoincrement(&db_insert, "acknowledgeid");
+			zbx_db_insert_execute(&db_insert);
+			zbx_db_insert_clean(&db_insert);
+		}
+		zbx_vector_uint64_clear(&eventids);
 	}
 	while (ZBX_DB_DOWN == zbx_dbconn_commit(db));
 
 	zbx_dbconn_pool_release_connection(dbpool, db);
 
-	zbx_db_insert_clean(&db_insert);
+	zbx_vector_uint64_destroy(&eventids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
