@@ -638,6 +638,7 @@ $output = [
 			'rules_get_value' => $data['js_validation_rules_get_value'],
 			'is_item_testable' => $data['is_item_testable'],
 			'can_select_server_for_test' => $data['user']['can_select_server_for_test'],
+			'proxies_enabled' => $data['proxies_enabled'],
 			'show_prev' => $data['show_prev'],
 			'show_snmp_form' => $data['show_snmp_form'],
 			'interface_address_enabled' => $data['interface_address_enabled'],

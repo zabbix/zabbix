@@ -33,9 +33,10 @@ window.itemtestedit_view_popup = new class {
 	#show_snmp_form = false;
 	#interface_address_enabled = false;
 	#interface_port_enabled = false;
+	#proxies_enabled = false;
 
 	init({rules, rules_get_value, is_item_testable, show_prev, show_snmp_form, interface_address_enabled,
-			interface_port_enabled, can_select_server_for_test}) {
+			interface_port_enabled, can_select_server_for_test, proxies_enabled}) {
 		this.#overlay = overlays_stack.getById('item-test');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#footer = this.#overlay.$dialogue.$footer[0];
@@ -48,6 +49,7 @@ window.itemtestedit_view_popup = new class {
 		this.#show_snmp_form = show_snmp_form;
 		this.#interface_address_enabled = interface_address_enabled;
 		this.#interface_port_enabled = interface_port_enabled;
+		this.#proxies_enabled = proxies_enabled;
 
 		this.#form.discoverAllFields();
 
@@ -101,7 +103,7 @@ window.itemtestedit_view_popup = new class {
 
 		for (const element of this.#form_element.querySelectorAll('#test_with input')) {
 			if (element.value == <?= CControllerPopupItemTest::TEST_WITH_SERVER ?>) {
-				element.disabled = !this.#can_select_server_for_test;
+				element.disabled = !get_value_checked || !this.#can_select_server_for_test;
 			}
 			else {
 				element.disabled = !get_value_checked;
@@ -137,7 +139,7 @@ window.itemtestedit_view_popup = new class {
 		const proxy_field = this.#form.findFieldByName('proxyid');
 
 		if (proxy_field !== null) {
-			$(proxy_field.getField()).multiSelect(get_value_checked ? 'enable' : 'disable');
+			$(proxy_field.getField()).multiSelect(get_value_checked && this.#proxies_enabled ? 'enable' : 'disable');
 		}
 
 		const interface_address_field = this.#form.findFieldByName('interface[address]');
