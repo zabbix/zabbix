@@ -164,7 +164,7 @@ Currently has no effect and the maximum wait time is determined by item timeout 
 - `*:\Program Files\Zabbix Agent 2\Custom Queries\Oracle` for Microsoft Windows systems,
 where * is drive name taken from `ProgramFiles` environment variable.
 
-**Plugins.Oracle.CustomQueriesEnabled** — if set, enables the execution of `mysql.custom.query` item key.
+**Plugins.Oracle.CustomQueriesEnabled** — if set, enables the execution of `oracle.custom.query` item key.
 If disabled, will not load any queries from the custom query dir path.
 *Default value:* false
 
