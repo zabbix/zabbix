@@ -206,7 +206,6 @@ static void	cep_window_free(zbx_cep_rule_window_t *window)
 	zbx_free(window->capacity);
 	zbx_free(window->duration);
 	zbx_free(window->event_count_tag);
-	zbx_free(window->formula);
 	zbx_free(window->script);
 	zbx_free(window->group_tag);
 	zbx_free(window);
@@ -246,12 +245,10 @@ static zbx_cep_rule_window_t	*cep_window_clone(const zbx_cep_rule_window_t *wind
 
 	clone = cep_window_create();
 	clone->type = window->type;
-	clone->evaltype = window->evaltype;
 	clone->group_by = window->group_by;
 	clone->capacity = zbx_strdup(NULL, window->capacity);
 	clone->duration = zbx_strdup(NULL, window->duration);
 	clone->event_count_tag = zbx_strdup(NULL, window->event_count_tag);
-	clone->formula = zbx_strdup(NULL, window->formula);
 	clone->script = zbx_strdup(NULL, window->script);
 	clone->group_tag = zbx_strdup(NULL, window->group_tag);
 
@@ -723,10 +720,10 @@ static void	cep_condition_dump(zbx_cep_condition_t *condition)
  ******************************************************************************/
 static void	cep_window_dump(zbx_cep_rule_window_t *window)
 {
-	zabbix_log(LOG_LEVEL_TRACE, "  window type:%d duration:%s capacity:%s evaltype:%d formula:%s group_by:%x"
-			" group_tag:%s event_count_tag:%s",
-		window->type,  window->duration, window->capacity, window->evaltype, window->formula, window->group_by,
-		window->group_tag, window->event_count_tag);
+	zabbix_log(LOG_LEVEL_TRACE, "  window type:%d duration:%s capacity:%s group_by:%x group_tag:%s"
+			" event_count_tag:%s",
+			window->type,  window->duration, window->capacity, window->group_by,
+			window->group_tag, window->event_count_tag);
 
 	if ('\0' != *window->script)
 		zabbix_log(LOG_LEVEL_TRACE, "    script:\n%s", window->script);
@@ -1177,19 +1174,17 @@ static void	cep_sync_windows(zbx_cep_config_t *cep_config, zbx_dbsync_t *sync, z
 		window->type = atoi(row[1]);
 		ZBX_DBROW2STR(window->duration, row[2]);
 		ZBX_DBROW2STR(window->capacity, row[3]);
-		window->evaltype = atoi(row[4]);
-		ZBX_DBROW2STR(window->formula, row[5]);
-		ZBX_DBROW2STR(window->script, row[6]);
+		ZBX_DBROW2STR(window->script, row[4]);
 
-		if (0 != atoi(row[7]))
+		if (0 != atoi(row[5]))
 			group_by |= ZBX_CEP_GROUP_BY_HOSTGROUP;
-		if (0 != atoi(row[8]))
+		if (0 != atoi(row[6]))
 			group_by |= ZBX_CEP_GROUP_BY_HOST;
-		if (0 != atoi(row[9]))
+		if (0 != atoi(row[7]))
 			group_by |= ZBX_CEP_GROUP_BY_TAG;
 		window->group_by = group_by;
-		ZBX_DBROW2STR(window->group_tag, row[10]);
-		ZBX_DBROW2STR(window->event_count_tag, row[11]);
+		ZBX_DBROW2STR(window->group_tag, row[8]);
+		ZBX_DBROW2STR(window->event_count_tag, row[9]);
 	}
 
 	/* remove deleted cep windows */

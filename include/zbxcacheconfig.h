@@ -1856,11 +1856,9 @@ ZBX_VECTOR_DECL(cep_condition, zbx_cep_condition_t)
 typedef struct
 {
 	int		type;
-	int		evaltype;
 	zbx_uint32_t	group_by;
 	char		*duration;
 	char		*capacity;
-	char		*formula;
 	char		*event_count_tag;
 	char		*script;
 	char		*group_tag;

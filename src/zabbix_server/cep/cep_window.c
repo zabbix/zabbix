@@ -1119,7 +1119,7 @@ void	cep_window_pool_save(zbx_cep_window_pool_t *pool, zbx_dbconn_pool_t *dbpool
 	db = zbx_dbconn_pool_acquire_connection(dbpool);
 
 	zbx_dbconn_prepare_insert(db, &db_insert_groups, "cep_group", "cep_groupid", "cep_ruleid", "group_by",
-			"groupid", "hostid", "tag", "tag_value", "nextcheck", NULL);
+			"groupid", "hostid", "tags", "tags_value", "nextcheck", NULL);
 	zbx_dbconn_prepare_insert(db, &db_insert_events, "cep_group_event", "cep_group_eventid", "cep_groupid",
 			"eventid", NULL);
 
@@ -1176,7 +1176,7 @@ static void	cep_window_pool_load_groups(zbx_cep_window_pool_t *pool, zbx_dbconn_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	result = zbx_dbconn_select(db, "select cep_groupid,cep_ruleid,group_by,groupid,hostid,tag,tag_value,nextcheck"
+	result = zbx_dbconn_select(db, "select cep_groupid,cep_ruleid,group_by,groupid,hostid,tags,tags_value,nextcheck"
 					" from cep_group");
 
 	while (NULL != (row = zbx_db_fetch(result)))

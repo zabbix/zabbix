@@ -4276,8 +4276,8 @@ int	zbx_dbsync_prepare_cep_window(zbx_dbsync_t *sync)
 	zbx_dcsync_sql_start(sync);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select cep_ruleid,type,duration,capacity,evaltype,formula,script,group_by_host_group,"
-				"group_by_host,group_by_tag,tag,event_count_tag"
+			"select cep_ruleid,type,duration,capacity,script,group_by_host_group,"
+				"group_by_host,group_by_tags,tags,event_count_tag"
 			" from cep_window");
 
 	dbsync_prepare(sync, 12, NULL);
