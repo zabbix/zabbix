@@ -637,10 +637,10 @@ class testFormUserProfile extends CLegacyWebTest {
 		$form = $this->query('id:userprofile-notification-form')->asForm()->one();
 		$form->selectTab('Frontend notifications');
 		$form->fill(['Frontend notifications' => true, 'Message timeout' => '86401']);
-		$form->fill($trigger_severity)->submit();
-		$this->assertMessage(TEST_BAD, 'Cannot update user',
-				'Incorrect value for field "timeout": value must be one of 30-86400.');
-		$form->invalidate();
+		$form->fill($trigger_severity);
+		$this->page->removeFocus();
+		$this->assertInlineError($form, ['Message timeout' => 'Value must be between 30s and 86400s (1d).']);
+		$form->submit();
 		$form->checkValue($trigger_severity);
 	}
 }

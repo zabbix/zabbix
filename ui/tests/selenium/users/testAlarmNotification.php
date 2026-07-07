@@ -24,13 +24,13 @@ require_once __DIR__ . '/../../include/CWebTest.php';
 class testAlarmNotification extends CWebTest {
 
 	/**
-	 * Attach MessageBehavior, CTableBehavior to the test.
+	 * Attach MessageBehavior, CDatatableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			CTableBehavior::class,
+			CDatatableBehavior::class,
 			CMessageBehavior::class
 		];
 	}
@@ -294,6 +294,11 @@ class testAlarmNotification extends CWebTest {
 			}
 		}
 
+		// Check that clicking close button twice (simulating double-click) closes the dialog without producing an error.
+		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click()->click();
+		$alarm_dialog->waitUntilNotVisible();
+		$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid());
+
 		// Close problem and open Problem page.
 		CDBHelper::setTriggerProblem('Not_classified_trigger_4', TRIGGER_VALUE_FALSE);
 		$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
@@ -453,7 +458,7 @@ class testAlarmNotification extends CWebTest {
 				self::$hostid[self::HOST_NAME])->waitUntilReady();
 
 		// Check that problems displayed in table.
-		$this->assertTableDataColumn($data['trigger_name'], 'Problem');
+		$this->assertDatatableDataColumn($data['trigger_name'], 'Problem');
 
 		// Find appeared Alarm notification overlay dialog and check triggered problems by trigger name.
 		$alarm_dialog = $this->getAlarmOverlay();
@@ -639,7 +644,7 @@ class testAlarmNotification extends CWebTest {
 
 		// Check that problems displayed in table.
 		$triggered_problems = (array_key_exists('suppressed_problem', $data)) ? $data['suppressed_problem'] : self::ALL_TRIGGERS;
-		$this->assertTableDataColumn($triggered_problems, 'Problem');
+		$this->assertDatatableDataColumn($triggered_problems, 'Problem');
 
 		if ($data['trigger_name'] === '') {
 			$this->assertFalse($this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->one()->isDisplayed());

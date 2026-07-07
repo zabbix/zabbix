@@ -18,6 +18,8 @@
 #include "async_tcpsvc.h"
 #include "async_telnet.h"
 
+#include "zbxcommon.h"
+
 #ifdef HAVE_LIBCURL
 #	include "async_http.h"
 #endif
@@ -39,8 +41,6 @@
 #ifndef EVDNS_BASE_INITIALIZE_NAMESERVERS
 #	define EVDNS_BASE_INITIALIZE_NAMESERVERS	1
 #endif
-
-static ZBX_THREAD_LOCAL int log_worker_id;
 
 static int	discovery_async_poller_dns_init(discovery_poller_config_t *poller_config)
 {
@@ -82,12 +82,12 @@ static int	discovery_async_poller_dns_init(discovery_poller_config_t *poller_con
 
 static void	discovery_async_poller_destroy(discovery_poller_config_t *poller_config)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s()", log_worker_id, __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	evdns_base_free(poller_config->dnsbase, 1);
 	event_base_free(poller_config->base);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static int	discovery_async_poller_init(zbx_discoverer_manager_t *dmanager,
@@ -95,7 +95,7 @@ static int	discovery_async_poller_init(zbx_discoverer_manager_t *dmanager,
 {
 	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s()", log_worker_id, __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL == (poller_config->base = event_base_new()))
 	{
@@ -112,7 +112,7 @@ static int	discovery_async_poller_init(zbx_discoverer_manager_t *dmanager,
 	if (FAIL == (ret = discovery_async_poller_dns_init(poller_config)))
 		event_base_free(poller_config->base);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() error:'%s'", log_worker_id, __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() error:'%s'", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -124,7 +124,7 @@ static void	process_snmp_result(void *data)
 	zbx_dc_item_context_t	*item = zbx_async_check_snmp_get_item_context(data);
 	char			**pvalue;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() key:'%s' host:'%s' addr:'%s' ret:%s", log_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' ret:%s", __func__,
 			item->key, item->host, item->interface.addr, zbx_result_string(item->ret));
 
 	async_result->poller_config->processing--;
@@ -153,7 +153,7 @@ static void	process_snmp_result(void *data)
 	zbx_free(async_result);
 	zbx_async_check_snmp_clean(data);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc_dcheck_t *dcheck,
@@ -236,7 +236,7 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 	zbx_free(item.key_orig);
 	zbx_free(item.key);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s ret:%d", log_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() ip:%s port:%d, key:%s ret:%d", __func__,
 			ip, port, dcheck->key_, ret);
 
 	return ret;
@@ -250,7 +250,7 @@ static void	process_agent_result(void *data)
 	zbx_dc_item_context_t		*item = &agent_context->item;
 	char				**pvalue;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() key:'%s' host:'%s' addr:'%s' ret:%s", log_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' ret:%s", __func__,
 			item->key, item->host, item->interface.addr, zbx_result_string(item->ret));
 
 	async_result->poller_config->processing--;
@@ -280,7 +280,7 @@ static void	process_agent_result(void *data)
 	zbx_async_check_agent_clean(agent_context);
 	zbx_free(agent_context);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_dc_dcheck_t *dcheck,
@@ -331,7 +331,7 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 	zbx_free(item.key_orig);
 	zbx_free(item.key);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s ret:%d", log_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() ip:%s port:%d, key:%s ret:%d", __func__,
 			ip, port, dcheck->key_, ret);
 
 	return ret;
@@ -343,7 +343,7 @@ static void	async_task_process_result_tcpsvc(void *data)
 	discovery_async_result_t	*async_result = (discovery_async_result_t *)tcpsvc_context->arg;
 	zbx_dc_item_context_t		*item = &tcpsvc_context->item;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() key:'%s' host:'%s' addr:'%s' ret:%s", log_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' ret:%s", __func__,
 			item->key, item->host, item->interface.addr, zbx_result_string(item->ret));
 
 	async_result->poller_config->processing--;
@@ -371,7 +371,7 @@ static void	async_task_process_result_tcpsvc(void *data)
 	zbx_free(async_result);
 	zbx_async_check_tcpsvc_free(tcpsvc_context);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static int	discovery_tcpsvc(discovery_poller_config_t *poller_config, const zbx_dc_dcheck_t *dcheck,
@@ -451,7 +451,7 @@ static int	discovery_tcpsvc(discovery_poller_config_t *poller_config, const zbx_
 		poller_config->processing++;
 
 	zbx_free_agent_result(&result);
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s ret:%d", log_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() ip:%s port:%d, key:%s ret:%d", __func__,
 			ip, port, item.key_orig, ret);
 	return ret;
 }
@@ -462,7 +462,7 @@ static void	process_telnet_result(void *data)
 	discovery_async_result_t	*async_result = (discovery_async_result_t *)telnet_context->arg;
 	zbx_dc_item_context_t		*item = &telnet_context->item;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() key:'%s' host:'%s' addr:'%s' ret:%s", log_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' ret:%s", __func__,
 			item->key, item->host, item->interface.addr, zbx_result_string(item->ret));
 
 	async_result->poller_config->processing--;
@@ -490,7 +490,7 @@ static void	process_telnet_result(void *data)
 	zbx_free(async_result);
 	zbx_async_check_telnet_free(telnet_context);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static int	discovery_telnet(discovery_poller_config_t *poller_config, const zbx_dc_dcheck_t *dcheck,
@@ -523,7 +523,7 @@ static int	discovery_telnet(discovery_poller_config_t *poller_config, const zbx_
 			poller_config->dnsbase, poller_config->config_source_ip, ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES);
 	poller_config->processing++;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s", log_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() ip:%s port:%d, key:%s", __func__,
 			ip, port, item.key_orig);
 	return SUCCEED;
 }
@@ -608,7 +608,7 @@ static int	discovery_net_check_result_flush(zbx_discoverer_manager_t *dmanager, 
 	ret = discoverer_results_partrange_merge(&dmanager->results, results, task, force);
 	pthread_mutex_unlock(&dmanager->results_lock);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() results:%d saved:%d ret:%d", log_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() results:%d saved:%d ret:%d", __func__,
 			results->values_num, n - results->values_num, ret);
 
 	last = now;
@@ -632,7 +632,7 @@ int	discovery_pending_checks_count_decrease(zbx_discoverer_queue_t *queue, int c
 }
 
 int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int concurrency_max, int *stop,
-		zbx_discoverer_manager_t *dmanager, int worker_id, char **error)
+		zbx_discoverer_manager_t *dmanager, char **error)
 {
 	zbx_vector_discoverer_results_ptr_t	results;
 	discovery_poller_config_t		poller_config;
@@ -643,12 +643,9 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 	int					ret = FAIL, abort = SUCCEED;
 	zbx_uint64_t				dec_counter = 0;
 
-	if (0 == log_worker_id)
-		log_worker_id = worker_id;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() druleid:" ZBX_FS_UI64 " range id:" ZBX_FS_UI64 " state.count:"
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() druleid:" ZBX_FS_UI64 " range id:" ZBX_FS_UI64 " state.count:"
 			ZBX_FS_UI64 " checks per ip:%u dchecks:%d type:%u concurrency_max:%d checks_per_worker_max:%d",
-			log_worker_id, __func__, druleid, task->range.id, task->range.state.count,
+			__func__, druleid, task->range.id, task->range.state.count,
 			task->range.state.checks_per_ip, task->ds_dchecks.values_num,
 			GET_DTYPE(task), concurrency_max, dmanager->queue.checks_per_worker_max);
 
@@ -777,8 +774,8 @@ out:
 		zbx_clear_cache_snmp(dmanager->process_type, FAIL);
 #endif
 poller_fail:
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:" ZBX_FS_UI64
-			" first ip:%s last ip:%s abort:%d ret:%d", log_worker_id, __func__, druleid,
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:" ZBX_FS_UI64
+			" first ip:%s last ip:%s abort:%d ret:%d", __func__, druleid,
 			task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.type,
 			task->range.state.count, first_ip, ip, abort, ret);
 

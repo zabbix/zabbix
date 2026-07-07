@@ -75,6 +75,7 @@
 #include "zbxbincommon.h"
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
+#include "zbxcurl.h"
 
 #ifdef HAVE_OPENIPMI
 #include "zbxipmi.h"
@@ -1198,7 +1199,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 
 	int	sync_mode = (0 == proxy_has_started ? ZBX_SYNC_NONE : ZBX_SYNC_ALL);
 
-	zbx_free_database_cache(sync_mode, &events_cbs, config_history_storage_pipelines);
+	zbx_free_database_cache(sync_mode, &events_cbs);
 	zbx_pb_flush();
 	zbx_pb_destroy();
 	zbx_free_configuration_cache();
@@ -1583,7 +1584,9 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.discovery_open_cb = zbx_discovery_open_proxy,
 			.discovery_close_cb = zbx_discovery_close_proxy,
 			.discovery_find_host_cb = zbx_discovery_find_host_proxy,
+			.discovery_update_interface_cb = zbx_discovery_update_interface_proxy,
 			.discovery_update_host_cb = zbx_discovery_update_host_proxy,
+			.discovery_update_hosts_cb = zbx_discovery_update_hosts_proxy,
 			.discovery_update_service_cb = zbx_discovery_update_service_proxy,
 			.discovery_update_service_down_cb = zbx_discovery_update_service_down_proxy,
 			.discovery_update_drule_cb = zbx_discovery_update_drule_proxy
@@ -1673,6 +1676,8 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 	thread_args.info.program_type = zbx_program_type;
 
 	/* prepare supervisor unit definitions */
+
+	zbx_curl_cleanup();
 
 	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_PREPROCMAN] = (zbx_supervisor_unit_def_t){
 			.entry = zbx_pp_manager_thread,

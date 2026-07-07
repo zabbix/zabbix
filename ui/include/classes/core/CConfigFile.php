@@ -22,6 +22,23 @@ class CConfigFile {
 
 	const CONFIG_FILE_PATH = '/conf/zabbix.conf.php';
 
+	/**
+	 * Mapping between ITEM_VALUE_TYPE_* constants and strings from configuration file when configuring history storage.
+	 * ITEM_VALUE_TYPE_BINARY is not supported.
+	 */
+	public const VALUE_TYPE_CONFIG_NAME = [
+		ITEM_VALUE_TYPE_FLOAT => 'dbl',
+		ITEM_VALUE_TYPE_STR => 'str',
+		ITEM_VALUE_TYPE_LOG => 'log',
+		ITEM_VALUE_TYPE_UINT64 => 'uint',
+		ITEM_VALUE_TYPE_TEXT => 'text',
+		ITEM_VALUE_TYPE_JSON => 'json'
+	];
+
+	public const SUPPORTED_SOURCE = [
+		ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC
+	];
+
 	private static $supported_db_types = [
 		ZBX_DB_MYSQL => true,
 		ZBX_DB_POSTGRESQL => true
@@ -180,16 +197,71 @@ class CConfigFile {
 			$this->config['IMAGE_FORMAT_DEFAULT'] = $IMAGE_FORMAT_DEFAULT;
 		}
 
+		if (isset($HISTORY) && isset($HISTORY_PROVIDERS)) {
+			self::exception(_s('Cannot use both %1$s and %2$s at the same time.', '$HISTORY_PROVIDERS', '$HISTORY'));
+		}
+
 		if (isset($HISTORY)) {
-			$this->config['HISTORY'] = $HISTORY;
+			if (is_array($HISTORY)
+					&& array_key_exists('types', $HISTORY) && is_array($HISTORY['types'])
+					&& array_key_exists('url', $HISTORY) && (is_array($HISTORY['url']) || is_string($HISTORY['url']))) {
+				$HISTORY_PROVIDERS = $this->validateHistoryProvidersDeprecated($HISTORY);
+			}
+			else {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', '$HISTORY',
+					_('incorrect format'))
+				);
+			}
+		}
+
+		if (isset($HISTORY_PROVIDERS)) {
+			if (!is_array($HISTORY_PROVIDERS)) {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', '$HISTORY_PROVIDERS',
+					_('incorrect format'))
+				);
+			}
+
+			$this->config['HISTORY_PROVIDERS'] = $this->validateHistoryProviders($HISTORY_PROVIDERS);
 		}
 
 		if (isset($SSO)) {
 			$this->config['SSO'] = $SSO;
 		}
 
+		if (isset($ALLOW_HTTP_AUTH) && isset($ZBX_FEATURE_FLAGS['http_auth_enabled'])) {
+			self::exception(_s('Cannot use both %1$s and %2$s at the same time.', '$ALLOW_HTTP_AUTH',
+				'$ZBX_FEATURE_FLAGS[\'http_auth_enabled\']'));
+		}
+
 		if (isset($ALLOW_HTTP_AUTH)) {
+			$ZBX_FEATURE_FLAGS['http_auth_enabled'] = $ALLOW_HTTP_AUTH;
 			$this->config['ALLOW_HTTP_AUTH'] = $ALLOW_HTTP_AUTH;
+		}
+
+		if (isset($ZBX_FEATURE_FLAGS['banners_enabled'])) {
+			$this->config['ZBX_FEATURE_FLAGS']['banners_enabled'] = $ZBX_FEATURE_FLAGS['banners_enabled'];
+		}
+
+		if (isset($ZBX_FEATURE_FLAGS['http_auth_enabled'])) {
+			$this->config['ZBX_FEATURE_FLAGS']['http_auth_enabled'] = $ZBX_FEATURE_FLAGS['http_auth_enabled'];
+		}
+
+		if (isset($ZBX_FEATURE_FLAGS['modules_config_enabled'])) {
+			$this->config['ZBX_FEATURE_FLAGS']['modules_config_enabled'] = $ZBX_FEATURE_FLAGS['modules_config_enabled'];
+		}
+
+		if (isset($ZBX_FEATURE_FLAGS['media_type_denylist'])) {
+			if (!is_array($ZBX_FEATURE_FLAGS['media_type_denylist'])) {
+				self::exception(_s('Incorrect configuration %1$s: %2$s.',
+					'$ZBX_FEATURE_FLAGS[\'media_type_denylist\']',
+					_('an array is expected')
+				));
+			}
+			else {
+				$this->config['ZBX_FEATURE_FLAGS']['media_type_denylist'] = $this->getMediaTypeDenylist(
+					$ZBX_FEATURE_FLAGS['media_type_denylist']
+				);
+			}
 		}
 
 		if (isset($ZBX_SERVER_TLS) && is_array($ZBX_SERVER_TLS)) {
@@ -224,17 +296,17 @@ class CConfigFile {
 	}
 
 	public function makeGlobal() {
-		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO,
-			$ALLOW_HTTP_AUTH, $ZBX_SERVER_TLS;
+		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY_PROVIDERS, $SSO,
+			$ZBX_SERVER_TLS, $ZBX_FEATURE_FLAGS;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
 		$ZBX_SERVER_PORT = $this->config['ZBX_SERVER_PORT'];
 		$ZBX_SERVER_NAME = $this->config['ZBX_SERVER_NAME'];
 		$IMAGE_FORMAT_DEFAULT = $this->config['IMAGE_FORMAT_DEFAULT'];
-		$HISTORY = $this->config['HISTORY'];
+		$HISTORY_PROVIDERS = $this->config['HISTORY_PROVIDERS'];
 		$SSO = $this->config['SSO'];
-		$ALLOW_HTTP_AUTH = $this->config['ALLOW_HTTP_AUTH'];
+		$ZBX_FEATURE_FLAGS = $this->config['ZBX_FEATURE_FLAGS'];
 		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
 	}
 
@@ -316,16 +388,45 @@ $ZBX_SERVER_NAME		= \''.addcslashes($this->config['ZBX_SERVER_NAME'], "'\\").'\'
 
 $IMAGE_FORMAT_DEFAULT		= IMAGE_FORMAT_PNG;
 
-// Uncomment this block only if you are using Elasticsearch.
-// Elasticsearch url (can be string if same url is used for all types).
-//$HISTORY[\'url\'] = [
-//	\'uint\' => \'http://localhost:9200\',
-//	\'text\' => \'http://localhost:9200\'
+// Configuration of history storage providers for Elasticsearch or ClickHouse.
+// Supported configuration parameters:
+// \'types\'    - Array of data types to be stored in the external storage.
+// \'provider\' - History provider type: \'elasticsearch\' or \'clickhouse\'.
+// \'url\'      - History provider URL.
+// \'db\'       - Database name (used for ClickHouse).
+// \'username\' - Database user (used for ClickHouse).
+// \'password\' - Database password (used for ClickHouse).
+// ClickHouse:
+//$HISTORY_PROVIDERS[] = [
+//	\'types\' => [\'uint\', \'dbl\', \'str\', \'log\', \'text\', \'json\'],
+//	\'provider\' => \'clickhouse\',
+//	\'url\' => \'http://localhost:8123\',
+//	\'db\' => \'zabbix\',
+//	\'username\' => \'zabbix\',
+//	\'password\' => \'zabbix\'
 //];
-// Value types stored in Elasticsearch.
-//$HISTORY[\'types\'] = [\'uint\', \'text\'];
+// Elasticsearch:
+//$HISTORY_PROVIDERS[] = [
+//	\'types\' => [\'uint\', \'dbl\', \'str\', \'log\', \'text\', \'json\'],
+//	\'provider\' => \'elasticsearch\',
+//	\'url\' => \'http://localhost:9200\'
+//];
+// ClickHouse and Elasticsearch:
+//$HISTORY_PROVIDERS[] = [
+//	\'types\' => [\'uint\', \'dbl\', \'str\'],
+//	\'provider\' => \'clickhouse\',
+//	\'url\' => \'http://localhost:8123\',
+//	\'db\' => \'zabbix\',
+//	\'username\' => \'zabbix\',
+//	\'password\' => \'zabbix\'
+//];
+//$HISTORY_PROVIDERS[] = [
+//	\'types\' => [\'log\', \'text\', \'json\'],
+//	\'provider\' => \'elasticsearch\',
+//	\'url\' => \'http://localhost:9200\'
+//];
 
-// Used for SAML authentication.
+// SAML authentication.
 
 // Uncomment to set extra settings.
 //$SSO[\'SETTINGS\']		= [];
@@ -338,8 +439,18 @@ $SSO[\'CERT_STORAGE\']		= \'database\';
 //$SSO[\'SP_CERT\']		= \'conf/certs/sp.crt\';
 //$SSO[\'IDP_CERT\']		= \'conf/certs/idp.crt\';
 
-// If set to false, support for HTTP authentication will be disabled.
-// $ALLOW_HTTP_AUTH = true;
+// Uncomment and set to false to disable support for banners.
+//$ZBX_FEATURE_FLAGS[\'banners_enabled\'] = true;
+
+// Uncomment and set to false to disable user HTTP authentication.
+//$ZBX_FEATURE_FLAGS[\'http_auth_enabled\'] = true;
+
+// Uncomment and set to false to disable access to modules.
+//$ZBX_FEATURE_FLAGS[\'modules_config_enabled\'] = true;
+
+// Uncomment and set to desired values to disable editing of specific media types.
+// Possible values: \'email\', \'script\', \'sms\', \'webhook\'. One or more values can be set.
+//$ZBX_FEATURE_FLAGS[\'media_type_denylist\'] = [];
 
 $ZBX_SERVER_TLS[\'ACTIVE\'] = '.($this->config['ZBX_SERVER_TLS']['ACTIVE'] ? 'true' : 'false').';
 $ZBX_SERVER_TLS[\'CA_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CA_FILE'], "'\\").'\';
@@ -348,6 +459,31 @@ $ZBX_SERVER_TLS[\'CERT_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']
 $ZBX_SERVER_TLS[\'CERTIFICATE_ISSUER\']  = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_ISSUER'], "'\\").'\';
 $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_SUBJECT'], "'\\").'\';
 ';
+	}
+
+	/**
+	 * Validate and return $ZBX_FEATURE_FLAGS['media_type_denylist'] configuration.
+	 *
+	 * @param array $media_type_denylist  Array from configuration file.
+	 *
+	 * @throws Exception
+	 */
+	protected function getMediaTypeDenylist(array $media_type_denylist): array {
+		$type_flag = [
+			MEDIA_TYPE_EMAIL => 'email',
+			MEDIA_TYPE_EXEC => 'script',
+			MEDIA_TYPE_SMS => 'sms',
+			MEDIA_TYPE_WEBHOOK => 'webhook'
+		];
+
+		if (array_diff($media_type_denylist, $type_flag)) {
+			self::exception(_s('Incorrect configuration %1$s: %2$s.',
+				'$ZBX_FEATURE_FLAGS[\'media_type_denylist\']',
+				_s('value must be one of %1$s', implode(',', $type_flag))
+			));
+		}
+
+		return array_keys(array_intersect($type_flag, $media_type_denylist));
 	}
 
 	protected function setDefaults() {
@@ -378,9 +514,14 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 		$this->config['ZBX_SERVER_PORT'] = null;
 		$this->config['ZBX_SERVER_NAME'] = '';
 		$this->config['IMAGE_FORMAT_DEFAULT'] = IMAGE_FORMAT_PNG;
-		$this->config['HISTORY'] = null;
+		$this->config['HISTORY_PROVIDERS'] = [];
 		$this->config['SSO'] = null;
-		$this->config['ALLOW_HTTP_AUTH'] = true;
+		$this->config['ZBX_FEATURE_FLAGS'] = [
+			'banners_enabled' => true,
+			'http_auth_enabled' => true,
+			'modules_config_enabled' => true,
+			'media_type_denylist' => []
+		];
 		$this->config['ZBX_SERVER_TLS'] = [
 			'ACTIVE' => false,
 			'CA_FILE' => '',
@@ -389,5 +530,102 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 			'CERTIFICATE_ISSUER' => '',
 			'CERTIFICATE_SUBJECT' => ''
 		];
+	}
+
+	/**
+	 * Get valid history storage configuration.
+	 *
+	 * @param array $providers
+	 * @throws ConfigFileException
+	 */
+	protected function validateHistoryProviders(array $providers): array {
+		$result = [];
+		$value_types = [];
+		$required = [
+			ZBX_HISTORY_SOURCE_CLICKHOUSE => ['types', 'url', 'db', 'username', 'password'],
+			ZBX_HISTORY_SOURCE_ELASTIC => ['types', 'url']
+		];
+
+		foreach ($providers as $i => $provider) {
+			$path = ($i + 1).'/';
+			$missing = array_key_exists('provider', $provider) && array_key_exists($provider['provider'], $required)
+				? $required[$provider['provider']]
+				: ['provider'];
+			$missing = array_diff($missing, array_keys($provider));
+
+			if ($missing) {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', $path,
+					_s('the parameter "%1$s" is missing', reset($missing))
+				));
+			}
+
+			if (!in_array($provider['provider'], self::SUPPORTED_SOURCE)) {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', $path.'provider',
+					_s('value must be one of %1$s', implode(',', self::SUPPORTED_SOURCE))
+				));
+			}
+
+			if (!is_array($provider['types']) || array_diff($provider['types'], self::VALUE_TYPE_CONFIG_NAME)) {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', $path.'types',
+					_s('value must be one of %1$s', implode(',', self::VALUE_TYPE_CONFIG_NAME))
+				));
+			}
+
+			$provider_value_types = array_fill_keys($provider['types'], $i);
+			$in_use = array_intersect_key($value_types, $provider_value_types);
+			$value_types += $provider_value_types;
+
+			if ($in_use) {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', $path.'types',
+					_s('value "%1$s" already exists', key($in_use))
+				));
+			}
+
+			$provider['url'] = rtrim($provider['url'], '/');
+			$provider['types'] = array_keys(array_intersect(self::VALUE_TYPE_CONFIG_NAME, $provider['types']));
+			$result[] = $provider;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Get valid Elastic history storage configuration from deprecated format.
+	 * Return array of providers configurations in format compatible with $HISTORY_PROVIDERS configuration.
+	 *
+	 * @param array $config
+	 * @throws ConfigFileException
+	 */
+	protected function validateHistoryProvidersDeprecated(array $config): array {
+		if (is_string($config['url'])) {
+			return [[
+				'types' => $config['types'],
+				'provider' => ZBX_HISTORY_SOURCE_ELASTIC,
+				'url' => $config['url']
+			]];
+		}
+
+		$providers = [];
+
+		foreach ($config['types'] as $type_name) {
+			if (!array_key_exists($type_name, $config['url'])) {
+				self::exception(_s('Elasticsearch URL is not set for type: %1$s.', $type_name));
+			}
+
+			$url = $config['url'][$type_name];
+
+			if (array_key_exists($url, $providers)) {
+				$providers[$url]['types'][] = $type_name;
+			}
+			else {
+				$providers[$url] = [
+					'types' => [$type_name],
+					'provider' => ZBX_HISTORY_SOURCE_ELASTIC,
+					'url' => $url
+				];
+			}
+		}
+
+		return array_values($providers);
 	}
 }

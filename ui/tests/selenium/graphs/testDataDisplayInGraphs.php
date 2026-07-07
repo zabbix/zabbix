@@ -5610,7 +5610,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		// Switch to filter tab and fill in the name pattern to return only graphs with certain type.
 		CFilterElement::find()->one()->selectTab('Filter');
-		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
+		$filter_form = $this->query('name:zbx_filter')->waitUntilVisible()->asForm()->one();
 		$filter_form->fill(['Name' => $data['type']]);
 
 		$screenshot_string = (CTestArrayHelper::get($data, 'kiosk_mode'))
@@ -5663,6 +5663,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
 				$this->query('xpath://button[@title="Normal view"]')->one()->click();
 				$this->page->waitUntilReady();
+				$this->query('class:btn-kiosk')->waitUntilVisible();
 			}
 		}
 	}
@@ -5819,12 +5820,14 @@ class testDataDisplayInGraphs extends CWebTest {
 		}
 		else {
 			$object->asDashboard()->waitUntilReady();
+			$this->query('class:dashboard-is-multipage')->one()->waitUntilClassesPresent('is-ready');
 		}
 
 		$this->assertScreenshotExcept($object, $this->query('class:header-kioskmode-controls')->one(), $id.'_kiosk');
 
 		$this->query('xpath://button[@title="Normal view"]')->one()->click();
 		$this->page->waitUntilReady();
+		$this->query('xpath://button[@title="Kiosk mode"]')->waitUntilPresent();
 	}
 
 	/**
