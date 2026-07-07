@@ -5767,6 +5767,11 @@ class testDataDisplayInGraphs extends CWebTest {
 	}
 
 	/**
+	 * The ignore browser errors annotation is required due to the errors coming from Dashboard with timeselector
+	 * opened in Kiosk mode. TODO: Remove after fix - ZBX-27942
+	 *
+	 * @ignoreBrowserErrors
+	 *
 	 * @dataProvider getDashboardWidgetData
 	 */
 	public function testDataDisplayInGraphs_DashboardWidgets($data) {
@@ -5781,6 +5786,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		// Open the required dashboard page and check screenshot.
 		if ($data['page'] !== $dashboard->getSelectedPageName()) {
+			sleep(10);
 			$dashboard->selectPage($data['page']);
 			$dashboard->waitUntilReady();
 		}
