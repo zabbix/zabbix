@@ -2965,6 +2965,22 @@ HEREDOC;
 
 	/**
 	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp,
+	 * but once every problem is open (at the trigger's DISASTER priority, so each per-trigger service is at
+	 * DISASTER too) the open problems are manually downgraded to WARNING via event.acknowledge. The test
+	 * then verifies the service manager follows the manual severity change: every service drops to WARNING.
+	 * The "up" values then close the problems and the services recover to OK.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_AddServices$|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSeverity$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSeverity() {
+		$this->skipIfServicesTestsDisabled();
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSeverity(false);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
+	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp,
 	 * but the discovered host only enters data-collection maintenance after the first wave of problems is
 	 * already open: the maintenance is created mid-run, so the already-open problems must be suppressed
 	 * retroactively, and every problem opened afterwards (while maintenance is active) suppressed at
@@ -3718,6 +3734,70 @@ HEREDOC;
 		// 4. "up" for the second id set closes each trigger's remaining problem; nothing stays open.
 		$this->dispatchSenderValues($values('up', $m), null, 0);
 		$this->waitForNoOpenProblems($all);
+	}
+
+	/**
+	 * Same close-on-up flow as runEventAssessmentTestGlobalCorrelationCloseOnUp, but once all problems are
+	 * open it downgrades every open problem's severity to WARNING via event.acknowledge and asserts the
+	 * per-trigger services follow the manual severity change from DISASTER to WARNING, then closes the
+	 * problems with "up" and asserts the services recover to OK.
+	 */
+	private function runEventAssessmentTestGlobalCorrelationCloseOnUpSeverity(bool $restart): void {
+		$keys = array_merge(
+			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
+			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2)
+		);
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+		$m = count($keys);
+
+		// Build one sender value per key with a unique id: value "<prefix>_<offset + key index>".
+		$values = fn(string $prefix, int $offset) => array_map(
+			fn($key, $i) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $prefix.'_'.($offset + $i)],
+			$keys, array_keys($keys)
+		);
+
+		// All triggers must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'All triggers must start in OK state for close-on-up severity global correlation test.');
+		}
+
+		// 1. Open the first problem on every trigger (unique id per trigger); triggers go TRUE.
+		$this->dispatchSenderValues($values('down', 0), null, 0);
+		$this->waitForOpenProblemCount($all, $m);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		// 2. Open a second problem on every trigger (a different unique id, mult_event); still TRUE.
+		$this->dispatchSenderValues($values('down', $m), null, 0);
+		$this->waitForOpenProblemCount($all, 2 * $m);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		// The trigger prototypes have DISASTER priority, so with problems open every per-trigger service
+		// (matched via the SERVICE_TAG problem tag) is at DISASTER.
+		$this->waitForServicesStatus(TRIGGER_SEVERITY_DISASTER);
+
+		$this->maybeRestartServer($restart);
+
+		// 3. Manually downgrade every open problem to WARNING. The service manager must recompute each
+		//    service's status from the new problem severity, so all services drop DISASTER -> WARNING.
+		$this->updateOpenProblemsSeverity($all, TRIGGER_SEVERITY_WARNING);
+		$this->waitForServicesStatus(TRIGGER_SEVERITY_WARNING);
+
+		$this->maybeRestartServer($restart);
+
+		// 4. "up" for the first id set closes each corresponding "down" (and itself); each trigger's second
+		//    problem stays open, so the services stay in problem state (still WARNING).
+		$this->dispatchSenderValues($values('up', 0), null, 0);
+		$this->waitForOpenProblemCount($all, $m);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->waitForServicesStatus(TRIGGER_SEVERITY_WARNING);
+
+		$this->maybeRestartServer($restart);
+
+		// 5. "up" for the second id set closes each trigger's remaining problem; every service recovers to OK.
+		$this->dispatchSenderValues($values('up', $m), null, 0);
+		$this->waitForNoOpenProblems($all);
+		$this->waitForServicesStatus(ZBX_SEVERITY_OK);
 	}
 
 	/**
@@ -4929,6 +5009,42 @@ HEREDOC;
 			'object' => EVENT_OBJECT_SERVICE,
 			'source' => EVENT_SOURCE_SERVICE
 		], $expected_open_problems, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Poll the per-trigger CEP services until every one reports $expected_status (a ZBX_SEVERITY_* value,
+	 * or ZBX_SEVERITY_OK once recovered). Unlike assertServicesStatus() this only checks the status, so it
+	 * can be used after a manual problem-severity change where the open service problem count is irrelevant.
+	 */
+	private function waitForServicesStatus(int $expected_status): void {
+		$serviceids = self::$serviceids;
+
+		$this->callUntilCountIsPresent('service.get', [
+			'serviceids' => $serviceids,
+			'filter' => ['status' => $expected_status]
+		], count($serviceids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Collect every open problem on $triggerids and manually change its severity to $severity via
+	 * event.acknowledge (ZBX_PROBLEM_UPDATE_SEVERITY), so the service manager recomputes the status of the
+	 * services matched to those problems.
+	 */
+	private function updateOpenProblemsSeverity(array $triggerids, int $severity): void {
+		$response = $this->call('problem.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'output' => ['eventid']
+		]);
+		$eventids = array_column($response['result'], 'eventid');
+		$this->assertNotEmpty($eventids, 'Expected open problems to update severity for, found none.');
+
+		$this->call('event.acknowledge', [
+			'eventids' => $eventids,
+			'action' => ZBX_PROBLEM_UPDATE_SEVERITY,
+			'severity' => $severity
+		]);
 	}
 
 	private function currentClockNs(): array {
