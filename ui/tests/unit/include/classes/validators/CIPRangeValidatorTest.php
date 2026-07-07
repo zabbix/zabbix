@@ -19,7 +19,9 @@ use PHPUnit\Framework\TestCase;
 class CIPRangeValidatorTest extends TestCase {
 	public function dataProvider() {
 		return [
-			["0.0.0.0,255.255.255.255 \t\r\n,\t\r\n 192.168.1.0,2002:0:0:0:0:0:0:0,2002:0:0:0:0:0:ffff:ffff,www.zabbix.com", [], 'incorrect address starting from "2002:0:0:0:0:0:0:0,2002:0:0:0:0:0:ffff:ffff,www.zabbix.com"'],
+			["0.0.0.0,255.255.255.255 \t\r\n,\t\r\n 192.168.1.0,2002:0:0:0:0:0:0:0,2002:0:0:0:0:0:ffff:ffff,www.zabbix.com", [],
+				'incorrect address starting from "2002:0:0:0:0:0:0:0,2002:0:0:0:0:0:ffff:ffff,www.zabbix.com"'
+			],
 			['www.zabbix.com', [], 'incorrect address starting from "www.zabbix.com"'],
 			['www.zabbix.com,bad.dns-', [], 'incorrect address starting from "www.zabbix.com,bad.dns-"'],
 			['Zabbix server', [], 'incorrect address starting from "Zabbix server"'],
@@ -31,17 +33,25 @@ class CIPRangeValidatorTest extends TestCase {
 			['192.168.0.0/16,192.168.0.1', [], null],
 			['192.168.0.1-127,192.168.2.1', [], null],
 			[' 192.168.0.2 , 192.168.1-127.0  ,  192.168.255.0/16  ', [], null],
-			['2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF', [], 'incorrect address starting from "2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF"'],
+			['2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF', [],
+				'incorrect address starting from "2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF"'
+			],
 			['fe80:0:0:0:0:0:c0a8:0/128', [], 'incorrect address starting from "fe80:0:0:0:0:0:c0a8:0/128"'],
-			['ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/0', [], 'incorrect address starting from "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/0"'],
+			['ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/0', [],
+				'incorrect address starting from "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/0"'
+			],
 			['::', [], 'incorrect address starting from "::"'],
 			['fe80::c0a8:0/112', [], 'incorrect address starting from "fe80::c0a8:0/112"'],
 			['fe80::c0a8:0/112', ['v6' => false], 'incorrect address starting from "fe80::c0a8:0/112"'],
 			['fe80::c0a8:0/128', [], 'incorrect address starting from "fe80::c0a8:0/128"'],
 			['fe80:0:0:0:0:0:c0a8:0-ff', [], 'incorrect address starting from "fe80:0:0:0:0:0:c0a8:0-ff"'],
 			['fe80::c0a8:0-ff', [], 'incorrect address starting from "fe80::c0a8:0-ff"'],
-			['0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff', [], 'incorrect address starting from "0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff"'],
-			[' fe80::c0a8:100 , fe80::c0a8:0-ff:1  ,  fe80::c0a8:0:1/112  ', [], 'incorrect address starting from "fe80::c0a8:100 , fe80::c0a8:0-ff:1  ,  fe80::c0a8:0:1/112  "'],
+			['0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff', [],
+				'incorrect address starting from "0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff"'
+			],
+			[' fe80::c0a8:100 , fe80::c0a8:0-ff:1  ,  fe80::c0a8:0:1/112  ', [],
+				'incorrect address starting from "fe80::c0a8:100 , fe80::c0a8:0-ff:1  ,  fe80::c0a8:0:1/112  "'
+			],
 			['255.255.255.254/30', [], null],
 			['255.255.0.0/16', [], null],
 			['fe80:0:0:0:0:0:c0a8:0/112', [], 'incorrect address starting from "fe80:0:0:0:0:0:c0a8:0/112"'],
@@ -78,9 +88,15 @@ class CIPRangeValidatorTest extends TestCase {
 			['192.168.0.0/30', ['max' => 3], 'IP range "192.168.0.0/30" exceeds "3" address limit'],
 			['192.168.0.1-2,192.168.1.1-3', ['max' => 3], null],
 			['192.168.0.1-2,192.168.1.1-4', ['max' => 3], 'IP range "192.168.1.1-4" exceeds "3" address limit'],
-			['www.zabbix.com', ['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30], 'incorrect address starting from "www.zabbix.com"'],
-			['192.168.0.0/29', ['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30, 'max' => 7], 'IP range "192.168.0.0/29" exceeds "7" address limit'],
-			['192.168.0.0/30', ['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30, 'max' => 3], 'IP range "192.168.0.0/30" exceeds "3" address limit']
+			['www.zabbix.com', ['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30],
+				'incorrect address starting from "www.zabbix.com"'
+			],
+			['192.168.0.0/29', ['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30, 'max' => 7],
+				'IP range "192.168.0.0/29" exceeds "7" address limit'
+			],
+			['192.168.0.0/30', ['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30, 'max' => 3],
+				'IP range "192.168.0.0/30" exceeds "3" address limit'
+			]
 		];
 	}
 
@@ -94,14 +110,9 @@ class CIPRangeValidatorTest extends TestCase {
 	public function testValidate(string $source, array $options, ?string $expected): void {
 		$validator = new CIPRangeValidator($options);
 
-		$expected_result = [
-			'result' => $expected === null,
-			'error' => $expected
-		];
+		$result = $validator->validate($source);
 
-		$this->assertSame($expected_result, [
-			'result' => $validator->validate($source),
-			'error' => $validator->getError()
-		]);
+		$this->assertSame($expected === null, $result);
+		$this->assertSame($expected, $validator->getError());
 	}
 }
