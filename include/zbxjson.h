@@ -268,6 +268,7 @@
 #define ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE	"expressions.evaluate"
 #define ZBX_PROTO_VALUE_DEVICE_INIT		"device.init"
 #define ZBX_PROTO_VALUE_DEVICE_OFFBOARD		"device.offboard"
+#define ZBX_PROTO_VALUE_DEVICE_DEACTIVATE	"device.deactivate"
 #define ZBX_PROTO_VALUE_DEVICE_NOTIFY		"device.notify"
 #define ZBX_PROTO_VALUE_MEDIA_TEST		"media.test"
 

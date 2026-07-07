@@ -649,7 +649,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 	zbx_json_init(&request, 512);
 
 	zbx_json_addstring(&request, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&request, "method", "device.deactivate", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&request, "method", ZBX_PROTO_VALUE_DEVICE_DEACTIVATE, ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&request, "params");
 	zbx_json_addstring(&request, "device_id", device_id, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&request);
