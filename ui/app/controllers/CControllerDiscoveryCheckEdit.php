@@ -67,24 +67,13 @@ class CControllerDiscoveryCheckEdit extends CController {
 		], $this->getInputAll());
 
 		$params = array_intersect_key($data, DB::getSchema('dchecks')['fields']);
-
-		if ($data['type'] == SVC_ICMPPING) {
-			unset($data['ports']);
-		}
-
-		if (array_key_exists('snmp_oid', $data)) {
-			$params['key_'] = $data['snmp_oid'];
-		}
-
 		$params['name'] = discovery_check_type2str($data['type']);
-
-		$dchecks = $this->getInput('dchecks', []);
 
 		$output = [
 			'title' => _('Discovery check'),
 			'params' => $params + DB::getDefaults('dchecks'),
 			'update' => $this->getInput('update', 0),
-			'dchecks' => $dchecks,
+			'dchecks' => $data['dchecks'],
 			'js_validation_rules' => (new CFormValidator(
 				CControllerDiscoveryCheckCheck::getValidationRules()
 			))->getRules(),
