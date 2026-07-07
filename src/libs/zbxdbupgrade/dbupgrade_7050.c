@@ -1050,29 +1050,43 @@ static int	DBpatch_7050083(void)
 	return SUCCEED;
 }
 
+typedef struct
+{
+	zbx_uint64_t	roleid;
+	const char	*values;
+}
+zbx_role_rule_t;
+
 static int	DBpatch_7050084(void)
 {
 	int		i;
 	const char	*columns = "role_ruleid,roleid,type,name,value_int,value_str,value_moduleid,value_serviceid";
-	const char	*values[] = {
-			"1,0,'devices.access',0,'',NULL,NULL",
-			"1,0,'devices.actions.default_access',0,'',NULL,NULL",
-			"2,0,'devices.access',0,'',NULL,NULL",
-			"2,0,'devices.actions.default_access',0,'',NULL,NULL",
-			"3,0,'devices.access',1,'',NULL,NULL",
-			"3,0,'devices.actions.default_access',1,'',NULL,NULL",
-			"4,0,'devices.access',0,'',NULL,NULL",
-			"4,0,'devices.actions.default_access',0,'',NULL,NULL",
-			NULL
+
+	static const zbx_role_rule_t values[] = {
+			{1, "1,0,'devices.access',0,'',NULL,NULL"},
+			{1, "1,0,'devices.actions.default_access',0,'',NULL,NULL"},
+			{2, "2,0,'devices.access',0,'',NULL,NULL"},
+			{2, "2,0,'devices.actions.default_access',0,'',NULL,NULL"},
+			{3, "3,0,'devices.access',1,'',NULL,NULL"},
+			{3, "3,0,'devices.actions.default_access',1,'',NULL,NULL"},
+			{4, "4,0,'devices.access',0,'',NULL,NULL"},
+			{4, "4,0,'devices.actions.default_access',0,'',NULL,NULL"},
+			{0, NULL}
 	};
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	for (i = 0; NULL != values[i]; i++)
+	for (i = 0; NULL != values[i].values; i++)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("insert into role_rule (%s) values (" ZBX_FS_UI64 ",%s)", columns,
-				zbx_db_get_maxid("role_rule"), values[i]))
+		if (ZBX_DB_OK > zbx_db_execute(
+				"insert into role_rule (%s)"
+					" select " ZBX_FS_UI64 ",%s"
+					" where exists ("
+						"select 1 from role"
+						" where roleid=" ZBX_FS_UI64
+				")",
+				columns, zbx_db_get_maxid("role_rule"), values[i].values, values[i].roleid))
 		{
 			return FAIL;
 		}
