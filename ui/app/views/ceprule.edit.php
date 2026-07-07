@@ -142,7 +142,6 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => $this->readJsFile('ceprule.condition.edit.js.php')
-		.$this->readJsFile('ceprule.window.condition.edit.js.php')
 		.$this->readJsFile('ceprule.operation.edit.js.php')
 		.$this->readJsFile('ceprule.edit.js.php')
 		.'ceprule_edit_popup.init('.json_encode([
