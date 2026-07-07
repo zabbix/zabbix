@@ -5786,7 +5786,6 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		// Open the required dashboard page and check screenshot.
 		if ($data['page'] !== $dashboard->getSelectedPageName()) {
-			sleep(10);
 			$dashboard->selectPage($data['page']);
 			$dashboard->waitUntilReady();
 		}
