@@ -1746,19 +1746,19 @@ class CUserGroup extends CApiService {
 			return;
 		}
 
-		$db_proxies = [];
+		$db_proxy_groups = [];
 		$relation_map = $this->createRelationMap($result, 'usrgrpid', 'proxy_groupid', 'usrgrp_proxy_group');
 		$related_ids = $relation_map->getRelatedIds();
 
 		if ($related_ids) {
-			$db_proxies = API::ProxyGroup()->get([
+			$db_proxy_groups = API::ProxyGroup()->get([
 				'output' => $options['selectProxyGroups'],
 				'proxy_groupids' => $related_ids,
 				'preservekeys' => true
 			]);
 		}
 
-		$result = $relation_map->mapMany($result, $db_proxies, 'proxy_groups');
+		$result = $relation_map->mapMany($result, $db_proxy_groups, 'proxy_groups');
 	}
 
 	private static function addRelatedHostGroupRights(array $options, array &$result): void {

@@ -160,7 +160,7 @@ class CProxyHelper {
 		];
 	}
 
-	private static function buildAccessListHtml($objects): array {
+	private static function buildAccessListHtml(array $objects): array {
 		if (empty($objects['list'])) {
 			return self::getDefaultAccessHtml($objects['mode']);
 		}
@@ -191,7 +191,7 @@ class CProxyHelper {
 		return $objects_list;
 	}
 
-	private static function buildObjectBadge($object): CSpan {
+	private static function buildObjectBadge(array $object): CSpan {
 		return (new CSpan($object['name']))->addClass(
 			$object['mode'] === PROXY_MODE_ALLOW ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
 		);
