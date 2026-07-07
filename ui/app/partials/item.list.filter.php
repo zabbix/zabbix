@@ -240,13 +240,20 @@ if ($data['filtered_count'] > 1) {
 			}
 
 			$name = $subfilter['key'].'[]';
+			$hidden_input = null;
+
+			if ($is_selected) {
+				$hidden_input = new CInput('hidden', $name, $value);
+				$hidden_input->removeId();
+			}
+
 			$cell[] = (new CSpan([
 				($count > 0 || $is_selected)
 					? (new CLinkAction($value_label))
 						->setAttribute('data-name', $name)
 						->setAttribute('data-value', $value)
 					: (new CSpan($value_label))->addClass(ZBX_STYLE_GREY),
-				$is_selected ? new CInput('hidden', $name, $value) : null,
+				$hidden_input,
 				' ',
 				new CSup($prefix.$count)
 			]))
