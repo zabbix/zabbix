@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0beta2');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',	7050060);
+define('ZABBIX_DB_VERSION',	7050061);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1008,6 +1008,9 @@ define('DASHBOARD_FILTER_SHOW_ALL',	0);
 define('DASHBOARD_FILTER_SHOW_MY',	1);
 define('DASHBOARD_DISPLAY_PERIODS',	[10, 30, 60, 120, 600, 1800, 3600]);
 
+define('DASHBOARD_SLIDESHOW_OFF',	'off');
+define('DASHBOARD_SLIDESHOW_ON',	'on');
+
 // alignments
 define('HALIGN_CENTER',		0);
 define('HALIGN_LEFT',		1);
@@ -1949,6 +1952,9 @@ define('ZBX_STYLE_ARROW_DOWN', 'arrow-down');
 define('ZBX_STYLE_ARROW_LEFT', 'arrow-left');
 define('ZBX_STYLE_ARROW_RIGHT', 'arrow-right');
 define('ZBX_STYLE_ARROW_UP', 'arrow-up');
+define('ZBX_STYLE_BANNER', 'banner');
+define('ZBX_STYLE_BANNER_CLOSE', 'banner-close');
+define('ZBX_STYLE_BANNER_CONTENT', 'banner-content');
 define('ZBX_STYLE_BLUE', 'blue');
 define('ZBX_STYLE_BTN', 'btn');
 define('ZBX_STYLE_BTN_ALT', 'btn-alt');
@@ -2425,6 +2431,7 @@ define('ZBX_ICON_SUPPORT', 'zi-support');
 define('ZBX_ICON_SQUARE', 'zi-square');
 define('ZBX_ICON_TEXT', 'zi-text');
 define('ZBX_ICON_TIME_PERIOD', 'zi-time-period');
+define('ZBX_ICON_TIMES', 'zi-times');
 define('ZBX_ICON_TREE_TOP_BOTTOM', 'zi-tree-top-bottom');
 define('ZBX_ICON_TREE_TOP_BOTTOM_SMALL', 'zi-tree-top-bottom-small');
 define('ZBX_ICON_TREE_TOP_RIGHT', 'zi-tree-top-right');
@@ -2462,9 +2469,9 @@ define('TAG_NAME_FULL',      0);
 define('TAG_NAME_SHORTENED', 1);
 define('TAG_NAME_NONE',      2);
 
-define('OPERATIONAL_DATA_SHOW_NONE',         0);
-define('OPERATIONAL_DATA_SHOW_SEPARATELY',   1);
-define('OPERATIONAL_DATA_SHOW_WITH_PROBLEM', 2);
+define('OPERATIONAL_DATA_SHOW_NONE',         0x00);
+define('OPERATIONAL_DATA_SHOW_SEPARATELY',   0x01);
+define('OPERATIONAL_DATA_SHOW_WITH_PROBLEM', 0x02);
 
 define('ZBX_ROLE_RULE_DISABLED',				0);
 define('ZBX_ROLE_RULE_ENABLED',					1);

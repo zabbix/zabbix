@@ -265,7 +265,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 						[
 							'Parameter' => 'Zabbix server is running',
 							'Value' => 'Yes',
-							'Details' => 'localhost:0'
+							'Details' => '{address}'
 						],
 						[
 							'Parameter' => 'Zabbix frontend version',
@@ -484,6 +484,16 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		CDashboardElement::find()->one()->waitUntilReady();
 
 		if (in_array(CTestArrayHelper::get($data, 'type'), ['Super admin', 'Admin'])) {
+			if ($data['type'] === 'Admin') {
+				global $DB;
+
+				foreach ($data['available_fields'] as &$field) {
+					$field['Details'] = str_replace('{address}', $DB['SERVER'].':0', $field['Details']);
+				}
+
+			}
+
+
 			$this->assertTableHasData($data['available_fields']);
 		}
 		else {

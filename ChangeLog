@@ -1,6 +1,12 @@
 Changes for 8.0.0beta2
 
 New features:
+..F....... [ZBXNEXT-10241] implemented a skip to main content link (gklavins)
+..F....... [ZBXNEXT-7713] added slideshow parameter for URL sharing and made slideshow disabled by default (gklavins)
+..F....... [ZBXNEXT-10393] implemented inline validation for item test form (gberzina)
+.........T [ZBXNEXT-10534] added Claude API by HTTP template (abrosimovs)
+A.F.....S. [ZBXNEXT-9109] added Zabbix server identity; export of System information (arimdjonoks, gcalenko, jfreibergs)
+.........T [ZBXNEXT-10558] updated Veeam Backup and Replication & Veeam Backup Enterprise Manager by HTTP templates (egordymov)
 ........S. [ZBXNEXT-10480] added zabbix[tcache,cache,paccessed] internal item for monitoring trend function cache usage (mkorotkov)
 A......PS. [ZBXNEXT-10478] updated maximum supported MariaDB version to 12.3 (mprihodko)
 .........T [ZBXNEXT-10561] added GCP Application Load Balancer by HTTP template (kflorowski)
@@ -14,6 +20,12 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 A.F.....S. [ZBXNEXT-1150] implemented storage and display of maintenance-related event suppressions and unsuppressions (aetatsu, Ivo)
 
 Bug fixes:
+..F....... [ZBX-27855] fixed JS errors in Host Wizard form when templates have required secret macros (Ivo)
+...G...... [ZBX-27495] fixed history upload excessive delay for both Zabbix agents (vsmelovs)
+..F....... [ZBX-27401] suppressed Elasticsearch technical errors from regular users (Sasha)
+..F....... [ZBX-27661] fixed input not being focused when changing password or psk in some forms (aluchko, kastafjevs)
+.........T [ZBX-27466] fixed widgets in Nextcloud by HTTP template (kbruvers)
+..F....... [ZBX-27449] fixed alignment of description field in inherited and host macros form (gklavins)
 ...G...... [ZBX-18840] fixed misleading comments in agent 2 (dbriedis)
 ..F....... [ZBX-27883] fixed inability to copy trigger prototypes which depends on the same trigger prototype when cloning template or host (vmaksimovs)
 ..F....... [ZBX-27128] increased width of the created_at field in service edit form (gklavins)
@@ -1866,6 +1878,11 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.28
+
+7.0.28rc1 was released as 7.0.28 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.28rc1
@@ -5987,6 +6004,11 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.47
+
+6.0.47rc1 was released as 6.0.47 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.47rc1

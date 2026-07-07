@@ -310,6 +310,12 @@ a.btn-icon,
 	}
 }
 
+.skip-link {
+	&:focus-visible {
+		border-bottom-width: 1px;
+	}
+}
+
 // components/menu-user
 .menu-user {
 	a {
