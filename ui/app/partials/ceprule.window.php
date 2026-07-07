@@ -89,19 +89,12 @@ echo (new CObject())
 			->addItem(new CObject('&nbsp;'))
 
 			->addItem(
-				(new CPatternSelect([
-					'name' => 'window[tags][]',
-					'data' => $data['window']['tags'],
-					'multiple' => true,
-					'popup' => false,
-					'add_new' => true,
-					'new_item_name' => 'window[tags][]',
-					'selectedLimit' => 0,
-					'placeholder' => _('tag names'),
-					'add_post_js' => false
-				]))
+				(new CTag('z-chips-input'))
 					->setId('ceprule-window-groupby-tag')
+					->setAttribute('value', json_encode($data['window']['tags']))
+					/* ->setAttribute('data-field-type', 'chips-input') */
 					->setAttribute('data-field-name', 'window[tags]')
+					->addItem('[work in progress..]')
 			)
 
 	]))->setId('ceprule-window-groupby')))
