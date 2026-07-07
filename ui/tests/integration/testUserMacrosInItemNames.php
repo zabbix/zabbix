@@ -20,15 +20,19 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * Test suite for user macro expansion in item names.
  *
  * @required-components server
- * @backup hosts,items,item_rtname,globalmacro,hosts
+ * @backup hosts,items,item_rtname,globalmacro,triggers,hostmacro,item_tag,trigger_tag,functions,events,problem,history_uint,trends_uint,hosts_templates
  */
 class testUserMacrosInItemNames extends CIntegrationTest {
 	const HOSTNAME1 = 'test_user_macros_in_item_names1';
 	const HOSTNAME2 = 'test_user_macros_in_item_names2';
+	const HOSTNAME_EXPORT = 'test_ndjson_export_macros';
 
 	private static $hostid1;
 	private static $hostid2;
 	private static $macroid;
+	private static $hostid_export;
+	private static $itemid_export;
+	private static $triggerid_export;
 
 	/**
 	 * @inheritdoc
@@ -214,7 +218,279 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid2 = $response['result']['hostids'][0];
 
+		// Create host, item name, item tag and trigger tag macros for NDJSON export checks.
+		$response = $this->call('host.create', [
+			[
+				'host' => self::HOSTNAME_EXPORT,
+				'interfaces' => [],
+				'groups' => [['groupid' => 4]],
+				'status' => HOST_STATUS_MONITORED,
+				'macros' => [
+					['macro' => '{$ENV}', 'value' => 'prod'],
+					['macro' => '{$FILE_NAME}', 'value' => 'config.json']
+				]
+			]
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['hostids']);
+		self::$hostid_export = $response['result']['hostids'][0];
+
+		$response = $this->call('item.create', [
+			'hostid' => self::$hostid_export,
+			'name' => 'File {$FILE_NAME} exists',
+			'key_' => 'macro.export.test',
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'tags' => [
+				['tag' => 'env', 'value' => '{$ENV}']
+			]
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['itemids']);
+		self::$itemid_export = $response['result']['itemids'][0];
+
+		$response = $this->call('trigger.create', [
+			'description' => 'Macro export trigger for ' . self::HOSTNAME_EXPORT,
+			'expression' => 'last(/' . self::HOSTNAME_EXPORT . '/macro.export.test)>5',
+			'tags' => [
+				['tag' => 'env', 'value' => '{$ENV}']
+			]
+		]);
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['triggerids']);
+		self::$triggerid_export = $response['result']['triggerids'][0];
+
 		return true;
+	}
+
+	public function serverConfigurationProvider() {
+		$export_dir = sys_get_temp_dir() . '/zabbix_export_test';
+
+		if (!is_dir($export_dir)) {
+			mkdir($export_dir, 0777, true);
+		}
+
+		return [
+			self::COMPONENT_SERVER => [
+				'ExportDir' => $export_dir,
+				'ExportType' => 'events,history,trends',
+				'DebugLevel' => 5
+			]
+		];
+	}
+
+	/**
+	 * Check user macro resolution in NDJSON export for item names and tag values in history, trends and problem events.
+	 *
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
+	public function testUserMacrosInNdjsonExport() {
+		$export_dir = sys_get_temp_dir() . '/zabbix_export_test';
+		$now = time();
+		$prev_hour = $now - 3600;
+
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->prepareExportDir($export_dir);
+		// Send two values with one-hour shift:
+		// - the first value keeps the trigger in OK state and creates previous-hour trend data;
+		// - the second value crosses the threshold, flushes the previous-hour trend and creates a problem event.
+		$this->sendSenderValues([
+			['host' => self::HOSTNAME_EXPORT, 'key' => 'macro.export.test', 'value' => '3',
+				'clock' => $prev_hour
+			],
+			['host' => self::HOSTNAME_EXPORT, 'key' => 'macro.export.test', 'value' => '127',
+				'clock' => $now
+			]
+		]);
+		// Verify history NDJSON.
+		$this->waitForExportFile($export_dir, 'history');
+		$this->assertExportNameResolved($export_dir, 'history', self::$itemid_export,
+			'File config.json exists');
+		$this->assertExportTagResolvedByItemid($export_dir, 'history', self::$itemid_export,
+			'item_tags', 'env', 'prod', '{$ENV}');
+		// Verify trends NDJSON.
+		$this->waitForExportFile($export_dir, 'trends');
+		$this->assertExportNameResolved($export_dir, 'trends', self::$itemid_export,
+			'File config.json exists');
+		$this->assertExportTagResolvedByItemid($export_dir, 'trends', self::$itemid_export,
+			'item_tags', 'env', 'prod', '{$ENV}');
+		// Verify event NDJSON.
+		$this->waitForExportFile($export_dir, 'problems');
+		$this->assertEventTagResolved($export_dir, 'Macro export trigger for ' . self::HOSTNAME_EXPORT,
+			'env', 'prod', '{$ENV}');
+	}
+
+	private function prepareExportDir($export_dir) {
+		if (!is_dir($export_dir)) {
+			mkdir($export_dir, 0777, true);
+			chmod($export_dir, 0777);
+		}
+
+		foreach (glob($export_dir . '/*.ndjson') as $file) {
+			@unlink($file);
+		}
+	}
+
+	private function waitForExportFile($dir, $type) {
+		for ($i = 0; $i < 30; $i++) {
+			$files = glob($dir . '/' . $type . '*.ndjson');
+
+			foreach ($files as $file) {
+				if (filesize($file) > 0) {
+					return;
+				}
+			}
+
+			sleep(1);
+		}
+
+		$this->fail('Export file "' . $type . '*.ndjson" not found or empty in ' . $dir);
+	}
+
+	private function assertExportTagResolvedByItemid($dir, $type, $itemid, $array_key,
+			$tag_name, $expected_value, $unresolved_macro) {
+		$found = false;
+
+		foreach (glob($dir . '/' . $type . '*.ndjson') as $file) {
+			$lines = array_values(array_filter(explode("\n", file_get_contents($file)), 'strlen'));
+
+			foreach ($lines as $line) {
+				$data = json_decode($line, true);
+
+				if (!is_array($data) || !isset($data['itemid'], $data[$array_key])) {
+					continue;
+				}
+
+				if ((string)$data['itemid'] !== (string)$itemid) {
+					continue;
+				}
+
+				$found = true;
+				$tag_found = false;
+
+				foreach ($data[$array_key] as $tag) {
+					if (!isset($tag['tag'], $tag['value'])) {
+						continue;
+					}
+
+					if ($tag['tag'] !== $tag_name) {
+						continue;
+					}
+
+					$tag_found = true;
+					$this->assertSame($expected_value, $tag['value'],
+						$type . ' NDJSON itemid=' . $itemid . ': tag "' . $tag_name
+						. '" should be resolved to "' . $expected_value . '", got: "'
+						. $tag['value'] . '".'
+					);
+					$this->assertStringNotContainsString($unresolved_macro, $tag['value'],
+						$type . ' NDJSON itemid=' . $itemid . ': tag "' . $tag_name
+						. '" should not contain unresolved "' . $unresolved_macro . '", got: "'
+						. $tag['value'] . '".'
+					);
+				}
+
+				$this->assertTrue($tag_found,
+					$type . ' NDJSON itemid=' . $itemid . ': tag "' . $tag_name . '" not found.'
+				);
+			}
+		}
+
+		$this->assertTrue($found,
+			$type . ' NDJSON: no record with itemid=' . $itemid . ' found.'
+		);
+	}
+
+	private function assertExportNameResolved($dir, $type, $itemid, $expected_name) {
+		$found = false;
+
+		foreach (glob($dir . '/' . $type . '*.ndjson') as $file) {
+			$lines = array_values(array_filter(explode("\n", file_get_contents($file)), 'strlen'));
+
+			foreach ($lines as $line) {
+				$data = json_decode($line, true);
+
+				if (!is_array($data) || !isset($data['itemid'])) {
+					continue;
+				}
+
+				if ((string)$data['itemid'] !== (string)$itemid) {
+					continue;
+				}
+
+				$found = true;
+
+				if (!isset($data['name'])) {
+					$this->fail($type . ' NDJSON itemid=' . $itemid . ': "name" field is missing.');
+				}
+
+				$this->assertSame($expected_name, $data['name'],
+					$type . ' NDJSON itemid=' . $itemid . ': name should be "' . $expected_name
+					. '", got: "' . $data['name'] . '".'
+				);
+				$this->assertStringNotContainsString('{$FILE_NAME}', $data['name'],
+					$type . ' NDJSON itemid=' . $itemid . ': name should not contain "{$FILE_NAME}".'
+				);
+			}
+		}
+
+		$this->assertTrue($found,
+			$type . ' NDJSON: no record with itemid=' . $itemid . ' found.'
+		);
+	}
+
+	private function assertEventTagResolved($dir, $event_name, $tag_name, $expected_value,
+			$unresolved_macro) {
+		$found = false;
+
+		foreach (glob($dir . '/problems*.ndjson') as $file) {
+			$lines = array_values(array_filter(explode("\n", file_get_contents($file)), 'strlen'));
+
+			foreach ($lines as $line) {
+				$data = json_decode($line, true);
+
+				if (!is_array($data) || !isset($data['name'], $data['tags'])) {
+					continue;
+				}
+
+				if ($data['name'] !== $event_name) {
+					continue;
+				}
+
+				$found = true;
+				$tag_found = false;
+
+				foreach ($data['tags'] as $tag) {
+					if (!isset($tag['tag'], $tag['value'])) {
+						continue;
+					}
+
+					if ($tag['tag'] !== $tag_name) {
+						continue;
+					}
+
+					$tag_found = true;
+					$this->assertSame($expected_value, $tag['value'],
+						'events NDJSON for "' . $event_name . '": tag "' . $tag_name
+						. '" should be resolved to "' . $expected_value . '", got: "'
+						. $tag['value'] . '".'
+					);
+					$this->assertStringNotContainsString($unresolved_macro, $tag['value'],
+						'events NDJSON for "' . $event_name . '": tag "' . $tag_name
+						. '" should not contain unresolved "' . $unresolved_macro . '", got: "'
+						. $tag['value'] . '".'
+					);
+				}
+
+				$this->assertTrue($tag_found,
+					'events NDJSON for "' . $event_name . '": tag "' . $tag_name . '" not found.'
+				);
+			}
+		}
+
+		$this->assertTrue($found,
+			'events NDJSON: no event record with name "' . $event_name . '" found.'
+		);
 	}
 
 	/**
