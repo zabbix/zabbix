@@ -40,7 +40,9 @@ class CDashboard {
 
 	static EVENT_REFERRED_UPDATE = 'dashboard-referred-update';
 	static EVENT_FEEDBACK = 'dashboard-feedback';
+
 	static EVENT_PAGE_SELECT = 'dashboard-page-select';
+
 	static EVENT_SLIDESHOW_START = 'dashboard-slideshow-start';
 	static EVENT_SLIDESHOW_STOP = 'dashboard-slideshow-stop';
 
