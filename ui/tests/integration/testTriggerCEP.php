@@ -5131,16 +5131,13 @@ HEREDOC;
 	private function assertVpsWrittenIncreasedBy(int $baseline, int $min_increase): void {
 		$expected = $baseline + $min_increase;
 
-		// Poll every 100 ms; keep the same overall timeout as the 1 s-based waits by scaling the
-		// iteration count up by 10x (WAIT_ITERATIONS * WAIT_ITERATION_DELAY seconds total).
-		$iterations = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY * 10;
-		for ($i = 0; $i < $iterations; $i++) {
-			if ($this->getVpsWritten() >= $expected) {
-				break;
+		$this->testItemUntilCallback(
+			['value_type' => '3', 'type' => '5', 'key' => 'zabbix[vps,written]'],
+			function ($result) use ($expected) {
+				return $result !== false && isset($result['item']['result'])
+						&& is_numeric($result['item']['result']) && (int) $result['item']['result'] >= $expected;
 			}
-			usleep(100000);
-		}
-		$this->assertGreaterThanOrEqual($expected, $this->getVpsWritten());
+		);
 	}
 
 	/**
@@ -5176,62 +5173,69 @@ HEREDOC;
 	}
 
 	/**
+	 * Extract a single numeric CEP statistic from a testItem() response, or null if it is not available.
+	 */
+	private function cepStatFromResult($result, string $group, string $name): ?int {
+		if ($result === false || !isset($result['item']['result'])) {
+			return null;
+		}
+
+		$stats = json_decode($result['item']['result'], true);
+
+		return (isset($stats[$group][$name]) && is_numeric($stats[$group][$name]))
+				? (int) $stats[$group][$name] : null;
+	}
+
+	/**
 	 * Poll the zabbix["cep"] statistics until the given counter reaches $baseline + $min_increase, then
 	 * assert it. Mirrors assertVpsWrittenIncreasedBy.
 	 */
 	private function assertCepStatIncreasedBy(string $group, string $name, int $baseline, int $min_increase): void {
 		$expected = $baseline + $min_increase;
 
-		// Poll every 100 ms; keep the same overall timeout as the 1 s-based waits by scaling the
-		// iteration count up by 10x (WAIT_ITERATIONS * WAIT_ITERATION_DELAY seconds total).
-		$iterations = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY * 10;
-		for ($i = 0; $i < $iterations; $i++) {
-			if ($this->getCepStat($group, $name) >= $expected) {
-				break;
+		$this->testItemUntilCallback(
+			['value_type' => '4', 'type' => '5', 'key' => 'zabbix["cep"]'],
+			function ($result) use ($group, $name, $expected) {
+				$value = $this->cepStatFromResult($result, $group, $name);
+
+				return $value !== null && $value >= $expected;
 			}
-			usleep(100000);
-		}
-		$this->assertGreaterThanOrEqual($expected, $this->getCepStat($group, $name),
-			'CEP '.$group.'.'.$name.' did not increase by at least '.$min_increase.' (baseline '.$baseline.').');
+		);
 	}
 
 	/**
 	 * Poll the zabbix["cep"] statistics until the given counter equals $expected, then assert it.
 	 */
 	private function assertCepStatEquals(string $group, string $name, int $expected): void {
-		// Poll every 100 ms; keep the same overall timeout as the 1 s-based waits by scaling the
-		// iteration count up by 10x (WAIT_ITERATIONS * WAIT_ITERATION_DELAY seconds total).
-		$iterations = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY * 10;
-		for ($i = 0; $i < $iterations; $i++) {
-			if ($this->getCepStat($group, $name) == $expected) {
-				break;
-			}
-			usleep(100000);
-		}
-		$actual = $this->getCepStat($group, $name);
-		$info = '';
-		if ($actual != $expected) {
-			// Surface up to 10 still-open trigger problems to help diagnose why the cache did not drain.
-			$response = $this->call('problem.get', [
-				'object' => EVENT_OBJECT_TRIGGER,
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'output' => ['eventid', 'objectid', 'name', 'clock'],
-				'limit' => 10
-			]);
-
-			// If no trigger-source problem is open, fall back to any open problem (e.g. internal-source) so
-			// the diagnostics are not empty when the cache is held open by a non-trigger problem.
-			if (empty($response['result'])) {
+		$this->testItemUntilCallback(
+			['value_type' => '4', 'type' => '5', 'key' => 'zabbix["cep"]'],
+			function ($result) use ($group, $name, $expected) {
+				return $this->cepStatFromResult($result, $group, $name) === $expected;
+			},
+			['single' => false, 'state' => 0],
+			null,
+			// Surface up to 10 still-open problems to help diagnose why the cache did not drain.
+			function () use ($group, $name, $expected) {
 				$response = $this->call('problem.get', [
-					'output' => ['eventid', 'source', 'object', 'objectid', 'name', 'clock'],
+					'object' => EVENT_OBJECT_TRIGGER,
+					'source' => EVENT_SOURCE_TRIGGERS,
+					'output' => ['eventid', 'objectid', 'name', 'clock'],
 					'limit' => 10
 				]);
-			}
 
-			$info = ' Open problems (max 10): '.json_encode($response['result']);
-		}
-		$this->assertEquals($expected, $actual,
-			'CEP '.$group.'.'.$name.' did not reach '.$expected.'.'.$info);
+				// If no trigger-source problem is open, fall back to any open problem (e.g. internal-source) so
+				// the diagnostics are not empty when the cache is held open by a non-trigger problem.
+				if (empty($response['result'])) {
+					$response = $this->call('problem.get', [
+						'output' => ['eventid', 'source', 'object', 'objectid', 'name', 'clock'],
+						'limit' => 10
+					]);
+				}
+
+				return ' CEP '.$group.'.'.$name.' did not reach '.$expected.
+						'. Open problems (max 10): '.json_encode($response['result']);
+			}
+		);
 	}
 
 	public static function clearData(): void {

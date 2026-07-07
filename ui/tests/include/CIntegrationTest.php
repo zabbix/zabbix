@@ -60,6 +60,8 @@ class CIntegrationTest extends CAPITest {
 
 	private const STAT_LABELS = [
 		'call_data_present'	=> 'callUntilDataIsPresent',
+		'call_count_present'	=> 'callUntilCountIsPresent',
+		'test_item_callback'	=> 'testItemUntilCallback',
 		'wait_log_line'		=> 'waitForLogLineToBePresent',
 		'wait_send'		=> 'sendDataValues',
 		'reload_config_cache'	=> 'reloadConfigurationCache',
@@ -1311,6 +1313,87 @@ class CIntegrationTest extends CAPITest {
 				'specified interval. Params used:'."\n".json_encode($params);
 		if (isset($response)) {
 			$message .= "\nLast response:\n".json_encode($response);
+		}
+		$this->fail($message);
+	}
+
+	/**
+	 * Test an item on the server repeatedly until the given callback accepts its result (@see testItem).
+	 *
+	 * The item is tested via the "item.test" request (@see CZabbixServer::testItem), which allows waiting on
+	 * values that are not exposed through the API (e.g. internal statistics such as zabbix["cep"]). The callback
+	 * receives the raw testItem response and decides whether the wait is satisfied - returning true stops the
+	 * loop. This keeps the comparison logic (equals, at-least, extract-from-JSON, ...) in the caller instead of
+	 * baking it into this helper.
+	 *
+	 * @param array    $item           item definition (key, type, value_type, ...)
+	 * @param callable $callback       predicate receiving the raw testItem response; return true when satisfied
+	 * @param array    $options        item.test options
+	 * @param integer  $timeout        overall timeout in milliseconds (the item is polled every 100 ms)
+	 * @param callable $info_callback  optional callback returning extra diagnostics for the failure message
+	 *
+	 * @return array  the testItem response that satisfied the callback
+	 */
+	public function testItemUntilCallback(array $item, callable $callback,
+			array $options = ['single' => false, 'state' => 0], $timeout = null, $info_callback = null) {
+		if ($timeout === null) {
+			$timeout = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY * 1000;
+		}
+
+		// The item.test request needs an authorized session; the host block is omitted as internal items
+		// (e.g. zabbix["cep"]) carry no host context - the server defaults maintenance to off/normal.
+		if (CAPIHelper::getSessionId() === null) {
+			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+		}
+		$sid = CAPIHelper::getSessionId();
+
+		$data = [
+			'options' => $options,
+			'item' => $item
+		];
+
+		$client = $this->getClient(self::COMPONENT_SERVER);
+		$exception = null;
+		$last_result = null;
+		$start = microtime(true);
+		$deadline = $start + $timeout / 1000;
+		while (true) {
+			try {
+				$result = $client->testItem($data, $sid);
+				$last_result = $result;
+
+				if (call_user_func($callback, $result) === true) {
+					if (static::$trace_delays) {
+						self::recordDelay('test_item_callback', microtime(true) - $start);
+					}
+
+					return $result;
+				}
+			} catch (Exception $e) {
+				$exception = $e;
+			}
+
+			// Poll every 100 ms until the timeout is reached (do not sleep after the final attempt).
+			if (microtime(true) >= $deadline) {
+				break;
+			}
+
+			usleep(100000);
+		}
+
+		if (static::$trace_delays) {
+			self::recordDelay('test_item_callback', microtime(true) - $start);
+		}
+
+		if ($exception !== null) {
+			throw $exception;
+		}
+
+		$message = 'Item '.(isset($item['key']) ? $item['key'] : '').' tested on server'.
+				' did not satisfy the callback within '.$timeout.' ms.'.
+				"\nLast response: ".json_encode($last_result);
+		if ($info_callback !== null) {
+			$message .= call_user_func($info_callback);
 		}
 		$this->fail($message);
 	}
