@@ -91,6 +91,12 @@ zbx_db_config_t;
 #endif
 
 #ifdef HAVE_MYSQL
+#	define ZBX_SQL_FORCE_PK		" force index (primary)"
+#else
+#	define ZBX_SQL_FORCE_PK		""
+#endif
+
+#ifdef HAVE_MYSQL
 #	define	ZBX_SQL_STRCMP			"%s binary '%s'"
 #else
 #	define	ZBX_SQL_STRCMP			"%s'%s'"
@@ -374,6 +380,8 @@ int	zbx_dbconn_lock_record(zbx_dbconn_t *db, const char *table, zbx_uint64_t id,
 		zbx_uint64_t add_id);
 int	zbx_dbconn_lock_records(zbx_dbconn_t *db, const char *table, const zbx_vector_uint64_t *ids);
 int	zbx_dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *field_name, zbx_vector_uint64_t *ids);
+int	zbx_dbconn_lock_ids_pk(zbx_dbconn_t *db, const char *table_name, const char *field_name,
+		zbx_vector_uint64_t *ids);
 
 int	zbx_db_config_validate_features(zbx_db_config_t *config, unsigned char program_type);
 void	zbx_db_config_validate(zbx_db_config_t *config);

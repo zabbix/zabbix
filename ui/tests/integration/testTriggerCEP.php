@@ -116,6 +116,7 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $discovered_dep_triggerids = [];
 	private static $correlationid;
 	private static $correlationid2;
+	private static $disc_maintenanceid;
 	private static $serviceids = [];
 	private static $service_actionid;
 	private static $trigger_actionid;
@@ -2964,20 +2965,40 @@ HEREDOC;
 
 	/**
 	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp,
-	 * but the discovered host is under data-collection maintenance for the whole run: every problem the
-	 * scenario opens must be suppressed while global correlation still closes it, so no open problem remains.
-	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenance$)
+	 * but once every problem is open (at the trigger's DISASTER priority, so each per-trigger service is at
+	 * DISASTER too) the open problems are manually downgraded to WARNING via event.acknowledge. When services
+	 * exist the test also verifies the service manager follows the manual severity change: every service drops
+	 * from DISASTER to WARNING, then recovers to OK once the "up" values close the problems. When services are
+	 * disabled the service assertions are skipped and the close-on-up flow runs as usual.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSeverity$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
-	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenance() {
-		$maintenanceid = $this->startDiscHostMaintenance();
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSeverity() {
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSeverity(false);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
+	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp,
+	 * but the discovered host only enters data-collection maintenance after the first wave of problems is
+	 * already open: the maintenance is created mid-run, so the already-open problems must be suppressed
+	 * retroactively, and every problem opened afterwards (while maintenance is active) suppressed at
+	 * creation time too, while global correlation still closes them all, leaving nothing open.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirst$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirst() {
+		self::$disc_maintenanceid = null;
 		$this->prepareDataGlobalCorrelationCloseOnUp();
 		try {
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true);
 			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 		}
 		finally {
-			$this->stopDiscHostMaintenance($maintenanceid);
+			if (self::$disc_maintenanceid !== null) {
+				$this->stopDiscHostMaintenance(self::$disc_maintenanceid);
+			}
 		}
 	}
 
@@ -3167,9 +3188,10 @@ HEREDOC;
 	/**
 	 * Same "close old down when new up" setup as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp,
 	 * but the scenario only OPENS problems: both "down" waves are sent (two open problems per trigger) and
-	 * the "up" values that would close them are deliberately never sent. The discovered host is then removed
-	 * via testTriggerCEP_CleanupDiscoveredHost(); deleting the host must delete its triggers and resolve every
-	 * open problem, so no open problem remains afterwards.
+	 * the "up" values that would close them are deliberately never sent. The discovered triggers are then
+	 * deleted via empty LLD (triggerCEP_Cleanup()) and the discovered host via testTriggerCEP_CleanupDiscoveredHost();
+	 * deleting them must resolve every open problem and drop their events from the CEP cache, so no open
+	 * problem remains afterwards.
 	 *
 	 * This is the terminal test that uses the discovered host, so it is declared last among the host-using
 	 * tests: the cleanup chain (testTriggerCEP_Cleanup, testTriggerCEP_CleanupDiscoveredHost) runs after it and
@@ -3185,7 +3207,12 @@ HEREDOC;
 		// Only open problems: send both "down" waves (no "up" values), so two problems stay open per trigger.
 		$this->openProblemsGlobalCorrelationCloseOnUp();
 
-		// Removing the discovered host must delete its triggers and resolve every open problem.
+		// Delete the discovered triggers via empty LLD while their problems are still open: this must resolve
+		// every open problem and drop their events from the CEP cache, exercising the trigger-deletion path
+		// before the host itself is removed.
+		$this->triggerCEP_Cleanup();
+
+		// Removing the discovered host must delete any remaining resources and resolve every open problem.
 		$this->testTriggerCEP_CleanupDiscoveredHost();
 
 		// Deleting the host queues its triggers' problem/event records for removal; force both the general and
@@ -3196,9 +3223,9 @@ HEREDOC;
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'forced execution of the trigger housekeeper',
 				true, 20, 3);
 
-		// The triggers were deleted with the host, so only the problem count can be checked here:
-		// waitForNoOpenProblems() additionally asserts the triggers are still present in OK state, which no
-		// longer holds. No open problem may remain on the now-deleted triggers.
+		// The triggers were deleted (by empty LLD and then with the host), so only the problem count can be
+		// checked here: waitForNoOpenProblems() additionally asserts the triggers are still present in OK
+		// state, which no longer holds. No open problem may remain on the now-deleted triggers.
 		$this->waitForOpenProblemCount($all, 0);
 
 		// Removing the host must also drop the discovered items' problem events from the CEP cache: no other
@@ -3647,7 +3674,8 @@ HEREDOC;
 		return $m;
 	}
 
-	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart, bool $maintenance = false): void {
+	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart,
+			bool $maintenance_after_first = false): void {
 		$keys = array_merge(
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2)
@@ -3672,9 +3700,11 @@ HEREDOC;
 		$this->waitForOpenProblemCount($all, $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
-		// Under data-collection maintenance every problem opened on the host must be suppressed, while
-		// global correlation still processes and closes it normally in the steps below.
-		if ($maintenance) {
+		// The host only enters maintenance after the first problems are already open: creating the
+		// maintenance now must retroactively suppress those $m open problems (and every problem opened
+		// later), while global correlation still closes them normally below.
+		if ($maintenance_after_first) {
+			self::$disc_maintenanceid = $this->startDiscHostMaintenance();
 			$this->waitForOpenProblemsSuppressed($all, $m);
 		}
 
@@ -3684,6 +3714,13 @@ HEREDOC;
 		$this->dispatchSenderValues($values('down', $m), null, 0);
 		$this->waitForOpenProblemCount($all, 2 * $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		// The host is in maintenance by now, so this second wave (opened while maintenance is active) must
+		// be suppressed at creation time as well: all 2 * $m open problems suppressed.
+		if ($maintenance_after_first) {
+			$this->waitForOpenProblemsSuppressed($all, 2 * $m);
+		}
+
 		$this->maybeRestartServer($restart);
 
 		// 3. "up" for the first id set: each is a PROBLEM that closes only its corresponding "down"
@@ -3697,6 +3734,70 @@ HEREDOC;
 		// 4. "up" for the second id set closes each trigger's remaining problem; nothing stays open.
 		$this->dispatchSenderValues($values('up', $m), null, 0);
 		$this->waitForNoOpenProblems($all);
+	}
+
+	/**
+	 * Same close-on-up flow as runEventAssessmentTestGlobalCorrelationCloseOnUp, but once all problems are
+	 * open it downgrades every open problem's severity to WARNING via event.acknowledge and asserts the
+	 * per-trigger services follow the manual severity change from DISASTER to WARNING, then closes the
+	 * problems with "up" and asserts the services recover to OK.
+	 */
+	private function runEventAssessmentTestGlobalCorrelationCloseOnUpSeverity(bool $restart): void {
+		$keys = array_merge(
+			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
+			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2)
+		);
+		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
+		$m = count($keys);
+
+		// Build one sender value per key with a unique id: value "<prefix>_<offset + key index>".
+		$values = fn(string $prefix, int $offset) => array_map(
+			fn($key, $i) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $prefix.'_'.($offset + $i)],
+			$keys, array_keys($keys)
+		);
+
+		// All triggers must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'All triggers must start in OK state for close-on-up severity global correlation test.');
+		}
+
+		// 1. Open the first problem on every trigger (unique id per trigger); triggers go TRUE.
+		$this->dispatchSenderValues($values('down', 0), null, 0);
+		$this->waitForOpenProblemCount($all, $m);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		// 2. Open a second problem on every trigger (a different unique id, mult_event); still TRUE.
+		$this->dispatchSenderValues($values('down', $m), null, 0);
+		$this->waitForOpenProblemCount($all, 2 * $m);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		// The trigger prototypes have DISASTER priority, so with problems open every per-trigger service
+		// (matched via the SERVICE_TAG problem tag) is at DISASTER.
+		$this->waitForServicesStatus(TRIGGER_SEVERITY_DISASTER);
+
+		$this->maybeRestartServer($restart);
+
+		// 3. Manually downgrade every open problem to WARNING. The service manager must recompute each
+		//    service's status from the new problem severity, so all services drop DISASTER -> WARNING.
+		$this->updateOpenProblemsSeverity($all, TRIGGER_SEVERITY_WARNING);
+		$this->waitForServicesStatus(TRIGGER_SEVERITY_WARNING);
+
+		$this->maybeRestartServer($restart);
+
+		// 4. "up" for the first id set closes each corresponding "down" (and itself); each trigger's second
+		//    problem stays open, so the services stay in problem state (still WARNING).
+		$this->dispatchSenderValues($values('up', 0), null, 0);
+		$this->waitForOpenProblemCount($all, $m);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+		$this->waitForServicesStatus(TRIGGER_SEVERITY_WARNING);
+
+		$this->maybeRestartServer($restart);
+
+		// 5. "up" for the second id set closes each trigger's remaining problem; every service recovers to OK.
+		$this->dispatchSenderValues($values('up', $m), null, 0);
+		$this->waitForNoOpenProblems($all);
+		$this->waitForServicesStatus(ZBX_SEVERITY_OK);
 	}
 
 	/**
@@ -4910,6 +5011,47 @@ HEREDOC;
 		], $expected_open_problems, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
+	/**
+	 * Poll the per-trigger CEP services until every one reports $expected_status (a ZBX_SEVERITY_* value,
+	 * or ZBX_SEVERITY_OK once recovered). Unlike assertServicesStatus() this only checks the status, so it
+	 * can be used after a manual problem-severity change where the open service problem count is irrelevant.
+	 * A no-op when no services exist (service tests disabled), so the caller runs as usual either way.
+	 */
+	private function waitForServicesStatus(int $expected_status): void {
+		$serviceids = self::$serviceids;
+
+		if (empty($serviceids)) {
+			return;
+		}
+
+		$this->callUntilCountIsPresent('service.get', [
+			'serviceids' => $serviceids,
+			'filter' => ['status' => $expected_status]
+		], count($serviceids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Collect every open problem on $triggerids and manually change its severity to $severity via
+	 * event.acknowledge (ZBX_PROBLEM_UPDATE_SEVERITY), so the service manager recomputes the status of the
+	 * services matched to those problems.
+	 */
+	private function updateOpenProblemsSeverity(array $triggerids, int $severity): void {
+		$response = $this->call('problem.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'output' => ['eventid']
+		]);
+		$eventids = array_column($response['result'], 'eventid');
+		$this->assertNotEmpty($eventids, 'Expected open problems to update severity for, found none.');
+
+		$this->call('event.acknowledge', [
+			'eventids' => $eventids,
+			'action' => ZBX_PROBLEM_UPDATE_SEVERITY,
+			'severity' => $severity
+		]);
+	}
+
 	private function currentClockNs(): array {
 		static $last_clock = -1;
 		static $last_ns = -1;
@@ -5069,13 +5211,23 @@ HEREDOC;
 		$actual = $this->getCepStat($group, $name);
 		$info = '';
 		if ($actual != $expected) {
-			// Surface up to 10 still-open problems to help diagnose why the cache did not drain.
+			// Surface up to 10 still-open trigger problems to help diagnose why the cache did not drain.
 			$response = $this->call('problem.get', [
 				'object' => EVENT_OBJECT_TRIGGER,
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'output' => ['eventid', 'objectid', 'name', 'clock'],
 				'limit' => 10
 			]);
+
+			// If no trigger-source problem is open, fall back to any open problem (e.g. internal-source) so
+			// the diagnostics are not empty when the cache is held open by a non-trigger problem.
+			if (empty($response['result'])) {
+				$response = $this->call('problem.get', [
+					'output' => ['eventid', 'source', 'object', 'objectid', 'name', 'clock'],
+					'limit' => 10
+				]);
+			}
+
 			$info = ' Open problems (max 10): '.json_encode($response['result']);
 		}
 		$this->assertEquals($expected, $actual,

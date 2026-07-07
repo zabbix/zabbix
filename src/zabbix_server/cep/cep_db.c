@@ -407,7 +407,7 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_ta
 		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		zbx_dbconn_lock_ids(db, "events", "eventid", &eventids);
+		zbx_dbconn_lock_ids_pk(db, "events", "eventid", &eventids);
 
 		recoveries_num = recoveries.values_num;
 
@@ -870,7 +870,10 @@ void	cep_db_add_tags(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *
 		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+		zbx_dbconn_lock_ids_pk(db, "events", "eventid", &eventids);
 		zbx_db_write_tags(db, &event_tags, "events", "eventid", "event_tag", "eventtagid", &eventids);
+
+		zbx_dbconn_lock_ids_pk(db, "problem", "eventid", &eventids);
 		zbx_db_write_tags(db, &event_tags, "problem", "eventid", "problem_tag", "problemtagid", &eventids);
 
 		zbx_vector_uint64_clear(&eventids);

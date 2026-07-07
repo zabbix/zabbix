@@ -99,7 +99,7 @@ class CControllerCepRuleEdit extends CController {
 					'tag_value', 'severity', 'tags'],
 				'selectFilter' => ['formula', 'evaltype', 'conditions'],
 				'selectWindow' => ['duration', 'capacity', 'script', 'group_by_host_group', 'group_by_host',
-					'group_by_tag', 'event_count_tag', 'tag']
+					'group_by_tags', 'event_count_tag', 'tags']
 			]);
 		}
 		else {
@@ -143,10 +143,6 @@ class CControllerCepRuleEdit extends CController {
 		unset($ceprule['cep_ruleid']);
 
 		$ceprule['filter']['conditions'] = self::prepareFilterConditions($ceprule['filter']['conditions']);
-
-		// TODO: await API to use "tag"->"tags"
-		$ceprule['window']['tags'] = $ceprule['window']['tag'] ? [$ceprule['window']['tag']] : [];
-		unset($ceprule['window']['tag']);
 
 		return $ceprule;
 	}

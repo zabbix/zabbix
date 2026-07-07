@@ -72,11 +72,6 @@ abstract class CControllerCepRuleGeneral extends CController {
 			if (array_key_exists('event_count_tag_enabled', $request['window'])) {
 				unset($request['window']['event_count_tag_enabled']);
 			}
-
-			// TODO: awaiting API changes.. remapping.
-			if (array_key_exists(0, $request['window']['tags'] ?? [])) {
-				$request['window']['tag'] =  $request['window']['tags'][0];
-			}
 		}
 
 		if (array_key_exists('filter', $request)) {
@@ -167,14 +162,24 @@ abstract class CControllerCepRuleGeneral extends CController {
 						CCepRuleHelper::WINDOW_PATTERN_MATCH
 					]]
 				],
-				'group_by_tag' => ['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
-					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
-						CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
-						CCepRuleHelper::WINDOW_PATTERN_MATCH
-					]]
+				'group_by_tags' => [
+					['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
+						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
+							CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
+							CCepRuleHelper::WINDOW_PATTERN_MATCH
+						]]
+					],
+					['integer', 'required', 'in' => [CCepRuleHelper::GROUP_BY_YES],
+						'messages' => ['in' => _('At least one of "Group by" options must be selected.')],
+						'when' => [
+							['../window_type', 'in' => [CCepRuleHelper::WINDOW_CAUSE_SYMPTOM]],
+							['group_by_host', 'in' => [CCepRuleHelper::GROUP_BY_NO]],
+							['group_by_host_group', 'in' => [CCepRuleHelper::GROUP_BY_NO]]
+						]
+					]
 				],
 				'tags' => ['array', 'required', 'not_empty', 'field' => ['string', 'not_empty'],
-					'when' => ['group_by_tag', 'in' => [CCepRuleHelper::GROUP_BY_YES]]
+					'when' => ['group_by_tags', 'in' => [CCepRuleHelper::GROUP_BY_YES]]
 				],
 				'event_count_tag_enabled' => ['integer', 'required', 'in' => [0, 1],
 					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_CAUSE_SYMPTOM]]
