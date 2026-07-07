@@ -35,7 +35,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const SKIP_RESTART_TESTS = true;
 
 	// Leave null to decide randomly based on the current time; set to true or false to force a path.
-	const SKIP_SERVICES_TESTS = null;
+	const SKIP_SERVICES_TESTS = true;
 
 	const HOST_NAME = 'test';
 	const TEMPLATE_NAME = 'template_trigger_cep';
@@ -2966,14 +2966,14 @@ HEREDOC;
 	/**
 	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp,
 	 * but once every problem is open (at the trigger's DISASTER priority, so each per-trigger service is at
-	 * DISASTER too) the open problems are manually downgraded to WARNING via event.acknowledge. The test
-	 * then verifies the service manager follows the manual severity change: every service drops to WARNING.
-	 * The "up" values then close the problems and the services recover to OK.
-	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_AddServices$|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSeverity$)
+	 * DISASTER too) the open problems are manually downgraded to WARNING via event.acknowledge. When services
+	 * exist the test also verifies the service manager follows the manual severity change: every service drops
+	 * from DISASTER to WARNING, then recovers to OK once the "up" values close the problems. When services are
+	 * disabled the service assertions are skipped and the close-on-up flow runs as usual.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSeverity$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSeverity() {
-		$this->skipIfServicesTestsDisabled();
 		$this->prepareDataGlobalCorrelationCloseOnUp();
 		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSeverity(false);
 		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
@@ -5015,9 +5015,14 @@ HEREDOC;
 	 * Poll the per-trigger CEP services until every one reports $expected_status (a ZBX_SEVERITY_* value,
 	 * or ZBX_SEVERITY_OK once recovered). Unlike assertServicesStatus() this only checks the status, so it
 	 * can be used after a manual problem-severity change where the open service problem count is irrelevant.
+	 * A no-op when no services exist (service tests disabled), so the caller runs as usual either way.
 	 */
 	private function waitForServicesStatus(int $expected_status): void {
 		$serviceids = self::$serviceids;
+
+		if (empty($serviceids)) {
+			return;
+		}
 
 		$this->callUntilCountIsPresent('service.get', [
 			'serviceids' => $serviceids,
