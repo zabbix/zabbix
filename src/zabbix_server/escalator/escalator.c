@@ -1760,6 +1760,10 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 		zabbix_log(LOG_LEVEL_DEBUG, "severity:%d, media severity:%d, period:'%s', userid:" ZBX_FS_UI64,
 				priority, severity, period, userid);
 
+		/* push notifications are supported only for trigger events */
+		if (MEDIA_TYPE_PUSH == type && EVENT_SOURCE_TRIGGERS != event->source)
+			continue;
+
 		if (MEDIA_STATUS_DISABLED == atoi(row[5]))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "will not send message (user media disabled)");
@@ -1797,10 +1801,6 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 			status = ALERT_STATUS_NEW;
 			perror = "";
 		}
-
-		/* push notifications are supported only for trigger events */
-		if (MEDIA_TYPE_PUSH == type && EVENT_SOURCE_TRIGGERS != event->source)
-			continue;
 
 		if (0 == have_alerts)
 		{
