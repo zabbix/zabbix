@@ -28,13 +28,14 @@ window.itemtestedit_view_popup = new class {
 	#form_element;
 	#rules_get_value;
 	#is_item_testable = false;
+	#can_select_server_for_test = false;
 	#show_prev = false;
 	#show_snmp_form = false;
 	#interface_address_enabled = false;
 	#interface_port_enabled = false;
 
 	init({rules, rules_get_value, is_item_testable, show_prev, show_snmp_form, interface_address_enabled,
-			interface_port_enabled}) {
+			interface_port_enabled, can_select_server_for_test}) {
 		this.#overlay = overlays_stack.getById('item-test');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#footer = this.#overlay.$dialogue.$footer[0];
@@ -42,6 +43,7 @@ window.itemtestedit_view_popup = new class {
 		this.#form = new CForm(this.#form_element, rules);
 		this.#rules_get_value = rules_get_value;
 		this.#is_item_testable = is_item_testable;
+		this.#can_select_server_for_test = can_select_server_for_test;
 		this.#show_prev = show_prev;
 		this.#show_snmp_form = show_snmp_form;
 		this.#interface_address_enabled = interface_address_enabled;
@@ -98,7 +100,12 @@ window.itemtestedit_view_popup = new class {
 		const get_value_checked = this.#form.findFieldByName('get_value').getField().checked;
 
 		for (const element of this.#form_element.querySelectorAll('#test_with input')) {
-			element.disabled = !get_value_checked;
+			if (element.value == <?= CControllerPopupItemTest::TEST_WITH_SERVER ?>) {
+				element.disabled = !this.#can_select_server_for_test;
+			}
+			else {
+				element.disabled = !get_value_checked;
+			}
 		}
 
 		this.#form_element.querySelector('.js-test-with-proxy').style
