@@ -116,8 +116,7 @@ class CSettings extends CApiService {
 		$parameters['server_status'] += ['configuration' => [
 			'enable_global_scripts' => true,
 			'allow_software_update_check' => false,
-			// TODO: change to false
-			'enable_mobile_devices' => true,
+			'enable_mobile_devices' => false,
 			'bridge_adapter_configured' => false
 		]];
 		$parameters['software_update_check_data'] =
