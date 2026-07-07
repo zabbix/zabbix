@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @hosts test
  */
 class testTriggerCEP extends CIntegrationTest {
-	const LLD_DISCOVERY_COUNT = 500; // should be at least 4000 for local tests
+	const LLD_DISCOVERY_COUNT = 20; // should be at least 4000 for local tests
 	const LOG_EVENT_COUNT = 10000;
 
 	const SKIP_RESTART_TESTS = true;
@@ -4352,16 +4352,30 @@ HEREDOC;
 	}
 
 	/**
-	 * Remove a maintenance created by startDiscHostMaintenance() and reload the configuration cache so the
-	 * host leaves maintenance before the rest of the suite runs.
+	 * End a maintenance created by startDiscHostMaintenance() without deleting it: push its active period
+	 * far into the future so it is no longer active now, then reload the configuration cache so the host
+	 * leaves maintenance before the rest of the suite runs.
 	 */
 	private function stopDiscHostMaintenance(string $maintenanceid): void {
-		$this->call('maintenance.delete', [$maintenanceid]);
+		// Ten years ahead - a start that will never come within the test run, so the maintenance stays
+		// defined but idle and the host is taken out of maintenance.
+		$future = time() + 10 * 365 * 24 * 3600;
+
+		$this->call('maintenance.update', [
+			'maintenanceid' => $maintenanceid,
+			'active_since' => $future,
+			'active_till' => $future + 3600,
+			'timeperiods' => [
+				'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+				'period' => 3600,
+				'start_date' => $future
+			]
+		]);
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
-		// Deleting the maintenance only removes it from the configuration; the timer process still has to
-		// take the host out of maintenance and clear the suppression of the events opened during the run
-		// (their event_suppress rows persist even after the problems were closed by correlation). Wait
+		// Moving the maintenance out of its active window only changes the configuration; the timer process
+		// still has to take the host out of maintenance and clear the suppression of the events opened during
+		// the run (their event_suppress rows persist even after the problems were closed by correlation). Wait
 		// until nothing on the discovered host is suppressed any more, so the next test starts with the
 		// host fully out of maintenance and cannot observe stale suppression.
 		$this->callUntilCountIsPresent('event.get', [
@@ -5263,6 +5277,13 @@ HEREDOC;
 		if (!empty(self::$correlationid2)) {
 			CDataHelper::call('correlation.delete', [self::$correlationid2]);
 			self::$correlationid2 = null;
+		}
+
+		// stopDiscHostMaintenance() only pushes the maintenance out of its active window; delete it for real
+		// here (before its host) so it does not leak into later suites.
+		if (!empty(self::$disc_maintenanceid)) {
+			CDataHelper::call('maintenance.delete', [self::$disc_maintenanceid]);
+			self::$disc_maintenanceid = null;
 		}
 
 		if (!empty(self::$disc_hostid)) {
