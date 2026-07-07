@@ -142,7 +142,8 @@
 						.setFields(['opdata'])
 						.setVisible(false),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
-					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>)
+					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
+					new CDataTableColumnCustomText('custom_text', <?= json_encode(_('Custom text')); ?>)
 				])
 				.setOption('compact_view', <?= json_encode(_('Compact view')); ?>, {
 					onRender: option => {

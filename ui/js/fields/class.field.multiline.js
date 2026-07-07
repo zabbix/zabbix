@@ -63,4 +63,26 @@ class CFieldMultiline extends CField {
 	isDisabled() {
 		return this._field.disabled;
 	}
+
+	lock() {
+		if ($(this._field).data().multilineInput.options.disabled) {
+			return false;
+		}
+
+		this._field.dataset.formDisabled = '';
+		$(this._field).prop('disabled', true);
+
+		return true;
+	}
+
+	unlock() {
+		if ('formDisabled' in this._field.dataset) {
+			$(this._field).prop('disabled', false);
+			delete this._field.dataset.formDisabled;
+
+			return true;
+		}
+
+		return false;
+	}
 }

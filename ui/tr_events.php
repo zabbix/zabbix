@@ -75,16 +75,15 @@ if (!$events) {
 $event = reset($events);
 
 $event['comments'] = ($trigger['comments'] !== '')
-	? CMacrosResolverHelper::resolveTriggerDescription(
-		[
+	? CMacrosResolverHelper::resolveEventDescriptions(
+		[$event['eventid'] => [
 			'triggerid' => $trigger['triggerid'],
 			'expression' => $trigger['expression'],
 			'comments' => $trigger['comments'],
 			'clock' => $event['clock'],
 			'ns' => $event['ns']
-		],
-		['events' => true]
-	)
+		]]
+	)[$event['eventid']]['comments']
 	: '';
 
 if ($event['r_eventid'] != 0) {
@@ -105,19 +104,16 @@ if ($event['r_eventid'] != 0) {
 }
 
 if ($trigger['opdata'] !== '') {
-	$event['opdata'] = (new CCol(CMacrosResolverHelper::resolveTriggerOpdata(
-		[
+	$event['opdata'] = (new CCol(CMacrosResolverHelper::resolveEventOpdatas(
+		[$event['eventid'] => [
 			'triggerid' => $trigger['triggerid'],
 			'expression' => $trigger['expression'],
 			'opdata' => $trigger['opdata'],
 			'clock' => $event['clock'],
 			'ns' => $event['ns']
-		],
-		[
-			'events' => true,
-			'html' => true
-		]
-	)))->addClass('opdata');
+		]],
+		['html' => true]
+	)[$event['eventid']]['opdata']))->addClass('opdata');
 }
 else {
 	$db_items = API::Item()->get([

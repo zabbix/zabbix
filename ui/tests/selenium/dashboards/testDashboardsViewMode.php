@@ -86,7 +86,10 @@ class testDashboardsViewMode extends CLegacyWebTest {
 				$this->assertEquals($content, $widget->query('class:no-data-message')->one()->getText());
 			}
 
-			$this->assertEquals(2, $system_rows);
+			// Admin role user has access to all information in System information widget thus 11 rows.
+			$expected_system_rows = ($data['username'] === 'admin-zabbix') ? 11 : 2;
+			$this->assertEquals($expected_system_rows, $system_rows);
+
 			$this->assertEquals("0\nTotal", $host_total);
 			$this->assertEquals("0\nWarning", $problems_warning);
 			$this->assertFalse($geomap_icon->exists());
@@ -102,7 +105,7 @@ class testDashboardsViewMode extends CLegacyWebTest {
 			}
 
 			$this->zbxTestCheckNoRealHostnames();
-			$this->assertEquals(10, $system_rows);
+			$this->assertEquals(11, $system_rows);
 			$this->assertNotEquals("0\nTotal", $host_total);
 			$this->assertNotEquals("0\nWarning", $problems_warning);
 			$this->assertTrue($geomap_icon->exists());
