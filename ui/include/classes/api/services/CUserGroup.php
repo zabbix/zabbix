@@ -1722,7 +1722,7 @@ class CUserGroup extends CApiService {
 	}
 
 	private function addRelatedProxies(array $options, array &$result): void {
-		if ($options['selectProxies'] === null) {
+		if (!array_key_exists('selectProxies', $options) || $options['selectProxies'] === null) {
 			return;
 		}
 
@@ -1742,7 +1742,7 @@ class CUserGroup extends CApiService {
 	}
 
 	private function addRelatedProxyGroups(array $options, array &$result): void {
-		if ($options['selectProxyGroups'] === null) {
+		if (!array_key_exists('selectProxyGroups', $options) || $options['selectProxyGroups'] === null) {
 			return;
 		}
 
