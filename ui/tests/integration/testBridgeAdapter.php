@@ -1359,6 +1359,8 @@ class testBridgeAdapter extends CIntegrationTest {
 	}
 
 	public function testBridgeAdapter_housekeeperDpopJtiCache(): void {
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_dc_sync_configuration()', true, 30, 1);
+
 		DB::insertBatch('dpop_jti_cache', [[
 			'jti' => self::HOUSEKEEPER_TEST_JTI,
 			'expires_at' => time() - 100
