@@ -296,7 +296,7 @@
 			delete cached_values.interface_details;
 		}
 
-		PopUp('popup.itemtest.edit', jQuery.extend(item_properties, {
+		const overlay = PopUp('popup.itemtest.edit', jQuery.extend(item_properties, {
 			steps: getPreprocessingSteps(step_nums),
 			hostid: <?= $data['hostid'] ?>,
 			test_type: <?= $data['preprocessing_test_type'] ?>,
@@ -305,5 +305,9 @@
 			get_value: get_value ? 1 : 0,
 			data: cached_values
 		}), {dialogueid: 'item-test', dialogue_class: 'modal-popup-generic', trigger_element});
+
+		overlay.$dialogue[0].addEventListener('itemtest.close', (e) => {
+			$row.data('test-data', e.detail);
+		});
 	}
 </script>
