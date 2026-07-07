@@ -127,10 +127,15 @@ class CControllerDashboardView extends CController {
 		updateTimeSelectorPeriod($time_selector_options);
 
 		$dashboard_time_period = getTimeSelectorPeriod($time_selector_options);
-		$start_slideshow = $this->hasInput('slideshow')
+
+		if ($dashboard['dashboardid'] === null) {
+			$start_slideshow = false;
+		}
+		else {
+			$start_slideshow = $this->hasInput('slideshow')
 				? $this->getInput('slideshow') === DASHBOARD_SLIDESHOW_ON
 				: $dashboard['auto_start'] == 1;
-		$start_slideshow = $start_slideshow && $dashboard['dashboardid'] !== null;
+		}
 
 		$data = [
 			// The dashboard property shall only contain data used by the JavaScript framework.
