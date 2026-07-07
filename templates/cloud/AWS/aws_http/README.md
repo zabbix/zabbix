@@ -3187,7 +3187,7 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS region daily cost discovery|<p>Discovers AWS service based on its category.</p>|Dependent item|aws.region.daily.cost.discovery|
+|AWS region daily cost discovery|<p>Discovers AWS daily region cost data.</p>|Dependent item|aws.region.daily.cost.discovery|
 
 ### Item prototypes for AWS region daily cost discovery
 

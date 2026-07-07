@@ -5573,7 +5573,7 @@ zabbix_export:
           key: aws.cost.total
           value_type: FLOAT
           units: '!USD'
-          params: 'sum(last_foreach(/*/aws.monthly.cost[*]))'
+          params: 'sum(last_foreach(//aws.monthly.cost[*]))'
           description: 'Total cost across all AWS billing months.'
           tags:
             - tag: component
@@ -5672,7 +5672,7 @@ zabbix_export:
           key: aws.daily.average.cost
           value_type: FLOAT
           units: '!USD'
-          params: 'avg(avg_foreach(/*/aws.daily.service.total.cost,1w))'
+          params: 'avg(avg_foreach(//aws.daily.service.total.cost,1w))'
           description: 'AWS service weekly average cost.'
           tags:
             - tag: component
@@ -5792,7 +5792,7 @@ zabbix_export:
           key: aws.daily.service.total.cost
           value_type: FLOAT
           units: '!USD'
-          params: 'sum(last_foreach(/*/aws.account.daily.total.cost[*]))'
+          params: 'sum(last_foreach(//aws.account.daily.total.cost[*]))'
           description: 'AWS daily service total cost.'
           tags:
             - tag: component
@@ -6846,7 +6846,7 @@ zabbix_export:
           key: aws.monthly.average.cost
           value_type: FLOAT
           units: '!USD'
-          params: 'avg(last_foreach(/*/aws.monthly.cost[*]))'
+          params: 'avg(last_foreach(//aws.monthly.cost[*]))'
           description: 'AWS service monthly average cost.'
           tags:
             - tag: component
@@ -8070,8 +8070,8 @@ zabbix_export:
                 key: aws.get.daily.costs
               tags:
                 - tag: component
-                  value: billing
-                - tag: service
+                  value: daily-service
+                - tag: daily-service
                   value: '{#AWS.BILLING.SERVICE.NAME}'
               trigger_prototypes:
                 - uuid: 195e4caadce742aeb2d09609cb4e8a45
@@ -8267,7 +8267,7 @@ zabbix_export:
           name: 'AWS region daily cost discovery'
           type: DEPENDENT
           key: aws.region.daily.cost.discovery
-          description: 'Discovers AWS service based on its category.'
+          description: 'Discovers AWS daily region cost data.'
           item_prototypes:
             - uuid: 0473c09e0f1c49f3af7768e024f7afba
               name: 'Region [{#AWS.REGION}]: Get daily data'
@@ -8537,8 +8537,8 @@ zabbix_export:
                 key: 'aws.top.daily.service.preprocessed.get["{#AWS.SERVICE.NAME}"]'
               tags:
                 - tag: component
-                  value: daily-service
-                - tag: daily-service
+                  value: daily-top-service
+                - tag: daily-top-service
                   value: '{#AWS.SERVICE.NAME}'
               trigger_prototypes:
                 - uuid: 4f9b7c1d2e3a4b5c9d8f7a6b5c4d3e21
@@ -8579,8 +8579,8 @@ zabbix_export:
                 key: aws.top.daily.service.get
               tags:
                 - tag: component
-                  value: daily-service
-                - tag: daily-service
+                  value: daily-top-service
+                - tag: daily-top-service
                   value: '{#AWS.SERVICE.NAME}'
           master_item:
             key: aws.top.daily.service.get
