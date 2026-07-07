@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0beta2');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050086);
+define('ZABBIX_DB_VERSION',		7050087);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1008,6 +1008,9 @@ define('DASHBOARD_ROW_HEIGHT',		70);
 define('DASHBOARD_FILTER_SHOW_ALL',	0);
 define('DASHBOARD_FILTER_SHOW_MY',	1);
 define('DASHBOARD_DISPLAY_PERIODS',	[10, 30, 60, 120, 600, 1800, 3600]);
+
+define('DASHBOARD_SLIDESHOW_OFF',	'off');
+define('DASHBOARD_SLIDESHOW_ON',	'on');
 
 // alignments
 define('HALIGN_CENTER',		0);
