@@ -1,6 +1,9 @@
 Changes for 8.0.0beta2
 
 New features:
+..F....... [ZBXNEXT-10241] implemented a skip to main content link (gklavins)
+..F....... [ZBXNEXT-7713] added slideshow parameter for URL sharing and made slideshow disabled by default (gklavins)
+..F....... [ZBXNEXT-10393] implemented inline validation for item test form (gberzina)
 .........T [ZBXNEXT-10534] added Claude API by HTTP template (abrosimovs)
 A.F.....S. [ZBXNEXT-9109] added Zabbix server identity; export of System information (arimdjonoks, gcalenko, jfreibergs)
 .........T [ZBXNEXT-10558] updated Veeam Backup and Replication & Veeam Backup Enterprise Manager by HTTP templates (egordymov)
@@ -17,6 +20,8 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 A.F.....S. [ZBXNEXT-1150] implemented storage and display of maintenance-related event suppressions and unsuppressions (aetatsu, Ivo)
 
 Bug fixes:
+..F....... [ZBX-27855] fixed JS errors in Host Wizard form when templates have required secret macros (Ivo)
+...G...... [ZBX-27495] fixed history upload excessive delay for both Zabbix agents (vsmelovs)
 ..F....... [ZBX-27401] suppressed Elasticsearch technical errors from regular users (Sasha)
 ..F....... [ZBX-27661] fixed input not being focused when changing password or psk in some forms (aluchko, kastafjevs)
 .........T [ZBX-27466] fixed widgets in Nextcloud by HTTP template (kbruvers)
