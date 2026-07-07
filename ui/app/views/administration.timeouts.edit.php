@@ -38,7 +38,6 @@ $form_grid = (new CFormGrid())
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
-						->setAttribute('autofocus', 'autofocus')
 				)
 			])
 			->addItem([

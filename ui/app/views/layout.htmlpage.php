@@ -59,6 +59,12 @@ function local_showHeader(array $data): void {
 	]))->getOutput();
 }
 
+function local_showSkipToMainContentLink(): void {
+	echo (new CLink(_('Skip to main content'), '#'.CHtmlPage::PAGE_TITLE_ID))
+		->addClass(ZBX_STYLE_BTN)
+		->addClass('skip-link');
+}
+
 function local_showSidebar(array $data): void {
 	global $ZBX_SERVER_NAME;
 
@@ -99,6 +105,10 @@ function local_showFooter(array $data): void {
 local_showHeader($data);
 
 echo '<body>';
+
+if ($data['web_layout_mode'] != ZBX_LAYOUT_KIOSKMODE) {
+	local_showSkipToMainContentLink();
+}
 
 local_showSidebar($data);
 
