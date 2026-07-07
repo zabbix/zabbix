@@ -10484,18 +10484,6 @@ return [
 				'length' => 255,
 				'default' => '0'
 			],
-			'evaltype' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'formula' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
 			'script' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
