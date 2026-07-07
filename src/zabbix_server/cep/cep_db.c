@@ -327,6 +327,9 @@ static void	cep_db_write_symptoms(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr
 	{
 		const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)tasks->values[i];
 
+		if (EVENT_SOURCE_TRIGGERS != task->db_event->source || EVENT_OBJECT_TRIGGER != task->db_event->object)
+			continue;
+
 		if (CEP_EVENT_OPEN != task->event_op)
 			continue;
 
@@ -498,13 +501,15 @@ static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_mw_ta
 	for (int i = 0; i < tasks->values_num; i++)
 	{
 		const zbx_cep_task_event_t	*task = (const zbx_cep_task_event_t *)tasks->values[i];
-		const zbx_db_event		*event = task->db_event;
+		const zbx_db_event		*event;
+
+		if (EVENT_SOURCE_TRIGGERS != task->db_event->source || EVENT_OBJECT_TRIGGER != task->db_event->object)
+			continue;
 
 		if (CEP_EVENT_OPEN != task->event_op)
 			continue;
 
-		if (EVENT_SOURCE_TRIGGERS != event->source || EVENT_OBJECT_TRIGGER != event->object)
-			continue;
+		event = task->db_event;
 
 		if (NULL == event->suppress)
 			continue;
