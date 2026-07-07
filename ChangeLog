@@ -1,6 +1,7 @@
 Changes for 8.0.0beta2
 
 New features:
+..F....... [ZBXNEXT-9922] modernized Zabbix UI to improve accessibility and usability (aluchko, ashubin)
 ..F....... [ZBXNEXT-10241] implemented skip to main content link (gklavins)
 ..F....... [ZBXNEXT-7713] added slideshow parameter for URL sharing and made slideshow disabled by default (gklavins)
 ..F....... [ZBXNEXT-10393] implemented inline validation for item test form (gberzina)
