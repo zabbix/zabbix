@@ -1390,12 +1390,12 @@ zabbix_export:
           password: '{$VMWARE.PASSWORD}'
           description: 'System boot time.'
           preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - 'return Math.floor(Date.parse(value)/1000);'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+            - type: JAVASCRIPT
+              parameters:
+                - 'return Math.floor(Date.parse(value)/1000);'
           tags:
             - tag: component
               value: system
