@@ -1798,6 +1798,10 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 			perror = "";
 		}
 
+		/* push notifications are supported only for trigger events */
+		if (MEDIA_TYPE_PUSH == type && EVENT_SOURCE_TRIGGERS != event->source)
+			continue;
+
 		if (0 == have_alerts)
 		{
 			have_alerts = 1;
