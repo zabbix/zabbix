@@ -4364,6 +4364,18 @@ section {
       background-color: var(--severity-color-disaster-bg);
       color: #4b0c0c; }
 
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 12px;
+  overflow: hidden;
+  width: 134px;
+  z-index: 99999; }
+  .skip-link:focus-visible {
+    left: 10px;
+    overflow: visible;
+    height: auto; }
+
 .status-na-bg,
 .status-info-bg,
 .status-warning-bg,
@@ -9816,6 +9828,9 @@ a.btn-icon:link, a.btn-icon:hover, a.btn-icon:focus, a.btn-icon:visited,
 .btn-icon:focus,
 .btn-icon:visited {
   border-bottom: none; }
+
+.skip-link:focus-visible {
+  border-bottom-width: 1px; }
 
 .menu-user a:link, .menu-user a:visited {
   border-bottom: 0; }
