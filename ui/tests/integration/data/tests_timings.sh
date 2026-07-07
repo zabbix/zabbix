@@ -21,6 +21,7 @@ declare -A BASELINE_TIMES=(
   [testItemState]=98
   [testHistoryPush]=92
   [testValuemaps]=89
+  [testBridgeAdapter]=86
   [testAutoregistrationPSK]=85
   [testLowLevelDiscovery]=84
   [testDataCollection]=77
@@ -57,5 +58,4 @@ declare -A BASELINE_TIMES=(
   [testUserMacrosWithContext]=10
   [testGraphLinking]=8
   [testFunctions]=3
-  [testBridgeAdapter]=15
 )
