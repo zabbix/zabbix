@@ -159,7 +159,7 @@ class testSystemInformation extends CWebTest {
 		$current_time = time();
 
 		if (!$dashboardid) {
-			$nodes_table = $this->query('xpath://table[@class="list-table sticky-header sticky-footer"]')->asTable()->one();
+			$nodes_table = $this->query('xpath://table[@class="list-table sticky-header rounded-surface sticky-footer"]')->asTable()->one();
 			$server_address = $this->query('xpath://th[text()="Zabbix server is running"]/../td[2]')->one();
 		}
 		else {
