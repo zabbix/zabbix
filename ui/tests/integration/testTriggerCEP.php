@@ -653,7 +653,7 @@ class testTriggerCEP extends CIntegrationTest {
 				'key' => self::LLD_RULE_KEY,
 				'value' => $this->buildItemLLDData()
 			]
-		], null, 0);
+		]);
 
 		$this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
@@ -703,7 +703,7 @@ class testTriggerCEP extends CIntegrationTest {
 				'key' => self::LLD_RULE_KEY,
 				'value' => $this->buildItemLLDData()
 			]
-		], null, 0);
+		]);
 
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'triggerids' => [self::$discovered_triggerid, self::$discovered_dep_triggerid],
@@ -753,7 +753,7 @@ class testTriggerCEP extends CIntegrationTest {
 				'key' => self::LLD_RULE_KEY,
 				'value' => $this->buildItemLLDData()
 			]
-		], null, 0);
+		]);
 
 		// Reload configuration cache so the server is aware of the changed prototypes.
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -808,7 +808,7 @@ class testTriggerCEP extends CIntegrationTest {
 				'key' => self::LLD_RULE_KEY,
 				'value' => $this->buildItemLLDData()
 			]
-		], null, 0);
+		]);
 
 		// Verify the discovered triggers reflect the updated mode.
 		$response = $this->callUntilDataIsPresent('trigger.get', [
@@ -868,7 +868,7 @@ class testTriggerCEP extends CIntegrationTest {
 				'key' => self::LLD_RULE_KEY,
 				'value' => $this->buildItemLLDData()
 			]
-		], null, 0);
+		]);
 
 		// Verify the discovered triggers reflect the updated correlation mode.
 		$response = $this->callUntilDataIsPresent('trigger.get', [
@@ -969,7 +969,7 @@ class testTriggerCEP extends CIntegrationTest {
 				'key' => self::LLD_RULE_KEY,
 				'value' => $this->buildItemLLDData()
 			]
-		], null, 0);
+		]);
 
 		// Verify the discovered items reflect the updated value type.
 		$response = $this->callUntilDataIsPresent('item.get', [
@@ -1102,7 +1102,7 @@ class testTriggerCEP extends CIntegrationTest {
 				'key' => self::LLD_RULE_KEY,
 				'value' => $this->buildItemLLDData()
 			]
-		], null, 0);
+		]);
 
 		// Verify the discovered items reflect the updated value type.
 		$response = $this->callUntilDataIsPresent('item.get', [
@@ -1299,7 +1299,7 @@ class testTriggerCEP extends CIntegrationTest {
 				'key' => self::LLD_RULE_KEY,
 				'value' => $this->buildItemLLDData()
 			]
-		], null, 0);
+		]);
 
 		// Wait for the discovered items to reflect the text value type and the discovered triggers to
 		// reflect global correlation mode + multiple event generation.
@@ -1728,7 +1728,7 @@ HEREDOC;
 				'key' => self::LLD_RULE_KEY,
 				'value' => $this->buildItemLLDData(true)
 			]
-		], null, 0);
+		]);
 
 		// Verify the discovered items reflect the updated value type.
 		$response = $this->callUntilDataIsPresent('item.get', [
@@ -1831,7 +1831,7 @@ HEREDOC;
 					['{#HOST}' => self::HOST_DISC_VALUE]
 				]])
 			]
-		], null, 0);
+		]);
 
 		// Wait for the discovered host to be created by the server.
 		$response = $this->callUntilDataIsPresent('host.get', [
@@ -1858,7 +1858,7 @@ HEREDOC;
 				'key' => self::LLD_RULE_KEY,
 				'value' => $this->buildItemLLDData()
 			]
-		], null, 0);
+		]);
 
 		// Verify all LLD_DISCOVERY_COUNT items from proto1 were created.
 		$response = $this->callUntilDataIsPresent('item.get', [
@@ -1961,8 +1961,7 @@ HEREDOC;
 
 		$vps_written = $this->getVpsWritten();
 		$this->dispatchSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'], $keys),
-			null, 0
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'], $keys)
 		);
 		$this->assertVpsWrittenIncreasedBy($vps_written, count($keys));
 	}
@@ -2284,7 +2283,7 @@ HEREDOC;
 				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
 			}
 		}
-		$this->dispatchSenderValues($data, null, 0);
+		$this->dispatchSenderValues($data);
 
 		$expected_events = count($values);
 
@@ -2340,7 +2339,7 @@ HEREDOC;
 				$data[] = $entry;
 			}
 		}
-		$this->dispatchSenderValues($data, null, 0);
+		$this->dispatchSenderValues($data);
 
 		$expected_values = [];
 		$current = TRIGGER_VALUE_FALSE;
@@ -2406,7 +2405,7 @@ HEREDOC;
 		foreach ($values as $value) {
 			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
 		}
-		$this->dispatchSenderValues($data, null, 0);
+		$this->dispatchSenderValues($data);
 
 		$expected_events = count($values);
 
@@ -2495,8 +2494,7 @@ HEREDOC;
 
 		// Fire all triggers by sending a numeric value of 1 to all discovered items.
 		$this->dispatchSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '1'], $keys),
-			null, 0
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '1'], $keys)
 		);
 		$this->validateTriggerParams(TRIGGER_STATE_NORMAL, TRIGGER_VALUE_TRUE);
 
@@ -2504,15 +2502,13 @@ HEREDOC;
 		// CEP must keep all trigger values as PROBLEM while state becomes UNKNOWN.
 		$this->dispatchSenderValues(
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'not_a_number',
-					'state' => ITEM_STATE_NOTSUPPORTED], $keys),
-			null, 0
+					'state' => ITEM_STATE_NOTSUPPORTED], $keys)
 		);
 		$this->validateTriggerParams(TRIGGER_STATE_UNKNOWN, TRIGGER_VALUE_TRUE);
 
 		// Recover all triggers by sending a numeric value of 0 to all discovered items.
 		$this->dispatchSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'], $keys),
-			null, 0
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'], $keys)
 		);
 		$this->validateTriggerParams(TRIGGER_STATE_NORMAL, TRIGGER_VALUE_FALSE);
 	}
@@ -3100,7 +3096,7 @@ HEREDOC;
 				'value' => 'problem '.$i
 			];
 		}
-		$this->dispatchSenderValues($values, null, 0);
+		$this->dispatchSenderValues($values);
 
 		// Every one of the LOG_EVENT_COUNT values must have generated a problem event on the trigger.
 		$this->callUntilCountIsPresent('event.get', [
@@ -3134,7 +3130,7 @@ HEREDOC;
 				'value' => 'recovered '.$i
 			];
 		}
-		$this->dispatchSenderValues($values, null, 0);
+		$this->dispatchSenderValues($values);
 
 		$this->waitForNoOpenProblems($triggerids, 'log recovery');
 	}
@@ -3155,7 +3151,7 @@ HEREDOC;
 					[self::LOG_LLD_MACRO => self::LOG_COMPONENT_VALUE]
 				]])
 			]
-		], null, 0);
+		]);
 
 		$item_key = self::LOG_ITEM_PROTO_KEY.'['.self::LOG_COMPONENT_VALUE.']';
 
@@ -3265,7 +3261,7 @@ HEREDOC;
 				'key' => self::HOST_LLD_RULE_KEY,
 				'value' => json_encode(['data' => []])
 			]
-		], null, 0);
+		]);
 
 		$this->callUntilCountIsPresent('host.get', [
 			'hostids' => [self::$disc_hostid]
@@ -3321,8 +3317,7 @@ HEREDOC;
 		// value unchanged (OK) while the state becomes UNKNOWN.
 		$this->dispatchSenderValues(
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'not_a_number',
-					'state' => ITEM_STATE_NOTSUPPORTED], $keys),
-			null, 0
+					'state' => ITEM_STATE_NOTSUPPORTED], $keys)
 		);
 
 		$this->validateTriggerParams(TRIGGER_STATE_UNKNOWN, TRIGGER_VALUE_FALSE);
@@ -3352,8 +3347,7 @@ HEREDOC;
 		// Send a numeric value of 0 to restore all items to supported state; the trigger returns to
 		// the NORMAL state and stays OK.
 		$this->dispatchSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'], $keys),
-			null, 0
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'], $keys)
 		);
 
 		$this->validateTriggerParams(TRIGGER_STATE_NORMAL, TRIGGER_VALUE_FALSE);
@@ -3413,8 +3407,7 @@ HEREDOC;
 		// 3. All items unsupported while PROBLEM: CEP keeps trigger values as PROBLEM, state becomes UNKNOWN.
 		$this->dispatchSenderValues(
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'not_a_number',
-					'state' => ITEM_STATE_NOTSUPPORTED], $keys),
-			null, 0
+					'state' => ITEM_STATE_NOTSUPPORTED], $keys)
 		);
 		$this->validateTriggerParams(TRIGGER_STATE_UNKNOWN, TRIGGER_VALUE_TRUE);
 		$this->maybeRestartServer($restart);
@@ -3654,12 +3647,12 @@ HEREDOC;
 		}
 
 		// 1. Open the first problem on every trigger (unique id per trigger); triggers go TRUE.
-		$this->dispatchSenderValues($values('down', 0), null, 0);
+		$this->dispatchSenderValues($values('down', 0));
 		$this->waitForOpenProblemCount($all, $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
 		// 2. Open a second problem on every trigger (a different unique id, mult_event); still TRUE.
-		$this->dispatchSenderValues($values('down', $m), null, 0);
+		$this->dispatchSenderValues($values('down', $m));
 		$this->waitForOpenProblemCount($all, 2 * $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
@@ -3688,7 +3681,7 @@ HEREDOC;
 		}
 
 		// 1. Open the first problem on every trigger (unique id per trigger); triggers go TRUE.
-		$this->dispatchSenderValues($values('down', 0), null, 0);
+		$this->dispatchSenderValues($values('down', 0));
 		$this->waitForOpenProblemCount($all, $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
@@ -3703,7 +3696,7 @@ HEREDOC;
 		$this->maybeRestartServer($restart);
 
 		// 2. Open a second problem on every trigger (a different unique id, mult_event); still TRUE.
-		$this->dispatchSenderValues($values('down', $m), null, 0);
+		$this->dispatchSenderValues($values('down', $m));
 		$this->waitForOpenProblemCount($all, 2 * $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
@@ -3718,13 +3711,13 @@ HEREDOC;
 		// 3. "up" for the first id set: each is a PROBLEM that closes only its corresponding "down"
 		//    (CLOSE_OLD) and itself (CLOSE_NEW). Each trigger's second problem stays open, so triggers
 		//    stay TRUE and exactly $m problems remain.
-		$this->dispatchSenderValues($values('up', 0), null, 0);
+		$this->dispatchSenderValues($values('up', 0));
 		$this->waitForOpenProblemCount($all, $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 		$this->maybeRestartServer($restart);
 
 		// 4. "up" for the second id set closes each trigger's remaining problem; nothing stays open.
-		$this->dispatchSenderValues($values('up', $m), null, 0);
+		$this->dispatchSenderValues($values('up', $m));
 		$this->waitForNoOpenProblems($all);
 	}
 
@@ -3755,12 +3748,12 @@ HEREDOC;
 		}
 
 		// 1. Open the first problem on every trigger (unique id per trigger); triggers go TRUE.
-		$this->dispatchSenderValues($values('down', 0), null, 0);
+		$this->dispatchSenderValues($values('down', 0));
 		$this->waitForOpenProblemCount($all, $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
 		// 2. Open a second problem on every trigger (a different unique id, mult_event); still TRUE.
-		$this->dispatchSenderValues($values('down', $m), null, 0);
+		$this->dispatchSenderValues($values('down', $m));
 		$this->waitForOpenProblemCount($all, 2 * $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
@@ -3779,7 +3772,7 @@ HEREDOC;
 
 		// 4. "up" for the first id set closes each corresponding "down" (and itself); each trigger's second
 		//    problem stays open, so the services stay in problem state (still WARNING).
-		$this->dispatchSenderValues($values('up', 0), null, 0);
+		$this->dispatchSenderValues($values('up', 0));
 		$this->waitForOpenProblemCount($all, $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 		$this->waitForServicesStatus(TRIGGER_SEVERITY_WARNING);
@@ -3787,7 +3780,7 @@ HEREDOC;
 		$this->maybeRestartServer($restart);
 
 		// 5. "up" for the second id set closes each trigger's remaining problem; every service recovers to OK.
-		$this->dispatchSenderValues($values('up', $m), null, 0);
+		$this->dispatchSenderValues($values('up', $m));
 		$this->waitForNoOpenProblems($all);
 		$this->waitForServicesStatus(ZBX_SEVERITY_OK);
 	}
@@ -3831,8 +3824,7 @@ HEREDOC;
 		$this->maybeRestartServer($restart);
 
 		$this->dispatchSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down'], $keys2),
-			null, 0
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down'], $keys2)
 		);
 
 		$this->waitForNoOpenProblems(array_merge($triggerids1, $triggerids2));
@@ -3903,8 +3895,7 @@ HEREDOC;
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 		$this->dispatchSenderValues(
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down'],
-				$keys2_by_parity[$first_parity]),
-			null, 0
+				$keys2_by_parity[$first_parity])
 		);
 		$this->waitForOpenProblemCountByTag($all, 'odd', $first_parity, 0);
 		$this->waitForOpenProblemCountByTag($all, 'odd', $second_parity, $open_count[$second_parity]);
@@ -3916,8 +3907,7 @@ HEREDOC;
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 		$this->dispatchSenderValues(
 			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => 'down'],
-				$keys2_by_parity[$second_parity]),
-			null, 0
+				$keys2_by_parity[$second_parity])
 		);
 
 		$this->waitForNoOpenProblems($all);
@@ -4048,7 +4038,7 @@ HEREDOC;
 			$intermingled[] = ['host' => self::HOST_DISC_VALUE, 'key' => $pkey, 'value' => '1'];
 			$intermingled[] = ['host' => self::HOST_DISC_VALUE, 'key' => $dep_keys[$idx], 'value' => '1'];
 		}
-		$this->dispatchSenderValues($intermingled, null, 1);
+		$this->dispatchSenderValues($intermingled);
 
 		$this->waitForParentsValue($parent_ids, TRIGGER_VALUE_TRUE);
 		$this->waitForAllTriggerEventCounts($parent_ids, $parent_event_count + 1);
@@ -4057,16 +4047,14 @@ HEREDOC;
 
 		// 2. Intermingled recovery: parent OK + dep OK values in one packet
 		//    (parent_key, dep_key, parent_key, dep_key, ...); only parents are asserted.
-		$prev_parent_triggers = $this->getTriggers($parent_ids);
-		$prev_parent_lastchanges = array_map(fn($tid) => $prev_parent_triggers[$tid]['lastchange'], $parent_ids);
 		$intermingled_recovery = [];
 		foreach ($parent_keys as $idx => $pkey) {
 			$intermingled_recovery[] = ['host' => self::HOST_DISC_VALUE, 'key' => $pkey, 'value' => '0'];
 			$intermingled_recovery[] = ['host' => self::HOST_DISC_VALUE, 'key' => $dep_keys[$idx], 'value' => '0'];
 		}
-		$this->dispatchSenderValues($intermingled_recovery, null, 1);
+		$this->dispatchSenderValues($intermingled_recovery);
 
-		$this->waitForParentsValueAndLastchange($parent_ids, $prev_parent_lastchanges, TRIGGER_VALUE_FALSE);
+		$this->waitForParentsValue($parent_ids, TRIGGER_VALUE_FALSE);
 		$this->waitForAllTriggerEventCounts($parent_ids, $parent_event_count + 2);
 
 		// When the parent recovered in the intermingled batch above, dependency suppression lifted while a
@@ -4077,7 +4065,7 @@ HEREDOC;
 		foreach ($dep_keys as $dkey) {
 			$dep_recovery[] = ['host' => self::HOST_DISC_VALUE, 'key' => $dkey, 'value' => '0'];
 		}
-		$this->dispatchSenderValues($dep_recovery, null, 1);
+		$this->dispatchSenderValues($dep_recovery);
 
 		// After recovery no problems must remain open on either the parent or the dependent triggers.
 		$this->waitForNoOpenProblems(array_merge($parent_ids, self::$discovered_dep_triggerids),
@@ -4085,9 +4073,9 @@ HEREDOC;
 	}
 
 	/**
-	 * Wait until every parent trigger reached $expected_value in NORMAL state with its lastchange
-	 * advanced past the captured baseline. The callback returns a descriptive string on mismatch
-	 * (surfaced in the callUntilDataIsPresent failure message) rather than a bare false.
+	 * Wait until every parent trigger reached $expected_value in NORMAL state. The callback returns a
+	 * descriptive string on mismatch (surfaced in the callUntilDataIsPresent failure message) rather
+	 * than a bare false.
 	 */
 	private function waitForParentsValue(array $parent_ids, int $expected_value): void {
 		$this->callUntilDataIsPresent('trigger.get', [
@@ -4106,35 +4094,6 @@ HEREDOC;
 					}
 					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) {
 						return 'trigger '.$tid.' state '.$t['state'].', expected NORMAL';
-					}
-				}
-				return true;
-			}
-		);
-	}
-
-	private function waitForParentsValueAndLastchange(array $parent_ids, array $prev_parent_lastchanges,
-			int $expected_value): void {
-		$this->callUntilDataIsPresent('trigger.get', [
-			'triggerids' => $parent_ids,
-			'output' => ['triggerid', 'value', 'lastchange', 'state']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY,
-			function ($response) use ($parent_ids, $prev_parent_lastchanges, $expected_value) {
-				$by_id = array_column($response['result'], null, 'triggerid');
-				foreach ($parent_ids as $idx => $tid) {
-					if (!isset($by_id[$tid])) {
-						return 'trigger '.$tid.' missing from response';
-					}
-					$t = $by_id[$tid];
-					if ((int) $t['value'] !== $expected_value) {
-						return 'trigger '.$tid.' value '.$t['value'].', expected '.$expected_value;
-					}
-					if ((int) $t['state'] !== TRIGGER_STATE_NORMAL) {
-						return 'trigger '.$tid.' state '.$t['state'].', expected NORMAL';
-					}
-					if ((int) $t['lastchange'] <= $prev_parent_lastchanges[$idx]) {
-						return 'trigger '.$tid.' lastchange '.$t['lastchange'].
-								' not advanced past '.$prev_parent_lastchanges[$idx];
 					}
 				}
 				return true;
@@ -4224,7 +4183,7 @@ HEREDOC;
 				'key' => self::LLD_RULE_KEY,
 				'value' => $this->buildItemLLDData()
 			]
-		], null, 0);
+		]);
 
 		// Wait for the discovered triggers to reflect the updated manual_close setting.
 		$this->callUntilDataIsPresent('trigger.get', [
@@ -4262,7 +4221,7 @@ HEREDOC;
 					'key' => self::LOG_LLD_RULE_KEY,
 					'value' => json_encode(['data' => []])
 				]
-			], null, 0);
+			]);
 
 			$this->callUntilCountIsPresent('trigger.get', [
 				'triggerids' => [self::$discovered_log_triggerid]
@@ -4284,7 +4243,7 @@ HEREDOC;
 				'key' => self::LLD_RULE_KEY,
 				'value' => json_encode(['data' => []])
 			]
-		], null, 0);
+		]);
 
 		$this->callUntilCountIsPresent('trigger.get', [
 			'triggerids' => $triggerids
@@ -4464,7 +4423,7 @@ HEREDOC;
 	 * unsupported by setting 'state' => ITEM_STATE_NOTSUPPORTED explicitly (the value is then taken as the
 	 * error text); a non-numeric value alone would be dropped rather than turning the item unsupported.
 	 */
-	protected function dispatchSenderValues($values, $component = null, $delayOverride = null): void {
+	protected function dispatchSenderValues($values, $component = null, $delayOverride = 0): void {
 		$this->ensureItemidsResolved($values);
 
 		$data = [];
@@ -4491,7 +4450,7 @@ HEREDOC;
 	 * Deliver item id based history values to the server impersonating the active proxy. Subclasses that
 	 * run a real proxy daemon can override this to route the values through the proxy instead.
 	 */
-	protected function dispatchValues(array $values, $delayOverride = null): void {
+	protected function dispatchValues(array $values, $delayOverride = 0): void {
 		$this->sendAgentDataValues($values, self::HOST_NAME, self::COMPONENT_SERVER, $delayOverride,
 			self::PROXY_NAME);
 	}
@@ -4782,8 +4741,7 @@ HEREDOC;
 	private function assertPartialRecoveryForAll(array $triggerids, array $keys, string $item_value,
 			int $expected_event_count): void {
 		$this->dispatchSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value], $keys),
-			null, 1
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value], $keys)
 		);
 		$this->waitForAllTriggerEventCounts($triggerids, $expected_event_count);
 		$events_by_trigger = $this->getScenarioEventsByTrigger($triggerids);
@@ -4803,8 +4761,7 @@ HEREDOC;
 		$prev_triggers = $this->getTriggers($triggerids);
 		$prev_lastchanges = array_map(fn($tid) => $prev_triggers[$tid]['lastchange'], $triggerids);
 		$this->dispatchSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value], $keys),
-			null, 0
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value], $keys)
 		);
 
 		$trigger_params = [
@@ -4881,8 +4838,7 @@ HEREDOC;
 		//$cep_processed = $this->getCepStat('events', 'assessed');
 		$expected_lastchanges = array_map(fn($tid) => $current_triggers[$tid]['lastchange'], $triggerids);
 		$this->dispatchSenderValues(
-			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value], $keys),
-			null, 0
+			array_map(fn($key) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $item_value], $keys)
 		);
 
 		$this->assertVpsWrittenIncreasedBy($vps_written, count($keys));
