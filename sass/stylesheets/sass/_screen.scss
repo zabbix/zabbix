@@ -987,6 +987,8 @@ input {
 	}
 
 	&[type="password"] {
+		--font-stack: var(--font-stack-mono);
+
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}

@@ -7795,6 +7795,8 @@ label input[type="radio"] {
 input {
   font-family: var(--font-stack);
   font-size: 1em; }
+  input[type="password"] {
+    --font-stack: var(--font-stack-mono); }
   input[type="file"] {
     padding: 1px; }
 
