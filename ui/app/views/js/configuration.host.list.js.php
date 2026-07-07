@@ -646,7 +646,7 @@
 							cell_inner.innerHTML = proxy_group.name;
 						}
 
-						if (assigned_proxyid != 0) {
+						if (assigned_proxyid != 0 && !proxy_group.inaccessible) {
 							cell_inner.innerHTML += NAME_DELIMITER;
 
 							if (can_edit_proxies && !assigned_proxy.inaccessible) {
