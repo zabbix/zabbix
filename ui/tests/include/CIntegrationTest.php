@@ -61,7 +61,7 @@ class CIntegrationTest extends CAPITest {
 	private const STAT_LABELS = [
 		'call_data_present'	=> 'callUntilDataIsPresent',
 		'call_count_present'	=> 'callUntilCountIsPresent',
-		'test_item_callback'	=> 'testItemUntilCallback',
+		'test_item_callback'	=> 'callTestItemUntilCallback',
 		'wait_log_line'		=> 'waitForLogLineToBePresent',
 		'wait_send'		=> 'sendDataValues',
 		'reload_config_cache'	=> 'reloadConfigurationCache',
@@ -1334,7 +1334,7 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @return array  the testItem response that satisfied the callback
 	 */
-	public function testItemUntilCallback(array $item, callable $callback,
+	public function callTestItemUntilCallback(array $item, callable $callback,
 			array $options = ['single' => false, 'state' => 0], $timeout = null, $info_callback = null) {
 		if ($timeout === null) {
 			$timeout = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY * 1000;

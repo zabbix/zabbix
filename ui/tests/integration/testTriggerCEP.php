@@ -3267,20 +3267,12 @@ HEREDOC;
 			]
 		], null, 0);
 
-		for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
-			$response = $this->call('host.get', [
-				'hostids' => [self::$disc_hostid],
-				'countOutput' => true
-			]);
-			if ($response['result'] == 0) {
-				self::$disc_hostid = null;
-				$this->reloadConfigurationCacheAndWaitForLogLine();
-				return;
-			}
-			sleep(self::WAIT_ITERATION_DELAY);
-		}
+		$this->callUntilCountIsPresent('host.get', [
+			'hostids' => [self::$disc_hostid]
+		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
-		$this->fail('Discovered host was not deleted after sending empty host LLD data.');
+		self::$disc_hostid = null;
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 	}
 
 	/**
@@ -4272,20 +4264,12 @@ HEREDOC;
 				]
 			], null, 0);
 
-			for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
-				$response = $this->call('trigger.get',
-					['triggerids' => [self::$discovered_log_triggerid], 'countOutput' => true]
-				);
-				if ($response['result'] == 0) {
-					self::$discovered_log_triggerid = null;
-					$this->reloadConfigurationCacheAndWaitForLogLine();
-					break;
-				}
-				sleep(self::WAIT_ITERATION_DELAY);
-			}
+			$this->callUntilCountIsPresent('trigger.get', [
+				'triggerids' => [self::$discovered_log_triggerid]
+			], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
-			$this->assertNull(self::$discovered_log_triggerid,
-				'Discovered log trigger was not deleted after sending empty log LLD data.');
+			self::$discovered_log_triggerid = null;
+			$this->reloadConfigurationCacheAndWaitForLogLine();
 		}
 
 		$triggerids = array_filter([self::$discovered_triggerid, self::$discovered_dep_triggerid]);
@@ -4302,20 +4286,15 @@ HEREDOC;
 			]
 		], null, 0);
 
-		for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
-			$response = $this->call('trigger.get', ['triggerids' => $triggerids, 'countOutput' => true]);
-			if ($response['result'] == 0) {
-				self::$discovered_triggerid = null;
-				self::$discovered_dep_triggerid = null;
-				self::$discovered_triggerids = [];
-				self::$discovered_dep_triggerids = [];
-				$this->reloadConfigurationCacheAndWaitForLogLine();
-				return;
-			}
-			sleep(self::WAIT_ITERATION_DELAY);
-		}
+		$this->callUntilCountIsPresent('trigger.get', [
+			'triggerids' => $triggerids
+		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
-		$this->fail('Discovered triggers were not deleted after sending empty LLD data:'. json_encode($response));
+		self::$discovered_triggerid = null;
+		self::$discovered_dep_triggerid = null;
+		self::$discovered_triggerids = [];
+		self::$discovered_dep_triggerids = [];
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 	}
 
 	/**
@@ -5131,7 +5110,7 @@ HEREDOC;
 	private function assertVpsWrittenIncreasedBy(int $baseline, int $min_increase): void {
 		$expected = $baseline + $min_increase;
 
-		$this->testItemUntilCallback(
+		$this->callTestItemUntilCallback(
 			['value_type' => '3', 'type' => '5', 'key' => 'zabbix[vps,written]'],
 			function ($result) use ($expected) {
 				return $result !== false && isset($result['item']['result'])
@@ -5193,7 +5172,7 @@ HEREDOC;
 	private function assertCepStatIncreasedBy(string $group, string $name, int $baseline, int $min_increase): void {
 		$expected = $baseline + $min_increase;
 
-		$this->testItemUntilCallback(
+		$this->callTestItemUntilCallback(
 			['value_type' => '4', 'type' => '5', 'key' => 'zabbix["cep"]'],
 			function ($result) use ($group, $name, $expected) {
 				$value = $this->cepStatFromResult($result, $group, $name);
@@ -5207,7 +5186,7 @@ HEREDOC;
 	 * Poll the zabbix["cep"] statistics until the given counter equals $expected, then assert it.
 	 */
 	private function assertCepStatEquals(string $group, string $name, int $expected): void {
-		$this->testItemUntilCallback(
+		$this->callTestItemUntilCallback(
 			['value_type' => '4', 'type' => '5', 'key' => 'zabbix["cep"]'],
 			function ($result) use ($group, $name, $expected) {
 				return $this->cepStatFromResult($result, $group, $name) === $expected;
