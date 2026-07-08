@@ -1167,7 +1167,7 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 			zbx_set_exiting_with_fail();
 		}
 	}
-out:
+
 	if (ZBX_RUNLEVEL_DEFAULT != sv.runlevel || 0 != sv.states[sv.runlevel].pending_local_num ||
 		SUCCEED != ZBX_IS_NORMAL_EXIT())
 	{
