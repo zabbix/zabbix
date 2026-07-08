@@ -615,9 +615,8 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 	if (ZBX_TQ_CATEGORY_UNKNOWN == query->category)
 		return ret_errf(FAIL, error, max_error_len, "Category is not set");
 
-	if (ZBX_TQ_CATEGORY_APM_METRICS == query->category && ZBX_TQ_METRIC_TYPE_UNKNOWN == query->metric_type)
-		return ret_errf(FAIL, error, max_error_len,
-				"Metric type is not set (when category is \"APM metrics\")");
+	if (ZBX_TQ_METRIC_TYPE_UNKNOWN == query->metric_type)
+		return ret_errf(FAIL, error, max_error_len, "Metric type is not set");
 
 	for (int i = 0; i < query->columns.values_num; i++)
 	{
@@ -629,7 +628,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 		if (ZBX_TQ_COLUMN_TYPE_UNKNOWN == col->col_type)
 			return ret_errf(FAIL, error, max_error_len, "Column name is invalid for column #%d", i);
 
-		if (NULL == col->key && SUCCEED == tq_column_type_is_attributes(col->col_type))
+		if (NULL == col->key)
 			return ret_errf(FAIL, error, max_error_len, "Key is not set for attribute column #%d", i);
 
 		if (FAIL == tq_validate_str(col->key))
@@ -643,12 +642,12 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 	{
 		const zbx_tq_aggr_column_t *aggr_col = &query->aggregated_columns.values[i];
 
-		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function)
-		{
-			if (NULL == aggr_col->column_name)
-				return ret_errf(FAIL, error, max_error_len,
+		if (NULL == aggr_col->column_name)
+			return ret_errf(FAIL, error, max_error_len,
 					"Column name is not set for aggregated column #%d", i);
 
+		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function)
+		{
 			if (ZBX_TQ_COLUMN_TYPE_UNKNOWN == aggr_col->col_type)
 				return ret_errf(FAIL, error, max_error_len,
 						"Column name is invalid for aggregated column #%d", i);
@@ -678,16 +677,18 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 		}
 	}
 
+	if (ZBX_TQ_EVAL_TYPE_UNKNOWN == query->evaltype)
+		return ret_errf(FAIL, error, max_error_len, "Evaltype is not set");
+
+	if (NULL == query->formula)
+		return ret_errf(FAIL, error, max_error_len, "Formula is not set");
+
 	if (0 != query->conditions.values_num)
 	{
-		if (ZBX_TQ_EVAL_TYPE_UNKNOWN == query->evaltype)
-			return ret_errf(FAIL, error, max_error_len, "Evaltype is not set");
-
 		if (ZBX_TQ_EVAL_TYPE_EXPRESSION == query->evaltype)
 		{
 			if (NULL == query->formula_parsed)
-				return ret_errf(FAIL, error, max_error_len,
-						"Formula is not set (when evaltype is \"expression\")");
+				return ret_errf(FAIL, error, max_error_len, "Formula is not set or is invalid");
 
 			if (SUCCEED != tq_validate_formula_node_indices(query->formula_parsed,
 					query->conditions.values_num, error, max_error_len))
@@ -709,7 +710,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 			if (ZBX_TQ_OPERATOR_UNKNOWN == condition->operator)
 				return ret_errf(FAIL, error, max_error_len, "Operator is not set for condition #%d", i);
 
-			if (NULL == condition->key && SUCCEED == tq_column_type_is_attributes(condition->col_type))
+			if (NULL == condition->key)
 				return ret_errf(FAIL, error, max_error_len,
 						"Key is not set for attribute condition #%d", i);
 
@@ -717,7 +718,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 				return ret_errf(FAIL, error, max_error_len,
 						"Key is not valid UTF-8 for condition #%d", i);
 
-			if (NULL == condition->value && ZBX_TQ_OPERATOR_EXISTS != condition->operator)
+			if (NULL == condition->value)
 				return ret_errf(FAIL, error, max_error_len, "value is not set for condition #%d", i);
 
 			if (FAIL == tq_validate_str(condition->value))
@@ -792,7 +793,8 @@ int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, char *erro
 
 	tq_set_column_types(query);
 
-	if (NULL != query->formula)
+	/* formula being set is enforced by tq_validate_query, if it is set, then it must be either empty or valid */
+	if (NULL != query->formula && '\0' != *query->formula)
 	{
 		if (NULL == (query->formula_parsed = tq_formula_parse(query->formula, error, max_error_len)))
 		{

@@ -235,6 +235,7 @@ void	zbx_audit_item_update_json_add_query_fields_json(int audit_context_mode, zb
 		const char *val);
 void	zbx_audit_item_update_json_add_headers(int audit_context_mode, zbx_uint64_t itemid, int flags,
 		const char *val);
+void	zbx_audit_item_update_json_add_query(int audit_context_mode, zbx_uint64_t itemid, int flags, const char *val);
 
 zbx_audit_entry_t	*zbx_audit_item_get_entry(int audit_context_mode, zbx_uint64_t itemid);
 zbx_audit_entry_t	*zbx_audit_item_get_or_create_entry(int audit_context_mode, int audit_action,
@@ -294,5 +295,6 @@ void	zbx_audit_entry_update_json_add_lld_override_filter(zbx_audit_entry_t *audi
 		int evaltype, const char *formula);
 void	zbx_audit_entry_update_json_add_query_fields_json(zbx_audit_entry_t *audit_entry, const char *val);
 void	zbx_audit_entry_update_json_add_headers(zbx_audit_entry_t* audit_entry, const char *val);
+void	zbx_audit_entry_update_json_add_query(zbx_audit_entry_t *audit_entry, const char *val);
 
 #endif	/* ZABBIX_AUDIT_ITEM_H */

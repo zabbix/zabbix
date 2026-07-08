@@ -21,6 +21,8 @@
 #include "zbxtypes.h"
 #include "zbxnum.h"
 
+/* TODO: maybe validate that keys in query are valid for elastic? i.e. not "", etc. */
+
 /* TODO: maybe this should be user-defined? or at least documented? */
 #define TQ_ELASTIC_MAX_BUCKETS 10000
 
