@@ -24,7 +24,8 @@ $status = $data['system_info']['status'];
 $info_table = (new CTableInfo())
 	->setHeader([_('Parameter'), _('Value'), _('Details')])
 	->setHeadingColumn(0)
-	->addClass(ZBX_STYLE_LIST_TABLE_STICKY_HEADER);
+	->addClass(ZBX_STYLE_LIST_TABLE_STICKY_HEADER)
+	->addClass(ZBX_STYLE_ROUNDED_SURFACE);
 
 if (array_key_exists('serverid', $data) && $data['serverid'] !== '') {
 	$info_table->addRow([

@@ -160,22 +160,26 @@ $event_tab = (new CDiv([
 	new CDiv([
 		(new CSection(make_trigger_details($trigger, $event['eventid'])))
 			->setId(SECTION_HAT_TRIGGERDETAILS)
-			->setHeader(new CTag('h4', true, _('Trigger details'))),
+			->setHeader(new CTag('h4', true, _('Trigger details')))
+			->addClass(ZBX_STYLE_ROUNDED_SURFACE),
 		(new CSection(make_event_details($event, $allowed)))
 			->setId(SECTION_HAT_EVENTDETAILS)
 			->setHeader(new CTag('h4', true, _('Event details')))
+			->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 	]),
 	new CDiv([
 		(new CSectionCollapsible(makeEventDetailsActionsTable($actions, $users, $mediatypes, $maintenances)))
 			->setId(SECTION_HAT_EVENTACTIONS)
 			->setHeader(new CTag('h4', true, _('Actions')))
 			->setProfileIdx('web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state')
-			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state', true)),
+			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state', true))
+			->addClass(ZBX_STYLE_ROUNDED_SURFACE),
 		(new CSectionCollapsible(make_small_eventlist($event, $allowed)))
 			->setId(SECTION_HAT_EVENTLIST)
 			->setHeader(new CTag('h4', true, _('Event list [previous 20]')))
 			->setProfileIdx('web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state')
 			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state', true))
+			->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 	])
 ]))
 	->addClass(ZBX_STYLE_COLUMNS)
