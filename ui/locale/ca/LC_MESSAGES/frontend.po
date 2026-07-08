@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-03-21 08:16+0000\n"
+"PO-Revision-Date: 2026-06-13 13:11+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -14373,6 +14373,10 @@ msgstr "Nous valors"
 msgid "Next dashboard"
 msgstr "Tauler següent"
 
+#: jsLoader.php:260
+msgid "Next month"
+msgstr "Mes vinent"
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -14386,6 +14390,10 @@ msgstr "Següent pàgina"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Passa següent"
+
+#: jsLoader.php:258
+msgid "Next year"
+msgstr "Any vinent"
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
