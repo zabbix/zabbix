@@ -1455,7 +1455,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'.']
 		], 0, self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
-		/* check that server successfuly removed large amount of items from cache */
+		/* check that server successfully removed large amount of items from cache */
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER, null, self::LLD_ITERATIONS, self::WAIT_ITERATION_DELAY);
 
 	}
