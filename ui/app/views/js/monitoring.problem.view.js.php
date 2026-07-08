@@ -40,6 +40,7 @@
 			filter,
 			filter_defaults,
 			filter_options,
+			highlight_row_enabled,
 			layout_mode,
 			page,
 			refresh_interval,
@@ -55,8 +56,8 @@
 			this.#csrf_token = csrf_token;
 
 			this.#initFilter(filter_options);
-			this.#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order,
-				storage_idx, user_configs, severities});
+			this.#initDataTable({page, filter, highlight_row_enabled, default_sort_field, default_sort_order,
+				sort_field, sort_order, storage_idx, user_configs, severities});
 
 			$.subscribe('event.rank_change', () => this.#refresh());
 
@@ -81,8 +82,8 @@
 			jqBlink.blink();
 		}
 
-		#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
-				user_configs, severities}) {
+		#initDataTable({page, filter, highlight_row_enabled, default_sort_field, default_sort_order, sort_field,
+				sort_order, storage_idx, user_configs, severities}) {
 
 			const data_provider_url = new URL('zabbix.php', location.href);
 			data_provider_url.searchParams.set('action', 'problem.view.data');
@@ -161,7 +162,7 @@
 					}
 				})
 				.setOption('highlight_row', <?= json_encode(_('Highlight whole row')); ?>, {
-					enabled: <?= in_array(CWebUser::$data['theme'], ['hc-light', 'hc-dark']) ? 'false' : 'true'; ?>,
+					enabled: highlight_row_enabled,
 					onRender: option => {
 						this.#datatable.getElement().classList.toggle('has-highlighted-rows', option.checked);
 					},
