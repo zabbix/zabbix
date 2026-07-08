@@ -47,6 +47,7 @@ LLD_LIBS = \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a \
+	$(top_srcdir)/src/libs/zbxtelemetry/libzbxtelemetry.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
@@ -75,6 +76,7 @@ LLD_LIBS = \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a \
+	$(top_srcdir)/src/libs/zbxtelemetry/libzbxtelemetry.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
