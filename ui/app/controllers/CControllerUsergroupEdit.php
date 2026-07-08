@@ -93,7 +93,7 @@ class CControllerUsergroupEdit extends CController {
 			'mfa_status' => $mfa_config_status == MFA_ENABLED ? GROUP_MFA_ENABLED : GROUP_MFA_DISABLED,
 			'mfaid' => 0,
 			'proxy_mode' => PROXY_MODE_DENY,
-			'proxy_group_mode' => PROXY_GROUP_MODE_DENY,
+			'proxy_group_mode' => PROXY_GROUP_MODE_DENY
 		];
 
 		if ($this->hasInput('usrgrpid')) {
