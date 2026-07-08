@@ -35,6 +35,17 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 	private static $hostid_export;
 	private static $itemid_export;
 	private static $triggerid_export;
+	private static $export_dir = null;
+
+	private static function getExportDir(): string {
+		if (self::$export_dir === null) {
+			self::$export_dir = sys_get_temp_dir()
+				. '/zabbix_export_test_'
+				. str_replace('.', '', (string) microtime(true));
+		}
+
+		return self::$export_dir;
+	}
 
 	/**
 	 * @inheritdoc
@@ -265,7 +276,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 	}
 
 	public function serverConfigurationProvider() {
-		$export_dir = sys_get_temp_dir() . '/zabbix_export_test';
+		$export_dir = self::getExportDir();
 
 		if (!is_dir($export_dir)) {
 			mkdir($export_dir, 0777, true);
@@ -284,7 +295,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 	 * Clean up the temporary export directory after all tests.
 	 */
 	public static function tearDownAfterClass(): void {
-		$export_dir = sys_get_temp_dir() . '/zabbix_export_test';
+		$export_dir = self::getExportDir();
 
 		if (is_dir($export_dir)) {
 			foreach (glob($export_dir . '/*.ndjson') as $file) {
@@ -301,7 +312,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testUserMacrosInNdjsonExport() {
-		$export_dir = sys_get_temp_dir() . '/zabbix_export_test';
+		$export_dir = self::getExportDir();
 		$now = time();
 		$prev_hour = $now - 3600;
 
@@ -513,8 +524,13 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 						. '" should be resolved to "' . $expected_value . '", got: "'
 						. $tag['value'] . '".'
 					);
+					$this->assertStringNotContainsString($unresolved_macro, $tag['tag'],
+						'events NDJSON for "' . $event_name . '": tag name "' . $tag_name
+						. '" should not contain unresolved "' . $unresolved_macro . '", got: "'
+						. $tag['tag'] . '".'
+					);
 					$this->assertStringNotContainsString($unresolved_macro, $tag['value'],
-						'events NDJSON for "' . $event_name . '": tag "' . $tag_name
+						'events NDJSON for "' . $event_name . '": tag value "' . $expected_value
 						. '" should not contain unresolved "' . $unresolved_macro . '", got: "'
 						. $tag['value'] . '".'
 					);
