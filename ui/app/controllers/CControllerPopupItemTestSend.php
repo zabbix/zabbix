@@ -278,6 +278,13 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 	protected function checkInput() {
 		$ret = $this->validateInput(self::getValidationRules());
 
+		if ($ret && $this->getInput('get_value', 0) == 1
+				&& $this->getInput('test_with', self::TEST_WITH_SERVER) == self::TEST_WITH_PROXY
+				&& $this->getInput('proxyid', 0) == 0) {
+			error(_('Proxy is not assigned yet.'));
+			$ret = false;
+		}
+
 		if ($ret) {
 			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', '0'));
 			$this->get_value_from_host = (bool) $this->getInput('get_value');
