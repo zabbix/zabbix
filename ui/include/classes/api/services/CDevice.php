@@ -303,7 +303,7 @@ class CDevice extends CApiService {
 			'mobile_identity_key' =>	self::getJwkValidationRules(),
 			'mobile_encryption_key' =>	self::getJwkValidationRules(),
 			'push_token' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('device', 'name')]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
