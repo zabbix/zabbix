@@ -35,9 +35,10 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 	 */
 	public static function convertApiInputForForm(array $item): array {
 		$item = parent::convertApiInputForForm($item);
+		$parent_templates = getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 		$item['parent_items'] = makeItemTemplatesHtml(
 			$item['itemid'],
-			getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_PROTOTYPE),
+			$parent_templates,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
@@ -48,6 +49,11 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 			'usermacros' => true,
 			'lldmacros' => true
 		]);
+
+		if ($item['templated'] && $item['valuemap']) {
+			$parent_template = $parent_templates['templates'][$item['valuemap']['hostid']];
+			$item['valuemap']['prefix'] = $parent_template['name'].NAME_DELIMITER;
+		}
 
 		if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
 			$item = static::addDelayWithFlexibleIntervals($update_interval_parser, $item);
