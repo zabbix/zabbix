@@ -286,7 +286,7 @@ static zbx_uint64_t	cep_eventid_next(zbx_cep_t *cep)
  * Return value: event handle or NULL if not found                            *
  *                                                                            *
  ******************************************************************************/
-static zbx_cep_event_handle_t	cep_get_event(zbx_cep_t *cep, zbx_uint64_t eventid)
+static zbx_cep_event_handle_t	cep_get_event_handle(zbx_cep_t *cep, zbx_uint64_t eventid)
 {
 	zbx_cep_event_handle_t	h = (zbx_cep_event_handle_t)zbx_hashset_search(&cep->events, &eventid);
 
@@ -454,7 +454,7 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 
 			if (NULL == event || event->eventid != eventid)
 			{
-				zbx_cep_event_handle_t	h = cep_get_event(cep, eventid);
+				zbx_cep_event_handle_t	h = cep_get_event_handle(cep, eventid);
 
 				if (NULL == h)
 					continue;
@@ -501,7 +501,7 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
 
 		if (NULL == h || h->eventid != eventid)
 		{
-			if (NULL == (h = cep_get_event(cep, eventid)))
+			if (NULL == (h = cep_get_event_handle(cep, eventid)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -1462,7 +1462,7 @@ void	cep_update_event_maintenances(zbx_cep_t *cep, const zbx_vector_event_mainte
 			if (NULL != h)
 				cep_event_update_maintenances(h, &maintenanceids, action);
 
-			if (NULL == (h = cep_get_event(cep, events->values[i].eventid)))
+			if (NULL == (h = cep_get_event_handle(cep, events->values[i].eventid)))
 				continue;
 
 			zbx_vector_cep_event_handle_append(handles, zbx_cep_event_handle_addref(h));
@@ -1493,7 +1493,7 @@ void	cep_update_event_severities(zbx_cep_t *cep, const zbx_vector_event_severity
 	{
 		zbx_cep_event_handle_t	h;
 
-		if (NULL == (h = cep_get_event(cep, events->values[i].eventid)))
+		if (NULL == (h = cep_get_event_handle(cep, events->values[i].eventid)))
 			continue;
 
 		zbx_cep_event_t	*event = cep_event_handle_mutable(h);
@@ -1585,7 +1585,7 @@ void	cep_add_event_tags(zbx_cep_t *cep, zbx_vector_event_tags_t *events, zbx_vec
 	{
 		zbx_cep_event_handle_t	h;
 
-		if (NULL == (h = cep_get_event(cep, events->values[i].eventid)))
+		if (NULL == (h = cep_get_event_handle(cep, events->values[i].eventid)))
 		{
 			i++;
 			continue;
@@ -1722,12 +1722,9 @@ void	cep_delete_events(zbx_cep_t *cep, const zbx_vector_uint64_t *eventids, zbx_
 	for (int i = 0; i < eventids->values_num; i++)
 	{
 		zbx_cep_event_handle_t	h;
-		zbx_cep_event_ptr_t	ptr_local;
 		zbx_cep_object_t	*obj;
 
-		ptr_local.eventid = eventids->values[i];
-
-		if (NULL == (h = (zbx_cep_event_handle_t)zbx_hashset_search(&cep->events, &ptr_local)))
+		if (NULL == (h = cep_get_event_handle(cep, eventids->values[i])))
 			continue;
 
 		if (NULL != (obj = cep_get_object(cep, &h->event->origin)))
