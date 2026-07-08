@@ -194,6 +194,7 @@ int	zbx_async_check_telemetry_query(zbx_dc_telemetry_query_item_t *item, AGENT_R
 		ret = async_check_telemetry_query_http(item, now, lasttimestamp, result, poller_config);
 #else
 		ZBX_UNUSED(poller_config);
+		ZBX_UNUSED(now);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "cURL library was not compiled in"));
 		ret = NOTSUPPORTED;
 #endif
