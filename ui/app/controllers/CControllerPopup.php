@@ -34,8 +34,6 @@ class CControllerPopup extends CController {
 	 */
 	private string $action;
 
-	private bool $popup_has_errors = false;
-
 	protected function init(): void {
 		$this->disableCsrfValidation();
 
@@ -106,9 +104,6 @@ class CControllerPopup extends CController {
 							foreach ($main_block['error']['messages'] as $message) {
 								CMessageHelper::addError($message);
 							}
-
-							$this->popup_has_errors = true;
-							$ret = true;
 						}
 					}
 				}
@@ -123,20 +118,16 @@ class CControllerPopup extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if ($this->popup_has_errors) {
-			return true;
-		}
-
 		return $this->popup_controller->checkPermissions();
 	}
 
 	protected function doAction(): void {
-		$data = $this->popup_has_errors
-			? []
-			: ['popup' => [
+		$data = [
+			'popup' => [
 				'action' => $this->action,
 				'action_parameters' => $this->popup_controller->getInputAll()
-			]];
+			]
+		];
 
 		$response = (new CControllerResponseData($data));
 		$response->setTitle($this->supported_popups[$this->getInput('popup')]);
