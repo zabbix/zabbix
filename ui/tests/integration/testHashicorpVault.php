@@ -18,12 +18,20 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 /**
  * Test suite for HashiCorp Vault integration (DB credentials retrieval by Zabbix server).
  *
- * A disposable HashiCorp Vault instance is started, for the duration of this test suite, from the
- * official "hashicorp/vault" Docker image (https://hub.docker.com/r/hashicorp/vault) in dev mode.
- * Requires a working "docker" CLI, with the user running the tests able to reach the Docker daemon
- * (e.g. member of the "docker" group), and network access to pull the image on first use.
+ * This test suite does not manage the Vault instance's lifecycle: it expects a HashiCorp Vault
+ * dev-mode instance, started independently (e.g. from the official "hashicorp/vault" Docker image,
+ * see https://hub.docker.com/r/hashicorp/vault), to already be running and reachable at VAULT_ADDR
+ * with the VAULT_ROOT_TOKEN root token before this suite executes, for example:
  *
- * The instance is configured with:
+ *   sudo docker run --cap-add=IPC_LOCK \
+ *       --name vault \
+ *       -p 8200:8200 \
+ *       -e VAULT_DEV_ROOT_TOKEN_ID=root \
+ *       -e VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200 \
+ *       hashicorp/vault:latest
+ *
+ * On top of that instance, this suite sets up (idempotently, so re-running the suite against the
+ * same long-lived instance is safe):
  *   - a KV v2 secret containing the credentials of the database used by the test environment;
  *   - a policy granting read access to that secret;
  *   - the AppRole auth method, with a role bound to that policy;
@@ -33,11 +41,9 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  */
 class testHashicorpVault extends CIntegrationTest {
 
-	const VAULT_IMAGE = 'hashicorp/vault:2.0.3';
-	const VAULT_CONTAINER_NAME = 'zbx-it-vault';
-	const VAULT_PORT = 8284;
+	const VAULT_PORT = 8200;
 	const VAULT_ADDR = 'http://127.0.0.1:'.self::VAULT_PORT;
-	const VAULT_ROOT_TOKEN = 'zbx-it-root-token';
+	const VAULT_ROOT_TOKEN = 'root';
 	const VAULT_ROLE_NAME = 'zbx-it-role';
 	const VAULT_POLICY_NAME = 'zbx-it-policy';
 	const VAULT_SECRET_PATH = 'zabbix/db';
@@ -53,27 +59,12 @@ class testHashicorpVault extends CIntegrationTest {
 	private static $hostid;
 
 	/**
-	 * Start a disposable HashiCorp Vault dev-mode container and wait until it responds.
+	 * Wait until the pre-existing Vault instance (see class docblock) is reachable. Does not start,
+	 * stop or otherwise manage the instance.
 	 *
-	 * @throws Exception    on failure to start Vault within the allotted time
+	 * @throws Exception    if Vault is not reachable within the allotted time
 	 */
-	private static function vaultStart(): void {
-		// Remove any stale container left over from a previously interrupted run.
-		shell_exec('docker rm -f '.self::VAULT_CONTAINER_NAME.' > /dev/null 2>&1');
-
-		// Pulled separately (with no timeout budget of its own) so a cold image cache doesn't eat
-		// into the startup wait loop below.
-		shell_exec('docker pull '.self::VAULT_IMAGE.' > /dev/null 2>&1');
-
-		$cmd = 'docker run -d --name '.self::VAULT_CONTAINER_NAME.
-				' --cap-add=IPC_LOCK'.
-				' -p 127.0.0.1:'.self::VAULT_PORT.':8200'.
-				' -e VAULT_DEV_ROOT_TOKEN_ID='.self::VAULT_ROOT_TOKEN.
-				' -e VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200'.
-				' '.self::VAULT_IMAGE.
-				' > /dev/null 2>&1';
-		shell_exec($cmd);
-
+	private static function vaultWaitUntilReady(): void {
 		for ($i = 0; $i < 50; $i++) {
 			if (@file_get_contents(self::VAULT_ADDR.'/v1/sys/health') !== false) {
 				return;
@@ -82,16 +73,9 @@ class testHashicorpVault extends CIntegrationTest {
 			usleep(200000);
 		}
 
-		throw new Exception('Failed to start local HashiCorp Vault container for integration testing. Log:'."\n".
-				shell_exec('docker logs '.self::VAULT_CONTAINER_NAME.' 2>&1')
+		throw new Exception('HashiCorp Vault instance at "'.self::VAULT_ADDR.'" is not reachable. It must be '.
+				'started independently before running this test suite, see the class docblock.'
 		);
-	}
-
-	/**
-	 * Stop and remove the container started by {@see vaultStart()}.
-	 */
-	private static function vaultStop(): void {
-		shell_exec('docker rm -f '.self::VAULT_CONTAINER_NAME.' > /dev/null 2>&1 &');
 	}
 
 	/**
@@ -112,7 +96,9 @@ class testHashicorpVault extends CIntegrationTest {
 			'http' => [
 				'method' => $method,
 				'header' => "X-Vault-Token: $token\r\nContent-Type: application/json\r\n",
-				'content' => ($data !== null) ? json_encode($data) : '',
+				// json_encode() renders an empty PHP array as "[]", but Vault requires a JSON
+				// object ("{}") for empty request bodies; casting to stdClass forces the latter.
+				'content' => ($data !== null) ? json_encode($data ?: new stdClass()) : '',
 				'ignore_errors' => true
 			]
 		]);
@@ -197,9 +183,16 @@ class testHashicorpVault extends CIntegrationTest {
 
 	/**
 	 * @inheritdoc
+	 *
+	 * Every Vault call below is either read-only or safe to repeat against the same long-lived
+	 * Vault instance across separate runs of this suite (see class docblock): KV writes just create
+	 * a new secret version, the policy PUT and the role POST both overwrite in place, and the
+	 * secret-id/token creation calls always succeed and simply mint an additional credential
+	 * (each self-expires via its TTL, so nothing accumulates unbounded). The one call that is NOT
+	 * naturally repeatable, enabling the AppRole auth method, is explicitly guarded below.
 	 */
 	public function prepareData() {
-		self::vaultStart();
+		self::vaultWaitUntilReady();
 
 		global $DB;
 
@@ -216,8 +209,14 @@ class testHashicorpVault extends CIntegrationTest {
 			'policy' => 'path "secret/data/'.self::VAULT_SECRET_PATH.'" { capabilities = ["read"] }'
 		], self::VAULT_ROOT_TOKEN);
 
-		self::vaultRequest('POST', '/v1/sys/auth/approle', ['type' => 'approle'], self::VAULT_ROOT_TOKEN);
+		// Enabling an already-enabled auth method errors out, so check first.
+		$auth_methods = self::vaultRequest('GET', '/v1/sys/auth', null, self::VAULT_ROOT_TOKEN);
 
+		if (!isset($auth_methods['body']['approle/'])) {
+			self::vaultRequest('POST', '/v1/sys/auth/approle', ['type' => 'approle'], self::VAULT_ROOT_TOKEN);
+		}
+
+		// A role POST to an already-existing role name overwrites its configuration in place.
 		self::vaultRequest('POST', '/v1/auth/approle/role/'.self::VAULT_ROLE_NAME, [
 			'token_policies' => self::VAULT_POLICY_NAME,
 			'token_ttl' => '20s',
@@ -264,7 +263,6 @@ class testHashicorpVault extends CIntegrationTest {
 	}
 
 	public static function clearData(): void {
-		self::vaultStop();
 		CDataHelper::call('host.delete', [self::$hostid]);
 	}
 
