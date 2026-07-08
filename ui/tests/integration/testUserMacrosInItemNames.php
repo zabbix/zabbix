@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * @backup hosts,items,item_rtname,globalmacro,triggers,hostmacro,item_tag,trigger_tag,functions,events,problem,history_uint,trends_uint,hosts_templates
  */
 class testUserMacrosInItemNames extends CIntegrationTest {
+	/** Maximum number of iterations to wait for NDJSON export files to appear. */
+	private const WAIT_EXPORT_FILE_ITERATIONS = 30;
 	const HOSTNAME1 = 'test_user_macros_in_item_names1';
 	const HOSTNAME2 = 'test_user_macros_in_item_names2';
 	const HOSTNAME_EXPORT = 'test_ndjson_export_macros';
@@ -215,7 +217,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid2 = $response['result']['hostids'][0];
 
-		// Create host, item name, item tag and trigger tag macros for NDJSON export checks.
+		// Create host with host macros and trapper item with tag for NDJSON export test.
 		$response = $this->call('host.create', [
 			[
 				'host' => self::HOSTNAME_EXPORT,
@@ -239,7 +241,8 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
 			'tags' => [
-				['tag' => 'env', 'value' => '{$ENV}']
+				['tag' => 'env', 'value' => '{$ENV}'],
+				['tag' => 'env-{$ENV}', 'value' => 'value-{$ENV}']
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -250,7 +253,8 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			'description' => 'Macro export trigger for ' . self::HOSTNAME_EXPORT,
 			'expression' => 'last(/' . self::HOSTNAME_EXPORT . '/macro.export.test)>5',
 			'tags' => [
-				['tag' => 'env', 'value' => '{$ENV}']
+				['tag' => 'env', 'value' => '{$ENV}'],
+				['tag' => 'event-{$ENV}', 'value' => 'problem-{$ENV}']
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $response['result']);
@@ -277,6 +281,21 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 	}
 
 	/**
+	 * Clean up the temporary export directory after all tests.
+	 */
+	public static function tearDownAfterClass(): void {
+		$export_dir = sys_get_temp_dir() . '/zabbix_export_test';
+
+		if (is_dir($export_dir)) {
+			foreach (glob($export_dir . '/*.ndjson') as $file) {
+				@unlink($file);
+			}
+
+			@rmdir($export_dir);
+		}
+	}
+
+	/**
 	 * Check user macro resolution in NDJSON export for item names and tag values in history, trends and problem events.
 	 *
 	 * @configurationDataProvider serverConfigurationProvider
@@ -288,9 +307,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->prepareExportDir($export_dir);
-		// Send two values with one-hour shift:
-		// - the first value keeps the trigger in OK state and creates previous-hour trend data;
-		// - the second value crosses the threshold, flushes the previous-hour trend and creates a problem event.
+		// Send values one hour apart to flush trends and create a problem event.
 		$this->sendSenderValues([
 			['host' => self::HOSTNAME_EXPORT, 'key' => 'macro.export.test', 'value' => '3',
 				'clock' => $prev_hour
@@ -303,18 +320,24 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 		$this->waitForExportFile($export_dir, 'history');
 		$this->assertExportNameResolved($export_dir, 'history', self::$itemid_export,
 			'File config.json exists');
-		$this->assertExportTagResolvedByItemid($export_dir, 'history', self::$itemid_export,
-			'item_tags', 'env', 'prod', '{$ENV}');
+		$this->assertExportTagPairResolvedByItemid($export_dir, 'history', self::$itemid_export,
+			'item_tags', 'env', 'prod', ['{$ENV}']);
+		$this->assertExportTagPairResolvedByItemid($export_dir, 'history', self::$itemid_export,
+			'item_tags', 'env-prod', 'value-prod', ['{$ENV}']);
 		// Verify trends NDJSON.
 		$this->waitForExportFile($export_dir, 'trends');
 		$this->assertExportNameResolved($export_dir, 'trends', self::$itemid_export,
 			'File config.json exists');
-		$this->assertExportTagResolvedByItemid($export_dir, 'trends', self::$itemid_export,
-			'item_tags', 'env', 'prod', '{$ENV}');
+		$this->assertExportTagPairResolvedByItemid($export_dir, 'trends', self::$itemid_export,
+			'item_tags', 'env', 'prod', ['{$ENV}']);
+		$this->assertExportTagPairResolvedByItemid($export_dir, 'trends', self::$itemid_export,
+			'item_tags', 'env-prod', 'value-prod', ['{$ENV}']);
 		// Verify event NDJSON.
 		$this->waitForExportFile($export_dir, 'problems');
 		$this->assertEventTagResolved($export_dir, 'Macro export trigger for ' . self::HOSTNAME_EXPORT,
 			'env', 'prod', '{$ENV}');
+		$this->assertEventTagResolved($export_dir, 'Macro export trigger for ' . self::HOSTNAME_EXPORT,
+			'event-prod', 'problem-prod', '{$ENV}');
 	}
 
 	private function prepareExportDir($export_dir) {
@@ -329,7 +352,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 	}
 
 	private function waitForExportFile($dir, $type) {
-		for ($i = 0; $i < 30; $i++) {
+		for ($i = 0; $i < self::WAIT_EXPORT_FILE_ITERATIONS; $i++) {
 			$files = glob($dir . '/' . $type . '*.ndjson');
 
 			foreach ($files as $file) {
@@ -344,15 +367,26 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 		$this->fail('Export file "' . $type . '*.ndjson" not found or empty in ' . $dir);
 	}
 
-	private function assertExportTagResolvedByItemid($dir, $type, $itemid, $array_key,
-			$tag_name, $expected_value, $unresolved_macro) {
+	private function decodeNdjsonLine($line, $file, $type) {
+		$data = json_decode($line, true);
+
+		if (JSON_ERROR_NONE !== json_last_error()) {
+			$this->fail('Invalid JSON in ' . $type . ' NDJSON file "' . $file . '": '
+				. json_last_error_msg() . '. Line: ' . $line);
+		}
+
+		return $data;
+	}
+
+	private function assertExportTagPairResolvedByItemid($dir, $type, $itemid, $array_key,
+			$expected_tag, $expected_value, array $unresolved_macros) {
 		$found = false;
 
 		foreach (glob($dir . '/' . $type . '*.ndjson') as $file) {
 			$lines = array_values(array_filter(explode("\n", file_get_contents($file)), 'strlen'));
 
 			foreach ($lines as $line) {
-				$data = json_decode($line, true);
+				$data = $this->decodeNdjsonLine($line, $file, $type);
 
 				if (!is_array($data) || !isset($data['itemid'], $data[$array_key])) {
 					continue;
@@ -370,25 +404,32 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 						continue;
 					}
 
-					if ($tag['tag'] !== $tag_name) {
+					if ($tag['tag'] !== $expected_tag) {
 						continue;
 					}
 
 					$tag_found = true;
 					$this->assertSame($expected_value, $tag['value'],
-						$type . ' NDJSON itemid=' . $itemid . ': tag "' . $tag_name
-						. '" should be resolved to "' . $expected_value . '", got: "'
+						$type . ' NDJSON itemid=' . $itemid . ': tag "' . $expected_tag
+						. '" should have value "' . $expected_value . '", got: "'
 						. $tag['value'] . '".'
 					);
-					$this->assertStringNotContainsString($unresolved_macro, $tag['value'],
-						$type . ' NDJSON itemid=' . $itemid . ': tag "' . $tag_name
-						. '" should not contain unresolved "' . $unresolved_macro . '", got: "'
-						. $tag['value'] . '".'
-					);
+
+					foreach ($unresolved_macros as $macro) {
+						$this->assertStringNotContainsString($macro, $tag['tag'],
+							$type . ' NDJSON itemid=' . $itemid . ': tag name "' . $expected_tag
+							. '" should not contain "' . $macro . '", got: "' . $tag['tag'] . '".'
+						);
+						$this->assertStringNotContainsString($macro, $tag['value'],
+							$type . ' NDJSON itemid=' . $itemid . ': tag value "' . $expected_value
+							. '" should not contain "' . $macro . '", got: "' . $tag['value'] . '".'
+						);
+					}
 				}
 
 				$this->assertTrue($tag_found,
-					$type . ' NDJSON itemid=' . $itemid . ': tag "' . $tag_name . '" not found.'
+					$type . ' NDJSON itemid=' . $itemid . ': tag "' . $expected_tag
+					. '" with value "' . $expected_value . '" not found.'
 				);
 			}
 		}
@@ -405,7 +446,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			$lines = array_values(array_filter(explode("\n", file_get_contents($file)), 'strlen'));
 
 			foreach ($lines as $line) {
-				$data = json_decode($line, true);
+				$data = $this->decodeNdjsonLine($line, $file, $type);
 
 				if (!is_array($data) || !isset($data['itemid'])) {
 					continue;
@@ -444,7 +485,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			$lines = array_values(array_filter(explode("\n", file_get_contents($file)), 'strlen'));
 
 			foreach ($lines as $line) {
-				$data = json_decode($line, true);
+				$data = $this->decodeNdjsonLine($line, $file, 'events');
 
 				if (!is_array($data) || !isset($data['name'], $data['tags'])) {
 					continue;
