@@ -19,6 +19,22 @@
 #include "zbxdb.h"
 #include "zbxvault.h"
 
+#define ZBX_TQ_QUERY_TAG_SIGNAL_TYPE		"signal_type"
+#define ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE	"metric_point_type"
+#define ZBX_TQ_QUERY_TAG_COLUMNS		"columns"
+#define ZBX_TQ_QUERY_TAG_COLUMN			"column"
+#define ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY		"attribute_key"
+#define ZBX_TQ_QUERY_TAG_AGGREGATED_COLUMNS	"aggregated_columns"
+#define ZBX_TQ_QUERY_TAG_FUNCTION		"function"
+#define ZBX_TQ_QUERY_TAG_PARAMETERS		"parameters"
+#define ZBX_TQ_QUERY_TAG_ALIAS			"alias"
+#define ZBX_TQ_QUERY_TAG_FILTER			"filter"
+#define ZBX_TQ_QUERY_TAG_EVALTYPE		"evaltype"
+#define ZBX_TQ_QUERY_TAG_FORMULA		"formula"
+#define ZBX_TQ_QUERY_TAG_CONDITIONS		"conditions"
+#define ZBX_TQ_QUERY_TAG_OPERATOR		"operator"
+#define ZBX_TQ_QUERY_TAG_VALUE			"value"
+
 /* apm db */
 
 typedef enum zbx_apm_db_type

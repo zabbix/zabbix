@@ -1346,8 +1346,8 @@ static void	audit_item_add_query_column(const char *prefix_col, const zbx_tq_col
 	char	key[AUDIT_DETAILS_KEY_LEN];
 
 	add_string_cb(prefix_col, "Added", ctx);
-	add_string_cb(KEY(prefix_col, "column"), col->name, ctx);
-	add_string_cb(KEY(prefix_col, "attribute_key"), col->key, ctx);
+	add_string_cb(KEY(prefix_col, ZBX_TQ_QUERY_TAG_COLUMN), col->name, ctx);
+	add_string_cb(KEY(prefix_col, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY), col->key, ctx);
 #undef KEY
 }
 
@@ -1359,20 +1359,21 @@ static void	audit_item_add_query_aggr_column(const char *prefix_aggr_col,
 	char	key[AUDIT_DETAILS_KEY_LEN];
 
 	add_string_cb(prefix_aggr_col, "Added", ctx);
-	add_string_cb(KEY(prefix_aggr_col, "column"), aggr_col->column_name, ctx);
-	add_int_cb(KEY(prefix_aggr_col, "function"), (int)aggr_col->function, ctx);
+	add_string_cb(KEY(prefix_aggr_col, ZBX_TQ_QUERY_TAG_COLUMN), aggr_col->column_name, ctx);
+	add_int_cb(KEY(prefix_aggr_col, ZBX_TQ_QUERY_TAG_FUNCTION), (int)aggr_col->function, ctx);
 
 	for (int j = 0; j < aggr_col->args.values_num; j++)
 	{
 		char	prefix_param[AUDIT_DETAILS_KEY_LEN];
 
-		zbx_snprintf(prefix_param, sizeof(prefix_param), "%s.%s[%d]", prefix_aggr_col, "parameters", j);
+		zbx_snprintf(prefix_param, sizeof(prefix_param), "%s.%s[%d]",
+				prefix_aggr_col, ZBX_TQ_QUERY_TAG_PARAMETERS, j);
 
 		add_string_cb(prefix_param, "Added", ctx);
-		add_string_cb(KEY(prefix_param, "value"), aggr_col->args.values[j], ctx);
+		add_string_cb(KEY(prefix_param, ZBX_TQ_QUERY_TAG_VALUE), aggr_col->args.values[j], ctx);
 	}
 
-	add_string_cb(KEY(prefix_aggr_col, "alias"), aggr_col->alias, ctx);
+	add_string_cb(KEY(prefix_aggr_col, ZBX_TQ_QUERY_TAG_ALIAS), aggr_col->alias, ctx);
 #undef KEY
 }
 
@@ -1383,10 +1384,10 @@ static void	audit_item_add_query_condition(const char *prefix_cond, const zbx_tq
 	char	key[AUDIT_DETAILS_KEY_LEN];
 
 	add_string_cb(prefix_cond, "Added", ctx);
-	add_string_cb(KEY(prefix_cond, "column"), cond->column_name, ctx);
-	add_string_cb(KEY(prefix_cond, "attribute_key"), cond->key, ctx);
-	add_int_cb(KEY(prefix_cond, "operator"), (int)cond->operator, ctx);
-	add_string_cb(KEY(prefix_cond, "value"), cond->value, ctx);
+	add_string_cb(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_COLUMN), cond->column_name, ctx);
+	add_string_cb(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY), cond->key, ctx);
+	add_int_cb(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_OPERATOR), (int)cond->operator, ctx);
+	add_string_cb(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_VALUE), cond->value, ctx);
 #undef KEY
 }
 
@@ -1396,14 +1397,15 @@ static void	audit_item_add_query(const char *prop, const zbx_tq_query_t *query,
 #define KEY(a, b) audit_item_query_key(a, b, key, sizeof(key))
 	char	key[AUDIT_DETAILS_KEY_LEN];
 
-	add_int_cb(KEY(prop, "signal_type"), (int)query->category, ctx);
-	add_int_cb(KEY(prop, "metric_point_type"), (int)query->metric_type, ctx);
+	add_int_cb(KEY(prop, ZBX_TQ_QUERY_TAG_SIGNAL_TYPE), (int)query->category, ctx);
+	add_int_cb(KEY(prop, ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE), (int)query->metric_type, ctx);
 
 	for (int i = 0; i < query->columns.values_num; i++)
 	{
 		char	prefix_col[AUDIT_DETAILS_KEY_LEN];
 
-		zbx_snprintf(prefix_col, sizeof(prefix_col), "%s.columns[%d]", prop, i);
+		zbx_snprintf(prefix_col, sizeof(prefix_col), "%s.%s[%d]",
+				prop, ZBX_TQ_QUERY_TAG_COLUMNS, i);
 		audit_item_add_query_column(prefix_col, &query->columns.values[i], add_string_cb, ctx);
 	}
 
@@ -1411,20 +1413,22 @@ static void	audit_item_add_query(const char *prop, const zbx_tq_query_t *query,
 	{
 		char				prefix_aggr_col[AUDIT_DETAILS_KEY_LEN];
 
-		zbx_snprintf(prefix_aggr_col, sizeof(prefix_aggr_col), "%s.aggregated_columns[%d]", prop, i);
+		zbx_snprintf(prefix_aggr_col, sizeof(prefix_aggr_col), "%s.%s[%d]",
+				prop, ZBX_TQ_QUERY_TAG_AGGREGATED_COLUMNS, i);
 		audit_item_add_query_aggr_column(prefix_aggr_col, &query->aggregated_columns.values[i],
 				add_string_cb, add_int_cb, ctx);
 	}
 
-	add_string_cb(KEY(prop, "filter"), "Added", ctx);
-	add_int_cb(KEY(prop, "filter.evaltype"), (int)query->evaltype, ctx);
-	add_string_cb(KEY(prop, "filter.formula"), query->formula, ctx);
+	add_string_cb(KEY(prop, ZBX_TQ_QUERY_TAG_FILTER), "Added", ctx);
+	add_int_cb(KEY(prop, ZBX_TQ_QUERY_TAG_FILTER "." ZBX_TQ_QUERY_TAG_EVALTYPE), (int)query->evaltype, ctx);
+	add_string_cb(KEY(prop, ZBX_TQ_QUERY_TAG_FILTER "." ZBX_TQ_QUERY_TAG_FORMULA), query->formula, ctx);
 
 	for (int i = 0; i < query->conditions.values_num; i++)
 	{
 		char				prefix_cond[AUDIT_DETAILS_KEY_LEN];
 
-		zbx_snprintf(prefix_cond, sizeof(prefix_cond), "%s.filter.conditions[%d]", prop, i);
+		zbx_snprintf(prefix_cond, sizeof(prefix_cond), "%s.%s.%s[%d]",
+				prop, ZBX_TQ_QUERY_TAG_FILTER, ZBX_TQ_QUERY_TAG_CONDITIONS, i);
 		audit_item_add_query_condition(prefix_cond, &query->conditions.values[i],
 				add_string_cb, add_int_cb, ctx);
 	}
@@ -1558,15 +1562,17 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 
 	lld_audit_item_prop(flags, "query", prop, sizeof(prop));
 
-	UPD_INT(KEY(prop, "signal_type"), (int)query_old.category, (int)query_new.category, NULL);
-	UPD_INT(KEY(prop, "metric_point_type"), (int)query_old.metric_type, (int)query_new.metric_type, NULL);
+	UPD_INT(KEY(prop, ZBX_TQ_QUERY_TAG_SIGNAL_TYPE), (int)query_old.category, (int)query_new.category,
+			NULL);
+	UPD_INT(KEY(prop, ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE), (int)query_old.metric_type, (int)query_new.metric_type,
+			NULL);
 
 	for (int i = 0; i < query_old.columns.values_num || i < query_new.columns.values_num; i++)
 	{
 		const zbx_tq_column_t	*col_old = NULL, *col_new = NULL;
 		char			prefix_col[AUDIT_DETAILS_KEY_LEN];
 
-		zbx_snprintf(prefix_col, sizeof(prefix_col), "%s.columns[%d]", prop, i);
+		zbx_snprintf(prefix_col, sizeof(prefix_col), "%s.%s[%d]", prop, ZBX_TQ_QUERY_TAG_COLUMNS, i);
 
 		if (i < query_old.columns.values_num)
 			col_old = &query_old.columns.values[i];
@@ -1578,8 +1584,10 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 		{
 			int	col_changed = FAIL;
 
-			UPD_STR(KEY(prefix_col, "column"), col_old->name, col_new->name, &col_changed);
-			UPD_STR(KEY(prefix_col, "attribute_key"), col_old->key, col_new->key, &col_changed);
+			UPD_STR(KEY(prefix_col, ZBX_TQ_QUERY_TAG_COLUMN), col_old->name, col_new->name,
+					&col_changed);
+			UPD_STR(KEY(prefix_col, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY), col_old->key, col_new->key,
+					&col_changed);
 
 			if (SUCCEED == col_changed)
 			{
@@ -1603,7 +1611,8 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 		const zbx_tq_aggr_column_t	*aggr_col_old = NULL, *aggr_col_new = NULL;
 		char				prefix_aggr_col[AUDIT_DETAILS_KEY_LEN];
 
-		zbx_snprintf(prefix_aggr_col, sizeof(prefix_aggr_col), "%s.aggregated_columns[%d]", prop, i);
+		zbx_snprintf(prefix_aggr_col, sizeof(prefix_aggr_col), "%s.%s[%d]", prop,
+				ZBX_TQ_QUERY_TAG_AGGREGATED_COLUMNS, i);
 
 		if (i < query_old.aggregated_columns.values_num)
 			aggr_col_old = &query_old.aggregated_columns.values[i];
@@ -1615,9 +1624,9 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 		{
 			int	aggr_col_changed = FAIL;
 
-			UPD_STR(KEY(prefix_aggr_col, "column"), aggr_col_old->column_name,
+			UPD_STR(KEY(prefix_aggr_col, ZBX_TQ_QUERY_TAG_COLUMN), aggr_col_old->column_name,
 					aggr_col_new->column_name, &aggr_col_changed);
-			UPD_INT(KEY(prefix_aggr_col, "function"), (int)aggr_col_old->function,
+			UPD_INT(KEY(prefix_aggr_col, ZBX_TQ_QUERY_TAG_FUNCTION), (int)aggr_col_old->function,
 					(int)aggr_col_new->function, &aggr_col_changed);
 
 			if (aggr_col_old->args.values_num != aggr_col_new->args.values_num)
@@ -1635,13 +1644,14 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 					param_new = aggr_col_new->args.values[j];
 
 				zbx_snprintf(prefix_param, sizeof(prefix_param), "%s.%s[%d]", prefix_aggr_col,
-						"parameters", j);
+						ZBX_TQ_QUERY_TAG_PARAMETERS, j);
 
 				if (NULL != param_old && NULL != param_new)
 				{
 					int	param_changed = FAIL;
 
-					UPD_STR(KEY(prefix_param, "value"), param_old, param_new, &param_changed);
+					UPD_STR(KEY(prefix_param, ZBX_TQ_QUERY_TAG_VALUE), param_old, param_new,
+							&param_changed);
 
 					if (SUCCEED == param_changed)
 					{
@@ -1656,8 +1666,9 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 					zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID,
 							AUDIT_DETAILS_ACTION_ADD, prefix_param, "Added", NULL, NULL);
 					zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID,
-							AUDIT_DETAILS_ACTION_ADD, KEY(prefix_param, "value"), param_new,
-							NULL, NULL);
+							AUDIT_DETAILS_ACTION_ADD,
+							KEY(prefix_param, ZBX_TQ_QUERY_TAG_VALUE), param_new, NULL,
+							NULL);
 				}
 				else /* NULL == param_new */
 				{
@@ -1666,7 +1677,7 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 				}
 			}
 
-			UPD_STR(KEY(prefix_aggr_col, "alias"), aggr_col_old->alias, aggr_col_new->alias,
+			UPD_STR(KEY(prefix_aggr_col, ZBX_TQ_QUERY_TAG_ALIAS), aggr_col_old->alias, aggr_col_new->alias,
 					&aggr_col_changed);
 
 			if (SUCCEED == aggr_col_changed)
@@ -1688,8 +1699,10 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 		}
 	}
 
-	UPD_INT(KEY(prop, "filter.evaltype"), (int)query_old.evaltype, (int)query_new.evaltype, &filter_changed);
-	UPD_STR(KEY(prop, "filter.formula"), query_old.formula, query_new.formula, &filter_changed);
+	UPD_INT(KEY(prop, ZBX_TQ_QUERY_TAG_FILTER "." ZBX_TQ_QUERY_TAG_EVALTYPE),
+			(int)query_old.evaltype, (int)query_new.evaltype, &filter_changed);
+	UPD_STR(KEY(prop, ZBX_TQ_QUERY_TAG_FILTER "." ZBX_TQ_QUERY_TAG_FORMULA),
+			query_old.formula, query_new.formula, &filter_changed);
 
 	if (query_old.conditions.values_num != query_new.conditions.values_num)
 		filter_changed = SUCCEED;
@@ -1699,7 +1712,8 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 		const zbx_tq_condition_t	*cond_old = NULL, *cond_new = NULL;
 		char				prefix_cond[AUDIT_DETAILS_KEY_LEN];
 
-		zbx_snprintf(prefix_cond, sizeof(prefix_cond), "%s.filter.conditions[%d]", prop, i);
+		zbx_snprintf(prefix_cond, sizeof(prefix_cond), "%s.%s.%s[%d]", prop, ZBX_TQ_QUERY_TAG_FILTER,
+				ZBX_TQ_QUERY_TAG_CONDITIONS, i);
 
 		if (i < query_old.conditions.values_num)
 			cond_old = &query_old.conditions.values[i];
@@ -1711,14 +1725,14 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 		{
 			int	cond_changed = FAIL;
 
-			UPD_STR(KEY(prefix_cond, "column"), cond_old->column_name, cond_new->column_name,
-					&cond_changed);
-			UPD_STR(KEY(prefix_cond, "attribute_key"), cond_old->key, cond_new->key,
-					&cond_changed);
-			UPD_INT(KEY(prefix_cond, "operator"), (int)cond_old->operator, (int)cond_new->operator,
-					&cond_changed);
-			UPD_STR(KEY(prefix_cond, "value"), cond_old->value, cond_new->value,
-					&cond_changed);
+			UPD_STR(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_COLUMN),
+					cond_old->column_name, cond_new->column_name, &cond_changed);
+			UPD_STR(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY),
+					cond_old->key, cond_new->key, &cond_changed);
+			UPD_INT(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_OPERATOR),
+					(int)cond_old->operator, (int)cond_new->operator, &cond_changed);
+			UPD_STR(KEY(prefix_cond, ZBX_TQ_QUERY_TAG_VALUE),
+					cond_old->value, cond_new->value, &cond_changed);
 
 			if (SUCCEED == cond_changed)
 			{
@@ -1742,7 +1756,7 @@ void	zbx_audit_item_update_json_update_query(int audit_context_mode, zbx_uint64_
 	if (SUCCEED == filter_changed)
 	{
 		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-						KEY(prop, "filter"), "Updated", NULL, NULL);
+						KEY(prop, ZBX_TQ_QUERY_TAG_FILTER), "Updated", NULL, NULL);
 	}
 
 	zbx_tq_query_clean(&query_old);
