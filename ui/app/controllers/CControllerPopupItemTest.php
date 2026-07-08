@@ -323,9 +323,9 @@ abstract class CControllerPopupItemTest extends CController {
 
 		if ($ret && $hostid != 0) {
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'host', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status',
-					'maintenance_status', 'maintenance_type', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
-					'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_connect'
+				'output' => ['hostid', 'host', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'proxy_groupid',
+					'status', 'maintenance_status', 'maintenance_type', 'ipmi_authtype', 'ipmi_privilege',
+					'ipmi_username', 'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_connect'
 				],
 				'selectInventory' => in_array($this->item_type, [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])
 					? array_column(getHostInventories(), 'db_field')
@@ -338,6 +338,10 @@ abstract class CControllerPopupItemTest extends CController {
 				if ($hosts[0]['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
 					$hosts[0]['proxyid'] = $hosts[0]['assigned_proxyid'];
 				}
+				else {
+					$hosts[0]['proxy_groupid'] = 0;
+				}
+
 
 				unset($hosts[0]['monitored_by'], $hosts[0]['assigned_proxyid']);
 			}
