@@ -309,10 +309,10 @@ typedef struct
 	char			host_name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	zbx_dc_interface_t	interface;
 	zbx_uint64_t		itemid;
+	zbx_uint64_t		lastlogsize;
 	unsigned char		value_type;
 	unsigned char		flags;
 	char			*key_orig, *key;
-	int			mtime;
 	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
 	int			timeout;
 	char			*query;

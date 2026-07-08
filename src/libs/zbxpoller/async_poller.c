@@ -307,7 +307,7 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 				SET_TEXT_RESULT(&result, values.values[i]);
 				values.values[i] = NULL;
 
-				zbx_set_agent_result_meta(&result, 0, item_context->newlasttimestamp);
+				zbx_set_agent_result_meta(&result, (zbx_uint64_t)item_context->newlasttimestamp, 0);
 
 				zbx_preprocess_item_value(item_context->itemid, item_context->value_type,
 						item_context->flags, item_context->preprocessing, &result,
@@ -327,7 +327,7 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 
 				zbx_init_agent_result(&result);
 
-				zbx_set_agent_result_meta(&result, 0, item_context->newlasttimestamp);
+				zbx_set_agent_result_meta(&result, (zbx_uint64_t)item_context->newlasttimestamp, 0);
 
 				zbx_preprocess_item_value(item_context->itemid, item_context->value_type,
 						item_context->flags, item_context->preprocessing, &result, &timespec,

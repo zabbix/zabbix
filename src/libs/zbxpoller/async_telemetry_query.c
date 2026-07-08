@@ -171,14 +171,15 @@ int	zbx_async_check_telemetry_query(zbx_dc_telemetry_query_item_t *item, AGENT_R
 	lasttimestamp = item->lasttimestamp;
 
 	/* mtime is used to store lasttimestamp persistently throughout restarts and monitored_by changes */
-	if ((time_t)item->mtime > item->lasttimestamp)
+	if ((time_t)item->lastlogsize > item->lasttimestamp)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): setting lasttimestamp to mtime", __func__);
-		lasttimestamp = item->mtime;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): setting lasttimestamp to lastlogsize", __func__);
+		lasttimestamp = (time_t)item->lastlogsize;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): lasttimestamp: " ZBX_FS_TIME_T ", mtime: %d, max: " ZBX_FS_TIME_T,
-			__func__, item->lasttimestamp, item->mtime, lasttimestamp);
+	zabbix_log(LOG_LEVEL_DEBUG,
+			"%s(): lasttimestamp: " ZBX_FS_TIME_T ", lastlogsize: " ZBX_FS_UI64 ", max: " ZBX_FS_TIME_T,
+			__func__, item->lasttimestamp, item->lastlogsize, lasttimestamp);
 
 	if (0 == poller_config->apm_db_config->have_local_config)
 	{

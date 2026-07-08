@@ -10224,7 +10224,7 @@ static void	DCget_telemetry_query_item(zbx_dc_telemetry_query_item_t *dst_item, 
 	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
 	dst_item->value_type = src_item->value_type;
 
-	dst_item->mtime = src_item->mtime;
+	dst_item->lastlogsize = src_item->lastlogsize;
 
 	dst_item->key_orig = zbx_strdup(NULL, src_item->key);
 
