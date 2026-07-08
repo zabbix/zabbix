@@ -64,7 +64,7 @@ class CControllerUsergroupTagFilterCheck extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput($this->getValidationRules()) && $this->validateHostGroups();
+		$ret = $this->validateInput(self::getValidationRules()) && $this->validateHostGroups();
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();

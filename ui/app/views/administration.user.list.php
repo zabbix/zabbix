@@ -50,7 +50,6 @@ $html_page = (new CHtmlPage())
 					new CFormField(
 						(new CTextBox('filter_username', $data['filter']['username']))
 							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-							->setAttribute('autofocus', 'autofocus')
 					)
 				])
 				->addItem([

@@ -171,7 +171,8 @@
 						.setRenderer('dashboards'),
 					new CDataTableColumn('web', <?= json_encode(_('Web')); ?>)
 						.setFields(['hostid', 'httpTests'])
-						.setRenderer('web')
+						.setRenderer('web'),
+					new CDataTableColumnCustomText('custom_text', <?= json_encode(_('Custom text')); ?>)
 				])
 				.setPage(page)
 				.setFilter(filter)
