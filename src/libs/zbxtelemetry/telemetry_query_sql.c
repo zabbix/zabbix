@@ -12,12 +12,14 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxtelemetry.h"
+
 #include "telemetry.h"
+
 #include "zbxalgo.h"
 #include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxstr.h"
-#include "zbxtelemetry.h"
 
 ZBX_PTR_VECTOR_DECL(tq_aggr_column_ptr, zbx_tq_aggr_column_t *)
 ZBX_PTR_VECTOR_IMPL(tq_aggr_column_ptr, zbx_tq_aggr_column_t *)

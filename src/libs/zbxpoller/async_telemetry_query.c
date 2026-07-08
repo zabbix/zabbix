@@ -13,6 +13,7 @@
 **/
 
 #include "async_telemetry_query.h"
+
 #include "module.h"
 #include "zbxcommon.h"
 #include "zbxtelemetry.h"

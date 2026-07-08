@@ -13,6 +13,7 @@
 **/
 
 #include "zbxtelemetry.h"
+
 #include "telemetry.h"
 
 static const tq_column_info_t	column_info_apm_traces[] = {

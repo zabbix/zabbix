@@ -12,9 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxjson.h"
 #include "zbxtelemetry.h"
+
 #include "telemetry.h"
+
+#include "zbxjson.h"
 #include "zbxalgo.h"
 
 ZBX_VECTOR_IMPL(tq_column, zbx_tq_column_t)

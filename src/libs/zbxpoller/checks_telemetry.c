@@ -13,6 +13,7 @@
 **/
 
 #include "checks_telemetry.h"
+
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"

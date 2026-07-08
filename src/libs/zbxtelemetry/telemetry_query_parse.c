@@ -13,7 +13,9 @@
 **/
 
 #include "zbxtelemetry.h"
+
 #include "telemetry.h"
+
 #include "zbxstr.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
