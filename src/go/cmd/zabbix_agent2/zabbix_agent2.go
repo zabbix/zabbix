@@ -15,6 +15,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -28,6 +29,7 @@ import (
 
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/internal/agent/keyaccess"
+	"golang.zabbix.com/agent2/internal/agent/profiler"
 	"golang.zabbix.com/agent2/internal/agent/resultcache"
 	"golang.zabbix.com/agent2/internal/agent/runtimecontrol"
 	"golang.zabbix.com/agent2/internal/agent/scheduler"
@@ -50,6 +52,14 @@ import (
 
 const runtimeCommandSendingTimeout = time.Second
 
+const (
+	commandLogLevelIncrease    = "log_level_increase"
+	commandLogLevelDecrease    = "log_level_decrease"
+	commandMetrics             = "metrics"
+	commandUserParameterReload = "userparameter_reload"
+	commandVersion             = "version"
+)
+
 const usageMessageFormatRuntimeControlFormat = //
 `Perform administrative functions (%s timeout)
 
@@ -57,6 +67,11 @@ const usageMessageFormatRuntimeControlFormat = //
       log_level_increase     Increase log level
       log_level_decrease     Decrease log level
       userparameter_reload   Reload user parameters
+      periodic_prof_enable   Enable periodic profiling
+      periodic_prof_disable  Disable periodic profiling
+      periodic_prof_execute  Write profiling data immediately
+      periodic_prof_set_interval <seconds>
+                             Set profiling interval
       metrics                List available metrics
       version                Display Agent version
 `
@@ -99,7 +114,25 @@ var (
 	closeChan        = make(chan bool)
 	pidFile          *pidfile.File
 	pluginSocket     string
+	profilerControl  *profiler.Controller
 )
+
+var (
+	errEmptyCommand    = errs.New("empty command")
+	errTooManyCommands = errs.New("too many commands")
+	errUnknownCommand  = errs.New("unknown command")
+)
+
+//nolint:gochecknoglobals
+var remoteCommandHandlers = map[string]remoteCommandHandler{
+	commandLogLevelIncrease:    processCommandWithoutParameters(processLoglevelIncreaseCommand),
+	commandLogLevelDecrease:    processCommandWithoutParameters(processLoglevelDecreaseCommand),
+	commandMetrics:             processCommandWithoutParameters(processMetricsCommand),
+	commandVersion:             processCommandWithoutParameters(processVersionCommand),
+	commandUserParameterReload: processCommandWithoutParameters(processUserParamReloadCommand),
+}
+
+type remoteCommandHandler func(*runtimecontrol.Client) error
 
 type AgentUserParamOption struct {
 	UserParameter []string `conf:"optional"`
@@ -499,10 +532,23 @@ func runAgent(isForeground bool, configPath string, systemOpt agent.PluginSystem
 		}
 	}
 
+	profilerControl = profiler.New(profiler.Options{
+		Enabled:            agent.Options.EnableProfiler == 1,
+		Dir:                agent.Options.ProfilerDir,
+		MaxFilesPerProfile: agent.Options.ProfilerMaxFilesPerProfile,
+		Interval:           time.Duration(agent.Options.ProfilerInterval) * time.Second,
+	})
+	profilerCtx, profilerCancel := context.WithCancel(context.Background())
+	profilerControl.Start(profilerCtx)
+	registerProfilerCommands()
+
 	err = waitStop()
 	if err != nil {
 		log.Errf("cannot start agent: %s", err.Error())
 	}
+
+	profilerCancel()
+	profilerControl.Wait()
 
 	if agent.Options.StatusPort != 0 {
 		statuslistener.Stop()
@@ -802,32 +848,44 @@ func processUserParamReloadCommand(c *runtimecontrol.Client) (err error) {
 	return
 }
 
+func processCommandWithoutParameters(handler remoteCommandHandler) remoteCommandHandler {
+	return func(c *runtimecontrol.Client) error {
+		params := strings.Fields(c.Request())
+		if len(params) > 1 {
+			return errTooManyCommands
+		}
+
+		return handler(c)
+	}
+}
+
+func processProfilerCommand(c *runtimecontrol.Client) error {
+	err := profilerControl.ProcessCommand(c)
+	if err != nil {
+		return errs.Wrap(err, "cannot process profiler command")
+	}
+
+	return nil
+}
+
+func registerProfilerCommands() {
+	for _, command := range profiler.Commands() {
+		remoteCommandHandlers[command] = processProfilerCommand
+	}
+}
+
 func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 	params := strings.Fields(c.Request())
-	switch len(params) {
-	case 0:
-		return errors.New("Empty command")
-	case 2: //nolint:mnd
-		return errors.New("Too many commands")
-	default:
+	if len(params) == 0 {
+		return errEmptyCommand
 	}
 
-	switch params[0] {
-	case "log_level_increase":
-		err = processLoglevelIncreaseCommand(c)
-	case "log_level_decrease":
-		err = processLoglevelDecreaseCommand(c)
-	case "metrics":
-		err = processMetricsCommand(c)
-	case "version":
-		err = processVersionCommand(c)
-	case "userparameter_reload":
-		err = processUserParamReloadCommand(c)
-	default:
-		return errors.New("Unknown command")
+	handler, ok := remoteCommandHandlers[params[0]]
+	if !ok {
+		return errUnknownCommand
 	}
 
-	return
+	return handler(c)
 }
 
 func waitStop() error {
