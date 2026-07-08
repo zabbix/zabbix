@@ -1202,7 +1202,7 @@ td.inactive-bg {
 			&.high-bg,
 			&.disaster-bg {
 				border-bottom-color: $ui-border-color;
-				padding-left: 34px;
+				padding-left: 42px;
 			}
 		}
 
@@ -1233,17 +1233,18 @@ td.inactive-bg {
 		}
 	}
 
-	&.compact-view .datatable-body .row:not(.row-disabled):hover .cell.cell-data {
+	&.compact-view .datatable-body .cell.cell-data {
 		&.na-bg,
 		&.info-bg,
 		&.warning-bg,
 		&.average-bg,
 		&.high-bg,
 		&.disaster-bg {
-			&:before {
-				font-size: 22px;
-				padding-top: 0;
-				padding-bottom: 0;
+			color: #ffffff;
+
+			&::after {
+				background-position: center 0;
+				background-size: 22px;
 			}
 		}
 	}
