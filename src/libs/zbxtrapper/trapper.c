@@ -50,6 +50,7 @@
 #include "zbxautoreg.h"
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
+#include "zbxtelemetry.h"
 #ifdef HAVE_NETSNMP
 #	include "zbxipcservice.h"
 #endif

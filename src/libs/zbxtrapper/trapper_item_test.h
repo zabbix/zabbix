@@ -18,6 +18,7 @@
 #include "zbxcomms.h"
 #include "zbxjson.h"
 #include "zbxpoller.h"
+#include "zbxtelemetry.h"
 
 void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,

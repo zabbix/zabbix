@@ -17,6 +17,8 @@
 
 #include "zbxcacheconfig.h"
 
+#include "zbxtelemetry.h"
+
 int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *apm_db_config, AGENT_RESULT *result);
 
 #endif
