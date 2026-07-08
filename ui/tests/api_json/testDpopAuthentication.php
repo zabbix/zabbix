@@ -17,7 +17,7 @@
 require_once __DIR__.'/../include/CAPITest.php';
 require_once __DIR__.'/../../include/classes/api/helpers/CApiTokenHelper.php';
 require_once __DIR__.'/../../include/classes/api/helpers/CApiDpopHelper.php';
-require_once __DIR__.'/../../include/classes/helpers/CSettingsHelper.php';
+require_once __DIR__.'/../../include/classes/api/helpers/CApiSettingsHelper.php';
 
 /**
  * @onBefore prepareTestData
@@ -39,6 +39,14 @@ AwEHoUQDQgAEjIQIcDocDq/7fdk1hEoEW4Gw6gMVtUP3tUiBLmeu7tyM8HicuolL
 KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 -----END EC PRIVATE KEY-----
 ';
+
+	private static string $serverid = '';
+
+	private static bool $db_serverid_existed = false;
+
+	private static string $db_server_status = '';
+
+	private static string $server_status_mobile_devices_enabled = '{"configuration":{"enable_mobile_devices":true}}';
 
 	private static $data = [
 		'userids' => [
@@ -77,6 +85,29 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 	];
 
 	public function prepareTestData(): void {
+		$db_settings = CApiSettingsHelper::getParameters(['server_status', 'serverid'], false);
+
+		self::$db_server_status = $db_settings['server_status'];
+
+		DB::update('settings', [
+			'values' => ['value_str' => self::$server_status_mobile_devices_enabled],
+			'where' => ['name' => 'server_status']
+		]);
+
+		if (array_key_exists('serverid', $db_settings)) {
+			self::$serverid = $db_settings['serverid'];
+			self::$db_serverid_existed = true;
+		}
+		else {
+			self::$serverid = generateUuidV7();
+
+			DB::insertBatch('settings', [[
+				'name' => 'serverid',
+				'type' => 1,
+				'value_str' => self::$serverid
+			]], false);
+		}
+
 		//Create users.
 		$users = CDataHelper::call('user.create', [
 			[
@@ -424,8 +455,8 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 					'jwk' => ['keys', 'identity'],
 					'kid' => ['kids', 'identity'],
 					'htu_api_method' => 'user.get',
-					'iat' => 3,
-					'exp' => 4,
+					'iat' => 4,
+					'exp' => 5,
 					'jti' => bin2hex(random_bytes(16))
 				],
 				'expected_error' => 'Not authorized. Invalid iat: JWT token issued in the future beyond allowed skew.'
@@ -485,7 +516,7 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 					'htu_api_method' => 'user.get',
 					'iat' => 0,
 					'exp' => 5,
-					'jti' => '1234567890'
+					'jti' => md5('jti_static'.getmypid())
 				],
 				'expected_error' => null
 			],
@@ -500,7 +531,7 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 					'htu_api_method' => 'user.get',
 					'iat' => 0,
 					'exp' => 0,
-					'jti' => '1234567890'
+					'jti' => md5('jti_static'.getmypid())
 				],
 				'expected_error' => 'Not authorized. jti already used.'
 			],
@@ -667,7 +698,7 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 
 		if (array_key_exists('htu_api_method', $dpop_data)) {
 			$payload['htu'] =
-				'urn:zbx:'.CSettingsHelper::get(CSettingsHelper::SERVER_ID).':'.$dpop_data['htu_api_method'];
+				'urn:zbx:'.self::$serverid.':'.$dpop_data['htu_api_method'];
 		}
 
 		if (array_key_exists('iat', $dpop_data)) {
@@ -696,6 +727,15 @@ KjzHX0EemVt476k9mF1ES35JMrimwv3Yew==
 	}
 
 	public static function cleanTestData(): void {
+		DB::update('settings', [
+			'values' => ['value_str' => self::$db_server_status],
+			'where' => ['name' => 'server_status']
+		]);
+
+		if (!self::$db_serverid_existed) {
+			DB::delete('settings', ['name' => 'serverid']);
+		}
+
 		CDataHelper::call('user.delete', array_values(self::$data['userids']));
 
 		DB::delete('device', ['deviceid' => array_values(self::$data['deviceids'])]);
