@@ -931,8 +931,9 @@ fail:
 
 static int	bridge_adapter_parse_url_hostport(const char *url, char **host, unsigned short *port, char **error)
 {
-	char	*parsed = NULL, *host_start, *port_start;
+	char	*parsed = NULL, *host_start, *port_start, *host_tmp = NULL, *host_validate = NULL;
 	size_t	host_alloc = 0, host_offset = 0;
+	unsigned short	host_port;
 	int	ret = FAIL;
 
 	if (SUCCEED != zbx_iregexp_sub(url,
@@ -967,7 +968,11 @@ static int	bridge_adapter_parse_url_hostport(const char *url, char **host, unsig
 	zbx_strncpy_alloc(host, &host_alloc, &host_offset, host_start, (size_t)(port_start - host_start));
 	port_start++;
 
-	if (FAIL == zbx_is_supported_ip(*host) && FAIL == zbx_is_rfc_extended_hostname(*host))
+	host_tmp = zbx_strdup(NULL, *host);
+
+	if (SUCCEED != zbx_parse_serveractive_element(host_tmp, &host_validate, &host_port, 0) ||
+			(FAIL == zbx_is_supported_ip(host_validate) &&
+					FAIL == zbx_is_rfc_extended_hostname(host_validate)))
 		goto fail;
 
 	if ('\0' != *port_start && (SUCCEED != zbx_is_ushort(port_start, port) || 0 == *port))
@@ -981,6 +986,8 @@ fail:
 
 out:
 	zbx_free(parsed);
+	zbx_free(host_tmp);
+	zbx_free(host_validate);
 
 	return ret;
 }

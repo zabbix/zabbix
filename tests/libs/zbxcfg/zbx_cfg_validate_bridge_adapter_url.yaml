@@ -131,11 +131,12 @@ in:
 out:
   return: FAIL
 ---
-test case: "IPv6 in URL brackets not supported"
+test case: "IPv6 URL in brackets with explicit port is valid"
 in:
   url: "http://[::1]:8080/rpc"
+  ipv: 1
 out:
-  return: FAIL
+  return: SUCCEED
 ---
 test case: "URL fragment is rejected after mandatory rpc endpoint"
 in:
@@ -209,19 +210,21 @@ in:
 out:
   return: FAIL
 ---
-test case: "IPv6 loopback in brackets without explicit port"
+test case: "IPv6 URL in brackets without explicit port is valid"
 in:
   url: "http://[::1]/rpc"
+  ipv: 1
 out:
-  return: FAIL
+  return: SUCCEED
 ---
-test case: "IPv6 full address in brackets with HTTPS"
+test case: "IPv6 HTTPS URL in brackets with explicit port is valid"
 in:
   url: "https://[2001:db8::1]:443/rpc"
+  ipv: 1
 out:
-  return: FAIL
+  return: SUCCEED
 ---
-test case: "IPv6 loopback in brackets with path"
+test case: "IPv6 URL in brackets with non-rpc path fails"
 in:
   url: "http://[::1]/some/path"
 out:
@@ -233,11 +236,12 @@ in:
 out:
   return: FAIL
 ---
-test case: "IPv4-mapped IPv6 in brackets not supported"
+test case: "IPv4-mapped IPv6 URL in brackets is valid"
 in:
   url: "https://[::ffff:192.168.1.1]:8080/rpc"
+  ipv: 1
 out:
-  return: FAIL
+  return: SUCCEED
 ---
 test case: "emoji in hostname rejected by hostname validator"
 in:

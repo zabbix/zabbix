@@ -212,13 +212,14 @@ in:
 out:
   return: FAIL
 ---
-test case: "IPv6 URL fails even with valid connect_to"
+test case: "IPv6 URL with IPv4 connect_to succeeds"
 in:
   url: "http://[::1]:8080/rpc"
   connect_to: "192.168.1.1:9090"
-  ipv: 0
+  ipv: 1
 out:
-  return: FAIL
+  return: SUCCEED
+  curl_connect_to: "[::1]:8080:192.168.1.1:9090"
 ---
 test case: "emoji in connect_to host rejected by hostname validator"
 in:

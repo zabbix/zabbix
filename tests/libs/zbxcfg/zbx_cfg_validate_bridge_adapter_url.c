@@ -19,18 +19,30 @@
 
 #include "zbxcommon.h"
 #include "zbxcfg.h"
+#include "zbxip.h"
 
 void	zbx_mock_test_entry(void **state)
 {
 	const char	*url = zbx_mock_get_parameter_string("in.url");
 	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
+	int		ipv = ZBX_IPRANGE_V4;
 	char		*error = NULL;
 	int		result;
 
 	ZBX_UNUSED(state);
 
-	result = zbx_cfg_validate_bridge_adapter_url(url, &error);
-	zbx_mock_assert_int_eq("return value", exp_result, result);
+	if (SUCCEED == zbx_mock_parameter_exists("in.ipv"))
+		ipv = zbx_mock_get_parameter_int("in.ipv");
+
+#ifndef HAVE_IPV6
+	if (ZBX_IPRANGE_V4 == ipv)
+#else
+	if (ZBX_IPRANGE_V4 == ipv || ZBX_IPRANGE_V6 == ipv)
+#endif
+	{
+		result = zbx_cfg_validate_bridge_adapter_url(url, &error);
+		zbx_mock_assert_int_eq("return value", exp_result, result);
+	}
 
 	zbx_free(error);
 }
