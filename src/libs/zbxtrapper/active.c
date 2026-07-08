@@ -710,6 +710,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 		for (int i = 0; i < regexps.values_num; i++)
 		{
 			zbx_expression_t	*regexp = regexps.values[i];
+			char			exp_delimiter = regexp->exp_delimiter;
 
 			zbx_json_addobject(&json, NULL);
 			zbx_json_addstring(&json, "name", regexp->name, ZBX_JSON_TYPE_STRING);
@@ -718,7 +719,10 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 			zbx_snprintf(str, sizeof(str), "%d", regexp->expression_type);
 			zbx_json_addstring(&json, "expression_type", str, ZBX_JSON_TYPE_INT);
 
-			zbx_snprintf(str, sizeof(str), "%c", regexp->exp_delimiter);
+			if ('\0' == exp_delimiter && ZBX_COMPONENT_VERSION(6, 0, 4) > version)
+				exp_delimiter = ',';
+
+			zbx_snprintf(str, sizeof(str), "%c", exp_delimiter);
 			zbx_json_addstring(&json, "exp_delimiter", str, ZBX_JSON_TYPE_STRING);
 
 			zbx_snprintf(str, sizeof(str), "%d", regexp->case_sensitive);
