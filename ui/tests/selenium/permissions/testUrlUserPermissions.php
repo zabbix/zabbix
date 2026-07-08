@@ -295,8 +295,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
-					'test-admin' => false,
-					'admin-no-group' => false,
+					'test-admin' => true,
+					'admin-no-group' => true,
 					'super-no-group' => true,
 					'user-no-group' => false
 				]
