@@ -232,11 +232,11 @@ window.drule_edit_popup = new class {
 
 		if (update === false) {
 			if (typeof input.uniq === 'undefined') {
-				const checked_uniqueness_criteria = document.querySelector('[name="uniqueness_criteria"]:checked:not([data-id])');
+				const checked_uniqueness_criteria = document.querySelector('[name="uniqueness_criteria"]:checked');
 				input.uniq = checked_uniqueness_criteria !== null
 				&& checked_uniqueness_criteria.value === input.dcheckid
-					? '<?= ZBX_DISCOVERY_DNS ?>'
-					: checked_uniqueness_criteria.value;
+					? 1
+					: 0;
 			}
 
 			if (typeof input.host_source === 'undefined') {

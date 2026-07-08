@@ -114,7 +114,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 					]
 				],
 				'messages' => [
-					'uniq' => _('An identical discovery check already exists for this rule.')
+					'uniq' => _('Checks should be unique.')
 				]
 			],
 			'type' => ['db dchecks.type', 'required', 'not_empty',
@@ -128,6 +128,9 @@ class CControllerDiscoveryCheckCheck extends CController {
 					'in' => [SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_IMAP, SVC_LDAP, SVC_NNTP, SVC_POP, SVC_SMTP,
 						SVC_SSH, SVC_TCP, SVC_TELNET, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_AGENT
 					]
+				],
+				'messages' => [
+					'use' => _('Incorrect port range.')
 				]
 			],
 			'key_' => [
@@ -204,14 +207,13 @@ class CControllerDiscoveryCheckCheck extends CController {
 
 	protected function checkInput(): bool {
 		$ret = $this->validateInput(self::getValidationRules());
-		CMessageHelper::setErrorTitle(_('Cannot update discovery check'));
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
 			$response = $form_errors
 				? ['form_errors' => $form_errors]
 				: ['error' => [
-					'title' => CMessageHelper::getTitle(),
+					'title' => _('Cannot update discovery check'),
 					'messages' => array_column(get_and_clear_messages(), 'message')
 				]];
 
@@ -225,7 +227,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 
 	private function validateDuplicateDCheck(&$data): int {
 		if (!isset($data['dchecks']) || !is_array($data['dchecks'])) {
-			return false;
+			return CFormValidator::SUCCESS;
 		}
 
 		$newDCheck = array_diff_key($data, array_flip(['dchecks']));
@@ -256,7 +258,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 		if ($is_valid !== CFormValidator::SUCCESS) {
 			$response = [
 				'error' => [
-					'title' => _('Duplicate discovery check found'),
+					'title' => _('Checks should be unique.'),
 					'messages' => $this->getValidationError()
 				]
 			];

@@ -31,13 +31,12 @@ $dchecks = array_values($data['dchecks'] ?? []);
 foreach ($dchecks as $index => $dcheck) {
 	foreach ($dcheck as $key => $value) {
 		if (in_array($key, ['type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
-			'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
-			'snmpv3_contextname', 'allow_redirect'])) {
+				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
+				'snmpv3_contextname', 'allow_redirect'])) {
 			$form->addVar('dchecks['.$index.']['.$key.']', $value);
 		}
 	}
 }
-
 
 if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']) {
 	$form->addVar('dcheckid', $data['params']['dcheckid']);

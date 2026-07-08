@@ -161,18 +161,23 @@ class CControllerDiscoveryCreate extends CController {
 				],
 				'count_values' => [
 					[
+						'field_rules' => ['uniq', 'in' => [1]],
+						'max' => 1,
+						'message' => _('Only one check can be unique.')
+					],
+					[
 						'field_rules' => ['host_source', 'in' => [ZBX_DISCOVERY_VALUE]],
 						'max' => 1,
-						'message' => _('Only one check can be used as host name source.')
+						'message' => _('Only one check can be unique.')
 					],
 					[
 						'field_rules' => ['name_source', 'in' => [ZBX_DISCOVERY_VALUE]],
 						'max' => 1,
-						'message' => _('Only one check can be used as visible name source.')
+						'message' => _('Only one check can be unique.')
 					]
 				],
 				'messages' => [
-					'uniq' => _('An identical discovery check already exists for this rule.')
+					'uniq' => _('Checks should be unique.')
 				]
 			]
 		]];
