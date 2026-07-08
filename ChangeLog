@@ -1,11 +1,18 @@
+Changes for 6.0.47
+
+6.0.47rc1 was released as 6.0.47 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.47rc1
 
 New features:
+A......PS. [ZBXNEXT-10478] updated maximum supported MariaDB version to 12.3 (mprihodko)
 A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27 (mprihodko)
 
 Bug fixes:
-........S. [ZBX-22504] improved memory usage in lld worker proecesses with large low level discovery (vso)
+...G...... [ZBX-27900] fixed Windows job handle not being closed on Zabbix agent 2 (esneiders)
+........S. [ZBX-22504] improved memory usage in LLD worker processes with large low-level discovery (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.46
