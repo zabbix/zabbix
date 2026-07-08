@@ -26,7 +26,7 @@
 /******************************************************************************
  *                                                                            *
  * Purpose: For PostgreSQL, MySQL and MariaDB:                                *
- *          stoires DBMS version as integer: MMmmuu                           *
+ *          stores DBMS version as integer: MMmmuu                            *
  *          M = major version part                                            *
  *          m = minor version part                                            *
  *          u = patch version part                                            *

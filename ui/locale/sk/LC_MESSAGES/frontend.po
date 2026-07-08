@@ -26402,7 +26402,7 @@ msgstr "Nemáte oprávnenie na vykonanie tejto operácie."
 
 #: index_sso.php:358
 msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
-msgstr "Boli ste autorizovaný pomocou Single sign-on (SSO), avšak prihlásenie do Zabbx-u zlyhalo."
+msgstr "Boli ste autorizovaný pomocou Single sign-on (SSO), avšak prihlásenie do Zabbix-u zlyhalo."
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."

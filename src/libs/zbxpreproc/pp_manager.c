@@ -865,7 +865,7 @@ static void	preprocessor_reply_size(zbx_pp_manager_t *manager, zbx_ipc_client_t 
  *                                                                            *
  * Parameters: manager  - [IN] preprocessing manager                          *
  *             tasks    - [IN] processed tasks                                *
- *             runstate - [IN] preprocexsing manager run state                *
+ *             runstate - [IN] preprocessing manager run state                *
  *                                                                            *
  ******************************************************************************/
 static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_task_t *task,

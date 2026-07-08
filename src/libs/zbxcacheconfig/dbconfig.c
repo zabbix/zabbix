@@ -6244,7 +6244,7 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
  *                                                                            *
  * Purpose: calculate nextcheck timestamp                                     *
  *                                                                            *
- * Parameters: seend - [IN] the seed                                          *
+ * Parameters: send - [IN] the seed                                           *
  *             delay - [IN] the delay in seconds                              *
  *             now   - [IN] current timestamp                                 *
  *                                                                            *
