@@ -136,11 +136,7 @@ window.itemtestedit_view_popup = new class {
 			this.#form.findFieldByName('prev_time').getField().readOnly = get_value_checked;
 		}
 
-		const proxy_field = this.#form.findFieldByName('proxyid');
-
-		if (proxy_field !== null) {
-			$(proxy_field.getField()).multiSelect(get_value_checked && this.#proxies_enabled ? 'enable' : 'disable');
-		}
+		this.#updateProxyField(get_value_checked);
 
 		const interface_address_field = this.#form.findFieldByName('interface[address]');
 
@@ -271,6 +267,7 @@ window.itemtestedit_view_popup = new class {
 		}
 
 		this.#form.unlock();
+		this.#updateProxyField(this.#form.findFieldByName('get_value').getField().checked);
 		this.#overlay.unsetLoading();
 	}
 
@@ -327,6 +324,26 @@ window.itemtestedit_view_popup = new class {
 					this.#processGetValueResult(response, fields.upd_last);
 				});
 			})
+	}
+
+	#updateProxyField(get_value_checked) {
+		const proxy_field = this.#form.findFieldByName('proxyid');
+
+		if (proxy_field === null) {
+			return;
+		}
+
+		const proxy_multiselect = $(proxy_field.getField());
+
+		proxy_multiselect.multiSelect(get_value_checked ? 'enable' : 'disable');
+
+		if (get_value_checked && !this.#proxies_enabled) {
+			const select_button = proxy_multiselect.multiSelect('getSelectButton');
+
+			if (select_button !== null) {
+				select_button.disabled = true;
+			}
+		}
 	}
 
 	#submit() {
