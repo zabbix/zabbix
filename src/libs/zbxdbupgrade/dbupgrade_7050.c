@@ -844,17 +844,17 @@ static int	DBpatch_7050059(void)
 
 static int	DBpatch_7050060(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	/* 1 - ZBX_SETTING_TYPE_STR */
-	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str) values ('banner_data',1,'')"))
-		return FAIL;
-
 	return SUCCEED;
 }
 
 static int	DBpatch_7050061(void)
+{
+	const zbx_db_field_t	field = {"auto_start", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("dashboard", &field);
+}
+
+static int	DBpatch_7050062(void)
 {
 	int		i;
 	const char	*values[] = {
@@ -984,5 +984,6 @@ DBPATCH_ADD(7050058, 0, 1)
 DBPATCH_ADD(7050059, 0, 1)
 DBPATCH_ADD(7050060, 0, 1)
 DBPATCH_ADD(7050061, 0, 1)
+DBPATCH_ADD(7050062, 0, 1)
 
 DBPATCH_END()
