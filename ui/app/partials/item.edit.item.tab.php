@@ -811,7 +811,7 @@ $formgrid
 				'data' => $item['valuemap']
 					? [[
 						'id' => $item['valuemap']['valuemapid'],
-						'prefix' => $item['valuemap']['prefix'] ?? '',
+						'prefix' => $item['templated'] ? $item['valuemap']['prefix'] : '',
 						'name' => $item['valuemap']['name']
 					]]
 					: [],

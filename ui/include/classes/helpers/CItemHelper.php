@@ -82,7 +82,7 @@ class CItemHelper extends CItemGeneralHelper {
 			'lldmacros' => false
 		]);
 
-		if ($item['templated'] && array_key_exists('hostid', $item['valuemap'])) {
+		if ($item['templated'] && $item['valuemap']) {
 			$parent_template = $parent_templates['templates'][$item['valuemap']['hostid']];
 			$item['valuemap']['prefix'] = $parent_template['name'].NAME_DELIMITER;
 		}
