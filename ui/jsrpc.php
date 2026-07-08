@@ -615,25 +615,10 @@ switch ($data['method']) {
 					break;
 				}
 
-				if ($data['context'] === 'host') {
-					$hosts = API::Host()->get([
-						'output' => ['name'],
-						'hostids' => $data['hostids'],
-						'preservekeys' => true
-					]);
-				}
-				else {
-					$hosts = API::Template()->get([
-						'output' => ['name'],
-						'templateids' => $data['hostids'],
-						'preservekeys' => true
-					]);
-				}
-
 				$valuemaps = API::ValueMap()->get([
-					'output' => ['valuemapid', 'name', 'hostid'],
+					'output' => ['valuemapid', 'name'],
 					'hostids' => $data['hostids'],
-					'search' => ['name' => $data['search'] ? $data['search'] : null],
+					'search' => ['name' => $data['search'] ?: null],
 					'limit' => $limit
 				]);
 

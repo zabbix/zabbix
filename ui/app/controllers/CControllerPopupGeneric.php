@@ -1812,7 +1812,6 @@ class CControllerPopupGeneric extends CController {
 				foreach ($db_valuemaps as $db_valuemap) {
 					$valuemap = [
 						'id' => $db_valuemap['valuemapid'],
-						'hostname' => $hosts[$db_valuemap['hostid']]['name'],
 						'name' => $db_valuemap['name'],
 						'mappings' => array_values($db_valuemap['mappings']),
 						'_disabled' => in_array($db_valuemap['name'], $disable_names)
@@ -1822,7 +1821,7 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				$records = array_column($records, null, 'id');
-				CArrayHelper::sort($records, ['name', 'hostname']);
+				CArrayHelper::sort($records, ['name']);
 				break;
 
 			case 'dashboard':
