@@ -854,12 +854,6 @@ static int	DBpatch_7050061(void)
 	return DBset_default("dashboard", &field);
 }
 
-
-
-
-
-
-
 static int	DBpatch_7050062(void)
 {
 	const zbx_db_field_t	field = {"auth_scheme", "0", NULL, NULL, 32, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
