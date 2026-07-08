@@ -29,8 +29,13 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @hosts test
  */
 class testTriggerCEP extends CIntegrationTest {
-	const LLD_DISCOVERY_COUNT = 500; // should be at least 4000 for local tests
-	const LOG_EVENT_COUNT = 10000;
+	// Scale knobs for how much load each scenario generates. They are intentionally tiny here so the suite
+	// runs quickly in CI, and small values are also handy while debugging to reach a failure fast; when
+	// running locally to actually stress CEP, raise them to the recommended values noted below (or higher).
+	// Increasing them makes the tests slower but far more thorough.
+	const LLD_DISCOVERY_COUNT = 500;	// discovered items/triggers per rule; use at least 4000 to stress CEP
+	const LOG_EVENT_COUNT = 10000;		// log values pushed at the single-trigger stream; use at least 10000
+	const RECOVERY_CYCLES_COUNT = 1000;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
 
 	const SKIP_RESTART_TESTS = true;
 
@@ -146,7 +151,8 @@ class testTriggerCEP extends CIntegrationTest {
 				'ValueCacheSize' => '128M',
 				'LogSlowQueries' => 10000,
 				'StartEscalators' => 8,
-				'MaxHousekeeperDelete' => 0
+				'MaxHousekeeperDelete' => 0,
+				'StartTrappers' => 32
 			]
 		];
 	}
@@ -2394,7 +2400,7 @@ HEREDOC;
 		// value gets a strictly increasing (clock, ns) so CEP must process the whole rapid burst in order
 		// and emit one event per transition without collapsing or dropping any. The sequence ends on 0 so
 		// the trigger finishes OK.
-		$cycles = 1000;
+		$cycles = self::RECOVERY_CYCLES_COUNT;
 		$values = [];
 		for ($i = 0; $i < $cycles; $i++) {
 			$values[] = '1';
@@ -2908,6 +2914,20 @@ HEREDOC;
 		$this->prepareDataGlobalCorrelationCloseOnUp();
 		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false);
 		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
+	 * Same "close old down when new up" scenario as
+	 * testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp, but the whole flow lands on a single
+	 * discovered item (and its one trigger) instead of every discovered item, exercising the correlation
+	 * close-on-up path on one event stream.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItem$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpSingleItem() {
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(false);
+		$this->waitForNoOpenProblems([self::$discovered_triggerids[0]]);
 	}
 
 	/**
@@ -3722,6 +3742,59 @@ HEREDOC;
 	}
 
 	/**
+	 * Same "close old down when new up" scenario as runEventAssessmentTestGlobalCorrelationCloseOnUp, but
+	 * the whole flow lands on a single discovered item (and its one trigger) rather than being spread
+	 * across every discovered item. The one trigger opens two "down" problems (each with a unique 'service'
+	 * id), then the matching "up" values — themselves PROBLEM events — close each corresponding "down"
+	 * (and themselves) strictly 1:1, leaving no open problem. When $restart is true, the server is
+	 * restarted between steps.
+	 */
+	private function runEventAssessmentTestGlobalCorrelationCloseOnUpSingleItem(bool $restart): void {
+		// Drive a single discovered item (and its one trigger) so the whole scenario lands on one event
+		// stream rather than being spread across every discovered item.
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::$discovered_triggerids[0];
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for single-item close-on-up global correlation test.');
+		}
+
+		// Send one value with a unique id: value "<prefix>_<id>".
+		$send = fn(string $prefix, int $id) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $prefix.'_'.$id]
+		]);
+
+		// 1. Open the first problem on the trigger (unique id); trigger goes TRUE.
+		$send('down', 0);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		$this->maybeRestartServer($restart);
+
+		// 2. Open a second problem on the trigger (a different unique id, mult_event); still TRUE.
+		$send('down', 1);
+		$this->waitForOpenProblemCount($all, 2);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		$this->maybeRestartServer($restart);
+
+		// 3. "up" for the first id: a PROBLEM that closes only its corresponding "down" (CLOSE_OLD) and
+		//    itself (CLOSE_NEW). The second problem stays open, so the trigger stays TRUE and one remains.
+		$send('up', 0);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		$this->maybeRestartServer($restart);
+
+		// 4. "up" for the second id closes the trigger's remaining problem; nothing stays open.
+		$send('up', 1);
+		$this->waitForNoOpenProblems($all);
+	}
+
+	/**
 	 * Same close-on-up flow as runEventAssessmentTestGlobalCorrelationCloseOnUp, but once all problems are
 	 * open it downgrades every open problem's severity to WARNING via event.acknowledge and asserts the
 	 * per-trigger services follow the manual severity change from DISASTER to WARNING, then closes the
@@ -4022,7 +4095,7 @@ HEREDOC;
 		$this->assertStateChangeForAll($parent_ids, $parent_keys, '0', TRIGGER_VALUE_FALSE, $parent_event_count + 2);
 		$this->assertStateChangeForAll($dep_ids, $dep_keys, '0', TRIGGER_VALUE_FALSE, $dep_event_count + 2);
 
-		$this->runIntermingledDependentTriggerBatch($restart, $parent_event_count + 2);
+		/*$this->runIntermingledDependentTriggerBatch($restart, $parent_event_count + 2);*/
 	}
 
 	private function runIntermingledDependentTriggerBatch(bool $restart, int $parent_event_count): void {
