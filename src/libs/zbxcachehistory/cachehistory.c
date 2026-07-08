@@ -1232,6 +1232,32 @@ static void	zbx_item_info_clean_wrapper(void *data)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: helper function to add resolved item name to JSON                 *
+ *                                                                            *
+ * Parameters: json       - [OUT] JSON builder                                *
+ *             um_handle  - [IN] user macros handle for macro resolution      *
+ *             hostid     - [IN] host identifier for macro resolution         *
+ *             name       - [IN] item name to resolve                         *
+ *                                                                            *
+ * Comments: Resolves user macros in item names before adding to JSON.        *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_export_add_item_name_json(struct zbx_json *json, zbx_dc_um_handle_t *um_handle,
+		const zbx_uint64_t *hostid, const char *name)
+{
+	char	*name_resolved;
+
+	if (NULL == name)
+		return;
+
+	name_resolved = zbx_strdup(NULL, name);
+	(void)zbx_dc_expand_user_and_func_macros(um_handle, &name_resolved, hostid, 1, NULL);
+	zbx_json_addstring(json, ZBX_PROTO_TAG_NAME, name_resolved, ZBX_JSON_TYPE_STRING);
+	zbx_free(name_resolved);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: helper function to add resolved item tags to JSON                 *
  *                                                                            *
  * Parameters: json       - [OUT] JSON builder                                *
@@ -1245,11 +1271,9 @@ static void	zbx_item_info_clean_wrapper(void *data)
 static void	dc_export_add_item_tags_json(struct zbx_json *json, const zbx_item_info_t *item_info,
 		zbx_dc_um_handle_t *um_handle, const zbx_uint64_t *hostid)
 {
-	int	j;
-
-	for (j = 0; j < item_info->item_tags.values_num; j++)
+	for (int i = 0; i < item_info->item_tags.values_num; i++)
 	{
-		zbx_tag_t	*item_tag = item_info->item_tags.values[j];
+		zbx_tag_t	*item_tag = item_info->item_tags.values[i];
 		char		*tag_resolved, *value_resolved;
 
 		zbx_json_addobject(json, NULL);
@@ -1270,20 +1294,6 @@ static void	dc_export_add_item_tags_json(struct zbx_json *json, const zbx_item_i
 
 		zbx_json_close(json);
 	}
-}
-
-static void	dc_export_add_item_name_json(struct zbx_json *json, zbx_dc_um_handle_t *um_handle,
-		const zbx_uint64_t *hostid, const char *name)
-{
-	char	*name_resolved;
-
-	if (NULL == name)
-		return;
-
-	name_resolved = zbx_strdup(NULL, name);
-	(void)zbx_dc_expand_user_and_func_macros(um_handle, &name_resolved, hostid, 1, NULL);
-	zbx_json_addstring(json, ZBX_PROTO_TAG_NAME, name_resolved, ZBX_JSON_TYPE_STRING);
-	zbx_free(name_resolved);
 }
 
 /******************************************************************************
