@@ -1111,12 +1111,8 @@ static void	db_get_item_names_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select i.itemid,coalesce(ir.name_resolved,i.name)"
-			" from items i"
-			" left join item_rtname ir on i.itemid=ir.itemid"
-			" where");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids->values, itemids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,name from items where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 
 	result = zbx_db_select("%s", sql);
 
@@ -1229,6 +1225,62 @@ static void	zbx_item_info_clean_wrapper(void *data)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: helper function to add resolved item tags to JSON                 *
+ *                                                                            *
+ * Parameters: json       - [OUT] JSON builder                                *
+ *             item_info  - [IN] item information containing tags             *
+ *             um_handle  - [IN] user macros handle for macro resolution      *
+ *             hostid     - [IN] host identifier for macro resolution         *
+ *                                                                            *
+ * Comments: Resolves user macros in tag values before adding to JSON.        *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_export_add_item_tags_json(struct zbx_json *json, const zbx_item_info_t *item_info,
+		zbx_dc_um_handle_t *um_handle, const zbx_uint64_t *hostid)
+{
+	int	j;
+
+	for (j = 0; j < item_info->item_tags.values_num; j++)
+	{
+		zbx_tag_t	*item_tag = item_info->item_tags.values[j];
+		char		*tag_resolved, *value_resolved;
+
+		zbx_json_addobject(json, NULL);
+
+		tag_resolved = zbx_strdup(NULL, item_tag->tag);
+		(void)zbx_dc_expand_user_and_func_macros(um_handle, &tag_resolved,
+				hostid, 1, NULL);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_TAG, tag_resolved,
+				ZBX_JSON_TYPE_STRING);
+		zbx_free(tag_resolved);
+
+		value_resolved = zbx_strdup(NULL, item_tag->value);
+		(void)zbx_dc_expand_user_and_func_macros(um_handle, &value_resolved,
+				hostid, 1, NULL);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_VALUE, value_resolved,
+				ZBX_JSON_TYPE_STRING);
+		zbx_free(value_resolved);
+
+		zbx_json_close(json);
+	}
+}
+
+static void	dc_export_add_item_name_json(struct zbx_json *json, zbx_dc_um_handle_t *um_handle,
+		const zbx_uint64_t *hostid, const char *name)
+{
+	char	*name_resolved;
+
+	if (NULL == name)
+		return;
+
+	name_resolved = zbx_strdup(NULL, name);
+	(void)zbx_dc_expand_user_and_func_macros(um_handle, &name_resolved, hostid, 1, NULL);
+	zbx_json_addstring(json, ZBX_PROTO_TAG_NAME, name_resolved, ZBX_JSON_TYPE_STRING);
+	zbx_free(name_resolved);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: export trends                                                     *
  *                                                                            *
  * Parameters: trends     - [IN] trends from cache                            *
@@ -1283,29 +1335,12 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 		zbx_json_close(&json);
 
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_ITEM_TAGS);
-
-		for (j = 0; j < item_info->item_tags.values_num; j++)
-		{
-			zbx_tag_t	*item_tag = item_info->item_tags.values[j];
-			char		*value_resolved;
-
-			zbx_json_addobject(&json, NULL);
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_TAG, item_tag->tag, ZBX_JSON_TYPE_STRING);
-
-			value_resolved = zbx_strdup(NULL, item_tag->value);
-			(void)zbx_dc_expand_user_and_func_macros(um_handle, &value_resolved, &item->host.hostid, 1,
-					NULL);
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, value_resolved, ZBX_JSON_TYPE_STRING);
-			zbx_free(value_resolved);
-
-			zbx_json_close(&json);
-		}
+		dc_export_add_item_tags_json(&json, item_info, um_handle, &item->host.hostid);
 
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_ITEMID, item->itemid);
 
-		if (NULL != item_info->name)
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, item_info->name, ZBX_JSON_TYPE_STRING);
+		dc_export_add_item_name_json(&json, um_handle, &item->host.hostid, item_info->name);
 
 		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, trend->clock);
 		zbx_json_addint64(&json, ZBX_PROTO_TAG_COUNT, trend->num);
@@ -1431,29 +1466,12 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 		zbx_json_close(&json);
 
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_ITEM_TAGS);
-
-		for (j = 0; j < item_info->item_tags.values_num; j++)
-		{
-			zbx_tag_t	*item_tag = item_info->item_tags.values[j];
-			char		*value_resolved;
-
-			zbx_json_addobject(&json, NULL);
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_TAG, item_tag->tag, ZBX_JSON_TYPE_STRING);
-
-			value_resolved = zbx_strdup(NULL, item_tag->value);
-			(void)zbx_dc_expand_user_and_func_macros(um_handle, &value_resolved, &item->host.hostid, 1,
-					NULL);
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, value_resolved, ZBX_JSON_TYPE_STRING);
-			zbx_free(value_resolved);
-
-			zbx_json_close(&json);
-		}
+		dc_export_add_item_tags_json(&json, item_info, um_handle, &item->host.hostid);
 
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_ITEMID, item->itemid);
 
-		if (NULL != item_info->name)
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, item_info->name, ZBX_JSON_TYPE_STRING);
+		dc_export_add_item_name_json(&json, um_handle, &item->host.hostid, item_info->name);
 
 		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, h->ts.sec);
 		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, h->ts.ns);
