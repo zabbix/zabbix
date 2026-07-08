@@ -623,6 +623,7 @@ void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
 
 int	zbx_db_check_instanceid(void);
 int	zbx_db_update_software_update_checkid(void);
+int	zbx_db_check_serverid(void);
 
 /* tags */
 typedef struct
@@ -772,6 +773,8 @@ void	zbx_lld_filter_clean(zbx_lld_filter_t *filter);
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 
+int	zbx_db_verify_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
+		unsigned char program_type);
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
 		unsigned char program_type);
 void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
@@ -869,5 +872,7 @@ const zbx_sync_row_t	*zbx_sync_rowset_search_by_id(const zbx_sync_rowset_t *rows
 zbx_sync_row_t	*zbx_sync_rowset_search_by_parent(zbx_sync_rowset_t *rowset, zbx_uint64_t parent_rowid);
 void	zbx_sync_rowset_rollback(zbx_sync_rowset_t *rowset);
 void	zbx_sync_rowset_copy(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src);
+
+int	zbx_db_settings_set_value(const char *name, const void *value, int type);
 
 #endif

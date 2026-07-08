@@ -18,8 +18,8 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['itemid', 'data_actions', 'host', 'maintenance', 'maintenanceid',
 		'maintenance_type', 'maintenance_status', 'itemid', 'description_expanded', 'name', 'key_expanded', 'interval',
-		'history', 'trends', 'type', 'state', 'last_check', 'last_value', 'change', 'is_graph', 'keep_history',
-		'keep_trends', 'item_icons', 'tags'];
+		'history', 'trends', 'type', 'state', 'last_check', 'last_value', 'change', 'is_graph', 'show_link',
+		'item_icons', 'tags', 'custom_text'];
 
 	protected function init(): void {
 		parent::init();
@@ -33,6 +33,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 	protected function getData(): array {
 		$data_fields = $this->getDataFields();
+		$options = $this->getInput('options');
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
 
@@ -110,15 +111,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 		order_result($data['items'], $sort_field, $sort_order);
 
-		$simple_interval_parser = new CSimpleIntervalParser();
 		$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
-
-		$config = [
-			'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
-			'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
-			'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
-			'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
-		];
 
 		foreach ($data['items'] as &$item) {
 			$host = $hosts_on_page[$item['hostid']];
@@ -201,7 +194,8 @@ class CControllerLatestViewData extends CControllerDataTable {
 			}
 
 			if (in_array($item['type'], [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT])
-					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_expanded'], 'mqtt.get', 8) == 0)) {
+					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+						&& strncmp($item['key_expanded'], 'mqtt.get', 8) == 0)) {
 				$item_delay = '';
 			}
 			elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -221,45 +215,30 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 			$item['interval'] = $item_delay;
 
-			if ($config['hk_history_global']) {
-				$keep_history = timeUnitToSeconds($config['hk_history']);
-				$item_history = $config['hk_history'];
-			}
-			elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
-				$keep_history = timeUnitToSeconds($item['history']);
-				$item_history = $item['history'];
-			}
-			else {
-				$keep_history = 0;
-				$item_history = (new CSpan($item['history']))
+			[
+				'history' => $item['history'],
+				'keep_history' => $keep_history,
+				'history_has_errors' => $history_has_errors,
+				'trends' => $item['trends'],
+				'keep_trends' => $keep_trends,
+				'trends_has_errors' => $trends_has_errors
+			] = CItemHelper::getStoragePeriods((int) $item['value_type'], $item['history'], $item['trends']);
+
+			if ($history_has_errors) {
+				$item['history'] = (new CSpan($item['history']))
 					->addClass(ZBX_STYLE_RED)
 					->toString();
 			}
 
-			$item['keep_history'] = $keep_history;
-			$item['history'] = $item_history;
-
-			if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-				if ($config['hk_trends_global']) {
-					$keep_trends = timeUnitToSeconds($config['hk_trends']);
-					$item_trends = $config['hk_trends'];
-				}
-				elseif ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
-					$keep_trends = timeUnitToSeconds($item['trends']);
-					$item_trends = $item['trends'];
-				}
-				else {
-					$keep_trends = 0;
-					$item_trends = (new CSpan($item['trends']))->addClass(ZBX_STYLE_RED);
-				}
-			}
-			else {
-				$keep_trends = 0;
-				$item_trends = '';
+			if ($trends_has_errors) {
+				$item['trends'] = (new CSpan($item['trends']))
+					->addClass(ZBX_STYLE_RED)
+					->toString();
 			}
 
-			$item['keep_trends'] = $keep_trends;
-			$item['trends'] = $item_trends;
+			// A strict comparison with zero is required here because these variables may have a null value.
+			$item['show_link'] = $keep_history !== 0 || $keep_trends !== 0;
+
 			$item['type'] = item_type2str($item['type']);
 			$item['last_check'] = $last_check;
 			$item['last_value'] = $last_value;
@@ -275,6 +254,13 @@ class CControllerLatestViewData extends CControllerDataTable {
 				->toString();
 		}
 		unset($item);
+
+		$custom_text = $this->extractCustomText($options);
+		$this->flattenColumnOptions($options);
+
+		if ($custom_text) {
+			$this->resolveCustomText($data, $custom_text);
+		}
 
 		$output += [
 			'filter_counters' => $this->getFilterCounters(),
@@ -416,5 +402,20 @@ class CControllerLatestViewData extends CControllerDataTable {
 			'items' => $items,
 			'items_rw' => $items_rw
 		];
+	}
+
+	protected function resolveCustomText(array &$data, array $custom_text): void {
+		$items = [];
+
+		foreach ($data['items'] as $itemid => $item) {
+			$items[$itemid] = ['hostid' => $item['hostid']] + $custom_text;
+		}
+
+		$keys = array_keys($custom_text);
+		$items = CMacrosResolverHelper::resolveItemBasedWidgetMacros($items, array_combine($keys, $keys));
+
+		foreach ($items as $itemid => $item) {
+			$data['items'][$itemid]['custom_text'] = array_intersect_key($item, $custom_text);
+		}
 	}
 }
