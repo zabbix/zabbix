@@ -113,7 +113,7 @@ void	*zbx_dbconfig_thread(void *args)
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
 		int		vault_ret = SUCCEED;
-		int		sleeptime = nextcheck - (int)time(NULL);
+		int		sleeptime = MAX(0, nextcheck - (int)time(NULL));
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
