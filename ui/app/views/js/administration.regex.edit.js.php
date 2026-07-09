@@ -250,12 +250,12 @@ window.regex_edit_popup = new class {
 
 		const values = this.#form.getAllValues();
 
-		this.#setTestLoadingStatus(test_fields);
+		this.#setTestLoadingStatus();
 
 		this.#form.validateFieldsForAction(test_fields, rules, values)
 			.then(result => {
 				if (!result) {
-					this.#unsetTestLoadingStatus(test_fields)
+					this.#unsetTestLoadingStatus();
 					return;
 				}
 
@@ -277,28 +277,28 @@ window.regex_edit_popup = new class {
 						this.#showTestResult(response, expressions);
 					})
 					.catch(exception => this.#ajaxExceptionHandler(exception))
-					.finally(() => this.#unsetTestLoadingStatus(test_fields));
+					.finally(() => this.#unsetTestLoadingStatus());
 			});
 	}
 
-	#setTestLoadingStatus(test_fields) {
+	#setTestLoadingStatus() {
 		if (!this.#form_element.isConnected) {
 			return;
 		}
 
-		this.#form.lock(test_fields);
+		this.#form.lock();
 
 		document.getElementById('regular-expressions-table')
 			.querySelectorAll('.js-add, .js-remove')
 			.forEach(button => button.disabled = true);
 	}
 
-	#unsetTestLoadingStatus(test_fields) {
+	#unsetTestLoadingStatus() {
 		if (!this.#form_element.isConnected) {
 			return;
 		}
 
-		this.#form.unlock(test_fields);
+		this.#form.unlock();
 
 		document.getElementById('regular-expressions-table')
 			.querySelectorAll('.js-add, .js-remove')

@@ -44,6 +44,10 @@ class CField {
 	}
 
 	onBlur() {
+		if (this._field.disabled) {
+			return;
+		}
+
 		this.cancelDelayedValidation();
 		this.fieldChanged();
 	}
