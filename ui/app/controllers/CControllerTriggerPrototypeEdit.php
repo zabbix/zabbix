@@ -32,7 +32,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 			'form_refresh' => ['integer', 'in' => [0, 1]]
 		]];
 
-		foreach (array_keys(CControllerTriggerUpdate::getValidationRules()['fields']) as $name) {
+		foreach (array_keys(CControllerTriggerPrototypeUpdate::getValidationRules()['fields']) as $name) {
 			if (!array_key_exists($name, $rules['fields'])) {
 				$rules['fields'][$name] = [];
 			}
