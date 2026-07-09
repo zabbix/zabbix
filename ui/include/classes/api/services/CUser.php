@@ -4163,12 +4163,16 @@ class CUser extends CApiService {
 				$user_media['sendto'] = explode("\n", $user_media['sendto']);
 
 				if (array_key_exists($user_media['mediatypeid'], $db_user_media_types)) {
-					if (in_array($uuid, $user_media['sendto']) && count($user_media['sendto']) == 1
-							|| in_array('*', $user_media['sendto']) && $db_devices_count == 1) {
+					if ($db_devices_count == 1) {
 						unset($user['medias'][$key]);
+
+						continue;
 					}
-					elseif (in_array($uuid, $user_media['sendto'])) {
-						$user_media['sendto'] = array_diff($user_media['sendto'], [$uuid]);
+
+					$user_media['sendto'] = array_diff($user_media['sendto'], [$uuid]);
+
+					if (!$user_media['sendto']) {
+						unset($user['medias'][$key]);
 					}
 				}
 			}
