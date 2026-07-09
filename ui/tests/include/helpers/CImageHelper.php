@@ -19,11 +19,13 @@
 class CImageHelper {
 
 	/**
-	 * Image compare threshold.
+	 * Image compare threshold (maximum allowed sum of color channel differences for a single pixel).
+	 * Default of 7.68 (1%) tolerates anti-aliasing noise on rounded corners, where color channels of corner
+	 * pixels can differ by 1-3 units between test runs, while visible differences still fail the comparison.
 	 *
-	 * @var integer
+	 * @var float
 	 */
-	protected static $threshold = 0;
+	protected static $threshold = 7.68;
 
 	/**
 	 * Default color used to erase regions.
@@ -224,8 +226,11 @@ class CImageHelper {
 						continue;
 					}
 
-					$diff = ($color1 ^ $color2);
-					if ((((0xff0000 & $diff) >> 16) + ((0xff00 & $diff) >> 8) + (0xff & $diff)) > self::$threshold) {
+					$diff = abs((($color1 >> 16) & 0xff) - (($color2 >> 16) & 0xff))
+							+ abs((($color1 >> 8) & 0xff) - (($color2 >> 8) & 0xff))
+							+ abs(($color1 & 0xff) - ($color2 & 0xff));
+
+					if ($diff > self::$threshold) {
 						$delta++;
 						imagesetpixel($mask, $x, $y, $red);
 					}
