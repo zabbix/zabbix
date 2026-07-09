@@ -170,45 +170,45 @@ static const tq_column_info_t	*get_column_info_from_arr(const tq_column_info_t *
 	return NULL;
 }
 
-const tq_column_info_t	*tq_get_column_info(zbx_tq_category_t category, zbx_tq_metric_type_t metric_type,
-		const char *column_name)
+const tq_column_info_t	*tq_get_column_info(zbx_tq_signal_type_t signal_type,
+		zbx_tq_metric_point_type_t metric_point_type, const char *column)
 {
-	if (NULL == column_name)
+	if (NULL == column)
 		return NULL;
 
-	switch (category)
+	switch (signal_type)
 	{
-		case ZBX_TQ_CATEGORY_APM_TRACES:
-			return get_column_info_from_arr(column_info_apm_traces, column_name);
+		case ZBX_TQ_SIGNAL_TYPE_APM_TRACES:
+			return get_column_info_from_arr(column_info_apm_traces, column);
 
-		case ZBX_TQ_CATEGORY_APM_METRICS:
-			switch (metric_type)
+		case ZBX_TQ_SIGNAL_TYPE_APM_METRICS:
+			switch (metric_point_type)
 			{
-				case ZBX_TQ_METRIC_TYPE_SUM:
-					return get_column_info_from_arr(column_info_apm_metrics_sum, column_name);
-				case ZBX_TQ_METRIC_TYPE_GAUGE:
-					return get_column_info_from_arr(column_info_apm_metrics_gauge, column_name);
-				case ZBX_TQ_METRIC_TYPE_HISTOGRAM:
-					return get_column_info_from_arr(column_info_apm_metrics_histogram, column_name);
-				case ZBX_TQ_METRIC_TYPE_EXPONENTIAL_HISTOGRAM:
+				case ZBX_TQ_METRIC_POINT_TYPE_SUM:
+					return get_column_info_from_arr(column_info_apm_metrics_sum, column);
+				case ZBX_TQ_METRIC_POINT_TYPE_GAUGE:
+					return get_column_info_from_arr(column_info_apm_metrics_gauge, column);
+				case ZBX_TQ_METRIC_POINT_TYPE_HISTOGRAM:
+					return get_column_info_from_arr(column_info_apm_metrics_histogram, column);
+				case ZBX_TQ_METRIC_POINT_TYPE_EXPONENTIAL_HISTOGRAM:
 					return get_column_info_from_arr(column_info_apm_metrics_exponentialhistogram,
-							column_name);
+							column);
 				default:
 					return NULL;
 			}
 
-		case ZBX_TQ_CATEGORY_APM_LOGS:
-			return get_column_info_from_arr(column_info_apm_logs, column_name);
+		case ZBX_TQ_SIGNAL_TYPE_APM_LOGS:
+			return get_column_info_from_arr(column_info_apm_logs, column);
 
 		default:
 			return NULL;
 	}
 }
 
-zbx_tq_column_type_t	tq_get_column_type(zbx_tq_category_t category, zbx_tq_metric_type_t metric_type,
-		const char *column_name)
+zbx_tq_column_type_t	tq_get_column_type(zbx_tq_signal_type_t signal_type,
+		zbx_tq_metric_point_type_t metric_point_type, const char *column)
 {
-	const tq_column_info_t	*info = tq_get_column_info(category, metric_type, column_name);
+	const tq_column_info_t	*info = tq_get_column_info(signal_type, metric_point_type, column);
 
 	return NULL == info ? ZBX_TQ_COLUMN_TYPE_UNKNOWN : info->type;
 }

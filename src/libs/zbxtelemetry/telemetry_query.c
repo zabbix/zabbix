@@ -26,60 +26,60 @@ ZBX_PTR_VECTOR_IMPL(tq_condition_ptr, zbx_tq_condition_t *)
 
 void	tq_query_init(zbx_tq_query_t *query)
 {
-	query->category		= ZBX_TQ_CATEGORY_UNKNOWN;
-	query->metric_type	= ZBX_TQ_METRIC_TYPE_UNKNOWN;
+	query->signal_type		= ZBX_TQ_SIGNAL_TYPE_UNKNOWN;
+	query->metric_point_type	= ZBX_TQ_METRIC_POINT_TYPE_UNKNOWN;
 	zbx_vector_tq_column_create(&query->columns);
 	zbx_vector_tq_aggr_column_create(&query->aggregated_columns);
-	query->evaltype		= ZBX_TQ_EVAL_TYPE_UNKNOWN;
-	query->formula		= NULL;
-	query->formula_parsed	= NULL;
+	query->evaltype			= ZBX_TQ_EVAL_TYPE_UNKNOWN;
+	query->formula			= NULL;
+	query->formula_parsed		= NULL;
 	zbx_vector_tq_condition_create(&query->conditions);
 }
 
 void	tq_column_init(zbx_tq_column_t *column)
 {
-	column->name		= NULL;
+	column->column		= NULL;
 	column->col_type	= ZBX_TQ_COLUMN_TYPE_UNKNOWN;
-	column->key		= NULL;
+	column->attribute_key	= NULL;
 }
 
 void	tq_column_clean(zbx_tq_column_t *column)
 {
-	zbx_free(column->name);
-	zbx_free(column->key);
+	zbx_free(column->column);
+	zbx_free(column->attribute_key);
 }
 
 void	tq_aggr_column_init(zbx_tq_aggr_column_t *aggr_column)
 {
-	aggr_column->column_name	= NULL;
+	aggr_column->column		= NULL;
 	aggr_column->col_type		= ZBX_TQ_COLUMN_TYPE_UNKNOWN;
 	aggr_column->function		= ZBX_TQ_FUNCTION_UNKNOWN;
-	zbx_vector_str_create(&aggr_column->args);
+	zbx_vector_str_create(&aggr_column->parameters);
 	aggr_column->alias		= NULL;
 }
 
 void	tq_aggr_column_clean(zbx_tq_aggr_column_t *aggr_column)
 {
-	zbx_free(aggr_column->column_name);
+	zbx_free(aggr_column->column);
 	zbx_free(aggr_column->alias);
 
-	zbx_vector_str_clear_ext(&aggr_column->args, zbx_str_free);
-	zbx_vector_str_destroy(&aggr_column->args);
+	zbx_vector_str_clear_ext(&aggr_column->parameters, zbx_str_free);
+	zbx_vector_str_destroy(&aggr_column->parameters);
 }
 
 void	tq_condition_init(zbx_tq_condition_t *condition)
 {
-	condition->column_name	= NULL;
-	condition->col_type	= ZBX_TQ_COLUMN_TYPE_UNKNOWN;
-	condition->key		= NULL;
-	condition->value	= NULL;
-	condition->operator	= ZBX_TQ_OPERATOR_UNKNOWN;
+	condition->column		= NULL;
+	condition->col_type		= ZBX_TQ_COLUMN_TYPE_UNKNOWN;
+	condition->attribute_key	= NULL;
+	condition->value		= NULL;
+	condition->operator		= ZBX_TQ_OPERATOR_UNKNOWN;
 }
 
 void	tq_condition_clean(zbx_tq_condition_t *condition)
 {
-	zbx_free(condition->column_name);
-	zbx_free(condition->key);
+	zbx_free(condition->column);
+	zbx_free(condition->attribute_key);
 	zbx_free(condition->value);
 }
 
@@ -163,9 +163,9 @@ void	zbx_tq_get_newlasttimestamp(int lookback_limit, int granularity, time_t now
 char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col)
 {
 	if (SUCCEED == tq_column_type_is_attributes(col->col_type))
-		return zbx_dsprintf(NULL, "%s.%s", col->name, col->key);
+		return zbx_dsprintf(NULL, "%s.%s", col->column, col->attribute_key);
 	else
-		return zbx_strdup(NULL, col->name);
+		return zbx_strdup(NULL, col->column);
 }
 
 int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void *b)
@@ -174,7 +174,7 @@ int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void *b)
 	const zbx_tq_condition_t	*cond_b = *(const zbx_tq_condition_t * const *)b;
 	int				is_attr_a, is_attr_b;
 
-	int	column_name_cmp_res = strcmp(cond_a->column_name, cond_b->column_name);
+	int	column_name_cmp_res = strcmp(cond_a->column, cond_b->column);
 
 	if (0 != column_name_cmp_res)
 		return column_name_cmp_res;
@@ -190,7 +190,7 @@ int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void *b)
 		return column_name_cmp_res;
 	}
 
-	return strcmp(cond_a->key, cond_b->key);
+	return strcmp(cond_a->attribute_key, cond_b->attribute_key);
 }
 
 void	tq_get_conditions_and_or_sorted(const zbx_tq_query_t *query, zbx_vector_tq_condition_ptr_t *conditions_sorted)

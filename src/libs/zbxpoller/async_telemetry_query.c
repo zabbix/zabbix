@@ -133,7 +133,7 @@ static int	async_check_telemetry_query_http(zbx_dc_telemetry_query_item_t *item,
 	if (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type)
 		zbx_tq_clickhouse_get_query_url(apm_db_config->url, apm_db_config->db, &url);
 	else
-		zbx_tq_elastic_get_search_url(apm_db_config->url, query->category, query->metric_type, &url);
+		zbx_tq_elastic_get_search_url(apm_db_config->url, query->signal_type, query->metric_point_type, &url);
 
 	post_type = (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type ? ZBX_POSTTYPE_RAW : ZBX_POSTTYPE_JSON);
 	output_format = (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type ? HTTP_STORE_RAW : HTTP_STORE_JSON);

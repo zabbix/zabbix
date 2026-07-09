@@ -54,10 +54,10 @@ void	tq_aggr_column_clean(zbx_tq_aggr_column_t *aggr_column);
 void	tq_condition_init(zbx_tq_condition_t *condition);
 void	tq_condition_clean(zbx_tq_condition_t *condition);
 
-const tq_column_info_t	*tq_get_column_info(zbx_tq_category_t category, zbx_tq_metric_type_t metric_type,
-		const char *column_name);
-zbx_tq_column_type_t	tq_get_column_type(zbx_tq_category_t category, zbx_tq_metric_type_t metric_type,
-		const char *column_name);
+const tq_column_info_t	*tq_get_column_info(zbx_tq_signal_type_t signal_type,
+		zbx_tq_metric_point_type_t metric_point_type, const char *column);
+zbx_tq_column_type_t	tq_get_column_type(zbx_tq_signal_type_t signal_type,
+		zbx_tq_metric_point_type_t metric_point_type, const char *column);
 
 int	tq_column_type_is_array(zbx_tq_column_type_t type);
 int	tq_column_type_is_attributes(zbx_tq_column_type_t type);

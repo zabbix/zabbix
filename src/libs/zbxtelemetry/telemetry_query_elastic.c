@@ -58,15 +58,15 @@ static char	*tq_es_escape_wildcard_pattern_dyn(const char *src)
 	return dst;
 }
 
-static void	tq_es_add_condition(const zbx_tq_condition_t *cond, zbx_tq_category_t category,
-		zbx_tq_metric_type_t metric_type, struct zbx_json *j, char *buf, size_t buf_size)
+static void	tq_es_add_condition(const zbx_tq_condition_t *cond, zbx_tq_signal_type_t signal_type,
+		zbx_tq_metric_point_type_t metric_point_type, struct zbx_json *j, char *buf, size_t buf_size)
 {
-	const tq_column_info_t	*col_info = tq_get_column_info(category, metric_type, cond->column_name);
-	const char		*field = NULL == col_info->es_nested_path ? cond->column_name :
+	const tq_column_info_t	*col_info = tq_get_column_info(signal_type, metric_point_type, cond->column);
+	const char		*field = NULL == col_info->es_nested_path ? cond->column :
 			col_info->es_nested_subfield;
 
 	if (SUCCEED == tq_column_type_is_attributes(cond->col_type))
-		zbx_snprintf(buf, buf_size, "%s.%s", field, cond->key);
+		zbx_snprintf(buf, buf_size, "%s.%s", field, cond->attribute_key);
 	else
 		zbx_strlcpy(buf, field, buf_size);
 
@@ -155,7 +155,7 @@ static void	tq_es_add_conditions_simple(const zbx_tq_query_t *query, struct zbx_
 
 	for (int i = 0; i < query->conditions.values_num; i++)
 	{
-		tq_es_add_condition(&query->conditions.values[i], query->category, query->metric_type, j, buf,
+		tq_es_add_condition(&query->conditions.values[i], query->signal_type, query->metric_point_type, j, buf,
 				buf_size);
 	}
 
@@ -183,7 +183,7 @@ static void	tq_es_add_conditions_and_or(const zbx_tq_query_t *query, struct zbx_
 	{
 		const zbx_tq_condition_t	*cond = conditions_sorted.values[i];
 
-		tq_es_add_condition(cond, query->category, query->metric_type, j, buf, buf_size);
+		tq_es_add_condition(cond, query->signal_type, query->metric_point_type, j, buf, buf_size);
 
 		if (conditions_sorted.values_num - 1 == i)
 		{
@@ -191,7 +191,7 @@ static void	tq_es_add_conditions_and_or(const zbx_tq_query_t *query, struct zbx_
 			zbx_json_close(j); /* bool */
 			zbx_json_close(j);
 		}
-		else if (0 != strcmp(cond->column_name, conditions_sorted.values[i + 1]->column_name))
+		else if (0 != strcmp(cond->column, conditions_sorted.values[i + 1]->column))
 		{
 			zbx_json_close(j); /* should */
 			zbx_json_close(j); /* bool */
@@ -245,8 +245,8 @@ static void	tq_es_add_condition_node(const zbx_tq_query_t *query, const zbx_tq_f
 	}
 	else /* TQ_FORMULA_NODE_TYPE_LEAF */
 	{
-		tq_es_add_condition(&query->conditions.values[node->condition_idx], query->category, query->metric_type,
-				j, buf, buf_size);
+		tq_es_add_condition(&query->conditions.values[node->condition_idx], query->signal_type,
+				query->metric_point_type, j, buf, buf_size);
 	}
 }
 
@@ -320,9 +320,9 @@ static void	tq_es_add_columns(const zbx_vector_tq_column_t *cols, struct zbx_jso
 		zbx_json_addobject(j, "terms");
 
 		if (SUCCEED == tq_column_type_is_attributes(cols->values[i].col_type))
-			zbx_snprintf(buf, buf_size, "%s.%s", cols->values[i].name, cols->values[i].key);
+			zbx_snprintf(buf, buf_size, "%s.%s", cols->values[i].column, cols->values[i].attribute_key);
 		else
-			zbx_strlcpy(buf, cols->values[i].name, buf_size);
+			zbx_strlcpy(buf, cols->values[i].column, buf_size);
 
 		zbx_json_addstring(j, "field", buf, ZBX_JSON_TYPE_STRING);
 
@@ -369,11 +369,11 @@ static void	tq_es_add_aggr_columns(const zbx_vector_tq_aggr_column_t *aggr_cols,
 		zbx_json_addobject(j, buf);
 		zbx_json_addobject(j, tq_es_get_func_name(col->function));
 
-		zbx_json_addstring(j, "field", col->column_name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(j, "field", col->column, ZBX_JSON_TYPE_STRING);
 
 		if (ZBX_TQ_FUNCTION_PERCENTILE == col->function)
 		{
-			double percentage = strtod(col->args.values[0], NULL);
+			double percentage = strtod(col->parameters.values[0], NULL);
 
 			zbx_json_addstring(j, "keyed", "false", ZBX_JSON_TYPE_FALSE);
 
@@ -461,25 +461,26 @@ void	zbx_tq_generate_elastic(const zbx_tq_query_t *query, int time_shift, int lo
 	zbx_json_free(&j);
 }
 
-const char	*zbx_tq_elastic_get_index_name(zbx_tq_category_t category, zbx_tq_metric_type_t metric_type)
+const char	*zbx_tq_elastic_get_index_name(zbx_tq_signal_type_t signal_type,
+		zbx_tq_metric_point_type_t metric_point_type)
 {
 	/* TODO: replace with actual index names (or probably macros) */
 
-	switch (category)
+	switch (signal_type)
 	{
-		case ZBX_TQ_CATEGORY_APM_TRACES:
+		case ZBX_TQ_SIGNAL_TYPE_APM_TRACES:
 			return "apm_traces";
 
-		case ZBX_TQ_CATEGORY_APM_METRICS:
-			switch (metric_type)
+		case ZBX_TQ_SIGNAL_TYPE_APM_METRICS:
+			switch (metric_point_type)
 			{
-				case ZBX_TQ_METRIC_TYPE_SUM:
+				case ZBX_TQ_METRIC_POINT_TYPE_SUM:
 					return "apm_metrics_sum";
-				case ZBX_TQ_METRIC_TYPE_GAUGE:
+				case ZBX_TQ_METRIC_POINT_TYPE_GAUGE:
 					return "apm_metrics_gauge";
-				case ZBX_TQ_METRIC_TYPE_HISTOGRAM:
+				case ZBX_TQ_METRIC_POINT_TYPE_HISTOGRAM:
 					return "apm_metrics_histogram";
-				case ZBX_TQ_METRIC_TYPE_EXPONENTIAL_HISTOGRAM:
+				case ZBX_TQ_METRIC_POINT_TYPE_EXPONENTIAL_HISTOGRAM:
 					return "apm_metrics_exponentialhistogram";
 
 				default:
@@ -488,7 +489,7 @@ const char	*zbx_tq_elastic_get_index_name(zbx_tq_category_t category, zbx_tq_met
 			}
 			break;
 
-		case ZBX_TQ_CATEGORY_APM_LOGS:
+		case ZBX_TQ_SIGNAL_TYPE_APM_LOGS:
 			return "apm_logs";
 
 		default:
@@ -497,14 +498,14 @@ const char	*zbx_tq_elastic_get_index_name(zbx_tq_category_t category, zbx_tq_met
 	}
 }
 
-void	zbx_tq_elastic_get_search_url(const char *base_url, zbx_tq_category_t category,
-		zbx_tq_metric_type_t metric_type, char **url)
+void	zbx_tq_elastic_get_search_url(const char *base_url, zbx_tq_signal_type_t signal_type,
+		zbx_tq_metric_point_type_t metric_point_type, char **url)
 {
 	*url = zbx_strdup(NULL, base_url);
 
 	zbx_rtrim(*url, "/");
 
-	*url = zbx_dsprintf(*url, "%s/%s/_search", *url, zbx_tq_elastic_get_index_name(category, metric_type));
+	*url = zbx_dsprintf(*url, "%s/%s/_search", *url, zbx_tq_elastic_get_index_name(signal_type, metric_point_type));
 }
 
 static char	*tq_elastic_parse_bucket(const zbx_tq_query_t *query, struct zbx_json_parse *jp, int bucket_id)

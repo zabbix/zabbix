@@ -90,36 +90,36 @@ static int	__set_func_name(int __x, void *__out)		\
 	return (int)(*(__type *)__out = __match_func(__x));	\
 }
 
-static zbx_tq_category_t	tq_match_category(int x)
+static zbx_tq_signal_type_t	tq_match_signal_type(int x)
 {
 	switch (x)
 	{
-		case ZBX_TQ_CATEGORY_APM_TRACES:
-		case ZBX_TQ_CATEGORY_APM_METRICS:
-		case ZBX_TQ_CATEGORY_APM_LOGS:
+		case ZBX_TQ_SIGNAL_TYPE_APM_TRACES:
+		case ZBX_TQ_SIGNAL_TYPE_APM_METRICS:
+		case ZBX_TQ_SIGNAL_TYPE_APM_LOGS:
 			return x;
 		default:
-			return ZBX_TQ_CATEGORY_UNKNOWN;
+			return ZBX_TQ_SIGNAL_TYPE_UNKNOWN;
 	}
 }
 
-TQ_INT_ENUM_SET_FUNC_DEF(tq_set_category, tq_match_category, zbx_tq_category_t)
+TQ_INT_ENUM_SET_FUNC_DEF(tq_set_signal_type, tq_match_signal_type, zbx_tq_signal_type_t)
 
-static zbx_tq_metric_type_t	tq_match_metric_type(int x)
+static zbx_tq_metric_point_type_t	tq_match_metric_point_type(int x)
 {
 	switch (x)
 	{
-		case ZBX_TQ_METRIC_TYPE_SUM:
-		case ZBX_TQ_METRIC_TYPE_GAUGE:
-		case ZBX_TQ_METRIC_TYPE_HISTOGRAM:
-		case ZBX_TQ_METRIC_TYPE_EXPONENTIAL_HISTOGRAM:
+		case ZBX_TQ_METRIC_POINT_TYPE_SUM:
+		case ZBX_TQ_METRIC_POINT_TYPE_GAUGE:
+		case ZBX_TQ_METRIC_POINT_TYPE_HISTOGRAM:
+		case ZBX_TQ_METRIC_POINT_TYPE_EXPONENTIAL_HISTOGRAM:
 			return x;
 		default:
-			return ZBX_TQ_METRIC_TYPE_UNKNOWN;
+			return ZBX_TQ_METRIC_POINT_TYPE_UNKNOWN;
 	}
 }
 
-TQ_INT_ENUM_SET_FUNC_DEF(tq_set_metric_type, tq_match_metric_type, zbx_tq_metric_type_t)
+TQ_INT_ENUM_SET_FUNC_DEF(tq_set_metric_point_type, tq_match_metric_point_type, zbx_tq_metric_point_type_t)
 
 static zbx_tq_function_type_t	tq_match_function_type(int x)
 {
@@ -186,12 +186,13 @@ static int	tq_parse_col(struct zbx_json_parse *jp, zbx_tq_column_t *col, char *b
 	{
 		if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_COLUMN))
 		{
-			if (FAIL == tq_read_string(p, &col->name, ZBX_TQ_QUERY_TAG_COLUMN, error, max_error_len))
+			if (FAIL == tq_read_string(p, &col->column, ZBX_TQ_QUERY_TAG_COLUMN, error, max_error_len))
 				goto out;
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY))
 		{
-			if (FAIL == tq_read_string(p, &col->key, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, error, max_error_len))
+			if (FAIL == tq_read_string(p, &col->attribute_key, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, error,
+					max_error_len))
 				goto out;
 		}
 		else
@@ -240,9 +241,10 @@ out:
 	return ret;
 }
 
-static int	tq_parse_function_args(struct zbx_json_parse *jp, zbx_vector_str_t *args, char *buf, size_t buf_size)
+static int	tq_parse_function_parameters(struct zbx_json_parse *jp, zbx_vector_str_t *parameters, char *buf,
+		size_t buf_size)
 {
-	/* in case of an error the args vector is cleaned by the calling function */
+	/* in case of an error the parameters vector is cleaned by the calling function */
 	int		ret = FAIL;
 	const char	*p = NULL;
 	zbx_json_type_t	type;
@@ -254,7 +256,7 @@ static int	tq_parse_function_args(struct zbx_json_parse *jp, zbx_vector_str_t *a
 		if (NULL == zbx_json_decodevalue(p, buf, buf_size, &type) || ZBX_JSON_TYPE_STRING != type)
 			goto out;
 
-		zbx_vector_str_append(args, zbx_strdup(NULL, buf));
+		zbx_vector_str_append(parameters, zbx_strdup(NULL, buf));
 	}
 
 	ret = SUCCEED;
@@ -278,7 +280,7 @@ static int	tq_parse_aggr_col(struct zbx_json_parse *jp, zbx_tq_aggr_column_t *ag
 	{
 		if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_COLUMN))
 		{
-			if (FAIL == tq_read_string(p, &aggr_col->column_name, ZBX_TQ_QUERY_TAG_COLUMN, error,
+			if (FAIL == tq_read_string(p, &aggr_col->column, ZBX_TQ_QUERY_TAG_COLUMN, error,
 					max_error_len))
 				goto out;
 		}
@@ -291,16 +293,16 @@ static int	tq_parse_aggr_col(struct zbx_json_parse *jp, zbx_tq_aggr_column_t *ag
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_PARAMETERS))
 		{
-			if (0 != aggr_col->args.values_num)
+			if (0 != aggr_col->parameters.values_num)
 			{
 				zbx_snprintf(error, max_error_len, "Duplicate \"%s\" tag", ZBX_TQ_QUERY_TAG_PARAMETERS);
 				goto out;
 			}
 
-			struct zbx_json_parse	jp_args;
-			if (FAIL == zbx_json_brackets_open(p, &jp_args))
+			struct zbx_json_parse	jp_params;
+			if (FAIL == zbx_json_brackets_open(p, &jp_params))
 				goto out;
-			if (FAIL == tq_parse_function_args(&jp_args, &aggr_col->args, buf, buf_size))
+			if (FAIL == tq_parse_function_parameters(&jp_params, &aggr_col->parameters, buf, buf_size))
 				goto out;
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_ALIAS))
@@ -368,13 +370,14 @@ static int	tq_parse_cond(struct zbx_json_parse *jp, zbx_tq_condition_t *cond, ch
 	{
 		if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_COLUMN))
 		{
-			if (FAIL == tq_read_string(p, &cond->column_name, ZBX_TQ_QUERY_TAG_COLUMN, error,
+			if (FAIL == tq_read_string(p, &cond->column, ZBX_TQ_QUERY_TAG_COLUMN, error,
 					max_error_len))
 				goto out;
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY))
 		{
-			if (FAIL == tq_read_string(p, &cond->key, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, error, max_error_len))
+			if (FAIL == tq_read_string(p, &cond->attribute_key, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, error,
+					max_error_len))
 				goto out;
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_VALUE))
@@ -500,16 +503,17 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query, char
 	{
 		if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_SIGNAL_TYPE))
 		{
-			if (FAIL == tq_read_int_enum(p, buf, buf_size, tq_set_category, &query->category,
-					query->category, ZBX_TQ_CATEGORY_UNKNOWN, ZBX_TQ_QUERY_TAG_SIGNAL_TYPE, error,
-					max_error_len))
+			if (FAIL == tq_read_int_enum(p, buf, buf_size, tq_set_signal_type, &query->signal_type,
+					query->signal_type, ZBX_TQ_SIGNAL_TYPE_UNKNOWN, ZBX_TQ_QUERY_TAG_SIGNAL_TYPE,
+					error, max_error_len))
 				goto out;
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE))
 		{
-			if (FAIL == tq_read_int_enum(p, buf, buf_size, tq_set_metric_type, &query->metric_type,
-					query->metric_type, ZBX_TQ_METRIC_TYPE_UNKNOWN,
-					ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE, error, max_error_len))
+			if (FAIL == tq_read_int_enum(p, buf, buf_size, tq_set_metric_point_type,
+					&query->metric_point_type, query->metric_point_type,
+					ZBX_TQ_METRIC_POINT_TYPE_UNKNOWN, ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE, error,
+					max_error_len))
 				goto out;
 		}
 		else if (0 == strcmp(buf, ZBX_TQ_QUERY_TAG_COLUMNS))
@@ -577,21 +581,22 @@ static void	tq_set_column_types(zbx_tq_query_t *query)
 	{
 		zbx_tq_column_t	*col = &query->columns.values[i];
 
-		col->col_type = tq_get_column_type(query->category, query->metric_type, col->name);
+		col->col_type = tq_get_column_type(query->signal_type, query->metric_point_type, col->column);
 	}
 
 	for (int i = 0; i < query->aggregated_columns.values_num; i++)
 	{
 		zbx_tq_aggr_column_t *aggr_col = &query->aggregated_columns.values[i];
 
-		aggr_col->col_type = tq_get_column_type(query->category, query->metric_type, aggr_col->column_name);
+		aggr_col->col_type = tq_get_column_type(query->signal_type, query->metric_point_type, aggr_col->column);
 	}
 
 	for (int i = 0; i < query->conditions.values_num; i++)
 	{
 		zbx_tq_condition_t	*condition = &query->conditions.values[i];
 
-		condition->col_type = tq_get_column_type(query->category, query->metric_type, condition->column_name);
+		condition->col_type = tq_get_column_type(query->signal_type, query->metric_point_type,
+				condition->column);
 	}
 }
 
@@ -620,17 +625,17 @@ static int	tq_validate_formula_node_indices(const zbx_tq_formula_node_t *node, i
 
 static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t max_error_len)
 {
-	if (ZBX_TQ_CATEGORY_UNKNOWN == query->category)
+	if (ZBX_TQ_SIGNAL_TYPE_UNKNOWN == query->signal_type)
 		return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set", ZBX_TQ_QUERY_TAG_SIGNAL_TYPE);
 
-	if (ZBX_TQ_METRIC_TYPE_UNKNOWN == query->metric_type)
+	if (ZBX_TQ_METRIC_POINT_TYPE_UNKNOWN == query->metric_point_type)
 		return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set", ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE);
 
 	for (int i = 0; i < query->columns.values_num; i++)
 	{
 		const zbx_tq_column_t	*col = &query->columns.values[i];
 
-		if (NULL == col->name)
+		if (NULL == col->column)
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for column #%d",
 					ZBX_TQ_QUERY_TAG_COLUMN, i);
 
@@ -638,11 +643,11 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is invalid for column #%d",
 					ZBX_TQ_QUERY_TAG_COLUMN, i);
 
-		if (NULL == col->key)
+		if (NULL == col->attribute_key)
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for attribute column #%d",
 					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
 
-		if (FAIL == tq_validate_str(col->key))
+		if (FAIL == tq_validate_str(col->attribute_key))
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not valid UTF-8 for column #%d",
 					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
 	}
@@ -654,7 +659,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 	{
 		const zbx_tq_aggr_column_t *aggr_col = &query->aggregated_columns.values[i];
 
-		if (NULL == aggr_col->column_name)
+		if (NULL == aggr_col->column)
 			return ret_errf(FAIL, error, max_error_len,
 					"\"%s\" is not set for aggregated column #%d", ZBX_TQ_QUERY_TAG_COLUMN, i);
 
@@ -686,9 +691,10 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 		{
 			double	x;
 
-			if (1 != aggr_col->args.values_num || NULL == aggr_col->args.values[0] ||
-					FAIL == zbx_is_double(aggr_col->args.values[0], &x) || x < 0.0 || x > 100.0)
-				return ret_errf(FAIL, error, max_error_len, "Invalid arguments for \"percentile\" "
+			if (1 != aggr_col->parameters.values_num || NULL == aggr_col->parameters.values[0] ||
+					FAIL == zbx_is_double(aggr_col->parameters.values[0], &x) ||
+					0.0 > x || x > 100.0)
+				return ret_errf(FAIL, error, max_error_len, "Invalid parameters for \"percentile\" "
 						"function in aggregated column #%d", i);
 		}
 	}
@@ -716,7 +722,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 		{
 			const zbx_tq_condition_t	*condition = &query->conditions.values[i];
 
-			if (NULL == condition->column_name)
+			if (NULL == condition->column)
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is not set for condition #%d", ZBX_TQ_QUERY_TAG_COLUMN, i);
 
@@ -728,12 +734,12 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 				return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for condition #%d",
 						ZBX_TQ_QUERY_TAG_OPERATOR, i);
 
-			if (NULL == condition->key)
+			if (NULL == condition->attribute_key)
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is not set for attribute condition #%d",
 						ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
 
-			if (FAIL == tq_validate_str(condition->key))
+			if (FAIL == tq_validate_str(condition->attribute_key))
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is not valid UTF-8 for condition #%d",
 						ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);

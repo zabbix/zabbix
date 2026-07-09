@@ -89,26 +89,26 @@ zbx_tq_column_type_t;
 
 typedef enum
 {
-	ZBX_TQ_CATEGORY_UNKNOWN		= -1,
-	ZBX_TQ_CATEGORY_APM_TRACES	= 0,
-	ZBX_TQ_CATEGORY_APM_METRICS	= 1,
-	ZBX_TQ_CATEGORY_APM_LOGS	= 2,
+	ZBX_TQ_SIGNAL_TYPE_UNKNOWN	= -1,
+	ZBX_TQ_SIGNAL_TYPE_APM_TRACES	= 0,
+	ZBX_TQ_SIGNAL_TYPE_APM_METRICS	= 1,
+	ZBX_TQ_SIGNAL_TYPE_APM_LOGS	= 2,
 }
-zbx_tq_category_t;
+zbx_tq_signal_type_t;
 
 typedef enum
 {
-	ZBX_TQ_METRIC_TYPE_UNKNOWN			= -1,
-	ZBX_TQ_METRIC_TYPE_SUM				= 0,
-	ZBX_TQ_METRIC_TYPE_GAUGE			= 1,
-	ZBX_TQ_METRIC_TYPE_HISTOGRAM			= 2,
-	ZBX_TQ_METRIC_TYPE_EXPONENTIAL_HISTOGRAM	= 3,
+	ZBX_TQ_METRIC_POINT_TYPE_UNKNOWN		= -1,
+	ZBX_TQ_METRIC_POINT_TYPE_SUM			= 0,
+	ZBX_TQ_METRIC_POINT_TYPE_GAUGE			= 1,
+	ZBX_TQ_METRIC_POINT_TYPE_HISTOGRAM		= 2,
+	ZBX_TQ_METRIC_POINT_TYPE_EXPONENTIAL_HISTOGRAM	= 3,
 }
-zbx_tq_metric_type_t;
+zbx_tq_metric_point_type_t;
 
 typedef enum
 {
-	ZBX_TQ_FUNCTION_UNKNOWN = -1,
+	ZBX_TQ_FUNCTION_UNKNOWN		= -1,
 	ZBX_TQ_FUNCTION_MIN		= 1,
 	ZBX_TQ_FUNCTION_MAX		= 2,
 	ZBX_TQ_FUNCTION_AVG		= 3,
@@ -141,9 +141,9 @@ zbx_tq_operator_t;
 
 typedef struct
 {
-	char			*name;
+	char			*column;
 	zbx_tq_column_type_t	col_type; /* stored here in order to not look it up every time */
-	char			*key;
+	char			*attribute_key;
 }
 zbx_tq_column_t;
 
@@ -151,10 +151,10 @@ ZBX_VECTOR_DECL(tq_column, zbx_tq_column_t)
 
 typedef struct
 {
-	char			*column_name;
+	char			*column;
 	zbx_tq_column_type_t	col_type; /* stored here in order to not look it up every time */
 	zbx_tq_function_type_t	function;
-	zbx_vector_str_t	args;
+	zbx_vector_str_t	parameters;
 	char			*alias;
 }
 zbx_tq_aggr_column_t;
@@ -163,9 +163,9 @@ ZBX_VECTOR_DECL(tq_aggr_column, zbx_tq_aggr_column_t)
 
 typedef struct
 {
-	char			*column_name;
+	char			*column;
 	zbx_tq_column_type_t	col_type; /* stored here in order to not look it up every time */
-	char			*key;
+	char			*attribute_key;
 	char			*value;
 	zbx_tq_operator_t	operator;
 }
@@ -177,8 +177,8 @@ typedef struct tq_formula_node zbx_tq_formula_node_t;
 
 typedef struct
 {
-	zbx_tq_category_t		category;
-	zbx_tq_metric_type_t		metric_type;
+	zbx_tq_signal_type_t		signal_type;
+	zbx_tq_metric_point_type_t	metric_point_type;
 	zbx_vector_tq_column_t		columns;
 	zbx_vector_tq_aggr_column_t	aggregated_columns;
 	zbx_tq_eval_type_t		evaltype;
@@ -217,8 +217,9 @@ int	zbx_tq_parse_sql_result(const zbx_tq_query_t *query, zbx_db_result_t result,
 
 void	zbx_tq_clickhouse_get_query_url(const char *base_url, const char *db, char **url);
 
-const char	*zbx_tq_elastic_get_index_name(zbx_tq_category_t category, zbx_tq_metric_type_t metric_type);
-void		zbx_tq_elastic_get_search_url(const char *base_url, zbx_tq_category_t category,
-		zbx_tq_metric_type_t metric_type, char **url);
+const char	*zbx_tq_elastic_get_index_name(zbx_tq_signal_type_t signal_type,
+		zbx_tq_metric_point_type_t metric_point_type);
+void		zbx_tq_elastic_get_search_url(const char *base_url, zbx_tq_signal_type_t signal_type,
+		zbx_tq_metric_point_type_t metric_point_type, char **url);
 
 #endif

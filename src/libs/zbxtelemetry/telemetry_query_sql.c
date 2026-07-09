@@ -269,9 +269,9 @@ static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, const
 	for (int i = 0; i < query->columns.values_num; i++)
 	{
 		const zbx_tq_column_t	*col = &query->columns.values[i];
-		char			*name_esc = tq_sql_dyn_escape_name(col->name, ctx);
+		char			*name_esc = tq_sql_dyn_escape_name(col->column, ctx);
 		char			*col_to_select = tq_sql_dyn_get_operand_raw(name_esc,
-				tq_sql_key_or_null(col->key, col->col_type), ctx);
+				tq_sql_key_or_null(col->attribute_key, col->col_type), ctx);
 
 		zbx_snprintf_alloc(&str, &alloc, &offset, "%s", col_to_select);
 
@@ -338,7 +338,7 @@ static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, 
 		char				*col_name_esc = NULL;
 
 		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function && ZBX_TQ_FUNCTION_PERCENTILE != aggr_col->function)
-			col_name_esc = tq_sql_dyn_escape_name(aggr_col->column_name, ctx);
+			col_name_esc = tq_sql_dyn_escape_name(aggr_col->column, ctx);
 
 		switch (aggr_col->function)
 		{
@@ -359,8 +359,8 @@ static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, 
 				break;
 			case ZBX_TQ_FUNCTION_PERCENTILE:
 			{
-				double	fraction = strtod(aggr_col->args.values[0], NULL) / 100.0;
-				char	*percentile_expr = tq_sql_dyn_get_percentile(aggr_col->column_name,
+				double	fraction = strtod(aggr_col->parameters.values[0], NULL) / 100.0;
+				char	*percentile_expr = tq_sql_dyn_get_percentile(aggr_col->column,
 						fraction, ctx);
 
 				zbx_snprintf_alloc(&str, &alloc, &offset, "%s", percentile_expr);
@@ -398,38 +398,38 @@ static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, co
 	char	*str = NULL;
 	char	*str_esc;
 
-	switch (query->category)
+	switch (query->signal_type)
 	{
-		case ZBX_TQ_CATEGORY_APM_TRACES:
+		case ZBX_TQ_SIGNAL_TYPE_APM_TRACES:
 			str = zbx_strdup(NULL, "apm_traces");
 			break;
 
-		case ZBX_TQ_CATEGORY_APM_METRICS:
-			switch (query->metric_type)
+		case ZBX_TQ_SIGNAL_TYPE_APM_METRICS:
+			switch (query->metric_point_type)
 			{
-				case ZBX_TQ_METRIC_TYPE_SUM:
+				case ZBX_TQ_METRIC_POINT_TYPE_SUM:
 					str = zbx_strdup(NULL, "apm_metrics_sum");
 					break;
-				case ZBX_TQ_METRIC_TYPE_GAUGE:
+				case ZBX_TQ_METRIC_POINT_TYPE_GAUGE:
 					str = zbx_strdup(NULL, "apm_metrics_gauge");
 					break;
-				case ZBX_TQ_METRIC_TYPE_HISTOGRAM:
+				case ZBX_TQ_METRIC_POINT_TYPE_HISTOGRAM:
 					str = zbx_strdup(NULL, "apm_metrics_histogram");
 					break;
-				case ZBX_TQ_METRIC_TYPE_EXPONENTIAL_HISTOGRAM:
+				case ZBX_TQ_METRIC_POINT_TYPE_EXPONENTIAL_HISTOGRAM:
 					str = zbx_strdup(NULL, "apm_metrics_exponentialhistogram");
 					break;
 
-				case ZBX_TQ_METRIC_TYPE_UNKNOWN:
+				case ZBX_TQ_METRIC_POINT_TYPE_UNKNOWN:
 					THIS_SHOULD_NEVER_HAPPEN;
 			}
 			break;
 
-		case ZBX_TQ_CATEGORY_APM_LOGS:
+		case ZBX_TQ_SIGNAL_TYPE_APM_LOGS:
 			str = zbx_strdup(NULL, "apm_logs");
 			break;
 
-		case ZBX_TQ_CATEGORY_UNKNOWN:
+		case ZBX_TQ_SIGNAL_TYPE_UNKNOWN:
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
 
@@ -561,14 +561,15 @@ static char	*tq_sql_dyn_get_atom_condition(const char *atom, const char *key, co
 static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, const tq_sql_ctx_t *ctx)
 {
 	char	*str;
-	char	*col_esc = tq_sql_dyn_escape_name(cond->column_name, ctx);
+	char	*col_esc = tq_sql_dyn_escape_name(cond->column, ctx);
 
 	if (ZBX_APM_DB_TYPE_POSTGRESQL == ctx->db_type)
 	{
 		const char	*array_elems_func = (ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == cond->col_type
 				? "jsonb_array_elements" : "jsonb_array_elements_text");
 		char	*elem_cond = tq_sql_dyn_get_atom_condition("e.elem",
-				tq_sql_key_or_null(cond->key, cond->col_type), cond->value, cond->operator, ctx);
+				tq_sql_key_or_null(cond->attribute_key, cond->col_type), cond->value, cond->operator,
+				ctx);
 
 		str = zbx_dsprintf(NULL, "(EXISTS(SELECT 1 FROM %s(%s) AS e(elem) WHERE %s))", array_elems_func,
 				col_esc, elem_cond);
@@ -578,7 +579,8 @@ static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, cons
 	else if (ZBX_APM_DB_TYPE_MYSQL == ctx->db_type)
 	{
 		char	*elem_cond = tq_sql_dyn_get_atom_condition("e.elem",
-				tq_sql_key_or_null(cond->key, cond->col_type), cond->value, cond->operator, ctx);
+				tq_sql_key_or_null(cond->attribute_key, cond->col_type), cond->value, cond->operator,
+				ctx);
 
 		str = zbx_dsprintf(NULL,
 				"(EXISTS(SELECT 1 FROM JSON_TABLE(%s, '$[*]' COLUMNS(elem %s PATH '$')) "
@@ -590,8 +592,8 @@ static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, cons
 	}
 	else /* clickhouse */
 	{
-		char	*elem_cond = tq_sql_dyn_get_atom_condition("x", tq_sql_key_or_null(cond->key, cond->col_type),
-				cond->value, cond->operator, ctx);
+		char	*elem_cond = tq_sql_dyn_get_atom_condition("x", tq_sql_key_or_null(cond->attribute_key,
+				cond->col_type), cond->value, cond->operator, ctx);
 
 		str = zbx_dsprintf(NULL, "arrayExists(x -> %s, %s)", elem_cond, col_esc);
 
@@ -609,9 +611,10 @@ static char	*tq_sql_dyn_get_condition(const zbx_tq_condition_t *cond, const tq_s
 		return tq_sql_dyn_get_array_condition(cond, ctx);
 	else
 	{
-		char	*name_esc = tq_sql_dyn_escape_name(cond->column_name, ctx);
-		char	*str = tq_sql_dyn_get_atom_condition(name_esc, tq_sql_key_or_null(cond->key, cond->col_type),
-				cond->value, cond->operator, ctx);
+		char	*name_esc = tq_sql_dyn_escape_name(cond->column, ctx);
+		char	*str = tq_sql_dyn_get_atom_condition(name_esc,
+				tq_sql_key_or_null(cond->attribute_key, cond->col_type), cond->value, cond->operator,
+				ctx);
 
 		zbx_free(name_esc);
 
@@ -777,12 +780,12 @@ static int	tq_sql_aggr_column_ptr_compare_by_column(const void *a, const void *b
 	const zbx_tq_aggr_column_t	*cond_a = *(const zbx_tq_aggr_column_t * const *)a;
 	const zbx_tq_aggr_column_t	*cond_b = *(const zbx_tq_aggr_column_t * const *)b;
 
-	return strcmp(cond_a->column_name, cond_b->column_name);
+	return strcmp(cond_a->column, cond_b->column);
 }
 
 static const char	*tq_sql_get_timestamp_column_raw(const zbx_tq_query_t *query)
 {
-	return (ZBX_TQ_CATEGORY_APM_METRICS == query->category ? "TimeUnix" : "Timestamp");
+	return (ZBX_TQ_SIGNAL_TYPE_APM_METRICS == query->signal_type ? "TimeUnix" : "Timestamp");
 }
 
 static char	*tq_sql_dyn_get_cume_dists_mysql(const zbx_tq_query_t *query, const char *rounded_time_expr,
@@ -810,11 +813,11 @@ static char	*tq_sql_dyn_get_cume_dists_mysql(const zbx_tq_query_t *query, const 
 
 	for (int i = 0; i < percentile_cols_sorted.values_num; i++)
 	{
-		const char	*name = percentile_cols_sorted.values[i]->column_name;
+		const char	*name = percentile_cols_sorted.values[i]->column;
 		char		*cd_alias;
 		char		*name_esc;
 
-		if (0 != i && 0 == strcmp(percentile_cols_sorted.values[i-1]->column_name, name))
+		if (0 != i && 0 == strcmp(percentile_cols_sorted.values[i-1]->column, name))
 			continue;
 
 		cd_alias = tq_sql_dyn_get_cume_dist_alias_mysql(name, ctx);
@@ -859,14 +862,14 @@ static char	*tq_sql_dyn_get_used_columns_mysql(const zbx_tq_query_t *query, cons
 	zbx_vector_str_append(&col_names_sorted, (char *)tq_sql_get_timestamp_column_raw(query));
 
 	for (int i = 0; i < query->columns.values_num; i++)
-		zbx_vector_str_append(&col_names_sorted, query->columns.values[i].name);
+		zbx_vector_str_append(&col_names_sorted, query->columns.values[i].column);
 
 	for (int i = 0; i < query->aggregated_columns.values_num; i++)
 	{
 		if (ZBX_TQ_FUNCTION_COUNT == query->aggregated_columns.values[i].function)
 			continue;
 
-		zbx_vector_str_append(&col_names_sorted, query->aggregated_columns.values[i].column_name);
+		zbx_vector_str_append(&col_names_sorted, query->aggregated_columns.values[i].column);
 	}
 
 	zbx_vector_str_sort(&col_names_sorted, ZBX_DEFAULT_STR_COMPARE_FUNC);
