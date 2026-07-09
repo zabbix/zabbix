@@ -405,4 +405,32 @@ class testHashicorpVault extends CIntegrationTest {
 			'VaultAppSecretID' => '00000000-0000-0000-0000-000000000000'
 		], 'cannot initialize vault: cannot login with AppRole method');
 	}
+
+	// The three tests below don't need a running CyberArk vault: "Vault=CyberArk" together with any
+	// of "VaultToken"/"VaultAppRoleID"/"VaultAppSecretID" is rejected by configuration validation
+	// alone, before any connection is attempted (AppRole authentication is HashiCorp-specific and is
+	// not a supported CyberArk credential source).
+
+	public function testHashicorpVault_cyberArkWithToken() {
+		$this->startServerAndExpectVaultError([
+			'Vault' => 'CyberArk',
+			'VaultToken' => self::$static_token
+		], '"Vault" value "CyberArk" cannot be used when "VaultToken" configuration parameter or '.
+				'"VAULT_TOKEN" environment variable is defined'
+		);
+	}
+
+	public function testHashicorpVault_cyberArkWithAppRoleId() {
+		$this->startServerAndExpectVaultError([
+			'Vault' => 'CyberArk',
+			'VaultAppRoleID' => self::$role_id
+		], 'configuration parameter "VaultAppRoleID" cannot be used with CyberArk vault');
+	}
+
+	public function testHashicorpVault_cyberArkWithAppSecretId() {
+		$this->startServerAndExpectVaultError([
+			'Vault' => 'CyberArk',
+			'VaultAppSecretID' => self::$secret_id
+		], 'configuration parameter "VaultAppSecretID" cannot be used with CyberArk vault');
+	}
 }
