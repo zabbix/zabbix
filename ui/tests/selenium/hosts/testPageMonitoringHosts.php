@@ -63,7 +63,7 @@ class testPageMonitoringHosts extends CWebTest {
 		// Check filter collapse/expand.
 		foreach ([true, false] as $status) {
 			$this->assertTrue($this->query('id:monitoring_hosts_filter')->asFilterElement()->one()->isExpanded($status));
-			$this->query('xpath://a[@aria-label="Home"]')->one()->click();
+			$this->query('xpath://a[@aria-label="Default filter tab"]')->one()->click();
 		}
 
 		// Check fields maximum length.
