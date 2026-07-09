@@ -158,10 +158,6 @@
 					checkbox.readOnly = false;
 				}
 			}
-
-			document.getElementById('<?= CRoleHelper::API_ACCESS ?>').checked
-				= user_type > <?= USER_TYPE_ZABBIX_USER ?>;
-
 			const access_max = <?= json_encode([
 					CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW => USER_TYPE_ZABBIX_ADMIN
 			], JSON_FORCE_OBJECT) ?>;
@@ -236,7 +232,7 @@
 			}
 
 			document.querySelectorAll('.js-userrole-apimode input').forEach((element) => {
-				element.readOnly = !is_apiaccess_checked;
+				element.disabled = !is_apiaccess_checked;
 			});
 
 			$('#api_methods_').multiSelect(is_apiaccess_checked ? 'enable' : 'disable');
