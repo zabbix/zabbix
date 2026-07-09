@@ -37,6 +37,12 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  *   - the AppRole auth method, with a role bound to that policy;
  *   - a plain token bound to that policy (for the "VaultToken" authentication scenario).
  *
+ * The Vault instance itself is shared between parallel test runs (e.g. concurrent Jenkins
+ * executors), unlike the Zabbix components and database, which get a fresh instance per run. The
+ * role/policy/secret names are therefore namespaced with PHPUNIT_PORT_PREFIX - the same value
+ * already used elsewhere in CIntegrationTest to keep parallel runs from colliding on ports - so
+ * that concurrent runs never read, write or revoke each other's Vault objects.
+ *
  * @onAfter clearData
  */
 class testHashicorpVault extends CIntegrationTest {
@@ -44,9 +50,9 @@ class testHashicorpVault extends CIntegrationTest {
 	const VAULT_PORT = 8200;
 	const VAULT_ADDR = 'http://127.0.0.1:'.self::VAULT_PORT;
 	const VAULT_ROOT_TOKEN = 'root';
-	const VAULT_ROLE_NAME = 'zbx-it-role';
-	const VAULT_POLICY_NAME = 'zbx-it-policy';
-	const VAULT_SECRET_PATH = 'zabbix/db';
+	const VAULT_ROLE_NAME = 'zbx-it-role-'.PHPUNIT_PORT_PREFIX;
+	const VAULT_POLICY_NAME = 'zbx-it-policy-'.PHPUNIT_PORT_PREFIX;
+	const VAULT_SECRET_PATH = 'zabbix/'.PHPUNIT_PORT_PREFIX.'/db';
 	const VAULT_DB_PATH = 'secret/'.self::VAULT_SECRET_PATH;
 
 	const HOSTNAME = 'test_hashicorp_vault';
@@ -65,12 +71,12 @@ class testHashicorpVault extends CIntegrationTest {
 	 * @throws Exception    if Vault is not reachable within the allotted time
 	 */
 	private static function vaultWaitUntilReady(): void {
-		for ($i = 0; $i < 50; $i++) {
+		for ($i = 0; $i < self::WAIT_ITERATIONS_STARTUP; $i++) {
 			if (@file_get_contents(self::VAULT_ADDR.'/v1/sys/health') !== false) {
 				return;
 			}
 
-			usleep(200000);
+			sleep(self::WAIT_ITERATION_DELAY);
 		}
 
 		throw new Exception('HashiCorp Vault instance at "'.self::VAULT_ADDR.'" is not reachable. It must be '.
@@ -90,8 +96,7 @@ class testHashicorpVault extends CIntegrationTest {
 	 *
 	 * @throws Exception    on failure to communicate with Vault
 	 */
-	private static function vaultRequest(string $method, string $path, ?array $data = null,
-			?string $token = null): array {
+	private static function vaultRequest($method, $path, $data = null, $token = null) {
 		$context = stream_context_create([
 			'http' => [
 				'method' => $method,
@@ -126,7 +131,7 @@ class testHashicorpVault extends CIntegrationTest {
 	 *
 	 * @return array
 	 */
-	private static function vaultRoleAccessors(string $role_name): array {
+	private static function vaultRoleAccessors($role_name) {
 		$accessors = self::vaultRequest('GET', '/v1/auth/token/accessors?list=true', null, self::VAULT_ROOT_TOKEN);
 		$matching = [];
 
@@ -149,7 +154,7 @@ class testHashicorpVault extends CIntegrationTest {
 	 *
 	 * @param array $accessors
 	 */
-	private static function vaultRevokeAccessors(array $accessors): void {
+	private static function vaultRevokeAccessors($accessors) {
 		foreach ($accessors as $accessor) {
 			self::vaultRequest('POST', '/v1/auth/token/revoke-accessor', ['accessor' => $accessor],
 					self::VAULT_ROOT_TOKEN
@@ -161,10 +166,16 @@ class testHashicorpVault extends CIntegrationTest {
 	 * Start the server component with a deliberately broken Vault configuration and wait for the
 	 * expected error to be logged, instead of waiting for a successful startup.
 	 *
+	 * These tests are not annotated with "@required-components", so the usual after-test cleanup
+	 * never stops this component; that's normally fine, since a rejected configuration makes the
+	 * server exit on its own. But if the expected error line never shows up (e.g. a regression lets
+	 * the server start successfully instead), it would otherwise be left running and hold the port
+	 * for the next test - so it's explicitly stopped here regardless of the outcome.
+	 *
 	 * @param array  $vault_config     "Vault*" configuration options to apply on top of the defaults
 	 * @param string $expected_error   substring expected to appear in the server log
 	 */
-	private function startServerAndExpectVaultError(array $vault_config, string $expected_error): void {
+	private function startServerAndExpectVaultError($vault_config, $expected_error) {
 		$configuration = self::getDefaultComponentConfiguration();
 		$configuration[self::COMPONENT_SERVER] = array_merge($configuration[self::COMPONENT_SERVER], [
 			'DBUser' => [],
@@ -178,7 +189,17 @@ class testHashicorpVault extends CIntegrationTest {
 				['-c', PHPUNIT_CONFIG_DIR.'zabbix_'.self::COMPONENT_SERVER.'.conf']
 		);
 
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, $expected_error, false, 10, 1);
+		try {
+			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, $expected_error, false,
+					self::WAIT_ITERATIONS_STARTUP, self::WAIT_ITERATION_DELAY
+			);
+		} finally {
+			try {
+				self::stopComponent(self::COMPONENT_SERVER);
+			} catch (Exception $e) {
+				// Nothing left to stop if the server already exited on its own, as expected.
+			}
+		}
 	}
 
 	/**
@@ -339,13 +360,13 @@ class testHashicorpVault extends CIntegrationTest {
 
 		$relogged_in = false;
 
-		for ($i = 0; $i < 40; $i++) {
+		for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
 			if (array_diff(self::vaultRoleAccessors(self::VAULT_ROLE_NAME), $old_accessors)) {
 				$relogged_in = true;
 				break;
 			}
 
-			sleep(1);
+			sleep(self::WAIT_ITERATION_DELAY);
 		}
 
 		$this->assertTrue($relogged_in, 'Server did not re-login with AppRole after its Vault token was revoked.');
