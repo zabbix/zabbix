@@ -142,6 +142,8 @@ static void	cep_worker_add_events(zbx_cep_worker_t *worker, zbx_cep_task_remote_
 		zbx_vector_mw_task_ptr_destroy(&tasks);
 	}
 
+	(void)zbx_serialize_value(task->response, events.values_num);
+
 	zbx_vector_db_event_destroy(&events);
 }
 

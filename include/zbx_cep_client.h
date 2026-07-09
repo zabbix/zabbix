@@ -68,7 +68,7 @@ int	zbx_cep_peek_event_queries(const unsigned char *data);
 void	zbx_cep_deserialize_event_queries(const unsigned char *data, zbx_vector_cep_assessment_query_t *queries);
 void	zbx_cep_assessment_query_clear(zbx_cep_assessment_query_t *query);
 
-void	zbx_cep_send_events(zbx_db_event * const *events, int events_num);
+int	zbx_cep_send_events(zbx_db_event * const *events, int events_num);
 void	zbx_cep_deserialize_events(const unsigned char *data, zbx_vector_db_event_t *events);
 
 void	zbx_cep_close_problem_by_user(const zbx_db_event *event, zbx_uint64_t eventid, zbx_uint64_t userid);
