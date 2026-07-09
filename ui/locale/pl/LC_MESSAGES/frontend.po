@@ -26401,7 +26401,7 @@ msgstr "Nie masz uprawnień do wykonania tej operacji"
 
 #: index_sso.php:358
 msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
-msgstr "Zostałeś uwierzytelniony przez Single sign-on (SSO), ale logowanie do Zabbx nie powiodło się."
+msgstr "Zostałeś uwierzytelniony przez Single sign-on (SSO), ale logowanie do Zabbix nie powiodło się."
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
