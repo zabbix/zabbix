@@ -69,7 +69,8 @@ class CControllerDiscoveryCheckEdit extends CController {
 	protected function doAction(): void {
 		$data = array_merge([
 			'type' => self::DEFAULT_TYPE,
-			'ports' => svc_default_port(self::DEFAULT_TYPE)
+			'ports' => svc_default_port(self::DEFAULT_TYPE),
+			'dchecks' => []
 		], $this->getInputAll());
 
 		$params = array_intersect_key($data, DB::getSchema('dchecks')['fields']);
