@@ -10,7 +10,8 @@
 		}
 	}
 
-	.calendar-year {
+	.calendar-year,
+	.calendar-month {
 		height: 24px;
 		line-height: 26px;
 		display: table;
@@ -28,10 +29,6 @@
 			background-color: $action-hover-color;
 			cursor: pointer;
 		}
-	}
-
-	.calendar-month {
-		@extend .calendar-year;
 	}
 
 	.calendar-time {
@@ -78,8 +75,15 @@
 			text-align: center;
 
 			td {
-				@if $ui-transitions {
-					transition: background-color $ui-controls-transition-duration ease-out;
+				border-radius: var(--button-border-radius);
+
+				&:hover {
+					background-color: $action-hover-color;
+					cursor: pointer;
+				}
+
+				&:focus {
+					outline: none;
 				}
 
 				&.selected {
@@ -91,24 +95,20 @@
 					}
 				}
 
-				&:hover {
-					background-color: $action-hover-color;
-					cursor: pointer;
-				}
-
 				&.highlighted {
 					@include btn-hover-active($btn-color, $btn-bg-color);
-					cursor: pointer;
-				}
 
-				&:focus {
-					outline: none;
+					cursor: pointer;
 				}
 
 				span {
 					z-index: -1;
 					padding: 4px;
 					display: block;
+				}
+
+				@if $ui-transitions {
+					transition: background-color $ui-controls-transition-duration ease-out;
 				}
 			}
 		}

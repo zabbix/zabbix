@@ -43,7 +43,6 @@ $html_page = (new CHtmlPage())
 			(new CFormList())->addRow(_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
 			),
 			(new CFormList())->addRow(_('Show'),
 				(new CRadioButtonList('filter_show', (int) $data['filter']['show']))
