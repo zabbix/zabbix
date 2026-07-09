@@ -57,9 +57,17 @@ class testHashicorpVault extends CIntegrationTest {
 	const VAULT_SECRET_PATH = 'zabbix/'.PHPUNIT_PORT_PREFIX.'/db';
 	const VAULT_DB_PATH = 'secret/'.self::VAULT_SECRET_PATH;
 
+	// Deliberately a *different* Vault path than VAULT_SECRET_PATH/VAULT_DB_PATH: Zabbix refuses to
+	// register a Vault macro whose path equals "VaultDBPath" with key "username"/"password" (see
+	// um_macro_register_kvs() in user_macro.c) - that combination is reserved for DB credentials and
+	// silently never gets fetched, so a macro pointing at it would always resolve to "*UNKNOWN*".
+	const VAULT_MACRO_SECRET_PATH = 'zabbix/'.PHPUNIT_PORT_PREFIX.'/macro';
+	const VAULT_MACRO_SECRET_KEY = 'value';
+	const VAULT_MACRO_SECRET_VALUE = 'vault-macro-secret-'.PHPUNIT_PORT_PREFIX;
+
 	const HOSTNAME = 'test_hashicorp_vault';
 	const TRAPPER_ITEM_KEY = 'vault_trap';
-	const VAULT_MACRO = '{$VAULT_SECRET_USERNAME}';
+	const VAULT_MACRO = '{$VAULT_SECRET_VALUE}';
 	const VAULT_MACRO_ITEM_KEY = 'vault_secret_macro_test';
 
 	private static $role_id;
@@ -68,7 +76,6 @@ class testHashicorpVault extends CIntegrationTest {
 
 	private static $hostid;
 	private static $vault_macro_itemid;
-	private static $db_user;
 
 	/**
 	 * Wait until the pre-existing Vault instance (see class docblock) is reachable. Does not start,
@@ -223,11 +230,8 @@ class testHashicorpVault extends CIntegrationTest {
 
 		global $DB;
 
-		self::$db_user = $DB['USER'];
-
 		// Store the credentials of the database used by the test environment as a Vault secret,
-		// mirroring how a real deployment would keep DB credentials out of zabbix_server.conf. The
-		// same secret doubles as the target of the Vault secret macro set up below.
+		// mirroring how a real deployment would keep DB credentials out of zabbix_server.conf.
 		self::vaultRequest('POST', '/v1/secret/data/'.self::VAULT_SECRET_PATH, [
 			'data' => [
 				'username' => $DB['USER'],
@@ -235,8 +239,17 @@ class testHashicorpVault extends CIntegrationTest {
 			]
 		], self::VAULT_ROOT_TOKEN);
 
+		// A separate, unrelated secret used only by the Vault secret macro test below - see the
+		// VAULT_MACRO_SECRET_PATH comment for why it can't just reuse VAULT_SECRET_PATH.
+		self::vaultRequest('POST', '/v1/secret/data/'.self::VAULT_MACRO_SECRET_PATH, [
+			'data' => [
+				self::VAULT_MACRO_SECRET_KEY => self::VAULT_MACRO_SECRET_VALUE
+			]
+		], self::VAULT_ROOT_TOKEN);
+
 		self::vaultRequest('PUT', '/v1/sys/policy/'.self::VAULT_POLICY_NAME, [
-			'policy' => 'path "secret/data/'.self::VAULT_SECRET_PATH.'" { capabilities = ["read"] }'
+			'policy' => 'path "secret/data/'.self::VAULT_SECRET_PATH.'" { capabilities = ["read"] }'.
+					"\n".'path "secret/data/'.self::VAULT_MACRO_SECRET_PATH.'" { capabilities = ["read"] }'
 		], self::VAULT_ROOT_TOKEN);
 
 		// Enabling an already-enabled auth method errors out, so check first.
@@ -300,7 +313,7 @@ class testHashicorpVault extends CIntegrationTest {
 			'hostid' => self::$hostid,
 			'macro' => self::VAULT_MACRO,
 			'type' => ZBX_MACRO_TYPE_VAULT,
-			'value' => self::VAULT_DB_PATH.':username'
+			'value' => 'secret/'.self::VAULT_MACRO_SECRET_PATH.':'.self::VAULT_MACRO_SECRET_KEY
 		]);
 		$this->assertArrayHasKey('hostmacroids', $response['result']);
 
@@ -362,7 +375,7 @@ class testHashicorpVault extends CIntegrationTest {
 	}
 
 	/**
-	 * Verify that a Vault secret macro ({$VAULT_SECRET_USERNAME}, created in prepareData() with a
+	 * Verify that a Vault secret macro ({$VAULT_SECRET_VALUE}, created in prepareData() with a
 	 * "path:key" value) is actually resolved to the real secret stored in Vault, rather than just
 	 * accepted by the API. This is a separate code path from Vault-sourced DB credentials: it is
 	 * resolved via the periodic "zbx_dc_sync_kvs_paths" cache sync (which also runs once, right at
@@ -377,15 +390,16 @@ class testHashicorpVault extends CIntegrationTest {
 	 */
 	public function testHashicorpVault_vaultMacroResolution() {
 		// The script item returns the macro's resolved value as its own history value on every
-		// execution (delay=1s); if the macro had failed to resolve, or resolved to the wrong secret,
-		// this would never match the real database username fetched from Vault.
+		// execution (delay=1s); if the macro had failed to resolve, this would stay "*UNKNOWN*"
+		// (Zabbix's placeholder for an unresolved Vault macro) instead of the value actually stored
+		// in Vault.
 		$this->callUntilDataIsPresent('history.get', [
 			'itemids' => [self::$vault_macro_itemid],
 			'history' => ITEM_VALUE_TYPE_TEXT
 		], null, null, function($response) {
 			$value = $response['result'][0]['value'];
 
-			return ($value === self::$db_user) ? true : 'unexpected value "'.$value.'"';
+			return ($value === self::VAULT_MACRO_SECRET_VALUE) ? true : 'unexpected value "'.$value.'"';
 		});
 	}
 
