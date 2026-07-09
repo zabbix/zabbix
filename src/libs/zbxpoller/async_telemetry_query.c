@@ -60,12 +60,11 @@ static int	async_send_telemetry_query_http(zbx_dc_telemetry_query_item_t *item, 
 	telemetry_query_context->item_context.flags = item->flags;
 	telemetry_query_context->item_context.preprocessing = item->preprocessing;
 
-	if (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type)
-		zbx_tq_sql_generate_clickhouse(query, item->time_shift, item->lookback_limit, item->granularity, now,
-				lasttimestamp, &telemetry_query_context->item_context.posts);
-	else
-		zbx_tq_generate_elastic(query, item->time_shift, item->lookback_limit, item->granularity, now,
-				lasttimestamp, &telemetry_query_context->item_context.posts);
+	if (ZBX_APM_DB_TYPE_CLICKHOUSE != apm_db_config->db_type)
+		THIS_SHOULD_NEVER_HAPPEN;
+
+	zbx_tq_sql_generate_clickhouse(query, item->time_shift, item->lookback_limit, item->granularity, now,
+			lasttimestamp, &telemetry_query_context->item_context.posts);
 
 	zbx_tq_get_newlasttimestamp(item->lookback_limit, item->granularity, now, lasttimestamp,
 			&telemetry_query_context->item_context.newlasttimestamp);
@@ -130,13 +129,13 @@ static int	async_check_telemetry_query_http(zbx_dc_telemetry_query_item_t *item,
 	query = item->telemetry_query;
 	item->telemetry_query = NULL;
 
-	if (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type)
-		zbx_tq_clickhouse_get_query_url(apm_db_config->url, apm_db_config->db, &url);
-	else
-		zbx_tq_elastic_get_search_url(apm_db_config->url, query->signal_type, query->metric_point_type, &url);
+	if (ZBX_APM_DB_TYPE_CLICKHOUSE != apm_db_config->db_type)
+		THIS_SHOULD_NEVER_HAPPEN;
 
-	post_type = (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type ? ZBX_POSTTYPE_RAW : ZBX_POSTTYPE_JSON);
-	output_format = (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type ? HTTP_STORE_RAW : HTTP_STORE_JSON);
+	zbx_tq_clickhouse_get_query_url(apm_db_config->url, apm_db_config->db, &url);
+
+	post_type = ZBX_POSTTYPE_RAW;
+	output_format = HTTP_STORE_RAW;
 
 	if (SUCCEED != async_send_telemetry_query_http(item, query, now, lasttimestamp, &item->min_free_ts,
 			apm_db_config, url, post_type, output_format, poller_config->curl_handle, &send_error))
@@ -188,8 +187,7 @@ int	zbx_async_check_telemetry_query(zbx_dc_telemetry_query_item_t *item, AGENT_R
 		goto out;
 	}
 
-	if (ZBX_APM_DB_TYPE_CLICKHOUSE == poller_config->apm_db_config->db_type
-			|| ZBX_APM_DB_TYPE_ELASTIC == poller_config->apm_db_config->db_type)
+	if (ZBX_APM_DB_TYPE_CLICKHOUSE == poller_config->apm_db_config->db_type)
 	{
 #ifdef HAVE_LIBCURL
 		ret = async_check_telemetry_query_http(item, now, lasttimestamp, result, poller_config);
@@ -202,8 +200,8 @@ int	zbx_async_check_telemetry_query(zbx_dc_telemetry_query_item_t *item, AGENT_R
 	}
 	else
 	{
-		/* TODO */
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "UNIMPLEMENTED"));
+		THIS_SHOULD_NEVER_HAPPEN;
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported APM data source type"));
 		ret = NOTSUPPORTED;
 	}
 out:

@@ -16,7 +16,6 @@
 #define ZABBIX_ZBXTELEMETRY_H
 
 #include "zbxalgo.h"
-#include "zbxdb.h"
 #include "zbxvault.h"
 
 #define ZBX_TQ_QUERY_TAG_SIGNAL_TYPE		"signal_type"
@@ -197,14 +196,8 @@ int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out,
 		int *lookback_limit_out, const char *granularity_str, int *granularity_out, char *error,
 		size_t max_error_len);
 
-void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
-		time_t now, time_t lasttimestamp, char **sql, const zbx_dbconn_t *db);
-void	zbx_tq_sql_generate_mysql(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
-		time_t now, time_t lasttimestamp, char **sql, const zbx_dbconn_t *db);
 void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
 		time_t now, time_t lasttimestamp, char **sql);
-void	zbx_tq_generate_elastic(const zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
-		time_t now, time_t lasttimestamp, char **dsl);
 
 void	zbx_tq_get_timestamp_filter_bounds(int time_shift, int lookback_limit, int granularity, time_t now,
 		time_t lasttimestamp, time_t *out_lower, time_t *out_upper);
@@ -212,14 +205,7 @@ void	zbx_tq_get_newlasttimestamp(int lookback_limit, int granularity, time_t now
 		time_t *newlasttimestamp);
 
 int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_vector_str_t *values);
-int	zbx_tq_elastic_parse_resp(const zbx_tq_query_t *query, const char *resp, zbx_vector_str_t *values);
-int	zbx_tq_parse_sql_result(const zbx_tq_query_t *query, zbx_db_result_t result, zbx_vector_str_t *values);
 
 void	zbx_tq_clickhouse_get_query_url(const char *base_url, const char *db, char **url);
-
-const char	*zbx_tq_elastic_get_index_name(zbx_tq_signal_type_t signal_type,
-		zbx_tq_metric_point_type_t metric_point_type);
-void		zbx_tq_elastic_get_search_url(const char *base_url, zbx_tq_signal_type_t signal_type,
-		zbx_tq_metric_point_type_t metric_point_type, char **url);
 
 #endif

@@ -23,8 +23,6 @@ typedef struct
 {
 	const char		*name;
 	zbx_tq_column_type_t	type;
-	const char		*es_nested_path; /* NULL - not nested subfield */
-	const char		*es_nested_subfield; /* NULL - not nested subfield */
 }
 tq_column_info_t;
 

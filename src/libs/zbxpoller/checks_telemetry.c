@@ -17,7 +17,6 @@
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
-#include "zbxdb.h"
 #include "zbxtelemetry.h"
 #include "zbxstr.h"
 #include "zbxtypes.h"
@@ -89,20 +88,16 @@ static int	get_values_telemetry_http(const zbx_dc_item_t *item, time_t now, time
 	char			*url = NULL;
 	unsigned char		post_type, output_format;
 
-	if (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type)
-		zbx_tq_clickhouse_get_query_url(apm_db_config->url, apm_db_config->db, &url);
-	else
-		zbx_tq_elastic_get_search_url(apm_db_config->url, query->signal_type, query->metric_point_type, &url);
+	if (ZBX_APM_DB_TYPE_CLICKHOUSE != apm_db_config->db_type)
+		THIS_SHOULD_NEVER_HAPPEN;
 
-	post_type = (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type ? ZBX_POSTTYPE_RAW : ZBX_POSTTYPE_JSON);
-	output_format = (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type ? HTTP_STORE_RAW : HTTP_STORE_JSON);
+	zbx_tq_clickhouse_get_query_url(apm_db_config->url, apm_db_config->db, &url);
 
-	if (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type)
-		zbx_tq_sql_generate_clickhouse(query, item->time_shift, item->lookback_limit, item->granularity,
-				now, lasttimestamp, &posts);
-	else
-		zbx_tq_generate_elastic(query, item->time_shift, item->lookback_limit, item->granularity, now,
-				lasttimestamp, &posts);
+	post_type = ZBX_POSTTYPE_RAW;
+	output_format = HTTP_STORE_RAW;
+
+	zbx_tq_sql_generate_clickhouse(query, item->time_shift, item->lookback_limit, item->granularity,
+			now, lasttimestamp, &posts);
 
 	if (SUCCEED != send_query_http(posts, apm_db_config, url, item->timeout, post_type, output_format, &resp,
 			error))
@@ -111,10 +106,7 @@ static int	get_values_telemetry_http(const zbx_dc_item_t *item, time_t now, time
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): response: '%s'", __func__, ZBX_NULL2STR(resp));
 
 
-	if (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type)
-		parse_ret = zbx_tq_clickhouse_parse_resp(query, resp, values);
-	else
-		parse_ret = zbx_tq_elastic_parse_resp(query, resp, values);
+	parse_ret = zbx_tq_clickhouse_parse_resp(query, resp, values);
 
 	if (SUCCEED != parse_ret)
 	{
@@ -131,110 +123,6 @@ out:
 	return ret;
 }
 #endif
-
-static int	have_required_db(zbx_apm_db_type_t db_type)
-{
-#if defined(HAVE_MYSQL)
-	return ZBX_APM_DB_TYPE_MYSQL == db_type ? SUCCEED : FAIL;
-#elif defined(HAVE_POSTGRESQL)
-	return ZBX_APM_DB_TYPE_POSTGRESQL == db_type ? SUCCEED : FAIL;
-#else
-	ZBX_UNUSED(db_type);
-
-	return FAIL;
-#endif
-}
-
-static zbx_db_result_t	sql_lib_execute_telemetry_query(const zbx_tq_query_t *query, int time_shift, int lookback_limit,
-		int granularity, time_t now, time_t lasttimestamp, zbx_apm_db_type_t db_type, char **error)
-{
-	zbx_db_config_t	*db_config = zbx_db_config_create();
-	zbx_dbconn_t	*db;
-	char		*sql = NULL;
-	zbx_db_result_t	res;
-	int		open_ret;
-
-	/* FIXME: placeholder start */
-	ZBX_STRDUP(db_config->dbhost, "127.0.0.1");
-	db_config->dbport = 5433;
-	ZBX_STRDUP(db_config->dbuser, "testuser");
-	ZBX_STRDUP(db_config->dbpassword, "testpass");
-	ZBX_STRDUP(db_config->dbname, "testdb");
-
-#if defined(HAVE_POSTGRESQL)
-	if (0 != db_config->dbport)
-		db_config->dbports = zbx_dsprintf(NULL, "%u", db_config->dbport);
-#endif
-	/* FIXME: placeholder end */
-
-	db = zbx_dbconn_create_custom(db_config);
-	zbx_dbconn_set_connect_options(db, ZBX_DB_CONNECT_ONCE);
-
-	if (ZBX_DB_OK > (open_ret = zbx_dbconn_open(db)))
-	{
-		if (ZBX_DB_DOWN == open_ret)
-			*error = zbx_strdup(NULL, "Failed to connect to database, database is down");
-		else
-			*error = zbx_strdup(NULL, "Failed to connect to database");
-
-		res = NULL;
-		goto out;
-	}
-
-	if (ZBX_APM_DB_TYPE_POSTGRESQL == db_type)
-		zbx_tq_sql_generate_postgresql(query, time_shift, lookback_limit, granularity, now, lasttimestamp, &sql,
-		db);
-	else
-		zbx_tq_sql_generate_mysql(query, time_shift, lookback_limit, granularity, now, lasttimestamp, &sql, db);
-
-	res = zbx_dbconn_select(db, "%s", sql);
-
-	if (NULL == res)
-		*error = zbx_strdup(NULL, "Query failed");
-	else if (ZBX_DB_DOWN == (intptr_t)res)
-	{
-		*error = zbx_strdup(NULL, "Query failed, database is down");
-		res = NULL;
-	}
-out:
-	zbx_free(sql);
-	zbx_dbconn_free(db);
-	zbx_db_config_free(db_config);
-
-	return res;
-}
-
-static int	get_values_telemetry_sql_lib(const zbx_dc_item_t *item, zbx_apm_db_type_t db_type, time_t now,
-		time_t lasttimestamp, zbx_vector_str_t *values, char **error)
-{
-	int		ret = FAIL;
-	zbx_db_result_t	sql_result;
-
-	if (FAIL == have_required_db(db_type))
-	{
-		*error = zbx_dsprintf(NULL, "%s support was not compiled in",
-				(ZBX_APM_DB_TYPE_POSTGRESQL == db_type ? "PostgreSQL" : "MySQL"));
-		return FAIL;
-	}
-
-	sql_result = sql_lib_execute_telemetry_query(item->telemetry_query, item->time_shift,
-			item->lookback_limit, item->granularity, now, lasttimestamp, db_type, error);
-
-	if (NULL == sql_result)
-		goto clean;
-
-	if (SUCCEED != zbx_tq_parse_sql_result(item->telemetry_query, sql_result, values))
-	{
-		*error = zbx_strdup(NULL, "Failed to parse result");
-		goto clean;
-	}
-
-	ret = SUCCEED;
-clean:
-	zbx_db_free_result(sql_result);
-
-	return ret;
-}
 
 int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *apm_db_config, AGENT_RESULT *result)
 {
@@ -254,7 +142,7 @@ int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *ap
 	/* when testing the item, the time range being queried is restricted only by the lookback limit */
 	lasttimestamp = 0;
 
-	if (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type || ZBX_APM_DB_TYPE_ELASTIC == apm_db_config->db_type)
+	if (ZBX_APM_DB_TYPE_CLICKHOUSE == apm_db_config->db_type)
 	{
 #ifdef HAVE_LIBCURL
 		values_ret = get_values_telemetry_http(item, now, lasttimestamp, apm_db_config, &values, &error);
@@ -265,8 +153,11 @@ int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *ap
 #endif
 	}
 	else
-		values_ret = get_values_telemetry_sql_lib(item, apm_db_config->db_type, now, lasttimestamp, &values,
-				&error);
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		error = zbx_strdup(NULL, "Unsupported APM data source type");
+		values_ret = FAIL;
+	}
 
 	if (SUCCEED != values_ret)
 	{

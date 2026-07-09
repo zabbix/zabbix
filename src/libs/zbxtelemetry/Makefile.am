@@ -8,8 +8,6 @@ libzbxtelemetry_a_SOURCES = \
         telemetry_query_sql.c \
         telemetry.h \
         telemetry_query_clickhouse.c \
-        telemetry_query_elastic.c \
         telemetry_query_formula_parse.c \
-        telemetry_query_sql_result.c \
         telemetry_query_columns.c \
         telemetry_apm_db_config.c

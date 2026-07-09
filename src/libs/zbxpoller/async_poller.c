@@ -246,8 +246,6 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 		goto fail;
 	}
 
-	/* TODO: for elasticsearch: maybe either implement pagination or detect if not all buckets were gotten */
-
 	zbx_timespec(&timespec);
 
 	item_context = &telemetry_query_context->item_context;
@@ -272,10 +270,10 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 
 		zabbix_log(LOG_LEVEL_TRACE, "%s(): response: '%s'", __func__, http_resp);
 
-		if (ZBX_APM_DB_TYPE_CLICKHOUSE == item_context->db_type)
-			parse_ret = zbx_tq_clickhouse_parse_resp(item_context->query, http_resp, &values);
-		else
-			parse_ret = zbx_tq_elastic_parse_resp(item_context->query, http_resp, &values);
+		if (ZBX_APM_DB_TYPE_CLICKHOUSE != item_context->db_type)
+			THIS_SHOULD_NEVER_HAPPEN;
+
+		parse_ret = zbx_tq_clickhouse_parse_resp(item_context->query, http_resp, &values);
 
 		if (SUCCEED == parse_ret)
 		{
