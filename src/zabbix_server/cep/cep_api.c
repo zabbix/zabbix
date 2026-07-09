@@ -344,17 +344,16 @@ void	zbx_cep_get_events(unsigned char source, zbx_vector_cep_event_handle_t *han
  ******************************************************************************/
 void	zbx_cep_event_handle_release(zbx_cep_event_handle_t h)
 {
-	if (1 != cep_event_handle_release(h))
-		return;
-
 	zbx_cep_t	*cep;
-	zbx_cep_event_t	*event;
+	zbx_cep_event_t	*event = NULL;
 
 	cep_cache_acquire(&cep);
-	event = cep_event_handle_remove(cep, h);
+	if (1 == cep_event_handle_release(h))
+		event = cep_event_handle_remove(cep, h);
 	cep_cache_release(&cep);
 
-	zbx_cep_event_release(event);
+	if (NULL != event)
+		zbx_cep_event_release(event);
 }
 
 void	cep_stats_update_events_accessed(zbx_uint64_t value)
