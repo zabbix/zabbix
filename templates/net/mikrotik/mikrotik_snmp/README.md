@@ -5,12 +5,12 @@
 
 ### Known Issues
 
-  Description: Doesn't have ifHighSpeed filled. fixed in more recent versions
-  Version: RouterOS 6.28 or lower
+- Description: Doesn't have ifHighSpeed filled. Fixed in more recent versions
+  - Version: RouterOS 6.28 or lower
 
-  Description: Doesn't have any temperature sensors
-  Version: RouterOS 6.38.5
-  Device: Mikrotik 941-2nD, Mikrotik 951G-2HnD
+- Description: Doesn't have any temperature sensors
+  - Version: RouterOS 6.38.5
+  - Device: Mikrotik 941-2nD, Mikrotik 951G-2HnD
 
 ## Requirements
 
@@ -33,15 +33,15 @@ Refer to the vendor documentation.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$CPU.UTIL.CRIT}||`90`|
-|{$MEMORY.UTIL.MAX}||`90`|
-|{$TEMP_CRIT_LOW}||`5`|
-|{$TEMP_WARN}||`50`|
-|{$TEMP_CRIT}||`60`|
-|{$TEMP_WARN:"CPU"}||`70`|
-|{$TEMP_CRIT:"CPU"}||`75`|
-|{$VFS.FS.PUSED.MAX.WARN}||`80`|
-|{$VFS.FS.PUSED.MAX.CRIT}||`90`|
+|{$CPU.UTIL.CRIT}|<p>The critical threshold of CPU utilization expressed in %.</p>|`90`|
+|{$MEMORY.UTIL.MAX}|<p>Threshold for maximum memory utilization in %.</p>|`90`|
+|{$TEMP_CRIT_LOW}|<p>Critical threshold for low temperature.</p>|`5`|
+|{$TEMP_WARN}|<p>Warning threshold for temperature.</p>|`50`|
+|{$TEMP_CRIT}|<p>Critical threshold for temperature.</p>|`60`|
+|{$TEMP_WARN:"CPU"}|<p>Warning threshold for CPU temperature.</p>|`70`|
+|{$TEMP_CRIT:"CPU"}|<p>Critical threshold for CPU temperature.</p>|`75`|
+|{$VFS.FS.PUSED.MAX.WARN}|<p>The warning threshold of filesystem utilization.</p>|`80`|
+|{$VFS.FS.PUSED.MAX.CRIT}|<p>The critical threshold of filesystem utilization.</p>|`90`|
 |{$LTEMODEM.RSSI.MIN.WARN}|<p>The LTE modem RSSI minimum value for warning trigger expression.</p>|`-100`|
 |{$LTEMODEM.RSRP.MIN.WARN}|<p>The LTE modem RSRP minimum value for warning trigger expression.</p>|`-100`|
 |{$LTEMODEM.RSRQ.MIN.WARN}|<p>The LTE modem RSRQ minimum value for warning trigger expression.</p>|`-20`|

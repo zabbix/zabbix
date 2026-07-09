@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -63,32 +63,9 @@ class CWidgetFieldThresholds extends CWidgetField {
 			return $errors;
 		}
 
-		$number_parser = new CNumberParser([
-			'with_size_suffix' => true,
-			'with_time_suffix' => true,
-			'is_binary_size' => $this->is_binary_units
-		]);
+		$thresholds = $this->getValue();
 
-		$thresholds = [];
-
-		foreach ($this->getValue() as $threshold) {
-			if ($number_parser->parse($threshold['threshold']) === CParser::PARSE_SUCCESS) {
-				$thresholds[] = $threshold + ['threshold_value' => $number_parser->calcValue()];
-			}
-		}
-
-		uasort($thresholds,
-			static function (array $threshold_1, array $threshold_2): int {
-				return $threshold_1['threshold_value'] <=> $threshold_2['threshold_value'];
-			}
-		);
-
-		foreach ($thresholds as &$threshold) {
-			unset($threshold['threshold_value']);
-		}
-		unset($threshold);
-
-		$thresholds = array_values($thresholds);
+		$thresholds = array_values(filterAndSortThresholds($thresholds, $this->is_binary_units));
 
 		$this->setValue($thresholds);
 

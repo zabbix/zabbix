@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -94,8 +94,8 @@ $form_grid->addItem([
 	new CLabel(_('Display value as'), 'display_value_as'),
 	new CFormField(
 		(new CRadioButtonList('display_value_as', (int) $data['display_value_as']))
-			->addValue(_('Numeric'), CWidgetFieldColumnsList::DISPLAY_AS_IS)
-			->addValue(_('Text'), CWidgetFieldColumnsList::DISPLAY_BAR)
+			->addValue(_('Numeric'), CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC)
+			->addValue(_('Text'), CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT)
 			->setModern()
 	)
 ]);

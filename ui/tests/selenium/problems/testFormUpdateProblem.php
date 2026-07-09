@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -896,10 +896,6 @@ class testFormUpdateProblem extends CWebTest {
 		// Assert that eye icon stopped blinking.
 		$this->page->refresh();
 		$this->assertTrue($row->getColumn('Info')->query('xpath:.//button[not(contains(@class, "js-blink"))]')->exists());
-
-		// TODO: Remove sleep after fix ZBX-26128. Sometimes suppress and unsuppress events have the same acknowledege time and
-		// are displayed in the wrong order in history table in the acknowledege popup. Failure in checkHistoryTable()
-		sleep(1);
 
 		// Unsuppress problem.
 		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();

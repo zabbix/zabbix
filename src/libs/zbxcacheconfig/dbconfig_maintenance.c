@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1442,8 +1442,10 @@ static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, co
 		return dc_maintenance_match_tags_or(maintenance, tags);
 }
 
-static void	host_event_maintenance_clean(zbx_host_event_maintenance_t *host_event_maintenance)
+static void	host_event_maintenance_clean(void *data)
 {
+	zbx_host_event_maintenance_t	*host_event_maintenance = (zbx_host_event_maintenance_t*)data;
+
 	zbx_vector_ptr_destroy(&host_event_maintenance->maintenances);
 }
 
@@ -1473,7 +1475,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_event_suppress_query_ptr_t *event_q
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_hashset_create_ext(&host_event_maintenances, maintenanceids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)host_event_maintenance_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, host_event_maintenance_clean,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 	/* event tags must be sorted by name to perform maintenance tag matching */
 

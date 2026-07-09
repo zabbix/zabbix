@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -65,6 +65,10 @@ class CFieldArray extends CField {
 		return this.getInnerValue(true);
 	}
 
+	updateState() {
+		this.#discoverAllFields();
+	}
+
 	_appendErrorHint(error_hint) {
 		this._field.parentNode.parentNode.appendChild(error_hint);
 	}
@@ -94,6 +98,9 @@ class CFieldArray extends CField {
 					field_instance = new CForm.field_types[field_type](field);
 					field_instance.init();
 					field_instance.setTabId(this._tab_id);
+				}
+				else {
+					field_instance.updateState();
 				}
 
 				fields.push(field_instance);

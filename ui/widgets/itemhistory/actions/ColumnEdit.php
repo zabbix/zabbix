@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -76,11 +76,12 @@ class ColumnEdit extends CController {
 
 		$field = new CWidgetFieldColumnsList('columns', '');
 
-		if (!$this->hasInput('edit') && !$this->hasInput('update')) {
+		if (!$this->hasInput('edit')) {
 			$input += self::getColumnDefaults();
 		}
 
 		unset($input['edit'], $input['update'], $input['templateid']);
+
 		$field->setValue([$input]);
 
 		$errors = $field->validate(true);
@@ -147,32 +148,8 @@ class ColumnEdit extends CController {
 			$this->setResponse(new CControllerResponseData($data));
 		}
 		else {
-			$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
-
-			$thresholds = [];
-
-			foreach ($input['thresholds'] as $threshold) {
-				$order_threshold = trim($threshold['threshold']);
-
-				if ($order_threshold !== '' && $number_parser->parse($order_threshold) == CParser::PARSE_SUCCESS) {
-					$thresholds[] = $threshold + ['order_threshold' => $number_parser->calcValue()];
-				}
-			}
-
-			$input['thresholds'] = [];
-
-			if ($thresholds) {
-				uasort($thresholds,
-					static function (array $threshold_1, array $threshold_2): int {
-						return $threshold_1['order_threshold'] <=> $threshold_2['order_threshold'];
-					}
-				);
-
-				foreach ($thresholds as $threshold) {
-					unset($threshold['order_threshold']);
-
-					$input['thresholds'][] = $threshold;
-				}
+			if (array_key_exists('thresholds', $input)) {
+				$input['thresholds'] = array_values(filterAndSortThresholds($input['thresholds']));
 			}
 
 			$this->setResponse(

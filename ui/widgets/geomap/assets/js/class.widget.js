@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -50,6 +50,12 @@ class CWidgetGeoMap extends CWidget {
 		this._initial_load = true;
 		this._home_coords = {};
 		this._severity_levels = new Map();
+	}
+
+	onResize() {
+		if (this._map !== null) {
+			this._map.invalidateSize();
+		}
 	}
 
 	promiseReady() {
@@ -263,8 +269,8 @@ class CWidgetGeoMap extends CWidget {
 				collision: 'fit'
 			});
 
-			Overlay.prototype.recoverFocus.call({'$dialogue': node.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': node.hintBoxItem});
+			Focuser.recoverFocus(node.hintBoxItem[0]);
+			Focuser.containFocus(node.hintBoxItem[0]);
 		});
 
 		this._markers.on('click keypress', (e) => {
@@ -307,8 +313,8 @@ class CWidgetGeoMap extends CWidget {
 				collision: 'fit'
 			});
 
-			Overlay.prototype.recoverFocus.call({'$dialogue': node.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': node.hintBoxItem});
+			Focuser.recoverFocus(node.hintBoxItem[0]);
+			Focuser.containFocus(node.hintBoxItem[0]);
 		});
 
 		this._map.getContainer().addEventListener('cluster.dblclick', (e) => {

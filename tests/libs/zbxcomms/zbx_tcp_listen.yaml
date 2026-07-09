@@ -1,0 +1,71 @@
+---
+test case: "ipv4 random port"
+in:
+  ipv: "ipv4"
+  ip: "127.0.0.1"
+  port: 0
+  timeout: 1
+  backlog_size: 1
+out:
+  result: SUCCEED
+---
+test case: "invalid IP format"
+in:
+  ipv: "ipv4"
+  ip: "999.999.999.999"
+  port: 12345
+  timeout: 1
+  backlog_size: 1
+out:
+  result: FAIL
+---
+test case: "mixture of valid and invalid IPs"
+in:
+  ipv: "ipv4"
+  ip: "127.0.0.1,192.0.2.1"
+  port: 0
+  timeout: 1
+  backlog_size: 1
+out:
+  result: FAIL
+---
+test case: "invalid ipv6 address"
+in:
+  ipv: "ipv6"
+  ip: "gggg::1"
+  port: 12345
+  timeout: 1
+  backlog_size: 1
+out:
+  result: FAIL
+---
+test case: "ipv4 0.0.0.0"
+in:
+  ipv: "ipv4"
+  ip: "0.0.0.0"
+  port: 0
+  timeout: 1
+  backlog_size: 1
+out:
+  result: SUCCEED
+---
+test case: "port negative value - edge case"
+in:
+  ipv: "ipv4"
+  ip: "0.0.0.0"
+  port: -1  # function can accept negative port values
+  timeout: 1
+  backlog_size: 1
+out:
+  result: SUCCEED
+---
+test case: "timeout negative value - edge case"
+in:
+  ipv: "ipv4"
+  ip: "127.0.0.1"
+  port: 0
+  timeout: -1 # function can accept negative timeout values
+  backlog_size: 1
+out:
+  result: SUCCEED
+...

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -37,12 +37,11 @@
 
 		checkbox_object: null,
 
-		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object, filter_set, layout_mode}) {
+		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object, layout_mode}) {
 			this.refresh_url = new Curl(refresh_url);
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
 			this.checkbox_object = checkbox_object;
-			this.filter_set = filter_set;
 			this.layout_mode = layout_mode;
 
 			const url = new Curl('zabbix.php');
@@ -53,11 +52,7 @@
 			this.initExpandableSubfilter();
 			this.initListActions();
 			this.initPopupListeners();
-
-			if (this.refresh_interval != 0 && this.filter_set) {
-				this.running = true;
-				this.scheduleRefresh();
-			}
+			this.scheduleRefresh();
 		},
 
 		initTabFilter(filter_options) {
@@ -253,7 +248,24 @@
 			}
 		},
 
+		_refreshDebug(debug) {
+			const debug_output = document
+				.querySelector('.wrapper > main > .<?= ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH ?>');
+
+			if (debug_output) {
+				debug_output.classList.add('<?= ZBX_STYLE_DEBUG_OUTPUT ?>');
+				debug_output.innerHTML = new DOMParser().parseFromString(debug, 'text/html')
+					.querySelector('.<?= ZBX_STYLE_DEBUG_OUTPUT ?>').innerHTML;
+			}
+		},
+
 		refresh() {
+			if (isUserInteracting()) {
+				this.scheduleRefresh();
+
+				return;
+			}
+
 			this.setLoading();
 
 			const params = this.refresh_url.getArgumentsObject();
@@ -343,6 +355,10 @@
 				this._addRefreshMessage(response.messages);
 			}
 
+			if ('debug' in response) {
+				this._refreshDebug(response.debug);
+			}
+
 			this.initExpandableSubfilter();
 		},
 
@@ -365,9 +381,7 @@
 		},
 
 		onDataAlways() {
-			if (this.running) {
-				this.scheduleRefresh();
-			}
+			this.scheduleRefresh();
 		},
 
 		scheduleRefresh() {

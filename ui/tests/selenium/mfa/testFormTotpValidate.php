@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -127,7 +127,7 @@ class testFormTotpValidate extends testFormTotp {
 		$form->invalidate();
 		$form->getField('id:verification_code')->fill($totp);
 		$form->query('button:Sign in')->one()->click();
-		$this->assertEquals(self::DEFAULT_ERROR, $form->query('class:red')->one()->getText());
+		$this->assertEquals(self::DEFAULT_ERROR, $form->query('class:red')->waitUntilVisible()->one()->getText());
 	}
 
 	/**

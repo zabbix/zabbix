@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -57,6 +57,7 @@ type ResultCache interface {
 	// TODO: will be used once the runtime configuration reload is implemented
 	UpdateOptions(options *agent.AgentOptions)
 	EnableUpload(bool)
+	IsUploadEnabled() bool
 }
 
 type AgentData struct {
@@ -171,6 +172,11 @@ func (c *cacheData) isUploadEnabled() bool {
 	defer c.mu.Unlock()
 
 	return c.historyUpload
+}
+
+// IsUploadEnabled returns true if history upload is currently enabled.
+func (c *cacheData) IsUploadEnabled() bool {
+	return c.isUploadEnabled()
 }
 
 func tableName(prefix string, index int) string {

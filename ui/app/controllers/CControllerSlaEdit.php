@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -91,7 +91,7 @@ class CControllerSlaEdit extends CController {
 					'row_index' => $row_index,
 					'start_time' => zbx_date2str(DATE_TIME_FORMAT, $excluded_downtime['period_from']),
 					'duration' => convertUnitsS($excluded_downtime['period_to'] - $excluded_downtime['period_from'],
-						true
+						['ignore_milliseconds' => true]
 					)
 				];
 			}

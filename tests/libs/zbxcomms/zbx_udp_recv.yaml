@@ -1,0 +1,44 @@
+---
+test case: default
+in:
+  poll_mode: "MOCK_POLL_DEFAULT"
+  recvfrom_return: [1, 0]
+out:
+  result: SUCCEED
+---
+test case: connection shutdown
+in:
+  poll_mode: "MOCK_POLL_DEFAULT"
+  recvfrom_return: [0, 0]
+out:
+  result: FAIL
+---
+test case: poll error
+in:
+  poll_mode: "MOCK_POLL_ERROR"
+  recvfrom_return: [-1, 0]
+out:
+  result: FAIL
+---
+test case: recvfrom > 2048
+in:
+  poll_mode: "MOCK_POLL_DEFAULT"
+  recvfrom_return: [2050, 0]
+out:
+  result: SUCCEED
+---
+test case: socket had blocking error
+in:
+  poll_mode: "MOCK_POLL_DEFAULT"
+  recvfrom_return: [-1, 0]
+  socket_had_blocking_error: true
+out:
+  result: FAIL
+---
+test case: poll revents error
+in:
+  poll_mode: "MOCK_POLL_REVENTS_ERROR"
+  recvfrom_return: [-1, 0]
+out:
+  result: FAIL
+...

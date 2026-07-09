@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -48,7 +48,6 @@ unsigned char	zbx_get_interface_type_by_item_type(unsigned char type)
 		case ITEM_TYPE_EXTERNAL:
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
-			return INTERFACE_TYPE_ANY;
 		case ITEM_TYPE_HTTPAGENT:
 		case ITEM_TYPE_SCRIPT:
 		case ITEM_TYPE_BROWSER:
@@ -77,8 +76,6 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type)
 			return "JMX";
 		case INTERFACE_TYPE_OPT:
 			return "optional";
-		case INTERFACE_TYPE_ANY:
-			return "any";
 		case INTERFACE_TYPE_UNKNOWN:
 		default:
 			return "unknown";

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -61,6 +61,10 @@ abstract class CGraphDraw {
 	 * Use top and bottom padding for graph image.
 	 */
 	public $with_vertical_padding = true;
+	/**
+	 * Add bottom padding for graph image when downloading.
+	 */
+	public $with_bottom_padding = false;
 
 	public function __construct($type = GRAPH_TYPE_NORMAL) {
 		$this->stime = null;

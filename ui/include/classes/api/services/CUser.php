@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -144,7 +144,7 @@ class CUser extends CApiService {
 		];
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if (!$options['editable']) {
+			if (self::$userData['ugsetid'] != 0 && !$options['editable']) {
 				$sql_parts['from']['users_groups'] = 'users_groups ug';
 				$sql_parts['where']['uug'] = 'u.userid=ug.userid';
 				$sql_parts['where'][] = 'ug.usrgrpid IN ('.
@@ -1653,13 +1653,14 @@ class CUser extends CApiService {
 	private static function createUserUgSets(array $ugsets): void {
 		$ins_user_ugsets = [];
 
-		$options = [
-			'output' => ['ugsetid', 'hash'],
-			'filter' => ['hash' => array_keys($ugsets)]
-		];
-		$result = DBselect(DB::makeSql('ugset', $options));
+		$resource = DBselect(
+			'SELECT us.hash,MIN(us.ugsetid) AS ugsetid'.
+			' FROM ugset us'.
+			' WHERE '.dbConditionString('us.hash', array_keys($ugsets)).
+			' GROUP BY us.hash'
+		);
 
-		while ($row = DBfetch($result)) {
+		while ($row = DBfetch($resource)) {
 			foreach ($ugsets[$row['hash']]['userids'] as $userid) {
 				$ins_user_ugsets[] = [
 					'userid' => $userid,
@@ -1690,8 +1691,7 @@ class CUser extends CApiService {
 		$ins_user_ugsets = [];
 		$upd_user_ugsets = [];
 
-		$db_user_ugsetids = self::getDbUserUgSetIds($ugsets);
-		$db_ugsetids = array_flip($db_user_ugsetids);
+		$db_userids = self::getDbUserIdsWithUgsets($ugsets);
 
 		$empty_ugset_hash = self::getUgSetHash([]);
 
@@ -1701,19 +1701,20 @@ class CUser extends CApiService {
 		}
 
 		if ($ugsets) {
-			$options = [
-				'output' => ['ugsetid', 'hash'],
-				'filter' => ['hash' => array_keys($ugsets)]
-			];
-			$result = DBselect(DB::makeSql('ugset', $options));
+			$result = DBselect(
+				'SELECT us.hash,MIN(us.ugsetid) AS ugsetid'.
+				' FROM ugset us'.
+				' WHERE '.dbConditionString('us.hash', array_keys($ugsets)).
+				' GROUP BY us.hash'
+			);
 
 			while ($row = DBfetch($result)) {
 				$upd_userids = [];
 
 				foreach ($ugsets[$row['hash']]['userids'] as $userid) {
-					if (array_key_exists($userid, $db_user_ugsetids)) {
+					if (array_key_exists($userid, $db_userids)) {
 						$upd_userids[] = $userid;
-						unset($db_user_ugsetids[$userid]);
+						unset($db_userids[$userid]);
 					}
 					else {
 						$ins_user_ugsets[] = [
@@ -1728,10 +1729,6 @@ class CUser extends CApiService {
 						'values' => ['ugsetid' => $row['ugsetid']],
 						'where' => ['userid' => $upd_userids]
 					];
-
-					if (array_key_exists($row['ugsetid'], $db_ugsetids)) {
-						unset($db_ugsetids[$row['ugsetid']]);
-					}
 				}
 
 				unset($ugsets[$row['hash']]);
@@ -1744,9 +1741,9 @@ class CUser extends CApiService {
 					$upd_userids = [];
 
 					foreach ($ugset['userids'] as $userid) {
-						if (array_key_exists($userid, $db_user_ugsetids)) {
+						if (array_key_exists($userid, $db_userids)) {
 							$upd_userids[] = $userid;
-							unset($db_user_ugsetids[$userid]);
+							unset($db_userids[$userid]);
 						}
 						else {
 							$ins_user_ugsets[] = [
@@ -1773,32 +1770,20 @@ class CUser extends CApiService {
 				DB::insert('user_ugset', $ins_user_ugsets, false);
 			}
 		}
-
-		if ($db_ugsetids) {
-			self::deleteUnusedUgSets(array_keys($db_ugsetids));
-		}
 	}
 
-	private static function getDbUserUgSetIds(array $ugsets): array {
+	private static function getDbUserIdsWithUgsets(array $ugsets): array {
 		$userids = [];
 
 		foreach ($ugsets as $ugset) {
 			$userids = array_merge($userids, $ugset['userids']);
 		}
 
-		$options = [
-			'output' => ['userid', 'ugsetid'],
-			'userids' => $userids
-		];
-		$result = DBselect(DB::makeSql('user_ugset', $options));
-
-		$db_user_ugsetids = [];
-
-		while ($row = DBfetch($result)) {
-			$db_user_ugsetids[$row['userid']] = $row['ugsetid'];
-		}
-
-		return $db_user_ugsetids;
+		return DB::select('user_ugset', [
+			'output' => [],
+			'userids' => $userids,
+			'preservekeys' => true
+		]);
 	}
 
 	private static function createUgSets(array &$ugsets): void {
@@ -1932,22 +1917,6 @@ class CUser extends CApiService {
 		return $hgset_groupids;
 	}
 
-	private static function deleteUnusedUgSets(array $db_ugsetids): void {
-		$del_ugsetids = DBfetchColumn(DBselect(
-			'SELECT u.ugsetid'.
-			' FROM ugset u'.
-			' LEFT JOIN user_ugset uu ON u.ugsetid=uu.ugsetid'.
-			' WHERE '.dbConditionId('u.ugsetid', $db_ugsetids).
-				' AND uu.userid IS NULL'
-		), 'ugsetid');
-
-		if ($del_ugsetids) {
-			DB::delete('permission', ['ugsetid' => $del_ugsetids]);
-			DB::delete('ugset_group', ['ugsetid' => $del_ugsetids]);
-			DB::delete('ugset', ['ugsetid' => $del_ugsetids]);
-		}
-	}
-
 	/**
 	 * @param array      $users
 	 * @param null|array $db_users
@@ -2027,12 +1996,6 @@ class CUser extends CApiService {
 	public function delete(array $userids) {
 		$this->validateDelete($userids, $db_users);
 
-		DB::delete('media', ['userid' => $userids]);
-		DB::delete('profiles', ['userid' => $userids]);
-
-		self::deleteUgSets($db_users);
-		DB::delete('users_groups', ['userid' => $userids]);
-		DB::delete('mfa_totp_secret', ['userid' => $userids]);
 		DB::update('token', [
 			'values' => ['creator_userid' => null],
 			'where' => ['creator_userid' => $userids]
@@ -2047,31 +2010,13 @@ class CUser extends CApiService {
 			'filter' => ['userid' => $userids],
 			'preservekeys' => true
 		]);
-		CToken::deleteForce(array_keys($tokenids), false);
+		CToken::deleteForce(array_keys($tokenids));
 
 		DB::delete('users', ['userid' => $userids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $db_users);
 
 		return ['userids' => $userids];
-	}
-
-	private static function deleteUgSets(array $db_users): void {
-		$ugsets = [];
-		$ugset_hash = self::getUgSetHash([]);
-
-		foreach ($db_users as $db_user) {
-			if ($db_user['role'] && $db_user['role']['type'] != USER_TYPE_SUPER_ADMIN
-					&& $db_user['usrgrps']) {
-				$ugsets[$ugset_hash]['hash'] = $ugset_hash;
-				$ugsets[$ugset_hash]['usrgrpids'] = [];
-				$ugsets[$ugset_hash]['userids'][] = $db_user['userid'];
-			}
-		}
-
-		if ($ugsets) {
-			self::updateUserUgSets($ugsets);
-		}
 	}
 
 	/**
@@ -2089,7 +2034,6 @@ class CUser extends CApiService {
 		$db_users = $this->get([
 			'output' => ['userid', 'username', 'roleid'],
 			'selectRole' => ['type'],
-			'selectUsrgrps' => ['usrgrpid'],
 			'userids' => $userids,
 			'editable' => true,
 			'preservekeys' => true
@@ -2445,24 +2389,25 @@ class CUser extends CApiService {
 	}
 
 	public static function findUsersByUsername(string $username, bool $case_sensitive = true): array {
-		$db_users = [];
-
 		$fields = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
 			'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid',
 			'userdirectoryid', 'ts_provisioned'
 		];
 
 		if ($case_sensitive) {
-			$db_users = DB::select('users', [
-				'output' => $fields,
-				'filter' => ['username' => $username]
-			]);
+			$db_users = DBfetchArray(DBselect(
+				'SELECT '.implode(',', $fields).
+				' FROM users'.
+				' WHERE username='.zbx_dbstr($username).
+				' FOR UPDATE'
+			));
 		}
 		else {
 			$db_users = DBfetchArray(DBselect(
 				'SELECT '.implode(',', $fields).
 				' FROM users'.
-				' WHERE LOWER(username)='.zbx_dbstr(mb_strtolower($username))
+				' WHERE LOWER(username)='.zbx_dbstr(mb_strtolower($username)).
+				' FOR UPDATE'
 			));
 		}
 

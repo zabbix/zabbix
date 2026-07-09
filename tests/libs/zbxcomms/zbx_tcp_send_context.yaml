@@ -1,0 +1,73 @@
+---
+test case: "send small data"
+in:
+  data: "abc"
+  send_len: 3
+  written: 0
+  written_header: 0
+  header_len: 0
+out:
+  result: "SUCCEED"
+---
+test case: "resume after partial send"
+in:
+  data: "abcdef"
+  send_len: 6
+  written: 3
+  written_header: 0
+  header_len: 0
+out:
+  result: "SUCCEED"
+---
+test case: "send with header"
+in:
+  data: "payload"
+  send_len: 7
+  written: 0
+  written_header: 0
+  header_len: 5
+out:
+  result: "SUCCEED"
+---
+test case: "send_len > written"
+in:
+  data: "abc"
+  send_len: 3
+  written: 0
+  written_header: 0
+  header_len: 0
+out:
+  result: "SUCCEED"
+---
+test case: "header_len > written_header"
+in:
+  data: "abc"
+  send_len: 3
+  written: 0
+  written_header: 0
+  header_len: 5
+out:
+  result: "SUCCEED"
+---
+test case: "send_len > written - write fail"
+in:
+  data: "abc"
+  send_len: 3
+  written: 0
+  written_header: 0
+  header_len: 0
+  write_error: true
+out:
+  result: "FAIL"
+---
+test case: "header_len > written_header - write fail"
+in:
+  data: "abc"
+  send_len: 3
+  written: 0
+  written_header: 0
+  header_len: 5
+  write_error: true
+out:
+  result: "FAIL"
+...

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1429,26 +1429,6 @@ class CAction extends CApiService {
 	public function delete(array $actionids): array {
 		$this->validateDelete($actionids, $db_actions);
 
-		$operationids = array_keys(DB::select('operations', [
-			'output' => ['operationid'],
-			'filter' => ['actionid' => $actionids],
-			'preservekeys' => true
-		]));
-
-		DB::delete('opcommand', ['operationid' => $operationids]);
-		DB::delete('opcommand_grp', ['operationid' => $operationids]);
-		DB::delete('opcommand_hst', ['operationid' => $operationids]);
-		DB::delete('opmessage', ['operationid' => $operationids]);
-		DB::delete('opmessage_grp', ['operationid' => $operationids]);
-		DB::delete('opmessage_usr', ['operationid' => $operationids]);
-		DB::delete('opgroup', ['operationid' => $operationids]);
-		DB::delete('optemplate', ['operationid' => $operationids]);
-		DB::delete('opinventory', ['operationid' => $operationids]);
-		DB::delete('optag', ['operationid' => $operationids]);
-		DB::delete('opconditions', ['operationid' => $operationids]);
-
-		DB::delete('operations', ['actionid' => $actionids]);
-		DB::delete('conditions', ['actionid' => $actionids]);
 		DB::delete('actions', ['actionid' => $actionids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_ACTION, $db_actions);

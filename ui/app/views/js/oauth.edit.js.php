@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -92,14 +92,44 @@ window.oauth_edit_popup = new class {
 			e.target.focus();
 		});
 
-		this.form.querySelector('button[name="client_secret_button"]')?.addEventListener('click', e => {
-			const input = this.form.querySelector('[name="client_secret"]');
+		const client_secret_button = this.form.querySelector('[name="client_secret_button"]');
 
-			e.target.remove();
-			input.style.display = '';
-			input.removeAttribute('disabled');
-			input.focus();
-		});
+		if (client_secret_button !== null) {
+			client_secret_button.addEventListener('click', () => {
+				this.#showClientSecretField();
+				this.form.querySelector('[name="client_secret"]').focus();
+			});
+
+			if (this.is_advanced_form) {
+				const token_url = this.form.querySelector('[name="token_url"]');
+				token_url.addEventListener('input', () => this.#showClientSecretWithWarning());
+
+				const token_parameters_table = this.form.querySelector('#oauth-token-parameters-table');
+				token_parameters_table.addEventListener('input', () => this.#showClientSecretWithWarning());
+				token_parameters_table.addEventListener('click', e => {
+					if (e.target.matches('.element-table-remove') || e.target.matches('.element-table-add')) {
+						this.#showClientSecretWithWarning();
+					}
+				});
+			}
+		}
+	}
+
+	#showClientSecretWithWarning() {
+		if (this.form.querySelector('[name="client_secret_button"]') === null) {
+			return;
+		}
+
+		this.#showClientSecretField();
+		this.form.querySelector('.js-client-secret-warning').style.display = '';
+	}
+
+	#showClientSecretField() {
+		this.form.querySelector('[name="client_secret_button"]').remove();
+
+		const input_element = this.form.querySelector('[name="client_secret"]');
+		input_element.style.display = '';
+		input_element.disabled = false;
 	}
 
 	#initDynamicRows(url_selector, parameters_selector, options) {

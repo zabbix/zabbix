@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-18 16:00+0000\n"
-"Last-Translator: Justin <info@jstorfinger.de>\n"
+"PO-Revision-Date: 2026-06-24 10:57+0000\n"
+"Last-Translator: Udo <zabbix@inet-hamburg.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -2246,6 +2246,13 @@ msgstr "Zum Ändern der TLS-PSK Verschlüsselung Einstellung, müssen beide Wert
 msgid "Both passwords must be equal."
 msgstr "Beide Passwörter müssen gleich sein."
 
+#: app/controllers/CControllerItemCreate.php:264
+#: app/controllers/CControllerItemPrototypeCreate.php:279
+#: app/controllers/CControllerItemPrototypeUpdate.php:267
+#: app/controllers/CControllerItemUpdate.php:264
+msgid "Both username and password should be either present or empty."
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
 #: include/views/js/monitoring.sysmaps.js.php:681
@@ -4216,6 +4223,10 @@ msgstr "Kann \"%1$s\"\" für Diagramm-Prototypen \"%2$s\" nicht setzen."
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
+msgstr ""
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
@@ -6278,7 +6289,7 @@ msgstr ""
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
-msgstr "Düster"
+msgstr "Dunkel"
 
 #: app/controllers/CControllerAuditLogList.php:227
 #: app/controllers/CControllerDashboardPrint.php:71
@@ -6427,7 +6438,7 @@ msgstr ""
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:325
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:449
 msgid "Data set label"
-msgstr ""
+msgstr "Beschriftung"
 
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
@@ -6571,7 +6582,7 @@ msgstr "Tag"
 
 #: include/func.inc.php:2565
 msgid "Day before yesterday"
-msgstr "Vorvorgestern"
+msgstr "Vorgestern"
 
 #: app/views/maintenance.timeperiod.edit.php:138
 #: app/views/maintenance.timeperiod.edit.php:168
@@ -7902,7 +7913,7 @@ msgstr ""
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
-msgstr ""
+msgstr "Zeige Min/Avg/Max"
 
 #: widgets/svggraph/includes/WidgetForm.php:351
 msgid "Display min/max/avg"
@@ -10116,7 +10127,7 @@ msgstr "Kontrastreich dunkel"
 
 #: include/classes/core/ZBase.php:382
 msgid "High-contrast light"
-msgstr "Konotrastreich hell"
+msgstr "Kontrastreich hell"
 
 #: app/partials/monitoring.problem.filter.php:312
 msgid "Highlight whole row"
@@ -12271,6 +12282,13 @@ msgstr ""
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "Ungültige API-Methode \"%2$s\" für Benutzerrolle \"%1$s\"."
 
+#: app/controllers/CControllerItemCreate.php:183
+#: app/controllers/CControllerItemPrototypeCreate.php:198
+#: app/controllers/CControllerItemPrototypeUpdate.php:186
+#: app/controllers/CControllerItemUpdate.php:183
+msgid "Invalid HTTP status code or range."
+msgstr ""
+
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
@@ -12359,6 +12377,11 @@ msgstr "Ungültige E-Mail Adresse \"%1$s\"."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Ungültige E-Mail Adresse für Medientyp mit ID \"%1$s\"."
+
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -12741,6 +12764,11 @@ msgstr ""
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Ungültige Marker \"%1$s\": %2$s."
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -15225,6 +15253,10 @@ msgstr "neuer LDAP-Server"
 msgid "New MFA method"
 msgstr ""
 
+#: app/views/oauth.edit.php:242
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "Neues SLA"
@@ -15417,6 +15449,10 @@ msgstr ""
 msgid "Next dashboard"
 msgstr ""
 
+#: jsLoader.php:328
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15430,6 +15466,10 @@ msgstr "Nächste Seite"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Nächster Schritt"
+
+#: jsLoader.php:326
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -15619,6 +15659,11 @@ msgstr "Keine Karten hinzugefügt."
 #: include/classes/html/CMultiSelect.php:66 jsLoader.php:328
 msgid "No matches found"
 msgstr "Keine Treffer gefunden"
+
+#: app/controllers/CControllerValidateApiExists.php:118
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr ""
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
@@ -17699,7 +17744,7 @@ msgstr "Vorangehende Woche"
 #: app/partials/scheduledreport.formgrid.html.php:89
 #: app/partials/scheduledreport.table.html.php:60 include/func.inc.php:2569
 msgid "Previous year"
-msgstr "Vorangehedes Jahr"
+msgstr "Vorangehendes Jahr"
 
 #: include/hosts.inc.php:399
 msgid "Primary POC cell"
@@ -17820,7 +17865,7 @@ msgstr "Problemausdruck"
 #: widgets/problemhosts/Widget.php:29
 #: widgets/svggraph/includes/WidgetForm.php:386
 msgid "Problem hosts"
-msgstr "Problem Hosts"
+msgstr "Problem-Hosts"
 
 #: app/views/js/popup.action.edit.js.php:289 include/actions.inc.php:365
 msgid "Problem is not suppressed"
@@ -20416,7 +20461,7 @@ msgstr "Zeiträume anzeigen"
 
 #: widgets/svggraph/includes/WidgetForm.php:377
 msgid "Show problems"
-msgstr "Ziege Probleme"
+msgstr "Zeige Probleme"
 
 # Passive Form besser lesbar im Dropdown-Feld
 #: include/views/monitoring.history.php:168
@@ -21242,6 +21287,10 @@ msgstr "Auslagerungsspeichergrösse in Bytes oder Prozent vom Ganzen. Gibt Ganzz
 msgid "Swedish (sv_SE)"
 msgstr "Schwedisch (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Alle Sitzungen werden zurückgesetzt beim Wechseln der Authentifizierungsmethode! Weiter?"
@@ -21869,6 +21918,10 @@ msgstr ""
 
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
+msgstr ""
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
 msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
@@ -23250,6 +23303,10 @@ msgstr "Problemquittierung rückgängig machen."
 
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
+msgstr ""
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
 msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
@@ -25102,6 +25159,10 @@ msgstr ""
 msgid "Widget is deprecated."
 msgstr "Widget ist veraltet."
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Das Widget ist zu klein für die angegebene Anzahl von Spalten und Zeilen."
@@ -25485,6 +25546,10 @@ msgstr "Sie können die Vorlage für die aktuelle Auswahl nicht wechseln."
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Sie haben keine Berechtigung, diese Operation durchzuführen."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -26888,6 +26953,11 @@ msgstr "ungültigen Byte-Sequenz in UTF-8"
 msgid "invalid data type"
 msgstr "ungültiger Datentyp"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "ungültige Verzögerung"
@@ -28288,6 +28358,11 @@ msgstr "Wert muss zwischen \"%1$s\" und \"%2$s\" liegen"
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr ""
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "Wert muss leer sein"
@@ -28303,6 +28378,16 @@ msgstr[1] "Wert muss leer oder %1$s sein"
 #: widgets/gauge/includes/WidgetForm.php:133
 #, c-format
 msgid "value must be greater than \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
 msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342

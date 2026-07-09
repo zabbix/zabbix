@@ -2218,6 +2218,13 @@ msgstr "接続の暗号化用の 事前共有鍵を変更する場合は、\"tls
 msgid "Both passwords must be equal."
 msgstr "両方のパスワードが一致している必要があります。"
 
+#: app/controllers/CControllerItemCreate.php:264
+#: app/controllers/CControllerItemPrototypeCreate.php:279
+#: app/controllers/CControllerItemPrototypeUpdate.php:267
+#: app/controllers/CControllerItemUpdate.php:264
+msgid "Both username and password should be either present or empty."
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
 #: include/views/js/monitoring.sysmaps.js.php:681
@@ -4111,6 +4118,10 @@ msgstr "グラフのプロトタイプ\"%2$s\"に\"%1$s\"を設定できませ�
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "\"合計\" タイプの項目がグラフに追加されている場合、 \"データ セットの集計\" を設定できません。"
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -12105,6 +12116,13 @@ msgstr "周期と保存"
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "ユーザーの役割\"%1$s\"のためのAPIメソッド\"%2$s\"が正しくありません。"
 
+#: app/controllers/CControllerItemCreate.php:183
+#: app/controllers/CControllerItemPrototypeCreate.php:198
+#: app/controllers/CControllerItemPrototypeUpdate.php:186
+#: app/controllers/CControllerItemUpdate.php:183
+msgid "Invalid HTTP status code or range."
+msgstr ""
+
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
@@ -12193,6 +12211,11 @@ msgstr "メールアドレス\"%1$s\"が正しくありません。"
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "ID \"%1$s\"のメディアタイプのメールアドレスが正しくありません。"
+
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -12575,6 +12598,11 @@ msgstr "無効な文字列です。"
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "タグ\"%1$s\"が正しくありません: %2$s。"
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -15029,6 +15057,10 @@ msgstr "新規LDAPサーバー"
 msgid "New MFA method"
 msgstr "新しい多要素認証(MFA)方式"
 
+#: app/views/oauth.edit.php:242
+msgid "New OAuth"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "新規SLA"
@@ -15221,6 +15253,10 @@ msgstr "次"
 msgid "Next dashboard"
 msgstr "次のダッシュボード"
 
+#: jsLoader.php:328
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15234,6 +15270,10 @@ msgstr "次のページ"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "次のステップ"
+
+#: jsLoader.php:326
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -15423,6 +15463,11 @@ msgstr "マップが追加されていません。"
 #: include/classes/html/CMultiSelect.php:66 jsLoader.php:328
 msgid "No matches found"
 msgstr "条件に一致するデータはありません"
+
+#: app/controllers/CControllerValidateApiExists.php:118
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr ""
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
@@ -21019,6 +21064,10 @@ msgstr "スワップ容量。返り値: 整数値 - バイト単位, 浮動小�
 msgid "Swedish (sv_SE)"
 msgstr "スウェーデン語 (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "認証方式の変更を行うと現在のセッション以外はリセットされます実行しますか？"
@@ -21640,6 +21689,10 @@ msgstr "認可サーバーに登録されたクライアント識別子。"
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
 msgstr "認可サーバーに登録されたクライアント秘密鍵。"
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -23009,6 +23062,10 @@ msgstr "障害確認の解除"
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "予期しない HTTP レスポンスステータス コード"
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
+msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -24848,6 +24905,10 @@ msgstr "ウィジェットの設定が元に戻ります。"
 msgid "Widget is deprecated."
 msgstr "ウィジェットは廃止予定です。"
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "指定された列と行の数に対してウィジェットが小さすぎます。"
@@ -25231,6 +25292,10 @@ msgstr "現在選択しているテンプレートを切り替えることはで
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "操作に対する権限がありません。"
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -26637,6 +26702,11 @@ msgstr "UTF-8のバイトシーケンスが正しくありません"
 msgid "invalid data type"
 msgstr "データタイプが正しくありません"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "監視間隔が正しくありません"
@@ -28035,6 +28105,11 @@ msgstr "値は\"%1$s\"から\"%2$s\"までにしてください"
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "値は \"%1$s\" から \"%2$s\" の範囲で、小数点以下は \"%3$s\" 桁以下である必要があります。"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "値は空にしてください"
@@ -28050,6 +28125,16 @@ msgstr[0] "値は空か%1$sを指定してください"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "指定する値は\"%1$s\"以上にしてください。"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

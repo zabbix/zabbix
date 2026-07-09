@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -80,7 +80,7 @@ class CControllerSlaExcludedDowntimeValidate extends CController {
 				'period_from' => $period_from,
 				'period_to' => $period_to,
 				'start_time' => zbx_date2str(DATE_TIME_FORMAT, $period_from),
-				'duration' => convertUnitsS($period_to - $period_from, true)
+				'duration' => convertUnitsS($period_to - $period_from, ['ignore_milliseconds' => true])
 			]
 		];
 

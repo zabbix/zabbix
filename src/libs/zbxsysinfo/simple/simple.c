@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,9 +25,12 @@
 #include "zbxcomms.h"
 #include "zbx_discoverer_constants.h"
 
+#if defined(HAVE_LIBCURL) || defined(HAVE_LDAP)
+#	include "zbxip.h"
+#endif
+
 #ifdef HAVE_LIBCURL
 #	include "zbxcurl.h"
-#	include "zbxip.h"
 #endif
 
 #ifdef HAVE_LDAP

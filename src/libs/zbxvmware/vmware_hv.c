@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -421,7 +421,7 @@ static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *
 		goto out;
 
 	if (NULL == (hv->datacenter_name = zbx_xml_doc_read_value(doc,
-			ZBX_XPATH_NAME_BY_TYPE(ZBX_VMWARE_SOAP_DATACENTER))))
+			ZBX_XPATH_NAME_BY_TYPE(ZBX_VMWARE_SOAP_DC))))
 	{
 		hv->datacenter_name = zbx_strdup(NULL, "");
 	}
@@ -439,7 +439,7 @@ static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *
 	else if ('\0' != *hv->datacenter_name)
 	{
 		hv->parent_name = zbx_strdup(NULL, hv->datacenter_name);
-		hv->parent_type = zbx_strdup(NULL, ZBX_VMWARE_SOAP_DATACENTER);
+		hv->parent_type = zbx_strdup(NULL, ZBX_VMWARE_SOAP_DC);
 	}
 	else
 	{

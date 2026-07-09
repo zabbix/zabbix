@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -451,6 +451,10 @@ class CLineGraphDraw extends CGraphDraw {
 
 			if ($item['throttling_type'] == ZBX_PREPROC_THROTTLE_TIMED_VALUE
 					&& ($throttling_delay = timeUnitToSeconds($item['throttling_delay'])) === null) {
+				continue;
+			}
+
+			if (!array_key_exists($item['itemid'], $results)) {
 				continue;
 			}
 
@@ -2026,6 +2030,10 @@ class CLineGraphDraw extends CGraphDraw {
 			$y_offsets -= ($this->show_triggers && count($this->triggers) > 0)
 				? static::DEFAULT_TOP_BOTTOM_PADDING / 2
 				: static::DEFAULT_TOP_BOTTOM_PADDING;
+		}
+
+		if ($this->with_bottom_padding) {
+			$y_offsets += static::DEFAULT_TOP_BOTTOM_PADDING / 2;
 		}
 
 		// Actual outer dimensions, regardless $this->outer setting.

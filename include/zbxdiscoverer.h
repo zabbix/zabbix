@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -33,7 +33,9 @@ typedef struct
 	zbx_discovery_open_func_t			discovery_open_cb;
 	zbx_discovery_close_func_t			discovery_close_cb;
 	zbx_discovery_find_host_func_t			discovery_find_host_cb;
+	zbx_discovery_update_interface_func_t		discovery_update_interface_cb;
 	zbx_discovery_update_host_func_t		discovery_update_host_cb;
+	zbx_discovery_update_hosts_func_t 		discovery_update_hosts_cb;
 	zbx_discovery_update_service_func_t		discovery_update_service_cb;
 	zbx_discovery_update_service_down_func_t	discovery_update_service_down_cb;
 	zbx_discovery_update_drule_func_t		discovery_update_drule_cb;

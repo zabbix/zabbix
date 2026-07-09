@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -143,6 +143,16 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 
 	switch ($column['display']) {
 		case CWidgetFieldColumnsList::DISPLAY_AS_IS:
+			if (array_key_exists('thresholds', $column)) {
+				foreach ($column['thresholds'] as $threshold) {
+					if ($value < $threshold['threshold']) {
+						break;
+					}
+
+					$color = $threshold['color'];
+				}
+			}
+
 			$style = $color !== '' ? 'background-color: #'.$color : null;
 			$value_cell->addStyle($style);
 
@@ -236,7 +246,7 @@ function makeTableCellViewsText(array $cell, array $data, $formatted_value, bool
 	$color = '';
 	if (array_key_exists('highlights', $column)) {
 		foreach ($column['highlights'] as $highlight) {
-			if (@preg_match('('.$highlight['pattern'].')', $value)) {
+			if (@preg_match('/'.CRegexHelper::handleSlashEscaping($highlight['pattern']).'/', $value)) {
 				$color = $highlight['color'];
 				break;
 			}
