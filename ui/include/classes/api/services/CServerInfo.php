@@ -30,11 +30,11 @@ class CServerInfo extends CApiService {
 
 		$server_data = [];
 
-		if (array_key_exists('serverid', array_flip($options['output']))) {
+		if (in_array('serverid', $options['output'])) {
 			$server_data['serverid'] = $options['serverid'];
 		}
 
-		if (array_key_exists('lastaccess', array_flip($options['output']))) {
+		if (in_array('lastaccess', $options['output'])) {
 			$server_data['lastaccess'] = self::getServerLastAccess();
 		}
 
@@ -68,8 +68,8 @@ class CServerInfo extends CApiService {
 		$active_node = DB::select('ha_node', [
 			'output' => ['lastaccess'],
 			'filter' => ['address' => $ZBX_SERVER, 'port' => $ZBX_SERVER_PORT],
-			'sortfield' => 'lastaccess',
-			'sortorder' => 'DESC',
+			'sortfield' => ['lastaccess'],
+			'sortorder' => [ZBX_SORT_DOWN],
 			'limit' => 1
 		]);
 
