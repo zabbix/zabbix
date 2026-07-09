@@ -1503,7 +1503,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'link'   => 'Dashboards',
 					'header' => 'Host dashboards',
 					'title'  => 'Dashboards',
-					'url' => 'zabbix.php?action=host.dashboard.view&hostid={hostid}'
+					'url' => 'zabbix.php?action=host.dashboard.view&hostid={hostid}&dashboardid={dashboardid}&from=now-1h&to=now'
 				]
 			],
 			// #3.
@@ -1578,7 +1578,19 @@ class testDashboardHostCardWidget extends testWidgets {
 		$this->page->assertHeader($data['header']);
 
 		// Replace {id} draft to the real host id.
-		$data['url'] = str_replace('{hostid}', self::$hostid, $data['url']);
+		if ($data['title'] === 'Dashboards') {
+			// We need to find templates dashboardid that linked to Host.
+			//There is possibility that id can be changed during template build. It can't be hardcoded.
+			$dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard d JOIN hosts h ON d.templateid = '.
+					'h.hostid WHERE d.name = '.zbx_dbstr('Apache performance').' AND h.host = '.zbx_dbstr('Apache by Zabbix agent'));
+
+			$data['url'] = str_replace('{hostid}', self::$hostid, $data['url']);
+			$data['url'] = str_replace('{dashboardid}', $dashboardid, $data['url']);
+		}
+		else {
+			$data['url'] = str_replace('{hostid}', self::$hostid, $data['url']);
+		}
+
 		$this->assertEquals(PHPUNIT_URL.$data['url'], $this->page->getCurrentUrl());
 		$this->page->assertTitle($data['title']);
 	}

@@ -23,15 +23,17 @@ $html_page = (new CHtmlPage())
 	->setTitleSubmenu(getAdministrationQueueSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::QUEUE_OVERVIEW));
 
-$table = (new CTableInfo())->setHeader([
-	_('Items'),
-	_('5 seconds'),
-	_('10 seconds'),
-	_('30 seconds'),
-	_('1 minute'),
-	_('5 minutes'),
-	_('More than 10 minutes')
-]);
+$table = (new CTableInfo())
+	->addClass(ZBX_STYLE_ROUNDED_SURFACE)
+	->setHeader([
+		_('Items'),
+		_('5 seconds'),
+		_('10 seconds'),
+		_('30 seconds'),
+		_('1 minute'),
+		_('5 minutes'),
+		_('More than 10 minutes')
+	]);
 
 foreach ($data['item_types'] as $item_type) {
 	$item_type_queue = array_key_exists($item_type, $data['queue_data'])

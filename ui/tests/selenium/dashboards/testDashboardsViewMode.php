@@ -120,6 +120,12 @@ class testDashboardsViewMode extends CLegacyWebTest {
 		$this->page->logout();
 	}
 
+	/**
+	 * The ignore browser errors annotation is required due to the errors coming from Dashboard with timeselector
+	 * opened in Kiosk mode. TODO: Remove after fix - ZBX-27942
+	 *
+	 * @ignoreBrowserErrors
+	 */
 	public function testDashboardsViewMode_KioskMode() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view&dashboardid=1', false);
 		$this->zbxTestCheckHeader('Global view');
@@ -142,6 +148,12 @@ class testDashboardsViewMode extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath('//ul[@class="breadcrumbs"]');
 	}
 
+	/**
+	 * The ignore browser errors annotation is required due to the errors coming from Dashboard with timeselector
+	 * opened in Kiosk mode. TODO: Remove after fix - ZBX-27942
+	 *
+	 * @ignoreBrowserErrors
+	 */
 	public function testDashboardsViewMode_KioskModeUrlParameter() {
 		// Set layout mode to kiosk view.
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view&kiosk=1', false);
