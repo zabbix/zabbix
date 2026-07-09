@@ -133,9 +133,6 @@ static void	cep_worker_add_events(zbx_cep_worker_t *worker, zbx_cep_task_remote_
 		{
 			zbx_vector_mw_task_ptr_append(&tasks, cep_create_task_event(events.values[i]));
 			zbx_db_event *db_event = events.values[i];
-			zabbix_log(LOG_LEVEL_INFORMATION, "In %s() source:%d object:%d objectid:" ZBX_FS_UI64 " name:%s value:%d ts:%d.%09d",
-				__func__, db_event->source, db_event->object, db_event->objectid,
-				db_event->name, db_event->value, db_event->clock, db_event->ns);
 		}
 
 		zbx_mw_queue_lock(worker->base.queue);
@@ -741,7 +738,7 @@ static void	cep_worker_process_internal_event(zbx_cep_task_event_t *task)
  ******************************************************************************/
 static void	cep_worker_process_task_event(zbx_cep_worker_t *worker, zbx_cep_task_event_t *task)
 {
-	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() source:%d object:%d objectid:" ZBX_FS_UI64 " name:%s value:%d ts:%d.%09d",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:%d object:%d objectid:" ZBX_FS_UI64 " name:%s value:%d ts:%d.%09d",
 			__func__, task->db_event->source, task->db_event->object, task->db_event->objectid,
 			task->db_event->name, task->db_event->value, task->db_event->clock, task->db_event->ns);
 
