@@ -275,6 +275,12 @@ a.btn-icon,
 	}
 }
 
+.skip-link {
+	&:focus-visible {
+		border-bottom-width: 1px;
+	}
+}
+
 // components/menu-user
 .menu-user {
 	a {
@@ -523,17 +529,17 @@ a.link-action {
 	}
 }
 
-.table-paging {
+.pager {
 	a {
 		&:focus {
 			background-color: #777777 !important;
 		}
 	}
-}
 
-.paging-selected {
-	&:focus {
-		background-color: #777777 !important;
+	.selected {
+		&:focus {
+			background-color: #777777 !important;
+		}
 	}
 }
 
@@ -977,7 +983,7 @@ td.inactive-bg {
 }
 
 .problem-icon-link {
-	border-radius: 3px;
+	border-radius: var(--badge-border-radius);
 
 	&:focus {
 		box-shadow: 0 0 0 2px $btn-focus-outline-color;
@@ -1000,7 +1006,7 @@ td.inactive-bg {
 			height: $icon-medium-size;
 			vertical-align: top;
 			margin-right: 4px;
-			border-radius: 3px;
+			border-radius: var(--badge-border-radius);
 			content: '';
 		}
 	}

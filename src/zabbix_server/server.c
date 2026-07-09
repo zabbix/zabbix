@@ -886,7 +886,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_REPORTWRITER] && NULL == zbx_config_webservice_url)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "\"WebServiceURL\" configuration parameter must be set when "
+		zabbix_log(LOG_LEVEL_CRIT, "\"WebServiceURL\" configuration parameter must be set when"
 				" setting \"StartReportWriters\" configuration parameter");
 		err = 1;
 	}
@@ -2654,6 +2654,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (SUCCEED != zbx_db_update_software_update_checkid())
 			goto out;
 	}
+
+	if (SUCCEED != zbx_db_check_serverid())
+		goto out;
 
 	zbx_db_save_server_status();
 
