@@ -29,7 +29,7 @@ class CWidgetElement extends CElement {
 	 */
 	public function getRefreshInterval() {
 		$this->getHeader()->hoverMouse();
-		$this->query('xpath:.//button[contains(@class, "js-widget-action")]')->waitUntilPresent()->one()->click(true);
+		$this->query('xpath:.//button[contains(@class, "js-widget-action")]')->waitUntilPresent()->one()->forceClick();
 		$menu = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$aria_label = explode(', ', $menu->getSelected()->getAttribute('aria-label'), 3);
 

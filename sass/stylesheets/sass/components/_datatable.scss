@@ -7,6 +7,7 @@
 .datatable {
 	position: relative;
 	border: 1px solid $ui-border-color;
+	border-radius: var(--surface-border-radius);
 
 	&::before {
 		content: '';
@@ -177,6 +178,7 @@
 		user-select: none;
 		background-color: $ui-bg-color;
 		border: 1px solid $ui-border-color;
+		border-radius: var(--surface-border-radius);
 		box-shadow: 0 4px 20px 0 $action-shadow-color;
 
 		&:focus {
@@ -214,6 +216,8 @@
 	.datatable-header {
 		display: grid;
 		overflow: hidden;
+		border-top-left-radius: var(--surface-border-radius);
+		border-top-right-radius: var(--surface-border-radius);
 
 		&.datatable-header-sticky {
 			position: sticky;
@@ -281,6 +285,7 @@
 
 			.datatable-options-link {
 				margin-right: 0;
+				border-radius: 0 var(--surface-border-radius) 0 0;
 
 				&:not(:hover):not(:focus):not(.datatable-options-link-opened) {
 					border-left-color: $ui-border-color;
@@ -390,7 +395,7 @@
 			bottom: 0;
 		}
 
-		&.table-paging {
+		&.pager {
 			border: solid $ui-border-color;
 			border-width: 1px 0 0;
 
@@ -460,6 +465,7 @@
 				}
 
 				.header-link {
+					@extend %overflow-ellipsis;
 					box-sizing: border-box;
 					display: flex;
 					align-items: center;

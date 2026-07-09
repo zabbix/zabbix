@@ -108,8 +108,8 @@ class CSettingsHelper {
 	public const SERVER_STATUS = 'server_status';
 	public const SOFTWARE_UPDATE_CHECKID = 'software_update_checkid';
 	public const SOFTWARE_UPDATE_CHECK_DATA = 'software_update_check_data';
-	public const BANNER_DATA = 'banner_data';
 	public const HA_FAILOVER_DELAY = 'ha_failover_delay';
+	public const SERVER_ID = 'serverid';
 
 	private static $params = [];
 	private static $params_public = [];
@@ -158,7 +158,7 @@ class CSettingsHelper {
 					'auditlog_enabled', 'auditlog_mode',
 
 					// Read-only parameters.
-					'ha_failover_delay'
+					'ha_failover_delay', 'serverid'
 				]
 			]);
 
@@ -226,14 +226,6 @@ class CSettingsHelper {
 		}
 
 		return self::$params_private[self::SOFTWARE_UPDATE_CHECK_DATA];
-	}
-
-	public static function getBannerData(): array {
-		if (!self::$params_private) {
-			self::$params_private = CSettings::getPrivate();
-		}
-
-		return self::$params_private[self::BANNER_DATA];
 	}
 
 	public static function isGlobalScriptsEnabled(): bool {
