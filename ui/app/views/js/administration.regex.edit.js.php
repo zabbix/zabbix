@@ -240,8 +240,6 @@ window.regex_edit_popup = new class {
 	}
 
 	#testExpression(rules) {
-		this.#setTestLoadingStatus();
-
 		const test_fields = ['expressions', 'test_string'];
 
 		Object.values(this.#form.findFieldByName('expressions').getFields()).forEach(field => {
@@ -250,14 +248,18 @@ window.regex_edit_popup = new class {
 
 		this.#form.findFieldByName('test_string').setChanged();
 
-		this.#form.validateFieldsForAction(test_fields, rules)
+		const values = this.#form.getAllValues();
+
+		this.#setTestLoadingStatus(test_fields);
+
+		this.#form.validateFieldsForAction(test_fields, rules, values)
 			.then(result => {
 				if (!result) {
-					this.#unsetTestLoadingStatus()
+					this.#unsetTestLoadingStatus(test_fields)
 					return;
 				}
 
-				const {expressions, test_string} = this.#form.getAllValues();
+				const {expressions, test_string} = values;
 
 				this.#removePopupMessages();
 
@@ -275,26 +277,28 @@ window.regex_edit_popup = new class {
 						this.#showTestResult(response, expressions);
 					})
 					.catch(exception => this.#ajaxExceptionHandler(exception))
-					.finally(() => this.#unsetTestLoadingStatus());
+					.finally(() => this.#unsetTestLoadingStatus(test_fields));
 			});
 	}
 
-	#setTestLoadingStatus() {
+	#setTestLoadingStatus(test_fields) {
 		if (!this.#form_element.isConnected) {
 			return;
 		}
-		// TODO:: need to use the this.#form.lock() method after the merge task ZBXNEXT-10393
+
+		this.#form.lock(test_fields);
 
 		document.getElementById('regular-expressions-table')
 			.querySelectorAll('.js-add, .js-remove')
 			.forEach(button => button.disabled = true);
 	}
 
-	#unsetTestLoadingStatus() {
+	#unsetTestLoadingStatus(test_fields) {
 		if (!this.#form_element.isConnected) {
 			return;
 		}
-		// TODO:: need to use the this.#form.unlock() method after the merge task ZBXNEXT-10393
+
+		this.#form.unlock(test_fields);
 
 		document.getElementById('regular-expressions-table')
 			.querySelectorAll('.js-add, .js-remove')
