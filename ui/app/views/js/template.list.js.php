@@ -151,7 +151,8 @@
 						.setFields(['templates'])
 						.setRenderer('linked_to_templates'),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
-					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>)
+					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
+					new CDataTableColumnCustomText('custom_text', <?= json_encode(_('Custom text')); ?>)
 				])
 				.setPage(page)
 				.setFilter(filter)

@@ -31,9 +31,10 @@ class CControllerConnectorUpdate extends CControllerConnectorUpdateGeneral {
 			'data_type' => ['db connector.data_type', 'required',
 				'in' => [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS]
 			],
-			'url' => ['db connector.url', 'required', 'not_empty',
-				'use' => [CUrlValidator::class, []]
-			],
+			'url' => ['db connector.url', 'required', 'not_empty', 'use' => [CUrlValidator::class, [
+				'user_macro' => true,
+				'schemes' => CSettingsHelper::getAllowedUriSchemes()
+			]]],
 			'item_value_types' => ['array', 'required', 'not_empty',
 				'field' => ['integer',
 					'in' => [ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64, ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT,

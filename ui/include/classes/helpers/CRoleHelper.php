@@ -260,6 +260,7 @@ class CRoleHelper {
 				self::UI_MONITORING_DISCOVERY,
 				self::UI_SERVICES_SLA,
 				self::UI_REPORTS_SCHEDULED_REPORTS,
+				self::UI_REPORTS_SYSTEM_INFO,
 				self::UI_REPORTS_NOTIFICATIONS,
 				self::UI_CONFIGURATION_TEMPLATE_GROUPS,
 				self::UI_CONFIGURATION_HOST_GROUPS,
@@ -277,7 +278,6 @@ class CRoleHelper {
 
 		if ($user_type === USER_TYPE_SUPER_ADMIN) {
 			$rules = array_merge($rules, [
-				self::UI_REPORTS_SYSTEM_INFO,
 				self::UI_REPORTS_AUDIT,
 				self::UI_REPORTS_ACTION_LOG,
 				self::UI_CONFIGURATION_EVENT_CORRELATION,
@@ -413,12 +413,9 @@ class CRoleHelper {
 			case self::UI_SECTION_REPORTS:
 				$labels = [];
 
-				if ($user_type === USER_TYPE_SUPER_ADMIN) {
-					$labels += [self::UI_REPORTS_SYSTEM_INFO => _('System information')];
-				}
-
 				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 					$labels += [
+						self::UI_REPORTS_SYSTEM_INFO => _('System information'),
 						self::UI_REPORTS_SCHEDULED_REPORTS => _('Scheduled reports')
 					];
 				}

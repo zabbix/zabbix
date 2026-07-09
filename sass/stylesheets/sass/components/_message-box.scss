@@ -10,7 +10,7 @@ output {
 	background: $ui-bg-color;
 	border-style: solid;
 	border-width: 2px 2px 2px 60px;
-	border-radius: 4px;
+	border-radius: var(--surface-border-radius);
 
 	&::before {
 		@extend %icons-font;
@@ -25,6 +25,9 @@ output {
 
 	> span {
 		font-size: $font-h4-size;
+		padding-right: 10px;
+		word-break: break-all;
+		white-space: normal;
 	}
 
 	.msg-buttons {
@@ -64,7 +67,7 @@ output {
 	}
 
 	&.collapsible {
-		grid-template: 16.8px 1fr / max-content 1fr;
+		grid-template: minmax(16.8px, max-content) 1fr / max-content 1fr;
 		grid-gap: 6px 10px;
 
 		@if $ui-transitions {
@@ -102,7 +105,7 @@ output {
 		}
 
 		&.collapsed {
-			grid-template-rows: 32px 0fr;
+			grid-template-rows: minmax(32px, max-content) 0fr;
 			grid-row-gap: 0;
 
 			.msg-details {

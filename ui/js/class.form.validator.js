@@ -373,7 +373,8 @@ class CFormValidator {
 			rule_set.api_uniq.forEach(api_uniq => {
 				const [method, api_params, id_field, error_msg] = api_uniq;
 				const referenced_fields = [];
-				const parameters = {filter: {}};
+				const parameters = Object.create(null);
+				parameters.filter = Object.create(null);
 				let exclude_id = null;
 
 				if (id_field !== null) {
@@ -522,14 +523,13 @@ class CFormValidator {
 			.then(response => response.json())
 			.then(response => {
 				if ('error' in response) {
-					throw {error: response.error};
+					console.error('validate.api.exists error', response.error);
+					throw new Error();
 				}
 
 				return response;
 			})
-			.catch(exception => {
-				console.error(exception);
-
+			.catch(() => {
 				return {result: false};
 			});
 	}
@@ -603,6 +603,7 @@ class CFormValidator {
 			if (delayed_checks.length) {
 				let requests = [];
 				let id = 0;
+				let result_all = true;
 
 				for (const check of delayed_checks) {
 					requests.push(new Promise((resolve) => {
@@ -629,13 +630,15 @@ class CFormValidator {
 								}
 
 								resolve();
+							})
+							.catch(() => {
+								result_all = false;
+								resolve();
 							});
 					}));
 				}
 
 				Promise.all(requests).then(() => {
-					let result_all = true;
-
 					delayed_checks.forEach((check) => {
 						if ('error_msg' in check) {
 							this.#addError(check.path, check.error_msg, CFormValidator.ERROR_LEVEL_DELAYED);
@@ -740,7 +743,7 @@ class CFormValidator {
 						rule_sets = rule_sets.filter(rule_set => rule_set);
 						if (rule_sets.length) {
 							if (!('fields' in rule)) {
-								rule.fields = {};
+								rule.fields = Object.create(null);
 							}
 
 							rule.fields[field_name] = rule_sets;
@@ -795,7 +798,7 @@ class CFormValidator {
 						return false;
 					}
 
-					if (!this.#isTypeObject(rule) || !(part in rule.fields)) {
+					if (!this.#isTypeObject(rule) || !Object.hasOwn(rule.fields, part)) {
 						return false;
 					}
 
@@ -939,7 +942,7 @@ class CFormValidator {
 			let data = all_values;
 
 			for (const part of field_path.split('/').slice(1)) {
-				if (!(part in data)) {
+				if (!Object.hasOwn(data, part)) {
 					return null;
 				}
 
@@ -949,7 +952,7 @@ class CFormValidator {
 			return data;
 		};
 
-		let subset = {};
+		let subset = Object.create(null);
 
 		fields_to_validate.forEach((field_path) => {
 			const parts = field_path.split('/').slice(1);
@@ -976,7 +979,7 @@ class CFormValidator {
 			return {result: CFormValidator.SUCCESS};
 		}
 
-		if (!(field in data) || data[field] === null) {
+		if (!Object.hasOwn(data, field) || data[field] === null) {
 			if ('required' in rules) {
 				this.#addError(path, this.#getMessage(rules, 'required', t('This field cannot be empty.')),
 					CFormValidator.ERROR_LEVEL_PRIMARY
@@ -1351,7 +1354,7 @@ class CFormValidator {
 			 * Object without properties may arrive here as empty array.
 			 * That's not actually the error so simply normalize it.
 			 */
-			data = {};
+			data = Object.create(null);
 		}
 
 		if (!this.#isTypeObject(data)) {
@@ -1429,7 +1432,7 @@ class CFormValidator {
 			return {result: CFormValidator.ERROR};
 		}
 
-		const normalized_values = {};
+		const normalized_values = Object.create(null);
 		let has_error = false;
 
 		if ('fields' in rules) {
@@ -1448,8 +1451,8 @@ class CFormValidator {
 
 		if ('count_values' in rules) {
 			rules.count_values.forEach(count_rule => {
-				let counted_fields = {};
-				const field_names = {};
+				let counted_fields = Object.create(null);
+				const field_names = Object.create(null);
 
 				for (const [key, obj] of Object.entries(objects_values)) {
 					if (typeof(obj) !== 'object' || obj === null) {
@@ -1460,7 +1463,7 @@ class CFormValidator {
 					count_rule.field_rules.forEach((count_field_rule) => {
 						field_names[count_field_rule[0]] = true;
 
-						if (count_field_rule[0] in obj) {
+						if (Object.hasOwn(obj, count_field_rule[0])) {
 							if ('in' in count_field_rule) {
 								keep = keep && count_field_rule['in'].includes(obj[count_field_rule[0]]);
 							}
@@ -1949,7 +1952,7 @@ class CFormValidator {
 			let is_distinct = true;
 
 			for (const [index, data] of Object.entries(objects_values)) {
-				const data_new = {};
+				const data_new = Object.create(null);
 
 				for (const key in data) {
 					if (field_names.includes(key)) {

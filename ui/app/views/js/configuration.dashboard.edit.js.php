@@ -87,8 +87,6 @@
 				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 			});
 
-			ZABBIX.Dashboard.activate();
-
 			document
 				.getElementById('dashboard-config')
 				.addEventListener('click', () => ZABBIX.Dashboard.editProperties());
@@ -115,6 +113,15 @@
 
 			ZABBIX.Dashboard.on(DASHBOARD_EVENT_BUSY, this.events.busy);
 			ZABBIX.Dashboard.on(DASHBOARD_EVENT_IDLE, this.events.idle);
+
+			ZABBIX.Dashboard.on(CDashboard.EVENT_PAGE_SELECT, e => {
+				const {dashboard_page_index} = e.detail;
+				const page = dashboard_page_index > 0 ? dashboard_page_index + 1 : null;
+
+				this.updateHistory({page, add_new: false});
+			});
+
+			ZABBIX.Dashboard.activate();
 
 			this.enableNavigationWarning();
 
@@ -188,6 +195,38 @@
 			document.getElementById('dashboard-add-widget').disabled = do_disable;
 			document.getElementById('dashboard-add').disabled = do_disable;
 			document.getElementById('dashboard-save').disabled = do_disable;
+		},
+
+		updateHistory({page = undefined, add_new} = {}) {
+			const curl = new Curl('zabbix.php');
+
+			curl.setArgument('action', 'template.dashboard.edit');
+
+			if (this.dashboard.dashboardid !== null) {
+				curl.setArgument('dashboardid', this.dashboard.dashboardid);
+			}
+			else if (this.dashboard.templateid !== null) {
+				curl.setArgument('templateid', this.dashboard.templateid);
+			}
+
+			const state = {};
+
+			const url = new Curl();
+
+			if (page === undefined) {
+				page = url.getArgument('page');
+			}
+
+			if (page !== null) {
+				curl.setArgument('page', page);
+			}
+
+			if (add_new) {
+				history.pushState(state, '', curl.getUrl());
+			}
+			else {
+				history.replaceState(state, '', curl.getUrl());
+			}
 		},
 
 		cancelEditing() {

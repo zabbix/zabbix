@@ -59,7 +59,7 @@ window.widget_form = new class extends CWidgetForm {
 		this.#dataset_row_unique_id =
 			this.#dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length;
 
-		jQuery('.overlay-dialogue-body').off('scroll');
+		jQuery(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY}`).off('scroll');
 
 		jQuery(`#${form_tabs_id}`)
 			.on('change', 'input, z-color-picker, z-select, .multiselect', () => {
@@ -271,7 +271,7 @@ window.widget_form = new class extends CWidgetForm {
 		this.#updateVariableOrder(this.#dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 		this.#updateDatasetsLabel();
 
-		const $overlay_body = jQuery('.overlay-dialogue-body')
+		const $overlay_body = jQuery(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY}`)
 
 		$overlay_body.scrollTop(Math.max($overlay_body.scrollTop(), this.#form.scrollHeight - $overlay_body.height()));
 

@@ -86,7 +86,8 @@ class CDatatableBehavior extends CBehavior {
 	 * @param string  $selector    datatable selector
 	 */
 	public function assertDatatableData($data = [], $selector = null) {
-		$rows = $this->getDatatable($selector)->waitUntilReady()->getRows();
+		$datatable = $this->getDatatable($selector)->waitUntilReady();
+		$rows = $datatable->getRows();
 		if (!$data) {
 			$this->test->assertEquals(0, $rows->count());
 			// Check that datatable contain one row with text "No data found."
@@ -101,7 +102,8 @@ class CDatatableBehavior extends CBehavior {
 		);
 
 		foreach ($this->normalizeData($data) as $i => $values) {
-			$row = $rows->get($i);
+			// Use getRow() instead of $rows->get() so each row has its own selector and can be reloaded if the page auto-refreshes.
+			$row = $datatable->getRow($i);
 
 			foreach ($values as $name => $value) {
 				if (($text = $row->getColumnData($name, $value)) === null) {
