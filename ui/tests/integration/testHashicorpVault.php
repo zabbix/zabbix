@@ -16,7 +16,9 @@
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 /**
- * Test suite for HashiCorp Vault integration (DB credentials retrieval by Zabbix server).
+ * Test suite for HashiCorp Vault integration: DB credentials retrieval by Zabbix server, and
+ * resolution of Vault secret macros (a separate feature, exercised by
+ * testHashicorpVault_vaultMacroResolution()).
  *
  * This test suite does not manage the Vault instance's lifecycle: it expects a HashiCorp Vault
  * dev-mode instance, started independently (e.g. from the official "hashicorp/vault" Docker image,
@@ -57,12 +59,16 @@ class testHashicorpVault extends CIntegrationTest {
 
 	const HOSTNAME = 'test_hashicorp_vault';
 	const TRAPPER_ITEM_KEY = 'vault_trap';
+	const VAULT_MACRO = '{$VAULT_SECRET_USERNAME}';
+	const VAULT_MACRO_ITEM_KEY = 'vault_secret_macro_test';
+	const VAULT_MACRO_LOG_MARKER = 'vault secret macro resolved to: ';
 
 	private static $role_id;
 	private static $secret_id;
 	private static $static_token;
 
 	private static $hostid;
+	private static $db_user;
 
 	/**
 	 * Wait until the pre-existing Vault instance (see class docblock) is reachable. Does not start,
@@ -217,8 +223,11 @@ class testHashicorpVault extends CIntegrationTest {
 
 		global $DB;
 
+		self::$db_user = $DB['USER'];
+
 		// Store the credentials of the database used by the test environment as a Vault secret,
-		// mirroring how a real deployment would keep DB credentials out of zabbix_server.conf.
+		// mirroring how a real deployment would keep DB credentials out of zabbix_server.conf. The
+		// same secret doubles as the target of the Vault secret macro set up below.
 		self::vaultRequest('POST', '/v1/secret/data/'.self::VAULT_SECRET_PATH, [
 			'data' => [
 				'username' => $DB['USER'],
@@ -280,6 +289,39 @@ class testHashicorpVault extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 
+		// A Vault secret macro is a separate feature from Vault-sourced DB credentials: it resolves
+		// a "path:key" reference into the actual secret value wherever the macro is used, via a
+		// periodic cache sync ("zbx_dc_sync_kvs_paths") rather than at server startup. Making the
+		// frontend accept a HashiCorp-style "path:key" macro value requires the "vault_provider"
+		// setting to be HashiCorp (it already defaults to that, but this suite doesn't rely on it).
+		$this->call('settings.update', ['vault_provider' => ZBX_VAULT_TYPE_HASHICORP]);
+
+		$response = $this->call('usermacro.create', [
+			'hostid' => self::$hostid,
+			'macro' => self::VAULT_MACRO,
+			'type' => ZBX_MACRO_TYPE_VAULT,
+			'value' => self::VAULT_DB_PATH.':username'
+		]);
+		$this->assertArrayHasKey('hostmacroids', $response['result']);
+
+		// A script item that surfaces the macro's resolved value into the server log: the macro is
+		// substituted into "parameters" before the script runs, exposed to it as the JSON-encoded
+		// "value" variable. This is the only externally observable side effect of the macro actually
+		// having been resolved, since the API never returns the resolved value of a Vault macro.
+		$response = $this->call('item.create', [
+			'hostid' => self::$hostid,
+			'name' => self::VAULT_MACRO_ITEM_KEY,
+			'key_' => self::VAULT_MACRO_ITEM_KEY,
+			'type' => ITEM_TYPE_SCRIPT,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'timeout' => '3s',
+			'delay' => '1s',
+			'parameters' => ['name' => 'secret', 'value' => self::VAULT_MACRO],
+			'params' => 'var obj = JSON.parse(value); Zabbix.log(5, "'.self::VAULT_MACRO_LOG_MARKER.'"+obj.secret); '.
+					'return 0;'
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+
 		return true;
 	}
 
@@ -317,6 +359,35 @@ class testHashicorpVault extends CIntegrationTest {
 	 */
 	public function testHashicorpVault_tokenAuthentication() {
 		$this->assertServerIsOperational();
+	}
+
+	public function vaultMacroConfigurationProvider() {
+		$config = $this->tokenAuthenticationConfigurationProvider();
+		$config[self::COMPONENT_SERVER]['DebugLevel'] = 5;
+
+		return $config;
+	}
+
+	/**
+	 * Verify that a Vault secret macro ({$VAULT_SECRET_USERNAME}, created in prepareData() with a
+	 * "path:key" value) is actually resolved to the real secret stored in Vault, rather than just
+	 * accepted by the API. This is a separate code path from Vault-sourced DB credentials: it goes
+	 * through the periodic "zbx_dc_sync_kvs_paths" cache sync, not the server startup sequence.
+	 *
+	 * @required-components server
+	 * @configurationDataProvider vaultMacroConfigurationProvider
+	 */
+	public function testHashicorpVault_vaultMacroResolution() {
+		// Forces the server to notice the host/macro/item created in prepareData(), and to run the
+		// periodic Vault secret sync that resolves the macro.
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		// The script item logs the macro's resolved value on every execution (delay=1s); if the
+		// macro had failed to resolve, or resolved to the wrong secret, this exact line - the real
+		// database username fetched from Vault - would never appear.
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, self::VAULT_MACRO_LOG_MARKER.self::$db_user, true,
+				self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY
+		);
 	}
 
 	public function appRoleAuthenticationConfigurationProvider() {
