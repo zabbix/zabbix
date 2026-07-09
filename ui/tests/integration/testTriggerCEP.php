@@ -35,7 +35,7 @@ class testTriggerCEP extends CIntegrationTest {
 	// Increasing them makes the tests slower but far more thorough.
 	const LLD_DISCOVERY_COUNT = 500;	// discovered items/triggers per rule; use at least 4000 to stress CEP
 	const LOG_EVENT_COUNT = 10000;		// log values pushed at the single-trigger stream; use at least 10000
-	const RECOVERY_CYCLES_COUNT = 1000;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
+	const RECOVERY_CYCLES_COUNT = 2000;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
 
 	const SKIP_RESTART_TESTS = true;
 
@@ -5204,32 +5204,10 @@ HEREDOC;
 	}
 
 	private function currentClockNs(): array {
-		static $last_clock = -1;
-		static $last_ns = -1;
+		static $ns = 0;
 
-		$clock = time();
-		$ns = (int)(fmod(microtime(true), 1) * 1e9);
-
-		// Ensure the returned (clock, ns) pair is always strictly increasing, so no two values ever collide,
-		// even when the clock stalls, the sub-second fraction wraps, or two calls land in the same nanosecond.
-		if ($clock < $last_clock) {
-			$clock = $last_clock;
-		}
-
-		if ($clock === $last_clock && $ns <= $last_ns) {
-			$ns = $last_ns + 1;
-
-			// Carry into the next second when the nanosecond field overflows.
-			if ($ns >= 1000000000) {
-				$ns = 0;
-				$clock++;
-			}
-		}
-
-		$last_clock = $clock;
-		$last_ns = $ns;
-
-		return ['clock' => $clock, 'ns' => $ns];
+		// Use a monotonically increasing ns starting from 0, so no two returned values ever collide.
+		return ['clock' => time(), 'ns' => $ns++];
 	}
 
 	private function getApiSessionId(): string {
