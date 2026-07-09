@@ -61,13 +61,13 @@ class testHashicorpVault extends CIntegrationTest {
 	const TRAPPER_ITEM_KEY = 'vault_trap';
 	const VAULT_MACRO = '{$VAULT_SECRET_USERNAME}';
 	const VAULT_MACRO_ITEM_KEY = 'vault_secret_macro_test';
-	const VAULT_MACRO_LOG_MARKER = 'vault secret macro resolved to: ';
 
 	private static $role_id;
 	private static $secret_id;
 	private static $static_token;
 
 	private static $hostid;
+	private static $vault_macro_itemid;
 	private static $db_user;
 
 	/**
@@ -304,8 +304,8 @@ class testHashicorpVault extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('hostmacroids', $response['result']);
 
-		// A script item that surfaces the macro's resolved value into the server log: the macro is
-		// substituted into "parameters" before the script runs, exposed to it as the JSON-encoded
+		// A script item that surfaces the macro's resolved value as its own history value: the macro
+		// is substituted into "parameters" before the script runs, exposed to it as the JSON-encoded
 		// "value" variable. This is the only externally observable side effect of the macro actually
 		// having been resolved, since the API never returns the resolved value of a Vault macro.
 		$response = $this->call('item.create', [
@@ -313,14 +313,14 @@ class testHashicorpVault extends CIntegrationTest {
 			'name' => self::VAULT_MACRO_ITEM_KEY,
 			'key_' => self::VAULT_MACRO_ITEM_KEY,
 			'type' => ITEM_TYPE_SCRIPT,
-			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'value_type' => ITEM_VALUE_TYPE_TEXT,
 			'timeout' => '3s',
 			'delay' => '1s',
 			'parameters' => ['name' => 'secret', 'value' => self::VAULT_MACRO],
-			'params' => 'var obj = JSON.parse(value); Zabbix.log(5, "'.self::VAULT_MACRO_LOG_MARKER.'"+obj.secret); '.
-					'return 0;'
+			'params' => 'return JSON.parse(value).secret;'
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
+		self::$vault_macro_itemid = $response['result']['itemids'][0];
 
 		return true;
 	}
@@ -361,33 +361,32 @@ class testHashicorpVault extends CIntegrationTest {
 		$this->assertServerIsOperational();
 	}
 
-	public function vaultMacroConfigurationProvider() {
-		$config = $this->tokenAuthenticationConfigurationProvider();
-		$config[self::COMPONENT_SERVER]['DebugLevel'] = 5;
-
-		return $config;
-	}
-
 	/**
 	 * Verify that a Vault secret macro ({$VAULT_SECRET_USERNAME}, created in prepareData() with a
 	 * "path:key" value) is actually resolved to the real secret stored in Vault, rather than just
-	 * accepted by the API. This is a separate code path from Vault-sourced DB credentials: it goes
-	 * through the periodic "zbx_dc_sync_kvs_paths" cache sync, not the server startup sequence.
+	 * accepted by the API. This is a separate code path from Vault-sourced DB credentials: it is
+	 * resolved via the periodic "zbx_dc_sync_kvs_paths" cache sync (which also runs once, right at
+	 * startup, as part of the initial configuration sync), not the DB-credentials-at-startup one.
+	 *
+	 * The host, macro and script item all already existed in the database before this test's server
+	 * was started (they were created once in prepareData(), at suite setup), so no configuration
+	 * cache reload is needed here - the server's own initial sync picks them up.
 	 *
 	 * @required-components server
-	 * @configurationDataProvider vaultMacroConfigurationProvider
+	 * @configurationDataProvider tokenAuthenticationConfigurationProvider
 	 */
 	public function testHashicorpVault_vaultMacroResolution() {
-		// Forces the server to notice the host/macro/item created in prepareData(), and to run the
-		// periodic Vault secret sync that resolves the macro.
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		// The script item returns the macro's resolved value as its own history value on every
+		// execution (delay=1s); if the macro had failed to resolve, or resolved to the wrong secret,
+		// this would never match the real database username fetched from Vault.
+		$this->callUntilDataIsPresent('history.get', [
+			'itemids' => [self::$vault_macro_itemid],
+			'history' => ITEM_VALUE_TYPE_TEXT
+		], null, null, function($response) {
+			$value = $response['result'][0]['value'];
 
-		// The script item logs the macro's resolved value on every execution (delay=1s); if the
-		// macro had failed to resolve, or resolved to the wrong secret, this exact line - the real
-		// database username fetched from Vault - would never appear.
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, self::VAULT_MACRO_LOG_MARKER.self::$db_user, true,
-				self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY
-		);
+			return ($value === self::$db_user) ? true : 'unexpected value "'.$value.'"';
+		});
 	}
 
 	public function appRoleAuthenticationConfigurationProvider() {
