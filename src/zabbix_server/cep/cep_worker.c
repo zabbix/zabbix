@@ -130,10 +130,7 @@ static void	cep_worker_add_events(zbx_cep_worker_t *worker, zbx_cep_task_remote_
 		zbx_vector_mw_task_ptr_create(&tasks);
 
 		for (int i = 0; i < events.values_num; i++)
-		{
 			zbx_vector_mw_task_ptr_append(&tasks, cep_create_task_event(events.values[i]));
-			zbx_db_event *db_event = events.values[i];
-		}
 
 		zbx_mw_queue_lock(worker->base.queue);
 		cep_queue_push_batch((zbx_cep_queue_t *)worker->base.queue, &tasks);
