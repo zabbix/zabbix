@@ -55,8 +55,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 						],
 						['db dchecks.key_',
 							'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
-						],
-						['db dchecks.key_']
+						]
 					],
 					'snmp_community' => ['db dchecks.snmp_community',
 						'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c]]
@@ -140,8 +139,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 				],
 				['db dchecks.key_', 'required', 'not_empty',
 					'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
-				],
-				['db dchecks.key_']
+				]
 			],
 			'snmp_community' => ['db dchecks.snmp_community', 'required', 'not_empty',
 				'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c]]

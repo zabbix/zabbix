@@ -17,7 +17,7 @@
 use PHPUnit\Framework\TestCase;
 
 class CIPRangeValidatorTest extends TestCase {
-	public function dataProvider() {
+	public function dataProvider(): array {
 		return [
 			["0.0.0.0,255.255.255.255 \t\r\n,\t\r\n 192.168.1.0,2002:0:0:0:0:0:0:0,2002:0:0:0:0:0:ffff:ffff,www.zabbix.com", [],
 				'incorrect address starting from "2002:0:0:0:0:0:0:0,2002:0:0:0:0:0:ffff:ffff,www.zabbix.com"'
@@ -96,6 +96,38 @@ class CIPRangeValidatorTest extends TestCase {
 			],
 			['192.168.0.0/30', ['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30, 'max' => 3],
 				'IP range "192.168.0.0/30" exceeds "3" address limit'
+			],
+			['192.168.0.1-254',
+				['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30, 'max' => ZBX_DISCOVERER_IPRANGE_LIMIT],
+				null
+			],
+			['192.168.0.156-155',
+				['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30, 'max' => ZBX_DISCOVERER_IPRANGE_LIMIT],
+				'incorrect address starting from "192.168.0.156-155"'
+			],
+			['192.168.0.1-256',
+				['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30, 'max' => ZBX_DISCOVERER_IPRANGE_LIMIT],
+				'incorrect address starting from "192.168.0.1-256"'
+			],
+			['192.168.0.1-254, 192.168.0.0-126, 192.168.0.1-2, 192.168.0.1-1, 192.168.172.1/18, 192.168.172.1/18',
+				['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30, 'max' => ZBX_DISCOVERER_IPRANGE_LIMIT],
+				null
+			],
+			['192.168.0.1/31',
+				['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30, 'max' => ZBX_DISCOVERER_IPRANGE_LIMIT],
+				'incorrect address starting from "/31"'
+			],
+			['192.168.0.1/30',
+				['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30, 'max' => ZBX_DISCOVERER_IPRANGE_LIMIT],
+				null
+			],
+			['192.168.0.1/16',
+				['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30, 'max' => ZBX_DISCOVERER_IPRANGE_LIMIT],
+				null
+			],
+			['192.168.0.1/15',
+				['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30, 'max' => ZBX_DISCOVERER_IPRANGE_LIMIT],
+				'IP range "192.168.0.1/15" exceeds "65536" address limit'
 			]
 		];
 	}

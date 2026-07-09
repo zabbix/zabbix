@@ -74,8 +74,7 @@ class CControllerDiscoveryCreate extends CController {
 						],
 						['db dchecks.key_', 'required', 'not_empty',
 							'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
-						],
-						['db dchecks.key_']
+						]
 					],
 					'snmp_community' => ['db dchecks.snmp_community', 'required', 'not_empty',
 						'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c]]
@@ -191,7 +190,7 @@ class CControllerDiscoveryCreate extends CController {
 			$response = $form_errors
 				? ['form_errors' => $form_errors]
 				: ['error' => [
-					'title' => _('Cannot add discovery rule'),
+					'title' => _('Cannot create discovery rule'),
 					'messages' => array_column(get_and_clear_messages(), 'message')
 				]];
 

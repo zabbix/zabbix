@@ -18,32 +18,23 @@ class CIPRangeValidator extends CValidator {
 
 	/**
 	 * Support for IPv6 addresses.
-	 *
-	 * @var bool
 	 */
 	protected bool $v6 = false;
 
 	/**
 	 * Support for DNS names.
-	 *
-	 * @var bool
 	 */
 	protected bool $dns = false;
 
 	/**
 	 * Maximum value for IPv4 CIDR subnet mask notations.
-	 *
-	 * @var int
 	 */
 	protected int $max_ipv4_cidr = 30;
-
 
 	/**
 	 * Maximum allowed IP count inside the range.
 	 *
 	 * Null means no maximum check.
-	 *
-	 * @var int|null
 	 */
 	protected ?int $max = null;
 

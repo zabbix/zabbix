@@ -476,14 +476,6 @@ window.drule_edit_popup = new class {
 			})
 	}
 
-
-	/**
-	 * Sends a POST request to the specified URL with the provided data and executes the success_callback function.
-	 *
-	 * @param {string}   url               The URL to send the POST request to.
-	 * @param {object}   data              The data to send with the POST request.
-	 * @param {callback} success_callback  The function to execute when a successful response is received.
-	 */
 	#post(url, data, success_callback) {
 		fetch(url, {
 			method: 'POST',
