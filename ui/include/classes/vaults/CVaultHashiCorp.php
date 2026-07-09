@@ -31,11 +31,11 @@ class CVaultHashiCorp extends CVault {
 	private string $api_endpoint;
 	private string $db_prefix;
 	private string $db_path;
-	private string $token;
+	private ?string $token;
 	private string $role_id;
 	private string $secret_id;
 
-	public function __construct(string $api_endpoint, string $db_prefix, string $db_path, string $token = '',
+	public function __construct(string $api_endpoint, string $db_prefix, string $db_path, ?string $token,
 			string $role_id = '', string $secret_id = '') {
 		$this->api_endpoint = $api_endpoint;
 		$this->db_prefix = $db_prefix;
@@ -60,13 +60,18 @@ class CVaultHashiCorp extends CVault {
 			$this->addError(_s('Provided secret path "%1$s" is invalid.', $this->db_path));
 		}
 
-		if ($this->token === '') {
-			if ($this->role_id === '') {
-				$this->addError(_s('Provided authentication role id "%1$s" is empty.', $this->role_id));
+		if (!$this->token) {
+			if ($this->token === '' && $this->role_id === '' && $this->secret_id === '') {
+				$this->addError(_s('Provided authentication token "%1$s" is empty.', $this->token));
 			}
+			else {
+				if ($this->role_id === '') {
+					$this->addError(_s('Provided authentication role id "%1$s" is empty.', $this->role_id));
+				}
 
-			if ($this->secret_id === '') {
-				$this->addError(_s('Provided authentication secret id "%1$s" is empty.', $this->secret_id));
+				if ($this->secret_id === '') {
+					$this->addError(_s('Provided authentication secret id "%1$s" is empty.', $this->secret_id));
+				}
 			}
 		}
 		elseif ($this->role_id !== '' || $this->secret_id !== '') {
@@ -89,7 +94,7 @@ class CVaultHashiCorp extends CVault {
 			$url = $this->api_endpoint.$this->db_prefix.$this->db_path;
 		}
 
-		if ($this->token === '') {
+		if (!$this->token) {
 			$login_url = rtrim($this->api_endpoint, '/').self::APP_ROLE_LOGIN_PATH;
 			$data = [
 				'role_id' => $this->role_id,

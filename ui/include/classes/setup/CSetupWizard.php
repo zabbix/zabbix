@@ -261,10 +261,13 @@ class CSetupWizard extends CForm {
 			if (hasRequest('next') && array_key_exists(self::STAGE_DB_CONNECTION, getRequest('next'))) {
 				switch ($this->getConfig('DB_CREDS_STORAGE')) {
 					case DB_STORE_CREDS_VAULT_HASHICORP:
+						$vault_token = $this->getConfig('DB_VAULT_AUTH_TYPE') == DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN
+							? $this->getConfig('DB_VAULT_TOKEN')
+							: null;
+
 						$vault_provider = new CVaultHashiCorp($this->getConfig('DB_VAULT_URL'),
-							$this->getConfig('DB_VAULT_PREFIX'), $this->getConfig('DB_VAULT_DB_PATH'),
-							$this->getConfig('DB_VAULT_TOKEN'), $this->getConfig('DB_VAULT_APP_ROLE_ID'),
-							$this->getConfig('DB_VAULT_APP_SECRET_ID')
+							$this->getConfig('DB_VAULT_PREFIX'), $this->getConfig('DB_VAULT_DB_PATH'), $vault_token,
+							$this->getConfig('DB_VAULT_APP_ROLE_ID'), $this->getConfig('DB_VAULT_APP_SECRET_ID')
 						);
 
 						break;
