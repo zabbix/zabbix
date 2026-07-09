@@ -314,7 +314,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 	 *
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testUserMacrosInNdjsonExport() {
+	public function testUserMacrosInItemNames_ndjsonExport() {
 		$export_dir = self::getExportDir();
 		$now = time();
 		$prev_hour = $now - 3600;
