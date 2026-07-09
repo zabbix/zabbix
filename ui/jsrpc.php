@@ -611,7 +611,7 @@ switch ($data['method']) {
 
 			case 'valuemaps':
 			case 'template_valuemaps':
-				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
+				if (!array_key_exists('hostids', $data)) {
 					break;
 				}
 
