@@ -338,7 +338,7 @@ class testPagesWithoutData extends CWebTest {
 				$this->assertEquals('No data found', $table->query('class:datatable-body')->one()->getText());
 			}
 			else {
-				$table = $this->getTable('xpath://table[@class="list-table no-data"]');
+				$table = $this->getTable('xpath://table[contains(@class, "no-data")]');
 				$this->assertTableStats();
 				$this->assertEquals(['No data found'], $table->getRows()->asText());
 			}

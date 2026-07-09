@@ -220,15 +220,10 @@ class testDashboardCopyWidgets extends CWebTest {
 			$name_index = '[2]';
 		}
 
-		/* At the moment this is the only option how to wait for the loading spinner to disappear after pasting the widget,
-		 * since the widget header and the content block without the loading appear first,
-		 * and only after that the loading appears.
-		 * TODO: after ZBX-26280 remove sleep and change to ->asWidget()->waitUntilReady()->one();
-		 */
 		$copied_widget = $dashboard->query('xpath:(.//div[contains(@class, "dashboard-grid-widget-header") or'.
 				' contains(@class, "dashboard-grid-iterator-header")]/h4[text()='.
-				CXPathHelper::escapeQuotes($widget_name).'])'.$name_index.'/../../..')->waitUntilPresent()->asWidget()->one();
-		sleep(1);
+				CXPathHelper::escapeQuotes($widget_name).'])'.$name_index.'/../../..')
+				->waitUntilPresent()->asWidget()->one();
 		$copied_widget->waitUntilReady();
 
 		// For Other dashboard and Map from Navigation tree case - add map source, because it is not being copied by design.

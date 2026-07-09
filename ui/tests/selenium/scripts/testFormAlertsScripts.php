@@ -159,7 +159,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "timeout": value must be one of 1-60.',
 					'fields' => [
 						'Name' => 'Timeout test 0',
 						'Script' => 'java script',
@@ -174,7 +173,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "timeout": value must be one of 1-60.',
 					'fields' => [
 						'Name' => 'Timeout test 1h',
 						'Script' => 'java script',
@@ -189,7 +187,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "timeout": value must be one of 1-60.',
 					'fields' => [
 						'Name' => 'Timeout test 70',
 						'Script' => 'java script',
@@ -204,7 +201,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "timeout": a time unit is expected.',
 					'fields' => [
 						'Name' => 'Timeout test -1',
 						'Script' => 'java script',
@@ -219,7 +215,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "timeout": a time unit is expected.',
 					'fields' => [
 						'Name' => 'Timeout test character',
 						'Script' => 'java script',
@@ -234,7 +229,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.',
 					'fields' => [
 						'Name' => 'Test empty parameters',
 						'Type' => 'Webhook',
@@ -263,7 +257,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/parameters/2": value (name)=(Param1) already exists.',
 					'fields' => [
 						'Name' => 'Test empty parameter names',
 						'Type' => 'Webhook',
@@ -292,7 +285,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/command": cannot be empty.',
 					'fields' => [
 						'Name' => 'Webhook Empty script',
 						'Script' => ''
@@ -306,7 +298,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' => [
 						'Name' => '',
 						'Script' => 'Webhook: empty name'
@@ -320,7 +311,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' => [
 						'Name' => '',
 						'Type' => 'Script',
@@ -335,7 +325,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/command": cannot be empty.',
 					'fields' => [
 						'Name' => 'Script empty command',
 						'Type' => 'Script',
@@ -350,7 +339,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' => [
 						'Name' => '',
 						'Type' => 'IPMI',
@@ -365,7 +353,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/command": cannot be empty.',
 					'fields' => [
 						'Name' => 'IPMI empty command',
 						'Type' => 'IPMI',
@@ -380,7 +367,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' => [
 						'Name' => '',
 						'Type' => 'SSH',
@@ -395,7 +381,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/command": cannot be empty.',
 					'fields' => [
 						'Name' => 'SSH empty command',
 						'Type' => 'SSH',
@@ -410,7 +395,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/username": cannot be empty.',
 					'fields' => [
 						'Name' => 'SSH empty username',
 						'Type' => 'SSH',
@@ -426,7 +410,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' => [
 						'Name' => '',
 						'Type' => 'Telnet',
@@ -441,7 +424,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/command": cannot be empty.',
 					'fields' => [
 						'Name' => 'Telnet empty command',
 						'Type' => 'Telnet',
@@ -456,7 +438,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/username": cannot be empty.',
 					'fields' => [
 						'Name' => 'Telnet empty username',
 						'Type' => 'Telnet',
@@ -472,7 +453,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/url": cannot be empty.',
 					'fields' => [
 						'Name' => 'Url empty for host action',
 						'Scope' => 'Manual host action',
@@ -488,7 +468,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/url": cannot be empty.',
 					'fields' => [
 						'Name' => 'Url empty for event action',
 						'Scope' => 'Manual event action',
@@ -500,11 +479,10 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// TODO: Uncomment after DEV-4736 fixed
-			/*[
+			// #21
+			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/url": unacceptable URL.',
 					'fields' => [
 						'Name' => 'invalid uri schema',
 						'Scope' => 'Manual event action',
@@ -512,15 +490,29 @@ class testFormAlertsScripts extends CWebTest {
 						'URL' => 'htt://zabbix.com'
 					],
 					'inline_errors' => [
-						'URL' => 'This field cannot be empty.'
+						'URL' => 'Unacceptable URL scheme.'
 					]
 				]
-			],*/
-			// #21
+			],
+			// #22
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/menu_path": directory cannot be empty.',
+					'fields' => [
+						'Name' => 'invalid uri schema',
+						'Scope' => 'Manual event action',
+						'Type' => 'URL',
+						'URL' => 'javascript:window.opener.alert("XSS"); //'
+					],
+					'inline_errors' => [
+						'URL' => 'Unacceptable URL scheme.'
+					]
+				]
+			],
+			// #23
+			[
+				[
+					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'invalid menu path',
 						'Scope' => 'Manual event action',
@@ -533,11 +525,10 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #22 User input fields validation.
+			// #24 User input fields validation.
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/manualinput_prompt": cannot be empty.',
 					'fields' => [
 						'Name' => 'invalid input prompt',
 						'Scope' => 'Manual host action',
@@ -552,11 +543,10 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #23
+			// #25
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/manualinput_prompt": cannot be empty.',
 					'fields' => [
 						'Name' => 'invalid input prompt',
 						'Scope' => 'Manual event action',
@@ -576,7 +566,6 @@ class testFormAlertsScripts extends CWebTest {
 			/*[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/manualinput_default_value": input does not match the provided pattern: ^$.',
 					'fields' => [
 						'Name' => 'invalid default input string - not match empty string',
 						'Scope' => 'Manual event action',
@@ -598,7 +587,6 @@ class testFormAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/manualinput_default_value": input does not match the provided pattern: ^.*@.*\..*$.',
 					'fields' => [
 						'Name' => 'invalid default input string - not match an email input',
 						'Scope' => 'Manual host action',
@@ -616,11 +604,10 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],*/
-			// #24
+			// #26
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/manualinput_validator": cannot be empty.',
 					'fields' => [
 						'Name' => 'invalid input validation rule',
 						'Scope' => 'Manual event action',
@@ -636,11 +623,10 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #25
+			// #27
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/manualinput_validator": cannot be empty.',
 					'fields' => [
 						'Name' => 'invalid input validation rule',
 						'Scope' => 'Manual host action',
@@ -656,11 +642,10 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #26
+			// #28
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/manualinput_validator": cannot be empty.',
 					'fields' => [
 						'Name' => 'invalid dropdown options',
 						'Scope' => 'Manual host action',
@@ -677,11 +662,10 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #27
+			// #29
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/manualinput_validator": cannot be empty.',
 					'fields' => [
 						'Name' => 'invalid dropdown options',
 						'Scope' => 'Manual event action',
@@ -699,11 +683,10 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #28
+			// #30
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/manualinput_validator": values must be unique.',
 					'fields' => [
 						'Name' => 'invalid dropdown options',
 						'Scope' => 'Manual host action',
@@ -720,11 +703,10 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #29
+			// #31
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/manualinput_validator": values must be unique.',
 					'fields' => [
 						'Name' => 'invalid dropdown options',
 						'Scope' => 'Manual event action',
@@ -741,11 +723,10 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #30 Confirmation text validation.
+			// #32 Confirmation text validation.
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "confirmation": cannot be empty.',
 					'fields' => [
 						'Name' => 'invalid confirmation text',
 						'Scope' => 'Manual host action',
@@ -759,11 +740,10 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #31
+			// #33
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Incorrect value for field "confirmation": cannot be empty.',
 					'fields' => [
 						'Name' => 'invalid confirmation text',
 						'Scope' => 'Manual event action',
@@ -778,7 +758,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #32 Webhook.
+			// #34 Webhook.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -788,7 +768,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #33 Remove trailing spaces.
+			// #35 Remove trailing spaces.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -814,7 +794,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #34
+			// #36
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -850,7 +830,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #35
+			// #37
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -880,7 +860,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #36
+			// #38
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -916,7 +896,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #37
+			// #39
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -957,7 +937,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #38
+			// #40
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -969,7 +949,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #39
+			// #41
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -980,7 +960,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #40
+			// #42
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -991,7 +971,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #41
+			// #43
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1002,7 +982,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #42 Script.
+			// #44 Script.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1023,7 +1003,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #43
+			// #45
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1039,7 +1019,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #44
+			// #46
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1060,7 +1040,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #45 IPMI.
+			// #47 IPMI.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1081,7 +1061,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #46
+			// #48
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1096,7 +1076,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #47
+			// #49
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1117,7 +1097,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #48 SSH.
+			// #50 SSH.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1140,7 +1120,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #49
+			// #51
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1158,7 +1138,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #50
+			// #52
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1181,7 +1161,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #51
+			// #53
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1207,7 +1187,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #52
+			// #54
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1228,7 +1208,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #53
+			// #55
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1254,7 +1234,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #54 Telnet.
+			// #56 Telnet.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1277,7 +1257,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #55
+			// #57
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1295,7 +1275,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #56
+			// #58
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1318,7 +1298,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #57 URL.
+			// #59 URL.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1340,7 +1320,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #58
+			// #60
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1352,7 +1332,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #59
+			// #61
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1370,7 +1350,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #60
+			// #62
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1387,7 +1367,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #61
+			// #63
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1405,7 +1385,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #62 User manual input cases with UTF-8 4-byte characters.
+			// #64 User manual input cases with UTF-8 4-byte characters.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1424,7 +1404,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #63
+			// #65
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1442,7 +1422,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #64 User manual input cases with maxlength.
+			// #66 User manual input cases with maxlength.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1460,7 +1440,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #65
+			// #67
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1477,7 +1457,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #66 User manual input cases with macro.
+			// #68 User manual input cases with macro.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1496,7 +1476,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #67
+			// #69
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1517,7 +1497,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #68 Check that manual input fields leading and trailing spaces and are trimmed.
+			// #70 Check that manual input fields leading and trailing spaces and are trimmed.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1536,7 +1516,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #69
+			// #71
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2148,6 +2128,14 @@ class testFormAlertsScripts extends CWebTest {
 	private function assertUriScheme($form, $data, $expected = TEST_GOOD) {
 		foreach ($data as $scheme) {
 			$form->fill(['URL' => $scheme]);
+
+			// Wait for error not to be present for positive test cases before submitting the form.
+			$url_field = $form->getField('URL');
+
+			if ($expected === TEST_GOOD && $url_field->hasClass('has-error')) {
+				$url_field->waitUntilClassesNotPresent('has-error');
+			}
+
 			$form->submit();
 
 			if ($expected === TEST_GOOD) {
@@ -2155,8 +2143,7 @@ class testFormAlertsScripts extends CWebTest {
 				$this->openScriptForm(self::$ids['URI schemes'], false);
 			}
 			else {
-				$this->assertMessage(TEST_BAD, 'Cannot update script', 'Invalid parameter "/1/url": unacceptable URL.');
-				CMessageElement::find()->one()->close();
+				$this->assertInlineError($form, ['URL' => 'Unacceptable URL scheme.']);
 			}
 		}
 	}

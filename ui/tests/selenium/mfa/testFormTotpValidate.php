@@ -127,7 +127,7 @@ class testFormTotpValidate extends testFormTotp {
 		$form->invalidate();
 		$form->getField('id:verification_code')->fill($totp);
 		$form->query('button:Sign in')->one()->click();
-		$this->assertEquals(self::DEFAULT_ERROR, $form->query('class:red')->one()->getText());
+		$this->assertEquals(self::DEFAULT_ERROR, $form->query('class:red')->waitUntilVisible()->one()->getText());
 	}
 
 	/**

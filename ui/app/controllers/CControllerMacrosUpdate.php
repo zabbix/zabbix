@@ -21,7 +21,7 @@ class CControllerMacrosUpdate extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	static function getValidationRules(): array {
+	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
 			'macros' => ['objects',
 				'uniq' => [['macro']],

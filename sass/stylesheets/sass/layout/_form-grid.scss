@@ -151,6 +151,7 @@
 		grid-column: 2 / -1;
 		padding: 5px;
 		border: 1px solid $form-fields-group-border-color;
+		border-radius: var(--surface-border-radius);
 	}
 
 	> .form-field,

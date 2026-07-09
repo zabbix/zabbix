@@ -18,7 +18,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['eventid', 'data_actions', 'time', 'eventid', 'objectid', 'severity',
 		'recovery', 'status', 'info', 'host', 'description', 'duration', 'can_be_closed', 'actions', 'opdata', 'nested',
-		'symptom_count', 'cause_eventid', 'tags'];
+		'symptom_count', 'cause_eventid', 'tags', 'custom_text'];
 
 	protected function init(): void {
 		parent::init();
@@ -112,8 +112,25 @@ class CControllerProblemViewData extends CControllerDataTable {
 	private static function addProblemRows(array &$rows, array &$data, array $problems, array $filter,
 			array $options, bool $nested = false): void {
 
+		$events = [];
+
 		foreach ($problems as $problem) {
-			if ($data['sort_field'] == 'clock' && $options['show_timeline'] && !$options['compact_view']
+			$trigger = $data['triggers'][$problem['objectid']];
+
+			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] !== '') {
+				$events[$problem['eventid']] = [
+					'triggerid' => $trigger['triggerid'],
+					'expression' => $trigger['expression'],
+					'opdata' => $trigger['opdata'],
+					'clock' => $problem['r_eventid'] != 0 ? $problem['r_clock'] : $problem['clock'],
+					'ns' => $problem['r_eventid'] != 0 ? $problem['r_ns'] : $problem['ns']
+				];
+			}
+		}
+		$events = CMacrosResolverHelper::resolveEventOpdatas($events, ['html' => true]);
+
+		foreach ($problems as $problem) {
+			if ($data['sort_field'] == 'clock' && $options['show_timeline'] && $options['compact_view'] == 0
 					&& $data['last_clock'] != 0) {
 
 				$breakpoint = self::createTimelineBreakpoint($data, $problem);
@@ -217,7 +234,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 				}
 			}
 
-			if ($options['compact_view'] && $filter['show_suppressed'] && count($info_icons) > 1) {
+			if ($options['compact_view'] == 1 && $filter['show_suppressed'] && count($info_icons) > 1) {
 				$cell_info = (new CButtonIcon(ZBX_ICON_MORE))->setHint(makeInformationList($info_icons));
 			}
 			else {
@@ -234,20 +251,9 @@ class CControllerProblemViewData extends CControllerDataTable {
 					$opdata = (new CDiv(
 						CScreenProblem::getLatestValues($trigger['items'])
 					))->addClass('latest-values');
-				} else {
-					$opdata = (new CSpan(CMacrosResolverHelper::resolveTriggerOpdata(
-						[
-							'triggerid' => $trigger['triggerid'],
-							'expression' => $trigger['expression'],
-							'opdata' => $trigger['opdata'],
-							'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
-							'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
-						],
-						[
-							'events' => true,
-							'html' => true
-						]
-					)))->addClass('opdata');
+				}
+				else {
+					$opdata = (new CSpan($events[$problem['eventid']]['opdata']))->addClass('opdata');
 				}
 			}
 
@@ -268,8 +274,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 					'show_rank_change_symptom' => true
 				]));
 
-			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] != '' && !$options['compact_view']
-					&& $options['show_opdata'] == 1) {
+			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] !== '' && $options['compact_view'] == 0
+					&& $options['show_opdata'] & OPERATIONAL_DATA_SHOW_WITH_PROBLEM) {
 				$description[] = ' (';
 				$description[] = $opdata;
 				$description[] = ')';
@@ -277,7 +283,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			$description[] = ($problem['comments'] !== '') ? makeDescriptionIcon($problem['comments']) : null;
 
-			if (!$options['compact_view'] && $options['details'] == 1) {
+			if ($options['compact_view'] == 0 && $options['details'] == 1) {
 				$description[] = BR();
 
 				if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
@@ -291,7 +297,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 				}
 			}
 
-			$problem['description'] = $options['compact_view']
+			$problem['description'] = $options['compact_view'] == 1
 				? (new CDiv($description))
 					->addClass(ZBX_STYLE_ACTION_CONTAINER)
 					->toString()
@@ -383,7 +389,10 @@ class CControllerProblemViewData extends CControllerDataTable {
 		}
 
 		$data = $this->prepareData();
-		$show_opdata_separately = in_array('opdata', $data['data_fields']);
+
+		$show_opdata = $data['options']['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
+		$show_opdata_separately = (bool) ($data['options']['show_opdata'] & OPERATIONAL_DATA_SHOW_SEPARATELY);
+		$show_opdata_with_problem = (bool) ($data['options']['show_opdata'] & OPERATIONAL_DATA_SHOW_WITH_PROBLEM);
 
 		$csv = [];
 
@@ -418,6 +427,23 @@ class CControllerProblemViewData extends CControllerDataTable {
 				: API::Problem()->get($event_options);
 		}
 
+		$events = [];
+
+		foreach ($data['problems'] as $problem) {
+			$trigger = $data['triggers'][$problem['objectid']];
+
+			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] !== '') {
+				$events[$problem['eventid']] = [
+					'triggerid' => $trigger['triggerid'],
+					'expression' => $trigger['expression'],
+					'opdata' => $trigger['opdata'],
+					'clock' => $problem['r_eventid'] != 0 ? $problem['r_clock'] : $problem['clock'],
+					'ns' => $problem['r_eventid'] != 0 ? $problem['r_ns'] : $problem['ns']
+				];
+			}
+		}
+		$events = CMacrosResolverHelper::resolveEventOpdatas($events);
+
 		foreach ($data['problems'] as $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
@@ -435,23 +461,14 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			// operational data
 			$opdata = null;
-			if ($data['options']['show_opdata'] || $show_opdata_separately) {
+			if ($show_opdata) {
 				if ($trigger['opdata'] === '') {
 					if ($show_opdata_separately) {
 						$opdata = CScreenProblem::getLatestValues($trigger['items'], false);
 					}
 				}
 				else {
-					$opdata = CMacrosResolverHelper::resolveTriggerOpdata(
-						[
-							'triggerid' => $trigger['triggerid'],
-							'expression' => $trigger['expression'],
-							'opdata' => $trigger['opdata'],
-							'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
-							'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
-						],
-						['events' => true]
-					);
+					$opdata = $events[$problem['eventid']]['opdata'];
 				}
 			}
 
@@ -486,7 +503,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$row[] = $problem['r_eventid'] != 0 ? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']) : '';
 			$row[] = $value_str;
 			$row[] = implode(', ', $hosts);
-			$row[] = ($data['options']['show_opdata'] && $trigger['opdata'] !== '')
+			$row[] = ($show_opdata_with_problem && $trigger['opdata'] !== '')
 				? $problem['name'].' ('.$opdata.')'
 				: $problem['name'];
 
@@ -513,7 +530,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 	private function prepareData(): array {
 		$data_fields = $this->getDataFields();
-		$options = $this->getInput('options', []);
+		$options = $this->getInput('options');
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
 		$export = $this->getInput('export_file', '');
@@ -547,9 +564,19 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$filter['to'] = $timeline['to_ts'];
 		}
 
-		$data = CScreenProblem::getData($filter, ['show_opdata' => OPERATIONAL_DATA_SHOW_SEPARATELY] + $options, $limit,
-			true
-		);
+		$custom_text = $this->extractCustomText($options);
+		$this->flattenColumnOptions($options);
+
+		$show_opdata = in_array('opdata', $data_fields) ? OPERATIONAL_DATA_SHOW_SEPARATELY : OPERATIONAL_DATA_SHOW_NONE;
+
+		if ($options['compact_view'] == 0 && array_key_exists('show_opdata', $options)
+				&& $options['show_opdata'] == 1) {
+			$show_opdata |= OPERATIONAL_DATA_SHOW_WITH_PROBLEM;
+		}
+
+		$options['show_opdata'] = $show_opdata;
+
+		$data = CScreenProblem::getData($filter, $options, $limit, true);
 		$data = CScreenProblem::sortData($data, $limit, $sort_field, $sort_order);
 
 		if ($export == null) {
@@ -693,7 +720,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 					foreach ($data['problems'] as &$problem) {
 						foreach ($_symptom_data['problems'] as $symptom) {
 							if (bccomp($symptom['cause_eventid'], $problem['eventid']) == 0) {
-								$problem['symptoms'][] = $symptom;
+								$problem['symptoms'][$symptom['eventid']] = $symptom;
 							}
 						}
 					}
@@ -779,6 +806,46 @@ class CControllerProblemViewData extends CControllerDataTable {
 			'sort_order' => $sort_order
 		];
 
+		if ($custom_text) {
+			$this->resolveCustomText($data, $custom_text);
+		}
+
 		return $data;
+	}
+
+	protected function resolveCustomText(array &$data, array $custom_text): void {
+		$problems = [];
+
+		foreach ($data['problems'] as $eventid => $problem) {
+			$trigger = $data['triggers'][$problem['objectid']];
+			$problems[$eventid] = [
+				'triggerid' => $problem['objectid'],
+				'expression' => $trigger['expression'],
+				'clock' => $problem['r_eventid'] != 0 ? $problem['r_clock'] : $problem['clock'],
+				'ns' => $problem['r_eventid'] != 0 ? $problem['r_ns'] : $problem['ns']
+			] + $custom_text;
+
+			foreach ($problem['symptoms'] as $s_eventid => $s_problem) {
+				$trigger = $data['triggers'][$s_problem['objectid']];
+				$problems[$s_eventid] = [
+					'triggerid' => $s_problem['objectid'],
+					'expression' => $trigger['expression'],
+					'clock' => $s_problem['r_eventid'] != 0 ? $s_problem['r_clock'] : $s_problem['clock'],
+					'ns' => $s_problem['r_eventid'] != 0 ? $s_problem['r_ns'] : $s_problem['ns']
+				] + $custom_text;
+			}
+		}
+
+		$problems = CMacrosResolverHelper::resolveEventCustomTexts($problems, ['sources' => array_keys($custom_text)]);
+
+		foreach ($data['problems'] as $eventid => &$problem) {
+			$problem['custom_text'] = array_intersect_key($problems[$eventid], $custom_text);
+
+			foreach ($problem['symptoms'] as $s_eventid => &$s_problem) {
+				$s_problem['custom_text'] = array_intersect_key($problems[$s_eventid], $custom_text);
+			}
+			unset($s_problem);
+		}
+		unset($problem);
 	}
 }

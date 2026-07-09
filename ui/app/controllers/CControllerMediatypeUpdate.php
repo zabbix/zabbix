@@ -107,6 +107,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 				]
 			],
 			'redirection_url' => ['db media_type_oauth.redirection_url', 'required', 'not_empty',
+				'use' => [CUrlValidator::class, ['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_EMAIL]],
 					['smtp_authentication', 'in' => [SMTP_AUTHENTICATION_OAUTH]],
@@ -129,6 +130,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 				]
 			],
 			'authorization_url' => ['db media_type_oauth.authorization_url', 'required', 'not_empty',
+				'use' => [CUrlValidator::class, ['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_EMAIL]],
 					['smtp_authentication', 'in' => [SMTP_AUTHENTICATION_OAUTH]],
@@ -137,6 +139,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 				'messages' => ['not_empty' => _('Invalid OAuth configuration')]
 			],
 			'token_url' => ['db media_type_oauth.token_url', 'required', 'not_empty',
+				'use' => [CUrlValidator::class, ['schemes' => CMediatypeHelper::OAUTH_URL_SCHEMES]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_EMAIL]],
 					['smtp_authentication', 'in' => [SMTP_AUTHENTICATION_OAUTH]],
@@ -208,7 +211,10 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 				'when' => ['type', 'in' => [MEDIA_TYPE_WEBHOOK]]
 			],
 			'event_menu_url' =>	['db media_type.event_menu_url', 'required', 'not_empty',
-				// 'use' => [CHtmlUrlValidator::class, ['allow_event_tags_macro' => true, 'allow_user_macro' => false]],
+				'use' => [CUrlValidator::class, [
+					'event_tags_macro' => true,
+					'schemes' => CSettingsHelper::getAllowedUriSchemes()
+				]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_WEBHOOK]],
 					['show_event_menu', 'in' => [ZBX_EVENT_MENU_SHOW]]

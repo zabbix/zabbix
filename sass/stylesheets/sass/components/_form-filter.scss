@@ -1,0 +1,114 @@
+.filter-space {
+	box-sizing: border-box;
+
+	li .ui-tabs-anchor {
+		vertical-align: top;
+	}
+
+	ul.ui-tabs-nav li:focus {
+		outline: none;
+	}
+
+	.filter-btn-container {
+		height: 29px;
+		z-index: 2;
+	}
+
+	.ui-tabs-nav {
+		height: 29px;
+		border-bottom: 0;
+
+		a {
+			display: inline-block;
+			box-sizing: border-box;
+			line-height: 22px;
+			margin-bottom: 5px;
+			text-align: center;
+		}
+	}
+}
+
+.filter-btn-container {
+	position: relative;
+	text-align: right;
+}
+
+.filter-container {
+	position: relative;
+	padding: 10px 0;
+	margin-bottom: 8px;
+	background-color: $ui-bg-color;
+	border: 1px solid $ui-border-color;
+	border-radius: var(--surface-border-radius) 0 var(--surface-border-radius) var(--surface-border-radius);
+
+	.table {
+		border-bottom: 1px solid $table-border-color;
+	}
+
+	.filter-forms {
+		padding: 0 10px;
+	}
+
+	.list-table {
+		margin-bottom: -10px;
+		border: 0;
+		border-bottom-left-radius: var(--surface-border-radius);
+		border-bottom-right-radius: var(--surface-border-radius);
+
+		thead {
+			th {
+				color: initial;
+				padding: 8px 5px 5px;
+				border-bottom-width: 1px;
+			}
+		}
+	}
+}
+
+.filter-forms {
+	margin: 0 auto;
+	text-align: center;
+	white-space: nowrap;
+	background-color: $ui-bg-color;
+
+	.cell {
+		text-align: left;
+		padding: 0 20px 5px;
+
+		&:first-child {
+			padding-left: 0;
+		}
+
+		&:last-child {
+			padding-right: 0;
+			border-right: 0;
+		}
+
+		button {
+			margin: 0;
+		}
+
+		.btn-icon {
+			margin-left: 5px;
+		}
+
+		table {
+			width: auto;
+		}
+	}
+
+	button {
+		margin: 10px 5px 0;
+	}
+
+	select {
+		vertical-align: top;
+	}
+
+	.table-forms .table-forms-td-right {
+		td {
+			padding: 0 5px 5px 0;
+			vertical-align: middle;
+		}
+	}
+}

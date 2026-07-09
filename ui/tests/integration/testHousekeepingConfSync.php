@@ -18,6 +18,9 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 /**
  * @onBefore clearData
  * @onAfter clearData
+ * @suite-components-reuse true
+ * @required-components server, proxy
+ * @configurationDataProvider configurationProvider
  */
 class testHousekeepingConfSync extends CIntegrationTest {
 	const PROXY_NAME = 'Housekeeping proxy';
@@ -125,15 +128,14 @@ class testHousekeepingConfSync extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 5,
-				'LogFileSize' => 20
+				'LogFileSize' => 0
 			],
 			self::COMPONENT_PROXY => [
 				'DebugLevel' => 5,
 				'LogFileSize' => 20,
 				'Hostname' => self::PROXY_NAME,
 				'ProxyMode' => PROXY_OPERATING_MODE_ACTIVE,
-				'Server' => '127.0.0.1:'.
-					self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
+				'Server' => '127.0.0.1:'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX
 			]
 		];
 	}
@@ -659,9 +661,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	/**
 	 * Check that default housekeeping settings are propagated to server and proxy
 	 * runtime configuration caches without housekeeping.update API call.
-	 *
-	 * @required-components server, proxy
-	 * @configurationDataProvider configurationProvider
 	 */
 	public function testHousekeepingConfSync_DefaultConfig() {
 		$housekeeping = self::defaultHousekeeping();
@@ -685,8 +684,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	 * runtime configuration caches.
 	 *
 	 * @dataProvider housekeepingProvider
-	 * @required-components server, proxy
-	 * @configurationDataProvider configurationProvider
 	 */
 	public function testHousekeepingConfSync_ApiUpdate(array $data) {
 		if (array_key_exists('precondition', $data)) {
@@ -713,9 +710,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	/**
 	 * Check that TimescaleDB compression settings are propagated to server
 	 * runtime configuration cache and applied to TimescaleDB compression policy.
-	 *
-	 * @required-components server
-	 * @configurationDataProvider configurationProvider
 	 */
 	public function testHousekeepingConfSync_TimescaleDbCompressionSettings() {
 		if (self::getDBExtension() !== ZBX_DB_EXTENSION_TIMESCALEDB) {
@@ -747,8 +741,6 @@ class testHousekeepingConfSync extends CIntegrationTest {
 	 * history records received from proxy.
 	 *
 	 * @depends testHousekeepingConfSync_ApiUpdate
-	 * @required-components server, proxy
-	 * @configurationDataProvider configurationProvider
 	 */
 	public function testHousekeepingConfSync_OldHistoryCleanup() {
 		$housekeeping = [
@@ -814,7 +806,9 @@ class testHousekeepingConfSync extends CIntegrationTest {
 
 		$this->reloadServerAndAssertHousekeeping($housekeeping);
 
+		$this->clearLog(self::COMPONENT_SERVER);
 		$this->executeHousekeeper(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'housekeeper [deleted', true, 300, 1);
 
 		$this->waitForHistoryCount(1);
 		$this->assertEventsCount($eventids['old'], 0);

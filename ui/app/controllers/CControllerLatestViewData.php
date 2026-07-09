@@ -19,7 +19,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 	protected array $allowed_data_fields = ['itemid', 'data_actions', 'host', 'maintenance', 'maintenanceid',
 		'maintenance_type', 'maintenance_status', 'itemid', 'description_expanded', 'name', 'key_expanded', 'interval',
 		'history', 'trends', 'type', 'state', 'last_check', 'last_value', 'change', 'is_graph', 'show_link',
-		'item_icons', 'tags'];
+		'item_icons', 'tags', 'custom_text'];
 
 	protected function init(): void {
 		parent::init();
@@ -33,6 +33,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 	protected function getData(): array {
 		$data_fields = $this->getDataFields();
+		$options = $this->getInput('options');
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
 
@@ -193,7 +194,8 @@ class CControllerLatestViewData extends CControllerDataTable {
 			}
 
 			if (in_array($item['type'], [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT])
-					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_expanded'], 'mqtt.get', 8) == 0)) {
+					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+						&& strncmp($item['key_expanded'], 'mqtt.get', 8) == 0)) {
 				$item_delay = '';
 			}
 			elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -252,6 +254,13 @@ class CControllerLatestViewData extends CControllerDataTable {
 				->toString();
 		}
 		unset($item);
+
+		$custom_text = $this->extractCustomText($options);
+		$this->flattenColumnOptions($options);
+
+		if ($custom_text) {
+			$this->resolveCustomText($data, $custom_text);
+		}
 
 		$output += [
 			'filter_counters' => $this->getFilterCounters(),
@@ -393,5 +402,20 @@ class CControllerLatestViewData extends CControllerDataTable {
 			'items' => $items,
 			'items_rw' => $items_rw
 		];
+	}
+
+	protected function resolveCustomText(array &$data, array $custom_text): void {
+		$items = [];
+
+		foreach ($data['items'] as $itemid => $item) {
+			$items[$itemid] = ['hostid' => $item['hostid']] + $custom_text;
+		}
+
+		$keys = array_keys($custom_text);
+		$items = CMacrosResolverHelper::resolveItemBasedWidgetMacros($items, array_combine($keys, $keys));
+
+		foreach ($items as $itemid => $item) {
+			$data['items'][$itemid]['custom_text'] = array_intersect_key($item, $custom_text);
+		}
 	}
 }

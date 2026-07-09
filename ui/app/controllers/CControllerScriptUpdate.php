@@ -128,6 +128,11 @@ class CControllerScriptUpdate extends CController {
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]
 			],
 			'url' => ['db scripts.url', 'required', 'not_empty',
+				'use' => [CUrlValidator::class, [
+					'user_macro' => true,
+					'manualinput_macro' => true,
+					'schemes' => CSettingsHelper::getAllowedUriSchemes()
+				]],
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_URL]]
 			],
 			'new_window' => ['db scripts.new_window', 'required',

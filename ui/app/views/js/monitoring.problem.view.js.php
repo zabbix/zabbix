@@ -142,7 +142,8 @@
 						.setFields(['opdata'])
 						.setVisible(false),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
-					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>)
+					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
+					new CDataTableColumnCustomText('custom_text', <?= json_encode(_('Custom text')); ?>)
 				])
 				.setOption('compact_view', <?= json_encode(_('Compact view')); ?>, {
 					onRender: option => {
@@ -469,7 +470,7 @@
 					table_stats.textContent = paging;
 
 					const paging_container = document.createElement('div');
-					paging_container.classList.add(ZBX_STYLE_PAGING_BTN_CONTAINER);
+					paging_container.classList.add(ZBX_STYLE_PAGER_CONTAINER);
 					paging_container.appendChild(table_stats);
 
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);

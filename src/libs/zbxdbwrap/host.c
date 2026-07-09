@@ -5922,21 +5922,6 @@ static zbx_uint64_t	permission_hgset_add(const char *hash_str, zbx_vector_uint64
 	return hgsetid;
 }
 
-static void	permission_hgset_remove(zbx_uint64_t hgsetid)
-{
-	char		*sql;
-	zbx_db_result_t	result;
-
-	sql = zbx_dsprintf(NULL, "select null from host_hgset where hgsetid=" ZBX_FS_UI64, hgsetid);
-	result = zbx_db_select_n(sql, 1);
-	zbx_free(sql);
-
-	if (NULL == zbx_db_fetch(result))
-		zbx_db_execute("delete from hgset where hgsetid=" ZBX_FS_UI64, hgsetid);
-
-	zbx_db_free_result(result);
-}
-
 static void	host_permissions_update(zbx_uint64_t hostid)
 {
 	zbx_uint64_t		hgsetid = 0, hgsetid_old = 0;
@@ -5974,11 +5959,9 @@ static void	host_permissions_update(zbx_uint64_t hostid)
 
 	if (0 != hgsetid_old)
 	{
-		if (ZBX_DB_OK <= zbx_db_execute("update host_hgset set hgsetid=" ZBX_FS_UI64
-				" where hostid=" ZBX_FS_UI64, hgsetid, hostid))
-		{
-			permission_hgset_remove(hgsetid_old);
-		}
+		/* cleanup of hgset will be performed by housekeeper because hgset becomes unlinked from hosts */
+		zbx_db_execute("update host_hgset set hgsetid=" ZBX_FS_UI64 " where hostid=" ZBX_FS_UI64, hgsetid,
+				hostid);
 	}
 	else
 	{
@@ -6171,10 +6154,10 @@ static void	db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-	/* delete host groups sets */
+	/* mark host group sets for complete removal by housekeeper by unlinking host group sets from hosts */
 	if (0 < hgsetids_del.values_num)
 	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_hgset where");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids_del.values,
 				hgsetids_del.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
@@ -7103,11 +7086,18 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	if (SUCCEED == ret)
 		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
-	/* delete hgsets */
+	/* mark hgsets for complete removal by housekeeper by unlinking hgsets from hosts */
 
 	sql_offset = 0;
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset where");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_hgset where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids.values,
+			hgsetids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	/* hgset_group has to be deleted to prevent error: */
+	/* update or delete on table "hstgrp" violates foreign key constraint on table "hgset_group" */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset_group where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids.values,
 			hgsetids.values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");

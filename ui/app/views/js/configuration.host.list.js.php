@@ -294,7 +294,8 @@
 						.setFields(['info_icons'])
 						.setRenderer('info'),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
-					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>)
+					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
+					new CDataTableColumnCustomText('custom_text', <?= json_encode(_('Custom text')); ?>)
 				])
 				.setPage(page)
 				.setFilter(filter)
@@ -671,6 +672,8 @@
 					const {max_in_table} = response;
 					const max_in_table_exceeded = templates.length > max_in_table;
 					const visible_templates = Object.values(templates).slice(0, max_in_table);
+
+					cell_inner.classList.add('wrap');
 
 					visible_templates.forEach(({templateid, name, parentTemplates, editable}, i) => {
 						const element = editable ? document.createElement('a') : document.createElement('span');
