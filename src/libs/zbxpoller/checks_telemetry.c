@@ -126,8 +126,7 @@ out:
 
 int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *apm_db_config, AGENT_RESULT *result)
 {
-	time_t			now = time(NULL);
-	time_t			lasttimestamp;
+	time_t			now, lasttimestamp;
 	int			values_ret;
 	zbx_vector_str_t	values;
 	char			*error = NULL;
@@ -139,6 +138,8 @@ int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *ap
 		return NOTSUPPORTED;
 	}
 
+	now = time(NULL);
+
 	/* when testing the item, the time range being queried is restricted only by the lookback limit */
 	lasttimestamp = 0;
 
@@ -147,6 +148,9 @@ int	get_value_telemetry(const zbx_dc_item_t *item, const zbx_apm_db_config_t *ap
 #ifdef HAVE_LIBCURL
 		values_ret = get_values_telemetry_http(item, now, lasttimestamp, apm_db_config, &values, &error);
 #else
+		ZBX_UNUSED(item);
+		ZBX_UNUSED(lasttimestamp);
+		ZBX_UNUSED(now);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "cURL library was not compiled in"));
 
 		return NOTSUPPORTED;
