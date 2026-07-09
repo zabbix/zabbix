@@ -20,19 +20,14 @@ class ApmDbClickHouse extends ApmDb {
 		$curl_options = [
 			CURLOPT_POST => true,
 			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
 			CURLOPT_CONNECTTIMEOUT => 10,
 			CURLOPT_TIMEOUT => 60,
-			CURLOPT_ENCODING => ''
+			CURLOPT_ENCODING => '',
+			CURLOPT_USERPWD => sprintf('%s:%s', $this->settings['user'] !== null ? $this->settings['user'] : 'default',
+				$this->settings['password'] !== null ? $this->settings['password'] : ''
+			)
 		];
-
-		if ($this->settings['user'] !== null) {
-			$curl_options += [
-				CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-				CURLOPT_USERPWD => sprintf('%s:%s', $this->settings['user'],
-					$this->settings['password'] !== null ? $this->settings['password'] : ''
-				)
-			];
-		}
 
 		if ($this->settings['encryption']) {
 			$curl_options[CURLOPT_SSL_VERIFYHOST] = $this->settings['verify_host'] ? 2 : 0;
