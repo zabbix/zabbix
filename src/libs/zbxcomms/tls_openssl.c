@@ -1820,7 +1820,7 @@ out1:
  * Parameters:                                                                *
  *     s          - [IN] socket with opened connection                        *
  *     error      - [OUT] dynamically allocated memory with error message     *
- *     tls_accept - [IN] type of connection to accept. Can be be either       *
+ *     tls_accept - [IN] type of connection to accept. Can be either          *
  *                       ZBX_TCP_SEC_TLS_CERT or ZBX_TCP_SEC_TLS_PSK, or      *
  *                       a bitwise 'OR' of both.                              *
  *                                                                            *
