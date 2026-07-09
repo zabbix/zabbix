@@ -315,7 +315,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$problem['actions'] = (new CDiv(
 				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged))
 			)
-				->addClass(ZBX_STYLE_WORDBREAK)
+				->addClass(ZBX_STYLE_ACTION_WRAPPER)
 				->toString();
 
 			$problem['nested'] = $nested;

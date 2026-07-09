@@ -596,6 +596,16 @@
 				}
 			}
 
+			.action-wrapper {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1px 5px;
+
+				.btn-icon:not(.no-indent):not(:first-child) {
+					margin-left: 0;
+				}
+			}
+
 			.symptoms {
 				display: flex;
 				justify-content: flex-start;
