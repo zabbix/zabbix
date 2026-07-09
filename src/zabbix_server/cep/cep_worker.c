@@ -757,7 +757,7 @@ static void	cep_worker_process_task_event(zbx_cep_worker_t *worker, zbx_cep_task
 				task->db_event->object);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() event_op:%d", __func__, task->event_op);
 }
 
 /******************************************************************************
