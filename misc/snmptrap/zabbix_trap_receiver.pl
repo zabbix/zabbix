@@ -76,7 +76,7 @@ sub sanitize_trap_header
 
 	return $value unless defined $value;
 
-	$value =~ s/(?<!\w)ZBXTRAP(?!\w)/'ZBXTRAP'/g;
+	$value =~ s/\bZBXTRAP\b/'ZBXTRAP'/g;
 
 	return $value;
 }
