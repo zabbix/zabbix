@@ -2411,12 +2411,24 @@ HEREDOC;
 		foreach ($values as $value) {
 			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
 		}
-		$this->dispatchSenderValues($data);
+		$vps_written = $this->getVpsWritten();
+		$sent = $this->dispatchSenderValues($data);
+
+		// Confirm the whole burst was ingested (written to the history cache) before asserting on events,
+		// so a dropped or not-yet-processed value surfaces here rather than as a confusing event mismatch.
+		$this->assertVpsWrittenIncreasedBy($vps_written, count($values));
 
 		$expected_events = count($values);
 
-		// The trigger must produce one event per transition: PROBLEM, RESOLVED, PROBLEM, RESOLVED, ...
-		$this->waitForAllTriggerEventCounts([$triggerid], $expected_events);
+		// The trigger must produce one event per transition: PROBLEM, RESOLVED, PROBLEM, RESOLVED, ... . Every
+		// value flips the trigger, so each sent (clock, ns) must appear as exactly one event. If the count is
+		// still off on the final wait iteration, the info callback diagnoses which sent offset/timestamp never
+		// produced an event and appends it to the failure message.
+		$this->waitForAllTriggerEventCounts([$triggerid], $expected_events,
+			function () use ($triggerid, $sent) {
+				return $this->diagnoseMissingBurstEvents($triggerid, $sent);
+			}
+		);
 
 		// Events are newest-first, so they alternate RESOLVED, PROBLEM, RESOLVED, PROBLEM, ... (the burst
 		// ends on a recovery, so the newest event is RESOLVED).
@@ -4557,7 +4569,7 @@ HEREDOC;
 	 * unsupported by setting 'state' => ITEM_STATE_NOTSUPPORTED explicitly (the value is then taken as the
 	 * error text); a non-numeric value alone would be dropped rather than turning the item unsupported.
 	 */
-	protected function dispatchSenderValues($values, $component = null, $delayOverride = 0): void {
+	protected function dispatchSenderValues($values, $component = null, $delayOverride = 0): array {
 		$this->ensureItemidsResolved($values);
 
 		$data = [];
@@ -4578,6 +4590,10 @@ HEREDOC;
 		}
 
 		$this->dispatchValues($data, $delayOverride);
+
+		// Return the enriched entries (with resolved itemid and the assigned clock/ns) so callers can keep a
+		// reference of exactly what was sent and, on an event mismatch, pinpoint which (clock, ns) is missing.
+		return $data;
 	}
 
 	/**
@@ -4805,17 +4821,19 @@ HEREDOC;
 	 * every event row on each poll iteration. callUntilCountIsPresent requires exact equality, so a
 	 * missing or extra event on any trigger keeps the total off-target and fails the wait.
 	 */
-	private function waitForAllTriggerEventCounts(array $triggerids, int $expected_count): void {
+	private function waitForAllTriggerEventCounts(array $triggerids, int $expected_count,
+			?callable $info_callback = null): void {
 		// eventid_from is inclusive, so +1 excludes the baseline event itself. A target of 0
 		// (no state change expected) is handled too: the count returns 0 immediately, and any
-		// spurious event keeps it off-target and fails the wait.
+		// spurious event keeps it off-target and fails the wait. $info_callback (if given) is invoked
+		// only on the final failed iteration to append a diagnostic to the failure message.
 		$this->callUntilCountIsPresent('event.get', [
 			'objectids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'eventid_from' => $this->event_baseline_id + 1
 		], count($triggerids) * $expected_count,
-			self::STATE_CHANGE_WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY
+			self::STATE_CHANGE_WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, null, $info_callback
 		);
 	}
 
@@ -4840,6 +4858,56 @@ HEREDOC;
 			$events_by_trigger[(int) $event['objectid']][] = $event;
 		}
 		return $events_by_trigger;
+	}
+
+	/**
+	 * Build a human-readable diagnostic for a burst that produced the wrong number of events. Each sent
+	 * value in $sent (as returned by dispatchSenderValues(), carrying the assigned clock/ns) is expected to
+	 * flip the trigger and thus produce exactly one event with the same (clock, ns). This fetches the
+	 * events generated since the baseline and reports, per sent offset, which (clock, ns) never produced an
+	 * event and which events were emitted with no matching sent value, so a dropped or duplicated value is
+	 * pinned to its exact offset and timestamp instead of surfacing only as a count mismatch.
+	 */
+	private function diagnoseMissingBurstEvents(int $triggerid, array $sent): string {
+		$response = $this->call('event.get', [
+			'objectids' => [$triggerid],
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'eventid_from' => $this->event_baseline_id + 1,
+			'sortfield' => ['clock', 'eventid'],
+			'sortorder' => 'ASC',
+			'output' => ['eventid', 'value', 'clock', 'ns']
+		]);
+
+		// Index the emitted events by their (clock, ns) so each sent value can be looked up directly.
+		$events_by_key = [];
+		foreach ($response['result'] as $event) {
+			$events_by_key[$event['clock']."\0".$event['ns']][] = $event;
+		}
+
+		$lines = ['event diagnostic for trigger '.$triggerid.': sent '.count($sent).' value(s), got '
+			.count($response['result']).' event(s)'];
+
+		foreach ($sent as $offset => $entry) {
+			$key = $entry['clock']."\0".$entry['ns'];
+			if (isset($events_by_key[$key]) && $events_by_key[$key] !== []) {
+				array_shift($events_by_key[$key]);
+			}
+			else {
+				$lines[] = 'MISSING event for offset '.$offset.' value='.$entry['value']
+					.' clock='.$entry['clock'].' ns='.$entry['ns'];
+			}
+		}
+
+		// Any events left over matched no sent value (e.g. a duplicate emitted for one value).
+		foreach ($events_by_key as $key => $leftover) {
+			foreach ($leftover as $event) {
+				$lines[] = 'UNEXPECTED event eventid='.$event['eventid'].' value='.$event['value']
+					.' clock='.$event['clock'].' ns='.$event['ns'].' (no matching sent value)';
+			}
+		}
+
+		return implode("\n", $lines);
 	}
 
 	/**
