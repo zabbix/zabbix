@@ -94,6 +94,10 @@ abstract class CControllerCepRuleGeneral extends CController {
 			}
 		}
 
+		if (array_key_exists('operations', $request)) {
+			$request['operations'] = array_values($request['operations']);
+		}
+
 		return $request;
 	}
 
@@ -254,9 +258,11 @@ abstract class CControllerCepRuleGeneral extends CController {
 				CCepRuleHelper::OP_INCREASE_TAG_VALUE, CCepRuleHelper::OP_DECREASE_TAG_VALUE,
 				CCepRuleHelper::OP_RENAME_TAG, CCepRuleHelper::OP_REMOVE_TAG
 			]]],
-			'severity' => ['db cep_operation.severity', 'required', 'when' => ['type', 'in' => [
-				CCepRuleHelper::OP_SET_SEVERITY
-			]]],
+			'severity' => ['db cep_operation.severity', 'required',
+				'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
+					TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
+				'when' => ['type', 'in' => [CCepRuleHelper::OP_SET_SEVERITY]
+			]],
 			'suppress_until' => ['string',
 				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SUPPRESS]]

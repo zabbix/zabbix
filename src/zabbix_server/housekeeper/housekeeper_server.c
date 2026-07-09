@@ -1199,14 +1199,106 @@ static int	get_housekeeping_period(double time_slept)
 
 static int	housekeeping_delete_internal_events(int config_max_hk_delete)
 {
-	int	deleted = 0, rc;
+#define HK_EVENT_MAX_DELETE_RATIO	5
+#define HK_MIN_BATCH_SIZE		100
 
-	rc = hk_delete_from_table("events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL), config_max_hk_delete);
+	int			deleted_num = 0, batch_size = config_max_hk_delete / HK_EVENT_MAX_DELETE_RATIO;
+	zbx_vector_uint64_t	eventids, r_eventids;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0;
 
-	if (ZBX_DB_OK <= rc)
-		deleted = rc;
+	if (HK_MIN_BATCH_SIZE > batch_size)
+		batch_size = HK_MIN_BATCH_SIZE;
 
-	return deleted;
+	zbx_vector_uint64_create(&eventids);
+	zbx_vector_uint64_create(&r_eventids);
+
+	zbx_db_begin();
+
+	while (deleted_num < config_max_hk_delete)
+	{
+		size_t	sql_offset = 0;
+		int	events_num;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select eventid from events where source=%d",
+				EVENT_SOURCE_INTERNAL);
+		result = zbx_db_select_n(sql, batch_size);
+
+		zbx_vector_uint64_clear(&eventids);
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			zbx_uint64_t	eventid;
+
+			ZBX_STR2UINT64(eventid, row[0]);
+			zbx_vector_uint64_append(&eventids, eventid);
+		}
+		zbx_db_free_result(result);
+		events_num = eventids.values_num;
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select r_eventid from event_recovery where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values,
+				eventids.values_num);
+
+		result = zbx_db_select("%s", sql);
+
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			zbx_uint64_t	eventid;
+
+			ZBX_STR2UINT64(eventid, row[0]);
+			zbx_vector_uint64_append(&r_eventids, eventid);
+		}
+		zbx_db_free_result(result);
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from event_recovery where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values,
+				eventids.values_num);
+
+		if (ZBX_DB_OK >= zbx_db_execute("%s", sql))
+				break;
+
+		if (0 != r_eventids.values_num)
+		{
+			zbx_vector_uint64_sort(&r_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(&r_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			zbx_vector_uint64_append_array(&eventids, r_eventids.values, r_eventids.values_num);
+			zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			zbx_vector_uint64_clear(&r_eventids);
+		}
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from events where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values,
+				eventids.values_num);
+
+		if (ZBX_DB_OK >= zbx_db_execute("%s", sql))
+			break;
+
+		deleted_num += eventids.values_num;
+
+		if (events_num != batch_size)
+			break;
+
+		zbx_vector_uint64_clear(&eventids);
+	}
+
+	zbx_db_commit();
+
+	zbx_vector_uint64_destroy(&r_eventids);
+	zbx_vector_uint64_destroy(&eventids);
+	zbx_free(sql);
+
+	return deleted_num;
+
+#undef HK_MIN_BATCH_SIZE
+#undef HK_EVENT_MAX_DELETE_RATIO
 }
 
 ZBX_THREAD_ENTRY(housekeeper_thread, args)

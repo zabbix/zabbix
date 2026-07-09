@@ -858,8 +858,6 @@ void	*zbx_cep_manager_thread(void *args)
 		pending_num = cep_queue_pending_commits_num((zbx_cep_queue_t *)manager->base.queue);
 		zbx_mw_queue_unlock(manager->base.queue);
 
-		cep_manager_process_pending(manager);
-
 		if (0 != tasks.values_num)
 		{
 			int	commits_num = manager->commits.values_num;
@@ -869,6 +867,8 @@ void	*zbx_cep_manager_thread(void *args)
 			if (0 == commits_num && 0 != manager->commits.values_num)
 				time_flush = time_now;
 		}
+
+		cep_manager_process_pending(manager);
 
 		if (0 != manager->commits.values_num &&
 				manager->commit_task_num < cep_manager_commit_limit(manager, cep_args))

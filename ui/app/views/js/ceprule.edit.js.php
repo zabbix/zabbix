@@ -83,15 +83,6 @@ window.ceprule_edit_popup = new class {
 			value: ceprule.window.script
 		});
 
-		this.#ms_group_tags = jQuery('#ceprule-window-groupby-tag');
-		this.#ms_group_tags.multiSelect();
-		this.#ms_group_tags.multiSelect('modify', {
-			suggest_list_modifier: available => new Map(
-				[...available].map(([key, value])=>[key, {...value, name: value.id}])
-			),
-			custom_suggest_list: () => new Map()
-		});
-
 		this.#initActions();
 		this.form = new CForm(this.form_element, rules);
 
