@@ -69,7 +69,7 @@
 			margin-top: 16px;
 			padding: 16px;
 			border: 1px solid $ui-border-color;
-			border-radius: 2px;
+			border-radius: var(--surface-border-radius);
 		}
 
 		&.collapsible {
@@ -179,7 +179,7 @@
 				bottom: 0;
 				height: 0;
 				border-bottom: 4px var(--progress-type-style, solid) var(--pregress-step-color, #{$progress-default-color});
-				border-radius: 2px;
+				border-radius: var(--surface-border-radius);
 			}
 
 			&.progress-step-complete {
@@ -239,7 +239,7 @@
 	.fields-group {
 		padding: 8px;
 		background: $form-darker-bg-color;
-		border-radius: 2px;
+		border-radius: var(--surface-border-radius);
 	}
 
 	.form-field {
@@ -262,7 +262,7 @@
 		input,
 		textarea,
 		z-select > button {
-			border-radius: 2px;
+			border-radius: var(--input-border-radius);
 		}
 
 		z-select {
@@ -384,7 +384,7 @@
 			left: 0;
 			width: 0;
 			border-left: 4px solid $form-description-border-color;
-			border-radius: 2px;
+			border-radius: var(--surface-border-radius);
 		}
 
 		&.field-baseline {

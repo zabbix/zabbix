@@ -825,7 +825,7 @@ class CScreenProblem extends CScreenBase {
 					(new CDiv(
 						_s('Displaying %1$s of %2$s found', ZBX_PROBLEM_SYMPTOM_LIMIT, $problem['symptom_count'])
 					))->addClass(ZBX_STYLE_TABLE_STATS)
-				))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+				))->addClass(ZBX_STYLE_PAGER_CONTAINER)
 			))->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL);
 
 			if ($data['show_timeline']) {
