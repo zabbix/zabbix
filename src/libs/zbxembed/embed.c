@@ -940,7 +940,7 @@ void	es_put_function_list(duk_context *ctx, duk_idx_t obj_idx, const duk_functio
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve 'enumerable' state of property from prototype            *
+ * Purpose: retrieves 'enumerable' state of property from prototype           *
  *                                                                            *
  * Parameters: ctx - [IN] duktape context                                     *
  *             key - [IN] property name                                       *
@@ -971,14 +971,34 @@ static duk_bool_t	es_property_proto_is_enum(duk_context *ctx, const char *key)
 		duk_pop(ctx);					/* pop "enumerable" value */
 	}
 
-	duk_pop_2(ctx);						/* pop [..., base, enum, key, desc, value, desc */
+	duk_pop_2(ctx);						/* pop [..., base, enum, key, desc, value, desc] */
 
 	return ret;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: recursively define read-only state for object and its properties  *
+ * Purpose: deep-freezes a single object on top of the stack using the        *
+ *          ECMAScript Object.freeze() semantics provided by Duktape          *
+ *                                                                            *
+ * Parameters: ctx - [IN] duktape context                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	es_object_freeze(duk_context *ctx)
+{
+	if (0 == duk_is_object(ctx, -1))
+		return;
+
+	duk_get_global_string(ctx, "Object");	/* [..., base] */
+	duk_push_string(ctx, "freeze");		/* [..., base, Object] */
+	duk_dup(ctx, -3);			/* [..., base, Object, "freeze"] */
+	duk_call_prop(ctx, -3, 1);		/* Object.freeze(obj); [..., base, Object, "freeze", obj] */
+	duk_pop_2(ctx);				/* pop result + Object; [..., base, Object, result] */
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: recursively defines read-only state for object and its properties *
  *                                                                            *
  * Parameters: ctx     - [IN] duktape context                                 *
  *             obj_idx - [IN] object index                                    *
@@ -988,8 +1008,17 @@ static void	es_object_deep_ro_set(duk_context *ctx, const char *parent_key)
 {
 #	define	RO_FLAGS	(DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_CLEAR_CONFIGURABLE)
 
-	if (0 == duk_is_object(ctx, -1) || 0 != duk_is_function(ctx, -1))
+	if (0 == duk_is_object(ctx, -1))
 		return;
+
+	if (0 != duk_get_prop_string(ctx, -1, "prototype"))	/* [..., base] */
+	{
+		es_object_freeze(ctx);
+		duk_pop(ctx);					/* pop prototype; [..., base, proto] */
+		return;
+	}
+
+	duk_pop(ctx);						/* pop prototype; [..., base, undefined] */
 
 	/* we don't use DUK_ENUM_OWN_PROPERTIES_ONLY because               */
 	/* duktape does not inherit conf of property from __proto__ object */
@@ -1019,6 +1048,12 @@ static void	es_object_deep_ro_set(duk_context *ctx, const char *parent_key)
 
 		if (0 != duk_is_object(ctx, -1))	/* enum state for existing objects is inherited */
 		{
+			if (0 != duk_has_prop_string(ctx, -1, "get") || 0 != duk_has_prop_string(ctx, -1, "set"))
+			{
+				duk_pop_2(ctx);				/* pop key, descriptor */
+				continue;
+			}
+
 			duk_get_prop_string(ctx, -1, "configurable");
 
 			if (0 != (ret = duk_is_boolean(ctx, -1)))	/* to escape 'Undefined' */
