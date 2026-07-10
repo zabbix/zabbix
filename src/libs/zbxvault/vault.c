@@ -209,43 +209,6 @@ int	zbx_vault_init(zbx_config_vault_t *config_vault, const char *config_source_i
 	if (NULL == config_vault->name || '\0' == *(config_vault->name) || 0 == strcmp(config_vault->name,
 			ZBX_HASHICORP_NAME))
 	{
-		if (NULL == config_vault->token && NULL == config_vault->app_role_id &&
-				0 == zbx_strcmp_null(config_vault->name, ZBX_HASHICORP_NAME))
-		{
-			*error = zbx_dsprintf(*error, "at least one configuration parameter "
-					"(\"VaultToken\" or \"VaultAppRoleID\")"
-					" or corresponding environment variable is required");
-			return FAIL;
-		}
-
-		if (NULL != config_vault->token)
-		{
-			if (NULL != config_vault->app_role_id)
-			{
-				*error = zbx_dsprintf(*error, "invalid configuration:"
-						" either \"VaultToken\" or \"VaultAppRoleID\""
-						" configuration parameter or corresponding environment"
-						" variable can be defined but not both");
-				return FAIL;
-			}
-
-			if (NULL != config_vault->app_secret_id)
-			{
-				*error = zbx_dsprintf(*error, "invalid configuration:"
-						" \"VaultToken\" and \"VaultAppSecretID\""
-						" configuration parameters or corresponding environment"
-						" variables cannot be defined at the same time");
-				return FAIL;
-			}
-		}
-
-		if (NULL != config_vault->app_role_id && NULL == config_vault->app_secret_id)
-		{
-			*error = zbx_dsprintf(*error,
-					"\"VaultAppRoleID\" is defined but \"VaultAppSecretID\" is not defined");
-			return FAIL;
-		}
-
 		zbx_vault_get_kvs_cb = zbx_vault_get_kvs_hashicorp;
 		zbx_vault_renew_token_cb = zbx_vault_renew_token_hashicorp;
 		zbx_vault_dbuser_key = ZBX_HASHICORP_DBUSER_KEY;
@@ -263,38 +226,11 @@ int	zbx_vault_init(zbx_config_vault_t *config_vault, const char *config_source_i
 			}
 		}
 	}
-	else if (0 == strcmp(config_vault->name, ZBX_CYBERARK_NAME))
+	else	/* CyberArk */
 	{
-		if (NULL != config_vault->token)
-		{
-			*error = zbx_dsprintf(*error, "\"Vault\" value \"%s\" cannot be used when \"VaultToken\""
-					" configuration parameter or \"VAULT_TOKEN\" environment variable is defined",
-					config_vault->name);
-			return FAIL;
-		}
-
-		if (NULL != config_vault->app_role_id)
-		{
-			*error = zbx_dsprintf(*error, "configuration parameter \"VaultAppRoleID\" cannot be used"
-					" with CyberArk vault");
-			return FAIL;
-		}
-
-		if (NULL != config_vault->app_secret_id)
-		{
-			*error = zbx_dsprintf(*error, "configuration parameter \"VaultAppSecretID\" cannot be used"
-					" with CyberArk vault");
-			return FAIL;
-		}
-
 		zbx_vault_get_kvs_cb = zbx_vault_get_kvs_cyberark;
 		zbx_vault_dbuser_key = ZBX_CYBERARK_DBUSER_KEY;
 		zbx_vault_dbpassword_key = ZBX_CYBERARK_DBPASSWORD_KEY;
-	}
-	else
-	{
-		*error = zbx_dsprintf(*error, "invalid \"Vault\" configuration parameter: '%s'", config_vault->name);
-		return FAIL;
 	}
 
 	return SUCCEED;
@@ -347,20 +283,6 @@ int	zbx_vault_db_credentials_get(zbx_config_vault_t *config_vault, char **dbuser
 
 	if (NULL == config_vault->db_path)
 		return SUCCEED;
-
-	if (NULL != *dbuser)
-	{
-		*error = zbx_dsprintf(*error, "\"DBUser\" configuration parameter cannot be used when \"VaultDBPath\""
-				" is defined");
-		return FAIL;
-	}
-
-	if (NULL != *dbpassword)
-	{
-		*error = zbx_dsprintf(*error, "\"DBPassword\" configuration parameter cannot be used when"
-				" \"VaultDBPath\" is defined");
-		return FAIL;
-	}
 
 	zbx_kvs_create(&kvs, 2);
 
