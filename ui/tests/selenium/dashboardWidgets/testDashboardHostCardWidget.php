@@ -1248,7 +1248,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 4,
-						'Latest data' => 121,
+						'Latest data' => 125,
 						'Graphs' => 8,
 						'Web' => 0
 					]
