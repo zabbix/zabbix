@@ -29,7 +29,7 @@ typedef struct zbx_cep zbx_cep_t;
 
 zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event);
 
-zbx_uint32_t	cep_event_handle_release(zbx_cep_event_handle_t h);
+zbx_uint32_t	cep_event_handle_unref(zbx_cep_event_handle_t h);
 zbx_cep_event_t	*cep_event_handle_remove(zbx_cep_t *cep, zbx_cep_event_handle_t h);
 
 zbx_cep_t	*cep_create(void);
