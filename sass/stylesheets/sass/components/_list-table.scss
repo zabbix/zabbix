@@ -287,38 +287,6 @@
 .list-table {
 	thead {
 		th {
-			&.column-tags-1 {
-				width: 75px;
-
-				@media screen and (min-width: 1200px) {
-					width: 106px;
-				}
-
-				@media screen and (min-width: 1400px) {
-					width: 137px;
-				}
-
-				@media screen and (min-width: 1600px) {
-					width: 168px;
-				}
-			}
-
-			&.column-tags-2 {
-				width: 124px;
-
-				@media screen and (min-width: 1200px) {
-					width: 186px;
-				}
-
-				@media screen and (min-width: 1400px) {
-					width: 248px;
-				}
-
-				@media screen and (min-width: 1600px) {
-					width: 310px;
-				}
-			}
-
 			&.column-tags {
 				width: 173px;
 

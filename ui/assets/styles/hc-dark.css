@@ -3357,28 +3357,6 @@ z-color-picker.has-error .color-picker-box {
 .list-table .entity-count {
   vertical-align: top; }
 
-.list-table thead th.column-tags-1 {
-  width: 75px; }
-  @media screen and (min-width: 1200px) {
-    .list-table thead th.column-tags-1 {
-      width: 106px; } }
-  @media screen and (min-width: 1400px) {
-    .list-table thead th.column-tags-1 {
-      width: 137px; } }
-  @media screen and (min-width: 1600px) {
-    .list-table thead th.column-tags-1 {
-      width: 168px; } }
-.list-table thead th.column-tags-2 {
-  width: 124px; }
-  @media screen and (min-width: 1200px) {
-    .list-table thead th.column-tags-2 {
-      width: 186px; } }
-  @media screen and (min-width: 1400px) {
-    .list-table thead th.column-tags-2 {
-      width: 248px; } }
-  @media screen and (min-width: 1600px) {
-    .list-table thead th.column-tags-2 {
-      width: 310px; } }
 .list-table thead th.column-tags {
   width: 173px; }
   @media screen and (min-width: 1200px) {
