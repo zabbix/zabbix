@@ -1348,7 +1348,7 @@ class CDataTable {
 
 		this.getData({check_changes, force_load})
 			.then(response => {
-				if (response && 'error' in response) {
+				if ('error' in response) {
 					const title = response.error.title || t('Unexpected server error.');
 					const messages = response.error.messages || [];
 
