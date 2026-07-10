@@ -608,7 +608,7 @@ static void	zbx_set_defaults(void)
 		config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER] = 1;
 
 	if (NULL == zbx_config_vault.url)
-		zbx_config_vault.url = zbx_strdup(zbx_config_vault.url, "https://127.0.0.1:8200");
+		zbx_config_vault.url = zbx_strdup(zbx_config_vault.url, ZBX_VAULT_DEFAULT_URL);
 
 	if (-1 != config_heartbeat_frequency)
 		zabbix_log(LOG_LEVEL_WARNING, "HeartbeatFrequency parameter is deprecated, and has no effect");

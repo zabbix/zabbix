@@ -17,6 +17,8 @@
 
 #include "zbxkvs.h"
 
+#define ZBX_VAULT_DEFAULT_URL	"https://127.0.0.1:8200"
+
 typedef struct
 {
 	char	*name;

@@ -714,7 +714,7 @@ static void	zbx_set_defaults(void)
 		config_forks[ZBX_PROCESS_TYPE_IPMIMANAGER] = 1;
 
 	if (NULL == zbx_config_vault.url)
-		zbx_config_vault.url = zbx_strdup(zbx_config_vault.url, "https://127.0.0.1:8200");
+		zbx_config_vault.url = zbx_strdup(zbx_config_vault.url, ZBX_VAULT_DEFAULT_URL);
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_REPORTWRITER])
 		config_forks[ZBX_PROCESS_TYPE_REPORTMANAGER] = 1;
