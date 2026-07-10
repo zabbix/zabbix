@@ -20,12 +20,12 @@ class CImageHelper {
 
 	/**
 	 * Image compare threshold (maximum allowed sum of color channel differences for a single pixel).
-	 * Default of 7.68 (1%) tolerates anti-aliasing noise on rounded corners, where color channels of corner
-	 * pixels can differ by 1-3 units between test runs, while visible differences still fail the comparison.
+	 * Default of 4 tolerates anti-aliasing noise on rounded corners, where color channels of corner pixels
+	 * can differ by 1-3 units between test runs, while visible differences still fail the comparison.
 	 *
 	 * @var float
 	 */
-	protected static $threshold = 7.68;
+	protected static $threshold = 4;
 
 	/**
 	 * Default color used to erase regions.
