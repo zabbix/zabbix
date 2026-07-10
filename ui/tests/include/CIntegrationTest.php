@@ -1252,10 +1252,11 @@ class CIntegrationTest extends CAPITest {
 	 * @param integer  $iterations      iteration count
 	 * @param integer  $delay           iteration delay
 	 * @param callable $callback        Callback function to test if API response is valid.
+	 * @param callable $info_callback   optional callback returning extra diagnostics for the failure message
 	 *
 	 * @return array
 	 */
-	public function callUntilCountIsPresent($method, $params, $expected_count, $iterations = null, $delay = null, $callback = null) {
+	public function callUntilCountIsPresent($method, $params, $expected_count, $iterations = null, $delay = null, $callback = null, $info_callback = null) {
 		if ($iterations === null) {
 			$iterations = self::WAIT_ITERATIONS;
 		}
@@ -1313,6 +1314,9 @@ class CIntegrationTest extends CAPITest {
 				'specified interval. Params used:'."\n".json_encode($params);
 		if (isset($response)) {
 			$message .= "\nLast response:\n".json_encode($response);
+		}
+		if ($info_callback !== null) {
+			$message .= "\n".call_user_func($info_callback);
 		}
 		$this->fail($message);
 	}

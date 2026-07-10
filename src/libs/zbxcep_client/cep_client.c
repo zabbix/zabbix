@@ -383,10 +383,10 @@ static void	cep_buffer_serialize_event(unsigned char **data, zbx_uint32_t *data_
  *             events_num - [IN]  number of events in the array               *
  *                                                                            *
  ******************************************************************************/
-void	zbx_cep_send_events(zbx_db_event * const *events, int events_num)
+int	zbx_cep_send_events(zbx_db_event * const *events, int events_num)
 {
-	unsigned char		*data;
-	zbx_uint32_t		data_alloc = 4096, data_offset = 0;
+	unsigned char	*data;
+	zbx_uint32_t	data_alloc = 4096, data_offset = 0;
 
 	data = (unsigned char *)zbx_malloc(NULL, data_alloc);
 	data_offset = zbx_serialize_value(data, events_num);
@@ -400,7 +400,21 @@ void	zbx_cep_send_events(zbx_db_event * const *events, int events_num)
 		zbx_exit(EXIT_FAILURE);
 	}
 
+	zbx_ipc_message_t	response = {0};
+
+	if (FAIL == zbx_ipc_socket_read(cep_client_socket(), &response))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot receive events message response from CEP service");
+		zbx_exit(EXIT_FAILURE);
+	}
+
+	(void)zbx_deserialize_value(response.data, &events_num);
+
+	zbx_ipc_message_clean(&response);
+
 	zbx_free(data);
+
+	return events_num;
 }
 
 /******************************************************************************

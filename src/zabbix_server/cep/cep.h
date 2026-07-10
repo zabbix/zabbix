@@ -29,7 +29,7 @@ typedef struct zbx_cep zbx_cep_t;
 
 zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event);
 
-zbx_uint32_t	cep_event_handle_release(zbx_cep_event_handle_t h);
+zbx_uint32_t	cep_event_handle_unref(zbx_cep_event_handle_t h);
 zbx_cep_event_t	*cep_event_handle_remove(zbx_cep_t *cep, zbx_cep_event_handle_t h);
 int	cep_event_handle_compare(const void *a1, const void *a2);
 void	cep_event_handle_set(zbx_cep_event_handle_t h, zbx_cep_event_t *event);
@@ -58,7 +58,7 @@ zbx_uint64_t	cep_open_internal_event(zbx_cep_t *cep, unsigned char object, zbx_u
 zbx_uint64_t	cep_close_internal_event(zbx_cep_t *cep, unsigned char object, zbx_uint64_t objectid,
 		zbx_vector_uint64_t *eventids);
 
-zbx_cep_event_handle_t	cep_get_event_handle(zbx_cep_t *cep, zbx_uint64_t eventid);
+zbx_cep_event_handle_t	cep_acquire_event_handle(zbx_cep_t *cep, zbx_uint64_t eventid);
 
 int	cep_origin_problem(const zbx_cep_origin_t *origin);
 

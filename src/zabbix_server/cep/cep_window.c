@@ -1248,11 +1248,11 @@ static void	cep_window_pool_load_events(zbx_hashset_t *groups, zbx_dbconn_t *db)
 		}
 
 		ZBX_STR2UINT64(eventid, row[1]);
-		if (NULL == (h = cep_get_event_handle(cep, eventid)))
+		if (NULL == (h = cep_acquire_event_handle(cep, eventid)))
 			continue;
 
 		events_num++;
-		zbx_queue_ptr_push(&group->window->hevents, zbx_cep_event_handle_addref(h));
+		zbx_queue_ptr_push(&group->window->hevents, h);
 	}
 	zbx_db_free_result(result);
 

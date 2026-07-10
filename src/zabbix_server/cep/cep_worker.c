@@ -143,6 +143,8 @@ static void	cep_worker_add_events(zbx_cep_worker_t *worker, zbx_cep_task_remote_
 		zbx_vector_mw_task_ptr_destroy(&tasks);
 	}
 
+	(void)zbx_serialize_value(task->response, events.values_num);
+
 	zbx_vector_db_event_destroy(&events);
 }
 
@@ -800,7 +802,7 @@ static void	cep_worker_process_task_event(zbx_cep_worker_t *worker, zbx_cep_task
 				task->db_event->object);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() event_op:%d", __func__, task->event_op);
 }
 
 static int	cep_task_sync_event_compare(const void *a1, const void *a2)

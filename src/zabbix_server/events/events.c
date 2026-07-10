@@ -801,17 +801,20 @@ int	zbx_process_events(void)
 		if (0 != cep_events.values_num)
 		{
 			update_event_maintenances(&cep_events);
-			zbx_cep_send_events(cep_events.values, cep_events.values_num);
+			processed_num = zbx_cep_send_events(cep_events.values, cep_events.values_num);
 		}
 
-		if (0 != (processed_num = discovery_events.values_num))
+		if (0 != discovery_events.values_num)
+		{
 			save_discovery_events(discovery_events.values, discovery_events.values_num);
+			processed_num += discovery_events.values_num;
+		}
 
 		zbx_vector_db_event_destroy(&discovery_events);
 		zbx_vector_db_event_destroy(&cep_events);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __func__, processed_num);
 
 	return processed_num;
 }

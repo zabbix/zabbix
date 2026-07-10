@@ -426,7 +426,7 @@ void	zbx_cep_get_events(unsigned char source, zbx_vector_cep_event_handle_t *han
  ******************************************************************************/
 void	zbx_cep_event_handle_release(zbx_cep_event_handle_t h)
 {
-	if (1 != cep_event_handle_release(h))
+	if (1 != cep_event_handle_unref(h))
 		return;
 
 	zbx_cep_t	*cep;
