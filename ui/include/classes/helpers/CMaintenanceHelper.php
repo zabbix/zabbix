@@ -119,4 +119,10 @@ class CMaintenanceHelper {
 
 		return '';
 	}
+
+	public static function normalizeTimePeriod($period): int {
+		$period = timeUnitToSeconds($period, true);
+
+		return $period - $period % SEC_PER_MIN;
+	}
 }

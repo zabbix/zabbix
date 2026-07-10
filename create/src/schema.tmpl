@@ -40,6 +40,7 @@ FIELD		|autologin	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|autologout	|t_varchar(32)	|'15m'	|NOT NULL	|0
 FIELD		|lang		|t_varchar(7)	|'default'|NOT NULL	|ZBX_NODATA
 FIELD		|refresh	|t_varchar(32)	|'30s'	|NOT NULL	|0
+FIELD		|default_maintenance_period	|t_integer	|'3600'	|NOT NULL	|0
 FIELD		|theme		|t_varchar(128)	|'default'|NOT NULL	|ZBX_NODATA
 FIELD		|attempt_failed	|t_integer	|0	|NOT NULL	|ZBX_NODATA
 FIELD		|attempt_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_NODATA
@@ -945,6 +946,20 @@ FIELD		|maintenanceid	|t_id		|	|NOT NULL	|0			|1|maintenances
 FIELD		|groupid	|t_id		|	|NOT NULL	|0			|2|hstgrp
 UNIQUE		|1		|maintenanceid,groupid
 INDEX		|2		|groupid
+
+TABLE|maintenance_triggers|maintenance_triggerid|ZBX_DATA
+FIELD		|maintenance_triggerid|t_id	|	|NOT NULL	|0
+FIELD		|maintenanceid	|t_id		|	|NOT NULL	|0			|1|maintenances
+FIELD		|triggerid	|t_id		|	|NOT NULL	|0			|2|triggers
+UNIQUE		|1		|maintenanceid,triggerid
+INDEX		|2		|triggerid
+
+TABLE|maintenance_eventnames|maintenance_eventnameid|ZBX_DATA
+FIELD		|maintenance_eventnameid|t_id	|	|NOT NULL	|0
+FIELD		|maintenanceid	|t_id		|	|NOT NULL	|0			|1|maintenances
+FIELD		|value		|t_varchar(2048)|	|NOT NULL	|0
+FIELD		|operator	|t_integer	|'2'	|NOT NULL	|0
+INDEX		|1		|maintenanceid
 
 TABLE|timeperiods|timeperiodid|ZBX_DATA
 FIELD		|timeperiodid	|t_id		|	|NOT NULL	|0

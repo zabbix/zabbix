@@ -106,6 +106,12 @@ return [
 				'length' => 32,
 				'default' => '30s'
 			],
+			'default_maintenance_period' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '3600'
+			],
 			'theme' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -4143,6 +4149,58 @@ return [
 				'length' => 20,
 				'ref_table' => 'hstgrp',
 				'ref_field' => 'groupid'
+			]
+		]
+	],
+	'maintenance_triggers' => [
+		'key' => 'maintenance_triggerid',
+		'fields' => [
+			'maintenance_triggerid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'maintenanceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'maintenances',
+				'ref_field' => 'maintenanceid'
+			],
+			'triggerid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'triggers',
+				'ref_field' => 'triggerid'
+			]
+		]
+	],
+	'maintenance_eventnames' => [
+		'key' => 'maintenance_eventnameid',
+		'fields' => [
+			'maintenance_eventnameid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'maintenanceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'maintenances',
+				'ref_field' => 'maintenanceid'
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048
+			],
+			'operator' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '2'
 			]
 		]
 	],
