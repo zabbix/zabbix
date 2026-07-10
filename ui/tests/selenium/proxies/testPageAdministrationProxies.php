@@ -122,9 +122,7 @@ class testPageAdministrationProxies extends CWebTest {
 				$this->assertEquals($parameters['hint_text'], $hint->getText());
 
 				if (array_key_exists('hint_color', $parameters)) {
-					$this->assertTrue($hint->query('xpath:.//div['.
-							CXPathHelper::fromClass('hintbox-wrap').
-							' and '.
+					$this->assertTrue($hint->query('xpath:.//div['.CXPathHelper::fromClass('hintbox-wrap').' and '.
 							CXPathHelper::fromClass($parameters['hint_color']).']')->exists()
 					);
 				}
