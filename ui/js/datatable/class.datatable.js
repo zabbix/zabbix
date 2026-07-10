@@ -94,7 +94,7 @@ class CDataTable {
 	/**
 	 * @type {number}
 	 */
-	static COLUMN_INITIAL_MIN_WIDTH = 50;
+	static COLUMN_INITIAL_MIN_WIDTH = 32;
 
 	/**
 	 * @type {number}
@@ -109,7 +109,7 @@ class CDataTable {
 	/**
 	 * @type {number}
 	 */
-	static COLUMN_OPTIONS_BUTTON_WIDTH = 31;
+	static COLUMN_OPTIONS_BUTTON_WIDTH = 32;
 
 	/**
 	 * @type {number}
@@ -119,7 +119,7 @@ class CDataTable {
 	/**
 	 * @type {number}
 	 */
-	static TABLE_OPTIONS_BUTTON_WIDTH = 32;
+	static TABLE_OPTIONS_BUTTON_WIDTH = 34;
 
 	/**
 	 * Flag to determine when a component is initialized, to disallow any further modifications.
@@ -428,7 +428,7 @@ class CDataTable {
 						cell.classList.add(CDataTable.ZBX_STYLE_CELL_FOCUSED);
 					});
 
-					if (this.#options_popup?.getColumnConfig().getColumnIndex() == column.getColumnIndex()) {
+					if (this.#options_popup?.getColumn().getColumnIndex() == column.getColumnIndex()) {
 						context_handle.classList.add(CDataTable.ZBX_STYLE_OPTIONS_LINK_OPENED);
 
 						this.#options_popup.setHandle(context_handle);
@@ -461,6 +461,7 @@ class CDataTable {
 
 		this.setOptionsHandler('tags', CDataTableOptionsPopupTags);
 		this.setOptionsHandler('tagvalue', CDataTableOptionsPopupTagValue);
+		this.setOptionsHandler('custom_text', CDataTableOptionsPopupCustomText);
 
 		this.setRowRenderer('default', this.renderDataCells);
 
@@ -729,6 +730,13 @@ class CDataTable {
 			cell_inner.appendChild(tags_wrapper);
 		});
 
+		this.setCellRenderer('custom_text', ({column, cell_data, cell_inner}) => {
+			const column_index = column.getColumnIndex();
+			const [custom_text] = cell_data;
+
+			cell_inner.textContent = custom_text ? (custom_text[column_index] ?? '') : '';
+		});
+
 		this.setOptionsHandler(CDataTableColumn.TABLE_OPTIONS, CDataTableOptionsPopupTableOptions);
 
 		this.#templates = {
@@ -897,10 +905,6 @@ class CDataTable {
 
 	getStickyColumns() {
 		return this.#columns.filter(column => column.isSticky());
-	}
-
-	getNonDuplicateColumns() {
-		return this.#columns.filter(column => !column.isDuplicate());
 	}
 
 	getColumnsInRange(lowest_order = null, highest_order = null) {
@@ -1170,39 +1174,37 @@ class CDataTable {
 	}
 
 	onColumnDuplicate(e) {
-		let {column_index, user_column} = {user_column: {}, ...e.detail};
+		const {column_index} = e.detail;
 
 		const column = this.getColumn(column_index);
 		if (!column) {
 			return null;
 		}
 
-		const duplicate_column = this.#duplicateColumnConfig(column, user_column);
-		duplicate_column.setColumnIndex(this.#columns.length);
+		const duplicate_column = this.#duplicateColumn(column, column.diff(), true);
 
-		const start = this.#columns.indexOf(column) + 1;
-
-		this.#columns.splice(start, 0, duplicate_column);
-
-		for (let i = start; i < this.#columns.length; i++) {
+		for (let i = this.#columns.indexOf(duplicate_column); i < this.#columns.length; i++) {
 			this.#columns[i].setOrder(i + 1);
 		}
 
+		this.updateUserConfig();
+
 		this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
-		this.getData().then(response => {
-			this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
-			this.dispatchEvent(CDataTable.EVENT_SAVE);
+		this.dispatchEvent(CDataTable.EVENT_INIT, {
+			onSuccess: () => {
+				requestAnimationFrame(() => {
+					const header_cell = this.getColumn(duplicate_column.getColumnIndex())?.getHeaderCell();
+					if (header_cell) {
+						this.#scrollBodyToTarget(header_cell.target);
 
-			requestAnimationFrame(() => {
-				const header_cell = duplicate_column.getHeaderCell();
-				if (header_cell) {
-					this.#scrollBodyToTarget(header_cell.target);
-
-					header_cell.target.focus();
-				}
-			});
+						header_cell.target.focus();
+					}
+				});
+			}
 		});
+
+		this.dispatchEvent(CDataTable.EVENT_SAVE);
 	}
 
 	onColumnDelete(e) {
@@ -1404,6 +1406,8 @@ class CDataTable {
 			return;
 		}
 
+		this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
+
 		column.setResized(false);
 
 		this.#resizing = true;
@@ -1571,6 +1575,10 @@ class CDataTable {
 
 		const handle = this.#options_popup.getHandle();
 		handle.classList.remove(CDataTable.ZBX_STYLE_OPTIONS_LINK_OPENED);
+
+		if (this.#options_popup.isForceLoadOnClose()) {
+			this.dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
+		}
 
 		this.#options_popup = null;
 		this.#options_popup_updated = false;
@@ -1960,10 +1968,7 @@ class CDataTable {
 					continue;
 				}
 
-				const duplicate_column = this.#duplicateColumnConfig(column, user_column);
-				duplicate_column.setColumnIndex(this.#columns.length);
-
-				this.#columns.splice(this.#columns.indexOf(column) + 1, 0, duplicate_column);
+				this.#duplicateColumn(column, user_column);
 			}
 
 			this.#columns.sort((a, b) => {
@@ -2200,39 +2205,47 @@ class CDataTable {
 		this.#columns = this.#columns.sort((left, right) => left.getOrder() - right.getOrder());
 	}
 
-	#duplicateColumnConfig(column, user_column = {}) {
-		const id = column.getId();
-		const name = this.#columns.find(column => column.getId() === id).getName();
-
-		const duplicate_count = this.#columns
-			.filter(column => column.getName().replace(/\s*\(\d+\)$/g, '') === name)
-			.length;
-
-		const defaults = column.clone()
+	#duplicateColumn(column, user_column = {}, duplicate_name = false) {
+		const defaults = column.getDefaults()
+			.clone()
 			.setDuplicate(false)
-			.setName(`${name} (${duplicate_count})`)
 			.setSpan(1)
 			.setVisible(user_column.visible || true);
 
-		return defaults.clone()
-			.setDuplicate(true)
+		const duplicate_column = defaults.clone()
+			.setColumnIndex(this.#columns.length)
 			.setDefaults(defaults)
+			.setDuplicate(true)
 			.merge(user_column);
+
+		if (duplicate_name) {
+			const name = column.getName().replace(/\s*\(\d+\)$/g, '');
+
+			const duplicate_count = this.#columns
+				.filter(column => column.getName().replace(/\s*\(\d+\)$/g, '') === name)
+				.length;
+
+			duplicate_column.setName(`${name} (${duplicate_count})`);
+		}
+
+		const start = this.#columns.indexOf(column) + 1;
+		this.#columns.splice(start, 0, duplicate_column);
+
+		return duplicate_column;
 	}
 
 	#getColumnMinWidth(column) {
 		let min_width = CDataTable.COLUMN_INITIAL_MIN_WIDTH;
 
 		if (column.getOptionsPopupHandler()) {
-			min_width += CDataTable.COLUMN_OPTIONS_BUTTON_WIDTH + CDataTable.COLUMN_HEADER_PADDING;
+			min_width += CDataTable.COLUMN_OPTIONS_BUTTON_WIDTH;
+		}
+		else {
+			min_width += CDataTable.COLUMN_HEADER_PADDING;
 		}
 
 		if (column.isSortable()) {
 			min_width += CDataTable.COLUMN_SORTABLE_ARROW_WIDTH;
-		}
-
-		if (this.#customizable && this.#visible_columns.at(-1) === column) {
-			min_width += CDataTable.TABLE_OPTIONS_BUTTON_WIDTH;
 		}
 
 		return min_width;
@@ -2266,7 +2279,11 @@ class CDataTable {
 			return;
 		}
 
-		const min_width = this.#getColumnMinWidth(column);
+		let min_width = this.#getColumnMinWidth(column);
+		if (this.#customizable && this.#visible_columns.at(-1) === column) {
+			min_width += CDataTable.TABLE_OPTIONS_BUTTON_WIDTH;
+		}
+
 		const header_width = column.getHeaderCell()?.target.getBoundingClientRect().width ?? 0;
 		const data_width = column.getDataCells().at(0)?.target.getBoundingClientRect().width ?? 0;
 
@@ -2433,9 +2450,12 @@ class CDataTable {
 	}
 
 	#getDataProviderParams(params) {
-		const column_options = this.getNonDuplicateColumns().reduce((options, column) => {
-			return Object.assign(options, column.getColumnOptions());
-		}, {});
+		const column_options = {};
+		for (const column of this.getVisibleColumns().filter(column => Object.keys(column.getColumnOptions()).length)) {
+			const column_index = column.getColumnIndex()
+
+			column_options[column_index] = column.getColumnOptions();
+		}
 
 		const options = Object.fromEntries(
 			Object.entries(this.#options).map(([id, option]) => [id, option.checked ? 1 : 0])

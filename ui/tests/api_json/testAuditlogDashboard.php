@@ -95,6 +95,7 @@ class testAuditlogDashboard extends testAuditlogCommon {
 
 		$created = json_encode([
 			'dashboard.name' => ['add', 'Audit dashboard'],
+			'dashboard.auto_start' => ['add', '1'],
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].']' => ['add'],
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].type' => ['add', 'problems'],
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].width' => ['add', '12'],

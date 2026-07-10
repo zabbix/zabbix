@@ -844,45 +844,45 @@ static int	DBpatch_7050059(void)
 
 static int	DBpatch_7050060(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	/* 1 - ZBX_SETTING_TYPE_STR */
-	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str) values ('banner_data',1,'')"))
-		return FAIL;
-
 	return SUCCEED;
 }
 
 static int	DBpatch_7050061(void)
+{
+	const zbx_db_field_t	field = {"auto_start", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("dashboard", &field);
+}
+
+static int	DBpatch_7050062(void)
 {
 	const zbx_db_field_t	field = {"timeout_telemetry_query", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_7050062(void)
+static int	DBpatch_7050063(void)
 {
 	const zbx_db_field_t	field = {"query", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_7050063(void)
+static int	DBpatch_7050064(void)
 {
 	const zbx_db_field_t	field = {"time_shift", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_7050064(void)
+static int	DBpatch_7050065(void)
 {
 	const zbx_db_field_t	field = {"lookback_limit", "10m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_7050065(void)
+static int	DBpatch_7050066(void)
 {
 	const zbx_db_field_t	field = {"granularity", "15s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -961,5 +961,6 @@ DBPATCH_ADD(7050062, 0, 1)
 DBPATCH_ADD(7050063, 0, 1)
 DBPATCH_ADD(7050064, 0, 1)
 DBPATCH_ADD(7050065, 0, 1)
+DBPATCH_ADD(7050066, 0, 1)
 
 DBPATCH_END()

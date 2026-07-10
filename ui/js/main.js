@@ -443,7 +443,8 @@ const hintBox = {
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo = '.wrapper',
 			reposition_on_resize = true) {
 		const hintboxid = hintBox.getUniqueId();
-		const box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue hintbox wordbreak');
+		const box = jQuery('<div>', {'data-hintboxid': hintboxid})
+			.addClass(`${ZBX_STYLE_OVERLAY_DIALOGUE} hintbox wordbreak`);
 
 		for (let element = target; element && element !== document.body; element = element.parentElement) {
 			if (getComputedStyle(element).position === 'fixed') {
