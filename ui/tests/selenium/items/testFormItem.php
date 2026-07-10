@@ -2256,11 +2256,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->item);
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
-		$hintbox = "//div[@data-hintboxid and (".
-				CXPathHelper::fromClass('overlay-dialogue').
-				") and (".
-				CXPathHelper::fromClass('wordbreak').
-				")]";
+		$hintbox = '//div[contains(@class, "hintbox-static")]';
 		$form->getLabel('History')->query("xpath:span[@class='js-hint']/button")->one()->click();
 		$this->zbxTestAssertElementText($hintbox, 'Overridden by global housekeeping settings (99d)');
 		$form->getLabel('Trends')->query("xpath:span[@class='js-hint']/button")->one()->click();

@@ -931,11 +931,7 @@ class testFormUpdateProblem extends CWebTest {
 		$unsuppress_button = 'xpath:.//button['.CXPathHelper::fromClass('zi-eye').']';
 		$row->getColumn('Actions')->query($unsuppress_button)->waitUntilClickable()->one()->click();
 
-		$hint = $this->query('xpath://div[@data-hintboxid and ('.
-				CXPathHelper::fromClass('overlay-dialogue').
-				') and ('.
-				CXPathHelper::fromClass('wordbreak').
-				')]')->asOverlayDialog()->waitUntilVisible()->one();
+		$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilVisible()->one();
 		$this->checkHistoryTable($hint->query('class:list-table')->asTable()->one(), 'User', 'Action');
 		$hint->close();
 
