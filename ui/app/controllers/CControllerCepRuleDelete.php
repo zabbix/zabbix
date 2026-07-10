@@ -53,8 +53,8 @@ class CControllerCepRuleDelete extends CControllerCepRuleGeneral {
 		$result = $result_cep && $result_correlation;
 
 		if ($result) {
-			$output['success']['title'] = _n('Complex event processing rule deleted',
-				'Complex event processing rules deleted', $deleted
+			$output['success']['title'] = _n('Event processing rule deleted',
+				'Event processing rules deleted', $deleted
 			);
 
 			if ($messages = get_and_clear_messages()) {
@@ -63,8 +63,8 @@ class CControllerCepRuleDelete extends CControllerCepRuleGeneral {
 		}
 		else {
 			$output['error'] = [
-				'title' => _n('Cannot delete complex event processing rule',
-					'Cannot delete complex event processing rules', $deleted
+				'title' => _n('Cannot delete event processing rule',
+					'Cannot delete event processing rules', $deleted
 				),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];

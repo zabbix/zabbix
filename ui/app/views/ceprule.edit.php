@@ -137,7 +137,9 @@ $form = (new CForm())
 	);
 
 $output = [
-	'header' => $data['ceprule']['cepruleid'] === null ? _('New complex event processing') : _('Complex event processing'),
+	'header' => $data['ceprule']['cepruleid'] === null
+		? _('New complex event processing')
+		: _('Complex event processing'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CEPRULE_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,

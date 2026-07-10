@@ -238,8 +238,8 @@ window.correlation_edit_popup = new class {
 			this.#removePopupMessages();
 			const curl = new Curl('zabbix.php');
 
-			curl.setArgument('action', 'correlation.delete');
-			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('correlation')) ?>);
+			curl.setArgument('action', 'ceprule.delete');
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('ceprule')) ?>);
 
 			const correlationid = this.form.findFieldByName('correlationid').getValue();
 
