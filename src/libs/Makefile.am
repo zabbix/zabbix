@@ -59,6 +59,7 @@ DIST_SUBDIRS = \
 	zbxnix \
 	zbxnum \
 	zbxodbc \
+	zbxotel_client \
 	zbxparam \
 	zbxpgservice \
 	zbxpinger \

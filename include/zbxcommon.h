@@ -326,7 +326,9 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_SUPERVISOR		48
 #define ZBX_PROCESS_TYPE_CEP_MANAGER		49
 #define ZBX_PROCESS_TYPE_CEP_WORKER		50
-#define ZBX_PROCESS_TYPE_COUNT			51	/* number of process types */
+#define ZBX_PROCESS_TYPE_OTEL_MANAGER		51
+#define ZBX_PROCESS_TYPE_OTEL_WORKER		52
+#define ZBX_PROCESS_TYPE_COUNT			53	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_MAIN			126

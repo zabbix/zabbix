@@ -35,6 +35,7 @@
 #include "zbxtimekeeper.h"
 #include "zbxdb.h"
 #include "zbx_cep_client.h"
+#include "zbx_otel_client.h"
 
 static int	compare_interfaces(const void *p1, const void *p2)
 {
@@ -535,6 +536,8 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
 			case ZBX_PROCESS_TYPE_DATASENDER:
+			case ZBX_PROCESS_TYPE_OTEL_MANAGER:
+			case ZBX_PROCESS_TYPE_OTEL_WORKER:
 				if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
@@ -551,6 +554,16 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 			char	*error = NULL;
 
 			if (FAIL == zbx_mw_get_worker_count(ZBX_IPC_SERVICE_CEP, &process_forks, &error))
+			{
+				SET_MSG_RESULT(result, error);
+				goto out;
+			}
+		}
+		else if (ZBX_PROCESS_TYPE_OTEL_WORKER == process_type)
+		{
+			char	*error = NULL;
+
+			if (FAIL == zbx_mw_get_worker_count(ZBX_IPC_SERVICE_OTEL, &process_forks, &error))
 			{
 				SET_MSG_RESULT(result, error);
 				goto out;

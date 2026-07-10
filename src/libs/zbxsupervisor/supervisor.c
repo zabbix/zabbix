@@ -315,6 +315,16 @@ static void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *
 			*runlevel = ZBX_RUNLEVEL_UNKNOWN;
 			break;
 
+		case ZBX_PROCESS_TYPE_OTEL_MANAGER:
+			*owner = PROCESS_OWNER_SUPERVISOR;
+			*runlevel = ZBX_RUNLEVEL_DEFAULT;
+			break;
+
+		case ZBX_PROCESS_TYPE_OTEL_WORKER:
+			*owner = PROCESS_OWNER_UNKNOWN;
+			*runlevel = ZBX_RUNLEVEL_UNKNOWN;
+			break;
+
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("Unknown process type: %d", process_type);
 			zbx_exit(EXIT_FAILURE);

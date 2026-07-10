@@ -1621,10 +1621,10 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
     dnl *****************************************************************
     dnl * OTLP/gRPC event collector (proxy only)                        *
     dnl *****************************************************************
-    AC_ARG_WITH([otel],
+    AC_ARG_WITH([otcollector],
         [
 If you want to use Open Telemetry collector in proxy:
-AS_HELP_STRING([--with-otel], [turn on OTLP/gRPC event collector, requires --enable-proxy @<:@default=no@:>@])],
+AS_HELP_STRING([--with-otcollector], [turn on OTLP/gRPC event collector, requires --enable-proxy @<:@default=no@:>@])],
         [
         if test "x$withval" = "xno"; then
             with_otel="no"
@@ -1638,7 +1638,7 @@ AS_HELP_STRING([--with-otel], [turn on OTLP/gRPC event collector, requires --ena
 
     if test "x$with_otel" != "xno"; then
         if test "x$proxy" != "xyes"; then
-            AC_MSG_ERROR([--with-otel requires --enable-proxy])
+            AC_MSG_ERROR([--with-otcollector requires --enable-proxy])
         fi
 
         AC_LANG_PUSH([C++])
@@ -1649,7 +1649,7 @@ AS_HELP_STRING([--with-otel], [turn on OTLP/gRPC event collector, requires --ena
             PKG_CHECK_MODULES([GRPC], [grpc++ >= 1.40])
             PKG_CHECK_MODULES([PROTOBUF], [protobuf])
         ], [
-            AC_MSG_ERROR([--with-otel needs pkg-config autoconf macros (pkg.m4); install pkg-config/pkgconf and re-run autoreconf])
+            AC_MSG_ERROR([--with-oteotcollectorl needs pkg-config autoconf macros (pkg.m4); install pkg-config/pkgconf and re-run autoreconf])
         ])
 
         OTEL_CFLAGS="$GRPC_CFLAGS $PROTOBUF_CFLAGS"
@@ -2286,6 +2286,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxmodules/Makefile
 	src/libs/zbxmutexs/Makefile
 	src/libs/zbxmw/Makefile
+	src/libs/zbxotel_client/Makefile
 	src/libs/zbxpgservice/Makefile
 	src/libs/zbxprof/Makefile
 	src/libs/zbxnix/Makefile
@@ -2358,6 +2359,7 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/diag/Makefile
 	src/zabbix_proxy/discovery/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
+	src/zabbix_proxy/otel/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/rtc/Makefile
 	src/zabbix_proxy/poller/Makefile

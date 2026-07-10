@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = \
+SUBDIRS_COMMON = \
 	autoreg \
 	cachehistory \
 	diag \
@@ -15,6 +15,13 @@ SUBDIRS = \
 	trapper \
 	proxyconfigwrite \
 	poller
+
+DIST_SUBDIRS = $(SUBDIRS_COMMON) otel
+
+SUBDIRS = $(SUBDIRS_COMMON)
+if HAVE_OTEL
+SUBDIRS += otel
+endif
 
 sbin_PROGRAMS = zabbix_proxy
 
@@ -141,6 +148,12 @@ zabbix_proxy_LDADD = \
 
 if HAVE_IPMI
 zabbix_proxy_LDADD += $(top_builddir)/src/libs/zbxipmi/libzbxipmi.a
+endif
+
+if HAVE_OTEL
+zabbix_proxy_LDADD += \
+	otel/libzbxotel.a \
+	$(OTEL_LIBS)
 endif
 
 zabbix_proxy_LDADD += $(PROXY_LIBS)
