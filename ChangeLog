@@ -20,6 +20,7 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27495] fixed excessive history upload delay for both Zabbix agents (vsmelovs)
 ..F....... [ZBX-27883] fixed inability to copy trigger prototypes that depend on same trigger prototype when cloning template or host (vmaksimovs)
 ...G...... [ZBX-27900] fixed Windows job handle not being closed on Zabbix agent 2 (esneiders)
 ..F....... [ZBX-27594] fixed sorting of discovered hosts (msnihach)
