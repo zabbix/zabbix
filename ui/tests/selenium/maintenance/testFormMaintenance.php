@@ -175,20 +175,6 @@ class testFormMaintenance extends CLegacyWebTest {
 			$period_overlay->waitUntilReady();
 			$this->page->removeFocus();
 
-			// Remove Add and Cancel buttons edge curling from screenshots as their rendering is unstable.
-			$dialog_footer = $period_overlay->getFooter();
-			foreach (['Add', 'Cancel'] as $button) {
-				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;',
-					[$dialog_footer->query('button', $button)->one()]
-				);
-			}
-
-			// Remove border radius from Date field segment.
-			if ($period_type === 'Monthly with Day of week period') {
-				$segment = $period_overlay->asForm()->getField('Date')->query('xpath:.//label[text()="Day of week"]')->one();
-				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;', [$segment]);
-			}
-
 			if ($period_type === 'One time only') {
 				$this->assertScreenshotExcept($period_overlay, [$period_overlay->query('id:start_date')->one()],
 						$period_type
