@@ -884,11 +884,13 @@ class testPageHosts extends CLegacyWebTest {
 
 		foreach (['Disabled' => HOST_STATUS_NOT_MONITORED, 'Enabled' => HOST_STATUS_MONITORED] as $status => $id) {
 			$host_row->invalidate();
-			$host_row->getColumn('Status')->scrollIntoView(50)->query('tag:a')->one()->click();
+			$status_link = $host_row->getColumn('Status')->query('tag:a')->one();
+			$status_link->scrollIntoView(50)->click();
 			$this->page->waitUntilReady();
-			$host_row->invalidate();
+			$status_link->waitUntilStalled();
 			$this->assertMessage(TEST_GOOD, 'Host '.strtolower($status));
-			$this->assertEquals($status, $host_row->getColumn('Status')->getText());
+			$status_link->invalidate();
+			$this->assertEquals($status, $status_link->getText());
 			$this->assertEquals($id, CDBHelper::getValue('SELECT status FROM hosts WHERE host='.zbx_dbstr('Enabled status')));
 			CMessageElement::find()->one()->close();
 		}

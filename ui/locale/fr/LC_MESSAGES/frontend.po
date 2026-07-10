@@ -13,8 +13,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pontoon\n"
-"X-POOTLE-MTIME: 1516000918.000000\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1516000918.000000\n"
 
 #: include/classes/validators/CFormValidator.php:1397
 #: include/classes/validators/CFormValidator.php:1442 jsLoader.php:439
@@ -5295,11 +5295,11 @@ msgstr "Fonction d'agrégation de colonnes"
 
 #: jsLoader.php:304
 msgid "Column list"
-msgstr ""
+msgstr "Liste des colonnes"
 
 #: jsLoader.php:273
 msgid "Column name"
-msgstr ""
+msgstr "Nom de la colonne"
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
@@ -5768,7 +5768,7 @@ msgstr[1] "Connecteurs désactivés"
 
 #: app/controllers/CControllerPopup.php:43
 msgid "Connector edit"
-msgstr ""
+msgstr "Modification du connecteur"
 
 #: app/controllers/CControllerConnectorEnable.php:69
 msgid "Connector enabled"
@@ -5930,7 +5930,7 @@ msgstr "Copier dans le presse-papier"
 
 #: app/controllers/CControllerPopup.php:44
 msgid "Correlation edit"
-msgstr ""
+msgstr "Modification de la corrélation"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:52
 #: app/controllers/CControllerPopupTriggerExpr.php:693
@@ -6399,7 +6399,7 @@ msgstr "Les modèles personnalisés ne sont pas pris en charge."
 
 #: jsLoader.php:270
 msgid "Customize table"
-msgstr ""
+msgstr "Personnaliser le tableau"
 
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
@@ -6996,7 +6996,7 @@ msgstr "Supprimer et nettoyer le modèle ? (Attention : tous les hôtes liés se
 
 #: jsLoader.php:275
 msgid "Delete column"
-msgstr ""
+msgstr "Supprimer la colonne"
 
 #: app/views/popup.action.edit.php:292
 msgid "Delete current action?"
@@ -8294,7 +8294,7 @@ msgstr "Identifiant de groupe d'utilisateurs \"%1$s\" en doublon dans les groupe
 
 #: jsLoader.php:274
 msgid "Duplicate column"
-msgstr ""
+msgstr "Dupliquer la colonne"
 
 #: include/classes/api/services/CHost.php:2096
 #: include/classes/api/services/CHost.php:2396
@@ -10034,7 +10034,7 @@ msgstr[1] "Graphiques supprimés"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Graph edit"
-msgstr ""
+msgstr "Modification du graphique"
 
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
@@ -10090,7 +10090,7 @@ msgstr[1] "Prototypes de graphique supprimés"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Graph prototype edit"
-msgstr ""
+msgstr "Modification du prototype de graphique"
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -10649,7 +10649,7 @@ msgstr[1] "Hôtes désactivés"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Host edit"
-msgstr ""
+msgstr "Modification de l'hôte"
 
 #: app/controllers/CControllerHostGroupEnable.php:76
 #: app/controllers/CControllerPopupMassupdateHost.php:491
@@ -10712,7 +10712,7 @@ msgstr[1] "Groupes d'hôtes supprimé"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Host group edit"
-msgstr ""
+msgstr "Modification du groupe d'hôtes"
 
 #: include/views/js/monitoring.sysmaps.js.php:112
 msgid "Host group elements"
@@ -10883,7 +10883,7 @@ msgstr[1] "Prototypes d'hôte supprimés"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Host prototype edit"
-msgstr ""
+msgstr "Modification du prototype d'hôte"
 
 #: include/views/configuration.host.prototype.edit.php:370
 msgid "Host prototype macros"
@@ -13298,7 +13298,7 @@ msgstr[1] "Éléments désactivés"
 
 #: app/controllers/CControllerPopup.php:48
 msgid "Item edit"
-msgstr ""
+msgstr "Modification de l'élément"
 
 #: items.php:707
 msgid "Item enabled"
@@ -13375,7 +13375,7 @@ msgstr[1] "Prototypes d'élément supprimés"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Item prototype edit"
-msgstr ""
+msgstr "Modification du prototype d'élément"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
@@ -14380,7 +14380,7 @@ msgstr "La maintenance \"%1$s\" existe déjà."
 
 #: app/controllers/CControllerPopup.php:50
 msgid "Maintenance edit"
-msgstr ""
+msgstr "Modification de la maintenance"
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:238
@@ -14873,7 +14873,7 @@ msgstr "Type de média désactivé par l'administration."
 
 #: app/controllers/CControllerPopup.php:51
 msgid "Media type edit"
-msgstr ""
+msgstr "Modification du type de média"
 
 #: app/controllers/CControllerMediatypeEnable.php:87
 #: app/controllers/CControllerMediatypeEnable.php:94
@@ -15250,7 +15250,7 @@ msgstr[1] "Modules désactivés"
 
 #: app/controllers/CControllerPopup.php:52
 msgid "Module edit"
-msgstr ""
+msgstr "Modification du module"
 
 #: app/controllers/CControllerModuleEnable.php:91
 msgid "Module enabled"
@@ -18593,7 +18593,7 @@ msgstr[1] "Proxy supprimé"
 
 #: app/controllers/CControllerPopup.php:53
 msgid "Proxy edit"
-msgstr ""
+msgstr "Modification du proxy"
 
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/partials/configuration.host.edit.html.php:266
@@ -18631,7 +18631,7 @@ msgstr[1] "Groupes de proxy supprimés"
 
 #: app/controllers/CControllerPopup.php:54
 msgid "Proxy group edit"
-msgstr ""
+msgstr "Modification du groupe de proxys"
 
 #: app/controllers/CControllerProxyGroupUpdate.php:74
 msgid "Proxy group updated"
@@ -19430,7 +19430,7 @@ msgstr "Réinitialiser aux valeurs par défaut"
 
 #: jsLoader.php:305
 msgid "Reset layout"
-msgstr ""
+msgstr "Réinitialiser la disposition"
 
 #: widgets/geomap/Widget.php:37
 msgid "Reset to initial view"
@@ -19789,7 +19789,7 @@ msgstr[1] "SLAs désactivés"
 
 #: app/controllers/CControllerPopup.php:58
 msgid "SLA edit"
-msgstr ""
+msgstr "Modification de SLA"
 
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
@@ -20171,7 +20171,7 @@ msgstr[1] "Rapports planifiés désactivés"
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Scheduled report edit"
-msgstr ""
+msgstr "Modification du rapport planifié"
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
@@ -20256,7 +20256,7 @@ msgstr "Le script n'a pas de paramètres."
 
 #: app/controllers/CControllerPopup.php:56
 msgid "Script edit"
-msgstr ""
+msgstr "Modification du script"
 
 #: app/views/administration.timeouts.edit.php:168
 msgid "Script execution"
@@ -20635,7 +20635,7 @@ msgstr[1] "Services supprimés"
 
 #: app/controllers/CControllerPopup.php:57
 msgid "Service edit"
-msgstr ""
+msgstr "Modification du service"
 
 #: app/views/administration.userrole.edit.php:166
 #: app/views/administration.userrole.edit.php:207
@@ -20948,7 +20948,7 @@ msgstr "Afficher les hôtes en maintenance"
 
 #: jsLoader.php:281
 msgid "Show item key"
-msgstr ""
+msgstr "Afficher la clé de l'élément"
 
 #: include/views/js/monitoring.sysmaps.js.php:158
 #: include/views/js/monitoring.sysmaps.js.php:698
@@ -21986,7 +21986,7 @@ msgstr "La table \"%1$s\" n'a pas de champ nommé \"%2$s\"."
 
 #: jsLoader.php:303
 msgid "Table options"
-msgstr ""
+msgstr "Options du tableau"
 
 #: app/controllers/CControllerActionOperationCheck.php:210
 #: app/controllers/CControllerActionOperationCheck.php:216
@@ -22049,7 +22049,7 @@ msgstr "La combinaison du nom et de la valeur du tag n'est pas unique."
 
 #: jsLoader.php:292
 msgid "Tag name display"
-msgstr ""
+msgstr "Affichage du nom du tag"
 
 #: app/controllers/CControllerMaintenanceCreate.php:93
 #: app/controllers/CControllerMaintenanceUpdate.php:94
@@ -22194,7 +22194,7 @@ msgstr[1] "Modèles supprimés"
 
 #: app/controllers/CControllerPopup.php:59
 msgid "Template edit"
-msgstr ""
+msgstr "Modification du modèle"
 
 #: app/controllers/CControllerAuditLogList.php:259
 #: app/partials/configuration.templategroup.edit.html.php:52
@@ -22221,7 +22221,7 @@ msgstr[1] "Groupes de modèles supprimés"
 
 #: app/controllers/CControllerPopup.php:55
 msgid "Template group edit"
-msgstr ""
+msgstr "Modification du groupe de modèles"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:86
 msgid "Template group updated"
@@ -23077,7 +23077,7 @@ msgstr "Aujourd'hui jusqu'à présent"
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
-msgstr ""
+msgstr "Modification du jeton"
 
 #: app/views/oauth.edit.php:188
 msgid "Token endpoint"
@@ -23217,7 +23217,7 @@ msgstr "Statistiques du cache de la fonction de tendance. Les paramètres valide
 
 #: include/classes/data/CItemData.php:3013
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems, paccessed and requests."
-msgstr ""
+msgstr "Statistiques du cache des fonctions de tendance. Les paramètres valides sont : all, hits, phits, misses, pmisses, items, pitems, paccessed et requests."
 
 #: app/controllers/CControllerPopupLldOperation.php:226
 #: app/partials/configuration.filter.items.php:162
@@ -23364,7 +23364,7 @@ msgstr "Options d'affichage des déclencheurs"
 
 #: app/controllers/CControllerPopup.php:61
 msgid "Trigger edit"
-msgstr ""
+msgstr "Modification du déclencheur"
 
 #: app/controllers/CControllerTriggerEnable.php:67
 msgid "Trigger enabled"
@@ -23507,7 +23507,7 @@ msgstr[1] "Prototypes de déclencheur supprimés"
 
 #: app/controllers/CControllerPopup.php:62
 msgid "Trigger prototype edit"
-msgstr ""
+msgstr "Modification du prototype de déclencheur"
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -27310,7 +27310,7 @@ msgstr "ne correspond pas"
 
 #: jsLoader.php:268
 msgid "duplicate"
-msgstr ""
+msgstr "dupliquer"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
