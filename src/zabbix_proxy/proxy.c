@@ -2028,21 +2028,32 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_init(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location, &error))
+	if (SUCCEED == zbx_vault_is_configured(&zbx_config_vault))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
-		zbx_free(error);
-		zbx_exit(EXIT_FAILURE);
-	}
+		if (SUCCEED != zbx_vault_validate_config(&zbx_config_vault, zbx_db_config->dbuser,
+				zbx_db_config->dbpassword, &error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "invalid vault configuration: %s", error);
+			zbx_free(error);
+			zbx_exit(EXIT_FAILURE);
+		}
 
-	if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &zbx_db_config->dbuser,
-			&zbx_db_config->dbpassword, zbx_config_source_ip, config_ssl_ca_location,
-			config_ssl_cert_location, config_ssl_key_location, &error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
-		zbx_free(error);
-		zbx_exit(EXIT_FAILURE);
+		if (SUCCEED != zbx_vault_init(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
+				config_ssl_cert_location, config_ssl_key_location, &error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
+			zbx_free(error);
+			zbx_exit(EXIT_FAILURE);
+		}
+
+		if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &zbx_db_config->dbuser,
+				&zbx_db_config->dbpassword, zbx_config_source_ip, config_ssl_ca_location,
+				config_ssl_cert_location, config_ssl_key_location, &error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
+			zbx_free(error);
+			zbx_exit(EXIT_FAILURE);
+		}
 	}
 
 	if (FAIL == zbx_pb_create(config_proxy_buffer_mode, config_proxy_memory_buffer_size,

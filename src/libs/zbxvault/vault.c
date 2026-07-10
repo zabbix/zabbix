@@ -35,9 +35,9 @@ typedef	void (*zbx_vault_renew_token_cb_t)(const char *vault_url, const char *ap
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, long timeout, char **token);
 
-static zbx_vault_get_kvs_cb_t		zbx_vault_get_kvs_cb;
-static zbx_vault_renew_token_cb_t	zbx_vault_renew_token_cb;
-static const char			*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
+static zbx_vault_get_kvs_cb_t		zbx_vault_get_kvs_cb = NULL;
+static zbx_vault_renew_token_cb_t	zbx_vault_renew_token_cb = NULL;
+static const char			*zbx_vault_dbuser_key = NULL, *zbx_vault_dbpassword_key = NULL;
 
 /**********************************************************************************************
  *                                                                                            *
@@ -323,6 +323,12 @@ int	zbx_vault_get_kvs(const char *path, zbx_kvs_t *kvs, const zbx_config_vault_t
 		const char *config_ssl_cert_location, const char *config_ssl_key_location, int *vault_ret,
 		char **error)
 {
+	if (NULL == zbx_vault_get_kvs_cb)
+	{
+		*error = zbx_strdup(*error, "vault is not configured");
+		return FAIL;
+	}
+
 	return zbx_vault_get_kvs_cb(config_vault->url, config_vault->prefix, config_vault->token,
 			config_vault->app_role_id,
 			config_vault->tls_cert_file, config_vault->tls_key_file, config_source_ip,
