@@ -135,9 +135,9 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 
 		$this->page->waitUntilReady();
 		$button = $this->query('xpath://button[@id="addrm_fav"]')->waitUntilVisible()->one();
-		$this->assertEquals('Add to favorites', $button->getAttribute('title'));
+		$this->assertEquals('Add map to Favorite maps widget', $button->getAttribute('aria-label'));
 		$button->waitUntilClickable()->click();
-		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['title' => 'Remove from favorites']);
+		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['aria-label' => 'Remove map from the Favorite maps widget']);
 
 		$this->page->login()->open(self::$dashboard_url)->waitUntilReady();
 		$widget = CDashboardElement::find()->one()->getWidget(self::$edit_widget)->waitUntilReady()->getContent();

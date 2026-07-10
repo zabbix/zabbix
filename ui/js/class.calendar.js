@@ -28,11 +28,13 @@ var CLNDR = null,
 function toggleCalendar(trigger_elmnt, time_input, date_time_format) {
 	if (CLNDR && jQuery(trigger_elmnt).is(CLNDR.trigger_elmnt) && CLNDR.is_visible) {
 		CLNDR.clndrhide();
+		trigger_elmnt.setAttribute('aria-expanded', 'false');
 	}
 	else {
 		CLNDR && CLNDR.clndrhide();
 		CLNDR = new calendar(time_input, trigger_elmnt, date_time_format);
 		CLNDR.clndrshow();
+		trigger_elmnt.setAttribute('aria-expanded', 'true');
 	}
 }
 
@@ -616,8 +618,8 @@ calendar.prototype = {
 
 		this.clndr_yeardown = document.createElement('button');
 		this.clndr_yeardown.setAttribute('type', 'button');
-		this.clndr_yeardown.className = `${ZBX_STYLE_BTN_GREY} btn-year-prev`;
-		this.clndr_yeardown.setAttribute('aria-label', t('Previous year'));
+		this.clndr_yeardown.setAttribute('tabindex', '-1');
+		this.clndr_yeardown.className = 'btn-grey';
 		this.clndr_yeardown.appendChild(arrow_left);
 		this.clndr_year_div.appendChild(this.clndr_yeardown);
 
@@ -630,8 +632,8 @@ calendar.prototype = {
 
 		this.clndr_yearup = document.createElement('button');
 		this.clndr_yearup.setAttribute('type', 'button');
-		this.clndr_yearup.className = `${ZBX_STYLE_BTN_GREY} btn-year-next`;
-		this.clndr_yearup.setAttribute('aria-label', t('Next year'));
+		this.clndr_yearup.setAttribute('tabindex', '-1');
+		this.clndr_yearup.className = 'btn-grey';
 		this.clndr_yearup.appendChild(arrow_right);
 		this.clndr_year_div.appendChild(this.clndr_yearup);
 
