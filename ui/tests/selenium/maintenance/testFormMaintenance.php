@@ -991,7 +991,7 @@ class testFormMaintenance extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
 
 		if ($update) {
-			// Add prefix to the Update scenarios taking into account the trainling and leading spaces scenario.
+			// Add prefix to the Update scenarios taking into account the trailing and leading spaces scenario.
 			if ($expected === TEST_GOOD) {
 				$data['fields']['Name'] = (CTestArrayHelper::get($data, 'trim'))
 					? ' Updated - '.trim($data['fields']['Name']).'  '
