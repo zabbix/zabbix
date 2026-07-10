@@ -24,6 +24,7 @@ window.widget_clock_form = new class {
 		this._form = document.getElementById('widget-dialogue-form');
 		this._time_type = document.getElementById('time_type');
 		this._clock_type = document.getElementById('clock_type');
+		this._init_time_type_value = this._time_type.value;
 
 		this._show_date = document.getElementById('show_1');
 		this._show_time = document.getElementById('show_2');
@@ -82,5 +83,17 @@ window.widget_clock_form = new class {
 				element.style.display = this._time_type.value != <?= TIME_TYPE_HOST ?> ? '' : 'none';
 			}
 		}
+
+		if (this._time_type.value != this._init_time_type_value) {
+			if (this._time_type.value == <?= TIME_TYPE_SERVER ?>) {
+				document.querySelector('z-select[name="tzone_timezone"]').value = '<?= ZBX_DEFAULT_TIMEZONE ?>';
+			}
+			else if (this._time_type.value == <?= TIME_TYPE_LOCAL ?>) {
+				document.querySelector('z-select[name="tzone_timezone"]').value = '<?= TIMEZONE_DEFAULT_LOCAL ?>';
+			}
+
+			this._init_time_type_value = this._time_type.value;
+		}
+
 	}
 };

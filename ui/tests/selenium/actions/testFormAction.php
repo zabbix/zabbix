@@ -1066,7 +1066,7 @@ class testFormAction extends CLegacyWebTest {
 		$operation_details->getField('Custom message')->set(true);
 		$this->assertEquals(255, $operation_details->getField('id:operation-opmessage-subject')->waitUntilVisible()->getAttribute('maxlength'));
 		$this->assertEquals(65535, $operation_details->getField('id:operation_opmessage_message')->waitUntilVisible()->getAttribute('maxlength'));
-		$this->zbxTestClickXpath("//div[@class='overlay-dialogue modal modal-popup modal-popup-medium']//button[@title='Close']");
+		$this->zbxTestClickXpath("//div[@class='overlay-dialogue modal modal-popup modal-popup-medium']//button[@aria-label='Close modal window']");
 	}
 
 	public static function update() {
@@ -1477,7 +1477,7 @@ class testFormAction extends CLegacyWebTest {
 		else {
 			$title = CTestArrayHelper::get($data, 'error_title', 'Cannot add action');
 			$this->assertMessage(TEST_BAD, $title, $data['errors']);
-			$this->query('xpath://output[@aria-label="Error message"]//button[@title="Close"]')->one()->click();
+			$this->query('xpath://output[@aria-label="Error message"]//button[@aria-label="Close notification"]')->one()->click();
 			$this->assertEquals(0, CDBHelper::getCount($sql), 'Action has not been created in the DB.');
 			$this->query('xpath://button[text()="Cancel"]')->waitUntilVisible()->one()->click();
 		}

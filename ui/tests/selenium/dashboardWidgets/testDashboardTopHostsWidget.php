@@ -2336,7 +2336,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				}
 
 				$this->assertMessage(TEST_BAD, null, $data['column_error']);
-				$this->query('xpath://div/h4[text()="'.$dialog_title.'"]/../button[@title="Close"]')->one()->click();
+				$this->query('xpath://div/h4[text()="'.$dialog_title.'"]/../button[@aria-label="Close modal window"]')->one()->click();
 			}
 
 			$column_form->waitUntilNotVisible();

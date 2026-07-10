@@ -17,7 +17,7 @@
 require_once __DIR__.'/../include/CAPITest.php';
 
 /**
- * @backup   ids
+ * @backup   ids,hgset
  *
  * @onBefore prepareTestData
  * @onAfter  clearData

@@ -203,7 +203,7 @@ class CDashboardElement extends CElement {
 		$this->checkIfEditable();
 		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or contains(@class,'.
 				' "dashboard-grid-iterator-header")]/h4[text()="'.$name.
-				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()
+				'"]/../ul/li/button[@aria-label="Open widget actions"]')->asPopupButton()->one()
 				->select('Delete')->waitUntilNotVisible();
 
 		return $this;
@@ -219,7 +219,7 @@ class CDashboardElement extends CElement {
 	public function copyWidget($name) {
 		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or contains(@class,'.
 				' "dashboard-grid-iterator-header")]/h4[text()="'.$name.
-				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Copy');
+				'"]/../ul/li/button[@aria-label="Open widget actions"]')->asPopupButton()->one()->select('Copy');
 
 		return $this;
 	}
@@ -250,7 +250,7 @@ class CDashboardElement extends CElement {
 
 		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or contains(@class,'.
 				' "dashboard-grid-iterator-header")]/h4[text()="'.$name.
-				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Paste');
+				'"]/../ul/li/button[@aria-label="Open widget actions"]')->asPopupButton()->one()->select('Paste');
 
 		return $this;
 	}

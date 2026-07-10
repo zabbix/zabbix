@@ -492,7 +492,6 @@ class testFormUserMedia extends CWebTest {
 			$row = $table->findRow('Send to', 'test@zabbix.com');
 			$this->assertEquals($row->getColumn('Status')->getText(), 'Enabled');
 			$row->getColumn('Status')->click();
-			$this->page->waitUntilReady();
 			$this->assertEquals($row->getColumn('Status')->getText(), 'Disabled');
 
 			// Remove one of the media.

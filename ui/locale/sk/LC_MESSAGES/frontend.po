@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-04-09 09:05+0000\n"
+"PO-Revision-Date: 2026-07-01 07:27+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -14529,6 +14529,10 @@ msgstr "Nové hodnoty"
 msgid "Next dashboard"
 msgstr "Ďalší dashboard"
 
+#: jsLoader.php:260
+msgid "Next month"
+msgstr "Ďalší mesiac"
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -14542,6 +14546,10 @@ msgstr "Ďalšia strana"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Ďalší krok"
+
+#: jsLoader.php:258
+msgid "Next year"
+msgstr "Ďalší rok"
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131

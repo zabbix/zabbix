@@ -702,13 +702,13 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	public function testDashboardTriggerOverviewWidget_CheckDependencyPopups() {
 		$popup_content = [
 			'Dependent trigger ONE' => [
-				'Depends on' => ['Trigger disabled with tags']
+				'Dependent trigger' => ['Trigger disabled with tags']
 			],
 			'Inheritance trigger with tags' => [
-				'Depends on' => ['Trigger disabled with tags']
+				'Dependent trigger' => ['Trigger disabled with tags']
 			],
 			'Trigger disabled with tags' => [
-				'Dependent' => ['Inheritance trigger with tags', 'Dependent trigger ONE']
+				'Parent trigger' => ['Inheritance trigger with tags', 'Dependent trigger ONE']
 			]
 		];
 

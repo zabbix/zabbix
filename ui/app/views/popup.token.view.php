@@ -47,6 +47,7 @@ $token_from_grid = (new CFormGrid())
 				->onClick('writeTextClipboard(this.dataset.auth_token);')
 				->setAttribute('data-auth_token', $data['auth_token'])
 				->setAttribute('autofocus', 'autofocus')
+				->setAttribute('aria-label', _('Copy to clipboard'))
 		])
 	])
 	->addItem([

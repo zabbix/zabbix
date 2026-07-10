@@ -919,7 +919,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 				'=now&filter_search_type=0&filter_set=1')->waitUntilReady();
 
 		// Check Kiosk mode.
-		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter disappeared.
@@ -927,7 +927,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		$this->assertFalse($this->query('xpath://div[@aria-label="Filter"]')->exists());
 
 		// Return to normal view.
-		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->click(true);
+		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->waitUntilPresent()->one()->click(true);
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter are visible again.

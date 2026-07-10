@@ -682,9 +682,9 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=latest.view&hostids%5B%5D='.$hostid)->waitUntilReady();
 
 		if ($kiosk_mode) {
-			$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+			$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertTrue($this->query('xpath://button[@title="Normal view"]')->exists());
+			$this->assertTrue($this->query('xpath://button[@aria-label="Exit full screen mode"]')->exists());
 		}
 
 		$this->getTable()->query('button', $tag['tag'].$tag['value'])->waitUntilClickable()->one()->click();
@@ -705,9 +705,9 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->assertTableData($data, $this->getTableSelector());
 
 		if ($kiosk_mode) {
-			$this->query('xpath://button[@title="Normal view"]')->one()->click();
+			$this->query('xpath://button[@aria-label="Exit full screen mode"]')->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
+			$this->assertTrue($this->query('xpath://button[@aria-label="Enter full screen mode"]')->exists());
 			$this->assertTableData($data, $this->getTableSelector());
 		}
 		else {
