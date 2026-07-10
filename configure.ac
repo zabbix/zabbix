@@ -1618,6 +1618,50 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${DB_LDFLAGS}"
 	PROXY_LIBS="${PROXY_LIBS} ${DB_LIBS}"
 
+    dnl *****************************************************************
+    dnl * OTLP/gRPC event collector (proxy only)                        *
+    dnl *****************************************************************
+    AC_ARG_WITH([otel],
+        [
+If you want to use Open Telemetry collector in proxy:
+AS_HELP_STRING([--with-otel], [turn on OTLP/gRPC event collector, requires --enable-proxy @<:@default=no@:>@])],
+        [
+        if test "x$withval" = "xno"; then
+            with_otel="no"
+        elif test "x$withval" = "xyes"; then
+            with_otel="yes"
+        else
+            with_otel="yes"
+        fi
+        ],
+        [with_otel="no"])
+
+    if test "x$with_otel" != "xno"; then
+        if test "x$proxy" != "xyes"; then
+            AC_MSG_ERROR([--with-otel requires --enable-proxy])
+        fi
+
+        AC_LANG_PUSH([C++])
+        AX_CXX_COMPILE_STDCXX([17], [noext], [mandatory])
+        AC_LANG_POP([C++])
+
+        m4_ifdef([PKG_CHECK_MODULES], [
+            PKG_CHECK_MODULES([GRPC], [grpc++ >= 1.40])
+            PKG_CHECK_MODULES([PROTOBUF], [protobuf])
+        ], [
+            AC_MSG_ERROR([--with-otel needs pkg-config autoconf macros (pkg.m4); install pkg-config/pkgconf and re-run autoreconf])
+        ])
+
+        OTEL_CFLAGS="$GRPC_CFLAGS $PROTOBUF_CFLAGS"
+        OTEL_LIBS="$GRPC_LIBS $PROTOBUF_LIBS"
+        AC_SUBST(OTEL_CFLAGS)
+        AC_SUBST(OTEL_LIBS)
+
+        AC_DEFINE([HAVE_OTEL], [1], [Define to 1 if built with OTLP/gRPC event collector support])
+    fi
+
+    AM_CONDITIONAL([HAVE_OTEL], [test "x$with_otel" != "xno"])
+
 	dnl Check for LIBXML2 [by default - skip]
 	LIBXML2_CHECK_CONFIG([no])
 	if test "x$want_libxml2" = "xyes"; then
@@ -2468,6 +2512,10 @@ if test "x$LIBEVENT_CFLAGS" != "x"; then
 	echo "    libevent:              ${LIBEVENT_CFLAGS}"
 fi
 
+if test "x$OTEL_CFLAGS" != "x"; then
+	echo "    OTLP/gRPC:             ${OTEL_CFLAGS}"
+fi
+
 echo "
   Enable server:         ${server}"
 
@@ -2515,6 +2563,7 @@ echo "    SNMP:                  ${have_snmp}
     SSH:                   ${have_ssh}
     TLS:                   ${have_tls}
     ODBC:                  ${have_unixodbc}
+    OTLP collector:        ${with_otel}
     Linker flags:          ${PROXY_LDFLAGS} ${LDFLAGS}
     Libraries:             ${PROXY_LIBS} ${LIBS}
     Configuration file:    ${PROXY_CONFIG_FILE}
