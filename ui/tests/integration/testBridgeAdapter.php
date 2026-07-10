@@ -198,6 +198,22 @@ class testBridgeAdapter extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('userids', $response['result']);
 
+		return true;
+	}
+
+	/**
+	 * Create the restricted role and user on first use.
+	 *
+	 * The "devices.actions.default_access" rule is only accepted once the server has reported that mobile
+	 * devices are enabled, which only happens after the server component is started. prepareData() runs
+	 * before that, so this cannot be created there and is instead created lazily by the test cases that
+	 * need it.
+	 */
+	private function ensureRestrictedUser(): void {
+		if (self::$restricted_userid !== null) {
+			return;
+		}
+
 		$response = $this->call('role.create', [
 			'name' => 'bridge_adapter_restricted_role',
 			'type' => USER_TYPE_ZABBIX_USER,
@@ -214,8 +230,6 @@ class testBridgeAdapter extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('userids', $response['result']);
 		self::$restricted_userid = $response['result']['userids'][0];
-
-		return true;
 	}
 
 	private function clearPreparedData(): void {
@@ -1095,6 +1109,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	public function testBridgeAdapter_initPermissionDenied(): void {
 		[$client] = $this->getServerClientAndSid();
 
+		$this->ensureRestrictedUser();
 		$this->authorize(self::RESTRICTED_USER_NAME, self::RESTRICTED_USER_PASSWD);
 		$restricted_sid = CAPIHelper::getSessionId();
 
@@ -1217,6 +1232,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	public function testBridgeAdapter_offboardPermissionDenied(): void {
 		[$client] = $this->getServerClientAndSid();
 
+		$this->ensureRestrictedUser();
 		$this->authorize(self::RESTRICTED_USER_NAME, self::RESTRICTED_USER_PASSWD);
 		$restricted_sid = CAPIHelper::getSessionId();
 
