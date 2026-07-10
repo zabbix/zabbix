@@ -5510,7 +5510,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 			// Switch to kiosk mode if screenshot needs to be checked in Kiosk mode.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
-				$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+				$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
 				$charts_table->waitUntilReloaded();
 				$this->page->waitUntilReady();
 			}
@@ -5531,7 +5531,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 			// Switch back to normal view to avoid impacting following scenarios.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
-				$this->query('xpath://button[@title="Normal view"]')->one()->click();
+				$this->query('xpath://button[@aria-label="Exit full screen mode"]')->one()->click();
 				$this->page->waitUntilReady();
 			}
 		}
@@ -5672,7 +5672,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			$old_source = $image->getAttribute('src');
 		}
 
-		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
 		$this->page->waitUntilReady();
 
 		$object = $this->query($object_locator)->waitUntilPresent()->one();
@@ -5693,7 +5693,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		$this->assertScreenshotExcept($object, $this->query('class:header-kioskmode-controls')->one(), $id.'_kiosk');
 
-		$this->query('xpath://button[@title="Normal view"]')->one()->click();
+		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->one()->click();
 		$this->page->waitUntilReady();
 	}
 

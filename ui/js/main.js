@@ -403,9 +403,16 @@ var hintBox = {
 	},
 
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo, reposition_on_resize = true) {
-		var hintboxid = hintBox.getUniqueId(),
-			box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue wordbreak'),
-			appendTo = appendTo || '.wrapper';
+		var hintboxid = hintBox.getUniqueId();
+		var box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue wordbreak');
+		var appendTo = appendTo || '.wrapper';
+
+		if (!isStatic) {
+			id = 'hintbox-'+hintboxid;
+			$(target).attr('aria-describedby', id);
+			box.attr('id', id);
+			box.attr('role', 'tooltip');
+		}
 
 		if (styles) {
 			// property1: value1; property2: value2; property(n): value(n)
@@ -809,7 +816,8 @@ function toggleSection(toggle, profile_idx = '') {
 
 	toggle.classList.toggle(ZBX_ICON_CHEVRON_DOWN, !is_collapsed);
 	toggle.classList.toggle(ZBX_ICON_CHEVRON_UP, is_collapsed);
-	toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
+	toggle.setAttribute('aria-label', is_collapsed ? t('Collapse section') : t('Expand section'));
+	toggle.setAttribute('aria-expanded', is_collapsed ? 'true' : 'false');
 
 	section.dispatchEvent(new CustomEvent(!is_collapsed ? 'collapse' : 'expand'));
 
