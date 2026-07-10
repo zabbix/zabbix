@@ -1825,8 +1825,8 @@ out1:
  *     error      - [OUT] dynamically allocated memory with error message     *
  *                                                                            *
  * Return value:                                                              *
- *     SUCCEED	  - successful TLS handshake with a valid certificate or PSK  *
- *     FAIL		  - an error occurred                                         *
+ *     SUCCEED    - successful TLS handshake with a valid certificate or PSK  *
+ *     FAIL       - an error occurred                                         *
  *                                                                            *
  ******************************************************************************/
 int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
