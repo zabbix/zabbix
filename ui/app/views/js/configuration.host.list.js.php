@@ -721,8 +721,6 @@
 					const max_in_table_exceeded = templates.length > max_in_table;
 					const visible_templates = Object.values(templates).slice(0, max_in_table);
 
-					cell_inner.classList.add('wrap');
-
 					visible_templates.forEach(({templateid, name, parentTemplates, editable}, i) => {
 						const element = editable ? document.createElement('a') : document.createElement('span');
 
@@ -736,8 +734,8 @@
 							element.setAttribute('href', url.toString());
 						}
 
-						element.classList.add('grey');
-						element.textContent = name;
+						element.classList.add(ZBX_STYLE_GREY);
+						element.textContent = String(name);
 
 						cell.appendChild(element);
 
@@ -757,7 +755,7 @@
 									element.setAttribute('href', url.toString());
 								}
 
-								element.classList.add('grey');
+								element.classList.add(ZBX_STYLE_GREY);
 								element.textContent = name;
 
 								cell.appendChild(element);

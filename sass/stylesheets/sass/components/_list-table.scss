@@ -6,10 +6,6 @@
 	border-top-left-radius: var(--surface-border-radius);
 	border-top-right-radius: var(--surface-border-radius);
 
-	&.fixed {
-		table-layout: fixed;
-	}
-
 	thead {
 		th {
 			height: 100%;
@@ -109,13 +105,6 @@
 		text-align: left;
 		vertical-align: top;
 		border-bottom: 1px solid $table-border-color;
-
-		&.second-col {
-			width: 20px;
-			padding-left: 0;
-			padding-right: 0;
-			text-align: center;
-		}
 	}
 
 	&.sticky-header {
@@ -330,7 +319,7 @@
 				}
 			}
 
-			&.column-tags-3 {
+			&.column-tags {
 				width: 173px;
 
 				@media screen and (min-width: 1200px) {

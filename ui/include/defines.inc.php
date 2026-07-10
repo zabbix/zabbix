@@ -2014,7 +2014,7 @@ define('ZBX_STYLE_COLOR_ICON', 'color-icon');
 define('ZBX_STYLE_COLOR_NEGATIVE', 'color-negative');
 define('ZBX_STYLE_COLOR_POSITIVE', 'color-positive');
 define('ZBX_STYLE_COLOR_WARNING', 'color-warning');
-define('ZBX_STYLE_COLUMN_TAGS_3', 'column-tags-3');
+define('ZBX_STYLE_COLUMN_TAGS', 'column-tags');
 define('ZBX_STYLE_COMPACT_VIEW', 'compact-view');
 define('ZBX_STYLE_CURSOR_POINTER', 'cursor-pointer');
 define('ZBX_STYLE_DASHBOARD', 'dashboard');

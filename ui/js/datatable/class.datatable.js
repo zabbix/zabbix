@@ -764,11 +764,11 @@ class CDataTable {
 			cell.appendChild(tags_wrapper);
 		});
 
-		this.setCellRenderer('custom_text', ({column, cell_data, cell_inner}) => {
+		this.setCellRenderer('custom_text', ({column, cell_data, cell}) => {
 			const column_index = column.getColumnIndex();
 			const [custom_text] = cell_data;
 
-			cell_inner.textContent = custom_text ? (custom_text[column_index] ?? '') : '';
+			cell.textContent = custom_text ? (custom_text[column_index] ?? '') : '';
 		});
 
 		this.setOptionsHandler(CDataTableColumn.TABLE_OPTIONS, CDataTableOptionsPopupTableOptions);
