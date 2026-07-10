@@ -2418,7 +2418,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 			// Check hint-box.
 			$form->query($data['selector'])->one()->click();
-			$hint = $this->query('css:div.overlay-dialogue.wordbreak[data-hintboxid]')->waitUntilVisible()->one();
+			$hint = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilVisible()->one();
 			$this->assertEquals($data['warning_message'], $hint->getText());
 
 			// Close the hint-box.

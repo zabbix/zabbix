@@ -136,10 +136,7 @@ class testPageGroups extends CWebTest {
 			$icon = $row->getColumn('Info')->query('tag:button')->one();
 			$this->assertTrue($icon->hasClass('zi-i-warning'));
 			$icon->click();
-			$hintbox = $this->query('css:div.overlay-dialogue.wordbreak')
-					->asOverlayDialog()
-					->waitUntilVisible()
-					->one();
+			$hintbox = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilVisible()->one();
 
 			$this->assertEquals('The host group is not discovered anymore and will be deleted the next time discovery'.
 					' rule is processed.',
