@@ -564,6 +564,7 @@ class CControllerPopupGeneric extends CController {
 			'templates' =>							'string|not_empty',
 			'host_templates' =>						'string|not_empty',
 			'multiselect' =>						'in 1',
+			'massupdate' =>							'in 1',
 			'patternselect' =>						'in 1',
 			'submit' =>								'string',
 			'excludeids' =>							'array',
@@ -572,7 +573,6 @@ class CControllerPopupGeneric extends CController {
 			'monitored_hosts' =>					'in 1',
 			'templated_hosts' =>					'in 1',
 			'real_hosts' =>							'in 1',
-			'with_hosts' =>							'in 1',
 			'normal_only' =>						'in 1',
 			'with_graphs' =>						'in 1',
 			'with_hosts' =>							'in 1',
@@ -1773,6 +1773,7 @@ class CControllerPopupGeneric extends CController {
 				$records = [];
 				$hostids = $this->getInput('hostids', []);
 				$context = $this->getInput('context', '');
+				$massupdate = $this->getInput('massupdate', 0);
 
 				if ($context === '' || (!$hostids && !$this->groupids && !$this->template_groupids)) {
 					break;
@@ -1812,16 +1813,18 @@ class CControllerPopupGeneric extends CController {
 				foreach ($db_valuemaps as $db_valuemap) {
 					$valuemap = [
 						'id' => $db_valuemap['valuemapid'],
+						'hostname' => $hosts[$db_valuemap['hostid']]['name'],
 						'name' => $db_valuemap['name'],
 						'mappings' => array_values($db_valuemap['mappings']),
-						'_disabled' => in_array($db_valuemap['name'], $disable_names)
+						'_disabled' => in_array($db_valuemap['name'], $disable_names),
+						'massupdate' => $massupdate
 					];
 
 					$records[$db_valuemap['valuemapid']] = $valuemap;
 				}
 
 				$records = array_column($records, null, 'id');
-				CArrayHelper::sort($records, ['name']);
+				CArrayHelper::sort($records, ['name', 'hostname']);
 				break;
 
 			case 'dashboard':

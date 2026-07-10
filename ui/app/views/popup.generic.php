@@ -705,21 +705,27 @@ switch ($data['popup_type']) {
 	case 'valuemaps':
 	case 'template_valuemaps':
 		foreach ($data['table_records'] as $valuemap) {
+			$name = [];
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.$valuemap['id'].']', $valuemap['id'])
 				: null;
+
+			if ($valuemap['massupdate']) {
+				$name[] = (new CSpan($valuemap['hostname']))->addClass(ZBX_STYLE_GREY);
+				$name[] = NAME_DELIMITER;
+			}
 
 			if (array_key_exists('_disabled', $valuemap) && $valuemap['_disabled']) {
 				if ($data['multiselect']) {
 					$check_box->setChecked(1);
 					$check_box->setEnabled(false);
 				}
-				$name = (new CSpan($valuemap['name']))->addClass(ZBX_STYLE_GREY);
+				$name[] = (new CSpan($valuemap['name']))->addClass(ZBX_STYLE_GREY);
 
 				unset($data['table_records'][$valuemap['id']]);
 			}
 			else {
-				$name = (new CLink($valuemap['name'], '#'))
+				$name[] = (new CLink($valuemap['name'], '#'))
 					->setId('spanid'.$valuemap['id'])
 					->setAttribute('data-reference', $options['reference'])
 					->setAttribute('data-valuemapid', $valuemap['id'])
