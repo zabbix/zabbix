@@ -473,7 +473,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 			TRIGGER_VALUE_PROBLEM, db_event->severity, &db_event->tags, db_event->suppress);
 
 	cep_cache_acquire(&cep);
-	h = zbx_cep_event_handle_addref(cep_add_event(cep, event));
+	h = cep_add_event(cep, event);
 	cep_cache_release(&cep);
 
 	cep_stats_update_events_processed(1);
@@ -634,9 +634,10 @@ static void	cep_worker_process_trigger_event(zbx_cep_worker_t *worker, zbx_cep_t
  ******************************************************************************/
 static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 {
-	zbx_cep_t	*cep;
-	zbx_db_event	*db_event = task->db_event;
-	zbx_uint64_t	eventid;
+	zbx_cep_t		*cep;
+	zbx_db_event		*db_event = task->db_event;
+	zbx_uint64_t		eventid;
+	zbx_cep_event_handle_t	h;
 
 	cep_cache_acquire(&cep);
 	eventid = cep_open_internal_event(cep, db_event->object, db_event->objectid);
@@ -656,9 +657,10 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 			NULL);
 
 	cep_cache_acquire(&cep);
-	(void)cep_add_event(cep, event);
+	h = cep_add_event(cep, event);
 	cep_cache_release(&cep);
 
+	zbx_cep_event_handle_release(h);
 	cep_stats_update_events_processed(1);
 
 	task->event_op = CEP_EVENT_OPEN;

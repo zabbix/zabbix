@@ -824,7 +824,7 @@ void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool)
  * Parameters: cache - [IN/OUT] cache context                                 *
  *             event - [IN]     event to add                                  *
  *                                                                            *
- * Return value: event handle                                                 *
+ * Return value: event handle, must be released after use                     *
  *                                                                            *
  ******************************************************************************/
 zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event)
@@ -837,6 +837,12 @@ zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event)
 	zbx_vector_cep_event_handle_append(&obj->events, h);
 
 	obj->pending_events_num--;
+
+	if (NULL == (h = cep_event_handle_acquire(h)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("failed to acquire newly created event handle");
+		zbx_exit(EXIT_FAILURE);
+	}
 
 	return h;
 }
