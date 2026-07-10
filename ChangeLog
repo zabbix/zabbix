@@ -3,6 +3,8 @@ Changes for 7.0.29rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-26704] fixed redundant preprocessing before discard (kflorowski)
+..F....... [ZBX-26465] improved aria-label text for all functional buttons and icons and aria-expanded of side menu elements for Screen Reader users (aluchko)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.28
