@@ -22,6 +22,7 @@
 
 #define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
 #define ZBX_HASHICORP_NAME	"HashiCorp"
+#define ZBX_CYBERARK_NAME	"CyberArk"
 
 typedef	int (*zbx_vault_get_kvs_cb_t)(const char *vault_url, const char *prefix, const char *token, const char *approle,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
@@ -38,6 +39,164 @@ static zbx_vault_get_kvs_cb_t		zbx_vault_get_kvs_cb;
 static zbx_vault_renew_token_cb_t	zbx_vault_renew_token_cb;
 static const char			*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
 
+/**********************************************************************************************
+ *                                                                                            *
+ * Purpose: check if any vault configuration parameter is defined to non-default value        *
+ *                                                                                            *
+ * Return value: SUCCEED - at least one vault parameter defined                               *
+ *               FAIL - no vault parameters defined                                           *
+ *                                                                                            *
+ *********************************************************************************************/
+int	zbx_vault_is_configured(const zbx_config_vault_t *conf)
+{
+	if (NULL == conf->token &&
+			NULL == conf->name &&
+			NULL == conf->tls_cert_file &&
+			NULL == conf->tls_key_file &&
+			0 == strcmp(conf->url, ZBX_VAULT_DEFAULT_URL) &&
+			NULL == conf->prefix &&
+			NULL == conf->db_path &&
+			NULL == conf->app_role_id &&
+			NULL == conf->app_secret_id)
+	{
+		return	FAIL;
+	}
+	else
+		return	SUCCEED;
+}
+
+/**********************************************************************************************
+ *                                                                                            *
+ * Purpose: check for allowed combinations of vault configuration parameters on               *
+ *          server or proxy start up                                                          *
+ *                                                                                            *
+ * Precondition: vault configuration has non-default parameters (checked with                 *
+ *               zbx_vault_is_configured() which returned SUCCEED)                            *
+ *                                                                                            *
+ * Return value: SUCCEED - vault parameters are valid                                         *
+ *               FAIL - invalid vault parameter value or combination                          *
+ *                                                                                            *
+ *********************************************************************************************/
+int	zbx_vault_validate_config(const zbx_config_vault_t *conf, const char *dbuser,
+		const char *dbpassword, char **error)
+{
+	/* Vault configuration parameters:
+		VaultToken		conf->token, cannot be used with app_role_id, app_secret_id
+		Vault			conf->name
+		VaultTLSCertFile	conf->tls_cert_file
+		VaultTLSKeyFile		conf->tls_key_file, requires tls_key_file
+		VaultURL		conf->url
+		VaultPrefix		conf->prefix
+		VaultDBPath		conf->db_path, cannot be used with dbuser, dbpassword
+		VaultAppRoleID		conf->app_role_id, requires app_secret_id
+		VaultAppSecretID	conf->app_secret_id, requires app_role_id
+	*/
+
+	int	is_hashicorp = 0, is_cyberark = 0;
+
+	/* Default is Vault=HashiCorp */
+	if (NULL == conf->name || '\0' == *conf->name || 0 == strcmp(conf->name, ZBX_HASHICORP_NAME))
+		is_hashicorp = 1;
+	else if (0 == strcmp(conf->name, ZBX_CYBERARK_NAME))
+		is_cyberark = 1;
+
+	if (0 == is_hashicorp && 0 == is_cyberark)
+	{
+		*error = zbx_strdup(*error, "invalid value of configuration parameter \"Vault\"");
+		return FAIL;
+	}
+
+	/* VaultDBPath is common for HashiCorp and CyberArk */
+	if (NULL != conf->db_path)
+	{
+		if (NULL != dbuser)
+		{
+			*error = zbx_strdup(*error, "\"DBUser\" configuration parameter cannot be used"
+					" when \"VaultDBPath\" is defined");
+			return FAIL;
+		}
+
+		if (NULL != dbpassword)
+		{
+			*error = zbx_strdup(*error, "\"DBPassword\" configuration parameter cannot be used"
+					" when \"VaultDBPath\" is defined");
+			return FAIL;
+		}
+	}
+
+	/* VaultTLSCertFile can be specified with or without VaultTLSKeyFile (if VaultTLSCertFile */
+	/* contains also the private key). VaultTLSKeyFile requires VaultTLSCertFile. */
+	if (NULL == conf->tls_cert_file && NULL != conf->tls_key_file)
+	{
+		*error = zbx_strdup(*error, "\"VaultTLSKeyFile\" is defined but \"VaultTLSCertFile\" is not defined");
+		return FAIL;
+	}
+
+	if (1 == is_hashicorp)
+	{
+		/* partial, mixed or otherwise invalid configurations */
+
+		if (NULL != conf->token)
+		{
+			if (NULL != conf->app_role_id)
+			{
+				*error = zbx_strdup(*error, "either \"VaultToken\" or \"VaultAppRoleID\""
+						" configuration parameter or corresponding environment variable"
+						" should be defined for HashiCorp vault but not both");
+				return FAIL;
+			}
+
+			if (NULL != conf->app_secret_id)
+			{
+				*error = zbx_strdup(*error, "\"VaultToken\" and \"VaultAppSecretID\" configuration"
+						" parameters cannot be defined at the same time for HashiCorp vault");
+				return FAIL;
+			}
+		}
+		else	/* conf->token is not defined */
+		{
+			if (NULL == conf->app_role_id)
+			{
+				*error = zbx_strdup(*error, "either \"VaultToken\" or \"VaultAppRoleID\""
+						" configuration parameter should be defined for HashiCorp vault");
+				return FAIL;
+			}
+
+			if (NULL == conf->app_secret_id)
+			{
+				*error = zbx_strdup(*error, "if \"VaultAppRoleID\" is defined then \"VaultAppSecretID\""
+						" configuration parameter should be defined, too");
+				return FAIL;
+			}
+		}
+	}
+	else	/* CyberArk */
+	{
+		if (NULL != conf->token)
+		{
+			*error = zbx_strdup(*error, "\"VaultToken\" configuration parameter cannot be used"
+					" with CyberArk vault");
+			return FAIL;
+		}
+
+		if (NULL != conf->app_role_id)
+		{
+			*error = zbx_strdup(*error, "\"VaultAppRoleID\" configuration parameter cannot be used"
+					" with CyberArk vault");
+			return FAIL;
+		}
+
+		if (NULL != conf->app_secret_id)
+		{
+			*error = zbx_strdup(*error, "\"VaultAppSecretID\" configuration parameter cannot be used"
+					" with CyberArk vault");
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
 int	zbx_vault_init(zbx_config_vault_t *config_vault, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **error)
@@ -45,7 +204,6 @@ int	zbx_vault_init(zbx_config_vault_t *config_vault, const char *config_source_i
 #define ZBX_HASHICORP_DBUSER_KEY	"username"
 #define ZBX_HASHICORP_DBPASSWORD_KEY	"password"
 
-#define ZBX_CYBERARK_NAME		"CyberArk"
 #define ZBX_CYBERARK_DBUSER_KEY		"UserName"
 #define ZBX_CYBERARK_DBPASSWORD_KEY	"Content"
 	if (NULL == config_vault->name || '\0' == *(config_vault->name) || 0 == strcmp(config_vault->name,
@@ -143,7 +301,6 @@ int	zbx_vault_init(zbx_config_vault_t *config_vault, const char *config_source_i
 #undef ZBX_HASHICORP_DBUSER_KEY
 #undef ZBX_HASHICORP_DBPASSWORD_KEY
 
-#undef ZBX_CYBERARK_NAME
 #undef ZBX_CYBERARK_DBUSER_KEY
 #undef ZBX_CYBERARK_DBPASSWORD_KEY
 }
