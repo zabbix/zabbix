@@ -60,7 +60,7 @@ class CDataTableOptionsPopupMonitoringProblemsTime extends CDataTableOptionsPopu
 	onInit() {
 		super.onInit();
 
-		const {show_timeline} = this.getColumnConfig().getColumnOptions();
+		const {show_timeline} = this.getColumn().getColumnOptions();
 		const compact_view = this.getDataTable().getOption('compact_view');
 
 		const show_timeline_field = this.getField('show_timeline');
@@ -69,9 +69,9 @@ class CDataTableOptionsPopupMonitoringProblemsTime extends CDataTableOptionsPopu
 		show_timeline_field.addEventListener('input', e => {
 			e.stopPropagation();
 
-			const column_options = this.getColumnConfig().getColumnOptions();
+			const column_options = this.getColumn().getColumnOptions();
 
-			this.getColumnConfig().setColumnOptions({
+			this.getColumn().setColumnOptions({
 				...column_options,
 				show_timeline: e.target.checked ? '1' : '0'
 			});

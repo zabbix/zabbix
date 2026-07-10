@@ -20,7 +20,6 @@ package zbxlib
 #cgo pcre2 LDFLAGS: -lz -lpcre2-8 -lresolv
 
 #include "zbxsysinfo.h"
-#include "zbxcomms.h"
 #include "zbxlog.h"
 #include "../src/zabbix_agent/metrics/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
