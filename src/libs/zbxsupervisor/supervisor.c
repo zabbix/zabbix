@@ -325,16 +325,18 @@ static void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate total count of processes with direct ownership          *
+ * Purpose: prepare supervisor                                                *
  *                                                                            *
  * Parameters: config_forks - [IN] array of configured process counts         *
  *                                                                            *
- * Return value: total process count                                          *
+ * Return value: number of processes with direct ownership                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_supervisor_get_process_count(const int *config_forks)
+int	zbx_supervisor_prepare(const int *config_forks)
 {
 	int	process_count = 0;
+
+	zbx_supervisor_client_prepare(config_forks);
 
 	for (int i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
 	{
@@ -1195,3 +1197,4 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 
 #undef DEFAULT_SLEEP_TIME
 }
+

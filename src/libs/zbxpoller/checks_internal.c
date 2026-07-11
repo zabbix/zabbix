@@ -21,6 +21,7 @@
 #include "zbxalgo.h"
 #include "zbxcachehistory.h"
 #include "zbxjson.h"
+#include "zbxsupervisor_client.h"
 #include "zbxtime.h"
 #include "zbxstats.h"
 #include "zbxself.h"
@@ -279,7 +280,6 @@ static int	get_worker_process_stats(unsigned char process_type, unsigned char ag
  *             config_startup_time       - [IN] program startup time              *
  *             config_java_gateway       - [IN]                                   *
  *             config_java_gateway_port  - [IN]                                   *
- *             get_config_forks          - [IN]                                   *
  *             get_value_internal_ext_cb - [IN]                                   *
  *             program_type              - [IN]                                   *
  *                                                                                *
@@ -289,8 +289,7 @@ static int	get_worker_process_stats(unsigned char process_type, unsigned char ag
  **********************************************************************************/
 int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, const char *config_java_gateway, int config_java_gateway_port,
-		zbx_get_config_forks_f get_config_forks, zbx_get_value_internal_ext_f get_value_internal_ext_cb,
-		unsigned char program_type)
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb, unsigned char program_type)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;
@@ -546,18 +545,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 			goto out;
 		}
 
-		if (ZBX_PROCESS_TYPE_CEP_WORKER == process_type)
-		{
-			char	*error = NULL;
-
-			if (FAIL == zbx_mw_get_worker_count(ZBX_IPC_SERVICE_CEP, &process_forks, &error))
-			{
-				SET_MSG_RESULT(result, error);
-				goto out;
-			}
-		}
-		else
-			process_forks = ZBX_PROCESS_TYPE_COUNT > process_type ? get_config_forks(process_type) : 0;
+		process_forks = zbx_supervisor_get_process_count(process_type);
 
 		if (NULL == (tmp = get_rparam(&request, 2)))
 			tmp = "";
