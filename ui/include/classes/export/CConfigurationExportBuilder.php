@@ -317,22 +317,32 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatGlobalRegexes(array $regexps): array {
+		$result = [];
+
 		CArrayHelper::sort($regexps, ['name']);
 
-		foreach ($regexps as &$regexp) {
-			unset($regexp['regexpid']);
+		foreach ($regexps as $i => $regexp) {
+			$expressions = [];
 
-			foreach ($regexp['expressions'] as &$expression) {
-				$expression['type'] = $expression['expression_type'];
-				unset($expression['expression_type']);
+			foreach ($regexp['expressions'] as $expression) {
+				$expressions[] = [
+					'expression' => $expression['expression'],
+					'type' => $expression['expression_type'],
+					'exp_delimiter' => $expression['exp_delimiter'],
+					'case_sensitive' => $expression['case_sensitive']
+				];
 			}
-			unset($expression);
 
 			CArrayHelper::sort($regexp['expressions'], ['type', 'expression']);
-		}
-		unset($regexp);
 
-		return $regexps;
+			$result[$i] = [
+				'name' => $regexp['name'],
+				'description' => $regexp['description'],
+				'expressions' => $expressions
+			];
+		}
+
+		return $result;
 	}
 
 	/**
