@@ -291,8 +291,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'ExportDir' => $export_dir,
-				'ExportType' => 'events,history,trends',
-				'DebugLevel' => 5
+				'ExportType' => 'events,history,trends'
 			]
 		];
 	}
@@ -323,7 +322,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 		$prev_hour = $now - 3600;
 
 		try {
-			$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+			$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 			$this->prepareExportDir($export_dir);
 			// Send values one hour apart to flush trends and create a problem event.
 			$this->sendSenderValues([
@@ -379,33 +378,6 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 		if ($response['result']) {
 			$hostids = array_column($response['result'], 'hostid');
 			$this->call('host.delete', $hostids);
-		}
-
-		// Clean up events, history and trends that are not cascade-deleted.
-		$event_name = 'Macro export trigger for ' . self::HOSTNAME_EXPORT;
-
-		$response = $this->call('event.get', [
-			'filter' => ['name' => [$event_name]],
-			'output' => ['eventid']
-		]);
-
-		if ($response['result']) {
-			$eventids = array_column($response['result'], 'eventid');
-
-			if ($eventids) {
-				$eventids_str = implode(',', $eventids);
-
-				DBexecute('DELETE FROM problem_tag WHERE eventid IN (' . $eventids_str . ')');
-				DBexecute('DELETE FROM event_tag WHERE eventid IN (' . $eventids_str . ')');
-				DBexecute('DELETE FROM problem WHERE eventid IN (' . $eventids_str . ')');
-				DBexecute('DELETE FROM events WHERE eventid IN (' . $eventids_str . ')');
-			}
-		}
-
-		// Clean up history and trends that reference the deleted item.
-		if (self::$itemid_export !== null) {
-			DBexecute('DELETE FROM history_uint WHERE itemid=' . self::$itemid_export);
-			DBexecute('DELETE FROM trends_uint WHERE itemid=' . self::$itemid_export);
 		}
 	}
 
