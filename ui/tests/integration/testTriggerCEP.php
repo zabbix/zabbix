@@ -3087,6 +3087,7 @@ HEREDOC;
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirstRestart() {
+		$this->skipIfRestartTestsDisabled();
 		self::$disc_maintenanceid = null;
 		self::$disc_maintenanceid2 = null;
 		$this->prepareDataGlobalCorrelationCloseOnUp();
