@@ -249,7 +249,6 @@ if ($data['drule']['druleid']) {
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete discovery rule?'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
 			'isSubmit' => false

@@ -142,18 +142,15 @@ window.drule_edit_popup = new class {
 			}
 		}
 
-		let dchecks = this.#form.findFieldByName('dchecks').getValue();
+		params.dchecks = this.#form.findFieldByName('dchecks').getValue();
 
 		if (row !== null) {
 			const current_dcheckid = row.dataset.dcheckid;
 
-			if (Object.prototype.hasOwnProperty.call(dchecks, current_dcheckid)) {
-				dchecks = {...dchecks};
-				delete dchecks[current_dcheckid];
+			if (Object.prototype.hasOwnProperty.call(params.dchecks, current_dcheckid)) {
+				delete params.dchecks[current_dcheckid];
 			}
 		}
-
-		params.dchecks = dchecks;
 
 		const overlay = PopUp('discovery.check.edit', params, {
 			dialogueid: 'discovery-check',
@@ -443,17 +440,22 @@ window.drule_edit_popup = new class {
 	}
 
 	#delete() {
-		this.#removePopupMessages();
-		const url_params = {
-			action: 'discovery.delete',
-			[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('discovery')) ?>
-		};
+		if (window.confirm(<?= json_encode(_('Delete discovery rule?')) ?>)) {
+			this.#removePopupMessages();
+			const url_params = {
+				action: 'discovery.delete',
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('discovery')) ?>
+			};
 
-		this.#post(zabbixUrl(url_params), {druleids: [this.#form.findFieldByName('druleid').getValue()]}, (response) => {
-			overlayDialogueDestroy(this.#overlay.dialogueid);
+			this.#post(zabbixUrl(url_params), {druleids: [this.#form.findFieldByName('druleid').getValue()]}, (response) => {
+				overlayDialogueDestroy(this.#overlay.dialogueid);
 
-			this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+				this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			});
+		}
+		else {
+			this.#overlay.unsetLoading();
+		}
 	}
 
 	#submit() {
