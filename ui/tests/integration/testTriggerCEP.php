@@ -5467,12 +5467,11 @@ HEREDOC;
 			CDataHelper::call('maintenance.delete', [self::$disc_maintenanceid]);
 			self::$disc_maintenanceid = null;
 		}
-	
+
 		if (!empty(self::$disc_maintenanceid2)) {
 			CDataHelper::call('maintenance.delete', [self::$disc_maintenanceid2]);
 			self::$disc_maintenanceid2 = null;
 		}
-		
 
 		if (!empty(self::$disc_hostid)) {
 			CDataHelper::call('host.delete', [self::$disc_hostid]);
