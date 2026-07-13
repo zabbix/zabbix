@@ -28,6 +28,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"golang.zabbix.com/agent2/pkg/zbxcmd"
@@ -41,8 +42,9 @@ var impl Plugin
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	options  Options
-	executor zbxcmd.Executor
+	options        Options
+	executor       zbxcmd.Executor
+	executorInitMu sync.Mutex
 }
 
 // Options -
@@ -112,13 +114,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		regex = params[0]
 	}
 
-	if p.executor == nil {
-		var err error
-
-		p.executor, err = zbxcmd.InitExecutor()
-		if err != nil {
-			return nil, errs.Wrap(err, "command init failed")
-		}
+	err = p.initExecutor()
+	if err != nil {
+		return nil, err
 	}
 
 	managers := getManagers()
@@ -177,6 +175,24 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return
+}
+
+func (p *Plugin) initExecutor() error {
+	p.executorInitMu.Lock()
+	defer p.executorInitMu.Unlock()
+
+	if p.executor != nil {
+		return nil
+	}
+
+	executor, err := zbxcmd.InitExecutor()
+	if err != nil {
+		return errs.Wrap(err, "command init failed")
+	}
+
+	p.executor = executor
+
+	return nil
 }
 
 func getManagers() []manager {

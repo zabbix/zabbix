@@ -20,6 +20,8 @@
 package users
 
 import (
+	"sync"
+
 	"golang.zabbix.com/agent2/pkg/zbxcmd"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
@@ -29,8 +31,9 @@ var impl Plugin
 
 type Plugin struct {
 	plugin.Base
-	options  Options
-	executor zbxcmd.Executor
+	options        Options
+	executor       zbxcmd.Executor
+	executorInitMu sync.Mutex
 }
 
 type Options struct {
