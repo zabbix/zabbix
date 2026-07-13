@@ -856,7 +856,7 @@ static int	DBpatch_7050061(void)
 
 static int	DBpatch_7050062(void)
 {
-	const zbx_db_field_t	field = {"description", "", NULL, NULL, 2048, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("regexps", &field);
 }
