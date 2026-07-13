@@ -256,7 +256,7 @@ class testFormMaintenance extends CWebTest {
 				$list = COverlayDialogElement::find(1)->waitUntilReady()->one();
 				$this->assertEquals($field, $list->getTitle());
 				$this->assertEquals(['Select', 'Cancel'], $list->getFooter()->query('button')->all()
-					->filter(CElementFilter::CLICKABLE)->asText()
+						->filter(CElementFilter::CLICKABLE)->asText()
 				);
 				$list->close();
 			}
@@ -307,14 +307,16 @@ class testFormMaintenance extends CWebTest {
 				'name:period_minutes' => '0'
 			]);
 
-			$this->assertTrue($period_form->checkValue(['Date' => $now], false)
-					|| $period_form->checkValue(['Date' => $in_one_minute], false));
-
+			$date_value = $period_form->getField('Date')->getValue();
+			$this->assertTrue(in_array($date_value, [$now, $in_one_minute]), '"Date" field value "'.$date_value.
+					'" is not among expected values ["'.$now.'", "'.$in_one_minute.'].'
+			);
 
 			foreach ($periods as $period_type) {
 				if ($period_type === 'Monthly with Day of week period') {
 					$period_form->fill(['Period type' => 'Monthly', 'id:month_date_type' => 'Day of week']);
-				} else {
+				}
+				else {
 					$period_form->fill(['Period type' => $period_type]);
 				}
 
@@ -441,7 +443,7 @@ class testFormMaintenance extends CWebTest {
 					}
 					else {
 						$days_list = $period_form->query('xpath:.//div[contains(@class, "js-monthly-days")]//ul')
-							->asCheckboxList()->one();
+								->asCheckboxList()->one();
 					}
 					$this->assertTrue($days_list->isEnabled());
 					$this->assertEquals($weekdays, $days_list->getLabels()->filter(CElementFilter::VISIBLE)->asText());
@@ -470,7 +472,8 @@ class testFormMaintenance extends CWebTest {
 
 					if ($period_type === 'One time only') {
 						$this->assertScreenshotExcept($dialog, [$dialog->query('id:start_date')->one()], $period_type);
-					} else {
+					}
+					else {
 						$this->assertScreenshot($dialog, $period_type);
 					}
 				}
@@ -903,7 +906,28 @@ class testFormMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #7 Hosts and host groups empty.
+			// #7 All mandatory input fields have only empty space inside.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => ' ',
+						'Active since' => ' ',
+						'Active till' => ' '
+					],
+					'periods' => [
+						[
+							'Period type' => 'Daily'
+						]
+					],
+					'error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "active_since": a time is expected.',
+						'Incorrect value for field "active_till": a time is expected.'
+					]
+				]
+			],
+			// #8 Hosts and host groups empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -922,7 +946,7 @@ class testFormMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #8 Duplicate name.
+			// #9 Duplicate name.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -940,7 +964,7 @@ class testFormMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #9 Active since greater than Active till.
+			// #10 Active since greater than Active till.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -955,6 +979,137 @@ class testFormMaintenance extends CWebTest {
 					],
 					'error_details' => [
 						'Invalid parameter "/1/active_till": cannot be less than or equal to the value of parameter "/1/active_since".'
+					]
+				]
+			],
+			// #11 Trailing spaces in Active since or active till.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Trailing spaces in Active since or active till',
+						'Active since' => '2025-02-03 00:00 ',
+						'Active till' => '2026-01-01 00:00 ',
+						'Host groups' => 'Zabbix servers'
+					],
+					'periods' => [
+						'Period type' => 'Daily'
+					],
+					'error_details' => [
+						'Incorrect value for field "active_since": a time is expected.',
+						'Incorrect value for field "active_till": a time is expected.'
+					]
+				]
+			],
+			// #12 Leading spaces in Active since or active till.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Leading spaces in Active since or active till',
+						'Active since' => ' 2025-02-03 00:00',
+						'Active till' => ' 2026-01-01 00:00',
+						'Host groups' => 'Zabbix servers'
+					],
+					'periods' => [
+						'Period type' => 'Daily'
+					],
+					'error_details' => [
+						'Incorrect value for field "active_since": a time is expected.',
+						'Incorrect value for field "active_till": a time is expected.'
+					]
+				]
+			],
+			// #13 Wrong date format in active since or active till.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Wrong date format in active since or active till',
+						'Active since' => '03/02/2025 00:00',
+						'Active till' => '01.01.2026 00:00',
+						'Host groups' => 'Zabbix servers'
+					],
+					'periods' => [
+						'Period type' => 'Daily'
+					],
+					'error_details' => [
+						'Incorrect value for field "active_since": a time is expected.',
+						'Incorrect value for field "active_till": a time is expected.'
+					]
+				]
+			],
+			// #14 Invalid time in active since or active till.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Invalid time in active since or active till',
+						'Active since' => '2025-02-03 24:00',
+						'Active till' => '2026-01-01 00:61',
+						'Host groups' => 'Zabbix servers'
+					],
+					'periods' => [
+						'Period type' => 'Daily'
+					],
+					'error_details' => [
+						'Incorrect value for field "active_since": a time is expected.',
+						'Incorrect value for field "active_till": a time is expected.'
+					]
+				]
+			],
+			// #15 Non-existing dates with valid format in active since or active till.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Non-existing dates with valid format in active since or active till',
+						'Active since' => '2026-02-29 23:00',
+						'Active till' => '2026-02-30 23:00',
+						'Host groups' => 'Zabbix servers'
+					],
+					'periods' => [
+						'Period type' => 'Daily'
+					],
+					'error_details' => [
+						'Incorrect value for field "active_since": a time is expected.',
+						'Incorrect value for field "active_till": a time is expected.'
+					]
+				]
+			],
+			// #16 Active since too far in the past.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Active since too far in the past',
+						'Active since' => '1969-12-31 23:59',
+						'Active till' => '2026-02-10 23:00',
+						'Host groups' => 'Zabbix servers'
+					],
+					'periods' => [
+						'Period type' => 'Daily'
+					],
+					'error_details' => [
+						'Invalid parameter "/1/active_since": an unsigned integer is expected.'
+					]
+				]
+			],
+			// #17 Active till too far in the future.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Active till too far in the future',
+						'Active since' => '1970-01-01 12:00',
+						'Active till' => '2038-01-19 09:00',
+						'Host groups' => 'Zabbix servers'
+					],
+					'periods' => [
+						'Period type' => 'Daily'
+					],
+					'error_details' => [
+						'Invalid parameter "/1/active_till": a timestamp is too large.'
 					]
 				]
 			]

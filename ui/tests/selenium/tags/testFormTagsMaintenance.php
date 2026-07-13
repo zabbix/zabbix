@@ -165,10 +165,10 @@ class testFormTagsMaintenance extends testFormTags {
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
 							'tag' => 'Long tag name. Long tag name. Long tag name. Long tag name. Long tag name.'
-								.' Long tag name. Long tag name. Long tag name.',
+									.' Long tag name. Long tag name. Long tag name.',
 							'operator' => 'Equals',
 							'value' => 'Long tag value. Long tag value. Long tag value. Long tag value. Long tag value.'
-								.' Long tag value. Long tag value. Long tag value. Long tag value.'
+									.' Long tag value. Long tag value. Long tag value. Long tag value.'
 						]
 					]
 				]
