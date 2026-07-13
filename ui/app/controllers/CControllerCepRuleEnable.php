@@ -69,8 +69,8 @@ class CControllerCepRuleEnable extends CControllerCepRuleGeneral {
 		$updated = count($ceprules) + count($correlations);
 
 		if ($result) {
-			$output['success']['title'] = _n('Complex event processing rule enabled',
-				'Complex event processing rules enabled', $updated
+			$output['success']['title'] = _n('Event processing rule enabled',
+				'Event processing rules enabled', $updated
 			);
 
 			if ($messages = get_and_clear_messages()) {
@@ -79,8 +79,8 @@ class CControllerCepRuleEnable extends CControllerCepRuleGeneral {
 		}
 		else {
 			$output['error'] = [
-				'title' => _n('Cannot enable complex event processing rule',
-					'Cannot enable complex event processing rules', $updated
+				'title' => _n('Cannot enable event processing rule',
+					'Cannot enable event processing rules', $updated
 				),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];

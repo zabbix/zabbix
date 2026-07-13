@@ -19,6 +19,16 @@
  * @var array    $data
  */
 
+$tags = (new CMultiSelect([
+	'ms_list_of_string_mode' => true,
+	'name' => 'window[tags]',
+	'data' => array_map(fn (string $name) => ['id' => $name, 'name' => $name], $data['window']['tags']),
+	'placeholder' => _('tag names'),
+	'add_post_js' => false
+]))->setId('ceprule-window-groupby-tag');
+
+zbx_add_post_js($tags->getPostJS());
+
 echo (new CObject())
 	->addItem(new CLabel(_('Time window'), 'ceprule-window-type'))
 	->addItem(new CFormField((new CRadioButtonList('window_type', (int) $data['window_type']))
@@ -87,16 +97,7 @@ echo (new CObject())
 			)
 			->addItem(new CLabel(_('Tag'), 'ceprule-window-groupby-opt-tag'))
 			->addItem(new CObject('&nbsp;'))
-
-			->addItem(
-				(new CTag('z-chips-input'))
-					->setId('ceprule-window-groupby-tag')
-					->setAttribute('value', json_encode($data['window']['tags']))
-					/* ->setAttribute('data-field-type', 'chips-input') */
-					->setAttribute('data-field-name', 'window[tags]')
-					->addItem('[work in progress..]')
-			)
-
+			->addItem($tags)
 	]))->setId('ceprule-window-groupby')))
 
 	->addItem((new CLabel(_('Event count tag'), 'ceprule-window-counttag'))->setAsteriskMark())

@@ -345,6 +345,7 @@ int	zbx_dbconn_rollback(zbx_dbconn_t *db);
 int	zbx_dbconn_end(zbx_dbconn_t *db, int ret);
 
 zbx_uint64_t	zbx_dbconn_get_maxid_num(zbx_dbconn_t *db, const char *tablename, int num);
+zbx_uint64_t	zbx_dbconn_get_maxid_num_cached(const char *tablename, int num);
 
 /* bulk insert support */
 void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *table,

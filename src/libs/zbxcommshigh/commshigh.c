@@ -102,7 +102,7 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 		if (0 != retry_interval)
 		{
 #if !defined(_WINDOWS) && !defined(__MINGW32)
-			int	lastlogtime = (int)time(NULL);
+			int	lastlogtime = (int)time(NULL), retries_num = retry_interval;
 
 			zabbix_log(LOG_LEVEL_WARNING, "Will try to reconnect every %d second(s)",
 					retry_interval);
@@ -119,10 +119,10 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 					lastlogtime = now;
 				}
 
-				while (ZBX_IS_RUNNING() && 0 < retry_interval)
+				while (ZBX_IS_RUNNING() && 0 < retries_num)
 				{
 					sleep(1);
-					retry_interval--;
+					retries_num--;
 				}
 			}
 

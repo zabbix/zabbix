@@ -57,9 +57,6 @@ window.ceprule_edit_popup = new class {
 	/** @type {Object} */
 	#rules_for_clone;
 
-	/** @type {jQuery} */
-	#ms_group_tags;
-
 	init({rules, rules_for_clone, operation_rules, condition_rules, ceprule}) {
 		this.#rules_for_clone = rules_for_clone;
 		this.#initTemplates();
