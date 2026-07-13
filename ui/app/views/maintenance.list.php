@@ -63,7 +63,7 @@ $filter = (new CFilter())
 				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
 					->addValue(_('Any'), -1)
 					->addValue(_x('Active', 'maintenance status'), MAINTENANCE_STATUS_ACTIVE)
-					->addValue(_x('Approaching', 'maintenance status'), MAINTENANCE_STATUS_APPROACH)
+					->addValue(_x('Upcoming', 'maintenance status'), MAINTENANCE_STATUS_UPCOMING)
 					->addValue(_x('Expired', 'maintenance status'), MAINTENANCE_STATUS_EXPIRED)
 					->setModern(true)
 			)
@@ -100,8 +100,8 @@ foreach ($data['maintenances'] as $maintenanceid => $maintenance) {
 			$maintenance_status = (new CSpan(_x('Expired', 'maintenance status')))->addClass(ZBX_STYLE_RED);
 			break;
 
-		case MAINTENANCE_STATUS_APPROACH:
-			$maintenance_status = (new CSpan(_x('Approaching', 'maintenance status')))->addClass(ZBX_STYLE_ORANGE);
+		case MAINTENANCE_STATUS_UPCOMING:
+			$maintenance_status = (new CSpan(_x('Upcoming', 'maintenance status')))->addClass(ZBX_STYLE_ORANGE);
 			break;
 
 		case MAINTENANCE_STATUS_ACTIVE:

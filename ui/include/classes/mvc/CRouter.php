@@ -63,6 +63,8 @@ class CRouter {
 		'autoreg.update'							=> [CControllerAutoregUpdate::class,								'layout.json',			null],
 		'availabilityreport.list'					=> [CControllerAvailabilityReportList::class,						'layout.htmlpage',		'reports.availabilityreport.list'],
 		'availabilityreport.trigger'				=> [CControllerAvailabilityReportTrigger::class,					'layout.htmlpage',		'reports.availabilityreport.trigger'],
+		'banner.get'								=> [CControllerBannerGet::class,									'layout.json',			null],
+		'banner.update'								=> [CControllerBannerUpdate::class,									'layout.json',			null],
 		'charts.view'								=> [CControllerChartsView::class,									'layout.htmlpage',		'monitoring.charts.view'],
 		'charts.view.json'							=> [CControllerChartsViewJson::class,								'layout.json',			'monitoring.charts.view.json'],
 		'connector.create'							=> [CControllerConnectorCreate::class,								'layout.json',			null],

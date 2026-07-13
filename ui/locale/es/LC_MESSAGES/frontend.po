@@ -148,6 +148,12 @@ msgstr "%1$s caracteres"
 msgid "%1$s characters remaining"
 msgstr "%1$s caracteres restantes"
 
+#: app/views/administration.housekeeping.edit.php:165
+#: app/views/administration.housekeeping.edit.php:166
+#, c-format
+msgid "%1$s data storage period"
+msgstr "Período de almacenamiento de datos de %1$s"
+
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
 #, c-format
@@ -1679,6 +1685,11 @@ msgstr "Fondo de arco"
 msgid "Arc size"
 msgstr "Tamaño del arco"
 
+#: jsLoader.php:267
+#, c-format
+msgid "Are you sure you want to delete %1$s? This action cannot be undone."
+msgstr "¿Está seguro de que desea eliminar %1$s? Esta acción no se puede deshacer."
+
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
 msgstr "¿Estás seguro de que quieres borrar este filtro?"
@@ -1795,17 +1806,17 @@ msgstr "Debe ser especificado al menos un día de la semana o del mes."
 
 #: app/controllers/CControllerAutoregUpdate.php:30
 msgid "At least one encryption level must be selected."
-msgstr "Se debe seleccionar al menos un nivel de cifrado."
+msgstr "Debe seleccionarse al menos un nivel de cifrado."
 
 #: app/controllers/CControllerSlaCreate.php:53
 #: app/controllers/CControllerSlaUpdate.php:54
 msgid "At least one entry should be selected."
-msgstr "Se debe seleccionar al menos una entrada."
+msgstr "Debe seleccionarse al menos una entrada."
 
 #: app/controllers/CControllerRegExCreate.php:54
 #: app/controllers/CControllerRegExUpdate.php:55
 msgid "At least one expression must be added."
-msgstr "Se debe añadir al menos una expresión."
+msgstr "Debe añadirse al menos una expresión."
 
 #: app/controllers/CControllerMaintenanceCreate.php:62
 #: app/controllers/CControllerMaintenanceUpdate.php:63
@@ -1824,7 +1835,7 @@ msgstr "Al menos un item debe ser un prototipo"
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
 #: app/controllers/CControllerMaintenanceUpdate.php:58
 msgid "At least one month must be selected."
-msgstr "Se debe seleccionar al menos un mes."
+msgstr "Debe seleccionarse al menos un mes."
 
 #: include/classes/helpers/CItemGeneralHelper.php:411
 msgid "At least one of \"min\" or \"max\" parameters should be specified."
@@ -1858,12 +1869,12 @@ msgstr "Se debe habilitar al menos un parámetro."
 #: app/controllers/CControllerMaintenanceCreate.php:40
 #: app/controllers/CControllerMaintenanceUpdate.php:41
 msgid "At least one period must be added."
-msgstr "Se debe añadir al menos un período."
+msgstr "Debe añadirse al menos un período."
 
 #: app/controllers/CControllerConnectorCreate.php:44
 #: app/controllers/CControllerConnectorUpdate.php:45
 msgid "At least one type of information must be selected."
-msgstr "Se debe seleccionar al menos un tipo de información."
+msgstr "Debe seleccionarse al menos un tipo de información."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
@@ -1887,7 +1898,7 @@ msgstr "Debe ser especificado al menos un usuario o grupo de usuarios."
 #: app/controllers/CControllerMaintenanceUpdate.php:62
 #: app/controllers/CControllerMaintenanceUpdate.php:66
 msgid "At least one weekday must be selected."
-msgstr "Se debe seleccionar al menos un día de la semana."
+msgstr "Debe seleccionarse al menos un día de la semana."
 
 #: app/views/administration.mediatype.edit.php:354
 #: app/views/mediatype.edit.php:464
@@ -3536,7 +3547,7 @@ msgstr "No se puede encontrar el grupo de equipos \"%1$s\" para el prototipo de 
 #: include/classes/import/importers/CDashboardImporterGeneral.php:57
 #, c-format
 msgid "Cannot find host group \"%1$s\" used in dashboard \"%2$s\"."
-msgstr "No se puede encontrar el grupo de host \"%1$s\" usado en el dashboard \"%2$s\"."
+msgstr "No se puede encontrar el grupo de host \"%1$s\" usado en el panel \"%2$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -4307,7 +4318,7 @@ msgstr "No se puede establecer \"Agregación de conjuntos de datos\" cuando se a
 
 #: include/classes/db/MysqlDbBackend.php:197
 msgid "Cannot set charset."
-msgstr "No se puede establecer el juego de caracteres."
+msgstr "No se puede establecer el conjunto de caracteres."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4765,6 +4776,11 @@ msgstr "No se pudo actualizar el escenario web"
 msgid "Cannot update web scenario step"
 msgstr "No se puede actualizar el paso del escenario web"
 
+#: include/classes/core/CConfigFile.php:192
+#, c-format
+msgid "Cannot use both %1$s and %2$s at the same time."
+msgstr "No se pueden usar %1$s y %2$s al mismo tiempo."
+
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
 msgstr "Distingue mayúsculas y minúsculas"
@@ -4809,12 +4825,16 @@ msgstr "Centro"
 msgid "Certificate"
 msgstr "Certificado"
 
+#: app/views/js/monitoring.latest.view.js.php:211
+msgid "Change"
+msgstr "Cambiar"
+
 #: app/partials/monitoring.latest.view.html.php:78
 #: app/partials/monitoring.latest.view.html.php:91 include/items.inc.php:1577
 #: include/items.inc.php:1581
 msgctxt "noun"
 msgid "Change"
-msgstr "Cambio"
+msgstr "Cambiar"
 
 #: app/partials/hostmacros.inherited.list.html.php:124
 #: app/partials/hostmacros.inherited.list.html.php:141
@@ -4823,7 +4843,7 @@ msgstr "Cambio"
 #: include/classes/screens/CScreenMap.php:45 jsLoader.php:315
 msgctxt "verb"
 msgid "Change"
-msgstr "Cambio"
+msgstr "Cambiar"
 
 #: app/views/administration.authentication.edit.php:316
 msgid "Change IdP certificate"
@@ -4838,11 +4858,11 @@ msgstr "Cambiar PSK"
 
 #: app/views/administration.authentication.edit.php:367
 msgid "Change SP certificate"
-msgstr "Cambiar certificado SP"
+msgstr "Cambiar certificado de SP"
 
 #: app/views/administration.authentication.edit.php:342
 msgid "Change SP private key"
-msgstr "Cambiar clave privada SP"
+msgstr "Cambiar clave privada de SP"
 
 #: app/views/mfa.edit.php:128
 msgid "Change client secret"
@@ -4885,7 +4905,7 @@ msgstr "Cambiar tipo"
 
 #: app/views/js/administration.authentication.edit.js.php:409
 msgid "Changing the authentication method will reset all sessions, except the current one."
-msgstr "Cambiar el método de autenticación restablecerá todas las sesiones, excepto la actual."
+msgstr "Al cambiar el método de autenticación se restablecerán todas las sesiones, excepto la actual."
 
 #: app/partials/configuration.filter.items.php:144
 #: app/views/popup.massupdate.item.php:149 include/items.inc.php:127
@@ -4924,7 +4944,7 @@ msgstr "Verifique si ya existe."
 
 #: app/controllers/CControllerPopupImportCompare.php:121
 msgid "Check and reconfigure widgets after the import is completed."
-msgstr "Compruebe y reconfigure los widgets después de que se complete la importación."
+msgstr "Compruebe y reconfigure los widgets después de completar la importación."
 
 #: app/controllers/CControllerPopupImport.php:136
 msgid "Check and reconfigure widgets."
@@ -5103,6 +5123,15 @@ msgstr "Pinche y arrastre hasta el tamaño deseado."
 msgid "Click to view or edit"
 msgstr "Pulse para ver o editar"
 
+#: app/views/administration.housekeeping.edit.php:165
+msgid "ClickHouse"
+msgstr "ClickHouse"
+
+#: include/classes/api/managers/history/CClickHouseStorage.php:118
+#, c-format
+msgid "ClickHouse error: %1$s."
+msgstr "Error de ClickHouse: %1$s."
+
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
 msgstr "Identificación del cliente"
@@ -5263,6 +5292,14 @@ msgstr "Colores"
 #: widgets/topitems/views/column.edit.php:293
 msgid "Column aggregation function"
 msgstr "Función de agregación de columna"
+
+#: jsLoader.php:304
+msgid "Column list"
+msgstr "Lista de columnas"
+
+#: jsLoader.php:273
+msgid "Column name"
+msgstr "Nombre de columna"
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
@@ -6360,6 +6397,10 @@ msgstr "Tamaño personalizado"
 msgid "Custom templates are not supported."
 msgstr "No se admiten plantillas personalizadas."
 
+#: jsLoader.php:270
+msgid "Customize table"
+msgstr "Personalizar tabla"
+
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
 msgid "CyberArk Vault"
@@ -6952,6 +6993,10 @@ msgstr "¿Desea eliminar y limpiar las plantillas seleccionadas? (Advertencia: T
 #: app/views/template.edit.php:309
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "¿Desea eliminar y limpiar la plantilla? (Advertencia: Todos los equipos enlazados serán purgados)"
+
+#: jsLoader.php:275
+msgid "Delete column"
+msgstr "Eliminar columna"
 
 #: app/views/popup.action.edit.php:292
 msgid "Delete current action?"
@@ -8247,6 +8292,10 @@ msgstr "Valor \"nombre\" duplicado \"%1$s\" para el mapa."
 msgid "Duplicate \"usrgrpid\" \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "\"usrgrpid\" \"%1$s\" duplicado en grupos de usuarios para el mapa \"%2$s\"."
 
+#: jsLoader.php:274
+msgid "Duplicate column"
+msgstr "Duplicar columna"
+
 #: include/classes/api/services/CHost.php:2096
 #: include/classes/api/services/CHost.php:2396
 #, c-format
@@ -8350,6 +8399,10 @@ msgstr "Fecha efectiva"
 #: app/partials/hostmacros.inherited.list.html.php:50
 msgid "Effective value"
 msgstr "Valor efectivo"
+
+#: app/views/administration.housekeeping.edit.php:166
+msgid "Elasticsearch"
+msgstr "Elasticsearch"
 
 #: include/classes/api/managers/CHistoryManager.php:1449
 #: include/classes/api/managers/CHistoryManager.php:1458
@@ -10788,7 +10841,7 @@ msgstr "Nombre de equipo"
 #: widgets/scatterplot/includes/WidgetForm.php:173
 #: widgets/svggraph/includes/WidgetForm.php:265
 msgid "Host names in labels"
-msgstr "Nombres de host en las etiquetas"
+msgstr "Nombres de host en etiquetas"
 
 #: widgets/hostnavigator/Widget.php:29
 msgid "Host navigator"
@@ -11272,7 +11325,7 @@ msgstr "Si menos de %2$s de servicios dependientes tienen el estado %1$s o infer
 
 #: include/classes/setup/CSetupWizard.php:614
 msgid "If no port is specified, the \"Database port\" value is used."
-msgstr "Si no se especifica ningún puerto, se usa el valor de \"Database port\"."
+msgstr "Si no se especifica ningún puerto, se utiliza el valor de \"Puerto de la base de datos\"."
 
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -11749,7 +11802,7 @@ msgstr "Valor masivo incorrecto para la interfaz."
 
 #: include/classes/validators/CHostGroupNameValidator.php:36
 msgid "Incorrect characters used for host group name."
-msgstr "Se han usado caracteres incorrectos para el nombre del grupo de hosts."
+msgstr "Se han utilizado caracteres incorrectos para el nombre del grupo de hosts."
 
 #: include/classes/api/services/CHost.php:1029
 #: include/classes/api/services/CHost.php:2052
@@ -11766,12 +11819,18 @@ msgstr "Se utilizaron caracteres incorrectos para el nombre del equipo."
 #: app/controllers/CControllerProxyCreate.php:34
 #: app/controllers/CControllerProxyUpdate.php:30
 msgid "Incorrect characters used for proxy name."
-msgstr "Se han usado caracteres incorrectos para el nombre del proxy."
+msgstr "Se han utilizado caracteres incorrectos para el nombre del proxy."
 
 #: app/controllers/CControllerTemplateCreate.php:35
 #: app/controllers/CControllerTemplateUpdate.php:36
 msgid "Incorrect characters used for template name."
 msgstr "Se utilizaron caracteres incorrectos para el nombre de la plantilla."
+
+#: include/classes/core/CConfigFile.php:215
+#: include/classes/core/CConfigFile.php:411
+#, c-format
+msgid "Incorrect configuration %1$s: %2$s."
+msgstr "Configuración incorrecta %1$s: %2$s."
 
 #: include/classes/api/services/CUser.php:482
 msgid "Incorrect current password."
@@ -11807,6 +11866,16 @@ msgstr "Subida de archivo incorrecta."
 #: include/triggers.inc.php:768
 msgid "Incorrect function is used"
 msgstr "Función incorrecta usada"
+
+#: include/classes/core/CConfigFile.php:211
+#: include/classes/core/CConfigFile.php:219
+#: include/classes/core/CConfigFile.php:557
+#: include/classes/core/CConfigFile.php:563
+#: include/classes/core/CConfigFile.php:569
+#: include/classes/core/CConfigFile.php:579
+#, c-format
+msgid "Incorrect history storage configuration %1$s: %2$s."
+msgstr "Configuración incorrecta del almacenamiento del historial %1$s: %2$s."
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -12346,17 +12415,25 @@ msgstr "Macros heredadas y de equipo"
 msgid "Inherited and host prototype macros"
 msgstr "Macros heredadas y de prototipo de equipo"
 
+#: jsLoader.php:260
+msgid "Inherited and host prototype tag"
+msgstr "Etiqueta heredada y de prototipo de host"
+
 #: include/classes/helpers/CTagHelper.php:230
 msgid "Inherited and host tag"
-msgstr "Heredada y etiqueta de host"
+msgstr "Etiqueta heredada y de host"
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Inherited and host tags"
-msgstr "Heredadas y etiquetas de host"
+msgstr "Etiquetas heredadas y de host"
+
+#: jsLoader.php:262
+msgid "Inherited and item prototype tag"
+msgstr "Etiqueta heredada y de prototipo de item"
 
 #: include/classes/helpers/CTagHelper.php:231
 msgid "Inherited and item tag"
-msgstr "Heredada y etiqueta de item"
+msgstr "Etiqueta heredada y de item"
 
 #: app/partials/configuration.tags.tab.php:165
 msgid "Inherited and item tags"
@@ -12372,15 +12449,19 @@ msgstr "Etiquetas heredadas y de plantillas"
 
 #: include/classes/helpers/CTagHelper.php:229
 msgid "Inherited and template tag"
-msgstr "Heredada y etiqueta de template"
+msgstr "Etiqueta heredada y de template"
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Inherited and template tags"
-msgstr "Heredadas y etiquetas de template"
+msgstr "Etiquetas heredadas y de template"
+
+#: jsLoader.php:264
+msgid "Inherited and trigger prototype tag"
+msgstr "Etiqueta heredada y de prototipo de trigger"
 
 #: include/classes/helpers/CTagHelper.php:232
 msgid "Inherited and trigger tag"
-msgstr "Heredada y etiqueta de trigger"
+msgstr "Etiqueta heredada y de trigger"
 
 #: app/partials/configuration.tags.tab.php:155
 msgid "Inherited and trigger tags"
@@ -12690,7 +12771,7 @@ msgstr "Función no válida"
 #: app/controllers/CControllerHostGroupCreate.php:31
 #: app/controllers/CControllerHostGroupUpdate.php:34
 msgid "Invalid host group name."
-msgstr "Nombre de grupo de host no válido."
+msgstr "Nombre de grupo de hosts no válido."
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -13014,6 +13095,11 @@ msgstr "Expresión de rango no válida."
 msgid "Invalid range."
 msgstr "Rango no válido."
 
+#: app/controllers/CControllerDataTable.php:59
+#: app/controllers/CControllerDataTable.php:138
+msgid "Invalid request"
+msgstr "Solicitud no válida"
+
 #: include/classes/core/CJsonRpc.php:205
 msgid "Invalid request."
 msgstr "Solicitud incorrecta."
@@ -13077,7 +13163,7 @@ msgstr "Etiqueta incorrecta \"%1$s\": %2$s."
 #: app/controllers/CControllerTemplateGroupCreate.php:31
 #: app/controllers/CControllerTemplateGroupUpdate.php:32
 msgid "Invalid template group name."
-msgstr "Nombre de grupo de template no válido."
+msgstr "Nombre de grupo de templates no válido."
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -13974,7 +14060,7 @@ msgstr "Lista de dispositivos de bloques y su tipo. Devuelve JSON"
 
 #: include/classes/data/CItemData.php:1724
 msgid "List of block devices with detailed information. Returns JSON"
-msgstr "Lista de dispositivos de bloque con información detallada. Devuelve JSON"
+msgstr "Lista de dispositivos de bloques con información detallada. Devuelve JSON"
 
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
@@ -14392,6 +14478,21 @@ msgstr "Manualmente por: %1$s"
 #: include/actions.inc.php:1987
 msgid "Manually closed"
 msgstr "Cerrado manualmente"
+
+#: app/controllers/CControllerProblemViewData.php:472
+#: include/actions.inc.php:1660 include/actions.inc.php:1661
+#: include/actions.inc.php:1698 include/actions.inc.php:2195
+#: include/html.inc.php:1135
+msgid "Manually suppressed"
+msgstr "Suprimido manualmente"
+
+#: app/controllers/CControllerProblemViewData.php:475
+#: include/actions.inc.php:1674 include/actions.inc.php:1675
+#: include/actions.inc.php:1698 include/actions.inc.php:2200
+#: include/actions.inc.php:2201 include/blocks.inc.php:692
+#: widgets/problems/includes/WidgetProblems.php:280
+msgid "Manually unsuppressed"
+msgstr "Supresión manual desactivada"
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: include/classes/data/CWidgetsData.php:110
@@ -15834,6 +15935,10 @@ msgstr "Siguiente"
 msgid "Next dashboard"
 msgstr "Siguiente tablero"
 
+#: jsLoader.php:416
+msgid "Next month"
+msgstr "Próximo mes"
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15847,6 +15952,10 @@ msgstr "Siguiente página"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "Siguiente paso"
+
+#: jsLoader.php:414
+msgid "Next year"
+msgstr "Próximo año"
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -16103,7 +16212,7 @@ msgstr "No hay permisos para llamar a \"%1$s.%2$s\"."
 
 #: include/classes/api/services/CConfiguration.php:337
 msgid "No permissions to import dashboards."
-msgstr "No tiene permisos para importar paneles."
+msgstr "No tiene permisos para importar dashboards."
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
@@ -16139,31 +16248,31 @@ msgstr "No tiene permisos para importar tipos de medio."
 
 #: include/classes/api/services/CConfiguration.php:324
 msgid "No permissions to import template dashboards."
-msgstr "No hay permisos para importar dashboards de template."
+msgstr "No tiene permisos para importar paneles de template."
 
 #: include/classes/api/services/CConfiguration.php:315
 msgid "No permissions to import template groups."
-msgstr "No hay permisos para importar grupos de template."
+msgstr "No tiene permisos para importar grupos de template."
 
 #: include/classes/api/services/CConfiguration.php:322
 msgid "No permissions to import template links."
-msgstr "No hay permisos para importar enlaces de template."
+msgstr "No tiene permisos para importar enlaces de template."
 
 #: include/classes/api/services/CConfiguration.php:323
 msgid "No permissions to import templates."
-msgstr "No hay permisos para importar templates."
+msgstr "No tiene permisos para importar templates."
 
 #: include/classes/api/services/CConfiguration.php:325
 msgid "No permissions to import triggers."
-msgstr "No hay permisos para importar triggers."
+msgstr "No tiene permisos para importar triggers."
 
 #: include/classes/api/services/CConfiguration.php:326
 msgid "No permissions to import value maps."
-msgstr "No hay permisos para importar mapas de valores."
+msgstr "No tiene permisos para importar mapas de valores."
 
 #: include/classes/api/services/CConfiguration.php:317
 msgid "No permissions to import web scenarios."
-msgstr "No hay permisos para importar escenarios web."
+msgstr "No tiene permisos para importar escenarios web."
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -16552,6 +16661,12 @@ msgstr "No hay métricas heredadas"
 msgid "Not linked"
 msgstr "No vinculado"
 
+#: app/views/item.list.php:233 app/views/item.list.php:234
+#: include/classes/helpers/CItemHelper.php:386
+#: include/classes/helpers/CItemHelper.php:416
+msgid "Not stored"
+msgstr "No almacenado"
+
 #: app/controllers/CControllerLatest.php:546
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.latest.filter.php:191
@@ -16706,6 +16821,10 @@ msgstr "Número de temporadas"
 #: include/views/configuration.httpconf.list.php:143
 msgid "Number of steps"
 msgstr "Número de pasos"
+
+#: jsLoader.php:291
+msgid "Number of tags"
+msgstr "Número de etiquetas"
 
 #: app/partials/administration.system.info.php:60
 msgid "Number of templates"
@@ -17386,7 +17505,7 @@ msgstr "PHP curl"
 
 #: include/classes/setup/CFrontendSetup.php:733
 msgid "PHP curl extension is missing or outdated."
-msgstr "La extensión curl de PHP falta o está desactualizada."
+msgstr "La extensión curl de PHP falta o está obsoleta."
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
@@ -19309,6 +19428,10 @@ msgstr "Confirmar restablecer"
 msgid "Reset defaults"
 msgstr "Restablecer predeterminados"
 
+#: jsLoader.php:305
+msgid "Reset layout"
+msgstr "Restablecer diseño"
+
 #: widgets/geomap/Widget.php:37
 msgid "Reset to initial view"
 msgstr "Restablecer a la vista inicial"
@@ -19373,7 +19496,7 @@ msgstr "Tiempo de respuesta"
 #: include/classes/server/CZabbixServer.php:507
 #, c-format
 msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
-msgstr "Se superó el tiempo de espera de respuesta de %1$s al conectar con el server Zabbix \"%2$s\"."
+msgstr "Se superó el tiempo de espera de respuesta de %1$s al conectarse al server Zabbix \"%2$s\"."
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -19474,7 +19597,7 @@ msgstr "Devuelve un objeto JSON que contiene métricas internas del servidor Zab
 
 #: include/classes/data/CItemData.php:2797
 msgid "Returns a JSON object containing database connection pool configuration and statistics."
-msgstr "Devuelve un objeto JSON que contiene la configuración y las estadísticas del pool de conexiones a la base de datos."
+msgstr "Devuelve un objeto JSON que contiene la configuración y las estadísticas del pool de conexiones de la base de datos."
 
 #: include/classes/data/CItemData.php:2673
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
@@ -19856,7 +19979,7 @@ msgstr "Formato de ID de nombre de SP"
 
 #: app/views/administration.authentication.edit.php:338
 msgid "SP private key"
-msgstr "Clave privada SP"
+msgstr "Clave privada de SP"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -20048,7 +20171,7 @@ msgstr[1] "Informes programados desactivados"
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Scheduled report edit"
-msgstr "Editar informe programado"
+msgstr "Edición de informe programado"
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
@@ -20768,7 +20891,7 @@ msgstr "Debe ser al menos %1$s."
 #: app/views/administration.housekeeping.edit.php:197
 #, c-format
 msgid "Should not be higher than %1$s."
-msgstr "No debe ser mayor que %1$s."
+msgstr "No debe ser superior a %1$s."
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
@@ -20822,6 +20945,10 @@ msgstr "Mostrar encabezado"
 #: widgets/web/includes/WidgetForm.php:66
 msgid "Show hosts in maintenance"
 msgstr "Mostrar equipos en mantenimiento"
+
+#: jsLoader.php:281
+msgid "Show item key"
+msgstr "Mostrar clave de item"
 
 #: include/views/js/monitoring.sysmaps.js.php:158
 #: include/views/js/monitoring.sysmaps.js.php:698
@@ -20950,6 +21077,10 @@ msgstr "Mostrar marca de tiempo"
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
 msgstr "Mostrar valor total"
+
+#: jsLoader.php:285
+msgid "Show trigger expression"
+msgstr "Mostrar expresión de trigger"
 
 #: include/views/configuration.graph.edit.php:131
 msgid "Show triggers"
@@ -21687,6 +21818,10 @@ msgstr "Suprimir hasta"
 msgid "Suppressed"
 msgstr "Suprimido"
 
+#: include/actions.inc.php:2241 include/html.inc.php:1134
+msgid "Suppressed by maintenance"
+msgstr "Suprimido por mantenimiento"
+
 #: include/actions.inc.php:2019 include/html.inc.php:1000
 #, c-format
 msgid "Suppressed till: %1$s"
@@ -21849,6 +21984,10 @@ msgstr "La tabla \"%1$s\" no existe."
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr "La tabla \"%1$s\" no tiene un campo llamado \"%2$s\"."
 
+#: jsLoader.php:303
+msgid "Table options"
+msgstr "Opciones de tabla"
+
 #: app/controllers/CControllerActionOperationCheck.php:210
 #: app/controllers/CControllerActionOperationCheck.php:216
 #: app/controllers/CControllerActionOperationCheck.php:228
@@ -21877,7 +22016,7 @@ msgstr "Filtro de etiqueta"
 #: app/controllers/CControllerConnectorCreate.php:120
 #: app/controllers/CControllerConnectorUpdate.php:121
 msgid "Tag filter name, operator and value combination is not unique."
-msgstr "La combinación de nombre, operador y valor del filtro de etiquetas no es única."
+msgstr "La combinación del nombre de la etiqueta, el operador y el valor del filtro de etiquetas no es única."
 
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"
@@ -21908,10 +22047,14 @@ msgstr "Nombre de etiqueta"
 msgid "Tag name and value combination is not unique."
 msgstr "La combinación de nombre y valor de la etiqueta no es única."
 
+#: jsLoader.php:292
+msgid "Tag name display"
+msgstr "Visualización del nombre de la etiqueta"
+
 #: app/controllers/CControllerMaintenanceCreate.php:93
 #: app/controllers/CControllerMaintenanceUpdate.php:94
 msgid "Tag name, operator and value combination is not unique."
-msgstr "La combinación de nombre, operador y valor de la etiqueta no es única."
+msgstr "La combinación del nombre de la etiqueta, el operador y el valor no es única."
 
 #: include/actions.inc.php:68
 msgid "Tag value"
@@ -22591,6 +22734,10 @@ msgstr "Esta configuración se aplica sólo a datos numéricos."
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "Esta configuración se aplica sólo a datos numéricos. Los datos no numéricos siempre se tomarán del histórico."
 
+#: app/views/administration.housekeeping.edit.php:145
+msgid "This setting does not affect Elasticsearch and ClickHouse storage periods."
+msgstr "Esta configuración no afecta a los períodos de almacenamiento de Elasticsearch y ClickHouse."
+
 #: app/partials/administration.system.info.php:212
 #: app/views/administration.housekeeping.edit.php:132
 msgid "This setting should be enabled, because history tables contain compressed chunks."
@@ -22989,6 +23136,11 @@ msgctxt "compact table header"
 msgid "Total"
 msgstr "Total"
 
+#: include/classes/debug/CProfiler.php:172
+#, c-format
+msgid "Total ClickHouse time: %1$s"
+msgstr "Tiempo total de ClickHouse: %1$s"
+
 #: include/classes/debug/CProfiler.php:153
 #, c-format
 msgid "Total Elasticsearch time: %1$s"
@@ -23063,6 +23215,10 @@ msgstr "Tratar como 0"
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr "Estadísticas de caché de la función de tendencia. Los parámetros válidos son: all, hits, phits, misses, pmisses, items, pitems y requests."
 
+#: include/classes/data/CItemData.php:3013
+msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems, paccessed and requests."
+msgstr "Estadísticas de caché de la función de tendencias. Los parámetros válidos son: all, hits, phits, misses, pmisses, items, pitems, paccessed y requests."
+
 #: app/controllers/CControllerPopupLldOperation.php:226
 #: app/partials/configuration.filter.items.php:162
 #: app/partials/monitoring.latest.view.html.php:74
@@ -23078,6 +23234,11 @@ msgstr "Estadísticas de caché de la función de tendencia. Los parámetros vá
 #: widgets/tophosts/views/column.edit.php:206
 msgid "Trends"
 msgstr "Tendencias"
+
+#: app/partials/item.edit.item.tab.php:774
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse."
+msgstr "Las tendencias no se calculan ni se almacenan para los items cuyo historial se conserva en Elasticsearch o ClickHouse."
 
 #: app/controllers/CControllerAuditLogList.php:257
 #: app/views/reports.toptriggers.list.php:120 app/views/trigger.edit.php:54
@@ -24013,6 +24174,10 @@ msgstr "No suprimir"
 msgid "Unsuppressed"
 msgstr "No suprimido"
 
+#: include/actions.inc.php:2257
+msgid "Unsuppressed by maintenance"
+msgstr "No suprimido por mantenimiento"
+
 #: include/blocks.inc.php:670 include/classes/screens/CScreenProblem.php:1425
 #: widgets/problems/includes/WidgetProblems.php:278
 #, c-format
@@ -24193,6 +24358,11 @@ msgstr "Tiempo de actividad del proceso del servidor Zabbix en segundos."
 #: include/actions.inc.php:61
 msgid "Uptime/Downtime"
 msgstr "Tiempo operativo/Tiempo inoperativo"
+
+#: app/partials/administration.system.info.php:328
+#, c-format
+msgid "Use %1$s instead"
+msgstr "Use %1$s en su lugar"
 
 #: app/views/popup.ldap.edit.php:173
 msgid "Use %{ref} in group filter to reference value of this user attribute."
@@ -26034,7 +26204,7 @@ msgstr "No tiene permiso para realizar esta operación."
 
 #: index_sso.php:358
 msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
-msgstr "Ha sido autorizado mediante inicio de sesión único (SSO), pero el inicio de sesión en Zabbix falló."
+msgstr "Ha sido autorizado mediante inicio de sesión único (SSO), pero el inicio de sesión en Zabbix ha fallado."
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -26055,6 +26225,10 @@ msgstr "Su base de datos no funciona correctamente. Espere unos minutos e intent
 #: app/views/host.wizard.edit.php:1044
 msgid "Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?"
 msgstr "Su progreso se descartará y saldrá del asistente de equipo. ¿Está seguro de que desea cancelar?"
+
+#: jsLoader.php:307
+msgid "Your table settings will be reset to default and duplicated columns will be removed."
+msgstr "La configuración de su tabla se restablecerá a los valores predeterminados y se eliminarán las columnas duplicadas."
 
 #: include/page_header.php:122
 msgid "Zabbix"
@@ -27134,6 +27308,10 @@ msgstr "no existe"
 msgid "does not match"
 msgstr "no coincide"
 
+#: jsLoader.php:268
+msgid "duplicate"
+msgstr "duplicado"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr "e() - Devuelve el número de Euler"
@@ -27239,13 +27417,17 @@ msgstr "fuzzytime(): la diferencia entre el valor del elemento (como marca de ti
 msgid "geographical coordinates (values of comma separated latitude and longitude) are expected"
 msgstr "se esperan coordenadas geográficas (valores de latitud y longitud separados por comas)"
 
+#: app/views/item.edit.php:224 app/views/item.edit.php:228
+msgid "global housekeeping settings"
+msgstr "configuración global de limpieza interna"
+
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.edit.php:891
 #: include/views/configuration.item.edit.php:918
 #: include/views/configuration.item.edit.php:923
 msgctxt "item_form"
 msgid "global housekeeping settings"
-msgstr "configuración global de limpieza"
+msgstr "configuración global de limpieza interna"
 
 #: include/classes/api/services/CScript.php:726
 msgid "global script execution on Zabbix server is disabled by server configuration"
@@ -27397,6 +27579,11 @@ msgstr "recuento de elementos incorrecto"
 #, c-format
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "expresión incorrecta a partir de \"%1$s\""
+
+#: include/classes/core/CConfigFile.php:212
+#: include/classes/core/CConfigFile.php:220
+msgid "incorrect format"
+msgstr "formato incorrecto"
 
 #: jsLoader.php:298
 msgid "incorrect item value type"
@@ -28388,7 +28575,7 @@ msgstr "sqrt() - Raíz cuadrada de un valor"
 #: include/classes/validators/CTimeRangesValidator.php:44
 #: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:23
 msgid "start time must be less than end time"
-msgstr "la hora de inicio debe ser menor que la hora de fin"
+msgstr "la hora de inicio debe ser menor que la hora de finalización"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1027
 msgid "stddevpop() - Population standard deviation"

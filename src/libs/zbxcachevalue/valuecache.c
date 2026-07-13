@@ -47,6 +47,7 @@
  */
 
 ZBX_PTR_VECTOR_IMPL(vc_item_stats_ptr, zbx_vc_item_stats_t *)
+ZBX_VECTOR_IMPL(vc_query, zbx_vc_query_t)
 
 void	zbx_vc_item_stats_free(zbx_vc_item_stats_t * vc_item_stats)
 {
@@ -282,9 +283,6 @@ static zbx_vc_cache_t	*vc_cache = NULL;
 #define	UNLOCK_CACHE	zbx_rwlock_unlock(vc_lock)
 
 /* function prototypes */
-static void	vc_history_record_copy(zbx_history_record_t *dst, const zbx_history_record_t *src, int value_type);
-static void	vc_history_record_vector_clean(zbx_vector_history_record_t *vector, int value_type);
-
 static size_t	vch_item_free_cache(zbx_vc_item_t *item);
 static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk);
 static int	vch_item_add_values_at_tail(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num);
@@ -490,7 +488,7 @@ static int	vc_db_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_hist
 	/* all values are past requested range (timestamp greater than requested), return empty vector */
 	if (i == values->values_num)
 	{
-		vc_history_record_vector_clean(values, value_type);
+		zbx_history_record_vector_clean(values, value_type);
 		return SUCCEED;
 	}
 
@@ -568,83 +566,6 @@ static int	vc_item_weight_compare(const void *a1, const void *a2)
 	ZBX_RETURN_IF_NOT_EQUAL(d1->weight, d2->weight);
 
 	return 0;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees history log and all resources allocated for it              *
- *                                                                            *
- * Parameters: log   - [IN] the history log to free                           *
- *                                                                            *
- ******************************************************************************/
-static void	vc_history_logfree(zbx_log_value_t *log)
-{
-	zbx_free(log->source);
-	zbx_free(log->value);
-	zbx_free(log);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: duplicates history log by allocating necessary resources and      *
- *          copying the target log values.                                    *
- *                                                                            *
- * Parameters: log   - [IN] the history log to duplicate                      *
- *                                                                            *
- * Return value: the duplicated history log                                   *
- *                                                                            *
- ******************************************************************************/
-static zbx_log_value_t	*vc_history_logdup(const zbx_log_value_t *log)
-{
-	zbx_log_value_t	*plog;
-
-	plog = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
-
-	plog->timestamp = log->timestamp;
-	plog->logeventid = log->logeventid;
-	plog->severity = log->severity;
-	plog->source = (NULL == log->source ? NULL : zbx_strdup(NULL, log->source));
-	plog->value = zbx_strdup(NULL, log->value);
-
-	return plog;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: releases resources allocated to store history records             *
- *                                                                            *
- * Parameters: vector      - [IN] the history record vector                   *
- *             value_type  - [IN] the type of vector values                   *
- *                                                                            *
- ******************************************************************************/
-static void	vc_history_record_vector_clean(zbx_vector_history_record_t *vector, int value_type)
-{
-	int	i;
-
-	switch (value_type)
-	{
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-			for (i = 0; i < vector->values_num; i++)
-				zbx_free(vector->values[i].value.str);
-
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			for (i = 0; i < vector->values_num; i++)
-				vc_history_logfree(vector->values[i].value.log);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-		case ITEM_VALUE_TYPE_FLOAT:
-			break;
-		case ITEM_VALUE_TYPE_BIN:
-		case ITEM_VALUE_TYPE_JSON:
-		case ITEM_VALUE_TYPE_NONE:
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			zbx_exit(EXIT_FAILURE);
-	}
-
-	zbx_vector_history_record_clear(vector);
 }
 
 /******************************************************************************
@@ -906,36 +827,6 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copies history value                                              *
- *                                                                            *
- * Parameters: dst        - [OUT] a pointer to the destination value          *
- *             src        - [IN] a pointer to the source value                *
- *             value_type - [IN] the value type (see ITEM_VALUE_TYPE_* defs)  *
- *                                                                            *
- * Comments: Additional memory is allocated to store string, text and log     *
- *           value contents. This memory must be freed by the caller.         *
- *                                                                            *
- ******************************************************************************/
-static void	vc_history_record_copy(zbx_history_record_t *dst, const zbx_history_record_t *src, int value_type)
-{
-	dst->timestamp = src->timestamp;
-
-	switch (value_type)
-	{
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-			dst->value.str = zbx_strdup(NULL, src->value.str);
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			dst->value.log = vc_history_logdup(src->value.log);
-			break;
-		default:
-			dst->value = src->value;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: appends the specified value to value vector                       *
  *                                                                            *
  * Parameters: vector     - [IN/OUT] the value vector                         *
@@ -951,7 +842,7 @@ static void	vc_history_record_vector_append(zbx_vector_history_record_t *vector,
 {
 	zbx_history_record_t	record;
 
-	vc_history_record_copy(&record, value, value_type);
+	zbx_history_record_copy(&record, value, value_type);
 	zbx_vector_history_record_append_ptr(vector, &record);
 }
 
@@ -2555,22 +2446,22 @@ static int	vc_is_value_type_supported(unsigned char value_type)
  *                                                                            *
  * Purpose: adds item values to history and value cache                       *
  *                                                                            *
- * Parameters:                                                                *
- *   history                          - [IN] item history values              *
- *   ret_flush                        - [OUT]                                 *
- *   config_history_storage_pipelines - [IN]                                  *
+ *                                                                            *
+ * Parameters: history   - [IN] item history values                           *
+ *             flush_err - [OUT] bitmask containing flush error statuses per  *
+ *                               value types                                  *
  *                                                                            *
  * Return value: SUCCEED - values were added successfully                     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int config_history_storage_pipelines)
+int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, zbx_uint64_t *flush_err)
 {
 	zbx_vc_item_t		*item;
 	int			i;
 	zbx_dc_history_t	*h;
 
-	if (SUCCEED != zbx_history_add_values(history, ret_flush, config_history_storage_pipelines))
+	if (SUCCEED != zbx_history_add_values(history, flush_err))
 		return FAIL;
 
 	if (ZBX_VC_DISABLED == vc_state)
@@ -2582,9 +2473,9 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 	{
 		h = history->values[i];
 
-		item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid);
+		item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->entry.itemid);
 
-		if (FAIL == vc_is_value_type_supported(h->value_type))
+		if (FAIL == vc_is_value_type_supported(h->entry.value_type))
 		{
 			if (NULL != item)
 				vc_remove_item(item);
@@ -2595,11 +2486,10 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 		if (NULL == item && 0 != (h->flags & ZBX_DC_FLAG_HASTRIGGER) && ZBX_VC_MODE_NORMAL == vc_cache->mode)
 		{
 			zbx_vc_item_t	item_local = {
-					.itemid = h->itemid,
-					.value_type = h->value_type,
+					.itemid = h->entry.itemid,
+					.value_type = h->entry.value_type,
 					.last_accessed = (int)time(NULL),
 					.active_range = VC_MIN_RANGE
-
 			};
 
 			item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local));
@@ -2608,7 +2498,7 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 		/* cache new values only after the item history database status is known */
 		if (NULL != item)
 		{
-			zbx_history_record_t	record = {h->ts, h->value};
+			zbx_history_record_t	record = {h->entry.ts, h->entry.value};
 			zbx_vc_chunk_t		*head = item->head;
 			int			last_value_timestamp;
 
@@ -2623,7 +2513,8 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 			/* Also remove item if the value adding failed. In this case we             */
 			/* won't have the latest data in cache - so the requests must go directly   */
 			/* to the database.                                                         */
-			if (item->value_type != h->value_type || FAIL == vch_item_add_value_at_head(item, &record))
+			if (item->value_type != h->entry.value_type ||
+					FAIL == vch_item_add_value_at_head(item, &record))
 			{
 				vc_remove_item(item);
 				continue;
@@ -2638,6 +2529,398 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 	UNLOCK_CACHE;
 
 	return SUCCEED;
+}
+
+/* history pre-caching */
+
+#define VC_PRECACHE_MIN_QUERIES	5
+
+typedef enum
+{
+	VC_PRECACHE_QUERY,
+	VC_PRECACHE_RANGE,
+}
+zbx_vc_precache_mode_t;
+
+static int	vc_query_compare_by_timestamp_desc(const void *d1, const void *d2)
+{
+	const zbx_vc_query_t	*q1 = (const zbx_vc_query_t *)d1;
+	const zbx_vc_query_t	*q2 = (const zbx_vc_query_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(q2->ts_end, q1->ts_end);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if item history data is cached                              *
+ *                                                                            *
+ * Parameters: item - [IN]                                                    *
+ *                                                                            *
+ * Return value: SUCCEED - item history data is cached                        *
+ *               FAIL    - item history data is not cached                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	vc_query_item_cached(zbx_vc_item_t *item)
+{
+	if (0 != item->db_cached_from)
+		return SUCCEED;
+
+	if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: precache history data for number of values                        *
+ *                                                                            *
+ * Parameters: item      - [IN/OUT]                                           *
+ *             rows      - [IN] history records to cache                      *
+ *             nvalues   - [IN] number of values to cache                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	vc_item_precache_nvalues(zbx_vc_item_t *item, zbx_vector_history_record_t *rows, int nvalues)
+{
+	int	index_start = -1, ts_start = 0;
+
+	/* Find the starting index for values to cache. To ensure complete second coverage, */
+	/* discard the earliest value(s) by iterating through values and tracking the index */
+	/* where the timestamp (seconds) changed. Use this index as the starting point.     */
+	ts_start = rows->values[0].timestamp.sec;
+	for (int i = 1; i < rows->values_num; i++)
+	{
+		if (ts_start != rows->values[i].timestamp.sec)
+		{
+			/* the new index would not cover the required nvalues - */
+			/* so the current index is the closest one              */
+			if (-1 != index_start && i + nvalues > rows->values_num)
+				break;
+
+			ts_start = rows->values[i].timestamp.sec;
+			index_start = i;
+		}
+	}
+
+	if (-1 != index_start)
+	{
+		vch_item_add_values_at_tail(item, rows->values + index_start, rows->values_num - index_start);
+		vc_item_update_db_cached_from(item, ts_start);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: precache history data for time-based range                        *
+ *                                                                            *
+ * Parameters: item      - [IN/OUT]                                           *
+ *             rows      - [IN] history records to cache                      *
+ *             ts_start  - [IN] window start timestamp                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	vc_item_precache_seconds(zbx_vc_item_t *item, zbx_vector_history_record_t *rows, int ts_start)
+{
+	vch_item_add_values_at_tail(item, rows->values, rows->values_num);
+	vc_item_update_db_cached_from(item, ts_start);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: precache history data for a single item                           *
+ *                                                                            *
+ * Parameters: hist       - [IN] item history data                            *
+ *             value_type - [IN] item value type                              *
+ *             ts_start   - [IN] history start timestamp                      *
+ *             limit      - [IN] maximum number of values                     *
+ *                                                                            *
+ * Comments: For count based requests only the required number of values will *
+ *           be cached. For time based requests all fetched values will be    *
+ *           cached.                                                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type, int ts_start, int limit)
+{
+	zbx_vc_item_t	*item;
+
+	zbx_vc_item_t	item_local = {
+			.itemid = hist->itemid,
+			.value_type = value_type,
+			.last_accessed = (int)time(NULL),
+			.active_range = VC_MIN_RANGE
+	};
+
+	if (NULL == (item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local))))
+		return;
+
+	if (SUCCEED == vc_query_item_cached(item))
+		return;
+
+	if (hist->rows.values_num < limit)
+	{
+		vc_item_precache_seconds(item, &hist->rows, ts_start);
+	}
+	else
+	{
+		int	nvalues;
+
+		switch (hist->selector->type)
+		{
+			case ZBX_VALUE_SECONDS:
+				nvalues = limit;
+				break;
+			case ZBX_VALUE_NVALUES:
+				nvalues = hist->selector->value;
+				break;
+			default:
+				nvalues = 1;
+				break;
+		}
+
+		vc_item_precache_nvalues(item, &hist->rows, nvalues);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: precache history data for queries within a single time window     *
+ *                                                                            *
+ * Parameters: queries    - [IN/OUT] vector of history queries                *
+ *             window     - [IN/OUT] vector of query indices to precache      *
+ *             value_type - [IN] item value type                              *
+ *             ts_start   - [IN] window start timestamp                       *
+ *             mode       - [IN] precache mode (QUERY or RANGE)               *
+ *                                                                            *
+ * Return value: SUCCEED - queries were precached successfully                *
+ *               FAIL    - value cache is full                                *
+ *                                                                            *
+ * Comments: Items with at least 2 values fetched will be cached and removed  *
+ *           from the queries.                                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t *window,
+		unsigned char value_type, int ts_start, zbx_vc_precache_mode_t mode)
+{
+	zbx_vector_item_history_t	results;
+	int				limit;
+
+	if (VC_PRECACHE_MIN_QUERIES > window->values_num)
+		goto out;
+
+	zbx_vector_item_history_create(&results);
+	zbx_vector_item_history_reserve(&results, (size_t)window->values_num);
+
+	limit = 2;
+
+	for (int i = 0; i < window->values_num; i++)
+	{
+		int			index = window->values[i];
+		zbx_vc_query_t		*query = &queries->values[index];
+		zbx_item_history_t	hist_local;
+
+		hist_local.index = index;
+		hist_local.itemid = query->itemid;
+		hist_local.selector = query->selector;
+		zbx_vector_history_record_create(&hist_local.rows);
+		zbx_vector_item_history_append_ptr(&results, &hist_local);
+
+		switch (query->selector->type)
+		{
+			case ZBX_VALUE_SECONDS:
+				if (limit < query->selector->value / SEC_PER_MIN + 1)
+					limit = query->selector->value / SEC_PER_MIN + 1;
+				break;
+			case ZBX_VALUE_NVALUES:
+				if (limit < query->selector->value + 1)
+					limit = query->selector->value + 1;
+				break;
+			case ZBX_VALUE_NODATA:
+				/* nodata requires 1 value, which is the starting point */
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN_MSG("invalid history range:%u for itemid:" ZBX_FS_UI64
+						" ts_end:%d", query->selector->type, query->itemid, query->ts_end);
+		}
+	}
+
+	zbx_vector_item_history_sort(&results, zbx_item_history_compare_by_itemid);
+	zbx_history_get_batch(&results, value_type, ts_start, limit);
+
+	zbx_vector_item_history_sort(&results, zbx_item_history_compare_by_index_desc);
+
+	for (int i = 0; i < results.values_num; i++)
+	{
+		zbx_vector_history_record_sort(&results.values[i].rows,
+				(zbx_compare_func_t)zbx_history_record_compare_asc);
+	}
+
+	WRLOCK_CACHE;
+
+	for (int i = 0; i < results.values_num; i++)
+	{
+		zbx_item_history_t	*hist = &results.values[i];
+
+		if (ZBX_VC_MODE_NORMAL != vc_cache->mode)
+			break;
+
+		if (1 < hist->rows.values_num)
+		{
+			vc_precache_item(hist, value_type, ts_start, limit);
+			zbx_vector_vc_query_remove(queries, hist->index);
+		}
+		else if (VC_PRECACHE_RANGE == mode)
+		{
+			vc_precache_item(hist, value_type, ts_start, limit);
+		}
+	}
+
+	UNLOCK_CACHE;
+
+	for (int i = 0; i < results.values_num; i++)
+		zbx_history_record_vector_destroy(&results.values[i].rows, value_type);
+
+	zbx_vector_item_history_destroy(&results);
+out:
+	zbx_vector_int32_clear(window);
+
+	return (ZBX_VC_MODE_NORMAL == vc_cache->mode ? SUCCEED : FAIL);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: precache history data for queries grouped by time windows         *
+ *                                                                            *
+ * Parameters: queries  - [IN/OUT] vector of history queries, sorted in       *
+ *                        descending order by origin timestamp - oldest data  *
+ *                        queries at the end                                  *
+ *             interval - [IN] time window interval in seconds                *
+ *             mode     - [IN] precache mode (QUERY or RANGE)                 *
+ *                                                                            *
+ * Return value: SUCCEED - queries were precached successfully                *
+ *               FAIL    - value cache is full                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	vc_precache_query_windows(zbx_vector_vc_query_t *queries, int interval, zbx_vc_precache_mode_t mode)
+{
+	zbx_vector_int32_t	window;
+	int			ret = FAIL, ts_start;
+	unsigned char		value_type;
+	zbx_vc_query_t		*query;
+
+	if (VC_PRECACHE_MIN_QUERIES > queries->values_num)
+		return SUCCEED;
+
+	zbx_vector_int32_create(&window);
+	zbx_vector_int32_reserve(&window, (size_t)queries->values_num);
+
+	query = &queries->values[queries->values_num - 1];
+	ts_start = query->ts_end;
+	value_type = query->value_type;
+
+	/* go from the oldest queries, group by the interval windows and try to precache them */
+	for (int i = queries->values_num - 1; i >= 0; i--)
+	{
+		query = &queries->values[i];
+
+		if (query->value_type != value_type)
+			continue;
+
+		if (query->ts_end < ts_start + interval)
+		{
+			zbx_vector_int32_append(&window, i);
+			continue;
+		}
+
+		if (FAIL == vc_precache_window(queries, &window, value_type, ts_start - interval, mode))
+			goto out;
+
+		ts_start = query->ts_end;
+		zbx_vector_int32_append(&window, i);
+	}
+
+	if (FAIL == vc_precache_window(queries, &window, value_type, ts_start - interval, mode))
+		goto out;
+
+	ret = SUCCEED;
+out:
+	zbx_vector_int32_destroy(&window);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: precache history data for multiple item history queries           *
+ *                                                                            *
+ * Parameters: queries - [IN] vector of history queries                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vc_precache_queries(zbx_vector_vc_query_t *queries)
+{
+#define VC_PRECACHE_WINDOW1	(SEC_PER_MIN * 10)
+#define VC_PRECACHE_WINDOW2	(SEC_PER_HOUR)
+
+	zbx_vector_vc_query_t	uncached_queries[ITEM_VALUE_TYPE_COUNT - 1];
+	int			uncached_num = 0;
+
+	if (ZBX_VC_DISABLED == vc_state)
+		return;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() queries:%d", __func__, queries->values_num);
+
+	for (size_t i = 0; i < ARRSIZE(uncached_queries); i++)
+		zbx_vector_vc_query_create(&uncached_queries[i]);
+
+	/* group queries by value type and filter out items cached before */
+
+	RDLOCK_CACHE;
+
+	for (int i = 0; i < queries->values_num; i++)
+	{
+		zbx_vc_query_t	*query = &queries->values[i];
+		zbx_vc_item_t	*item;
+
+		if (ARRSIZE(uncached_queries) <= query->value_type)
+			continue;
+
+		/* check if the item was not added before */
+		if (NULL == (item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &query->itemid)) ||
+				SUCCEED != vc_query_item_cached(item))
+		{
+			zbx_vector_vc_query_append_ptr(&uncached_queries[query->value_type], query);
+			uncached_num++;
+		}
+	}
+
+	UNLOCK_CACHE;
+
+	if (0 == uncached_num)
+		goto out;
+
+	/* precache history */
+
+	for (size_t i = 0; i < ARRSIZE(uncached_queries); i++)
+	{
+		if (VC_PRECACHE_MIN_QUERIES > uncached_queries[i].values_num)
+			continue;
+
+		zbx_vector_vc_query_sort(&uncached_queries[i], vc_query_compare_by_timestamp_desc);
+
+		if (FAIL == vc_precache_query_windows(&uncached_queries[i], VC_PRECACHE_WINDOW1, VC_PRECACHE_QUERY))
+			goto out;
+
+		if (FAIL == vc_precache_query_windows(&uncached_queries[i], VC_PRECACHE_WINDOW2, VC_PRECACHE_RANGE))
+			goto out;
+	}
+out:
+	for (size_t i = 0; i < ARRSIZE(uncached_queries); i++)
+		zbx_vector_vc_query_destroy(&uncached_queries[i]);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+#undef VC_PRECACHE_WINDOW1
+#undef VC_PRECACHE_WINDOW2
 }
 
 /******************************************************************************
@@ -2674,6 +2957,11 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, unsigned char value_type, zbx_vector_
 
 	if (SUCCEED != vc_is_value_type_supported(value_type))
 		return FAIL;
+
+	if (0 != count)
+		zbx_vector_history_record_reserve(values, MIN(count + 1, 32));
+	else
+		zbx_vector_history_record_reserve(values, 8);
 
 	RDLOCK_CACHE;
 
@@ -2955,6 +3243,8 @@ void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
 	if (ZBX_VC_DISABLED == vc_state)
 		return;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() items:%d", __func__, items->values_num);
+
 	WRLOCK_CACHE;
 
 	if (ZBX_VC_MODE_NORMAL == vc_cache->mode)
@@ -2989,4 +3279,6 @@ void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
 	}
 
 	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

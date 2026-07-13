@@ -23,7 +23,7 @@ class CField {
 	_changed = false;
 	_error_msg = null;
 	_error_level = -1;
-	_global_errors = {};
+	_global_errors = Object.create(null);
 	_error_container = null;
 	_error_label;
 	_allow_trim;
@@ -139,7 +139,7 @@ class CField {
 			if (this._error_level >= level) {
 				this._error_msg = null;
 				this._error_level = -1;
-				this._global_errors = {};
+				this._global_errors = Object.create(null);
 			}
 		}
 		else {
@@ -263,5 +263,27 @@ class CField {
 				errors_list.classList.remove('list-dashed');
 			}
 		}
+	}
+
+	lock() {
+		if (this._field.disabled) {
+			return false;
+		}
+
+		this._field.dataset.formDisabled = '';
+		this._field.disabled = true;
+
+		return true;
+	}
+
+	unlock() {
+		if ('formDisabled' in this._field.dataset) {
+			this._field.disabled = false;
+			delete this._field.dataset.formDisabled;
+
+			return true;
+		}
+
+		return false;
 	}
 }
