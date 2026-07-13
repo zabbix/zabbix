@@ -49,6 +49,15 @@
 
 #define	ALARM_ACTION_TIMEOUT	40
 
+#define ZBX_PUSH_BA_ERR_NOT_CONFIGURED	\
+	"Cannot deliver mobile device notification, bridge-adapter is not configured."
+#define ZBX_PUSH_BA_ERR_CONNECT	\
+	"Cannot deliver mobile device notification, cannot connect to bridge-adapter."
+#define ZBX_PUSH_BA_ERR_INVALID_RESPONSE	\
+	"Cannot deliver mobile device notification, bridge-adapter returned an invalid response."
+#define ZBX_PUSH_BA_ERR_RETURNED_ERROR	\
+	"Cannot deliver mobile device notification, bridge-adapter returned an error."
+
 ZBX_PTR_VECTOR_IMPL(am_source_stats_ptr, zbx_am_source_stats_t *)
 
 /******************************************************************************
@@ -565,14 +574,14 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to bridge-adapter: \"BridgeAdapterURL\""
 				" configuration parameter is not set");
-		error = zbx_strdup(NULL, "Failed to connect to bridge-adapter");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_NOT_CONFIGURED);
 		goto out;
 	}
 
 	if (NULL == (curl = curl_easy_init()))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to initialize cURL library");
-		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
 		goto out;
 	}
 
@@ -580,7 +589,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 			errbuf, &error_curl))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot prepare HTTP callbacks: %s", ZBX_NULL2EMPTY_STR(error_curl));
-		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
 		goto out;
 	}
 
@@ -594,7 +603,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 					(long)ZBX_BRIDGE_ADAPTER_TIMEOUT)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
-		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
 		goto out;
 	}
 
@@ -602,7 +611,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL HTTPS options: %s",
 				ZBX_NULL2EMPTY_STR(error_curl));
-		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
 		goto out;
 	}
 
@@ -610,7 +619,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL SSL version: %s",
 				ZBX_NULL2EMPTY_STR(error_curl));
-		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
 		goto out;
 	}
 
@@ -630,7 +639,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
-			error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
 			goto out;
 		}
 
@@ -640,7 +649,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
-			error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
 			goto out;
 		}
 
@@ -650,7 +659,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
-			error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
 			goto out;
 		}
 
@@ -663,7 +672,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
-			error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
 			goto out;
 		}
 	}
@@ -675,7 +684,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		if (NULL == connect_to)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to prepare CURLOPT_CONNECT_TO value");
-			error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
 			goto out;
 		}
 
@@ -683,7 +692,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 				curl_easy_strerror(err));
-			error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
 			goto out;
 		}
 	}
@@ -691,7 +700,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to bridge-adapter: %s", curl_easy_strerror(err));
-		error = zbx_strdup(NULL, "Failed to connect to bridge-adapter");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_CONNECT);
 		goto out;
 	}
 
@@ -699,7 +708,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to obtain bridge-adapter response code: %s",
 				curl_easy_strerror(err));
-		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
 		goto out;
 	}
 
@@ -709,7 +718,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned too large response body for "
 				ZBX_PROTO_VALUE_DEVICE_NOTIFY " request: size:" ZBX_FS_SIZE_T " body:'%s'",
 				(zbx_fs_size_t)body.offset, body.data);
-		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
 		goto out;
 	}
 
@@ -717,7 +726,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
 				ZBX_NULL2EMPTY_STR(body.data));
-		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
 		goto out;
 	}
 
@@ -725,7 +734,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
-		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
 		goto out;
 	}
 
@@ -733,7 +742,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing JSON-RPC version in bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
-		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
 		goto out;
 	}
 
@@ -741,7 +750,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid JSON-RPC version in bridge-adapter response body: %s,"
 				" expected 2.0", jsonrpc);
-		error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+		error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
 		goto out;
 	}
 
@@ -759,10 +768,10 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s",
 					code, message);
 #endif
-			error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_RETURNED_ERROR);
 		}
 		else
-			error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_NOTIFY " request");
+			error = zbx_strdup(NULL, ZBX_PUSH_BA_ERR_INVALID_RESPONSE);
 
 		goto out;
 	}

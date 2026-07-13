@@ -156,6 +156,51 @@ static int	device_get_userid_by_uuid(const char *uuid, zbx_uint64_t *target_user
 }
 
 #if defined(HAVE_LIBCURL)
+typedef enum
+{
+	ZBX_DEVICE_BA_ERR_NOT_CONFIGURED,
+	ZBX_DEVICE_BA_ERR_CONNECT,
+	ZBX_DEVICE_BA_ERR_INVALID_RESPONSE,
+	ZBX_DEVICE_BA_ERR_RETURNED_ERROR
+}
+zbx_device_ba_error_t;
+
+static const char	*trapper_device_bridge_adapter_error(const char *request, zbx_device_ba_error_t error)
+{
+	if (0 == strcmp(request, ZBX_PROTO_VALUE_DEVICE_INIT))
+	{
+		switch (error)
+		{
+			case ZBX_DEVICE_BA_ERR_NOT_CONFIGURED:
+				return "Cannot initialize mobile device, bridge-adapter is not configured.";
+			case ZBX_DEVICE_BA_ERR_CONNECT:
+				return "Cannot initialize mobile device, cannot connect to bridge-adapter.";
+			case ZBX_DEVICE_BA_ERR_INVALID_RESPONSE:
+				return "Cannot initialize mobile device, bridge-adapter returned an invalid response.";
+			case ZBX_DEVICE_BA_ERR_RETURNED_ERROR:
+				return "Cannot initialize mobile device, bridge-adapter returned an error.";
+		}
+	}
+	else if (0 == strcmp(request, ZBX_PROTO_VALUE_DEVICE_OFFBOARD))
+	{
+		switch (error)
+		{
+			case ZBX_DEVICE_BA_ERR_NOT_CONFIGURED:
+				return "Cannot remove mobile device, bridge-adapter is not configured.";
+			case ZBX_DEVICE_BA_ERR_CONNECT:
+				return "Cannot remove mobile device, cannot connect to bridge-adapter.";
+			case ZBX_DEVICE_BA_ERR_INVALID_RESPONSE:
+				return "Cannot remove mobile device, bridge-adapter returned an invalid response.";
+			case ZBX_DEVICE_BA_ERR_RETURNED_ERROR:
+				return "Cannot remove mobile device, bridge-adapter returned an error.";
+		}
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+
+	return "Cannot initialize mobile device, bridge-adapter returned an invalid response.";
+}
+
 static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *config_comms,
 		const char *config_bridge_adapter_url, const char *config_bridge_adapter_connect_to,
 		const char *payload, const char *request, char **body_data, struct zbx_json_parse *jp_body,
@@ -177,14 +222,15 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to bridge-adapter: \"BridgeAdapterURL\""
 				" configuration parameter is not set");
-		*error = zbx_strdup(NULL, "Failed to connect to bridge-adapter");
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request,
+				ZBX_DEVICE_BA_ERR_NOT_CONFIGURED));
 		goto out;
 	}
 
 	if (NULL == (curl = curl_easy_init()))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to initialize cURL library");
-		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request, ZBX_DEVICE_BA_ERR_CONNECT));
 		goto out;
 	}
 
@@ -193,7 +239,7 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot prepare HTTP callbacks: %s",
 				ZBX_NULL2EMPTY_STR(error_curl));
-		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request, ZBX_DEVICE_BA_ERR_CONNECT));
 		goto out;
 	}
 
@@ -208,7 +254,7 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: %s.", (int)opt,
 				curl_easy_strerror(err));
-		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request, ZBX_DEVICE_BA_ERR_CONNECT));
 		goto out;
 	}
 
@@ -216,7 +262,7 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL HTTPS options: %s",
 				ZBX_NULL2EMPTY_STR(error_curl));
-		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request, ZBX_DEVICE_BA_ERR_CONNECT));
 		goto out;
 	}
 
@@ -224,7 +270,7 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL SSL version: %s",
 				ZBX_NULL2EMPTY_STR(error_curl));
-		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request, ZBX_DEVICE_BA_ERR_CONNECT));
 		goto out;
 	}
 
@@ -244,7 +290,8 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
-			*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+			*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request,
+					ZBX_DEVICE_BA_ERR_CONNECT));
 			goto out;
 		}
 
@@ -253,7 +300,8 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
-			*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+			*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request,
+					ZBX_DEVICE_BA_ERR_CONNECT));
 			goto out;
 		}
 
@@ -262,7 +310,8 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
-			*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+			*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request,
+					ZBX_DEVICE_BA_ERR_CONNECT));
 			goto out;
 		}
 
@@ -274,7 +323,8 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
-			*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+			*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request,
+					ZBX_DEVICE_BA_ERR_CONNECT));
 			goto out;
 		}
 	}
@@ -286,7 +336,8 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 		if (NULL == connect_to)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to prepare CURLOPT_CONNECT_TO value");
-			*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+			*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request,
+					ZBX_DEVICE_BA_ERR_CONNECT));
 			goto out;
 		}
 
@@ -294,7 +345,8 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
-			*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+			*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request,
+					ZBX_DEVICE_BA_ERR_CONNECT));
 			goto out;
 		}
 	}
@@ -302,7 +354,7 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to connect to bridge-adapter: %s", curl_easy_strerror(err));
-		*error = zbx_strdup(NULL, "Failed to connect to bridge-adapter");
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request, ZBX_DEVICE_BA_ERR_CONNECT));
 		goto out;
 	}
 
@@ -310,7 +362,8 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to obtain bridge-adapter response code: %s",
 				curl_easy_strerror(err));
-		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request,
+				ZBX_DEVICE_BA_ERR_INVALID_RESPONSE));
 		goto out;
 	}
 
@@ -319,7 +372,8 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 		body.data[ZBX_MAX_RECV_2KB_DATA_SIZE] = '\0';
 		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned too large response body for %s request: size:"
 				ZBX_FS_SIZE_T " body:'%s'", request, (zbx_fs_size_t)body.offset, body.data);
-		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request,
+				ZBX_DEVICE_BA_ERR_INVALID_RESPONSE));
 		goto out;
 	}
 
@@ -327,7 +381,8 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
 				ZBX_NULL2EMPTY_STR(body.data));
-		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request,
+				ZBX_DEVICE_BA_ERR_INVALID_RESPONSE));
 		goto out;
 	}
 
@@ -335,7 +390,8 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
-		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request,
+				ZBX_DEVICE_BA_ERR_INVALID_RESPONSE));
 		goto out;
 	}
 
@@ -343,7 +399,8 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing JSON-RPC version in bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
-		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request,
+				ZBX_DEVICE_BA_ERR_INVALID_RESPONSE));
 		goto out;
 	}
 
@@ -351,7 +408,8 @@ static int	trapper_device_bridge_adapter_request(const zbx_config_comms_args_t *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid JSON-RPC version in bridge-adapter response body: %s,"
 				" expected 2.0", jsonrpc);
-		*error = zbx_dsprintf(NULL, "Failed to process %s request", request);
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(request,
+				ZBX_DEVICE_BA_ERR_INVALID_RESPONSE));
 		goto out;
 	}
 
@@ -404,14 +462,16 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_body))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing data object in " ZBX_PROTO_VALUE_DEVICE_INIT " request");
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(ZBX_PROTO_VALUE_DEVICE_INIT,
+				ZBX_DEVICE_BA_ERR_INVALID_RESPONSE));
 		goto out2;
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp_body, "uuid", device_id, sizeof(device_id), NULL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing uuid in " ZBX_PROTO_VALUE_DEVICE_INIT " request");
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(ZBX_PROTO_VALUE_DEVICE_INIT,
+				ZBX_DEVICE_BA_ERR_INVALID_RESPONSE));
 		goto out2;
 	}
 
@@ -445,13 +505,15 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s",
 					code, message);
 #endif
-			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+			*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(ZBX_PROTO_VALUE_DEVICE_INIT,
+					ZBX_DEVICE_BA_ERR_RETURNED_ERROR));
 		}
 		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "incomplete error in bridge-adapter response body: %s",
 					ZBX_NULL2EMPTY_STR(body_data));
-			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+			*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(ZBX_PROTO_VALUE_DEVICE_INIT,
+					ZBX_DEVICE_BA_ERR_INVALID_RESPONSE));
 		}
 
 		goto out;
@@ -461,7 +523,8 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing result in bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body_data));
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(ZBX_PROTO_VALUE_DEVICE_INIT,
+				ZBX_DEVICE_BA_ERR_INVALID_RESPONSE));
 		goto out;
 	}
 
@@ -472,7 +535,8 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const zbx_config
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing enrollment_token/adapter_enc_key/bridge_url in bridge-adapter"
 				" result: %s", ZBX_NULL2EMPTY_STR(body_data));
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_INIT " request");
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(ZBX_PROTO_VALUE_DEVICE_INIT,
+				ZBX_DEVICE_BA_ERR_INVALID_RESPONSE));
 		goto out;
 	}
 
@@ -635,14 +699,16 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_body))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing data object in " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(ZBX_PROTO_VALUE_DEVICE_OFFBOARD,
+				ZBX_DEVICE_BA_ERR_INVALID_RESPONSE));
 		goto out2;
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp_body, "uuid", device_id, sizeof(device_id), NULL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing uuid in " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
-		*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
+		*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(ZBX_PROTO_VALUE_DEVICE_OFFBOARD,
+				ZBX_DEVICE_BA_ERR_INVALID_RESPONSE));
 		goto out2;
 	}
 
@@ -669,15 +735,22 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const zbx_co
 				sizeof(message), NULL))
 		{
 			error_data = zbx_json_raw_value_by_path_dyn(&jp_result, "$.data");
+#ifdef ZBX_DEBUG
 			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s data: %s",
 					code, message, ZBX_NULL2EMPTY_STR(error_data));
-			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
+#else
+			zabbix_log(LOG_LEVEL_WARNING, "Bridge-adapter returned code: %s, message: %s",
+					code, message);
+#endif
+			*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(ZBX_PROTO_VALUE_DEVICE_OFFBOARD,
+					ZBX_DEVICE_BA_ERR_RETURNED_ERROR));
 		}
 		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "incomplete error in bridge-adapter response body: %s",
 					ZBX_NULL2EMPTY_STR(body_data));
-			*error = zbx_strdup(NULL, "Failed to process " ZBX_PROTO_VALUE_DEVICE_OFFBOARD " request");
+			*error = zbx_strdup(NULL, trapper_device_bridge_adapter_error(ZBX_PROTO_VALUE_DEVICE_OFFBOARD,
+					ZBX_DEVICE_BA_ERR_INVALID_RESPONSE));
 		}
 
 		goto out;

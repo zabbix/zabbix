@@ -35,8 +35,9 @@ class testBridgeAdapter extends CIntegrationTest {
 	private const REAL_NOTIFY_SUBJECT = 'Bridge adapter real notification';
 	private const REAL_NOTIFY_MESSAGE = 'Bridge adapter real notification message';
 	private const MEDIA_SEVERITY_ALL = 63;
-	private const PUSH_ALERT_ERROR_NO_PERMISSION = 'No permissions to referred device or it does not exist.';
-	private const PUSH_ALERT_ERROR_DEVICE_NOT_LINKED = 'Device linkage or registration is not finished.';
+	private const PUSH_ALERT_ERROR_DEVICE_UNKNOWN = 'Cannot deliver alert, device id is not known.';
+	private const PUSH_ALERT_ERROR_DEVICE_NOT_ACTIVE =
+		'Cannot deliver notification, target device is not in Active state.';
 	private const LOG_MOBILE_DEVICES_DISABLED_INIT = 'cannot initialize device: mobile devices are disabled';
 	private const LOG_MOBILE_DEVICES_DISABLED_NOTIFY =
 		'cannot send device notification: mobile devices are disabled';
@@ -699,12 +700,12 @@ class testBridgeAdapter extends CIntegrationTest {
 			[
 				'sendto' => self::UNKNOWN_DEVICE_UUID,
 				'status' => ALERT_STATUS_FAILED,
-				'error' => self::PUSH_ALERT_ERROR_NO_PERMISSION
+				'error' => self::PUSH_ALERT_ERROR_DEVICE_UNKNOWN
 			],
 			[
 				'sendto' => self::DEVICE_NOT_LINKED_UUID,
 				'status' => ALERT_STATUS_FAILED,
-				'error' => self::PUSH_ALERT_ERROR_DEVICE_NOT_LINKED
+				'error' => self::PUSH_ALERT_ERROR_DEVICE_NOT_ACTIVE
 			],
 			[
 				'sendto' => self::NOTIFY_DEVICE_UUID,
