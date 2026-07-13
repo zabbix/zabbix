@@ -49,6 +49,8 @@
 #include "zbxvault.h"
 #include "zbxautoreg.h"
 #include "zbxrtc.h"
+#include "zbxcfg.h"
+#include "zbxexpr.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -1001,37 +1003,71 @@ static int	process_active_check_heartbeat(zbx_socket_t *sock, const struct zbx_j
 {
 	char			host[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
 				hbfreq[ZBX_MAX_UINT64_LEN];
-	zbx_history_recv_host_t	recv_host;
 	unsigned char		*data = NULL;
 	zbx_uint32_t		data_len;
-	zbx_comms_redirect_t	redirect;
-	int			ret;
+	zbx_comms_redirect_t	redirect = {0};
+	zbx_uint64_t		hostid, revision;
+	unsigned char		status, monitored_by;
+	char			*error = NULL;
+	int			freq;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
 		return FAIL;
 
-	if (FAIL == (ret = zbx_dc_config_get_host_by_name(host, sock, &recv_host, &redirect)))
-		return FAIL;
-
-	if (SUCCEED_PARTIAL == ret)
+	if (FAIL == zbx_check_hostname(host, &error))
 	{
-		struct zbx_json	j;
-
-		zbx_json_init(&j, 1024);
-		zbx_add_redirect_response(&j, &redirect);
-		zbx_send_response_json(sock, FAIL, NULL, NULL, sock->protocol, config_timeout, j.buffer);
-		zbx_json_free(&j);
+		zabbix_log(LOG_LEVEL_WARNING, "invalid host name \"%s\" for heartbeat: %s", host, error);
+		zbx_free(error);
 
 		return FAIL;
 	}
 
-	if (HOST_MONITORED_BY_SERVER != recv_host.monitored_by || HOST_STATUS_NOT_MONITORED == recv_host.status)
+	if (SUCCEED != zbx_dc_check_host_conn_permissions(host, sock, &hostid, &status, &monitored_by,
+			&revision, &redirect, ZBX_AUTOREG_NO_CHANGES, &error))
+	{
+		if (0 != redirect.revision || ZBX_REDIRECT_NONE != redirect.reset)
+		{
+			struct zbx_json	j;
+
+			zbx_json_init(&j, 1024);
+			zbx_add_redirect_response(&j, &redirect);
+			(void)zbx_send_response_json(sock, FAIL, NULL, NULL, sock->protocol, config_timeout, j.buffer);
+			zbx_json_free(&j);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process heartbeat from host \"%s\": %s", host, error);
+		}
+
+		zbx_free(error);
+
+		return FAIL;
+	}
+
+	if (0 == hostid)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process heartbeat from host \"%s\": host not found", host);
+		return FAIL;
+	}
+
+	if (HOST_MONITORED_BY_SERVER != monitored_by || HOST_STATUS_NOT_MONITORED == status)
 		return SUCCEED;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HEARTBEAT_FREQ, hbfreq, sizeof(hbfreq), NULL))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid heartbeat message \"%s\"", sock->peer);
 		return FAIL;
+	}
 
-	data_len = zbx_availability_serialize_active_heartbeat(&data, recv_host.hostid, atoi(hbfreq));
+	if (SUCCEED != zbx_is_uint31(hbfreq, &freq) || 0 == freq || ZBX_AGENT_HEARTBEAT_FREQUENCY_MAX < freq)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid heartbeat frequency \"%s\" from \"%s\"", hbfreq,
+				sock->peer);
+
+		return FAIL;
+	}
+
+	data_len = zbx_availability_serialize_active_heartbeat(&data, hostid, freq);
 	zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HB, data, data_len, NULL);
 
 	zbx_free(data);
