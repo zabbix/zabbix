@@ -36,7 +36,6 @@ $house_keeper_tab = (new CFormList())
 		(new CCheckBox('hk_events_mode'))
 			->setChecked($data['hk_events_mode'] == 1)
 			->setUncheckedValue(0)
-			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(
 		(new CLabel(_('Trigger data storage period'), 'hk_events_trigger'))->setAsteriskMark(),

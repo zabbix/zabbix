@@ -1785,7 +1785,7 @@ msgstr "Plkst. %1$s %4$s cikla %2$s %3$s"
 #: include/classes/helpers/CMaintenanceHelper.php:119
 #, c-format
 msgid "At %1$s on day %2$s of every %3$s"
-msgstr "Plkst. %1$s katra %3$s cikla %2$. dienā"
+msgstr "Plkst. %1$s katra %3$s cikla %2$s. dienā"
 
 #: app/views/maintenance.timeperiod.edit.php:189
 msgid "At (hour:minute)"
