@@ -180,7 +180,7 @@ $translate_strings = [
 		'No refresh' => _('No refresh'),
 		'Paste' => _('Paste'),
 		'Refresh interval' => _('Refresh interval'),
-		'Edit widget' => _('Edit widget settings'),
+		'Edit widget settings' => _('Edit widget settings'),
 		'Open widget actions' => _('Open widget actions')
 	],
 	'class.widget.inaccessible.js' => [
