@@ -110,7 +110,7 @@ class CControllerCepRuleEdit extends CController {
 					'conditions' => []
 				],
 				'window_type' => CCepRuleHelper::WINDOW_NONE,
-				'window' => DB::getDefaults('cep_window'),
+				'window' => ['tags' => []] + DB::getDefaults('cep_window'),
 				'operations' => []
 			]];
 		}

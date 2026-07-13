@@ -232,6 +232,7 @@ class CCepRule extends CApiService {
 
 		foreach ($cep_rules as &$cep_rule) {
 			$cep_rule['window'] = [];
+			$cep_rule['window']['tags'] = [];
 		}
 		unset($cep_rule);
 
@@ -896,7 +897,8 @@ class CCepRule extends CApiService {
 					|| $db_cep_rules[$cep_ruleid]['window_type'] == CCepRuleHelper::WINDOW_NONE) {
 				$ins_windows[] = [
 					'cep_ruleid' => $cep_ruleid,
-					'type' => $cep_rule['window_type']
+					'type' => $cep_rule['window_type'],
+					'tags' => implode(PHP_EOL, $cep_rule['window']['tags'])
 				] + $cep_rule['window'];
 			}
 			else {
@@ -1269,8 +1271,13 @@ class CCepRule extends CApiService {
 			return;
 		}
 
+		$operation_output = self::OPERATIONS_OUTPUT_FIELDS;
+		$operation_output[] = 'cep_operationid';
+		$operation_output[] = 'cep_ruleid';
+		unset($operation_output[array_search('tags', $operation_output)]);
+
 		$options = [
-			'output' => array_merge(['cep_operationid', 'cep_ruleid'], self::OPERATIONS_OUTPUT_FIELDS),
+			'output' => $operation_output,
 			'filter' => ['cep_ruleid' => $cep_ruleids],
 			'sortfield' => ['sortorder']
 		];
