@@ -45,7 +45,6 @@ class CWidgetElement extends CElement {
 		$this->getHeader()->hoverMouse();
 		$this->query('xpath:.//li[@class="widget-info-button"]/button')->waitUntilPresent()->one()->click(true);
 		$hintbox = $this->query('xpath://div[contains(@class, "overlay-dialogue hintbox wordbreak")]')->waitUntilVisible()->one();
-
 		$hint_text = $hintbox->getText();
 
 		return $hint_text;
