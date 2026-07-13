@@ -117,21 +117,6 @@ window.check_popup = new class {
 		this.#removePopupMessages();
 		let fields = this.#form.getAllValues();
 
-		for (const element of this.#form_element.parentNode.children) {
-			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-				element.parentNode.removeChild(element);
-			}
-		}
-
-		if (fields.type !== [<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>, <?= SVC_AGENT ?>]) {
-			if (!fields['key_'] && !fields['snmp_oid']) {
-				delete fields['key_'];
-				delete fields['snmp_oid'];
-			} else if (!fields['key_']) {
-				fields['key_'] = fields['snmp_oid'];
-			}
-		}
-
 		this.#form.validateSubmit(fields)
 			.then((result) => {
 				if (!result) {
@@ -163,8 +148,10 @@ window.check_popup = new class {
 					return;
 				}
 
-				this.#dialogue.dispatchEvent(new CustomEvent('check.submit', {detail: response}));
-				overlayDialogueDestroy(this.#overlay.dialogueid);
+				if (this.#overlay.$dialogue[0].isConnected) {
+					this.#dialogue.dispatchEvent(new CustomEvent('check.submit', {detail: response}));
+					overlayDialogueDestroy(this.#overlay.dialogueid);
+				}
 			})
 			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => this.#overlay.unsetLoading());

@@ -26,7 +26,6 @@ window.drule_edit_popup = new class {
 	#form_element;
 	#form;
 	#clone_rules;
-	#druleid;
 	#dchecks;
 	#drule;
 	#dcheckid;
@@ -39,7 +38,6 @@ window.drule_edit_popup = new class {
 		this.#form = new CForm(this.#form_element, rules);
 		this.#clone_rules = clone_rules;
 
-		this.#druleid = drule.druleid;
 		this.#dchecks = dchecks;
 		this.#drule = drule;
 		this.#dcheckid = getUniqueId();
@@ -114,7 +112,7 @@ window.drule_edit_popup = new class {
 
 	#updateCheck(row, input) {
 		delete input.dchecks;
-		input.dcheckid = row.id.substring(row.id.indexOf('_') + 1);
+		input.dcheckid = row.dataset.dcheckid;
 		input.warning = row.querySelector('.btn-icon')?.getAttribute('data-hintbox-html');
 
 		this.#addCheck(input, row, true);
@@ -147,7 +145,7 @@ window.drule_edit_popup = new class {
 		let dchecks = this.#form.findFieldByName('dchecks').getValue();
 
 		if (row !== null) {
-			const current_dcheckid = row.id.substring(row.id.indexOf('_') + 1);
+			const current_dcheckid = row.dataset.dcheckid;
 
 			if (Object.prototype.hasOwnProperty.call(dchecks, current_dcheckid)) {
 				dchecks = {...dchecks};
@@ -167,8 +165,7 @@ window.drule_edit_popup = new class {
 				this.#updateCheck(row, e.detail);
 			}
 			else {
-				e.detail.dcheckid = this.#dcheckid;
-				this.#dcheckid = getUniqueId();
+				e.detail.dcheckid = getUniqueId();
 				this.#addCheck(e.detail, null);
 				this.#form.discoverAllFields();
 			}
@@ -184,29 +181,35 @@ window.drule_edit_popup = new class {
 			}
 		});
 
-		document.querySelectorAll('#device-uniqueness-list, #host_source, #name_source').forEach((element) => {
+		document.querySelectorAll('#host_source, #name_source').forEach((element) => {
 			element.addEventListener('change', (e) => {
 				this.#updateRadioButtonValues(e);
 			});
 		});
+
+		document.querySelectorAll('#device-uniqueness-list').forEach((element) => {
+			element.addEventListener('change', (e) => {
+				this.#updateRadioButtonUniquenessCriteria(e);
+			});
+		});
+	}
+
+	#updateRadioButtonUniquenessCriteria(event) {
+		let target = event.target;
+
+		document.querySelectorAll('[name^=dchecks][name$="[uniq]"]')
+			.forEach((dcheck) => {
+				dcheck.value = 0;
+			});
+
+		if (typeof target.dataset.id !== 'undefined') {
+			document.querySelector(`[name="dchecks[${target.dataset.id}][uniq]"]`).value = 1;
+		}
 	}
 
 	#updateRadioButtonValues(event) {
 		let target = event.target;
 		let name = target.getAttribute('name');
-
-		if (name === 'uniqueness_criteria') {
-			document.querySelectorAll('[name^=dchecks][name$="[uniq]"]')
-				.forEach((dcheck) => {
-					dcheck.value = 0;
-				});
-
-			if (typeof target.dataset.id !== 'undefined') {
-				document.querySelector(`[name="dchecks[${target.dataset.id}][uniq]"]`).value = 1;
-			}
-
-			return;
-		}
 
 		if (typeof target.dataset.id !== 'undefined') {
 			document.querySelectorAll(`[name^=dchecks][name$="[${name}]"]`)
@@ -232,7 +235,7 @@ window.drule_edit_popup = new class {
 
 		if (update === false) {
 			if (typeof input.uniq === 'undefined') {
-				const checked_uniqueness_criteria = document.querySelector('[name="uniqueness_criteria"]:checked');
+				const checked_uniqueness_criteria = document.querySelector('[name="uniqueness_criteria"]:checked:not([data-id])');
 				input.uniq = checked_uniqueness_criteria !== null
 				&& checked_uniqueness_criteria.value === input.dcheckid
 					? 1
@@ -406,8 +409,6 @@ window.drule_edit_popup = new class {
 
 	#clone() {
 		this.#removePopupMessages();
-		this.#druleid = null;
-		document.getElementById('druleid').remove();
 
 		// Remove all warning icons and enable all Remove buttons in Checks table.
 		const table = document.getElementById('dcheckList');
@@ -448,7 +449,7 @@ window.drule_edit_popup = new class {
 			[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('discovery')) ?>
 		};
 
-		this.#post(zabbixUrl(url_params), {druleids: [this.#druleid]}, (response) => {
+		this.#post(zabbixUrl(url_params), {druleids: [this.#form.findFieldByName('druleid').getValue()]}, (response) => {
 			overlayDialogueDestroy(this.#overlay.dialogueid);
 
 			this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
@@ -458,6 +459,7 @@ window.drule_edit_popup = new class {
 	#submit() {
 		this.#removePopupMessages();
 		const fields = this.#form.getAllValues();
+		const action = document.getElementById('druleid') !== null ? 'discovery.update' : 'discovery.create';
 
 		this.#form.validateSubmit(fields)
 			.then((result) => {
@@ -465,8 +467,6 @@ window.drule_edit_popup = new class {
 					this.#overlay.unsetLoading();
 					return;
 				}
-
-				const action = document.getElementById('druleid') !== null ? 'discovery.update' : 'discovery.create';
 
 				this.#post(zabbixUrl({action}), fields, (response) => {
 					overlayDialogueDestroy(this.#overlay.dialogueid);

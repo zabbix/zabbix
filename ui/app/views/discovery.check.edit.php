@@ -28,12 +28,15 @@ $form = (new CForm())->addStyle('display: none;');
 
 $dchecks = array_values($data['dchecks'] ?? []);
 
+$allowedKeys = [
+	'type', 'ports', 'key_', 'snmp_community', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
+	'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'allow_redirect'
+];
+
 foreach ($dchecks as $index => $dcheck) {
-	foreach ($dcheck as $key => $value) {
-		if (in_array($key, ['type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
-				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
-				'snmpv3_contextname', 'allow_redirect'])) {
-			$form->addVar('dchecks['.$index.']['.$key.']', $value);
+	foreach ($allowedKeys as $key) {
+		if (array_key_exists($key, $dcheck)) {
+			$form->addVar('dchecks['.$index.']['.$key.']', $dcheck[$key]);
 		}
 	}
 }

@@ -223,6 +223,7 @@ $check_template_default = (new CTemplateTag('dcheck-row-tmpl'))->addItem(
 	]))
 		->setId('dcheckRow_#{dcheckid}')
 		->setAttribute('dcheckRow', '#{dcheckid}')
+		->setAttribute('data-dcheckid', '#{dcheckid}')
 );
 
 $form

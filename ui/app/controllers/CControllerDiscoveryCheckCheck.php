@@ -30,9 +30,9 @@ class CControllerDiscoveryCheckCheck extends CController {
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
 			'dchecks' => ['objects',
-				'uniq' => ['type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
-					'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
-					'snmpv3_contextname', 'allow_redirect'
+				'uniq' => ['type', 'ports', 'key_', 'snmp_community', 'snmpv3_contextname', 'snmpv3_securityname',
+					'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
+					'snmpv3_privpassphrase', 'allow_redirect'
 				],
 				'fields' => [
 					'type' => ['db dchecks.type',
@@ -116,7 +116,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 					'uniq' => _('Checks should be unique.')
 				]
 			],
-			'type' => ['db dchecks.type', 'required', 'not_empty',
+			'type' => ['db dchecks.type', 'required',
 				'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,
 					SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET
 				]
@@ -137,14 +137,14 @@ class CControllerDiscoveryCheckCheck extends CController {
 					'use' => [CItemKey::class],
 					'when' => ['type', 'in' => [SVC_AGENT]]
 				],
-				['db dchecks.key_', 'required', 'not_empty',
+				['db dchecks.key_', 'required',
 					'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
 				]
 			],
 			'snmp_community' => ['db dchecks.snmp_community', 'required', 'not_empty',
 				'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c]]
 			],
-			'snmp_oid' => ['string', 'required', 'not_empty',
+			'snmp_oid' => ['string', 'required',
 				'when' => ['type', 'in' => [SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3]]
 			],
 			'snmpv3_securityname' => ['db dchecks.snmpv3_securityname',
@@ -250,6 +250,12 @@ class CControllerDiscoveryCheckCheck extends CController {
 		$data = array_merge([
 			'type' => self::DEFAULT_TYPE
 		], $this->getInputAll());
+
+		if (in_array($data['type'], [SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_AGENT])) {
+			if (!empty($data['snmp_oid'])) {
+				$data['key_'] = $data['snmp_oid'];
+			}
+		}
 
 		$is_valid = self::validateDuplicateDCheck($data);
 
