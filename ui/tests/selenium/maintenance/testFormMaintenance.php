@@ -205,7 +205,7 @@ class testFormMaintenance extends CWebTest {
 
 			// Check Periods table.
 			$periods_table = $this->query(self::PERIODS_TABLE)->asTable()->one();
-			$this->assertEquals(['Period type', 'Schedule', 'Period', 'Action'], $periods_table->getHeadersText());
+			$this->assertEquals(['Period type', 'Schedule', 'Period', 'Actions'], $periods_table->getHeadersText());
 
 			$periods_rows_count = ($is_update) ? count(self::EXPECTED_PERIODS) : 0;
 			$this->assertEquals($periods_rows_count, $periods_table->getRows()->count());
@@ -983,7 +983,7 @@ class testFormMaintenance extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
 
 		if ($update) {
-			// Add prefix to the Update scenarios taking into account the trainling and leading spaces scenario.
+			// Add prefix to the Update scenarios taking into account the trailing and leading spaces scenario.
 			if ($expected === TEST_GOOD) {
 				$data['fields']['Name'] = (CTestArrayHelper::get($data, 'trim'))
 					? ' Updated - '.trim($data['fields']['Name']).'  '
@@ -1035,7 +1035,7 @@ class testFormMaintenance extends CWebTest {
 				$this->assertInlineError($form, $data['inline_errors']);
 			}
 			else {
-				$this->assertMessage(TEST_BAD, 'Cannot create maintenance period', $data['error_details']);
+				$this->assertMessage(TEST_BAD, 'Cannot '.$action.' maintenance period', $data['error_details']);
 			}
 
 			// Check that DB hash has not changed.
@@ -1173,7 +1173,7 @@ class testFormMaintenance extends CWebTest {
 						'name:period_minutes' => '0'
 					],
 					'inline_errors' => [
-						'Every day(s)' => 'This value must be no less than "1".',
+						'Every day(s)' => 'Value must be greater than or equal to 1.',
 						'name:period_minutes' => 'Minutes: Minimum value of "Maintenance period length" is 5 minutes.'
 					]
 				]
@@ -1188,9 +1188,9 @@ class testFormMaintenance extends CWebTest {
 						'id:period_days' => '-9'
 					],
 					'inline_errors' => [
-						'id:hour' => 'Hour: This value must be no greater than "23".',
-						'id:minute' => 'Minute: This value must be no greater than "59".',
-						'id:period_days' => 'Days: This value must be no less than "0".'
+						'id:hour' => "Hour: Value must be less than or equal to 23.",
+						'id:minute' => "Minute: Value must be less than or equal to 59.",
+						'id:period_days' => 'Days: Value must be greater than or equal to 0.'
 					]
 				]
 			],
@@ -1202,7 +1202,7 @@ class testFormMaintenance extends CWebTest {
 						'Every week(s)' => '0'
 					],
 					'inline_errors' => [
-						'Every week(s)' => 'This value must be no less than "1".',
+						'Every week(s)' => 'Value must be greater than or equal to 1.',
 						'xpath:.//ul[@data-field-name="weekly_days"]' => 'At least one day must be selected.'
 					]
 				]
@@ -1215,7 +1215,7 @@ class testFormMaintenance extends CWebTest {
 						'Day of month' => '0'
 					],
 					'inline_errors' => [
-						'Day of month' => 'This value must be no less than "1".',
+						'Day of month' => 'Value must be greater than or equal to 1.',
 						'xpath:.//ul[@data-field-name="months"]' => 'At least one month must be selected.'
 					]
 				]
@@ -1270,7 +1270,7 @@ class testFormMaintenance extends CWebTest {
 			$overlay = COverlayDialogElement::find(1)->waitUntilReady()->one();
 			$overlay->asForm()->fill($data['fields'])->submit();
 
-			$this->assertInlineError($overlay, $data['inline_errors']);
+			$this->assertInlineError($overlay->asForm(), $data['inline_errors']);
 
 			COverlayDialogElement::closeAll();
 		}

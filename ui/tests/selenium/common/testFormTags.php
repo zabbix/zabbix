@@ -250,7 +250,7 @@ class testFormTags extends CWebTest {
 		$old_hash = null;
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 		$inline_validation = in_array($object, ['host', 'host prototype', 'template', 'trigger', 'trigger prototype',
-			'item', 'item prototype', 'service', 'connector']
+			'item', 'item prototype', 'service', 'connector', 'maintenance']
 		);
 
 		switch ($object) {
@@ -349,11 +349,7 @@ class testFormTags extends CWebTest {
 			$form->selectTab('Tags');
 		}
 
-		$tags_table = $this->query($this->tags_table)->asMultifieldTable()->one();
-		if ($object === 'maintenance') {
-			$tags_table->setFieldMapping(['tag', 'operator', 'value']);
-		}
-
+		$tags_table = $this->getTagsTable($object);
 		$tags_table->fill($data['tags']);
 
 		// Check screenshots of text area right after filling.
@@ -506,7 +502,7 @@ class testFormTags extends CWebTest {
 		$old_hash = null;
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 		$inline_validation = in_array($object, ['host', 'host prototype', 'template', 'trigger', 'trigger prototype',
-			'item', 'item prototype', 'service', 'connector'
+			'item', 'item prototype', 'service', 'connector', 'maintenance'
 		]);
 
 		switch ($object) {
@@ -574,11 +570,7 @@ class testFormTags extends CWebTest {
 			$form->selectTab('Tags');
 		}
 
-		$tags_table = $this->query($this->tags_table)->asMultifieldTable()->waitUntilPresent()->one();
-		if ($object === 'maintenance') {
-			$tags_table->setFieldMapping(['tag', 'operator', 'value']);
-		}
-
+		$tags_table = $this->getTagsTable($object);
 		$tags_table->fill($data['tags']);
 
 		if ($inline_validation && $expected === TEST_BAD) {
@@ -983,12 +975,7 @@ class testFormTags extends CWebTest {
 		}
 		unset($tag);
 
-		$tags_table = $this->query($this->tags_table)->asMultifieldTable()->one();
-
-		if ($object === 'maintenance') {
-			$tags_table->setFieldMapping(['tag', 'operator', 'value']);
-		}
-
+		$tags_table = $this->getTagsTable($object);
 		$tags_table->checkValue($expected);
 
 		// Check screenshot of text area after saving.
@@ -1490,16 +1477,38 @@ class testFormTags extends CWebTest {
 			$form->selectTab('Tags');
 		}
 
-		$tags_table = $this->query($this->tags_table)->asMultifieldTable()->waitUntilPresent()->one();
-
-		if ($object === 'maintenance') {
-			$tags_table->setFieldMapping(['tag', 'operator', 'value']);
-		}
-
+		$tags_table = $this->getTagsTable($object);
 		$tags_table->clear();
 		$form->submit();
 		$this->page->waitUntilReady();
 
 		$this->checkResult($data, $object, $form, 'update');
+	}
+
+	/**
+	 * Helper to get the correct MultifieldTable configuration for different objects.
+	 *
+	 * @param string $object    Object type (e.g., 'host', 'template', 'maintenance').
+	 *
+	 * @return CMultifieldTableElement
+	 */
+	protected function getTagsTable($object) {
+		$options = [];
+		if ($object === 'maintenance') {
+			$options['selectors'] = [
+				'header' => 'xpath:.//thead/tr/th',
+				// Filter out error container rows by matching only rows containing textareas.
+				'row'    => 'xpath:.//tbody/tr[.//textarea]',
+				'column' => 'xpath:.//td'
+			];
+		}
+
+		$table = $this->query($this->tags_table)->asMultifieldTable($options)->one();
+
+		if ($object === 'maintenance') {
+			$table->setFieldMapping(['tag', 'operator', 'value']);
+		}
+
+		return $table;
 	}
 }
