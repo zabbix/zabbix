@@ -334,7 +334,7 @@ class testFormTags extends CWebTest {
 				break;
 
 			case 'maintenance':
-				$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one()->waitUntilVisible();
+				$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 				$form->fill($fields);
 				$form->getField('Periods')->query('button:Add')->one()->click();
 				$period_form = COverlayDialogElement::find(1)->waitUntilReady()->asForm()->one();
@@ -374,7 +374,6 @@ class testFormTags extends CWebTest {
 		$this->checkResult($data, $object, $form, 'add', $sql, $old_hash, $inline_validation);
 
 		return $form;
-
 	}
 
 	public static function getUpdateData() {
@@ -562,9 +561,9 @@ class testFormTags extends CWebTest {
 			$this->query('link', $this->update_name)->waitUntilClickable()->one()->click();
 		}
 
-			$form = ($object === 'web scenario' || $object === 'host prototype')
-					? $this->query($locator)->asForm()->waitUntilPresent()->one()
-					: COverlayDialogElement::find()->waitUntilVisible()->asForm()->one();
+		$form = ($object === 'web scenario' || $object === 'host prototype')
+			? $this->query($locator)->asForm()->waitUntilPresent()->one()
+			: COverlayDialogElement::find()->waitUntilVisible()->asForm()->one();
 
 		if (!$this->problem_tags && !in_array($object, ['connector', 'maintenance'])) {
 			$form->selectTab('Tags');
