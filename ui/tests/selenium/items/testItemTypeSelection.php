@@ -191,9 +191,8 @@ class testItemTypeSelection extends CWebTest {
 			$icon = $this->query('class:js-hint')->waitUntilClickable()->one();
 			$icon->click();
 			$this->assertEquals($data['hint_text'], $form->query('xpath://div[contains(@class, "hintbox-wrap")]')
-				->waitUntilPresent()->one()->getText()
+					->waitUntilPresent()->one()->getText()
 			);
-
 		}
 		elseif (CTestArrayHelper::get($data, 'hint') === false) {
 			$this->assertFalse($form->query('class:js-hint')->waitUntilPresent()->one()->isVisible());
