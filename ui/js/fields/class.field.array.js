@@ -79,24 +79,4 @@ class CFieldArray extends CFieldCollection {
 			}
 		}
 	}
-
-	lock() {
-		let res = false;
-
-		for (const field of Object.values(this.#fields)) {
-			res = field.lock() || res;
-		}
-
-		return res;
-	}
-
-	unlock() {
-		let res = false;
-
-		for (const field of Object.values(this.#fields)) {
-			res = field.unlock() || res;
-		}
-
-		return res;
-	}
 }
