@@ -96,6 +96,11 @@ abstract class CControllerCepRuleGeneral extends CController {
 
 		if (array_key_exists('operations', $request)) {
 			$request['operations'] = array_values($request['operations']);
+			array_walk($request['operations'], function(array &$operation) {
+				if ($operation['type'] == CCepRuleHelper::OP_SUPPRESS && $operation['suppress_until'] === '') {
+					$operation['suppress_until'] = DB::getDefault('cep_operation', 'suppress_until');
+				}
+			});
 		}
 
 		return $request;
