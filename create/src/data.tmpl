@@ -1142,12 +1142,12 @@ ROW   |2            |{$SNMP_COMMUNITY}       |public       |           |0   |
 ROW   |3            |{$TRAPPER.ALLOWED_HOSTS}|127.0.0.1,::1|           |0   |
 
 TABLE |regexps
-FIELDS|regexpid|name                                        |test_string|
-ROW   |1       |File systems for discovery                  |ext3       |
-ROW   |2       |Network interfaces for discovery            |eth0       |
-ROW   |3       |Storage devices for SNMP discovery          |/boot      |
-ROW   |4       |Windows service names for discovery         |SysmonLog  |
-ROW   |5       |Windows service startup states for discovery|automatic  |
+FIELDS|regexpid|name                                        |test_string|description|
+ROW   |1       |File systems for discovery                  |ext3       |           |
+ROW   |2       |Network interfaces for discovery            |eth0       |           |
+ROW   |3       |Storage devices for SNMP discovery          |/boot      |           |
+ROW   |4       |Windows service names for discovery         |SysmonLog  |           |
+ROW   |5       |Windows service startup states for discovery|automatic  |           |
 
 TABLE |expressions
 FIELDS|expressionid|regexpid|expression                                                                                                                                                            |expression_type|exp_delimiter|case_sensitive|

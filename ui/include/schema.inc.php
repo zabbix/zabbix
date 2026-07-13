@@ -4250,7 +4250,7 @@ return [
 			],
 			'description' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'length' => 2048,
 				'default' => ''
 			]
