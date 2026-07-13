@@ -1681,11 +1681,6 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.config_tls = zbx_config_tls
 		};
 
-	zbx_thread_otel_manager_args_t	otel_args =
-		{
-			.config_timeout = zbx_config_timeout,
-		};
-
 	thread_args.info.program_type = zbx_program_type;
 
 	/* prepare supervisor unit definitions */
@@ -1702,10 +1697,17 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.args = &proxyconfig_args
 	};
 
+#ifdef HAVE_OTEL
+	zbx_thread_otel_manager_args_t	otel_args =
+	{
+		.config_timeout = zbx_config_timeout,
+	};
+
 	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_OTEL_MANAGER] = (zbx_supervisor_unit_def_t){
 		.entry = zbx_otel_manager_thread,
 		.args = &otel_args
-};
+	};
+#endif
 
 	zbx_vector_proc_info_t	*processes = &runlevels[runlevel].processes;
 
