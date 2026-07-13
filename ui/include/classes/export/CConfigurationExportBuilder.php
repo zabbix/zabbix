@@ -301,30 +301,30 @@ class CConfigurationExportBuilder {
 	 * Format global regexes.
 	 *
 	 * @param array $schema      Tag schema from validation class.
-	 * @param array $regexps  Export data.
+	 * @param array $global_regexes  Export data.
 	 */
-	public function buildGlobalRegexes(array $schema, array $regexps): void {
-		$regexps = $this->formatGlobalRegexes($regexps);
+	public function buildGlobalRegexes(array $schema, array $global_regexes): void {
+		$global_regexes = $this->formatGlobalRegexes($global_regexes);
 
-		$this->data['global_regexes'] = self::build($schema, $regexps, 'global_regexes');
+		$this->data['global_regexes'] = self::build($schema, $global_regexes, 'global_regexes');
 	}
 
 	/**
 	 * Format global regexes.
 	 *
-	 * @param array $regexps
+	 * @param array $global_regexes
 	 *
 	 * @return array
 	 */
-	protected function formatGlobalRegexes(array $regexps): array {
+	protected function formatGlobalRegexes(array $global_regexes): array {
 		$result = [];
 
-		CArrayHelper::sort($regexps, ['name']);
+		CArrayHelper::sort($global_regexes, ['name']);
 
-		foreach ($regexps as $i => $regexp) {
+		foreach ($global_regexes as $i => $global_regex) {
 			$expressions = [];
 
-			foreach ($regexp['expressions'] as $expression) {
+			foreach ($global_regex['expressions'] as $expression) {
 				$expressions[] = [
 					'expression' => $expression['expression'],
 					'type' => $expression['expression_type'],
@@ -333,11 +333,11 @@ class CConfigurationExportBuilder {
 				];
 			}
 
-			CArrayHelper::sort($regexp['expressions'], ['type', 'expression']);
+			CArrayHelper::sort($global_regex['expressions'], ['type', 'expression']);
 
 			$result[$i] = [
-				'name' => $regexp['name'],
-				'description' => $regexp['description'],
+				'name' => $global_regex['name'],
+				'description' => $global_regex['description'],
 				'expressions' => $expressions
 			];
 		}

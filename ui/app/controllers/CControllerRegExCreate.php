@@ -86,21 +86,21 @@ class CControllerRegExCreate extends CController {
 	}
 
 	protected function doAction(): void {
-		$regexp = [
+		$global_regex = [
 			'name' => $this->getInput('name'),
 			'description' => $this->getInput('description', ''),
 			'test_string' => $this->getInput('test_string', ''),
 			'expressions' => $this->getInput('expressions')
 		];
 
-		foreach ($regexp['expressions'] as &$expression) {
+		foreach ($global_regex['expressions'] as &$expression) {
 			if ($expression['expression_type'] != REGEX_TYPE_STRING_IN_LIST) {
 				$expression['exp_delimiter'] = '';
 			}
 		}
 		unset($expression);
 
-		$result = API::Regexp()->create($regexp);
+		$result = API::Regexp()->create($global_regex);
 
 		$output = [];
 

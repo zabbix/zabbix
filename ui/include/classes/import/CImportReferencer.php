@@ -971,13 +971,13 @@ class CImportReferencer {
 	 *
 	 * @return string|null
 	 */
-	public function findGlobalRegexByName(string $name): ?string {
+	public function findGlobalRegexidByName(string $name): ?string {
 		if ($this->db_global_regexes === null) {
 			$this->selectGlobalRegexes();
 		}
 
-		foreach ($this->db_global_regexes as $regexpid => $regexp) {
-			if ($regexp['name'] === $name) {
+		foreach ($this->db_global_regexes as $regexpid => $global_regex) {
+			if ($global_regex['name'] === $name) {
 				return $regexpid;
 			}
 		}
@@ -1339,10 +1339,10 @@ class CImportReferencer {
 	/**
 	 * Add global regexes names that need association with a database regexp ID.
 	 *
-	 * @param array $regexps
+	 * @param array $global_regexes
 	 */
-	public function addGlobalRegexes(array $regexps): void {
-		$this->global_regexes = $regexps;
+	public function addGlobalRegexes(array $global_regexes): void {
+		$this->global_regexes = $global_regexes;
 	}
 
 	/**

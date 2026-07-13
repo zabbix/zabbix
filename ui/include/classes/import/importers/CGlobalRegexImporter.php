@@ -22,31 +22,31 @@ class CGlobalRegexImporter extends CImporter {
 	/**
 	 * Import global regexes.
 	 *
-	 * @param array $regexps
+	 * @param array $global_regexes
 	 */
-	public function import(array $regexps): void {
-		$regexps_to_create = [];
-		$regexps_to_update = [];
+	public function import(array $global_regexes): void {
+		$global_regexes_to_create = [];
+		$global_regexes_to_update = [];
 
-		foreach ($regexps as $regexp) {
-			$regexpid = $this->referencer->findGlobalRegexByName($regexp['name']);
+		foreach ($global_regexes as $global_regex) {
+			$regexpid = $this->referencer->findGlobalRegexidByName($global_regex['name']);
 
 			if ($regexpid !== null && $this->options['global_regexes']['updateExisting']) {
-				$regexp['regexpid'] = $regexpid;
+				$global_regex['regexpid'] = $regexpid;
 
-				$regexps_to_update[] = $regexp;
+				$global_regexes_to_update[] = $global_regex;
 			}
 			elseif ($regexpid === null && $this->options['global_regexes']['createMissing']) {
-				$regexps_to_create[] = $regexp;
+				$global_regexes_to_create[] = $global_regex;
 			}
 		}
 
-		if ($regexps_to_update) {
-			API::Regexp()->update($regexps_to_update);
+		if ($global_regexes_to_update) {
+			API::Regexp()->update($global_regexes_to_update);
 		}
 
-		if ($regexps_to_create) {
-			API::Regexp()->create($regexps_to_create);
+		if ($global_regexes_to_create) {
+			API::Regexp()->create($global_regexes_to_create);
 		}
 	}
 }

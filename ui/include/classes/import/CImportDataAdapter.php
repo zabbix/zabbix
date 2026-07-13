@@ -436,21 +436,21 @@ class CImportDataAdapter {
 	 * @return array
 	 */
 	public function getGlobalRegexes(): array {
-		$regexps = [];
+		$global_regexes = [];
 
 		if (array_key_exists('global_regexes', $this->data)) {
-			foreach ($this->data['global_regexes'] as $regexp) {
-				foreach ($regexp['expressions'] as &$expression) {
+			foreach ($this->data['global_regexes'] as $global_regex) {
+				foreach ($global_regex['expressions'] as &$expression) {
 					$expression['expression_type'] = $expression['type'];
 					unset($expression['type']);
 				}
 				unset($expression);
 
-				$regexps[$regexp['name']] = $regexp;
+				$global_regexes[$global_regex['name']] = $global_regex;
 			}
 		}
 
-		return $regexps;
+		return $global_regexes;
 	}
 
 	/**

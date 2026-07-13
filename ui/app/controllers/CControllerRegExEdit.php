@@ -79,13 +79,13 @@ class CControllerRegExEdit extends CController {
 			]]
 		];
 
-		$regexp = array_replace($regexp_default, $this->getInput('regexp', []), $this->db_regexp);
+		$global_regex = array_replace($regexp_default, $this->getInput('regexp', []), $this->db_regexp);
 		$js_validation_rules = $this->hasInput('regexpid')
 			? CControllerRegExUpdate::getValidationRules()
 			: CControllerRegExCreate::getValidationRules();
 
 		$data = [
-			'regexp' => $regexp,
+			'regexp' => $global_regex,
 			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules(),
 			'js_clone_validation_rules' => (new CFormValidator(CControllerRegExCreate::getValidationRules()))
 				->getRules(),

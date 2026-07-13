@@ -599,7 +599,7 @@ class CConfigurationImport {
 			);
 		}
 
-		foreach ($this->getFormattedGlobalRegexes() as $name => $regexp) {
+		foreach ($this->getFormattedGlobalRegexes() as $name => $global_regex) {
 			$global_regexes_refs[$name] = [];
 		}
 
@@ -2384,15 +2384,15 @@ class CConfigurationImport {
 			return;
 		}
 
-		$regexps = $this->getFormattedGlobalRegexes();
+		$global_regexes = $this->getFormattedGlobalRegexes();
 
-		if (!$regexps) {
+		if (!$global_regexes) {
 			return;
 		}
 
-		$regexp_importer = new CGlobalRegexImporter($this->options, $this->referencer, $this->importedObjectContainer);
+		$regex_importer = new CGlobalRegexImporter($this->options, $this->referencer, $this->importedObjectContainer);
 
-		$regexp_importer->import($regexps);
+		$regex_importer->import($global_regexes);
 	}
 
 	/**

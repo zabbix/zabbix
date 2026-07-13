@@ -79,11 +79,11 @@ $table = (new CTableInfo())
 	])
 	->setPageNavigation($data['paging']);
 
-foreach ($data['regexps'] as $regexpid => $regexp) {
+foreach ($data['regexps'] as $regexpid => $global_regex) {
 	$numb = 1;
 	$expressions = [];
 
-	foreach ($regexp['expressions'] as $expression) {
+	foreach ($global_regex['expressions'] as $expression) {
 		$expressions[] = (new CTable())->addRow([
 			new CCol($numb++),
 			new CCol([' ', RARR(), ' ']),
@@ -101,10 +101,10 @@ foreach ($data['regexps'] as $regexpid => $regexp) {
 	$table->addRow([
 		new CCheckBox('regexpids['.$regexpid.']', $regexpid),
 		(new CCol(
-			new CLink($regexp['name'], $regexp_url)
+			new CLink($global_regex['name'], $regexp_url)
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		$expressions,
-		(new CCol($regexp['description']))->addClass(ZBX_STYLE_WORDBREAK)
+		(new CCol($global_regex['description']))->addClass(ZBX_STYLE_WORDBREAK)
 	]);
 }
 
