@@ -895,6 +895,11 @@ class CCepRule extends CApiService {
 			}
 			elseif ($db_cep_rules === null
 					|| $db_cep_rules[$cep_ruleid]['window_type'] == CCepRuleHelper::WINDOW_NONE) {
+
+				if (!array_key_exists('tags', $cep_rule['window'])) {
+					$cep_rule['window']['tags'] = [];
+				}
+
 				$ins_windows[] = [
 					'cep_ruleid' => $cep_ruleid,
 					'type' => $cep_rule['window_type'],
@@ -965,7 +970,8 @@ class CCepRule extends CApiService {
 			}
 
 			$cep_rule['window'] += array_diff_key($db_defaults, array_flip($allowed_fields));
-			if ($cep_rule['window']['tags'] === '') {
+
+			if (!array_key_exists('tags', $cep_rule['window']) || $cep_rule['window']['tags'] === '') {
 				$cep_rule['window']['tags'] = [];
 			}
 		}
