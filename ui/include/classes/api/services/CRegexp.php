@@ -212,6 +212,15 @@ class CRegexp extends CApiService {
 					})
 				);
 
+				/**
+				 * Set default value for expression delimiter.
+				 * Because Zabbix agent 2 cannot work with regular expression when delimiter is empty.
+				 * Bugfix for Zabbix agent 2 5.0.22 and less.
+				 */
+				if ($expression['expression_type'] == REGEX_TYPE_STRING_IN_LIST) {
+					$expression += ['exp_delimiter' => ','];
+				}
+
 				if ($db_expression) {
 					$expression['expressionid'] = $db_expression['expressionid'];
 					unset($db_expressions[$db_expression['expressionid']]);

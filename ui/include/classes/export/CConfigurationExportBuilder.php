@@ -324,9 +324,11 @@ class CConfigurationExportBuilder {
 
 			foreach ($regexp['expressions'] as &$expression) {
 				$expression['type'] = $expression['expression_type'];
-				unset($expression['expressionid'], $expression['regexpid'], $expression['expression_type']);
+				unset($expression['expression_type']);
 			}
 			unset($expression);
+
+			CArrayHelper::sort($regexp['expressions'], ['type', 'expression']);
 		}
 		unset($regexp);
 
