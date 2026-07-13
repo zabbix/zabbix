@@ -97,13 +97,25 @@ abstract class CControllerCepRuleGeneral extends CController {
 		if (array_key_exists('operations', $request)) {
 			$request['operations'] = array_values($request['operations']);
 			array_walk($request['operations'], function(array &$operation) {
-				if ($operation['type'] == CCepRuleHelper::OP_SUPPRESS && $operation['suppress_until'] === '') {
-					$operation['suppress_until'] = DB::getDefault('cep_operation', 'suppress_until');
+				if ($operation['type'] == CCepRuleHelper::OP_SUPPRESS) {
+					if ($operation['suppress_until'] === '') {
+						$operation['suppress_until'] = DB::getDefault('cep_operation', 'suppress_until');
+					}
+					else {
+						$operation['suppress_until'] = self::parseSuppressUntil($operation['suppress_until']);
+					}
 				}
 			});
 		}
 
 		return $request;
+	}
+
+	protected static function parseSuppressUntil(string $suppress_until): int {
+		$absolute_time_parser = new CAbsoluteTimeParser();
+		$absolute_time_parser->parse($suppress_until);
+
+		return $absolute_time_parser->getDateTime(true)->getTimestamp();
 	}
 
 	public static function getValidationRules(bool $existing = true): array {
