@@ -17,6 +17,7 @@ package hw
 import (
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"golang.zabbix.com/agent2/pkg/zbxcmd"
@@ -43,7 +44,8 @@ const (
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	executor zbxcmd.Executor
+	executor       zbxcmd.Executor
+	executorInitMu sync.Mutex
 }
 
 var impl Plugin
@@ -273,11 +275,9 @@ func (p *Plugin) exportDevices(params []string, timeout int) (any, error) {
 
 	// Needed so the executor is initialized once, this should be done in configure, but then Zabbix agent 2
 	// will not start if there are issues with finding cmd.exe on windows, and that will break backwards compatibility.
-	if p.executor == nil {
-		p.executor, err = zbxcmd.InitExecutor()
-		if err != nil {
-			return nil, errs.Wrap(err, "command init failed")
-		}
+	err = p.initExecutor()
+	if err != nil {
+		return nil, err
 	}
 
 	out, err := p.executor.ExecuteStrict(cmd, time.Second*time.Duration(timeout), "")
@@ -286,6 +286,24 @@ func (p *Plugin) exportDevices(params []string, timeout int) (any, error) {
 	}
 
 	return out, nil
+}
+
+func (p *Plugin) initExecutor() error {
+	p.executorInitMu.Lock()
+	defer p.executorInitMu.Unlock()
+
+	if p.executor != nil {
+		return nil
+	}
+
+	executor, err := zbxcmd.InitExecutor()
+	if err != nil {
+		return errs.Wrap(err, "command init failed")
+	}
+
+	p.executor = executor
+
+	return nil
 }
 
 func getDeviceCmd(params []string) (string, error) {
