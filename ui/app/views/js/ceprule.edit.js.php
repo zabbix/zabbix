@@ -567,7 +567,7 @@ window.ceprule_edit_popup = new class {
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
 				tag: '',
 				tag_value: '',
-				tags: [{tag: '', operator: <?= TAG_OPERATOR_EQUAL ?>, value: ''}]
+				tags: [{tag: '$STATUS.CODE', operator: <?= TAG_OPERATOR_EQUAL ?>, value: '1'}]
 			};
 		}
 
