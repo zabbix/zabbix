@@ -122,6 +122,7 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $correlationid;
 	private static $correlationid2;
 	private static $disc_maintenanceid;
+	private static $disc_maintenanceid2;
 	private static $serviceids = [];
 	private static $service_actionid;
 	private static $trigger_actionid;
@@ -3047,6 +3048,7 @@ HEREDOC;
 	 */
 	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirst() {
 		self::$disc_maintenanceid = null;
+		self::$disc_maintenanceid2 = null;
 		$this->prepareDataGlobalCorrelationCloseOnUp();
 		try {
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true);
@@ -3055,6 +3057,62 @@ HEREDOC;
 		finally {
 			if (self::$disc_maintenanceid !== null) {
 				$this->stopDiscHostMaintenance(self::$disc_maintenanceid);
+			}
+			if (self::$disc_maintenanceid2 !== null) {
+				$this->stopDiscHostMaintenance(self::$disc_maintenanceid2);
+			$this->reloadConfigurationCacheAndWaitForLogLine();
+
+			// Moving the maintenance out of its active window only changes the configuration; the timer process
+			// still has to take the host out of maintenance and clear the suppression of the events opened during
+			// the run (their event_suppress rows persist even after the problems were closed by correlation). Wait
+			// until nothing on the discovered host is suppressed any more, so the next test starts with the
+			// host fully out of maintenance and cannot observe stale suppression.
+			$this->callUntilCountIsPresent('event.get', [
+				'hostids' => [self::$disc_hostid],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'suppressed' => true
+			], 0, 120, self::WAIT_ITERATION_DELAY);
+			}
+		}
+	}
+
+		/**
+	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp,
+	 * but the discovered host only enters data-collection maintenance after the first wave of problems is
+	 * already open: the maintenance is created mid-run, so the already-open problems must be suppressed
+	 * retroactively, and every problem opened afterwards (while maintenance is active) suppressed at
+	 * creation time too, while global correlation still closes them all, leaving nothing open.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirstRestart$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirstRestart() {
+		self::$disc_maintenanceid = null;
+		self::$disc_maintenanceid2 = null;
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true);
+			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		}
+		finally {
+			if (self::$disc_maintenanceid !== null) {
+				$this->stopDiscHostMaintenance(self::$disc_maintenanceid);
+			}
+			if (self::$disc_maintenanceid2 !== null) {
+				$this->stopDiscHostMaintenance(self::$disc_maintenanceid2);
+			$this->reloadConfigurationCacheAndWaitForLogLine();
+
+			// Moving the maintenance out of its active window only changes the configuration; the timer process
+			// still has to take the host out of maintenance and clear the suppression of the events opened during
+			// the run (their event_suppress rows persist even after the problems were closed by correlation). Wait
+			// until nothing on the discovered host is suppressed any more, so the next test starts with the
+			// host fully out of maintenance and cannot observe stale suppression.
+			$this->callUntilCountIsPresent('event.get', [
+				'hostids' => [self::$disc_hostid],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'suppressed' => true
+			], 0, 120, self::WAIT_ITERATION_DELAY);
 			}
 		}
 	}
@@ -3759,7 +3817,8 @@ HEREDOC;
 		// maintenance now must retroactively suppress those $m open problems (and every problem opened
 		// later), while global correlation still closes them normally below.
 		if ($maintenance_after_first) {
-			self::$disc_maintenanceid = $this->startDiscHostMaintenance();
+			self::$disc_maintenanceid = $this->startDiscHostMaintenance('CEP close-on-up maintenance');
+			self::$disc_maintenanceid2 = $this->startDiscHostMaintenance('CEP close-on-up maintenance2');
 			$this->waitForOpenProblemsSuppressed($all, $m);
 		}
 
@@ -4431,11 +4490,11 @@ HEREDOC;
 	 * Put the discovered host into data-collection maintenance and wait for the server to start it, so any
 	 * problem opened afterwards is suppressed. Returns the maintenance id for stopDiscHostMaintenance().
 	 */
-	private function startDiscHostMaintenance(): string {
+	private function startDiscHostMaintenance(string $name): string {
 		$now = time();
 
 		$response = $this->call('maintenance.create', [
-			'name' => 'CEP close-on-up maintenance',
+			'name' => $name,
 			'hosts' => ['hostid' => self::$disc_hostid],
 			'active_since' => $now - 60,
 			'active_till' => $now + 3600,
@@ -4476,19 +4535,6 @@ HEREDOC;
 				'start_date' => $future
 			]
 		]);
-		$this->reloadConfigurationCacheAndWaitForLogLine();
-
-		// Moving the maintenance out of its active window only changes the configuration; the timer process
-		// still has to take the host out of maintenance and clear the suppression of the events opened during
-		// the run (their event_suppress rows persist even after the problems were closed by correlation). Wait
-		// until nothing on the discovered host is suppressed any more, so the next test starts with the
-		// host fully out of maintenance and cannot observe stale suppression.
-		$this->callUntilCountIsPresent('event.get', [
-			'hostids' => [self::$disc_hostid],
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'suppressed' => true
-		], 0, 120, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
@@ -5421,6 +5467,12 @@ HEREDOC;
 			CDataHelper::call('maintenance.delete', [self::$disc_maintenanceid]);
 			self::$disc_maintenanceid = null;
 		}
+	
+		if (!empty(self::$disc_maintenanceid2)) {
+			CDataHelper::call('maintenance.delete', [self::$disc_maintenanceid2]);
+			self::$disc_maintenanceid2 = null;
+		}
+		
 
 		if (!empty(self::$disc_hostid)) {
 			CDataHelper::call('host.delete', [self::$disc_hostid]);
