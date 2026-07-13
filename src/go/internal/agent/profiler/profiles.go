@@ -30,16 +30,8 @@ const (
 	profileFileMode = 0o600
 	profileDirMode  = 0o700
 	timeFormat      = "20060102_150405"
-)
 
-const (
-	profileCPU          = "cpu"
-	profileHeap         = "heap"
-	profileAllocs       = "allocs"
-	profileGoroutine    = "goroutine"
-	profileBlock        = "block"
-	profileMutex        = "mutex"
-	profileThreadCreate = "threadcreate"
+	profileCPU = "cpu"
 )
 
 func (s *state) dump(restartCPUProfile bool) error {
@@ -53,21 +45,29 @@ func (s *state) dump(restartCPUProfile bool) error {
 		return err
 	}
 
+	if restartCPUProfile {
+		// Keep periodic CPU profiling active even if writing another profile fails.
+		defer func() {
+			restartErr := s.startCPUProfile()
+			if restartErr != nil {
+				log.Errf("profiler: cannot restart CPU profile after dump: %s", restartErr.Error())
+			}
+		}()
+	}
+
 	timestamp := time.Now().Format(timeFormat)
-	for _, profile := range profileNames() {
+
+	profiles := profilesExcludingCPU()
+	for _, profile := range profiles {
 		err = s.writeProfile(profile, timestamp)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = s.rotate()
+	err = s.rotate(append([]string{profileCPU}, profiles...))
 	if err != nil {
 		return err
-	}
-
-	if restartCPUProfile {
-		return s.startCPUProfile()
 	}
 
 	return nil
@@ -80,7 +80,7 @@ func (s *state) startCPUProfile() error {
 
 	path := s.profilePath(profileCPU, time.Now().Format(timeFormat))
 
-	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_EXCL, profileFileMode) //nolint:gosec
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, profileFileMode) //nolint:gosec
 	if err != nil {
 		return errs.Wrap(err, "cannot create CPU profile file")
 	}
@@ -123,7 +123,9 @@ func (s *state) writeProfile(name, timestamp string) error {
 		return errs.Wrapf(errs.New("profile is not available"), "profile %q", name)
 	}
 
-	file, err := os.OpenFile(s.profilePath(name, timestamp), os.O_RDWR|os.O_CREATE|os.O_EXCL, profileFileMode)
+	file, err := os.OpenFile(
+		s.profilePath(name, timestamp), os.O_RDWR|os.O_CREATE|os.O_TRUNC, profileFileMode,
+	)
 	if err != nil {
 		return errs.Wrapf(err, "cannot create %s profile file", name)
 	}
@@ -143,8 +145,8 @@ func (s *state) writeProfile(name, timestamp string) error {
 	return nil
 }
 
-func (s *state) rotate() error {
-	for _, profile := range allProfileNames() {
+func (s *state) rotate(profiles []string) error {
+	for _, profile := range profiles {
 		err := s.rotateProfile(profile)
 		if err != nil {
 			return err
@@ -180,25 +182,15 @@ func (s *state) profilePath(profile, timestamp string) string {
 	return filepath.Join(s.options.Dir, fmt.Sprintf("%s_%s.pprof", profile, timestamp))
 }
 
-func profileNames() []string {
-	return []string{
-		profileHeap,
-		profileAllocs,
-		profileGoroutine,
-		profileBlock,
-		profileMutex,
-		profileThreadCreate,
-	}
-}
+func profilesExcludingCPU() []string {
+	// By default pprof.Profiles returns allocs, block, goroutine, heap, mutex, and threadcreate.
+	// It also includes any profiles registered with pprof.NewProfile.
+	profiles := pprof.Profiles()
+	names := make([]string, 0, len(profiles))
 
-func allProfileNames() []string {
-	return []string{
-		profileCPU,
-		profileHeap,
-		profileAllocs,
-		profileGoroutine,
-		profileBlock,
-		profileMutex,
-		profileThreadCreate,
+	for _, profile := range profiles {
+		names = append(names, profile.Name())
 	}
+
+	return names
 }

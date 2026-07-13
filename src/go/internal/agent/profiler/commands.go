@@ -16,6 +16,8 @@ package profiler
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -31,46 +33,31 @@ const (
 	commandSetInterval = "periodic_prof_set_interval"
 )
 
+var (
+	errEmptyCommand           = errs.New("empty command")
+	errFailedToParseInterval  = errs.New("failed to parse interval")
+	errInvalidParameterNumber = errs.New("invalid number of parameters")
+	errIntervalOutOfRange     = errs.New("interval out of range")
+	errTooManyParameters      = errs.New("too many parameters")
+	errUnknownCommand         = errs.New("unknown command")
+)
+
 type commandHandler func([]string) (string, error)
 
-func newCommandHandlers(c *Controller) map[string]commandHandler {
-	return map[string]commandHandler{
-		commandEnable:      commandWithoutParameters(c.Enable),
-		commandDisable:     commandWithoutParameters(c.Disable),
-		commandExecute:     commandWithoutParameters(c.Execute),
-		commandSetInterval: c.executeSetIntervalCommand,
-	}
-}
-
-// HasCommand returns true if command is handled by the profiler.
-func HasCommand(command string) bool {
-	switch command {
-	case commandEnable, commandDisable, commandExecute, commandSetInterval:
-		return true
-	default:
-		return false
-	}
-}
-
 // Commands returns profiler runtime command names.
-func Commands() []string {
-	return []string{
-		commandEnable,
-		commandDisable,
-		commandExecute,
-		commandSetInterval,
-	}
+func (c *Controller) Commands() []string {
+	return slices.Sorted(maps.Keys(c.handlers))
 }
 
 // ExecuteCommand parses and executes a profiler runtime command.
 func (c *Controller) ExecuteCommand(params []string) (string, error) {
 	if len(params) == 0 {
-		return "", errs.New("empty command")
+		return "", errEmptyCommand
 	}
 
 	handler, ok := c.handlers[params[0]]
 	if !ok {
-		return "", errs.New("unknown command")
+		return "", errUnknownCommand
 	}
 
 	return handler(params)
@@ -118,7 +105,7 @@ func (c *Controller) ProcessCommand(client runtimecontrol.Exchanger) error {
 func commandWithoutParameters(execute func() (string, error)) commandHandler {
 	return func(params []string) (string, error) {
 		if len(params) != 1 {
-			return "", errs.New("too many parameters")
+			return "", errTooManyParameters
 		}
 
 		message, err := execute()
@@ -132,16 +119,16 @@ func commandWithoutParameters(execute func() (string, error)) commandHandler {
 
 func (c *Controller) executeSetIntervalCommand(params []string) (string, error) {
 	if len(params) != 2 { //nolint:mnd
-		return "", errs.New("invalid number of parameters")
+		return "", errInvalidParameterNumber
 	}
 
 	seconds, err := strconv.Atoi(params[1])
 	if err != nil {
-		return "", errs.New("failed to parse interval")
+		return "", errFailedToParseInterval
 	}
 
 	if seconds < 1 || seconds > 86400 {
-		return "", errs.New("interval out of range")
+		return "", errIntervalOutOfRange
 	}
 
 	message, err := c.SetInterval(time.Duration(seconds) * time.Second)

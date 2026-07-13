@@ -52,14 +52,6 @@ import (
 
 const runtimeCommandSendingTimeout = time.Second
 
-const (
-	commandLogLevelIncrease    = "log_level_increase"
-	commandLogLevelDecrease    = "log_level_decrease"
-	commandMetrics             = "metrics"
-	commandUserParameterReload = "userparameter_reload"
-	commandVersion             = "version"
-)
-
 const usageMessageFormatRuntimeControlFormat = //
 `Perform administrative functions (%s timeout)
 
@@ -113,22 +105,15 @@ var (
 	closeChan        = make(chan bool)
 	pidFile          *pidfile.File
 	pluginSocket     string
-	profilerControl  *profiler.Controller
-)
-
-var (
-	errEmptyCommand    = errs.New("empty command")
-	errTooManyCommands = errs.New("too many commands")
-	errUnknownCommand  = errs.New("unknown command")
 )
 
 //nolint:gochecknoglobals
 var remoteCommandHandlers = map[string]remoteCommandHandler{
-	commandLogLevelIncrease:    processCommandWithoutParameters(processLoglevelIncreaseCommand),
-	commandLogLevelDecrease:    processCommandWithoutParameters(processLoglevelDecreaseCommand),
-	commandMetrics:             processCommandWithoutParameters(processMetricsCommand),
-	commandVersion:             processCommandWithoutParameters(processVersionCommand),
-	commandUserParameterReload: processCommandWithoutParameters(processUserParamReloadCommand),
+	"log_level_increase":   processCommandWithoutParameters(processLoglevelIncreaseCommand),
+	"log_level_decrease":   processCommandWithoutParameters(processLoglevelDecreaseCommand),
+	"metrics":              processCommandWithoutParameters(processMetricsCommand),
+	"userparameter_reload": processCommandWithoutParameters(processVersionCommand),
+	"version":              processCommandWithoutParameters(processUserParamReloadCommand),
 }
 
 type remoteCommandHandler func(*runtimecontrol.Client) error
@@ -531,7 +516,7 @@ func runAgent(isForeground bool, configPath string, systemOpt agent.PluginSystem
 		}
 	}
 
-	profilerControl = profiler.New(profiler.Options{
+	profilerControl := profiler.New(profiler.Options{
 		Enabled:            agent.Options.EnableProfiler == 1,
 		Dir:                agent.Options.ProfilerDir,
 		MaxFilesPerProfile: agent.Options.ProfilerMaxFilesPerProfile,
@@ -539,7 +524,7 @@ func runAgent(isForeground bool, configPath string, systemOpt agent.PluginSystem
 	})
 	profilerCtx, profilerCancel := context.WithCancel(context.Background())
 	profilerControl.Start(profilerCtx)
-	registerProfilerCommands()
+	registerProfilerCommands(profilerControl)
 
 	err = waitStop()
 	if err != nil {
@@ -851,37 +836,37 @@ func processCommandWithoutParameters(handler remoteCommandHandler) remoteCommand
 	return func(c *runtimecontrol.Client) error {
 		params := strings.Fields(c.Request())
 		if len(params) > 1 {
-			return errTooManyCommands
+			return errs.New("too many commands")
 		}
 
 		return handler(c)
 	}
 }
 
-func processProfilerCommand(c *runtimecontrol.Client) error {
-	err := profilerControl.ProcessCommand(c)
-	if err != nil {
-		return errs.Wrap(err, "cannot process profiler command")
+func registerProfilerCommands(controller *profiler.Controller) {
+	handler := func(c *runtimecontrol.Client) error {
+		err := controller.ProcessCommand(c)
+		if err != nil {
+			return errs.Wrap(err, "cannot process profiler command")
+		}
+
+		return nil
 	}
 
-	return nil
-}
-
-func registerProfilerCommands() {
-	for _, command := range profiler.Commands() {
-		remoteCommandHandlers[command] = processProfilerCommand
+	for _, command := range controller.Commands() {
+		remoteCommandHandlers[command] = handler
 	}
 }
 
 func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 	params := strings.Fields(c.Request())
 	if len(params) == 0 {
-		return errEmptyCommand
+		return errs.New("empty command")
 	}
 
 	handler, ok := remoteCommandHandlers[params[0]]
 	if !ok {
-		return errUnknownCommand
+		return errs.New("unknown command")
 	}
 
 	return handler(c)

@@ -25,6 +25,7 @@ import (
 )
 
 const (
+	extensiveProfilingEnabled  = true
 	onDemandCPUProfileSeconds  = 5
 	onDemandCPUProfileDuration = onDemandCPUProfileSeconds * time.Second
 )
@@ -99,7 +100,7 @@ func (s *state) disableRequest() (string, error) {
 		return "profiler: already stopped", nil
 	}
 
-	err := s.disable(true)
+	err := s.disable()
 	if err != nil {
 		return "", err
 	}
@@ -119,8 +120,7 @@ func (s *state) executeRequest() (string, error) {
 			return "", errs.Wrap(err, "cannot create profiler directory")
 		}
 
-		runtime.SetBlockProfileRate(1)
-		runtime.SetMutexProfileFraction(1)
+		setExtensiveProfiling(true)
 	}
 
 	err := s.stopCPUProfile()
@@ -165,8 +165,7 @@ func (s *state) finishOnDemandProfile(periodicEnabled bool) {
 		return
 	}
 
-	runtime.SetBlockProfileRate(0)
-	runtime.SetMutexProfileFraction(0)
+	setExtensiveProfiling(false)
 }
 
 func (s *state) setIntervalRequest(interval time.Duration) (string, error) {
@@ -190,7 +189,12 @@ func (s *state) stopRequest() error {
 		return nil
 	}
 
-	return s.disable(true)
+	err := s.disable()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *state) enable() error {
@@ -199,13 +203,11 @@ func (s *state) enable() error {
 		return errs.Wrap(err, "cannot create profiler directory")
 	}
 
-	runtime.SetBlockProfileRate(1)
-	runtime.SetMutexProfileFraction(1)
+	setExtensiveProfiling(true)
 
 	err = s.startCPUProfile()
 	if err != nil {
-		runtime.SetBlockProfileRate(0)
-		runtime.SetMutexProfileFraction(0)
+		setExtensiveProfiling(false)
 
 		return err
 	}
@@ -216,22 +218,20 @@ func (s *state) enable() error {
 	return nil
 }
 
-func (s *state) disable(writeCurrent bool) error {
+func (s *state) disable() error {
 	s.stopTimer()
 
-	var err error
-	if writeCurrent {
-		err = s.dump(false)
-	} else {
-		err = s.stopCPUProfile()
-	}
+	err := s.dump(false)
 
-	runtime.SetBlockProfileRate(0)
-	runtime.SetMutexProfileFraction(0)
+	setExtensiveProfiling(false)
 
 	s.options.Enabled = false
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *state) timerChannel() <-chan time.Time {
@@ -263,12 +263,20 @@ func (s *state) stopTimer() {
 		return
 	}
 
-	if !s.timer.Stop() {
-		select {
-		case <-s.timer.C:
-		default:
-		}
+	s.timer.Stop()
+	s.timer = nil
+}
+
+func setExtensiveProfiling(enabled bool) {
+	if !extensiveProfilingEnabled {
+		return
 	}
 
-	s.timer = nil
+	rate := 0
+	if enabled {
+		rate = 1
+	}
+
+	runtime.SetBlockProfileRate(rate)
+	runtime.SetMutexProfileFraction(rate)
 }

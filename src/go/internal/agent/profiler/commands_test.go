@@ -119,24 +119,17 @@ func TestExecuteCommandCollectsCPUProfile(t *testing.T) { //nolint:paralleltest 
 func TestCommands(t *testing.T) {
 	t.Parallel()
 
+	controller := New(Options{})
 	want := []string{
-		commandEnable,
 		commandDisable,
+		commandEnable,
 		commandExecute,
 		commandSetInterval,
 	}
-	if !slices.Equal(Commands(), want) {
-		t.Fatalf("unexpected profiler commands: %v", Commands())
-	}
+	commands := controller.Commands()
 
-	for _, command := range want {
-		if !HasCommand(command) {
-			t.Errorf("command %q is not recognized", command)
-		}
-	}
-
-	if HasCommand("unknown") {
-		t.Error("unknown command is recognized")
+	if !slices.Equal(commands, want) {
+		t.Fatalf("got commands %v, want %v", commands, want)
 	}
 }
 
@@ -147,41 +140,41 @@ func TestExecuteCommandValidation(t *testing.T) {
 	tests := []struct {
 		name   string
 		params []string
-		want   string
+		want   error
 	}{
 		{
 			name: "empty command",
-			want: "Empty command.",
+			want: errEmptyCommand,
 		},
 		{
 			name:   "unknown command",
 			params: []string{"unknown"},
-			want:   "Unknown command.",
+			want:   errUnknownCommand,
 		},
 		{
 			name:   "enable with parameter",
 			params: []string{commandEnable, "unexpected"},
-			want:   "Too many parameters.",
+			want:   errTooManyParameters,
 		},
 		{
 			name:   "missing interval",
 			params: []string{commandSetInterval},
-			want:   "Invalid number of parameters.",
+			want:   errInvalidParameterNumber,
 		},
 		{
 			name:   "invalid interval",
 			params: []string{commandSetInterval, "invalid"},
-			want:   "Failed to parse interval.",
+			want:   errFailedToParseInterval,
 		},
 		{
 			name:   "zero interval",
 			params: []string{commandSetInterval, "0"},
-			want:   "Interval out of range.",
+			want:   errIntervalOutOfRange,
 		},
 		{
 			name:   "too large interval",
 			params: []string{commandSetInterval, "86401"},
-			want:   "Interval out of range.",
+			want:   errIntervalOutOfRange,
 		},
 	}
 
@@ -190,8 +183,8 @@ func TestExecuteCommandValidation(t *testing.T) {
 			t.Parallel()
 
 			_, err := controller.ExecuteCommand(tt.params)
-			if err == nil || err.Error() != tt.want {
-				t.Fatalf("got error %v, want %q", err, tt.want)
+			if !errors.Is(err, tt.want) {
+				t.Fatalf("got error %v, want %v", err, tt.want)
 			}
 		})
 	}
@@ -262,7 +255,8 @@ func waitForReply(t *testing.T, replies <-chan string) string {
 func checkProfileFiles(t *testing.T, dir string) {
 	t.Helper()
 
-	for _, profile := range allProfileNames() {
+	profiles := append([]string{profileCPU}, profilesExcludingCPU()...)
+	for _, profile := range profiles {
 		matches, err := filepath.Glob(filepath.Join(dir, profile+"_*.pprof"))
 		if err != nil {
 			t.Fatalf("cannot list %s profiles: %s", profile, err)

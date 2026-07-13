@@ -19,10 +19,98 @@ import (
 	"path/filepath"
 	"slices"
 	"testing"
+	"time"
 )
+
+//nolint:paralleltest // CPU profiling is process-global.
+func TestRestartCPUProfileWithinSameSecond(t *testing.T) {
+	dir := t.TempDir()
+	s := state{options: Options{Dir: dir}}
+
+	now := time.Now()
+	time.Sleep(time.Second - time.Duration(now.Nanosecond()) + 10*time.Millisecond)
+
+	err := s.startCPUProfile()
+	if err != nil {
+		t.Fatalf("cannot start CPU profile: %s", err)
+	}
+
+	t.Cleanup(func() {
+		stopErr := s.stopCPUProfile()
+		if stopErr != nil {
+			t.Errorf("cannot stop CPU profile: %s", stopErr)
+		}
+	})
+
+	err = s.stopCPUProfile()
+	if err != nil {
+		t.Fatalf("cannot stop CPU profile: %s", err)
+	}
+
+	err = s.startCPUProfile()
+	if err != nil {
+		t.Fatalf("cannot restart CPU profile within the same second: %s", err)
+	}
+}
+
+//nolint:paralleltest // CPU profiling is process-global.
+func TestDumpRestartsCPUProfileAfterRotationFailure(t *testing.T) {
+	dir := filepath.Join(t.TempDir(), "profiles[")
+
+	err := os.MkdirAll(dir, profileDirMode)
+	if err != nil {
+		t.Fatalf("cannot create profile directory: %s", err)
+	}
+
+	s := state{options: Options{
+		Dir:                dir,
+		MaxFilesPerProfile: 2,
+	}}
+
+	err = s.startCPUProfile()
+	if err != nil {
+		t.Fatalf("cannot start CPU profile: %s", err)
+	}
+
+	t.Cleanup(func() {
+		stopErr := s.stopCPUProfile()
+		if stopErr != nil {
+			t.Errorf("cannot stop CPU profile: %s", stopErr)
+		}
+	})
+
+	err = s.dump(true)
+	if err == nil {
+		t.Fatal("expected profile rotation to fail")
+	}
+
+	if s.cpuFile == nil {
+		t.Fatal("CPU profiling was not restarted after rotation failure")
+	}
+}
+
+func TestWriteProfileWithinSameSecond(t *testing.T) {
+	t.Parallel()
+
+	const timestamp = "20260713_163841"
+
+	s := state{options: Options{Dir: t.TempDir()}}
+
+	err := s.writeProfile("heap", timestamp)
+	if err != nil {
+		t.Fatalf("cannot write profile: %s", err)
+	}
+
+	err = s.writeProfile("heap", timestamp)
+	if err != nil {
+		t.Fatalf("cannot rewrite profile within the same second: %s", err)
+	}
+}
 
 func TestRotateProfileKeepsNewestFiles(t *testing.T) {
 	t.Parallel()
+
+	const testProfile = "heap"
 
 	dir := t.TempDir()
 	s := state{options: Options{
@@ -36,18 +124,18 @@ func TestRotateProfileKeepsNewestFiles(t *testing.T) {
 		"20260101_000000_000000003",
 	}
 	for _, timestamp := range timestamps {
-		err := os.WriteFile(s.profilePath(profileHeap, timestamp), []byte("profile"), profileFileMode)
+		err := os.WriteFile(s.profilePath(testProfile, timestamp), []byte("profile"), profileFileMode)
 		if err != nil {
 			t.Fatalf("cannot create profile file: %s", err)
 		}
 	}
 
-	err := s.rotateProfile(profileHeap)
+	err := s.rotateProfile(testProfile)
 	if err != nil {
 		t.Fatalf("cannot rotate profile files: %s", err)
 	}
 
-	files, err := filepath.Glob(filepath.Join(dir, profileHeap+"_*.pprof"))
+	files, err := filepath.Glob(filepath.Join(dir, testProfile+"_*.pprof"))
 	if err != nil {
 		t.Fatalf("cannot list profile files: %s", err)
 	}
@@ -55,31 +143,28 @@ func TestRotateProfileKeepsNewestFiles(t *testing.T) {
 	slices.Sort(files)
 
 	want := []string{
-		s.profilePath(profileHeap, timestamps[1]),
-		s.profilePath(profileHeap, timestamps[2]),
+		s.profilePath(testProfile, timestamps[1]),
+		s.profilePath(testProfile, timestamps[2]),
 	}
 	if !slices.Equal(files, want) {
 		t.Fatalf("got profile files %v, want %v", files, want)
 	}
 }
 
-func TestProfileNames(t *testing.T) {
+func TestProfilesExcludingCPU(t *testing.T) {
 	t.Parallel()
 
 	wantSnapshots := []string{
-		profileHeap,
-		profileAllocs,
-		profileGoroutine,
-		profileBlock,
-		profileMutex,
-		profileThreadCreate,
-	}
-	if !slices.Equal(profileNames(), wantSnapshots) {
-		t.Fatalf("unexpected snapshot profiles: %v", profileNames())
+		"allocs",
+		"block",
+		"goroutine",
+		"heap",
+		"mutex",
+		"threadcreate",
 	}
 
-	wantAll := append([]string{profileCPU}, wantSnapshots...)
-	if !slices.Equal(allProfileNames(), wantAll) {
-		t.Fatalf("unexpected profiles: %v", allProfileNames())
+	profiles := profilesExcludingCPU()
+	if !slices.Equal(profiles, wantSnapshots) {
+		t.Fatalf("got profiles %v, want %v", profiles, wantSnapshots)
 	}
 }

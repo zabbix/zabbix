@@ -55,7 +55,13 @@ func New(options Options) *Controller {
 		requests: make(chan request, 1),
 		done:     make(chan struct{}),
 	}
-	c.handlers = newCommandHandlers(c)
+
+	c.handlers = map[string]commandHandler{
+		commandEnable:      commandWithoutParameters(c.Enable),
+		commandDisable:     commandWithoutParameters(c.Disable),
+		commandExecute:     commandWithoutParameters(c.Execute),
+		commandSetInterval: c.executeSetIntervalCommand,
+	}
 
 	return c
 }
@@ -99,8 +105,11 @@ func (c *Controller) call(req request) (string, error) {
 	c.requests <- req
 
 	resp := <-req.reply
+	if resp.err != nil {
+		return "", resp.err
+	}
 
-	return resp.message, resp.err
+	return resp.message, nil
 }
 
 func (c *Controller) run(ctx context.Context) {
