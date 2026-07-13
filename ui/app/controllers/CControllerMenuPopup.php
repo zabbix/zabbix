@@ -370,8 +370,10 @@ class CControllerMenuPopup extends CController {
 	 * @return array
 	 */
 	private static function sanitizeMapElementUrls(array $urls): array {
+		$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
 		foreach ($urls as &$url) {
-			if (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false]) === false) {
+			if (!$url_validator->validate($url['url'])) {
 				$url['url'] = 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).');';
 			}
 		}
@@ -919,6 +921,8 @@ class CControllerMenuPopup extends CController {
 	}
 
 	private static function addUrls(array $menu_data, array $urls): array {
+		$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
 		$fields = ['scriptid', 'manualinput', 'manualinput_prompt', 'manualinput_validator_type',
 			'manualinput_validator', 'manualinput_default_value'
 		];
@@ -934,7 +938,7 @@ class CControllerMenuPopup extends CController {
 				? '_blank'
 				: '';
 
-			if (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
+			if ($url_validator->validate($url['url'])) {
 				$menu_data_parameters += [
 					'url' => $url['url'],
 					'target' => $target
