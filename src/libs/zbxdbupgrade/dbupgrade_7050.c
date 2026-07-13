@@ -873,7 +873,7 @@ static int	DBpatch_7050064(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	/* 1  - REGEX_TYPE_STRING_IN_LIST   */
+	/* 1  - REGEX_TYPE_CONTAINS_ANY_SUBSTRING   */
 	if (ZBX_DB_OK > zbx_db_execute("update expressions set exp_delimiter='' where expression_type<>1"
 			" and exp_delimiter<>''"))
 	{

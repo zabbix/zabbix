@@ -33,8 +33,8 @@ class CControllerRegExCreate extends CController {
 			'expressions' => ['objects', 'required', 'not_empty', 'uniq' => [['expression_type', 'expression']],
 				'fields' => [
 					'expression_type' => ['db expressions.expression_type', 'required',
-						'in' => [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_STRING_IN_LIST, REGEX_TYPE_NOT_CONTAINS_STRING,
-							REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX
+						'in' => [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_CONTAINS_ANY_SUBSTRING,
+							REGEX_TYPE_NOT_CONTAINS_STRING, REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX
 						]
 					],
 					'expression' => [
@@ -42,14 +42,18 @@ class CControllerRegExCreate extends CController {
 							'messageInvalid' => _('Regular expression must be a string'),
 							'messageRegex' => _('Incorrect regular expression: "%2$s"')
 						]],
-							'when' => ['expression_type', 'in' => [REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX]]
+							'when' => ['expression_type',
+								'in' => [REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX]
+							]
 						],
-						['db expressions.expression', 'required', 'not_empty', 'when' => ['expression_type', 'in' => [
-							REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_STRING_IN_LIST, REGEX_TYPE_NOT_CONTAINS_STRING
-						]]]
+						['db expressions.expression', 'required', 'not_empty', 'when' => ['expression_type',
+							'in' => [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_CONTAINS_ANY_SUBSTRING,
+								REGEX_TYPE_NOT_CONTAINS_STRING
+							]
+						]]
 					],
 					'exp_delimiter' => ['db expressions.exp_delimiter', 'in' => [',', '.', '/'], 'when' => [
-						'expression_type', 'in' => [REGEX_TYPE_STRING_IN_LIST]
+						'expression_type', 'in' => [REGEX_TYPE_CONTAINS_ANY_SUBSTRING]
 					]],
 					'case_sensitive' => ['db expressions.case_sensitive', 'in' => [0, 1]]
 				],
@@ -94,7 +98,7 @@ class CControllerRegExCreate extends CController {
 		];
 
 		foreach ($global_regex['expressions'] as &$expression) {
-			if ($expression['expression_type'] != REGEX_TYPE_STRING_IN_LIST) {
+			if ($expression['expression_type'] != REGEX_TYPE_CONTAINS_ANY_SUBSTRING) {
 				$expression['exp_delimiter'] = '';
 			}
 		}

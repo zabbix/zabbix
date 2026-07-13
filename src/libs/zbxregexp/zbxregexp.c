@@ -1423,7 +1423,7 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
  **********************************************************************************/
 /* regular expressions */
 #define REGEX_TYPE_CONTAINS_STRING	0
-#define REGEX_TYPE_STRING_IN_LIST	1
+#define REGEX_TYPE_CONTAINS_ANY_SUBSTRING	1
 #define REGEX_TYPE_NOT_CONTAINS_STRING	2
 #define REGEX_TYPE_MATCHES_REGEX	3
 #define REGEX_TYPE_NOT_MATCHES_REGEX	4
@@ -1491,7 +1491,7 @@ int	zbx_regexp_sub_ex(const zbx_vector_expression_t *regexps, const char *string
 				/* invert output value */
 				ret = (ZBX_REGEXP_MATCH == ret ? ZBX_REGEXP_NO_MATCH : ZBX_REGEXP_MATCH);
 				break;
-			case REGEX_TYPE_STRING_IN_LIST:
+			case REGEX_TYPE_CONTAINS_ANY_SUBSTRING:
 				ret = regexp_match_ex_substring_list(string, regexp->expression, regexp->case_sensitive,
 						regexp->exp_delimiter);
 				break;
@@ -1648,7 +1648,7 @@ int	zbx_regexp_sub_ex2(const zbx_vector_expression_t *regexps, const char *strin
 				/* invert output value */
 				ret = (ZBX_REGEXP_MATCH == ret ? ZBX_REGEXP_NO_MATCH : ZBX_REGEXP_MATCH);
 				break;
-			case REGEX_TYPE_STRING_IN_LIST:
+			case REGEX_TYPE_CONTAINS_ANY_SUBSTRING:
 				ret = regexp_match_ex_substring_list(string, regexp->expression, regexp->case_sensitive,
 						regexp->exp_delimiter);
 				break;
@@ -1695,7 +1695,7 @@ out:
 	return ret;
 }
 #undef REGEX_TYPE_CONTAINS_STRING
-#undef REGEX_TYPE_STRING_IN_LIST
+#undef REGEX_TYPE_CONTAINS_ANY_SUBSTRING
 #undef REGEX_TYPE_NOT_CONTAINS_STRING
 #undef REGEX_TYPE_MATCHES_REGEX
 #undef REGEX_TYPE_NOT_MATCHES_REGEX

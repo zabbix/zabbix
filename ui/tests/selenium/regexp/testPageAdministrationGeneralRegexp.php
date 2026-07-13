@@ -53,7 +53,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 				'expressions' => [
 					[
 						'expression' => 'test',
-						'expression_type' => REGEX_TYPE_STRING_IN_LIST,
+						'expression_type' => REGEX_TYPE_CONTAINS_ANY_SUBSTRING,
 						'case_sensitive' => 1
 					],
 					[

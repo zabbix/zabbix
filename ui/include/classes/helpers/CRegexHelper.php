@@ -19,7 +19,7 @@ class CRegexHelper {
 	public static function expression_type2str(?int $type = null) {
 		$types = [
 			REGEX_TYPE_CONTAINS_STRING => _('Contains string'),
-			REGEX_TYPE_STRING_IN_LIST => _('String is in list'),
+			REGEX_TYPE_CONTAINS_ANY_SUBSTRING => _('Contains any substring from list'),
 			REGEX_TYPE_NOT_CONTAINS_STRING => _('Does not contain string'),
 			REGEX_TYPE_MATCHES_REGEX => _('Matches regular expression'),
 			REGEX_TYPE_NOT_MATCHES_REGEX => _('Does not match regular expression')

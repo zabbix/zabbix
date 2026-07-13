@@ -51,13 +51,13 @@ class CGlobalRegexpTest extends TestCase
 			],
 			// ANY character string included, case-sensitive
 			[
-				'expression' => $this->expr(REGEX_TYPE_STRING_IN_LIST, 'Error,Disaster,Critical', 1),
+				'expression' => $this->expr(REGEX_TYPE_CONTAINS_ANY_SUBSTRING, 'Error,Disaster,Critical', 1),
 				'success' => ['Error message', 'Object has Error', 'Status: Critical', 'Disaster Errors'],
 				'fail' => ['ERROR: error', 'Object state: CRITICAL']
 			],
 			// ANY character string included, case-insensitive
 			[
-				'expression' => $this->expr(REGEX_TYPE_STRING_IN_LIST, 'Error,Disaster,Critical', 0),
+				'expression' => $this->expr(REGEX_TYPE_CONTAINS_ANY_SUBSTRING, 'Error,Disaster,Critical', 0),
 				'success' => ['Error message', 'Object has Error', 'Status: Critical', 'Disaster Errors',
 					'ERROR: error', 'Object state: CRITICAL', 'Log levels: DISASTER', 'Log levels: error'
 				],
@@ -107,13 +107,13 @@ class CGlobalRegexpTest extends TestCase
 			],
 			// empty part of search string is ignored during match
 			[
-				'expression' => $this->expr(REGEX_TYPE_STRING_IN_LIST, '/', 0, '/'),
+				'expression' => $this->expr(REGEX_TYPE_CONTAINS_ANY_SUBSTRING, '/', 0, '/'),
 				'success' => ['/'],
 				'fail' => []
 			],
 			// empty part of search string is ignored during match
 			[
-				'expression' => $this->expr(REGEX_TYPE_STRING_IN_LIST, '/0/a/ /', 0, '/'),
+				'expression' => $this->expr(REGEX_TYPE_CONTAINS_ANY_SUBSTRING, '/0/a/ /', 0, '/'),
 				'success' => ['d// e', '1/0// '],
 				'fail' => ['/', 'b//	b']
 			]

@@ -155,7 +155,7 @@ class CGlobalRegexp {
 	private static function _matchString(array $expression, $string) {
 		$result = true;
 
-		if ($expression['expression_type'] == REGEX_TYPE_STRING_IN_LIST) {
+		if ($expression['expression_type'] == REGEX_TYPE_CONTAINS_ANY_SUBSTRING) {
 			$patterns = array_filter(explode($expression['exp_delimiter'], $expression['expression']), 'strlen');
 		}
 		else {
@@ -176,7 +176,7 @@ class CGlobalRegexp {
 			$pos = mb_strpos($string, $pattern);
 			$tmp = (($pos !== false) == $expectedResult);
 
-			if ($expression['expression_type'] == REGEX_TYPE_STRING_IN_LIST && $tmp) {
+			if ($expression['expression_type'] == REGEX_TYPE_CONTAINS_ANY_SUBSTRING && $tmp) {
 				return true;
 			}
 			else {
