@@ -61,7 +61,7 @@ static int	get_option_value_int(const zbx_vector_config_option_t *options, const
 
 	if (SUCCEED != zbx_is_int(str, out))
 	{
-		*error = zbx_dsprintf(NULL, "invalid \"%s\" in APMProvider: \"%s\"", name, str);
+		*error = zbx_dsprintf(NULL, "invalid \"%s\" in TelemetryProvider: \"%s\"", name, str);
 		return FAIL;
 	}
 
@@ -78,7 +78,7 @@ static int	get_option_value_bool_uchar(const zbx_vector_config_option_t *options
 
 	if (0 != i && 1 != i)
 	{
-		*error = zbx_dsprintf(NULL, "invalid \"%s\" in APMProvider: %d", name, i);
+		*error = zbx_dsprintf(NULL, "invalid \"%s\" in TelemetryProvider: %d", name, i);
 		return FAIL;
 	}
 
@@ -122,7 +122,7 @@ static void	log_unsupported_options(const zbx_vector_config_option_t *options)
 
 		if (SUCCEED != found)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Unsupported APMProvider option: \"%s\"",
+			zabbix_log(LOG_LEVEL_WARNING, "Unsupported TelemetryProvider option: \"%s\"",
 					options->values[i].name);
 		}
 	}
@@ -142,7 +142,7 @@ static int	parse_apm_provider(zbx_apm_db_config_t *apm_db_config, const char *co
 
 	if (NULL == (p2 = strchr(p, ';')))
 	{
-		*error = zbx_dsprintf(NULL, "invalid APMProvider value \"%s\"", config_apm_provider);
+		*error = zbx_dsprintf(NULL, "invalid TelemetryProvider value \"%s\"", config_apm_provider);
 		goto out;
 	}
 
@@ -151,7 +151,7 @@ static int	parse_apm_provider(zbx_apm_db_config_t *apm_db_config, const char *co
 		apm_db_config->db_type = ZBX_APM_DB_TYPE_CLICKHOUSE;
 	else
 	{
-		*error = zbx_dsprintf(NULL, "invalid database type in APMProvider: \"%s\"", config_apm_provider);
+		*error = zbx_dsprintf(NULL, "invalid database type in TelemetryProvider: \"%s\"", config_apm_provider);
 		goto out;
 	}
 
@@ -212,25 +212,29 @@ static int	validate_config(const zbx_apm_db_config_t *apm_db_config, char **erro
 {
 	if (NULL != apm_db_config->vault_path && (NULL != apm_db_config->username || NULL != apm_db_config->password))
 	{
-		*error = zbx_strdup(NULL, "vault_path cannot be set when username or password is set in APMProvider");
+		*error = zbx_strdup(NULL,
+				"vault_path cannot be set when username or password is set in TelemetryProvider");
 		return FAIL;
 	}
 
 	if (NULL == apm_db_config->url)
 	{
-		*error = zbx_dsprintf(NULL, "missing mandatory \"%s\" option in APMProvider", APM_PROVIDER_OPTION_URL);
+		*error = zbx_dsprintf(NULL, "missing mandatory \"%s\" option in TelemetryProvider",
+				APM_PROVIDER_OPTION_URL);
 		return FAIL;
 	}
 
 	if (NULL == apm_db_config->vault_path && (NULL == apm_db_config->username || NULL == apm_db_config->password))
 	{
-		*error = zbx_strdup(NULL, "either vault_path or username and password must be set in APMProvider");
+		*error = zbx_strdup(NULL,
+				"either vault_path or username and password must be set in TelemetryProvider");
 		return FAIL;
 	}
 
 	if (NULL == apm_db_config->db)
 	{
-		*error = zbx_dsprintf(NULL, "missing mandatory \"%s\" option in APMProvider", APM_PROVIDER_OPTION_DB);
+		*error = zbx_dsprintf(NULL, "missing mandatory \"%s\" option in TelemetryProvider",
+				APM_PROVIDER_OPTION_DB);
 		return FAIL;
 	}
 

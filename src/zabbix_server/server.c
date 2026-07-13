@@ -1245,7 +1245,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			ZBX_CONF_PARM_OPT,	0,			0},
 		{"HistoryProvider",		&config_history_providers,		ZBX_CFG_TYPE_MULTISTRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"APMProvider",			&config_apm_provider,			ZBX_CFG_TYPE_STRING,
+		{"TelemetryProvider",			&config_apm_provider,			ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
