@@ -13,6 +13,7 @@
 **/
 
 #include "otel_worker.h"
+#include "zabbix_proxy/otel/otel_task.h"
 #include "zbxmw.h"
 #include "zbxnix.h"
 #include "zbxsupervisor_client.h"
@@ -24,6 +25,21 @@ zbx_otel_worker_t	*otel_worker_create(void)
 	worker = (zbx_otel_worker_t *)zbx_calloc(NULL, 1, sizeof(zbx_otel_worker_t));
 
 	return worker;
+}
+
+static void	otel_worker_process_message(zbx_otel_task_message_t *task)
+{
+	char	*error = NULL;
+
+	if (SUCCEED != zbx_grpc_decode_request(task->request, task->type, &task->message, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+		zbx_free(error);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "OTEL: %s", task->message);
+	}
 }
 
 void	*otel_worker_entry(void *args)
@@ -52,6 +68,9 @@ void	*otel_worker_entry(void *args)
 
 			switch (task->type)
 			{
+				case OTEL_TASK_MESSAGE:
+					otel_worker_process_message((zbx_otel_task_message_t *)task);
+					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN_MSG("unknown task type %d", task->type);
 					break;

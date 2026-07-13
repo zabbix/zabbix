@@ -12,21 +12,29 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_TYPES_EXT_H
-#define ZABBIX_TYPES_EXT_H
+#ifndef ZABBIX_OTEL_TASK_H
+#define ZABBIX_OTEL_TASK_H
 
-/* type declarations using post c99 features */
+#include "otel_grpc.h"
+#include "zbxmw.h"
 
-#include "zbxsysinc.h"
+typedef enum
+{
+	OTEL_TASK_MESSAGE
+}
+zbx_cep_task_type_t;
 
-#if defined(HAVE_STDATOMIC_H) && !defined(__cplusplus)
-typedef _Atomic uint64_t zbx_atomic_uint64_t;
-typedef _Atomic uint32_t zbx_atomic_uint32_t;
-typedef _Atomic int zbx_atomic_int_t;
-#else
-typedef volatile uint64_t zbx_atomic_uint64_t;
-typedef volatile uint32_t zbx_atomic_uint32_t;
-typedef volatile int zbx_atomic_int_t;
-#endif
+typedef struct
+{
+	zbx_mw_task_t		base;
+	zbx_grpc_request_type_t	type;
+	zbx_grpc_request_t	request;
+	char			*message;
+}
+zbx_otel_task_message_t;
+
+zbx_mw_task_t	*otel_task_message_create(zbx_grpc_request_t request, zbx_grpc_request_type_t type);
+
+void	otel_task_free(zbx_mw_task_t *mw_task);
 
 #endif

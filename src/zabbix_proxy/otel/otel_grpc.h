@@ -12,21 +12,38 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_TYPES_EXT_H
-#define ZABBIX_TYPES_EXT_H
+#ifndef ZABBIX_OTEL_GRPC_H
+#define ZABBIX_OTEL_GRPC_H
 
-/* type declarations using post c99 features */
-
-#include "zbxsysinc.h"
-
-#if defined(HAVE_STDATOMIC_H) && !defined(__cplusplus)
-typedef _Atomic uint64_t zbx_atomic_uint64_t;
-typedef _Atomic uint32_t zbx_atomic_uint32_t;
-typedef _Atomic int zbx_atomic_int_t;
-#else
-typedef volatile uint64_t zbx_atomic_uint64_t;
-typedef volatile uint32_t zbx_atomic_uint32_t;
-typedef volatile int zbx_atomic_int_t;
+#ifdef __cplusplus
+extern "C" {
 #endif
 
+#include "zbxmw.h"
+
+typedef enum
+{
+	OTEL_TRACE,
+	OTEL_METRIC,
+	OTEL_LOG
+}
+zbx_grpc_request_type_t;
+
+typedef void * zbx_grpc_request_t;
+typedef void * zbx_grpc_handle_t;
+
+zbx_grpc_handle_t	zbx_grpc_start(const char *address, const char *port, zbx_mw_queue_t *queue, char **error);
+void	zbx_grpc_stop(zbx_grpc_handle_t handle);
+
+int	zbx_grpc_decode_request(zbx_grpc_request_t request, zbx_grpc_request_type_t type, char **output,
+		char **error);
+void	zbx_grpc_request_free(zbx_grpc_request_t request, zbx_grpc_request_type_t type);
+
+#ifdef __cplusplus
+}
 #endif
+
+
+#endif
+
+

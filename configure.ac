@@ -1653,7 +1653,7 @@ AS_HELP_STRING([--with-otcollector], [turn on OTLP/gRPC event collector, require
         ])
 
         OTEL_CFLAGS="$GRPC_CFLAGS $PROTOBUF_CFLAGS"
-        OTEL_LIBS="$GRPC_LIBS $PROTOBUF_LIBS"
+        OTEL_LIBS="$GRPC_LIBS $PROTOBUF_LIBS -lstdc++"
         AC_SUBST(OTEL_CFLAGS)
         AC_SUBST(OTEL_LIBS)
 
