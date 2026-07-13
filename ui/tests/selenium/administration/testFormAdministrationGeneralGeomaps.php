@@ -116,7 +116,6 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 			foreach ($hintboxes as $field => $text) {
 				$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->click();
 				$hint = $this->query('css:div.overlay-dialogue.wordbreak')->waitUntilPresent()->one();
-
 				$this->assertEquals($text, $hint->getText());
 				$hint->asOverlayDialog()->close();
 			}
