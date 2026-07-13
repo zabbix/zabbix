@@ -116,9 +116,10 @@ $html_page = (new CHtmlPage())
 							->addClass(ZBX_STYLE_BTN_ACTION)
 							->addClass(ZBX_ICON_MENU)
 							->setId('dashboard-actions')
-							->setTitle(_('Actions'))
+							->setHint(_('Actions'), '', false)
 							->setEnabled($data['dashboard']['can_edit_dashboards'] || $data['can_view_reports'])
 							->setAttribute('aria-haspopup', true)
+							->setAttribute('aria-label', _('Dashboard actions'))
 							->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
 								$data['dashboard']['editable'], $data['has_related_reports'],
 								$data['dashboard']['can_edit_dashboards'], $data['can_view_reports'],
@@ -131,7 +132,8 @@ $html_page = (new CHtmlPage())
 				(new CTag('nav', true, new CList([
 					(new CButton('dashboard-config'))
 						->addClass(ZBX_STYLE_BTN_ICON)
-						->addClass(ZBX_ICON_COG_FILLED),
+						->addClass(ZBX_ICON_COG_FILLED)
+						->setAttribute('aria-label', _('Dashboard properties')),
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
 						->addItem(
