@@ -20,7 +20,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * Test suite for user macro expansion in item names.
  *
  * @required-components server
- * @backup hosts,items,item_rtname,globalmacro,triggers,hostmacro,item_tag,trigger_tag,functions,events,problem,hosts_templates
+ * @backup hosts,globalmacro
  */
 class testUserMacrosInItemNames extends CIntegrationTest {
 	/** Maximum number of iterations to wait for NDJSON export files to appear. */
@@ -231,6 +231,9 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid2 = $response['result']['hostids'][0];
 
+		// Clean up stale NDJSON data from a previous run before creating new data.
+		$this->cleanupNdjsonExportData();
+
 		// Create host with host macros and trapper item with tag for NDJSON export test.
 		$response = $this->call('host.create', [
 			[
@@ -319,39 +322,91 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 		$now = time();
 		$prev_hour = $now - 3600;
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->prepareExportDir($export_dir);
-		// Send values one hour apart to flush trends and create a problem event.
-		$this->sendSenderValues([
-			['host' => self::HOSTNAME_EXPORT, 'key' => 'macro.export.test', 'value' => '3',
-				'clock' => $prev_hour
-			],
-			['host' => self::HOSTNAME_EXPORT, 'key' => 'macro.export.test', 'value' => '127',
-				'clock' => $now
-			]
+		try {
+			$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+			$this->prepareExportDir($export_dir);
+			// Send values one hour apart to flush trends and create a problem event.
+			$this->sendSenderValues([
+				['host' => self::HOSTNAME_EXPORT, 'key' => 'macro.export.test', 'value' => '3',
+					'clock' => $prev_hour
+				],
+				['host' => self::HOSTNAME_EXPORT, 'key' => 'macro.export.test', 'value' => '127',
+					'clock' => $now
+				]
+			]);
+			// Verify history NDJSON.
+			$this->waitForExportFile($export_dir, 'history');
+			$this->assertExportNameResolved($export_dir, 'history', self::$itemid_export,
+				'File config.json exists');
+			$this->assertExportTagPairResolvedByItemid($export_dir, 'history', self::$itemid_export,
+				'item_tags', 'env', 'prod', ['{$ENV}']);
+			$this->assertExportTagPairResolvedByItemid($export_dir, 'history', self::$itemid_export,
+				'item_tags', 'env-prod', 'value-prod', ['{$ENV}']);
+			// Verify trends NDJSON.
+			$this->waitForExportFile($export_dir, 'trends');
+			$this->assertExportNameResolved($export_dir, 'trends', self::$itemid_export,
+				'File config.json exists');
+			$this->assertExportTagPairResolvedByItemid($export_dir, 'trends', self::$itemid_export,
+				'item_tags', 'env', 'prod', ['{$ENV}']);
+			$this->assertExportTagPairResolvedByItemid($export_dir, 'trends', self::$itemid_export,
+				'item_tags', 'env-prod', 'value-prod', ['{$ENV}']);
+			// Verify event NDJSON.
+			$this->waitForExportFile($export_dir, 'problems');
+			$this->assertEventTagResolved($export_dir, 'Macro export trigger for ' . self::HOSTNAME_EXPORT,
+				'env', 'prod', '{$ENV}');
+			$this->assertEventTagResolved($export_dir, 'Macro export trigger for ' . self::HOSTNAME_EXPORT,
+				'event-prod', 'problem-prod', '{$ENV}');
+		}
+		finally {
+			$this->cleanupNdjsonExportData();
+		}
+	}
+
+	private function cleanupNdjsonExportData(): void {
+		// Remove NDJSON files created by this test run.
+		$export_dir = self::getExportDir();
+
+		foreach (glob($export_dir . '/*.ndjson') as $file) {
+			@unlink($file);
+		}
+
+		// Delete the NDJSON host via API. This cascades to items, triggers, item tags, trigger tags, host macros and functions.
+		$response = $this->call('host.get', [
+			'filter' => ['host' => [self::HOSTNAME_EXPORT]],
+			'output' => ['hostid']
 		]);
-		// Verify history NDJSON.
-		$this->waitForExportFile($export_dir, 'history');
-		$this->assertExportNameResolved($export_dir, 'history', self::$itemid_export,
-			'File config.json exists');
-		$this->assertExportTagPairResolvedByItemid($export_dir, 'history', self::$itemid_export,
-			'item_tags', 'env', 'prod', ['{$ENV}']);
-		$this->assertExportTagPairResolvedByItemid($export_dir, 'history', self::$itemid_export,
-			'item_tags', 'env-prod', 'value-prod', ['{$ENV}']);
-		// Verify trends NDJSON.
-		$this->waitForExportFile($export_dir, 'trends');
-		$this->assertExportNameResolved($export_dir, 'trends', self::$itemid_export,
-			'File config.json exists');
-		$this->assertExportTagPairResolvedByItemid($export_dir, 'trends', self::$itemid_export,
-			'item_tags', 'env', 'prod', ['{$ENV}']);
-		$this->assertExportTagPairResolvedByItemid($export_dir, 'trends', self::$itemid_export,
-			'item_tags', 'env-prod', 'value-prod', ['{$ENV}']);
-		// Verify event NDJSON.
-		$this->waitForExportFile($export_dir, 'problems');
-		$this->assertEventTagResolved($export_dir, 'Macro export trigger for ' . self::HOSTNAME_EXPORT,
-			'env', 'prod', '{$ENV}');
-		$this->assertEventTagResolved($export_dir, 'Macro export trigger for ' . self::HOSTNAME_EXPORT,
-			'event-prod', 'problem-prod', '{$ENV}');
+
+		if ($response['result']) {
+			$hostids = array_column($response['result'], 'hostid');
+			$this->call('host.delete', $hostids);
+		}
+
+		// Clean up events, history and trends that are not cascade-deleted.
+		$event_name = 'Macro export trigger for ' . self::HOSTNAME_EXPORT;
+
+		$response = $this->call('event.get', [
+			'filter' => ['name' => [$event_name]],
+			'output' => ['eventid']
+		]);
+
+		if ($response['result']) {
+			$eventids = array_column($response['result'], 'eventid');
+
+			if ($eventids) {
+				$eventids_str = implode(',', $eventids);
+
+				DBexecute('DELETE FROM problem_tag WHERE eventid IN (' . $eventids_str . ')');
+				DBexecute('DELETE FROM event_tag WHERE eventid IN (' . $eventids_str . ')');
+				DBexecute('DELETE FROM problem WHERE eventid IN (' . $eventids_str . ')');
+				DBexecute('DELETE FROM events WHERE eventid IN (' . $eventids_str . ')');
+			}
+		}
+
+		// Clean up history and trends that reference the deleted item.
+		if (self::$itemid_export !== null) {
+			DBexecute('DELETE FROM history_uint WHERE itemid=' . self::$itemid_export);
+			DBexecute('DELETE FROM trends_uint WHERE itemid=' . self::$itemid_export);
+		}
 	}
 
 	private function prepareExportDir($export_dir) {
