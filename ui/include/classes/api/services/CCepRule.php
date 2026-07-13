@@ -884,10 +884,6 @@ class CCepRule extends CApiService {
 				continue;
 			}
 
-			if (array_key_exists('tags', $cep_rule['window'])) {
-				$cep_rule['window']['tags'] = implode(PHP_EOL, $cep_rule['window']['tags']);
-			}
-
 			$cep_ruleid = $cep_rule['cep_ruleid'];
 
 			if ($cep_rule['window_type'] == CCepRuleHelper::WINDOW_NONE) {
@@ -910,6 +906,10 @@ class CCepRule extends CApiService {
 				);
 
 				if ($upd_window) {
+					if (array_key_exists('tags', $upd_window)) {
+						$upd_window['tags'] = implode(PHP_EOL, $upd_window['tags']);
+					}
+
 					$upd_windows[] = [
 						'values' => $upd_window,
 						'where' => ['cep_ruleid' => $cep_ruleid]
@@ -963,6 +963,9 @@ class CCepRule extends CApiService {
 			}
 
 			$cep_rule['window'] += array_diff_key($db_defaults, array_flip($allowed_fields));
+			if ($cep_rule['window']['tags'] === '') {
+				$cep_rule['window']['tags'] = [];
+			}
 		}
 		unset($cep_rule);
 	}
@@ -1301,6 +1304,14 @@ class CCepRule extends CApiService {
 	}
 
 	private static function updateForce(array $cep_rules, ?array &$db_cep_rules = null): void {
+		$tags_formatted = function(array $cep_rule): array {
+			if (array_key_exists('window', $cep_rule) && array_key_exists('tags', $cep_rule['window'])) {
+				$cep_rule['window']['tags'] = implode(PHP_EOL, $cep_rule['window']['tags']);
+			}
+
+			return $cep_rule;
+		};
+
 		$upd_rules = [];
 
 		foreach ($cep_rules as $cep_rule) {
@@ -1309,7 +1320,7 @@ class CCepRule extends CApiService {
 
 			if ($upd_rule) {
 				$upd_rules[] = [
-					'values' => $upd_rule,
+					'values' => $tags_formatted($upd_rule),
 					'where' => ['cep_ruleid' => $cep_rule['cep_ruleid']]
 				];
 			}
@@ -1323,7 +1334,19 @@ class CCepRule extends CApiService {
 		self::updateWindow($cep_rules, $db_cep_rules);
 		self::updateOperations($cep_rules, $db_cep_rules);
 
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_CEP_RULE, $cep_rules, $db_cep_rules);
+		$window_tags_newlines = function(array $records): array {
+			return array_map(function(array $record) {
+				if (array_key_exists('window', $record) && array_key_exists('tags', $record['window'])) {
+					$record['window']['tags'] = implode(PHP_EOL, $record['window']['tags']);
+				}
+
+				return $record;
+			}, $records);
+		};
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_CEP_RULE, $window_tags_newlines($cep_rules),
+			$window_tags_newlines($db_cep_rules)
+		);
 	}
 
 	public function delete(array $cep_ruleids): array {
