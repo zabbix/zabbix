@@ -256,7 +256,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 			'tag_value' => ['db cep_operation.tag_value', 'required', 'when' => ['type', 'in' => [
 				CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG, CCepRuleHelper::OP_SET_TAG_VALUE,
 				CCepRuleHelper::OP_INCREASE_TAG_VALUE, CCepRuleHelper::OP_DECREASE_TAG_VALUE,
-				CCepRuleHelper::OP_RENAME_TAG, CCepRuleHelper::OP_REMOVE_TAG
+				CCepRuleHelper::OP_REMOVE_TAG
 			]]],
 			'severity' => ['db cep_operation.severity', 'required',
 				'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,

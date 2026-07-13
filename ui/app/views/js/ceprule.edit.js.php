@@ -152,7 +152,7 @@ window.ceprule_edit_popup = new class {
 					<input data-field-type="hidden" name="operations[#{sortorder}][evaltype]" type="hidden" value="#{evaltype}"/>
 					<input data-field-type="hidden" name="operations[#{sortorder}][event_name]" type="hidden" value="#{event_name}"/>
 					<input data-field-type="hidden" name="operations[#{sortorder}][tag]" type="hidden" value="#{tag}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][new_tag]" type="hidden" value="#{new_tag_name}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][new_tag]" type="hidden" value="#{new_tag}"/>
 					<input data-field-type="hidden" name="operations[#{sortorder}][tag_value]" type="hidden" value="#{tag_value}"/>
 					<input data-field-type="hidden" name="operations[#{sortorder}][severity]" type="hidden" value="#{severity}"/>
 					<input data-field-type="hidden" name="operations[#{sortorder}][suppress_until]" type="hidden" value="#{suppress_until}"/>
