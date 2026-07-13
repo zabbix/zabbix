@@ -49,9 +49,8 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  */
 class testHashicorpVault extends CIntegrationTest {
 
-	const VAULT_PORT = 8200;
-	const VAULT_ADDR = 'http://127.0.0.1:'.self::VAULT_PORT;
-	const VAULT_ROOT_TOKEN = 'root';
+	const VAULT_ADDR = PHPUNIT_HASHICORP_ADDRESS;
+	const VAULT_ROOT_TOKEN = PHPUNIT_HASHICORP_ROOT_TOKEN_ID;
 	const VAULT_ROLE_NAME = 'zbx-it-role-'.PHPUNIT_PORT_PREFIX;
 	const VAULT_POLICY_NAME = 'zbx-it-policy-'.PHPUNIT_PORT_PREFIX;
 	const VAULT_SECRET_PATH = 'zabbix/'.PHPUNIT_PORT_PREFIX.'/db';
