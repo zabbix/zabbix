@@ -8,6 +8,6 @@ z-bar-gauge {
 		top: 0;
 		left: 0;
 		border: 1px solid $form-border-color;
-		border-radius: 3px;
+		border-radius: var(--surface-border-radius);
 	}
 }

@@ -177,15 +177,8 @@
 		}
 	}
 
-	&.multiselect-suggest-grouped {
-		li {
-			padding-left: 25px;
-
-			&.suggest-group {
-				padding-left: 5px;
-				font-weight: bold;
-			}
-		}
+	li:first-child {
+		border-top: none;
 	}
 
 	.suggest-hover {
@@ -197,6 +190,17 @@
 
 		span:first-child {
 			font-weight: bold;
+		}
+	}
+
+	&.multiselect-suggest-grouped {
+		li {
+			padding-left: 25px;
+
+			&.suggest-group {
+				padding-left: 5px;
+				font-weight: bold;
+			}
 		}
 	}
 }
@@ -211,7 +215,9 @@
 .multiselect-available {
 	position: absolute;
 	z-index: 20000;
+	margin-top: 3px ;
 	border: 1px solid $action-border-color;
+	border-radius: var(--input-border-radius);
 	overflow-y: auto;
 	@extend %webkit-scrollbar;
 	box-shadow: 0 6px 10px 0 $action-shadow-color;

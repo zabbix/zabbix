@@ -523,14 +523,13 @@ class CFormValidator {
 			.then(response => response.json())
 			.then(response => {
 				if ('error' in response) {
-					throw {error: response.error};
+					console.error('validate.api.exists error', response.error);
+					throw new Error();
 				}
 
 				return response;
 			})
-			.catch(exception => {
-				console.error(exception);
-
+			.catch(() => {
 				return {result: false};
 			});
 	}
@@ -604,6 +603,7 @@ class CFormValidator {
 			if (delayed_checks.length) {
 				let requests = [];
 				let id = 0;
+				let result_all = true;
 
 				for (const check of delayed_checks) {
 					requests.push(new Promise((resolve) => {
@@ -630,13 +630,15 @@ class CFormValidator {
 								}
 
 								resolve();
+							})
+							.catch(() => {
+								result_all = false;
+								resolve();
 							});
 					}));
 				}
 
 				Promise.all(requests).then(() => {
-					let result_all = true;
-
 					delayed_checks.forEach((check) => {
 						if ('error_msg' in check) {
 							this.#addError(check.path, check.error_msg, CFormValidator.ERROR_LEVEL_DELAYED);

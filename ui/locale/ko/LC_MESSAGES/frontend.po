@@ -15776,6 +15776,10 @@ msgstr ""
 msgid "Next dashboard"
 msgstr "다음 대시보드"
 
+#: jsLoader.php:416
+msgid "Next month"
+msgstr ""
+
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
 #: app/views/monitoring.dashboard.view.php:235
@@ -15789,6 +15793,10 @@ msgstr "다음 페이지"
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Next step"
 msgstr "다음 스텝"
+
+#: jsLoader.php:414
+msgid "Next year"
+msgstr ""
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -23027,6 +23035,10 @@ msgstr "0 으로 처리"
 #: include/classes/data/CItemData.php:2792
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr "추세 기능 캐시 통계입니다. 유효한 매개변수는 다음과 같습니다: all, hit, phits, misses, pmisses, items, pitems 및 request."
+
+#: include/classes/data/CItemData.php:3013
+msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems, paccessed and requests."
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:226
 #: app/partials/configuration.filter.items.php:162

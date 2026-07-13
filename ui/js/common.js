@@ -318,6 +318,10 @@ function PopUp(action, parameters, {
 		overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.reload'));
 	}
 
+	if (action === 'template.edit') {
+		parameters = JSON.stringify(parameters);
+	}
+
 	overlay
 		.load(action, parameters)
 		.then(function(resp) {
@@ -1121,6 +1125,30 @@ function deepCompare(first, second) {
 	}
 
 	return false;
+}
+
+function deepMerge(target, ...sources) {
+	if (!sources.length) {
+		return target;
+	}
+
+	const source = sources.shift();
+
+	if (typeof target === 'object' && typeof source === 'object') {
+		for (const key in source) {
+			if (typeof source[key] === 'object') {
+				if (!target[key]) {
+					Object.assign(target, {[key]: {}});
+				}
+
+				deepMerge(target[key], source[key]);
+			} else {
+				Object.assign(target, {[key]: source[key]});
+			}
+		}
+	}
+
+	return deepMerge(target, ...sources);
 }
 
 /**
