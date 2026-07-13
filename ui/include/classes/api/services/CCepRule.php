@@ -884,6 +884,10 @@ class CCepRule extends CApiService {
 				continue;
 			}
 
+			if (array_key_exists('tags', $cep_rule['window'])) {
+				$cep_rule['window']['tags'] = implode(PHP_EOL, $cep_rule['window']['tags']);
+			}
+
 			$cep_ruleid = $cep_rule['cep_ruleid'];
 
 			if ($cep_rule['window_type'] == CCepRuleHelper::WINDOW_NONE) {
