@@ -64,16 +64,15 @@ const usageMessageFormatRuntimeControlFormat = //
 `Perform administrative functions (%s timeout)
 
     Remote control interface, available commands:
-      log_level_increase     Increase log level
-      log_level_decrease     Decrease log level
-      userparameter_reload   Reload user parameters
-      periodic_prof_enable   Enable periodic profiling
-      periodic_prof_disable  Disable periodic profiling
-      periodic_prof_execute  Write profiling data immediately
-      periodic_prof_set_interval <seconds>
-                             Set profiling interval
-      metrics                List available metrics
-      version                Display Agent version
+      log_level_increase                    Increase log level
+      log_level_decrease                    Decrease log level
+      userparameter_reload                  Reload user parameters
+      periodic_prof_enable                  Enable periodic profiling
+      periodic_prof_disable                 Disable periodic profiling
+      periodic_prof_execute                 Write profiles after a 5-second sample
+      periodic_prof_set_interval <seconds>  Set profiling interval
+      metrics                               List available metrics
+      version                               Display Agent version
 `
 
 const usageMessageFormat = //
