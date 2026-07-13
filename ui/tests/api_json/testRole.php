@@ -23,6 +23,8 @@ require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
  */
 class testRole extends CAPITest {
 
+	private static array $roleids = [];
+
 	public static function prepareTestData(): void {
 		CTestDataHelper::createObjects([
 			'roles' => [
@@ -54,6 +56,22 @@ class testRole extends CAPITest {
 						]
 					],
 					'ui.default_access' => '0'
+				]],
+				['name' => 'zabbix-user-role', 'type' => USER_TYPE_ZABBIX_USER, 'rules' => [
+					'ui' => [
+						[
+							'name' => 'monitoring.dashboard',
+							'status' => '1'
+						]
+					]
+				]],
+				['name' => 'zabbix-admin-role', 'type' => USER_TYPE_ZABBIX_ADMIN, 'rules' => [
+					'ui' => [
+						[
+							'name' => 'monitoring.dashboard',
+							'status' => '1'
+						]
+					]
 				]]
 			],
 			'user_groups' => [
@@ -223,6 +241,10 @@ class testRole extends CAPITest {
 							],
 							[
 								'name' => 'administration.authentication',
+								'status' => '1'
+							],
+							[
+								'name' => 'administration.linked_devices',
 								'status' => '1'
 							],
 							[
@@ -469,6 +491,8 @@ class testRole extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['roleids'] as $roleid) {
+				self::$roleids[] = $roleid;
+
 				$dbRow = CDBHelper::getRow('SELECT name,type FROM role WHERE roleid='.zbx_dbstr($roleid));
 				$this->assertEquals($dbRow['name'], $role['name']);
 				$this->assertEquals($dbRow['type'], $role['type']);
@@ -534,11 +558,13 @@ class testRole extends CAPITest {
 	* @dataProvider role_delete
 	*/
 	public function testRole_Delete($roleids, $expected_error) {
-		CTestDataHelper::convertValueReferences($roleids);
+		$converted_roleids = CTestDataHelper::getConvertedValueReferences($roleids);
 
-		$result = $this->call('role.delete', $roleids, $expected_error);
+		$result = $this->call('role.delete', $converted_roleids, $expected_error);
 
 		if ($expected_error === null) {
+			CTestDataHelper::unsetDeletedObjectIds(array_diff($roleids, $converted_roleids));
+
 			foreach ($result['result']['roleids'] as $id) {
 				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM role WHERE roleid='.zbx_dbstr($id)));
 			}
@@ -579,8 +605,28 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
-					'roleid' => ':role:first-role-for-update',
-					'roleid' => 'zabbix-admin-role',
+					'roleid' => ':role:second-role-for-update',
+					'name' => 'Successfully updated role',
+					'type' => '3',
+					'rules' => [
+						'ui' => [
+							[
+								'name' => 'administration.macros',
+								'status' => '1'
+							],
+							[
+								'name' => 'administration.housekeeping',
+								'status' => '1'
+							]
+						],
+						'ui.default_access' => '0'
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'role' => [
+					'roleid' => ':role:zabbix-admin-role',
 					'name' => 'zabbix-admin-role',
 					'type' => 2, // USER_TYPE_ZABBIX_ADMIN
 					'rules' => [
@@ -596,7 +642,7 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
-					'roleid' => 'roleid_3',
+					'roleid' => ':role:first-role-for-update',
 					'name' => 'non existent parameter',
 					'type' => '4'
 				],
@@ -691,7 +737,7 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
-					'roleid' => 'zabbix-user-role',
+					'roleid' => ':role:zabbix-user-role',
 					'name' => 'zabbix-user-role',
 					'type' => 1, // USER_TYPE_ZABBIX_USER
 					'rules' => [
@@ -1025,113 +1071,8 @@ class testRole extends CAPITest {
 	}
 
 	public static function cleanTestData(): void {
+		CDataHelper::call('role.delete', self::$roleids);
+
 		CTestDataHelper::cleanUp();
-	/**
-	 * Test data used by tests.
-	 */
-	protected static $data = [
-		'roleids' => ['roleid_1', 'roleid_2', 'roleid_3', 'roleid_4', 'roleid_5', 'zabbix-user-role', 'zabbix-admin-role'],
-		'usergroupids' => ['usergroupid_1']
-	];
-
-	/**
-	 * Prepare data for tests.
-	 */
-	public function prepareTestData() {
-
-		$response = CDataHelper::call('role.create', [
-			[
-				'name' => 'used-role',
-				'type' => 2
-			],
-			[
-				'name' => 'deletable-role',
-				'type' => 1
-			],
-			[
-				'name' => 'first-role-for-update',
-				'type' => 3
-			],
-			[
-				'name' => 'second-role-for-update',
-				'type' => 3,
-				'rules' => [
-					'ui' => [
-						[
-							'name' => 'administration.macros',
-							'status' => '0'
-						],
-						[
-							'name' => 'administration.housekeeping',
-							'status' => '1'
-						]
-					],
-					'ui.default_access' => '0'
-				]
-			],
-			[
-				'name' => 'role-for-get',
-				'type' => 3,
-				'rules' => [
-					'ui' => [
-						[
-							'name' => 'configuration.discovery_actions',
-							'status' => '0'
-						],
-						[
-							'name' => 'configuration.internal_actions',
-							'status' => '1'
-						]
-					],
-					'ui.default_access' => '0'
-				]
-			],
-			[
-				'name' => 'zabbix-user-role',
-				'type' => 1, // USER_TYPE_ZABBIX_USER
-				'rules' => [
-					'ui' => [
-						[
-							'name' => 'monitoring.dashboard',
-							'status' => '1'
-						]
-					]
-				]
-			],
-			[
-				'name' => 'zabbix-admin-role',
-				'type' => 2, // USER_TYPE_ZABBIX_ADMIN
-				'rules' => [
-					'ui' => [
-						[
-							'name' => 'monitoring.dashboard',
-							'status' => '1'
-						]
-					]
-				]
-			]
-		]);
-
-		$this->assertArrayHasKey('roleids', $response);
-		self::$data['roleids'] = array_combine(self::$data['roleids'], $response['roleids']);
-
-		$response = CDataHelper::call('usergroup.create', [
-			[
-				'name' => 'user-group-used-for-role.delete-tests'
-			]
-		]);
-
-		$userGroupId = (int) $response['usrgrpids'][0];
-
-		CDataHelper::call('user.create', [
-			[
-				'username' => 'user-used-for-role.delete-tests',
-				'roleid' => self::$data['roleids']['roleid_1'],
-				'passwd' => 'Z@bb1x1234',
-				'usrgrps' => [
-						['usrgrpid' => $userGroupId]
-					]
-			]
-		]);
 	}
 }
