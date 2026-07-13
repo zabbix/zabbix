@@ -107,8 +107,7 @@ class CSettings extends CApiService {
 	 */
 	public static function getPrivate(): array {
 		$parameters = CApiSettingsHelper::getParameters([
-			'session_key', 'dbversion_status', 'server_status', 'software_update_checkid', 'software_update_check_data',
-			'banner_data'
+			'session_key', 'dbversion_status', 'server_status', 'software_update_checkid', 'software_update_check_data'
 		]);
 
 		$parameters['dbversion_status'] = json_decode($parameters['dbversion_status'], true) ?: [];
@@ -123,8 +122,6 @@ class CSettings extends CApiService {
 		if ($parameters['software_update_checkid'] !== '') {
 			$parameters['software_update_checkid'] = hash('sha256', $parameters['software_update_checkid']);
 		}
-
-		$parameters['banner_data'] = json_decode($parameters['banner_data'], true) ?: [];
 
 		return $parameters;
 	}
@@ -309,13 +306,7 @@ class CSettings extends CApiService {
 	}
 
 	public static function updatePrivate(array $settings): array {
-		if (array_key_exists('software_update_check_data', $settings)) {
-			$settings['software_update_check_data'] = json_encode($settings['software_update_check_data']);
-		}
-
-		if (array_key_exists('banner_data', $settings)) {
-			$settings['banner_data'] = json_encode($settings['banner_data']);
-		}
+		$settings['software_update_check_data'] = json_encode($settings['software_update_check_data']);
 
 		CApiSettingsHelper::updateParameters($settings);
 
