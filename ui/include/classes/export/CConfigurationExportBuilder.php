@@ -326,8 +326,8 @@ class CConfigurationExportBuilder {
 
 			foreach ($global_regex['expressions'] as $expression) {
 				$expressions[] = [
-					'expression' => $expression['expression'],
 					'type' => $expression['expression_type'],
+					'expression' => $expression['expression'],
 					'exp_delimiter' => $expression['exp_delimiter'],
 					'case_sensitive' => $expression['case_sensitive']
 				];
@@ -337,8 +337,8 @@ class CConfigurationExportBuilder {
 
 			$result[$i] = [
 				'name' => $global_regex['name'],
-				'description' => $global_regex['description'],
-				'expressions' => $expressions
+				'expressions' => $expressions,
+				'description' => $global_regex['description']
 			];
 		}
 
