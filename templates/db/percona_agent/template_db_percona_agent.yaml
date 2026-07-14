@@ -165,7 +165,7 @@ zabbix_export:
             ( last(//percona.innodb_buffer_pool_read_requests) + 
             ( last(//percona.innodb_buffer_pool_read_requests) = 0 ) ) * 100 * 
             ( last(//percona.innodb_buffer_pool_read_requests) > 0 ))
-          description: 'The item shows how effectively the buffer pool is serving reads.'
+          description: 'Shows how effectively the buffer pool is serving reads.'
           tags:
             - tag: component
               value: memory
@@ -656,7 +656,7 @@ zabbix_export:
             Normally, writes to the InnoDB buffer pool happen in the background.
             When no clean pages are available, dirty pages are flushed first
             in order to free some up. This counts the number of waits for this operation
-            to finish. If this value is not small, look at the increasing `innodb_buffer_pool_size`.
+            to finish. If this value is not small, consider increasing `innodb_buffer_pool_size`.
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -877,7 +877,7 @@ zabbix_export:
           key: percona.innodb_row_lock_time
           value_type: FLOAT
           units: s
-          description: 'The total time spent in acquiring row locks for InnoDB tables, in milliseconds.'
+          description: 'The total time spent in acquiring row locks for InnoDB tables.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -901,7 +901,7 @@ zabbix_export:
           key: percona.innodb_row_lock_time_avg
           value_type: FLOAT
           units: s
-          description: 'Average time spent waiting for row locks in InnoDB, in milliseconds.'
+          description: 'Average time spent waiting for row locks in InnoDB.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -925,7 +925,7 @@ zabbix_export:
           key: percona.innodb_row_lock_time_max
           value_type: FLOAT
           units: s
-          description: 'The maximum time to acquire a row lock for InnoDB tables, in milliseconds.'
+          description: 'The maximum time to acquire a row lock for InnoDB tables.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -1550,7 +1550,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'percona.slave_sql_running_state["{#MASTER_HOST}"]'
               value_type: TEXT
-              description: 'Shows the state of the SQL driver threads.'
+              description: 'Shows the state of the SQL thread.'
               preprocessing:
                 - type: XMLPATH
                   parameters:
