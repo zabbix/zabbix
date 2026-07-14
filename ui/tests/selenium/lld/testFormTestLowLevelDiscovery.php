@@ -56,7 +56,7 @@ class testFormTestLowLevelDiscovery extends testItemTest {
 	 * @ignoreBrowserErrors
 	 */
 	public function testFormTestLowLevelDiscovery_TestLLDHost($data) {
-		$this->checkTestItem($data, true, self::HOST_ID, 'lldrule', true);
+		$this->checkTestItem($data, true, self::HOST_ID, 'lldrule');
 	}
 
 	/**
@@ -70,6 +70,6 @@ class testFormTestLowLevelDiscovery extends testItemTest {
 	 * @ignoreBrowserErrors
 	 */
 	public function testFormTestLowLevelDiscovery_TestLLDTemplate($data) {
-		$this->checkTestItem($data, false, self::TEMPLATE_ID, 'lldrule', true);
+		$this->checkTestItem($data, false, self::TEMPLATE_ID, 'lldrule');
 	}
 }

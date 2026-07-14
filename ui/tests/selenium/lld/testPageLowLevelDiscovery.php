@@ -278,7 +278,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			case 'disabled':
 				$this->query('button:Disable')->one()->click();
 				$this->page->acceptAlert();
-				$this->page->waitUntilReady();
+				$this->assertMessage(TEST_GOOD, 'Discovery rule disabled');
 				$table->waitUntilStalled();
 				$this->selectTableRows($data['names'], 'Name', self::SELECTOR);
 				$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());

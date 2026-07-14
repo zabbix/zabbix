@@ -741,10 +741,10 @@ class testItemTest extends CWebTest {
 	 * @param array		$data			data provider
 	 * @param boolean	$is_host		true if host, false if template
 	 * @param string	$id				id of a host, template or LLD rule
-	 * @param string	$item_type			pointer to form in URL
-	 * @param boolean   $lld            true if lld, false if item or item prototype
+	 * @param string	$item_type		pointer to form in URL
 	 */
-	public function checkTestItem($data, $is_host, $id, $item_type = null, $lld = false) {
+	public function checkTestItem($data, $is_host, $id, $item_type = null) {
+		$lld = ($item_type === 'lldrule');
 		$context = ($is_host === true) ? 'host' : 'template';
 		$create_link = ($item_type === 'item prototype')
 			? 'zabbix.php?action=item.prototype.list&context='.$context.'&parent_discoveryid='.$id
@@ -755,7 +755,7 @@ class testItemTest extends CWebTest {
 		}
 
 		$this->page->login()->open($create_link);
-		$this->query('button:'.(($item_type === 'lldrule') ? 'Create discovery rule' : 'Create '.$item_type))->one()->click();
+		$this->query('button:'.(($lld) ? 'Create discovery rule' : 'Create '.$item_type))->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$item_form = $dialog->asForm();
 		$item_form->fill($data['fields']);
@@ -1238,7 +1238,7 @@ class testItemTest extends CWebTest {
 					}
 				}
 			}
-			if ($lld === false){
+			if ($lld === false) {
 				$not_supported->check();
 				$this->assertFalse($value->isEnabled());
 			}
@@ -1274,11 +1274,13 @@ class testItemTest extends CWebTest {
 		$item_form->selectTab($item_type);
 	}
 
-	private function saveFormAndCheckMessage($message, $lld = 'false') {
-
-		$item_form = $lld
-			? $this->query('name:itemForm')->waitUntilPresent()->asForm()->one()
-			: COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
+	private function saveFormAndCheckMessage($message, $lld = false) {
+		if ($lld) {
+			$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		}
+		else {
+			$item_form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
+		}
 
 		$item_form->submit();
 		$this->page->waitUntilReady();

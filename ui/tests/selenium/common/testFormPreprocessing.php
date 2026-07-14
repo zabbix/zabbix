@@ -4182,7 +4182,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				->one(false)->isVisible(!$lld)
 		);
 
-		// Hint is present only for Items and Item prototypes.
+		// Check hintbox content.
 		$form->getLabel('Preprocessing steps')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
 		$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->waitUntilReady();
 
@@ -4223,7 +4223,7 @@ abstract class testFormPreprocessing extends CWebTest {
 		foreach ($data as $step) {
 			$step_type_field->fill($step['type']);
 
-			/**
+			/*
 			 * Check Custom on fail checkbox. Note that error handler and parameters are checked by
 			 * separate scenario _CustomOnFail and function checkCustomOnFail().
 			 */

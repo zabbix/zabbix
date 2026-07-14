@@ -29,7 +29,6 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	public $success_message = 'Discovery rule created';
 	public $fail_message = 'Cannot add discovery rule';
 
-	const IS_LLD = true;
 	const HOSTID = 40001;
 	const INHERITANCE_TEMPLATEID	= 15000;	// 'Inheritance test template'
 	const INHERITANCE_HOSTID		= 15001;	// 'Template inheritance test host'
