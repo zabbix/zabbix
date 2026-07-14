@@ -1344,6 +1344,12 @@ zbx_uint64_t	cep_close_internal_event(zbx_cep_t *cep, unsigned char object, zbx_
 	if (NULL == (obj = cep_get_object(cep, &origin)))
 		return 0;
 
+	if (0 == obj->events.values_num)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("found internal event object without events in cache");
+		return 0;
+	}
+
 	/* internal event objects in cache as exactly one event */
 	zbx_cep_event_handle_t	h = obj->events.values[0];
 
