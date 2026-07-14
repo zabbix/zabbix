@@ -192,7 +192,7 @@ window.drule_edit_popup = new class {
 	}
 
 	#updateRadioButtonUniquenessCriteria(event) {
-		let target = event.target;
+		const target = event.target;
 
 		document.querySelectorAll('[name^=dchecks][name$="[uniq]"]')
 			.forEach((dcheck) => {
@@ -205,8 +205,8 @@ window.drule_edit_popup = new class {
 	}
 
 	#updateRadioButtonValues(event) {
-		let target = event.target;
-		let name = target.getAttribute('name');
+		const target = event.target;
+		const name = target.getAttribute('name');
 
 		if (typeof target.dataset.id !== 'undefined') {
 			document.querySelectorAll(`[name^=dchecks][name$="[${name}]"]`)
@@ -447,11 +447,13 @@ window.drule_edit_popup = new class {
 				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('discovery')) ?>
 			};
 
-			this.#post(zabbixUrl(url_params), {druleids: [this.#form.findFieldByName('druleid').getValue()]}, (response) => {
-				overlayDialogueDestroy(this.#overlay.dialogueid);
+			this.#post(zabbixUrl(url_params), {druleids: [this.#form.findFieldByName('druleid').getValue()]},
+				(response) => {
+					overlayDialogueDestroy(this.#overlay.dialogueid);
 
-				this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-			});
+					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				}
+			);
 		}
 		else {
 			this.#overlay.unsetLoading();
