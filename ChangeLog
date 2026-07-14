@@ -1,3 +1,14 @@
+Changes for 8.0.0rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-27453] fixed average trend calculation to avoid producing inf values when dealing with DBL_MAX input; updated timeleft() function to return DBL_MAX when threshold cannot be reached and history approaches DBL_MAX (arimdjonoks)
+.........T [ZBX-26704] fixed redundant preprocessing before discard (kflorowski)
+..F....... [ZBX-27145] improved selected row color for dark themes (gklavins)
+..F....... [ZBX-27555] fixed saved settings not being displayed for geographical maps, when tile provider set to Other (gklavins)
+
+--------------------------------------------------------------------------------
 Changes for 8.0.0beta2
 
 New features:
@@ -393,6 +404,15 @@ Bug fixes:
 .......PS. [ZBX-25752] reduced memory allocations in preprocessing manager (wiper)
 A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
 .......PS. [ZBX-27638] prohibited to modify or override global system JavaScript objects via user script for preprocessing subsystem and zabbix_js (MVekslers)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.13rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-26704] fixed redundant preprocessing before discard (kflorowski)
+........S. [ZBX-27453] fixed average trend calculation to avoid producing inf values when dealing with DBL_MAX input; updated timeleft() function to return DBL_MAX when threshold cannot be reached and history approaches DBL_MAX (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.12
@@ -1887,6 +1907,15 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
 
 --------------------------------------------------------------------------------
+Changes for 7.0.29rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-26704] fixed redundant preprocessing before discard (kflorowski)
+..F....... [ZBX-26465] improved aria-label text for all functional buttons and icons and aria-expanded of side menu elements for Screen Reader users (aluchko)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.28
 
 7.0.28rc1 was released as 7.0.28 without any changes
@@ -1902,6 +1931,7 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27495] fixed excessive history upload delay for both Zabbix agents (vsmelovs)
 ..F....... [ZBX-27883] fixed inability to copy trigger prototypes that depend on same trigger prototype when cloning template or host (vmaksimovs)
 ...G...... [ZBX-27900] fixed Windows job handle not being closed on Zabbix agent 2 (esneiders)
 ..F....... [ZBX-27594] fixed sorting of discovered hosts (msnihach)
@@ -6011,6 +6041,13 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.48rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 6.0.47

@@ -2694,7 +2694,7 @@ button {
         font-size: 11px; }
       .datatable .datatable-body .row.row-selected .row-spacer,
       .datatable .datatable-body .row.row-selected .cell:not(.cell-bg) {
-        background-color: #2f280a;
+        background-color: #252525;
         border-bottom-color: rgba(31, 44, 51, 0.1); }
       .datatable .datatable-body .row .table-stats.table-stats-small {
         font-size: 11px; }
@@ -3376,7 +3376,7 @@ z-color-picker.has-error .color-picker-box {
   .list-table tbody tr:not(.hover-nobg):not(.row-selected):hover {
     background-color: #383838; }
   .list-table tbody tr.row-selected {
-    background-color: #2f280a; }
+    background-color: #252525; }
   .list-table tbody th.table-info,
   .list-table tbody td.table-info {
     color: #737373; }
@@ -8836,7 +8836,7 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
   overflow-y: auto;
   padding: 10px;
   margin: 10px;
-  background-color: #2f280a;
+  background-color: #252525;
   border: 1px solid #303030; }
   .debug-output.debug-output-table-refresh {
     margin: 10px 0 0 0; }
@@ -8991,7 +8991,7 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
 .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info, .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info:hover, div.dashboard-widget-itemhistory .list-table tr.selected td,
 div.dashboard-widget-itemhistory .list-table td.selected, div.dashboard-widget-itemhistory .list-table tr.selected td:hover,
 div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .svg-graph-hintbox .has-broadcast-data.selected, .svg-graph-hintbox .has-broadcast-data.selected:hover {
-  background-color: #2f280a; }
+  background-color: #252525; }
 
 @keyframes is-loading-kf {
   to {
