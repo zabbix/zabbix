@@ -989,8 +989,8 @@ void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_q
 
 		results[i] = result;
 
-		/* unknown trigger events will not be sent to CEP */
-		if (TRIGGER_VALUE_UNKNOWN == (query->flags & CEP_QUERY_MASK_VALUE))
+		/* unknown and none trigger events will not be sent to CEP */
+		if (TRIGGER_VALUE_UNKNOWN <= (query->flags & CEP_QUERY_MASK_VALUE))
 		{
 			if (0 == obj->pending_events_num && 0 == obj->events.values_num)
 				zbx_hashset_remove_direct(&cep->objects, obj);
