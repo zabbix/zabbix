@@ -2598,12 +2598,18 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			zbx_exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED != zbx_vault_init(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location, &error))
+		zbx_vault_init(zbx_config_vault.name);
+
+		if (NULL == zbx_config_vault.token)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
-			zbx_free(error);
-			zbx_exit(EXIT_FAILURE);
+			zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
+					config_ssl_cert_location, config_ssl_key_location, &zbx_config_vault.token);
+
+			if (NULL == zbx_config_vault.token)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot login into HashiCorp vault with AppRole method");
+				zbx_exit(EXIT_FAILURE);
+			}
 		}
 	}
 

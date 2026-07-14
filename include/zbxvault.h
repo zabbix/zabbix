@@ -37,9 +37,7 @@ int	zbx_vault_is_configured(const zbx_config_vault_t *conf);
 int	zbx_vault_validate_config(const zbx_config_vault_t *config_vault, const char *dbuser,
 		const char *dbpassword, char **error);
 
-int	zbx_vault_init(zbx_config_vault_t *config_vault, const char *config_source_ip,
-		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, char **error);
+void	zbx_vault_init(const char *vault_name);
 
 int	zbx_vault_get_kvs(const char *path, zbx_kvs_t *kvs, const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location,
