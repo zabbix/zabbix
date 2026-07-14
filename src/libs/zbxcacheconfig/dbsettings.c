@@ -477,6 +477,9 @@ static int	setting_get_server_status_enable_mobile_devices(const zbx_setting_val
 		return 0;
 	}
 
+	if ('\0' == *value_str)
+		return 0;
+
 	if (SUCCEED != zbx_json_open(value_str, &jp))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid server status value: %s", value_str);
@@ -569,7 +572,7 @@ static void	update_hk_history_overrides(const char *history_status)
 }
 
 static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uint64_t revision,
-		int defaults_log_level, unsigned char program_type)
+		int defaults_log_level)
 {
 	int		value_int = 0;
 	zbx_uint64_t	value_uint64;
@@ -589,16 +592,13 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 	store_int_setting(values, "autoreg_tls_accept", defaults_log_level, &config->config->autoreg_tls_accept,
 			revision);
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-	{
-		value_int = setting_get_server_status_enable_mobile_devices(values, defaults_log_level);
+	value_int = setting_get_server_status_enable_mobile_devices(values, defaults_log_level);
 
-		if (config->config->enable_mobile_devices != value_int)
-		{
-			UPDATE_REVISION(revision, "enable_mobile_devices", "%d", config->config->enable_mobile_devices,
-					value_int);
-			config->config->enable_mobile_devices = value_int;
-		}
+	if (config->config->enable_mobile_devices != value_int)
+	{
+		UPDATE_REVISION(revision, "enable_mobile_devices", "%d", config->config->enable_mobile_devices,
+				value_int);
+		config->config->enable_mobile_devices = value_int;
 	}
 
 	if (SUCCEED == setting_get_str(values, "compress_older", defaults_log_level, &value_str))
@@ -886,7 +886,7 @@ void	dc_sync_settings(zbx_dbsync_t *sync, zbx_uint64_t revision, unsigned char p
 	if (0 == setup_entry_table(sync, values))
 		zabbix_log(LOG_LEVEL_WARNING, "no records in \"settings\" table");
 
-	store_settings(values, found, revision, defaults_log_level, program_type);
+	store_settings(values, found, revision, defaults_log_level);
 
 	for (size_t i = 0; i < ARRSIZE(settings_description_table); i++)
 	{
