@@ -1757,6 +1757,23 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 		zbx_dc_expand_user_and_func_macros(um_handle, &period, NULL, 0, NULL);
 		zbx_dc_close_user_macros(um_handle);
 
+		/* push notifications are supported only for trigger events */
+		if (MEDIA_TYPE_PUSH == type && ALERT_STATUS_NEW == status &&
+				EVENT_SOURCE_TRIGGERS != event->source)
+		{
+			const char	*push_error = "Push notifications are supported only for trigger actions.";
+
+			zabbix_log(LOG_LEVEL_WARNING, "%s actionid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
+					" userid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64,
+					push_error, actionid, eventid, userid, mediatypeid);
+
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, eventid, userid, now,
+					mediatypeid, row[1], subject, message, (int)ALERT_STATUS_FAILED,
+					push_error, esc_step, (int)ALERT_TYPE_MESSAGE, ackid, "{}", p_eventid);
+
+			continue;
+		}
+
 		zabbix_log(LOG_LEVEL_DEBUG, "severity:%d, media severity:%d, period:'%s', userid:" ZBX_FS_UI64,
 				priority, severity, period, userid);
 
@@ -1805,23 +1822,6 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 					"clock", "mediatypeid", "sendto", "subject", "message", "status", "error",
 					"esc_step", "alerttype", "acknowledgeid", "parameters", "p_eventid",
 					(char *)NULL);
-		}
-
-		/* push notifications are supported only for trigger events */
-		if (MEDIA_TYPE_PUSH == type && ALERT_STATUS_NEW == status &&
-				EVENT_SOURCE_TRIGGERS != event->source)
-		{
-			const char	*push_error = "Push notifications are supported only for trigger actions.";
-
-			zabbix_log(LOG_LEVEL_WARNING, "%s actionid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
-					" userid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64,
-					push_error, actionid, eventid, userid, mediatypeid);
-
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, eventid, userid, now,
-					mediatypeid, row[1], subject, message, (int)ALERT_STATUS_FAILED,
-					push_error, esc_step, (int)ALERT_TYPE_MESSAGE, ackid, "{}", p_eventid);
-
-			continue;
 		}
 
 		if (MEDIA_TYPE_EXEC == type)
