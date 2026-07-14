@@ -333,7 +333,7 @@ class CConfigurationExportBuilder {
 				];
 			}
 
-			CArrayHelper::sort($global_regex['expressions'], ['type', 'expression']);
+			CArrayHelper::sort($expressions, ['type', 'expression']);
 
 			$result[$i] = [
 				'name' => $global_regex['name'],
