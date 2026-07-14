@@ -202,8 +202,8 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$this->page->login()->open('httpdetails.php?httptestid='.self::$httptest_id)->waitUntilReady();
 
 		// Test Kiosk mode.
-		$this->query('xpath://button[@title="Kiosk mode"]')->one()->hoverMouse()->click();
-		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent();
+		$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->hoverMouse()->click();
+		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->waitUntilPresent();
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter disappeared.
@@ -211,7 +211,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$this->assertFalse($this->query('xpath://div[@aria-label="Filter"]')->exists());
 		$this->assertTrue($this->query('class:list-table')->exists());
 
-		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->click(true);
+		$this->query('xpath://button[@aria-label="Exit full screen mode"]')->waitUntilPresent()->one()->click(true);
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter are visible again.

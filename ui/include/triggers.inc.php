@@ -2020,9 +2020,11 @@ function makeTriggerDependencies(array $dependencies, bool $freeze_on_click = tr
 
 	foreach (['down', 'up'] as $type) {
 		if (array_key_exists($type, $dependencies)) {
+			$title = $type === 'down' ? _('Dependent trigger') : _('Parent trigger');
+
 			$table = (new CTableInfo())
 				->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-				->setHeader([$type === 'down' ? _('Depends on') : _('Dependent')]);
+				->setHeader([$title]);
 
 			foreach ($dependencies[$type] as $description) {
 				$table->addRow($description);
@@ -2030,6 +2032,7 @@ function makeTriggerDependencies(array $dependencies, bool $freeze_on_click = tr
 
 			$result[] = (new CButtonIcon($type === 'down' ? ZBX_ICON_BULLET_ALT_DOWN : ZBX_ICON_BULLET_ALT_UP))
 				->addClass(ZBX_STYLE_COLOR_ICON)
+				->setAttribute('aria-label', $title)
 				->setHint($table, '', $freeze_on_click);
 		}
 	}
