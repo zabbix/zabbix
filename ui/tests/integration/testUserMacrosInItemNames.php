@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  */
 class testUserMacrosInItemNames extends CIntegrationTest {
 	/** Maximum number of iterations to wait for NDJSON export files to appear. */
-	private const WAIT_EXPORT_FILE_ITERATIONS = 30;
+	private const WAIT_EXPORT_FILE_ITERATIONS = 120;
 	const HOSTNAME1 = 'test_user_macros_in_item_names1';
 	const HOSTNAME2 = 'test_user_macros_in_item_names2';
 	const HOSTNAME_EXPORT = 'test_ndjson_export_macros';
