@@ -64,6 +64,9 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid1 = $response['result']['hostids'][0];
 
+		// Ensure the global macro for trapper allowed hosts exists before creating any trapper items.
+		$this->ensureTrapperAllowedHostsMacro();
+
 		$response = $this->call('item.create', [
 			'hostid' => self::$hostid1,
 			'name' => 'Item {$TEST}',
@@ -257,6 +260,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			'key_' => 'macro.export.test',
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'tags' => [
 				['tag' => 'env', 'value' => '{$ENV}'],
 				['tag' => 'env-{$ENV}', 'value' => 'value-{$ENV}']
@@ -379,6 +383,45 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			$hostids = array_column($response['result'], 'hostid');
 			$this->call('host.delete', $hostids);
 		}
+	}
+
+	private function ensureTrapperAllowedHostsMacro(): void {
+		$allowed_hosts = $this->call('usermacro.get', [
+			'globalmacro' => true,
+			'filter' => ['macro' => '{$TRAPPER.ALLOWED_HOSTS}'],
+			'output' => ['globalmacroid', 'value']
+		]);
+
+		$this->assertArrayHasKey('result', $allowed_hosts);
+
+		if ($allowed_hosts['result']) {
+			$this->assertArrayHasKey(0, $allowed_hosts['result']);
+			$this->assertArrayHasKey('globalmacroid', $allowed_hosts['result'][0]);
+			$this->assertArrayHasKey('value', $allowed_hosts['result'][0]);
+
+			if ($allowed_hosts['result'][0]['value'] !== '0.0.0.0/0,::/0') {
+				$response = $this->call('usermacro.updateglobal', [
+					'globalmacroid' => $allowed_hosts['result'][0]['globalmacroid'],
+					'macro' => '{$TRAPPER.ALLOWED_HOSTS}',
+					'value' => '0.0.0.0/0,::/0'
+				]);
+
+				$this->assertArrayHasKey('result', $response);
+				$this->assertArrayHasKey('globalmacroids', $response['result']);
+				$this->assertArrayHasKey(0, $response['result']['globalmacroids']);
+			}
+
+			return;
+		}
+
+		$response = $this->call('usermacro.createglobal', [
+			'macro' => '{$TRAPPER.ALLOWED_HOSTS}',
+			'value' => '0.0.0.0/0,::/0'
+		]);
+
+		$this->assertArrayHasKey('result', $response);
+		$this->assertArrayHasKey('globalmacroids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['globalmacroids']);
 	}
 
 	private function prepareExportDir($export_dir) {
