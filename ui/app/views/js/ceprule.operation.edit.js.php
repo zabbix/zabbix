@@ -120,21 +120,15 @@ window.ceprule_operation_edit_popup = new class {
 		const execute_when = Number(this.form.findFieldByName('execute_when').getValue());
 		const zselect = window['ceprule-operation-type'];
 
+		const operation_by_execute_when = JSON.parse('<?=
+			json_encode(CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN)
+		?>');
+		const available_options = operation_by_execute_when[execute_when];
+
 		const events_options = [];
 		const tags_options = [];
 		const enable_if_allowed = (option) => {
-			const value = Number(option.value);
-
-			option.is_disabled = false;
-			if (this.#window_type === '<?= CCepRuleHelper::WINDOW_PATTERN_MATCH ?>') {
-				option.is_disabled = !(value == <?= CCepRuleHelper::OP_COPY_LAST ?>
-					|| value == <?= CCepRuleHelper::OP_COPY_FIRST ?>);
-			}
-
-			if (value == <?= CCepRuleHelper::OP_DISCARD ?>) {
-				option.is_disabled = (execute_when == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>)
-					|| (execute_when == <?= CCepRuleHelper::WHEN_EVENT_EVICTED ?>);
-			}
+			option.is_disabled = !operation_by_execute_when[execute_when].includes(Number(option.value));
 		};
 
 		zselect.options.forEach(option => {
@@ -189,6 +183,7 @@ window.ceprule_operation_edit_popup = new class {
 
 		name.style.display = 'none';
 		tag.style.display = 'none';
+		tag.disabled = true;
 		severity.style.display = 'none';
 		period.style.display = 'none';
 		tag_pair.style.display = 'none';
@@ -233,6 +228,7 @@ window.ceprule_operation_edit_popup = new class {
 			<?= CCepRuleHelper::OP_REMOVE_TAG ?>
 		].includes(value)) {
 			tag.style.display = '';
+			tag.disabled = false;
 			return;
 		}
 

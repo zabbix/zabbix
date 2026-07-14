@@ -1248,7 +1248,7 @@ static void	cep_window_pool_load_events(zbx_hashset_t *groups, zbx_dbconn_t *db)
 		}
 
 		ZBX_STR2UINT64(eventid, row[1]);
-		if (NULL == (h = cep_acquire_event_handle(cep, eventid)))
+		if (NULL == (h = cep_acquire_event_handle_by_eventid(cep, eventid)))
 			continue;
 
 		events_num++;

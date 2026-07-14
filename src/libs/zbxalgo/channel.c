@@ -343,17 +343,21 @@ void	zbx_chan_compact(zbx_channel_t *chan, int min_capacity)
 
 	msgs = zbx_malloc(NULL, (size_t)chan->msg_size * new_capacity);
 
-	if (chan->head < chan->tail)
+	if (0 != chan->msg_num)
 	{
-		memcpy(msgs, chan->msgs + (size_t)chan->head * chan->msg_size, (size_t)chan->msg_num * chan->msg_size);
-	}
-	else
-	{
-		int	head_num = chan->capacity - chan->head;
-		size_t	head_size = head_num * chan->msg_size;
+		if (chan->head < chan->tail)
+		{
+			memcpy(msgs, chan->msgs + (size_t)chan->head * chan->msg_size,
+					(size_t)chan->msg_num * chan->msg_size);
+		}
+		else
+		{
+			int	head_num = chan->capacity - chan->head;
+			size_t	head_size = (size_t)head_num * chan->msg_size;
 
-		memcpy(msgs, chan->msgs + chan->head * chan->msg_size, head_size);
-		memcpy(msgs + head_size, chan->msgs, chan->tail * chan->msg_size);
+			memcpy(msgs, chan->msgs + (size_t)chan->head * chan->msg_size, head_size);
+			memcpy(msgs + head_size, chan->msgs, (size_t)chan->tail * chan->msg_size);
+		}
 	}
 
 	zbx_free(chan->msgs);

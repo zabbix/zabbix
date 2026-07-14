@@ -17,5 +17,6 @@
 [ ] debug mode smoke-test: check heavy page loads db queries/query plans. (API)
 [ ] problems table info column (if closed by cep -> add info icon)
 [.] template/data default cep rules in clean installation and DB upgrade
-[ ] Tags pattern-select multiselect will need new a component? The current one, can't be used.
+[x] Tags pattern-select multiselect will need new a component? The current one, can't be used.
+[x] inline validation using count_values for case where operations must contain at least one Execute when Event pattern matched operation when Window type is event pattern match
 [ ] PR review -> peer review..

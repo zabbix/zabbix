@@ -98,7 +98,7 @@ class CMultiSelect extends CTag {
 
 		$options_list = [
 			'defaultValue', 'disabled', 'selectedLimit', 'addNew', 'newItemName', 'styles', 'placeholder', 'hidden',
-			'readonly', 'maxlength'
+			'readonly', 'maxlength', 'ms_list_of_string_mode'
 		];
 		foreach ($options_list as $option) {
 			if (array_key_exists($option, $options)) {
@@ -154,7 +154,7 @@ class CMultiSelect extends CTag {
 	protected function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiselect_id', 'multiple', 'disabled', 'default_value', 'data',
 			'add_new', 'new_item_name', 'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest',
-			'hidden', 'readonly', 'maxlength'
+			'hidden', 'readonly', 'maxlength', 'ms_list_of_string_mode'
 		];
 
 		foreach ($options as $field => $value) {
@@ -174,6 +174,7 @@ class CMultiSelect extends CTag {
 			'data' => 'data',
 			'add_new' => 'addNew',
 			'new_item_name' => 'newItemName',
+			'ms_list_of_string_mode' => 'ms_list_of_string_mode',
 			'add_post_js' => 'add_post_js',
 			'styles' => 'styles',
 			'placeholder' => 'placeholder',

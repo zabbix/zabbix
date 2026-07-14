@@ -63,7 +63,9 @@ zbx_supervisor_client_t;
 
 int	zbx_supervisor_client_init(zbx_supervisor_client_t *svc, char **error);
 void	zbx_supervisor_client_clear(zbx_supervisor_client_t *svc);
+void	zbx_supervisor_client_prepare(const int *forks);
 int	zbx_supervisor_client_poll(zbx_supervisor_client_t *svc, int runlevel, char **error);
+int	zbx_supervisor_get_process_count(int process_type);
 
 void	zbx_supervisor_worklog_init(void);
 void	zbx_supervisor_worklog_clear(void);

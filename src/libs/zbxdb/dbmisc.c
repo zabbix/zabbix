@@ -325,6 +325,44 @@ static zbx_uint64_t	dbconn_get_nextid(zbx_dbconn_t *db, const char *tablename, z
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: retrieve and reserve a range of cached ids for a table            *
+ *                                                                            *
+ * Parameters: tablename - [IN] name of the table to get ids for              *
+ *             num       - [IN] number of ids to reserve                      *
+ *                                                                            *
+ * Return value: first id of the reserved range, 0 if the table is not        *
+ *               cached or has not yet had an id cached for it                *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_dbconn_get_maxid_num_cached(const char *tablename, int num)
+{
+	const char	**ptr;
+	size_t		index;
+	zbx_uint64_t	nextid = 0;
+
+	if (NULL == (ptr = (const char **)bsearch(&tablename, idcache_tables, ZBX_IDS_SIZE, sizeof(idcache_tables[0]),
+			compare_table_names)))
+	{
+		return 0;
+	}
+
+	index = (size_t)(ptr - idcache_tables);
+
+	zbx_mutex_lock(idcache_mutex);
+
+	if (0 != idcache->lastids[index])
+	{
+		nextid = idcache->lastids[index] + 1;
+		idcache->lastids[index] += num;
+	}
+
+	zbx_mutex_unlock(idcache_mutex);
+
+	return nextid;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get next id for requested table                                   *
  *                                                                            *
  ******************************************************************************/

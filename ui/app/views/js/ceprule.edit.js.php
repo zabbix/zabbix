@@ -57,9 +57,6 @@ window.ceprule_edit_popup = new class {
 	/** @type {Object} */
 	#rules_for_clone;
 
-	/** @type {jQuery} */
-	#ms_group_tags;
-
 	init({rules, rules_for_clone, operation_rules, condition_rules, ceprule}) {
 		this.#rules_for_clone = rules_for_clone;
 		this.#initTemplates();
@@ -155,7 +152,7 @@ window.ceprule_edit_popup = new class {
 					<input data-field-type="hidden" name="operations[#{sortorder}][evaltype]" type="hidden" value="#{evaltype}"/>
 					<input data-field-type="hidden" name="operations[#{sortorder}][event_name]" type="hidden" value="#{event_name}"/>
 					<input data-field-type="hidden" name="operations[#{sortorder}][tag]" type="hidden" value="#{tag}"/>
-					<input data-field-type="hidden" name="operations[#{sortorder}][new_tag]" type="hidden" value="#{new_tag_name}"/>
+					<input data-field-type="hidden" name="operations[#{sortorder}][new_tag]" type="hidden" value="#{new_tag}"/>
 					<input data-field-type="hidden" name="operations[#{sortorder}][tag_value]" type="hidden" value="#{tag_value}"/>
 					<input data-field-type="hidden" name="operations[#{sortorder}][severity]" type="hidden" value="#{severity}"/>
 					<input data-field-type="hidden" name="operations[#{sortorder}][suppress_until]" type="hidden" value="#{suppress_until}"/>
@@ -219,15 +216,18 @@ window.ceprule_edit_popup = new class {
 		window['ceprule-window-counttag-toggle'].addEventListener('change', (e) => {
 			const enabled = window['ceprule-window-counttag-toggle'].querySelector('[value="1"]').checked;
 			window['ceprule-window-counttag'].style.display = enabled ? '' : 'none';
+			window['ceprule-window-counttag'].disabled = !enabled;
 		});
 
 		window['ceprule-window-capacity-toggle'].addEventListener('change', (e) => {
 			const enabled = window['ceprule-window-capacity-toggle'].querySelector('[value="1"]').checked;
 			window['ceprule-window-capacity'].style.display = enabled ? '' : 'none';
+			window['ceprule-window-capacity'].disabled = !enabled;
 		});
 
 		window['ceprule-window-groupby-opt-tag'].addEventListener('change', (e) => {
 			window['ceprule-window-groupby-tag'].style.display = e.target.checked ? '' : 'none';
+			jQuery(window['ceprule-window-groupby-tag']).multiSelect(e.target.checked ? 'enable' : 'disable');
 		});
 
 		window['ceprule-window-type'].addEventListener('change', () => this.#handleWindowTypeChanged());
@@ -270,7 +270,6 @@ window.ceprule_edit_popup = new class {
 			.find(node => node.checked);
 		const type = Number(input.value);
 
-
 		// TODO: why are these fields initally in changed state although no interaction yet?
 		if (this.form.findFieldByName('window[group_by_host]')._changed
 				|| this.form.findFieldByName('window[group_by_host_group]')._changed
@@ -290,6 +289,7 @@ window.ceprule_edit_popup = new class {
 
 			form_field.style.display = display;
 			form_field.previousSibling.style.display = display;
+			jQuery(window['ceprule-script']).multilineInput(display === '' ? 'enable' : 'disable');
 		}
 		{
 			const form_field = window['ceprule-window-counttag'].closest('.form-field');
@@ -570,7 +570,7 @@ window.ceprule_edit_popup = new class {
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
 				tag: '',
 				tag_value: '',
-				tags: [{tag: '', operator: <?= TAG_OPERATOR_EQUAL ?>, value: ''}]
+				tags: [{tag: '$STATUS.CODE', operator: <?= TAG_OPERATOR_EQUAL ?>, value: '1'}]
 			};
 		}
 

@@ -307,11 +307,13 @@ static zbx_uint64_t	cep_eventid_next(zbx_cep_t *cep)
 
 	if (cep->eventid_next == cep->eventid_max)
 	{
-		zbx_dbconn_t	*db = zbx_dbconn_pool_acquire_connection(cep->dbpool);
+		if (0 == (cep->eventid_next = zbx_dbconn_get_maxid_num_cached("events", CEP_EVENTID_BATCH_SIZE)))
+		{
+			zbx_dbconn_t	*db = zbx_dbconn_pool_acquire_connection(cep->dbpool);
 
-		cep->eventid_next = zbx_dbconn_get_maxid_num(db, "events", CEP_EVENTID_BATCH_SIZE);
-
-		zbx_dbconn_pool_release_connection(cep->dbpool, db);
+			cep->eventid_next = zbx_dbconn_get_maxid_num(db, "events", CEP_EVENTID_BATCH_SIZE);
+			zbx_dbconn_pool_release_connection(cep->dbpool, db);
+		}
 
 		cep->eventid_max = cep->eventid_next + CEP_EVENTID_BATCH_SIZE;
 	}
@@ -319,6 +321,21 @@ static zbx_uint64_t	cep_eventid_next(zbx_cep_t *cep)
 	return cep->eventid_next++;
 
 #undef CEP_EVENTID_BATCH_SIZE
+}
+
+static zbx_cep_event_handle_t	cep_event_handle_acquire(zbx_cep_event_handle_t h)
+{
+	if (CEP_EVENT_STATE_ACTIVE != h->state)
+		return NULL;
+
+	if (0 == atomic_fetch_add(&h->refcount, 1))
+	{
+		/* handle is being released, revert refcount and return NULL */
+		atomic_fetch_sub(&h->refcount, 1);
+		return NULL;
+	}
+
+	return h;
 }
 
 /******************************************************************************
@@ -331,21 +348,14 @@ static zbx_uint64_t	cep_eventid_next(zbx_cep_t *cep)
  * Return value: event handle or NULL if not found or being released          *
  *                                                                            *
  ******************************************************************************/
-zbx_cep_event_handle_t	cep_acquire_event_handle(zbx_cep_t *cep, zbx_uint64_t eventid)
+zbx_cep_event_handle_t	cep_acquire_event_handle_by_eventid(zbx_cep_t *cep, zbx_uint64_t eventid)
 {
 	zbx_cep_event_handle_t	h = (zbx_cep_event_handle_t)zbx_hashset_search(&cep->events, &eventid);
 
-	if (NULL == h || CEP_EVENT_STATE_ACTIVE != h->state)
+	if (NULL == h)
 		return NULL;
 
-	if (0 == atomic_fetch_add(&h->refcount, 1))
-	{
-		/* handle is being released, revert refcount and return NULL */
-		atomic_fetch_sub(&h->refcount, 1);
-		return NULL;
-	}
-
-	return h;
+	return cep_event_handle_acquire(h);
 }
 
 /******************************************************************************
@@ -513,7 +523,7 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 
 			if (NULL == event || event->eventid != eventid)
 			{
-				zbx_cep_event_handle_t	h = cep_acquire_event_handle(cep, eventid);
+				zbx_cep_event_handle_t	h = cep_acquire_event_handle_by_eventid(cep, eventid);
 
 				if (NULL == h)
 					continue;
@@ -561,11 +571,12 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
 
 		if (NULL == h || h->eventid != eventid)
 		{
-			if (NULL == (h = cep_acquire_event_handle(cep, eventid)))
+			if (NULL == (h = cep_acquire_event_handle_by_eventid(cep, eventid)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
+			cep_release_event_handle(cep, h);
 		}
 
 		ZBX_DBROW2UINT64(suppress_local.maintenanceid, row[1]);
@@ -573,7 +584,6 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
 		suppress_local.until = 0;
 
 		zbx_vector_db_event_suppress_append(&h->event->suppress, suppress_local);
-		cep_release_event_handle(cep, h);
 	}
 
 	zbx_db_free_result(result);
@@ -888,7 +898,7 @@ void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool)
  * Parameters: cache - [IN/OUT] cache context                                 *
  *             event - [IN]     event to add                                  *
  *                                                                            *
- * Return value: event handle                                                 *
+ * Return value: event handle, must be released after use                     *
  *                                                                            *
  ******************************************************************************/
 zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event)
@@ -901,6 +911,12 @@ zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event)
 	zbx_vector_cep_event_handle_append(&obj->events, h);
 
 	obj->pending_events_num--;
+
+	if (NULL == (h = cep_event_handle_acquire(h)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("failed to acquire newly created event handle");
+		zbx_exit(EXIT_FAILURE);
+	}
 
 	return h;
 }
@@ -1044,7 +1060,15 @@ void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_q
 		}
 
 		results[i] = result;
-		obj->pending_events_num++;
+
+		/* unknown and none trigger events will not be sent to CEP */
+		if (TRIGGER_VALUE_UNKNOWN <= (query->flags & CEP_QUERY_MASK_VALUE))
+		{
+			if (0 == obj->pending_events_num && 0 == obj->events.values_num)
+				zbx_hashset_remove_direct(&cep->objects, obj);
+		}
+		else
+			obj->pending_events_num++;
 	}
 
 	zbx_hashset_destroy(&triggerids);
@@ -1146,12 +1170,18 @@ zbx_uint64_t	cep_open_trigger_event(zbx_cep_t *cep, zbx_uint64_t triggerid, unsi
 	}
 
 	if (CEP_EVENT_DEPENDENCY_DENY == cep_check_trigger_dependency(cep, NULL, dep_triggerids))
+	{
+		obj->pending_events_num--;
 		return 0;
+	}
 
 	if (0 != obj->events.values_num)
 	{
 		if (TRIGGER_TYPE_MULTIPLE_TRUE != trigger_type)
+		{
+			obj->pending_events_num--;
 			return 0;
+		}
 	}
 	else
 		*obj_value = TRIGGER_VALUE_PROBLEM;
@@ -1368,6 +1398,8 @@ zbx_uint64_t	cep_open_internal_event(zbx_cep_t *cep, unsigned char object, zbx_u
 	if (0 != obj->events.values_num)
 		return 0;
 
+	obj->pending_events_num++;
+
 	return cep_eventid_next(cep);
 }
 
@@ -1396,7 +1428,11 @@ zbx_uint64_t	cep_close_internal_event(zbx_cep_t *cep, unsigned char object, zbx_
 	if (NULL == (obj = cep_get_object(cep, &origin)))
 		return 0;
 
-	obj->pending_events_num--;
+	if (0 == obj->events.values_num)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("found internal event object without events in cache");
+		return 0;
+	}
 
 	/* internal event objects in cache as exactly one event */
 	zbx_cep_event_handle_t	h = obj->events.values[0];
@@ -1552,7 +1588,7 @@ void	cep_update_event_maintenances(zbx_cep_t *cep, const zbx_vector_event_mainte
 			if (NULL != h)
 				cep_event_update_maintenances(h, &suppress, action);
 
-			if (NULL == (h = cep_acquire_event_handle(cep, events->values[i].eventid)))
+			if (NULL == (h = cep_acquire_event_handle_by_eventid(cep, events->values[i].eventid)))
 				continue;
 
 			zbx_vector_cep_event_handle_append(handles, h);
@@ -1583,7 +1619,7 @@ void	cep_update_event_severities(zbx_cep_t *cep, const zbx_vector_event_severity
 	{
 		zbx_cep_event_handle_t	h;
 
-		if (NULL == (h = cep_acquire_event_handle(cep, events->values[i].eventid)))
+		if (NULL == (h = cep_acquire_event_handle_by_eventid(cep, events->values[i].eventid)))
 			continue;
 
 		zbx_cep_event_t	*event = cep_event_handle_mutable(h);
@@ -1675,7 +1711,7 @@ void	cep_add_event_tags(zbx_cep_t *cep, zbx_vector_event_tags_t *events, zbx_vec
 	{
 		zbx_cep_event_handle_t	h;
 
-		if (NULL == (h = cep_acquire_event_handle(cep, events->values[i].eventid)))
+		if (NULL == (h = cep_acquire_event_handle_by_eventid(cep, events->values[i].eventid)))
 		{
 			i++;
 			continue;
@@ -1792,13 +1828,13 @@ void	cep_get_events(zbx_cep_t *cep, unsigned char source, zbx_vector_cep_event_h
 	zbx_hashset_iter_reset(&cep->events, &iter);
 	while (NULL != (h = (zbx_cep_event_handle_t)zbx_hashset_iter_next(&iter)))
 	{
-		if (CEP_EVENT_STATE_DELETED == h->state)
-			continue;
-
 		if (h->event->origin.source != source)
 			continue;
 
-		zbx_vector_cep_event_handle_append(handles, zbx_cep_event_handle_addref(h));
+		if (NULL == (h = cep_event_handle_acquire(h)))
+			continue;
+
+		zbx_vector_cep_event_handle_append(handles, h);
 	}
 }
 
@@ -1820,7 +1856,7 @@ void	cep_delete_events(zbx_cep_t *cep, const zbx_vector_uint64_t *eventids, zbx_
 		zbx_cep_event_handle_t	h;
 		zbx_cep_object_t	*obj;
 
-		if (NULL == (h = cep_acquire_event_handle(cep, eventids->values[i])))
+		if (NULL == (h = cep_acquire_event_handle_by_eventid(cep, eventids->values[i])))
 			continue;
 
 		if (NULL != (obj = cep_get_object(cep, &h->event->origin)))
@@ -1931,11 +1967,22 @@ void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats)
 	stats->events_discarded = atomic_load(&cep->events_discarded_num);
 
 	stats->events_num = cep->events.num_data;
+	stats->objects_num = cep->objects.num_data;
+}
+
+int	zbx_cep_event_handle_compare(const void *a1, const void *a2)
+{
+	const zbx_cep_event_handle_t	*h1 = (const zbx_cep_event_handle_t *)a1;
+	const zbx_cep_event_handle_t	*h2 = (const zbx_cep_event_handle_t *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(*h1, *h2);
+
+	return 0;
 }
 
 void	cep_set_event_cause(zbx_cep_t *cep, zbx_uint64_t eventid, zbx_uint64_t cause_eventid)
 {
-	zbx_cep_event_handle_t	h = cep_acquire_event_handle(cep, eventid);
+	zbx_cep_event_handle_t	h = cep_acquire_event_handle_by_eventid(cep, eventid);
 
 	if (NULL != h)
 	{

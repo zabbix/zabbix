@@ -495,7 +495,7 @@ static void	discovery_update_host_status(zbx_db_dhost *dhost, int status, int no
 
 	if (NULL != add_event_cb)
 	{
-		event = zbx_create_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid, now, status, 0);
+		event = zbx_create_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid, now, 0, status);
 		add_event_cb(event);
 	}
 }

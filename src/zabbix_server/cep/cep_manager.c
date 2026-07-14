@@ -275,7 +275,7 @@ static void	cep_manager_get_stats(zbx_cep_manager_t *manager, zbx_ipc_client_t *
 	zbx_ipc_message_t **message)
 {
 	unsigned char*	response;
-	zbx_uint32_t	reponse_len = sizeof(zbx_uint64_t) * 3 + sizeof(int) * 4;
+	zbx_uint32_t	reponse_len = sizeof(zbx_uint64_t) * 3 + sizeof(int) * 5;
 
 	response = (unsigned char*)zbx_malloc(NULL, reponse_len);
 
@@ -334,7 +334,7 @@ static void	cep_manager_reset_rule(zbx_cep_manager_t *manager, const zbx_ipc_mes
  ******************************************************************************/
 static void	cep_manager_flush_remote_task(zbx_cep_task_remote_t *task)
 {
-	if (NULL != task->response)
+	if (NULL != task->response && SUCCEED == zbx_ipc_client_connected(task->client))
 		zbx_ipc_client_send(task->client, task->message->code, task->response, task->response_len);
 }
 

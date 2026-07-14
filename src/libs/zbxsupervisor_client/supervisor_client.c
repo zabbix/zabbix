@@ -13,6 +13,8 @@
 **/
 
 #include "supervisor_client.h"
+#include "zbx_cep_client.h"
+#include "zbxmw.h"
 #include "zbxsupervisor_client.h"
 
 #include "zbxcommon.h"
@@ -21,6 +23,8 @@
 #include "zbxipcservice.h"
 
 #define SUPERVISOR_TIMEOUT	5
+
+static const int	*config_forks;
 
 /******************************************************************************
  *                                                                            *
@@ -152,3 +156,34 @@ char	*supervisor_client_get_activities(void)
 
 	return (char *)message.data;
 }
+
+void	zbx_supervisor_client_prepare(const int *forks)
+{
+	config_forks =  forks;
+}
+
+int	zbx_supervisor_get_process_count(int process_type)
+{
+	const char	*service;
+	char		*error = NULL;
+	int		count;
+
+	switch (process_type)
+	{
+		case ZBX_PROCESS_TYPE_CEP_WORKER:
+			service = ZBX_IPC_SERVICE_CEP;
+			break;
+		default:
+			return  ZBX_PROCESS_TYPE_COUNT > process_type ? config_forks[process_type] : 0;
+	}
+
+	if (SUCCEED == zbx_mw_get_worker_count(service, &count, &error))
+		return count;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain number of running processes of type %d: %s",
+			process_type, error);
+	zbx_free(error);
+
+	return 0;
+}
+

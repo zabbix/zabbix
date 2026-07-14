@@ -276,12 +276,13 @@ static void	cep_worker_add_event_tags(zbx_cep_worker_t *worker, zbx_cep_task_rem
 	cep_add_event_tags(cep, &event_tags, &handles);
 	cep_cache_release(&cep);
 
+	zbx_cep_get_eventids_from_handles(handles.values, handles.values_num, &eventids);
+	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	zbx_cep_task_add_tags_t	*db_task = (zbx_cep_task_add_tags_t *)cep_create_task_add_tags(&event_tags, &eventids);
 
 	if (0 != handles.values_num)
 	{
-		zbx_cep_get_eventids_from_handles(handles.values, handles.values_num, &eventids);
-		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_event_tags_sort(&event_tags, zbx_event_tags_compare);
 
 		/* remove non trigger event handles from returned handles - no need */
@@ -391,7 +392,8 @@ static void	cep_worker_get_stats(zbx_cep_worker_t *worker, zbx_cep_task_remote_t
 	ptr += zbx_serialize_value(ptr, stats.task_remote_num);
 	ptr += zbx_serialize_value(ptr, stats.task_internal_num);
 	ptr += zbx_serialize_value(ptr, stats.task_completed_num);
-	(void)zbx_serialize_value(ptr, stats.events_num);
+	ptr += zbx_serialize_value(ptr, stats.events_num);
+	(void)zbx_serialize_value(ptr, stats.objects_num);
 }
 
 static void	cep_worker_set_event_cause(zbx_cep_task_remote_t *task)
@@ -473,6 +475,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	zbx_cep_t		*cep;
 	zbx_db_event		*db_event = task->db_event;
 	zbx_uint64_t		eventid;
+	zbx_cep_event_handle_t	h;
 
 	cep_cache_acquire(&cep);
 	eventid = cep_open_trigger_event(cep, db_event->objectid, db_event->trigger.type,
@@ -492,6 +495,12 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	zbx_cep_event_t	*event = cep_event_create(db_event->eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
 			db_event->objectid, db_event->name, db_event->clock, db_event->ns, TRIGGER_VALUE_PROBLEM,
 			db_event->severity, task->flags, 0, &db_event->tags, db_event->suppress);
+
+	cep_cache_acquire(&cep);
+	h = cep_add_event(cep, event);
+	cep_cache_release(&cep);
+
+	cep_stats_update_events_processed(1);
 
 	const zbx_cep_rule_t		**rules = NULL;
 	int				rules_num = 0;
@@ -543,13 +552,15 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	if (0 != zbx_dc_local_get_itservices_num() && CEP_ACTION_DISABLED != task->action_state)
 	{
 		zbx_cep_event_update_t	update_local = {
-			.handle = zbx_cep_event_handle_addref(event_ctx.hevent),
+			.handle = h,
 			.op = CEP_EVENT_OPEN
 		};
 
 		zbx_vector_cep_event_update_reserve(&task->updates, 1);
 		zbx_vector_cep_event_update_append(&task->updates, update_local);
 	}
+	else
+		zbx_cep_event_handle_release(h);
 out:
 	cep_event_context_clear(&event_ctx);
 
@@ -680,9 +691,10 @@ static void	cep_worker_process_trigger_event(zbx_cep_worker_t *worker, zbx_cep_t
  ******************************************************************************/
 static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 {
-	zbx_cep_t	*cep;
-	zbx_db_event	*db_event = task->db_event;
-	zbx_uint64_t	eventid;
+	zbx_cep_t		*cep;
+	zbx_db_event		*db_event = task->db_event;
+	zbx_uint64_t		eventid;
+	zbx_cep_event_handle_t	h;
 
 	cep_cache_acquire(&cep);
 	eventid = cep_open_internal_event(cep, db_event->object, db_event->objectid);
@@ -702,9 +714,10 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 			ZBX_EVENT_NORMAL, 0, NULL, NULL);
 
 	cep_cache_acquire(&cep);
-	(void)cep_add_event(cep, event);
+	h = cep_add_event(cep, event);
 	cep_cache_release(&cep);
 
+	zbx_cep_event_handle_release(h);
 	cep_stats_update_events_processed(1);
 
 	task->event_op = CEP_EVENT_OPEN;

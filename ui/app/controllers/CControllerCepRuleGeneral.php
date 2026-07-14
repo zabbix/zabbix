@@ -76,10 +76,18 @@ abstract class CControllerCepRuleGeneral extends CController {
 
 		if (array_key_exists('filter', $request)) {
 			if (array_key_exists('conditions', $request['filter'])) {
+				if ($request['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					array_walk($request['filter']['conditions'], function (array &$condition) {
+						unset($condition['formulaid']);
+					});
+				}
+
 				array_walk($request['filter']['conditions'], function (array &$condition) {
-					$is_tag_type = $condition['type'] == CCepRuleHelper::CONDITION_TAG
-						|| $condition['type'] == CCepRuleHelper::CONDITION_TAG_VALUE;
-					$condition['operator'] = $is_tag_type ? $condition['tag_operator'] : $condition['operator'];
+					$condition['operator'] = match ($condition['type']) {
+						CCepRuleHelper::CONDITION_TAG,
+						CCepRuleHelper::CONDITION_TAG_VALUE => $condition['tag_operator'],
+						default => $condition['operator']
+					};
 
 					$is_exists_operator = $condition['operator'] == CONDITION_OPERATOR_EXISTS
 						|| $condition['operator'] == CONDITION_OPERATOR_NOT_EXISTS;
@@ -88,7 +96,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 						$condition['type'] = CCepRuleHelper::CONDITION_TAG_VALUE;
 					}
 
-					unset($condition['tag_operator'], $condition['formulaid']);
+					unset($condition['tag_operator']);
 				});
 				$request['filter']['conditions'] = array_values($request['filter']['conditions']);
 			}
@@ -96,9 +104,26 @@ abstract class CControllerCepRuleGeneral extends CController {
 
 		if (array_key_exists('operations', $request)) {
 			$request['operations'] = array_values($request['operations']);
+			array_walk($request['operations'], function(array &$operation) {
+				if ($operation['type'] == CCepRuleHelper::OP_SUPPRESS) {
+					if ($operation['suppress_until'] === '') {
+						$operation['suppress_until'] = DB::getDefault('cep_operation', 'suppress_until');
+					}
+					else {
+						$operation['suppress_until'] = self::parseSuppressUntil($operation['suppress_until']);
+					}
+				}
+			});
 		}
 
 		return $request;
+	}
+
+	protected static function parseSuppressUntil(string $suppress_until): int {
+		$absolute_time_parser = new CAbsoluteTimeParser();
+		$absolute_time_parser->parse($suppress_until);
+
+		return $absolute_time_parser->getDateTime(true)->getTimestamp();
 	}
 
 	public static function getValidationRules(bool $existing = true): array {
@@ -126,7 +151,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 				CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
 				CCepRuleHelper::WINDOW_PATTERN_MATCH
 			]],
-			'window' => ['object', 'fields' => [
+			'window' => ['object', 'required', 'fields' => [
 				'duration' => ['db cep_window.duration', 'required', 'not_empty',
 					'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_YEAR, 'min' => 1, 'usermacros' => true,
 						'lldmacros' => false, 'accept_zero' => false, 'with_year' => false
@@ -194,14 +219,22 @@ abstract class CControllerCepRuleGeneral extends CController {
 				'script' => ['db cep_window.script', 'required', 'not_empty',
 					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_PATTERN_MATCH]]
 				]
-			]],
+			], 'when' => ['window_type', 'not_in' => [CCepRuleHelper::WINDOW_NONE]]],
 			'operations' => [
 				['objects', 'required', 'fields' => self::getOperationValidationFields()],
 				['objects', 'required', 'not_empty', 'fields' => self::getOperationValidationFields(), 'when' => [
 					'window_type', 'in' => [CCepRuleHelper::WINDOW_NONE, CCepRuleHelper::WINDOW_SIMPLE,
 						CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH
 					]
-				]]
+				]],
+				['objects', 'required', 'not_empty', 'fields' => self::getOperationValidationFields(), 'when' => [
+						'window_type', 'in' => [CCepRuleHelper::WINDOW_PATTERN_MATCH]],
+					'count_values' => [
+						'field_rules' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_PATTERN_MATCHED]],
+						'min' => 1,
+						'message' => _('The rule must contain Event pattern match operation.')
+					]
+				]
 			],
 			'stop' => ['db cep_rule.stop', 'required', 'in' => [CCepRuleHelper::EXECUTION_CONTINUE,
 				CCepRuleHelper::EXECUTION_STOP
@@ -256,7 +289,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 			'tag_value' => ['db cep_operation.tag_value', 'required', 'when' => ['type', 'in' => [
 				CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG, CCepRuleHelper::OP_SET_TAG_VALUE,
 				CCepRuleHelper::OP_INCREASE_TAG_VALUE, CCepRuleHelper::OP_DECREASE_TAG_VALUE,
-				CCepRuleHelper::OP_RENAME_TAG, CCepRuleHelper::OP_REMOVE_TAG
+				CCepRuleHelper::OP_REMOVE_TAG
 			]]],
 			'severity' => ['db cep_operation.severity', 'required',
 				'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,

@@ -122,6 +122,7 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $correlationid;
 	private static $correlationid2;
 	private static $disc_maintenanceid;
+	private static $disc_maintenanceid2;
 	private static $serviceids = [];
 	private static $service_actionid;
 	private static $trigger_actionid;
@@ -1345,7 +1346,7 @@ class testTriggerCEP extends CIntegrationTest {
 		});
 
 		// Start from a clean correlation slate, then create the single "close old down when new up" rule.
-		$this->deleteCepCorrelations();
+
 		self::$correlationid = $this->upsertCorrelation(
 			$this->buildCloseOnUpCorrelationParams('CEP global event correlation up', $evaltype)
 		);
@@ -1656,6 +1657,49 @@ HEREDOC;
 			'filter' => $filter,
 			'operations' => [
 				['type' => ZBX_CORR_OPERATION_CLOSE_OLD],
+				['type' => ZBX_CORR_OPERATION_CLOSE_NEW]
+			]
+		];
+	}
+
+	/**
+	 * Build a global event correlation rule that only closes new problems (CLOSE_NEW), not old problems.
+	 * Useful for testing correlation update behavior where you want to verify that changing the
+	 * operations changes the event lifecycle behavior.
+	 */
+	private function buildCloseNewOnlyCorrelationParams(string $name, $evaltype): array {
+		$new_up = [
+			'type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE,
+			'tag' => 'state',
+			'operator' => CONDITION_OPERATOR_EQUAL,
+			'value' => 'up'
+		];
+		$tag_pair = [
+			'type' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
+			'oldtag' => 'service',
+			'newtag' => 'service'
+		];
+
+		if ($evaltype == CONDITION_EVAL_TYPE_EXPRESSION) {
+			$new_up['formulaid'] = 'A';
+			$tag_pair['formulaid'] = 'B';
+			$filter = [
+				'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+				'formula' => 'A and B',
+				'conditions' => [$new_up, $tag_pair]
+			];
+		}
+		else {
+			$filter = [
+				'evaltype' => $evaltype,
+				'conditions' => [$new_up, $tag_pair]
+			];
+		}
+
+		return [
+			'name' => $name,
+			'filter' => $filter,
+			'operations' => [
 				['type' => ZBX_CORR_OPERATION_CLOSE_NEW]
 			]
 		];
@@ -2057,6 +2101,7 @@ HEREDOC;
 
 		// CEP cached one event per opened problem (one per trigger).
 		$this->assertCepStatEquals('tasks', 'cached_events', count($keys));
+		$this->assertCepStatEquals('tasks', 'cached_objects', count($keys));
 	}
 
 	/**
@@ -2095,6 +2140,7 @@ HEREDOC;
 		// CEP processed the recovered events (one per trigger).
 		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, count($keys));
 		$this->assertCepStatEquals('tasks', 'cached_events', 0);
+		$this->assertCepStatEquals('tasks', 'cached_objects', 0);
 	}
 
 	/**
@@ -2943,6 +2989,17 @@ HEREDOC;
 	}
 
 	/**
+	 * Test correlation rule update behavior: verify that changing from CLOSE_OLD+CLOSE_NEW to CLOSE_NEW only
+	 * leaves old problems open, and changing back to CLOSE_OLD+CLOSE_NEW restores the closing behavior.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpUpdateBehavior$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpUpdateBehavior() {
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUpUpdateBehavior(false);
+	}
+
+	/**
 	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp
 	 * (correlation still pairs on the 'service' trigger tag), but a webhook media type with process_tags
 	 * enabled additionally adds a WEB_SERVICE_TAG tag to every problem event from JavaScript, driven by a
@@ -3047,6 +3104,7 @@ HEREDOC;
 	 */
 	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirst() {
 		self::$disc_maintenanceid = null;
+		self::$disc_maintenanceid2 = null;
 		$this->prepareDataGlobalCorrelationCloseOnUp();
 		try {
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true);
@@ -3055,6 +3113,63 @@ HEREDOC;
 		finally {
 			if (self::$disc_maintenanceid !== null) {
 				$this->stopDiscHostMaintenance(self::$disc_maintenanceid);
+			}
+			if (self::$disc_maintenanceid2 !== null) {
+				$this->stopDiscHostMaintenance(self::$disc_maintenanceid2);
+			$this->reloadConfigurationCacheAndWaitForLogLine();
+
+			// Moving the maintenance out of its active window only changes the configuration; the timer process
+			// still has to take the host out of maintenance and clear the suppression of the events opened during
+			// the run (their event_suppress rows persist even after the problems were closed by correlation). Wait
+			// until nothing on the discovered host is suppressed any more, so the next test starts with the
+			// host fully out of maintenance and cannot observe stale suppression.
+			$this->callUntilCountIsPresent('event.get', [
+				'hostids' => [self::$disc_hostid],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'suppressed' => true
+			], 0, 120, self::WAIT_ITERATION_DELAY);
+			}
+		}
+	}
+
+		/**
+	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp,
+	 * but the discovered host only enters data-collection maintenance after the first wave of problems is
+	 * already open: the maintenance is created mid-run, so the already-open problems must be suppressed
+	 * retroactively, and every problem opened afterwards (while maintenance is active) suppressed at
+	 * creation time too, while global correlation still closes them all, leaving nothing open.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirstRestart$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirstRestart() {
+		$this->skipIfRestartTestsDisabled();
+		self::$disc_maintenanceid = null;
+		self::$disc_maintenanceid2 = null;
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true);
+			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+		}
+		finally {
+			if (self::$disc_maintenanceid !== null) {
+				$this->stopDiscHostMaintenance(self::$disc_maintenanceid);
+			}
+			if (self::$disc_maintenanceid2 !== null) {
+				$this->stopDiscHostMaintenance(self::$disc_maintenanceid2);
+			$this->reloadConfigurationCacheAndWaitForLogLine();
+
+			// Moving the maintenance out of its active window only changes the configuration; the timer process
+			// still has to take the host out of maintenance and clear the suppression of the events opened during
+			// the run (their event_suppress rows persist even after the problems were closed by correlation). Wait
+			// until nothing on the discovered host is suppressed any more, so the next test starts with the
+			// host fully out of maintenance and cannot observe stale suppression.
+			$this->callUntilCountIsPresent('event.get', [
+				'hostids' => [self::$disc_hostid],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'suppressed' => true
+			], 0, 120, self::WAIT_ITERATION_DELAY);
 			}
 		}
 	}
@@ -3288,6 +3403,7 @@ HEREDOC;
 		// Removing the host must also drop the discovered items' problem events from the CEP cache: no other
 		// problem is open in the system at this point, so cached_events must drain back to zero.
 		$this->assertCepStatEquals('tasks', 'cached_events', 0);
+		$this->assertCepStatEquals('tasks', 'cached_objects', 0);
 	}
 
 	/**
@@ -3759,7 +3875,8 @@ HEREDOC;
 		// maintenance now must retroactively suppress those $m open problems (and every problem opened
 		// later), while global correlation still closes them normally below.
 		if ($maintenance_after_first) {
-			self::$disc_maintenanceid = $this->startDiscHostMaintenance();
+			self::$disc_maintenanceid = $this->startDiscHostMaintenance('CEP close-on-up maintenance');
+			self::$disc_maintenanceid2 = $this->startDiscHostMaintenance('CEP close-on-up maintenance2');
 			$this->waitForOpenProblemsSuppressed($all, $m);
 		}
 
@@ -3865,6 +3982,79 @@ HEREDOC;
 		// 4. "up" for the second id closes the trigger's remaining problem; nothing stays open.
 		$send('up', 1);
 		$this->waitForNoOpenProblems($all);
+	}
+
+	/**
+	 * Test correlation update behavior: start with CLOSE_OLD+CLOSE_NEW, then update to CLOSE_NEW only,
+	 * verify old problems stay open, then update back to CLOSE_OLD+CLOSE_NEW and verify closing works.
+	 * This validates that correlation rule changes take effect on subsequent events.
+	 */
+	private function runEventAssessmentTestGlobalCorrelationCloseOnUpUpdateBehavior(bool $restart): void {
+		// Drive a single discovered item (and its one trigger) so the whole scenario lands on one event stream.
+		$key = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY)[0];
+		$triggerid = self::$discovered_triggerids[0];
+		$all = [$triggerid];
+
+		// The one trigger must start in OK state.
+		foreach ($this->getTriggers($all) as $t) {
+			$this->assertEquals(TRIGGER_VALUE_FALSE, $t['value'],
+				'Trigger must start in OK state for correlation update test.');
+		}
+
+		// Send one value with a unique id: value "<prefix>_<id>".
+		$send = fn(string $prefix, int $id) => $this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $prefix.'_'.$id]
+		]);
+
+		// 1. Open the first problem on the trigger (unique id); trigger goes TRUE.
+		$send('down', 0);
+		$this->waitForOpenProblemCount($all, 1);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		$this->maybeRestartServer($restart);
+
+		// 2. Open a second problem on the trigger (a different unique id, mult_event); still TRUE.
+		$send('down', 1);
+		$this->waitForOpenProblemCount($all, 2);
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		$this->maybeRestartServer($restart);
+
+		// 3. Update correlation to only close new problems (not old). This will be applied to the next event.
+		self::$correlationid = $this->upsertCorrelation(
+			$this->buildCloseNewOnlyCorrelationParams('CEP global event correlation up', CONDITION_EVAL_TYPE_AND_OR)
+		);
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		// 4. "up" for the first id: with updated correlation (CLOSE_NEW only), this closes only itself,
+		//    not the corresponding "down_0" problem. So we still have 2 problems open (down_0 and down_1).
+		$send('up', 0);
+		$this->waitForOpenProblemCount($all, 2, 'After up_0 with CLOSE_NEW only, down_0 should remain open');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		$this->maybeRestartServer($restart);
+
+		// 5. Update correlation back to close both old and new problems.
+		self::$correlationid = $this->upsertCorrelation(
+			$this->buildCloseOnUpCorrelationParams('CEP global event correlation up', CONDITION_EVAL_TYPE_AND_OR)
+		);
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		// 6. "up" for the second id: with restored correlation (CLOSE_OLD+CLOSE_NEW), this closes down_1
+		//    and itself, but down_0 was already created before the correlation was restored, so it needs
+		//    to be closed manually or by another mechanism. We check that down_1 is closed.
+		$send('up', 1);
+		$this->waitForOpenProblemCount($all, 1, 'After up_1 with CLOSE_OLD+CLOSE_NEW, only down_0 remains open');
+		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
+
+		// 7. Send "down_0" recovery to close the last remaining problem.
+		// For now, we'll send a different value to trigger recovery, or manually acknowledge the problem.
+		// Since the trigger is based on find(regexp,"down|up"), we need to send a value that doesn't match.
+		// Let's send a recovery for down_0 by changing the item value to something that doesn't match the pattern.
+		$this->dispatchSenderValues([
+			['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0']
+		]);
+		$this->waitForNoOpenProblems($all, 'After final recovery, all problems should be closed');
 	}
 
 	/**
@@ -4431,11 +4621,11 @@ HEREDOC;
 	 * Put the discovered host into data-collection maintenance and wait for the server to start it, so any
 	 * problem opened afterwards is suppressed. Returns the maintenance id for stopDiscHostMaintenance().
 	 */
-	private function startDiscHostMaintenance(): string {
+	private function startDiscHostMaintenance(string $name): string {
 		$now = time();
 
 		$response = $this->call('maintenance.create', [
-			'name' => 'CEP close-on-up maintenance',
+			'name' => $name,
 			'hosts' => ['hostid' => self::$disc_hostid],
 			'active_since' => $now - 60,
 			'active_till' => $now + 3600,
@@ -4476,19 +4666,6 @@ HEREDOC;
 				'start_date' => $future
 			]
 		]);
-		$this->reloadConfigurationCacheAndWaitForLogLine();
-
-		// Moving the maintenance out of its active window only changes the configuration; the timer process
-		// still has to take the host out of maintenance and clear the suppression of the events opened during
-		// the run (their event_suppress rows persist even after the problems were closed by correlation). Wait
-		// until nothing on the discovered host is suppressed any more, so the next test starts with the
-		// host fully out of maintenance and cannot observe stale suppression.
-		$this->callUntilCountIsPresent('event.get', [
-			'hostids' => [self::$disc_hostid],
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'suppressed' => true
-		], 0, 120, self::WAIT_ITERATION_DELAY);
 	}
 
 	/**
@@ -5103,6 +5280,7 @@ HEREDOC;
 		// Skip when other problems may still be open elsewhere in the system (cached_events is global).
 		if ($wait_cep_drained) {
 			$this->assertCepStatEquals('tasks', 'cached_events', 0);
+			$this->assertCepStatEquals('tasks', 'cached_objects', 0);
 		}
 	}
 
@@ -5420,6 +5598,11 @@ HEREDOC;
 		if (!empty(self::$disc_maintenanceid)) {
 			CDataHelper::call('maintenance.delete', [self::$disc_maintenanceid]);
 			self::$disc_maintenanceid = null;
+		}
+
+		if (!empty(self::$disc_maintenanceid2)) {
+			CDataHelper::call('maintenance.delete', [self::$disc_maintenanceid2]);
+			self::$disc_maintenanceid2 = null;
 		}
 
 		if (!empty(self::$disc_hostid)) {

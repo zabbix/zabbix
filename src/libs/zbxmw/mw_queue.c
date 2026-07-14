@@ -33,7 +33,6 @@ int	mw_queue_init(zbx_mw_queue_t *queue, char **error)
 	if (0 != (err = pthread_mutex_init(&queue->lock, NULL)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot initialize CEP task queue mutex: %s", zbx_strerror(err));
-		zbx_free(queue);
 
 		return FAIL;
 	}
@@ -43,7 +42,6 @@ int	mw_queue_init(zbx_mw_queue_t *queue, char **error)
 		*error = zbx_dsprintf(NULL, "cannot initialize CEP task queue conditional variable: %s",
 			zbx_strerror(err));
 		pthread_mutex_destroy(&queue->lock);
-		zbx_free(queue);
 
 		return FAIL;
 	}

@@ -19,8 +19,26 @@
  * @var array    $data
  */
 
+$tags = (new CMultiSelect([
+	'ms_list_of_string_mode' => true,
+	'name' => 'window[tags]',
+	'data' => array_map(fn (string $name) => ['id' => $name, 'name' => $name], $data['window']['tags']),
+	'placeholder' => _('tag names'),
+	'add_post_js' => false
+]))->setId('ceprule-window-groupby-tag');
+
+zbx_add_post_js($tags->getPostJS());
+
 echo (new CObject())
-	->addItem(new CLabel(_('Time window'), 'ceprule-window-type'))
+	->addItem((new CLabel(_('Time window'), 'ceprule-window-type'))
+		->addItem(makeHelpIcon([
+			_("None - there will be no time window specific processing.").PHP_EOL,
+			_("Simple - set up time window based event eviction operations.").PHP_EOL,
+			_("Cause and symptom grouping - first event from the window (fixed) will be treated as cause other symptoms.").PHP_EOL,
+			_("Tag correlation - map past and current window events using tags.").PHP_EOL,
+			_("Event pattern match - execute JavaScript to identify event patterns.")
+		]))
+	)
 	->addItem(new CFormField((new CRadioButtonList('window_type', (int) $data['window_type']))
 		->setId('ceprule-window-type')
 		->addValue(_('None'), CCepRuleHelper::WINDOW_NONE)
@@ -87,16 +105,7 @@ echo (new CObject())
 			)
 			->addItem(new CLabel(_('Tag'), 'ceprule-window-groupby-opt-tag'))
 			->addItem(new CObject('&nbsp;'))
-
-			->addItem(
-				(new CTag('z-chips-input'))
-					->setId('ceprule-window-groupby-tag')
-					->setAttribute('value', json_encode($data['window']['tags']))
-					/* ->setAttribute('data-field-type', 'chips-input') */
-					->setAttribute('data-field-name', 'window[tags]')
-					->addItem('[work in progress..]')
-			)
-
+			->addItem($tags)
 	]))->setId('ceprule-window-groupby')))
 
 	->addItem((new CLabel(_('Event count tag'), 'ceprule-window-counttag'))->setAsteriskMark())
