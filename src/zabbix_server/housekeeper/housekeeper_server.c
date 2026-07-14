@@ -1259,7 +1259,7 @@ static int	housekeeping_delete_internal_events(int config_max_hk_delete)
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values,
 				eventids.values_num);
 
-		if (ZBX_DB_OK >= zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 				break;
 
 		if (0 != r_eventids.values_num)
@@ -1279,7 +1279,7 @@ static int	housekeeping_delete_internal_events(int config_max_hk_delete)
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values,
 				eventids.values_num);
 
-		if (ZBX_DB_OK >= zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			break;
 
 		deleted_num += eventids.values_num;
