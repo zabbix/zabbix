@@ -1477,8 +1477,7 @@ class testFormTags extends CWebTest {
 			$form->selectTab('Tags');
 		}
 
-		$tags_table = $this->getTagsTable($object);
-		$tags_table->clear();
+		$this->getTagsTable($object)->clear();
 		$form->submit();
 		$this->page->waitUntilReady();
 

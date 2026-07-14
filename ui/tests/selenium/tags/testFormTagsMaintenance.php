@@ -172,7 +172,7 @@ class testFormTagsMaintenance extends testFormTags {
 								.' Long tag name. Long tag name. Long tag name.',
 							'operator' => 'Equals',
 							'value' => 'Long tag value. Long tag value. Long tag value. Long tag value. Long tag value.'
-								.' Long tag value. Long tag value. Long tag value. Long tag value.'
+									.' Long tag value. Long tag value. Long tag value. Long tag value.'
 						]
 					]
 				]

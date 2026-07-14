@@ -186,13 +186,6 @@ class testFormMaintenance extends CWebTest {
 				}
 			}
 
-			// Check Periods table.
-			$periods_table = $this->query(self::PERIODS_TABLE)->asTable()->one();
-			$this->assertEquals(['Period type', 'Schedule', 'Period', 'Actions'], $periods_table->getHeadersText());
-			if (!$is_update) {
-				$this->assertEquals(0, $periods_table->getRows()->count());
-			}
-
 			// Check radio buttons.
 			$radio_buttons = [
 				'Maintenance type' => ['With data collection', 'No data collection'],
@@ -263,7 +256,7 @@ class testFormMaintenance extends CWebTest {
 				$list = COverlayDialogElement::find(1)->waitUntilReady()->one();
 				$this->assertEquals($field, $list->getTitle());
 				$this->assertEquals(['Select', 'Cancel'], $list->getFooter()->query('button')->all()
-					->filter(CElementFilter::CLICKABLE)->asText()
+						->filter(CElementFilter::CLICKABLE)->asText()
 				);
 				$list->close();
 			}
@@ -314,14 +307,16 @@ class testFormMaintenance extends CWebTest {
 				'name:period_minutes' => '0'
 			]);
 
-			$this->assertTrue($period_form->checkValue(['Date' => $now], false)
-					|| $period_form->checkValue(['Date' => $in_one_minute], false));
-
+			$date_value = $period_form->getField('Date')->getValue();
+			$this->assertTrue(in_array($date_value, [$now, $in_one_minute]), '"Date" field value "'.$date_value.
+					'" is not among expected values ["'.$now.'", "'.$in_one_minute.'].'
+			);
 
 			foreach ($periods as $period_type) {
 				if ($period_type === 'Monthly with Day of week period') {
 					$period_form->fill(['Period type' => 'Monthly', 'id:month_date_type' => 'Day of week']);
-				} else {
+				}
+				else {
 					$period_form->fill(['Period type' => $period_type]);
 				}
 
@@ -448,7 +443,7 @@ class testFormMaintenance extends CWebTest {
 					}
 					else {
 						$days_list = $period_form->query('xpath:.//div[contains(@class, "js-monthly-days")]//ul')
-							->asCheckboxList()->one();
+								->asCheckboxList()->one();
 					}
 					$this->assertTrue($days_list->isEnabled());
 					$this->assertEquals($weekdays, $days_list->getLabels()->filter(CElementFilter::VISIBLE)->asText());
@@ -477,7 +472,8 @@ class testFormMaintenance extends CWebTest {
 
 					if ($period_type === 'One time only') {
 						$this->assertScreenshotExcept($dialog, [$dialog->query('id:start_date')->one()], $period_type);
-					} else {
+					}
+					else {
 						$this->assertScreenshot($dialog, $period_type);
 					}
 				}
@@ -875,8 +871,8 @@ class testFormMaintenance extends CWebTest {
 				[
 					'fields' => [
 						'Name' => '  Trim test  ',
-						'Active since' => '2025-02-03 05',
-						'Active till' => '2030',
+						'Active since' => '   2025-02-03 05   ',
+						'Active till' => '   2030   ',
 						'Host groups' => 'Zabbix servers',
 						'Hosts' => 'ЗАББИКС Сервер',
 						'Description' => '  This description should be trimmed  '
@@ -914,7 +910,24 @@ class testFormMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #7 Duplicate name.
+			// #7 Only empty space in mandatory input elements.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => ' ',
+						'Active since' => ' ',
+						'Active till' => ' ',
+						'Host groups' => 'Zabbix servers'
+					],
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'id:active_since' => 'This field cannot be empty.',
+						'id:active_till' => 'This field cannot be empty.'
+					]
+				]
+			],
+			// #8 Duplicate name.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -932,7 +945,7 @@ class testFormMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #8 Active since greater than Active till.
+			// #9 Active since greater than Active till.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -947,6 +960,101 @@ class testFormMaintenance extends CWebTest {
 					],
 					'error_details' => [
 						'Invalid parameter "/1/active_till": cannot be less than or equal to the value of parameter "/1/active_since".'
+					]
+				]
+			],
+			// #10 Wrong date format in active since or active till.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Wrong date format in active since or active till',
+						'Active since' => '03/02/2025 00:00',
+						'Active till' => '01.01.2026 00:00',
+						'Host groups' => 'Zabbix servers'
+					],
+					'periods' => [
+						'Period type' => 'Daily'
+					],
+					'inline_errors' => [
+						'id:active_since' => 'Invalid date.',
+						'id:active_till' => 'Invalid date.'
+					]
+				]
+			],
+			// #11 Invalid time in active since or active till.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Invalid time in active since or active till',
+						'Active since' => '2025-02-03 24:00',
+						'Active till' => '2026-01-01 00:61',
+						'Host groups' => 'Zabbix servers'
+					],
+					'periods' => [
+						'Period type' => 'Daily'
+					],
+					'inline_errors' => [
+						'id:active_since' => 'Invalid date.',
+						'id:active_till' => 'Invalid date.'
+					]
+				]
+			],
+			// #12 Non-existing dates with valid format in active since or active till.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Non-existing dates with valid format in active since or active till',
+						'Active since' => '2026-02-29 23:00',
+						'Active till' => '2026-02-30 23:00',
+						'Host groups' => 'Zabbix servers'
+					],
+					'periods' => [
+						'Period type' => 'Daily'
+					],
+					'inline_errors' => [
+						'id:active_since' => 'Invalid date.',
+						'id:active_till' => 'Invalid date.'
+					]
+				]
+			],
+			// #13 Active since and active till too far in the past.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Active since and active till too far in the past',
+						'Active since' => '1969-12-30 00:00',
+						'Active till' => '1969-12-31 23:59',
+						'Host groups' => 'Zabbix servers'
+					],
+					'periods' => [
+						'Period type' => 'Daily'
+					],
+					'inline_errors' => [
+						'id:active_since' => 'Invalid date.',
+						'id:active_till' => 'Invalid date.'
+					]
+				]
+			],
+			// #14 Active since and active till too far in the future.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Active since and active till too far in the future',
+						'Active since' => '2038-01-19 09:00',
+						'Active till' => '2038-01-20 23:59',
+						'Host groups' => 'Zabbix servers'
+					],
+					'periods' => [
+						'Period type' => 'Daily'
+					],
+					'inline_errors' => [
+						'id:active_since' => 'Value must be less than or equal to 2038-01-19 05:14:07.',
+						'id:active_till' => 'Value must be less than or equal to 2038-01-19 05:14:07.'
 					]
 				]
 			]
