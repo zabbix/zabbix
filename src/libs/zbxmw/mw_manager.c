@@ -56,6 +56,8 @@ static int	mw_manager_start_workers(zbx_mw_manager_t *manager, int workers_num, 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "starting %d workers", workers_num);
 
+	manager->workers_diff = 0;
+
 	for (int i = manager->workers_num; i < manager->workers_num + workers_num; i++)
 	{
 		if (SUCCEED != mw_worker_start(manager->workers[i], manager->worker_process_type,
@@ -63,10 +65,10 @@ static int	mw_manager_start_workers(zbx_mw_manager_t *manager, int workers_num, 
 		{
 			return FAIL;
 		}
-	}
 
-	manager->workers_diff = workers_num;
-	manager->worker_pool_state = MW_WORKER_POOL_GROWING;
+		manager->workers_diff++;
+		manager->worker_pool_state = MW_WORKER_POOL_GROWING;
+	}
 
 	return SUCCEED;
 }
