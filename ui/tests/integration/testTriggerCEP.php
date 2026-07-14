@@ -2101,6 +2101,7 @@ HEREDOC;
 
 		// CEP cached one event per opened problem (one per trigger).
 		$this->assertCepStatEquals('tasks', 'cached_events', count($keys));
+		$this->assertCepStatEquals('tasks', 'cached_objects', count($keys));
 	}
 
 	/**
@@ -2139,6 +2140,7 @@ HEREDOC;
 		// CEP processed the recovered events (one per trigger).
 		$this->assertCepStatIncreasedBy('events', 'processed', $cep_processed, count($keys));
 		$this->assertCepStatEquals('tasks', 'cached_events', 0);
+		$this->assertCepStatEquals('tasks', 'cached_objects', 0);
 	}
 
 	/**
@@ -3401,6 +3403,7 @@ HEREDOC;
 		// Removing the host must also drop the discovered items' problem events from the CEP cache: no other
 		// problem is open in the system at this point, so cached_events must drain back to zero.
 		$this->assertCepStatEquals('tasks', 'cached_events', 0);
+		$this->assertCepStatEquals('tasks', 'cached_objects', 0);
 	}
 
 	/**
@@ -5277,6 +5280,7 @@ HEREDOC;
 		// Skip when other problems may still be open elsewhere in the system (cached_events is global).
 		if ($wait_cep_drained) {
 			$this->assertCepStatEquals('tasks', 'cached_events', 0);
+			$this->assertCepStatEquals('tasks', 'cached_objects', 0);
 		}
 	}
 
