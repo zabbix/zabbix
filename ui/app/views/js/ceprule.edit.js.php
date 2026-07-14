@@ -289,7 +289,7 @@ window.ceprule_edit_popup = new class {
 
 			form_field.style.display = display;
 			form_field.previousSibling.style.display = display;
-				jQuery(window['ceprule-script']).multilineInput(display ? 'enable' : 'disable');
+			jQuery(window['ceprule-script']).multilineInput(display === '' ? 'enable' : 'disable');
 		}
 		{
 			const form_field = window['ceprule-window-counttag'].closest('.form-field');

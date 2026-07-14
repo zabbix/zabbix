@@ -151,7 +151,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 				CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
 				CCepRuleHelper::WINDOW_PATTERN_MATCH
 			]],
-			'window' => ['object', 'fields' => [
+			'window' => ['object', 'required', 'fields' => [
 				'duration' => ['db cep_window.duration', 'required', 'not_empty',
 					'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_YEAR, 'min' => 1, 'usermacros' => true,
 						'lldmacros' => false, 'accept_zero' => false, 'with_year' => false
@@ -219,7 +219,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 				'script' => ['db cep_window.script', 'required', 'not_empty',
 					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_PATTERN_MATCH]]
 				]
-			]],
+			], 'when' => ['window_type', 'not_in' => [CCepRuleHelper::WINDOW_NONE]]],
 			'operations' => [
 				['objects', 'required', 'fields' => self::getOperationValidationFields()],
 				['objects', 'required', 'not_empty', 'fields' => self::getOperationValidationFields(), 'when' => [
