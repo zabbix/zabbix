@@ -55,6 +55,7 @@ class CControllerDiscoveryUpdate extends CController {
 					'snmpv3_contextname', 'allow_redirect'
 				],
 				'fields' => [
+					'dcheckid' => ['string', 'required', 'not_empty'],
 					'type' => ['db dchecks.type', 'required',
 						'in' => [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,
 							SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET
@@ -214,6 +215,12 @@ class CControllerDiscoveryUpdate extends CController {
 
 		if ($drule['concurrency_max_type'] != ZBX_DISCOVERY_CHECKS_CUSTOM) {
 			$drule['concurrency_max'] = $drule['concurrency_max_type'];
+		}
+
+		foreach ($drule['dchecks'] as $key => $check) {
+			if (str_starts_with($check['dcheckid'], 'new')) {
+				unset($drule['dchecks'][$key]['dcheckid']);
+			}
 		}
 
 		unset($drule['discovery_by']);
