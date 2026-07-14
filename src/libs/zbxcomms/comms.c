@@ -286,7 +286,7 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 
 	if (SUCCEED == zbx_is_ip(host))
 		hints.ai_flags = AI_NUMERICHOST;
-	
+
 	if (0 != getaddrinfo(host, NULL, &hints, &ai))
 	{
 		ip[0] = '\0';
