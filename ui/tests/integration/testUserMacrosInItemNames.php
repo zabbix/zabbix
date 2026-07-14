@@ -64,12 +64,16 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid1 = $response['result']['hostids'][0];
 
+		// Ensure the global macro for trapper allowed hosts exists before creating any trapper items.
+		$this->ensureTrapperAllowedHostsMacro();
+
 		$response = $this->call('item.create', [
 			'hostid' => self::$hostid1,
 			'name' => 'Item {$TEST}',
 			'key_' => 'item1',
 			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_UINT64
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
@@ -78,7 +82,8 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			'hostid' => self::$hostid1,
 			'name' => 'Trapper discovery',
 			'key_' => 'item_discovery',
-			'type' => ITEM_TYPE_TRAPPER
+			'type' => ITEM_TYPE_TRAPPER,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -91,7 +96,8 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			'name' => 'LLD {$TEST} {#KEY}',
 			'key_' => 'trap[{#KEY}]',
 			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_TEXT
+			'value_type' => ITEM_VALUE_TYPE_TEXT,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
 
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -254,6 +260,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			'key_' => 'macro.export.test',
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'tags' => [
 				['tag' => 'env', 'value' => '{$ENV}'],
 				['tag' => 'env-{$ENV}', 'value' => 'value-{$ENV}']
@@ -314,15 +321,10 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testUserMacrosInItemNames_ndjsonExport() {
-echo "\n[DEBUG][ndjsonExport] started\n";
 		$export_dir = self::getExportDir();
 		$now = time();
 		$prev_hour = $now - 3600;
-echo '[DEBUG][ndjsonExport] export_dir=' . $export_dir . "\n";
-echo '[DEBUG][ndjsonExport] now=' . $now . ', prev_hour=' . $prev_hour . "\n";
-echo '[DEBUG][ndjsonExport] host=' . self::HOSTNAME_EXPORT . "\n";
-echo '[DEBUG][ndjsonExport] itemid=' . var_export(self::$itemid_export, true) . "\n";
-echo '[DEBUG][ndjsonExport] triggerid=' . var_export(self::$triggerid_export, true) . "\n";
+
 		try {
 			$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 			$this->prepareExportDir($export_dir);
@@ -381,6 +383,45 @@ echo '[DEBUG][ndjsonExport] triggerid=' . var_export(self::$triggerid_export, tr
 			$hostids = array_column($response['result'], 'hostid');
 			$this->call('host.delete', $hostids);
 		}
+	}
+
+	private function ensureTrapperAllowedHostsMacro(): void {
+		$allowed_hosts = $this->call('usermacro.get', [
+			'globalmacro' => true,
+			'filter' => ['macro' => '{$TRAPPER.ALLOWED_HOSTS}'],
+			'output' => ['globalmacroid', 'value']
+		]);
+
+		$this->assertArrayHasKey('result', $allowed_hosts);
+
+		if ($allowed_hosts['result']) {
+			$this->assertArrayHasKey(0, $allowed_hosts['result']);
+			$this->assertArrayHasKey('globalmacroid', $allowed_hosts['result'][0]);
+			$this->assertArrayHasKey('value', $allowed_hosts['result'][0]);
+
+			if ($allowed_hosts['result'][0]['value'] !== '0.0.0.0/0,::/0') {
+				$response = $this->call('usermacro.updateglobal', [
+					'globalmacroid' => $allowed_hosts['result'][0]['globalmacroid'],
+					'macro' => '{$TRAPPER.ALLOWED_HOSTS}',
+					'value' => '0.0.0.0/0,::/0'
+				]);
+
+				$this->assertArrayHasKey('result', $response);
+				$this->assertArrayHasKey('globalmacroids', $response['result']);
+				$this->assertArrayHasKey(0, $response['result']['globalmacroids']);
+			}
+
+			return;
+		}
+
+		$response = $this->call('usermacro.createglobal', [
+			'macro' => '{$TRAPPER.ALLOWED_HOSTS}',
+			'value' => '0.0.0.0/0,::/0'
+		]);
+
+		$this->assertArrayHasKey('result', $response);
+		$this->assertArrayHasKey('globalmacroids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['globalmacroids']);
 	}
 
 	private function prepareExportDir($export_dir) {
@@ -598,10 +639,6 @@ echo '[DEBUG][ndjsonExport] triggerid=' . var_export(self::$triggerid_export, tr
 	 * Check update of macro value.
 	 */
 	public function testUserMacrosInItemNames_normalItemUpdated() {
-		echo "\n[DEBUG][normalItemUpdated] started\n";
-		echo '[DEBUG][normalItemUpdated] macroid=' . var_export(self::$macroid, true) . "\n";
-		echo '[DEBUG][normalItemUpdated] hostid1=' . var_export(self::$hostid1, true) . "\n";
-		echo "[DEBUG][normalItemUpdated] before usermacro.updateglobal\n";
 		$response = $this->call('usermacro.updateglobal', [
 			'globalmacroid' => self::$macroid,
 			'macro' => '{$TEST}',
