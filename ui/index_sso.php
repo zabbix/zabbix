@@ -224,26 +224,21 @@ try {
 		}
 	}
 
-	if ($saml_settings['slo_url'] !== '') {
-		if (hasRequest('slo') && ($saml_data !== null || CSessionHelper::has('saml_data'))) {
-			$saml_data_logout = CSessionHelper::has('saml_data')
-				? CSessionHelper::get('saml_data')
-				: $saml_data;
+	if ($saml_settings['slo_url'] !== '' && hasRequest('slo') && CSessionHelper::has('saml_data')) {
+		$saml_data_logout = CSessionHelper::get('saml_data');
+		CWebUser::logout();
 
-			CWebUser::logout();
+		$auth->logout(null, [], $saml_data_logout['nameid'], $saml_data_logout['session_index'], false,
+			$saml_data_logout['nameid_format'], $saml_data_logout['nameid_name_qualifier'],
+			$saml_data_logout['nameid_sp_name_qualifier']
+		);
+	}
 
-			$auth->logout(null, [], $saml_data_logout['nameid'], $saml_data_logout['session_index'], false,
-				$saml_data_logout['nameid_format'], $saml_data_logout['nameid_name_qualifier'],
-				$saml_data_logout['nameid_sp_name_qualifier']
-			);
-		}
+	if ($saml_settings['slo_url'] !== '' && hasRequest('sls')) {
+		CSessionHelper::unset(['saml_data']);
+		$auth->processSLO();
 
-		if (hasRequest('sls')) {
-			CSessionHelper::unset(['saml_data']);
-			$auth->processSLO();
-
-			redirect('index.php');
-		}
+		redirect('index.php');
 	}
 
 	if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
@@ -317,10 +312,7 @@ catch (Exception $e) {
 	error($e->getMessage());
 }
 
-$sso_authorized = $saml_data !== null || CSessionHelper::has('saml_data');
-CSessionHelper::unset(['saml_data']);
-
-if ($sso_authorized) {
+if ($saml_data !== null) {
 	error(_('You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed.'));
 	error(_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.'));
 }
@@ -329,7 +321,7 @@ echo (new CView('general.warning', [
 	'header' => _('You are not logged in'),
 	'messages' => array_column(get_and_clear_messages(), 'message'),
 	'buttons' => [
-		$sso_authorized && (!CWebUser::isLoggedIn() || CWebUser::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
+		$saml_data !== null && (!CWebUser::isLoggedIn() || CWebUser::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
 			? (new CButton('force_authn', _('Switch SSO user')))
 					->setAttribute('data-url',
 						(new CUrl('index_sso.php'))
