@@ -226,7 +226,15 @@ abstract class CControllerCepRuleGeneral extends CController {
 					'window_type', 'in' => [CCepRuleHelper::WINDOW_NONE, CCepRuleHelper::WINDOW_SIMPLE,
 						CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH
 					]
-				]]
+				]],
+				['objects', 'required', 'not_empty', 'fields' => self::getOperationValidationFields(), 'when' => [
+						'window_type', 'in' => [CCepRuleHelper::WINDOW_PATTERN_MATCH]],
+					'count_values' => [
+						'field_rules' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_PATTERN_MATCHED]],
+						'min' => 1,
+						'message' => _('The rule must contain Event pattern match operation.')
+					]
+				]
 			],
 			'stop' => ['db cep_rule.stop', 'required', 'in' => [CCepRuleHelper::EXECUTION_CONTINUE,
 				CCepRuleHelper::EXECUTION_STOP
