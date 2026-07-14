@@ -284,6 +284,9 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PF_UNSPEC;
 
+	if (SUCCEED == zbx_is_ip(host))
+		hints.ai_flags = AI_NUMERICHOST;
+	
 	if (0 != getaddrinfo(host, NULL, &hints, &ai))
 	{
 		ip[0] = '\0';
@@ -2702,6 +2705,9 @@ int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *
 		hints.ai_family = AF_UNSPEC;
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
+
+		if (SUCCEED == zbx_is_ip(start))
+			hints.ai_flags = AI_NUMERICHOST;
 
 		if (0 == getaddrinfo(start, NULL, &hints, &ai))
 		{
