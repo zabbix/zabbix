@@ -216,15 +216,18 @@ window.ceprule_edit_popup = new class {
 		window['ceprule-window-counttag-toggle'].addEventListener('change', (e) => {
 			const enabled = window['ceprule-window-counttag-toggle'].querySelector('[value="1"]').checked;
 			window['ceprule-window-counttag'].style.display = enabled ? '' : 'none';
+			window['ceprule-window-counttag'].disabled = !enabled;
 		});
 
 		window['ceprule-window-capacity-toggle'].addEventListener('change', (e) => {
 			const enabled = window['ceprule-window-capacity-toggle'].querySelector('[value="1"]').checked;
 			window['ceprule-window-capacity'].style.display = enabled ? '' : 'none';
+			window['ceprule-window-capacity'].disabled = !enabled;
 		});
 
 		window['ceprule-window-groupby-opt-tag'].addEventListener('change', (e) => {
 			window['ceprule-window-groupby-tag'].style.display = e.target.checked ? '' : 'none';
+			jQuery(window['ceprule-window-groupby-tag']).multiSelect(e.target.checked ? 'enable' : 'disable');
 		});
 
 		window['ceprule-window-type'].addEventListener('change', () => this.#handleWindowTypeChanged());
@@ -287,6 +290,7 @@ window.ceprule_edit_popup = new class {
 
 			form_field.style.display = display;
 			form_field.previousSibling.style.display = display;
+				jQuery(window['ceprule-script']).multilineInput(display ? 'enable' : 'disable');
 		}
 		{
 			const form_field = window['ceprule-window-counttag'].closest('.form-field');
