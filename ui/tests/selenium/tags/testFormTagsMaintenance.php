@@ -214,7 +214,8 @@ class testFormTagsMaintenance extends testFormTags {
 							'value' => 'maintenance update'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, operator, value)=(maintenance action, 2, maintenance update) already exists.'
+					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, operator, value)=(maintenance action,'.
+							' 2, maintenance update) already exists.'
 				]
 			],
 			[
@@ -229,7 +230,8 @@ class testFormTagsMaintenance extends testFormTags {
 							'value' => ''
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/tags/3": value (tag, operator, value)=(maintenance tag without value, 0, ) already exists.'
+					'error_details' => 'Invalid parameter "/1/tags/3": value (tag, operator, value)=(maintenance tag'.
+							' without value, 0, ) already exists.'
 				]
 			],
 			[
