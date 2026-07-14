@@ -963,12 +963,12 @@ class testFormMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #10 Wrong date format in active since or active till.
+			// #10 Wrong date format in Active since and Active till.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Wrong date format in active since or active till',
+						'Name' => 'Wrong date format in Active since and Active till',
 						'Active since' => '03/02/2025 00:00',
 						'Active till' => '01.01.2026 00:00',
 						'Host groups' => 'Zabbix servers'
@@ -982,12 +982,12 @@ class testFormMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #11 Invalid time in active since or active till.
+			// #11 Invalid time in Active since and Active till.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Invalid time in active since or active till',
+						'Name' => 'Invalid time in Active since and Active till',
 						'Active since' => '2025-02-03 24:00',
 						'Active till' => '2026-01-01 00:61',
 						'Host groups' => 'Zabbix servers'
@@ -1001,12 +1001,12 @@ class testFormMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #12 Non-existing dates with valid format in active since or active till.
+			// #12 Non-existing dates with valid format in Active since and Active till.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Non-existing dates with valid format in active since or active till',
+						'Name' => 'Non-existing dates with valid format in Active since and Active till',
 						'Active since' => '2026-02-29 23:00',
 						'Active till' => '2026-02-30 23:00',
 						'Host groups' => 'Zabbix servers'
@@ -1020,12 +1020,12 @@ class testFormMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #13 Active since and active till too far in the past.
+			// #13 Active since and Active till too far in the past.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Active since and active till too far in the past',
+						'Name' => 'Active since and Active till too far in the past',
 						'Active since' => '1969-12-30 00:00',
 						'Active till' => '1969-12-31 23:59',
 						'Host groups' => 'Zabbix servers'
@@ -1039,12 +1039,12 @@ class testFormMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #14 Active since and active till too far in the future.
+			// #14 Active since and Active till too far in the future.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Active since and active till too far in the future',
+						'Name' => 'Active since and Active till too far in the future',
 						'Active since' => '2038-01-19 09:00',
 						'Active till' => '2038-01-20 23:59',
 						'Host groups' => 'Zabbix servers'
