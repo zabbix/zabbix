@@ -488,7 +488,6 @@ static void	correlation_config_sync_correlations(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&corr_config->correlations, ref);
 	}
 
-	atomic_store(&corr_config->correlations_num, corr_config->correlations.num_data);
 	zbx_dcsync_sync_end(sync, dbconfig_used_size());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -766,6 +765,8 @@ void	correlation_config_sync(zbx_dbsync_t *correlation_sync, zbx_dbsync_t *corr_
 		corr_config->handle = handle;
 
 		pthread_mutex_unlock(&corr_config->lock);
+
+		atomic_store(&corr_config->correlations_num, corr_config->correlations.num_data);
 	}
 }
 
