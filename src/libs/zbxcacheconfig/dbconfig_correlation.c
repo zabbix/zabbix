@@ -550,10 +550,10 @@ static void	correlation_config_sync_operations(zbx_dbsync_t *sync)
 		switch (op->type)
 		{
 			case ZBX_CORR_OPERATION_CLOSE_OLD:
-				ref->correlation->operations |= CORRELATION_OP_CLOSE_OLD;
+				correlation->operations |= CORRELATION_OP_CLOSE_OLD;
 				break;
 			case ZBX_CORR_OPERATION_CLOSE_NEW:
-				ref->correlation->operations |= CORRELATION_OP_CLOSE_NEW;
+				correlation->operations |= CORRELATION_OP_CLOSE_NEW;
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported correlation operation");
