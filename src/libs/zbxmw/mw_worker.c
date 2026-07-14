@@ -119,8 +119,6 @@ int	mw_worker_start(zbx_mw_worker_t *worker, unsigned char process_type, void *(
 	pthread_attr_t		attr;
 	zbx_mw_worker_args_t	*args;
 
-	atomic_fetch_or(&worker->state, MW_WORKER_STATE_STARTING);
-
 	zbx_pthread_init_attr(&attr);
 
 	args = (zbx_mw_worker_args_t *)zbx_malloc(NULL, sizeof(zbx_mw_worker_args_t));
@@ -133,6 +131,8 @@ int	mw_worker_start(zbx_mw_worker_t *worker, unsigned char process_type, void *(
 		*error = zbx_dsprintf(NULL, "cannot create thread: %s", zbx_strerror(err));
 		goto out;
 	}
+
+	atomic_fetch_or(&worker->state, MW_WORKER_STATE_STARTING);
 
 	ret = SUCCEED;
 out:
