@@ -16,7 +16,6 @@
 #include "cep_api.h"
 #include "zbx_cep.h"
 #include "zbxcommon.h"
-#include "zbxdbwrap.h"
 
 void	cep_event_clear(zbx_cep_event_t *event)
 {
@@ -30,7 +29,7 @@ void	cep_event_clear(zbx_cep_event_t *event)
 	}
 	zbx_vector_lite_tag_destroy(&event->tags);
 
-	zbx_vector_lite_uint64_destroy(&event->maintenanceids);
+	zbx_vector_db_event_suppress_destroy(&event->suppress);
 
 	zbx_free(event->name);
 }
@@ -78,13 +77,9 @@ zbx_cep_event_t	*cep_event_create(zbx_uint64_t eventid, unsigned char source, un
 		}
 	}
 
-	zbx_vector_lite_uint64_create(&event->maintenanceids);
+	zbx_vector_db_event_suppress_create(&event->suppress);
 	if (NULL != suppress)
-	{
-		zbx_vector_lite_uint64_reserve(&event->maintenanceids, (size_t)suppress->values_num);
-		for (int i = 0; i < suppress->values_num; i++)
-			zbx_vector_lite_uint64_append(&event->maintenanceids, suppress->values[i].maintenanceid);
-	}
+		zbx_vector_db_event_suppress_append_array(&event->suppress, suppress->values, suppress->values_num);
 
 	return event;
 }
@@ -135,9 +130,8 @@ zbx_cep_event_t	*cep_event_clone(const zbx_cep_event_t *event)
 		zbx_vector_lite_tag_append(&clone->tags, tag_local);
 	}
 
-	zbx_vector_lite_uint64_create(&clone->maintenanceids);
-	zbx_vector_lite_uint64_append_array(&clone->maintenanceids, event->maintenanceids.values,
-			event->maintenanceids.values_num);
+	zbx_vector_db_event_suppress_create(&clone->suppress);
+	zbx_vector_db_event_suppress_append_array(&clone->suppress, event->suppress.values, event->suppress.values_num);
 
 	return clone;
 }

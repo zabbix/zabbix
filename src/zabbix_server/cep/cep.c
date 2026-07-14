@@ -524,10 +524,9 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t		eventid;
-		zbx_uint64_t		maintenanceid;
+		zbx_db_event_suppress_t	suppress_local;
 
 		ZBX_STR2UINT64(eventid, row[0]);
-		ZBX_DBROW2UINT64(maintenanceid, row[1]);
 
 		if (NULL == h || h->eventid != eventid)
 		{
@@ -538,7 +537,12 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
 			}
 			cep_release_event_handle(cep, h);
 		}
-		zbx_vector_lite_uint64_append(&h->event->maintenanceids, maintenanceid);
+
+		ZBX_DBROW2UINT64(suppress_local.maintenanceid, row[1]);
+		suppress_local.cep_ruleid = 0;
+		suppress_local.until = 0;
+
+		zbx_vector_db_event_suppress_append(&h->event->suppress, suppress_local);
 	}
 
 	zbx_db_free_result(result);
@@ -1389,102 +1393,96 @@ zbx_uint64_t	cep_close_internal_event(zbx_cep_t *cep, unsigned char object, zbx_
 	return eventid;
 }
 
+static int	db_event_suppress_compare(const void *a1, const void *a2)
+{
+	const zbx_db_event_suppress_t	*s1 = (const zbx_db_event_suppress_t *)a1;
+	const zbx_db_event_suppress_t	*s2 = (const zbx_db_event_suppress_t *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(s1->maintenanceid, s2->maintenanceid);
+	ZBX_RETURN_IF_NOT_EQUAL(s1->cep_ruleid, s2->cep_ruleid);
+
+	return 0;
+}
+
 /******************************************************************************
+ *                                                                           *
+ * Purpose: add suppress records to event and update suppression time         *
  *                                                                            *
- * Purpose: add maintenance IDs to event and update suppression time          *
- *                                                                            *
- * Parameters: h             - [IN/OUT] event handle                          *
- *             maintenanceids- [IN/OUT] maintenance IDs to add                *
+ * Parameters: h         - [IN/OUT] event handle                              *
+ *             suppress  - [IN/OUT] event suppress data to add                *
  *                                                                            *
  ******************************************************************************/
-static void	cep_event_add_maintenaces(zbx_cep_event_handle_t h, zbx_vector_uint64_t *maintenanceids)
+void	cep_event_add_suppress(zbx_cep_event_t *event, const zbx_db_event_suppress_t *suppress,
+		int suppress_num)
 {
-	for (int i = 0; i < h->event->maintenanceids.values_num; i++)
+	int	event_suppress_num = event->suppress.values_num;
+
+	for (int i = 0; i < suppress_num; i++)
 	{
 		int	index;
 
-		if (FAIL != (index = zbx_vector_uint64_search(maintenanceids, h->event->maintenanceids.values[i],
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		if (FAIL == (index = zbx_vector_db_event_suppress_search(&event->suppress, suppress[i],
+				db_event_suppress_compare)))
 		{
-			zbx_vector_uint64_remove_noorder(maintenanceids, index);
+			zbx_vector_db_event_suppress_append(&event->suppress, suppress[i]);
 		}
 	}
 
-	if (0 == maintenanceids->values_num)
+	if (event->suppress.values_num == suppress_num)
 		return;
 
-	zbx_cep_event_t	*event = cep_event_handle_mutable(h);
-
-	if (0 == event->maintenanceids.values_num)
+	if (0 == event_suppress_num)
 		event->suppress_mtime = time(NULL);
-
-	zbx_vector_lite_uint64_append_array(&event->maintenanceids, maintenanceids->values, maintenanceids->values_num);
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: remove maintenance IDs from event and update suppression time     *
+ * Purpose: remove suppress records from event and update suppression time    *
  *                                                                            *
- * Parameters: h             - [IN/OUT] event handle                          *
- *             maintenanceids- [IN]     maintenance IDs to remove             *
+ * Parameters: h        - [IN/OUT] event handle                               *
+ *             suppress - [IN] event suppress data to remove                  *
  *                                                                            *
  ******************************************************************************/
-static void	cep_event_remove_maintenaces(zbx_cep_event_handle_t h, zbx_vector_uint64_t *maintenanceids)
+static void	cep_event_remove_suppress(zbx_cep_event_t *event, const zbx_db_event_suppress_t *suppress,
+		int suppress_num)
 {
-	zbx_vector_uint64_t	ids;
-
-	zbx_vector_uint64_create(&ids);
-	zbx_vector_uint64_append_array(&ids, h->event->maintenanceids.values, h->event->maintenanceids.values_num);
-
-	for (int i = 0; i < ids.values_num;)
+	for (int i = 0; i < suppress_num; i++)
 	{
-		if (FAIL != zbx_vector_uint64_search(maintenanceids, ids.values[i], ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			zbx_vector_uint64_remove_noorder(&ids, i);
-		else
-			i++;
+		int	index;
+
+		if (FAIL != (index = zbx_vector_db_event_suppress_search(&event->suppress, suppress[i],
+				db_event_suppress_compare)))
+		{
+			zbx_vector_db_event_suppress_remove_noorder(&event->suppress, index);
+		}
 	}
 
-	if (ids.values_num != h->event->maintenanceids.values_num)
+	if (0 == event->suppress.values_num)
 	{
-		zbx_cep_event_t	*event = cep_event_handle_mutable(h);
-
-		if (0 != ids.values_num)
-		{
-			zbx_vector_lite_uint64_clear(&event->maintenanceids);
-			zbx_vector_lite_uint64_append_array(&event->maintenanceids, ids.values, ids.values_num);
-		}
-		else
-		{
-			zbx_vector_lite_uint64_reset(&event->maintenanceids);
-		}
-
-		if (0 == event->maintenanceids.values_num)
-			event->suppress_mtime = time(NULL);
+		zbx_vector_db_event_suppress_reset(&event->suppress);
+		event->suppress_mtime = time(NULL);
 	}
-
-	zbx_vector_uint64_destroy(&ids);
 }
-
 
 /******************************************************************************
  *                                                                            *
  * Purpose: update event maintenances                                         *
  *                                                                            *
- * Parameters: h             - [IN/OUT] event handle                          *
- *             maintenanceids- [IN/OUT] maintenance IDs                       *
- *             action        - [IN]     maintenance operation                 *
+ * Parameters: h        - [IN/OUT] event handle                               *
+ *             suppress - [IN/OUT] supppress data                             *
+ *             action   - [IN]     maintenance operation                      *
  *                                                                            *
  * Comments: Suppresses or unsuppresses event by adding or removing           *
  *           maintenances depending on action.                                *
  *                                                                            *
  ******************************************************************************/
-static  void	cep_event_update_maintenances(zbx_cep_event_handle_t h, zbx_vector_uint64_t *maintenanceids,
+static  void	cep_event_update_maintenances(zbx_cep_event_handle_t h, zbx_vector_db_event_suppress_t *suppress,
 	zbx_cep_event_op_t action)
 {
 	if (CEP_EVENT_SUPPRESS == action)
-		cep_event_add_maintenaces(h, maintenanceids);
+		cep_event_add_suppress(cep_event_handle_mutable(h), suppress->values, suppress->values_num);
 	else
-		cep_event_remove_maintenaces(h, maintenanceids);
+		cep_event_remove_suppress(cep_event_handle_mutable(h), suppress->values, suppress->values_num);
 }
 
 /******************************************************************************
@@ -1500,17 +1498,19 @@ static  void	cep_event_update_maintenances(zbx_cep_event_handle_t h, zbx_vector_
 void	cep_update_event_maintenances(zbx_cep_t *cep, const zbx_vector_event_maintenance_t *events,
 		zbx_cep_event_op_t action, zbx_vector_cep_event_handle_t *handles)
 {
-	zbx_cep_event_handle_t	h = NULL;
-	zbx_vector_uint64_t	maintenanceids;
+	zbx_cep_event_handle_t		h = NULL;
+	zbx_vector_db_event_suppress_t	suppress;
 
-	zbx_vector_uint64_create(&maintenanceids);
+	zbx_vector_db_event_suppress_create(&suppress);
 
 	for (int i = 0; i < events->values_num; i++)
 	{
+		zbx_db_event_suppress_t	suppress_local = {.maintenanceid = events->values[i].maintenanceid};
+
 		if (NULL == h || h->eventid != events->values[i].eventid)
 		{
 			if (NULL != h)
-				cep_event_update_maintenances(h, &maintenanceids, action);
+				cep_event_update_maintenances(h, &suppress, action);
 
 			if (NULL == (h = cep_acquire_event_handle_by_eventid(cep, events->values[i].eventid)))
 				continue;
@@ -1518,13 +1518,13 @@ void	cep_update_event_maintenances(zbx_cep_t *cep, const zbx_vector_event_mainte
 			zbx_vector_cep_event_handle_append(handles, h);
 		}
 
-		zbx_vector_uint64_append(&maintenanceids, events->values[i].maintenanceid);
+		zbx_vector_db_event_suppress_append(&suppress, suppress_local);
 	}
 
 	if (NULL != h)
-		cep_event_update_maintenances(h, &maintenanceids, action);
+		cep_event_update_maintenances(h, &suppress, action);
 
-	zbx_vector_uint64_destroy(&maintenanceids);
+	zbx_vector_db_event_suppress_destroy(&suppress);
 }
 
 /******************************************************************************
@@ -1836,11 +1836,15 @@ static void	cep_dump_event(const char *indent, zbx_cep_event_t *event)
 				event->tags.values[i].value);
 	}
 
-	if (0 != event->maintenanceids.values_num)
+	if (0 != event->suppress.values_num)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s  maintenances:", indent);
-		for (int i = 0; i < event->maintenanceids.values_num; i++)
-			zabbix_log(LOG_LEVEL_DEBUG, "%s    " ZBX_FS_UI64, indent, event->maintenanceids.values[i]);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s  suppress:", indent);
+		for (int i = 0; i < event->suppress.values_num; i++)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s    maintenanceid:" ZBX_FS_UI64 " cep_ruleid:" ZBX_FS_UI64 ,
+					indent, event->suppress.values[i].maintenanceid,
+					event->suppress.values[i].cep_ruleid);
+		}
 	}
 }
 

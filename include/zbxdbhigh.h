@@ -171,11 +171,12 @@ zbx_db_trigger;
 typedef struct
 {
 	zbx_uint64_t	maintenanceid;
+	zbx_uint64_t	cep_ruleid;
 	int		until;
 }
 zbx_db_event_suppress_t;
 
-ZBX_VECTOR_DECL(db_event_suppress, zbx_db_event_suppress_t)
+ZBX_VECTOR_LITE_DECL(db_event_suppress, zbx_db_event_suppress_t)
 
 typedef struct
 {

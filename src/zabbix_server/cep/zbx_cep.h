@@ -16,6 +16,7 @@
 #define ZABBIX_ZBX_CEP_H
 
 #include "zbxalgo.h"
+#include "zbxdbhigh.h"
 #include "zbxtypes_ext.h"
 
 typedef struct
@@ -57,7 +58,7 @@ struct zbx_cep_event
 	zbx_cep_origin_t		origin;
 
 	zbx_vector_lite_tag_t		tags;
-	zbx_vector_lite_uint64_t	maintenanceids;
+	zbx_vector_db_event_suppress_t	suppress;
 
 	zbx_atomic_uint32_t		refcount;
 
