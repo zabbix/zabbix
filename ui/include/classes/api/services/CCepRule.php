@@ -914,7 +914,7 @@ class CCepRule extends CApiService {
 
 				if ($upd_window) {
 					if (array_key_exists('tags', $upd_window)) {
-						$upd_window['tags'] = implode(PHP_EOL, $upd_window['tags']);
+						$upd_window['tags'] = implode(PHP_EOL, (array) $upd_window['tags']);
 					}
 
 					$upd_windows[] = [
@@ -1350,7 +1350,7 @@ class CCepRule extends CApiService {
 		$window_tags_newlines = function(array $records): array {
 			return array_map(function(array $record) {
 				if (array_key_exists('window', $record) && array_key_exists('tags', $record['window'])) {
-					$record['window']['tags'] = implode(PHP_EOL, $record['window']['tags']);
+					$record['window']['tags'] = implode(PHP_EOL, (array) $record['window']['tags']);
 				}
 
 				return $record;
