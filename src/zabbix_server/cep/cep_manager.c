@@ -303,7 +303,7 @@ static void	cep_manager_sync_object_state(zbx_dbconn_pool_t *dbpool, zbx_ipc_cli
  ******************************************************************************/
 static void	cep_manager_flush_remote_task(zbx_cep_task_remote_t *task)
 {
-	if (NULL != task->response)
+	if (NULL != task->response && SUCCEED == zbx_ipc_client_connected(task->client))
 		zbx_ipc_client_send(task->client, task->message->code, task->response, task->response_len);
 }
 
