@@ -272,12 +272,13 @@ static void	cep_worker_add_event_tags(zbx_cep_worker_t *worker, zbx_cep_task_rem
 	cep_add_event_tags(cep, &event_tags, &handles);
 	cep_cache_release(&cep);
 
+	zbx_cep_get_eventids_from_handles(handles.values, handles.values_num, &eventids);
+	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	zbx_cep_task_add_tags_t	*db_task = (zbx_cep_task_add_tags_t *)cep_create_task_add_tags(&event_tags, &eventids);
 
 	if (0 != handles.values_num)
 	{
-		zbx_cep_get_eventids_from_handles(handles.values, handles.values_num, &eventids);
-		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_event_tags_sort(&event_tags, zbx_event_tags_compare);
 
 		/* remove non trigger event handles from returned handles - no need */
