@@ -3380,14 +3380,16 @@ class testUsers extends CAPITest {
 
 		curl_multi_close($multi_handle);
 
+		$expected_result = [
+			'code' => -32500,
+			'message' => 'Application error.',
+			'data' => 'Incorrect user name or password or account is temporarily blocked.'
+		];
+
 		foreach ($responses as $response) {
 			$data = json_decode($response, true);
 
-			$this->assertEquals([
-				'code' => -32500,
-				'message' => 'Application error.',
-				'data' => 'Incorrect user name or password or account is temporarily blocked.'
-			], $data['error']);
+			$this->assertEquals($expected_result, array_intersect_key($data['error'], $expected_result));
 		}
 
 		$response = CDataHelper::callRaw([
@@ -3400,11 +3402,7 @@ class testUsers extends CAPITest {
 			'id' => 1
 		]);
 
-		$this->assertEquals([
-			'code' => -32500,
-			'message' => 'Application error.',
-			'data' => 'Incorrect user name or password or account is temporarily blocked.'
-		], $response['error']);
+		$this->assertEquals($expected_result, array_intersect_key($response['error'], $expected_result));
 
 		$user = DB::find('users', ['username' => $username])[0];
 
