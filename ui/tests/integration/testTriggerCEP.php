@@ -3912,6 +3912,10 @@ HEREDOC;
 			$this->startDiscHostMaintenances(self::MAINTENANCE_COUNT);
 			$this->waitForOpenProblemsSuppressed($all, $m);
 			$this->waitForServicesSuppressed();
+
+			// Start additional maintenances on the already-suppressed host: the extra overlapping
+			// maintenances must not disturb the existing suppression.
+			//$this->startDiscHostMaintenances(10);
 		}
 
 		// Wave 1 is fully open ($m problems), so $m problem events are tagged.
@@ -4736,8 +4740,9 @@ HEREDOC;
 	 */
 	private function startDiscHostMaintenances(int $count): void {
 		$now = time();
+		$start = count(self::$disc_maintenanceids) + 1;
 
-		for ($i = 1; $i <= $count; $i++) {
+		for ($i = $start; $i < $start + $count; $i++) {
 			$response = $this->call('maintenance.create', [
 				'name' => 'CEP close-on-up maintenance'.$i,
 				'hosts' => ['hostid' => self::$disc_hostid],
