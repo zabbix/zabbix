@@ -97,7 +97,7 @@ class CControllerCepRuleEdit extends CController {
 				'output' => ['cep_ruleid', 'name', 'description', 'window_type', 'status', 'stop', 'sortorder'],
 				'selectOperations' => ['sortorder', 'execute_when', 'type', 'evaltype', 'event_name', 'tag', 'new_tag',
 					'tag_value', 'severity', 'tags'],
-				'selectFilter' => ['formula', 'evaltype', 'conditions'],
+				'selectFilter' => ['eval_formula', 'evaltype', 'conditions'],
 				'selectWindow' => ['duration', 'capacity', 'script', 'group_by_host_group', 'group_by_host',
 					'group_by_tags', 'event_count_tag', 'tags']
 			]);
@@ -105,7 +105,7 @@ class CControllerCepRuleEdit extends CController {
 		else {
 			$ceprules = [DB::getDefaults('cep_rule') + [
 				'filter' => [
-					'formula' => DB::getDefault('cep_rule', 'formula'),
+					'eval_formula' => DB::getDefault('cep_rule', 'eval_formula'),
 					'evaltype' => DB::getDefault('cep_rule', 'evaltype'),
 					'conditions' => []
 				],
@@ -141,6 +141,10 @@ class CControllerCepRuleEdit extends CController {
 		// Consistent naming with URL and fields.
 		$ceprule['cepruleid'] = array_key_exists('cep_ruleid', $ceprule) ? $ceprule['cep_ruleid'] : null;
 		unset($ceprule['cep_ruleid']);
+
+		// Form will use this interpolated formula API field's name in submited structure.
+		$ceprule['filter']['formula'] = $ceprule['filter']['eval_formula'];
+		unset($ceprule['filter']['eval_formula']);
 
 		$ceprule['filter']['conditions'] = self::prepareFilterConditions($ceprule['filter']['conditions']);
 
