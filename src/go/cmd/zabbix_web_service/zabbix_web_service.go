@@ -236,6 +236,7 @@ func run(ctx context.Context) error {
 	}
 
 	serverErr := make(chan error, 1)
+
 	go func() {
 		serverErr <- serve(server)
 	}()
@@ -298,7 +299,7 @@ func normalizeServerError(err error) error {
 }
 
 func fatalExit(message string, err error) {
-	if len(message) == 0 {
+	if message == "" {
 		message = err.Error()
 	} else {
 		message = fmt.Sprintf("%s: %s", message, err.Error())
