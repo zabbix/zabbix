@@ -138,7 +138,7 @@ class CRegexp extends CApiService {
 											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_CONTAINS_ANY_SUBSTRING, REGEX_TYPE_NOT_CONTAINS_STRING])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('expressions', 'expression')]
 				]],
 				'exp_delimiter' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_CONTAINS_ANY_SUBSTRING])], 'type' => API_STRING_UTF8, 'in' => '\\,,.,/'],
+											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_CONTAINS_ANY_SUBSTRING])], 'type' => API_STRING_UTF8, 'in' => '\\,,.,/', 'default' => ','],
 											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_NOT_CONTAINS_STRING, REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX])], 'type' => API_STRING_UTF8, 'in' => '']
 				]],
 				'case_sensitive' =>		['type' => API_INT32, 'in' => '0,1']
@@ -211,15 +211,6 @@ class CRegexp extends CApiService {
 							&& $expression['expression'] === $db_expression['expression']);
 					})
 				);
-
-				/**
-				 * Set default value for expression delimiter.
-				 * Because Zabbix agent 2 cannot work with regular expression when delimiter is empty.
-				 * Bugfix for Zabbix agent 2 5.0.22 and less.
-				 */
-				if ($expression['expression_type'] == REGEX_TYPE_CONTAINS_ANY_SUBSTRING) {
-					$expression += ['exp_delimiter' => ','];
-				}
 
 				if ($db_expression) {
 					$expression['expressionid'] = $db_expression['expressionid'];
@@ -336,7 +327,7 @@ class CRegexp extends CApiService {
 											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_CONTAINS_ANY_SUBSTRING, REGEX_TYPE_NOT_CONTAINS_STRING])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('expressions', 'expression')]
 				]],
 				'exp_delimiter' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_CONTAINS_ANY_SUBSTRING])], 'type' => API_STRING_UTF8, 'in' => '\\,,.,/'],
+											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_CONTAINS_ANY_SUBSTRING])], 'type' => API_STRING_UTF8, 'in' => '\\,,.,/', 'default' => ','],
 											['if' => ['field' => 'expression_type', 'in' => implode(',', [REGEX_TYPE_CONTAINS_STRING, REGEX_TYPE_NOT_CONTAINS_STRING, REGEX_TYPE_MATCHES_REGEX, REGEX_TYPE_NOT_MATCHES_REGEX])], 'type' => API_STRING_UTF8, 'in' => '']
 				]],
 				'case_sensitive' =>		['type' => API_INT32, 'in' => '0,1']
