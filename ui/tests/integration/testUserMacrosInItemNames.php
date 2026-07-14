@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  */
 class testUserMacrosInItemNames extends CIntegrationTest {
 	/** Maximum number of iterations to wait for NDJSON export files to appear. */
-	private const WAIT_EXPORT_FILE_ITERATIONS = 120;
+	private const WAIT_EXPORT_FILE_ITERATIONS = 30;
 	const HOSTNAME1 = 'test_user_macros_in_item_names1';
 	const HOSTNAME2 = 'test_user_macros_in_item_names2';
 	const HOSTNAME_EXPORT = 'test_ndjson_export_macros';
@@ -314,10 +314,15 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testUserMacrosInItemNames_ndjsonExport() {
+echo "\n[DEBUG][ndjsonExport] started\n";
 		$export_dir = self::getExportDir();
 		$now = time();
 		$prev_hour = $now - 3600;
-
+echo '[DEBUG][ndjsonExport] export_dir=' . $export_dir . "\n";
+echo '[DEBUG][ndjsonExport] now=' . $now . ', prev_hour=' . $prev_hour . "\n";
+echo '[DEBUG][ndjsonExport] host=' . self::HOSTNAME_EXPORT . "\n";
+echo '[DEBUG][ndjsonExport] itemid=' . var_export(self::$itemid_export, true) . "\n";
+echo '[DEBUG][ndjsonExport] triggerid=' . var_export(self::$triggerid_export, true) . "\n";
 		try {
 			$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 			$this->prepareExportDir($export_dir);
@@ -593,6 +598,10 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 	 * Check update of macro value.
 	 */
 	public function testUserMacrosInItemNames_normalItemUpdated() {
+		echo "\n[DEBUG][normalItemUpdated] started\n";
+		echo '[DEBUG][normalItemUpdated] macroid=' . var_export(self::$macroid, true) . "\n";
+		echo '[DEBUG][normalItemUpdated] hostid1=' . var_export(self::$hostid1, true) . "\n";
+		echo "[DEBUG][normalItemUpdated] before usermacro.updateglobal\n";
 		$response = $this->call('usermacro.updateglobal', [
 			'globalmacroid' => self::$macroid,
 			'macro' => '{$TEST}',
