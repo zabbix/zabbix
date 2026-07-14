@@ -1098,12 +1098,18 @@ zbx_uint64_t	cep_open_trigger_event(zbx_cep_t *cep, zbx_uint64_t triggerid, unsi
 	}
 
 	if (CEP_EVENT_DEPENDENCY_DENY == cep_check_trigger_dependency(cep, NULL, dep_triggerids))
+	{
+		obj->pending_events_num--;
 		return 0;
+	}
 
 	if (0 != obj->events.values_num)
 	{
 		if (TRIGGER_TYPE_MULTIPLE_TRUE != trigger_type)
+		{
+			obj->pending_events_num--;
 			return 0;
+		}
 	}
 	else
 		*obj_value = TRIGGER_VALUE_PROBLEM;
