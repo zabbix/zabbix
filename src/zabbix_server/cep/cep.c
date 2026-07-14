@@ -536,9 +536,9 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
+			cep_release_event_handle(cep, h);
 		}
 		zbx_vector_lite_uint64_append(&h->event->maintenanceids, maintenanceid);
-		cep_release_event_handle(cep, h);
 	}
 
 	zbx_db_free_result(result);
