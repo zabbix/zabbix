@@ -1073,6 +1073,22 @@ static int	cep_event_match_tag(const zbx_cep_event_t *event, const char *tag, co
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: decrease pending event count for a CEP object and remove it if    *
+ *          it holds no events                                                *
+ *                                                                            *
+ * Parameters: cep - [IN] cep instance                                        *
+ *             obj - [IN] cep object to update                                *
+ *                                                                            *
+ ******************************************************************************/
+static void cep_object_pending_event_done(zbx_cep_t *cep, zbx_cep_object_t *obj)
+{
+	obj->pending_events_num--;
+	if (0 == obj->events.values_num && 0 == obj->pending_events_num)
+		zbx_hashset_remove_direct(&cep->objects, obj);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: open problem event for trigger                                    *
  *                                                                            *
  * Parameters: cache          - [IN/OUT] cache context                        *
@@ -1094,6 +1110,7 @@ zbx_uint64_t	cep_open_trigger_event(zbx_cep_t *cep, zbx_uint64_t triggerid, unsi
 					.objectid = triggerid
 					};
 	zbx_cep_object_t	*obj;
+	zbx_uint64_t		eventid = 0;
 
 	if (NULL == (obj = cep_get_object(cep, &origin)))
 	{
@@ -1102,23 +1119,22 @@ zbx_uint64_t	cep_open_trigger_event(zbx_cep_t *cep, zbx_uint64_t triggerid, unsi
 	}
 
 	if (CEP_EVENT_DEPENDENCY_DENY == cep_check_trigger_dependency(cep, NULL, dep_triggerids))
-	{
-		obj->pending_events_num--;
-		return 0;
-	}
+		goto out;
 
 	if (0 != obj->events.values_num)
 	{
 		if (TRIGGER_TYPE_MULTIPLE_TRUE != trigger_type)
-		{
-			obj->pending_events_num--;
-			return 0;
-		}
+			goto out;
 	}
 	else
 		*obj_value = TRIGGER_VALUE_PROBLEM;
 
-	return cep_eventid_next(cep);
+	eventid = cep_eventid_next(cep);
+out:
+	if (0 == eventid)
+		cep_object_pending_event_done(cep, obj);
+
+	return eventid;
 }
 
 /******************************************************************************
@@ -1202,6 +1218,7 @@ zbx_uint64_t	cep_close_trigger_events(zbx_cep_t *cep, zbx_uint64_t triggerid,
 					.objectid = triggerid
 					};
 	zbx_cep_object_t	*obj;
+	zbx_uint64_t		r_eventid = 0;
 
 	if (NULL == (obj = cep_get_object(cep, &origin)))
 	{
@@ -1209,10 +1226,8 @@ zbx_uint64_t	cep_close_trigger_events(zbx_cep_t *cep, zbx_uint64_t triggerid,
 		return 0;
 	}
 
-	obj->pending_events_num--;
-
 	if (CEP_EVENT_DEPENDENCY_DENY == cep_check_trigger_dependency(cep, NULL, dep_triggerids))
-		return 0;
+		goto out;
 
 	for (int i = obj->events.values_num - 1; i >= 0 && 0 != obj->events.values_num; i--)
 	{
@@ -1230,17 +1245,16 @@ zbx_uint64_t	cep_close_trigger_events(zbx_cep_t *cep, zbx_uint64_t triggerid,
 
 	/* no events to recover */
 	if (0 == events->values_num)
-		return 0;
+		goto out;
 
 	if (0 == obj->events.values_num)
-	{
 		*obj_value = TRIGGER_VALUE_OK;
 
-		if (0 == obj->pending_events_num)
-			zbx_hashset_remove_direct(&cep->objects, obj);
-	}
+	r_eventid = cep_eventid_next(cep);
+out:
+	cep_object_pending_event_done(cep, obj);
 
-	return cep_eventid_next(cep);
+	return r_eventid;
 }
 
 /******************************************************************************
@@ -1265,14 +1279,13 @@ zbx_uint64_t	cep_close_trigger_event_by_eventid(zbx_cep_t *cep, zbx_uint64_t tri
 			.object = EVENT_OBJECT_TRIGGER,
 			.objectid = triggerid
 	};
+	zbx_uint64_t	r_eventid = 0;
 
 	if (NULL == (obj = cep_get_object(cep, &origin)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("detected incoming trigger event without creation check");
 		return 0;
 	}
-
-	obj->pending_events_num--;
 
 	for (int i = 0; i < obj->events.values_num; i++)
 	{
@@ -1286,17 +1299,16 @@ zbx_uint64_t	cep_close_trigger_event_by_eventid(zbx_cep_t *cep, zbx_uint64_t tri
 
 	/* no events to recover */
 	if (0 == handles->values_num)
-		return 0;
+		goto out;
 
 	if (0 == obj->events.values_num)
-	{
 		*obj_value = TRIGGER_VALUE_OK;
 
-		if (0 == obj->pending_events_num)
-			zbx_hashset_remove_direct(&cep->objects, obj);
-	}
+	r_eventid = cep_eventid_next(cep);
+out:
+	cep_object_pending_event_done(cep, obj);
 
-	return cep_eventid_next(cep);
+	return r_eventid;
 }
 
 /******************************************************************************
