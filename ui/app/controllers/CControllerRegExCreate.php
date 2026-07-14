@@ -90,21 +90,21 @@ class CControllerRegExCreate extends CController {
 	}
 
 	protected function doAction(): void {
-		$global_regex = [
+		$regexp = [
 			'name' => $this->getInput('name'),
 			'description' => $this->getInput('description', ''),
 			'test_string' => $this->getInput('test_string', ''),
 			'expressions' => $this->getInput('expressions')
 		];
 
-		foreach ($global_regex['expressions'] as &$expression) {
+		foreach ($regexp['expressions'] as &$expression) {
 			if ($expression['expression_type'] != REGEX_TYPE_CONTAINS_ANY_SUBSTRING) {
 				$expression['exp_delimiter'] = '';
 			}
 		}
 		unset($expression);
 
-		$result = API::Regexp()->create($global_regex);
+		$result = API::Regexp()->create($regexp);
 
 		$output = [];
 

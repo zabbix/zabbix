@@ -64,13 +64,13 @@ class CControllerRegExDelete extends CController {
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 
-			$global_regexes = API::Regexp()->get([
+			$regexps = API::Regexp()->get([
 				'output' => [],
 				'regexpids' => $regexpids,
 				'preservekeys' => true
 			]);
 
-			$output['keepids'] = array_keys($global_regexes);
+			$output['keepids'] = array_keys($regexps);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
