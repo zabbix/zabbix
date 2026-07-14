@@ -16,7 +16,13 @@ form.dashboard-widget-scatterplot {
 			position: sticky;
 			top: 0;
 			background: $header-bg-color;
+			border-top-left-radius: var(--surface-border-radius);
+			border-top-right-radius: var(--surface-border-radius);
 			z-index: 3;
+
+			> li:first-child a:hover {
+				border-top-left-radius: var(--surface-border-radius);
+			}
 		}
 	}
 
