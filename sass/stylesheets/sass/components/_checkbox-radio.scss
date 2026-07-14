@@ -1,0 +1,133 @@
+.checkbox-radio {
+	position: absolute !important;
+	top: auto !important;
+	z-index: 1;
+	width: 16px !important;
+	height: 16px !important;
+	opacity: 0;
+
+	& + label {
+		span {
+			position: relative;
+			box-sizing: border-box;
+			display: inline-block;
+			width: 16px;
+			height: 16px;
+			margin-right: 4px;
+			vertical-align: text-bottom;
+			background-color: $form-bg-color;
+			border: 1px solid $form-border-color;
+
+			&:active {
+				border-color: $form-border-color;
+			}
+		}
+
+		&.label-pos-left span {
+			margin-left: 4px;
+			margin-right: 0;
+		}
+	}
+
+	&:checked[readonly] + label span {
+		transition: none;
+
+		&::after {
+			border-color: $form-border-color !important;
+		}
+	}
+
+	&[readonly] {
+		&,
+		& + label {
+			pointer-events: none;
+
+			span {
+				transition: none;
+				@extend %form-disabled;
+			}
+		}
+	}
+
+	&[type="checkbox"] {
+		& + label span {
+			border-radius: #{"max(0px, calc(var(--input-border-radius) - 2px))"};
+		}
+
+		&:checked + label span {
+			&::after {
+				content: '';
+				position: absolute;
+				display: block;
+				width: 7px;
+				height: 4px;
+				top: 6px;
+				left: 7px;
+				border-left: 2px solid $btn-bg-color;
+				border-bottom: 2px solid $btn-bg-color;
+				transform: translate(-50%, -50%) rotate(-45deg);
+			}
+		}
+
+		&:checked[disabled] + label span {
+			&::after {
+				border-color: $form-border-color !important;
+			}
+		}
+
+		&:checked[readonly] + label span {
+			&::after {
+				border-color: $font-color !important;
+			}
+		}
+	}
+
+	&[type="radio"] {
+		& + label span {
+			border-radius: 50%;
+		}
+
+		&:checked + label span {
+			&::after {
+				content: '';
+				position: absolute;
+				display: block;
+				width: 8px;
+				height: 8px;
+				top: 3px;
+				left: 3px;
+				background-color: $form-radio-selected-color;
+				border-radius: 50%;
+			}
+		}
+
+		&:checked[disabled] + label span {
+			&::after {
+				background-color: $form-border-color !important;
+			}
+		}
+
+		&:checked[readonly] + label span {
+			&::after {
+				background-color: $font-color !important;
+			}
+		}
+	}
+
+	&:focus + label span {
+		border-color: $form-focus-border-color;
+	}
+
+	&:checked[disabled] + label span {
+		transition: none;
+
+		&::after {
+			border-color: $form-border-color !important;
+		}
+	}
+
+	&[disabled] + label span {
+		transition: none;
+		@extend %form-disabled;
+	}
+}
