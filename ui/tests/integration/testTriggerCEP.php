@@ -36,6 +36,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const LLD_DISCOVERY_COUNT = 500;	// discovered items/triggers per rule; use at least 4000 to stress CEP
 	const LOG_EVENT_COUNT = 10000;		// log values pushed at the single-trigger stream; use at least 10000
 	const RECOVERY_CYCLES_COUNT = 2000;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
+	const MAINTENANCE_COUNT = 64;		// number of maintenances to create; change to any number
 
 	const SKIP_RESTART_TESTS = true;
 
@@ -121,8 +122,7 @@ class testTriggerCEP extends CIntegrationTest {
 	private static $discovered_dep_triggerids = [];
 	private static $correlationid;
 	private static $correlationid2;
-	private static $disc_maintenanceid;
-	private static $disc_maintenanceid2;
+	private static $disc_maintenanceids = [];
 	private static $serviceids = [];
 	private static $service_actionid;
 	private static $trigger_actionid;
@@ -3099,23 +3099,20 @@ HEREDOC;
 	 * already open: the maintenance is created mid-run, so the already-open problems must be suppressed
 	 * retroactively, and every problem opened afterwards (while maintenance is active) suppressed at
 	 * creation time too, while global correlation still closes them all, leaving nothing open.
-	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirst$)
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirst$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
 	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirst() {
-		self::$disc_maintenanceid = null;
-		self::$disc_maintenanceid2 = null;
+		self::$disc_maintenanceids = [];
 		$this->prepareDataGlobalCorrelationCloseOnUp();
 		try {
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true);
 			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 		}
 		finally {
-			if (self::$disc_maintenanceid !== null) {
-				$this->stopDiscHostMaintenance(self::$disc_maintenanceid);
+			foreach (self::$disc_maintenanceids as $maintenanceid) {
+				$this->stopDiscHostMaintenance($maintenanceid);
 			}
-			if (self::$disc_maintenanceid2 !== null) {
-				$this->stopDiscHostMaintenance(self::$disc_maintenanceid2);
 			$this->reloadConfigurationCacheAndWaitForLogLine();
 
 			// Moving the maintenance out of its active window only changes the configuration; the timer process
@@ -3129,11 +3126,10 @@ HEREDOC;
 				'object' => EVENT_OBJECT_TRIGGER,
 				'suppressed' => true
 			], 0, 120, self::WAIT_ITERATION_DELAY);
-			}
 		}
 	}
 
-		/**
+	/**
 	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUp,
 	 * but the discovered host only enters data-collection maintenance after the first wave of problems is
 	 * already open: the maintenance is created mid-run, so the already-open problems must be suppressed
@@ -3144,19 +3140,16 @@ HEREDOC;
 	 */
 	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirstRestart() {
 		$this->skipIfRestartTestsDisabled();
-		self::$disc_maintenanceid = null;
-		self::$disc_maintenanceid2 = null;
+		self::$disc_maintenanceids = [];
 		$this->prepareDataGlobalCorrelationCloseOnUp();
 		try {
 			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true);
 			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 		}
 		finally {
-			if (self::$disc_maintenanceid !== null) {
-				$this->stopDiscHostMaintenance(self::$disc_maintenanceid);
+			foreach (self::$disc_maintenanceids as $maintenanceid) {
+				$this->stopDiscHostMaintenance($maintenanceid);
 			}
-			if (self::$disc_maintenanceid2 !== null) {
-				$this->stopDiscHostMaintenance(self::$disc_maintenanceid2);
 			$this->reloadConfigurationCacheAndWaitForLogLine();
 
 			// Moving the maintenance out of its active window only changes the configuration; the timer process
@@ -3170,6 +3163,47 @@ HEREDOC;
 				'object' => EVENT_OBJECT_TRIGGER,
 				'suppressed' => true
 			], 0, 120, self::WAIT_ITERATION_DELAY);
+		}
+	}
+
+	/**
+	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirst,
+	 * but verifies that problems and services are suppressed during maintenance and no longer suppressed after
+	 * the maintenance is stopped.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_SuppressUnsuppressProblems$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_SuppressUnsuppressProblems() {
+		self::$disc_maintenanceids = [];
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, true, false, true);
+		}
+		finally {
+			// Clean up: ensure maintenance is stopped
+			foreach (self::$disc_maintenanceids as $maintenanceid) {
+				$this->stopDiscHostMaintenance($maintenanceid);
+			}
+		}
+	}
+
+	/**
+	 * Same "close old down when new up" scenario as testTriggerCEP_SuppressUnsuppressProblems,
+	 * but the server component is stopped and restarted between each step.
+	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_SuppressUnsuppressProblemsRestart$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_SuppressUnsuppressProblemsRestart() {
+		$this->skipIfRestartTestsDisabled();
+		self::$disc_maintenanceids = [];
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		try {
+			$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(true, true, false, true);
+		}
+		finally {
+			// Clean up: ensure maintenance is stopped
+			foreach (self::$disc_maintenanceids as $maintenanceid) {
+				$this->stopDiscHostMaintenance($maintenanceid);
 			}
 		}
 	}
@@ -3846,7 +3880,7 @@ HEREDOC;
 	 * be set up by the caller.
 	 */
 	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart,
-			bool $maintenance_after_first = false, bool $check_tags = false): void {
+			bool $maintenance_after_first = false, bool $check_tags = false, bool $stop_maintenance_and_verify_suppression = false): void {
 		$keys = array_merge(
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2)
@@ -3875,9 +3909,9 @@ HEREDOC;
 		// maintenance now must retroactively suppress those $m open problems (and every problem opened
 		// later), while global correlation still closes them normally below.
 		if ($maintenance_after_first) {
-			self::$disc_maintenanceid = $this->startDiscHostMaintenance('CEP close-on-up maintenance');
-			self::$disc_maintenanceid2 = $this->startDiscHostMaintenance('CEP close-on-up maintenance2');
+			$this->startDiscHostMaintenances(self::MAINTENANCE_COUNT);
 			$this->waitForOpenProblemsSuppressed($all, $m);
+			$this->waitForServicesSuppressed();
 		}
 
 		// Wave 1 is fully open ($m problems), so $m problem events are tagged.
@@ -3886,6 +3920,10 @@ HEREDOC;
 		}
 
 		$this->maybeRestartServer($restart);
+
+		if ($maintenance_after_first) {
+			$this->waitForServicesSuppressed();
+		}
 
 		// 2. Open a second problem on every trigger (a different unique id, mult_event); still TRUE.
 		$this->dispatchSenderValues($values('down', $m));
@@ -3896,6 +3934,31 @@ HEREDOC;
 		// be suppressed at creation time as well: all 2 * $m open problems suppressed.
 		if ($maintenance_after_first) {
 			$this->waitForOpenProblemsSuppressed($all, 2 * $m);
+			$this->waitForServicesSuppressed();
+
+			// If requested, verify services are suppressed while problems are still open,
+			// then stop maintenance and verify suppression is cleared.
+			if ($stop_maintenance_and_verify_suppression) {
+				// Stop the maintenance
+				foreach (self::$disc_maintenanceids as $maintenanceid) {
+					$this->stopDiscHostMaintenance($maintenanceid);
+				}
+
+				$this->maybeRestartServer($restart);
+
+				$this->reloadConfigurationCacheAndWaitForLogLine();
+
+				// Verify that no suppressed events remain after maintenance is stopped
+				$this->callUntilCountIsPresent('event.get', [
+					'hostids' => [self::$disc_hostid],
+					'source' => EVENT_SOURCE_TRIGGERS,
+					'object' => EVENT_OBJECT_TRIGGER,
+					'suppressed' => true
+				], 0, 120, self::WAIT_ITERATION_DELAY);
+
+				// Verify services are no longer suppressed
+				$this->waitForServicesNoLongerSuppressed();
+			}
 		}
 
 		// Both "down" waves are now open (2 * $m problems), so 2 * $m problem events are tagged.
@@ -4669,6 +4732,34 @@ HEREDOC;
 	}
 
 	/**
+	 * Create multiple maintenances for the discovered host and reload configuration cache once after all are created.
+	 */
+	private function startDiscHostMaintenances(int $count): void {
+		$now = time();
+
+		for ($i = 1; $i <= $count; $i++) {
+			$response = $this->call('maintenance.create', [
+				'name' => 'CEP close-on-up maintenance'.$i,
+				'hosts' => ['hostid' => self::$disc_hostid],
+				'active_since' => $now - 60,
+				'active_till' => $now + 3600,
+				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
+				'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_AND_OR,
+				'timeperiods' => [
+					'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+					'period' => 3600,
+					'start_date' => $now - 60
+				]
+			]);
+			$this->assertArrayHasKey('maintenanceids', $response['result']);
+			$this->assertCount(1, $response['result']['maintenanceids']);
+			self::$disc_maintenanceids[] = $response['result']['maintenanceids'][0];
+		}
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+	}
+
+	/**
 	 * Skip the calling *Restart test when SKIP_RESTART_TESTS is enabled. The non-restart sibling
 	 * leaves the system in the same asserted state, so dependents can rely on it instead.
 	 */
@@ -5359,6 +5450,51 @@ HEREDOC;
 		], count($serviceids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
 	}
 
+	private function waitForServicesSuppressed(): void {
+		$serviceids = self::$serviceids;
+
+		if (empty($serviceids)) {
+			return;
+		}
+
+		try {
+			$this->callUntilCountIsPresent('service.get', [
+				'serviceids' => $serviceids,
+				'filter' => ['status' => -1]
+			], count($serviceids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+		} catch (Exception $e) {
+			$response = $this->call('service.get', [
+				'serviceids' => $serviceids,
+				'output' => ['serviceid', 'status']
+			]);
+			if (!empty($response['result'])) {
+				$status = $response['result'][0]['status'];
+				throw new Exception('Expected all services to have status -1 (OK), but got status '.$status.' for service '.$response['result'][0]['serviceid'].'. '.$e->getMessage());
+			}
+			throw $e;
+		}
+	}
+
+	private function waitForServicesNoLongerSuppressed(): void {
+		$serviceids = self::$serviceids;
+
+		if (empty($serviceids)) {
+			return;
+		}
+
+		$this->callUntilCountIsPresent('service.get', [
+			'serviceids' => $serviceids,
+			'filter' => ['status' => [
+				TRIGGER_SEVERITY_NOT_CLASSIFIED,
+				TRIGGER_SEVERITY_INFORMATION,
+				TRIGGER_SEVERITY_WARNING,
+				TRIGGER_SEVERITY_AVERAGE,
+				TRIGGER_SEVERITY_HIGH,
+				TRIGGER_SEVERITY_DISASTER
+			]]
+		], count($serviceids), self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY);
+	}
+
 	/**
 	 * Collect every open problem on $triggerids and manually change its severity to $severity via
 	 * event.acknowledge (ZBX_PROBLEM_UPDATE_SEVERITY), so the service manager recomputes the status of the
@@ -5595,14 +5731,9 @@ HEREDOC;
 
 		// stopDiscHostMaintenance() only pushes the maintenance out of its active window; delete it for real
 		// here (before its host) so it does not leak into later suites.
-		if (!empty(self::$disc_maintenanceid)) {
-			CDataHelper::call('maintenance.delete', [self::$disc_maintenanceid]);
-			self::$disc_maintenanceid = null;
-		}
-
-		if (!empty(self::$disc_maintenanceid2)) {
-			CDataHelper::call('maintenance.delete', [self::$disc_maintenanceid2]);
-			self::$disc_maintenanceid2 = null;
+		if (!empty(self::$disc_maintenanceids)) {
+			CDataHelper::call('maintenance.delete', self::$disc_maintenanceids);
+			self::$disc_maintenanceids = [];
 		}
 
 		if (!empty(self::$disc_hostid)) {
