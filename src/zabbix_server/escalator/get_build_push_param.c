@@ -463,7 +463,8 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 		if (NULL != t->enc_key)
 			zbx_json_addraw(&json, "mobile_encryption_key", t->enc_key);
 		else
-			/* Adapter treats {} as invalid; null keeps missing MEK explicit for non-encrypted delivery. */
+			/* Bridge-adapter treats empty {} as an invalid key.             */
+			/* null indicates that MEK is absent for non-encrypted delivery. */
 			zbx_json_addstring(&json, "mobile_encryption_key", NULL, ZBX_JSON_TYPE_NULL);
 
 		zbx_json_close(&json); /* params */

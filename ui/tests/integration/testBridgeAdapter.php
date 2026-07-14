@@ -733,7 +733,7 @@ class testBridgeAdapter extends CIntegrationTest {
 	private static function hasExpectedRealNotificationActionLog(array $alerts, array $expected_alerts,
 			bool $recovery): bool {
 		$alerts = array_values(array_filter($alerts, static function (array $alert) use ($recovery): bool {
-			return $recovery ? $alert['p_eventid'] != 0 : $alert['p_eventid'] == 0;
+			return $recovery ? $alert['p_eventid'] !== '0' : $alert['p_eventid'] === '0';
 		}));
 
 		foreach ($expected_alerts as $expected_alert) {
@@ -899,12 +899,8 @@ class testBridgeAdapter extends CIntegrationTest {
 	public function testBridgeAdapter_notify(): void {
 		[$client, $sid] = $this->getServerClientAndSid();
 
-		$mediatypeid = CDBHelper::getValue(
-			'select mediatypeid from media_type where type='.MEDIA_TYPE_PUSH.' order by mediatypeid'
-		);
-
 		$result = $client->testMediaType([
-			'mediatypeid' => $mediatypeid,
+			'mediatypeid' => self::$push_mediatypeid,
 			'sendto' => self::NOTIFY_DEVICE_UUID,
 			'subject' => 'Bridge adapter integration test',
 			'message' => 'Bridge adapter integration test message'

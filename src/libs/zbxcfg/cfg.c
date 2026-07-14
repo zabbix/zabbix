@@ -970,9 +970,11 @@ static int	bridge_adapter_parse_url_hostport(const char *url, char **host, unsig
 
 	host_tmp = zbx_strdup(NULL, *host);
 
-	if (SUCCEED != zbx_parse_serveractive_element(host_tmp, &host_validate, &host_port, 0) ||
-			(FAIL == zbx_is_supported_ip(host_validate) &&
-					FAIL == zbx_is_rfc_extended_hostname(host_validate)))
+	if (SUCCEED != zbx_parse_serveractive_element(host_tmp, &host_validate, &host_port, 0))
+		goto fail;
+
+	if (FAIL == zbx_is_supported_ip(host_validate) &&
+			FAIL == zbx_is_rfc_extended_hostname(host_validate))
 		goto fail;
 
 	if ('\0' != *port_start && (SUCCEED != zbx_is_ushort(port_start, port) || 0 == *port))
