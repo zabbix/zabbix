@@ -28262,6 +28262,10 @@ msgstr "начните печатать для поиска"
 msgid "unacceptable URL"
 msgstr "неприемлемый URL"
 
+#: include/classes/validators/CUrlValidator.php:147
+msgid "unacceptable URL scheme"
+msgstr ""
+
 #: include/classes/import/validators/CXmlValidatorGeneral.php:296
 #, c-format
 msgid "unexpected constant \"%1$s\""

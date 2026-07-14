@@ -27870,6 +27870,10 @@ msgstr "검색 문자열을 입력"
 msgid "unacceptable URL"
 msgstr "허용되지 않는 URL"
 
+#: include/classes/validators/CUrlValidator.php:147
+msgid "unacceptable URL scheme"
+msgstr ""
+
 #: include/classes/import/validators/CXmlValidatorGeneral.php:296
 #, c-format
 msgid "unexpected constant \"%1$s\""

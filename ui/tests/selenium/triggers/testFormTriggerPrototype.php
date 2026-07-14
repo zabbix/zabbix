@@ -792,7 +792,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expression' => 'last(/Simple form test host/someItem.uptime,#1)<0',
 					'url' => 'javascript:alert(123);',
 					'inline_errors' => [
-						'Menu entry URL' => 'Unacceptable URL.'
+						'Menu entry URL' => 'Unacceptable URL scheme.'
 					]
 				]
 			],

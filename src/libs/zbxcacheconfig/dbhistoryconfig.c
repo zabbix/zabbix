@@ -1126,27 +1126,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get host information by name                                      *
- *                                                                            *
- * Parameters: host      - [IN] host name                                     *
- *             sock      - [IN] connection socket                             *
- *             recv_host - [OUT] host information                             *
- *             redirect  - [OUT] host redirection data (optional)             *
- *                                                                            *
- * Return value: SUCCEED         - host found                                 *
- *               SUCCEED_PARTIAL - redirection data was specified and host is *
- *                                 not monitored by the this instance         *
- *               FAIL            - host not found                             *
- *                                                                            *
- ******************************************************************************/
-int	zbx_dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock, zbx_history_recv_host_t *recv_host,
-		zbx_comms_redirect_t *redirect)
-{
-	return dc_config_get_host_by_name(host, sock, ZBX_ITEM_GET_HOSTINFO, recv_host, redirect);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: get host identifier by name                                       *
  *                                                                            *
  * Parameters: host     - [IN] host name                                      *

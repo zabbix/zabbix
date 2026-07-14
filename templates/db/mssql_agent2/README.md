@@ -88,7 +88,7 @@ Note: Since version 7.2.0, you can also connect to the MSSQL instance using its 
 |{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}|<p>The minimum buffer cache hit ratio, in percent - for the High trigger expression.</p>|`30`|
 |{$MSSQL.FREE_LIST_STALLS.MAX}|<p>The maximum free list stalls per second - for the trigger expression.</p>|`2`|
 |{$MSSQL.LAZY_WRITES.MAX}|<p>The maximum lazy writes per second - for the trigger expression.</p>|`20`|
-|{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}|<p>The minimum page life expectancy - for the trigger expression.</p>|`300`|
+|{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}|<p>The minimum page life (in seconds) expectancy - for the trigger expression.</p>|`300`|
 |{$MSSQL.PAGE_READS.MAX}|<p>The maximum page reads per second - for the trigger expression.</p>|`90`|
 |{$MSSQL.PAGE_WRITES.MAX}|<p>The maximum page writes per second - for the trigger expression.</p>|`90`|
 |{$MSSQL.AVERAGE_WAIT_TIME.MAX}|<p>The maximum average wait time, in milliseconds - for the trigger expression.</p>|`500`|

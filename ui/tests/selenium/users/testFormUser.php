@@ -779,7 +779,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL scheme.'
 				]
 			],
 			// Incorrect URL protocol.
@@ -795,7 +795,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL scheme.'
 				]
 			],
 			// Creating user by specifying only mandatory parameters.
@@ -1329,7 +1329,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'javascript:alert(123);'
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL scheme.'
 				]
 			],
 			// #26 Incorrect URL protocol.
@@ -1340,7 +1340,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL scheme.'
 				]
 			],
 			// #27 Updating LDAP user with empty password fields.
