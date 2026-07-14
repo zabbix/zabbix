@@ -225,13 +225,14 @@ try {
 	}
 
 	if ($saml_settings['slo_url'] !== '' && hasRequest('slo') && CSessionHelper::has('saml_data')) {
-		$saml_data_logout = CSessionHelper::get('saml_data');
+		$saml_data = CSessionHelper::get('saml_data');
 		CWebUser::logout();
 
-		$auth->logout(null, [], $saml_data_logout['nameid'], $saml_data_logout['session_index'], false,
-			$saml_data_logout['nameid_format'], $saml_data_logout['nameid_name_qualifier'],
-			$saml_data_logout['nameid_sp_name_qualifier']
+		$url = $auth->logout(null, [], $saml_data['nameid'], $saml_data['session_index'], true,
+			$saml_data['nameid_format'], $saml_data['nameid_name_qualifier'], $saml_data['nameid_sp_name_qualifier']
 		);
+
+		redirect($url);
 	}
 
 	if ($saml_settings['slo_url'] !== '' && hasRequest('sls')) {
