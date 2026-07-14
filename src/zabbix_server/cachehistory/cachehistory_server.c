@@ -145,8 +145,7 @@ static void	process_triggers(zbx_vector_dc_trigger_t *triggers, zbx_add_event_fu
 
 	for (int i = 0; i < triggers->values_num; i++)
 	{
-		zbx_dc_trigger_t	*trigger = triggers->values[i];
-
+		zbx_dc_trigger_t		*trigger = triggers->values[i];
 		zbx_cep_assessment_query_t	query;
 
 		query.triggerid = trigger->triggerid;

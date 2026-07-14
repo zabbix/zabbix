@@ -988,7 +988,15 @@ void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_q
 		}
 
 		results[i] = result;
-		obj->pending_events_num++;
+
+		/* unknown trigger events will not be sent to CEP */
+		if (TRIGGER_VALUE_UNKNOWN == (query->flags & CEP_QUERY_MASK_VALUE))
+		{
+			if (0 == obj->pending_events_num && 0 == obj->events.values_num)
+				zbx_hashset_remove_direct(&cep->objects, obj);
+		}
+		else
+			obj->pending_events_num++;
 	}
 
 	zbx_hashset_destroy(&triggerids);
@@ -1306,6 +1314,8 @@ zbx_uint64_t	cep_open_internal_event(zbx_cep_t *cep, unsigned char object, zbx_u
 	if (0 != obj->events.values_num)
 		return 0;
 
+	obj->pending_events_num++;
+
 	return cep_eventid_next(cep);
 }
 
@@ -1333,8 +1343,6 @@ zbx_uint64_t	cep_close_internal_event(zbx_cep_t *cep, unsigned char object, zbx_
 
 	if (NULL == (obj = cep_get_object(cep, &origin)))
 		return 0;
-
-	obj->pending_events_num--;
 
 	/* internal event objects in cache as exactly one event */
 	zbx_cep_event_handle_t	h = obj->events.values[0];
@@ -1878,6 +1886,7 @@ void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats)
 	stats->events_discarded = atomic_load(&cep->events_discarded_num);
 
 	stats->events_num = cep->events.num_data;
+	stats->objects_num = cep->objects.num_data;
 }
 
 int	zbx_cep_event_handle_compare(const void *a1, const void *a2)

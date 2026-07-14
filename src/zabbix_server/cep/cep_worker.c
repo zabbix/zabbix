@@ -388,7 +388,8 @@ static void	cep_worker_get_stats(zbx_cep_worker_t *worker, zbx_cep_task_remote_t
 	ptr += zbx_serialize_value(ptr, stats.task_remote_num);
 	ptr += zbx_serialize_value(ptr, stats.task_internal_num);
 	ptr += zbx_serialize_value(ptr, stats.task_completed_num);
-	(void)zbx_serialize_value(ptr, stats.events_num);
+	ptr += zbx_serialize_value(ptr, stats.events_num);
+	(void)zbx_serialize_value(ptr, stats.objects_num);
 
 }
 

@@ -120,6 +120,7 @@ typedef struct
 	int		task_completed_num;
 
 	int		events_num;
+	int		objects_num;
 }
 zbx_cep_stats_t;
 
