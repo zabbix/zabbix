@@ -2958,6 +2958,13 @@ static void	process_event_updates(zbx_service_manager_t *service_manager, zbx_ce
 		zabbix_log(LOG_LEVEL_TRACE, "eventid:" ZBX_FS_UI64 " action:%d", (NULL != event ? event->eventid : 0),
 				updates[i].op);
 
+		if (NULL == event)
+		{
+			/* event has been deleted - treat as deleted notification even with different op */
+			zbx_vector_cep_event_handle_append(&deleted_events, updates[i].handle);
+			continue;
+		}
+
 		switch (updates[i].op)
 		{
 			case CEP_EVENT_CLOSE:
@@ -3000,6 +3007,7 @@ static void	process_event_updates(zbx_service_manager_t *service_manager, zbx_ce
 				zbx_vector_cep_event_ptr_append(&severities, event);
 				break;
 			case CEP_EVENT_DELETE:
+				THIS_SHOULD_NEVER_HAPPEN_MSG("non-empty event object passed with delete operation");
 				zbx_vector_cep_event_handle_append(&deleted_events, updates[i].handle);
 				break;
 			default:
@@ -3012,7 +3020,11 @@ static void	process_event_updates(zbx_service_manager_t *service_manager, zbx_ce
 	zbx_dbconn_t	*db = zbx_dbconn_pool_acquire_connection(dbpool);
 
 	if (0 != deleted_events.values_num)
+	{
+		zbx_vector_cep_event_handle_sort(&deleted_events, zbx_cep_event_handle_compare);
+		zbx_vector_cep_event_handle_uniq(&deleted_events, zbx_cep_event_handle_compare);
 		process_deleted_problems(service_manager, deleted_events.values, deleted_events.values_num);
+	}
 
 	if (0 != severities.values_num)
 		update_event_severities(service_manager, &severities, db);

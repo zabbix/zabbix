@@ -1880,3 +1880,13 @@ void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats)
 	stats->events_num = cep->events.num_data;
 }
 
+int	zbx_cep_event_handle_compare(const void *a1, const void *a2)
+{
+	const zbx_cep_event_handle_t	*h1 = (const zbx_cep_event_handle_t *)a1;
+	const zbx_cep_event_handle_t	*h2 = (const zbx_cep_event_handle_t *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(*h1, *h2);
+
+	return 0;
+}
+
