@@ -3323,13 +3323,16 @@ static void	recalculate_services(zbx_service_manager_t *service_manager, zbx_dbc
 			if (NULL == events[j])
 			{
 				process_deleted_problems(service_manager, &handles.values[i + j], 1);
-				continue;
+			}
+			else
+			{
+				match_event_to_service_problem_tags(events[j],
+						&service_manager->service_problem_tags_index,
+						&service_manager->service_diffs, flags);
+
+				zbx_cep_event_release(events[j]);
 			}
 
-			match_event_to_service_problem_tags(events[j], &service_manager->service_problem_tags_index,
-				&service_manager->service_diffs, flags);
-
-			zbx_cep_event_release(events[j]);
 			zbx_cep_event_handle_release(handles.values[i + j]);
 		}
 	}
