@@ -1373,7 +1373,7 @@ zabbix_export:
                 - \2
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 6h
+                - 1d
           tags:
             - tag: component
               value: application
