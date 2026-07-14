@@ -171,7 +171,13 @@ window.drule_edit_popup = new class {
 
 	#addRadioButtonValues(drule) {
 		['uniqueness_criteria', 'host_source', 'name_source'].forEach((field) => {
-			const radioButton = document.querySelector(`input[type="radio"][name="${field}"][value="${CSS.escape(drule[field])}"]`);
+			if (field === 'uniqueness_criteria' && drule.uniq === 1) {
+				drule[field] = `_${drule.dcheckid}`;
+			}
+
+			const radioButton = document.querySelector(
+				`input[type="radio"][name="${field}"][value="${CSS.escape(drule[field])}"]`
+			);
 
 			if (radioButton) {
 				radioButton.checked = true;
@@ -259,7 +265,7 @@ window.drule_edit_popup = new class {
 				input.name_source = document.querySelector('input[name=name_source]:checked').value;
 				const checked_uniqueness_criteria = document.querySelector('input[name=uniqueness_criteria]:checked');
 
-				input.uniq = checked_uniqueness_criteria.value === input.dcheckid ? 1 : 0;
+				input.uniq = checked_uniqueness_criteria.value === '_'+input.dcheckid ? 1 : 0;
 			}
 		}
 

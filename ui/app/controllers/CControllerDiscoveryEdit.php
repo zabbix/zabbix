@@ -77,7 +77,7 @@ class CControllerDiscoveryEdit extends CController {
 
 				foreach ($drule['dchecks'] as $dcheck) {
 					if ($dcheck['uniq']) {
-						$uniqueness_criteria = $dcheck['dcheckid'];
+						$uniqueness_criteria = '_'.$dcheck['dcheckid'];
 					}
 
 					if ($dcheck['host_source'] == ZBX_DISCOVERY_VALUE) {

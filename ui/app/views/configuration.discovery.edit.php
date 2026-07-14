@@ -142,7 +142,7 @@ $form_grid->addItem([
 
 $uniqueness_template = (new CTemplateTag('unique-row-tmpl'))->addItem(
 	(new CListItem([
-		(new CInput('radio', 'uniqueness_criteria', '#{dcheckid}'))
+		(new CInput('radio', 'uniqueness_criteria', '_#{dcheckid}'))
 			->addClass(ZBX_STYLE_CHECKBOX_RADIO)
 			->setAttribute('data-id', '#{dcheckid}')
 			->setId('uniqueness_criteria_#{dcheckid}'),
