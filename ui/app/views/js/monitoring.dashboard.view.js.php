@@ -189,7 +189,7 @@
 				}
 			}
 
-			ZABBIX.Dashboard.on(CDashboard.EVENT_REFERRED_UPDATE, e => this.#onReferredUpdate(e));
+			ZABBIX.Dashboard.on(CDashboard.EVENT_REFERRED_UPDATE, e => this.#onReferredUpdate(e, web_layout_mode));
 
 			ZABBIX.Dashboard.on(CDashboard.EVENT_FEEDBACK, e => this.#onFeedback(e));
 
@@ -567,7 +567,7 @@
 			});
 		}
 
-		#onReferredUpdate(e) {
+		#onReferredUpdate(e, web_layout_mode) {
 			switch (e.detail.type) {
 				case CWidgetsData.DATA_TYPE_TIME_PERIOD:
 					if (this.#time_selector_toggle_timeout !== null) {
@@ -581,7 +581,9 @@
 							this.#updateHistory({add_new: false});
 						}
 
-						this.#toggleTimeSelector(e.detail.is_referred);
+						if (web_layout_mode === undefined || web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>) {
+							this.#toggleTimeSelector(e.detail.is_referred);
+						}
 					});
 
 					break;
