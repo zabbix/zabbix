@@ -1045,49 +1045,41 @@ static int	DBpatch_7050082(void)
 	return SUCCEED;
 }
 
-typedef struct
-{
-	zbx_uint64_t	roleid;
-	const char	*values;
-}
-zbx_role_rule_t;
-
 static int	DBpatch_7050083(void)
 {
-	int		i;
-	const char	*columns = "role_ruleid,roleid,type,name,value_int,value_str,value_moduleid,value_serviceid";
-
-	static const zbx_role_rule_t values[] = {
-			{1, "1,0,'devices.access',0,'',NULL,NULL"},
-			{1, "1,0,'devices.actions.default_access',0,'',NULL,NULL"},
-			{2, "2,0,'devices.access',0,'',NULL,NULL"},
-			{2, "2,0,'devices.actions.default_access',0,'',NULL,NULL"},
-			{3, "3,0,'devices.access',1,'',NULL,NULL"},
-			{3, "3,0,'devices.actions.default_access',1,'',NULL,NULL"},
-			{4, "4,0,'devices.access',0,'',NULL,NULL"},
-			{4, "4,0,'devices.actions.default_access',0,'',NULL,NULL"},
-			{0, NULL}
-	};
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_db_insert_t	db_insert;
+	int		ret;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	for (i = 0; NULL != values[i].values; i++)
-	{
-		if (ZBX_DB_OK > zbx_db_execute(
-				"insert into role_rule (%s)"
-					" select " ZBX_FS_UI64 ",%s"
-					" where exists ("
-						"select 1 from role"
-						" where roleid=" ZBX_FS_UI64
-				")",
-				columns, zbx_db_get_maxid("role_rule"), values[i].values, values[i].roleid))
-		{
-			return FAIL;
-		}
-	}
+	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int",
+			"value_str", "value_moduleid", "value_serviceid", (char *)NULL);
 
-	return SUCCEED;
+	result = zbx_db_select("select roleid,type from role");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	roleid;
+		int		access;
+
+		ZBX_STR2UINT64(roleid, row[0]);
+		access = (USER_TYPE_SUPER_ADMIN == atoi(row[1])) ? 1 : 0;
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 0, "devices.access", access, "",
+				__UINT64_C(0), __UINT64_C(0));
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 0, "devices.actions.default_access",
+				access, "", __UINT64_C(0), __UINT64_C(0));
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "role_ruleid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
 }
 
 static int	DBpatch_7050084(void)
