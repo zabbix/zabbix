@@ -166,15 +166,16 @@ class CControllerCepRuleList extends CController {
 			$is_legacy = array_key_exists('correlationid', $ceprule);
 
 			if ($is_legacy) {
-				$groupids += array_column($ceprule['filter']['conditions'], 'groupid', 'groupid');
+				$groupids = array_merge($groupids,
+					array_column($ceprule['filter']['conditions'], 'groupid', 'groupid')
+				);
 			}
 		}
 
 		if ($groupids) {
 			$groups = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
-				'groupids' => array_keys($groupids),
-				'preservekeys' => true
+				'groupids' => array_unique($groupids)
 			]);
 
 			return array_column($groups, 'name', 'groupid');
