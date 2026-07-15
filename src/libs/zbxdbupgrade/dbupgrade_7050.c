@@ -1036,8 +1036,8 @@ static int	DBpatch_7050082(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str,value_int) values"
-			" ('device_link_timeout',1,'60s',0)"))
+	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str) values"
+			" ('device_link_timeout',1,'60s')"))
 	{
 		return FAIL;
 	}
@@ -1056,7 +1056,7 @@ static int	DBpatch_7050083(void)
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int",
-			"value_str", "value_moduleid", "value_serviceid", (char *)NULL);
+			(char *)NULL);
 
 	result = zbx_db_select("select roleid,type from role");
 
@@ -1068,10 +1068,9 @@ static int	DBpatch_7050083(void)
 		ZBX_STR2UINT64(roleid, row[0]);
 		access = (USER_TYPE_SUPER_ADMIN == atoi(row[1])) ? 1 : 0;
 
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 0, "devices.access", access, "",
-				__UINT64_C(0), __UINT64_C(0));
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 0, "devices.access", access);
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 0, "devices.actions.default_access",
-				access, "", __UINT64_C(0), __UINT64_C(0));
+				access);
 	}
 	zbx_db_free_result(result);
 
@@ -1089,13 +1088,8 @@ static int	DBpatch_7050084(void)
 
 	zbx_uint64_t	media_typeid = zbx_db_get_maxid("media_type");
 
-	if (ZBX_DB_OK > zbx_db_execute("insert into media_type (mediatypeid,type,name,smtp_server,smtp_helo,"
-			"smtp_email,exec_path,gsm_modem,username,passwd,status,smtp_port,smtp_security,"
-			"smtp_verify_peer,smtp_verify_host,smtp_authentication,maxsessions,maxattempts,"
-			"attempt_interval,message_format,script,timeout,process_tags,show_event_menu,"
-			"event_menu_url,event_menu_name,description,provider) values "
-			"(" ZBX_FS_UI64 ",5,'Push notification','','','','','','','',1,25,0,0,0,0,1,3,'10s',1,'',"
-			"'30s',0,0,'','','',0)", media_typeid))
+	if (ZBX_DB_OK > zbx_db_execute("insert into media_type (mediatypeid,type,name) values "
+			"(" ZBX_FS_UI64 ",5,'Push notification')", media_typeid))
 	{
 		return FAIL;
 	}
