@@ -1049,7 +1049,7 @@ static int	DBpatch_7050084(void)
 		return SUCCEED;
 
 	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str,value_int) values"
-			" ('device_link_timeout',1,'30s',0)"))
+			" ('device_link_timeout',1,'60s',0)"))
 	{
 		return FAIL;
 	}

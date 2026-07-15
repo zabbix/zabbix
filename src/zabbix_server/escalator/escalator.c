@@ -76,6 +76,7 @@ typedef struct
 	char		*message;
 	char		*tz;
 	int		err;
+	int		all_mediatypes;
 	void		*next;
 }
 zbx_user_msg_t;
@@ -128,7 +129,7 @@ static void	zbx_tag_filter_free(zbx_tag_filter_t *tag_filter)
 static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_event, zbx_uint64_t actionid,
 		int esc_step, zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
-		int err_type, const char *tz);
+		int err_type, int all_mediatypes, const char *tz);
 
 typedef enum
 {
@@ -633,7 +634,7 @@ out2:
 static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, zbx_user_msg_t **user_msg, const char *subj,
 		const char *msg, zbx_uint64_t actionid, const zbx_db_event *event, const zbx_db_event *r_event,
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
-		int expand_macros, int macro_type, int err_type, const char *tz)
+		int expand_macros, int macro_type, int err_type, int all_mediatypes, const char *tz)
 {
 	zbx_user_msg_t	*p;
 
@@ -664,6 +665,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, zbx_user
 					0 == strcmp(p->message, message) && 0 != p->mediatypeid)
 			{
 				*pnext = (zbx_user_msg_t *)p->next;
+				all_mediatypes |= p->all_mediatypes;
 
 				zbx_free(p->subject);
 				zbx_free(p->message);
@@ -692,6 +694,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, zbx_user
 		p->userid = userid;
 		p->mediatypeid = mediatypeid;
 		p->err = err_type;
+		p->all_mediatypes = all_mediatypes;
 		p->subject = subject;
 		p->message = message;
 		p->tz = zbx_strdup(NULL, tz);
@@ -701,6 +704,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, zbx_user
 	}
 	else
 	{
+		p->all_mediatypes |= all_mediatypes;
 		zbx_free(subject);
 		zbx_free(message);
 	}
@@ -717,6 +721,7 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	zbx_uint64_t	mtid;
+	int		all_mediatypes;
 	const char	*tz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -732,14 +737,19 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
+		all_mediatypes = 0;
+
 		if (0 == mediatypeid)
+		{
 			ZBX_DBROW2UINT64(mediatypeid, row[0]);
+			all_mediatypes = (0 == mediatypeid);
+		}
 
 		if (1 != atoi(row[1]))
 		{
 			add_user_msg(userid, mediatypeid, user_msg, row[2], row[3], actionid, event, r_event, ack,
 					service_alarm, service, ZBX_MACRO_EXPAND_YES, message_type,
-					ZBX_ALERT_MESSAGE_ERR_NONE, tz);
+					ZBX_ALERT_MESSAGE_ERR_NONE, all_mediatypes, tz);
 			goto out;
 		}
 
@@ -781,12 +791,13 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 		{
 			add_user_msg(userid, mediatypeid, user_msg, row[1], row[2], actionid, event, r_event, ack,
 					service_alarm, service, ZBX_MACRO_EXPAND_YES, message_type,
-					ZBX_ALERT_MESSAGE_ERR_NONE, tz);
+					ZBX_ALERT_MESSAGE_ERR_NONE, all_mediatypes, tz);
 		}
 		else
 		{
 			add_user_msg(userid, mediatypeid, user_msg, "", "", actionid, event, r_event, ack,
-					service_alarm, service, ZBX_MACRO_EXPAND_NO, 0, ZBX_ALERT_MESSAGE_ERR_MSG, tz);
+					service_alarm, service, ZBX_MACRO_EXPAND_NO, 0, ZBX_ALERT_MESSAGE_ERR_MSG,
+					all_mediatypes, tz);
 		}
 	}
 
@@ -794,7 +805,7 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 	{
 		add_user_msg(userid, mtid, user_msg, "", "", actionid, event, r_event, ack, service_alarm, service,
 				ZBX_MACRO_EXPAND_NO, 0,
-				0 == mtid ? ZBX_ALERT_MESSAGE_ERR_USR : ZBX_ALERT_MESSAGE_ERR_MSG, tz);
+				0 == mtid ? ZBX_ALERT_MESSAGE_ERR_USR : ZBX_ALERT_MESSAGE_ERR_MSG, all_mediatypes, tz);
 	}
 out:
 	zbx_db_free_result(result);
@@ -1058,7 +1069,7 @@ static void	add_sentusers_msg_esc_cancel(zbx_user_msg_t **user_msg, zbx_uint64_t
 		tz = NULL == user_timezone || 0 == strcmp(user_timezone, "default") ? default_timezone : user_timezone;
 
 		add_user_msg(userid, mediatypeid, user_msg, row[2], message_dyn, actionid, event, NULL, NULL,
-				NULL, NULL, ZBX_MACRO_EXPAND_NO, 0, ZBX_ALERT_MESSAGE_ERR_NONE, tz);
+				NULL, NULL, ZBX_MACRO_EXPAND_NO, 0, ZBX_ALERT_MESSAGE_ERR_NONE, 0, tz);
 
 		zbx_free(message_dyn);
 clean:
@@ -1142,7 +1153,7 @@ static void	flush_user_msg(zbx_user_msg_t **user_msg, int esc_step, const zbx_db
 		*user_msg = (zbx_user_msg_t *)(*user_msg)->next;
 
 		add_message_alert(event, r_event, actionid, esc_step, p->userid, p->mediatypeid, p->subject,
-					p->message, ack, service_alarm, service, p->err, p->tz);
+					p->message, ack, service_alarm, service, p->err, p->all_mediatypes, p->tz);
 
 		zbx_free(p->subject);
 		zbx_free(p->message);
@@ -1684,7 +1695,7 @@ static void	get_mediatype_params_array(const zbx_db_event *event, const zbx_db_e
 static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_event, zbx_uint64_t actionid,
 		int esc_step, zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
-		int err_type, const char *tz)
+		int err_type, int all_mediatypes, const char *tz)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -1761,6 +1772,9 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 		if (MEDIA_TYPE_PUSH == type && EVENT_SOURCE_TRIGGERS != event->source)
 		{
 			const char	*push_error = "Push notifications are supported only for trigger actions.";
+
+			if (0 != all_mediatypes)
+				continue;
 
 			zabbix_log(LOG_LEVEL_WARNING, "%s actionid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
 					" userid:" ZBX_FS_UI64 " mediatypeid:" ZBX_FS_UI64,

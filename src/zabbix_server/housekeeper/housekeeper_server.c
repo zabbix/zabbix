@@ -1455,7 +1455,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [removing unlinked group sets]", get_process_type_string(process_type));
 		int	d_sets = housekeeping_group_sets(now);
 
-		zbx_setproctitle("%s [removing old DPoP JTI cache records]",
+		zbx_setproctitle("%s [removing expired device authentication records]",
 				get_process_type_string(process_type));
 		int	d_dpop_jti_cache = housekeeping_dpop_jti_cache(now);
 
@@ -1468,7 +1468,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zbx_snprintf(msg, sizeof(msg), "%s [deleted " ZBX_FS_I64 " hist/trends, " ZBX_FS_I64 " events, "
 				ZBX_FS_I64 " problems, %d sessions, %d alarms, %d audit, %d autoreg_host,"
-				" %d records, %d sets, %d dpop_jti_cache in " ZBX_FS_DBL " sec, %s]",
+				" %d records, %d sets, %d expired device authentication records in "
+				"" ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type),
 				d_history_and_trends, d_events, d_problems, d_sessions, d_services, d_audit,
 				d_autoreg_host, records, d_sets, d_dpop_jti_cache, sec, sleeptext);
