@@ -556,7 +556,7 @@ static void	correlation_config_sync_operations(zbx_dbsync_t *sync)
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported correlation operation");
-				continue;
+				break;
 		}
 
 		correlation_ref_update(ref, correlation);
