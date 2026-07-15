@@ -3,6 +3,10 @@ Changes for 8.0.0rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-27453] fixed average trend calculation to avoid producing inf values when dealing with DBL_MAX input; updated timeleft() function to return DBL_MAX when threshold cannot be reached and history approaches DBL_MAX (arimdjonoks)
+.........T [ZBX-26704] fixed redundant preprocessing before discard (kflorowski)
+..F....... [ZBX-27145] improved selected row color for dark themes (gklavins)
+..F....... [ZBX-27555] fixed saved settings not being displayed for geographical maps, when tile provider set to Other (gklavins)
 
 --------------------------------------------------------------------------------
 Changes for 8.0.0beta2
@@ -407,6 +411,8 @@ Changes for 7.4.13rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-26704] fixed redundant preprocessing before discard (kflorowski)
+........S. [ZBX-27453] fixed average trend calculation to avoid producing inf values when dealing with DBL_MAX input; updated timeleft() function to return DBL_MAX when threshold cannot be reached and history approaches DBL_MAX (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.12
@@ -1906,6 +1912,8 @@ Changes for 7.0.29rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-26704] fixed redundant preprocessing before discard (kflorowski)
+..F....... [ZBX-26465] improved aria-label text for all functional buttons and icons and aria-expanded of side menu elements for Screen Reader users (aluchko)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.28
