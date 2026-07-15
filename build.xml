@@ -144,7 +144,7 @@
 	<target name="make-gettext">
 		<!-- Build translation strings -->
 		<exec executable="make" failonerror="on">
-			<arg line="-j4"/>
+			<arg line="-j12"/>
 			<arg line="-s"/>
 			<arg line="gettext"/>
 		</exec>
@@ -165,12 +165,12 @@
 			<arg line="--with-libcurl"/>
 		</exec>
 		<exec executable="make" failonerror="on">
-			<arg line="-j4"/>
+			<arg line="-j12"/>
 			<arg line="-s"/>
 			<arg line="dbschema"/>
 		</exec>
 		<exec executable="make" failonerror="on">
-			<arg line="-j4"/>
+			<arg line="-j12"/>
 			<arg line="-s"/>
 			<arg line="install"/>
 		</exec>
@@ -541,12 +541,12 @@
 			<arg line="--with-libcurl"/>
 		</exec>
 		<exec executable="make" failonerror="on">
-			<arg line="-j4"/>
+			<arg line="-j12"/>
 			<arg line="-s"/>
 			<arg line="dbschema"/>
 		</exec>
 		<exec executable="make" failonerror="on">
-			<arg line="-j4"/>
+			<arg line="-j12"/>
 			<arg line="-s"/>
 			<arg line="install"/>
 		</exec>
