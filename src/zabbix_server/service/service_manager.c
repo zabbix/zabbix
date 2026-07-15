@@ -43,6 +43,9 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_rtc_constants.h"
 
+#define SERVICE_INIT	0
+#define SERVICE_UPDATE	1
+
 ZBX_PTR_VECTOR_IMPL(service_update_ptr, zbx_service_update_t *)
 ZBX_PTR_VECTOR_IMPL(service_action_condition_ptr, zbx_service_action_condition_t *)
 ZBX_PTR_VECTOR_IMPL(service_rule_ptr, zbx_service_rule_t *)
@@ -3205,8 +3208,35 @@ static void	service_manager_trace(zbx_service_manager_t *service_manager)
 	dump_actions(&service_manager->actions);
 }
 
+static void	init_service_problem_suppress(zbx_service_manager_t *service_manager, const zbx_cep_event_t *event)
+{
+	zbx_service_problem_index_t	*pi, pi_local;
 
-static void	recalculate_services(zbx_service_manager_t *service_manager, zbx_dbconn_pool_t *dbpool)
+	if (0 == event->suppress.values_num)
+		return;
+
+	pi_local.eventid = event->eventid;
+	if (NULL == (pi = zbx_hashset_search(&service_manager->service_problems_index, &pi_local)))
+		return;
+
+	for (int i = 0; i < pi->services.values_num; i++)
+	{
+		zbx_service_t	*service = pi->services.values[i];
+
+		for (int j = 0; j < service->service_problems.values_num; j++)
+		{
+			zbx_service_problem_t	*problem = service->service_problems.values[j];
+
+			if (problem->eventid == event->eventid)
+			{
+				problem->suppress = 1;
+				break;
+			}
+		}
+	}
+}
+
+static void	recalculate_services(zbx_service_manager_t *service_manager, zbx_dbconn_pool_t *dbpool, int mode)
 {
 #define EVENT_BATCH_SIZE		1000
 
@@ -3238,6 +3268,9 @@ static void	recalculate_services(zbx_service_manager_t *service_manager, zbx_dbc
 			}
 			else
 			{
+				if (SERVICE_INIT == mode)
+					init_service_problem_suppress(service_manager, events[j]);
+
 				match_event_to_service_problem_tags(events[j],
 						&service_manager->service_problem_tags_index,
 						&service_manager->service_diffs, flags);
@@ -3414,8 +3447,9 @@ void	*zbx_service_manager_thread(void *args)
 	db = zbx_dbconn_pool_acquire_connection(unit_args->shared->dbpool);
 	service_manager_sync_cache(&service_manager, db, &updated);
 	sync_service_problems(&service_manager.services, db, &service_manager.service_problems_index);
-	recalculate_services(&service_manager, unit_args->shared->dbpool);
 	zbx_dbconn_pool_release_connection(unit_args->shared->dbpool, db);
+
+	recalculate_services(&service_manager, unit_args->shared->dbpool, SERVICE_INIT);
 
 	zbx_dc_config_local_acquire();
 	zbx_cep_api_acquire();
@@ -3489,7 +3523,7 @@ void	*zbx_service_manager_thread(void *args)
 			zbx_dbconn_pool_release_connection(unit_args->shared->dbpool, db);
 
 			if (0 != updated)
-				recalculate_services(&service_manager, unit_args->shared->dbpool);
+				recalculate_services(&service_manager, unit_args->shared->dbpool, SERVICE_UPDATE);
 
 			if (1 == service_cache_reload_requested)
 			{
