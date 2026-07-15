@@ -238,7 +238,9 @@ window.drule_edit_popup = new class {
 
 		if (update === false) {
 			if (typeof input.uniq === 'undefined') {
-				const checked_uniqueness_criteria = document.querySelector('[name="uniqueness_criteria"]:checked:not([data-id])');
+				const checked_uniqueness_criteria = document.querySelector(
+					'[name="uniqueness_criteria"]:checked:not([data-id])'
+				);
 				input.uniq = checked_uniqueness_criteria !== null
 				&& checked_uniqueness_criteria.value === input.dcheckid
 					? 1
