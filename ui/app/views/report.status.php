@@ -43,7 +43,9 @@ require_once __DIR__.'/js/report.status.js.php';
 				'show_software_update_check_details' => true,
 				'user_type' => $data['user_type']
 			])
-		))->addClass(ZBX_STYLE_CONTAINER)
+		))
+			->addClass(ZBX_STYLE_CONTAINER)
+			->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 	)
 	->addItem(
 		(($data['user_type'] == USER_TYPE_ZABBIX_ADMIN || $data['user_type'] == USER_TYPE_SUPER_ADMIN)
@@ -54,7 +56,9 @@ require_once __DIR__.'/js/report.status.js.php';
 					'ha_cluster_enabled' => $data['system_info']['ha_cluster_enabled'],
 					'failover_delay' => null
 				])
-			))->addClass(ZBX_STYLE_CONTAINER)
+			))
+				->addClass(ZBX_STYLE_CONTAINER)
+				->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 			: null
 	)
 	->show();
