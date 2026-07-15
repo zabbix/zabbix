@@ -2129,14 +2129,14 @@ class CHost extends CHostGeneral {
 						&& $db_hosts[$host['hostid']]['monitored_by'] != ZBX_MONITORED_BY_SERVER) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/monitored_by/',
-						_("you don't have permission to select server for monitoring")
+						_('you do not have permission to select server for monitoring')
 					));
 				}
 
 				if ($db_hosts[$host['hostid']]['monitored_by'] === ZBX_MONITORED_BY_SERVER && $db_hosts !== null) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/monitored_by/',
-						_("parameter is readonly while you don't have permission to select server for monitoring")
+						_('parameter is readonly while you do not have permission to select server for monitoring')
 					));
 				}
 			}
@@ -2213,7 +2213,7 @@ class CHost extends CHostGeneral {
 				$path = '/'.($i + 1).'/'.$field;
 
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',$path,
-					_("parameter is readonly while you don't have permission to current proxy")
+					_('parameter is readonly while you do not have permission to current proxy')
 				));
 			}
 
@@ -2226,7 +2226,7 @@ class CHost extends CHostGeneral {
 				$path = '/'.($i + 1).'/'.$field;
 
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',$path,
-					_("parameter is readonly while you don't have permission to current proxy group")
+					_('parameter is readonly while you do not permission to current proxy group')
 				));
 			}
 		}
