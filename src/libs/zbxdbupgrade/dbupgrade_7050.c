@@ -1081,12 +1081,36 @@ static int	DBpatch_7050083(void)
 	return ret;
 }
 
+typedef struct
+{
+	int		eventsource;
+	int		recovery;
+	const char	*subject;
+	const char	*message;
+}
+zbx_media_type_message_t;
+
 static int	DBpatch_7050084(void)
 {
+	zbx_db_insert_t					db_insert;
+	zbx_uint64_t					media_typeid;
+	int						ret, i;
+	static const zbx_media_type_message_t		messages[] = {
+			{0, 0, "{HOST.NAME} - {EVENT.NAME}",
+					"Started on {{EVENT.TIMESTAMP}.fmttime(\"%x %X\")}\n"
+					"Data: {EVENT.OPDATA}"},
+			{0, 1, "[RESOLVED] {HOST.NAME} - {EVENT.NAME}",
+					"Resolved on {{EVENT.RECOVERY.TIMESTAMP}.fmttime(\"%x %X\")}\n"
+					"Duration: {EVENT.DURATION}"},
+			{0, 2, "[UPDATED] {HOST.NAME} - {EVENT.NAME}",
+					"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem on "
+					"{{EVENT.UPDATE.TIMESTAMP}.fmttime(\"%x %X\")}\n{EVENT.UPDATE.MESSAGE}"}
+	};
+
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_uint64_t	media_typeid = zbx_db_get_maxid("media_type");
+	media_typeid = zbx_db_get_maxid("media_type");
 
 	if (ZBX_DB_OK > zbx_db_execute("insert into media_type (mediatypeid,type,name,script,description) values "
 			"(" ZBX_FS_UI64 ",5,'Push notification','','')", media_typeid))
@@ -1094,34 +1118,20 @@ static int	DBpatch_7050084(void)
 		return FAIL;
 	}
 
-	const char	*columns = "mediatype_messageid,mediatypeid,eventsource,recovery,subject,message";
-	const char	*values[] = {
-			"0,0,"
-				"'{HOST.NAME} - {EVENT.NAME}',"
-				"'Started on {{EVENT.TIMESTAMP}.fmttime(\"%x %X\")}&eol;"
-				"Data: {EVENT.OPDATA}'",
-			"0,1,"
-				"'[RESOLVED] {HOST.NAME} - {EVENT.NAME}',"
-				"'Resolved on {{EVENT.RECOVERY.TIMESTAMP}.fmttime(\"%x %X\")}&eol;"
-				"Duration: {EVENT.DURATION}'",
-			"0,2,"
-				"'[UPDATED] {HOST.NAME} - {EVENT.NAME}',"
-				"'{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem on "
-				"{{EVENT.UPDATE.TIMESTAMP}.fmttime(\"%x %X\")}&eol;{EVENT.UPDATE.MESSAGE}'",
-			NULL
-	};
+	zbx_db_insert_prepare(&db_insert, "media_type_message", "mediatype_messageid", "mediatypeid", "eventsource",
+			"recovery", "subject", "message", (char *)NULL);
 
-	for (int i = 0; NULL != values[i]; i++)
+	for (i = 0; i < (int)ARRSIZE(messages); i++)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("insert into media_type_message (%s) values (" ZBX_FS_UI64 ","
-				ZBX_FS_UI64 ",%s)", columns, zbx_db_get_maxid("media_type_message"), media_typeid,
-				values[i]))
-		{
-			return FAIL;
-		}
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), media_typeid, messages[i].eventsource,
+				messages[i].recovery, messages[i].subject, messages[i].message);
 	}
 
-	return SUCCEED;
+	zbx_db_insert_autoincrement(&db_insert, "mediatype_messageid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
 }
 
 static int	DBpatch_7050085(void)
