@@ -115,19 +115,9 @@ svg *:focus {
   unicode-range: U+4E00-9FFF; }
 @font-face {
   font-family: "zabbix-icons";
-<<<<<<< HEAD
   src: url("../fonts/zabbix-icons.woff2?t=1782391548915") format("woff2"), url("../fonts/zabbix-icons.woff?t=1782391548915") format("woff"), url("../fonts/zabbix-icons.ttf?t=1782391548915") format("truetype"), url("../fonts/zabbix-icons.svg?t=1782391548915#zabbix-icons") format("svg"); }
-[class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close::before, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, .color-picker-no-color::after, .z-select .focusable::after,
-z-select .focusable::after, .link-external::after, .markdown a::after, .modal-popup-host-wizard .formated-text a::after, .tag.tag-inherited::before, .tag.tag-inherited-duplicate::before, .drag-icon::before, .btn-dropdown-container .btn-dropdown-toggle::after {
-||||||| 1e2f5b4bb81
-  src: url("../fonts/zabbix-icons.woff2?t=1779433480634") format("woff2"), url("../fonts/zabbix-icons.woff?t=1779433480634") format("woff"), url("../fonts/zabbix-icons.ttf?t=1779433480634") format("truetype"), url("../fonts/zabbix-icons.svg?t=1779433480634#zabbix-icons") format("svg"); }
-[class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close::before, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, .color-picker-no-color::after, .z-select .focusable::after,
-z-select .focusable::after, .link-external::after, .markdown a::after, .modal-popup-host-wizard .formated-text a::after, .tag.tag-inherited::before, .tag.tag-inherited-duplicate::before, .drag-icon::before, .btn-dropdown-container .btn-dropdown-toggle::after {
-=======
-  src: url("../fonts/zabbix-icons.woff2?t=1779433480634") format("woff2"), url("../fonts/zabbix-icons.woff?t=1779433480634") format("woff"), url("../fonts/zabbix-icons.ttf?t=1779433480634") format("truetype"), url("../fonts/zabbix-icons.svg?t=1779433480634#zabbix-icons") format("svg"); }
 [class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close::before, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, .tag.tag-inherited::before, .tag.tag-inherited-duplicate::before, .color-picker-no-color::after, .z-select .focusable::after,
 z-select .focusable::after, .link-external::after, .markdown a::after, .modal-popup-host-wizard .formated-text a::after, .drag-icon::before, .btn-dropdown-container .btn-dropdown-toggle::after {
->>>>>>> 5999deb38a4d554ee74fc39df52c52287babf175
   font-family: 'zabbix-icons';
   font-size: 18px;
   line-height: 1;
@@ -5616,9 +5606,9 @@ section {
     vertical-align: top;
     opacity: .6; }
   .tag.tag-inherited::before {
-    content: ""; }
+    content: ""; }
   .tag.tag-inherited-duplicate::before {
-    content: ""; }
+    content: ""; }
 
 .tag-inherited-title {
   margin-bottom: 3px;
@@ -8899,96 +8889,6 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
   background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
   background-attachment: local, local, scroll, scroll; }
 
-<<<<<<< HEAD
-.tags-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px 3px; }
-  .tags-wrapper .tag {
-    margin-top: 1px;
-    margin-bottom: 1px; }
-  .tags-wrapper.form-field .tag {
-    margin-top: 4px;
-    margin-bottom: 4px; }
-
-.tag {
-  display: inline-block;
-  color: #f2f2f2;
-  background-color: #4f4f4f;
-  padding: 2px 3px;
-  line-height: 1em;
-  vertical-align: middle;
-  border-radius: 2px;
-  box-sizing: border-box; }
-  .tag a.link-action {
-    color: inherit !important;
-    border-bottom: none; }
-    .tag a.link-action:hover {
-      text-decoration: underline;
-      border-bottom: none; }
-  .tag:last-of-type {
-    margin-right: 0; }
-  .tag.tag-inherited::before, .tag.tag-inherited-duplicate::before {
-    margin-right: 3px;
-    font-size: 10px;
-    line-height: 12px;
-    vertical-align: top;
-    opacity: .6; }
-  .tag.tag-inherited::before {
-    content: ""; }
-  .tag.tag-inherited-duplicate::before {
-    content: ""; }
-
-.tag-inherited-title {
-  margin-bottom: 3px;
-  color: #737373; }
-
-||||||| 1e2f5b4bb81
-.tags-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px 3px; }
-  .tags-wrapper .tag {
-    margin-top: 1px;
-    margin-bottom: 1px; }
-  .tags-wrapper.form-field .tag {
-    margin-top: 4px;
-    margin-bottom: 4px; }
-
-.tag {
-  display: inline-block;
-  color: #f2f2f2;
-  background-color: #4f4f4f;
-  padding: 2px 3px;
-  line-height: 1em;
-  vertical-align: middle;
-  border-radius: 2px;
-  box-sizing: border-box; }
-  .tag a.link-action {
-    color: inherit !important;
-    border-bottom: none; }
-    .tag a.link-action:hover {
-      text-decoration: underline;
-      border-bottom: none; }
-  .tag:last-of-type {
-    margin-right: 0; }
-  .tag.tag-inherited::before, .tag.tag-inherited-duplicate::before {
-    margin-right: 3px;
-    font-size: 10px;
-    line-height: 12px;
-    vertical-align: top;
-    opacity: .6; }
-  .tag.tag-inherited::before {
-    content: ""; }
-  .tag.tag-inherited-duplicate::before {
-    content: ""; }
-
-.tag-inherited-title {
-  margin-bottom: 3px;
-  color: #737373; }
-
-=======
->>>>>>> 5999deb38a4d554ee74fc39df52c52287babf175
 .na-bg {
   color: #2a353a;
   position: relative; }
