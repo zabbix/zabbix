@@ -25,29 +25,6 @@ abstract class CControllerCepRuleGeneral extends CController {
 		return $this->getUserType() == USER_TYPE_SUPER_ADMIN;
 	}
 
-	protected final function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules(existing: $this->getAction() === 'ceprule.update'));
-
-		if (!$ret) {
-			$form_errors = $this->getValidationError();
-			$response = array_filter([
-				'form_errors' => $form_errors,
-				'error' => !$form_errors
-					? [
-						'title' => static::class === CControllerCepRuleCreate::class
-							? _('Cannot add complex event processing rule')
-							: _('Cannot update complex event processing rule'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-					: null
-			]);
-
-			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
-		}
-
-		return $ret;
-	}
-
 	protected function prepareApiRequest(): array {
 		$request = $this->getInputAll();
 		unset($request['_cep_rule_reset']);
