@@ -285,7 +285,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 		]];
 	}
 
-	public static function getOperationValidationFields(): array {
+	private static function getOperationValidationFields(): array {
 		// Note: the correct fix is needed to be done in IV-core client side (BE has no issues) -
 		// when "objects" has no "fields" in rules definition it currently deteles "fields" instead of merging.
 		return [

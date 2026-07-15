@@ -76,7 +76,7 @@ class CControllerCepRuleEdit extends CController {
 			'js_validation_rules' => $rules,
 			'js_validation_rules_for_clone' => $rules_for_clone,
 			'condition_js_validation_rules' => self::getConditionPopupValidationRules(),
-			'operation_js_validation_rules' => self::getOperationValidationRules(),
+			'operation_js_validation_rules' => self::getOperationPopupValidationRules(),
 			'ceprule' => $this->ceprule,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
@@ -177,10 +177,55 @@ class CControllerCepRuleEdit extends CController {
 		return $conditions;
 	}
 
-	protected static function getOperationValidationRules(): array {
-		return (new CFormValidator([
-			'object', 'fields' => CControllerCepRuleGeneral::getOperationValidationFields()
-		]))->getRules();
+	protected static function getOperationPopupValidationRules(): array {
+		return (new CFormValidator(['object', 'fields' => [
+			'execute_when' => ['db cep_operation.execute_when', 'required', 'in' => [
+				CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_EVICTED,
+				CCepRuleHelper::WHEN_WINDOW_CLOSED, CCepRuleHelper::WHEN_TAGS_CORRELATED,
+				CCepRuleHelper::WHEN_PATTERN_MATCHED
+			]],
+			'tags' => ['objects', 'fields' => [
+				'tag' => ['db cep_operation_condition.tag', 'required', 'not_empty'],
+				'operator' => ['db cep_operation_condition.operator', 'required', 'in' => [TAG_OPERATOR_EXISTS,
+					TAG_OPERATOR_EQUAL, TAG_OPERATOR_LIKE, TAG_OPERATOR_NOT_EXISTS, TAG_OPERATOR_NOT_EQUAL,
+					TAG_OPERATOR_NOT_LIKE
+				]],
+				'value' => ['db cep_operation_condition.value', 'required']
+			]],
+			'type' => array_map(fn(int $execute_when) => ['db cep_operation.type', 'required',
+				'in' => CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN[$execute_when],
+				'when' => ['execute_when', 'in' => [$execute_when]]
+			], array_keys(CCepRuleHelper::OPERATION_TYPES_BY_EXECUTE_WHEN)),
+			'evaltype' => ['db cep_operation.evaltype', 'required', 'in' => [CONDITION_EVAL_TYPE_AND_OR,
+				CONDITION_EVAL_TYPE_OR
+			]],
+			'event_name' => ['db cep_operation.event_name', 'required', 'not_empty', 'when' => ['type',
+				'in' => [CCepRuleHelper::OP_SET_NAME]
+			]],
+			'tag' => ['db cep_operation.tag', 'required', 'not_empty', 'when' => ['type', 'in' => [
+				CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG, CCepRuleHelper::OP_SET_TAG_VALUE,
+				CCepRuleHelper::OP_INCREASE_TAG_VALUE, CCepRuleHelper::OP_DECREASE_TAG_VALUE,
+				CCepRuleHelper::OP_RENAME_TAG, CCepRuleHelper::OP_REMOVE_TAG
+			]]],
+			'new_tag' => ['db cep_operation.new_tag', 'required', 'not_empty', 'when' => ['type', 'in' => [
+				CCepRuleHelper::OP_RENAME_TAG
+			]]],
+			'tag_value' => ['db cep_operation.tag_value', 'required', 'when' => ['type', 'in' => [
+				CCepRuleHelper::OP_ADD_TAG, CCepRuleHelper::OP_SET_TAG, CCepRuleHelper::OP_SET_TAG_VALUE,
+				CCepRuleHelper::OP_INCREASE_TAG_VALUE, CCepRuleHelper::OP_DECREASE_TAG_VALUE,
+				CCepRuleHelper::OP_REMOVE_TAG
+			]]],
+			'severity' => ['db cep_operation.severity', 'required',
+				'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
+					TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
+				'when' => ['type', 'in' => [CCepRuleHelper::OP_SET_SEVERITY]
+			]],
+			'suppress_until' => ['string',
+				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
+				'when' => ['type', 'in' => [CCepRuleHelper::OP_SUPPRESS]]
+			],
+			'sortorder' => ['db cep_operation.sortorder', 'required']
+		]]))->getRules();
 	}
 
 	protected static function getConditionPopupValidationRules(): array {
