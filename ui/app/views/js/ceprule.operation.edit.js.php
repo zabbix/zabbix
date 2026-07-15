@@ -51,7 +51,7 @@ window.ceprule_operation_edit_popup = new class {
 		window['ceprule-operation-execute-when'].dispatchEvent(new Event('change'));
 		window['ceprule-operation-type'].dispatchEvent(new Event('change'));
 
-		window.requestAnimationFrame(() => this.form_element.style.display = '');
+		window.requestAnimationFrame(() => this.form_element.classList.remove(ZBX_STYLE_DISPLAY_NONE));
 	}
 
 	#initActions() {

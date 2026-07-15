@@ -57,7 +57,7 @@ $form = (new CForm())
 	// Enable form submitting on Enter.
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
 	->addVar('cepruleid', $data['ceprule']['cepruleid'])
-	->addStyle('display: none;')
+	->addClass(ZBX_STYLE_DISPLAY_NONE)
 	->addItem((new CFormGrid())
 		->addItem([
 			(new CLabel(_('Name'), 'name'))->setAsteriskMark(),

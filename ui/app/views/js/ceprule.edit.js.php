@@ -89,7 +89,8 @@ window.ceprule_edit_popup = new class {
 		window['ceprule-window-groupby-opt-tag'].dispatchEvent(new Event('change'));
 
 		this.#handleWindowTypeChanged();
-		this.form_element.style.display = '';
+
+		window.requestAnimationFrame(() => this.form_element.classList.remove(ZBX_STYLE_DISPLAY_NONE));
 	}
 
 	/**

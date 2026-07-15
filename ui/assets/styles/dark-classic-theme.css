@@ -7251,6 +7251,9 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
   display: inline-block;
   width: 300px; }
 
+#ceprule-window-capacity, #ceprule-window-counttag {
+  line-height: 16px; }
+
 .link-action {
   color: #f2f2f2;
   cursor: pointer; }

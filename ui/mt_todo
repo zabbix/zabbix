@@ -1,4 +1,4 @@
-[ ] reuse CCepRuleHelper in manner API does, currently duplicating structures
+[x] reuse CCepRuleHelper in manner API does, currently duplicating structures
 - EXECUTE_WHEN_BY_WINDOW_TYPE and OPERATION_TYPES_BY_EXECUTE_WHEN
 - for iv-rules
 - for form dynamics
