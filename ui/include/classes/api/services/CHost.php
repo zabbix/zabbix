@@ -2117,9 +2117,7 @@ class CHost extends CHostGeneral {
 	}
 
 	private function checkMonitoredByField(array $hosts, ?array $db_hosts = null): void {
-		$select_server_for_monitoring = self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING);
-
-		if ($select_server_for_monitoring) {
+		if (self::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)) {
 			return;
 		}
 
