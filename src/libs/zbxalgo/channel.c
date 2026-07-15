@@ -364,7 +364,7 @@ void	zbx_chan_compact(zbx_channel_t *chan, int min_capacity)
 	chan->msgs = msgs;
 	chan->capacity = new_capacity;
 	chan->head = 0;
-	chan->tail = chan->msg_num;
+	chan->tail = (chan->msg_num == new_capacity ? 0 : chan->msg_num);
 out:
 	pthread_mutex_unlock(&chan->lock);
 }
