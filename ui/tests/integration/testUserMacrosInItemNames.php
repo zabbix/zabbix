@@ -20,6 +20,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * Test suite for user macro expansion in item names.
  *
  * @required-components server
+ * @backup
  */
 class testUserMacrosInItemNames extends CIntegrationTest {
 	/** Maximum number of iterations to wait for NDJSON export files to appear. */
