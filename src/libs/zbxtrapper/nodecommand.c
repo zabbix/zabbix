@@ -418,6 +418,16 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			zbx_strlcpy(error, "Unknown host identifier.", sizeof(error));
 			goto fail;
 		}
+
+		if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by)
+		{
+			zbx_uint64_t	proxyid;
+
+			if (SUCCEED == zbx_dc_get_host_proxyid_by_name(host.host, &proxyid))
+				host.proxyid = proxyid;
+			else
+				host.proxyid = 0;
+		}
 	}
 	else /* eventid */
 	{
@@ -491,6 +501,15 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		{
 			goto fail;
 		}
+	}
+
+	if (HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by && 0 == host.proxyid &&
+			ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on &&
+			ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
+	{
+		zbx_snprintf(error, sizeof(error), "Host is monitored by proxy group, "
+				"but its proxy assignment is still pending.");
+		goto fail;
 	}
 
 	if (SUCCEED != zbx_check_script_permissions(groupid, host.hostid))
