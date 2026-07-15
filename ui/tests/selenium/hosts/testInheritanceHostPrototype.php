@@ -460,6 +460,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		if (array_key_exists('cloned_name', $data)) {
 			$this->zbxTestInputTypeOverwrite('host', $data['cloned_name']);
+			// Remove focus to avoid inline error "This object already exists." appearing from the original clone name.
+			$this->query('id:host')->one()->removeFocus();
 		}
 		if (array_key_exists('cloned_visible_name', $data)) {
 			$this->zbxTestInputTypeOverwrite('name', $data['cloned_visible_name']);
@@ -497,9 +499,11 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$dialog->getFooter()->query('button:Add')->one()->click();
+		$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 
 		if (array_key_exists('error_inline', $data)) {
+			$dialog->waitUntilTextPresent(array_values($data['error_inline'])[0]);
+
 			$this->assertInlineError($dialog->waitUntilReady()->asForm(), $data['error_inline']);
 		}
 		else {

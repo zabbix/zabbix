@@ -13,8 +13,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pontoon\n"
-"X-POOTLE-MTIME: 1646244996.000000\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1646244996.000000\n"
 
 #: include/classes/validators/CFormValidator.php:1397
 #: include/classes/validators/CFormValidator.php:1442 jsLoader.php:439
@@ -155,7 +155,7 @@ msgstr "Pozostało %1$s znaków"
 #: app/views/administration.housekeeping.edit.php:166
 #, c-format
 msgid "%1$s data storage period"
-msgstr ""
+msgstr "Okres przechowywania danych %1$s"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -517,7 +517,7 @@ msgstr "Wymagana jest wiadomość lub co najmniej jedno działanie."
 
 #: app/views/host.wizard.edit.php:139
 msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
-msgstr ""
+msgstr "Szablon to zestaw predefiniowanych konfiguracji (metryki do zbierania, warunki generowania alertów itp.) przeznaczony dla monitorowanego celu."
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
 msgid "ADD OVERRIDE"
@@ -1317,7 +1317,7 @@ msgstr "Sprawdza rodzaj Agenta. Zwraca 1 - dla Zabbix agenta; 2 - dla Zabbix age
 
 #: app/views/host.wizard.edit.php:158 app/views/js/host.wizard.edit.js.php:1781
 msgid "Agent-based"
-msgstr ""
+msgstr "Oparty na agencie"
 
 #: app/views/host.wizard.edit.php:159 app/views/js/host.wizard.edit.js.php:1782
 msgid "Agentless"
@@ -1353,7 +1353,7 @@ msgstr "Funkcja agregująca"
 #: widgets/tophosts/views/column.edit.php:330
 #: widgets/topitems/views/column.edit.php:256
 msgid "Aggregation function does not affect the sparkline."
-msgstr ""
+msgstr "Funkcja agregacji nie wpływa na wykres iskrowy."
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:406
 #: widgets/tophosts/views/column.edit.php:165
@@ -1711,7 +1711,7 @@ msgstr "Rozmiar łuku"
 #: jsLoader.php:267
 #, c-format
 msgid "Are you sure you want to delete %1$s? This action cannot be undone."
-msgstr ""
+msgstr "Czy na pewno chcesz usunąć %1$s? Tej operacji nie można cofnąć."
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -2041,7 +2041,7 @@ msgstr "Kod autoryzacji"
 
 #: app/views/oauth.edit.php:136
 msgid "Authorization endpoint"
-msgstr ""
+msgstr "Punkt końcowy autoryzacji"
 
 #: app/views/oauth.edit.php:148
 msgid "Authorization parameters"
@@ -2049,11 +2049,11 @@ msgstr "Parametry autoryzacji"
 
 #: app/views/oauth.edit.php:137
 msgid "Authorization server URL for requesting user authorization."
-msgstr ""
+msgstr "URL serwera autoryzacji do żądania autoryzacji użytkownika."
 
 #: app/views/oauth.edit.php:189
 msgid "Authorization server URL to exchange the authorization code for an access token."
-msgstr ""
+msgstr "URL serwera autoryzacji do wymiany kodu autoryzacyjnego na token dostępu."
 
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
@@ -3589,7 +3589,7 @@ msgstr "Nie można rozwinąć makra."
 #: include/classes/import/CConfigurationImport.php:1159
 #, c-format
 msgid "Cannot find \"parent_discovery_rule\" with key \"%1$s\" used for LLD rule prototype with key \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Nie można znaleźć \"parent_discovery_rule\" z kluczem \"%1$s\" używanego dla prototypu reguły LLD z kluczem \"%2$s\" w \"%3$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
@@ -3634,12 +3634,12 @@ msgstr "Nie można znaleźć grupy hostów \"%1$s\" dla prototypu hosta \"%2$s\"
 #: include/classes/import/CConfigurationImport.php:1326
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Nie można znaleźć grupy hostów \"%1$s\" dla prototypu hosta \"%2$s\" prototypu reguły wykrywania \"%3$s\" w \"%4$s\"."
 
 #: include/classes/import/importers/CDashboardImporterGeneral.php:57
 #, c-format
 msgid "Cannot find host group \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Nie można znaleźć grupy hostów \"%1$s\" używanej w pulpicie \"%2$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -3684,7 +3684,7 @@ msgstr "Nie można znaleźć interfejsu \"%1$s\" dla prototypu pozycji \"%2$s\" 
 #: include/classes/import/CConfigurationImport.php:1220
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Nie można znaleźć interfejsu \"%1$s\" używanego dla prototypu pozycji \"%2$s\" prototypu reguły wykrywania \"%3$s\" w \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1852
 #, c-format
@@ -3699,7 +3699,7 @@ msgstr "Nie można znaleźć pozycji \"%1$s\" na \"%2$s\" użytej jako wartość
 #: include/classes/import/CConfigurationImport.php:1515
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Nie można znaleźć pozycji \"%1$s\" w \"%2$s\" używanej jako wartość MAX osi Y dla prototypu wykresu \"%3$s\" prototypu reguły wykrywania \"%4$s\" w \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1834
 #, c-format
@@ -3714,7 +3714,7 @@ msgstr "Nie można znaleźć pozycji \"%1$s\" na \"%2$s\" użytej jako wartość
 #: include/classes/import/CConfigurationImport.php:1490
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Nie można znaleźć pozycji \"%1$s\" w \"%2$s\" używanej jako wartość MIN osi Y dla prototypu wykresu \"%3$s\" prototypu reguły wykrywania \"%4$s\" w \"%5$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:244
 #, c-format
@@ -3734,7 +3734,7 @@ msgstr "Nie można znaleźć pozycji \"%1$s\" na \"%2$s\" użytej w prototypie w
 #: include/classes/import/CConfigurationImport.php:1540
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule prototype \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Nie można znaleźć pozycji \"%1$s\" w \"%2$s\" używanej w prototypie wykresu \"%3$s\" prototypu reguły wykrywania \"%4$s\" w \"%5$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:166
 #, c-format
@@ -3769,7 +3769,7 @@ msgstr "Nie można znaleźć szablonu \"%1$s\" dla prototypu hosta \"%2$s\" dla 
 #: include/classes/import/CConfigurationImport.php:1353
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Nie można znaleźć szablonu \"%1$s\" dla prototypu hosta \"%2$s\" prototypu reguły wykrywania \"%3$s\" w \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1182
 #, c-format
@@ -3804,15 +3804,15 @@ msgstr "Nie można znaleźć mapy wartości \"%1$s\" użytej dla prototypu pozyc
 #: include/classes/import/CConfigurationImport.php:1243
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Nie można znaleźć mapy wartości \"%1$s\" używanej dla prototypu pozycji \"%2$s\" prototypu reguły wykrywania \"%3$s\" w \"%4$s\"."
 
 #: app/views/oauth.authorize.php:33
 msgid "Cannot get authentication tokens"
-msgstr ""
+msgstr "Nie można pobrać tokenów uwierzytelniania"
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
-msgstr ""
+msgstr "Nie można pobrać kodu autoryzacyjnego."
 
 #: include/classes/api/services/CRole.php:583
 #: include/classes/api/services/CRole.php:600
@@ -3850,72 +3850,72 @@ msgstr "Nie można dziedziczyć reguł LDD z kluczem „%1$s” szablonów „%2
 #: include/classes/api/services/CItemGeneral.php:1000
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypu reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" i reguły LLD \"%3$s\" do hosta \"%4$s\", ponieważ prototyp reguły LLD z tym samym kluczem już należy do reguły LLD \"%5$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1001
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an LLD rule prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypu reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" i reguły LLD \"%3$s\" do szablonu \"%4$s\", ponieważ prototyp reguły LLD z tym samym kluczem już należy do reguły LLD \"%5$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:926
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypu reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" do hosta \"%3$s\", ponieważ wykryty prototyp reguły LLD z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:1358
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypu reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" do hosta \"%3$s\", ponieważ wymagany jest interfejs hosta typu \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:969
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypu reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" do hosta \"%3$s\", ponieważ prototyp reguły LLD z tym samym kluczem jest już dziedziczony z szablonu \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:921
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypu reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" do hosta \"%3$s\", ponieważ reguła LLD z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:914
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypu reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" do hosta \"%3$s\", ponieważ prototyp pozycji z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:907
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypu reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" do hosta \"%3$s\", ponieważ pozycja z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:970
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypu reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" do szablonu \"%3$s\", ponieważ prototyp reguły LLD z tym samym kluczem jest już dziedziczony z szablonu \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:922
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypu reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" do szablonu \"%3$s\", ponieważ reguła LLD z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:915
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypu reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" do szablonu \"%3$s\", ponieważ prototyp pozycji z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:908
 #, c-format
 msgid "Cannot inherit LLD rule prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypu reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" do szablonu \"%3$s\", ponieważ pozycja z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:717
 #, c-format
 msgid "Cannot inherit LLD rule prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypów reguł LLD z kluczem \"%1$s\" z obu szablonów \"%2$s\" i \"%3$s\", ponieważ klucz musi być unikalny na hoście \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:718
 #, c-format
 msgid "Cannot inherit LLD rule prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypów reguł LLD z kluczem \"%1$s\" z obu szablonów \"%2$s\" i \"%3$s\", ponieważ klucz musi być unikalny w szablonie \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
@@ -3930,7 +3930,7 @@ msgstr "Nie można odziedziczyć reguły LLD z kluczem „%1$s” szablonu „%2
 #: include/classes/api/services/CItemGeneral.php:897
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Nie można dziedziczyć reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" do hosta \"%3$s\", ponieważ prototyp reguły LLD z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:874
 #, c-format
@@ -3955,7 +3955,7 @@ msgstr "Nie można odziedziczyć reguły LLD z kluczem „%1$s” szablonu „%2
 #: include/classes/api/services/CItemGeneral.php:898
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Nie można dziedziczyć reguły LLD z kluczem \"%1$s\" z szablonu \"%2$s\" do szablonu \"%3$s\", ponieważ prototyp reguły LLD z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
@@ -3995,7 +3995,7 @@ msgstr "Nie można odziedziczyć prototypu pozycji z kluczem „%1$s” szablonu
 #: include/classes/api/services/CItemGeneral.php:856
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item prototype with the same key already exists."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypu pozycji z kluczem \"%1$s\" z szablonu \"%2$s\" do hosta \"%3$s\", ponieważ wykryty prototyp pozycji z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
@@ -4010,7 +4010,7 @@ msgstr "Nie można odziedziczyć prototypu pozycji z kluczem „%1$s” szablonu
 #: include/classes/api/services/CItemGeneral.php:869
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypu pozycji z kluczem \"%1$s\" z szablonu \"%2$s\" do hosta \"%3$s\", ponieważ prototyp reguły LLD z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:835
 #, c-format
@@ -4035,7 +4035,7 @@ msgstr "Nie można odziedziczyć prototypu pozycji z kluczem „%1$s” szablonu
 #: include/classes/api/services/CItemGeneral.php:870
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypu pozycji z kluczem \"%1$s\" z szablonu \"%2$s\" do szablonu \"%3$s\", ponieważ prototyp reguły LLD z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:836
 #, c-format
@@ -4075,7 +4075,7 @@ msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s�
 #: include/classes/api/services/CItemGeneral.php:891
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered LLD rule with the same key already exists."
-msgstr ""
+msgstr "Nie można dziedziczyć pozycji z kluczem \"%1$s\" z szablonu \"%2$s\" do hosta \"%3$s\", ponieważ wykryta reguła LLD z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:797
 #, c-format
@@ -4090,7 +4090,7 @@ msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s�
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Nie można dziedziczyć pozycji z kluczem \"%1$s\" z szablonu \"%2$s\" do hosta \"%3$s\", ponieważ prototyp reguły LLD z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:785
 #, c-format
@@ -4120,7 +4120,7 @@ msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s�
 #: include/classes/api/services/CItemGeneral.php:842
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule prototype with the same key already exists."
-msgstr ""
+msgstr "Nie można dziedziczyć pozycji z kluczem \"%1$s\" z szablonu \"%2$s\" do szablonu \"%3$s\", ponieważ prototyp reguły LLD z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:786
 #, c-format
@@ -4294,7 +4294,7 @@ msgstr "Nie można otworzyć adresu URL"
 
 #: app/views/oauth.edit.php:229
 msgid "Cannot open authorization popup window."
-msgstr ""
+msgstr "Nie można otworzyć wyskakującego okna autoryzacji."
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4631,7 +4631,7 @@ msgstr "Nie można zaktualizować konektora"
 
 #: host_discovery_prototypes.php:526 host_discovery_prototypes.php:550
 msgid "Cannot update discovery prototype"
-msgstr ""
+msgstr "Nie można zaktualizować prototypu wykrywania"
 
 #: app/controllers/CControllerDiscoveryUpdate.php:48
 #: app/controllers/CControllerDiscoveryUpdate.php:96 host_discovery.php:548
@@ -4885,7 +4885,7 @@ msgstr "Nie można zaktualizować kroku scenariusza sieci www"
 #: include/classes/core/CConfigFile.php:192
 #, c-format
 msgid "Cannot use both %1$s and %2$s at the same time."
-msgstr ""
+msgstr "Nie można używać jednocześnie %1$s i %2$s."
 
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
@@ -4933,7 +4933,7 @@ msgstr "Certyfikat"
 
 #: app/views/js/monitoring.latest.view.js.php:211
 msgid "Change"
-msgstr ""
+msgstr "Zmień"
 
 #: app/partials/monitoring.latest.view.html.php:78
 #: app/partials/monitoring.latest.view.html.php:91 include/items.inc.php:1577
@@ -4953,7 +4953,7 @@ msgstr "Zmień"
 
 #: app/views/administration.authentication.edit.php:316
 msgid "Change IdP certificate"
-msgstr ""
+msgstr "Zmień certyfikat IdP"
 
 #: app/partials/configuration.host.edit.html.php:449
 #: app/views/administration.autoreg.edit.php:82
@@ -4964,11 +4964,11 @@ msgstr "Zmień PSK"
 
 #: app/views/administration.authentication.edit.php:367
 msgid "Change SP certificate"
-msgstr ""
+msgstr "Zmień certyfikat SP"
 
 #: app/views/administration.authentication.edit.php:342
 msgid "Change SP private key"
-msgstr ""
+msgstr "Zmień klucz prywatny SP"
 
 #: app/views/mfa.edit.php:128
 msgid "Change client secret"
@@ -4994,7 +4994,7 @@ msgstr "Zmiana na sekundę"
 
 #: app/views/host.wizard.edit.php:386
 msgid "Change pre-shared key"
-msgstr ""
+msgstr "Zmień klucz współdzielony"
 
 #: include/classes/helpers/CRoleHelper.php:561
 msgid "Change problem ranking"
@@ -5011,7 +5011,7 @@ msgstr "Zmień typ"
 
 #: app/views/js/administration.authentication.edit.js.php:409
 msgid "Changing the authentication method will reset all sessions, except the current one."
-msgstr ""
+msgstr "Zmiana metody uwierzytelniania spowoduje zresetowanie wszystkich sesji oprócz bieżącej."
 
 #: app/partials/configuration.filter.items.php:144
 #: app/views/popup.massupdate.item.php:149 include/items.inc.php:127
@@ -5050,11 +5050,11 @@ msgstr "Test już istnieje."
 
 #: app/controllers/CControllerPopupImportCompare.php:121
 msgid "Check and reconfigure widgets after the import is completed."
-msgstr ""
+msgstr "Sprawdź i skonfiguruj ponownie widgety po zakończeniu importu."
 
 #: app/controllers/CControllerPopupImport.php:136
 msgid "Check and reconfigure widgets."
-msgstr ""
+msgstr "Sprawdź i skonfiguruj ponownie widgety."
 
 #: include/classes/parsers/C10TriggerExpression.php:542
 #, c-format
@@ -5210,16 +5210,16 @@ msgstr "Wyczyść podczas odłączania"
 #: app/views/host.wizard.edit.php:1007
 #, c-format
 msgid "Click %1$s to complete the setup."
-msgstr ""
+msgstr "Kliknij %1$s, aby ukończyć konfigurację."
 
 #: app/views/js/host.wizard.edit.js.php:771
 msgid "Click Finish to close the Host wizard."
-msgstr ""
+msgstr "Kliknij Zakończ, aby zamknąć kreatora hosta."
 
 #: app/views/js/host.wizard.edit.js.php:770
 #, c-format
 msgid "Click Finish to navigate to the Latest data section and view the most recent data for your host (%1$s)."
-msgstr ""
+msgstr "Kliknij Zakończ, aby przejść do sekcji Najnowsze dane i wyświetlić najnowsze dane dla swojego hosta (%1$s)."
 
 #: jsLoader.php:157
 msgid "Click and drag to desired size."
@@ -5231,12 +5231,12 @@ msgstr "Kliknij i przeciągnij do pożądanego rozmiaru"
 
 #: app/views/administration.housekeeping.edit.php:165
 msgid "ClickHouse"
-msgstr ""
+msgstr "ClickHouse"
 
 #: include/classes/api/managers/history/CClickHouseStorage.php:118
 #, c-format
 msgid "ClickHouse error: %1$s."
-msgstr ""
+msgstr "Błąd ClickHouse: %1$s."
 
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
@@ -5401,11 +5401,11 @@ msgstr "Funkcja agregacji kolumn"
 
 #: jsLoader.php:304
 msgid "Column list"
-msgstr ""
+msgstr "Lista kolumn"
 
 #: jsLoader.php:273
 msgid "Column name"
-msgstr ""
+msgstr "Nazwa kolumny"
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
@@ -5414,7 +5414,7 @@ msgstr "Kolumny"
 
 #: widgets/topitems/views/column.edit.php:313
 msgid "Combined column name"
-msgstr ""
+msgstr "Połączona nazwa kolumny"
 
 #: app/views/js/administration.regex.edit.js.php:66
 msgid "Combined result"
@@ -5445,11 +5445,11 @@ msgstr "Komunikacja"
 
 #: app/views/host.wizard.edit.php:375
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
-msgstr ""
+msgstr "Komunikacja między agent Zabbix a serwerem/proxy jest zabezpieczona unikalnym, zdefiniowanym przez użytkownika identyfikatorem klucza współdzielonego oraz powiązanym z nim tajnym kluczem współdzielonym."
 
 #: app/views/host.wizard.edit.php:414
 msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
-msgstr ""
+msgstr "Komunikacja między agent Zabbix a serwerem/proxy jest zabezpieczona metodą szyfrowania kluczem współdzielonym (PSK)."
 
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
@@ -5462,7 +5462,7 @@ msgstr "Kompaktowy widok"
 
 #: app/views/oauth.edit.php:228
 msgid "Complete authentication to get tokens."
-msgstr ""
+msgstr "Ukończ uwierzytelnianie, aby uzyskać tokeny."
 
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
@@ -5498,7 +5498,7 @@ msgstr "Warunek"
 #: app/controllers/CControllerServiceCreate.php:45
 #: app/controllers/CControllerServiceUpdate.php:46
 msgid "Condition, limit and status combination is not unique."
-msgstr ""
+msgstr "Połączenie warunku, limitu i statusu nie jest unikalne."
 
 #: app/views/action.list.php:116 app/views/correlation.edit.php:225
 #: app/views/correlation.list.php:83 app/views/popup.action.edit.php:166
@@ -5519,7 +5519,7 @@ msgstr "Statystyki cache'a konfiguracji. Cache - bufor (tryby: pfree, total, use
 
 #: app/views/host.wizard.edit.php:1024
 msgid "Configuration complete"
-msgstr ""
+msgstr "Konfiguracja ukończona"
 
 #: include/classes/setup/CSetupWizard.php:1061
 #, c-format
@@ -5549,7 +5549,7 @@ msgstr "Konfiguracja pulpitów"
 
 #: host_discovery_prototypes.php:22
 msgid "Configuration of discovery prototypes"
-msgstr ""
+msgstr "Konfiguracja prototypów wykrywania"
 
 #: app/controllers/CControllerDiscoveryEdit.php:144
 #: app/controllers/CControllerDiscoveryList.php:143 host_discovery.php:27
@@ -6410,11 +6410,11 @@ msgstr "Aktualny"
 
 #: app/views/js/administration.authentication.edit.js.php:419
 msgid "Current SP certificate will be deleted."
-msgstr ""
+msgstr "Bieżący certyfikat SP zostanie usunięty."
 
 #: app/views/js/administration.authentication.edit.js.php:425
 msgid "Current SP private key will be deleted."
-msgstr ""
+msgstr "Bieżący klucz prywatny SP zostanie usunięty."
 
 #: app/views/popup.operation.edit.php:256
 msgid "Current host"
@@ -6507,11 +6507,11 @@ msgstr "Własny rozmiar"
 
 #: app/views/host.wizard.edit.php:138
 msgid "Custom templates are not supported."
-msgstr ""
+msgstr "Niestandardowe szablony nie są obsługiwane."
 
 #: jsLoader.php:270
 msgid "Customize table"
-msgstr ""
+msgstr "Dostosuj tabelę"
 
 #: app/views/administration.miscconfig.edit.php:103
 #: include/classes/setup/CSetupWizard.php:561
@@ -6627,7 +6627,7 @@ msgstr "Właściwości strony pulpitu"
 
 #: app/controllers/CControllerPopupImportCompare.php:216
 msgid "Dashboard pages"
-msgstr ""
+msgstr "Strony pulpitu"
 
 #: app/views/dashboard.properties.edit.php:87
 msgid "Dashboard properties"
@@ -7109,7 +7109,7 @@ msgstr "Usunąć i wyczyścić szablon? (Uwaga: wszystkie powiązane hosty zosta
 
 #: jsLoader.php:275
 msgid "Delete column"
-msgstr ""
+msgstr "Usuń kolumnę"
 
 #: app/views/popup.action.edit.php:292
 msgid "Delete current action?"
@@ -7626,7 +7626,7 @@ msgstr "Rozmiar opisu"
 
 #: app/views/oauth.edit.php:46
 msgid "Destination URL where successful authorization redirects."
-msgstr ""
+msgstr "Docelowy adres URL, do którego następuje przekierowanie po pomyślnej autoryzacji."
 
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -8413,7 +8413,7 @@ msgstr "Duplikat \"usrgrpid\" \"%1$s\" w grupach użytkowników dla mapy \"%2$s\
 
 #: jsLoader.php:274
 msgid "Duplicate column"
-msgstr ""
+msgstr "Duplikuj kolumnę"
 
 #: include/classes/api/services/CHost.php:2096
 #: include/classes/api/services/CHost.php:2396
@@ -8449,7 +8449,7 @@ msgstr "Czas trwania"
 
 #: app/controllers/CControllerSlaExcludedDowntimeValidate.php:38
 msgid "Duration must be no less than a minute."
-msgstr ""
+msgstr "Czas trwania nie może być krótszy niż minuta."
 
 #: include/locales.inc.php:40
 msgid "Dutch (nl_NL)"
@@ -8509,7 +8509,7 @@ msgstr "Edycja widżeta"
 
 #: jsLoader.php:185
 msgid "Editing other objects is not allowed in dashboard editing mode."
-msgstr ""
+msgstr "Edycja innych obiektów nie jest dozwolona w trybie edycji pulpitu."
 
 #: app/views/popup.sla.edit.php:114 app/views/sla.list.php:89
 msgid "Effective date"
@@ -8521,7 +8521,7 @@ msgstr "Wartość efektywna"
 
 #: app/views/administration.housekeeping.edit.php:166
 msgid "Elasticsearch"
-msgstr ""
+msgstr "Elasticsearch"
 
 #: include/classes/api/managers/CHistoryManager.php:1449
 #: include/classes/api/managers/CHistoryManager.php:1458
@@ -8898,7 +8898,7 @@ msgstr "Szyfruj"
 #: include/classes/setup/CSetupWizard.php:846
 #: include/classes/setup/CSetupWizard.php:1075
 msgid "Encrypt connections from Web interface"
-msgstr ""
+msgstr "Szyfruj połączenia z interfejsu WWW"
 
 #: app/partials/configuration.host.edit.html.php:513
 #: app/views/administration.proxy.list.php:88
@@ -8929,11 +8929,11 @@ msgstr "Angielski (en_US)"
 
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
-msgstr ""
+msgstr "Wprowadź nietajny ciąg identyfikatora klucza współdzielonego. Unikaj umieszczania danych wrażliwych."
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
-msgstr ""
+msgstr "Wprowadź unikalną nazwę, której komponenty Zabbix będą używać do rozpoznawania klucza współdzielonego."
 
 #: include/classes/setup/CSetupWizard.php:612
 msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
@@ -8962,7 +8962,7 @@ msgstr "Wprowadź adres IP/DNS, port i szczegóły autentykacji twojego celu mon
 #: include/classes/validators/CFormValidator.php:1192 jsLoader.php:435
 #, c-format
 msgid "Entry \"%1$s\" is not unique."
-msgstr ""
+msgstr "Wpis \"%1$s\" nie jest unikalny."
 
 #: app/partials/monitoring.host.filter.php:51
 #: app/partials/monitoring.host.filter.php:202
@@ -9011,7 +9011,7 @@ msgstr "Komunikat błędu"
 
 #: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:73
 msgid "Error text"
-msgstr ""
+msgstr "Tekst błędu"
 
 #: app/partials/administration.system.info.php:141
 #: app/partials/administration.system.info.php:148
@@ -9196,12 +9196,12 @@ msgstr "Wyłączony czas przestoju"
 #: app/controllers/CControllerSlaExcludedDowntimeValidate.php:88
 #, c-format
 msgid "Excluded downtime must not extend beyond %1$s."
-msgstr ""
+msgstr "Wykluczony przestój nie może wykraczać poza %1$s."
 
 #: app/controllers/CControllerSlaCreate.php:74
 #: app/controllers/CControllerSlaUpdate.php:75
 msgid "Excluded downtime periods must be unique."
-msgstr ""
+msgstr "Okresy wykluczonego przestoju muszą być unikalne."
 
 #: app/views/popup.sla.edit.php:196 app/views/popup.sla.edit.php:207
 #: app/views/slareport.list.php:168
@@ -9624,7 +9624,7 @@ msgstr "Pole \"%1$s\" musi być puste."
 #: include/classes/data/CTriggerConditionFunctionData.php:2400
 #: include/classes/data/CTriggerConditionFunctionData.php:2470
 msgid "Field \"Last of\" cannot be empty when \"Time shift\" is not empty."
-msgstr ""
+msgstr "Pole \"Last of\" nie może być puste, gdy \"Time shift\" nie jest puste."
 
 #: include/forms.inc.php:1495 include/forms.inc.php:1530
 #: include/views/js/item.preprocessing.js.php:154
@@ -9832,7 +9832,7 @@ msgstr "Rozmiar czcionki"
 
 #: app/views/host.wizard.edit.php:816 app/views/host.wizard.edit.php:873
 msgid "For more details, see"
-msgstr ""
+msgstr "Więcej informacji znajduje się w"
 
 #: app/views/webscenario.step.edit.php:106
 msgid "Form data"
@@ -9937,7 +9937,7 @@ msgstr "Ogólne"
 
 #: app/views/host.wizard.edit.php:417
 msgid "Generate a secret pre-shared key hexadecimal string."
-msgstr ""
+msgstr "Wygeneruj szesnastkowy ciąg tajnego klucza współdzielonego."
 
 #: app/views/host.wizard.edit.php:411
 msgid "Generate new"
@@ -9998,7 +9998,7 @@ msgstr "Podane wyrażenie nie jest makrem"
 #: app/controllers/CControllerValueMapEdit.php:95
 #: app/controllers/CControllerValueMapEdit.php:109
 msgid "Given valuemap name is already taken."
-msgstr ""
+msgstr "Podana nazwa mapowania wartości jest już zajęta."
 
 #: app/views/popup.massupdate.item.php:298 app/views/popup.proxy.edit.php:194
 #: include/views/configuration.host.discovery.edit.php:734
@@ -10972,7 +10972,7 @@ msgstr "Nazwa hosta"
 #: widgets/scatterplot/includes/WidgetForm.php:173
 #: widgets/svggraph/includes/WidgetForm.php:265
 msgid "Host names in labels"
-msgstr ""
+msgstr "Nazwy hostów w etykietach"
 
 #: widgets/hostnavigator/Widget.php:29
 msgid "Host navigator"
@@ -11015,7 +11015,7 @@ msgstr[2] "Usunięto prototypy hostów"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Host prototype edit"
-msgstr ""
+msgstr "Edycja prototypu hosta"
 
 #: include/views/configuration.host.prototype.edit.php:370
 msgid "Host prototype macros"
@@ -11109,7 +11109,7 @@ msgstr[2] "Zaktualizowano hosty"
 
 #: app/controllers/CControllerHostWizardUpdate.php:147
 msgid "Host updated successfully"
-msgstr ""
+msgstr "Host został pomyślnie zaktualizowany"
 
 #: include/classes/api/services/CDashboardGeneral.php:583
 #, c-format
@@ -11186,7 +11186,7 @@ msgstr "Hosty"
 
 #: app/views/host.wizard.edit.php:278
 msgid "Hosts are organized into host groups for easier management and access control."
-msgstr ""
+msgstr "Hosty są organizowane w grupy hostów w celu łatwiejszego zarządzania i kontroli dostępu."
 
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
@@ -11388,7 +11388,7 @@ msgstr "Ikony"
 
 #: app/views/administration.authentication.edit.php:312
 msgid "IdP certificate"
-msgstr ""
+msgstr "Certyfikat IdP"
 
 #: app/views/administration.authentication.edit.php:291
 msgid "IdP entity ID"
@@ -11461,7 +11461,7 @@ msgstr "Jeśli mniej niż %2$s usługa podrzędna ma status %1$s lub niższy"
 
 #: include/classes/setup/CSetupWizard.php:614
 msgid "If no port is specified, the \"Database port\" value is used."
-msgstr ""
+msgstr "Jeśli nie określono portu, używana jest wartość \"Database port\"."
 
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -11485,7 +11485,7 @@ msgstr "Jeśli waga usług podrzędnych, ze statusem %1$s lub niższym, wynosi n
 
 #: app/views/host.wizard.edit.php:380
 msgid "If you do not know your PSK or would like to change it, click the button below. Note that changing the PSK may impact existing configurations."
-msgstr ""
+msgstr "Jeśli nie znasz swojego PSK lub chcesz go zmienić, kliknij poniższy przycisk. Pamiętaj, że zmiana PSK może wpłynąć na istniejące konfiguracje."
 
 #: include/classes/core/ZBase.php:767 include/func.inc.php:1688
 #: include/func.inc.php:1710
@@ -11802,7 +11802,7 @@ msgstr "Błędne API \"%1$s\"."
 #: app/controllers/CControllerHostCreate.php:65
 #: app/controllers/CControllerHostUpdate.php:69
 msgid "Incorrect DNS provided."
-msgstr ""
+msgstr "Podano nieprawidłowy DNS."
 
 #: include/classes/api/services/CDRule.php:602
 msgid "Incorrect SNMP OID."
@@ -11966,7 +11966,7 @@ msgstr "Użyto nieprawidłowych znaków w nazwie szablonu."
 #: include/classes/core/CConfigFile.php:411
 #, c-format
 msgid "Incorrect configuration %1$s: %2$s."
-msgstr ""
+msgstr "Nieprawidłowa konfiguracja %1$s: %2$s."
 
 #: include/classes/api/services/CUser.php:482
 msgid "Incorrect current password."
@@ -12011,7 +12011,7 @@ msgstr "Wykorzystano błędną funkcję"
 #: include/classes/core/CConfigFile.php:579
 #, c-format
 msgid "Incorrect history storage configuration %1$s: %2$s."
-msgstr ""
+msgstr "Nieprawidłowa konfiguracja przechowywania historii %1$s: %2$s."
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -12519,7 +12519,7 @@ msgstr "Informacje o dyskach wewnętrznych hiperwizora wymaganych dla vmware.dat
 
 #: include/func.inc.php:1610
 msgid "Info message"
-msgstr ""
+msgstr "Komunikat informacyjny"
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: widgets/geomap/Widget.php:40
@@ -12553,23 +12553,23 @@ msgstr "Prototypy makr dziedziczone i hosta"
 
 #: jsLoader.php:260
 msgid "Inherited and host prototype tag"
-msgstr ""
+msgstr "Dziedziczony tag i tag prototypu hosta"
 
 #: include/classes/helpers/CTagHelper.php:230
 msgid "Inherited and host tag"
-msgstr ""
+msgstr "Dziedziczony i tag hosta"
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Inherited and host tags"
-msgstr ""
+msgstr "Dziedziczone i tagi hosta"
 
 #: jsLoader.php:262
 msgid "Inherited and item prototype tag"
-msgstr ""
+msgstr "Dziedziczony i tag prototypu pozycji"
 
 #: include/classes/helpers/CTagHelper.php:231
 msgid "Inherited and item tag"
-msgstr ""
+msgstr "Dziedziczony i tag pozycji"
 
 #: app/partials/configuration.tags.tab.php:165
 msgid "Inherited and item tags"
@@ -12585,19 +12585,19 @@ msgstr "Makra dziedziczone i szablonu"
 
 #: include/classes/helpers/CTagHelper.php:229
 msgid "Inherited and template tag"
-msgstr ""
+msgstr "Dziedziczony i tag szablonu"
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Inherited and template tags"
-msgstr ""
+msgstr "Dziedziczone i tagi szablonu"
 
 #: jsLoader.php:264
 msgid "Inherited and trigger prototype tag"
-msgstr ""
+msgstr "Dziedziczony i tag prototypu wyzwalacza"
 
 #: include/classes/helpers/CTagHelper.php:232
 msgid "Inherited and trigger tag"
-msgstr ""
+msgstr "Dziedziczony i tag wyzwalacza"
 
 #: app/partials/configuration.tags.tab.php:155
 msgid "Inherited and trigger tags"
@@ -12605,7 +12605,7 @@ msgstr "Znaczniki dziedziczone i wyzwalacz"
 
 #: include/classes/helpers/CTagHelper.php:233
 msgid "Inherited and web scenario tag"
-msgstr ""
+msgstr "Dziedziczony i tag scenariusza WWW"
 
 #: include/forms.inc.php:311
 msgid "Inherited items"
@@ -12613,7 +12613,7 @@ msgstr "Dziedziczone elementy"
 
 #: include/classes/helpers/CTagHelper.php:222
 msgid "Inherited tag"
-msgstr ""
+msgstr "Dziedziczony tag"
 
 #: widgets/geomap/includes/WidgetForm.php:62
 msgid "Initial view"
@@ -12788,7 +12788,7 @@ msgstr "Interwał"
 
 #: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
 msgid "Interval and storage"
-msgstr ""
+msgstr "Interwał i przechowywanie"
 
 #: include/classes/api/services/CRole.php:731
 #, c-format
@@ -12843,12 +12843,12 @@ msgstr "Błędna konfiguracja Oauth"
 
 #: include/classes/helpers/CItemGeneralHelper.php:456
 msgid "Invalid Prometheus label."
-msgstr ""
+msgstr "Nieprawidłowa etykieta Prometheus."
 
 #: include/classes/helpers/CItemGeneralHelper.php:441
 #: include/classes/helpers/CItemGeneralHelper.php:446
 msgid "Invalid Prometheus pattern."
-msgstr ""
+msgstr "Nieprawidłowy wzorzec Prometheus."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
@@ -13234,7 +13234,7 @@ msgstr "Nieprawidłowy zakres."
 #: app/controllers/CControllerDataTable.php:59
 #: app/controllers/CControllerDataTable.php:138
 msgid "Invalid request"
-msgstr ""
+msgstr "Nieprawidłowe żądanie"
 
 #: include/classes/core/CJsonRpc.php:205
 msgid "Invalid request."
@@ -13349,7 +13349,7 @@ msgstr "Tryb inwentarzowy"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:235
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:236
 msgid "Invert values"
-msgstr ""
+msgstr "Odwróć wartości"
 
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
@@ -13396,7 +13396,7 @@ msgstr "Pozycja"
 #: app/controllers/CControllerPopupTriggerExpr.php:1472
 #, c-format
 msgid "Item \"%1$s\" cannot be used in trigger: unsupported data type."
-msgstr ""
+msgstr "Pozycja \"%1$s\" nie może być użyta w wyzwalaczu: nieobsługiwany typ danych."
 
 #: items.php:667
 msgid "Item added"
@@ -13404,7 +13404,7 @@ msgstr "Dodano pozycję"
 
 #: widgets/itemcard/Widget.php:32
 msgid "Item card"
-msgstr ""
+msgstr "Karta pozycji"
 
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
@@ -14209,7 +14209,7 @@ msgstr "Lista urządzeń blokowych i ich typów. Zwraca JSON"
 
 #: include/classes/data/CItemData.php:1724
 msgid "List of block devices with detailed information. Returns JSON"
-msgstr ""
+msgstr "Lista urządzeń blokowych ze szczegółowymi informacjami. Zwraca JSON"
 
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
@@ -14479,7 +14479,7 @@ msgstr "Makro \"%1$s\" już istnieje."
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:63
 #, c-format
 msgid "Macro \"%1$s\" is missing."
-msgstr ""
+msgstr "Brakuje makra \"%1$s\"."
 
 #: app/controllers/CControllerHostCreate.php:180
 #: app/controllers/CControllerHostUpdate.php:185
@@ -14634,7 +14634,7 @@ msgstr "Ręcznie zamknięte"
 #: include/actions.inc.php:1698 include/actions.inc.php:2195
 #: include/html.inc.php:1135
 msgid "Manually suppressed"
-msgstr ""
+msgstr "Wyłączone ręcznie"
 
 #: app/controllers/CControllerProblemViewData.php:475
 #: include/actions.inc.php:1674 include/actions.inc.php:1675
@@ -14642,7 +14642,7 @@ msgstr ""
 #: include/actions.inc.php:2201 include/blocks.inc.php:692
 #: widgets/problems/includes/WidgetProblems.php:280
 msgid "Manually unsuppressed"
-msgstr ""
+msgstr "Ręcznie wyłączono tłumienie"
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: include/classes/data/CWidgetsData.php:110
@@ -14797,7 +14797,7 @@ msgstr "Oznacz zaznaczone jako objawy"
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:437
 msgid "Marker"
-msgstr ""
+msgstr "Znacznik"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -15312,7 +15312,7 @@ msgstr[2] "Minimalny okres do wyświetlenia to %1$s minuty."
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:82
 #, c-format
 msgid "Minimum value of \"Maintenance period length\" is %1$d minutes."
-msgstr ""
+msgstr "Minimalna wartość pola \"Długość okresu utrzymania\" to %1$d minut."
 
 #: app/views/maintenance.timeperiod.edit.php:202
 msgid "Minute"
@@ -16097,7 +16097,7 @@ msgstr "Następny pulpit"
 
 #: jsLoader.php:416
 msgid "Next month"
-msgstr ""
+msgstr "Następny miesiąc"
 
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
@@ -16115,7 +16115,7 @@ msgstr "Następny krok"
 
 #: jsLoader.php:414
 msgid "Next year"
-msgstr ""
+msgstr "Następny rok"
 
 #: app/partials/administration.system.info.php:35
 #: app/partials/administration.system.info.php:131
@@ -16309,7 +16309,7 @@ msgstr "Nie znaleziono"
 #: include/classes/validators/CFormValidator.php:2332 jsLoader.php:419
 #, c-format
 msgid "No more than %1$d items based on field \"%2$s\" rules"
-msgstr ""
+msgstr "Nie więcej niż %1$d pozycji na podstawie reguł pola \"%2$s\""
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
@@ -16372,67 +16372,67 @@ msgstr "Brak uprawnień do wywołania \"%1$s.%2$s\"."
 
 #: include/classes/api/services/CConfiguration.php:337
 msgid "No permissions to import dashboards."
-msgstr ""
+msgstr "Brak uprawnień do importu pulpitów."
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
-msgstr ""
+msgstr "Brak uprawnień do importu reguł wykrywania."
 
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
-msgstr ""
+msgstr "Brak uprawnień do importu wykresów."
 
 #: include/classes/api/services/CConfiguration.php:314
 msgid "No permissions to import host groups."
-msgstr ""
+msgstr "Brak uprawnień do importu grup hostów."
 
 #: include/classes/api/services/CConfiguration.php:316
 msgid "No permissions to import hosts."
-msgstr ""
+msgstr "Brak uprawnień do importu hostów."
 
 #: include/classes/api/services/CConfiguration.php:318
 msgid "No permissions to import images."
-msgstr ""
+msgstr "Brak uprawnień do importu obrazów."
 
 #: include/classes/api/services/CConfiguration.php:319
 msgid "No permissions to import items."
-msgstr ""
+msgstr "Brak uprawnień do importu pozycji."
 
 #: include/classes/api/services/CConfiguration.php:320
 msgid "No permissions to import maps."
-msgstr ""
+msgstr "Brak uprawnień do importu map."
 
 #: include/classes/api/services/CConfiguration.php:321
 msgid "No permissions to import media types."
-msgstr ""
+msgstr "Brak uprawnień do importu typów mediów."
 
 #: include/classes/api/services/CConfiguration.php:324
 msgid "No permissions to import template dashboards."
-msgstr ""
+msgstr "Brak uprawnień do importu pulpitów szablonów."
 
 #: include/classes/api/services/CConfiguration.php:315
 msgid "No permissions to import template groups."
-msgstr ""
+msgstr "Brak uprawnień do importu grup szablonów."
 
 #: include/classes/api/services/CConfiguration.php:322
 msgid "No permissions to import template links."
-msgstr ""
+msgstr "Brak uprawnień do importu powiązań szablonów."
 
 #: include/classes/api/services/CConfiguration.php:323
 msgid "No permissions to import templates."
-msgstr ""
+msgstr "Brak uprawnień do importu szablonów."
 
 #: include/classes/api/services/CConfiguration.php:325
 msgid "No permissions to import triggers."
-msgstr ""
+msgstr "Brak uprawnień do importu wyzwalaczy."
 
 #: include/classes/api/services/CConfiguration.php:326
 msgid "No permissions to import value maps."
-msgstr ""
+msgstr "Brak uprawnień do importu map wartości."
 
 #: include/classes/api/services/CConfiguration.php:317
 msgid "No permissions to import web scenarios."
-msgstr ""
+msgstr "Brak uprawnień do importu scenariuszy WWW."
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -16819,13 +16819,13 @@ msgstr "Elementy niedziedziczone"
 
 #: app/views/host.wizard.edit.php:175
 msgid "Not linked"
-msgstr ""
+msgstr "Niepowiązane"
 
 #: app/views/item.list.php:233 app/views/item.list.php:234
 #: include/classes/helpers/CItemHelper.php:386
 #: include/classes/helpers/CItemHelper.php:416
 msgid "Not stored"
-msgstr ""
+msgstr "Niezapisane"
 
 #: app/controllers/CControllerLatest.php:546
 #: app/partials/configuration.filter.items.php:184
@@ -16843,7 +16843,7 @@ msgstr "Pamiętaj, że %1$s lub %2$s będą traktowane jako nazwy hostów, jeśl
 
 #: app/views/host.wizard.edit.php:518 app/views/host.wizard.edit.php:541
 msgid "Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1."
-msgstr ""
+msgstr "Pamiętaj, że podczas instalacji agenta konieczne będzie skonfigurowanie zarówno tożsamości PSK, jak i PSK. Upewnij się, że są zgodne z tożsamością PSK i PSK ustawionymi w kroku 1."
 
 #: app/views/host.wizard.edit.php:578
 #, c-format
@@ -16984,7 +16984,7 @@ msgstr "Liczba kroków"
 
 #: jsLoader.php:291
 msgid "Number of tags"
-msgstr ""
+msgstr "Liczba tagów"
 
 #: app/partials/administration.system.info.php:60
 msgid "Number of templates"
@@ -17205,17 +17205,17 @@ msgstr "Jeden"
 #: app/controllers/CControllerItem.php:166
 #: app/controllers/CControllerItemPrototype.php:168
 msgid "One \"Change\" step allowed per item."
-msgstr ""
+msgstr "Dozwolony jest jeden krok \"Zmiana\" na pozycję."
 
 #: app/controllers/CControllerItem.php:182
 #: app/controllers/CControllerItemPrototype.php:184
 msgid "One \"Prometheus\" step allowed per item."
-msgstr ""
+msgstr "Dozwolony jest jeden krok \"Prometheus\" na pozycję."
 
 #: app/controllers/CControllerItem.php:174
 #: app/controllers/CControllerItemPrototype.php:176
 msgid "One \"Throttling\" step allowed per item."
-msgstr ""
+msgstr "Dozwolony jest jeden krok \"Ograniczanie\" na pozycję."
 
 #: app/views/maintenance.timeperiod.edit.php:79
 #: include/classes/helpers/CMaintenanceHelper.php:29
@@ -17309,7 +17309,7 @@ msgstr "Otwórz w nowym oknie"
 #: app/views/host.wizard.edit.php:524 app/views/host.wizard.edit.php:547
 #: app/views/host.wizard.edit.php:553
 msgid "Open installation instructions"
-msgstr ""
+msgstr "Otwórz instrukcje instalacji"
 
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
@@ -17318,11 +17318,11 @@ msgstr "Otwórz dziennik"
 #: include/classes/validators/CSslCertificateValidator.php:28
 #: include/classes/validators/CSslPrivateKeyValidator.php:28
 msgid "OpenSSL extension is not available"
-msgstr ""
+msgstr "Rozszerzenie OpenSSL jest niedostępne"
 
 #: include/classes/server/CZabbixServer.php:627
 msgid "OpenSSL extension is not available."
-msgstr ""
+msgstr "Rozszerzenie OpenSSL jest niedostępne."
 
 #: include/httptest.inc.php:414
 msgid "Opera"
@@ -17525,7 +17525,7 @@ msgstr "Inne"
 
 #: app/views/host.wizard.edit.php:556
 msgid "Other OS"
-msgstr ""
+msgstr "Inny system operacyjny"
 
 #: app/controllers/CControllerMiscConfigEdit.php:112
 #: app/views/administration.miscconfig.edit.php:30
@@ -17617,15 +17617,15 @@ msgstr "Właściciel"
 
 #: app/views/administration.authentication.edit.php:322
 msgid "PEM-encoded IdP certificate"
-msgstr ""
+msgstr "Certyfikat IdP zakodowany w PEM"
 
 #: app/views/administration.authentication.edit.php:373
 msgid "PEM-encoded SP certificate"
-msgstr ""
+msgstr "Certyfikat SP zakodowany w PEM"
 
 #: app/views/administration.authentication.edit.php:348
 msgid "PEM-encoded SP private key"
-msgstr ""
+msgstr "Klucz prywatny SP zakodowany w PEM"
 
 #: include/classes/setup/CFrontendSetup.php:531
 msgid "PHP LDAP"
@@ -17850,17 +17850,17 @@ msgstr "Tożsamość PSK"
 #: app/controllers/CControllerHostCreate.php:162
 #: app/controllers/CControllerHostUpdate.php:167
 msgid "PSK must be an even number of characters."
-msgstr ""
+msgstr "PSK musi mieć parzystą liczbę znaków."
 
 #: app/controllers/CControllerHostCreate.php:166
 #: app/controllers/CControllerHostUpdate.php:171
 msgid "PSK must be at least 32 characters long."
-msgstr ""
+msgstr "PSK musi mieć co najmniej 32 znaki."
 
 #: app/controllers/CControllerHostCreate.php:170
 #: app/controllers/CControllerHostUpdate.php:175
 msgid "PSK must contain only hexadecimal characters."
-msgstr ""
+msgstr "PSK może zawierać tylko znaki szesnastkowe."
 
 #: jsLoader.php:146
 #, c-format
@@ -17887,12 +17887,12 @@ msgstr "Pager"
 
 #: jsLoader.php:554
 msgid "Palette"
-msgstr ""
+msgstr "Paleta"
 
 #: jsLoader.php:555
 #, c-format
 msgid "Palette %1$d"
-msgstr ""
+msgstr "Paleta %1$d"
 
 #: app/partials/administration.system.info.php:30
 msgid "Parameter"
@@ -17931,7 +17931,7 @@ msgstr "Parametry \"esc_step_from\" oraz \"esc_step_to\" muszą być ustawione r
 
 #: include/views/configuration.host.discovery.prototype.edit.php:66
 msgid "Parent discovery prototypes"
-msgstr ""
+msgstr "Nadrzędne prototypy wykrywania"
 
 #: include/views/configuration.host.discovery.edit.php:56
 #: include/views/configuration.host.prototype.edit.php:66
@@ -18107,7 +18107,7 @@ msgstr "Procent czasu kiedy wirtualna maszyna była gotowa, ale nie mogła otrzy
 #: include/classes/graphdraw/CLineGraphDraw.php:1620
 #, c-format
 msgid "Percentile %1$s: %2$s"
-msgstr ""
+msgstr "Percentyl %1$s: %2$s"
 
 #: graphs.php:50 include/views/configuration.graph.edit.php:154
 #: widgets/svggraph/includes/WidgetForm.php:87
@@ -18336,11 +18336,11 @@ msgstr "Podsumowanie przed instalacją"
 
 #: app/views/host.wizard.edit.php:405
 msgid "Pre-shared key"
-msgstr ""
+msgstr "Klucz współdzielony"
 
 #: app/views/host.wizard.edit.php:394
 msgid "Pre-shared key identity"
-msgstr ""
+msgstr "Tożsamość klucza współdzielonego"
 
 #: app/views/popup.triggerexpr.php:132
 msgid "Prediction functions"
@@ -18362,7 +18362,7 @@ msgstr "Przetwarzanie wstępne to transformacja przed zapisaniem wartości w baz
 #: app/controllers/CControllerItem.php:190
 #: app/controllers/CControllerItemPrototype.php:192
 msgid "Preprocessing step with such Name and Parameters combination already exists."
-msgstr ""
+msgstr "Krok przetwarzania wstępnego z taką kombinacją Nazwy i Parametrów już istnieje."
 
 #: app/views/popup.itemtestedit.view.php:375
 #: app/views/popup.massupdate.item.php:203
@@ -18861,7 +18861,7 @@ msgstr "Naciskać"
 
 #: include/views/js/item.preprocessing.js.php:208
 msgid "Qualifier"
-msgstr ""
+msgstr "Kwalifikator"
 
 #: include/classes/helpers/CSlaHelper.php:64
 msgid "Quarter"
@@ -19089,7 +19089,7 @@ msgstr "Prostokąt"
 
 #: app/views/oauth.edit.php:44
 msgid "Redirection endpoint"
-msgstr ""
+msgstr "Punkt końcowy przekierowania"
 
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
@@ -19097,11 +19097,11 @@ msgstr "Atrybut odniesienia"
 
 #: app/controllers/CControllerPopupImport.php:135
 msgid "References to missing objects were ignored:"
-msgstr ""
+msgstr "Odwołania do brakujących obiektów zostały zignorowane:"
 
 #: app/controllers/CControllerPopupImportCompare.php:120
 msgid "References to missing objects will be ignored:"
-msgstr ""
+msgstr "Odwołania do brakujących obiektów zostaną zignorowane:"
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
@@ -19136,7 +19136,7 @@ msgstr "Przedział odświeżania"
 
 #: app/views/mediatype.edit.php:163
 msgid "Refresh token is invalid or outdated."
-msgstr ""
+msgstr "Token odświeżania jest nieprawidłowy lub nieaktualny."
 
 #: app/views/popup.token.edit.php:129
 msgid "Regenerate"
@@ -19521,7 +19521,7 @@ msgstr "Wymagane"
 
 #: include/classes/validators/CFormValidator.php:652 jsLoader.php:420
 msgid "Required field is missing."
-msgstr ""
+msgstr "Brak wymaganego pola."
 
 #: app/views/administration.script.edit.php:314
 msgid "Required host permissions"
@@ -19594,7 +19594,7 @@ msgstr "Przywróć domyślne"
 
 #: jsLoader.php:305
 msgid "Reset layout"
-msgstr ""
+msgstr "Resetuj układ"
 
 #: widgets/geomap/Widget.php:37
 msgid "Reset to initial view"
@@ -19660,7 +19660,7 @@ msgstr "Czas odpowiedzi"
 #: include/classes/server/CZabbixServer.php:507
 #, c-format
 msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
-msgstr ""
+msgstr "Przekroczono limit czasu odpowiedzi %1$s podczas łączenia z serwerem Zabbix \"%2$s\"."
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -19761,7 +19761,7 @@ msgstr "Zwraca objekt JSON zawierający serwer Zabbix lub wewnętrzny wskaźnik 
 
 #: include/classes/data/CItemData.php:2797
 msgid "Returns a JSON object containing database connection pool configuration and statistics."
-msgstr ""
+msgstr "Zwraca obiekt JSON zawierający konfigurację i statystyki puli połączeń z bazą danych."
 
 #: include/classes/data/CItemData.php:2673
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
@@ -20134,7 +20134,7 @@ msgstr "Agent SNMPv3"
 
 #: app/views/administration.authentication.edit.php:363
 msgid "SP certificate"
-msgstr ""
+msgstr "Certyfikat SP"
 
 #: app/views/administration.authentication.edit.php:334
 msgid "SP entity ID"
@@ -20146,7 +20146,7 @@ msgstr "Format ID nazwy SP"
 
 #: app/views/administration.authentication.edit.php:338
 msgid "SP private key"
-msgstr ""
+msgstr "Klucz prywatny SP"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -20291,7 +20291,7 @@ msgstr "Zeskanuj ten kod QR"
 
 #: widgets/scatterplot/Widget.php:24
 msgid "Scatter plot"
-msgstr ""
+msgstr "Wykres punktowy"
 
 #: include/views/configuration.httpconf.edit.php:373
 msgid "Scenario"
@@ -20340,7 +20340,7 @@ msgstr[2] "Wyłączono raporty okresowe"
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Scheduled report edit"
-msgstr ""
+msgstr "Edycja zaplanowanego raportu"
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
@@ -20592,7 +20592,7 @@ msgstr "Wybierz prototyp"
 
 #: app/views/oauth.edit.php:171
 msgid "Select retrieval method: automatically through a redirection page or manually if automatic retrieval fails."
-msgstr ""
+msgstr "Wybierz metodę pobierania: automatycznie przez stronę przekierowania lub ręcznie, jeśli automatyczne pobieranie się nie powiedzie."
 
 #: app/views/host.wizard.edit.php:447
 msgid "Select the OS distribution"
@@ -20737,17 +20737,17 @@ msgstr "Serwer (proxy)"
 
 #: include/classes/setup/CSetupWizard.php:1081
 msgid "Server TLS CA file"
-msgstr ""
+msgstr "Plik CA TLS serwera"
 
 #: include/classes/setup/CSetupWizard.php:890
 #: include/classes/setup/CSetupWizard.php:1095
 msgid "Server TLS certificate issuer"
-msgstr ""
+msgstr "Wystawca certyfikatu TLS serwera"
 
 #: include/classes/setup/CSetupWizard.php:899
 #: include/classes/setup/CSetupWizard.php:1099
 msgid "Server TLS certificate subject"
-msgstr ""
+msgstr "Podmiot certyfikatu TLS serwera"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:62
 #: widgets/clock/includes/WidgetForm.php:62
@@ -20936,11 +20936,11 @@ msgstr "Ustaw ten widok jako domyślny"
 
 #: app/views/host.wizard.edit.php:493
 msgid "Set up Zabbix agent on your monitoring target by executing the following PowerShell script [with administrator permissions]:"
-msgstr ""
+msgstr "Skonfiguruj agent Zabbix na monitorowanym celu, wykonując następujący skrypt PowerShell [z uprawnieniami administratora]:"
 
 #: app/views/host.wizard.edit.php:477
 msgid "Set up Zabbix agent on your monitoring target by executing the following script [bash under root]:"
-msgstr ""
+msgstr "Skonfiguruj agent Zabbix na monitorowanym celu, wykonując następujący skrypt [bash jako root]:"
 
 #: app/views/js/popup.itemtestedit.view.js.php:383 include/forms.inc.php:1599
 #: include/views/js/item.preprocessing.js.php:67
@@ -21057,13 +21057,13 @@ msgstr "Skrócony"
 #: app/views/administration.housekeeping.edit.php:187
 #, c-format
 msgid "Should be at least %1$s."
-msgstr ""
+msgstr "Powinno być co najmniej %1$s."
 
 #: app/partials/administration.system.info.php:262
 #: app/views/administration.housekeeping.edit.php:197
 #, c-format
 msgid "Should not be higher than %1$s."
-msgstr ""
+msgstr "Nie powinno być większe niż %1$s."
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
@@ -21120,7 +21120,7 @@ msgstr "Wyświetl hosty w utrzymaniu"
 
 #: jsLoader.php:281
 msgid "Show item key"
-msgstr ""
+msgstr "Pokaż klucz pozycji"
 
 #: include/views/js/monitoring.sysmaps.js.php:158
 #: include/views/js/monitoring.sysmaps.js.php:698
@@ -21252,7 +21252,7 @@ msgstr "Pokaż całkowitą wartość"
 
 #: jsLoader.php:285
 msgid "Show trigger expression"
-msgstr ""
+msgstr "Pokaż wyrażenie wyzwalacza"
 
 #: include/views/configuration.graph.edit.php:131
 msgid "Show triggers"
@@ -21482,7 +21482,7 @@ msgstr "Ostatnio sprawdzona aktualizacja oprogramowania"
 
 #: jsLoader.php:556
 msgid "Solid color"
-msgstr ""
+msgstr "Jednolity kolor"
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -21491,12 +21491,12 @@ msgstr "Część historii tej pozycji może być skompresowana, usunięcie jest 
 #: app/views/host.wizard.edit.php:129
 #, c-format
 msgid "Some templates (%1$s) are hidden. Custom templates are not supported."
-msgstr ""
+msgstr "Niektóre szablony (%1$s) są ukryte. Własne szablony nie są obsługiwane."
 
 #: app/views/host.wizard.edit.php:130
 #, c-format
 msgid "Some templates (%1$s) are incompatible with the Host Wizard."
-msgstr ""
+msgstr "Niektóre szablony (%1$s) są niezgodne z Kreatorem hosta."
 
 #: widgets/actionlog/includes/WidgetForm.php:79
 #: widgets/problems/includes/WidgetForm.php:145
@@ -21555,7 +21555,7 @@ msgstr "Określ jakieś warunki filtra, żeby zobaczyć wartości."
 
 #: app/views/host.wizard.edit.php:365
 msgid "Specifying new or existing host groups will add the host to these groups without removing it from any current groups."
-msgstr ""
+msgstr "Określenie nowych lub istniejących grup hostów doda host do tych grup bez usuwania go z żadnych bieżących grup."
 
 #: httpdetails.php:107 include/classes/screens/CScreenHttpTestDetails.php:82
 msgid "Speed"
@@ -21623,11 +21623,11 @@ msgstr "Czas rozpoczęcia musi być mniejszy niż czas zakończenia wykluczonego
 
 #: app/views/host.wizard.edit.php:310
 msgid "Start typing or click Select to choose an existing host, or enter a new host name."
-msgstr ""
+msgstr "Zacznij pisać lub kliknij Wybierz, aby wybrać istniejący host, albo wprowadź nową nazwę hosta."
 
 #: app/views/host.wizard.edit.php:334
 msgid "Start typing or click Select to choose existing host groups, or enter a new host group name."
-msgstr ""
+msgstr "Zacznij pisać lub kliknij Wybierz, aby wybrać istniejące grupy hostów, albo wprowadź nową nazwę grupy hostów."
 
 #: app/views/popup.ldap.edit.php:287
 msgid "StartTLS"
@@ -21678,7 +21678,7 @@ msgstr "Statystyki i dostępność bufora pamięci proxy. Tryb (tryby: pfree, fr
 
 #: include/classes/data/CItemData.php:2870
 msgid "Statistics of values received by the preprocessing manager."
-msgstr ""
+msgstr "Statystyki wartości odebranych przez menedżera przetwarzania wstępnego."
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -21992,7 +21992,7 @@ msgstr "Stłumiony"
 
 #: include/actions.inc.php:2241 include/html.inc.php:1134
 msgid "Suppressed by maintenance"
-msgstr ""
+msgstr "Wstrzymane przez konserwację"
 
 #: include/actions.inc.php:2019 include/html.inc.php:1000
 #, c-format
@@ -22017,7 +22017,7 @@ msgstr "Szwedzki (sv_SE)"
 
 #: index_sso.php:367
 msgid "Switch SSO user"
-msgstr ""
+msgstr "Przełącz użytkownika SSO"
 
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
@@ -22105,22 +22105,22 @@ msgstr "Agent TELNET"
 
 #: include/classes/setup/CSetupWizard.php:855
 msgid "TLS CA file"
-msgstr ""
+msgstr "Plik CA TLS"
 
 #: include/classes/setup/CSetupWizard.php:873
 msgid "TLS certificate file"
-msgstr ""
+msgstr "Plik certyfikatu TLS"
 
 #: include/classes/server/CZabbixServer.php:634
 #: include/classes/server/CZabbixServer.php:641
 #: include/classes/server/CZabbixServer.php:648
 #: include/classes/setup/CSetupWizard.php:911
 msgid "TLS fields are misconfigured or the files are not accessible."
-msgstr ""
+msgstr "Pola TLS są nieprawidłowo skonfigurowane lub pliki nie są dostępne."
 
 #: include/classes/setup/CSetupWizard.php:865
 msgid "TLS key file"
-msgstr ""
+msgstr "Plik klucza TLS"
 
 #: include/classes/screens/CScreenHttpTestDetails.php:190
 msgid "TOTAL"
@@ -22158,7 +22158,7 @@ msgstr "Tabela \"%1$s\" nie posiada pola o nazwie \"%2$s\"."
 
 #: jsLoader.php:303
 msgid "Table options"
-msgstr ""
+msgstr "Opcje tabeli"
 
 #: app/controllers/CControllerActionOperationCheck.php:210
 #: app/controllers/CControllerActionOperationCheck.php:216
@@ -22188,7 +22188,7 @@ msgstr "Filtr znacznika"
 #: app/controllers/CControllerConnectorCreate.php:120
 #: app/controllers/CControllerConnectorUpdate.php:121
 msgid "Tag filter name, operator and value combination is not unique."
-msgstr ""
+msgstr "Kombinacja nazwy tagu, operatora i wartości nie jest unikalna."
 
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"
@@ -22217,16 +22217,16 @@ msgstr "Nazwa znacznika"
 #: app/controllers/CControllerTriggerPrototypeUpdate.php:61
 #: app/controllers/CControllerTriggerUpdate.php:61
 msgid "Tag name and value combination is not unique."
-msgstr ""
+msgstr "Kombinacja nazwy tagu i wartości nie jest unikalna."
 
 #: jsLoader.php:292
 msgid "Tag name display"
-msgstr ""
+msgstr "Wyświetlanie nazwy tagu"
 
 #: app/controllers/CControllerMaintenanceCreate.php:93
 #: app/controllers/CControllerMaintenanceUpdate.php:94
 msgid "Tag name, operator and value combination is not unique."
-msgstr ""
+msgstr "Kombinacja nazwy tagu, operatora i wartości nie jest unikalna."
 
 #: include/actions.inc.php:68
 msgid "Tag value"
@@ -22439,7 +22439,7 @@ msgstr "Uprawnienia szablonu"
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Template tags"
-msgstr ""
+msgstr "Tagi szablonu"
 
 #: report2.php:398
 msgid "Template trigger"
@@ -22515,7 +22515,7 @@ msgstr "Szablonów połączonych przez wykrywanie hostów nie można odłączyć
 
 #: app/views/oauth.edit.php:169
 msgid "Temporary token to exchange for an access token."
-msgstr ""
+msgstr "Tymczasowy token do wymiany na token dostępu."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:211
 #: app/partials/scheduledreport.formgrid.html.php:211
@@ -22638,7 +22638,7 @@ msgstr "%1$s nie jest już wykrywany i %2$s."
 
 #: app/views/host.wizard.edit.php:101
 msgid "The Host Wizard will help you set up your monitoring target (device, application, service, etc.) in Zabbix."
-msgstr ""
+msgstr "Kreator hosta pomoże Ci skonfigurować cel monitorowania (urządzenie, aplikację, usługę itp.) w Zabbix."
 
 #: app/views/oauth.edit.php:48
 msgid "The URL must comply with the OAuth provider's policy."
@@ -22663,15 +22663,15 @@ msgstr "Średni czas zapisu z dysku wirtualnego, \"url\" - URL usługi VMware, \
 
 #: app/views/oauth.edit.php:70
 msgid "The client identifier registered within the authorization server."
-msgstr ""
+msgstr "Identyfikator klienta zarejestrowany na serwerze autoryzacji."
 
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
-msgstr ""
+msgstr "Sekret klienta zarejestrowany na serwerze autoryzacji."
 
 #: app/views/oauth.edit.php:105
 msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
-msgstr ""
+msgstr "Sekret klienta został wyczyszczony z powodu zmiany punktu końcowego tokenu. Wprowadź nowy sekret klienta."
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -22726,7 +22726,7 @@ msgstr "Host nie jest już wykrywany i zostanie usunięty przy następnym przetw
 
 #: app/controllers/CControllerHostPrototypeEdit.php:268
 msgid "The host prototype being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host prototype."
-msgstr ""
+msgstr "Klonowany prototyp hosta należy do grupy hostów, do której nie masz uprawnień zapisu. Grupa bez uprawnień zapisu została usunięta z nowego prototypu hosta."
 
 #: include/classes/api/services/CImage.php:555
 #, c-format
@@ -22761,7 +22761,7 @@ msgstr "Maksymalne przybliżenie to \"%1$s\"."
 #: include/classes/api/services/CDiscoveryRule.php:962
 #, c-format
 msgid "The nested LLD rule with key \"%1$s\" of the template \"%2$s\" cannot be inherited to non-discovered host \"%3$s\"."
-msgstr ""
+msgstr "Zagnieżdżona reguła LLD z kluczem \"%1$s\" szablonu \"%2$s\" nie może zostać odziedziczona do niewykrytego hosta \"%3$s\"."
 
 #: include/classes/data/CItemData.php:1281
 msgid "The number of processes. Returns integer"
@@ -22774,7 +22774,7 @@ msgstr "Brak parametru \"%1$s\" w atrybutach użytkownika."
 
 #: app/views/popup.ldap.edit.php:101
 msgid "The previous password was cleared due to a host change. Please enter the new password."
-msgstr ""
+msgstr "Poprzednie hasło zostało wyczyszczone z powodu zmiany hosta. Wprowadź nowe hasło."
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
@@ -22801,12 +22801,12 @@ msgstr "Szablon który wybierasz (%1$s) wymaga instalacji i działania agenta Za
 #: app/views/host.wizard.edit.php:899
 #, c-format
 msgid "The template you selected (%1$s) requires additional configuration."
-msgstr ""
+msgstr "Wybrany szablon (%1$s) wymaga dodatkowej konfiguracji."
 
 #: app/views/host.wizard.edit.php:573
 #, c-format
 msgid "The template you selected (%1$s) requires the %2$s to be added to the host (%3$s)."
-msgstr ""
+msgstr "Wybrany szablon (%1$s) wymaga dodania %2$s do hosta (%3$s)."
 
 #: app/views/popup.token.view.php:62
 msgid "The token has expired. Please update the expiry date to use the token."
@@ -22823,7 +22823,7 @@ msgstr "Wyzwalacz nie jest już wykrywany i zostanie usunięty przy następnym p
 
 #: app/views/js/host.wizard.edit.js.php:722
 msgid "The value does not match the existing value on the selected host."
-msgstr ""
+msgstr "Wartość nie jest zgodna z istniejącą wartością na wybranym hoście."
 
 #: include/views/configuration.host.discovery.edit.php:712
 msgid "The value should be greater than LLD rule update interval."
@@ -22860,7 +22860,7 @@ msgstr[2] "Tych sprawdzeń nie można usunąć, ponieważ są one używane jako 
 
 #: app/views/host.wizard.edit.php:384
 msgid "This configuration will overwrite all existing encryption settings on the host."
-msgstr ""
+msgstr "Ta konfiguracja nadpisze wszystkie istniejące ustawienia szyfrowania na hoście."
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -22870,14 +22870,14 @@ msgstr "Tydzień temu"
 #: include/classes/validators/CFormValidator.php:1109
 #: include/classes/validators/CFormValidator.php:1158 jsLoader.php:427
 msgid "This field cannot be empty."
-msgstr ""
+msgstr "To pole nie może być puste."
 
 #: app/controllers/CControllerItemCreate.php:263
 #: app/controllers/CControllerItemPrototypeCreate.php:271
 #: app/controllers/CControllerItemPrototypeUpdate.php:228
 #: app/controllers/CControllerItemUpdate.php:228
 msgid "This field cannot be set to \"0\" without defining custom intervals."
-msgstr ""
+msgstr "To pole nie może być ustawione na \"0\" bez zdefiniowania niestandardowych interwałów."
 
 #: app/partials/configuration.host.edit.html.php:383
 #, c-format
@@ -22886,7 +22886,7 @@ msgstr "To pole jest automatycznie uzupełniane przez element \"%1$s\"."
 
 #: include/classes/validators/CItemKeyValidator.php:42
 msgid "This field must contain at least one low-level discovery macro."
-msgstr ""
+msgstr "To pole musi zawierać co najmniej jedno makro wykrywania niskopoziomowego."
 
 #: app/controllers/CControllerMediatypeTestEdit.php:86
 msgid "This is the test message from Zabbix"
@@ -22914,7 +22914,7 @@ msgstr "To ustawienie dotyczy jedynie danych liczbowych. Dane nieliczbowe będą
 
 #: app/views/administration.housekeeping.edit.php:145
 msgid "This setting does not affect Elasticsearch and ClickHouse storage periods."
-msgstr ""
+msgstr "To ustawienie nie wpływa na okresy przechowywania w Elasticsearch i ClickHouse."
 
 #: app/partials/administration.system.info.php:212
 #: app/views/administration.housekeeping.edit.php:132
@@ -22948,19 +22948,19 @@ msgstr "Ten użytkownik ma przydzielony dostęp przez IdP. Ręczne zmiany dla p�
 #, c-format
 msgid "This value cannot be %1$s."
 msgid_plural "This value cannot be one of %1$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Ta wartość nie może być jedną z %1$s."
+msgstr[1] "Te wartości nie mogą być jednymi z %1$s."
+msgstr[2] "Te wartości nie mogą być jednymi z %1$s."
 
 #: jsLoader.php:429
 #, c-format
 msgid "This value cannot be one of %1$s."
-msgstr ""
+msgstr "Ta wartość nie może być jedną z %1$s."
 
 #: include/classes/validators/CFormValidator.php:1143 jsLoader.php:427
 #, c-format
 msgid "This value cannot have more than %1$s decimal places."
-msgstr ""
+msgstr "Ta wartość nie może mieć więcej niż %1$s miejsc po przecinku."
 
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
@@ -22999,26 +22999,26 @@ msgstr "Wartość jest za krótka."
 #, c-format
 msgid "This value must be %1$s."
 msgid_plural "This value must be one of %1$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Ta wartość musi być jedną z %1$s."
+msgstr[1] "Te wartości muszą być jednymi z %1$s."
+msgstr[2] "Te wartości muszą być jednymi z %1$s."
 
 #: include/classes/validators/CFormValidator.php:847
 #: include/classes/validators/CFormValidator.php:898 jsLoader.php:433
 #, c-format
 msgid "This value must be no greater than \"%1$s\"."
-msgstr ""
+msgstr "Ta wartość nie może być większa niż \"%1$s\"."
 
 #: include/classes/validators/CFormValidator.php:841
 #: include/classes/validators/CFormValidator.php:892 jsLoader.php:432
 #, c-format
 msgid "This value must be no less than \"%1$s\"."
-msgstr ""
+msgstr "Ta wartość nie może być mniejsza niż \"%1$s\"."
 
 #: jsLoader.php:434
 #, c-format
 msgid "This value must be one of %1$s."
-msgstr ""
+msgstr "Ta wartość musi być jedną z %1$s."
 
 #: include/func.inc.php:2572
 msgid "This week"
@@ -23241,7 +23241,7 @@ msgstr "Do"
 
 #: app/views/host.wizard.edit.php:930
 msgid "To complete the setup, configure the following variables (host macros)."
-msgstr ""
+msgstr "Aby ukończyć konfigurację, skonfiguruj następujące zmienne (makra hosta)."
 
 #: jsLoader.php:398
 msgid "To set a host interface select a single item type for all items"
@@ -23261,11 +23261,11 @@ msgstr "Edycja tokena"
 
 #: app/views/oauth.edit.php:188
 msgid "Token endpoint"
-msgstr ""
+msgstr "Punkt końcowy tokenu"
 
 #: app/views/oauth.edit.php:201
 msgid "Token parameters"
-msgstr ""
+msgstr "Parametry tokenu"
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
@@ -23319,7 +23319,7 @@ msgstr "Ogółem"
 #: include/classes/debug/CProfiler.php:172
 #, c-format
 msgid "Total ClickHouse time: %1$s"
-msgstr ""
+msgstr "Łączny czas ClickHouse: %1$s"
 
 #: include/classes/debug/CProfiler.php:153
 #, c-format
@@ -23395,6 +23395,10 @@ msgstr "Traktuj jako 0"
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr "Statystyki pamięci podręcznej funkcji trendów. Prawidłowe parametry to: all, hits, phits, misses, pmisses, items, pitems oraz requests."
 
+#: include/classes/data/CItemData.php:3013
+msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems, paccessed and requests."
+msgstr "Statystyki pamięci podręcznej funkcji trendów. Prawidłowe parametry to: all, hits, phits, misses, pmisses, items, pitems, paccessed i requests."
+
 #: app/controllers/CControllerPopupLldOperation.php:226
 #: app/partials/configuration.filter.items.php:162
 #: app/partials/monitoring.latest.view.html.php:74
@@ -23414,7 +23418,7 @@ msgstr "Trendy"
 #: app/partials/item.edit.item.tab.php:774
 #: app/views/administration.housekeeping.edit.php:204
 msgid "Trends are not calculated or stored for items whose history is kept in Elasticsearch or ClickHouse."
-msgstr ""
+msgstr "Trendy nie są obliczane ani przechowywane dla pozycji, których historia jest przechowywana w Elasticsearch lub ClickHouse."
 
 #: app/controllers/CControllerAuditLogList.php:257
 #: app/views/reports.toptriggers.list.php:120 app/views/trigger.edit.php:54
@@ -23834,7 +23838,7 @@ msgstr "Typ (OK)"
 
 #: app/views/host.wizard.edit.php:149
 msgid "Type a keyword to search for templates."
-msgstr ""
+msgstr "Wpisz słowo kluczowe, aby wyszukać szablony."
 
 #: app/views/correlation.edit.php:195 app/views/popup.action.edit.php:125
 #: app/views/popup.lldoverride.php:77 app/views/popup.operation.edit.php:423
@@ -23962,7 +23966,7 @@ msgstr "Nie można zmienić konfiguracji z powodu uprawanień 0600 do pliku."
 #: include/classes/server/CZabbixServer.php:673
 #: include/classes/server/CZabbixServer.php:681 jsrpc.php:86 jsrpc.php:101
 msgid "Unable to connect to the Zabbix server due to TLS settings. Some functions are unavailable."
-msgstr ""
+msgstr "Nie można połączyć się z serwerem Zabbix z powodu ustawień TLS. Niektóre funkcje są niedostępne."
 
 #: include/classes/core/CConfigFile.php:237
 msgid "Unable to create the configuration file."
@@ -24012,11 +24016,11 @@ msgstr "Nie można ustalić wersji TimescaleDB."
 
 #: app/views/administration.housekeeping.edit.php:173
 msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "Nie można pobrać stanu obsługi kompresji rozszerzenia bazy danych szeregów czasowych TimescaleDB dla PostgreSQL."
 
 #: app/views/administration.housekeeping.edit.php:178
 msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "Nie można pobrać wersji rozszerzenia bazy danych szeregów czasowych TimescaleDB dla PostgreSQL."
 
 #: include/views/mfa.login.php:65
 #, c-format
@@ -24095,7 +24099,7 @@ msgstr "Nieoczekiwany kod stanu odpowiedzi HTTP."
 
 #: app/views/mediatype.edit.php:166
 msgid "Unexpected access token update time."
-msgstr ""
+msgstr "Nieoczekiwany czas aktualizacji tokenu dostępu."
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -24315,7 +24319,7 @@ msgstr "Wersja serwera bazodanowego %1$s nie jest wspierana. Nie może być wię
 #: app/partials/administration.system.info.php:206
 #: app/views/administration.housekeeping.edit.php:169
 msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
-msgstr ""
+msgstr "Używane jest nieobsługiwane rozszerzenie bazy danych szeregów czasowych TimescaleDB dla PostgreSQL."
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -24361,7 +24365,7 @@ msgstr "Poprzednio stłumiony"
 
 #: include/actions.inc.php:2257
 msgid "Unsuppressed by maintenance"
-msgstr ""
+msgstr "Nie wyciszone przez konserwację"
 
 #: include/blocks.inc.php:670 include/classes/screens/CScreenProblem.php:1425
 #: widgets/problems/includes/WidgetProblems.php:278
@@ -24547,7 +24551,7 @@ msgstr "Czas dostępności/niedostępności"
 #: app/partials/administration.system.info.php:328
 #, c-format
 msgid "Use %1$s instead"
-msgstr ""
+msgstr "Użyj zamiast tego %1$s"
 
 #: app/views/popup.ldap.edit.php:173
 msgid "Use %{ref} in group filter to reference value of this user attribute."
@@ -25018,7 +25022,7 @@ msgstr "Użytkownicy"
 
 #: include/locales.inc.php:62
 msgid "Uzbek (uz_UZ)"
-msgstr ""
+msgstr "Uzbecki (uz_UZ)"
 
 #: include/classes/data/CItemData.php:1876
 msgid "VMware Distributed Virtual Switch, \"url\" - VMware service URL. Returns JSON"
@@ -25695,7 +25699,7 @@ msgstr "Zweryfikuj certyfikat bazy danych"
 
 #: include/classes/setup/CSetupWizard.php:881
 msgid "Verify server certificate issuer and subject"
-msgstr ""
+msgstr "Weryfikuj wystawcę i podmiot certyfikatu serwera"
 
 #: app/views/administration.proxy.list.php:62
 #: app/views/administration.proxy.list.php:89 app/views/module.edit.php:40
@@ -25838,11 +25842,11 @@ msgstr "WWW"
 
 #: include/classes/setup/CSetupWizard.php:1089
 msgid "Web interface TLS certificate file"
-msgstr ""
+msgstr "Plik certyfikatu TLS interfejsu WWW"
 
 #: include/classes/setup/CSetupWizard.php:1085
 msgid "Web interface TLS key file"
-msgstr ""
+msgstr "Plik klucza TLS interfejsu WWW"
 
 #: app/controllers/CControllerWebView.php:163
 #: app/views/monitoring.web.view.php:37 include/items.inc.php:101
@@ -25970,7 +25974,7 @@ msgstr "Widżet o współrzędnych X:%3$d, Y:%4$d na stronie #%2$d pupitu \"%1$s
 
 #: jsLoader.php:247
 msgid "Widget configuration will be reverted."
-msgstr ""
+msgstr "Konfiguracja widżetu zostanie przywrócona."
 
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
@@ -25978,7 +25982,7 @@ msgstr "Widżet jest przestarzały."
 
 #: jsLoader.php:255
 msgid "Widget is not fully configured"
-msgstr ""
+msgstr "Widżet nie jest w pełni skonfigurowany"
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
@@ -26014,7 +26018,7 @@ msgstr "Szerokość"
 
 #: app/views/host.wizard.edit.php:435
 msgid "Windows"
-msgstr ""
+msgstr "Windows"
 
 #: app/views/host.wizard.edit.php:450
 msgid "Windows 10/Server 2016 or later"
@@ -26369,7 +26373,7 @@ msgstr "Nie zalogowano."
 
 #: app/views/host.wizard.edit.php:103
 msgid "You can always access Host Wizard from Data collection > Hosts."
-msgstr ""
+msgstr "Zawsze możesz uzyskać dostęp do Kreatora hosta z poziomu Zbieranie danych > Hosty."
 
 #: app/views/popup.generic.php:74
 msgid "You cannot switch hosts for current selection."
@@ -26397,7 +26401,7 @@ msgstr "Nie masz uprawnień do wykonania tej operacji"
 
 #: index_sso.php:358
 msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
-msgstr ""
+msgstr "Zostałeś uwierzytelniony przez Single sign-on (SSO), ale logowanie do Zabbix nie powiodło się."
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -26417,11 +26421,11 @@ msgstr "Twoja baza danych nie pracuje poprawnie. Poczekaj proszę kilka minut i 
 
 #: app/views/host.wizard.edit.php:1044
 msgid "Your progress will be discarded and you will exit the Host Wizard. Are you sure you want to cancel?"
-msgstr ""
+msgstr "Twój postęp zostanie odrzucony i opuścisz Kreatora hosta. Czy na pewno chcesz anulować?"
 
 #: jsLoader.php:307
 msgid "Your table settings will be reset to default and duplicated columns will be removed."
-msgstr ""
+msgstr "Ustawienia tabeli zostaną zresetowane do domyślnych, a zduplikowane kolumny zostaną usunięte."
 
 #: include/page_header.php:122
 msgid "Zabbix"
@@ -26583,11 +26587,11 @@ msgstr "oczekiwano nazwy DNS"
 
 #: include/classes/validators/CApiInputValidator.php:4407
 msgid "a PEM-encoded certificate is expected"
-msgstr ""
+msgstr "oczekiwany jest certyfikat zakodowany w PEM"
 
 #: include/classes/validators/CApiInputValidator.php:4444
 msgid "a PEM-encoded private key is expected"
-msgstr ""
+msgstr "oczekiwany jest klucz prywatny zakodowany w PEM"
 
 #: include/classes/validators/CApiInputValidator.php:1381
 msgid "a boolean is expected"
@@ -27054,11 +27058,11 @@ msgstr "migotanie"
 
 #: include/classes/api/services/CMediatype.php:680
 msgid "both \"access_token\" and \"access_expires_in\" must be specified when marking access token valid"
-msgstr ""
+msgstr "zarówno \"access_token\", jak i \"access_expires_in\" muszą być określone podczas oznaczania tokenu dostępu jako prawidłowego"
 
 #: include/classes/api/services/CMediatype.php:695
 msgid "both \"access_token\" and \"access_expires_in\" should be either present or absent"
-msgstr ""
+msgstr "zarówno \"access_token\", jak i \"access_expires_in\" powinny być albo obecne, albo nieobecne"
 
 #: include/classes/api/services/CItemGeneral.php:265
 msgid "both username and password should be either present or empty"
@@ -27257,7 +27261,7 @@ msgstr "nie można usunąć prototypu hosta pochodzącego z szablonu"
 
 #: include/classes/api/services/CDiscoveryRule.php:726
 msgid "cannot have a nested LLD rule on a non-discovered host"
-msgstr ""
+msgstr "nie może mieć zagnieżdżonej reguły LLD na niewykrytym hoście"
 
 #: include/classes/api/services/CHostPrototype.php:1411
 msgid "cannot have more than one default interface of the same type"
@@ -27503,7 +27507,7 @@ msgstr "nie pasuje"
 
 #: jsLoader.php:268
 msgid "duplicate"
-msgstr ""
+msgstr "duplikat"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
@@ -27612,7 +27616,7 @@ msgstr "oczekiwano współrzędnej geograficznej (wartość zawierająca szeroko
 
 #: app/views/item.edit.php:224 app/views/item.edit.php:228
 msgid "global housekeeping settings"
-msgstr ""
+msgstr "globalne ustawienia housekeeping"
 
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.edit.php:891
@@ -27620,7 +27624,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:923
 msgctxt "item_form"
 msgid "global housekeeping settings"
-msgstr "globalne ustawienia porządkowania"
+msgstr "globalne ustawienia housekeeping"
 
 #: include/classes/api/services/CScript.php:726
 msgid "global script execution on Zabbix server is disabled by server configuration"
@@ -27711,7 +27715,7 @@ msgstr "oczekiwano ID wyzwalacza hosta"
 
 #: app/views/host.wizard.edit.php:134
 msgid "how to update them"
-msgstr ""
+msgstr "jak je zaktualizować"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -27776,7 +27780,7 @@ msgstr "nieprawidłowe wyrażenie zaczynając od \"%1$s\""
 #: include/classes/core/CConfigFile.php:212
 #: include/classes/core/CConfigFile.php:220
 msgid "incorrect format"
-msgstr ""
+msgstr "nieprawidłowy format"
 
 #: jsLoader.php:298
 msgid "incorrect item value type"
@@ -27804,7 +27808,7 @@ msgstr "niewłaściwe wykorzystanie funkcji \"%1$s\""
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:88
 #, c-format
 msgid "input does not match the pattern: %1$s"
-msgstr ""
+msgstr "dane wejściowe nie pasują do wzorca: %1$s"
 
 #: app/controllers/CControllerScriptUserInputCheck.php:111
 #: include/classes/api/services/CScript.php:517
@@ -27938,7 +27942,7 @@ msgstr "niepoprawny okres przechowywania trendów"
 
 #: widgets/svggraph/includes/CSvgGraphHelper.php:1119
 msgid "inverted"
-msgstr ""
+msgstr "odwrócony"
 
 #: app/views/popup.valuemap.edit.php:75 include/actions.inc.php:29
 msgid "is greater than or equals"
@@ -28543,7 +28547,7 @@ msgstr "percentile() - Percentyl P okresu T"
 #: include/classes/validators/CTimeRangesValidator.php:56
 #: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:24
 msgid "periods must be unique"
-msgstr ""
+msgstr "okresy muszą być unikalne"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:885
 msgid "pi() - Returns the Pi constant"
@@ -28768,7 +28772,7 @@ msgstr "sqrt() - Pierwiastek z wartości"
 #: include/classes/validators/CTimeRangesValidator.php:44
 #: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:23
 msgid "start time must be less than end time"
-msgstr ""
+msgstr "czas rozpoczęcia musi być wcześniejszy niż czas zakończenia"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1027
 msgid "stddevpop() - Population standard deviation"
@@ -28848,7 +28852,7 @@ msgstr "szablon o tym samym identyfikatorze UUID już istnieje"
 
 #: include/classes/api/services/CMediatype.php:688
 msgid "the \"refresh_token\" parameter must be specified when marking refresh token valid"
-msgstr ""
+msgstr "parametr \"refresh_token\" musi być określony podczas oznaczania tokenu odświeżania jako prawidłowego"
 
 #: include/classes/api/services/CItemGeneral.php:1814
 #: include/classes/api/services/CItemGeneral.php:1831

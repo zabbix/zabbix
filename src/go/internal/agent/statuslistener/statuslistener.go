@@ -82,7 +82,7 @@ func Stop() {
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Errf("cannot gacefully stop status listener: %s", err.Error())
+		log.Errf("cannot gracefully stop status listener: %s", err.Error())
 	} else {
 		log.Debugf("status listener has been stopped")
 	}

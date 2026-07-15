@@ -26,7 +26,7 @@
 /******************************************************************************
  *                                                                            *
  * Purpose: For PostgreSQL, MySQL and MariaDB:                                *
- *          stoires DBMS version as integer: MMmmuu                           *
+ *          stores DBMS version as integer: MMmmuu                            *
  *          M = major version part                                            *
  *          m = minor version part                                            *
  *          u = patch version part                                            *
@@ -436,7 +436,7 @@ void	zbx_tsdb_set_compression_availability(int compression_availabile)
  *                                                                            *
  * Purpose: retrieves TimescaleDB (TSDB) compression availability             *
  *                                                                            *
- * Return value: compression availability as as integer                       *
+ * Return value: compression availability as integer                          *
  *               0 (OFF): compression is not available                        *
  *               1 (ON): compression is available                             *
  *                                                                            *

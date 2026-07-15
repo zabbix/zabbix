@@ -10,6 +10,7 @@ z-textarea-flexible {
 		line-height: 14px;
 		white-space: break-spaces;
 		word-break: break-word;
+		border-radius: var(--input-border-radius);
 
 		@extend %form-input-style;
 		@extend %webkit-scrollbar;

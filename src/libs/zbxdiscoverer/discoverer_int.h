@@ -44,6 +44,9 @@ typedef struct
 	int			stop;
 	int			flags;
 	zbx_timekeeper_t	*timekeeper;
+	zbx_log_component_t	logger;
+	unsigned char		thread_type;
+
 }
 zbx_discoverer_worker_t;
 
