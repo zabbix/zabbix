@@ -14,6 +14,11 @@
 
 package agent
 
+import (
+	"os"
+	"path/filepath"
+)
+
 type AgentOptions struct {
 	LogType                    string   `conf:"optional,default=file"`
 	LogFile                    string   `conf:"optional,default=c:\\zabbix_agent2.log"`
@@ -45,7 +50,7 @@ type AgentOptions struct {
 	ControlSocket              string   `conf:"optional"`
 	Alias                      []string `conf:"optional"`
 	EnableProfiler             int      `conf:"optional,range=0:1,default=0"`
-	ProfilerDir                string   `conf:"optional,default=c:\\zabbix_agent2_profiles"`
+	ProfilerDir                string   `conf:"optional,default=%TEMP%\\zabbix"`
 	ProfilerMaxFilesPerProfile int      `conf:"optional,range=1:100,default=10"`
 	ProfilerInterval           int      `conf:"optional,range=1:86400,default=3600"`
 	PerfCounter                []string `conf:"optional"`
@@ -77,4 +82,13 @@ type AgentOptions struct {
 	DenyKeyRegexp  any `conf:"optional"`
 
 	Plugins map[string]interface{} `conf:"optional"`
+}
+
+// ProfilerDirectory returns the configured profiler directory with the default temporary directory expanded.
+func (a *AgentOptions) ProfilerDirectory() string {
+	if a.ProfilerDir == `%TEMP%\zabbix` {
+		return filepath.Join(os.TempDir(), "zabbix")
+	}
+
+	return a.ProfilerDir
 }

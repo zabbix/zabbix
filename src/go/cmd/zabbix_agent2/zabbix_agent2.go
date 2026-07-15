@@ -518,7 +518,7 @@ func runAgent(isForeground bool, configPath string, systemOpt agent.PluginSystem
 
 	profilerControl := profiler.New(profiler.Options{
 		Enabled:            agent.Options.EnableProfiler == 1,
-		Dir:                agent.Options.ProfilerDir,
+		Dir:                agent.Options.ProfilerDirectory(),
 		MaxFilesPerProfile: agent.Options.ProfilerMaxFilesPerProfile,
 		Interval:           time.Duration(agent.Options.ProfilerInterval) * time.Second,
 	})
