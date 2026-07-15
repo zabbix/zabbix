@@ -14,9 +14,13 @@
 **/
 
 
-class CControllerCepRuleDisable extends CControllerCepRuleGeneral {
+class CControllerCepRuleDisable extends CController {
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	protected function checkPermissions(): bool {
+		return $this->getUserType() == USER_TYPE_SUPER_ADMIN;
 	}
 
 	protected function checkInput(): bool {

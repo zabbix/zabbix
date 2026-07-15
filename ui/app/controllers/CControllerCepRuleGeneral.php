@@ -25,7 +25,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 		return $this->getUserType() == USER_TYPE_SUPER_ADMIN;
 	}
 
-	protected function checkInput(): bool {
+	protected final function checkInput(): bool {
 		$ret = $this->validateInput(self::getValidationRules(existing: $this->getAction() === 'ceprule.update'));
 
 		if (!$ret) {
