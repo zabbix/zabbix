@@ -125,7 +125,7 @@ static zbx_cep_manager_t	*cep_manager_create(const zbx_thread_info_t *info, zbx_
 	zbx_cep_queue_t		*queue;
 
 	manager = (zbx_cep_manager_t *)zbx_calloc(NULL, 1, sizeof(zbx_cep_manager_t));
-	workers = (zbx_cep_worker_t **)zbx_calloc(NULL, (size_t)CEP_WORKERS_MAX, sizeof(zbx_cep_worker_t));
+	workers = (zbx_cep_worker_t **)zbx_calloc(NULL, (size_t)CEP_WORKERS_MAX, sizeof(zbx_cep_worker_t *));
 
 	for (int i = 0; i < CEP_WORKERS_MAX; i++)
 		workers[i] = cep_worker_create(dbpool);
