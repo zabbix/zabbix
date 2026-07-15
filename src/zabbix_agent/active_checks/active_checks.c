@@ -101,6 +101,7 @@ static ZBX_THREAD_LOCAL zbx_hashset_t			commands_hash;
 static ZBX_THREAD_LOCAL zbx_vector_expression_t		regexps;
 static ZBX_THREAD_LOCAL char				*session_token;
 static ZBX_THREAD_LOCAL zbx_uint64_t			last_valueid = 0;
+static ZBX_THREAD_LOCAL unsigned char			active_comms_protocol = ZBX_TCP_PROTOCOL;
 static ZBX_THREAD_LOCAL zbx_vector_pre_persistent_t	pre_persistent_vec;	/* used for staging of data going */
 										/* into persistent files */
 /* used for deleting inactive persistent files */
@@ -942,7 +943,7 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
 	ret = zbx_comms_exchange_with_redirect(config_source_ip, addrs, config_timeout, config_timeout, 0, level,
-			config_tls, json.buffer, NULL, NULL, &data, NULL);
+			config_tls, active_comms_protocol, json.buffer, NULL, NULL, &data, NULL);
 
 	if (SUCCEED == ret && '\0' == *data)
 	{
@@ -1268,7 +1269,8 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 	level = 0 == buffer.first_error ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG;
 
 	ret = zbx_comms_exchange_with_redirect(config_source_ip, addrs, MIN(buffer.count * config_timeout, 60),
-			config_timeout, 0, level, config_tls, json.buffer, connect_callback, &json, &data, NULL);
+			config_timeout, 0, level, config_tls, active_comms_protocol, json.buffer, connect_callback, &json,
+			&data, NULL);
 
 	if (SUCCEED == ret)
 	{
@@ -1898,7 +1900,7 @@ static void	send_heartbeat_msg(zbx_vector_addr_ptr_t *addrs, const zbx_config_tl
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
 	ret = zbx_comms_exchange_with_redirect(config_source_ip, addrs, config_timeout, config_timeout, 0, level,
-			config_tls, json.buffer, NULL, NULL, NULL, &error);
+			config_tls, active_comms_protocol, json.buffer, NULL, NULL, NULL, &error);
 
 	if (SUCCEED == ret)
 	{
@@ -1935,6 +1937,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 					process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	activechks_args_in = (zbx_thread_activechk_args *)((((zbx_thread_args_t *)args))->args);
+	active_comms_protocol = ZBX_TCP_PROTOCOL;
+	if (0 != activechks_args_in->config_enable_compression)
+		active_comms_protocol |= ZBX_TCP_COMPRESS;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
