@@ -69,7 +69,7 @@ class API {
 		}
 
 		return $authenticate_response === null || $authenticate_response->errorCode === null
-			? $response->setResponse($client->callMethod($endpoint, $method, $input, $auth))
+			? $response->setResponse($client->callMethod($endpoint, $method, $input, $auth['type']))
 			: $response->setResponse($authenticate_response);
 	}
 

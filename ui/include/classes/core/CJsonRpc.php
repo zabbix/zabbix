@@ -150,7 +150,9 @@ class CJsonRpc {
 					);
 				}
 				else {
-					$result = $this->apiClient->callMethod($call['api'], $call['method'], $call['params'], $auth);
+					$result = $this->apiClient->callMethod($call['api'], $call['method'], $call['params'],
+						$auth['type']
+					);
 				}
 
 				$this->processResult($call, $result);

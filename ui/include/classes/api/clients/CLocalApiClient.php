@@ -52,13 +52,11 @@ class CLocalApiClient extends CApiClient {
 	 * @param string $requestApi     API name.
 	 * @param string $requestMethod  API method.
 	 * @param array  $params         API parameters.
-	 * @param array  $auth
-	 * @param int    $auth['type']   CJsonRpc::AUTH_TYPE_BEARER, CJsonRpc::AUTH_TYPE_COOKIE, CJsonRpc::AUTH_TYPE_DPOP
-	 * @param string $auth['auth']   Authentication token.
+	 * @param int    $auth_type      CJsonRpc::AUTH_TYPE_BEARER, CJsonRpc::AUTH_TYPE_COOKIE, CJsonRpc::AUTH_TYPE_DPOP
 	 *
 	 * @return CApiClientResponse
 	 */
-	public function callMethod(string $requestApi, string $requestMethod, array $params, array $auth) {
+	public function callMethod(string $requestApi, string $requestMethod, array $params, int $auth_type) {
 		global $DB;
 
 		$api = strtolower($requestApi);
@@ -77,10 +75,8 @@ class CLocalApiClient extends CApiClient {
 		$newTransaction = false;
 		try {
 			// check permissions
-			if (APP::getMode() === APP::EXEC_MODE_API
-					&& ($this->requiresAuthentication($api, $method)
-						|| ($this->supportsAuthentication($api, $method) && $auth['auth'] !== null))
-					&& !$this->isAllowedMethod($api, $method, $auth['type'])) {
+			if (APP::getMode() === APP::EXEC_MODE_API && $this->requiresAuthentication($api, $method)
+					&& !$this->isAllowedMethod($api, $method, $auth_type)) {
 				$response->errorCode = ZBX_API_ERROR_PERMISSIONS;
 				$response->errorMessage = _s('No permissions to call "%1$s.%2$s".', $requestApi, $requestMethod);
 
@@ -203,10 +199,6 @@ class CLocalApiClient extends CApiClient {
 		$api_service = $this->serviceFactory->getObject($api);
 		$user_data = $api_service::$userData;
 		$method_rules = $api_service::ACCESS_RULES[$method];
-
-		if (!array_key_exists('min_user_type', $method_rules)) {
-			return true;
-		}
 
 		if (!in_array($user_data['type'], [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 				|| $user_data['type'] < $method_rules['min_user_type']) {
