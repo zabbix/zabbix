@@ -1,1 +1,1 @@
-..F....... [ZBX-27961] fixed cancel confirmation for popup forms in user API tokens and administration proxy edit forms (scernisenko)
+..F....... [ZBX-27961] fixed delete cancel confirmation in API tokens and proxy group edit forms (scernisenko)
