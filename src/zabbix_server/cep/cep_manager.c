@@ -109,6 +109,7 @@ static void	cep_manager_free(zbx_cep_manager_t *manager)
  *                                                                            *
  * Parameters: workers_num - [IN] initial number of workers                   *
  *             dbpool      - [IN] database connection pool                    *
+ *             stats       - [OUT] initialization statistics                  *
  *             error       - [OUT] error message                              *
  *                                                                            *
  * Return value: pointer to the created CEP manager instance or NULL on       *
@@ -116,7 +117,7 @@ static void	cep_manager_free(zbx_cep_manager_t *manager)
  *                                                                            *
  ******************************************************************************/
 static zbx_cep_manager_t	*cep_manager_create(const zbx_thread_info_t *info, zbx_dbconn_pool_t *dbpool,
-		char **error)
+		zbx_cep_init_stats_t *stats, char **error)
 {
 	zbx_cep_manager_t	*manager;
 	int			ret = FAIL;
@@ -152,7 +153,7 @@ static zbx_cep_manager_t	*cep_manager_create(const zbx_thread_info_t *info, zbx_
 	zbx_cep_api_acquire();
 
 	cep_cache_acquire(&cep);
-	cep_init(cep, dbpool);
+	cep_init(cep, dbpool, stats);
 	cep_dump(cep, "cache initialization");
 	cep_cache_release(&cep);
 
@@ -533,6 +534,7 @@ void	*zbx_cep_manager_thread(void *args)
 	zbx_vector_mw_task_ptr_t		tasks;
 	int					shutdown = 0;
 	zbx_cep_stats_t				stats = {0};
+	zbx_cep_init_stats_t			init_stats;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -545,12 +547,16 @@ void	*zbx_cep_manager_thread(void *args)
 
 	zbx_vector_mw_task_ptr_create(&tasks);
 
-	if (NULL == (manager = cep_manager_create(info, unit_args->shared->dbpool, &error)))
+	if (NULL == (manager = cep_manager_create(info, unit_args->shared->dbpool, &init_stats, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize CEP manager: %s", error);
 		zbx_free(error);
 		zbx_exit(EXIT_FAILURE);
 	}
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "loaded %d events in %.3fs, %d tags in %.3fs, %d suppress data in %.3fs",
+			init_stats.events_num, init_stats.events_time, init_stats.tags_num, init_stats.tags_time,
+			init_stats.suppress_num, init_stats.suppress_time);
 
 	/* initialize statistics */
 	time_stat = zbx_time();

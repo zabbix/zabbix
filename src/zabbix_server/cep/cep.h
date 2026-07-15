@@ -32,8 +32,19 @@ zbx_cep_event_handle_t	cep_add_event(zbx_cep_t *cep, zbx_cep_event_t *event);
 zbx_uint32_t	cep_event_handle_unref(zbx_cep_event_handle_t h);
 zbx_cep_event_t	*cep_event_handle_remove(zbx_cep_t *cep, zbx_cep_event_handle_t h);
 
+typedef struct
+{
+	int	events_num;
+	int	tags_num;
+	int	suppress_num;
+	double	events_time;
+	double	tags_time;
+	double	suppress_time;
+}
+zbx_cep_init_stats_t;
+
 zbx_cep_t	*cep_create(void);
-void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool);
+void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool, zbx_cep_init_stats_t *stats);
 void	cep_destroy(zbx_cep_t *cep);
 
 void	cep_sync_object_state(zbx_cep_t *cep, zbx_dbconn_t *db);

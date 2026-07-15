@@ -408,9 +408,10 @@ int	cep_origin_problem(const zbx_cep_origin_t *origin)
  *                                                                            *
  * Parameters: cache - [IN/OUT] cache context                                 *
  *             db    - [IN]     database connection                           *
+ *             stats  - [OUT] initialization statistics                       *
  *                                                                            *
  ******************************************************************************/
-static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
+static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db, zbx_cep_init_stats_t *stats)
 {
 #define CEP_PROBLEM_BATCH	5000
 
@@ -421,9 +422,12 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 	zbx_uint64_t		eventid = 0;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
-	int			events_num;
+	int			events_num, tags_num = 0;
+	double			events_time, tags_time;
 
 	zbx_vector_uint64_create(&eventids);
+
+	events_time = zbx_time();
 
 	do
 	{
@@ -466,6 +470,10 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 	}
 	while (CEP_PROBLEM_BATCH == events_num);
 
+	tags_time = zbx_time();
+	stats->events_time = tags_time - events_time;
+	stats->events_num = eventids.values_num;
+
 	if (0 != eventids.values_num)
 	{
 		zbx_db_large_query_t	query;
@@ -495,9 +503,14 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
 			tag.tag = zbx_strdup(NULL, row[1]);
 			tag.value = zbx_strdup(NULL, row[2]);
 			zbx_vector_lite_tag_append(&event->tags, tag);
+
+			tags_num++;
 		}
 		zbx_db_large_query_clear(&query);
 	}
+
+	stats->tags_time = zbx_time() - tags_time;
+	stats->tags_num = tags_num;
 
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&eventids);
@@ -511,13 +524,18 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db)
  *                                                                            *
  * Parameters: cache - [IN/OUT] cache context                                 *
  *             db    - [IN]     database connection                           *
+ *             stats  - [OUT] initialization statistics                       *
  *                                                                            *
  ******************************************************************************/
-static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
+static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db, zbx_cep_init_stats_t *stats)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_cep_event_handle_t	h = NULL;
+	double			suppress_time;
+	int			suppress_num = 0;
+
+	suppress_time = zbx_time();
 
 	result = zbx_dbconn_select(db, "select eventid,maintenanceid from event_suppress order by eventid");
 
@@ -531,10 +549,8 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
 		if (NULL == h || h->eventid != eventid)
 		{
 			if (NULL == (h = cep_acquire_event_handle_by_eventid(cep, eventid)))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
-			}
+
 			cep_release_event_handle(cep, h);
 		}
 
@@ -543,7 +559,12 @@ static void	cep_load_maintenances(zbx_cep_t *cep, zbx_dbconn_t *db)
 		suppress_local.until = 0;
 
 		zbx_vector_db_event_suppress_append(&h->event->suppress, suppress_local);
+
+		suppress_num++;
 	}
+
+	stats->suppress_time = zbx_time() - suppress_time;
+	stats->suppress_num = suppress_num;
 
 	zbx_db_free_result(result);
 }
@@ -806,10 +827,11 @@ void	cep_sync_object_state(zbx_cep_t *cep, zbx_dbconn_t *db)
  * Purpose: initialize cache                                                  *
  *                                                                            *
  * Parameters: cep   - [IN/OUT] cep cache                                     *
- *             dbpool - [IN]     database connection pool                     *
+ *             dbpool - [IN] database connection pool                         *
+ *             stats  - [OUT] initialization statistics                       *
  *                                                                            *
  ******************************************************************************/
-void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool)
+void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool, zbx_cep_init_stats_t *stats)
 {
 	zbx_dbconn_t	*db;
 
@@ -817,8 +839,8 @@ void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool)
 
 	db = zbx_dbconn_pool_acquire_connection(dbpool);
 
-	cep_load_problems(cep, db);
-	cep_load_maintenances(cep, db);
+	cep_load_problems(cep, db, stats);
+	cep_load_maintenances(cep, db, stats);
 
 	zbx_dbconn_pool_release_connection(dbpool, db);
 }
