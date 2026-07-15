@@ -590,6 +590,7 @@ typedef struct
 	int		auditlog_mode;
 	int		proxy_secrets_provider;
 	int		enable_mobile_devices;
+
 	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
 	zbx_config_db_t	db;
 
