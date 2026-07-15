@@ -120,6 +120,10 @@ class CControllerLldRulePrototypeEdit extends CController
 				$ret = false;
 				error(_s('Incorrect value for "%1$s" field.', 'parent_discoveryid'));
 			}
+			elseif (!$this->hasInput('itemid') && !$this->hasInput('hostid')) {
+				$ret = false;
+				error(_s('Incorrect value for "%1$s" field.', 'hostid'));
+			}
 		}
 
 		if (!$ret) {
