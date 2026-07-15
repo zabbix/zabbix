@@ -3352,7 +3352,7 @@ class CAction extends CApiService {
 
 				if (!array_key_exists($condition['value'], $proxies)) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS,_s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i1 + 1).'/filter/conditions/'.($i2 + 1).'/value/',
+						'/'.($i1 + 1).'/filter/conditions/'.($i2 + 1).'/value',
 						_('object does not exist, or you have no permissions to it')
 					));
 				}
