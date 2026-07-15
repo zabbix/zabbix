@@ -1081,39 +1081,19 @@ static int	DBpatch_7050083(void)
 	return ret;
 }
 
-typedef struct
-{
-	int		eventsource;
-	int		recovery;
-	const char	*subject;
-	const char	*message;
-}
-zbx_media_type_message_t;
-
 static int	DBpatch_7050084(void)
 {
-	zbx_db_insert_t					db_insert;
-	zbx_uint64_t					media_typeid;
-	int						ret, i;
-	static const zbx_media_type_message_t		messages[] = {
-			{0, 0, "{HOST.NAME} - {EVENT.NAME}",
-					"Started on {{EVENT.TIMESTAMP}.fmttime(\"%x %X\")}\n"
-					"Data: {EVENT.OPDATA}"},
-			{0, 1, "[RESOLVED] {HOST.NAME} - {EVENT.NAME}",
-					"Resolved on {{EVENT.RECOVERY.TIMESTAMP}.fmttime(\"%x %X\")}\n"
-					"Duration: {EVENT.DURATION}"},
-			{0, 2, "[UPDATED] {HOST.NAME} - {EVENT.NAME}",
-					"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem on "
-					"{{EVENT.UPDATE.TIMESTAMP}.fmttime(\"%x %X\")}\n{EVENT.UPDATE.MESSAGE}"}
-	};
+	zbx_db_insert_t	db_insert;
+	zbx_uint64_t	mediatypeid;
+	int		ret;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	media_typeid = zbx_db_get_maxid("media_type");
+	mediatypeid = zbx_db_get_maxid("media_type");
 
 	if (ZBX_DB_OK > zbx_db_execute("insert into media_type (mediatypeid,type,name,script,description) values "
-			"(" ZBX_FS_UI64 ",5,'Push notification','','')", media_typeid))
+			"(" ZBX_FS_UI64 ",5,'Push notification','','')", mediatypeid))
 	{
 		return FAIL;
 	}
@@ -1121,11 +1101,15 @@ static int	DBpatch_7050084(void)
 	zbx_db_insert_prepare(&db_insert, "media_type_message", "mediatype_messageid", "mediatypeid", "eventsource",
 			"recovery", "subject", "message", (char *)NULL);
 
-	for (i = 0; i < (int)ARRSIZE(messages); i++)
-	{
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), media_typeid, messages[i].eventsource,
-				messages[i].recovery, messages[i].subject, messages[i].message);
-	}
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), mediatypeid, 0, 0, "{HOST.NAME} - {EVENT.NAME}",
+			"Started on {{EVENT.TIMESTAMP}.fmttime(\"%x %X\")}\nData: {EVENT.OPDATA}");
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), mediatypeid, 0, 1,
+			"[RESOLVED] {HOST.NAME} - {EVENT.NAME}",
+			"Resolved on {{EVENT.RECOVERY.TIMESTAMP}.fmttime(\"%x %X\")}\nDuration: {EVENT.DURATION}");
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), mediatypeid, 0, 2,
+			"[UPDATED] {HOST.NAME} - {EVENT.NAME}",
+			"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem on "
+			"{{EVENT.UPDATE.TIMESTAMP}.fmttime(\"%x %X\")}\n{EVENT.UPDATE.MESSAGE}");
 
 	zbx_db_insert_autoincrement(&db_insert, "mediatype_messageid");
 	ret = zbx_db_insert_execute(&db_insert);
