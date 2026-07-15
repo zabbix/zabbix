@@ -424,32 +424,32 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 	return str;
 }
 
-static char	*tq_sql_dyn_get_exists_check(const char *atom, zbx_tq_column_type_t type, const char *key,
-		const tq_sql_ctx_t *ctx)
-{
-	if (ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == type)
-		return tq_sql_dyn_get_condition_exists(atom, key, ctx);
-
-	return zbx_dsprintf(NULL, "(%s IS NOT NULL)", atom);
-}
-
 static char	*tq_sql_dyn_get_atom_condition(const char *atom, zbx_tq_column_type_t type, const char *key,
 		const char *value, zbx_tq_operator_t operator, const tq_sql_ctx_t *ctx)
 {
 	if (ZBX_TQ_OPERATOR_EQUAL == operator || ZBX_TQ_OPERATOR_NOT_EQUAL == operator)
 	{
-		char	*str;
-		char	*operand = tq_sql_dyn_get_operand(atom, type, key, ctx);
-		char	*value_esc = tq_sql_dyn_escape_string(value, ctx);
-		char	*not_null_check = tq_sql_dyn_get_exists_check(atom, type, key, ctx);
+		char		*str;
+		char		*operand = tq_sql_dyn_get_operand(atom, type, key, ctx);
+		char		*value_esc = tq_sql_dyn_escape_string(value, ctx);
+		const char	*operator_str = (ZBX_TQ_OPERATOR_EQUAL == operator ? "=" : "<>");
 
-		/* ensure that "not equal" results in false if attribute key is missing */
-		str = zbx_dsprintf(NULL, "(%s AND %s %s %s)", not_null_check, operand,
-				(ZBX_TQ_OPERATOR_EQUAL == operator ? "=" : "<>"), value_esc);
+		if (ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == type)
+		{
+			char	*exists_check = tq_sql_dyn_get_condition_exists(atom, key, ctx);
+
+			/* ensure that "not equal" results in false if attribute key is missing */
+			str = zbx_dsprintf(NULL, "(%s AND %s%s%s)", exists_check, operand, operator_str, value_esc);
+
+			zbx_free(exists_check);
+		}
+		else
+		{
+			str = zbx_dsprintf(NULL, "(%s%s%s)", operand, operator_str, value_esc);
+		}
 
 		zbx_free(operand);
 		zbx_free(value_esc);
-		zbx_free(not_null_check);
 
 		return	str;
 	}
@@ -457,14 +457,10 @@ static char	*tq_sql_dyn_get_atom_condition(const char *atom, zbx_tq_column_type_
 	{
 		char	*operand = tq_sql_dyn_get_operand(atom, type, key, ctx);
 		char	*str = tq_sql_dyn_get_condition_contains(operand, value, ctx);
-		char	*not_null_check = tq_sql_dyn_get_exists_check(atom, type, key, ctx);
 
-		/* check for NULL for consistency with "equal"/"not equal" behavior */
-		str = zbx_dsprintf(str, "(%s AND %s%s)", not_null_check,
-				(ZBX_TQ_OPERATOR_CONTAINS == operator ? "" : "NOT "), str);
+		str = zbx_dsprintf(str, "(%s%s)", (ZBX_TQ_OPERATOR_CONTAINS == operator ? "" : "NOT "), str);
 
 		zbx_free(operand);
-		zbx_free(not_null_check);
 
 		return str;
 	}
