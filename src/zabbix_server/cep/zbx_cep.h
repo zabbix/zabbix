@@ -16,6 +16,7 @@
 #define ZABBIX_ZBX_CEP_H
 
 #include "zbxalgo.h"
+#include "zbxdbhigh.h"
 #include "zbxtypes_ext.h"
 #include "zbxdbhigh.h"
 

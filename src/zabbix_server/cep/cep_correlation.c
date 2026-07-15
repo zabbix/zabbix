@@ -589,8 +589,6 @@ static zbx_db_event	*cep_create_close_event(const zbx_db_event *problem)
 		}
 	}
 
-	cep_event_expect(ok);
-
 	return ok;
 }
 
@@ -609,8 +607,12 @@ static void	correlation_add_close_new_task(zbx_vector_mw_task_ptr_t *tasks, cons
 		const zbx_correlation_result_t *result)
 {
 	zbx_mw_task_t	*task;
+	zbx_db_event	*close_event;
 
-	task = cep_create_task_event_by_correlation(cep_create_close_event(db_event), result->eventid,
+	close_event = cep_create_close_event(db_event);
+	cep_event_expect(close_event);
+
+	task = cep_create_task_event_by_correlation(close_event, result->eventid,
 			result->correlationid, db_event->eventid);
 
 	/* 'close new' operations must skip actions for the problem and generated ok event */
