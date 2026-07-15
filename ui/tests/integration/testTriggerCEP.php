@@ -3915,7 +3915,7 @@ HEREDOC;
 
 			// Start additional maintenances on the already-suppressed host: the extra overlapping
 			// maintenances must not disturb the existing suppression.
-			//$this->startDiscHostMaintenances(10);
+			$this->startDiscHostMaintenances(10);
 		}
 
 		// Wave 1 is fully open ($m problems), so $m problem events are tagged.
