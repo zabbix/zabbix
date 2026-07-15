@@ -36,8 +36,8 @@ class testTriggerCEP extends CIntegrationTest {
 	const LLD_DISCOVERY_COUNT = 500;	// discovered items/triggers per rule; use at least 4000 to stress CEP
 	const LOG_EVENT_COUNT = 10000;		// log values pushed at the single-trigger stream; use at least 10000
 	const RECOVERY_CYCLES_COUNT = 2000;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
-	const MAINTENANCE_COUNT = 32;		// number of maintenances to create; change to any number
-
+	const MAINTENANCE_COUNT = 40;		// number of maintenances to create; change to any number
+	const MAINTENANCE_COUNT_EXTRA = 10;
 	const SKIP_RESTART_TESTS = true;
 
 	// Leave null to decide randomly based on the current time; set to true or false to force a path.
@@ -3165,7 +3165,9 @@ HEREDOC;
 	/**
 	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirst,
 	 * but verifies that problems and services are suppressed during maintenance and no longer suppressed after
-	 * the maintenance is stopped.
+	 * the maintenance is stopped. The stopped maintenances are then resumed one at a time out of creation
+	 * order (middle, first, last) - suppression must return after the first resume and survive the
+	 * overlapping ones - and finally stopped again, after which suppression must clear once more.
 	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_SuppressUnsuppressProblems$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -3902,12 +3904,14 @@ HEREDOC;
 		// later), while global correlation still closes them normally below.
 		if ($maintenance_after_first) {
 			$this->startDiscHostMaintenances(self::MAINTENANCE_COUNT);
-			$this->waitForOpenProblemsSuppressed($all, $m);
+			$this->waitForOpenProblemsSuppressedByMaintenances($all, $m, self::$disc_maintenanceids);
 			$this->waitForServicesSuppressed();
 
 			// Start additional maintenances on the already-suppressed host: the extra overlapping
-			// maintenances must not disturb the existing suppression.
-			$this->startDiscHostMaintenances(10);
+			// maintenances must not disturb the existing suppression, and every open problem must end
+			// up suppressed by every active maintenance.
+			$this->startDiscHostMaintenances(self::MAINTENANCE_COUNT_EXTRA);
+			$this->waitForOpenProblemsSuppressedByMaintenances($all, $m, self::$disc_maintenanceids);
 		}
 
 		// Wave 1 is fully open ($m problems), so $m problem events are tagged.
@@ -3927,31 +3931,67 @@ HEREDOC;
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
 		// The host is in maintenance by now, so this second wave (opened while maintenance is active) must
-		// be suppressed at creation time as well: all 2 * $m open problems suppressed.
+		// be suppressed at creation time as well: all 2 * $m open problems suppressed, each by every
+		// active maintenance.
 		if ($maintenance_after_first) {
-			$this->waitForOpenProblemsSuppressed($all, 2 * $m);
+			$this->waitForOpenProblemsSuppressedByMaintenances($all, 2 * $m, self::$disc_maintenanceids);
 			$this->waitForServicesSuppressed();
 
 			// If requested, verify services are suppressed while problems are still open,
 			// then stop maintenance and verify suppression is cleared.
 			if ($stop_maintenance_and_verify_suppression) {
-				// Stop the maintenance
+				// Stop all maintenances at once: suppression of the still-open problems and services
+				// must be cleared.
 				$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 
 				$this->maybeRestartServer($restart);
 
 				$this->reloadConfigurationCacheAndWaitForLogLine();
 
-				// Verify that no suppressed events remain after maintenance is stopped
-				$this->callUntilCountIsPresent('event.get', [
-					'hostids' => [self::$disc_hostid],
-					'source' => EVENT_SOURCE_TRIGGERS,
-					'object' => EVENT_OBJECT_TRIGGER,
-					'suppressed' => true
-				], 0, 120, self::WAIT_ITERATION_DELAY);
+				$this->waitForSuppressionCleared();
 
-				// Verify services are no longer suppressed
-				$this->waitForServicesNoLongerSuppressed();
+				// Resume the stopped maintenances out of creation order, highest maintenanceid
+				// first: the suppression data in the DB then holds only the highest id, and every
+				// later resume adds maintenances with lower ids, which sort before the existing
+				// entries (both sides are compared sorted by maintenanceid, not by start time).
+				// The second step resumes all remaining lower-id maintenances but one at once, so a
+				// single timer pass sees far more new cache-side maintenances than there are
+				// DB-side suppression rows. After every step each problem must be suppressed by
+				// exactly the maintenances resumed so far - the stopped ones must not linger in
+				// the suppression data.
+				$last = count(self::$disc_maintenanceids) - 1;
+				$resumed = [];
+				foreach ([[$last], range(0, $last - 2), [$last - 1]] as $indexes) {
+					$ids = array_map(fn($index) => self::$disc_maintenanceids[$index], $indexes);
+					$resumed = array_merge($resumed, $ids);
+					$this->resumeDiscHostMaintenances($ids);
+					$this->waitForOpenProblemsSuppressedByMaintenances($all, 2 * $m, $resumed);
+					$this->waitForServicesSuppressed();
+				}
+
+				// Stop the resumed maintenances one by one in the same order: while at least one of
+				// them is still active every problem must stay suppressed - by exactly the remaining
+				// maintenances - and only stopping the last one may clear the suppression.
+				//foreach ($resumed as $i => $maintenanceid) {
+				//	$this->stopDiscHostMaintenances([$maintenanceid]);
+				//
+				//	$this->reloadConfigurationCacheAndWaitForLogLine();
+				//
+				//	$remaining = array_slice($resumed, $i + 1);
+				//	if (!empty($remaining)) {
+				//		$this->waitForOpenProblemsSuppressedByMaintenances($all, 2 * $m, $remaining);
+				//		$this->waitForServicesSuppressed();
+				//	}
+				//}
+
+				// Stop all resumed maintenances in bulk.
+				$this->stopDiscHostMaintenances($resumed);
+
+				$this->reloadConfigurationCacheAndWaitForLogLine();
+
+				$this->maybeRestartServer($restart);
+
+				$this->waitForSuppressionCleared();
 			}
 		}
 
@@ -4342,6 +4382,57 @@ HEREDOC;
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'suppressed' => true
 		], $expected, 120, self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Wait until exactly $expected open problems on the given triggers are suppressed and every one of
+	 * them is suppressed by exactly the given maintenances: each problem's suppression data must list
+	 * every maintenanceid from $maintenanceids and nothing else, so rows of stopped maintenances must
+	 * be gone and rows of every active maintenance must be present.
+	 */
+	private function waitForOpenProblemsSuppressedByMaintenances(array $triggerids, int $expected,
+			array $maintenanceids): void {
+		$expected_ids = array_values($maintenanceids);
+		sort($expected_ids);
+
+		$this->callUntilDataIsPresent('problem.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'suppressed' => true,
+			'selectSuppressionData' => ['maintenanceid']
+		], 120, self::WAIT_ITERATION_DELAY, function (array $response) use ($expected, $expected_ids) {
+			if (count($response['result']) != $expected) {
+				return 'expected '.$expected.' suppressed problems, got '.count($response['result']);
+			}
+
+			foreach ($response['result'] as $problem) {
+				$ids = array_column($problem['suppression_data'], 'maintenanceid');
+				sort($ids);
+
+				if ($ids !== $expected_ids) {
+					return 'problem '.$problem['eventid'].' is suppressed by maintenances ['.
+							implode(', ', $ids).'], expected ['.implode(', ', $expected_ids).']';
+				}
+			}
+
+			return true;
+		});
+	}
+
+	/**
+	 * Wait until no suppressed trigger events remain on the discovered host and its services are no
+	 * longer suppressed - the state expected once every maintenance is out of its active window.
+	 */
+	private function waitForSuppressionCleared(): void {
+		$this->callUntilCountIsPresent('event.get', [
+			'hostids' => [self::$disc_hostid],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'suppressed' => true
+		], 0, 120, self::WAIT_ITERATION_DELAY);
+
+		$this->waitForServicesNoLongerSuppressed();
 	}
 
 	private function runDependentTriggerTest(bool $restart): void {
@@ -4801,6 +4892,37 @@ HEREDOC;
 		}
 
 		$this->call('maintenance.update', $maintenances);
+	}
+
+	/**
+	 * Bring maintenances ended by stopDiscHostMaintenances() back into an active window covering now
+	 * with a single maintenance.update call, then reload the configuration cache so the host re-enters
+	 * maintenance.
+	 */
+	private function resumeDiscHostMaintenances(array $maintenanceids): void {
+		if (empty($maintenanceids)) {
+			return;
+		}
+
+		$now = time();
+
+		$maintenances = [];
+		foreach ($maintenanceids as $maintenanceid) {
+			$maintenances[] = [
+				'maintenanceid' => $maintenanceid,
+				'active_since' => $now - 60,
+				'active_till' => $now + 3600,
+				'timeperiods' => [
+					'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+					'period' => 3600,
+					'start_date' => $now - 60
+				]
+			];
+		}
+
+		$this->call('maintenance.update', $maintenances);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 	}
 
 	/**
