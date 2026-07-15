@@ -1332,7 +1332,7 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 	}
 
 	if (SUCCEED == (res = zbx_db_insert_execute(&db_insert)))
-		zbx_db_insert_execute(&db_insert_rt);
+		res = zbx_db_insert_execute(&db_insert_rt);
 
 	zbx_db_insert_clean(&db_insert);
 	zbx_db_insert_clean(&db_insert_rt);
