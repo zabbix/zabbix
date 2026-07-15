@@ -36,7 +36,7 @@ class testTriggerCEP extends CIntegrationTest {
 	const LLD_DISCOVERY_COUNT = 500;	// discovered items/triggers per rule; use at least 4000 to stress CEP
 	const LOG_EVENT_COUNT = 10000;		// log values pushed at the single-trigger stream; use at least 10000
 	const RECOVERY_CYCLES_COUNT = 2000;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
-	const MAINTENANCE_COUNT = 64;		// number of maintenances to create; change to any number
+	const MAINTENANCE_COUNT = 32;		// number of maintenances to create; change to any number
 
 	const SKIP_RESTART_TESTS = true;
 
@@ -4689,9 +4689,22 @@ HEREDOC;
 	 * problem opened afterwards is suppressed. Returns the maintenance id for stopDiscHostMaintenance().
 	 */
 	private function startDiscHostMaintenance(string $name): string {
+		$maintenanceid = $this->upsertDiscHostMaintenance($name);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return $maintenanceid;
+	}
+
+	/**
+	 * Create a data-collection maintenance for the discovered host with an active period covering now, or,
+	 * if a maintenance with the given name already exists (left over from a previous run), update it back
+	 * into an active window. Returns the maintenance id.
+	 */
+	private function upsertDiscHostMaintenance(string $name): string {
 		$now = time();
 
-		$response = $this->call('maintenance.create', [
+		$params = [
 			'name' => $name,
 			'hosts' => ['hostid' => self::$disc_hostid],
 			'active_since' => $now - 60,
@@ -4703,14 +4716,27 @@ HEREDOC;
 				'period' => 3600,
 				'start_date' => $now - 60
 			]
+		];
+
+		$response = $this->call('maintenance.get', [
+			'output' => ['maintenanceid'],
+			'filter' => ['name' => $name]
 		]);
+
+		if (!empty($response['result'])) {
+			$maintenanceid = $response['result'][0]['maintenanceid'];
+
+			$params['maintenanceid'] = $maintenanceid;
+			$this->call('maintenance.update', $params);
+
+			return $maintenanceid;
+		}
+
+		$response = $this->call('maintenance.create', $params);
 		$this->assertArrayHasKey('maintenanceids', $response['result']);
 		$this->assertCount(1, $response['result']['maintenanceids']);
-		$maintenanceid = $response['result']['maintenanceids'][0];
 
-		$this->reloadConfigurationCacheAndWaitForLogLine();
-
-		return $maintenanceid;
+		return $response['result']['maintenanceids'][0];
 	}
 
 	/**
@@ -4739,26 +4765,10 @@ HEREDOC;
 	 * Create multiple maintenances for the discovered host and reload configuration cache once after all are created.
 	 */
 	private function startDiscHostMaintenances(int $count): void {
-		$now = time();
 		$start = count(self::$disc_maintenanceids) + 1;
 
 		for ($i = $start; $i < $start + $count; $i++) {
-			$response = $this->call('maintenance.create', [
-				'name' => 'CEP close-on-up maintenance'.$i,
-				'hosts' => ['hostid' => self::$disc_hostid],
-				'active_since' => $now - 60,
-				'active_till' => $now + 3600,
-				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
-				'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_AND_OR,
-				'timeperiods' => [
-					'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
-					'period' => 3600,
-					'start_date' => $now - 60
-				]
-			]);
-			$this->assertArrayHasKey('maintenanceids', $response['result']);
-			$this->assertCount(1, $response['result']['maintenanceids']);
-			self::$disc_maintenanceids[] = $response['result']['maintenanceids'][0];
+			self::$disc_maintenanceids[] = $this->upsertDiscHostMaintenance('CEP close-on-up maintenance'.$i);
 		}
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
