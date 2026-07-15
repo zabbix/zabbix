@@ -1088,8 +1088,8 @@ static int	DBpatch_7050084(void)
 
 	zbx_uint64_t	media_typeid = zbx_db_get_maxid("media_type");
 
-	if (ZBX_DB_OK > zbx_db_execute("insert into media_type (mediatypeid,type,name) values "
-			"(" ZBX_FS_UI64 ",5,'Push notification')", media_typeid))
+	if (ZBX_DB_OK > zbx_db_execute("insert into media_type (mediatypeid,type,name,script,description) values "
+			"(" ZBX_FS_UI64 ",5,'Push notification','','')", media_typeid))
 	{
 		return FAIL;
 	}
