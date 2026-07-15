@@ -3110,9 +3110,7 @@ HEREDOC;
 			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 		}
 		finally {
-			foreach (self::$disc_maintenanceids as $maintenanceid) {
-				$this->stopDiscHostMaintenance($maintenanceid);
-			}
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 			$this->reloadConfigurationCacheAndWaitForLogLine();
 
 			// Moving the maintenance out of its active window only changes the configuration; the timer process
@@ -3147,9 +3145,7 @@ HEREDOC;
 			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 		}
 		finally {
-			foreach (self::$disc_maintenanceids as $maintenanceid) {
-				$this->stopDiscHostMaintenance($maintenanceid);
-			}
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 			$this->reloadConfigurationCacheAndWaitForLogLine();
 
 			// Moving the maintenance out of its active window only changes the configuration; the timer process
@@ -3181,9 +3177,7 @@ HEREDOC;
 		}
 		finally {
 			// Clean up: ensure maintenance is stopped
-			foreach (self::$disc_maintenanceids as $maintenanceid) {
-				$this->stopDiscHostMaintenance($maintenanceid);
-			}
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 		}
 	}
 
@@ -3202,9 +3196,7 @@ HEREDOC;
 		}
 		finally {
 			// Clean up: ensure maintenance is stopped
-			foreach (self::$disc_maintenanceids as $maintenanceid) {
-				$this->stopDiscHostMaintenance($maintenanceid);
-			}
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 		}
 	}
 
@@ -3944,9 +3936,7 @@ HEREDOC;
 			// then stop maintenance and verify suppression is cleared.
 			if ($stop_maintenance_and_verify_suppression) {
 				// Stop the maintenance
-				foreach (self::$disc_maintenanceids as $maintenanceid) {
-					$this->stopDiscHostMaintenance($maintenanceid);
-				}
+				$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 
 				$this->maybeRestartServer($restart);
 
@@ -4702,10 +4692,23 @@ HEREDOC;
 	 * into an active window. Returns the maintenance id.
 	 */
 	private function upsertDiscHostMaintenance(string $name): string {
-		$now = time();
+		$maintenanceids = $this->upsertDiscHostMaintenances([$name]);
 
-		$params = [
-			'name' => $name,
+		return $maintenanceids[0];
+	}
+
+	/**
+	 * Bulk variant of upsertDiscHostMaintenance(): one maintenance.get to find leftovers by name, then a
+	 * single maintenance.update for the existing ones and a single maintenance.create for the rest.
+	 * Returns the maintenance ids in the same order as the given names.
+	 */
+	private function upsertDiscHostMaintenances(array $names): array {
+		if (empty($names)) {
+			return [];
+		}
+
+		$now = time();
+		$defaults = [
 			'hosts' => ['hostid' => self::$disc_hostid],
 			'active_since' => $now - 60,
 			'active_till' => $now + 3600,
@@ -4719,24 +4722,46 @@ HEREDOC;
 		];
 
 		$response = $this->call('maintenance.get', [
-			'output' => ['maintenanceid'],
-			'filter' => ['name' => $name]
+			'output' => ['maintenanceid', 'name'],
+			'filter' => ['name' => $names]
 		]);
 
-		if (!empty($response['result'])) {
-			$maintenanceid = $response['result'][0]['maintenanceid'];
-
-			$params['maintenanceid'] = $maintenanceid;
-			$this->call('maintenance.update', $params);
-
-			return $maintenanceid;
+		$ids_by_name = [];
+		foreach ($response['result'] as $maintenance) {
+			$ids_by_name[$maintenance['name']] = $maintenance['maintenanceid'];
 		}
 
-		$response = $this->call('maintenance.create', $params);
-		$this->assertArrayHasKey('maintenanceids', $response['result']);
-		$this->assertCount(1, $response['result']['maintenanceids']);
+		$updates = [];
+		$creates = [];
+		foreach ($names as $name) {
+			if (isset($ids_by_name[$name])) {
+				$updates[] = array_merge(['maintenanceid' => $ids_by_name[$name]], $defaults);
+			}
+			else {
+				$creates[] = array_merge(['name' => $name], $defaults);
+			}
+		}
 
-		return $response['result']['maintenanceids'][0];
+		if (!empty($updates)) {
+			$this->call('maintenance.update', $updates);
+		}
+
+		if (!empty($creates)) {
+			$response = $this->call('maintenance.create', $creates);
+			$this->assertArrayHasKey('maintenanceids', $response['result']);
+			$this->assertCount(count($creates), $response['result']['maintenanceids']);
+
+			foreach ($creates as $index => $maintenance) {
+				$ids_by_name[$maintenance['name']] = $response['result']['maintenanceids'][$index];
+			}
+		}
+
+		$maintenanceids = [];
+		foreach ($names as $name) {
+			$maintenanceids[] = $ids_by_name[$name];
+		}
+
+		return $maintenanceids;
 	}
 
 	/**
@@ -4745,20 +4770,37 @@ HEREDOC;
 	 * leaves maintenance before the rest of the suite runs.
 	 */
 	private function stopDiscHostMaintenance(string $maintenanceid): void {
-		// Ten years ahead - a start that will never come within the test run, so the maintenance stays
+		$this->stopDiscHostMaintenances([$maintenanceid]);
+	}
+
+	/**
+	 * Bulk variant of stopDiscHostMaintenance(): push the active period of all given maintenances out of
+	 * the current window with a single maintenance.update call.
+	 */
+	private function stopDiscHostMaintenances(array $maintenanceids): void {
+		if (empty($maintenanceids)) {
+			return;
+		}
+
+		// Ten years ahead - a start that will never come within the test run, so the maintenances stay
 		// defined but idle and the host is taken out of maintenance.
 		$future = time() + 10 * 365 * 24 * 3600;
 
-		$this->call('maintenance.update', [
-			'maintenanceid' => $maintenanceid,
-			'active_since' => $future,
-			'active_till' => $future + 3600,
-			'timeperiods' => [
-				'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
-				'period' => 3600,
-				'start_date' => $future
-			]
-		]);
+		$maintenances = [];
+		foreach ($maintenanceids as $maintenanceid) {
+			$maintenances[] = [
+				'maintenanceid' => $maintenanceid,
+				'active_since' => $future,
+				'active_till' => $future + 3600,
+				'timeperiods' => [
+					'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+					'period' => 3600,
+					'start_date' => $future
+				]
+			];
+		}
+
+		$this->call('maintenance.update', $maintenances);
 	}
 
 	/**
@@ -4767,9 +4809,12 @@ HEREDOC;
 	private function startDiscHostMaintenances(int $count): void {
 		$start = count(self::$disc_maintenanceids) + 1;
 
+		$names = [];
 		for ($i = $start; $i < $start + $count; $i++) {
-			self::$disc_maintenanceids[] = $this->upsertDiscHostMaintenance('CEP close-on-up maintenance'.$i);
+			$names[] = 'CEP close-on-up maintenance'.$i;
 		}
+
+		self::$disc_maintenanceids = array_merge(self::$disc_maintenanceids, $this->upsertDiscHostMaintenances($names));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 	}
