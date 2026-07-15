@@ -643,6 +643,11 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is invalid for column #%d",
 					ZBX_TQ_QUERY_TAG_COLUMN, i);
 
+		if (!(ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == col->col_type || ZBX_TQ_COLUMN_TYPE_STR == col->col_type ||
+				ZBX_TQ_COLUMN_TYPE_NUM == col->col_type
+				|| ZBX_TQ_COLUMN_TYPE_TIMESTAMP == col->col_type))
+			return ret_errf(FAIL, error, max_error_len, "Unsupported column type for column #%d", i);
+
 		if (NULL == col->attribute_key)
 			return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for attribute column #%d",
 					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
@@ -665,14 +670,24 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 
 		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function)
 		{
+			const tq_column_info_t	*col_info;
+
 			if (ZBX_TQ_COLUMN_TYPE_UNKNOWN == aggr_col->col_type)
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is invalid for aggregated column #%d", ZBX_TQ_QUERY_TAG_COLUMN,
 								i);
 
-			if (ZBX_TQ_COLUMN_TYPE_NUM != aggr_col->col_type)
+			if (!(ZBX_TQ_COLUMN_TYPE_NUM == aggr_col->col_type
+					|| ZBX_TQ_COLUMN_TYPE_TIMESTAMP == aggr_col->col_type))
 				return ret_errf(FAIL, error, max_error_len,
-						"Invalid column type for aggregated column #%d", i);
+						"Unsupported column type for aggregated column #%d", i);
+
+			col_info = tq_get_column_info(query->signal_type, query->metric_point_type, aggr_col->column);
+
+			if (0 != (col_info->flags & TQ_COLUMN_INFO_FLAG_NO_AGGREGATION))
+				return ret_errf(FAIL, error, max_error_len,
+						"Aggregation is not supported column \"%s\" in aggregated column #%d",
+						aggr_col->column, i);
 		}
 
 		if (NULL == aggr_col->alias)
@@ -720,57 +735,57 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 
 		for (int i = 0; i < query->conditions.values_num; i++)
 		{
-			const zbx_tq_condition_t	*condition = &query->conditions.values[i];
+			const zbx_tq_condition_t	*cond = &query->conditions.values[i];
 
-			if (NULL == condition->column)
+			if (NULL == cond->column)
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is not set for condition #%d", ZBX_TQ_QUERY_TAG_COLUMN, i);
 
-			if (ZBX_TQ_COLUMN_TYPE_UNKNOWN == condition->col_type)
+			if (ZBX_TQ_COLUMN_TYPE_UNKNOWN == cond->col_type)
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is invalid for condition #%d", ZBX_TQ_QUERY_TAG_COLUMN, i);
 
-			if (ZBX_TQ_OPERATOR_UNKNOWN == condition->operator)
+			if (ZBX_TQ_OPERATOR_UNKNOWN == cond->operator)
 				return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for condition #%d",
 						ZBX_TQ_QUERY_TAG_OPERATOR, i);
 
-			if (NULL == condition->attribute_key)
+			if (NULL == cond->attribute_key)
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is not set for attribute condition #%d",
 						ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
 
-			if (FAIL == tq_validate_str(condition->attribute_key))
+			if (FAIL == tq_validate_str(cond->attribute_key))
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is not valid UTF-8 for condition #%d",
 						ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
 
-			if (NULL == condition->value)
+			if (NULL == cond->value)
 				return ret_errf(FAIL, error, max_error_len, "\"%s\" is not set for condition #%d",
 						ZBX_TQ_QUERY_TAG_VALUE, i);
 
-			if (FAIL == tq_validate_str(condition->value))
+			if (FAIL == tq_validate_str(cond->value))
 				return ret_errf(FAIL, error, max_error_len,
 						"\"%s\" is not valid UTF-8 for condition #%d",
 						ZBX_TQ_QUERY_TAG_VALUE, i);
 
-			if (ZBX_TQ_OPERATOR_EQUAL != condition->operator
-					&& ZBX_TQ_OPERATOR_NOT_EQUAL != condition->operator
-					&& (ZBX_TQ_COLUMN_TYPE_NUM == condition->col_type
-					|| ZBX_TQ_COLUMN_TYPE_ARRAY_NUM == condition->col_type))
-				return ret_errf(FAIL, error, max_error_len,
-						"Invalid operator used with numeric column for condition #%d", i);
+			if (!(ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == cond->col_type ||
+					ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == cond->col_type ||
+					ZBX_TQ_COLUMN_TYPE_STR == cond->col_type ||
+					ZBX_TQ_COLUMN_TYPE_ARRAY_STR == cond->col_type))
+				return ret_errf(FAIL, error, max_error_len, "Unsupported column type for condition #%d",
+						i);
 
-			if (ZBX_TQ_OPERATOR_EXISTS == condition->operator
-					&& SUCCEED != tq_column_type_is_attributes(condition->col_type))
+			if (ZBX_TQ_OPERATOR_EXISTS == cond->operator
+					&& SUCCEED != tq_column_type_is_attributes(cond->col_type))
 				return ret_errf(FAIL, error, max_error_len,
 						"Operator \"exists\" selected for non-attribute condition #%d", i);
 
-			if (SUCCEED == tq_column_type_is_attributes(condition->col_type) &&
-					(ZBX_TQ_OPERATOR_CONTAINS == condition->operator ||
-					ZBX_TQ_OPERATOR_NOT_CONTAINS == condition->operator))
+			if (SUCCEED == tq_column_type_is_attributes(cond->col_type) &&
+					(ZBX_TQ_OPERATOR_CONTAINS == cond->operator ||
+					ZBX_TQ_OPERATOR_NOT_CONTAINS == cond->operator))
 				return ret_errf(FAIL, error, max_error_len,
 						"Operator \"%s\" selected for attribute condition #%d",
-						(ZBX_TQ_OPERATOR_CONTAINS == condition->operator ? "contains" :
+						(ZBX_TQ_OPERATOR_CONTAINS == cond->operator ? "contains" :
 						"not contains"), i);
 		}
 	}

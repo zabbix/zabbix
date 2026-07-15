@@ -17,145 +17,141 @@
 #include "telemetry.h"
 
 static const tq_column_info_t	column_info_apm_traces[] = {
-	{"Timestamp",		ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"TraceId",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"SpanId",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ParentSpanId",	ZBX_TQ_COLUMN_TYPE_STR			},
-	{"TraceState",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"SpanName",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"SpanKind",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ServiceName",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ResourceAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES		},
-	{"SpanAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES		},
-	{"ScopeName",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ScopeVersion",	ZBX_TQ_COLUMN_TYPE_STR			},
-	{"Duration",		ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"StatusCode",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"StatusMessage",	ZBX_TQ_COLUMN_TYPE_STR			},
-	{"Events.Name",		ZBX_TQ_COLUMN_TYPE_ARRAY_STR		},
-	{"Events.Attributes",	ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES	},
+	{"Timestamp",		ZBX_TQ_COLUMN_TYPE_TIMESTAMP,		0	},
+	{"TraceId",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"SpanId",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ParentSpanId",	ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"TraceState",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"SpanName",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"SpanKind",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ServiceName",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ResourceAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
+	{"SpanAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
+	{"ScopeName",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ScopeVersion",	ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"Duration",		ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"StatusCode",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"StatusMessage",	ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"Events.Name",		ZBX_TQ_COLUMN_TYPE_ARRAY_STR,		0	},
+	{"Events.Attributes",	ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
 	{0}
 };
 
 static const tq_column_info_t	column_info_apm_logs[] = {
-	{"Timestamp",		ZBX_TQ_COLUMN_TYPE_NUM		},
-	{"TraceId",		ZBX_TQ_COLUMN_TYPE_STR		},
-	{"SpanId",		ZBX_TQ_COLUMN_TYPE_STR		},
-	{"TraceFlags",		ZBX_TQ_COLUMN_TYPE_NUM		},
-	{"SeverityText",	ZBX_TQ_COLUMN_TYPE_STR		},
-	{"SeverityNumber",	ZBX_TQ_COLUMN_TYPE_NUM		},
-	{"ServiceName",		ZBX_TQ_COLUMN_TYPE_STR		},
-	{"Body",		ZBX_TQ_COLUMN_TYPE_STR		},
-	{"ResourceSchemaUrl",	ZBX_TQ_COLUMN_TYPE_STR		},
-	{"ScopeSchemaUrl",	ZBX_TQ_COLUMN_TYPE_STR		},
-	{"ScopeName",		ZBX_TQ_COLUMN_TYPE_STR		},
-	{"ScopeVersion",	ZBX_TQ_COLUMN_TYPE_STR		},
-	{"ResourceAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES	},
-	{"ScopeAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES	},
-	{"LogAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES	},
-	{"EventName",		ZBX_TQ_COLUMN_TYPE_STR		},
+	{"Timestamp",		ZBX_TQ_COLUMN_TYPE_TIMESTAMP,	0	},
+	{"TraceId",		ZBX_TQ_COLUMN_TYPE_STR,		0	},
+	{"SpanId",		ZBX_TQ_COLUMN_TYPE_STR,		0	},
+	{"TraceFlags",		ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"SeverityText",	ZBX_TQ_COLUMN_TYPE_STR,		0	},
+	{"SeverityNumber",	ZBX_TQ_COLUMN_TYPE_NUM,		0	},
+	{"ServiceName",		ZBX_TQ_COLUMN_TYPE_STR,		0	},
+	{"Body",		ZBX_TQ_COLUMN_TYPE_STR,		0	},
+	{"ResourceSchemaUrl",	ZBX_TQ_COLUMN_TYPE_STR,		0	},
+	{"ScopeSchemaUrl",	ZBX_TQ_COLUMN_TYPE_STR,		0	},
+	{"ScopeName",		ZBX_TQ_COLUMN_TYPE_STR,		0	},
+	{"ScopeVersion",	ZBX_TQ_COLUMN_TYPE_STR,		0	},
+	{"ResourceAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,	0	},
+	{"ScopeAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,	0	},
+	{"LogAttributes",	ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,	0	},
+	{"EventName",		ZBX_TQ_COLUMN_TYPE_STR,		0	},
 	{0}
 };
 
 static const tq_column_info_t	column_info_apm_metrics_sum[] = {
-	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES		},
-	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ScopeVersion",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ScopeAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES		},
-	{"ScopeDroppedAttrCount",	ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"ScopeSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ServiceName",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"MetricName",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"MetricDescription",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"MetricUnit",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"Attributes",			ZBX_TQ_COLUMN_TYPE_ATTRIBUTES		},
-	{"StartTimeUnix",		ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"TimeUnix",			ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Value",			ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES	},
-	{"Exemplars.Value",		ZBX_TQ_COLUMN_TYPE_ARRAY_NUM		},
-	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"IsMonotonic",			ZBX_TQ_COLUMN_TYPE_NUM			},
+	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
+	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ScopeVersion",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ScopeAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
+	{"ScopeDroppedAttrCount",	ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"ScopeSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ServiceName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"MetricName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"MetricDescription",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"MetricUnit",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"Attributes",			ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
+	{"StartTimeUnix",		ZBX_TQ_COLUMN_TYPE_TIMESTAMP,		0	},
+	{"TimeUnix",			ZBX_TQ_COLUMN_TYPE_TIMESTAMP,		0	},
+	{"Value",			ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
+	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"IsMonotonic",			ZBX_TQ_COLUMN_TYPE_NUM,			0	},
 	{0}
 };
 
 static const tq_column_info_t	column_info_apm_metrics_gauge[] = {
-	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES		},
-	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ScopeVersion",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ScopeAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES		},
-	{"ScopeDroppedAttrCount",	ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"ScopeSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ServiceName",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"MetricName",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"MetricDescription",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"MetricUnit",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"Attributes",			ZBX_TQ_COLUMN_TYPE_ATTRIBUTES		},
-	{"StartTimeUnix",		ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"TimeUnix",			ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Value",			ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES	},
-	{"Exemplars.Value",		ZBX_TQ_COLUMN_TYPE_ARRAY_NUM		},
+	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
+	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ScopeVersion",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ScopeAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
+	{"ScopeDroppedAttrCount",	ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"ScopeSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ServiceName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"MetricName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"MetricDescription",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"MetricUnit",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"Attributes",			ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
+	{"StartTimeUnix",		ZBX_TQ_COLUMN_TYPE_TIMESTAMP,		0	},
+	{"TimeUnix",			ZBX_TQ_COLUMN_TYPE_TIMESTAMP,		0	},
+	{"Value",			ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
 	{0}
 };
 
 static const tq_column_info_t	column_info_apm_metrics_histogram[] = {
-	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES		},
-	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ScopeVersion",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ScopeAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES		},
-	{"ScopeDroppedAttrCount",	ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"ScopeSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ServiceName",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"MetricName",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"MetricDescription",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"MetricUnit",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"Attributes",			ZBX_TQ_COLUMN_TYPE_ATTRIBUTES		},
-	{"StartTimeUnix",		ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"TimeUnix",			ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Count",			ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Sum",				ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES	},
-	{"Exemplars.Value",		ZBX_TQ_COLUMN_TYPE_ARRAY_NUM		},
-	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Min",				ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Max",				ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM			},
+	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
+	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ScopeVersion",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ScopeAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
+	{"ScopeDroppedAttrCount",	ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"ScopeSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ServiceName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"MetricName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"MetricDescription",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"MetricUnit",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"Attributes",			ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
+	{"StartTimeUnix",		ZBX_TQ_COLUMN_TYPE_TIMESTAMP,		0	},
+	{"TimeUnix",			ZBX_TQ_COLUMN_TYPE_TIMESTAMP,		0	},
+	{"Count",			ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"Sum",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
+	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"Min",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"Max",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{0}
 };
 
 static const tq_column_info_t	column_info_apm_metrics_exponentialhistogram[] = {
-	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES		},
-	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ScopeVersion",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ScopeAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES		},
-	{"ScopeDroppedAttrCount",	ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"ScopeSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"ServiceName",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"MetricName",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"MetricDescription",		ZBX_TQ_COLUMN_TYPE_STR			},
-	{"MetricUnit",			ZBX_TQ_COLUMN_TYPE_STR			},
-	{"Attributes",			ZBX_TQ_COLUMN_TYPE_ATTRIBUTES		},
-	{"StartTimeUnix",		ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"TimeUnix",			ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Count",			ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Sum",				ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Scale",			ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"ZeroCount",			ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"PositiveOffset",		ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"NegativeOffset",		ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES	},
-	{"Exemplars.Value",		ZBX_TQ_COLUMN_TYPE_ARRAY_NUM		},
-	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Min",				ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"Max",				ZBX_TQ_COLUMN_TYPE_NUM			},
-	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM			},
+	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
+	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ScopeVersion",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ScopeAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
+	{"ScopeDroppedAttrCount",	ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"ScopeSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"ServiceName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"MetricName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"MetricDescription",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"MetricUnit",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
+	{"Attributes",			ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
+	{"StartTimeUnix",		ZBX_TQ_COLUMN_TYPE_TIMESTAMP,		0	},
+	{"TimeUnix",			ZBX_TQ_COLUMN_TYPE_TIMESTAMP,		0	},
+	{"Count",			ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"Sum",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"Scale",			ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"ZeroCount",			ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"PositiveOffset",		ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"NegativeOffset",		ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
+	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
+	{"Min",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"Max",				ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{0}
 };
 
@@ -215,11 +211,38 @@ zbx_tq_column_type_t	tq_get_column_type(zbx_tq_signal_type_t signal_type,
 
 int	tq_column_type_is_array(zbx_tq_column_type_t type)
 {
-	return ZBX_TQ_COLUMN_TYPE_ARRAY_STR == type || ZBX_TQ_COLUMN_TYPE_ARRAY_NUM == type
-		|| ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == type ? SUCCEED : FAIL;
+	return ZBX_TQ_COLUMN_TYPE_ARRAY_STR == type || ZBX_TQ_COLUMN_TYPE_ARRAY_NUM == type ||
+			ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == type ||
+			ZBX_TQ_COLUMN_TYPE_ARRAY_TIMESTAMP == type ? SUCCEED : FAIL;
 }
 
 int	tq_column_type_is_attributes(zbx_tq_column_type_t type)
 {
 	return ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == type || ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == type ? SUCCEED : FAIL;
+}
+
+zbx_tq_column_type_t	tq_get_base_column_type(zbx_tq_column_type_t type)
+{
+	switch (type)
+	{
+		case ZBX_TQ_COLUMN_TYPE_ATTRIBUTES:
+		case ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES:
+			return ZBX_TQ_COLUMN_TYPE_ATTRIBUTES;
+
+		case ZBX_TQ_COLUMN_TYPE_STR:
+		case ZBX_TQ_COLUMN_TYPE_ARRAY_STR:
+			return ZBX_TQ_COLUMN_TYPE_STR;
+
+		case ZBX_TQ_COLUMN_TYPE_NUM:
+		case ZBX_TQ_COLUMN_TYPE_ARRAY_NUM:
+			return ZBX_TQ_COLUMN_TYPE_NUM;
+
+		case ZBX_TQ_COLUMN_TYPE_TIMESTAMP:
+		case ZBX_TQ_COLUMN_TYPE_ARRAY_TIMESTAMP:
+			return ZBX_TQ_COLUMN_TYPE_TIMESTAMP;
+
+		default:
+		case ZBX_TQ_COLUMN_TYPE_UNKNOWN:
+			return ZBX_TQ_COLUMN_TYPE_UNKNOWN;
+	}
 }

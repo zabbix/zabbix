@@ -174,18 +174,7 @@ static char	*tq_sql_dyn_escape_like_pattern(const char *src, const tq_sql_ctx_t 
 	return zbx_dbconn_dyn_escape_like_pattern(ctx->db, src);
 }
 
-static const char	*tq_sql_key_or_null(const char *key, zbx_tq_column_type_t col_type)
-{
-	return (SUCCEED == tq_column_type_is_attributes(col_type) ? key : NULL);
-}
-
-/******************************************************************************
- *                                                                            *
- * Comments: does not escape operand! If escaping is needed, it must be done  *
- *           by the caller, before passing it to this function.               *
- *                                                                            *
- ******************************************************************************/
-static char	*tq_sql_dyn_get_attribute_by_key_raw(const char *operand, const char *key, const tq_sql_ctx_t *ctx)
+static char	*tq_sql_dyn_get_attribute_by_key(const char *atom, const char *key, const tq_sql_ctx_t *ctx)
 {
 	char	*str;
 
@@ -193,7 +182,7 @@ static char	*tq_sql_dyn_get_attribute_by_key_raw(const char *operand, const char
 	{
 		char	*key_esc = tq_sql_dyn_escape_string(key, ctx);
 
-		str = zbx_dsprintf(NULL, "%s[%s]", operand, key_esc);
+		str = zbx_dsprintf(NULL, "%s[%s]", atom, key_esc);
 
 		zbx_free(key_esc);
 	}
@@ -206,18 +195,29 @@ static char	*tq_sql_dyn_get_attribute_by_key_raw(const char *operand, const char
 	return str;
 }
 
-/******************************************************************************
- *                                                                            *
- * Comments: does not escape x! If escaping is needed, it must be done        *
- *           by the caller, before passing it to this function.               *
- *                                                                            *
- ******************************************************************************/
-static char	*tq_sql_dyn_get_operand_raw(const char *x, const char *key, const tq_sql_ctx_t *ctx)
+static char	*tq_sql_dyn_get_operand(const char *atom, zbx_tq_column_type_t type, const char *key,
+		const tq_sql_ctx_t *ctx)
 {
-	if (NULL == key)
-		return zbx_strdup(NULL, x);
-
-	return tq_sql_dyn_get_attribute_by_key_raw(x, key, ctx);
+	if (ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == type)
+	{
+		return tq_sql_dyn_get_attribute_by_key(atom, key, ctx);
+	}
+	else if (ZBX_TQ_COLUMN_TYPE_TIMESTAMP == type)
+	{
+		if (ZBX_APM_DB_TYPE_CLICKHOUSE == ctx->db_type)
+		{
+			return zbx_dsprintf(NULL, "toUnixTimestamp(%s)", atom);
+		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			return zbx_strdup(NULL, "");
+		}
+	}
+	else
+	{
+		return zbx_strdup(NULL, atom);
+	}
 }
 
 static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, const tq_sql_ctx_t *ctx)
@@ -230,8 +230,8 @@ static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, const
 	{
 		const zbx_tq_column_t	*col = &query->columns.values[i];
 		char			*name_esc = tq_sql_dyn_escape_name(col->column, ctx);
-		char			*col_to_select = tq_sql_dyn_get_operand_raw(name_esc,
-				tq_sql_key_or_null(col->attribute_key, col->col_type), ctx);
+		char			*col_to_select = tq_sql_dyn_get_operand(name_esc, col->col_type,
+				col->attribute_key, ctx);
 
 		zbx_snprintf_alloc(&str, &alloc, &offset, "%s", col_to_select);
 
@@ -248,22 +248,19 @@ static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, const
 	return str;
 }
 
-static char	*tq_sql_dyn_get_percentile(const char *name, double fraction, const tq_sql_ctx_t *ctx)
+static char	*tq_sql_dyn_get_percentile(const char *atom, double fraction, const tq_sql_ctx_t *ctx)
 {
 	char	*str;
-	char	*name_esc = tq_sql_dyn_escape_name(name, ctx);
 
 	if (ZBX_APM_DB_TYPE_CLICKHOUSE == ctx->db_type)
 	{
-		str = zbx_dsprintf(NULL, "quantileTDigest(" ZBX_FS_DBL_EXT(4) ")(%s)", fraction, name_esc);
+		str = zbx_dsprintf(NULL, "quantileTDigest(" ZBX_FS_DBL_EXT(4) ")(%s)", fraction, atom);
 	}
 	else
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		str = zbx_strdup(NULL, "");
 	}
-
-	zbx_free(name_esc);
 
 	return str;
 }
@@ -278,9 +275,13 @@ static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, 
 	{
 		const zbx_tq_aggr_column_t	*aggr_col = &query->aggregated_columns.values[i];
 		char				*col_name_esc = NULL;
+		char				*operand = NULL;
 
-		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function && ZBX_TQ_FUNCTION_PERCENTILE != aggr_col->function)
+		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function)
+		{
 			col_name_esc = tq_sql_dyn_escape_name(aggr_col->column, ctx);
+			operand = tq_sql_dyn_get_operand(col_name_esc, aggr_col->col_type, NULL, ctx);
+		}
 
 		switch (aggr_col->function)
 		{
@@ -288,22 +289,21 @@ static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, 
 				zbx_snprintf_alloc(&str, &alloc, &offset, "COUNT(*)");
 				break;
 			case ZBX_TQ_FUNCTION_MIN:
-				zbx_snprintf_alloc(&str, &alloc, &offset, "MIN(%s)", col_name_esc);
+				zbx_snprintf_alloc(&str, &alloc, &offset, "MIN(%s)", operand);
 				break;
 			case ZBX_TQ_FUNCTION_MAX:
-				zbx_snprintf_alloc(&str, &alloc, &offset, "MAX(%s)", col_name_esc);
+				zbx_snprintf_alloc(&str, &alloc, &offset, "MAX(%s)", operand);
 				break;
 			case ZBX_TQ_FUNCTION_AVG:
-				zbx_snprintf_alloc(&str, &alloc, &offset, "AVG(%s)", col_name_esc);
+				zbx_snprintf_alloc(&str, &alloc, &offset, "AVG(%s)", operand);
 				break;
 			case ZBX_TQ_FUNCTION_SUM:
-				zbx_snprintf_alloc(&str, &alloc, &offset, "SUM(%s)", col_name_esc);
+				zbx_snprintf_alloc(&str, &alloc, &offset, "SUM(%s)", operand);
 				break;
 			case ZBX_TQ_FUNCTION_PERCENTILE:
 			{
 				double	fraction = strtod(aggr_col->parameters.values[0], NULL) / 100.0;
-				char	*percentile_expr = tq_sql_dyn_get_percentile(aggr_col->column,
-						fraction, ctx);
+				char	*percentile_expr = tq_sql_dyn_get_percentile(operand, fraction, ctx);
 
 				zbx_snprintf_alloc(&str, &alloc, &offset, "%s", percentile_expr);
 
@@ -319,6 +319,7 @@ static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, 
 			zbx_snprintf_alloc(&str, &alloc, &offset, ",");
 
 		zbx_free(col_name_esc);
+		zbx_free(operand);
 	}
 
 	if (str == NULL)
@@ -382,14 +383,14 @@ static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, co
 	return str_esc;
 }
 
-static char	*tq_sql_dyn_get_condition_contains(const char *operand, const char *value, const tq_sql_ctx_t *ctx)
+static char	*tq_sql_dyn_get_condition_contains(const char *atom, const char *value, const tq_sql_ctx_t *ctx)
 {
 	char	*str;
 	char	*value_esc = tq_sql_dyn_escape_like_pattern(value, ctx);
 
 	if (ZBX_APM_DB_TYPE_CLICKHOUSE == ctx->db_type)
 	{
-		str = zbx_dsprintf(NULL, "%s LIKE '%%%s%%'", operand, value_esc);
+		str = zbx_dsprintf(NULL, "%s LIKE '%%%s%%'", atom, value_esc);
 	}
 	else
 	{
@@ -423,23 +424,24 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 	return str;
 }
 
-static char	*tq_sql_dyn_get_exists_check(const char *atom, const char *key, const tq_sql_ctx_t *ctx)
+static char	*tq_sql_dyn_get_exists_check(const char *atom, zbx_tq_column_type_t type, const char *key,
+		const tq_sql_ctx_t *ctx)
 {
-	if (NULL == key)
-		return zbx_dsprintf(NULL, "(%s IS NOT NULL)", atom);
+	if (ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == type)
+		return tq_sql_dyn_get_condition_exists(atom, key, ctx);
 
-	return tq_sql_dyn_get_condition_exists(atom, key, ctx);
+	return zbx_dsprintf(NULL, "(%s IS NOT NULL)", atom);
 }
 
-static char	*tq_sql_dyn_get_atom_condition(const char *atom, const char *key, const char *value,
-		zbx_tq_operator_t operator, const tq_sql_ctx_t *ctx)
+static char	*tq_sql_dyn_get_atom_condition(const char *atom, zbx_tq_column_type_t type, const char *key,
+		const char *value, zbx_tq_operator_t operator, const tq_sql_ctx_t *ctx)
 {
 	if (ZBX_TQ_OPERATOR_EQUAL == operator || ZBX_TQ_OPERATOR_NOT_EQUAL == operator)
 	{
 		char	*str;
-		char	*operand = tq_sql_dyn_get_operand_raw(atom, key, ctx);
+		char	*operand = tq_sql_dyn_get_operand(atom, type, key, ctx);
 		char	*value_esc = tq_sql_dyn_escape_string(value, ctx);
-		char	*not_null_check = tq_sql_dyn_get_exists_check(atom, key, ctx);
+		char	*not_null_check = tq_sql_dyn_get_exists_check(atom, type, key, ctx);
 
 		/* ensure that "not equal" results in false if attribute key is missing */
 		str = zbx_dsprintf(NULL, "(%s AND %s %s %s)", not_null_check, operand,
@@ -453,9 +455,9 @@ static char	*tq_sql_dyn_get_atom_condition(const char *atom, const char *key, co
 	}
 	else if (ZBX_TQ_OPERATOR_CONTAINS == operator || ZBX_TQ_OPERATOR_NOT_CONTAINS == operator)
 	{
-		char	*operand = tq_sql_dyn_get_operand_raw(atom, key, ctx);
+		char	*operand = tq_sql_dyn_get_operand(atom, type, key, ctx);
 		char	*str = tq_sql_dyn_get_condition_contains(operand, value, ctx);
-		char	*not_null_check = tq_sql_dyn_get_exists_check(atom, key, ctx);
+		char	*not_null_check = tq_sql_dyn_get_exists_check(atom, type, key, ctx);
 
 		/* check for NULL for consistency with "equal"/"not equal" behavior */
 		str = zbx_dsprintf(str, "(%s AND %s%s)", not_null_check,
@@ -468,7 +470,6 @@ static char	*tq_sql_dyn_get_atom_condition(const char *atom, const char *key, co
 	}
 	else /* exists */
 	{
-		/* TODO: revisit when it is decided if attribute_key or value is used for exists condition */
 		return tq_sql_dyn_get_condition_exists(atom, key, ctx);
 	}
 }
@@ -480,8 +481,8 @@ static char	*tq_sql_dyn_get_array_condition(const zbx_tq_condition_t *cond, cons
 
 	if (ZBX_APM_DB_TYPE_CLICKHOUSE == ctx->db_type)
 	{
-		char	*elem_cond = tq_sql_dyn_get_atom_condition("x", tq_sql_key_or_null(cond->attribute_key,
-				cond->col_type), cond->value, cond->operator, ctx);
+		char	*elem_cond = tq_sql_dyn_get_atom_condition("x", tq_get_base_column_type(cond->col_type),
+				cond->attribute_key, cond->value, cond->operator, ctx);
 
 		str = zbx_dsprintf(NULL, "arrayExists(x -> %s, %s)", elem_cond, col_esc);
 
@@ -505,9 +506,8 @@ static char	*tq_sql_dyn_get_condition(const zbx_tq_condition_t *cond, const tq_s
 	else
 	{
 		char	*name_esc = tq_sql_dyn_escape_name(cond->column, ctx);
-		char	*str = tq_sql_dyn_get_atom_condition(name_esc,
-				tq_sql_key_or_null(cond->attribute_key, cond->col_type), cond->value, cond->operator,
-				ctx);
+		char	*str = tq_sql_dyn_get_atom_condition(name_esc, cond->col_type, cond->attribute_key, cond->value,
+				cond->operator, ctx);
 
 		zbx_free(name_esc);
 
@@ -658,7 +658,7 @@ static char	*tq_sql_dyn_get_conditions(const zbx_tq_query_t *query, const tq_sql
 	}
 }
 
-static const char	*tq_sql_get_timestamp_column_raw(const zbx_tq_query_t *query)
+static const char	*tq_sql_get_timestamp_column_name(const zbx_tq_query_t *query)
 {
 	return (ZBX_TQ_SIGNAL_TYPE_APM_METRICS == query->signal_type ? "TimeUnix" : "Timestamp");
 }
@@ -673,7 +673,7 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift,
 
 	const int	query_has_columns = (0 != query->columns.values_num) ? SUCCEED : FAIL;
 	const int	query_has_conditions = (0 != query->conditions.values_num) ? SUCCEED : FAIL;
-	const char	*ts_col = tq_sql_get_timestamp_column_raw(query);
+	const char	*ts_col = tq_sql_get_timestamp_column_name(query);
 	size_t		alloc = 0, offset = 0;
 	time_t		timestamp_filter_lower_bound, timestamp_filter_upper_bound;
 	char		*columns_to_select;
@@ -694,11 +694,9 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int time_shift,
 	/* select */
 	zbx_snprintf_alloc(sql, &alloc, &offset, "SELECT ");
 	zbx_snprintf_alloc(sql, &alloc, &offset,
-			"toStartOfInterval ("
-			"\"%s\" - INTERVAL " ZBX_FS_TIME_T " SECOND, INTERVAL %d SECOND"
-			") + INTERVAL " ZBX_FS_TIME_T " SECOND AS rounded_time,",
-			ts_col, timestamp_filter_lower_bound, granularity, timestamp_filter_lower_bound);
-	zbx_snprintf_alloc(sql, &alloc, &offset, "toUnixTimestamp(MIN(\"%s\")) AS starttime,", ts_col);
+			"intDiv((toUnixTimestamp(\"%s\")-" ZBX_FS_TIME_T "), %d)*%d+" ZBX_FS_TIME_T " AS rounded_time,",
+			ts_col, timestamp_filter_lower_bound, granularity, granularity, timestamp_filter_lower_bound);
+
 	if (SUCCEED == query_has_columns)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "%s,", columns_to_select);
 	zbx_snprintf_alloc(sql, &alloc, &offset, "%s ", aggr_columns_to_select);

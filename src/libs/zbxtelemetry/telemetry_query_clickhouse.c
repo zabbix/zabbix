@@ -37,13 +37,6 @@ static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_jso
 	/* row id */
 	zbx_json_adduint64(&j, "id", row_id);
 
-	/* skip rounded time */
-	if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), NULL)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot parse rounded time from row \"%s\"", jp->start);
-		goto out;
-	}
-
 	/* timestamp */
 	if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), NULL)) ||
 			SUCCEED != zbx_is_uint64(buf, &timestamp))

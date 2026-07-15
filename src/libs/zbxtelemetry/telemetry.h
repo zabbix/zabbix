@@ -19,10 +19,13 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 
+#define TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	0x01
+
 typedef struct
 {
 	const char		*name;
 	zbx_tq_column_type_t	type;
+	int			flags;
 }
 tq_column_info_t;
 
@@ -59,6 +62,8 @@ zbx_tq_column_type_t	tq_get_column_type(zbx_tq_signal_type_t signal_type,
 
 int	tq_column_type_is_array(zbx_tq_column_type_t type);
 int	tq_column_type_is_attributes(zbx_tq_column_type_t type);
+
+zbx_tq_column_type_t	tq_get_base_column_type(zbx_tq_column_type_t type);
 
 char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col);
 int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void *b);
