@@ -16,6 +16,27 @@
 
 class CControllerCepRuleCreate extends CControllerCepRuleGeneral {
 
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules(existing: false));
+
+		if (!$ret) {
+			$form_errors = $this->getValidationError();
+			$response = array_filter([
+				'form_errors' => $form_errors,
+				'error' => !$form_errors
+					? [
+						'title' => _('Cannot add complex event processing rule'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+					: null
+			]);
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
+		}
+
+		return $ret;
+	}
+
 	protected function doAction() {
 		$result = API::CepRule()->create($this->prepareApiRequest());
 		$output = [];

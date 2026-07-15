@@ -36,8 +36,8 @@ class testTriggerCEP extends CIntegrationTest {
 	const LLD_DISCOVERY_COUNT = 500;	// discovered items/triggers per rule; use at least 4000 to stress CEP
 	const LOG_EVENT_COUNT = 10000;		// log values pushed at the single-trigger stream; use at least 10000
 	const RECOVERY_CYCLES_COUNT = 2000;	// PROBLEM/recovery cycles in the rapid burst; use at least 1000
-	const MAINTENANCE_COUNT = 64;		// number of maintenances to create; change to any number
-
+	const MAINTENANCE_COUNT = 40;		// number of maintenances to create; change to any number
+	const MAINTENANCE_COUNT_EXTRA = 10;
 	const SKIP_RESTART_TESTS = true;
 
 	// Leave null to decide randomly based on the current time; set to true or false to force a path.
@@ -3110,9 +3110,7 @@ HEREDOC;
 			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 		}
 		finally {
-			foreach (self::$disc_maintenanceids as $maintenanceid) {
-				$this->stopDiscHostMaintenance($maintenanceid);
-			}
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 			$this->reloadConfigurationCacheAndWaitForLogLine();
 
 			// Moving the maintenance out of its active window only changes the configuration; the timer process
@@ -3147,9 +3145,7 @@ HEREDOC;
 			$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
 		}
 		finally {
-			foreach (self::$disc_maintenanceids as $maintenanceid) {
-				$this->stopDiscHostMaintenance($maintenanceid);
-			}
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 			$this->reloadConfigurationCacheAndWaitForLogLine();
 
 			// Moving the maintenance out of its active window only changes the configuration; the timer process
@@ -3169,7 +3165,9 @@ HEREDOC;
 	/**
 	 * Same "close old down when new up" scenario as testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpMaintenanceAfterFirst,
 	 * but verifies that problems and services are suppressed during maintenance and no longer suppressed after
-	 * the maintenance is stopped.
+	 * the maintenance is stopped. The stopped maintenances are then resumed one at a time out of creation
+	 * order (middle, first, last) - suppression must return after the first resume and survive the
+	 * overlapping ones - and finally stopped again, after which suppression must clear once more.
 	 * run as (testTriggerCEP_AddServices|testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_SuppressUnsuppressProblems$)
 	 * @depends testPrepareTriggerCEP_LLDDiscovery
 	 */
@@ -3181,9 +3179,7 @@ HEREDOC;
 		}
 		finally {
 			// Clean up: ensure maintenance is stopped
-			foreach (self::$disc_maintenanceids as $maintenanceid) {
-				$this->stopDiscHostMaintenance($maintenanceid);
-			}
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 		}
 	}
 
@@ -3202,9 +3198,7 @@ HEREDOC;
 		}
 		finally {
 			// Clean up: ensure maintenance is stopped
-			foreach (self::$disc_maintenanceids as $maintenanceid) {
-				$this->stopDiscHostMaintenance($maintenanceid);
-			}
+			$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 		}
 	}
 
@@ -3910,12 +3904,14 @@ HEREDOC;
 		// later), while global correlation still closes them normally below.
 		if ($maintenance_after_first) {
 			$this->startDiscHostMaintenances(self::MAINTENANCE_COUNT);
-			$this->waitForOpenProblemsSuppressed($all, $m);
+			$this->waitForOpenProblemsSuppressedByMaintenances($all, $m, self::$disc_maintenanceids);
 			$this->waitForServicesSuppressed();
 
 			// Start additional maintenances on the already-suppressed host: the extra overlapping
-			// maintenances must not disturb the existing suppression.
-			//$this->startDiscHostMaintenances(10);
+			// maintenances must not disturb the existing suppression, and every open problem must end
+			// up suppressed by every active maintenance.
+			$this->startDiscHostMaintenances(self::MAINTENANCE_COUNT_EXTRA);
+			$this->waitForOpenProblemsSuppressedByMaintenances($all, $m, self::$disc_maintenanceids);
 		}
 
 		// Wave 1 is fully open ($m problems), so $m problem events are tagged.
@@ -3935,33 +3931,67 @@ HEREDOC;
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
 		// The host is in maintenance by now, so this second wave (opened while maintenance is active) must
-		// be suppressed at creation time as well: all 2 * $m open problems suppressed.
+		// be suppressed at creation time as well: all 2 * $m open problems suppressed, each by every
+		// active maintenance.
 		if ($maintenance_after_first) {
-			$this->waitForOpenProblemsSuppressed($all, 2 * $m);
+			$this->waitForOpenProblemsSuppressedByMaintenances($all, 2 * $m, self::$disc_maintenanceids);
 			$this->waitForServicesSuppressed();
 
 			// If requested, verify services are suppressed while problems are still open,
 			// then stop maintenance and verify suppression is cleared.
 			if ($stop_maintenance_and_verify_suppression) {
-				// Stop the maintenance
-				foreach (self::$disc_maintenanceids as $maintenanceid) {
-					$this->stopDiscHostMaintenance($maintenanceid);
-				}
+				// Stop all maintenances at once: suppression of the still-open problems and services
+				// must be cleared.
+				$this->stopDiscHostMaintenances(self::$disc_maintenanceids);
 
 				$this->maybeRestartServer($restart);
 
 				$this->reloadConfigurationCacheAndWaitForLogLine();
 
-				// Verify that no suppressed events remain after maintenance is stopped
-				$this->callUntilCountIsPresent('event.get', [
-					'hostids' => [self::$disc_hostid],
-					'source' => EVENT_SOURCE_TRIGGERS,
-					'object' => EVENT_OBJECT_TRIGGER,
-					'suppressed' => true
-				], 0, 120, self::WAIT_ITERATION_DELAY);
+				$this->waitForSuppressionCleared();
 
-				// Verify services are no longer suppressed
-				$this->waitForServicesNoLongerSuppressed();
+				// Resume the stopped maintenances out of creation order, highest maintenanceid
+				// first: the suppression data in the DB then holds only the highest id, and every
+				// later resume adds maintenances with lower ids, which sort before the existing
+				// entries (both sides are compared sorted by maintenanceid, not by start time).
+				// The second step resumes all remaining lower-id maintenances but one at once, so a
+				// single timer pass sees far more new cache-side maintenances than there are
+				// DB-side suppression rows. After every step each problem must be suppressed by
+				// exactly the maintenances resumed so far - the stopped ones must not linger in
+				// the suppression data.
+				$last = count(self::$disc_maintenanceids) - 1;
+				$resumed = [];
+				foreach ([[$last], range(0, $last - 2), [$last - 1]] as $indexes) {
+					$ids = array_map(fn($index) => self::$disc_maintenanceids[$index], $indexes);
+					$resumed = array_merge($resumed, $ids);
+					$this->resumeDiscHostMaintenances($ids);
+					$this->waitForOpenProblemsSuppressedByMaintenances($all, 2 * $m, $resumed);
+					$this->waitForServicesSuppressed();
+				}
+
+				// Stop the resumed maintenances one by one in the same order: while at least one of
+				// them is still active every problem must stay suppressed - by exactly the remaining
+				// maintenances - and only stopping the last one may clear the suppression.
+				//foreach ($resumed as $i => $maintenanceid) {
+				//	$this->stopDiscHostMaintenances([$maintenanceid]);
+				//
+				//	$this->reloadConfigurationCacheAndWaitForLogLine();
+				//
+				//	$remaining = array_slice($resumed, $i + 1);
+				//	if (!empty($remaining)) {
+				//		$this->waitForOpenProblemsSuppressedByMaintenances($all, 2 * $m, $remaining);
+				//		$this->waitForServicesSuppressed();
+				//	}
+				//}
+
+				// Stop all resumed maintenances in bulk.
+				$this->stopDiscHostMaintenances($resumed);
+
+				$this->reloadConfigurationCacheAndWaitForLogLine();
+
+				$this->maybeRestartServer($restart);
+
+				$this->waitForSuppressionCleared();
 			}
 		}
 
@@ -4354,6 +4384,57 @@ HEREDOC;
 		], $expected, 120, self::WAIT_ITERATION_DELAY);
 	}
 
+	/**
+	 * Wait until exactly $expected open problems on the given triggers are suppressed and every one of
+	 * them is suppressed by exactly the given maintenances: each problem's suppression data must list
+	 * every maintenanceid from $maintenanceids and nothing else, so rows of stopped maintenances must
+	 * be gone and rows of every active maintenance must be present.
+	 */
+	private function waitForOpenProblemsSuppressedByMaintenances(array $triggerids, int $expected,
+			array $maintenanceids): void {
+		$expected_ids = array_values($maintenanceids);
+		sort($expected_ids);
+
+		$this->callUntilDataIsPresent('problem.get', [
+			'objectids' => $triggerids,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'suppressed' => true,
+			'selectSuppressionData' => ['maintenanceid']
+		], 120, self::WAIT_ITERATION_DELAY, function (array $response) use ($expected, $expected_ids) {
+			if (count($response['result']) != $expected) {
+				return 'expected '.$expected.' suppressed problems, got '.count($response['result']);
+			}
+
+			foreach ($response['result'] as $problem) {
+				$ids = array_column($problem['suppression_data'], 'maintenanceid');
+				sort($ids);
+
+				if ($ids !== $expected_ids) {
+					return 'problem '.$problem['eventid'].' is suppressed by maintenances ['.
+							implode(', ', $ids).'], expected ['.implode(', ', $expected_ids).']';
+				}
+			}
+
+			return true;
+		});
+	}
+
+	/**
+	 * Wait until no suppressed trigger events remain on the discovered host and its services are no
+	 * longer suppressed - the state expected once every maintenance is out of its active window.
+	 */
+	private function waitForSuppressionCleared(): void {
+		$this->callUntilCountIsPresent('event.get', [
+			'hostids' => [self::$disc_hostid],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'suppressed' => true
+		], 0, 120, self::WAIT_ITERATION_DELAY);
+
+		$this->waitForServicesNoLongerSuppressed();
+	}
+
 	private function runDependentTriggerTest(bool $restart): void {
 		$parent_keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
 		$dep_keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2);
@@ -4689,10 +4770,36 @@ HEREDOC;
 	 * problem opened afterwards is suppressed. Returns the maintenance id for stopDiscHostMaintenance().
 	 */
 	private function startDiscHostMaintenance(string $name): string {
-		$now = time();
+		$maintenanceid = $this->upsertDiscHostMaintenance($name);
 
-		$response = $this->call('maintenance.create', [
-			'name' => $name,
+		$this->reloadConfigurationCacheAndWaitForLogLine();
+
+		return $maintenanceid;
+	}
+
+	/**
+	 * Create a data-collection maintenance for the discovered host with an active period covering now, or,
+	 * if a maintenance with the given name already exists (left over from a previous run), update it back
+	 * into an active window. Returns the maintenance id.
+	 */
+	private function upsertDiscHostMaintenance(string $name): string {
+		$maintenanceids = $this->upsertDiscHostMaintenances([$name]);
+
+		return $maintenanceids[0];
+	}
+
+	/**
+	 * Bulk variant of upsertDiscHostMaintenance(): one maintenance.get to find leftovers by name, then a
+	 * single maintenance.update for the existing ones and a single maintenance.create for the rest.
+	 * Returns the maintenance ids in the same order as the given names.
+	 */
+	private function upsertDiscHostMaintenances(array $names): array {
+		if (empty($names)) {
+			return [];
+		}
+
+		$now = time();
+		$defaults = [
 			'hosts' => ['hostid' => self::$disc_hostid],
 			'active_since' => $now - 60,
 			'active_till' => $now + 3600,
@@ -4703,14 +4810,49 @@ HEREDOC;
 				'period' => 3600,
 				'start_date' => $now - 60
 			]
+		];
+
+		$response = $this->call('maintenance.get', [
+			'output' => ['maintenanceid', 'name'],
+			'filter' => ['name' => $names]
 		]);
-		$this->assertArrayHasKey('maintenanceids', $response['result']);
-		$this->assertCount(1, $response['result']['maintenanceids']);
-		$maintenanceid = $response['result']['maintenanceids'][0];
 
-		$this->reloadConfigurationCacheAndWaitForLogLine();
+		$ids_by_name = [];
+		foreach ($response['result'] as $maintenance) {
+			$ids_by_name[$maintenance['name']] = $maintenance['maintenanceid'];
+		}
 
-		return $maintenanceid;
+		$updates = [];
+		$creates = [];
+		foreach ($names as $name) {
+			if (isset($ids_by_name[$name])) {
+				$updates[] = array_merge(['maintenanceid' => $ids_by_name[$name]], $defaults);
+			}
+			else {
+				$creates[] = array_merge(['name' => $name], $defaults);
+			}
+		}
+
+		if (!empty($updates)) {
+			$this->call('maintenance.update', $updates);
+		}
+
+		if (!empty($creates)) {
+			$response = $this->call('maintenance.create', $creates);
+			$this->assertArrayHasKey('maintenanceids', $response['result']);
+			$this->assertCount(count($creates), $response['result']['maintenanceids']);
+
+			foreach ($creates as $index => $maintenance) {
+				$ids_by_name[$maintenance['name']] = $response['result']['maintenanceids'][$index];
+			}
+		}
+
+		$maintenanceids = [];
+		foreach ($names as $name) {
+			$maintenanceids[] = $ids_by_name[$name];
+		}
+
+		return $maintenanceids;
 	}
 
 	/**
@@ -4719,47 +4861,82 @@ HEREDOC;
 	 * leaves maintenance before the rest of the suite runs.
 	 */
 	private function stopDiscHostMaintenance(string $maintenanceid): void {
-		// Ten years ahead - a start that will never come within the test run, so the maintenance stays
+		$this->stopDiscHostMaintenances([$maintenanceid]);
+	}
+
+	/**
+	 * Bulk variant of stopDiscHostMaintenance(): push the active period of all given maintenances out of
+	 * the current window with a single maintenance.update call.
+	 */
+	private function stopDiscHostMaintenances(array $maintenanceids): void {
+		if (empty($maintenanceids)) {
+			return;
+		}
+
+		// Ten years ahead - a start that will never come within the test run, so the maintenances stay
 		// defined but idle and the host is taken out of maintenance.
 		$future = time() + 10 * 365 * 24 * 3600;
 
-		$this->call('maintenance.update', [
-			'maintenanceid' => $maintenanceid,
-			'active_since' => $future,
-			'active_till' => $future + 3600,
-			'timeperiods' => [
-				'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
-				'period' => 3600,
-				'start_date' => $future
-			]
-		]);
+		$maintenances = [];
+		foreach ($maintenanceids as $maintenanceid) {
+			$maintenances[] = [
+				'maintenanceid' => $maintenanceid,
+				'active_since' => $future,
+				'active_till' => $future + 3600,
+				'timeperiods' => [
+					'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+					'period' => 3600,
+					'start_date' => $future
+				]
+			];
+		}
+
+		$this->call('maintenance.update', $maintenances);
+	}
+
+	/**
+	 * Bring maintenances ended by stopDiscHostMaintenances() back into an active window covering now
+	 * with a single maintenance.update call, then reload the configuration cache so the host re-enters
+	 * maintenance.
+	 */
+	private function resumeDiscHostMaintenances(array $maintenanceids): void {
+		if (empty($maintenanceids)) {
+			return;
+		}
+
+		$now = time();
+
+		$maintenances = [];
+		foreach ($maintenanceids as $maintenanceid) {
+			$maintenances[] = [
+				'maintenanceid' => $maintenanceid,
+				'active_since' => $now - 60,
+				'active_till' => $now + 3600,
+				'timeperiods' => [
+					'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+					'period' => 3600,
+					'start_date' => $now - 60
+				]
+			];
+		}
+
+		$this->call('maintenance.update', $maintenances);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 	}
 
 	/**
 	 * Create multiple maintenances for the discovered host and reload configuration cache once after all are created.
 	 */
 	private function startDiscHostMaintenances(int $count): void {
-		$now = time();
 		$start = count(self::$disc_maintenanceids) + 1;
 
+		$names = [];
 		for ($i = $start; $i < $start + $count; $i++) {
-			$response = $this->call('maintenance.create', [
-				'name' => 'CEP close-on-up maintenance'.$i,
-				'hosts' => ['hostid' => self::$disc_hostid],
-				'active_since' => $now - 60,
-				'active_till' => $now + 3600,
-				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
-				'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_AND_OR,
-				'timeperiods' => [
-					'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
-					'period' => 3600,
-					'start_date' => $now - 60
-				]
-			]);
-			$this->assertArrayHasKey('maintenanceids', $response['result']);
-			$this->assertCount(1, $response['result']['maintenanceids']);
-			self::$disc_maintenanceids[] = $response['result']['maintenanceids'][0];
+			$names[] = 'CEP close-on-up maintenance'.$i;
 		}
+
+		self::$disc_maintenanceids = array_merge(self::$disc_maintenanceids, $this->upsertDiscHostMaintenances($names));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 	}

@@ -150,7 +150,7 @@ static int	mw_manager_scale_workers(zbx_mw_manager_t *manager)
 
 			if (SUCCEED != (ret = mw_manager_start_workers(manager, num, &error)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "cannot start %: %s",
+				zabbix_log(LOG_LEVEL_ERR, "cannot start %s: %s",
 						get_process_type_string(manager->worker_process_type), error);
 				zbx_free(error);
 

@@ -1,6 +1,7 @@
 if AGENT
 AGENT_tests = \
 	net_if_discovery \
+	net_if_get \
 	vfs_fs_discovery \
 	system_process \
 	kernel_maxproc \
@@ -87,6 +88,20 @@ net_if_discovery_LDADD += @AGENT_LIBS@
 net_if_discovery_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 net_if_discovery_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# net_if_get
+net_if_get_SOURCES = \
+	net_if_get.c \
+	$(COMMON_SRC_FILES)
+
+net_if_get_LDADD = \
+	$(COMMON_LIB_FILES)
+
+net_if_get_LDADD += @AGENT_LIBS@
+
+net_if_get_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+net_if_get_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 # vfs_fs_discovery
 vfs_fs_discovery_SOURCES = \

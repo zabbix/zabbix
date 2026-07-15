@@ -25,29 +25,6 @@ abstract class CControllerCepRuleGeneral extends CController {
 		return $this->getUserType() == USER_TYPE_SUPER_ADMIN;
 	}
 
-	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules(existing: $this->getAction() === 'ceprule.update'));
-
-		if (!$ret) {
-			$form_errors = $this->getValidationError();
-			$response = array_filter([
-				'form_errors' => $form_errors,
-				'error' => !$form_errors
-					? [
-						'title' => static::class === CControllerCepRuleCreate::class
-							? _('Cannot add complex event processing rule')
-							: _('Cannot update complex event processing rule'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-					: null
-			]);
-
-			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
-		}
-
-		return $ret;
-	}
-
 	protected function prepareApiRequest(): array {
 		$request = $this->getInputAll();
 		unset($request['_cep_rule_reset']);
@@ -141,7 +118,64 @@ abstract class CControllerCepRuleGeneral extends CController {
 						CONDITION_EVAL_TYPE_EXPRESSION
 					]
 				],
-				'conditions' => ['objects', 'fields' => self::getConditionValidationFields()],
+				'conditions' => ['objects', 'fields' => [
+					'type' => ['integer', 'required', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME,
+						CCepRuleHelper::CONDITION_TAG, CCepRuleHelper::CONDITION_SEVERITY, CCepRuleHelper::CONDITION_HOST,
+						CCepRuleHelper::CONDITION_HOST_GROUP, CCepRuleHelper::CONDITION_TIME_PERIOD
+					]],
+					'operator' => [
+						[
+							'integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
+								CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
+							],
+							'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME,
+								CCepRuleHelper::CONDITION_HOST, CCepRuleHelper::CONDITION_HOST_GROUP
+							]]
+						],
+						[
+							'integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
+								CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_MORE_EQUAL
+							],
+							'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_SEVERITY]]
+						],
+						[
+							'integer', 'required',
+							'in' => [CONDITION_OPERATOR_IN, CONDITION_OPERATOR_NOT_IN],
+							'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
+						]
+					],
+					'event_name' => ['db cep_condition.event_name', 'required', 'not_empty',
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME]]
+					],
+					'tag_operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
+							CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS,
+							CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL
+						],
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
+					],
+					'tag' => ['db cep_condition.tag', 'required', 'not_empty',
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
+					],
+					'tag_value' => ['db cep_condition.tag_value',
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
+					],
+					'host' => ['db cep_condition.host', 'required', 'not_empty',
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST]]
+					],
+					'host_group' => ['db cep_condition.host_group', 'required', 'not_empty',
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST_GROUP]]
+					],
+					'severity' => ['db cep_condition.severity', 'required',
+						'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
+							TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_SEVERITY]]
+					],
+					'time_period' => ['db cep_condition.time_period', 'required', 'not_empty',
+						'use' => [CTimePeriodParser::class, ['usermacros' => false, 'lldmacros' => false]],
+						'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
+					],
+					'formulaid' => ['string', 'required', 'not_empty']
+				]],
 				'formula' => ['db cep_rule.formula', 'required', 'not_empty',
 					'use' => [CConditionFormulaParser::class, []],
 					'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
@@ -251,7 +285,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 		]];
 	}
 
-	public static function getOperationValidationFields(): array {
+	private static function getOperationValidationFields(): array {
 		// Note: the correct fix is needed to be done in IV-core client side (BE has no issues) -
 		// when "objects" has no "fields" in rules definition it currently deteles "fields" instead of merging.
 		return [
@@ -301,67 +335,6 @@ abstract class CControllerCepRuleGeneral extends CController {
 				'when' => ['type', 'in' => [CCepRuleHelper::OP_SUPPRESS]]
 			],
 			'sortorder' => ['db cep_operation.sortorder', 'required']
-		];
-	}
-
-	public static function getConditionValidationFields(): array {
-		return [
-			'type' => ['integer', 'required', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME,
-				CCepRuleHelper::CONDITION_TAG, CCepRuleHelper::CONDITION_SEVERITY, CCepRuleHelper::CONDITION_HOST,
-				CCepRuleHelper::CONDITION_HOST_GROUP, CCepRuleHelper::CONDITION_TIME_PERIOD
-			]],
-			'operator' => [
-				[
-					'integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
-						CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
-					],
-					'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME,
-						CCepRuleHelper::CONDITION_HOST, CCepRuleHelper::CONDITION_HOST_GROUP
-					]]
-				],
-				[
-					'integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
-						CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_MORE_EQUAL
-					],
-					'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_SEVERITY]]
-				],
-				[
-					'integer', 'required',
-					'in' => [CONDITION_OPERATOR_IN, CONDITION_OPERATOR_NOT_IN],
-					'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
-				]
-			],
-			'event_name' => ['db cep_condition.event_name', 'required', 'not_empty',
-				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_EVENT_NAME]]
-			],
-			'tag_operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL,
-					CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS,
-					CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL
-				],
-				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
-			],
-			'tag' => ['db cep_condition.tag', 'required', 'not_empty',
-				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
-			],
-			'tag_value' => ['db cep_condition.tag_value',
-				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TAG]]
-			],
-			'host' => ['db cep_condition.host', 'required', 'not_empty',
-				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST]]
-			],
-			'host_group' => ['db cep_condition.host_group', 'required', 'not_empty',
-				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_HOST_GROUP]]
-			],
-			'severity' => ['db cep_condition.severity', 'required',
-				'in' => [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
-					TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER],
-				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_SEVERITY]]
-			],
-			'time_period' => ['db cep_condition.time_period', 'required', 'not_empty',
-				'use' => [CTimePeriodParser::class, ['usermacros' => false, 'lldmacros' => false]],
-				'when' => ['type', 'in' => [CCepRuleHelper::CONDITION_TIME_PERIOD]]
-			],
-			'formulaid' => ['string', 'required', 'not_empty']
 		];
 	}
 }

@@ -82,7 +82,12 @@ window.ldap_edit_popup = new class {
 			});
 
 		if (document.getElementById('bind-password-btn') !== null) {
-			document.getElementById('bind-password-btn').addEventListener('click', this.showPasswordField);
+			document.getElementById('bind-password-btn').addEventListener('click', () => {
+				this.showPasswordField();
+
+				this.#form_element.querySelector('[name="bind_password"][type="password"]').focus();
+			});
+
 			document.getElementById('host').addEventListener('change', this.showPasswordFieldWithWarning.bind(this));
 		}
 

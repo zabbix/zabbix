@@ -50,7 +50,7 @@ echo (new CForm())
 	// Enable form submitting on Enter.
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
 	->addVar('sortorder', '0')
-	->addStyle('display: none;')
+	->addClass(ZBX_STYLE_DISPLAY_NONE)
 	->addItem((new CFormGrid())
 		->addItem((new CTemplateTag('ceprule-operation-tag-template'))
 			->addItem((new CRow())

@@ -2183,7 +2183,7 @@ out:
  ******************************************************************************/
 char	*zbx_dbconn_get_schema_esc(const zbx_dbconn_t *db)
 {
-	static char	*name;
+	static ZBX_THREAD_LOCAL char	*name;
 
 	if (NULL == name)
 	{

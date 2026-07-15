@@ -33,7 +33,7 @@ window.widget_form = new class extends CWidgetForm {
 	init({form_tabs_id, color_palette, templateid}) {
 		colorPalette.setThemeColors(color_palette);
 
-		this._$overlay_body = jQuery('.overlay-dialogue-body');
+		this._$overlay_body = jQuery(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY}`);
 		this._form = this.getForm();
 		this._templateid = templateid;
 		this._dataset_wrapper = document.getElementById('data_sets');

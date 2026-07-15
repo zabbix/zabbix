@@ -14,9 +14,13 @@
 **/
 
 
-class CControllerCepRuleDisable extends CControllerCepRuleGeneral {
+class CControllerCepRuleDisable extends CController {
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	protected function checkPermissions(): bool {
+		return $this->getUserType() == USER_TYPE_SUPER_ADMIN;
 	}
 
 	protected function checkInput(): bool {
@@ -85,19 +89,17 @@ class CControllerCepRuleDisable extends CControllerCepRuleGeneral {
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 
-			$keep_cepruleids = array_keys(API::CepRule()->get([
-				'output' => [],
-				'correlationids' => $cepruleids,
-				'editable' => true,
-				'preservekeys' => true
-			]));
+			$keep_cepruleids = array_column(API::CepRule()->get([
+				'output' => ['cep_ruleid'],
+				'cep_ruleids' => $cepruleids,
+				'editable' => true
+			]), 'cep_ruleid');
 
-			$keep_correlationids = array_keys(API::Correlation()->get([
-				'output' => [],
+			$keep_correlationids = array_column(API::Correlation()->get([
+				'output' => ['correlationid'],
 				'correlationids' => $correlationids,
-				'editable' => true,
-				'preservekeys' => true
-			]));
+				'editable' => true
+			]), 'correlationid');
 
 			$output['keepids'] = [...$keep_cepruleids,
 				...array_map(fn(string $correlationid) => "legacy-$correlationid", $keep_correlationids)

@@ -38,7 +38,7 @@ foreach (CCepRuleHelper::getConditionTagOperators() as $value => $name) {
 echo (new CForm())
 	// Enable form submitting on Enter.
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
-	->addStyle('display: none;')
+	->addClass(ZBX_STYLE_DISPLAY_NONE)
 	->addItem((new CFormGrid())
 		->addItem([
 			new CLabel('Type', 'ceprule-condition-type-focus'),

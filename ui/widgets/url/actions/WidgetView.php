@@ -18,9 +18,9 @@ namespace Widgets\Url\Actions;
 
 use CControllerDashboardWidgetView,
 	CControllerResponseData,
-	CHtmlUrlValidator,
 	CMacrosResolverHelper,
-	CSettingsHelper;
+	CSettingsHelper,
+	CUrlValidator;
 
 use Zabbix\Core\CWidget;
 
@@ -59,8 +59,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 			}
 
-			if (!$error && !CHtmlUrlValidator::validate($this->fields_values['url'], ['allow_user_macro' => false])) {
-				$error = _s('Provided URL "%1$s" is invalid.', $this->fields_values['url']);
+			if (!$error) {
+				$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
+				if (!$url_validator->validate($this->fields_values['url'])) {
+					$error = _s('Provided URL "%1$s" is invalid.', $this->fields_values['url']);
+				}
 			}
 		}
 

@@ -2294,13 +2294,10 @@ clean:
 static int	evaluate_FORECAST(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *parameters,
 		const zbx_timespec_t *ts, zbx_history_selector_t *selector, char **error)
 {
-	char				*fit_str = NULL, *mode_str = NULL;
-	double				*t = NULL, *x = NULL;
 	int				nparams, i, ret = FAIL, seconds = 0, nvalues = 0;
 	zbx_history_selector_t		time_selector = {0};
 	unsigned int			k = 0;
 	zbx_vector_history_record_t	values;
-	zbx_timespec_t			zero_time;
 	zbx_fit_t			fit;
 	zbx_mode_t			mode;
 	zbx_timespec_t			ts_end = *ts;
@@ -2343,12 +2340,17 @@ static int	evaluate_FORECAST(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 
 	if (3 <= nparams)
 	{
+		char	*fit_str = NULL;
+
 		if (SUCCEED != get_function_parameter_str(parameters, 3, &fit_str) ||
 				SUCCEED != zbx_fit_code(fit_str, &fit, &k, error))
 		{
 			*error = zbx_strdup(*error, "invalid fourth parameter");
+			zbx_free(fit_str);
 			goto out;
 		}
+
+		zbx_free(fit_str);
 	}
 	else
 	{
@@ -2357,12 +2359,17 @@ static int	evaluate_FORECAST(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 
 	if (4 == nparams)
 	{
+		char	*mode_str = NULL;
+
 		if (SUCCEED != get_function_parameter_str(parameters, 4, &mode_str) ||
 				SUCCEED != zbx_mode_code(mode_str, &mode, error))
 		{
 			*error = zbx_strdup(*error, "invalid fifth parameter");
+			zbx_free(mode_str);
 			goto out;
 		}
+
+		zbx_free(mode_str);
 	}
 	else
 	{
@@ -2391,8 +2398,10 @@ static int	evaluate_FORECAST(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 
 	if (0 < values.values_num)
 	{
-		t = (double *)zbx_malloc(t, (size_t)values.values_num * sizeof(double));
-		x = (double *)zbx_malloc(x, (size_t)values.values_num * sizeof(double));
+		zbx_timespec_t	zero_time;
+
+		double	*t = (double *)zbx_malloc(t, (size_t)values.values_num * sizeof(double));
+		double	*x = (double *)zbx_malloc(x, (size_t)values.values_num * sizeof(double));
 
 		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
 		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
@@ -2419,6 +2428,8 @@ static int	evaluate_FORECAST(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 		zbx_variant_set_dbl(value, zbx_forecast(t, x, values.values_num,
 				ts->sec - zero_time.sec - 1.0e-9 * (zero_time.ns + 1), time_selector.value, fit, k,
 				mode));
+		zbx_free(x);
+		zbx_free(t);
 	}
 	else
 	{
@@ -2428,12 +2439,6 @@ static int	evaluate_FORECAST(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 	ret = SUCCEED;
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
-
-	zbx_free(fit_str);
-	zbx_free(mode_str);
-
-	zbx_free(t);
-	zbx_free(x);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

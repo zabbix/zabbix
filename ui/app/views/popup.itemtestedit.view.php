@@ -21,7 +21,14 @@
 
 $form = (new CForm())
 	->setId('preprocessing-test-form')
-	->setName('preprocessing_test_form');
+	->setName('preprocessing_test_form')
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('itemtest')))->removeId())
+	->addVar('hostid', $data['hostid'])
+	->addVar('interfaceid', $data['interfaceid'])
+	->addVar('valuemapid', $data['valuemapid'])
+	->addVar('test_type', $data['test_type'])
+	->addVar('show_final_result', $data['show_final_result'])
+	->addStyle('display: none;');
 
 if ($data['show_prev']) {
 	$form
@@ -36,8 +43,19 @@ foreach ($data['inputs']['item'] as $name => $value) {
 			$form->addVar($name.'['.$num.'][value]', $row['value']);
 		}
 	}
+	elseif ($name === 'type') {
+		$form->addItem(
+			(new CInput('hidden', 'item_type', $value))
+				->setAttribute('data-field-type', 'hidden')
+				->removeId()
+		);
+	}
 	else {
-		$form->addItem((new CInput('hidden', $name, $value))->removeId());
+		$form->addItem(
+			(new CInput('hidden', $name, $value))
+				->setAttribute('data-field-type', 'hidden')
+				->removeId()
+		);
 	}
 }
 
@@ -59,28 +77,35 @@ foreach ($data['inputs']['host'] as $name => $value) {
 		continue;
 	}
 
-	$form->addItem((new CInput('hidden', $name, $value))->removeId());
+	$form->addItem(
+		(new CInput('hidden', $name, $value))
+			->setAttribute('data-field-type', 'hidden')
+			->removeId()
+	);
 }
 
 // Create macros table.
-$macros_table = $data['macros'] ? (new CTable())->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER) : null;
+$macros_table = $data['macros']
+	? (new CTable())
+		->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
+		->setAttribute('data-field-type', 'set')
+		->setAttribute('data-field-name', 'macros')
+	: null;
 
 $i = 0;
 foreach ($data['macros'] as $macro_name => $macro_value) {
 	$macros_table->addRow([
 		(new CCol(
-			(new CTextAreaFlexible('macro_rows['.$i.']', $macro_name))
+			(new CTextAreaFlexible('macros['.$i.'][name]', $macro_name))
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->removeId()
-				->removeAttribute('name')
 				->setReadonly()
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(RARR()))->addStyle('vertical-align: top;'),
 		(new CCol([
-			new CVar('macro_names['.$i.']', $macro_name),
-			(new CTextAreaFlexible('macro_values['.$i.']', $macro_value))
+			(new CTextAreaFlexible('macros['.$i.'][value]', $macro_value))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-				->setMaxlength(CControllerPopupItemTest::INPUT_MAX_LENGTH)
+				->setMaxlength(DB::getFieldLength('globalmacro', 'value'))
 				->setAttribute('placeholder', _('value'))
 				->disableSpellcheck()
 				->removeId()
@@ -97,7 +122,10 @@ if ($data['is_item_testable']) {
 	$form_grid->addItem([
 		new CLabel(_('Get value from host'), 'get_value'),
 		(new CFormField(
-			(new CCheckBox('get_value', 1))->setChecked($data['get_value'])
+			(new CCheckBox('get_value', 1))
+				->setChecked($data['get_value'])
+				->setUncheckedValue(0)
+				->setAttribute('autofocus', 'autofocus')
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
 
 		(new CLabel(_('Host address'), 'interface_address'))
@@ -106,9 +134,11 @@ if ($data['is_item_testable']) {
 		(new CFormField(
 			$data['interface_address_enabled']
 				? (new CTextBox('interface[address]', $data['inputs']['host']['interface']['address'], false,
-						CControllerPopupItemTest::INPUT_MAX_LENGTH
+						DB::getFieldLength('interface', 'dns')
 					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				: (new CTextBox('interface[address]', '', false, CControllerPopupItemTest::INPUT_MAX_LENGTH))
+				: (new CTextBox('interface[address]', '', false,
+						DB::getFieldLength('interface', 'dns')
+					))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setEnabled(false)
 		))->addClass('js-host-address-row'),
@@ -116,7 +146,9 @@ if ($data['is_item_testable']) {
 		(new CLabel(_('Port'), 'interface_port'))->addClass('js-host-address-row'),
 		(new CFormField(
 			$data['interface_port_enabled']
-				? (new CTextBox('interface[port]', $data['inputs']['host']['interface']['port'], '', 64))
+				? (new CTextBox('interface[port]', $data['inputs']['host']['interface']['port'], '',
+						DB::getFieldLength('interface', 'port')
+					))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				: (new CTextBox('interface[port]'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -149,7 +181,7 @@ if ($data['is_item_testable']) {
 			(new CFormField(
 				(new CTextBox('interface[details][community]',
 					$data['inputs']['host']['interface']['details']['community'], false,
-					CControllerPopupItemTest::INPUT_MAX_LENGTH
+					DB::getFieldLength('interface_snmp', 'community')
 				))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAriaRequired()
@@ -158,11 +190,12 @@ if ($data['is_item_testable']) {
 				->addClass('js-popup-row-snmp-community'),
 
 			(new CLabel(_('Max repetition count'), 'interface[details][max_repetitions]'))
+				->setAsteriskMark()
 				->addClass('js-popup-row-snmp-max-repetition'),
 			(new CFormField(
 					(new CTextBox('interface[details][max_repetitions]',
 						$data['inputs']['host']['interface']['details']['max_repetitions'], false,
-						CControllerPopupItemTest::INPUT_MAX_LENGTH
+						DB::getFieldLength('interface_snmp', 'max_repetitions')
 					))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAriaRequired()
@@ -175,7 +208,7 @@ if ($data['is_item_testable']) {
 			(new CFormField(
 				(new CTextBox('interface[details][contextname]',
 					$data['inputs']['host']['interface']['details']['contextname'], false,
-					CControllerPopupItemTest::INPUT_MAX_LENGTH
+					DB::getFieldLength('interface_snmp', 'contextname')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -186,7 +219,7 @@ if ($data['is_item_testable']) {
 			(new CFormField(
 				(new CTextBox('interface[details][securityname]',
 					$data['inputs']['host']['interface']['details']['securityname'], false,
-					CControllerPopupItemTest::INPUT_MAX_LENGTH
+					DB::getFieldLength('interface_snmp', 'securityname')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -224,7 +257,7 @@ if ($data['is_item_testable']) {
 			(new CFormField(
 				(new CTextBox('interface[details][authpassphrase]',
 					$data['inputs']['host']['interface']['details']['authpassphrase'], false,
-					CControllerPopupItemTest::INPUT_MAX_LENGTH
+					DB::getFieldLength('interface_snmp', 'authpassphrase')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -245,7 +278,7 @@ if ($data['is_item_testable']) {
 			(new CFormField(
 				(new CTextBox('interface[details][privpassphrase]',
 					$data['inputs']['host']['interface']['details']['privpassphrase'], false,
-					CControllerPopupItemTest::INPUT_MAX_LENGTH
+					DB::getFieldLength('interface_snmp', 'privpassphrase')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -287,7 +320,7 @@ if ($data['is_item_testable']) {
 
 		(new CFormField(
 			(new CSimpleButton(_('Get value')))
-				->setId('get_value_btn')
+				->addClass('js-get-value-submit')
 				->addClass(ZBX_STYLE_BTN_ALT)
 		))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_3)
@@ -304,27 +337,42 @@ $form_grid->addItem([
 			->addStyle('display: none;')
 	], 'value'),
 	new CFormField(
-		(new CMultilineInput('value', '', [
-			'disabled' => false,
-			'readonly' => false,
-			'use_tab' => false
+		(new CMultilineInput('value', $data['value'], [
+			'placeholder' => _('value'),
+			'rows' => 0,
+			'grow' => 'auto',
+			'monospace_font' => false,
+			'readonly' => $data['not_supported'],
+			'use_tab' => false,
+			'autofocus' => !$data['is_item_testable']
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	),
 
 	new CLabel(_('Time'), 'time'),
 	new CFormField(
-		(new CTextBox(null, 'now', true))
+		(new CTextBox('', 'now', true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->removeAttribute('data-field-type')
 			->setId('time')
 	),
 
 	($data['test_type'] == CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD)
 		? null
 		: (new CFormField([
-			(new CCheckBox('not_supported'))->setLabel(_('Not supported'))->setChecked((bool) $data['not_supported']),
+			(new CCheckBox('not_supported'))
+				->setLabel(_('Not supported'))
+				->setChecked((bool) $data['not_supported'])
+				->setUncheckedValue(0),
 			(new CDiv([
 				(new CLabel(_('Error'), 'runtime_error_match'))->setFor('runtime_error'),
-				(new CMultilineInput('runtime_error', '', ['readonly' => false, 'use_tab' => false]))
+				new CMultilineInput('runtime_error', $data['runtime_error'], [
+					'placeholder' => _('error text'),
+					'rows' => 0,
+					'grow' => 'auto',
+					'monospace_font' => false,
+					'readonly' => $data['not_supported'],
+					'use_tab' => false
+				])
 			]))
 		]))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -333,7 +381,11 @@ $form_grid->addItem([
 
 	new CLabel(_('Previous value'), 'prev_item_value'),
 	new CFormField(
-		(new CMultilineInput('prev_value', '', [
+		(new CMultilineInput('prev_value', $data['prev_value'], [
+			'placeholder' => $data['show_prev'] ? _('value'): '',
+			'rows' => 0,
+			'grow' => 'auto',
+			'monospace_font' => false,
 			'disabled' => !$data['show_prev'],
 			'use_tab' => false
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -385,32 +437,79 @@ if (count($data['steps']) > 0) {
 			->addVar('steps['.$i.'][error_handler]', $step['error_handler'])
 			->addVar('steps['.$i.'][error_handler_params]', $step['error_handler_params']);
 
-		// Temporary solution to fix "\n\n1" conversion to "\n1" in the hidden textarea field after jQuery.append().
-		if ($step['type'] == ZBX_PREPROC_CSV_TO_JSON || $step['type'] == ZBX_PREPROC_VALIDATE_RANGE) {
-			$form->addItem(new CInput('hidden', 'steps['.$i.'][params]', $step['params']));
-		}
-		else {
-			$form->addVar('steps['.$i.'][params]', $step['params']);
+		if ($step['error_handler'] == ZBX_PREPROC_FAIL_SET_VALUE
+				|| $step['error_handler'] == ZBX_PREPROC_FAIL_SET_ERROR) {
+			$form->addVar('steps['.$i.'][on_fail]', 1);
 		}
 
-		$result_table->addRow([
-			(new CCol($step['num'].':')),
-			(new CCol($step['name']))
-				->setId('preproc-test-step-'.$i.'-name')
-				->addClass(ZBX_STYLE_WORDBREAK),
-			(new CCol())
-				->addClass(ZBX_STYLE_RIGHT)
-				->setId('preproc-test-step-'.$i.'-result'),
-			(new CCol(
-				(new CButton('copy_button-'.$i))
-					->setTitle(_('Copy to clipboard'))
-					->addClass(ZBX_ICON_COPY)
-					->addClass(ZBX_STYLE_BTN_GREY_ICON)
-					->addClass('js-copy-button')
-					->setAttribute('data-index', $i)
-					->addStyle('display: none')
-			))->addClass('result-copy')
-		]);
+		$step_params = $step['type'] == ZBX_PREPROC_SCRIPT
+			? [$step['params'], ''] : explode("\n", $step['params']);
+
+		if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+			foreach ($step_params as $j => $param_value) {
+				$form->addItem(
+						(new CInput('hidden', 'steps['.$i.'][params_'.$j.'_not_supported]', $param_value))
+							->setAttribute('data-notrim', '')
+							->setAttribute('data-field-type', 'hidden')
+					);
+			}
+		}
+		elseif ($step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+			$j = 0;
+
+			for ($k = 0; $k < count($step_params); $k += 3) {
+				$form->addItem(
+						(new CInput('hidden', 'steps['.$i.'][params_set_snmp]['.$j.'][name]', $step_params[$k]))
+							->setAttribute('data-field-type', 'hidden')
+					)
+					->addItem(
+						(new CInput('hidden', 'steps['.$i.'][params_set_snmp]['.$j.'][oid_prefix]',
+							$step_params[$k+1]
+						))
+							->setAttribute('data-field-type', 'hidden')
+					)
+					->addItem(
+						(new CInput('hidden', 'steps['.$i.'][params_set_snmp]['.$j.'][format]', $step_params[$k+2]))
+							->setAttribute('data-field-type', 'hidden')
+					);
+
+				$j++;
+			}
+		}
+		else {
+			foreach ($step_params as $j => $param_value) {
+				$form->addItem(
+					(new CInput('hidden', 'steps['.$i.'][params_'.$j.']', $param_value))
+						->setAttribute('data-notrim', '')
+						->setAttribute('data-field-type', 'hidden')
+				);
+			}
+		}
+
+		$result_table->addRow(
+			(new CRow([
+				(new CCol($step['num'].':')),
+				(new CCol($step['name']))
+					->setId('preproc-test-step-'.$i.'-name')
+					->addClass('js-preproc-step-name')
+					->addClass(ZBX_STYLE_WORDBREAK),
+				(new CCol())
+					->addClass(ZBX_STYLE_RIGHT)
+					->addClass('js-preproc-step-result')
+					->setId('preproc-test-step-'.$i.'-result'),
+				(new CCol(
+					(new CButton('copy_button-'.$i))
+						->setTitle(_('Copy to clipboard'))
+						->addClass(ZBX_ICON_COPY)
+						->addClass(ZBX_STYLE_BTN_GREY_ICON)
+						->addClass('js-copy-button')
+						->setAttribute('data-index', $i)
+						->addStyle('display: none')
+				))->addClass('result-copy')
+			]))
+				->addClass('js-preprocessing-test-step')
+				->setAttribute('data-index', $i)
+		);
 	}
 
 	$form_grid->addItem([
@@ -425,10 +524,13 @@ if (count($data['steps']) > 0) {
 
 if ($data['show_final_result']) {
 	$form_grid->addItem([
-		(new CLabel(_('Result')))->addClass('js-final-result'),
-		(new CFormField())
+		(new CLabel(_('Result')))->addClass('js-final-result')->addStyle('display: none'),
+		(new CFormField(
+			(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 			->addClass('item-final-result')
+			->addStyle('display: none')
 	]);
 }
 
@@ -456,6 +558,12 @@ $form->addItem([
 			->addClass('item-test-result')
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 	),
+	(new CTemplateTag('preprocessing-step-result-empty'))->addItem(
+		(new CSpan('#{result}'))->addClass(ZBX_STYLE_GREY)
+	),
+	(new CTemplateTag('preprocessing-step-result-default'))->addItem(
+		(new CSpan('#{result}'))
+	),
 	(new CTemplateTag('preprocessing-step-result-warning'))->addItem(
 		(new CDiv([
 			(new CDiv('#{result}'))
@@ -481,6 +589,24 @@ $form->addItem([
 		]))
 			->addStyle('margin-top: 1px;')
 			->addClass(ZBX_STYLE_GREY)
+	),
+	(new CTemplateTag('final-result-row'))->addItem(
+		(new CDiv([
+			(new CSpan('#{action}'))->addClass('final-result-action'),
+			(new CSpan())
+				->addClass('final-result-result')
+				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+				->addClass('item-test-result')
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CButton('copy_button_final_#{mode}'))
+				->setTitle(_('Copy to clipboard'))
+				->addClass(ZBX_ICON_COPY)
+				->addClass(ZBX_STYLE_BTN_GREY_ICON)
+				->addClass('js-copy-button')
+				->addStyle('display: none')
+		]))
+			->addClass('final-result-row')
+			->addClass('display-icon')
 	)
 ]);
 
@@ -493,18 +619,27 @@ $warning_box = $data['show_warning']
 $output = [
 	'header' => $data['title'],
 	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_TEST_EDIT),
-	'script_inline' => $this->readJsFile('popup.itemtestedit.view.js.php'),
 	'body' => (new CDiv([$warning_box, $form]))->toString(),
-	'cancel_action' => 'return saveItemTestInputs();',
 	'buttons' => [
 		[
 			'title' => ($data['is_item_testable'] && $data['get_value']) ? _('Get value and test') : _('Test'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
 			'enabled' => true,
-			'isSubmit' => true,
-			'action' => 'return itemCompleteTest(overlay);'
+			'isSubmit' => true
 		]
-	]
+	],
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('popup.itemtestedit.view.js.php').
+		'itemtestedit_view_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'rules_get_value' => $data['js_validation_rules_get_value'],
+			'is_item_testable' => $data['is_item_testable'],
+			'show_prev' => $data['show_prev'],
+			'show_snmp_form' => $data['show_snmp_form'],
+			'interface_address_enabled' => $data['interface_address_enabled'],
+			'interface_port_enabled' => $data['interface_port_enabled']
+		]).');'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

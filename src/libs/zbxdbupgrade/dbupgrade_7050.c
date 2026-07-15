@@ -844,17 +844,17 @@ static int	DBpatch_7050059(void)
 
 static int	DBpatch_7050060(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	/* 1 - ZBX_SETTING_TYPE_STR */
-	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str) values ('banner_data',1,'')"))
-		return FAIL;
-
 	return SUCCEED;
 }
 
 static int	DBpatch_7050061(void)
+{
+	const zbx_db_field_t	field = {"auto_start", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("dashboard", &field);
+}
+
+static int	DBpatch_7050062(void)
 {
 	const zbx_db_table_t	table =
 			{"trigger_rtdata", "triggerid", 0,
@@ -872,12 +872,12 @@ static int	DBpatch_7050061(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050062(void)
+static int	DBpatch_7050063(void)
 {
 	return DBcreate_index("trigger_rtdata", "trigger_rtdata_1", "value,lastchange", 0);
 }
 
-static int	DBpatch_7050063(void)
+static int	DBpatch_7050064(void)
 {
 	const zbx_db_field_t	field = {"triggerid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -885,7 +885,7 @@ static int	DBpatch_7050063(void)
 	return DBadd_foreign_key("trigger_rtdata", 1, &field);
 }
 
-static int	DBpatch_7050064(void)
+static int	DBpatch_7050065(void)
 {
 	/* hosts.status 3 - HOST_STATUS_TEMPLATE */
 	/* triggers.flags 0, 4 - ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED */
@@ -910,66 +910,66 @@ static int	DBpatch_7050064(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050065(void)
+static int	DBpatch_7050066(void)
 {
 	return DBdrop_field("triggers", "value");
 }
 
-static int	DBpatch_7050066(void)
+static int	DBpatch_7050067(void)
 {
 	return DBdrop_field("triggers", "state");
 }
 
-static int	DBpatch_7050067(void)
+static int	DBpatch_7050068(void)
 {
 	return DBdrop_field("triggers", "lastchange");
 }
 
-static int	DBpatch_7050068(void)
+static int	DBpatch_7050069(void)
 {
 	return DBdrop_field("triggers", "error");
 }
 
-static int	DBpatch_7050069(void)
+static int	DBpatch_7050070(void)
 {
 	return DBcreate_changelog_insert_trigger("trigger_depends", "triggerdepid");
 }
 
-static int	DBpatch_7050070(void)
+static int	DBpatch_7050071(void)
 {
 	return DBcreate_changelog_update_trigger("trigger_depends", "triggerdepid");
 }
 
-static int	DBpatch_7050071(void)
+static int	DBpatch_7050072(void)
 {
 	return DBcreate_changelog_delete_trigger("trigger_depends", "triggerdepid");
 }
 
-static int	DBpatch_7050072(void)
+static int	DBpatch_7050073(void)
 {
 	return DBdrop_foreign_key("trigger_depends", 2);
 }
 
-static int	DBpatch_7050073(void)
+static int	DBpatch_7050074(void)
 {
 	return DBdrop_foreign_key("trigger_depends", 1);
 }
 
-static int	DBpatch_7050074(void)
+static int	DBpatch_7050075(void)
 {
 	const zbx_db_field_t	field = {"triggerid_down", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("trigger_depends", 1, &field);
 }
 
-static int	DBpatch_7050075(void)
+static int	DBpatch_7050076(void)
 {
 	const zbx_db_field_t	field = {"triggerid_up", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("trigger_depends", 2, &field);
 }
 
-static int	DBpatch_7050076(void)
+static int	DBpatch_7050077(void)
 {
 	int	i;
 	const char	*values[] = {
@@ -993,7 +993,7 @@ static int	DBpatch_7050076(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050077(void)
+static int	DBpatch_7050078(void)
 {
 	zbx_db_result_t result;
 	zbx_db_row_t	row;
@@ -1022,7 +1022,7 @@ static int	DBpatch_7050077(void)
 	return ret;
 }
 
-static int	DBpatch_7050078(void)
+static int	DBpatch_7050079(void)
 {
 	const zbx_db_table_t	table =
 			{"cep_rule", "cep_ruleid", 0,
@@ -1043,22 +1043,22 @@ static int	DBpatch_7050078(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050079(void)
+static int	DBpatch_7050080(void)
 {
 	return DBcreate_changelog_insert_trigger("cep_rule", "cep_ruleid");
 }
 
-static int	DBpatch_7050080(void)
+static int	DBpatch_7050081(void)
 {
 	return DBcreate_changelog_update_trigger("cep_rule", "cep_ruleid");
 }
 
-static int	DBpatch_7050081(void)
+static int	DBpatch_7050082(void)
 {
 	return DBcreate_changelog_delete_trigger("cep_rule", "cep_ruleid");
 }
 
-static int	DBpatch_7050082(void)
+static int	DBpatch_7050083(void)
 {
 	const zbx_db_table_t	table =
 			{"cep_rule_rtdata", "cep_ruleid", 0,
@@ -1073,7 +1073,7 @@ static int	DBpatch_7050082(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050083(void)
+static int	DBpatch_7050084(void)
 {
 	const zbx_db_field_t	field = {"cep_ruleid", NULL, "cep_rule", "cep_ruleid", 0, ZBX_TYPE_ID, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1082,7 +1082,7 @@ static int	DBpatch_7050083(void)
 }
 
 
-static int	DBpatch_7050084(void)
+static int	DBpatch_7050085(void)
 {
 	const zbx_db_table_t	table =
 			{"cep_condition", "cep_conditionid", 0,
@@ -1106,34 +1106,34 @@ static int	DBpatch_7050084(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050085(void)
+static int	DBpatch_7050086(void)
 {
 	return DBcreate_index("cep_condition", "cep_condition_1", "cep_ruleid", 0);
 }
 
-static int	DBpatch_7050086(void)
+static int	DBpatch_7050087(void)
 {
 	const zbx_db_field_t	field = {"cep_ruleid", NULL, "cep_rule", "cep_ruleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBadd_foreign_key("cep_condition", 1, &field);
 }
 
-static int	DBpatch_7050087(void)
+static int	DBpatch_7050088(void)
 {
 	return DBcreate_changelog_insert_trigger("cep_condition", "cep_conditionid");
 }
 
-static int	DBpatch_7050088(void)
+static int	DBpatch_7050089(void)
 {
 	return DBcreate_changelog_update_trigger("cep_condition", "cep_conditionid");
 }
 
-static int	DBpatch_7050089(void)
+static int	DBpatch_7050090(void)
 {
 	return DBcreate_changelog_delete_trigger("cep_condition", "cep_conditionid");
 }
 
-static int	DBpatch_7050090(void)
+static int	DBpatch_7050091(void)
 {
 	const zbx_db_table_t	table =
 			{"cep_window", "cep_ruleid", 0,
@@ -1156,34 +1156,34 @@ static int	DBpatch_7050090(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050091(void)
+static int	DBpatch_7050092(void)
 {
 	return DBcreate_index("cep_window", "cep_window_1", "cep_ruleid", 0);
 }
 
-static int	DBpatch_7050092(void)
+static int	DBpatch_7050093(void)
 {
 	const zbx_db_field_t	field = {"cep_ruleid", NULL, "cep_rule", "cep_ruleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBadd_foreign_key("cep_window", 1, &field);
 }
 
-static int	DBpatch_7050093(void)
+static int	DBpatch_7050094(void)
 {
 	return DBcreate_changelog_insert_trigger("cep_window", "cep_ruleid");
 }
 
-static int	DBpatch_7050094(void)
+static int	DBpatch_7050095(void)
 {
 	return DBcreate_changelog_update_trigger("cep_window", "cep_ruleid");
 }
 
-static int	DBpatch_7050095(void)
+static int	DBpatch_7050096(void)
 {
 	return DBcreate_changelog_delete_trigger("cep_window", "cep_ruleid");
 }
 
-static int	DBpatch_7050096(void)
+static int	DBpatch_7050097(void)
 {
 	const zbx_db_table_t	table =
 			{"cep_operation", "cep_operationid", 0,
@@ -1208,34 +1208,34 @@ static int	DBpatch_7050096(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050097(void)
+static int	DBpatch_7050098(void)
 {
 	return DBcreate_index("cep_operation", "cep_operation_1", "cep_ruleid", 0);
 }
 
-static int	DBpatch_7050098(void)
+static int	DBpatch_7050099(void)
 {
 	const zbx_db_field_t	field = {"cep_ruleid", NULL, "cep_rule", "cep_ruleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBadd_foreign_key("cep_operation", 1, &field);
 }
 
-static int	DBpatch_7050099(void)
+static int	DBpatch_7050100(void)
 {
 	return DBcreate_changelog_insert_trigger("cep_operation", "cep_operationid");
 }
 
-static int	DBpatch_7050100(void)
+static int	DBpatch_7050101(void)
 {
 	return DBcreate_changelog_update_trigger("cep_operation", "cep_operationid");
 }
 
-static int	DBpatch_7050101(void)
+static int	DBpatch_7050102(void)
 {
 	return DBcreate_changelog_delete_trigger("cep_operation", "cep_operationid");
 }
 
-static int	DBpatch_7050102(void)
+static int	DBpatch_7050103(void)
 {
 	const zbx_db_table_t	table =
 			{"cep_operation_condition", "cep_operation_conditionid", 0,
@@ -1254,12 +1254,12 @@ static int	DBpatch_7050102(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050103(void)
+static int	DBpatch_7050104(void)
 {
 	return DBcreate_index("cep_operation_condition", "cep_operation_condition_1", "cep_operationid", 0);
 }
 
-static int	DBpatch_7050104(void)
+static int	DBpatch_7050105(void)
 {
 	const zbx_db_field_t	field = {"cep_operationid", NULL, "cep_operation", "cep_operationid", 0, ZBX_TYPE_ID,
 			ZBX_NOTNULL, 0};
@@ -1267,22 +1267,22 @@ static int	DBpatch_7050104(void)
 	return DBadd_foreign_key("cep_operation_condition", 1, &field);
 }
 
-static int	DBpatch_7050105(void)
+static int	DBpatch_7050106(void)
 {
 	return DBcreate_changelog_insert_trigger("cep_operation_condition", "cep_operation_conditionid");
 }
 
-static int	DBpatch_7050106(void)
+static int	DBpatch_7050107(void)
 {
 	return DBcreate_changelog_update_trigger("cep_operation_condition", "cep_operation_conditionid");
 }
 
-static int	DBpatch_7050107(void)
+static int	DBpatch_7050108(void)
 {
 	return DBcreate_changelog_delete_trigger("cep_operation_condition", "cep_operation_conditionid");
 }
 
-static int	DBpatch_7050108(void)
+static int	DBpatch_7050109(void)
 {
 	const zbx_db_table_t	table =
 			{"cep_group", "cep_groupid", 0,
@@ -1302,12 +1302,12 @@ static int	DBpatch_7050108(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050109(void)
+static int	DBpatch_7050110(void)
 {
 	return DBcreate_index("cep_group", "cep_group_1", "cep_ruleid", 0);
 }
 
-static int	DBpatch_7050110(void)
+static int	DBpatch_7050111(void)
 {
 	const zbx_db_table_t	table =
 			{"cep_group_event", "cep_groupid_eventid", 0,
@@ -1323,52 +1323,52 @@ static int	DBpatch_7050110(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050111(void)
+static int	DBpatch_7050112(void)
 {
 	return DBcreate_index("cep_group_event", "cep_group_event_1", "cep_groupid,cep_groupid_eventid", 0);
 }
 
-static int	DBpatch_7050112(void)
-{
-	const zbx_db_field_t	field = {"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
-
-	return DBadd_field("problem", &field);
-}
-
 static int	DBpatch_7050113(void)
 {
-	const zbx_db_field_t	field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("problem", &field);
 }
 
 static int	DBpatch_7050114(void)
 {
+	const zbx_db_field_t	field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_7050115(void)
+{
 	const zbx_db_field_t	field = {"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("event_recovery", &field);
 }
 
-static int	DBpatch_7050115(void)
+static int	DBpatch_7050116(void)
 {
 	const zbx_db_field_t	field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("events", &field);
 }
 
-static int	DBpatch_7050116(void)
+static int	DBpatch_7050117(void)
 {
 	const zbx_db_field_t	field = {"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("event_suppress", &field);
 }
 
-static int	DBpatch_7050117(void)
+static int	DBpatch_7050118(void)
 {
 	return DBcreate_index("event_suppress", "event_suppress_5", "cep_ruleid", 0);
 }
 
-static int	DBpatch_7050118(void)
+static int	DBpatch_7050119(void)
 {
 	const zbx_db_field_t	field = {"cep_ruleid", NULL, "cep_rule", "cep_ruleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
@@ -1376,14 +1376,14 @@ static int	DBpatch_7050118(void)
 	return DBadd_foreign_key("event_suppress", 4, &field);
 }
 
-static int	DBpatch_7050119(void)
+static int	DBpatch_7050120(void)
 {
 	const zbx_db_field_t	field = {"details", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("acknowledges", &field);
 }
 
-static int	DBpatch_7050120(void)
+static int	DBpatch_7050121(void)
 {
 	const zbx_db_field_t	field = {"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
@@ -1517,5 +1517,6 @@ DBPATCH_ADD(7050117, 0, 1)
 DBPATCH_ADD(7050118, 0, 1)
 DBPATCH_ADD(7050119, 0, 1)
 DBPATCH_ADD(7050120, 0, 1)
+DBPATCH_ADD(7050121, 0, 1)
 
 DBPATCH_END()

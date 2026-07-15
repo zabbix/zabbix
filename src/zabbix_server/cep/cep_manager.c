@@ -123,6 +123,7 @@ static void	cep_manager_free(zbx_cep_manager_t *manager)
  * Parameters: workers_num      - [IN] initial number of workers              *
  *             dbpool           - [IN] database connection pool               *
  *             config_source_ip - [IN] source ip from conf parameters         *
+ *             stats            - [OUT] initialization statistics             *
  *             error            - [OUT] error message                         *
  *                                                                            *
  * Return value: pointer to the created CEP manager instance or NULL on       *
@@ -130,7 +131,7 @@ static void	cep_manager_free(zbx_cep_manager_t *manager)
  *                                                                            *
  ******************************************************************************/
 static zbx_cep_manager_t	*cep_manager_create(const zbx_thread_info_t *info, zbx_dbconn_pool_t *dbpool,
-		const char *config_source_ip, char **error)
+		const char *config_source_ip, zbx_cep_init_stats_t *stats, char **error)
 {
 	zbx_cep_manager_t	*manager;
 	int			ret = FAIL;
@@ -139,7 +140,7 @@ static zbx_cep_manager_t	*cep_manager_create(const zbx_thread_info_t *info, zbx_
 	zbx_cep_queue_t		*queue;
 
 	manager = (zbx_cep_manager_t *)zbx_calloc(NULL, 1, sizeof(zbx_cep_manager_t));
-	workers = (zbx_cep_worker_t **)zbx_calloc(NULL, (size_t)CEP_WORKERS_MAX, sizeof(zbx_cep_worker_t));
+	workers = (zbx_cep_worker_t **)zbx_calloc(NULL, (size_t)CEP_WORKERS_MAX, sizeof(zbx_cep_worker_t *));
 
 	for (int i = 0; i < CEP_WORKERS_MAX; i++)
 		workers[i] = cep_worker_create(dbpool);
@@ -165,7 +166,8 @@ static zbx_cep_manager_t	*cep_manager_create(const zbx_thread_info_t *info, zbx_
 	zbx_cep_api_acquire();
 
 	cep_cache_acquire(&cep);
-	cep_init(cep, dbpool);
+	cep_init(cep, dbpool, stats);
+	cep_dump(cep, "cache initialization");
 	cep_cache_release(&cep);
 
 	ret = SUCCEED;
@@ -280,6 +282,28 @@ static void	cep_manager_get_stats(zbx_cep_manager_t *manager, zbx_ipc_client_t *
 	response = (unsigned char*)zbx_malloc(NULL, reponse_len);
 
 	cep_manager_add_remote_task(manager, client, message, response, reponse_len);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get cep statistics                                                *
+ *                                                                            *
+ * Parameters: stats  - [IN/OUT] CEP startup statistics                       *
+ *             client  - [IN/OUT] IPC client requesting the statistics        *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_manager_get_init_stats(zbx_cep_init_stats_t *stats, zbx_ipc_client_t **client)
+{
+	unsigned char	response[sizeof(zbx_cep_init_stats_t)], *ptr = response;
+
+	ptr += zbx_serialize_value(ptr, stats->events_num);
+	ptr += zbx_serialize_value(ptr, stats->events_time);
+	ptr += zbx_serialize_value(ptr, stats->tags_num);
+	ptr += zbx_serialize_value(ptr, stats->tags_time);
+	ptr += zbx_serialize_value(ptr, stats->suppress_num);
+	ptr += zbx_serialize_value(ptr, stats->suppress_time);
+
+	zbx_ipc_client_send(*client, ZBX_CEP_GET_INIT_STATS, response, (zbx_uint32_t)(ptr - response));
 }
 
 /******************************************************************************
@@ -728,6 +752,7 @@ void	*zbx_cep_manager_thread(void *args)
 	zbx_vector_mw_task_ptr_t		tasks;
 	int					shutdown = 0;
 	zbx_cep_stats_t				stats = {0};
+	zbx_cep_init_stats_t			init_stats;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -740,7 +765,8 @@ void	*zbx_cep_manager_thread(void *args)
 
 	zbx_vector_mw_task_ptr_create(&tasks);
 
-	if (NULL == (manager = cep_manager_create(info, unit_args->shared->dbpool, cep_args->config_source_ip, &error)))
+	if (NULL == (manager = cep_manager_create(info, unit_args->shared->dbpool, cep_args->config_source_ip,
+			&init_stats, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize CEP manager: %s", error);
 		zbx_free(error);
@@ -825,6 +851,9 @@ void	*zbx_cep_manager_thread(void *args)
 					break;
 				case ZBX_CEP_GET_STATS:
 					cep_manager_get_stats(manager, &client, &message);
+					break;
+				case ZBX_CEP_GET_INIT_STATS:
+					cep_manager_get_init_stats(&init_stats, &client);
 					break;
 				case ZBX_CEP_ADD_EVENTS:
 					cep_manager_add_events(manager, &client, &message);

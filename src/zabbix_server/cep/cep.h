@@ -35,7 +35,7 @@ int	cep_event_handle_compare(const void *a1, const void *a2);
 void	cep_event_handle_set(zbx_cep_event_handle_t h, zbx_cep_event_t *event);
 
 zbx_cep_t	*cep_create(void);
-void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool);
+void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool, zbx_cep_init_stats_t *stats);
 void	cep_destroy(void *a);
 
 void	cep_sync_object_state(zbx_cep_t *cep, zbx_dbconn_t *db);
