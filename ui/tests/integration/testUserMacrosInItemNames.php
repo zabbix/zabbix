@@ -20,7 +20,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * Test suite for user macro expansion in item names.
  *
  * @required-components server
- * @backup
+ * @configurationDataProvider serverConfigurationProvider
  */
 class testUserMacrosInItemNames extends CIntegrationTest {
 	/** Maximum number of iterations to wait for NDJSON export files to appear. */
@@ -76,6 +76,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
 			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
+
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
 
@@ -100,7 +101,6 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			'value_type' => ITEM_VALUE_TYPE_TEXT,
 			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
-
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['itemids']);
 
@@ -235,7 +235,6 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid2 = $response['result']['hostids'][0];
 
-		// Clean up stale NDJSON data from a previous run before creating new data.
 		$this->cleanupNdjsonExportData();
 
 		// Create host with host macros and trapper item with tag for NDJSON export test.
@@ -378,7 +377,6 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 	/**
 	 * Check user macro resolution in NDJSON export for item names and tag values in history, trends and problem events.
 	 *
-	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testUserMacrosInItemNames_ndjsonExport() {
 		$export_dir = self::getExportDir();
