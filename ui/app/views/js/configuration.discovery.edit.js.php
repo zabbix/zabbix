@@ -241,10 +241,12 @@ window.drule_edit_popup = new class {
 				const checked_uniqueness_criteria = document.querySelector(
 					'[name="uniqueness_criteria"]:checked:not([data-id])'
 				);
-				input.uniq = checked_uniqueness_criteria !== null
-				&& checked_uniqueness_criteria.value === input.dcheckid
-					? 1
-					: 0;
+
+				if (checked_uniqueness_criteria !== null && checked_uniqueness_criteria.value === input.dcheckid) {
+					input.uniq = 1;
+				} else {
+					input.uniq = 0;
+				}
 			}
 
 			if (typeof input.host_source === 'undefined') {
@@ -456,11 +458,10 @@ window.drule_edit_popup = new class {
 				action: 'discovery.delete',
 				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('discovery')) ?>
 			};
+			const druleid = this.#form.findFieldByName('druleid').getValue();
 
-			this.#post(zabbixUrl(url_params), {druleids: [this.#form.findFieldByName('druleid').getValue()]},
-				(response) => {
+			this.#post(zabbixUrl(url_params), {druleids: [druleid]}, (response) => {
 					overlayDialogueDestroy(this.#overlay.dialogueid);
-
 					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				}
 			);
