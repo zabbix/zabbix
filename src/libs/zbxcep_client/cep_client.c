@@ -1000,7 +1000,7 @@ int	zbx_cep_get_stats(zbx_cep_stats_t *stats, char **error)
 
 	if (FAIL == zbx_ipc_socket_read(&socket, &response))
 	{
-		*error = zbx_strdup(NULL, "cannot send delete events message to CEP service");
+		*error = zbx_strdup(NULL, "cannot receive data from CEP service");
 		goto out;
 	}
 
@@ -1054,7 +1054,7 @@ int	zbx_cep_sync_object_state(char **error)
 
 	if (FAIL == zbx_ipc_socket_read(&socket, &response))
 	{
-		*error = zbx_strdup(NULL, "cannot send delete events message to CEP service");
+		*error = zbx_strdup(NULL, "cannot receive data from CEP service");
 		goto out;
 	}
 
@@ -1067,4 +1067,57 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve startup statistics from the CEP service                  *
+ *                                                                            *
+ * Parameters: stats - [OUT] CEP cache loading statistics                     *
+ *             error - [OUT] error message if the operation fails             *
+ *                                                                            *
+ * Return value: SUCCEED on success, FAIL otherwise                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cep_get_init_stats(zbx_cep_init_stats_t *stats, char **error)
+{
+	zbx_ipc_socket_t	socket;
+	char			*errmsg = NULL;
+	int			ret = FAIL;
+	zbx_ipc_message_t	response = {0};
+	unsigned char		*ptr;
+
+	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_CEP, SEC_PER_MIN, &errmsg))
+	{
+		*error = zbx_dsprintf(NULL, "cannot connect to CEP service: %s", errmsg);
+		zbx_free(errmsg);
+		return ret;
+	}
+
+	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_CEP_GET_INIT_STATS, NULL, 0))
+	{
+		*error = zbx_strdup(NULL, "cannot send get init stats message to CEP service");
+		goto out;
+	}
+
+	if (FAIL == zbx_ipc_socket_read(&socket, &response))
+	{
+		*error = zbx_strdup(NULL, "cannot receive data from CEP service");
+		goto out;
+	}
+
+	ptr = response.data;
+	ptr += zbx_deserialize_value(ptr, &stats->events_num);
+	ptr += zbx_deserialize_value(ptr, &stats->events_time);
+	ptr += zbx_deserialize_value(ptr, &stats->tags_num);
+	ptr += zbx_deserialize_value(ptr, &stats->tags_time);
+	ptr += zbx_deserialize_value(ptr, &stats->suppress_num);
+	(void)zbx_deserialize_value(ptr, &stats->suppress_time);
+
+	zbx_ipc_message_clean(&response);
+
+	ret = SUCCEED;
+out:
+	zbx_ipc_socket_close(&socket);
+
+	return ret;
+}
 

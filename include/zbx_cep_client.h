@@ -34,7 +34,8 @@
 #define ZBX_CEP_DELETE_EVENTS		(ZBX_IPC_RTC_MAX + 9)
 #define ZBX_CEP_CHECK_TRIGGER_DEPS	(ZBX_IPC_RTC_MAX + 10)
 #define ZBX_CEP_GET_STATS		(ZBX_IPC_RTC_MAX + 11)
-#define ZBX_CEP_SYNC_OBJECT_STATE	(ZBX_IPC_RTC_MAX + 12)
+#define ZBX_CEP_GET_INIT_STATS		(ZBX_IPC_RTC_MAX + 12)
+#define ZBX_CEP_SYNC_OBJECT_STATE	(ZBX_IPC_RTC_MAX + 13)
 
 typedef enum
 {
@@ -125,6 +126,19 @@ typedef struct
 zbx_cep_stats_t;
 
 int	zbx_cep_get_stats(zbx_cep_stats_t *stats, char **error);
+
+typedef struct
+{
+	int	events_num;
+	double	events_time;
+	int	tags_num;
+	double	tags_time;
+	int	suppress_num;
+	double	suppress_time;
+}
+zbx_cep_init_stats_t;
+
+int	zbx_cep_get_init_stats(zbx_cep_init_stats_t *stats, char **error);
 
 int	zbx_cep_sync_object_state(char **error);
 

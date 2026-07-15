@@ -28,6 +28,7 @@
 #include "zbxipcservice.h"
 #include "zbxlog.h"
 #include "zbxmw.h"
+#include "zbxserialize.h"
 #include "zbxsupervisor_client.h"
 #include "zbxtimekeeper.h"
 #include "zbxself.h"
@@ -269,6 +270,28 @@ static void	cep_manager_get_stats(zbx_cep_manager_t *manager, zbx_ipc_client_t *
 	response = (unsigned char*)zbx_malloc(NULL, reponse_len);
 
 	cep_manager_add_remote_task(manager, client, message, response, reponse_len);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get cep statistics                                                *
+ *                                                                            *
+ * Parameters: stats  - [IN/OUT] CEP startup statistics                       *
+ *             client  - [IN/OUT] IPC client requesting the statistics        *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_manager_get_init_stats(zbx_cep_init_stats_t *stats, zbx_ipc_client_t **client)
+{
+	unsigned char	response[sizeof(zbx_cep_init_stats_t)], *ptr = response;
+
+	ptr += zbx_serialize_value(ptr, stats->events_num);
+	ptr += zbx_serialize_value(ptr, stats->events_time);
+	ptr += zbx_serialize_value(ptr, stats->tags_num);
+	ptr += zbx_serialize_value(ptr, stats->tags_time);
+	ptr += zbx_serialize_value(ptr, stats->suppress_num);
+	ptr += zbx_serialize_value(ptr, stats->suppress_time);
+
+	zbx_ipc_client_send(*client, ZBX_CEP_GET_INIT_STATS, response, (zbx_uint32_t)(ptr - response));
 }
 
 /******************************************************************************
@@ -554,10 +577,6 @@ void	*zbx_cep_manager_thread(void *args)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "loaded %d events in %.3fs, %d tags in %.3fs, %d suppress data in %.3fs",
-			init_stats.events_num, init_stats.events_time, init_stats.tags_num, init_stats.tags_time,
-			init_stats.suppress_num, init_stats.suppress_time);
-
 	/* initialize statistics */
 	time_stat = zbx_time();
 
@@ -618,6 +637,9 @@ void	*zbx_cep_manager_thread(void *args)
 					break;
 				case ZBX_CEP_GET_STATS:
 					cep_manager_get_stats(manager, &client, &message);
+					break;
+				case ZBX_CEP_GET_INIT_STATS:
+					cep_manager_get_init_stats(&init_stats, &client);
 					break;
 				case ZBX_CEP_ADD_EVENTS:
 					cep_manager_add_events(manager, &client, &message);

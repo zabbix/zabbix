@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxcommon.h"
 #include "zbxdiag.h"
 
 #include "zbxjson.h"
@@ -554,6 +555,9 @@ static void	diag_prepare_default_request(struct zbx_json *j, unsigned int flags)
 	if (0 != (flags & (1 << ZBX_DIAGINFO_PROXYBUFFER)))
 		diag_add_section_request(j, ZBX_DIAG_PROXYBUFFER, NULL);
 
+	if (0 != (flags & (1 << ZBX_DIAGINFO_CEP)))
+		diag_add_section_request(j, ZBX_DIAG_CEP, NULL);
+
 }
 
 /******************************************************************************
@@ -836,6 +840,52 @@ static void	diag_log_proxybuffer(struct zbx_json_parse *jp, char **out, size_t *
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "==");
 }
 
+static const char	*diag_log_cep_get_stat(struct zbx_json_parse *jp, const char *key, char *buf, size_t size)
+{
+	if (SUCCEED != zbx_json_value_by_name(jp, key, buf, size, NULL))
+		zbx_snprintf(buf, size, "?");
+
+	return buf;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: log history cache diagnostic information                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	diag_log_cep(struct zbx_json_parse *jp, char **out, size_t *out_alloc, size_t *out_offset)
+{
+	struct zbx_json_parse	jp_startup;
+
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "== CEP diagnostic information ==");
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp, "startup", &jp_startup))
+	{
+		char	*str = NULL;
+		size_t	str_alloc = 0, str_offset = 0;
+		char	buf[ZBX_MAX_DOUBLE_LEN + 1];
+
+		zbx_strcpy_alloc(&str, &str_alloc, &str_offset, "loaded");
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, " %s events",
+			diag_log_cep_get_stat(&jp_startup, "events_num", buf, sizeof(buf)));
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, " in %ss",
+			diag_log_cep_get_stat(&jp_startup, "events_time", buf, sizeof(buf)));
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ", %s tags",
+			diag_log_cep_get_stat(&jp_startup, "tags_num", buf, sizeof(buf)));
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, " in %ss",
+			diag_log_cep_get_stat(&jp_startup, "tags_time", buf, sizeof(buf)));
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ", %s suppress data",
+			diag_log_cep_get_stat(&jp_startup, "suppress_num", buf, sizeof(buf)));
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, " in %ss",
+			diag_log_cep_get_stat(&jp_startup, "suppress_time", buf, sizeof(buf)));
+
+		zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "%s", str);
+		zbx_free(str);
+	}
+
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "==");
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: log diagnostic information                                        *
@@ -902,6 +952,8 @@ void	zbx_diag_log_info(unsigned int flags, char **result)
 				diag_log_connector(&jp_section, result, &result_alloc, &result_offset);
 			else if (0 == strcmp(section, ZBX_DIAG_PROXYBUFFER))
 				diag_log_proxybuffer(&jp_section, result, &result_alloc, &result_offset);
+			else if (0 == strcmp(section, ZBX_DIAG_CEP))
+				diag_log_cep(&jp_section, result, &result_alloc, &result_offset);
 		}
 	}
 	else
