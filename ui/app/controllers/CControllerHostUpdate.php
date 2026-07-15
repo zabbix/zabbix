@@ -228,7 +228,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput($this->getValidationRules());
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
