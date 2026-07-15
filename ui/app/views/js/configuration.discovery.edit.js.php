@@ -417,7 +417,7 @@ window.drule_edit_popup = new class {
 	#clone() {
 		this.#removePopupMessages();
 		const druleid = this.#form_element.querySelector('[name="druleid"]');
-		druleid?.remove();
+		druleid.remove();
 
 		// Remove all warning icons and enable all Remove buttons in Checks table.
 		const table = document.getElementById('dcheckList');
