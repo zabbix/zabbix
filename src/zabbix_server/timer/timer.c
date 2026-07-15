@@ -524,7 +524,7 @@ static int	db_update_event_suppress_data(int *suppressed_num, int process_num, z
 
 							zbx_event_maintenance_t	event = {
 								.eventid = query->eventid,
-								.maintenanceid = data->maintenances.values[k].first
+								.maintenanceid = query->maintenances.values[k].first
 							};
 
 							zbx_vector_event_maintenance_append(&suppressed, event);
