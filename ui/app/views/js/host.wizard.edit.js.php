@@ -534,7 +534,7 @@ window.host_wizard_edit = new class {
 				field_with_error.scrollIntoView({block: 'center', behavior: 'auto'});
 			}
 			else {
-				this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = 0;
+				this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY}`).scrollTop = 0;
 			}
 		});
 	}
@@ -1085,7 +1085,8 @@ window.host_wizard_edit = new class {
 	}
 
 	#removeMessageBoxes() {
-		this.#dialogue.querySelectorAll('.overlay-dialogue-body .msg-bad').forEach(message_box => message_box.remove());
+		this.#dialogue.querySelectorAll(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY} .msg-bad`)
+			.forEach(message_box => message_box.remove());
 	}
 
 	#updateStepsQueue() {
@@ -1214,7 +1215,7 @@ window.host_wizard_edit = new class {
 
 		const step = this.#getCurrentStep();
 
-		const scroll_top = this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop;
+		const scroll_top = this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY}`).scrollTop;
 		const step_init = path === undefined;
 
 		switch (step) {
@@ -1467,7 +1468,7 @@ window.host_wizard_edit = new class {
 
 		requestAnimationFrame(() => {
 			if (path) {
-				this.#dialogue.querySelector('.overlay-dialogue-body').scrollTop = scroll_top;
+				this.#dialogue.querySelector(`.${ZBX_STYLE_OVERLAY_DIALOGUE_BODY}`).scrollTop = scroll_top;
 			}
 			else if (step_init) {
 				this.#overlay.recoverFocus();
