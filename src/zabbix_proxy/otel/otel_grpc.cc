@@ -119,8 +119,6 @@ ServerUnaryReactor *MetricsServiceImpl::Export(CallbackServerContext *context,
 
 	zbx_mw_task_t	*task = otel_task_message_create(static_cast<zbx_grpc_request_t>(heap_request), OTEL_METRIC);
 
-	zabbix_log(LOG_LEVEL_ERR, "[WDN] push task");
-
 	zbx_mw_queue_lock(handle->queue);
 	zbx_mw_queue_push_priority(handle->queue, task);
 	zbx_mw_queue_unlock(handle->queue);

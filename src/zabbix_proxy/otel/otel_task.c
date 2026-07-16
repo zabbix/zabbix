@@ -28,16 +28,12 @@ zbx_mw_task_t	*otel_task_message_create(zbx_grpc_request_t request, zbx_grpc_req
 	task->type = type;
 	task->message = NULL;
 
-	zabbix_log(LOG_LEVEL_ERR, "[WDN] create otel task message, type:%d", type);
-
 	return (zbx_mw_task_t *)task;
 }
 
 static void	otel_task_message_free(void *task)
 {
 	zbx_otel_task_message_t	*otel_task = (zbx_otel_task_message_t *)task;
-
-	zabbix_log(LOG_LEVEL_ERR, "[WDN] free message task");
 
 	zbx_grpc_request_free(otel_task->request, otel_task->type);
 	zbx_free(otel_task->message);

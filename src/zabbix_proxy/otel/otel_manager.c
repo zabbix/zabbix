@@ -96,11 +96,8 @@ out:
 
 static void	otel_manager_process_finished(zbx_otel_manager_t *manager, zbx_vector_mw_task_ptr_t *tasks)
 {
-	zabbix_log(LOG_LEVEL_ERR, "[WDN] process finished");
 	for (int i = 0; i < tasks->values_num; i++)
-	{
 		otel_task_free(tasks->values[i]);
-	}
 
 	zbx_vector_mw_task_ptr_clear(tasks);
 }
