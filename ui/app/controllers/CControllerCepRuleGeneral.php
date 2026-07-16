@@ -291,7 +291,10 @@ abstract class CControllerCepRuleGeneral extends CController {
 		return [
 			'execute_when' => array_map(fn(int $window_type) => ['db cep_operation.execute_when', 'required',
 				'in' => CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE[$window_type],
-				'messages' => ['in' => 'Execute when type not allowed for this window type.'],
+				'messages' => ['in' => _s(
+					'Execute when type not allowed for window type "%1$s".',
+					CCepRuleHelper::getWindowLabelString(compact('window_type'))
+				)],
 				'when' => ['../window_type', 'in' => [$window_type]]
 			], array_keys(CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE)),
 			'tags' => ['objects', 'fields' => [
