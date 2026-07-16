@@ -229,7 +229,7 @@ $form_grid = (new CFormGrid())
 						->addValue(_('Custom'), 1)
 						->setModern()
 						->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					(new CNumericBox('max_records', $data['form']['max_records'], 10, false, false, false))
+					(new CNumericBox('max_records', $data['form']['max_records'], 10, false, false))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
 				])

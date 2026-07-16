@@ -752,7 +752,7 @@ function stepAddHostInterface(): array {
 									makeHelpIcon(_('Max repetition count is applicable to walk only.'))
 								], 'interfaces[#{row_index}][details][max_repetitions]')),
 								new CNumericBox('interfaces[#{row_index}][details][max_repetitions]', 0, 10,
-									false, false, false
+									false, false
 								)
 							]))->addClass('js-snmp-repetition-count'),
 							(new CFormField([

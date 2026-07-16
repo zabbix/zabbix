@@ -16,20 +16,17 @@
 
 class CNumericBox extends CInput {
 
-	private bool $allow_empty;
 	private bool $allow_negative;
 	private int $min_length = 0;
-	private ?int $default_value = null;
 
 	public function __construct($name = 'number', $value = '0', $maxlength = 20, $readonly = false,
-			$allow_empty = false, $allow_negative = true) {
+			$allow_negative = true) {
 		parent::__construct('text', $name, $value);
 
 		$this->setReadonly($readonly);
 		$this->setAttribute('maxlength', $maxlength);
 		$this->setAttribute('data-field-type', 'text-box');
 
-		$this->allow_empty = $allow_empty;
 		$this->allow_negative = $allow_negative;
 	}
 
@@ -50,16 +47,8 @@ class CNumericBox extends CInput {
 		return $this;
 	}
 
-	public function setDefaultValue(int $value): static {
-		$this->default_value = $value;
-
-		return $this;
-	}
-
 	public function toString($destroy = true) {
 		$this->onChange('normalizeNumericBox(this, '.json_encode([
-			'default_value' => $this->default_value,
-			'allow_empty' => $this->allow_empty,
 			'allow_negative' => $this->allow_negative,
 			'min_length' => $this->min_length
 		]).');');
