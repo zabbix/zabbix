@@ -339,7 +339,6 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 		if (data.parentId === null) {
 			new AddValueMap({
-				hostname: value.hostname,
 				name: value.name,
 				mappings: value.mappings
 			});
@@ -357,8 +356,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 			srcfld1: 'valuemapid',
 			context: element.dataset.context,
 			disable_names: disable_names,
-			editable: true,
-			massupdate: 1
+			editable: true
 		}, {dialogue_class: 'modal-popup-generic', trigger_element: element});
 	}
 

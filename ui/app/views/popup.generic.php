@@ -710,7 +710,7 @@ switch ($data['popup_type']) {
 				? new CCheckBox('item['.$valuemap['id'].']', $valuemap['id'])
 				: null;
 
-			if ($valuemap['massupdate']) {
+			if (array_key_exists('hostname', $valuemap)) {
 				$name[] = (new CSpan($valuemap['hostname']))->addClass(ZBX_STYLE_GREY);
 				$name[] = NAME_DELIMITER;
 			}

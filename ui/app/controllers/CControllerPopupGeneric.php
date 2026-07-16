@@ -564,7 +564,6 @@ class CControllerPopupGeneric extends CController {
 			'templates' =>							'string|not_empty',
 			'host_templates' =>						'string|not_empty',
 			'multiselect' =>						'in 1',
-			'massupdate' =>							'in 1',
 			'patternselect' =>						'in 1',
 			'submit' =>								'string',
 			'excludeids' =>							'array',
@@ -1773,7 +1772,7 @@ class CControllerPopupGeneric extends CController {
 				$records = [];
 				$hostids = $this->getInput('hostids', []);
 				$context = $this->getInput('context', '');
-				$massupdate = $this->getInput('massupdate', 0);
+				$include_hostname = !$hostids;
 
 				if ($context === '' || (!$hostids && !$this->groupids && !$this->template_groupids)) {
 					break;
@@ -1786,12 +1785,7 @@ class CControllerPopupGeneric extends CController {
 					'preservekeys' => true
 				];
 
-				if ($hostids) {
-					$hosts = $context === 'host'
-						? API::Host()->get($options + ['hostids' => $hostids])
-						: API::Template()->get($options + ['templateids' => $hostids]);
-				}
-				else {
+				if (!$hostids) {
 					$options['limit'] = $limit;
 
 					$hosts = $context === 'host'
@@ -1813,12 +1807,10 @@ class CControllerPopupGeneric extends CController {
 				foreach ($db_valuemaps as $db_valuemap) {
 					$valuemap = [
 						'id' => $db_valuemap['valuemapid'],
-						'hostname' => $hosts[$db_valuemap['hostid']]['name'],
 						'name' => $db_valuemap['name'],
 						'mappings' => array_values($db_valuemap['mappings']),
-						'_disabled' => in_array($db_valuemap['name'], $disable_names),
-						'massupdate' => $massupdate
-					];
+						'_disabled' => in_array($db_valuemap['name'], $disable_names)
+					] + ($include_hostname ? ['hostname' => $hosts[$db_valuemap['hostid']]['name']] : []);
 
 					$records[$db_valuemap['valuemapid']] = $valuemap;
 				}
