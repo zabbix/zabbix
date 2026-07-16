@@ -37,7 +37,7 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 	protected static $before_user;
 
 	/**
-	 * Resource type Sheduled report
+	 * Resource type Scheduled report
 	 */
 	const RESOURCE_TYPE = 46;
 
