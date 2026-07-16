@@ -566,8 +566,8 @@ class CSetupWizard extends CForm {
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			)
 			->addRow(_('Database port'), [
-				(new CNumericBox('port', $this->getConfig('DB_PORT', $config->config['DB']['PORT']), 5, false, false
-				))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+				(new CNumericBox('port', $this->getConfig('DB_PORT', $config->config['DB']['PORT']), 5, false, false))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CSpan(_('0 - use default port')))->addClass(ZBX_STYLE_GREY)
 			])
