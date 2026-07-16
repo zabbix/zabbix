@@ -609,7 +609,7 @@ class CSetupWizard extends CForm {
 					->addOptions(CSelect::createOptionsFromArray(CFrontendSetup::getSupportedDatabases()))
 			)
 			->addRow(new CLabel([
-					_('Database host'),
+					_('Host'),
 					makeHelpIcon([
 						_('Enter one or more values as host:port or [host]:port (IPv6), separated by commas.'),
 						BR(),
@@ -621,18 +621,18 @@ class CSetupWizard extends CForm {
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 				'db_host_row'
 			)
-			->addRow(_('Database port'), [
+			->addRow(_('Port'), [
 				(new CNumericBox('port', $this->getConfig('DB_PORT', $config->config['DB']['PORT']), 5, false, false,
 					false
 				))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CSpan(_('0 - use default port')))->addClass(ZBX_STYLE_GREY)
 			])
-			->addRow(_('Database name'),
+			->addRow(_('Name'),
 				(new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix')))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			)
-			->addRow(_('Database schema'),
+			->addRow(_('Schema'),
 				(new CTextBox('schema', $this->getConfig('DB_SCHEMA', $config->config['DB']['SCHEMA'])))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 				'db_schema_row',
@@ -650,7 +650,7 @@ class CSetupWizard extends CForm {
 					->setModern(true)
 			)
 			// Plaintext.
-			->addRow(_('User'),
+			->addRow(_('Username'),
 				(new CTextBox('user', $this->getConfig('DB_USER', 'zabbix')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 				'db_user',
 				$db_creds_storage != DB_STORE_CREDS_CONFIG ? ZBX_STYLE_DISPLAY_NONE : null
@@ -761,7 +761,7 @@ class CSetupWizard extends CForm {
 			);
 
 		$table
-			->addRow(_('Database TLS encryption'),
+			->addRow(_('Use secure connection (TLS)'),
 				[
 					(new CCheckBox('tls_encryption'))->setChecked($this->getConfig('DB_ENCRYPTION', true)),
 					(new CDiv(
@@ -773,34 +773,34 @@ class CSetupWizard extends CForm {
 				'db_encryption_row',
 				ZBX_STYLE_DISPLAY_NONE
 			)
-			->addRow(_('Verify database certificate'),
+			->addRow(_('Verify server certificate'),
 				(new CCheckBox('verify_certificate'))->setChecked($this->getConfig('DB_ENCRYPTION_ADVANCED')),
 				'db_verify_host',
 				ZBX_STYLE_DISPLAY_NONE
 			)
 			->addRow(
-				(new CLabel(_('Database TLS CA file'), 'ca_file'))->setAsteriskMark(),
+				(new CLabel(_('CA certificate file'), 'ca_file'))->setAsteriskMark(),
 				(new CTextBox('ca_file', $this->getConfig('DB_CA_FILE')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 				'db_cafile_row',
 				ZBX_STYLE_DISPLAY_NONE
 			)
-			->addRow(_('Database TLS key file'),
+			->addRow(_('Client private key file'),
 				(new CTextBox('key_file', $this->getConfig('DB_KEY_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 				'db_keyfile_row',
 				ZBX_STYLE_DISPLAY_NONE
 			)
-			->addRow(_('Database TLS certificate file'),
+			->addRow(_('Client certificate file'),
 				(new CTextBox('cert_file', $this->getConfig('DB_CERT_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 				'db_certfile_row',
 				ZBX_STYLE_DISPLAY_NONE
 			)
-			->addRow(_('Database host verification'),
+			->addRow(_('Verify hostname'),
 				(new CCheckBox('verify_host'))->setChecked($this->getConfig('DB_VERIFY_HOST')),
 				'db_verify_host_row',
 				ZBX_STYLE_DISPLAY_NONE
 			)
-			->addRow(_('Database TLS cipher list'),
+			->addRow(_('TLS cipher list'),
 				(new CTextBox('cipher_list', $this->getConfig('DB_CIPHER_LIST')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 				'db_cipher_row',
 				ZBX_STYLE_DISPLAY_NONE

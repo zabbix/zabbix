@@ -80,6 +80,10 @@ define('ELASTICSEARCH_RESPONSE_PLAIN',			0);
 define('ELASTICSEARCH_RESPONSE_AGGREGATION',	1);
 define('ELASTICSEARCH_RESPONSE_DOCUMENTS',		2);
 
+define('ELASTICSEARCH_AUTH_NONE',		0);
+define('ELASTICSEARCH_AUTH_BASIC',		1);
+define('ELASTICSEARCH_AUTH_API_KEY',	2);
+
 define('ZBX_FONTPATH',				realpath('assets/fonts')); // where to search for font (GD > 2.0.18)
 define('ZBX_GRAPH_FONT_NAME',		'DejaVuSans'); // font file name
 define('ZBX_GRAPH_LEGEND_HEIGHT',	120); // when graph height is less then this value, some legend will not show up
@@ -213,8 +217,10 @@ define('PASSWD_CHECK_DIGITS', 0x02);
 define('PASSWD_CHECK_SPECIAL', 0x04);
 define('PASSWD_CHECK_SIMPLE', 0x08);
 
-define('ZBX_DB_MYSQL',		'MYSQL');
-define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
+define('ZBX_DB_MYSQL',			'MYSQL');
+define('ZBX_DB_POSTGRESQL',		'POSTGRESQL');
+define('ZBX_DB_CLICKHOUSE',		'CLICKHOUSE');
+define('ZBX_DB_ELASTICSEARCH',	'ELASTICSEARCH');
 
 define('ZBX_DB_EXTENSION_TIMESCALEDB', 'timescaledb');
 
