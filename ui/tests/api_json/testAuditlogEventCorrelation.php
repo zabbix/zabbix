@@ -26,6 +26,11 @@ class testAuditlogEventCorrelation extends testAuditlogCommon {
 	 */
 	private const CORRELATIONID = 99001;
 
+	/**
+	 * Resource type Event corelation
+	 */
+	const RESOURCE_TYPE = 34;
+
 	public function testAuditlogEventCorrelation_Create() {
 		$create = $this->call('correlation.create', [
 			[
@@ -66,7 +71,7 @@ class testAuditlogEventCorrelation extends testAuditlogCommon {
 			'correlation.correlationid' => ['add', $resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
+		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogEventCorrelation_Update() {
@@ -111,11 +116,13 @@ class testAuditlogEventCorrelation extends testAuditlogCommon {
 				=> ['add', $condition['corr_conditionid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::CORRELATIONID);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::CORRELATIONID, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogEventCorrelation_Delete() {
 		$this->call('correlation.delete', [self::CORRELATIONID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated event correlation name', self::CORRELATIONID);
+		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated event correlation name', self::CORRELATIONID,
+				self::RESOURCE_TYPE
+		);
 	}
 }

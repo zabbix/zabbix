@@ -41,6 +41,11 @@ class testAuditlogService extends testAuditlogCommon {
 	 */
 	protected static $problem_tagid;
 
+	/**
+	 * Resource type Service
+	 */
+	const RESOURCE_TYPE = 18;
+
 	public function testAuditlogService_Create() {
 		$create = $this->call('service.create', [
 			[
@@ -114,7 +119,7 @@ class testAuditlogService extends testAuditlogCommon {
 			'service.serviceid' => ['add', self::$resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid);
+		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -192,7 +197,7 @@ class testAuditlogService extends testAuditlogCommon {
 					=> ['add', $upd_problem_tagid['service_problem_tagid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -200,6 +205,6 @@ class testAuditlogService extends testAuditlogCommon {
 	 */
 	public function testAuditlogService_Delete() {
 		$this->call('service.delete', [self::$resourceid]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Update service audit', self::$resourceid);
+		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Update service audit', self::$resourceid, self::RESOURCE_TYPE);
 	}
 }

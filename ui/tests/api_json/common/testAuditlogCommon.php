@@ -51,20 +51,23 @@ class testAuditlogCommon extends CAPITest {
 	/**
 	 * Send auditlog.get request and check returned values.
 	 *
-	 * @param string $parameter 	what parameter need to be checked in audit
-	 * @param integer $actionid 	action id
-	 * @param string $expected 		what should be returned in request
-	 * @param integer $resourceid 	resource id
+	 * @param string       $parameter      What parameter need to be checked in audit.
+	 * @param integer      $action_type    Action ID.
+	 * @param string       $expected       What should be returned in request.
+	 * @param integer|null $resourceid     Resource ID.
+	 * @param integer      $resource_type  For what type of resource should the record be retrieved
 	 */
-	public function getAuditDetails($parameter, $actionid, $expected, $resourceid) {
+	public function getAuditDetails($parameter, $action_type, $expected, $resourceid, $resource_type) {
 		$get = $this->call('auditlog.get', [
 			'output' => [$parameter],
 			'sortfield' => 'clock',
 			'sortorder' => 'DESC',
 			'filter' => [
 				'resourceid' => $resourceid,
-				'action' => $actionid
-			]
+				'resourcetype' => $resource_type,
+				'action' => $action_type
+			],
+			'limit' => 1
 		]);
 
 		$this->assertEquals($expected, $get['result'][0][$parameter]);

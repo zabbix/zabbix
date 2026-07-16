@@ -26,6 +26,11 @@ class testAuditlogAction extends testAuditlogCommon {
 	 */
 	private const ACTIONID = 3;
 
+	/**
+	 * Resource type Action
+	 */
+	const RESOURCE_TYPE = 5;
+
 	public function testAuditlogAction_Create() {
 		$create = $this->call('action.create', [
 			[
@@ -134,7 +139,7 @@ class testAuditlogAction extends testAuditlogCommon {
 			'action.actionid' => ['add', $resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
+		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogAction_Update() {
@@ -213,11 +218,11 @@ class testAuditlogAction extends testAuditlogCommon {
 			'action.operations['.$operationid['operationid'].'].opmessage.subject' => ['update', 'Updated audit message', '']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::ACTIONID);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::ACTIONID, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogAction_Delete() {
 		$this->call('action.delete', [self::ACTIONID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated action audit', self::ACTIONID);
+		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated action audit', self::ACTIONID, self::RESOURCE_TYPE);
 	}
 }

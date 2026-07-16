@@ -24,7 +24,12 @@ class testAuditlogDashboard extends testAuditlogCommon {
 	/**
 	 * Existing Dashboard ID.
 	 */
-	private const DASHBOARDID = 1;
+	const DASHBOARDID = 1;
+
+	/**
+	 * Resource type Dashboard
+	 */
+	const RESOURCE_TYPE = 33;
 
 	public function testAuditlogDashboard_Create() {
 		$create = $this->call('dashboard.create', [
@@ -143,7 +148,7 @@ class testAuditlogDashboard extends testAuditlogCommon {
 			'dashboard.dashboardid' => ['add', $resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
+		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogDashboard_Update() {
@@ -205,11 +210,11 @@ class testAuditlogDashboard extends testAuditlogCommon {
 				=> ['add', $dashboard_usrgrpid['dashboard_usrgrpid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::DASHBOARDID);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::DASHBOARDID, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogDashboard_Delete() {
 		$this->call('dashboard.delete', [self::DASHBOARDID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated dashboard name', self::DASHBOARDID);
+		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated dashboard name', self::DASHBOARDID, self::RESOURCE_TYPE);
 	}
 }
