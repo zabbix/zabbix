@@ -89,7 +89,7 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 			'maintenance.maintenanceid' => ['add', $resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, $resourceid, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogMaintenance_Update() {
@@ -156,11 +156,11 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 			'maintenance.tags['.$tags['maintenancetagid'].'].maintenancetagid' => ['add', $tags['maintenancetagid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::MAINTENANCEID, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::MAINTENANCEID, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogMaintenance_Delete() {
 		$this->call('maintenance.delete', [self::MAINTENANCEID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'updated_maintenance', self::MAINTENANCEID, self::RESOURCE_TYPE);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'updated_maintenance', self::MAINTENANCEID, self::RESOURCE_TYPE);
 	}
 }

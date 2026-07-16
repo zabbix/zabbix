@@ -148,7 +148,7 @@ class testAuditlogDashboard extends testAuditlogCommon {
 			'dashboard.dashboardid' => ['add', $resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, $resourceid, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogDashboard_Update() {
@@ -210,11 +210,11 @@ class testAuditlogDashboard extends testAuditlogCommon {
 				=> ['add', $dashboard_usrgrpid['dashboard_usrgrpid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::DASHBOARDID, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::DASHBOARDID, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogDashboard_Delete() {
 		$this->call('dashboard.delete', [self::DASHBOARDID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated dashboard name', self::DASHBOARDID, self::RESOURCE_TYPE);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'Updated dashboard name', self::DASHBOARDID, self::RESOURCE_TYPE);
 	}
 }

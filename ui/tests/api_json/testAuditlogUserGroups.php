@@ -69,7 +69,7 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 			'usergroup.usrgrpid' => ['add', $resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid, self::RESOURCE_TYPE_GROUP);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, $resourceid, self::RESOURCE_TYPE_GROUP);
 
 		$updated = json_encode([
 			'user.usrgrps['.$id['id'].']' => ['add'],
@@ -77,7 +77,7 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 			'user.usrgrps['.$id['id'].'].id' => ['add', $id['id']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::USERID, self::RESOURCE_TYPE_USER);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::USERID, self::RESOURCE_TYPE_USER);
 	}
 
 	public function testAuditlogUserGroups_Update() {
@@ -96,12 +96,12 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 			'usergroup.name' => ['update', 'Updated user group name', 'No access to the frontend']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::USRGRPID, self::RESOURCE_TYPE_GROUP);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::USRGRPID, self::RESOURCE_TYPE_GROUP);
 	}
 
 	public function testAuditlogUserGroups_Delete() {
 		$this->call('usergroup.delete', [self::USRGRPID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated user group name', self::USRGRPID,
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'Updated user group name', self::USRGRPID,
 				self::RESOURCE_TYPE_GROUP
 		);
 	}

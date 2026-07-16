@@ -123,6 +123,6 @@ class testAuditlogSettings extends testAuditlogCommon {
 			'report_test_timeout' => '50s'
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, 1, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, 1, self::RESOURCE_TYPE);
 	}
 }

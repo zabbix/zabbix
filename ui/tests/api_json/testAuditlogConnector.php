@@ -123,7 +123,7 @@ class testAuditlogConnector extends testAuditlogCommon {
 			'connector.connectorid' => ['add', self::$resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, self::$resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -196,7 +196,7 @@ class testAuditlogConnector extends testAuditlogCommon {
 					=> ['add', $updated_tagid['connector_tagid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::$resourceid, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogConnector_CreateNtlm() {
@@ -224,7 +224,7 @@ class testAuditlogConnector extends testAuditlogCommon {
 			'connector.connectorid' => ['add', self::$resourceid_ntlm]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid_ntlm, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, self::$resourceid_ntlm, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -248,7 +248,7 @@ class testAuditlogConnector extends testAuditlogCommon {
 			'connector.item_value_type' => ['update', '4', '1']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid_ntlm, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::$resourceid_ntlm, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogConnector_CreateKerberos() {
@@ -276,7 +276,7 @@ class testAuditlogConnector extends testAuditlogCommon {
 			'connector.connectorid' => ['add', self::$resourceid_kerberos]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid_kerberos, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, self::$resourceid_kerberos, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -298,7 +298,7 @@ class testAuditlogConnector extends testAuditlogCommon {
 			'connector.password' => ['update', '******', '******']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid_kerberos, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::$resourceid_kerberos, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogConnector_CreateDigest() {
@@ -326,7 +326,7 @@ class testAuditlogConnector extends testAuditlogCommon {
 			'connector.connectorid' => ['add', self::$resourceid_digest]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid_digest, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, self::$resourceid_digest, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -348,7 +348,7 @@ class testAuditlogConnector extends testAuditlogCommon {
 			'connector.password' => ['update', '******', '******']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid_digest, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::$resourceid_digest, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogConnector_CreateBearer() {
@@ -374,7 +374,7 @@ class testAuditlogConnector extends testAuditlogCommon {
 			'connector.connectorid' => ['add', self::$resourceid_bearer]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid_bearer, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, self::$resourceid_bearer, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -394,7 +394,7 @@ class testAuditlogConnector extends testAuditlogCommon {
 			'connector.token' => ['update', '******', '******']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid_bearer, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::$resourceid_bearer, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -402,6 +402,6 @@ class testAuditlogConnector extends testAuditlogCommon {
 	 */
 	public function testAuditlogConnector_Delete() {
 		$this->call('connector.delete', [self::$resourceid]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated controller', self::$resourceid, self::RESOURCE_TYPE);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'Updated controller', self::$resourceid, self::RESOURCE_TYPE);
 	}
 }

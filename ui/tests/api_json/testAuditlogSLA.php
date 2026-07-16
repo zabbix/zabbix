@@ -120,7 +120,7 @@ class testAuditlogSLA extends testAuditlogCommon {
 			'sla.slaid' => ['add', self::$resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid, self::RESOURCE_TYPE, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, self::$resourceid, self::RESOURCE_TYPE, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -199,7 +199,7 @@ class testAuditlogSLA extends testAuditlogCommon {
 					=> ['add', $updated_downtime['sla_excluded_downtimeid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid, self::RESOURCE_TYPE, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::$resourceid, self::RESOURCE_TYPE, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -207,7 +207,7 @@ class testAuditlogSLA extends testAuditlogCommon {
 	 */
 	public function testAuditlogSLA_Delete() {
 		$this->call('sla.delete', [self::$resourceid]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated SLA', self::$resourceid, self::RESOURCE_TYPE,
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'Updated SLA', self::$resourceid, self::RESOURCE_TYPE,
 				self::RESOURCE_TYPE
 		);
 	}

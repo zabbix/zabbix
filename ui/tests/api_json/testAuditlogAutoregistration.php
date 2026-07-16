@@ -39,6 +39,6 @@ class testAuditlogAutoregistration extends testAuditlogCommon {
 			'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478'
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, 1, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, 1, self::RESOURCE_TYPE);
 	}
 }

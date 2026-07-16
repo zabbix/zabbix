@@ -79,7 +79,7 @@ class testAuditlogMediaType extends testAuditlogCommon {
 			'mediatype.mediatypeid' => ['add', $resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, $resourceid, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogMediaType_Update() {
@@ -132,11 +132,11 @@ class testAuditlogMediaType extends testAuditlogCommon {
 			'mediatype.attempt_interval' => ['update', '30s', '10s']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::MEDIATYPEID, self::RESOURCE_TYPE);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::MEDIATYPEID, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogMediaType_Delete() {
 		$this->call('mediatype.delete', [self::MEDIATYPEID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'updated_email_media', self::MEDIATYPEID, self::RESOURCE_TYPE);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'updated_email_media', self::MEDIATYPEID, self::RESOURCE_TYPE);
 	}
 }
