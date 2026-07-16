@@ -2233,7 +2233,7 @@ class CHost extends CHostGeneral {
 				$path = '/'.($i + 1).'/'.$field;
 
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',$path,
-					_('parameter is readonly while you do not permission to current proxy group')
+					_('parameter is readonly while you do not have permission to current proxy group')
 				));
 			}
 		}
