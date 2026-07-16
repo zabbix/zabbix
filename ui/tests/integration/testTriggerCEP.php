@@ -2989,6 +2989,16 @@ HEREDOC;
 	}
 
 	/**
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpFromSameTrigger$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpFromSameTrigger() {
+		$this->prepareDataGlobalCorrelationCloseOnUp();
+		$this->runEventAssessmentTestGlobalCorrelationCloseOnUp(false, false, false, false, false);
+		$this->waitForNoOpenProblems(array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids));
+	}
+
+	/**
 	 * Test correlation rule update behavior: verify that changing from CLOSE_OLD+CLOSE_NEW to CLOSE_NEW only
 	 * leaves old problems open, and changing back to CLOSE_OLD+CLOSE_NEW restores the closing behavior.
 	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_EventAssessmentGlobalCorrelationCloseOnUpUpdateBehavior$)
@@ -3872,9 +3882,15 @@ HEREDOC;
 	 * mark of the open-problem count — $m after wave 1, then 2 * $m from wave 2 onwards (unchanged as the
 	 * "up" waves close problems back down). Requires captureEventBaseline() and the tag webhook action to
 	 * be set up by the caller.
+	 *
+	 * When $up_from_other_trigger is true, each "up_N" value is sent to the next discovered item instead
+	 * of the one whose trigger opened "down_N", so the closing "up" PROBLEM event is raised on a different
+	 * trigger and the correlation service tag pair must close the relevant "down" problem by its id across
+	 * triggers rather than each trigger receiving its own "up".
 	 */
 	private function runEventAssessmentTestGlobalCorrelationCloseOnUp(bool $restart,
-			bool $maintenance_after_first = false, bool $check_tags = false, bool $stop_maintenance_and_verify_suppression = false): void {
+			bool $maintenance_after_first = false, bool $check_tags = false,
+			bool $stop_maintenance_and_verify_suppression = false, bool $up_from_other_trigger = true): void {
 		$keys = array_merge(
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY),
 			$this->buildDiscoveredKeys(self::ITEM_PROTO_KEY2)
@@ -3882,11 +3898,18 @@ HEREDOC;
 		$all = array_merge(self::$discovered_triggerids, self::$discovered_dep_triggerids);
 		$m = count($keys);
 
-		// Build one sender value per key with a unique id: value "<prefix>_<offset + key index>".
-		$values = fn(string $prefix, int $offset) => array_map(
-			fn($key, $i) => ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $prefix.'_'.($offset + $i)],
-			$keys, array_keys($keys)
+		// Build one sender value per key with a unique id: value "<prefix>_<offset + key index>". A
+		// non-zero $shift sends the value carrying id N at the item $shift positions over, so the event
+		// with service=N originates from a different trigger than the one that opened "down_N".
+		$values = fn(string $prefix, int $offset, int $shift = 0) => array_map(
+			fn($i) => [
+				'host' => self::HOST_DISC_VALUE,
+				'key' => $keys[($i + $shift) % $m],
+				'value' => $prefix.'_'.($offset + $i)
+			],
+			array_keys($keys)
 		);
+		$up_shift = $up_from_other_trigger ? 1 : 0;
 
 		// All triggers must start in OK state.
 		foreach ($this->getTriggers($all) as $t) {
@@ -4003,9 +4026,10 @@ HEREDOC;
 		$this->maybeRestartServer($restart);
 
 		// 3. "up" for the first id set: each is a PROBLEM that closes only its corresponding "down"
-		//    (CLOSE_OLD) and itself (CLOSE_NEW). Each trigger's second problem stays open, so triggers
-		//    stay TRUE and exactly $m problems remain.
-		$this->dispatchSenderValues($values('up', 0));
+		//    (CLOSE_OLD) and itself (CLOSE_NEW) — matched by the service id even when the "up" was
+		//    raised on another trigger ($up_shift). Each trigger's second problem stays open, so
+		//    triggers stay TRUE and exactly $m problems remain.
+		$this->dispatchSenderValues($values('up', 0, $up_shift));
 		$this->waitForOpenProblemCount($all, $m);
 		$this->waitForParentsValue($all, TRIGGER_VALUE_TRUE);
 
@@ -4018,7 +4042,7 @@ HEREDOC;
 		$this->maybeRestartServer($restart);
 
 		// 4. "up" for the second id set closes each trigger's remaining problem; nothing stays open.
-		$this->dispatchSenderValues($values('up', $m));
+		$this->dispatchSenderValues($values('up', $m, $up_shift));
 		$this->waitForNoOpenProblems($all);
 
 		// Wave 4 closed the rest; nothing stays open, but the tagged count still reflects every down
