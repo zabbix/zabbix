@@ -2249,6 +2249,19 @@ HEREDOC;
 	}
 
 	/**
+	 * Like testTriggerCEP_OpenAndImmediateRecovery but the single batch is grouped by value ("waves")
+	 * instead of by key: every discovered item first gets 0 (the triggers are already OK, so this wave
+	 * must emit no events), then every item gets 1 (every trigger opens) and finally every item gets 0
+	 * again (every trigger recovers). Verifies CEP handles the cross-item interleaved ordering, emitting
+	 * exactly one PROBLEM and one RESOLVED event per trigger and leaving no open problems.
+	 * (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_OpenAndImmediateRecoveryValueWaves)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_OpenAndImmediateRecoveryValueWaves() {
+		$this->runOpenAndImmediateRecoveryValueWavesTest(false);
+	}
+
+	/**
 	 * Open the problem and let every per-trigger service follow it to PROBLEM (disaster). When $restart is
 	 * true, the server is restarted first.
 	 */
@@ -2487,6 +2500,80 @@ HEREDOC;
 		}
 
 		$this->waitForNoOpenProblems([$triggerid], 'open and immediate recovery single item');
+	}
+
+	/**
+	 * Same as runOpenAndImmediateRecoveryTest but the batch is grouped by value instead of by key:
+	 * alternating waves of 1, 0, 1, each wave sent to every discovered item, all in one batch with
+	 * strictly increasing (clock, ns). Each 1 wave opens one problem per trigger and the 0 wave
+	 * recovers it, so the batch ends with every trigger in PROBLEM. Once the batch is fully processed,
+	 * a separate closing 0 wave is sent to recover the open problems. So unlike the per-key bursts,
+	 * each trigger's transitions are separated by values for every other item, and CEP must still emit
+	 * exactly one event per transition and leave no open problems. When $restart is true, the server
+	 * is restarted first.
+	 */
+	private function runOpenAndImmediateRecoveryValueWavesTest(bool $restart): void {
+		$this->maybeRestartServer($restart);
+
+		$keys = $this->buildDiscoveredKeys(self::ITEM_PROTO_KEY);
+		$triggerids = self::$discovered_triggerids;
+
+		$this->captureEventBaseline($triggerids);
+
+		$data = [];
+		foreach (['1', '0', '1'] as $value) {
+			foreach ($keys as $key) {
+				$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => $value];
+			}
+		}
+		$vps_written = $this->getVpsWritten();
+		$this->dispatchSenderValues($data);
+
+		// Confirm the whole batch was ingested (written to the history cache) before asserting on
+		// events, so a dropped or not-yet-processed value surfaces here rather than as a confusing
+		// event mismatch.
+		$this->assertVpsWrittenIncreasedBy($vps_written, count($data));
+
+		// Every wave flips each trigger, so the batch produces exactly three events per trigger:
+		// PROBLEM, RESOLVED, PROBLEM. Waiting for the exact count also ensures the whole batch is
+		// processed before the closing 0 wave is sent.
+		$this->waitForAllTriggerEventCounts($triggerids, 3);
+
+		// The batch ends on a 1 wave, so every trigger must be left in PROBLEM.
+		$this->assertAllTriggerValues($triggerids, TRIGGER_VALUE_TRUE, 'must be PROBLEM after the batch');
+
+		// Send the closing 0 wave separately, after the batch has been fully processed, to recover
+		// the problems left open by the batch's final 1 wave.
+		$data = [];
+		foreach ($keys as $key) {
+			$data[] = ['host' => self::HOST_DISC_VALUE, 'key' => $key, 'value' => '0'];
+		}
+		$vps_written = $this->getVpsWritten();
+		$this->dispatchSenderValues($data);
+		$this->assertVpsWrittenIncreasedBy($vps_written, count($data));
+
+		// The closing wave adds one RESOLVED event per trigger: PROBLEM, RESOLVED, PROBLEM, RESOLVED
+		// in total. The wait requires an exact total, so a collapsed or extra event fails it too.
+		$expected_events = 4;
+		$this->waitForAllTriggerEventCounts($triggerids, $expected_events);
+
+		// The closing 0 wave must have recovered every trigger back to OK.
+		$this->assertAllTriggerValues($triggerids, TRIGGER_VALUE_FALSE, 'must be OK after the closing 0 wave');
+
+		// Events are newest-first, so they alternate RESOLVED, PROBLEM, RESOLVED, PROBLEM (the batch
+		// ends on a 0 wave, so the newest event is RESOLVED).
+		$events_by_trigger = $this->getScenarioEventsByTrigger($triggerids);
+		foreach ($triggerids as $idx => $triggerid) {
+			$events = $events_by_trigger[$triggerid];
+			$info = 'trigger #'.$idx.': '.count($events).' events';
+			$this->assertCount($expected_events, $events, $info);
+			foreach ($events as $pos => $event) {
+				$expected_value = ($pos % 2 === 0) ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
+				$this->assertEquals($expected_value, (int) $event['value'], $info.' at pos '.$pos);
+			}
+		}
+
+		$this->waitForNoOpenProblems($triggerids, 'open and immediate recovery value waves');
 	}
 
 	/**
@@ -5407,6 +5494,25 @@ HEREDOC;
 			'output' => ['triggerid', 'value', 'lastchange', 'state', 'recovery_mode', 'type', 'correlation_mode']
 		]);
 		return array_column($response['result'], null, 'triggerid');
+	}
+
+	/**
+	 * Assert that every trigger currently has the expected value. Instead of failing on the first
+	 * mismatch, all triggers are checked and the failure message reports how many were correct, how
+	 * many were wrong and the full data of every wrong one.
+	 */
+	private function assertAllTriggerValues(array $triggerids, int $expected_value, string $info): void {
+		$triggers = $this->getTriggers($triggerids);
+		$wrong = [];
+		foreach ($triggerids as $idx => $triggerid) {
+			if (!isset($triggers[$triggerid]) || (int) $triggers[$triggerid]['value'] !== $expected_value) {
+				$wrong[] = 'trigger #'.$idx.': '
+					.(isset($triggers[$triggerid]) ? json_encode($triggers[$triggerid]) : 'missing from trigger.get');
+			}
+		}
+		$this->assertCount(0, $wrong, $info.': expected value '.$expected_value.' on all '.count($triggerids)
+			.' triggers, '.(count($triggerids) - count($wrong)).' correct, '.count($wrong).' wrong: '
+			.implode('; ', $wrong));
 	}
 
 	/**
