@@ -129,8 +129,10 @@ class CControllerProblemViewData extends CControllerDataTable {
 		}
 		$events = CMacrosResolverHelper::resolveEventOpdatas($events, ['html' => true]);
 
+		$show_timeline = array_key_exists('show_timeline', $options) && $options['show_timeline'] == 1;
+
 		foreach ($problems as $problem) {
-			if ($data['sort_field'] == 'clock' && $options['show_timeline'] && $options['compact_view'] == 0
+			if ($data['sort_field'] == 'clock' && $show_timeline && $options['compact_view'] == 0
 					&& $data['last_clock'] != 0) {
 
 				$breakpoint = self::createTimelineBreakpoint($data, $problem);

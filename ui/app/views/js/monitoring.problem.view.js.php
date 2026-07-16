@@ -302,6 +302,8 @@
 				.setCellRenderer('time', ({column, cell_data, cell}) => {
 					const [clock, eventid, triggerid] = cell_data;
 
+					cell.innerHTML = '';
+
 					if (clock && eventid && triggerid) {
 						const url = new URL('tr_events.php', location.href);
 						url.searchParams.set('triggerid', triggerid);
