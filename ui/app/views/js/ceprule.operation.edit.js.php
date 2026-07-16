@@ -64,6 +64,8 @@ window.ceprule_operation_edit_popup = new class {
 			else if (e.target.classList.contains('js-tag-remove')) {
 				e.target.closest('tr').remove();
 			}
+
+			this.#togglePositionTags(window['ceprule-operation-execute-when'].value);
 		});
 	}
 
@@ -90,6 +92,13 @@ window.ceprule_operation_edit_popup = new class {
 		on_operator_change(Number(tag.operator));
 
 		return tag_row;
+	}
+
+	#togglePositionTags(value) {
+		const has_position_tags = value == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>;
+
+		[...this.form_element.querySelectorAll('[is="z-cep-tagsuggest"]')]
+			.map(node => node.toggleAttribute('disable-position-tags', has_position_tags));
 	}
 
 	#setAvailableOperationOptions() {
@@ -161,6 +170,8 @@ window.ceprule_operation_edit_popup = new class {
 		zselect.clearOptions();
 		zselect.addOptions(options);
 		zselect.init();
+
+		this.#togglePositionTags(window['ceprule-operation-execute-when'].value);
 	}
 
 	#handleOperationTypeChanged(value) {
@@ -242,11 +253,7 @@ window.ceprule_operation_edit_popup = new class {
 
 	#handleExecuteWhenChanged(value) {
 		this.#setAvailableOperationOptions();
-
-		const has_position_tags = value == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>;
-
-		[...this.form_element.querySelectorAll('[is="z-cep-tagsuggest"]')]
-			.map(node => node.toggleAttribute('disable-position-tags', has_position_tags));
+		this.#togglePositionTags(value);
 	}
 };
 
