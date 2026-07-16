@@ -2568,7 +2568,7 @@ button {
   .datatable .datatable-options-popup {
     position: absolute;
     top: calc(var(--datatable-row-height) + 1px);
-    z-index: 200;
+    z-index: 2000;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;

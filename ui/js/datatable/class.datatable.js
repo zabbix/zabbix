@@ -1543,9 +1543,9 @@ class CDataTable {
 					this.#scrollBodyToTarget(header_cell.target);
 				}
 			});
-		}
 
-		this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_UPDATE, e.detail);
+			this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_UPDATE, e.detail);
+		}
 	}
 
 	onOptionsPopup(e) {
