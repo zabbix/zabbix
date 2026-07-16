@@ -1125,8 +1125,6 @@ class CDataTable {
 		const overrides = column.getOverrides();
 		column.setOverrides({...overrides, visible});
 
-		this.#options_popup_updated = true;
-
 		this.updateUserConfig();
 
 		this.dispatchEvent(CDataTable.EVENT_INIT, {reset: true});
@@ -2339,8 +2337,8 @@ class CDataTable {
 		}
 
 		const default_width = column.getDefaults().getWidth();
-		const header_width = column.getHeaderCell()?.target.clientWidth ?? 0;
-		const data_width = column.getDataCells().at(0)?.target.clientWidth ?? 0;
+		const header_width = Math.floor(column.getHeaderCell()?.target.getBoundingClientRect().width ?? 0);
+		const data_width = Math.floor(column.getDataCells().at(0)?.target.getBoundingClientRect().width ?? 0);
 
 		let width = Math.max(min_width, header_width, data_width);
 
