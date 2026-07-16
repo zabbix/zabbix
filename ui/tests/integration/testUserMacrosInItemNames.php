@@ -20,7 +20,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * Test suite for user macro expansion in item names.
  *
  * @required-components server
- * @configurationDataProvider serverConfigurationProvider
+ * @backup hosts,globalmacro
  */
 class testUserMacrosInItemNames extends CIntegrationTest {
 	/** Maximum number of iterations to wait for NDJSON export files to appear. */
@@ -36,7 +36,6 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 	private static $itemid_export;
 	private static $triggerid_export;
 	private static $export_dir = null;
-	private static $original_trapper_allowed_hosts = null;
 
 	private static function getExportDir(): string {
 		if (self::$export_dir === null) {
@@ -76,7 +75,6 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
 			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
-
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
 
@@ -101,6 +99,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			'value_type' => ITEM_VALUE_TYPE_TEXT,
 			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}'
 		]);
+
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['itemids']);
 
@@ -235,6 +234,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid2 = $response['result']['hostids'][0];
 
+		// Clean up stale NDJSON data from a previous run before creating new data.
 		$this->cleanupNdjsonExportData();
 
 		// Create host with host macros and trapper item with tag for NDJSON export test.
@@ -313,70 +313,12 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 
 			@rmdir($export_dir);
 		}
-
-		// Delete the test hosts via API.
-		foreach ([self::HOSTNAME1, self::HOSTNAME2] as $hostname) {
-			$response = CAPIHelper::call('host.get', [
-				'filter' => ['host' => [$hostname]],
-				'output' => ['hostid']
-			]);
-
-			if ($response['result']) {
-				$hostids = array_column($response['result'], 'hostid');
-				CAPIHelper::call('host.delete', $hostids);
-			}
-		}
-
-		// Delete the imported template.
-		$response = CAPIHelper::call('template.get', [
-			'filter' => ['name' => ['Um1']],
-			'output' => ['templateid']
-		]);
-
-		if ($response['result']) {
-			$templateids = array_column($response['result'], 'templateid');
-			CAPIHelper::call('template.delete', $templateids);
-		}
-
-		// Delete the global macro {$TEST} created by the test.
-		$response = CAPIHelper::call('usermacro.get', [
-			'globalmacro' => true,
-			'filter' => ['macro' => ['{$TEST}']],
-			'output' => ['globalmacroid']
-		]);
-
-		if ($response['result']) {
-			$macroid = $response['result'][0]['globalmacroid'];
-			CAPIHelper::call('usermacro.deleteglobal', [$macroid]);
-		}
-
-		// Restore or delete {$TRAPPER.ALLOWED_HOSTS} based on its original state.
-		if (self::$original_trapper_allowed_hosts !== null) {
-			if (self::$original_trapper_allowed_hosts['exists']) {
-				CAPIHelper::call('usermacro.updateglobal', [
-					'globalmacroid' => self::$original_trapper_allowed_hosts['globalmacroid'],
-					'macro' => '{$TRAPPER.ALLOWED_HOSTS}',
-					'value' => self::$original_trapper_allowed_hosts['value']
-				]);
-			}
-			else {
-				$response = CAPIHelper::call('usermacro.get', [
-					'globalmacro' => true,
-					'filter' => ['macro' => ['{$TRAPPER.ALLOWED_HOSTS}']],
-					'output' => ['globalmacroid']
-				]);
-
-				if ($response['result']) {
-					$macroid = $response['result'][0]['globalmacroid'];
-					CAPIHelper::call('usermacro.deleteglobal', [$macroid]);
-				}
-			}
-		}
 	}
 
 	/**
 	 * Check user macro resolution in NDJSON export for item names and tag values in history, trends and problem events.
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testUserMacrosInItemNames_ndjsonExport() {
 		$export_dir = self::getExportDir();
@@ -457,15 +399,6 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			$this->assertArrayHasKey('globalmacroid', $allowed_hosts['result'][0]);
 			$this->assertArrayHasKey('value', $allowed_hosts['result'][0]);
 
-			// Save the original state before modifying.
-			if (self::$original_trapper_allowed_hosts === null) {
-				self::$original_trapper_allowed_hosts = [
-					'exists' => true,
-					'globalmacroid' => $allowed_hosts['result'][0]['globalmacroid'],
-					'value' => $allowed_hosts['result'][0]['value']
-				];
-			}
-
 			if ($allowed_hosts['result'][0]['value'] !== '0.0.0.0/0,::/0') {
 				$response = $this->call('usermacro.updateglobal', [
 					'globalmacroid' => $allowed_hosts['result'][0]['globalmacroid'],
@@ -479,11 +412,6 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			}
 
 			return;
-		}
-
-		// Save that the macro did not exist before this test.
-		if (self::$original_trapper_allowed_hosts === null) {
-			self::$original_trapper_allowed_hosts = ['exists' => false];
 		}
 
 		$response = $this->call('usermacro.createglobal', [
