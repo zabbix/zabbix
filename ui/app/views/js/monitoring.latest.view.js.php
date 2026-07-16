@@ -363,7 +363,7 @@
 					}
 				})
 				.setCellRenderer('actions', ({cell_data, cell}) => {
-					const [itemid, is_graph, keep_history, keep_trends] = cell_data;
+					const [itemid, is_graph, show_link] = cell_data;
 
 					if (!show_link) {
 						return;
