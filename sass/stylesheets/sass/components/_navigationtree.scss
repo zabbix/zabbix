@@ -162,7 +162,7 @@ $max_levels: 10;
 				height: $icon-medium-size;
 				font-size: $icon-medium-size;
 				padding: 0;
-				border-radius: 3px;
+				border-radius: var(--overlay-border-radius);
 			}
 		}
 	}
