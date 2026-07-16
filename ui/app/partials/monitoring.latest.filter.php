@@ -138,45 +138,11 @@ $filter_tags_table->addRow(
 	))->setColSpan(3)
 );
 
-$tag_format_line = (new CHorList())
-	->addItem((new CRadioButtonList('show_tags', (int) $data['show_tags']))
-		->addValue(_('None'), SHOW_TAGS_NONE, 'show_tags_'.SHOW_TAGS_NONE.'#{uniqid}')
-		->addValue(SHOW_TAGS_1, SHOW_TAGS_1, 'show_tags_'.SHOW_TAGS_1.'#{uniqid}')
-		->addValue(SHOW_TAGS_2, SHOW_TAGS_2, 'show_tags_'.SHOW_TAGS_2.'#{uniqid}')
-		->addValue(SHOW_TAGS_3, SHOW_TAGS_3, 'show_tags_'.SHOW_TAGS_3.'#{uniqid}')
-		->setModern(true)
-		->setId('show_tags_#{uniqid}')
-	)
-	->addItem((new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
-	->addItem(new CLabel(_('Tag name')))
-	->addItem((new CRadioButtonList('tag_name_format', (int) $data['tag_name_format']))
-		->addValue(_('Full'), TAG_NAME_FULL, 'tag_name_format_'.TAG_NAME_FULL.'#{uniqid}')
-		->addValue(_('Shortened'), TAG_NAME_SHORTENED, 'tag_name_format_'.TAG_NAME_SHORTENED.'#{uniqid}')
-		->addValue(_('None'), TAG_NAME_NONE, 'tag_name_format_'.TAG_NAME_NONE.'#{uniqid}')
-		->setModern(true)
-		->setEnabled((int) $data['show_tags'] !== SHOW_TAGS_NONE)
-		->setId('tag_name_format_#{uniqid}')
-	);
-
 $right_column = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 	->addItem([
 		new CLabel(_('Tags')),
 		new CFormField($filter_tags_table)
-	])
-	->addItem([
-		new CLabel(_('Show tags')),
-		new CFormField($tag_format_line)
-	])
-	->addItem([
-		new CLabel(_('Tag display priority'), 'tag_priority_#{uniqid}'),
-		new CFormField(
-			(new CTextBox('tag_priority', $data['tag_priority']))
-				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				->setAttribute('placeholder', _('comma-separated list'))
-				->setEnabled((int) $data['show_tags'] !== SHOW_TAGS_NONE)
-				->setId('tag_priority_#{uniqid}')
-		)
 	])
 	->addItem([
 		new CLabel(_('State'), 'state_#{uniqid}'),
@@ -188,14 +154,6 @@ $right_column = (new CFormGrid())
 				->setModern()
 				->setId('state_#{uniqid}')
 		)
-	])
-	->addItem([
-		new CLabel(_('Show details'), 'show_details'),
-		new CFormField([
-			(new CCheckBox('show_details'))
-				->setChecked($data['show_details'] == 1)
-				->setUncheckedValue(0)
-		])
 	]);
 
 $filter_template = (new CDiv())
@@ -213,9 +171,7 @@ $template = (new CForm('get'))
 		(new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN),
 		(new CVar('filter_name', '#{filter_name}'))->removeId(),
 		(new CVar('filter_show_counter', '#{filter_show_counter}'))->removeId(),
-		(new CVar('filter_custom_time', '#{filter_custom_time}'))->removeId(),
-		(new CVar('sort', '#{sort}'))->removeId(),
-		(new CVar('sortorder', '#{sortorder}'))->removeId()
+		(new CVar('filter_custom_time', '#{filter_custom_time}'))->removeId()
 	]);
 
 if (array_key_exists('render_html', $data)) {
@@ -274,8 +230,8 @@ if (array_key_exists('render_html', $data)) {
 
 	function render(data, container) {
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
-		$('[name="filter_new"],[name="filter_update"]').hide()
-			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
+		document.querySelector('[name="filter_new"]').style.display = data.filter_configurable ? 'none' : '';
+		document.querySelector('[name="filter_update"]').style.display = data.filter_configurable ? '' : 'none';
 
 		// host groups multiselect
 		$('#groupids_' + data.uniqid, container).multiSelectHelper({
@@ -415,8 +371,8 @@ if (array_key_exists('render_html', $data)) {
 
 	function expand(data, container) {
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
-		$('[name="filter_new"],[name="filter_update"]').hide()
-			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
+		document.querySelector('[name="filter_new"]').style.display = data.filter_configurable ? 'none' : '';
+		document.querySelector('[name="filter_update"]').style.display = data.filter_configurable ? '' : 'none';
 	}
 
 	function select(data, container) {

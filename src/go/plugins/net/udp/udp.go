@@ -21,6 +21,7 @@ import (
 	"strconv"
 	"time"
 
+	"golang.zabbix.com/agent2/pkg/inet"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
@@ -96,6 +97,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		if params[0] != "ntp" {
 			return nil, errs.New(errorInvalidFirstParam)
+		}
+
+		if len(params) >= 2 && params[1] != "" {
+			if net.ParseIP(params[1]) == nil && !inet.IsRFCExtendedHostName(params[1]) {
+				return nil, errs.New(errorInvalidSecondParam)
+			}
 		}
 
 		if len(params) == 3 && params[2] != "" {

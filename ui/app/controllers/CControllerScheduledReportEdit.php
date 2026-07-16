@@ -16,35 +16,18 @@
 
 class CControllerScheduledReportEdit extends CController {
 
-	protected $report = [];
+	protected array $report = [];
 
-	protected function init() {
+	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
-		$fields = [
-			'reportid' =>			'db report.reportid',
-			'userid' =>				'db report.userid',
-			'name' =>				'db report.name',
-			'dashboardid' =>		'db report.dashboardid',
-			'old_dashboardid' =>	'db report.dashboardid',
-			'period' =>				'db report.period|in '.implode(',', [ZBX_REPORT_PERIOD_DAY, ZBX_REPORT_PERIOD_WEEK, ZBX_REPORT_PERIOD_MONTH, ZBX_REPORT_PERIOD_YEAR]),
-			'cycle' =>				'db report.cycle|in '.implode(',', [ZBX_REPORT_CYCLE_DAILY, ZBX_REPORT_CYCLE_WEEKLY, ZBX_REPORT_CYCLE_MONTHLY, ZBX_REPORT_CYCLE_YEARLY]),
-			'weekdays' =>			'array',
-			'hours' =>				'int32',
-			'minutes' =>			'int32',
-			'active_since' =>		'string',
-			'active_till' =>		'string',
-			'subject' =>			'string',
-			'message' =>			'string',
-			'subscriptions' =>		'array',
-			'description' =>		'db report.description',
-			'status' =>				'db report.status|in '.ZBX_REPORT_STATUS_DISABLED.','.ZBX_REPORT_STATUS_ENABLED,
-			'form_refresh' =>		'int32'
-		];
-
-		$ret = $this->validateInput($fields);
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(['object', 'fields' => [
+			'reportid' => ['db report.reportid'],
+			'dashboardid' => ['db report.dashboardid']
+		]]);
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -53,18 +36,16 @@ class CControllerScheduledReportEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		if (!$this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS)
-				|| (!$this->hasInput('reportid')
-					&& !$this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS))) {
+	protected function checkPermissions(): bool {
+		if (!$this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS)) {
 			return false;
 		}
 
-		if ($this->hasInput('reportid') && !$this->hasInput('form_refresh')) {
-			if (!$this->getInput('reportid', 0)) {
-				return false;
-			}
+		if (!$this->hasInput('reportid') && !$this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS)) {
+			return false;
+		}
 
+		if ($this->hasInput('reportid')) {
 			$reports = API::Report()->get([
 				'output' => ['reportid', 'userid', 'name', 'description', 'status', 'dashboardid', 'period', 'cycle',
 					'weekdays', 'start_time', 'active_since', 'active_till', 'subject', 'message'
@@ -84,15 +65,14 @@ class CControllerScheduledReportEdit extends CController {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$db_defaults = DB::getDefaults('report');
 		$current_user_name = getUserFullname(CWebUser::$data);
 		$data = [
-			'reportid' => 0,
+			'reportid' => null,
 			'userid' => CWebUser::$data['userid'],
 			'name' => $db_defaults['name'],
 			'dashboardid' => 0,
-			'old_dashboardid' => 0,
 			'period' => $db_defaults['period'],
 			'cycle' => $db_defaults['cycle'],
 			'hours' => '00',
@@ -126,7 +106,6 @@ class CControllerScheduledReportEdit extends CController {
 			$data['userid'] = $this->report['userid'];
 			$data['name'] = $this->report['name'];
 			$data['dashboardid'] = $this->report['dashboardid'];
-			$data['old_dashboardid'] = $this->report['dashboardid'];
 			$data['period'] = $this->report['period'];
 			$data['cycle'] = $this->report['cycle'];
 			$data['hours'] = sprintf("%02d", floor($this->report['start_time'] / SEC_PER_HOUR));
@@ -203,6 +182,7 @@ class CControllerScheduledReportEdit extends CController {
 			}
 
 			if ($data['userid'] != CWebUser::$data['userid']) {
+				$data['owner_inaccessible'] = true;
 				$data['ms_user'] = [[
 					'id' => $data['userid'],
 					'name' => array_key_exists($data['userid'], $db_users)
@@ -256,7 +236,7 @@ class CControllerScheduledReportEdit extends CController {
 			CArrayHelper::sort($data['subscriptions'], ['recipient_name']);
 		}
 
-		$this->getInputs($data, ['reportid', 'name', 'dashboardid', 'old_dashboardid', 'period', 'cycle', 'hours',
+		$this->getInputs($data, ['reportid', 'name', 'dashboardid', 'period', 'cycle', 'hours',
 			'minutes', 'active_since', 'active_till', 'subject', 'message', 'description', 'status', 'form_refresh'
 		]);
 
@@ -300,8 +280,16 @@ class CControllerScheduledReportEdit extends CController {
 			}
 		}
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Scheduled reports'));
-		$this->setResponse($response);
+		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+		$data['js_validation_rules'] = (new CFormValidator($this->hasInput('reportid')
+			? CControllerScheduledReportUpdate::getValidationRules()
+			: CControllerScheduledReportCreate::getValidationRules()
+		))->getRules();
+
+		$data['js_validation_create_rules'] = $this->hasInput('reportid')
+			? (new CFormValidator(CControllerScheduledReportCreate::getValidationRules()))->getRules()
+			: $data['js_validation_rules'];
+
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }
