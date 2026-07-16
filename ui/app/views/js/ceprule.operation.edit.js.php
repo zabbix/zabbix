@@ -57,7 +57,7 @@ window.ceprule_operation_edit_popup = new class {
 	#initActions() {
 		this.form_element.addEventListener('change', (e) => {
 			e.target.id === 'ceprule-operation-execute-when' && this.#handleExecuteWhenChanged(e.target.value);
-			e.target.id === 'ceprule-operation-type' && this.#handleActionChanged(e.target.value);
+			e.target.id === 'ceprule-operation-type' && this.#handleOperationTypeChanged(e.target.value);
 		}, {capture: true});
 
 		this.form_element.addEventListener('click', (e) => {
@@ -172,7 +172,7 @@ window.ceprule_operation_edit_popup = new class {
 		}
 	}
 
-	#handleActionChanged(value) {
+	#handleOperationTypeChanged(value) {
 		value = Number(value);
 		const name = window['ceprule-operation-name-argument'];
 		const tag = window['ceprule-operation-tag-argument'];
