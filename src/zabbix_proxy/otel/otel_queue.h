@@ -12,29 +12,32 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_OTEL_TASK_H
-#define ZABBIX_OTEL_TASK_H
+#ifndef ZABBIX_OTEL_QUEUE_H
+#define ZABBIX_OTEL_QUEUE_H
 
-#include "otel_queue.h"
 #include "zbxmw.h"
 
 typedef enum
 {
-	OTEL_TASK_MESSAGE
+	OTEL_TRACE,
+	OTEL_METRIC,
+	OTEL_LOG
 }
-zbx_cep_task_type_t;
+zbx_otel_request_type_t;
+
+typedef void * zbx_otel_request_t;
 
 typedef struct
 {
-	zbx_mw_task_t		base;
-	zbx_otel_request_type_t	type;
-	zbx_otel_request_t	request;
-	char			*message;
+	zbx_mw_queue_t	base;
+	zbx_uint64_t	usage;
+	zbx_uint64_t	quota;
+	time_t		window_start;
 }
-zbx_otel_task_message_t;
+zbx_otel_queue_t;
 
-zbx_mw_task_t	*otel_task_message_create(zbx_otel_request_t request, zbx_otel_request_type_t type);
+zbx_otel_queue_t	*otel_queue_create(int quota);
 
-void	otel_task_free(zbx_mw_task_t *mw_task);
+int	otel_queue_push_request(zbx_otel_queue_t *queue, zbx_otel_request_t request, zbx_otel_request_type_t type);
 
 #endif

@@ -14,6 +14,7 @@
 
 #include "otel_worker.h"
 #include "otel_grpc.h"
+#include "zabbix_proxy/otel/otel_queue.h"
 #include "zabbix_proxy/otel/otel_task.h"
 #include "zbx_otel.h"
 #include "zbx_otel_client.h"
@@ -58,15 +59,15 @@ static void	otel_manager_free(zbx_otel_manager_t *manager)
 	zbx_free(manager);
 }
 
-static zbx_otel_manager_t	*otel_manager_create(const zbx_thread_info_t *info, char **error)
+static zbx_otel_manager_t	*otel_manager_create(const zbx_thread_info_t *info, int quota, char **error)
 {
 	zbx_otel_manager_t	*manager;
 	zbx_otel_worker_t	**workers;
-	zbx_mw_queue_t		*queue;
+	zbx_otel_queue_t		*queue;
 	int			ret = FAIL;
 
 	manager = (zbx_otel_manager_t *)zbx_calloc(NULL, 1, sizeof(zbx_otel_manager_t));
-	queue = (zbx_mw_queue_t *)zbx_calloc(NULL, 1, sizeof(zbx_mw_queue_t));
+	queue = otel_queue_create(quota);
 	workers = (zbx_otel_worker_t **)zbx_calloc(NULL, (size_t)OTEL_WORKERS_MAX, sizeof(zbx_otel_worker_t));
 
 	for (int i = 0; i < OTEL_WORKERS_MAX; i++)
@@ -74,13 +75,13 @@ static zbx_otel_manager_t	*otel_manager_create(const zbx_thread_info_t *info, ch
 
 	if (SUCCEED != zbx_mw_manager_init(&manager->base, info, ZBX_IPC_SERVICE_OTEL, ZBX_PROCESS_TYPE_OTEL_WORKER,
 			(zbx_mw_worker_t **)workers, OTEL_WORKERS_MAX, OTEL_WORKERS_DEFAULT, otel_worker_entry,
-			queue, error))
+			(zbx_mw_queue_t *)queue, error))
 	{
 		goto out;
 	}
 
 	/* TODO: use grpc listen address / port */
-	if (NULL == (manager->grpc = zbx_grpc_start(NULL, NULL, manager->base.queue, error)))
+	if (NULL == (manager->grpc = zbx_grpc_start(NULL, NULL, queue, error)))
 		goto out;
 
 	ret = SUCCEED;
@@ -123,7 +124,8 @@ void	*zbx_otel_manager_thread(void *args)
 
 	otel_args = (const zbx_thread_otel_manager_args_t *)unit_args->args.args;
 
-	if (NULL == (manager = otel_manager_create(info, &error)))
+	/* TODO: fetch requests throttle limit from settings/configuration cache */
+	if (NULL == (manager = otel_manager_create(info, 0, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize open telemetry manager: %s", error);
 		zbx_free(error);

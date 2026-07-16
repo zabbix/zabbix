@@ -17,7 +17,7 @@
 
 static void	otel_task_message_free(void *task);
 
-zbx_mw_task_t	*otel_task_message_create(zbx_grpc_request_t request, zbx_grpc_request_type_t type)
+zbx_mw_task_t	*otel_task_message_create(zbx_otel_request_t request, zbx_otel_request_type_t type)
 {
 	zbx_otel_task_message_t	*task;
 
@@ -35,7 +35,7 @@ static void	otel_task_message_free(void *task)
 {
 	zbx_otel_task_message_t	*otel_task = (zbx_otel_task_message_t *)task;
 
-	zbx_grpc_request_free(otel_task->request, otel_task->type);
+	zbx_otel_request_free(otel_task->request, otel_task->type);
 	zbx_free(otel_task->message);
 	zbx_free(otel_task);
 }

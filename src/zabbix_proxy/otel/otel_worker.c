@@ -13,6 +13,7 @@
 **/
 
 #include "otel_worker.h"
+#include "zabbix_proxy/otel/otel_grpc.h"
 #include "zabbix_proxy/otel/otel_task.h"
 #include "zbxmw.h"
 #include "zbxnix.h"
@@ -31,7 +32,7 @@ static void	otel_worker_process_message(zbx_otel_task_message_t *task)
 {
 	char	*error = NULL;
 
-	if (SUCCEED != zbx_grpc_decode_request(task->request, task->type, &task->message, &error))
+	if (SUCCEED != zbx_otel_decode_request(task->request, task->type, &task->message, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 		zbx_free(error);

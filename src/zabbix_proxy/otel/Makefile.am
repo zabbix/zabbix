@@ -70,6 +70,8 @@ libzbxotel_a_SOURCES = \
 	otel_grpc.h \
 	otel_task.c \
 	otel_task.h \
+	otel_queue.c \
+	otel_queue.h \
 	$(OTEL_PROTO_SRCS)
 
 # --- message-only protos: --cpp_out only ---

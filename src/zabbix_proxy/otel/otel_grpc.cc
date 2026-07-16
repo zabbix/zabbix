@@ -23,7 +23,7 @@
 #include <cstdio>
 
 extern "C" {
-	#include "otel_task.h"
+	#include "otel_queue.h"
 	#include "zbxmw.h"
 	#include "zbxlog.h"
 }
@@ -79,14 +79,14 @@ private:
 
 struct GrpcServerHandle
 {
-	GrpcServerHandle(zbx_mw_queue_t *queue) : queue(queue) {}
+	GrpcServerHandle(zbx_otel_queue_t *queue) : queue(queue) {}
 
 	std::unique_ptr<Server> server;
 	std::unique_ptr<TraceServiceImpl> trace_service;
 	std::unique_ptr<MetricsServiceImpl> metrics_service;
 	std::unique_ptr<LogsServiceImpl> logs_service;
 
-	zbx_mw_queue_t * const queue;
+	zbx_otel_queue_t * const queue;
 };
 
 ServerUnaryReactor *TraceServiceImpl::Export(CallbackServerContext *context,
@@ -98,13 +98,14 @@ ServerUnaryReactor *TraceServiceImpl::Export(CallbackServerContext *context,
 	auto *heap_request = new otlp_trace::ExportTraceServiceRequest();
 	heap_request->Swap(const_cast<otlp_trace::ExportTraceServiceRequest *>(request));
 
-	zbx_mw_task_t	*task = otel_task_message_create(static_cast<zbx_grpc_request_t>(heap_request), OTEL_TRACE);
+	if (FAIL == otel_queue_push_request(handle->queue, static_cast<zbx_otel_request_t>(heap_request), OTEL_TRACE))
+	{
+		reactor->Finish(grpc::Status(grpc::StatusCode::RESOURCE_EXHAUSTED, "export rate limit exceeded"));
+		delete heap_request;
+	}
+	else
+		reactor->Finish(Status::OK);
 
-	zbx_mw_queue_lock(handle->queue);
-	zbx_mw_queue_push_priority(handle->queue, task);
-	zbx_mw_queue_unlock(handle->queue);
-
-	reactor->Finish(Status::OK);
 	return reactor;
 }
 
@@ -117,11 +118,13 @@ ServerUnaryReactor *MetricsServiceImpl::Export(CallbackServerContext *context,
 	auto *heap_request = new otlp_metrics::ExportMetricsServiceRequest();
 	heap_request->Swap(const_cast<otlp_metrics::ExportMetricsServiceRequest *>(request));
 
-	zbx_mw_task_t	*task = otel_task_message_create(static_cast<zbx_grpc_request_t>(heap_request), OTEL_METRIC);
-
-	zbx_mw_queue_lock(handle->queue);
-	zbx_mw_queue_push_priority(handle->queue, task);
-	zbx_mw_queue_unlock(handle->queue);
+	if (FAIL == otel_queue_push_request(handle->queue, static_cast<zbx_otel_request_t>(heap_request), OTEL_METRIC))
+	{
+		reactor->Finish(grpc::Status(grpc::StatusCode::RESOURCE_EXHAUSTED, "export rate limit exceeded"));
+		delete heap_request;
+	}
+	else
+		reactor->Finish(Status::OK);
 
 	reactor->Finish(Status::OK);
 	return reactor;
@@ -136,11 +139,13 @@ ServerUnaryReactor *LogsServiceImpl::Export(CallbackServerContext *context,
 	auto *heap_request = new otlp_logs::ExportLogsServiceRequest();
 	heap_request->Swap(const_cast<otlp_logs::ExportLogsServiceRequest *>(request));
 
-	zbx_mw_task_t	*task = otel_task_message_create(static_cast<zbx_grpc_request_t>(heap_request), OTEL_LOG);
-
-	zbx_mw_queue_lock(handle->queue);
-	zbx_mw_queue_push_priority(handle->queue, task);
-	zbx_mw_queue_unlock(handle->queue);
+	if (FAIL == otel_queue_push_request(handle->queue, static_cast<zbx_otel_request_t>(heap_request), OTEL_LOG))
+	{
+		reactor->Finish(grpc::Status(grpc::StatusCode::RESOURCE_EXHAUSTED, "export rate limit exceeded"));
+		delete heap_request;
+	}
+	else
+		reactor->Finish(Status::OK);
 
 	reactor->Finish(Status::OK);
 	return reactor;
@@ -166,7 +171,7 @@ namespace
 
 extern "C"
 {
-	zbx_grpc_handle_t zbx_grpc_start(const char *address, const char *port, zbx_mw_queue_t *queue, char **error)
+	zbx_grpc_handle_t zbx_grpc_start(const char *address, const char *port, zbx_otel_queue_t *queue, char **error)
 	{
 		try
 		{
@@ -224,7 +229,7 @@ extern "C"
 		zabbix_log(LOG_LEVEL_WARNING, "Open Telemetry collector stopped");
 	}
 
-	int	zbx_grpc_decode_request(zbx_grpc_request_t request, zbx_grpc_request_type_t type, char **output,
+	int	zbx_otel_decode_request(zbx_otel_request_t request, zbx_otel_request_type_t type, char **output,
 			char **error)
 	{
 
@@ -271,7 +276,7 @@ extern "C"
 		}
 	}
 
-	void	zbx_grpc_request_free(zbx_grpc_request_t request, zbx_grpc_request_type_t type)
+	void	zbx_otel_request_free(zbx_otel_request_t request, zbx_otel_request_type_t type)
 	{
 		switch (type)
 		{

@@ -19,25 +19,16 @@
 extern "C" {
 #endif
 
-#include "zbxmw.h"
+#include "otel_queue.h"
 
-typedef enum
-{
-	OTEL_TRACE,
-	OTEL_METRIC,
-	OTEL_LOG
-}
-zbx_grpc_request_type_t;
-
-typedef void * zbx_grpc_request_t;
 typedef void * zbx_grpc_handle_t;
 
-zbx_grpc_handle_t	zbx_grpc_start(const char *address, const char *port, zbx_mw_queue_t *queue, char **error);
+zbx_grpc_handle_t	zbx_grpc_start(const char *address, const char *port, zbx_otel_queue_t *queue, char **error);
 void	zbx_grpc_stop(zbx_grpc_handle_t handle);
 
-int	zbx_grpc_decode_request(zbx_grpc_request_t request, zbx_grpc_request_type_t type, char **output,
+int	zbx_otel_decode_request(zbx_otel_request_t request, zbx_otel_request_type_t type, char **output,
 		char **error);
-void	zbx_grpc_request_free(zbx_grpc_request_t request, zbx_grpc_request_type_t type);
+void	zbx_otel_request_free(zbx_otel_request_t request, zbx_otel_request_type_t type);
 
 #ifdef __cplusplus
 }
