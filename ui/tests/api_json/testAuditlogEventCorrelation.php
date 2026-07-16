@@ -27,7 +27,7 @@ class testAuditlogEventCorrelation extends testAuditlogCommon {
 	private const CORRELATIONID = 99001;
 
 	/**
-	 * Resource type Event corelation
+	 * Resource type Event correlation
 	 */
 	const RESOURCE_TYPE = 34;
 
