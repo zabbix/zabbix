@@ -164,7 +164,7 @@
 						.setRenderer('latest_data'),
 					new CDataTableColumn('problems', <?= json_encode(_('Problems')); ?>)
 						.setColumnOptions({
-							show_suppressed: false
+							show_suppressed: 0
 						})
 						.setOptionsPopupHandler('problems')
 						.setFields(['problems']),
