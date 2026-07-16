@@ -969,7 +969,7 @@ static int	DBpatch_7050075(void)
 	const zbx_db_table_t	table =
 			{"device_key", "device_keyid", 0,
 				{
-					{"device_keyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"device_keyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"scope", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"kid", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -1007,7 +1007,7 @@ static int	DBpatch_7050079(void)
 	const zbx_db_table_t	table =
 			{"device_enrollment_token", "deviceid", 0,
 				{
-					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"token", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"expires_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{0}
