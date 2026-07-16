@@ -19,51 +19,53 @@ require_once dirname(__FILE__).'/../../include/CAPITest.php';
 class testAuditlogCommon extends CAPITest {
 
 	/**
-	 * Audit log Add action id.
+	 * Audit log Add action.
 	 */
-	public $add_actionid = 0;
+	const ACTION_ADD = 0;
 
 	/**
-	 * Audit log Update action id.
+	 * Audit log Update action.
 	 */
-	public $update_actionid = 1;
+	const ACTION_UPDATE = 1;
 
 	/**
-	 * Audit log Delete action id.
+	 * Audit log Delete action.
 	 */
-	public $delete_actionid = 2;
+	const ACTION_DELETE = 2;
 
 	/**
-	 * Audit log Logout action id.
+	 * Audit log Logout action.
 	 */
-	public $logout_actionid = 4;
+	const ACTION_LOGOUT = 4;
 
 	/**
-	 * Audit log Login action id.
+	 * Audit log Login action.
 	 */
-	public $login_actionid = 8;
+	const ACTION_LOGIN = 8;
 
 	/**
-	 * Audit log Failed Login action id.
+	 * Audit log Failed Login action.
 	 */
-	public $failedlogin_actionid = 9;
+	const ACTION_FAILED_LOGIN = 9;
 
 	/**
 	 * Send auditlog.get request and check returned values.
 	 *
-	 * @param string       $parameter   What parameter need to be checked in audit.
-	 * @param integer      $actionid    Action ID.
-	 * @param string       $expected    What should be returned in request.
-	 * @param integer|null $resourceid  Resource ID.
+	 * @param string       $parameter      What parameter need to be checked in audit.
+	 * @param integer      $action         Action for which the auditlog is retrieved.
+	 * @param string       $expected       What should be returned in request.
+	 * @param integer|null $resourceid     Resource ID.
+	 * @param integer      $resourcetype  For what type of resource should the record be retrieved
 	 */
-	public function getAuditDetails($parameter, $actionid, $expected, $resourceid) {
+	public function getAuditDetails($parameter, $action, $expected, $resourceid, $resourcetype) {
 		$get = $this->call('auditlog.get', [
 			'output' => [$parameter],
 			'sortfield' => 'clock',
 			'sortorder' => 'DESC',
 			'filter' => [
 				'resourceid' => $resourceid,
-				'action' => $actionid
+				'resourcetype' => $resourcetype,
+				'action' => $action
 			],
 			'limit' => 1
 		]);
