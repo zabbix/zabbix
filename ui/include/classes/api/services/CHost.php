@@ -2154,13 +2154,21 @@ class CHost extends CHostGeneral {
 		$proxy_groupids = [];
 
 		foreach ($hosts as $host) {
-			if ($db_hosts !== null && $db_hosts[$host['hostid']]['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
+			if ($db_hosts[$host['hostid']]['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
 				continue;
 			}
 
 			if (array_key_exists('monitored_by', $host)) {
-				if (bccomp($host['monitored_by'], (int) $db_hosts[$host['hostid']]['monitored_by']) ) {
+				if (bccomp($host['monitored_by'], (int) $db_hosts[$host['hostid']]['monitored_by'])
+						&& $db_hosts[$host['hostid']]['monitored_by'] != ZBX_MONITORED_BY_SERVER) {
 					$monitored_by_upd[$host['hostid']] = true;
+
+					if ($db_hosts[$host['hostid']]['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+						$proxyids[$host['hostid']] = (int) $db_hosts[$host['hostid']]['proxyid'];
+					}
+					elseif ($db_hosts[$host['hostid']]['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+						$proxy_groupids[$host['hostid']] = (int) $db_hosts[$host['hostid']]['proxy_groupid'];
+					}
 				}
 			}
 
@@ -2171,9 +2179,6 @@ class CHost extends CHostGeneral {
 						&& $db_hosts[$host['hostid']]['proxyid'] != 0) {
 					$proxyids[$host['hostid']] = (int) $db_hosts[$host['hostid']]['proxyid'];
 				}
-				else {
-					$proxyids[$host['hostid']] = (int) $host['proxyid'];
-				}
 			}
 
 			if (array_key_exists('proxy_groupid', $host)
@@ -2182,9 +2187,6 @@ class CHost extends CHostGeneral {
 				if (bccomp($host['proxy_groupid'], $db_hosts[$host['hostid']]['proxy_groupid']) != 0
 						&& $db_hosts[$host['hostid']]['proxy_groupid'] != 0) {
 					$proxy_groupids[$host['hostid']] = $db_hosts[$host['hostid']]['proxy_groupid'];
-				}
-				else {
-					$proxy_groupids[$host['hostid']] = (int) $host['proxy_groupid'];
 				}
 			}
 		}
