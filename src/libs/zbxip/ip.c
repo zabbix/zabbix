@@ -17,6 +17,8 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 
+#include <limits.h>
+
 /******************************************************************************
  *                                                                            *
  * Purpose: check if string is valid host name used for checking services     *
@@ -134,6 +136,10 @@ int	zbx_is_ip4(const char *ip)
 	{
 		if (0 != isdigit(*p))
 		{
+			if ((INT_MAX - (*p - '0')) / 10 < octet) {
+				res = FAIL;
+				break;
+			}
 			octet = octet * 10 + (*p - '0');
 			digits++;
 		}
