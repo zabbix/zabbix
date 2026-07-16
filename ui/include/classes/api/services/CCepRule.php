@@ -609,9 +609,14 @@ class CCepRule extends CApiService {
 		$resource = DBselect(DB::makeSql('cep_window', $options));
 
 		while ($row = DBfetch($resource)) {
-			$cep_rules[$rule_indexes[$row['cep_ruleid']]]['window'] += array_intersect_key($row,
+			$rule_index = $rule_indexes[$row['cep_ruleid']];
+			$cep_rules[$rule_index]['window'] += array_intersect_key($row,
 				array_flip(['group_by_host_group', 'group_by_host', 'group_by_tags', 'tags'])
 			);
+
+			if ($cep_rules[$rule_index]['window']['group_by_tags'] == 0) {
+				unset($cep_rules[$rule_indexes[$row['cep_ruleid']]]['window']['tags']);
+			}
 		}
 	}
 
