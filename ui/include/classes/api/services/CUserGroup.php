@@ -665,11 +665,8 @@ class CUserGroup extends CApiService {
 				continue;
 			}
 
-			$db_proxyids = [];
-
 			foreach ($usrgrp['proxies'] as $i2 => $proxy) {
-				if (!array_key_exists($proxy['proxyid'], $db_proxyids)
-						&& !array_key_exists($proxy['proxyid'], $proxy_indexes)) {
+				if (!array_key_exists($proxy['proxyid'], $proxy_indexes)) {
 					$proxy_indexes[$proxy['proxyid']][$i1] = $i2;
 				}
 			}
@@ -722,11 +719,8 @@ class CUserGroup extends CApiService {
 				continue;
 			}
 
-			$db_proxy_groupids = [];
-
 			foreach ($usrgrp['proxy_groups'] as $i2 => $proxy_group) {
-				if (!array_key_exists($proxy_group['proxy_groupid'], $db_proxy_groupids)
-						&& !array_key_exists($proxy_group['proxy_groupid'], $proxy_groups_indexes)) {
+				if (!array_key_exists($proxy_group['proxy_groupid'], $proxy_groups_indexes)) {
 					$proxy_groups_indexes[$proxy_group['proxy_groupid']][$i1] = $i2;
 				}
 			}
