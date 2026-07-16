@@ -39,8 +39,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 
 	private static function getExportDir(): string {
 		if (self::$export_dir === null) {
-			self::$export_dir = sys_get_temp_dir()
-				. '/zabbix_export_test_'
+			self::$export_dir = PHPUNIT_COMPONENT_DIR. 'zabbix_export_test_'
 				. str_replace('.', '', (string) microtime(true));
 		}
 
@@ -284,13 +283,16 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 
 		return true;
 	}
-	/*
+
 	public function serverConfigurationProvider() {
 		$export_dir = self::getExportDir();
 
 		if (!is_dir($export_dir)) {
 			mkdir($export_dir, 0777, true);
 		}
+
+		error_log('EXPORT_DIR=' . $export_dir);
+		error_log('EXPORT_EXISTS=' . (is_dir($export_dir) ? 'YES' : 'NO'));
 
 		return [
 			self::COMPONENT_SERVER => [
@@ -299,15 +301,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			]
 		];
 	}
-	*/
-	public function serverConfigurationProvider() {
-		return [
-			self::COMPONENT_SERVER => [
-				'ExportDir' => '/tmp/zabbix-export',
-				'ExportType' => 'events,history,trends'
-			]
-		];
-	}
+
 	/**
 	 * Clean up the temporary export directory after all tests.
 	 */
@@ -434,7 +428,9 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 
 	private function prepareExportDir($export_dir) {
 		if (!is_dir($export_dir)) {
-			mkdir($export_dir, 0777, true);
+			if (!mkdir($export_dir, 0777, true) && !is_dir($export_dir)) {
+				throw new Exception('Failed to create export directory: ' . $export_dir);
+			}
 			chmod($export_dir, 0777);
 		}
 
