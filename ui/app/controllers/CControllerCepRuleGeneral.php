@@ -185,75 +185,78 @@ abstract class CControllerCepRuleGeneral extends CController {
 				CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
 				CCepRuleHelper::WINDOW_PATTERN_MATCH
 			]],
-			'window' => ['object', 'required', 'fields' => [
-				'duration' => ['db cep_window.duration', 'required', 'not_empty',
-					'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_YEAR, 'min' => 1, 'usermacros' => true,
-						'lldmacros' => false, 'accept_zero' => false, 'with_year' => false
-					]],
-					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
-						CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
-						CCepRuleHelper::WINDOW_PATTERN_MATCH
-					]]
-				],
-				'capacity_enabled' => ['boolean', 'required',
-					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
-						CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
-						CCepRuleHelper::WINDOW_PATTERN_MATCH
-					]]
-				],
-				'capacity' => ['db cep_window.capacity', 'required', 'not_empty',
-					'use' => [CNumberValidator::class, ['min' => 1, 'max' => ZBX_MAX_INT64, 'with_float' => false,
-						'usermacros' => true, 'lldmacros' => false
-					]],
-					'when' => [
-						['capacity_enabled', 'in' => [1]],
-						['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
-							CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH
-						]]
-					]
-				],
-				'group_by_host_group' => ['integer',
-					'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
-					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
-						CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
-						CCepRuleHelper::WINDOW_PATTERN_MATCH
-					]]
-				],
-				'group_by_host' => ['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
-					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
-						CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
-						CCepRuleHelper::WINDOW_PATTERN_MATCH
-					]]
-				],
-				'group_by_tags' => [
-					['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
+			'window' => ['object', 'required',
+				'fields' => [
+					'duration' => ['db cep_window.duration', 'required', 'not_empty',
+						'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_YEAR, 'min' => 1, 'usermacros' => true,
+							'lldmacros' => false, 'accept_zero' => false, 'with_year' => false
+						]],
 						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
 							CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
 							CCepRuleHelper::WINDOW_PATTERN_MATCH
 						]]
 					],
-					['integer', 'required', 'in' => [CCepRuleHelper::GROUP_BY_YES],
-						'messages' => ['in' => _('At least one of "Group by" options must be selected.')],
+					'capacity_enabled' => ['boolean', 'required',
+						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
+							CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
+							CCepRuleHelper::WINDOW_PATTERN_MATCH
+						]]
+					],
+					'capacity' => ['db cep_window.capacity', 'required', 'not_empty',
+						'use' => [CNumberValidator::class, ['min' => 1, 'max' => ZBX_MAX_INT64, 'with_float' => false,
+							'usermacros' => true, 'lldmacros' => false
+						]],
 						'when' => [
-							['../window_type', 'in' => [CCepRuleHelper::WINDOW_CAUSE_SYMPTOM]],
-							['group_by_host', 'in' => [CCepRuleHelper::GROUP_BY_NO]],
-							['group_by_host_group', 'in' => [CCepRuleHelper::GROUP_BY_NO]]
+							['capacity_enabled', 'in' => [1]],
+							['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE, CCepRuleHelper::WINDOW_CAUSE_SYMPTOM,
+								CCepRuleHelper::WINDOW_TAG_MATCH, CCepRuleHelper::WINDOW_PATTERN_MATCH
+							]]
 						]
+					],
+					'group_by_host_group' => ['integer',
+						'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
+						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
+							CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
+							CCepRuleHelper::WINDOW_PATTERN_MATCH
+						]]
+					],
+					'group_by_host' => ['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
+						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
+							CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
+							CCepRuleHelper::WINDOW_PATTERN_MATCH
+						]]
+					],
+					'group_by_tags' => [
+						['integer', 'in' => [CCepRuleHelper::GROUP_BY_YES, CCepRuleHelper::GROUP_BY_NO],
+							'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_SIMPLE,
+								CCepRuleHelper::WINDOW_CAUSE_SYMPTOM, CCepRuleHelper::WINDOW_TAG_MATCH,
+								CCepRuleHelper::WINDOW_PATTERN_MATCH
+							]]
+						],
+						['integer', 'required', 'in' => [CCepRuleHelper::GROUP_BY_YES],
+							'messages' => ['in' => _('At least one of "Group by" options must be selected.')],
+							'when' => [
+								['../window_type', 'in' => [CCepRuleHelper::WINDOW_CAUSE_SYMPTOM]],
+								['group_by_host', 'in' => [CCepRuleHelper::GROUP_BY_NO]],
+								['group_by_host_group', 'in' => [CCepRuleHelper::GROUP_BY_NO]]
+							]
+						]
+					],
+					'tags' => ['array', 'required', 'not_empty', 'field' => ['string', 'not_empty'],
+						'when' => ['group_by_tags', 'in' => [CCepRuleHelper::GROUP_BY_YES]]
+					],
+					'event_count_tag_enabled' => ['integer', 'required', 'in' => [0, 1],
+						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_CAUSE_SYMPTOM]]
+					],
+					'event_count_tag' => ['db cep_window.event_count_tag', 'required', 'not_empty',
+						'when' => ['event_count_tag_enabled', 'in' => [1]]
+					],
+					'script' => ['db cep_window.script', 'required', 'not_empty',
+						'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_PATTERN_MATCH]]
 					]
 				],
-				'tags' => ['array', 'required', 'not_empty', 'field' => ['string', 'not_empty'],
-					'when' => ['group_by_tags', 'in' => [CCepRuleHelper::GROUP_BY_YES]]
-				],
-				'event_count_tag_enabled' => ['integer', 'required', 'in' => [0, 1],
-					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_CAUSE_SYMPTOM]]
-				],
-				'event_count_tag' => ['db cep_window.event_count_tag', 'required', 'not_empty',
-					'when' => ['event_count_tag_enabled', 'in' => [1]]
-				],
-				'script' => ['db cep_window.script', 'required', 'not_empty',
-					'when' => ['../window_type', 'in' => [CCepRuleHelper::WINDOW_PATTERN_MATCH]]
-				]
-			], 'when' => ['window_type', 'not_in' => [CCepRuleHelper::WINDOW_NONE]]],
+				'when' => ['window_type', 'not_in' => [CCepRuleHelper::WINDOW_NONE]]
+			],
 			'operations' => [
 				['objects', 'required', 'fields' => self::getOperationValidationFields()],
 				['objects', 'required', 'not_empty', 'fields' => self::getOperationValidationFields(), 'when' => [
@@ -264,7 +267,7 @@ abstract class CControllerCepRuleGeneral extends CController {
 				['objects', 'required', 'not_empty', 'fields' => self::getOperationValidationFields(), 'when' => [
 						'window_type', 'in' => [CCepRuleHelper::WINDOW_PATTERN_MATCH]],
 					'count_values' => [
-						'field_rules' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_PATTERN_MATCHED]],
+						'field_rules' => ['execute_when', 'in' => [(string) CCepRuleHelper::WHEN_PATTERN_MATCHED]],
 						'min' => 1,
 						'message' => _('At least one operation must execute when event pattern matched.')
 					]
