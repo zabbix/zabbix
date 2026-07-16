@@ -215,6 +215,9 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 	hints.ai_family = AF_INET;
 #endif
 
+	if (SUCCEED == zbx_is_ip(host))
+		hints.ai_flags = AI_NUMERICHOST;
+
 	if (0 != getaddrinfo(ip, NULL, &hints, &ai))
 	{
 		host[0] = '\0';
@@ -2748,10 +2751,13 @@ int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
 
+		if (SUCCEED == zbx_is_ip(start))
+			hints.ai_flags = AI_NUMERICHOST;
+
 #ifdef HAVE_ARES_QUERY_CACHE
 		struct ares_addrinfo	*ares_ai = NULL;
 
-		if (0 == zbx_ares_getaddrinfo(start, NULL, 0, hints.ai_family, hints.ai_socktype, &ares_ai,
+		if (0 == zbx_ares_getaddrinfo(start, NULL, hints.ai_flags, hints.ai_family, hints.ai_socktype, &ares_ai,
 				zbx_socket_strerror_message, sizeof(zbx_socket_strerror_message)))
 		{
 			for (struct ares_addrinfo_node	*ai_node = ares_ai->nodes; NULL != ai_node;
