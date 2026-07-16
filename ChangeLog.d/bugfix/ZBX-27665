@@ -1,0 +1,1 @@
+........S. [ZBX-27665] fixed remote command execution failing for trigger action operations when the target host is monitored by a proxy group (vsmelovs)

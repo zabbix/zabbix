@@ -166,7 +166,7 @@ class CTabFilter extends CDiv {
 		if (!is_a($label, CTag::class)) {
 			if ($tab_index == 0) {
 				$label = (new CLink(''))
-					->setAttribute('aria-label', _('Home'))
+					->setAttribute('aria-label', _('Default filter tab'))
 					->addClass(ZBX_ICON_FILTER);
 				$data += [
 					'filter_sortable' => false,
@@ -329,12 +329,14 @@ class CTabFilter extends CDiv {
 		return [
 			(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))
 				->addClass('js-btn-time-left')
+				->setAttribute('aria-label', _('Move time range backward'))
 				->setEnabled($enabled),
 			(new CSimpleButton(_('Zoom out')))
 				->addClass(ZBX_STYLE_BTN_TIME_ZOOMOUT)
 				->setEnabled($enabled),
 			(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT))
 				->addClass('js-btn-time-right')
+				->setAttribute('aria-label', _('Move time range forward'))
 				->setEnabled($enabled),
 			(new CListItem(
 				(new CLink(relativeDateToText($data['from'], $data['to'])))
@@ -375,8 +377,14 @@ class CTabFilter extends CDiv {
 		array_unshift($sortable, array_shift($static));
 
 		$nav_list = new CList([
-			(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN))->setAttribute('data-action', 'toggleTabsList'),
-			(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT))->setAttribute('data-action', 'selectNextTab')
+			(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN))
+				->setAttribute('data-action', 'toggleTabsList')
+				->setAttribute('aria-label', _('List of open filter tabs'))
+				->setAttribute('aria-expanded', 'false')
+				->setAttribute('aria-controls', $this->options['idx'].'-'.'toggle-tabs-list'),
+			(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT))
+				->setAttribute('data-action', 'selectNextTab')
+				->setAttribute('aria-label', _('Go to next filter tab'))
 		]);
 
 		if (array_key_exists('timeselector', $this->options)) {
@@ -387,7 +395,9 @@ class CTabFilter extends CDiv {
 
 		return new CTag('nav', true,
 			new CList([
-				(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))->setAttribute('data-action', 'selectPrevTab'),
+				(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))
+					->setAttribute('data-action', 'selectPrevTab')
+					->setAttribute('aria-label', _('Go to previous filter tab')),
 				$sortable ? (new CList($sortable))->addClass(static::CSS_TABS) : null,
 				$static ?: null,
 				$nav_list
