@@ -185,22 +185,13 @@ class CAction extends CApiService {
 			')';
 
 			// Check permissions of proxies used in filter conditions.
-			$sqlParts['where'][] = '('.
-				'NOT EXISTS ('.
-					'SELECT NULL'.
-					' FROM conditions c'.
-					' JOIN proxy p ON '.zbx_dbcast_2bigint('c.value').'=p.proxyid'.
-					' WHERE a.actionid=c.actionid'.
-						' AND c.conditiontype='.ZBX_CONDITION_TYPE_PROXY.
-				')'.
-				' OR EXISTS ('.
-					'SELECT NULL'.
-					' FROM conditions c'.
-					' JOIN proxy p ON '.zbx_dbcast_2bigint('c.value').'=p.proxyid'.
-					' WHERE a.actionid=c.actionid'.
-						' AND c.conditiontype='.ZBX_CONDITION_TYPE_PROXY.
-						' AND '.CApiUserGroupHelper::getProxyPermissionsCondition('p').
-				')'.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM conditions c'.
+				' JOIN proxy p ON '.zbx_dbcast_2bigint('c.value').'=p.proxyid'.
+				' WHERE a.actionid=c.actionid'.
+					' AND c.conditiontype='.ZBX_CONDITION_TYPE_PROXY.
+					' AND NOT ('.CApiUserGroupHelper::getProxyPermissionsCondition('p').')'.
 			')';
 
 			// Check permissions of user groups mentioned for "send message" operations.
