@@ -82,11 +82,16 @@ function escapeHtml(string) {
 function normalizeNumericBox(input, {allow_negative, min_length}) {
 	let num = parseInt(input.value, 10);
 
-	if (num < 0 && !allow_negative) {
-		num = -num;
+	if (isNaN(num)) {
+		input.value = input.value === '' ? '' : '0'.repeat(Math.max(min_length, 1));
 	}
+	else {
+		if (num < 0 && !allow_negative) {
+			num = -num;
+		}
 
-	input.value = num < 0 ? num : num.toString().padStart(min_length, '0');
+		input.value = num < 0 ? num : num.toString().padStart(min_length, '0');
+	}
 }
 
 /**
