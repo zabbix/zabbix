@@ -284,7 +284,7 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 
 		return true;
 	}
-
+	/*
 	public function serverConfigurationProvider() {
 		$export_dir = self::getExportDir();
 
@@ -299,7 +299,15 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 			]
 		];
 	}
-
+	*/
+	public function serverConfigurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'ExportDir' => '/tmp/zabbix-export',
+				'ExportType' => 'events,history,trends'
+			]
+		];
+	}
 	/**
 	 * Clean up the temporary export directory after all tests.
 	 */
