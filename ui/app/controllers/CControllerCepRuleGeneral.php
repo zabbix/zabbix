@@ -289,11 +289,11 @@ abstract class CControllerCepRuleGeneral extends CController {
 		// Note: the correct fix is needed to be done in IV-core client side (BE has no issues) -
 		// when "objects" has no "fields" in rules definition it currently deteles "fields" instead of merging.
 		return [
-			'execute_when' => ['db cep_operation.execute_when', 'required', 'in' => [
-				CCepRuleHelper::WHEN_EVENT_OCCURRED, CCepRuleHelper::WHEN_EVENT_EVICTED,
-				CCepRuleHelper::WHEN_WINDOW_CLOSED, CCepRuleHelper::WHEN_TAGS_CORRELATED,
-				CCepRuleHelper::WHEN_PATTERN_MATCHED
-			]],
+			'execute_when' => array_map(fn(int $window_type) => ['db cep_operation.execute_when', 'required',
+				'in' => CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE[$window_type],
+				'messages' => ['in' => 'Execute when type not allowed for this window type.'],
+				'when' => ['../window_type', 'in' => [$window_type]]
+			], array_keys(CCepRuleHelper::EXECUTE_WHEN_BY_WINDOW_TYPE)),
 			'tags' => ['objects', 'fields' => [
 				'tag' => ['db cep_operation_condition.tag', 'required', 'not_empty'],
 				'operator' => ['db cep_operation_condition.operator', 'required', 'in' => [TAG_OPERATOR_EXISTS,
