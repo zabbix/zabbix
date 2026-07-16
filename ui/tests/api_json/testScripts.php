@@ -1600,7 +1600,7 @@ class testScripts extends CAPITest {
 					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'url' => 'htp:/d'
 				],
-				'expected_error' => 'Invalid parameter "/1/url": unacceptable URL.'
+				'expected_error' => 'Invalid parameter "/1/url": unacceptable URL scheme.'
 			],
 			'Test script.create invalid URL (broken manual input macro)' => [
 				'script' => [

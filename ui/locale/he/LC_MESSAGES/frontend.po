@@ -28079,6 +28079,10 @@ msgstr "יש להקליד כאן כדי לחפש"
 msgid "unacceptable URL"
 msgstr "כתובת לא מקובלת"
 
+#: include/classes/validators/CUrlValidator.php:147
+msgid "unacceptable URL scheme"
+msgstr ""
+
 #: include/classes/import/validators/CXmlValidatorGeneral.php:296
 #, c-format
 msgid "unexpected constant \"%1$s\""
