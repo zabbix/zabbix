@@ -17,11 +17,11 @@
 class CControllerHostListData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['hostid', 'data_actions', 'name', 'discovery', 'flags', 'maintenance',
-		'status', 'discoveryData', 'discoveryRule', 'is_discovery_rule_editable', 'maintenanceid', 'maintenance_type',
-		'maintenance_status', 'items', 'triggers', 'graphs', 'discoveryRules', 'httpTests', 'interface', 'monitored_by',
-		'proxyid', 'assigned_proxyid', 'proxy', 'proxy_groupid', 'proxy_group', 'assigned_proxy', 'templates',
-		'parentTemplates', 'disabled_by_lld', 'disable_source', 'availability', 'active_available', 'tls_accept',
-		'tls_connect', 'info_icons', 'tags', 'custom_text'];
+		'status', 'discoveryData', 'discoveryRule', 'maintenanceid', 'maintenance_type', 'maintenance_status',
+		'items', 'triggers', 'graphs', 'discoveryRules', 'httpTests', 'interface', 'monitored_by', 'proxyid',
+		'assigned_proxyid', 'proxy', 'proxy_groupid', 'proxy_group', 'assigned_proxy', 'templates', 'parentTemplates',
+		'disabled_by_lld', 'disable_source', 'availability', 'active_available', 'tls_accept', 'tls_connect',
+		'info_icons', 'tags', 'custom_text'];
 
 	protected function init(): void {
 		parent::init();
@@ -242,10 +242,17 @@ class CControllerHostListData extends CControllerDataTable {
 		CTagHelper::mergeOwnAndInheritedTags($hosts, true);
 
 		foreach ($hosts as &$host) {
+			$is_discovery_rule_editable = $host['discoveryRule']
+				&& API::DiscoveryRule()->get([
+					'output' => [],
+					'itemids' => $host['discoveryRule']['itemid'],
+					'editable' => true
+				]);
+
 			$host['discovery'] = [
 				'data' => $host['discoveryData'],
 				'rule' => $host['discoveryRule'],
-				'editable' => $host['is_discovery_rule_editable'] ?? false
+				'editable' => $is_discovery_rule_editable
 			];
 
 			$host['maintenance'] = null;

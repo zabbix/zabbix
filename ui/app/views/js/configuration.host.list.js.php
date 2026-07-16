@@ -249,8 +249,7 @@
 				.setColumns([
 					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
 						.setFields(['hostid', 'name', 'discovery', 'flags', 'maintenance', 'status', 'discoveryData',
-							'discoveryRule', 'is_discovery_rule_editable', 'maintenanceid', 'maintenance_type',
-							'maintenance_status'])
+							'discoveryRule', 'maintenanceid', 'maintenance_type', 'maintenance_status'])
 						.setRenderer('name')
 						.setSortable(true)
 						.setTogglable(false)
@@ -361,6 +360,7 @@
 								const discovery_rule_link = document.createElement('a');
 								discovery_rule_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_ORANGE);
 								discovery_rule_link.setAttribute('href', host_prototype_url.toString());
+								discovery_rule_link.textContent = discovery.rule.name;
 
 								cell_inner.appendChild(discovery_rule_link);
 							}
