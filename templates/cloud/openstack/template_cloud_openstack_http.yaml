@@ -131,6 +131,7 @@ zabbix_export:
             					ret.push({
             						'service_name': service.name[0].toUpperCase() + service.name.slice(1),
             						'service_url': endpoint.url,
+                        'service_id': endpoint.id,
             						'token': token
             					});
             				}
@@ -174,8 +175,8 @@ zabbix_export:
           description: 'Discovers OpenStack services from the monitoring user''s services catalog.'
           host_prototypes:
             - uuid: 580d769292ec48379c5b84cd5c72533b
-              host: 'OpenStack {#SERVICE_NAME}'
-              name: 'OpenStack {#SERVICE_NAME}'
+              host: 'OpenStack {#SERVICE_ID}'
+              name: 'OpenStack {#SERVICE_NAME} [{#SERVICE_URL}]'
               group_links:
                 - group:
                     name: 'Virtual machines'
@@ -191,6 +192,8 @@ zabbix_export:
           master_item:
             key: openstack.identity.auth
           lld_macro_paths:
+            - lld_macro: '{#SERVICE_ID}'
+              path: $.service_id
             - lld_macro: '{#SERVICE_NAME}'
               path: $.service_name
             - lld_macro: '{#SERVICE_URL}'
