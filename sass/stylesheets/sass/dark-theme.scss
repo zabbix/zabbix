@@ -290,6 +290,23 @@ $datatable-resizer-border-color: #69808d;
 // Datatables.
 .datatable {
 	&.has-highlighted-rows .datatable-body .row {
+		&.row-selected .cell.cell-data {
+			&.na-bg,
+			&.info-bg,
+			&.warning-bg,
+			&.average-bg,
+			&.high-bg,
+			&.disaster-bg {
+				a.link-action {
+					color: $font-color;
+
+					&:hover {
+						color: $link-color;
+					}
+				}
+			}
+		}
+
 		&:not(.row-disabled):not(.row-selected) {
 			.cell.cell-data {
 				color: #000000;

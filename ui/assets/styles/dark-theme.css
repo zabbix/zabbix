@@ -9864,6 +9864,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
 .list-table.sticky-footer tfoot tr:first-of-type td {
   border-color: #404040; }
 
+.datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.na-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.info-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.warning-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.average-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.high-bg a.link-action, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.disaster-bg a.link-action {
+  color: #f2f2f2; }
+  .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.na-bg a.link-action:hover, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.info-bg a.link-action:hover, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.warning-bg a.link-action:hover, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.average-bg a.link-action:hover, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.high-bg a.link-action:hover, .datatable.has-highlighted-rows .datatable-body .row.row-selected .cell.cell-data.disaster-bg a.link-action:hover {
+    color: #4796c4; }
 .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data {
   color: #000000; }
   .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected) .cell.cell-data a {
