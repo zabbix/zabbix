@@ -20,7 +20,7 @@
 
 typedef enum
 {
-	OTEL_TASK_MESSAGE
+	OTEL_TASK_REQUEST
 }
 zbx_cep_task_type_t;
 
@@ -29,11 +29,11 @@ typedef struct
 	zbx_mw_task_t		base;
 	zbx_otel_request_type_t	type;
 	zbx_otel_request_t	request;
-	char			*message;
+	char			*data;
 }
-zbx_otel_task_message_t;
+zbx_otel_task_request_t;
 
-zbx_mw_task_t	*otel_task_message_create(zbx_otel_request_t request, zbx_otel_request_type_t type);
+zbx_mw_task_t	*otel_task_request_create(zbx_otel_request_t request, zbx_otel_request_type_t type);
 
 void	otel_task_free(zbx_mw_task_t *mw_task);
 
