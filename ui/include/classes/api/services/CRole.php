@@ -888,17 +888,7 @@ class CRole extends CApiService {
 
 		foreach ($roles as $roleid => $role) {
 			$type = array_key_exists('type', $role) ? $role['type'] : $db_roles[$role['roleid']]['type'];
-
-			if ($db_roles !== null) {
-				$old_rules = $db_roles[$roleid]['rules'];
-			}
-			else {
-				$api_access_default = in_array($type, [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN], true)
-					? ZBX_ROLE_RULE_ENABLED
-					: ZBX_ROLE_RULE_DISABLED;
-				$old_rules = $default_rules + ['api.access' => $api_access_default];
-			}
-
+			$old_rules = $db_roles !== null ? $db_roles[$roleid]['rules'] : $default_rules;
 			$new_rules = array_key_exists('rules', $role) ? $role['rules'] + $old_rules : $old_rules;
 
 			$rules[$roleid] = array_merge(
