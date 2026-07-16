@@ -282,7 +282,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 				);
 
 			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] != '' && !$options['compact_view']
-					&& $options['show_opdata'] !== OPERATIONAL_DATA_SHOW_NONE) {
+					&& ($options['show_opdata'] & OPERATIONAL_DATA_SHOW_WITH_PROBLEM)) {
 				$problem_link_wrapper->addItem([' (', $opdata, ') ']);
 			}
 
