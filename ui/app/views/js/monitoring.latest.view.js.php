@@ -293,6 +293,8 @@
 				.setCellRenderer('name', ({column, cell_data, cell}) => {
 					const [itemid, description_expanded, name, key_expanded] = cell_data;
 
+					cell.innerHTML = '';
+
 					const url_params = objectToSearchParams({action: 'latest.view', context: 'host'});
 
 					const flex_wrapper = document.createElement('div');
@@ -335,7 +337,8 @@
 
 					const {show_item_key} = column.getColumnOptions();
 
-					if (show_item_key) {
+					console.log(show_item_key);
+					if (show_item_key == 1) {
 						const overflow_ellipsis = document.createElement('div');
 						overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 

@@ -34,7 +34,7 @@ class CDataTableOptionsPopupMonitoringLatestName extends CDataTableOptionsPopup 
 	}
 
 	getFieldData() {
-		const show_item_key = this.getField('show_item_key').checked;
+		const show_item_key = this.getField('show_item_key').checked ? 1 : 0;
 
 		return {show_item_key};
 	}
@@ -50,7 +50,7 @@ class CDataTableOptionsPopupMonitoringLatestName extends CDataTableOptionsPopup 
 
 		data = {...defaults, ...data};
 
-		if (typeof data.show_item_key !== 'boolean') {
+		if (data.show_item_key < 0 || data.show_item_key > 1) {
 			data.show_item_key = defaults.show_item_key;
 		}
 
@@ -65,19 +65,18 @@ class CDataTableOptionsPopupMonitoringLatestName extends CDataTableOptionsPopup 
 
 		const input = this.getField('show_item_key');
 		input.checked = show_item_key == 1;
-		input.addEventListener('input', e => {
+		input.addEventListener('change', e => {
 			e.stopPropagation();
 
 			this.getColumn().setColumnOptions({
 				...column_options,
-				show_item_key: e.target.checked
+				show_item_key: e.target.checked ? 1 : 0
 			});
 
-			this.getDataTable()
-				.getData()
-				.then(response => {
-					this.getDataTable().dispatchEvent(CDataTable.EVENT_RENDER, {response});
-				});
+			this.getDataTable().updateUserConfig();
+
+			this.getDataTable().dispatchEvent(CDataTable.EVENT_INIT);
+			this.getDataTable().dispatchEvent(CDataTable.EVENT_SAVE);
 		});
 	}
 }
