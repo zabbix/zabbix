@@ -93,6 +93,8 @@ class CApiUserGroupHelper {
 			'proxy_group_allow_list_usrgrpids' => $proxy_group_allow_list_usrgrpids
 		] = self::getUserGroupIdsByPermissionLists();
 
+		$conditions = [];
+
 		if ($proxy_group_deny_list_usrgrpids) {
 			$conditions[] = 'NOT EXISTS ('.
 				'SELECT NULL'.
@@ -111,7 +113,7 @@ class CApiUserGroupHelper {
 			')';
 		}
 
-		return implode(' AND ', $conditions);
+		return $conditions ? '('.implode(' AND ', $conditions).')' : '1=0';
 	}
 
 	private static function getUserGroupIdsByPermissionLists(): array {
