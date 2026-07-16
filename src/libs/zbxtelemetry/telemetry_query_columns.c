@@ -16,7 +16,7 @@
 
 #include "telemetry.h"
 
-static const tq_column_info_t	column_info_apm_traces[] = {
+static const tq_column_info_t	column_info_traces[] = {
 	{"Timestamp",		ZBX_TQ_COLUMN_TYPE_TIMESTAMP,		0	},
 	{"TraceId",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
 	{"SpanId",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
@@ -37,7 +37,7 @@ static const tq_column_info_t	column_info_apm_traces[] = {
 	{0}
 };
 
-static const tq_column_info_t	column_info_apm_logs[] = {
+static const tq_column_info_t	column_info_logs[] = {
 	{"Timestamp",		ZBX_TQ_COLUMN_TYPE_TIMESTAMP,	0	},
 	{"TraceId",		ZBX_TQ_COLUMN_TYPE_STR,		0	},
 	{"SpanId",		ZBX_TQ_COLUMN_TYPE_STR,		0	},
@@ -57,7 +57,7 @@ static const tq_column_info_t	column_info_apm_logs[] = {
 	{0}
 };
 
-static const tq_column_info_t	column_info_apm_metrics_sum[] = {
+static const tq_column_info_t	column_info_metrics_sum[] = {
 	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
 	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
 	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
@@ -76,11 +76,11 @@ static const tq_column_info_t	column_info_apm_metrics_sum[] = {
 	{"Flags",			ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{"Exemplars.FilteredAttributes",ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES,	0	},
 	{"AggregationTemporality",	ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
-	{"IsMonotonic",			ZBX_TQ_COLUMN_TYPE_NUM,			0	},
+	{"IsMonotonic",			ZBX_TQ_COLUMN_TYPE_NUM,		TQ_COLUMN_INFO_FLAG_NO_AGGREGATION	},
 	{0}
 };
 
-static const tq_column_info_t	column_info_apm_metrics_gauge[] = {
+static const tq_column_info_t	column_info_metrics_gauge[] = {
 	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
 	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
 	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
@@ -101,7 +101,7 @@ static const tq_column_info_t	column_info_apm_metrics_gauge[] = {
 	{0}
 };
 
-static const tq_column_info_t	column_info_apm_metrics_histogram[] = {
+static const tq_column_info_t	column_info_metrics_histogram[] = {
 	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
 	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
 	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
@@ -126,7 +126,7 @@ static const tq_column_info_t	column_info_apm_metrics_histogram[] = {
 	{0}
 };
 
-static const tq_column_info_t	column_info_apm_metrics_exponentialhistogram[] = {
+static const tq_column_info_t	column_info_metrics_exponential_histogram[] = {
 	{"ResourceAttributes",		ZBX_TQ_COLUMN_TYPE_ATTRIBUTES,		0	},
 	{"ResourceSchemaUrl",		ZBX_TQ_COLUMN_TYPE_STR,			0	},
 	{"ScopeName",			ZBX_TQ_COLUMN_TYPE_STR,			0	},
@@ -175,26 +175,26 @@ const tq_column_info_t	*tq_get_column_info(zbx_tq_signal_type_t signal_type,
 	switch (signal_type)
 	{
 		case ZBX_TQ_SIGNAL_TYPE_APM_TRACES:
-			return get_column_info_from_arr(column_info_apm_traces, column);
+			return get_column_info_from_arr(column_info_traces, column);
 
 		case ZBX_TQ_SIGNAL_TYPE_APM_METRICS:
 			switch (metric_point_type)
 			{
 				case ZBX_TQ_METRIC_POINT_TYPE_SUM:
-					return get_column_info_from_arr(column_info_apm_metrics_sum, column);
+					return get_column_info_from_arr(column_info_metrics_sum, column);
 				case ZBX_TQ_METRIC_POINT_TYPE_GAUGE:
-					return get_column_info_from_arr(column_info_apm_metrics_gauge, column);
+					return get_column_info_from_arr(column_info_metrics_gauge, column);
 				case ZBX_TQ_METRIC_POINT_TYPE_HISTOGRAM:
-					return get_column_info_from_arr(column_info_apm_metrics_histogram, column);
+					return get_column_info_from_arr(column_info_metrics_histogram, column);
 				case ZBX_TQ_METRIC_POINT_TYPE_EXPONENTIAL_HISTOGRAM:
-					return get_column_info_from_arr(column_info_apm_metrics_exponentialhistogram,
+					return get_column_info_from_arr(column_info_metrics_exponential_histogram,
 							column);
 				default:
 					return NULL;
 			}
 
 		case ZBX_TQ_SIGNAL_TYPE_APM_LOGS:
-			return get_column_info_from_arr(column_info_apm_logs, column);
+			return get_column_info_from_arr(column_info_logs, column);
 
 		default:
 			return NULL;

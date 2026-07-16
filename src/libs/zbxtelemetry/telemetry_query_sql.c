@@ -344,23 +344,23 @@ static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, co
 	switch (query->signal_type)
 	{
 		case ZBX_TQ_SIGNAL_TYPE_APM_TRACES:
-			str = zbx_strdup(NULL, "apm_traces");
+			str = zbx_strdup(NULL, "otel_traces");
 			break;
 
 		case ZBX_TQ_SIGNAL_TYPE_APM_METRICS:
 			switch (query->metric_point_type)
 			{
 				case ZBX_TQ_METRIC_POINT_TYPE_SUM:
-					str = zbx_strdup(NULL, "apm_metrics_sum");
+					str = zbx_strdup(NULL, "otel_metrics_sum");
 					break;
 				case ZBX_TQ_METRIC_POINT_TYPE_GAUGE:
-					str = zbx_strdup(NULL, "apm_metrics_gauge");
+					str = zbx_strdup(NULL, "otel_metrics_gauge");
 					break;
 				case ZBX_TQ_METRIC_POINT_TYPE_HISTOGRAM:
-					str = zbx_strdup(NULL, "apm_metrics_histogram");
+					str = zbx_strdup(NULL, "otel_metrics_histogram");
 					break;
 				case ZBX_TQ_METRIC_POINT_TYPE_EXPONENTIAL_HISTOGRAM:
-					str = zbx_strdup(NULL, "apm_metrics_exponentialhistogram");
+					str = zbx_strdup(NULL, "otel_metrics_exponential_histogram");
 					break;
 
 				case ZBX_TQ_METRIC_POINT_TYPE_UNKNOWN:
@@ -369,7 +369,7 @@ static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, co
 			break;
 
 		case ZBX_TQ_SIGNAL_TYPE_APM_LOGS:
-			str = zbx_strdup(NULL, "apm_logs");
+			str = zbx_strdup(NULL, "otel_logs");
 			break;
 
 		case ZBX_TQ_SIGNAL_TYPE_UNKNOWN:
