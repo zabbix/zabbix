@@ -250,18 +250,12 @@ window.ceprule_operation_edit_popup = new class {
 	}
 
 	#handleExecuteWhenChanged(value) {
-		// Update a dependent selector view.
 		this.#setAvailableOperationOptions();
 
+		const has_position_tags = value == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>;
+
 		[...this.form_element.querySelectorAll('[is="z-cep-tagsuggest"]')]
-			.map(node => {
-				if (value == <?= CCepRuleHelper::WHEN_TAGS_CORRELATED ?>) {
-					node.setAttribute('disable-position-tags', '');
-				}
-				else {
-					node.removeAttribute('disable-position-tags');
-				}
-			});
+			.map(node => node.toggleAttribute('disable-position-tags', has_position_tags));
 	}
 };
 

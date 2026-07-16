@@ -517,7 +517,7 @@ window.ceprule_edit_popup = new class {
 			content: form_element,
 			buttons: [
 				{
-					title: is_new ? t('Add') : t('Edit'),
+					title: is_new ? t('Add') : t('Update'),
 					isSubmit: true,
 					action: (overlay) => {
 						const form = ceprule_condition_edit_popup.form;
@@ -584,7 +584,7 @@ window.ceprule_edit_popup = new class {
 			content: form_element,
 			buttons: [
 				{
-					title: is_new ? t('Add') : t('Edit'),
+					title: is_new ? t('Add') : t('Update'),
 					isSubmit: true,
 					action: (overlay) => {
 						const form = ceprule_operation_edit_popup.form;
