@@ -24,7 +24,7 @@ class CWidgetFieldIntegerBoxView extends CWidgetFieldView {
 
 	public function getView(): CNumericBox {
 		return (new CNumericBox($this->field->getName(), $this->field->getValue(), $this->field->getMaxLength(), false,
-			!$this->isNotEmpty()
+			false
 		))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired($this->isRequired());
