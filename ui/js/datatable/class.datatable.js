@@ -1179,7 +1179,7 @@ class CDataTable {
 			return null;
 		}
 
-		const duplicate_column = this.#duplicateColumn(column, column.diff(), true);
+		const duplicate_column = this.#duplicateColumn(column, column.diff());
 
 		for (let i = this.#columns.indexOf(duplicate_column); i < this.#columns.length; i++) {
 			this.#columns[i].setOrder(i + 1);
@@ -1251,15 +1251,13 @@ class CDataTable {
 			return;
 		}
 
-		column.setName(name);
-
-		this.updateUserConfig();
+		column.setName(name === '' ? column.getDefaults().getName() : name);
 
 		const header_cell = column.getHeaderCell();
 		if (header_cell !== null) {
 			const header_name = header_cell.target.querySelector(`.${CDataTable.ZBX_STYLE_HEADER_NAME}`);
 			if (header_name !== null) {
-				header_name.textContent = name;
+				header_name.textContent = column.getName();
 			}
 		}
 	}
@@ -1531,8 +1529,6 @@ class CDataTable {
 		if (!deepCompare(column.getColumnOptions(), column_options)) {
 			column.setColumnOptions(column_options);
 
-			this.updateUserConfig();
-
 			this.#renderColumnDataCells(column);
 
 			this.#options_popup_updated = true;
@@ -1543,9 +1539,11 @@ class CDataTable {
 					this.#scrollBodyToTarget(header_cell.target);
 				}
 			});
-
-			this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_UPDATE, e.detail);
 		}
+
+		this.updateUserConfig();
+
+		this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_UPDATE, e.detail);
 	}
 
 	onOptionsPopup(e) {
@@ -1608,7 +1606,6 @@ class CDataTable {
 		const {save = false} = e.detail;
 
 		if (save) {
-			this.dispatchEvent(CDataTable.EVENT_INIT);
 			this.dispatchEvent(CDataTable.EVENT_SAVE);
 		}
 	}
@@ -2250,28 +2247,26 @@ class CDataTable {
 		this.#columns = this.#columns.sort((left, right) => left.getOrder() - right.getOrder());
 	}
 
-	#duplicateColumn(column, user_column = {}, duplicate_name = false) {
+	#duplicateColumn(column, user_column = {}) {
 		const defaults = column.getDefaults()
 			.clone()
 			.setDuplicate(false)
 			.setSpan(1)
 			.setVisible(user_column.visible || true);
 
+		const name = defaults.getName();
+
+		const duplicate_count = this.#columns
+			.filter(column => column.getName().replace(/\s*\(\d+\)$/g, '') === name)
+			.length;
+
+		defaults.setName(`${name} (${duplicate_count})`);
+
 		const duplicate_column = defaults.clone()
 			.setColumnIndex(this.#columns.length)
 			.setDefaults(defaults)
 			.setDuplicate(true)
 			.merge(user_column);
-
-		if (duplicate_name) {
-			const name = column.getName().replace(/\s*\(\d+\)$/g, '');
-
-			const duplicate_count = this.#columns
-				.filter(column => column.getName().replace(/\s*\(\d+\)$/g, '') === name)
-				.length;
-
-			duplicate_column.setName(`${name} (${duplicate_count})`);
-		}
 
 		const start = this.#columns.indexOf(column) + 1;
 		this.#columns.splice(start, 0, duplicate_column);
