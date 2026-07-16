@@ -296,8 +296,8 @@ class testUserMacrosInItemNames extends CIntegrationTest {
 
 		return [
 			self::COMPONENT_SERVER => [
-				'ExportDir' => $export_dir,
-				'ExportType' => 'events,history,trends'
+				'ExportDir' => $export_dir
+				//'ExportType' => 'events,history,trends'
 			]
 		];
 	}

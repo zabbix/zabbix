@@ -271,8 +271,13 @@ class CIntegrationTest extends CAPITest {
 			}
 
 			foreach ($components as $component) {
+				error_log('BEFORE_PREPARE_CONFIG ' . $component);
 				self::prepareComponentConfiguration($component, self::$case_configuration);
+				error_log('AFTER_PREPARE_CONFIG ' . $component);
+
+				error_log('BEFORE_START_COMPONENT ' . $component);
 				self::startComponent($component);
+				error_log('AFTER_START_COMPONENT ' . $component);
 			}
 			self::$suite_components_running = true;
 		}
@@ -411,29 +416,40 @@ class CIntegrationTest extends CAPITest {
 	 * @throws Exception    on failed wait operation
 	 */
 	protected static function waitForStartup($component, $waitLogLineOverride = '', $skip_pid = false) {
+		error_log('WAIT_FOR_STARTUP_ENTER ' . $component);
 		$start = microtime(true);
 		self::validateComponent($component);
 
 		$saved_time = time();
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
+			error_log('CHECK_PID ' . $component);
 			$pid = @file_get_contents(self::getPidPath($component));
 			if ($skip_pid == true || ($pid && is_numeric($pid) && posix_kill($pid, 0))) {
+				error_log('PID_FOUND ' . $component . ' PID=' . $pid);
 				switch ($component) {
 					case self::COMPONENT_SERVER_HANODE1:
+						error_log('WAIT_FOR_LOG_LINE ' . $component);
 						self::waitForLogLineToBePresent($component, 'HA manager started', false, 5, 1);
+						error_log('LOG_LINE_FOUND ' . $component);
 						break;
 					case self::COMPONENT_SERVER:
 					case self::COMPONENT_PROXY:
 						$line = empty($waitLogLineOverride) ? 'started [trapper #1]' : $waitLogLineOverride;
+						error_log('WAIT_FOR_LOG_LINE ' . $component);
 						self::waitForLogLineToBePresent($component, $line, false, 10, 1);
+						error_log('LOG_LINE_FOUND ' . $component);
 						break;
 					case self::COMPONENT_AGENT:
 					case self::COMPONENT_AGENT_3_0:
+						error_log('WAIT_FOR_LOG_LINE ' . $component);
 						self::waitForLogLineToBePresent($component, 'started [listener #1]', false, 5, 1);
+						error_log('LOG_LINE_FOUND ' . $component);
 						break;
 
 					case self::COMPONENT_AGENT2:
+						error_log('WAIT_FOR_LOG_LINE ' . $component);
 						self::waitForLogLineToBePresent($component, 'Zabbix Agent2 hostname', false, 5, 1);
+						error_log('LOG_LINE_FOUND ' . $component);
 						break;
 				}
 
@@ -441,6 +457,7 @@ class CIntegrationTest extends CAPITest {
 					self::recordDelay('startup', microtime(true) - $start);
 				}
 
+				error_log('STARTUP_SUCCESS ' . $component);
 				return;
 			}
 
@@ -451,6 +468,7 @@ class CIntegrationTest extends CAPITest {
 			self::recordDelay('startup', microtime(true) - $start);
 		}
 
+		error_log('STARTUP_TIMEOUT ' . $component);
 		throw new Exception('Failed to wait for component "'.$component.'" to start. Waited '.(time() - $saved_time).' seconds..');
 	}
 
@@ -560,7 +578,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$command .= $params.($background ? ' > /dev/null 2>&1 &' : ' 2>&1');
-
+		error_log('FULL_COMMAND=' . $command);
 		exec($command, $output, $return);
 
 		if ($return !== 0) {
@@ -708,6 +726,7 @@ class CIntegrationTest extends CAPITest {
 	 * @throws Exception    on missing configuration or failed start
 	 */
 	protected function startComponent($component, $waitLogLineOverride = '', $skip_pid = false) {
+		error_log('START_COMPONENT_ENTER ' . $component);
 		self::validateComponent($component);
 
 		$config = PHPUNIT_CONFIG_DIR.'zabbix_'.$component.'.conf';
@@ -730,8 +749,13 @@ class CIntegrationTest extends CAPITest {
 			$bin_path = PHPUNIT_BINARY_DIR.'zabbix_'.$component;
 		}
 
+		error_log('EXECUTE_COMMAND ' . $component);
 		self::executeCommand($bin_path, ['-c', $config], $background);
+		error_log('EXECUTE_COMMAND_DONE ' . $component);
+
+		error_log('WAIT_FOR_STARTUP ' . $component);
 		self::waitForStartup($component, $waitLogLineOverride, $skip_pid);
+		error_log('WAIT_FOR_STARTUP_DONE ' . $component);
 	}
 
 	/**
