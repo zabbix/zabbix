@@ -1513,7 +1513,6 @@ fi
 
 if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
-
 	dnl Checking for MySQL support
 	AX_LIB_MYSQL()
 	if test "x$want_mysql" = "xyes"; then
@@ -1617,50 +1616,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${DB_LDFLAGS}"
 	PROXY_LIBS="${PROXY_LIBS} ${DB_LIBS}"
-
-    dnl *****************************************************************
-    dnl * OTLP/gRPC event collector (proxy only)                        *
-    dnl *****************************************************************
-    AC_ARG_WITH([otcollector],
-        [
-If you want to use Open Telemetry collector in proxy:
-AS_HELP_STRING([--with-otcollector], [turn on OTLP/gRPC event collector, requires --enable-proxy @<:@default=no@:>@])],
-        [
-        if test "x$withval" = "xno"; then
-            with_otel="no"
-        elif test "x$withval" = "xyes"; then
-            with_otel="yes"
-        else
-            with_otel="yes"
-        fi
-        ],
-        [with_otel="no"])
-
-    if test "x$with_otel" != "xno"; then
-        if test "x$proxy" != "xyes"; then
-            AC_MSG_ERROR([--with-otcollector requires --enable-proxy])
-        fi
-
-        AC_LANG_PUSH([C++])
-        AX_CXX_COMPILE_STDCXX([17], [noext], [mandatory])
-        AC_LANG_POP([C++])
-
-        m4_ifdef([PKG_CHECK_MODULES], [
-            PKG_CHECK_MODULES([GRPC], [grpc++ >= 1.40])
-            PKG_CHECK_MODULES([PROTOBUF], [protobuf])
-        ], [
-            AC_MSG_ERROR([--with-oteotcollectorl needs pkg-config autoconf macros (pkg.m4); install pkg-config/pkgconf and re-run autoreconf])
-        ])
-
-        OTEL_CFLAGS="$GRPC_CFLAGS $PROTOBUF_CFLAGS"
-        OTEL_LIBS="$GRPC_LIBS $PROTOBUF_LIBS -lstdc++"
-        AC_SUBST(OTEL_CFLAGS)
-        AC_SUBST(OTEL_LIBS)
-
-        AC_DEFINE([HAVE_OTEL], [1], [Define to 1 if built with OTLP/gRPC event collector support])
-    fi
-
-    AM_CONDITIONAL([HAVE_OTEL], [test "x$with_otel" != "xno"])
 
 	dnl Check for LIBXML2 [by default - skip]
 	LIBXML2_CHECK_CONFIG([no])
@@ -1789,6 +1744,64 @@ AS_HELP_STRING([--with-otcollector], [turn on OTLP/gRPC event collector, require
 	if test "x$found_libpthread" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libpthread (libpthread check failed)])
 	fi
+fi
+
+if test "x$proxy" = "xyes"; then
+    dnl *****************************************************************
+    dnl * OTLP/gRPC event collector (proxy only)                        *
+    dnl *****************************************************************
+    AC_ARG_WITH([otcollector],
+        [
+If you want to use Open Telemetry collector in proxy:
+AS_HELP_STRING([--with-otcollector], [turn on OTLP/gRPC event collector, requires --enable-proxy @<:@default=no@:>@])],
+        [
+        if test "x$withval" = "xno"; then
+            with_otel="no"
+        elif test "x$withval" = "xyes"; then
+            with_otel="yes"
+        else
+            with_otel="yes"
+        fi
+        ],
+        [with_otel="no"])
+
+    if test "x$with_otel" != "xno"; then
+        AC_LANG_PUSH([C++])
+        AX_CXX_COMPILE_STDCXX([17], [noext], [mandatory])
+        AC_LANG_POP([C++])
+
+        m4_ifdef([PKG_CHECK_MODULES], [
+            PKG_CHECK_MODULES([GRPC], [grpc++ >= 1.40])
+            PKG_CHECK_MODULES([PROTOBUF], [protobuf])
+        ], [
+            AC_MSG_ERROR([--with-oteotcollectorl needs pkg-config autoconf macros (pkg.m4); install pkg-config/pkgconf and re-run autoreconf])
+        ])
+
+        dnl Check / grpc_cpp_plugin (build-time codegen tools)
+        AC_ARG_VAR([PROTOC], [Path to the protoc compiler])
+        AC_PATH_PROG([PROTOC], [protoc], [no])
+        AS_IF([test "x$PROTOC" = "xno"],
+            [AC_MSG_ERROR([protoc not found; required by --with-otcollector. Install protobuf-compiler (or equivalent) and re-run configure.])])
+
+        AC_ARG_VAR([GRPC_CPP_PLUGIN], [Path to the grpc_cpp_plugin protoc plugin])
+        AC_PATH_PROG([GRPC_CPP_PLUGIN], [grpc_cpp_plugin], [no])
+        AS_IF([test "x$GRPC_CPP_PLUGIN" = "xno"],
+            [AC_MSG_ERROR([grpc_cpp_plugin not found; required by --with-otcollector. Install grpc-cpp-plugin/grpc-plugins (or equivalent) and re-run configure.])])
+
+        dnl Optionally sanity-check protoc version matches libprotobuf
+        protoc_version=`$PROTOC --version | sed 's/^libprotoc //'`
+        AC_MSG_NOTICE([using protoc $protoc_version at $PROTOC])
+        AC_MSG_NOTICE([using grpc_cpp_plugin at $GRPC_CPP_PLUGIN])
+
+        OTEL_CFLAGS="$GRPC_CFLAGS $PROTOBUF_CFLAGS"
+        OTEL_LIBS="$GRPC_LIBS $PROTOBUF_LIBS -lstdc++"
+        AC_SUBST(OTEL_CFLAGS)
+        AC_SUBST(OTEL_LIBS)
+
+        AC_DEFINE([HAVE_OTEL], [1], [Define to 1 if built with OTLP/gRPC event collector support])
+    fi
+
+    AM_CONDITIONAL([HAVE_OTEL], [test "x$with_otel" != "xno"])
 fi
 
 SERVER_LDFLAGS="$SERVER_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
