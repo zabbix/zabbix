@@ -1,0 +1,191 @@
+zabbix_export:
+  version: '7.4'
+  media_types:
+    - name: Plivo SMS/WhatsApp
+      type: WEBHOOK
+      parameters:
+        # ── Plivo credentials and settings ──────────────────────────────
+        - name: auth_id
+          value: '{$PLIVO.AUTH_ID}'
+        - name: auth_token
+          value: '{$PLIVO.AUTH_TOKEN}'
+        - name: message_type
+          value: 'sms'
+        - name: from_number
+          value: '<PLACE YOUR FROM NUMBER>'
+        # ── Message-specific parameters ────────────────────────────────
+        - name: to_number
+          value: '{ALERT.SENDTO}'
+        - name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        - name: alert_message
+          value: '{ALERT.MESSAGE}'
+        - name: event_id
+          value: '{EVENT.ID}'
+        - name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
+        - name: event_source
+          value: '{EVENT.SOURCE}'
+        - name: event_value
+          value: '{EVENT.VALUE}'
+        # optional HTTP proxy
+        - name: http_proxy
+          value: ''
+      status: DISABLED
+      attempts: '3'
+      max_sessions: '0'
+      process_tags: 'NO'
+      script: |
+        /**
+         * Plivo SMS/WhatsApp webhook for Zabbix
+         * Supports both SMS and WhatsApp via Plivo API
+         * Docs: https://www.plivo.com/docs/messaging/api/message/send-a-message
+         */
+        try {
+            var params = JSON.parse(value),
+                request = new HttpRequest(),
+                response,
+                apiUrl,
+                payload,
+                messageType;
+
+            /* Proxy support */
+            if (typeof params.http_proxy === 'string' && params.http_proxy.trim() !== '') {
+                request.setProxy(params.http_proxy);
+            }
+
+            /* Basic sanity checks */
+            if (typeof params.auth_id !== 'string' || params.auth_id.trim() === '') {
+                throw 'Parameter "auth_id" is missing';
+            }
+            if (typeof params.auth_token !== 'string' || params.auth_token.trim() === '') {
+                throw 'Parameter "auth_token" is missing';
+            }
+            if (typeof params.from_number !== 'string' || params.from_number.trim() === '' || params.from_number === '<PLACE YOUR FROM NUMBER>') {
+                throw 'Parameter "from_number" is not set';
+            }
+            if (typeof params.to_number !== 'string' || params.to_number.trim() === '') {
+                throw 'Parameter "to_number" is empty (did you set "Send to" field?)';
+            }
+
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-3.';
+            }
+
+            if (params.event_value !== '0' && params.event_value !== '1'
+                && (params.event_source === '0' || params.event_source === '3')) {
+                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+            }
+
+            if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
+                params.event_nseverity = '0';
+            }
+
+            /* Determine message type and API endpoint */
+            messageType = (typeof params.message_type === 'string') ? params.message_type.toLowerCase() : 'sms';
+            
+            if (['sms', 'whatsapp'].indexOf(messageType) === -1) {
+                throw 'Invalid message_type: "' + messageType + '". Must be "sms" or "whatsapp"';
+            }
+            
+            /* Plivo uses same endpoint for both SMS and WhatsApp */
+            apiUrl = 'https://api.plivo.com/v1/Account/' + params.auth_id + '/Message/';
+
+            /* Build JSON payload */
+            var messageBody = (params.alert_subject ? params.alert_subject + '\n' : '') + params.alert_message;
+            
+            var payloadObj = {
+                src: params.from_number,
+                dst: params.to_number,
+                text: messageBody,
+                type: messageType  // Plivo API requires 'type' parameter: 'sms', 'mms', or 'whatsapp'
+            };
+
+            /* WhatsApp-specific formatting */
+            if (messageType === 'whatsapp') {
+                /* WhatsApp supports basic formatting */
+                payloadObj.text = messageBody
+                    .replace(/\*([^*]+)\*/g, '*$1*')  // Keep bold formatting
+                    .replace(/Problem:/g, '*Problem:*')
+                    .replace(/Resolved:/g, '*Resolved:*');
+            }
+
+            payload = JSON.stringify(payloadObj);
+
+            /* Prepare HTTP request */
+            request.addHeader('Content-Type: application/json');
+            request.setBasicAuth(params.auth_id, params.auth_token);
+
+            Zabbix.log(4, '[ Plivo ' + messageType.toUpperCase() + ' ] Sending POST to ' + apiUrl + ' with body: ' + payload);
+            response = request.post(apiUrl, payload);
+            Zabbix.log(4, '[ Plivo ' + messageType.toUpperCase() + ' ] Response code ' + request.getStatus() + ': ' + response);
+
+            if (request.getStatus() >= 200 && request.getStatus() < 300) {
+                return 'OK';
+            }
+
+            throw 'HTTP ' + request.getStatus() + ' - ' + response;
+        }
+        catch (error) {
+            Zabbix.log(4, '[ Plivo Webhook ] Plivo notification failed: ' + error);
+            throw 'Plivo notification failed: ' + error;
+        }
+      description: |
+        Please refer to setup guide here: https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/plivo
+
+        Set auth_id and auth_token parameters to your Plivo credentials.
+        Set message_type to 'sms' or 'whatsapp'.
+        When assigning Plivo media to the Zabbix user - add destination phone number into send to field.
+      message_templates:
+        - event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: 'Problem: {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        - event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        - event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+
+            Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
+        - event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        - event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT} 
