@@ -117,7 +117,14 @@ class CColorPickerElement extends CElement {
 	 * @return CElement
 	 */
 	public function open() {
-		$this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one()->click();
+		$button = $this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one();
+
+		// The color picker closes itself on any scroll event. WebDriver scrolls the button into view when clicking it,
+		// and that scroll would dismiss the just-opened dialog. Scroll the button into view first
+		// so the click itself triggers no scroll.
+		$button->scrollIntoView();
+		$button->click();
+
 		return (new CElementQuery('id:color_picker'))->waitUntilVisible()->one();
 	}
 
