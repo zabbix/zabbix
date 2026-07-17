@@ -343,6 +343,11 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					'Unknown' => '1'
 				]
 			],
+			'Host card listener' => null,
+			'Item card listener' => [
+				'Hostname' => self::FIRST_HOST_NAME,
+				'Last value' => 3
+			],
 			'Item navigator listener' => [
 				self::FIRST_HOST_NAME => [
 					'severity' => 'info',
@@ -359,11 +364,6 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					'index' => 4,
 					'count' => 1
 				]
-			],
-			'Host card listener' => null,
-			'Item card listener' => [
-				'Hostname' => self::FIRST_HOST_NAME,
-				'Last value' => 3
 			],
 			'Gauge listener' => [
 				'class' => 'svg-gauge-value',
