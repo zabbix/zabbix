@@ -43,6 +43,7 @@ class CTrigger extends CTriggerGeneral {
 	 * @param array $options['hostids']
 	 * @param array $options['groupids']
 	 * @param array $options['triggerids']
+	 * @param array $options['maintenanceids']
 	 * @param array $options['status']
 	 * @param bool  $options['editable']
 	 * @param array $options['count']
@@ -69,6 +70,7 @@ class CTrigger extends CTriggerGeneral {
 			'templateids'					=> null,
 			'hostids'						=> null,
 			'triggerids'					=> null,
+			'maintenanceids'				=> null,
 			'itemids'						=> null,
 			'functions'						=> null,
 			'inherited'						=> null,
@@ -198,6 +200,18 @@ class CTrigger extends CTriggerGeneral {
 			zbx_value2array($options['triggerids']);
 
 			$sqlParts['where']['triggerid'] = dbConditionInt('t.triggerid', $options['triggerids']);
+		}
+
+		// maintenanceids
+		if ($options['maintenanceids'] !== null) {
+			zbx_value2array($options['maintenanceids']);
+
+			$sqlParts['join']['mt'] = ['table' => 'maintenance_triggers', 'using' => 'triggerid'];
+			$sqlParts['where'][] = dbConditionInt('mt.maintenanceid', $options['maintenanceids']);
+
+			if ($options['groupCount']) {
+				$sqlParts['group']['maintenanceid'] = 'mt.maintenanceid';
+			}
 		}
 
 		// itemids
