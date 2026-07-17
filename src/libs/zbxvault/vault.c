@@ -142,7 +142,7 @@ int	zbx_vault_validate_config(const zbx_config_vault_t *conf, const char *dbuser
 			{
 				*error = zbx_strdup(*error, "either \"VaultToken\" or \"VaultAppRoleID\""
 						" configuration parameter or corresponding environment variable"
-						" should be defined for HashiCorp vault but not both");
+						" can be defined for HashiCorp vault but not both");
 				return FAIL;
 			}
 
@@ -175,8 +175,8 @@ int	zbx_vault_validate_config(const zbx_config_vault_t *conf, const char *dbuser
 	{
 		if (NULL != conf->token)
 		{
-			*error = zbx_strdup(*error, "configuration parameter \"VaultToken\" cannot be used"
-					" with CyberArk vault");
+			*error = zbx_strdup(*error, "configuration parameter \"VaultToken\" or \"VAULT_TOKEN\""
+					" environment variable cannot be used with CyberArk vault");
 			return FAIL;
 		}
 

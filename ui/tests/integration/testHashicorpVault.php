@@ -519,8 +519,8 @@ class testHashicorpVault extends CIntegrationTest {
 		$this->startServerAndExpectVaultError([
 			'Vault' => 'CyberArk',
 			'VaultToken' => self::$static_token
-		], '"Vault" value "CyberArk" cannot be used when "VaultToken" configuration parameter or '.
-				'"VAULT_TOKEN" environment variable is defined'
+		], 'configuration parameter "VaultToken" or "VAULT_TOKEN" environment variable ' .
+				"cannot be used with CyberArk vault'
 		);
 	}
 
