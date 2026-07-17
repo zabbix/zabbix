@@ -59,15 +59,15 @@ class CControllerCepRuleEdit extends CController {
 	protected function doAction(): void {
 		if ($this->hasInput('cepruleid')) {
 			$rules = (new CFormValidator(
-				CControllerCepRuleGeneral::getValidationRules(existing: true)
+				CControllerCepRuleUpdate::getValidationRules()
 			))->getRules();
 			$rules_for_clone = (new CFormValidator(
-				CControllerCepRuleGeneral::getValidationRules(existing: false)
+				CControllerCepRuleCreate::getValidationRules()
 			))->getRules();
 		}
 		else {
 			$rules = (new CFormValidator(
-				CControllerCepRuleGeneral::getValidationRules(existing: false)
+				CControllerCepRuleCreate::getValidationRules()
 			))->getRules();
 			$rules_for_clone = $rules;
 		}
