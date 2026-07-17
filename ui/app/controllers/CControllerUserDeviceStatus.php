@@ -63,7 +63,7 @@ class CControllerUserDeviceStatus extends CController {
 		$output = [];
 
 		if ($device) {
-			$success = ['title' => _('Device linked')];
+			$success = ['title' => _('Device added')];
 
 			if ($messages = get_and_clear_messages()) {
 				$success['messages'] = array_column($messages, 'message');

@@ -183,6 +183,12 @@ window.user_device_create_popup = new class {
 				}
 
 				if ('success' in response && this.#device_uuid) {
+					postMessageError(response.success.title);
+
+					if ('messages' in response.success) {
+						postMessageDetails('success', response.success.messages);
+					}
+
 					this.#device_uuid = null;
 					overlayDialogueDestroy(this.#overlay.dialogueid);
 				}
