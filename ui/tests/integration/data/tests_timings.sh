@@ -56,7 +56,7 @@ declare -A BASELINE_TIMES=(
   [testScriptItems]=10
   [testAutoregistration]=10
   [testUserMacrosWithContext]=10
-  [testHashicorpVault]=10
+  [testHashicorpVault]=45
   [testGraphLinking]=8
   [testFunctions]=3
 )
