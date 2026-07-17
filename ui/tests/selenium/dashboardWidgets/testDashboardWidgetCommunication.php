@@ -343,11 +343,6 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					'Unknown' => '1'
 				]
 			],
-			'Host card listener' => null,
-			'Item card listener' => [
-				'Hostname' => self::FIRST_HOST_NAME,
-				'Last value' => 3
-			],
 			'Item navigator listener' => [
 				self::FIRST_HOST_NAME => [
 					'severity' => 'info',
@@ -364,6 +359,11 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					'index' => 4,
 					'count' => 1
 				]
+			],
+			'Host card listener' => null,
+			'Item card listener' => [
+				'Hostname' => self::FIRST_HOST_NAME,
+				'Last value' => 3
 			],
 			'Gauge listener' => [
 				'class' => 'svg-gauge-value',
@@ -4029,13 +4029,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 			);
 
 			if ($field) {
-				try {
-					$widget_form = $listener_widget->edit();
-				}
-				catch (\Exception $e) {
-					var_dump($listener_name);
-					throw $e;
-				}
+				$widget_form = $listener_widget->edit();
 
 				if (in_array($listener_name, ['SVG graph listener', 'Pie chart listener']) && $field === 'Item') {
 					$this->assertEquals('Unavailable widget', $widget_form->query('xpath:.//td[contains(@class,"table-col-name")]')
