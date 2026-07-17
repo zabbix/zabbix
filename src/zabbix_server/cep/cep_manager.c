@@ -477,6 +477,9 @@ static void	cep_manager_deregister_blocking_task_event(zbx_cep_manager_t *manage
 	if (CEP_EVENT_OPEN == task->event_op)
 	{
 		zbx_hashset_remove(&manager->blocker_events, &task->db_event->eventid);
+
+		if (NULL != task->hevent)
+			cep_event_handle_set_committed(task->hevent);
 	}
 
 	if (CEP_EVENT_OPEN == task->event_op || CEP_EVENT_CLOSE == task->event_op)

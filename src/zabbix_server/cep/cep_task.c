@@ -103,6 +103,7 @@ zbx_mw_task_t	*cep_create_task_event(zbx_db_event *event)
 	task->obj_value = TRIGGER_VALUE_NONE;
 	zbx_vector_cep_event_update_create(&task->updates);
 	task->event = NULL;
+	task->hevent = NULL;
 
 	return (zbx_mw_task_t *)task;
 }
@@ -178,6 +179,9 @@ static void	cep_task_event_clear(zbx_cep_task_event_t *task)
 
 	if (NULL != task->event)
 		zbx_cep_event_release(task->event);
+
+	if (NULL != task->hevent)
+		zbx_cep_event_handle_release(task->hevent);
 }
 
 /******************************************************************************

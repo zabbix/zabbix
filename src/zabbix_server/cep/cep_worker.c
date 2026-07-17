@@ -484,6 +484,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 
 	task->event_op = CEP_EVENT_OPEN;
 	task->event = cep_event_addref(event);
+	task->hevent = zbx_cep_event_handle_addref(h);
 
 	if (0 != zbx_dc_local_get_itservices_num() && CEP_ACTION_DISABLED != task->action_state)
 	{
@@ -652,6 +653,7 @@ static void	cep_worker_open_internal_event(zbx_cep_task_event_t *task)
 
 	task->event_op = CEP_EVENT_OPEN;
 	task->event = NULL;
+	task->hevent = NULL;
 
 	return;
 }

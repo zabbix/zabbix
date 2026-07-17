@@ -70,6 +70,7 @@ typedef struct
 							/*       open event - created event     */
 							/*       close event - closed events    */
 	zbx_cep_event_t			*event;		/* out - created event */
+	zbx_cep_event_handle_t		hevent;		/* out - created event handle */
 }
 zbx_cep_task_event_t;
 
