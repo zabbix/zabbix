@@ -158,9 +158,7 @@ class CControllerCepRuleEdit extends CController {
 				$condition['type'] = CCepRuleHelper::CONDITION_TAG;
 			}
 
-			if ($condition['type'] == CCepRuleHelper::CONDITION_TAG) {
-				$condition['tag_operator'] = $condition['operator'];
-			}
+			$condition['tag_operator'] = $condition['operator'];
 
 			return $condition;
 		}, $conditions);
