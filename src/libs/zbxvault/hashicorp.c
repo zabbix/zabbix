@@ -105,50 +105,53 @@ fail:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get token information from vault /v1/auth/token/lookup-self       *
+ *          endpoint                                                          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     vault_url                - [IN]                                        *
+ *     token                    - [IN]                                        *
+ *     ssl_cert_file            - [IN]                                        *
+ *     ssl_key_file             - [IN]                                        *
+ *     config_source_ip         - [IN]                                        *
+ *     config_ssl_ca_location   - [IN]                                        *
+ *     config_ssl_cert_location - [IN]                                        *
+ *     config_ssl_key_location  - [IN]                                        *
+ *     timeout                  - [IN]                                        *
+ *     out                      - [OUT] pointer to JSON response from vault.  *
+ *                                      Must be deallocated by caller.        *
+ *     response_code            - [OUT] HTTP response code                    *
+ *     error                    - [OUT] error message. Must be deallocated by *
+ *                                      caller.                               *
+ *                                                                            *
+ * Return value: SUCCEED - HTTP request succeeded, but token lookup-self may  *
+ *                         have succeeded or failed. Examine 'response_code'  *
+ *                         and 'out' to get token lookup-self result.         *
+ *               FAIL - HTTP request failed (see 'error' message). No results *
+ *                      from token lookup-self.                               *
+ *                                                                            *
+ * Comments: token lookup-self result and error handling ('out' and           *
+ *           'response_code') are left to caller because they depend on       *
+ *           caller needs.                                                    *
+ *                                                                            *
+ ******************************************************************************/
 static int	zbx_vault_token_lookup_self(const char *vault_url, const char *token,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, long timeout, int *vault_ret, char **error)
+		const char *config_ssl_key_location, long timeout, char **out, long *response_code,
+		char **error)
 {
-	char	*out = NULL, *url, header[MAX_STRING_LEN];
-	int	ret = FAIL;
-	long	response_code;
+	char	header[MAX_STRING_LEN];
+	char	*url = zbx_dsprintf(NULL, "%s/v1/auth/token/lookup-self", vault_url);
 
 	zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s", token);
-	url = zbx_dsprintf(NULL, "%s/v1/auth/token/lookup-self", vault_url);
 
-	if (SUCCEED != zbx_http_req(url, header, timeout, ssl_cert_file, ssl_key_file, config_source_ip,
-			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &out,
-			NULL, &response_code, error))
-	{
-		goto out;
-	}
-
-	if (ZBX_HTTP_STATUS_CODE_OK == response_code)
-	{
-		*error = zbx_dsprintf(*error, "token is valid but lacks required policy");
-	}
-	else if (ZBX_HTTP_STATUS_CODE_FORBIDDEN == response_code)
-	{
-		if (NULL != vault_ret)
-		{
-			*vault_ret = FAIL;
-			*error = zbx_dsprintf(*error, "AppRole token is likely expired or revoked, re-login initiated");
-		}
-		else
-		{
-			*error = zbx_dsprintf(*error, "AppRole token is expired or revoked");
-		}
-
-		ret = SUCCEED;
-	}
-	else
-	{
-		*error = zbx_dsprintf(*error, "Vault token lookup-self failed with code \"%ld\"", response_code);
-	}
-out:
+	int	ret = zbx_http_req(url, header, timeout, ssl_cert_file, ssl_key_file, config_source_ip,
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, out,
+			NULL, response_code, error);
 	zbx_free(url);
-	zbx_free(out);
 
 	return ret;
 }
@@ -233,12 +236,38 @@ int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const
 	{
 		if (NULL != approle && ZBX_HTTP_STATUS_CODE_FORBIDDEN == response_code)
 		{
-			zbx_free(out);
+			char	*out2 = NULL, *errmsg = NULL;
+			long	resp_code;
 
-			(void)zbx_vault_token_lookup_self(vault_url, token, ssl_cert_file, ssl_key_file,
+			if (SUCCEED != zbx_vault_token_lookup_self(vault_url, token, ssl_cert_file, ssl_key_file,
 					config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
-					config_ssl_key_location, timeout, vault_ret, error);
+					config_ssl_key_location, timeout, &out2, &resp_code, &errmsg))
+			{
+				*error = zbx_dsprintf(*error, "token lookup-self request failed: %s", errmsg);
+				zbx_free(errmsg);
+				goto fail;
+			}
 
+			switch (resp_code)
+			{
+				case ZBX_HTTP_STATUS_CODE_OK:
+					*error = zbx_strdup(*error, "cannot get secrets, token is valid,"
+							" could be problem with policy");
+					break;
+				case ZBX_HTTP_STATUS_CODE_FORBIDDEN:
+					if (NULL != vault_ret)
+						*vault_ret = FAIL;
+
+					*error = zbx_strdup(*error, "approle token is likely expired or revoked"
+							" (lookup-self response code 403)");
+					break;
+				default:
+					*error = zbx_dsprintf(*error, "vault token lookup-self failed with"
+							" code \"%ld\"", resp_code);
+			}
+
+			zbx_free(out2);
+			zbx_free(errmsg);
 			goto fail;
 		}
 
@@ -327,20 +356,14 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 		next_renew = 0;
 	}
 
-	zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s", *token);
-
 	if (0 == (unsigned long)next_renew)
 	{
-		url = zbx_dsprintf(NULL, "%s%s", vault_url, "/v1/auth/token/lookup-self");
-
-		if (SUCCEED != zbx_http_req(url, header, timeout, ssl_cert_file, ssl_key_file, config_source_ip,
-				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &out, NULL,
-				&response_code, &error))
+		if (SUCCEED != zbx_vault_token_lookup_self(vault_url, *token, ssl_cert_file, ssl_key_file,
+				config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
+				config_ssl_key_location, timeout, &out, &response_code, &error))
 		{
 			goto out;
 		}
-
-		zbx_free(url);
 
 		if (ZBX_HTTP_STATUS_CODE_OK != response_code)
 		{
@@ -382,6 +405,8 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 	{
 		zbx_uint64_t	ttl;
 
+		zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s", *token);
+
 		url = zbx_dsprintf(url, "%s%s", vault_url, "/v1/auth/token/renew-self");
 
 		if (SUCCEED != zbx_http_req(url, header, timeout, ssl_cert_file, ssl_key_file,
@@ -395,37 +420,27 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 		{
 			if (NULL != app_role_id && ZBX_HTTP_STATUS_CODE_FORBIDDEN == response_code)
 			{
-				int	vault_ret = SUCCEED;
+				char	*errmsg = NULL;
 
-				zbx_free(out);
-
-				if (SUCCEED == zbx_vault_token_lookup_self(vault_url, *token, ssl_cert_file,
-						ssl_key_file, config_source_ip, config_ssl_ca_location,
-						config_ssl_cert_location, config_ssl_key_location, timeout,
-						&vault_ret, &error))
+				if (SUCCEED == zbx_vault_app_role_login_hashicorp(vault_url, app_role_id,
+						app_secret_id, ssl_cert_file, ssl_key_file, config_source_ip,
+						config_ssl_ca_location, config_ssl_cert_location,
+						config_ssl_key_location, timeout, &errmsg, token))
 				{
-					char	*errmsg = NULL;
-
-					if (SUCCEED == zbx_vault_app_role_login_hashicorp(vault_url, app_role_id,
-							app_secret_id, ssl_cert_file, ssl_key_file, config_source_ip,
-							config_ssl_ca_location, config_ssl_cert_location,
-							config_ssl_key_location, timeout, &errmsg, token))
-					{
-						next_renew = 0;
-						status = SUCCEED;
-						zbx_free(error);
-						goto out;
-					}
-
+					next_renew = 0;
+					status = SUCCEED;
 					zbx_free(error);
-					error = zbx_dsprintf(NULL, "cannot re-login with AppRole method: %s", errmsg);
-					zbx_free(errmsg);
+					goto out;
 				}
+
+				error = zbx_dsprintf(error, "cannot re-login with AppRole method: %s", errmsg);
+				zbx_free(errmsg);
 
 				goto out;
 			}
 
-			error = zbx_dsprintf(NULL, "unsuccessful response code \"%ld\"", response_code);
+			error = zbx_dsprintf(NULL, "unsuccessful response code from renew-self request: \"%ld\"",
+					response_code);
 			goto out;
 		}
 
