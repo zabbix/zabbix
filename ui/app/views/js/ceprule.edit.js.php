@@ -199,7 +199,9 @@ window.ceprule_edit_popup = new class {
 				this.#openOperationPopup(operation, e.target);
 			}
 			else if (e.target.classList.contains('js-operation-remove')) {
-				e.target.closest('tr').remove();
+				const row = e.target.closest('tr');
+				row.nextElementSibling.remove();
+				row.remove();
 				this.form.discoverAllFields();
 			}
 		});
@@ -233,7 +235,10 @@ window.ceprule_edit_popup = new class {
 
 		window['ceprule-window-type'].addEventListener('change', () => this.#handleWindowTypeChanged());
 
-		new CSortable(window['ceprule-operations-table'].querySelector('tbody'), {selector_handle: 'div.drag-icon'});
+		new CSortable(window['ceprule-operations-table'].querySelector('tbody'), {
+			selector_span: ':not(.error-container-row)',
+			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>'
+		});
 
 		// Confirm / cancel dialog.
 		this.#overlay.$dialogue.$footer.get(0).addEventListener('click', (e) => {
@@ -652,13 +657,16 @@ window.ceprule_edit_popup = new class {
 	}
 
 	#editOperationRow(operation) {
-		this.form_element.querySelector(`#ceprule-operations-table [data-sortorder="${operation.sortorder}"]`)
-			.replaceWith(this.#buildOperationRow(operation));
+		const row = this.form_element
+			.querySelector(`#ceprule-operations-table [data-sortorder="${operation.sortorder}"]`);
+
+		row.nextElementSibling.remove();
+		row.replaceWith(this.#buildOperationRow(operation));
 	}
 
 	#addOperationRow(operation) {
 		this.form_element.querySelector('#ceprule-operations-table tbody')
-			.insertAdjacentElement('beforeend', this.#buildOperationRow(operation));
+			.append(this.#buildOperationRow(operation));
 	}
 
 	#buildOperationRow(operation) {
@@ -731,8 +739,18 @@ window.ceprule_edit_popup = new class {
 				type="hidden" value="#{value}"/>
 		`)).evaluate(tag)).join('');
 
-		return this.#operation_row_template
-			.evaluateToElement({execute_when_str, label_str, arguments_str, tags_input_html, ...operation});
+		const template_args = {execute_when_str, label_str, arguments_str, tags_input_html, ...operation};
+		const row = this.#operation_row_template.evaluateToElement(template_args);
+		const error_container_id = `ceprule-operations-${template_args.sortorder}-error-container`;
+		const rows = new DocumentFragment();
+
+		row.querySelector('[name$="[execute_when]"]').setAttribute('data-error-container', error_container_id);
+		rows.append(row);
+		rows.append((new Template(`
+			<tr class="error-container-row"><td colspan="3" id="${error_container_id}"></td></tr>
+		`)).evaluateToElement());
+
+		return rows;
 	}
 
 	#editConditionRow(condition) {
