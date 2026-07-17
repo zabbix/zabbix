@@ -16,7 +16,7 @@
 #define ZABBIX_HISTORY_OPTION_H
 
 #include "zbxtypes.h"
-#include "zbxconfigoption.h"
+#include "zbxcfg.h"
 
 #define HISTORY_PROVIDER_SQL		"sql"	/* default provider */
 #define HISTORY_PROVIDER_ELASTICSEARCH	"elasticsearch"

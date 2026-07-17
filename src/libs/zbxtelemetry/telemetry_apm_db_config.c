@@ -15,7 +15,7 @@
 #include "zbxtelemetry.h"
 
 #include "zbxcommon.h"
-#include "zbxconfigoption.h"
+#include "zbxcfg.h"
 #include "zbxnum.h"
 #include "zbxtypes.h"
 #include "zbxvault.h"

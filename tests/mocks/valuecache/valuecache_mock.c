@@ -27,7 +27,7 @@
 #include "history.h"
 #include "zbxcacheconfig.h"
 #include "zbx_dbversion_constants.h"
-#include "zbxconfigoption.h"
+#include "zbxcfg.h"
 
 #include <setjmp.h>
 #include <cmocka.h>

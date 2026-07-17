@@ -19,7 +19,7 @@
 #include "zbxmockdb.h"
 #include "zbxhistory.h"
 #include "libs/zbxhistory/history_option.h"
-#include "zbxconfigoption.h"
+#include "zbxcfg.h"
 
 static int	history_option_compare(const void *d1, const void *d2)
 {

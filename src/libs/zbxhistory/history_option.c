@@ -123,15 +123,6 @@ int	history_provider_parse_options(const char *conf, char **name, zbx_vector_con
 	return SUCCEED;
 }
 
-void	zbx_config_option_clear_options(zbx_config_option_t *options, int options_num)
-{
-	for (int i = 0; i < options_num; i++)
-	{
-		zbx_free(options[i].name);
-		zbx_free(options[i].value);
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: convert value types option string to bitmask                      *
