@@ -553,7 +553,7 @@ switch ($data['type']) {
 
 				$proxygroup_multiselect = (new CMultiSelect([
 					'name' => 'value',
-					'object_name' => 'proxyGroup',
+					'object_name' => 'proxy_groups',
 					'multiple' => false,
 					'default_value' => 0,
 					'popup' => [
