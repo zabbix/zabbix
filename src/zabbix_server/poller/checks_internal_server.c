@@ -152,7 +152,7 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 
 		SET_UI64_RESULT(result, zbx_dc_get_trigger_count());
 	}
-	if (0 == strcmp(param1, "cep"))			/* zabbix["triggers"] */
+	else if (0 == strcmp(param1, "cep"))			/* zabbix["triggers"] */
 	{
 		if (1 != nparams)
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
