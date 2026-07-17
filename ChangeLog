@@ -1,8 +1,10 @@
 Changes for 6.0.48rc1
 
 New features:
+A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27024] resolved systemrun failing and race conditions (opucka)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.47
