@@ -823,6 +823,31 @@ class CFormValidatorTest extends TestCase {
 				]],
 				null,
 				'[RULES ERROR] Rule "use" should contain an array with up to two elements (Path: /value)'
+			],
+			[
+				['object', 'fields' => [
+					'item_type' => ['string', 'in' => [1 => 'agent', 2 => 'snmp', 3 => 'simple']]
+				]],
+				['type' => 'object', 'fields' => [
+					'item_type' => [['type' => 'string', 'in' => ['agent', 'snmp', 'simple']]]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'item_type' => ['string'],
+					'target_field' => ['string',
+						'when' => [
+							'item_type',
+							'in' => [1 => 'agent', 2 => 'snmp', 3 => 'simple']
+						]
+					]
+				]],
+				['type' => 'object', 'fields' => [
+					'item_type' => [['type' => 'string']],
+					'target_field' => [['type' => 'string', 'when' => [
+						['item_type', 'in' => ['agent', 'snmp', 'simple']]
+					]]]
+				]]
 			]
 		];
 	}
